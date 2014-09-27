@@ -21,8 +21,29 @@ Created by Jacques Lucke
 import bpy
 from animation_nodes_utils import *
 
+class AnimationNodeTree:
+	def __init__(self, nodeTree):
+		self.nodeTree = nodeTree
+		self.nodes = {}
+		for node in nodeTree.nodes:
+			self.nodes[node.name] = AnimationNode(node)
+
+class AnimationNode:
+	def __init__(self, node):
+		self.node = node
+		self.is_updated = False
+		self.input = []
+		self.output = []
+		
+	def getDependencyNodes(self):
+		node = self.node
+		dependencies = []
+		for input in node.inputs:
+			if input.is_linked: dependencies.append[input.links[0].from_node]
+		return dependencies
+
 def executeNodeTree(nodeTree):
-	print("hi")
+	animationNodeTree = AnimationNodeTree(nodeTree)
 	
 class AnimationNodesPanel(bpy.types.Panel):
 	bl_idname = "animation_nodes_panel"
