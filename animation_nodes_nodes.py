@@ -48,7 +48,7 @@ class TextDataOutputNode(Node, AnimationNode):
 		self.inputs.new("NodeSocketString", "Text")
 		
 	def draw_buttons(self, context, layout):
-		layout.prop(self, "objectProperty", text = "Object")
+		layout.label(self.inputs[0].getData())
 		
 class ObjectSelectionNode(Node, AnimationNode):
 	bl_idname = "ObjectSelectionNode"

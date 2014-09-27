@@ -26,22 +26,34 @@ class ObjectSocket(NodeSocket):
 	bl_idname = "ObjectSocket"
 	bl_label = "Object Socket"
 	
-	stringProperty = bpy.props.StringProperty()
+	objectName = bpy.props.StringProperty()
 	
 	def draw(self, context, layout, node, text):
 		if self.is_output or (not self.is_output and not self.is_linked):
 			col = layout.column()
 			row = col.row(align = True)
-			row.prop(self, "stringProperty", text = "")
+			row.prop(self, "objectName", text = "")
 			selector = row.operator("animation_nodes.assign_active_object_to_node", text = "", icon = "EYEDROPPER")
 			selector.nodeTreeName = node.id_data.name
 			selector.nodeName = node.name
+			selector.isOutput = self.is_output
+			selector.socketName = self.name
+			selector.target = "objectName"
 			col.separator()
 		else:
 			layout.label(text)
 		
 	def draw_color(self, context, node):
 		return (0, 0, 0, 1)
+		
+	def getData(self):
+		if self.is_output:
+			return self.objectName
+		else:
+			if self.is_linked:
+				return self.links[0].from_socket.getData()
+			else:
+				return self.objectName
 		
 		
 class AssignActiveObjectToNode(bpy.types.Operator):
@@ -50,6 +62,9 @@ class AssignActiveObjectToNode(bpy.types.Operator):
 	
 	nodeTreeName = bpy.props.StringProperty()
 	nodeName = bpy.props.StringProperty()
+	target = bpy.props.StringProperty()
+	isOutput = bpy.props.BoolProperty()
+	socketName = bpy.props.StringProperty()
 	
 	@classmethod
 	def poll(cls, context):
@@ -57,9 +72,9 @@ class AssignActiveObjectToNode(bpy.types.Operator):
 		
 	def execute(self, context):
 		obj = getActive()
-		bpy.data.node_groups[self.nodeTreeName].nodes[self.nodeName].outputs[0].stringProperty = obj.name
-		print(obj.name)
-		print(bpy.data.node_groups[self.nodeTreeName].nodes[self.nodeName].outputs[0].stringProperty)
+		node = getNode(self.nodeTreeName, self.nodeName)
+		socket = getSocketFromNode(node, self.isOutput, self.socketName)
+		setattr(socket, self.target, obj.name)
 		return {'FINISHED'}
 	
 	
