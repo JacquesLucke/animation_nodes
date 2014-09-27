@@ -27,23 +27,37 @@ class AnimationNodeTree:
 		self.nodes = {}
 		for node in nodeTree.nodes:
 			self.nodes[node.name] = AnimationNode(node)
+			
+	def execute(self):
+		for node in self.nodes.values():
+			node.isUpdated = False
+			
+		for node in self.nodes.values():
+			if not node.isUpdated:
+				self.updateNode(node)
+				
+	def updateNode(self, node):
+		dependencyNames = node.getDependencyNodeNames()
+		for name in dependencyNames:
+			if not self.nodes[name].isUpdated:
+				self.updateNode(self.nodes[name])
+		node.isUpdated = True
+		print(node.node.name)
 
 class AnimationNode:
 	def __init__(self, node):
 		self.node = node
-		self.is_updated = False
+		self.isUpdated = False
 		self.input = []
 		self.output = []
 		
-	def getDependencyNodes(self):
+	def getDependencyNodeNames(self):
 		node = self.node
 		dependencies = []
 		for input in node.inputs:
-			if input.is_linked: dependencies.append[input.links[0].from_node]
+			if input.is_linked: dependencies.append(input.links[0].from_node.name)
 		return dependencies
-
-def executeNodeTree(nodeTree):
-	animationNodeTree = AnimationNodeTree(nodeTree)
+		
 	
 class AnimationNodesPanel(bpy.types.Panel):
 	bl_idname = "animation_nodes_panel"
@@ -72,7 +86,9 @@ class ExecuteNodeTree(bpy.types.Operator):
 		nodeTree = bpy.data.node_groups.get(self.nodeTreeName)
 		if nodeTree is None: return {'FINISHED'}
 		
-		executeNodeTree(nodeTree)
+		animationNodeTree = AnimationNodeTree(nodeTree)
+		animationNodeTree.execute()
+		print()
 		
 		return {'FINISHED'}		
 
