@@ -88,7 +88,8 @@ nodeCategories = [
 		NodeItem("TextBodyOutputNode")
 		]),
 	AnimationNodesCategory("MODIFYSTRINGS", "Modify Strings", items = [
-		NodeItem("CombineStringsNode")
+		NodeItem("CombineStringsNode"),
+		NodeItem("ReplicateStringsNode")
 		]),
 	AnimationNodesCategory("CONVERTTYPES", "Convert", items = [
 		NodeItem("IntToStringConversion")
