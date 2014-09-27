@@ -56,8 +56,11 @@ class TextBodyOutputNode(Node, AnimationNode):
 		self.inputs.new("StringSocket", "Text")
 		
 	def execute(self, input):
-		object = bpy.data.objects[input["Object"]]
-		textObject = bpy.data.curves.get(object.data.name)
+		object = bpy.data.objects.get(input["Object"])
+		textObject = None
+		
+		if object is not None:
+			textObject = bpy.data.curves.get(object.data.name)
 		
 		if textObject is not None:
 			textObject.body = input["Text"]
