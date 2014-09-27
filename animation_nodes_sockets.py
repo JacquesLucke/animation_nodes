@@ -42,6 +42,26 @@ class IntegerSocket(NodeSocket):
 		
 	def getValue(self):
 		return self.number
+		
+class FloatSocket(NodeSocket):
+	bl_idname = "FloatSocket"
+	bl_label = "Float Socket"
+	dataType = "Float"
+	allowedInputTypes = ["Float"]
+	
+	number = bpy.props.FloatProperty(default = 0.0, update = updateHandler)
+	
+	def draw(self, context, layout, node, text):
+		if not self.is_output and not isSocketLinked(self):
+			layout.prop(self, "number", text = text)
+		else:
+			layout.label(text)
+			
+	def draw_color(self, context, node):
+		return (0.4, 0.4, 0.7, 1)
+		
+	def getValue(self):
+		return self.number
 
 class StringSocket(NodeSocket):
 	bl_idname = "StringSocket"
