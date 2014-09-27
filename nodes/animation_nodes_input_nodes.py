@@ -22,11 +22,12 @@ Created by Jacques Lucke
 import bpy
 from bpy.types import NodeTree, Node, NodeSocket
 from animation_nodes_node_helper import AnimationNode
+from animation_nodes_utils import *
 
 
 class IntegerInputNode(Node, AnimationNode):
 	bl_idname = "IntegerInputNode"
-	bl_label = "Integer Input"
+	bl_label = "Integer"
 	
 	intProperty = bpy.props.IntProperty(default = 0)
 	
@@ -44,7 +45,7 @@ class IntegerInputNode(Node, AnimationNode):
 
 class StringInputNode(Node, AnimationNode):
 	bl_idname = "StringInputNode"
-	bl_label = "String Input"
+	bl_label = "String"
 	
 	stringProperty = bpy.props.StringProperty(default = "text")
 	
@@ -62,7 +63,7 @@ class StringInputNode(Node, AnimationNode):
 		
 class ObjectInputNode(Node, AnimationNode):
 	bl_idname = "ObjectInputNode"
-	bl_label = "Object Input"
+	bl_label = "Object"
 	
 	objectName = bpy.props.StringProperty()
 	
@@ -82,6 +83,18 @@ class ObjectInputNode(Node, AnimationNode):
 	def execute(self, input):
 		output = {}
 		output["Object"] = self.objectName
+		return output
+		
+class TimeInfoNode(Node, AnimationNode):
+	bl_idname = "TimeInfoNode"
+	bl_label = "Time Info"
+	
+	def init(self, context):
+		self.outputs.new("IntegerSocket", "Frame")
+		
+	def execute(self, input):
+		output = {}
+		output["Frame"] = getCurrentFrame()
 		return output
 	
 		

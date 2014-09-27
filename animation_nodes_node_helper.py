@@ -81,7 +81,8 @@ nodeCategories = [
 	AnimationNodesCategory("INPUTNODES", "Input Nodes", items = [
 		NodeItem("IntegerInputNode"),
 		NodeItem("StringInputNode"),
-		NodeItem("ObjectInputNode")
+		NodeItem("ObjectInputNode"),
+		NodeItem("TimeInfoNode")
 		]),
 	AnimationNodesCategory("OUTPUTNODES", "Output Nodes", items = [
 		NodeItem("TextBodyOutputNode")

@@ -19,6 +19,7 @@ Created by Jacques Lucke
 '''
 
 import bpy
+from bpy.app.handlers import persistent
 from animation_nodes_utils import *
 
 class AnimationNodeTree:
@@ -86,9 +87,8 @@ class AnimationNode:
 		return dependencies
 		
 	def execute(self):
-		self.output = self.node.execute(self.input)
-		
-	
+		self.output = self.node.execute(self.input)	
+
 class AnimationNodesPanel(bpy.types.Panel):
 	bl_idname = "animation_nodes_panel"
 	bl_label = "Animation Nodes"
@@ -102,25 +102,16 @@ class AnimationNodesPanel(bpy.types.Panel):
 		return len(getAnimationNodeTrees()) > 0
 	
 	def draw(self, context):
-		layout = self.layout
-		execute = layout.operator("animation_nodes.execute_node_tree")
-		execute.nodeTreeName = getAnimationNodeTrees()[0].name
-
-class ExecuteNodeTree(bpy.types.Operator):
-	bl_idname = "animation_nodes.execute_node_tree"
-	bl_label = "Execute Node Tree"
-	
-	nodeTreeName = bpy.props.StringProperty()
-			
-	def execute(self, context):
-		nodeTree = bpy.data.node_groups.get(self.nodeTreeName)
-		if nodeTree is None: return {'FINISHED'}
+		pass
 		
+@persistent
+def updateAll(self):
+	nodeTrees = getAnimationNodeTrees()
+	for nodeTree in nodeTrees:		
 		animationNodeTree = AnimationNodeTree(nodeTree)
 		animationNodeTree.execute()
-		
-		return {'FINISHED'}		
-
+	
+bpy.app.handlers.frame_change_post.append(updateAll)
 		
 		
 # register
