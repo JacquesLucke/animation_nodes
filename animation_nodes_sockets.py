@@ -37,6 +37,9 @@ class StringSocket(NodeSocket):
 	def draw_color(self, context, node):
 		return (1, 1, 1, 1)
 		
+	def getValue(self):
+		return self.string
+		
 class ObjectSocket(NodeSocket):
 	bl_idname = "ObjectSocket"
 	bl_label = "Object Socket"
@@ -60,6 +63,9 @@ class ObjectSocket(NodeSocket):
 		
 	def draw_color(self, context, node):
 		return (0, 0, 0, 1)
+		
+	def getValue(self):
+		return self.objectName
 	
 	
 class AssignActiveObjectToNode(bpy.types.Operator):

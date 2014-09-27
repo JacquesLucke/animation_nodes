@@ -41,22 +41,38 @@ class AnimationNodeTree:
 		for name in dependencyNames:
 			if not self.nodes[name].isUpdated:
 				self.updateNode(self.nodes[name])
+		self.generateInputList(node)
+		node.execute()
 		node.isUpdated = True
-		print(node.node.name)
+		
+	def generateInputList(self, node):
+		node.input = {}
+		for socket in node.node.inputs:
+			value = None
+			if socket.is_linked:
+				parentNode = self.nodes[socket.links[0].from_node.name]
+				value = parentNode.output[socket.links[0].from_socket.name]
+			else:
+				value = socket.getValue()
+			node.input[socket.name] = value
 
 class AnimationNode:
 	def __init__(self, node):
 		self.node = node
 		self.isUpdated = False
-		self.input = []
-		self.output = []
+		self.input = {}
+		self.output = {}
 		
 	def getDependencyNodeNames(self):
 		node = self.node
 		dependencies = []
 		for input in node.inputs:
+			# TODO: check for reroute nodes
 			if input.is_linked: dependencies.append(input.links[0].from_node.name)
 		return dependencies
+		
+	def execute(self):
+		self.output = self.node.execute(self.input)
 		
 	
 class AnimationNodesPanel(bpy.types.Panel):
@@ -88,7 +104,6 @@ class ExecuteNodeTree(bpy.types.Operator):
 		
 		animationNodeTree = AnimationNodeTree(nodeTree)
 		animationNodeTree.execute()
-		print()
 		
 		return {'FINISHED'}		
 

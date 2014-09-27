@@ -41,14 +41,29 @@ class StringInputNode(Node, AnimationNode):
 	def draw_buttons(self, context, layout):
 		layout.prop(self, "stringProperty", text = "")
 		
+	def execute(self, input):
+		output = {}
+		output["Text"] = self.stringProperty
+		return output
 		
-class TextDataOutputNode(Node, AnimationNode):
-	bl_idname = "TextDataOutputNode"
-	bl_label = "Text Data Output"
+		
+class TextBodyOutputNode(Node, AnimationNode):
+	bl_idname = "TextBodyOutputNode"
+	bl_label = "Text Body Output"
 	
 	def init(self, context):
 		self.inputs.new("ObjectSocket", "Object")
 		self.inputs.new("StringSocket", "Text")
+		
+	def execute(self, input):
+		object = bpy.data.objects[input["Object"]]
+		textObject = bpy.data.curves.get(object.data.name)
+		
+		if textObject is not None:
+			textObject.body = input["Text"]
+		
+		output = {}
+		return output
 		
 class ObjectSelectionNode(Node, AnimationNode):
 	bl_idname = "ObjectSelectionNode"
@@ -68,6 +83,11 @@ class ObjectSelectionNode(Node, AnimationNode):
 		selector.nodeName = self.name
 		selector.target = "objectName"
 		col.separator()
+		
+	def execute(self, input):
+		output = {}
+		output["Object"] = self.objectName
+		return output
 		
 		
 
@@ -102,7 +122,7 @@ nodeCategories = [
 		NodeItem("ObjectSelectionNode")
 		]),
 	AnimationNodesCategory("OUTPUTNODES", "Output Nodes", items = [
-		NodeItem("TextDataOutputNode")
+		NodeItem("TextBodyOutputNode")
 		])
 	]
 	
