@@ -26,7 +26,8 @@ class AnimationNodeTree:
 		self.nodeTree = nodeTree
 		self.nodes = {}
 		for node in nodeTree.nodes:
-			self.nodes[node.name] = AnimationNode(node)
+			if node.type != "REROUTE":
+				self.nodes[node.name] = AnimationNode(node)
 			
 	def execute(self):
 		for node in self.nodes.values():
@@ -49,9 +50,9 @@ class AnimationNodeTree:
 		node.input = {}
 		for socket in node.node.inputs:
 			value = None
-			if socket.is_linked:
-				parentNode = self.nodes[socket.links[0].from_node.name]
-				value = parentNode.output[socket.links[0].from_socket.name]
+			if isSocketLinked(socket):
+				parentNode = self.nodes[getOriginSocket(socket).node.name]
+				value = parentNode.output[getOriginSocket(socket).name]
 			else:
 				value = socket.getValue()
 			node.input[socket.name] = value
@@ -66,9 +67,8 @@ class AnimationNode:
 	def getDependencyNodeNames(self):
 		node = self.node
 		dependencies = []
-		for input in node.inputs:
-			# TODO: check for reroute nodes
-			if input.is_linked: dependencies.append(input.links[0].from_node.name)
+		for socket in node.inputs:
+			if isSocketLinked(socket): dependencies.append(getOriginSocket(socket).node.name)
 		return dependencies
 		
 	def execute(self):

@@ -44,7 +44,7 @@ def isSocketLinked(socket):
 	return origin is not None and origin is not socket
 		
 def getOriginSocket(socket):
-	if socket.is_linked:
+	if hasLinks(socket):
 		fromSocket = socket.links[0].from_socket
 		if fromSocket.node.type == "REROUTE":
 			return getOriginSocket(fromSocket.node.inputs[0])
@@ -55,3 +55,6 @@ def getOriginSocket(socket):
 			return None
 		else:
 			return socket
+		
+def hasLinks(socket):
+	return len(socket.links) > 0
