@@ -104,6 +104,9 @@ class AnimationNodesPanel(bpy.types.Panel):
 	def draw(self, context):
 		pass
 		
+def updateHandler(self, context):
+	updateAll(bpy.context.scene)
+		
 @persistent
 def updateAll(scene):
 	nodeTrees = getAnimationNodeTrees()

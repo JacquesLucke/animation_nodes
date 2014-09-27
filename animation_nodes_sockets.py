@@ -21,6 +21,7 @@ Created by Jacques Lucke
 import bpy
 from bpy.types import NodeTree, Node, NodeSocket
 from animation_nodes_utils import *
+from animation_nodes_execution import updateHandler
 
 class IntegerSocket(NodeSocket):
 	bl_idname = "IntegerSocket"
@@ -28,7 +29,7 @@ class IntegerSocket(NodeSocket):
 	dataType = "Integer"
 	allowedInputTypes = ["Integer"]
 	
-	number = bpy.props.IntProperty(default = 0)
+	number = bpy.props.IntProperty(default = 0, update = updateHandler)
 	
 	def draw(self, context, layout, node, text):
 		if not self.is_output and not isSocketLinked(self):
@@ -48,7 +49,7 @@ class StringSocket(NodeSocket):
 	dataType = "String"
 	allowedInputTypes = ["String", "Object"]
 	
-	string = bpy.props.StringProperty(default = "text")
+	string = bpy.props.StringProperty(default = "text", update = updateHandler)
 	
 	def draw(self, context, layout, node, text):
 		if not self.is_output and not isSocketLinked(self):
@@ -69,7 +70,7 @@ class ObjectSocket(NodeSocket):
 	dataType = "Object"
 	allowedInputTypes = ["Object", "String"]
 	
-	objectName = bpy.props.StringProperty()
+	objectName = bpy.props.StringProperty(update = updateHandler)
 	
 	def draw(self, context, layout, node, text):
 		if not self.is_output and not isSocketLinked(self):

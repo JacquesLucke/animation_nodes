@@ -23,13 +23,14 @@ import bpy
 from bpy.types import NodeTree, Node, NodeSocket
 from animation_nodes_node_helper import AnimationNode
 from animation_nodes_utils import *
+from animation_nodes_execution import updateHandler
 
 
 class IntegerInputNode(Node, AnimationNode):
 	bl_idname = "IntegerInputNode"
 	bl_label = "Integer"
 	
-	intProperty = bpy.props.IntProperty(default = 0)
+	intProperty = bpy.props.IntProperty(default = 0, update = updateHandler)
 	
 	def init(self, context):
 		self.outputs.new("IntegerSocket", "Number")
@@ -47,7 +48,7 @@ class StringInputNode(Node, AnimationNode):
 	bl_idname = "StringInputNode"
 	bl_label = "String"
 	
-	stringProperty = bpy.props.StringProperty(default = "text")
+	stringProperty = bpy.props.StringProperty(default = "text", update = updateHandler)
 	
 	def init(self, context):
 		self.outputs.new("StringSocket", "Text")
@@ -65,7 +66,7 @@ class ObjectInputNode(Node, AnimationNode):
 	bl_idname = "ObjectInputNode"
 	bl_label = "Object"
 	
-	objectName = bpy.props.StringProperty()
+	objectName = bpy.props.StringProperty(update = updateHandler)
 	
 	def init(self, context):
 		self.outputs.new("ObjectSocket", "Object")
