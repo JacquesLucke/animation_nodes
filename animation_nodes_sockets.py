@@ -22,9 +22,12 @@ import bpy
 from bpy.types import NodeTree, Node, NodeSocket
 from animation_nodes_utils import *
 
+
 class StringSocket(NodeSocket):
 	bl_idname = "StringSocket"
 	bl_label = "String Socket"
+	dataType = "String"
+	allowedInputTypes = ["String", "Object"]
 	
 	string = bpy.props.StringProperty(default = "text")
 	
@@ -40,9 +43,12 @@ class StringSocket(NodeSocket):
 	def getValue(self):
 		return self.string
 		
+		
 class ObjectSocket(NodeSocket):
 	bl_idname = "ObjectSocket"
 	bl_label = "Object Socket"
+	dataType = "Object"
+	allowedInputTypes = ["Object", "String"]
 	
 	objectName = bpy.props.StringProperty()
 	

@@ -30,12 +30,26 @@ class AnimationNodeTree:
 				self.nodes[node.name] = AnimationNode(node)
 			
 	def execute(self):
+		self.cleanup()
+		
 		for node in self.nodes.values():
 			node.isUpdated = False
 			
 		for node in self.nodes.values():
 			if not node.isUpdated:
 				self.updateNode(node)
+				
+	def cleanup(self):
+		links = self.nodeTree.links
+		for link in links:
+			if link.to_node == "REROUTE":
+				continue
+			if not isSocketLinked(link.to_socket):
+				continue
+			toSocket = link.to_socket
+			fromSocket = getOriginSocket(toSocket)
+			if fromSocket.dataType not in toSocket.allowedInputTypes:
+				self.nodeTree.links.remove(link)
 				
 	def updateNode(self, node):
 		dependencyNames = node.getDependencyNodeNames()
