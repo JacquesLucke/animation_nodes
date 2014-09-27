@@ -18,37 +18,31 @@ Created by Jacques Lucke
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import bpy, sys, os
+import bpy
 from bpy.types import NodeTree, Node, NodeSocket
-sys.path.append(os.path.dirname(__file__))
 
-import animation_nodes_tree
-import animation_nodes_nodes
-import animation_nodes_sockets
-
-bl_info = {
-	"name":        "Animation Nodes",
-	"description": "",
-	"author":      "Jacques Lucke",
-	"version":     (0, 0, 1),
-	"blender":     (2, 7, 2),
-	"location":    "Node Editor",
-	"category":    "Animation",
-	"warning":	   "pre alpha"
-	}
+class ObjectSocket(NodeSocket):
+	bl_idname = "ObjectSocket"
+	bl_label = "Object Socket"
 	
-# register
-##################################
-
+	stringProperty = bpy.props.StringProperty()
+	
+	def draw(self, context, layout, node, text):
+		if self.is_output or (not self.is_output and not self.is_linked):
+			col = layout.column()
+			row = col.row(align = True)
+			row.prop(self, "stringProperty", text = "")
+			row.operator("mesh.primitive_cube_add", text = "", icon = "EYEDROPPER")
+			col.separator()
+		else:
+			layout.label(text)
+		
+	def draw_color(self, context, node):
+		return (0, 0, 0, 1)
+	
+	
 def register():
-	animation_nodes_tree.register()
-	animation_nodes_nodes.register()
-	animation_nodes_sockets.register()
+	bpy.utils.register_module(__name__)
 
 def unregister():
-	animation_nodes_tree.unregister()
-	animation_nodes_nodes.unregister()
-	animation_nodes_sockets.unregister()
-
-if __name__ == "__main__":
-	register()
+	bpy.utils.unregister_module(__name__)

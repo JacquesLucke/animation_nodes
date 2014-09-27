@@ -38,6 +38,27 @@ class StringInputNode(Node, AnimationNode):
 		
 	def draw_buttons(self, context, layout):
 		layout.prop(self, "stringProperty", text = "")
+		
+class TextDataOutputNode(Node, AnimationNode):
+	bl_idname = "TextDataOutputNode"
+	bl_label = "Text Data Output"
+	
+	def init(self, context):
+		self.inputs.new("ObjectSocket", "Object")
+		self.inputs.new("NodeSocketString", "Text")
+		
+	def draw_buttons(self, context, layout):
+		layout.prop(self, "objectProperty", text = "Object")
+		
+class ObjectSelectionNode(Node, AnimationNode):
+	bl_idname = "ObjectSelectionNode"
+	bl_label = "Object Selection"
+	
+	objectProperty = bpy.props.BoolProperty()
+	
+	def init(self, context):
+		self.outputs.new("ObjectSocket", "Object")
+		
 	
 class AnimationNodesCategory(NodeCategory):
 	@classmethod
@@ -46,7 +67,11 @@ class AnimationNodesCategory(NodeCategory):
 	
 nodeCategories = [
 	AnimationNodesCategory("INPUTNODES", "Input Nodes", items = [
-		NodeItem("StringInputNode", label = "String Input")
+		NodeItem("StringInputNode"),
+		NodeItem("ObjectSelectionNode")
+		]),
+	AnimationNodesCategory("OUTPUTNODES", "Output Nodes", items = [
+		NodeItem("TextDataOutputNode")
 		])
 	]
 	
