@@ -79,6 +79,7 @@ class AnimationNodesCategory(NodeCategory):
 	
 nodeCategories = [
 	AnimationNodesCategory("INPUTNODES", "Input Nodes", items = [
+		NodeItem("IntegerInputNode"),
 		NodeItem("StringInputNode"),
 		NodeItem("ObjectInputNode")
 		]),

@@ -22,6 +22,25 @@ import bpy
 from bpy.types import NodeTree, Node, NodeSocket
 from animation_nodes_utils import *
 
+class IntegerSocket(NodeSocket):
+	bl_idname = "IntegerSocket"
+	bl_label = "Integer Socket"
+	dataType = "Integer"
+	allowedInputTypes = ["Integer"]
+	
+	number = bpy.props.IntProperty(default = 0)
+	
+	def draw(self, context, layout, node, text):
+		if not self.is_output and not isSocketLinked(self):
+			layout.prop(self, "number", text = text)
+		else:
+			layout.label(text)
+			
+	def draw_color(self, context, node):
+		return (0.2, 0.2, 1, 1)
+		
+	def getValue(self):
+		return self.number
 
 class StringSocket(NodeSocket):
 	bl_idname = "StringSocket"
