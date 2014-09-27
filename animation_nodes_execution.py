@@ -105,7 +105,7 @@ class AnimationNodesPanel(bpy.types.Panel):
 		pass
 		
 @persistent
-def updateAll(self):
+def updateAll(scene):
 	nodeTrees = getAnimationNodeTrees()
 	for nodeTree in nodeTrees:		
 		animationNodeTree = AnimationNodeTree(nodeTree)
