@@ -65,7 +65,7 @@ class SubstringNode(Node, AnimationNode):
 		
 	def execute(self, input):
 		output = {}
-		output["Text"] = input["Text"][ max(input["Start"],0) : max(input["Length"],0) ]
+		output["Text"] = input["Text"][ max(input["Start"],0) : max(input["Length"]+input["Start"],0) ]
 		return output
 	
 		
