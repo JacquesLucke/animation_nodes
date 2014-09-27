@@ -22,6 +22,7 @@ Created by Jacques Lucke
 import bpy
 from bpy.types import NodeTree, Node, NodeSocket
 from animation_nodes_node_helper import AnimationNode
+from animation_nodes_utils import *
 
 
 class CombineStringsNode(Node, AnimationNode):
@@ -50,6 +51,21 @@ class ReplicateStringsNode(Node, AnimationNode):
 	def execute(self, input):
 		output = {}
 		output["Text"] = input["Text"] * input["Amount"]
+		return output
+		
+class SubstringNode(Node, AnimationNode):
+	bl_idname = "SubstringNode"
+	bl_label = "Substrings"
+	
+	def init(self, context):
+		self.inputs.new("StringSocket", "Text")
+		self.inputs.new("IntegerSocket", "Start")
+		self.inputs.new("IntegerSocket", "Length")
+		self.outputs.new("StringSocket", "Text")
+		
+	def execute(self, input):
+		output = {}
+		output["Text"] = input["Text"][ max(input["Start"],0) : max(input["Length"],0) ]
 		return output
 	
 		

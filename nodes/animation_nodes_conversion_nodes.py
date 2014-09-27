@@ -22,6 +22,7 @@ Created by Jacques Lucke
 import bpy
 from bpy.types import NodeTree, Node, NodeSocket
 from animation_nodes_node_helper import AnimationNode
+from animation_nodes_utils import *
 
 
 class IntToStringConversion(Node, AnimationNode):

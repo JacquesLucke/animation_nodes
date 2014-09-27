@@ -89,7 +89,8 @@ nodeCategories = [
 		]),
 	AnimationNodesCategory("MODIFYSTRINGS", "Modify Strings", items = [
 		NodeItem("CombineStringsNode"),
-		NodeItem("ReplicateStringsNode")
+		NodeItem("ReplicateStringsNode"),
+		NodeItem("SubstringNode")
 		]),
 	AnimationNodesCategory("CONVERTTYPES", "Convert", items = [
 		NodeItem("IntToStringConversion")
