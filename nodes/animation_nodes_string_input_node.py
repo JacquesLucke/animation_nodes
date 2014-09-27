@@ -21,7 +21,7 @@ Created by Jacques Lucke
 
 import bpy
 from bpy.types import NodeTree, Node, NodeSocket
-from animation_nodes_nodes import AnimationNode
+from animation_nodes_node_helper import AnimationNode
 
 
 class StringInputNode(Node, AnimationNode):

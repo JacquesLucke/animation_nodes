@@ -21,33 +21,23 @@ Created by Jacques Lucke
 
 import bpy
 from bpy.types import NodeTree, Node, NodeSocket
-from animation_nodes_node_helper import AnimationNode	
-	
-		
-class ObjectInputNode(Node, AnimationNode):
-	bl_idname = "ObjectInputNode"
-	bl_label = "Object Input"
-	
-	objectName = bpy.props.StringProperty()
+from animation_nodes_node_helper import AnimationNode
+
+
+class CombineStringsNode(Node, AnimationNode):
+	bl_idname = "CombineStringsNode"
+	bl_label = "Combine Strings"
 	
 	def init(self, context):
-		self.outputs.new("ObjectSocket", "Object")
-		
-	def draw_buttons(self, context, layout):
-		col = layout.column()
-		row = col.row(align = True)
-		row.prop(self, "objectName", text = "")
-		selector = row.operator("animation_nodes.assign_active_object_to_node", text = "", icon = "EYEDROPPER")
-		selector.nodeTreeName = self.id_data.name
-		selector.nodeName = self.name
-		selector.target = "objectName"
-		col.separator()
+		self.inputs.new("StringSocket", "Text 1")
+		self.inputs.new("StringSocket", "Text 2")
+		self.outputs.new("StringSocket", "Text")
 		
 	def execute(self, input):
 		output = {}
-		output["Object"] = self.objectName
+		output["Text"] = input["Text 1"] + input["Text 2"]
 		return output
-		
+	
 		
 # register
 ################################
