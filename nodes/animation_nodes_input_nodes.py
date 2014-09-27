@@ -21,8 +21,26 @@ Created by Jacques Lucke
 
 import bpy
 from bpy.types import NodeTree, Node, NodeSocket
-from animation_nodes_node_helper import AnimationNode	
+from animation_nodes_node_helper import AnimationNode
+
+
+class StringInputNode(Node, AnimationNode):
+	bl_idname = "StringInputNode"
+	bl_label = "String Input"
 	
+	stringProperty = bpy.props.StringProperty(default = "text")
+	
+	def init(self, context):
+		self.outputs.new("StringSocket", "Text")
+		
+	def draw_buttons(self, context, layout):
+		layout.prop(self, "stringProperty", text = "")
+		
+	def execute(self, input):
+		output = {}
+		output["Text"] = self.stringProperty
+		return output
+		
 		
 class ObjectInputNode(Node, AnimationNode):
 	bl_idname = "ObjectInputNode"
@@ -47,7 +65,7 @@ class ObjectInputNode(Node, AnimationNode):
 		output = {}
 		output["Object"] = self.objectName
 		return output
-		
+	
 		
 # register
 ################################

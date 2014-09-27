@@ -28,8 +28,7 @@ import animation_nodes_tree
 import animation_nodes_node_helper
 import animation_nodes_sockets
 import animation_nodes_execution
-import animation_nodes_string_input_node
-import animation_nodes_object_input_node
+import animation_nodes_input_nodes
 import animation_nodes_combine_stringst_node
 
 
@@ -54,8 +53,7 @@ def register():
 	animation_nodes_node_helper.register()
 	animation_nodes_sockets.register()
 	animation_nodes_execution.register()
-	animation_nodes_string_input_node.register()
-	animation_nodes_object_input_node.register()
+	animation_nodes_input_nodes.register()
 	animation_nodes_combine_stringst_node.register()
 
 def unregister():
@@ -63,8 +61,7 @@ def unregister():
 	animation_nodes_node_helper.unregister()
 	animation_nodes_sockets.unregister()
 	animation_nodes_execution.unregister()
-	animation_nodes_string_input_node.unregister()
-	animation_nodes_object_input_node.unregister()
+	animation_nodes_input_nodes.unregister()
 	animation_nodes_combine_stringst_node.unregister()
 
 if __name__ == "__main__":
