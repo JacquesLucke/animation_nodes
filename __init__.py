@@ -23,6 +23,7 @@ from bpy.types import NodeTree, Node, NodeSocket
 sys.path.append(os.path.dirname(__file__))
 
 import animation_nodes_tree
+import animation_nodes_nodes
 
 bl_info = {
 	"name":        "Animation Nodes",
@@ -40,9 +41,11 @@ bl_info = {
 
 def register():
 	animation_nodes_tree.register()
+	animation_nodes_nodes.register()
 
 def unregister():
 	animation_nodes_tree.unregister()
+	animation_nodes_nodes.unregister()
 
 if __name__ == "__main__":
 	register()

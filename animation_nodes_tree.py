@@ -19,7 +19,7 @@ Created by Jacques Lucke
 '''
 
 import bpy
-from bpy.types import NodeTree, NodeSocket
+from bpy.types import NodeTree, Node, NodeSocket
 
 class AnimationNodeTree(NodeTree):
 	bl_idname = "AnimationNodeTreeType"
