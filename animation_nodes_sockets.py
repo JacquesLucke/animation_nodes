@@ -20,6 +20,7 @@ Created by Jacques Lucke
 
 import bpy
 from bpy.types import NodeTree, Node, NodeSocket
+from animation_nodes_utils import *
 
 class ObjectSocket(NodeSocket):
 	bl_idname = "ObjectSocket"
@@ -32,13 +33,34 @@ class ObjectSocket(NodeSocket):
 			col = layout.column()
 			row = col.row(align = True)
 			row.prop(self, "stringProperty", text = "")
-			row.operator("mesh.primitive_cube_add", text = "", icon = "EYEDROPPER")
+			selector = row.operator("animation_nodes.assign_active_object_to_node", text = "", icon = "EYEDROPPER")
+			selector.nodeTreeName = node.id_data.name
+			selector.nodeName = node.name
 			col.separator()
 		else:
 			layout.label(text)
 		
 	def draw_color(self, context, node):
 		return (0, 0, 0, 1)
+		
+		
+class AssignActiveObjectToNode(bpy.types.Operator):
+	bl_idname = "animation_nodes.assign_active_object_to_node"
+	bl_label = "Assign Active Object"
+	
+	nodeTreeName = bpy.props.StringProperty()
+	nodeName = bpy.props.StringProperty()
+	
+	@classmethod
+	def poll(cls, context):
+		return getActive() is not None
+		
+	def execute(self, context):
+		obj = getActive()
+		bpy.data.node_groups[self.nodeTreeName].nodes[self.nodeName].outputs[0].stringProperty = obj.name
+		print(obj.name)
+		print(bpy.data.node_groups[self.nodeTreeName].nodes[self.nodeName].outputs[0].stringProperty)
+		return {'FINISHED'}
 	
 	
 def register():
