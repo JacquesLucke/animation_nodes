@@ -25,6 +25,7 @@ sys.path.append(os.path.dirname(__file__))
 import animation_nodes_tree
 import animation_nodes_nodes
 import animation_nodes_sockets
+import animation_nodes_execution
 
 bl_info = {
 	"name":        "Animation Nodes",
@@ -44,11 +45,13 @@ def register():
 	animation_nodes_tree.register()
 	animation_nodes_nodes.register()
 	animation_nodes_sockets.register()
+	animation_nodes_execution.register()
 
 def unregister():
 	animation_nodes_tree.unregister()
 	animation_nodes_nodes.unregister()
 	animation_nodes_sockets.unregister()
+	animation_nodes_execution.unregister()
 
 if __name__ == "__main__":
 	register()

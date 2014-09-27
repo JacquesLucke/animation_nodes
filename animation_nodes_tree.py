@@ -26,6 +26,8 @@ class AnimationNodeTree(NodeTree):
 	bl_label = "Animation";
 	bl_icon = "ACTION"
 	
+	isAnimationNodeTree = bpy.props.BoolProperty(default = True)
+	
 	
 def register():
 	bpy.utils.register_module(__name__)

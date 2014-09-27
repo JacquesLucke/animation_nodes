@@ -19,6 +19,7 @@ Created by Jacques Lucke
 '''
 
 import bpy
+from animation_nodes_utils import *
 	
 def getActive():
 	return bpy.context.scene.objects.active
@@ -30,3 +31,10 @@ def getSocketFromNode(node, isOutputSocket, name):
 		return node.outputs.get(name)
 	else:
 		return node.inputs.get(name)
+		
+def getAnimationNodeTrees():
+	nodeTrees = []
+	for nodeTree in bpy.data.node_groups:
+		if hasattr(nodeTree, "isAnimationNodeTree"):
+			nodeTrees.append(nodeTree)
+	return nodeTrees
