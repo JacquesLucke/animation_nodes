@@ -22,6 +22,21 @@ import bpy
 from bpy.types import NodeTree, Node, NodeSocket
 from animation_nodes_utils import *
 
+class StringSocket(NodeSocket):
+	bl_idname = "StringSocket"
+	bl_label = "String Socket"
+	
+	string = bpy.props.StringProperty(default = "text")
+	
+	def draw(self, context, layout, node, text):
+		if not self.is_output and not self.is_linked:
+			layout.prop(self, "string", text = text)
+		else:
+			layout.label(text)
+			
+	def draw_color(self, context, node):
+		return (1, 1, 1, 1)
+		
 class ObjectSocket(NodeSocket):
 	bl_idname = "ObjectSocket"
 	bl_label = "Object Socket"
@@ -29,11 +44,11 @@ class ObjectSocket(NodeSocket):
 	objectName = bpy.props.StringProperty()
 	
 	def draw(self, context, layout, node, text):
-		if self.is_output or (not self.is_output and not self.is_linked):
+		if not self.is_output and not self.is_linked:
 			col = layout.column()
 			row = col.row(align = True)
 			row.prop(self, "objectName", text = "")
-			selector = row.operator("animation_nodes.assign_active_object_to_node", text = "", icon = "EYEDROPPER")
+			selector = row.operator("animation_nodes.assign_active_object_to_socket", text = "", icon = "EYEDROPPER")
 			selector.nodeTreeName = node.id_data.name
 			selector.nodeName = node.name
 			selector.isOutput = self.is_output
@@ -45,19 +60,10 @@ class ObjectSocket(NodeSocket):
 		
 	def draw_color(self, context, node):
 		return (0, 0, 0, 1)
-		
-	def getData(self):
-		if self.is_output:
-			return self.objectName
-		else:
-			if self.is_linked:
-				return self.links[0].from_socket.getData()
-			else:
-				return self.objectName
-		
-		
+	
+	
 class AssignActiveObjectToNode(bpy.types.Operator):
-	bl_idname = "animation_nodes.assign_active_object_to_node"
+	bl_idname = "animation_nodes.assign_active_object_to_socket"
 	bl_label = "Assign Active Object"
 	
 	nodeTreeName = bpy.props.StringProperty()

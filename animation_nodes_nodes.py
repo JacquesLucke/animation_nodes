@@ -21,23 +21,26 @@ Created by Jacques Lucke
 import bpy, nodeitems_utils
 from bpy.types import NodeTree, Node, NodeSocket
 from nodeitems_utils import NodeCategory, NodeItem
+from animation_nodes_utils import *
 
 class AnimationNode:
 	@classmethod
 	def poll(cls, nodeTree):
 		return nodeTree == "AnimationNodeTreeType"
 		
+		
 class StringInputNode(Node, AnimationNode):
 	bl_idname = "StringInputNode"
 	bl_label = "String Input"
 	
-	stringProperty = bpy.props.StringProperty(default = "Hello World")
+	stringProperty = bpy.props.StringProperty(default = "text")
 	
 	def init(self, context):
-		self.outputs.new("NodeSocketString", "Text")
+		self.outputs.new("StringSocket", "Text")
 		
 	def draw_buttons(self, context, layout):
 		layout.prop(self, "stringProperty", text = "")
+		
 		
 class TextDataOutputNode(Node, AnimationNode):
 	bl_idname = "TextDataOutputNode"
@@ -45,19 +48,47 @@ class TextDataOutputNode(Node, AnimationNode):
 	
 	def init(self, context):
 		self.inputs.new("ObjectSocket", "Object")
-		self.inputs.new("NodeSocketString", "Text")
-		
-	def draw_buttons(self, context, layout):
-		layout.label(self.inputs[0].getData())
+		self.inputs.new("StringSocket", "Text")
 		
 class ObjectSelectionNode(Node, AnimationNode):
 	bl_idname = "ObjectSelectionNode"
 	bl_label = "Object Selection"
 	
-	objectProperty = bpy.props.BoolProperty()
+	objectName = bpy.props.StringProperty()
 	
 	def init(self, context):
 		self.outputs.new("ObjectSocket", "Object")
+		
+	def draw_buttons(self, context, layout):
+		col = layout.column()
+		row = col.row(align = True)
+		row.prop(self, "objectName", text = "")
+		selector = row.operator("animation_nodes.assign_active_object_to_node", text = "", icon = "EYEDROPPER")
+		selector.nodeTreeName = self.id_data.name
+		selector.nodeName = self.name
+		selector.target = "objectName"
+		col.separator()
+		
+		
+
+class AssignActiveObjectToNode(bpy.types.Operator):
+	bl_idname = "animation_nodes.assign_active_object_to_node"
+	bl_label = "Assign Active Object"
+	
+	nodeTreeName = bpy.props.StringProperty()
+	nodeName = bpy.props.StringProperty()
+	target = bpy.props.StringProperty()
+	
+	@classmethod
+	def poll(cls, context):
+		return getActive() is not None
+		
+	def execute(self, context):
+		obj = getActive()
+		node = getNode(self.nodeTreeName, self.nodeName)
+		setattr(node, self.target, obj.name)
+		return {'FINISHED'}		
+
 		
 	
 class AnimationNodesCategory(NodeCategory):
