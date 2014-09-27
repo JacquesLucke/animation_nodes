@@ -42,7 +42,7 @@ class AnimationNodeTree:
 	def cleanup(self):
 		links = self.nodeTree.links
 		for link in links:
-			if link.to_node == "REROUTE":
+			if link.to_node.type == "REROUTE":
 				continue
 			if not isSocketLinked(link.to_socket):
 				continue
