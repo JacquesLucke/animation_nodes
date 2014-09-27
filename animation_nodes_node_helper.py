@@ -88,6 +88,9 @@ nodeCategories = [
 		]),
 	AnimationNodesCategory("MODIFYSTRINGS", "Modify Strings", items = [
 		NodeItem("CombineStringsNode")
+		]),
+	AnimationNodesCategory("CONVERTTYPES", "Convert", items = [
+		NodeItem("IntToStringConversion")
 		])
 	]
 	
