@@ -29,7 +29,7 @@ class StringSocket(NodeSocket):
 	string = bpy.props.StringProperty(default = "text")
 	
 	def draw(self, context, layout, node, text):
-		if not self.is_output and not self.is_linked:
+		if not self.is_output and not isSocketLinked(self):
 			layout.prop(self, "string", text = text)
 		else:
 			layout.label(text)
@@ -47,7 +47,7 @@ class ObjectSocket(NodeSocket):
 	objectName = bpy.props.StringProperty()
 	
 	def draw(self, context, layout, node, text):
-		if not self.is_output and not self.is_linked:
+		if not self.is_output and not isSocketLinked(self):
 			col = layout.column()
 			row = col.row(align = True)
 			row.prop(self, "objectName", text = "")

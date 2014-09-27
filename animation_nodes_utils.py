@@ -38,3 +38,20 @@ def getAnimationNodeTrees():
 		if hasattr(nodeTree, "isAnimationNodeTree"):
 			nodeTrees.append(nodeTree)
 	return nodeTrees
+	
+def isSocketLinked(socket):
+	origin = getOriginSocket(socket)
+	return origin is not None and origin is not socket
+		
+def getOriginSocket(socket):
+	if socket.is_linked:
+		fromSocket = socket.links[0].from_socket
+		if fromSocket.node.type == "REROUTE":
+			return getOriginSocket(fromSocket.node.inputs[0])
+		else:
+			return fromSocket
+	else:
+		if socket.node.type == "REROUTE":
+			return None
+		else:
+			return socket
