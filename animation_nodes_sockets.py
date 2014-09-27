@@ -90,6 +90,11 @@ class AssignActiveObjectToNode(bpy.types.Operator):
 		return {'FINISHED'}
 	
 	
+	
+	
+# register
+################################
+	
 def register():
 	bpy.utils.register_module(__name__)
 

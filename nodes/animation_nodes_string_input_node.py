@@ -18,21 +18,33 @@ Created by Jacques Lucke
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
+
 import bpy
 from bpy.types import NodeTree, Node, NodeSocket
+from animation_nodes_nodes import AnimationNode
 
-class AnimationNodeTree(NodeTree):
-	bl_idname = "AnimationNodeTreeType"
-	bl_label = "Animation";
-	bl_icon = "ACTION"
+
+class StringInputNode(Node, AnimationNode):
+	bl_idname = "StringInputNode"
+	bl_label = "String Input"
 	
-	isAnimationNodeTree = bpy.props.BoolProperty(default = True)
+	stringProperty = bpy.props.StringProperty(default = "text")
 	
+	def init(self, context):
+		self.outputs.new("StringSocket", "Text")
+		
+	def draw_buttons(self, context, layout):
+		layout.prop(self, "stringProperty", text = "")
+		
+	def execute(self, input):
+		output = {}
+		output["Text"] = self.stringProperty
+		return output
 	
-	
+		
 # register
 ################################
-	
+		
 def register():
 	bpy.utils.register_module(__name__)
 

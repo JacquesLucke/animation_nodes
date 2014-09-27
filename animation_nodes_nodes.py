@@ -29,24 +29,6 @@ class AnimationNode:
 		return nodeTree == "AnimationNodeTreeType"
 		
 		
-class StringInputNode(Node, AnimationNode):
-	bl_idname = "StringInputNode"
-	bl_label = "String Input"
-	
-	stringProperty = bpy.props.StringProperty(default = "text")
-	
-	def init(self, context):
-		self.outputs.new("StringSocket", "Text")
-		
-	def draw_buttons(self, context, layout):
-		layout.prop(self, "stringProperty", text = "")
-		
-	def execute(self, input):
-		output = {}
-		output["Text"] = self.stringProperty
-		return output
-		
-		
 class TextBodyOutputNode(Node, AnimationNode):
 	bl_idname = "TextBodyOutputNode"
 	bl_label = "Text Body Output"
@@ -66,30 +48,6 @@ class TextBodyOutputNode(Node, AnimationNode):
 			textObject.body = input["Text"]
 		
 		output = {}
-		return output
-		
-class ObjectSelectionNode(Node, AnimationNode):
-	bl_idname = "ObjectSelectionNode"
-	bl_label = "Object Selection"
-	
-	objectName = bpy.props.StringProperty()
-	
-	def init(self, context):
-		self.outputs.new("ObjectSocket", "Object")
-		
-	def draw_buttons(self, context, layout):
-		col = layout.column()
-		row = col.row(align = True)
-		row.prop(self, "objectName", text = "")
-		selector = row.operator("animation_nodes.assign_active_object_to_node", text = "", icon = "EYEDROPPER")
-		selector.nodeTreeName = self.id_data.name
-		selector.nodeName = self.name
-		selector.target = "objectName"
-		col.separator()
-		
-	def execute(self, input):
-		output = {}
-		output["Object"] = self.objectName
 		return output
 		
 		
@@ -122,7 +80,7 @@ class AnimationNodesCategory(NodeCategory):
 nodeCategories = [
 	AnimationNodesCategory("INPUTNODES", "Input Nodes", items = [
 		NodeItem("StringInputNode"),
-		NodeItem("ObjectSelectionNode")
+		NodeItem("ObjectInputNode")
 		]),
 	AnimationNodesCategory("OUTPUTNODES", "Output Nodes", items = [
 		NodeItem("TextBodyOutputNode")
@@ -130,11 +88,13 @@ nodeCategories = [
 	]
 	
 	
+# register
+################################
+	
 def register():
 	bpy.utils.register_module(__name__)
 	nodeitems_utils.register_node_categories("ANIMATIONNODES", nodeCategories)
 
 def unregister():
-	nodeitems_utils.unregister_node_categories("ANIMATIONNODES", nodeCategories)
-	
+	nodeitems_utils.unregister_node_categories("ANIMATIONNODES", nodeCategories)	
 	bpy.utils.unregister_module(__name__)
