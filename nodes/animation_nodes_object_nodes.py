@@ -33,14 +33,24 @@ class ObjectInfoNode(Node, AnimationNode):
 	def init(self, context):
 		self.inputs.new("ObjectSocket", "Object")
 		self.outputs.new("VectorSocket", "Location")
+		self.outputs.new("VectorSocket", "Rotation")
+		self.outputs.new("VectorSocket", "Scale")
 		
 	def execute(self, input):
 		object = bpy.data.objects.get(input["Object"])
 		output = {}
+		
 		output["Location"] = (0, 0, 0)
+		output["Rotation"] = (0, 0, 0)
+		output["Scale"] = (1, 1, 1)
+		
 		if object is None:
 			return output
+			
 		output["Location"] = object.location
+		output["Rotation"] = object.rotation_euler
+		output["Scale"] = object.scale
+		
 		return output
 		
 	
