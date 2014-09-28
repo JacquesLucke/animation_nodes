@@ -41,7 +41,7 @@ class AttributeOutputNode(Node, AnimationNode):
 		try:
 			exec("object." + attribute + " = value")
 		except:
-			print("attribute not found - " + attribute)
+			print("attribute not found or wrong data type - " + attribute)
 		return {}
 	
 		

@@ -63,6 +63,20 @@ class FloatToIntegerConversion(Node, AnimationNode):
 		output = {}
 		output["Number"] = round(input["Number"])
 		return output
+		
+class ToStringConversion(Node, AnimationNode):
+	bl_idname = "ToStringConversion"
+	bl_label = "To String"
+	
+	def init(self, context):
+		self.inputs.new("GenericSocket", "Value")
+		self.outputs.new("StringSocket", "Text")
+		
+	def execute(self, input):
+		output = {}
+		output["Text"] = str(input["Value"])
+		return output
+	
 	
 		
 # register

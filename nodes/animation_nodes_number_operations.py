@@ -62,6 +62,29 @@ class FloatMathNode(Node, AnimationNode):
 		output = {}
 		output["Result"] = result
 		return output
+		
+class ExpressionNode(Node, AnimationNode):
+	bl_idname = "ExpressionNode"
+	bl_label = "Expression"
+	
+	def init(self, context):
+		self.inputs.new("StringSocket", "Expression")
+		self.inputs.new("GenericSocket", "a")
+		self.inputs.new("GenericSocket", "b")
+		self.outputs.new("GenericSocket", "Result")
+		
+	def execute(self, input):
+		a = input["a"]
+		b = input["b"]
+		expression = input["Expression"]
+		result = 0
+		try:
+			result = eval(expression)
+		except (ZeroDivisionError):
+			print("expression error - " + self.name)
+		output = {}
+		output["Result"] = result
+		return output
 	
 		
 # register

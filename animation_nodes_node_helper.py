@@ -103,10 +103,14 @@ nodeCategories = [
 	AnimationNodesCategory("CONVERTTYPES", "Convert", items = [
 		NodeItem("IntToStringConversion"),
 		NodeItem("FloatToStringConversion"),
-		NodeItem("FloatToIntegerConversion")
+		NodeItem("FloatToIntegerConversion"),
+		NodeItem("ToStringConversion")
 		]),
 	AnimationNodesCategory("MATHNODES", "Math", items = [
 		NodeItem("FloatMathNode")
+		]),
+	AnimationNodesCategory("SCIRPT", "Script", items = [
+		NodeItem("ExpressionNode")
 		])
 	]
 	
