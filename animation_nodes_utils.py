@@ -46,7 +46,7 @@ def isSocketLinked(socket):
 	return origin is not None and origin is not socket
 	
 def isOtherOriginSocket(socket, origin):
-	return origin is not None and origin is not socket
+	return origin is not None and origin.node.name != socket.node.name
 		
 def getOriginSocket(socket):
 	if hasLinks(socket):

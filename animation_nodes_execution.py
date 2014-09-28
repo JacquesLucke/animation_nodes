@@ -41,16 +41,54 @@ class CachePerNode:
 			self.objects[treeName] = {}
 		self.objects[treeName][nodeName] = object
 
+class CachePerSocket:
+	def __init__(self):
+		self.objects = {}
+	def clear(self):
+		self.objects = {}
+		
+	def getObjectFromSocket(self, socket):
+		identifier = self.getSocketIdentifier(socket)
+		if identifier in self.objects:
+			return self.objects[identifier]
+		else: return None
+	def setObjectForSocket(self, socket, object):
+		identifier = self.getSocketIdentifier(socket)
+		self.objects[identifier] = object
+		
+	def getSocketIdentifier(self, socket):
+		return socket.node.id_data.name + socket.node.name + socket.name
+	
+
 class AnimationTreeCache:
 	def __init__(self):
 		self.dependencies = CachePerNode()
+		self.originSockets = CachePerSocket()
 	def clear(self):
 		self.dependencies.clear()
+		self.originSockets.clear()
 		
 	def getDependencyNodeNames(self, node):
 		return self.dependencies.getObjectFromNode(node)
 	def setNodeDependencies(self, node, dependencies):
 		self.dependencies.setObjectFromNode(node, dependencies)
+		
+	def getOriginSocket(self, socket):
+		data = self.originSockets.getObjectFromSocket(socket)
+		if data is None:
+			return None
+		(treeName, nodeName, output, socketName) = data
+		node = getNode(treeName, nodeName)
+		if output:
+			return node.outputs[socketName]
+		else:
+			return node.inputs[socketName]
+	def setOriginSocket(self, socket, origin):
+		treeName = origin.node.id_data.name
+		nodeName = origin.node.name
+		output = origin.is_output
+		socketName = origin.name
+		self.originSockets.setObjectForSocket(socket, (treeName, nodeName, output, socketName))
 
 
 animationTreeCache = AnimationTreeCache()
@@ -72,13 +110,9 @@ class AnimationNodeTree:
 		for node in self.nodes.values():
 			node.isUpdated = False
 		
-		self.time = 0
-		
 		for node in self.nodes.values():
 			if not node.isUpdated:
 				self.updateNode(node)
-		
-		print(self.time)
 				
 	def cleanup(self):
 		links = self.nodeTree.links
@@ -97,9 +131,7 @@ class AnimationNodeTree:
 		for name in dependencyNames:
 			if not self.nodes[name].isUpdated:
 				self.updateNode(self.nodes[name])
-		start = time.clock()
 		self.generateInputList(node)
-		self.time += time.clock() - start
 		node.execute()
 		node.isUpdated = True
 		
@@ -109,7 +141,11 @@ class AnimationNodeTree:
 		
 		socketPairs = []
 		for socket in inputSockets:
-			socketPairs.append((socket, getOriginSocket(socket)))
+			origin = animationTreeCache.getOriginSocket(socket)
+			if origin is None:
+				origin = getOriginSocket(socket)
+				animationTreeCache.setOriginSocket(socket, origin)
+			socketPairs.append((socket, origin))
 		
 		for (socket, origin) in socketPairs:
 			if isOtherOriginSocket(socket, origin):
@@ -165,12 +201,12 @@ def updateAll(scene):
 	updateAnimationTrees(False)
 		
 def updateAnimationTrees(treeChanged = True):
-	#start = time.clock()
+	start = time.clock()
 	nodeTrees = getAnimationNodeTrees()
 	for nodeTree in nodeTrees:		
 		animationNodeTree = AnimationNodeTree(nodeTree)
-		animationNodeTree.execute(useDependencyCache = not treeChanged)
-	#print(time.clock() - start)
+		animationNodeTree.execute(useDependencyCache = False)#not treeChanged)
+	print(time.clock() - start)
 	
 bpy.app.handlers.frame_change_post.append(updateAll)
 		
