@@ -205,7 +205,7 @@ def updateAnimationTrees(treeChanged = True):
 	nodeTrees = getAnimationNodeTrees()
 	for nodeTree in nodeTrees:		
 		animationNodeTree = AnimationNodeTree(nodeTree)
-		animationNodeTree.execute(useDependencyCache = False)#not treeChanged)
+		animationNodeTree.execute(useDependencyCache = not treeChanged)
 	print(time.clock() - start)
 	
 bpy.app.handlers.frame_change_post.append(updateAll)
