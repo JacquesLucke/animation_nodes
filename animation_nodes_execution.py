@@ -211,10 +211,25 @@ def updateAll(scene):
 	updateAnimationTrees(False)
 		
 def updateAnimationTrees(treeChanged = True):
+	try:
+		if treeChanged: updateAndRebuildCache()
+		else: fastUpdateUsingCache()
+	except:
+		if not treeChanged:
+			updateAndRebuildCache()
+			
+def fastUpdateUsingCache():
 	nodeTrees = getAnimationNodeTrees()
 	for nodeTree in nodeTrees:		
 		animationNodeTree = AnimationNodeTree(nodeTree)
-		animationNodeTree.execute(useDependencyCache = not treeChanged)
+		animationNodeTree.execute(useDependencyCache = True)
+		
+def updateAndRebuildCache():
+	nodeTrees = getAnimationNodeTrees()
+	for nodeTree in nodeTrees:		
+		animationNodeTree = AnimationNodeTree(nodeTree)
+		animationNodeTree.execute(useDependencyCache = False)
+
 	
 bpy.app.handlers.frame_change_post.append(updateAll)
 		
