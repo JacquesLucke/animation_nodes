@@ -19,7 +19,7 @@ Created by Jacques Lucke
 '''
 
 
-import bpy
+import bpy, math
 from bpy.types import NodeTree, Node, NodeSocket
 from animation_nodes_node_helper import AnimationNode
 from animation_nodes_utils import *
@@ -27,7 +27,7 @@ from animation_nodes_utils import *
 
 class IntToStringConversion(Node, AnimationNode):
 	bl_idname = "IntToStringConversion"
-	bl_label = "Int to String Conversion"
+	bl_label = "Integer to String"
 	
 	def init(self, context):
 		self.inputs.new("IntegerSocket", "Number")
@@ -40,7 +40,7 @@ class IntToStringConversion(Node, AnimationNode):
 		
 class FloatToStringConversion(Node, AnimationNode):
 	bl_idname = "FloatToStringConversion"
-	bl_label = "Float to String Conversion"
+	bl_label = "Float to String"
 	
 	def init(self, context):
 		self.inputs.new("FloatSocket", "Number")
@@ -49,6 +49,19 @@ class FloatToStringConversion(Node, AnimationNode):
 	def execute(self, input):
 		output = {}
 		output["Text"] = str(input["Number"])
+		return output
+		
+class FloatToIntegerConversion(Node, AnimationNode):
+	bl_idname = "FloatToIntegerConversion"
+	bl_label = "Float to Integer"
+	
+	def init(self, context):
+		self.inputs.new("FloatSocket", "Number")
+		self.outputs.new("IntegerSocket", "Number")
+		
+	def execute(self, input):
+		output = {}
+		output["Number"] = round(input["Number"])
 		return output
 	
 		

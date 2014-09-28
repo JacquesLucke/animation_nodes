@@ -47,7 +47,7 @@ class FloatSocket(NodeSocket):
 	bl_idname = "FloatSocket"
 	bl_label = "Float Socket"
 	dataType = "Float"
-	allowedInputTypes = ["Float"]
+	allowedInputTypes = ["Float", "Integer"]
 	
 	number = bpy.props.FloatProperty(default = 0.0, update = updateHandler)
 	
