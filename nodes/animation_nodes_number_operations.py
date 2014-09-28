@@ -34,7 +34,8 @@ class FloatMathNode(Node, AnimationNode):
 		("ADD", "Add", ""),
 		("SUBTRACT", "Subtract", ""),
 		("MULITPLY", "Multiply", ""),
-		("DIVIDE", "Divide", "")]
+		("DIVIDE", "Divide", ""),
+		("MODULO", "Modulo", "")]
 	mathTypesProperty = bpy.props.EnumProperty(name = "Type", items = mathTypes, default = "ADD", update = updateHandler)
 	
 	def init(self, context):
@@ -50,12 +51,14 @@ class FloatMathNode(Node, AnimationNode):
 		b = input["B"]
 		result = 0
 		type = self.mathTypesProperty
-		
-		if type == "ADD": result = a + b
-		elif type == "SUBTRACT": result = a - b
-		elif type == "MULITPLY": result = a * b
-		elif type == "DIVIDE": result = a / b
-		
+		try:
+			if type == "ADD": result = a + b
+			elif type == "SUBTRACT": result = a - b
+			elif type == "MULITPLY": result = a * b
+			elif type == "DIVIDE": result = a / b
+			elif type == "MODULO": result = a % b
+		except (ZeroDivisionError):
+			print("ZeroDivisionError - " + self.name)
 		output = {}
 		output["Result"] = result
 		return output
