@@ -57,9 +57,9 @@ class ObjectOutputNode(Node, AnimationNode):
 	bl_idname = "ObjectOutputNode"
 	bl_label = "Object Output"
 	
-	useLocation = bpy.props.BoolVectorProperty()
-	useRotation = bpy.props.BoolVectorProperty()
-	useScale = bpy.props.BoolVectorProperty()
+	useLocation = bpy.props.BoolVectorProperty(update = updateHandler)
+	useRotation = bpy.props.BoolVectorProperty(update = updateHandler)
+	useScale = bpy.props.BoolVectorProperty(update = updateHandler)
 	
 	def init(self, context):
 		self.inputs.new("ObjectSocket", "Object")
