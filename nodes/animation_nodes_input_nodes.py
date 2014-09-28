@@ -19,7 +19,7 @@ Created by Jacques Lucke
 '''
 
 
-import bpy
+import bpy, random
 from bpy.types import NodeTree, Node, NodeSocket
 from animation_nodes_node_helper import AnimationNode
 from animation_nodes_utils import *
@@ -113,6 +113,25 @@ class TimeInfoNode(Node, AnimationNode):
 	def execute(self, input):
 		output = {}
 		output["Frame"] = getCurrentFrame()
+		return output
+		
+class RandomFloatNode(Node, AnimationNode):
+	bl_idname = "RandomFloatNode"
+	bl_label = "Random Float"
+	
+	def init(self, context):
+		self.inputs.new("IntegerSocket", "Seed")
+		self.inputs.new("FloatSocket", "Min").number = 0.0
+		self.inputs.new("FloatSocket", "Max").number = 1.0
+		self.outputs.new("FloatSocket", "Value")
+		
+	def execute(self, input):
+		output = {}
+		seed = input["Seed"]
+		min = input["Min"]
+		max = input["Max"]
+		random.seed(seed)
+		output["Value"] = random.uniform(min, max)
 		return output
 	
 		

@@ -25,6 +25,8 @@ def getActive():
 	return bpy.context.scene.objects.active
 def getCurrentFrame():
 	return bpy.context.scene.frame_current
+def getRandom(min, max):
+	return random.random() * (max - min) + min
 	
 def getNode(treeName, nodeName):
 	return bpy.data.node_groups[treeName].nodes[nodeName]
