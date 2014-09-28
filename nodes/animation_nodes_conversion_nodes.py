@@ -24,45 +24,6 @@ from bpy.types import NodeTree, Node, NodeSocket
 from animation_nodes_node_helper import AnimationNode
 from animation_nodes_utils import *
 
-
-class IntToStringConversion(Node, AnimationNode):
-	bl_idname = "IntToStringConversion"
-	bl_label = "Integer to String"
-	
-	def init(self, context):
-		self.inputs.new("IntegerSocket", "Number")
-		self.outputs.new("StringSocket", "Text")
-		
-	def execute(self, input):
-		output = {}
-		output["Text"] = str(input["Number"])
-		return output
-		
-class FloatToStringConversion(Node, AnimationNode):
-	bl_idname = "FloatToStringConversion"
-	bl_label = "Float to String"
-	
-	def init(self, context):
-		self.inputs.new("FloatSocket", "Number")
-		self.outputs.new("StringSocket", "Text")
-		
-	def execute(self, input):
-		output = {}
-		output["Text"] = str(input["Number"])
-		return output
-		
-class FloatToIntegerConversion(Node, AnimationNode):
-	bl_idname = "FloatToIntegerConversion"
-	bl_label = "Float to Integer"
-	
-	def init(self, context):
-		self.inputs.new("FloatSocket", "Number")
-		self.outputs.new("IntegerSocket", "Number")
-		
-	def execute(self, input):
-		output = {}
-		output["Number"] = round(input["Number"])
-		return output
 		
 class ToStringConversion(Node, AnimationNode):
 	bl_idname = "ToStringConversion"

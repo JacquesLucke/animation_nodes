@@ -101,9 +101,6 @@ nodeCategories = [
 		NodeItem("SubstringNode")
 		]),
 	AnimationNodesCategory("CONVERTTYPES", "Convert", items = [
-		NodeItem("IntToStringConversion"),
-		NodeItem("FloatToStringConversion"),
-		NodeItem("FloatToIntegerConversion"),
 		NodeItem("ToStringConversion"),
 		NodeItem("ToFloatConversion"),
 		NodeItem("ToIntegerConversion")
