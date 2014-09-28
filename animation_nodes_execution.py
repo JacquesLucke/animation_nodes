@@ -56,8 +56,7 @@ class AnimationNodeTree:
 	def execute(self, useDependencyCache = False):
 		if not useDependencyCache:
 			animationTreeCache.clear()
-		self.time = 0
-		self.cleanup()
+			self.cleanup()
 		
 		for node in self.nodes.values():
 			node.isUpdated = False
@@ -65,7 +64,6 @@ class AnimationNodeTree:
 		for node in self.nodes.values():
 			if not node.isUpdated:
 				self.updateNode(node)
-		print(self.time)
 				
 	def cleanup(self):
 		links = self.nodeTree.links
@@ -80,9 +78,7 @@ class AnimationNodeTree:
 				self.nodeTree.links.remove(link)
 				
 	def updateNode(self, node):
-		start = time.clock()
 		dependencyNames = node.getDependencyNodeNames()
-		self.time += time.clock() - start
 		for name in dependencyNames:
 			if not self.nodes[name].isUpdated:
 				self.updateNode(self.nodes[name])
@@ -147,10 +143,12 @@ def updateAll(scene):
 	updateAnimationTrees(False)
 		
 def updateAnimationTrees(treeChanged = True):
+	start = time.clock()
 	nodeTrees = getAnimationNodeTrees()
 	for nodeTree in nodeTrees:		
 		animationNodeTree = AnimationNodeTree(nodeTree)
 		animationNodeTree.execute(useDependencyCache = not treeChanged)
+	print(time.clock() - start)
 	
 bpy.app.handlers.frame_change_post.append(updateAll)
 		
