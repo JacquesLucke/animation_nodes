@@ -68,7 +68,7 @@ class ExpressionNode(Node, AnimationNode):
 	bl_label = "Expression"
 	
 	def init(self, context):
-		self.inputs.new("StringSocket", "Expression")
+		self.inputs.new("StringSocket", "Expression").string = "a+b"
 		self.inputs.new("GenericSocket", "a")
 		self.inputs.new("GenericSocket", "b")
 		self.outputs.new("GenericSocket", "Result")
