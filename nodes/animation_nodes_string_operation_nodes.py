@@ -67,6 +67,19 @@ class SubstringNode(Node, AnimationNode):
 		output = {}
 		output["Text"] = input["Text"][ max(input["Start"],0) : max(input["Length"]+input["Start"],0) ]
 		return output
+		
+class StringLengthNode(Node, AnimationNode):
+	bl_idname = "StringLengthNode"
+	bl_label = "Text Length"
+	
+	def init(self, context):
+		self.inputs.new("StringSocket", "Text")
+		self.outputs.new("IntegerSocket", "Length")
+		
+	def execute(self, input):
+		output = {}
+		output["Length"] = len(input["Text"])
+		return output
 	
 		
 # register

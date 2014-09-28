@@ -101,7 +101,8 @@ nodeCategories = [
 	AnimationNodesCategory("MODIFYSTRINGS", "Modify Strings", items = [
 		NodeItem("CombineStringsNode"),
 		NodeItem("ReplicateStringsNode"),
-		NodeItem("SubstringNode")
+		NodeItem("SubstringNode"),
+		NodeItem("StringLengthNode")
 		]),
 	AnimationNodesCategory("CONVERTTYPES", "Convert", items = [
 		NodeItem("ToStringConversion"),
