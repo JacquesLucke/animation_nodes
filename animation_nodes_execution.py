@@ -18,7 +18,7 @@ Created by Jacques Lucke
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import bpy
+import bpy, time
 from bpy.app.handlers import persistent
 from animation_nodes_utils import *
 
@@ -30,7 +30,11 @@ class AnimationNodeTree:
 			if node.type != "REROUTE":
 				self.nodes[node.name] = AnimationNode(node)
 			
-	def execute(self):
+	def execute(self, useDependencyCache = False):
+		global dependencyCache
+		if not useDependencyCache:
+			dependencyCache = {}
+		self.time = 0
 		self.cleanup()
 		
 		for node in self.nodes.values():
@@ -39,6 +43,7 @@ class AnimationNodeTree:
 		for node in self.nodes.values():
 			if not node.isUpdated:
 				self.updateNode(node)
+		print(self.time)
 				
 	def cleanup(self):
 		links = self.nodeTree.links
@@ -53,7 +58,9 @@ class AnimationNodeTree:
 				self.nodeTree.links.remove(link)
 				
 	def updateNode(self, node):
+		start = time.clock()
 		dependencyNames = node.getDependencyNodeNames()
+		self.time += time.clock() - start
 		for name in dependencyNames:
 			if not self.nodes[name].isUpdated:
 				self.updateNode(self.nodes[name])
@@ -71,6 +78,8 @@ class AnimationNodeTree:
 			else:
 				value = socket.getValue()
 			node.input[socket.name] = value
+			
+dependencyCache = {}
 
 class AnimationNode:
 	def __init__(self, node):
@@ -81,9 +90,12 @@ class AnimationNode:
 		
 	def getDependencyNodeNames(self):
 		node = self.node
+		if node.name in dependencyCache:
+			return dependencyCache[node.name]
 		dependencies = []
 		for socket in node.inputs:
 			if isSocketLinked(socket): dependencies.append(getOriginSocket(socket).node.name)
+		dependencyCache[node.name] = dependencies
 		return dependencies
 		
 	def execute(self):
@@ -105,14 +117,17 @@ class AnimationNodesPanel(bpy.types.Panel):
 		pass
 		
 def updateHandler(self, context):
-	updateAll(bpy.context.scene)
+	updateAnimationTrees(True)
 		
 @persistent
 def updateAll(scene):
+	updateAnimationTrees(False)
+		
+def updateAnimationTrees(treeChanged = True):
 	nodeTrees = getAnimationNodeTrees()
 	for nodeTree in nodeTrees:		
 		animationNodeTree = AnimationNodeTree(nodeTree)
-		animationNodeTree.execute()
+		animationNodeTree.execute(useDependencyCache = not treeChanged)
 	
 bpy.app.handlers.frame_change_post.append(updateAll)
 		
