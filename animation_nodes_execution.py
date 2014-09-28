@@ -22,6 +22,29 @@ import bpy, time
 from bpy.app.handlers import persistent
 from animation_nodes_utils import *
 
+
+class AnimationTreeCache:
+	def __init__(self):
+		self.dependencies = {}
+	def clear(self):
+		self.dependencies = {}
+	def getDependencyNodeNames(self, node):
+		treeName = node.id_data.name
+		nodeName = node.name
+		if treeName in self.dependencies:
+			if nodeName in self.dependencies[treeName]:
+				return self.dependencies[treeName][nodeName]
+		return None
+	def setNodeDependencies(self, node, dependencies):
+		treeName = node.id_data.name
+		nodeName = node.name
+		if treeName not in self.dependencies:
+			self.dependencies[treeName] = {}
+		self.dependencies[treeName][nodeName] = dependencies
+
+animationTreeCache = AnimationTreeCache()
+
+
 class AnimationNodeTree:
 	def __init__(self, nodeTree):
 		self.nodeTree = nodeTree
@@ -31,9 +54,8 @@ class AnimationNodeTree:
 				self.nodes[node.name] = AnimationNode(node)
 			
 	def execute(self, useDependencyCache = False):
-		global dependencyCache
 		if not useDependencyCache:
-			dependencyCache = {}
+			animationTreeCache.clear()
 		self.time = 0
 		self.cleanup()
 		
@@ -78,8 +100,7 @@ class AnimationNodeTree:
 			else:
 				value = socket.getValue()
 			node.input[socket.name] = value
-			
-dependencyCache = {}
+	
 
 class AnimationNode:
 	def __init__(self, node):
@@ -90,16 +111,18 @@ class AnimationNode:
 		
 	def getDependencyNodeNames(self):
 		node = self.node
-		if node.name in dependencyCache:
-			return dependencyCache[node.name]
+		cache = animationTreeCache.getDependencyNodeNames(node)
+		if cache is not None:
+			return cache
 		dependencies = []
 		for socket in node.inputs:
 			if isSocketLinked(socket): dependencies.append(getOriginSocket(socket).node.name)
-		dependencyCache[node.name] = dependencies
+		animationTreeCache.setNodeDependencies(node, dependencies)
 		return dependencies
 		
 	def execute(self):
-		self.output = self.node.execute(self.input)	
+		self.output = self.node.execute(self.input)
+		
 
 class AnimationNodesPanel(bpy.types.Panel):
 	bl_idname = "animation_nodes_panel"
