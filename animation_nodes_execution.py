@@ -72,9 +72,13 @@ class AnimationNodeTree:
 		for node in self.nodes.values():
 			node.isUpdated = False
 		
+		self.time = 0
+		
 		for node in self.nodes.values():
 			if not node.isUpdated:
 				self.updateNode(node)
+		
+		print(self.time)
 				
 	def cleanup(self):
 		links = self.nodeTree.links
@@ -93,17 +97,20 @@ class AnimationNodeTree:
 		for name in dependencyNames:
 			if not self.nodes[name].isUpdated:
 				self.updateNode(self.nodes[name])
+		start = time.clock()
 		self.generateInputList(node)
+		self.time += time.clock() - start
 		node.execute()
 		node.isUpdated = True
 		
 	def generateInputList(self, node):
 		node.input = {}
-		for socket in node.node.inputs:
-			value = None
-			if isSocketLinked(socket):
-				parentNode = self.nodes[getOriginSocket(socket).node.name]
-				value = parentNode.output[getOriginSocket(socket).name]
+		inputSockets = node.node.inputs
+		for socket in inputSockets:
+			originSocket = getOriginSocket(socket)
+			if isOtherOriginSocket(socket, originSocket):
+				parentNode = self.nodes[originSocket.node.name]
+				value = parentNode.output[originSocket.name]
 			else:
 				value = socket.getValue()
 			node.input[socket.name] = value
@@ -154,12 +161,12 @@ def updateAll(scene):
 	updateAnimationTrees(False)
 		
 def updateAnimationTrees(treeChanged = True):
-	start = time.clock()
+	#start = time.clock()
 	nodeTrees = getAnimationNodeTrees()
 	for nodeTree in nodeTrees:		
 		animationNodeTree = AnimationNodeTree(nodeTree)
 		animationNodeTree.execute(useDependencyCache = not treeChanged)
-	print(time.clock() - start)
+	#print(time.clock() - start)
 	
 bpy.app.handlers.frame_change_post.append(updateAll)
 		

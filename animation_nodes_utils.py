@@ -44,6 +44,9 @@ def getAnimationNodeTrees():
 def isSocketLinked(socket):
 	origin = getOriginSocket(socket)
 	return origin is not None and origin is not socket
+	
+def isOtherOriginSocket(socket, origin):
+	return origin is not None and origin is not socket
 		
 def getOriginSocket(socket):
 	if hasLinks(socket):
