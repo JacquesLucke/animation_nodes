@@ -106,11 +106,15 @@ class AnimationNodeTree:
 	def generateInputList(self, node):
 		node.input = {}
 		inputSockets = node.node.inputs
+		
+		socketPairs = []
 		for socket in inputSockets:
-			originSocket = getOriginSocket(socket)
-			if isOtherOriginSocket(socket, originSocket):
-				parentNode = self.nodes[originSocket.node.name]
-				value = parentNode.output[originSocket.name]
+			socketPairs.append((socket, getOriginSocket(socket)))
+		
+		for (socket, origin) in socketPairs:
+			if isOtherOriginSocket(socket, origin):
+				parentNode = self.nodes[origin.node.name]
+				value = parentNode.output[origin.name]
 			else:
 				value = socket.getValue()
 			node.input[socket.name] = value
