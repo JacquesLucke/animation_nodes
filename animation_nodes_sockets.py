@@ -88,7 +88,12 @@ class VectorSocket(NodeSocket):
 	
 	def draw(self, context, layout, node, text):
 		if not self.is_output and not isSocketLinked(self):
-			layout.prop(self, "vector", text = text)
+			col = layout.column(align = True)
+			col.label(text)
+			col.prop(self, "vector", index = 0, text = "X")
+			col.prop(self, "vector", index = 1, text = "Y")
+			col.prop(self, "vector", index = 2, text = "Z")
+			col.separator()
 		else:
 			layout.label(text)
 			
@@ -97,6 +102,7 @@ class VectorSocket(NodeSocket):
 		
 	def getValue(self):
 		return self.vector
+		
 
 class StringSocket(NodeSocket):
 	bl_idname = "StringSocket"
