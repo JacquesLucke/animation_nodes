@@ -179,11 +179,10 @@ class AnimationNode:
 		
 
 class AnimationNodesPanel(bpy.types.Panel):
-	bl_idname = "animation_nodes_panel"
+	bl_idname = "animation_nodes.panel"
 	bl_label = "Animation Nodes"
-	bl_space_type = "VIEW_3D"
-	bl_region_type = "TOOLS"
-	bl_category = "Animation"
+	bl_space_type = "NODE_EDITOR"
+	bl_region_type = "UI"
 	bl_context = "objectmode"
 	
 	@classmethod
@@ -191,7 +190,18 @@ class AnimationNodesPanel(bpy.types.Panel):
 		return len(getAnimationNodeTrees()) > 0
 	
 	def draw(self, context):
-		pass
+		layout = self.layout
+		layout.operator("animation_nodes.force_full_update")
+		
+		
+class ForceNodeTreeUpdate(bpy.types.Operator):
+	bl_idname = "animation_nodes.force_full_update"
+	bl_label = "Force Node Tree Update"
+
+	def execute(self, context):
+		updateAnimationTrees(treeChanged = True)
+		return {'FINISHED'}
+		
 		
 def updateHandler(self, context):
 	updateAnimationTrees(True)
