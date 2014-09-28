@@ -38,16 +38,16 @@ class FloatMathNode(Node, AnimationNode):
 	mathTypesProperty = bpy.props.EnumProperty(name = "Type", items = mathTypes, default = "ADD", update = updateHandler)
 	
 	def init(self, context):
-		self.inputs.new("FloatSocket", "Number 1")
-		self.inputs.new("FloatSocket", "Number 2")
-		self.outputs.new("FloatSocket", "Number")
+		self.inputs.new("FloatSocket", "A")
+		self.inputs.new("FloatSocket", "B")
+		self.outputs.new("FloatSocket", "Result")
 		
 	def draw_buttons(self, context, layout):
 		layout.prop(self, "mathTypesProperty")
 		
 	def execute(self, input):
-		a = input["Number 1"]
-		b = input["Number 2"]
+		a = input["A"]
+		b = input["B"]
 		result = 0
 		type = self.mathTypesProperty
 		
@@ -57,7 +57,7 @@ class FloatMathNode(Node, AnimationNode):
 		elif type == "DIVIDE": result = a / b
 		
 		output = {}
-		output["Number"] = result
+		output["Result"] = result
 		return output
 	
 		
