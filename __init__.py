@@ -32,6 +32,7 @@ import animation_nodes_input_nodes
 import animation_nodes_string_operation_nodes
 import animation_nodes_conversion_nodes
 import animation_nodes_number_operations
+import animation_nodes_attribute_output
 
 
 bl_info = {
@@ -59,6 +60,7 @@ def register():
 	animation_nodes_string_operation_nodes.register()
 	animation_nodes_conversion_nodes.register()
 	animation_nodes_number_operations.register()
+	animation_nodes_attribute_output.register()
 
 def unregister():
 	animation_nodes_tree.unregister()
@@ -69,6 +71,7 @@ def unregister():
 	animation_nodes_string_operation_nodes.unregister()
 	animation_nodes_conversion_nodes.unregister()
 	animation_nodes_number_operations.unregister()
+	animation_nodes_attribute_output.unregister()
 
 if __name__ == "__main__":
 	register()

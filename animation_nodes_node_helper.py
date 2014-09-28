@@ -92,7 +92,8 @@ nodeCategories = [
 		NodeItem("TimeInfoNode")
 		]),
 	AnimationNodesCategory("OUTPUTNODES", "Output Nodes", items = [
-		NodeItem("TextOutputNode")
+		NodeItem("TextOutputNode"),
+		NodeItem("AttributeOutputNode")
 		]),
 	AnimationNodesCategory("MODIFYSTRINGS", "Modify Strings", items = [
 		NodeItem("CombineStringsNode"),

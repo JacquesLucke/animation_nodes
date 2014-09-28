@@ -23,6 +23,21 @@ from bpy.types import NodeTree, Node, NodeSocket
 from animation_nodes_utils import *
 from animation_nodes_execution import updateHandler
 
+class GenericSocket(NodeSocket):
+	bl_idname = "GenericSocket"
+	bl_label = "Generic Socket"
+	dataType = "Generic"
+	allowedInputTypes = ["Generic", "Integer", "Float", "String"]
+	
+	def draw(self, context, layout, node, text):
+		layout.label(text)
+			
+	def draw_color(self, context, node):
+		return (0.6, 0.3, 0.3, 0.7)
+		
+	def getValue(self):
+		return 0
+
 class IntegerSocket(NodeSocket):
 	bl_idname = "IntegerSocket"
 	bl_label = "Integer Socket"
