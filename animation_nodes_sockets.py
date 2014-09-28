@@ -27,7 +27,7 @@ class GenericSocket(NodeSocket):
 	bl_idname = "GenericSocket"
 	bl_label = "Generic Socket"
 	dataType = "Generic"
-	allowedInputTypes = ["Generic", "Integer", "Float", "String"]
+	allowedInputTypes = ["Generic", "Integer", "Float", "Vector", "String"]
 	
 	def draw(self, context, layout, node, text):
 		layout.label(text)
@@ -77,6 +77,26 @@ class FloatSocket(NodeSocket):
 		
 	def getValue(self):
 		return self.number
+		
+class VectorSocket(NodeSocket):
+	bl_idname = "VectorSocket"
+	bl_label = "Vector Socket"
+	dataType = "Vector"
+	allowedInputTypes = ["Vector"]
+	
+	vector = bpy.props.FloatVectorProperty(default = (0, 0, 0), update = updateHandler)
+	
+	def draw(self, context, layout, node, text):
+		if not self.is_output and not isSocketLinked(self):
+			layout.prop(self, "vector", text = text)
+		else:
+			layout.label(text)
+			
+	def draw_color(self, context, node):
+		return (0.05, 0.05, 0.8, 0.7)
+		
+	def getValue(self):
+		return self.vector
 
 class StringSocket(NodeSocket):
 	bl_idname = "StringSocket"
