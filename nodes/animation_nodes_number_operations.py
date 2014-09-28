@@ -23,20 +23,41 @@ import bpy
 from bpy.types import NodeTree, Node, NodeSocket
 from animation_nodes_node_helper import AnimationNode
 from animation_nodes_utils import *
+from animation_nodes_execution import updateHandler
 
 
 class FloatMathNode(Node, AnimationNode):
 	bl_idname = "FloatMathNode"
 	bl_label = "Math (Float)"
 	
+	mathTypes = [
+		("ADD", "Add", ""),
+		("SUBTRACT", "Subtract", ""),
+		("MULITPLY", "Multiply", ""),
+		("DIVIDE", "Divide", "")]
+	mathTypesProperty = bpy.props.EnumProperty(name = "Type", items = mathTypes, default = "ADD", update = updateHandler)
+	
 	def init(self, context):
 		self.inputs.new("FloatSocket", "Number 1")
 		self.inputs.new("FloatSocket", "Number 2")
 		self.outputs.new("FloatSocket", "Number")
 		
+	def draw_buttons(self, context, layout):
+		layout.prop(self, "mathTypesProperty")
+		
 	def execute(self, input):
+		a = input["Number 1"]
+		b = input["Number 2"]
+		result = 0
+		type = self.mathTypesProperty
+		
+		if type == "ADD": result = a + b
+		elif type == "SUBTRACT": result = a - b
+		elif type == "MULITPLY": result = a * b
+		elif type == "DIVIDE": result = a / b
+		
 		output = {}
-		output["Number"] = input["Number 1"] + input["Number 2"]
+		output["Number"] = result
 		return output
 	
 		
