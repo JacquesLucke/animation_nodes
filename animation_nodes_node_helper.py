@@ -100,7 +100,8 @@ nodeCategories = [
 		NodeItem("SubstringNode")
 		]),
 	AnimationNodesCategory("CONVERTTYPES", "Convert", items = [
-		NodeItem("IntToStringConversion")
+		NodeItem("IntToStringConversion"),
+		NodeItem("FloatToStringConversion")
 		]),
 	AnimationNodesCategory("MATHNODES", "Math", items = [
 		NodeItem("FloatMathNode")

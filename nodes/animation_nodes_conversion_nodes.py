@@ -37,6 +37,19 @@ class IntToStringConversion(Node, AnimationNode):
 		output = {}
 		output["Text"] = str(input["Number"])
 		return output
+		
+class FloatToStringConversion(Node, AnimationNode):
+	bl_idname = "FloatToStringConversion"
+	bl_label = "Float to String Conversion"
+	
+	def init(self, context):
+		self.inputs.new("FloatSocket", "Number")
+		self.outputs.new("StringSocket", "Text")
+		
+	def execute(self, input):
+		output = {}
+		output["Text"] = str(input["Number"])
+		return output
 	
 		
 # register
