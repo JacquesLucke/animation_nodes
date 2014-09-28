@@ -105,7 +105,8 @@ nodeCategories = [
 		NodeItem("FloatToStringConversion"),
 		NodeItem("FloatToIntegerConversion"),
 		NodeItem("ToStringConversion"),
-		NodeItem("ToFloatConversion")
+		NodeItem("ToFloatConversion"),
+		NodeItem("ToIntegerConversion")
 		]),
 	AnimationNodesCategory("MATHNODES", "Math", items = [
 		NodeItem("FloatMathNode")

@@ -89,6 +89,19 @@ class ToFloatConversion(Node, AnimationNode):
 		output = {}
 		output["Number"] = str(input["Value"])
 		return output
+		
+class ToIntegerConversion(Node, AnimationNode):
+	bl_idname = "ToIntegerConversion"
+	bl_label = "To Integer"
+	
+	def init(self, context):
+		self.inputs.new("GenericSocket", "Value")
+		self.outputs.new("IntegerSocket", "Number")
+		
+	def execute(self, input):
+		output = {}
+		output["Number"] = int(input["Value"])
+		return output
 	
 	
 		
