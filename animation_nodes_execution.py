@@ -22,25 +22,36 @@ import bpy, time
 from bpy.app.handlers import persistent
 from animation_nodes_utils import *
 
+class CachePerNode:
+	def __init__(self):
+		self.objects = {}
+	def clear(self):
+		self.objects = {}
+	def getObjectFromNode(self, node):
+		treeName = node.id_data.name
+		nodeName = node.name
+		if treeName in self.objects:
+			if nodeName in self.objects[treeName]:
+				return self.objects[treeName][nodeName]
+		return None
+	def setObjectFromNode(self, node, object):
+		treeName = node.id_data.name
+		nodeName = node.name
+		if treeName not in self.objects:
+			self.objects[treeName] = {}
+		self.objects[treeName][nodeName] = object
 
 class AnimationTreeCache:
 	def __init__(self):
-		self.dependencies = {}
+		self.dependencies = CachePerNode()
 	def clear(self):
-		self.dependencies = {}
+		self.dependencies.clear()
+		
 	def getDependencyNodeNames(self, node):
-		treeName = node.id_data.name
-		nodeName = node.name
-		if treeName in self.dependencies:
-			if nodeName in self.dependencies[treeName]:
-				return self.dependencies[treeName][nodeName]
-		return None
+		return self.dependencies.getObjectFromNode(node)
 	def setNodeDependencies(self, node, dependencies):
-		treeName = node.id_data.name
-		nodeName = node.name
-		if treeName not in self.dependencies:
-			self.dependencies[treeName] = {}
-		self.dependencies[treeName][nodeName] = dependencies
+		self.dependencies.setObjectFromNode(node, dependencies)
+
 
 animationTreeCache = AnimationTreeCache()
 
@@ -60,7 +71,7 @@ class AnimationNodeTree:
 		
 		for node in self.nodes.values():
 			node.isUpdated = False
-			
+		
 		for node in self.nodes.values():
 			if not node.isUpdated:
 				self.updateNode(node)
