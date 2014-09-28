@@ -19,7 +19,7 @@ Created by Jacques Lucke
 '''
 
 
-import bpy, random
+import bpy, random, string
 from bpy.types import NodeTree, Node, NodeSocket
 from animation_nodes_node_helper import AnimationNode
 from animation_nodes_utils import *
@@ -132,6 +132,23 @@ class RandomFloatNode(Node, AnimationNode):
 		max = input["Max"]
 		random.seed(seed)
 		output["Value"] = random.uniform(min, max)
+		return output
+		
+class RandomStringNode(Node, AnimationNode):
+	bl_idname = "RandomStringNode"
+	bl_label = "Random Text"
+	
+	def init(self, context):
+		self.inputs.new("IntegerSocket", "Seed")
+		self.inputs.new("IntegerSocket", "Length").number = 5
+		self.outputs.new("StringSocket", "Text")
+		
+	def execute(self, input):
+		output = {}
+		seed = input["Seed"]
+		length = input["Length"]
+		random.seed(seed)
+		output["Text"] = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(length))
 		return output
 	
 		

@@ -91,7 +91,8 @@ nodeCategories = [
 		NodeItem("ObjectInputNode"),
 		NodeItem("TimeInfoNode"),
 		NodeItem("ObjectInfoNode"),
-		NodeItem("RandomFloatNode")
+		NodeItem("RandomFloatNode"),
+		NodeItem("RandomStringNode")
 		]),
 	AnimationNodesCategory("OUTPUTNODES", "Output Nodes", items = [
 		NodeItem("TextOutputNode"),
