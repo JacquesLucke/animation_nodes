@@ -63,6 +63,21 @@ class ToIntegerConversion(Node, AnimationNode):
 		output = {}
 		output["Number"] = int(input["Value"])
 		return output
+		
+class CombineVector(Node, AnimationNode):
+	bl_idname = "CombineVector"
+	bl_label = "Combine Vector"
+	
+	def init(self, context):
+		self.inputs.new("FloatSocket", "X")
+		self.inputs.new("FloatSocket", "Y")
+		self.inputs.new("FloatSocket", "Z")
+		self.outputs.new("VectorSocket", "Vector")
+		
+	def execute(self, input):
+		output = {}
+		output["Vector"] = (input["X"], input["Y"], input["Z"])
+		return output
 	
 	
 		

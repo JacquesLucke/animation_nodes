@@ -109,7 +109,8 @@ nodeCategories = [
 	AnimationNodesCategory("CONVERTTYPES", "Convert", items = [
 		NodeItem("ToStringConversion"),
 		NodeItem("ToFloatConversion"),
-		NodeItem("ToIntegerConversion")
+		NodeItem("ToIntegerConversion"),
+		NodeItem("CombineVector")
 		]),
 	AnimationNodesCategory("MATHNODES", "Math", items = [
 		NodeItem("FloatMathNode")
