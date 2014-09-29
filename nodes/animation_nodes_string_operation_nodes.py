@@ -23,22 +23,41 @@ import bpy
 from bpy.types import NodeTree, Node, NodeSocket
 from animation_nodes_node_helper import AnimationNode
 from animation_nodes_utils import *
-from animation_nodes_execution import nodePropertyChanged
+from animation_nodes_execution import nodePropertyChanged, nodeTreeChanged
 
+
+def inputAmountChanged(self, context):
+	self.inputs.clear()
+	self.setInputSockets()
+	nodeTreeChanged()	
 
 class CombineStringsNode(Node, AnimationNode):
 	bl_idname = "CombineStringsNode"
 	bl_label = "Combine Strings"
 	
+	inputAmount = bpy.props.IntProperty(default = 2, min = 1, soft_max = 10, update = inputAmountChanged)
+	
 	def init(self, context):
-		self.inputs.new("StringSocket", "Text 1")
-		self.inputs.new("StringSocket", "Text 2")
+		self.setInputSockets()
 		self.outputs.new("StringSocket", "Text")
+		
+	def draw_buttons(self, context, layout):
+		layout.prop(self, "inputAmount", text = "Input Amount")
 		
 	def execute(self, input):
 		output = {}
-		output["Text"] = input["Text 1"] + input["Text 2"]
+		output["Text"] = ""
+		for i in range(self.inputAmount):
+			output["Text"] += input[self.getInputIdentifierByIndex(i)]
 		return output
+		
+	def setInputSockets(self):
+		for i in range(self.inputAmount):
+			self.inputs.new("StringSocket", "Text", self.getInputIdentifierByIndex(i))
+			
+	def getInputIdentifierByIndex(self, index):
+		return "Text" + str(index)	
+	
 		
 class ReplicateStringsNode(Node, AnimationNode):
 	bl_idname = "ReplicateStringsNode"

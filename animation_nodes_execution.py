@@ -57,7 +57,6 @@ class CachePerSocket:
 		self.objects[identifier] = object
 		
 	def getSocketIdentifier(self, socket):
-		print(socket.identifier)
 		return socket.node.id_data.name + socket.node.name + socket.identifier
 	
 
@@ -206,6 +205,8 @@ class ForceNodeTreeUpdate(bpy.types.Operator):
 		
 def nodePropertyChanged(self, context):
 	updateAnimationTrees(False)
+def nodeTreeChanged():
+	updateAnimationTrees(True)
 		
 @persistent
 def updateAll(scene):
@@ -217,7 +218,11 @@ def updateAnimationTrees(treeChanged = True):
 		else: fastUpdateUsingCache()
 	except:
 		if not treeChanged:
-			updateAndRebuildCache()
+			try:
+				updateAndRebuildCache()
+			except BaseException as e:
+				print("couldn't update")
+				print(str(e))
 			
 def fastUpdateUsingCache():
 	nodeTrees = getAnimationNodeTrees()

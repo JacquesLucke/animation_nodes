@@ -20,7 +20,7 @@ Created by Jacques Lucke
 
 import bpy
 from bpy.types import NodeTree, Node, NodeSocket
-from animation_nodes_execution import updateAnimationTrees
+from animation_nodes_execution import nodeTreeChanged
 
 class AnimationNodeTree(NodeTree):
 	bl_idname = "AnimationNodeTreeType"
@@ -30,7 +30,7 @@ class AnimationNodeTree(NodeTree):
 	isAnimationNodeTree = bpy.props.BoolProperty(default = True)
 	
 	def update(self):
-		updateAnimationTrees(treeChanged = True)
+		nodeTreeChanged()
 	
 	
 # register
