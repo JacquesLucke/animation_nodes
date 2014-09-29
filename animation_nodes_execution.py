@@ -57,7 +57,8 @@ class CachePerSocket:
 		self.objects[identifier] = object
 		
 	def getSocketIdentifier(self, socket):
-		return socket.node.id_data.name + socket.node.name + socket.name
+		print(socket.identifier)
+		return socket.node.id_data.name + socket.node.name + socket.identifier
 	
 
 class AnimationTreeCache:
@@ -153,7 +154,7 @@ class AnimationNodeTree:
 				value = parentNode.output[origin.name]
 			else:
 				value = socket.getValue()
-			node.input[socket.name] = value
+			node.input[socket.identifier] = value
 	
 
 class AnimationNode:
