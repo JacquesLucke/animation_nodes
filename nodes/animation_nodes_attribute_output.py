@@ -43,6 +43,23 @@ class AttributeOutputNode(Node, AnimationNode):
 		except:
 			print("attribute not found or wrong data type - " + attribute)
 		return {}
+		
+class DebugOutputNode(Node, AnimationNode):
+	bl_idname = "DebugOutputNode"
+	bl_label = "Debug"
+	
+	debugOutputString = bpy.props.StringProperty(default = "")
+	
+	def init(self, context):
+		self.inputs.new("GenericSocket", "Data")
+		
+	def draw_buttons(self, context, layout):
+		layout.label(self.debugOutputString)
+		
+	def execute(self, input):
+		self.debugOutputString = str(input["Data"])
+		return {}
+	
 	
 		
 # register

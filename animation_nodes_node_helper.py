@@ -98,7 +98,8 @@ nodeCategories = [
 	AnimationNodesCategory("OUTPUTNODES", "Output Nodes", items = [
 		NodeItem("TextOutputNode"),
 		NodeItem("ObjectOutputNode"),
-		NodeItem("AttributeOutputNode")
+		NodeItem("AttributeOutputNode"),
+		NodeItem("DebugOutputNode")
 		]),
 	AnimationNodesCategory("MODIFYSTRINGS", "Modify Strings", items = [
 		NodeItem("CombineStringsNode"),
