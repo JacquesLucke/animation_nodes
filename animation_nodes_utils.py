@@ -65,3 +65,28 @@ def getOriginSocket(socket):
 		
 def hasLinks(socket):
 	return len(socket.links) > 0
+	
+	
+def getFCurveWithDataPath(object, dataPath, index = 0):
+	fCurves = getFCurvesWithDataPath(object, dataPath)
+	for fCurve in fCurves:
+		if fCurve.array_index == index:
+			return fCurve
+	return None
+def getFCurvesWithDataPath(object, dataPath):
+	fcurves = []
+	if hasActionData(object):
+		for fcurve in object.animation_data.action.fcurves:
+			if fcurve.data_path == dataPath:
+				fcurves.append(fcurve)
+	return fcurves
+	
+def hasActionData(object):
+	if hasAnimationData(object):
+		if object.animation_data.action is not None:
+		 return True
+	return False
+def hasAnimationData(object):
+	if object.animation_data is not None:
+		return True
+	return False
