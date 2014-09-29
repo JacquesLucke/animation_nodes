@@ -78,6 +78,24 @@ class CombineVector(Node, AnimationNode):
 		output = {}
 		output["Vector"] = (input["X"], input["Y"], input["Z"])
 		return output
+		
+class SeparateVector(Node, AnimationNode):
+	bl_idname = "SeparateVector"
+	bl_label = "Separate Vector"
+	
+	def init(self, context):
+		self.inputs.new("VectorSocket", "Vector")
+		self.outputs.new("FloatSocket", "X")
+		self.outputs.new("FloatSocket", "Y")
+		self.outputs.new("FloatSocket", "Z")
+		
+	def execute(self, input):
+		output = {}
+		output["X"]= input["Vector"][0]
+		output["Y"]= input["Vector"][1]
+		output["Z"]= input["Vector"][2]
+		return output
+	
 	
 	
 		
