@@ -21,7 +21,7 @@ Created by Jacques Lucke
 import bpy
 from bpy.types import NodeTree, Node, NodeSocket
 from animation_nodes_utils import *
-from animation_nodes_execution import updateHandler
+from animation_nodes_execution import nodePropertyChanged
 
 class GenericSocket(NodeSocket):
 	bl_idname = "GenericSocket"
@@ -44,7 +44,7 @@ class IntegerSocket(NodeSocket):
 	dataType = "Integer"
 	allowedInputTypes = ["Integer"]
 	
-	number = bpy.props.IntProperty(default = 0, update = updateHandler)
+	number = bpy.props.IntProperty(default = 0, update = nodePropertyChanged)
 	
 	def draw(self, context, layout, node, text):
 		if not self.is_output and not isSocketLinked(self):
@@ -64,7 +64,7 @@ class FloatSocket(NodeSocket):
 	dataType = "Float"
 	allowedInputTypes = ["Float", "Integer"]
 	
-	number = bpy.props.FloatProperty(default = 0.0, update = updateHandler)
+	number = bpy.props.FloatProperty(default = 0.0, update = nodePropertyChanged)
 	
 	def draw(self, context, layout, node, text):
 		if not self.is_output and not isSocketLinked(self):
@@ -84,7 +84,7 @@ class VectorSocket(NodeSocket):
 	dataType = "Vector"
 	allowedInputTypes = ["Vector"]
 	
-	vector = bpy.props.FloatVectorProperty(default = (0, 0, 0), update = updateHandler)
+	vector = bpy.props.FloatVectorProperty(default = (0, 0, 0), update = nodePropertyChanged)
 	
 	def draw(self, context, layout, node, text):
 		if not self.is_output and not isSocketLinked(self):
@@ -110,7 +110,7 @@ class StringSocket(NodeSocket):
 	dataType = "String"
 	allowedInputTypes = ["String", "Object"]
 	
-	string = bpy.props.StringProperty(default = "text", update = updateHandler)
+	string = bpy.props.StringProperty(default = "text", update = nodePropertyChanged)
 	
 	def draw(self, context, layout, node, text):
 		if not self.is_output and not isSocketLinked(self):
@@ -131,7 +131,7 @@ class ObjectSocket(NodeSocket):
 	dataType = "Object"
 	allowedInputTypes = ["Object", "String"]
 	
-	objectName = bpy.props.StringProperty(update = updateHandler)
+	objectName = bpy.props.StringProperty(update = nodePropertyChanged)
 	
 	def draw(self, context, layout, node, text):
 		if not self.is_output and not isSocketLinked(self):

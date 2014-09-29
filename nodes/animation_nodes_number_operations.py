@@ -23,7 +23,7 @@ import bpy
 from bpy.types import NodeTree, Node, NodeSocket
 from animation_nodes_node_helper import AnimationNode
 from animation_nodes_utils import *
-from animation_nodes_execution import updateHandler
+from animation_nodes_execution import nodePropertyChanged
 
 
 class FloatMathNode(Node, AnimationNode):
@@ -36,7 +36,7 @@ class FloatMathNode(Node, AnimationNode):
 		("MULITPLY", "Multiply", ""),
 		("DIVIDE", "Divide", ""),
 		("MODULO", "Modulo", "")]
-	mathTypesProperty = bpy.props.EnumProperty(name = "Type", items = mathTypes, default = "ADD", update = updateHandler)
+	mathTypesProperty = bpy.props.EnumProperty(name = "Type", items = mathTypes, default = "ADD", update = nodePropertyChanged)
 	
 	def init(self, context):
 		self.inputs.new("FloatSocket", "A")

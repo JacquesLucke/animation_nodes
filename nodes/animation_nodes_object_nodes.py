@@ -23,7 +23,7 @@ import bpy, math
 from bpy.types import NodeTree, Node, NodeSocket
 from animation_nodes_node_helper import AnimationNode
 from animation_nodes_utils import *
-from animation_nodes_execution import updateHandler
+from animation_nodes_execution import nodePropertyChanged
 
 
 class ObjectInfoNode(Node, AnimationNode):
@@ -57,9 +57,9 @@ class ObjectOutputNode(Node, AnimationNode):
 	bl_idname = "ObjectOutputNode"
 	bl_label = "Object Output"
 	
-	useLocation = bpy.props.BoolVectorProperty(update = updateHandler)
-	useRotation = bpy.props.BoolVectorProperty(update = updateHandler)
-	useScale = bpy.props.BoolVectorProperty(update = updateHandler)
+	useLocation = bpy.props.BoolVectorProperty(update = nodePropertyChanged)
+	useRotation = bpy.props.BoolVectorProperty(update = nodePropertyChanged)
+	useScale = bpy.props.BoolVectorProperty(update = nodePropertyChanged)
 	
 	def init(self, context):
 		self.inputs.new("ObjectSocket", "Object")

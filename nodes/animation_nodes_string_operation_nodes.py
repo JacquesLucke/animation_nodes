@@ -23,7 +23,7 @@ import bpy
 from bpy.types import NodeTree, Node, NodeSocket
 from animation_nodes_node_helper import AnimationNode
 from animation_nodes_utils import *
-from animation_nodes_execution import updateHandler
+from animation_nodes_execution import nodePropertyChanged
 
 
 class CombineStringsNode(Node, AnimationNode):
@@ -58,7 +58,7 @@ class SubstringNode(Node, AnimationNode):
 	bl_idname = "SubstringNode"
 	bl_label = "Substrings"
 	
-	ignoreLength =  bpy.props.BoolProperty(default = False, update = updateHandler)
+	ignoreLength =  bpy.props.BoolProperty(default = False, update = nodePropertyChanged)
 	
 	def init(self, context):
 		self.inputs.new("StringSocket", "Text")

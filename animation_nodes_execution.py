@@ -102,8 +102,8 @@ class AnimationNodeTree:
 			if node.type != "REROUTE":
 				self.nodes[node.name] = AnimationNode(node)
 			
-	def execute(self, useDependencyCache = False):
-		if not useDependencyCache:
+	def execute(self, rebuildDependencyCache = False):
+		if rebuildDependencyCache:
 			animationTreeCache.clear()
 			self.cleanup()
 		
@@ -203,8 +203,8 @@ class ForceNodeTreeUpdate(bpy.types.Operator):
 		return {'FINISHED'}
 		
 		
-def updateHandler(self, context):
-	updateAnimationTrees(True)
+def nodePropertyChanged(self, context):
+	updateAnimationTrees(False)
 		
 @persistent
 def updateAll(scene):
@@ -222,13 +222,13 @@ def fastUpdateUsingCache():
 	nodeTrees = getAnimationNodeTrees()
 	for nodeTree in nodeTrees:		
 		animationNodeTree = AnimationNodeTree(nodeTree)
-		animationNodeTree.execute(useDependencyCache = True)
+		animationNodeTree.execute(rebuildDependencyCache = False)
 		
 def updateAndRebuildCache():
 	nodeTrees = getAnimationNodeTrees()
 	for nodeTree in nodeTrees:		
 		animationNodeTree = AnimationNodeTree(nodeTree)
-		animationNodeTree.execute(useDependencyCache = False)
+		animationNodeTree.execute(rebuildDependencyCache = True)
 
 	
 bpy.app.handlers.frame_change_post.append(updateAll)
