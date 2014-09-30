@@ -108,6 +108,7 @@ class AnimationNodeTree:
 			if fromSocket.dataType not in toSocket.allowedInputTypes:
 				self.nodeTree.links.remove(link)
 	
+	
 	# warning: this is a recursion -> these two functions call each other
 	def updateNode(self, node):
 		self.updateNodeDependenciesIfNecessary(node)
@@ -122,23 +123,27 @@ class AnimationNodeTree:
 		
 	def generateInputList(self, node):
 		node.input = {}
-		inputSockets = node.node.inputs
-		
-		socketPairs = []
-		for socket in inputSockets:
-			origin = animationTreeCache.getOriginSocket(socket)
-			if origin is None:
-				origin = getOriginSocket(socket)
-				animationTreeCache.setOriginSocket(socket, origin)
-			socketPairs.append((socket, origin))
-		
+		socketPairs = self.getSocketPairs(node)
 		for (socket, origin) in socketPairs:
 			if isOtherOriginSocket(socket, origin):
-				parentNode = self.nodes[origin.node.name]
-				value = parentNode.output[origin.name]
+				value = self.nodes[origin.node.name].output[origin.name] # use value of origin socket
 			else:
-				value = socket.getValue()
+				value = socket.getValue() # use value of this socket
 			node.input[socket.identifier] = value
+			
+	def getSocketPairs(self, node):
+		inputSockets = node.node.inputs
+		socketPairs = []
+		for socket in inputSockets:
+			originSocket = self.getOriginSocketWithCache(socket)
+			socketPairs.append((socket, originSocket))
+		return socketPairs
+	def getOriginSocketWithCache(self, socket):
+		originSocket = animationTreeCache.getOriginSocket(socket)
+		if originSocket is None: # -> not found in cache -> calculate again
+			originSocket = getOriginSocket(socket)
+			animationTreeCache.setOriginSocket(socket, originSocket)
+		return originSocket
 	
 
 class AnimationNode:
