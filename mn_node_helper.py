@@ -76,60 +76,12 @@ class AssignActiveObjectToNode(bpy.types.Operator):
 		setattr(node, self.target, obj.name)
 		return {'FINISHED'}		
 
-		
-	
-class AnimationNodesCategory(NodeCategory):
-	@classmethod
-	def poll(cls, context):
-		return context.space_data.tree_type == 'AnimationNodeTreeType'
-	
-nodeCategories = [
-	AnimationNodesCategory("INPUTNODES", "Input Nodes", items = [
-		NodeItem("IntegerInputNode"),
-		NodeItem("FloatInputNode"),
-		NodeItem("StringInputNode"),
-		NodeItem("ObjectInputNode"),
-		NodeItem("TimeInfoNode"),
-		NodeItem("ObjectInfoNode"),
-		NodeItem("RandomFloatNode"),
-		NodeItem("RandomStringNode"),
-		NodeItem("CharactersNode")
-		]),
-	AnimationNodesCategory("OUTPUTNODES", "Output Nodes", items = [
-		NodeItem("TextOutputNode"),
-		NodeItem("ObjectOutputNode"),
-		NodeItem("AttributeOutputNode"),
-		NodeItem("DebugOutputNode")
-		]),
-	AnimationNodesCategory("MODIFYSTRINGS", "Modify Strings", items = [
-		NodeItem("CombineStringsNode"),
-		NodeItem("ReplicateStringsNode"),
-		NodeItem("SubstringNode"),
-		NodeItem("StringLengthNode")
-		]),
-	AnimationNodesCategory("CONVERTTYPES", "Convert", items = [
-		NodeItem("ToStringConversion"),
-		NodeItem("ToFloatConversion"),
-		NodeItem("ToIntegerConversion"),
-		NodeItem("CombineVector"),
-		NodeItem("SeparateVector")
-		]),
-	AnimationNodesCategory("MATHNODES", "Math", items = [
-		NodeItem("FloatMathNode")
-		]),
-	AnimationNodesCategory("SCIRPT", "Script", items = [
-		NodeItem("ExpressionNode")
-		])
-	]
-	
 	
 # register
 ################################
 	
 def register():
 	bpy.utils.register_module(__name__)
-	nodeitems_utils.register_node_categories("ANIMATIONNODES", nodeCategories)
 
 def unregister():
-	nodeitems_utils.unregister_node_categories("ANIMATIONNODES")	
 	bpy.utils.unregister_module(__name__)
