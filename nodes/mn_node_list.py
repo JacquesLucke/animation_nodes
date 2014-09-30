@@ -22,7 +22,7 @@ def getNodeNameDictionary():
 		"CombineStringsNode",
 		"ReplicateStringsNode",
 		"SubstringNode",
-		"StringLengthNode" ] ))
+		"StringAnalyzeNode" ] ))
 
 	nodes.append(("Convert", [
 		"ToStringConversion",
