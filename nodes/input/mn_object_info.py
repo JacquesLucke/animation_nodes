@@ -13,7 +13,9 @@ class ObjectInfoNode(Node, AnimationNode):
 		self.outputs.new("VectorSocket", "Location")
 		self.outputs.new("VectorSocket", "Rotation")
 		self.outputs.new("VectorSocket", "Scale")
-		self.outputs.new("FloatSocket", "X Velocity")
+		self.outputs.new("VectorSocket", "Location Velocity")
+		self.outputs.new("VectorSocket", "Rotation Velocity")
+		self.outputs.new("VectorSocket", "Scale Velocity")
 		
 	def execute(self, input):
 		object = bpy.data.objects.get(input["Object"])
@@ -23,13 +25,6 @@ class ObjectInfoNode(Node, AnimationNode):
 		output["Rotation"] = (0, 0, 0)
 		output["Scale"] = (1, 1, 1)
 		
-		frame = getCurrentFrame()
-		fCurve = getFCurveWithDataPath(object, dataPath = "location", index = 0)
-		if fCurve is None:
-			output["X Velocity"] = 0
-		else:
-			output["X Velocity"] = fCurve.evaluate(frame) - fCurve.evaluate(frame - 1)
-		
 		if object is None:
 			return output
 			
@@ -37,7 +32,32 @@ class ObjectInfoNode(Node, AnimationNode):
 		output["Rotation"] = object.rotation_euler
 		output["Scale"] = object.scale
 		
+		frame = getCurrentFrame()
+		
+		locationVelocity = [0, 0, 0]
+		for i in range(3):
+			locationVelocity[i] = self.getFrameChange(object, frame, "location", i)
+			
+		rotationVelocity = [0, 0, 0]
+		for i in range(3):
+			rotationVelocity[i] = self.getFrameChange(object, frame, "rotation_euler", i)
+			
+		scaleVelocity = [0, 0, 0]
+		for i in range(3):
+			scaleVelocity[i] = self.getFrameChange(object, frame, "scale", i)
+			
+		output["Location Velocity"] = locationVelocity
+		output["Rotation Velocity"] = rotationVelocity
+		output["Scale Velocity"] = scaleVelocity
+		
 		return output
+		
+	def getFrameChange(self, object, frame, dataPath, index):
+		fCurve = getFCurveWithDataPath(object, dataPath = dataPath, index = index)
+		if fCurve is None:
+			return 0
+		else:
+			return fCurve.evaluate(frame) - fCurve.evaluate(frame - 1)
 		
 # register
 ################################
