@@ -24,7 +24,7 @@ from fnmatch import fnmatch
 currentPath = os.path.dirname(__file__)
 
 bl_info = {
-	"name":        "Monodes",
+	"name":        "Animation Nodes",
 	"description": "Node system for more flexible animations.",
 	"author":      "Jacques Lucke",
 	"version":     (0, 0, 1),
