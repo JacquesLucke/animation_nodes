@@ -20,8 +20,8 @@ class ExpressionNode(Node, AnimationNode):
 		result = 0
 		try:
 			result = eval(expression)
-		except (ZeroDivisionError):
-			print("expression error - " + self.name)
+		except:
+			print("expression error - " + expression + " # " + self.name)
 		output = {}
 		output["Result"] = result
 		return output
