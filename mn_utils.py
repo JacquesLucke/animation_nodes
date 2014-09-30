@@ -21,6 +21,9 @@ Created by Jacques Lucke
 import bpy
 from mn_utils import *
 	
+# simple general functions
+##########################
+	
 def getActive():
 	return bpy.context.scene.objects.active
 def getCurrentFrame():
@@ -28,20 +31,8 @@ def getCurrentFrame():
 def getRandom(min, max):
 	return random.random() * (max - min) + min
 	
-def getNode(treeName, nodeName):
-	return bpy.data.node_groups[treeName].nodes[nodeName]
-def getSocketFromNode(node, isOutputSocket, name):
-	if isOutputSocket:
-		return node.outputs.get(name)
-	else:
-		return node.inputs.get(name)
-		
-def getAnimationNodeTrees():
-	nodeTrees = []
-	for nodeTree in bpy.data.node_groups:
-		if hasattr(nodeTree, "isAnimationNodeTree"):
-			nodeTrees.append(nodeTree)
-	return nodeTrees
+# socket origins
+######################
 	
 def isSocketLinked(socket):
 	origin = getOriginSocket(socket)
@@ -66,7 +57,10 @@ def getOriginSocket(socket):
 def hasLinks(socket):
 	return len(socket.links) > 0
 	
-	
+
+# fCurves
+######################
+
 def getFCurveWithDataPath(object, dataPath, index = 0):
 	fCurves = getFCurvesWithDataPath(object, dataPath)
 	for fCurve in fCurves:
@@ -80,7 +74,6 @@ def getFCurvesWithDataPath(object, dataPath):
 			if fcurve.data_path == dataPath:
 				fcurves.append(fcurve)
 	return fcurves
-	
 def hasActionData(object):
 	if hasAnimationData(object):
 		if object.animation_data.action is not None:

@@ -235,6 +235,21 @@ def updateAndRebuildCache():
 	for nodeTree in nodeTrees:		
 		animationNodeTree = AnimationNodeTree(nodeTree)
 		animationNodeTree.execute(rebuildDependencyCache = True)
+		
+def getAnimationNodeTrees():
+	nodeTrees = []
+	for nodeTree in bpy.data.node_groups:
+		if hasattr(nodeTree, "isAnimationNodeTree"):
+			nodeTrees.append(nodeTree)
+	return nodeTrees
+
+def getNode(treeName, nodeName):
+	return bpy.data.node_groups[treeName].nodes[nodeName]
+def getSocketFromNode(node, isOutputSocket, name):
+	if isOutputSocket:
+		return node.outputs.get(name)
+	else:
+		return node.inputs.get(name)
 
 	
 bpy.app.handlers.frame_change_post.append(updateAll)
