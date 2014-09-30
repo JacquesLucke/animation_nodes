@@ -21,9 +21,9 @@ Created by Jacques Lucke
 
 import bpy
 from bpy.types import NodeTree, Node, NodeSocket
-from animation_nodes_node_helper import AnimationNode
-from animation_nodes_utils import *
-from animation_nodes_execution import nodePropertyChanged, nodeTreeChanged
+from mn_node_helper import AnimationNode
+from mn_utils import *
+from mn_execution import nodePropertyChanged, nodeTreeChanged
 
 
 def inputAmountChanged(self, context):

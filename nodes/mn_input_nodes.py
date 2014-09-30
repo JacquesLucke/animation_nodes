@@ -21,9 +21,9 @@ Created by Jacques Lucke
 
 import bpy, random
 from bpy.types import NodeTree, Node, NodeSocket
-from animation_nodes_node_helper import AnimationNode
-from animation_nodes_utils import *
-from animation_nodes_execution import nodePropertyChanged
+from mn_node_helper import AnimationNode
+from mn_utils import *
+from mn_execution import nodePropertyChanged
 
 
 class IntegerInputNode(Node, AnimationNode):
@@ -92,7 +92,7 @@ class ObjectInputNode(Node, AnimationNode):
 		col = layout.column()
 		row = col.row(align = True)
 		row.prop(self, "objectName", text = "")
-		selector = row.operator("animation_nodes.assign_active_object_to_node", text = "", icon = "EYEDROPPER")
+		selector = row.operator("mn.assign_active_object_to_node", text = "", icon = "EYEDROPPER")
 		selector.nodeTreeName = self.id_data.name
 		selector.nodeName = self.name
 		selector.target = "objectName"

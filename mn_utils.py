@@ -19,7 +19,7 @@ Created by Jacques Lucke
 '''
 
 import bpy
-from animation_nodes_utils import *
+from mn_utils import *
 	
 def getActive():
 	return bpy.context.scene.objects.active

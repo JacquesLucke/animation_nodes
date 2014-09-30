@@ -20,8 +20,8 @@ Created by Jacques Lucke
 
 import bpy
 from bpy.types import NodeTree, Node, NodeSocket
-from animation_nodes_utils import *
-from animation_nodes_execution import nodePropertyChanged
+from mn_utils import *
+from mn_execution import nodePropertyChanged
 
 class GenericSocket(NodeSocket):
 	bl_idname = "GenericSocket"
@@ -138,7 +138,7 @@ class ObjectSocket(NodeSocket):
 			col = layout.column()
 			row = col.row(align = True)
 			row.prop(self, "objectName", text = "")
-			selector = row.operator("animation_nodes.assign_active_object_to_socket", text = "", icon = "EYEDROPPER")
+			selector = row.operator("mn.assign_active_object_to_socket", text = "", icon = "EYEDROPPER")
 			selector.nodeTreeName = node.id_data.name
 			selector.nodeName = node.name
 			selector.isOutput = self.is_output
@@ -156,7 +156,7 @@ class ObjectSocket(NodeSocket):
 	
 	
 class AssignActiveObjectToNode(bpy.types.Operator):
-	bl_idname = "animation_nodes.assign_active_object_to_socket"
+	bl_idname = "mn.assign_active_object_to_socket"
 	bl_label = "Assign Active Object"
 	
 	nodeTreeName = bpy.props.StringProperty()

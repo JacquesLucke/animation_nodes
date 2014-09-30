@@ -21,8 +21,8 @@ Created by Jacques Lucke
 
 import bpy, math
 from bpy.types import NodeTree, Node, NodeSocket
-from animation_nodes_node_helper import AnimationNode
-from animation_nodes_utils import *
+from mn_node_helper import AnimationNode
+from mn_utils import *
 
 
 class AttributeOutputNode(Node, AnimationNode):

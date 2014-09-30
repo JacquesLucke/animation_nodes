@@ -21,7 +21,7 @@ Created by Jacques Lucke
 import bpy, nodeitems_utils
 from bpy.types import NodeTree, Node, NodeSocket
 from nodeitems_utils import NodeCategory, NodeItem
-from animation_nodes_utils import *
+from mn_utils import *
 
 class AnimationNode:
 	@classmethod
@@ -59,7 +59,7 @@ class TextOutputNode(Node, AnimationNode):
 		
 
 class AssignActiveObjectToNode(bpy.types.Operator):
-	bl_idname = "animation_nodes.assign_active_object_to_node"
+	bl_idname = "mn.assign_active_object_to_node"
 	bl_label = "Assign Active Object"
 	
 	nodeTreeName = bpy.props.StringProperty()

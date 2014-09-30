@@ -20,7 +20,7 @@ Created by Jacques Lucke
 
 import bpy, time
 from bpy.app.handlers import persistent
-from animation_nodes_utils import *
+from mn_utils import *
 
 class CachePerNode:
 	def __init__(self):
@@ -179,8 +179,8 @@ class AnimationNode:
 		
 
 class AnimationNodesPanel(bpy.types.Panel):
-	bl_idname = "animation_nodes.panel"
-	bl_label = "Animation Nodes"
+	bl_idname = "mn.panel"
+	bl_label = "Monodes"
 	bl_space_type = "NODE_EDITOR"
 	bl_region_type = "UI"
 	bl_context = "objectmode"
@@ -191,11 +191,11 @@ class AnimationNodesPanel(bpy.types.Panel):
 	
 	def draw(self, context):
 		layout = self.layout
-		layout.operator("animation_nodes.force_full_update")
+		layout.operator("mn.force_full_update")
 		
 		
 class ForceNodeTreeUpdate(bpy.types.Operator):
-	bl_idname = "animation_nodes.force_full_update"
+	bl_idname = "mn.force_full_update"
 	bl_label = "Force Node Tree Update"
 
 	def execute(self, context):

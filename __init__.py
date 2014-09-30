@@ -24,27 +24,27 @@ currentPath = os.path.dirname(__file__)
 sys.path.append(currentPath)
 sys.path.append(currentPath + "\\nodes")
 
-import animation_nodes_tree
-import animation_nodes_node_helper
-import animation_nodes_sockets
-import animation_nodes_execution
-import animation_nodes_input_nodes
-import animation_nodes_string_operation_nodes
-import animation_nodes_conversion_nodes
-import animation_nodes_number_operations
-import animation_nodes_attribute_output
-import animation_nodes_object_nodes
+import mn_tree
+import mn_node_helper
+import mn_sockets
+import mn_execution
+import mn_input_nodes
+import mn_string_operation_nodes
+import mn_conversion_nodes
+import mn_number_operations
+import mn_attribute_output
+import mn_object_nodes
 
 
 bl_info = {
-	"name":        "Animation Nodes",
-	"description": "",
+	"name":        "Monodes",
+	"description": "Node system for more flexible animations.",
 	"author":      "Jacques Lucke",
 	"version":     (0, 0, 1),
 	"blender":     (2, 7, 2),
 	"location":    "Node Editor",
 	"category":    "Animation",
-	"warning":	   "pre alpha"
+	"warning":	   "alpha"
 	}
 	
 	
@@ -53,28 +53,28 @@ bl_info = {
 ##################################
 
 def register():
-	animation_nodes_tree.register()
-	animation_nodes_node_helper.register()
-	animation_nodes_sockets.register()
-	animation_nodes_execution.register()
-	animation_nodes_input_nodes.register()
-	animation_nodes_string_operation_nodes.register()
-	animation_nodes_conversion_nodes.register()
-	animation_nodes_number_operations.register()
-	animation_nodes_object_nodes.register()
-	animation_nodes_attribute_output.register()
+	mn_tree.register()
+	mn_node_helper.register()
+	mn_sockets.register()
+	mn_execution.register()
+	mn_input_nodes.register()
+	mn_string_operation_nodes.register()
+	mn_conversion_nodes.register()
+	mn_number_operations.register()
+	mn_object_nodes.register()
+	mn_attribute_output.register()
 
 def unregister():
-	animation_nodes_tree.unregister()
-	animation_nodes_node_helper.unregister()
-	animation_nodes_sockets.unregister()
-	animation_nodes_execution.unregister()
-	animation_nodes_input_nodes.unregister()
-	animation_nodes_string_operation_nodes.unregister()
-	animation_nodes_conversion_nodes.unregister()
-	animation_nodes_number_operations.unregister()
-	animation_nodes_object_nodes.unregister()
-	animation_nodes_attribute_output.unregister()
+	mn_tree.unregister()
+	mn_node_helper.unregister()
+	mn_sockets.unregister()
+	mn_execution.unregister()
+	mn_input_nodes.unregister()
+	mn_string_operation_nodes.unregister()
+	mn_conversion_nodes.unregister()
+	mn_number_operations.unregister()
+	mn_object_nodes.unregister()
+	mn_attribute_output.unregister()
 
 if __name__ == "__main__":
 	register()
