@@ -1,66 +1,8 @@
-'''
-Copyright (C) 2014 Jacques Lucke
-mail@jlucke.com
-
-Created by Jacques Lucke
-
-	This program is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program.  If not, see <http://www.gnu.org/licenses/>.
-'''
-
-
-import bpy, math
-from bpy.types import NodeTree, Node, NodeSocket
+import bpy
+from bpy.types import Node
 from mn_node_helper import AnimationNode
-from mn_utils import *
 from mn_execution import nodePropertyChanged
 
-
-class ObjectInfoNode(Node, AnimationNode):
-	bl_idname = "ObjectInfoNode"
-	bl_label = "Object Info"
-	
-	def init(self, context):
-		self.inputs.new("ObjectSocket", "Object")
-		self.outputs.new("VectorSocket", "Location")
-		self.outputs.new("VectorSocket", "Rotation")
-		self.outputs.new("VectorSocket", "Scale")
-		self.outputs.new("FloatSocket", "X Velocity")
-		
-	def execute(self, input):
-		object = bpy.data.objects.get(input["Object"])
-		output = {}
-		
-		output["Location"] = (0, 0, 0)
-		output["Rotation"] = (0, 0, 0)
-		output["Scale"] = (1, 1, 1)
-		
-		frame = getCurrentFrame()
-		fCurve = getFCurveWithDataPath(object, dataPath = "location", index = 0)
-		if fCurve is None:
-			output["X Velocity"] = 0
-		else:
-			output["X Velocity"] = fCurve.evaluate(frame) - fCurve.evaluate(frame - 1)
-		
-		if object is None:
-			return output
-			
-		output["Location"] = object.location
-		output["Rotation"] = object.rotation_euler
-		output["Scale"] = object.scale
-		
-		return output
-		
 class ObjectOutputNode(Node, AnimationNode):
 	bl_idname = "ObjectOutputNode"
 	bl_label = "Object Output"
@@ -112,8 +54,6 @@ class ObjectOutputNode(Node, AnimationNode):
 		if self.useScale[2]: object.scale[2] = input["Scale"][2]
 		
 		return {}
-		
-	
 		
 # register
 ################################
