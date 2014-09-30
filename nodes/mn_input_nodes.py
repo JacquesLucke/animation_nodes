@@ -24,38 +24,7 @@ from bpy.types import NodeTree, Node, NodeSocket
 from mn_node_helper import AnimationNode
 from mn_utils import *
 from mn_execution import nodePropertyChanged
-		
-		
-class TimeInfoNode(Node, AnimationNode):
-	bl_idname = "TimeInfoNode"
-	bl_label = "Time Info"
-	
-	def init(self, context):
-		self.outputs.new("IntegerSocket", "Frame")
-		
-	def execute(self, input):
-		output = {}
-		output["Frame"] = getCurrentFrame()
-		return output
-		
-class RandomFloatNode(Node, AnimationNode):
-	bl_idname = "RandomFloatNode"
-	bl_label = "Random Float"
-	
-	def init(self, context):
-		self.inputs.new("IntegerSocket", "Seed")
-		self.inputs.new("FloatSocket", "Min").number = 0.0
-		self.inputs.new("FloatSocket", "Max").number = 1.0
-		self.outputs.new("FloatSocket", "Value")
-		
-	def execute(self, input):
-		output = {}
-		seed = input["Seed"]
-		min = input["Min"]
-		max = input["Max"]
-		random.seed(seed)
-		output["Value"] = random.uniform(min, max)
-		return output
+
 		
 class RandomStringNode(Node, AnimationNode):
 	bl_idname = "RandomStringNode"
