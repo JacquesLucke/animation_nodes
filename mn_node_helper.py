@@ -131,5 +131,5 @@ def register():
 	nodeitems_utils.register_node_categories("ANIMATIONNODES", nodeCategories)
 
 def unregister():
-	nodeitems_utils.unregister_node_categories("ANIMATIONNODES", nodeCategories)	
+	nodeitems_utils.unregister_node_categories("ANIMATIONNODES")	
 	bpy.utils.unregister_module(__name__)
