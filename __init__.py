@@ -35,7 +35,7 @@ bl_info = {
 	}
 	
 # import all modules in same/subdirectories
-####################################
+###########################################
 
 def getAllPathsToPythonFiles(root):
 	filePaths = []
