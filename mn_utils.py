@@ -31,6 +31,17 @@ def getCurrentFrame():
 def getRandom(min, max):
 	return random.random() * (max - min) + min
 	
+# nodes and sockets
+######################
+
+def getNode(treeName, nodeName):
+	return bpy.data.node_groups[treeName].nodes[nodeName]
+def getSocketFromNode(node, isOutputSocket, name):
+	if isOutputSocket:
+		return node.outputs.get(name)
+	else:
+		return node.inputs.get(name)
+	
 # socket origins
 ######################
 	
