@@ -24,24 +24,6 @@ from bpy.types import NodeTree, Node, NodeSocket
 from mn_node_helper import AnimationNode
 from mn_utils import *
 from mn_execution import nodePropertyChanged
-
-
-class StringInputNode(Node, AnimationNode):
-	bl_idname = "StringInputNode"
-	bl_label = "String"
-	
-	stringProperty = bpy.props.StringProperty(default = "text", update = nodePropertyChanged)
-	
-	def init(self, context):
-		self.outputs.new("StringSocket", "Text")
-		
-	def draw_buttons(self, context, layout):
-		layout.prop(self, "stringProperty", text = "")
-		
-	def execute(self, input):
-		output = {}
-		output["Text"] = self.stringProperty
-		return output
 		
 		
 class ObjectInputNode(Node, AnimationNode):
