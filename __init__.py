@@ -34,7 +34,7 @@ bl_info = {
 	"warning":	   "alpha"
 	}
 	
-# import all modules in subDirectory
+# import all modules in same/subdirectories
 ####################################
 
 def getAllPathsToPythonFiles(root):
