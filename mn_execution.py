@@ -142,7 +142,7 @@ class AnimationNodeTree:
 		originSocket = animationTreeCache.getOriginSocket(socket)
 		if originSocket is None: # -> not found in cache -> calculate again
 			originSocket = getOriginSocket(socket)
-			animationTreeCache.setOriginSocket(socket, originSocket)
+			animationTreeCache.setOriginSocket(socket, originSocket) # store this in the cache now
 		return originSocket
 	
 
@@ -154,15 +154,16 @@ class AnimationNode:
 		self.output = {}
 		
 	def getDependencyNodeNames(self):
-		node = self.node
-		cache = animationTreeCache.getDependencyNodeNames(node)
-		if cache is not None:
-			return cache
-		dependencies = []
-		for socket in node.inputs:
-			if isSocketLinked(socket): dependencies.append(getOriginSocket(socket).node.name)
-		animationTreeCache.setNodeDependencies(node, dependencies)
-		return dependencies
+		dependencyNodeNames = self.getDependencyNodeNamesWithCache()
+		if dependencyNodeNames is None: # -> not found in cache
+			dependencyNodeNames = []
+			for socket in self.node.inputs:
+				if isSocketLinked(socket): dependencyNodeNames.append(getOriginSocket(socket).node.name)
+			animationTreeCache.setNodeDependencies(self.node, dependencyNodeNames) # store this in the cache now
+		return dependencyNodeNames
+		
+	def getDependencyNodeNamesWithCache(self):
+		return animationTreeCache.getDependencyNodeNames(self.node)
 		
 	def execute(self):
 		self.output = self.node.execute(self.input)
