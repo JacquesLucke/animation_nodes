@@ -8,7 +8,7 @@ def getNodeNameDictionary():
 		"ObjectInputNode",
 		"TimeInfoNode",
 		"ObjectInfoNode",
-		"RandomFloatNode",
+		"RandomNumberNode",
 		"RandomStringNode",
 		"CharactersNode" ] ))
 		
