@@ -1,5 +1,5 @@
-How to make my own nodes
-########################
+##How to make my own nodes
+
 
 ### Overview
 To create your own node you have to follow 2 simple steps:
