@@ -42,23 +42,6 @@ class IntegerInputNode(Node, AnimationNode):
 		output = {}
 		output["Number"] = self.intProperty
 		return output
-		
-class FloatInputNode(Node, AnimationNode):
-	bl_idname = "FloatInputNode"
-	bl_label = "Float"
-	
-	floatProperty = bpy.props.FloatProperty(default = 0.0, update = nodePropertyChanged)
-	
-	def init(self, context):
-		self.outputs.new("FloatSocket", "Number")
-		
-	def draw_buttons(self, context, layout):
-		layout.prop(self, "floatProperty", text = "")
-		
-	def execute(self, input):
-		output = {}
-		output["Number"] = self.floatProperty
-		return output
 
 
 class StringInputNode(Node, AnimationNode):
