@@ -20,21 +20,8 @@ Created by Jacques Lucke
 
 import bpy, sys, os
 from bpy.types import NodeTree, Node, NodeSocket
+from fnmatch import fnmatch
 currentPath = os.path.dirname(__file__)
-sys.path.append(currentPath)
-sys.path.append(currentPath + "\\nodes")
-
-import mn_tree
-import mn_node_helper
-import mn_sockets
-import mn_execution
-import mn_input_nodes
-import mn_string_operation_nodes
-import mn_conversion_nodes
-import mn_number_operations
-import mn_attribute_output
-import mn_object_nodes
-
 
 bl_info = {
 	"name":        "Monodes",
@@ -47,6 +34,37 @@ bl_info = {
 	"warning":	   "alpha"
 	}
 	
+# import all modules in subDirectory
+####################################
+
+def getAllPathsToPythonFiles(root):
+	filePaths = []
+	pattern = "*.py"
+	for (path, subDirectory, files) in os.walk(root):
+		for name in files:
+			if fnmatch(name, pattern): filePaths.append(os.path.join(path, name))
+	return filePaths
+def getModuleNames(filePaths):
+	moduleNames = []
+	for filePath in filePaths:
+		moduleNames.append(os.path.basename(os.path.splitext(filePath)[0]))
+	return moduleNames
+def getExecStringsForImport(moduleNames):
+	execStrings = []
+	for name in moduleNames:
+		execStrings.append("import " + name)
+	return execStrings
+def appendPathsToPythonSearchDirectories(filePaths):
+	for filePath in filePaths:
+		sys.path.append(os.path.dirname(filePath))
+
+filePaths = getAllPathsToPythonFiles(currentPath)
+moduleNames = getModuleNames(filePaths)
+appendPathsToPythonSearchDirectories(filePaths)
+execStrings = getExecStringsForImport(moduleNames)
+for name in moduleNames:
+	exec("import " + name)
+	print("import " + name)	
 	
 	
 # register
