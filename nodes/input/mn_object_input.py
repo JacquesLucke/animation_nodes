@@ -27,6 +27,24 @@ class ObjectInputNode(Node, AnimationNode):
 		output["Object"] = self.objectName
 		return output
 		
+class AssignActiveObjectToNode(bpy.types.Operator):
+	bl_idname = "mn.assign_active_object_to_node"
+	bl_label = "Assign Active Object"
+	
+	nodeTreeName = bpy.props.StringProperty()
+	nodeName = bpy.props.StringProperty()
+	target = bpy.props.StringProperty()
+	
+	@classmethod
+	def poll(cls, context):
+		return getActive() is not None
+		
+	def execute(self, context):
+		obj = getActive()
+		node = getNode(self.nodeTreeName, self.nodeName)
+		setattr(node, self.target, obj.name)
+		return {'FINISHED'}	
+		
 # register
 ################################
 		
