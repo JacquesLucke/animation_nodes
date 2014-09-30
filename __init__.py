@@ -47,7 +47,9 @@ def getAllPathsToPythonFiles(root):
 def getModuleNames(filePaths):
 	moduleNames = []
 	for filePath in filePaths:
-		moduleNames.append(os.path.basename(os.path.splitext(filePath)[0]))
+		moduleName = os.path.basename(os.path.splitext(filePath)[0])
+		if moduleName != "__init__":
+			moduleNames.append(moduleName)
 	return moduleNames
 def getExecStringsForImport(moduleNames):
 	execStrings = []
@@ -70,29 +72,23 @@ for name in moduleNames:
 # register
 ##################################
 
+def registerIfPossible(moduleName):
+	exec("global module; module = " + moduleName)
+	if hasattr(module, "register"):
+		module.register()
+		
+def unregisterIfPossible(moduleName):
+	exec("global module; module = " + moduleName)
+	if hasattr(module, "unregister"):
+		module.unregister()
+
 def register():
-	mn_tree.register()
-	mn_node_helper.register()
-	mn_sockets.register()
-	mn_execution.register()
-	mn_input_nodes.register()
-	mn_string_operation_nodes.register()
-	mn_conversion_nodes.register()
-	mn_number_operations.register()
-	mn_object_nodes.register()
-	mn_attribute_output.register()
+	for moduleName in moduleNames:
+		registerIfPossible(moduleName)
 
 def unregister():
-	mn_tree.unregister()
-	mn_node_helper.unregister()
-	mn_sockets.unregister()
-	mn_execution.unregister()
-	mn_input_nodes.unregister()
-	mn_string_operation_nodes.unregister()
-	mn_conversion_nodes.unregister()
-	mn_number_operations.unregister()
-	mn_object_nodes.unregister()
-	mn_attribute_output.unregister()
-
+	for moduleName in moduleNames:
+		unregisterIfPossible(moduleName)
+		
 if __name__ == "__main__":
 	register()
