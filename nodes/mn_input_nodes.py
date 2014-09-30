@@ -26,24 +26,6 @@ from mn_utils import *
 from mn_execution import nodePropertyChanged
 
 
-class IntegerInputNode(Node, AnimationNode):
-	bl_idname = "IntegerInputNode"
-	bl_label = "Integer"
-	
-	intProperty = bpy.props.IntProperty(default = 0, update = nodePropertyChanged)
-	
-	def init(self, context):
-		self.outputs.new("IntegerSocket", "Number")
-		
-	def draw_buttons(self, context, layout):
-		layout.prop(self, "intProperty", text = "")
-		
-	def execute(self, input):
-		output = {}
-		output["Number"] = self.intProperty
-		return output
-
-
 class StringInputNode(Node, AnimationNode):
 	bl_idname = "StringInputNode"
 	bl_label = "String"

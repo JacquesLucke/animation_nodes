@@ -76,8 +76,6 @@ def registerIfPossible(moduleName):
 	exec("global module; module = " + moduleName)
 	if hasattr(module, "register"):
 		module.register()
-	else:
-		print(module)
 		
 def unregisterIfPossible(moduleName):
 	exec("global module; module = " + moduleName)
