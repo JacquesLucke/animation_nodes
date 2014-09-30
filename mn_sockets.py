@@ -110,7 +110,7 @@ class StringSocket(NodeSocket):
 	dataType = "String"
 	allowedInputTypes = ["String", "Object"]
 	
-	string = bpy.props.StringProperty(default = "text", update = nodePropertyChanged)
+	string = bpy.props.StringProperty(default = "Text", update = nodePropertyChanged)
 	
 	def draw(self, context, layout, node, text):
 		if not self.is_output and not isSocketLinked(self):
