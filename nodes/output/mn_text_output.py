@@ -12,7 +12,7 @@ class TextOutputNode(Node, AnimationNode):
 		self.inputs.new("StringSocket", "Text")
 		self.inputs.new("FloatSocket", "Size").number = 1.0
 		self.inputs.new("FloatSocket", "Shear").number = 0.0
-		self.inputs.new("FloatSocket", "Extrude").number = 0.1
+		self.inputs.new("FloatSocket", "Extrude").number = 0.0
 		
 	def execute(self, input):
 		object = bpy.data.objects.get(input["Object"])
