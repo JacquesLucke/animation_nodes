@@ -93,8 +93,10 @@ class AnimationNodeTree:
 		for node in self.nodes.values():
 			if not node.isUpdated:
 				self.updateNode(node)
-				
+	
 	def cleanup(self):
+		self.removeLinksBetweenNotAllowedSocketTypes()
+	def removeLinksBetweenNotAllowedSocketTypes(self):
 		links = self.nodeTree.links
 		for link in links:
 			if link.to_node.type == "REROUTE":
@@ -105,15 +107,18 @@ class AnimationNodeTree:
 			fromSocket = getOriginSocket(toSocket)
 			if fromSocket.dataType not in toSocket.allowedInputTypes:
 				self.nodeTree.links.remove(link)
-				
+	
+	# warning: this is a recursion -> these two functions call each other
 	def updateNode(self, node):
-		dependencyNames = node.getDependencyNodeNames()
-		for name in dependencyNames:
-			if not self.nodes[name].isUpdated:
-				self.updateNode(self.nodes[name])
+		self.updateNodeDependenciesIfNecessary(node)
 		self.generateInputList(node)
 		node.execute()
 		node.isUpdated = True
+	def updateNodeDependenciesIfNecessary(self, node):
+		dependencyNodeNames = node.getDependencyNodeNames()
+		for name in dependencyNodeNames:
+			if not self.nodes[name].isUpdated:
+				self.updateNode(self.nodes[name])
 		
 	def generateInputList(self, node):
 		node.input = {}
@@ -157,7 +162,12 @@ class AnimationNode:
 	def execute(self):
 		self.output = self.node.execute(self.input)
 		
-
+		
+		
+		
+# Force Cache Rebuilding
+########################
+		
 class AnimationNodesPanel(bpy.types.Panel):
 	bl_idname = "mn.panel"
 	bl_label = "Monodes"
@@ -181,16 +191,20 @@ class ForceNodeTreeUpdate(bpy.types.Operator):
 	def execute(self, context):
 		updateAnimationTrees(treeChanged = True)
 		return {'FINISHED'}
-		
-		
+	
+	
+	
+	
+# handlers to start the update
+##############################
+	
+@persistent
+def frameChangeHandler(scene):
+	updateAnimationTrees(False)
 def nodePropertyChanged(self, context):
 	updateAnimationTrees(False)
 def nodeTreeChanged():
 	updateAnimationTrees(True)
-		
-@persistent
-def updateAll(scene):
-	updateAnimationTrees(False)
 		
 def updateAnimationTrees(treeChanged = True):
 	try:
@@ -224,7 +238,7 @@ def getAnimationNodeTrees():
 	return nodeTrees
 
 	
-bpy.app.handlers.frame_change_post.append(updateAll)
+bpy.app.handlers.frame_change_post.append(frameChangeHandler)
 		
 		
 # register
