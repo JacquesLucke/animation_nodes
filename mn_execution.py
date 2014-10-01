@@ -113,7 +113,7 @@ animationTreeCache = AnimationTreeCache()
 		
 class AnimationNodesPanel(bpy.types.Panel):
 	bl_idname = "mn.panel"
-	bl_label = "Monodes"
+	bl_label = "Animation Nodes"
 	bl_space_type = "NODE_EDITOR"
 	bl_region_type = "UI"
 	bl_context = "objectmode"
