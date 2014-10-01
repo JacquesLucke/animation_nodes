@@ -163,7 +163,7 @@ def sceneUpdateHandler(scene):
 def fileLoadHandler(scene):
 	updateAnimationTrees(True)
 def nodePropertyChanged(self, context):
-	if scene.updateAnimationTreeOnPropertyChange:
+	if context.scene.updateAnimationTreeOnPropertyChange:
 		updateAnimationTrees(False)
 def nodeTreeChanged():
 	updateAnimationTrees(True)
