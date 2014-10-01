@@ -16,7 +16,8 @@ def getNodeNameDictionary():
 		"TextOutputNode",
 		"ObjectOutputNode",
 		"AttributeOutputNode",
-		"DebugOutputNode" ] ))
+		"DebugOutputNode",
+		"ModifierOutputNode" ] ))
 		
 	nodes.append(("Strings", [
 		"CombineStringsNode",
