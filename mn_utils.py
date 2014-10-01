@@ -19,7 +19,6 @@ Created by Jacques Lucke
 '''
 
 import bpy
-from mn_utils import *
 	
 # simple general functions
 ##########################
