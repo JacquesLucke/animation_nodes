@@ -58,7 +58,7 @@ class AnimationNodeTree:
 		socketPairs = self.getSocketPairs(node)
 		for (socket, origin) in socketPairs:
 			if isOtherOriginSocket(socket, origin):
-				value = self.nodes[origin.node.name].output[origin.name] # use value of origin socket
+				value = self.nodes[origin.node.name].output[origin.identifier] # use value of origin socket
 			else:
 				value = socket.getValue() # use value of this socket
 			node.input[socket.identifier] = value
