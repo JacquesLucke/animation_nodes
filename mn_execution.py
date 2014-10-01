@@ -144,6 +144,10 @@ class ForceNodeTreeUpdate(bpy.types.Operator):
 @persistent
 def frameChangeHandler(scene):
 	updateAnimationTrees(False)
+@persistent
+def sceneUpdateHandler(scene):
+	updateAnimationTrees(False)
+@persistent
 def fileLoadHandler(scene):
 	updateAnimationTrees(True)
 def nodePropertyChanged(self, context):
@@ -184,6 +188,7 @@ def getAnimationNodeTrees():
 
 	
 bpy.app.handlers.frame_change_post.append(frameChangeHandler)
+bpy.app.handlers.scene_update_post.append(sceneUpdateHandler)
 bpy.app.handlers.load_post.append(fileLoadHandler)
 		
 		
