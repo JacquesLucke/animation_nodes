@@ -33,7 +33,8 @@ def getNodeNameDictionary():
 		"SeparateVector" ] ))
 	
 	nodes.append(("Math", [
-		"FloatMathNode" ] ))
+		"FloatMathNode",
+		"VectorLengthNode" ] ))
 		
 	nodes.append(("Script", [
 		"ExpressionNode" ] ))
