@@ -39,8 +39,7 @@ def getNodeNameDictionary():
 		"VectorLengthNode" ] ))
 		
 	nodes.append(("List", [
-		"GetFloatFromFloatListNode",
-		"GetStringFromStringListNode",
+		"GetListElementNode",
 		"GetListLengthNode",
 		"SumFloatListElementsNode",
 		"CombineListsNode" ] ))
