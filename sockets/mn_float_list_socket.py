@@ -3,20 +3,26 @@ from bpy.types import NodeTree, Node, NodeSocket
 from mn_utils import *
 from mn_execution import nodePropertyChanged
 
-class GenericSocket(NodeSocket):
-	bl_idname = "GenericSocket"
-	bl_label = "Generic Socket"
-	dataType = "Generic"
-	allowedInputTypes = ["Generic", "Integer", "Float", "Vector", "String", "Object", "Float List"]
+class FloatPropertyGroup(bpy.types.PropertyGroup):
+	value = bpy.props.FloatProperty(name = "Value", default = 0)
+
+class FloatListSocket(NodeSocket):
+	bl_idname = "FloatListSocket"
+	bl_label = "Float List Socket"
+	dataType = "Float List"
+	allowedInputTypes = ["Float List"]
+	
+	numbers = bpy.props.CollectionProperty(type = FloatPropertyGroup)
 	
 	def draw(self, context, layout, node, text):
 		layout.label(text)
 			
 	def draw_color(self, context, node):
-		return (0.6, 0.3, 0.3, 0.7)
+		return (0.4, 0.4, 0.7, 0.4)
 		
 	def getValue(self):
-		return 0
+		return self.number
+		
 		
 # register
 ################################
