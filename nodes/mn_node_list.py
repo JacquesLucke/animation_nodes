@@ -38,7 +38,8 @@ def getNodeNameDictionary():
 		"VectorLengthNode" ] ))
 		
 	nodes.append(("List", [
-		"GetFloatFromFloatListNode" ] ))
+		"GetFloatFromFloatListNode",
+		"GetListLengthNode" ] ))
 		
 	nodes.append(("Script", [
 		"ExpressionNode" ] ))
