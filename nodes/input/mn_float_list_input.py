@@ -27,12 +27,12 @@ class FloatListInputNode(Node, AnimationNode):
 				row = col.row(align = True)
 				row.scale_y = 1.3
 				row.prop(item, "value", text = str(index))
-				remove = row.operator("mn.remove_float_property_from_float_list_node", text = "", icon = "X")
+				remove = row.operator("mn.remove_property_from_list_node", text = "", icon = "X")
 				remove.nodeTreeName = self.id_data.name
 				remove.nodeName = self.name
 				remove.index = index
 				index += 1
-			add = layout.operator("mn.new_float_property_to_float_list_node", text = "New", icon = "PLUS")
+			add = layout.operator("mn.new_property_to_list_node", text = "New", icon = "PLUS")
 			add.nodeTreeName = self.id_data.name
 			add.nodeName = self.name
 				
@@ -53,41 +53,7 @@ class FloatListInputNode(Node, AnimationNode):
 		
 	def removeItemFromList(self, index):
 		self.numbers.remove(index)
-		
-		
-class NewFloatPropertyToFloatListNode(bpy.types.Operator):
-	bl_idname = "mn.new_float_property_to_float_list_node"
-	bl_label = "New Float Property to Float List Node"
-	
-	nodeTreeName = bpy.props.StringProperty()
-	nodeName = bpy.props.StringProperty()
-	
-	@classmethod
-	def poll(cls, context):
-		return getActive() is not None
-		
-	def execute(self, context):
-		node = getNode(self.nodeTreeName, self.nodeName)
-		node.addItemToList()
-		return {'FINISHED'}
-		
-class RemoveFloatPropertyFromFloatListNode(bpy.types.Operator):
-	bl_idname = "mn.remove_float_property_from_float_list_node"
-	bl_label = "Remove Float Property from Float List Node"
-	
-	nodeTreeName = bpy.props.StringProperty()
-	nodeName = bpy.props.StringProperty()
-	index = bpy.props.IntProperty()
-	
-	@classmethod
-	def poll(cls, context):
-		return getActive() is not None
-		
-	def execute(self, context):
-		node = getNode(self.nodeTreeName, self.nodeName)
-		node.removeItemFromList(self.index)
-		return {'FINISHED'}
-		
+
 		
 # register
 ################################
