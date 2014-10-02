@@ -41,7 +41,7 @@ def getNodeNameDictionary():
 	nodes.append(("List", [
 		"GetListElementNode",
 		"GetListLengthNode",
-		"SumFloatListElementsNode",
+		"SumListElementsNode",
 		"CombineListsNode" ] ))
 		
 	nodes.append(("Script", [
