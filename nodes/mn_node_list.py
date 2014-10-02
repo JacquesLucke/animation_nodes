@@ -40,6 +40,7 @@ def getNodeNameDictionary():
 		
 	nodes.append(("List", [
 		"GetFloatFromFloatListNode",
+		"GetStringFromStringListNode",
 		"GetListLengthNode" ] ))
 		
 	nodes.append(("Script", [
