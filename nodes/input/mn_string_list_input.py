@@ -5,7 +5,7 @@ from mn_execution import nodePropertyChanged
 from mn_utils import *
 
 class StringPropertyGroup(bpy.types.PropertyGroup):
-	string = bpy.props.StringProperty(name = "String", default = "")
+	string = bpy.props.StringProperty(name = "String", default = "", update = nodePropertyChanged)
 
 class StringListInputNode(Node, AnimationNode):
 	bl_idname = "StringListInputNode"

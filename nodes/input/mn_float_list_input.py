@@ -5,7 +5,7 @@ from mn_execution import nodePropertyChanged
 from mn_utils import *
 
 class FloatPropertyGroup(bpy.types.PropertyGroup):
-	value = bpy.props.FloatProperty(name = "Value", default = 0)
+	value = bpy.props.FloatProperty(name = "Value", default = 0, update = nodePropertyChanged)
 
 class FloatListInputNode(Node, AnimationNode):
 	bl_idname = "FloatListInputNode"
