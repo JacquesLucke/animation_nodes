@@ -13,7 +13,10 @@ class GetListLengthNode(Node, AnimationNode):
 		
 	def execute(self, input):
 		output = {}
-		output["Length"] = len(input["List"])
+		try:
+			output["Length"] = len(input["List"])
+		except:
+			output["Length"] = 0
 		return output
 		
 # register
