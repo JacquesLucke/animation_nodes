@@ -29,6 +29,8 @@ def getCurrentFrame():
 	return bpy.context.scene.frame_current
 def getRandom(min, max):
 	return random.random() * (max - min) + min
+def clampInt(value, minValue, maxValue):
+	return int(max(min(value, maxValue), minValue))
 	
 # nodes and sockets
 ######################
