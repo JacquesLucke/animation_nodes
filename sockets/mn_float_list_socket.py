@@ -3,8 +3,6 @@ from bpy.types import NodeTree, Node, NodeSocket
 from mn_utils import *
 from mn_execution import nodePropertyChanged
 
-class FloatPropertyGroup(bpy.types.PropertyGroup):
-	value = bpy.props.FloatProperty(name = "Value", default = 0)
 
 class FloatListSocket(NodeSocket):
 	bl_idname = "FloatListSocket"
