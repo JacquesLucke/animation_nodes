@@ -12,8 +12,6 @@ class FloatListSocket(NodeSocket):
 	dataType = "Float List"
 	allowedInputTypes = ["Float List"]
 	
-	numbers = bpy.props.CollectionProperty(type = FloatPropertyGroup)
-	
 	def draw(self, context, layout, node, text):
 		layout.label(text)
 			
@@ -21,7 +19,7 @@ class FloatListSocket(NodeSocket):
 		return (0.4, 0.4, 0.7, 0.4)
 		
 	def getValue(self):
-		return self.number
+		return [0]
 		
 		
 # register
