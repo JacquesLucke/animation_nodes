@@ -3,20 +3,22 @@ from bpy.types import NodeTree, Node, NodeSocket
 from mn_utils import *
 from mn_execution import nodePropertyChanged
 
-class GenericSocket(NodeSocket):
-	bl_idname = "GenericSocket"
-	bl_label = "Generic Socket"
-	dataType = "Generic"
-	allowedInputTypes = ["Generic", "Integer", "Float", "Vector", "String", "Object", "Float List", "String List"]
+
+class StringListSocket(NodeSocket):
+	bl_idname = "StringListSocket"
+	bl_label = "String List Socket"
+	dataType = "String List"
+	allowedInputTypes = ["String List"]
 	
 	def draw(self, context, layout, node, text):
 		layout.label(text)
 			
 	def draw_color(self, context, node):
-		return (0.6, 0.3, 0.3, 0.7)
+		return (1, 1, 1, 0.4)
 		
 	def getValue(self):
-		return 0
+		return [""]
+		
 		
 # register
 ################################
