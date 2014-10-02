@@ -10,7 +10,8 @@ def getNodeNameDictionary():
 		"ObjectInfoNode",
 		"RandomNumberNode",
 		"RandomStringNode",
-		"CharactersNode" ] ))
+		"CharactersNode",
+		"FloatListInputNode" ] ))
 		
 	nodes.append(("Output", [
 		"TextOutputNode",
