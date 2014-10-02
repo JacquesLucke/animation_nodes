@@ -149,7 +149,7 @@ class ForceNodeTreeUpdate(bpy.types.Operator):
 
 bpy.types.Scene.updateAnimationTreeOnFrameChange = bpy.props.BoolProperty(default = False, name = "Update Animation Tree On Frame Change")
 bpy.types.Scene.updateAnimationTreeOnSceneUpdate = bpy.props.BoolProperty(default = True, name = "Update Animation Tree On Scene Update")
-bpy.types.Scene.updateAnimationTreeOnPropertyChange = bpy.props.BoolProperty(default = False, name = "Update Animation Tree On Property Change")
+bpy.types.Scene.updateAnimationTreeOnPropertyChange = bpy.props.BoolProperty(default = True, name = "Update Animation Tree On Property Change")
 	
 @persistent
 def frameChangeHandler(scene):
