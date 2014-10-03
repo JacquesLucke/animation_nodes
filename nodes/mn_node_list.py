@@ -48,5 +48,7 @@ def getNodeNameDictionary():
 		
 	nodes.append(("Script", [
 		"ExpressionNode" ] ))
-	
+		
+	nodes.append(("System", [
+		"SubProgramNode" ] ))
 	return nodes
