@@ -44,8 +44,8 @@ class ForceNodeTreeUpdate(bpy.types.Operator):
 ##############################
 
 bpy.types.Scene.updateAnimationTreeOnFrameChange = bpy.props.BoolProperty(default = False, name = "Update Animation Tree On Frame Change")
-bpy.types.Scene.updateAnimationTreeOnSceneUpdate = bpy.props.BoolProperty(default = True, name = "Update Animation Tree On Scene Update")
-bpy.types.Scene.updateAnimationTreeOnPropertyChange = bpy.props.BoolProperty(default = True, name = "Update Animation Tree On Property Change")
+bpy.types.Scene.updateAnimationTreeOnSceneUpdate = bpy.props.BoolProperty(default = False, name = "Update Animation Tree On Scene Update")
+bpy.types.Scene.updateAnimationTreeOnPropertyChange = bpy.props.BoolProperty(default = False, name = "Update Animation Tree On Property Change")
 	
 @persistent
 def frameChangeHandler(scene):
@@ -70,6 +70,10 @@ def updateAnimationTrees(treeChanged = True):
 	for network in nodeNetworks:
 		nodeNameList = [node.name for node in network]
 		print(nodeNameList)
+		orderedNodes = orderNodes(network)
+		nodeNameList = [node.name for node in orderedNodes]
+		print(nodeNameList)
+		
 
 bpy.types.Node.isFound = bpy.props.BoolProperty(default = False)
 def getNodeNetworks():
@@ -103,8 +107,6 @@ def getNodeNetworkFromNode(node):
 			node.isFound = True
 		nodesToCheck = newCheckNodes
 	return network
-			
-
 	
 def getNotFoundLinkedNodes(node):
 	nodes = []
@@ -116,6 +118,31 @@ def getNotFoundLinkedNodes(node):
 			nodes.append(link.to_node)
 	nodes = [node for node in nodes if not node.isFound]
 	return nodes
+	
+def orderNodes(nodes):
+	for node in nodes:
+		node.isFound = False
+	orderedNodeList = []
+	for node in nodes:
+		if not node.isFound:
+			orderedNodeList.extend(getAllNodeDependencies(node))
+			orderedNodeList.append(node)
+			node.isFound = True
+	return orderedNodeList
+
+def getAllNodeDependencies(node):
+	dependencies = []
+	directDependencies = []
+	for socket in node.inputs:
+		if hasLinks(socket):
+			node = socket.links[0].from_node
+			if not node.isFound:
+				node.isFound = True
+				directDependencies.append(node)
+	for node in directDependencies:
+		dependencies.extend(getAllNodeDependencies(node))
+	dependencies.extend(directDependencies)
+	return dependencies
 		
 def getAnimationNodeTrees():
 	nodeTrees = []
