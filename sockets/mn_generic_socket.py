@@ -7,7 +7,7 @@ class GenericSocket(NodeSocket):
 	bl_idname = "GenericSocket"
 	bl_label = "Generic Socket"
 	dataType = "Generic"
-	allowedInputTypes = ["Generic", "Integer", "Float", "Vector", "String", "Object", "Float List", "String List"]
+	allowedInputTypes = ["all"]
 	
 	def draw(self, context, layout, node, text):
 		layout.label(text)
