@@ -14,7 +14,8 @@ class CombineListsNode(Node, AnimationNode):
 	
 	listTypes = [
 		("FLOAT", "Float", ""),
-		("STRING", "String", "")]
+		("STRING", "String", ""),
+		("OBJECT", "Object", "") ]
 	listTypesProperty = bpy.props.EnumProperty(name = "Type", items = listTypes, default = "FLOAT", update = setSocketTypes)
 	
 	def init(self, context):
@@ -41,6 +42,10 @@ class CombineListsNode(Node, AnimationNode):
 			self.inputs.new("StringListSocket", "List 1")
 			self.inputs.new("StringListSocket", "List 2")
 			self.outputs.new("StringListSocket", "Both Lists")
+		elif type == "OBJECT":
+			self.inputs.new("ObjectListSocket", "List 1")
+			self.inputs.new("ObjectListSocket", "List 2")
+			self.outputs.new("ObjectListSocket", "Both Lists")
 		
 # register
 ################################

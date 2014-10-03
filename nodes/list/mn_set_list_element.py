@@ -15,7 +15,8 @@ class SetListElementNode(Node, AnimationNode):
 	
 	listTypes = [
 		("FLOAT", "Float", ""),
-		("STRING", "String", "")]
+		("STRING", "String", ""),
+		("OBJECT", "Object", "") ]
 	listTypesProperty = bpy.props.EnumProperty(name = "Type", items = listTypes, default = "FLOAT", update = setSocketTypes)
 	
 	def init(self, context):
@@ -46,6 +47,11 @@ class SetListElementNode(Node, AnimationNode):
 			self.inputs.new("StringSocket", "Value")
 			self.inputs.new("IntegerSocket", "Index")
 			self.outputs.new("StringListSocket", "List")
+		elif type == "OBJECT":
+			self.inputs.new("ObjectListSocket", "List")
+			self.inputs.new("ObjectSocket", "Value")
+			self.inputs.new("IntegerSocket", "Index")
+			self.outputs.new("ObjectListSocket", "List")
 		
 # register
 ################################
