@@ -75,15 +75,17 @@ def updateAnimationTrees(treeChanged = True):
 			codeString = getCodeStringToExecuteNetwork(network)
 			compiledCodeObjects.append(compile(codeString, "<string>", "exec"))
 	for codeObject in compiledCodeObjects:
-		exec(codeObject)
+		try: exec(codeObject)
+		except BaseException as e: print(e)
 		
 def getCodeStringToExecuteNetwork(network):
 	orderedNodes = orderNodes(network)
 	for i, node in enumerate(orderedNodes):
 		node.codeIndex = i
 	codeLines = []
+	codeLines.append("nodes = bpy.data.node_groups['" + network[0].id_data.name + "'].nodes")
 	for node in orderedNodes:
-		declaration = getNodeVariableName(node) + " = bpy.data.node_groups['"+node.id_data.name+"'].nodes['"+node.name+"']"
+		declaration = getNodeVariableName(node) + " = nodes['"+node.name+"']"
 		inputDictionaryString = generateInputListString(node)
 		executionCode = getNodeOutputName(node) + " = " + getNodeVariableName(node) + ".execute(" + inputDictionaryString + ")"
 		codeLines.append(declaration)
