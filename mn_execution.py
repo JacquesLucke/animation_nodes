@@ -100,7 +100,7 @@ def getNodeNetworkFromNode(node):
 	while len(nodesToCheck) > 0:
 		linkedNodes = []
 		for node in nodesToCheck:
-			linkedNodes.extend(getNotFoundLinkedNodes(node))
+			linkedNodes.extend(getLinkedButNotFoundNodes(node))
 		network.extend(linkedNodes)
 		setNodesAsFound(linkedNodes)
 		nodesToCheck = linkedNodes
@@ -109,7 +109,7 @@ def getNodeNetworkFromNode(node):
 def setNodesAsFound(nodes):
 	for node in nodes: node.isFound = True
 	
-def getNotFoundLinkedNodes(node):
+def getLinkedButNotFoundNodes(node):
 	nodes = []
 	for socket in node.inputs:
 		for link in socket.links:
@@ -117,8 +117,11 @@ def getNotFoundLinkedNodes(node):
 	for socket in node.outputs:
 		for link in socket.links:
 			nodes.append(link.to_node)
-	nodes = [node for node in nodes if not node.isFound]
+	nodes = sortOutAlreadyFoundNodes(nodes)
 	return nodes
+	
+def sortOutAlreadyFoundNodes(nodes):
+	return [node for node in nodes if not node.isFound]
 	
 def orderNodes(nodes):
 	for node in nodes:
