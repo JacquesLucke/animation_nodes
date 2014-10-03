@@ -10,7 +10,6 @@ def updateAnimationTrees(treeChanged = True):
 	if treeChanged:
 		rebuildNodeNetworks()
 	for codeObject in compiledCodeObjects:
-		exec(codeObject)
 		try: exec(codeObject)
 		except: 
 			rebuildNodeNetworks()
@@ -74,6 +73,8 @@ class NormalNetworkStringGenerator:
 			if isSubProgramNode(node):
 				codeLines.append(self.getNodeDeclarationString(node))
 				codeLines.append(getNodeInputName(node) + " = " + generateInputListStringForSubProgram(node))
+				codeLines.append("for i in range(" + getNodeInputName(node) + "['Amount']):")
+				codeLines.append("    print(i)")
 				codeLines.append(getNodeOutputName(node) + " = " + getNodeInputName(node))
 		codeString = "\n".join(codeLines)
 		return codeString
@@ -100,7 +101,7 @@ def setUniqueCodeIndexToEveryNode(nodes):
 	global idCounter
 	for node in nodes:
 		node.codeIndex = idCounter
-	idCounter += 1
+		idCounter += 1
 		
 def isExecuteableNode(node):
 	return hasattr(node, "execute")
@@ -112,8 +113,6 @@ def generateInputListString(node):
 	inputParts = []
 	for socket in node.inputs:
 		originSocket = getOriginSocket(socket)
-		print(socket)
-		print(originSocket)
 		if isOtherOriginSocket(socket, originSocket):
 			otherNode = originSocket.node
 			part = "'" + socket.identifier + "' : " + getNodeOutputName(otherNode) + "['" + originSocket.identifier + "']"
@@ -125,7 +124,7 @@ def generateInputListString(node):
 def generateInputListStringForSubProgram(node):
 	inputParts = []
 	for i, socket in enumerate(node.inputs):
-		if i >= 2:
+		if i >= 1:
 			originSocket = getOriginSocket(socket)
 			print("blaa")
 			if isOtherOriginSocket(socket, originSocket):
