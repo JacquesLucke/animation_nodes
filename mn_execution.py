@@ -63,12 +63,59 @@ def nodePropertyChanged(self, context):
 		updateAnimationTrees(False)
 def nodeTreeChanged():
 	updateAnimationTrees(True)
-	
-def updateAnimationTrees(treeChanged = True):
-	nodeNetwork = getNodeNetWorks()[0]
 
-def getNodeNetWorks():
-	pass
+def updateAnimationTrees(treeChanged = True):
+	nodeNetworks = getNodeNetworks()
+	print()
+	for network in nodeNetworks:
+		nodeNameList = [node.name for node in network]
+		print(nodeNameList)
+
+bpy.types.Node.isFound = bpy.props.BoolProperty(default = False)
+def getNodeNetworks():
+	nodeNetworks = []
+	nodeTrees = getAnimationNodeTrees()
+	for nodeTree in nodeTrees:
+		nodeNetworks.extend(getNodeNetworksFromTree(nodeTree))
+	return nodeNetworks
+		
+def getNodeNetworksFromTree(nodeTree):
+	nodes = nodeTree.nodes
+	for node in nodes:
+		node.isFound = False
+	
+	networks = []
+	for node in nodes:
+		if not node.isFound:
+			networks.append(getNodeNetworkFromNode(node))
+	return networks
+	
+def getNodeNetworkFromNode(node):
+	nodesToCheck = [node]
+	network = [node]
+	node.isFound = True
+	while len(nodesToCheck) > 0:
+		newCheckNodes = []
+		for node in nodesToCheck:
+			newCheckNodes.extend(getNotFoundLinkedNodes(node))
+		network.extend(newCheckNodes)
+		for node in newCheckNodes:
+			node.isFound = True
+		nodesToCheck = newCheckNodes
+	return network
+			
+
+	
+def getNotFoundLinkedNodes(node):
+	nodes = []
+	for socket in node.inputs:
+		for link in socket.links:
+			nodes.append(link.from_node)
+	for socket in node.outputs:
+		for link in socket.links:
+			nodes.append(link.to_node)
+	nodes = [node for node in nodes if not node.isFound]
+	return nodes
 		
 def getAnimationNodeTrees():
 	nodeTrees = []
