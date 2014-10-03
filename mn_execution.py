@@ -68,14 +68,42 @@ def updateAnimationTrees(treeChanged = True):
 	nodeNetworks = getNodeNetworks()
 	print()
 	for network in nodeNetworks:
-		nodeNameList = [node.name for node in network]
-		print(nodeNameList)
 		orderedNodes = orderNodes(network)
-		nodeNameList = [node.name for node in orderedNodes]
-		print(nodeNameList)
+		for i, node in enumerate(orderedNodes):
+			node.codeIndex = i
+		codeLines = []
+		for node in orderedNodes:
+			declaration = getNodeVariableName(node) + " = bpy.data.node_groups['"+node.id_data.name+"'].nodes['"+node.name+"']"
+			inputDictionaryString = generateInputListString(node)
+			executionCode = getNodeOutputName(node) + " = " + getNodeVariableName(node) + ".execute(" + inputDictionaryString + ")"
+			codeLines.append(declaration)
+			codeLines.append(executionCode)
+		codeString = "\n".join(codeLines)
+		print(codeString)
+		exec(codeString)
+		
+def generateInputListString(node):
+	inputParts = []
+	for socket in node.inputs:
+		originSocket = getOriginSocket(socket)
+		if isOtherOriginSocket(socket, originSocket):
+			otherNode = originSocket.node
+			part = "'" + socket.identifier + "' : " + getNodeOutputName(otherNode) + "['" + originSocket.identifier + "']"
+		else:
+			part = "'" + socket.identifier + "' : " + getNodeVariableName(node) + ".inputs['" + socket.identifier + "'].getValue()"
+		inputParts.append(part)
+	return "{ " + ", ".join(inputParts) + " }"
+		
+def getNodeVariableName(node):
+	return "node_" + str(node.codeIndex)
+def getNodeInputName(node):
+	return "input_" + str(node.codeIndex)
+def getNodeOutputName(node):
+	return "output_" + str(node.codeIndex)
 		
 
 bpy.types.Node.isFound = bpy.props.BoolProperty(default = False)
+bpy.types.Node.codeIndex = bpy.props.IntProperty()
 def getNodeNetworks():
 	nodeNetworks = []
 	nodeTrees = getAnimationNodeTrees()
