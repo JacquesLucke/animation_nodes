@@ -23,11 +23,26 @@ def updateAnimationTrees(treeChanged = True):
 		
 def rebuildNodeNetworks():
 	global compiledCodeObjects
+	cleanupNodeTrees()
 	compiledCodeObjects = []
 	nodeNetworks = getNodeNetworks()
 	for network in nodeNetworks:
 		codeString = getCodeStringToExecuteNetwork(network)
 		compiledCodeObjects.append(compile(codeString, "<string>", "exec"))
+		
+def cleanupNodeTrees():
+	nodeTrees = getAnimationNodeTrees()
+	for nodeTree in nodeTrees:
+		cleanupNodeTree(nodeTree)
+def cleanupNodeTree(nodeTree):
+	links = nodeTree.links
+	for link in links:
+		toSocket = link.to_socket
+		fromSocket = link.from_socket
+		if toSocket.node.type == "REROUTE" or not isSocketLinked(toSocket):
+			continue
+		if fromSocket.dataType not in toSocket.allowedInputTypes:
+			nodeTree.links.remove(link)
 		
 def getCodeStringToExecuteNetwork(network):
 	orderedNodes = orderNodes(network)
