@@ -15,6 +15,10 @@ def updateAnimationTrees(treeChanged = True):
 			rebuildNodeNetworks()
 			try: exec(codeObject)
 			except BaseException as e: print(e)
+			
+			
+# compile code objects
+################################
 		
 def rebuildNodeNetworks():
 	global compiledCodeObjects
@@ -26,22 +30,25 @@ def rebuildNodeNetworks():
 		
 def getCodeStringToExecuteNetwork(network):
 	orderedNodes = orderNodes(network)
-	for i, node in enumerate(orderedNodes):
-		node.codeIndex = i
+	setUniqueCodeIndexToEveryNode(orderedNodes)
 	codeLines = []
 	codeLines.append("nodes = bpy.data.node_groups['" + network[0].id_data.name + "'].nodes")
 	for node in orderedNodes:
 		if isExecuteableNode(node):
-			declaration = getNodeVariableName(node) + " = nodes['"+node.name+"']"
-			inputDictionaryString = generateInputListString(node)
-			executionCode = getNodeOutputName(node) + " = " + getNodeVariableName(node) + ".execute(" + inputDictionaryString + ")"
-			codeLines.append(declaration)
-			codeLines.append(executionCode)
+			codeLines.append(getNodeDeclarationString(node))
+			codeLines.append(getNodeExecutionString(node))
 	codeString = "\n".join(codeLines)
 	return codeString
 	
+def setUniqueCodeIndexToEveryNode(nodes):
+	for i, node in enumerate(nodes):
+		node.codeIndex = i
 def isExecuteableNode(node):
 	return hasattr(node, "execute")
+def getNodeDeclarationString(node):
+	return getNodeVariableName(node) + " = nodes['"+node.name+"']"
+def getNodeExecutionString(node):
+	return getNodeOutputName(node) + " = " + getNodeVariableName(node) + ".execute(" + generateInputListString(node) + ")"
 		
 def generateInputListString(node):
 	inputParts = []
@@ -57,8 +64,6 @@ def generateInputListString(node):
 		
 def getNodeVariableName(node):
 	return "node_" + str(node.codeIndex)
-def getNodeInputName(node):
-	return "input_" + str(node.codeIndex)
 def getNodeOutputName(node):
 	return "output_" + str(node.codeIndex)
 		
@@ -195,8 +200,7 @@ class ForceNodeTreeUpdate(bpy.types.Operator):
 		return {'FINISHED'}
 	
 	
-	
-	
+		
 # handlers to start the update
 ##############################
 
