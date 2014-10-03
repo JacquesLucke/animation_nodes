@@ -82,8 +82,7 @@ def getAnimationNodeTrees():
 		
 def getNodeNetworksFromTree(nodeTree):
 	nodes = nodeTree.nodes
-	for node in nodes:
-		node.isFound = False
+	resetNodeFoundAttributes(nodes)
 	
 	networks = []
 	for node in nodes:
@@ -91,19 +90,24 @@ def getNodeNetworksFromTree(nodeTree):
 			networks.append(getNodeNetworkFromNode(node))
 	return networks
 	
+def resetNodeFoundAttributes(nodes):
+	for node in nodes: node.isFound = False
+	
 def getNodeNetworkFromNode(node):
 	nodesToCheck = [node]
 	network = [node]
 	node.isFound = True
 	while len(nodesToCheck) > 0:
-		newCheckNodes = []
+		linkedNodes = []
 		for node in nodesToCheck:
-			newCheckNodes.extend(getNotFoundLinkedNodes(node))
-		network.extend(newCheckNodes)
-		for node in newCheckNodes:
-			node.isFound = True
-		nodesToCheck = newCheckNodes
+			linkedNodes.extend(getNotFoundLinkedNodes(node))
+		network.extend(linkedNodes)
+		setNodesAsFound(linkedNodes)
+		nodesToCheck = linkedNodes
 	return network
+	
+def setNodesAsFound(nodes):
+	for node in nodes: node.isFound = True
 	
 def getNotFoundLinkedNodes(node):
 	nodes = []
