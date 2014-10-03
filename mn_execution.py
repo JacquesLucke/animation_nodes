@@ -68,10 +68,10 @@ class NormalNetworkStringGenerator:
 		codeLines.append("nodes = bpy.data.node_groups['" + network[0].id_data.name + "'].nodes")
 		for node in self.orderedNodes:
 			if isExecuteableNode(node):
-				codeLines.append(self.getNodeDeclarationString(node))
-				codeLines.append(self.getNodeExecutionString(node))
+				codeLines.append(getNodeDeclarationString(node))
+				codeLines.append(getNodeExecutionString(node))
 			if isSubProgramNode(node):
-				codeLines.append(self.getNodeDeclarationString(node))
+				codeLines.append(getNodeDeclarationString(node))
 				codeLines.append(getNodeInputName(node) + " = " + generateInputListStringForSubProgram(node))
 				functionName = getNodeVariableName(node) + "Function"
 				codeLines.append("for i in range(" + getNodeInputName(node) + "['Amount']):")
@@ -82,10 +82,11 @@ class NormalNetworkStringGenerator:
 				self.functions.append(subProgramStringGenerator.getCodeString())
 		codeString = "\n".join(self.functions) + "\n" + "\n".join(codeLines)
 		return codeString
-	def getNodeDeclarationString(self, node):
-		return getNodeVariableName(node) + " = nodes['"+node.name+"']"
-	def getNodeExecutionString(self, node):
-		return getNodeOutputName(node) + " = " + getNodeVariableName(node) + ".execute(" + generateInputListString(node) + ")"
+		
+def getNodeDeclarationString(node):
+	return getNodeVariableName(node) + " = nodes['"+node.name+"']"
+def getNodeExecutionString(node):
+	return getNodeOutputName(node) + " = " + getNodeVariableName(node) + ".execute(" + generateInputListString(node) + ")"
 		
 
 		
@@ -95,14 +96,21 @@ class SubProgramStringGenerator:
 			self.startNode = subProgram.inputs[0].links[0].from_node
 		self.functionName = functionName
 		self.network = subPrograms[getNodeIdentifier(self.startNode)]
-		self.codeLines = []
 		self.orderedNodes = orderNodes(self.network)
 		
 	def getCodeString(self):
 		#network = self.network
-		self.codeLines.append("def " + self.functionName + "(" + getNodeOutputName(self.startNode) + "):")
-		self.codeLines.append("    print(" + getNodeOutputName(self.startNode) + ")")
-		return "\n".join(self.codeLines)
+		codeLines = []
+		codeLines.append("def " + self.functionName + "(" + getNodeOutputName(self.startNode) + "):")
+		codeLines.append("    global nodes")
+		codeLines.append("    print(" + getNodeOutputName(self.startNode) + ")")
+		for node in self.orderedNodes:
+			if node != self.startNode:
+				if isExecuteableNode(node):
+					codeLines.append("    " + getNodeDeclarationString(node))
+					codeLines.append("    " + getNodeExecutionString(node))
+		
+		return "\n".join(codeLines)
 		
 idCounter = 0	
 def setUniqueCodeIndexToEveryNode(nodes):
