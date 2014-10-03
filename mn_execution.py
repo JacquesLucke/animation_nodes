@@ -20,16 +20,17 @@ def updateAnimationTrees(treeChanged = True):
 			
 # compile code objects
 ################################
-		
+subPrograms = {}	
 def rebuildNodeNetworks():
-	global compiledCodeObjects
+	global compiledCodeObjects, subPrograms
 	cleanupNodeTrees()
 	compiledCodeObjects = []
 	nodeNetworks = getNodeNetworks()
 	normalNetworks = []
-	subPrograms = {}
+	subProgram = {}
 	print()
 	for network in nodeNetworks:
+		setUniqueCodeIndexToEveryNode(network)
 		networkType = getNetworkType(network)
 		print(networkType)
 		if networkType == "Normal": normalNetworks.append(network)
@@ -64,49 +65,55 @@ class NormalNetworkStringGenerator:
 	def getCodeString(self):
 		network = self.network
 		self.orderedNodes = orderNodes(network)
-		self.setUniqueCodeIndexToEveryNode()
 		codeLines = []
 		codeLines.append("nodes = bpy.data.node_groups['" + network[0].id_data.name + "'].nodes")
 		for node in self.orderedNodes:
 			if isExecuteableNode(node):
 				codeLines.append(self.getNodeDeclarationString(node))
 				codeLines.append(self.getNodeExecutionString(node))
+			if isSubProgramNode(node):
+				codeLines.append(self.getNodeDeclarationString(node))
+				codeLines.append(getNodeInputName(node) + " = " + generateInputListStringForSubProgram(node))
+				codeLines.append(getNodeOutputName(node) + " = " + getNodeInputName(node))
 		codeString = "\n".join(codeLines)
 		return codeString
-	def setUniqueCodeIndexToEveryNode(self):
-		for i, node in enumerate(self.orderedNodes):
-			node.codeIndex = i
 	def getNodeDeclarationString(self, node):
 		return getNodeVariableName(node) + " = nodes['"+node.name+"']"
 	def getNodeExecutionString(self, node):
 		return getNodeOutputName(node) + " = " + getNodeVariableName(node) + ".execute(" + generateInputListString(node) + ")"
+		
+
+		
+class SubProgramStringGenerator:
+	def __init__(self, subProgram, functionName):
+		self.startNode = startNode
+		self.functionName = functionName
+		self.network = subPrograms[getNodeIdentifier(startNode)]
+		self.codeLines = []
+		self.orderedNodes = []
+		
+	def getCodeString(self):
+		network = self.network
+		
+idCounter = 0	
+def setUniqueCodeIndexToEveryNode(nodes):
+	global idCounter
+	for node in nodes:
+		node.codeIndex = idCounter
+	idCounter += 1
 		
 def isExecuteableNode(node):
 	return hasattr(node, "execute")
 def isSubProgramNode(node):
 	return node.bl_idname == "SubProgramNode"
 
-# def getSubProgramString(node):
-	# global subProgramCounter
-	# startNode = getConnectedSubProgramStartNode(node)
-	# if startNode is None:
-		# return
-	# subProgramName = "subProgram" + str(subProgramCounter)
-	# functionLines = []
-	# functionLines.append("def " + subProgramName + "(objects, index):")
-	
-	# subProgramCounter += 1
-# def getConnectedSubProgramStartNode(node):
-	# toSocket = node.inputs[0]
-	# if hasLinks(toSocket):
-		# return toSocket.links[0].from_node
-	# return None
-# subProgramCounter = 0
 		
 def generateInputListString(node):
 	inputParts = []
 	for socket in node.inputs:
 		originSocket = getOriginSocket(socket)
+		print(socket)
+		print(originSocket)
 		if isOtherOriginSocket(socket, originSocket):
 			otherNode = originSocket.node
 			part = "'" + socket.identifier + "' : " + getNodeOutputName(otherNode) + "['" + originSocket.identifier + "']"
@@ -114,9 +121,25 @@ def generateInputListString(node):
 			part = "'" + socket.identifier + "' : " + getNodeVariableName(node) + ".inputs['" + socket.identifier + "'].getValue()"
 		inputParts.append(part)
 	return "{ " + ", ".join(inputParts) + " }"
+	
+def generateInputListStringForSubProgram(node):
+	inputParts = []
+	for i, socket in enumerate(node.inputs):
+		if i >= 2:
+			originSocket = getOriginSocket(socket)
+			print("blaa")
+			if isOtherOriginSocket(socket, originSocket):
+				otherNode = originSocket.node
+				part = "'" + socket.identifier + "' : " + getNodeOutputName(otherNode) + "['" + originSocket.identifier + "']"
+			else:
+				part = "'" + socket.identifier + "' : " + getNodeVariableName(node) + ".inputs['" + socket.identifier + "'].getValue()"
+			inputParts.append(part)
+	return "{ " + ", ".join(inputParts) + " }"
 		
 def getNodeVariableName(node):
 	return "node_" + str(node.codeIndex)
+def getNodeInputName(node):
+	return "input_" + str(node.codeIndex)
 def getNodeOutputName(node):
 	return "output_" + str(node.codeIndex)
 		

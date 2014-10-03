@@ -10,6 +10,7 @@ class SubProgramStartNode(Node, AnimationNode):
 	def init(self, context):
 		self.outputs.new("SubProgramSocket", "Sub-Program")
 		self.outputs.new("ObjectListSocket", "Objects")
+		self.outputs.new("IntegerSocket", "Index")
 		
 	def execute(self, input):
 		return input
