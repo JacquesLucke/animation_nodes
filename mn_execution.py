@@ -63,24 +63,33 @@ def nodePropertyChanged(self, context):
 		updateAnimationTrees(False)
 def nodeTreeChanged():
 	updateAnimationTrees(True)
+	
+compiledCodeObjects = []
 
 def updateAnimationTrees(treeChanged = True):
-	nodeNetworks = getNodeNetworks()
-	print()
-	for network in nodeNetworks:
-		orderedNodes = orderNodes(network)
-		for i, node in enumerate(orderedNodes):
-			node.codeIndex = i
-		codeLines = []
-		for node in orderedNodes:
-			declaration = getNodeVariableName(node) + " = bpy.data.node_groups['"+node.id_data.name+"'].nodes['"+node.name+"']"
-			inputDictionaryString = generateInputListString(node)
-			executionCode = getNodeOutputName(node) + " = " + getNodeVariableName(node) + ".execute(" + inputDictionaryString + ")"
-			codeLines.append(declaration)
-			codeLines.append(executionCode)
-		codeString = "\n".join(codeLines)
-		print(codeString)
-		exec(codeString)
+	global compiledCodeObjects
+	if treeChanged:
+		compiledCodeObjects = []
+		nodeNetworks = getNodeNetworks()
+		for network in nodeNetworks:
+			codeString = getCodeStringToExecuteNetwork(network)
+			compiledCodeObjects.append(compile(codeString, "<string>", "exec"))
+	for codeObject in compiledCodeObjects:
+		exec(codeObject)
+		
+def getCodeStringToExecuteNetwork(network):
+	orderedNodes = orderNodes(network)
+	for i, node in enumerate(orderedNodes):
+		node.codeIndex = i
+	codeLines = []
+	for node in orderedNodes:
+		declaration = getNodeVariableName(node) + " = bpy.data.node_groups['"+node.id_data.name+"'].nodes['"+node.name+"']"
+		inputDictionaryString = generateInputListString(node)
+		executionCode = getNodeOutputName(node) + " = " + getNodeVariableName(node) + ".execute(" + inputDictionaryString + ")"
+		codeLines.append(declaration)
+		codeLines.append(executionCode)
+	codeString = "\n".join(codeLines)
+	return codeString
 		
 def generateInputListString(node):
 	inputParts = []
