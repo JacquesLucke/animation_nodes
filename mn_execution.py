@@ -103,7 +103,6 @@ class SubProgramStringGenerator:
 		codeLines = []
 		codeLines.append("def " + self.functionName + "(" + getNodeOutputName(self.startNode) + "):")
 		codeLines.append("    global nodes")
-		codeLines.append("    print(" + getNodeOutputName(self.startNode) + ")")
 		for node in self.orderedNodes:
 			if node != self.startNode:
 				if isExecuteableNode(node):
