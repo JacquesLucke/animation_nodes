@@ -50,5 +50,6 @@ def getNodeNameDictionary():
 		"ExpressionNode" ] ))
 		
 	nodes.append(("System", [
-		"SubProgramNode" ] ))
+		"SubProgramNode",
+		"SubProgramStartNode" ] ))
 	return nodes

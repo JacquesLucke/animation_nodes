@@ -26,31 +26,82 @@ def rebuildNodeNetworks():
 	cleanupNodeTrees()
 	compiledCodeObjects = []
 	nodeNetworks = getNodeNetworks()
+	normalNetworks = []
+	subPrograms = {}
+	print()
 	for network in nodeNetworks:
-		codeString = getCodeStringToExecuteNetwork(network)
+		networkType = getNetworkType(network)
+		print(networkType)
+		if networkType == "Normal": normalNetworks.append(network)
+		elif networkType == "SubProgram":
+			startNode = getSubProgramStartNodeOfNetwork(network)
+			subPrograms[getNodeIdentifier(startNode)] = network
+	for network in normalNetworks:
+		codeGenerator = NormalNetworkStringGenerator(network)
+		codeString = codeGenerator.getCodeString()
+		print(codeString)
 		compiledCodeObjects.append(compile(codeString, "<string>", "exec"))
 		
-def getCodeStringToExecuteNetwork(network):
-	orderedNodes = orderNodes(network)
-	setUniqueCodeIndexToEveryNode(orderedNodes)
-	codeLines = []
-	codeLines.append("nodes = bpy.data.node_groups['" + network[0].id_data.name + "'].nodes")
-	for node in orderedNodes:
-		if isExecuteableNode(node):
-			codeLines.append(getNodeDeclarationString(node))
-			codeLines.append(getNodeExecutionString(node))
-	codeString = "\n".join(codeLines)
-	return codeString
-	
-def setUniqueCodeIndexToEveryNode(nodes):
-	for i, node in enumerate(nodes):
-		node.codeIndex = i
+def getNetworkType(network):
+	subProgramAmount = 0
+	for node in network:
+		if node.bl_idname == "SubProgramStartNode":
+			subProgramAmount += 1
+	if subProgramAmount == 0: return "Normal"
+	elif subProgramAmount == 1: return "SubProgram"
+	return "Invalid"
+def getSubProgramStartNodeOfNetwork(network):
+	for node in network:
+		if node.bl_idname == "SubProgramStartNode":
+			return node
+			
+class NormalNetworkStringGenerator:
+	def __init__(self, network):
+		self.network = network
+		self.functions = []
+		self.codeLines = []
+		self.orderedNodes = []
+	def getCodeString(self):
+		network = self.network
+		self.orderedNodes = orderNodes(network)
+		self.setUniqueCodeIndexToEveryNode()
+		codeLines = []
+		codeLines.append("nodes = bpy.data.node_groups['" + network[0].id_data.name + "'].nodes")
+		for node in self.orderedNodes:
+			if isExecuteableNode(node):
+				codeLines.append(self.getNodeDeclarationString(node))
+				codeLines.append(self.getNodeExecutionString(node))
+		codeString = "\n".join(codeLines)
+		return codeString
+	def setUniqueCodeIndexToEveryNode(self):
+		for i, node in enumerate(self.orderedNodes):
+			node.codeIndex = i
+	def getNodeDeclarationString(self, node):
+		return getNodeVariableName(node) + " = nodes['"+node.name+"']"
+	def getNodeExecutionString(self, node):
+		return getNodeOutputName(node) + " = " + getNodeVariableName(node) + ".execute(" + generateInputListString(node) + ")"
+		
 def isExecuteableNode(node):
 	return hasattr(node, "execute")
-def getNodeDeclarationString(node):
-	return getNodeVariableName(node) + " = nodes['"+node.name+"']"
-def getNodeExecutionString(node):
-	return getNodeOutputName(node) + " = " + getNodeVariableName(node) + ".execute(" + generateInputListString(node) + ")"
+def isSubProgramNode(node):
+	return node.bl_idname == "SubProgramNode"
+
+# def getSubProgramString(node):
+	# global subProgramCounter
+	# startNode = getConnectedSubProgramStartNode(node)
+	# if startNode is None:
+		# return
+	# subProgramName = "subProgram" + str(subProgramCounter)
+	# functionLines = []
+	# functionLines.append("def " + subProgramName + "(objects, index):")
+	
+	# subProgramCounter += 1
+# def getConnectedSubProgramStartNode(node):
+	# toSocket = node.inputs[0]
+	# if hasLinks(toSocket):
+		# return toSocket.links[0].from_node
+	# return None
+# subProgramCounter = 0
 		
 def generateInputListString(node):
 	inputParts = []
@@ -117,15 +168,19 @@ def getLinkedButNotFoundNodes(node):
 	nodes = []
 	for socket in node.inputs:
 		for link in socket.links:
-			nodes.append(link.from_node)
+			if not isSystemLink(link):
+				nodes.append(link.from_node)
 	for socket in node.outputs:
 		for link in socket.links:
-			nodes.append(link.to_node)
+			if not isSystemLink(link):
+				nodes.append(link.to_node)
 	nodes = sortOutAlreadyFoundNodes(nodes)
 	return nodes
 	
 def sortOutAlreadyFoundNodes(nodes):
 	return [node for node in nodes if not node.isFound]
+def isSystemLink(link):
+	return link.to_socket.bl_idname == "SubProgramSocket"
 	
 
 # order nodes (network) to possible execution sequence

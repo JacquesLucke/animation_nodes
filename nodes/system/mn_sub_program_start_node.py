@@ -3,15 +3,16 @@ from bpy.types import Node
 from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged
 
-class SubProgramNode(Node, AnimationNode):
-	bl_idname = "SubProgramNode"
-	bl_label = "Sub-Program"
+class SubProgramStartNode(Node, AnimationNode):
+	bl_idname = "SubProgramStartNode"
+	bl_label = "Sub-Program Start"
 	
 	def init(self, context):
-		self.inputs.new("SubProgramSocket", "Sub-Program")
-		self.inputs.new("ObjectListSocket", "Objects")
+		self.outputs.new("SubProgramSocket", "Sub-Program")
 		self.outputs.new("ObjectListSocket", "Objects")
-
+		
+	def execute(self, input):
+		return input
 		
 # register
 ################################

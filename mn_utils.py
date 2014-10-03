@@ -42,6 +42,8 @@ def getSocketFromNode(node, isOutputSocket, name):
 		return node.outputs.get(name)
 	else:
 		return node.inputs.get(name)
+def getNodeIdentifier(node):
+	return node.id_data.name + node.name
 	
 # socket origins
 ######################
