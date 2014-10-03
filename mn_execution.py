@@ -2,68 +2,8 @@ import bpy, time
 from bpy.app.handlers import persistent
 from mn_utils import *
 
-		
-		
-# Force Cache Rebuilding Panel
-##############################
-		
-class AnimationNodesPanel(bpy.types.Panel):
-	bl_idname = "mn.panel"
-	bl_label = "Animation Nodes"
-	bl_space_type = "NODE_EDITOR"
-	bl_region_type = "UI"
-	bl_context = "objectmode"
-	
-	@classmethod
-	def poll(self, context):
-		return len(getAnimationNodeTrees()) > 0
-	
-	def draw(self, context):
-		layout = self.layout
-		layout.operator("mn.force_full_update")
-		scene = context.scene
-		layout.label("Update when:")
-		layout.prop(scene, "updateAnimationTreeOnFrameChange", text = "Frames Changes")
-		layout.prop(scene, "updateAnimationTreeOnSceneUpdate", text = "Scene Updates")
-		layout.prop(scene, "updateAnimationTreeOnPropertyChange", text = "Property Changes")
-		
-		
-		
-class ForceNodeTreeUpdate(bpy.types.Operator):
-	bl_idname = "mn.force_full_update"
-	bl_label = "Force Node Tree Update"
 
-	def execute(self, context):
-		updateAnimationTrees(treeChanged = True)
-		return {'FINISHED'}
-	
-	
-	
-	
-# handlers to start the update
-##############################
 
-bpy.types.Scene.updateAnimationTreeOnFrameChange = bpy.props.BoolProperty(default = True, name = "Update Animation Tree On Frame Change")
-bpy.types.Scene.updateAnimationTreeOnSceneUpdate = bpy.props.BoolProperty(default = True, name = "Update Animation Tree On Scene Update")
-bpy.types.Scene.updateAnimationTreeOnPropertyChange = bpy.props.BoolProperty(default = True, name = "Update Animation Tree On Property Change")
-	
-@persistent
-def frameChangeHandler(scene):
-	if scene.updateAnimationTreeOnFrameChange:
-		updateAnimationTrees(False)
-@persistent
-def sceneUpdateHandler(scene):
-	if scene.updateAnimationTreeOnSceneUpdate:
-		updateAnimationTrees(False)
-@persistent
-def fileLoadHandler(scene):
-	updateAnimationTrees(True)
-def nodePropertyChanged(self, context):
-	if context.scene.updateAnimationTreeOnPropertyChange:
-		updateAnimationTrees(False)
-def nodeTreeChanged():
-	updateAnimationTrees(True)
-	
 compiledCodeObjects = []
 
 def updateAnimationTrees(treeChanged = True):
@@ -123,14 +63,22 @@ def getNodeOutputName(node):
 	return "output_" + str(node.codeIndex)
 		
 
-bpy.types.Node.isFound = bpy.props.BoolProperty(default = False)
-bpy.types.Node.codeIndex = bpy.props.IntProperty()
+# get node networks (groups of connected nodes)
+###############################################
+		
 def getNodeNetworks():
 	nodeNetworks = []
 	nodeTrees = getAnimationNodeTrees()
 	for nodeTree in nodeTrees:
 		nodeNetworks.extend(getNodeNetworksFromTree(nodeTree))
 	return nodeNetworks
+	
+def getAnimationNodeTrees():
+	nodeTrees = []
+	for nodeTree in bpy.data.node_groups:
+		if hasattr(nodeTree, "isAnimationNodeTree"):
+			nodeTrees.append(nodeTree)
+	return nodeTrees
 		
 def getNodeNetworksFromTree(nodeTree):
 	nodes = nodeTree.nodes
@@ -193,12 +141,71 @@ def getAllNodeDependencies(node):
 	dependencies.extend(directDependencies)
 	return dependencies
 		
-def getAnimationNodeTrees():
-	nodeTrees = []
-	for nodeTree in bpy.data.node_groups:
-		if hasattr(nodeTree, "isAnimationNodeTree"):
-			nodeTrees.append(nodeTree)
-	return nodeTrees
+	
+bpy.types.Node.isFound = bpy.props.BoolProperty(default = False)
+bpy.types.Node.codeIndex = bpy.props.IntProperty()
+
+		
+		
+# Force Cache Rebuilding Panel
+##############################
+		
+class AnimationNodesPanel(bpy.types.Panel):
+	bl_idname = "mn.panel"
+	bl_label = "Animation Nodes"
+	bl_space_type = "NODE_EDITOR"
+	bl_region_type = "UI"
+	bl_context = "objectmode"
+	
+	@classmethod
+	def poll(self, context):
+		return len(getAnimationNodeTrees()) > 0
+	
+	def draw(self, context):
+		layout = self.layout
+		layout.operator("mn.force_full_update")
+		scene = context.scene
+		layout.label("Update when:")
+		layout.prop(scene, "updateAnimationTreeOnFrameChange", text = "Frames Changes")
+		layout.prop(scene, "updateAnimationTreeOnSceneUpdate", text = "Scene Updates")
+		layout.prop(scene, "updateAnimationTreeOnPropertyChange", text = "Property Changes")
+		
+		
+		
+class ForceNodeTreeUpdate(bpy.types.Operator):
+	bl_idname = "mn.force_full_update"
+	bl_label = "Force Node Tree Update"
+
+	def execute(self, context):
+		updateAnimationTrees(treeChanged = True)
+		return {'FINISHED'}
+	
+	
+	
+	
+# handlers to start the update
+##############################
+
+bpy.types.Scene.updateAnimationTreeOnFrameChange = bpy.props.BoolProperty(default = True, name = "Update Animation Tree On Frame Change")
+bpy.types.Scene.updateAnimationTreeOnSceneUpdate = bpy.props.BoolProperty(default = True, name = "Update Animation Tree On Scene Update")
+bpy.types.Scene.updateAnimationTreeOnPropertyChange = bpy.props.BoolProperty(default = True, name = "Update Animation Tree On Property Change")
+	
+@persistent
+def frameChangeHandler(scene):
+	if scene.updateAnimationTreeOnFrameChange:
+		updateAnimationTrees(False)
+@persistent
+def sceneUpdateHandler(scene):
+	if scene.updateAnimationTreeOnSceneUpdate:
+		updateAnimationTrees(False)
+@persistent
+def fileLoadHandler(scene):
+	updateAnimationTrees(True)
+def nodePropertyChanged(self, context):
+	if context.scene.updateAnimationTreeOnPropertyChange:
+		updateAnimationTrees(False)
+def nodeTreeChanged():
+	updateAnimationTrees(True)
 
 	
 bpy.app.handlers.frame_change_post.append(frameChangeHandler)
