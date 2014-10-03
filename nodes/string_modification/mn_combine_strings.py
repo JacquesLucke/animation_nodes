@@ -26,15 +26,15 @@ class CombineStringsNode(Node, AnimationNode):
 		output = {}
 		output["Text"] = ""
 		for i in range(self.inputAmount):
-			output["Text"] += input[self.getInputIdentifierByIndex(i)]
+			output["Text"] += input[self.getInputNameByIndex(i)]
 		return output
 		
 	def setInputSockets(self):
 		for i in range(self.inputAmount):
-			self.inputs.new("StringSocket", "Text", self.getInputIdentifierByIndex(i))
+			self.inputs.new("StringSocket", self.getInputNameByIndex(i))
 			
-	def getInputIdentifierByIndex(self, index):
-		return "Text" + str(index)	
+	def getInputNameByIndex(self, index):
+		return "Text " + str(index)	
 		
 # register
 ################################
