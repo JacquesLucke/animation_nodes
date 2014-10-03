@@ -67,16 +67,22 @@ def nodeTreeChanged():
 compiledCodeObjects = []
 
 def updateAnimationTrees(treeChanged = True):
-	global compiledCodeObjects
 	if treeChanged:
-		compiledCodeObjects = []
-		nodeNetworks = getNodeNetworks()
-		for network in nodeNetworks:
-			codeString = getCodeStringToExecuteNetwork(network)
-			compiledCodeObjects.append(compile(codeString, "<string>", "exec"))
+		rebuildNodeNetworks()
 	for codeObject in compiledCodeObjects:
 		try: exec(codeObject)
-		except BaseException as e: print(e)
+		except: 
+			rebuildNodeNetworks()
+			try: exec(codeObject)
+			except BaseException as e: print(e)
+		
+def rebuildNodeNetworks():
+	global compiledCodeObjects
+	compiledCodeObjects = []
+	nodeNetworks = getNodeNetworks()
+	for network in nodeNetworks:
+		codeString = getCodeStringToExecuteNetwork(network)
+		compiledCodeObjects.append(compile(codeString, "<string>", "exec"))
 		
 def getCodeStringToExecuteNetwork(network):
 	orderedNodes = orderNodes(network)
@@ -85,13 +91,17 @@ def getCodeStringToExecuteNetwork(network):
 	codeLines = []
 	codeLines.append("nodes = bpy.data.node_groups['" + network[0].id_data.name + "'].nodes")
 	for node in orderedNodes:
-		declaration = getNodeVariableName(node) + " = nodes['"+node.name+"']"
-		inputDictionaryString = generateInputListString(node)
-		executionCode = getNodeOutputName(node) + " = " + getNodeVariableName(node) + ".execute(" + inputDictionaryString + ")"
-		codeLines.append(declaration)
-		codeLines.append(executionCode)
+		if isExecuteableNode(node):
+			declaration = getNodeVariableName(node) + " = nodes['"+node.name+"']"
+			inputDictionaryString = generateInputListString(node)
+			executionCode = getNodeOutputName(node) + " = " + getNodeVariableName(node) + ".execute(" + inputDictionaryString + ")"
+			codeLines.append(declaration)
+			codeLines.append(executionCode)
 	codeString = "\n".join(codeLines)
 	return codeString
+	
+def isExecuteableNode(node):
+	return hasattr(node, "execute")
 		
 def generateInputListString(node):
 	inputParts = []
