@@ -90,9 +90,6 @@ def getNodeNetworksFromTree(nodeTree):
 			networks.append(getNodeNetworkFromNode(node))
 	return networks
 	
-def resetNodeFoundAttributes(nodes):
-	for node in nodes: node.isFound = False
-	
 def getNodeNetworkFromNode(node):
 	nodesToCheck = [node]
 	network = [node]
@@ -123,9 +120,12 @@ def getLinkedButNotFoundNodes(node):
 def sortOutAlreadyFoundNodes(nodes):
 	return [node for node in nodes if not node.isFound]
 	
+
+# order nodes (network) to possible execution sequence
+######################################################
+	
 def orderNodes(nodes):
-	for node in nodes:
-		node.isFound = False
+	resetNodeFoundAttributes(nodes)
 	orderedNodeList = []
 	for node in nodes:
 		if not node.isFound:
@@ -136,6 +136,13 @@ def orderNodes(nodes):
 
 def getAllNodeDependencies(node):
 	dependencies = []
+	directDependencies = getNotFoundDirectDependencies(node)
+	for directDependency in directDependencies:
+		dependencies.extend(getAllNodeDependencies(directDependency))
+	dependencies.extend(directDependencies)
+	return dependencies
+	
+def getNotFoundDirectDependencies(node):
 	directDependencies = []
 	for socket in node.inputs:
 		if hasLinks(socket):
@@ -143,10 +150,10 @@ def getAllNodeDependencies(node):
 			if not node.isFound:
 				node.isFound = True
 				directDependencies.append(node)
-	for node in directDependencies:
-		dependencies.extend(getAllNodeDependencies(node))
-	dependencies.extend(directDependencies)
-	return dependencies
+	return directDependencies
+	
+def resetNodeFoundAttributes(nodes):
+	for node in nodes: node.isFound = False
 		
 	
 bpy.types.Node.isFound = bpy.props.BoolProperty(default = False)
