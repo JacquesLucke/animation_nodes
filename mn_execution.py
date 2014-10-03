@@ -10,6 +10,7 @@ def updateAnimationTrees(treeChanged = True):
 	if treeChanged:
 		rebuildNodeNetworks()
 	for codeObject in compiledCodeObjects:
+		exec(codeObject)
 		try: exec(codeObject)
 		except: 
 			rebuildNodeNetworks()

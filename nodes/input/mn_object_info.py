@@ -3,13 +3,17 @@ from bpy.types import Node
 from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged
 from mn_utils import *
+from bpy.props import BoolProperty
 
 class ObjectInfoNode(Node, AnimationNode):
 	bl_idname = "ObjectInfoNode"
 	bl_label = "Object Info"
 	
+	useCurrentFrame = BoolProperty(default = True)
+	
 	def init(self, context):
 		self.inputs.new("ObjectSocket", "Object")
+		self.inputs.new("IntegerSocket", "Frame")
 		self.outputs.new("VectorSocket", "Location")
 		self.outputs.new("VectorSocket", "Rotation")
 		self.outputs.new("VectorSocket", "Scale")
@@ -17,40 +21,59 @@ class ObjectInfoNode(Node, AnimationNode):
 		self.outputs.new("VectorSocket", "Rotation Velocity")
 		self.outputs.new("VectorSocket", "Scale Velocity")
 		
+	def draw_buttons(self, context, layout):
+		layout.prop(self, "useCurrentFrame", text = "Use Current Frame")
+		
 	def execute(self, input):
 		object = bpy.data.objects.get(input["Object"])
 		output = {}
 		
-		output["Location"] = (0, 0, 0)
-		output["Rotation"] = (0, 0, 0)
-		output["Scale"] = (1, 1, 1)
+		output["Location"] = [0, 0, 0]
+		output["Rotation"] = [0, 0, 0]
+		output["Scale"] = [1, 1, 1]
+		output["Location Velocity"] = [0, 0, 0]
+		output["Rotation Velocity"] = [0, 0, 0]
+		output["Scale Velocity"] = [0, 0, 0]
 		
 		if object is None:
 			return output
 			
-		output["Location"] = object.location
-		output["Rotation"] = object.rotation_euler
-		output["Scale"] = object.scale
+		frame = input["Frame"]
+		if self.useCurrentFrame: frame = getCurrentFrame()
+			
+		output["Location"], output["Rotation"], output["Scale"] = self.getTransforms(object, frame)
 		
-		frame = getCurrentFrame()
-		
-		locationVelocity = [0, 0, 0]
 		for i in range(3):
-			locationVelocity[i] = self.getFrameChange(object, frame, "location", i)
+			output["Location Velocity"][i] = self.getFrameChange(object, frame, "location", i)
 			
-		rotationVelocity = [0, 0, 0]
 		for i in range(3):
-			rotationVelocity[i] = self.getFrameChange(object, frame, "rotation_euler", i)
+			output["Rotation Velocity"][i] = self.getFrameChange(object, frame, "rotation_euler", i)
 			
-		scaleVelocity = [0, 0, 0]
 		for i in range(3):
-			scaleVelocity[i] = self.getFrameChange(object, frame, "scale", i)
-			
-		output["Location Velocity"] = locationVelocity
-		output["Rotation Velocity"] = rotationVelocity
-		output["Scale Velocity"] = scaleVelocity
+			output["Scale Velocity"][i] = self.getFrameChange(object, frame, "scale", i)
 		
 		return output
+		
+	def getTransforms(self, object, frame):
+		location = [0, 0, 0]
+		rotation = [0, 0, 0]
+		scale = [1, 1, 1]
+		
+		for i in range(3):	
+			location[i] = self.getValueAtFrame(object, "location", i, frame)
+		for i in range(3):	
+			rotation[i] = self.getValueAtFrame(object, "rotation_euler", i, frame)
+		for i in range(3):	
+			scale[i] = self.getValueAtFrame(object, "scale", i, frame)
+		return location, rotation, scale
+			
+	def getValueAtFrame(self, object, dataPath, index, frame):
+		fCurve = getFCurveWithDataPath(object, dataPath = dataPath, index = index)
+		if fCurve is None:
+			print("object." + dataPath + "[" + str(index) + "]")
+			return eval("object." + dataPath + "[" + str(index) + "]")
+		else:
+			return fCurve.evaluate(frame)
 		
 	def getFrameChange(self, object, frame, dataPath, index):
 		fCurve = getFCurveWithDataPath(object, dataPath = dataPath, index = index)
