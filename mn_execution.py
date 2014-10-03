@@ -26,7 +26,7 @@ def rebuildNodeNetworks():
 	compiledCodeObjects = []
 	nodeNetworks = getNodeNetworks()
 	normalNetworks = []
-	subProgram = {}
+	subPrograms = {}
 	print()
 	for network in nodeNetworks:
 		setUniqueCodeIndexToEveryNode(network)
@@ -73,10 +73,14 @@ class NormalNetworkStringGenerator:
 			if isSubProgramNode(node):
 				codeLines.append(self.getNodeDeclarationString(node))
 				codeLines.append(getNodeInputName(node) + " = " + generateInputListStringForSubProgram(node))
+				functionName = getNodeVariableName(node) + "Function"
 				codeLines.append("for i in range(" + getNodeInputName(node) + "['Amount']):")
-				codeLines.append("    print(i)")
+				codeLines.append("    " + getNodeInputName(node) + "['Index'] = i")
+				codeLines.append("    " + functionName + "(" + getNodeInputName(node) + ")")
 				codeLines.append(getNodeOutputName(node) + " = " + getNodeInputName(node))
-		codeString = "\n".join(codeLines)
+				subProgramStringGenerator = SubProgramStringGenerator(node, functionName)
+				self.functions.append(subProgramStringGenerator.getCodeString())
+		codeString = "\n".join(self.functions) + "\n" + "\n".join(codeLines)
 		return codeString
 	def getNodeDeclarationString(self, node):
 		return getNodeVariableName(node) + " = nodes['"+node.name+"']"
@@ -87,14 +91,18 @@ class NormalNetworkStringGenerator:
 		
 class SubProgramStringGenerator:
 	def __init__(self, subProgram, functionName):
-		self.startNode = startNode
+		if hasLinks(subProgram.inputs[0]):
+			self.startNode = subProgram.inputs[0].links[0].from_node
 		self.functionName = functionName
-		self.network = subPrograms[getNodeIdentifier(startNode)]
+		self.network = subPrograms[getNodeIdentifier(self.startNode)]
 		self.codeLines = []
-		self.orderedNodes = []
+		self.orderedNodes = orderNodes(self.network)
 		
 	def getCodeString(self):
-		network = self.network
+		#network = self.network
+		self.codeLines.append("def " + self.functionName + "(" + getNodeOutputName(self.startNode) + "):")
+		self.codeLines.append("    print(" + getNodeOutputName(self.startNode) + ")")
+		return "\n".join(self.codeLines)
 		
 idCounter = 0	
 def setUniqueCodeIndexToEveryNode(nodes):
@@ -126,7 +134,6 @@ def generateInputListStringForSubProgram(node):
 	for i, socket in enumerate(node.inputs):
 		if i >= 1:
 			originSocket = getOriginSocket(socket)
-			print("blaa")
 			if isOtherOriginSocket(socket, originSocket):
 				otherNode = originSocket.node
 				part = "'" + socket.identifier + "' : " + getNodeOutputName(otherNode) + "['" + originSocket.identifier + "']"
@@ -190,11 +197,11 @@ def getLinkedButNotFoundNodes(node):
 	nodes = []
 	for socket in node.inputs:
 		for link in socket.links:
-			if not isSystemLink(link):
+			if not isSystemLink(link) and link.from_node not in nodes:
 				nodes.append(link.from_node)
 	for socket in node.outputs:
 		for link in socket.links:
-			if not isSystemLink(link):
+			if not isSystemLink(link) and link.from_node not in nodes:
 				nodes.append(link.to_node)
 	nodes = sortOutAlreadyFoundNodes(nodes)
 	return nodes
