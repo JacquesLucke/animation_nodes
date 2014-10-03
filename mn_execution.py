@@ -30,20 +30,6 @@ def rebuildNodeNetworks():
 		codeString = getCodeStringToExecuteNetwork(network)
 		compiledCodeObjects.append(compile(codeString, "<string>", "exec"))
 		
-def cleanupNodeTrees():
-	nodeTrees = getAnimationNodeTrees()
-	for nodeTree in nodeTrees:
-		cleanupNodeTree(nodeTree)
-def cleanupNodeTree(nodeTree):
-	links = nodeTree.links
-	for link in links:
-		toSocket = link.to_socket
-		fromSocket = link.from_socket
-		if toSocket.node.type == "REROUTE" or not isSocketLinked(toSocket):
-			continue
-		if fromSocket.dataType not in toSocket.allowedInputTypes:
-			nodeTree.links.remove(link)
-		
 def getCodeStringToExecuteNetwork(network):
 	orderedNodes = orderNodes(network)
 	setUniqueCodeIndexToEveryNode(orderedNodes)
@@ -179,6 +165,43 @@ def resetNodeFoundAttributes(nodes):
 	
 bpy.types.Node.isFound = bpy.props.BoolProperty(default = False)
 bpy.types.Node.codeIndex = bpy.props.IntProperty()
+
+
+# cleanup of node trees
+################################
+
+convertableTypes = [("Float", "Integer", "ToIntegerConversion"),
+					("Float", "String", "ToStringConversion"),
+					("Integer", "String", "ToStringConversion")]
+		
+def cleanupNodeTrees():
+	nodeTrees = getAnimationNodeTrees()
+	for nodeTree in nodeTrees:
+		cleanupNodeTree(nodeTree)
+def cleanupNodeTree(nodeTree):
+	links = nodeTree.links
+	for link in links:
+		toSocket = link.to_socket
+		fromSocket = link.from_socket
+		if toSocket.node.type == "REROUTE" or not isSocketLinked(toSocket):
+			continue
+		if fromSocket.dataType not in toSocket.allowedInputTypes:
+			handleNotAllowedLink(nodeTree, link, fromSocket, toSocket)
+def handleNotAllowedLink(nodeTree, link, fromSocket, toSocket):
+	fromType = fromSocket.dataType
+	toType = toSocket.dataType
+	nodeTree.links.remove(link)
+	for (t1, t2, nodeType) in convertableTypes:
+		if fromType == t1 and toType == t2: insertConversionNode(nodeTree, nodeType, link, fromSocket, toSocket)
+def insertConversionNode(nodeTree, nodeType, link, fromSocket, toSocket):
+	node = nodeTree.nodes.new(nodeType)
+	node.hide = True
+	node.select = False
+	x1, y1 = toSocket.node.location
+	x2, y2 = list(fromSocket.node.location)
+	node.location = [(x1+x2)/2+20, (y1+y2)/2-50]
+	nodeTree.links.new(node.inputs[0], fromSocket)
+	nodeTree.links.new(toSocket, node.outputs[0])
 
 		
 		
