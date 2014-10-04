@@ -87,7 +87,7 @@ class NormalNetworkStringGenerator:
 				codeLines.append(getNodeOutputName(node) + " = " + getNodeInputName(node))
 				subProgramNetworkStringGenerator = SubProgramNetworkStringGenerator(subPrograms[getNodeIdentifier(node.inputs[0].links[0].from_node)])
 				self.functions.append(subProgramNetworkStringGenerator.getCodeString())
-		codeString = "import bpy\n" + "\n".join(self.functions) + "\n" + "\n".join(codeLines)
+		codeString = "import bpy\n" + "\n".join(self.functions) + "\n\n" + "\n".join(codeLines)
 		return codeString
 		
 def getNodeDeclarationString(node):
@@ -122,7 +122,7 @@ class SubProgramNetworkStringGenerator:
 					codeLines.append("    " + getNodeOutputName(node) + " = " + getNodeInputName(node))
 					subProgramNetworkStringGenerator = SubProgramNetworkStringGenerator(subPrograms[getNodeIdentifier(node.inputs[0].links[0].from_node)])
 					self.functions.append(subProgramNetworkStringGenerator.getCodeString())
-		codeString = "\n".join(self.functions) + "\n" + "\n".join(codeLines)
+		codeString = "\n".join(self.functions) + "\n\n" + "\n".join(codeLines)
 		return codeString
 		
 		
