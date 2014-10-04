@@ -9,10 +9,6 @@ class NewPropertyListNode(bpy.types.Operator):
 	nodeTreeName = bpy.props.StringProperty()
 	nodeName = bpy.props.StringProperty()
 	
-	@classmethod
-	def poll(cls, context):
-		return getActive() is not None
-		
 	def execute(self, context):
 		node = getNode(self.nodeTreeName, self.nodeName)
 		node.addItemToList()
@@ -26,10 +22,6 @@ class RemovePropertyFromListNode(bpy.types.Operator):
 	nodeName = bpy.props.StringProperty()
 	index = bpy.props.IntProperty()
 	
-	@classmethod
-	def poll(cls, context):
-		return getActive() is not None
-		
 	def execute(self, context):
 		node = getNode(self.nodeTreeName, self.nodeName)
 		node.removeItemFromList(self.index)
