@@ -5,25 +5,32 @@ from mn_utils import *
 
 
 compiledCodeObjects = []
+codeStrings = []
 
 def updateAnimationTrees(treeChanged = True):
 	if treeChanged:
 		rebuildNodeNetworks()
-	for codeObject in compiledCodeObjects:
-		try: exec(codeObject)
-		except: 
-			rebuildNodeNetworks()
-			try: exec(codeObject)
-			except BaseException as e: print(e)
+	for i, codeObject in enumerate(compiledCodeObjects):
+		print(codeStrings[i])
+		file = open("C:\\Users\\Jacques Lucke\\Documents\\test.py", "w")
+		file.write(codeStrings[i])
+		file.close()
+		exec(codeObject)
+		#try: exec(codeObject)
+		#except BaseException as e: print(e)
+			#rebuildNodeNetworks()
+			#try: exec(codeObject)
+			#except BaseException as e: print(e)
 			
 			
 # compile code objects
 ################################
 subPrograms = {}	
 def rebuildNodeNetworks():
-	global compiledCodeObjects, subPrograms
+	global compiledCodeObjects, subPrograms, codeStrings
 	cleanupNodeTrees()
-	compiledCodeObjects = []
+	del compiledCodeObjects[:]
+	del codeStrings[:]
 	nodeNetworks = getNodeNetworks()
 	normalNetworks = []
 	subPrograms = {}
@@ -39,7 +46,8 @@ def rebuildNodeNetworks():
 	for network in normalNetworks:
 		codeGenerator = NormalNetworkStringGenerator(network)
 		codeString = codeGenerator.getCodeString()
-		print(codeString)
+		#print(codeString)
+		codeStrings.append(codeString)
 		compiledCodeObjects.append(compile(codeString, "<string>", "exec"))
 		
 def getNetworkType(network):
@@ -79,7 +87,7 @@ class NormalNetworkStringGenerator:
 				codeLines.append(getNodeOutputName(node) + " = " + getNodeInputName(node))
 				subProgramNetworkStringGenerator = SubProgramNetworkStringGenerator(subPrograms[getNodeIdentifier(node.inputs[0].links[0].from_node)])
 				self.functions.append(subProgramNetworkStringGenerator.getCodeString())
-		codeString = "\n".join(self.functions) + "\n" + "\n".join(codeLines)
+		codeString = "import bpy\n" + "\n".join(self.functions) + "\n" + "\n".join(codeLines)
 		return codeString
 		
 def getNodeDeclarationString(node):
@@ -110,7 +118,7 @@ class SubProgramNetworkStringGenerator:
 					codeLines.append("    " + getNodeInputName(node) + " = " + generateInputListStringForSubProgram(node))
 					codeLines.append("    for i in range(" + getNodeInputName(node) + "['Amount']):")
 					codeLines.append("        " + getNodeInputName(node) + "['Index'] = i")
-					codeLines.append("        " + getNodeFunctionName(startNode) + "(" + getNodeInputName(node) + ")")
+					codeLines.append("        " + getNodeFunctionName(node.inputs[0].links[0].from_node) + "(" + getNodeInputName(node) + ")")
 					codeLines.append("    " + getNodeOutputName(node) + " = " + getNodeInputName(node))
 					subProgramNetworkStringGenerator = SubProgramNetworkStringGenerator(subPrograms[getNodeIdentifier(node.inputs[0].links[0].from_node)])
 					self.functions.append(subProgramNetworkStringGenerator.getCodeString())
