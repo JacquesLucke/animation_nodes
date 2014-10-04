@@ -4,18 +4,18 @@ from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged
 import math
 
-def update_node(node, context):
+def updateNode(node, context):
 	nodePropertyChanged(node, context)
-	single_value_list = ["SINE",
-						 "COSINE",
-						 "TANGENT",
-						 "ARCSINE",
-						 "ARCCOSINE",
-						 "ARCTANGENT",
-						 "ABSOLUTE"]
-	if node.mathTypesProperty in single_value_list and not node.inputs[-1].hide:
+	singleInputOperations = ["SINE",
+							 "COSINE",
+							 "TANGENT",
+							 "ARCSINE",
+							 "ARCCOSINE",
+							 "ARCTANGENT",
+							 "ABSOLUTE"]
+	if node.mathTypesProperty in singleInputOperations and not node.inputs[-1].hide:
 		node.inputs[-1].hide = True
-	elif node.mathTypesProperty not in single_value_list and node.inputs[-1].hide:
+	elif node.mathTypesProperty not in singleInputOperations and node.inputs[-1].hide:
 		node.inputs[-1].hide = False
 
 
@@ -43,7 +43,7 @@ class FloatMathNode(Node, AnimationNode):
 		("GREATHERTHAN", "Greather Than", ""),
 		("MODULO", "Modulo", ""),
 		("ABSOLUTE", "Absolute", "")]
-	mathTypesProperty = bpy.props.EnumProperty(name="Operation", items=mathTypes, default="ADD", update=update_node)
+	mathTypesProperty = bpy.props.EnumProperty(name="Operation", items=mathTypes, default="ADD", update=updateNode)
 	
 	def init(self, context):
 		self.inputs.new("FloatSocket", "A")
