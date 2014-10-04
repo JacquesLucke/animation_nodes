@@ -73,13 +73,12 @@ class NormalNetworkStringGenerator:
 			if isSubProgramNode(node):
 				codeLines.append(getNodeDeclarationString(node))
 				codeLines.append(getNodeInputName(node) + " = " + generateInputListStringForSubProgram(node))
-				functionName = getNodeVariableName(node) + "Function"
 				codeLines.append("for i in range(" + getNodeInputName(node) + "['Amount']):")
 				codeLines.append("    " + getNodeInputName(node) + "['Index'] = i")
-				codeLines.append("    " + functionName + "(" + getNodeInputName(node) + ")")
+				codeLines.append("    " + getNodeFunctionName(node.inputs[0].links[0].from_node) + "(" + getNodeInputName(node) + ")")
 				codeLines.append(getNodeOutputName(node) + " = " + getNodeInputName(node))
-				subProgramStringGenerator = SubProgramStringGenerator(node, functionName)
-				self.functions.append(subProgramStringGenerator.getCodeString())
+				subProgramNetworkStringGenerator = SubProgramNetworkStringGenerator(subPrograms[getNodeIdentifier(node.inputs[0].links[0].from_node)])
+				self.functions.append(subProgramNetworkStringGenerator.getCodeString())
 		codeString = "\n".join(self.functions) + "\n" + "\n".join(codeLines)
 		return codeString
 		
@@ -88,28 +87,36 @@ def getNodeDeclarationString(node):
 def getNodeExecutionString(node):
 	return getNodeOutputName(node) + " = " + getNodeVariableName(node) + ".execute(" + generateInputListString(node) + ")"
 		
-
 		
-class SubProgramStringGenerator:
-	def __init__(self, subProgram, functionName):
-		if hasLinks(subProgram.inputs[0]):
-			self.startNode = subProgram.inputs[0].links[0].from_node
-		self.functionName = functionName
-		self.network = subPrograms[getNodeIdentifier(self.startNode)]
-		self.orderedNodes = orderNodes(self.network)
-		
+class SubProgramNetworkStringGenerator:
+	def __init__(self, network):
+		self.network = network
+		self.functions = []
+		self.orderedNodes = []
 	def getCodeString(self):
-		#network = self.network
+		network = self.network
+		startNode = getSubProgramStartNodeOfNetwork(network)
+		self.orderedNodes = orderNodes(network)
 		codeLines = []
-		codeLines.append("def " + self.functionName + "(" + getNodeOutputName(self.startNode) + "):")
+		codeLines.append("def " + getNodeFunctionName(startNode) + "(" + getNodeOutputName(startNode) + "):")
 		codeLines.append("    global nodes")
 		for node in self.orderedNodes:
-			if node != self.startNode:
+			if node != startNode:
 				if isExecuteableNode(node):
 					codeLines.append("    " + getNodeDeclarationString(node))
 					codeLines.append("    " + getNodeExecutionString(node))
+				if isSubProgramNode(node):
+					codeLines.append("    " + getNodeDeclarationString(node))
+					codeLines.append("    " + getNodeInputName(node) + " = " + generateInputListStringForSubProgram(node))
+					codeLines.append("    for i in range(" + getNodeInputName(node) + "['Amount']):")
+					codeLines.append("        " + getNodeInputName(node) + "['Index'] = i")
+					codeLines.append("        " + getNodeFunctionName(startNode) + "(" + getNodeInputName(node) + ")")
+					codeLines.append("    " + getNodeOutputName(node) + " = " + getNodeInputName(node))
+					subProgramNetworkStringGenerator = SubProgramNetworkStringGenerator(subPrograms[getNodeIdentifier(node.inputs[0].links[0].from_node)])
+					self.functions.append(subProgramNetworkStringGenerator.getCodeString())
+		codeString = "\n".join(self.functions) + "\n" + "\n".join(codeLines)
+		return codeString
 		
-		return "\n".join(codeLines)
 		
 idCounter = 0	
 def setUniqueCodeIndexToEveryNode(nodes):
@@ -155,6 +162,8 @@ def getNodeInputName(node):
 	return "input_" + str(node.codeIndex)
 def getNodeOutputName(node):
 	return "output_" + str(node.codeIndex)
+def getNodeFunctionName(node):
+	return getNodeVariableName(node) + "_" + "Function"
 		
 
 # get node networks (groups of connected nodes)
