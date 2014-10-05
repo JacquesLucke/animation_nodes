@@ -36,9 +36,16 @@ class ObjectListInputNode(Node, AnimationNode):
 				remove.nodeName = self.name
 				remove.index = index
 				index += 1
-			add = layout.operator("mn.new_property_to_list_node", text = "New", icon = "PLUS")
+				
+			add = layout.operator("mn.new_property_to_list_node", text = "New Item", icon = "PLUS")
 			add.nodeTreeName = self.id_data.name
 			add.nodeName = self.name
+			
+			add = layout.operator("mn.selected_objects_to_object_list_node", text = "From Selection", icon = "PLUS")
+			add.nodeTreeName = self.id_data.name
+			add.nodeName = self.name
+			
+			layout.separator()
 				
 	def execute(self, input):
 		output = {}
@@ -53,13 +60,17 @@ class ObjectListInputNode(Node, AnimationNode):
 		
 	def addItemToList(self):
 		item = self.objects.add()
-		item.value = 0.0
 		
 	def removeItemFromList(self, index):
 		self.objects.remove(index)
 		
 	def setObject(self, object, index):
 		self.objects[index].object = object.name
+		
+	def newItemsFromSelection(self, objects):
+		for object in objects:
+			item = self.objects.add()
+			item.object = object.name
 	
 	
 class AssignActiveObjectToListNode(bpy.types.Operator):
@@ -78,6 +89,19 @@ class AssignActiveObjectToListNode(bpy.types.Operator):
 		obj = getActive()
 		node = getNode(self.nodeTreeName, self.nodeName)
 		node.setObject(obj, self.index)
+		return {'FINISHED'}	
+		
+class SelectedObjectsToObjectListNode(bpy.types.Operator):
+	bl_idname = "mn.selected_objects_to_object_list_node"
+	bl_label = "New Items From Selection"
+	
+	nodeTreeName = bpy.props.StringProperty()
+	nodeName = bpy.props.StringProperty()
+		
+	def execute(self, context):
+		selectedObjects = bpy.context.selected_objects
+		node = getNode(self.nodeTreeName, self.nodeName)
+		node.newItemsFromSelection(selectedObjects)
 		return {'FINISHED'}	
 		
 		
