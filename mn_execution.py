@@ -112,7 +112,8 @@ def getNodeDeclarationString(node):
 def getNodeExecutionString(node):
 	return getNodeOutputName(node) + " = " + getNodeVariableName(node) + ".execute(" + generateInputListString(node) + ")"
 		
-idCounter = 0	
+idCounter = 0
+bpy.types.Node.codeIndex = bpy.props.IntProperty()
 def setUniqueCodeIndexToEveryNode(nodes):
 	global idCounter
 	for node in nodes:
@@ -208,12 +209,16 @@ def sortOutAlreadyFoundNodes(nodes):
 def isSystemLink(link):
 	return link.to_socket.bl_idname == "SubProgramSocket"
 	
+bpy.types.Node.isFound = bpy.props.BoolProperty(default = False)
+def resetNodeFoundAttributes(nodes):
+	for node in nodes: node.isFound = False
+		
+	
 
 # order nodes (network) to possible execution sequence
 ######################################################
 	
 def orderNodes(nodes):
-	resetNodeFoundAttributes(nodes)
 	preOrderedList = []
 	for node in nodes:
 		preOrderedList.extend(getAllNodeDependencies(node))
@@ -240,12 +245,6 @@ def getDirectDependencies(node):
 			directDependencies.append(node)
 	return directDependencies
 	
-def resetNodeFoundAttributes(nodes):
-	for node in nodes: node.isFound = False
-		
-	
-bpy.types.Node.isFound = bpy.props.BoolProperty(default = False)
-bpy.types.Node.codeIndex = bpy.props.IntProperty()
 
 
 # cleanup of node trees
