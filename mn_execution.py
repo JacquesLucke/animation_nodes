@@ -10,18 +10,12 @@ codeStrings = []
 def updateAnimationTrees(treeChanged = True):
 	if treeChanged:
 		rebuildNodeNetworks()
-	for i, codeObject in enumerate(compiledCodeObjects):
-		print(codeStrings[i])
-		file = open("C:\\Users\\Jacques Lucke\\Documents\\test.py", "w")
-		file.write(codeStrings[i])
-		file.close()
-		
-		exec(codeObject, {})
-		#try: exec(codeObject)
-		#except BaseException as e: print(e)
-			#rebuildNodeNetworks()
-			#try: exec(codeObject)
-			#except BaseException as e: print(e)
+	for i, codeObject in enumerate(compiledCodeObjects):	
+		try: exec(codeObject, {})
+		except BaseException as e:
+			rebuildNodeNetworks()
+			try: exec(codeObject, {})
+			except BaseException as e: print(e)
 			
 			
 # compile code objects
@@ -35,11 +29,9 @@ def rebuildNodeNetworks():
 	nodeNetworks = getNodeNetworks()
 	normalNetworks = []
 	subPrograms = {}
-	print()
 	for network in nodeNetworks:
 		setUniqueCodeIndexToEveryNode(network)
 		networkType = getNetworkType(network)
-		print(networkType)
 		if networkType == "Normal": normalNetworks.append(network)
 		elif networkType == "SubProgram":
 			startNode = getSubProgramStartNodeOfNetwork(network)
@@ -47,7 +39,6 @@ def rebuildNodeNetworks():
 	for network in normalNetworks:
 		codeGenerator = NormalNetworkStringGenerator(network)
 		codeString = codeGenerator.getCodeString()
-		#print(codeString)
 		codeStrings.append(codeString)
 		compiledCodeObjects.append(compile(codeString, "<string>", "exec"))
 		
