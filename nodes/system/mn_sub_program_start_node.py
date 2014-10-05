@@ -4,38 +4,74 @@ from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged
 from mn_utils import *
 
+class SocketPropertyGroup(bpy.types.PropertyGroup):
+	socketName = bpy.props.StringProperty(name = "Socket Name", default = "", update = nodePropertyChanged)
+	socketType = bpy.props.StringProperty(name = "Socket Type", default = "", update = nodePropertyChanged)
+
 class SubProgramStartNode(Node, AnimationNode):
 	bl_idname = "SubProgramStartNode"
 	bl_label = "Sub-Program Start"
 	
+	sockets = bpy.props.CollectionProperty(type = SocketPropertyGroup)
+	showEditOptions = bpy.props.BoolProperty(default = True)
+	
 	def init(self, context):
-		self.outputs.new("SubProgramSocket", "Sub-Program")
-		self.outputs.new("IntegerSocket", "Index")
+		self.rebuildOutputSockets()
 		
 	def draw_buttons(self, context, layout):
-		layout.label("Add New Socket")
+		layout.prop(self, "showEditOptions", text = "Show Options")
+		layout.separator()
+		if self.showEditOptions:
 		
-		objectList = layout.operator("mn.new_sub_program_socket", text = "Object List")
-		objectList.nodeTreeName = self.id_data.name
-		objectList.nodeName = self.name
-		objectList.socketType = "ObjectListSocket"
+			rebuild = layout.operator("mn.rebuild_sub_program_sockets", "Rebuild Sockets")
+			rebuild.nodeTreeName = self.id_data.name
+			rebuild.nodeName = self.name
 		
-		objectList = layout.operator("mn.new_sub_program_socket", text = "Float")
-		objectList.nodeTreeName = self.id_data.name
-		objectList.nodeName = self.name
-		objectList.socketType = "FloatSocket"
+			col = layout.column(align = True)
+			for index, item in enumerate(self.sockets):
+				row = col.row(align = True)
+				row.scale_y = 1.3
+				row.prop(item, "socketName", text = "")
+				remove = row.operator("mn.remove_property_from_list_node", text = "", icon = "X")
+				remove.nodeTreeName = self.id_data.name
+				remove.nodeName = self.name
+				remove.index = index
+			add = layout.operator("mn.new_sub_program_socket", text = "New Object List", icon = "PLUS")
+			add.nodeTreeName = self.id_data.name
+			add.nodeName = self.name
+			add.socketType = "ObjectListSocket"
+			add = layout.operator("mn.new_sub_program_socket", text = "New Float", icon = "PLUS")
+			add.nodeTreeName = self.id_data.name
+			add.nodeName = self.name
+			add.socketType = "FloatSocket"
 		
 	def execute(self, input):
 		return input
 		
 	def newSocket(self, socketType):
-		self.outputs.new(socketType, self.getPossibleName("Socket"))
+		item = self.sockets.add()
+		item.socketType = socketType
+		item.socketName = self.getPossibleName("Socket")
 	def getPossibleName(self, name):
 		counter = 1
-		while self.outputs.get(name + " " + str(counter)) is not None:
+		while self.socketNameExists(name + " " + str(counter)):
 			counter += 1
-		
 		return name + " " + str(counter)
+	def socketNameExists(self, name):
+		for item in self.sockets:
+			if item.socketName == name: return True
+		return False
+		
+	def removeItemFromList(self, index):
+		self.sockets.remove(index)
+		
+	def rebuildOutputSockets(self):
+		self.outputs.clear()
+		self.outputs.new("SubProgramSocket", "Sub-Program")
+		self.outputs.new("IntegerSocket", "Index")
+		for item in self.sockets:
+			self.outputs.new(item.socketType, item.socketName)
+			
 		
 class NewSubProgramSocketNode(bpy.types.Operator):
 	bl_idname = "mn.new_sub_program_socket"
@@ -52,6 +88,22 @@ class NewSubProgramSocketNode(bpy.types.Operator):
 	def execute(self, context):
 		node = getNode(self.nodeTreeName, self.nodeName)
 		node.newSocket(self.socketType)
+		return {'FINISHED'}
+		
+class RebuildSubProgramSockets(bpy.types.Operator):
+	bl_idname = "mn.rebuild_sub_program_sockets"
+	bl_label = "Rebuild Sub-Program Sockets"
+	
+	nodeTreeName = bpy.props.StringProperty()
+	nodeName = bpy.props.StringProperty()
+	
+	@classmethod
+	def poll(cls, context):
+		return getActive() is not None
+		
+	def execute(self, context):
+		node = getNode(self.nodeTreeName, self.nodeName)
+		node.rebuildOutputSockets()
 		return {'FINISHED'}	
 		
 # register
