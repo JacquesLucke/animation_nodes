@@ -37,14 +37,19 @@ class SubProgramStartNode(Node, AnimationNode):
 				remove.nodeTreeName = self.id_data.name
 				remove.nodeName = self.name
 				remove.index = index
-			add = layout.operator("mn.new_sub_program_socket", text = "New Object List", icon = "PLUS")
-			add.nodeTreeName = self.id_data.name
-			add.nodeName = self.name
-			add.socketType = "ObjectListSocket"
-			add = layout.operator("mn.new_sub_program_socket", text = "New Float", icon = "PLUS")
-			add.nodeTreeName = self.id_data.name
-			add.nodeName = self.name
-			add.socketType = "FloatSocket"
+				
+			addSocketList = [
+				("Object List", "ObjectListSocket"),
+				("String List", "StringListSocket"),
+				("Float", "FloatSocket"),
+				("Text", "StringSocket") ]
+			layout.label("Add Sockets")
+			col = layout.column(align = True)
+			for displayTame, socketType in addSocketList:
+				add = col.operator("mn.new_sub_program_socket", text = displayTame)
+				add.nodeTreeName = self.id_data.name
+				add.nodeName = self.name
+				add.socketType = socketType
 		
 	def execute(self, input):
 		return input
