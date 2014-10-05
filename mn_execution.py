@@ -15,7 +15,8 @@ def updateAnimationTrees(treeChanged = True):
 		file = open("C:\\Users\\Jacques Lucke\\Documents\\test.py", "w")
 		file.write(codeStrings[i])
 		file.close()
-		exec(codeObject)
+		
+		exec(codeObject, {})
 		#try: exec(codeObject)
 		#except BaseException as e: print(e)
 			#rebuildNodeNetworks()
