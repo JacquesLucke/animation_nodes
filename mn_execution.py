@@ -213,30 +213,30 @@ def isSystemLink(link):
 	
 def orderNodes(nodes):
 	resetNodeFoundAttributes(nodes)
-	orderedNodeList = []
+	preOrderedList = []
 	for node in nodes:
-		if not node.isFound:
-			orderedNodeList.extend(getAllNodeDependencies(node))
-			orderedNodeList.append(node)
-			node.isFound = True
-	return orderedNodeList
+		preOrderedList.extend(getAllNodeDependencies(node))
+		preOrderedList.append(node)
+	
+	orderedList = []
+	for node in preOrderedList:
+		if node not in orderedList: orderedList.append(node)
+	return orderedList
 
 def getAllNodeDependencies(node):
 	dependencies = []
-	directDependencies = getNotFoundDirectDependencies(node)
+	directDependencies = getDirectDependencies(node)
 	for directDependency in directDependencies:
 		dependencies.extend(getAllNodeDependencies(directDependency))
 	dependencies.extend(directDependencies)
 	return dependencies
 	
-def getNotFoundDirectDependencies(node):
+def getDirectDependencies(node):
 	directDependencies = []
 	for socket in node.inputs:
 		if hasLinks(socket):
 			node = socket.links[0].from_node
-			if not node.isFound:
-				node.isFound = True
-				directDependencies.append(node)
+			directDependencies.append(node)
 	return directDependencies
 	
 def resetNodeFoundAttributes(nodes):
