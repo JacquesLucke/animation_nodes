@@ -100,17 +100,26 @@ class NetworkCodeGenerator:
 		elif isSubProgramNode(node):
 			codeLines.append(getNodeDeclarationString(node))
 			codeLines.append(getNodeInputName(node) + " = " + generateInputListString(node, ignoreSocketNames = "Sub-Program"))
-			codeLines.append("for i in range(" + getNodeInputName(node) + "['Amount']):")
-			codeLines.append("    " + getNodeInputName(node) + "['Index'] = i")
-			codeLines.append("    " + getNodeFunctionName(node.inputs[0].links[0].from_node) + "(" + getNodeInputName(node) + ")")
+			startNode = getCorrespondingStartNode(node)
+			if startNode is not None:
+				codeLines.append("for i in range(" + getNodeInputName(node) + "['Amount']):")
+				codeLines.append("    " + getNodeInputName(node) + "['Index'] = i")
+				codeLines.append("    " + getNodeFunctionName(startNode) + "(" + getNodeInputName(node) + ")")
+				self.makeFunctionCode(subPrograms[getNodeIdentifier(startNode)])
 			codeLines.append(getNodeOutputName(node) + " = " + getNodeInputName(node))
-			self.makeFunctionCode(subPrograms[getNodeIdentifier(node.inputs[0].links[0].from_node)])
 		return codeLines		
 		
 def getNodeDeclarationString(node):
 	return getNodeVariableName(node) + " = nodes['"+node.name+"']"
 def getNodeExecutionString(node):
 	return getNodeOutputName(node) + " = " + getNodeVariableName(node) + ".execute(" + generateInputListString(node) + ")"
+	
+def getCorrespondingStartNode(node):
+	if hasLinks(node.inputs[0]):
+		startNode = node.inputs[0].links[0].from_node
+		if startNode.bl_idname == "SubProgramStartNode":
+			return startNode
+	return None
 		
 idCounter = 0
 bpy.types.Node.codeIndex = bpy.props.IntProperty()
