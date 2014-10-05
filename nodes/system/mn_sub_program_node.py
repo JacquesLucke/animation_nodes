@@ -12,20 +12,23 @@ class SubProgramNode(Node, AnimationNode):
 		self.inputs.new("SubProgramSocket", "Sub-Program")
 		self.inputs.new("IntegerSocket", "Amount")
 		
-	def update(self):
+	def draw_buttons(self, context, layout):
+		rebuild = layout.operator("mn.rebuild_sub_program_sockets", "Rebuild Sockets")
+		rebuild.nodeTreeName = self.id_data.name
+		rebuild.nodeName = self.name
+						
+	def rebuildSubProgramSockets(self):
+		self.removeDynamicSockets()
 		if hasLinks(self.inputs["Sub-Program"]):
 			startNode = self.inputs["Sub-Program"].links[0].from_node
 			for i, output in enumerate(startNode.outputs):
 				if i >= 2:
-					if len(self.inputs) > i:
-						if self.inputs[i].name != output.name:
-							self.inputs.remove(self.inputs[i])
-							self.inputs.new(output.bl_idname, output.name)
-							self.outputs.remove(self.inputs[i])
-							self.outputs.new(output.bl_idname, output.name)
-					else:
-						self.inputs.new(output.bl_idname, output.name)
-						self.outputs.new(output.bl_idname, output.name)
+					self.inputs.new(output.bl_idname, output.name)
+					self.outputs.new(output.bl_idname, output.name)
+	def removeDynamicSockets(self):
+		self.outputs.clear()
+		for i, socket in enumerate(self.inputs):
+			if i >= 2: self.inputs.remove(socket)
 					
 
 		

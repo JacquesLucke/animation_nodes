@@ -16,7 +16,8 @@ class SubProgramStartNode(Node, AnimationNode):
 	showEditOptions = bpy.props.BoolProperty(default = True)
 	
 	def init(self, context):
-		self.rebuildOutputSockets()
+		self.outputs.new("SubProgramSocket", "Sub-Program")
+		self.outputs.new("IntegerSocket", "Index")
 		
 	def draw_buttons(self, context, layout):
 		layout.prop(self, "showEditOptions", text = "Show Options")
@@ -65,12 +66,13 @@ class SubProgramStartNode(Node, AnimationNode):
 	def removeItemFromList(self, index):
 		self.sockets.remove(index)
 		
-	def rebuildOutputSockets(self):
-		self.outputs.clear()
-		self.outputs.new("SubProgramSocket", "Sub-Program")
-		self.outputs.new("IntegerSocket", "Index")
+	def rebuildSubProgramSockets(self):
+		self.removeDynamicSockets()
 		for item in self.sockets:
 			self.outputs.new(item.socketType, item.socketName)
+	def removeDynamicSockets(self):
+		for i, socket in enumerate(self.outputs):
+			if i >= 2: self.inputs.remove(socket)
 			
 		
 class NewSubProgramSocketNode(bpy.types.Operator):
@@ -103,7 +105,7 @@ class RebuildSubProgramSockets(bpy.types.Operator):
 		
 	def execute(self, context):
 		node = getNode(self.nodeTreeName, self.nodeName)
-		node.rebuildOutputSockets()
+		node.rebuildSubProgramSockets()
 		return {'FINISHED'}	
 		
 # register
