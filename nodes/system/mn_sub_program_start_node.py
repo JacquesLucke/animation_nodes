@@ -7,6 +7,12 @@ from mn_utils import *
 class SocketPropertyGroup(bpy.types.PropertyGroup):
 	socketName = bpy.props.StringProperty(name = "Socket Name", default = "", update = nodePropertyChanged)
 	socketType = bpy.props.StringProperty(name = "Socket Type", default = "", update = nodePropertyChanged)
+	
+addSocketList = [
+	("Object List", "ObjectListSocket"),
+	("String List", "StringListSocket"),
+	("Float", "FloatSocket"),
+	("Text", "StringSocket") ]
 
 class SubProgramStartNode(Node, AnimationNode):
 	bl_idname = "SubProgramStartNode"
@@ -38,11 +44,6 @@ class SubProgramStartNode(Node, AnimationNode):
 				remove.nodeName = self.name
 				remove.index = index
 				
-			addSocketList = [
-				("Object List", "ObjectListSocket"),
-				("String List", "StringListSocket"),
-				("Float", "FloatSocket"),
-				("Text", "StringSocket") ]
 			layout.label("Add Sockets")
 			col = layout.column(align = True)
 			for displayTame, socketType in addSocketList:
