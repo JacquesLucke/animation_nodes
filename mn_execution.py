@@ -22,13 +22,14 @@ def updateAnimationTrees(treeChanged = True):
 ################################
 subPrograms = {}	
 def rebuildNodeNetworks():
-	global compiledCodeObjects, subPrograms, codeStrings
+	global compiledCodeObjects, subPrograms, codeStrings, idCounter
 	cleanupNodeTrees()
 	del compiledCodeObjects[:]
 	del codeStrings[:]
 	nodeNetworks = getNodeNetworks()
 	normalNetworks = []
 	subPrograms = {}
+	idCounter = 0
 	for network in nodeNetworks:
 		setUniqueCodeIndexToEveryNode(network)
 		networkType = getNetworkType(network)
@@ -220,7 +221,7 @@ def orderNodes(nodes):
 	
 	orderedList = []
 	for node in preOrderedList:
-		if node not in orderedList: orderedList.append(node)
+		if node not in orderedList and node in nodes: orderedList.append(node)
 	return orderedList
 
 def getAllNodeDependencies(node):
