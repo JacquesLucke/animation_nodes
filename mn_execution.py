@@ -272,7 +272,7 @@ def cleanupNodeTree(nodeTree):
 	for link in links:
 		toSocket = link.to_socket
 		fromSocket = link.from_socket
-		if toSocket.node.type == "REROUTE" or not isSocketLinked(toSocket):
+		if toSocket.node.type == "REROUTE" or fromSocket.node.type == "REROUTE" or not isSocketLinked(toSocket):
 			continue
 		if fromSocket.dataType not in toSocket.allowedInputTypes and toSocket.allowedInputTypes[0] != "all":
 			handleNotAllowedLink(nodeTree, link, fromSocket, toSocket)
