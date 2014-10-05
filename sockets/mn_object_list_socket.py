@@ -17,7 +17,7 @@ class ObjectListSocket(NodeSocket):
 		return (0, 0, 0, 0.4)
 		
 	def getValue(self):
-		return [""]
+		return []
 		
 		
 # register

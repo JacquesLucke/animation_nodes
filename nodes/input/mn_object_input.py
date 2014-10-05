@@ -25,7 +25,7 @@ class ObjectInputNode(Node, AnimationNode):
 		
 	def execute(self, input):
 		output = {}
-		output["Object"] = self.objectName
+		output["Object"] = bpy.data.objects.get(self.objectName)
 		return output
 		
 class AssignActiveObjectToNode(bpy.types.Operator):

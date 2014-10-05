@@ -37,7 +37,7 @@ class ObjectOutputNode(Node, AnimationNode):
 		row.prop(self, "useScale", index = 2, text = "Z")
 		
 	def execute(self, input):
-		object = bpy.data.objects.get(input["Object"])
+		object = input["Object"]
 		if object is None:
 			return {}
 		

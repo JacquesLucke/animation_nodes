@@ -15,7 +15,7 @@ class TextOutputNode(Node, AnimationNode):
 		self.inputs.new("FloatSocket", "Extrude").number = 0.0
 		
 	def execute(self, input):
-		object = bpy.data.objects.get(input["Object"])
+		object = input["Object"]
 		textObject = None
 		
 		if object is not None:

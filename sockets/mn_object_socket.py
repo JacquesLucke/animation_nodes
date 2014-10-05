@@ -30,7 +30,7 @@ class ObjectSocket(NodeSocket):
 		return (0, 0, 0, 1)
 		
 	def getValue(self):
-		return self.objectName
+		return bpy.data.objects.get(self.objectName)
 	
 	
 class AssignActiveObjectToNode(bpy.types.Operator):

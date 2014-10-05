@@ -55,7 +55,7 @@ class ObjectListInputNode(Node, AnimationNode):
 	def getCurrentList(self):
 		objectList = []
 		for item in self.objects:
-			objectList.append(item.object)
+			objectList.append(bpy.data.objects.get(item.object))
 		return objectList
 		
 	def addItemToList(self):

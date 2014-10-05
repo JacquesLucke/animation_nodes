@@ -14,7 +14,7 @@ class ModifierOutputNode(Node, AnimationNode):
 		self.inputs.new("GenericSocket", "Value")
 		
 	def execute(self, input):
-		object = bpy.data.objects.get(input["Object"])
+		object = input["Object"]
 		dataPath = 'modifiers["' + input["Name"] + '"].' + input["Attribute"]
 		value = input["Value"]
 		try:

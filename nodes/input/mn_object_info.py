@@ -25,7 +25,6 @@ class ObjectInfoNode(Node, AnimationNode):
 		layout.prop(self, "useCurrentFrame", text = "Use Current Frame")
 		
 	def execute(self, input):
-		object = bpy.data.objects.get(input["Object"])
 		output = {}
 		
 		output["Location"] = [0, 0, 0]
@@ -35,6 +34,7 @@ class ObjectInfoNode(Node, AnimationNode):
 		output["Rotation Velocity"] = [0, 0, 0]
 		output["Scale Velocity"] = [0, 0, 0]
 		
+		object = input["Object"]
 		if object is None:
 			return output
 			
