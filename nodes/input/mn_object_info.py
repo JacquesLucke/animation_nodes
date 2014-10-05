@@ -70,7 +70,6 @@ class ObjectInfoNode(Node, AnimationNode):
 	def getValueAtFrame(self, object, dataPath, index, frame):
 		fCurve = getFCurveWithDataPath(object, dataPath = dataPath, index = index)
 		if fCurve is None:
-			print("object." + dataPath + "[" + str(index) + "]")
 			return eval("object." + dataPath + "[" + str(index) + "]")
 		else:
 			return fCurve.evaluate(frame)
