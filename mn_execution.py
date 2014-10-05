@@ -69,7 +69,7 @@ class NetworkCodeGenerator:
 		mainLines.append("nodes = bpy.data.node_groups['" + network[0].id_data.name + "'].nodes")
 		for node in self.orderedNodes:
 			mainLines.extend(self.getNodeCodeLines(node))
-		codeString = "import bpy\n" + "\n".join(self.functions.values()) + "\n\n" + "\n".join(mainLines)
+		codeString = "import bpy\n\n" + "\n\n".join(self.functions.values()) + "\n\n" + "\n".join(mainLines)
 		return codeString
 		
 	def makeFunctionCode(self, functionNetwork):
