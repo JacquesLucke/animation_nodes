@@ -322,6 +322,7 @@ class AnimationNodesPanel(bpy.types.Panel):
 	def draw(self, context):
 		layout = self.layout
 		layout.operator("mn.force_full_update")
+		layout.operator("mn.print_node_tree_execution_string")
 		scene = context.scene
 		layout.label("Update when:")
 		layout.prop(scene, "updateAnimationTreeOnFrameChange", text = "Frames Changes")
@@ -336,6 +337,17 @@ class ForceNodeTreeUpdate(bpy.types.Operator):
 
 	def execute(self, context):
 		updateAnimationTrees(treeChanged = True)
+		return {'FINISHED'}
+		
+class PrintNodeTreeExecutionStrings(bpy.types.Operator):
+	bl_idname = "mn.print_node_tree_execution_string"
+	bl_label = "Print Node Tree Code"
+
+	def execute(self, context):
+		print()
+		for codeString in codeStrings:
+			print(codeString)
+			print()
 		return {'FINISHED'}
 	
 	
