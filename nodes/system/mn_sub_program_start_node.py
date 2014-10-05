@@ -12,7 +12,8 @@ addSocketList = [
 	("Object List", "ObjectListSocket"),
 	("String List", "StringListSocket"),
 	("Float", "FloatSocket"),
-	("Text", "StringSocket") ]
+	("Text", "StringSocket"),
+	("Object", "ObjectSocket") ]
 
 class SubProgramStartNode(Node, AnimationNode):
 	bl_idname = "SubProgramStartNode"
