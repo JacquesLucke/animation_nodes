@@ -30,6 +30,7 @@ def rebuildNodeNetworks():
 	normalNetworks = []
 	subPrograms = {}
 	for network in nodeNetworks:
+		setUniqueCodeIndexToEveryNode(network)
 		networkType = getNetworkType(network)
 		if networkType == "Normal": normalNetworks.append(network)
 		elif networkType == "SubProgram":
@@ -59,35 +60,27 @@ class NetworkCodeGenerator:
 	def __init__(self, network):
 		self.network = network
 		self.functions = {}
-		self.idCounter = 0
 		
 	def getCode(self):
 		network = self.network
-		orderedNodes = orderNodes(network)
-		self.setUniqueCodeIndexToEveryNode(orderedNodes)
+		self.orderedNodes = orderNodes(network)
 		mainLines = []
 		mainLines.append("nodes = bpy.data.node_groups['" + network[0].id_data.name + "'].nodes")
-		for node in orderedNodes:
+		for node in self.orderedNodes:
 			mainLines.extend(self.getNodeCodeLines(node))
 		codeString = "import bpy\n" + "\n".join(self.functions.values()) + "\n\n" + "\n".join(mainLines)
 		return codeString
-			
-	def setUniqueCodeIndexToEveryNode(self, orderedNodes):
-		for node in orderedNodes:
-			node.codeIndex = self.idCounter
-			self.idCounter += 1
 		
 	def makeFunctionCode(self, functionNetwork):
 		startNode = getSubProgramStartNodeOfNetwork(functionNetwork)
 		if getNodeIdentifier(startNode) not in self.functions:
 			self.functions[getNodeIdentifier(startNode)] = self.getFunctionCode(functionNetwork, startNode)
 	def getFunctionCode(self, functionNetwork, startNode):
-		orderedNodes = orderNodes(functionNetwork)
-		self.setUniqueCodeIndexToEveryNode(orderedNodes)
+		self.orderedNodes = orderNodes(functionNetwork)
 		mainLines = []
 		mainLines.append("def " + getNodeFunctionName(startNode) + "(" + getNodeOutputName(startNode) + "):")
 		mainLines.append("    global nodes")
-		for node in orderedNodes:
+		for node in self.orderedNodes:
 			if node != startNode:
 				codeLines = self.getNodeCodeLines(node)
 				self.setIndentationOnEveryLine(codeLines)
@@ -117,6 +110,13 @@ def getNodeDeclarationString(node):
 	return getNodeVariableName(node) + " = nodes['"+node.name+"']"
 def getNodeExecutionString(node):
 	return getNodeOutputName(node) + " = " + getNodeVariableName(node) + ".execute(" + generateInputListString(node) + ")"
+		
+idCounter = 0	
+def setUniqueCodeIndexToEveryNode(nodes):
+	global idCounter
+	for node in nodes:
+		node.codeIndex = idCounter
+		idCounter += 1
 		
 def isExecuteableNode(node):
 	return hasattr(node, "execute")
