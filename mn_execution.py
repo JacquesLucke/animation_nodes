@@ -8,6 +8,7 @@ compiledCodeObjects = []
 codeStrings = []
 
 def updateAnimationTrees(treeChanged = True):
+	start = time.clock()
 	if treeChanged:
 		rebuildNodeNetworks()
 	for i, codeObject in enumerate(compiledCodeObjects):	
@@ -16,6 +17,9 @@ def updateAnimationTrees(treeChanged = True):
 			rebuildNodeNetworks()
 			try: exec(codeObject, {})
 			except BaseException as e: print(e)
+	if bpy.context.scene.printUpdateTime:
+		timeSpan = time.clock() - start
+		print(str(round(timeSpan, 7)) + "  -  " + str(round(1/timeSpan, 5)) + " fps")
 			
 			
 # compile code objects
@@ -317,6 +321,7 @@ class AnimationNodesPanel(bpy.types.Panel):
 		layout.prop(scene, "updateAnimationTreeOnFrameChange", text = "Frames Changes")
 		layout.prop(scene, "updateAnimationTreeOnSceneUpdate", text = "Scene Updates")
 		layout.prop(scene, "updateAnimationTreeOnPropertyChange", text = "Property Changes")
+		layout.prop(scene, "printUpdateTime", text = "Print Update Time")
 		
 		
 		
@@ -347,6 +352,8 @@ class PrintNodeTreeExecutionStrings(bpy.types.Operator):
 bpy.types.Scene.updateAnimationTreeOnFrameChange = bpy.props.BoolProperty(default = True, name = "Update Animation Tree On Frame Change")
 bpy.types.Scene.updateAnimationTreeOnSceneUpdate = bpy.props.BoolProperty(default = True, name = "Update Animation Tree On Scene Update")
 bpy.types.Scene.updateAnimationTreeOnPropertyChange = bpy.props.BoolProperty(default = True, name = "Update Animation Tree On Property Change")
+
+bpy.types.Scene.printUpdateTime = bpy.props.BoolProperty(default = False, name = "Print Update Time")
 	
 @persistent
 def frameChangeHandler(scene):
