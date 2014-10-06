@@ -5,15 +5,20 @@ from mn_execution import nodePropertyChanged
 from mn_utils import *
 from bpy.props import BoolProperty
 
+def updateNode(node, context):
+		if "Frame" in node.inputs:
+			node.inputs["Frame"].hide = node.useCurrentFrame
+		nodePropertyChanged(node, context)
+
 class ObjectInfoNode(Node, AnimationNode):
 	bl_idname = "ObjectInfoNode"
 	bl_label = "Object Info"
 	
-	useCurrentFrame = BoolProperty(default = True)
+	useCurrentFrame = BoolProperty(default = True, update = updateNode)
 	
 	def init(self, context):
 		self.inputs.new("ObjectSocket", "Object")
-		self.inputs.new("IntegerSocket", "Frame")
+		self.inputs.new("IntegerSocket", "Frame").hide = True
 		self.outputs.new("VectorSocket", "Location")
 		self.outputs.new("VectorSocket", "Rotation")
 		self.outputs.new("VectorSocket", "Scale")
