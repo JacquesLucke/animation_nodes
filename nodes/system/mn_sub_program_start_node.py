@@ -21,12 +21,13 @@ class SubProgramStartNode(Node, AnimationNode):
 	
 	sockets = bpy.props.CollectionProperty(type = SocketPropertyGroup)
 	showEditOptions = bpy.props.BoolProperty(default = True)
+	subProgramName = bpy.props.StringProperty(default = "Name")
 	
 	def init(self, context):
-		self.outputs.new("SubProgramSocket", "Sub-Program")
 		self.outputs.new("IntegerSocket", "Index")
 		
 	def draw_buttons(self, context, layout):
+		layout.prop(self, "subProgramName", text = "Name")
 		layout.prop(self, "showEditOptions", text = "Show Options")
 		layout.separator()
 		if self.showEditOptions:
@@ -79,7 +80,7 @@ class SubProgramStartNode(Node, AnimationNode):
 			self.outputs.new(item.socketType, item.socketName)
 	def removeDynamicSockets(self):
 		for i, socket in enumerate(self.outputs):
-			if i >= 2: self.inputs.remove(socket)
+			if i > 0: self.inputs.remove(socket)
 			
 		
 class NewSubProgramSocketNode(bpy.types.Operator):

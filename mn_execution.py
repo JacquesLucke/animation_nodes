@@ -119,11 +119,7 @@ def getNodeExecutionString(node):
 	return getNodeOutputName(node) + " = " + getNodeVariableName(node) + ".execute(" + generateInputListString(node) + ")"
 	
 def getCorrespondingStartNode(node):
-	if hasLinks(node.inputs[0]):
-		startNode = node.inputs[0].links[0].from_node
-		if startNode.bl_idname == "SubProgramStartNode":
-			return startNode
-	return None
+	return node.getStartNode()
 		
 idCounter = 0
 bpy.types.Node.codeIndex = bpy.props.IntProperty()
@@ -208,12 +204,10 @@ def getLinkedButNotFoundNodes(node):
 	nodes = []
 	for socket in node.inputs:
 		for link in socket.links:
-			if not isSystemLink(link) and link.from_node not in nodes:
-				nodes.append(link.from_node)
+			nodes.append(link.from_node)
 	for socket in node.outputs:
 		for link in socket.links:
-			if not isSystemLink(link) and link.from_node not in nodes:
-				nodes.append(link.to_node)
+			nodes.append(link.to_node)
 	nodes = sortOutAlreadyFoundNodes(nodes)
 	return nodes
 	
