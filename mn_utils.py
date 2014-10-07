@@ -66,7 +66,7 @@ def tryToSetConnectionDictionaries(node, connections):
 	#outputs
 	outputConnections = connections[1]
 	for identifier in outputConnections:
-		nodeSocket = node.inputs.get(identifier)
+		nodeSocket = node.outputs.get(identifier)
 		if nodeSocket is not None:
 			nodeTree.links.new(outputConnections[identifier], nodeSocket)
 	

@@ -3,21 +3,22 @@ from bpy.types import Node
 from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 from mn_utils import *
+from mn_dynamic_sockets_helper import *
 
 class EnumerateObjectsNode(Node, AnimationNode):
 	bl_idname = "EnumerateObjectsNode"
 	bl_label = "Loop Objects"
 	
-	def getSubProgramNames(self, context):
+	def getEnumerateObjectStartNodeNames(self, context):
 		nodeTree = self.id_data
 		subProgramNames = []
 		for node in nodeTree.nodes:
 			if node.bl_idname == "EnumerateObjectsStartNode": subProgramNames.append((node.subProgramName, node.subProgramName, ""))
 		return subProgramNames
 	def selectedProgramChanged(self, context):
-		self.rebuildSubProgramSockets()
+		rebuildSockets(self)
 	
-	subProgramsEnum = bpy.props.EnumProperty(items = getSubProgramNames, name = "Sub-Programs", update=selectedProgramChanged)
+	subProgramsEnum = bpy.props.EnumProperty(items = getEnumerateObjectStartNodeNames, name = "Sub-Programs", update=selectedProgramChanged)
 	
 	def init(self, context):
 		self.inputs.new("ObjectListSocket", "Objects")
@@ -28,19 +29,6 @@ class EnumerateObjectsNode(Node, AnimationNode):
 		rebuild = layout.operator("mn.rebuild_sub_program_sockets", "Rebuild Sockets")
 		rebuild.nodeTreeName = self.id_data.name
 		rebuild.nodeName = self.name
-						
-	def rebuildSubProgramSockets(self):
-		forbidCompiling()
-		connections = getConnectionDictionaries(self)
-		self.removeDynamicSockets()
-		startNode = self.getStartNode()
-		if startNode is not None:
-			for socket in startNode.sockets:
-				self.inputs.new(socket.socketType, socket.socketName)
-				self.outputs.new(socket.socketType, socket.socketName)
-		tryToSetConnectionDictionaries(self, connections)
-		allowCompiling()
-		nodeTreeChanged()
 		
 	def removeDynamicSockets(self):
 		for i, socket in enumerate(self.inputs):
