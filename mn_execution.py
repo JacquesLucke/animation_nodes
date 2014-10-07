@@ -46,10 +46,7 @@ def rebuildNodeNetworks():
 		setUniqueCodeIndexToEveryNode(network)
 		networkType = getNetworkType(network)
 		if networkType == "Normal": normalNetworks.append(network)
-		elif networkType == "SubProgram":
-			startNode = getSubProgramStartNodeOfNetwork(network)
-			subPrograms[getNodeIdentifier(startNode)] = network
-		elif networkType == "EnumerateObjects":
+		elif networkType == "SubProgram" or networkType == "EnumerateObjects":
 			startNode = getSubProgramStartNodeOfNetwork(network)
 			subPrograms[getNodeIdentifier(startNode)] = network
 	for network in normalNetworks:
