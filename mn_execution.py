@@ -37,7 +37,6 @@ def rebuildNodeNetworks():
 	for network in nodeNetworks:
 		setUniqueCodeIndexToEveryNode(network)
 		networkType = getNetworkType(network)
-		print(networkType)
 		if networkType == "Normal": normalNetworks.append(network)
 		elif networkType == "SubProgram":
 			startNode = getSubProgramStartNodeOfNetwork(network)
