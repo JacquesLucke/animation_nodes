@@ -47,6 +47,22 @@ class NewSubProgramSocketNode(bpy.types.Operator):
 		node.newSocket(self.socketType)
 		return {'FINISHED'}
 		
+class RebuildSubProgramCallerSockets(bpy.types.Operator):
+	bl_idname = "mn.rebuild_sub_program_caller_sockets"
+	bl_label = "Rebuild Sub-Program Caller Sockets"
+	
+	nodeTreeName = bpy.props.StringProperty()
+	nodeName = bpy.props.StringProperty()
+	
+	@classmethod
+	def poll(cls, context):
+		return getActive() is not None
+		
+	def execute(self, context):
+		node = getNode(self.nodeTreeName, self.nodeName)
+		rebuildSockets(node)
+		return {'FINISHED'}	
+		
 class RebuildSubProgramSockets(bpy.types.Operator):
 	bl_idname = "mn.rebuild_sub_program_sockets"
 	bl_label = "Rebuild Sub-Program Sockets"
@@ -60,7 +76,7 @@ class RebuildSubProgramSockets(bpy.types.Operator):
 		
 	def execute(self, context):
 		node = getNode(self.nodeTreeName, self.nodeName)
-		rebuildSockets(node)
+		node.rebuildSubProgramSockets()
 		return {'FINISHED'}	
 		
 		

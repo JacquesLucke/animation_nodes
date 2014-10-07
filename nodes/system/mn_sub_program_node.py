@@ -25,7 +25,7 @@ class SubProgramNode(Node, AnimationNode):
 		
 	def draw_buttons(self, context, layout):
 		layout.prop(self, "subProgramsEnum")
-		rebuild = layout.operator("mn.rebuild_sub_program_sockets", "Rebuild Sockets")
+		rebuild = layout.operator("mn.rebuild_sub_program_caller_sockets", "Rebuild Sockets")
 		rebuild.nodeTreeName = self.id_data.name
 		rebuild.nodeName = self.name
 		

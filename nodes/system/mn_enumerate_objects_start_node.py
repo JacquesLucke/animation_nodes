@@ -51,7 +51,7 @@ class EnumerateObjectsStartNode(Node, AnimationNode):
 	def newSocket(self, socketType):
 		item = self.sockets.add()
 		item.socketType = socketType
-		item.socketName = self.getPossibleName("Socket")
+		item.socketName = self.getPossibleName(socketType)
 	def getPossibleName(self, name):
 		counter = 1
 		while self.socketNameExists(name + " " + str(counter)):
