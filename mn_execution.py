@@ -352,6 +352,8 @@ class PrintNodeTreeExecutionStrings(bpy.types.Operator):
 		for codeString in codeStrings:
 			print(codeString)
 			print()
+			print("-"*80)
+			print()
 		return {'FINISHED'}
 	
 	
