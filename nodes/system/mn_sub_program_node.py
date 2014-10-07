@@ -14,15 +14,10 @@ class SubProgramNode(Node, AnimationNode):
 		for node in nodeTree.nodes:
 			if node.bl_idname == "SubProgramStartNode": subProgramNames.append((node.subProgramName, node.subProgramName, ""))
 		return subProgramNames
-	def getStartNode(self):
-		subProgramName = self.subProgramsEnum
-		for node in self.id_data.nodes:
-			if node.bl_idname == "SubProgramStartNode":
-				if node.subProgramName == subProgramName:
-					return node
-		return None
+	def selectedProgramChanged(self, context):
+		self.rebuildSubProgramSockets()
 	
-	subProgramsEnum = bpy.props.EnumProperty(items = getSubProgramNames, name = "Sub-Programs")
+	subProgramsEnum = bpy.props.EnumProperty(items = getSubProgramNames, name = "Sub-Programs", update=selectedProgramChanged)
 	
 	def init(self, context):
 		self.inputs.new("IntegerSocket", "Amount")
@@ -43,7 +38,15 @@ class SubProgramNode(Node, AnimationNode):
 	def removeDynamicSockets(self):
 		self.outputs.clear()
 		for i, socket in enumerate(self.inputs):
-			if i > 0: self.inputs.remove(socket)		
+			if i > 0: self.inputs.remove(socket)	
+
+	def getStartNode(self):
+		subProgramName = self.subProgramsEnum
+		for node in self.id_data.nodes:
+			if node.bl_idname == "SubProgramStartNode":
+				if node.subProgramName == subProgramName:
+					return node
+		return None
 					
 
 		
