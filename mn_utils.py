@@ -45,6 +45,31 @@ def getSocketFromNode(node, isOutputSocket, name):
 def getNodeIdentifier(node):
 	return node.id_data.name + node.name
 	
+def getConnectionDictionaries(node):
+	inputSocketConnections = {}
+	outputSocketConnections = {}
+	for socket in node.inputs:
+		for link in socket.links:
+			inputSocketConnections[socket.identifier] = link.from_socket
+	for socket in node.outputs:
+		for link in socket.links:
+			outputSocketConnections[socket.identifier] = link.to_socket
+	return (inputSocketConnections, outputSocketConnections)
+def tryToSetConnectionDictionaries(node, connections):
+	nodeTree = node.id_data
+	#inputs
+	inputConnections = connections[0]
+	for identifier in inputConnections:
+		nodeSocket = node.inputs.get(identifier)
+		if nodeSocket is not None:
+			nodeTree.links.new(nodeSocket, inputConnections[identifier])
+	#outputs
+	outputConnections = connections[1]
+	for identifier in outputConnections:
+		nodeSocket = node.inputs.get(identifier)
+		if nodeSocket is not None:
+			nodeTree.links.new(outputConnections[identifier], nodeSocket)
+	
 # socket origins
 ######################
 	

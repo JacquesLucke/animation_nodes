@@ -1,7 +1,7 @@
 import bpy
 from bpy.types import Node
 from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged
+from mn_execution import nodePropertyChanged, nodeTreeChanged
 from mn_utils import *
 
 class SubProgramNode(Node, AnimationNode):
@@ -29,12 +29,16 @@ class SubProgramNode(Node, AnimationNode):
 		rebuild.nodeName = self.name
 						
 	def rebuildSubProgramSockets(self):
+		connections = getConnectionDictionaries(self)
 		self.removeDynamicSockets()
 		startNode = self.getStartNode()
 		if startNode is not None:
 			for socket in startNode.sockets:
 				self.inputs.new(socket.socketType, socket.socketName)
 				self.outputs.new(socket.socketType, socket.socketName)
+		tryToSetConnectionDictionaries(self, connections)
+		nodeTreeChanged()
+		
 	def removeDynamicSockets(self):
 		self.outputs.clear()
 		for i, socket in enumerate(self.inputs):
