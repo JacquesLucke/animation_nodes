@@ -2,6 +2,15 @@ import bpy
 from mn_execution import nodePropertyChanged
 from mn_utils import *
 
+addSocketList = [
+	("Object List", "ObjectListSocket"),
+	("String List", "StringListSocket"),
+	("Float", "FloatSocket"),
+	("Text", "StringSocket"),
+	("Object", "ObjectSocket") ]
+
+def getAddSocketList():
+	return addSocketList
 
 class SocketPropertyGroup(bpy.types.PropertyGroup):
 	socketName = bpy.props.StringProperty(name = "Socket Name", default = "", update = nodePropertyChanged)

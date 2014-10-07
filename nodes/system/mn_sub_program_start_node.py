@@ -5,13 +5,6 @@ from mn_execution import nodePropertyChanged
 from mn_dynamic_sockets_helper import *
 from mn_utils import *
 
-	
-addSocketList = [
-	("Object List", "ObjectListSocket"),
-	("String List", "StringListSocket"),
-	("Float", "FloatSocket"),
-	("Text", "StringSocket"),
-	("Object", "ObjectSocket") ]
 
 class SubProgramStartNode(Node, AnimationNode):
 	bl_idname = "SubProgramStartNode"
@@ -46,7 +39,7 @@ class SubProgramStartNode(Node, AnimationNode):
 				
 			layout.label("Add Sockets")
 			col = layout.column(align = True)
-			for displayTame, socketType in addSocketList:
+			for displayTame, socketType in getAddSocketList():
 				add = col.operator("mn.new_sub_program_socket", text = displayTame)
 				add.nodeTreeName = self.id_data.name
 				add.nodeName = self.name
