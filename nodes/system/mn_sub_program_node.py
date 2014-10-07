@@ -1,7 +1,7 @@
 import bpy
 from bpy.types import Node
 from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, nodeTreeChanged
+from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 from mn_utils import *
 
 class SubProgramNode(Node, AnimationNode):
@@ -29,6 +29,7 @@ class SubProgramNode(Node, AnimationNode):
 		rebuild.nodeName = self.name
 						
 	def rebuildSubProgramSockets(self):
+		forbidCompiling()
 		connections = getConnectionDictionaries(self)
 		self.removeDynamicSockets()
 		startNode = self.getStartNode()
@@ -37,6 +38,7 @@ class SubProgramNode(Node, AnimationNode):
 				self.inputs.new(socket.socketType, socket.socketName)
 				self.outputs.new(socket.socketType, socket.socketName)
 		tryToSetConnectionDictionaries(self, connections)
+		allowCompiling()
 		nodeTreeChanged()
 		
 	def removeDynamicSockets(self):

@@ -2,24 +2,32 @@ import bpy, time
 from bpy.app.handlers import persistent
 from mn_utils import *
 
-
+ALLOW_COMPILING = True
 
 compiledCodeObjects = []
 codeStrings = []
 
 def updateAnimationTrees(treeChanged = True):
-	start = time.clock()
-	if treeChanged:
-		rebuildNodeNetworks()
-	for i, codeObject in enumerate(compiledCodeObjects):	
-		try: exec(codeObject, {})
-		except BaseException as e:
+	if ALLOW_COMPILING:
+		start = time.clock()
+		if treeChanged:
 			rebuildNodeNetworks()
+		for i, codeObject in enumerate(compiledCodeObjects):	
 			try: exec(codeObject, {})
-			except BaseException as e: print(e)
-	if bpy.context.scene.printUpdateTime:
-		timeSpan = time.clock() - start
-		print(str(round(timeSpan, 7)) + "  -  " + str(round(1/timeSpan, 5)) + " fps")
+			except BaseException as e:
+				rebuildNodeNetworks()
+				try: exec(codeObject, {})
+				except BaseException as e: print(e)
+		if bpy.context.scene.printUpdateTime:
+			timeSpan = time.clock() - start
+			print(str(round(timeSpan, 7)) + "  -  " + str(round(1/timeSpan, 5)) + " fps")
+			
+def allowCompiling():
+	global ALLOW_COMPILING
+	ALLOW_COMPILING = True
+def forbidCompiling():
+	global ALLOW_COMPILING
+	ALLOW_COMPILING = False
 			
 			
 # compile code objects
