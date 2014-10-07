@@ -16,7 +16,7 @@ class ReplicateObjectNode(Node, AnimationNode):
 	def init(self, context):
 		self.inputs.new("ObjectSocket", "Object")
 		self.inputs.new("IntegerSocket", "Instances")
-		self.outputs.new("ObjectListSocket", "Object")
+		self.outputs.new("ObjectListSocket", "Objects")
 		
 	def draw_buttons(self, context, layout):
 		pass
@@ -24,23 +24,42 @@ class ReplicateObjectNode(Node, AnimationNode):
 	def execute(self, input):
 		output = {}
 		object = input["Object"]
-		amount = input["Instances"]
+		amount = max(input["Instances"], 0)
 		while amount > len(self.objectNames):
 			self.newInstance(object)
+		while amount < len(self.objectNames):
+			self.removeInstance()
+			
+		objects = []
+		for item in self.objectNames:
+			objects.append(bpy.data.objects.get(item.objectName))
+			
+		output["Objects"] = objects
 		return output
+		
+	def free(self):
+		while len(self.objectNames) > 0:
+			self.removeInstance()
 		
 	def newInstance(self, object):
 		newObject = object.copy()
-		newObject.name = "instance"
+		newObject.name = self.getPossibleInstanceName()
 		bpy.context.scene.objects.link(newObject)
 		item = self.objectNames.add()
 		item.objectName = newObject.name
 		return object
+	def getPossibleInstanceName(self, name = "instance"):
+		counter = 1
+		while bpy.data.objects.get(name + str(counter)) is not None:
+			counter += 1
+		return name + str(counter)
 	def removeInstance(self):
-		if len(objectNames) > 0:
-			object = bpy.data.objects.get(self.objectNames[0].name)
+		if len(self.objectNames) > 0:
+			object = bpy.data.objects.get(self.objectNames[0].objectName)
 			if object is not None:
-				bpy.context.scene.objects.unlind(object)
+				object.name += "DELETED"
+				bpy.context.scene.objects.unlink(object)
+			self.objectNames.remove(0)
 		
 class AssignActiveObjectToNode(bpy.types.Operator):
 	bl_idname = "mn.assign_active_object_to_node"
