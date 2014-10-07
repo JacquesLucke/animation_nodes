@@ -37,6 +37,7 @@ def rebuildNodeNetworks():
 	for network in nodeNetworks:
 		setUniqueCodeIndexToEveryNode(network)
 		networkType = getNetworkType(network)
+		print(networkType)
 		if networkType == "Normal": normalNetworks.append(network)
 		elif networkType == "SubProgram":
 			startNode = getSubProgramStartNodeOfNetwork(network)
@@ -204,17 +205,20 @@ def getLinkedButNotFoundNodes(node):
 	nodes = []
 	for socket in node.inputs:
 		for link in socket.links:
-			nodes.append(link.from_node)
+			fromNode = link.from_node
+			if not fromNode.isFound:
+				nodes.append(fromNode)
+				fromNode.isFound = True
 	for socket in node.outputs:
 		for link in socket.links:
-			nodes.append(link.to_node)
-	nodes = sortOutAlreadyFoundNodes(nodes)
+			toNode = link.to_node
+			if not toNode.isFound:
+				nodes.append(toNode)
+				toNode.isFound = True
 	return nodes
 	
 def sortOutAlreadyFoundNodes(nodes):
 	return [node for node in nodes if not node.isFound]
-def isSystemLink(link):
-	return link.to_socket.bl_idname == "SubProgramSocket"
 	
 bpy.types.Node.isFound = bpy.props.BoolProperty(default = False)
 def resetNodeFoundAttributes(nodes):
