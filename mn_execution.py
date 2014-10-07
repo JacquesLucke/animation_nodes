@@ -217,9 +217,6 @@ def getLinkedButNotFoundNodes(node):
 				toNode.isFound = True
 	return nodes
 	
-def sortOutAlreadyFoundNodes(nodes):
-	return [node for node in nodes if not node.isFound]
-	
 bpy.types.Node.isFound = bpy.props.BoolProperty(default = False)
 def resetNodeFoundAttributes(nodes):
 	for node in nodes: node.isFound = False
