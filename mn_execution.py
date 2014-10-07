@@ -57,15 +57,11 @@ def rebuildNodeNetworks():
 		
 def getNetworkType(network):
 	subProgramAmount = 0
-	enumerateObjectsAmount = 0
 	for node in network:
-		if node.bl_idname == "SubProgramStartNode":
+		if node.bl_idname == "SubProgramStartNode" or node.bl_idname == "EnumerateObjectsStartNode":
 			subProgramAmount += 1
-		if node.bl_idname == "EnumerateObjectsStartNode":
-			enumerateObjectsAmount += 1
-	if subProgramAmount == 0 and enumerateObjectsAmount == 0: return "Normal"
-	elif subProgramAmount == 1 and enumerateObjectsAmount == 0: return "SubProgram"
-	elif subProgramAmount == 0 and enumerateObjectsAmount == 1: return "EnumerateObjects"
+	if subProgramAmount == 0: return "Normal"
+	elif subProgramAmount == 1: return "SubProgram"
 	return "Invalid"
 def getSubProgramStartNodeOfNetwork(network):
 	for node in network:
