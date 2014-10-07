@@ -51,5 +51,7 @@ def getNodeNameDictionary():
 		
 	nodes.append(("System", [
 		"SubProgramNode",
-		"SubProgramStartNode" ] ))
+		"SubProgramStartNode",
+		"EnumerateObjectsStartNode",
+		"EnumerateObjectsNode" ] ))
 	return nodes

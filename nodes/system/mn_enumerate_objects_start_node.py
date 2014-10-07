@@ -1,10 +1,9 @@
 import bpy
 from bpy.types import Node
 from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged
 from mn_dynamic_sockets_helper import *
+from mn_execution import nodePropertyChanged
 from mn_utils import *
-
 	
 addSocketList = [
 	("Object List", "ObjectListSocket"),
@@ -13,15 +12,16 @@ addSocketList = [
 	("Text", "StringSocket"),
 	("Object", "ObjectSocket") ]
 
-class SubProgramStartNode(Node, AnimationNode):
-	bl_idname = "SubProgramStartNode"
-	bl_label = "Sub-Program Start"
+class EnumerateObjectsStartNode(Node, AnimationNode):
+	bl_idname = "EnumerateObjectsStartNode"
+	bl_label = "Object Loop Start"
 	
 	sockets = bpy.props.CollectionProperty(type = SocketPropertyGroup)
 	showEditOptions = bpy.props.BoolProperty(default = True)
-	subProgramName = bpy.props.StringProperty(default = "Name")
+	subProgramName = bpy.props.StringProperty(default = "Object Loop")
 	
 	def init(self, context):
+		self.outputs.new("ObjectSocket", "Object")
 		self.outputs.new("IntegerSocket", "Index")
 		
 	def draw_buttons(self, context, layout):
@@ -78,10 +78,10 @@ class SubProgramStartNode(Node, AnimationNode):
 			self.outputs.new(item.socketType, item.socketName)
 	def removeDynamicSockets(self):
 		for i, socket in enumerate(self.outputs):
-			if i > 0: self.inputs.remove(socket)
+			if i > 1: self.inputs.remove(socket)
 			
 		
-		
+
 # register
 ################################
 		

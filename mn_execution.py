@@ -49,6 +49,9 @@ def rebuildNodeNetworks():
 		elif networkType == "SubProgram":
 			startNode = getSubProgramStartNodeOfNetwork(network)
 			subPrograms[getNodeIdentifier(startNode)] = network
+		elif networkType == "EnumerateObjects":
+			startNode = getSubProgramStartNodeOfNetwork(network)
+			subPrograms[getNodeIdentifier(startNode)] = network
 	for network in normalNetworks:
 		codeGenerator = NetworkCodeGenerator(network)
 		codeString = codeGenerator.getCode()
@@ -57,15 +60,19 @@ def rebuildNodeNetworks():
 		
 def getNetworkType(network):
 	subProgramAmount = 0
+	enumerateObjectsAmount = 0
 	for node in network:
 		if node.bl_idname == "SubProgramStartNode":
 			subProgramAmount += 1
-	if subProgramAmount == 0: return "Normal"
-	elif subProgramAmount == 1: return "SubProgram"
+		if node.bl_idname == "EnumerateObjectsStartNode":
+			enumerateObjectsAmount += 1
+	if subProgramAmount == 0 and enumerateObjectsAmount == 0: return "Normal"
+	elif subProgramAmount == 1 and enumerateObjectsAmount == 0: return "SubProgram"
+	elif subProgramAmount == 0 and enumerateObjectsAmount == 1: return "EnumerateObjects"
 	return "Invalid"
 def getSubProgramStartNodeOfNetwork(network):
 	for node in network:
-		if node.bl_idname == "SubProgramStartNode":
+		if node.bl_idname == "SubProgramStartNode" or node.bl_idname == "EnumerateObjectsStartNode":
 			return node
 			
 			
@@ -107,8 +114,7 @@ class NetworkCodeGenerator:
 	def getNodeCodeLines(self, node):
 		codeLines = []
 		if isExecuteableNode(node):
-			codeLines.append(getNodeDeclarationString(node))
-			codeLines.append(getNodeExecutionString(node))
+			codeLines.extend(getExecutableNodeCode(node))
 		elif isSubProgramNode(node):
 			codeLines.append(getNodeDeclarationString(node))
 			codeLines.append(getNodeInputName(node) + " = " + generateInputListString(node, ignoreSocketNames = "Sub-Program"))
@@ -119,7 +125,24 @@ class NetworkCodeGenerator:
 				codeLines.append("    " + getNodeFunctionName(startNode) + "(" + getNodeInputName(node) + ")")
 				self.makeFunctionCode(subPrograms[getNodeIdentifier(startNode)])
 			codeLines.append(getNodeOutputName(node) + " = " + getNodeInputName(node))
+		elif isEnumerateObjectsNode(node):
+			codeLines.append(getNodeDeclarationString(node))
+			codeLines.append(getNodeInputName(node) + " = " + generateInputListString(node, ignoreSocketNames = "Sub-Program"))
+			startNode = getCorrespondingStartNode(node)
+			if startNode is not None:
+				codeLines.append("for i, object in enumerate(" + getNodeInputName(node) + "['Objects']):")
+				codeLines.append("    " + getNodeInputName(node) + "['Index'] = i")
+				codeLines.append("    " + getNodeInputName(node) + "['Object'] = object")
+				codeLines.append("    " + getNodeFunctionName(startNode) + "(" + getNodeInputName(node) + ")")
+				self.makeFunctionCode(subPrograms[getNodeIdentifier(startNode)])
+			codeLines.append(getNodeOutputName(node) + " = " + getNodeInputName(node))
 		return codeLines		
+		
+	def getExecutableNodeCode(node):
+		codeLines = []
+		codeLines.append(getNodeDeclarationString(node))
+		codeLines.append(getNodeExecutionString(node))
+		return codeLines
 		
 def getNodeDeclarationString(node):
 	return getNodeVariableName(node) + " = nodes['"+node.name+"']"
@@ -141,6 +164,8 @@ def isExecuteableNode(node):
 	return hasattr(node, "execute")
 def isSubProgramNode(node):
 	return node.bl_idname == "SubProgramNode"
+def isEnumerateObjectsNode(node):
+	return node.bl_idname == "EnumerateObjectsNode"
 		
 def generateInputListString(node, ignoreSocketNames = []):
 	inputParts = []
