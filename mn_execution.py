@@ -114,35 +114,45 @@ class NetworkCodeGenerator:
 	def getNodeCodeLines(self, node):
 		codeLines = []
 		if isExecuteableNode(node):
-			codeLines.extend(getExecutableNodeCode(node))
+			codeLines.extend(self.getExecutableNodeCode(node))
 		elif isSubProgramNode(node):
-			codeLines.append(getNodeDeclarationString(node))
-			codeLines.append(getNodeInputName(node) + " = " + generateInputListString(node, ignoreSocketNames = "Sub-Program"))
-			startNode = getCorrespondingStartNode(node)
-			if startNode is not None:
-				codeLines.append("for i in range(" + getNodeInputName(node) + "['Amount']):")
-				codeLines.append("    " + getNodeInputName(node) + "['Index'] = i")
-				codeLines.append("    " + getNodeFunctionName(startNode) + "(" + getNodeInputName(node) + ")")
-				self.makeFunctionCode(subPrograms[getNodeIdentifier(startNode)])
-			codeLines.append(getNodeOutputName(node) + " = " + getNodeInputName(node))
+			codeLines.extend(self.getSubProgramNodeCode(node))
 		elif isEnumerateObjectsNode(node):
-			codeLines.append(getNodeDeclarationString(node))
-			codeLines.append(getNodeInputName(node) + " = " + generateInputListString(node, ignoreSocketNames = "Sub-Program"))
-			startNode = getCorrespondingStartNode(node)
-			if startNode is not None:
-				codeLines.append("for i, object in enumerate(" + getNodeInputName(node) + "['Objects']):")
-				codeLines.append("    " + getNodeInputName(node) + "['Index'] = i")
-				codeLines.append("    " + getNodeInputName(node) + "['Object'] = object")
-				codeLines.append("    " + getNodeFunctionName(startNode) + "(" + getNodeInputName(node) + ")")
-				self.makeFunctionCode(subPrograms[getNodeIdentifier(startNode)])
-			codeLines.append(getNodeOutputName(node) + " = " + getNodeInputName(node))
+			codeLines.extend(self.getEnumerateObjectsNodeCode(node))
 		return codeLines		
 		
-	def getExecutableNodeCode(node):
+	def getExecutableNodeCode(self, node):
 		codeLines = []
 		codeLines.append(getNodeDeclarationString(node))
 		codeLines.append(getNodeExecutionString(node))
 		return codeLines
+	def getSubProgramNodeCode(self, node):
+		codeLines = []
+		codeLines.append(getNodeDeclarationString(node))
+		codeLines.append(getNodeInputName(node) + " = " + generateInputListString(node, ignoreSocketNames = "Sub-Program"))
+		startNode = getCorrespondingStartNode(node)
+		if startNode is not None:
+			codeLines.append("for i in range(" + getNodeInputName(node) + "['Amount']):")
+			codeLines.append("    " + getNodeInputName(node) + "['Index'] = i")
+			codeLines.append("    " + getNodeFunctionName(startNode) + "(" + getNodeInputName(node) + ")")
+			self.makeFunctionCode(subPrograms[getNodeIdentifier(startNode)])
+		codeLines.append(getNodeOutputName(node) + " = " + getNodeInputName(node))
+		return codeLines
+	def getEnumerateObjectsNodeCode(self, node):
+		codeLines = []
+		codeLines.append(getNodeDeclarationString(node))
+		codeLines.append(getNodeInputName(node) + " = " + generateInputListString(node, ignoreSocketNames = "Sub-Program"))
+		startNode = getCorrespondingStartNode(node)
+		if startNode is not None:
+			codeLines.append("for i, object in enumerate(" + getNodeInputName(node) + "['Objects']):")
+			codeLines.append("    " + getNodeInputName(node) + "['Index'] = i")
+			codeLines.append("    " + getNodeInputName(node) + "['Object'] = object")
+			codeLines.append("    " + getNodeFunctionName(startNode) + "(" + getNodeInputName(node) + ")")
+			self.makeFunctionCode(subPrograms[getNodeIdentifier(startNode)])
+		codeLines.append(getNodeOutputName(node) + " = " + getNodeInputName(node))
+		return codeLines
+		
+		
 		
 def getNodeDeclarationString(node):
 	return getNodeVariableName(node) + " = nodes['"+node.name+"']"
