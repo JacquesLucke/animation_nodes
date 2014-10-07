@@ -9,7 +9,7 @@ class TimeInfoNode(Node, AnimationNode):
 	bl_label = "Time Info"
 	
 	def init(self, context):
-		self.outputs.new("IntegerSocket", "Frame")
+		self.outputs.new("FloatSocket", "Frame")
 		
 	def execute(self, input):
 		output = {}

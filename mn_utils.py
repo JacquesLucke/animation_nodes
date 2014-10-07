@@ -26,7 +26,7 @@ import bpy
 def getActive():
 	return bpy.context.scene.objects.active
 def getCurrentFrame():
-	return bpy.context.scene.frame_current
+	return bpy.context.scene.frame_current_final
 def getRandom(min, max):
 	return random.random() * (max - min) + min
 def clampInt(value, minValue, maxValue):
