@@ -9,6 +9,7 @@ codeStrings = []
 
 def updateAnimationTrees(treeChanged = True):
 	if ALLOW_COMPILING:
+		forbidCompiling()
 		start = time.clock()
 		if treeChanged:
 			rebuildNodeNetworks()
@@ -21,6 +22,7 @@ def updateAnimationTrees(treeChanged = True):
 		if bpy.context.scene.printUpdateTime:
 			timeSpan = time.clock() - start
 			print(str(round(timeSpan, 7)) + "  -  " + str(round(1/timeSpan, 5)) + " fps")
+		allowCompiling()
 			
 def allowCompiling():
 	global ALLOW_COMPILING

@@ -15,6 +15,9 @@ def getNodeNameDictionary():
 		"StringListInputNode",
 		"ObjectListInputNode" ] ))
 		
+	nodes.append(("Generate", [
+		"ReplicateObjectNode" ] ))
+		
 	nodes.append(("Output", [
 		"TextOutputNode",
 		"ObjectOutputNode",
