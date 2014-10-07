@@ -203,12 +203,20 @@ def setNodesAsFound(nodes):
 	
 def getLinkedButNotFoundNodes(node):
 	nodes = []
+	nodes.extend(getNotFoundInputNodes(node))
+	nodes.extend(getNotFoundOutputNodes(node))
+	return nodes
+def getNotFoundInputNodes(node):
+	nodes = []
 	for socket in node.inputs:
 		for link in socket.links:
 			fromNode = link.from_node
 			if not fromNode.isFound:
 				nodes.append(fromNode)
 				fromNode.isFound = True
+	return nodes
+def getNotFoundOutputNodes(node):
+	nodes = []
 	for socket in node.outputs:
 		for link in socket.links:
 			toNode = link.to_node
