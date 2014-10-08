@@ -37,8 +37,10 @@ class ReplicateObjectNode(Node, AnimationNode):
 		objects = []
 		for i in range(amount):
 			outputObject = bpy.data.objects.get(self.visibleObjectNames[i].objectName)
-			outputObject.data = object.data
-			objects.append(outputObject)
+			if outputObject is not None:
+				if outputObject.data != object.data:
+					outputObject.data = object.data
+				objects.append(outputObject)
 			
 		output["Objects"] = objects
 		return output
