@@ -14,7 +14,6 @@ def updateAnimationTrees(treeChanged = True):
 		if treeChanged:
 			rebuildNodeNetworks()
 		for i, codeObject in enumerate(compiledCodeObjects):
-			exec(codeObject, {})
 			try: exec(codeObject, {})
 			except BaseException as e:
 				rebuildNodeNetworks()
