@@ -35,11 +35,7 @@ class ReplicateObjectNode(Node, AnimationNode):
 				self.unlinkObjectFromScene()
 			return { "Objects" : [] }
 		
-		while amount < len(self.visibleObjectNames):
-			self.unlinkObjectFromScene()
-		
-		while amount > len(self.visibleObjectNames):
-			self.linkObjectToScene(object)
+		self.linkCorrectAmountOfObjects(amount, object)
 			
 		objects = []
 		for i in range(amount):
@@ -52,13 +48,28 @@ class ReplicateObjectNode(Node, AnimationNode):
 		output["Objects"] = objects
 		return output
 		
-	def free(self):
-		while len(self.visibleObjectNames) > 0:
+	def linkCorrectAmountOfObjects(self, amount, object):
+		while amount < len(self.visibleObjectNames):
 			self.unlinkObjectFromScene()
+		while amount > len(self.visibleObjectNames):
+			self.linkObjectToScene(object)
 			
-	def copy(self, node):
-		self.objectNames.clear()
-		self.visibleObjectNames.clear()
+	def linkObjectToScene(self, object):
+		if len(self.objectNames) == len(self.visibleObjectNames):
+			self.newInstance(object)
+		object = bpy.data.objects.get(self.objectNames[len(self.visibleObjectNames)].objectName)
+		if object is None:
+			self.objectNames.remove(len(self.visibleObjectNames))
+		else:
+			bpy.context.scene.objects.link(object)
+			item = self.visibleObjectNames.add()
+			item.objectName = object.name
+			
+	def unlinkObjectFromScene(self):
+		if len(self.visibleObjectNames) > 0:
+			object = bpy.data.objects.get(self.visibleObjectNames[-1].objectName)
+			bpy.context.scene.objects.unlink(object)
+			self.visibleObjectNames.remove(len(self.visibleObjectNames) - 1)
 		
 	def newInstance(self, object):
 		newObject = bpy.data.objects.new(self.getPossibleInstanceName(), object.data)
@@ -72,22 +83,14 @@ class ReplicateObjectNode(Node, AnimationNode):
 		while bpy.data.objects.get(name + randomString + str(counter)) is not None:
 			counter += 1
 		return name + randomString + str(counter)
-		
-	def linkObjectToScene(self, object):
-		if len(self.objectNames) == len(self.visibleObjectNames):
-			self.newInstance(object)
-		object = bpy.data.objects.get(self.objectNames[len(self.visibleObjectNames)].objectName)
-		if object is None:
-			self.objectNames.remove(len(self.visibleObjectNames))
-		else:
-			bpy.context.scene.objects.link(object)
-			item = self.visibleObjectNames.add()
-			item.objectName = object.name
-	def unlinkObjectFromScene(self):
-		if len(self.visibleObjectNames) > 0:
-			object = bpy.data.objects.get(self.visibleObjectNames[-1].objectName)
-			bpy.context.scene.objects.unlink(object)
-			self.visibleObjectNames.remove(len(self.visibleObjectNames) - 1)
+			
+	def free(self):
+		while len(self.visibleObjectNames) > 0:
+			self.unlinkObjectFromScene()
+			
+	def copy(self, node):
+		self.objectNames.clear()
+		self.visibleObjectNames.clear()
 	
 		
 # register
