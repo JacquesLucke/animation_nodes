@@ -48,6 +48,10 @@ class ReplicateObjectNode(Node, AnimationNode):
 	def free(self):
 		while len(self.visibleObjectNames) > 0:
 			self.unlinkObjectFromScene()
+			
+	def copy(self, node):
+		self.objectNames.clear()
+		self.visibleObjectNames.clear()
 		
 	def newInstance(self, object):
 		newObject = bpy.data.objects.new(self.getPossibleInstanceName(), object.data)
