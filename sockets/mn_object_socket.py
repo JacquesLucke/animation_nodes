@@ -10,11 +10,14 @@ class ObjectSocket(NodeSocket):
 	allowedInputTypes = ["Object", "String"]
 	
 	objectName = bpy.props.StringProperty(update = nodePropertyChanged)
+	showName = bpy.props.BoolProperty(default = False)
 	
 	def draw(self, context, layout, node, text):
 		if not self.is_output and not isSocketLinked(self):
 			col = layout.column()
 			row = col.row(align = True)
+			if self.showName:
+				row.label(text)
 			row.prop(self, "objectName", text = "")
 			selector = row.operator("mn.assign_active_object_to_socket", text = "", icon = "EYEDROPPER")
 			selector.nodeTreeName = node.id_data.name
