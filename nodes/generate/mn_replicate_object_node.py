@@ -1,7 +1,7 @@
 import bpy
 from bpy.types import Node
 from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged
+from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from mn_utils import *
 
 class ObjectNamePropertyGroup(bpy.types.PropertyGroup):
@@ -15,9 +15,11 @@ class ReplicateObjectNode(Node, AnimationNode):
 	visibleObjectNames = bpy.props.CollectionProperty(type = ObjectNamePropertyGroup)
 	
 	def init(self, context):
+		forbidCompiling()
 		self.inputs.new("ObjectSocket", "Object")
 		self.inputs.new("IntegerSocket", "Instances")
 		self.outputs.new("ObjectListSocket", "Objects")
+		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
 		pass
@@ -34,7 +36,7 @@ class ReplicateObjectNode(Node, AnimationNode):
 			
 		objects = []
 		for i in range(amount):
-			outputObject = bpy.data.objects.get(item.objectName)
+			outputObject = bpy.data.objects.get(self.visibleObjectNames[i].objectName)
 			outputObject.data = object.data
 			objects.append(outputObject)
 			
@@ -47,7 +49,6 @@ class ReplicateObjectNode(Node, AnimationNode):
 		
 	def newInstance(self, object):
 		newObject = bpy.data.objects.new(self.getPossibleInstanceName(), object.data)
-		bpy.context.scene.objects.link(newObject)
 		item = self.objectNames.add()
 		item.objectName = newObject.name
 		return object
@@ -61,14 +62,17 @@ class ReplicateObjectNode(Node, AnimationNode):
 		if len(self.objectNames) == len(self.visibleObjectNames):
 			self.newInstance(object)
 		object = bpy.data.objects.get(self.objectNames[len(self.visibleObjectNames)].objectName)
-		bpy.context.scene.objects.link(object)
-		item = self.visibleObjectNames.add()
-		item.objectName = object.name
+		if object is None:
+			self.objectNames.remove(len(self.visibleObjectNames))
+		else:
+			bpy.context.scene.objects.link(object)
+			item = self.visibleObjectNames.add()
+			item.objectName = object.name
 	def unlinkObjectFromScene(self):
 		if len(self.visibleObjectNames) > 0:
 			object = bpy.data.objects.get(self.visibleObjectNames[-1].objectName)
 			bpy.context.scene.objects.unlink(object)
-			self.visibleObjectNames.remove(len(self.visibleObjectNames))
+			self.visibleObjectNames.remove(len(self.visibleObjectNames) - 1)
 			
 class AssignActiveObjectToNode(bpy.types.Operator):
 	bl_idname = "mn.assign_active_object_to_node"
