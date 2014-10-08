@@ -18,7 +18,7 @@ Created by Jacques Lucke
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import bpy
+import bpy, random
 	
 # simple general functions
 ##########################
@@ -29,6 +29,8 @@ def getCurrentFrame():
 	return bpy.context.scene.frame_current_final
 def getRandom(min, max):
 	return random.random() * (max - min) + min
+def getRandomString(length):
+	return ''.join(random.choice("abcdefghijklmnopqrstuvwxyz") for _ in range(length))
 def clampInt(value, minValue, maxValue):
 	return int(max(min(value, maxValue), minValue))
 	

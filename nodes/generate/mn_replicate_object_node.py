@@ -67,10 +67,11 @@ class ReplicateObjectNode(Node, AnimationNode):
 		item.objectName = newObject.name
 		return object
 	def getPossibleInstanceName(self, name = "instance"):
+		randomString = getRandomString(3)
 		counter = 1
-		while bpy.data.objects.get(name + str(counter)) is not None:
+		while bpy.data.objects.get(name + randomString + str(counter)) is not None:
 			counter += 1
-		return name + str(counter)
+		return name + randomString + str(counter)
 		
 	def linkObjectToScene(self, object):
 		if len(self.objectNames) == len(self.visibleObjectNames):
