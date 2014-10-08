@@ -1,7 +1,9 @@
 import bpy
 from bpy.types import Node
 from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged
+from mn_execution import nodePropertyChanged, nodeTreeChanged
+from mn_object_utils import *
+from mn_utils import *
 
 class CopyTransformsNode(Node, AnimationNode):
 	bl_idname = "CopyTransformsNode"
@@ -11,23 +13,17 @@ class CopyTransformsNode(Node, AnimationNode):
 	useRotation = bpy.props.BoolVectorProperty(update = nodePropertyChanged)
 	useScale = bpy.props.BoolVectorProperty(update = nodePropertyChanged)
 	
-	def setFrameSocketName(self, context):
-		if self.frameTypesProperty == "OFFSET":
-			self.inputs[2].name = "Frame Offset"
-		elif self.frameTypesProperty == "ABSOLUTE":
-			self.inputs[2].name = "Source Frame"
-	
 	frameTypes = [
 		("OFFSET", "Offset", ""),
 		("ABSOLUTE", "Absolute", "") ]
-	frameTypesProperty = bpy.props.EnumProperty(name = "Frame Type", items = frameTypes, default = "OFFSET", update = setFrameSocketName)
+	frameTypesProperty = bpy.props.EnumProperty(name = "Frame Type", items = frameTypes, default = "OFFSET")
 	
 	def init(self, context):
 		fromSocket = self.inputs.new("ObjectSocket", "From")
 		fromSocket.showName = True
 		toSocket = self.inputs.new("ObjectSocket", "To")
 		toSocket.showName = True
-		self.inputs.new("FloatSocket", "Frame Offset")
+		self.inputs.new("FloatSocket", "Frame")
 		self.outputs.new("ObjectSocket", "To")
 		self.width = 200
 		
@@ -57,18 +53,26 @@ class CopyTransformsNode(Node, AnimationNode):
 		toObject = input["To"]
 		if fromObject is None or toObject is None:
 			return { "To" : None }
+			
+		if self.frameTypesProperty == "OFFSET":
+			frame = getCurrentFrame()
+			frame += input["Frame"]
+		elif self.frameTypesProperty == "ABSOLUTE":
+			frame = input["Frame"]
+			
+		location, rotation, scale = getObjectTransformsAtFrame(fromObject, frame)
 		
-		if self.useLocation[0]: toObject.location[0] = fromObject.location[0]
-		if self.useLocation[1]: toObject.location[1] = fromObject.location[1]
-		if self.useLocation[2]: toObject.location[2] = fromObject.location[2]
+		if self.useLocation[0]: toObject.location[0] = location[0]
+		if self.useLocation[1]: toObject.location[1] = location[1]
+		if self.useLocation[2]: toObject.location[2] = location[2]
 		
-		if self.useRotation[0]: toObject.rotation_euler[0] = fromObject.rotation_euler[0]
-		if self.useRotation[1]: toObject.rotation_euler[1] = fromObject.rotation_euler[1]
-		if self.useRotation[2]: toObject.rotation_euler[2] = fromObject.rotation_euler[2]
+		if self.useRotation[0]: toObject.rotation_euler[0] = rotation[0]
+		if self.useRotation[1]: toObject.rotation_euler[1] = rotation[1]
+		if self.useRotation[2]: toObject.rotation_euler[2] = rotation[2]
 		
-		if self.useScale[0]: toObject.scale[0] = fromObject.scale[0]
-		if self.useScale[1]: toObject.scale[1] = fromObject.scale[1]
-		if self.useScale[2]: toObject.scale[2] = fromObject.scale[2]
+		if self.useScale[0]: toObject.scale[0] = scale[0]
+		if self.useScale[1]: toObject.scale[1] = scale[1]
+		if self.useScale[2]: toObject.scale[2] = scale[2]
 		
 		return { "To" : toObject}
 		
