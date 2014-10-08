@@ -29,11 +29,17 @@ class ReplicateObjectNode(Node, AnimationNode):
 		output = {}
 		object = input["Object"]
 		amount = max(input["Instances"], 0)
-			
-		while amount > len(self.visibleObjectNames):
-			self.linkObjectToScene(object)
+		
+		if object is None:
+			while 0 < len(self.visibleObjectNames):
+				self.unlinkObjectFromScene()
+			return { "Objects" : [] }
+		
 		while amount < len(self.visibleObjectNames):
 			self.unlinkObjectFromScene()
+		
+		while amount > len(self.visibleObjectNames):
+			self.linkObjectToScene(object)
 			
 		objects = []
 		for i in range(amount):
