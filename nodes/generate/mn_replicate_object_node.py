@@ -3,6 +3,7 @@ from bpy.types import Node
 from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from mn_utils import *
+from mn_node_helper import *
 
 class ObjectNamePropertyGroup(bpy.types.PropertyGroup):
 	objectName = bpy.props.StringProperty(name = "Socket Name", default = "", update = nodePropertyChanged)
@@ -55,7 +56,7 @@ class ReplicateObjectNode(Node, AnimationNode):
 		
 	def newInstance(self, object):
 		newObject = bpy.data.objects.new(self.getPossibleInstanceName(), object.data)
-		#newObject.parent = bpy.data.objects["Suzanne"]
+		newObject.parent = getMainObjectContainer()
 		item = self.objectNames.add()
 		item.objectName = newObject.name
 		return object
