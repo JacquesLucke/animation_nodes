@@ -51,8 +51,11 @@ def getConnectionDictionaries(node):
 	inputSocketConnections = {}
 	outputSocketConnections = {}
 	for socket in node.inputs:
-		for link in socket.links:
-			inputSocketConnections[socket.identifier] = link.from_socket
+		value = socket.getStoreableValue()
+		if hasLinks(socket):
+			inputSocketConnections[socket.identifier] = (value, socket.links[0].from_socket)
+		else:
+			inputSocketConnections[socket.identifier] = (value, None)
 	for socket in node.outputs:
 		for link in socket.links:
 			outputSocketConnections[socket.identifier] = link.to_socket
@@ -64,7 +67,10 @@ def tryToSetConnectionDictionaries(node, connections):
 	for identifier in inputConnections:
 		nodeSocket = node.inputs.get(identifier)
 		if nodeSocket is not None:
-			nodeTree.links.new(nodeSocket, inputConnections[identifier])
+			nodeSocket.setStoreableValue(inputConnections[identifier][0])
+			if inputConnections[identifier][1] is not None:
+				nodeTree.links.new(nodeSocket, inputConnections[identifier][1])
+
 	#outputs
 	outputConnections = connections[1]
 	for identifier in outputConnections:

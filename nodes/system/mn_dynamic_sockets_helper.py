@@ -13,12 +13,16 @@ def getAddSocketList():
 	return addSocketList
 	
 def rebuildSockets(callerNode):
+	forbidCompiling()
+	connections = getConnectionDictionaries(callerNode)
 	callerNode.removeDynamicSockets()
 	startNode = callerNode.getStartNode()
 	if startNode is not None:
 		for socket in startNode.sockets:
 			callerNode.inputs.new(socket.socketType, socket.socketName)
 			callerNode.outputs.new(socket.socketType, socket.socketName)
+	tryToSetConnectionDictionaries(callerNode, connections)
+	allowCompiling()
 	nodeTreeChanged()
 		
 
@@ -56,11 +60,7 @@ class RebuildSubProgramCallerSockets(bpy.types.Operator):
 		
 	def execute(self, context):
 		node = getNode(self.nodeTreeName, self.nodeName)
-		forbidCompiling()
-		connections = getConnectionDictionaries(node)
 		rebuildSockets(node)
-		tryToSetConnectionDictionaries(node, connections)
-		allowCompiling()
 		return {'FINISHED'}	
 		
 class RebuildSubProgramSockets(bpy.types.Operator):
