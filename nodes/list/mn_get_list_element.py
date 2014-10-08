@@ -30,7 +30,7 @@ class GetListElementNode(Node, AnimationNode):
 		output = {}
 		list = input["List"]
 		index = input["Index"]
-		output["Number"] = 0
+		output["Number"] = None
 		if len(list) > 0:
 			output["Number"] = list[max(min(index, len(list) - 1), 0)]
 		return output

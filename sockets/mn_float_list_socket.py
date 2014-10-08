@@ -17,12 +17,12 @@ class FloatListSocket(NodeSocket):
 		return (0.4, 0.4, 0.7, 0.4)
 		
 	def getValue(self):
-		return [0]
+		return []
 		
 	def setStoreableValue(self, data):
 		pass
 	def getStoreableValue(self):
-		return [0]
+		return []
 		
 		
 # register

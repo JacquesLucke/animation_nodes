@@ -17,7 +17,7 @@ class ObjectInfoNode(Node, AnimationNode):
 	
 	def init(self, context):
 		self.inputs.new("ObjectSocket", "Object")
-		self.inputs.new("FloatSocket", "Frame").hide = True
+		self.inputs.new("FloatSocket", "Frame")
 		self.outputs.new("VectorSocket", "Location")
 		self.outputs.new("VectorSocket", "Rotation")
 		self.outputs.new("VectorSocket", "Scale")

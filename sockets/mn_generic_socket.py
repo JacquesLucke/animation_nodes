@@ -21,7 +21,7 @@ class GenericSocket(NodeSocket):
 	def setStoreableValue(self, data):
 		pass
 	def getStoreableValue(self):
-		return 0
+		return None
 		
 # register
 ################################

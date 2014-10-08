@@ -17,7 +17,7 @@ class StringListSocket(NodeSocket):
 		return (1, 1, 1, 0.4)
 		
 	def getValue(self):
-		return [""]
+		return []
 		
 	def setStoreableValue(self, data):
 		pass
