@@ -55,6 +55,7 @@ class ReplicateObjectNode(Node, AnimationNode):
 		
 	def newInstance(self, object):
 		newObject = bpy.data.objects.new(self.getPossibleInstanceName(), object.data)
+		#newObject.parent = bpy.data.objects["Suzanne"]
 		item = self.objectNames.add()
 		item.objectName = newObject.name
 		return object
@@ -79,24 +80,7 @@ class ReplicateObjectNode(Node, AnimationNode):
 			object = bpy.data.objects.get(self.visibleObjectNames[-1].objectName)
 			bpy.context.scene.objects.unlink(object)
 			self.visibleObjectNames.remove(len(self.visibleObjectNames) - 1)
-			
-class AssignActiveObjectToNode(bpy.types.Operator):
-	bl_idname = "mn.assign_active_object_to_node"
-	bl_label = "Assign Active Object"
 	
-	nodeTreeName = bpy.props.StringProperty()
-	nodeName = bpy.props.StringProperty()
-	target = bpy.props.StringProperty()
-	
-	@classmethod
-	def poll(cls, context):
-		return getActive() is not None
-		
-	def execute(self, context):
-		obj = getActive()
-		node = getNode(self.nodeTreeName, self.nodeName)
-		setattr(node, self.target, obj.name)
-		return {'FINISHED'}	
 		
 # register
 ################################
