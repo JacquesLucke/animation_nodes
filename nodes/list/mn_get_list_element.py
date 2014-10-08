@@ -7,8 +7,6 @@ class GetListElementNode(Node, AnimationNode):
 	bl_idname = "GetListElementNode"
 	bl_label = "Get Element"
 	
-	clampIndex = bpy.props.BoolProperty(default = True)
-	
 	def setSocketTypes(self, context):
 		self.setSocketType(self.listTypesProperty)	
 		nodePropertyChanged(self, context)
@@ -24,7 +22,6 @@ class GetListElementNode(Node, AnimationNode):
 		
 	def draw_buttons(self, context, layout):
 		layout.prop(self, "listTypesProperty")
-		layout.prop(self, "clampIndex", text = "Clamp Index")
 		
 	def execute(self, input):
 		output = {}
