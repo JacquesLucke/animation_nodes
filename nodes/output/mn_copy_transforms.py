@@ -11,12 +11,25 @@ class CopyTransformsNode(Node, AnimationNode):
 	useRotation = bpy.props.BoolVectorProperty(update = nodePropertyChanged)
 	useScale = bpy.props.BoolVectorProperty(update = nodePropertyChanged)
 	
+	def setFrameSocketName(self, context):
+		if self.frameTypesProperty == "OFFSET":
+			self.inputs[2].name = "Frame Offset"
+		elif self.frameTypesProperty == "ABSOLUTE":
+			self.inputs[2].name = "Source Frame"
+	
+	frameTypes = [
+		("OFFSET", "Offset", ""),
+		("ABSOLUTE", "Absolute", "") ]
+	frameTypesProperty = bpy.props.EnumProperty(name = "Frame Type", items = frameTypes, default = "OFFSET", update = setFrameSocketName)
+	
 	def init(self, context):
 		fromSocket = self.inputs.new("ObjectSocket", "From")
 		fromSocket.showName = True
 		toSocket = self.inputs.new("ObjectSocket", "To")
 		toSocket.showName = True
+		self.inputs.new("FloatSocket", "Frame Offset")
 		self.outputs.new("ObjectSocket", "To")
+		self.width = 200
 		
 	def draw_buttons(self, context, layout):
 		col = layout.column(align = True)
@@ -36,6 +49,8 @@ class CopyTransformsNode(Node, AnimationNode):
 		row.prop(self, "useScale", index = 0, text = "X")
 		row.prop(self, "useScale", index = 1, text = "Y")
 		row.prop(self, "useScale", index = 2, text = "Z")
+		
+		layout.prop(self, "frameTypesProperty")
 		
 	def execute(self, input):
 		fromObject = input["From"]

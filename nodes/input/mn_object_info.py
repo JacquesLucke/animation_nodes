@@ -3,6 +3,7 @@ from bpy.types import Node
 from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged
 from mn_utils import *
+from mn_object_utils import *
 from bpy.props import BoolProperty
 
 def updateNode(node, context):
@@ -46,45 +47,19 @@ class ObjectInfoNode(Node, AnimationNode):
 		frame = input["Frame"]
 		if self.useCurrentFrame: frame = getCurrentFrame()
 			
-		output["Location"], output["Rotation"], output["Scale"] = self.getTransforms(object, frame)
+		output["Location"], output["Rotation"], output["Scale"] = getObjectTransformsAtFrame(object, frame)
 		
 		for i in range(3):
-			output["Location Velocity"][i] = self.getFrameChange(object, frame, "location", i)
+			output["Location Velocity"][i] = getFrameChange(object, frame, "location", i)
 			
 		for i in range(3):
-			output["Rotation Velocity"][i] = self.getFrameChange(object, frame, "rotation_euler", i)
+			output["Rotation Velocity"][i] = getFrameChange(object, frame, "rotation_euler", i)
 			
 		for i in range(3):
-			output["Scale Velocity"][i] = self.getFrameChange(object, frame, "scale", i)
+			output["Scale Velocity"][i] = getFrameChange(object, frame, "scale", i)
 		
 		return output
 		
-	def getTransforms(self, object, frame):
-		location = [0, 0, 0]
-		rotation = [0, 0, 0]
-		scale = [1, 1, 1]
-		
-		for i in range(3):	
-			location[i] = self.getValueAtFrame(object, "location", i, frame)
-		for i in range(3):	
-			rotation[i] = self.getValueAtFrame(object, "rotation_euler", i, frame)
-		for i in range(3):	
-			scale[i] = self.getValueAtFrame(object, "scale", i, frame)
-		return location, rotation, scale
-			
-	def getValueAtFrame(self, object, dataPath, index, frame):
-		fCurve = getFCurveWithDataPath(object, dataPath = dataPath, index = index)
-		if fCurve is None:
-			return eval("object." + dataPath + "[" + str(index) + "]")
-		else:
-			return fCurve.evaluate(frame)
-		
-	def getFrameChange(self, object, frame, dataPath, index):
-		fCurve = getFCurveWithDataPath(object, dataPath = dataPath, index = index)
-		if fCurve is None:
-			return 0
-		else:
-			return fCurve.evaluate(frame) - fCurve.evaluate(frame - 1)
 		
 # register
 ################################
