@@ -28,6 +28,11 @@ class VectorSocket(NodeSocket):
 	def getValue(self):
 		return self.vector
 		
+	def setStoreableValue(self, data):
+		self.vector = data
+	def getStoreableValue(self):
+		return self.vector
+		
 # register
 ################################
 	

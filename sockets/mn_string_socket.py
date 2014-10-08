@@ -23,6 +23,11 @@ class StringSocket(NodeSocket):
 	def getValue(self):
 		return self.string
 		
+	def setStoreableValue(self, data):
+		self.string = data
+	def getStoreableValue(self):
+		return self.string
+		
 # register
 ################################
 	

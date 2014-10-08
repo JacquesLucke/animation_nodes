@@ -34,6 +34,11 @@ class ObjectSocket(NodeSocket):
 		
 	def getValue(self):
 		return bpy.data.objects.get(self.objectName)
+		
+	def setStoreableValue(self, data):
+		self.objectName = data
+	def getStoreableValue(self):
+		return self.objectName
 	
 	
 class AssignActiveObjectToNode(bpy.types.Operator):

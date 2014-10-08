@@ -23,6 +23,11 @@ class FloatSocket(NodeSocket):
 	def getValue(self):
 		return self.number
 		
+	def setStoreableValue(self, data):
+		self.number = data
+	def getStoreableValue(self):
+		return self.number
+		
 # register
 ################################
 	

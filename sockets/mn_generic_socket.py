@@ -18,6 +18,11 @@ class GenericSocket(NodeSocket):
 	def getValue(self):
 		return 0
 		
+	def setStoreableValue(self, data):
+		pass
+	def getStoreableValue(self):
+		return 0
+		
 # register
 ################################
 	
