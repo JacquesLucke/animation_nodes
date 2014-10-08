@@ -48,7 +48,8 @@ def getNodeNameDictionary():
 		"GetListLengthNode",
 		"SetListElementNode",
 		"SumListElementsNode",
-		"CombineListsNode" ] ))
+		"CombineListsNode",
+		"ShuffleListNode" ] ))
 		
 	nodes.append(("Script", [
 		"ExpressionNode" ] ))
