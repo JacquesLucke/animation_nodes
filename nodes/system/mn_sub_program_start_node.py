@@ -69,9 +69,16 @@ class SubProgramStartNode(Node, AnimationNode):
 		self.removeDynamicSockets()
 		for item in self.sockets:
 			self.outputs.new(item.socketType, item.socketName)
+		self.updateCallerNodeSockets()
 	def removeDynamicSockets(self):
 		for i, socket in enumerate(self.outputs):
 			if i > 0: self.inputs.remove(socket)
+			
+	def updateCallerNodeSockets(self):
+		for node in self.id_data.nodes:
+			if node.bl_idname == "SubProgramNode":
+				if node.subProgramsEnum == self.subProgramName:
+					rebuildSockets(node)
 			
 		
 		
