@@ -305,7 +305,9 @@ def getDirectDependencies(node):
 
 convertableTypes = [("Float", "Integer", "ToIntegerConversion"),
 					("Float", "String", "ToStringConversion"),
-					("Integer", "String", "ToStringConversion")]
+					("Integer", "String", "ToStringConversion"),
+					("Float", "Vector", "CombineVector"),
+					("Integer", "Vector", "CombineVector")]
 		
 def cleanupNodeTrees():
 	nodeTrees = getAnimationNodeTrees()
