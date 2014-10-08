@@ -13,7 +13,8 @@ def updateAnimationTrees(treeChanged = True):
 		start = time.clock()
 		if treeChanged:
 			rebuildNodeNetworks()
-		for i, codeObject in enumerate(compiledCodeObjects):	
+		for i, codeObject in enumerate(compiledCodeObjects):
+			exec(codeObject, {})
 			try: exec(codeObject, {})
 			except BaseException as e:
 				rebuildNodeNetworks()
