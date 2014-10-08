@@ -6,16 +6,14 @@ from mn_utils import *
 from mn_object_utils import *
 from bpy.props import BoolProperty
 
-def updateNode(node, context):
-		if "Frame" in node.inputs:
-			node.inputs["Frame"].hide = node.useCurrentFrame
-		nodePropertyChanged(node, context)
-
 class ObjectInfoNode(Node, AnimationNode):
 	bl_idname = "ObjectInfoNode"
 	bl_label = "Object Info"
 	
-	useCurrentFrame = BoolProperty(default = True, update = updateNode)
+	frameTypes = [
+		("OFFSET", "Offset", ""),
+		("ABSOLUTE", "Absolute", "") ]
+	frameTypesProperty = bpy.props.EnumProperty(name = "Frame Type", items = frameTypes, default = "OFFSET")
 	
 	def init(self, context):
 		self.inputs.new("ObjectSocket", "Object")
@@ -28,7 +26,7 @@ class ObjectInfoNode(Node, AnimationNode):
 		self.outputs.new("VectorSocket", "Scale Velocity")
 		
 	def draw_buttons(self, context, layout):
-		layout.prop(self, "useCurrentFrame", text = "Use Current Frame")
+		layout.prop(self, "frameTypesProperty")
 		
 	def execute(self, input):
 		output = {}
@@ -44,8 +42,11 @@ class ObjectInfoNode(Node, AnimationNode):
 		if object is None:
 			return output
 			
-		frame = input["Frame"]
-		if self.useCurrentFrame: frame = getCurrentFrame()
+		if self.frameTypesProperty == "OFFSET":
+			frame = getCurrentFrame()
+			frame += input["Frame"]
+		elif self.frameTypesProperty == "ABSOLUTE":
+			frame = input["Frame"]
 			
 		output["Location"], output["Rotation"], output["Scale"] = getObjectTransformsAtFrame(object, frame)
 		
