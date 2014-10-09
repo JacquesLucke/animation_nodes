@@ -14,6 +14,7 @@ def updateAnimationTrees(treeChanged = True):
 		if treeChanged:
 			rebuildNodeNetworks()
 		for i, codeObject in enumerate(compiledCodeObjects):
+			if bpy.context.scene.showFullError: exec(codeObject, {})
 			try: exec(codeObject, {})
 			except BaseException as e:
 				rebuildNodeNetworks()
@@ -21,7 +22,7 @@ def updateAnimationTrees(treeChanged = True):
 				except BaseException as e: print(e)
 		if bpy.context.scene.printUpdateTime:
 			timeSpan = time.clock() - start
-			print(str(round(timeSpan, 7)) + "  -  " + str(round(1/timeSpan, 5)) + " fps")
+			print("Exec. " + str(round(timeSpan, 7)) + " s  -  " + str(round(1/timeSpan, 5)) + " fps")
 		allowCompiling()
 			
 def allowCompiling():
@@ -364,6 +365,7 @@ class AnimationNodesPanel(bpy.types.Panel):
 		layout.prop(scene, "updateAnimationTreeOnSceneUpdate", text = "Scene Updates")
 		layout.prop(scene, "updateAnimationTreeOnPropertyChange", text = "Property Changes")
 		layout.prop(scene, "printUpdateTime", text = "Print Update Time")
+		layout.prop(scene, "showFullError", text = "Show Full Error")
 		
 		
 		
@@ -398,6 +400,7 @@ bpy.types.Scene.updateAnimationTreeOnSceneUpdate = bpy.props.BoolProperty(defaul
 bpy.types.Scene.updateAnimationTreeOnPropertyChange = bpy.props.BoolProperty(default = True, name = "Update Animation Tree On Property Change")
 
 bpy.types.Scene.printUpdateTime = bpy.props.BoolProperty(default = False, name = "Print Update Time")
+bpy.types.Scene.showFullError = bpy.props.BoolProperty(default = False, name = "Show Full Error")
 	
 @persistent
 def frameChangeHandler(scene):
