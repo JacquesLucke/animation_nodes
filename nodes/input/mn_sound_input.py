@@ -4,6 +4,7 @@ from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged
 from mn_utils import *
 from mn_object_utils import *
+from mn_node_helper import *
 
 class BakedSoundPropertyGroup(bpy.types.PropertyGroup):
 	low = bpy.props.FloatProperty(name = "Lowest Frequency", default = 10.0)
@@ -17,17 +18,23 @@ class SoundInputNode(Node, AnimationNode):
 	
 	bakedSound = bpy.props.CollectionProperty(type = BakedSoundPropertyGroup)
 	soundObjectName = bpy.props.StringProperty()
+	filePath = bpy.props.StringProperty()
 	
 	def init(self, context):
 		self.inputs.new("IntegerSocket", "Index")
 		self.outputs.new("FloatSocket", "Strength")
 		
 	def draw_buttons(self, context, layout):
+		row = layout.row(align = True)
+		row.prop(self, "filePath", text = "")
+		selectPath = row.operator("mn.select_sound_file_path", "Select Path")
+		selectPath.nodeTreeName = self.id_data.name
+		selectPath.nodeName = self.name
 		bake = layout.operator("mn.bake_sound_to_node", "Bake")
 		bake.nodeTreeName = self.id_data.name
 		bake.nodeName = self.name
 		loadSound = layout.operator("mn.set_sound_in_sequence_editor", "Load Sound")
-		loadSound.filePath = self.bakedSound[0].path
+		loadSound.filePath = self.filePath
 		
 	def execute(self, input):
 		output = {}
@@ -36,19 +43,25 @@ class SoundInputNode(Node, AnimationNode):
 		output["Strength"] = soundObject[self.bakedSound[index].propertyName]
 		return output
 		
-	def bakeSound(self, filePath):
+	def bakeSound(self):
 		bpy.context.scene.frame_current = 1
 		soundObject = self.getSoundObject()
 		self.removeSoundCurves(soundObject)
-		self.bakeIndividualSound(soundObject, filePath, 10, 200)
-		self.bakeIndividualSound(soundObject, filePath, 200, 500)
-		self.bakeIndividualSound(soundObject, filePath, 500, 1000)
+		soundCombinations = [(10, 50), (50, 150), (150, 300), (300, 500), (500, 1000), (1000, 2000), (2000, 4000), (4000, 10000)]
+		wm = bpy.context.window_manager
+		wm.progress_begin(0.0, len(soundCombinations))
+		wm.progress_update(0.0)
+		for index, (low, high) in enumerate(soundCombinations):
+			self.bakeIndividualSound(soundObject, self.filePath, low, high)
+			wm.progress_update(index + 1.0)
+		wm.progress_end()
 		soundObject.hide = True
 		
 	def getSoundObject(self):
 		soundObject = bpy.data.objects.get(self.soundObjectName)
 		if soundObject is None:
 			soundObject = bpy.data.objects.new(getPossibleObjectName("sound object"), None)
+			soundObject.parent = getMainObjectContainer()
 			self.soundObjectName = soundObject.name
 			bpy.context.scene.objects.link(soundObject)
 		return soundObject
@@ -89,6 +102,19 @@ class SoundInputNode(Node, AnimationNode):
 class BakeSoundToNode(bpy.types.Operator):
 	bl_idname = "mn.bake_sound_to_node"
 	bl_label = "Bake Sound to Node"
+	bl_options = {'REGISTER', 'UNDO'}
+	
+	nodeTreeName = bpy.props.StringProperty()
+	nodeName = bpy.props.StringProperty()
+	
+	def execute(self, context):
+		node = getNode(self.nodeTreeName, self.nodeName)
+		node.bakeSound()
+		return {'FINISHED'}	
+		
+class SelectSoundFilePath(bpy.types.Operator):
+	bl_idname = "mn.select_sound_file_path"
+	bl_label = "Select Sound File"
 	
 	nodeTreeName = bpy.props.StringProperty()
 	nodeName = bpy.props.StringProperty()
@@ -100,7 +126,7 @@ class BakeSoundToNode(bpy.types.Operator):
 		
 	def execute(self, context):
 		node = getNode(self.nodeTreeName, self.nodeName)
-		node.bakeSound(self.filepath)
+		node.filePath = self.filepath
 		return {'FINISHED'}	
 		
 class SetSoundInSequenceEditor(bpy.types.Operator):
