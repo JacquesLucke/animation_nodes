@@ -79,7 +79,7 @@ class EnumerateObjectsStartNode(Node, AnimationNode):
 		self.updateCallerNodeSockets()
 	def removeDynamicSockets(self):
 		for i, socket in enumerate(self.outputs):
-			if i > 1: self.inputs.remove(socket)
+			if i > 2: self.inputs.remove(socket)
 			
 	def updateCallerNodeSockets(self):
 		for node in self.id_data.nodes:
