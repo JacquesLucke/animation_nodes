@@ -25,7 +25,13 @@ class EnumerateObjectsNode(Node, AnimationNode):
 		self.outputs.new("ObjectListSocket", "Objects")
 		
 	def draw_buttons(self, context, layout):
-		layout.prop(self, "subProgramsEnum")
+		row = layout.row(align = True)
+		
+		row.prop(self, "subProgramsEnum", text = "")
+		newNode = row.operator("node.add_node", text = "", icon = "PLUS")
+		newNode.use_transform = True
+		newNode.type = "EnumerateObjectsStartNode"
+		
 		rebuild = layout.operator("mn.rebuild_sub_program_caller_sockets", "Rebuild Sockets")
 		rebuild.nodeTreeName = self.id_data.name
 		rebuild.nodeName = self.name
