@@ -1,4 +1,4 @@
-import bpy
+import bpy, math
 from bpy.types import Node
 from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged
@@ -21,7 +21,8 @@ class SoundInputNode(Node, AnimationNode):
 	filePath = bpy.props.StringProperty()
 	
 	def init(self, context):
-		self.inputs.new("IntegerSocket", "Index")
+		self.inputs.new("FloatSocket", "Value")
+		self.outputs.new("FloatListSocket", "Strengths")
 		self.outputs.new("FloatSocket", "Strength")
 		
 	def draw_buttons(self, context, layout):
@@ -30,18 +31,37 @@ class SoundInputNode(Node, AnimationNode):
 		selectPath = row.operator("mn.select_sound_file_path", "Select Path")
 		selectPath.nodeTreeName = self.id_data.name
 		selectPath.nodeName = self.name
-		bake = layout.operator("mn.bake_sound_to_node", "Bake")
+		
+		row = layout.row(align = True)
+		bake = row.operator("mn.bake_sound_to_node", "Bake")
 		bake.nodeTreeName = self.id_data.name
 		bake.nodeName = self.name
-		loadSound = layout.operator("mn.set_sound_in_sequence_editor", "Load Sound")
+		loadSound = row.operator("mn.set_sound_in_sequence_editor", "Load Sound")
 		loadSound.filePath = self.filePath
+		
+		layout.label("Value from 0 to 1 for different frequences.")
 		
 	def execute(self, input):
 		output = {}
-		index = max(min(input["Index"], len(self.bakedSound)-1), 0)
 		soundObject = self.getSoundObject()
-		output["Strength"] = soundObject[self.bakedSound[index].propertyName]
+		strenghts = self.getStrengthList(soundObject)
+		output["Strengths"] = strenghts
+		output["Strength"] = self.mapValueToStrengthList(strenghts, input["Value"])
 		return output
+		
+	def getStrengthList(self, soundObject):
+		strenghts = []
+		for item in self.bakedSound:
+			strenghts.append(soundObject[item.propertyName])
+		return strenghts
+		
+	def mapValueToStrengthList(self, strengths, value):
+		length = len(strengths)
+		value *= length
+		lower = strengths[max(min(math.floor(value), length - 1), 0)]
+		upper = strengths[max(min(math.ceil(value), length - 1), 0)]
+		influence = value % 1.0
+		return lower * (1 - influence) + upper * influence
 		
 	def bakeSound(self):
 		bpy.context.scene.frame_current = 1
