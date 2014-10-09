@@ -43,10 +43,10 @@ class EnumerateObjectsNode(Node, AnimationNode):
 			if i > 0: self.outputs.remove(socket)
 
 	def getStartNode(self):
-		subProgramName = self.subProgramsEnum
+		subProgramsName = self.subProgramsEnum
 		for node in self.id_data.nodes:
 			if node.bl_idname == "EnumerateObjectsStartNode":
-				if node.subProgramName == subProgramName:
+				if node.subProgramName == subProgramsName:
 					return node
 		return None
 					
