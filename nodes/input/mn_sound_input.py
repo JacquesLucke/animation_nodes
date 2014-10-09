@@ -99,10 +99,12 @@ class SoundInputNode(Node, AnimationNode):
 		self.soundObjectName = ""
 		self.bakedSound.clear()
 		
+	def free(self):
+		bpy.context.scene.objects.unlink(self.getSoundObject())
+		
 class BakeSoundToNode(bpy.types.Operator):
 	bl_idname = "mn.bake_sound_to_node"
 	bl_label = "Bake Sound to Node"
-	bl_options = {'REGISTER', 'UNDO'}
 	
 	nodeTreeName = bpy.props.StringProperty()
 	nodeName = bpy.props.StringProperty()
