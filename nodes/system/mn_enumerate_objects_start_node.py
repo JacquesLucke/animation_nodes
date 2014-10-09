@@ -20,12 +20,18 @@ class EnumerateObjectsStartNode(Node, AnimationNode):
 	def draw_buttons(self, context, layout):
 		layout.prop(self, "subProgramName", text = "Name")
 		layout.prop(self, "showEditOptions", text = "Show Options")
+		
 		layout.separator()
 		if self.showEditOptions:
-		
-			rebuild = layout.operator("mn.rebuild_sub_program_sockets", "Rebuild Sockets")
+			row = layout.row(align = True)
+			
+			rebuild = row.operator("mn.rebuild_sub_program_sockets", "Rebuild Sockets")
 			rebuild.nodeTreeName = self.id_data.name
 			rebuild.nodeName = self.name
+			
+			newNode = row.operator("node.add_node", text = "", icon = "PLUS")
+			newNode.use_transform = True
+			newNode.type = "EnumerateObjectsNode"
 		
 			col = layout.column(align = True)
 			for index, item in enumerate(self.sockets):
