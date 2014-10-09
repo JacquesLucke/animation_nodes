@@ -138,6 +138,7 @@ class NetworkCodeGenerator:
 		codeLines = []
 		codeLines.append(getNodeDeclarationString(node))
 		codeLines.append(getNodeInputName(node) + " = " + generateInputListString(node, ignoreSocketNames = "Sub-Program"))
+		codeLines.append(getNodeInputName(node) + "['List Length'] = len("+ getNodeInputName(node) + "['Objects'])")
 		startNode = getCorrespondingStartNode(node)
 		if startNode is not None:
 			codeLines.append("for i, object in enumerate(" + getNodeInputName(node) + "['Objects']):")

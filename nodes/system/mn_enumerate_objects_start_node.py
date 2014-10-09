@@ -16,6 +16,7 @@ class EnumerateObjectsStartNode(Node, AnimationNode):
 	def init(self, context):
 		self.outputs.new("ObjectSocket", "Object")
 		self.outputs.new("IntegerSocket", "Index")
+		self.outputs.new("IntegerSocket", "List Length")
 		
 	def draw_buttons(self, context, layout):
 		layout.prop(self, "subProgramName", text = "Name")
