@@ -4,6 +4,7 @@ from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from mn_utils import *
 from mn_node_helper import *
+from mn_object_utils import *
 
 class ObjectNamePropertyGroup(bpy.types.PropertyGroup):
 	objectName = bpy.props.StringProperty(name = "Socket Name", default = "", update = nodePropertyChanged)
@@ -72,17 +73,11 @@ class ReplicateObjectNode(Node, AnimationNode):
 			self.visibleObjectNames.remove(len(self.visibleObjectNames) - 1)
 		
 	def newInstance(self, object):
-		newObject = bpy.data.objects.new(self.getPossibleInstanceName(), object.data)
+		newObject = bpy.data.objects.new(getPossibleObjectName("instance"), object.data)
 		newObject.parent = getMainObjectContainer()
 		item = self.objectNames.add()
 		item.objectName = newObject.name
 		return object
-	def getPossibleInstanceName(self, name = "instance"):
-		randomString = getRandomString(3)
-		counter = 1
-		while bpy.data.objects.get(name + randomString + str(counter)) is not None:
-			counter += 1
-		return name + randomString + str(counter)
 			
 	def free(self):
 		while len(self.visibleObjectNames) > 0:

@@ -27,3 +27,10 @@ def getFrameChange(object, frame, dataPath, index):
 		return 0
 	else:
 		return fCurve.evaluate(frame) - fCurve.evaluate(frame - 1)
+		
+def getPossibleObjectName(self, name = "object"):
+	randomString = getRandomString(3)
+	counter = 1
+	while bpy.data.objects.get(name + randomString + str(counter)) is not None:
+		counter += 1
+	return name + randomString + str(counter)

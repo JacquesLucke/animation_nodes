@@ -13,7 +13,8 @@ def getNodeNameDictionary():
 		"CharactersNode",
 		"FloatListInputNode",
 		"StringListInputNode",
-		"ObjectListInputNode" ] ))
+		"ObjectListInputNode",
+		"SoundInputNode" ] ))
 		
 	nodes.append(("Generate", [
 		"ReplicateObjectNode" ] ))

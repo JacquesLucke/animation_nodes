@@ -25,6 +25,15 @@ import bpy, random
 	
 def getActive():
 	return bpy.context.scene.objects.active
+def setActive(object):
+	bpy.context.scene.objects.active = object
+	object.select = True
+def deselectAll():
+	bpy.ops.object.select_all(action = "DESELECT")
+def deselectAllFCurves(object):
+	if hasActionData(object):
+		for fCurve in object.animation_data.action.fcurves:
+			fCurve.select = False
 def getCurrentFrame():
 	return bpy.context.scene.frame_current_final
 def getRandom(min, max):
