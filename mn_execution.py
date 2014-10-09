@@ -137,16 +137,18 @@ class NetworkCodeGenerator:
 	def getEnumerateObjectsNodeCode(self, node):
 		codeLines = []
 		codeLines.append(getNodeDeclarationString(node))
-		codeLines.append(getNodeInputName(node) + " = " + generateInputListString(node, ignoreSocketNames = "Sub-Program"))
-		codeLines.append(getNodeInputName(node) + "['List Length'] = len("+ getNodeInputName(node) + "['Objects'])")
+		inputName = getNodeInputName(node)
+		codeLines.append(inputName + " = " + generateInputListString(node, ignoreSocketNames = "Sub-Program"))
+		codeLines.append(inputName + "['List Length'] = len("+ inputName + "['Objects'])")
 		startNode = getCorrespondingStartNode(node)
 		if startNode is not None:
-			codeLines.append("for i, object in enumerate(" + getNodeInputName(node) + "['Objects']):")
-			codeLines.append("    " + getNodeInputName(node) + "['Index'] = i")
-			codeLines.append("    " + getNodeInputName(node) + "['Object'] = object")
-			codeLines.append("    " + getNodeFunctionName(startNode) + "(" + getNodeInputName(node) + ")")
+			codeLines.append("if " + getNodeVariableName(node) + ".executeLoop:")
+			codeLines.append("    for i, object in enumerate(" + inputName + "['Objects']):")
+			codeLines.append("        " + inputName + "['Index'] = i")
+			codeLines.append("        " + inputName + "['Object'] = object")
+			codeLines.append("        " + getNodeFunctionName(startNode) + "(" + inputName + ")")
 			self.makeFunctionCode(subPrograms[getNodeIdentifier(startNode)])
-		codeLines.append(getNodeOutputName(node) + " = " + getNodeInputName(node))
+		codeLines.append(getNodeOutputName(node) + " = " + inputName)
 		return codeLines
 		
 		

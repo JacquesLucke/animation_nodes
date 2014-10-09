@@ -19,6 +19,7 @@ class EnumerateObjectsNode(Node, AnimationNode):
 		rebuildSockets(self)
 	
 	subProgramsEnum = bpy.props.EnumProperty(items = getEnumerateObjectStartNodeNames, name = "Sub-Programs", update=selectedProgramChanged)
+	executeLoop = bpy.props.BoolProperty(name = "Execute Loop", default = True)
 	
 	def init(self, context):
 		self.inputs.new("ObjectListSocket", "Objects")
@@ -35,6 +36,8 @@ class EnumerateObjectsNode(Node, AnimationNode):
 		rebuild = layout.operator("mn.rebuild_sub_program_caller_sockets", "Rebuild Sockets")
 		rebuild.nodeTreeName = self.id_data.name
 		rebuild.nodeName = self.name
+		
+		layout.prop(self, "executeLoop")
 		
 	def removeDynamicSockets(self):
 		for i, socket in enumerate(self.inputs):
