@@ -56,12 +56,14 @@ class SoundInputNode(Node, AnimationNode):
 		return strenghts
 		
 	def mapValueToStrengthList(self, strengths, value):
-		length = len(strengths)
-		value *= length
-		lower = strengths[max(min(math.floor(value), length - 1), 0)]
-		upper = strengths[max(min(math.ceil(value), length - 1), 0)]
-		influence = value % 1.0
-		return lower * (1 - influence) + upper * influence
+		if len(strengths) > 0:
+			length = len(strengths)
+			value *= length
+			lower = strengths[max(min(math.floor(value), length - 1), 0)]
+			upper = strengths[max(min(math.ceil(value), length - 1), 0)]
+			influence = value % 1.0
+			return lower * (1 - influence) + upper * influence
+		return 0.0
 		
 	def bakeSound(self):
 		bpy.context.scene.frame_current = 1
