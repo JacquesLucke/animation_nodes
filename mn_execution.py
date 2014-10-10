@@ -84,7 +84,7 @@ class NetworkCodeGenerator:
 		mainLines.append("nodes = bpy.data.node_groups['" + network[0].id_data.name + "'].nodes")
 		for node in self.orderedNodes:
 			mainLines.extend(self.getNodeCodeLines(node))
-		codeString = "import bpy\n\n" + "\n\n".join(self.functions.values()) + "\n\n" + "\n".join(mainLines)
+		codeString = "import bpy, timer\n\n" + "\n\n".join(self.functions.values()) + "\n\n" + "\n".join(mainLines)
 		return codeString
 		
 	def makeFunctionCode(self, functionNetwork):
@@ -119,8 +119,10 @@ class NetworkCodeGenerator:
 		
 	def getExecutableNodeCode(self, node):
 		codeLines = []
+		if bpy.context.scene.nodeExecutionProfiling: codeLines.append(getNodeTimerStartName(node) + " = timer.clock()")
 		codeLines.append(getNodeDeclarationString(node))
 		codeLines.append(getNodeExecutionString(node))
+		if bpy.context.scene.nodeExecutionProfiling: codeLines.append(getNodeTimerName(node) + " += timer.clock()")
 		return codeLines
 	def getSubProgramNodeCode(self, node):
 		codeLines = []
@@ -197,6 +199,10 @@ def getNodeOutputName(node):
 	return "output_" + str(node.codeIndex)
 def getNodeFunctionName(node):
 	return getNodeVariableName(node) + "_" + "Function"
+def getNodeTimerStartName(node):
+	return "timer_start_" + str(node.codeIndex)
+def getNodeTimerName(node):
+	return "timer_" + str(node.codeIndex)
 		
 
 # get node networks (groups of connected nodes)
@@ -369,6 +375,7 @@ class AnimationNodesPanel(bpy.types.Panel):
 		layout.prop(scene, "updateAnimationTreeOnPropertyChange", text = "Property Changes")
 		layout.prop(scene, "printUpdateTime", text = "Print Update Time")
 		layout.prop(scene, "showFullError", text = "Show Full Error")
+		layout.prop(scene, "nodeExecutionProfiling", text = "Show Full Error")
 		
 		
 		
@@ -404,6 +411,7 @@ bpy.types.Scene.updateAnimationTreeOnPropertyChange = bpy.props.BoolProperty(def
 
 bpy.types.Scene.printUpdateTime = bpy.props.BoolProperty(default = False, name = "Print Update Time")
 bpy.types.Scene.showFullError = bpy.props.BoolProperty(default = False, name = "Show Full Error")
+bpy.types.Scene.nodeExecutionProfiling = bpy.props.BoolProperty(default = False, name = "Node Execution Profiling")
 	
 @persistent
 def frameChangeHandler(scene):
