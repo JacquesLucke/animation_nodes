@@ -67,7 +67,7 @@ class SoundInputNode(Node, AnimationNode):
 		bpy.context.scene.frame_current = 1
 		soundObject = self.getSoundObject()
 		self.removeSoundCurves(soundObject)
-		soundCombinations = [(10, 50), (50, 150), (150, 300), (300, 500), (500, 1000), (1000, 2000), (2000, 4000), (4000, 10000)]
+		soundCombinations = [(0, 50), (50, 150), (150, 300), (300, 500), (500, 1000), (1000, 2000), (2000, 4000), (4000, 10000), (10000, 20000)]
 		wm = bpy.context.window_manager
 		wm.progress_begin(0.0, len(soundCombinations))
 		wm.progress_update(0.0)
