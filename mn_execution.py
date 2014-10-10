@@ -76,17 +76,17 @@ class NetworkCodeGenerator:
 	def __init__(self, network):
 		self.network = network
 		self.functions = {}
-		self.timersToDefine = []
+		self.allNodesInTree = []
 		
 	def getCode(self):
 		network = self.network
-		self.timersToDefine.extend(network)
+		self.allNodesInTree.extend(network)
 		self.orderedNodes = orderNodes(network)
 		mainLines = []
 		mainLines.append("nodes = bpy.data.node_groups['" + network[0].id_data.name + "'].nodes")
 		for node in self.orderedNodes:
 			mainLines.extend(self.getNodeCodeLines(node))
-		codeString = "import bpy, time\n\n" + self.getTimerDefinitions() + "\n\n".join(self.functions.values()) + "\n\n" + "\n".join(mainLines) + self.getCodeToPrintProfilingResult()
+		codeString = "import bpy, time\n\n" + self.getTimerDefinitions() + "\n\n".join(self.functions.values()) + "\n\n" + "\n".join(mainLines) + self.getNodeTreeExecutionFinishedCalls() + self.getCodeToPrintProfilingResult()
 		return codeString
 		
 	def makeFunctionCode(self, functionNetwork):
@@ -94,7 +94,7 @@ class NetworkCodeGenerator:
 		if getNodeIdentifier(startNode) not in self.functions:
 			self.functions[getNodeIdentifier(startNode)] = self.getFunctionCode(functionNetwork, startNode)
 	def getFunctionCode(self, functionNetwork, startNode):
-		self.timersToDefine.extend(functionNetwork)
+		self.allNodesInTree.extend(functionNetwork)
 		self.orderedNodes = orderNodes(functionNetwork)
 		mainLines = []
 		mainLines.append("def " + getNodeFunctionName(startNode) + "(" + getNodeOutputName(startNode) + "):")
@@ -105,6 +105,7 @@ class NetworkCodeGenerator:
 				codeLines = self.getNodeCodeLines(node)
 				self.setIndentationOnEveryLine(codeLines)
 				mainLines.extend(codeLines)
+		mainLines.append("    globals().update(locals())")
 		functionString = "\n".join(mainLines)
 		return functionString
 	def setIndentationOnEveryLine(self, codeLines):
@@ -156,11 +157,18 @@ class NetworkCodeGenerator:
 			self.makeFunctionCode(subPrograms[getNodeIdentifier(startNode)])
 		codeLines.append(getNodeOutputName(node) + " = " + inputName)
 		return codeLines
+
+	def getNodeTreeExecutionFinishedCalls(self):
+		codeLines = []
+		for node in self.allNodesInTree:
+			if hasattr(node, "executionFinished"):
+				codeLines.append(getNodeVariableName(node) + ".executionFinished()")
+		return "\n" + "\n".join(codeLines) + "\n"
 		
 	def getTimerDefinitions(self):
 		if bpy.context.scene.nodeExecutionProfiling:
 			codeLines = []
-			for node in self.timersToDefine:
+			for node in self.allNodesInTree:
 				codeLines.append(getNodeTimerName(node) + " = 0")
 			return "\n" + "\n".join(codeLines) + "\n"
 		return ""
@@ -176,7 +184,7 @@ class NetworkCodeGenerator:
 		if bpy.context.scene.nodeExecutionProfiling:
 			codeLines = []
 			codeLines.append("print('----------  Profiling  ----------')")
-			for node in self.timersToDefine:
+			for node in self.allNodesInTree:
 				codeLines.append("print('" + node.name + "')")
 				codeLines.append("print('  ' + str(round(" + getNodeTimerName(node) + ", 5)) + ' s')")
 			return "\n" + "\n".join(codeLines)
