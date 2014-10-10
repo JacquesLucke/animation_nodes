@@ -1,6 +1,7 @@
 import bpy, time
 from bpy.app.handlers import persistent
 from mn_utils import *
+from mn_cache import clearExecutionCache
 
 ALLOW_COMPILING = True
 
@@ -20,6 +21,7 @@ def updateAnimationTrees(treeChanged = True):
 				rebuildNodeNetworks()
 				try: exec(codeObject, {})
 				except BaseException as e: print(e)
+		clearExecutionCache()
 		if bpy.context.scene.printUpdateTime:
 			timeSpan = time.clock() - start
 			print("Exec. " + str(round(timeSpan, 7)) + " s  -  " + str(round(1/timeSpan, 5)) + " fps")

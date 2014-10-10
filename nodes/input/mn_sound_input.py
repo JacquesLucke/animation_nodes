@@ -5,6 +5,7 @@ from mn_execution import nodePropertyChanged
 from mn_utils import *
 from mn_object_utils import *
 from mn_node_helper import *
+from mn_cache import *
 
 class BakedSoundPropertyGroup(bpy.types.PropertyGroup):
 	low = bpy.props.FloatProperty(name = "Lowest Frequency", default = 10.0)
@@ -43,8 +44,7 @@ class SoundInputNode(Node, AnimationNode):
 		
 	def execute(self, input):
 		output = {}
-		soundObject = self.getSoundObject()
-		strenghts = self.getStrengthList(soundObject)
+		strenghts = self.getStrengthListFromCache()
 		output["Strengths"] = strenghts
 		output["Strength"] = self.mapValueToStrengthList(strenghts, input["Value"])
 		return output
@@ -123,6 +123,16 @@ class SoundInputNode(Node, AnimationNode):
 		
 	def free(self):
 		bpy.context.scene.objects.unlink(self.getSoundObject())
+		
+	def getStrengthListFromCache(self):
+		cache = getExecutionCache(self)
+		if cache is None:
+			soundObject = self.getSoundObject()
+			strenghts = self.getStrengthList(soundObject)
+			setExecutionCache(self, { "Strengths" : strenghts })
+		else:
+			strenghts = cache["Strengths"]
+		return strenghts
 		
 class BakeSoundToNode(bpy.types.Operator):
 	bl_idname = "mn.bake_sound_to_node"
