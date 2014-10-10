@@ -76,15 +76,17 @@ class NetworkCodeGenerator:
 	def __init__(self, network):
 		self.network = network
 		self.functions = {}
+		self.timersToDefine = []
 		
 	def getCode(self):
 		network = self.network
+		self.timersToDefine.extend(network)
 		self.orderedNodes = orderNodes(network)
 		mainLines = []
 		mainLines.append("nodes = bpy.data.node_groups['" + network[0].id_data.name + "'].nodes")
 		for node in self.orderedNodes:
 			mainLines.extend(self.getNodeCodeLines(node))
-		codeString = "import bpy, timer\n\n" + "\n\n".join(self.functions.values()) + "\n\n" + "\n".join(mainLines)
+		codeString = "import bpy, time\n\n" + self.getTimerDefinitions() + "\n\n".join(self.functions.values()) + "\n\n" + "\n".join(mainLines) + self.getCodeToPrintProfilingResult()
 		return codeString
 		
 	def makeFunctionCode(self, functionNetwork):
@@ -92,10 +94,12 @@ class NetworkCodeGenerator:
 		if getNodeIdentifier(startNode) not in self.functions:
 			self.functions[getNodeIdentifier(startNode)] = self.getFunctionCode(functionNetwork, startNode)
 	def getFunctionCode(self, functionNetwork, startNode):
+		self.timersToDefine.extend(functionNetwork)
 		self.orderedNodes = orderNodes(functionNetwork)
 		mainLines = []
 		mainLines.append("def " + getNodeFunctionName(startNode) + "(" + getNodeOutputName(startNode) + "):")
 		mainLines.append("    global nodes")
+		mainLines.append("    " + self.getTimerGlobalList(functionNetwork))
 		for node in self.orderedNodes:
 			if node != startNode:
 				codeLines = self.getNodeCodeLines(node)
@@ -119,10 +123,10 @@ class NetworkCodeGenerator:
 		
 	def getExecutableNodeCode(self, node):
 		codeLines = []
-		if bpy.context.scene.nodeExecutionProfiling: codeLines.append(getNodeTimerStartName(node) + " = timer.clock()")
+		if bpy.context.scene.nodeExecutionProfiling: codeLines.append(getNodeTimerStartName(node) + " = time.clock()")
 		codeLines.append(getNodeDeclarationString(node))
 		codeLines.append(getNodeExecutionString(node))
-		if bpy.context.scene.nodeExecutionProfiling: codeLines.append(getNodeTimerName(node) + " += timer.clock()")
+		if bpy.context.scene.nodeExecutionProfiling: codeLines.append(getNodeTimerName(node) + " += time.clock() - " + getNodeTimerStartName(node))
 		return codeLines
 	def getSubProgramNodeCode(self, node):
 		codeLines = []
@@ -152,6 +156,31 @@ class NetworkCodeGenerator:
 			self.makeFunctionCode(subPrograms[getNodeIdentifier(startNode)])
 		codeLines.append(getNodeOutputName(node) + " = " + inputName)
 		return codeLines
+		
+	def getTimerDefinitions(self):
+		if bpy.context.scene.nodeExecutionProfiling:
+			codeLines = []
+			for node in self.timersToDefine:
+				codeLines.append(getNodeTimerName(node) + " = 0")
+			return "\n" + "\n".join(codeLines) + "\n"
+		return ""
+	def getTimerGlobalList(self, network):
+		if bpy.context.scene.nodeExecutionProfiling:
+			nodeTimerNames = []
+			for node in network:
+				nodeTimerNames.append(getNodeTimerName(node))
+			return "global " + ", ".join(nodeTimerNames)
+		return ""
+		
+	def getCodeToPrintProfilingResult(self):
+		if bpy.context.scene.nodeExecutionProfiling:
+			codeLines = []
+			codeLines.append("print('----------  Profiling  ----------')")
+			for node in self.timersToDefine:
+				codeLines.append("print('" + node.name + "')")
+				codeLines.append("print('  ' + str(round(" + getNodeTimerName(node) + ", 5)) + ' s')")
+			return "\n" + "\n".join(codeLines)
+		return ""
 		
 		
 		
@@ -375,7 +404,7 @@ class AnimationNodesPanel(bpy.types.Panel):
 		layout.prop(scene, "updateAnimationTreeOnPropertyChange", text = "Property Changes")
 		layout.prop(scene, "printUpdateTime", text = "Print Update Time")
 		layout.prop(scene, "showFullError", text = "Show Full Error")
-		layout.prop(scene, "nodeExecutionProfiling", text = "Show Full Error")
+		layout.prop(scene, "nodeExecutionProfiling", text = "Node Execution Profiling")
 		
 		
 		
