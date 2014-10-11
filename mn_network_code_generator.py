@@ -307,7 +307,8 @@ class NetworkCodeGenerator:
 		for socket in self.neededSocketReferences:
 			codeLines.append(self.getSocketDeclarationString(socket))
 		return "\n".join(codeLines)
-		
+	
+
 	def generateInputListString(self, node):
 		inputParts = []
 		useFastMethod = hasattr(node, "getSocketVariableConnections")
@@ -320,7 +321,6 @@ class NetworkCodeGenerator:
 			else:
 				self.neededSocketReferences.append(socket)
 				inputParts.append(self.getInputPartFromSameNode(socket, useFastMethod, socketVarNames))
-		
 		return self.joinInputParts(inputParts, useFastMethod)
 			
 	def joinInputParts(self, inputParts, useFastMethod):
@@ -336,19 +336,15 @@ class NetworkCodeGenerator:
 	def getInputPartFromOtherNode(self, socket, originSocket, useFastMethod, socketVarNames):
 		originNode = originSocket.node
 		originUsesFastMethod = hasattr(originNode, "getSocketVariableConnections")
-		
 		originSocketVarNames = None
 		if originUsesFastMethod: 
 			originSocketVarNames = originNode.getSocketVariableConnections()[1]
-			
-		return self.getInputPartStart(socket, useFastMethod, socketVarNames) + self.getInputPartEnd(originNode, originSocket, originUsesFastMethod, originSocketVarNames)
-	
+		return self.getInputPartStart(socket, useFastMethod, socketVarNames) + self.getInputPartEnd(originNode, originSocket, originUsesFastMethod, originSocketVarNames)	
 	def getInputPartStart(self, socket, useFastMethod, socketVarNames):
 		if useFastMethod:
 			return socketVarNames[socket.identifier] + " = "
 		else:
 			return "'" + socket.identifier + "' : "
-	
 	def getInputPartEnd(self, originNode, originSocket, originUsesFastMethod, originSocketVarNames):
 		if originUsesFastMethod:
 			return getNodeOutputName(originNode) + "_" + originSocketVarNames[originSocket.identifier]
