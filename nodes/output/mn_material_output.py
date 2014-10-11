@@ -22,9 +22,9 @@ class MaterialOutputNode(Node, AnimationNode):
 				sockets.append((socket.identifier, socket.identifier, ""))
 		return sockets
 	
-	materialName = bpy.props.StringProperty()
-	nodeName = bpy.props.StringProperty()
-	socketIdentifier = bpy.props.EnumProperty(items = getPossibleSockets, name = "Socket")
+	materialName = bpy.props.StringProperty(update = nodePropertyChanged)
+	nodeName = bpy.props.StringProperty(update = nodePropertyChanged)
+	socketIdentifier = bpy.props.EnumProperty(items = getPossibleSockets, name = "Socket", update = nodePropertyChanged)
 	
 	def init(self, context):
 		self.inputs.new("GenericSocket", "Data")
@@ -41,9 +41,17 @@ class MaterialOutputNode(Node, AnimationNode):
 		
 	def execute(self, input):
 		output = {}
+		data = input["Data"]
 		socket = self.getSelectedSocket()
 		if socket is not None:
-			socket.default_value = input["Data"]
+			try:
+				# correct color by adding alpha channel
+				if socket.bl_idname == "NodeSocketColor" and len(data) == 3:
+					data = [data[0], data[1], data[2], 1.0]
+					
+				socket.default_value = data
+			except:
+				pass
 		return output
 		
 	def getSelectedNode(self):

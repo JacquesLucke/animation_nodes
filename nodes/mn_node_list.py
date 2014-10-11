@@ -14,7 +14,8 @@ def getNodeNameDictionary():
 		"FloatListInputNode",
 		"StringListInputNode",
 		"ObjectListInputNode",
-		"SoundInputNode" ] ))
+		"SoundInputNode",
+		"ColorInputNode" ] ))
 		
 	nodes.append(("Generate", [
 		"ReplicateObjectNode" ] ))
