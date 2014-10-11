@@ -84,24 +84,27 @@ class NetworkCodeGenerator:
 		self.allNodesInTree = []
 		
 	def getCode(self):
-		network = self.network
-		self.allNodesInTree.extend(network)
-		self.orderedNodes = orderNodes(network)
-		mainLines = []
+		mainCode = self.getMainCode()
+		
+		codeParts = []
+		codeParts.append("import bpy, time")
+		codeParts.append("nodes = bpy.data.node_groups['" + self.network[0].id_data.name + "'].nodes")
+		codeParts.append(self.getNodeReferencingCode())
+		codeParts.append(self.getSocketReferencingCode())
+		codeParts.append(self.getTimerDefinitions())
+		codeParts.append("\n\n".join(self.functions.values()))
+		codeParts.append(mainCode)
+		codeParts.append(self.getNodeTreeExecutionFinishedCalls())
+		codeParts.append(self.getCodeToPrintProfilingResult())
+		return "\n".join(codeParts)
+		
+	def getMainCode(self):
+		self.allNodesInTree.extend(self.network)
+		self.orderedNodes = orderNodes(self.network)
+		codeLines = []
 		for node in self.orderedNodes:
-			mainLines.extend(self.getNodeCodeLines(node))
-			
-		codeString = []
-		codeString.append("import bpy, time")
-		codeString.append("nodes = bpy.data.node_groups['" + network[0].id_data.name + "'].nodes")
-		codeString.append(self.getNodeReferencingCode())
-		codeString.append(self.getSocketReferencingCode())
-		codeString.append(self.getTimerDefinitions())
-		codeString.append("\n\n".join(self.functions.values()))
-		codeString.append("\n".join(mainLines))
-		codeString.append(self.getNodeTreeExecutionFinishedCalls())
-		codeString.append(self.getCodeToPrintProfilingResult())
-		return "\n".join(codeString)
+			codeLines.extend(self.getNodeCodeLines(node))
+		return "\n".join(codeLines)
 		
 	def makeFunctionCode(self, functionNetwork):
 		startNode = getSubProgramStartNodeOfNetwork(functionNetwork)
