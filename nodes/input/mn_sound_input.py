@@ -45,8 +45,16 @@ class SoundInputNode(Node, AnimationNode):
 			lower = strengths[max(min(math.floor(frequenceIndicator), length - 1), 0)]
 			upper = strengths[max(min(math.ceil(frequenceIndicator), length - 1), 0)]
 			influence = frequenceIndicator % 1.0
+			influence = self.interpolation(influence)
 			return lower * (1 - influence) + upper * influence
 		return 0.0
+		
+	def interpolation(self, influence):
+		influence *= 2
+		if influence < 1:
+			return influence ** 2 / 2
+		else:
+			return 1 - (2 - influence) ** 2 / 2
 		
 	def getBakeNode(self):
 		return self.id_data.nodes.get(self.bakeNodeName)
