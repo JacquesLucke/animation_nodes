@@ -243,7 +243,7 @@ class NetworkCodeGenerator:
 		startNode = getCorrespondingStartNode(node)
 		if startNode is not None:
 			codeLines.append("for i in range(" + getNodeInputName(node) + "['Amount']):")
-			codeLines.append("    " + getOutputSocketVariableName(startNode.outputs[0]) + " = i")
+			codeLines.append("    " + getNodeInputName(node) + "['Index'] = i")
 			codeLines.append("    " + getNodeFunctionName(startNode) + "(" + getNodeInputName(node) + ")")
 			self.makeFunctionCode(subNetworks[getNodeIdentifier(startNode)])
 		codeLines.append(getNodeOutputName(node) + " = " + getNodeInputName(node))
@@ -351,7 +351,7 @@ class NetworkCodeGenerator:
 	
 	def getInputPartEnd(self, originNode, originSocket, originUsesFastMethod, originSocketVarNames):
 		if originUsesFastMethod:
-			return getOutputSocketVariableName(originSocket)
+			return getNodeOutputName(originNode) + "_" + originSocketVarNames[originSocket.identifier]
 		else:
 			return getNodeOutputName(originNode) + "['" + originSocket.identifier + "']"
 		
@@ -366,9 +366,10 @@ class NetworkCodeGenerator:
 
 def getNodeOutputString(node):
 	if hasattr(node, "getSocketVariableConnections"):
+		con = node.getSocketVariableConnections()[1]
 		outputParts = []
 		for socket in node.outputs:
-			outputParts.append(getOutputSocketVariableName(socket))
+			outputParts.append(getNodeOutputName(node) + "_" + con[socket.identifier])
 		return ", ".join(outputParts)
 	else:
 		return getNodeOutputName(node)
@@ -395,16 +396,9 @@ def getNodeTimerStartName(node):
 	return "timer_start_" + str(node.codeIndex)
 def getNodeTimerName(node):
 	return "timer_" + str(node.codeIndex)
-def getInputSocketVariableName(socket, useOutputAsException = False):
+def getInputSocketVariableName(socket):
 	node = socket.node
-	if useOutputAsException:
-		return getNodeVariableName(node) + "_socketvalue_" + str(node.outputs.find(socket.name))
-	else:
-		return getNodeVariableName(node) + "_socketvalue_" + str(node.inputs.find(socket.name))
-def getOutputSocketVariableName(socket):
-	node = socket.node
-	socketVarNames = node.getSocketVariableConnections()[1]
-	return getNodeOutputName(socket.node) + "_" + socketVarNames[socket.identifier]
+	return getNodeVariableName(node) + "_socketvalue_" + str(node.inputs.find(socket.name))
 	
 	
 	
