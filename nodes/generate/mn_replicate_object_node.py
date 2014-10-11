@@ -8,6 +8,7 @@ from mn_object_utils import *
 
 class ObjectNamePropertyGroup(bpy.types.PropertyGroup):
 	objectName = bpy.props.StringProperty(name = "Socket Name", default = "", update = nodePropertyChanged)
+	indexInData = bpy.props.IntProperty(default = 0)
 
 class ReplicateObjectNode(Node, AnimationNode):
 	bl_idname = "ReplicateObjectNode"
@@ -40,7 +41,10 @@ class ReplicateObjectNode(Node, AnimationNode):
 			
 		objects = []
 		for i in range(amount):
-			outputObject = bpy.data.objects.get(self.visibleObjectNames[i].objectName)
+			outputObject = bpy.data.objects[self.visibleObjectNames[i].indexInData]
+			if outputObject.name != self.visibleObjectNames[i].objectName:
+				self.visibleObjectNames[i].indexInData = bpy.data.objects.find(self.visibleObjectNames[i].objectName)
+				outputObject = bpy.data.objects[self.visibleObjectNames[i].indexInData]
 			if outputObject is not None:
 				if outputObject.data != object.data:
 					outputObject.data = object.data
