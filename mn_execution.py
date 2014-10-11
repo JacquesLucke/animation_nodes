@@ -137,12 +137,12 @@ class NetworkCodeGenerator:
 	def getExecutableNodeCode(self, node):
 		codeLines = []
 		if bpy.context.scene.nodeExecutionProfiling: codeLines.append(getNodeTimerStartName(node) + " = time.clock()")
-		codeLines.append(getNodeExecutionString(node))
+		codeLines.append(self.getNodeExecutionString(node))
 		if bpy.context.scene.nodeExecutionProfiling: codeLines.append(getNodeTimerName(node) + " += time.clock() - " + getNodeTimerStartName(node))
 		return codeLines
 	def getSubProgramNodeCode(self, node):
 		codeLines = []
-		codeLines.append(getNodeInputName(node) + " = " + generateInputListString(node, ignoreSocketNames = "Sub-Program"))
+		codeLines.append(getNodeInputName(node) + " = " + self.generateInputListString(node))
 		startNode = getCorrespondingStartNode(node)
 		if startNode is not None:
 			codeLines.append("for i in range(" + getNodeInputName(node) + "['Amount']):")
@@ -154,7 +154,7 @@ class NetworkCodeGenerator:
 	def getEnumerateObjectsNodeCode(self, node):
 		codeLines = []
 		inputName = getNodeInputName(node)
-		codeLines.append(inputName + " = " + generateInputListString(node, ignoreSocketNames = "Sub-Program"))
+		codeLines.append(inputName + " = " + self.generateInputListString(node))
 		codeLines.append(inputName + "['List Length'] = len("+ inputName + "['Objects'])")
 		startNode = getCorrespondingStartNode(node)
 		if startNode is not None:
@@ -202,15 +202,47 @@ class NetworkCodeGenerator:
 	def getNodeReferencingCode(self):
 		codeLines = []
 		for node in self.allNodesInTree:
-			codeLines.append(getNodeDeclarationString(node))
+			codeLines.append(self.getNodeDeclarationString(node))
 		return "\n".join(codeLines)
 		
+	def generateInputListString(self, node):
+		inputParts = []
+		if hasattr(node, "getSocketVariableConnections"):
+			con = node.getSocketVariableConnections()[0]
+			for socket in node.inputs:
+				originSocket = getOriginSocket(socket)
+				if isOtherOriginSocket(socket, originSocket):
+					otherNode = originSocket.node
+					if hasattr(otherNode, "getSocketVariableConnections"):
+						con2 = otherNode.getSocketVariableConnections()[1]
+						part = con[socket.identifier] + " = " + getNodeOutputName(otherNode) + "_" + con2[originSocket.identifier]
+					else:
+						part = con[socket.identifier] + " = " + getNodeOutputName(otherNode) + "['" + originSocket.identifier + "']"
+				else:
+					part = con[socket.identifier] + " = " + getNodeVariableName(node) + ".inputs['" + socket.identifier + "'].getValue()"
+				inputParts.append(part)
+			return ", ".join(inputParts)
+		else:
+			for socket in node.inputs:
+				originSocket = getOriginSocket(socket)
+				if isOtherOriginSocket(socket, originSocket):
+					otherNode = originSocket.node
+					if hasattr(otherNode, "getSocketVariableConnections"):
+						con2 = otherNode.getSocketVariableConnections()[1]
+						part = "'" + socket.identifier + "' : " + getNodeOutputName(otherNode) + "_" + con2[originSocket.identifier]
+					else:
+						part = "'" + socket.identifier + "' : " + getNodeOutputName(otherNode) + "['" + originSocket.identifier + "']"
+				else:
+					part = "'" + socket.identifier + "' : " + getNodeVariableName(node) + ".inputs['" + socket.identifier + "'].getValue()"
+				inputParts.append(part)
+			return "{ " + ", ".join(inputParts) + " }"
 		
 		
-def getNodeDeclarationString(node):
-	return getNodeVariableName(node) + " = nodes['"+node.name+"']"
-def getNodeExecutionString(node):
-	return getNodeOutputString(node) + " = " + getNodeVariableName(node) + ".execute(" + generateInputListString(node) + ")"
+		
+	def getNodeDeclarationString(self, node):
+		return getNodeVariableName(node) + " = nodes['"+node.name+"']"
+	def getNodeExecutionString(self, node):
+		return getNodeOutputString(node) + " = " + getNodeVariableName(node) + ".execute(" + self.generateInputListString(node) + ")"
 
 def getNodeOutputString(node):
 	if hasattr(node, "getSocketVariableConnections"):
@@ -240,40 +272,6 @@ def isSubProgramNode(node):
 def isEnumerateObjectsNode(node):
 	return node.bl_idname == "EnumerateObjectsNode"
 		
-def generateInputListString(node, ignoreSocketNames = []):
-	inputParts = []
-	if hasattr(node, "getSocketVariableConnections"):
-		con = node.getSocketVariableConnections()[0]
-		for socket in node.inputs:
-			if socket.name not in ignoreSocketNames:
-				originSocket = getOriginSocket(socket)
-				if isOtherOriginSocket(socket, originSocket):
-					otherNode = originSocket.node
-					if hasattr(otherNode, "getSocketVariableConnections"):
-						con2 = otherNode.getSocketVariableConnections()[1]
-						part = con[socket.identifier] + " = " + getNodeOutputName(otherNode) + "_" + con2[originSocket.identifier]
-					else:
-						part = con[socket.identifier] + " = " + getNodeOutputName(otherNode) + "['" + originSocket.identifier + "']"
-				else:
-					part = con[socket.identifier] + " = " + getNodeVariableName(node) + ".inputs['" + socket.identifier + "'].getValue()"
-				inputParts.append(part)
-		return ", ".join(inputParts)
-	else:
-		for socket in node.inputs:
-			if socket.name not in ignoreSocketNames:
-				originSocket = getOriginSocket(socket)
-				if isOtherOriginSocket(socket, originSocket):
-					otherNode = originSocket.node
-					if hasattr(otherNode, "getSocketVariableConnections"):
-						con2 = otherNode.getSocketVariableConnections()[1]
-						part = "'" + socket.identifier + "' : " + getNodeOutputName(otherNode) + "_" + con2[originSocket.identifier]
-					else:
-						part = "'" + socket.identifier + "' : " + getNodeOutputName(otherNode) + "['" + originSocket.identifier + "']"
-				else:
-					part = "'" + socket.identifier + "' : " + getNodeVariableName(node) + ".inputs['" + socket.identifier + "'].getValue()"
-				inputParts.append(part)
-		return "{ " + ", ".join(inputParts) + " }"
-		
 def getNodeVariableName(node):
 	return "node_" + str(node.codeIndex)
 def getNodeInputName(node):
@@ -286,6 +284,9 @@ def getNodeTimerStartName(node):
 	return "timer_start_" + str(node.codeIndex)
 def getNodeTimerName(node):
 	return "timer_" + str(node.codeIndex)
+def getInputSocketVariableName(socket):
+	node = socket.node
+	return getNodeVariableName(node) + "_socket_" + node.inputs.find(socket.name)
 		
 
 # get node networks (groups of connected nodes)
