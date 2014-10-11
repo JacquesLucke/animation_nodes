@@ -27,6 +27,7 @@ class SoundBakeNode(Node, AnimationNode):
 		
 	def draw_buttons(self, context, layout):
 		layout.separator()
+		layout.label("Name: " + self.name)
 	
 		row = layout.row(align = True)
 		row.prop(self, "filePath", text = "")
@@ -46,22 +47,12 @@ class SoundBakeNode(Node, AnimationNode):
 	def execute(self, input):
 		return {}
 		
-	def getStrengthList(self, soundObject):
+	def getStrengthList(self):
 		soundObject = self.getSoundObject()
 		strenghts = []
 		for item in self.bakedSound:
 			strenghts.append(soundObject[item.propertyName])
 		return strenghts
-		
-	def getStrengthOfFrequence(self, strengths, frequenceIndicator):
-		if len(strengths) > 0:
-			length = len(strengths)
-			frequenceIndicator *= length
-			lower = strengths[max(min(math.floor(frequenceIndicator), length - 1), 0)]
-			upper = strengths[max(min(math.ceil(frequenceIndicator), length - 1), 0)]
-			influence = frequenceIndicator % 1.0
-			return lower * (1 - influence) + upper * influence
-		return 0.0
 		
 	def bakeSound(self):
 		bpy.context.scene.frame_current = 1
