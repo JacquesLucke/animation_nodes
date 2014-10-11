@@ -15,7 +15,6 @@ class ReplicateObjectNode(Node, AnimationNode):
 	
 	objectNames = bpy.props.CollectionProperty(type = ObjectNamePropertyGroup)
 	visibleObjectNames = bpy.props.CollectionProperty(type = ObjectNamePropertyGroup)
-	lastReferenceName = bpy.props.StringProperty()
 	
 	def init(self, context):
 		forbidCompiling()
@@ -38,19 +37,15 @@ class ReplicateObjectNode(Node, AnimationNode):
 			return { "Objects" : [] }
 		
 		self.linkCorrectAmountOfObjects(amount, object)
-		
-		if object.name != self.lastReferenceName:
-			for item in self.visibleObjectNames:
-				replicate = bpy.data.objects.get(item.objectName)
-				if replicate is not None: replicate.data = object.data
 			
 		objects = []
 		for i in range(amount):
 			outputObject = bpy.data.objects.get(self.visibleObjectNames[i].objectName)
 			if outputObject is not None:
+				if outputObject.data != object.data:
+					outputObject.data = object.data
 				objects.append(outputObject)
 			
-		self.lastReferenceName = object.name
 		output["Objects"] = objects
 		return output
 		
