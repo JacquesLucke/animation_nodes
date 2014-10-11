@@ -235,9 +235,9 @@ class NetworkCodeGenerator:
 			return "{ " + ", ".join(inputParts) + " }"
 	def getInputPartFromSameNode(self, socket, useFastMethod, socketVarNames):
 		if useFastMethod:
-			return socketVarNames[socket.identifier] + " = " + getInputSocketVariableName(socket) + ".getValue()"
+			return socketVarNames[socket.identifier] + " = " + getInputSocketVariableName(socket)
 		else:
-			return "'" + socket.identifier + "' : " + getInputSocketVariableName(socket) + ".getValue()"
+			return "'" + socket.identifier + "' : " + getInputSocketVariableName(socket)
 	def getInputPartFromOtherNode(self, socket, originSocket, useFastMethod, socketVarNames):
 		originNode = originSocket.node
 		originUsesFastMethod = hasattr(originNode, "getSocketVariableConnections")
@@ -265,7 +265,7 @@ class NetworkCodeGenerator:
 	def getNodeDeclarationString(self, node):
 		return getNodeVariableName(node) + " = nodes['"+node.name+"']"
 	def getSocketDeclarationString(self, socket):
-		return getInputSocketVariableName(socket) + " = " + getNodeVariableName(socket.node) + ".inputs['" + socket.identifier + "']"
+		return getInputSocketVariableName(socket) + " = " + getNodeVariableName(socket.node) + ".inputs['" + socket.identifier + "'].getValue()"
 	def getNodeExecutionString(self, node):
 		return getNodeOutputString(node) + " = " + getNodeVariableName(node) + ".execute(" + self.generateInputListString(node) + ")"
 
@@ -311,7 +311,7 @@ def getNodeTimerName(node):
 	return "timer_" + str(node.codeIndex)
 def getInputSocketVariableName(socket):
 	node = socket.node
-	return getNodeVariableName(node) + "_socket_" + str(node.inputs.find(socket.name))
+	return getNodeVariableName(node) + "_socketvalue_" + str(node.inputs.find(socket.name))
 		
 
 # get node networks (groups of connected nodes)
