@@ -26,17 +26,18 @@ class SoundInputNode(Node, AnimationNode):
 		self.outputs.new("FloatListSocket", "Strengths")
 		self.outputs.new("FloatSocket", "Strength")
 		
+	def getSocketVariableConnections(self):
+		return ({"Value" : "value"}, {"Strengths" : "strengths", "Strength" : "strength"})
+		
 	def draw_buttons(self, context, layout):
 		layout.prop(self, "bakeNodeName", text = "Sound")
 		
-	def execute(self, input):
-		output = {}
+	def execute(self, value):
+		strenghts = []
 		bakeNode = self.getBakeNode()
 		if bakeNode is not None:
 			strenghts = bakeNode.getStrengthListFromCache()
-			output["Strengths"] = strenghts
-			output["Strength"] = self.getStrengthOfFrequence(strenghts, input["Value"])
-		return output
+		return strenghts, self.getStrengthOfFrequence(strenghts, value)
 		
 	def getStrengthOfFrequence(self, strengths, frequenceIndicator):
 		if len(strengths) > 0:
