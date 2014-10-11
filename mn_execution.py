@@ -80,6 +80,7 @@ class NetworkCodeGenerator:
 	def __init__(self, network):
 		self.network = network
 		self.functions = {}
+		self.neededSocketReferences = []
 		self.allNodesInTree = []
 		
 	def getCode(self):
@@ -94,6 +95,7 @@ class NetworkCodeGenerator:
 		codeString.append("import bpy, time")
 		codeString.append("nodes = bpy.data.node_groups['" + network[0].id_data.name + "'].nodes")
 		codeString.append(self.getNodeReferencingCode())
+		codeString.append(self.getSocketReferencingCode())
 		codeString.append(self.getTimerDefinitions())
 		codeString.append("\n\n".join(self.functions.values()))
 		codeString.append("\n".join(mainLines))
@@ -205,6 +207,12 @@ class NetworkCodeGenerator:
 			codeLines.append(self.getNodeDeclarationString(node))
 		return "\n".join(codeLines)
 		
+	def getSocketReferencingCode(self):
+		codeLines = []
+		for socket in self.neededSocketReferences:
+			codeLines.append(self.getSocketDeclarationString(socket))
+		return "\n".join(codeLines)
+		
 	def generateInputListString(self, node):
 		inputParts = []
 		if hasattr(node, "getSocketVariableConnections"):
@@ -219,7 +227,8 @@ class NetworkCodeGenerator:
 					else:
 						part = con[socket.identifier] + " = " + getNodeOutputName(otherNode) + "['" + originSocket.identifier + "']"
 				else:
-					part = con[socket.identifier] + " = " + getNodeVariableName(node) + ".inputs['" + socket.identifier + "'].getValue()"
+					self.neededSocketReferences.append(socket)
+					part = con[socket.identifier] + " = " + getInputSocketVariableName(socket) + ".getValue()"
 				inputParts.append(part)
 			return ", ".join(inputParts)
 		else:
@@ -233,7 +242,8 @@ class NetworkCodeGenerator:
 					else:
 						part = "'" + socket.identifier + "' : " + getNodeOutputName(otherNode) + "['" + originSocket.identifier + "']"
 				else:
-					part = "'" + socket.identifier + "' : " + getNodeVariableName(node) + ".inputs['" + socket.identifier + "'].getValue()"
+					self.neededSocketReferences.append(socket)
+					part = "'" + socket.identifier + "' : " + getInputSocketVariableName(socket) + ".getValue()"
 				inputParts.append(part)
 			return "{ " + ", ".join(inputParts) + " }"
 		
@@ -241,6 +251,8 @@ class NetworkCodeGenerator:
 		
 	def getNodeDeclarationString(self, node):
 		return getNodeVariableName(node) + " = nodes['"+node.name+"']"
+	def getSocketDeclarationString(self, socket):
+		return getInputSocketVariableName(socket) + " = " + getNodeVariableName(socket.node) + ".inputs['" + socket.identifier + "']"
 	def getNodeExecutionString(self, node):
 		return getNodeOutputString(node) + " = " + getNodeVariableName(node) + ".execute(" + self.generateInputListString(node) + ")"
 
@@ -286,7 +298,7 @@ def getNodeTimerName(node):
 	return "timer_" + str(node.codeIndex)
 def getInputSocketVariableName(socket):
 	node = socket.node
-	return getNodeVariableName(node) + "_socket_" + node.inputs.find(socket.name)
+	return getNodeVariableName(node) + "_socket_" + str(node.inputs.find(socket.name))
 		
 
 # get node networks (groups of connected nodes)
