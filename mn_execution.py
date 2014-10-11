@@ -199,7 +199,17 @@ class NetworkCodeGenerator:
 def getNodeDeclarationString(node):
 	return getNodeVariableName(node) + " = nodes['"+node.name+"']"
 def getNodeExecutionString(node):
-	return getNodeOutputName(node) + " = " + getNodeVariableName(node) + ".execute(" + generateInputListString(node) + ")"
+	return getNodeOutputString(node) + " = " + getNodeVariableName(node) + ".execute(" + generateInputListString(node) + ")"
+
+def getNodeOutputString(node):
+	if hasattr(node, "getSocketVariableConnections"):
+		con = node.getSocketVariableConnections()[1]
+		outputParts = []
+		for socket in node.outputs:
+			outputParts.append(getNodeOutputName(node) + "_" + con[socket.identifier])
+		return ", ".join(outputParts)
+	else:
+		return getNodeOutputName(node)
 	
 def getCorrespondingStartNode(node):
 	return node.getStartNode()
@@ -222,13 +232,17 @@ def isEnumerateObjectsNode(node):
 def generateInputListString(node, ignoreSocketNames = []):
 	inputParts = []
 	if hasattr(node, "getSocketVariableConnections"):
-		con = node.getSocketVariableConnections()
+		con = node.getSocketVariableConnections()[0]
 		for socket in node.inputs:
 			if socket.name not in ignoreSocketNames:
 				originSocket = getOriginSocket(socket)
 				if isOtherOriginSocket(socket, originSocket):
 					otherNode = originSocket.node
-					part = con[socket.identifier] + " = " + getNodeOutputName(otherNode) + "['" + originSocket.identifier + "']"
+					if hasattr(otherNode, "getSocketVariableConnections"):
+						con2 = otherNode.getSocketVariableConnections()[1]
+						part = con[socket.identifier] + " = " + getNodeOutputName(otherNode) + "_" + con2[originSocket.identifier]
+					else:
+						part = con[socket.identifier] + " = " + getNodeOutputName(otherNode) + "['" + originSocket.identifier + "']"
 				else:
 					part = con[socket.identifier] + " = " + getNodeVariableName(node) + ".inputs['" + socket.identifier + "'].getValue()"
 				inputParts.append(part)
@@ -239,7 +253,11 @@ def generateInputListString(node, ignoreSocketNames = []):
 				originSocket = getOriginSocket(socket)
 				if isOtherOriginSocket(socket, originSocket):
 					otherNode = originSocket.node
-					part = "'" + socket.identifier + "' : " + getNodeOutputName(otherNode) + "['" + originSocket.identifier + "']"
+					if hasattr(otherNode, "getSocketVariableConnections"):
+						con2 = otherNode.getSocketVariableConnections()[1]
+						part = "'" + socket.identifier + "' : " + getNodeOutputName(otherNode) + "_" + con2[originSocket.identifier]
+					else:
+						part = "'" + socket.identifier + "' : " + getNodeOutputName(otherNode) + "['" + originSocket.identifier + "']"
 				else:
 					part = "'" + socket.identifier + "' : " + getNodeVariableName(node) + ".inputs['" + socket.identifier + "'].getValue()"
 				inputParts.append(part)

@@ -51,7 +51,7 @@ class FloatMathNode(Node, AnimationNode):
 		self.outputs.new("FloatSocket", "Result")
 		
 	def getSocketVariableConnections(self):
-		return {"A" : "a", "B" : "b"}
+		return ({"A" : "a", "B" : "b"}, {"Result" : "result"})
 		
 	def draw_buttons(self, context, layout):
 		layout.prop(self, "mathTypesProperty")
@@ -109,9 +109,7 @@ class FloatMathNode(Node, AnimationNode):
 			print("ZeroDivisionError: {error} - {name}".format(error=e, name=self.name))
 		except ValueError as e:
 			print("ValueError: {error} - {name}".format(error=e, name=self.name))
-		output = {}
-		output["Result"] = result
-		return output
+		return result
 		
 # register
 ################################
