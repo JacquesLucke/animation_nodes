@@ -15,12 +15,14 @@ def updateAnimationTrees(treeChanged = True):
 		if treeChanged:
 			rebuildNodeNetworks()
 		for i, codeObject in enumerate(compiledCodeObjects):
-			if bpy.context.scene.showFullError: exec(codeObject, {})
-			try: exec(codeObject, {})
-			except BaseException as e:
-				rebuildNodeNetworks()
+			if bpy.context.scene.showFullError: 
+				exec(codeObject, {})
+			else:
 				try: exec(codeObject, {})
-				except BaseException as e: print(e)
+				except BaseException as e:
+					rebuildNodeNetworks()
+					try: exec(codeObject, {})
+					except BaseException as e: print(e)
 		clearExecutionCache()
 		if bpy.context.scene.printUpdateTime:
 			timeSpan = time.clock() - start

@@ -1,4 +1,4 @@
-import bpy
+import bpy, time
 from bpy.types import Node
 from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged, nodeTreeChanged
@@ -66,27 +66,17 @@ class CopyTransformsNode(Node, AnimationNode):
 		rotation = [0, 0, 0]
 		scale = [1, 1, 1]
 		for i in range(3):
-			if fCurves["loc"][i] is None: location[i] = fromObject.location[i]
-			else: location[i] = fCurves["loc"][i].evaluate(frame)
+			if self.useLocation[i]:
+				if fCurves["loc"][i] is None: toObject.location[i] = fromObject.location[i]
+				else: toObject.location[i] = fCurves["loc"][i].evaluate(frame)
 		for i in range(3):
-			if fCurves["rot"][i] is None: rotation[i] = fromObject.rotation_euler[i]
-			else: rotation[i] = fCurves["rot"][i].evaluate(frame)
+			if self.useRotation[i]:
+				if fCurves["rot"][i] is None: toObject.rotation_euler[i] = fromObject.rotation_euler[i]
+				else: toObject.rotation_euler[i] = fCurves["rot"][i].evaluate(frame)
 		for i in range(3):
-			if fCurves["scale"][i] is None: scale[i] = fromObject.scale[i]
-			else: scale[i] = fCurves["scale"][i].evaluate(frame)
-		
-		if self.useLocation[0]: toObject.location[0] = location[0]
-		if self.useLocation[1]: toObject.location[1] = location[1]
-		if self.useLocation[2]: toObject.location[2] = location[2]
-		
-		if self.useRotation[0]: toObject.rotation_euler[0] = rotation[0]
-		if self.useRotation[1]: toObject.rotation_euler[1] = rotation[1]
-		if self.useRotation[2]: toObject.rotation_euler[2] = rotation[2]
-		
-		if self.useScale[0]: toObject.scale[0] = scale[0]
-		if self.useScale[1]: toObject.scale[1] = scale[1]
-		if self.useScale[2]: toObject.scale[2] = scale[2]
-		
+			if self.useScale[i]:
+				if fCurves["scale"][i] is None: toObject.scale[i] = fromObject.scale[i]
+				else: toObject.scale[i] = fCurves["scale"][i].evaluate(frame)
 		return { "To" : toObject}
 		
 	def getFCurvesFromCache(self, fromObject):
