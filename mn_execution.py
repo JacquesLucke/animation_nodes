@@ -221,16 +221,29 @@ def isEnumerateObjectsNode(node):
 		
 def generateInputListString(node, ignoreSocketNames = []):
 	inputParts = []
-	for socket in node.inputs:
-		if socket.name not in ignoreSocketNames:
-			originSocket = getOriginSocket(socket)
-			if isOtherOriginSocket(socket, originSocket):
-				otherNode = originSocket.node
-				part = "'" + socket.identifier + "' : " + getNodeOutputName(otherNode) + "['" + originSocket.identifier + "']"
-			else:
-				part = "'" + socket.identifier + "' : " + getNodeVariableName(node) + ".inputs['" + socket.identifier + "'].getValue()"
-			inputParts.append(part)
-	return "{ " + ", ".join(inputParts) + " }"
+	if hasattr(node, "getSocketVariableConnections"):
+		con = node.getSocketVariableConnections()
+		for socket in node.inputs:
+			if socket.name not in ignoreSocketNames:
+				originSocket = getOriginSocket(socket)
+				if isOtherOriginSocket(socket, originSocket):
+					otherNode = originSocket.node
+					part = con[socket.identifier] + " = " + getNodeOutputName(otherNode) + "['" + originSocket.identifier + "']"
+				else:
+					part = con[socket.identifier] + " = " + getNodeVariableName(node) + ".inputs['" + socket.identifier + "'].getValue()"
+				inputParts.append(part)
+		return ", ".join(inputParts)
+	else:
+		for socket in node.inputs:
+			if socket.name not in ignoreSocketNames:
+				originSocket = getOriginSocket(socket)
+				if isOtherOriginSocket(socket, originSocket):
+					otherNode = originSocket.node
+					part = "'" + socket.identifier + "' : " + getNodeOutputName(otherNode) + "['" + originSocket.identifier + "']"
+				else:
+					part = "'" + socket.identifier + "' : " + getNodeVariableName(node) + ".inputs['" + socket.identifier + "'].getValue()"
+				inputParts.append(part)
+		return "{ " + ", ".join(inputParts) + " }"
 		
 def getNodeVariableName(node):
 	return "node_" + str(node.codeIndex)

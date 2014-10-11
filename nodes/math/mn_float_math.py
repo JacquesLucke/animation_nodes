@@ -50,12 +50,13 @@ class FloatMathNode(Node, AnimationNode):
 		self.inputs.new("FloatSocket", "B")
 		self.outputs.new("FloatSocket", "Result")
 		
+	def getSocketVariableConnections(self):
+		return {"A" : "a", "B" : "b"}
+		
 	def draw_buttons(self, context, layout):
 		layout.prop(self, "mathTypesProperty")
 		
-	def execute(self, input):
-		a = input["A"]
-		b = input["B"]
+	def execute(self, a, b):
 		result = 0
 		operation = self.mathTypesProperty
 		try:
