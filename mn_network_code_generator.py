@@ -1,5 +1,157 @@
 import bpy
 from mn_utils import *
+subPrograms = {}	
+def getAllNetworkCodeStrings():
+	global subPrograms
+	networkStrings = []
+	cleanupNodeTrees()
+	nodeNetworks = getNodeNetworks()
+	normalNetworks = []
+	subPrograms = {}
+	idCounter = 0
+	for network in nodeNetworks:
+		setUniqueCodeIndexToEveryNode(network)
+		networkType = getNetworkType(network)
+		if networkType == "Normal": normalNetworks.append(network)
+		elif networkType == "SubProgram" or networkType == "EnumerateObjects":
+			startNode = getSubProgramStartNode(network)
+			subPrograms[getNodeIdentifier(startNode)] = network
+	for network in normalNetworks:
+		codeGenerator = NetworkCodeGenerator(network)
+		networkStrings.append(codeGenerator.getCode())
+	return networkStrings
+		
+def getNetworkType(network):
+	subProgramAmount = 0
+	for node in network:
+		if node.bl_idname == "SubProgramStartNode" or node.bl_idname == "EnumerateObjectsStartNode":
+			subProgramAmount += 1
+	if subProgramAmount == 0: return "Normal"
+	elif subProgramAmount == 1: return "SubProgram"
+	return "Invalid"
+def getSubProgramStartNode(network):
+	for node in network:
+		if node.bl_idname == "SubProgramStartNode" or node.bl_idname == "EnumerateObjectsStartNode":
+			return node
+			
+idCounter = 0
+bpy.types.Node.codeIndex = bpy.props.IntProperty()
+def setUniqueCodeIndexToEveryNode(nodes):
+	global idCounter
+	for node in nodes:
+		node.codeIndex = idCounter
+		idCounter += 1
+		
+
+# get node networks (groups of connected nodes)
+###############################################
+		
+def getNodeNetworks():
+	nodeNetworks = []
+	nodeTrees = getAnimationNodeTrees()
+	for nodeTree in nodeTrees:
+		nodeNetworks.extend(getNodeNetworksFromTree(nodeTree))
+	return nodeNetworks
+	
+def getAnimationNodeTrees():
+	nodeTrees = []
+	for nodeTree in bpy.data.node_groups:
+		if hasattr(nodeTree, "isAnimationNodeTree"):
+			nodeTrees.append(nodeTree)
+	return nodeTrees
+		
+def getNodeNetworksFromTree(nodeTree):
+	nodes = nodeTree.nodes
+	resetNodeFoundAttributes(nodes)
+	
+	networks = []
+	for node in nodes:
+		if not node.isFound:
+			networks.append(getNodeNetworkFromNode(node))
+	return networks
+	
+def getNodeNetworkFromNode(node):
+	nodesToCheck = [node]
+	network = [node]
+	node.isFound = True
+	while len(nodesToCheck) > 0:
+		linkedNodes = []
+		for node in nodesToCheck:
+			linkedNodes.extend(getLinkedButNotFoundNodes(node))
+		network.extend(linkedNodes)
+		setNodesAsFound(linkedNodes)
+		nodesToCheck = linkedNodes
+	return network
+	
+def setNodesAsFound(nodes):
+	for node in nodes: node.isFound = True
+	
+def getLinkedButNotFoundNodes(node):
+	nodes = []
+	nodes.extend(getNotFoundInputNodes(node))
+	nodes.extend(getNotFoundOutputNodes(node))
+	return nodes
+def getNotFoundInputNodes(node):
+	nodes = []
+	for socket in node.inputs:
+		for link in socket.links:
+			fromNode = link.from_node
+			if not fromNode.isFound:
+				nodes.append(fromNode)
+				fromNode.isFound = True
+	return nodes
+def getNotFoundOutputNodes(node):
+	nodes = []
+	for socket in node.outputs:
+		for link in socket.links:
+			toNode = link.to_node
+			if not toNode.isFound:
+				nodes.append(toNode)
+				toNode.isFound = True
+	return nodes
+	
+bpy.types.Node.isFound = bpy.props.BoolProperty(default = False)
+def resetNodeFoundAttributes(nodes):
+	for node in nodes: node.isFound = False	
+
+
+# cleanup of node trees
+################################
+
+convertableTypes = [("Float", "Integer", "ToIntegerConversion"),
+					("Float", "String", "ToStringConversion"),
+					("Integer", "String", "ToStringConversion"),
+					("Float", "Vector", "CombineVector"),
+					("Integer", "Vector", "CombineVector")]
+		
+def cleanupNodeTrees():
+	nodeTrees = getAnimationNodeTrees()
+	for nodeTree in nodeTrees:
+		cleanupNodeTree(nodeTree)
+def cleanupNodeTree(nodeTree):
+	links = nodeTree.links
+	for link in links:
+		toSocket = link.to_socket
+		fromSocket = link.from_socket
+		if toSocket.node.type == "REROUTE" or fromSocket.node.type == "REROUTE" or not isSocketLinked(toSocket):
+			continue
+		if fromSocket.dataType not in toSocket.allowedInputTypes and toSocket.allowedInputTypes[0] != "all":
+			handleNotAllowedLink(nodeTree, link, fromSocket, toSocket)
+def handleNotAllowedLink(nodeTree, link, fromSocket, toSocket):
+	fromType = fromSocket.dataType
+	toType = toSocket.dataType
+	nodeTree.links.remove(link)
+	for (t1, t2, nodeType) in convertableTypes:
+		if fromType == t1 and toType == t2: insertConversionNode(nodeTree, nodeType, link, fromSocket, toSocket)
+def insertConversionNode(nodeTree, nodeType, link, fromSocket, toSocket):
+	node = nodeTree.nodes.new(nodeType)
+	node.hide = True
+	node.select = False
+	x1, y1 = toSocket.node.location
+	x2, y2 = list(fromSocket.node.location)
+	node.location = [(x1+x2)/2+20, (y1+y2)/2-50]
+	nodeTree.links.new(node.inputs[0], fromSocket)
+	nodeTree.links.new(toSocket, node.outputs[0])
 
 class NetworkCodeGenerator:
 	def __init__(self, network):
@@ -32,7 +184,7 @@ class NetworkCodeGenerator:
 		return "\n".join(codeLines)
 		
 	def makeFunctionCode(self, functionNetwork):
-		startNode = getSubProgramStartNodeOfNetwork(functionNetwork)
+		startNode = getSubProgramStartNode(functionNetwork)
 		if getNodeIdentifier(startNode) not in self.functions:
 			self.functions[getNodeIdentifier(startNode)] = self.getFunctionCode(functionNetwork, startNode)
 	def getFunctionCode(self, functionNetwork, startNode):
