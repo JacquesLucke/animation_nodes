@@ -159,6 +159,11 @@ def insertConversionNode(nodeTree, nodeType, link, fromSocket, toSocket):
 	node.location = [(x1+x2)/2+20, (y1+y2)/2-50]
 	nodeTree.links.new(node.inputs[0], fromSocket)
 	nodeTree.links.new(toSocket, node.outputs[0])
+	
+	
+	
+# network code generator class
+########################################
 
 class NetworkCodeGenerator:
 	def __init__(self, network):
@@ -394,6 +399,8 @@ def getNodeTimerName(node):
 def getInputSocketVariableName(socket):
 	node = socket.node
 	return getNodeVariableName(node) + "_socketvalue_" + str(node.inputs.find(socket.name))
+	
+	
 	
 # order nodes (network) to possible execution sequence
 ######################################################
