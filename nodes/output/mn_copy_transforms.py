@@ -62,9 +62,6 @@ class CopyTransformsNode(Node, AnimationNode):
 			frame = input["Frame"]
 		
 		fCurves = self.getFCurvesFromCache(fromObject)
-		location = [0, 0, 0]
-		rotation = [0, 0, 0]
-		scale = [1, 1, 1]
 		for i in range(3):
 			if self.useLocation[i]:
 				if fCurves["loc"][i] is None: toObject.location[i] = fromObject.location[i]
