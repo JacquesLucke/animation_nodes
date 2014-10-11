@@ -92,7 +92,7 @@ class NetworkCodeGenerator:
 		codeParts.append(self.getNodeReferencingCode())
 		codeParts.append(self.getSocketReferencingCode())
 		codeParts.append(self.getTimerDefinitions())
-		codeParts.append("\n\n".join(self.functions.values()))
+		codeParts.append(self.getFunctionsCode())
 		codeParts.append(mainCode)
 		codeParts.append(self.getNodeTreeExecutionFinishedCalls())
 		codeParts.append(self.getCodeToPrintProfilingResult())
@@ -128,6 +128,9 @@ class NetworkCodeGenerator:
 	def setIndentationOnEveryLine(self, codeLines):
 		for i, line in enumerate(codeLines):
 			codeLines[i] = "    " + line
+			
+	def getFunctionsCode(self):
+		return "\n\n".join(self.functions.values())
 		
 	def getNodeCodeLines(self, node):
 		codeLines = []
