@@ -17,6 +17,9 @@ class SubProgramStartNode(Node, AnimationNode):
 	def init(self, context):
 		self.outputs.new("IntegerSocket", "Index")
 		
+	def getSocketVariableConnections(self):
+		return ({}, {"Index" : "index"})
+		
 	def draw_buttons(self, context, layout):
 		layout.prop(self, "subProgramName", text = "Name")
 		layout.prop(self, "showEditOptions", text = "Show Options")
