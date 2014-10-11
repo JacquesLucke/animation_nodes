@@ -119,7 +119,7 @@ class NetworkCodeGenerator:
 				codeLines = self.getNodeCodeLines(node)
 				self.setIndentationOnEveryLine(codeLines)
 				mainLines.extend(codeLines)
-		mainLines.append("    globals().update(locals())")
+		if bpy.context.scene.nodeExecutionProfiling: mainLines.append("    globals().update(locals())")
 		functionString = "\n".join(mainLines)
 		return functionString
 	def setIndentationOnEveryLine(self, codeLines):
@@ -215,37 +215,50 @@ class NetworkCodeGenerator:
 		
 	def generateInputListString(self, node):
 		inputParts = []
-		if hasattr(node, "getSocketVariableConnections"):
-			con = node.getSocketVariableConnections()[0]
-			for socket in node.inputs:
-				originSocket = getOriginSocket(socket)
-				if isOtherOriginSocket(socket, originSocket):
-					otherNode = originSocket.node
-					if hasattr(otherNode, "getSocketVariableConnections"):
-						con2 = otherNode.getSocketVariableConnections()[1]
-						part = con[socket.identifier] + " = " + getNodeOutputName(otherNode) + "_" + con2[originSocket.identifier]
-					else:
-						part = con[socket.identifier] + " = " + getNodeOutputName(otherNode) + "['" + originSocket.identifier + "']"
-				else:
-					self.neededSocketReferences.append(socket)
-					part = con[socket.identifier] + " = " + getInputSocketVariableName(socket) + ".getValue()"
-				inputParts.append(part)
+		useFastMethod = hasattr(node, "getSocketVariableConnections")
+		socketVarNames = None
+		if useFastMethod: socketVarNames = node.getSocketVariableConnections()[0]
+		for socket in node.inputs:
+			originSocket = getOriginSocket(socket)
+			if isOtherOriginSocket(socket, originSocket):
+				inputParts.append(self.getInputPartFromOtherNode(socket, originSocket, useFastMethod, socketVarNames))
+			else:
+				self.neededSocketReferences.append(socket)
+				inputParts.append(self.getInputPartFromSameNode(socket, useFastMethod, socketVarNames))
+		
+		return self.joinInputParts(inputParts, useFastMethod)
+			
+	def joinInputParts(self, inputParts, useFastMethod):
+		if useFastMethod:
 			return ", ".join(inputParts)
 		else:
-			for socket in node.inputs:
-				originSocket = getOriginSocket(socket)
-				if isOtherOriginSocket(socket, originSocket):
-					otherNode = originSocket.node
-					if hasattr(otherNode, "getSocketVariableConnections"):
-						con2 = otherNode.getSocketVariableConnections()[1]
-						part = "'" + socket.identifier + "' : " + getNodeOutputName(otherNode) + "_" + con2[originSocket.identifier]
-					else:
-						part = "'" + socket.identifier + "' : " + getNodeOutputName(otherNode) + "['" + originSocket.identifier + "']"
-				else:
-					self.neededSocketReferences.append(socket)
-					part = "'" + socket.identifier + "' : " + getInputSocketVariableName(socket) + ".getValue()"
-				inputParts.append(part)
 			return "{ " + ", ".join(inputParts) + " }"
+	def getInputPartFromSameNode(self, socket, useFastMethod, socketVarNames):
+		if useFastMethod:
+			return socketVarNames[socket.identifier] + " = " + getInputSocketVariableName(socket) + ".getValue()"
+		else:
+			return "'" + socket.identifier + "' : " + getInputSocketVariableName(socket) + ".getValue()"
+	def getInputPartFromOtherNode(self, socket, originSocket, useFastMethod, socketVarNames):
+		originNode = originSocket.node
+		originUsesFastMethod = hasattr(originNode, "getSocketVariableConnections")
+		
+		originSocketVarNames = None
+		if originUsesFastMethod: 
+			originSocketVarNames = originNode.getSocketVariableConnections()[1]
+			
+		return self.getInputPartStart(socket, useFastMethod, socketVarNames) + self.getInputPartEnd(originNode, originSocket, originUsesFastMethod, originSocketVarNames)
+	
+	def getInputPartStart(self, socket, useFastMethod, socketVarNames):
+		if useFastMethod:
+			return socketVarNames[socket.identifier] + " = "
+		else:
+			return "'" + socket.identifier + "' : "
+	
+	def getInputPartEnd(self, originNode, originSocket, originUsesFastMethod, originSocketVarNames):
+		if originUsesFastMethod:
+			return getNodeOutputName(originNode) + "_" + originSocketVarNames[originSocket.identifier]
+		else:
+			return getNodeOutputName(originNode) + "['" + originSocket.identifier + "']"
 		
 		
 		
