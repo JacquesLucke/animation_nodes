@@ -4,6 +4,7 @@ from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged, nodeTreeChanged
 from mn_object_utils import *
 from mn_utils import *
+from mn_cache import *
 
 class CopyTransformsNode(Node, AnimationNode):
 	bl_idname = "CopyTransformsNode"
@@ -59,8 +60,20 @@ class CopyTransformsNode(Node, AnimationNode):
 			frame += input["Frame"]
 		elif self.frameTypesProperty == "ABSOLUTE":
 			frame = input["Frame"]
-			
-		location, rotation, scale = getObjectTransformsAtFrame(fromObject, frame)
+		
+		fCurves = self.getFCurvesFromCache(fromObject)
+		location = [0, 0, 0]
+		rotation = [0, 0, 0]
+		scale = [1, 1, 1]
+		for i in range(3):
+			if fCurves["loc"][i] is None: location[i] = fromObject.location[i]
+			else: location[i] = fCurves["loc"][i].evaluate(frame)
+		for i in range(3):
+			if fCurves["rot"][i] is None: rotation[i] = fromObject.rotation_euler[i]
+			else: rotation[i] = fCurves["rot"][i].evaluate(frame)
+		for i in range(3):
+			if fCurves["scale"][i] is None: scale[i] = fromObject.scale[i]
+			else: scale[i] = fCurves["scale"][i].evaluate(frame)
 		
 		if self.useLocation[0]: toObject.location[0] = location[0]
 		if self.useLocation[1]: toObject.location[1] = location[1]
@@ -75,6 +88,29 @@ class CopyTransformsNode(Node, AnimationNode):
 		if self.useScale[2]: toObject.scale[2] = scale[2]
 		
 		return { "To" : toObject}
+		
+	def getFCurvesFromCache(self, fromObject):
+		context = fromObject.name
+		cache = getExecutionCache(self)
+		if cache is None:
+			cache = {}
+		if context not in cache:
+			fCurves = {}
+			
+			fCurves["loc"] = [None, None, None]
+			fCurves["rot"] = [None, None, None]
+			fCurves["scale"] = [None, None, None]
+			
+			for i in range(3):
+				fCurves["loc"][i] = getFCurveWithDataPath(fromObject, "location", index = i)
+			for i in range(3):
+				fCurves["rot"][i] = getFCurveWithDataPath(fromObject, "rotation_euler", index = i)
+			for i in range(3):
+				fCurves["scale"][i] = getFCurveWithDataPath(fromObject, "scale", index = i)
+			
+			cache[context] = fCurves
+			setExecutionCache(self, cache)
+		return cache[context]
 		
 # register
 ################################
