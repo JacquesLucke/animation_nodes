@@ -87,11 +87,19 @@ class NetworkCodeGenerator:
 		self.allNodesInTree.extend(network)
 		self.orderedNodes = orderNodes(network)
 		mainLines = []
-		mainLines.append("nodes = bpy.data.node_groups['" + network[0].id_data.name + "'].nodes")
 		for node in self.orderedNodes:
 			mainLines.extend(self.getNodeCodeLines(node))
-		codeString = "import bpy, time\n\n" + self.getTimerDefinitions() + "\n\n".join(self.functions.values()) + "\n\n" + "\n".join(mainLines) + self.getNodeTreeExecutionFinishedCalls() + self.getCodeToPrintProfilingResult()
-		return codeString
+			
+		codeString = []
+		codeString.append("import bpy, time")
+		codeString.append("nodes = bpy.data.node_groups['" + network[0].id_data.name + "'].nodes")
+		codeString.append(self.getNodeReferencingCode())
+		codeString.append(self.getTimerDefinitions())
+		codeString.append("\n\n".join(self.functions.values()))
+		codeString.append("\n".join(mainLines))
+		codeString.append(self.getNodeTreeExecutionFinishedCalls())
+		codeString.append(self.getCodeToPrintProfilingResult())
+		return "\n".join(codeString)
 		
 	def makeFunctionCode(self, functionNetwork):
 		startNode = getSubProgramStartNodeOfNetwork(functionNetwork)
@@ -129,13 +137,11 @@ class NetworkCodeGenerator:
 	def getExecutableNodeCode(self, node):
 		codeLines = []
 		if bpy.context.scene.nodeExecutionProfiling: codeLines.append(getNodeTimerStartName(node) + " = time.clock()")
-		codeLines.append(getNodeDeclarationString(node))
 		codeLines.append(getNodeExecutionString(node))
 		if bpy.context.scene.nodeExecutionProfiling: codeLines.append(getNodeTimerName(node) + " += time.clock() - " + getNodeTimerStartName(node))
 		return codeLines
 	def getSubProgramNodeCode(self, node):
 		codeLines = []
-		codeLines.append(getNodeDeclarationString(node))
 		codeLines.append(getNodeInputName(node) + " = " + generateInputListString(node, ignoreSocketNames = "Sub-Program"))
 		startNode = getCorrespondingStartNode(node)
 		if startNode is not None:
@@ -147,7 +153,6 @@ class NetworkCodeGenerator:
 		return codeLines
 	def getEnumerateObjectsNodeCode(self, node):
 		codeLines = []
-		codeLines.append(getNodeDeclarationString(node))
 		inputName = getNodeInputName(node)
 		codeLines.append(inputName + " = " + generateInputListString(node, ignoreSocketNames = "Sub-Program"))
 		codeLines.append(inputName + "['List Length'] = len("+ inputName + "['Objects'])")
@@ -193,6 +198,12 @@ class NetworkCodeGenerator:
 				codeLines.append("print('  ' + str(round(" + getNodeTimerName(node) + ", 5)) + ' s')")
 			return "\n" + "\n".join(codeLines)
 		return ""
+		
+	def getNodeReferencingCode(self):
+		codeLines = []
+		for node in self.allNodesInTree:
+			codeLines.append(getNodeDeclarationString(node))
+		return "\n".join(codeLines)
 		
 		
 		
