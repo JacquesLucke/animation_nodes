@@ -14,6 +14,7 @@ def getNodeNameDictionary():
 		"FloatListInputNode",
 		"StringListInputNode",
 		"ObjectListInputNode",
+		"SoundBakeNode",
 		"SoundInputNode",
 		"ColorInputNode" ] ))
 		
