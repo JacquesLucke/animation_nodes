@@ -1,13 +1,24 @@
 import bpy
 from mn_utils import *
-subPrograms = {}	
+
+normalNetworks = []
+subNetworks = {}	
+
 def getAllNetworkCodeStrings():
-	global subPrograms
+	global subNetworks
 	networkStrings = []
 	cleanupNodeTrees()
 	nodeNetworks = getNodeNetworks()
+	sortNetworks(nodeNetworks)
+	for network in normalNetworks:
+		codeGenerator = NetworkCodeGenerator(network)
+		networkStrings.append(codeGenerator.getCode())
+	return networkStrings
+	
+def sortNetworks(nodeNetworks):
+	global normalNetworks, subNetworks, idCounter
 	normalNetworks = []
-	subPrograms = {}
+	subNetworks = {}
 	idCounter = 0
 	for network in nodeNetworks:
 		setUniqueCodeIndexToEveryNode(network)
@@ -15,11 +26,7 @@ def getAllNetworkCodeStrings():
 		if networkType == "Normal": normalNetworks.append(network)
 		elif networkType == "SubProgram" or networkType == "EnumerateObjects":
 			startNode = getSubProgramStartNode(network)
-			subPrograms[getNodeIdentifier(startNode)] = network
-	for network in normalNetworks:
-		codeGenerator = NetworkCodeGenerator(network)
-		networkStrings.append(codeGenerator.getCode())
-	return networkStrings
+			subNetworks[getNodeIdentifier(startNode)] = network
 		
 def getNetworkType(network):
 	subProgramAmount = 0
@@ -233,7 +240,7 @@ class NetworkCodeGenerator:
 			codeLines.append("for i in range(" + getNodeInputName(node) + "['Amount']):")
 			codeLines.append("    " + getNodeInputName(node) + "['Index'] = i")
 			codeLines.append("    " + getNodeFunctionName(startNode) + "(" + getNodeInputName(node) + ")")
-			self.makeFunctionCode(subPrograms[getNodeIdentifier(startNode)])
+			self.makeFunctionCode(subNetworks[getNodeIdentifier(startNode)])
 		codeLines.append(getNodeOutputName(node) + " = " + getNodeInputName(node))
 		return codeLines
 	def getEnumerateObjectsNodeCode(self, node):
@@ -248,7 +255,7 @@ class NetworkCodeGenerator:
 			codeLines.append("        " + inputName + "['Index'] = i")
 			codeLines.append("        " + inputName + "['Object'] = object")
 			codeLines.append("        " + getNodeFunctionName(startNode) + "(" + inputName + ")")
-			self.makeFunctionCode(subPrograms[getNodeIdentifier(startNode)])
+			self.makeFunctionCode(subNetworks[getNodeIdentifier(startNode)])
 		codeLines.append(getNodeOutputName(node) + " = " + inputName)
 		return codeLines
 
