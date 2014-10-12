@@ -183,7 +183,6 @@ class NetworkCodeGenerator:
 		codeParts.append(self.getTimerDefinitions())
 		codeParts.append(self.getFunctionsCode())
 		codeParts.append(mainCode)
-		codeParts.append(self.getNodeTreeExecutionFinishedCalls())
 		codeParts.append(self.getCodeToPrintProfilingResult())
 		return "\n".join(codeParts)
 		
@@ -263,13 +262,6 @@ class NetworkCodeGenerator:
 			self.makeFunctionCode(subNetworks[getNodeIdentifier(startNode)])
 		codeLines.append(getNodeOutputName(node) + " = " + inputName)
 		return codeLines
-
-	def getNodeTreeExecutionFinishedCalls(self):
-		codeLines = []
-		for node in self.allNodesInTree:
-			if hasattr(node, "executionFinished"):
-				codeLines.append(getNodeVariableName(node) + ".executionFinished()")
-		return "\n" + "\n".join(codeLines) + "\n"
 		
 	def getTimerDefinitions(self):
 		if bpy.context.scene.nodeExecutionProfiling:
