@@ -15,10 +15,11 @@ class CombineVector(Node, AnimationNode):
 		self.outputs.new("VectorSocket", "Vector")
 		allowCompiling()
 		
-	def execute(self, input):
-		output = {}
-		output["Vector"] = (input["X"], input["Y"], input["Z"])
-		return output
+	def getSocketVariableConnections(self):
+		return ({"X" : "x", "Y" : "y", "Z" : "z"}, {"Vector" : "vector"})
+		
+	def execute(self, x, y, z):
+		return [x, y, z]
 		
 # register
 ################################
