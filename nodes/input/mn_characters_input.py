@@ -14,14 +14,20 @@ class CharactersNode(Node, AnimationNode):
 		self.outputs.new("StringSocket", "Special")
 		self.outputs.new("StringSocket", "All")
 		
-	def execute(self, input):
-		output = {}
-		output["Lower Case"] = "abcdefghijklmnopqrstuvwxyz"
-		output["Upper Case"] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-		output["Digits"] = "0123456789"
-		output["Special"] = "!$%&/()=?*+#'-_.:,;" + '"'
-		output["All"] = output["Lower Case"] + output["Upper Case"] + output["Digits"] + output["Special"]
-		return output
+	def getSocketVariableConnections(self):
+		return ({},	{"Lower Case" : "lower",
+					"Upper Case" : "upper", 
+					"Digits" : "digits", 
+					"Special" : "special", 
+					"All" : "all"})
+		
+	def execute(self):
+		lower = "abcdefghijklmnopqrstuvwxyz"
+		upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+		digits = "0123456789"
+		special = "!$%&/()=?*+#'-_.:,;" + '"'
+		all = lower + upper + digits + special
+		return lower, upper, digits, special, all
 		
 # register
 ################################
