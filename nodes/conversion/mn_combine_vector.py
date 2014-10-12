@@ -1,17 +1,19 @@
 import bpy
 from bpy.types import Node
 from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged
+from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 
 class CombineVector(Node, AnimationNode):
 	bl_idname = "CombineVector"
 	bl_label = "Combine Vector"
 	
 	def init(self, context):
+		forbidCompiling()
 		self.inputs.new("FloatSocket", "X")
 		self.inputs.new("FloatSocket", "Y")
 		self.inputs.new("FloatSocket", "Z")
 		self.outputs.new("VectorSocket", "Vector")
+		allowCompiling()
 		
 	def execute(self, input):
 		output = {}

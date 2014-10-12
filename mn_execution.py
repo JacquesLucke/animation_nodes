@@ -45,9 +45,12 @@ def rebuildNodeNetworks():
 	global compiledCodeObjects, codeStrings
 	del compiledCodeObjects[:]
 	del codeStrings[:]
-	codeStrings = getAllNetworkCodeStrings()
-	for code in codeStrings:
-		compiledCodeObjects.append(compile(code, "<string>", "exec"))
+	try:
+		codeStrings = getAllNetworkCodeStrings()
+		for code in codeStrings:
+			compiledCodeObjects.append(compile(code, "<string>", "exec"))
+	except:
+		pass
 				
 		
 # Force Cache Rebuilding Panel

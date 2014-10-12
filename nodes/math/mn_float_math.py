@@ -1,7 +1,7 @@
 import bpy
 from bpy.types import Node
 from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged
+from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 import math
 
 def updateNode(node, context):
@@ -46,9 +46,11 @@ class FloatMathNode(Node, AnimationNode):
 	mathTypesProperty = bpy.props.EnumProperty(name="Operation", items=mathTypes, default="ADD", update=updateNode)
 	
 	def init(self, context):
+		forbidCompiling()
 		self.inputs.new("FloatSocket", "A")
 		self.inputs.new("FloatSocket", "B")
 		self.outputs.new("FloatSocket", "Result")
+		allowCompiling()
 		
 	def getSocketVariableConnections(self):
 		return ({"A" : "a", "B" : "b"}, {"Result" : "result"})

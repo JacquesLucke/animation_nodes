@@ -363,6 +363,7 @@ class NetworkCodeGenerator:
 def getNodeOutputString(node):
 	if hasattr(node, "getSocketVariableConnections"):
 		con = node.getSocketVariableConnections()[1]
+		if len(con) != len(node.outputs): raise Exception()
 		outputParts = []
 		for socket in node.outputs:
 			outputParts.append(getNodeOutputName(node) + "_" + con[socket.identifier])

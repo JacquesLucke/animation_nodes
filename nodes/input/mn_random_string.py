@@ -1,17 +1,19 @@
 import bpy, random
 from bpy.types import Node
 from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged
+from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 class RandomStringNode(Node, AnimationNode):
 	bl_idname = "RandomStringNode"
 	bl_label = "Random Text"
 	
 	def init(self, context):
+		forbidCompiling()
 		self.inputs.new("IntegerSocket", "Seed")
 		self.inputs.new("IntegerSocket", "Length").number = 5
 		self.inputs.new("StringSocket", "Characters").string = "abcdefghijklmnopqrstuvwxyz"
 		self.outputs.new("StringSocket", "Text")
+		allowCompiling()
 		
 	def execute(self, input):
 		output = {}
