@@ -11,10 +11,11 @@ class ToFloatConversion(Node, AnimationNode):
 		self.inputs.new("GenericSocket", "Value")
 		self.outputs.new("FloatSocket", "Number")
 		
-	def execute(self, input):
-		output = {}
-		output["Number"] = str(input["Value"])
-		return output
+	def getSocketVariableConnections(self):
+		return ({"Value" : "value"}, {"Number" : "result"})
+		
+	def execute(self, value):
+		return float(value)
 		
 # register
 ################################
