@@ -163,13 +163,3 @@ class SetSoundInSequenceEditor(bpy.types.Operator):
 		scene.sequence_editor_create()
 		scene.sequence_editor.sequences.new_sound("Sound", self.filePath, channel = 0, frame_start = 1)
 		return {'FINISHED'}	
-		
-		
-# register
-################################
-		
-def register():
-	bpy.utils.register_module(__name__)
-
-def unregister():
-	bpy.utils.unregister_module(__name__)

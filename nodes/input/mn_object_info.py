@@ -60,13 +60,3 @@ class ObjectInfoNode(Node, AnimationNode):
 			output["Scale Velocity"][i] = getFrameChange(object, frame, "scale", i)
 		
 		return output
-		
-		
-# register
-################################
-		
-def register():
-	bpy.utils.register_module(__name__)
-
-def unregister():
-	bpy.utils.unregister_module(__name__)

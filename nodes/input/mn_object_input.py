@@ -45,12 +45,3 @@ class AssignActiveObjectToNode(bpy.types.Operator):
 		node = getNode(self.nodeTreeName, self.nodeName)
 		setattr(node, self.target, obj.name)
 		return {'FINISHED'}	
-		
-# register
-################################
-		
-def register():
-	bpy.utils.register_module(__name__)
-
-def unregister():
-	bpy.utils.unregister_module(__name__)

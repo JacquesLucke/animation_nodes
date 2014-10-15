@@ -53,13 +53,3 @@ class FloatListInputNode(Node, AnimationNode):
 		
 	def removeItemFromList(self, index):
 		self.numbers.remove(index)
-
-		
-# register
-################################
-		
-def register():
-	bpy.utils.register_module(__name__)
-
-def unregister():
-	bpy.utils.unregister_module(__name__)

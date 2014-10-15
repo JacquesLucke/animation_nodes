@@ -30,12 +30,3 @@ class CharactersNode(Node, AnimationNode):
 		special = "!$%&/()=?*+#'-_.:,;" + '"'
 		all = lower + upper + digits + special
 		return lower, upper, digits, special, all
-		
-# register
-################################
-		
-def register():
-	bpy.utils.register_module(__name__)
-
-def unregister():
-	bpy.utils.unregister_module(__name__)
