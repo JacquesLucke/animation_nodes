@@ -53,12 +53,3 @@ class SumListElementsNode(Node, AnimationNode):
 			self.inputs.new("IntegerSocket", "Start")
 			self.inputs.new("IntegerSocket", "End")
 			self.outputs.new("StringSocket", "Sum")
-		
-# register
-################################
-		
-def register():
-	bpy.utils.register_module(__name__)
-
-def unregister():
-	bpy.utils.unregister_module(__name__)

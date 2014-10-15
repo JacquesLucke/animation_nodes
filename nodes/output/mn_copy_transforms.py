@@ -98,12 +98,3 @@ class CopyTransformsNode(Node, AnimationNode):
 			cache[context] = fCurves
 			setExecutionCache(self, cache)
 		return cache[context]
-		
-# register
-################################
-		
-def register():
-	bpy.utils.register_module(__name__)
-
-def unregister():
-	bpy.utils.unregister_module(__name__)

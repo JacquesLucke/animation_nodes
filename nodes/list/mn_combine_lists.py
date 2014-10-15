@@ -46,12 +46,3 @@ class CombineListsNode(Node, AnimationNode):
 			self.inputs.new("ObjectListSocket", "List 1")
 			self.inputs.new("ObjectListSocket", "List 2")
 			self.outputs.new("ObjectListSocket", "Both Lists")
-		
-# register
-################################
-		
-def register():
-	bpy.utils.register_module(__name__)
-
-def unregister():
-	bpy.utils.unregister_module(__name__)

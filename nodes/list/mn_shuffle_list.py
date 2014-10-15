@@ -48,12 +48,3 @@ class ShuffleListNode(Node, AnimationNode):
 			self.inputs.new("ObjectListSocket", "List")
 			self.outputs.new("ObjectListSocket", "Shuffled List")
 		self.inputs.move(0, 1)
-		
-# register
-################################
-		
-def register():
-	bpy.utils.register_module(__name__)
-
-def unregister():
-	bpy.utils.unregister_module(__name__)

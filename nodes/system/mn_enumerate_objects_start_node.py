@@ -86,14 +86,3 @@ class EnumerateObjectsStartNode(Node, AnimationNode):
 			if node.bl_idname == "EnumerateObjectsNode":
 				if node.subProgramsEnum == self.subProgramName:
 					rebuildSockets(node)
-			
-		
-
-# register
-################################
-		
-def register():
-	bpy.utils.register_module(__name__)
-
-def unregister():
-	bpy.utils.unregister_module(__name__)

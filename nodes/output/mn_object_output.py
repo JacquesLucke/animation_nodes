@@ -54,12 +54,3 @@ class ObjectOutputNode(Node, AnimationNode):
 		if self.useScale[2]: object.scale[2] = input["Scale"][2]
 		
 		return {}
-		
-# register
-################################
-		
-def register():
-	bpy.utils.register_module(__name__)
-
-def unregister():
-	bpy.utils.unregister_module(__name__)

@@ -52,12 +52,3 @@ class SetListElementNode(Node, AnimationNode):
 			self.inputs.new("ObjectSocket", "Value")
 			self.inputs.new("IntegerSocket", "Index")
 			self.outputs.new("ObjectListSocket", "List")
-		
-# register
-################################
-		
-def register():
-	bpy.utils.register_module(__name__)
-
-def unregister():
-	bpy.utils.unregister_module(__name__)

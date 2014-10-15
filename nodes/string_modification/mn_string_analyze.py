@@ -15,12 +15,3 @@ class StringAnalyzeNode(Node, AnimationNode):
 		output = {}
 		output["Length"] = len(input["Text"])
 		return output
-		
-# register
-################################
-		
-def register():
-	bpy.utils.register_module(__name__)
-
-def unregister():
-	bpy.utils.unregister_module(__name__)
