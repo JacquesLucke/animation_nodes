@@ -114,12 +114,3 @@ class FloatMathNode(Node, AnimationNode):
 		except ValueError as e:
 			print("ValueError: {error} - {name}".format(error=e, name=self.name))
 		return result
-		
-# register
-################################
-		
-def register():
-	bpy.utils.register_module(__name__)
-
-def unregister():
-	bpy.utils.unregister_module(__name__)

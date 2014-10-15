@@ -22,12 +22,3 @@ class SeparateVector(Node, AnimationNode):
 		
 	def execute(self, vector):
 		return vector[0], vector[1], vector[2]
-		
-# register
-################################
-		
-def register():
-	bpy.utils.register_module(__name__)
-
-def unregister():
-	bpy.utils.unregister_module(__name__)
