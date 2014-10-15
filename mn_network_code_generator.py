@@ -65,6 +65,7 @@ def getAnimationNodeTrees():
 	for nodeTree in bpy.data.node_groups:
 		if hasattr(nodeTree, "isAnimationNodeTree"):
 			nodeTrees.append(nodeTree)
+			nodeTree.use_fake_user = True
 	return nodeTrees
 		
 def getNodeNetworksFromTree(nodeTree):
