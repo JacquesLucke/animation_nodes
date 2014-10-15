@@ -304,16 +304,16 @@ class NetworkCodeGenerator:
 
 	def generateInputListString(self, node):
 		inputParts = []
-		useFastMethod = hasattr(node, "getSocketVariableConnections")
-		socketVarNames = None
-		if useFastMethod: socketVarNames = node.getSocketVariableConnections()[0]
+		useFastMethod = usesFastCall(node)
+		inputSocketNames = None
+		if useFastMethod: inputSocketNames = node.getInputSocketNames()
 		for socket in node.inputs:
 			originSocket = getOriginSocket(socket)
 			if isOtherOriginSocket(socket, originSocket):
-				inputParts.append(self.getInputPartFromOtherNode(socket, originSocket, useFastMethod, socketVarNames))
+				inputParts.append(self.getInputPartFromOtherNode(socket, originSocket, useFastMethod, inputSocketNames))
 			else:
 				self.neededSocketReferences.append(socket)
-				inputParts.append(self.getInputPartFromSameNode(socket, useFastMethod, socketVarNames))
+				inputParts.append(self.getInputPartFromSameNode(socket, useFastMethod, inputSocketNames))
 		return self.joinInputParts(inputParts, useFastMethod)
 			
 	def joinInputParts(self, inputParts, useFastMethod):
@@ -321,26 +321,26 @@ class NetworkCodeGenerator:
 			return ", ".join(inputParts)
 		else:
 			return "{ " + ", ".join(inputParts) + " }"
-	def getInputPartFromSameNode(self, socket, useFastMethod, socketVarNames):
+	def getInputPartFromSameNode(self, socket, useFastMethod, inputSocketNames):
 		if useFastMethod:
-			return socketVarNames[socket.identifier] + " = " + getInputSocketVariableName(socket)
+			return inputSocketNames[socket.identifier] + " = " + getInputSocketVariableName(socket)
 		else:
 			return "'" + socket.identifier + "' : " + getInputSocketVariableName(socket)
-	def getInputPartFromOtherNode(self, socket, originSocket, useFastMethod, socketVarNames):
+	def getInputPartFromOtherNode(self, socket, originSocket, useFastMethod, inputSocketNames):
 		originNode = originSocket.node
-		originUsesFastMethod = hasattr(originNode, "getSocketVariableConnections")
-		originSocketVarNames = None
+		originUsesFastMethod = usesFastCall(originNode)
+		outputSocketNames = None
 		if originUsesFastMethod: 
-			originSocketVarNames = originNode.getSocketVariableConnections()[1]
-		return self.getInputPartStart(socket, useFastMethod, socketVarNames) + self.getInputPartEnd(originNode, originSocket, originUsesFastMethod, originSocketVarNames)	
-	def getInputPartStart(self, socket, useFastMethod, socketVarNames):
+			outputSocketNames = originNode.getOutputSocketNames()
+		return self.getInputPartStart(socket, useFastMethod, inputSocketNames) + self.getInputPartEnd(originNode, originSocket, originUsesFastMethod, outputSocketNames)	
+	def getInputPartStart(self, socket, useFastMethod, inputSocketNames):
 		if useFastMethod:
-			return socketVarNames[socket.identifier] + " = "
+			return inputSocketNames[socket.identifier] + " = "
 		else:
 			return "'" + socket.identifier + "' : "
-	def getInputPartEnd(self, originNode, originSocket, originUsesFastMethod, originSocketVarNames):
+	def getInputPartEnd(self, originNode, originSocket, originUsesFastMethod, outputSocketNames):
 		if originUsesFastMethod:
-			return getNodeOutputName(originNode) + "_" + originSocketVarNames[originSocket.identifier]
+			return getNodeOutputName(originNode) + "_" + outputSocketNames[originSocket.identifier]
 		else:
 			return getNodeOutputName(originNode) + "['" + originSocket.identifier + "']"
 		
@@ -354,12 +354,12 @@ class NetworkCodeGenerator:
 		return getNodeOutputString(node) + " = " + getNodeVariableName(node) + ".execute(" + self.generateInputListString(node) + ")"
 
 def getNodeOutputString(node):
-	if hasattr(node, "getSocketVariableConnections"):
-		con = node.getSocketVariableConnections()[1]
-		if len(con) != len(node.outputs): raise Exception()
+	if usesFastCall(node):
+		outputSocketNames = node.getOutputSocketNames()
+		if len(outputSocketNames) != len(node.outputs): raise Exception()
 		outputParts = []
 		for socket in node.outputs:
-			outputParts.append(getNodeOutputName(node) + "_" + con[socket.identifier])
+			outputParts.append(getNodeOutputName(node) + "_" + outputSocketNames[socket.identifier])
 		return ", ".join(outputParts)
 	else:
 		return getNodeOutputName(node)
@@ -373,6 +373,13 @@ def isSubProgramNode(node):
 	return node.bl_idname == "SubProgramNode"
 def isEnumerateObjectsNode(node):
 	return node.bl_idname == "EnumerateObjectsNode"
+	
+def usesFastCall(node):
+	if hasattr(node, "getInputSocketNames"):
+		if hasattr(node, "getOutputSocketNames"): return True
+		else: raise Exception()
+	if hasattr(node, "getOutputSocketNames"): raise Exception()
+	return False
 		
 def getNodeVariableName(node):
 	return "node_" + str(node.codeIndex)
