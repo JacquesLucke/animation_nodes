@@ -80,7 +80,6 @@ class AnimationNodesPanel(bpy.types.Panel):
 		newNode = layout.operator("node.add_node")
 		newNode.use_transform = True
 		newNode.type = scene.customNodeName
-		layout.operator("mn.register_custom_nodes")
 		
 		
 		
@@ -103,36 +102,6 @@ class PrintNodeTreeExecutionStrings(bpy.types.Operator):
 			print()
 			print("-"*80)
 			print()
-		return {'FINISHED'}
-		
-class RegisterCustomNodes(bpy.types.Operator):
-	bl_idname = "mn.register_custom_nodes"
-	bl_label = "Register Custom Node"
-	
-	nodeIdName = bpy.props.StringProperty()
-
-	def execute(self, context):
-		from mn_node_base import AnimationNode
-		from mn_node_register import getAllNodeIdNames
-		officialNodeNames = getAllNodeIdNames()
-		allNodeTypes = bpy.types.Node.__subclasses__()
-		customNodeClasses = []
-		for nodeType in allNodeTypes:
-			if hasattr(nodeType, "bl_idname") and issubclass(nodeType, AnimationNode):
-				if nodeType.bl_idname not in officialNodeNames:
-					customNodeClasses.append(nodeType)
-		customNodeNames = []
-		for customNodeClass in customNodeClasses:
-			customNodeNames.append(customNodeClass.bl_idname)
-			try:
-				try: 
-					bpy.utils.register_class(customNodeClass)
-					print("hey")
-				except:
-					bpy.utils.unregister_class(customNodeClass)
-					bpy.utils.register_class(customNodeClass)
-					print("hi")
-			except: pass
 		return {'FINISHED'}
 	
 	
