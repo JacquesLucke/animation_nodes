@@ -11,8 +11,10 @@ class ToStringConversion(Node, AnimationNode):
 		self.inputs.new("GenericSocket", "Value")
 		self.outputs.new("StringSocket", "Text")
 		
-	def getSocketVariableConnections(self):
-		return ({"Value" : "value"}, {"Text" : "text"})
+	def getInputSocketNames(self):
+		return {"Value" : "value"}
+	def getOutputSocketNames(self):
+		return {"Text" : "text"}
 		
 	def execute(self, value):
 		return str(value)

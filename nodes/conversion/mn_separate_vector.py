@@ -13,8 +13,12 @@ class SeparateVector(Node, AnimationNode):
 		self.outputs.new("FloatSocket", "Y")
 		self.outputs.new("FloatSocket", "Z")
 		
-	def getSocketVariableConnections(self):
-		return ({"Vector" : "vector"}, {"X" : "x", "Y" : "y", "Z" : "z"})
+	def getInputSocketNames(self):
+		return {"Vector" : "vector"}
+	def getOutputSocketNames(self):
+		return {"X" : "x",
+				"Y" : "y",
+				"Z" : "z"}
 		
 	def execute(self, vector):
 		return vector[0], vector[1], vector[2]

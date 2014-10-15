@@ -11,8 +11,10 @@ class ToIntegerConversion(Node, AnimationNode):
 		self.inputs.new("GenericSocket", "Value")
 		self.outputs.new("IntegerSocket", "Number")
 		
-	def getSocketVariableConnections(self):
-		return ({"Value" : "value"}, {"Number" : "number"})
+	def getInputSocketNames(self):
+		return {"Value" : "value"}
+	def getOutputSocketNames(self):
+		return {"Number" : "number"}
 		
 	def execute(self, value):
 		return int(value)

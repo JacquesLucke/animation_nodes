@@ -14,12 +14,14 @@ class CharactersNode(Node, AnimationNode):
 		self.outputs.new("StringSocket", "Special")
 		self.outputs.new("StringSocket", "All")
 		
-	def getSocketVariableConnections(self):
-		return ({},	{"Lower Case" : "lower",
-					"Upper Case" : "upper", 
-					"Digits" : "digits", 
-					"Special" : "special", 
-					"All" : "all"})
+	def getInputSocketNames(self):
+		return {}
+	def getOutputSocketNames(self):
+		return {"Lower Case" : "lower",
+				"Upper Case" : "upper", 
+				"Digits" : "digits", 
+				"Special" : "special", 
+				"All" : "all"}
 		
 	def execute(self):
 		lower = "abcdefghijklmnopqrstuvwxyz"
