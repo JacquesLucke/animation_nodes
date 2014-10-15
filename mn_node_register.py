@@ -7,6 +7,15 @@ class AnimationNodesCategory(NodeCategory):
 	@classmethod
 	def poll(cls, context):
 		return context.space_data.tree_type == 'AnimationNodeTreeType'
+		
+def getAllNodeIdNames():
+	nodeDictionary = getNodeNameDictionary()
+	nodeIdNames = []
+	for (categoryName, nodeNames) in nodeDictionary:
+		nodeItems = []
+		for nodeName in nodeNames:
+			nodeIdNames.append(nodeName)
+	return nodeIdNames
 
 def getNodeCategories():
 	nodeDictionary = getNodeNameDictionary()

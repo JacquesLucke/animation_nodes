@@ -67,6 +67,7 @@ class AnimationNodesPanel(bpy.types.Panel):
 		layout = self.layout
 		layout.operator("mn.force_full_update")
 		layout.operator("mn.print_node_tree_execution_string")
+		layout.operator("mn.load_custom_node")
 		scene = context.scene
 		layout.label("Update when:")
 		layout.prop(scene, "updateAnimationTreeOnFrameChange", text = "Frames Changes")
@@ -75,6 +76,11 @@ class AnimationNodesPanel(bpy.types.Panel):
 		layout.prop(scene, "printUpdateTime", text = "Print Update Time")
 		layout.prop(scene, "showFullError", text = "Show Full Error")
 		layout.prop(scene, "nodeExecutionProfiling", text = "Node Execution Profiling")
+		
+		layout.prop(scene, "customNodeName")
+		newNode = layout.operator("node.add_node", text = "", icon = "PLUS")
+		newNode.use_transform = True
+		newNode.type = scene.customNodeName
 		
 		
 		
@@ -98,6 +104,20 @@ class PrintNodeTreeExecutionStrings(bpy.types.Operator):
 			print("-"*80)
 			print()
 		return {'FINISHED'}
+		
+class LoadCustomNode(bpy.types.Operator):
+	bl_idname = "mn.load_custom_node"
+	bl_label = "Load Custom Node"
+
+	def execute(self, context):
+		from mn_node_base import AnimationNode
+		from mn_node_register import getAllNodeIdNames
+		officialNodeNames = getAllNodeIdNames()
+		allNodeTypes = bpy.types.Node.__subclasses__()
+		for nodeType in allNodeTypes:
+			if hasattr(nodeType, "bl_idname") and issubclass(nodeType, AnimationNode) and nodeType.bl_idname not in officialNodeNames:
+				print(nodeType.bl_idname)
+		return {'FINISHED'}
 	
 	
 		
@@ -111,6 +131,8 @@ bpy.types.Scene.updateAnimationTreeOnPropertyChange = bpy.props.BoolProperty(def
 bpy.types.Scene.printUpdateTime = bpy.props.BoolProperty(default = False, name = "Print Update Time")
 bpy.types.Scene.showFullError = bpy.props.BoolProperty(default = False, name = "Show Full Error")
 bpy.types.Scene.nodeExecutionProfiling = bpy.props.BoolProperty(default = False, name = "Node Execution Profiling")
+
+bpy.types.Scene.customNodeName = bpy.props.StringProperty(default = "", name = "Custom Node Name")
 	
 @persistent
 def frameChangeHandler(scene):
