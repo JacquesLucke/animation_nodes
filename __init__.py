@@ -73,14 +73,14 @@ for name in moduleNames:
 ##################################
 
 def registerIfPossible(moduleName):
-	exec("global module; module = " + moduleName)
-	if hasattr(module, "register"):
-		module.register()
+	try:
+		bpy.utils.register_module(moduleName)
+	except: pass
 		
 def unregisterIfPossible(moduleName):
-	exec("global module; module = " + moduleName)
-	if hasattr(module, "unregister"):
-		module.unregister()
+	try:
+		bpy.utils.unregister_module(moduleName)
+	except: pass
 
 def register():
 	for moduleName in moduleNames:
