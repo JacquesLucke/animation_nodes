@@ -19,6 +19,7 @@ Created by Jacques Lucke
 '''
 
 import bpy, sys, os
+from nodeitems_utils import register_node_categories, unregister_node_categories
 from bpy.types import NodeTree, Node, NodeSocket
 from fnmatch import fnmatch
 currentPath = os.path.dirname(__file__)
@@ -81,14 +82,17 @@ def unregisterIfPossible(moduleName):
 	try:
 		bpy.utils.unregister_module(moduleName)
 	except: pass
-
+	
 def register():
 	for moduleName in moduleNames:
 		registerIfPossible(moduleName)
+	categories = mn_node_register.getNodeCategories()
+	register_node_categories("ANIMATIONNODES", categories)
 
 def unregister():
 	for moduleName in moduleNames:
 		unregisterIfPossible(moduleName)
+	unregister_node_categories("ANIMATIONNODES")
 		
 if __name__ == "__main__":
 	register()

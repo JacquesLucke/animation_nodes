@@ -27,10 +27,3 @@ def getNodeCategories():
 		category = AnimationNodesCategory(categoryName.upper(), categoryName, items = nodeItems)
 		nodeCategories.append(category)
 	return nodeCategories
-		
-def register():
-	categories = getNodeCategories()
-	register_node_categories("ANIMATIONNODES", categories)
-	
-def unregister():
-	unregister_node_categories("ANIMATIONNODES")
