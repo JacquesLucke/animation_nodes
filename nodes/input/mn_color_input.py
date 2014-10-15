@@ -16,8 +16,10 @@ class ColorInputNode(Node, AnimationNode):
 	def draw_buttons(self, context, layout):
 		layout.template_color_picker(self, "colorProperty", value_slider = True)
 		
-	def getSocketVariableConnections(self):
-		return ({}, {"Color" : "color"})
+	def getInputSocketNames(self):
+		return {}
+	def getOutputSocketNames(self):
+		return {"Color" : "color"}
 		
 	def execute(self):
 		return self.colorProperty

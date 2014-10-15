@@ -15,8 +15,10 @@ class FloatInputNode(Node, AnimationNode):
 	def draw_buttons(self, context, layout):
 		layout.prop(self, "floatProperty", text = "")
 		
-	def getSocketVariableConnections(self):
-		return ({}, {"Number" : "number"})
+	def getInputSocketNames(self):
+		return {}
+	def getOutputSocketNames(self):
+		return {"Number" : "number"}
 		
 	def execute(self):
 		return self.floatProperty

@@ -10,9 +10,11 @@ class TimeInfoNode(Node, AnimationNode):
 	
 	def init(self, context):
 		self.outputs.new("FloatSocket", "Frame")
-	
-	def getSocketVariableConnections(self):
-		return ({}, {"Frame" : "frame"})
+		
+	def getInputSocketNames(self):
+		return {}
+	def getOutputSocketNames(self):
+		return {"Frame" : "frame"}
 		
 	def execute(self):
 		return getCurrentFrame()
