@@ -67,7 +67,6 @@ class AnimationNodesPanel(bpy.types.Panel):
 		layout = self.layout
 		layout.operator("mn.force_full_update")
 		layout.operator("mn.print_node_tree_execution_string")
-		layout.operator("mn.load_custom_node")
 		scene = context.scene
 		layout.label("Update when:")
 		layout.prop(scene, "updateAnimationTreeOnFrameChange", text = "Frames Changes")
@@ -78,9 +77,10 @@ class AnimationNodesPanel(bpy.types.Panel):
 		layout.prop(scene, "nodeExecutionProfiling", text = "Node Execution Profiling")
 		
 		layout.prop(scene, "customNodeName")
-		newNode = layout.operator("node.add_node", text = "", icon = "PLUS")
+		newNode = layout.operator("node.add_node")
 		newNode.use_transform = True
 		newNode.type = scene.customNodeName
+		layout.operator("mn.register_custom_nodes")
 		
 		
 		
@@ -105,18 +105,34 @@ class PrintNodeTreeExecutionStrings(bpy.types.Operator):
 			print()
 		return {'FINISHED'}
 		
-class LoadCustomNode(bpy.types.Operator):
-	bl_idname = "mn.load_custom_node"
-	bl_label = "Load Custom Node"
+class RegisterCustomNodes(bpy.types.Operator):
+	bl_idname = "mn.register_custom_nodes"
+	bl_label = "Register Custom Node"
+	
+	nodeIdName = bpy.props.StringProperty()
 
 	def execute(self, context):
 		from mn_node_base import AnimationNode
 		from mn_node_register import getAllNodeIdNames
 		officialNodeNames = getAllNodeIdNames()
 		allNodeTypes = bpy.types.Node.__subclasses__()
+		customNodeClasses = []
 		for nodeType in allNodeTypes:
-			if hasattr(nodeType, "bl_idname") and issubclass(nodeType, AnimationNode) and nodeType.bl_idname not in officialNodeNames:
-				print(nodeType.bl_idname)
+			if hasattr(nodeType, "bl_idname") and issubclass(nodeType, AnimationNode):
+				if nodeType.bl_idname not in officialNodeNames:
+					customNodeClasses.append(nodeType)
+		customNodeNames = []
+		for customNodeClass in customNodeClasses:
+			customNodeNames.append(customNodeClass.bl_idname)
+			try:
+				try: 
+					bpy.utils.register_class(customNodeClass)
+					print("hey")
+				except:
+					bpy.utils.unregister_class(customNodeClass)
+					bpy.utils.register_class(customNodeClass)
+					print("hi")
+			except: pass
 		return {'FINISHED'}
 	
 	
@@ -132,7 +148,23 @@ bpy.types.Scene.printUpdateTime = bpy.props.BoolProperty(default = False, name =
 bpy.types.Scene.showFullError = bpy.props.BoolProperty(default = False, name = "Show Full Error")
 bpy.types.Scene.nodeExecutionProfiling = bpy.props.BoolProperty(default = False, name = "Node Execution Profiling")
 
-bpy.types.Scene.customNodeName = bpy.props.StringProperty(default = "", name = "Custom Node Name")
+def getCustomNodes(self, context):
+	from mn_node_base import AnimationNode
+	from mn_node_register import getAllNodeIdNames
+	officialNodeNames = getAllNodeIdNames()
+	allNodeTypes = bpy.types.Node.__subclasses__()
+	customNodeNames = []
+	for nodeType in allNodeTypes:
+		if hasattr(nodeType, "bl_idname") and issubclass(nodeType, AnimationNode):
+			if nodeType.bl_idname not in officialNodeNames:
+				customNodeNames.append(nodeType.bl_idname)
+	customNodeNames = list(set(customNodeNames))
+	customNodeItems = []
+	for customNodeName in customNodeNames:
+		customNodeItems.append((customNodeName, customNodeName, ""))
+	return customNodeItems
+	
+bpy.types.Scene.customNodeName = bpy.props.EnumProperty(items = getCustomNodes, name = "Custom Node Name")
 	
 @persistent
 def frameChangeHandler(scene):
