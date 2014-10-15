@@ -52,8 +52,10 @@ class FloatMathNode(Node, AnimationNode):
 		self.outputs.new("FloatSocket", "Result")
 		allowCompiling()
 		
-	def getSocketVariableConnections(self):
-		return ({"A" : "a", "B" : "b"}, {"Result" : "result"})
+	def getInputSocketNames(self):
+		return {"A" : "a", "B" : "b"}
+	def getOutputSocketNames(self):
+		return {"Result" : "result"}
 		
 	def draw_buttons(self, context, layout):
 		layout.prop(self, "mathTypesProperty")

@@ -12,8 +12,10 @@ class VectorLengthNode(Node, AnimationNode):
 		self.inputs.new("VectorSocket", "Vector")
 		self.outputs.new("FloatSocket", "Length")
 		
-	def getSocketVariableConnections(self):
-		return ({"Vector" : "vector"}, {"Length" : "length"})
+	def getInputSocketNames(self):
+		return {"Vector" : "vector"}
+	def getOutputSocketNames(self):
+		return {"Length" : "length"}
 		
 	def execute(self, vector):
 		return mathutils.Vector(vector).length
