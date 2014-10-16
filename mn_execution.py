@@ -56,34 +56,72 @@ def rebuildNodeNetworks():
 # Force Cache Rebuilding Panel
 ##############################
 		
-class AnimationNodesPanel(bpy.types.Panel):
-	bl_idname = "mn.panel"
-	bl_label = "Animation Nodes"
+class AnimationNodesPerformance(bpy.types.Panel):
+	bl_idname = "mn.performance_panel"
+	bl_label = "Performance"
 	bl_space_type = "NODE_EDITOR"
-	bl_region_type = "UI"
-	bl_context = "objectmode"
+	bl_region_type = "TOOLS"
+	bl_category = "Settings"
+	
+	@classmethod
+	def poll(self, context):
+		return context.space_data.tree_type == "AnimationNodeTreeType"
 	
 	def draw(self, context):
 		layout = self.layout
-		layout.operator("mn.force_full_update")
-		layout.operator("mn.print_node_tree_execution_string")
 		scene = context.scene
 		layout.label("Update when:")
 		layout.prop(scene, "updateAnimationTreeOnFrameChange", text = "Frames Changes")
 		layout.prop(scene, "updateAnimationTreeOnSceneUpdate", text = "Scene Updates")
 		layout.prop(scene, "updateAnimationTreeOnPropertyChange", text = "Property Changes")
-		layout.prop(scene, "printUpdateTime", text = "Print Update Time")
-		layout.prop(scene, "showFullError", text = "Show Full Error")
-		layout.prop(scene, "nodeExecutionProfiling", text = "Node Execution Profiling")
-		
-		layout.operator("mn.load_normal_node_template")
-		layout.operator("mn.append_auto_update_code")
-		layout.prop(scene, "customNodeCategory")
+	
+class CustomAnimationNodes(bpy.types.Panel):
+	bl_idname = "mn.custom_nodes_panel"
+	bl_label = "Custom Nodes"
+	bl_space_type = "NODE_EDITOR"
+	bl_region_type = "TOOLS"
+	bl_category = "Settings"
+	
+	@classmethod
+	def poll(self, context):
+		return context.space_data.tree_type == "AnimationNodeTreeType"
+	
+	def draw(self, context):
+		layout = self.layout
+		scene = context.scene
+		layout.prop(scene, "customNodeCategory", text = "Category")
 		customNodeClasses = getCustomNodesInCategory(scene.customNodeCategory)
 		for nodeClass in customNodeClasses:
 			newNode = layout.operator("node.add_node", text = nodeClass.bl_label)
 			newNode.type = nodeClass.bl_idname
 			newNode.use_transform = True
+	
+class AnimationNodesDeveloperPanel(bpy.types.Panel):
+	bl_idname = "mn.developer_panel"
+	bl_label = "Developer"
+	bl_space_type = "NODE_EDITOR"
+	bl_region_type = "TOOLS"
+	bl_category = "Settings"
+	
+	@classmethod
+	def poll(self, context):
+		return context.space_data.tree_type == "AnimationNodeTreeType"
+	
+	def draw(self, context):
+		layout = self.layout
+		scene = context.scene
+		col = layout.column(align = True)
+		col.operator("mn.load_normal_node_template", "Load Template")
+		col.operator("mn.append_auto_update_code")
+		
+		col = layout.column(align = True)
+		col.operator("mn.force_full_update")
+		col.operator("mn.print_node_tree_execution_string")
+		
+		col = layout.column(align = True)
+		col.prop(scene, "printUpdateTime", text = "Print Update Time")
+		col.prop(scene, "showFullError", text = "Show Full Error")
+		col.prop(scene, "nodeExecutionProfiling", text = "Node Execution Profiling")
 		
 		
 		
@@ -138,18 +176,10 @@ class AppendAutoUpdateCode(bpy.types.Operator):
 						space.text.from_string(textString)
 		return {'FINISHED'}
 	
-	
-		
-# handlers to start the update
+
+# custom nodes
 ##############################
-
-bpy.types.Scene.updateAnimationTreeOnFrameChange = bpy.props.BoolProperty(default = True, name = "Update Animation Tree On Frame Change")
-bpy.types.Scene.updateAnimationTreeOnSceneUpdate = bpy.props.BoolProperty(default = True, name = "Update Animation Tree On Scene Update")
-bpy.types.Scene.updateAnimationTreeOnPropertyChange = bpy.props.BoolProperty(default = True, name = "Update Animation Tree On Property Change")
-
-bpy.types.Scene.printUpdateTime = bpy.props.BoolProperty(default = False, name = "Print Update Time")
-bpy.types.Scene.showFullError = bpy.props.BoolProperty(default = False, name = "Show Full Error")
-bpy.types.Scene.nodeExecutionProfiling = bpy.props.BoolProperty(default = False, name = "Node Execution Profiling")
+	
 
 def getAllAnimationNodeClasses():
 	from mn_node_base import AnimationNode
@@ -190,8 +220,13 @@ def getCustomNodesInCategory(category):
 def getCustomNodes(self, context):
 	return [("mn_TimeInfoNode", "Time Info", "")]
 	
-bpy.types.Scene.customNodeName = bpy.props.EnumProperty(items = getCustomNodes, name = "Custom Node Name")
 bpy.types.Scene.customNodeCategory = bpy.props.EnumProperty(items = getCustomNodeCategoryItems, name = "Custom Categories")
+	
+	
+	
+# handlers to start the update
+##############################
+
 	
 @persistent
 def frameChangeHandler(scene):
@@ -207,8 +242,18 @@ def fileLoadHandler(scene):
 def nodePropertyChanged(self, context):
 	if context.scene.updateAnimationTreeOnPropertyChange:
 		updateAnimationTrees(False)
+def settingPropertyChanged(self, context):
+	updateAnimationTrees(True)
 def nodeTreeChanged():
 	updateAnimationTrees(True)
+	
+bpy.types.Scene.updateAnimationTreeOnFrameChange = bpy.props.BoolProperty(default = True, name = "Update Animation Tree On Frame Change")
+bpy.types.Scene.updateAnimationTreeOnSceneUpdate = bpy.props.BoolProperty(default = True, name = "Update Animation Tree On Scene Update")
+bpy.types.Scene.updateAnimationTreeOnPropertyChange = bpy.props.BoolProperty(default = True, name = "Update Animation Tree On Property Change")
+
+bpy.types.Scene.printUpdateTime = bpy.props.BoolProperty(default = False, name = "Print Update Time")
+bpy.types.Scene.showFullError = bpy.props.BoolProperty(default = False, name = "Show Full Error")
+bpy.types.Scene.nodeExecutionProfiling = bpy.props.BoolProperty(default = False, name = "Node Execution Profiling", update = settingPropertyChanged)
 
 	
 bpy.app.handlers.frame_change_post.append(frameChangeHandler)
