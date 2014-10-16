@@ -3,8 +3,8 @@ from bpy.types import Node
 from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
-class RandomNumberNode(Node, AnimationNode):
-	bl_idname = "RandomNumberNode"
+class mn_RandomNumberNode(Node, AnimationNode):
+	bl_idname = "mn_RandomNumberNode"
 	bl_label = "Random Number"
 	
 	def init(self, context):

@@ -1,21 +1,23 @@
 import bpy
 from bpy.types import Node
 from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged
+from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from mn_utils import *
 
-class StringPropertyGroup(bpy.types.PropertyGroup):
+class mn_StringPropertyGroup(bpy.types.PropertyGroup):
 	string = bpy.props.StringProperty(name = "String", default = "", update = nodePropertyChanged)
 
-class StringListInputNode(Node, AnimationNode):
-	bl_idname = "StringListInputNode"
+class mn_StringListInputNode(Node, AnimationNode):
+	bl_idname = "mn_StringListInputNode"
 	bl_label = "String List"
 	
-	strings = bpy.props.CollectionProperty(type = StringPropertyGroup)
+	strings = bpy.props.CollectionProperty(type = mn_StringPropertyGroup)
 	showEditOptions = bpy.props.BoolProperty(default = True)
 	
 	def init(self, context):
+		forbidCompiling()
 		self.outputs.new("StringListSocket", "Strings")
+		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
 		layout.prop(self, "showEditOptions", text = "Show Options")

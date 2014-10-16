@@ -1,16 +1,18 @@
 import bpy
 from bpy.types import Node
 from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged
+from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
-class FloatInputNode(Node, AnimationNode):
-	bl_idname = "FloatInputNode"
+class mn_FloatInputNode(Node, AnimationNode):
+	bl_idname = "mn_FloatInputNode"
 	bl_label = "Float"
 	
 	floatProperty = bpy.props.FloatProperty(default = 0.0, update = nodePropertyChanged)
 	
 	def init(self, context):
+		forbidCompiling()
 		self.outputs.new("FloatSocket", "Number")
+		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
 		layout.prop(self, "floatProperty", text = "")

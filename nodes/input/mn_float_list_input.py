@@ -1,21 +1,23 @@
 import bpy
 from bpy.types import Node
 from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged
+from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from mn_utils import *
 
-class FloatPropertyGroup(bpy.types.PropertyGroup):
+class mn_FloatPropertyGroup(bpy.types.PropertyGroup):
 	value = bpy.props.FloatProperty(name = "Value", default = 0, update = nodePropertyChanged)
 
-class FloatListInputNode(Node, AnimationNode):
-	bl_idname = "FloatListInputNode"
+class mn_FloatListInputNode(Node, AnimationNode):
+	bl_idname = "mn_FloatListInputNode"
 	bl_label = "Float List"
 	
-	numbers = bpy.props.CollectionProperty(type = FloatPropertyGroup)
+	numbers = bpy.props.CollectionProperty(type = mn_FloatPropertyGroup)
 	showEditOptions = bpy.props.BoolProperty(default = True)
 	
 	def init(self, context):
+		forbidCompiling()
 		self.outputs.new("FloatListSocket", "Numbers")
+		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
 		layout.prop(self, "showEditOptions", text = "Show Options")

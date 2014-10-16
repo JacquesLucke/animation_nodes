@@ -1,17 +1,18 @@
 import bpy
 from bpy.types import Node
 from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged
+from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
-class ColorInputNode(Node, AnimationNode):
-	bl_idname = "ColorInputNode"
+class mn_ColorInputNode(Node, AnimationNode):
+	bl_idname = "mn_ColorInputNode"
 	bl_label = "Color"
 	
 	colorProperty = bpy.props.FloatVectorProperty(default = [0.5, 0.5, 0.5], subtype = "COLOR", soft_min = 0.0, soft_max = 1.0, update = nodePropertyChanged)
 	
 	def init(self, context):
+		forbidCompiling()
 		self.outputs.new("ColorSocket", "Color")
-		pass
+		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
 		layout.template_color_picker(self, "colorProperty", value_slider = True)

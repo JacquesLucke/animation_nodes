@@ -1,29 +1,31 @@
 import bpy, math
 from bpy.types import Node
 from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged
+from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from mn_utils import *
 from mn_object_utils import *
 from mn_node_helper import *
 from mn_cache import *
 
-class BakedSoundPropertyGroup(bpy.types.PropertyGroup):
+class mn_BakedSoundPropertyGroup(bpy.types.PropertyGroup):
 	low = bpy.props.FloatProperty(name = "Lowest Frequency", default = 10.0)
 	high = bpy.props.FloatProperty(name = "Highest Frequency", default = 5000.0)
 	path = bpy.props.StringProperty(name = "Path", default = "")
 	propertyName = bpy.props.StringProperty(name = "Property Path", default = "")
 
-class SoundBakeNode(Node, AnimationNode):
-	bl_idname = "SoundBakeNode"
+class mn_SoundBakeNode(Node, AnimationNode):
+	bl_idname = "mn_SoundBakeNode"
 	bl_label = "Sound Bake"
 	
-	bakedSound = bpy.props.CollectionProperty(type = BakedSoundPropertyGroup)
+	bakedSound = bpy.props.CollectionProperty(type = mn_BakedSoundPropertyGroup)
 	soundObjectName = bpy.props.StringProperty()
 	filePath = bpy.props.StringProperty()
 	
 	def init(self, context):
+		forbidCompiling()
 		self.use_custom_color = True
 		self.color = [0.3, 0.6, 0.4]
+		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
 		layout.separator()

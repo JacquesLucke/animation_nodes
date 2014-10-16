@@ -4,14 +4,14 @@ from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged
 from mn_utils import *
 
-class ObjectPropertyGroup(bpy.types.PropertyGroup):
+class mn_ObjectPropertyGroup(bpy.types.PropertyGroup):
 	object = bpy.props.StringProperty(name = "Object", default = "", update = nodePropertyChanged)
 
-class ObjectListInputNode(Node, AnimationNode):
-	bl_idname = "ObjectListInputNode"
+class mn_ObjectListInputNode(Node, AnimationNode):
+	bl_idname = "mn_ObjectListInputNode"
 	bl_label = "Object List"
 	
-	objects = bpy.props.CollectionProperty(type = ObjectPropertyGroup)
+	objects = bpy.props.CollectionProperty(type = mn_ObjectPropertyGroup)
 	showEditOptions = bpy.props.BoolProperty(default = True)
 	
 	def init(self, context):

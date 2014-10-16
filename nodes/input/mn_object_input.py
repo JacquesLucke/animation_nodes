@@ -1,17 +1,19 @@
 import bpy
 from bpy.types import Node
 from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged
+from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from mn_utils import *
 
-class ObjectInputNode(Node, AnimationNode):
-	bl_idname = "ObjectInputNode"
+class mn_ObjectInputNode(Node, AnimationNode):
+	bl_idname = "mn_ObjectInputNode"
 	bl_label = "Object"
 	
 	objectName = bpy.props.StringProperty(update = nodePropertyChanged)
 	
 	def init(self, context):
+		forbidCompiling()
 		self.outputs.new("ObjectSocket", "Object")
+		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
 		col = layout.column()

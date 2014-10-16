@@ -1,18 +1,20 @@
 import bpy
 from bpy.types import Node
 from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged
+from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
-class CharactersNode(Node, AnimationNode):
-	bl_idname = "CharactersNode"
+class mn_CharactersNode(Node, AnimationNode):
+	bl_idname = "mn_CharactersNode"
 	bl_label = "Characters"
 	
 	def init(self, context):
+		forbidCompiling()
 		self.outputs.new("StringSocket", "Lower Case")
 		self.outputs.new("StringSocket", "Upper Case")
 		self.outputs.new("StringSocket", "Digits")
 		self.outputs.new("StringSocket", "Special")
 		self.outputs.new("StringSocket", "All")
+		allowCompiling()
 		
 	def getInputSocketNames(self):
 		return {}

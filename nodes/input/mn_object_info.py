@@ -1,13 +1,13 @@
 import bpy
 from bpy.types import Node
 from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged
+from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from mn_utils import *
 from mn_object_utils import *
 from bpy.props import BoolProperty
 
-class ObjectInfoNode(Node, AnimationNode):
-	bl_idname = "ObjectInfoNode"
+class mn_ObjectInfoNode(Node, AnimationNode):
+	bl_idname = "mn_ObjectInfoNode"
 	bl_label = "Object Info"
 	
 	frameTypes = [
@@ -16,6 +16,7 @@ class ObjectInfoNode(Node, AnimationNode):
 	frameTypesProperty = bpy.props.EnumProperty(name = "Frame Type", items = frameTypes, default = "OFFSET")
 	
 	def init(self, context):
+		forbidCompiling()
 		self.inputs.new("ObjectSocket", "Object")
 		self.inputs.new("FloatSocket", "Frame")
 		self.outputs.new("VectorSocket", "Location")
@@ -24,6 +25,7 @@ class ObjectInfoNode(Node, AnimationNode):
 		self.outputs.new("VectorSocket", "Location Velocity")
 		self.outputs.new("VectorSocket", "Rotation Velocity")
 		self.outputs.new("VectorSocket", "Scale Velocity")
+		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
 		layout.prop(self, "frameTypesProperty")

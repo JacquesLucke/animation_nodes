@@ -1,30 +1,32 @@
 import bpy, math
 from bpy.types import Node
 from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged
+from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from mn_utils import *
 from mn_object_utils import *
 from mn_node_helper import *
 from mn_cache import *
 
 
-class SoundInputNode(Node, AnimationNode):
-	bl_idname = "SoundInputNode"
+class mn_SoundInputNode(Node, AnimationNode):
+	bl_idname = "mn_SoundInputNode"
 	bl_label = "Sound Input"
 	
 	def getSoundNodesInTree(self, context):
 		bakeNodeNames = []
 		for node in self.id_data.nodes:
-			if node.bl_idname == "SoundBakeNode":
+			if node.bl_idname == "mn_SoundBakeNode":
 				bakeNodeNames.append((node.name, node.name, ""))
 		return bakeNodeNames
 		
 	bakeNodeName = bpy.props.EnumProperty(items = getSoundNodesInTree, name = "Bake Node", update = nodePropertyChanged)
 	
 	def init(self, context):
+		forbidCompiling()
 		self.inputs.new("FloatSocket", "Value")
 		self.outputs.new("FloatListSocket", "Strengths")
 		self.outputs.new("FloatSocket", "Strength")
+		allowCompiling()
 		
 	def getInputSocketNames(self):
 		return {"Value" : "value"}

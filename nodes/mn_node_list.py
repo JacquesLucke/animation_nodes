@@ -2,21 +2,21 @@ def getNodeNameDictionary():
 	nodes = []
 	
 	nodes.append(("Input", [
-		"IntegerInputNode",
-		"FloatInputNode",
-		"StringInputNode",
-		"ObjectInputNode",
-		"TimeInfoNode",
-		"ObjectInfoNode",
-		"RandomNumberNode",
-		"RandomStringNode",
-		"CharactersNode",
-		"FloatListInputNode",
-		"StringListInputNode",
-		"ObjectListInputNode",
-		"SoundBakeNode",
-		"SoundInputNode",
-		"ColorInputNode" ] ))
+		"mn_IntegerInputNode",
+		"mn_FloatInputNode",
+		"mn_StringInputNode",
+		"mn_ObjectInputNode",
+		"mn_TimeInfoNode",
+		"mn_ObjectInfoNode",
+		"mn_RandomNumberNode",
+		"mn_RandomStringNode",
+		"mn_CharactersNode",
+		"mn_FloatListInputNode",
+		"mn_StringListInputNode",
+		"mn_ObjectListInputNode",
+		"mn_SoundBakeNode",
+		"mn_SoundInputNode",
+		"mn_ColorInputNode" ] ))
 		
 	nodes.append(("Generate", [
 		"mn_ReplicateObjectNode" ] ))
