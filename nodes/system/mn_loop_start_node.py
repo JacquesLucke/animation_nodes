@@ -6,19 +6,19 @@ from mn_dynamic_sockets_helper import *
 from mn_utils import *
 
 
-class mn_SubProgramStartNode(Node, AnimationNode):
-	bl_idname = "mn_SubProgramStartNode"
-	bl_label = "Sub-Program Start"
+class mn_LoopStartNode(Node, AnimationNode):
+	bl_idname = "mn_LoopStartNode"
+	bl_label = "Loop Start"
 	
 	sockets = bpy.props.CollectionProperty(type = SocketPropertyGroup)
 	showEditOptions = bpy.props.BoolProperty(default = True)
-	subProgramName = bpy.props.StringProperty(default = "Name")
+	loopName = bpy.props.StringProperty(default = "Name")
 	
 	def init(self, context):
 		self.outputs.new("IntegerSocket", "Index")
 		
 	def draw_buttons(self, context, layout):
-		layout.prop(self, "subProgramName", text = "Name")
+		layout.prop(self, "loopName", text = "Name")
 		layout.prop(self, "showEditOptions", text = "Show Options")
 		layout.separator()
 		if self.showEditOptions:
@@ -76,6 +76,6 @@ class mn_SubProgramStartNode(Node, AnimationNode):
 			
 	def updateCallerNodeSockets(self):
 		for node in self.id_data.nodes:
-			if node.bl_idname == "mn_SubProgramNode":
+			if node.bl_idname == "mn_LoopNode":
 				if node.subProgramsEnum == self.subProgramName:
 					rebuildSockets(node)

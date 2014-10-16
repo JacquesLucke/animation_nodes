@@ -24,21 +24,21 @@ def sortNetworks(nodeNetworks):
 		setUniqueCodeIndexToEveryNode(network)
 		networkType = getNetworkType(network)
 		if networkType == "Normal": normalNetworks.append(network)
-		elif networkType == "SubProgram" or networkType == "EnumerateObjects":
+		elif networkType == "Loop":
 			startNode = getSubProgramStartNode(network)
 			subNetworks[getNodeIdentifier(startNode)] = network
 		
 def getNetworkType(network):
-	subProgramAmount = 0
+	loopStarterAmount = 0
 	for node in network:
-		if node.bl_idname == "mn_SubProgramStartNode" or node.bl_idname == "mn_EnumerateObjectsStartNode":
-			subProgramAmount += 1
-	if subProgramAmount == 0: return "Normal"
-	elif subProgramAmount == 1: return "SubProgram"
+		if node.bl_idname == "mn_LoopStartNode" or node.bl_idname == "mn_EnumerateObjectsStartNode":
+			loopStarterAmount += 1
+	if loopStarterAmount == 0: return "Normal"
+	elif loopStarterAmount == 1: return "Loop"
 	return "Invalid"
 def getSubProgramStartNode(network):
 	for node in network:
-		if node.bl_idname == "mn_SubProgramStartNode" or node.bl_idname == "mn_EnumerateObjectsStartNode":
+		if node.bl_idname == "mn_LoopStartNode" or node.bl_idname == "mn_EnumerateObjectsStartNode":
 			return node
 			
 idCounter = 0
@@ -225,8 +225,8 @@ class NetworkCodeGenerator:
 		codeLines = []
 		if isExecuteableNode(node):
 			codeLines.extend(self.getExecutableNodeCode(node))
-		elif isSubProgramNode(node):
-			codeLines.extend(self.getSubProgramNodeCode(node))
+		elif isLoopNode(node):
+			codeLines.extend(self.getLoopNodeCode(node))
 		elif isEnumerateObjectsNode(node):
 			codeLines.extend(self.getEnumerateObjectsNodeCode(node))
 		return codeLines		
@@ -237,7 +237,7 @@ class NetworkCodeGenerator:
 		codeLines.append(self.getNodeExecutionString(node))
 		if bpy.context.scene.nodeExecutionProfiling: codeLines.append(getNodeTimerName(node) + " += time.clock() - " + getNodeTimerStartName(node))
 		return codeLines
-	def getSubProgramNodeCode(self, node):
+	def getLoopNodeCode(self, node):
 		codeLines = []
 		codeLines.append(getNodeInputName(node) + " = " + self.generateInputListString(node))
 		startNode = getCorrespondingStartNode(node)
@@ -369,8 +369,8 @@ def getCorrespondingStartNode(node):
 		
 def isExecuteableNode(node):
 	return hasattr(node, "execute")
-def isSubProgramNode(node):
-	return node.bl_idname == "mn_SubProgramNode"
+def isLoopNode(node):
+	return node.bl_idname == "mn_LoopNode"
 def isEnumerateObjectsNode(node):
 	return node.bl_idname == "mn_EnumerateObjectsNode"
 	

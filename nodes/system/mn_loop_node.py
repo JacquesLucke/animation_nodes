@@ -5,26 +5,26 @@ from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, f
 from mn_utils import *
 from mn_dynamic_sockets_helper import *
 
-class mn_SubProgramNode(Node, AnimationNode):
-	bl_idname = "mn_SubProgramNode"
-	bl_label = "Sub-Program"
+class mn_LoopNode(Node, AnimationNode):
+	bl_idname = "mn_LoopNode"
+	bl_label = "Loop"
 	
 	def getSubProgramNames(self, context):
 		nodeTree = self.id_data
 		subProgramNames = []
 		for node in nodeTree.nodes:
-			if node.bl_idname == "mn_SubProgramStartNode": subProgramNames.append((node.subProgramName, node.subProgramName, ""))
+			if node.bl_idname == "mn_LoopStartNode": subProgramNames.append((node.loopName, node.loopName, ""))
 		return subProgramNames
 	def selectedProgramChanged(self, context):
 		rebuildSockets(self)
 	
-	subProgramsEnum = bpy.props.EnumProperty(items = getSubProgramNames, name = "Sub-Programs", update=selectedProgramChanged)
+	loopsEnum = bpy.props.EnumProperty(items = getSubProgramNames, name = "Loop", update=selectedProgramChanged)
 	
 	def init(self, context):
 		self.inputs.new("IntegerSocket", "Amount")
 		
 	def draw_buttons(self, context, layout):
-		layout.prop(self, "subProgramsEnum")
+		layout.prop(self, "loopsEnum")
 		rebuild = layout.operator("mn.rebuild_sub_program_caller_sockets", "Rebuild Sockets")
 		rebuild.nodeTreeName = self.id_data.name
 		rebuild.nodeName = self.name
@@ -35,9 +35,9 @@ class mn_SubProgramNode(Node, AnimationNode):
 			if i > 0: self.inputs.remove(socket)	
 
 	def getStartNode(self):
-		subProgramName = self.subProgramsEnum
+		loopName = self.loopsEnum
 		for node in self.id_data.nodes:
-			if node.bl_idname == "mn_SubProgramStartNode":
-				if node.subProgramName == subProgramName:
+			if node.bl_idname == "mn_LoopStartNode":
+				if node.loopName == loopName:
 					return node
 		return None

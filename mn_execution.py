@@ -45,6 +45,7 @@ def rebuildNodeNetworks():
 	global compiledCodeObjects, codeStrings
 	del compiledCodeObjects[:]
 	del codeStrings[:]
+	codeStrings = getAllNetworkCodeStrings()
 	try:
 		codeStrings = getAllNetworkCodeStrings()
 		for code in codeStrings:
