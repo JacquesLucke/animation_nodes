@@ -118,7 +118,8 @@ class AppendAutoUpdateCode(bpy.types.Operator):
 					if space.text is not None:
 						textString = space.text.as_string()
 						textString += getAutoRegisterCode()
-						space.text.replace(textString)
+						space.text.clear()
+						space.text.write(textString)
 		return {'FINISHED'}
 	
 

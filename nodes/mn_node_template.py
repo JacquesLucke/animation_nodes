@@ -29,6 +29,7 @@ class mn_YourNodeName(Node, AnimationNode):
 
 def getAutoRegisterCode():
 	return '''
+	
 if __name__ == "__main__":
 	try: bpy.utils.register_module(__name__)
 	except: pass
