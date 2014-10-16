@@ -1,10 +1,10 @@
 import bpy, random
 from bpy.types import Node
 from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged
+from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
-class ShuffleListNode(Node, AnimationNode):
-	bl_idname = "ShuffleListNode"
+class mn_ShuffleListNode(Node, AnimationNode):
+	bl_idname = "mn_ShuffleListNode"
 	bl_label = "Shuffle List"
 	
 	def setSocketTypes(self, context):
@@ -18,6 +18,7 @@ class ShuffleListNode(Node, AnimationNode):
 	listTypesProperty = bpy.props.EnumProperty(name = "Type", items = listTypes, default = "OBJECT", update = setSocketTypes)
 	
 	def init(self, context):
+		forbidCompiling()
 		self.inputs.new("IntegerSocket", "Seed")
 		self.setSocketType(self.listTypesProperty)
 		
@@ -33,6 +34,7 @@ class ShuffleListNode(Node, AnimationNode):
 		return output
 		
 	def setSocketType(self, type):
+		forbidCompiling()
 		try:
 			self.inputs.remove(self.inputs["List"])
 			self.outputs.remove(self.outputs["Shuffled List"])
@@ -48,3 +50,4 @@ class ShuffleListNode(Node, AnimationNode):
 			self.inputs.new("ObjectListSocket", "List")
 			self.outputs.new("ObjectListSocket", "Shuffled List")
 		self.inputs.move(0, 1)
+		forbidCompiling()

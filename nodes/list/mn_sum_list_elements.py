@@ -1,11 +1,11 @@
 import bpy
 from bpy.types import Node
 from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged
+from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from mn_utils import *
 
-class SumListElementsNode(Node, AnimationNode):
-	bl_idname = "SumListElementsNode"
+class mn_SumListElementsNode(Node, AnimationNode):
+	bl_idname = "mn_SumListElementsNode"
 	bl_label = "Sum Elements"
 	
 	def setSocketTypes(self, context):
@@ -18,6 +18,7 @@ class SumListElementsNode(Node, AnimationNode):
 	listTypesProperty = bpy.props.EnumProperty(name = "Type", items = listTypes, default = "FLOAT", update = setSocketTypes)
 	
 	def init(self, context):
+		forbidCompiling()
 		self.setSocketType(self.listTypesProperty)
 		
 	def draw_buttons(self, context, layout):
@@ -41,6 +42,7 @@ class SumListElementsNode(Node, AnimationNode):
 		return output
 		
 	def setSocketType(self, type):
+		forbidCompiling()
 		self.inputs.clear()
 		self.outputs.clear()
 		if type == "FLOAT":
@@ -53,3 +55,4 @@ class SumListElementsNode(Node, AnimationNode):
 			self.inputs.new("IntegerSocket", "Start")
 			self.inputs.new("IntegerSocket", "End")
 			self.outputs.new("StringSocket", "Sum")
+		forbidCompiling()

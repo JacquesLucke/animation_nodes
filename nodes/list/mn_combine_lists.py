@@ -1,11 +1,11 @@
 import bpy
 from bpy.types import Node
 from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged
+from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from mn_utils import *
 
-class CombineListsNode(Node, AnimationNode):
-	bl_idname = "CombineListsNode"
+class mn_CombineListsNode(Node, AnimationNode):
+	bl_idname = "mn_CombineListsNode"
 	bl_label = "Combine Lists"
 	
 	def setSocketTypes(self, context):
@@ -19,7 +19,9 @@ class CombineListsNode(Node, AnimationNode):
 	listTypesProperty = bpy.props.EnumProperty(name = "Type", items = listTypes, default = "OBJECT", update = setSocketTypes)
 	
 	def init(self, context):
+		forbidCompiling()
 		self.setSocketType(self.listTypesProperty)
+		forbidCompiling()
 		
 	def draw_buttons(self, context, layout):
 		layout.prop(self, "listTypesProperty")
@@ -32,6 +34,7 @@ class CombineListsNode(Node, AnimationNode):
 		return output
 		
 	def setSocketType(self, type):
+		forbidCompiling()
 		self.inputs.clear()
 		self.outputs.clear()
 		if type == "FLOAT":
@@ -46,3 +49,4 @@ class CombineListsNode(Node, AnimationNode):
 			self.inputs.new("ObjectListSocket", "List 1")
 			self.inputs.new("ObjectListSocket", "List 2")
 			self.outputs.new("ObjectListSocket", "Both Lists")
+		forbidCompiling()

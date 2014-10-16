@@ -1,10 +1,10 @@
 import bpy
 from bpy.types import Node
 from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged
+from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
-class SetListElementNode(Node, AnimationNode):
-	bl_idname = "SetListElementNode"
+class mn_SetListElementNode(Node, AnimationNode):
+	bl_idname = "mn_SetListElementNode"
 	bl_label = "Set Element"
 	
 	clampIndex = bpy.props.BoolProperty(default = True)
@@ -20,6 +20,7 @@ class SetListElementNode(Node, AnimationNode):
 	listTypesProperty = bpy.props.EnumProperty(name = "Type", items = listTypes, default = "OBJECT", update = setSocketTypes)
 	
 	def init(self, context):
+		forbidCompiling()
 		self.setSocketType(self.listTypesProperty)
 		
 	def draw_buttons(self, context, layout):
@@ -35,6 +36,7 @@ class SetListElementNode(Node, AnimationNode):
 		return output
 		
 	def setSocketType(self, type):
+		forbidCompiling()
 		self.inputs.clear()
 		self.outputs.clear()
 		if type == "FLOAT":
@@ -52,3 +54,4 @@ class SetListElementNode(Node, AnimationNode):
 			self.inputs.new("ObjectSocket", "Value")
 			self.inputs.new("IntegerSocket", "Index")
 			self.outputs.new("ObjectListSocket", "List")
+		forbidCompiling()

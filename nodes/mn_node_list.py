@@ -48,12 +48,12 @@ def getNodeNameDictionary():
 		"mn_VectorLengthNode" ] ))
 		
 	nodes.append(("List", [
-		"GetListElementNode",
-		"GetListLengthNode",
-		"SetListElementNode",
-		"SumListElementsNode",
-		"CombineListsNode",
-		"ShuffleListNode" ] ))
+		"mn_GetListElementNode",
+		"mn_GetListLengthNode",
+		"mn_SetListElementNode",
+		"mn_SumListElementsNode",
+		"mn_CombineListsNode",
+		"mn_ShuffleListNode" ] ))
 		
 	nodes.append(("Script", [
 		"ExpressionNode" ] ))
