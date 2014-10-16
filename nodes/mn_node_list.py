@@ -59,8 +59,8 @@ def getNodeNameDictionary():
 		"mn_ExpressionNode" ] ))
 		
 	nodes.append(("System", [
-		"SubProgramNode",
-		"SubProgramStartNode",
-		"EnumerateObjectsStartNode",
-		"EnumerateObjectsNode" ] ))
+		"mn_SubProgramNode",
+		"mn_SubProgramStartNode",
+		"mn_EnumerateObjectsStartNode",
+		"mn_EnumerateObjectsNode" ] ))
 	return nodes

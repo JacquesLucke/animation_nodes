@@ -5,15 +5,15 @@ from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, f
 from mn_utils import *
 from mn_dynamic_sockets_helper import *
 
-class SubProgramNode(Node, AnimationNode):
-	bl_idname = "SubProgramNode"
+class mn_SubProgramNode(Node, AnimationNode):
+	bl_idname = "mn_SubProgramNode"
 	bl_label = "Sub-Program"
 	
 	def getSubProgramNames(self, context):
 		nodeTree = self.id_data
 		subProgramNames = []
 		for node in nodeTree.nodes:
-			if node.bl_idname == "SubProgramStartNode": subProgramNames.append((node.subProgramName, node.subProgramName, ""))
+			if node.bl_idname == "mn_SubProgramStartNode": subProgramNames.append((node.subProgramName, node.subProgramName, ""))
 		return subProgramNames
 	def selectedProgramChanged(self, context):
 		rebuildSockets(self)
@@ -37,7 +37,7 @@ class SubProgramNode(Node, AnimationNode):
 	def getStartNode(self):
 		subProgramName = self.subProgramsEnum
 		for node in self.id_data.nodes:
-			if node.bl_idname == "SubProgramStartNode":
+			if node.bl_idname == "mn_SubProgramStartNode":
 				if node.subProgramName == subProgramName:
 					return node
 		return None

@@ -5,15 +5,15 @@ from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, f
 from mn_utils import *
 from mn_dynamic_sockets_helper import *
 
-class EnumerateObjectsNode(Node, AnimationNode):
-	bl_idname = "EnumerateObjectsNode"
+class mn_EnumerateObjectsNode(Node, AnimationNode):
+	bl_idname = "mn_EnumerateObjectsNode"
 	bl_label = "Loop Objects"
 	
 	def getEnumerateObjectStartNodeNames(self, context):
 		nodeTree = self.id_data
 		subProgramNames = []
 		for node in nodeTree.nodes:
-			if node.bl_idname == "EnumerateObjectsStartNode": subProgramNames.append((node.subProgramName, node.subProgramName, ""))
+			if node.bl_idname == "mn_EnumerateObjectsStartNode": subProgramNames.append((node.subProgramName, node.subProgramName, ""))
 		return subProgramNames
 	def selectedProgramChanged(self, context):
 		rebuildSockets(self)
@@ -31,7 +31,7 @@ class EnumerateObjectsNode(Node, AnimationNode):
 		row.prop(self, "subProgramsEnum", text = "")
 		newNode = row.operator("node.add_node", text = "", icon = "PLUS")
 		newNode.use_transform = True
-		newNode.type = "EnumerateObjectsStartNode"
+		newNode.type = "mn_EnumerateObjectsStartNode"
 		
 		rebuild = layout.operator("mn.rebuild_sub_program_caller_sockets", "Rebuild Sockets")
 		rebuild.nodeTreeName = self.id_data.name
@@ -48,7 +48,7 @@ class EnumerateObjectsNode(Node, AnimationNode):
 	def getStartNode(self):
 		subProgramsName = self.subProgramsEnum
 		for node in self.id_data.nodes:
-			if node.bl_idname == "EnumerateObjectsStartNode":
+			if node.bl_idname == "mn_EnumerateObjectsStartNode":
 				if node.subProgramName == subProgramsName:
 					return node
 		return None

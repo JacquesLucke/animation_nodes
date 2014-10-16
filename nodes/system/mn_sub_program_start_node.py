@@ -6,8 +6,8 @@ from mn_dynamic_sockets_helper import *
 from mn_utils import *
 
 
-class SubProgramStartNode(Node, AnimationNode):
-	bl_idname = "SubProgramStartNode"
+class mn_SubProgramStartNode(Node, AnimationNode):
+	bl_idname = "mn_SubProgramStartNode"
 	bl_label = "Sub-Program Start"
 	
 	sockets = bpy.props.CollectionProperty(type = SocketPropertyGroup)
@@ -76,6 +76,6 @@ class SubProgramStartNode(Node, AnimationNode):
 			
 	def updateCallerNodeSockets(self):
 		for node in self.id_data.nodes:
-			if node.bl_idname == "SubProgramNode":
+			if node.bl_idname == "mn_SubProgramNode":
 				if node.subProgramsEnum == self.subProgramName:
 					rebuildSockets(node)

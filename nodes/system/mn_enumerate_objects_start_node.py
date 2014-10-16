@@ -5,8 +5,8 @@ from mn_dynamic_sockets_helper import *
 from mn_execution import nodePropertyChanged
 from mn_utils import *
 
-class EnumerateObjectsStartNode(Node, AnimationNode):
-	bl_idname = "EnumerateObjectsStartNode"
+class mn_EnumerateObjectsStartNode(Node, AnimationNode):
+	bl_idname = "mn_EnumerateObjectsStartNode"
 	bl_label = "Object Loop Start"
 	
 	sockets = bpy.props.CollectionProperty(type = SocketPropertyGroup)
@@ -32,7 +32,7 @@ class EnumerateObjectsStartNode(Node, AnimationNode):
 			
 			newNode = row.operator("node.add_node", text = "", icon = "PLUS")
 			newNode.use_transform = True
-			newNode.type = "EnumerateObjectsNode"
+			newNode.type = "mn_EnumerateObjectsNode"
 		
 			col = layout.column(align = True)
 			for index, item in enumerate(self.sockets):
@@ -83,6 +83,6 @@ class EnumerateObjectsStartNode(Node, AnimationNode):
 			
 	def updateCallerNodeSockets(self):
 		for node in self.id_data.nodes:
-			if node.bl_idname == "EnumerateObjectsNode":
+			if node.bl_idname == "mn_EnumerateObjectsNode":
 				if node.subProgramsEnum == self.subProgramName:
 					rebuildSockets(node)

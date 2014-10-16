@@ -31,14 +31,14 @@ def sortNetworks(nodeNetworks):
 def getNetworkType(network):
 	subProgramAmount = 0
 	for node in network:
-		if node.bl_idname == "SubProgramStartNode" or node.bl_idname == "EnumerateObjectsStartNode":
+		if node.bl_idname == "mn_SubProgramStartNode" or node.bl_idname == "mn_EnumerateObjectsStartNode":
 			subProgramAmount += 1
 	if subProgramAmount == 0: return "Normal"
 	elif subProgramAmount == 1: return "SubProgram"
 	return "Invalid"
 def getSubProgramStartNode(network):
 	for node in network:
-		if node.bl_idname == "SubProgramStartNode" or node.bl_idname == "EnumerateObjectsStartNode":
+		if node.bl_idname == "mn_SubProgramStartNode" or node.bl_idname == "mn_EnumerateObjectsStartNode":
 			return node
 			
 idCounter = 0
@@ -370,9 +370,9 @@ def getCorrespondingStartNode(node):
 def isExecuteableNode(node):
 	return hasattr(node, "execute")
 def isSubProgramNode(node):
-	return node.bl_idname == "SubProgramNode"
+	return node.bl_idname == "mn_SubProgramNode"
 def isEnumerateObjectsNode(node):
-	return node.bl_idname == "EnumerateObjectsNode"
+	return node.bl_idname == "mn_EnumerateObjectsNode"
 	
 def usesFastCall(node):
 	if hasattr(node, "getInputSocketNames"):
