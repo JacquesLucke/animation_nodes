@@ -51,6 +51,9 @@ def rebuildNodeNetworks():
 			compiledCodeObjects.append(compile(code, "<string>", "exec"))
 	except:
 		pass
+		
+def getCodeStrings():
+	return codeStrings
 	
 	
 	

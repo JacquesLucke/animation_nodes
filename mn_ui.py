@@ -1,4 +1,5 @@
 import bpy
+from mn_execution import getCodeStrings
 
 class AnimationNodesPerformance(bpy.types.Panel):
 	bl_idname = "mn.performance_panel"
@@ -82,7 +83,7 @@ class PrintNodeTreeExecutionStrings(bpy.types.Operator):
 
 	def execute(self, context):
 		print()
-		for codeString in codeStrings:
+		for codeString in getCodeStrings():
 			print(codeString)
 			print()
 			print("-"*80)
