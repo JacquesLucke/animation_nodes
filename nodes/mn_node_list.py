@@ -56,7 +56,7 @@ def getNodeNameDictionary():
 		"mn_ShuffleListNode" ] ))
 		
 	nodes.append(("Script", [
-		"ExpressionNode" ] ))
+		"mn_ExpressionNode" ] ))
 		
 	nodes.append(("System", [
 		"SubProgramNode",

@@ -1,17 +1,19 @@
 import bpy
 from bpy.types import Node
 from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged
+from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
-class ExpressionNode(Node, AnimationNode):
-	bl_idname = "ExpressionNode"
+class mn_ExpressionNode(Node, AnimationNode):
+	bl_idname = "mn_ExpressionNode"
 	bl_label = "Expression"
 	
 	def init(self, context):
+		forbidCompiling()
 		self.inputs.new("StringSocket", "Expression").string = "a+b"
 		self.inputs.new("GenericSocket", "a")
 		self.inputs.new("GenericSocket", "b")
 		self.outputs.new("GenericSocket", "Result")
+		allowCompiling()
 		
 	def execute(self, input):
 		a = input["a"]
@@ -21,7 +23,7 @@ class ExpressionNode(Node, AnimationNode):
 		try:
 			result = eval(expression)
 		except:
-			print("expression error - " + expression + " # " + self.name)
+			pass
 		output = {}
 		output["Result"] = result
 		return output
