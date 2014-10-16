@@ -10,6 +10,7 @@ from mn_utils import *
 class mn_YourNodeName(Node, AnimationNode):
 	bl_idname = "mn_YourNodeName"
 	bl_label = "Template Node"
+	node_category = "my category"
 
 	def init(self, context):
 		forbidCompiling()
