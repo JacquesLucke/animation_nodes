@@ -1,11 +1,14 @@
+def getNormalNodeTemplate():
+	return '''
 import bpy
 from bpy.types import Node
 from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
-
-class TemplateNode(Node, AnimationNode):
-	bl_idname = "TemplateNode"
-	bl_label = "Node Template"
+from mn_utils import *
+	
+class mn_YourNodeName(Node, AnimationNode):
+	bl_idname = "mn_YourNodeName"
+	bl_label = "Template Node"
 
 	def init(self, context):
 		forbidCompiling()
@@ -28,3 +31,4 @@ class TemplateNode(Node, AnimationNode):
 		
 if __name__ == "__main__":
 	bpy.utils.register_module(__name__)
+'''

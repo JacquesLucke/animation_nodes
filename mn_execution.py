@@ -81,6 +81,7 @@ class AnimationNodesPanel(bpy.types.Panel):
 		newNode = layout.operator("node.add_node")
 		newNode.use_transform = True
 		newNode.type = scene.customNodeName
+		layout.operator("mn.load_normal_node_template")
 		
 		
 		
@@ -103,6 +104,20 @@ class PrintNodeTreeExecutionStrings(bpy.types.Operator):
 			print()
 			print("-"*80)
 			print()
+		return {'FINISHED'}
+		
+class LoadNormalNodeTemplate(bpy.types.Operator):
+	bl_idname = "mn.load_normal_node_template"
+	bl_label = "Load Normal Node Template"
+
+	def execute(self, context):
+		from mn_node_template import getNormalNodeTemplate
+		textBlockName = "node template"
+		textBlock = bpy.data.texts.get(textBlockName)
+		if textBlock is None:
+			textBlock = bpy.data.texts.new(textBlockName)
+		textBlock.clear()
+		textBlock.write(getNormalNodeTemplate())
 		return {'FINISHED'}
 	
 	
