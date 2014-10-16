@@ -29,8 +29,12 @@ class mn_YourNodeName(Node, AnimationNode):
 		output["New Text"] = amount * text
 		output["Length"] = len(output["New Text"])
 		return output
-		
+'''
+
+def getAutoRegisterCode():
+	return '''
 if __name__ == "__main__":
-	bpy.utils.register_module(__name__)
+	try: bpy.utils.register_module(__name__)
+	except: pass
 	
 '''

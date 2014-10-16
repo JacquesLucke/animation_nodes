@@ -45,7 +45,6 @@ def rebuildNodeNetworks():
 	global compiledCodeObjects, codeStrings
 	del compiledCodeObjects[:]
 	del codeStrings[:]
-	codeStrings = getAllNetworkCodeStrings()
 	try:
 		codeStrings = getAllNetworkCodeStrings()
 		for code in codeStrings:
@@ -82,6 +81,7 @@ class AnimationNodesPanel(bpy.types.Panel):
 		newNode.use_transform = True
 		newNode.type = scene.customNodeName
 		layout.operator("mn.load_normal_node_template")
+		layout.operator("mn.append_auto_update_code")
 		
 		
 		
@@ -111,13 +111,29 @@ class LoadNormalNodeTemplate(bpy.types.Operator):
 	bl_label = "Load Normal Node Template"
 
 	def execute(self, context):
-		from mn_node_template import getNormalNodeTemplate
+		from mn_node_template import getNormalNodeTemplate, getAutoRegisterCode
 		textBlockName = "mn_node_template.py"
 		textBlock = bpy.data.texts.get(textBlockName)
 		if textBlock is None:
 			textBlock = bpy.data.texts.new(textBlockName)
 		textBlock.clear()
 		textBlock.write(getNormalNodeTemplate())
+		textBlock.write(getAutoRegisterCode())
+		return {'FINISHED'}
+		
+class AppendAutoUpdateCode(bpy.types.Operator):
+	bl_idname = "mn.append_auto_update_code"
+	bl_label = "Append Auto Update Code"
+
+	def execute(self, context):
+		from mn_node_template import getAutoRegisterCode
+		for area in bpy.context.screen.areas:
+			for space in area.spaces:
+				if space.type == "TEXT_EDITOR":
+					if space.text is not None:
+						textString = space.text.as_string()
+						textString += getAutoRegisterCode()
+						space.text.from_string(textString)
 		return {'FINISHED'}
 	
 	
