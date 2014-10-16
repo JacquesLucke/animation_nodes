@@ -37,7 +37,7 @@ def getNodeNameDictionary():
 		"StringAnalyzeNode" ] ))
 
 	nodes.append(("Convert", [
-		"ToStringConversion",
+		"mn_ToStringConversion",
 		"ToFloatConversion",
 		"ToIntegerConversion",
 		"CombineVector",
