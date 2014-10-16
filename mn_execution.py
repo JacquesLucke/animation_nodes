@@ -166,11 +166,11 @@ def getCustomNodeClasses():
 	return nodeClasses
 def getCustomCategories():
 	nodeClasses = getCustomNodeClasses()
-	categories = []
+	categories = set()
 	for nodeClass in nodeClasses:
-		if hasattr(nodeClass, "node_category"):
-			categories.append(nodeClass.node_category)
-	if len(categories) == 0: categories.append("None")
+		category = getattr(nodeClass, "node_category", "None")
+		categories.update([category])
+	if len(categories) == 0: categories.update(["None"])
 	return categories
 def getCustomNodeCategoryItems(self, context):
 	categories = getCustomCategories()
@@ -183,7 +183,7 @@ def getCustomNodesInCategory(category):
 	nodeClasses = getCustomNodeClasses()
 	nodeClassesInCategory = []
 	for nodeClass in nodeClasses:
-		if getattr(nodeClass, "node_category", None) == category:
+		if getattr(nodeClass, "node_category", "None") == category:
 			nodeClassesInCategory.append(nodeClass)
 	return nodeClassesInCategory
 
