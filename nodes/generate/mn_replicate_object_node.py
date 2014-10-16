@@ -6,15 +6,15 @@ from mn_utils import *
 from mn_node_helper import *
 from mn_object_utils import *
 
-class ObjectNamePropertyGroup(bpy.types.PropertyGroup):
+class mn_ObjectNamePropertyGroup(bpy.types.PropertyGroup):
 	objectName = bpy.props.StringProperty(name = "Socket Name", default = "", update = nodePropertyChanged)
 
-class ReplicateObjectNode(Node, AnimationNode):
-	bl_idname = "ReplicateObjectNode"
+class mn_ReplicateObjectNode(Node, AnimationNode):
+	bl_idname = "mn_ReplicateObjectNode"
 	bl_label = "Replicate Object"
 	
-	objectNames = bpy.props.CollectionProperty(type = ObjectNamePropertyGroup)
-	visibleObjectNames = bpy.props.CollectionProperty(type = ObjectNamePropertyGroup)
+	objectNames = bpy.props.CollectionProperty(type = mn_ObjectNamePropertyGroup)
+	visibleObjectNames = bpy.props.CollectionProperty(type = mn_ObjectNamePropertyGroup)
 	
 	def init(self, context):
 		forbidCompiling()

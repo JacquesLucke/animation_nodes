@@ -19,7 +19,7 @@ def getNodeNameDictionary():
 		"ColorInputNode" ] ))
 		
 	nodes.append(("Generate", [
-		"ReplicateObjectNode" ] ))
+		"mn_ReplicateObjectNode" ] ))
 		
 	nodes.append(("Output", [
 		"TextOutputNode",

@@ -126,11 +126,11 @@ def resetNodeFoundAttributes(nodes):
 # cleanup of node trees
 ################################
 
-convertableTypes = [("Float", "Integer", "ToIntegerConversion"),
-					("Float", "String", "ToStringConversion"),
-					("Integer", "String", "ToStringConversion"),
-					("Float", "Vector", "CombineVector"),
-					("Integer", "Vector", "CombineVector")]
+convertableTypes = [("Float", "Integer", "mn_ToIntegerConversion"),
+					("Float", "String", "mn_ToStringConversion"),
+					("Integer", "String", "mn_ToStringConversion"),
+					("Float", "Vector", "mn_CombineVector"),
+					("Integer", "Vector", "mn_CombineVector")]
 		
 def cleanupNodeTrees():
 	nodeTrees = getAnimationNodeTrees()
