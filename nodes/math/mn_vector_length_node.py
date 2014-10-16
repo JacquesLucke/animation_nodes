@@ -2,15 +2,17 @@ import bpy
 import mathutils
 from bpy.types import Node
 from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged
+from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
-class VectorLengthNode(Node, AnimationNode):
-	bl_idname = "VectorLengthNode"
+class mn_VectorLengthNode(Node, AnimationNode):
+	bl_idname = "mn_VectorLengthNode"
 	bl_label = "Vector Length"
 	
 	def init(self, context):
+		forbidCompiling()
 		self.inputs.new("VectorSocket", "Vector")
 		self.outputs.new("FloatSocket", "Length")
+		allowCompiling()
 		
 	def getInputSocketNames(self):
 		return {"Vector" : "vector"}

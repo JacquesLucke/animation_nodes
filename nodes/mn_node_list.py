@@ -44,8 +44,8 @@ def getNodeNameDictionary():
 		"mn_SeparateVector" ] ))
 	
 	nodes.append(("Math", [
-		"FloatMathNode",
-		"VectorLengthNode" ] ))
+		"mn_FloatMathNode",
+		"mn_VectorLengthNode" ] ))
 		
 	nodes.append(("List", [
 		"GetListElementNode",

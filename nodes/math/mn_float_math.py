@@ -19,8 +19,8 @@ def updateNode(node, context):
 		node.inputs[-1].hide = False
 
 
-class FloatMathNode(Node, AnimationNode):
-	bl_idname = "FloatMathNode"
+class mn_FloatMathNode(Node, AnimationNode):
+	bl_idname = "mn_FloatMathNode"
 	bl_label = "Math (Float)"
 	
 	mathTypes = [
@@ -43,12 +43,12 @@ class FloatMathNode(Node, AnimationNode):
 		("GREATHERTHAN", "Greather Than", ""),
 		("MODULO", "Modulo", ""),
 		("ABSOLUTE", "Absolute", "")]
-	mathTypesProperty = bpy.props.EnumProperty(name="Operation", items=mathTypes, default="ADD", update=updateNode)
+	mathTypesProperty = bpy.props.EnumProperty(name="Operation", items=mathTypes, default="MULITPLY", update=updateNode)
 	
 	def init(self, context):
 		forbidCompiling()
 		self.inputs.new("FloatSocket", "A")
-		self.inputs.new("FloatSocket", "B")
+		self.inputs.new("FloatSocket", "B").number = 1.0
 		self.outputs.new("FloatSocket", "Result")
 		allowCompiling()
 		
