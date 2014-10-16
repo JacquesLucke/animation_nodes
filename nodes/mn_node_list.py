@@ -31,10 +31,10 @@ def getNodeNameDictionary():
 		"mn_MaterialOutputNode" ] ))
 		
 	nodes.append(("Strings", [
-		"CombineStringsNode",
-		"ReplicateStringsNode",
-		"SubstringNode",
-		"StringAnalyzeNode" ] ))
+		"mn_CombineStringsNode",
+		"mn_ReplicateStringsNode",
+		"mn_SubstringNode",
+		"mn_StringAnalyzeNode" ] ))
 
 	nodes.append(("Convert", [
 		"mn_ToStringConversion",
