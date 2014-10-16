@@ -135,6 +135,23 @@ class AppendAutoUpdateCode(bpy.types.Operator):
 						textString += getAutoRegisterCode()
 						space.text.from_string(textString)
 		return {'FINISHED'}
+		
+# class CustomNodeMenu(bpy.types.Menu):
+	# bl_idname = "mn.node_menu"
+	# bl_label = "Animation Nodes"
+	
+	# def draw(self, context):
+		# layout = self.layout
+		# addNode = layout.operator("node.add_node")
+		# addNode.type = "mn_TimeInfoNode"
+		# addNode.use_transform = True
+		
+def menuDraw(self, context):
+	layout = self.layout
+	addNode = layout.operator("node.add_node")
+	addNode.type = "mn_TimeInfoNode"
+	addNode.use_transform = True
+bpy.types.NODE_MT_add.append(menuDraw)
 	
 	
 		
@@ -188,13 +205,3 @@ def nodeTreeChanged():
 bpy.app.handlers.frame_change_post.append(frameChangeHandler)
 bpy.app.handlers.scene_update_post.append(sceneUpdateHandler)
 bpy.app.handlers.load_post.append(fileLoadHandler)
-		
-		
-# register
-################################
-		
-def register():
-	bpy.utils.register_module(__name__)
-
-def unregister():
-	bpy.utils.unregister_module(__name__)
