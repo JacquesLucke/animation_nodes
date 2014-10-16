@@ -76,13 +76,14 @@ class AnimationNodesPanel(bpy.types.Panel):
 		layout.prop(scene, "showFullError", text = "Show Full Error")
 		layout.prop(scene, "nodeExecutionProfiling", text = "Node Execution Profiling")
 		
-		layout.prop(scene, "customNodeName")
-		layout.prop(scene, "customNodeCategories")
-		newNode = layout.operator("node.add_node")
-		newNode.use_transform = True
-		newNode.type = scene.customNodeName
 		layout.operator("mn.load_normal_node_template")
 		layout.operator("mn.append_auto_update_code")
+		layout.prop(scene, "customNodeCategory")
+		customNodeClasses = getCustomNodesInCategory(scene.customNodeCategory)
+		for nodeClass in customNodeClasses:
+			newNode = layout.operator("node.add_node", text = nodeClass.bl_label)
+			newNode.type = nodeClass.bl_idname
+			newNode.use_transform = True
 		
 		
 		
@@ -194,26 +195,20 @@ def getCustomNodeCategoryItems(self, context):
 	for category in categories:
 		items.append((category, category, ""))
 	return items
+	
+def getCustomNodesInCategory(category):
+	nodeClasses = getCustomNodeClasses()
+	nodeClassesInCategory = []
+	for nodeClass in nodeClasses:
+		if getattr(nodeClass, "node_category", None) == category:
+			nodeClassesInCategory.append(nodeClass)
+	return nodeClassesInCategory
 
 def getCustomNodes(self, context):
 	return [("mn_TimeInfoNode", "Time Info", "")]
-	# from mn_node_base import AnimationNode
-	# from mn_node_register import getAllNodeIdNames
-	# officialNodeNames = getAllNodeIdNames()
-	# allNodeTypes = bpy.types.Node.__subclasses__()
-	# customNodeNames = []
-	# for nodeType in allNodeTypes:
-		# if hasattr(nodeType, "bl_idname") and issubclass(nodeType, AnimationNode):
-			# if nodeType.bl_idname not in officialNodeNames:
-				# customNodeNames.append(nodeType.bl_idname)
-	# customNodeNames = list(set(customNodeNames))
-	# customNodeItems = []
-	# for customNodeName in customNodeNames:
-		# customNodeItems.append((customNodeName, customNodeName, ""))
-	# return customNodeItems
 	
 bpy.types.Scene.customNodeName = bpy.props.EnumProperty(items = getCustomNodes, name = "Custom Node Name")
-bpy.types.Scene.customNodeCategories = bpy.props.EnumProperty(items = getCustomNodeCategoryItems, name = "Custom Categories")
+bpy.types.Scene.customNodeCategory = bpy.props.EnumProperty(items = getCustomNodeCategoryItems, name = "Custom Categories")
 	
 @persistent
 def frameChangeHandler(scene):
