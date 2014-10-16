@@ -137,23 +137,6 @@ class AppendAutoUpdateCode(bpy.types.Operator):
 						textString += getAutoRegisterCode()
 						space.text.from_string(textString)
 		return {'FINISHED'}
-		
-# class CustomNodeMenu(bpy.types.Menu):
-	# bl_idname = "mn.node_menu"
-	# bl_label = "Animation Nodes"
-	
-	# def draw(self, context):
-		# layout = self.layout
-		# addNode = layout.operator("node.add_node")
-		# addNode.type = "mn_TimeInfoNode"
-		# addNode.use_transform = True
-		
-def menuDraw(self, context):
-	layout = self.layout
-	addNode = layout.operator("node.add_node")
-	addNode.type = "mn_TimeInfoNode"
-	addNode.use_transform = True
-bpy.types.NODE_MT_add.append(menuDraw)
 	
 	
 		
