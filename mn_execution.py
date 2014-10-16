@@ -157,8 +157,9 @@ class LoadNormalNodeTemplate(bpy.types.Operator):
 		if textBlock is None:
 			textBlock = bpy.data.texts.new(textBlockName)
 		textBlock.clear()
-		textBlock.write(getNormalNodeTemplate())
-		textBlock.write(getAutoRegisterCode())
+		text = getNormalNodeTemplate() + getAutoRegisterCode()
+		textBlock.from_string(text)
+		textBlock.use_tabs_as_spaces = True
 		return {'FINISHED'}
 		
 class AppendAutoUpdateCode(bpy.types.Operator):
@@ -173,7 +174,7 @@ class AppendAutoUpdateCode(bpy.types.Operator):
 					if space.text is not None:
 						textString = space.text.as_string()
 						textString += getAutoRegisterCode()
-						space.text.from_string(textString)
+						space.text.replace(textString)
 		return {'FINISHED'}
 	
 

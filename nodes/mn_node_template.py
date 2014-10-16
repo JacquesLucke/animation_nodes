@@ -14,10 +14,8 @@ class mn_YourNodeName(Node, AnimationNode):
 
 	def init(self, context):
 		forbidCompiling()
-		self.inputs.new("IntegerSocket", "Amount")
 		self.inputs.new("StringSocket", "Text")
-		self.outputs.new("StringSocket", "New Text")
-		self.outputs.new("IntegerSocket", "Length")
+		self.outputs.new("StringSocket", "Uppercase")
 		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
@@ -25,10 +23,7 @@ class mn_YourNodeName(Node, AnimationNode):
 		
 	def execute(self, input):
 		output = {}
-		amount = input["Amount"]
-		text = input["Text"]
-		output["New Text"] = amount * text
-		output["Length"] = len(output["New Text"])
+		output["Uppercase"] = input["Text"].upper()
 		return output
 '''
 
