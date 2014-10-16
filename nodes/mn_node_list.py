@@ -38,10 +38,10 @@ def getNodeNameDictionary():
 
 	nodes.append(("Convert", [
 		"mn_ToStringConversion",
-		"ToFloatConversion",
-		"ToIntegerConversion",
-		"CombineVector",
-		"SeparateVector" ] ))
+		"mn_ToFloatConversion",
+		"mn_ToIntegerConversion",
+		"mn_CombineVector",
+		"mn_SeparateVector" ] ))
 	
 	nodes.append(("Math", [
 		"FloatMathNode",

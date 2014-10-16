@@ -3,8 +3,8 @@ from bpy.types import Node
 from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 
-class CombineVector(Node, AnimationNode):
-	bl_idname = "CombineVector"
+class mn_CombineVector(Node, AnimationNode):
+	bl_idname = "mn_CombineVector"
 	bl_label = "Combine Vector"
 	
 	def init(self, context):

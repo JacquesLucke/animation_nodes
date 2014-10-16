@@ -1,15 +1,17 @@
 import bpy
 from bpy.types import Node
 from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged
+from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
-class ToIntegerConversion(Node, AnimationNode):
-	bl_idname = "ToIntegerConversion"
+class mn_ToIntegerConversion(Node, AnimationNode):
+	bl_idname = "mn_ToIntegerConversion"
 	bl_label = "To Integer"
 	
 	def init(self, context):
+		forbidCompiling()
 		self.inputs.new("GenericSocket", "Value")
 		self.outputs.new("IntegerSocket", "Number")
+		allowCompiling()
 		
 	def getInputSocketNames(self):
 		return {"Value" : "value"}
