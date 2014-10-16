@@ -22,13 +22,13 @@ def getNodeNameDictionary():
 		"mn_ReplicateObjectNode" ] ))
 		
 	nodes.append(("Output", [
-		"TextOutputNode",
-		"ObjectOutputNode",
-		"AttributeOutputNode",
-		"DebugOutputNode",
-		"ModifierOutputNode",
-		"CopyTransformsNode",
-		"MaterialOutputNode" ] ))
+		"mn_TextOutputNode",
+		"mn_ObjectOutputNode",
+		"mn_AttributeOutputNode",
+		"mn_DebugOutputNode",
+		"mn_ModifierOutputNode",
+		"mn_CopyTransformsNode",
+		"mn_MaterialOutputNode" ] ))
 		
 	nodes.append(("Strings", [
 		"CombineStringsNode",

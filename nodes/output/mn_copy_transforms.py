@@ -1,13 +1,13 @@
 import bpy, time
 from bpy.types import Node
 from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, nodeTreeChanged
+from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 from mn_object_utils import *
 from mn_utils import *
 from mn_cache import *
 
-class CopyTransformsNode(Node, AnimationNode):
-	bl_idname = "CopyTransformsNode"
+class mn_CopyTransformsNode(Node, AnimationNode):
+	bl_idname = "mn_CopyTransformsNode"
 	bl_label = "Copy Transforms"
 	
 	useLocation = bpy.props.BoolVectorProperty(update = nodePropertyChanged)
@@ -20,6 +20,7 @@ class CopyTransformsNode(Node, AnimationNode):
 	frameTypesProperty = bpy.props.EnumProperty(name = "Frame Type", items = frameTypes, default = "OFFSET")
 	
 	def init(self, context):
+		forbidCompiling()
 		fromSocket = self.inputs.new("ObjectSocket", "From")
 		fromSocket.showName = True
 		toSocket = self.inputs.new("ObjectSocket", "To")
@@ -27,6 +28,7 @@ class CopyTransformsNode(Node, AnimationNode):
 		self.inputs.new("FloatSocket", "Frame")
 		self.outputs.new("ObjectSocket", "To")
 		self.width = 200
+		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
 		col = layout.column(align = True)

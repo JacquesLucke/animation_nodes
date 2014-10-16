@@ -1,10 +1,10 @@
 import bpy
 from bpy.types import Node
 from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged
+from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
-class ObjectOutputNode(Node, AnimationNode):
-	bl_idname = "ObjectOutputNode"
+class mn_ObjectOutputNode(Node, AnimationNode):
+	bl_idname = "mn_ObjectOutputNode"
 	bl_label = "Object Output"
 	
 	useLocation = bpy.props.BoolVectorProperty(update = nodePropertyChanged)
@@ -12,10 +12,12 @@ class ObjectOutputNode(Node, AnimationNode):
 	useScale = bpy.props.BoolVectorProperty(update = nodePropertyChanged)
 	
 	def init(self, context):
+		forbidCompiling()
 		self.inputs.new("ObjectSocket", "Object")
 		self.inputs.new("VectorSocket", "Location")
 		self.inputs.new("VectorSocket", "Rotation")
 		self.inputs.new("VectorSocket", "Scale").vector = (1, 1, 1)
+		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
 		col = layout.column(align = True)

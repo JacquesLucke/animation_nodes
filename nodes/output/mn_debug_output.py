@@ -1,17 +1,19 @@
 import bpy
 from bpy.types import Node
 from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged
+from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
-class DebugOutputNode(Node, AnimationNode):
-	bl_idname = "DebugOutputNode"
+class mn_DebugOutputNode(Node, AnimationNode):
+	bl_idname = "mn_DebugOutputNode"
 	bl_label = "Debug"
 	
 	printDebugString = bpy.props.BoolProperty(default = False)
 	debugOutputString = bpy.props.StringProperty(default = "")
 	
 	def init(self, context):
+		forbidCompiling()
 		self.inputs.new("GenericSocket", "Data")
+		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
 		layout.prop(self, "printDebugString", text = "Print")

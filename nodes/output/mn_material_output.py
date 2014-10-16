@@ -1,7 +1,7 @@
 import bpy
 from bpy.types import Node
 from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged
+from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 allowedSocketTypes = [ 
 	"NodeSocketVector",
@@ -10,8 +10,8 @@ allowedSocketTypes = [
 	"NodeSocketFloat" ]
 					
 
-class MaterialOutputNode(Node, AnimationNode):
-	bl_idname = "MaterialOutputNode"
+class mn_MaterialOutputNode(Node, AnimationNode):
+	bl_idname = "mn_MaterialOutputNode"
 	bl_label = "Material Output"
 	
 	def getPossibleSockets(self, context):
@@ -27,7 +27,9 @@ class MaterialOutputNode(Node, AnimationNode):
 	socketIdentifier = bpy.props.EnumProperty(items = getPossibleSockets, name = "Socket", update = nodePropertyChanged)
 	
 	def init(self, context):
+		forbidCompiling()
 		self.inputs.new("GenericSocket", "Data")
+		allowCompiling()
 	
 	def draw_buttons(self, context, layout): 
 		layout.prop_search(self, 'materialName', bpy.data, 'materials', text='', icon='MATERIAL_DATA')
