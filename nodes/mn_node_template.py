@@ -5,6 +5,7 @@ from bpy.types import Node
 from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from mn_utils import *
+
 	
 class mn_YourNodeName(Node, AnimationNode):
 	bl_idname = "mn_YourNodeName"
@@ -31,4 +32,5 @@ class mn_YourNodeName(Node, AnimationNode):
 		
 if __name__ == "__main__":
 	bpy.utils.register_module(__name__)
+	
 '''

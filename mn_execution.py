@@ -112,7 +112,7 @@ class LoadNormalNodeTemplate(bpy.types.Operator):
 
 	def execute(self, context):
 		from mn_node_template import getNormalNodeTemplate
-		textBlockName = "node template"
+		textBlockName = "mn_node_template.py"
 		textBlock = bpy.data.texts.get(textBlockName)
 		if textBlock is None:
 			textBlock = bpy.data.texts.new(textBlockName)
