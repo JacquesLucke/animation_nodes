@@ -23,4 +23,5 @@ class mn_ColorInputNode(Node, AnimationNode):
 		return {"Color" : "color"}
 		
 	def execute(self):
-		return self.colorProperty
+		color = self.colorProperty
+		return [color[0], color[1], color[2], 1.0]
