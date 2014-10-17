@@ -7,7 +7,7 @@ class mn_ColorSocket(NodeSocket):
 	bl_idname = "mn_ColorSocket"
 	bl_label = "Color Socket"
 	dataType = "Color"
-	allowedInputTypes = ["Float", "Integer"]
+	allowedInputTypes = ["Color"]
 	
 	color = bpy.props.FloatVectorProperty(default = [0.5, 0.5, 0.5], subtype = "COLOR", soft_min = 0.0, soft_max = 1.0, update = nodePropertyChanged)
 	

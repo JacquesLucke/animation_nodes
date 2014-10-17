@@ -1,7 +1,8 @@
 import bpy
 from bpy.types import Node
 from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
+from mn_utils import *
 
 allowedSocketTypes = [ 
 	"NodeSocketVector",
@@ -21,10 +22,14 @@ class mn_MaterialOutputNode(Node, AnimationNode):
 			if socket.bl_idname in allowedSocketTypes:
 				sockets.append((socket.identifier, socket.identifier, ""))
 		return sockets
+		
+	def selectedSocketChanged(self, context):
+		self.setInputSocket()
+		nodeTreeChanged()
 	
-	materialName = bpy.props.StringProperty(update = nodePropertyChanged)
-	nodeName = bpy.props.StringProperty(update = nodePropertyChanged)
-	socketIdentifier = bpy.props.EnumProperty(items = getPossibleSockets, name = "Socket", update = nodePropertyChanged)
+	materialName = bpy.props.StringProperty(update = selectedSocketChanged)
+	nodeName = bpy.props.StringProperty(update = selectedSocketChanged)
+	socketIdentifier = bpy.props.EnumProperty(items = getPossibleSockets, name = "Socket", update = selectedSocketChanged)
 	
 	def init(self, context):
 		forbidCompiling()
@@ -70,3 +75,20 @@ class mn_MaterialOutputNode(Node, AnimationNode):
 		for socket in node.inputs:
 			if socket.identifier == identifier: return socket
 		return None
+		
+	def setInputSocket(self):
+		forbidCompiling()
+		socket = self.getSelectedSocket()
+		connections = getConnectionDictionaries(self)
+		self.inputs.clear()
+		if socket is None:
+			self.inputs.new("mn_GenericSocket", "Data")
+		else:
+			name = socket.bl_idname
+			if name == "NodeSocketColor": self.inputs.new("mn_ColorSocket", "Data")
+			elif name == "NodeSocketFloat": self.inputs.new("mn_FloatSocket", "Data")
+			elif name == "NodeSocketFloatFactor": self.inputs.new("mn_FloatSocket", "Data")
+			elif name == "NodeSocketVector": self.inputs.new("mn_VectorSocket", "Data")
+		tryToSetConnectionDictionaries(self, connections)
+		allowCompiling()
+			
