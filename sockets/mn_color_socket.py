@@ -25,7 +25,7 @@ class mn_ColorSocket(NodeSocket):
 		return [color[0], color[1], color[2], 1.0]
 		
 	def setStoreableValue(self, data):
-		self.color = data
+		self.color = data[:3]
 	def getStoreableValue(self):
 		return self.color
 		

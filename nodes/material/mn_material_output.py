@@ -85,10 +85,12 @@ class mn_MaterialOutputNode(Node, AnimationNode):
 			self.inputs.new("mn_GenericSocket", "Data")
 		else:
 			name = socket.bl_idname
+			data = socket.default_value
 			if name == "NodeSocketColor": self.inputs.new("mn_ColorSocket", "Data")
 			elif name == "NodeSocketFloat": self.inputs.new("mn_FloatSocket", "Data")
 			elif name == "NodeSocketFloatFactor": self.inputs.new("mn_FloatSocket", "Data")
 			elif name == "NodeSocketVector": self.inputs.new("mn_VectorSocket", "Data")
+			self.inputs["Data"].setStoreableValue(data)
 		tryToSetConnectionDictionaries(self, connections)
 		allowCompiling()
 			
