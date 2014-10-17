@@ -3,8 +3,8 @@ from bpy.types import NodeTree, Node, NodeSocket
 from mn_utils import *
 from mn_execution import nodePropertyChanged
 
-class VectorSocket(NodeSocket):
-	bl_idname = "VectorSocket"
+class mn_VectorSocket(NodeSocket):
+	bl_idname = "mn_VectorSocket"
 	bl_label = "Vector Socket"
 	dataType = "Vector"
 	allowedInputTypes = ["Vector"]

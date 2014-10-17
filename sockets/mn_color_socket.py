@@ -3,8 +3,8 @@ from bpy.types import NodeTree, Node, NodeSocket
 from mn_utils import *
 from mn_execution import nodePropertyChanged
 
-class ColorSocket(NodeSocket):
-	bl_idname = "ColorSocket"
+class mn_ColorSocket(NodeSocket):
+	bl_idname = "mn_ColorSocket"
 	bl_label = "Color Socket"
 	dataType = "Color"
 	allowedInputTypes = ["Float", "Integer"]

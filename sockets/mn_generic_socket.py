@@ -3,8 +3,8 @@ from bpy.types import NodeTree, Node, NodeSocket
 from mn_utils import *
 from mn_execution import nodePropertyChanged
 
-class GenericSocket(NodeSocket):
-	bl_idname = "GenericSocket"
+class mn_GenericSocket(NodeSocket):
+	bl_idname = "mn_GenericSocket"
 	bl_label = "Generic Socket"
 	dataType = "Generic"
 	allowedInputTypes = ["all"]

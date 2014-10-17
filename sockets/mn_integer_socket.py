@@ -3,8 +3,8 @@ from bpy.types import NodeTree, Node, NodeSocket
 from mn_utils import *
 from mn_execution import nodePropertyChanged
 
-class IntegerSocket(NodeSocket):
-	bl_idname = "IntegerSocket"
+class mn_IntegerSocket(NodeSocket):
+	bl_idname = "mn_IntegerSocket"
 	bl_label = "Integer Socket"
 	dataType = "Integer"
 	allowedInputTypes = ["Integer"]

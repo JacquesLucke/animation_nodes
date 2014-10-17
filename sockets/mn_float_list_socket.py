@@ -4,8 +4,8 @@ from mn_utils import *
 from mn_execution import nodePropertyChanged
 
 
-class FloatListSocket(NodeSocket):
-	bl_idname = "FloatListSocket"
+class mn_FloatListSocket(NodeSocket):
+	bl_idname = "mn_FloatListSocket"
 	bl_label = "Float List Socket"
 	dataType = "Float List"
 	allowedInputTypes = ["Float List"]

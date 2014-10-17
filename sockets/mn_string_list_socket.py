@@ -4,8 +4,8 @@ from mn_utils import *
 from mn_execution import nodePropertyChanged
 
 
-class StringListSocket(NodeSocket):
-	bl_idname = "StringListSocket"
+class mn_StringListSocket(NodeSocket):
+	bl_idname = "mn_StringListSocket"
 	bl_label = "String List Socket"
 	dataType = "String List"
 	allowedInputTypes = ["String List"]

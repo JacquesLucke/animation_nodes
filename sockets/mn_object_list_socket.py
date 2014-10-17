@@ -4,8 +4,8 @@ from mn_utils import *
 from mn_execution import nodePropertyChanged
 
 
-class ObjectListSocket(NodeSocket):
-	bl_idname = "ObjectListSocket"
+class mn_ObjectListSocket(NodeSocket):
+	bl_idname = "mn_ObjectListSocket"
 	bl_label = "Object List Socket"
 	dataType = "Object List"
 	allowedInputTypes = ["Object List"]

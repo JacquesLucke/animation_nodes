@@ -3,8 +3,8 @@ from bpy.types import NodeTree, Node, NodeSocket
 from mn_utils import *
 from mn_execution import nodePropertyChanged
 
-class FloatSocket(NodeSocket):
-	bl_idname = "FloatSocket"
+class mn_FloatSocket(NodeSocket):
+	bl_idname = "mn_FloatSocket"
 	bl_label = "Float Socket"
 	dataType = "Float"
 	allowedInputTypes = ["Float", "Integer"]

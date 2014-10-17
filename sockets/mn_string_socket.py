@@ -3,8 +3,8 @@ from bpy.types import NodeTree, Node, NodeSocket
 from mn_utils import *
 from mn_execution import nodePropertyChanged
 
-class StringSocket(NodeSocket):
-	bl_idname = "StringSocket"
+class mn_StringSocket(NodeSocket):
+	bl_idname = "mn_StringSocket"
 	bl_label = "String Socket"
 	dataType = "String"
 	allowedInputTypes = ["String", "Object"]
