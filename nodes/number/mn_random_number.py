@@ -3,9 +3,16 @@ from bpy.types import Node
 from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
+randomNumberCache = []
+random.seed(0)
+for i in range(2500):
+	randomNumberCache.append(random.random())
+
 class mn_RandomNumberNode(Node, AnimationNode):
 	bl_idname = "mn_RandomNumberNode"
 	bl_label = "Random Number"
+	
+	additionalSeed = bpy.props.IntProperty(update = nodePropertyChanged)
 	
 	def init(self, context):
 		forbidCompiling()
@@ -13,15 +20,18 @@ class mn_RandomNumberNode(Node, AnimationNode):
 		self.inputs.new("mn_FloatSocket", "Min").number = 0.0
 		self.inputs.new("mn_FloatSocket", "Max").number = 1.0
 		self.outputs.new("mn_FloatSocket", "Float Value")
-		self.outputs.new("mn_IntegerSocket", "Integer Value")
 		allowCompiling()
 		
-	def execute(self, input):
-		output = {}
-		seed = input["Seed"]
-		min = input["Min"]
-		max = input["Max"]
-		random.seed(seed)
-		output["Float Value"] = random.uniform(min, max)
-		output["Integer Value"] = int(output["Float Value"])
-		return output
+	def draw_buttons(self, context, layout):
+		layout.prop(self, "additionalSeed", text = "Additional Seed")
+		
+	def getInputSocketNames(self):
+		return {"Seed" : "seed", "Min" : "minValue", "Max" : "maxValue"}
+	def getOutputSocketNames(self):
+		return {"Float Value" : "random_number"}
+		
+	def execute(self, seed, minValue, maxValue):
+		return getRandomNumber(seed + 999 * self.additionalSeed, minValue, maxValue)
+		
+def getRandomNumber(seed, min, max):
+	return min + randomNumberCache[seed % 2500] * (max - min)
