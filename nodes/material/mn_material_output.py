@@ -47,10 +47,6 @@ class mn_MaterialOutputNode(Node, AnimationNode):
 		socket = self.getSelectedSocket()
 		if socket is not None:
 			try:
-				# correct color by adding alpha channel
-				if socket.bl_idname == "NodeSocketColor" and len(data) == 3:
-					data = [data[0], data[1], data[2], 1.0]
-					
 				socket.default_value = data
 			except:
 				pass
