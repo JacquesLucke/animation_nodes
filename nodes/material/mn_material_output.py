@@ -15,21 +15,31 @@ class mn_MaterialOutputNode(Node, AnimationNode):
 	bl_idname = "mn_MaterialOutputNode"
 	bl_label = "Material Output"
 	
-	def getPossibleSockets(self, context):
+	def getPossibleSocketItems(self, context):
+		sockets = self.getPossibleSockets()
+		items = []
+		for socket in sockets:
+			if socket.bl_idname in allowedSocketTypes.keys():
+				items.append((socket.identifier, socket.identifier, ""))
+		return items
+	def getPossibleSockets(self):
 		node = self.getSelectedNode()
-		sockets = []
+		identifiers = []
 		for socket in node.inputs:
 			if socket.bl_idname in allowedSocketTypes.keys():
-				sockets.append((socket.identifier, socket.identifier, ""))
-		return sockets
+				identifiers.append(socket)
+		return identifiers
 		
 	def selectedSocketChanged(self, context):
+		self.socketIsChanging = True
 		self.setInputSocket()
+		self.socketIsChanging = False
 		nodeTreeChanged()
 	
 	materialName = bpy.props.StringProperty(update = selectedSocketChanged)
 	nodeName = bpy.props.StringProperty(update = selectedSocketChanged)
-	socketIdentifier = bpy.props.EnumProperty(items = getPossibleSockets, name = "Socket", update = selectedSocketChanged)
+	socketIdentifier = bpy.props.EnumProperty(items = getPossibleSocketItems, name = "Socket", update = selectedSocketChanged)
+	socketIsChanging = bpy.props.BoolProperty()
 	
 	def init(self, context):
 		forbidCompiling()
@@ -56,6 +66,24 @@ class mn_MaterialOutputNode(Node, AnimationNode):
 			except:
 				pass
 		return output
+		
+	def update(self):
+		socket = self.inputs.get("Data")
+		if socket is not None and not self.socketIsChanging:
+			if hasLinks(socket):
+				fromType = self.inputs[0].links[0].from_socket.bl_idname
+				possibleIdentifiers = self.getInputIdentifiersFromSocketType(fromType)
+				if self.inputs["Data"].bl_idname != fromType and len(possibleIdentifiers) > 0:
+					self.socketIdentifier = possibleIdentifiers[0]
+					self.setInputSocket()
+		
+	def getInputIdentifiersFromSocketType(self, searchType):
+		identifiers = []
+		sockets = self.getPossibleSockets()
+		for socket in sockets:
+			if allowedSocketTypes[socket.bl_idname] == searchType:
+				identifiers.append(socket.identifier)
+		return identifiers
 		
 	def getSelectedNode(self):
 		material = bpy.data.materials.get(self.materialName)
