@@ -4,11 +4,11 @@ from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 from mn_utils import *
 
-allowedSocketTypes = [ 
-	"NodeSocketVector",
-	"NodeSocketFloatFactor",
-	"NodeSocketColor",
-	"NodeSocketFloat" ]
+allowedSocketTypes = { 
+	"NodeSocketVector" : "mn_VectorSocket",
+	"NodeSocketColor" : "mn_ColorSocket",
+	"NodeSocketFloatFactor" : "mn_FloatSocket",
+	"NodeSocketFloat" : "mn_FloatSocket" }
 					
 
 class mn_MaterialOutputNode(Node, AnimationNode):
@@ -19,7 +19,7 @@ class mn_MaterialOutputNode(Node, AnimationNode):
 		node = self.getSelectedNode()
 		sockets = []
 		for socket in node.inputs:
-			if socket.bl_idname in allowedSocketTypes:
+			if socket.bl_idname in allowedSocketTypes.keys():
 				sockets.append((socket.identifier, socket.identifier, ""))
 		return sockets
 		
@@ -84,12 +84,8 @@ class mn_MaterialOutputNode(Node, AnimationNode):
 		if socket is None:
 			self.inputs.new("mn_GenericSocket", "Data")
 		else:
-			name = socket.bl_idname
 			data = socket.default_value
-			if name == "NodeSocketColor": self.inputs.new("mn_ColorSocket", "Data")
-			elif name == "NodeSocketFloat": self.inputs.new("mn_FloatSocket", "Data")
-			elif name == "NodeSocketFloatFactor": self.inputs.new("mn_FloatSocket", "Data")
-			elif name == "NodeSocketVector": self.inputs.new("mn_VectorSocket", "Data")
+			self.inputs.new(allowedSocketTypes[socket.bl_idname], "Data")
 			self.inputs["Data"].setStoreableValue(data)
 		tryToSetConnectionDictionaries(self, connections)
 		allowCompiling()
