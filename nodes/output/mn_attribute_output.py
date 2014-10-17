@@ -3,9 +3,9 @@ from bpy.types import Node
 from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
-class mn_AttributeOutputNode(Node, AnimationNode):
-	bl_idname = "mn_AttributeOutputNode"
-	bl_label = "Attribute Output"
+class mn_ObjectAttributeOutputNode(Node, AnimationNode):
+	bl_idname = "mn_ObjectAttributeOutputNode"
+	bl_label = "Object Attribute Output"
 	
 	def init(self, context):
 		forbidCompiling()

@@ -2,10 +2,10 @@ def getNodeNameDictionary():
 	nodes = []
 	
 	nodes.append(("Number", [
+		"mn_FloatInputNode",
 		"mn_IntegerInputNode",
 		"mn_FloatListInputNode",
 		"mn_RandomNumberNode",
-		"mn_FloatInputNode",
 		"mn_FloatMathNode" ] ))
 		
 	nodes.append(("Vector", [
@@ -31,7 +31,7 @@ def getNodeNameDictionary():
 		"mn_ReplicateObjectNode",
 		"mn_TextOutputNode",
 		"mn_ObjectOutputNode",
-		"mn_AttributeOutputNode",
+		"mn_ObjectAttributeOutputNode",
 		"mn_ModifierOutputNode",
 		"mn_CopyTransformsNode"] ))
 		
