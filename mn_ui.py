@@ -1,5 +1,5 @@
 import bpy
-from mn_execution import getCodeStrings
+from mn_execution import getCodeStrings, updateAnimationTrees
 
 class AnimationNodesPerformance(bpy.types.Panel):
 	bl_idname = "mn.performance_panel"
