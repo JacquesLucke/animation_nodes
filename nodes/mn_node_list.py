@@ -29,7 +29,6 @@ def getNodeNameDictionary():
 		"mn_ObjectListInputNode",
 		"mn_ObjectInfoNode",
 		"mn_ReplicateObjectNode",
-		"mn_TextOutputNode",
 		"mn_ObjectOutputNode",
 		"mn_ObjectAttributeOutputNode",
 		"mn_ModifierOutputNode",
