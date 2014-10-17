@@ -5,7 +5,7 @@ from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 class mn_DebugOutputNode(Node, AnimationNode):
 	bl_idname = "mn_DebugOutputNode"
-	bl_label = "Debug"
+	bl_label = "Debug Output"
 	
 	printDebugString = bpy.props.BoolProperty(default = False)
 	debugOutputString = bpy.props.StringProperty(default = "")

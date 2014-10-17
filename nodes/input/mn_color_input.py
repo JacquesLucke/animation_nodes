@@ -5,7 +5,7 @@ from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 class mn_ColorInputNode(Node, AnimationNode):
 	bl_idname = "mn_ColorInputNode"
-	bl_label = "Color"
+	bl_label = "Color Input"
 	
 	colorProperty = bpy.props.FloatVectorProperty(default = [0.5, 0.5, 0.5], subtype = "COLOR", soft_min = 0.0, soft_max = 1.0, update = nodePropertyChanged)
 	

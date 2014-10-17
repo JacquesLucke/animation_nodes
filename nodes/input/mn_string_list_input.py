@@ -9,7 +9,7 @@ class mn_StringPropertyGroup(bpy.types.PropertyGroup):
 
 class mn_StringListInputNode(Node, AnimationNode):
 	bl_idname = "mn_StringListInputNode"
-	bl_label = "String List"
+	bl_label = "Text List"
 	
 	strings = bpy.props.CollectionProperty(type = mn_StringPropertyGroup)
 	showEditOptions = bpy.props.BoolProperty(default = True)

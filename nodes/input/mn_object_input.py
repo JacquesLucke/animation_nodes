@@ -6,7 +6,7 @@ from mn_utils import *
 
 class mn_ObjectInputNode(Node, AnimationNode):
 	bl_idname = "mn_ObjectInputNode"
-	bl_label = "Object"
+	bl_label = "Object Input"
 	
 	objectName = bpy.props.StringProperty(update = nodePropertyChanged)
 	

@@ -5,7 +5,7 @@ from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 class mn_StringInputNode(Node, AnimationNode):
 	bl_idname = "mn_StringInputNode"
-	bl_label = "String"
+	bl_label = "Text Input"
 	
 	stringProperty = bpy.props.StringProperty(default = "text", update = nodePropertyChanged)
 	

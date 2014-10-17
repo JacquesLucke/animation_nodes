@@ -9,7 +9,7 @@ class mn_FloatPropertyGroup(bpy.types.PropertyGroup):
 
 class mn_FloatListInputNode(Node, AnimationNode):
 	bl_idname = "mn_FloatListInputNode"
-	bl_label = "Float List"
+	bl_label = "Number List"
 	
 	numbers = bpy.props.CollectionProperty(type = mn_FloatPropertyGroup)
 	showEditOptions = bpy.props.BoolProperty(default = True)
