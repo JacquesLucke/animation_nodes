@@ -19,14 +19,11 @@ def perlinNoise(x, persistance, octaves):
 
 def interpolatedNoise(x):
 	intX = int(x)
-	v1 = smoothedNoise(intX)
-	v2 = smoothedNoise(intX + 1)
-	v3 = smoothedNoise(intX + 2)
-	v4 = smoothedNoise(intX + 3)
+	v1 = smoothNoiseCache[intX % smoothNoiseCacheSize]
+	v2 = smoothNoiseCache[(intX+1) % smoothNoiseCacheSize]
+	v3 = smoothNoiseCache[(intX+2) % smoothNoiseCacheSize]
+	v4 = smoothNoiseCache[(intX+3) % smoothNoiseCacheSize]
 	return cubicInterpolation(v1, v2, v3, v4, x - intX)
-	
-def smoothedNoise(x):
-	return smoothNoiseCache[x % smoothNoiseCacheSize]
 	
 def cubicInterpolation(v0, v1, v2, v3, x):
 	p = v3 - v2 - v0 + v1
