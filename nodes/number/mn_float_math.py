@@ -60,62 +60,34 @@ class mn_FloatMathNode(Node, AnimationNode):
 	def draw_buttons(self, context, layout):
 		layout.prop(self, "mathTypesProperty")
 		
-	def execute(self, a, b):
-		result = 0
-		operation = self.mathTypesProperty
-		try:
-			if operation == "ADD": result = a + b
-			elif operation == "SUBTRACT": result = a - b
-			elif operation == "MULITPLY": result = a * b
-			elif operation == "DIVIDE": result = a / b
-			elif operation == "SINE": result = math.sin(a)
-			elif operation == "COSINE": result = math.cos(a)
-			elif operation == "TANGENT": result = math.tan(a)
-			elif operation == "ARCSINE":
-				if a > 1:
-					a = 1
-					print("Clamping A to 1")
-				elif a < -1:
-					a = -1
-					print("Clamping A to -1")
-				result = math.asin(a)
-			elif operation == "ARCCOSINE":
-				if a > 1:
-					a = 1
-					print("Clamping A to 1")
-				elif a < -1:
-					a = -1
-					print("Clamping A to -1")
-				result = math.acos(a)
-			elif operation == "ARCTANGENT": result = math.atan(a)
-			elif operation == "POWER": result = math.pow(a, b)
-			elif operation == "LOGARITHM":
-				if b == 0:
-					result = math.log(a)
-				else:
-					result = math.log(a, b)
-			elif operation == "MINIMUM": result = min(a, b)
-			elif operation == "MAXIMUM": result = max(a, b)
-			elif operation == "ROUND": result = round(a, int(b))
-			elif operation == "LESSTHAN":
-				if b < a:
-					result = True
-				else:
-					result = False
-			elif operation == "GREATHERTHAN":
-				if b > a:
-					result = True
-				else:
-					result = False
-			elif operation == "MODULO": result = a % b
-			elif operation == "ABSOLUTE": result = abs(a)
-		except ZeroDivisionError as e:
-			print("ZeroDivisionError: {error} - {name}".format(error=e, name=self.name))
-		except ValueError as e:
-			print("ValueError: {error} - {name}".format(error=e, name=self.name))
-		return result
-		
 	def useInLineExecution(self):
-		return self.mathTypesProperty == "ADD"
+		return True
 	def getInLineExecutionString(self):
-		return "$result$ = %a% + %b%"
+		op = self.mathTypesProperty
+		if op == "ADD": return "$result$ = %a% + %b%"
+		elif op == "SUBTRACT": return "$result$ = %a% - %b%"
+		elif op == "MULITPLY": return "$result$ = %a% * %b%"
+		elif op == "DIVIDE": return "$result$ = %a% / %b%"
+		elif op == "SINE": return "$result$ = math.sin(%a%)"
+		elif op == "COSINE": return "$result$ = math.cos(%a%)"
+		elif op == "TANGENT": return "$result$ = math.tan(%a%)"
+		elif op == "ARCSINE": return "$result$ = math.asin(min(max(%a%, -1), 1))"
+		elif op == "ARCCOSINE": return "$result$ = math.acos(min(max(%a%, -1), 1))"
+		elif op == "ARCTANGENT": return "$result$ = math.atan(%a%)"
+		elif op == "POWER": return "$result$ = math.pow(%a%, %b%)"
+		elif op == "LOGARITHM": return '''
+if %b% == 0: $result$ = math.log(%a%)
+else: $result$ = math.log(%a%, %b%)
+'''
+		elif op == "MINIMUM": return "$result$ = min(%a%, %b%)"
+		elif op == "MAXIMUM": return "$result$ = max(%a%, %b%)"
+		elif op == "ROUND": return "$result$ = round(%a%, int(%b%))"
+		elif op == "LESSTHAN": return "$result$ = %a% < %b%"
+		elif op == "GREATHERTHAN": return "$result$ = %a% > %b%"
+		elif op == "ABSOLUTE": return "$result$ = abs(%a%)"
+		elif op == "MODULO": return '''
+if %b% == 0: $result$ = 0
+else: $result$ = %a% % %b%
+'''
+	def getModuleList(self):
+		return ["math"]

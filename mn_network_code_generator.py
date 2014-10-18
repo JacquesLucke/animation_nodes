@@ -171,6 +171,7 @@ def insertConversionNode(nodeTree, nodeType, link, fromSocket, toSocket):
 class NetworkCodeGenerator:
 	def __init__(self, network):
 		self.network = network
+		self.modules = set(["bpy", "time"])
 		self.functions = {}
 		self.neededSocketReferences = []
 		self.allNodesInTree = []
@@ -180,7 +181,7 @@ class NetworkCodeGenerator:
 		mainCode = self.getMainCode()
 		
 		codeParts = []
-		codeParts.append("import bpy, time")
+		codeParts.append("import " + ", ".join(self.modules))
 		codeParts.append("nodes = bpy.data.node_groups['" + self.network[0].id_data.name + "'].nodes")
 		codeParts.append(self.getNodeReferencingCode())
 		codeParts.append(self.getNodeExecuteReferencingCode())
@@ -357,6 +358,8 @@ class NetworkCodeGenerator:
 		if hasattr(node, "useInLineExecution"):
 			useInLineExecution = node.useInLineExecution()
 		if useInLineExecution:
+			if hasattr(node, "getModuleList"):
+				self.modules.update(node.getModuleList())
 			inLineString = node.getInLineExecutionString() 
 			inputSocketNames = node.getInputSocketNames()
 			outputSocketNames = node.getOutputSocketNames()
