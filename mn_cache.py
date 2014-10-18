@@ -33,4 +33,4 @@ for i in range(randomNumberCacheSize):
 def getRandom(seed):
 	return randomNumberCache[seed % randomNumberCacheSize]
 def getUniformRandom(seed, min, max):
-	return min + getRandom(seed) * (max - min)
+	return min + randomNumberCache[seed % randomNumberCacheSize] * (max - min)
