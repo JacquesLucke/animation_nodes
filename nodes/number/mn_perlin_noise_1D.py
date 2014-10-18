@@ -6,8 +6,8 @@ from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 randomNumberCache = []
 random.seed(0)
-for i in range(2500):
-	randomNumberCache.append(random.random())
+for i in range(400):
+	randomNumberCache.append((random.random()-0.5)*2)
 
 class mn_PerlinNoise1D(Node, AnimationNode):
 	bl_idname = "mn_PerlinNoise1D"
@@ -40,9 +40,7 @@ class mn_PerlinNoise1D(Node, AnimationNode):
 			frequency = 2**i
 			amplitude = persistance**i
 			total += interpolatedNoise(x * frequency) * amplitude
-			print(total)
 			
-		print()
 		return total
 		
 def interpolatedNoise(x):
@@ -50,15 +48,24 @@ def interpolatedNoise(x):
 	fraction = x - intX
 	v1 = smoothedNoise(intX)
 	v2 = smoothedNoise(intX + 1)
-	return interpolate(v1, v2, fraction)
+	v3 = smoothedNoise(intX + 2)
+	v4 = smoothedNoise(intX + 3)
+	return cubicInterpolation(v1, v2, v3, v4, fraction)
 	
 def smoothedNoise(x):
 	return noise(x)/2.0 + noise(x-1)/4.0 + noise(x+1)/4.0
 	
 def noise(x):
-	return randomNumberCache[x % 2500]
+	return randomNumberCache[x % 400]
 	#x = (x<<13) ** x
 	#return ( 1.0 - ( (x * (x * x * 15731 + 789221) + 1376312589) & 7fffffff) / 1073741824.0)
+	
+def cubicInterpolation(v0, v1, v2, v3, x):
+	p = (v3 - v2) - (v0 - v1)
+	q = (v0 - v1) - p
+	r = v2 - v0
+	s = v1
+	return p * x**3 + q * x**2 + r * x + s
 	
 def interpolate(a, b, x):
 	ft = x * 3.1415927
