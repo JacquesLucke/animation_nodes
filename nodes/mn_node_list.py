@@ -6,14 +6,14 @@ def getNodeNameDictionary():
 		"mn_IntegerInputNode",
 		"mn_FloatListInputNode",
 		"mn_RandomNumberNode",
-		"mn_PerlinNoise1D",
+		"mn_FloatWiggle",
 		"mn_FloatMathNode",
 		"mn_FloatClamp" ] ))
 		
 	nodes.append(("Vector", [
 		"mn_CombineVector",
 		"mn_SeparateVector",
-		"mn_PerlinNoise3D",
+		"mn_VectorWiggle",
 		"mn_VectorLengthNode" ] ))	
 		
 	nodes.append(("Text", [
@@ -71,9 +71,9 @@ def getNodeNameDictionary():
 		"mn_ExpressionNode" ] ))
 		
 	nodes.append(("System", [
-		"mn_LoopNode",
-		"mn_LoopStartNode",
+		"mn_EnumerateObjectsNode",
 		"mn_EnumerateObjectsStartNode",
-		"mn_EnumerateObjectsNode" ] ))
+		"mn_LoopNode",
+		"mn_LoopStartNode"] ))
 		
 	return nodes

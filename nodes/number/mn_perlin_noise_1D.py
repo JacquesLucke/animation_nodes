@@ -5,8 +5,8 @@ from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 
-class mn_PerlinNoise1D(Node, AnimationNode):
-	bl_idname = "mn_PerlinNoise1D"
+class mn_FloatWiggle(Node, AnimationNode):
+	bl_idname = "mn_FloatWiggle"
 	bl_label = "Number Wiggle"
 	
 	additionalSeed = bpy.props.IntProperty(update = nodePropertyChanged)

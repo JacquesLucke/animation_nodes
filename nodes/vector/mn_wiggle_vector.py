@@ -5,8 +5,8 @@ from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 
-class mn_PerlinNoise3D(Node, AnimationNode):
-	bl_idname = "mn_PerlinNoise3D"
+class mn_VectorWiggle(Node, AnimationNode):
+	bl_idname = "mn_VectorWiggle"
 	bl_label = "Vector Wiggle"
 	
 	additionalSeed = bpy.props.IntProperty(update = nodePropertyChanged)
@@ -15,7 +15,7 @@ class mn_PerlinNoise3D(Node, AnimationNode):
 		forbidCompiling()
 		self.inputs.new("mn_FloatSocket", "Evolution")
 		self.inputs.new("mn_FloatSocket", "Slowness").number = 15.0
-		self.inputs.new("mn_VectorSocket", "Amplitude").number = 1
+		self.inputs.new("mn_VectorSocket", "Amplitude").vector = [5, 5, 5]
 		self.inputs.new("mn_FloatSocket", "Persistance").number = 0.3
 		self.inputs.new("mn_IntegerSocket", "Octaves").number = 2.0
 		self.outputs.new("mn_VectorSocket", "Vector")
