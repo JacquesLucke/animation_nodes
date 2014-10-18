@@ -11,9 +11,9 @@ allowedSocketTypes = {
 	"NodeSocketFloat" : "mn_FloatSocket" }
 					
 
-class mn_MaterialOutputNode(Node, AnimationNode):
-	bl_idname = "mn_MaterialOutputNode"
-	bl_label = "Material Output"
+class mn_CyclesMaterialOutputNode(Node, AnimationNode):
+	bl_idname = "mn_CyclesMaterialOutputNode"
+	bl_label = "Cycles Material Output"
 	
 	def getPossibleSocketItems(self, context):
 		sockets = self.getPossibleSockets()
