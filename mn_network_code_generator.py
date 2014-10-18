@@ -172,6 +172,7 @@ class NetworkCodeGenerator:
 		self.functions = {}
 		self.neededSocketReferences = []
 		self.allNodesInTree = []
+		self.executeNodes = []
 		
 	def getCode(self):
 		mainCode = self.getMainCode()
@@ -180,6 +181,7 @@ class NetworkCodeGenerator:
 		codeParts.append("import bpy, time")
 		codeParts.append("nodes = bpy.data.node_groups['" + self.network[0].id_data.name + "'].nodes")
 		codeParts.append(self.getNodeReferencingCode())
+		codeParts.append(self.getNodeExecuteReferencingCode())
 		codeParts.append(self.getSocketReferencingCode())
 		codeParts.append(self.getTimerDefinitions())
 		codeParts.append(self.getFunctionsCode())
@@ -235,6 +237,7 @@ class NetworkCodeGenerator:
 		codeLines = []
 		if bpy.context.scene.nodeExecutionProfiling: codeLines.append(getNodeTimerStartName(node) + " = time.clock()")
 		codeLines.append(self.getNodeExecutionString(node))
+		self.executeNodes.append(node)
 		if bpy.context.scene.nodeExecutionProfiling: codeLines.append(getNodeTimerName(node) + " += time.clock() - " + getNodeTimerStartName(node))
 		return codeLines
 	def getLoopNodeCode(self, node):
@@ -295,6 +298,12 @@ class NetworkCodeGenerator:
 			codeLines.append(self.getNodeDeclarationString(node))
 		return "\n".join(codeLines)
 		
+	def getNodeExecuteReferencingCode(self):
+		codeLines = []
+		for node in self.executeNodes:
+			codeLines.append(self.getNodeFunctionDeclarationString(node))
+		return "\n".join(codeLines)
+		
 	def getSocketReferencingCode(self):
 		codeLines = []
 		for socket in self.neededSocketReferences:
@@ -348,10 +357,12 @@ class NetworkCodeGenerator:
 		
 	def getNodeDeclarationString(self, node):
 		return getNodeVariableName(node) + " = nodes['"+node.name+"']"
+	def getNodeFunctionDeclarationString(self, node):
+		return getNodeExecutionName(node) + " = " + getNodeVariableName(node) + ".execute"
 	def getSocketDeclarationString(self, socket):
 		return getInputSocketVariableName(socket) + " = " + getNodeVariableName(socket.node) + ".inputs['" + socket.identifier + "'].getValue()"
 	def getNodeExecutionString(self, node):
-		return getNodeOutputString(node) + " = " + getNodeVariableName(node) + ".execute(" + self.generateInputListString(node) + ")"
+		return getNodeOutputString(node) + " = " + getNodeExecutionName(node) + "(" + self.generateInputListString(node) + ")"
 
 def getNodeOutputString(node):
 	if usesFastCall(node):
@@ -389,6 +400,8 @@ def getNodeOutputName(node):
 	return "output_" + str(node.codeIndex)
 def getNodeFunctionName(node):
 	return getNodeVariableName(node) + "_" + "Function"
+def getNodeExecutionName(node):
+	return getNodeVariableName(node) + "_" + "execute"
 def getNodeTimerStartName(node):
 	return "timer_start_" + str(node.codeIndex)
 def getNodeTimerName(node):
