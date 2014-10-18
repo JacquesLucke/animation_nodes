@@ -130,7 +130,9 @@ convertableTypes = [("Float", "Integer", "mn_ToIntegerConversion"),
 					("Float", "String", "mn_ToStringConversion"),
 					("Integer", "String", "mn_ToStringConversion"),
 					("Float", "Vector", "mn_CombineVector"),
-					("Integer", "Vector", "mn_CombineVector")]
+					("Integer", "Vector", "mn_CombineVector"),
+					("Vector", "Float", "mn_SeparateVector"),
+					("Vector", "Integer", "mn_SeparateVector")]
 		
 def cleanupNodeTrees():
 	nodeTrees = getAnimationNodeTrees()
