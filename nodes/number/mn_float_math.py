@@ -1,11 +1,10 @@
 import bpy
 from bpy.types import Node
 from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from mn_execution import nodeTreeChanged, allowCompiling, forbidCompiling
 import math
 
 def updateNode(node, context):
-	nodePropertyChanged(node, context)
 	singleInputOperations = ["SINE",
 							 "COSINE",
 							 "TANGENT",
@@ -17,6 +16,7 @@ def updateNode(node, context):
 		node.inputs[-1].hide = True
 	elif node.mathTypesProperty not in singleInputOperations and node.inputs[-1].hide:
 		node.inputs[-1].hide = False
+	nodeTreeChanged()
 
 
 class mn_FloatMathNode(Node, AnimationNode):
@@ -114,3 +114,8 @@ class mn_FloatMathNode(Node, AnimationNode):
 		except ValueError as e:
 			print("ValueError: {error} - {name}".format(error=e, name=self.name))
 		return result
+		
+	def useInLineExecution(self):
+		return self.mathTypesProperty == "ADD"
+	def getInLineExecutionString(self):
+		return "$result$ = %a% + %b%"

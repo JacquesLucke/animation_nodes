@@ -239,7 +239,6 @@ class NetworkCodeGenerator:
 		codeLines = []
 		if bpy.context.scene.nodeExecutionProfiling: codeLines.append(getNodeTimerStartName(node) + " = time.clock()")
 		codeLines.append(self.getNodeExecutionString(node))
-		if not isInLineNode(node): self.executeNodes.append(node)
 		if bpy.context.scene.nodeExecutionProfiling: codeLines.append(getNodeTimerName(node) + " += time.clock() - " + getNodeTimerStartName(node))
 		return codeLines
 	def getLoopNodeCode(self, node):
@@ -368,6 +367,7 @@ class NetworkCodeGenerator:
 				inLineString = inLineString.replace("$" + name + "$", getOutputValueVariable(node.outputs[identifier]))
 			return inLineString
 		else:
+			self.executeNodes.append(node)
 			return getNodeOutputString(node) + " = " + getNodeExecutionName(node) + "(" + self.generateInputListString(node) + ")"
 
 def getNodeOutputString(node):
