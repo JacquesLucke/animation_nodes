@@ -7,7 +7,8 @@ def getNodeNameDictionary():
 		"mn_FloatListInputNode",
 		"mn_RandomNumberNode",
 		"mn_PerlinNoise1D",
-		"mn_FloatMathNode" ] ))
+		"mn_FloatMathNode",
+		"mn_FloatClamp" ] ))
 		
 	nodes.append(("Vector", [
 		"mn_CombineVector",
