@@ -18,5 +18,7 @@ class mn_ToFloatConversion(Node, AnimationNode):
 	def getOutputSocketNames(self):
 		return {"Number" : "number"}
 		
-	def execute(self, value):
-		return float(value)
+	def useInLineExecution(self):
+		return True
+	def getInLineExecutionString(self):
+		return "$number$ = float(%value%)"

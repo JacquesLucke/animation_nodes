@@ -227,7 +227,7 @@ class NetworkCodeGenerator:
 		
 	def getNodeCodeLines(self, node):
 		codeLines = []
-		if isExecuteableNode(node):
+		if isExecuteableNode(node) or isInLineNode(node):
 			codeLines.extend(self.getExecutableNodeCode(node))
 		elif isLoopNode(node):
 			codeLines.extend(self.getLoopNodeCode(node))
@@ -239,7 +239,7 @@ class NetworkCodeGenerator:
 		codeLines = []
 		if bpy.context.scene.nodeExecutionProfiling: codeLines.append(getNodeTimerStartName(node) + " = time.clock()")
 		codeLines.append(self.getNodeExecutionString(node))
-		self.executeNodes.append(node)
+		if not isInLineNode(node): self.executeNodes.append(node)
 		if bpy.context.scene.nodeExecutionProfiling: codeLines.append(getNodeTimerName(node) + " += time.clock() - " + getNodeTimerStartName(node))
 		return codeLines
 	def getLoopNodeCode(self, node):
@@ -365,7 +365,7 @@ class NetworkCodeGenerator:
 				inLineString = inLineString.replace("%" + name + "%", getInputValueVariable(node.inputs[identifier]))
 				self.neededSocketReferences.append(node.inputs[identifier])
 			for identifier, name in outputSocketNames.items():
-				inLineString = inLineString.replace("$" + name + "$", getOutputValueVariable(node.inputs[identifier]))
+				inLineString = inLineString.replace("$" + name + "$", getOutputValueVariable(node.outputs[identifier]))
 			return inLineString
 		else:
 			return getNodeOutputString(node) + " = " + getNodeExecutionName(node) + "(" + self.generateInputListString(node) + ")"
@@ -386,6 +386,8 @@ def getCorrespondingStartNode(node):
 		
 def isExecuteableNode(node):
 	return hasattr(node, "execute")
+def isInLineNode(node):
+	return hasattr(node, "getInLineExecutionString")
 def isLoopNode(node):
 	return node.bl_idname == "mn_LoopNode"
 def isEnumerateObjectsNode(node):

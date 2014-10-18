@@ -18,5 +18,7 @@ class mn_ToStringConversion(Node, AnimationNode):
 	def getOutputSocketNames(self):
 		return {"Text" : "text"}
 		
-	def execute(self, value):
-		return str(value)
+	def useInLineExecution(self):
+		return True
+	def getInLineExecutionString(self):
+		return "$text$ = str(%value%)"

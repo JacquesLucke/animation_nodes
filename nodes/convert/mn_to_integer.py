@@ -18,5 +18,7 @@ class mn_ToIntegerConversion(Node, AnimationNode):
 	def getOutputSocketNames(self):
 		return {"Number" : "number"}
 		
-	def execute(self, value):
-		return int(value)
+	def useInLineExecution(self):
+		return True
+	def getInLineExecutionString(self):
+		return "$number$ = int(%value%)"
