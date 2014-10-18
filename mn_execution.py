@@ -45,12 +45,12 @@ def rebuildNodeNetworks():
 	global compiledCodeObjects, codeStrings
 	del compiledCodeObjects[:]
 	del codeStrings[:]
-	try:
-		codeStrings = getAllNetworkCodeStrings()
-		for code in codeStrings:
-			compiledCodeObjects.append(compile(code, "<string>", "exec"))
-	except:
-		pass
+	if bpy.context.scene.showFullError: codeStrings = getAllNetworkCodeStrings()
+	else:
+		try: codeStrings = getAllNetworkCodeStrings()
+		except:	pass
+	for code in codeStrings:
+		compiledCodeObjects.append(compile(code, "<string>", "exec"))
 		
 def getCodeStrings():
 	return codeStrings

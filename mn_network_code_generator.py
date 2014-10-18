@@ -334,26 +334,16 @@ class NetworkCodeGenerator:
 			return "{ " + ", ".join(inputParts) + " }"
 	def getInputPartFromSameNode(self, socket, useFastMethod, inputSocketNames):
 		if useFastMethod:
-			return inputSocketNames[socket.identifier] + " = " + getInputSocketVariableName(socket)
+			return inputSocketNames[socket.identifier] + " = " + getInputValueVariable(socket)
 		else:
-			return "'" + socket.identifier + "' : " + getInputSocketVariableName(socket)
+			return "'" + socket.identifier + "' : " + getInputValueVariable(socket)
 	def getInputPartFromOtherNode(self, socket, originSocket, useFastMethod, inputSocketNames):
-		originNode = originSocket.node
-		originUsesFastMethod = usesFastCall(originNode)
-		outputSocketNames = None
-		if originUsesFastMethod: 
-			outputSocketNames = originNode.getOutputSocketNames()
-		return self.getInputPartStart(socket, useFastMethod, inputSocketNames) + self.getInputPartEnd(originNode, originSocket, originUsesFastMethod, outputSocketNames)	
+		return self.getInputPartStart(socket, useFastMethod, inputSocketNames) + getInputValueVariable(socket)	
 	def getInputPartStart(self, socket, useFastMethod, inputSocketNames):
 		if useFastMethod:
 			return inputSocketNames[socket.identifier] + " = "
 		else:
 			return "'" + socket.identifier + "' : "
-	def getInputPartEnd(self, originNode, originSocket, originUsesFastMethod, outputSocketNames):
-		if originUsesFastMethod:
-			return getNodeOutputName(originNode) + "_" + outputSocketNames[originSocket.identifier]
-		else:
-			return getNodeOutputName(originNode) + "['" + originSocket.identifier + "']"
 		
 		
 		
@@ -364,7 +354,13 @@ class NetworkCodeGenerator:
 	def getSocketDeclarationString(self, socket):
 		return getInputSocketVariableName(socket) + " = " + getNodeVariableName(socket.node) + ".inputs['" + socket.identifier + "'].getValue()"
 	def getNodeExecutionString(self, node):
-		return getNodeOutputString(node) + " = " + getNodeExecutionName(node) + "(" + self.generateInputListString(node) + ")"
+		useInLineExecution = False
+		if hasattr(node, "useInLineExecution"):
+			useInLineExecution = node.useInLineExecution()
+		if useInLineExecution:
+			inLineString = node.getInLineExecutionString() 
+		else:
+			return getNodeOutputString(node) + " = " + getNodeExecutionName(node) + "(" + self.generateInputListString(node) + ")"
 
 def getNodeOutputString(node):
 	if usesFastCall(node):
@@ -373,7 +369,7 @@ def getNodeOutputString(node):
 		if len(node.outputs) != 0:
 			outputParts = []
 			for socket in node.outputs:
-				outputParts.append(getNodeOutputName(node) + "_" + outputSocketNames[socket.identifier])
+				outputParts.append(getOutputValueVariable(socket))
 			return ", ".join(outputParts)
 	return getNodeOutputName(node)
 	
@@ -393,6 +389,19 @@ def usesFastCall(node):
 		else: raise Exception()
 	if hasattr(node, "getOutputSocketNames"): raise Exception()
 	return False
+	
+def getInputValueVariable(socket):
+	originSocket = getOriginSocket(socket)
+	if isOtherOriginSocket(socket, originSocket):
+		return getOutputValueVariable(originSocket)
+	else:
+		return getInputSocketVariableName(socket)
+def getOutputValueVariable(socket):
+	if usesFastCall(socket.node):
+		outputSocketNames = socket.node.getOutputSocketNames()
+		return getNodeOutputName(socket.node) + "_" + outputSocketNames[socket.identifier]
+	else:
+		return getNodeOutputName(socket.node) + "['" + socket.identifier + "']"
 		
 def getNodeVariableName(node):
 	return "node_" + str(node.codeIndex)
