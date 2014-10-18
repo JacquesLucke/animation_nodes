@@ -359,6 +359,14 @@ class NetworkCodeGenerator:
 			useInLineExecution = node.useInLineExecution()
 		if useInLineExecution:
 			inLineString = node.getInLineExecutionString() 
+			inputSocketNames = node.getInputSocketNames()
+			outputSocketNames = node.getOutputSocketNames()
+			for identifier, name in inputSocketNames.items():
+				inLineString = inLineString.replace("%" + name + "%", getInputValueVariable(node.inputs[identifier]))
+				self.neededSocketReferences.append(node.inputs[identifier])
+			for identifier, name in outputSocketNames.items():
+				inLineString = inLineString.replace("$" + name + "$", getOutputValueVariable(node.inputs[identifier]))
+			return inLineString
 		else:
 			return getNodeOutputString(node) + " = " + getNodeExecutionName(node) + "(" + self.generateInputListString(node) + ")"
 
