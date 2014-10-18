@@ -4,6 +4,11 @@ from mn_cache import *
 # perlin noise
 ################################
 
+smoothNoiseCacheSize = 7919
+smoothNoiseCache = []
+for i in range(smoothNoiseCacheSize):
+	smoothNoiseCache.append(getUniformRandom(i, -1, 1)/2.0 + getUniformRandom(i-1, -1, 1)/4.0 + getUniformRandom(i+1, -1, 1)/4.0)
+
 def perlinNoise(x, persistance, octaves):
 	total = 0
 	for i in range(octaves):
@@ -21,7 +26,7 @@ def interpolatedNoise(x):
 	return cubicInterpolation(v1, v2, v3, v4, x - intX)
 	
 def smoothedNoise(x):
-	return getRandomNoise(x)/2.0 + getRandomNoise(x-1)/4.0 + getRandomNoise(x+1)/4.0
+	return smoothNoiseCache[x % smoothNoiseCacheSize]
 	
 def cubicInterpolation(v0, v1, v2, v3, x):
 	p = v3 - v2 - v0 + v1

@@ -1,4 +1,5 @@
 from mn_utils import *
+import random
 
 # generic cache
 ###############################
@@ -25,17 +26,12 @@ def getExecutionCache(node):
 
 randomNumberCacheSize = 7919
 randomNumberCache = []
-randomNoiseCache = []
 random.seed(5827)
 for i in range(randomNumberCacheSize):
-	rand = random.random()
-	randomNumberCache.append(rand)
-	randomNoiseCache.append(rand * 2 - 1)
+	randomNumberCache.append(random.random())
 	
 	
 def getRandom(seed):
 	return randomNumberCache[seed % randomNumberCacheSize]
 def getUniformRandom(seed, min, max):
 	return min + randomNumberCache[seed % randomNumberCacheSize] * (max - min)
-def getRandomNoise(seed):
-	return randomNoiseCache[seed % randomNumberCacheSize]
