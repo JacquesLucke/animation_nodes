@@ -15,8 +15,9 @@ class mn_PerlinNoise1D(Node, AnimationNode):
 		forbidCompiling()
 		self.inputs.new("mn_FloatSocket", "Evolution")
 		self.inputs.new("mn_FloatSocket", "Slowness").number = 15.0
-		self.inputs.new("mn_FloatSocket", "Persistance").number = 1.0
-		self.inputs.new("mn_IntegerSocket", "Octaves").number = 3.0
+		self.inputs.new("mn_FloatSocket", "Amplitude").number = 1
+		self.inputs.new("mn_FloatSocket", "Persistance").number = 0.3
+		self.inputs.new("mn_IntegerSocket", "Octaves").number = 2.0
 		self.outputs.new("mn_FloatSocket", "Noise")
 		allowCompiling()
 		
@@ -26,19 +27,20 @@ class mn_PerlinNoise1D(Node, AnimationNode):
 	def getInputSocketNames(self):
 		return {"Evolution" : "x",
 				"Slowness" : "slowness",
+				"Amplitude" : "amplitude",
 				"Persistance" : "persistance",
 				"Octaves" : "octaves"}
 	def getOutputSocketNames(self):
 		return {"Noise" : "noise"}
 		
-	def execute(self, x, slowness, persistance, octaves):
+	def execute(self, x, slowness, amplitude, persistance, octaves):
 		total = 0
 		x = x / slowness
 		
 		for i in range(octaves):
 			frequency = 2**i
-			amplitude = persistance**i
-			total += interpolatedNoise(x * frequency + 823 * self.additionalSeed) * amplitude
+			localAmplitude = persistance**i * amplitude
+			total += interpolatedNoise(x * frequency + 823 * self.additionalSeed) * localAmplitude
 			
 		return total
 		

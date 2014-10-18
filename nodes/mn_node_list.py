@@ -6,6 +6,7 @@ def getNodeNameDictionary():
 		"mn_IntegerInputNode",
 		"mn_FloatListInputNode",
 		"mn_RandomNumberNode",
+		"mn_PerlinNoise1D",
 		"mn_FloatMathNode" ] ))
 		
 	nodes.append(("Vector", [
