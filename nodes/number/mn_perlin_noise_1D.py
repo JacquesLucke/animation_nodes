@@ -14,7 +14,7 @@ class mn_PerlinNoise1D(Node, AnimationNode):
 	def init(self, context):
 		forbidCompiling()
 		self.inputs.new("mn_FloatSocket", "Evolution")
-		self.inputs.new("mn_FloatSocket", "Speed").number = 0.5
+		self.inputs.new("mn_FloatSocket", "Slowness").number = 15.0
 		self.inputs.new("mn_FloatSocket", "Persistance").number = 1.0
 		self.inputs.new("mn_IntegerSocket", "Octaves").number = 3.0
 		self.outputs.new("mn_FloatSocket", "Noise")
@@ -25,15 +25,15 @@ class mn_PerlinNoise1D(Node, AnimationNode):
 		
 	def getInputSocketNames(self):
 		return {"Evolution" : "x",
-				"Speed" : "speed",
+				"Slowness" : "slowness",
 				"Persistance" : "persistance",
 				"Octaves" : "octaves"}
 	def getOutputSocketNames(self):
 		return {"Noise" : "noise"}
 		
-	def execute(self, x, speed, persistance, octaves):
+	def execute(self, x, slowness, persistance, octaves):
 		total = 0
-		x = x / speed
+		x = x / slowness
 		
 		for i in range(octaves):
 			frequency = 2**i
@@ -54,7 +54,7 @@ def smoothedNoise(x):
 	return getRandomNoise(x)/2.0 + getRandomNoise(x-1)/4.0 + getRandomNoise(x+1)/4.0
 	
 def cubicInterpolation(v0, v1, v2, v3, x):
-	p = v3 - v2 + v0 + v1
+	p = v3 - v2 - v0 + v1
 	return p * x**3 + ((v0 - v1) - p) * x**2 + (v2 - v0) * x + v1
 	
 	# P = (v3 - v2) - (v0 - v1)
