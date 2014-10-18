@@ -35,7 +35,7 @@ class mn_PerlinNoise1D(Node, AnimationNode):
 		for i in range(octaves):
 			frequency = 2**i
 			amplitude = persistance**i
-			total += interpolatedNoise(x * frequency) * amplitude
+			total += interpolatedNoise(x * frequency + 823 * self.additionalSeed) * amplitude
 			
 		return total
 		
