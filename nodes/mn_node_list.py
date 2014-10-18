@@ -12,6 +12,7 @@ def getNodeNameDictionary():
 	nodes.append(("Vector", [
 		"mn_CombineVector",
 		"mn_SeparateVector",
+		"mn_PerlinNoise3D",
 		"mn_VectorLengthNode" ] ))	
 		
 	nodes.append(("Text", [
