@@ -23,10 +23,7 @@ class mn_FloatClamp(Node, AnimationNode):
 				"Max" : "maxValue"}
 	def getOutputSocketNames(self):
 		return {"Value" : "value"}
-		
-	def execute(self, value, minValue, maxValue):
-		return min(max(value, minValue), maxValue)
-		
+
 	def useInLineExecution(self):
 		return True
 	def getInLineExecutionString(self):
