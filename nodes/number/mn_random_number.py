@@ -1,12 +1,8 @@
 import bpy, random
 from bpy.types import Node
+from mn_cache import getUniformRandom
 from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
-
-randomNumberCache = []
-random.seed(0)
-for i in range(2500):
-	randomNumberCache.append(random.random())
 
 class mn_RandomNumberNode(Node, AnimationNode):
 	bl_idname = "mn_RandomNumberNode"
@@ -31,7 +27,5 @@ class mn_RandomNumberNode(Node, AnimationNode):
 		return {"Float Value" : "random_number"}
 		
 	def execute(self, seed, minValue, maxValue):
-		return getRandomNumber(seed + 999 * self.additionalSeed, minValue, maxValue)
+		return getUniformRandom(seed + 1193 * self.additionalSeed, minValue, maxValue)
 		
-def getRandomNumber(seed, min, max):
-	return min + randomNumberCache[seed % 2500] * (max - min)
