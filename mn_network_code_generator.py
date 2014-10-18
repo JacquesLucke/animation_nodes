@@ -368,12 +368,12 @@ def getNodeOutputString(node):
 	if usesFastCall(node):
 		outputSocketNames = node.getOutputSocketNames()
 		if len(outputSocketNames) != len(node.outputs): raise Exception()
-		outputParts = []
-		for socket in node.outputs:
-			outputParts.append(getNodeOutputName(node) + "_" + outputSocketNames[socket.identifier])
-		return ", ".join(outputParts)
-	else:
-		return getNodeOutputName(node)
+		if len(node.outputs) != 0:
+			outputParts = []
+			for socket in node.outputs:
+				outputParts.append(getNodeOutputName(node) + "_" + outputSocketNames[socket.identifier])
+			return ", ".join(outputParts)
+	return getNodeOutputName(node)
 	
 def getCorrespondingStartNode(node):
 	return node.getStartNode()

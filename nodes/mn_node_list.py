@@ -57,7 +57,8 @@ def getNodeNameDictionary():
 		"mn_DebugOutputNode" ] ))
 			
 	nodes.append(("Material", [
-		"mn_CyclesMaterialOutputNode" ] ))
+		"mn_CyclesMaterialOutputNode",
+		"mn_ViewportColorNode" ] ))
 
 	nodes.append(("Convert", [
 		"mn_ToStringConversion",
