@@ -176,6 +176,7 @@ class NetworkCodeGenerator:
 		self.neededSocketReferences = []
 		self.allNodesInTree = []
 		self.executeNodes = []
+		self.outputUseNodes = []
 		
 	def getCode(self):
 		mainCode = self.getMainCode()
@@ -186,6 +187,7 @@ class NetworkCodeGenerator:
 		codeParts.append(self.getNodeReferencingCode())
 		codeParts.append(self.getNodeExecuteReferencingCode())
 		codeParts.append(self.getSocketReferencingCode())
+		codeParts.append(self.getOutputUseDeclarationCode())
 		codeParts.append(self.getTimerDefinitions())
 		codeParts.append(self.getFunctionsCode())
 		codeParts.append(mainCode)
@@ -311,7 +313,12 @@ class NetworkCodeGenerator:
 		for socket in self.neededSocketReferences:
 			codeLines.append(self.getSocketDeclarationString(socket))
 		return "\n".join(codeLines)
-	
+		
+	def getOutputUseDeclarationCode(self):
+		codeLines = []
+		for node in self.outputUseNodes:
+			codeLines.append(getNodeOutputUseName(node) + " = " + getOutputUseDictionaryCode(node))
+		return "\n".join(codeLines)
 
 	def generateInputListString(self, node):
 		inputParts = []
@@ -326,7 +333,8 @@ class NetworkCodeGenerator:
 				self.neededSocketReferences.append(socket)
 				inputParts.append(self.getInputPartFromSameNode(socket, useFastMethod, inputSocketNames))
 		if usesOutputUseParameter(node):
-			return node.outputUseParameterName + " = " + getOutputUseDictionaryCode(node) + ", " + self.joinInputParts(inputParts, useFastMethod)
+			self.outputUseNodes.append(node)
+			return node.outputUseParameterName + " = " + getNodeOutputUseName(node) + ", " + self.joinInputParts(inputParts, useFastMethod)
 		else:
 			return self.joinInputParts(inputParts, useFastMethod)
 			
@@ -438,6 +446,8 @@ def getNodeInputName(node):
 	return "input_" + str(node.codeIndex)
 def getNodeOutputName(node):
 	return "output_" + str(node.codeIndex)
+def getNodeOutputUseName(node):
+	return getNodeVariableName(node) + "_output_use"
 def getNodeFunctionName(node):
 	return getNodeVariableName(node) + "_" + "Function"
 def getNodeExecutionName(node):
