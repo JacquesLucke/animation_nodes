@@ -51,52 +51,43 @@ class mn_CopyTransformsNode(Node, AnimationNode):
 		
 		layout.prop(self, "frameTypesProperty")
 		
-	def execute(self, input):
-		fromObject = input["From"]
-		toObject = input["To"]
+	def getInputSocketNames(self):
+		return {"From" : "fromObject",
+				"To" : "toObject",
+				"Frame" : "frame"}
+	def getOutputSocketNames(self):
+		return {"To" : "toObject"}
+		
+	def execute(self, fromObject, toObject, frame):
 		if fromObject is None or toObject is None:
-			return { "To" : None }
+			return toObject
 			
 		if self.frameTypesProperty == "OFFSET":
-			frame = getCurrentFrame()
-			frame += input["Frame"]
-		elif self.frameTypesProperty == "ABSOLUTE":
-			frame = input["Frame"]
+			frame += getCurrentFrame()
+	
+		useLoc = self.useLocation
+		useRot = self.useRotation
+		useScale = self.useScale
 		
-		fCurves = self.getFCurvesFromCache(fromObject)
-		for i in range(3):
-			if self.useLocation[i]:
-				if fCurves["loc"][i] is None: toObject.location[i] = fromObject.location[i]
-				else: toObject.location[i] = fCurves["loc"][i].evaluate(frame)
-		for i in range(3):
-			if self.useRotation[i]:
-				if fCurves["rot"][i] is None: toObject.rotation_euler[i] = fromObject.rotation_euler[i]
-				else: toObject.rotation_euler[i] = fCurves["rot"][i].evaluate(frame)
-		for i in range(3):
-			if self.useScale[i]:
-				if fCurves["scale"][i] is None: toObject.scale[i] = fromObject.scale[i]
-				else: toObject.scale[i] = fCurves["scale"][i].evaluate(frame)
-		return { "To" : toObject}
-		
-	def getFCurvesFromCache(self, fromObject):
-		context = fromObject.name
-		cache = getExecutionCache(self)
-		if cache is None:
-			cache = {}
-		if context not in cache:
-			fCurves = {}
-			
-			fCurves["loc"] = [None, None, None]
-			fCurves["rot"] = [None, None, None]
-			fCurves["scale"] = [None, None, None]
-			
+		if useLoc[0] and useLoc[1] and useLoc[2]:
+			toObject.location = getArrayValueAtFrame(fromObject, "location", frame)
+		else:
 			for i in range(3):
-				fCurves["loc"][i] = getFCurveWithDataPath(fromObject, "location", index = i)
+				if useLoc[i]:
+					toObject.location[i] = getSingleValueOfArrayAtFrame(fromObject, "location", index = i, frame = frame)
+					
+		if useRot[0] and useRot[1] and useRot[2]:
+			toObject.rotation_euler = getArrayValueAtFrame(fromObject, "rotation_euler", frame)
+		else:
 			for i in range(3):
-				fCurves["rot"][i] = getFCurveWithDataPath(fromObject, "rotation_euler", index = i)
+				if useRot[i]:
+					toObject.rotation_euler[i] = getSingleValueOfArrayAtFrame(fromObject, "rotation_euler", index = i, frame = frame)
+					
+		if useScale[0] and useScale[1] and useScale[2]:
+			toObject.scale = getArrayValueAtFrame(fromObject, "scale", frame)
+		else:
 			for i in range(3):
-				fCurves["scale"][i] = getFCurveWithDataPath(fromObject, "scale", index = i)
-			
-			cache[context] = fCurves
-			setExecutionCache(self, cache)
-		return cache[context]
+				if useScale[i]:
+					toObject.scale[i] = getSingleValueOfArrayAtFrame(fromObject, "scale", index = i, frame = frame)
+					
+		return toObject
