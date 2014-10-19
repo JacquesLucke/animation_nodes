@@ -325,7 +325,10 @@ class NetworkCodeGenerator:
 			else:
 				self.neededSocketReferences.append(socket)
 				inputParts.append(self.getInputPartFromSameNode(socket, useFastMethod, inputSocketNames))
-		return self.joinInputParts(inputParts, useFastMethod)
+		if usesOutputUseParameter(node):
+			return node.outputUseParameterName + " = " + getOutputUseDictionaryCode(node) + ", " + self.joinInputParts(inputParts, useFastMethod)
+		else:
+			return self.joinInputParts(inputParts, useFastMethod)
 			
 	def joinInputParts(self, inputParts, useFastMethod):
 		if useFastMethod:
@@ -383,7 +386,12 @@ def getNodeOutputString(node):
 				outputParts.append(getOutputValueVariable(socket))
 			return ", ".join(outputParts)
 	return getNodeOutputName(node)
-	
+
+def getOutputUseDictionaryCode(node):
+	codeParts = []
+	for socket in node.outputs:
+		codeParts.append('"' + socket.identifier + '" : ' + str(hasLinks(socket)))
+	return "{" + ", ".join(codeParts) + "}"
 def getOutputUseDictionary(node):
 	outputUse = {}
 	for socket in node.outputs:
@@ -408,6 +416,8 @@ def usesFastCall(node):
 		else: raise Exception()
 	if hasattr(node, "getOutputSocketNames"): raise Exception()
 	return False
+def usesOutputUseParameter(node):
+	return hasattr(node, "outputUseParameterName")
 	
 def getInputValueVariable(socket):
 	originSocket = getOriginSocket(socket)
