@@ -5,10 +5,12 @@ from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from mn_utils import *
 from mn_object_utils import *
 from bpy.props import BoolProperty
+from operator import sub
 
 class mn_ObjectInfoNode(Node, AnimationNode):
 	bl_idname = "mn_ObjectInfoNode"
 	bl_label = "Object Info"
+	outputUseParameterName = "useOutput"
 	
 	frameTypes = [
 		("OFFSET", "Offset", ""),
@@ -30,35 +32,46 @@ class mn_ObjectInfoNode(Node, AnimationNode):
 	def draw_buttons(self, context, layout):
 		layout.prop(self, "frameTypesProperty")
 		
-	def execute(self, input):
-		output = {}
+	def getInputSocketNames(self):
+		return {"Object" : "object",
+				"Frame" : "frame"}
+	def getOutputSocketNames(self):
+		return {"Location" : "location",
+				"Rotation" : "rotation",
+				"Scale" : "scale",
+				"Location Velocity" : "locVelocity",
+				"Rotation Velocity" : "rotVelocity",
+				"Scale Velocity" : "scaleVelocity"}
 		
-		output["Location"] = [0, 0, 0]
-		output["Rotation"] = [0, 0, 0]
-		output["Scale"] = [1, 1, 1]
-		output["Location Velocity"] = [0, 0, 0]
-		output["Rotation Velocity"] = [0, 0, 0]
-		output["Scale Velocity"] = [0, 0, 0]
+	def execute(self, useOutput, object, frame):
+		location = [0, 0, 0]
+		rotation = [0, 0, 0]
+		scale = [1, 1, 1]
+		locVelocity = [0, 0, 0]
+		rotVelocity = [0, 0, 0]
+		scaleVelocity = [0, 0, 0]
 		
-		object = input["Object"]
 		if object is None:
-			return output
-			
+			return location, rotation, scale, locVelocity, rotVelocity, scaleVelocity
 		if self.frameTypesProperty == "OFFSET":
-			frame = getCurrentFrame()
-			frame += input["Frame"]
-		elif self.frameTypesProperty == "ABSOLUTE":
-			frame = input["Frame"]
+			frame += getCurrentFrame()
 			
-		output["Location"], output["Rotation"], output["Scale"] = getObjectTransformsAtFrame(object, frame)
+		if useOutput["Location Velocity"]:
+			[locationBefore, location] = getArrayValueAtMultipleFrames(object, "location", [frame-1, frame])
+			locVelocity = list(map(sub, location, locationBefore))
+		elif useOutput["Location"]:
+			location = getArrayValueAtFrame(object, "location", frame)
+			
+		if useOutput["Rotation Velocity"]:
+			[rotationBefore, rotation] = getArrayValueAtMultipleFrames(object, "rotation_euler", [frame-1, frame])
+			rotVelocity = list(map(sub, rotation, rotationBefore))
+		elif useOutput["Rotation"]:
+			rotation = getArrayValueAtFrame(object, "rotation_euler", frame)
+			
+		if useOutput["Scale Velocity"]:
+			[scaleBefore, scale] = getArrayValueAtMultipleFrames(object, "scale", [frame-1, frame])
+			scaleVelocity = list(map(sub, scale, scaleBefore))
+		elif useOutput["Scale"]:
+			scale = getArrayValueAtFrame(object, "scale", frame)
 		
-		for i in range(3):
-			output["Location Velocity"][i] = getFrameChange(object, frame, "location", i)
-			
-		for i in range(3):
-			output["Rotation Velocity"][i] = getFrameChange(object, frame, "rotation_euler", i)
-			
-		for i in range(3):
-			output["Scale Velocity"][i] = getFrameChange(object, frame, "scale", i)
-		
-		return output
+		return location, rotation, scale, locVelocity, rotVelocity, scaleVelocity

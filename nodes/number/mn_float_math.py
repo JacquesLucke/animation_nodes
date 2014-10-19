@@ -62,32 +62,37 @@ class mn_FloatMathNode(Node, AnimationNode):
 		
 	def useInLineExecution(self):
 		return True
-	def getInLineExecutionString(self):
-		op = self.mathTypesProperty
-		if op == "ADD": return "$result$ = %a% + %b%"
-		elif op == "SUBTRACT": return "$result$ = %a% - %b%"
-		elif op == "MULITPLY": return "$result$ = %a% * %b%"
-		elif op == "DIVIDE": return "$result$ = %a% / %b%"
-		elif op == "SINE": return "$result$ = math.sin(%a%)"
-		elif op == "COSINE": return "$result$ = math.cos(%a%)"
-		elif op == "TANGENT": return "$result$ = math.tan(%a%)"
-		elif op == "ARCSINE": return "$result$ = math.asin(min(max(%a%, -1), 1))"
-		elif op == "ARCCOSINE": return "$result$ = math.acos(min(max(%a%, -1), 1))"
-		elif op == "ARCTANGENT": return "$result$ = math.atan(%a%)"
-		elif op == "POWER": return "$result$ = math.pow(%a%, %b%)"
-		elif op == "LOGARITHM": return '''
+	def getInLineExecutionString(self, outputUse):
+		if outputUse["Result"]:
+			op = self.mathTypesProperty
+			if op == "ADD": return "$result$ = %a% + %b%"
+			elif op == "SUBTRACT": return "$result$ = %a% - %b%"
+			elif op == "MULITPLY": return "$result$ = %a% * %b%"
+			elif op == "DIVIDE": return '''
+if %b% == 0: $result$ = 0
+else: $result$ = %a% / %b%
+'''
+			elif op == "SINE": return "$result$ = math.sin(%a%)"
+			elif op == "COSINE": return "$result$ = math.cos(%a%)"
+			elif op == "TANGENT": return "$result$ = math.tan(%a%)"
+			elif op == "ARCSINE": return "$result$ = math.asin(min(max(%a%, -1), 1))"
+			elif op == "ARCCOSINE": return "$result$ = math.acos(min(max(%a%, -1), 1))"
+			elif op == "ARCTANGENT": return "$result$ = math.atan(%a%)"
+			elif op == "POWER": return "$result$ = math.pow(%a%, %b%)"
+			elif op == "LOGARITHM": return '''
 if %b% == 0: $result$ = math.log(%a%)
 else: $result$ = math.log(%a%, %b%)
 '''
-		elif op == "MINIMUM": return "$result$ = min(%a%, %b%)"
-		elif op == "MAXIMUM": return "$result$ = max(%a%, %b%)"
-		elif op == "ROUND": return "$result$ = round(%a%, int(%b%))"
-		elif op == "LESSTHAN": return "$result$ = %a% < %b%"
-		elif op == "GREATHERTHAN": return "$result$ = %a% > %b%"
-		elif op == "ABSOLUTE": return "$result$ = abs(%a%)"
-		elif op == "MODULO": return '''
+			elif op == "MINIMUM": return "$result$ = min(%a%, %b%)"
+			elif op == "MAXIMUM": return "$result$ = max(%a%, %b%)"
+			elif op == "ROUND": return "$result$ = round(%a%, int(%b%))"
+			elif op == "LESSTHAN": return "$result$ = %a% < %b%"
+			elif op == "GREATHERTHAN": return "$result$ = %a% > %b%"
+			elif op == "ABSOLUTE": return "$result$ = abs(%a%)"
+			elif op == "MODULO": return '''
 if %b% == 0: $result$ = 0
 else: $result$ = %a% % %b%
 '''
+		return ""
 	def getModuleList(self):
 		return ["math"]

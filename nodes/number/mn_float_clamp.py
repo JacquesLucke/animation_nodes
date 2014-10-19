@@ -26,6 +26,6 @@ class mn_FloatClamp(Node, AnimationNode):
 
 	def useInLineExecution(self):
 		return True
-	def getInLineExecutionString(self):
+	def getInLineExecutionString(self, outputUse):
 		return "$value$ = min(max(%value%, %minValue%), %maxValue%)"
 		

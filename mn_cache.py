@@ -10,15 +10,12 @@ def clearExecutionCache():
 	global executionCache
 	executionCache = {}
 	
-def setExecutionCache(node, object):
+def setExecutionCache(identifier, object):
 	global executionCache
-	executionCache[getNodeIdentifier(node)] = object
+	executionCache[identifier] = object
 	
-def getExecutionCache(node):
-	identifier = getNodeIdentifier(node)
-	if identifier in executionCache:
-		return executionCache[identifier]
-	return None
+def getExecutionCache(identifier):
+	return executionCache.get(identifier)
 	
 
 # random number cache

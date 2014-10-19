@@ -176,6 +176,7 @@ class NetworkCodeGenerator:
 		self.neededSocketReferences = []
 		self.allNodesInTree = []
 		self.executeNodes = []
+		self.outputUseNodes = []
 		
 	def getCode(self):
 		mainCode = self.getMainCode()
@@ -186,6 +187,7 @@ class NetworkCodeGenerator:
 		codeParts.append(self.getNodeReferencingCode())
 		codeParts.append(self.getNodeExecuteReferencingCode())
 		codeParts.append(self.getSocketReferencingCode())
+		codeParts.append(self.getOutputUseDeclarationCode())
 		codeParts.append(self.getTimerDefinitions())
 		codeParts.append(self.getFunctionsCode())
 		codeParts.append(mainCode)
@@ -239,7 +241,7 @@ class NetworkCodeGenerator:
 	def getExecutableNodeCode(self, node):
 		codeLines = []
 		if bpy.context.scene.nodeExecutionProfiling: codeLines.append(getNodeTimerStartName(node) + " = time.clock()")
-		codeLines.append(self.getNodeExecutionString(node))
+		codeLines.extend(self.getNodeExecutionLines(node))
 		if bpy.context.scene.nodeExecutionProfiling: codeLines.append(getNodeTimerName(node) + " += time.clock() - " + getNodeTimerStartName(node))
 		return codeLines
 	def getLoopNodeCode(self, node):
@@ -311,7 +313,12 @@ class NetworkCodeGenerator:
 		for socket in self.neededSocketReferences:
 			codeLines.append(self.getSocketDeclarationString(socket))
 		return "\n".join(codeLines)
-	
+		
+	def getOutputUseDeclarationCode(self):
+		codeLines = []
+		for node in self.outputUseNodes:
+			codeLines.append(getNodeOutputUseName(node) + " = " + getOutputUseDictionaryCode(node))
+		return "\n".join(codeLines)
 
 	def generateInputListString(self, node):
 		inputParts = []
@@ -325,7 +332,11 @@ class NetworkCodeGenerator:
 			else:
 				self.neededSocketReferences.append(socket)
 				inputParts.append(self.getInputPartFromSameNode(socket, useFastMethod, inputSocketNames))
-		return self.joinInputParts(inputParts, useFastMethod)
+		if usesOutputUseParameter(node):
+			self.outputUseNodes.append(node)
+			return node.outputUseParameterName + " = " + getNodeOutputUseName(node) + ", " + self.joinInputParts(inputParts, useFastMethod)
+		else:
+			return self.joinInputParts(inputParts, useFastMethod)
 			
 	def joinInputParts(self, inputParts, useFastMethod):
 		if useFastMethod:
@@ -353,14 +364,14 @@ class NetworkCodeGenerator:
 		return getNodeExecutionName(node) + " = " + getNodeVariableName(node) + ".execute"
 	def getSocketDeclarationString(self, socket):
 		return getInputSocketVariableName(socket) + " = " + getNodeVariableName(socket.node) + ".inputs['" + socket.identifier + "'].getValue()"
-	def getNodeExecutionString(self, node):
+	def getNodeExecutionLines(self, node):
 		useInLineExecution = False
 		if hasattr(node, "useInLineExecution"):
 			useInLineExecution = node.useInLineExecution()
 		if useInLineExecution:
 			if hasattr(node, "getModuleList"):
 				self.modules.update(node.getModuleList())
-			inLineString = node.getInLineExecutionString() 
+			inLineString = node.getInLineExecutionString(getOutputUseDictionary(node)) 
 			inputSocketNames = node.getInputSocketNames()
 			outputSocketNames = node.getOutputSocketNames()
 			for identifier, name in inputSocketNames.items():
@@ -368,11 +379,11 @@ class NetworkCodeGenerator:
 				self.neededSocketReferences.append(node.inputs[identifier])
 			for identifier, name in outputSocketNames.items():
 				inLineString = inLineString.replace("$" + name + "$", getOutputValueVariable(node.outputs[identifier]))
-			return inLineString
+			return inLineString.split("\n")
 		else:
 			self.executeNodes.append(node)
-			return getNodeOutputString(node) + " = " + getNodeExecutionName(node) + "(" + self.generateInputListString(node) + ")"
-
+			return [getNodeOutputString(node) + " = " + getNodeExecutionName(node) + "(" + self.generateInputListString(node) + ")"]
+			
 def getNodeOutputString(node):
 	if usesFastCall(node):
 		outputSocketNames = node.getOutputSocketNames()
@@ -383,6 +394,17 @@ def getNodeOutputString(node):
 				outputParts.append(getOutputValueVariable(socket))
 			return ", ".join(outputParts)
 	return getNodeOutputName(node)
+
+def getOutputUseDictionaryCode(node):
+	codeParts = []
+	for socket in node.outputs:
+		codeParts.append('"' + socket.identifier + '" : ' + str(hasLinks(socket)))
+	return "{" + ", ".join(codeParts) + "}"
+def getOutputUseDictionary(node):
+	outputUse = {}
+	for socket in node.outputs:
+		outputUse[socket.identifier] = hasLinks(socket)
+	return outputUse
 	
 def getCorrespondingStartNode(node):
 	return node.getStartNode()
@@ -402,6 +424,8 @@ def usesFastCall(node):
 		else: raise Exception()
 	if hasattr(node, "getOutputSocketNames"): raise Exception()
 	return False
+def usesOutputUseParameter(node):
+	return hasattr(node, "outputUseParameterName")
 	
 def getInputValueVariable(socket):
 	originSocket = getOriginSocket(socket)
@@ -422,6 +446,8 @@ def getNodeInputName(node):
 	return "input_" + str(node.codeIndex)
 def getNodeOutputName(node):
 	return "output_" + str(node.codeIndex)
+def getNodeOutputUseName(node):
+	return getNodeVariableName(node) + "_output_use"
 def getNodeFunctionName(node):
 	return getNodeVariableName(node) + "_" + "Function"
 def getNodeExecutionName(node):
