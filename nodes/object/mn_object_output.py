@@ -38,21 +38,28 @@ class mn_ObjectOutputNode(Node, AnimationNode):
 		row.prop(self, "useScale", index = 1, text = "Y")
 		row.prop(self, "useScale", index = 2, text = "Z")
 		
-	def execute(self, input):
-		object = input["Object"]
+	def getInputSocketNames(self):
+		return {"Object" : "object",
+				"Location" : "location",
+				"Rotation" : "rotation",
+				"Scale" : "scale"}
+	def getOutputSocketNames(self):
+		return {}
+		
+	def execute(self, object, location, rotation, scale):
 		if object is None:
-			return {}
+			return None
 		
-		if self.useLocation[0]: object.location[0] = input["Location"][0]
-		if self.useLocation[1]: object.location[1] = input["Location"][1]
-		if self.useLocation[2]: object.location[2] = input["Location"][2]
+		if self.useLocation[0]: object.location[0] = location[0]
+		if self.useLocation[1]: object.location[1] = location[1]
+		if self.useLocation[2]: object.location[2] = location[2]
 		
-		if self.useRotation[0]: object.rotation_euler[0] = input["Rotation"][0]
-		if self.useRotation[1]: object.rotation_euler[1] = input["Rotation"][1]
-		if self.useRotation[2]: object.rotation_euler[2] = input["Rotation"][2]
+		if self.useRotation[0]: object.rotation_euler[0] = rotation[0]
+		if self.useRotation[1]: object.rotation_euler[1] = rotation[1]
+		if self.useRotation[2]: object.rotation_euler[2] = rotation[2]
 		
-		if self.useScale[0]: object.scale[0] = input["Scale"][0]
-		if self.useScale[1]: object.scale[1] = input["Scale"][1]
-		if self.useScale[2]: object.scale[2] = input["Scale"][2]
+		if self.useScale[0]: object.scale[0] = scale[0]
+		if self.useScale[1]: object.scale[1] = scale[1]
+		if self.useScale[2]: object.scale[2] = scale[2]
 		
 		return {}

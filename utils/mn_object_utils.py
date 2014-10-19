@@ -78,20 +78,7 @@ def getFCurvesWithDataPath(object, dataPath):
 	return cache
 	
 	
-	
-	
-	
-	
-	
-	
-	
-		
-def getValueAtFrame(object, dataPath, index, frame):
-	fCurve = getFCurveWithDataPath(object, dataPath = dataPath, index = index)
-	if fCurve is None:
-		return eval("object." + dataPath + "[" + str(index) + "]")
-	else:
-		return fCurve.evaluate(frame)
+# names
 		
 def getPossibleObjectName(self, name = "object"):
 	randomString = getRandomString(3)
