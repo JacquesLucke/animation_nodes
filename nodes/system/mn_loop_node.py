@@ -24,7 +24,7 @@ class mn_LoopNode(Node, AnimationNode):
 		self.inputs.new("mn_IntegerSocket", "Amount")
 		
 	def draw_buttons(self, context, layout):
-		layout.prop(self, "loopsEnum")
+		row = layout.row(align = True)
 		row.prop(self, "loopsEnum")
 		newNode = row.operator("node.add_node", text = "", icon = "PLUS")
 		newNode.use_transform = True
