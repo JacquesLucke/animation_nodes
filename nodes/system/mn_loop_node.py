@@ -25,6 +25,10 @@ class mn_LoopNode(Node, AnimationNode):
 		
 	def draw_buttons(self, context, layout):
 		layout.prop(self, "loopsEnum")
+		row.prop(self, "loopsEnum")
+		newNode = row.operator("node.add_node", text = "", icon = "PLUS")
+		newNode.use_transform = True
+		newNode.type = "mn_LoopStartNode"
 		rebuild = layout.operator("mn.rebuild_sub_program_caller_sockets", "Rebuild Sockets")
 		rebuild.nodeTreeName = self.id_data.name
 		rebuild.nodeName = self.name
