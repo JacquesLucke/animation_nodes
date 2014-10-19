@@ -13,8 +13,9 @@ class mn_FloatWiggle(Node, AnimationNode):
 	
 	def init(self, context):
 		forbidCompiling()
+		self.inputs.new("mn_FloatSocket", "Seed")
 		self.inputs.new("mn_FloatSocket", "Evolution")
-		self.inputs.new("mn_FloatSocket", "Slowness").number = 15.0
+		self.inputs.new("mn_FloatSocket", "Speed").number = 15.0
 		self.inputs.new("mn_FloatSocket", "Amplitude").number = 1
 		self.inputs.new("mn_FloatSocket", "Persistance").number = 0.3
 		self.inputs.new("mn_IntegerSocket", "Octaves").number = 2.0
@@ -25,16 +26,17 @@ class mn_FloatWiggle(Node, AnimationNode):
 		layout.prop(self, "additionalSeed", text = "Additional Seed")
 		
 	def getInputSocketNames(self):
-		return {"Evolution" : "x",
-				"Slowness" : "slowness",
+		return {"Seed" : "seed",
+				"Evolution" : "x",
+				"Speed" : "speed",
 				"Amplitude" : "amplitude",
 				"Persistance" : "persistance",
 				"Octaves" : "octaves"}
 	def getOutputSocketNames(self):
 		return {"Noise" : "noise"}
 		
-	def execute(self, x, slowness, amplitude, persistance, octaves):
-		x = x / slowness + 823 * self.additionalSeed
+	def execute(self, seed, x, speed, amplitude, persistance, octaves):
+		x = x / speed + 2673 * seed + 823 * self.additionalSeed
 		total = perlinNoise(x, persistance, octaves)
 		return total * amplitude
 		
