@@ -50,21 +50,21 @@ class mn_ObjectInfoNode(Node, AnimationNode):
 		elif self.frameTypesProperty == "ABSOLUTE":
 			frame = input["Frame"]
 			
-		output["Location"] = getArrayValueAtFrame(object, "location", frame)
-		output["Rotation"] = getArrayValueAtFrame(object, "rotation_euler", frame)
-		output["Scale"] = getArrayValueAtFrame(object, "scale", frame)
-		
-		beforeLoc = getArrayValueAtFrame(object, "location", frame - 1)
-		beforeRot = getArrayValueAtFrame(object, "rotation_euler", frame - 1)
-		beforeScale = getArrayValueAtFrame(object, "scale", frame - 1)
+		[locationBefore, location] = getArrayValueAtMultipleFrames(object, "location", [frame-1, frame])
+		[rotationBefore, rotation] = getArrayValueAtMultipleFrames(object, "rotation_euler", [frame-1, frame])
+		[scaleBefore, scale] = getArrayValueAtMultipleFrames(object, "scale", [frame-1, frame])
+			
+		output["Location"] = location
+		output["Rotation"] = rotation
+		output["Scale"] = scale
 		
 		for i in range(3):
-			output["Location Velocity"][i] = output["Location"][i] - beforeLoc[i]
+			output["Location Velocity"][i] = location[i] - locationBefore[i]
 			
 		for i in range(3):
-			output["Rotation Velocity"][i] = output["Rotation"][i] - beforeRot[i]
+			output["Rotation Velocity"][i] = rotation[i] - rotationBefore[i]
 			
 		for i in range(3):
-			output["Scale Velocity"][i] = output["Scale"][i] - beforeScale[i]
+			output["Scale Velocity"][i] = scale[i] - scaleBefore[i]
 		
 		return output
