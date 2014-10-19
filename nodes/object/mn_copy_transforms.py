@@ -69,25 +69,43 @@ class mn_CopyTransformsNode(Node, AnimationNode):
 		useRot = self.useRotation
 		useScale = self.useScale
 		
+		# location
 		if useLoc[0] and useLoc[1] and useLoc[2]:
 			toObject.location = getArrayValueAtFrame(fromObject, "location", frame)
+		elif useLoc[0] and useLoc[1]:
+			[toObject.location[0], toObject.location[1]] = getMultipleValuesOfArrayAtFrame(fromObject, "location", [0, 1], frame)
+		elif useLoc[0] and useLoc[2]:
+			[toObject.location[0], toObject.location[2]] = getMultipleValuesOfArrayAtFrame(fromObject, "location", [0, 2], frame)
+		elif useLoc[1] and useLoc[2]:
+			[toObject.location[1], toObject.location[2]] = getMultipleValuesOfArrayAtFrame(fromObject, "location", [1, 2], frame)
 		else:
 			for i in range(3):
-				if useLoc[i]:
-					toObject.location[i] = getSingleValueOfArrayAtFrame(fromObject, "location", index = i, frame = frame)
-					
+				if useLoc[i]: toObject.location[i] = getSingleValueOfArrayAtFrame(fromObject, "location", index = i, frame = frame)
+				
+		# rotation
 		if useRot[0] and useRot[1] and useRot[2]:
 			toObject.rotation_euler = getArrayValueAtFrame(fromObject, "rotation_euler", frame)
+		elif useRot[0] and useRot[1]:
+			[toObject.rotation_euler[0], toObject.rotation_euler[1]] = getMultipleValuesOfArrayAtFrame(fromObject, "rotation_euler", [0, 1], frame)
+		elif useRot[0] and useRot[2]:
+			[toObject.rotation_euler[0], toObject.rotation_euler[2]] = getMultipleValuesOfArrayAtFrame(fromObject, "rotation_euler", [0, 2], frame)
+		elif useRot[1] and useRot[2]:
+			[toObject.rotation_euler[1], toObject.rotation_euler[2]] = getMultipleValuesOfArrayAtFrame(fromObject, "rotation_euler", [1, 2], frame)
 		else:
 			for i in range(3):
-				if useRot[i]:
-					toObject.rotation_euler[i] = getSingleValueOfArrayAtFrame(fromObject, "rotation_euler", index = i, frame = frame)
-					
+				if useRot[i]: toObject.rotation_euler[i] = getSingleValueOfArrayAtFrame(fromObject, "rotation_euler", index = i, frame = frame)	
+				
+		# scale
 		if useScale[0] and useScale[1] and useScale[2]:
 			toObject.scale = getArrayValueAtFrame(fromObject, "scale", frame)
+		elif useScale[0] and useScale[1]:
+			[toObject.scale[0], toObject.scale[1]] = getMultipleValuesOfArrayAtFrame(fromObject, "scale", [0, 1], frame)
+		elif useScale[0] and useScale[2]:
+			[toObject.scale[0], toObject.scale[2]] = getMultipleValuesOfArrayAtFrame(fromObject, "scale", [0, 2], frame)
+		elif useScale[1] and useScale[2]:
+			[toObject.scale[1], toObject.scale[2]] = getMultipleValuesOfArrayAtFrame(fromObject, "scale", [1, 2], frame)
 		else:
 			for i in range(3):
-				if useScale[i]:
-					toObject.scale[i] = getSingleValueOfArrayAtFrame(fromObject, "scale", index = i, frame = frame)
+				if useScale[i]: toObject.scale[i] = getSingleValueOfArrayAtFrame(fromObject, "scale", index = i, frame = frame)	
 					
 		return toObject

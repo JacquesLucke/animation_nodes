@@ -31,6 +31,15 @@ def getSingleValueOfArrayAtFrame(object, dataPath, index, frame):
 	if fCurve is None: return getattr(object, dataPath)[index]
 	return fCurve.evaluate(frame)
 	
+def getMultipleValuesOfArrayAtFrame(object, dataPath, indices, frame):
+	fCurves = getFCurvesWithDataPath(object, dataPath)
+	values = [0] * len(indices)
+	for i, index in enumerate(indices):
+		fCurve = getFCurveWithIndex(fCurves, index)
+		if fCurve is None: values[i] = getattr(object, dataPath)[index]
+		else: values[i] = fCurve.evaluate(frame)
+	return values
+	
 	
 # get values of multiple frames
 
