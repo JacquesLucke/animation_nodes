@@ -5,6 +5,7 @@ from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from mn_utils import *
 from mn_node_helper import *
 from mn_object_utils import *
+from mn_cache import *
 
 class mn_ObjectNamePropertyGroup(bpy.types.PropertyGroup):
 	objectName = bpy.props.StringProperty(name = "Socket Name", default = "", update = nodePropertyChanged)
