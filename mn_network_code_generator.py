@@ -375,8 +375,10 @@ class NetworkCodeGenerator:
 			inputSocketNames = node.getInputSocketNames()
 			outputSocketNames = node.getOutputSocketNames()
 			for identifier, name in inputSocketNames.items():
-				inLineString = inLineString.replace("%" + name + "%", getInputValueVariable(node.inputs[identifier]))
-				self.neededSocketReferences.append(node.inputs[identifier])
+				socket = node.inputs[identifier]
+				inLineString = inLineString.replace("%" + name + "%", getInputValueVariable(socket))
+				if not hasLinks(socket):
+					self.neededSocketReferences.append(socket)
 			for identifier, name in outputSocketNames.items():
 				inLineString = inLineString.replace("$" + name + "$", getOutputValueVariable(node.outputs[identifier]))
 			return inLineString.split("\n")
