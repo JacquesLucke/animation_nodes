@@ -44,7 +44,6 @@ class mn_ObjectInfoNode(Node, AnimationNode):
 				"Scale Velocity" : "scaleVelocity"}
 		
 	def execute(self, useOutput, object, frame):
-		
 		location = [0, 0, 0]
 		rotation = [0, 0, 0]
 		scale = [1, 1, 1]
