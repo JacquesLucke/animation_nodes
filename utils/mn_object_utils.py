@@ -1,17 +1,24 @@
 import bpy
 from mn_utils import *
 
+def getArrayValueAtFrame(object, dataPath, frame, arraySize = 3):
+	fCurves = getFCurvesWithDataPath(object, dataPath)
+	values = [0] * arraySize
+	for index in range(arraySize):
+		fCurve = getFCurveWithIndex(fCurves, index)
+		if fCurve is None: 	values[index] = getattr(object, dataPath)[index]
+		else: values[index] = fCurve.evaluate(frame)
+	return values
+		
+def getFCurveWithIndex(fCurves, index):
+	for fCurve in fCurves:
+		if fCurve.array_index == index: return fCurve
+	return None
+
 def getObjectTransformsAtFrame(object, frame):
-	location = [0, 0, 0]
-	rotation = [0, 0, 0]
-	scale = [1, 1, 1]
-	
-	for i in range(3):	
-		location[i] = getValueAtFrame(object, "location", i, frame)
-	for i in range(3):	
-		rotation[i] = getValueAtFrame(object, "rotation_euler", i, frame)
-	for i in range(3):	
-		scale[i] = getValueAtFrame(object, "scale", i, frame)
+	location = getArrayValueAtFrame(object, "location", frame)
+	rotation = getArrayValueAtFrame(object, "rotation_euler", frame)
+	scale = getArrayValueAtFrame(object, "scale", frame)
 	return location, rotation, scale
 		
 def getValueAtFrame(object, dataPath, index, frame):
@@ -20,13 +27,6 @@ def getValueAtFrame(object, dataPath, index, frame):
 		return eval("object." + dataPath + "[" + str(index) + "]")
 	else:
 		return fCurve.evaluate(frame)
-	
-def getFrameChange(object, frame, dataPath, index):
-	fCurve = getFCurveWithDataPath(object, dataPath = dataPath, index = index)
-	if fCurve is None:
-		return 0
-	else:
-		return fCurve.evaluate(frame) - fCurve.evaluate(frame - 1)
 		
 def getPossibleObjectName(self, name = "object"):
 	randomString = getRandomString(3)

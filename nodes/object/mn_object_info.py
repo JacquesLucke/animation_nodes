@@ -50,15 +50,21 @@ class mn_ObjectInfoNode(Node, AnimationNode):
 		elif self.frameTypesProperty == "ABSOLUTE":
 			frame = input["Frame"]
 			
-		output["Location"], output["Rotation"], output["Scale"] = getObjectTransformsAtFrame(object, frame)
+		output["Location"] = getArrayValueAtFrame(object, "location", frame)
+		output["Rotation"] = getArrayValueAtFrame(object, "rotation_euler", frame)
+		output["Scale"] = getArrayValueAtFrame(object, "scale", frame)
+		
+		beforeLoc = getArrayValueAtFrame(object, "location", frame - 1)
+		beforeRot = getArrayValueAtFrame(object, "rotation_euler", frame - 1)
+		beforeScale = getArrayValueAtFrame(object, "scale", frame - 1)
 		
 		for i in range(3):
-			output["Location Velocity"][i] = getFrameChange(object, frame, "location", i)
+			output["Location Velocity"][i] = output["Location"][i] - beforeLoc[i]
 			
 		for i in range(3):
-			output["Rotation Velocity"][i] = getFrameChange(object, frame, "rotation_euler", i)
+			output["Rotation Velocity"][i] = output["Rotation"][i] - beforeRot[i]
 			
 		for i in range(3):
-			output["Scale Velocity"][i] = getFrameChange(object, frame, "scale", i)
+			output["Scale Velocity"][i] = output["Scale"][i] - beforeScale[i]
 		
 		return output
