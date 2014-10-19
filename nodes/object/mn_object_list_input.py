@@ -25,7 +25,6 @@ class mn_ObjectListInputNode(Node, AnimationNode):
 			col = layout.column(align = True)
 			for item in self.objects:
 				row = col.row(align = True)
-				row.scale_y = 1.3
 				select = row.operator("mn.assign_active_object_to_list_node", text = "", icon = "EYEDROPPER")
 				select.nodeTreeName = self.id_data.name
 				select.nodeName = self.name

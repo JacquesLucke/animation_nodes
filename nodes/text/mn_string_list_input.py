@@ -16,7 +16,7 @@ class mn_StringListInputNode(Node, AnimationNode):
 	
 	def init(self, context):
 		forbidCompiling()
-		self.outputs.new("mn_mn_StringSocket", "Strings")
+		self.outputs.new("mn_StringSocket", "Strings")
 		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
@@ -27,7 +27,6 @@ class mn_StringListInputNode(Node, AnimationNode):
 			col = layout.column(align = True)
 			for item in self.strings:
 				row = col.row(align = True)
-				row.scale_y = 1.3
 				row.prop(item, "string", text = "")
 				remove = row.operator("mn.remove_property_from_list_node", text = "", icon = "X")
 				remove.nodeTreeName = self.id_data.name
