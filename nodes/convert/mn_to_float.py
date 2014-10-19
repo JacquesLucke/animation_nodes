@@ -20,5 +20,5 @@ class mn_ToFloatConversion(Node, AnimationNode):
 		
 	def useInLineExecution(self):
 		return True
-	def getInLineExecutionString(self):
+	def getInLineExecutionString(self, outputUse):
 		return "$number$ = float(%value%)"

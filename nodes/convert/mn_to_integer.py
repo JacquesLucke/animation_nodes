@@ -20,5 +20,5 @@ class mn_ToIntegerConversion(Node, AnimationNode):
 		
 	def useInLineExecution(self):
 		return True
-	def getInLineExecutionString(self):
+	def getInLineExecutionString(self, outputUse):
 		return "$number$ = int(%value%)"

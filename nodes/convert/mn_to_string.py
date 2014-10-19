@@ -20,5 +20,5 @@ class mn_ToStringConversion(Node, AnimationNode):
 		
 	def useInLineExecution(self):
 		return True
-	def getInLineExecutionString(self):
+	def getInLineExecutionString(self, outputUse):
 		return "$text$ = str(%value%)"

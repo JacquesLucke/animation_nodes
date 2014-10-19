@@ -30,6 +30,17 @@ class mn_ObjectInfoNode(Node, AnimationNode):
 	def draw_buttons(self, context, layout):
 		layout.prop(self, "frameTypesProperty")
 		
+	def getInputSocketNames(self):
+		return {"Object" : "object",
+				"Frame" : "frame"}
+	def getOutputSocketNames(self):
+		return {"Location" : "location",
+				"Rotation" : "rotation",
+				"Scale" : "scale",
+				"Location Velocity" : "locVelocity",
+				"Rotation Velocity" : "rotVelocity",
+				"Scale Velocity" : "scaleVelocity"}
+		
 	def execute(self, input):
 		output = {}
 		
