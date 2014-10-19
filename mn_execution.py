@@ -77,7 +77,7 @@ def nodePropertyChanged(self, context):
 		updateAnimationTrees(False)
 def settingPropertyChanged(self, context):
 	updateAnimationTrees(True)
-def nodeTreeChanged():
+def nodeTreeChanged(self = None, context = None):
 	updateAnimationTrees(True)
 	
 bpy.types.Scene.updateAnimationTreeOnFrameChange = bpy.props.BoolProperty(default = True, name = "Update Animation Tree On Frame Change")

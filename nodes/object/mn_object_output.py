@@ -1,15 +1,15 @@
 import bpy
 from bpy.types import Node
 from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 
 class mn_ObjectOutputNode(Node, AnimationNode):
 	bl_idname = "mn_ObjectOutputNode"
 	bl_label = "Object Output"
 	
-	useLocation = bpy.props.BoolVectorProperty(update = nodePropertyChanged)
-	useRotation = bpy.props.BoolVectorProperty(update = nodePropertyChanged)
-	useScale = bpy.props.BoolVectorProperty(update = nodePropertyChanged)
+	useLocation = bpy.props.BoolVectorProperty(update = nodeTreeChanged)
+	useRotation = bpy.props.BoolVectorProperty(update = nodeTreeChanged)
+	useScale = bpy.props.BoolVectorProperty(update = nodeTreeChanged)
 	
 	def init(self, context):
 		forbidCompiling()
@@ -46,20 +46,39 @@ class mn_ObjectOutputNode(Node, AnimationNode):
 	def getOutputSocketNames(self):
 		return {}
 		
-	def execute(self, object, location, rotation, scale):
-		if object is None:
-			return None
+	def useInLineExecution(self):
+		return True
+	def getInLineExecutionString(self, outputUse):
+		useLoc = self.useLocation
+		useRot = self.useRotation
+		useScale = self.useScale
 		
-		if self.useLocation[0]: object.location[0] = location[0]
-		if self.useLocation[1]: object.location[1] = location[1]
-		if self.useLocation[2]: object.location[2] = location[2]
+		codeLines = []
+		codeLines.append("if %object% is not None:")
 		
-		if self.useRotation[0]: object.rotation_euler[0] = rotation[0]
-		if self.useRotation[1]: object.rotation_euler[1] = rotation[1]
-		if self.useRotation[2]: object.rotation_euler[2] = rotation[2]
+		# location
+		if useLoc[0] and useLoc[1] and useLoc[2]:
+			codeLines.append("    %object%.location = %location%")
+		else:
+			for i in range(3):
+				if useLoc[i]: codeLines.append("    %object%.location["+str(i)+"] = %location%["+str(i)+"]")
+				
+		# rotation		
+		if useRot[0] and useRot[1] and useRot[2]:
+			codeLines.append("    %object%.rotation_euler = %rotation%")
+		else:
+			for i in range(3):
+				if useRot[i]: codeLines.append("    %object%.rotation_euler["+str(i)+"] = %rotation%["+str(i)+"]")
 		
-		if self.useScale[0]: object.scale[0] = scale[0]
-		if self.useScale[1]: object.scale[1] = scale[1]
-		if self.useScale[2]: object.scale[2] = scale[2]
+		# scale
+		if useScale[0] and useScale[1] and useScale[2]:
+			codeLines.append("    %object%.scale = %scale%")
+		else:
+			for i in range(3):
+				if useScale[i]: codeLines.append("    %object%.scale["+str(i)+"] = %scale%["+str(i)+"]")
 		
-		return {}
+		if not (useLoc[0] or useLoc[1] or useLoc[2] or
+				useRot[0] or useRot[1] or useRot[2] or
+				useScale[0] or useScale[1] or useScale[2]):
+			codeLines = []
+		return "\n".join(codeLines)
