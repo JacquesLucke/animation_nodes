@@ -37,7 +37,6 @@ class mn_EnumerateObjectsStartNode(Node, AnimationNode):
 			col = layout.column(align = True)
 			for index, item in enumerate(self.sockets):
 				row = col.row(align = True)
-				row.scale_y = 1.3
 				row.prop(item, "socketName", text = "")
 				remove = row.operator("mn.remove_property_from_list_node", text = "", icon = "X")
 				remove.nodeTreeName = self.id_data.name
