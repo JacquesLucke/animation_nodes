@@ -1,7 +1,7 @@
 from mn_utils import *
 import random
 
-# generic cache
+# generic execution cache
 ###############################
 
 executionCache = {}
@@ -16,6 +16,23 @@ def setExecutionCache(identifier, object):
 	
 def getExecutionCache(identifier):
 	return executionCache.get(identifier)
+	
+	
+# generic long time cache
+###############################
+
+longTimeCache = {}
+
+def clearLongTimeCache():
+	global longTimeCache
+	longTimeCache = {}
+	
+def setLongTimeCache(identifier, object):
+	global longTimeCache
+	longTimeCache[identifier] = object
+	
+def getLongTimeCache(identifier):
+	return longTimeCache.get(identifier)
 	
 
 # random number cache
