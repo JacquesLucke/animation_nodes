@@ -31,9 +31,10 @@ def setActive(object):
 def deselectAll():
 	bpy.ops.object.select_all(action = "DESELECT")
 def deselectAllFCurves(object):
-	if hasActionData(object):
-		for fCurve in object.animation_data.action.fcurves:
-			fCurve.select = False
+	if object.animation_data is not None:
+		if object.animation_data.action is not None:
+			for fCurve in object.animation_data.action.fcurves:
+				fCurve.select = False
 def getCurrentFrame():
 	return bpy.context.scene.frame_current_final
 def getRandom(min, max):
