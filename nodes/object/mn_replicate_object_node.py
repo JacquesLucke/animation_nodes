@@ -1,4 +1,4 @@
-import bpy
+import bpy, time
 from bpy.types import Node
 from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
@@ -17,6 +17,7 @@ class mn_ReplicateObjectNode(Node, AnimationNode):
 	
 	objectNames = bpy.props.CollectionProperty(type = mn_ObjectNamePropertyGroup)
 	visibleObjectNames = bpy.props.CollectionProperty(type = mn_ObjectNamePropertyGroup)
+	setObjectData = bpy.props.BoolProperty(default = False)
 	
 	def init(self, context):
 		forbidCompiling()
@@ -26,7 +27,9 @@ class mn_ReplicateObjectNode(Node, AnimationNode):
 		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
-		pass
+		setData = layout.operator("mn.set_object_data_on_all_objects")
+		setData.nodeTreeName = self.id_data.name
+		setData.nodeName = self.name
 		
 	def getInputSocketNames(self):
 		return {"Object" : "sourceObject",
@@ -43,25 +46,31 @@ class mn_ReplicateObjectNode(Node, AnimationNode):
 			return []
 		
 		self.linkCorrectAmountOfObjects(instances, sourceObject)
-			
 		objects = []
+		allObjects = bpy.data.objects
 		for i in range(instances):
-			name = self.visibleObjectNames[i].objectName
-			index = self.visibleObjectNames[i].objectIndex
-			object = bpy.data.objects[index]
+			item = self.visibleObjectNames[i]
+			name = item.objectName
+			object = allObjects[item.objectIndex]
 			if object.name != name:
-				index = bpy.data.objects.find(name)
-				self.visibleObjectNames[i].objectIndex = index
-				object = bpy.data.objects[index]
-			if object.data != sourceObject.data:
-				object.data = sourceObject.data
+				index = allObjects.find(name)
+				item.objectIndex = index
+				object = allObjects[index]
+				print("hey")
 			objects.append(object)
+			
+		if self.setObjectData:
+			for object in objects:
+				if object.data != sourceObject.data:
+					object.data = sourceObject.data
+			self.setObjectData = False
+		
 		return objects
 		
-	def linkCorrectAmountOfObjects(self, amount, object):
-		while amount < len(self.visibleObjectNames):
+	def linkCorrectAmountOfObjects(self, instances, object):
+		while instances < len(self.visibleObjectNames):
 			self.unlinkObjectFromScene()
-		while amount > len(self.visibleObjectNames):
+		while instances > len(self.visibleObjectNames):
 			self.linkObjectToScene(object)
 			
 	def linkObjectToScene(self, object):
@@ -87,6 +96,10 @@ class mn_ReplicateObjectNode(Node, AnimationNode):
 		item = self.objectNames.add()
 		item.objectName = newObject.name
 		return object
+		
+	def setObjectDataOnAllObjects(self):
+		self.setObjectData = True
+			
 			
 	def free(self):
 		while len(self.visibleObjectNames) > 0:
@@ -95,3 +108,15 @@ class mn_ReplicateObjectNode(Node, AnimationNode):
 	def copy(self, node):
 		self.objectNames.clear()
 		self.visibleObjectNames.clear()
+		
+class SetObjectDataOnAllObjects(bpy.types.Operator):
+	bl_idname = "mn.set_object_data_on_all_objects"
+	bl_label = "Set Correct Mesh"
+	
+	nodeTreeName = bpy.props.StringProperty()
+	nodeName = bpy.props.StringProperty()
+	
+	def execute(self, context):
+		node = getNode(self.nodeTreeName, self.nodeName)
+		node.setObjectDataOnAllObjects()
+		return {'FINISHED'}
