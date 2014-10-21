@@ -20,6 +20,7 @@ class mn_GetListElementNode(Node, AnimationNode):
 	def init(self, context):
 		forbidCompiling()
 		self.setSocketType(self.listTypesProperty)
+		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
 		layout.prop(self, "listTypesProperty")

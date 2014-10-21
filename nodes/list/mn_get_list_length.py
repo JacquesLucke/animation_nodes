@@ -11,7 +11,7 @@ class mn_GetListLengthNode(Node, AnimationNode):
 		forbidCompiling()
 		self.inputs.new("mn_GenericSocket", "List")
 		self.outputs.new("mn_IntegerSocket", "Length")
-		forbidCompiling()
+		allowCompiling()()
 		
 	def execute(self, input):
 		output = {}

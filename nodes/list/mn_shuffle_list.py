@@ -21,6 +21,7 @@ class mn_ShuffleListNode(Node, AnimationNode):
 		forbidCompiling()
 		self.inputs.new("mn_IntegerSocket", "Seed")
 		self.setSocketType(self.listTypesProperty)
+		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
 		layout.prop(self, "listTypesProperty")
