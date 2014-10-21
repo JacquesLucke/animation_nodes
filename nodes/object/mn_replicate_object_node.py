@@ -15,8 +15,8 @@ class mn_ReplicateObjectNode(Node, AnimationNode):
 	bl_idname = "mn_ReplicateObjectNode"
 	bl_label = "Replicate Object"
 	
-	objectNames = bpy.props.CollectionProperty(type = mn_ObjectNamePropertyGroup)
-	visibleObjectNames = bpy.props.CollectionProperty(type = mn_ObjectNamePropertyGroup)
+	linkedObjects = bpy.props.CollectionProperty(type = mn_ObjectNamePropertyGroup)
+	unlinkedObjects = bpy.props.CollectionProperty(type = mn_ObjectNamePropertyGroup)
 	setObjectData = bpy.props.BoolProperty(default = False)
 	
 	def init(self, context):
@@ -41,29 +41,56 @@ class mn_ReplicateObjectNode(Node, AnimationNode):
 		instances = max(instances, 0)
 		
 		if sourceObject is None:
-			while 0 < len(self.visibleObjectNames):
-				self.unlinkObjectFromScene()
+			self.unlinkAllObjects()
 			return []
-		
-		self.linkCorrectAmountOfObjects(instances, sourceObject)
+			
+		while instances < len(self.linkedObjects):
+			self.unlinkOneObject()
+			
+			
 		objects = []
 		allObjects = bpy.data.objects
 		objectAmount = len(allObjects)
-		for i in range(instances):
-			item = self.visibleObjectNames[i]
-			name = item.objectName
-			if item.objectIndex < objectAmount:
-				object = allObjects[item.objectIndex]
-				if object.name != name:
-					index = allObjects.find(name)
-					item.objectIndex = index
-					object = allObjects[index]
+		
+		outputObjectCounter = 0
+		currentIndex = 0
+		while(outputObjectCounter < instances):
+			useObject = False
+			incrementIndex = True
+			if currentIndex < len(self.linkedObjects):
+				item = self.linkedObjects[currentIndex]
+				searchName = item.objectName
+				if item.objectIndex < objectAmount:
+					object = allObjects[item.objectIndex]
+					if object.name == searchName: useObject = True
+					else:
+						index = allObjects.find(searchName)
+						if index != -1:
+							item.objectIndex = index
+							object = allObjects[index]
+							useObject = True
+						else:
+							self.unlinkObjectItemIndex(currentIndex)
+							incrementIndex = False
+				else: # duplicated code. have to find a cleaner solution
+					index = allObjects.find(searchName)
+					if index != -1:
+						item.objectIndex = index
+						object = allObjects[index]
+						useObject = True
+					else:
+						self.unlinkObjectItemIndex(currentIndex)
+						incrementIndex = False
 			else:
-				index = allObjects.find(name)
-				item.objectIndex = index
-				object = allObjects[index]
-			objects.append(object)
+				object = self.linkNextObjectToScene(sourceObject)
+				useObject = True
+				incrementIndex = False
 			
+			if useObject: 
+				objects.append(object)
+				outputObjectCounter += 1
+			if incrementIndex: currentIndex += 1
+		
 		if self.setObjectData:
 			for object in objects:
 				if object.data != sourceObject.data:
@@ -72,47 +99,58 @@ class mn_ReplicateObjectNode(Node, AnimationNode):
 		
 		return objects
 		
-	def linkCorrectAmountOfObjects(self, instances, object):
-		while instances < len(self.visibleObjectNames):
-			self.unlinkObjectFromScene()
-		while instances > len(self.visibleObjectNames):
-			self.linkObjectToScene(object)
-			
-	def linkObjectToScene(self, object):
-		if len(self.objectNames) == len(self.visibleObjectNames):
-			self.newInstance(object)
-		object = bpy.data.objects.get(self.objectNames[len(self.visibleObjectNames)].objectName)
-		if object is None:
-			self.objectNames.remove(len(self.visibleObjectNames))
-		else:
-			bpy.context.scene.objects.link(object)
-			item = self.visibleObjectNames.add()
-			item.objectName = object.name
-			
-	def unlinkObjectFromScene(self):
-		if len(self.visibleObjectNames) > 0:
-			object = bpy.data.objects.get(self.visibleObjectNames[-1].objectName)
-			bpy.context.scene.objects.unlink(object)
-			self.visibleObjectNames.remove(len(self.visibleObjectNames) - 1)
+	def unlinkAllObjects(self):
+		while len(self.linkedObjects) > 0:
+			self.unlinkObjectItemIndex(0)
+		self.linkedObjects.clear()
 		
-	def newInstance(self, object):
-		newObject = bpy.data.objects.new(getPossibleObjectName("instance"), object.data)
-		newObject.parent = getMainObjectContainer()
-		item = self.objectNames.add()
-		item.objectName = newObject.name
+	def unlinkOneObject(self):
+		self.unlinkObjectItemIndex(0)
+		
+	def unlinkObjectItemIndex(self, itemIndex):
+		item = self.linkedObjects[itemIndex]
+		object = bpy.data.objects.get(item.objectName)
+		if object is not None:
+			try:
+				bpy.context.scene.objects.unlink(object)
+				newItem = self.unlinkedObjects.add()
+				newItem.objectName = item.objectName
+				newItem.objectIndex = item.objectIndex
+			except: pass
+		self.linkedObjects.remove(itemIndex)
+			
+	def linkNextObjectToScene(self, sourceObject):
+		isNewObjectLinked = False
+		while not isNewObjectLinked:
+			if len(self.unlinkedObjects) == 0:
+				self.newReplication(sourceObject)
+			item = self.unlinkedObjects[0]
+			object = bpy.data.objects.get(item.objectName)
+			if object is not None:
+				bpy.context.scene.objects.link(object)
+				linkedItem = self.linkedObjects.add()
+				linkedItem.objectName = item.objectName
+				linkedItem.objectIndex = item.objectIndex
+				isNewObjectLinked = True
+			self.unlinkedObjects.remove(0)
 		return object
+			
+	def newReplication(self, sourceObject):
+		newObject = bpy.data.objects.new(getPossibleObjectName("instance"), sourceObject.data)
+		newObject.parent = getMainObjectContainer()
+		item = self.unlinkedObjects.add()
+		item.objectName = newObject.name
+		item.objectIndex = 0
 		
 	def setObjectDataOnAllObjects(self):
 		self.setObjectData = True
 			
-			
 	def free(self):
-		while len(self.visibleObjectNames) > 0:
-			self.unlinkObjectFromScene()
+		self.unlinkAllObjects()
 			
 	def copy(self, node):
-		self.objectNames.clear()
-		self.visibleObjectNames.clear()
+		self.linkedObjects.clear()
+		self.unlinkedObjects.clear()
 		
 class SetObjectDataOnAllObjects(bpy.types.Operator):
 	bl_idname = "mn.set_object_data_on_all_objects"

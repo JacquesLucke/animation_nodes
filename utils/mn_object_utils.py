@@ -80,7 +80,7 @@ def getFCurvesWithDataPath(object, dataPath):
 	
 # names
 		
-def getPossibleObjectName(self, name = "object"):
+def getPossibleObjectName(name = "object"):
 	randomString = getRandomString(3)
 	counter = 1
 	while bpy.data.objects.get(name + randomString + str(counter)) is not None:
