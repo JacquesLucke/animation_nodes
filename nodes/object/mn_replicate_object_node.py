@@ -8,7 +8,8 @@ from mn_object_utils import *
 from mn_cache import *
 
 class mn_ObjectNamePropertyGroup(bpy.types.PropertyGroup):
-	objectName = bpy.props.StringProperty(name = "Socket Name", default = "", update = nodePropertyChanged)
+	objectName = bpy.props.StringProperty(name = "Object Name", default = "", update = nodePropertyChanged)
+	objectIndex = bpy.props.IntProperty(name = "Object Index", default = 0, update = nodePropertyChanged)
 
 class mn_ReplicateObjectNode(Node, AnimationNode):
 	bl_idname = "mn_ReplicateObjectNode"
@@ -27,28 +28,35 @@ class mn_ReplicateObjectNode(Node, AnimationNode):
 	def draw_buttons(self, context, layout):
 		pass
 		
-	def execute(self, input):
-		output = {}
-		object = input["Object"]
-		amount = max(input["Instances"], 0)
+	def getInputSocketNames(self):
+		return {"Object" : "sourceObject",
+				"Instances" : "instances"}
+	def getOutputSocketNames(self):
+		return {"Objects" : "objects",}
 		
-		if object is None:
+	def execute(self, sourceObject, instances):
+		instances = max(instances, 0)
+		
+		if sourceObject is None:
 			while 0 < len(self.visibleObjectNames):
 				self.unlinkObjectFromScene()
-			return { "Objects" : [] }
+			return []
 		
-		self.linkCorrectAmountOfObjects(amount, object)
+		self.linkCorrectAmountOfObjects(instances, sourceObject)
 			
 		objects = []
-		for i in range(amount):
-			outputObject = bpy.data.objects.get(self.visibleObjectNames[i].objectName)
-			if outputObject is not None:
-				if outputObject.data != object.data:
-					outputObject.data = object.data
-				objects.append(outputObject)
-			
-		output["Objects"] = objects
-		return output
+		for i in range(instances):
+			name = self.visibleObjectNames[i].objectName
+			index = self.visibleObjectNames[i].objectIndex
+			object = bpy.data.objects[index]
+			if object.name != name:
+				index = bpy.data.objects.find(name)
+				self.visibleObjectNames[i].objectIndex = index
+				object = bpy.data.objects[index]
+			if object.data != sourceObject.data:
+				object.data = sourceObject.data
+			objects.append(object)
+		return objects
 		
 	def linkCorrectAmountOfObjects(self, amount, object):
 		while amount < len(self.visibleObjectNames):
