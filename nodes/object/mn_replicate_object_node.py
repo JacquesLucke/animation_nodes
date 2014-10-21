@@ -100,24 +100,31 @@ class mn_ReplicateObjectNode(Node, AnimationNode):
 		return objects
 		
 	def unlinkAllObjects(self):
-		while len(self.linkedObjects) > 0:
-			self.unlinkObjectItemIndex(0)
-		self.linkedObjects.clear()
+		objectNames = []
+		for item in self.linkedObjects:
+			objectNames.append(item.objectName)
+			
+		for name in objectNames:
+			object = bpy.data.objects.get(name)
+			if object is not None:
+				bpy.context.scene.objects.unlink(object)
 		
 	def unlinkOneObject(self):
-		self.unlinkObjectItemIndex(0)
+		self.unlinkObjectItemIndex(len(self.linkedObjects)-1)
 		
 	def unlinkObjectItemIndex(self, itemIndex):
 		item = self.linkedObjects[itemIndex]
-		object = bpy.data.objects.get(item.objectName)
+		objectName = item.objectName
+		objectIndex = item.objectIndex
+		self.linkedObjects.remove(itemIndex)
+		object = bpy.data.objects.get(objectName)
 		if object is not None:
 			try:
 				bpy.context.scene.objects.unlink(object)
 				newItem = self.unlinkedObjects.add()
-				newItem.objectName = item.objectName
-				newItem.objectIndex = item.objectIndex
+				newItem.objectName = objectName
+				newItem.objectIndex = objectIndex
 			except: pass
-		self.linkedObjects.remove(itemIndex)
 			
 	def linkNextObjectToScene(self, sourceObject):
 		isNewObjectLinked = False
@@ -147,6 +154,8 @@ class mn_ReplicateObjectNode(Node, AnimationNode):
 			
 	def free(self):
 		self.unlinkAllObjects()
+		self.linkedObjects.clear()
+		self.unlinkedObjects.clear()
 			
 	def copy(self, node):
 		self.linkedObjects.clear()
