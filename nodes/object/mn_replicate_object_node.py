@@ -58,13 +58,9 @@ class mn_ReplicateObjectNode(Node, AnimationNode):
 			if item.objectIndex < objectAmount:
 				object = allObjects[item.objectIndex]
 				if object.name != name:
-					index = allObjects.find(name)
-					item.objectIndex = index
-					object = allObjects[index]
+					object = self.getObjectAndCorrectIndex(name, item, allObjects)
 			else:
-				index = allObjects.find(name)
-				item.objectIndex = index
-				object = allObjects[index]
+				object = self.getObjectAndCorrectIndex(name, item, allObjects)
 			objects.append(object)
 			
 		if self.setObjectData:
@@ -74,6 +70,12 @@ class mn_ReplicateObjectNode(Node, AnimationNode):
 			self.setObjectData = False
 		
 		return objects
+		
+	def getObjectAndCorrectIndex(self, objectName, item, allObjects):
+		index = allObjects.find(objectName)
+		item.objectIndex = index
+		object = allObjects[index]
+		return object
 		
 	def linkCorrectAmountOfObjects(self, instances, object):
 		while instances < len(self.visibleObjectNames):
@@ -88,14 +90,17 @@ class mn_ReplicateObjectNode(Node, AnimationNode):
 		if object is None:
 			self.objectNames.remove(len(self.visibleObjectNames))
 		else:
-			bpy.context.scene.objects.link(object)
+			try:
+				bpy.context.scene.objects.link(object)
+			except: pass
 			item = self.visibleObjectNames.add()
 			item.objectName = object.name
 			
 	def unlinkObjectFromScene(self):
 		if len(self.visibleObjectNames) > 0:
 			object = bpy.data.objects.get(self.visibleObjectNames[-1].objectName)
-			bpy.context.scene.objects.unlink(object)
+			if object is not None:
+				bpy.context.scene.objects.unlink(object)
 			self.visibleObjectNames.remove(len(self.visibleObjectNames) - 1)
 		
 	def newInstance(self, object):
