@@ -30,6 +30,9 @@ class mn_ReplicateObjectNode(Node, AnimationNode):
 		setData = layout.operator("mn.set_object_data_on_all_objects")
 		setData.nodeTreeName = self.id_data.name
 		setData.nodeName = self.name
+		cleanupNode = layout.operator("mn.cleanup_replicator_node")
+		cleanupNode.nodeTreeName = self.id_data.name
+		cleanupNode.nodeName = self.name
 		
 	def getInputSocketNames(self):
 		return {"Object" : "sourceObject",
@@ -48,15 +51,20 @@ class mn_ReplicateObjectNode(Node, AnimationNode):
 		self.linkCorrectAmountOfObjects(instances, sourceObject)
 		objects = []
 		allObjects = bpy.data.objects
+		objectAmount = len(allObjects)
 		for i in range(instances):
 			item = self.visibleObjectNames[i]
 			name = item.objectName
-			object = allObjects[item.objectIndex]
-			if object.name != name:
+			if item.objectIndex < objectAmount:
+				object = allObjects[item.objectIndex]
+				if object.name != name:
+					index = allObjects.find(name)
+					item.objectIndex = index
+					object = allObjects[index]
+			else:
 				index = allObjects.find(name)
 				item.objectIndex = index
 				object = allObjects[index]
-				print("hey")
 			objects.append(object)
 			
 		if self.setObjectData:
@@ -99,6 +107,23 @@ class mn_ReplicateObjectNode(Node, AnimationNode):
 		
 	def setObjectDataOnAllObjects(self):
 		self.setObjectData = True
+		
+	def cleanup(self):
+		removeIndices = []
+		for i, item in enumerate(self.objectNames):
+			object = bpy.data.objects.get(item.objectName)
+			if object is None or item.objectIndex == -1:
+				removeIndices.append(i)
+		for index in removeIndices:
+			self.objectNames.remove(index)
+			
+		removeIndices = []
+		for i, item in enumerate(self.visibleObjectNames):
+			object = bpy.data.objects.get(item.objectName)
+			if object is None or item.objectIndex == -1:
+				removeIndices.append(i)
+		for alreadyRemoved, index in enumerate(removeIndices):
+			self.visibleObjectNames.remove(index - alreadyRemoved)
 			
 			
 	def free(self):
@@ -119,4 +144,16 @@ class SetObjectDataOnAllObjects(bpy.types.Operator):
 	def execute(self, context):
 		node = getNode(self.nodeTreeName, self.nodeName)
 		node.setObjectDataOnAllObjects()
+		return {'FINISHED'}
+		
+class CleanupReplicatorNode(bpy.types.Operator):
+	bl_idname = "mn.cleanup_replicator_node"
+	bl_label = "Cleanup"
+	
+	nodeTreeName = bpy.props.StringProperty()
+	nodeName = bpy.props.StringProperty()
+	
+	def execute(self, context):
+		node = getNode(self.nodeTreeName, self.nodeName)
+		node.cleanup()
 		return {'FINISHED'}
