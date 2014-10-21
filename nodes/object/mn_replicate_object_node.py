@@ -56,7 +56,6 @@ class mn_ReplicateObjectNode(Node, AnimationNode):
 				index = allObjects.find(name)
 				item.objectIndex = index
 				object = allObjects[index]
-				print("hey")
 			objects.append(object)
 			
 		if self.setObjectData:
