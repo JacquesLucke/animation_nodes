@@ -96,7 +96,7 @@ def tryToSetConnectionDictionaries(node, connections):
 	
 def isSocketLinked(socket):
 	origin = getOriginSocket(socket)
-	return origin is not None and origin is not socket
+	return isOtherOriginSocket(socket, origin)
 	
 def isOtherOriginSocket(socket, origin):
 	return origin is not None and origin.node.name != socket.node.name
