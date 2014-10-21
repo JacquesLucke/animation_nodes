@@ -21,6 +21,8 @@ class mn_CombineVector(Node, AnimationNode):
 				"Z" : "z"}
 	def getOutputSocketNames(self):
 		return {"Vector" : "vector"}
-		
-	def execute(self, x, y, z):
-		return [x, y, z]
+
+	def useInLineExecution(self):
+		return True
+	def getInLineExecutionString(self, outputUse):
+		return "$vector$ = [%x%, %y%, %z%]"
