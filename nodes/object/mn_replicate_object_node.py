@@ -48,11 +48,17 @@ class mn_ReplicateObjectNode(Node, AnimationNode):
 		self.linkCorrectAmountOfObjects(instances, sourceObject)
 		objects = []
 		allObjects = bpy.data.objects
+		objectAmount = len(allObjects)
 		for i in range(instances):
 			item = self.visibleObjectNames[i]
 			name = item.objectName
-			object = allObjects[item.objectIndex]
-			if object.name != name:
+			if item.objectIndex < objectAmount:
+				object = allObjects[item.objectIndex]
+				if object.name != name:
+					index = allObjects.find(name)
+					item.objectIndex = index
+					object = allObjects[index]
+			else:
 				index = allObjects.find(name)
 				item.objectIndex = index
 				object = allObjects[index]

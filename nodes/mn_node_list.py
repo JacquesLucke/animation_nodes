@@ -15,7 +15,8 @@ def getNodeNameDictionary():
 		"mn_SeparateVector",
 		"mn_RandomVectorNode",
 		"mn_VectorWiggle",
-		"mn_VectorLengthNode" ] ))	
+		"mn_VectorLengthNode",
+		"mn_VectorMathNode" ] ))	
 		
 	nodes.append(("Text", [
 		"mn_StringInputNode",
