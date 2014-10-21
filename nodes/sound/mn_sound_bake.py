@@ -46,9 +46,6 @@ class mn_SoundBakeNode(Node, AnimationNode):
 		
 		layout.separator()
 		
-	def execute(self, input):
-		return {}
-		
 	def getStrengthList(self):
 		soundObject = self.getSoundObject()
 		strenghts = []
