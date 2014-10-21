@@ -13,6 +13,7 @@ def getNodeNameDictionary():
 	nodes.append(("Vector", [
 		"mn_CombineVector",
 		"mn_SeparateVector",
+		"mn_RandomVectorNode",
 		"mn_VectorWiggle",
 		"mn_VectorLengthNode" ] ))	
 		
