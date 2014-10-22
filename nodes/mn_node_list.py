@@ -58,7 +58,8 @@ def getNodeNameDictionary():
 		"mn_ColorInputNode" ] ))
 		
 	nodes.append(("Animation", [
-		"mn_TimeInfoNode" ] ))
+		"mn_TimeInfoNode",
+		"mn_InterpolationNode" ] ))
 		
 	nodes.append(("Debug", [
 		"mn_DebugOutputNode" ] ))
