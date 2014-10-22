@@ -14,7 +14,7 @@ class mn_MixVectorNode(Node, AnimationNode):
 		self.inputs.new("mn_VectorSocket", "A")
 		self.inputs.new("mn_VectorSocket", "B")
 		self.inputs.new("mn_FloatSocket", "Value")
-		self.inputs.new("mn_FloatSocket", "Movement Time").number = 1.0
+		self.inputs.new("mn_FloatSocket", "Movement Time").number = 20.0
 		self.inputs.new("mn_FloatSocket", "Stay Time").number = 0.0
 		self.outputs.new("mn_VectorSocket", "Vector")
 		self.outputs.new("mn_FloatSocket", "New Value")
