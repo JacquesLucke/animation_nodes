@@ -14,6 +14,7 @@ class mn_MixVectorNode(Node, AnimationNode):
 		self.inputs.new("mn_VectorSocket", "A")
 		self.inputs.new("mn_VectorSocket", "B")
 		self.inputs.new("mn_FloatSocket", "Value")
+		self.inputs.new("mn_InterpolationSocket", "Interpolation")
 		self.inputs.new("mn_FloatSocket", "Movement Time").number = 20.0
 		self.inputs.new("mn_FloatSocket", "Stay Time").number = 0.0
 		self.outputs.new("mn_VectorSocket", "Vector")
@@ -24,13 +25,13 @@ class mn_MixVectorNode(Node, AnimationNode):
 		pass
 		
 	def getInputSocketNames(self):
-		return {"A" : "a", "B" : "b", "Value" : "value", "Movement Time" : "moveTime", "Stay Time" : "stayTime"}
+		return {"A" : "a", "B" : "b", "Value" : "value", "Interpolation" : "interpolation", "Movement Time" : "moveTime", "Stay Time" : "stayTime"}
 	def getOutputSocketNames(self):
 		return {"Vector" : "vector", "New Value" : "newValue"}
 		
-	def execute(self, a, b, value, moveTime, stayTime):
+	def execute(self, a, b, value, interpolation, moveTime, stayTime):
 		value /= moveTime
-		influence = getBackOutNormalInfluence(max(min(value, 1.0), 0.0))
+		influence = interpolation(max(min(value, 1.0), 0.0))
 		newVector = [a[0] * (1 - influence) + b[0] * influence,
 					a[1] * (1 - influence) + b[1] * influence,
 					a[2] * (1 - influence) + b[2] * influence]
