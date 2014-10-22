@@ -45,12 +45,15 @@ def rebuildNodeNetworks():
 	global compiledCodeObjects, codeStrings
 	del compiledCodeObjects[:]
 	del codeStrings[:]
+	start = time.clock()
 	if bpy.context.scene.showFullError: codeStrings = getAllNetworkCodeStrings()
 	else:
 		try: codeStrings = getAllNetworkCodeStrings()
 		except:	pass
 	for code in codeStrings:
 		compiledCodeObjects.append(compile(code, "<string>", "exec"))
+	timeSpan = time.clock() - start
+	if bpy.context.scene.printScriptGenerationTime:  print("Script Gen. " + str(round(timeSpan, 7)) + " s  -  " + str(round(1/timeSpan, 5)) + " fps")
 		
 def getCodeStrings():
 	return codeStrings
@@ -85,6 +88,7 @@ bpy.types.Scene.updateAnimationTreeOnSceneUpdate = bpy.props.BoolProperty(defaul
 bpy.types.Scene.updateAnimationTreeOnPropertyChange = bpy.props.BoolProperty(default = True, name = "Update Animation Tree On Property Change")
 
 bpy.types.Scene.printUpdateTime = bpy.props.BoolProperty(default = False, name = "Print Update Time")
+bpy.types.Scene.printScriptGenerationTime = bpy.props.BoolProperty(default = False, name = "Print Script Generation Time")
 bpy.types.Scene.showFullError = bpy.props.BoolProperty(default = False, name = "Show Full Error")
 bpy.types.Scene.nodeExecutionProfiling = bpy.props.BoolProperty(default = False, name = "Node Execution Profiling", update = settingPropertyChanged)
 

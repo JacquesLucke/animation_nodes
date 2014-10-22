@@ -64,6 +64,7 @@ class AnimationNodesDeveloperPanel(bpy.types.Panel):
 		
 		col = layout.column(align = True)
 		col.prop(scene, "printUpdateTime", text = "Print Update Time")
+		col.prop(scene, "printScriptGenerationTime")
 		col.prop(scene, "showFullError", text = "Show Full Error")
 		col.prop(scene, "nodeExecutionProfiling", text = "Node Execution Profiling")
 		
