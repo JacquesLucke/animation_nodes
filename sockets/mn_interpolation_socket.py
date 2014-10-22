@@ -20,18 +20,20 @@ class InterpolationMode:
 interpolationEnum = []
 linearMode = InterpolationMode("LINEAR", "Linear")
 
-exponentialCategory = InterpolationCategory("EXPONENTIAL", "Exponential")
+exponentialCategory = InterpolationCategory("EASING", "Easing")
 exponentialCategory.append(InterpolationMode("IN", "Ease In"))
 exponentialCategory.append(InterpolationMode("OUT", "Ease Out"))
+exponentialCategory.append(InterpolationMode("INOUT", "Ease In Out"))
 
 interpolationEnum.append(linearMode)
 interpolationEnum.append(exponentialCategory)
 
 def getInterpolationFunction(mode, subMode):
 	if mode == "LINEAR": return linear
-	if mode == "EXPONENTIAL":
-		if subMode == "IN": return expoEaseIn
-		if subMode == "OUT": return expoEaseOut
+	if mode == "EASING":
+		if subMode == "IN": return cubicEaseIn
+		if subMode == "OUT": return cubicEaseOut
+		if subMode == "INOUT": return cubicEaseInOut
 	return linear
 
 
@@ -49,8 +51,9 @@ class mn_InterpolationSocket(NodeSocket):
 	def getSubModeItems(self, context):
 		items = []
 		mode = self.getCurrentMode()
-		for interpolation in mode.interpolationModes:
-			items.append((interpolation.identifier, interpolation.name, ""))
+		if mode is not None:
+			for interpolation in mode.interpolationModes:
+				items.append((interpolation.identifier, interpolation.name, ""))
 		if len(items) == 0: items.append(("None", "None", ""))
 		return items
 	
@@ -84,6 +87,7 @@ class mn_InterpolationSocket(NodeSocket):
 		for mode in interpolationEnum:
 			if mode.identifier == self.mode:
 				return mode
+		return None
 				
 		
 # register
