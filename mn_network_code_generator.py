@@ -14,6 +14,7 @@ def getAllNetworkCodeStrings():
 	for network in normalNetworks:
 		codeGenerator = NetworkCodeGenerator(network)
 		networkStrings.append(codeGenerator.getCode())
+	clearSocketConnections()
 	return networkStrings
 	
 def sortNetworks(nodeNetworks):
@@ -327,8 +328,8 @@ class NetworkCodeGenerator:
 		inputSocketNames = None
 		if useFastMethod: inputSocketNames = node.getInputSocketNames()
 		for socket in node.inputs:
-			originSocket = getOriginSocket(socket)
-			if isOtherOriginSocket(socket, originSocket):
+			originSocket = getDataOriginSocket(socket)
+			if originSocket is not None:
 				inputParts.append(self.getInputPartFromOtherNode(socket, originSocket, useFastMethod, inputSocketNames))
 			else:
 				self.neededSocketReferences.append(socket)
@@ -431,8 +432,8 @@ def usesOutputUseParameter(node):
 	return hasattr(node, "outputUseParameterName")
 	
 def getInputValueVariable(socket):
-	originSocket = getOriginSocket(socket)
-	if isOtherOriginSocket(socket, originSocket):
+	originSocket = getDataOriginSocket(socket)
+	if originSocket is not None:
 		return getOutputValueVariable(originSocket)
 	else:
 		return getInputSocketVariableName(socket)
@@ -513,16 +514,25 @@ def findOriginSockets():
 				originSocket = getOriginSocket(link.to_socket)
 				if isOtherOriginSocket(link.to_socket, originSocket):
 					setDataConnection(originSocket, link.to_socket)
+					
+def clearSocketConnections():
+	global inputSockets, outputSockets
+	inputSockets = {}
+	outputSockets = {}
 				
 def setDataConnection(fromSocket, toSocket):
 	global inputSockets, outputSockets
 	
 	if fromSocket not in outputSockets:	outputSockets[fromSocket] = []
-	if toSocket not in inputSockets: inputSockets[toSocket] = []
 	
-	inputSockets[toSocket].append(fromSocket)
+	inputSockets[toSocket] = fromSocket
 	outputSockets[fromSocket].append(toSocket)
 			
 def isValidNode(node):
 	return node.bl_idname[:3] == "mn_"
+	
+def getDataOriginSocket(socket):
+	return inputSockets.get(socket)
+def isSocketUsed(socket):
+	return socket in outputSockets
 			
