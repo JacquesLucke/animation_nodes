@@ -4,6 +4,7 @@ from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from mn_utils import *
 from mn_object_utils import *
+from mn_fcurve_utils import *
 from bpy.props import BoolProperty
 from operator import sub
 
