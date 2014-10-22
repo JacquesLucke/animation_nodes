@@ -6,7 +6,6 @@ subNetworks = {}
 
 def getAllNetworkCodeStrings():
 	global subNetworks
-	start = time.clock()
 	networkStrings = []
 	cleanupNodeTrees()
 	nodeNetworks = getNodeNetworks()
@@ -15,7 +14,6 @@ def getAllNetworkCodeStrings():
 		codeGenerator = NetworkCodeGenerator(network)
 		networkStrings.append(codeGenerator.getCode())
 	clearSocketConnections()
-	print(time.clock() - start)
 	return networkStrings
 	
 def sortNetworks(nodeNetworks):
