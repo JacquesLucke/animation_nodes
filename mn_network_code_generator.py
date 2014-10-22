@@ -10,7 +10,7 @@ def getAllNetworkCodeStrings():
 	cleanupNodeTrees()
 	start = time.clock()
 	findOriginSockets()
-	print(time.clock() - start)
+	#print(time.clock() - start)
 	nodeNetworks = getNodeNetworks()
 	sortNetworks(nodeNetworks)
 	for network in normalNetworks:
@@ -149,12 +149,15 @@ def cleanupNodeTree(nodeTree):
 	for link in links:
 		toSocket = link.to_socket
 		fromSocket = link.from_socket
-		if toSocket.node.type == "REROUTE" or fromSocket.node.type == "REROUTE" or not isSocketLinked(toSocket):
+		if toSocket.node.type == "REROUTE":
 			continue
-		if fromSocket.dataType not in toSocket.allowedInputTypes and toSocket.allowedInputTypes[0] != "all":
-			handleNotAllowedLink(nodeTree, link, fromSocket, toSocket)
-def handleNotAllowedLink(nodeTree, link, fromSocket, toSocket):
-	fromType = fromSocket.dataType
+		if fromSocket.node.type == "REROUTE": originSocket = getOriginSocket(toSocket)
+		else: originSocket = fromSocket
+		if isOtherOriginSocket(toSocket, originSocket):
+			if originSocket.dataType not in toSocket.allowedInputTypes and toSocket.allowedInputTypes[0] != "all":
+				handleNotAllowedLink(nodeTree, link, fromSocket, toSocket, originSocket)
+def handleNotAllowedLink(nodeTree, link, fromSocket, toSocket, originSocket):
+	fromType = originSocket.dataType
 	toType = toSocket.dataType
 	nodeTree.links.remove(link)
 	for (t1, t2, nodeType) in convertableTypes:
