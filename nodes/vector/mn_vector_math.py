@@ -50,5 +50,6 @@ class mn_VectorMathNode(Node, AnimationNode):
 			op = self.mathTypesProperty
 			if op == "ADD": return "$result$ = [%a%[0] + %b%[0], %a%[1] + %b%[1], %a%[2] + %b%[2]]"
 			elif op == "SUBTRACT": return "$result$ = [%a%[0] - %b%[0], %a%[1] - %b%[1], %a%[2] - %b%[2]]"
+		return ""
 	def getModuleList(self):
 		return ["math"]

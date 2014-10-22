@@ -9,7 +9,7 @@ class mn_VectorSocket(NodeSocket):
 	dataType = "Vector"
 	allowedInputTypes = ["Vector"]
 	
-	vector = bpy.props.FloatVectorProperty(default = (0, 0, 0), update = nodePropertyChanged)
+	vector = bpy.props.FloatVectorProperty(default = [0, 0, 0], update = nodePropertyChanged)
 	
 	def draw(self, context, layout, node, text):
 		if not self.is_output and not isSocketLinked(self):
