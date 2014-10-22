@@ -22,8 +22,10 @@ class mn_EnumerateObjectsNode(Node, AnimationNode):
 	executeLoop = bpy.props.BoolProperty(name = "Execute Loop", default = True)
 	
 	def init(self, context):
+		forbidCompiling()
 		self.inputs.new("mn_ObjectListSocket", "Objects")
 		self.outputs.new("mn_ObjectListSocket", "Objects")
+		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
 		row = layout.row(align = True)

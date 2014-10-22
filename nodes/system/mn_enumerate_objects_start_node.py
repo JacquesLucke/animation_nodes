@@ -2,7 +2,7 @@ import bpy
 from bpy.types import Node
 from mn_node_base import AnimationNode
 from mn_dynamic_sockets_helper import *
-from mn_execution import nodePropertyChanged
+from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from mn_utils import *
 
 class mn_EnumerateObjectsStartNode(Node, AnimationNode):
@@ -14,9 +14,11 @@ class mn_EnumerateObjectsStartNode(Node, AnimationNode):
 	subProgramName = bpy.props.StringProperty(default = "Object Loop")
 	
 	def init(self, context):
+		forbidCompiling()
 		self.outputs.new("mn_ObjectSocket", "Object")
 		self.outputs.new("mn_IntegerSocket", "Index")
 		self.outputs.new("mn_IntegerSocket", "List Length")
+		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
 		layout.prop(self, "subProgramName", text = "Name")

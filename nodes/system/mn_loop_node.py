@@ -21,7 +21,9 @@ class mn_LoopNode(Node, AnimationNode):
 	loopsEnum = bpy.props.EnumProperty(items = getSubProgramNames, name = "Loop", update=selectedProgramChanged)
 	
 	def init(self, context):
+		forbidCompiling()
 		self.inputs.new("mn_IntegerSocket", "Amount")
+		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
 		row = layout.row(align = True)

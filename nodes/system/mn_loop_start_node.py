@@ -1,7 +1,7 @@
 import bpy
 from bpy.types import Node
 from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged
+from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from mn_dynamic_sockets_helper import *
 from mn_utils import *
 
@@ -15,7 +15,9 @@ class mn_LoopStartNode(Node, AnimationNode):
 	loopName = bpy.props.StringProperty(default = "Name")
 	
 	def init(self, context):
+		forbidCompiling()
 		self.outputs.new("mn_IntegerSocket", "Index")
+		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
 		layout.prop(self, "loopName", text = "Name")
