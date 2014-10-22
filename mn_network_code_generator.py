@@ -8,6 +8,7 @@ def getAllNetworkCodeStrings():
 	global subNetworks
 	networkStrings = []
 	cleanupNodeTrees()
+	findOriginSockets()
 	nodeNetworks = getNodeNetworks()
 	sortNetworks(nodeNetworks)
 	for network in normalNetworks:
@@ -493,3 +494,35 @@ def getDirectDependencies(node):
 			node = socket.links[0].from_node
 			directDependencies.append(node)
 	return directDependencies
+	
+	
+	
+# find origin sockets
+############################################
+
+inputSockets = {}
+outputSockets = {}
+def findOriginSockets():
+	animationTrees = getAnimationNodeTrees()
+	for nodeTree in animationTrees:
+		for link in nodeTree.links:
+			fromValid = isValidNode(link.from_node)
+			toValid = isValidNode(link.to_node)
+			if fromValid and toValid: setDataConnection(link.from_socket, link.to_socket)
+			elif toValid:
+				originSocket = getOriginSocket(link.to_socket)
+				if isOtherOriginSocket(link.to_socket, originSocket):
+					setDataConnection(originSocket, link.to_socket)
+				
+def setDataConnection(fromSocket, toSocket):
+	global inputSockets, outputSockets
+	
+	if fromSocket not in outputSockets:	outputSockets[fromSocket] = []
+	if toSocket not in inputSockets: inputSockets[toSocket] = []
+	
+	inputSockets[toSocket].append(fromSocket)
+	outputSockets[fromSocket].append(toSocket)
+			
+def isValidNode(node):
+	return node.bl_idname[:3] == "mn_"
+			
