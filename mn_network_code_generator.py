@@ -491,8 +491,9 @@ def getAllNodeDependencies(node):
 def getDirectDependencies(node):
 	directDependencies = []
 	for socket in node.inputs:
-		if hasLinks(socket):
-			node = socket.links[0].from_node
+		originSocket = getDataOriginSocket(socket)
+		if originSocket is not None:
+			node = originSocket.node
 			directDependencies.append(node)
 	return directDependencies
 	
