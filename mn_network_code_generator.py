@@ -402,12 +402,12 @@ def getNodeOutputString(node):
 def getOutputUseDictionaryCode(node):
 	codeParts = []
 	for socket in node.outputs:
-		codeParts.append('"' + socket.identifier + '" : ' + str(hasLinks(socket)))
+		codeParts.append('"' + socket.identifier + '" : ' + str(isOutputSocketUsed(socket)))
 	return "{" + ", ".join(codeParts) + "}"
 def getOutputUseDictionary(node):
 	outputUse = {}
 	for socket in node.outputs:
-		outputUse[socket.identifier] = hasLinks(socket)
+		outputUse[socket.identifier] = isOutputSocketUsed(socket)
 	return outputUse
 	
 def getCorrespondingStartNode(node):
@@ -534,6 +534,6 @@ def isValidNode(node):
 	
 def getDataOriginSocket(socket):
 	return inputSockets.get(socket)
-def isSocketUsed(socket):
+def isOutputSocketUsed(socket):
 	return socket in outputSockets
 			
