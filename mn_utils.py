@@ -44,7 +44,7 @@ def getRandomString(length):
 def clampInt(value, minValue, maxValue):
 	return int(max(min(value, maxValue), minValue))
 def isAnimationPlaying():
-	if hasattr(bpy.context, "screen"):
+	if bpy.context.screen is not None:
 		return bpy.context.screen.is_animation_playing
 	return False
 	

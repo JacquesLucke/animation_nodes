@@ -25,9 +25,10 @@ class mn_CyclesMaterialOutputNode(Node, AnimationNode):
 	def getPossibleSockets(self):
 		node = self.getSelectedNode()
 		identifiers = []
-		for socket in node.inputs:
-			if socket.bl_idname in allowedSocketTypes.keys():
-				identifiers.append(socket)
+		if node is not None:
+			for socket in node.inputs:
+				if socket.bl_idname in allowedSocketTypes.keys():
+					identifiers.append(socket)
 		return identifiers
 		
 	def selectedSocketChanged(self, context):
