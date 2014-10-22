@@ -1,12 +1,6 @@
 import bpy
 from mn_utils import *
 from mn_cache import *
-
-def getObjectTransformsAtFrame(object, frame):
-	location = getArrayValueAtFrame(object, "location", frame)
-	rotation = getArrayValueAtFrame(object, "rotation_euler", frame)
-	scale = getArrayValueAtFrame(object, "scale", frame)
-	return location, rotation, scale
 	
 # get value in one frame
 
@@ -76,6 +70,18 @@ def getFCurvesWithDataPath(object, dataPath):
 		cache = fCurves
 		setExecutionCache(identifier, cache)
 	return cache
+	
+
+def getSingleFCurveWithDataPath(object, dataPath):
+	identifier = object.type + object.name + dataPath + "first"
+	cache = getExecutionCache(identifier)
+	if cache is None:
+		if object.animation_data is not None:
+			for fCurve in object.animation_data.action.fcurves:
+				if fCurve.data_path == dataPath:
+					setExecutionCache(identifier, fCurve)
+					return fCurve
+	return None
 	
 	
 # names

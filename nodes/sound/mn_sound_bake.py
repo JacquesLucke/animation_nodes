@@ -78,7 +78,7 @@ class mn_SoundBakeNode(Node, AnimationNode):
 		
 	def removeSoundCurves(self, soundObject):
 		for item in self.bakedSound:
-			fCurve = getFCurveWithDataPath(soundObject, '["' + item.propertyName + '"]')
+			fCurve = getSingleFCurveWithDataPath(soundObject, '["' + item.propertyName + '"]')
 			if fCurve is not None:
 				soundObject.animation_data.action.fcurves.remove(fCurve)
 		self.bakedSound.clear()
