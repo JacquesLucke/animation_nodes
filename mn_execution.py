@@ -49,7 +49,7 @@ def rebuildNodeNetworks():
 	if bpy.context.scene.showFullError: codeStrings = getAllNetworkCodeStrings()
 	else:
 		try: codeStrings = getAllNetworkCodeStrings()
-		except:	pass
+		except BaseException as e: pass
 	for code in codeStrings:
 		compiledCodeObjects.append(compile(code, "<string>", "exec"))
 	timeSpan = time.clock() - start

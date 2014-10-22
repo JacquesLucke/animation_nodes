@@ -6,17 +6,16 @@ subNetworks = {}
 
 def getAllNetworkCodeStrings():
 	global subNetworks
+	start = time.clock()
 	networkStrings = []
 	cleanupNodeTrees()
-	start = time.clock()
-	findOriginSockets()
-	#print(time.clock() - start)
 	nodeNetworks = getNodeNetworks()
 	sortNetworks(nodeNetworks)
 	for network in normalNetworks:
 		codeGenerator = NetworkCodeGenerator(network)
 		networkStrings.append(codeGenerator.getCode())
 	clearSocketConnections()
+	print(time.clock() - start)
 	return networkStrings
 	
 def sortNetworks(nodeNetworks):
@@ -129,49 +128,6 @@ def resetNodeFoundAttributes(nodes):
 	for node in nodes: node.isFound = False	
 
 
-# cleanup of node trees
-################################
-
-convertableTypes = [("Float", "Integer", "mn_ToIntegerConversion"),
-					("Float", "String", "mn_ToStringConversion"),
-					("Integer", "String", "mn_ToStringConversion"),
-					("Float", "Vector", "mn_CombineVector"),
-					("Integer", "Vector", "mn_CombineVector"),
-					("Vector", "Float", "mn_SeparateVector"),
-					("Vector", "Integer", "mn_SeparateVector")]
-		
-def cleanupNodeTrees():
-	nodeTrees = getAnimationNodeTrees()
-	for nodeTree in nodeTrees:
-		cleanupNodeTree(nodeTree)
-def cleanupNodeTree(nodeTree):
-	links = nodeTree.links
-	for link in links:
-		toSocket = link.to_socket
-		fromSocket = link.from_socket
-		if toSocket.node.type == "REROUTE":
-			continue
-		if fromSocket.node.type == "REROUTE": originSocket = getOriginSocket(toSocket)
-		else: originSocket = fromSocket
-		if isOtherOriginSocket(toSocket, originSocket):
-			if originSocket.dataType not in toSocket.allowedInputTypes and toSocket.allowedInputTypes[0] != "all":
-				handleNotAllowedLink(nodeTree, link, fromSocket, toSocket, originSocket)
-def handleNotAllowedLink(nodeTree, link, fromSocket, toSocket, originSocket):
-	fromType = originSocket.dataType
-	toType = toSocket.dataType
-	nodeTree.links.remove(link)
-	for (t1, t2, nodeType) in convertableTypes:
-		if fromType == t1 and toType == t2: insertConversionNode(nodeTree, nodeType, link, fromSocket, toSocket)
-def insertConversionNode(nodeTree, nodeType, link, fromSocket, toSocket):
-	node = nodeTree.nodes.new(nodeType)
-	node.hide = True
-	node.select = False
-	x1, y1 = toSocket.node.location
-	x2, y2 = list(fromSocket.node.location)
-	node.location = [(x1+x2)/2+20, (y1+y2)/2-50]
-	nodeTree.links.new(node.inputs[0], fromSocket)
-	nodeTree.links.new(toSocket, node.outputs[0])
-	
 	
 	
 # network code generator class
@@ -505,23 +461,67 @@ def getDirectDependencies(node):
 	return directDependencies
 	
 	
+# cleanup of node trees
+################################
+
+convertableTypes = [("Float", "Integer", "mn_ToIntegerConversion"),
+					("Float", "String", "mn_ToStringConversion"),
+					("Integer", "String", "mn_ToStringConversion"),
+					("Float", "Vector", "mn_CombineVector"),
+					("Integer", "Vector", "mn_CombineVector"),
+					("Vector", "Float", "mn_SeparateVector"),
+					("Vector", "Integer", "mn_SeparateVector")]
+		
+def cleanupNodeTrees():
+	nodeTrees = getAnimationNodeTrees()
+	for nodeTree in nodeTrees:
+		cleanupNodeTree(nodeTree)
+def cleanupNodeTree(nodeTree):
+	originalLinks = list(nodeTree.links)
+	for link in originalLinks:
+		toSocket = link.to_socket
+		fromSocket = link.from_socket
+		if toSocket.node.type == "REROUTE":
+			continue
+		if fromSocket.node.type == "REROUTE": originSocket = getOriginSocket(toSocket)
+		else: originSocket = fromSocket
+		if isOtherOriginSocket(toSocket, originSocket):
+			if originSocket.dataType not in toSocket.allowedInputTypes and toSocket.allowedInputTypes[0] != "all":
+				handleNotAllowedLink(nodeTree, link, fromSocket, toSocket, originSocket)
+			else: setDataConnection(originSocket, toSocket)
+def handleNotAllowedLink(nodeTree, link, fromSocket, toSocket, originSocket):
+	fromType = originSocket.dataType
+	toType = toSocket.dataType
+	nodeTree.links.remove(link)
+	for (t1, t2, nodeType) in convertableTypes:
+		if fromType == t1 and toType == t2: insertConversionNode(nodeTree, nodeType, link, fromSocket, toSocket, originSocket)
+def insertConversionNode(nodeTree, nodeType, link, fromSocket, toSocket, originSocket):
+	node = nodeTree.nodes.new(nodeType)
+	node.hide = True
+	node.select = False
+	x1, y1 = toSocket.node.location
+	x2, y2 = list(fromSocket.node.location)
+	node.location = [(x1+x2)/2+20, (y1+y2)/2-50]
+	nodeTree.links.new(node.inputs[0], fromSocket)
+	nodeTree.links.new(toSocket, node.outputs[0])
+	setDataConnection(originSocket, node.inputs[0])
+	setDataConnection(node.outputs[0], toSocket)
+	
 	
 # find origin sockets
 ############################################
 
 inputSockets = {}
 outputSockets = {}
-def findOriginSockets():
-	animationTrees = getAnimationNodeTrees()
-	for nodeTree in animationTrees:
-		for link in nodeTree.links:
-			fromValid = isValidNode(link.from_node)
-			toValid = isValidNode(link.to_node)
-			if fromValid and toValid: setDataConnection(link.from_socket, link.to_socket)
-			elif toValid:
-				originSocket = getOriginSocket(link.to_socket)
-				if isOtherOriginSocket(link.to_socket, originSocket):
-					setDataConnection(originSocket, link.to_socket)
+					
+def handleLink(link):
+	fromValid = isValidNode(link.from_node)
+	toValid = isValidNode(link.to_node)
+	if fromValid and toValid: setDataConnection(link.from_socket, link.to_socket)
+	elif toValid:
+		originSocket = getOriginSocket(link.to_socket)
+		if isOtherOriginSocket(link.to_socket, originSocket):
+			setDataConnection(originSocket, link.to_socket)
 					
 def clearSocketConnections():
 	global inputSockets, outputSockets
