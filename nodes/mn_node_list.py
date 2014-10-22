@@ -17,6 +17,7 @@ def getNodeNameDictionary():
 		"mn_VectorWiggle",
 		"mn_VectorLengthNode",
 		"mn_MixVectorNode",
+		"mn_VectorDistanceNode",
 		"mn_VectorMathNode" ] ))	
 		
 	nodes.append(("Text", [
