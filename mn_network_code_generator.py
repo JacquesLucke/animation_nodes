@@ -106,8 +106,9 @@ def getLinkedButNotFoundNodes(node):
 def getNotFoundInputNodes(node):
 	nodes = []
 	for socket in node.inputs:
-		for link in socket.links:
-			fromNode = link.from_node
+		originSocket = getDataOriginSocket(socket)
+		if originSocket is not None:
+			fromNode = originSocket.node
 			if not fromNode.isFound:
 				nodes.append(fromNode)
 				fromNode.isFound = True
@@ -115,8 +116,9 @@ def getNotFoundInputNodes(node):
 def getNotFoundOutputNodes(node):
 	nodes = []
 	for socket in node.outputs:
-		for link in socket.links:
-			toNode = link.to_node
+		connectedSockets = getSocketsFromOutputSocket(socket)
+		for toSocket in connectedSockets:
+			toNode = toSocket.node
 			if not toNode.isFound:
 				nodes.append(toNode)
 				toNode.isFound = True
@@ -540,4 +542,6 @@ def getDataOriginSocket(socket):
 	return inputSockets.get(socket)
 def isOutputSocketUsed(socket):
 	return socket in outputSockets
+def getSocketsFromOutputSocket(socket):
+	return outputSockets.get(socket, [])
 			
