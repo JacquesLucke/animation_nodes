@@ -20,21 +20,29 @@ class InterpolationMode:
 interpolationEnum = []
 linearMode = InterpolationMode("LINEAR", "Linear")
 
-exponentialCategory = InterpolationCategory("EASING", "Easing")
-exponentialCategory.append(InterpolationMode("IN", "Ease In"))
-exponentialCategory.append(InterpolationMode("OUT", "Ease Out"))
-exponentialCategory.append(InterpolationMode("INOUT", "Ease In Out"))
+easingCategory = InterpolationCategory("EASING", "Easing")
+easingCategory.append(InterpolationMode("IN", "Ease In"))
+easingCategory.append(InterpolationMode("OUT", "Ease Out"))
+easingCategory.append(InterpolationMode("INOUT", "Ease In Out"))
+
+backCategory = InterpolationCategory("BACK", "Back")
+backCategory.append(InterpolationMode("IN", "In"))
+backCategory.append(InterpolationMode("OUT", "Out"))
 
 interpolationEnum.append(linearMode)
-interpolationEnum.append(exponentialCategory)
+interpolationEnum.append(easingCategory)
+interpolationEnum.append(backCategory)
 
-def getInterpolationFunction(mode, subMode):
-	if mode == "LINEAR": return linear
+def getInterpolationFunctionTupel(mode, subMode):
+	if mode == "LINEAR": return (linear, None)
 	if mode == "EASING":
-		if subMode == "IN": return cubicEaseIn
-		if subMode == "OUT": return cubicEaseOut
-		if subMode == "INOUT": return cubicEaseInOut
-	return linear
+		if subMode == "IN": return (cubicEaseIn, None)
+		if subMode == "OUT": return (cubicEaseOut, None)
+		if subMode == "INOUT": return (cubicEaseInOut, None)
+	if mode == "BACK":
+		if subMode == "IN": return (backEaseIn, 1.70158)
+		if subMode == "OUT": return (backEaseOut, 1.70158)
+	return (linear, None)
 
 
 class mn_InterpolationSocket(NodeSocket):
@@ -47,11 +55,12 @@ class mn_InterpolationSocket(NodeSocket):
 		items = []
 		for interpolation in interpolationEnum:
 			items.append((interpolation.identifier, interpolation.name, ""))
+		if len(items) == 0: items.append(("None", "None", ""))
 		return items
 	def getSubModeItems(self, context):
 		items = []
 		mode = self.getCurrentMode()
-		if mode is not None:
+		if type(mode) == InterpolationCategory:
 			for interpolation in mode.interpolationModes:
 				items.append((interpolation.identifier, interpolation.name, ""))
 		if len(items) == 0: items.append(("None", "None", ""))
@@ -76,7 +85,7 @@ class mn_InterpolationSocket(NodeSocket):
 		return (0.3, 0.8, 0.3, 1)
 		
 	def getValue(self):
-		return getInterpolationFunction(self.mode, self.subMode)
+		return getInterpolationFunctionTupel(self.mode, self.subMode)
 		
 	def setStoreableValue(self, data):
 		self.mode = data

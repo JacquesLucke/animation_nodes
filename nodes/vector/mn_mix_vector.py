@@ -31,7 +31,7 @@ class mn_MixVectorNode(Node, AnimationNode):
 		
 	def execute(self, a, b, value, interpolation, moveTime, stayTime):
 		value /= moveTime
-		influence = interpolation(max(min(value, 1.0), 0.0))
+		influence = interpolation[0](max(min(value, 1.0), 0.0), interpolation[1])
 		newVector = [a[0] * (1 - influence) + b[0] * influence,
 					a[1] * (1 - influence) + b[1] * influence,
 					a[2] * (1 - influence) + b[2] * influence]
