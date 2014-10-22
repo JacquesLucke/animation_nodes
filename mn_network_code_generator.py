@@ -1,4 +1,4 @@
-import bpy
+import bpy, time
 from mn_utils import *
 
 normalNetworks = []
@@ -8,7 +8,9 @@ def getAllNetworkCodeStrings():
 	global subNetworks
 	networkStrings = []
 	cleanupNodeTrees()
+	start = time.clock()
 	findOriginSockets()
+	print(time.clock() - start)
 	nodeNetworks = getNodeNetworks()
 	sortNetworks(nodeNetworks)
 	for network in normalNetworks:
@@ -379,7 +381,7 @@ class NetworkCodeGenerator:
 			for identifier, name in inputSocketNames.items():
 				socket = node.inputs[identifier]
 				inLineString = inLineString.replace("%" + name + "%", getInputValueVariable(socket))
-				if not isSocketLinked(socket):
+				if not hasOtherDataOrigin(socket):
 					self.neededSocketReferences.append(socket)
 			for identifier, name in outputSocketNames.items():
 				inLineString = inLineString.replace("$" + name + "$", getOutputValueVariable(node.outputs[identifier]))
@@ -531,7 +533,9 @@ def setDataConnection(fromSocket, toSocket):
 			
 def isValidNode(node):
 	return node.bl_idname[:3] == "mn_"
-	
+
+def hasOtherDataOrigin(socket):
+	return inputSockets.get(socket) is not None
 def getDataOriginSocket(socket):
 	return inputSockets.get(socket)
 def isOutputSocketUsed(socket):
