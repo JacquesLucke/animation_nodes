@@ -70,7 +70,7 @@ def frameChangeHandler(scene):
 		updateAnimationTrees(False)
 @persistent
 def sceneUpdateHandler(scene):
-	if scene.updateAnimationTreeOnSceneUpdate:
+	if scene.updateAnimationTreeOnSceneUpdate and not bpy.context.screen.is_animation_playing:
 		updateAnimationTrees(False)
 @persistent
 def fileLoadHandler(scene):
