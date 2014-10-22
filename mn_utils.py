@@ -43,6 +43,10 @@ def getRandomString(length):
 	return ''.join(random.choice("abcdefghijklmnopqrstuvwxyz") for _ in range(length))
 def clampInt(value, minValue, maxValue):
 	return int(max(min(value, maxValue), minValue))
+def isAnimationPlaying():
+	if hasattr(bpy.context, "screen"):
+		return bpy.context.screen.is_animation_playing
+	return False
 	
 # nodes and sockets
 ######################
