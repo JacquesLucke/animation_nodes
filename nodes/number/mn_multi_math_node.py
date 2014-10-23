@@ -18,6 +18,17 @@ class mn_MultiMathNode(Node, AnimationNode):
 		self.outputs.new("mn_FloatSocket", "Result")
 		allowCompiling()
 		
+	def draw_buttons(self, context, layout):
+		row = layout.row(align = True)
+	
+		newSocket = row.operator("mn.add_multi_math_socket", text = "New", icon = "PLUS")
+		newSocket.nodeTreeName = self.id_data.name
+		newSocket.nodeName = self.name
+		
+		removeSocket = row.operator("mn.remove_multi_math_socket", text = "Remove", icon = "X")
+		removeSocket.nodeTreeName = self.id_data.name
+		removeSocket.nodeName = self.name
+		
 	def update(self):
 		forbidCompiling()
 		socket = self.inputs.get("...")
@@ -40,5 +51,48 @@ class mn_MultiMathNode(Node, AnimationNode):
 		
 	def execute(self, inputs):
 		output = {}
+		result = 0
+		for identifier, value in inputs.items():
+			if identifier != "...":
+				result += value
+				
+		output["Result"] = result
 		return output
 		
+	def newInputSocket(self):
+		forbidCompiling()
+		newSocketName = newSocketName = str(len(self.inputs)) + "."
+		newSocket = self.inputs.new("mn_FloatSocket", newSocketName)
+		self.inputs.move(len(self.inputs) - 1, len(self.inputs) - 2)
+		allowCompiling()
+		
+	def removeInputSocket(self):
+		forbidCompiling()
+		if len(self.inputs) > 2:
+			self.inputs.remove(self.inputs[len(self.inputs) - 2])
+		allowCompiling()
+		
+
+class AddMultiMathSocket(bpy.types.Operator):
+	bl_idname = "mn.add_multi_math_socket"
+	bl_label = "Add Multi Math Socket"
+	
+	nodeTreeName = bpy.props.StringProperty()
+	nodeName = bpy.props.StringProperty()
+	
+	def execute(self, context):
+		node = getNode(self.nodeTreeName, self.nodeName)
+		node.newInputSocket()
+		return {'FINISHED'}
+		
+class RemoveMultiMathSocket(bpy.types.Operator):
+	bl_idname = "mn.remove_multi_math_socket"
+	bl_label = "Remove Multi Math Socket"
+	
+	nodeTreeName = bpy.props.StringProperty()
+	nodeName = bpy.props.StringProperty()
+	
+	def execute(self, context):
+		node = getNode(self.nodeTreeName, self.nodeName)
+		node.removeInputSocket()
+		return {'FINISHED'}
