@@ -9,6 +9,7 @@ class mn_SetVertexColor(Node, AnimationNode):
 	bl_idname = "mn_SetVertexColor"
 	bl_label = "Set Vertex Color"
 	
+	enabled = bpy.props.BoolProperty(default = True, update = nodePropertyChanged)
 	vertexColorName = bpy.props.StringProperty(default = "Col", update = nodePropertyChanged)
 	checkIfColorIsSet = bpy.props.BoolProperty(default = True)
 	
@@ -19,6 +20,7 @@ class mn_SetVertexColor(Node, AnimationNode):
 		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
+		layout.prop(self, "enabled", text = "Enabled")
 		layout.prop(self, "checkIfColorIsSet", text = "Check Color")
 		
 	def getInputSocketNames(self):
@@ -28,6 +30,7 @@ class mn_SetVertexColor(Node, AnimationNode):
 		return {}
 
 	def execute(self, object, color):
+		if not self.enabled: return None
 		if object is None: return None
 		
 		mesh = object.data
