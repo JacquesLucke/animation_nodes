@@ -55,7 +55,9 @@ def getNodeNameDictionary():
 		"mn_SoundInputNode" ] ))
 		
 	nodes.append(("Color", [
-		"mn_ColorInputNode" ] ))
+		"mn_ColorInputNode",
+		"mn_ColorMix",
+		"mn_SetVertexColor" ] ))
 		
 	nodes.append(("Animation", [
 		"mn_TimeInfoNode",
