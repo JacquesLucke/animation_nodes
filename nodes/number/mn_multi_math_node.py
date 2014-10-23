@@ -5,10 +5,15 @@ from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from mn_utils import *
 
-class mn_MultiMathNode(Node, AnimationNode):
-	bl_idname = "mn_MultiMathNode"
-	bl_label = "Multi Math"
+class mn_MultiFloatMathNode(Node, AnimationNode):
+	bl_idname = "mn_MultiFloatMathNode"
+	bl_label = "Multi Float Math"
 	node_category = "Math"
+	
+	operationItems = [("ADD", "Add", ""),
+					("MULTIPLY", "Multiply", "")]
+	
+	operation = bpy.props.EnumProperty(default = "ADD", name = "Operation", items = operationItems, update = nodePropertyChanged)
 	
 	def init(self, context):
 		forbidCompiling()
@@ -19,6 +24,8 @@ class mn_MultiMathNode(Node, AnimationNode):
 		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
+		layout.prop(self, "operation", text = "Operation")
+	
 		row = layout.row(align = True)
 	
 		newSocket = row.operator("mn.add_multi_math_socket", text = "New", icon = "PLUS")
@@ -52,9 +59,16 @@ class mn_MultiMathNode(Node, AnimationNode):
 	def execute(self, inputs):
 		output = {}
 		result = 0
-		for identifier, value in inputs.items():
-			if identifier != "...":
-				result += value
+		
+		if self.operation == "ADD":
+			for identifier, value in inputs.items():
+				if identifier != "...":
+					result += value
+		if self.operation == "MULTIPLY":
+			result = 1
+			for identifier, value in inputs.items():
+				if identifier != "...":
+					result *= value
 				
 		output["Result"] = result
 		return output
