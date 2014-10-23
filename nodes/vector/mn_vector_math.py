@@ -5,17 +5,6 @@ from mn_execution import nodeTreeChanged, allowCompiling, forbidCompiling
 import math
 
 def updateNode(node, context):
-	# singleInputOperations = ["SINE",
-							 # "COSINE",
-							 # "TANGENT",
-							 # "ARCSINE",
-							 # "ARCCOSINE",
-							 # "ARCTANGENT",
-							 # "ABSOLUTE"]
-	# if node.mathTypesProperty in singleInputOperations and not node.inputs[-1].hide:
-		# node.inputs[-1].hide = True
-	# elif node.mathTypesProperty not in singleInputOperations and node.inputs[-1].hide:
-		# node.inputs[-1].hide = False
 	nodeTreeChanged()
 
 
@@ -25,7 +14,9 @@ class mn_VectorMathNode(Node, AnimationNode):
 	
 	mathTypes = [
 		("ADD", "Add", ""),
-		("SUBTRACT", "Subtract", "")]
+		("SUBTRACT", "Subtract", ""),
+		("MULTIPLY", "Multiply", "Multiply element by element"),
+		("DIVIDE", "Divide", "")]
 	mathTypesProperty = bpy.props.EnumProperty(name="Operation", items=mathTypes, default="ADD", update=updateNode)
 	
 	def init(self, context):
@@ -50,6 +41,13 @@ class mn_VectorMathNode(Node, AnimationNode):
 			op = self.mathTypesProperty
 			if op == "ADD": return "$result$ = [%a%[0] + %b%[0], %a%[1] + %b%[1], %a%[2] + %b%[2]]"
 			elif op == "SUBTRACT": return "$result$ = [%a%[0] - %b%[0], %a%[1] - %b%[1], %a%[2] - %b%[2]]"
+			elif op == "MULTIPLY": return "$result$ = [%a%[0] * %b%[0], %a%[1] * %b%[1], %a%[2] * %b%[2]]"
+			elif op == "DIVIDE": return '''
+$result$ = [0, 0, 0]
+if %b%[0] != 0: $result$[0] = %a%[0] / %b%[0]
+if %b%[1] != 0: $result$[1] = %a%[1] / %b%[1]
+if %b%[2] != 0: $result$[2] = %a%[2] / %b%[2]
+'''
 		return ""
 	def getModuleList(self):
 		return ["math"]
