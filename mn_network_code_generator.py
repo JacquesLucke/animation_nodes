@@ -462,13 +462,14 @@ def getDirectDependencies(node):
 # cleanup of node trees
 ################################
 
-convertableTypes = [("Float", "Integer", "mn_ToIntegerConversion"),
-					("Float", "String", "mn_ToStringConversion"),
-					("Integer", "String", "mn_ToStringConversion"),
-					("Float", "Vector", "mn_CombineVector"),
-					("Integer", "Vector", "mn_CombineVector"),
-					("Vector", "Float", "mn_SeparateVector"),
-					("Vector", "Integer", "mn_SeparateVector")]
+convertRules = {}
+convertRules[("Float", "Integer")] = "mn_ToIntegerConversion"
+convertRules[("Float", "String")] = "mn_ToStringConversion"
+convertRules[("Integer", "String")] = "mn_ToStringConversion"
+convertRules[("Float", "Vector")] = "mn_CombineVector"
+convertRules[("Integer", "Vector")] = "mn_CombineVector"
+convertRules[("Vector", "Float")] = "mn_SeparateVector"
+convertRules[("Vector", "Integer")] = "mn_SeparateVector"
 		
 def cleanupNodeTrees():
 	nodeTrees = getAnimationNodeTrees()
@@ -491,19 +492,23 @@ def handleNotAllowedLink(nodeTree, link, fromSocket, toSocket, originSocket):
 	fromType = originSocket.dataType
 	toType = toSocket.dataType
 	nodeTree.links.remove(link)
-	for (t1, t2, nodeType) in convertableTypes:
-		if fromType == t1 and toType == t2: insertConversionNode(nodeTree, nodeType, link, fromSocket, toSocket, originSocket)
-def insertConversionNode(nodeTree, nodeType, link, fromSocket, toSocket, originSocket):
-	node = nodeTree.nodes.new(nodeType)
+	convertNodeType = convertRules.get((fromType, toType))
+	if convertNodeType is not None:
+		insertConversionNode(nodeTree, convertNodeType, fromSocket, toSocket, originSocket)
+def insertConversionNode(nodeTree, convertNodeType, fromSocket, toSocket, originSocket):
+	node = nodeTree.nodes.new(convertNodeType)
 	node.hide = True
 	node.select = False
 	x1, y1 = toSocket.node.location
 	x2, y2 = list(fromSocket.node.location)
 	node.location = [(x1+x2)/2+20, (y1+y2)/2-50]
+	
 	nodeTree.links.new(node.inputs[0], fromSocket)
-	nodeTree.links.new(toSocket, node.outputs[0])
 	setDataConnection(originSocket, node.inputs[0])
+	
+	nodeTree.links.new(toSocket, node.outputs[0])
 	setDataConnection(node.outputs[0], toSocket)
+	
 	
 	
 # find origin sockets
