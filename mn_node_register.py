@@ -13,8 +13,8 @@ def getAllNodeIdNames():
 	nodeIdNames = []
 	for (categoryName, nodeNames) in nodeDictionary:
 		nodeItems = []
-		for nodeName in nodeNames:
-			nodeIdNames.append(nodeName)
+		for nodeData in nodeNames:
+			nodeIdNames.append(nodeData[0])
 	return nodeIdNames
 
 def getNodeCategories():
@@ -22,8 +22,8 @@ def getNodeCategories():
 	nodeCategories = []
 	for (categoryName, nodeNames) in nodeDictionary:
 		nodeItems = []
-		for nodeName in nodeNames:
-			nodeItems.append(NodeItem(nodeName))
+		for nodeData in nodeNames:
+			nodeItems.append(NodeItem(nodeData[0], label = nodeData[1]))
 		category = AnimationNodesCategory(categoryName.upper(), categoryName, items = nodeItems)
 		nodeCategories.append(category)
 	return nodeCategories
