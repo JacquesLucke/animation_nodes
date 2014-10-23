@@ -47,11 +47,15 @@ class mn_SoundBakeNode(Node, AnimationNode):
 		
 		layout.separator()
 		
-	def getStrengthList(self):
+	def getStrengthList(self, frame, isCurrentFrame = False):
 		soundObject = self.getSoundObject()
 		strenghts = []
-		for item in self.bakedSound:
-			strenghts.append(soundObject[item.propertyName])
+		if isCurrentFrame:
+			for item in self.bakedSound:
+				strenghts.append(soundObject[item.propertyName])
+		else:
+			for item in self.bakedSound:
+				strenghts.append(getSingleValueAtFrame(soundObject, '["' + item.propertyName + '"]', frame))
 		return strenghts
 		
 	def bakeSound(self):
@@ -113,13 +117,16 @@ class mn_SoundBakeNode(Node, AnimationNode):
 	def free(self):
 		bpy.context.scene.objects.unlink(self.getSoundObject())
 		
-	def getStrengthListFromCache(self):
-		cache = getExecutionCache(self)
-		if cache is None:
-			strenghts = self.getStrengthList()
-			setExecutionCache(self, { "Strengths" : strenghts })
+	def getStrengthListFromCache(self, frame, isCurrentFrame = False):
+		if isCurrentFrame:
+			cache = getExecutionCache(self)
+			if cache is None:
+				strenghts = self.getStrengthList()
+				setExecutionCache(self, { "Strengths" : strenghts })
+			else:
+				strenghts = cache["Strengths"]
 		else:
-			strenghts = cache["Strengths"]
+			strenghts = self.getStrengthList(frame, isCurrentFrame)
 		return strenghts
 		
 class BakeSoundToNode(bpy.types.Operator):
