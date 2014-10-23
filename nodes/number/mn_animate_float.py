@@ -34,7 +34,7 @@ class mn_AnimateFloatNode(Node, AnimationNode):
 	def execute(self, useOutput, start, end, time, interpolation, moveTime, stayTime):
 		influence = interpolation[0](max(min(time / moveTime, 1.0), 0.0), interpolation[1])
 		result = start * (1 - influence) + end * influence
-		velocity = 0
+		difference = 0
 		if useOutput["Difference"]:
 			influence = interpolation[0](max(min((time - 1)/ moveTime, 1.0), 0.0), interpolation[1])
 			oldResult = start * (1 - influence) + end * influence
