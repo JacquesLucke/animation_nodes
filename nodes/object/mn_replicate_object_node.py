@@ -15,9 +15,14 @@ class mn_ReplicateObjectNode(Node, AnimationNode):
 	bl_idname = "mn_ReplicateObjectNode"
 	bl_label = "Replicate Object"
 	
+	def copyTypeChanged(self, context):
+		self.free()
+	
 	linkedObjects = bpy.props.CollectionProperty(type = mn_ObjectNamePropertyGroup)
 	unlinkedObjects = bpy.props.CollectionProperty(type = mn_ObjectNamePropertyGroup)
 	setObjectData = bpy.props.BoolProperty(default = False)
+	
+	deepCopy = bpy.props.BoolProperty(default = False, update = copyTypeChanged)
 	
 	def init(self, context):
 		forbidCompiling()
@@ -30,6 +35,8 @@ class mn_ReplicateObjectNode(Node, AnimationNode):
 		setData = layout.operator("mn.set_object_data_on_all_objects")
 		setData.nodeTreeName = self.id_data.name
 		setData.nodeName = self.name
+		
+		layout.prop(self, "deepCopy", text = "Deep Copy")
 		
 	def getInputSocketNames(self):
 		return {"Object" : "sourceObject",
@@ -143,7 +150,9 @@ class mn_ReplicateObjectNode(Node, AnimationNode):
 		return object
 			
 	def newReplication(self, sourceObject):
-		newObject = bpy.data.objects.new(getPossibleObjectName("instance"), sourceObject.data)
+		if self.deepCopy: data = sourceObject.data.copy()
+		else: data = sourceObject.data
+		newObject = bpy.data.objects.new(getPossibleObjectName("instance"), data)
 		newObject.parent = getMainObjectContainer()
 		item = self.unlinkedObjects.add()
 		item.objectName = newObject.name
