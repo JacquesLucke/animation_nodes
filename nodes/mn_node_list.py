@@ -16,7 +16,7 @@ def getNodeNameDictionary():
 		"mn_RandomVectorNode",
 		"mn_VectorWiggle",
 		"mn_VectorLengthNode",
-		"mn_MixVectorNode",
+		"mn_AnimateVectorNode",
 		"mn_VectorDistanceNode",
 		"mn_VectorMathNode" ] ))	
 		
@@ -57,6 +57,7 @@ def getNodeNameDictionary():
 	nodes.append(("Color", [
 		"mn_ColorInputNode",
 		"mn_ColorMix",
+		"mn_CombineColor",
 		"mn_SetVertexColor" ] ))
 		
 	nodes.append(("Animation", [
