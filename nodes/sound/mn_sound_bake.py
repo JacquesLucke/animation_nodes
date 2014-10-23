@@ -50,21 +50,44 @@ class mn_SoundBakeNode(Node, AnimationNode):
 	def getStrengthList(self, frame):
 		identifier = self.id_data.name + self.name
 		nodeCache = getLongTimeCache(identifier)
-		intFrame = int(max(frame, 0))
+		intFrame = math.floor(max(frame, 0))
 		if nodeCache is None:
 			nodeCache = {}
 			setLongTimeCache(identifier, nodeCache)
 		if self.filePath not in nodeCache:
 			nodeCache[self.filePath] = []
 		fileCache = nodeCache[self.filePath]
-		if intFrame >= len(fileCache):
-			newFrameCaches = [None] * (intFrame - len(fileCache) + 1)
+		if intFrame + 1 >= len(fileCache):
+			newFrameCaches = [None] * (intFrame - len(fileCache) + 2)
 			fileCache.extend(newFrameCaches)
-		frameCache = fileCache[intFrame]
-		if frameCache is None:
-			frameCache = self.loadStrengthListAtFrame(intFrame)
-			fileCache[intFrame] = frameCache
-		return frameCache
+			
+		if frame == intFrame:
+			frameCache = fileCache[intFrame]
+			if frameCache is None:
+				frameCache = self.loadStrengthListAtFrame(intFrame)
+				fileCache[intFrame] = frameCache
+			strengthList = frameCache
+		else: # for subframes
+			lowerFrame = intFrame
+			upperFrame = intFrame + 1
+			
+			lowerCache = fileCache[lowerFrame]
+			if lowerCache is None:
+				lowerCache = self.loadStrengthListAtFrame(intFrame)
+				fileCache[lowerFrame] = lowerCache		
+			upperCache = fileCache[upperFrame]
+			if upperCache is None:
+				upperCache = self.loadStrengthListAtFrame(intFrame)
+				fileCache[upperFrame] = upperCache
+			strengthList = self.mixStrengthLists(lowerCache, upperCache, frame - lowerFrame)
+			
+		return strengthList
+		
+	def mixStrengthLists(self, list1, list2, influence):
+		strenghts = []
+		for a, b in zip(list1, list2):
+			strenghts.append(a * (1 - influence) + b * influence)
+		return strenghts
 		
 	def loadStrengthListAtFrame(self, frame):
 		soundObject = self.getSoundObject()
