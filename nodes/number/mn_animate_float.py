@@ -8,6 +8,7 @@ from mn_interpolation_utils import *
 class mn_AnimateFloatNode(Node, AnimationNode):
 	bl_idname = "mn_AnimateFloatNode"
 	bl_label = "Animate Number"
+	outputUseParameterName = "useOutput"
 	
 	def init(self, context):
 		forbidCompiling()
@@ -19,6 +20,7 @@ class mn_AnimateFloatNode(Node, AnimationNode):
 		self.inputs.new("mn_FloatSocket", "Stay Time").number = 0.0
 		self.outputs.new("mn_FloatSocket", "Result")
 		self.outputs.new("mn_FloatSocket", "New Time")
+		self.outputs.new("mn_FloatSocket", "Difference")
 		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
@@ -27,10 +29,15 @@ class mn_AnimateFloatNode(Node, AnimationNode):
 	def getInputSocketNames(self):
 		return {"Start" : "start", "End" : "end", "Time" : "time", "Interpolation" : "interpolation", "Movement Time" : "moveTime", "Stay Time" : "stayTime"}
 	def getOutputSocketNames(self):
-		return {"Result" : "result", "New Time" : "newTime"}
+		return {"Result" : "result", "New Time" : "newTime", "Difference" : "difference"}
 		
-	def execute(self, start, end, time, interpolation, moveTime, stayTime):
+	def execute(self, useOutput, start, end, time, interpolation, moveTime, stayTime):
 		influence = interpolation[0](max(min(time / moveTime, 1.0), 0.0), interpolation[1])
 		result = start * (1 - influence) + end * influence
-		return result, time - moveTime - stayTime
+		velocity = 0
+		if useOutput["Difference"]:
+			influence = interpolation[0](max(min((time - 1)/ moveTime, 1.0), 0.0), interpolation[1])
+			oldResult = start * (1 - influence) + end * influence
+			difference = result - oldResult
+		return result, time - moveTime - stayTime, difference
 		
