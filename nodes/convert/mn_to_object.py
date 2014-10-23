@@ -21,4 +21,4 @@ class mn_ToObjectConversion(Node, AnimationNode):
 	def useInLineExecution(self):
 		return True
 	def getInLineExecutionString(self, outputUse):
-		return "$object$ = bpy.data.objects.get(%value%)"
+		return "$object$ = bpy.data.objects.get(str(%value%))"

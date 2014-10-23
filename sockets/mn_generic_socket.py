@@ -16,7 +16,7 @@ class mn_GenericSocket(NodeSocket):
 		return (0.6, 0.3, 0.3, 0.7)
 		
 	def getValue(self):
-		return 0
+		return None
 		
 	def setStoreableValue(self, data):
 		pass
