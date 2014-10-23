@@ -11,8 +11,8 @@ class mn_AnimateFloatNode(Node, AnimationNode):
 	
 	def init(self, context):
 		forbidCompiling()
-		self.inputs.new("mn_FloatSocket", "A")
-		self.inputs.new("mn_FloatSocket", "B")
+		self.inputs.new("mn_FloatSocket", "Start")
+		self.inputs.new("mn_FloatSocket", "End")
 		self.inputs.new("mn_FloatSocket", "Time")
 		self.inputs.new("mn_InterpolationSocket", "Interpolation")
 		self.inputs.new("mn_FloatSocket", "Movement Time").number = 20.0
@@ -25,12 +25,12 @@ class mn_AnimateFloatNode(Node, AnimationNode):
 		pass
 		
 	def getInputSocketNames(self):
-		return {"A" : "a", "B" : "b", "Time" : "time", "Interpolation" : "interpolation", "Movement Time" : "moveTime", "Stay Time" : "stayTime"}
+		return {"Start" : "start", "End" : "end", "Time" : "time", "Interpolation" : "interpolation", "Movement Time" : "moveTime", "Stay Time" : "stayTime"}
 	def getOutputSocketNames(self):
 		return {"Result" : "result", "New Time" : "newTime"}
 		
-	def execute(self, a, b, time, interpolation, moveTime, stayTime):
+	def execute(self, start, end, time, interpolation, moveTime, stayTime):
 		influence = interpolation[0](max(min(time / moveTime, 1.0), 0.0), interpolation[1])
-		result = a * (1 - influence) + b * influence
+		result = start * (1 - influence) + end * influence
 		return result, time - moveTime - stayTime
 		

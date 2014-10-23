@@ -14,7 +14,7 @@ class mn_VectorWiggle(Node, AnimationNode):
 	def init(self, context):
 		forbidCompiling()
 		self.inputs.new("mn_FloatSocket", "Seed")
-		self.inputs.new("mn_FloatSocket", "Evolution")
+		self.inputs.new("mn_FloatSocket", "Time")
 		self.inputs.new("mn_FloatSocket", "Speed").number = 15.0
 		self.inputs.new("mn_VectorSocket", "Amplitude").vector = [5, 5, 5]
 		self.inputs.new("mn_FloatSocket", "Persistance").number = 0.3
@@ -27,7 +27,7 @@ class mn_VectorWiggle(Node, AnimationNode):
 		
 	def getInputSocketNames(self):
 		return {"Seed" : "seed",
-				"Evolution" : "x",
+				"Time" : "time",
 				"Speed" : "speed",
 				"Amplitude" : "amplitude",
 				"Persistance" : "persistance",
@@ -35,13 +35,13 @@ class mn_VectorWiggle(Node, AnimationNode):
 	def getOutputSocketNames(self):
 		return {"Vector" : "vector"}
 		
-	def execute(self, seed, x, speed, amplitude, persistance, octaves):
+	def execute(self, seed, time, speed, amplitude, persistance, octaves):
 		vector = [0, 0, 0]
-		x = x / speed + 2541 * seed + 823 * self.additionalSeed
-		vector[0] = perlinNoise(x, persistance, octaves) * amplitude[0]
-		x += 79
-		vector[1] = perlinNoise(x, persistance, octaves) * amplitude[1]
-		x += 263
-		vector[2] = perlinNoise(x, persistance, octaves) * amplitude[2]
+		time = time / speed + 2541 * seed + 823 * self.additionalSeed
+		vector[0] = perlinNoise(time, persistance, octaves) * amplitude[0]
+		time += 79
+		vector[1] = perlinNoise(time, persistance, octaves) * amplitude[1]
+		time += 263
+		vector[2] = perlinNoise(time, persistance, octaves) * amplitude[2]
 		return vector
 		

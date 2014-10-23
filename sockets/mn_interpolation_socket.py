@@ -26,8 +26,8 @@ easingCategory.append(InterpolationMode("OUT", "Ease Out"))
 easingCategory.append(InterpolationMode("INOUT", "Ease In Out"))
 
 backCategory = InterpolationCategory("BACK", "Back")
-backCategory.append(InterpolationMode("IN", "In"))
 backCategory.append(InterpolationMode("OUT", "Out"))
+backCategory.append(InterpolationMode("IN", "In"))
 
 interpolationEnum.append(linearMode)
 interpolationEnum.append(easingCategory)
