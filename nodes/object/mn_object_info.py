@@ -54,25 +54,49 @@ class mn_ObjectInfoNode(Node, AnimationNode):
 		
 		if object is None:
 			return location, rotation, scale, locVelocity, rotVelocity, scaleVelocity
+			
+		currentFrame = getCurrentFrame()
 		if self.frameTypesProperty == "OFFSET":
-			frame += getCurrentFrame()
+			frame += currentFrame
 			
-		if useOutput["Location Velocity"]:
-			[locationBefore, location] = getArrayValueAtMultipleFrames(object, "location", [frame-1, frame])
-			locVelocity = list(map(sub, location, locationBefore))
-		elif useOutput["Location"]:
-			location = getArrayValueAtFrame(object, "location", frame)
-			
-		if useOutput["Rotation Velocity"]:
-			[rotationBefore, rotation] = getArrayValueAtMultipleFrames(object, "rotation_euler", [frame-1, frame])
-			rotVelocity = list(map(sub, rotation, rotationBefore))
-		elif useOutput["Rotation"]:
-			rotation = getArrayValueAtFrame(object, "rotation_euler", frame)
-			
-		if useOutput["Scale Velocity"]:
-			[scaleBefore, scale] = getArrayValueAtMultipleFrames(object, "scale", [frame-1, frame])
-			scaleVelocity = list(map(sub, scale, scaleBefore))
-		elif useOutput["Scale"]:
-			scale = getArrayValueAtFrame(object, "scale", frame)
+		if frame == currentFrame:
+			if useOutput["Location Velocity"]:
+				location = object.location
+				locationBefore = getArrayValueAtFrame(object, "location", frame-1)
+				locVelocity = list(map(sub, location, locationBefore))
+			elif useOutput["Location"]:
+				location = object.location
+				
+			if useOutput["Rotation Velocity"]:
+				rotation = object.rotation_euler
+				rotationBefore = getArrayValueAtFrame(object, "rotation_euler", frame-1)
+				rotVelocity = list(map(sub, rotation, rotationBefore))
+			elif useOutput["Rotation"]:
+				rotation = object.rotation_euler
+				
+			if useOutput["Scale Velocity"]:
+				scale = object.scale
+				scaleBefore = getArrayValueAtFrame(object, "scale", frame-1)
+				scaleVelocity = list(map(sub, scale, scaleBefore))
+			elif useOutput["Scale"]:
+				scale = object.scale
+		else:
+			if useOutput["Location Velocity"]:
+				[locationBefore, location] = getArrayValueAtMultipleFrames(object, "location", [frame-1, frame])
+				locVelocity = list(map(sub, location, locationBefore))
+			elif useOutput["Location"]:
+				location = getArrayValueAtFrame(object, "location", frame)
+				
+			if useOutput["Rotation Velocity"]:
+				[rotationBefore, rotation] = getArrayValueAtMultipleFrames(object, "rotation_euler", [frame-1, frame])
+				rotVelocity = list(map(sub, rotation, rotationBefore))
+			elif useOutput["Rotation"]:
+				rotation = getArrayValueAtFrame(object, "rotation_euler", frame)
+				
+			if useOutput["Scale Velocity"]:
+				[scaleBefore, scale] = getArrayValueAtMultipleFrames(object, "scale", [frame-1, frame])
+				scaleVelocity = list(map(sub, scale, scaleBefore))
+			elif useOutput["Scale"]:
+				scale = getArrayValueAtFrame(object, "scale", frame)
 		
 		return location, rotation, scale, locVelocity, rotVelocity, scaleVelocity
