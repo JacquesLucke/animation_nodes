@@ -2,11 +2,12 @@ def getNodeNameDictionary():
 	nodes = []
 	
 	nodes.append(("Number", [
-		("mn_FloatInputNode", "Decimal Number"),
+		("mn_FloatInputNode", "Number"),
 		("mn_IntegerInputNode", "Integer"),
-		("mn_FloatListInputNode", "Decimal Number List"),
+		("mn_FloatListInputNode", "Number List"),
 		("mn_RandomNumberNode", "Random"),
 		("mn_FloatWiggle", "Wiggle"),
+		("mn_AnimateFloatNode", "Animate"),
 		("mn_FloatMathNode", "Math"),
 		("mn_FloatClamp", "Clamp") ] ))
 		
@@ -73,7 +74,7 @@ def getNodeNameDictionary():
 
 	nodes.append(("Convert", [
 		("mn_ToStringConversion", "To Text"),
-		("mn_ToFloatConversion", "To Decimal Number"),
+		("mn_ToFloatConversion", "To Number"),
 		("mn_ToIntegerConversion", "To Integer"),
 		("mn_ToObjectConversion", "To Object") ] ))
 		
