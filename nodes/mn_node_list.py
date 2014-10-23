@@ -74,7 +74,8 @@ def getNodeNameDictionary():
 	nodes.append(("Convert", [
 		("mn_ToStringConversion", "To Text"),
 		("mn_ToFloatConversion", "To Decimal Number"),
-		("mn_ToIntegerConversion", "To Integer") ] ))
+		("mn_ToIntegerConversion", "To Integer"),
+		("mn_ToObjectConversion", "To Object") ] ))
 		
 	nodes.append(("Script", [
 		("mn_ExpressionNode", "Expression") ] ))
