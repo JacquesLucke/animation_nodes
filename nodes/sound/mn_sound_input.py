@@ -21,6 +21,11 @@ class mn_SoundInputNode(Node, AnimationNode):
 		
 	bakeNodeName = bpy.props.EnumProperty(items = getSoundNodesInTree, name = "Bake Node", update = nodePropertyChanged)
 	
+	frameTypes = [
+		("OFFSET", "Offset", ""),
+		("ABSOLUTE", "Absolute", "") ]
+	frameType = bpy.props.EnumProperty(name = "Frame Type", items = frameTypes, default = "OFFSET")
+	
 	def init(self, context):
 		forbidCompiling()
 		self.inputs.new("mn_FloatSocket", "Value")
@@ -38,12 +43,17 @@ class mn_SoundInputNode(Node, AnimationNode):
 		
 	def draw_buttons(self, context, layout):
 		layout.prop(self, "bakeNodeName", text = "Sound")
+		layout.prop(self, "frameType", text = "Frame Type")
 		
 	def execute(self, value, frame):
-		strenghts = []
+		currentFrame = getCurrentFrame()
+		if self.frameType == "OFFSET":
+			frame += currentFrame
+	
 		bakeNode = self.getBakeNode()
+		strenghts = []
 		if bakeNode is not None:
-			strenghts = bakeNode.getStrengthListFromCache(frame)
+			strenghts = bakeNode.getStrengthList(frame)
 		return strenghts, self.getStrengthOfFrequence(strenghts, value)
 		
 	def getStrengthOfFrequence(self, strengths, frequenceIndicator):

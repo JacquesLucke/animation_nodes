@@ -47,15 +47,30 @@ class mn_SoundBakeNode(Node, AnimationNode):
 		
 		layout.separator()
 		
-	def getStrengthList(self, frame, isCurrentFrame = False):
+	def getStrengthList(self, frame):
+		identifier = self.id_data.name + self.name
+		nodeCache = getLongTimeCache(identifier)
+		intFrame = int(max(frame, 0))
+		if nodeCache is None:
+			nodeCache = {}
+			setLongTimeCache(identifier, nodeCache)
+		if self.filePath not in nodeCache:
+			nodeCache[self.filePath] = []
+		fileCache = nodeCache[self.filePath]
+		if intFrame >= len(fileCache):
+			newFrameCaches = [None] * (intFrame - len(fileCache) + 1)
+			fileCache.extend(newFrameCaches)
+		frameCache = fileCache[intFrame]
+		if frameCache is None:
+			frameCache = self.loadStrengthListAtFrame(intFrame)
+			fileCache[intFrame] = frameCache
+		return frameCache
+		
+	def loadStrengthListAtFrame(self, frame):
 		soundObject = self.getSoundObject()
 		strenghts = []
-		if isCurrentFrame:
-			for item in self.bakedSound:
-				strenghts.append(soundObject[item.propertyName])
-		else:
-			for item in self.bakedSound:
-				strenghts.append(getSingleValueAtFrame(soundObject, '["' + item.propertyName + '"]', frame))
+		for item in self.bakedSound:
+			strenghts.append(getSingleValueAtFrame(soundObject, '["' + item.propertyName + '"]', frame))
 		return strenghts
 		
 	def bakeSound(self):
@@ -117,17 +132,6 @@ class mn_SoundBakeNode(Node, AnimationNode):
 	def free(self):
 		bpy.context.scene.objects.unlink(self.getSoundObject())
 		
-	def getStrengthListFromCache(self, frame, isCurrentFrame = False):
-		if isCurrentFrame:
-			cache = getExecutionCache(self)
-			if cache is None:
-				strenghts = self.getStrengthList()
-				setExecutionCache(self, { "Strengths" : strenghts })
-			else:
-				strenghts = cache["Strengths"]
-		else:
-			strenghts = self.getStrengthList(frame, isCurrentFrame)
-		return strenghts
 		
 class BakeSoundToNode(bpy.types.Operator):
 	bl_idname = "mn.bake_sound_to_node"
