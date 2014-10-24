@@ -1,24 +1,18 @@
 import bpy
-from bpy.types import NodeTree, Node, NodeSocket
-from mn_utils import *
 from mn_execution import nodePropertyChanged
+from mn_node_base import * 
 
-class mn_IntegerSocket(NodeSocket):
+class mn_IntegerSocket(mn_BaseSocket):
 	bl_idname = "mn_IntegerSocket"
 	bl_label = "Integer Socket"
 	dataType = "Integer"
 	allowedInputTypes = ["Integer"]
+	drawColor = (0.2, 0.2, 1, 1)
 	
 	number = bpy.props.IntProperty(default = 0, update = nodePropertyChanged)
 	
-	def draw(self, context, layout, node, text):
-		if not self.is_output and not isSocketLinked(self):
-			layout.prop(self, "number", text = text)
-		else:
-			layout.label(text)
-			
-	def draw_color(self, context, node):
-		return (0.2, 0.2, 1, 1)
+	def drawInput(self, layout, node, text):
+		layout.prop(self, "number", text = text)
 		
 	def getValue(self):
 		return self.number
@@ -27,12 +21,3 @@ class mn_IntegerSocket(NodeSocket):
 		self.number = data
 	def getStoreableValue(self):
 		return self.number
-		
-# register
-################################
-	
-def register():
-	bpy.utils.register_module(__name__)
-
-def unregister():
-	bpy.utils.unregister_module(__name__)
