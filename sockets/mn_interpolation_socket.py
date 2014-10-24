@@ -44,7 +44,7 @@ def getInterpolationFunctionTupel(mode, subMode):
 	return (linear, None)
 
 
-class mn_InterpolationSocket(mn_BaseSocket):
+class mn_InterpolationSocket(mn_BaseSocket, mn_SocketProperties):
 	bl_idname = "mn_InterpolationSocket"
 	bl_label = "Interpolation Socket"
 	dataType = "Interpolation"

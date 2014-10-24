@@ -2,7 +2,7 @@ import bpy
 from mn_execution import nodePropertyChanged
 from mn_node_base import * 
 
-class mn_VectorSocket(mn_BaseSocket):
+class mn_VectorSocket(mn_BaseSocket, mn_SocketProperties):
 	bl_idname = "mn_VectorSocket"
 	bl_label = "Vector Socket"
 	dataType = "Vector"

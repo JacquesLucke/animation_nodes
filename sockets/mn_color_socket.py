@@ -2,7 +2,7 @@ import bpy
 from mn_execution import nodePropertyChanged
 from mn_node_base import * 
 
-class mn_ColorSocket(mn_BaseSocket):
+class mn_ColorSocket(mn_BaseSocket, mn_SocketProperties):
 	bl_idname = "mn_ColorSocket"
 	bl_label = "Color Socket"
 	dataType = "Color"

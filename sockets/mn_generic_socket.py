@@ -2,7 +2,7 @@ import bpy
 from mn_execution import nodePropertyChanged
 from mn_node_base import * 
 
-class mn_GenericSocket(mn_BaseSocket):
+class mn_GenericSocket(mn_BaseSocket, mn_SocketProperties):
 	bl_idname = "mn_GenericSocket"
 	bl_label = "Generic Socket"
 	dataType = "Generic"

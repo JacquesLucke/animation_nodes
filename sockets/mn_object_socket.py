@@ -2,7 +2,7 @@ import bpy
 from mn_execution import nodePropertyChanged
 from mn_node_base import * 
 
-class mn_ObjectSocket(mn_BaseSocket):
+class mn_ObjectSocket(mn_BaseSocket, mn_SocketProperties):
 	bl_idname = "mn_ObjectSocket"
 	bl_label = "Object Socket"
 	dataType = "Object"

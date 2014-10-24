@@ -2,7 +2,7 @@ import bpy
 from mn_execution import nodePropertyChanged
 from mn_node_base import * 
 
-class mn_StringListSocket(mn_BaseSocket):
+class mn_StringListSocket(mn_BaseSocket, mn_SocketProperties):
 	bl_idname = "mn_StringListSocket"
 	bl_label = "String List Socket"
 	dataType = "String List"
