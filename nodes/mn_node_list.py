@@ -38,10 +38,10 @@ def getNodeNameDictionary():
 		("mn_ObjectInfoNode", "Info"),
 		("mn_ReplicateObjectNode", "Replicate"),
 		("mn_CopyObjectData", "Copy Data (Mesh)"),
-		("mn_ObjectOutputNode", "Transform Output"),
 		("mn_ObjectAttributeOutputNode", "Attribute Output"),
 		("mn_ModifierOutputNode", "Modifier Output"),
-		("mn_CopyTransformsNode", "Copy Transforms") ] ))
+		("mn_CopyTransformsNode", "Copy Transforms"),
+		("mn_ObjectOutputNode", "Transform Output") ] ))
 		
 	nodes.append(("List", [
 		("mn_GetListElementNode", "Get Element"),
