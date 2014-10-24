@@ -58,6 +58,13 @@ def getSocketFromNode(node, isOutputSocket, name):
 		return node.outputs.get(name)
 	else:
 		return node.inputs.get(name)
+def getSocketByIdentifier(node, isOutputSocket, identifier):
+	if isOutputSocket: return getSocketFromListByIdentifier(node.outputs, identifier)
+	return getSocketFromListByIdentifier(node.inputs, identifier)
+def getSocketFromListByIdentifier(sockets, identifier):
+	for socket in sockets:
+		if socket.identifier == identifier: return socket
+	return None
 def getNodeIdentifier(node):
 	return node.id_data.name + node.name
 	
