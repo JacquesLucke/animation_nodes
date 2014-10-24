@@ -4,13 +4,14 @@ from mn_utils import *
 from mn_cache import clearExecutionCache
 from mn_network_code_generator import getAllNetworkCodeStrings
 
-ALLOW_COMPILING = True
+COMPILE_BLOCKER = 0
 
 compiledCodeObjects = []
 codeStrings = []
 
 def updateAnimationTrees(treeChanged = True):
-	if ALLOW_COMPILING:
+	print(COMPILE_BLOCKER)
+	if COMPILE_BLOCKER <= 0:
 		forbidCompiling()
 		start = time.clock()
 		if treeChanged:
@@ -31,11 +32,11 @@ def updateAnimationTrees(treeChanged = True):
 		allowCompiling()
 			
 def allowCompiling():
-	global ALLOW_COMPILING
-	ALLOW_COMPILING = True
+	global COMPILE_BLOCKER
+	COMPILE_BLOCKER = max(COMPILE_BLOCKER - 1, 0)
 def forbidCompiling():
-	global ALLOW_COMPILING
-	ALLOW_COMPILING = False
+	global COMPILE_BLOCKER
+	COMPILE_BLOCKER += 1
 			
 			
 # compile code objects

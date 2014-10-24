@@ -24,7 +24,6 @@ class mn_ExpressionNode(Node, AnimationNode):
 		self.inputs.new("mn_EmptySocket", "...")
 		self.outputs.new("mn_GenericSocket", "Result")
 		allowCompiling()
-		print(self.outputs[0].identifier)
 		
 	def draw_buttons(self, context, layout):
 		layout.prop(self, "expression", text = "Expression")
