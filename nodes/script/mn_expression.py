@@ -8,7 +8,7 @@ class mn_ExpressionNode(Node, AnimationNode):
 	bl_idname = "mn_ExpressionNode"
 	bl_label = "Expression"
 	
-	expression = bpy.props.StringProperty(default = "a+bw", update = nodeTreeChanged)
+	expression = bpy.props.StringProperty(default = "a+bw", update = nodeTreeChanged, description = "Python Expression")
 	
 	def init(self, context):
 		forbidCompiling()
@@ -16,6 +16,7 @@ class mn_ExpressionNode(Node, AnimationNode):
 		aSocket.editableCustomName = True
 		aSocket.customName = "a"
 		aSocket.customNameIsVariable = True
+		aSocket.removeableSocket = True
 		bSocket = self.inputs.new("mn_GenericSocket", "b")
 		bSocket.editableCustomName = True
 		bSocket.customName = "bw"
@@ -26,7 +27,7 @@ class mn_ExpressionNode(Node, AnimationNode):
 		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
-		layout.prop(self, "expression", text = "Expression")
+		layout.prop(self, "expression", text = "")
 		
 	def update(self):
 		forbidCompiling()
@@ -41,6 +42,7 @@ class mn_ExpressionNode(Node, AnimationNode):
 				newSocket = self.inputs.new("mn_GenericSocket", newSocketName)
 				newSocket.editableCustomName = True
 				newSocket.customNameIsVariable = True
+				newSocket.removeableSocket = True
 				newSocket.customName = getRandomString(1)
 				self.inputs.new("mn_EmptySocket", "...")
 				self.id_data.links.new(newSocket, fromSocket)	
