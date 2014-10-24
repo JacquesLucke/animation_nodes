@@ -2,13 +2,15 @@ import bpy, ast
 from bpy.types import Node
 from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
-from mn_utils import * 
+from mn_utils import *
+
+defaultVariableNames = list("abcdefghijklmnopqrstuvwxyz")
 
 class mn_ExpressionNode(Node, AnimationNode):
 	bl_idname = "mn_ExpressionNode"
 	bl_label = "Expression"
 	
-	expression = bpy.props.StringProperty(default = "a+bw", update = nodeTreeChanged, description = "Python Expression")
+	expression = bpy.props.StringProperty(default = "a+b", update = nodeTreeChanged, description = "Python Expression (math module is imported)")
 	
 	def init(self, context):
 		forbidCompiling()
@@ -19,7 +21,7 @@ class mn_ExpressionNode(Node, AnimationNode):
 		aSocket.removeableSocket = True
 		bSocket = self.inputs.new("mn_GenericSocket", "b")
 		bSocket.editableCustomName = True
-		bSocket.customName = "bw"
+		bSocket.customName = "b"
 		bSocket.customNameIsVariable = True
 		bSocket.removeableSocket = True
 		self.inputs.new("mn_EmptySocket", "...")
@@ -38,15 +40,34 @@ class mn_ExpressionNode(Node, AnimationNode):
 				link = links[0]
 				fromSocket = link.from_socket
 				self.inputs.remove(socket)
-				newSocketName = "expression socket" + getRandomString(5)
-				newSocket = self.inputs.new("mn_GenericSocket", newSocketName)
+				newSocket = self.inputs.new("mn_GenericSocket", self.getNotUsedSocketName())
 				newSocket.editableCustomName = True
 				newSocket.customNameIsVariable = True
 				newSocket.removeableSocket = True
-				newSocket.customName = getRandomString(1)
+				newSocket.customName = self.getNextCustomName()
 				self.inputs.new("mn_EmptySocket", "...")
 				self.id_data.links.new(newSocket, fromSocket)	
 		allowCompiling()
+		
+	def getNextCustomName(self):
+		for name in defaultVariableNames:
+			if not self.isCustomNamesUsed(name): return name
+		return getRandomString(5)
+			
+	def isCustomNamesUsed(self, customName):
+		for socket in self.inputs:
+			if socket.customName == customName: return True
+		return False
+		
+	def getNotUsedSocketName(self):
+		socketName = getRandomString(5)
+		while(self.isSocketNameUsed(socketName)):
+			socketName = getRandomString(5)
+		return socketName
+	def isSocketNameUsed(self, name):
+		for socket in self.inputs:
+			if socket.name == name or socket.identifier == name: return True
+		return False
 		
 	def getInputSocketNames(self):
 		inputSocketNames = {}
