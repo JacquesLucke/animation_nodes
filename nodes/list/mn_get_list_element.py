@@ -43,7 +43,7 @@ class mn_GetListElementNode(Node, AnimationNode):
 			self.inputs.new("mn_IntegerSocket", "Index")
 			self.outputs.new("mn_FloatSocket", "Element")
 		elif type == "STRING":
-			self.inputs.new("mn_mn_StringSocket", "List")
+			self.inputs.new("mn_StringListSocket", "List")
 			self.inputs.new("mn_IntegerSocket", "Index")
 			self.outputs.new("mn_StringSocket", "Element")
 		elif type == "OBJECT":

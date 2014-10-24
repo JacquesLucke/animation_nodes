@@ -42,9 +42,9 @@ class mn_CombineListsNode(Node, AnimationNode):
 			self.inputs.new("mn_FloatListSocket", "List 2")
 			self.outputs.new("mn_FloatListSocket", "Both Lists")
 		elif type == "STRING":
-			self.inputs.new("mn_mn_StringSocket", "List 1")
-			self.inputs.new("mn_mn_StringSocket", "List 2")
-			self.outputs.new("mn_mn_StringSocket", "Both Lists")
+			self.inputs.new("mn_StringListSocket", "List 1")
+			self.inputs.new("mn_StringListSocket", "List 2")
+			self.outputs.new("mn_StringListSocket", "Both Lists")
 		elif type == "OBJECT":
 			self.inputs.new("mn_ObjectListSocket", "List 1")
 			self.inputs.new("mn_ObjectListSocket", "List 2")

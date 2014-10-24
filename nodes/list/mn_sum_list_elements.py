@@ -52,7 +52,7 @@ class mn_SumListElementsNode(Node, AnimationNode):
 			self.inputs.new("mn_IntegerSocket", "End")
 			self.outputs.new("mn_FloatSocket", "Sum")
 		elif type == "STRING":
-			self.inputs.new("mn_mn_StringSocket", "List")
+			self.inputs.new("mn_StringListSocket", "List")
 			self.inputs.new("mn_IntegerSocket", "Start")
 			self.inputs.new("mn_IntegerSocket", "End")
 			self.outputs.new("mn_StringSocket", "Sum")

@@ -46,10 +46,10 @@ class mn_SetListElementNode(Node, AnimationNode):
 			self.inputs.new("mn_IntegerSocket", "Index")
 			self.outputs.new("mn_FloatListSocket", "List")
 		elif type == "STRING":
-			self.inputs.new("mn_mn_StringSocket", "List")
+			self.inputs.new("mn_StringListSocket", "List")
 			self.inputs.new("mn_StringSocket", "Value")
 			self.inputs.new("mn_IntegerSocket", "Index")
-			self.outputs.new("mn_mn_StringSocket", "List")
+			self.outputs.new("mn_StringSocket", "List")
 		elif type == "OBJECT":
 			self.inputs.new("mn_ObjectListSocket", "List")
 			self.inputs.new("mn_ObjectSocket", "Value")
