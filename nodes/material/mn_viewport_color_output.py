@@ -26,6 +26,8 @@ class mn_ViewportColorNode(Node, AnimationNode):
 	def execute(self, color):
 		material = bpy.data.materials.get(self.materialName)
 		if material is not None:
-			material.diffuse_color = color[:3]
+			try:
+				material.diffuse_color = color[:3]
+			except: pass
 		return None
 		

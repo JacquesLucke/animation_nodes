@@ -11,7 +11,7 @@ class mn_ColorSocket(mn_BaseSocket):
 	
 	color = bpy.props.FloatVectorProperty(default = [0.5, 0.5, 0.5], subtype = "COLOR", soft_min = 0.0, soft_max = 1.0, update = nodePropertyChanged)
 	
-	def draw(self, context, layout, node, text):
+	def drawInput(self, layout, node, text):
 		layout.prop(self, "color", text = text)
 		
 	def getValue(self):
