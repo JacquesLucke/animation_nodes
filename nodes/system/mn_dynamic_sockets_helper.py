@@ -4,7 +4,7 @@ from mn_utils import *
 
 addSocketList = [
 	("Object List", "mn_ObjectListSocket"),
-	("String List", "mn_mn_StringSocket"),
+	("String List", "mn_StringSocket"),
 	("Float", "mn_FloatSocket"),
 	("Text", "mn_StringSocket"),
 	("Object", "mn_ObjectSocket") ]
@@ -37,10 +37,6 @@ class NewSubProgramSocketNode(bpy.types.Operator):
 	nodeTreeName = bpy.props.StringProperty()
 	nodeName = bpy.props.StringProperty()
 	socketType = bpy.props.StringProperty()
-	
-	@classmethod
-	def poll(cls, context):
-		return getActive() is not None
 		
 	def execute(self, context):
 		node = getNode(self.nodeTreeName, self.nodeName)
@@ -53,10 +49,6 @@ class RebuildSubProgramCallerSockets(bpy.types.Operator):
 	
 	nodeTreeName = bpy.props.StringProperty()
 	nodeName = bpy.props.StringProperty()
-	
-	@classmethod
-	def poll(cls, context):
-		return getActive() is not None
 		
 	def execute(self, context):
 		node = getNode(self.nodeTreeName, self.nodeName)
@@ -69,10 +61,6 @@ class RebuildSubProgramSockets(bpy.types.Operator):
 	
 	nodeTreeName = bpy.props.StringProperty()
 	nodeName = bpy.props.StringProperty()
-	
-	@classmethod
-	def poll(cls, context):
-		return getActive() is not None
 		
 	def execute(self, context):
 		node = getNode(self.nodeTreeName, self.nodeName)
