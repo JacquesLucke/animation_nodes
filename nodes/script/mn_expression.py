@@ -11,6 +11,7 @@ class mn_ExpressionNode(Node, AnimationNode):
 	bl_label = "Expression"
 	
 	expression = bpy.props.StringProperty(default = "a+b", update = nodeTreeChanged, description = "Python Expression (math module is imported)")
+	isExpressionValid = bpy.props.BoolProperty(default = True)
 	
 	def init(self, context):
 		forbidCompiling()
@@ -30,6 +31,8 @@ class mn_ExpressionNode(Node, AnimationNode):
 		
 	def draw_buttons(self, context, layout):
 		layout.prop(self, "expression", text = "")
+		if not self.isExpressionValid:
+			layout.label("invalid expression", icon = "ERROR")
 		
 	def update(self):
 		forbidCompiling()
@@ -85,7 +88,11 @@ class mn_ExpressionNode(Node, AnimationNode):
 	def getModuleList(self):
 		return ["math"]
 	def getInLineExecutionString(self, outputUse):
-		if not isValidCode(self.expression): return "$result$ = None"
+		if not isValidCode(self.expression):
+			self.isExpressionValid = False	
+			return "$result$ = None"
+		else:
+			self.isExpressionValid = True		
 		
 		expression = self.expression + " "
 		customNames = self.getCustomNames()
