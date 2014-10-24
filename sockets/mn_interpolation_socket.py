@@ -1,7 +1,6 @@
 import bpy
-from bpy.types import NodeTree, Node, NodeSocket
-from mn_utils import *
 from mn_execution import nodePropertyChanged
+from mn_node_base import * 
 from mn_interpolation_utils import *
 
 class InterpolationCategory:
@@ -45,11 +44,12 @@ def getInterpolationFunctionTupel(mode, subMode):
 	return (linear, None)
 
 
-class mn_InterpolationSocket(NodeSocket):
+class mn_InterpolationSocket(mn_BaseSocket):
 	bl_idname = "mn_InterpolationSocket"
 	bl_label = "Interpolation Socket"
 	dataType = "Interpolation"
 	allowedInputTypes = ["Interpolation"]
+	drawColor = (0.7, 0.4, 0.3, 1)
 	
 	def getCategoryEnumItems(self, context):
 		items = []
@@ -69,20 +69,14 @@ class mn_InterpolationSocket(NodeSocket):
 	mode = bpy.props.EnumProperty(name = "Mode", items = getCategoryEnumItems, update = nodePropertyChanged)
 	subMode = bpy.props.EnumProperty(name = "SubMode", items = getSubModeItems, update = nodePropertyChanged)
 	
-	def draw(self, context, layout, node, text):
-		if not self.is_output and not isSocketLinked(self):
-			col = layout.column(align = False)
-			col.label(text)
-			row = col.row(align = True)
-			row.prop(self, "mode", text = "")
-			mode = self.getCurrentMode()
-			if type(mode) == InterpolationCategory:
-				row.prop(self, "subMode", text = "")
-		else:
-			layout.label(text)
-			
-	def draw_color(self, context, node):
-		return (0.7, 0.4, 0.3, 1)
+	def drawInput(self, layout, node, text):
+		col = layout.column(align = False)
+		col.label(text)
+		row = col.row(align = True)
+		row.prop(self, "mode", text = "")
+		mode = self.getCurrentMode()
+		if type(mode) == InterpolationCategory:
+			row.prop(self, "subMode", text = "")
 		
 	def getValue(self):
 		return getInterpolationFunctionTupel(self.mode, self.subMode)
@@ -97,13 +91,3 @@ class mn_InterpolationSocket(NodeSocket):
 			if mode.identifier == self.mode:
 				return mode
 		return None
-				
-		
-# register
-################################
-	
-def register():
-	bpy.utils.register_module(__name__)
-
-def unregister():
-	bpy.utils.unregister_module(__name__)
