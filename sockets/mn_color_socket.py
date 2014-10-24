@@ -1,24 +1,18 @@
 import bpy
-from bpy.types import NodeTree, Node, NodeSocket
-from mn_utils import *
 from mn_execution import nodePropertyChanged
+from mn_node_base import * 
 
-class mn_ColorSocket(NodeSocket):
+class mn_ColorSocket(mn_BaseSocket):
 	bl_idname = "mn_ColorSocket"
 	bl_label = "Color Socket"
 	dataType = "Color"
 	allowedInputTypes = ["Color"]
+	drawColor = (0.8, 0.8, 0.2, 1)
 	
 	color = bpy.props.FloatVectorProperty(default = [0.5, 0.5, 0.5], subtype = "COLOR", soft_min = 0.0, soft_max = 1.0, update = nodePropertyChanged)
 	
 	def draw(self, context, layout, node, text):
-		if not self.is_output and not isSocketLinked(self):
-			layout.prop(self, "color", text = text)
-		else:
-			layout.label(text)
-			
-	def draw_color(self, context, node):
-		return (0.8, 0.8, 0.2, 1)
+		layout.prop(self, "color", text = text)
 		
 	def getValue(self):
 		color = self.color
@@ -28,12 +22,3 @@ class mn_ColorSocket(NodeSocket):
 		self.color = data[:3]
 	def getStoreableValue(self):
 		return self.color
-		
-# register
-################################
-	
-def register():
-	bpy.utils.register_module(__name__)
-
-def unregister():
-	bpy.utils.unregister_module(__name__)
