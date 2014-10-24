@@ -1,20 +1,16 @@
 import bpy
-from bpy.types import NodeTree, Node, NodeSocket
-from mn_utils import *
 from mn_execution import nodePropertyChanged
+from mn_node_base import * 
 
-
-class mn_StringListSocket(NodeSocket):
+class mn_StringListSocket(mn_BaseSocket):
 	bl_idname = "mn_StringListSocket"
 	bl_label = "String List Socket"
 	dataType = "String List"
 	allowedInputTypes = ["String List"]
+	drawColor = (1, 1, 1, 0.4)
 	
-	def draw(self, context, layout, node, text):
+	def drawInput(self, layout, node, text):
 		layout.label(text)
-			
-	def draw_color(self, context, node):
-		return (1, 1, 1, 0.4)
 		
 	def getValue(self):
 		return []
@@ -23,13 +19,3 @@ class mn_StringListSocket(NodeSocket):
 		pass
 	def getStoreableValue(self):
 		return []
-		
-		
-# register
-################################
-	
-def register():
-	bpy.utils.register_module(__name__)
-
-def unregister():
-	bpy.utils.unregister_module(__name__)
