@@ -10,7 +10,6 @@ compiledCodeObjects = []
 codeStrings = []
 
 def updateAnimationTrees(treeChanged = True):
-	print(COMPILE_BLOCKER)
 	if COMPILE_BLOCKER <= 0:
 		forbidCompiling()
 		start = time.clock()
