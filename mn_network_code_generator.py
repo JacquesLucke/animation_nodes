@@ -464,7 +464,9 @@ def getDirectDependencies(node):
 
 convertRules = {}
 convertRules[("Float", "Integer")] = "mn_ToIntegerConversion"
+convertRules[("Generic", "Integer")] = "mn_ToIntegerConversion"
 convertRules[("Float", "String")] = "mn_ToStringConversion"
+convertRules[("Generic", "Float")] = "mn_ToFloatConversion"
 convertRules[("Integer", "String")] = "mn_ToStringConversion"
 convertRules[("Float", "Vector")] = "mn_CombineVector"
 convertRules[("Integer", "Vector")] = "mn_CombineVector"
