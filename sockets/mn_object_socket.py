@@ -1,33 +1,30 @@
 import bpy
-from bpy.types import NodeTree, Node, NodeSocket
-from mn_utils import *
 from mn_execution import nodePropertyChanged
+from mn_node_base import * 
 
-class mn_ObjectSocket(NodeSocket):
+class mn_ObjectSocket(mn_BaseSocket):
 	bl_idname = "mn_ObjectSocket"
 	bl_label = "Object Socket"
 	dataType = "Object"
 	allowedInputTypes = ["Object", "String"]
+	drawColor = (0, 0, 0, 1)
 	
 	objectName = bpy.props.StringProperty(update = nodePropertyChanged)
 	showName = bpy.props.BoolProperty(default = False)
 	
-	def draw(self, context, layout, node, text):
-		if not self.is_output and not isSocketLinked(self):
-			col = layout.column()
-			row = col.row(align = True)
-			if self.showName:
-				row.label(text)
-			row.prop(self, "objectName", text = "")
-			selector = row.operator("mn.assign_active_object_to_socket", text = "", icon = "EYEDROPPER")
-			selector.nodeTreeName = node.id_data.name
-			selector.nodeName = node.name
-			selector.isOutput = self.is_output
-			selector.socketName = self.name
-			selector.target = "objectName"
-			col.separator()
-		else:
-			layout.label(text)
+	def drawInput(self, layout, node, text):
+		col = layout.column()
+		row = col.row(align = True)
+		if self.showName:
+			row.label(text)
+		row.prop(self, "objectName", text = "")
+		selector = row.operator("mn.assign_active_object_to_socket", text = "", icon = "EYEDROPPER")
+		selector.nodeTreeName = node.id_data.name
+		selector.nodeName = node.name
+		selector.isOutput = self.is_output
+		selector.socketName = self.name
+		selector.target = "objectName"
+		col.separator()
 		
 	def draw_color(self, context, node):
 		return (0, 0, 0, 1)
@@ -61,12 +58,3 @@ class AssignActiveObjectToNode(bpy.types.Operator):
 		socket = getSocketFromNode(node, self.isOutput, self.socketName)
 		setattr(socket, self.target, obj.name)
 		return {'FINISHED'}
-		
-# register
-################################
-	
-def register():
-	bpy.utils.register_module(__name__)
-
-def unregister():
-	bpy.utils.unregister_module(__name__)
