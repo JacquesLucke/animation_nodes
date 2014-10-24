@@ -9,36 +9,90 @@ class mn_CombineStringsNode(Node, AnimationNode):
 	bl_idname = "mn_CombineStringsNode"
 	bl_label = "Combine Strings"
 	
-	def inputAmountChanged(self, context):
-		forbidCompiling()
-		connections = getConnectionDictionaries(self)
-		self.inputs.clear()
-		self.setInputSockets()
-		tryToSetConnectionDictionaries(self, connections)
-		allowCompiling()
-		nodeTreeChanged()
-	
-	inputAmount = bpy.props.IntProperty(default = 2, min = 1, soft_max = 10, update = inputAmountChanged)
-	
 	def init(self, context):
 		forbidCompiling()
-		self.setInputSockets()
+		self.inputs.new("mn_StringSocket", "1.")
+		self.inputs.new("mn_StringSocket", "2.")
+		self.inputs.new("mn_EmptySocket", "...")
 		self.outputs.new("mn_StringSocket", "Text")
 		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
-		layout.prop(self, "inputAmount", text = "Input Amount")
+		row = layout.row(align = True)
+	
+		newSocket = row.operator("mn.add_combine_strings_socket", text = "New", icon = "PLUS")
+		newSocket.nodeTreeName = self.id_data.name
+		newSocket.nodeName = self.name
+		
+		removeSocket = row.operator("mn.remove_combine_strings_socket", text = "Remove", icon = "X")
+		removeSocket.nodeTreeName = self.id_data.name
+		removeSocket.nodeName = self.name
+		
+	def update(self):
+		forbidCompiling()
+		socket = self.inputs.get("...")
+		if socket is not None:
+			links = socket.links
+			if len(links) == 1:
+				link = links[0]
+				fromSocket = link.from_socket
+				originSocket = getOriginSocket(socket)
+				self.id_data.links.remove(link)
+				if originSocket is not None:
+					if originSocket.dataType == "String":
+						self.inputs.remove(socket)
+						newSocketName = str(len(self.inputs) + 1) + "."
+						newSocket = self.inputs.new("mn_StringSocket", newSocketName)
+						self.inputs.new("mn_EmptySocket", "...")
+						self.id_data.links.new(newSocket, fromSocket)
+				
+		allowCompiling()
 		
 	def execute(self, input):
 		output = {}
-		output["Text"] = ""
-		for i in range(self.inputAmount):
-			output["Text"] += input[self.getInputNameByIndex(i)]
+		text = ""
+		for i in range(len(self.inputs) - 1):
+			identifier = str(i+1) + "."
+			text += input[identifier]
+		output["Text"] = text
 		return output
 		
-	def setInputSockets(self):
-		for i in range(self.inputAmount):
-			self.inputs.new("mn_StringSocket", self.getInputNameByIndex(i))
-			
-	def getInputNameByIndex(self, index):
-		return "Text " + str(index)	
+	def newInputSocket(self):
+		forbidCompiling()
+		newSocketName = str(len(self.inputs)) + "."
+		newSocket = self.inputs.new("mn_StringSocket", newSocketName)
+		self.inputs.move(len(self.inputs) - 1, len(self.inputs) - 2)
+		allowCompiling()
+		
+	def removeInputSocket(self):
+		forbidCompiling()
+		if len(self.inputs) > 2:
+			self.inputs.remove(self.inputs[len(self.inputs) - 2])
+		allowCompiling()
+		
+		
+		
+		
+class AddCombineStringsSocket(bpy.types.Operator):
+	bl_idname = "mn.add_combine_strings_socket"
+	bl_label = "Add Multi Math Socket"
+	
+	nodeTreeName = bpy.props.StringProperty()
+	nodeName = bpy.props.StringProperty()
+	
+	def execute(self, context):
+		node = getNode(self.nodeTreeName, self.nodeName)
+		node.newInputSocket()
+		return {'FINISHED'}
+		
+class RemoveCombineStringsSocket(bpy.types.Operator):
+	bl_idname = "mn.remove_combine_strings_socket"
+	bl_label = "Remove Multi Math Socket"
+	
+	nodeTreeName = bpy.props.StringProperty()
+	nodeName = bpy.props.StringProperty()
+	
+	def execute(self, context):
+		node = getNode(self.nodeTreeName, self.nodeName)
+		node.removeInputSocket()
+		return {'FINISHED'}

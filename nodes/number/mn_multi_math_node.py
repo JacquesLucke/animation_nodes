@@ -75,7 +75,7 @@ class mn_MultiFloatMathNode(Node, AnimationNode):
 		
 	def newInputSocket(self):
 		forbidCompiling()
-		newSocketName = newSocketName = str(len(self.inputs)) + "."
+		newSocketName = str(len(self.inputs)) + "."
 		newSocket = self.inputs.new("mn_FloatSocket", newSocketName)
 		self.inputs.move(len(self.inputs) - 1, len(self.inputs) - 2)
 		allowCompiling()
