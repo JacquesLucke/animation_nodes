@@ -16,7 +16,7 @@ class mn_StringListInputNode(Node, AnimationNode):
 	
 	def init(self, context):
 		forbidCompiling()
-		self.outputs.new("mn_StringSocket", "Strings")
+		self.outputs.new("mn_StringListSocket", "Strings")
 		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
