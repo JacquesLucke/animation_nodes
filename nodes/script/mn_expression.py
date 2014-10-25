@@ -19,12 +19,12 @@ class mn_ExpressionNode(Node, AnimationNode):
 		aSocket.editableCustomName = True
 		aSocket.customName = "a"
 		aSocket.customNameIsVariable = True
-		aSocket.removeableSocket = True
+		aSocket.removeable = True
 		bSocket = self.inputs.new("mn_GenericSocket", "b")
 		bSocket.editableCustomName = True
 		bSocket.customName = "b"
 		bSocket.customNameIsVariable = True
-		bSocket.removeableSocket = True
+		bSocket.removeable = True
 		self.inputs.new("mn_EmptySocket", "...")
 		self.outputs.new("mn_GenericSocket", "Result")
 		allowCompiling()
@@ -46,7 +46,7 @@ class mn_ExpressionNode(Node, AnimationNode):
 				newSocket = self.inputs.new("mn_GenericSocket", self.getNotUsedSocketName())
 				newSocket.editableCustomName = True
 				newSocket.customNameIsVariable = True
-				newSocket.removeableSocket = True
+				newSocket.removeable = True
 				newSocket.customName = self.getNextCustomName()
 				self.inputs.new("mn_EmptySocket", "...")
 				self.id_data.links.new(newSocket, fromSocket)	

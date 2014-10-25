@@ -29,6 +29,8 @@ def customNameChanged(self, context):
 				if char.isalpha(): newCustomName += char
 			self.customName = newCustomName
 		self.customNameIsUpdating = False
+		if self.callNodeWhenCustomNameChanged:
+			self.node.customSocketNameChanged(self)
 		nodeTreeChanged()
 		
 class mn_SocketProperties:
@@ -36,7 +38,9 @@ class mn_SocketProperties:
 	customName = bpy.props.StringProperty(default = "custom name", update = customNameChanged)
 	customNameIsVariable = bpy.props.BoolProperty(default = False)
 	customNameIsUpdating = bpy.props.BoolProperty(default = False)
-	removeableSocket = bpy.props.BoolProperty(default = False)
+	removeable = bpy.props.BoolProperty(default = False)
+	callNodeToRemove = bpy.props.BoolProperty(default = False)
+	callNodeWhenCustomNameChanged = bpy.props.BoolProperty(default = False)
 		
 class mn_BaseSocket(NodeSocket):
 	bl_idname = "mn_BaseSocket"
@@ -46,7 +50,7 @@ class mn_BaseSocket(NodeSocket):
 		if self.editableCustomName:
 			row = layout.row(align = True)
 			row.prop(self, "customName", text = "")
-			if self.removeableSocket:
+			if self.removeable:
 				removeSocket = row.operator("mn.remove_socket", text = "", icon = "X")
 				removeSocket.nodeTreeName = node.id_data.name
 				removeSocket.nodeName = node.name
@@ -73,6 +77,9 @@ class RemoveSocketOperator(bpy.types.Operator):
 	def execute(self, context):
 		node = getNode(self.nodeTreeName, self.nodeName)
 		socket = getSocketByIdentifier(node, self.isOutputSocket, self.socketIdentifier)
-		if self.isOutputSocket: node.outputs.remove(socket)
-		else: node.inputs.remove(socket)
+		if socket.callNodeToRemove:
+			node.removeSocket(socket)
+		else:
+			if self.isOutputSocket: node.outputs.remove(socket)
+			else: node.inputs.remove(socket)
 		return {'FINISHED'}

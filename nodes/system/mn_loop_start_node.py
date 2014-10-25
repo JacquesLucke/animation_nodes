@@ -1,7 +1,7 @@
 import bpy
 from bpy.types import Node
 from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 from mn_dynamic_sockets_helper import *
 from mn_utils import *
 
@@ -16,72 +16,68 @@ class mn_LoopStartNode(Node, AnimationNode):
 	
 	def init(self, context):
 		forbidCompiling()
-		self.outputs.new("mn_IntegerSocket", "Index")
+		self.outputs.new("mn_IntegerSocket", "Index")		
+		self.outputs.new("mn_EmptySocket", "...")
+		self.updateCallerNodes()
 		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
-		layout.prop(self, "loopName", text = "Name")
-		layout.prop(self, "showEditOptions", text = "Show Options")
-		layout.separator()
-		if self.showEditOptions:
-			row = layout.row(align = True)
-			
-			rebuild = row.operator("mn.rebuild_sub_program_sockets", "Rebuild Sockets")
-			rebuild.nodeTreeName = self.id_data.name
-			rebuild.nodeName = self.name
-			
-			newNode = row.operator("node.add_node", text = "", icon = "PLUS")
-			newNode.use_transform = True
-			newNode.type = "mn_LoopNode"
+		row = layout.row(align = True)
+	
+		row.prop(self, "loopName", text = "")
 		
-			col = layout.column(align = True)
-			for index, item in enumerate(self.sockets):
-				row = col.row(align = True)
-				row.prop(item, "socketName", text = "")
-				remove = row.operator("mn.remove_property_from_list_node", text = "", icon = "X")
-				remove.nodeTreeName = self.id_data.name
-				remove.nodeName = self.name
-				remove.index = index
-				
-			layout.label("Add Sockets")
-			col = layout.column(align = True)
-			for displayTame, socketType in getAddSocketList():
-				add = col.operator("mn.new_sub_program_socket", text = displayTame)
-				add.nodeTreeName = self.id_data.name
-				add.nodeName = self.name
-				add.socketType = socketType
+		newNode = row.operator("node.add_node", text = "", icon = "PLUS")
+		newNode.use_transform = True
+		newNode.type = "mn_LoopNode"
 		
 	def execute(self, input):
 		return input
 		
-	def newSocket(self, socketType):
-		item = self.sockets.add()
-		item.socketType = socketType
-		item.socketName = self.getPossibleName("Socket")
-	def getPossibleName(self, name):
-		counter = 1
-		while self.socketNameExists(name + " " + str(counter)):
-			counter += 1
-		return name + " " + str(counter)
-	def socketNameExists(self, name):
-		for item in self.sockets:
-			if item.socketName == name: return True
-		return False
+	def update(self):
+		forbidCompiling()
+		socket = self.outputs.get("...")
+		if socket is not None:
+			links = socket.links
+			if len(links) > 0:
+				toSocket = links[0].to_socket
+				self.id_data.links.remove(links[0])
+				if toSocket.node.type != "REROUTE":
+					self.outputs.remove(socket)
+					idName = toSocket.bl_idname
+					if idName == "mn_EmptySocket": 
+						idName = "mn_GenericSocket"
+					newSocket = self.outputs.new(idName, toSocket.name)
+					newSocket.editableCustomName = True
+					newSocket.customName = toSocket.name
+					newSocket.removeable = True
+					newSocket.callNodeToRemove = True
+					newSocket.callNodeWhenCustomNameChanged = True
+					self.outputs.new("mn_EmptySocket", "...")
+					self.id_data.links.new(toSocket, newSocket)
+				self.updateCallerNodes()
+		allowCompiling()
 		
-	def removeItemFromList(self, index):
-		self.sockets.remove(index)
+	def customSocketNameChanged(self, socket):
+		self.updateCallerNodes()
+		print("hey")
 		
-	def rebuildSubProgramSockets(self):
-		self.removeDynamicSockets()
-		for item in self.sockets:
-			self.outputs.new(item.socketType, item.socketName)
-		self.updateCallerNodeSockets()
-	def removeDynamicSockets(self):
-		for i, socket in enumerate(self.outputs):
-			if i > 0: self.inputs.remove(socket)
-			
-	def updateCallerNodeSockets(self):
+	def removeSocket(self, socket):
+		self.outputs.remove(socket)
+		self.updateCallerNodes()
+		
+	def updateCallerNodes(self):
+		socketDescriptions = self.getSocketDescriptions()
+		
 		for node in self.id_data.nodes:
 			if node.bl_idname == "mn_LoopNode":
-				if node.subProgramsEnum == self.subProgramName:
-					rebuildSockets(node)
+				if node.selectedLoop == self.loopName:
+					node.updateSockets(socketDescriptions)
+					
+		nodeTreeChanged()
+					
+	def getSocketDescriptions(self):
+		socketDescriptions = []
+		for socket in self.outputs:
+			if socket.name not in ["Index", "..."]:
+				socketDescriptions.append((socket.customName, socket.bl_idname))
+		return socketDescriptions

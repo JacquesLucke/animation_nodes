@@ -44,10 +44,21 @@ class mn_LoopNode(Node, AnimationNode):
 		rebuild.nodeTreeName = self.id_data.name
 		rebuild.nodeName = self.name
 		
+	def updateSockets(self, socketDescriptions):
+		forbidCompiling()
+		self.removeDynamicSockets()
+		for customName, idName in socketDescriptions:
+			self.inputs.new(idName, customName)
+			self.outputs.new(idName, customName)
+		allowCompiling()
+		
 	def removeDynamicSockets(self):
+		forbidCompiling()
 		self.outputs.clear()
-		for i, socket in enumerate(self.inputs):
-			if i > 0: self.inputs.remove(socket)	
+		for socket in self.inputs:
+			if socket.name not in ["Amount"]:
+				self.inputs.remove(socket)
+		allowCompiling()
 
 	def getStartNode(self):
 		loopName = self.selectedLoop
