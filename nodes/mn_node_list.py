@@ -52,8 +52,8 @@ def getNodeNameDictionary():
 		("mn_SumListElementsNode", "Sum Elements") ] ))
 		
 	nodes.append(("Sound", [
-		("mn_SoundBakeNode", "Bake"),
-		("mn_SoundInputNode", "Input") ] ))
+		("mn_SoundBakeNode", "Sound Bake"),
+		("mn_SoundInputNode", "Sound Input") ] ))
 		
 	nodes.append(("Color", [
 		("mn_ColorInputNode", "RGB"),
