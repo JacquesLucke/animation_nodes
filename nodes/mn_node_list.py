@@ -2,9 +2,9 @@ def getNodeNameDictionary():
 	nodes = []
 	
 	nodes.append(("Number", [
-		("mn_FloatInputNode", "Number"),
+		("mn_FloatInputNode", "Float"),
 		("mn_IntegerInputNode", "Integer"),
-		("mn_FloatListInputNode", "Number List"),
+		("mn_FloatListInputNode", "Float List"),
 		("mn_RandomNumberNode", "Random"),
 		("mn_FloatWiggle", "Wiggle"),
 		("mn_AnimateFloatNode", "Animate"),
@@ -12,32 +12,32 @@ def getNodeNameDictionary():
 		("mn_FloatClamp", "Clamp") ] ))
 		
 	nodes.append(("Vector", [
-		("mn_CombineVector", "Combine"),
-		("mn_SeparateVector", "Separate"),
-		("mn_RandomVectorNode", "Random"),
-		("mn_VectorWiggle", "Wiggle"),
-		("mn_VectorLengthNode", "Length"),
-		("mn_AnimateVectorNode", "Animate"),
-		("mn_VectorDistanceNode", "Distance"),
-		("mn_VectorMathNode", "Math") ] ))	
+		("mn_CombineVector", "Combine Vector"),
+		("mn_SeparateVector", "Separate Vector"),
+		("mn_RandomVectorNode", "Random Vector"),
+		("mn_VectorWiggle", "Vector Wiggle"),
+		("mn_VectorLengthNode", "Vector Length"),
+		("mn_AnimateVectorNode", "Animate Vector"),
+		("mn_VectorDistanceNode", "Vector Distance"),
+		("mn_VectorMathNode", "Vector Math") ] ))	
 		
 	nodes.append(("Text", [
 		("mn_StringInputNode", "Text"),
 		("mn_StringListInputNode", "Text List"),
 		("mn_RandomStringNode", "Random"),
 		("mn_CharactersNode", "Characters"),
-		("mn_CombineStringsNode", "Combine"),
-		("mn_ReplicateStringsNode", "Replicate"),
-		("mn_SubstringNode", "Slice"),
+		("mn_CombineStringsNode", "Combine Texts"),
+		("mn_ReplicateStringsNode", "Replicate Text"),
+		("mn_SubstringNode", "Trim"),
 		("mn_StringAnalyzeNode", "Analyze"),
-		("mn_TextOutputNode", "Text Object Output") ] ))
+		("mn_TextOutputNode", "Text Output") ] ))
 	
 	nodes.append(("Object", [
 		("mn_ObjectInputNode", "Object"),
 		("mn_ObjectListInputNode", "Object List"),
-		("mn_ObjectInfoNode", "Info"),
-		("mn_ReplicateObjectNode", "Replicate"),
-		("mn_CopyObjectData", "Copy Data (Mesh)"),
+		("mn_ObjectInfoNode", "Object Info"),
+		("mn_ReplicateObjectNode", "Replicate Object"),
+		("mn_CopyObjectData", "Copy Data"),
 		("mn_ObjectAttributeOutputNode", "Attribute Output"),
 		("mn_ModifierOutputNode", "Modifier Output"),
 		("mn_CopyTransformsNode", "Copy Transforms"),
@@ -46,8 +46,8 @@ def getNodeNameDictionary():
 	nodes.append(("List", [
 		("mn_GetListElementNode", "Get Element"),
 		("mn_SetListElementNode", "Set Element"),
-		("mn_GetListLengthNode", "Length"),
-		("mn_CombineListsNode", "Combine"),
+		("mn_GetListLengthNode", "Get Length"),
+		("mn_CombineListsNode", "Combine Lists"),
 		("mn_ShuffleListNode", "Shuffle"),
 		("mn_SumListElementsNode", "Sum Elements") ] ))
 		
@@ -56,13 +56,13 @@ def getNodeNameDictionary():
 		("mn_SoundInputNode", "Input") ] ))
 		
 	nodes.append(("Color", [
-		("mn_ColorInputNode", "Color"),
-		("mn_CombineColor", "Combine"),
+		("mn_ColorInputNode", "RGB"),
+		("mn_CombineColor", "Combine RGBA"),
 		("mn_ColorMix", "Mix"),
 		("mn_SetVertexColor", "Set Vertex Color") ] ))
 		
 	nodes.append(("Animation", [
-		("mn_TimeInfoNode", "Time"),
+		("mn_TimeInfoNode", "Time Info"),
 		("mn_InterpolationNode", "Interpolation") ] ))
 		
 	nodes.append(("Debug", [
@@ -74,7 +74,7 @@ def getNodeNameDictionary():
 
 	nodes.append(("Convert", [
 		("mn_ToStringConversion", "To Text"),
-		("mn_ToFloatConversion", "To Number"),
+		("mn_ToFloatConversion", "To Float"),
 		("mn_ToIntegerConversion", "To Integer"),
 		("mn_ToObjectConversion", "To Object") ] ))
 		
