@@ -46,10 +46,12 @@ class mn_LoopNode(Node, AnimationNode):
 		
 	def updateSockets(self, socketDescriptions):
 		forbidCompiling()
+		connections = getConnectionDictionaries(self)
 		self.removeDynamicSockets()
 		for customName, idName, identifier in socketDescriptions:
 			self.inputs.new(idName, customName, identifier)
 			self.outputs.new(idName, customName, identifier)
+		tryToSetConnectionDictionaries(self, connections)
 		allowCompiling()
 		
 	def removeDynamicSockets(self):
