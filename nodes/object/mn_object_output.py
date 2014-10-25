@@ -5,7 +5,7 @@ from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, f
 
 class mn_ObjectOutputNode(Node, AnimationNode):
 	bl_idname = "mn_ObjectOutputNode"
-	bl_label = "Object Output"
+	bl_label = "Transforms Output"
 	
 	useLocation = bpy.props.BoolVectorProperty(update = nodeTreeChanged)
 	useRotation = bpy.props.BoolVectorProperty(update = nodeTreeChanged)
