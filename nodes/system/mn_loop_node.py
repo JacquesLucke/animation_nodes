@@ -22,10 +22,10 @@ class mn_LoopNode(Node, AnimationNode):
 			startLoopItems.append((name, name, ""))
 		if len(startLoopItems) == 0: startLoopItems.append(("NONE", "NONE", ""))
 		return startLoopItems
-	def selectedProgramChanged(self, context):
-		rebuildSockets(self)
+	def selectedLoopStarterChanged(self, context):
+		self.updateSockets(self.getStartNode())
 	
-	selectedLoop = bpy.props.EnumProperty(items = getStartLoopNodeItems, name = "Loop", update=selectedProgramChanged)
+	selectedLoop = bpy.props.EnumProperty(items = getStartLoopNodeItems, name = "Loop", update=selectedLoopStarterChanged)
 	
 	def init(self, context):
 		forbidCompiling()
@@ -39,13 +39,10 @@ class mn_LoopNode(Node, AnimationNode):
 			newNode.type = "mn_LoopStartNode"
 		else:
 			layout.prop(self, "selectedLoop")
-
-		rebuild = layout.operator("mn.rebuild_sub_program_caller_sockets", "Rebuild Sockets")
-		rebuild.nodeTreeName = self.id_data.name
-		rebuild.nodeName = self.name
 		
-	def updateSockets(self, socketDescriptions):
+	def updateSockets(self, startNode):
 		forbidCompiling()
+		socketDescriptions = startNode.getSocketDescriptions()
 		connections = getConnectionDictionaries(self)
 		self.removeDynamicSockets()
 		for customName, idName, identifier in socketDescriptions:

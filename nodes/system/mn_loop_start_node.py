@@ -85,12 +85,10 @@ class mn_LoopStartNode(Node, AnimationNode):
 		self.updateCallerNodes()
 		
 	def updateCallerNodes(self):
-		socketDescriptions = self.getSocketDescriptions()
-		
 		for node in self.id_data.nodes:
 			if node.bl_idname == "mn_LoopNode":
 				if node.selectedLoop == self.loopName:
-					node.updateSockets(socketDescriptions)
+					node.updateSockets(self)
 					
 		nodeTreeChanged()
 					
