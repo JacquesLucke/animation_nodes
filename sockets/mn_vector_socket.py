@@ -25,4 +25,4 @@ class mn_VectorSocket(mn_BaseSocket, mn_SocketProperties):
 	def setStoreableValue(self, data):
 		self.vector = data
 	def getStoreableValue(self):
-		return self.vector
+		return self.vector[:]
