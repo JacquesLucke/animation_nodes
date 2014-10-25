@@ -2,14 +2,19 @@ import bpy, time
 from mn_utils import *
 
 normalNetworks = []
-subNetworks = {}	
+subNetworks = {}
+invalidNetworks = []
 
 def getAllNetworkCodeStrings():
-	global subNetworks
+	global subNetworks, invalidNetworks
 	networkStrings = []
+	clearSocketConnections()
 	cleanupNodeTrees()
 	nodeNetworks = getNodeNetworks()
 	sortNetworks(nodeNetworks)
+	if len(invalidNetworks) > 0:
+		print("invalid node tree")
+		return []
 	for network in normalNetworks:
 		codeGenerator = NetworkCodeGenerator(network)
 		networkStrings.append(codeGenerator.getCode())
@@ -17,9 +22,10 @@ def getAllNetworkCodeStrings():
 	return networkStrings
 	
 def sortNetworks(nodeNetworks):
-	global normalNetworks, subNetworks, idCounter
+	global normalNetworks, subNetworks, invalidNetworks, idCounter
 	normalNetworks = []
 	subNetworks = {}
+	invalidNetworks = []
 	idCounter = 0
 	for network in nodeNetworks:
 		setUniqueCodeIndexToEveryNode(network)
@@ -28,6 +34,7 @@ def sortNetworks(nodeNetworks):
 		elif networkType == "Loop":
 			startNode = getSubProgramStartNode(network)
 			subNetworks[getNodeIdentifier(startNode)] = network
+		elif networkType == "Invalid": invalidNetworks.append(network)
 		
 def getNetworkType(network):
 	loopStarterAmount = 0
