@@ -7,7 +7,7 @@ from mn_utils import *
 
 class mn_CombineStringsNode(Node, AnimationNode):
 	bl_idname = "mn_CombineStringsNode"
-	bl_label = "Combine Strings"
+	bl_label = "Combine Texts"
 	
 	def init(self, context):
 		forbidCompiling()
