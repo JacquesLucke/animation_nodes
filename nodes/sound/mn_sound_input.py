@@ -12,14 +12,23 @@ class mn_SoundInputNode(Node, AnimationNode):
 	bl_idname = "mn_SoundInputNode"
 	bl_label = "Sound Input"
 	
-	def getSoundNodesInTree(self, context):
+	def getSoundBakeNodeNames(self):
 		bakeNodeNames = []
 		for node in self.id_data.nodes:
 			if node.bl_idname == "mn_SoundBakeNode":
-				bakeNodeNames.append((node.name, node.name, ""))
+				bakeNodeNames.append(node.name)
 		return bakeNodeNames
 		
-	bakeNodeName = bpy.props.EnumProperty(items = getSoundNodesInTree, name = "Bake Node", update = nodePropertyChanged)
+	def getSoundBakeNodeItems(self, context):
+		bakeNodeNames = self.getSoundBakeNodeNames()
+		bakeNodeItems = []
+		for name in bakeNodeNames:
+			bakeNodeItems.append((name, name, ""))
+		if len(bakeNodeItems) == 0: bakeNodeItems.append(("NONE", "NONE", ""))
+		return bakeNodeItems
+	
+	bakeNodeSelected = bpy.props.BoolProperty(default = False)
+	bakeNodeName = bpy.props.EnumProperty(items = getSoundBakeNodeItems, name = "Bake Node", update = nodePropertyChanged)
 	
 	frameTypes = [
 		("OFFSET", "Offset", ""),
@@ -34,16 +43,22 @@ class mn_SoundInputNode(Node, AnimationNode):
 		self.outputs.new("mn_FloatSocket", "Strength")
 		allowCompiling()
 		
+	def draw_buttons(self, context, layout):
+		bakeNodeNames = self.getSoundBakeNodeNames()
+		if len(bakeNodeNames) == 0:
+			addBakeNode = layout.operator("node.add_node", text = "New Bake Node", icon = "PLUS")
+			addBakeNode.type = "mn_SoundBakeNode"
+			addBakeNode.use_transform = True
+		else:
+			layout.prop(self, "bakeNodeName", text = "Sound")
+		layout.prop(self, "frameType", text = "Frame Type")
+		
 	def getInputSocketNames(self):
 		return {"Value" : "value",
 				"Frame" : "frame"}
 	def getOutputSocketNames(self):
 		return {"Strengths" : "strengths",
 				"Strength" : "strength"}
-		
-	def draw_buttons(self, context, layout):
-		layout.prop(self, "bakeNodeName", text = "Sound")
-		layout.prop(self, "frameType", text = "Frame Type")
 		
 	def execute(self, value, frame):
 		currentFrame = getCurrentFrame()

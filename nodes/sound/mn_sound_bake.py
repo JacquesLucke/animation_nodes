@@ -80,7 +80,6 @@ class mn_SoundBakeNode(Node, AnimationNode):
 				upperCache = self.loadStrengthListAtFrame(intFrame)
 				fileCache[upperFrame] = upperCache
 			strengthList = self.mixStrengthLists(lowerCache, upperCache, frame - lowerFrame)
-			
 		return strengthList
 		
 	def mixStrengthLists(self, list1, list2, influence):
@@ -148,13 +147,19 @@ class mn_SoundBakeNode(Node, AnimationNode):
 		item.path = filePath
 		item.propertyName = propertyName
 		
+		self.clearCache()
+		
 	def copy(self, node):
 		self.soundObjectName = ""
 		self.bakedSound.clear()
 		
 	def free(self):
 		bpy.context.scene.objects.unlink(self.getSoundObject())
+		self.clearCache()
 		
+	def clearCache(self):
+		identifier = self.id_data.name + self.name
+		setLongTimeCache(identifier, None)
 		
 class BakeSoundToNode(bpy.types.Operator):
 	bl_idname = "mn.bake_sound_to_node"
