@@ -40,13 +40,15 @@ class mn_LoopNode(Node, AnimationNode):
 		else:
 			layout.prop(self, "selectedLoop")
 		
-	def updateSockets(self, startNode):
+	def updateSockets(self, startNode, socketStartValue  = (None, None)):
 		forbidCompiling()
 		socketDescriptions = startNode.getSocketDescriptions()
 		connections = getConnectionDictionaries(self)
 		self.removeDynamicSockets()
 		for customName, idName, identifier in socketDescriptions:
-			self.inputs.new(idName, customName, identifier)
+			inputSocket = self.inputs.new(idName, customName, identifier)
+			if inputSocket.identifier == socketStartValue[0]:
+				inputSocket.setStoreableValue(socketStartValue[1])
 			self.outputs.new(idName, customName, identifier)
 		tryToSetConnectionDictionaries(self, connections)
 		allowCompiling()

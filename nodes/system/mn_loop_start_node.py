@@ -54,7 +54,8 @@ class mn_LoopStartNode(Node, AnimationNode):
 					newSocket.callNodeWhenCustomNameChanged = True
 					self.outputs.new("mn_EmptySocket", "...")
 					self.id_data.links.new(toSocket, newSocket)
-				self.updateCallerNodes()
+					oldValue = toSocket.getStoreableValue()
+					self.updateCallerNodes(socketStartValue = (newSocket.identifier, oldValue))
 		allowCompiling()
 		
 	def getNotUsedCustomName(self, prefix = "custom name"):
@@ -84,11 +85,11 @@ class mn_LoopStartNode(Node, AnimationNode):
 		self.outputs.remove(socket)
 		self.updateCallerNodes()
 		
-	def updateCallerNodes(self):
+	def updateCallerNodes(self, socketStartValue = (None, None)):
 		for node in self.id_data.nodes:
 			if node.bl_idname == "mn_LoopNode":
 				if node.selectedLoop == self.loopName:
-					node.updateSockets(self)
+					node.updateSockets(self, socketStartValue)
 					
 		nodeTreeChanged()
 					
