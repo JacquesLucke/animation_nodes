@@ -3,6 +3,7 @@ from bpy.app.handlers import persistent
 from mn_utils import *
 from mn_cache import clearExecutionCache
 from mn_network_code_generator import getAllNetworkCodeStrings
+from bpy.props import *
 
 COMPILE_BLOCKER = 0
 
@@ -13,10 +14,11 @@ def updateAnimationTrees(treeChanged = True):
 	if COMPILE_BLOCKER <= 0:
 		forbidCompiling()
 		start = time.clock()
+		scene = bpy.context.scene
 		if treeChanged:
 			rebuildNodeNetworks()
 		for i, codeObject in enumerate(compiledCodeObjects):
-			if bpy.context.scene.showFullError: 
+			if scene.mn_settings.developer.showErrors: 
 				exec(codeObject, {})
 			else:
 				try: exec(codeObject, {})
@@ -25,7 +27,7 @@ def updateAnimationTrees(treeChanged = True):
 					try: exec(codeObject, {})
 					except BaseException as e: print(e)
 		clearExecutionCache()
-		if bpy.context.scene.printUpdateTime:
+		if scene.mn_settings.developer.printUpdateTime:
 			timeSpan = time.clock() - start
 			print("Exec. " + str(round(timeSpan, 7)) + " s  -  " + str(round(1/timeSpan, 5)) + " fps")
 		allowCompiling()
@@ -46,14 +48,15 @@ def rebuildNodeNetworks():
 	del compiledCodeObjects[:]
 	del codeStrings[:]
 	start = time.clock()
-	if bpy.context.scene.showFullError: codeStrings = getAllNetworkCodeStrings()
+	scene = bpy.context.scene
+	if scene.mn_settings.developer.showErrors: codeStrings = getAllNetworkCodeStrings()
 	else:
 		try: codeStrings = getAllNetworkCodeStrings()
 		except BaseException as e: pass
 	for code in codeStrings:
 		compiledCodeObjects.append(compile(code, "<string>", "exec"))
 	timeSpan = time.clock() - start
-	if bpy.context.scene.printScriptGenerationTime:  print("Script Gen. " + str(round(timeSpan, 7)) + " s  -  " + str(round(1/timeSpan, 5)) + " fps")
+	if scene.mn_settings.developer.printGenerationTime:  print("Script Gen. " + str(round(timeSpan, 7)) + " s  -  " + str(round(1/timeSpan, 5)) + " fps")
 		
 def getCodeStrings():
 	return codeStrings
@@ -66,32 +69,23 @@ def getCodeStrings():
 	
 @persistent
 def frameChangeHandler(scene):
-	if scene.updateAnimationTreeOnFrameChange:
+	if scene.mn_settings.update.frameChange:
 		updateAnimationTrees(False)
 @persistent
 def sceneUpdateHandler(scene):
-	if scene.updateAnimationTreeOnSceneUpdate and not isAnimationPlaying():
+	if scene.mn_settings.update.sceneUpdate and not isAnimationPlaying():
 		updateAnimationTrees(False)
 @persistent
 def fileLoadHandler(scene):
 	updateAnimationTrees(True)
 def nodePropertyChanged(self, context):
-	if context.scene.updateAnimationTreeOnPropertyChange:
+	if context.scene.mn_settings.update.propertyChange:
 		updateAnimationTrees(False)
 def settingPropertyChanged(self, context):
 	updateAnimationTrees(True)
 def nodeTreeChanged(self = None, context = None):
 	updateAnimationTrees(True)
 	
-bpy.types.Scene.updateAnimationTreeOnFrameChange = bpy.props.BoolProperty(default = True, name = "Update Animation Tree On Frame Change")
-bpy.types.Scene.updateAnimationTreeOnSceneUpdate = bpy.props.BoolProperty(default = True, name = "Update Animation Tree On Scene Update")
-bpy.types.Scene.updateAnimationTreeOnPropertyChange = bpy.props.BoolProperty(default = True, name = "Update Animation Tree On Property Change")
-
-bpy.types.Scene.printUpdateTime = bpy.props.BoolProperty(default = False, name = "Print Update Time")
-bpy.types.Scene.printScriptGenerationTime = bpy.props.BoolProperty(default = False, name = "Print Script Generation Time")
-bpy.types.Scene.showFullError = bpy.props.BoolProperty(default = False, name = "Show Full Error")
-bpy.types.Scene.nodeExecutionProfiling = bpy.props.BoolProperty(default = False, name = "Node Execution Profiling", update = settingPropertyChanged)
-
 	
 bpy.app.handlers.frame_change_post.append(frameChangeHandler)
 bpy.app.handlers.scene_update_post.append(sceneUpdateHandler)

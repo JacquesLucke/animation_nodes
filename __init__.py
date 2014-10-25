@@ -22,6 +22,7 @@ import bpy, sys, os
 from nodeitems_utils import register_node_categories, unregister_node_categories
 from bpy.types import NodeTree, Node, NodeSocket
 from fnmatch import fnmatch
+from bpy.props import *
 currentPath = os.path.dirname(__file__)
 
 bl_info = {
@@ -68,6 +69,23 @@ execStrings = getExecStringsForImport(moduleNames)
 for name in moduleNames:
 	exec("import " + name)
 	print("import " + name)	
+
+from mn_execution import nodeTreeChanged	
+class GlobalUpdateSettings(bpy.types.PropertyGroup):
+	frameChange = BoolProperty(default = True, name = "Frame Change")
+	sceneUpdate = BoolProperty(default = True, name = "Scene Update")
+	propertyChange = BoolProperty(default = True, name = "Property Change")
+	
+class DeveloperSettings(bpy.types.PropertyGroup):
+	printUpdateTime = BoolProperty(default = False, name = "Print Update Time")
+	printGenerationTime = BoolProperty(default = False, name = "Print Script Generation Time")
+	showErrors = BoolProperty(default = False, name = "Show Full Error")
+	executionProfiling = BoolProperty(default = False, name = "Node Execution Profiling", update = nodeTreeChanged)
+	
+class AnimationNodesSettings(bpy.types.PropertyGroup):
+	update = PointerProperty(type = GlobalUpdateSettings, name = "Update Settings")
+	developer = PointerProperty(type = DeveloperSettings, name = "Developer Settings")
+	
 	
 	
 # register
@@ -84,10 +102,13 @@ def unregisterIfPossible(moduleName):
 	except: pass
 	
 def register():
+	registerIfPossible(__name__)
 	for moduleName in moduleNames:
 		registerIfPossible(moduleName)
 	categories = mn_node_register.getNodeCategories()
 	register_node_categories("ANIMATIONNODES", categories)
+	
+	bpy.types.Scene.mn_settings = PointerProperty(type = AnimationNodesSettings, name = "Animation Node Settings")
 
 def unregister():
 	for moduleName in moduleNames:

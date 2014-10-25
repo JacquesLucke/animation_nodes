@@ -15,9 +15,9 @@ class AnimationNodesPerformance(bpy.types.Panel):
 	def draw(self, context):
 		layout = self.layout
 		scene = context.scene
-		layout.prop(scene, "updateAnimationTreeOnFrameChange", text = "Frames Update")
-		layout.prop(scene, "updateAnimationTreeOnSceneUpdate", text = "Scene Update")
-		layout.prop(scene, "updateAnimationTreeOnPropertyChange", text = "Property Update")
+		layout.prop(scene.mn_settings.update, "frameChange", text = "Frames Update")
+		layout.prop(scene.mn_settings.update, "sceneUpdate", text = "Scene Update")
+		layout.prop(scene.mn_settings.update, "propertyChange", text = "Property Update")
 	
 class CustomAnimationNodes(bpy.types.Panel):
 	bl_idname = "mn.custom_nodes_panel"
@@ -63,10 +63,10 @@ class AnimationNodesDeveloperPanel(bpy.types.Panel):
 		col.operator("mn.print_node_tree_execution_string")
 		
 		col = layout.column(align = True)
-		col.prop(scene, "printUpdateTime", text = "Print Update Time")
-		col.prop(scene, "printScriptGenerationTime")
-		col.prop(scene, "showFullError", text = "Show Full Error")
-		col.prop(scene, "nodeExecutionProfiling", text = "Node Execution Profiling")
+		col.prop(scene.mn_settings.developer, "printUpdateTime", text = "Print Update Time")
+		col.prop(scene.mn_settings.developer, "printGenerationTime", text = "Print Generation Time")
+		col.prop(scene.mn_settings.developer, "showErrors", text = "Show Errors")
+		col.prop(scene.mn_settings.developer, "executionProfiling", text = "Node Execution Profiling")
 		
 		
 		

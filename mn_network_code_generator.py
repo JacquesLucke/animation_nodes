@@ -4,9 +4,11 @@ from mn_utils import *
 normalNetworks = []
 subNetworks = {}
 invalidNetworks = []
+useProfiling = False
 
 def getAllNetworkCodeStrings():
-	global subNetworks, invalidNetworks
+	global subNetworks, invalidNetworks, useProfiling
+	useProfiling = bpy.context.scene.mn_settings.developer.executionProfiling
 	networkStrings = []
 	clearSocketConnections()
 	cleanupNodeTrees()
@@ -188,7 +190,7 @@ class NetworkCodeGenerator:
 				codeLines = self.getNodeCodeLines(node)
 				self.setIndentationOnEveryLine(codeLines)
 				mainLines.extend(codeLines)
-		if bpy.context.scene.nodeExecutionProfiling: mainLines.append("    globals().update(locals())")
+		if useProfiling: mainLines.append("    globals().update(locals())")
 		functionString = "\n".join(mainLines)
 		return functionString
 	def setIndentationOnEveryLine(self, codeLines):
@@ -210,9 +212,9 @@ class NetworkCodeGenerator:
 		
 	def getExecutableNodeCode(self, node):
 		codeLines = []
-		if bpy.context.scene.nodeExecutionProfiling: codeLines.append(getNodeTimerStartName(node) + " = time.clock()")
+		if useProfiling: codeLines.append(getNodeTimerStartName(node) + " = time.clock()")
 		codeLines.extend(self.getNodeExecutionLines(node))
-		if bpy.context.scene.nodeExecutionProfiling: codeLines.append(getNodeTimerName(node) + " += time.clock() - " + getNodeTimerStartName(node))
+		if useProfiling: codeLines.append(getNodeTimerName(node) + " += time.clock() - " + getNodeTimerStartName(node))
 		return codeLines
 	def getLoopNodeCode(self, node):
 		codeLines = []
@@ -242,14 +244,14 @@ class NetworkCodeGenerator:
 		return codeLines
 		
 	def getTimerDefinitions(self):
-		if bpy.context.scene.nodeExecutionProfiling:
+		if useProfiling:
 			codeLines = []
 			for node in self.allNodesInTree:
 				codeLines.append(getNodeTimerName(node) + " = 0")
 			return "\n" + "\n".join(codeLines) + "\n"
 		return ""
 	def getTimerGlobalList(self, network):
-		if bpy.context.scene.nodeExecutionProfiling:
+		if useProfiling:
 			nodeTimerNames = []
 			for node in network:
 				nodeTimerNames.append(getNodeTimerName(node))
@@ -257,7 +259,7 @@ class NetworkCodeGenerator:
 		return ""
 		
 	def getCodeToPrintProfilingResult(self):
-		if bpy.context.scene.nodeExecutionProfiling:
+		if useProfiling:
 			codeLines = []
 			codeLines.append("print('----------  Profiling  ----------')")
 			for node in self.allNodesInTree:
