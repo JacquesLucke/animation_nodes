@@ -5,7 +5,7 @@ from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 class mn_FloatInputNode(Node, AnimationNode):
 	bl_idname = "mn_FloatInputNode"
-	bl_label = "Number Input"
+	bl_label = "Float Input"
 	
 	floatProperty = bpy.props.FloatProperty(default = 0.0, update = nodePropertyChanged)
 	
