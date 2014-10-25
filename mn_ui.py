@@ -1,5 +1,5 @@
 import bpy
-from mn_execution import getCodeStrings, updateAnimationTrees
+from mn_execution import getCodeStrings, resetCompileBlocker, updateAnimationTrees
 
 class AnimationNodesPerformance(bpy.types.Panel):
 	bl_idname = "mn.performance_panel"
@@ -75,6 +75,7 @@ class ForceNodeTreeUpdate(bpy.types.Operator):
 	bl_label = "Force Node Tree Update"
 
 	def execute(self, context):
+		resetCompileBlocker()
 		updateAnimationTrees(treeChanged = True)
 		return {'FINISHED'}
 		

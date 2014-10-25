@@ -38,6 +38,9 @@ def allowCompiling():
 def forbidCompiling():
 	global COMPILE_BLOCKER
 	COMPILE_BLOCKER += 1
+def resetCompileBlocker():
+	global COMPILE_BLOCKER
+	COMPILE_BLOCKER = 0
 			
 			
 # compile code objects
