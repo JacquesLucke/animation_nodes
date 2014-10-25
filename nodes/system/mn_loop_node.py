@@ -9,16 +9,23 @@ class mn_LoopNode(Node, AnimationNode):
 	bl_idname = "mn_LoopNode"
 	bl_label = "Loop"
 	
-	def getSubProgramNames(self, context):
+	def getStartLoopNames(self):
 		nodeTree = self.id_data
-		subProgramNames = []
+		startLoopNames = []
 		for node in nodeTree.nodes:
-			if node.bl_idname == "mn_LoopStartNode": subProgramNames.append((node.loopName, node.loopName, ""))
-		return subProgramNames
+			if node.bl_idname == "mn_LoopStartNode": startLoopNames.append(node.loopName)
+		return startLoopNames
+	def getStartLoopNodeItems(self, context):
+		startLoopNames = self.getStartLoopNames()
+		startLoopItems = []
+		for name in startLoopNames:
+			startLoopItems.append((name, name, ""))
+		if len(startLoopItems) == 0: startLoopItems.append(("NONE", "NONE", ""))
+		return startLoopItems
 	def selectedProgramChanged(self, context):
 		rebuildSockets(self)
 	
-	loopsEnum = bpy.props.EnumProperty(items = getSubProgramNames, name = "Loop", update=selectedProgramChanged)
+	selectedLoop = bpy.props.EnumProperty(items = getStartLoopNodeItems, name = "Loop", update=selectedProgramChanged)
 	
 	def init(self, context):
 		forbidCompiling()
@@ -26,11 +33,13 @@ class mn_LoopNode(Node, AnimationNode):
 		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
-		row = layout.row(align = True)
-		row.prop(self, "loopsEnum")
-		newNode = row.operator("node.add_node", text = "", icon = "PLUS")
-		newNode.use_transform = True
-		newNode.type = "mn_LoopStartNode"
+		if self.selectedLoop == "NONE":
+			newNode = layout.operator("node.add_node", text = "New Loop Start", icon = "PLUS")
+			newNode.use_transform = True
+			newNode.type = "mn_LoopStartNode"
+		else:
+			layout.prop(self, "selectedLoop")
+
 		rebuild = layout.operator("mn.rebuild_sub_program_caller_sockets", "Rebuild Sockets")
 		rebuild.nodeTreeName = self.id_data.name
 		rebuild.nodeName = self.name
@@ -41,7 +50,7 @@ class mn_LoopNode(Node, AnimationNode):
 			if i > 0: self.inputs.remove(socket)	
 
 	def getStartNode(self):
-		loopName = self.loopsEnum
+		loopName = self.selectedLoop
 		for node in self.id_data.nodes:
 			if node.bl_idname == "mn_LoopStartNode":
 				if node.loopName == loopName:
