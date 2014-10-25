@@ -46,9 +46,9 @@ class mn_LoopStartNode(Node, AnimationNode):
 					idName = toSocket.bl_idname
 					if idName == "mn_EmptySocket": 
 						idName = "mn_GenericSocket"
-					newSocket = self.outputs.new(idName, toSocket.name)
+					newSocket = self.outputs.new(idName, self.getNotUsedSocketName())
 					newSocket.editableCustomName = True
-					newSocket.customName = toSocket.name
+					newSocket.customName = self.getNotUsedCustomName(prefix = toSocket.name)
 					newSocket.removeable = True
 					newSocket.callNodeToRemove = True
 					newSocket.callNodeWhenCustomNameChanged = True
@@ -57,9 +57,28 @@ class mn_LoopStartNode(Node, AnimationNode):
 				self.updateCallerNodes()
 		allowCompiling()
 		
+	def getNotUsedCustomName(self, prefix = "custom name"):
+		customName = prefix
+		while self.isCustomNameUsed(customName):
+			customName = prefix + getRandomString(3)
+		return customName
+	def isCustomNameUsed(self, customName):
+		for socket in self.outputs:
+			if socket.customName == customName: return True
+		return False
+	
+	def getNotUsedSocketName(self):
+		socketName = getRandomString(5)
+		while self.isSocketNameUsed(socketName):
+			socketName = getRandomString(5)
+		return socketName
+	def isSocketNameUsed(self, name):
+		for socket in self.outputs:
+			if socket.name == name or socket.identifier == name: return True
+		return False
+		
 	def customSocketNameChanged(self, socket):
 		self.updateCallerNodes()
-		print("hey")
 		
 	def removeSocket(self, socket):
 		self.outputs.remove(socket)
@@ -79,5 +98,5 @@ class mn_LoopStartNode(Node, AnimationNode):
 		socketDescriptions = []
 		for socket in self.outputs:
 			if socket.name not in ["Index", "..."]:
-				socketDescriptions.append((socket.customName, socket.bl_idname))
+				socketDescriptions.append((socket.customName, socket.bl_idname, socket.identifier))
 		return socketDescriptions

@@ -56,4 +56,4 @@ class mn_SumListElementsNode(Node, AnimationNode):
 			self.inputs.new("mn_IntegerSocket", "Start")
 			self.inputs.new("mn_IntegerSocket", "End")
 			self.outputs.new("mn_StringSocket", "Sum")
-		forbidCompiling()
+		allowCompiling()

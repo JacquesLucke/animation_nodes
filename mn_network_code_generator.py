@@ -326,7 +326,7 @@ class NetworkCodeGenerator:
 	def getNodeFunctionDeclarationString(self, node):
 		return getNodeExecutionName(node) + " = " + getNodeVariableName(node) + ".execute"
 	def getSocketDeclarationString(self, socket):
-		return getInputSocketVariableName(socket) + " = " + getNodeVariableName(socket.node) + ".inputs['" + socket.identifier + "'].getValue()"
+		return getInputSocketVariableName(socket) + " = " + getNodeVariableName(socket.node) + ".inputs['" + socket.name + "'].getValue()"
 	def getNodeExecutionLines(self, node):
 		useInLineExecution = False
 		if hasattr(node, "useInLineExecution"):

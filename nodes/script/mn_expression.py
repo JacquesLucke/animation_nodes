@@ -64,7 +64,7 @@ class mn_ExpressionNode(Node, AnimationNode):
 		
 	def getNotUsedSocketName(self):
 		socketName = getRandomString(5)
-		while(self.isSocketNameUsed(socketName)):
+		while self.isSocketNameUsed(socketName):
 			socketName = getRandomString(5)
 		return socketName
 	def isSocketNameUsed(self, name):

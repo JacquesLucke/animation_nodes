@@ -51,4 +51,4 @@ class mn_ShuffleListNode(Node, AnimationNode):
 			self.inputs.new("mn_ObjectListSocket", "List")
 			self.outputs.new("mn_ObjectListSocket", "Shuffled List")
 		self.inputs.move(0, 1)
-		forbidCompiling()
+		allowCompiling()

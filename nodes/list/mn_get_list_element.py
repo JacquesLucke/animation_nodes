@@ -50,4 +50,4 @@ class mn_GetListElementNode(Node, AnimationNode):
 			self.inputs.new("mn_ObjectListSocket", "List")
 			self.inputs.new("mn_IntegerSocket", "Index")
 			self.outputs.new("mn_ObjectSocket", "Element")
-		forbidCompiling()
+		allowCompiling()

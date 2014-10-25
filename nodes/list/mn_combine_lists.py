@@ -49,4 +49,4 @@ class mn_CombineListsNode(Node, AnimationNode):
 			self.inputs.new("mn_ObjectListSocket", "List 1")
 			self.inputs.new("mn_ObjectListSocket", "List 2")
 			self.outputs.new("mn_ObjectListSocket", "Both Lists")
-		forbidCompiling()
+		allowCompiling()

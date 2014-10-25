@@ -55,4 +55,4 @@ class mn_SetListElementNode(Node, AnimationNode):
 			self.inputs.new("mn_ObjectSocket", "Value")
 			self.inputs.new("mn_IntegerSocket", "Index")
 			self.outputs.new("mn_ObjectListSocket", "List")
-		forbidCompiling()
+		allowCompiling()

@@ -45,11 +45,12 @@ class mn_LoopNode(Node, AnimationNode):
 		rebuild.nodeName = self.name
 		
 	def updateSockets(self, socketDescriptions):
+		print("hey")
 		forbidCompiling()
 		self.removeDynamicSockets()
-		for customName, idName in socketDescriptions:
-			self.inputs.new(idName, customName)
-			self.outputs.new(idName, customName)
+		for customName, idName, identifier in socketDescriptions:
+			self.inputs.new(idName, customName, identifier)
+			self.outputs.new(idName, customName, identifier)
 		allowCompiling()
 		
 	def removeDynamicSockets(self):
