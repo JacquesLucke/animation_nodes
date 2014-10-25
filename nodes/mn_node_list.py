@@ -41,7 +41,7 @@ def getNodeNameDictionary():
 		("mn_ObjectAttributeOutputNode", "Attribute Output"),
 		("mn_ModifierOutputNode", "Modifier Output"),
 		("mn_CopyTransformsNode", "Copy Transforms"),
-		("mn_ObjectOutputNode", "Transform Output") ] ))
+		("mn_ObjectOutputNode", "Transforms Output") ] ))
 		
 	nodes.append(("List", [
 		("mn_GetListElementNode", "Get Element"),
