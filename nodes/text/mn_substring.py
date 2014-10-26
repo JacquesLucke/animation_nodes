@@ -5,7 +5,7 @@ from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 class mn_SubstringNode(Node, AnimationNode):
 	bl_idname = "mn_SubstringNode"
-	bl_label = "Substrings"
+	bl_label = "Trim Text"
 	
 	ignoreLength =  bpy.props.BoolProperty(default = False, update = nodePropertyChanged)
 	
