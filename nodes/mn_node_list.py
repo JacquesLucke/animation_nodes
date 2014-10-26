@@ -39,7 +39,6 @@ def getNodeNameDictionary():
 		("mn_ReplicateObjectNode", "Replicate Object"),
 		("mn_CopyObjectData", "Copy Data"),
 		("mn_ObjectAttributeOutputNode", "Attribute Output"),
-		("mn_ModifierOutputNode", "Modifier Output"),
 		("mn_CopyTransformsNode", "Copy Transforms"),
 		("mn_ObjectOutputNode", "Transforms Output") ] ))
 		
