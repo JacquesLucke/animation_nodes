@@ -114,7 +114,7 @@ class mn_ReplicateObjectNode(Node, AnimationNode):
 		for name in objectNames:
 			object = bpy.data.objects.get(name)
 			if object is not None:
-				bpy.context.scene.objects.unlink(object)
+				self.unlinkReplication(object)
 		
 	def unlinkOneObject(self):
 		self.unlinkObjectItemIndex(len(self.linkedObjects)-1)
@@ -127,7 +127,7 @@ class mn_ReplicateObjectNode(Node, AnimationNode):
 		object = bpy.data.objects.get(objectName)
 		if object is not None:
 			try:
-				bpy.context.scene.objects.unlink(object)
+				self.unlinkReplication(object)
 				newItem = self.unlinkedObjects.add()
 				newItem.objectName = objectName
 				newItem.objectIndex = objectIndex
@@ -157,6 +157,10 @@ class mn_ReplicateObjectNode(Node, AnimationNode):
 		item = self.unlinkedObjects.add()
 		item.objectName = newObject.name
 		item.objectIndex = 0
+		
+	def unlinkReplication(self, object):
+		if bpy.context.mode != "OBJECT": bpy.ops.object.mode_set(mode = "OBJECT")
+		bpy.context.scene.objects.unlink(object)
 		
 	def setObjectDataOnAllObjects(self):
 		self.setObjectData = True
