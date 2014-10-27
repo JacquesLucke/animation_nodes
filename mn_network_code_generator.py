@@ -174,17 +174,17 @@ class NetworkCodeGenerator:
 			codeLines.extend(self.getNodeCodeLines(node))
 		return "\n".join(codeLines)
 		
-	def makeFunctionCode(self, functionNetwork):
-		startNode = getSubProgramStartNode(functionNetwork)
+	def makeLoopCode(self, loopNetwork):
+		startNode = getSubProgramStartNode(loopNetwork)
 		if getNodeIdentifier(startNode) not in self.functions:
-			self.functions[getNodeIdentifier(startNode)] = self.getFunctionCode(functionNetwork, startNode)
-	def getFunctionCode(self, functionNetwork, startNode):
-		self.allNodesInTree.extend(functionNetwork)
-		self.orderedNodes = orderNodes(functionNetwork)
+			self.functions[getNodeIdentifier(startNode)] = self.getLoopCode(loopNetwork, startNode)
+	def getLoopCode(self, loopNetwork, startNode):
+		self.allNodesInTree.extend(loopNetwork)
+		self.orderedNodes = orderNodes(loopNetwork)
 		mainLines = []
 		mainLines.append("def " + getNodeFunctionName(startNode) + "(" + getNodeOutputName(startNode) + "):")
 		mainLines.append("    global nodes")
-		mainLines.append("    " + self.getTimerGlobalList(functionNetwork))
+		mainLines.append("    " + self.getTimerGlobalList(loopNetwork))
 		for node in self.orderedNodes:
 			if node != startNode:
 				codeLines = self.getNodeCodeLines(node)
@@ -204,10 +204,8 @@ class NetworkCodeGenerator:
 		codeLines = []
 		if isExecuteableNode(node) or isInLineNode(node):
 			codeLines.extend(self.getExecutableNodeCode(node))
-		elif isLoopNode(node):
-			codeLines.extend(self.getLoopNodeCode(node))
-		elif isEnumerateObjectsNode(node):
-			codeLines.extend(self.getEnumerateObjectsNodeCode(node))
+		elif isForLoopNode(node):
+			codeLines.extend(self.getForLoopNodeCode(node))
 		return codeLines		
 		
 	def getExecutableNodeCode(self, node):
@@ -216,32 +214,35 @@ class NetworkCodeGenerator:
 		codeLines.extend(self.getNodeExecutionLines(node))
 		if useProfiling: codeLines.append(getNodeTimerName(node) + " += time.clock() - " + getNodeTimerStartName(node))
 		return codeLines
-	def getLoopNodeCode(self, node):
+	def getForLoopNodeCode(self, node):
 		codeLines = []
 		codeLines.append(getNodeInputName(node) + " = " + self.generateInputListString(node))
 		startNode = getCorrespondingStartNode(node)
 		if startNode is not None:
-			codeLines.append("for i in range(" + getNodeInputName(node) + "['Amount']):")
+			loopHeader = self.getForLoopHeader(startNode)
+			print(loopHeader)
+			codeLines.append(loopHeader)
 			codeLines.append("    " + getNodeInputName(node) + "['Index'] = i")
 			codeLines.append("    " + getNodeFunctionName(startNode) + "(" + getNodeInputName(node) + ")")
-			self.makeFunctionCode(subNetworks[getNodeIdentifier(startNode)])
+			self.makeLoopCode(subNetworks[getNodeIdentifier(startNode)])
 		codeLines.append(getNodeOutputName(node) + " = " + getNodeInputName(node))
 		return codeLines
-	def getEnumerateObjectsNodeCode(self, node):
-		codeLines = []
-		inputName = getNodeInputName(node)
-		codeLines.append(inputName + " = " + self.generateInputListString(node))
-		codeLines.append(inputName + "['List Length'] = len("+ inputName + "['Objects'])")
-		startNode = getCorrespondingStartNode(node)
-		if startNode is not None:
-			codeLines.append("if " + getNodeVariableName(node) + ".executeLoop:")
-			codeLines.append("    for i, object in enumerate(" + inputName + "['Objects']):")
-			codeLines.append("        " + inputName + "['Index'] = i")
-			codeLines.append("        " + inputName + "['Object'] = object")
-			codeLines.append("        " + getNodeFunctionName(startNode) + "(" + inputName + ")")
-			self.makeFunctionCode(subNetworks[getNodeIdentifier(startNode)])
-		codeLines.append(getNodeOutputName(node) + " = " + inputName)
-		return codeLines
+	def getForLoopHeader(self, node):
+		fromListSockets = node.getSocketDescriptions()[0]
+		if len(fromListSockets) == 0: return "for i in range(" + getNodeInputName(node) + "['Amount']):"
+		codeParts = []
+		codeParts.append("for i, ")
+		variableNames = []
+		for socket in fromListSockets:
+			variableNames.append(socket.name)
+		codeParts.append(", ".join(variableNames))
+		codeParts.append(" in enumerate(zip(")
+		listVariables = []
+		for socket in fromListSockets:
+			listVariables.append(getNodeInputName(node) + "['" + socket.identifier + "']")
+		codeParts.append(", ".join(listVariables))
+		codeParts.append(")):")
+		return "".join(codeParts)
 		
 	def getTimerDefinitions(self):
 		if useProfiling:
@@ -387,10 +388,8 @@ def isExecuteableNode(node):
 	return hasattr(node, "execute")
 def isInLineNode(node):
 	return hasattr(node, "getInLineExecutionString")
-def isLoopNode(node):
-	return node.bl_idname == "mn_LoopNode"
-def isEnumerateObjectsNode(node):
-	return node.bl_idname == "mn_EnumerateObjectsNode"
+def isForLoopNode(node):
+	return node.bl_idname == "mn_ForLoopNode"
 	
 def usesFastCall(node):
 	if hasattr(node, "getInputSocketNames"):

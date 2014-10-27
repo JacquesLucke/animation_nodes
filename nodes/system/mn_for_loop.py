@@ -67,4 +67,4 @@ class mn_ForLoopNode(Node, AnimationNode):
 		return listSocketType
 
 	def getStartNode(self):
-		return getNodeFromTypeWithAttribute("mn_EnumerateObjectsStartNode", "loopName", self.selectedLoop)
+		return getNodeFromTypeWithAttribute("mn_ForLoopStartNode", "loopName", self.selectedLoop)
