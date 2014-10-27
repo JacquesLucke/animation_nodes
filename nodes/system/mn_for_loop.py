@@ -43,10 +43,16 @@ class mn_ForLoopNode(Node, AnimationNode):
 		connections = getConnectionDictionaries(self)
 		self.removeSockets()
 		fromListSockets, fromSingleSockets = startNode.getSocketDescriptions()
+		
 		for socket in fromListSockets:
 			idName = self.getSocketTypeForListSocket(socket.bl_idname)
 			self.inputs.new(idName, socket.customName, socket.identifier)
 			self.outputs.new(idName, socket.customName, socket.identifier)
+			
+		for socket in fromSingleSockets:
+			self.inputs.new(socket.bl_idname, socket.customName, socket.identifier)
+			self.outputs.new(socket.bl_idname, socket.customName, socket.identifier)
+			
 		tryToSetConnectionDictionaries(self, connections)
 		allowCompiling()
 		
