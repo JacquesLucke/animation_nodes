@@ -52,7 +52,7 @@ class mn_FloatCompareNode(Node, AnimationNode):
 			output["Result"] = a >= b
 
 		elif comp == "GREATER":
-			output["Result"] = a < b
+			output["Result"] = a > b
 
 		elif comp == "EQUAL":
 			output["Result"] = a == b
