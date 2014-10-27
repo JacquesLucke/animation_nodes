@@ -1,4 +1,5 @@
 import bpy
+from bpy.props import *
 from mn_execution import nodeTreeChanged
 from bpy.types import NodeTree, Node, NodeSocket
 from mn_utils import *
@@ -34,13 +35,14 @@ def customNameChanged(self, context):
 		nodeTreeChanged()
 		
 class mn_SocketProperties:
-	editableCustomName = bpy.props.BoolProperty(default = False)
-	customName = bpy.props.StringProperty(default = "custom name", update = customNameChanged)
-	customNameIsVariable = bpy.props.BoolProperty(default = False)
-	customNameIsUpdating = bpy.props.BoolProperty(default = False)
-	removeable = bpy.props.BoolProperty(default = False)
-	callNodeToRemove = bpy.props.BoolProperty(default = False)
-	callNodeWhenCustomNameChanged = bpy.props.BoolProperty(default = False)
+	editableCustomName = BoolProperty(default = False)
+	customName = StringProperty(default = "custom name", update = customNameChanged)
+	customNameIsVariable = BoolProperty(default = False)
+	customNameIsUpdating = BoolProperty(default = False)
+	removeable = BoolProperty(default = False)
+	callNodeToRemove = BoolProperty(default = False)
+	callNodeWhenCustomNameChanged = BoolProperty(default = False)
+	loopAsList = BoolProperty(default = False)
 		
 class mn_BaseSocket(NodeSocket):
 	bl_idname = "mn_BaseSocket"

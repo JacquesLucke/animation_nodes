@@ -1,4 +1,5 @@
 import bpy
+from mn_utils import *
 
 def getNodeFromTypeWithAttribute(nodeType, attribute, data):
 	nodes = getNodesFromTypeWithAttribute(nodeType, attribute, data)
@@ -28,3 +29,27 @@ def getAnimationNodeTrees():
 		if hasattr(nodeTree, "isAnimationNodeTree"):
 			nodeTrees.append(nodeTree)
 	return nodeTrees
+	
+	
+def getNotUsedSocketName(node, prefix = "socket name"):
+	socketName = prefix
+	while isSocketNameUsed(node, socketName):
+		socketName = prefix + getRandomString(3)
+	return socketName
+def isSocketNameUsed(node, name):
+	for socket in node.outputs:
+		if socket.name == name or socket.identifier == name: return True
+	for socket in node.inputs:
+		if socket.name == name or socket.identifier == name: return True
+	return False
+	
+	
+def getNotUsedCustomSocketName(node, prefix = "custom name"):
+	customName = prefix
+	while isCustomSocketNameUsed(node, customName):
+		customName = prefix + getRandomString(3)
+	return customName
+def isCustomSocketNameUsed(node, customName):
+	for socket in node.outputs:
+		if socket.customName == customName: return True
+	return False
