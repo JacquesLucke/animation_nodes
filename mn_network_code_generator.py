@@ -220,7 +220,9 @@ class NetworkCodeGenerator:
 		startNode = getCorrespondingStartNode(node)
 		if startNode is not None:
 			loopHeader = self.getForLoopHeader(node, startNode)
+			enumeratedObjectsLine = self.getForLoopObjectsCodeLine(node, startNode)
 			codeLines.append(loopHeader)
+			codeLines.append("    " + enumeratedObjectsLine)
 			codeLines.append("    " + getNodeInputName(node) + "['Index'] = i")
 			codeLines.append("    " + getNodeFunctionName(startNode) + "(" + getNodeInputName(node) + ")")
 			self.makeLoopCode(subNetworks[getNodeIdentifier(startNode)])
@@ -230,19 +232,35 @@ class NetworkCodeGenerator:
 		fromListSockets = startNode.getSocketDescriptions()[0]
 		if len(fromListSockets) == 0: return "for i in range(" + getNodeInputName(node) + "['Amount']):"
 		codeParts = []
-		codeParts.append("for i, ")
+		codeParts.append("for i, (")
 		variableNames = []
 		for socket in fromListSockets:
-			variableNames.append(socket.name)
+			variableNames.append(socket.identifier)
 		codeParts.append(", ".join(variableNames))
-		codeParts.append(" in enumerate(zip(")
+		codeParts.append(") in enumerate(zip(")
 		listVariables = []
 		for socket in fromListSockets:
 			listVariables.append(getNodeInputName(node) + "['" + socket.identifier + "list']")
 		codeParts.append(", ".join(listVariables))
 		codeParts.append(")):")
 		return "".join(codeParts)
-	
+	def getForLoopObjectsCodeLine(self, node, startNode):
+		fromListSockets = startNode.getSocketDescriptions()[0]
+		if len(fromListSockets) == 0: return ""
+		codeParts = []
+		
+		listVariables = []
+		for socket in fromListSockets:
+			listVariables.append(getNodeInputName(node) + "['" + socket.identifier + "']")
+		codeParts.append(", ".join(listVariables))
+		codeParts.append(" = ")
+		
+		variableNames = []
+		for socket in fromListSockets:
+			variableNames.append(socket.identifier)
+		codeParts.append(", ".join(variableNames))
+		
+		return "".join(codeParts)
 		
 	def getTimerDefinitions(self):
 		if useProfiling:
