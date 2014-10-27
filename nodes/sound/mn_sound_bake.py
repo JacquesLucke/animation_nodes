@@ -1,4 +1,4 @@
-import bpy, math
+import bpy, math, os
 from bpy.types import Node
 from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
@@ -108,6 +108,8 @@ class mn_SoundBakeNode(Node, AnimationNode):
 			wm.progress_update(index + 1.0)
 		wm.progress_end()
 		soundObject.hide = True
+		self.name = os.path.basename(self.filePath)
+		loadSound(self.filePath)
 		
 	def getSoundObject(self):
 		soundObject = bpy.data.objects.get(self.soundObjectName)
@@ -197,8 +199,11 @@ class SetSoundInSequenceEditor(bpy.types.Operator):
 	filePath = bpy.props.StringProperty()
 		
 	def execute(self, context):
-		scene = bpy.context.scene
-		scene.sequence_editor_clear()
-		scene.sequence_editor_create()
-		scene.sequence_editor.sequences.new_sound("Sound", self.filePath, channel = 0, frame_start = 1)
+		loadSound(self.filePath)
 		return {'FINISHED'}	
+		
+def loadSound(filePath):
+	scene = bpy.context.scene
+	scene.sequence_editor_clear()
+	scene.sequence_editor_create()
+	scene.sequence_editor.sequences.new_sound("Sound", filePath, channel = 0, frame_start = 1)
