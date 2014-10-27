@@ -65,7 +65,8 @@ def getNodeNameDictionary():
 		("mn_InterpolationNode", "Interpolation") ] ))
 		
 	nodes.append(("Debug", [
-		("mn_DebugOutputNode", "Socket Values") ] ))
+		("mn_DebugOutputNode", "Socket Values"),
+        ("mn_DebugVectorOutputNode", "Vector Socket Value") ] ))
 			
 	nodes.append(("Material", [
 		("mn_CyclesMaterialOutputNode", "Cycles Material Output"),
