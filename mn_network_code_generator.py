@@ -41,14 +41,14 @@ def sortNetworks(nodeNetworks):
 def getNetworkType(network):
 	loopStarterAmount = 0
 	for node in network:
-		if node.bl_idname == "mn_LoopStartNode" or node.bl_idname == "mn_EnumerateObjectsStartNode":
+		if node.bl_idname == "mn_ForLoopStartNode":
 			loopStarterAmount += 1
 	if loopStarterAmount == 0: return "Normal"
 	elif loopStarterAmount == 1: return "Loop"
 	return "Invalid"
 def getSubProgramStartNode(network):
 	for node in network:
-		if node.bl_idname == "mn_LoopStartNode" or node.bl_idname == "mn_EnumerateObjectsStartNode":
+		if node.bl_idname == "mn_ForLoopStartNode":
 			return node
 			
 idCounter = 0
@@ -219,16 +219,15 @@ class NetworkCodeGenerator:
 		codeLines.append(getNodeInputName(node) + " = " + self.generateInputListString(node))
 		startNode = getCorrespondingStartNode(node)
 		if startNode is not None:
-			loopHeader = self.getForLoopHeader(startNode)
-			print(loopHeader)
+			loopHeader = self.getForLoopHeader(node, startNode)
 			codeLines.append(loopHeader)
 			codeLines.append("    " + getNodeInputName(node) + "['Index'] = i")
 			codeLines.append("    " + getNodeFunctionName(startNode) + "(" + getNodeInputName(node) + ")")
 			self.makeLoopCode(subNetworks[getNodeIdentifier(startNode)])
 		codeLines.append(getNodeOutputName(node) + " = " + getNodeInputName(node))
 		return codeLines
-	def getForLoopHeader(self, node):
-		fromListSockets = node.getSocketDescriptions()[0]
+	def getForLoopHeader(self, node, startNode):
+		fromListSockets = startNode.getSocketDescriptions()[0]
 		if len(fromListSockets) == 0: return "for i in range(" + getNodeInputName(node) + "['Amount']):"
 		codeParts = []
 		codeParts.append("for i, ")
@@ -239,10 +238,11 @@ class NetworkCodeGenerator:
 		codeParts.append(" in enumerate(zip(")
 		listVariables = []
 		for socket in fromListSockets:
-			listVariables.append(getNodeInputName(node) + "['" + socket.identifier + "']")
+			listVariables.append(getNodeInputName(node) + "['" + socket.identifier + "list']")
 		codeParts.append(", ".join(listVariables))
 		codeParts.append(")):")
 		return "".join(codeParts)
+	
 		
 	def getTimerDefinitions(self):
 		if useProfiling:

@@ -75,7 +75,7 @@ class mn_ForLoopStartNode(Node, AnimationNode):
 	def newOutputSocket(self, targetSocket):
 		idName = self.correctIdName(targetSocket.bl_idname)
 		
-		socket = self.outputs.new(idName, getNotUsedSocketName(self, prefix = ""))
+		socket = self.outputs.new(idName, getNotUsedSocketName(self, prefix = "socket"))
 		socket.customName = getNotUsedCustomSocketName(self, prefix = targetSocket.name)
 		targetSocket = None
 		socket.editableCustomName = True
