@@ -2,7 +2,6 @@ import bpy
 from bpy.types import Node
 from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
-from mn_dynamic_sockets_helper import *
 from mn_utils import *
 
 
@@ -10,7 +9,6 @@ class mn_LoopStartNode(Node, AnimationNode):
 	bl_idname = "mn_LoopStartNode"
 	bl_label = "Loop Start"
 	
-	sockets = bpy.props.CollectionProperty(type = SocketPropertyGroup)
 	showEditOptions = bpy.props.BoolProperty(default = True)
 	loopName = bpy.props.StringProperty(default = "Name")
 	

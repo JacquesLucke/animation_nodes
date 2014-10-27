@@ -3,7 +3,6 @@ from bpy.types import Node
 from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 from mn_utils import *
-from mn_dynamic_sockets_helper import *
 
 class mn_LoopNode(Node, AnimationNode):
 	bl_idname = "mn_LoopNode"
