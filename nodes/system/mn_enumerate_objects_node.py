@@ -3,6 +3,7 @@ from bpy.types import Node
 from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 from mn_utils import *
+from mn_node_utils import *
 
 class mn_EnumerateObjectsNode(Node, AnimationNode):
 	bl_idname = "mn_EnumerateObjectsNode"
@@ -63,9 +64,4 @@ class mn_EnumerateObjectsNode(Node, AnimationNode):
 			if i > 0: self.outputs.remove(socket)
 
 	def getStartNode(self):
-		selectedLoop = self.selectedLoop
-		for node in self.id_data.nodes:
-			if node.bl_idname == "mn_EnumerateObjectsStartNode":
-				if node.loopName == selectedLoop:
-					return node
-		return None
+		return getNodeFromTypeWithAttribute("mn_EnumerateObjectsStartNode", "loopName", self.selectedLoop)
