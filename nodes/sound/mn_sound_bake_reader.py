@@ -1,13 +1,16 @@
-import bpy
-from mn_execution import nodePropertyChanged
-from mn_node_base import * 
+import bpy, math
+from bpy.types import Node
+from mn_node_base import AnimationNode
+from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from mn_utils import *
+from mn_object_utils import *
+from mn_node_helper import *
+from mn_cache import *
 
-class mn_BakedSoundSocket(mn_BaseSocket, mn_SocketProperties):
-	bl_idname = "mn_BakedSoundSocket"
-	bl_label = "Baked Sound Socket"
-	dataType = "Sound"
-	allowedInputTypes = ["Sound"]
-	drawColor = (0.5, 0.9, 0.6, 1)
+
+class mn_SoundBakeReaderNode(Node, AnimationNode):
+	bl_idname = "mn_SoundBakeReaderNode"
+	bl_label = "Sound Bake Reader"
 	
 	def getSoundBakeNodeNames(self):
 		bakeNodeNames = []
@@ -26,18 +29,23 @@ class mn_BakedSoundSocket(mn_BaseSocket, mn_SocketProperties):
 	
 	bakeNodeName = bpy.props.EnumProperty(items = getSoundBakeNodeItems, name = "Bake Node", update = nodePropertyChanged)
 	
-	def drawInput(self, layout, node, text):
+	def init(self, context):
+		forbidCompiling()
+		self.outputs.new("mn_BakedSoundSocket", "Sound")
+		allowCompiling()
+		
+	def draw_buttons(self, context, layout):
 		if self.bakeNodeName == "NONE":
 			newNode = layout.operator("node.add_node", text = "Sound Bake", icon = "PLUS")
 			newNode.type = "mn_SoundBakeNode"
 			newNode.use_transform = True
 		else:
-			layout.prop(self, "bakeNodeName", text = text)
+			layout.prop(self, "bakeNodeName", text = "Sound")
 		
-	def getValue(self):
-		return self.node.id_data.nodes.get(self.bakeNodeName)
+	def getInputSocketNames(self):
+		return {}
+	def getOutputSocketNames(self):
+		return {"Sound" : "sound"}
 		
-	def setStoreableValue(self, data):
-		self.bakeNodeName = data
-	def getStoreableValue(self):
-		return self.bakeNodeName
+	def execute(self):
+		return self.id_data.nodes.get(self.bakeNodeName)
