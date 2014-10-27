@@ -16,7 +16,8 @@ class mn_VectorMathNode(Node, AnimationNode):
 		("ADD", "Add", ""),
 		("SUBTRACT", "Subtract", ""),
 		("MULTIPLY", "Multiply", "Multiply element by element"),
-		("DIVIDE", "Divide", "")]
+		("DIVIDE", "Divide", ""),
+        ("CROSS", "Cross Product", "Calculate the cross/vector product, yielding a vector that is orthogonal to both input vectors")]
 	mathTypesProperty = bpy.props.EnumProperty(name="Operation", items=mathTypes, default="ADD", update=updateNode)
 	
 	def init(self, context):
@@ -48,6 +49,7 @@ if %b%[0] != 0: $result$[0] = %a%[0] / %b%[0]
 if %b%[1] != 0: $result$[1] = %a%[1] / %b%[1]
 if %b%[2] != 0: $result$[2] = %a%[2] / %b%[2]
 '''
+			elif op == "CROSS": return "$result$ = [%a%[1] * %b%[2] - %a%[2] * %b%[1], %a%[2] * %b%[0] - %a%[0] * %b%[2], %a%[0] * %b%[1] - %a%[1] * %b%[0]]"
 		return ""
 	def getModuleList(self):
 		return ["math"]
