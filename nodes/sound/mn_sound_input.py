@@ -20,7 +20,7 @@ class mn_SoundInputNode(Node, AnimationNode):
 	def init(self, context):
 		forbidCompiling()
 		self.inputs.new("mn_BakedSoundSocket", "Sound")
-		self.inputs.new("mn_FloatSocket", "Value")
+		self.inputs.new("mn_FloatSocket", "Frequence")
 		self.inputs.new("mn_FloatSocket", "Frame")
 		self.outputs.new("mn_FloatListSocket", "Strengths")
 		self.outputs.new("mn_FloatSocket", "Strength")
@@ -31,13 +31,13 @@ class mn_SoundInputNode(Node, AnimationNode):
 		
 	def getInputSocketNames(self):
 		return {"Sound" : "bakeNode",
-				"Value" : "value",
+				"Frequence" : "frequence",
 				"Frame" : "frame"}
 	def getOutputSocketNames(self):
 		return {"Strengths" : "strengths",
 				"Strength" : "strength"}
 		
-	def execute(self, value, frame, bakeNode):
+	def execute(self, frequence, frame, bakeNode):
 		currentFrame = getCurrentFrame()
 		if self.frameType == "OFFSET":
 			frame += currentFrame
@@ -45,7 +45,7 @@ class mn_SoundInputNode(Node, AnimationNode):
 		strenghts = []
 		if bakeNode is not None:
 			strenghts = bakeNode.getStrengthList(frame)
-		return strenghts, self.getStrengthOfFrequence(strenghts, value)
+		return strenghts, self.getStrengthOfFrequence(strenghts, frequence)
 		
 	def getStrengthOfFrequence(self, strengths, frequenceIndicator):
 		if len(strengths) > 0:
