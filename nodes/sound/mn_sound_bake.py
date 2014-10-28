@@ -96,6 +96,7 @@ class mn_SoundBakeNode(Node, AnimationNode):
 		return strenghts
 		
 	def bakeSound(self):
+		forbidCompiling()
 		bpy.context.scene.frame_current = 1
 		soundObject = self.getSoundObject()
 		self.removeSoundCurves(soundObject)
@@ -110,6 +111,7 @@ class mn_SoundBakeNode(Node, AnimationNode):
 		soundObject.hide = True
 		self.name = os.path.basename(self.filePath)
 		loadSound(self.filePath)
+		allowCompiling()
 		
 	def getSoundObject(self):
 		soundObject = bpy.data.objects.get(self.soundObjectName)
