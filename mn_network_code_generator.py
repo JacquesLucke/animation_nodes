@@ -219,36 +219,47 @@ class NetworkCodeGenerator:
 		codeLines.append(getNodeInputName(node) + " = " + self.generateInputListString(node))
 		startNode = getCorrespondingStartNode(node)
 		if startNode is not None:
-		
 			fromListSockets = startNode.getSocketDescriptions()[0]
-			codeParts = []
-			codeParts.append("zippedList = list(zip(")
-			if len(fromListSockets) > 0:
-				listVariables = []
-				for socket in fromListSockets:
-					listVariables.append(getNodeInputName(node) + "['" + socket.identifier + "list']")
-				codeParts.append(", ".join(listVariables))
-			codeParts.append("))")
-			codeLines.append("".join(codeParts))
-			codeLines.append(getNodeInputName(node) + "['List Length'] = len(zippedList)")
 			
-			loopHeader = self.getForLoopHeader(node, startNode)
-			codeLines.append(loopHeader)
+			if len(fromListSockets) == 0:
+				codeLines.append(getNodeInputName(node) + "['List Length'] = " + getNodeInputName(node) + "['Amount']")
+				codeLines.append("for i in range(" + getNodeInputName(node) + "['Amount']):")
+			else:
+				codeLines.append(self.getZipListCode(node, fromListSockets))
+				codeLines.append(getNodeInputName(node) + "['List Length'] = len(zippedList)")
+				codeLines.append(self.getEnumerateLoopHeader(node, fromListSockets))
+			
 			codeLines.append("    " + getNodeFunctionName(startNode) + "(" + getNodeInputName(node) + ")")
 			self.makeLoopCode(subNetworks[getNodeIdentifier(startNode)])
 		codeLines.append(getNodeOutputName(node) + " = " + getNodeInputName(node))
 		return codeLines
-	def getForLoopHeader(self, node, startNode):
-		fromListSockets = startNode.getSocketDescriptions()[0]
-		if len(fromListSockets) == 0: return "for i in range(" + getNodeInputName(node) + "['Amount']):"
+		
+	def getZipListCode(self, node, fromListSockets):
+		codeParts = []
+		codeParts.append("zippedList = list(zip(")
+		
+		listVariables = []
+		for socket in fromListSockets:
+			listVariables.append(getNodeInputName(node) + "['" + socket.identifier + "list']")
+			
+		codeParts.append(", ".join(listVariables))
+		codeParts.append("))")
+		
+		return "".join(codeParts)
+		
+	def getEnumerateLoopHeader(self, node, fromListSockets):
 		codeParts = []
 		codeParts.append("for (" + getNodeInputName(node) + "['Index']" + ", (")
-		variableNames = []
+		
+		listVariables = []
 		for socket in fromListSockets:
-			variableNames.append(getNodeInputName(node) + "['" + socket.identifier + "']")
-		codeParts.append(", ".join(variableNames))
+			listVariables.append(getNodeInputName(node) + "['" + socket.identifier + "']")
+			
+		codeParts.append(", ".join(listVariables))
 		codeParts.append(",)) in enumerate(zippedList):")
+		
 		return "".join(codeParts)
+		
 		
 	def getTimerDefinitions(self):
 		if useProfiling:
