@@ -44,6 +44,9 @@ class mn_ForLoopNode(Node, AnimationNode):
 		self.removeSockets()
 		fromListSockets, fromSingleSockets = startNode.getSocketDescriptions()
 		
+		if len(fromListSockets) == 0:
+			self.inputs.new("mn_IntegerSocket", "Amount")
+		
 		for socket in fromListSockets:
 			idName = self.getSocketTypeForListSocket(socket.bl_idname)
 			self.inputs.new(idName, socket.customName, socket.identifier + "list")
@@ -57,9 +60,8 @@ class mn_ForLoopNode(Node, AnimationNode):
 		allowCompiling()
 		
 	def removeSockets(self):
+		self.inputs.clear()
 		self.outputs.clear()
-		for i, socket in enumerate(self.inputs):
-			if i > 0: self.inputs.remove(socket)
 			
 	def getSocketTypeForListSocket(self, socketType):
 		listSocketType = getListSocketType(socketType)

@@ -223,7 +223,7 @@ class NetworkCodeGenerator:
 			
 			if len(fromListSockets) == 0:
 				codeLines.append(getNodeInputName(node) + "['List Length'] = " + getNodeInputName(node) + "['Amount']")
-				codeLines.append("for i in range(" + getNodeInputName(node) + "['Amount']):")
+				codeLines.append("for " + getNodeInputName(node) + "['Index'] in range(" + getNodeInputName(node) + "['Amount']):")
 			else:
 				codeLines.append(self.getZipListCode(node, fromListSockets))
 				codeLines.append(getNodeInputName(node) + "['List Length'] = len(zippedList)")

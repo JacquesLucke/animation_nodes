@@ -100,6 +100,7 @@ class mn_ForLoopStartNode(Node, AnimationNode):
 		nodes = getNodesFromTypeWithAttribute("mn_ForLoopNode", "selectedLoop", self.loopName)
 		for node in nodes:
 			node.updateSockets(self)
+		nodeTreeChanged()
 			
 	def getSocketDescriptions(self):
 		fromListSockets = []
