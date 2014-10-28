@@ -30,9 +30,9 @@ class mn_ForLoopNode(Node, AnimationNode):
 		
 	def draw_buttons(self, context, layout):
 		if self.selectedLoop == "NONE":
-			newNode = layout.operator("node.add_node", text = "New Object Loop Start", icon = "PLUS")
+			newNode = layout.operator("node.add_node", text = "New Loop Start", icon = "PLUS")
 			newNode.use_transform = True
-			newNode.type = "mn_EnumerateObjectsStartNode"
+			newNode.type = "mn_ForLoopStartNode"
 		else:
 			layout.prop(self, "selectedLoop")
 		

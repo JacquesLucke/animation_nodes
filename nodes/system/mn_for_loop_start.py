@@ -29,7 +29,7 @@ class mn_ForLoopStartNode(Node, AnimationNode):
 		
 		newNode = row.operator("node.add_node", text = "", icon = "PLUS")
 		newNode.use_transform = True
-		newNode.type = "mn_EnumerateObjectsNode"
+		newNode.type = "mn_ForLoopNode"
 		
 	def execute(self, input):
 		return input
