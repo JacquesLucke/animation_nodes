@@ -25,7 +25,7 @@ class mn_ExpressionNode(Node, AnimationNode):
 		bSocket.customName = "b"
 		bSocket.customNameIsVariable = True
 		bSocket.removeable = True
-		self.inputs.new("mn_EmptySocket", "...")
+		self.inputs.new("mn_EmptySocket", "...").passiveSocketType = "mn_GenericSocket"
 		self.outputs.new("mn_GenericSocket", "Result")
 		allowCompiling()
 		
@@ -48,7 +48,7 @@ class mn_ExpressionNode(Node, AnimationNode):
 				newSocket.customNameIsVariable = True
 				newSocket.removeable = True
 				newSocket.customName = self.getNextCustomName()
-				self.inputs.new("mn_EmptySocket", "...")
+				self.inputs.new("mn_EmptySocket", "...").passiveSocketType = "mn_GenericSocket"
 				self.id_data.links.new(newSocket, fromSocket)	
 		allowCompiling()
 		

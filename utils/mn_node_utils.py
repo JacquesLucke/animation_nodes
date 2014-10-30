@@ -53,3 +53,11 @@ def isCustomSocketNameUsed(node, customName):
 	for socket in node.outputs:
 		if socket.customName == customName: return True
 	return False
+	
+
+def updateDependencyNode(socket):
+	if socket is not None:
+		if len(socket.links) == 1:
+			fromNode = socket.links[0].from_node
+			if hasattr(fromNode, "update"):
+				fromNode.update()

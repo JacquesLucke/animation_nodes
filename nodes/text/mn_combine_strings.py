@@ -3,6 +3,7 @@ from bpy.types import Node
 from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 from mn_utils import *
+from mn_node_utils import *
 
 
 class mn_CombineStringsNode(Node, AnimationNode):
@@ -13,7 +14,7 @@ class mn_CombineStringsNode(Node, AnimationNode):
 		forbidCompiling()
 		self.inputs.new("mn_StringSocket", "1.")
 		self.inputs.new("mn_StringSocket", "2.")
-		self.inputs.new("mn_EmptySocket", "...")
+		self.inputs.new("mn_EmptySocket", "...").passiveSocketType = "mn_StringSocket"
 		self.outputs.new("mn_StringSocket", "Text")
 		allowCompiling()
 		
@@ -30,7 +31,10 @@ class mn_CombineStringsNode(Node, AnimationNode):
 		
 	def update(self):
 		forbidCompiling()
+		
 		socket = self.inputs.get("...")
+		updateDependencyNode(socket)
+		
 		if socket is not None:
 			links = socket.links
 			if len(links) == 1:
@@ -43,7 +47,7 @@ class mn_CombineStringsNode(Node, AnimationNode):
 						self.inputs.remove(socket)
 						newSocketName = str(len(self.inputs) + 1) + "."
 						newSocket = self.inputs.new("mn_StringSocket", newSocketName)
-						self.inputs.new("mn_EmptySocket", "...")
+						self.inputs.new("mn_EmptySocket", "...").passiveSocketType = "mn_StringSocket"
 						self.id_data.links.new(newSocket, fromSocket)
 				
 		allowCompiling()
@@ -63,13 +67,14 @@ class mn_CombineStringsNode(Node, AnimationNode):
 		newSocket = self.inputs.new("mn_StringSocket", newSocketName)
 		self.inputs.move(len(self.inputs) - 1, len(self.inputs) - 2)
 		allowCompiling()
+		nodeTreeChanged()
 		
 	def removeInputSocket(self):
 		forbidCompiling()
 		if len(self.inputs) > 2:
 			self.inputs.remove(self.inputs[len(self.inputs) - 2])
 		allowCompiling()
-		
+		nodeTreeChanged()
 		
 		
 		

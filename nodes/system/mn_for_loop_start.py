@@ -4,6 +4,7 @@ from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 from mn_utils import *
 from mn_node_utils import *
+from mn_socket_info import *
 
 fromListSocketName = "From List"
 fromSingleSocketName = "From Single"
@@ -41,25 +42,36 @@ class mn_ForLoopStartNode(Node, AnimationNode):
 		socket = self.outputs.get(fromListSocketName)
 		targetSocket = self.getValidTargetSocket(socket)
 		if targetSocket is not None:
-			newSocket = self.newOutputSocket(targetSocket)
-			newSocket.loopAsList = True
-			self.id_data.links.new(targetSocket, newSocket)
-			newIndex = self.outputs.find(socket.name)
-			self.outputs.move(len(self.outputs) - 1, newIndex)
-			self.updateCallerNodes()
+			socketType = self.getTargetSocketType(targetSocket)
+			if hasListSocketType(socketType):
+				newSocket = self.newOutputSocket(socketType, namePrefix = targetSocket.name)
+				newSocket.loopAsList = True
+				self.id_data.links.new(targetSocket, newSocket)
+				newIndex = self.outputs.find(socket.name)
+				self.outputs.move(len(self.outputs) - 1, newIndex)
+				self.updateCallerNodes()
+			else:
+				self.id_data.links.remove(socket.links[0])
 			
 			
 		# from single socket
-		socket = self.outputs.get(fromSingleSocketName)
-		targetSocket = self.getValidTargetSocket(socket)
-		if targetSocket is not None:
-			newSocket = self.newOutputSocket(targetSocket)
-			self.id_data.links.new(targetSocket, newSocket)
-			newIndex = self.outputs.find(socket.name)
-			self.outputs.move(len(self.outputs) - 1, newIndex)
-			self.updateCallerNodes()
+		# socket = self.outputs.get(fromSingleSocketName)
+		# targetSocket = self.getValidTargetSocket(socket)
+		# if targetSocket is not None:
+			# newSocket = self.newOutputSocket(targetSocket)
+			# self.id_data.links.new(targetSocket, newSocket)
+			# newIndex = self.outputs.find(socket.name)
+			# self.outputs.move(len(self.outputs) - 1, newIndex)
+			# self.updateCallerNodes()
 			
 		allowCompiling()
+		
+	def getTargetSocketType(self, targetSocket):
+		idName = targetSocket.bl_idname
+		if idName == "mn_EmptySocket":
+			if targetSocket.passiveSocketType != "":
+				idName = targetSocket.passiveSocketType
+		return idName
 		
 	def getValidTargetSocket(self, socket):
 		if socket is None:
@@ -72,22 +84,15 @@ class mn_ForLoopStartNode(Node, AnimationNode):
 			return None
 		return toSocket
 		
-	def newOutputSocket(self, targetSocket):
-		idName = self.correctIdName(targetSocket.bl_idname)
-		
+	def newOutputSocket(self, idName, namePrefix):		
 		socket = self.outputs.new(idName, getNotUsedSocketName(self, prefix = "socket"))
-		socket.customName = getNotUsedCustomSocketName(self, prefix = targetSocket.name)
+		socket.customName = getNotUsedCustomSocketName(self, prefix = namePrefix)
 		targetSocket = None
 		socket.editableCustomName = True
 		socket.callNodeWhenCustomNameChanged = True
 		socket.removeable = True
 		socket.callNodeToRemove = True
 		return socket
-		
-	def correctIdName(self, idName):
-		if idName == "mn_EmptySocket":
-			idName = "mn_GenericSocket"
-		return idName
 		
 	def customSocketNameChanged(self, socket):
 		self.updateCallerNodes()
