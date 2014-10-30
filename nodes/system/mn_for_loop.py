@@ -8,7 +8,7 @@ from mn_socket_info import *
 
 class mn_ForLoopNode(Node, AnimationNode):
 	bl_idname = "mn_ForLoopNode"
-	bl_label = "For Loop"
+	bl_label = "Loop Call"
 	
 	def getStartLoopNodeItems(self, context):
 		startLoopNames = getAttributesFromNodesWithType("mn_ForLoopStartNode", "loopName")

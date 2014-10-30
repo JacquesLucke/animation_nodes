@@ -11,7 +11,7 @@ newOptionSocketName = "New Option"
 
 class mn_ForLoopStartNode(Node, AnimationNode):
 	bl_idname = "mn_ForLoopStartNode"
-	bl_label = "For Loop Start"
+	bl_label = "Loop"
 	
 	def loopNameChanged(self, context):
 		if not self.nameIsChanging:
