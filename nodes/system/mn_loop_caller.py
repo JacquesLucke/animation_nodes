@@ -6,6 +6,8 @@ from mn_utils import *
 from mn_node_utils import *
 from mn_socket_info import *
 
+loopTypes = [("Generic", "NONE"), ("Object", "OBJECT")]
+
 class mn_LoopCallerNode(Node, AnimationNode):
 	bl_idname = "mn_LoopCallerNode"
 	bl_label = "Loop Call"
@@ -33,9 +35,17 @@ class mn_LoopCallerNode(Node, AnimationNode):
 		
 	def draw_buttons(self, context, layout):
 		if self.selectedLoop == "NONE":
-			newNode = layout.operator("node.add_node", text = "New Loop Start", icon = "PLUS")
-			newNode.use_transform = True
-			newNode.type = "mn_LoopStartNode"
+			col = layout.column(align = True)
+			col.label("New Loop:")
+			for loopType in loopTypes:
+				row = col.row()
+				row.scale_y = 1.3
+				newNode = row.operator("node.add_node", text = loopType[0], icon = "PLUS")
+				newNode.use_transform = True
+				newNode.type = "mn_LoopStartNode"
+				setting = newNode.settings.add()
+				setting.name = "preset"
+				setting.value = repr(loopType[1])
 		else:
 			layout.prop(self, "selectedLoop")
 		layout.separator()
