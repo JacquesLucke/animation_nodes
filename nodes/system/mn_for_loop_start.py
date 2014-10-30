@@ -13,15 +13,27 @@ class mn_ForLoopStartNode(Node, AnimationNode):
 	bl_idname = "mn_ForLoopStartNode"
 	bl_label = "For Loop Start"
 	
+	def loopNameChanged(self, context):
+		if not self.nameIsChanging:
+			self.nameIsChanging = True
+			self.loopName = self.getNotUsedLoopName(prefix = self.loopName)
+			self.nameIsChanging = False
 	def allowNewListChanged(self, context):
 		self.outputs.get(newListSocketName).hide = not self.allowNewList
+	def presetChanged(self, context):
+		self.buildPreset()
 	
-	loopName = bpy.props.StringProperty(default = "Object Loop")
+	loopName = bpy.props.StringProperty(default = "Object Loop", update = loopNameChanged)
+	nameIsChanging = bpy.props.BoolProperty(default = False)
 	
 	allowNewList = bpy.props.BoolProperty(default = True, update = allowNewListChanged)
+	preset = bpy.props.StringProperty(default = "", update = presetChanged)
+	
+	boolPresetBuild = bpy.props.BoolProperty(default = False)
 	
 	def init(self, context):
 		forbidCompiling()
+		self.loopName = self.getNotUsedLoopName()
 		self.outputs.new("mn_IntegerSocket", "Index")
 		self.outputs.new("mn_IntegerSocket", "List Length")
 		self.outputs.new("mn_EmptySocket", newListSocketName)
@@ -133,5 +145,28 @@ class mn_ForLoopStartNode(Node, AnimationNode):
 			
 		return (fromListSockets, fromSingleSockets)
 		
+	def buildPreset(self):
+		self.removeDynamicSockets()
+		if self.preset == "OBJECT":
+			objectSocket = self.newOutputSocket("mn_ObjectSocket", namePrefix = "Object")
+			objectSocket.loopAsList = True
+			self.outputs.move(4, 2)
+			self.allowNewList = False
+		self.updateCallerNodes()
+			
+	def removeDynamicSockets(self):
+		for socket in self.outputs:
+			if socket.identifier not in ["Index", "List Length", newListSocketName, newOptionSocketName]:
+				self.outputs.remove(socket)
+	
+	def copy(self, node):
+		self.loopName = self.getNotUsedLoopName()
+		
 	def free(self):
 		self.clearCallerNodes()
+		
+	def getNotUsedLoopName(self, prefix = "Loop"):
+		loopName = prefix
+		while getNodeFromTypeWithAttribute("mn_ForLoopStartNode", "loopName", loopName) not in [self, None]:
+			loopName = prefix + getRandomString(3)
+		return loopName

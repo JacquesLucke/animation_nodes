@@ -83,6 +83,7 @@ def getNodeNameDictionary():
 		
 	nodes.append(("System", [
 		("mn_ForLoopNode", "Loop"),
-		("mn_ForLoopStartNode", "Loop Start", {"allowNewList" : repr(True)}) ] ))
+		("mn_ForLoopStartNode", "Loop Start", {"preset" : repr("NONE")}),
+		("mn_ForLoopStartNode", "Object Loop Start", {"preset" : repr("OBJECT")}) ] ))
 		
 	return nodes
