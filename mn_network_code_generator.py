@@ -204,8 +204,8 @@ class NetworkCodeGenerator:
 		codeLines = []
 		if isExecuteableNode(node) or isInLineNode(node):
 			codeLines.extend(self.getExecutableNodeCode(node))
-		elif isForLoopNode(node):
-			codeLines.extend(self.getForLoopNodeCode(node))
+		elif isLoopNode(node):
+			codeLines.extend(self.getLoopNodeCode(node))
 		return codeLines		
 		
 	def getExecutableNodeCode(self, node):
@@ -214,7 +214,7 @@ class NetworkCodeGenerator:
 		codeLines.extend(self.getNodeExecutionLines(node))
 		if useProfiling: codeLines.append(getNodeTimerName(node) + " += time.clock() - " + getNodeTimerStartName(node))
 		return codeLines
-	def getForLoopNodeCode(self, node):
+	def getLoopNodeCode(self, node):
 		codeLines = []
 		codeLines.append(getNodeInputName(node) + " = " + self.generateInputListString(node))
 		startNode = getCorrespondingStartNode(node)
@@ -406,7 +406,7 @@ def isExecuteableNode(node):
 	return hasattr(node, "execute")
 def isInLineNode(node):
 	return hasattr(node, "getInLineExecutionString")
-def isForLoopNode(node):
+def isLoopNode(node):
 	return node.bl_idname == "mn_LoopCallerNode"
 	
 def usesFastCall(node):
