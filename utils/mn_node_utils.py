@@ -61,6 +61,13 @@ def isCustomSocketNameUsed(node, customName):
 		if socket.customName == customName: return True
 	return False
 	
+	
+def removeLinksFromSocket(socket):
+	if socket is None: return
+	allLinks = socket.node.id_data.links
+	for link in socket.links:
+		allLinks.remove(link)
+	
 
 def updateDependencyNode(socket):
 	if socket is not None:

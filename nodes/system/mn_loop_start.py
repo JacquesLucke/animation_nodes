@@ -74,6 +74,8 @@ class mn_LoopStartNode(Node, AnimationNode):
 				self.updateCallerNodes()
 			else:
 				self.id_data.links.remove(socket.links[0])
+		else:
+			removeLinksFromSocket(socket)
 			
 		# from single socket	
 		socket = self.outputs.get(newOptionSocketName)
@@ -88,6 +90,8 @@ class mn_LoopStartNode(Node, AnimationNode):
 			if targetSocket.bl_idname != "mn_EmptySocket":
 				socketStartValue = (newSocket, targetSocket.getStoreableValue())
 			self.updateCallerNodes(socketStartValue)
+		else:
+			removeLinksFromSocket(socket)
 			
 		allowCompiling()
 		
