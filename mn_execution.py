@@ -73,7 +73,11 @@ def getCodeStrings():
 @persistent
 def frameChangeHandler(scene):
 	if scene.mn_settings.update.frameChange:
-		updateAnimationTrees(False)
+		if isAnimationPlaying():
+			if getCurrentFrame() % (scene.mn_settings.update.skipFramesAmount + 1) == 0:
+				updateAnimationTrees(False)
+		else:
+			updateAnimationTrees(False)
 @persistent
 def sceneUpdateHandler(scene):
 	if scene.mn_settings.update.sceneUpdate and not isAnimationPlaying():

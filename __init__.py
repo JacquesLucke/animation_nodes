@@ -75,6 +75,7 @@ class GlobalUpdateSettings(bpy.types.PropertyGroup):
 	frameChange = BoolProperty(default = True, name = "Frame Change")
 	sceneUpdate = BoolProperty(default = True, name = "Scene Update")
 	propertyChange = BoolProperty(default = True, name = "Property Change")
+	skipFramesAmount = IntProperty(default = 0, name = "Skip Frames", min = 0, soft_max = 10)
 	
 class DeveloperSettings(bpy.types.PropertyGroup):
 	printUpdateTime = BoolProperty(default = False, name = "Print Update Time")

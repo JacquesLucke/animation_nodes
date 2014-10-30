@@ -18,6 +18,7 @@ class AnimationNodesPerformance(bpy.types.Panel):
 		layout.prop(scene.mn_settings.update, "frameChange", text = "Frames Update")
 		layout.prop(scene.mn_settings.update, "sceneUpdate", text = "Scene Update")
 		layout.prop(scene.mn_settings.update, "propertyChange", text = "Property Update")
+		layout.prop(scene.mn_settings.update, "skipFramesAmount")
 	
 class CustomAnimationNodes(bpy.types.Panel):
 	bl_idname = "mn.custom_nodes_panel"
