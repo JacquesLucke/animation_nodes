@@ -1,6 +1,13 @@
 import bpy
 from mn_utils import *
 
+def getAttributesFromNodesWithType(nodeType, attribute):
+	data = []
+	nodes = getNodesFromType(nodeType)
+	for node in nodes:
+		data.append(getattr(node, attribute))
+	return data
+
 def getNodeFromTypeWithAttribute(nodeType, attribute, data):
 	nodes = getNodesFromTypeWithAttribute(nodeType, attribute, data)
 	if len(nodes) > 0: return nodes[0]

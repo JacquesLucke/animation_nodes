@@ -11,10 +11,12 @@ class mn_ForLoopNode(Node, AnimationNode):
 	bl_label = "For Loop"
 	
 	def getStartLoopNodeItems(self, context):
-		startLoopNodes = getNodesFromType("mn_ForLoopStartNode")
+		startLoopNames = getAttributesFromNodesWithType("mn_ForLoopStartNode", "loopName")
+		startLoopNames.sort()
+		startLoopNames.reverse()
 		startLoopItems = []
-		for node in startLoopNodes:
-			startLoopItems.append((node.loopName, node.loopName, ""))
+		for loopName in startLoopNames:
+			startLoopItems.append((loopName, loopName, ""))
 		if len(startLoopItems) == 0: startLoopItems.append(("NONE", "NONE", ""))
 		return startLoopItems
 	def selectedLoopStarterChanged(self, context):
