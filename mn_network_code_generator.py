@@ -225,7 +225,8 @@ class NetworkCodeGenerator:
 				codeLines.append(getNodeInputName(node) + "['List Length'] = " + getNodeInputName(node) + "['Amount']")
 				codeLines.append("for " + getNodeInputName(node) + "['Index'] in range(" + getNodeInputName(node) + "['Amount']):")
 			else:
-				codeLines.append(self.getZipListCode(node, fromListSockets))
+				codeLines.append("try: " + self.getZipListCode(node, fromListSockets))
+				codeLines.append("except: zippedList = []")
 				codeLines.append(getNodeInputName(node) + "['List Length'] = len(zippedList)")
 				codeLines.append(self.getEnumerateLoopHeader(node, fromListSockets))
 			
