@@ -14,6 +14,13 @@ class mn_TextOutputNode(Node, AnimationNode):
 		self.inputs.new("mn_FloatSocket", "Size").number = 1.0
 		self.inputs.new("mn_FloatSocket", "Shear").number = 0.0
 		self.inputs.new("mn_FloatSocket", "Extrude").number = 0.0
+		
+		self.inputs.new("mn_FloatSocket", "Letter Spacing").number = 1.0
+		self.inputs.new("mn_FloatSocket", "Word Spacing").number = 1.0
+		self.inputs.new("mn_FloatSocket", "Line Spacing").number = 1.0
+		
+		self.inputs.new("mn_FloatSocket", "X Offset").number = 0.0
+		self.inputs.new("mn_FloatSocket", "Y Offset").number = 0.0
 		allowCompiling()
 		
 	def execute(self, input):
@@ -28,6 +35,13 @@ class mn_TextOutputNode(Node, AnimationNode):
 			textObject.size = input["Size"]
 			textObject.shear = input["Shear"]
 			textObject.extrude = input["Extrude"]
+			
+			textObject.space_character = input["Letter Spacing"]
+			textObject.space_word = input["Word Spacing"]
+			textObject.space_line = input["Line Spacing"]
+			
+			textObject.offset_x = input["X Offset"]
+			textObject.offset_y = input["Y Offset"]
 		
 		output = {}
 		return output
