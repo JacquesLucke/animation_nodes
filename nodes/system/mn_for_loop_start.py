@@ -53,16 +53,16 @@ class mn_ForLoopStartNode(Node, AnimationNode):
 			else:
 				self.id_data.links.remove(socket.links[0])
 			
-			
-		# from single socket
-		# socket = self.outputs.get(fromSingleSocketName)
-		# targetSocket = self.getValidTargetSocket(socket)
-		# if targetSocket is not None:
-			# newSocket = self.newOutputSocket(targetSocket)
-			# self.id_data.links.new(targetSocket, newSocket)
-			# newIndex = self.outputs.find(socket.name)
-			# self.outputs.move(len(self.outputs) - 1, newIndex)
-			# self.updateCallerNodes()
+		# from single socket	
+		socket = self.outputs.get(fromSingleSocketName)
+		targetSocket = self.getValidTargetSocket(socket)
+		if targetSocket is not None:
+			socketType = self.getTargetSocketType(targetSocket)
+			newSocket = self.newOutputSocket(socketType, namePrefix = targetSocket.name)
+			self.id_data.links.new(targetSocket, newSocket)
+			newIndex = self.outputs.find(socket.name)
+			self.outputs.move(len(self.outputs) - 1, newIndex)
+			self.updateCallerNodes()
 			
 		allowCompiling()
 		
