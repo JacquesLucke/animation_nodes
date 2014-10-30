@@ -21,15 +21,13 @@ class mn_LoopCallerNode(Node, AnimationNode):
 			startLoopItems.append((loopName, loopName, ""))
 		if len(startLoopItems) == 0: startLoopItems.append(("NONE", "NONE", ""))
 		return startLoopItems
-	def selectedLoopStarterChanged(self, context):
+	def selectedLoopChanged(self, context):
 		self.updateSockets(self.getStartNode())
 	
-	selectedLoop = bpy.props.EnumProperty(items = getStartLoopNodeItems, name = "Loop", update=selectedLoopStarterChanged)
+	selectedLoop = bpy.props.EnumProperty(items = getStartLoopNodeItems, name = "Loop", update=selectedLoopChanged)
 	
 	def init(self, context):
 		forbidCompiling()
-		self.inputs.new("mn_IntegerSocket", "Amount")
-		
 		self.updateSockets(self.getStartNode())
 		allowCompiling()
 		
@@ -60,7 +58,6 @@ class mn_LoopCallerNode(Node, AnimationNode):
 			fromListSockets, fromSingleSockets = startNode.getSocketDescriptions()
 			
 			self.inputs["Amount"].hide = len(fromListSockets) != 0
-				
 			
 			for socket in fromListSockets:
 				idName = self.getSocketTypeForListSocket(socket.bl_idname)

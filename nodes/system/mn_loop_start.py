@@ -25,11 +25,8 @@ class mn_LoopStartNode(Node, AnimationNode):
 	
 	loopName = bpy.props.StringProperty(default = "Object Loop", update = loopNameChanged)
 	nameIsChanging = bpy.props.BoolProperty(default = False)
-	
 	allowNewList = bpy.props.BoolProperty(default = True, update = allowNewListChanged)
 	preset = bpy.props.StringProperty(default = "", update = presetChanged)
-	
-	boolPresetBuild = bpy.props.BoolProperty(default = False)
 	
 	def init(self, context):
 		forbidCompiling()
@@ -87,7 +84,6 @@ class mn_LoopStartNode(Node, AnimationNode):
 			self.id_data.links.new(targetSocket, newSocket)
 			newIndex = self.outputs.find(socket.name)
 			self.outputs.move(len(self.outputs) - 1, newIndex)
-			
 			socketStartValue = (None, None)
 			if targetSocket.bl_idname != "mn_EmptySocket":
 				socketStartValue = (newSocket, targetSocket.getStoreableValue())
