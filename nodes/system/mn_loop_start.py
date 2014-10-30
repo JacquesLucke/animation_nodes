@@ -95,13 +95,6 @@ class mn_LoopStartNode(Node, AnimationNode):
 			
 		allowCompiling()
 		
-	def getTargetSocketType(self, targetSocket):
-		idName = targetSocket.bl_idname
-		if idName == "mn_EmptySocket":
-			if targetSocket.passiveSocketType != "":
-				idName = targetSocket.passiveSocketType
-		return idName
-		
 	def getValidTargetSocket(self, socket):
 		if socket is None:
 			return None
@@ -113,6 +106,13 @@ class mn_LoopStartNode(Node, AnimationNode):
 			return None
 		return toSocket
 		
+	def getTargetSocketType(self, targetSocket):
+		idName = targetSocket.bl_idname
+		if idName == "mn_EmptySocket":
+			if targetSocket.passiveSocketType != "":
+				idName = targetSocket.passiveSocketType
+		return idName
+		
 	def newOutputSocket(self, idName, namePrefix):		
 		socket = self.outputs.new(idName, getNotUsedSocketName(self, prefix = "socket"))
 		socket.customName = getNotUsedCustomSocketName(self, prefix = namePrefix)
@@ -122,13 +122,6 @@ class mn_LoopStartNode(Node, AnimationNode):
 		socket.removeable = True
 		socket.callNodeToRemove = True
 		return socket
-		
-	def customSocketNameChanged(self, socket):
-		self.updateCallerNodes()
-		
-	def removeSocket(self, socket):
-		self.outputs.remove(socket)
-		self.updateCallerNodes()
 		
 	def updateCallerNodes(self, socketStartValue = (None, None)):
 		nodes = getNodesFromTypeWithAttribute("mn_LoopCallerNode", "selectedLoop", self.loopName)
@@ -152,6 +145,12 @@ class mn_LoopStartNode(Node, AnimationNode):
 			
 		return (fromListSockets, fromSingleSockets)
 		
+	def getNotUsedLoopName(self, prefix = "Loop"):
+		loopName = prefix
+		while getNodeFromTypeWithAttribute("mn_LoopStartNode", "loopName", loopName) not in [self, None]:
+			loopName = prefix + getRandomString(3)
+		return loopName
+		
 	def buildPreset(self):
 		self.removeDynamicSockets()
 		if self.preset == "OBJECT":
@@ -165,15 +164,16 @@ class mn_LoopStartNode(Node, AnimationNode):
 		for socket in self.outputs:
 			if socket.identifier not in ["Index", "List Length", newListSocketName, newOptionSocketName]:
 				self.outputs.remove(socket)
+				
+	def customSocketNameChanged(self, socket):
+		self.updateCallerNodes()
+		
+	def removeSocket(self, socket):
+		self.outputs.remove(socket)
+		self.updateCallerNodes()
 	
 	def copy(self, node):
 		self.loopName = self.getNotUsedLoopName()
 		
 	def free(self):
 		self.clearCallerNodes()
-		
-	def getNotUsedLoopName(self, prefix = "Loop"):
-		loopName = prefix
-		while getNodeFromTypeWithAttribute("mn_LoopStartNode", "loopName", loopName) not in [self, None]:
-			loopName = prefix + getRandomString(3)
-		return loopName
