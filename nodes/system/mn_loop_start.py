@@ -50,6 +50,9 @@ class mn_LoopStartNode(Node, AnimationNode):
 		newNode = row.operator("node.add_node", text = "", icon = "PLUS")
 		newNode.use_transform = True
 		newNode.type = "mn_LoopCallerNode"
+		setting = newNode.settings.add()
+		setting.name = "selectedLoop"
+		setting.value = repr(self.loopName)
 		
 	def draw_buttons_ext(self, context, layout):
 		layout.prop(self, "allowNewList", text = "Allow New List")
