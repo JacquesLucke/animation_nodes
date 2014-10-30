@@ -13,7 +13,7 @@ class mn_ObjectOutputNode(Node, AnimationNode):
 	
 	def init(self, context):
 		forbidCompiling()
-		self.inputs.new("mn_ObjectSocket", "Object")
+		self.inputs.new("mn_ObjectSocket", "Object").showName = False
 		self.inputs.new("mn_VectorSocket", "Location")
 		self.inputs.new("mn_VectorSocket", "Rotation")
 		self.inputs.new("mn_VectorSocket", "Scale").vector = (1, 1, 1)

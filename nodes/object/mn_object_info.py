@@ -20,7 +20,7 @@ class mn_ObjectInfoNode(Node, AnimationNode):
 	
 	def init(self, context):
 		forbidCompiling()
-		self.inputs.new("mn_ObjectSocket", "Object")
+		self.inputs.new("mn_ObjectSocket", "Object").showName = False
 		self.inputs.new("mn_FloatSocket", "Frame")
 		self.outputs.new("mn_VectorSocket", "Location")
 		self.outputs.new("mn_VectorSocket", "Rotation")

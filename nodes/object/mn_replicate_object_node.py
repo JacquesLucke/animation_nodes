@@ -26,7 +26,7 @@ class mn_ReplicateObjectNode(Node, AnimationNode):
 	
 	def init(self, context):
 		forbidCompiling()
-		self.inputs.new("mn_ObjectSocket", "Object")
+		self.inputs.new("mn_ObjectSocket", "Object").showName = False
 		self.inputs.new("mn_IntegerSocket", "Instances")
 		self.outputs.new("mn_ObjectListSocket", "Objects")
 		allowCompiling()

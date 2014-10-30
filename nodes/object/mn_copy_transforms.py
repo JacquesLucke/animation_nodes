@@ -22,10 +22,8 @@ class mn_CopyTransformsNode(Node, AnimationNode):
 	
 	def init(self, context):
 		forbidCompiling()
-		fromSocket = self.inputs.new("mn_ObjectSocket", "From")
-		fromSocket.showName = True
-		toSocket = self.inputs.new("mn_ObjectSocket", "To")
-		toSocket.showName = True
+		self.inputs.new("mn_ObjectSocket", "From")
+		self.inputs.new("mn_ObjectSocket", "To")
 		self.inputs.new("mn_FloatSocket", "Frame")
 		self.outputs.new("mn_ObjectSocket", "To")
 		self.width = 200

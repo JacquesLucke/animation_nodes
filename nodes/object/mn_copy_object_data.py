@@ -10,8 +10,8 @@ class mn_CopyObjectData(Node, AnimationNode):
 	
 	def init(self, context):
 		forbidCompiling()
-		self.inputs.new("mn_ObjectSocket", "From").showName = True
-		self.inputs.new("mn_ObjectSocket", "To").showName = True
+		self.inputs.new("mn_ObjectSocket", "From")
+		self.inputs.new("mn_ObjectSocket", "To")
 		self.outputs.new("mn_ObjectSocket", "To")
 		allowCompiling()
 		

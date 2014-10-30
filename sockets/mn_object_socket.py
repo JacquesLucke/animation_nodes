@@ -10,7 +10,7 @@ class mn_ObjectSocket(mn_BaseSocket, mn_SocketProperties):
 	drawColor = (0, 0, 0, 1)
 	
 	objectName = bpy.props.StringProperty(update = nodePropertyChanged)
-	showName = bpy.props.BoolProperty(default = False)
+	showName = bpy.props.BoolProperty(default = True)
 	
 	def drawInput(self, layout, node, text):
 		col = layout.column()
