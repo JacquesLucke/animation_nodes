@@ -15,39 +15,13 @@ class AnimationNodeTree(bpy.types.NodeTree):
 		nodeTreeChanged()
 		
 		
+		
 class AnimationNode:
 	@classmethod
 	def poll(cls, nodeTree):
 		return nodeTree == "AnimationNodeTreeType"
 		
-		
-def customNameChanged(self, context):
-	if not self.customNameIsUpdating:
-		self.customNameIsUpdating = True
-		if self.customNameIsVariable:
-			newCustomName = ""
-			for char in self.customName:
-				if char.isalpha(): newCustomName += char
-			self.customName = newCustomName
-		if self.uniqueCustomName:
-			customName = self.customName
-			self.customName = "temporary name to avoid some errors"
-			self.customName = getNotUsedCustomName(self.node, prefix = customName)
-		if self.callNodeWhenCustomNameChanged:
-			self.node.customSocketNameChanged(self)
-		self.customNameIsUpdating = False
-		nodeTreeChanged()
-def getNotUsedCustomName(node, prefix):
-	customName = prefix
-	while isCustomNameUsed(node, customName):
-		customName = prefix + getRandomString(3)
-	return customName
-def isCustomNameUsed(node, name):
-	for socket in node.inputs:
-		if socket.customName == name: return True
-	for socket in node.outputs:
-		if socket.customName == name: return True
-	return False
+
 		
 class mn_SocketProperties:
 	editableCustomName = BoolProperty(default = False)
@@ -82,6 +56,36 @@ class mn_BaseSocket(NodeSocket):
 			
 	def draw_color(self, context, node):
 		return self.drawColor
+		
+		
+def customNameChanged(self, context):
+	if not self.customNameIsUpdating:
+		self.customNameIsUpdating = True
+		if self.customNameIsVariable:
+			newCustomName = ""
+			for char in self.customName:
+				if char.isalpha(): newCustomName += char
+			self.customName = newCustomName
+		if self.uniqueCustomName:
+			customName = self.customName
+			self.customName = "temporary name to avoid some errors"
+			self.customName = getNotUsedCustomName(self.node, prefix = customName)
+		if self.callNodeWhenCustomNameChanged:
+			self.node.customSocketNameChanged(self)
+		self.customNameIsUpdating = False
+		nodeTreeChanged()
+def getNotUsedCustomName(node, prefix):
+	customName = prefix
+	while isCustomNameUsed(node, customName):
+		customName = prefix + getRandomString(3)
+	return customName
+def isCustomNameUsed(node, name):
+	for socket in node.inputs:
+		if socket.customName == name: return True
+	for socket in node.outputs:
+		if socket.customName == name: return True
+	return False
+	
 		
 class RemoveSocketOperator(bpy.types.Operator):
 	bl_idname = "mn.remove_socket"
