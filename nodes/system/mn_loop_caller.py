@@ -6,12 +6,12 @@ from mn_utils import *
 from mn_node_utils import *
 from mn_socket_info import *
 
-class mn_ForLoopNode(Node, AnimationNode):
-	bl_idname = "mn_ForLoopNode"
+class mn_LoopCallerNode(Node, AnimationNode):
+	bl_idname = "mn_LoopCallerNode"
 	bl_label = "Loop Call"
 	
 	def getStartLoopNodeItems(self, context):
-		startLoopNames = getAttributesFromNodesWithType("mn_ForLoopStartNode", "loopName")
+		startLoopNames = getAttributesFromNodesWithType("mn_LoopStartNode", "loopName")
 		startLoopNames.sort()
 		startLoopNames.reverse()
 		startLoopItems = []
@@ -35,7 +35,7 @@ class mn_ForLoopNode(Node, AnimationNode):
 		if self.selectedLoop == "NONE":
 			newNode = layout.operator("node.add_node", text = "New Loop Start", icon = "PLUS")
 			newNode.use_transform = True
-			newNode.type = "mn_ForLoopStartNode"
+			newNode.type = "mn_LoopStartNode"
 		else:
 			layout.prop(self, "selectedLoop")
 		layout.separator()
@@ -83,4 +83,4 @@ class mn_ForLoopNode(Node, AnimationNode):
 		return listSocketType
 
 	def getStartNode(self):
-		return getNodeFromTypeWithAttribute("mn_ForLoopStartNode", "loopName", self.selectedLoop)
+		return getNodeFromTypeWithAttribute("mn_LoopStartNode", "loopName", self.selectedLoop)

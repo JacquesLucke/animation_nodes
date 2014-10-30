@@ -82,8 +82,8 @@ def getNodeNameDictionary():
 		("mn_ExpressionNode", "Expression") ] ))
 		
 	nodes.append(("System", [
-		("mn_ForLoopNode", "Loop Caller"),
-		("mn_ForLoopStartNode", "Generic Loop", {"preset" : repr("NONE")}),
-		("mn_ForLoopStartNode", "Object Loop", {"preset" : repr("OBJECT")}) ] ))
+		("mn_LoopCallerNode", "Loop Caller"),
+		("mn_LoopStartNode", "Generic Loop", {"preset" : repr("NONE")}),
+		("mn_LoopStartNode", "Object Loop", {"preset" : repr("OBJECT")}) ] ))
 		
 	return nodes

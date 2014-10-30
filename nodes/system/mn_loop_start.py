@@ -9,8 +9,8 @@ from mn_socket_info import *
 newListSocketName = "New List"
 newOptionSocketName = "New Option"
 
-class mn_ForLoopStartNode(Node, AnimationNode):
-	bl_idname = "mn_ForLoopStartNode"
+class mn_LoopStartNode(Node, AnimationNode):
+	bl_idname = "mn_LoopStartNode"
 	bl_label = "Loop"
 	
 	def loopNameChanged(self, context):
@@ -49,7 +49,7 @@ class mn_ForLoopStartNode(Node, AnimationNode):
 		
 		newNode = row.operator("node.add_node", text = "", icon = "PLUS")
 		newNode.use_transform = True
-		newNode.type = "mn_ForLoopNode"
+		newNode.type = "mn_LoopCallerNode"
 		
 	def draw_buttons_ext(self, context, layout):
 		layout.prop(self, "allowNewList", text = "Allow New List")
@@ -128,13 +128,13 @@ class mn_ForLoopStartNode(Node, AnimationNode):
 		self.updateCallerNodes()
 		
 	def updateCallerNodes(self, socketStartValue = (None, None)):
-		nodes = getNodesFromTypeWithAttribute("mn_ForLoopNode", "selectedLoop", self.loopName)
+		nodes = getNodesFromTypeWithAttribute("mn_LoopCallerNode", "selectedLoop", self.loopName)
 		for node in nodes:
 			node.updateSockets(self, socketStartValue)
 		nodeTreeChanged()
 		
 	def clearCallerNodes(self):
-		nodes = getNodesFromTypeWithAttribute("mn_ForLoopNode", "selectedLoop", self.loopName)
+		nodes = getNodesFromTypeWithAttribute("mn_LoopCallerNode", "selectedLoop", self.loopName)
 		for node in nodes:
 			node.loopRemoved()
 			
@@ -171,6 +171,6 @@ class mn_ForLoopStartNode(Node, AnimationNode):
 		
 	def getNotUsedLoopName(self, prefix = "Loop"):
 		loopName = prefix
-		while getNodeFromTypeWithAttribute("mn_ForLoopStartNode", "loopName", loopName) not in [self, None]:
+		while getNodeFromTypeWithAttribute("mn_LoopStartNode", "loopName", loopName) not in [self, None]:
 			loopName = prefix + getRandomString(3)
 		return loopName

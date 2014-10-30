@@ -41,14 +41,14 @@ def sortNetworks(nodeNetworks):
 def getNetworkType(network):
 	loopStarterAmount = 0
 	for node in network:
-		if node.bl_idname == "mn_ForLoopStartNode":
+		if node.bl_idname == "mn_LoopStartNode":
 			loopStarterAmount += 1
 	if loopStarterAmount == 0: return "Normal"
 	elif loopStarterAmount == 1: return "Loop"
 	return "Invalid"
 def getSubProgramStartNode(network):
 	for node in network:
-		if node.bl_idname == "mn_ForLoopStartNode":
+		if node.bl_idname == "mn_LoopStartNode":
 			return node
 			
 idCounter = 0
@@ -407,7 +407,7 @@ def isExecuteableNode(node):
 def isInLineNode(node):
 	return hasattr(node, "getInLineExecutionString")
 def isForLoopNode(node):
-	return node.bl_idname == "mn_ForLoopNode"
+	return node.bl_idname == "mn_LoopCallerNode"
 	
 def usesFastCall(node):
 	if hasattr(node, "getInputSocketNames"):
