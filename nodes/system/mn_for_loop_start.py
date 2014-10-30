@@ -84,7 +84,11 @@ class mn_ForLoopStartNode(Node, AnimationNode):
 			self.id_data.links.new(targetSocket, newSocket)
 			newIndex = self.outputs.find(socket.name)
 			self.outputs.move(len(self.outputs) - 1, newIndex)
-			self.updateCallerNodes(socketStartValue = (newSocket, targetSocket.getStoreableValue()))
+			
+			socketStartValue = (None, None)
+			if targetSocket.bl_idname != "mn_EmptySocket":
+				socketStartValue = (newSocket, targetSocket.getStoreableValue())
+			self.updateCallerNodes(socketStartValue)
 			
 		allowCompiling()
 		
