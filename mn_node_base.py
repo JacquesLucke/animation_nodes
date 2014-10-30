@@ -23,17 +23,6 @@ class AnimationNode:
 		
 
 		
-class mn_SocketProperties:
-	editableCustomName = BoolProperty(default = False)
-	customName = StringProperty(default = "custom name", update = customNameChanged)
-	uniqueCustomName = BoolProperty(default = True)
-	customNameIsVariable = BoolProperty(default = False)
-	customNameIsUpdating = BoolProperty(default = False)
-	removeable = BoolProperty(default = False)
-	callNodeToRemove = BoolProperty(default = False)
-	callNodeWhenCustomNameChanged = BoolProperty(default = False)
-	loopAsList = BoolProperty(default = False)
-		
 class mn_BaseSocket(NodeSocket):
 	bl_idname = "mn_BaseSocket"
 	bl_label = "Base Socket"
@@ -85,6 +74,18 @@ def isCustomNameUsed(node, name):
 	for socket in node.outputs:
 		if socket.customName == name: return True
 	return False
+	
+	
+class mn_SocketProperties:
+	editableCustomName = BoolProperty(default = False)
+	customName = StringProperty(default = "custom name", update = customNameChanged)
+	uniqueCustomName = BoolProperty(default = True)
+	customNameIsVariable = BoolProperty(default = False)
+	customNameIsUpdating = BoolProperty(default = False)
+	removeable = BoolProperty(default = False)
+	callNodeToRemove = BoolProperty(default = False)
+	callNodeWhenCustomNameChanged = BoolProperty(default = False)
+	loopAsList = BoolProperty(default = False)
 	
 		
 class RemoveSocketOperator(bpy.types.Operator):
