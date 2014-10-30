@@ -21,6 +21,7 @@ class mn_ForLoopNode(Node, AnimationNode):
 		self.updateSockets(self.getStartNode())
 	
 	selectedLoop = bpy.props.EnumProperty(items = getStartLoopNodeItems, name = "Loop", update=selectedLoopStarterChanged)
+	executeLoop = bpy.props.BoolProperty(name = "Execute Loop", default = True)
 	
 	def init(self, context):
 		forbidCompiling()
@@ -34,6 +35,8 @@ class mn_ForLoopNode(Node, AnimationNode):
 			newNode.type = "mn_ForLoopStartNode"
 		else:
 			layout.prop(self, "selectedLoop")
+		
+		layout.prop(self, "executeLoop", text = "Execute Loop")
 		
 	def updateSockets(self, startNode):
 		forbidCompiling()
