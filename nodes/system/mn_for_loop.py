@@ -25,6 +25,8 @@ class mn_ForLoopNode(Node, AnimationNode):
 	def init(self, context):
 		forbidCompiling()
 		self.inputs.new("mn_IntegerSocket", "Amount")
+		
+		self.updateSockets(self.getStartNode())
 		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
@@ -34,31 +36,42 @@ class mn_ForLoopNode(Node, AnimationNode):
 			newNode.type = "mn_ForLoopStartNode"
 		else:
 			layout.prop(self, "selectedLoop")
+		layout.separator()
 		
 	def updateSockets(self, startNode):
 		forbidCompiling()
-		connections = getConnectionDictionaries(self)
-		self.removeSockets()
-		fromListSockets, fromSingleSockets = startNode.getSocketDescriptions()
-		
-		if len(fromListSockets) == 0:
-			self.inputs.new("mn_IntegerSocket", "Amount")
-		
-		for socket in fromListSockets:
-			idName = self.getSocketTypeForListSocket(socket.bl_idname)
-			self.inputs.new(idName, socket.customName, socket.identifier + "list")
-			self.outputs.new(idName, socket.customName, socket.identifier + "list")
+		if startNode is None:
+			self.resetSockets()
+		else:
+			connections = getConnectionDictionaries(self)
+			self.resetSockets()
+			fromListSockets, fromSingleSockets = startNode.getSocketDescriptions()
 			
-		for socket in fromSingleSockets:
-			self.inputs.new(socket.bl_idname, socket.customName, socket.identifier)
-			self.outputs.new(socket.bl_idname, socket.customName, socket.identifier)
+			self.inputs["Amount"].hide = len(fromListSockets) != 0
+				
 			
-		tryToSetConnectionDictionaries(self, connections)
+			for socket in fromListSockets:
+				idName = self.getSocketTypeForListSocket(socket.bl_idname)
+				self.inputs.new(idName, socket.customName, socket.identifier + "list")
+				self.outputs.new(idName, socket.customName, socket.identifier + "list")
+				
+			for socket in fromSingleSockets:
+				self.inputs.new(socket.bl_idname, socket.customName, socket.identifier)
+				self.outputs.new(socket.bl_idname, socket.customName, socket.identifier)
+				
+			tryToSetConnectionDictionaries(self, connections)
 		allowCompiling()
 		
-	def removeSockets(self):
+	def loopRemoved(self):
+		self.resetSockets()
+		self.inputs["Amount"].hide = True
+		
+	def resetSockets(self):
+		forbidCompiling()
 		self.inputs.clear()
 		self.outputs.clear()
+		self.inputs.new("mn_IntegerSocket", "Amount")
+		allowCompiling()
 			
 	def getSocketTypeForListSocket(self, socketType):
 		listSocketType = getListSocketType(socketType)

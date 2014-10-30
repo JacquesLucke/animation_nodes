@@ -21,6 +21,7 @@ class mn_ForLoopStartNode(Node, AnimationNode):
 		self.outputs.new("mn_IntegerSocket", "List Length")
 		self.outputs.new("mn_EmptySocket", fromListSocketName)
 		self.outputs.new("mn_EmptySocket", fromSingleSocketName)
+		self.updateCallerNodes()
 		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
@@ -106,6 +107,11 @@ class mn_ForLoopStartNode(Node, AnimationNode):
 		for node in nodes:
 			node.updateSockets(self)
 		nodeTreeChanged()
+		
+	def clearCallerNodes(self):
+		nodes = getNodesFromTypeWithAttribute("mn_ForLoopNode", "selectedLoop", self.loopName)
+		for node in nodes:
+			node.loopRemoved()
 			
 	def getSocketDescriptions(self):
 		fromListSockets = []
@@ -117,3 +123,6 @@ class mn_ForLoopStartNode(Node, AnimationNode):
 				else: fromSingleSockets.append(socket)
 			
 		return (fromListSockets, fromSingleSockets)
+		
+	def free(self):
+		self.clearCallerNodes()
