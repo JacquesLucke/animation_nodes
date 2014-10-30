@@ -40,7 +40,7 @@ class mn_ForLoopNode(Node, AnimationNode):
 			layout.prop(self, "selectedLoop")
 		layout.separator()
 		
-	def updateSockets(self, startNode):
+	def updateSockets(self, startNode, socketStartValue = (None, None)):
 		forbidCompiling()
 		if startNode is None:
 			self.resetSockets()
@@ -58,7 +58,9 @@ class mn_ForLoopNode(Node, AnimationNode):
 				self.outputs.new(idName, socket.customName, socket.identifier + "list")
 				
 			for socket in fromSingleSockets:
-				self.inputs.new(socket.bl_idname, socket.customName, socket.identifier)
+				inputSocket = self.inputs.new(socket.bl_idname, socket.customName, socket.identifier)
+				if socket == socketStartValue[0]:
+					inputSocket.setStoreableValue(socketStartValue[1])
 				self.outputs.new(socket.bl_idname, socket.customName, socket.identifier)
 				
 			tryToSetConnectionDictionaries(self, connections)

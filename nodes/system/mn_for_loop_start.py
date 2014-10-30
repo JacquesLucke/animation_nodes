@@ -84,7 +84,7 @@ class mn_ForLoopStartNode(Node, AnimationNode):
 			self.id_data.links.new(targetSocket, newSocket)
 			newIndex = self.outputs.find(socket.name)
 			self.outputs.move(len(self.outputs) - 1, newIndex)
-			self.updateCallerNodes()
+			self.updateCallerNodes(socketStartValue = (newSocket, targetSocket.getStoreableValue()))
 			
 		allowCompiling()
 		
@@ -123,10 +123,10 @@ class mn_ForLoopStartNode(Node, AnimationNode):
 		self.outputs.remove(socket)
 		self.updateCallerNodes()
 		
-	def updateCallerNodes(self):
+	def updateCallerNodes(self, socketStartValue = (None, None)):
 		nodes = getNodesFromTypeWithAttribute("mn_ForLoopNode", "selectedLoop", self.loopName)
 		for node in nodes:
-			node.updateSockets(self)
+			node.updateSockets(self, socketStartValue)
 		nodeTreeChanged()
 		
 	def clearCallerNodes(self):
