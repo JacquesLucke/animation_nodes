@@ -29,14 +29,30 @@ def customNameChanged(self, context):
 			for char in self.customName:
 				if char.isalpha(): newCustomName += char
 			self.customName = newCustomName
-		self.customNameIsUpdating = False
+		if self.uniqueCustomName:
+			customName = self.customName
+			self.customName = "temporary name to avoid some errors"
+			self.customName = getNotUsedCustomName(self.node, prefix = customName)
 		if self.callNodeWhenCustomNameChanged:
 			self.node.customSocketNameChanged(self)
+		self.customNameIsUpdating = False
 		nodeTreeChanged()
+def getNotUsedCustomName(node, prefix):
+	customName = prefix
+	while isCustomNameUsed(node, customName):
+		customName = prefix + getRandomString(3)
+	return customName
+def isCustomNameUsed(node, name):
+	for socket in node.inputs:
+		if socket.customName == name: return True
+	for socket in node.outputs:
+		if socket.customName == name: return True
+	return False
 		
 class mn_SocketProperties:
 	editableCustomName = BoolProperty(default = False)
 	customName = StringProperty(default = "custom name", update = customNameChanged)
+	uniqueCustomName = BoolProperty(default = True)
 	customNameIsVariable = BoolProperty(default = False)
 	customNameIsUpdating = BoolProperty(default = False)
 	removeable = BoolProperty(default = False)
