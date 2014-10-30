@@ -6,21 +6,27 @@ from mn_utils import *
 from mn_node_utils import *
 from mn_socket_info import *
 
-fromListSocketName = "From List"
-fromSingleSocketName = "From Single"
+newListSocketName = "New List"
+newOptionSocketName = "New Option"
 
 class mn_ForLoopStartNode(Node, AnimationNode):
 	bl_idname = "mn_ForLoopStartNode"
 	bl_label = "For Loop Start"
 	
+	def allowNewListChanged(self, context):
+		self.outputs.get(newListSocketName).hide = not self.allowNewList
+	
 	loopName = bpy.props.StringProperty(default = "Object Loop")
+	
+	allowNewList = bpy.props.BoolProperty(default = True, update = allowNewListChanged)
 	
 	def init(self, context):
 		forbidCompiling()
 		self.outputs.new("mn_IntegerSocket", "Index")
 		self.outputs.new("mn_IntegerSocket", "List Length")
-		self.outputs.new("mn_EmptySocket", fromListSocketName)
-		self.outputs.new("mn_EmptySocket", fromSingleSocketName)
+		self.outputs.new("mn_EmptySocket", newListSocketName)
+		self.outputs.new("mn_EmptySocket", newOptionSocketName)
+		self.outputs.get(newListSocketName).hide = not self.allowNewList
 		self.updateCallerNodes()
 		allowCompiling()
 		
@@ -33,6 +39,9 @@ class mn_ForLoopStartNode(Node, AnimationNode):
 		newNode.use_transform = True
 		newNode.type = "mn_ForLoopNode"
 		
+	def draw_buttons_ext(self, context, layout):
+		layout.prop(self, "allowNewList", text = "Allow New List")
+		
 	def execute(self, input):
 		return input
 		
@@ -40,7 +49,7 @@ class mn_ForLoopStartNode(Node, AnimationNode):
 		forbidCompiling()
 		
 		# from list socket
-		socket = self.outputs.get(fromListSocketName)
+		socket = self.outputs.get(newListSocketName)
 		targetSocket = self.getValidTargetSocket(socket)
 		if targetSocket is not None:
 			socketType = self.getTargetSocketType(targetSocket)
@@ -55,7 +64,7 @@ class mn_ForLoopStartNode(Node, AnimationNode):
 				self.id_data.links.remove(socket.links[0])
 			
 		# from single socket	
-		socket = self.outputs.get(fromSingleSocketName)
+		socket = self.outputs.get(newOptionSocketName)
 		targetSocket = self.getValidTargetSocket(socket)
 		if targetSocket is not None:
 			socketType = self.getTargetSocketType(targetSocket)
