@@ -235,6 +235,7 @@ class NetworkCodeGenerator:
 		codeLines.append(getNodeOutputName(node) + " = " + getNodeInputName(node))
 		return codeLines
 		
+	# zippedList = list(zip(list1, list2, list3))
 	def getZipListCode(self, node, fromListSockets):
 		codeParts = []
 		codeParts.append("zippedList = list(zip(")
@@ -247,7 +248,7 @@ class NetworkCodeGenerator:
 		codeParts.append("))")
 		
 		return "".join(codeParts)
-		
+	# for (input['Index'], (element1, element2, element3,)) in enumerate(zippedList):
 	def getEnumerateLoopHeader(self, node, fromListSockets):
 		codeParts = []
 		codeParts.append("for (" + getNodeInputName(node) + "['Index']" + ", (")
