@@ -27,6 +27,7 @@ class mn_AnimateMatrixNode(Node, AnimationNode):
 		return {"Current" : "current", "New Time" : "newTime"}
 		
 	def execute(self, start, end, time, interpolation, duration, delay):
+		duration = max(duration, 1)
 		influence = interpolation[0](max(min(time / duration, 1.0), 0.0), interpolation[1])
 		current = start.lerp(end, influence)
 		return current, time - duration - delay

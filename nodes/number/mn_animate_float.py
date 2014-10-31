@@ -32,6 +32,7 @@ class mn_AnimateFloatNode(Node, AnimationNode):
 		return {"Current" : "current", "New Time" : "newTime", "Difference" : "difference"}
 		
 	def execute(self, useOutput, start, end, time, interpolation, duration, delay):
+		duration = max(duration, 1)
 		influence = interpolation[0](max(min(time / duration, 1.0), 0.0), interpolation[1])
 		current = start * (1 - influence) + end * influence
 		difference = 0
