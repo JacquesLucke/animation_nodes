@@ -33,3 +33,6 @@ class mn_RotationMatrix(Node, AnimationNode):
 		
 	def getModuleList(self):
 		return ["mathutils"]
+		
+	def copy(self, node):
+		self.inputs[0].number = 0

@@ -27,3 +27,6 @@ class mn_TranslationMatrix(Node, AnimationNode):
 		
 	def getModuleList(self):
 		return ["mathutils"]
+		
+	def copy(self, node):
+		self.inputs[0].vector = [0, 0, 0]
