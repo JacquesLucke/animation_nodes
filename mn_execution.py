@@ -4,6 +4,7 @@ from mn_utils import *
 from mn_cache import clearExecutionCache
 from mn_network_code_generator import getAllNetworkCodeStrings
 from bpy.props import *
+from mn_selection_utils import *
 
 COMPILE_BLOCKER = 0
 
@@ -80,6 +81,7 @@ def frameChangeHandler(scene):
 			updateAnimationTrees(False)
 @persistent
 def sceneUpdateHandler(scene):
+	updateSelectionSorting()
 	if scene.mn_settings.update.sceneUpdate and not isAnimationPlaying():
 		updateAnimationTrees(False)
 @persistent

@@ -3,6 +3,7 @@ from bpy.types import Node
 from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged
 from mn_utils import *
+from mn_selection_utils import *
 
 class mn_ObjectPropertyGroup(bpy.types.PropertyGroup):
 	object = bpy.props.StringProperty(name = "Object", default = "", update = nodePropertyChanged)
@@ -66,10 +67,10 @@ class mn_ObjectListInputNode(Node, AnimationNode):
 	def setObject(self, object, index):
 		self.objects[index].object = object.name
 		
-	def newItemsFromSelection(self, objects):
-		for object in objects:
+	def newItemsFromList(self, names):
+		for name in names:
 			item = self.objects.add()
-			item.object = object.name
+			item.object = name
 	
 	
 class AssignActiveObjectToListNode(bpy.types.Operator):
@@ -98,7 +99,6 @@ class SelectedObjectsToObjectListNode(bpy.types.Operator):
 	nodeName = bpy.props.StringProperty()
 		
 	def execute(self, context):
-		selectedObjects = bpy.context.selected_objects
 		node = getNode(self.nodeTreeName, self.nodeName)
-		node.newItemsFromSelection(selectedObjects)
+		node.newItemsFromList(getSortedSelectedObjectNames())
 		return {'FINISHED'}	
