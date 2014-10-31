@@ -23,9 +23,9 @@ class mn_TextOutputNode(Node, AnimationNode):
 		nodeTreeChanged()
 	
 	useText = BoolProperty(default = True, update = usePropertyChanged)
-	useSize = BoolProperty(default = False, update = usePropertyChanged)
-	useShear = BoolProperty(default = False, update = usePropertyChanged)
 	useExtrude = BoolProperty(default = False, update = usePropertyChanged)
+	useShear = BoolProperty(default = False, update = usePropertyChanged)
+	useSize = BoolProperty(default = False, update = usePropertyChanged)
 	
 	useLetterSpacing = BoolProperty(default = False, update = usePropertyChanged)
 	useWordSpacing = BoolProperty(default = False, update = usePropertyChanged)
@@ -37,6 +37,7 @@ class mn_TextOutputNode(Node, AnimationNode):
 	def init(self, context):
 		forbidCompiling()
 		self.inputs.new("mn_ObjectSocket", "Object")
+		
 		self.inputs.new("mn_StringSocket", "Text")
 		self.inputs.new("mn_FloatSocket", "Extrude").number = 0.0
 		self.inputs.new("mn_FloatSocket", "Shear").number = 0.0
@@ -64,29 +65,46 @@ class mn_TextOutputNode(Node, AnimationNode):
 			if i in [4, 7]: col.separator(); col.separator()
 			col.prop(self, option[0], text = option[1])
 		
-	def execute(self, input):
-		object = input["Object"]
-		textObject = None
-		
-		if object is not None:
-			textObject = bpy.data.curves.get(object.data.name)
-		
-		if textObject is not None:
-			textObject.body = input["Text"]
-			textObject.size = input["Size"]
-			textObject.shear = input["Shear"]
-			textObject.extrude = input["Extrude"]
-			
-			textObject.space_character = input["Letter Spacing"]
-			textObject.space_word = input["Word Spacing"]
-			textObject.space_line = input["Line Spacing"]
-			
-			textObject.offset_x = input["X Offset"]
-			textObject.offset_y = input["Y Offset"]
-		
-		output = {}
-		return output
-		
 	def setHideProperty(self):
 		for option in options:
 			self.inputs[option[1]].hide = not getattr(self, option[0])
+			
+			
+	def getInputSocketNames(self):
+		return {"Object" : "object",
+				"Text" : "text",
+				"Size" : "size",
+				"Shear" : "shear",
+				"Extrude" : "extrude",
+				"Letter Spacing" : "letterSpacing",
+				"Word Spacing" : "wordSpacing",
+				"Line Spacing" : "lineSpacing",
+				"X Offset" : "xOffset",
+				"Y Offset" : "yOffset"}
+	def getOutputSocketNames(self):
+		return {}
+		
+	def useInLineExecution(self):
+		return True
+	def getInLineExecutionString(self, outputUse):
+		codeLines = []
+		codeLines.append("if %object% is not None:")
+		codeLines.append("    textObject = None")
+		codeLines.append("    if %object%.type == 'FONT': textObject = %object%.data")
+		codeLines.append("    if textObject is not None:")
+		
+		if self.useText: codeLines.append(" "*8 + "textObject.body = %text%")
+		if self.useExtrude: codeLines.append(" "*8 + "textObject.extrude = %extrude%")
+		if self.useShear: codeLines.append(" "*8 + "textObject.shear = %shear%")
+		if self.useSize: codeLines.append(" "*8 + "textObject.size = %size%")
+		
+		if self.useLetterSpacing: codeLines.append(" "*8 + "textObject.space_character = %letterSpacing%")
+		if self.useWordSpacing: codeLines.append(" "*8 + "textObject.space_word = %wordSpacing%")
+		if self.useLineSpacing: codeLines.append(" "*8 + "textObject.space_line = %lineSpacing%")
+		
+		if self.useXOffset: codeLines.append(" "*8 + "textObject.offset_x = %xOffset%")
+		if self.useYOffset: codeLines.append(" "*8 + "textObject.offset_y = %yOffset%")
+		
+		codeLines.append(" "*8 + "pass")
+		
+		return "\n".join(codeLines)
