@@ -36,11 +36,15 @@ def getNodeNameDictionary():
 		("mn_ObjectInputNode", "Object"),
 		("mn_ObjectListInputNode", "Object List"),
 		("mn_ObjectInfoNode", "Object Info"),
+		("mn_ObjectMatrixInput", "Object Matrices"),
 		("mn_ReplicateObjectNode", "Replicate Object"),
 		("mn_CopyObjectData", "Copy Data"),
 		("mn_ObjectAttributeOutputNode", "Attribute Output"),
 		("mn_CopyTransformsNode", "Copy Transforms"),
 		("mn_ObjectOutputNode", "Transforms Output") ] ))
+		
+	nodes.append(("Matrix", [
+		("mn_MatrixConvert", "Transforms from Matrix") ] ))
 		
 	nodes.append(("List", [
 		("mn_GetListElementNode", "Get Element"),
