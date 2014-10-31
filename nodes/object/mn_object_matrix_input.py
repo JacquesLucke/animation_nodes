@@ -26,9 +26,23 @@ class mn_ObjectMatrixInput(Node, AnimationNode):
 				"Local" : "local",
 				"Parent Inverse" : "parentInverse",
 				"World" : "world"}
+	
+	def useInLineExecution(self):
+		return True
+	def getInLineExecutionString(self, outputUse):
+		codeLines = []
+		codeLines.append("try:")
+		if outputUse["Basis"]: codeLines.append("    $basis$ = %object%.matrix_basis")
+		if outputUse["Local"]: codeLines.append("    $local$ = %object%.matrix_local")
+		if outputUse["Parent Inverse"]: codeLines.append("    $parentInverse$ = %object%.matrix_parent_inverse")
+		if outputUse["World"]: codeLines.append("    $world$ = %object%.matrix_world")
+		codeLines.append("    pass")
+		codeLines.append("except:")
+		codeLines.append("    $basis$ = mathutils.Matrix.Identity(4)")
+		codeLines.append("    $local$ = mathutils.Matrix.Identity(4)")
+		codeLines.append("    $parentInverse$ = mathutils.Matrix.Identity(4)")
+		codeLines.append("    $world$ = mathutils.Matrix.Identity(4)")
+		return "\n".join(codeLines)
 		
-	def execute(self, useOutput, object):
-		if object is None:
-			return Matrix.Identity(4), Matrix.Identity(4), Matrix.Identity(4), Matrix.Identity(4)
-			
-		return object.matrix_basis, object.matrix_local, object.matrix_parent_inverse, object.matrix_world
+	def getModuleList(self):
+		return ["mathutils"]
