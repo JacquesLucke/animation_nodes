@@ -3,46 +3,20 @@ from mn_execution import nodePropertyChanged
 from mn_node_base import * 
 from mn_interpolation_utils import *
 
-class InterpolationCategory:
-	def __init__(self, identifier, name):
-		self.identifier = identifier
-		self.name = name
-		self.interpolationModes = []
-	def append(self, mode):
-		self.interpolationModes.append(mode)
-		
-class InterpolationMode:
-	def __init__(self, identifier, name):
-		self.identifier = identifier
-		self.name = name
-
-interpolationEnum = []
-linearMode = InterpolationMode("LINEAR", "Linear")
-
-easingCategory = InterpolationCategory("EASING", "Easing")
-easingCategory.append(InterpolationMode("IN", "Ease In"))
-easingCategory.append(InterpolationMode("OUT", "Ease Out"))
-easingCategory.append(InterpolationMode("INOUT", "Ease In Out"))
-
-backCategory = InterpolationCategory("BACK", "Back")
-backCategory.append(InterpolationMode("OUT", "Out"))
-backCategory.append(InterpolationMode("IN", "In"))
-
-interpolationEnum.append(linearMode)
-interpolationEnum.append(easingCategory)
-interpolationEnum.append(backCategory)
-
-def getInterpolationFunctionTupel(mode, subMode):
-	if mode == "LINEAR": return (linear, None)
-	if mode == "EASING":
-		if subMode == "IN": return (cubicEaseIn, None)
-		if subMode == "OUT": return (cubicEaseOut, None)
-		if subMode == "INOUT": return (cubicEaseInOut, None)
-	if mode == "BACK":
-		if subMode == "IN": return (backEaseIn, 1.70158)
-		if subMode == "OUT": return (backEaseOut, 1.70158)
-	return (linear, None)
-
+topCategoryItems = [("LINEAR", "Linear", ""),
+					("EXPONENTIAL", "Exponential", ""),
+					("CUBIC", "Cubic", ""),
+					("BACK", "Back", "")]
+					
+exponentialCategoryItems = [("IN", "In", ""),
+							("OUT", "Out", "")]
+							
+cubicCategoryItems = [("IN", "In", ""),
+					("OUT", "Out", ""),
+					("INOUT", "In / Out", "")]
+					
+backCategoryItems = [("IN", "In", ""),
+					("OUT", "Out", "")]
 
 class mn_InterpolationSocket(mn_BaseSocket, mn_SocketProperties):
 	bl_idname = "mn_InterpolationSocket"
@@ -51,40 +25,40 @@ class mn_InterpolationSocket(mn_BaseSocket, mn_SocketProperties):
 	allowedInputTypes = ["Interpolation"]
 	drawColor = (0.7, 0.4, 0.3, 1)
 	
-	def getCategoryEnumItems(self, context):
-		items = []
-		for interpolation in interpolationEnum:
-			items.append((interpolation.identifier, interpolation.name, ""))
-		if len(items) == 0: items.append(("None", "None", ""))
-		return items
-	def getSubModeItems(self, context):
-		items = []
-		mode = self.getCurrentMode()
-		if type(mode) == InterpolationCategory:
-			for interpolation in mode.interpolationModes:
-				items.append((interpolation.identifier, interpolation.name, ""))
-		if len(items) == 0: items.append(("None", "None", ""))
-		return items
+	topCategory = bpy.props.EnumProperty(items = topCategoryItems, default = "LINEAR", update = nodePropertyChanged, name = "Category")
+	backCategory = bpy.props.EnumProperty(items = backCategoryItems, default = "OUT", update = nodePropertyChanged, name = "Back")
+	exponentialCategory = bpy.props.EnumProperty(items = exponentialCategoryItems, default = "OUT", update = nodePropertyChanged, name = "Exponential")
+	cubicCategory = bpy.props.EnumProperty(items = cubicCategoryItems, default = "OUT", update = nodePropertyChanged, name = "Cubic")
 	
-	mode = bpy.props.EnumProperty(name = "Mode", items = getCategoryEnumItems, update = nodePropertyChanged)
-	subMode = bpy.props.EnumProperty(name = "SubMode", items = getSubModeItems, update = nodePropertyChanged)
+	showName = bpy.props.BoolProperty(default = True)
 	
 	def drawInput(self, layout, node, text):
-		col = layout.column(align = False)
-		col.label(text)
+		col = layout.column(align = True)
+		if self.showName: col.label(text)
 		row = col.row(align = True)
-		row.prop(self, "mode", text = "")
-		mode = self.getCurrentMode()
-		if type(mode) == InterpolationCategory:
-			row.prop(self, "subMode", text = "")
+		row.prop(self, "topCategory", text = "")
+		if self.topCategory == "BACK": row.prop(self, "backCategory", text = "")
+		if self.topCategory == "EXPONENTIAL": row.prop(self, "exponentialCategory", text = "")
+		if self.topCategory == "CUBIC": row.prop(self, "cubicCategory", text = "")
 		
 	def getValue(self):
-		return getInterpolationFunctionTupel(self.mode, self.subMode)
+		if self.topCategory == "LINEAR": return (linear, None)
+		if self.topCategory == "EXPONENTIAL":
+			if self.exponentialCategory == "IN": return (expoEaseIn, None)
+			if self.exponentialCategory == "OUT": return (expoEaseOut, None)
+		if self.topCategory == "CUBIC":
+			if self.cubicCategory == "IN": return (cubicEaseIn, None)
+			if self.cubicCategory == "OUT": return (cubicEaseOut, None)
+			if self.cubicCategory == "INOUT": return (cubicEaseInOut, None)
+		if self.topCategory == "BACK":
+			if self.backCategory == "IN": return (backEaseIn, 1.70158)
+			if self.backCategory == "OUT": return (backEaseOut, 1.70158)
+		return (linear, None)
 		
 	def setStoreableValue(self, data):
-		self.mode = data
+		self.topCategory, self.backCategory, self.exponentialCategory, self.cubicCategory = data
 	def getStoreableValue(self):
-		return self.mode
+		return (self.topCategory, self.backCategory, self.exponentialCategory, self.cubicCategory)
 		
 	def getCurrentMode(self):
 		for mode in interpolationEnum:

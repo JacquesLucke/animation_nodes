@@ -15,7 +15,7 @@ class mn_AnimateFloatNode(Node, AnimationNode):
 		self.inputs.new("mn_FloatSocket", "Start")
 		self.inputs.new("mn_FloatSocket", "End")
 		self.inputs.new("mn_FloatSocket", "Time")
-		self.inputs.new("mn_InterpolationSocket", "Interpolation")
+		self.inputs.new("mn_InterpolationSocket", "Interpolation").showName = False
 		self.inputs.new("mn_FloatSocket", "Duration").number = 20.0
 		self.inputs.new("mn_FloatSocket", "Delay").number = 0.0
 		self.outputs.new("mn_FloatSocket", "Current")
