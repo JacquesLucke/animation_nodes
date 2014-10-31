@@ -38,10 +38,17 @@ class mn_BaseSocket(NodeSocket):
 				removeSocket.isOutputSocket = self.is_output
 				removeSocket.socketIdentifier = self.identifier
 		else:
+			row = layout.row()
 			if not self.is_output and not isSocketLinked(self):
-				self.drawInput(layout, node, text)
+				self.drawInput(row, node, text)
 			else:
-				layout.label(text)
+				row.label(text)
+			if self.removeable: 
+				removeSocket = row.operator("mn.remove_socket", text = "", icon = "X")
+				removeSocket.nodeTreeName = node.id_data.name
+				removeSocket.nodeName = node.name
+				removeSocket.isOutputSocket = self.is_output
+				removeSocket.socketIdentifier = self.identifier
 			
 	def draw_color(self, context, node):
 		return self.drawColor

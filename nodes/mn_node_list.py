@@ -47,6 +47,7 @@ def getNodeNameDictionary():
 		("mn_MatrixConvert", "Transforms from Matrix"),
 		("mn_TranslationMatrix", "Translation Matrix"),
 		("mn_RotationMatrix", "Rotation Matrix"),
+		("mn_MatrixCombine", "Combine Matrices"),
 		("mn_MatrixMath", "Matrix Math") ] ))
 		
 	nodes.append(("List", [

@@ -11,8 +11,12 @@ class mn_MatrixCombine(Node, AnimationNode):
 	
 	def init(self, context):
 		forbidCompiling()
-		self.inputs.new("mn_MatrixSocket", "1.")
-		self.inputs.new("mn_MatrixSocket", "2.")
+		socket = self.inputs.new("mn_MatrixSocket", "Matrix")
+		socket.removeable = True
+		socket.callNodeToRemove = True
+		self.inputs.new("mn_MatrixSocket", "Matrix").removeable = True
+		socket.removeable = True
+		socket.callNodeToRemove = True
 		self.inputs.new("mn_EmptySocket", "...").passiveSocketType = "mn_MatrixSocket"
 		self.outputs.new("mn_MatrixSocket", "Result")
 		allowCompiling()
@@ -33,11 +37,16 @@ class mn_MatrixCombine(Node, AnimationNode):
 				if originSocket is not None:
 					if originSocket.dataType == "Matrix":
 						self.inputs.remove(socket)
-						newSocketName = str(len(self.inputs) + 1) + "."
-						newSocket = self.inputs.new("mn_MatrixSocket", newSocketName)
+						newSocket = self.inputs.new("mn_MatrixSocket", "Matrix")
+						newSocket.removeable = True
+						newSocket.callNodeToRemove = True
 						self.inputs.new("mn_EmptySocket", "...")
 						self.id_data.links.new(newSocket, fromSocket)
-				
+		allowCompiling()
+		
+	def removeSocket(self, socket):
+		forbidCompiling()
+		self.inputs.remove(socket)
 		allowCompiling()
 		
 	def execute(self, input):
@@ -46,6 +55,6 @@ class mn_MatrixCombine(Node, AnimationNode):
 		sockets = self.inputs
 		for socket in reversed(sockets):
 			if socket.bl_idname == "mn_MatrixSocket":
-				result *= input[socket.name]
+				result *= input[socket.identifier]
 		
 		return { "Result" : result }
