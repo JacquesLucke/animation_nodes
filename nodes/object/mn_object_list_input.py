@@ -29,7 +29,7 @@ class mn_ObjectListInputNode(Node, AnimationNode):
 				select.nodeTreeName = self.id_data.name
 				select.nodeName = self.name
 				select.index = index
-				row.prop(item, "object", text = "")
+				row.prop_search(item, "object",  context.scene, "objects", icon="NONE", text = "")  
 				remove = row.operator("mn.remove_property_from_list_node", text = "", icon = "X")
 				remove.nodeTreeName = self.id_data.name
 				remove.nodeName = self.name

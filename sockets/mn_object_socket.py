@@ -17,7 +17,7 @@ class mn_ObjectSocket(mn_BaseSocket, mn_SocketProperties):
 		row = col.row(align = True)
 		if self.showName:
 			row.label(text)
-		row.prop(self, "objectName", text = "")
+		row.prop_search(self, "objectName",  bpy.context.scene, "objects", icon="NONE", text = "")  
 		selector = row.operator("mn.assign_active_object_to_socket", text = "", icon = "EYEDROPPER")
 		selector.nodeTreeName = node.id_data.name
 		selector.nodeName = node.name

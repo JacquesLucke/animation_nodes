@@ -18,7 +18,7 @@ class mn_ObjectInputNode(Node, AnimationNode):
 	def draw_buttons(self, context, layout):
 		col = layout.column()
 		row = col.row(align = True)
-		row.prop_search(self, "objectName",  context.scene, "objects", icon="NONE")         
+		row.prop_search(self, "objectName",  context.scene, "objects", icon="NONE", text = "")         
 		selector = row.operator("mn.assign_active_object_to_node", text = "", icon = "EYEDROPPER")
 		selector.nodeTreeName = self.id_data.name
 		selector.nodeName = self.name
