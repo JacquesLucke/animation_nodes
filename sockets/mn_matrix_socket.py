@@ -1,6 +1,7 @@
 import bpy
 from mn_execution import nodePropertyChanged
 from mn_node_base import * 
+from mathutils import Matrix
 
 class mn_MatrixSocket(mn_BaseSocket, mn_SocketProperties):
 	bl_idname = "mn_MatrixSocket"
@@ -13,7 +14,7 @@ class mn_MatrixSocket(mn_BaseSocket, mn_SocketProperties):
 		layout.label(text)
 		
 	def getValue(self):
-		return self.string
+		return Matrix.Identity(4)
 		
 	def setStoreableValue(self, data):
 		pass
