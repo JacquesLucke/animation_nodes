@@ -98,11 +98,16 @@ class mn_ReplicateObjectNode(Node, AnimationNode):
 				outputObjectCounter += 1
 			if incrementIndex: currentIndex += 1
 		
+		renewObjects = False
 		if self.setObjectData:
 			for object in objects:
-				if object.data != sourceObject.data:
-					object.data = sourceObject.data
+				if object.type == sourceObject.type:
+					if object.data != sourceObject.data:
+						object.data = sourceObject.data
+				else:
+					renewObjects = True
 			self.setObjectData = False
+		if renewObjects: self.free()
 		
 		return objects
 		
