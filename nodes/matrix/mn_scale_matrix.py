@@ -11,7 +11,7 @@ class mn_ScaleMatrix(Node, AnimationNode):
 	
 	def init(self, context):
 		forbidCompiling()
-		self.inputs.new("mn_VectorSocket", "Scale")
+		self.inputs.new("mn_VectorSocket", "Scale").vector = [1, 1, 1]
 		self.outputs.new("mn_MatrixSocket", "Matrix")
 		allowCompiling()
 		
