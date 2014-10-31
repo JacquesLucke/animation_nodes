@@ -30,4 +30,7 @@ class mn_RandomVectorNode(Node, AnimationNode):
 		return [getUniformRandom(seed + 1193 * self.additionalSeed, -max, max),
 				getUniformRandom(seed + 754 + 1193 * self.additionalSeed, -max, max),
 				getUniformRandom(seed + 2345 + 1193 * self.additionalSeed, -max, max)]
+				
+	def copy(self, node):
+		self.additionalSeed = int(random.random()*1000)
 		

@@ -29,3 +29,6 @@ class mn_RandomNumberNode(Node, AnimationNode):
 	def execute(self, seed, minValue, maxValue):
 		return getUniformRandom(seed + 1193 * self.additionalSeed, minValue, maxValue)
 		
+	def copy(self, node):
+		self.additionalSeed = int(random.random()*1000)
+		
