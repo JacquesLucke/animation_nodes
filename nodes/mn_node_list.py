@@ -44,7 +44,8 @@ def getNodeNameDictionary():
 		("mn_ObjectOutputNode", "Transforms Output") ] ))
 		
 	nodes.append(("Matrix", [
-		("mn_MatrixConvert", "Transforms from Matrix") ] ))
+		("mn_MatrixConvert", "Transforms from Matrix"),
+		("mn_TranslationMatrix", "Translation Matrix") ] ))
 		
 	nodes.append(("List", [
 		("mn_GetListElementNode", "Get Element"),
