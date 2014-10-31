@@ -2,6 +2,7 @@ import bpy
 from bpy.types import Node
 from mathutils import *
 from mn_utils import *
+from mn_node_utils import *
 from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 
@@ -26,7 +27,10 @@ class mn_MatrixCombine(Node, AnimationNode):
 		
 	def update(self):
 		forbidCompiling()
+		
 		socket = self.inputs.get("...")
+		updateDependencyNode(socket)
+		
 		if socket is not None:
 			links = socket.links
 			if len(links) == 1:
@@ -40,7 +44,7 @@ class mn_MatrixCombine(Node, AnimationNode):
 						newSocket = self.inputs.new("mn_MatrixSocket", "Matrix")
 						newSocket.removeable = True
 						newSocket.callNodeToRemove = True
-						self.inputs.new("mn_EmptySocket", "...")
+						self.inputs.new("mn_EmptySocket", "...").passiveSocketType = "mn_MatrixSocket"
 						self.id_data.links.new(newSocket, fromSocket)
 		allowCompiling()
 		
