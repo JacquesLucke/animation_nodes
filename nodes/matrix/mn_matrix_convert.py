@@ -24,6 +24,12 @@ class mn_MatrixConvert(Node, AnimationNode):
 		return {"Translation" : "translation",
 				"Rotation" : "rotation",
 				"Scale" : "scale"}
-		
-	def execute(self, useOutput, matrix):
-		return matrix.to_translation(), matrix.to_euler(), matrix.to_scale()
+
+	def useInLineExecution(self):
+		return True
+	def getInLineExecutionString(self, outputUse):
+		codeLines = []
+		if outputUse["Translation"]: codeLines.append("$translation$ = %matrix%.to_translation()")
+		if outputUse["Rotation"]: codeLines.append("$rotation$ = %matrix%.to_euler()")
+		if outputUse["Scale"]: codeLines.append("$scale$ = %matrix%.to_scale()")
+		return "\n".join(codeLines)
