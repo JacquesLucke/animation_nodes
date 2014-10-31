@@ -50,6 +50,7 @@ def getNodeNameDictionary():
 		("mn_ScaleMatrix", "Scale Matrix"),
 		("mn_MatrixCombine", "Combine Matrices"),
 		("mn_MatrixMath", "Matrix Math"),
+		("mn_AnimateMatrixNode", "Animate Matrix"),
 		("mn_InvertMatrix", "Invert Matrix") ] ))
 		
 	nodes.append(("List", [
