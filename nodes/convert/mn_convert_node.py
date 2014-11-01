@@ -4,7 +4,7 @@ from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 from mn_utils import *
 
-types = ["Float", "Integer", "String", "Object"]
+types = ["Float", "Integer", "String", "Object", "Color"]
 
 typeItems = []
 for type in types:
@@ -54,6 +54,7 @@ class mn_ConvertNode(Node, AnimationNode):
 		if self.convertType == "Integer": self.outputs.new("mn_IntegerSocket", "New")
 		if self.convertType == "String": self.outputs.new("mn_StringSocket", "New")
 		if self.convertType == "Object": self.outputs.new("mn_ObjectSocket", "New")
+		if self.convertType == "Color": self.outputs.new("mn_ColorSocket", "New")
 		tryToSetConnectionDictionaries(self, connections)
 		allowCompiling()
 		
@@ -82,3 +83,14 @@ except: $new$ = 0
 if isinstance(%old%, bpy.types.Object): $new$ = %old%
 else: $new$ = None
 '''
+		elif t == "Color":
+			codeLines = []
+			codeLines.append("try:")
+			codeLines.append("    if hasattr(%old%, '__iter__'):")
+			codeLines.append("        if len(%old%) == 4: $new$ = %old%[:4]")
+			codeLines.append("        elif len(%old%) == 3: $new$ = %old%[:3] + [1]")
+			codeLines.append("        elif len(%old%) == 2: $new$ = [%old%[0]] * 3 + [%old%[1]]")
+			codeLines.append("        elif len(%old%) == 1: $new$ = [%old%[0] * 3] + [1]")
+			codeLines.append("    else: $new$ = [float(%old%)] * 3 + [1]")
+			codeLines.append("except: $new$ = [0, 0, 0, 1]")
+			return "\n".join(codeLines)
