@@ -24,19 +24,28 @@ class mn_ConvertNode(Node, AnimationNode):
 		
 	def update(self):
 		forbidCompiling()
-		socket = self.outputs.get("New")
-		if socket is not None:
-			links = socket.links
-			if len(links) == 1:
-				link = links[0]
-				toSocket = link.to_socket
-				if toSocket.node.type != "REROUTE":
-					if socket.dataType != toSocket.dataType:
-						if toSocket.dataType in types:
-							self.convertType = toSocket.dataType
-							self.buildOutputSocket()
+		link = self.getFirstOutputLink()
+		if link is not None:
+			fromSocket = link.from_socket
+			toSocket = link.to_socket
+			if toSocket.node.type != "REROUTE":
+				if fromSocket.dataType != toSocket.dataType:
+					if toSocket.dataType in types:
+						self.convertType = toSocket.dataType
+						self.buildOutputSocket()
 					
 		allowCompiling()
+		
+	def getFirstOutputLink(self):
+		links = self.getLinksFromOutputSocket()
+		if len(links) == 1: return links[0]
+		return None
+		
+	def getLinksFromOutputSocket(self):
+		socket = self.outputs.get("New")
+		if socket is not None:
+			return socket.links
+		return []
 		
 	def buildOutputSocket(self):
 		forbidCompiling()
