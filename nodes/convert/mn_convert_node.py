@@ -2,6 +2,7 @@ import bpy
 from bpy.types import Node
 from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
+from mn_utils import *
 
 types = ["Float", "Integer", "String"]
 
@@ -13,20 +14,13 @@ class mn_ConvertNode(Node, AnimationNode):
 	bl_idname = "mn_ConvertNode"
 	bl_label = "Convert"
 	
-	def convertTypeChanged(self, context):
-		self.buildOutputSocket()
-		nodeTreeChanged()
-	
-	convertType = bpy.props.EnumProperty(items = typeItems, update = convertTypeChanged, default = "Integer")
+	convertType = bpy.props.EnumProperty(items = typeItems, default = "Integer")
 	
 	def init(self, context):
 		forbidCompiling()
 		self.inputs.new("mn_GenericSocket", "Old")
-		self.outputs.new("mn_IntegerSocket", "New")
+		self.buildOutputSocket()
 		allowCompiling()
-		
-	def draw_buttons_ext(self, context, layout):
-		layout.prop(self, "convertType", text = "Type")
 		
 	def update(self):
 		forbidCompiling()
@@ -38,20 +32,20 @@ class mn_ConvertNode(Node, AnimationNode):
 				toSocket = link.to_socket
 				if toSocket.node.type != "REROUTE":
 					if socket.dataType != toSocket.dataType:
-						self.id_data.links.remove(link)
 						if toSocket.dataType in types:
 							self.convertType = toSocket.dataType
 							self.buildOutputSocket()
-							self.id_data.links.new(toSocket, self.outputs.get("New"))
 					
 		allowCompiling()
 		
 	def buildOutputSocket(self):
 		forbidCompiling()
+		connections = getConnectionDictionaries(self)
 		self.outputs.clear()
 		if self.convertType == "Float": self.outputs.new("mn_FloatSocket", "New")
 		if self.convertType == "Integer": self.outputs.new("mn_IntegerSocket", "New")
 		if self.convertType == "String": self.outputs.new("mn_StringSocket", "New")
+		tryToSetConnectionDictionaries(self, connections)
 		allowCompiling()
 		
 	def getInputSocketNames(self):
@@ -62,7 +56,16 @@ class mn_ConvertNode(Node, AnimationNode):
 	def useInLineExecution(self):
 		return True
 	def getInLineExecutionString(self, outputUse):
-		return '''
+		t = self.convertType
+		if t == "Float": return '''
+try: $new$ = float(%old%)
+except: $new$ = 0
+'''
+		elif t == "Integer": return '''
 try: $new$ = int(%old%)
+except: $new$ = 0
+'''
+		elif t == "String": return '''
+try: $new$ = str(%old%)
 except: $new$ = 0
 '''
