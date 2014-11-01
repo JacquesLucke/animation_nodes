@@ -36,7 +36,7 @@ class mn_TextOutputNode(Node, AnimationNode):
 	
 	def init(self, context):
 		forbidCompiling()
-		self.inputs.new("mn_ObjectSocket", "Object")
+		self.inputs.new("mn_ObjectSocket", "Object").showName = False
 		
 		self.inputs.new("mn_StringSocket", "Text")
 		self.inputs.new("mn_FloatSocket", "Extrude").number = 0.0
