@@ -4,7 +4,7 @@ from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 from mn_utils import *
 
-types = ["Float", "Integer", "String"]
+types = ["Float", "Integer", "String", "Object"]
 
 typeItems = []
 for type in types:
@@ -33,7 +33,6 @@ class mn_ConvertNode(Node, AnimationNode):
 					if toSocket.dataType in types:
 						self.convertType = toSocket.dataType
 						self.buildOutputSocket()
-					
 		allowCompiling()
 		
 	def getFirstOutputLink(self):
@@ -54,6 +53,7 @@ class mn_ConvertNode(Node, AnimationNode):
 		if self.convertType == "Float": self.outputs.new("mn_FloatSocket", "New")
 		if self.convertType == "Integer": self.outputs.new("mn_IntegerSocket", "New")
 		if self.convertType == "String": self.outputs.new("mn_StringSocket", "New")
+		if self.convertType == "Object": self.outputs.new("mn_ObjectSocket", "New")
 		tryToSetConnectionDictionaries(self, connections)
 		allowCompiling()
 		
@@ -77,4 +77,8 @@ except: $new$ = 0
 		elif t == "String": return '''
 try: $new$ = str(%old%)
 except: $new$ = 0
+'''
+		elif t == "Object": return '''
+if isinstance(%old%, bpy.types.Object): $new$ = %old%
+else: $new$ = None
 '''
