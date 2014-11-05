@@ -1,3 +1,5 @@
+import mn_node_base
+
 listChains = [
 	["mn_FloatSocket", "mn_FloatListSocket"],
 	["mn_ObjectSocket", "mn_ObjectListSocket"],
@@ -14,3 +16,9 @@ def getListSocketType(socketType):
 	
 def hasListSocketType(socketType):
 	return not getListSocketType(socketType) == None
+	
+def getSocketNameByDataType(dataType):
+	subClasses = mn_node_base.mn_BaseSocket.__subclasses__()
+	for subClass in subClasses:
+		if getattr(subClass, "dataType") == dataType: return subClass.bl_idname
+	return None

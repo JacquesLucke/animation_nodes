@@ -490,15 +490,15 @@ def getDirectDependencies(node):
 ################################
 
 convertRules = {}
-convertRules[("Float", "Integer")] = "mn_ToIntegerConversion"
-convertRules[("Generic", "Integer")] = "mn_ToIntegerConversion"
-convertRules[("Float", "String")] = "mn_ToStringConversion"
-convertRules[("Generic", "Float")] = "mn_ToFloatConversion"
-convertRules[("Integer", "String")] = "mn_ToStringConversion"
+convertRules[("Float", "Integer")] = "mn_ConvertNode"
+convertRules[("Generic", "Integer")] = "mn_ConvertNode"
+convertRules[("Float", "String")] = "mn_ConvertNode"
+convertRules[("Generic", "Float")] = "mn_ConvertNode"
+convertRules[("Integer", "String")] = "mn_ConvertNode"
 convertRules[("Float", "Vector")] = "mn_CombineVector"
 convertRules[("Integer", "Vector")] = "mn_CombineVector"
-convertRules[("Vector", "Float")] = "mn_SeparateVector"
-convertRules[("Vector", "Integer")] = "mn_SeparateVector"
+convertRules[("Vector", "Float")] = "mn_ConvertNode"
+convertRules[("Vector", "Integer")] = "mn_ConvertNode"
 		
 def cleanupNodeTrees():
 	nodeTrees = getAnimationNodeTrees()
@@ -521,13 +521,21 @@ def handleNotAllowedLink(nodeTree, link, fromSocket, toSocket, originSocket):
 	fromType = originSocket.dataType
 	toType = toSocket.dataType
 	nodeTree.links.remove(link)
-	convertNodeType = convertRules.get((fromType, toType))
+	if fromType == "Generic":
+		
+		convertNodeType = "mn_ConvertNode"
+	else:convertNodeType = convertRules.get((fromType, toType))
 	if convertNodeType is not None:
 		insertConversionNode(nodeTree, convertNodeType, fromSocket, toSocket, originSocket)
 def insertConversionNode(nodeTree, convertNodeType, fromSocket, toSocket, originSocket):
 	node = nodeTree.nodes.new(convertNodeType)
 	node.hide = True
 	node.select = False
+	
+	if convertNodeType == "mn_ConvertNode":
+		node.convertType = toSocket.dataType
+		node.buildOutputSocket()
+	
 	x1, y1 = toSocket.node.location
 	x2, y2 = list(fromSocket.node.location)
 	node.location = [(x1+x2)/2+20, (y1+y2)/2-50]

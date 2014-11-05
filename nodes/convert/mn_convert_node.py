@@ -3,18 +3,13 @@ from bpy.types import Node
 from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 from mn_utils import *
-
-types = ["Float", "Integer", "String", "Object", "Color"]
-
-typeItems = []
-for type in types:
-	typeItems.append((type, type, ""))
+from mn_socket_info import *
 
 class mn_ConvertNode(Node, AnimationNode):
 	bl_idname = "mn_ConvertNode"
 	bl_label = "Convert"
 	
-	convertType = bpy.props.EnumProperty(items = typeItems, default = "Integer")
+	convertType = bpy.props.StringProperty(default = "Integer")
 	
 	def init(self, context):
 		forbidCompiling()
@@ -30,9 +25,8 @@ class mn_ConvertNode(Node, AnimationNode):
 			toSocket = link.to_socket
 			if toSocket.node.type != "REROUTE":
 				if fromSocket.dataType != toSocket.dataType:
-					if toSocket.dataType in types:
-						self.convertType = toSocket.dataType
-						self.buildOutputSocket()
+					self.convertType = toSocket.dataType
+					self.buildOutputSocket()
 		allowCompiling()
 		
 	def getFirstOutputLink(self):
@@ -46,15 +40,13 @@ class mn_ConvertNode(Node, AnimationNode):
 			return socket.links
 		return []
 		
+	def getConversionTypes(self):
+		return types
 	def buildOutputSocket(self):
 		forbidCompiling()
 		connections = getConnectionDictionaries(self)
 		self.outputs.clear()
-		if self.convertType == "Float": self.outputs.new("mn_FloatSocket", "New")
-		if self.convertType == "Integer": self.outputs.new("mn_IntegerSocket", "New")
-		if self.convertType == "String": self.outputs.new("mn_StringSocket", "New")
-		if self.convertType == "Object": self.outputs.new("mn_ObjectSocket", "New")
-		if self.convertType == "Color": self.outputs.new("mn_ColorSocket", "New")
+		self.outputs.new(getSocketNameByDataType(self.convertType), "New")
 		tryToSetConnectionDictionaries(self, connections)
 		allowCompiling()
 		
@@ -94,3 +86,17 @@ else: $new$ = None
 			codeLines.append("    else: $new$ = [float(%old%)] * 3 + [1]")
 			codeLines.append("except: $new$ = [0, 0, 0, 1]")
 			return "\n".join(codeLines)
+		elif t == "Interpolation":
+			codeLines = []
+			codeLines.append("try:")
+			codeLines.append("    if hasattr(%old%[0], '__call__'): $new$ = %old%")
+			codeLines.append("    else: $new$ = (mn_interpolation_utils.linear, None)")
+			codeLines.append("except: $new$ = (mn_interpolation_utils.linear, None)")
+			return "\n".join(codeLines)
+		else:
+			return "$new$ = %old%"
+			
+	def getModuleList(self):
+		t = self.convertType
+		if t == "Interpolation": return ["mn_interpolation_utils"]
+		return []
