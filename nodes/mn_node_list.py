@@ -24,12 +24,14 @@ def getNodeNameDictionary():
 	nodes.append(("Text", [
 		("mn_StringInputNode", "Text"),
 		("mn_StringListInputNode", "Text List"),
-		("mn_RandomStringNode", "Random"),
+		("mn_RandomStringNode", "Random Text"),
+		("mn_TextBlockReader", "Text Block Reader"),
 		("mn_CharactersNode", "Characters"),
 		("mn_CombineStringsNode", "Combine Texts"),
+		("mn_SplitText", "Split Text"),
 		("mn_ReplicateStringsNode", "Replicate Text"),
-		("mn_SubstringNode", "Trim"),
-		("mn_StringAnalyzeNode", "Analyze"),
+		("mn_SubstringNode", "Trim Text"),
+		("mn_StringAnalyzeNode", "Analyze Text"),
 		("mn_TextOutputNode", "Text Output") ] ))
 	
 	nodes.append(("Object", [
@@ -49,6 +51,7 @@ def getNodeNameDictionary():
 		("mn_TranslationMatrix", "Translation Matrix"),
 		("mn_RotationMatrix", "Rotation Matrix"),
 		("mn_ScaleMatrix", "Scale Matrix"),
+		("mn_ComposeMatrix", "Compose Matrix"),
 		("mn_MatrixCombine", "Combine Matrices"),
 		("mn_MatrixMath", "Matrix Math"),
 		("mn_AnimateMatrixNode", "Animate Matrix"),
