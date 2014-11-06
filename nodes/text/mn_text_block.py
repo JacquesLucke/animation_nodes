@@ -8,12 +8,14 @@ from mn_utils import *
 class mn_TextBlock(Node, AnimationNode):
 	bl_idname = "mn_TextBlock"
 	bl_label = "Text Block"
+	outputUseParameterName = "useOutput"
 	
 	selectedTextBlockName = bpy.props.StringProperty(name = "Text Block")
 	
 	def init(self, context):
 		forbidCompiling()
 		self.outputs.new("mn_StringSocket", "Text")
+		self.outputs.new("mn_StringListSocket", "Lines")
 		allowCompiling()
 	
 	def draw_buttons(self, context, layout):
@@ -22,12 +24,16 @@ class mn_TextBlock(Node, AnimationNode):
 	def getInputSocketNames(self):
 		return {}
 	def getOutputSocketNames(self):
-		return {"Text" : "text"}
+		return {"Text" : "text",
+				"Lines" : "lines"}
 
-	def execute(self):
+	def execute(self, useOutput):
 		textBlock = bpy.data.texts.get(self.selectedTextBlockName)
 		
-		if textBlock is None:
-			return ""
-		else:
-			return textBlock.as_string()
+		text = ""
+		if textBlock is not None:
+			text = textBlock.as_string()
+			
+		if useOutput["Lines"]: return text, text.split("\n")
+		else: return text, []
+		

@@ -326,7 +326,11 @@ class NetworkCodeGenerator:
 				inputParts.append(self.getInputPartFromSameNode(socket, useFastMethod, inputSocketNames))
 		if usesOutputUseParameter(node):
 			self.outputUseNodes.append(node)
-			return node.outputUseParameterName + " = " + getNodeOutputUseName(node) + ", " + self.joinInputParts(inputParts, useFastMethod)
+			joinedInputParts = self.joinInputParts(inputParts, useFastMethod)
+			if len(joinedInputParts) > 0:
+				return node.outputUseParameterName + " = " + getNodeOutputUseName(node) + ", " + self.joinInputParts(inputParts, useFastMethod)
+			else:
+				return node.outputUseParameterName + " = " + getNodeOutputUseName(node)
 		else:
 			return self.joinInputParts(inputParts, useFastMethod)
 			
