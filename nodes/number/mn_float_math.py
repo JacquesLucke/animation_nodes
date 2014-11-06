@@ -5,13 +5,7 @@ from mn_execution import nodeTreeChanged, allowCompiling, forbidCompiling
 import math
 
 def updateNode(node, context):
-	singleInputOperations = ["SINE",
-							 "COSINE",
-							 "TANGENT",
-							 "ARCSINE",
-							 "ARCCOSINE",
-							 "ARCTANGENT",
-							 "ABSOLUTE"]
+	singleInputOperations = ["SINE", "COSINE", "TANGENT", "ARCSINE", "ARCCOSINE", "ARCTANGENT", "ABSOLUTE", "FLOOR", "CEILING"]
 	if node.mathTypesProperty in singleInputOperations and not node.inputs[-1].hide:
 		node.inputs[-1].hide = True
 	elif node.mathTypesProperty not in singleInputOperations and node.inputs[-1].hide:
@@ -42,7 +36,9 @@ class mn_FloatMathNode(Node, AnimationNode):
 		("LESSTHAN", "Less Than", ""),
 		("GREATHERTHAN", "Greather Than", ""),
 		("MODULO", "Modulo", ""),
-		("ABSOLUTE", "Absolute", "")]
+		("ABSOLUTE", "Absolute", ""),
+		("FLOOR", "Floor", ""),
+		("CEILING", "Ceiling", "")]
 	mathTypesProperty = bpy.props.EnumProperty(name="Operation", items=mathTypes, default="MULITPLY", update=updateNode)
 	
 	def init(self, context):
@@ -93,6 +89,8 @@ else: $result$ = math.log(%a%, %b%)
 if %b% == 0: $result$ = 0
 else: $result$ = %a% % %b%
 '''
+			elif op == "FLOOR": return "$result$ = math.floor(%a%)"
+			elif op == "CEILING": return "$result$ = math.ceil(%a%)"
 		return ""
 	def getModuleList(self):
 		return ["math"]
