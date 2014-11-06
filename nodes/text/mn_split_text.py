@@ -17,7 +17,7 @@ class mn_SplitText(Node, AnimationNode):
 	def splitTypeChanges(self, context):
 		self.setHideProperty()
 	
-	splitType = bpy.props.EnumProperty(name = "Split Type", items = splitTypes, update = splitTypeChanges)
+	splitType = bpy.props.EnumProperty(name = "Split Type", default = "Custom", items = splitTypes, update = splitTypeChanges)
 	
 	def init(self, context):
 		forbidCompiling()
@@ -25,7 +25,6 @@ class mn_SplitText(Node, AnimationNode):
 		self.inputs.new("mn_StringSocket", "Split By")
 		self.outputs.new("mn_StringListSocket", "Text List")
 		self.outputs.new("mn_IntegerSocket", "Length")
-		self.setHideProperty()
 		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
@@ -46,5 +45,7 @@ class mn_SplitText(Node, AnimationNode):
 		if self.splitType == "Characters": textList = list(text)
 		elif self.splitType == "Words": textList = text.split()
 		elif self.splitType == "Lines": textList = text.split("\n")
-		elif self.splitType == "Custom": textList = text.split(splitBy)
+		elif self.splitType == "Custom":
+			if splitBy == "": textList = list(text)
+			else: textList = text.split(splitBy)
 		return textList, len(textList)

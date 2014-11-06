@@ -9,7 +9,7 @@ class mn_StringSocket(mn_BaseSocket, mn_SocketProperties):
 	allowedInputTypes = ["String", "Object"]
 	drawColor = (1, 1, 1, 1)
 	
-	string = bpy.props.StringProperty(default = "Text", update = nodePropertyChanged)
+	string = bpy.props.StringProperty(default = "", update = nodePropertyChanged)
 	
 	def drawInput(self, layout, node, text):
 		layout.prop(self, "string", text = text)
