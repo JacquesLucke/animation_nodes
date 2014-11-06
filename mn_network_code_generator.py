@@ -502,7 +502,6 @@ convertRules[("Integer", "String")] = "mn_ConvertNode"
 convertRules[("Float", "Vector")] = "mn_CombineVector"
 convertRules[("Integer", "Vector")] = "mn_CombineVector"
 convertRules[("Vector", "Float")] = "mn_SeparateVector"
-convertRules[("Vector", "Integer")] = "mn_SeparateVector"
 		
 def cleanupNodeTrees():
 	nodeTrees = getAnimationNodeTrees()
