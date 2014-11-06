@@ -49,6 +49,7 @@ def getNodeNameDictionary():
 		("mn_TranslationMatrix", "Translation Matrix"),
 		("mn_RotationMatrix", "Rotation Matrix"),
 		("mn_ScaleMatrix", "Scale Matrix"),
+		("mn_ComposeMatrix", "Compose Matrix"),
 		("mn_MatrixCombine", "Combine Matrices"),
 		("mn_MatrixMath", "Matrix Math"),
 		("mn_AnimateMatrixNode", "Animate Matrix"),
