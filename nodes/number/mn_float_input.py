@@ -7,20 +7,16 @@ class mn_FloatInputNode(Node, AnimationNode):
 	bl_idname = "mn_FloatInputNode"
 	bl_label = "Float Input"
 	
-	floatProperty = bpy.props.FloatProperty(default = 0.0, update = nodePropertyChanged)
-	
 	def init(self, context):
 		forbidCompiling()
+		self.inputs.new("mn_FloatSocket", "Number").showName = False
 		self.outputs.new("mn_FloatSocket", "Number")
 		allowCompiling()
 		
-	def draw_buttons(self, context, layout):
-		layout.prop(self, "floatProperty", text = "")
-		
 	def getInputSocketNames(self):
-		return {}
+		return {"Number" : "number"}
 	def getOutputSocketNames(self):
 		return {"Number" : "number"}
 		
-	def execute(self):
-		return self.floatProperty
+	def execute(self, number):
+		return number

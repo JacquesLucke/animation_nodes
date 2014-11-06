@@ -10,8 +10,10 @@ class mn_FloatSocket(mn_BaseSocket, mn_SocketProperties):
 	drawColor = (0.4, 0.4, 0.7, 1)
 	
 	number = bpy.props.FloatProperty(default = 0.0, update = nodePropertyChanged)
+	showName = bpy.props.BoolProperty(default = True)
 	
 	def drawInput(self, layout, node, text):
+		if not self.showName: text = ""
 		layout.prop(self, "number", text = text)
 	
 	def getValue(self):
