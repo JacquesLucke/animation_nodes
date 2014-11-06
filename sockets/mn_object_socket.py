@@ -26,9 +26,6 @@ class mn_ObjectSocket(mn_BaseSocket, mn_SocketProperties):
 		selector.target = "objectName"
 		col.separator()
 		
-	def draw_color(self, context, node):
-		return (0, 0, 0, 1)
-		
 	def getValue(self):
 		return bpy.data.objects.get(self.objectName)
 		

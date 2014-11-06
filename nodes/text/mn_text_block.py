@@ -5,31 +5,25 @@ from mn_execution import nodeTreeChanged, allowCompiling, forbidCompiling
 from mn_utils import *
 
 
-class mn_TextBlock(Node, AnimationNode):
-	bl_idname = "mn_TextBlock"
-	bl_label = "Text Block"
+class mn_TextBlockReader(Node, AnimationNode):
+	bl_idname = "mn_TextBlockReader"
+	bl_label = "Text Block Reader"
 	outputUseParameterName = "useOutput"
-	
-	selectedTextBlockName = bpy.props.StringProperty(name = "Text Block")
 	
 	def init(self, context):
 		forbidCompiling()
+		self.inputs.new("mn_TextBlockSocket", "Text Block").showName = False
 		self.outputs.new("mn_StringSocket", "Text")
 		self.outputs.new("mn_StringListSocket", "Lines")
 		allowCompiling()
-	
-	def draw_buttons(self, context, layout):
-		layout.prop_search(self, "selectedTextBlockName",  bpy.data, "texts", icon="NONE", text = "")
 		
 	def getInputSocketNames(self):
-		return {}
+		return {"Text Block" : "textBlock"}
 	def getOutputSocketNames(self):
 		return {"Text" : "text",
 				"Lines" : "lines"}
 
-	def execute(self, useOutput):
-		textBlock = bpy.data.texts.get(self.selectedTextBlockName)
-		
+	def execute(self, useOutput, textBlock):
 		text = ""
 		if textBlock is not None:
 			text = textBlock.as_string()
