@@ -526,7 +526,6 @@ def handleNotAllowedLink(nodeTree, link, fromSocket, toSocket, originSocket):
 	toType = toSocket.dataType
 	nodeTree.links.remove(link)
 	if fromType == "Generic":
-		
 		convertNodeType = "mn_ConvertNode"
 	else:convertNodeType = convertRules.get((fromType, toType))
 	if convertNodeType is not None:
