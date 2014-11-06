@@ -12,38 +12,14 @@ class mn_ObjectInputNode(Node, AnimationNode):
 	
 	def init(self, context):
 		forbidCompiling()
+		self.inputs.new("mn_ObjectSocket", "Object").showName = False
 		self.outputs.new("mn_ObjectSocket", "Object")
 		allowCompiling()
 		
-	def draw_buttons(self, context, layout):
-		col = layout.column()
-		row = col.row(align = True)
-		row.prop_search(self, "objectName",  context.scene, "objects", icon="NONE", text = "")         
-		selector = row.operator("mn.assign_active_object_to_node", text = "", icon = "EYEDROPPER")
-		selector.nodeTreeName = self.id_data.name
-		selector.nodeName = self.name
-		selector.target = "objectName"
-		col.separator()
+	def getInputSocketNames(self):
+		return {"Object" : "object"}
+	def getOutputSocketNames(self):
+		return {"Object" : "object"}
 		
-	def execute(self, input):
-		output = {}
-		output["Object"] = bpy.data.objects.get(self.objectName)
-		return output
-		
-class AssignActiveObjectToNode(bpy.types.Operator):
-	bl_idname = "mn.assign_active_object_to_node"
-	bl_label = "Assign Active Object"
-	
-	nodeTreeName = bpy.props.StringProperty()
-	nodeName = bpy.props.StringProperty()
-	target = bpy.props.StringProperty()
-	
-	@classmethod
-	def poll(cls, context):
-		return getActive() is not None
-		
-	def execute(self, context):
-		obj = getActive()
-		node = getNode(self.nodeTreeName, self.nodeName)
-		setattr(node, self.target, obj.name)
-		return {'FINISHED'}	
+	def execute(self, object):
+		return object
