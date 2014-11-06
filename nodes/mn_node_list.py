@@ -28,6 +28,7 @@ def getNodeNameDictionary():
 		("mn_TextBlock", "Text Block"),
 		("mn_CharactersNode", "Characters"),
 		("mn_CombineStringsNode", "Combine Texts"),
+		("mn_SplitText", "Split Text"),
 		("mn_ReplicateStringsNode", "Replicate Text"),
 		("mn_SubstringNode", "Trim Text"),
 		("mn_StringAnalyzeNode", "Analyze Text"),
