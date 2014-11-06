@@ -88,10 +88,7 @@ def getNodeNameDictionary():
 		("mn_ViewportColorNode" , "Viewport Color") ] ))
 
 	nodes.append(("Convert", [
-		("mn_ToStringConversion", "To Text"),
-		("mn_ToFloatConversion", "To Float"),
-		("mn_ToIntegerConversion", "To Integer"),
-		("mn_ToObjectConversion", "To Object") ] ))
+		("mn_ConvertNode", "Convert") ] ))
 		
 	nodes.append(("Script", [
 		("mn_ExpressionNode", "Expression") ] ))
