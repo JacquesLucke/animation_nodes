@@ -7,17 +7,16 @@ class mn_StringInputNode(Node, AnimationNode):
 	bl_idname = "mn_StringInputNode"
 	bl_label = "Text Input"
 	
-	stringProperty = bpy.props.StringProperty(default = "text", update = nodePropertyChanged)
-	
 	def init(self, context):
 		forbidCompiling()
+		self.inputs.new("mn_StringSocket", "Text").showName = False
 		self.outputs.new("mn_StringSocket", "Text")
 		allowCompiling()
 		
-	def draw_buttons(self, context, layout):
-		layout.prop(self, "stringProperty", text = "")
+	def getInputSocketNames(self):
+		return {"Text" : "text"}
+	def getOutputSocketNames(self):
+		return {"Text" : "text"}
 		
-	def execute(self, input):
-		output = {}
-		output["Text"] = self.stringProperty
-		return output
+	def execute(self, text):
+		return text
