@@ -15,6 +15,7 @@ class mn_ScriptNode(Node, AnimationNode):
 	def selectedScriptChanged(self, context):
 		updateScripts()
 		self.buildSockets()
+		self.errorMessage = ""
 		nodeTreeChanged()
 		
 	def getScriptNameItems(self, context):
@@ -27,19 +28,21 @@ class mn_ScriptNode(Node, AnimationNode):
 		
 	textBlockName = bpy.props.StringProperty(default = "", update = selectedScriptChanged)
 	scriptName = bpy.props.EnumProperty(items = getScriptNameItems, update = selectedScriptChanged, name = "Script Name")
+	errorMessage = bpy.props.StringProperty(default = "")
 	
 	def init(self, context):
 		forbidCompiling()
-		
 		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
-		layout.operator("mn.update_scripts", text = "Update Scripts")
+		layout.operator("mn.update_scripts", text = "Update Scripts", icon = "FILE_REFRESH")
 	
-		layout.prop_search(self, "textBlockName",  bpy.data, "texts", icon="NONE", text = "Text Block")
-
+		layout.prop_search(self, "textBlockName",  bpy.data, "texts", icon="NONE", text = "Code")
 		if self.scriptName != "NONE":
 			layout.prop(self, "scriptName", text = "Script")
+			
+		if self.errorMessage != "":
+			layout.label(self.errorMessage, icon = "ERROR")
 	
 	def buildSockets(self):
 		global textBlockData
@@ -84,14 +87,20 @@ class mn_ScriptNode(Node, AnimationNode):
 		
 		if self.textBlockName not in textBlockData:
 			updateScripts()
-		
-		functionOutput = textBlockData[self.textBlockName][1][self.scriptName + "__execute__"](**input)
-		
-		if len(self.outputs) == 1:
-			output[self.outputs[0].identifier] = functionOutput
-		else:
-			for i, socket in enumerate(self.outputs):
-				output[socket.identifier] = functionOutput[i]
+		try:
+			functionOutput = textBlockData[self.textBlockName][1][self.scriptName + "__execute__"](**input)
+			
+			if len(self.outputs) == 1:
+				output[self.outputs[0].identifier] = functionOutput
+			else:
+				for i, socket in enumerate(self.outputs):
+					output[socket.identifier] = functionOutput[i]
+					
+			self.errorMessage = ""
+		except BaseException as e:
+			self.errorMessage = str(e)
+			for socket in self.outputs:
+				output[socket.identifier] = socket.getValue()
 		
 		return output
 		
