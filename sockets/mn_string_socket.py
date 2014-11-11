@@ -6,7 +6,7 @@ class mn_StringSocket(mn_BaseSocket, mn_SocketProperties):
 	bl_idname = "mn_StringSocket"
 	bl_label = "String Socket"
 	dataType = "String"
-	allowedInputTypes = ["String", "Object"]
+	allowedInputTypes = ["String"]
 	drawColor = (1, 1, 1, 1)
 	
 	string = bpy.props.StringProperty(default = "", update = nodePropertyChanged)

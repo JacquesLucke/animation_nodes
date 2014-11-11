@@ -6,7 +6,7 @@ class mn_ObjectSocket(mn_BaseSocket, mn_SocketProperties):
 	bl_idname = "mn_ObjectSocket"
 	bl_label = "Object Socket"
 	dataType = "Object"
-	allowedInputTypes = ["Object", "String"]
+	allowedInputTypes = ["Object"]
 	drawColor = (0, 0, 0, 1)
 	
 	objectName = bpy.props.StringProperty(update = nodePropertyChanged)
