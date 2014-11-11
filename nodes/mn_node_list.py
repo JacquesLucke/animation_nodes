@@ -91,7 +91,8 @@ def getNodeNameDictionary():
 		("mn_ConvertNode", "Convert") ] ))
 		
 	nodes.append(("Script", [
-		("mn_ExpressionNode", "Expression") ] ))
+		("mn_ExpressionNode", "Expression"),
+		("mn_ScriptNode", "Script") ] ))
 		
 	nodes.append(("System", [
 		("mn_LoopCallerNode", "Loop Caller"),

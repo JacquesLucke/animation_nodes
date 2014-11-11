@@ -13,10 +13,8 @@ class mn_ScriptNode(Node, AnimationNode):
 	bl_label = "Script"
 	
 	def selectedScriptChanged(self, context):
-		forbidCompiling()
 		updateScripts()
 		self.buildSockets()
-		allowCompiling()
 		nodeTreeChanged()
 		
 	def getScriptNameItems(self, context):
@@ -45,9 +43,11 @@ class mn_ScriptNode(Node, AnimationNode):
 	
 	def buildSockets(self):
 		global textBlockData
+		forbidCompiling()
 		connections = getConnectionDictionaries(self)
 		self.removeSockets()
-		
+		if self.textBlockName == "":
+			return
 		vars = textBlockData[self.textBlockName][1]
 		
 		socketDescriptionName = self.scriptName + "__sockets__"
@@ -56,6 +56,7 @@ class mn_ScriptNode(Node, AnimationNode):
 			self.buildSocketsFromDescription(socketDescription)
 			
 		tryToSetConnectionDictionaries(self, connections)
+		allowCompiling()
 			
 	def buildSocketsFromDescription(self, socketDescription):
 		inputDescription = socketDescription[0]
@@ -100,6 +101,8 @@ class mn_ScriptNode(Node, AnimationNode):
 		if self.textBlockName == "":
 			return []
 			
+		if self.textBlockName not in textBlockData:
+			updateScripts()
 		names = textBlockData[self.textBlockName][0].co_names
 		
 		scriptNames = set()
@@ -150,3 +153,4 @@ class UpdateScripts(bpy.types.Operator):
 	def execute(self, context):
 		updateScripts()
 		return {'FINISHED'}
+		
