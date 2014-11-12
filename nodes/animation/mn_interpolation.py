@@ -2,6 +2,7 @@ import bpy
 from bpy.types import Node
 from mn_cache import getUniformRandom
 from mn_node_base import AnimationNode
+from mn_utils import *
 from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from mn_interpolation_utils import *
 from mn_node_helper import *
@@ -54,6 +55,9 @@ class mn_InterpolationNode(Node, AnimationNode):
 		if self.topCategory == "CUSTOM":
 			node = self.getCurveNode()
 			layout.template_curve_mapping(node, "mapping", type = "NONE")
+			resetEndPoints = layout.operator("mn.reset_custom_interpolation_end_points", text = "Reset End Points")
+			resetEndPoints.nodeTreeName = self.id_data.name
+			resetEndPoints.nodeName = self.name
 		
 	def getInputSocketNames(self):
 		return {"Back" : "back"}
@@ -107,9 +111,7 @@ class mn_InterpolationNode(Node, AnimationNode):
 		nodeTree = material.node_tree
 		node = nodeTree.nodes.new("ShaderNodeRGBCurve")
 		node.name = self.curveNodeName
-		curvePoints = node.mapping.curves[3].points
-		curvePoints[0].location = [0, 0.25]
-		curvePoints[-1].location = [1, 0.75]
+		self.resetCurveEndPoints()
 		return node
 	def removeCurveNode(self):
 		nodeTree = getHelperMaterial().node_tree
@@ -117,3 +119,21 @@ class mn_InterpolationNode(Node, AnimationNode):
 		if node is not None:
 			nodeTree.nodes.remove(node)
 		self.curveNodeName = ""
+	
+	def resetCurveEndPoints(self):
+		curvePoints = self.getCurve().points
+		curvePoints[0].location = [0, 0.25]
+		curvePoints[-1].location = [1, 0.75]
+		
+		
+class ResetEndPoints(bpy.types.Operator):
+	bl_idname = "mn.reset_custom_interpolation_end_points"
+	bl_label = "Reset End Points"
+	
+	nodeTreeName = bpy.props.StringProperty()
+	nodeName = bpy.props.StringProperty()
+
+	def execute(self, context):
+		node = getNode(self.nodeTreeName, self.nodeName)
+		node.resetCurveEndPoints()
+		return {'FINISHED'}
