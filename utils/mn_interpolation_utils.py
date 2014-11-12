@@ -27,3 +27,6 @@ def backEaseOut(x, back = 1.70158):
 	return x*x*((1 + back)*x+back)+1
 def backEaseIn(x, back = 1.70158):
 	return x*x*((1 + back)*x-back)
+	
+def curveInterpolation(x, curve):
+	return (curve.evaluate(x) - 0.25)*2

@@ -4,11 +4,13 @@ from mn_cache import getUniformRandom
 from mn_node_base import AnimationNode
 from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from mn_interpolation_utils import *
+from mn_node_helper import *
 
 topCategoryItems = [("LINEAR", "Linear", ""),
 					("EXPONENTIAL", "Exponential", ""),
 					("CUBIC", "Cubic", ""),
-					("BACK", "Back", "")]
+					("BACK", "Back", ""),
+					("CUSTOM", "Custom", "")]
 					
 exponentialCategoryItems = [("IN", "In", ""),
 							("OUT", "Out", "")]
@@ -29,16 +31,19 @@ class mn_InterpolationNode(Node, AnimationNode):
 		if self.topCategory == "BACK": self.inputs["Back"].hide = False
 		nodePropertyChanged(self, context)
 	
-	topCategory = bpy.props.EnumProperty(items = topCategoryItems, default = "LINEAR", update = topCategoryChanged)
-	backCategory = bpy.props.EnumProperty(items = backCategoryItems, default = "OUT", update = nodePropertyChanged)
-	exponentialCategory = bpy.props.EnumProperty(items = exponentialCategoryItems, default = "OUT", update = nodePropertyChanged)
-	cubicCategory = bpy.props.EnumProperty(items = cubicCategoryItems, default = "OUT", update = nodePropertyChanged)
+	topCategory = bpy.props.EnumProperty(items = topCategoryItems, default = "LINEAR", update = topCategoryChanged, name = "Category")
+	backCategory = bpy.props.EnumProperty(items = backCategoryItems, default = "OUT", update = nodePropertyChanged, name = "Back")
+	exponentialCategory = bpy.props.EnumProperty(items = exponentialCategoryItems, default = "OUT", update = nodePropertyChanged, name = "Exponential")
+	cubicCategory = bpy.props.EnumProperty(items = cubicCategoryItems, default = "OUT", update = nodePropertyChanged, name = "Cubic")
+	
+	curveNodeName = bpy.props.StringProperty(default = "")
 	
 	def init(self, context):
 		forbidCompiling()
 		self.inputs.new("mn_FloatSocket", "Back").number = 1.70158
 		self.outputs.new("mn_InterpolationSocket", "Interpolation")
 		self.hideInputSockets()
+		self.createCurveNode()
 		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
@@ -46,6 +51,9 @@ class mn_InterpolationNode(Node, AnimationNode):
 		if self.topCategory == "BACK": layout.prop(self, "backCategory", text = "")
 		if self.topCategory == "EXPONENTIAL": layout.prop(self, "exponentialCategory", text = "")
 		if self.topCategory == "CUBIC": layout.prop(self, "cubicCategory", text = "")
+		if self.topCategory == "CUSTOM":
+			node = self.getCurveNode()
+			layout.template_curve_mapping(node, "mapping", type = "NONE")
 		
 	def getInputSocketNames(self):
 		return {"Back" : "back"}
@@ -54,19 +62,58 @@ class mn_InterpolationNode(Node, AnimationNode):
 		
 	def execute(self, back):
 		if self.topCategory == "LINEAR": return (linear, None)
-		if self.topCategory == "EXPONENTIAL":
+		elif self.topCategory == "EXPONENTIAL":
 			if self.exponentialCategory == "IN": return (expoEaseIn, None)
-			if self.exponentialCategory == "OUT": return (expoEaseOut, None)
-		if self.topCategory == "CUBIC":
+			elif self.exponentialCategory == "OUT": return (expoEaseOut, None)
+		elif self.topCategory == "CUBIC":
 			if self.cubicCategory == "IN": return (cubicEaseIn, None)
-			if self.cubicCategory == "OUT": return (cubicEaseOut, None)
-			if self.cubicCategory == "INOUT": return (cubicEaseInOut, None)
-		if self.topCategory == "BACK":
+			elif self.cubicCategory == "OUT": return (cubicEaseOut, None)
+			elif self.cubicCategory == "INOUT": return (cubicEaseInOut, None)
+		elif self.topCategory == "BACK":
 			if self.backCategory == "IN": return (backEaseIn, back)
-			if self.backCategory == "OUT": return (backEaseOut, back)
+			elif self.backCategory == "OUT": return (backEaseOut, back)
+		elif self.topCategory == "CUSTOM":
+			node = self.getCurveNode()
+			return (curveInterpolation, self.getCurve())
 		return (linear, None)
 		
 	def hideInputSockets(self):
 		for socket in self.inputs:
 			socket.hide = True
+			
+	def copy(self, node):
+		self.createCurveNode()
+		curvePoints = self.getCurve().points
+		for i, point in enumerate(node.getCurve().points):
+			if len(curvePoints) == i:
+				curvePoints.new(50, 50) #random start position
+			curvePoints[i].location = point.location
+	def free(self):
+		self.removeCurveNode()
 		
+	def getCurveNode(self):
+		material = getHelperMaterial()
+		nodeTree = material.node_tree
+		node = nodeTree.nodes.get(self.curveNodeName)
+		if node is None:
+			self.createCurveNode()
+		return node
+	def getCurve(self):
+		return self.getCurveNode().mapping.curves[3]
+		
+	def createCurveNode(self):
+		self.curveNodeName = getNotUsedMaterialNodeName()
+		material = getHelperMaterial()
+		nodeTree = material.node_tree
+		node = nodeTree.nodes.new("ShaderNodeRGBCurve")
+		node.name = self.curveNodeName
+		curvePoints = node.mapping.curves[3].points
+		curvePoints[0].location = [0, 0.25]
+		curvePoints[-1].location = [1, 0.75]
+		return node
+	def removeCurveNode(self):
+		nodeTree = getHelperMaterial().node_tree
+		node = nodeTree.nodes.get(self.curveNodeName)
+		if node is not None:
+			nodeTree.nodes.remove(node)
+		self.curveNodeName = ""
