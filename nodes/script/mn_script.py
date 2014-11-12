@@ -46,11 +46,9 @@ class mn_ScriptNode(Node, AnimationNode):
 	
 	def buildSockets(self):
 		global textBlockData
-		forbidCompiling()
 		connections = getConnectionDictionaries(self)
 		self.removeSockets()
 		if self.textBlockName == "":
-			allowCompiling()
 			return
 		vars = textBlockData[self.textBlockName][1]
 		
@@ -60,21 +58,28 @@ class mn_ScriptNode(Node, AnimationNode):
 			self.buildSocketsFromDescription(socketDescription)
 			
 		tryToSetConnectionDictionaries(self, connections)
-		allowCompiling()
 			
 	def buildSocketsFromDescription(self, socketDescription):
-		inputDescription = socketDescription[0]
-		for d in inputDescription:
-			blName = getSocketNameByDataType(d[0])
-			name = d[1]
-			identifier = d[2]
-			self.inputs.new(blName, name, identifier)
-			
-		outputDescription = socketDescription[1]
-		for d in outputDescription:
-			blName = getSocketNameByDataType(d[0])
-			name = d[1]
-			self.outputs.new(blName, name)
+		forbidCompiling()
+		try:
+			inputDescription = socketDescription[0]
+			for d in inputDescription:
+				blName = getSocketNameByDataType(d[0])
+				name = d[1]
+				identifier = d[2]
+				self.inputs.new(blName, name, identifier)
+				
+			outputDescription = socketDescription[1]
+			for d in outputDescription:
+				blName = getSocketNameByDataType(d[0])
+				name = d[1]
+				self.outputs.new(blName, name)
+			self.errorMessage = ""
+		except:
+			self.errorMessage = "cannot build sockets"
+			self.removeSockets()
+		allowCompiling()
+		nodeTreeChanged()
 		
 	def removeSockets(self):
 		self.inputs.clear()
@@ -89,6 +94,8 @@ class mn_ScriptNode(Node, AnimationNode):
 		if self.textBlockName not in textBlockData:
 			updateScripts()
 		try:
+			if self.errorMessage == "cannot build sockets": raise
+			
 			functionOutput = textBlockData[self.textBlockName][1][getExecuteFunctionName(self.scriptName)](**input)
 			
 			if len(self.outputs) == 1:
