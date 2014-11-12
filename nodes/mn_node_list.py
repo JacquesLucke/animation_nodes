@@ -19,6 +19,7 @@ def getNodeNameDictionary():
 		("mn_VectorLengthNode", "Vector Length"),
 		("mn_AnimateVectorNode", "Animate Vector"),
 		("mn_VectorDistanceNode", "Vector Distance"),
+		("mn_TransfromVector", "Transform Vector"),
 		("mn_VectorMathNode", "Vector Math") ] ))	
 		
 	nodes.append(("Text", [
@@ -47,11 +48,11 @@ def getNodeNameDictionary():
 		("mn_ObjectOutputNode", "Transforms Output") ] ))
 		
 	nodes.append(("Matrix", [
-		("mn_MatrixConvert", "Transforms from Matrix"),
+		("mn_ComposeMatrix", "Compose Matrix"),
+		("mn_DecomposeMatrix", "Decompose Matrix"),
 		("mn_TranslationMatrix", "Translation Matrix"),
 		("mn_RotationMatrix", "Rotation Matrix"),
 		("mn_ScaleMatrix", "Scale Matrix"),
-		("mn_ComposeMatrix", "Compose Matrix"),
 		("mn_MatrixCombine", "Combine Matrices"),
 		("mn_MatrixMath", "Matrix Math"),
 		("mn_AnimateMatrixNode", "Animate Matrix"),
