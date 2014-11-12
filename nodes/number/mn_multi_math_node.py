@@ -9,6 +9,7 @@ class mn_MultiFloatMathNode(Node, AnimationNode):
 	bl_idname = "mn_MultiFloatMathNode"
 	bl_label = "Multi Float Math"
 	node_category = "Math"
+	isDetermined = True
 	
 	operationItems = [("ADD", "Add", ""),
 					("MULTIPLY", "Multiply", "")]

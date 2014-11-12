@@ -8,6 +8,7 @@ from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 class mn_ColorMix(Node, AnimationNode):
 	bl_idname = "mn_ColorMix"
 	bl_label = "Color Mix"
+	isDetermined = True
 	
 	def init(self, context):
 		forbidCompiling()

@@ -6,6 +6,7 @@ from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 class mn_FloatInputNode(Node, AnimationNode):
 	bl_idname = "mn_FloatInputNode"
 	bl_label = "Float Input"
+	isDetermined = True
 	
 	def init(self, context):
 		forbidCompiling()

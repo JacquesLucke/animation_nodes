@@ -9,7 +9,7 @@ def updateNode(node, context):
 class mn_FloatCompareNode(Node, AnimationNode):
 	bl_idname = "mn_FloatCompareNode"
 	bl_label = "Compare Numbers"
-
+	isDetermined = True
 	
 	comparisonTypes = [
 		("SMALLER_EQ", "Smaller or equal", ""),

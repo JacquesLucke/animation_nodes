@@ -8,6 +8,7 @@ from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 class mn_FloatClamp(Node, AnimationNode):
 	bl_idname = "mn_FloatClamp"
 	bl_label = "Clamp"
+	isDetermined = True
 	
 	def init(self, context):
 		forbidCompiling()

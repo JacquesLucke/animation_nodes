@@ -6,6 +6,7 @@ from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 class mn_EvaluateInterpolation(Node, AnimationNode):
 	bl_idname = "mn_EvaluateInterpolation"
 	bl_label = "Evaluate Interpolation"
+	isDetermined = True
 	
 	def init(self, context):
 		forbidCompiling()

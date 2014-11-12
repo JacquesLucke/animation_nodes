@@ -8,6 +8,7 @@ from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 class mn_CombineColor(Node, AnimationNode):
 	bl_idname = "mn_CombineColor"
 	bl_label = "Combine Color"
+	isDetermined = True
 	
 	def init(self, context):
 		forbidCompiling()

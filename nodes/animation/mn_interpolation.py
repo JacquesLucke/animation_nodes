@@ -26,6 +26,7 @@ backCategoryItems = [("IN", "In", ""),
 class mn_InterpolationNode(Node, AnimationNode):
 	bl_idname = "mn_InterpolationNode"
 	bl_label = "Interpolation"
+	isDetermined = True
 	
 	def topCategoryChanged(self, context):
 		self.hideInputSockets()

@@ -7,6 +7,7 @@ class mn_FloatRangeListNode(Node, AnimationNode):
 	bl_idname = "mn_FloatRangeListNode"
 	bl_label = "Number Range"
 	node_category = "Math"
+	isDetermined = True
 	
 	def init(self, context):
 		forbidCompiling()

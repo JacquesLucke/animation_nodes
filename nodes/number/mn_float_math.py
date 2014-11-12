@@ -16,6 +16,7 @@ def updateNode(node, context):
 class mn_FloatMathNode(Node, AnimationNode):
 	bl_idname = "mn_FloatMathNode"
 	bl_label = "Math"
+	isDetermined = True
 	
 	mathTypes = [
 		("ADD", "Add", ""),

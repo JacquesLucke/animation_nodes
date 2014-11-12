@@ -9,6 +9,7 @@ class mn_GridArrange(Node, AnimationNode):
 	bl_idname = "mn_GridArrange"
 	bl_label = "Grid Arrange"
 	node_category = "Arrange"
+	isDetermined = True
 	
 	def init(self, context):
 		forbidCompiling()

@@ -8,6 +8,7 @@ from mn_socket_info import *
 class mn_ConvertNode(Node, AnimationNode):
 	bl_idname = "mn_ConvertNode"
 	bl_label = "Convert"
+	isDetermined = True
 	
 	convertType = bpy.props.StringProperty(default = "Integer")
 	

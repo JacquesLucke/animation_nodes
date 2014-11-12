@@ -9,6 +9,7 @@ class mn_AnimateFloatNode(Node, AnimationNode):
 	bl_idname = "mn_AnimateFloatNode"
 	bl_label = "Animate Number"
 	outputUseParameterName = "useOutput"
+	isDetermined = True
 	
 	def init(self, context):
 		forbidCompiling()

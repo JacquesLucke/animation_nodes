@@ -6,6 +6,7 @@ from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 class mn_IntegerInputNode(Node, AnimationNode):
 	bl_idname = "mn_IntegerInputNode"
 	bl_label = "Integer Input"
+	isDetermined = True
 	
 	intProperty = bpy.props.IntProperty(default = 0, update = nodePropertyChanged)
 	

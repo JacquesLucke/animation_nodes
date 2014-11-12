@@ -7,6 +7,7 @@ from mn_interpolation_utils import *
 class mn_MixInterpolation(Node, AnimationNode):
 	bl_idname = "mn_MixInterpolation"
 	bl_label = "Mix Interpolation"
+	isDetermined = True
 	
 	def init(self, context):
 		forbidCompiling()
