@@ -77,8 +77,8 @@ class mn_InterpolationNode(Node, AnimationNode):
 			if self.backCategory == "IN": return (backEaseIn, back)
 			elif self.backCategory == "OUT": return (backEaseOut, back)
 		elif self.topCategory == "CUSTOM":
-			node = self.getCurveNode()
-			return (curveInterpolation, self.getCurve())
+			mapping = self.getMapping()
+			return (curveInterpolation, (mapping.curves[3], mapping))
 		return (linear, None)
 		
 	def hideInputSockets(self):
@@ -102,8 +102,10 @@ class mn_InterpolationNode(Node, AnimationNode):
 		if node is None:
 			self.createCurveNode()
 		return node
+	def getMapping(self):
+		return self.getCurveNode().mapping
 	def getCurve(self):
-		return self.getCurveNode().mapping.curves[3]
+		return self.getMapping().curves[3]
 		
 	def createCurveNode(self):
 		self.curveNodeName = getNotUsedMaterialNodeName()
@@ -112,13 +114,13 @@ class mn_InterpolationNode(Node, AnimationNode):
 		node = nodeTree.nodes.new("ShaderNodeRGBCurve")
 		node.name = self.curveNodeName
 		self.resetCurveEndPoints()
-		return node
 	def removeCurveNode(self):
 		nodeTree = getHelperMaterial().node_tree
 		node = nodeTree.nodes.get(self.curveNodeName)
 		if node is not None:
 			nodeTree.nodes.remove(node)
 		self.curveNodeName = ""
+		
 	
 	def resetCurveEndPoints(self):
 		curvePoints = self.getCurve().points

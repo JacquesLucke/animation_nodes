@@ -28,5 +28,13 @@ def backEaseOut(x, back = 1.70158):
 def backEaseIn(x, back = 1.70158):
 	return x*x*((1 + back)*x-back)
 	
-def curveInterpolation(x, curve):
-	return (curve.evaluate(x) - 0.25)*2
+def curveInterpolation(x, settings):
+	try:
+		return (settings[0].evaluate(x) - 0.25)*2
+	except:
+		settings[1].initialize()
+		return (settings[0].evaluate(x) - 0.25)*2
+	
+def mixedInterpolation(x, settings):
+	a, b, factor = settings
+	return a[0](x, a[1]) * (1 - factor) + b[0](x, b[1]) * factor
