@@ -32,3 +32,7 @@ class mn_FloatSocket(mn_BaseSocket, mn_SocketProperties):
 	def getStoreableValue(self):
 		return self.number
 		
+	def setMinMax(self, min, max):
+		self.min = min
+		self.max = max
+		
