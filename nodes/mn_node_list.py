@@ -78,7 +78,8 @@ def getNodeNameDictionary():
 	nodes.append(("Animation", [
 		("mn_TimeInfoNode", "Time Info"),
 		("mn_InterpolationNode", "Interpolation"),
-		("mn_EvaluateInterpolation", "Evaluate Interpolation") ] ))
+		("mn_EvaluateInterpolation", "Evaluate Interpolation"),
+		("mn_MixInterpolation", "Mix Interpolation") ] ))
 		
 	nodes.append(("Debug", [
 		("mn_DebugOutputNode", "Socket Values"),
