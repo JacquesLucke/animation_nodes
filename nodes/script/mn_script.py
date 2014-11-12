@@ -50,10 +50,11 @@ class mn_ScriptNode(Node, AnimationNode):
 		connections = getConnectionDictionaries(self)
 		self.removeSockets()
 		if self.textBlockName == "":
+			allowCompiling()
 			return
 		vars = textBlockData[self.textBlockName][1]
 		
-		socketDescriptionName = self.scriptName + "__sockets__"
+		socketDescriptionName = getSocketDefinitionName(self.scriptName)
 		if socketDescriptionName in vars:
 			socketDescription = vars.get(socketDescriptionName)
 			self.buildSocketsFromDescription(socketDescription)
@@ -82,13 +83,13 @@ class mn_ScriptNode(Node, AnimationNode):
 	def execute(self, input):
 		output = {}
 		
-		if self.scriptName == "NONE":
+		if self.scriptName in ["NONE", ""]:
 			return output
 		
 		if self.textBlockName not in textBlockData:
 			updateScripts()
 		try:
-			functionOutput = textBlockData[self.textBlockName][1][self.scriptName + "__execute__"](**input)
+			functionOutput = textBlockData[self.textBlockName][1][getExecuteFunctionName(self.scriptName)](**input)
 			
 			if len(self.outputs) == 1:
 				output[self.outputs[0].identifier] = functionOutput
@@ -117,13 +118,33 @@ class mn_ScriptNode(Node, AnimationNode):
 		scriptNames = set()
 		for name in names:
 			if isApiName(name):
-				scriptNames.update([name[:name.find("__")]])
-		return scriptNames
+				scriptNames.update([getScriptName(name)])
+				
+		validScriptNames = []
+		for name in scriptNames:
+			if isValidScriptName(name, names):
+				validScriptNames.append(name)
+		return validScriptNames
 				
 			
 def isApiName(name):
 	return ("__sockets__" in name or
 			"__execute__" in name)
+			
+def isValidScriptName(scriptName, names):
+	return hasSocketDefinition(scriptName, names) and hasExecuteFunction(scriptName, names)
+def hasSocketDefinition(scriptName, names):
+	return getSocketDefinitionName(scriptName) in names
+def hasExecuteFunction(scriptName, names):
+	return getExecuteFunctionName(scriptName) in names
+	
+def getSocketDefinitionName(scriptName):
+	return scriptName + "__sockets__"
+def getExecuteFunctionName(scriptName):
+	return scriptName + "__execute__"
+			
+def getScriptName(varName):
+	return varName[:varName.find("__")]
 			
 def updateScripts():
 	global textBlockData
@@ -134,6 +155,10 @@ def updateScripts():
 		vars = {}
 		exec(compiledTextBlock, vars)
 		textBlockData[textBlock.name] = (compiledTextBlock, vars)
+		
+	for scriptNode in getNodesFromType("mn_ScriptNode"):
+		scriptNode.buildSockets()
+	
 			
 def getUsedTextBlocks():
 	textBlockNames = getUsedTextBlockNames()
