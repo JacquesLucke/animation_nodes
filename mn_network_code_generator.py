@@ -149,6 +149,7 @@ class NetworkCodeGenerator:
 		self.allNodesInTree = []
 		self.executeNodes = []
 		self.outputUseNodes = []
+		self.determinedNodesCode = []
 		
 	def getCode(self):
 		mainCode = self.getMainCode()
@@ -161,6 +162,7 @@ class NetworkCodeGenerator:
 		codeParts.append(self.getSocketReferencingCode())
 		codeParts.append(self.getOutputUseDeclarationCode())
 		codeParts.append(self.getTimerDefinitions())
+		codeParts.append(self.getDeterminedNodesCode())
 		codeParts.append(self.getFunctionsCode())
 		codeParts.append(mainCode)
 		codeParts.append(self.getCodeToPrintProfilingResult())
@@ -210,9 +212,13 @@ class NetworkCodeGenerator:
 		
 	def getExecutableNodeCode(self, node):
 		codeLines = []
-		if useProfiling: codeLines.append(getNodeTimerStartName(node) + " = time.clock()")
-		codeLines.extend(self.getNodeExecutionLines(node))
-		if useProfiling: codeLines.append(getNodeTimerName(node) + " += time.clock() - " + getNodeTimerStartName(node))
+		lines = self.getNodeExecutionLines(node)
+		if isDeterminedNode(node):
+			self.determinedNodesCode.extend(lines)
+		else:
+			if useProfiling: codeLines.append(getNodeTimerStartName(node) + " = time.clock()")
+			codeLines.extend(lines)
+			if useProfiling: codeLines.append(getNodeTimerName(node) + " += time.clock() - " + getNodeTimerStartName(node))
 		return codeLines
 	def getLoopNodeCode(self, node):
 		codeLines = []
@@ -287,6 +293,9 @@ class NetworkCodeGenerator:
 				codeLines.append("print('  ' + str(round(" + getNodeTimerName(node) + ", 5)) + ' s')")
 			return "\n" + "\n".join(codeLines)
 		return ""
+		
+	def getDeterminedNodesCode(self):
+		return "\n".join(self.determinedNodesCode)
 		
 	def getNodeReferencingCode(self):
 		codeLines = []
@@ -435,6 +444,15 @@ def getOutputValueVariable(socket):
 		return getNodeOutputName(socket.node) + "_" + outputSocketNames[socket.identifier]
 	else:
 		return getNodeOutputName(socket.node) + "['" + socket.identifier + "']"
+		
+def isDeterminedNode(node):
+	if getattr(node, "isDetermined", False):
+		for socket in node.inputs:
+			originNode = getDataOriginNode(socket)
+			if originNode is not None:
+				if not isDeterminedNode(originNode): return False
+		return True
+	return False
 		
 def getNodeVariableName(node):
 	return "node_" + str(node.codeIndex)
@@ -586,6 +604,11 @@ def hasOtherDataOrigin(socket):
 	return inputSockets.get(socket) is not None
 def getDataOriginSocket(socket):
 	return inputSockets.get(socket)
+def getDataOriginNode(socket):
+	originSocket = getDataOriginSocket(socket)
+	if originSocket is not None:
+		return originSocket.node
+	return None
 def isOutputSocketUsed(socket):
 	return socket in outputSockets
 def getSocketsFromOutputSocket(socket):

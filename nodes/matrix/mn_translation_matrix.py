@@ -8,6 +8,7 @@ from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 class mn_TranslationMatrix(Node, AnimationNode):
 	bl_idname = "mn_TranslationMatrix"
 	bl_label = "Translation Matrix"
+	isDetermined = True
 	
 	def init(self, context):
 		forbidCompiling()

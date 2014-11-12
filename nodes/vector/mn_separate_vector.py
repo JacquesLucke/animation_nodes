@@ -6,6 +6,7 @@ from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 class mn_SeparateVector(Node, AnimationNode):
 	bl_idname = "mn_SeparateVector"
 	bl_label = "Separate Vector"
+	isDetermined = True
 	
 	def init(self, context):
 		forbidCompiling()

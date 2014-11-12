@@ -9,6 +9,7 @@ class mn_MatrixConvert(Node, AnimationNode):
 	bl_idname = "mn_MatrixConvert"
 	bl_label = "Convert Matrix"
 	outputUseParameterName = "useOutput"
+	isDetermined = True
 	
 	def init(self, context):
 		forbidCompiling()

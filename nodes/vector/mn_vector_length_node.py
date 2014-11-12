@@ -7,6 +7,7 @@ from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 class mn_VectorLengthNode(Node, AnimationNode):
 	bl_idname = "mn_VectorLengthNode"
 	bl_label = "Vector Length"
+	isDetermined = True
 	
 	def init(self, context):
 		forbidCompiling()

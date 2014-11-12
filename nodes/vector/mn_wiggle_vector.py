@@ -8,6 +8,7 @@ from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 class mn_VectorWiggle(Node, AnimationNode):
 	bl_idname = "mn_VectorWiggle"
 	bl_label = "Vector Wiggle"
+	isDetermined = True
 	
 	additionalSeed = bpy.props.IntProperty(update = nodePropertyChanged)
 	

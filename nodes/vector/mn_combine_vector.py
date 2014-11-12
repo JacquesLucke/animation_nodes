@@ -6,6 +6,7 @@ from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, f
 class mn_CombineVector(Node, AnimationNode):
 	bl_idname = "mn_CombineVector"
 	bl_label = "Combine Vector"
+	isDetermined = True
 	
 	def init(self, context):
 		forbidCompiling()

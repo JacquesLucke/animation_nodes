@@ -8,6 +8,7 @@ from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 class mn_ComposeMatrix(Node, AnimationNode):
 	bl_idname = "mn_ComposeMatrix"
 	bl_label = "Compose Matrix"
+	isDetermined = True
 	
 	def init(self, context):
 		forbidCompiling()

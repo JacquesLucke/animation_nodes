@@ -7,6 +7,7 @@ from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 class mn_RandomVectorNode(Node, AnimationNode):
 	bl_idname = "mn_RandomVectorNode"
 	bl_label = "Random Vector"
+	isDetermined = True
 	
 	additionalSeed = bpy.props.IntProperty(update = nodePropertyChanged)
 	

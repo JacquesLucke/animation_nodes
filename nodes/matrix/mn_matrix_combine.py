@@ -9,6 +9,7 @@ from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, f
 class mn_MatrixCombine(Node, AnimationNode):
 	bl_idname = "mn_MatrixCombine"
 	bl_label = "Combine Matrices"
+	isDetermined = True
 	
 	def init(self, context):
 		forbidCompiling()

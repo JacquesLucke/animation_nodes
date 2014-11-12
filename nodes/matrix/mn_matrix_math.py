@@ -9,6 +9,7 @@ operationItems = [("MULTIPLY", "Multiply", "")]
 class mn_MatrixMath(Node, AnimationNode):
 	bl_idname = "mn_MatrixMath"
 	bl_label = "Matrix Math"
+	isDetermined = True
 	
 	operation = bpy.props.EnumProperty(items = operationItems, update = nodeTreeChanged)
 	

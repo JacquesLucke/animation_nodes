@@ -9,6 +9,7 @@ axisItems = [("X", "X", ""), ("Y", "Y", ""), ("Z", "Z", "")]
 class mn_RotationMatrix(Node, AnimationNode):
 	bl_idname = "mn_RotationMatrix"
 	bl_label = "Rotation Matrix"
+	isDetermined = True
 	
 	axis = bpy.props.EnumProperty(items = axisItems, update = nodeTreeChanged)
 	

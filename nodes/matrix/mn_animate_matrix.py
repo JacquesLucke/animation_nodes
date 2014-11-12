@@ -8,6 +8,7 @@ from mn_interpolation_utils import *
 class mn_AnimateMatrixNode(Node, AnimationNode):
 	bl_idname = "mn_AnimateMatrixNode"
 	bl_label = "Animate Matrix"
+	isDetermined = True
 	
 	def init(self, context):
 		forbidCompiling()

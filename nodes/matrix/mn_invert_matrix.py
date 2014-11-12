@@ -8,6 +8,7 @@ from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 class mn_InvertMatrix(Node, AnimationNode):
 	bl_idname = "mn_InvertMatrix"
 	bl_label = "Invert Matrix"
+	isDetermined = True
 	
 	def init(self, context):
 		forbidCompiling()

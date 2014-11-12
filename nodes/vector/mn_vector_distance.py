@@ -7,6 +7,7 @@ from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 class mn_VectorDistanceNode(Node, AnimationNode):
 	bl_idname = "mn_VectorDistanceNode"
 	bl_label = "Vector Distance"
+	isDetermined = True
 	
 	def init(self, context):
 		forbidCompiling()

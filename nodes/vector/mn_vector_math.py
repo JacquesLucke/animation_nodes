@@ -11,6 +11,7 @@ def updateNode(node, context):
 class mn_VectorMathNode(Node, AnimationNode):
 	bl_idname = "mn_VectorMathNode"
 	bl_label = "Vector Math"
+	isDetermined = True
 	
 	mathTypes = [
 		("ADD", "Add", ""),

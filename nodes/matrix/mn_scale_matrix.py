@@ -8,6 +8,7 @@ from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 class mn_ScaleMatrix(Node, AnimationNode):
 	bl_idname = "mn_ScaleMatrix"
 	bl_label = "Scale Matrix"
+	isDetermined = True
 	
 	def init(self, context):
 		forbidCompiling()

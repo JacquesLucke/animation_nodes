@@ -9,6 +9,7 @@ class mn_AnimateVectorNode(Node, AnimationNode):
 	bl_idname = "mn_AnimateVectorNode"
 	bl_label = "Animate Vector"
 	outputUseParameterName = "useOutput"
+	isDetermined = True
 	
 	def init(self, context):
 		forbidCompiling()
