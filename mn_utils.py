@@ -28,6 +28,9 @@ def getActive():
 def setActive(object):
 	bpy.context.scene.objects.active = object
 	object.select = True
+def getSelectedObjects():
+	try: return bpy.context.selected_objects
+	except: return []
 def deselectAll():
 	bpy.ops.object.select_all(action = "DESELECT")
 def deselectAllFCurves(object):
