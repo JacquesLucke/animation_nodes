@@ -2,6 +2,7 @@ import bpy
 from mn_execution import getCodeStrings, resetCompileBlocker, updateAnimationTrees
 from mn_keyframes import *
 from mn_utils import *
+from mn_selection_utils import *
 
 class AnimationNodesPerformance(bpy.types.Panel):
 	bl_idname = "mn.performance_panel"
@@ -71,6 +72,35 @@ class AnimationNodesDeveloperPanel(bpy.types.Panel):
 		col.prop(scene.mn_settings.developer, "showErrors", text = "Show Errors")
 		col.prop(scene.mn_settings.developer, "executionProfiling", text = "Node Execution Profiling")
 		
+class KeyframeManagerPanel(bpy.types.Panel):
+	bl_idname = "mn.keyframes_manager"
+	bl_label = "Keyframes Manager"
+	bl_space_type = "VIEW_3D"
+	bl_region_type = "TOOLS"
+	bl_category = "Animation Nodes"
+		
+	def draw(self, context):
+		layout = self.layout
+		scene = context.scene
+		
+		keyframes = getKeyframes()
+		box = layout.box()
+		col = box.column(align = True)
+		for i, keyframe in enumerate(keyframes):
+			row = col.row(align = True)
+			row.label(keyframe[0])
+			row.label(keyframe[1])
+			if i > 0:
+				remove = row.operator("mn.remove_keyframe", text = "Remove")
+				remove.keyframeName = keyframe[0]
+				
+		row = layout.row(align = True)
+		row.prop(scene.mn_settings.keyframes, "selectedType", text = "")
+		row.prop(scene.mn_settings.keyframes, "newName", text = "")
+		new = row.operator("mn.new_keyframe", text = "Create", icon = "PLUS")
+		new.keyframeName = scene.mn_settings.keyframes.newName
+		new.keyframeType = scene.mn_settings.keyframes.selectedType
+		
 class KeyframePanel(bpy.types.Panel):
 	bl_idname = "mn.keyframes"
 	bl_label = "Keyframes"
@@ -81,7 +111,7 @@ class KeyframePanel(bpy.types.Panel):
 	def draw(self, context):
 		layout = self.layout
 		scene = context.scene
-		objects = getSelectedObjects()
+		objects = getSortedSelectedObjects()
 		
 		layout.prop(scene.mn_settings.keyframes, "selectedName", text = "Keyframe")
 		

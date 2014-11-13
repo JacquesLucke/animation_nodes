@@ -4,6 +4,11 @@ from mn_utils import *
 enableSelectionSorting = True
 sortedSelectionNames = []
 
+def getSortedSelectedObjects():
+	objects = []
+	for name in getSortedSelectedObjectNames():
+		objects.append(bpy.data.objects.get(name))
+	return objects
 def getSortedSelectedObjectNames():
 	return sortedSelectionNames
 

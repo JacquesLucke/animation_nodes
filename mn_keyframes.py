@@ -20,6 +20,19 @@ def getKeyframeNames():
 	for name, type in getKeyframes():
 		names.append(name)
 	return names
+	
+def newKeyframe(name, type):
+	item = bpy.context.scene.mn_settings.keyframes.keys.add()
+	item.name = name
+	item.type = type
+def removeKeyframe(name):
+	for object in bpy.data.objects:
+		removeKeyframeFromObject(object, name)	
+	item = None
+	for i, item in enumerate(bpy.context.scene.mn_settings.keyframes.keys):
+		if item.name == name: break
+	if item is not None:
+		bpy.context.scene.mn_settings.keyframes.keys.remove(i)
 
 def getKeyframes():
 	keyframes = []
@@ -156,4 +169,25 @@ class RemoveKeyframeFromObject(bpy.types.Operator):
 		object = bpy.data.objects.get(self.objectName)
 		if object is not None:
 			removeKeyframeFromObject(object, self.keyframeName)
+		return {'FINISHED'}
+		
+class RemoveKeyframe(bpy.types.Operator):
+	bl_idname = "mn.remove_keyframe"
+	bl_label = "Remove Keyframe"
+	
+	keyframeName = bpy.props.StringProperty(default = "")
+
+	def execute(self, context):
+		removeKeyframe(self.keyframeName)
+		return {'FINISHED'}
+			
+class NewKeyframe(bpy.types.Operator):
+	bl_idname = "mn.new_keyframe"
+	bl_label = "New Keyframe"
+	
+	keyframeName = bpy.props.StringProperty(default = "temp")
+	keyframeType = bpy.props.StringProperty(default = "Float")
+
+	def execute(self, context):
+		newKeyframe(self.keyframeName, self.keyframeType)
 		return {'FINISHED'}
