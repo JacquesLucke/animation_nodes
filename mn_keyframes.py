@@ -5,11 +5,21 @@ keyframePropertyPrefix = "Animation Nodes - "
 
 keyframeTypes = ["Float", "Transforms"]
 	
-def getKeyframeTypeItems():
+def getKeyframeTypeItems(self = None, context = None):
 	items = []
 	for type in keyframeTypes:
 		items.append((type, type, ""))
 	return items
+def getKeyframeNameItems(self = None, context = None):
+	items = []
+	for name, type in getKeyframes():
+		items.append((name, name, type))
+	return items
+def getKeyframeNames():
+	names = []
+	for name, type in getKeyframes():
+		names.append(name)
+	return names
 
 def getKeyframes():
 	keyframes = []

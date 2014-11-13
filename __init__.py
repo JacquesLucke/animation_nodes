@@ -91,6 +91,7 @@ class Keyframes(bpy.types.PropertyGroup):
 class KeyframesSettings(bpy.types.PropertyGroup):
 	keys = CollectionProperty(type = Keyframes, name = "Keyframes")
 	selectedPath = StringProperty(default = "", name = "Selected Path")
+	selectedName = EnumProperty(items = mn_keyframes.getKeyframeNameItems, name = "Keyframe Type")
 	
 class AnimationNodesSettings(bpy.types.PropertyGroup):
 	update = PointerProperty(type = GlobalUpdateSettings, name = "Update Settings")

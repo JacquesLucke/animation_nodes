@@ -84,33 +84,33 @@ class KeyframePanel(bpy.types.Panel):
 		
 	def draw(self, context):
 		layout = self.layout
+		scene = context.scene
 		objects = getSelectedObjects()
 		
 		layout.label("Selected Objects: " + str(len(objects)))
 		
-		keyframes = getKeyframes()
-		for keyframe in keyframes:
-			box = layout.box()
+		layout.prop(scene.mn_settings.keyframes, "selectedName", text = "Keyframe")
+		
+		name = scene.mn_settings.keyframes.selectedName
+		type = getKeyframeType(name)
+		
+		row = layout.row()
+		row.label("Type: " + str(type))
+		
+		if type == "Float":
+			layout.prop(context.scene.mn_settings.keyframes, "selectedPath", text = "Path")
+			setTransformsKeyframe = layout.operator("mn.set_float_keyframe", text = "Set Value From Path")
+			setTransformsKeyframe.keyframeName = name
+			setTransformsKeyframe.dataPath = context.scene.mn_settings.keyframes.selectedPath
 			
-			name, type = keyframe[0], keyframe[1]
-			row = box.row()
-			row.label("Name: " + name)
-			row.label("Type: " + type)
-			
-			if type == "Float":
-				box.prop(context.scene.mn_settings.keyframes, "selectedPath", text = "Path")
-				setTransformsKeyframe = box.operator("mn.set_float_keyframe", text = "Set Value From Path")
-				setTransformsKeyframe.keyframeName = name
-				setTransformsKeyframe.dataPath = context.scene.mn_settings.keyframes.selectedPath
-				
-			elif type == "Transforms":
-				setTransformsKeyframe = box.operator("mn.set_transforms_keyframe", text = "Set Current Transforms As Keyframe")
-				setTransformsKeyframe.keyframeName = name
-			
-			for object in objects:
-				subBox = box.box()
-				subBox.label("Name: " + object.name)
-				drawKeyframeInput(subBox, object, name)
+		elif type == "Transforms":
+			setTransformsKeyframe = layout.operator("mn.set_transforms_keyframe", text = "Set Current Transforms As Keyframe")
+			setTransformsKeyframe.keyframeName = name
+		
+		for object in objects:
+			subBox = layout.box()
+			subBox.label("Name: " + object.name)
+			drawKeyframeInput(subBox, object, name)
 		
 		
 class ForceNodeTreeUpdate(bpy.types.Operator):
