@@ -8,6 +8,7 @@ from mn_math_utils import *
 class mn_ObjectKeyframeInput(Node, AnimationNode):
 	bl_idname = "mn_ObjectKeyframeInput"
 	bl_label = "Object Keyframe Input"
+	outputUseParameterName = "useOutput"
 	
 	def keyframeChanged(self, context):
 		self.buildOutputSockets()
@@ -41,15 +42,22 @@ class mn_ObjectKeyframeInput(Node, AnimationNode):
 		tryToSetConnectionDictionaries(self, connections)
 		allowCompiling()
 		
-	def execute(self, input):
-		object = input["Object"]
-		output = {}
-		data = getKeyframe(object, self.keyframe, self.currentType)
+	def getInputSocketNames(self):
+		return {"Object" : "object"}
+	def getOutputSocketNames(self):
 		if self.currentType == "Float":
-			output["Value"] = data
+			return {"Value" : "value"}
 		elif self.currentType == "Transforms":
-			output["Location"] = data[0]
-			output["Rotation"] = data[1]
-			output["Scale"] = data[2]
-			output["Matrix"] = composeMatrix(data[0], data[1], data[2])
-		return output
+			return {"Location" : "location",
+					"Rotation" : "rotation",
+					"Scale" : "scale",
+					"Matrix" : "matrix"}
+		
+	def execute(self, useOutput, object):
+		data = getKeyframe(object, self.keyframe, self.currentType)
+		if self.currentType == "Float":	return data
+		elif self.currentType == "Transforms":
+			if useOutput["Matrix"]:
+				return data[0], data[1], data[2], composeMatrix(data[0], data[1], data[2])
+			else:
+				return data[0], data[1], data[2], None

@@ -97,7 +97,7 @@ class KeyframePanel(bpy.types.Panel):
 			setTransformsKeyframe.dataPath = context.scene.mn_settings.keyframes.selectedPath
 			
 		elif type == "Transforms":
-			setTransformsKeyframe = layout.operator("mn.set_transforms_keyframe", text = "Set Current Transforms As Keyframe", icon = "PASTEDOWN")
+			setTransformsKeyframe = layout.operator("mn.set_transforms_keyframe", text = "Set From Current", icon = "PASTEDOWN")
 			setTransformsKeyframe.keyframeName = name
 		
 		for object in objects:
