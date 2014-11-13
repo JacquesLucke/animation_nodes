@@ -74,20 +74,14 @@ class AnimationNodesDeveloperPanel(bpy.types.Panel):
 class KeyframePanel(bpy.types.Panel):
 	bl_idname = "mn.keyframes"
 	bl_label = "Keyframes"
-	bl_space_type = "NODE_EDITOR"
+	bl_space_type = "VIEW_3D"
 	bl_region_type = "TOOLS"
-	bl_category = "Settings"
-	
-	@classmethod
-	def poll(self, context):
-		return context.space_data.tree_type == "AnimationNodeTreeType"
+	bl_category = "Animation Nodes"
 		
 	def draw(self, context):
 		layout = self.layout
 		scene = context.scene
 		objects = getSelectedObjects()
-		
-		layout.label("Selected Objects: " + str(len(objects)))
 		
 		layout.prop(scene.mn_settings.keyframes, "selectedName", text = "Keyframe")
 		
@@ -95,7 +89,6 @@ class KeyframePanel(bpy.types.Panel):
 		type = getKeyframeType(name)
 		
 		row = layout.row()
-		row.label("Type: " + str(type))
 		
 		if type == "Float":
 			layout.prop(context.scene.mn_settings.keyframes, "selectedPath", text = "Path")
@@ -104,7 +97,7 @@ class KeyframePanel(bpy.types.Panel):
 			setTransformsKeyframe.dataPath = context.scene.mn_settings.keyframes.selectedPath
 			
 		elif type == "Transforms":
-			setTransformsKeyframe = layout.operator("mn.set_transforms_keyframe", text = "Set Current Transforms As Keyframe")
+			setTransformsKeyframe = layout.operator("mn.set_transforms_keyframe", text = "Set Current Transforms As Keyframe", icon = "PASTEDOWN")
 			setTransformsKeyframe.keyframeName = name
 		
 		for object in objects:

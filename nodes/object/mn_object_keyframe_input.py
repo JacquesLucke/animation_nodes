@@ -14,6 +14,7 @@ class mn_ObjectKeyframeInput(Node, AnimationNode):
 		nodeTreeChanged()
 	
 	keyframe = bpy.props.EnumProperty(items = getKeyframeNameItems, name = "Keyframe", update = keyframeChanged)
+	currentType = bpy.props.StringProperty(default = "Transforms")
 	
 	def init(self, context):
 		forbidCompiling()
@@ -29,6 +30,7 @@ class mn_ObjectKeyframeInput(Node, AnimationNode):
 		connections = getConnectionDictionaries(self)
 		self.outputs.clear()
 		type = getKeyframeType(self.keyframe)
+		self.currentType == type
 		if type == "Float":
 			self.outputs.new("mn_FloatSocket", "Value")
 		elif type == "Transforms":
@@ -42,11 +44,10 @@ class mn_ObjectKeyframeInput(Node, AnimationNode):
 	def execute(self, input):
 		object = input["Object"]
 		output = {}
-		type = getKeyframeType(self.keyframe)
-		data = getKeyframe(object, self.keyframe)
-		if type == "Float":
+		data = getKeyframe(object, self.keyframe, self.currentType)
+		if self.currentType == "Float":
 			output["Value"] = data
-		elif type == "Transforms":
+		elif self.currentType == "Transforms":
 			output["Location"] = data[0]
 			output["Rotation"] = data[1]
 			output["Scale"] = data[2]

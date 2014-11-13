@@ -24,8 +24,6 @@ def getKeyframeNames():
 def getKeyframes():
 	keyframes = []
 	keyframes.append(("Initial Transforms", "Transforms"))
-	keyframes.append(("Secondary Transforms", "Transforms"))
-	keyframes.append(("test", "Float"))
 	for item in bpy.context.scene.mn_settings.keyframes.keys:
 		keyframes.append((item.name, item.type))
 	return keyframes
@@ -50,8 +48,8 @@ def setKeyframe(object, name, data):
 		object[propertyName + " rotation"] = data[1]
 		object[propertyName + " scale"] = data[2]
 		
-def getKeyframe(object, name):
-	type = getKeyframeType(name)
+def getKeyframe(object, name, type = None):
+	if type is None: type = getKeyframeType(name)
 	propertyName = getKeyframePropertyName(name)
 	try:
 		if type == "Float":
