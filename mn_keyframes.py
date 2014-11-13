@@ -22,12 +22,11 @@ def getKeyframeNames():
 	return names
 	
 def newKeyframe(name, type):
-	item = bpy.context.scene.mn_settings.keyframes.keys.add()
-	item.name = name
-	item.type = type
-def removeKeyframe(name):
-	for object in bpy.data.objects:
-		removeKeyframeFromObject(object, name)	
+	if not isKeyframeNameUsed(name):
+		item = bpy.context.scene.mn_settings.keyframes.keys.add()
+		item.name = name
+		item.type = type
+def removeKeyframe(name):	
 	item = None
 	for i, item in enumerate(bpy.context.scene.mn_settings.keyframes.keys):
 		if item.name == name: break
@@ -79,6 +78,11 @@ def getKeyframe(object, name, type = None):
 		elif type == "Transforms":
 			return ([0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [1.0, 1.0, 1.0])
 
+def isKeyframeNameUsed(name):
+	for keyframe in getKeyframes():
+		if keyframe[0] == name: return True
+	return False
+			
 def hasKeyframe(object, name):
 	type = getKeyframeType(name)
 	propertyName = getKeyframePropertyName(name)
