@@ -91,7 +91,7 @@ class KeyframeManagerPanel(bpy.types.Panel):
 			row.label(keyframe[0])
 			row.label(keyframe[1])
 			if i > 0:
-				remove = row.operator("mn.remove_keyframe", text = "Remove")
+				remove = row.operator("mn.remove_keyframe", text = "Remove", icon = "X")
 				remove.keyframeName = keyframe[0]
 				
 		row = layout.row(align = True)
@@ -122,13 +122,19 @@ class KeyframePanel(bpy.types.Panel):
 		
 		if type == "Float":
 			layout.prop(context.scene.mn_settings.keyframes, "selectedPath", text = "Path")
-			setTransformsKeyframe = layout.operator("mn.set_float_keyframe", text = "Set Value From Path")
-			setTransformsKeyframe.keyframeName = name
-			setTransformsKeyframe.dataPath = context.scene.mn_settings.keyframes.selectedPath
-			
+			setKeyframe = layout.operator("mn.set_float_keyframe", text = "Set Value From Path")
+			setKeyframe.keyframeName = name
+			setKeyframe.dataPath = context.scene.mn_settings.keyframes.selectedPath
 		elif type == "Transforms":
 			setTransformsKeyframe = layout.operator("mn.set_transforms_keyframe", text = "Set From Current", icon = "PASTEDOWN")
 			setTransformsKeyframe.keyframeName = name
+		elif type == "Vector":
+			layout.label("Set Vector From:")
+			row = layout.row(align = True)
+			for path in [("Location", "location"), ("Rotation", "rotation_euler"), ("Scale", "scale")]:
+				setKeyframe = row.operator("mn.set_vector_keyframe_from_path", text = path[0])
+				setKeyframe.keyframeName = name
+				setKeyframe.vectorPath = path[1]
 		
 		for object in objects:
 			box = layout.box()

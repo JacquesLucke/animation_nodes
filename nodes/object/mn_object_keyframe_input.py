@@ -5,6 +5,8 @@ from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, f
 from mn_keyframes import *
 from mn_math_utils import *
 
+currentTypes = {}
+
 class mn_ObjectKeyframeInput(Node, AnimationNode):
 	bl_idname = "mn_ObjectKeyframeInput"
 	bl_label = "Object Keyframe Input"
@@ -15,7 +17,6 @@ class mn_ObjectKeyframeInput(Node, AnimationNode):
 		nodeTreeChanged()
 	
 	keyframe = bpy.props.EnumProperty(items = getKeyframeNameItems, name = "Keyframe", update = keyframeChanged)
-	currentType = bpy.props.StringProperty(default = "Transforms")
 	
 	def init(self, context):
 		forbidCompiling()
@@ -31,7 +32,7 @@ class mn_ObjectKeyframeInput(Node, AnimationNode):
 		connections = getConnectionDictionaries(self)
 		self.outputs.clear()
 		type = getKeyframeType(self.keyframe)
-		self.currentType == type
+		currentTypes[getNodeIdentifier(self)] = type
 		if type == "Float":
 			self.outputs.new("mn_FloatSocket", "Value")
 		elif type == "Transforms":
@@ -39,24 +40,31 @@ class mn_ObjectKeyframeInput(Node, AnimationNode):
 			self.outputs.new("mn_VectorSocket", "Rotation")
 			self.outputs.new("mn_VectorSocket", "Scale")
 			self.outputs.new("mn_MatrixSocket", "Matrix")
+		elif type == "Vector":
+			self.outputs.new("mn_VectorSocket", "Vector")
 		tryToSetConnectionDictionaries(self, connections)
 		allowCompiling()
 		
 	def getInputSocketNames(self):
 		return {"Object" : "object"}
 	def getOutputSocketNames(self):
-		if self.currentType == "Float":
+		type = getKeyframeType(self.keyframe)
+		currentTypes[getNodeIdentifier(self)] = type	
+		if type == "Float":
 			return {"Value" : "value"}
-		elif self.currentType == "Transforms":
+		elif type == "Transforms":
 			return {"Location" : "location",
 					"Rotation" : "rotation",
 					"Scale" : "scale",
 					"Matrix" : "matrix"}
+		elif type == "Vector":
+			return {"Vector" : "vector"}
 		
 	def execute(self, useOutput, object):
-		data = getKeyframe(object, self.keyframe, self.currentType)
-		if self.currentType == "Float":	return data
-		elif self.currentType == "Transforms":
+		type = currentTypes[getNodeIdentifier(self)]
+		data = getKeyframe(object, self.keyframe, type)
+		if type in ["Float", "Vector"]:	return data
+		elif type == "Transforms":
 			if useOutput["Matrix"]:
 				return data[0], data[1], data[2], composeMatrix(data[0], data[1], data[2])
 			else:

@@ -3,7 +3,7 @@ from mn_utils import *
 
 keyframePropertyPrefix = "Animation Nodes - "
 
-keyframeTypes = ["Float", "Transforms"]
+keyframeTypes = ["Float", "Transforms", "Vector"]
 	
 def getKeyframeTypeItems(self = None, context = None):
 	items = []
@@ -59,6 +59,8 @@ def setKeyframe(object, name, data):
 		object[propertyName + " location"] = data[0]
 		object[propertyName + " rotation"] = data[1]
 		object[propertyName + " scale"] = data[2]
+	elif type == "Vector":
+		object[propertyName] = data
 		
 def getKeyframe(object, name, type = None):
 	if type is None: type = getKeyframeType(name)
@@ -72,11 +74,15 @@ def getKeyframe(object, name, type = None):
 			transforms.append(list(object[propertyName + " rotation"]))
 			transforms.append(list(object[propertyName + " scale"]))
 			return transforms
+		elif type == "Vector":
+			return list(object[propertyName])
 	except:
 		if type == "Float":
 			return 0.0
 		elif type == "Transforms":
 			return ([0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [1.0, 1.0, 1.0])
+		elif type == "Vector":
+			return [0, 0, 0]
 
 def isKeyframeNameUsed(name):
 	for keyframe in getKeyframes():
@@ -87,9 +93,9 @@ def hasKeyframe(object, name):
 	type = getKeyframeType(name)
 	propertyName = getKeyframePropertyName(name)
 	try:
-		if type == "Float":
+		if type in ["Float", "Vector"]:
 			tmp = object[propertyName]
-		if type == "Transforms":
+		elif type == "Transforms":
 			tmp = (object[propertyName + " location"], object[propertyName + " rotation"], object[propertyName + " scale"])
 		return True
 	except:
@@ -99,7 +105,7 @@ def removeKeyframeFromObject(object, name):
 	type = getKeyframeType(name)
 	propertyName = getKeyframePropertyName(name)
 	try:
-		if type == "Float":
+		if type in ["Float", "Vector"]:
 			del object[propertyName]
 		elif type == "Transforms":
 			del object[propertyName + " location"]
@@ -113,7 +119,7 @@ def drawKeyframeInput(layout, object, name):
 	if hasKeyframe(object, name):
 		if type == "Float":
 			layout.prop(object, nameToPath(propertyName), text = "Value")
-		if type == "Transforms":
+		elif type == "Transforms":
 			row = layout.row()
 			col = row.column(align = True)
 			
@@ -130,6 +136,8 @@ def drawKeyframeInput(layout, object, name):
 			col.label("Scale")
 			for i in range(3):
 				col.prop(object, nameToPath(propertyName + " scale"), index = i, text = "")
+		elif type == "Vector":
+			layout.prop(object, nameToPath(propertyName), text = "")
 	else:
 		layout.label("keyframe isn't set on this object")
 		
@@ -160,6 +168,19 @@ class SetTransformsKeyframe(bpy.types.Operator):
 		selectedObjects = getSelectedObjects()
 		for object in selectedObjects:
 			setKeyframe(object, self.keyframeName, (object.location, object.rotation_euler, object.scale))
+		return {'FINISHED'}
+		
+class SetVectorKeyframeFromPath(bpy.types.Operator):
+	bl_idname = "mn.set_vector_keyframe_from_path"
+	bl_label = "Set Vector Keyframe"
+	
+	keyframeName = bpy.props.StringProperty(default = "")
+	vectorPath = bpy.props.StringProperty(default = "location")
+
+	def execute(self, context):
+		selectedObjects = getSelectedObjects()
+		for object in selectedObjects:
+			setKeyframe(object, self.keyframeName, getattr(object, self.vectorPath, [0, 0, 0]))
 		return {'FINISHED'}
 		
 class RemoveKeyframeFromObject(bpy.types.Operator):
