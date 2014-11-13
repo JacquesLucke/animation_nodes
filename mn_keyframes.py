@@ -55,7 +55,45 @@ def getKeyframe(object, name):
 			return 0
 		elif type == "Transforms":
 			return ([0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [1.0, 1.0, 1.0])
+
+def hasKeyframe(object, name):
+	type = getKeyframeType(name)
+	propertyName = getKeyframePropertyName(name)
+	try:
+		if type == "Float":
+			tmp = object[propertyName]
+		if type == "Transforms":
+			tmp = (object[propertyName + " location"], object[propertyName + " rotation"], object[propertyName + " scale"])
+		return True
+	except:
+		return False
+		
+def drawKeyframeInput(layout, object, name):
+	type = getKeyframeType(name)
+	propertyName = getKeyframePropertyName(name)
+	if hasKeyframe(object, name):
+		if type == "Float":
+			layout.prop(object, nameToPath(propertyName))
+		if type == "Transforms":
+			row = layout.row()
+			col = row.column(align = True)
 			
+			col.label("Location")
+			for i in range(3):
+				col.prop(object, nameToPath(propertyName + " location"), index = i, text = "")
+			col = row.column(align = True)
+			
+			col.label("Rotation")
+			for i in range(3):
+				col.prop(object, nameToPath(propertyName + " rotation"), index = i, text = "")
+			col = row.column(align = True)
+			
+			col.label("Scale")
+			for i in range(3):
+				col.prop(object, nameToPath(propertyName + " scale"), index = i, text = "")
+	else:
+		layout.label("keyframe isn't set on this object")
+		
 			
 			
 class SetTransformsKeyframe(bpy.types.Operator):

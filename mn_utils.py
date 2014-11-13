@@ -50,6 +50,8 @@ def isAnimationPlaying():
 	if bpy.context.screen is not None:
 		return bpy.context.screen.is_animation_playing
 	return False
+def nameToPath(name):
+	return '["' + name + '"]'
 	
 # nodes and sockets
 ######################

@@ -103,11 +103,7 @@ class KeyframePanel(bpy.types.Panel):
 			for object in objects:
 				subBox = box.box()
 				
-				data = getKeyframe(object, name)
-				subBox.label(object.name)
-				subBox.label("Location: " + str(data[0][0]) + ", " + str(data[0][1]) + ", " + str(data[0][2]))
-				subBox.label("Rotation: " + str(data[1][0]) + ", " + str(data[1][1]) + ", " + str(data[1][2]))
-				subBox.label("Scale: " + str(data[2][0]) + ", " + str(data[2][1]) + ", " + str(data[2][2]))
+				drawKeyframeInput(subBox, object, name)
 		
 		
 class ForceNodeTreeUpdate(bpy.types.Operator):
