@@ -80,6 +80,18 @@ def hasKeyframe(object, name):
 	except:
 		return False
 		
+def removeKeyframeFromObject(object, name):
+	type = getKeyframeType(name)
+	propertyName = getKeyframePropertyName(name)
+	try:
+		if type == "Float":
+			del object[propertyName]
+		elif type == "Transforms":
+			del object[propertyName + " location"]
+			del object[propertyName + " rotation"]
+			del object[propertyName + " scale"]
+	except: pass
+		
 def drawKeyframeInput(layout, object, name):
 	type = getKeyframeType(name)
 	propertyName = getKeyframePropertyName(name)
@@ -133,4 +145,17 @@ class SetTransformsKeyframe(bpy.types.Operator):
 		selectedObjects = getSelectedObjects()
 		for object in selectedObjects:
 			setKeyframe(object, self.keyframeName, (object.location, object.rotation_euler, object.scale))
+		return {'FINISHED'}
+		
+class RemoveKeyframeFromObject(bpy.types.Operator):
+	bl_idname = "mn.remove_keyframe_from_object"
+	bl_label = "Remove Keyframe From Object"
+	
+	objectName = bpy.props.StringProperty(default = "")
+	keyframeName = bpy.props.StringProperty(default = "")
+
+	def execute(self, context):
+		object = bpy.data.objects.get(self.objectName)
+		if object is not None:
+			removeKeyframeFromObject(object, self.keyframeName)
 		return {'FINISHED'}

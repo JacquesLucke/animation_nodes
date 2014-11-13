@@ -108,9 +108,15 @@ class KeyframePanel(bpy.types.Panel):
 			setTransformsKeyframe.keyframeName = name
 		
 		for object in objects:
-			subBox = layout.box()
-			subBox.label("Name: " + object.name)
-			drawKeyframeInput(subBox, object, name)
+			box = layout.box()
+			row = box.row()
+			row.prop(object, "name", text = "")
+			
+			remove = row.operator("mn.remove_keyframe_from_object", text = "Remove Keyframe")
+			remove.objectName = object.name
+			remove.keyframeName = name
+			
+			drawKeyframeInput(box, object, name)
 		
 		
 class ForceNodeTreeUpdate(bpy.types.Operator):
