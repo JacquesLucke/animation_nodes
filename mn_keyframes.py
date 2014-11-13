@@ -58,9 +58,9 @@ def getKeyframe(object, name):
 			return object[propertyName]
 		elif type == "Transforms":
 			transforms = []
-			transforms.append(object[propertyName + " location"])
-			transforms.append(object[propertyName + " rotation"])
-			transforms.append(object[propertyName + " scale"])
+			transforms.append(list(object[propertyName + " location"]))
+			transforms.append(list(object[propertyName + " rotation"]))
+			transforms.append(list(object[propertyName + " scale"]))
 			return transforms
 	except:
 		if type == "Float":

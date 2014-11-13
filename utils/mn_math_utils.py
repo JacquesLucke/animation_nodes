@@ -1,5 +1,6 @@
 from mn_utils import *
 from mn_cache import *
+from mathutils import *
 
 # perlin noise
 ################################
@@ -35,3 +36,17 @@ def cubicInterpolation(v0, v1, v2, v3, x):
 	# S = v1
 
 	# return P*x**3 + Q*x**2 + R*x + S
+	
+	
+# matrices
+###################################
+
+def composeMatrix(location, rotation, scale):
+	matrix = Matrix.Translation(location)
+	matrix *= Matrix.Rotation(rotation[2], 4, 'Z')
+	matrix *= Matrix.Rotation(rotation[1], 4, 'Y')
+	matrix *= Matrix.Rotation(rotation[0], 4, 'X')
+	matrix *= Matrix.Scale(scale[0], 4, [1, 0, 0])
+	matrix *= Matrix.Scale(scale[1], 4, [0, 1, 0])
+	matrix *= Matrix.Scale(scale[2], 4, [0, 0, 1])
+	return matrix

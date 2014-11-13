@@ -28,15 +28,7 @@ class mn_ComposeMatrix(Node, AnimationNode):
 	def useInLineExecution(self):
 		return True
 	def getInLineExecutionString(self, outputUse):
-		codeLines = []
-		codeLines.append("$matrix$ = mathutils.Matrix.Translation(%position%)")
-		codeLines.append("$matrix$ *= mathutils.Matrix.Rotation(%rotation%[2], 4, 'Z')")
-		codeLines.append("$matrix$ *= mathutils.Matrix.Rotation(%rotation%[1], 4, 'Y')")
-		codeLines.append("$matrix$ *= mathutils.Matrix.Rotation(%rotation%[0], 4, 'X')")
-		codeLines.append("$matrix$ *= mathutils.Matrix.Scale(%scale%[0], 4, [1, 0, 0])")
-		codeLines.append("$matrix$ *= mathutils.Matrix.Scale(%scale%[1], 4, [0, 1, 0])")
-		codeLines.append("$matrix$ *= mathutils.Matrix.Scale(%scale%[2], 4, [0, 0, 1])")
-		return "\n".join(codeLines)
+		return "$matrix$ = mn_math_utils.composeMatrix(%position%, %rotation%, %scale%)"
 		
 	def getModuleList(self):
-		return ["mathutils"]
+		return ["mn_math_utils"]
