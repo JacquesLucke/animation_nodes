@@ -1,4 +1,5 @@
 import bpy
+from mn_utils import *
 
 keyframePropertyPrefix = "Animation Nodes - "
 
@@ -13,12 +14,12 @@ def getKeyframeTypeItems():
 def getKeyframes():
 	keyframes = []
 	keyframes.append(("Initial Transforms", "Transforms"))
-	for item in bpy.context.scene.keyframes:
+	for item in bpy.context.scene.mn_settings.keyframes:
 		keyframes.append((item.name, item.type))
 	return keyframes
 def getKeyframeType(name):
-	for item in bpy.context.scene.keyframes:
-		if item.name == name: return item.type
+	for keyframe in getKeyframes():
+		if keyframe[0] == name: return keyframe[1]
 	return None
 def getKeyframePropertyName(name):
 	return keyframePropertyPrefix + name
@@ -53,4 +54,18 @@ def getKeyframe(object, name):
 		if type == "Float":
 			return 0
 		elif type == "Transforms":
-			return ([0, 0, 0], [0, 0, 0], [1, 1, 1])
+			return ([0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [1.0, 1.0, 1.0])
+			
+			
+			
+class SetTransformsKeyframe(bpy.types.Operator):
+	bl_idname = "mn.set_transforms_keyframe"
+	bl_label = "Set Transforms Keyframe"
+	
+	keyframeName = bpy.props.StringProperty(default = "")
+
+	def execute(self, context):
+		selectedObjects = getSelectedObjects()
+		for object in selectedObjects:
+			setKeyframe(object, self.keyframeName, (object.location, object.rotation_euler, object.scale))
+		return {'FINISHED'}

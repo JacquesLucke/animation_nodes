@@ -1,6 +1,7 @@
 import bpy
 from mn_execution import getCodeStrings, resetCompileBlocker, updateAnimationTrees
 from mn_keyframes import *
+from mn_utils import *
 
 class AnimationNodesPerformance(bpy.types.Panel):
 	bl_idname = "mn.performance_panel"
@@ -83,7 +84,30 @@ class KeyframePanel(bpy.types.Panel):
 		
 	def draw(self, context):
 		layout = self.layout
+		objects = getSelectedObjects()
 		
+		layout.label("Selected Objects: " + str(len(objects)))
+		
+		keyframes = getKeyframes()
+		for keyframe in keyframes:
+			box = layout.box()
+			
+			name, type = keyframe[0], keyframe[1]
+			box.label("Name: " + name)
+			box.label("Type: " + type)
+			
+			if type == "Transforms":
+				setTransformsKeyframe = box.operator("mn.set_transforms_keyframe")
+				setTransformsKeyframe.keyframeName = name
+			
+			for object in objects:
+				subBox = box.box()
+				
+				data = getKeyframe(object, name)
+				subBox.label(object.name)
+				subBox.label("Location: " + str(data[0][0]) + ", " + str(data[0][1]) + ", " + str(data[0][2]))
+				subBox.label("Rotation: " + str(data[1][0]) + ", " + str(data[1][1]) + ", " + str(data[1][2]))
+				subBox.label("Scale: " + str(data[2][0]) + ", " + str(data[2][1]) + ", " + str(data[2][2]))
 		
 		
 class ForceNodeTreeUpdate(bpy.types.Operator):
