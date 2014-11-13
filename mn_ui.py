@@ -1,5 +1,6 @@
 import bpy
 from mn_execution import getCodeStrings, resetCompileBlocker, updateAnimationTrees
+from mn_keyframes import *
 
 class AnimationNodesPerformance(bpy.types.Panel):
 	bl_idname = "mn.performance_panel"
@@ -68,6 +69,20 @@ class AnimationNodesDeveloperPanel(bpy.types.Panel):
 		col.prop(scene.mn_settings.developer, "printGenerationTime", text = "Print Generation Time")
 		col.prop(scene.mn_settings.developer, "showErrors", text = "Show Errors")
 		col.prop(scene.mn_settings.developer, "executionProfiling", text = "Node Execution Profiling")
+		
+class KeyframePanel(bpy.types.Panel):
+	bl_idname = "mn.keyframes"
+	bl_label = "Keyframes"
+	bl_space_type = "NODE_EDITOR"
+	bl_region_type = "TOOLS"
+	bl_category = "Settings"
+	
+	@classmethod
+	def poll(self, context):
+		return context.space_data.tree_type == "AnimationNodeTreeType"
+		
+	def draw(self, context):
+		layout = self.layout
 		
 		
 		
