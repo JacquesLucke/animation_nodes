@@ -82,17 +82,20 @@ class DeveloperSettings(bpy.types.PropertyGroup):
 	printGenerationTime = BoolProperty(default = False, name = "Print Script Generation Time")
 	showErrors = BoolProperty(default = False, name = "Show Full Error")
 	executionProfiling = BoolProperty(default = False, name = "Node Execution Profiling", update = nodeTreeChanged)
-	
 
 import mn_keyframes	
-class KeyframesSettings(bpy.types.PropertyGroup):
+class Keyframes(bpy.types.PropertyGroup):
 	name = StringProperty(default = "", name = "Keyframe Name")
 	type = EnumProperty(items = mn_keyframes.getKeyframeTypeItems(), name = "Keyframe Type")
+	
+class KeyframesSettings(bpy.types.PropertyGroup):
+	keys = CollectionProperty(type = Keyframes, name = "Keyframes")
+	selectedPath = StringProperty(default = "", name = "Selected Path")
 	
 class AnimationNodesSettings(bpy.types.PropertyGroup):
 	update = PointerProperty(type = GlobalUpdateSettings, name = "Update Settings")
 	developer = PointerProperty(type = DeveloperSettings, name = "Developer Settings")
-	keyframes = CollectionProperty(type = KeyframesSettings, name = "Keyframes")
+	keyframes = PointerProperty(type = KeyframesSettings, name = "Keyframes")
 	
 	
 	

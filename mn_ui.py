@@ -93,16 +93,23 @@ class KeyframePanel(bpy.types.Panel):
 			box = layout.box()
 			
 			name, type = keyframe[0], keyframe[1]
-			box.label("Name: " + name)
-			box.label("Type: " + type)
+			row = box.row()
+			row.label("Name: " + name)
+			row.label("Type: " + type)
 			
-			if type == "Transforms":
-				setTransformsKeyframe = box.operator("mn.set_transforms_keyframe")
+			if type == "Float":
+				box.prop(context.scene.mn_settings.keyframes, "selectedPath", text = "Path")
+				setTransformsKeyframe = box.operator("mn.set_float_keyframe", text = "Set Value From Path")
+				setTransformsKeyframe.keyframeName = name
+				setTransformsKeyframe.dataPath = context.scene.mn_settings.keyframes.selectedPath
+				
+			elif type == "Transforms":
+				setTransformsKeyframe = box.operator("mn.set_transforms_keyframe", text = "Set Current Transforms As Keyframe")
 				setTransformsKeyframe.keyframeName = name
 			
 			for object in objects:
 				subBox = box.box()
-				
+				subBox.label("Name: " + object.name)
 				drawKeyframeInput(subBox, object, name)
 		
 		

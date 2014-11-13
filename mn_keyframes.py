@@ -14,7 +14,9 @@ def getKeyframeTypeItems():
 def getKeyframes():
 	keyframes = []
 	keyframes.append(("Initial Transforms", "Transforms"))
-	for item in bpy.context.scene.mn_settings.keyframes:
+	keyframes.append(("Secondary Transforms", "Transforms"))
+	keyframes.append(("test", "Float"))
+	for item in bpy.context.scene.mn_settings.keyframes.keys:
 		keyframes.append((item.name, item.type))
 	return keyframes
 def getKeyframeType(name):
@@ -52,7 +54,7 @@ def getKeyframe(object, name):
 			return transforms
 	except:
 		if type == "Float":
-			return 0
+			return 0.0
 		elif type == "Transforms":
 			return ([0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [1.0, 1.0, 1.0])
 
@@ -73,7 +75,7 @@ def drawKeyframeInput(layout, object, name):
 	propertyName = getKeyframePropertyName(name)
 	if hasKeyframe(object, name):
 		if type == "Float":
-			layout.prop(object, nameToPath(propertyName))
+			layout.prop(object, nameToPath(propertyName), text = "Value")
 		if type == "Transforms":
 			row = layout.row()
 			col = row.column(align = True)
@@ -94,7 +96,22 @@ def drawKeyframeInput(layout, object, name):
 	else:
 		layout.label("keyframe isn't set on this object")
 		
-			
+		
+
+class SetFloatKeyframe(bpy.types.Operator):
+	bl_idname = "mn.set_float_keyframe"
+	bl_label = "Set Float Keyframe"
+	
+	keyframeName = bpy.props.StringProperty(default = "")
+	dataPath = bpy.props.StringProperty(default = "")
+
+	def execute(self, context):
+		selectedObjects = getSelectedObjects()
+		for object in selectedObjects:
+			try: value = float(eval("object." + self.dataPath))
+			except: value = 0.0
+			setKeyframe(object, self.keyframeName, value)
+		return {'FINISHED'}		
 			
 class SetTransformsKeyframe(bpy.types.Operator):
 	bl_idname = "mn.set_transforms_keyframe"
