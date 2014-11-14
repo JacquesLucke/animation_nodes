@@ -58,6 +58,9 @@ def getNodeNameDictionary():
 		("mn_AnimateMatrixNode", "Animate Matrix"),
 		("mn_InvertMatrix", "Invert Matrix") ] ))
 		
+	nodes.append(("Mesh", [
+		("mn_VertexInfo", "Vertex Info") ] ))
+		
 	nodes.append(("List", [
 		("mn_GetListElementNode", "Get Element"),
 		("mn_SetListElementNode", "Set Element"),
