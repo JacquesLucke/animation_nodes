@@ -5,6 +5,7 @@ listChains = [
 	["mn_VectorSocket", "mn_VectorListSocket"],
 	["mn_ObjectSocket", "mn_ObjectListSocket"],
 	["mn_StringSocket", "mn_StringListSocket"],
+	["mn_VertexSocket", "mn_VertexListSocket"],
 	["mn_GenericSocket", "mn_GenericSocket"] ]
 	
 def getListSocketType(socketType):

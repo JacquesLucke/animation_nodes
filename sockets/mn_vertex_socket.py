@@ -7,7 +7,7 @@ class mn_VertexSocket(mn_BaseSocket, mn_SocketProperties):
 	bl_label = "Vertex Socket"
 	dataType = "Vertex"
 	allowedInputTypes = ["Vertex"]
-	drawColor = (0.7, 1, 0.36, 1)
+	drawColor = (0.6, 0.8, 0.36, 1)
 	
 	position = bpy.props.FloatVectorProperty(default = [0, 0, 0], update = nodePropertyChanged)
 	normal = bpy.props.FloatVectorProperty(default = [0, 0, 1], update = nodePropertyChanged)
