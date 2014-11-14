@@ -19,6 +19,7 @@ def getNodeNameDictionary():
 		("mn_VectorLengthNode", "Vector Length"),
 		("mn_AnimateVectorNode", "Animate Vector"),
 		("mn_VectorDistanceNode", "Vector Distance"),
+		("mn_DirectionToRotation", "Direction to Rotation"),
 		("mn_TransfromVector", "Transform Vector"),
 		("mn_VectorMathNode", "Vector Math") ] ))	
 		
