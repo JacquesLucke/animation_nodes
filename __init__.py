@@ -59,8 +59,13 @@ def getExecStringsForImport(moduleNames):
 		execStrings.append("import " + name)
 	return execStrings
 def appendPathsToPythonSearchDirectories(filePaths):
+	sys.path.extend(getDirectoryList(filePaths))
+def getDirectoryList(filePaths):
+	directories = []
 	for filePath in filePaths:
-		sys.path.append(os.path.dirname(filePath))
+		directories.append(os.path.dirname(filePath))
+	directories = list(set(directories))
+	return directories
 
 filePaths = getAllPathsToPythonFiles(currentPath)
 moduleNames = getModuleNames(filePaths)
