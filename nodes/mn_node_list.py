@@ -42,6 +42,7 @@ def getNodeNameDictionary():
 		("mn_ObjectMatrixInput", "Object Matrices"),
 		("mn_ReplicateObjectNode", "Replicate Object"),
 		("mn_CopyObjectData", "Copy Data"),
+		("mn_ObjectAttributeInputNode", "Attribute Input"),
 		("mn_ObjectAttributeOutputNode", "Attribute Output"),
 		("mn_CopyTransformsNode", "Copy Transforms"),
 		("mn_ObjectMatrixOutputNode", "Object Matrix Output"),
