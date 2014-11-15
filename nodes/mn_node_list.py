@@ -76,7 +76,8 @@ def getNodeNameDictionary():
 		
 	nodes.append(("Sound", [
 		("mn_SoundBakeNode", "Sound Bake"),
-		("mn_SoundInputNode", "Sound Input") ] ))
+		("mn_SoundBakeInput", "Sound Bake Input"),
+		("mn_SoundBakeReaderNode", "Sound Reader") ] ))
 		
 	nodes.append(("Color", [
 		("mn_ColorInputNode", "RGB"),

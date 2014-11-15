@@ -1,7 +1,7 @@
 import bpy, math, os
 from bpy.types import Node
 from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 from mn_utils import *
 from mn_object_utils import *
 from mn_fcurve_utils import *
@@ -91,8 +91,10 @@ class mn_SoundBakeNode(Node, AnimationNode):
 	def loadStrengthListAtFrame(self, frame):
 		soundObject = self.getSoundObject()
 		strenghts = []
-		for item in self.bakedSound:
-			strenghts.append(getSingleValueAtFrame(soundObject, '["' + item.propertyName + '"]', frame))
+		try:
+			for item in self.bakedSound:
+				strenghts.append(getSingleValueAtFrame(soundObject, '["' + item.propertyName + '"]', frame))
+		except: strenghts = [0]
 		return strenghts
 		
 	def bakeSound(self):
@@ -112,11 +114,13 @@ class mn_SoundBakeNode(Node, AnimationNode):
 		self.name = os.path.basename(self.filePath)
 		loadSound(self.filePath)
 		allowCompiling()
+		nodeTreeChanged()
 		
 	def getSoundObject(self):
 		soundObject = bpy.data.objects.get(self.soundObjectName)
 		if soundObject is None:
 			soundObject = bpy.data.objects.new(getPossibleObjectName("sound object"), None)
+			soundObject.hide = True
 			soundObject.parent = getMainObjectContainer()
 			self.soundObjectName = soundObject.name
 			bpy.context.scene.objects.link(soundObject)
@@ -132,17 +136,19 @@ class mn_SoundBakeNode(Node, AnimationNode):
 	def bakeIndividualSound(self, soundObject, filePath, low, high):
 		propertyName = "sound " + str(low) + " - " + str(high)
 		propertyPath = '["' + propertyName + '"]'
+		
+		bpy.context.area.type = "GRAPH_EDITOR"
+		soundObject.hide = False
 		deselectAllFCurves(soundObject)
 		soundObject[propertyName] = 0.0
 		soundObject.keyframe_insert(frame = 1, data_path = propertyPath)
-		bpy.context.area.type = "GRAPH_EDITOR"
-		soundObject.hide = False
 		deselectAll()
 		setActive(soundObject)
 		bpy.ops.graph.sound_bake(
 			filepath = filePath,
 			low = low,
 			high = high)
+		soundObject.hide = True
 		bpy.context.area.type = "NODE_EDITOR"
 		
 		item = self.bakedSound.add()
