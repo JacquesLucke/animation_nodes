@@ -61,8 +61,8 @@ class mn_LoopCallerNode(Node, AnimationNode):
 			
 			for socket in fromListSockets:
 				idName = self.getSocketTypeForListSocket(socket.bl_idname)
-				self.inputs.new(idName, socket.customName, socket.identifier + "list")
-				self.outputs.new(idName, socket.customName, socket.identifier + "list")
+				self.inputs.new(idName, socket.customName + " List", socket.identifier + "list")
+				self.outputs.new(idName, socket.customName + " List", socket.identifier + "list")
 				
 			for socket in fromSingleSockets:
 				inputSocket = self.inputs.new(socket.bl_idname, socket.customName, socket.identifier)
