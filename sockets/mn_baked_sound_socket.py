@@ -1,6 +1,7 @@
 import bpy
 from mn_execution import nodePropertyChanged
-from mn_node_base import * 
+from mn_node_base import *
+from mn_node_utils import *
 
 class mn_BakedSoundSocket(mn_BaseSocket, mn_SocketProperties):
 	bl_idname = "mn_BakedSoundSocket"
@@ -8,16 +9,9 @@ class mn_BakedSoundSocket(mn_BaseSocket, mn_SocketProperties):
 	dataType = "Sound"
 	allowedInputTypes = ["Sound"]
 	drawColor = (0.5, 0.9, 0.6, 1)
-	
-	def getSoundBakeNodeNames(self):
-		bakeNodeNames = []
-		for node in self.id_data.nodes:
-			if node.bl_idname == "mn_SoundBakeNode":
-				bakeNodeNames.append(node.name)
-		return bakeNodeNames
 		
 	def getSoundBakeNodeItems(self, context):
-		bakeNodeNames = self.getSoundBakeNodeNames()
+		bakeNodeNames = getAttributesFromNodesWithType("mn_SoundBakeNode", "name")
 		bakeNodeItems = []
 		for name in bakeNodeNames:
 			bakeNodeItems.append((name, name, ""))
