@@ -146,6 +146,7 @@ class NetworkCodeGenerator:
 		self.modules = set(["bpy", "time"])
 		self.functions = {}
 		self.neededSocketReferences = []
+		self.nodeTreeNames = {}
 		self.allNodesInTree = []
 		self.executeNodes = []
 		self.outputUseNodes = []
@@ -156,7 +157,7 @@ class NetworkCodeGenerator:
 		
 		codeParts = []
 		codeParts.append("import " + ", ".join(self.modules))
-		codeParts.append("nodes = bpy.data.node_groups['" + self.network[0].id_data.name + "'].nodes")
+		codeParts.append(self.getNodeTreeReferencingCode())
 		codeParts.append(self.getNodeReferencingCode())
 		codeParts.append(self.getNodeExecuteReferencingCode())
 		codeParts.append(self.getSocketReferencingCode())
@@ -297,6 +298,17 @@ class NetworkCodeGenerator:
 	def getDeterminedNodesCode(self):
 		return "\n".join(self.determinedNodesCode)
 		
+	def getNodeTreeReferencingCode(self):
+		nodeTrees = []
+		for node in self.allNodesInTree:
+			if node.id_data not in nodeTrees: nodeTrees.append(node.id_data)
+		codeLines = []
+		for i, nodeTree in enumerate(nodeTrees):
+			nodeTreeVarName = "nodes" + str(i)
+			self.nodeTreeNames[nodeTree] = nodeTreeVarName
+			codeLines.append(nodeTreeVarName + " = bpy.data.node_groups['" + nodeTree.name + "'].nodes")
+		return "\n".join(codeLines)
+		
 	def getNodeReferencingCode(self):
 		codeLines = []
 		for node in self.allNodesInTree:
@@ -364,7 +376,7 @@ class NetworkCodeGenerator:
 		
 		
 	def getNodeDeclarationString(self, node):
-		return getNodeVariableName(node) + " = nodes['"+node.name+"']"
+		return getNodeVariableName(node) + " = " + self.nodeTreeNames[node.id_data] + "['"+node.name+"']"
 	def getNodeFunctionDeclarationString(self, node):
 		return getNodeExecutionName(node) + " = " + getNodeVariableName(node) + ".execute"
 	def getSocketDeclarationString(self, socket):
