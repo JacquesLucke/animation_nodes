@@ -94,6 +94,12 @@ else: $new$ = None
 			codeLines.append("    else: $new$ = (mn_interpolation_utils.linear, None)")
 			codeLines.append("except: $new$ = (mn_interpolation_utils.linear, None)")
 			return "\n".join(codeLines)
+		elif t == "Vertex": 
+			codeLines = []
+			codeLines.append("try:")
+			codeLines.append("    if len(%old%) == 2: $new$ = %old%")
+			codeLines.append("except: $new$ = [[0, 0, 0], [0, 0, 1]]")
+			return "\n".join(codeLines)			
 		else:
 			return "$new$ = %old%"
 			

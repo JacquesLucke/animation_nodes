@@ -62,7 +62,7 @@ def getNodeNameDictionary():
 		("mn_InvertMatrix", "Invert Matrix") ] ))
 		
 	nodes.append(("Mesh", [
-		("mn_ObjectMeshInfo", "Object Mesh Info"),
+		("mn_MeshInfo", "Mesh Info"),
 		("mn_VertexInfo", "Vertex Info") ] ))
 		
 	nodes.append(("List", [
