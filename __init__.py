@@ -72,8 +72,11 @@ moduleNames = getModuleNames(filePaths)
 appendPathsToPythonSearchDirectories(filePaths)
 execStrings = getExecStringsForImport(moduleNames)
 for name in moduleNames:
-	exec("import " + name)
-	print("import " + name)	
+	try:
+		exec("import " + name)
+		print("import " + name)
+	except BaseException as e:
+		print(e)
 
 from mn_execution import nodeTreeChanged	
 class GlobalUpdateSettings(bpy.types.PropertyGroup):

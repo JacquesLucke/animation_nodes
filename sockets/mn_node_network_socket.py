@@ -4,8 +4,8 @@ from mn_node_base import *
 
 class mn_NodeNetworkSocket(mn_BaseSocket, mn_SocketProperties):
 	bl_idname = "mn_NodeNetworkSocket"
-	bl_label = "Generic Socket"
-	dataType = "Generic"
+	bl_label = "Node Network Socket"
+	dataType = "Node Network"
 	allowedInputTypes = ["all"]
 	drawColor = (0.34, 0.25, 0.22, 1.0)
 	
