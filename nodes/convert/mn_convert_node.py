@@ -99,7 +99,13 @@ else: $new$ = None
 			codeLines.append("try:")
 			codeLines.append("    if len(%old%) == 2: $new$ = %old%")
 			codeLines.append("except: $new$ = [[0, 0, 0], [0, 0, 1]]")
-			return "\n".join(codeLines)			
+			return "\n".join(codeLines)		
+		elif t == "Polygon": 
+			codeLines = []
+			codeLines.append("try:")
+			codeLines.append("    if len(%old%) == 4: $new$ = %old%")
+			codeLines.append("except: $new$ = [[0, 0, 0], [0, 0, 1], 0.0, 0]")
+			return "\n".join(codeLines)		
 		else:
 			return "$new$ = %old%"
 			

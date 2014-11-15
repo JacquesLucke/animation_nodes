@@ -8,17 +8,16 @@ class mn_IntegerInputNode(Node, AnimationNode):
 	bl_label = "Integer Input"
 	isDetermined = True
 	
-	intProperty = bpy.props.IntProperty(default = 0, update = nodePropertyChanged)
-	
 	def init(self, context):
 		forbidCompiling()
+		self.inputs.new("mn_IntegerSocket", "Number")
 		self.outputs.new("mn_IntegerSocket", "Number")
 		allowCompiling()
 		
-	def draw_buttons(self, context, layout):
-		layout.prop(self, "intProperty", text = "")
+	def getInputSocketNames(self):
+		return {"Number" : "number"}
+	def getOutputSocketNames(self):
+		return {"Number" : "number"}
 		
-	def execute(self, input):
-		output = {}
-		output["Number"] = self.intProperty
-		return output
+	def execute(self, number):
+		return number

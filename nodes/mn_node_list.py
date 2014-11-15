@@ -63,7 +63,8 @@ def getNodeNameDictionary():
 		
 	nodes.append(("Mesh", [
 		("mn_MeshInfo", "Mesh Info"),
-		("mn_VertexInfo", "Vertex Info") ] ))
+		("mn_VertexInfo", "Vertex Info"),
+		("mn_PolygonInfo", "Polygon Info") ] ))
 		
 	nodes.append(("List", [
 		("mn_GetListElementNode", "Get Element"),
