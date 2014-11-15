@@ -99,12 +99,14 @@ class mn_SoundBakeNode(Node, AnimationNode):
 		
 	def bakeSound(self):
 		forbidCompiling()
-		bpy.context.scene.frame_current = 1
+		scene = bpy.context.scene
+		oldFrame = scene.frame_current
+		scene.frame_current = 1
 		soundObject = self.getSoundObject()
 		self.removeSoundCurves(soundObject)
 		soundCombinations = [(0, 50), (50, 150), (150, 300), (300, 500), (500, 1000), (1000, 2000), (2000, 4000), (4000, 10000), (10000, 20000)]
 		wm = bpy.context.window_manager
-		wm.progress_begin(0.0, len(soundCombinations))
+		wm.progress_begin(0.0, len(soundCombinations) - 1.0)
 		wm.progress_update(0.0)
 		for index, (low, high) in enumerate(soundCombinations):
 			self.bakeIndividualSound(soundObject, self.filePath, low, high)
@@ -113,6 +115,8 @@ class mn_SoundBakeNode(Node, AnimationNode):
 		soundObject.hide = True
 		self.name = os.path.basename(self.filePath)
 		loadSound(self.filePath)
+		scene.sync_mode = "AUDIO_SYNC"
+		scene.frame_current = oldFrame
 		allowCompiling()
 		nodeTreeChanged()
 		
