@@ -1,3 +1,5 @@
+http://animation-nodes-documentation.readthedocs.org/en/latest/
+
 ##How to make my own nodes
 
 
