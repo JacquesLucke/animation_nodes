@@ -44,7 +44,7 @@ class ExecutionUnit:
 			unitName = node.settings.unitName
 			
 		# don't use scene/property update when animation plays back
-		if event == "FRAME":
+		if event in ["SCENE", "PROPERTY", "FRAME"]:
 			if isAnimationPlaying() and onFrameChange and (onSceneUpdate or onPropertyChange):
 				onSceneUpdate = False
 				onPropertyChange = False
