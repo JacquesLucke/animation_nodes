@@ -20,6 +20,7 @@ class mn_NetworkUpdateSettingsNode(Node, AnimationNode):
 	needsExecution = False
 	
 	settings = bpy.props.PointerProperty(type = UpdateSettings, name = "Update Settings")
+	executionTime = bpy.props.FloatProperty(name = "Execution Time")
 	
 	def init(self, context):
 		forbidCompiling()
@@ -39,6 +40,8 @@ class mn_NetworkUpdateSettingsNode(Node, AnimationNode):
 		layout.separator()
 		layout.prop(self.settings, "printTime")
 		layout.prop(self.settings, "unitName")
+		layout.separator()
+		layout.label("Time: " + str(round(self.executionTime, 6)) + " s")
 		
 		
 class ForceLocalNodeTreeExecution(bpy.types.Operator):

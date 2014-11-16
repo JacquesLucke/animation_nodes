@@ -30,8 +30,10 @@ class ExecutionUnit:
 		printTime = False
 		unitName = "Unit"
 		
+		node = None
 		if self.updateSettingsNode is not None:
 			node = getNode(self.updateSettingsNode[0], self.updateSettingsNode[1])
+			
 			onFrameChange = node.settings.frameChanged
 			onSceneUpdate = node.settings.sceneUpdates
 			onPropertyChange = node.settings.propertyChanged
@@ -71,6 +73,8 @@ class ExecutionUnit:
 			self.executeAmount += 1
 			if printTime:
 				printTimeSpan(unitName + " exec. ", self.totalExecuteTime / self.executeAmount, "counter: " + str(self.executeAmount))
+			if node is not None:
+				node.executionTime += timeSpan
 
 def getExecutionUnits():
 	global subNetworks, invalidNetworks, useProfiling

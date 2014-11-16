@@ -15,9 +15,12 @@ def updateAnimationTrees(event = "NONE"):
 		forbidCompiling()
 		
 		start = time.clock()
+		updateSettingNodes = getAndResetUpdateSettingsNodes()
+		
 		for executionUnit in executionUnits:
 			executionUnit.execute(event)
-		resetForceUpdateProperties()
+			
+		resetForceUpdateProperties(updateSettingNodes)
 		clearExecutionCache()
 		timeSpan = time.clock() - start
 		
@@ -36,8 +39,12 @@ def resetCompileBlocker():
 	global COMPILE_BLOCKER
 	COMPILE_BLOCKER = 0
 	
-def resetForceUpdateProperties():
+def getAndResetUpdateSettingsNodes():
 	nodes = getNodesFromType("mn_NetworkUpdateSettingsNode")
+	for node in nodes:
+		node.executionTime = 0.0
+	return nodes
+def resetForceUpdateProperties(nodes):
 	for node in nodes:
 		node.settings.forceExecution = False
 			
