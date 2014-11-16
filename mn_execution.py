@@ -8,8 +8,6 @@ from mn_selection_utils import *
 from mn_node_utils import *
 
 COMPILE_BLOCKER = 0
-
-
 executionUnits = []
 
 def updateAnimationTrees(event = "NONE"):
@@ -24,7 +22,7 @@ def updateAnimationTrees(event = "NONE"):
 		timeSpan = time.clock() - start
 		
 		if bpy.context.scene.mn_settings.developer.printUpdateTime:
-			print("Exec. " + str(round(timeSpan, 7)) + " s  -  " + str(round(1/timeSpan, 5)) + " fps")
+			printTimeSpan("Update Time ", timeSpan)
 			
 		allowCompiling()
 			

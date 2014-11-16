@@ -52,6 +52,8 @@ def isAnimationPlaying():
 	return False
 def nameToPath(name):
 	return '["' + name + '"]'
+def printTimeSpan(name, timeSpan, extraInfo = ""):
+	print(name + " " + str(round(timeSpan, 7)).rjust(13) + " s  -  " + str(round(1.0 / timeSpan, 5)).rjust(13) + " fps  " + extraInfo)
 	
 # nodes and sockets
 ######################

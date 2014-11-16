@@ -19,6 +19,7 @@ class ExecutionUnit:
 		
 	def execute(self, event = "NONE"):
 		update = bpy.context.scene.mn_settings.update
+		developer = bpy.context.scene.mn_settings.developer
 		
 		onFrameChange = update.frameChange
 		onSceneUpdate = update.sceneUpdate
@@ -26,6 +27,7 @@ class ExecutionUnit:
 		onTreeChange = update.treeChange
 		skipFrames = update.skipFramesAmount
 		forceExecution = False
+		printTime = False
 		unitName = "Unit"
 		
 		if self.updateSettingsNode is not None:
@@ -36,6 +38,8 @@ class ExecutionUnit:
 			onTreeChange = node.settings.treeChanged
 			skipFrames = node.settings.skipFramesAmount
 			forceExecution = node.settings.forceExecution
+			printTime = node.settings.printTime
+			unitName = node.settings.unitName
 			
 		# don't use scene/property update when animation plays back
 		if isAnimationPlaying() and onFrameChange and (onSceneUpdate or onPropertyChange):
@@ -59,11 +63,9 @@ class ExecutionUnit:
 			timeSpan = time.clock() - start
 			self.totalExecuteTime += timeSpan
 			self.executeAmount += 1
-			printTimeSpan(unitName + " exec. ", self.totalExecuteTime / self.executeAmount, "counter: " + str(self.executeAmount))
+			if printTime:
+				printTimeSpan(unitName + " exec. ", self.totalExecuteTime / self.executeAmount, "counter: " + str(self.executeAmount))
 
-def printTimeSpan(name, timeSpan, extraInfo = ""):
-	print(name + " " + str(round(timeSpan, 7)).rjust(13) + " s  -  " + str(round(1.0 / timeSpan, 5)).rjust(13) + " fps  " + extraInfo)
-		
 def getExecutionUnits():
 	global subNetworks, invalidNetworks, useProfiling
 	useProfiling = bpy.context.scene.mn_settings.developer.executionProfiling

@@ -87,9 +87,8 @@ class GlobalUpdateSettings(bpy.types.PropertyGroup):
 	skipFramesAmount = IntProperty(default = 0, name = "Skip Frames", min = 0, soft_max = 10)
 	
 class DeveloperSettings(bpy.types.PropertyGroup):
-	printUpdateTime = BoolProperty(default = False, name = "Print Update Time")
+	printUpdateTime = BoolProperty(default = False, name = "Print Global Update Time")
 	printGenerationTime = BoolProperty(default = False, name = "Print Script Generation Time")
-	showErrors = BoolProperty(default = False, name = "Show Full Error")
 	executionProfiling = BoolProperty(default = False, name = "Node Execution Profiling", update = nodeTreeChanged)
 
 import mn_keyframes	

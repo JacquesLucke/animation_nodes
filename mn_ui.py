@@ -69,7 +69,6 @@ class AnimationNodesDeveloperPanel(bpy.types.Panel):
 		col = layout.column(align = True)
 		col.prop(scene.mn_settings.developer, "printUpdateTime", text = "Print Update Time")
 		col.prop(scene.mn_settings.developer, "printGenerationTime", text = "Print Generation Time")
-		col.prop(scene.mn_settings.developer, "showErrors", text = "Show Errors")
 		col.prop(scene.mn_settings.developer, "executionProfiling", text = "Node Execution Profiling")
 		
 class KeyframeManagerPanel(bpy.types.Panel):
