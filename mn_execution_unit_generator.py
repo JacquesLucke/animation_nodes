@@ -50,6 +50,11 @@ class ExecutionUnit:
 		if isAnimationPlaying() and getCurrentFrame() % (max(skipFrames, 0) + 1) != 0:
 			onFrameChange = False
 			
+		# reset counter on force execution
+		if forceExecution:
+			self.totalExecuteTime = 0.0
+			self.executeAmount = 0
+			
 		execute = event == "NONE" \
 			or event == "FRAME" and onFrameChange \
 			or event == "SCENE" and onSceneUpdate \
