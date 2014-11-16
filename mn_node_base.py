@@ -4,8 +4,8 @@ from mn_execution import nodeTreeChanged
 from bpy.types import NodeTree, Node, NodeSocket
 from mn_utils import *
 
-class AnimationNodeTree(bpy.types.NodeTree):
-	bl_idname = "AnimationNodeTreeType"
+class mn_AnimationNodeTree(bpy.types.NodeTree):
+	bl_idname = "mn_AnimationNodeTree"
 	bl_label = "Animation";
 	bl_icon = "ACTION"
 	
@@ -19,7 +19,7 @@ class AnimationNodeTree(bpy.types.NodeTree):
 class AnimationNode:
 	@classmethod
 	def poll(cls, nodeTree):
-		return nodeTree == "AnimationNodeTreeType"
+		return nodeTree.bl_idname == "mn_AnimationNodeTree"
 		
 
 		

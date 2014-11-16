@@ -6,7 +6,7 @@ from nodeitems_utils import register_node_categories, unregister_node_categories
 class AnimationNodesCategory(NodeCategory):
 	@classmethod
 	def poll(cls, context):
-		return context.space_data.tree_type == 'AnimationNodeTreeType'
+		return context.space_data.tree_type == 'mn_AnimationNodeTree'
 		
 def getAllNodeIdNames():
 	nodeDictionary = getNodeNameDictionary()

@@ -41,7 +41,7 @@ def getNodesFromType(nodeType):
 def getAnimationNodeTrees():
 	nodeTrees = []
 	for nodeTree in bpy.data.node_groups:
-		if hasattr(nodeTree, "isAnimationNodeTree"):
+		if nodeTree.bl_idname == "mn_AnimationNodeTree":
 			nodeTrees.append(nodeTree)
 	return nodeTrees
 	

@@ -13,7 +13,7 @@ class AnimationNodesPerformance(bpy.types.Panel):
 	
 	@classmethod
 	def poll(self, context):
-		return context.space_data.tree_type == "AnimationNodeTreeType"
+		return context.space_data.tree_type == "mn_AnimationNodeTree"
 	
 	def draw(self, context):
 		layout = self.layout
@@ -32,7 +32,7 @@ class CustomAnimationNodes(bpy.types.Panel):
 	
 	@classmethod
 	def poll(self, context):
-		return context.space_data.tree_type == "AnimationNodeTreeType"
+		return context.space_data.tree_type == "mn_AnimationNodeTree"
 	
 	def draw(self, context):
 		layout = self.layout
@@ -53,7 +53,7 @@ class AnimationNodesDeveloperPanel(bpy.types.Panel):
 	
 	@classmethod
 	def poll(self, context):
-		return context.space_data.tree_type == "AnimationNodeTreeType"
+		return context.space_data.tree_type == "mn_AnimationNodeTree"
 	
 	def draw(self, context):
 		layout = self.layout

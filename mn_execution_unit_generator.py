@@ -1,4 +1,4 @@
-import bpy, time
+import bpy, time, mn_node_utils
 from mn_utils import *
 
 normalNetworks = []
@@ -138,16 +138,15 @@ def setUniqueCodeIndexToEveryNode(nodes):
 def getNodeNetworks():
 	nodeNetworks = []
 	nodeTrees = getAnimationNodeTrees()
+	print(nodeTrees)
 	for nodeTree in nodeTrees:
 		nodeNetworks.extend(getNodeNetworksFromTree(nodeTree))
 	return nodeNetworks
 	
 def getAnimationNodeTrees():
-	nodeTrees = []
-	for nodeTree in bpy.data.node_groups:
-		if hasattr(nodeTree, "isAnimationNodeTree"):
-			nodeTrees.append(nodeTree)
-			nodeTree.use_fake_user = True
+	nodeTrees = mn_node_utils.getAnimationNodeTrees()
+	for nodeTree in nodeTrees:
+		nodeTree.use_fake_user = True
 	return nodeTrees
 		
 def getNodeNetworksFromTree(nodeTree):
