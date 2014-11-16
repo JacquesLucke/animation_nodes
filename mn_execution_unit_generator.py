@@ -74,7 +74,7 @@ class ExecutionUnit:
 			if printTime:
 				printTimeSpan(unitName + " exec. ", self.totalExecuteTime / self.executeAmount, "counter: " + str(self.executeAmount))
 			if node is not None:
-				node.executionTime += timeSpan
+				node.executionTime = timeSpan
 
 def getExecutionUnits():
 	global subNetworks, invalidNetworks, useProfiling
