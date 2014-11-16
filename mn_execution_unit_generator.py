@@ -7,18 +7,21 @@ invalidNetworks = []
 useProfiling = False
 
 class ExecutionUnit:
+
 	def __init__(self, code, updateSettingsNode):
 		self.executionCode = code
 		self.codeObject = compile(code, "<string>", "exec")
 		if getattr(updateSettingsNode, "bl_idname", "") == "mn_NetworkUpdateSettingsNode":
 			self.updateSettingsNode = (updateSettingsNode.id_data.name, updateSettingsNode.name)
 		else: self.updateSettingsNode = None
+		
 	def execute(self, event = "NONE"):
 		update = bpy.context.scene.mn_settings.update
 		onFrameChange = update.frameChange
 		onSceneUpdate = update.sceneUpdate
 		onPropertyChange = update.propertyChange
 		onTreeChange = update.treeChange
+		skipFrames = update.skipFramesAmount
 		forceExecution = False
 		
 		if self.updateSettingsNode is not None:
@@ -27,7 +30,17 @@ class ExecutionUnit:
 			onSceneUpdate = node.settings.sceneUpdates
 			onPropertyChange = node.settings.propertyChanged
 			onTreeChange = node.settings.treeChanged
+			skipFrames = node.settings.skipFramesAmount
 			forceExecution = node.settings.forceExecution
+			
+		# don't use scene/property update when animation plays back
+		if isAnimationPlaying() and onFrameChange and (onSceneUpdate or onPropertyChange):
+			onSceneUpdate = False
+			onPropertyChange = False
+			
+		# use skip frames
+		if isAnimationPlaying() and getCurrentFrame() % (skipFrames + 1) != 0:
+			onFrameChange = False
 			
 		execute = event == "NONE" \
 			or event == "FRAME" and onFrameChange \
@@ -36,7 +49,8 @@ class ExecutionUnit:
 			or event == "TREE" and onTreeChange \
 			or forceExecution
 			
-		if execute: exec(self.codeObject, {})
+		if execute:
+			exec(self.codeObject, {})
 		
 def getExecutionUnits():
 	global subNetworks, invalidNetworks, useProfiling
@@ -117,7 +131,7 @@ def getNodeNetworksFromTree(nodeTree):
 	
 	networks = []
 	for node in nodes:
-		if not node.isFound:
+		if not node.isFound and getattr(node, "needsExecution", True):
 			networks.append(getNodeNetworkFromNode(node))
 	return networks
 	
