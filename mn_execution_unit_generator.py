@@ -264,7 +264,6 @@ class NetworkCodeGenerator:
 		self.orderedNodes = orderNodes(loopNetwork)
 		mainLines = []
 		mainLines.append("def " + getNodeFunctionName(startNode) + "(" + getNodeOutputName(startNode) + "):")
-		mainLines.append("    global nodes")
 		mainLines.append("    " + self.getTimerGlobalList(loopNetwork))
 		for node in self.orderedNodes:
 			if node != startNode:
@@ -272,6 +271,7 @@ class NetworkCodeGenerator:
 				self.setIndentationOnEveryLine(codeLines)
 				mainLines.extend(codeLines)
 		if useProfiling: mainLines.append("    globals().update(locals())")
+		mainLines.append("    pass")
 		functionString = "\n".join(mainLines)
 		return functionString
 	def setIndentationOnEveryLine(self, codeLines):
