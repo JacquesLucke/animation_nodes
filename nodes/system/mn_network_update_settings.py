@@ -7,6 +7,7 @@ class UpdateSettings(bpy.types.PropertyGroup):
 	propertyChanged = bpy.props.BoolProperty(default = False, name = "Property Changed")
 	frameChanged = bpy.props.BoolProperty(default = False, name = "Frame Changed")
 	sceneUpdates = bpy.props.BoolProperty(default = False, name = "Scene Updates")
+	treeChanged = bpy.props.BoolProperty(default = False, name = "Tree Changed")
 
 class mn_NetworkUpdateSettingsNode(Node, AnimationNode):
 	bl_idname = "mn_NetworkUpdateSettingsNode"
@@ -23,6 +24,7 @@ class mn_NetworkUpdateSettingsNode(Node, AnimationNode):
 		layout.prop(self.settings, "propertyChanged")
 		layout.prop(self.settings, "frameChanged")
 		layout.prop(self.settings, "sceneUpdates")
+		layout.prop(self.settings, "treeChanged")
 
 	def execute(self, input):
 		return {}

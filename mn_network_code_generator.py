@@ -6,10 +6,38 @@ subNetworks = {}
 invalidNetworks = []
 useProfiling = False
 
-def getAllNetworkCodeStrings():
+class ExecutionUnit:
+	def __init__(self, code, updateSettingsNode):
+		self.executionCode = code
+		self.codeObject = compile(code, "<string>", "exec")
+		if getattr(updateSettingsNode, "bl_idname", "") == "mn_NetworkUpdateSettingsNode":
+			self.updateSettingsNode = (updateSettingsNode.id_data.name, updateSettingsNode.name)
+		else: self.updateSettingsNode = None
+	def execute(self, event = "NONE"):
+		update = bpy.context.scene.mn_settings.update
+		onFrameChange = update.frameChange
+		onSceneUpdate = update.sceneUpdate
+		onPropertyChange = update.propertyChange
+		onTreeChange = update.treeChange
+		
+		if self.updateSettingsNode is not None:
+			node = getNode(self.updateSettingsNode[0], self.updateSettingsNode[1])
+			onFrameChange = node.settings.frameChanged
+			onSceneUpdate = node.settings.sceneUpdates
+			onPropertyChange = node.settings.propertyChanged
+			onTreeChange = node.settings.treeChanged
+			
+		execute = event == "NONE" \
+			or event == "FRAME" and onFrameChange \
+			or event == "SCENE" and onSceneUpdate \
+			or event == "PROPERTY" and onPropertyChange \
+			or event == "TREE" and onTreeChange
+			
+		if execute: exec(self.codeObject, {})
+		
+def getExecutionUnits():
 	global subNetworks, invalidNetworks, useProfiling
 	useProfiling = bpy.context.scene.mn_settings.developer.executionProfiling
-	networkStrings = []
 	clearSocketConnections()
 	cleanupNodeTrees()
 	nodeNetworks = getNodeNetworks()
@@ -17,11 +45,13 @@ def getAllNetworkCodeStrings():
 	if len(invalidNetworks) > 0:
 		print("invalid node tree")
 		return []
+	executionUnits = []
 	for network in normalNetworks:
 		codeGenerator = NetworkCodeGenerator(network)
-		networkStrings.append(codeGenerator.getCode())
+		codeGenerator.generateCode()
+		executionUnits.append(ExecutionUnit(codeGenerator.generateCode, codeGenerator.updateSettingsNode))
 	clearSocketConnections()
-	return networkStrings
+	return executionUnits
 	
 def sortNetworks(nodeNetworks):
 	global normalNetworks, subNetworks, invalidNetworks, idCounter
@@ -152,7 +182,10 @@ class NetworkCodeGenerator:
 		self.outputUseNodes = []
 		self.determinedNodesCode = []
 		
-	def getCode(self):
+		self.updateSettingsNode = None
+		self.generatedCode = ""
+		
+	def generateCode(self):
 		mainCode = self.getMainCode()
 		
 		codeParts = []
@@ -167,13 +200,16 @@ class NetworkCodeGenerator:
 		codeParts.append(self.getFunctionsCode())
 		codeParts.append(mainCode)
 		codeParts.append(self.getCodeToPrintProfilingResult())
-		return "\n".join(codeParts)
+		
+		self.generateCode = "\n".join(codeParts)
 		
 	def getMainCode(self):
 		self.allNodesInTree.extend(self.network)
 		self.orderedNodes = orderNodes(self.network)
 		codeLines = []
 		for node in self.orderedNodes:
+			if self.updateSettingsNode is None:
+				self.updateSettingsNode = getUpdateSettingsNode(node)
 			codeLines.extend(self.getNodeCodeLines(node))
 		return "\n".join(codeLines)
 		
@@ -599,13 +635,12 @@ def setDataConnection(fromSocket, toSocket):
 	global inputSockets, outputSockets, updateSettingConnections
 	
 	if toSocket.bl_idname == "mn_NodeNetworkSocket":
-		if toSocket not in updateSettingConnections: updateSettingConnections[toSocket] = []
-		updateSettingConnections[toSocket].append(fromSocket)
-	
-	if fromSocket not in outputSockets:	outputSockets[fromSocket] = []
-	
-	inputSockets[toSocket] = fromSocket
-	outputSockets[fromSocket].append(toSocket)
+		updateSettingConnections[fromSocket.node] = toSocket.node
+	else:
+		if fromSocket not in outputSockets:	outputSockets[fromSocket] = []
+		
+		inputSockets[toSocket] = fromSocket
+		outputSockets[fromSocket].append(toSocket)
 
 def hasOtherDataOrigin(socket):
 	return inputSockets.get(socket) is not None
@@ -620,4 +655,7 @@ def isOutputSocketUsed(socket):
 	return socket in outputSockets
 def getSocketsFromOutputSocket(socket):
 	return outputSockets.get(socket, [])
+	
+def getUpdateSettingsNode(node):
+	return updateSettingConnections.get(node)
 			
