@@ -65,6 +65,7 @@ class AnimationNodesDeveloperPanel(bpy.types.Panel):
 		col = layout.column(align = True)
 		col.operator("mn.force_full_update")
 		col.operator("mn.print_node_tree_execution_string")
+		col.operator("mn.unit_execution_code_in_text_block")
 		
 		col = layout.column(align = True)
 		col.prop(scene.mn_settings.developer, "printUpdateTime", text = "Print Update Time")
@@ -168,6 +169,18 @@ class PrintNodeTreeExecutionStrings(bpy.types.Operator):
 			print()
 			print("-"*80)
 			print()
+		return {'FINISHED'}
+		
+class UnitExecutionCodeInTextBlock(bpy.types.Operator):
+	bl_idname = "mn.unit_execution_code_in_text_block"
+	bl_label = "Code in Text Block"
+
+	def execute(self, context):
+		codeString = ("\n\n#"+ "-"*50 + "\n\n").join(getCodeStrings())
+		textBlock = bpy.data.texts.get("Unit Execution Code")
+		if textBlock is None:
+			textBlock = bpy.data.texts.new("Unit Execution Code")
+		textBlock.from_string(codeString)
 		return {'FINISHED'}
 		
 class LoadNormalNodeTemplate(bpy.types.Operator):
