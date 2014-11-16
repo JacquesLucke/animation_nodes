@@ -5,6 +5,7 @@ from mn_cache import clearExecutionCache
 from mn_network_code_generator import getExecutionUnits
 from bpy.props import *
 from mn_selection_utils import *
+from mn_node_utils import *
 
 COMPILE_BLOCKER = 0
 
@@ -22,6 +23,7 @@ def updateAnimationTrees(treeChanged, event = "NONE"):
 			rebuildNodeNetworks()
 		for executionUnit in executionUnits:
 			executionUnit.execute(event)
+		resetForceUpdateProperties()
 		clearExecutionCache()
 		if scene.mn_settings.developer.printUpdateTime:
 			timeSpan = time.clock() - start
@@ -37,6 +39,11 @@ def forbidCompiling():
 def resetCompileBlocker():
 	global COMPILE_BLOCKER
 	COMPILE_BLOCKER = 0
+	
+def resetForceUpdateProperties():
+	nodes = getNodesFromType("mn_NetworkUpdateSettingsNode")
+	for node in nodes:
+		node.settings.forceExecution = False
 			
 			
 # compile code objects

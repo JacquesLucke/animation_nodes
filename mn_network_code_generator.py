@@ -19,6 +19,7 @@ class ExecutionUnit:
 		onSceneUpdate = update.sceneUpdate
 		onPropertyChange = update.propertyChange
 		onTreeChange = update.treeChange
+		forceExecution = False
 		
 		if self.updateSettingsNode is not None:
 			node = getNode(self.updateSettingsNode[0], self.updateSettingsNode[1])
@@ -26,12 +27,14 @@ class ExecutionUnit:
 			onSceneUpdate = node.settings.sceneUpdates
 			onPropertyChange = node.settings.propertyChanged
 			onTreeChange = node.settings.treeChanged
+			forceExecution = node.settings.forceExecution
 			
 		execute = event == "NONE" \
 			or event == "FRAME" and onFrameChange \
 			or event == "SCENE" and onSceneUpdate \
 			or event == "PROPERTY" and onPropertyChange \
-			or event == "TREE" and onTreeChange
+			or event == "TREE" and onTreeChange \
+			or forceExecution
 			
 		if execute: exec(self.codeObject, {})
 		
