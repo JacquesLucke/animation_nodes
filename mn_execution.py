@@ -50,11 +50,17 @@ def resetForceUpdateProperties():
 
 def generateExecutionUnits():
 	global executionUnits
-	start = time.clock()
-	executionUnits = getExecutionUnits()
-	timeSpan = time.clock() - start
-	if bpy.context.scene.mn_settings.developer.printGenerationTime:
-		print("Script Gen. " + str(round(timeSpan, 7)) + " s  -  " + str(round(1/timeSpan, 5)) + " fps")
+	
+	if COMPILE_BLOCKER <= 0:
+		forbidCompiling()
+		
+		start = time.clock()
+		executionUnits = getExecutionUnits()
+		timeSpan = time.clock() - start
+		if bpy.context.scene.mn_settings.developer.printGenerationTime:
+			print("Script Gen. " + str(round(timeSpan, 7)) + " s  -  " + str(round(1/timeSpan, 5)) + " fps")
+		
+		allowCompiling()
 		
 def getCodeStrings():
 	codeStrings = []

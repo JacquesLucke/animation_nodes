@@ -11,18 +11,22 @@ class ExecutionUnit:
 	def __init__(self, code, updateSettingsNode):
 		self.executionCode = code
 		self.codeObject = compile(code, "<string>", "exec")
+		self.executeAmount = 0
+		self.totalExecuteTime = 0.0
 		if getattr(updateSettingsNode, "bl_idname", "") == "mn_NetworkUpdateSettingsNode":
 			self.updateSettingsNode = (updateSettingsNode.id_data.name, updateSettingsNode.name)
 		else: self.updateSettingsNode = None
 		
 	def execute(self, event = "NONE"):
 		update = bpy.context.scene.mn_settings.update
+		
 		onFrameChange = update.frameChange
 		onSceneUpdate = update.sceneUpdate
 		onPropertyChange = update.propertyChange
 		onTreeChange = update.treeChange
 		skipFrames = update.skipFramesAmount
 		forceExecution = False
+		unitName = "Unit"
 		
 		if self.updateSettingsNode is not None:
 			node = getNode(self.updateSettingsNode[0], self.updateSettingsNode[1])
@@ -39,7 +43,7 @@ class ExecutionUnit:
 			onPropertyChange = False
 			
 		# use skip frames
-		if isAnimationPlaying() and getCurrentFrame() % (skipFrames + 1) != 0:
+		if isAnimationPlaying() and getCurrentFrame() % (max(skipFrames, 0) + 1) != 0:
 			onFrameChange = False
 			
 		execute = event == "NONE" \
@@ -50,7 +54,15 @@ class ExecutionUnit:
 			or forceExecution
 			
 		if execute:
+			start = time.clock()
 			exec(self.codeObject, {})
+			timeSpan = time.clock() - start
+			self.totalExecuteTime += timeSpan
+			self.executeAmount += 1
+			printTimeSpan(unitName + " exec. ", self.totalExecuteTime / self.executeAmount, "counter: " + str(self.executeAmount))
+
+def printTimeSpan(name, timeSpan, extraInfo = ""):
+	print(name + " " + str(round(timeSpan, 7)).rjust(13) + " s  -  " + str(round(1.0 / timeSpan, 5)).rjust(13) + " fps  " + extraInfo)
 		
 def getExecutionUnits():
 	global subNetworks, invalidNetworks, useProfiling

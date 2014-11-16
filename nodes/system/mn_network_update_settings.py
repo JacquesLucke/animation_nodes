@@ -9,7 +9,7 @@ class UpdateSettings(bpy.types.PropertyGroup):
 	frameChanged = bpy.props.BoolProperty(default = False, name = "Frame Changed")
 	sceneUpdates = bpy.props.BoolProperty(default = False, name = "Scene Updates")
 	treeChanged = bpy.props.BoolProperty(default = False, name = "Tree Changed")
-	skipFramesAmount = bpy.props.IntProperty(default = 0, name = "Skip Frames")
+	skipFramesAmount = bpy.props.IntProperty(default = 0, name = "Skip Frames", min = 0, soft_max = 10)
 	forceExecution = bpy.props.BoolProperty(default = False, name = "Force Execution")
 
 class mn_NetworkUpdateSettingsNode(Node, AnimationNode):
@@ -33,7 +33,7 @@ class mn_NetworkUpdateSettingsNode(Node, AnimationNode):
 		layout.prop(self.settings, "sceneUpdates")
 		layout.prop(self.settings, "frameChanged")
 		if self.settings.frameChanged:
-			layout.prop(self.settings, "skipFramesAmount")
+			layout.prop(self.settings, "skipFramesAmount", slider = True)
 		
 		
 class ForceLocalNodeTreeExecution(bpy.types.Operator):
