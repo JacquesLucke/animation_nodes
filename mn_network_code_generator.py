@@ -586,31 +586,26 @@ def insertConversionNode(nodeTree, convertNodeType, fromSocket, toSocket, origin
 
 inputSockets = {}
 outputSockets = {}
-					
-def handleLink(link):
-	fromValid = isValidNode(link.from_node)
-	toValid = isValidNode(link.to_node)
-	if fromValid and toValid: setDataConnection(link.from_socket, link.to_socket)
-	elif toValid:
-		originSocket = getOriginSocket(link.to_socket)
-		if isOtherOriginSocket(link.to_socket, originSocket):
-			setDataConnection(originSocket, link.to_socket)
+
+updateSettingConnections = {}
 					
 def clearSocketConnections():
-	global inputSockets, outputSockets
+	global inputSockets, outputSockets, updateSettingConnections
 	inputSockets = {}
 	outputSockets = {}
+	updateSettingConnections = {}
 				
 def setDataConnection(fromSocket, toSocket):
-	global inputSockets, outputSockets
+	global inputSockets, outputSockets, updateSettingConnections
+	
+	if toSocket.bl_idname == "mn_NodeNetworkSocket":
+		if toSocket not in updateSettingConnections: updateSettingConnections[toSocket] = []
+		updateSettingConnections[toSocket].append(fromSocket)
 	
 	if fromSocket not in outputSockets:	outputSockets[fromSocket] = []
 	
 	inputSockets[toSocket] = fromSocket
 	outputSockets[fromSocket].append(toSocket)
-			
-def isValidNode(node):
-	return node.bl_idname[:3] == "mn_"
 
 def hasOtherDataOrigin(socket):
 	return inputSockets.get(socket) is not None
