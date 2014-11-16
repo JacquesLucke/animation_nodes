@@ -8,7 +8,7 @@ useProfiling = False
 
 class ExecutionUnit:
 
-	def __init__(self, code, updateSettingsNode):
+	def __init__(self, code, updateSettingsNode = None):
 		self.executionCode = code
 		self.codeObject = compile(code, "<string>", "exec")
 		self.executeAmount = 0
@@ -42,13 +42,14 @@ class ExecutionUnit:
 			unitName = node.settings.unitName
 			
 		# don't use scene/property update when animation plays back
-		if isAnimationPlaying() and onFrameChange and (onSceneUpdate or onPropertyChange):
-			onSceneUpdate = False
-			onPropertyChange = False
-			
-		# use skip frames
-		if isAnimationPlaying() and getCurrentFrame() % (max(skipFrames, 0) + 1) != 0:
-			onFrameChange = False
+		if event == "FRAME":
+			if isAnimationPlaying() and onFrameChange and (onSceneUpdate or onPropertyChange):
+				onSceneUpdate = False
+				onPropertyChange = False
+				
+			# use skip frames
+			if isAnimationPlaying() and getCurrentFrame() % (max(skipFrames, 0) + 1) != 0:
+				onFrameChange = False
 			
 		# reset counter on force execution
 		if forceExecution:
@@ -85,7 +86,8 @@ def getExecutionUnits():
 	for network in normalNetworks:
 		codeGenerator = NetworkCodeGenerator(network)
 		codeGenerator.generateCode()
-		executionUnits.append(ExecutionUnit(codeGenerator.generateCode, codeGenerator.updateSettingsNode))
+		executionUnit = ExecutionUnit(codeGenerator.generatedCode, codeGenerator.updateSettingsNode)
+		executionUnits.append(executionUnit)
 	clearSocketConnections()
 	return executionUnits
 	
@@ -237,7 +239,7 @@ class NetworkCodeGenerator:
 		codeParts.append(mainCode)
 		codeParts.append(self.getCodeToPrintProfilingResult())
 		
-		self.generateCode = "\n".join(codeParts)
+		self.generatedCode = "\n".join(codeParts)
 		
 	def getMainCode(self):
 		self.allNodesInTree.extend(self.network)

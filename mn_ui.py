@@ -1,5 +1,5 @@
 import bpy
-from mn_execution import getCodeStrings, resetCompileBlocker, updateAnimationTrees
+from mn_execution import getCodeStrings, resetCompileBlocker, updateAnimationTrees, generateExecutionUnits
 from mn_keyframes import *
 from mn_utils import *
 from mn_selection_utils import *
@@ -153,7 +153,8 @@ class ForceNodeTreeUpdate(bpy.types.Operator):
 
 	def execute(self, context):
 		resetCompileBlocker()
-		updateAnimationTrees(treeChanged = True)
+		generateExecutionUnits()
+		updateAnimationTrees()
 		return {'FINISHED'}
 		
 class PrintNodeTreeExecutionStrings(bpy.types.Operator):

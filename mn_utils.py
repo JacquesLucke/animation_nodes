@@ -39,7 +39,8 @@ def deselectAllFCurves(object):
 			for fCurve in object.animation_data.action.fcurves:
 				fCurve.select = False
 def getCurrentFrame():
-	return bpy.context.scene.frame_current_final
+	try: return bpy.context.scene.frame_current_final
+	except: return 1
 def getRandom(min, max):
 	return random.random() * (max - min) + min
 def getRandomString(length):
@@ -47,9 +48,9 @@ def getRandomString(length):
 def clampInt(value, minValue, maxValue):
 	return int(max(min(value, maxValue), minValue))
 def isAnimationPlaying():
-	if bpy.context.screen is not None:
+	try:	
 		return bpy.context.screen.is_animation_playing
-	return False
+	except:	return False
 def nameToPath(name):
 	return '["' + name + '"]'
 def printTimeSpan(name, timeSpan, extraInfo = ""):
