@@ -23,6 +23,7 @@ class mn_LoopCallerNode(Node, AnimationNode):
 		return startLoopItems
 	def selectedLoopChanged(self, context):
 		self.updateSockets(self.getStartNode())
+		nodeTreeChanged()
 	
 	selectedLoop = bpy.props.EnumProperty(items = getStartLoopNodeItems, name = "Loop", update=selectedLoopChanged)
 	
