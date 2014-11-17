@@ -138,7 +138,6 @@ def setUniqueCodeIndexToEveryNode(nodes):
 def getNodeNetworks():
 	nodeNetworks = []
 	nodeTrees = getAnimationNodeTrees()
-	print(nodeTrees)
 	for nodeTree in nodeTrees:
 		nodeNetworks.extend(getNodeNetworksFromTree(nodeTree))
 	return nodeNetworks
