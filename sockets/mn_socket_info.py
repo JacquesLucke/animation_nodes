@@ -25,3 +25,11 @@ def getSocketNameByDataType(dataType):
 	for subClass in subClasses:
 		if getattr(subClass, "dataType") == dataType: return subClass.bl_idname
 	return None
+	
+def getListDataTypes():
+	types = []
+	for listChain in listChains:
+		for i, type in enumerate(listChain):
+			if i > 0:
+				types.append(type)
+	return types

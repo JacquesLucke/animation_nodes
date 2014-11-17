@@ -609,6 +609,8 @@ convertRules[("Float", "Vector")] = "mn_CombineVector"
 convertRules[("Integer", "Vector")] = "mn_CombineVector"
 convertRules[("Vector", "Float")] = "mn_SeparateVector"
 convertRules[("Text Block", "String")] = "mn_TextBlockReader"
+for dataType in ["Object", "Vertex", "Polygon", "Float", "Vector", "String"]:
+	convertRules[(dataType + " List", "Integer")] = "mn_GetListLengthNode"
 		
 def cleanupNodeTrees():
 	nodeTrees = getAnimationNodeTrees()
