@@ -15,6 +15,7 @@ class mn_PolygonInfo(Node, AnimationNode):
 		self.outputs.new("mn_VectorSocket", "Normal")
 		self.outputs.new("mn_FloatSocket", "Area")
 		self.outputs.new("mn_IntegerSocket", "Material Index")
+		self.outputs.new("mn_ObjectSocket", "From Object")
 		allowCompiling()
 		
 	def getInputSocketNames(self):
@@ -23,7 +24,8 @@ class mn_PolygonInfo(Node, AnimationNode):
 		return {"Center" : "center",
 				"Normal" : "normal",
 				"Area" : "area",
-				"Material Index" : "materialIndex"}
+				"Material Index" : "materialIndex",
+				"From Object" : "fromObject"}
 		
 	def useInLineExecution(self):
 		return True
@@ -33,5 +35,6 @@ class mn_PolygonInfo(Node, AnimationNode):
 		if outputUse["Normal"]: codeLines.append("$normal$ = %polygon%[1]")
 		if outputUse["Area"]: codeLines.append("$area$ = %polygon%[2]")
 		if outputUse["Material Index"]: codeLines.append("$materialIndex$ = %polygon%[3]")
+		if outputUse["From Object"]: codeLines.append("$fromObject$ = %polygon%[4]")
 		return "\n".join(codeLines)
 		

@@ -13,13 +13,15 @@ class mn_VertexInfo(Node, AnimationNode):
 		self.inputs.new("mn_VertexSocket", "Vertex")
 		self.outputs.new("mn_VectorSocket", "Position")
 		self.outputs.new("mn_VectorSocket", "Normal")
+		self.outputs.new("mn_ObjectSocket", "From Object")
 		allowCompiling()
 		
 	def getInputSocketNames(self):
 		return {"Vertex" : "vertex"}
 	def getOutputSocketNames(self):
 		return {"Position" : "position",
-				"Normal" : "normal"}
+				"Normal" : "normal",
+				"From Object" : "fromObject"}
 		
 	def useInLineExecution(self):
 		return True
@@ -27,5 +29,6 @@ class mn_VertexInfo(Node, AnimationNode):
 		codeLines = []
 		if outputUse["Position"]: codeLines.append("$position$ = %vertex%[0]")
 		if outputUse["Normal"]: codeLines.append("$normal$ = %vertex%[1]")
+		if outputUse["From Object"]: codeLines.append("$fromObject$ = %vertex%[2]")
 		return "\n".join(codeLines)
 		
