@@ -59,9 +59,10 @@ def getAllImportFiles():
 
     for root, dirs, files in os.walk(currentPath):
         path = ".".join(get_path(root))
-        for f in filter(lambda f:fnmatch(f, "*.py"), files):
-            if not f[:-3] == "__init__":
-                yield path + "." + f[:-3]
+        for f in filter(lambda f:f.endswith(".py"), files):
+            name = f[:-3]
+            if not name == "__init__":
+                yield path + "." + name
 
 animation_nodes_modules = []
 
@@ -115,9 +116,10 @@ if reload_event:
 ##################################
 
 def register():
-    #  two calls need one for registering the things in this file
+    #  two calls needed
+    #  one for registering the things in this file
     #  the other everything that lives in the fake 'animation_nodes'
-    #  namespace. It registers everything
+    #  namespace. It registers everything else.
     bpy.utils.register_module(__name__)
     bpy.utils.register_module("animation_nodes")
 
