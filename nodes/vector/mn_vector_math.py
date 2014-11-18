@@ -18,7 +18,7 @@ class mn_VectorMathNode(Node, AnimationNode):
 		("SUBTRACT", "Subtract", ""),
 		("MULTIPLY", "Multiply", "Multiply element by element"),
 		("DIVIDE", "Divide", ""),
-        ("CROSS", "Cross Product", "Calculate the cross/vector product, yielding a vector that is orthogonal to both input vectors")]
+		("CROSS", "Cross Product", "Calculate the cross/vector product, yielding a vector that is orthogonal to both input vectors")]
 	mathTypesProperty = bpy.props.EnumProperty(name="Operation", items=mathTypes, default="ADD", update=updateNode)
 	
 	def init(self, context):
