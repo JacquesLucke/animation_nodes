@@ -1,7 +1,7 @@
 import bpy
 from bpy.types import Node
-from mn_node_base import AnimationNode
-from mn_execution import nodeTreeChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodeTreeChanged, allowCompiling, forbidCompiling
 
 class mn_TransfromVector(Node, AnimationNode):
 	bl_idname = "mn_TransfromVector"
@@ -26,3 +26,17 @@ class mn_TransfromVector(Node, AnimationNode):
 		return "$vector$ = %matrix% * mathutils.Vector(%vector%)"
 	def getModuleList(self):
 		return ["mathutils"]
+
+
+classes = [
+	mn_TransfromVector
+]
+    
+def register():
+    for cls in classes:
+        bpy.utils.register_class(cls)
+ 
+ 
+def unregister():
+    for cls in classes:
+        bpy.utils.unregister_class(cls)

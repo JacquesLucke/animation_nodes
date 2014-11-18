@@ -1,8 +1,8 @@
 import bpy, random
-from mn_math_utils import perlinNoise
+from animation_nodes.utils.mn_math_utils import perlinNoise
 from bpy.types import Node
-from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 
 class mn_CombineColor(Node, AnimationNode):
@@ -30,3 +30,17 @@ class mn_CombineColor(Node, AnimationNode):
 	def execute(self, red, green, blue, alpha):
 		return [red, green, blue, alpha] 
 		
+
+
+classes = [
+	mn_CombineColor
+]
+    
+def register():
+    for cls in classes:
+        bpy.utils.register_class(cls)
+ 
+ 
+def unregister():
+    for cls in classes:
+        bpy.utils.unregister_class(cls)

@@ -1,7 +1,7 @@
 import bpy
 from bpy.types import Node
-from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 class mn_ColorInputNode(Node, AnimationNode):
 	bl_idname = "mn_ColorInputNode"
@@ -26,3 +26,16 @@ class mn_ColorInputNode(Node, AnimationNode):
 	def execute(self):
 		color = self.colorProperty
 		return [color[0], color[1], color[2], 1.0]
+
+classes = [
+	mn_ColorInputNode
+]
+    
+def register():
+    for cls in classes:
+        bpy.utils.register_class(cls)
+ 
+ 
+def unregister():
+    for cls in classes:
+        bpy.utils.unregister_class(cls)

@@ -1,7 +1,7 @@
 import bpy
 from bpy.types import Node
-from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 class mn_VertexInfo(Node, AnimationNode):
 	bl_idname = "mn_VertexInfo"
@@ -29,3 +29,16 @@ class mn_VertexInfo(Node, AnimationNode):
 		if outputUse["Normal"]: codeLines.append("$normal$ = %vertex%[1]")
 		return "\n".join(codeLines)
 		
+
+classes = [
+	mn_VertexInfo
+]
+    
+def register():
+    for cls in classes:
+        bpy.utils.register_class(cls)
+ 
+ 
+def unregister():
+    for cls in classes:
+        bpy.utils.unregister_class(cls)

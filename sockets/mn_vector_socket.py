@@ -1,6 +1,6 @@
 import bpy
-from mn_execution import nodePropertyChanged
-from mn_node_base import * 
+from animation_nodes.mn_execution import nodePropertyChanged
+from animation_nodes.mn_node_base import *
 
 class mn_VectorSocket(mn_BaseSocket, mn_SocketProperties):
 	bl_idname = "mn_VectorSocket"
@@ -26,3 +26,16 @@ class mn_VectorSocket(mn_BaseSocket, mn_SocketProperties):
 		self.vector = data
 	def getStoreableValue(self):
 		return self.vector[:]
+
+classes = [
+	mn_VectorSocket
+]
+    
+def register():
+    for cls in classes:
+        bpy.utils.register_class(cls)
+ 
+ 
+def unregister():
+    for cls in classes:
+        bpy.utils.unregister_class(cls)

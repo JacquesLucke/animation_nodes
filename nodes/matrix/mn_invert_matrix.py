@@ -1,8 +1,8 @@
 import bpy
 from bpy.types import Node
 from mathutils import *
-from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 
 class mn_InvertMatrix(Node, AnimationNode):
@@ -31,3 +31,16 @@ class mn_InvertMatrix(Node, AnimationNode):
 		
 	def getModuleList(self):
 		return ["mathutils"]
+
+classes = [
+	mn_InvertMatrix
+]
+    
+def register():
+    for cls in classes:
+        bpy.utils.register_class(cls)
+ 
+ 
+def unregister():
+    for cls in classes:
+        bpy.utils.unregister_class(cls)

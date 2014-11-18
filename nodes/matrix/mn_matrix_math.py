@@ -1,8 +1,8 @@
 import bpy
 from bpy.types import Node
 from mathutils import *
-from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 
 operationItems = [("MULTIPLY", "Multiply", "")]
 
@@ -34,3 +34,16 @@ class mn_MatrixMath(Node, AnimationNode):
 	def getInLineExecutionString(self, outputUse):
 		if self.operation == "MULTIPLY":
 			return "$result$ = %a% * %b%"
+
+classes = [
+	mn_MatrixMath
+]
+    
+def register():
+    for cls in classes:
+        bpy.utils.register_class(cls)
+ 
+ 
+def unregister():
+    for cls in classes:
+        bpy.utils.unregister_class(cls)

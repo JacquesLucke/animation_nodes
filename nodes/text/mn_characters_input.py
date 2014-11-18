@@ -1,7 +1,7 @@
 import bpy
 from bpy.types import Node
-from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 class mn_CharactersNode(Node, AnimationNode):
 	bl_idname = "mn_CharactersNode"
@@ -32,3 +32,16 @@ class mn_CharactersNode(Node, AnimationNode):
 		special = "!$%&/()=?*+#'-_.:,;" + '"'
 		all = lower + upper + digits + special
 		return lower, upper, digits, special, all
+
+classes = [
+	mn_CharactersNode
+]
+    
+def register():
+    for cls in classes:
+        bpy.utils.register_class(cls)
+ 
+ 
+def unregister():
+    for cls in classes:
+        bpy.utils.unregister_class(cls)

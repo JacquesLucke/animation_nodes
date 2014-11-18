@@ -1,8 +1,8 @@
 import bpy
 from bpy.types import Node
 from mathutils import *
-from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 
 axisItems = [("X", "X", ""), ("Y", "Y", ""), ("Z", "Z", "")]
 
@@ -37,3 +37,16 @@ class mn_RotationMatrix(Node, AnimationNode):
 		
 	def copy(self, node):
 		self.inputs[0].number = 0
+
+classes = [
+	mn_RotationMatrix
+]
+    
+def register():
+    for cls in classes:
+        bpy.utils.register_class(cls)
+ 
+ 
+def unregister():
+    for cls in classes:
+        bpy.utils.unregister_class(cls)

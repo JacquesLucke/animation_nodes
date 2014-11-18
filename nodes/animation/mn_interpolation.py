@@ -1,11 +1,11 @@
 import bpy
 from bpy.types import Node
-from mn_cache import getUniformRandom
-from mn_node_base import AnimationNode
-from mn_utils import *
-from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
-from mn_interpolation_utils import *
-from mn_node_helper import *
+from animation_nodes.mn_cache import getUniformRandom
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_utils import *
+from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from animation_nodes.utils.mn_interpolation_utils import *
+from animation_nodes.nodes.mn_node_helper import *
 
 topCategoryItems = [("LINEAR", "Linear", ""),
 					("EXPONENTIAL", "Exponential", ""),
@@ -140,3 +140,17 @@ class ResetEndPoints(bpy.types.Operator):
 		node = getNode(self.nodeTreeName, self.nodeName)
 		node.resetCurveEndPoints()
 		return {'FINISHED'}
+
+classes = [
+	mn_InterpolationNode,
+	ResetEndPoints
+]
+    
+def register():
+    for cls in classes:
+        bpy.utils.register_class(cls)
+ 
+ 
+def unregister():
+    for cls in classes:
+        bpy.utils.unregister_class(cls)

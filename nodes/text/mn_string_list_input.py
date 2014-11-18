@@ -1,8 +1,8 @@
 import bpy
 from bpy.types import Node
-from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
-from mn_utils import *
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_utils import *
 
 class mn_StringPropertyGroup(bpy.types.PropertyGroup):
 	string = bpy.props.StringProperty(name = "String", default = "", update = nodePropertyChanged)
@@ -54,3 +54,17 @@ class mn_StringListInputNode(Node, AnimationNode):
 		
 	def removeItemFromList(self, index):
 		self.strings.remove(index)
+
+classes = [
+	mn_StringPropertyGroup,
+	mn_StringListInputNode
+]
+    
+def register():
+    for cls in classes:
+        bpy.utils.register_class(cls)
+ 
+ 
+def unregister():
+    for cls in classes:
+        bpy.utils.unregister_class(cls)

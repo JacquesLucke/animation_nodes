@@ -1,8 +1,8 @@
 import bpy
 from bpy.types import Node
-from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
-from mn_utils import *
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_utils import *
 
 class mn_SumListElementsNode(Node, AnimationNode):
 	bl_idname = "mn_SumListElementsNode"
@@ -57,3 +57,16 @@ class mn_SumListElementsNode(Node, AnimationNode):
 			self.inputs.new("mn_IntegerSocket", "End")
 			self.outputs.new("mn_StringSocket", "Sum")
 		allowCompiling()
+
+classes = [
+	mn_SumListElementsNode
+]
+    
+def register():
+    for cls in classes:
+        bpy.utils.register_class(cls)
+ 
+ 
+def unregister():
+    for cls in classes:
+        bpy.utils.unregister_class(cls)

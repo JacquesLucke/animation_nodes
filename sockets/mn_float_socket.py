@@ -1,6 +1,6 @@
 import bpy
-from mn_execution import nodePropertyChanged
-from mn_node_base import * 
+from animation_nodes.mn_execution import nodePropertyChanged
+from animation_nodes.mn_node_base import *
 
 def getValue(self):
 	return min(max(self.min, self.get("number", 0)), self.max)
@@ -36,3 +36,17 @@ class mn_FloatSocket(mn_BaseSocket, mn_SocketProperties):
 		self.min = min
 		self.max = max
 		
+
+
+classes = [
+	mn_FloatSocket
+]
+    
+def register():
+    for cls in classes:
+        bpy.utils.register_class(cls)
+ 
+ 
+def unregister():
+    for cls in classes:
+        bpy.utils.unregister_class(cls)

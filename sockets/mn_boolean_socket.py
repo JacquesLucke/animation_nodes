@@ -1,6 +1,6 @@
 import bpy
-from mn_execution import nodePropertyChanged
-from mn_node_base import * 
+from animation_nodes.mn_execution import nodePropertyChanged
+from animation_nodes.mn_node_base import *
 
 class mn_BooleanSocket(mn_BaseSocket, mn_SocketProperties):
 	bl_idname = "mn_BooleanSocket"
@@ -22,3 +22,17 @@ class mn_BooleanSocket(mn_BaseSocket, mn_SocketProperties):
 		
 	def getStoreableValue(self):
 		return self.value
+
+
+classes = [
+	mn_BooleanSocket
+]
+    
+def register():
+    for cls in classes:
+        bpy.utils.register_class(cls)
+ 
+ 
+def unregister():
+    for cls in classes:
+        bpy.utils.unregister_class(cls)

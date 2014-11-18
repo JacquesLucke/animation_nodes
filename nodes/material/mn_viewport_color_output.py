@@ -1,8 +1,8 @@
 import bpy, random
 from bpy.types import Node
-from mn_cache import getUniformRandom
-from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_cache import getUniformRandom
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 class mn_ViewportColorNode(Node, AnimationNode):
 	bl_idname = "mn_ViewportColorNode"
@@ -31,3 +31,16 @@ class mn_ViewportColorNode(Node, AnimationNode):
 			except: pass
 		return None
 		
+
+classes = [
+	mn_ViewportColorNode
+]
+    
+def register():
+    for cls in classes:
+        bpy.utils.register_class(cls)
+ 
+ 
+def unregister():
+    for cls in classes:
+        bpy.utils.unregister_class(cls)

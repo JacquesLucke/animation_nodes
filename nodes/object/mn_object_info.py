@@ -1,10 +1,10 @@
 import bpy
 from bpy.types import Node
-from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
-from mn_utils import *
-from mn_object_utils import *
-from mn_fcurve_utils import *
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_utils import *
+from animation_nodes.utils.mn_object_utils import *
+from animation_nodes.utils.mn_fcurve_utils import *
 from bpy.props import BoolProperty
 from operator import sub
 
@@ -100,3 +100,16 @@ class mn_ObjectInfoNode(Node, AnimationNode):
 				scale = getArrayValueAtFrame(object, "scale", frame)
 		
 		return location, rotation, scale, locVelocity, rotVelocity, scaleVelocity
+
+classes = [
+	mn_ObjectInfoNode
+]
+    
+def register():
+    for cls in classes:
+        bpy.utils.register_class(cls)
+ 
+ 
+def unregister():
+    for cls in classes:
+        bpy.utils.unregister_class(cls)

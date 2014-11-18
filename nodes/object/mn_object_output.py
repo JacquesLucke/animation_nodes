@@ -1,7 +1,7 @@
 import bpy
 from bpy.types import Node
-from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 
 class mn_ObjectOutputNode(Node, AnimationNode):
 	bl_idname = "mn_ObjectOutputNode"
@@ -82,3 +82,17 @@ class mn_ObjectOutputNode(Node, AnimationNode):
 				useScale[0] or useScale[1] or useScale[2]):
 			codeLines = []
 		return "\n".join(codeLines)
+
+
+classes = [
+	mn_ObjectOutputNode
+]
+    
+def register():
+    for cls in classes:
+        bpy.utils.register_class(cls)
+ 
+ 
+def unregister():
+    for cls in classes:
+        bpy.utils.unregister_class(cls)

@@ -1,8 +1,8 @@
 import bpy, ast
 from bpy.types import Node
-from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
-from mn_utils import *
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_utils import *
 
 defaultVariableNames = list("abcdefghijklmnopqrstuvwxyz")
 
@@ -122,3 +122,16 @@ def isValidCode(code):
 	except SyntaxError:
 		return False
 	return True
+
+classes = [
+	mn_ExpressionNode
+]
+    
+def register():
+    for cls in classes:
+        bpy.utils.register_class(cls)
+ 
+ 
+def unregister():
+    for cls in classes:
+        bpy.utils.unregister_class(cls)

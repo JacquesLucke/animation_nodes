@@ -1,8 +1,8 @@
 import bpy
 from bpy.types import Node
 from mathutils import *
-from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 
 class mn_ComposeMatrix(Node, AnimationNode):
@@ -32,3 +32,16 @@ class mn_ComposeMatrix(Node, AnimationNode):
 		
 	def getModuleList(self):
 		return ["mn_math_utils"]
+
+classes = [
+	mn_ComposeMatrix
+]
+    
+def register():
+    for cls in classes:
+        bpy.utils.register_class(cls)
+ 
+ 
+def unregister():
+    for cls in classes:
+        bpy.utils.unregister_class(cls)

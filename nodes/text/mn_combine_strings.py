@@ -1,9 +1,9 @@
 import bpy
 from bpy.types import Node
-from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
-from mn_utils import *
-from mn_node_utils import *
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_utils import *
+from animation_nodes.utils.mn_node_utils import *
 
 
 class mn_CombineStringsNode(Node, AnimationNode):
@@ -101,3 +101,19 @@ class RemoveCombineStringsSocket(bpy.types.Operator):
 		node = getNode(self.nodeTreeName, self.nodeName)
 		node.removeInputSocket()
 		return {'FINISHED'}
+
+
+classes = [
+	mn_CombineStringsNode,
+	AddCombineStringsSocket,
+	RemoveCombineStringsSocket
+]
+    
+def register():
+    for cls in classes:
+        bpy.utils.register_class(cls)
+ 
+ 
+def unregister():
+    for cls in classes:
+        bpy.utils.unregister_class(cls)
