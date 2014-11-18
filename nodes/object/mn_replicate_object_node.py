@@ -164,7 +164,7 @@ class mn_ReplicateObjectNode(Node, AnimationNode):
 		item.objectIndex = 0
 		
 	def unlinkReplication(self, object):
-		if bpy.context.mode != "OBJECT": bpy.ops.object.mode_set(mode = "OBJECT")
+		if bpy.context.mode != "OBJECT" and getActive() == object: bpy.ops.object.mode_set(mode = "OBJECT")
 		bpy.context.scene.objects.unlink(object)
 		
 	def setObjectDataOnAllObjects(self):
