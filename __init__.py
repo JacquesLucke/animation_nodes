@@ -18,13 +18,13 @@ Created by Jacques Lucke
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import bpy, sys, os
-import importlib
+ 
+import importlib, sys, os
 from nodeitems_utils import register_node_categories, unregister_node_categories
+import nodeitems_utils
 from bpy.types import NodeTree, Node, NodeSocket
 from fnmatch import fnmatch
 from bpy.props import *
-currentPath = os.path.dirname(__file__)
 
 bl_info = {
     "name":        "Animation Nodes",
@@ -39,6 +39,7 @@ bl_info = {
     
 # import all modules in same/subdirectories
 ###########################################
+currentPath = os.path.dirname(__file__)
 
 if __name__ != "animation_nodes":
     sys.modules["animation_nodes"] = sys.modules[__name__]
@@ -67,6 +68,10 @@ for name, base in getAllImportFiles():
     print("importing", name, base)
     mod = importlib.import_module("{}.{}".format(base,name))
     animation_nodes_modules.append(mod)
+
+reload_event = "bpy" in locals()
+
+import bpy
 
 from animation_nodes.mn_execution import nodeTreeChanged
 class GlobalUpdateSettings(bpy.types.PropertyGroup):
@@ -98,15 +103,17 @@ class AnimationNodesSettings(bpy.types.PropertyGroup):
     developer = PointerProperty(type = DeveloperSettings, name = "Developer Settings")
     keyframes = PointerProperty(type = KeyframesSettings, name = "Keyframes")
     
-    
-    
+
+#  Reload
+#  makes F8 reload actually reload the code
+
+if reload_event:
+    for module in animation_nodes_modules:
+        importlib.reload(module)
     
 # register
 ##################################
 
-def unregisterIfPossible(moduleName):
-    bpy.utils.unregister_module(moduleName)
-    
 def register():
     bpy.utils.register_module(__name__)
     
@@ -114,11 +121,11 @@ def register():
 
     for module in animation_nodes_modules:
         if hasattr(module, "register"):
-            try:
-                module.register()
-            except:
-                print(module.__name__)
+            module.register()
     categories = mn_node_register.getNodeCategories()
+    
+    if "ANIMATIONNODES" in nodeitems_utils._node_categories:
+        unregister_node_categories("ANIMATIONNODES")
     register_node_categories("ANIMATIONNODES", categories)
     
     bpy.types.Scene.mn_settings = PointerProperty(type = AnimationNodesSettings, name = "Animation Node Settings")
