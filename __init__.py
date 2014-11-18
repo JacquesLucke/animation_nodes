@@ -45,28 +45,28 @@ if __name__ != "animation_nodes":
     sys.modules["animation_nodes"] = sys.modules[__name__]
 
 def getAllImportFiles():
-    # an_dir name of a
-    _, animation_nodes_dir = os.path.split(currentPath)
-    for root, dirs, files in os.walk(currentPath):
-        base, tail = os.path.split(root)
-        curr_dir = [tail]
-        while  animation_nodes_dir != tail:
-            base, tail = os.path.split(base)
-            curr_dir.append(tail)
-        curr_dir = curr_dir[:-1]
-        if curr_dir:
-            i_path = "animation_nodes." + ".".join(curr_dir[::-1])
+    """
+    Should return full python import path to module as
+    animation_nodes.nodes.mesh.mn_mesh_polygon_info
+    animation_nodes.sockets.mn_float_socket
+    """
+    def get_path(base):
+        b, t = os.path.split(base)
+        if __name__ == t:
+            return ["animation_nodes"]
         else:
-            i_path = "animation_nodes"
-        for f in filter(lambda f:fnmatch(f,"*.py"), files):
+            return get_path(b) + [t]
+
+    for root, dirs, files in os.walk(currentPath):
+        path = ".".join(get_path(root))
+        for f in filter(lambda f:fnmatch(f, "*.py"), files):
             if not f[:-3] == "__init__":
-                yield (f[:-3], i_path)
+                yield path + "." + f[:-3]
 
 animation_nodes_modules = []
 
-for name, base in getAllImportFiles():
-    print("importing", name, base)
-    mod = importlib.import_module("{}.{}".format(base,name))
+for name in getAllImportFiles():
+    mod = importlib.import_module(name)
     animation_nodes_modules.append(mod)
 
 reload_event = "bpy" in locals()
@@ -128,6 +128,7 @@ def register():
     register_node_categories("ANIMATIONNODES", categories)
     
     bpy.types.Scene.mn_settings = PointerProperty(type = AnimationNodesSettings, name = "Animation Node Settings")
+    print("Loaded Animation Nodes with {} modules".format(len(animation_nodes_modules)))
 
 def unregister():
     bpy.utils.unregister_module(__name__)
