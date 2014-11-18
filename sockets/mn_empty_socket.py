@@ -22,15 +22,3 @@ class mn_EmptySocket(mn_BaseSocket, mn_SocketProperties):
 	def getStoreableValue(self):
 		return None
 
-classes = [
-	mn_EmptySocket
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

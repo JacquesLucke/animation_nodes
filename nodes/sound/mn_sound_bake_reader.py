@@ -68,15 +68,3 @@ class mn_SoundBakeReaderNode(Node, AnimationNode):
 	def getBakeNode(self):
 		return self.id_data.nodes.get(self.bakeNodeName)
 
-classes = [
-	mn_SoundBakeReaderNode
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

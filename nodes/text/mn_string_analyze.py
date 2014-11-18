@@ -18,15 +18,3 @@ class mn_StringAnalyzeNode(Node, AnimationNode):
 		output["Length"] = len(input["Text"])
 		return output
 
-classes = [
-	mn_StringAnalyzeNode
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

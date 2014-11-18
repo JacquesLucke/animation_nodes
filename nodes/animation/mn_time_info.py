@@ -36,15 +36,3 @@ class mn_TimeInfoNode(Node, AnimationNode):
 		if outputUse["Frame Rate"]: codeLines.append("$frame_rate$ = scene.render.fps")
 		return "\n".join(codeLines)
 
-classes = [
-	mn_TimeInfoNode
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

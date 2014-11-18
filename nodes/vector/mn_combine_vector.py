@@ -28,15 +28,3 @@ class mn_CombineVector(Node, AnimationNode):
 	def getInLineExecutionString(self, outputUse):
 		return "$vector$ = [%x%, %y%, %z%]"
 
-classes = [
-	mn_CombineVector
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

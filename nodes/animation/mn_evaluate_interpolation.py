@@ -23,15 +23,3 @@ class mn_EvaluateInterpolation(Node, AnimationNode):
 	def execute(self, interpolation, position):
 		return interpolation[0](max(min(position, 1.0), 0.0), interpolation[1])
 
-classes = [
-	mn_EvaluateInterpolation
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

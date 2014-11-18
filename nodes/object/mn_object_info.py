@@ -101,15 +101,3 @@ class mn_ObjectInfoNode(Node, AnimationNode):
 		
 		return location, rotation, scale, locVelocity, rotVelocity, scaleVelocity
 
-classes = [
-	mn_ObjectInfoNode
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

@@ -26,16 +26,3 @@ class mn_RemovePropertyFromListNode(bpy.types.Operator):
 		node.removeItemFromList(self.index)
 		return {'FINISHED'}
 
-classes = [
-	mn_NewPropertyListNode,
-	mn_RemovePropertyFromListNode
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

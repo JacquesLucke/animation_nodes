@@ -56,15 +56,3 @@ if %b%[2] != 0: $result$[2] = %a%[2] / %b%[2]
 		return ["math"]
 
 
-classes = [
-	mn_VectorMathNode
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

@@ -27,15 +27,3 @@ class mn_ColorInputNode(Node, AnimationNode):
 		color = self.colorProperty
 		return [color[0], color[1], color[2], 1.0]
 
-classes = [
-	mn_ColorInputNode
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

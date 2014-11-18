@@ -70,15 +70,3 @@ class mn_ObjectKeyframeInput(Node, AnimationNode):
 			else:
 				return data[0], data[1], data[2], None
 
-classes = [
-	mn_ObjectKeyframeInput
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

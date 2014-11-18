@@ -55,16 +55,3 @@ class mn_StringListInputNode(Node, AnimationNode):
 	def removeItemFromList(self, index):
 		self.strings.remove(index)
 
-classes = [
-	mn_StringPropertyGroup,
-	mn_StringListInputNode
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

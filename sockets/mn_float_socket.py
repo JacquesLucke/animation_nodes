@@ -38,15 +38,3 @@ class mn_FloatSocket(mn_BaseSocket, mn_SocketProperties):
 		
 
 
-classes = [
-	mn_FloatSocket
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

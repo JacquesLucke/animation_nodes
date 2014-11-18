@@ -93,15 +93,3 @@ class mn_LoopCallerNode(Node, AnimationNode):
 	def getStartNode(self):
 		return getNodeFromTypeWithAttribute("mn_LoopStartNode", "loopName", self.selectedLoop)
 
-classes = [
-	mn_LoopCallerNode
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

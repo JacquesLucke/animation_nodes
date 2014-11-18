@@ -220,19 +220,3 @@ def loadSound(filePath):
 	scene.sequence_editor_create()
 	scene.sequence_editor.sequences.new_sound("Sound", filePath, channel = 0, frame_start = 1)
 
-classes = [
-	mn_BakedSoundPropertyGroup,
-	mn_SoundBakeNode,
-	BakeSoundToNode,
-	SelectSoundFilePath,
-	SetSoundInSequenceEditor
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

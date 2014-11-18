@@ -84,15 +84,3 @@ class mn_ObjectOutputNode(Node, AnimationNode):
 		return "\n".join(codeLines)
 
 
-classes = [
-	mn_ObjectOutputNode
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

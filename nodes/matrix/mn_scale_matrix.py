@@ -32,15 +32,3 @@ class mn_ScaleMatrix(Node, AnimationNode):
 	def copy(self, node):
 		self.inputs[0].vector = [1, 1, 1]
 
-classes = [
-	mn_ScaleMatrix
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

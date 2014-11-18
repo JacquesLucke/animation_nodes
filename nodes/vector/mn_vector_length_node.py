@@ -23,15 +23,3 @@ class mn_VectorLengthNode(Node, AnimationNode):
 	def execute(self, vector):
 		return mathutils.Vector(vector).length
 
-classes = [
-	mn_VectorLengthNode
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

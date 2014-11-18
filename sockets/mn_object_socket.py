@@ -56,16 +56,3 @@ class AssignActiveObjectToNode(bpy.types.Operator):
 		setattr(socket, self.target, obj.name)
 		return {'FINISHED'}
 
-classes = [
-	mn_ObjectSocket,
-	AssignActiveObjectToNode
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

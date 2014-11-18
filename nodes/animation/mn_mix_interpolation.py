@@ -25,15 +25,3 @@ class mn_MixInterpolation(Node, AnimationNode):
 	def execute(self, factor, a, b):
 		return (mixedInterpolation, (a, b, factor))
 
-classes = [
-	mn_MixInterpolation
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

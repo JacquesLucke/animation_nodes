@@ -197,16 +197,3 @@ class UpdateScripts(bpy.types.Operator):
 		
 
 
-classes = [
-	mn_ScriptNode,
-	UpdateScripts
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

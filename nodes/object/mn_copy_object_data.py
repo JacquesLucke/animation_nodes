@@ -27,15 +27,3 @@ class mn_CopyObjectData(Node, AnimationNode):
 		return toObject
 		
 
-classes = [
-	mn_CopyObjectData
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

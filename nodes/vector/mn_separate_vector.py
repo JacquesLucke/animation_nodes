@@ -26,15 +26,3 @@ class mn_SeparateVector(Node, AnimationNode):
 	def execute(self, vector):
 		return vector[0], vector[1], vector[2]
 
-classes = [
-	mn_SeparateVector
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

@@ -19,15 +19,3 @@ class mn_ReplicateStringsNode(Node, AnimationNode):
 		output["Text"] = input["Text"] * input["Amount"]
 		return output
 
-classes = [
-	mn_ReplicateStringsNode
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

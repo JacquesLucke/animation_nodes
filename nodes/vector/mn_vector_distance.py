@@ -24,15 +24,3 @@ class mn_VectorDistanceNode(Node, AnimationNode):
 	def execute(self, a, b):
 		return (Vector(a) - Vector(b)).length
 
-classes = [
-	mn_VectorDistanceNode
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

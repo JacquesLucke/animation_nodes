@@ -22,15 +22,3 @@ class mn_IntegerSocket(mn_BaseSocket, mn_SocketProperties):
 	def getStoreableValue(self):
 		return self.number
 
-classes = [
-	mn_IntegerSocket
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

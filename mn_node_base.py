@@ -114,17 +114,3 @@ class RemoveSocketOperator(bpy.types.Operator):
 			else: node.inputs.remove(socket)
 		return {'FINISHED'}
 
-classes = [
-	mn_AnimationNodeTree,
-	mn_BaseSocket,
-	RemoveSocketOperator
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

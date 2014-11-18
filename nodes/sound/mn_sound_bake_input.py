@@ -50,15 +50,3 @@ class mn_SoundBakeInput(Node, AnimationNode):
 	def execute(self):
 		return self.id_data.nodes.get(self.bakeNodeName)
 
-classes = [
-	mn_SoundBakeInput
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

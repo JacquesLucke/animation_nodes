@@ -114,15 +114,3 @@ else: $new$ = None
 		if t == "Interpolation": return ["mn_interpolation_utils"]
 		return []
 
-classes = [
-	mn_ConvertNode
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

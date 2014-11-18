@@ -96,15 +96,3 @@ else: $result$ = %a% % %b%
 	def getModuleList(self):
 		return ["math"]
 
-classes = [
-	mn_FloatMathNode
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

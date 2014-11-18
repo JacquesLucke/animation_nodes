@@ -44,15 +44,3 @@ class mn_AnimateFloatNode(Node, AnimationNode):
 		return current, time - duration - delay, difference
 		
 
-classes = [
-	mn_AnimateFloatNode
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

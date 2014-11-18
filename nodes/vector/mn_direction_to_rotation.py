@@ -40,15 +40,3 @@ class mn_DirectionToRotation(Node, AnimationNode):
 		
 
 
-classes = [
-	mn_DirectionToRotation
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

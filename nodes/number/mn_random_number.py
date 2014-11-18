@@ -34,15 +34,3 @@ class mn_RandomNumberNode(Node, AnimationNode):
 		self.additionalSeed = int(random.random()*1000)
 		
 
-classes = [
-	mn_RandomNumberNode
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

@@ -57,16 +57,3 @@ class mn_FloatListInputNode(Node, AnimationNode):
 	def removeItemFromList(self, index):
 		self.numbers.remove(index)
 
-classes = [
-	mn_FloatPropertyGroup,
-	mn_FloatListInputNode
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

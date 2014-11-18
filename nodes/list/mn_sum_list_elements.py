@@ -58,15 +58,3 @@ class mn_SumListElementsNode(Node, AnimationNode):
 			self.outputs.new("mn_StringSocket", "Sum")
 		allowCompiling()
 
-classes = [
-	mn_SumListElementsNode
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

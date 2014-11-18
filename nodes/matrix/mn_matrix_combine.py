@@ -64,15 +64,3 @@ class mn_MatrixCombine(Node, AnimationNode):
 		
 		return { "Result" : result }
 
-classes = [
-	mn_MatrixCombine
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

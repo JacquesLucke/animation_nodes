@@ -35,15 +35,3 @@ class mn_DecomposeMatrix(Node, AnimationNode):
 		if outputUse["Scale"]: codeLines.append("$scale$ = %matrix%.to_scale()")
 		return "\n".join(codeLines)
 
-classes = [
-	mn_DecomposeMatrix
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

@@ -191,17 +191,3 @@ class SetObjectDataOnAllObjects(bpy.types.Operator):
 		node.setObjectDataOnAllObjects()
 		return {'FINISHED'}
 
-classes = [
-	mn_ObjectNamePropertyGroup,
-	mn_ReplicateObjectNode,
-	SetObjectDataOnAllObjects
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

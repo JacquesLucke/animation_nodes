@@ -141,16 +141,3 @@ class ResetEndPoints(bpy.types.Operator):
 		node.resetCurveEndPoints()
 		return {'FINISHED'}
 
-classes = [
-	mn_InterpolationNode,
-	ResetEndPoints
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

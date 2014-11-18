@@ -20,15 +20,3 @@ class mn_GenericSocket(mn_BaseSocket, mn_SocketProperties):
 	def getStoreableValue(self):
 		return None
 
-classes = [
-	mn_GenericSocket
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

@@ -32,15 +32,3 @@ class mn_ViewportColorNode(Node, AnimationNode):
 		return None
 		
 
-classes = [
-	mn_ViewportColorNode
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

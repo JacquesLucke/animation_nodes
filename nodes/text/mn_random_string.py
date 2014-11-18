@@ -24,15 +24,3 @@ class mn_RandomStringNode(Node, AnimationNode):
 		output["Text"] = ''.join(random.choice(characters) for _ in range(length))
 		return output
 
-classes = [
-	mn_RandomStringNode
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

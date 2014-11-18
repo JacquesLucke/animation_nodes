@@ -21,15 +21,3 @@ class mn_ObjectListSocket(mn_BaseSocket, mn_SocketProperties):
 		return []
 
 
-classes = [
-	mn_ObjectListSocket
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

@@ -53,15 +53,3 @@ class mn_GetListElementNode(Node, AnimationNode):
 		allowCompiling()
 
 
-classes = [
-	mn_GetListElementNode
-]
-    
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
- 
- 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)
