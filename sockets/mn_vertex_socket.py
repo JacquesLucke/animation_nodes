@@ -23,7 +23,8 @@ class mn_VertexSocket(mn_BaseSocket, mn_SocketProperties):
 		col.separator()
 		
 	def getValue(self):
-		return [self.position, self.normal]
+		# Position, Normal, From Object
+		return [self.position, self.normal, None]
 		
 	def setStoreableValue(self, data):
 		self.position, self.normal = data

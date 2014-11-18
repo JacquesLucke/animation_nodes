@@ -9,6 +9,11 @@ from animation_nodes.sockets.mn_socket_info import *
 newListSocketName = "New List"
 newOptionSocketName = "New Option"
 
+presets = {
+	"OBJECT" : ([("mn_ObjectSocket", "Object")], []),
+	"VERTEX" : ([("mn_VertexSocket", "Vertex")], []),
+	"POLYGON" : ([("mn_PolygonSocket", "Polygon")], []) }
+
 class mn_LoopStartNode(Node, AnimationNode):
 	bl_idname = "mn_LoopStartNode"
 	bl_label = "Loop"
@@ -18,14 +23,11 @@ class mn_LoopStartNode(Node, AnimationNode):
 			self.nameIsChanging = True
 			self.loopName = self.getNotUsedLoopName(prefix = self.loopName)
 			self.nameIsChanging = False
-	def allowNewListChanged(self, context):
-		self.outputs.get(newListSocketName).hide = not self.allowNewList
 	def presetChanged(self, context):
 		self.buildPreset()
 	
 	loopName = bpy.props.StringProperty(default = "Object Loop", update = loopNameChanged)
 	nameIsChanging = bpy.props.BoolProperty(default = False)
-	allowNewList = bpy.props.BoolProperty(default = True, update = allowNewListChanged)
 	preset = bpy.props.StringProperty(default = "", update = presetChanged)
 	
 	def init(self, context):
@@ -35,7 +37,6 @@ class mn_LoopStartNode(Node, AnimationNode):
 		self.outputs.new("mn_IntegerSocket", "List Length")
 		self.outputs.new("mn_EmptySocket", newListSocketName)
 		self.outputs.new("mn_EmptySocket", newOptionSocketName)
-		self.outputs.get(newListSocketName).hide = not self.allowNewList
 		self.updateCallerNodes()
 		allowCompiling()
 		
@@ -50,9 +51,6 @@ class mn_LoopStartNode(Node, AnimationNode):
 		setting = newNode.settings.add()
 		setting.name = "selectedLoop"
 		setting.value = repr(self.loopName)
-		
-	def draw_buttons_ext(self, context, layout):
-		layout.prop(self, "allowNewList", text = "Allow New List")
 		
 	def execute(self, input):
 		return input
@@ -152,13 +150,22 @@ class mn_LoopStartNode(Node, AnimationNode):
 		return loopName
 		
 	def buildPreset(self):
-		self.removeDynamicSockets()
-		if self.preset == "OBJECT":
-			objectSocket = self.newOutputSocket("mn_ObjectSocket", namePrefix = "Object")
-			objectSocket.loopAsList = True
-			self.outputs.move(4, 2)
-			self.allowNewList = False
+		forbidCompiling()
+		self.outputs.clear()
+		preset = presets.get(self.preset)
+		self.outputs.new("mn_IntegerSocket", "Index")
+		self.outputs.new("mn_IntegerSocket", "List Length")
+		if preset is not None:
+			for idName, customName in preset[0]:
+				socket = self.newOutputSocket(idName, namePrefix = customName)
+				socket.loopAsList = True
+		self.outputs.new("mn_EmptySocket", newListSocketName)
+		if preset is not None:
+			for idName, customName in preset[1]:
+				socket = self.newOutputSocket(idName, namePrefix = customName)
+		self.outputs.new("mn_EmptySocket", newOptionSocketName)
 		self.updateCallerNodes()
+		allowCompiling()
 			
 	def removeDynamicSockets(self):
 		for socket in self.outputs:

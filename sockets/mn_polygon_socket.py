@@ -13,8 +13,8 @@ class mn_PolygonSocket(mn_BaseSocket, mn_SocketProperties):
 		layout.label(text)
 		
 	def getValue(self):
-		# [center, normal, area, material_index]
-		return [[0, 0, 0], [0, 0, 1], 0.0, 0]
+		# [center, normal, area, material_index, from object]
+		return [[0, 0, 0], [0, 0, 1], 0.0, 0, None]
 		
 	def setStoreableValue(self, data):
 		pass

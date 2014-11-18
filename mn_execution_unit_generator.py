@@ -139,11 +139,10 @@ def setUniqueCodeIndexToEveryNode(nodes):
 def getNodeNetworks():
     nodeNetworks = []
     nodeTrees = getAnimationNodeTrees()
-    print(nodeTrees)
     for nodeTree in nodeTrees:
         nodeNetworks.extend(getNodeNetworksFromTree(nodeTree))
     return nodeNetworks
-    
+
 def getAnimationNodeTrees():
     nodeTrees = mn_node_utils.getAnimationNodeTrees()
     for nodeTree in nodeTrees:
@@ -611,6 +610,9 @@ convertRules[("Float", "Vector")] = "mn_CombineVector"
 convertRules[("Integer", "Vector")] = "mn_CombineVector"
 convertRules[("Vector", "Float")] = "mn_SeparateVector"
 convertRules[("Text Block", "String")] = "mn_TextBlockReader"
+
+for dataType in ["Object", "Vertex", "Polygon", "Float", "Vector", "String"]:
+    convertRules[(dataType + " List", "Integer")] = "mn_GetListLengthNode"
         
 def cleanupNodeTrees():
     nodeTrees = getAnimationNodeTrees()
