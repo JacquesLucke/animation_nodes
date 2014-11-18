@@ -27,48 +27,48 @@ from fnmatch import fnmatch
 from bpy.props import *
 
 bl_info = {
-    "name":        "Animation Nodes",
-    "description": "Node system for more flexible animations.",
-    "author":      "Jacques Lucke",
-    "version":     (0, 0, 1),
-    "blender":     (2, 7, 2),
-    "location":    "Node Editor",
-    "category":    "Animation",
-    "warning":     "alpha"
-    }
-    
+	"name":        "Animation Nodes",
+	"description": "Node system for more flexible animations.",
+	"author":      "Jacques Lucke",
+	"version":     (0, 0, 1),
+	"blender":     (2, 7, 2),
+	"location":    "Node Editor",
+	"category":    "Animation",
+	"warning":     "alpha"
+	}
+	
 # import all modules in same/subdirectories
 ###########################################
 currentPath = os.path.dirname(__file__)
 
 if __name__ != "animation_nodes":
-    sys.modules["animation_nodes"] = sys.modules[__name__]
+	sys.modules["animation_nodes"] = sys.modules[__name__]
 
 def getAllImportFiles():
-    """
-    Should return full python import path to module as
-    animation_nodes.nodes.mesh.mn_mesh_polygon_info
-    animation_nodes.sockets.mn_float_socket
-    """
-    def get_path(base):
-        b, t = os.path.split(base)
-        if __name__ == t:
-            return ["animation_nodes"]
-        else:
-            return get_path(b) + [t]
+	"""
+	Should return full python import path to module as
+	animation_nodes.nodes.mesh.mn_mesh_polygon_info
+	animation_nodes.sockets.mn_float_socket
+	"""
+	def get_path(base):
+		b, t = os.path.split(base)
+		if __name__ == t:
+			return ["animation_nodes"]
+		else:
+			return get_path(b) + [t]
 
-    for root, dirs, files in os.walk(currentPath):
-        path = ".".join(get_path(root))
-        for f in filter(lambda f:f.endswith(".py"), files):
-            name = f[:-3]
-            if not name == "__init__":
-                yield path + "." + name
+	for root, dirs, files in os.walk(currentPath):
+		path = ".".join(get_path(root))
+		for f in filter(lambda f:f.endswith(".py"), files):
+			name = f[:-3]
+			if not name == "__init__":
+				yield path + "." + name
 
 animation_nodes_modules = []
 
 for name in getAllImportFiles():
-    mod = importlib.import_module(name)
-    animation_nodes_modules.append(mod)
+	mod = importlib.import_module(name)
+	animation_nodes_modules.append(mod)
 
 reload_event = "bpy" in locals()
 
@@ -76,67 +76,67 @@ import bpy
 
 from animation_nodes.mn_execution import nodeTreeChanged
 class GlobalUpdateSettings(bpy.types.PropertyGroup):
-    frameChange = BoolProperty(default = True, name = "Frame Change")
-    sceneUpdate = BoolProperty(default = True, name = "Scene Update")
-    propertyChange = BoolProperty(default = True, name = "Property Change")
-    treeChange = BoolProperty(default = True, name = "Tree Change")
-    skipFramesAmount = IntProperty(default = 0, name = "Skip Frames", min = 0, soft_max = 10)
-    
+	frameChange = BoolProperty(default = True, name = "Frame Change")
+	sceneUpdate = BoolProperty(default = True, name = "Scene Update")
+	propertyChange = BoolProperty(default = True, name = "Property Change")
+	treeChange = BoolProperty(default = True, name = "Tree Change")
+	skipFramesAmount = IntProperty(default = 0, name = "Skip Frames", min = 0, soft_max = 10)
+	
 class DeveloperSettings(bpy.types.PropertyGroup):
-    printUpdateTime = BoolProperty(default = False, name = "Print Global Update Time")
-    printGenerationTime = BoolProperty(default = False, name = "Print Script Generation Time")
-    executionProfiling = BoolProperty(default = False, name = "Node Execution Profiling", update = nodeTreeChanged)
+	printUpdateTime = BoolProperty(default = False, name = "Print Global Update Time")
+	printGenerationTime = BoolProperty(default = False, name = "Print Script Generation Time")
+	executionProfiling = BoolProperty(default = False, name = "Node Execution Profiling", update = nodeTreeChanged)
 
 import animation_nodes.mn_keyframes
 class Keyframes(bpy.types.PropertyGroup):
-    name = StringProperty(default = "", name = "Keyframe Name")
-    type = EnumProperty(items = mn_keyframes.getKeyframeTypeItems(), name = "Keyframe Type")
-    
+	name = StringProperty(default = "", name = "Keyframe Name")
+	type = EnumProperty(items = mn_keyframes.getKeyframeTypeItems(), name = "Keyframe Type")
+	
 class KeyframesSettings(bpy.types.PropertyGroup):
-    keys = CollectionProperty(type = Keyframes, name = "Keyframes")
-    selectedPath = StringProperty(default = "", name = "Selected Path")
-    selectedName = EnumProperty(items = mn_keyframes.getKeyframeNameItems, name = "Keyframe Name")
-    newName = StringProperty(default = "", name = "Name")
-    selectedType = EnumProperty(items = mn_keyframes.getKeyframeTypeItems(), name = "Keyframe Type")
-    
+	keys = CollectionProperty(type = Keyframes, name = "Keyframes")
+	selectedPath = StringProperty(default = "", name = "Selected Path")
+	selectedName = EnumProperty(items = mn_keyframes.getKeyframeNameItems, name = "Keyframe Name")
+	newName = StringProperty(default = "", name = "Name")
+	selectedType = EnumProperty(items = mn_keyframes.getKeyframeTypeItems(), name = "Keyframe Type")
+	
 class AnimationNodesSettings(bpy.types.PropertyGroup):
-    update = PointerProperty(type = GlobalUpdateSettings, name = "Update Settings")
-    developer = PointerProperty(type = DeveloperSettings, name = "Developer Settings")
-    keyframes = PointerProperty(type = KeyframesSettings, name = "Keyframes")
-    
+	update = PointerProperty(type = GlobalUpdateSettings, name = "Update Settings")
+	developer = PointerProperty(type = DeveloperSettings, name = "Developer Settings")
+	keyframes = PointerProperty(type = KeyframesSettings, name = "Keyframes")
+	
 
 #  Reload
 #  makes F8 reload actually reload the code
 
 if reload_event:
-    for module in animation_nodes_modules:
-        importlib.reload(module)
-    
+	for module in animation_nodes_modules:
+		importlib.reload(module)
+	
 # register
 ##################################
 
 def register():
-    #  two calls needed
-    #  one for registering the things in this file
-    #  the other everything that lives in the fake 'animation_nodes'
-    #  namespace. It registers everything else.
-    bpy.utils.register_module(__name__)
-    bpy.utils.register_module("animation_nodes")
+	#  two calls needed
+	#  one for registering the things in this file
+	#  the other everything that lives in the fake 'animation_nodes'
+	#  namespace. It registers everything else.
+	bpy.utils.register_module(__name__)
+	bpy.utils.register_module("animation_nodes")
 
-    categories = mn_node_register.getNodeCategories()
-    # if we use F8 reload this happens.
-    if "ANIMATIONNODES" in nodeitems_utils._node_categories:
-        unregister_node_categories("ANIMATIONNODES")
-    register_node_categories("ANIMATIONNODES", categories)
-    
-    bpy.types.Scene.mn_settings = PointerProperty(type = AnimationNodesSettings, name = "Animation Node Settings")
-    print("Loaded Animation Nodes with {} modules".format(len(animation_nodes_modules)))
+	categories = mn_node_register.getNodeCategories()
+	# if we use F8 reload this happens.
+	if "ANIMATIONNODES" in nodeitems_utils._node_categories:
+		unregister_node_categories("ANIMATIONNODES")
+	register_node_categories("ANIMATIONNODES", categories)
+	
+	bpy.types.Scene.mn_settings = PointerProperty(type = AnimationNodesSettings, name = "Animation Node Settings")
+	print("Loaded Animation Nodes with {} modules".format(len(animation_nodes_modules)))
 
 def unregister():
-    bpy.utils.unregister_module(__name__)
-    bpy.utils.unregister_module("animation_nodes")
-    
-    unregister_node_categories("ANIMATIONNODES")
-        
+	bpy.utils.unregister_module(__name__)
+	bpy.utils.unregister_module("animation_nodes")
+	
+	unregister_node_categories("ANIMATIONNODES")
+		
 if __name__ == "__main__":
-    register()
+	register()
