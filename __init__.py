@@ -115,15 +115,14 @@ if reload_event:
 ##################################
 
 def register():
+    #  two calls need one for registering the things in this file
+    #  the other everything that lives in the fake 'animation_nodes'
+    #  namespace. It registers everything
     bpy.utils.register_module(__name__)
-    
-    bpy.types.Scene.mn_settings = PointerProperty(type = AnimationNodesSettings, name = "Animation Node Settings")
+    bpy.utils.register_module("animation_nodes")
 
-    for module in animation_nodes_modules:
-        if hasattr(module, "register"):
-            module.register()
     categories = mn_node_register.getNodeCategories()
-    
+    # if we use F8 reload this happens.
     if "ANIMATIONNODES" in nodeitems_utils._node_categories:
         unregister_node_categories("ANIMATIONNODES")
     register_node_categories("ANIMATIONNODES", categories)
@@ -131,10 +130,8 @@ def register():
     bpy.types.Scene.mn_settings = PointerProperty(type = AnimationNodesSettings, name = "Animation Node Settings")
 
 def unregister():
-    for module in reversed(animation_nodes_modules):
-        if hasattr(module, "register"):
-            module.register()
     bpy.utils.unregister_module(__name__)
+    bpy.utils.unregister_module("animation_nodes")
     
     unregister_node_categories("ANIMATIONNODES")
         
