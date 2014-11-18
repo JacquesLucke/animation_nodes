@@ -37,7 +37,7 @@ class mn_VertexGroupInfo(Node, AnimationNode):
 		codeLines.append("    vertexGroup = %object%.vertex_groups[%index%]")
 		codeLines.append("    for vertex in %object%.data.vertices:")
 		codeLines.append("        if %min% <= vertexGroup.weight(vertex.index) <= %max%:")
-		codeLines.append("            $vertices$.append([vertex.co, vertex.normal, %object%])")
+		codeLines.append("            $vertices$.append([vertex.co, vertex.normal, vertex.index, %object%])")
 		codeLines.append("except: pass")
 		return "\n".join(codeLines)
 		

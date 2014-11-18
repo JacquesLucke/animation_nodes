@@ -18,6 +18,8 @@ def updateAnimationTrees(event = "NONE"):
 		
 		for executionUnit in executionUnits:
 			executionUnit.execute(event)
+		if len(executionUnits) > 0:
+			bpy.context.scene.update()
 			
 		resetForceUpdateProperties()
 		clearExecutionCache()

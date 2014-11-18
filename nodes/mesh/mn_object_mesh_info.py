@@ -28,7 +28,7 @@ class mn_ObjectMeshInfo(Node, AnimationNode):
 		codeLines.append("$polygons$ = []")
 		codeLines.append("try:")
 		codeLines.append("    for vertex in %object%.data.vertices:")
-		codeLines.append("        $vertices$.append([vertex.co, vertex.normal, %object%])")
+		codeLines.append("        $vertices$.append([vertex.co, vertex.normal, vertex.index, %object%])")
 		codeLines.append("    for polygon in %object%.data.polygons:")
 		codeLines.append("        $polygons$.append([polygon.center, polygon.normal, polygon.area, polygon.material_index, %object%])")
 		codeLines.append("except: pass")

@@ -24,7 +24,7 @@ class mn_VertexSocket(mn_BaseSocket, mn_SocketProperties):
 		
 	def getValue(self):
 		# Position, Normal, From Object
-		return [self.position, self.normal, None]
+		return [self.position, self.normal, 0, None]
 		
 	def setStoreableValue(self, data):
 		self.position, self.normal = data
