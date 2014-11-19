@@ -1,8 +1,8 @@
 import bpy
 from bpy.props import *
-from mn_execution import nodeTreeChanged
+from animation_nodes.mn_execution import nodeTreeChanged
 from bpy.types import NodeTree, Node, NodeSocket
-from mn_utils import *
+from animation_nodes.mn_utils import *
 
 class mn_AnimationNodeTree(bpy.types.NodeTree):
 	bl_idname = "mn_AnimationNodeTree"
@@ -113,3 +113,4 @@ class RemoveSocketOperator(bpy.types.Operator):
 			if self.isOutputSocket: node.outputs.remove(socket)
 			else: node.inputs.remove(socket)
 		return {'FINISHED'}
+

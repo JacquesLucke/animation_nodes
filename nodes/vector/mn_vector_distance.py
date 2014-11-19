@@ -1,8 +1,8 @@
 import bpy
 from mathutils import Vector
 from bpy.types import Node
-from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 class mn_VectorDistanceNode(Node, AnimationNode):
 	bl_idname = "mn_VectorDistanceNode"
@@ -23,3 +23,4 @@ class mn_VectorDistanceNode(Node, AnimationNode):
 		
 	def execute(self, a, b):
 		return (Vector(a) - Vector(b)).length
+

@@ -1,7 +1,7 @@
 import bpy
 from bpy.types import Node
-from mn_node_base import AnimationNode
-from mn_execution import nodeTreeChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodeTreeChanged, allowCompiling, forbidCompiling
 import math
 
 def updateNode(node, context):
@@ -18,7 +18,7 @@ class mn_VectorMathNode(Node, AnimationNode):
 		("SUBTRACT", "Subtract", ""),
 		("MULTIPLY", "Multiply", "Multiply element by element"),
 		("DIVIDE", "Divide", ""),
-        ("CROSS", "Cross Product", "Calculate the cross/vector product, yielding a vector that is orthogonal to both input vectors")]
+		("CROSS", "Cross Product", "Calculate the cross/vector product, yielding a vector that is orthogonal to both input vectors")]
 	mathTypesProperty = bpy.props.EnumProperty(name="Operation", items=mathTypes, default="ADD", update=updateNode)
 	
 	def init(self, context):
@@ -54,3 +54,5 @@ if %b%[2] != 0: $result$[2] = %a%[2] / %b%[2]
 		return ""
 	def getModuleList(self):
 		return ["math"]
+
+

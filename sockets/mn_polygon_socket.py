@@ -1,6 +1,6 @@
 import bpy
-from mn_execution import nodePropertyChanged
-from mn_node_base import * 
+from animation_nodes.mn_execution import nodePropertyChanged
+from animation_nodes.mn_node_base import *
 
 class mn_PolygonSocket(mn_BaseSocket, mn_SocketProperties):
 	bl_idname = "mn_PolygonSocket"
@@ -20,3 +20,4 @@ class mn_PolygonSocket(mn_BaseSocket, mn_SocketProperties):
 		pass
 	def getStoreableValue(self):
 		return None
+

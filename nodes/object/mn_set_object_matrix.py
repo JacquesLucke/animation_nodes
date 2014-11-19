@@ -1,7 +1,7 @@
 import bpy
 from bpy.types import Node
-from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 
 outputItems = [	("BASIS", "Basis", ""),
 				("LOCAL", "Local", ""),
@@ -40,3 +40,5 @@ class mn_ObjectMatrixOutputNode(Node, AnimationNode):
 		if t == "PARENT INVERSE": codeLines.append("    %object%.matrix_parent_inverse = %matrix%")
 		if t == "WORLD": codeLines.append("    %object%.matrix_world = %matrix%")
 		return "\n".join(codeLines)
+
+

@@ -1,8 +1,8 @@
 import bpy
 from bpy.types import Node
-from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
-from mn_utils import *
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_utils import *
 
 class mn_TimeInfoNode(Node, AnimationNode):
 	bl_idname = "mn_TimeInfoNode"
@@ -35,3 +35,4 @@ class mn_TimeInfoNode(Node, AnimationNode):
 		if outputUse["End Frame"]: codeLines.append("$end_frame$ = scene.frame_end")
 		if outputUse["Frame Rate"]: codeLines.append("$frame_rate$ = scene.render.fps")
 		return "\n".join(codeLines)
+

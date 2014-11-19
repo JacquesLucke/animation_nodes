@@ -1,6 +1,6 @@
 import bpy
-from mn_utils import *
-from mn_cache import *
+from animation_nodes.mn_utils import *
+from animation_nodes.mn_cache import *
 	
 # get value in one frame
 

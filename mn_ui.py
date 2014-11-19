@@ -1,8 +1,8 @@
 import bpy
-from mn_execution import getCodeStrings, resetCompileBlocker, updateAnimationTrees, generateExecutionUnits
-from mn_keyframes import *
-from mn_utils import *
-from mn_selection_utils import *
+from animation_nodes.mn_execution import getCodeStrings, resetCompileBlocker, updateAnimationTrees, generateExecutionUnits
+from animation_nodes.mn_keyframes import *
+from animation_nodes.mn_utils import *
+from animation_nodes.utils.mn_selection_utils import *
 
 class AnimationNodesPerformance(bpy.types.Panel):
 	bl_idname = "mn.performance_panel"
@@ -188,7 +188,7 @@ class LoadNormalNodeTemplate(bpy.types.Operator):
 	bl_label = "Load Normal Node Template"
 
 	def execute(self, context):
-		from mn_node_template import getNormalNodeTemplate, getAutoRegisterCode
+		from animation_nodes.nodes.mn_node_template import getNormalNodeTemplate, getAutoRegisterCode
 		textBlockName = "mn_node_template.py"
 		textBlock = bpy.data.texts.get(textBlockName)
 		if textBlock is None:
@@ -204,7 +204,7 @@ class AppendAutoUpdateCode(bpy.types.Operator):
 	bl_label = "Append Auto Update Code"
 
 	def execute(self, context):
-		from mn_node_template import getAutoRegisterCode
+		from animation_nodes.nodes.mn_node_template import getAutoRegisterCode
 		for area in bpy.context.screen.areas:
 			for space in area.spaces:
 				if space.type == "TEXT_EDITOR":
@@ -221,10 +221,10 @@ class AppendAutoUpdateCode(bpy.types.Operator):
 	
 
 def getAllAnimationNodeClasses():
-	from mn_node_base import AnimationNode
+	from animation_nodes.mn_node_base import AnimationNode
 	return AnimationNode.__subclasses__()
 def getCustomNodeClasses():
-	from mn_node_register import getAllNodeIdNames
+	from animation_nodes.mn_node_register import getAllNodeIdNames
 	officialNodeNames = getAllNodeIdNames()
 	nodeClasses = []
 	foundNames = []
@@ -260,3 +260,4 @@ def getCustomNodes(self, context):
 	return [("mn_TimeInfoNode", "Time Info", "")]
 	
 bpy.types.Scene.customNodeCategory = bpy.props.EnumProperty(items = getCustomNodeCategoryItems, name = "Custom Categories")
+

@@ -1,11 +1,11 @@
 import bpy, math
 from bpy.types import Node
-from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
-from mn_utils import *
-from mn_object_utils import *
-from mn_node_helper import *
-from mn_cache import *
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_utils import *
+from animation_nodes.utils.mn_object_utils import *
+from animation_nodes.nodes.mn_node_helper import *
+from animation_nodes.mn_cache import *
 
 
 class mn_SoundBakeReaderNode(Node, AnimationNode):
@@ -67,3 +67,4 @@ class mn_SoundBakeReaderNode(Node, AnimationNode):
 		
 	def getBakeNode(self):
 		return self.id_data.nodes.get(self.bakeNodeName)
+

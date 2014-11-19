@@ -1,5 +1,5 @@
 import bpy
-from mn_utils import *
+from animation_nodes.mn_utils import *
 
 class mn_NewPropertyListNode(bpy.types.Operator):
 	bl_idname = "mn.new_property_to_list_node"
@@ -25,3 +25,4 @@ class mn_RemovePropertyFromListNode(bpy.types.Operator):
 		node = getNode(self.nodeTreeName, self.nodeName)
 		node.removeItemFromList(self.index)
 		return {'FINISHED'}
+

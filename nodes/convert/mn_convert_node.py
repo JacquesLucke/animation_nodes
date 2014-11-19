@@ -1,9 +1,9 @@
 import bpy
 from bpy.types import Node
-from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
-from mn_utils import *
-from mn_socket_info import *
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_utils import *
+from animation_nodes.sockets.mn_socket_info import *
 
 class mn_ConvertNode(Node, AnimationNode):
 	bl_idname = "mn_ConvertNode"
@@ -91,8 +91,8 @@ else: $new$ = None
 			codeLines = []
 			codeLines.append("try:")
 			codeLines.append("    if hasattr(%old%[0], '__call__'): $new$ = %old%")
-			codeLines.append("    else: $new$ = (mn_interpolation_utils.linear, None)")
-			codeLines.append("except: $new$ = (mn_interpolation_utils.linear, None)")
+			codeLines.append("    else: $new$ = (animation_nodes.utils.mn_interpolation_utils.linear, None)")
+			codeLines.append("except: $new$ = (animation_nodes.utils.mn_interpolation_utils.linear, None)")
 			return "\n".join(codeLines)
 		elif t == "Vertex": 
 			codeLines = []
@@ -111,5 +111,6 @@ else: $new$ = None
 			
 	def getModuleList(self):
 		t = self.convertType
-		if t == "Interpolation": return ["mn_interpolation_utils"]
+		if t == "Interpolation": return ["animation_nodes.utils.mn_interpolation_utils"]
 		return []
+

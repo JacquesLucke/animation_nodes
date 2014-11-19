@@ -1,9 +1,9 @@
 import bpy
 from bpy.types import Node
-from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
-from mn_keyframes import *
-from mn_math_utils import *
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_keyframes import *
+from animation_nodes.utils.mn_math_utils import *
 
 currentTypes = {}
 
@@ -69,3 +69,4 @@ class mn_ObjectKeyframeInput(Node, AnimationNode):
 				return data[0], data[1], data[2], composeMatrix(data[0], data[1], data[2])
 			else:
 				return data[0], data[1], data[2], None
+

@@ -1,11 +1,11 @@
 import bpy, time
 from bpy.types import Node
-from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
-from mn_object_utils import *
-from mn_fcurve_utils import *
-from mn_utils import *
-from mn_cache import *
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
+from animation_nodes.utils.mn_object_utils import *
+from animation_nodes.utils.mn_fcurve_utils import *
+from animation_nodes.mn_utils import *
+from animation_nodes.mn_cache import *
 
 class mn_CopyTransformsNode(Node, AnimationNode):
 	bl_idname = "mn_CopyTransformsNode"
@@ -108,3 +108,4 @@ class mn_CopyTransformsNode(Node, AnimationNode):
 				if useScale[i]: toObject.scale[i] = getSingleValueOfArrayAtFrame(fromObject, "scale", index = i, frame = frame)	
 					
 		return toObject
+

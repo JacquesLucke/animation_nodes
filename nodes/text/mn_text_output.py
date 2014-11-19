@@ -1,8 +1,8 @@
 import bpy
 from bpy.types import Node
 from bpy.props import *
-from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 
 options = [ ("useText", "Text"),
 			("useExtrude", "Extrude"),
@@ -108,3 +108,4 @@ class mn_TextOutputNode(Node, AnimationNode):
 		codeLines.append(" "*8 + "pass")
 		
 		return "\n".join(codeLines)
+

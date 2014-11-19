@@ -1,7 +1,7 @@
 import bpy
 from bpy.types import Node
-from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 class mn_FloatRangeListNode(Node, AnimationNode):
 	bl_idname = "mn_FloatRangeListNode"
@@ -27,3 +27,4 @@ class mn_FloatRangeListNode(Node, AnimationNode):
 		for i in range(amount):
 			list.append(start + i * step)
 		return list
+

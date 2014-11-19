@@ -1,9 +1,9 @@
 import bpy, random
 from bpy.types import Node
-from mn_cache import getUniformRandom
-from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
-from mn_utils import *
+from animation_nodes.mn_cache import getUniformRandom
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_utils import *
 
 class mn_MultiFloatMathNode(Node, AnimationNode):
 	bl_idname = "mn_MultiFloatMathNode"
@@ -111,3 +111,4 @@ class RemoveMultiMathSocket(bpy.types.Operator):
 		node = getNode(self.nodeTreeName, self.nodeName)
 		node.removeInputSocket()
 		return {'FINISHED'}
+

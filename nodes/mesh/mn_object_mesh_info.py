@@ -1,7 +1,7 @@
 import bpy
 from bpy.types import Node
-from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 class mn_ObjectMeshInfo(Node, AnimationNode):
 	bl_idname = "mn_ObjectMeshInfo"
@@ -34,3 +34,4 @@ class mn_ObjectMeshInfo(Node, AnimationNode):
 		codeLines.append("except: pass")
 		return "\n".join(codeLines)
 		
+

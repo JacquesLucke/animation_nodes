@@ -1,8 +1,8 @@
 import bpy
 from bpy.types import Node
-from mn_node_base import AnimationNode
-from mn_utils import *
-from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_utils import *
+from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 class UpdateSettings(bpy.types.PropertyGroup):
 	propertyChanged = bpy.props.BoolProperty(default = False, name = "Property Changed")
@@ -55,3 +55,4 @@ class ForceLocalNodeTreeExecution(bpy.types.Operator):
 		node = getNode(self.nodeTreeName, self.nodeName)
 		node.settings.forceExecution = True
 		return {'FINISHED'}
+

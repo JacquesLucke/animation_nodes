@@ -1,11 +1,11 @@
 import bpy, time
 from bpy.app.handlers import persistent
-from mn_utils import *
-from mn_cache import clearExecutionCache
-from mn_execution_unit_generator import getExecutionUnits
+from animation_nodes.mn_utils import *
+from animation_nodes.mn_cache import clearExecutionCache
+from animation_nodes.mn_execution_unit_generator import getExecutionUnits
 from bpy.props import *
-from mn_selection_utils import *
-from mn_node_utils import *
+from animation_nodes.utils.mn_selection_utils import *
+from animation_nodes.utils.mn_node_utils import *
 
 COMPILE_BLOCKER = 0
 executionUnits = []
