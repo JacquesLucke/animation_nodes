@@ -12,8 +12,18 @@ class mn_GroupInput(Node, AnimationNode):
 	bl_idname = "mn_GroupInput"
 	bl_label = "Group Input"
 	
+	def groupNameChanged(self, context):
+		if not self.nameIsChanging:
+			self.nameIsChanging = True
+			self.groupName = self.getNotUsedGroupName(prefix = self.groupName)
+			self.nameIsChanging = False
+	
+	groupName = bpy.props.StringProperty(default = "Group", update = groupNameChanged)
+	nameIsChanging = bpy.props.BoolProperty(default = False)
+	
 	def init(self, context):
 		forbidCompiling()
+		self.groupName = self.getNotUsedGroupName()
 		self.outputs.new("mn_EmptySocket", newInputSocketName)
 		allowCompiling()
 		
@@ -23,13 +33,17 @@ class mn_GroupInput(Node, AnimationNode):
 	def execute(self, input):
 		return input
 		
+	def draw_buttons(self, context, layout):
+		row = layout.row(align = True)
+		row.prop(self, "groupName", text = "")
+		
 	def update(self):
 		forbidCompiling()
 		socket = self.outputs.get(newInputSocketName)
 		targetSocket = self.getValidTargetSocket(socket)
 		if targetSocket is not None:
 			socketType = self.getTargetSocketType(targetSocket)
-			newSocket = self.newOutputSocket(socketType, namePrefix = "socket")
+			newSocket = self.newOutputSocket(socketType, namePrefix = targetSocket.name)
 			self.id_data.links.new(targetSocket, newSocket)
 			newIndex = self.outputs.find(socket.name)
 			self.outputs.move(len(self.outputs) - 1, newIndex)
@@ -67,3 +81,9 @@ class mn_GroupInput(Node, AnimationNode):
 		
 	def removeSocket(self, socket):
 		self.outputs.remove(socket)
+		
+	def getNotUsedGroupName(self, prefix = "Group"):
+		groupName = prefix
+		while getNodeFromTypeWithAttribute("mn_GroupInput", "groupName", groupName) not in [self, None]:
+			groupName = prefix + getRandomString(3)
+		return groupName

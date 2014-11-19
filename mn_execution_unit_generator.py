@@ -3,7 +3,8 @@ import animation_nodes.utils.mn_node_utils as mn_node_utils
 from animation_nodes.mn_utils import *
 
 normalNetworks = []
-subNetworks = {}
+loopNetworks = {}
+groupNetworks = {}
 invalidNetworks = []
 useProfiling = False
 
@@ -78,7 +79,7 @@ class ExecutionUnit:
 				node.executionTime = timeSpan
 
 def getExecutionUnits():
-	global subNetworks, invalidNetworks, useProfiling
+	global loopNetworks, invalidNetworks, useProfiling
 	useProfiling = bpy.context.scene.mn_settings.developer.executionProfiling
 	clearSocketConnections()
 	cleanupNodeTrees()
@@ -97,9 +98,9 @@ def getExecutionUnits():
 	return executionUnits
 	
 def sortNetworks(nodeNetworks):
-	global normalNetworks, subNetworks, invalidNetworks, idCounter
+	global normalNetworks, loopNetworks, groupNetworks, invalidNetworks, idCounter
 	normalNetworks = []
-	subNetworks = {}
+	loopNetworks = {}
 	invalidNetworks = []
 	idCounter = 0
 	for network in nodeNetworks:
@@ -107,21 +108,35 @@ def sortNetworks(nodeNetworks):
 		networkType = getNetworkType(network)
 		if networkType == "Normal": normalNetworks.append(network)
 		elif networkType == "Loop":
-			startNode = getSubProgramStartNode(network)
-			subNetworks[getNodeIdentifier(startNode)] = network
+			startNode = getLoopStartNode(network)
+			loopNetworks[getNodeIdentifier(startNode)] = network
+		elif networkType == "Group":
+			inputNode = getGroupInputNode(network)
+			groupNetworks[getNodeIdentifier(inputNode)] = network
 		elif networkType == "Invalid": invalidNetworks.append(network)
 		
 def getNetworkType(network):
 	loopStarterAmount = 0
+	groupInputAmount = 0
+	totalSpecials = 0
 	for node in network:
 		if node.bl_idname == "mn_LoopStartNode":
 			loopStarterAmount += 1
-	if loopStarterAmount == 0: return "Normal"
-	elif loopStarterAmount == 1: return "Loop"
+			totalSpecials += 1
+		if node.bl_idname == "mn_GroupInput":
+			groupInputAmount += 1
+			totalSpecials += 1
+	if totalSpecials == 0: return "Normal"
+	elif loopStarterAmount == 1 and totalSpecials == 1: return "Loop"
+	elif groupInputAmount == 1 and totalSpecials == 1: return "Group"
 	return "Invalid"
-def getSubProgramStartNode(network):
+def getLoopStartNode(network):
 	for node in network:
 		if node.bl_idname == "mn_LoopStartNode":
+			return node
+def getGroupInputNode(network):
+	for node in network:
+		if node.bl_idname == "mn_GroupInput":
 			return node
 			
 idCounter = 0
@@ -255,7 +270,7 @@ class NetworkCodeGenerator:
 		return "\n".join(codeLines)
 		
 	def makeLoopCode(self, loopNetwork):
-		startNode = getSubProgramStartNode(loopNetwork)
+		startNode = getLoopStartNode(loopNetwork)
 		if getNodeIdentifier(startNode) not in self.functions:
 			self.functions[getNodeIdentifier(startNode)] = self.getLoopCode(loopNetwork, startNode)
 	def getLoopCode(self, loopNetwork, startNode):
@@ -315,7 +330,7 @@ class NetworkCodeGenerator:
 				codeLines.append(self.getEnumerateLoopHeader(node, fromListSockets))
 			
 			codeLines.append("    " + getNodeFunctionName(startNode) + "(" + getNodeInputName(node) + ")")
-			self.makeLoopCode(subNetworks[getNodeIdentifier(startNode)])
+			self.makeLoopCode(loopNetworks[getNodeIdentifier(startNode)])
 		codeLines.append(getNodeOutputName(node) + " = " + getNodeInputName(node))
 		return codeLines
 		
