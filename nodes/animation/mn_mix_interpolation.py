@@ -1,8 +1,8 @@
 import bpy
 from bpy.types import Node
-from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
-from mn_interpolation_utils import *
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from animation_nodes.utils.mn_interpolation_utils import *
 
 class mn_MixInterpolation(Node, AnimationNode):
 	bl_idname = "mn_MixInterpolation"
@@ -24,3 +24,4 @@ class mn_MixInterpolation(Node, AnimationNode):
 		
 	def execute(self, factor, a, b):
 		return (mixedInterpolation, (a, b, factor))
+

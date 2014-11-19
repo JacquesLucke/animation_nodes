@@ -1,7 +1,7 @@
 import bpy
 from bpy.types import Node
-from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 class mn_SubstringNode(Node, AnimationNode):
 	bl_idname = "mn_SubstringNode"
@@ -26,3 +26,5 @@ class mn_SubstringNode(Node, AnimationNode):
 		if not self.ignoreLength:
 			output["Text"] = output["Text"][:max(input["Length"],0) ]
 		return output
+
+

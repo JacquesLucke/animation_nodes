@@ -1,5 +1,5 @@
 import bpy
-from mn_utils import *
+from animation_nodes.mn_utils import *
 
 def getPossibleNodeName(nodeTree, name = "node"):
 	randomString = getRandomString(3)

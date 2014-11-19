@@ -1,8 +1,8 @@
 import bpy
 from bpy.types import Node
-from mn_node_base import AnimationNode
-from mn_execution import nodeTreeChanged, allowCompiling, forbidCompiling
-from mn_utils import *
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodeTreeChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_utils import *
 
 
 class mn_TextBlockReader(Node, AnimationNode):
@@ -31,3 +31,4 @@ class mn_TextBlockReader(Node, AnimationNode):
 		if useOutput["Lines"]: return text, text.split("\n")
 		else: return text, []
 		
+

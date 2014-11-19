@@ -1,7 +1,7 @@
 import bpy
 from bpy.types import Node
-from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 
 class mn_CombineVector(Node, AnimationNode):
 	bl_idname = "mn_CombineVector"
@@ -27,3 +27,4 @@ class mn_CombineVector(Node, AnimationNode):
 		return True
 	def getInLineExecutionString(self, outputUse):
 		return "$vector$ = [%x%, %y%, %z%]"
+

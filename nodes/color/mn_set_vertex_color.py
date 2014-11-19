@@ -1,8 +1,8 @@
 import bpy, random
-from mn_math_utils import perlinNoise
+from animation_nodes.utils.mn_math_utils import perlinNoise
 from bpy.types import Node
-from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 
 class mn_SetVertexColor(Node, AnimationNode):
@@ -49,3 +49,5 @@ class mn_SetVertexColor(Node, AnimationNode):
 			meshColor.color = color
 		return None
 		
+
+

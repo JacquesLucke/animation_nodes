@@ -1,7 +1,7 @@
 import bpy
 from bpy.types import Node
-from mn_node_base import AnimationNode
-from mn_execution import nodeTreeChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodeTreeChanged, allowCompiling, forbidCompiling
 import math
 
 def updateNode(node, context):
@@ -95,3 +95,4 @@ else: $result$ = %a% % %b%
 		return ""
 	def getModuleList(self):
 		return ["math"]
+

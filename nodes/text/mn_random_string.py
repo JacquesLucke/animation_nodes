@@ -1,7 +1,7 @@
 import bpy, random
 from bpy.types import Node
-from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 class mn_RandomStringNode(Node, AnimationNode):
 	bl_idname = "mn_RandomStringNode"
@@ -23,3 +23,4 @@ class mn_RandomStringNode(Node, AnimationNode):
 		random.seed(seed)
 		output["Text"] = ''.join(random.choice(characters) for _ in range(length))
 		return output
+

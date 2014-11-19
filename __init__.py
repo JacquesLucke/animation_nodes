@@ -18,12 +18,13 @@ Created by Jacques Lucke
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import bpy, sys, os
+ 
+import importlib, sys, os
 from nodeitems_utils import register_node_categories, unregister_node_categories
+import nodeitems_utils
 from bpy.types import NodeTree, Node, NodeSocket
 from fnmatch import fnmatch
 from bpy.props import *
-currentPath = os.path.dirname(__file__)
 
 bl_info = {
 	"name":        "Animation Nodes",
@@ -33,52 +34,47 @@ bl_info = {
 	"blender":     (2, 7, 2),
 	"location":    "Node Editor",
 	"category":    "Animation",
-	"warning":	   "alpha"
+	"warning":     "alpha"
 	}
 	
 # import all modules in same/subdirectories
 ###########################################
+currentPath = os.path.dirname(__file__)
 
-def getAllPathsToPythonFiles(root):
-	filePaths = []
-	pattern = "*.py"
-	for (path, subDirectory, files) in os.walk(root):
-		for name in files:
-			if fnmatch(name, pattern): filePaths.append(os.path.join(path, name))
-	return filePaths
-def getModuleNames(filePaths):
-	moduleNames = []
-	for filePath in filePaths:
-		moduleName = os.path.basename(os.path.splitext(filePath)[0])
-		if moduleName != "__init__":
-			moduleNames.append(moduleName)
-	return moduleNames
-def getExecStringsForImport(moduleNames):
-	execStrings = []
-	for name in moduleNames:
-		execStrings.append("import " + name)
-	return execStrings
-def appendPathsToPythonSearchDirectories(filePaths):
-	sys.path.extend(getDirectoryList(filePaths))
-def getDirectoryList(filePaths):
-	directories = []
-	for filePath in filePaths:
-		directories.append(os.path.dirname(filePath))
-	directories = list(set(directories))
-	return directories
+if __name__ != "animation_nodes":
+	sys.modules["animation_nodes"] = sys.modules[__name__]
 
-filePaths = getAllPathsToPythonFiles(currentPath)
-moduleNames = getModuleNames(filePaths)
-appendPathsToPythonSearchDirectories(filePaths)
-execStrings = getExecStringsForImport(moduleNames)
-for name in moduleNames:
-	try:
-		exec("import " + name)
-		print("import " + name)
-	except BaseException as e:
-		print(e)
+def getAllImportFiles():
+	"""
+	Should return full python import path to module as
+	animation_nodes.nodes.mesh.mn_mesh_polygon_info
+	animation_nodes.sockets.mn_float_socket
+	"""
+	def get_path(base):
+		b, t = os.path.split(base)
+		if __name__ == t:
+			return ["animation_nodes"]
+		else:
+			return get_path(b) + [t]
 
-from mn_execution import nodeTreeChanged	
+	for root, dirs, files in os.walk(currentPath):
+		path = ".".join(get_path(root))
+		for f in filter(lambda f:f.endswith(".py"), files):
+			name = f[:-3]
+			if not name == "__init__":
+				yield path + "." + name
+
+animation_nodes_modules = []
+
+for name in getAllImportFiles():
+	mod = importlib.import_module(name)
+	animation_nodes_modules.append(mod)
+
+reload_event = "bpy" in locals()
+
+import bpy
+
+from animation_nodes.mn_execution import nodeTreeChanged
 class GlobalUpdateSettings(bpy.types.PropertyGroup):
 	frameChange = BoolProperty(default = True, name = "Frame Change")
 	sceneUpdate = BoolProperty(default = True, name = "Scene Update")
@@ -91,7 +87,7 @@ class DeveloperSettings(bpy.types.PropertyGroup):
 	printGenerationTime = BoolProperty(default = False, name = "Print Script Generation Time")
 	executionProfiling = BoolProperty(default = False, name = "Node Execution Profiling", update = nodeTreeChanged)
 
-import mn_keyframes	
+import animation_nodes.mn_keyframes
 class Keyframes(bpy.types.PropertyGroup):
 	name = StringProperty(default = "", name = "Keyframe Name")
 	type = EnumProperty(items = mn_keyframes.getKeyframeTypeItems(), name = "Keyframe Type")
@@ -108,34 +104,38 @@ class AnimationNodesSettings(bpy.types.PropertyGroup):
 	developer = PointerProperty(type = DeveloperSettings, name = "Developer Settings")
 	keyframes = PointerProperty(type = KeyframesSettings, name = "Keyframes")
 	
-	
-	
+
+#  Reload
+#  makes F8 reload actually reload the code
+
+if reload_event:
+	for module in animation_nodes_modules:
+		importlib.reload(module)
 	
 # register
 ##################################
 
-def registerIfPossible(moduleName):
-	try:
-		bpy.utils.register_module(moduleName)
-	except: pass
-		
-def unregisterIfPossible(moduleName):
-	try:
-		bpy.utils.unregister_module(moduleName)
-	except: pass
-	
 def register():
-	registerIfPossible(__name__)
-	for moduleName in moduleNames:
-		registerIfPossible(moduleName)
+	#  two calls needed
+	#  one for registering the things in this file
+	#  the other everything that lives in the fake 'animation_nodes'
+	#  namespace. It registers everything else.
+	bpy.utils.register_module(__name__)
+	bpy.utils.register_module("animation_nodes")
+
 	categories = mn_node_register.getNodeCategories()
+	# if we use F8 reload this happens.
+	if "ANIMATIONNODES" in nodeitems_utils._node_categories:
+		unregister_node_categories("ANIMATIONNODES")
 	register_node_categories("ANIMATIONNODES", categories)
 	
 	bpy.types.Scene.mn_settings = PointerProperty(type = AnimationNodesSettings, name = "Animation Node Settings")
+	print("Loaded Animation Nodes with {} modules".format(len(animation_nodes_modules)))
 
 def unregister():
-	for moduleName in moduleNames:
-		unregisterIfPossible(moduleName)
+	bpy.utils.unregister_module(__name__)
+	bpy.utils.unregister_module("animation_nodes")
+	
 	unregister_node_categories("ANIMATIONNODES")
 		
 if __name__ == "__main__":

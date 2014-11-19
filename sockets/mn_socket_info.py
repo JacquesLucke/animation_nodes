@@ -1,4 +1,4 @@
-import mn_node_base
+import animation_nodes.mn_node_base
 
 listChains = [
 	["mn_FloatSocket", "mn_FloatListSocket"],

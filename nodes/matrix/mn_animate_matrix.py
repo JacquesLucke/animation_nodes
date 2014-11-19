@@ -1,9 +1,9 @@
 import bpy
 from bpy.types import Node
-from mn_cache import getUniformRandom
-from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
-from mn_interpolation_utils import *
+from animation_nodes.mn_cache import getUniformRandom
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from animation_nodes.utils.mn_interpolation_utils import *
 
 class mn_AnimateMatrixNode(Node, AnimationNode):
 	bl_idname = "mn_AnimateMatrixNode"
@@ -33,3 +33,4 @@ class mn_AnimateMatrixNode(Node, AnimationNode):
 		current = start.lerp(end, influence)
 		return current, time - duration - delay
 		
+

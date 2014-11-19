@@ -1,5 +1,5 @@
 import bpy
-from mn_utils import *
+from animation_nodes.mn_utils import *
 
 keyframePropertyPrefix = "Animation Nodes - "
 
@@ -216,3 +216,4 @@ class NewKeyframe(bpy.types.Operator):
 	def execute(self, context):
 		newKeyframe(self.keyframeName, self.keyframeType)
 		return {'FINISHED'}
+

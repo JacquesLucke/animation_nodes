@@ -1,8 +1,8 @@
 import bpy
 from bpy.types import Node
-from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
-from mn_utils import *
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_utils import *
 
 class mn_CombineListsNode(Node, AnimationNode):
 	bl_idname = "mn_CombineListsNode"
@@ -50,3 +50,5 @@ class mn_CombineListsNode(Node, AnimationNode):
 			self.inputs.new("mn_ObjectListSocket", "List 2")
 			self.outputs.new("mn_ObjectListSocket", "Both Lists")
 		allowCompiling()
+
+

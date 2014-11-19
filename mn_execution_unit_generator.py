@@ -1,5 +1,6 @@
-import bpy, time, mn_node_utils
-from mn_utils import *
+import bpy, time
+import animation_nodes.utils.mn_node_utils as mn_node_utils
+from animation_nodes.mn_utils import *
 
 normalNetworks = []
 subNetworks = {}
@@ -141,7 +142,7 @@ def getNodeNetworks():
 	for nodeTree in nodeTrees:
 		nodeNetworks.extend(getNodeNetworksFromTree(nodeTree))
 	return nodeNetworks
-	
+
 def getAnimationNodeTrees():
 	nodeTrees = mn_node_utils.getAnimationNodeTrees()
 	for nodeTree in nodeTrees:
@@ -202,7 +203,7 @@ def getNotFoundOutputNodes(node):
 	
 bpy.types.Node.isFound = bpy.props.BoolProperty(default = False)
 def resetNodeFoundAttributes(nodes):
-	for node in nodes: node.isFound = False	
+	for node in nodes: node.isFound = False 
 
 
 	
@@ -285,7 +286,7 @@ class NetworkCodeGenerator:
 			codeLines.extend(self.getExecutableNodeCode(node))
 		elif isLoopNode(node):
 			codeLines.extend(self.getLoopNodeCode(node))
-		return codeLines		
+		return codeLines        
 		
 	def getExecutableNodeCode(self, node):
 		codeLines = []
@@ -442,7 +443,7 @@ class NetworkCodeGenerator:
 		else:
 			return "'" + socket.identifier + "' : " + getInputValueVariable(socket)
 	def getInputPartFromOtherNode(self, socket, originSocket, useFastMethod, inputSocketNames):
-		return self.getInputPartStart(socket, useFastMethod, inputSocketNames) + getInputValueVariable(socket)	
+		return self.getInputPartStart(socket, useFastMethod, inputSocketNames) + getInputValueVariable(socket)  
 	def getInputPartStart(self, socket, useFastMethod, inputSocketNames):
 		if useFastMethod:
 			return inputSocketNames[socket.identifier] + " = "
@@ -609,6 +610,7 @@ convertRules[("Float", "Vector")] = "mn_CombineVector"
 convertRules[("Integer", "Vector")] = "mn_CombineVector"
 convertRules[("Vector", "Float")] = "mn_SeparateVector"
 convertRules[("Text Block", "String")] = "mn_TextBlockReader"
+
 for dataType in ["Object", "Vertex", "Polygon", "Float", "Vector", "String"]:
 	convertRules[(dataType + " List", "Integer")] = "mn_GetListLengthNode"
 		
@@ -679,7 +681,7 @@ def setDataConnection(fromSocket, toSocket):
 	if toSocket.bl_idname == "mn_NodeNetworkSocket":
 		updateSettingConnections[fromSocket.node] = toSocket.node
 	else:
-		if fromSocket not in outputSockets:	outputSockets[fromSocket] = []
+		if fromSocket not in outputSockets: outputSockets[fromSocket] = []
 		
 		inputSockets[toSocket] = fromSocket
 		outputSockets[fromSocket].append(toSocket)

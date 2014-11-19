@@ -1,8 +1,8 @@
 import bpy, re
 from bpy.types import Node
-from mn_node_base import AnimationNode
-from mn_execution import nodeTreeChanged, allowCompiling, forbidCompiling
-from mn_utils import *
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodeTreeChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_utils import *
 
 splitTypes = [
 	("Characters", "Characters", ""),
@@ -49,3 +49,4 @@ class mn_SplitText(Node, AnimationNode):
 			if splitBy == "": textList = list(text)
 			else: textList = text.split(splitBy)
 		return textList, len(textList)
+

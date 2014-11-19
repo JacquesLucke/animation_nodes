@@ -1,9 +1,9 @@
 import bpy
 from bpy.types import Node
-from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged
-from mn_utils import *
-from mn_selection_utils import *
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodePropertyChanged
+from animation_nodes.mn_utils import *
+from animation_nodes.utils.mn_selection_utils import *
 
 class mn_ObjectPropertyGroup(bpy.types.PropertyGroup):
 	object = bpy.props.StringProperty(name = "Object", default = "", update = nodePropertyChanged)
@@ -102,3 +102,5 @@ class SelectedObjectsToObjectListNode(bpy.types.Operator):
 		node = getNode(self.nodeTreeName, self.nodeName)
 		node.newItemsFromList(getSortedSelectedObjectNames())
 		return {'FINISHED'}	
+
+

@@ -1,10 +1,10 @@
 import bpy
 from bpy.types import Node
-from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
-from mn_utils import *
-from mn_node_utils import *
-from mn_socket_info import *
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_utils import *
+from animation_nodes.utils.mn_node_utils import *
+from animation_nodes.sockets.mn_socket_info import *
 
 loopTypes = [("Generic", "NONE"), ("Object", "OBJECT"), ("Vertex", "VERTEX"), ("Polygon", "POLYGON")]
 
@@ -92,3 +92,4 @@ class mn_LoopCallerNode(Node, AnimationNode):
 
 	def getStartNode(self):
 		return getNodeFromTypeWithAttribute("mn_LoopStartNode", "loopName", self.selectedLoop)
+

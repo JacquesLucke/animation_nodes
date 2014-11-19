@@ -1,6 +1,6 @@
 import bpy
-from mn_execution import nodePropertyChanged
-from mn_node_base import * 
+from animation_nodes.mn_execution import nodePropertyChanged
+from animation_nodes.mn_node_base import *
 
 class mn_ObjectSocket(mn_BaseSocket, mn_SocketProperties):
 	bl_idname = "mn_ObjectSocket"
@@ -55,3 +55,4 @@ class AssignActiveObjectToNode(bpy.types.Operator):
 		socket = getSocketFromNode(node, self.isOutput, self.socketName)
 		setattr(socket, self.target, obj.name)
 		return {'FINISHED'}
+

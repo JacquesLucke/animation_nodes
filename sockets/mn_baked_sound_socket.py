@@ -1,7 +1,7 @@
 import bpy
-from mn_execution import nodePropertyChanged
-from mn_node_base import *
-from mn_node_utils import *
+from animation_nodes.mn_execution import nodePropertyChanged
+from animation_nodes.mn_node_base import *
+from animation_nodes.utils.mn_node_utils import *
 
 class mn_BakedSoundSocket(mn_BaseSocket, mn_SocketProperties):
 	bl_idname = "mn_BakedSoundSocket"
@@ -35,3 +35,4 @@ class mn_BakedSoundSocket(mn_BaseSocket, mn_SocketProperties):
 		self.bakeNodeName = data
 	def getStoreableValue(self):
 		return self.bakeNodeName
+

@@ -1,8 +1,8 @@
 import bpy
 from bpy.types import Node
-from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
-from mn_utils import *
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_utils import *
 
 class mn_FloatPropertyGroup(bpy.types.PropertyGroup):
 	value = bpy.props.FloatProperty(name = "Value", default = 0, update = nodePropertyChanged)
@@ -56,3 +56,4 @@ class mn_FloatListInputNode(Node, AnimationNode):
 		
 	def removeItemFromList(self, index):
 		self.numbers.remove(index)
+

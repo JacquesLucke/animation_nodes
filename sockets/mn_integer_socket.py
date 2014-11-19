@@ -1,6 +1,6 @@
 import bpy
-from mn_execution import nodePropertyChanged
-from mn_node_base import * 
+from animation_nodes.mn_execution import nodePropertyChanged
+from animation_nodes.mn_node_base import *
 
 class mn_IntegerSocket(mn_BaseSocket, mn_SocketProperties):
 	bl_idname = "mn_IntegerSocket"
@@ -21,3 +21,4 @@ class mn_IntegerSocket(mn_BaseSocket, mn_SocketProperties):
 		self.number = data
 	def getStoreableValue(self):
 		return self.number
+

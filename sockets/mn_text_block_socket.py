@@ -1,6 +1,6 @@
 import bpy
-from mn_execution import nodePropertyChanged
-from mn_node_base import * 
+from animation_nodes.mn_execution import nodePropertyChanged
+from animation_nodes.mn_node_base import *
 
 class mn_TextBlockSocket(mn_BaseSocket, mn_SocketProperties):
 	bl_idname = "mn_TextBlockSocket"
@@ -25,3 +25,4 @@ class mn_TextBlockSocket(mn_BaseSocket, mn_SocketProperties):
 		self.textBlockName = data
 	def getStoreableValue(self):
 		return self.textBlockName
+

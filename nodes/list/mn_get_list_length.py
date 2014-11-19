@@ -1,7 +1,7 @@
 import bpy
 from bpy.types import Node
-from mn_node_base import AnimationNode
-from mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 class mn_GetListLengthNode(Node, AnimationNode):
 	bl_idname = "mn_GetListLengthNode"
@@ -20,3 +20,4 @@ class mn_GetListLengthNode(Node, AnimationNode):
 		except:
 			output["Length"] = 0
 		return output
+
