@@ -30,6 +30,7 @@ class mn_GroupOutput(Node, AnimationNode):
 			self.id_data.links.new(newSocket, fromSocket)
 			newIndex = self.inputs.find(socket.name)
 			self.inputs.move(len(self.inputs) - 1, newIndex)
+			self.updateCallerNodes()
 		else:
 			removeLinksFromSocket(socket)
 		allowCompiling()
@@ -59,3 +60,20 @@ class mn_GroupOutput(Node, AnimationNode):
 		
 	def removeSocket(self, socket):
 		self.inputs.remove(socket)
+		self.updateCallerNodes()
+		
+	def customSocketNameChanged(self, socket):
+		self.updateCallerNodes()
+		
+	def updateCallerNodes(self):
+		network = NodeNetwork.fromNode(self)
+		inputNode = network.getGroupInputNode()
+		if inputNode is not None:
+			inputNode.updateCallerNodes()
+		
+	def getSockets(self):
+		sockets = []
+		for socket in self.inputs:
+			if socket.name != newOutputSocketName:
+				sockets.append(socket)
+		return sockets

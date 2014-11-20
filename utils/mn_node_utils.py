@@ -149,7 +149,7 @@ class NodeTreeInfo:
 			for targetSocket in targetSockets:
 				childrenNodes.update([targetSocket.node])
 		return childrenNodes
-	def getNodesInNetwork(self, node):
+	def getNetworkWith(self, node):
 		networkNodes = []
 		uncheckedNodes = [node]
 		while len(uncheckedNodes) > 0:
@@ -160,7 +160,60 @@ class NodeTreeInfo:
 				if node not in uncheckedNodes and node not in networkNodes:
 					uncheckedNodes.append(node)
 			networkNodes.append(checkNode)
-		return networkNodes
+		return NodeNetwork(networkNodes)
+	def getNetworks(self):
+		networks = []
+		foundNodes = []
+		for node in self.nodes:
+			if node not in foundNodes:
+				network = self.getNetworkWith(node)
+				foundNodes.extend(network.nodes)
+				networks.append(network)
+		return networks
+	
+class NodeNetwork:
+	def __init__(self, nodes):
+		self.nodes = nodes
+		self.type = self.getNetworkType()
+		
+	def getGroupInputNode(self):
+		if self.type != "Group": return None
+		for node in self.nodes:
+			if node.bl_idname == "mn_GroupInput": return node
+		return None
+	def getGroupOutputNode(self):
+		if self.type != "Group": return None
+		for node in self.nodes:
+			if node.bl_idname == "mn_GroupOutput": return node
+		return None
+		
+	def getNetworkType(self):
+		loopStartAmount = 0
+		groupInputAmount = 0
+		groupOutputAmount = 0
+		totalSpecials = 0
+		for node in self.nodes:
+			if node.bl_idname == "mn_LoopStartNode":
+				loopStartAmount += 1
+				totalSpecials = 0
+			elif node.bl_idname == "mn_GroupInput":
+				groupInputAmount += 1
+				totalSpecials += 1
+			elif node.bl_idname == "mn_GroupOutput":
+				groupOutputAmount += 1
+				totalSpecials += 1
+		if totalSpecials == 0: return "Normal"
+		elif loopStartAmount == 1 and totalSpecials == 1: return "Loop"
+		elif (groupInputAmount == 1 and totalSpecials == 1 or
+			groupOutputAmount == 1 and totalSpecials == 1 or
+			groupInputAmount == 1 and groupOutputAmount == 1 and totalSpecials == 2): return "Group"
+		return "Invalid"
+				
+		
+	@staticmethod
+	def fromNode(node):
+		nodeTreeInfo = NodeTreeInfo(node.id_data)
+		return nodeTreeInfo.getNetworkWith(node)
 		
 def isReroute(object):
 	if isinstance(object, bpy.types.Node):
