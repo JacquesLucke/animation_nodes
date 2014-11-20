@@ -1,11 +1,12 @@
 import bpy, time
-import animation_nodes.utils.mn_node_utils as mn_node_utils
+from animation_nodes.utils.mn_node_utils import *
 from animation_nodes.mn_utils import *
 
 normalNetworks = []
 loopNetworks = {}
 groupNetworks = {}
 invalidNetworks = []
+treeInfo = None
 useProfiling = False
 
 class ExecutionUnit:
@@ -79,65 +80,38 @@ class ExecutionUnit:
 				node.executionTime = timeSpan
 
 def getExecutionUnits():
-	global loopNetworks, invalidNetworks, useProfiling
+	global useProfiling, idCounter, treeInfo
 	useProfiling = bpy.context.scene.mn_settings.developer.executionProfiling
-	clearSocketConnections()
+	idCounter = 0
 	cleanupNodeTrees()
-	nodeNetworks = getNodeNetworks()
-	sortNetworks(nodeNetworks)
-	if len(invalidNetworks) > 0:
-		print("invalid node tree")
-		return []
+	treeInfo = NodeTreeInfo(getAnimationNodeTrees())
+	networks = getNodeNetworks()
+	prepareNetworks(networks)
 	executionUnits = []
 	for network in normalNetworks:
 		codeGenerator = NetworkCodeGenerator(network)
 		codeGenerator.generateCode()
 		executionUnit = ExecutionUnit(codeGenerator.generatedCode, codeGenerator.updateSettingsNode)
 		executionUnits.append(executionUnit)
-	clearSocketConnections()
 	return executionUnits
 	
-def sortNetworks(nodeNetworks):
-	global normalNetworks, loopNetworks, groupNetworks, invalidNetworks, idCounter
+def prepareNetworks(networks):
+	global normalNetworks, loopNetworks, groupNetworks, invalidNetworks
 	normalNetworks = []
 	loopNetworks = {}
+	groupNetworks = {}
 	invalidNetworks = []
-	idCounter = 0
-	for network in nodeNetworks:
-		setUniqueCodeIndexToEveryNode(network)
-		networkType = getNetworkType(network)
-		if networkType == "Normal": normalNetworks.append(network)
-		elif networkType == "Loop":
-			startNode = getLoopStartNode(network)
-			loopNetworks[getNodeIdentifier(startNode)] = network
-		elif networkType == "Group":
-			inputNode = getGroupInputNode(network)
-			groupNetworks[getNodeIdentifier(inputNode)] = network
-		elif networkType == "Invalid": invalidNetworks.append(network)
+	for network in networks:
+		setUniqueCodeIndexToEveryNode(network.nodes)
+		if network.type == "Normal":
+			normalNetworks.append(network)
+		elif network.type == "Loop":
+			loopNetworks[network.getLoopStartNode()] = network
+		elif network.type == "Group":
+			groupNetworks[network.getGroupInputNode()] = network
+		elif network.type == "Invalid":
+			invalidNetworks.append(network)
 		
-def getNetworkType(network):
-	loopStarterAmount = 0
-	groupInputAmount = 0
-	totalSpecials = 0
-	for node in network:
-		if node.bl_idname == "mn_LoopStartNode":
-			loopStarterAmount += 1
-			totalSpecials += 1
-		if node.bl_idname == "mn_GroupInput":
-			groupInputAmount += 1
-			totalSpecials += 1
-	if totalSpecials == 0: return "Normal"
-	elif loopStarterAmount == 1 and totalSpecials == 1: return "Loop"
-	elif groupInputAmount == 1 and totalSpecials == 1: return "Group"
-	return "Invalid"
-def getLoopStartNode(network):
-	for node in network:
-		if node.bl_idname == "mn_LoopStartNode":
-			return node
-def getGroupInputNode(network):
-	for node in network:
-		if node.bl_idname == "mn_GroupInput":
-			return node
 			
 idCounter = 0
 bpy.types.Node.codeIndex = bpy.props.IntProperty()
@@ -152,74 +126,13 @@ def setUniqueCodeIndexToEveryNode(nodes):
 ###############################################
 		
 def getNodeNetworks():
-	nodeNetworks = []
+	networks = []
 	nodeTrees = getAnimationNodeTrees()
 	for nodeTree in nodeTrees:
-		nodeNetworks.extend(getNodeNetworksFromTree(nodeTree))
-	return nodeNetworks
-
-def getAnimationNodeTrees():
-	nodeTrees = mn_node_utils.getAnimationNodeTrees()
-	for nodeTree in nodeTrees:
 		nodeTree.use_fake_user = True
-	return nodeTrees
-		
-def getNodeNetworksFromTree(nodeTree):
-	nodes = nodeTree.nodes
-	resetNodeFoundAttributes(nodes)
-	
-	networks = []
-	for node in nodes:
-		if not node.isFound and getattr(node, "needsExecution", True):
-			networks.append(getNodeNetworkFromNode(node))
+		nodeTreeInfo = NodeTreeInfo(nodeTree)
+		networks.extend(nodeTreeInfo.getNetworks())
 	return networks
-	
-def getNodeNetworkFromNode(node):
-	nodesToCheck = [node]
-	network = [node]
-	node.isFound = True
-	while len(nodesToCheck) > 0:
-		linkedNodes = []
-		for node in nodesToCheck:
-			linkedNodes.extend(getLinkedButNotFoundNodes(node))
-		network.extend(linkedNodes)
-		setNodesAsFound(linkedNodes)
-		nodesToCheck = linkedNodes
-	return network
-	
-def setNodesAsFound(nodes):
-	for node in nodes: node.isFound = True
-	
-def getLinkedButNotFoundNodes(node):
-	nodes = []
-	nodes.extend(getNotFoundInputNodes(node))
-	nodes.extend(getNotFoundOutputNodes(node))
-	return nodes
-def getNotFoundInputNodes(node):
-	nodes = []
-	for socket in node.inputs:
-		originSocket = getDataOriginSocket(socket)
-		if originSocket is not None:
-			fromNode = originSocket.node
-			if not fromNode.isFound:
-				nodes.append(fromNode)
-				fromNode.isFound = True
-	return nodes
-def getNotFoundOutputNodes(node):
-	nodes = []
-	for socket in node.outputs:
-		connectedSockets = getSocketsFromOutputSocket(socket)
-		for toSocket in connectedSockets:
-			toNode = toSocket.node
-			if not toNode.isFound:
-				nodes.append(toNode)
-				toNode.isFound = True
-	return nodes
-	
-bpy.types.Node.isFound = bpy.props.BoolProperty(default = False)
-def resetNodeFoundAttributes(nodes):
-	for node in nodes: node.isFound = False 
-
 
 	
 	
@@ -260,22 +173,22 @@ class NetworkCodeGenerator:
 		self.generatedCode = "\n".join(codeParts)
 		
 	def getMainCode(self):
-		self.allNodesInTree.extend(self.network)
-		self.orderedNodes = orderNodes(self.network)
+		self.allNodesInTree.extend(self.network.nodes)
+		self.orderedNodes = orderNodes(self.network.nodes)
 		codeLines = []
 		for node in self.orderedNodes:
 			if self.updateSettingsNode is None:
-				self.updateSettingsNode = getUpdateSettingsNode(node)
+				self.updateSettingsNode = treeInfo.getUpdateSettingsNode(node)
 			codeLines.extend(self.getNodeCodeLines(node))
 		return "\n".join(codeLines)
 		
 	def makeLoopCode(self, loopNetwork):
-		startNode = getLoopStartNode(loopNetwork)
-		if getNodeIdentifier(startNode) not in self.functions:
-			self.functions[getNodeIdentifier(startNode)] = self.getLoopCode(loopNetwork, startNode)
+		startNode = loopNetwork.getLoopStartNode()
+		if startNode not in self.functions:
+			self.functions[startNode] = self.getLoopCode(loopNetwork, startNode)
 	def getLoopCode(self, loopNetwork, startNode):
-		self.allNodesInTree.extend(loopNetwork)
-		self.orderedNodes = orderNodes(loopNetwork)
+		self.allNodesInTree.extend(loopNetwork.nodes)
+		self.orderedNodes = orderNodes(loopNetwork.nodes)
 		mainLines = []
 		mainLines.append("def " + getNodeFunctionName(startNode) + "(" + getNodeOutputName(startNode) + "):")
 		mainLines.append("    " + self.getTimerGlobalList(loopNetwork))
@@ -299,7 +212,7 @@ class NetworkCodeGenerator:
 		codeLines = []
 		if isExecuteableNode(node) or isInLineNode(node):
 			codeLines.extend(self.getExecutableNodeCode(node))
-		elif isLoopNode(node):
+		elif isLoopCallerNode(node):
 			codeLines.extend(self.getLoopNodeCode(node))
 		return codeLines        
 		
@@ -316,7 +229,7 @@ class NetworkCodeGenerator:
 	def getLoopNodeCode(self, node):
 		codeLines = []
 		codeLines.append(getNodeInputName(node) + " = " + self.generateInputListString(node))
-		startNode = getCorrespondingStartNode(node)
+		startNode = node.getStartNode()
 		if startNode is not None:
 			fromListSockets = startNode.getSocketDescriptions()[0]
 			
@@ -330,7 +243,7 @@ class NetworkCodeGenerator:
 				codeLines.append(self.getEnumerateLoopHeader(node, fromListSockets))
 			
 			codeLines.append("    " + getNodeFunctionName(startNode) + "(" + getNodeInputName(node) + ")")
-			self.makeLoopCode(loopNetworks[getNodeIdentifier(startNode)])
+			self.makeLoopCode(loopNetworks[startNode])
 		codeLines.append(getNodeOutputName(node) + " = " + getNodeInputName(node))
 		return codeLines
 		
@@ -372,7 +285,7 @@ class NetworkCodeGenerator:
 	def getTimerGlobalList(self, network):
 		if useProfiling:
 			nodeTimerNames = []
-			for node in network:
+			for node in network.nodes:
 				nodeTimerNames.append(getNodeTimerName(node))
 			return "global " + ", ".join(nodeTimerNames)
 		return ""
@@ -431,7 +344,7 @@ class NetworkCodeGenerator:
 		inputSocketNames = None
 		if useFastMethod: inputSocketNames = node.getInputSocketNames()
 		for socket in node.inputs:
-			originSocket = getDataOriginSocket(socket)
+			originSocket = treeInfo.getDataOriginSocket(socket)
 			if originSocket is not None:
 				inputParts.append(self.getInputPartFromOtherNode(socket, originSocket, useFastMethod, inputSocketNames))
 			else:
@@ -486,7 +399,7 @@ class NetworkCodeGenerator:
 			for identifier, name in inputSocketNames.items():
 				socket = node.inputs[identifier]
 				inLineString = inLineString.replace("%" + name + "%", getInputValueVariable(socket))
-				if not hasOtherDataOrigin(socket):
+				if not treeInfo.hasOtherDataOrigin(socket):
 					self.neededSocketReferences.append(socket)
 			for identifier, name in outputSocketNames.items():
 				inLineString = inLineString.replace("$" + name + "$", getOutputValueVariable(node.outputs[identifier]))
@@ -509,22 +422,20 @@ def getNodeOutputString(node):
 def getOutputUseDictionaryCode(node):
 	codeParts = []
 	for socket in node.outputs:
-		codeParts.append('"' + socket.identifier + '" : ' + str(isOutputSocketUsed(socket)))
+		codeParts.append('"' + socket.identifier + '" : ' + str(treeInfo.isOutputSocketUsed(socket)))
 	return "{" + ", ".join(codeParts) + "}"
 def getOutputUseDictionary(node):
 	outputUse = {}
 	for socket in node.outputs:
-		outputUse[socket.identifier] = isOutputSocketUsed(socket)
+		outputUse[socket.identifier] = treeInfo.isOutputSocketUsed(socket)
 	return outputUse
 	
-def getCorrespondingStartNode(node):
-	return node.getStartNode()
 		
 def isExecuteableNode(node):
 	return hasattr(node, "execute")
 def isInLineNode(node):
 	return hasattr(node, "getInLineExecutionString")
-def isLoopNode(node):
+def isLoopCallerNode(node):
 	return node.bl_idname == "mn_LoopCallerNode"
 	
 def usesFastCall(node):
@@ -537,7 +448,7 @@ def usesOutputUseParameter(node):
 	return hasattr(node, "outputUseParameterName")
 	
 def getInputValueVariable(socket):
-	originSocket = getDataOriginSocket(socket)
+	originSocket = treeInfo.getDataOriginSocket(socket)
 	if originSocket is not None:
 		return getOutputValueVariable(originSocket)
 	else:
@@ -552,7 +463,7 @@ def getOutputValueVariable(socket):
 def isDeterminedNode(node):
 	if getattr(node, "isDetermined", False):
 		for socket in node.inputs:
-			originNode = getDataOriginNode(socket)
+			originNode = treeInfo.getDataOriginNode(socket)
 			if originNode is not None:
 				if not isDeterminedNode(originNode): return False
 		return True
@@ -605,7 +516,7 @@ def getAllNodeDependencies(node):
 def getDirectDependencies(node):
 	directDependencies = []
 	for socket in node.inputs:
-		originSocket = getDataOriginSocket(socket)
+		originSocket = treeInfo.getDataOriginSocket(socket)
 		if originSocket is not None:
 			node = originSocket.node
 			directDependencies.append(node)
@@ -645,7 +556,6 @@ def cleanupNodeTree(nodeTree):
 		if isOtherOriginSocket(toSocket, originSocket):
 			if originSocket.dataType not in toSocket.allowedInputTypes and toSocket.allowedInputTypes[0] != "all":
 				handleNotAllowedLink(nodeTree, link, fromSocket, toSocket, originSocket)
-			else: setDataConnection(originSocket, toSocket)
 def handleNotAllowedLink(nodeTree, link, fromSocket, toSocket, originSocket):
 	fromType = originSocket.dataType
 	toType = toSocket.dataType
@@ -669,52 +579,5 @@ def insertConversionNode(nodeTree, convertNodeType, fromSocket, toSocket, origin
 	node.location = [(x1+x2)/2+20, (y1+y2)/2-50]
 	
 	nodeTree.links.new(node.inputs[0], fromSocket)
-	setDataConnection(originSocket, node.inputs[0])
-	
 	nodeTree.links.new(toSocket, node.outputs[0])
-	setDataConnection(node.outputs[0], toSocket)
-	
-	
-	
-# find origin sockets
-############################################
-
-inputSockets = {}
-outputSockets = {}
-
-updateSettingConnections = {}
-					
-def clearSocketConnections():
-	global inputSockets, outputSockets, updateSettingConnections
-	inputSockets = {}
-	outputSockets = {}
-	updateSettingConnections = {}
-				
-def setDataConnection(fromSocket, toSocket):
-	global inputSockets, outputSockets, updateSettingConnections
-	
-	if toSocket.bl_idname == "mn_NodeNetworkSocket":
-		updateSettingConnections[fromSocket.node] = toSocket.node
-	else:
-		if fromSocket not in outputSockets: outputSockets[fromSocket] = []
 		
-		inputSockets[toSocket] = fromSocket
-		outputSockets[fromSocket].append(toSocket)
-
-def hasOtherDataOrigin(socket):
-	return inputSockets.get(socket) is not None
-def getDataOriginSocket(socket):
-	return inputSockets.get(socket)
-def getDataOriginNode(socket):
-	originSocket = getDataOriginSocket(socket)
-	if originSocket is not None:
-		return originSocket.node
-	return None
-def isOutputSocketUsed(socket):
-	return socket in outputSockets
-def getSocketsFromOutputSocket(socket):
-	return outputSockets.get(socket, [])
-	
-def getUpdateSettingsNode(node):
-	return updateSettingConnections.get(node)
-			

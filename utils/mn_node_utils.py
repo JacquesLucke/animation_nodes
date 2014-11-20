@@ -84,11 +84,19 @@ def updateDependencyNode(socket):
 			if hasattr(fromNode, "update"):
 				fromNode.update()
 				
+				
 class NodeTreeInfo:
-	def __init__(self, nodeTree):
-		self.nodeTree = nodeTree
-		self.nodes = nodeTree.nodes
-		self.links = nodeTree.links
+	def __init__(self, nodeTrees):
+		if isinstance(nodeTrees, (list, tuple, set)):
+			self.nodes = []
+			self.links = []
+			for nodeTree in nodeTrees:
+				self.nodes.extend(nodeTree.nodes)
+				self.links.extend(nodeTree.links)
+		else:
+			nodeTree = nodeTrees
+			self.nodes = nodeTree.nodes
+			self.links = nodeTree.links
 		
 		self.inputSockets = {}
 		self.outputSockets = {}
@@ -116,6 +124,12 @@ class NodeTreeInfo:
 			self.outputSockets[fromSocket].append(toSocket)
 			self.inputSockets[toSocket].append(fromSocket)
 			
+	def getUpdateSettingsNode(self, node):
+		return self.updateSettings.get(node)
+	def isOutputSocketUsed(self, socket):
+		return socket in self.outputSockets
+	def hasOtherDataOrigin(self, socket):
+		return self.getDataOriginSocket(socket) is not None
 	def getDataOriginSockets(self, socket):
 		return self.inputSockets.get(socket, [])
 	def getDataTargetSockets(self, socket):
@@ -176,6 +190,12 @@ class NodeNetwork:
 		self.nodes = nodes
 		self.type = self.getNetworkType()
 		
+	def getLoopStartNode(self):
+		if self.type != "Loop": return None
+		for node in self.nodes:
+			if node.bl_idname == "mn_LoopStartNode": return node
+		return None
+		
 	def getGroupInputNode(self):
 		if self.type != "Group": return None
 		for node in self.nodes:
@@ -195,7 +215,7 @@ class NodeNetwork:
 		for node in self.nodes:
 			if node.bl_idname == "mn_LoopStartNode":
 				loopStartAmount += 1
-				totalSpecials = 0
+				totalSpecials = 1
 			elif node.bl_idname == "mn_GroupInput":
 				groupInputAmount += 1
 				totalSpecials += 1
