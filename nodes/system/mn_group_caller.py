@@ -35,9 +35,6 @@ class mn_GroupCaller(Node, AnimationNode):
 		setActive.nodeName = self.name
 		layout.label("Group: " + self.activeGroup)
 		
-	def execute(self, input):
-		return input
-		
 	def update(self):
 		forbidCompiling()
 		allowCompiling()
@@ -52,11 +49,11 @@ class mn_GroupCaller(Node, AnimationNode):
 			network = NodeNetwork.fromNode(inputNode)
 			if network.type == "Group":
 				for socket in inputNode.getSockets():
-					self.inputs.new(socket.bl_idname, socket.customName)
+					self.inputs.new(socket.bl_idname, socket.customName, socket.identifier)
 				outputNode = network.getGroupOutputNode()
 				if outputNode is not None:
 					for socket in outputNode.getSockets():
-						self.outputs.new(socket.bl_idname, socket.customName)
+						self.outputs.new(socket.bl_idname, socket.customName, socket.identifier)
 		
 		tryToSetConnectionDictionaries(self, connections)
 		allowCompiling()
@@ -69,6 +66,9 @@ class mn_GroupCaller(Node, AnimationNode):
 	def updateActiveGroup(self):
 		self.activeGroup = self.selectedGroup
 		self.updateSockets()
+		
+	def getInputNode(self):
+		return getNodeFromTypeWithAttribute("mn_GroupInput", "groupName", self.activeGroup)
 		
 		
 class UpdateActiveGroup(bpy.types.Operator):

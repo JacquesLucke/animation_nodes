@@ -174,9 +174,9 @@ class NetworkCodeGenerator:
 		
 	def getMainCode(self):
 		self.allNodesInTree.extend(self.network.nodes)
-		self.orderedNodes = orderNodes(self.network.nodes)
+		orderedNodes = orderNodes(self.network.nodes)
 		codeLines = []
-		for node in self.orderedNodes:
+		for node in orderedNodes:
 			if self.updateSettingsNode is None:
 				self.updateSettingsNode = treeInfo.getUpdateSettingsNode(node)
 			codeLines.extend(self.getNodeCodeLines(node))
@@ -188,11 +188,11 @@ class NetworkCodeGenerator:
 			self.functions[startNode] = self.getLoopCode(loopNetwork, startNode)
 	def getLoopCode(self, loopNetwork, startNode):
 		self.allNodesInTree.extend(loopNetwork.nodes)
-		self.orderedNodes = orderNodes(loopNetwork.nodes)
+		orderedNodes = orderNodes(loopNetwork.nodes)
 		mainLines = []
 		mainLines.append("def " + getNodeFunctionName(startNode) + "(" + getNodeOutputName(startNode) + "):")
 		mainLines.append("    " + self.getTimerGlobalList(loopNetwork))
-		for node in self.orderedNodes:
+		for node in orderedNodes:
 			if node != startNode:
 				codeLines = self.getNodeCodeLines(node)
 				self.setIndentationOnEveryLine(codeLines)
@@ -214,6 +214,8 @@ class NetworkCodeGenerator:
 			codeLines.extend(self.getExecutableNodeCode(node))
 		elif isLoopCallerNode(node):
 			codeLines.extend(self.getLoopNodeCode(node))
+		elif isGroupCallerNode(node):
+			codeLines.extend(self.getGroupNodeCode(node))
 		return codeLines        
 		
 	def getExecutableNodeCode(self, node):
@@ -274,6 +276,36 @@ class NetworkCodeGenerator:
 		
 		return "".join(codeParts)
 		
+	def getGroupNodeCode(self, node):
+		codeLines = []
+		codeLines.append(getNodeInputName(node) + " = " + self.generateInputListString(node))
+		inputNode = node.getInputNode()
+		if inputNode is not None:
+			codeLines.append(getNodeOutputName(node) + " = " + getNodeFunctionName(inputNode) + "(" + getNodeInputName(node) + ")")
+			self.makeGroupCode(inputNode)
+		return codeLines
+		
+	def makeGroupCode(self, inputNode):
+		groupNetwork = groupNetworks[inputNode]
+		outputNode = groupNetwork.getGroupOutputNode()
+		if inputNode not in self.functions:
+			self.functions[inputNode] = self.getGroupCode(groupNetwork, inputNode, outputNode)
+	def getGroupCode(self, groupNetwork, inputNode, outputNode):
+		self.allNodesInTree.extend(groupNetwork.nodes)
+		codeLines = []
+		codeLines.append("def " + getNodeFunctionName(inputNode) + "(" + getNodeOutputName(inputNode) + "):")
+		codeLines.append("    " + self.getTimerGlobalList(groupNetwork))
+		orderedNodes = orderNodes(groupNetwork.nodes)
+		for node in orderedNodes:
+			if node not in [inputNode, outputNode]:
+				nodeCodeLines = self.getNodeCodeLines(node)
+				self.setIndentationOnEveryLine(nodeCodeLines)
+				codeLines.extend(nodeCodeLines)
+		if useProfiling: codeLines.append("    globals().update(locals())")
+		if outputNode is not None:
+			codeLines.append("    return " + self.generateInputListString(outputNode))
+		else: codeLines.append("    pass")
+		return "\n".join(codeLines)
 		
 	def getTimerDefinitions(self):
 		if useProfiling:
@@ -437,6 +469,8 @@ def isInLineNode(node):
 	return hasattr(node, "getInLineExecutionString")
 def isLoopCallerNode(node):
 	return node.bl_idname == "mn_LoopCallerNode"
+def isGroupCallerNode(node):
+	return node.bl_idname == "mn_GroupCaller"
 	
 def usesFastCall(node):
 	if hasattr(node, "getInputSocketNames"):
