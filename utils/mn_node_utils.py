@@ -83,3 +83,88 @@ def updateDependencyNode(socket):
 			fromNode = socket.links[0].from_node
 			if hasattr(fromNode, "update"):
 				fromNode.update()
+				
+class NodeTreeInfo:
+	def __init__(self, nodeTree):
+		self.nodeTree = nodeTree
+		self.nodes = nodeTree.nodes
+		self.links = nodeTree.links
+		
+		self.inputSockets = {}
+		self.outputSockets = {}
+		self.updateSettings = {}
+		
+		self.createConnectionDics()
+		
+	def createConnectionDics(self):
+		for link in self.links:
+			fromSocket = link.from_socket
+			toSocket = link.to_socket
+			if isReroute(toSocket): continue
+			originSocket = fromSocket
+			if isReroute(fromSocket): originSocket = getOriginSocket(toSocket)
+			if isOtherOriginSocket(toSocket, originSocket):
+				self.setConnection(originSocket, toSocket)
+	def setConnection(self, fromSocket, toSocket):
+		if toSocket.bl_idname == "mn_NodeNetworkSocket":
+			self.updateSettings[fromSocket.node] = toSocket.node
+		else:
+			if fromSocket not in self.outputSockets:
+				self.outputSockets[fromSocket] = []
+			if toSocket not in self.inputSockets:
+				self.inputSockets[toSocket] = []
+			self.outputSockets[fromSocket].append(toSocket)
+			self.inputSockets[toSocket].append(fromSocket)
+			
+	def getDataOriginSockets(self, socket):
+		return self.inputSockets.get(socket, [])
+	def getDataTargetSockets(self, socket):
+		return self.outputSockets.get(socket, [])
+	def getDataOriginSocket(self, socket):
+		originSockets = self.inputSockets.get(socket)
+		if originSockets is not None:
+			return originSockets[0]
+		return None
+	def getDataOriginNode(self, socket):
+		originSocket = self.getDataOriginSocket(socket)
+		if originSocket is not None:
+			return originSocket.node
+		return None
+	def getDirectLinkedNodes(self, node):
+		linkedNodes = set()
+		linkedNodes.update(self.getDirectParentNodes(node))
+		linkedNodes.update(self.getDirectChildrenNodes(node))
+		return linkedNodes
+	def getDirectParentNodes(self, node):
+		parentNodes = set()
+		for socket in node.inputs:
+			originSockets = self.getDataOriginSockets(socket)
+			for originSocket in originSockets:
+				parentNodes.update([originSocket.node])
+		return parentNodes
+	def getDirectChildrenNodes(self, node):
+		childrenNodes = set()
+		for socket in node.outputs:
+			targetSockets = self.getDataTargetSockets(socket)
+			for targetSocket in targetSockets:
+				childrenNodes.update([targetSocket.node])
+		return childrenNodes
+	def getNodesInNetwork(self, node):
+		networkNodes = []
+		uncheckedNodes = [node]
+		while len(uncheckedNodes) > 0:
+			checkNode = uncheckedNodes[-1]
+			linkedNodes = self.getDirectLinkedNodes(checkNode)
+			del uncheckedNodes[-1]
+			for node in linkedNodes:
+				if node not in uncheckedNodes and node not in networkNodes:
+					uncheckedNodes.append(node)
+			networkNodes.append(checkNode)
+		return networkNodes
+		
+def isReroute(object):
+	if isinstance(object, bpy.types.Node):
+		return object.bl_idname == "NodeReroute"
+	if isinstance(object, bpy.types.NodeSocket):
+		return object.node.bl_idname == "NodeReroute"
+	return False
