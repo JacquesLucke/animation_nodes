@@ -60,6 +60,8 @@ class mn_GroupInput(Node, AnimationNode):
 		toSocket = links[0].to_socket
 		if toSocket.node.type == "REROUTE":
 			return None
+		if getattr(toSocket, "passiveSocketType", "other node") == "":
+			return None
 		return toSocket
 		
 	def getTargetSocketType(self, targetSocket):
