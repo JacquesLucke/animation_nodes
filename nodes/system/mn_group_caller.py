@@ -35,17 +35,13 @@ class mn_GroupCaller(Node, AnimationNode):
 		setActive.nodeName = self.name
 		layout.label("Group: " + self.activeGroup)
 		
-	def update(self):
-		forbidCompiling()
-		allowCompiling()
-		
-	def updateSockets(self, socketStartValue = (None, None), outputRemoved = False):
+	def updateSockets(self, socketStartValue = (None, None), inputRemoved = False, outputRemoved = False):
 		forbidCompiling()
 		connections = getConnectionDictionaries(self)
 		self.removeSockets()
 		
 		inputNode = getNodeFromTypeWithAttribute("mn_GroupInput", "groupName", self.activeGroup)
-		if inputNode is not None:
+		if inputNode is not None and not inputRemoved:
 			network = NodeNetwork.fromNode(inputNode)
 			if network.type == "Group":
 				for socket in inputNode.getSockets():
