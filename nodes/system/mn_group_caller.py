@@ -77,10 +77,6 @@ class UpdateActiveGroup(bpy.types.Operator):
 	nodeTreeName = bpy.props.StringProperty()
 	nodeName = bpy.props.StringProperty()
 	
-	@classmethod
-	def poll(cls, context):
-		return getActive() is not None
-		
 	def execute(self, context):
 		node = getNode(self.nodeTreeName, self.nodeName)
 		node.updateActiveGroup()

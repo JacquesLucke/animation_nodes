@@ -17,7 +17,8 @@ def updateAnimationTrees(event = "NONE"):
 		start = time.clock()
 		
 		for executionUnit in executionUnits:
-			executionUnit.execute(event)
+			try: executionUnit.execute(event)
+			except: pass
 		if len(executionUnits) > 0:
 			bpy.context.scene.update()
 			
@@ -42,8 +43,10 @@ def resetCompileBlocker():
 	
 def resetForceUpdateProperties():
 	nodes = getNodesFromType("mn_NetworkUpdateSettingsNode")
-	for node in nodes:
-		node.settings.forceExecution = False
+	try:
+		for node in nodes:
+			node.settings.forceExecution = False
+	except: pass
 			
 		
 		
