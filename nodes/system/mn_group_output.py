@@ -62,14 +62,17 @@ class mn_GroupOutput(Node, AnimationNode):
 		self.inputs.remove(socket)
 		self.updateCallerNodes()
 		
+	def free(self):
+		self.updateCallerNodes(outputRemoved = True)
+		
 	def customSocketNameChanged(self, socket):
 		self.updateCallerNodes()
 		
-	def updateCallerNodes(self):
+	def updateCallerNodes(self, outputRemoved = False):
 		network = NodeNetwork.fromNode(self)
 		inputNode = network.getGroupInputNode()
 		if inputNode is not None:
-			inputNode.updateCallerNodes()
+			inputNode.updateCallerNodes(outputRemoved = outputRemoved)
 		
 	def getSockets(self):
 		sockets = []

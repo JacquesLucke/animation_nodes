@@ -47,7 +47,7 @@ class mn_GroupInput(Node, AnimationNode):
 			self.id_data.links.new(targetSocket, newSocket)
 			newIndex = self.outputs.find(socket.name)
 			self.outputs.move(len(self.outputs) - 1, newIndex)
-			self.updateCallerNodes()
+			self.updateCallerNodes((newSocket, targetSocket.getStoreableValue()))
 		else:
 			removeLinksFromSocket(socket)
 		allowCompiling()
@@ -89,10 +89,10 @@ class mn_GroupInput(Node, AnimationNode):
 	def customSocketNameChanged(self, socket):
 		self.updateCallerNodes()
 		
-	def updateCallerNodes(self):
+	def updateCallerNodes(self, socketStartValue = (None, None), outputRemoved = False):
 		nodes = getNodesFromTypeWithAttribute("mn_GroupCaller", "activeGroup", self.groupName)
 		for node in nodes:
-			node.updateSockets()
+			node.updateSockets(socketStartValue, outputRemoved)
 		
 	def getNotUsedGroupName(self, prefix = "Group"):
 		groupName = prefix
@@ -102,6 +102,8 @@ class mn_GroupInput(Node, AnimationNode):
 		
 	def copy(self, node):
 		self.groupName = self.getNotUsedGroupName()
+	def free(self):
+		self.updateCallerNodes()
 
 	def getSockets(self):
 		sockets = []

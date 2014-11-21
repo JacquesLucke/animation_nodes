@@ -88,11 +88,13 @@ def getExecutionUnits():
 	networks = getNodeNetworks()
 	prepareNetworks(networks)
 	executionUnits = []
-	for network in normalNetworks:
-		codeGenerator = NetworkCodeGenerator(network)
-		codeGenerator.generateCode()
-		executionUnit = ExecutionUnit(codeGenerator.generatedCode, codeGenerator.updateSettingsNode)
-		executionUnits.append(executionUnit)
+	if len(invalidNetworks) == 0:
+		for network in normalNetworks:
+			codeGenerator = NetworkCodeGenerator(network)
+			codeGenerator.generateCode()
+			executionUnit = ExecutionUnit(codeGenerator.generatedCode, codeGenerator.updateSettingsNode)
+			executionUnits.append(executionUnit)
+	else: print("There is at least one invalid network.")
 	return executionUnits
 	
 def prepareNetworks(networks):

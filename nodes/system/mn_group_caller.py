@@ -39,7 +39,7 @@ class mn_GroupCaller(Node, AnimationNode):
 		forbidCompiling()
 		allowCompiling()
 		
-	def updateSockets(self):
+	def updateSockets(self, socketStartValue = (None, None), outputRemoved = False):
 		forbidCompiling()
 		connections = getConnectionDictionaries(self)
 		self.removeSockets()
@@ -49,11 +49,14 @@ class mn_GroupCaller(Node, AnimationNode):
 			network = NodeNetwork.fromNode(inputNode)
 			if network.type == "Group":
 				for socket in inputNode.getSockets():
-					self.inputs.new(socket.bl_idname, socket.customName, socket.identifier)
-				outputNode = network.getGroupOutputNode()
-				if outputNode is not None:
-					for socket in outputNode.getSockets():
-						self.outputs.new(socket.bl_idname, socket.customName, socket.identifier)
+					newSocket = self.inputs.new(socket.bl_idname, socket.customName, socket.identifier)
+					if socket == socketStartValue[0]: newSocket.setStoreableValue(socketStartValue[1])
+				if not outputRemoved:
+					outputNode = network.getGroupOutputNode()
+					if outputNode is not None:
+						for socket in outputNode.getSockets():
+							newSocket = self.outputs.new(socket.bl_idname, socket.customName, socket.identifier)
+							if socket == socketStartValue[0]: newSocket.setStoreableValue(socketStartValue[1])
 		
 		tryToSetConnectionDictionaries(self, connections)
 		allowCompiling()
