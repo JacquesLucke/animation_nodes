@@ -102,7 +102,10 @@ class mn_GroupInput(Node, AnimationNode):
 		
 	def copy(self, node):
 		self.groupName = self.getNotUsedGroupName()
+		
+	isRemoved = bpy.props.BoolProperty(default = False)
 	def free(self):
+		self.isRemoved = True
 		self.updateCallerNodes(inputRemoved = True)
 
 	def getSockets(self):

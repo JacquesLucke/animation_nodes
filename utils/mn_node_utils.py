@@ -84,6 +84,9 @@ def updateDependencyNode(socket):
 			if hasattr(fromNode, "update"):
 				fromNode.update()
 				
+def isNodeRemoved(node):
+	return getattr(node, "isRemoved", False)
+				
 				
 class NodeTreeInfo:
 	def __init__(self, nodeTrees):
@@ -97,6 +100,8 @@ class NodeTreeInfo:
 			nodeTree = nodeTrees
 			self.nodes = nodeTree.nodes
 			self.links = nodeTree.links
+			
+		self.removeDeletedObjects()
 		
 		self.inputSockets = {}
 		self.outputSockets = {}
@@ -104,6 +109,19 @@ class NodeTreeInfo:
 		
 		self.createConnectionDics()
 		
+	def removeDeletedObjects(self):
+		newNodeList = []
+		for node in self.nodes:
+			if not isNodeRemoved(node):
+				newNodeList.append(node)
+		self.nodes = newNodeList
+		
+		newLinkList = []
+		for link in self.links:
+			if not (isNodeRemoved(link.from_node) or isNodeRemoved(link.to_node)):
+				newLinkList.append(link)
+		self.links = newLinkList
+				
 	def createConnectionDics(self):
 		for link in self.links:
 			fromSocket = link.from_socket
