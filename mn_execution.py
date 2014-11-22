@@ -18,7 +18,7 @@ def updateAnimationTrees(event = "NONE"):
 		
 		secureExecution(event)
 		
-		if len(executionUnits) > 0:
+		if len(executionUnits) > 0 and event != "TREE":
 			bpy.context.scene.update()
 			
 		resetForceUpdateProperties()
