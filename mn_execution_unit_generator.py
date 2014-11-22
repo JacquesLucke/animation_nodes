@@ -280,10 +280,9 @@ class NetworkCodeGenerator:
 		
 	def getGroupNodeCode(self, node):
 		codeLines = []
-		codeLines.append(getNodeInputName(node) + " = " + self.generateInputListString(node))
 		inputNode = node.getInputNode()
 		if inputNode is not None:
-			codeLines.append(getNodeOutputName(node) + " = " + getNodeFunctionName(inputNode) + "(" + getNodeInputName(node) + ")")
+			codeLines.append(getNodeOutputName(node) + " = " + getNodeFunctionName(inputNode) + "(" + self.generateInputListString(node) + ")")
 			self.makeGroupCode(inputNode)
 		return codeLines
 		
