@@ -11,14 +11,13 @@ COMPILE_BLOCKER = 0
 executionUnits = []
 
 def updateAnimationTrees(event = "NONE"):
-	if COMPILE_BLOCKER <= 0:
+	if COMPILE_BLOCKER == 0:
 		forbidCompiling()
 		
 		start = time.clock()
 		
-		for executionUnit in executionUnits:
-			try: executionUnit.execute(event)
-			except: pass
+		secureExecution(event)
+		
 		if len(executionUnits) > 0:
 			bpy.context.scene.update()
 			
@@ -30,6 +29,20 @@ def updateAnimationTrees(event = "NONE"):
 			printTimeSpan("Update Time ", timeSpan)
 			
 		allowCompiling()
+		
+def secureExecution(event):
+	try: executeUnits(event)
+	except:
+		resetCompileBlocker()
+		generateExecutionUnits()
+		forbidCompiling()
+		try: executeUnits(executeUnits, event)
+		except: pass
+		
+		
+def executeUnits(event):
+	for executionUnit in executionUnits:
+		executionUnit.execute(event)
 			
 def allowCompiling():
 	global COMPILE_BLOCKER
@@ -56,7 +69,7 @@ def resetForceUpdateProperties():
 def generateExecutionUnits():
 	global executionUnits
 	
-	if COMPILE_BLOCKER <= 0:
+	if COMPILE_BLOCKER == 0:
 		forbidCompiling()
 		
 		start = time.clock()
