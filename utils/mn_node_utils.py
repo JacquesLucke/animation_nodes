@@ -244,6 +244,7 @@ class NodeNetwork:
 		elif loopStartAmount == 1 and totalSpecials == 1: return "Loop"
 		elif (groupInputAmount == 1 and totalSpecials == 1 or
 			groupInputAmount == 1 and groupOutputAmount == 1 and totalSpecials == 2): return "Group"
+		if groupOutputAmount == totalSpecials: return "Ignore"
 		return "Invalid"
 				
 		
