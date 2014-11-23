@@ -77,7 +77,7 @@ else: $result$ = %a% / %b%
 			elif op == "ARCTANGENT": return "$result$ = math.atan(%a%)"
 			elif op == "POWER": return "$result$ = math.pow(%a%, %b%)"
 			elif op == "LOGARITHM": return '''
-if %b% == 0: $result$ = math.log(%a%)
+if %b% <= 0 or %b% == 1: $result$ = math.log(%a%)
 else: $result$ = math.log(%a%, %b%)
 '''
 			elif op == "MINIMUM": return "$result$ = min(%a%, %b%)"
