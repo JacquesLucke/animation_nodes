@@ -5,7 +5,7 @@ from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, fo
 
 class mn_ReplicateStringsNode(Node, AnimationNode):
 	bl_idname = "mn_ReplicateStringsNode"
-	bl_label = "Replicate Strings"
+	bl_label = "Replicate Text"
 	
 	def init(self, context):
 		forbidCompiling()
