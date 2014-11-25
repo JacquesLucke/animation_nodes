@@ -7,9 +7,13 @@ class mn_ObjectOutputNode(Node, AnimationNode):
 	bl_idname = "mn_ObjectOutputNode"
 	bl_label = "Transforms Output"
 	
-	useLocation = bpy.props.BoolVectorProperty(update = nodeTreeChanged)
-	useRotation = bpy.props.BoolVectorProperty(update = nodeTreeChanged)
-	useScale = bpy.props.BoolVectorProperty(update = nodeTreeChanged)
+	def checkedPropertiesChanged(self, context):
+		self.updateSocketVisibility()
+		nodeTreeChanged()
+	
+	useLocation = bpy.props.BoolVectorProperty(update = checkedPropertiesChanged)
+	useRotation = bpy.props.BoolVectorProperty(update = checkedPropertiesChanged)
+	useScale = bpy.props.BoolVectorProperty(update = checkedPropertiesChanged)
 	
 	def init(self, context):
 		forbidCompiling()
@@ -37,6 +41,11 @@ class mn_ObjectOutputNode(Node, AnimationNode):
 		row.prop(self, "useScale", index = 0, text = "X")
 		row.prop(self, "useScale", index = 1, text = "Y")
 		row.prop(self, "useScale", index = 2, text = "Z")
+		
+	def updateSocketVisibility(self):
+		self.inputs["Location"].hide = not (self.useLocation[0] or self.useLocation[1] or self.useLocation[2])
+		self.inputs["Rotation"].hide = not (self.useRotation[0] or self.useRotation[1] or self.useRotation[2])
+		self.inputs["Scale"].hide = not (self.useScale[0] or self.useScale[1] or self.useScale[2])
 		
 	def getInputSocketNames(self):
 		return {"Object" : "object",
