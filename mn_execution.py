@@ -37,7 +37,7 @@ def secureExecution(event):
 		generateExecutionUnits()
 		forbidCompiling()
 		try: executeUnits(executeUnits, event)
-		except: pass
+		except e as BaseException: print(e)
 		
 		
 def executeUnits(event):

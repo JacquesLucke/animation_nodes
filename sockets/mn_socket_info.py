@@ -9,6 +9,13 @@ listChains = [
 	["mn_PolygonSocket", "mn_PolygonListSocket"],
 	["mn_GenericSocket", "mn_GenericSocket"] ]
 	
+def getBaseSocketType(socketType):
+	for listChain in listChains:
+		if socketType in listChain:
+			index = listChain.index(socketType)
+			if index == 0: return None
+			else: return listChain[index - 1]
+	
 def getListSocketType(socketType):
 	for listChain in listChains:
 		if socketType in listChain:
