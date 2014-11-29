@@ -36,8 +36,8 @@ def secureExecution(event):
 		resetCompileBlocker()
 		generateExecutionUnits()
 		forbidCompiling()
-		try: executeUnits(executeUnits, event)
-		except e as BaseException: print(e)
+		try: executeUnits(event)
+		except Exception as e: print(e)
 		
 		
 def executeUnits(event):

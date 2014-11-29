@@ -1,56 +1,56 @@
 import bpy, random
 from bpy.types import Node
 from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.utils.mn_node_utils import *
+from animation_nodes.sockets.mn_socket_info import *
 from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 class mn_ShuffleListNode(Node, AnimationNode):
 	bl_idname = "mn_ShuffleListNode"
 	bl_label = "Shuffle List"
 	
-	def setSocketTypes(self, context):
-		self.setSocketType(self.listTypesProperty)	
-		nodePropertyChanged(self, context)
-	
-	listTypes = [
-		("FLOAT", "Float", ""),
-		("STRING", "String", ""),
-		("OBJECT", "Object", "") ]
-	listTypesProperty = bpy.props.EnumProperty(name = "Type", items = listTypes, default = "OBJECT", update = setSocketTypes)
-	
 	def init(self, context):
 		forbidCompiling()
-		self.inputs.new("mn_IntegerSocket", "Seed")
-		self.setSocketType(self.listTypesProperty)
+		self.generateSockets()
 		allowCompiling()
 		
-	def draw_buttons(self, context, layout):
-		layout.prop(self, "listTypesProperty")
+	def getInputSocketNames(self):
+		return {"List" : "list",
+				"Seed" : "seed"}
+	def getOutputSocketNames(self):
+		return {"Shuffled List" : "shuffledList"}
 		
-	def execute(self, input):
-		output = {}
-		list = input["List"]
-		output["Shuffled List"] = list
-		random.seed(input["Seed"])
-		random.shuffle(output["Shuffled List"])
-		return output
+	def execute(self, list, seed):
+		random.seed(seed)
+		list = list[:] # make a new copy of this list
+		random.shuffle(list)
+		return list
 		
-	def setSocketType(self, type):
+	def update(self):
+		nodeTree = self.id_data
+		treeInfo = NodeTreeInfo(nodeTree)
+		originSocket = treeInfo.getDataOriginSocket(self.inputs.get("List"))
+		targetSockets = treeInfo.getDataTargetSockets(self.outputs.get("Shuffled List"))
+		
 		forbidCompiling()
-		try:
-			self.inputs.remove(self.inputs["List"])
-			self.outputs.remove(self.outputs["Shuffled List"])
-		except:
-			pass
-		if type == "FLOAT":
-			self.inputs.new("mn_FloatListSocket", "List")
-			self.outputs.new("mn_FloatListSocket", "Shuffled List")
-		elif type == "STRING":
-			self.inputs.new("mn_StringListSocket", "List")
-			self.outputs.new("mn_StringListSocket", "Shuffled List")
-		elif type == "OBJECT":
-			self.inputs.new("mn_ObjectListSocket", "List")
-			self.outputs.new("mn_ObjectListSocket", "Shuffled List")
-		self.inputs.move(0, 1)
+		if originSocket is not None and len(targetSockets) == 0:
+			self.generateSockets(originSocket.bl_idname)
+			nodeTree.links.new(self.inputs.get("List"), originSocket)
+		if originSocket is None and len(targetSockets) == 1:
+			self.generateSockets(targetSockets[0].bl_idname)
+			nodeTree.links.new(targetSockets[0], self.outputs.get("Shuffled List"))
 		allowCompiling()
-
+		
+	def generateSockets(self, listIdName = "mn_ObjectListSocket"):
+		if listIdName is None: return
+		if listIdName == getattr(self.inputs.get("List"), "bl_idname", None): return
+		if not isListSocketType(listIdName): return
+		
+		forbidCompiling()
+		self.inputs.clear()
+		self.outputs.clear()
+		self.inputs.new(listIdName, "List")
+		self.inputs.new("mn_IntegerSocket", "Seed")
+		self.outputs.new(listIdName, "Shuffled List")
+		allowCompiling()
 

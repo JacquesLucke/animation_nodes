@@ -45,7 +45,7 @@ class mn_GetListElementNode(Node, AnimationNode):
 		if listIdName is None: return
 		baseIdName = getBaseSocketType(listIdName)
 		if baseIdName is None: return
-		if listIdName == self.inputs.get("List").bl_idname: return
+		if listIdName == getattr(self.inputs.get("List"), "bl_idname", None): return
 		
 		forbidCompiling()
 		self.inputs.clear()

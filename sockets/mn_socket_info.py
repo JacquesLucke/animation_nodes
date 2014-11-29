@@ -6,8 +6,7 @@ listChains = [
 	["mn_ObjectSocket", "mn_ObjectListSocket"],
 	["mn_StringSocket", "mn_StringListSocket"],
 	["mn_VertexSocket", "mn_VertexListSocket"],
-	["mn_PolygonSocket", "mn_PolygonListSocket"],
-	["mn_GenericSocket", "mn_GenericSocket"] ]
+	["mn_PolygonSocket", "mn_PolygonListSocket"] ]
 	
 def getBaseSocketType(socketType):
 	for listChain in listChains:
@@ -23,6 +22,9 @@ def getListSocketType(socketType):
 			if index == len(listChain) - 1: return None
 			return listChain[index + 1]
 	return None
+	
+def isListSocketType(socketType):
+	return not getBaseSocketType(socketType) == None
 	
 def hasListSocketType(socketType):
 	return not getListSocketType(socketType) == None
