@@ -18,9 +18,10 @@ class mn_GetListLengthNode(Node, AnimationNode):
 	def getOutputSocketNames(self):
 		return {"Length" : "length"}
 		
-	def execute(self, list):
-		try:
-			return len(list)
-		except:
-			return 0
+	def useInLineExecution(self):
+		return True
+	def getInLineExecutionString(self, outputUse):
+		return """
+try: $length$ = len(%list%)
+except: $length$ = 0 """
 
