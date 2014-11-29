@@ -13,11 +13,14 @@ class mn_GetListLengthNode(Node, AnimationNode):
 		self.outputs.new("mn_IntegerSocket", "Length")
 		allowCompiling()
 		
-	def execute(self, input):
-		output = {}
+	def getInputSocketNames(self):
+		return {"List" : "list"}
+	def getOutputSocketNames(self):
+		return {"Length" : "length"}
+		
+	def execute(self, list):
 		try:
-			output["Length"] = len(input["List"])
+			return len(list)
 		except:
-			output["Length"] = 0
-		return output
+			return 0
 
