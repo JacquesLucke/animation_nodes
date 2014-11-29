@@ -20,11 +20,16 @@ class mn_ShuffleListNode(Node, AnimationNode):
 	def getOutputSocketNames(self):
 		return {"Shuffled List" : "shuffledList"}
 		
-	def execute(self, list, seed):
-		random.seed(seed)
-		list = list[:] # make a new copy of this list
-		random.shuffle(list)
-		return list
+	def useInLineExecution(self):
+		return True
+	def getInLineExecutionString(self, outputUse):
+		return """
+random.seed(%seed%)
+$shuffledList$ = %list%[:]
+random.shuffle($shuffledList$) """
+
+	def getModuleList(self):
+		return ["random"]
 		
 	def update(self):
 		nodeTree = self.id_data
