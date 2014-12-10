@@ -18,6 +18,7 @@ class mn_ObjectMatrixOutputNode(Node, AnimationNode):
 		forbidCompiling()
 		self.inputs.new("mn_ObjectSocket", "Object").showName = False
 		self.inputs.new("mn_MatrixSocket", "Matrix")
+		self.outputs.new("mn_ObjectSocket", "Object")
 		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
@@ -27,7 +28,7 @@ class mn_ObjectMatrixOutputNode(Node, AnimationNode):
 		return {"Object" : "object",
 				"Matrix" : "matrix"}
 	def getOutputSocketNames(self):
-		return {}
+		return {"Object" : "object"}
 		
 	def useInLineExecution(self):
 		return True
@@ -39,6 +40,7 @@ class mn_ObjectMatrixOutputNode(Node, AnimationNode):
 		if t == "LOCAL": codeLines.append("    %object%.matrix_local = %matrix%")
 		if t == "PARENT INVERSE": codeLines.append("    %object%.matrix_parent_inverse = %matrix%")
 		if t == "WORLD": codeLines.append("    %object%.matrix_world = %matrix%")
+		codeLines.append("$object$ = %object%")
 		return "\n".join(codeLines)
 
 
