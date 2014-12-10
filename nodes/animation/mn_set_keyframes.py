@@ -14,11 +14,6 @@ class mn_KeyframePath(bpy.types.PropertyGroup):
 class mn_SetKeyframesNode(Node, AnimationNode):
 	bl_idname = "mn_SetKeyframesNode"
 	bl_label = "Set Keyframes"
-	
-	def selectedPathTypeChanged(self, context):
-		type = self.selectedPathType
-		if type == "Location": self.attributePath == "location"
-		elif type == "Rotation": self.attributePath
 		
 	paths = bpy.props.CollectionProperty(type = mn_KeyframePath)
 	
@@ -28,12 +23,10 @@ class mn_SetKeyframesNode(Node, AnimationNode):
 	def init(self, context):
 		forbidCompiling()
 		self.width = 200
-		self.inputs.new("mn_BooleanSocket", "Enable")
+		self.inputs.new("mn_BooleanSocket", "Enable").value = False
 		self.inputs.new("mn_BooleanSocket", "Set Keyframe")
 		self.inputs.new("mn_BooleanSocket", "Remove Unwanted")
 		self.inputs.new("mn_ObjectSocket", "Object")
-		self.newPath("location")
-		self.newPath("rotation_euler")
 		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
@@ -67,12 +60,23 @@ class mn_SetKeyframesNode(Node, AnimationNode):
 		frame = getCurrentFrame()
 		if setKeyframe:
 			for item in self.paths:
-				try: object.keyframe_insert(data_path = item.path, frame = frame, index = item.index)
+				try:
+					obj, path = self.getResolvedNestedPath(object, item.path)
+					obj.keyframe_insert(data_path = path, frame = frame, index = item.index)
 				except: pass
 		elif removeUnwanted:
 			for item in self.paths:
-				try: object.keyframe_delete(data_path = item.path, frame = frame, index = item.index)
+				try:
+					obj, path = self.getResolvedNestedPath(object, item.path)
+					obj.keyframe_delete(data_path = path, frame = frame, index = item.index)
 				except: pass
+				
+	def getResolvedNestedPath(self, object, path):
+		index = path.find(".")
+		if index == -1: return object, path
+		else:
+			data = eval("object." + path[:index])
+			return data, path[index+1:]
 			
 	def newPath(self, path, index = -1):
 		item = self.paths.add()
