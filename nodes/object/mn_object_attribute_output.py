@@ -7,20 +7,32 @@ class mn_ObjectAttributeOutputNode(Node, AnimationNode):
 	bl_idname = "mn_ObjectAttributeOutputNode"
 	bl_label = "Object Attribute Output"
 	
+	attribute = bpy.props.StringProperty(default = "", name = "Attribute")
+	
 	def init(self, context):
 		forbidCompiling()
+		self.width = 200
 		self.inputs.new("mn_ObjectSocket", "Object").showName = False
-		self.inputs.new("mn_StringSocket", "Attribute").string = ""
 		self.inputs.new("mn_GenericSocket", "Value")
+		self.outputs.new("mn_ObjectSocket", "Object")
 		allowCompiling()
 		
-	def execute(self, input):
-		object = input["Object"]
-		attribute = input["Attribute"]
-		value = input["Value"]
-		try:
-			exec("object." + attribute + " = value")
-		except:
-			pass
-		return {}
+	def draw_buttons(self, context, layout):
+		layout.prop(self, "attribute")
+		
+	def getInputSocketNames(self):
+		return {"Object" : "object",
+				"Value" : "value"}
+	def getOutputSocketNames(self):
+		return {"Object" : "object"}
+		
+	def useInLineExecution(self):
+		return True
+	def getInLineExecutionString(self, outputUse):
+		codeLines = [
+			"try:",
+			"    %object%." + self.attribute + " = %value%",
+			"except: pass",
+			"$object$ = %object%" ]
+		return "\n".join(codeLines)
 
