@@ -38,6 +38,11 @@ class mn_ReplicateObjectNode(Node, AnimationNode):
 		
 		layout.prop(self, "deepCopy", text = "Deep Copy")
 		
+	def draw_buttons_ext(self, context, layout):
+		unlink = layout.operator("mn.unlink_instances_from_node")
+		unlink.nodeTreeName = self.id_data.name
+		unlink.nodeName = self.name
+		
 	def getInputSocketNames(self):
 		return {"Object" : "sourceObject",
 				"Instances" : "instances"}
@@ -169,6 +174,11 @@ class mn_ReplicateObjectNode(Node, AnimationNode):
 		
 	def setObjectDataOnAllObjects(self):
 		self.setObjectData = True
+		
+	def unlinkInstancesFromNode(self):
+		self.linkedObjects.clear()
+		self.unlinkedObjects.clear()
+		self.inputs.get("Instances").number = 0
 			
 	def free(self):
 		self.unlinkAllObjects()
@@ -189,5 +199,18 @@ class SetObjectDataOnAllObjects(bpy.types.Operator):
 	def execute(self, context):
 		node = getNode(self.nodeTreeName, self.nodeName)
 		node.setObjectDataOnAllObjects()
+		return {'FINISHED'}
+		
+class UnlinkInstancesFromNode(bpy.types.Operator):
+	bl_idname = "mn.unlink_instances_from_node"
+	bl_label = "Unlink Instances from Node"
+	bl_description = "This will make sure that the objects won't be removed if you remove the Replicate Node."
+	
+	nodeTreeName = bpy.props.StringProperty()
+	nodeName = bpy.props.StringProperty()
+	
+	def execute(self, context):
+		node = getNode(self.nodeTreeName, self.nodeName)
+		node.unlinkInstancesFromNode()
 		return {'FINISHED'}
 

@@ -3,8 +3,8 @@ from bpy.types import Node
 from animation_nodes.mn_node_base import AnimationNode
 from animation_nodes.mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 
-class mn_ObjectOutputNode(Node, AnimationNode):
-	bl_idname = "mn_ObjectOutputNode"
+class mn_ObjectTransformsOutput(Node, AnimationNode):
+	bl_idname = "mn_ObjectTransformsOutput"
 	bl_label = "Transforms Output"
 	
 	def checkedPropertiesChanged(self, context):
@@ -21,6 +21,8 @@ class mn_ObjectOutputNode(Node, AnimationNode):
 		self.inputs.new("mn_VectorSocket", "Location")
 		self.inputs.new("mn_VectorSocket", "Rotation")
 		self.inputs.new("mn_VectorSocket", "Scale").vector = (1, 1, 1)
+		self.outputs.new("mn_ObjectSocket", "Object")
+		self.updateSocketVisibility()
 		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
@@ -53,7 +55,7 @@ class mn_ObjectOutputNode(Node, AnimationNode):
 				"Rotation" : "rotation",
 				"Scale" : "scale"}
 	def getOutputSocketNames(self):
-		return {}
+		return {"Object" : "object"}
 		
 	def useInLineExecution(self):
 		return True
@@ -90,6 +92,8 @@ class mn_ObjectOutputNode(Node, AnimationNode):
 				useRot[0] or useRot[1] or useRot[2] or
 				useScale[0] or useScale[1] or useScale[2]):
 			codeLines = []
+			
+		codeLines.append("$object$ = %object%")
 		return "\n".join(codeLines)
 
 
