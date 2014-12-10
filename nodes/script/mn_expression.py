@@ -4,27 +4,22 @@ from animation_nodes.mn_node_base import AnimationNode
 from animation_nodes.mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 from animation_nodes.mn_utils import *
 
-defaultVariableNames = list("abcdefghijklmnopqrstuvwxyz")
+defaultVariableNames = list("xyzwabcdefghijklmnopqrstuv")
 
 class mn_ExpressionNode(Node, AnimationNode):
 	bl_idname = "mn_ExpressionNode"
 	bl_label = "Expression"
 	
-	expression = bpy.props.StringProperty(default = "a+b", update = nodeTreeChanged, description = "Python Expression (math module is imported)")
+	expression = bpy.props.StringProperty(default = "x", update = nodeTreeChanged, description = "Python Expression (math module is imported)")
 	isExpressionValid = bpy.props.BoolProperty(default = True)
 	
 	def init(self, context):
 		forbidCompiling()
-		aSocket = self.inputs.new("mn_GenericSocket", "a")
-		aSocket.editableCustomName = True
-		aSocket.customName = "a"
-		aSocket.customNameIsVariable = True
-		aSocket.removeable = True
-		bSocket = self.inputs.new("mn_GenericSocket", "b")
-		bSocket.editableCustomName = True
-		bSocket.customName = "b"
-		bSocket.customNameIsVariable = True
-		bSocket.removeable = True
+		socket = self.inputs.new("mn_GenericSocket", "x")
+		socket.editableCustomName = True
+		socket.customName = "x"
+		socket.customNameIsVariable = True
+		socket.removeable = True
 		self.inputs.new("mn_EmptySocket", "...").passiveSocketType = "mn_GenericSocket"
 		self.outputs.new("mn_GenericSocket", "Result")
 		allowCompiling()
