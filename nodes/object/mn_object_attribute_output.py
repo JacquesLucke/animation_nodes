@@ -1,13 +1,14 @@
 import bpy
 from bpy.types import Node
 from animation_nodes.mn_node_base import AnimationNode
-from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_utils import *
 
 class mn_ObjectAttributeOutputNode(Node, AnimationNode):
 	bl_idname = "mn_ObjectAttributeOutputNode"
 	bl_label = "Object Attribute Output"
 	
-	attribute = bpy.props.StringProperty(default = "", name = "Attribute")
+	attribute = bpy.props.StringProperty(default = "", name = "Attribute", update = nodeTreeChanged)
 	
 	def init(self, context):
 		forbidCompiling()
@@ -34,5 +35,7 @@ class mn_ObjectAttributeOutputNode(Node, AnimationNode):
 			"    %object%." + self.attribute + " = %value%",
 			"except: pass",
 			"$object$ = %object%" ]
-		return "\n".join(codeLines)
+		if isValidCode(self.attribute) and self.attribute != "":
+			return "\n".join(codeLines)
+		return "$object$ = %object%"
 

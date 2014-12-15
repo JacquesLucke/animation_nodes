@@ -18,7 +18,7 @@ Created by Jacques Lucke
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import bpy, random
+import bpy, random, ast
 	
 # simple general functions
 ##########################
@@ -135,3 +135,14 @@ def getOriginSocket(socket):
 		
 def hasLinks(socket):
 	return len(socket.links) > 0
+	
+	
+# code
+########################
+
+def isValidCode(code):
+	try:
+		ast.parse(code)
+	except SyntaxError:
+		return False
+	return True

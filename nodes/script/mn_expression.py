@@ -1,4 +1,4 @@
-import bpy, ast
+import bpy
 from bpy.types import Node
 from animation_nodes.mn_node_base import AnimationNode
 from animation_nodes.mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
@@ -111,10 +111,3 @@ class mn_ExpressionNode(Node, AnimationNode):
 				customNames.append(socket.customName)
 		return customNames
 		
-def isValidCode(code):
-	try:
-		ast.parse(code)
-	except SyntaxError:
-		return False
-	return True
-
