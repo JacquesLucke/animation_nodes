@@ -2,6 +2,7 @@ import bpy
 from bpy.types import Node
 from animation_nodes.mn_node_base import AnimationNode
 from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from animation_nodes.utils.mn_mesh_utils import *
 
 class mn_ObjectMeshInfo(Node, AnimationNode):
 	bl_idname = "mn_ObjectMeshInfo"
@@ -10,28 +11,17 @@ class mn_ObjectMeshInfo(Node, AnimationNode):
 	def init(self, context):
 		forbidCompiling()
 		self.inputs.new("mn_ObjectSocket", "Object").showName = False
-		self.outputs.new("mn_VertexListSocket", "Vertices")
 		self.outputs.new("mn_PolygonListSocket", "Polygons")
 		allowCompiling()
 		
 	def getInputSocketNames(self):
 		return {"Object" : "object"}
 	def getOutputSocketNames(self):
-		return {"Vertices" : "vertices",
-				"Polygons" : "polygons"}
+		return {"Polygons" : "polygons"}
 		
-	def useInLineExecution(self):
-		return True
-	def getInLineExecutionString(self, outputUse):
-		codeLines = []
-		codeLines.append("$vertices$ = []")
-		codeLines.append("$polygons$ = []")
-		codeLines.append("try:")
-		codeLines.append("    for vertex in %object%.data.vertices:")
-		codeLines.append("        $vertices$.append([vertex.co, vertex.normal, vertex.index, %object%])")
-		codeLines.append("    for polygon in %object%.data.polygons:")
-		codeLines.append("        $polygons$.append([polygon.center, polygon.normal, polygon.area, polygon.material_index, %object%])")
-		codeLines.append("except: pass")
-		return "\n".join(codeLines)
+	def execute(self, object):
+		if object is None: return []
+		if object.type != "MESH": return []
+		return get_faces_from_mesh(object.data)
 		
 

@@ -5,8 +5,8 @@ class Face:
     def __init__(self, 
 				vertex_positions = [], 
 				area = 0, 
-				center = mathutils.Vector((0, 0, 0)), 
-				normal = mathutils.Vector((0, 0, 0)),
+				center = Vector((0, 0, 0)), 
+				normal = Vector((0, 0, 0)),
 				material_index = 0):
         self.vertices = vertex_positions
         self.area = area
