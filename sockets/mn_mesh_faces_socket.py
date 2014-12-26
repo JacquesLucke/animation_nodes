@@ -1,7 +1,6 @@
 import bpy
 from animation_nodes.mn_execution import nodePropertyChanged
 from animation_nodes.mn_node_base import *
-from animation_nodes.utils.mn_mesh_utils import Face
 from mathutils import Matrix
 
 class mn_MeshFaces(mn_BaseSocket, mn_SocketProperties):
