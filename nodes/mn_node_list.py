@@ -64,7 +64,7 @@ def getNodeNameDictionary():
 	nodes.append(("Mesh", [
 		("mn_ObjectMeshInfo", "Object Mesh Info"),
 		("mn_TransformPolygon", "Transform Polygon"),
-		("mn_SetPolygonsOnObject", "Set Polygons on Object") ] ))
+		("mn_SetMeshOnObject", "Set Mesh on Object") ] ))
 		
 	nodes.append(("List", [
 		("mn_GetListElementNode", "Get Element"),

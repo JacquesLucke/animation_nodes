@@ -10,7 +10,7 @@ class mn_MeshSocket(mn_BaseSocket, mn_SocketProperties):
 	drawColor = (1.0, 0.9, 0.6, 1)
 	
 	def drawInput(self, layout, node, text):
-		layout.prop(self, "color", text = text)
+		layout.label(text)
 		
 	def getValue(self):
 		return bmesh.new()
