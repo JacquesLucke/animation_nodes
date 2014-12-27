@@ -3,7 +3,6 @@ from bpy.types import Node
 from animation_nodes.mn_node_base import AnimationNode
 from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from animation_nodes.utils.mn_mesh_utils import *
-import bmesh
 
 class mn_SetMeshOnObject(Node, AnimationNode):
 	bl_idname = "mn_SetMeshOnObject"
@@ -21,12 +20,12 @@ class mn_SetMeshOnObject(Node, AnimationNode):
 		
 	def getInputSocketNames(self):
 		return {"Object" : "object",
-				"Mesh" : "bmesh"}
+				"Mesh" : "bm"}
 	def getOutputSocketNames(self):
 		return {"Object" : "object"}
 		
-	def execute(self, object, bmesh):
+	def execute(self, object, bm):
 		if object is None: return object
 		if object.type == "MESH":
-			bmesh.to_mesh(object.data)
+			bm.to_mesh(object.data)
 		return object
