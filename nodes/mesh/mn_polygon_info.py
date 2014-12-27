@@ -12,12 +12,18 @@ class mn_PolygonInfo(Node, AnimationNode):
 		forbidCompiling()
 		self.inputs.new("mn_PolygonSocket", "Polygon")
 		self.outputs.new("mn_VectorSocket", "Center")
+		self.outputs.new("mn_VectorSocket", "Normal")
+		self.outputs.new("mn_VectorSocket", "Material Index")
+		self.outputs.new("mn_FloatSocket", "Area")
 		allowCompiling()
 		
 	def getInputSocketNames(self):
 		return {"Polygon" : "polygon"}
 	def getOutputSocketNames(self):
-		return {"Center" : "center"}
+		return {"Center" : "center",
+				"Normal" : "normal",
+				"Material Index" : "materialIndex",
+				"Area" : "area"}
 		
 	def execute(self, polygon):
-		return polygon.center
+		return polygon.center, polygon.normal, polygon.materialIndex, polygon.area
