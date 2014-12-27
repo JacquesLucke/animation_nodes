@@ -67,6 +67,8 @@ def getNodeNameDictionary():
 		("mn_TransformVertex", "Transform Vertex"),
 		("mn_PolygonInfo", "Polygon Info"),
 		("mn_TransformPolygon", "Transform Polygon"),
+		("mn_MeshRecalculateFaceNormals", "Recalculate Normals"),
+		("mn_MeshRemoveDoubles", "Remove Doubles"),
 		("mn_CreateMeshFromData", "Create Mesh from Data"),
 		("mn_SetMeshOnObject", "Set Mesh on Object") ] ))
 		

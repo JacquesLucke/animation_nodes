@@ -5,7 +5,7 @@ from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, fo
 
 class mn_MeshRecalculateFaceNormals(Node, AnimationNode):
 	bl_idname = "mn_MeshRecalculateFaceNormals"
-	bl_label = "Calculate Face Normals"
+	bl_label = "Recalculate Face Normals"
 	
 	def init(self, context):
 		forbidCompiling()
