@@ -16,15 +16,15 @@ class mn_GetListElementNode(Node, AnimationNode):
 		
 	def getInputSocketNames(self):
 		return {"List" : "list",
-				"Index" : "index"}
+				"Index" : "index",
+				"Fallback" : "fallback"}
 	def getOutputSocketNames(self):
 		return {"Element" : "element"}
 		
-	def execute(self, list, index):
-		length = len(list)
-		if length == 0: return self.outputs.get("Element").getValue()
-		index = min(max(index, 0), length - 1)
-		return list[index]
+	def execute(self, list, index, fallback):
+		if 0 <= index < len(list): 
+			return list[index]
+		return fallback
 		
 	def update(self):
 		nodeTree = self.id_data
@@ -52,6 +52,7 @@ class mn_GetListElementNode(Node, AnimationNode):
 		self.outputs.clear()
 		self.inputs.new(listIdName, "List")
 		self.inputs.new("mn_IntegerSocket", "Index")
+		self.inputs.new(baseIdName, "Fallback")
 		self.outputs.new(baseIdName, "Element")
 		allowCompiling()
 
