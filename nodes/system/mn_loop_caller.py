@@ -44,6 +44,9 @@ class mn_LoopCallerNode(Node, AnimationNode):
 		setActive.nodeName = self.name
 		col.label("Active: \"" + self.activeLoop + "\"")
 		
+		if self.getStartNode() is None:
+			layout.label("Cannot find Loop", icon = "ERROR")
+		
 	def updateSockets(self, socketStartValue = (None, None)):
 		forbidCompiling()
 		startNode = self.getStartNode()

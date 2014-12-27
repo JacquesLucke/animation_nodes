@@ -23,6 +23,7 @@ class mn_LoopStartNode(Node, AnimationNode):
 			self.nameIsChanging = True
 			self.loopName = self.getNotUsedLoopName(prefix = self.loopName)
 			self.nameIsChanging = False
+			nodeTreeChanged()
 	def presetChanged(self, context):
 		self.buildPreset()
 	
