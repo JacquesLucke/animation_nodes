@@ -15,6 +15,7 @@ class mn_PolygonInfo(Node, AnimationNode):
 		self.outputs.new("mn_VectorSocket", "Normal")
 		self.outputs.new("mn_VectorSocket", "Material Index")
 		self.outputs.new("mn_FloatSocket", "Area")
+		self.outputs.new("mn_VertexListSocket", "Vertices")
 		allowCompiling()
 		
 	def getInputSocketNames(self):
@@ -23,7 +24,8 @@ class mn_PolygonInfo(Node, AnimationNode):
 		return {"Center" : "center",
 				"Normal" : "normal",
 				"Material Index" : "materialIndex",
-				"Area" : "area"}
+				"Area" : "area",
+				"Vertices" : "vertices"}
 		
 	def execute(self, polygon):
-		return polygon.center, polygon.normal, polygon.materialIndex, polygon.area
+		return polygon.center, polygon.normal, polygon.materialIndex, polygon.area, polygon.vertices

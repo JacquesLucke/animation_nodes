@@ -2,17 +2,20 @@ import bpy, bmesh
 from mathutils import Vector
 
 class Polygon:
-    def __init__(self, 
+	def __init__(self, 
 				vertex_positions = [], 
 				area = 0, 
 				center = Vector((0, 0, 0)), 
 				normal = Vector((0, 0, 1)),
 				materialIndex = 0):
-        self.vertices = vertex_positions
-        self.area = area
-        self.center = center
-        self.normal = normal
-        self.materialIndex = materialIndex
+		self.vertices = vertex_positions
+		self.area = area
+		self.center = center
+		self.normal = normal
+		self.materialIndex = materialIndex
+		
+	def __repr__(self):
+		return "Polygon - Center: " + str(self.center) + " Vertices: " + str(len(self.vertices))
 		
 class Vertex:
 	def __init__(self,
@@ -26,6 +29,9 @@ class Vertex:
 	@classmethod
 	def fromMeshVertex(cls, v):
 		return Vertex(v.co, v.normal, [groupWeight.weight for groupWeight in v.groups])
+		
+	def __repr__(self):
+		return "Vertex - " + str(self.location)
 		
 def getPolygonsFromMesh(mesh):
 	polygons = []
