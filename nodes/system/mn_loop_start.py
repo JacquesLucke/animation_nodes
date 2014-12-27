@@ -49,7 +49,7 @@ class mn_LoopStartNode(Node, AnimationNode):
 		newNode.use_transform = True
 		newNode.type = "mn_LoopCallerNode"
 		setting = newNode.settings.add()
-		setting.name = "selectedLoop"
+		setting.name = "activeLoop"
 		setting.value = repr(self.loopName)
 		
 	def execute(self, input):
@@ -122,13 +122,13 @@ class mn_LoopStartNode(Node, AnimationNode):
 		return socket
 		
 	def updateCallerNodes(self, socketStartValue = (None, None)):
-		nodes = getNodesFromTypeWithAttribute("mn_LoopCallerNode", "selectedLoop", self.loopName)
+		nodes = getNodesFromTypeWithAttribute("mn_LoopCallerNode", "activeLoop", self.loopName)
 		for node in nodes:
-			node.updateSockets(self, socketStartValue)
+			node.updateSockets(socketStartValue)
 		nodeTreeChanged()
 		
 	def clearCallerNodes(self):
-		nodes = getNodesFromTypeWithAttribute("mn_LoopCallerNode", "selectedLoop", self.loopName)
+		nodes = getNodesFromTypeWithAttribute("mn_LoopCallerNode", "activeLoop", self.loopName)
 		for node in nodes:
 			node.loopRemoved()
 			

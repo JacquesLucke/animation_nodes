@@ -25,32 +25,39 @@ class mn_LoopCallerNode(Node, AnimationNode):
 		self.updateSockets(self.getStartNode())
 		nodeTreeChanged()
 	
-	selectedLoop = bpy.props.EnumProperty(items = getStartLoopNodeItems, name = "Loop", update=selectedLoopChanged)
+	
+	selectedLoop = bpy.props.EnumProperty(items = getStartLoopNodeItems, name = "Selected Loop")
+	activeLoop = bpy.props.StringProperty(name = "Active Loop", update = selectedLoopChanged)
 	
 	def init(self, context):
 		forbidCompiling()
-		self.updateSockets(self.getStartNode())
+		self.updateSockets()
 		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
-		if self.selectedLoop == "NONE":
-			col = layout.column(align = True)
-			col.label("New Loop:")
-			for loopType in loopTypes:
-				row = col.row()
-				row.scale_y = 1.3
-				newNode = row.operator("node.add_node", text = loopType[0], icon = "PLUS")
-				newNode.use_transform = True
-				newNode.type = "mn_LoopStartNode"
-				setting = newNode.settings.add()
-				setting.name = "preset"
-				setting.value = repr(loopType[1])
-		else:
-			layout.prop(self, "selectedLoop")
-		layout.separator()
+	
+		col = layout.column(align = True)
+		col.label("New Loop:")
+		for loopType in loopTypes:
+			row = col.row()
+			row.scale_y = 1.3
+			newNode = row.operator("node.add_node", text = loopType[0], icon = "PLUS")
+			newNode.use_transform = True
+			newNode.type = "mn_LoopStartNode"
+			setting = newNode.settings.add()
+			setting.name = "preset"
+			setting.value = repr(loopType[1])
 		
-	def updateSockets(self, startNode, socketStartValue = (None, None)):
+		row = layout.row(align = True)
+		row.prop(self, "selectedLoop", text = "")
+		setActive = row.operator("mn.update_active_loop", text = "", icon = "FILE_REFRESH")
+		setActive.nodeTreeName = self.id_data.name
+		setActive.nodeName = self.name
+		layout.label("Loop: " + self.activeLoop)
+		
+	def updateSockets(self, socketStartValue = (None, None)):
 		forbidCompiling()
+		startNode = self.getStartNode()
 		if startNode is None:
 			self.resetSockets()
 		else:
@@ -91,5 +98,20 @@ class mn_LoopCallerNode(Node, AnimationNode):
 		return listSocketType
 
 	def getStartNode(self):
-		return getNodeFromTypeWithAttribute("mn_LoopStartNode", "loopName", self.selectedLoop)
+		return getNodeFromTypeWithAttribute("mn_LoopStartNode", "loopName", self.activeLoop)
+		
+	def updateActiveLoop(self):
+		self.activeLoop = self.selectedLoop
+		self.updateSockets()
 
+class UpdateActiveLoop(bpy.types.Operator):
+	bl_idname = "mn.update_active_loop"
+	bl_label = "Update Active Loop"
+	
+	nodeTreeName = bpy.props.StringProperty()
+	nodeName = bpy.props.StringProperty()
+	
+	def execute(self, context):
+		node = getNode(self.nodeTreeName, self.nodeName)
+		node.updateActiveLoop()
+		return {'FINISHED'}
