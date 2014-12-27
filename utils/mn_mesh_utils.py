@@ -42,10 +42,10 @@ def getPolygonsFromMesh(mesh):
 		polygons.append(Polygon(vertices, polygon.area, polygon.center, polygon.normal, polygon.material_index))
 	return polygons
 	
-def getBmeshFromPolygons(polygons):
-	return getBmeshFromMeshPydata(*getMeshPydataFromPolygons(polygons))
+def getBMeshFromPolygons(polygons):
+	return getBMeshFromMeshPydata(*getMeshPydataFromPolygons(polygons))
 	
-def getBmeshFromMeshPydata(vertexData, edgeData, faceData):
+def getBMeshFromMeshPydata(vertexData, edgeData, faceData):
 	bm = bmesh.new()
 	for co in vertexData:
 		bm.verts.new(co)

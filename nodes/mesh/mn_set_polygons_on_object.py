@@ -32,7 +32,7 @@ class mn_SetPolygonsOnObject(Node, AnimationNode):
 	def execute(self, object, polygons):
 		if object is None: return object
 		if object.type != "MESH": return object
-		bm = getBmeshFromPolygons(polygons)
+		bm = getBMeshFromPolygons(polygons)
 		if self.removeDoubles:
 			bmesh.ops.remove_doubles(bm, verts = bm.verts, dist = 0.0001)
 		if self.calculateNormals:
