@@ -10,7 +10,7 @@ class mn_PolygonInfo(Node, AnimationNode):
 	
 	def init(self, context):
 		forbidCompiling()
-		self.inputs.new("mn_PolygonSocket", "Polygon").showName = False
+		self.inputs.new("mn_PolygonSocket", "Polygon")
 		self.outputs.new("mn_VectorSocket", "Center")
 		allowCompiling()
 		

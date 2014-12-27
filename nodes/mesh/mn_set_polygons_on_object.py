@@ -25,5 +25,5 @@ class mn_SetPolygonsOnObject(Node, AnimationNode):
 	def execute(self, object, polygons):
 		if object is None: return object
 		if object.type != "MESH": return object
-		replace_mesh_by_polygons(object.data, polygons)
+		replaceMeshWithPolygons(object.data, polygons)
 		return object

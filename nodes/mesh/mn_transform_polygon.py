@@ -24,11 +24,11 @@ class mn_TransformPolygon(Node, AnimationNode):
 		
 	def execute(self, polygon, matrix):
 		offsetMatrix = Matrix.Translation(polygon.center)
-		invertedOffsetMatrix = offsetMatrix.inverted()
-		vertices = polygon.vertices
-		for i in range(len(vertices)):
-			vertex = vertices[i]
-			polygon.vertices[i] = offsetMatrix * matrix *  invertedOffsetMatrix * vertex
+		transfromMatrix = offsetMatrix * matrix * offsetMatrix.inverted()
+		
+		for vertex in polygon.vertices:
+			vertex.location = transfromMatrix * vertex.location
+		
 		return polygon
 		
 		

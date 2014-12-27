@@ -6,53 +6,61 @@ class Polygon:
 				vertex_positions = [], 
 				area = 0, 
 				center = Vector((0, 0, 0)), 
-				normal = Vector((0, 0, 0)),
-				material_index = 0):
+				normal = Vector((0, 0, 1)),
+				materialIndex = 0):
         self.vertices = vertex_positions
         self.area = area
         self.center = center
         self.normal = normal
-        self.material_index = material_index
+        self.materialIndex = materialIndex
 		
-def get_polygons_from_mesh(mesh):
+class Vertex:
+	def __init__(self,
+				location = Vector((0, 0, 0)),
+				normal = Vector((0, 0, 1)),
+				groupWeights = []):
+		self.location = location
+		self.normal = normal
+		self.groupWeights = groupWeights
+	
+	@classmethod
+	def fromMeshVertex(cls, v):
+		return Vertex(v.co, v.normal, [groupWeight.weight for groupWeight in v.groups])
+		
+def getPolygonsFromMesh(mesh):
 	polygons = []
 	for polygon in mesh.polygons:
 		vertices = []
 		for vertex_index in polygon.vertices:
-			vertices.append(mesh.vertices[vertex_index].co)
+			vertices.append(Vertex.fromMeshVertex(mesh.vertices[vertex_index]))
 		polygons.append(Polygon(vertices, polygon.area, polygon.center, polygon.normal, polygon.material_index))
 	return polygons
 	
-def new_mesh_from_polygons(polygons, name = "mesh"):
-	mesh = bpy.data.meshes.new(name = name)
-	mesh.from_pydata(*get_mesh_pydata_from_polygons(polygons))
-	return mesh
-	
-def replace_mesh_by_polygons(mesh, polygons):
-	bm = get_bmesh_from_mesh_pydata(*get_mesh_pydata_from_polygons(polygons))
+def replaceMeshWithPolygons(mesh, polygons):
+	bm = getBmeshFromMeshPydata(*getMeshPydataFromPolygons(polygons))
 	bm.to_mesh(mesh)
 	bm.free()
 	
-def get_bmesh_from_mesh_pydata(vertex_data, edge_data, face_data):
+def getBmeshFromMeshPydata(vertexData, edgeData, faceData):
 	bm = bmesh.new()
-	for co in vertex_data:
+	for co in vertexData:
 		bm.verts.new(co)
 	bm.verts.ensure_lookup_table()
-	for edge_indices in edge_data:
-		bm.edges.new((bm.verts[edge_indices[0]], bm.verts[edge_indices[1]]))
-	for face_indices in face_data:
-		bm.faces.new(tuple(bm.verts[index] for index in face_indices))
+	for edgeIndices in edgeData:
+		bm.edges.new((bm.verts[edgeIndices[0]], bm.verts[edgeIndices[1]]))
+	for faceIndices in faceData:
+		bm.faces.new(tuple(bm.verts[index] for index in faceIndices))
 	return bm
 	
-def get_mesh_pydata_from_polygons(polygons):
-	vertex_data = []
-	face_data = []
+def getMeshPydataFromPolygons(polygons):
+	vertexData = []
+	faceData = []
 	
 	index = 0
 	for polygon in polygons:
-		vertex_data.extend(polygon.vertices)
-		vertex_amount = len(polygon.vertices)
-		face_data.append(tuple(range(index, index + vertex_amount)))
-		index += vertex_amount
+		vertexData.extend([v.location for v in polygon.vertices])
+		vertexAmount = len(polygon.vertices)
+		faceData.append(tuple(range(index, index + vertexAmount)))
+		index += vertexAmount
 		
-	return vertex_data, [], face_data
+	return vertexData, [], faceData
