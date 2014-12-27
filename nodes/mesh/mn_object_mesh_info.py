@@ -22,6 +22,6 @@ class mn_ObjectMeshInfo(Node, AnimationNode):
 	def execute(self, object):
 		if object is None: return []
 		if object.type != "MESH": return []
-		return get_faces_from_mesh(object.data)
+		return get_polygons_from_mesh(object.data)
 		
 
