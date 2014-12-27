@@ -12,16 +12,18 @@ class mn_ObjectMeshInfo(Node, AnimationNode):
 		forbidCompiling()
 		self.inputs.new("mn_ObjectSocket", "Object").showName = False
 		self.outputs.new("mn_PolygonListSocket", "Polygons")
+		self.outputs.new("mn_VertexListSocket", "Vertices")
 		allowCompiling()
 		
 	def getInputSocketNames(self):
 		return {"Object" : "object"}
 	def getOutputSocketNames(self):
-		return {"Polygons" : "polygons"}
+		return {"Polygons" : "polygons",
+				"Vertices" : "vertices"}
 		
 	def execute(self, object):
 		if object is None: return []
 		if object.type != "MESH": return []
-		return getPolygonsFromMesh(object.data)
+		return getPolygonsFromMesh(object.data), getVerticesFromMesh(object.data)
 		
 

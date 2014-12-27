@@ -42,6 +42,12 @@ def getPolygonsFromMesh(mesh):
 		polygons.append(Polygon(vertices, polygon.area, polygon.center, polygon.normal, polygon.material_index))
 	return polygons
 	
+def getVerticesFromMesh(mesh):
+	vertices = []
+	for vertex in mesh.vertices:
+		vertices.append(Vertex.fromMeshVertex(vertex))
+	return vertices
+	
 def getBMeshFromPolygons(polygons):
 	return getBMeshFromMeshPydata(*getMeshPydataFromPolygons(polygons))
 	
@@ -68,3 +74,7 @@ def getMeshPydataFromPolygons(polygons):
 		index += vertexAmount
 		
 	return vertexData, [], faceData
+	
+def getMeshPydataFromVertices(vertices):
+	vertexData = [vertex.location for vertex in vertices]
+	return vertexData, [], []
