@@ -11,7 +11,8 @@ newOptionSocketName = "New Option"
 
 presets = {
 	"OBJECT" : ([("mn_ObjectSocket", "Object")], []),
-	"POLYGON" : ([("mn_PolygonSocket", "Polygon")], []) }
+	"POLYGON" : ([("mn_PolygonSocket", "Polygon")], []),
+	"VERTEX" : ([("mn_VertexSocket", "Vertex")], []) }
 
 class mn_LoopStartNode(Node, AnimationNode):
 	bl_idname = "mn_LoopStartNode"

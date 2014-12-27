@@ -6,7 +6,7 @@ from animation_nodes.mn_utils import *
 from animation_nodes.utils.mn_node_utils import *
 from animation_nodes.sockets.mn_socket_info import *
 
-loopTypes = [("Generic", "NONE"), ("Object", "OBJECT"), ("Polygon", "POLYGON")]
+loopTypes = [("Generic", "NONE"), ("Object", "OBJECT"), ("Polygon", "POLYGON"), ("Vertex", "VERTEX")]
 
 class mn_LoopCallerNode(Node, AnimationNode):
 	bl_idname = "mn_LoopCallerNode"
