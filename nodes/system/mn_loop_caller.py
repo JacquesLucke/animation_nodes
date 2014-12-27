@@ -22,7 +22,7 @@ class mn_LoopCallerNode(Node, AnimationNode):
 		if len(startLoopItems) == 0: startLoopItems.append(("NONE", "NONE", ""))
 		return startLoopItems
 	def selectedLoopChanged(self, context):
-		self.updateSockets(self.getStartNode())
+		self.updateSockets()
 		nodeTreeChanged()
 	
 	
@@ -34,26 +34,15 @@ class mn_LoopCallerNode(Node, AnimationNode):
 		self.updateSockets()
 		allowCompiling()
 		
-	def draw_buttons(self, context, layout):
-	
+	def draw_buttons(self, context, layout):	
 		col = layout.column(align = True)
-		col.label("New Loop:")
-		for loopType in loopTypes:
-			row = col.row()
-			row.scale_y = 1.3
-			newNode = row.operator("node.add_node", text = loopType[0], icon = "PLUS")
-			newNode.use_transform = True
-			newNode.type = "mn_LoopStartNode"
-			setting = newNode.settings.add()
-			setting.name = "preset"
-			setting.value = repr(loopType[1])
-		
-		row = layout.row(align = True)
+		col.operator("wm.call_menu", text = "New Loop").name = "mn.add_loop_node_menu"
+		row = col.row(align = True)
 		row.prop(self, "selectedLoop", text = "")
 		setActive = row.operator("mn.update_active_loop", text = "", icon = "FILE_REFRESH")
 		setActive.nodeTreeName = self.id_data.name
 		setActive.nodeName = self.name
-		layout.label("Loop: " + self.activeLoop)
+		col.label("Active: \"" + self.activeLoop + "\"")
 		
 	def updateSockets(self, socketStartValue = (None, None)):
 		forbidCompiling()
@@ -115,3 +104,17 @@ class UpdateActiveLoop(bpy.types.Operator):
 		node = getNode(self.nodeTreeName, self.nodeName)
 		node.updateActiveLoop()
 		return {'FINISHED'}
+		
+class AddLoopNodeMenu(bpy.types.Menu):
+	bl_idname = "mn.add_loop_node_menu"
+	bl_label = "New Loop"
+	
+	def draw(self, context):
+		layout = self.layout
+		for loopType in loopTypes:
+			newNode = layout.operator("node.add_node", text = loopType[0])
+			newNode.use_transform = True
+			newNode.type = "mn_LoopStartNode"
+			setting = newNode.settings.add()
+			setting.name = "preset"
+			setting.value = repr(loopType[1])		
