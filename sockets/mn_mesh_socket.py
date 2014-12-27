@@ -2,11 +2,11 @@ import bpy, bmesh
 from animation_nodes.mn_execution import nodePropertyChanged
 from animation_nodes.mn_node_base import *
 
-class mn_BMeshSocket(mn_BaseSocket, mn_SocketProperties):
-	bl_idname = "mn_BMeshSocket"
-	bl_label = "BMesh Socket"
-	dataType = "BMesh"
-	allowedInputTypes = ["BMesh"]
+class mn_MeshSocket(mn_BaseSocket, mn_SocketProperties):
+	bl_idname = "mn_MeshSocket"
+	bl_label = "Mesh Socket"
+	dataType = "Mesh"
+	allowedInputTypes = ["Mesh"]
 	drawColor = (1.0, 0.9, 0.6, 1)
 	
 	def drawInput(self, layout, node, text):
