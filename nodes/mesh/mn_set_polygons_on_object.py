@@ -5,8 +5,8 @@ from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, fo
 from animation_nodes.utils.mn_mesh_utils import *
 import bmesh
 
-class mn_SetMeshOnObject(Node, AnimationNode):
-	bl_idname = "mn_SetMeshOnObject"
+class mn_SetPolygonsOnObject(Node, AnimationNode):
+	bl_idname = "mn_SetPolygonsOnObject"
 	bl_label = "Set Mesh"
 	
 	def init(self, context):
