@@ -102,7 +102,6 @@ def sceneUpdateHandler(scene):
 @persistent
 def fileLoadHandler(scene):
 	generateExecutionUnits()
-	updateAnimationTrees()
 def nodePropertyChanged(self, context):
 	updateAnimationTrees("PROPERTY")
 def settingPropertyChanged(self, context):
