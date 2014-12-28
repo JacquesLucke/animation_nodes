@@ -63,14 +63,8 @@ def getPolygonsIndicesFromMesh(mesh):
 def getBMeshFromPolygons(polygons):
 	return getBMeshFromMeshPydata(*getMeshPydataFromPolygons(polygons))
 	
-def getBMeshFromVertices(vertices):
-	return getBMeshFromMeshPydata(*getMeshPydataFromVertices(vertices))
-	
-def getBMeshFromVerticesAndEdgesIndices(vertices, edgesIndices):
-	return getBMeshFromMeshPydata(*getMeshPydataFromVerticesAndEdgesIndices(vertices, edgesIndices))
-	
-def getBMeshFromVerticesAndPolygonsIndices(vertices, polygonsIndices):
-	return getBMeshFromMeshPydata(*getMeshPydataFromVerticesAndPolygonsIndices(vertices, polygonsIndices))
+def getBMeshFromVerticesAndIndices(vertices, edgesIndices, polygonsIndices):
+	return getBMeshFromMeshPydata(getLocationsFromVertices(vertices), edgesIndices, polygonsIndices)
 	
 def getBMeshFromMeshPydata(vertexData, edgeData, faceData):
 	bm = bmesh.new()
@@ -100,16 +94,6 @@ def getMeshPydataFromPolygons(polygons):
 		
 	return vertexData, [], faceData
 	
-def getMeshPydataFromVertices(vertices):
+def getLocationsFromVertices(vertices):
 	vertexData = [vertex.location for vertex in vertices]
-	return vertexData, [], []
-	
-def getMeshPydataFromVerticesAndEdgesIndices(vertices, edgesIndices):
-	vertexData = [vertex.location for vertex in vertices]
-	edgeData = edgesIndices
-	return vertexData, edgeData, []
-	
-def getMeshPydataFromVerticesAndPolygonsIndices(vertices, polygonsIndices):
-	vertexData = [vertex.location for vertex in vertices]
-	faceData = polygonsIndices
-	return vertexData, [], faceData
+	return vertexData
