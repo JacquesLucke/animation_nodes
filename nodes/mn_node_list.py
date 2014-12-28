@@ -119,6 +119,7 @@ def getNodeNameDictionary():
 		("mn_LoopStartNode", "Object Loop", {"preset" : repr("OBJECT")}),
 		("mn_GroupCaller", "Group Caller"),
 		("mn_GroupInput", "Group Input"),
-		("mn_GroupOutput", "Group Output") ] ))
+		("mn_GroupOutput", "Group Output"),
+		("mn_NetworkUpdateSettingsNode", "Update Settings") ] ))
 		
 	return nodes

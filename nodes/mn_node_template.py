@@ -1,30 +1,34 @@
 def getNormalNodeTemplate():
-	return '''
-import bpy
+	return '''import bpy
 from bpy.types import Node
 from animation_nodes.mn_node_base import AnimationNode
 from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
-from animation_nodes.mn_utils import *
 
+class mn_TransformText(Node, AnimationNode):
+	bl_idname = "mn_TransformText"
+	bl_label = "Transform Text"
 	
-class mn_YourNodeName(Node, AnimationNode):
-	bl_idname = "mn_YourNodeName"
-	bl_label = "Template Node"
-	node_category = "my category"
-
 	def init(self, context):
 		forbidCompiling()
-		self.inputs.new("StringSocket", "Text")
-		self.outputs.new("StringSocket", "Uppercase")
+		self.inputs.new("mn_StringSocket", "Text")
+		self.inputs.new("mn_BooleanSocket", "To Uppercase")
+		self.outputs.new("mn_StringSocket", "New Text")
 		allowCompiling()
 		
-	def draw_buttons(self, context, layout):
-		pass
+	def getInputSocketNames(self):
+		return {"Text" : "text",
+				"To Uppercase" : "toUpper"}
+	def getOutputSocketNames(self):
+		return {"New Text" : "newText"}
 		
-	def execute(self, input):
-		output = {}
-		output["Uppercase"] = input["Text"].upper()
-		return output
+	def execute(self, text, toUpper):
+		if toUpper:
+			newText = text.upper()
+		else:
+			newText = text.lower()
+		return newText
+
+
 '''
 
 def getAutoRegisterCode():
