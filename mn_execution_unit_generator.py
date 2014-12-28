@@ -20,7 +20,7 @@ class ExecutionUnit:
 			self.updateSettingsNode = (updateSettingsNode.id_data.name, updateSettingsNode.name)
 		else: self.updateSettingsNode = None
 		
-	def execute(self, event = "NONE"):
+	def execute(self, event = "NONE", sender = None):
 		update = bpy.context.scene.mn_settings.update
 		developer = bpy.context.scene.mn_settings.developer
 		
@@ -42,9 +42,11 @@ class ExecutionUnit:
 			onPropertyChange = node.settings.propertyChanged
 			onTreeChange = node.settings.treeChanged
 			skipFrames = node.settings.skipFramesAmount
-			forceExecution = node.settings.forceExecution
 			printTime = node.settings.printTime
 			unitName = node.settings.unitName
+			
+		if node is not None and node == sender and event == "FORCE":
+			forceExecution = True
 			
 		# don't use scene/property update when animation plays back
 		if event in ["SCENE", "PROPERTY", "FRAME"]:

@@ -10,13 +10,13 @@ from animation_nodes.utils.mn_node_utils import *
 COMPILE_BLOCKER = 0
 executionUnits = []
 
-def updateAnimationTrees(event = "NONE"):
+def updateAnimationTrees(event = "NONE", sender = None):
 	if COMPILE_BLOCKER == 0:
 		forbidCompiling()
 		
 		start = time.clock()
 		
-		secureExecution(event)
+		secureExecution(event, sender)
 		
 		if len(executionUnits) > 0 and event != "TREE":
 			bpy.context.scene.update()
@@ -27,22 +27,24 @@ def updateAnimationTrees(event = "NONE"):
 		
 		if bpy.context.scene.mn_settings.developer.printUpdateTime:
 			printTimeSpan("Update Time ", timeSpan)
+		
+		redraw_areas_if_possible()
 			
 		allowCompiling()
 		
-def secureExecution(event):
-	try: executeUnits(event)
+def secureExecution(event, sender):
+	try: executeUnits(event, sender)
 	except:
 		resetCompileBlocker()
 		generateExecutionUnits()
 		forbidCompiling()
-		try: executeUnits(event)
+		try: executeUnits(event, sender)
 		except Exception as e: print(e)
 		
 		
-def executeUnits(event):
+def executeUnits(event, sender):
 	for executionUnit in executionUnits:
-		executionUnit.execute(event)
+		executionUnit.execute(event, sender)
 			
 def allowCompiling():
 	global COMPILE_BLOCKER
@@ -110,7 +112,15 @@ def settingPropertyChanged(self, context):
 def nodeTreeChanged(self = None, context = None):
 	generateExecutionUnits()
 	updateAnimationTrees("TREE")
+def forceExecution(sender = None):
+	generateExecutionUnits()
+	updateAnimationTrees("FORCE", sender)
 	
+def redraw_areas_if_possible():
+	try:
+		for area in bpy.context.screen.areas:
+			area.tag_redraw()
+	except: print("cannot redraw")
 	
 bpy.app.handlers.frame_change_post.append(frameChangeHandler)
 bpy.app.handlers.scene_update_post.append(sceneUpdateHandler)

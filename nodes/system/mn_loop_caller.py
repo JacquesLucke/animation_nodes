@@ -38,7 +38,7 @@ class mn_LoopCallerNode(Node, AnimationNode):
 		setActive = row.operator("mn.update_active_loop", text = "", icon = "FILE_REFRESH")
 		setActive.nodeTreeName = self.id_data.name
 		setActive.nodeName = self.name
-		col.label("Active: \"" + self.activeLoop + "\"")
+		layout.label("Active: \"" + self.activeLoop + "\"")
 		
 		if self.getStartNode() is None:
 			layout.label("Cannot find Loop", icon = "ERROR")
