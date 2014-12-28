@@ -36,8 +36,13 @@ class mn_ObjectMeshInfo(Node, AnimationNode):
 		
 		cache = self.getInitializedCache()
 		
-		polygons = cacheFunctionResult(cache, object.name + "POLYGONS", getPolygonsFromMesh, [object.data], self.usePerObjectCache)
-		vertices = cacheFunctionResult(cache, object.name + "VERTICES", getVerticesFromMesh, [object.data], self.usePerObjectCache)
+		polygons = []
+		vertices = []
+		
+		if useOutput["Polygons"]:		
+			polygons = cacheFunctionResult(cache, object.name + "POLYGONS", getPolygonsFromMesh, [object.data], self.usePerObjectCache)
+		if useOutput["Vertices"]:
+			vertices = cacheFunctionResult(cache, object.name + "VERTICES", getVerticesFromMesh, [object.data], self.usePerObjectCache)
 		
 		return polygons, vertices
 		
