@@ -39,7 +39,7 @@ def getPolygonsFromMesh(mesh):
 		vertices = []
 		for vertex_index in polygon.vertices:
 			vertices.append(Vertex.fromMeshVertex(mesh.vertices[vertex_index]))
-		polygons.append(Polygon(vertices, polygon.area, polygon.center, polygon.normal, polygon.material_index))
+		polygons.append(Polygon(vertices, polygon.area, polygon.center.copy(), polygon.normal.copy(), polygon.material_index))
 	return polygons
 	
 def getVerticesFromMesh(mesh):
