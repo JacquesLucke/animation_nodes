@@ -35,10 +35,7 @@ def getLongTimeCache(identifier):
 	return longTimeCache.get(identifier)
 	
 def cacheFunctionResult(cacheDic, identifier, function, args, useCache):
-	if useCache:
-		if identifier not in cacheDic:
-			cacheDic[identifier] = function(*args)
-	else:
+	if not useCache or identifier not in cacheDic:
 		cacheDic[identifier] = function(*args)
 	return cacheDic[identifier]
 	
