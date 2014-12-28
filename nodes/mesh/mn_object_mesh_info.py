@@ -19,6 +19,8 @@ class mn_ObjectMeshInfo(Node, AnimationNode):
 		self.inputs.new("mn_ObjectSocket", "Object").showName = False
 		self.outputs.new("mn_PolygonListSocket", "Polygons")
 		self.outputs.new("mn_VertexListSocket", "Vertices")
+		self.outputs.new("mn_IntegerList2DSocket", "Edges Indices")
+		self.outputs.new("mn_IntegerList2DSocket", "Polygons Indices")
 		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
@@ -28,23 +30,31 @@ class mn_ObjectMeshInfo(Node, AnimationNode):
 		return {"Object" : "object"}
 	def getOutputSocketNames(self):
 		return {"Polygons" : "polygons",
-				"Vertices" : "vertices"}
+				"Vertices" : "vertices",
+				"Edges Indices" : "edgesIndices",
+				"Polygons Indices" : "polygonsIndices"}
 		
 	def execute(self, object, useOutput):
-		if object is None: return [], []
-		if object.type != "MESH": return [], []
+		if object is None: return [], [], [], []
+		if object.type != "MESH": return [], [], [], []
 		
 		cache = self.getInitializedCache()
 		
 		polygons = []
 		vertices = []
+		edgesIndices = []
+		polygonsIndices = []
 		
 		if useOutput["Polygons"]:		
 			polygons = cacheFunctionResult(cache, object.name + "POLYGONS", getPolygonsFromMesh, [object.data], self.usePerObjectCache)
 		if useOutput["Vertices"]:
 			vertices = cacheFunctionResult(cache, object.name + "VERTICES", getVerticesFromMesh, [object.data], self.usePerObjectCache)
+		if useOutput["Edges Indices"]:
+			edgesIndices = cacheFunctionResult(cache, object.name + "EDGES_INDICES", getEdgesIndicesFromMesh, [object.data], self.usePerObjectCache)
+		if useOutput["Polygons Indices"]:
+			polygonsIndices = cacheFunctionResult(cache, object.name + "POLYGONS_INDICES", getPolygonsIndicesFromMesh, [object.data], self.usePerObjectCache)
 		
-		return polygons, vertices
+		return polygons, vertices, edgesIndices, polygonsIndices
 		
 	def getInitializedCache(self):
 		cache = getLongTimeCache(cacheIdentifier)
