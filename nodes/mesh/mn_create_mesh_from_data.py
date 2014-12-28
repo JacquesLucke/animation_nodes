@@ -6,10 +6,8 @@ from animation_nodes.utils.mn_mesh_utils import *
 import bmesh
 
 creation_type_items = [
-	("POLYGONS", "Polygons", ""),
-	("VERTICES_ONLY", "Vertices only", ""),
-	("VERTICES_EDGES", "Vertices and Edges", ""),
-	("VERTICES_POLYGONS", "Vertices and Polygons", "") ]
+	("POLYGONS_ONLY", "Polygons only", ""),
+	("NORMAL", "Vertices and Indices", "") ]
 
 class mn_CreateMeshFromData(Node, AnimationNode):
 	bl_idname = "mn_CreateMeshFromData"
@@ -42,14 +40,10 @@ class mn_CreateMeshFromData(Node, AnimationNode):
 		return {"Mesh" : "mesh"}
 		
 	def execute(self, polygons, vertices, edgesIndices, polygonsIndices):
-		if self.creation_type == "POLYGONS":
+		if self.creation_type == "POLYGONS_ONLY":
 			return getBMeshFromPolygons(polygons)
-		if self.creation_type == "VERTICES_ONLY":
-			return getBMeshFromVertices(vertices)
-		if self.creation_type == "VERTICES_EDGES":
-			return getBMeshFromVerticesAndEdgesIndices(vertices, edgesIndices)
-		if self.creation_type == "VERTICES_POLYGONS":
-			return getBMeshFromVerticesAndPolygonsIndices(vertices, polygonsIndices)
+		if self.creation_type == "NORMAL":
+			return getBMeshFromVerticesAndIndices(vertices, edgesIndices, polygonsIndices)
 		return bmesh.new()
 		
 	def changeHideStatusOfSockets(self):
@@ -58,13 +52,9 @@ class mn_CreateMeshFromData(Node, AnimationNode):
 		self.inputs["Edges Indices"].hide = True
 		self.inputs["Polygons Indices"].hide = True
 		
-		if self.creation_type == "POLYGONS":
+		if self.creation_type == "POLYGONS_ONLY":
 			self.inputs["Polygons"].hide = False
-		if self.creation_type == "VERTICES_ONLY":
-			self.inputs["Vertices"].hide = False
-		if self.creation_type == "VERTICES_EDGES":
+		if self.creation_type == "NORMAL":
 			self.inputs["Vertices"].hide = False
 			self.inputs["Edges Indices"].hide = False
-		if self.creation_type == "VERTICES_POLYGONS":
-			self.inputs["Vertices"].hide = False
 			self.inputs["Polygons Indices"].hide = False
