@@ -21,13 +21,9 @@ class mn_LoopCallerNode(Node, AnimationNode):
 			startLoopItems.append((loopName, loopName, ""))
 		if len(startLoopItems) == 0: startLoopItems.append(("NONE", "NONE", ""))
 		return startLoopItems
-	def selectedLoopChanged(self, context):
-		self.updateSockets()
-		nodeTreeChanged()
-	
 	
 	selectedLoop = bpy.props.EnumProperty(items = getStartLoopNodeItems, name = "Selected Loop")
-	activeLoop = bpy.props.StringProperty(name = "Active Loop", update = selectedLoopChanged)
+	activeLoop = bpy.props.StringProperty(name = "Active Loop", default = "Loop")
 	
 	def init(self, context):
 		forbidCompiling()
@@ -95,6 +91,7 @@ class mn_LoopCallerNode(Node, AnimationNode):
 	def updateActiveLoop(self):
 		self.activeLoop = self.selectedLoop
 		self.updateSockets()
+		nodeTreeChanged()
 
 class UpdateActiveLoop(bpy.types.Operator):
 	bl_idname = "mn.update_active_loop"
