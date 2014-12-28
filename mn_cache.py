@@ -34,6 +34,14 @@ def setLongTimeCache(identifier, object):
 def getLongTimeCache(identifier):
 	return longTimeCache.get(identifier)
 	
+def cacheFunctionResult(cacheDic, identifier, function, args, useCache):
+	if useCache:
+		if identifier not in cacheDic:
+			cacheDic[identifier] = function(*args)
+	else:
+		cacheDic[identifier] = function(*args)
+	return cacheDic[identifier]
+	
 
 # random number cache
 ###############################

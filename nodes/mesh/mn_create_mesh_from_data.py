@@ -27,8 +27,7 @@ class mn_CreateMeshFromData(Node, AnimationNode):
 		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
-		row = layout.row(align = True)
-		row.prop(self, "creation_type")
+		layout.prop(self, "creation_type")
 		
 	def getInputSocketNames(self):
 		return {"Polygons" : "polygons",

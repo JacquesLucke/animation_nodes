@@ -28,7 +28,7 @@ class Vertex:
 	
 	@classmethod
 	def fromMeshVertex(cls, v):
-		return Vertex(v.co, v.normal, [groupWeight.weight for groupWeight in v.groups])
+		return Vertex(v.co.copy(), v.normal.copy(), [groupWeight.weight for groupWeight in v.groups])
 		
 	def __repr__(self):
 		return "Vertex - " + str(self.location)
