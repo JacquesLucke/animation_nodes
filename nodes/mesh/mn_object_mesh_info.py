@@ -22,8 +22,8 @@ class mn_ObjectMeshInfo(Node, AnimationNode):
 				"Vertices" : "vertices"}
 		
 	def execute(self, object):
-		if object is None: return []
-		if object.type != "MESH": return []
+		if object is None: return [], []
+		if object.type != "MESH": return [], []
 		return getPolygonsFromMesh(object.data), getVerticesFromMesh(object.data)
 		
 

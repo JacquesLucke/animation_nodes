@@ -51,6 +51,9 @@ def getVerticesFromMesh(mesh):
 def getBMeshFromPolygons(polygons):
 	return getBMeshFromMeshPydata(*getMeshPydataFromPolygons(polygons))
 	
+def getBMeshFromVertices(vertices):
+	return getBMeshFromMeshPydata(*getMeshPydataFromVertices(vertices))
+	
 def getBMeshFromMeshPydata(vertexData, edgeData, faceData):
 	bm = bmesh.new()
 	for co in vertexData:
