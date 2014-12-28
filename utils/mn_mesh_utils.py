@@ -58,7 +58,11 @@ def getBMeshFromMeshPydata(vertexData, edgeData, faceData):
 	bm = bmesh.new()
 	for co in vertexData:
 		bm.verts.new(co)
-	bm.verts.ensure_lookup_table()
+		
+	# for Blender Version >= 2.63
+	try: bm.verts.ensure_lookup_table()
+	except: pass
+	
 	for edgeIndices in edgeData:
 		bm.edges.new((bm.verts[edgeIndices[0]], bm.verts[edgeIndices[1]]))
 	for faceIndices in faceData:
