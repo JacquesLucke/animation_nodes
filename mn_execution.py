@@ -17,18 +17,16 @@ def updateAnimationTrees(event = "NONE", sender = None):
 		start = time.clock()
 		
 		secureExecution(event, sender)
-		
-		if len(executionUnits) > 0 and event != "TREE":
-			bpy.context.scene.update()
-			
-		resetForceUpdateProperties()
 		clearExecutionCache()
+		
 		timeSpan = time.clock() - start
 		
 		if bpy.context.scene.mn_settings.developer.printUpdateTime:
 			printTimeSpan("Update Time ", timeSpan)
-		
-		redraw_areas_if_possible()
+			
+		if len(executionUnits) > 0 and event != "TREE":
+			bpy.context.scene.update()
+			redraw_areas_if_possible()
 			
 		allowCompiling()
 		
@@ -55,13 +53,6 @@ def forbidCompiling():
 def resetCompileBlocker():
 	global COMPILE_BLOCKER
 	COMPILE_BLOCKER = 0
-	
-def resetForceUpdateProperties():
-	nodes = getNodesFromType("mn_NetworkUpdateSettingsNode")
-	try:
-		for node in nodes:
-			node.settings.forceExecution = False
-	except: pass
 			
 		
 		
