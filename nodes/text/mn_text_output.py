@@ -50,6 +50,8 @@ class mn_TextOutputNode(Node, AnimationNode):
 		self.inputs.new("mn_FloatSocket", "X Offset").number = 0.0
 		self.inputs.new("mn_FloatSocket", "Y Offset").number = 0.0
 		self.setHideProperty()
+		
+		self.outputs.new("mn_ObjectSocket", "Object")
 		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
@@ -82,12 +84,14 @@ class mn_TextOutputNode(Node, AnimationNode):
 				"X Offset" : "xOffset",
 				"Y Offset" : "yOffset"}
 	def getOutputSocketNames(self):
-		return {}
+		return {"Object": "object"}
 		
 	def useInLineExecution(self):
 		return True
 	def getInLineExecutionString(self, outputUse):
 		codeLines = []
+		if outputUse["Object"]:
+			codeLines.append("$object$ = %object%")
 		codeLines.append("if %object% is not None:")
 		codeLines.append("    textObject = None")
 		codeLines.append("    if %object%.type == 'FONT': textObject = %object%.data")
