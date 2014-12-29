@@ -42,7 +42,7 @@ def getNodeNameDictionary():
 		("mn_ObjectInfoNode", "Object Info"),
 		("mn_ObjectMatrixInput", "Object Matrices"),
 		("mn_ObjectKeyframeInput", "Keyframe"),
-		("mn_ReplicateObjectNode", "Replicate Object"),
+		("mn_ObjectInstancer", "Object Instancer"),
 		("mn_CopyObjectData", "Copy Data"),
 		("mn_ObjectAttributeInputNode", "Attribute Input"),
 		("mn_ObjectAttributeOutputNode", "Attribute Output"),

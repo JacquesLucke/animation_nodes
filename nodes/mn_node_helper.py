@@ -1,5 +1,6 @@
 import bpy
 from animation_nodes.utils.mn_node_utils import *
+from animation_nodes.utils.mn_name_utils import *
 
 mainObjectContainerName = "Animation Nodes Object Container"
 helperMaterialName = "Helper Material for Animation Nodes"
