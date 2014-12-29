@@ -29,6 +29,13 @@ def getPossibleCameraName(name = "camera"):
 		counter += 1
 	return name + randomString + str(counter)
 	
+def getPossibleLampName(name = "lamp"):
+	randomString = getRandomString(3)
+	counter = 1
+	while bpy.data.lamps.get(name + randomString + str(counter)) is not None:
+		counter += 1
+	return name + randomString + str(counter)
+	
 def getPossibleNodeName(nodeTree, name = "node"):
 	randomString = getRandomString(3)
 	counter = 1

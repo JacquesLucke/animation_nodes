@@ -7,7 +7,7 @@ from animation_nodes.nodes.mn_node_helper import *
 from animation_nodes.utils.mn_name_utils import *
 from animation_nodes.mn_cache import *
 
-objectTypes = ["Mesh", "Text", "Camera"]
+objectTypes = ["Mesh", "Text", "Camera", "Point Lamp"]
 objectTypeItems = [(type, type, "") for type in objectTypes]
 
 class mn_ObjectNamePropertyGroup(bpy.types.PropertyGroup):
@@ -60,13 +60,13 @@ class mn_ObjectInstancer(Node, AnimationNode):
 		unlink.nodeName = self.name
 		
 	def getInputSocketNames(self):
-		return {"Instances" : "instances",
+		return {"Instances" : "instancesAmount",
 				"Source" : "sourceObject"}
 	def getOutputSocketNames(self):
 		return {"Objects" : "objects",}
 		
-	def execute(self, instances, sourceObject):
-		instances = max(instances, 0)
+	def execute(self, instancesAmount, sourceObject):
+		instancesAmount = max(instancesAmount, 0)
 			
 		if self.copyFromSource and sourceObject is None:
 			self.removeAllObjects()
@@ -76,53 +76,43 @@ class mn_ObjectInstancer(Node, AnimationNode):
 			self.removeAllObjects()
 			self.resetInstances = False
 			
-		while instances < len(self.linkedObjects):
+		while instancesAmount < len(self.linkedObjects):
 			self.removeLastObject()
-					
-		objects = []
-		allObjects = bpy.data.objects
-		objectAmount = len(allObjects)
+			
+		return self.getOutputObjects(instancesAmount, sourceObject)
 		
-		outputObjectCounter = 0
-		currentIndex = 0
-		while(outputObjectCounter < instances):
-			useObject = False
-			incrementIndex = True
-			if currentIndex < len(self.linkedObjects):
-				item = self.linkedObjects[currentIndex]
-				searchName = item.objectName
-				if item.objectIndex < objectAmount:
-					object = allObjects[item.objectIndex]
-					if object.name == searchName: useObject = True
-					else:
-						index = allObjects.find(searchName)
-						if index != -1:
-							item.objectIndex = index
-							object = allObjects[index]
-							useObject = True
-						else:
-							self.removeObjectFromItemIndex(currentIndex)
-							incrementIndex = False
-				else: # duplicated code. have to find a cleaner solution
-					index = allObjects.find(searchName)
-					if index != -1:
-						item.objectIndex = index
-						object = allObjects[index]
-						useObject = True
-					else:
-						self.removeObjectFromItemIndex(currentIndex)
-						incrementIndex = False
+	def getOutputObjects(self, instancesAmount, sourceObject):
+		objects = []
+		objectAmount = len(bpy.data.objects)
+		counter = 0
+		
+		while(counter < instancesAmount):
+			if counter < len(self.linkedObjects):
+				object = self.getObjectFromItemIndex(counter, objectAmount)
+				if object is None:
+					self.removeObjectFromItemIndex(counter)
 			else:
 				object = self.appendNewObject(sourceObject)
-				useObject = True
-				incrementIndex = False
-			
-			if useObject: 
+				
+			if object is not None:
 				objects.append(object)
-				outputObjectCounter += 1
-			if incrementIndex: currentIndex += 1
-		
+				counter += 1
+			
 		return objects
+	
+	# at first try to get the object by index, because it's faster and then search by name
+	def getObjectFromItemIndex(self, itemIndex, objectAmount):
+		item = self.linkedObjects[itemIndex]
+		if item.objectIndex < objectAmount:
+			object = bpy.data.objects[item.objectIndex]
+			if object.name == item.objectName:
+				return object
+				
+		index = bpy.data.objects.find(item.objectName)
+		if index == -1: return None
+		
+		item.objectIndex = index
+		return bpy.data.objects[index]
 		
 	def removeAllObjects(self):
 		objectNames = []
@@ -199,9 +189,11 @@ class mn_ObjectInstancer(Node, AnimationNode):
 			if self.objectType == "Mesh":
 				return bpy.data.meshes.new(getPossibleMeshName("instance mesh"))
 			elif self.objectType == "Text":
-				return bpy.data.curves.new(getPossibleCurveName("text curve"), type = "FONT")
+				return bpy.data.curves.new(getPossibleCurveName("instance text"), type = "FONT")
 			elif self.objectType == "Camera":
 				return bpy.data.cameras.new(getPossibleCameraName("instance camera"))
+			elif self.objectType == "Point Lamp":
+				return bpy.data.lamps.new(getPossibleLampName("instance lamp"), type = "POINT")
 		return None
 		
 	def unlinkInstance(self, object):
@@ -210,7 +202,7 @@ class mn_ObjectInstancer(Node, AnimationNode):
 		bpy.context.scene.objects.unlink(object)
 		
 	def resetObjectDataOnAllInstances(self):
-		self.resetObjectData = True
+		self.resetInstances = True
 		
 	def unlinkInstancesFromNode(self):
 		self.linkedObjects.clear()
