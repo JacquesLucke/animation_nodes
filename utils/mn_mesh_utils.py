@@ -34,32 +34,6 @@ class Vertex:
 	def __repr__(self):
 		return "Vertex - " + str(self.location)
 		
-def getPolygonsFromMesh(mesh):
-	polygons = []
-	for polygon in mesh.polygons:
-		vertices = []
-		for vertex_index in polygon.vertices:
-			vertices.append(Vertex.fromMeshVertex(mesh.vertices[vertex_index]))
-		polygons.append(Polygon(vertices, polygon.area, polygon.center.copy(), polygon.normal.copy(), polygon.material_index))
-	return polygons
-	
-def getVerticesFromMesh(mesh):
-	vertices = []
-	for vertex in mesh.vertices:
-		vertices.append(Vertex.fromMeshVertex(vertex))
-	return vertices
-	
-def getEdgesIndicesFromMesh(mesh):
-	edgesIndices = []
-	for edge in mesh.edges:
-		edgesIndices.append((edge.vertices[0], edge.vertices[1]))
-	return edgesIndices
-	
-def getPolygonsIndicesFromMesh(mesh):
-	polygonsIndices = []
-	for polygon in mesh.polygons:
-		polygonsIndices.append(polygon.vertices[:])
-	return polygonsIndices
 	
 def getBMeshFromPolygons(polygons):
 	return getBMeshFromMeshPydata(*getMeshPydataFromPolygons(polygons))
