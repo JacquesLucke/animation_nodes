@@ -71,7 +71,7 @@ def getBMeshFromMeshPydata(vertexData, edgeData, faceData):
 	for co in vertexData:
 		bm.verts.new(co)
 		
-	# for Blender Version >= 2.63
+	# for Blender Version >= 2.73
 	try: bm.verts.ensure_lookup_table()
 	except: pass
 	
