@@ -19,9 +19,7 @@ class mn_ObjectMeshInfo(Node, AnimationNode):
 		self.inputs.new("mn_ObjectSocket", "Object").showName = False
 		self.outputs.new("mn_PolygonListSocket", "Polygons")
 		self.outputs.new("mn_VertexListSocket", "Vertices")
-		self.outputs.new("mn_VectorListSocket", "Vertex Locations")
-		self.outputs.new("mn_IntegerList2DSocket", "Edges Indices")
-		self.outputs.new("mn_IntegerList2DSocket", "Polygons Indices")
+		self.outputs.new("mn_MeshDataSocket", "Mesh Data")
 		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
@@ -32,34 +30,26 @@ class mn_ObjectMeshInfo(Node, AnimationNode):
 	def getOutputSocketNames(self):
 		return {"Polygons" : "polygons",
 				"Vertices" : "vertices",
-				"Vertex Locations" : "vertexLocations",
-				"Edges Indices" : "edgesIndices",
-				"Polygons Indices" : "polygonsIndices"}
+				"Mesh Data" : "meshData"}
 		
 	def execute(self, object, useOutput):
-		if object is None: return [], [], [], [], []
-		if object.type != "MESH": return [], [], [], [], []
+		if getattr(object, "type", None) != "MESH": 
+			return [], [], MeshData()
 		
 		cache = self.getInitializedCache()
 		
 		polygons = []
 		vertices = []
-		vertexLocations = []
-		edgesIndices = []
-		polygonsIndices = []
+		meshData = MeshData()
 		
 		if useOutput["Polygons"]:		
 			polygons = cacheFunctionResult(cache, object.name + "POLYGONS", getPolygonsFromMesh, [object.data], self.usePerObjectCache)
 		if useOutput["Vertices"]:
 			vertices = cacheFunctionResult(cache, object.name + "VERTICES", getVerticesFromMesh, [object.data], self.usePerObjectCache)
-		if useOutput["Vertex Locations"]:
-			vertexLocations = cacheFunctionResult(cache, object.name + "VERTEX_LOCATIONS", getVertexLocationsFromMesh, [object.data], self.usePerObjectCache)
-		if useOutput["Edges Indices"]:
-			edgesIndices = cacheFunctionResult(cache, object.name + "EDGES_INDICES", getEdgesIndicesFromMesh, [object.data], self.usePerObjectCache)
-		if useOutput["Polygons Indices"]:
-			polygonsIndices = cacheFunctionResult(cache, object.name + "POLYGONS_INDICES", getPolygonsIndicesFromMesh, [object.data], self.usePerObjectCache)
-		
-		return polygons, vertices, vertexLocations, edgesIndices, polygonsIndices
+		if useOutput["Mesh Data"]:
+			meshData = cacheFunctionResult(cache, object.name + "MESH_DATA", getMeshDataFromMesh, [object.data], self.usePerObjectCache)
+			
+		return polygons, vertices, meshData
 		
 	def getInitializedCache(self):
 		cache = getLongTimeCache(cacheIdentifier)
@@ -67,6 +57,7 @@ class mn_ObjectMeshInfo(Node, AnimationNode):
 			cache = {}
 			setLongTimeCache(cacheIdentifier, cache)
 		return cache
+		
 		
 def getPolygonsFromMesh(mesh):
 	polygons = []
@@ -77,11 +68,19 @@ def getPolygonsFromMesh(mesh):
 		polygons.append(Polygon(vertices, polygon.area, polygon.center.copy(), polygon.normal.copy(), polygon.material_index))
 	return polygons
 	
+	
 def getVerticesFromMesh(mesh):
 	vertices = []
 	for vertex in mesh.vertices:
 		vertices.append(Vertex.fromMeshVertex(vertex))
 	return vertices
+	
+	
+def getMeshDataFromMesh(mesh):
+	vertices = getVertexLocationsFromMesh(mesh)
+	edges = getEdgesIndicesFromMesh(mesh)
+	polygons = getPolygonsIndicesFromMesh(mesh)
+	return MeshData(vertices, edges, polygons)	
 	
 def getVertexLocationsFromMesh(mesh):
 	return [vertex.co.copy() for vertex in mesh.vertices]
@@ -96,4 +95,6 @@ def getPolygonsIndicesFromMesh(mesh):
 	polygonsIndices = []
 	for polygon in mesh.polygons:
 		polygonsIndices.append(polygon.vertices[:])
-	return polygonsIndices		
+	return polygonsIndices	
+
+
