@@ -7,7 +7,7 @@ from animation_nodes.nodes.mn_node_helper import *
 from animation_nodes.utils.mn_name_utils import *
 from animation_nodes.mn_cache import *
 
-objectTypes = ["Mesh", "Text"]
+objectTypes = ["Mesh", "Text", "Camera"]
 objectTypeItems = [(type, type, "") for type in objectTypes]
 
 class mn_ObjectNamePropertyGroup(bpy.types.PropertyGroup):
@@ -188,6 +188,8 @@ class mn_ObjectInstancer(Node, AnimationNode):
 				return bpy.data.meshes.new(getPossibleMeshName("instance mesh"))
 			elif self.objectType == "Text":
 				return bpy.data.curves.new(getPossibleCurveName("text curve"), type = "FONT")
+			elif self.objectType == "Camera":
+				return bpy.data.cameras.new(getPossibleCameraName("instance camera"))
 		return None
 		
 	def unlinkInstance(self, object):

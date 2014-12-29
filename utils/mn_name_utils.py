@@ -22,6 +22,13 @@ def getPossibleMeshName(name = "mesh"):
 		counter += 1
 	return name + randomString + str(counter)
 	
+def getPossibleCameraName(name = "camera"):
+	randomString = getRandomString(3)
+	counter = 1
+	while bpy.data.cameras.get(name + randomString + str(counter)) is not None:
+		counter += 1
+	return name + randomString + str(counter)
+	
 def getPossibleNodeName(nodeTree, name = "node"):
 	randomString = getRandomString(3)
 	counter = 1
