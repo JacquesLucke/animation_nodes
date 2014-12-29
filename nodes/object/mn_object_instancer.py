@@ -18,25 +18,21 @@ class mn_ObjectInstancer(Node, AnimationNode):
 	bl_idname = "mn_ObjectInstancer"
 	bl_label = "Object Instancer"
 	
-	def copyTypeChanged(self, context):
-		self.free()
-		nodePropertyChanged(self, context)
-		
 	def copyFromSourceChanged(self, context):
 		self.inputs["Source"].hide = not self.copyFromSource
-		nodePropertyChanged(self, context)
+		self.resetInstancesEvent(context)
 		
-	def objectTypeChanged(self, context):
-		self.resetObjectData = True
-		nodePropertyChanged(self, context)
+	def resetInstancesEvent(self, context):
+		self.resetInstances = True
 	
 	linkedObjects = bpy.props.CollectionProperty(type = mn_ObjectNamePropertyGroup)
-	unlinkedObjects = bpy.props.CollectionProperty(type = mn_ObjectNamePropertyGroup)
-	resetObjectData = bpy.props.BoolProperty(default = False, update = nodePropertyChanged)
+	resetInstances = bpy.props.BoolProperty(default = False, update = nodePropertyChanged)
 	
 	copyFromSource = bpy.props.BoolProperty(default = True, name = "Copy from Source", update = copyFromSourceChanged)
-	deepCopy = bpy.props.BoolProperty(default = False, update = copyTypeChanged, name = "Deep Copy", description = "Use this to copy all data to the new object (to unlink it from the source mesh for example)")
-	objectType = bpy.props.EnumProperty(default = "Mesh", name = "Object Type", items = objectTypeItems, update = objectTypeChanged)
+	deepCopy = bpy.props.BoolProperty(default = False, update = resetInstancesEvent, name = "Deep Copy", description = "Use this to copy all data to the new object (to unlink it from the source mesh for example)")
+	objectType = bpy.props.EnumProperty(default = "Mesh", name = "Object Type", items = objectTypeItems, update = resetInstancesEvent)
+	
+	parentInstances = bpy.props.BoolProperty(default = True, name = "Parent to Main Controler", update = resetInstancesEvent)
 	
 	def init(self, context):
 		forbidCompiling()
@@ -53,6 +49,8 @@ class mn_ObjectInstancer(Node, AnimationNode):
 			layout.prop(self, "objectType", text = "")
 		
 	def draw_buttons_ext(self, context, layout):
+		layout.prop(self, "parentInstances")
+	
 		setData = layout.operator("mn.reset_object_data_on_all_objects")
 		setData.nodeTreeName = self.id_data.name
 		setData.nodeName = self.name
@@ -71,15 +69,15 @@ class mn_ObjectInstancer(Node, AnimationNode):
 		instances = max(instances, 0)
 			
 		if self.copyFromSource and sourceObject is None:
-			self.free()
+			self.removeAllObjects()
 			return []
 			
-		if self.resetObjectData:
-			self.free()
-			self.resetObjectData = False
+		if self.resetInstances:
+			self.removeAllObjects()
+			self.resetInstances = False
 			
 		while instances < len(self.linkedObjects):
-			self.unlinkOneObject()
+			self.removeLastObject()
 					
 		objects = []
 		allObjects = bpy.data.objects
@@ -103,7 +101,7 @@ class mn_ObjectInstancer(Node, AnimationNode):
 							object = allObjects[index]
 							useObject = True
 						else:
-							self.unlinkObjectItemIndex(currentIndex)
+							self.removeObjectFromItemIndex(currentIndex)
 							incrementIndex = False
 				else: # duplicated code. have to find a cleaner solution
 					index = allObjects.find(searchName)
@@ -112,10 +110,10 @@ class mn_ObjectInstancer(Node, AnimationNode):
 						object = allObjects[index]
 						useObject = True
 					else:
-						self.unlinkObjectItemIndex(currentIndex)
+						self.removeObjectFromItemIndex(currentIndex)
 						incrementIndex = False
 			else:
-				object = self.linkNextObjectToScene(sourceObject)
+				object = self.appendNewObject(sourceObject)
 				useObject = True
 				incrementIndex = False
 			
@@ -126,7 +124,7 @@ class mn_ObjectInstancer(Node, AnimationNode):
 		
 		return objects
 		
-	def unlinkAllObjects(self):
+	def removeAllObjects(self):
 		objectNames = []
 		for item in self.linkedObjects:
 			objectNames.append(item.objectName)
@@ -134,48 +132,62 @@ class mn_ObjectInstancer(Node, AnimationNode):
 		for name in objectNames:
 			object = bpy.data.objects.get(name)
 			if object is not None:
-				self.unlinkInstance(object)
+				self.removeObject(object)
+				
+		self.linkedObjects.clear()
 		
-	def unlinkOneObject(self):
-		self.unlinkObjectItemIndex(len(self.linkedObjects)-1)
+	def removeLastObject(self):
+		self.removeObjectFromItemIndex(len(self.linkedObjects)-1)
 		
-	def unlinkObjectItemIndex(self, itemIndex):
+	def removeObjectFromItemIndex(self, itemIndex):
 		item = self.linkedObjects[itemIndex]
 		objectName = item.objectName
-		objectIndex = item.objectIndex
 		self.linkedObjects.remove(itemIndex)
 		object = bpy.data.objects.get(objectName)
 		if object is not None:
-			try:
-				self.unlinkInstance(object)
-				newItem = self.unlinkedObjects.add()
-				newItem.objectName = objectName
-				newItem.objectIndex = objectIndex
-			except: pass
+			self.removeObject(object)
 			
-	def linkNextObjectToScene(self, sourceObject):
-		isNewObjectLinked = False
-		while not isNewObjectLinked:
-			if len(self.unlinkedObjects) == 0:
-				self.newInstance(sourceObject)
-			item = self.unlinkedObjects[0]
-			object = bpy.data.objects.get(item.objectName)
-			if object is not None:
-				bpy.context.scene.objects.link(object)
-				linkedItem = self.linkedObjects.add()
-				linkedItem.objectName = item.objectName
-				linkedItem.objectIndex = item.objectIndex
-				isNewObjectLinked = True
-			self.unlinkedObjects.remove(0)
+	def removeObject(self, object):
+		self.unlinkInstance(object)
+		if object.users == 0:
+			data = object.data
+			type = object.type
+			bpy.data.objects.remove(object)
+			self.removeObjectData(data, type)
+			
+	def removeObjectData(self, data, type):
+		if data.users == 0:
+			if type == "MESH":
+				bpy.data.meshes.remove(data)
+			elif type == "CAMERA":
+				bpy.data.cameras.remove(data)
+			elif type in ["FONT", "CURVE", "SURFACE"]:
+				bpy.data.curves.remove(data)
+			elif type == "META":
+				bpy.data.metaballs.remove(data)
+			elif type == "ARMATURE":
+				bpy.data.armatures.remove(data)
+			elif type == "LATTICE":
+				bpy.data.lattices.remove(data)
+			elif type == "LAMP":
+				bpy.data.lamps.remove(data)
+			elif type == "SPEADER":
+				bpy.data.speakers.remove(data)
+			
+	def appendNewObject(self, sourceObject):
+		object = self.newInstance(sourceObject)
+		bpy.context.scene.objects.link(object)
+		linkedItem = self.linkedObjects.add()
+		linkedItem.objectName = object.name
+		linkedItem.objectIndex = bpy.data.objects.find(object.name)
 		return object
 			
 	def newInstance(self, sourceObject):
 		data = self.getSourceObjectData(sourceObject)
 		newObject = bpy.data.objects.new(getPossibleObjectName("instance"), data)
-		newObject.parent = getMainObjectContainer()
-		item = self.unlinkedObjects.add()
-		item.objectName = newObject.name
-		item.objectIndex = 0
+		if self.parentInstances:
+			newObject.parent = getMainObjectContainer()
+		return newObject
 		
 	def getSourceObjectData(self, sourceObject):
 		if self.copyFromSource:
@@ -193,7 +205,8 @@ class mn_ObjectInstancer(Node, AnimationNode):
 		return None
 		
 	def unlinkInstance(self, object):
-		if bpy.context.mode != "OBJECT" and getActive() == object: bpy.ops.object.mode_set(mode = "OBJECT")
+		if bpy.context.mode != "OBJECT" and getActive() == object: 
+			bpy.ops.object.mode_set(mode = "OBJECT")
 		bpy.context.scene.objects.unlink(object)
 		
 	def resetObjectDataOnAllInstances(self):
@@ -201,17 +214,13 @@ class mn_ObjectInstancer(Node, AnimationNode):
 		
 	def unlinkInstancesFromNode(self):
 		self.linkedObjects.clear()
-		self.unlinkedObjects.clear()
 		self.inputs.get("Instances").number = 0
 			
 	def free(self):
-		self.unlinkAllObjects()
-		self.linkedObjects.clear()
-		self.unlinkedObjects.clear()
+		self.removeAllObjects()
 			
 	def copy(self, node):
 		self.linkedObjects.clear()
-		self.unlinkedObjects.clear()
 		
 class ResetObjectDataOnAllInstances(bpy.types.Operator):
 	bl_idname = "mn.reset_object_data_on_all_objects"
