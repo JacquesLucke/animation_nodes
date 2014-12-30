@@ -25,8 +25,6 @@ class mn_AppendToMeshData(Node, AnimationNode):
 	def execute(self, meshDataA, meshDataB):
 		meshData = meshDataA
 		offset = len(meshDataA.vertices)
-		print(offset)
-		print(meshDataA.vertices)
 		
 		meshData.vertices += meshDataB.vertices
 		
@@ -35,7 +33,5 @@ class mn_AppendToMeshData(Node, AnimationNode):
 			
 		for poly in meshDataB.polygons:
 			meshData.polygons.append(tuple([index + offset for index in poly]))
-			
-		print(offset)
 			
 		return meshData

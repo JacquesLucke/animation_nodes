@@ -167,6 +167,7 @@ class NetworkCodeGenerator:
 		codeParts.append(self.getNodeReferencingCode())
 		codeParts.append(self.getNodeExecuteReferencingCode())
 		codeParts.append(self.getSocketReferencingCode())
+		codeParts.append(self.getSocketValueReferencingCode())
 		codeParts.append(self.getOutputUseDeclarationCode())
 		codeParts.append(self.getTimerDefinitions())
 		codeParts.append(self.getDeterminedNodesCode())
@@ -360,8 +361,14 @@ class NetworkCodeGenerator:
 		for node in self.executeNodes:
 			codeLines.append(self.getNodeFunctionDeclarationString(node))
 		return "\n".join(codeLines)
-		
+	
 	def getSocketReferencingCode(self):
+		codeLines = []
+		for socket in self.neededSocketReferences:
+			codeLines.append(getInputSocketName(socket) + " = " + getSocketReferenceString(socket))
+		return "\n".join(codeLines)
+		
+	def getSocketValueReferencingCode(self):
 		codeLines = []
 		for socket in self.neededSocketReferences:
 			codeLines.append(self.getSocketDeclarationString(socket))
@@ -420,7 +427,7 @@ class NetworkCodeGenerator:
 	def getNodeFunctionDeclarationString(self, node):
 		return getNodeExecutionName(node) + " = " + getNodeVariableName(node) + ".execute"
 	def getSocketDeclarationString(self, socket):
-		return getInputSocketVariableName(socket) + " = " + getNodeVariableName(socket.node) + ".inputs['" + socket.name + "'].getValue()"
+		return getInputSocketValueName(socket) + " = " + getSocketValueGetterString(socket)
 	def getNodeExecutionLines(self, node):
 		useInLineExecution = False
 		if hasattr(node, "useInLineExecution"):
@@ -442,6 +449,16 @@ class NetworkCodeGenerator:
 		else:
 			self.executeNodes.append(node)
 			return [getNodeOutputString(node) + " = " + getNodeExecutionName(node) + "(" + self.generateInputListString(node) + ")"]
+			
+def getInputValueVariable(socket):
+	originSocket = treeInfo.getDataOriginSocket(socket)
+	if originSocket is not None:
+		return getOutputValueVariable(originSocket)
+	else:
+		if recreateSocketValue(socket):
+			return getSocketValueGetterString(socket)
+		else:
+			return getInputSocketValueName(socket)
 			
 def getNodeOutputString(node):
 	if usesFastCall(node):
@@ -484,12 +501,7 @@ def usesFastCall(node):
 def usesOutputUseParameter(node):
 	return hasattr(node, "outputUseParameterName")
 	
-def getInputValueVariable(socket):
-	originSocket = treeInfo.getDataOriginSocket(socket)
-	if originSocket is not None:
-		return getOutputValueVariable(originSocket)
-	else:
-		return getInputSocketVariableName(socket)
+
 def getOutputValueVariable(socket):
 	if usesFastCall(socket.node):
 		outputSocketNames = socket.node.getOutputSocketNames()
@@ -505,6 +517,9 @@ def isDeterminedNode(node):
 				if not isDeterminedNode(originNode): return False
 		return True
 	return False
+	
+def recreateSocketValue(socket):
+	return getattr(socket, "recreateValueOnEachUse", False)
 		
 def getNodeVariableName(node):
 	return "node_" + str(node.codeIndex)
@@ -522,9 +537,16 @@ def getNodeTimerStartName(node):
 	return "timer_start_" + str(node.codeIndex)
 def getNodeTimerName(node):
 	return "timer_" + str(node.codeIndex)
-def getInputSocketVariableName(socket):
+def getInputSocketValueName(socket):
 	node = socket.node
 	return getNodeVariableName(node) + "_socketvalue_" + str(node.inputs.find(socket.name))
+def getInputSocketName(socket):
+	node = socket.node
+	return getNodeVariableName(node) + "_socket_" + str(node.inputs.find(socket.name))
+def getSocketReferenceString(socket):
+	return getNodeVariableName(socket.node) + ".inputs['" + socket.name + "']"
+def getSocketValueGetterString(socket):
+	return getInputSocketName(socket) + ".getValue()"
 	
 	
 	

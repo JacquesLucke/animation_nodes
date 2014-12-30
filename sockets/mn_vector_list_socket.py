@@ -8,6 +8,7 @@ class mn_VectorListSocket(mn_BaseSocket, mn_SocketProperties):
 	dataType = "Vector List"
 	allowedInputTypes = ["Vector List"]
 	drawColor = (0.3, 0.9, 1, 0.6)
+	recreateValueOnEachUse = True
 	
 	def drawInput(self, layout, node, text):
 		layout.label(text)
