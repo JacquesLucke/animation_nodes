@@ -14,7 +14,7 @@ class mn_MeshDataSocket(mn_BaseSocket, mn_SocketProperties):
 		layout.label(text)
 		
 	def getValue(self):
-		return MeshData()
+		return MeshData([], [], [])
 		
 	def setStoreableValue(self, data):
 		pass
