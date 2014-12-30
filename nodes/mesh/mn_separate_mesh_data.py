@@ -11,7 +11,7 @@ class mn_SeparateMeshData(Node, AnimationNode):
 	
 	def init(self, context):
 		forbidCompiling()
-		self.inputs.new("mn_MeshDataSocket", "Mesh Data").showName = False
+		self.inputs.new("mn_MeshDataSocket", "Mesh Data")
 		self.outputs.new("mn_VertexListSocket", "Vertex Locations")
 		self.outputs.new("mn_IntegerList2DSocket", "Edges Indices")
 		self.outputs.new("mn_IntegerList2DSocket", "Polygons Indices")
