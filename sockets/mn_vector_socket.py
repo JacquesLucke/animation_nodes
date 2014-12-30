@@ -8,6 +8,7 @@ class mn_VectorSocket(mn_BaseSocket, mn_SocketProperties):
 	dataType = "Vector"
 	allowedInputTypes = ["Vector"]
 	drawColor = (0.05, 0.05, 0.8, 0.7)
+	recreateValueOnEachUse = True
 	
 	vector = bpy.props.FloatVectorProperty(default = [0, 0, 0], update = nodePropertyChanged)
 	

@@ -8,6 +8,7 @@ class mn_ObjectListSocket(mn_BaseSocket, mn_SocketProperties):
 	dataType = "Object List"
 	allowedInputTypes = ["Object List"]
 	drawColor = (0, 0, 0, 0.4)
+	recreateValueOnEachUse = True
 	
 	def drawInput(self, layout, node, text):
 		layout.label(text)

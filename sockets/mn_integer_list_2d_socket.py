@@ -8,6 +8,7 @@ class mn_IntegerList2DSocket(mn_BaseSocket, mn_SocketProperties):
 	dataType = "Integer List 2D"
 	allowedInputTypes = ["Integer List 2D"]
 	drawColor = (0.5, 0.7, 0.7, 1.0)
+	recreateValueOnEachUse = True
 	
 	def drawInput(self, layout, node, text):
 		layout.label(text)

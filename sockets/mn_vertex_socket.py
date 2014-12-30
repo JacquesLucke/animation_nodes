@@ -9,6 +9,7 @@ class mn_VertexSocket(mn_BaseSocket, mn_SocketProperties):
 	dataType = "Vertex"
 	allowedInputTypes = ["Vertex"]
 	drawColor = (0.6, 0.8, 0.36, 1)
+	recreateValueOnEachUse = True
 	
 	def drawInput(self, layout, node, text):
 		layout.label(text)

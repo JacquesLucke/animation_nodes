@@ -9,6 +9,7 @@ class mn_PolygonListSocket(mn_BaseSocket, mn_SocketProperties):
 	dataType = "Polygon List"
 	allowedInputTypes = ["Polygon List"]
 	drawColor = (0.25, 0.55, 0.23, 1)
+	recreateValueOnEachUse = True
 	
 	def drawInput(self, layout, node, text):
 		layout.label(text)
