@@ -7,7 +7,7 @@ class mn_MeshSocket(mn_BaseSocket, mn_SocketProperties):
 	bl_label = "Mesh Socket"
 	dataType = "Mesh"
 	allowedInputTypes = ["Mesh"]
-	drawColor = (1.0, 0.9, 0.6, 1)
+	drawColor = (0.1, 1.0, 0.1, 1)
 	
 	def drawInput(self, layout, node, text):
 		layout.label(text)
