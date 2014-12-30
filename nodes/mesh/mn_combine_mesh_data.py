@@ -12,8 +12,8 @@ class mn_CombineMeshData(Node, AnimationNode):
 	def init(self, context):
 		forbidCompiling()
 		self.inputs.new("mn_VectorListSocket", "Vertex Locations")
-		self.inputs.new("mn_EdgeIndicesList", "Edges Indices")
-		self.inputs.new("mn_PolygonIndicesList", "Polygons Indices")
+		self.inputs.new("mn_EdgeIndicesListSocket", "Edges Indices")
+		self.inputs.new("mn_PolygonIndicesListSocket", "Polygons Indices")
 		self.outputs.new("mn_MeshDataSocket", "Mesh Data")	
 		allowCompiling()
 		

@@ -13,8 +13,8 @@ class mn_SeparateMeshData(Node, AnimationNode):
 		forbidCompiling()
 		self.inputs.new("mn_MeshDataSocket", "Mesh Data")
 		self.outputs.new("mn_VectorListSocket", "Vertex Locations")
-		self.outputs.new("mn_EdgeIndicesList", "Edges Indices")
-		self.outputs.new("mn_PolygonIndicesList", "Polygons Indices")
+		self.outputs.new("mn_EdgeIndicesListSocket", "Edges Indices")
+		self.outputs.new("mn_PolygonIndicesListSocket", "Polygons Indices")
 		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
