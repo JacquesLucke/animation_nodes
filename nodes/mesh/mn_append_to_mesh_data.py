@@ -12,17 +12,20 @@ class mn_AppendToMeshData(Node, AnimationNode):
 	def init(self, context):
 		forbidCompiling()
 		self.inputs.new("mn_MeshDataSocket", "Mesh Data")
-		self.inputs.new("mn_MeshDataSocket", "New Mesh Data")
-		self.outputs.new("mn_MeshDataSocket", "Mesh Data")
+		self.inputs.new("mn_MeshDataSocket", "Other")
+		self.outputs.new("mn_MeshDataSocket", "Joined Mesh Data")
 		allowCompiling()
 		
 	def getInputSocketNames(self):
 		return {"Mesh Data" : "meshDataA",
-				"New Mesh Data" : "meshDataB"}
+				"Other" : "meshDataB"}
 	def getOutputSocketNames(self):
-		return {"Mesh Data" : "meshData"}
+		return {"Joined Mesh Data" : "meshData"}
 		
 	def execute(self, meshDataA, meshDataB):
+		if meshDataA == meshDataB:
+			meshDataB = meshDataB.copy()
+	
 		meshData = meshDataA
 		offset = len(meshDataA.vertices)
 		
