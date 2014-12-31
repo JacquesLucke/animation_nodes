@@ -23,18 +23,26 @@ class mn_AppendToMeshData(Node, AnimationNode):
 		return {"Joined Mesh Data" : "meshData"}
 		
 	def execute(self, meshDataA, meshDataB):
-		if meshDataA == meshDataB:
-			meshDataB = meshDataB.copy()
+		newVertices = meshDataB.vertices
+		newEdges = meshDataB.edges
+		newPolygons = meshDataB.polygons
+		
+		if meshDataA.vertices == newVertices:
+			newVertices = meshDataB.getVerticesCopy()
+		if meshDataA.edges == newEdges:
+			newEdges = meshDataB.getEdgesCopy()
+		if meshDataA.polygons == newPolygons:
+			newPolygons = meshDataB.getPolygonsCopy()
 	
 		meshData = meshDataA
 		offset = len(meshDataA.vertices)
 		
-		meshData.vertices += meshDataB.vertices
+		meshData.vertices += newVertices
 		
-		for edge in meshDataB.edges:
+		for edge in newEdges:
 			meshData.edges.append((edge[0] + offset, edge[1] + offset))
 			
-		for poly in meshDataB.polygons:
+		for poly in newPolygons:
 			meshData.polygons.append(tuple([index + offset for index in poly]))
 			
 		return meshData
