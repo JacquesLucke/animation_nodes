@@ -44,6 +44,11 @@ class mn_ObjectListInputNode(Node, AnimationNode):
 			add = layout.operator("mn.selected_objects_to_object_list_node", text = "From Selection", icon = "PLUS")
 			add.nodeTreeName = self.id_data.name
 			add.nodeName = self.name
+
+			if len(self.objects) > 0:
+				add = layout.operator("mn.clear_object_list_node", text="Clear List", icon="NONE")
+				add.nodeTreeName = self.id_data.name
+				add.nodeName = self.name
 			
 			layout.separator()
 				
@@ -71,6 +76,9 @@ class mn_ObjectListInputNode(Node, AnimationNode):
 		for name in names:
 			item = self.objects.add()
 			item.object = name
+
+	def removeAllObjectsFromList(self):
+		self.objects.clear()
 	
 	
 class AssignActiveObjectToListNode(bpy.types.Operator):
@@ -90,7 +98,8 @@ class AssignActiveObjectToListNode(bpy.types.Operator):
 		node = getNode(self.nodeTreeName, self.nodeName)
 		node.setObject(obj, self.index)
 		return {'FINISHED'}	
-		
+
+
 class SelectedObjectsToObjectListNode(bpy.types.Operator):
 	bl_idname = "mn.selected_objects_to_object_list_node"
 	bl_label = "New Items From Selection"
@@ -101,6 +110,19 @@ class SelectedObjectsToObjectListNode(bpy.types.Operator):
 	def execute(self, context):
 		node = getNode(self.nodeTreeName, self.nodeName)
 		node.newItemsFromList(getSortedSelectedObjectNames())
-		return {'FINISHED'}	
+		return {'FINISHED'}
+
+
+class ClearObjectListNode(bpy.types.Operator):
+	bl_idname = "mn.clear_object_list_node"
+	bl_label = "Clear List"
+
+	nodeTreeName = bpy.props.StringProperty()
+	nodeName = bpy.props.StringProperty()
+
+	def execute(self, context):
+		node = getNode(self.nodeTreeName, self.nodeName)
+		node.removeAllObjectsFromList()
+		return {'FINISHED'}
 
 
