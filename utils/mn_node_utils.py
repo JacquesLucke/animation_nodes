@@ -142,6 +142,9 @@ class NodeTreeInfo:
 		return self.getDataOriginSocket(socket) is not None
 	def getDataOriginSockets(self, socket):
 		return self.inputSockets.get(socket, [])
+	def getTargetIndexFromOutputSocket(self, outputSocket, targetSocket):
+		if outputSocket is None: return -1
+		return self.getDataTargetSockets(outputSocket).index(targetSocket)
 	def getDataTargetSockets(self, socket):
 		return self.outputSockets.get(socket, [])
 	def getDataOriginSocket(self, socket):

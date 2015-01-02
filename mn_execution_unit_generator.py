@@ -211,7 +211,7 @@ class NetworkCodeGenerator:
 			codeLines[i] = "    " + line
 			
 	def getFunctionsCode(self):
-		return "\n\n".join(self.functions.values())
+		return "\n\n".join(self.functions.values()) + "\n"
 		
 	def getNodeCodeLines(self, node):
 		codeLines = []
@@ -409,11 +409,11 @@ class NetworkCodeGenerator:
 			return "{ " + ", ".join(inputParts) + " }"
 	def getInputPartFromSameNode(self, socket, useFastMethod, inputSocketNames):
 		if useFastMethod:
-			return inputSocketNames[socket.identifier] + " = " + getInputValueVariable(socket)
+			return inputSocketNames[socket.identifier] + " = " + self.getInputValueString(socket)
 		else:
-			return "'" + socket.identifier + "' : " + getInputValueVariable(socket)
+			return "'" + socket.identifier + "' : " + self.getInputValueString(socket)
 	def getInputPartFromOtherNode(self, socket, originSocket, useFastMethod, inputSocketNames):
-		return self.getInputPartStart(socket, useFastMethod, inputSocketNames) + getInputValueVariable(socket)  
+		return self.getInputPartStart(socket, useFastMethod, inputSocketNames) + self.getInputValueString(socket)  
 	def getInputPartStart(self, socket, useFastMethod, inputSocketNames):
 		if useFastMethod:
 			return inputSocketNames[socket.identifier] + " = "
@@ -440,7 +440,7 @@ class NetworkCodeGenerator:
 			outputSocketNames = node.getOutputSocketNames()
 			for identifier, name in inputSocketNames.items():
 				socket = node.inputs[identifier]
-				inLineString = inLineString.replace("%" + name + "%", getInputValueVariable(socket))
+				inLineString = inLineString.replace("%" + name + "%", self.getInputValueString(socket))
 				if not treeInfo.hasOtherDataOrigin(socket):
 					self.neededSocketReferences.append(socket)
 			for identifier, name in outputSocketNames.items():
@@ -450,15 +450,36 @@ class NetworkCodeGenerator:
 			self.executeNodes.append(node)
 			return [getNodeOutputString(node) + " = " + getNodeExecutionName(node) + "(" + self.generateInputListString(node) + ")"]
 			
-def getInputValueVariable(socket):
-	originSocket = treeInfo.getDataOriginSocket(socket)
-	if originSocket is not None:
-		return getOutputValueVariable(originSocket)
-	else:
-		if recreateSocketValue(socket):
-			return getSocketValueGetterString(socket)
+	def getInputValueString(self, socket):
+		originSocket = treeInfo.getDataOriginSocket(socket)
+		inputVariableName = self.getInputValueVariable(socket, originSocket)
+		
+		if self.copyValueBeforeUsing(socket, originSocket):
+			functionName = getCopyValueFunctionName(socket)
+			if functionName not in self.functions:
+				self.functions[functionName] = self.getCopyFunctionString(socket)
+			return functionName + "(" + inputVariableName + ")"
 		else:
+			return inputVariableName
+				
+	def getInputValueVariable(self, socket, originSocket):
+		if originSocket is None:
 			return getInputSocketValueName(socket)
+		else:
+			return getOutputValueVariable(originSocket)
+			
+	def copyValueBeforeUsing(self, socket, originSocket):
+		if hasattr(socket, "getCopyValueFunctionString"):
+			return originSocket is None or treeInfo.getTargetIndexFromOutputSocket(originSocket, socket) > 0
+		return False
+				
+	def getCopyFunctionString(self, socket):
+		codeLines = []
+		codeLines.append("def " + getCopyValueFunctionName(socket) + "(value):")
+		functionLines = socket.getCopyValueFunctionString().split("\n")
+		self.setIndentationOnEveryLine(functionLines)
+		codeLines.extend(functionLines)
+		return "\n".join(codeLines)
 			
 def getNodeOutputString(node):
 	if usesFastCall(node):
@@ -517,9 +538,6 @@ def isDeterminedNode(node):
 				if not isDeterminedNode(originNode): return False
 		return True
 	return False
-	
-def recreateSocketValue(socket):
-	return getattr(socket, "recreateValueOnEachUse", False)
 		
 def getNodeVariableName(node):
 	return "node_" + str(node.codeIndex)
@@ -547,6 +565,8 @@ def getSocketReferenceString(socket):
 	return getNodeVariableName(socket.node) + ".inputs['" + socket.name + "']"
 def getSocketValueGetterString(socket):
 	return getInputSocketName(socket) + ".getValue()"
+def getCopyValueFunctionName(socket):
+	return socket.bl_idname + "_copy"
 	
 	
 	
