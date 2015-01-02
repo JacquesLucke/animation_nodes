@@ -9,7 +9,6 @@ class mn_MeshDataSocket(mn_BaseSocket, mn_SocketProperties):
 	dataType = "Mesh Data"
 	allowedInputTypes = ["Mesh Data"]
 	drawColor = (0.3, 0.4, 0.18, 1)
-	recreateValueOnEachUse = True
 	
 	def drawInput(self, layout, node, text):
 		layout.label(text)
@@ -22,3 +21,5 @@ class mn_MeshDataSocket(mn_BaseSocket, mn_SocketProperties):
 	def getStoreableValue(self):
 		pass
 
+	def getCopyValueFunctionString(self):
+		return "return value.copy()"
