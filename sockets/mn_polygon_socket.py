@@ -21,4 +21,7 @@ class mn_PolygonSocket(mn_BaseSocket, mn_SocketProperties):
 		pass
 	def getStoreableValue(self):
 		pass
+		
+	def getCopyValueFunctionString(self):
+		return "return value.copy()"
 
