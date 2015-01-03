@@ -19,4 +19,7 @@ class mn_EdgeIndicesSocket(mn_BaseSocket, mn_SocketProperties):
 		pass
 	def getStoreableValue(self):
 		pass
+		
+	def getCopyValueFunctionString(self):
+		return "return value[:]"
 

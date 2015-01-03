@@ -9,7 +9,6 @@ class mn_PolygonSocket(mn_BaseSocket, mn_SocketProperties):
 	dataType = "Polygon"
 	allowedInputTypes = ["Polygon"]
 	drawColor = (0.14, 0.34, 0.19, 1)
-	recreateValueOnEachUse = True
 	
 	def drawInput(self, layout, node, text):
 		layout.label(text)
@@ -21,7 +20,3 @@ class mn_PolygonSocket(mn_BaseSocket, mn_SocketProperties):
 		pass
 	def getStoreableValue(self):
 		pass
-		
-	def getCopyValueFunctionString(self):
-		return "return value.copy()"
-

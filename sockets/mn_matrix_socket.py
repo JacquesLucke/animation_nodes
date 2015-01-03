@@ -21,3 +21,5 @@ class mn_MatrixSocket(mn_BaseSocket, mn_SocketProperties):
 	def getStoreableValue(self):
 		pass
 
+	def getCopyValueFunctionString(self):
+		return "return value.copy()"

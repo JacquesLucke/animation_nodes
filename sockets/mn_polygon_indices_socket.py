@@ -20,3 +20,5 @@ class mn_PolygonIndicesSocket(mn_BaseSocket, mn_SocketProperties):
 	def getStoreableValue(self):
 		pass
 
+	def getCopyValueFunctionString(self):
+		return "return value[:]"

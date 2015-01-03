@@ -8,7 +8,6 @@ class mn_PolygonIndicesListSocket(mn_BaseSocket, mn_SocketProperties):
 	dataType = "Polygon Indices List"
 	allowedInputTypes = ["Polygon Indices List"]
 	drawColor = (0.4, 0.2, 1.0, 1)
-	recreateValueOnEachUse = True
 	
 	def drawInput(self, layout, node, text):
 		layout.label(text)
@@ -21,3 +20,5 @@ class mn_PolygonIndicesListSocket(mn_BaseSocket, mn_SocketProperties):
 	def getStoreableValue(self):
 		pass
 
+	def getCopyValueFunctionString(self):
+		return "return [polygonIndices[:] for polygonIndices in value]"

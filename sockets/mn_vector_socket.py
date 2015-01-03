@@ -1,6 +1,7 @@
 import bpy
 from animation_nodes.mn_execution import nodePropertyChanged
 from animation_nodes.mn_node_base import *
+from mathutils import Vector
 
 class mn_VectorSocket(mn_BaseSocket, mn_SocketProperties):
 	bl_idname = "mn_VectorSocket"
@@ -8,7 +9,6 @@ class mn_VectorSocket(mn_BaseSocket, mn_SocketProperties):
 	dataType = "Vector"
 	allowedInputTypes = ["Vector"]
 	drawColor = (0.05, 0.05, 0.8, 0.7)
-	recreateValueOnEachUse = True
 	
 	vector = bpy.props.FloatVectorProperty(default = [0, 0, 0], update = nodePropertyChanged)
 	
@@ -21,10 +21,13 @@ class mn_VectorSocket(mn_BaseSocket, mn_SocketProperties):
 		col.separator()
 		
 	def getValue(self):
-		return self.vector
+		return Vector(self.vector)
 		
 	def setStoreableValue(self, data):
 		self.vector = data
 	def getStoreableValue(self):
 		return self.vector[:]
+		
+	def getCopyValueFunctionString(self):
+		return "return value.copy()"
 

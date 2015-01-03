@@ -8,7 +8,6 @@ class mn_FloatListSocket(mn_BaseSocket, mn_SocketProperties):
 	dataType = "Float List"
 	allowedInputTypes = ["Float List"]
 	drawColor = (0.4, 0.2, 0.9, 1.0)
-	recreateValueOnEachUse = True
 	
 	def drawInput(self, layout, node, text):
 		layout.label(text)
@@ -20,4 +19,7 @@ class mn_FloatListSocket(mn_BaseSocket, mn_SocketProperties):
 		pass
 	def getStoreableValue(self):
 		return []
+		
+	def getCopyValueFunctionString(self):
+		return "return value[:]"
 

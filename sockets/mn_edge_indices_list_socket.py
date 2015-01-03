@@ -8,7 +8,6 @@ class mn_EdgeIndicesListSocket(mn_BaseSocket, mn_SocketProperties):
 	dataType = "Edge Indices List"
 	allowedInputTypes = ["Edge Indices List"]
 	drawColor = (0, 0.55, 0.23, 1)
-	recreateValueOnEachUse = True
 	
 	def drawInput(self, layout, node, text):
 		layout.label(text)
@@ -20,4 +19,7 @@ class mn_EdgeIndicesListSocket(mn_BaseSocket, mn_SocketProperties):
 		pass
 	def getStoreableValue(self):
 		pass
+		
+	def getCopyValueFunctionString(self):
+		return "return [edgeIndices[:] for edgeIndices in value]"
 

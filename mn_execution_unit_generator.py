@@ -170,8 +170,8 @@ class NetworkCodeGenerator:
 		codeParts.append(self.getSocketValueReferencingCode())
 		codeParts.append(self.getOutputUseDeclarationCode())
 		codeParts.append(self.getTimerDefinitions())
-		codeParts.append(self.getDeterminedNodesCode())
 		codeParts.append(self.getFunctionsCode())
+		codeParts.append(self.getDeterminedNodesCode())
 		codeParts.append(mainCode)
 		codeParts.append(self.getCodeToPrintProfilingResult())
 		
@@ -455,9 +455,7 @@ class NetworkCodeGenerator:
 		inputVariableName = self.getInputValueVariable(socket, originSocket)
 		
 		if self.copyValueBeforeUsing(socket, originSocket):
-			functionName = getCopyValueFunctionName(socket)
-			if functionName not in self.functions:
-				self.functions[functionName] = self.getCopyFunctionString(socket)
+			functionName = self.makeCopyFunction(socket, originSocket)
 			return functionName + "(" + inputVariableName + ")"
 		else:
 			return inputVariableName
@@ -469,17 +467,24 @@ class NetworkCodeGenerator:
 			return getOutputValueVariable(originSocket)
 			
 	def copyValueBeforeUsing(self, socket, originSocket):
-		if hasattr(socket, "getCopyValueFunctionString"):
+		if hasattr(socket, "getCopyValueFunctionString") or hasattr(originSocket, "getCopyValueFunctionString"):
 			return originSocket is None or treeInfo.getTargetIndexFromOutputSocket(originSocket, socket) > 0
 		return False
 				
-	def getCopyFunctionString(self, socket):
+	def makeCopyFunction(self, socket, originSocket):
 		codeLines = []
-		codeLines.append("def " + getCopyValueFunctionName(socket) + "(value):")
-		functionLines = socket.getCopyValueFunctionString().split("\n")
+		if hasattr(originSocket, "getCopyValueFunctionString"):
+			functionName = getCopyValueFunctionName(originSocket)
+			codeLines.append("def " + getCopyValueFunctionName(originSocket) + "(value):")
+			functionLines = originSocket.getCopyValueFunctionString().split("\n")
+		else:
+			functionName = getCopyValueFunctionName(socket)
+			codeLines.append("def " + getCopyValueFunctionName(socket) + "(value):")
+			functionLines = socket.getCopyValueFunctionString().split("\n")
 		self.setIndentationOnEveryLine(functionLines)
 		codeLines.extend(functionLines)
-		return "\n".join(codeLines)
+		self.functions[functionName] = "\n".join(codeLines)
+		return functionName
 			
 def getNodeOutputString(node):
 	if usesFastCall(node):
