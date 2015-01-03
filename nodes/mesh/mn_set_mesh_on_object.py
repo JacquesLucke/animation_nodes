@@ -29,6 +29,6 @@ class mn_SetMeshOnObject(Node, AnimationNode):
 		if object.type == "MESH":
 			if object.mode != "OBJECT":
 				bpy.ops.object.mode_set(mode = "OBJECT")
-			bm.to_mesh(object.data)
-			object.data.update()
+			if object.mode == "OBJECT":
+				bm.to_mesh(object.data)
 		return object
