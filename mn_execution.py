@@ -24,8 +24,7 @@ def updateAnimationTrees(event = "NONE", sender = None):
 		if bpy.context.scene.mn_settings.developer.printUpdateTime:
 			printTimeSpan("Update Time ", timeSpan)
 			
-		if len(executionUnits) > 0 and event != "TREE":
-			bpy.context.scene.update()
+		if event in ["TREE"]:
 			redraw_areas_if_possible()
 			
 		allowCompiling()
@@ -111,7 +110,7 @@ def redraw_areas_if_possible():
 	try:
 		for area in bpy.context.screen.areas:
 			area.tag_redraw()
-	except: print("cannot redraw")
+	except: pass
 	
 bpy.app.handlers.frame_change_post.append(frameChangeHandler)
 bpy.app.handlers.scene_update_post.append(sceneUpdateHandler)
