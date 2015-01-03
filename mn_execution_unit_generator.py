@@ -468,7 +468,9 @@ class NetworkCodeGenerator:
 			
 	def copyValueBeforeUsing(self, socket, originSocket):
 		if hasattr(socket, "getCopyValueFunctionString") or hasattr(originSocket, "getCopyValueFunctionString"):
-			return originSocket is None or treeInfo.getTargetIndexFromOutputSocket(originSocket, socket) > 0
+			index = treeInfo.getTargetIndexFromOutputSocket(originSocket, socket)
+			amount = len(treeInfo.getDataTargetSockets(originSocket))
+			return originSocket is None or (amount >= 2)# and index < amount - 1)
 		return False
 				
 	def makeCopyFunction(self, socket, originSocket):
