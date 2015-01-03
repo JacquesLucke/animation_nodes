@@ -26,5 +26,7 @@ class mn_CombineVector(Node, AnimationNode):
 	def useInLineExecution(self):
 		return True
 	def getInLineExecutionString(self, outputUse):
-		return "$vector$ = [%x%, %y%, %z%]"
+		return "$vector$ = mathutils.Vector((%x%, %y%, %z%))"
+	def getModuleList(self):
+		return ["mathutils"]
 

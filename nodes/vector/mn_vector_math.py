@@ -17,7 +17,7 @@ class mn_VectorMathNode(Node, AnimationNode):
 		("ADD", "Add", ""),
 		("SUBTRACT", "Subtract", ""),
 		("MULTIPLY", "Multiply", "Multiply element by element"),
-		("DIVIDE", "Divide", ""),
+		("DIVIDE", "Divide", "Divide element by element"),
 		("CROSS", "Cross Product", "Calculate the cross/vector product, yielding a vector that is orthogonal to both input vectors")]
 	mathTypesProperty = bpy.props.EnumProperty(name="Operation", items=mathTypes, default="ADD", update=updateNode)
 	
@@ -41,18 +41,18 @@ class mn_VectorMathNode(Node, AnimationNode):
 	def getInLineExecutionString(self, outputUse):
 		if outputUse["Result"]:
 			op = self.mathTypesProperty
-			if op == "ADD": return "$result$ = [%a%[0] + %b%[0], %a%[1] + %b%[1], %a%[2] + %b%[2]]"
-			elif op == "SUBTRACT": return "$result$ = [%a%[0] - %b%[0], %a%[1] - %b%[1], %a%[2] - %b%[2]]"
-			elif op == "MULTIPLY": return "$result$ = [%a%[0] * %b%[0], %a%[1] * %b%[1], %a%[2] * %b%[2]]"
+			if op == "ADD": return "$result$ = %a% + %b%"
+			elif op == "SUBTRACT": return "$result$ = %a% - %b%"
+			elif op == "MULTIPLY": return "$result$ = mathutils.Vector((%a%[0] * %b%[0], %a%[1] * %b%[1], %a%[2] * %b%[2]))"
 			elif op == "DIVIDE": return '''
-$result$ = [0, 0, 0]
+$result$ = mathutils.Vector((0, 0, 0))
 if %b%[0] != 0: $result$[0] = %a%[0] / %b%[0]
 if %b%[1] != 0: $result$[1] = %a%[1] / %b%[1]
 if %b%[2] != 0: $result$[2] = %a%[2] / %b%[2]
 '''
-			elif op == "CROSS": return "$result$ = [%a%[1] * %b%[2] - %a%[2] * %b%[1], %a%[2] * %b%[0] - %a%[0] * %b%[2], %a%[0] * %b%[1] - %a%[1] * %b%[0]]"
+			elif op == "CROSS": return "$result$ = %a%.cross(%b%)"
 		return ""
 	def getModuleList(self):
-		return ["math"]
+		return ["mathutils"]
 
 

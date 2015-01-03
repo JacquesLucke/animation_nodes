@@ -22,5 +22,5 @@ class mn_VectorDistanceNode(Node, AnimationNode):
 		return {"Distance" : "distance"}
 		
 	def execute(self, a, b):
-		return (Vector(a) - Vector(b)).length
+		return (a - b).length
 

@@ -4,6 +4,7 @@ from animation_nodes.mn_cache import getUniformRandom
 from animation_nodes.mn_node_base import AnimationNode
 from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from animation_nodes.utils.mn_interpolation_utils import *
+from mathutils import Vector
 
 class mn_AnimateVectorNode(Node, AnimationNode):
 	bl_idname = "mn_AnimateVectorNode"
@@ -35,16 +36,16 @@ class mn_AnimateVectorNode(Node, AnimationNode):
 	def execute(self, useOutput, start, end, time, interpolation, duration, delay):
 		duration = max(duration, 1)
 		influence = interpolation[0](max(min(time / duration, 1.0), 0.0), interpolation[1])
-		current = [start[0] * (1 - influence) + end[0] * influence,
+		current = Vector((start[0] * (1 - influence) + end[0] * influence,
 					start[1] * (1 - influence) + end[1] * influence,
-					start[2] * (1 - influence) + end[2] * influence]
+					start[2] * (1 - influence) + end[2] * influence))
 		difference = [0, 0, 0]
 		if useOutput["Difference"]:
 			influence = interpolation[0](max(min((time - 1) / duration, 1.0), 0.0), interpolation[1])
-			oldVector = [start[0] * (1 - influence) + end[0] * influence,
+			oldVector = Vector((start[0] * (1 - influence) + end[0] * influence,
 						start[1] * (1 - influence) + end[1] * influence,
-						start[2] * (1 - influence) + end[2] * influence]
-			difference = [current[0] - oldVector[0], current[1] - oldVector[1], current[2] - oldVector[2]]
+						start[2] * (1 - influence) + end[2] * influence))
+			difference = current - oldVector
 		return current, time - duration - delay, difference
 		
 

@@ -3,6 +3,7 @@ from bpy.types import Node
 from animation_nodes.mn_cache import getUniformRandom
 from animation_nodes.mn_node_base import AnimationNode
 from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from mathutils import Vector
 
 class mn_RandomVectorNode(Node, AnimationNode):
 	bl_idname = "mn_RandomVectorNode"
@@ -29,9 +30,9 @@ class mn_RandomVectorNode(Node, AnimationNode):
 	def execute(self, seed, maxValues):
 		max = maxValues/2
 		addSeed = 1193 * self.additionalSeed
-		return [getUniformRandom(seed + addSeed, -max, max),
+		return Vector((getUniformRandom(seed + addSeed, -max, max),
 				getUniformRandom(seed + 754 + addSeed, -max, max),
-				getUniformRandom(seed + 2345 + addSeed, -max, max)]
+				getUniformRandom(seed + 2345 + addSeed, -max, max)))
 				
 	def copy(self, node):
 		self.additionalSeed = int(random.random()*1000)

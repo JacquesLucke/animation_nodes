@@ -21,5 +21,5 @@ class mn_VectorLengthNode(Node, AnimationNode):
 		return {"Length" : "length"}
 		
 	def execute(self, vector):
-		return mathutils.Vector(vector).length
+		return vector.length
 

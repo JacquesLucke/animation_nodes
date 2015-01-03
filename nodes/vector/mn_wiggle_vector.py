@@ -3,7 +3,7 @@ from animation_nodes.utils.mn_math_utils import perlinNoise
 from bpy.types import Node
 from animation_nodes.mn_node_base import AnimationNode
 from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
-
+from mathutils import Vector
 
 class mn_VectorWiggle(Node, AnimationNode):
 	bl_idname = "mn_VectorWiggle"
@@ -37,7 +37,7 @@ class mn_VectorWiggle(Node, AnimationNode):
 		return {"Vector" : "vector"}
 		
 	def execute(self, seed, evolution, speed, amplitude, persistance, octaves):
-		vector = [0, 0, 0]
+		vector = Vector()
 		evolution = evolution / speed + 2541 * seed + 823 * self.additionalSeed
 		vector[0] = perlinNoise(evolution, persistance, octaves) * amplitude[0]
 		evolution += 79
