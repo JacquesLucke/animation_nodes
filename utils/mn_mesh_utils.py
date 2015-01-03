@@ -15,7 +15,7 @@ class MeshData:
 		return MeshData(self.getVerticesCopy(), self.getEdgesCopy(), self.getPolygonsCopy())
 
 	def getVerticesCopy(self):
-		return copy2dList(self.vertices)
+		return [vertex.copy() for vertex in self.vertices]
 	def getEdgesCopy(self):
 		return copy2dList(self.edges)
 	def getPolygonsCopy(self):
