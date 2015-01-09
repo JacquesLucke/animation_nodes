@@ -1,4 +1,4 @@
-import bpy, random
+import bpy, random, mathutils
 from animation_nodes.utils.mn_math_utils import perlinNoise
 from bpy.types import Node
 from animation_nodes.mn_node_base import AnimationNode
@@ -28,7 +28,7 @@ class mn_GridArrange(Node, AnimationNode):
 
 	def execute(self, index, width, distance):
 		width = max(width, 1)
-		vector = [0, 0, 0]
+		vector = mathutils.Vector((0, 0, 0))
 		vector[0] = index % width * distance
 		vector[1] = int(index / width) * distance
 		return vector
