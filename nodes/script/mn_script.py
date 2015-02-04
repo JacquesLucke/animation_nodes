@@ -35,6 +35,9 @@ class mn_ScriptNode(Node, AnimationNode):
 		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
+		if self.textBlockName == "":
+			layout.operator("mn.load_script_preset", text = "Load Preset", icon = "LOAD_FACTORY")
+	
 		layout.operator("mn.update_scripts", text = "Update Scripts", icon = "FILE_REFRESH")
 	
 		layout.prop_search(self, "textBlockName",  bpy.data, "texts", icon="NONE", text = "Code")
@@ -195,5 +198,30 @@ class UpdateScripts(bpy.types.Operator):
 		updateScripts()
 		return {'FINISHED'}
 		
+class LoadScriptPreset(bpy.types.Operator):
+	bl_idname = "mn.load_script_preset"
+	bl_label = "Load Script Preset"
 
+	def execute(self, context):
+		presetBlockName = "node script preset"
+		if not presetBlockName in bpy.data.texts:
+			textBlock = bpy.data.texts.new(presetBlockName)
+			textBlock.from_string(scriptPresetCode)
+		return {'FINISHED'}
+		
+scriptPresetCode = '''import bpy
+
+name__sockets__ = (
+	[
+		("String", "Text", "inputText"),
+		("Integer", "Amount", "amount")],
+	[
+		("String", "Upper Text"),
+		("String", "Lower Text")])
+		
+def name__execute__(inputText, amount):		
+	text = inputText * amount
+	upperText = text.upper()
+	lowerText = text.lower()
+	return upperText, lowerText '''
 
