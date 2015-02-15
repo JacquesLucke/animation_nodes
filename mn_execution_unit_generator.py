@@ -133,7 +133,8 @@ def getNodeNetworks():
 	networks = []
 	nodeTrees = getAnimationNodeTrees()
 	for nodeTree in nodeTrees:
-		nodeTree.use_fake_user = True
+		try: nodeTree.use_fake_user = True
+		except: pass
 		nodeTreeInfo = NodeTreeInfo(nodeTree)
 		networks.extend(nodeTreeInfo.getNetworks())
 	return networks
