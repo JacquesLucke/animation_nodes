@@ -20,6 +20,7 @@ class mn_SeparateTextObject(Node, AnimationNode):
 	def init(self, context):
 		forbidCompiling()
 		self.outputs.new("mn_ObjectListSocket", "Text Objects")
+		self.width = 180
 		allowCompiling()
 		
 	def getInputSocketNames(self):
