@@ -3,6 +3,7 @@ from animation_nodes.mn_utils import *
 from bpy.types import Node
 from animation_nodes.mn_node_base import AnimationNode
 from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from mathutils import Vector, Matrix
 
 idPropertyName = "text separation node id"
 indexPropertyName = "text separation node index"
@@ -32,6 +33,10 @@ class mn_SeparateTextObject(Node, AnimationNode):
 		assign.nodeTreeName = self.id_data.name
 		assign.nodeName = self.name
 		
+		source = self.getSourceObject()
+		if source is not None:
+			row.prop(source, "hide", text = "")
+		
 		update = layout.operator("mn.update_text_separation_node", text = "Update", icon = "FILE_REFRESH")
 		update.nodeTreeName = self.id_data.name
 		update.nodeName = self.name
@@ -47,10 +52,12 @@ class mn_SeparateTextObject(Node, AnimationNode):
 		self.removeExistingObjects()
 		self.createNewNodeID()
 		
-		source = bpy.data.objects.get(self.sourceObjectName);
-		if source.type != "FONT":
-			return
+		source = self.getSourceObject()
+		if source is None: return
 		
+		splitTextObject(source)
+		
+		source.hide = True
 		
 	def removeExistingObjects(self):
 		deselectAll()
@@ -64,6 +71,56 @@ class mn_SeparateTextObject(Node, AnimationNode):
 		
 	def isObjectPartOfThisNode(self, object):
 		return getattr(object, idPropertyName, -1) == self.currentID
+	def getSourceObject(self):
+		source = bpy.data.objects.get(self.sourceObjectName)
+		if getattr(source, "type", "") == "FONT": return source
+		return None
+		
+def splitTextObject(source):
+	sourceSplinePositions = getSplinePositions(source)
+	text = source.data.body.replace(" ", "");
+	
+	splineCounter = 0
+	for i, character in enumerate(text):
+		name = source.name + " part " + str(i)
+		characterObject = newCharacterObject(name, source.data, character)
+
+		characterSplinePositions = getSplinePositions(characterObject)
+		setCharacterPosition(characterObject, source, sourceSplinePositions[splineCounter], characterSplinePositions[0])
+		splineCounter += len(characterSplinePositions)
+		
+def newCharacterObject(name, sourceData, character):
+	newTextData = sourceData.copy()
+	newTextData.body = character
+	characterObject = bpy.data.objects.new(name, newTextData)
+	bpy.context.scene.objects.link(characterObject)
+	return characterObject
+	
+def setCharacterPosition(characterObject, source, sourceSplinePosition, offsetPosition):	
+	characterOffset = sourceSplinePosition - offsetPosition
+	characterObject.matrix_world = source.matrix_world * Matrix.Translation(characterOffset)
+		
+def getSplinePositions(textObject):
+	onlySelect(textObject)
+	curve = newCurveFromActiveObject()
+	positions = [Vector(spline.bezier_points[0].co) for spline in curve.data.splines]
+	removeCurve(curve)
+	return positions
+
+def onlySelect(object):
+	bpy.ops.object.select_all(action = "DESELECT")
+	bpy.context.scene.objects.active = object
+	object.select = True
+	
+def newCurveFromActiveObject():
+	bpy.ops.object.convert(target = "CURVE", keep_original = True)
+	return bpy.context.scene.objects.active
+	
+def removeCurve(curve):
+	curveData = curve.data
+	bpy.context.scene.objects.unlink(curve)
+	bpy.data.objects.remove(curve)
+	bpy.data.curves.remove(curveData)
 		
 class UpdateTextSeparationNode(bpy.types.Operator):
 	bl_idname = "mn.update_text_separation_node"
@@ -71,10 +128,6 @@ class UpdateTextSeparationNode(bpy.types.Operator):
 	
 	nodeTreeName = bpy.props.StringProperty()
 	nodeName = bpy.props.StringProperty()
-	
-	@classmethod
-	def poll(cls, context):
-		return getActive() is not None
 		
 	def execute(self, context):
 		obj = getActive()
