@@ -42,10 +42,10 @@ class mn_SeparateTextObject(Node, AnimationNode):
 		update.nodeName = self.name
 		
 	def execute(self):
-		textObjects = []
+		textObjects = [None] * self.objectCount
 		for object in bpy.context.scene.objects:
 			if self.isObjectPartOfThisNode(object):
-				textObjects[getattr(object, indexPropertyName, 0)] = object
+				textObjects[getattr(object, '["'+indexPropertyName+'"]', 0)] = object
 		return textObjects
 		
 	def updateSeparation(self):
@@ -54,8 +54,14 @@ class mn_SeparateTextObject(Node, AnimationNode):
 		
 		source = self.getSourceObject()
 		if source is None: return
+		if source.data is None: return
+		source.hide = False
 		
-		splitTextObject(source)
+		objects = splitTextObject(source)
+		for i, object in enumerate(objects):
+			object[idPropertyName] = self.currentID
+			object[indexPropertyName] = i
+		self.objectCount = len(objects)
 		
 		source.hide = True
 		
@@ -70,24 +76,39 @@ class mn_SeparateTextObject(Node, AnimationNode):
 		self.currentID = round(random.random() * 100000)
 		
 	def isObjectPartOfThisNode(self, object):
-		return getattr(object, idPropertyName, -1) == self.currentID
+		return getattr(object, '["'+idPropertyName+'"]', -1) == self.currentID
 	def getSourceObject(self):
 		source = bpy.data.objects.get(self.sourceObjectName)
 		if getattr(source, "type", "") == "FONT": return source
 		return None
 		
+	def copy(self, node):
+		self.createNewNodeID()
+		
 def splitTextObject(source):
-	sourceSplinePositions = getSplinePositions(source)
-	text = source.data.body.replace(" ", "");
+	text = cleanText(source.data.body)
 	
 	splineCounter = 0
+	sourceSplinePositions = getSplinePositions(source)
+	objects = []
+	
 	for i, character in enumerate(text):
 		name = source.name + " part " + str(i)
 		characterObject = newCharacterObject(name, source.data, character)
 
 		characterSplinePositions = getSplinePositions(characterObject)
+		test = characterSplinePositions[0]
 		setCharacterPosition(characterObject, source, sourceSplinePositions[splineCounter], characterSplinePositions[0])
 		splineCounter += len(characterSplinePositions)
+		
+		objects.append(characterObject)
+		
+	return objects
+	
+def cleanText(text):
+	for part in [" ", "\n", "\t", "\r"]:
+		text = text.replace(part, "");
+	return text
 		
 def newCharacterObject(name, sourceData, character):
 	newTextData = sourceData.copy()
