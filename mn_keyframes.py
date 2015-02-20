@@ -1,4 +1,5 @@
 import bpy
+from mathutils import Vector
 from animation_nodes.mn_utils import *
 
 keyframePropertyPrefix = "Animation Nodes - "
@@ -75,14 +76,14 @@ def getKeyframe(object, name, type = None):
 			transforms.append(list(object[propertyName + " scale"]))
 			return transforms
 		elif type == "Vector":
-			return list(object[propertyName])
+			return Vector(object[propertyName])
 	except:
 		if type == "Float":
 			return 0.0
 		elif type == "Transforms":
 			return ([0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [1.0, 1.0, 1.0])
 		elif type == "Vector":
-			return [0, 0, 0]
+			return Vector([0, 0, 0])
 
 def isKeyframeNameUsed(name):
 	for keyframe in getKeyframes():
