@@ -4,6 +4,7 @@ from bpy.types import Node
 from animation_nodes.mn_node_base import AnimationNode
 from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from mathutils import Vector, Matrix
+from animation_nodes.mn_keyframes import setKeyframe
 
 idPropertyName = "text separation node id"
 indexPropertyName = "text separation node index"
@@ -61,16 +62,22 @@ class mn_SeparateTextObject(Node, AnimationNode):
 		for i, object in enumerate(objects):
 			object[idPropertyName] = self.currentID
 			object[indexPropertyName] = i
+			setKeyframe(object, "Initial Transforms", (object.location, object.rotation_euler, object.scale))
 		self.objectCount = len(objects)
 		
 		source.hide = True
 		
 	def removeExistingObjects(self):
 		deselectAll()
+		objects = []
 		for object in bpy.context.scene.objects:
 			if self.isObjectPartOfThisNode(object):
-				object.select = True
-		bpy.ops.object.delete()
+				objects.append(object)
+		for object in objects:
+			bpy.context.scene.objects.unlink(object)
+			data = object.data
+			bpy.data.objects.remove(object)
+			bpy.data.curves.remove(data)
 		
 	def createNewNodeID(self):
 		self.currentID = round(random.random() * 100000)
