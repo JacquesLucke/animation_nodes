@@ -32,7 +32,7 @@ class mn_ObjectInstancer(Node, AnimationNode):
 	deepCopy = bpy.props.BoolProperty(default = False, update = resetInstancesEvent, name = "Deep Copy", description = "Use this to copy all data to the new object (to unlink it from the source mesh for example)")
 	objectType = bpy.props.EnumProperty(default = "Mesh", name = "Object Type", items = objectTypeItems, update = resetInstancesEvent)
 	
-	parentInstances = bpy.props.BoolProperty(default = True, name = "Parent to Main Controler", update = resetInstancesEvent)
+	parentInstances = bpy.props.BoolProperty(default = True, name = "Parent to Main Container", update = resetInstancesEvent)
 	
 	def init(self, context):
 		forbidCompiling()
