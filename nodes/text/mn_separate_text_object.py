@@ -104,7 +104,7 @@ def splitTextObject(source):
 	objects = []
 	
 	for i, character in enumerate(text):
-		name = source.name + " part " + str(i)
+		name = source.name + " part " + str(i).zfill(3)
 		characterObject = newCharacterObject(name, source.data, character)
 
 		characterSplinePositions = getSplinePositions(characterObject)
