@@ -16,6 +16,7 @@ class mn_SeparateTextObject(Node, AnimationNode):
 	sourceObjectName = bpy.props.StringProperty(name = "Source Object")
 	currentID = bpy.props.IntProperty(default = 0);
 	objectCount = bpy.props.IntProperty(default = 0);
+	convertToMesh = bpy.props.BoolProperty(name = "Convert to Mesh", default = False)
 	
 	def init(self, context):
 		forbidCompiling()
@@ -38,6 +39,8 @@ class mn_SeparateTextObject(Node, AnimationNode):
 		source = self.getSourceObject()
 		if source is not None:
 			row.prop(source, "hide", text = "")
+			
+		layout.prop(self, "convertToMesh")
 		
 		update = layout.operator("mn.update_text_separation_node", text = "Update", icon = "FILE_REFRESH")
 		update.nodeTreeName = self.id_data.name
@@ -66,19 +69,19 @@ class mn_SeparateTextObject(Node, AnimationNode):
 			setKeyframe(object, "Initial Transforms", (object.location, object.rotation_euler, object.scale))
 		self.objectCount = len(objects)
 		
+		onlySelectList(objects)
+		if self.convertToMesh:
+			convertSelectedObjectsToMeshes()
+		
 		source.hide = True
 		
 	def removeExistingObjects(self):
-		deselectAll()
 		objects = []
 		for object in bpy.context.scene.objects:
 			if self.isObjectPartOfThisNode(object):
 				objects.append(object)
 		for object in objects:
-			bpy.context.scene.objects.unlink(object)
-			data = object.data
-			bpy.data.objects.remove(object)
-			bpy.data.curves.remove(data)
+			removeObject(object)
 		
 	def createNewNodeID(self):
 		self.currentID = round(random.random() * 100000)
@@ -140,6 +143,15 @@ def onlySelect(object):
 	bpy.ops.object.select_all(action = "DESELECT")
 	bpy.context.scene.objects.active = object
 	object.select = True
+
+def onlySelectList(objectList):
+	bpy.ops.object.select_all(action = "DESELECT")
+	if len(objectList) == 0:
+		bpy.context.scene.objects.active = None
+	else:
+		bpy.context.scene.objects.active = objectList[0]
+	for object in objectList:
+		object.select = True
 	
 def newCurveFromActiveObject():
 	bpy.ops.object.convert(target = "CURVE", keep_original = True)
@@ -150,6 +162,21 @@ def removeCurve(curve):
 	bpy.context.scene.objects.unlink(curve)
 	bpy.data.objects.remove(curve)
 	bpy.data.curves.remove(curveData)
+	
+def convertSelectedObjectsToMeshes():
+	bpy.context.area.type = "VIEW_3D"
+	bpy.ops.object.convert(target = "MESH")
+	bpy.context.area.type = "NODE_EDITOR"
+	
+def removeObject(object):
+	bpy.context.scene.objects.unlink(object)
+	objectType = object.type
+	data = object.data
+	bpy.data.objects.remove(object)
+	if objectType == "FONT":
+		bpy.data.curves.remove(data)
+	elif objectType == "MESH":
+		bpy.data.meshes.remove(data)
 		
 class UpdateTextSeparationNode(bpy.types.Operator):
 	bl_idname = "mn.update_text_separation_node"
