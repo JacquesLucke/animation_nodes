@@ -19,6 +19,7 @@ class mn_SeparateTextObject(Node, AnimationNode):
 	objectCount = bpy.props.IntProperty(default = 0);
 	convertToMesh = bpy.props.BoolProperty(name = "Convert to Mesh", default = False)
 	parentLetters = bpy.props.BoolProperty(name = "Parent to Main Container", default = True)
+	materialName = bpy.props.StringProperty(name = "Material", default = "")
 	
 	def init(self, context):
 		forbidCompiling()
@@ -43,6 +44,7 @@ class mn_SeparateTextObject(Node, AnimationNode):
 			row.prop(source, "hide", text = "")
 			
 		layout.prop(self, "convertToMesh")
+		layout.prop_search(self, "materialName", bpy.data, "materials", text="Material", icon="MATERIAL_DATA")
 		
 		update = layout.operator("mn.update_text_separation_node", text = "Update", icon = "FILE_REFRESH")
 		update.nodeTreeName = self.id_data.name
@@ -80,6 +82,10 @@ class mn_SeparateTextObject(Node, AnimationNode):
 		
 		if self.parentLetters:
 			parentObjectsToMainControler(objects)
+			
+		material = bpy.data.materials.get(self.materialName)
+		if material:
+			setMaterialOnObjects(objects, material)
 		
 		source.hide = True
 		
@@ -190,6 +196,10 @@ def parentObjectsToMainControler(objects):
 	mainControler = getMainObjectContainer()
 	for object in objects:
 		object.parent = mainControler
+		
+def setMaterialOnObjects(objects, material):
+	for object in objects:
+		object.active_material = material
 		
 class UpdateTextSeparationNode(bpy.types.Operator):
 	bl_idname = "mn.update_text_separation_node"
