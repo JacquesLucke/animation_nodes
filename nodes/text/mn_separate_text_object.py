@@ -5,6 +5,7 @@ from animation_nodes.mn_node_base import AnimationNode
 from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from mathutils import Vector, Matrix
 from animation_nodes.mn_keyframes import setKeyframe
+from animation_nodes.nodes.mn_node_helper import getMainObjectContainer
 
 idPropertyName = "text separation node id"
 indexPropertyName = "text separation node index"
@@ -17,6 +18,7 @@ class mn_SeparateTextObject(Node, AnimationNode):
 	currentID = bpy.props.IntProperty(default = 0);
 	objectCount = bpy.props.IntProperty(default = 0);
 	convertToMesh = bpy.props.BoolProperty(name = "Convert to Mesh", default = False)
+	parentLetters = bpy.props.BoolProperty(name = "Parent to Main Container", default = True)
 	
 	def init(self, context):
 		forbidCompiling()
@@ -46,6 +48,9 @@ class mn_SeparateTextObject(Node, AnimationNode):
 		update.nodeTreeName = self.id_data.name
 		update.nodeName = self.name
 		
+	def draw_buttons_ext(self, context, layout):
+		layout.prop(self, "parentLetters")
+		
 	def execute(self):
 		textObjects = [None] * self.objectCount
 		for object in bpy.context.scene.objects:
@@ -72,6 +77,9 @@ class mn_SeparateTextObject(Node, AnimationNode):
 		onlySelectList(objects)
 		if self.convertToMesh:
 			convertSelectedObjectsToMeshes()
+		
+		if self.parentLetters:
+			parentObjectsToMainControler(objects)
 		
 		source.hide = True
 		
@@ -144,13 +152,13 @@ def onlySelect(object):
 	bpy.context.scene.objects.active = object
 	object.select = True
 
-def onlySelectList(objectList):
+def onlySelectList(objects):
 	bpy.ops.object.select_all(action = "DESELECT")
-	if len(objectList) == 0:
+	if len(objects) == 0:
 		bpy.context.scene.objects.active = None
 	else:
-		bpy.context.scene.objects.active = objectList[0]
-	for object in objectList:
+		bpy.context.scene.objects.active = objects[0]
+	for object in objects:
 		object.select = True
 	
 def newCurveFromActiveObject():
@@ -177,6 +185,11 @@ def removeObject(object):
 		bpy.data.curves.remove(data)
 	elif objectType == "MESH":
 		bpy.data.meshes.remove(data)
+		
+def parentObjectsToMainControler(objects):
+	mainControler = getMainObjectContainer()
+	for object in objects:
+		object.parent = mainControler
 		
 class UpdateTextSeparationNode(bpy.types.Operator):
 	bl_idname = "mn.update_text_separation_node"
