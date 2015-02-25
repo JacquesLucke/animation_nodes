@@ -39,7 +39,7 @@ class mn_ObjectTransformsOutput(Node, AnimationNode):
 		row.prop(self, "useRotation", index = 1, text = "Y")
 		row.prop(self, "useRotation", index = 2, text = "Z")
 		row = col.row(align = True)
-		row.label("cale")
+		row.label("Scale")
 		row.prop(self, "useScale", index = 0, text = "X")
 		row.prop(self, "useScale", index = 1, text = "Y")
 		row.prop(self, "useScale", index = 2, text = "Z")
