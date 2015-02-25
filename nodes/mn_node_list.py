@@ -40,6 +40,7 @@ def getNodeNameDictionary():
 	nodes.append(("Object", [
 		("mn_ObjectInputNode", "Object"),
 		("mn_ObjectListInputNode", "Object List"),
+		("mn_ObjectGroupInput", "Object Group Input"),
 		("mn_ObjectInfoNode", "Object Info"),
 		("mn_ObjectMatrixInput", "Object Matrices"),
 		("mn_ObjectKeyframeInput", "Keyframe"),
