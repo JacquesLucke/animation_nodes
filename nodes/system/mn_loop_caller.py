@@ -21,8 +21,13 @@ class mn_LoopCallerNode(Node, AnimationNode):
     def getStartLoopNodeItems(self, context):
         startLoopNames = getAttributesFromNodesWithType(
             "mn_LoopStartNode", "loopName")
-        startLoopNames.sort()
-        startLoopNames.reverse()
+
+        # Disabling the sort fixes a bug that was causing
+        # the loopcaller to select another loop when a new
+        # one was added
+
+        # startLoopNames.sort()
+        # startLoopNames.reverse()
         startLoopItems = []
         for loopName in startLoopNames:
             startLoopItems.append((loopName, loopName, ""))
