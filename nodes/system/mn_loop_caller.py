@@ -30,7 +30,11 @@ class mn_LoopCallerNode(Node, AnimationNode):
         # startLoopNames.reverse()
         startLoopItems = []
         for loopName in startLoopNames:
-            startLoopItems.append((loopName, loopName, ""))
+            if loopName == self.activeLoop:
+                startLoopItems.insert(0, (loopName, loopName, ""))
+            else:
+                startLoopItems.append((loopName, loopName, ""))
+
         if len(startLoopItems) == 0:
             startLoopItems.append(("NONE", "NONE", ""))
         return startLoopItems
