@@ -51,6 +51,7 @@ class mn_LoopCallerNode(Node, AnimationNode):
     def init(self, context):
         forbidCompiling()
         self.updateSockets()
+        self.updateActiveLoop()
         allowCompiling()
 
     def draw_buttons(self, context, layout):
@@ -119,7 +120,8 @@ class mn_LoopCallerNode(Node, AnimationNode):
         return getNodeFromTypeWithAttribute("mn_LoopStartNode", "loopName", self.activeLoop)
 
     def updateActiveLoop(self):
-        self.activeLoop = self.selectedLoop
+        if self.selectedLoop != "NONE":
+            self.activeLoop = self.selectedLoop
         self.updateSockets()
         nodeTreeChanged()
 
