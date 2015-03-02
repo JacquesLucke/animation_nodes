@@ -81,7 +81,7 @@ def getKeyframe(object, name, type = None):
 		if type == "Float":
 			return 0.0
 		elif type == "Transforms":
-			return ([0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [1.0, 1.0, 1.0])
+			return (Vector((0.0, 0.0, 0.0)), Vector((0.0, 0.0, 0.0)), Vector((1.0, 1.0, 1.0)))
 		elif type == "Vector":
 			return Vector([0, 0, 0])
 
