@@ -47,10 +47,10 @@ class mn_SplitText(Node, AnimationNode):
 		textList = []
 
 		if self.splitType == "Characters": textList = list(text)
-		if self.splitType == "Words": textList = text.split()
-		if self.splitType == "Lines": textList = text.split("\n")
+		elif self.splitType == "Words": textList = text.split()
+		elif self.splitType == "Lines": textList = text.split("\n")
 
-		if self.splitType == "Regexp":
+		elif self.splitType == "Regexp":
 			if splitBy == "": textList = [text]
 			else: 
 				if self.keepDelimiters == True: textList = re.split("("+splitBy+")", text)
