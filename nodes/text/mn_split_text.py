@@ -51,7 +51,7 @@ class mn_SplitText(Node, AnimationNode):
 		if self.splitType == "Lines": textList = text.split("\n")
 
 		if self.splitType == "Regexp":
-			if splitBy == "": textList = list(text)
+			if splitBy == "": textList = [text]
 			else: 
 				if self.keepDelimiters == True: textList = re.split("("+splitBy+")", text)
 				else: textList = re.split(splitBy, text)
