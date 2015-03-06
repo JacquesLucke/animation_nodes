@@ -22,7 +22,10 @@ class mn_ObjectAttributeInputNode(Node, AnimationNode):
 		
 	def execute(self, object, attribute):
 		try:
-			return eval("object." + attribute)
+			if attribute.startswith("["):
+				return eval("object" + attribute)
+			else:
+				return eval("object." + attribute)
 		except:
 			return None
 
