@@ -19,20 +19,27 @@ class mn_LoopCallerNode(Node, AnimationNode):
 	
 	def getStartLoopNodeItems(self, context):
 		startLoopNames = getAttributesFromNodesWithType("mn_LoopStartNode", "loopName")
-		startLoopNames.sort()
-		startLoopNames.reverse()
+		
 		startLoopItems = []
 		for loopName in startLoopNames:
 			startLoopItems.append((loopName, loopName, ""))
-		if len(startLoopItems) == 0: startLoopItems.append(("NONE", "NONE", ""))
+
+		if len(startLoopItems) == 0: 
+			startLoopItems.append(("NONE", "NONE", ""))
 		return startLoopItems
 	
-	selectedLoop = bpy.props.EnumProperty(items = getStartLoopNodeItems, name = "Selected Loop")
+	def updateActiveL(self, context):
+		self.updateActiveLoop()
+
+	selectedLoop = bpy.props.EnumProperty(
+        items=getStartLoopNodeItems,
+        name="Selected Loop",
+        update=updateActiveL)
 	activeLoop = bpy.props.StringProperty(name = "Active Loop", default = "Loop")
 	
 	def init(self, context):
 		forbidCompiling()
-		self.updateSockets()
+		self.updateActiveLoop()
 		allowCompiling()
 		
 	def draw_buttons(self, context, layout):	
@@ -94,7 +101,8 @@ class mn_LoopCallerNode(Node, AnimationNode):
 		return getNodeFromTypeWithAttribute("mn_LoopStartNode", "loopName", self.activeLoop)
 		
 	def updateActiveLoop(self):
-		self.activeLoop = self.selectedLoop
+		if self.selectedLoop != "NONE":
+			self.activeLoop = self.selectedLoop
 		self.updateSockets()
 		nodeTreeChanged()
 
