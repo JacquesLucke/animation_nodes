@@ -18,6 +18,7 @@ class mn_SplitText(Node, AnimationNode):
 		self.setHideProperty()
 	
 	splitType = bpy.props.EnumProperty(name = "Split Type", default = "Regexp", items = splitTypes, update = splitTypeChanges)
+	keepDelimiters = bpy.props.BoolProperty(default=False)
 	
 	def init(self, context):
 		forbidCompiling()
@@ -29,9 +30,11 @@ class mn_SplitText(Node, AnimationNode):
 		
 	def draw_buttons(self, context, layout):
 		layout.prop(self, "splitType", text = "Type")
+		if self.splitType == "Regexp": layout.prop(self, "keepDelimiters", text="Keep Delimiters")
 		
 	def setHideProperty(self):
 		self.inputs["Split By"].hide = not self.splitType == "Regexp"
+
 		
 	def getInputSocketNames(self):
 		return {"Text" : "text",
@@ -49,7 +52,9 @@ class mn_SplitText(Node, AnimationNode):
 
 		if self.splitType == "Regexp":
 			if splitBy == "": textList = list(text)
-			else: textList = re.split(splitBy, text)
+			else: 
+				if self.keepDelimiters == True: textList = re.split("("+splitBy+")", text)
+				else: textList = re.split(splitBy, text)
 
 		return textList, len(textList)
 
