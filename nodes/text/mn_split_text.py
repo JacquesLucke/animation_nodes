@@ -8,7 +8,7 @@ splitTypes = [
 	("Characters", "Characters", ""),
 	("Words", "Words", ""),
 	("Lines", "Lines", ""),
-	("Custom", "Custom", "") ]
+	("Regexp", "Regexp", "") ]
 
 class mn_SplitText(Node, AnimationNode):
 	bl_idname = "mn_SplitText"
@@ -17,7 +17,7 @@ class mn_SplitText(Node, AnimationNode):
 	def splitTypeChanges(self, context):
 		self.setHideProperty()
 	
-	splitType = bpy.props.EnumProperty(name = "Split Type", default = "Custom", items = splitTypes, update = splitTypeChanges)
+	splitType = bpy.props.EnumProperty(name = "Split Type", default = "Regexp", items = splitTypes, update = splitTypeChanges)
 	
 	def init(self, context):
 		forbidCompiling()
@@ -31,7 +31,7 @@ class mn_SplitText(Node, AnimationNode):
 		layout.prop(self, "splitType", text = "Type")
 		
 	def setHideProperty(self):
-		self.inputs["Split By"].hide = not self.splitType == "Custom"
+		self.inputs["Split By"].hide = not self.splitType == "Regexp"
 		
 	def getInputSocketNames(self):
 		return {"Text" : "text",
@@ -42,11 +42,14 @@ class mn_SplitText(Node, AnimationNode):
 
 	def execute(self, text, splitBy):
 		textList = []
+
 		if self.splitType == "Characters": textList = list(text)
-		elif self.splitType == "Words": textList = text.split()
-		elif self.splitType == "Lines": textList = text.split("\n")
-		elif self.splitType == "Custom":
+		if self.splitType == "Words": textList = text.split()
+		if self.splitType == "Lines": textList = text.split("\n")
+
+		if self.splitType == "Regexp":
 			if splitBy == "": textList = list(text)
-			else: textList = text.split(splitBy)
+			else: textList = re.split(splitBy, text)
+
 		return textList, len(textList)
 
