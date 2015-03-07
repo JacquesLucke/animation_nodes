@@ -81,7 +81,7 @@ class mn_ExpressionNode(Node, AnimationNode):
 	def useInLineExecution(self):
 		return True
 	def getModuleList(self):
-		return ["math"]
+		return ["math", "re"]
 	def getInLineExecutionString(self, outputUse):
 		if not isValidCode(self.expression):
 			self.isExpressionValid = False	
