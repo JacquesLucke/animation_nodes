@@ -76,6 +76,11 @@ except: $new$ = 0
 if isinstance(%old%, bpy.types.Object): $new$ = %old%
 else: $new$ = None
 '''
+		elif t == "Vector":
+			codeLines = []
+			codeLines.append("try: $new$ = mathutils.Vector(%old%)")
+			codeLines.append("except: $new$ = mathutils.Vector((0, 0, 0))")
+			return "\n".join(codeLines)
 		elif t == "Color":
 			codeLines = []
 			codeLines.append("try:")
@@ -112,5 +117,6 @@ else: $new$ = None
 	def getModuleList(self):
 		t = self.convertType
 		if t == "Interpolation": return ["animation_nodes.utils.mn_interpolation_utils"]
+		if t == "Vector": return ["mathutils"]
 		return []
 
