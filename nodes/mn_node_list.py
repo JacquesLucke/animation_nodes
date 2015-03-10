@@ -54,6 +54,7 @@ def getNodeNameDictionary():
 		
 	nodes.append(("Boolean", [
 		("mn_CompareNode", "Compare"),
+		("mn_InvertNode", "Invert"),
 		("mn_ConditionNode", "Condition")] ))
 		
 	nodes.append(("Matrix", [
