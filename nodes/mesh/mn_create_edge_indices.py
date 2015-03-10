@@ -7,6 +7,7 @@ import math
 class mn_CreateEdgeIndices(Node, AnimationNode):
 	bl_idname = "mn_CreateEdgeIndices"
 	bl_label = "Create Edge Indices"
+	node_category = "Mesh"
 	isDetermined = True
 	
 	def init(self, context):

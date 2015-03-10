@@ -7,6 +7,7 @@ from animation_nodes.mn_utils import *
 class mn_CreatePolygonIndices(Node, AnimationNode):
 	bl_idname = "mn_CreatePolygonIndices"
 	bl_label = "Create Polygon Indices"
+	node_category = "Mesh"
 	isDetermined = True
 	
 	def amountChanged(self, context):

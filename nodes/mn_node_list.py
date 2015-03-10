@@ -74,6 +74,9 @@ def getNodeNameDictionary():
 		("mn_TransformVertex", "Transform Vertex"),
 		("mn_PolygonInfo", "Polygon Info"),
 		("mn_TransformPolygon", "Transform Polygon"),
+		("mn_CombineMeshData", "Recombine Mesh Data"),
+		("mn_AppendToMeshData", "Append Mesh Data"),
+		("mn_SeparateMeshData", "Separate Mesh Data"),
 		("mn_MeshRecalculateFaceNormals", "Recalculate Normals"),
 		("mn_MeshRemoveDoubles", "Remove Doubles"),
 		("mn_CreateMeshFromData", "Create Mesh from Data"),
@@ -85,7 +88,8 @@ def getNodeNameDictionary():
 		("mn_GetListLengthNode", "Get Length"),
 		("mn_CombineListsNode", "Combine Lists"),
 		("mn_ShuffleListNode", "Shuffle"),
-		("mn_SumListElementsNode", "Sum Elements") ] ))
+		("mn_SumListElementsNode", "Sum Elements"),
+		("mn_AppendListNode", "Append to List")] ))
 		
 	nodes.append(("Sound", [
 		("mn_SoundBakeNode", "Sound Bake"),

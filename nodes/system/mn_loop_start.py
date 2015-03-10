@@ -17,7 +17,7 @@ presets = {
 
 class mn_LoopStartNode(Node, AnimationNode):
 	bl_idname = "mn_LoopStartNode"
-	bl_label = "Loop"
+	bl_label = "Loop Start"
 	
 	def loopNameChanged(self, context):
 		if not self.nameIsChanging:
