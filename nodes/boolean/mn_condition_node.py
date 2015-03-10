@@ -14,6 +14,7 @@ class mn_ConditionNode(Node, AnimationNode):
 		self.inputs.new("mn_GenericSocket", "If True")
 		self.inputs.new("mn_GenericSocket", "If False")
 		self.outputs.new("mn_GenericSocket", "Output")
+		self.outputs.new("mn_GenericSocket", "Other")
 		allowCompiling()
 		
 	def getInputSocketNames(self):
@@ -21,10 +22,12 @@ class mn_ConditionNode(Node, AnimationNode):
 				"If True" : "ifTrue",
 				"If False" : "ifFalse"}
 	def getOutputSocketNames(self):
-		return {"Output" : "output"}
+		return {"Output" : "output",
+				"Other" : "other"}
 		
 	def useInLineExecution(self):
 		return True
 	def getInLineExecutionString(self, outputUse):
-		return "$output$ = %ifTrue% if %condition% else %ifFalse%"
+		return "$output$ = %ifTrue% if %condition% else %ifFalse%\n" + \
+			"$other$ = %ifFalse% if %condition% else %ifTrue%"
 
