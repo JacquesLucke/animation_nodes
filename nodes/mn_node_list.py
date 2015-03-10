@@ -28,6 +28,7 @@ def getNodeNameDictionary():
 		("mn_StringListInputNode", "Text List"),
 		("mn_RandomStringNode", "Random Text"),
 		("mn_TextBlockReader", "Text Block Reader"),
+		("mn_TextBlockWriter", "Text Block Writer"),
 		("mn_SeparateTextObject", "Separate Text Object"),
 		("mn_CharactersNode", "Characters"),
 		("mn_CombineStringsNode", "Combine Texts"),
