@@ -1,0 +1,30 @@
+import bpy
+from bpy.types import Node
+from animation_nodes.mn_node_base import AnimationNode
+from animation_nodes.mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
+
+
+class mn_ConditionNode(Node, AnimationNode):
+	bl_idname = "mn_ConditionNode"
+	bl_label = "Condition"
+	
+	def init(self, context):
+		forbidCompiling()
+		self.inputs.new("mn_BooleanSocket", "Condition")
+		self.inputs.new("mn_GenericSocket", "If True")
+		self.inputs.new("mn_GenericSocket", "If False")
+		self.outputs.new("mn_GenericSocket", "Output")
+		allowCompiling()
+		
+	def getInputSocketNames(self):
+		return {"Condition" : "condition",
+				"If True" : "ifTrue",
+				"If False" : "ifFalse"}
+	def getOutputSocketNames(self):
+		return {"Output" : "output"}
+		
+	def useInLineExecution(self):
+		return True
+	def getInLineExecutionString(self, outputUse):
+		return "$output$ = %ifTrue% if %condition% else %ifFalse%"
+

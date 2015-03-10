@@ -53,7 +53,8 @@ def getNodeNameDictionary():
 		("mn_ObjectTransformsOutput", "Transforms Output") ] ))
 		
 	nodes.append(("Boolean", [
-		("mn_CompareNode", "Compare") ] ))
+		("mn_CompareNode", "Compare"),
+		("mn_ConditionNode", "Condition")] ))
 		
 	nodes.append(("Matrix", [
 		("mn_ComposeMatrix", "Compose Matrix"),
