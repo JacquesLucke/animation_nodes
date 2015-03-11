@@ -128,7 +128,7 @@ class KeyframePanel(bpy.types.Panel):
 		elif type == "Transforms":
 			setTransformsKeyframe = layout.operator("mn.set_transforms_keyframe", text = "Set From Current", icon = "PASTEDOWN")
 			setTransformsKeyframe.keyframeName = name
-			layout.operator("mn.reset_object_transformations", text = "Set Initial Transforms on Object")
+			layout.operator("mn.reset_object_transformations", text = "Set Initial Transforms on Object", icon = "PASTEFLIPUP")
 		elif type == "Vector":
 			layout.label("Set Vector From:")
 			row = layout.row(align = True)

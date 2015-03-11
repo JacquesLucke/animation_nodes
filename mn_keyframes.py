@@ -221,6 +221,7 @@ class NewKeyframe(bpy.types.Operator):
 class ResetObjectTransformations(bpy.types.Operator):
 	bl_idname = "mn.reset_object_transformations"
 	bl_label = "Reset Object Transformations"
+	bl_description = "Set the Initial Transforms keyframe back on the selected objects"
 
 	def execute(self, context):
 		for object in context.selected_objects:
