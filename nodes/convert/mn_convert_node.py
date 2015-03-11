@@ -70,7 +70,7 @@ except: $new$ = 0
 '''
 		elif t == "String": return '''
 try: $new$ = str(%old%)
-except: $new$ = 0
+except: $new$ = ""
 '''
 		elif t == "Object": return '''
 if isinstance(%old%, bpy.types.Object): $new$ = %old%
