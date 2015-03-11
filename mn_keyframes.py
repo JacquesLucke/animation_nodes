@@ -218,3 +218,15 @@ class NewKeyframe(bpy.types.Operator):
 		newKeyframe(self.keyframeName, self.keyframeType)
 		return {'FINISHED'}
 
+class ResetObjectTransformations(bpy.types.Operator):
+	bl_idname = "mn.reset_object_transformations"
+	bl_label = "Reset Object Transformations"
+
+	def execute(self, context):
+		for object in context.selected_objects:
+			if hasKeyframe(object, "Initial Transforms"):
+				location, rotation, scale = getKeyframe(object, "Initial Transforms")
+				object.location = location
+				object.rotation_euler = rotation
+				object.scale = scale
+		return {'FINISHED'}		
