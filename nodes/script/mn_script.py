@@ -11,7 +11,8 @@ class mn_ScriptNode(Node, AnimationNode):
 	bl_idname = "mn_ScriptNode"
 	bl_label = "Script"
 	
-	textBlockName = bpy.props.StringProperty(name = "Script", default = "", description = "Choose")
+	textBlockName = bpy.props.StringProperty(name = "Script", default = "", description = "Choose the script you want to execute in this node")
+	errorMessage = bpy.props.StringProperty(name = "Error Message", default = "")
 	
 	def init(self, context):
 		forbidCompiling()
@@ -24,6 +25,9 @@ class mn_ScriptNode(Node, AnimationNode):
 		operator = row.operator("mn.open_new_script", text = "", icon = "PLUS")
 		operator.nodeTreeName = self.id_data.name
 		operator.nodeName = self.name
+		
+		if self.errorMessage != "":
+			layout.label(self.errorMessage, icon = "ERROR")
 		
 	def update(self):
 		forbidCompiling()
@@ -73,20 +77,26 @@ class mn_ScriptNode(Node, AnimationNode):
 		
 	def execute(self, inputs):
 		outputs = {}
+		self.errorMessage = ""
 		textBlock = bpy.data.texts.get(self.textBlockName)
 		if textBlock:
 			scriptLocals = {}
-			scriptGlobals = {}
-			scriptGlobals["bpy"] = bpy
 			for socket in self.inputs:
 				if socket.name == emptySocketName: continue
 				scriptLocals[socket.customName] = inputs[socket.identifier]
 			
 			script = textBlock.as_string()
-			exec(script, scriptGlobals, scriptLocals)
-			for socket in self.outputs:
-				if socket.name == emptySocketName: continue
-				outputs[socket.identifier] = scriptLocals[socket.customName]
+			
+			try:
+				exec(script, {}, scriptLocals)
+				for socket in self.outputs:
+					if socket.name == emptySocketName: continue
+					outputs[socket.identifier] = scriptLocals[socket.customName]
+			except BaseException as e:
+				self.errorMessage = str(e)
+				for socket in self.outputs:
+					if socket.identifier not in outputs:
+						outputs[socket.identifier] = socket.getValue()
 		return outputs
 		
 		
