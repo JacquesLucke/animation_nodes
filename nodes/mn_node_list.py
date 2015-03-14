@@ -90,7 +90,8 @@ def getNodeNameDictionary():
 		("mn_CombineListsNode", "Combine Lists"),
 		("mn_ShuffleListNode", "Shuffle"),
 		("mn_SumListElementsNode", "Sum Elements"),
-		("mn_AppendListNode", "Append to List")] ))
+		("mn_AppendListNode", "Append to List"),
+		("mn_ReverseListNode", "Reverse List") ] ))
 		
 	nodes.append(("Sound", [
 		("mn_SoundBakeNode", "Sound Bake"),
