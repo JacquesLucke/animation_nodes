@@ -4,6 +4,7 @@ from animation_nodes.mn_node_base import AnimationNode
 from animation_nodes.mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 from animation_nodes.mn_utils import *
 from animation_nodes.utils.mn_node_utils import NodeTreeInfo
+from animation_nodes.sockets.mn_socket_info import getSocketNameItems, getSocketNameByDataType
 
 emptySocketName = "New Socket"
 
@@ -13,6 +14,7 @@ class mn_ScriptNode(Node, AnimationNode):
 	
 	textBlockName = bpy.props.StringProperty(name = "Script", default = "", description = "Choose the script you want to execute in this node")
 	errorMessage = bpy.props.StringProperty(name = "Error Message", default = "")
+	selectedSocketType = bpy.props.EnumProperty(name = "Selected Socket Type", items = getSocketNameItems)
 	
 	def init(self, context):
 		forbidCompiling()
@@ -20,6 +22,8 @@ class mn_ScriptNode(Node, AnimationNode):
 		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
+		layout.separator()
+		
 		row = layout.row(align = True)
 		row.prop_search(self, "textBlockName",  bpy.data, "texts", text = "")  
 		operator = row.operator("mn.open_new_script", text = "", icon = "PLUS")
@@ -28,6 +32,25 @@ class mn_ScriptNode(Node, AnimationNode):
 		
 		if self.errorMessage != "":
 			layout.label(self.errorMessage, icon = "ERROR")
+			
+		layout.separator()
+			
+	def draw_buttons_ext(self, context, layout):
+		col = layout.column(align = True)
+		col.label("New Socket")
+		col.prop(self, "selectedSocketType", text = "")
+		
+		row = col.row(align = True)
+		
+		operator = row.operator("mn.append_socket_to_script_node", text = "Input")
+		operator.nodeTreeName = self.id_data.name
+		operator.nodeName = self.name
+		operator.makeOutputSocket = False
+		
+		operator = row.operator("mn.append_socket_to_script_node", text = "Output")
+		operator.nodeTreeName = self.id_data.name
+		operator.nodeName = self.name
+		operator.makeOutputSocket = True
 		
 	def update(self):
 		forbidCompiling()
@@ -103,6 +126,7 @@ class mn_ScriptNode(Node, AnimationNode):
 class OpenNewScript(bpy.types.Operator):
 	bl_idname = "mn.open_new_script"
 	bl_label = "New Keyframe"
+	bl_description = "Create a new text block (hold ctrl to open a new text editor)"
 	
 	nodeTreeName = bpy.props.StringProperty()
 	nodeName = bpy.props.StringProperty()
@@ -125,3 +149,23 @@ class OpenNewScript(bpy.types.Operator):
 		for area in bpy.context.screen.areas:
 			if area.type == type: return area
 		return None
+		
+		
+class AppendSocket(bpy.types.Operator):
+	bl_idname = "mn.append_socket_to_script_node"
+	bl_label = "Append Socket to Script Node"
+	bl_description = "Append a new socket to this node"
+	
+	nodeTreeName = bpy.props.StringProperty()
+	nodeName = bpy.props.StringProperty()
+	makeOutputSocket = bpy.props.BoolProperty()
+
+	def execute(self, context):
+		node = getNode(self.nodeTreeName, self.nodeName)
+		type = getSocketNameByDataType(node.selectedSocketType)
+		if self.makeOutputSocket:
+			node.appendSocket(node.outputs, type, "name")
+		else:
+			node.appendSocket(node.inputs, type, "name")
+			
+		return {'FINISHED'}	

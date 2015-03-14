@@ -32,8 +32,7 @@ def hasListSocketType(socketType):
 	return not getListSocketType(socketType) == None
 	
 def getSocketNameByDataType(dataType):
-	subClasses = mn_node_base.mn_BaseSocket.__subclasses__()
-	for subClass in subClasses:
+	for subClass in getSocketClasses():
 		if getattr(subClass, "dataType") == dataType: return subClass.bl_idname
 	return None
 	
@@ -44,3 +43,14 @@ def getListDataTypes():
 			if i > 0:
 				types.append(type)
 	return types
+
+def getSocketNameItems(self, context):
+	socketNames = getSocketNames()
+	socketNames.sort()
+	return [(name, name, "") for name in socketNames]
+		
+def getSocketNames():
+	return [socketClass.dataType for socketClass in getSocketClasses()]
+	
+def getSocketClasses():
+	return mn_node_base.mn_BaseSocket.__subclasses__()
