@@ -1,227 +1,75 @@
 import bpy
-from animation_nodes.mn_utils import *
 from bpy.types import Node
-from animation_nodes.sockets.mn_socket_info import *
-from animation_nodes.utils.mn_node_utils import *
 from animation_nodes.mn_node_base import AnimationNode
 from animation_nodes.mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
+from animation_nodes.mn_utils import *
+from animation_nodes.utils.mn_node_utils import NodeTreeInfo
 
-textBlockData = {}
+defaultVariableNames = list("xyzwabcdefghijklmnopqrstuv")
 
 class mn_ScriptNode(Node, AnimationNode):
 	bl_idname = "mn_ScriptNode"
 	bl_label = "Script"
 	
-	def selectedScriptChanged(self, context):
-		updateScripts()
-		self.buildSockets()
-		self.errorMessage = ""
-		nodeTreeChanged()
-		
-	def getScriptNameItems(self, context):
-		scriptNames = self.getScriptNamesInTextBlock()
-		scriptNameItems = []
-		for scriptName in scriptNames:
-			scriptNameItems.append((scriptName, scriptName, ""))
-		if len(scriptNameItems) == 0: scriptNameItems.append(("NONE", "NONE", ""))
-		return scriptNameItems
-		
-	textBlockName = bpy.props.StringProperty(default = "", update = selectedScriptChanged)
-	scriptName = bpy.props.EnumProperty(items = getScriptNameItems, update = selectedScriptChanged, name = "Script Name")
-	errorMessage = bpy.props.StringProperty(default = "")
-	
 	def init(self, context):
 		forbidCompiling()
+		self.createEmptySockets()
 		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
-		if self.textBlockName == "":
-			layout.operator("mn.load_script_preset", text = "Load Preset", icon = "LOAD_FACTORY")
-	
-		layout.operator("mn.update_scripts", text = "Update Scripts", icon = "FILE_REFRESH")
-	
-		layout.prop_search(self, "textBlockName",  bpy.data, "texts", icon="NONE", text = "Code")
-		if self.scriptName != "NONE":
-			layout.prop(self, "scriptName", text = "Script")
+		pass
 			
-		if self.errorMessage != "":
-			layout.label(self.errorMessage, icon = "ERROR")
-	
-	def buildSockets(self):
-		global textBlockData
-		connections = getConnectionDictionaries(self)
-		self.removeSockets()
-		if self.textBlockName == "":
-			return
-		vars = textBlockData[self.textBlockName][1]
+	# def getInputSocketNames(self):
+		# return {socket.identifier: socket.customName for socket in self.inputs}
+	# def getOutputSocketNames(self):
+		# return {socket.identifier: socket.customName for socket in self.outputs}
 		
-		socketDescriptionName = getSocketDefinitionName(self.scriptName)
-		if socketDescriptionName in vars:
-			socketDescription = vars.get(socketDescriptionName)
-			self.buildSocketsFromDescription(socketDescription)
-			
-		tryToSetConnectionDictionaries(self, connections)
-			
-	def buildSocketsFromDescription(self, socketDescription):
+	def update(self):
 		forbidCompiling()
-		try:
-			inputDescription = socketDescription[0]
-			for d in inputDescription:
-				blName = getSocketNameByDataType(d[0])
-				name = d[1]
-				identifier = d[2]
-				self.inputs.new(blName, name, identifier)
-				
-			outputDescription = socketDescription[1]
-			for d in outputDescription:
-				blName = getSocketNameByDataType(d[0])
-				name = d[1]
-				self.outputs.new(blName, name)
-			self.errorMessage = ""
-		except:
-			self.errorMessage = "cannot build sockets"
-			self.removeSockets()
+		nodeTreeInfo = NodeTreeInfo(self.id_data)
+		for sockets in (self.inputs, self.outputs):
+			emptySocket = sockets.get("...")
+			if emptySocket:
+				linkedDataSocket = nodeTreeInfo.getFirstLinkedSocket(emptySocket)
+				if linkedDataSocket:
+					link = emptySocket.links[0]
+					type = linkedDataSocket.bl_idname
+					if type != "mn_EmptySocket":
+						newSocket = self.appendSocket(sockets, linkedDataSocket.bl_idname, linkedDataSocket.name)
+						linkedSocket = self.getSocketFromOtherNode(link)
+						self.id_data.links.remove(link)
+						self.makeLink(newSocket, linkedSocket)
 		allowCompiling()
-		nodeTreeChanged()
 		
-	def removeSockets(self):
-		self.inputs.clear()
-		self.outputs.clear()
-
-	def execute(self, input):
-		output = {}
-		
-		if self.scriptName in ["NONE", ""]:
-			return output
-		
-		if self.textBlockName not in textBlockData:
-			updateScripts()
-		try:
-			if self.errorMessage == "cannot build sockets": raise
+	def createEmptySockets(self):
+		for sockets in (self.inputs, self.outputs):
+			socket = sockets.new("mn_EmptySocket", "...")
+			socket.passiveSocketType = "mn_GenericSocket"
+			socket.customName = "EMPTYSOCKET"
 			
-			functionOutput = textBlockData[self.textBlockName][1][getExecuteFunctionName(self.scriptName)](**input)
-			
-			if len(self.outputs) == 1:
-				output[self.outputs[0].identifier] = functionOutput
-			else:
-				for i, socket in enumerate(self.outputs):
-					output[socket.identifier] = functionOutput[i]
-					
-			self.errorMessage = ""
-		except BaseException as e:
-			self.errorMessage = str(e)
-			for socket in self.outputs:
-				output[socket.identifier] = socket.getValue()
+	def appendSocket(self, sockets, type, name):
+		socket = sockets.new(type, name)
+		self.setupNewSocket(socket, name)
+		sockets.move(len(sockets)-1, len(sockets)-2)
+		return socket
 		
-		return output
+	def setupNewSocket(self, socket, name):
+		socket.editableCustomName = True
+		socket.customName = name
+		socket.customNameIsVariable = True
+		socket.removeable = True
 		
+	def getSocketFromOtherNode(self, link):
+		if link.from_node == self:
+			return link.to_socket
+		return link.from_socket
 		
-	def getScriptNamesInTextBlock(self):
-		global textBlockData
-		if self.textBlockName == "":
-			return []
-			
-		if self.textBlockName not in textBlockData:
-			updateScripts()
-		names = textBlockData[self.textBlockName][0].co_names
+	def makeLink(self, socketA, socketB):
+		if socketA.is_output:
+			self.id_data.links.new(socketB, socketA)
+		else:
+			self.id_data.links.new(socketA, socketB)
 		
-		scriptNames = set()
-		for name in names:
-			if isApiName(name):
-				scriptNames.update([getScriptName(name)])
-				
-		validScriptNames = []
-		for name in scriptNames:
-			if isValidScriptName(name, names):
-				validScriptNames.append(name)
-		return validScriptNames
-				
-			
-def isApiName(name):
-	return ("__sockets__" in name or
-			"__execute__" in name)
-			
-def isValidScriptName(scriptName, names):
-	return hasSocketDefinition(scriptName, names) and hasExecuteFunction(scriptName, names)
-def hasSocketDefinition(scriptName, names):
-	return getSocketDefinitionName(scriptName) in names
-def hasExecuteFunction(scriptName, names):
-	return getExecuteFunctionName(scriptName) in names
-	
-def getSocketDefinitionName(scriptName):
-	return scriptName + "__sockets__"
-def getExecuteFunctionName(scriptName):
-	return scriptName + "__execute__"
-			
-def getScriptName(varName):
-	return varName[:varName.find("__")]
-			
-def updateScripts():
-	global textBlockData
-	textBlockData.clear()
-	textBlocks = getUsedTextBlocks()
-	for textBlock in textBlocks:
-		compiledTextBlock = compileTextBlock(textBlock)
-		vars = {}
-		exec(compiledTextBlock, vars)
-		textBlockData[textBlock.name] = (compiledTextBlock, vars)
-		
-	for scriptNode in getNodesFromType("mn_ScriptNode"):
-		scriptNode.buildSockets()
-	
-			
-def getUsedTextBlocks():
-	textBlockNames = getUsedTextBlockNames()
-	textBlocks = []
-	for textBlockName in textBlockNames:
-		textBlock = bpy.data.texts.get(textBlockName)
-		if textBlock is not None:
-			textBlocks.append(textBlock)
-	return textBlocks
-	
-def getUsedTextBlockNames():
-	scriptNodes = getNodesFromType("mn_ScriptNode")
-	textBlockNames = set()
-	for scriptNode in scriptNodes:
-		if scriptNode.textBlockName != "":
-			textBlockNames.update([scriptNode.textBlockName])
-	return textBlockNames
-	
-def compileTextBlock(textBlock):
-	return compile(textBlock.as_string(), "<string>", "exec")
-			
-class UpdateScripts(bpy.types.Operator):
-	bl_idname = "mn.update_scripts"
-	bl_label = "Update Scripts"
-
-	def execute(self, context):
-		updateScripts()
-		return {'FINISHED'}
-		
-class LoadScriptPreset(bpy.types.Operator):
-	bl_idname = "mn.load_script_preset"
-	bl_label = "Load Script Preset"
-
-	def execute(self, context):
-		presetBlockName = "node script preset"
-		if not presetBlockName in bpy.data.texts:
-			textBlock = bpy.data.texts.new(presetBlockName)
-			textBlock.from_string(scriptPresetCode)
-		return {'FINISHED'}
-		
-scriptPresetCode = '''import bpy
-
-name__sockets__ = (
-	[
-		("String", "Text", "inputText"),
-		("Integer", "Amount", "amount")],
-	[
-		("String", "Upper Text"),
-		("String", "Lower Text")])
-		
-def name__execute__(inputText, amount):		
-	text = inputText * amount
-	upperText = text.upper()
-	lowerText = text.lower()
-	return upperText, lowerText '''
-
+	def execute(self, inputs):
+		outputs = {}
+		return outputs
