@@ -75,11 +75,18 @@ class mn_ScriptNode(Node, AnimationNode):
 		outputs = {}
 		textBlock = bpy.data.texts.get(self.textBlockName)
 		if textBlock:
+			scriptLocals = {}
+			scriptGlobals = {}
+			scriptGlobals["bpy"] = bpy
+			for socket in self.inputs:
+				if socket.name == emptySocketName: continue
+				scriptLocals[socket.customName] = inputs[socket.identifier]
 			
-			inputDeclarations = "".join([socket.customName+"=inputs['"+socket.identifier+"']\n" for socket in self.inputs if socket.name != emptySocketName])
-			outputDeclarations = "".join(["outputs['"+socket.identifier+"']="+socket.customName+"\n" for socket in self.outputs if socket.name != emptySocketName])
-			script = inputDeclarations + textBlock.as_string() + "\n" + outputDeclarations
-			exec(script)
+			script = textBlock.as_string()
+			exec(script, scriptGlobals, scriptLocals)
+			for socket in self.outputs:
+				if socket.name == emptySocketName: continue
+				outputs[socket.identifier] = scriptLocals[socket.customName]
 		return outputs
 		
 		
