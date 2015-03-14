@@ -24,11 +24,6 @@ class mn_ScriptNode(Node, AnimationNode):
 		operator = row.operator("mn.open_new_script", text = "", icon = "PLUS")
 		operator.nodeTreeName = self.id_data.name
 		operator.nodeName = self.name
-			
-	# def getInputSocketNames(self):
-		# return {socket.identifier: socket.customName for socket in self.inputs}
-	# def getOutputSocketNames(self):
-		# return {socket.identifier: socket.customName for socket in self.outputs}
 		
 	def update(self):
 		forbidCompiling()
@@ -78,6 +73,13 @@ class mn_ScriptNode(Node, AnimationNode):
 		
 	def execute(self, inputs):
 		outputs = {}
+		textBlock = bpy.data.texts.get(self.textBlockName)
+		if textBlock:
+			
+			inputDeclarations = "".join([socket.customName+"=inputs['"+socket.identifier+"']\n" for socket in self.inputs if socket.name != emptySocketName])
+			outputDeclarations = "".join(["outputs['"+socket.identifier+"']="+socket.customName+"\n" for socket in self.outputs if socket.name != emptySocketName])
+			script = inputDeclarations + textBlock.as_string() + "\n" + outputDeclarations
+			exec(script)
 		return outputs
 		
 		
@@ -94,12 +96,11 @@ class OpenNewScript(bpy.types.Operator):
 		node.textBlockName = textBlock.name
 		
 		if event.ctrl or event.shift or event.alt:
-			if self.getAreaByType("TEXT_EDITOR") is None:
-				area = bpy.context.area
-				area.type = "TEXT_EDITOR"
-				area.spaces.active.text = textBlock
-				bpy.ops.screen.area_split(direction = "HORIZONTAL", factor = 0.7)
-				area.type = "NODE_EDITOR"
+			area = bpy.context.area
+			area.type = "TEXT_EDITOR"
+			area.spaces.active.text = textBlock
+			bpy.ops.screen.area_split(direction = "HORIZONTAL", factor = 0.7)
+			area.type = "NODE_EDITOR"
 			
 		return {'FINISHED'}		
 		
