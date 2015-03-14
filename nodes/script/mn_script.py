@@ -19,7 +19,9 @@ class mn_ScriptNode(Node, AnimationNode):
 		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
-		operator = layout.operator("mn.open_new_script", text = "New Script")
+		row = layout.row(align = True)
+		row.prop_search(self, "textBlockName",  bpy.data, "texts", text = "")  
+		operator = row.operator("mn.open_new_script", text = "", icon = "PLUS")
 		operator.nodeTreeName = self.id_data.name
 		operator.nodeName = self.name
 			
@@ -86,8 +88,22 @@ class OpenNewScript(bpy.types.Operator):
 	nodeTreeName = bpy.props.StringProperty()
 	nodeName = bpy.props.StringProperty()
 
-	def execute(self, context):
+	def invoke(self, context, event):
 		node = getNode(self.nodeTreeName, self.nodeName)
 		textBlock = bpy.data.texts.new("script")
+		node.textBlockName = textBlock.name
 		
+		if event.ctrl or event.shift or event.alt:
+			if self.getAreaByType("TEXT_EDITOR") is None:
+				area = bpy.context.area
+				area.type = "TEXT_EDITOR"
+				area.spaces.active.text = textBlock
+				bpy.ops.screen.area_split(direction = "HORIZONTAL", factor = 0.7)
+				area.type = "NODE_EDITOR"
+			
 		return {'FINISHED'}		
+		
+	def getAreaByType(self, type):
+		for area in bpy.context.screen.areas:
+			if area.type == type: return area
+		return None
