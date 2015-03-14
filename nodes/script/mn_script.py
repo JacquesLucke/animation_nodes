@@ -22,8 +22,6 @@ class mn_ScriptNode(Node, AnimationNode):
 		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
-		layout.separator()
-		
 		row = layout.row(align = True)
 		row.prop_search(self, "textBlockName",  bpy.data, "texts", text = "")  
 		operator = row.operator("mn.open_new_script", text = "", icon = "PLUS")
