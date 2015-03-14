@@ -5,11 +5,13 @@ from animation_nodes.mn_execution import nodePropertyChanged, nodeTreeChanged, a
 from animation_nodes.mn_utils import *
 from animation_nodes.utils.mn_node_utils import NodeTreeInfo
 
-defaultVariableNames = list("xyzwabcdefghijklmnopqrstuv")
+emptySocketName = "New Socket"
 
 class mn_ScriptNode(Node, AnimationNode):
 	bl_idname = "mn_ScriptNode"
 	bl_label = "Script"
+	
+	textBlockName = bpy.props.StringProperty(name = "Script", default = "", description = "Choose")
 	
 	def init(self, context):
 		forbidCompiling()
@@ -17,7 +19,9 @@ class mn_ScriptNode(Node, AnimationNode):
 		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
-		pass
+		operator = layout.operator("mn.open_new_script", text = "New Script")
+		operator.nodeTreeName = self.id_data.name
+		operator.nodeName = self.name
 			
 	# def getInputSocketNames(self):
 		# return {socket.identifier: socket.customName for socket in self.inputs}
@@ -28,7 +32,7 @@ class mn_ScriptNode(Node, AnimationNode):
 		forbidCompiling()
 		nodeTreeInfo = NodeTreeInfo(self.id_data)
 		for sockets in (self.inputs, self.outputs):
-			emptySocket = sockets.get("...")
+			emptySocket = sockets.get(emptySocketName)
 			if emptySocket:
 				linkedDataSocket = nodeTreeInfo.getFirstLinkedSocket(emptySocket)
 				if linkedDataSocket:
@@ -43,7 +47,7 @@ class mn_ScriptNode(Node, AnimationNode):
 		
 	def createEmptySockets(self):
 		for sockets in (self.inputs, self.outputs):
-			socket = sockets.new("mn_EmptySocket", "...")
+			socket = sockets.new("mn_EmptySocket", emptySocketName)
 			socket.passiveSocketType = "mn_GenericSocket"
 			socket.customName = "EMPTYSOCKET"
 			
@@ -73,3 +77,17 @@ class mn_ScriptNode(Node, AnimationNode):
 	def execute(self, inputs):
 		outputs = {}
 		return outputs
+		
+		
+class OpenNewScript(bpy.types.Operator):
+	bl_idname = "mn.open_new_script"
+	bl_label = "New Keyframe"
+	
+	nodeTreeName = bpy.props.StringProperty()
+	nodeName = bpy.props.StringProperty()
+
+	def execute(self, context):
+		node = getNode(self.nodeTreeName, self.nodeName)
+		textBlock = bpy.data.texts.new("script")
+		
+		return {'FINISHED'}		
