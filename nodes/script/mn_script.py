@@ -1,9 +1,10 @@
-import bpy
+import bpy, re
 from bpy.types import Node
 from animation_nodes.mn_node_base import AnimationNode
 from animation_nodes.mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 from animation_nodes.mn_utils import *
 from animation_nodes.utils.mn_node_utils import NodeTreeInfo
+from animation_nodes.utils.mn_name_utils import getPossibleSocketName
 from animation_nodes.sockets.mn_socket_info import getSocketNameItems, getSocketNameByDataType
 
 emptySocketName = "New Socket"
@@ -12,9 +13,14 @@ class mn_ScriptNode(Node, AnimationNode):
 	bl_idname = "mn_ScriptNode"
 	bl_label = "Script"
 	
+	def makeFromClipboardChanged(self, context):
+		if self.makeFromClipboard:
+			self.buildFromText(context.window_manager.clipboard)
+	
 	textBlockName = bpy.props.StringProperty(name = "Script", default = "", description = "Choose the script you want to execute in this node")
 	errorMessage = bpy.props.StringProperty(name = "Error Message", default = "")
 	selectedSocketType = bpy.props.EnumProperty(name = "Selected Socket Type", items = getSocketNameItems)
+	makeFromClipboard = bpy.props.BoolProperty(default = False, update = makeFromClipboardChanged)
 	
 	def init(self, context):
 		forbidCompiling()
@@ -49,6 +55,10 @@ class mn_ScriptNode(Node, AnimationNode):
 		operator.nodeTreeName = self.id_data.name
 		operator.nodeName = self.name
 		operator.makeOutputSocket = True
+		
+		operator = layout.operator("mn.export_script_node")
+		operator.nodeTreeName = self.id_data.name
+		operator.nodeName = self.name
 		
 	def update(self):
 		forbidCompiling()
@@ -99,26 +109,62 @@ class mn_ScriptNode(Node, AnimationNode):
 	def execute(self, inputs):
 		outputs = {}
 		self.errorMessage = ""
+		
+		scriptLocals = {}
+		for socket in self.inputs:
+			if socket.name == emptySocketName: continue
+			scriptLocals[socket.customName] = inputs[socket.identifier]
+		
+		try:
+			exec(self.getScript(), {}, scriptLocals)
+			for socket in self.outputs:
+				if socket.name == emptySocketName: continue
+				outputs[socket.identifier] = scriptLocals[socket.customName]
+		except BaseException as e:
+			self.errorMessage = str(e)
+			for socket in self.outputs:
+				if socket.identifier not in outputs:
+					outputs[socket.identifier] = socket.getValue()
+		return outputs
+		
+	def getScript(self):
 		textBlock = bpy.data.texts.get(self.textBlockName)
 		if textBlock:
-			scriptLocals = {}
-			for socket in self.inputs:
-				if socket.name == emptySocketName: continue
-				scriptLocals[socket.customName] = inputs[socket.identifier]
-			
-			script = textBlock.as_string()
-			
-			try:
-				exec(script, {}, scriptLocals)
-				for socket in self.outputs:
-					if socket.name == emptySocketName: continue
-					outputs[socket.identifier] = scriptLocals[socket.customName]
-			except BaseException as e:
-				self.errorMessage = str(e)
-				for socket in self.outputs:
-					if socket.identifier not in outputs:
-						outputs[socket.identifier] = socket.getValue()
-		return outputs
+			return textBlock.as_string()
+		return ""
+		
+	def buildFromText(self, text):
+		lines = text.split("\n")
+		state = "none"
+		
+		scriptLines = []
+		
+		for line in lines:
+			if state == "none":
+				if re.match("[Ii]nputs:", line): 
+					state = "inputs"
+					continue
+			elif state == "inputs":
+				if re.match("[Oo]utputs:", line): 
+					state = "outputs"
+					continue
+				match = re.search("\s*(\w+)\s*-\s*(.+)", line)
+				if match:
+					self.appendSocket(self.inputs, getSocketNameByDataType(match.group(2).strip()), match.group(1))
+			elif state == "outputs":
+				if re.match("[Ss]cript:", line): 
+					state = "script"
+					continue
+				match = re.search("\s*(\w+)\s*-\s*(.+)", line)
+				if match:
+					self.appendSocket(self.outputs, getSocketNameByDataType(match.group(2).strip()), match.group(1))
+			elif state == "script":
+				scriptLines.append(line)
+				
+		scriptText = "\n".join(scriptLines)
+		textBlock = bpy.data.texts.new("script")
+		textBlock.from_string(scriptText)
+		self.textBlockName = textBlock.name
 		
 		
 class OpenNewScript(bpy.types.Operator):
@@ -162,8 +208,34 @@ class AppendSocket(bpy.types.Operator):
 		node = getNode(self.nodeTreeName, self.nodeName)
 		type = getSocketNameByDataType(node.selectedSocketType)
 		if self.makeOutputSocket:
-			node.appendSocket(node.outputs, type, "name")
+			node.appendSocket(node.outputs, type, getPossibleSocketName(node, "socket"))
 		else:
-			node.appendSocket(node.inputs, type, "name")
+			node.appendSocket(node.inputs, type, getPossibleSocketName(node, "socket"))
 			
 		return {'FINISHED'}	
+		
+		
+class ExportScriptNode(bpy.types.Operator):
+	bl_idname = "mn.export_script_node"
+	bl_label = "Export Script Node"
+	bl_description = "Copy a text that describes the full script node"
+	
+	nodeTreeName = bpy.props.StringProperty()
+	nodeName = bpy.props.StringProperty()
+
+	def execute(self, context):
+		node = getNode(self.nodeTreeName, self.nodeName)
+		socketLines = []
+		socketLines.append("Inputs:")
+		for socket in node.inputs[:-1]:
+			socketLines.append(socket.customName + " - " + socket.dataType)
+		socketLines.append("\nOutputs:")
+		for socket in node.outputs[:-1]:
+			socketLines.append(socket.customName + " - " + socket.dataType)
+			
+		scriptText = "Script:\n"
+		scriptText += node.getScript()
+			
+		exportText = "\n".join(socketLines)	+ "\n\n" + scriptText	
+		context.window_manager.clipboard = exportText
+		return {'FINISHED'}			

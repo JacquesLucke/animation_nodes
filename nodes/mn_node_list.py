@@ -123,7 +123,8 @@ def getNodeNameDictionary():
 		
 	nodes.append(("Script", [
 		("mn_ExpressionNode", "Expression"),
-		("mn_ScriptNode", "Script") ] ))
+		("mn_ScriptNode", "Script"),
+		("mn_ScriptNode", "Script from Clipboard", {"makeFromClipboard" : repr(True) } )] ))
 		
 	nodes.append(("System", [
 		("mn_LoopCallerNode", "Loop"),

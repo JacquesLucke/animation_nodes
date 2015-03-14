@@ -42,3 +42,10 @@ def getPossibleNodeName(nodeTree, name = "node"):
 	while nodeTree.nodes.get(name + randomString + str(counter)) is not None:
 		counter += 1
 	return name + randomString + str(counter)
+	
+def getPossibleSocketName(node, name = "socket"):
+	randomString = getRandomString(3)
+	counter = 1
+	while node.inputs.get(name + randomString + str(counter)) or node.outputs.get(name + randomString + str(counter)):
+		counter += 1
+	return name + randomString + str(counter)
