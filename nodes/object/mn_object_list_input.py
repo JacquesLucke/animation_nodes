@@ -13,15 +13,29 @@ class mn_ObjectListInputNode(Node, AnimationNode):
 	bl_label = "Object List"
 	
 	objects = bpy.props.CollectionProperty(type = mn_ObjectPropertyGroup)
-	showEditOptions = bpy.props.BoolProperty(default = True)
+	showList = bpy.props.BoolProperty(default = True)
 	
 	def init(self, context):
 		self.outputs.new("mn_ObjectListSocket", "Objects")
 		
 	def draw_buttons(self, context, layout):
-		layout.prop(self, "showEditOptions", text = "Show Options")
-		layout.separator()
-		if self.showEditOptions:
+		col = layout.column(align = True)
+		add = col.operator("mn.new_property_to_list_node", text = "New Item", icon = "PLUS")
+		add.nodeTreeName = self.id_data.name
+		add.nodeName = self.name
+		
+		add = col.operator("mn.selected_objects_to_object_list_node", text = "From Selection", icon = "PLUS")
+		add.nodeTreeName = self.id_data.name
+		add.nodeName = self.name
+
+		if len(self.objects) > 0:
+			add = layout.operator("mn.clear_object_list_node", text="Clear List", icon="NONE")
+			add.nodeTreeName = self.id_data.name
+			add.nodeName = self.name
+		
+		layout.prop(self, "showList", text = "Show Options")
+		
+		if self.showList:
 			index = 0
 			col = layout.column(align = True)
 			for item in self.objects:
@@ -36,19 +50,6 @@ class mn_ObjectListInputNode(Node, AnimationNode):
 				remove.nodeName = self.name
 				remove.index = index
 				index += 1
-				
-			add = layout.operator("mn.new_property_to_list_node", text = "New Item", icon = "PLUS")
-			add.nodeTreeName = self.id_data.name
-			add.nodeName = self.name
-			
-			add = layout.operator("mn.selected_objects_to_object_list_node", text = "From Selection", icon = "PLUS")
-			add.nodeTreeName = self.id_data.name
-			add.nodeName = self.name
-
-			if len(self.objects) > 0:
-				add = layout.operator("mn.clear_object_list_node", text="Clear List", icon="NONE")
-				add.nodeTreeName = self.id_data.name
-				add.nodeName = self.name
 			
 			layout.separator()
 				
