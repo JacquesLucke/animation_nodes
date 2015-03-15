@@ -179,6 +179,7 @@ class mn_ScriptNode(Node, AnimationNode):
 		scriptText = "\n".join(scriptLines)
 		textBlock = self.getTextBlockWithText(scriptText)
 		self.textBlockName = textBlock.name
+		self.hideEditableElements = True
 		
 	def customSocketNameChanged(self, socket):
 		forbidCompiling()
