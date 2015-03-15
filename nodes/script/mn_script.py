@@ -16,11 +16,21 @@ class mn_ScriptNode(Node, AnimationNode):
 	def makeFromClipboardChanged(self, context):
 		if self.makeFromClipboard:
 			self.buildFromText(context.window_manager.clipboard)
+			
+	def hideEditableElementsChanged(self, context):
+		hide = self.hideEditableElements
+		for socket in list(self.inputs) + list(self.outputs):
+			if socket.name == emptySocketName:
+				socket.hide = hide
+			else:
+				socket.editableCustomName = not hide
+				socket.removeable = not hide
 	
 	textBlockName = bpy.props.StringProperty(name = "Script", default = "", description = "Choose the script you want to execute in this node")
 	errorMessage = bpy.props.StringProperty(name = "Error Message", default = "")
 	selectedSocketType = bpy.props.EnumProperty(name = "Selected Socket Type", items = getSocketNameItems)
 	makeFromClipboard = bpy.props.BoolProperty(default = False, update = makeFromClipboardChanged)
+	hideEditableElements = bpy.props.BoolProperty(name = "Hide Editable Elements", default = False, update = hideEditableElementsChanged)
 	
 	def init(self, context):
 		forbidCompiling()
@@ -28,16 +38,18 @@ class mn_ScriptNode(Node, AnimationNode):
 		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
-		row = layout.row(align = True)
-		row.prop_search(self, "textBlockName",  bpy.data, "texts", text = "")  
-		operator = row.operator("mn.open_new_script", text = "", icon = "PLUS")
-		operator.nodeTreeName = self.id_data.name
-		operator.nodeName = self.name
-		
+		if not self.hideEditableElements:
+			row = layout.row(align = True)
+			row.prop_search(self, "textBlockName",  bpy.data, "texts", text = "")  
+			operator = row.operator("mn.open_new_script", text = "", icon = "PLUS")
+			operator.nodeTreeName = self.id_data.name
+			operator.nodeName = self.name
+			
 		if self.errorMessage != "":
 			layout.label(self.errorMessage, icon = "ERROR")
 			
-		layout.separator()
+		if not self.hideEditableElements:
+			layout.separator()
 			
 	def draw_buttons_ext(self, context, layout):
 		col = layout.column(align = True)
@@ -59,6 +71,8 @@ class mn_ScriptNode(Node, AnimationNode):
 		operator = layout.operator("mn.export_script_node")
 		operator.nodeTreeName = self.id_data.name
 		operator.nodeName = self.name
+		
+		layout.prop(self, "hideEditableElements")
 		
 	def update(self):
 		forbidCompiling()
@@ -93,6 +107,7 @@ class mn_ScriptNode(Node, AnimationNode):
 		socket.editableCustomName = True
 		socket.customName = name
 		socket.customNameIsVariable = True
+		socket.callNodeWhenCustomNameChanged = True
 		socket.removeable = True
 		
 	def getSocketFromOtherNode(self, link):
@@ -162,9 +177,21 @@ class mn_ScriptNode(Node, AnimationNode):
 				scriptLines.append(line)
 				
 		scriptText = "\n".join(scriptLines)
-		textBlock = bpy.data.texts.new("script")
-		textBlock.from_string(scriptText)
+		textBlock = self.getTextBlockWithText(scriptText)
 		self.textBlockName = textBlock.name
+		
+	def customSocketNameChanged(self, socket):
+		forbidCompiling()
+		socket.name = socket.customName
+		allowCompiling()
+		
+	def getTextBlockWithText(self, text):
+		for textBlock in bpy.data.texts:
+			if len(textBlock.as_string()) == len(text):
+				return textBlock
+		textBlock = bpy.data.texts.new("script")
+		textBlock.from_string(text)
+		return textBlock
 		
 		
 class OpenNewScript(bpy.types.Operator):
