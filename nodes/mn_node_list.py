@@ -54,6 +54,7 @@ def getNodeNameDictionary():
 		("mn_ObjectTransformsOutput", "Transforms Output") ] ))
 		
 	nodes.append(("Boolean", [
+		("mn_BooleanInputNode", "Boolean"),
 		("mn_CompareNode", "Compare"),
 		("mn_InvertNode", "Invert"),
 		("mn_ConditionNode", "Condition")] ))
