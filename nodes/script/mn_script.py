@@ -191,10 +191,11 @@ class mn_ScriptNode(Node, AnimationNode):
 		
 	def customSocketNameChanged(self, socket):
 		forbidCompiling()
-		if self.enableUINameConversion:
-			socket.name = convertVariableNameToUI(socket.customName)
-		else:
-			socket.name = socket.customName
+		if socket.name != emptySocketName:
+			if self.enableUINameConversion:
+				socket.name = convertVariableNameToUI(socket.customName)
+			else:
+				socket.name = socket.customName
 		allowCompiling()
 		
 	def getTextBlockWithText(self, text):
