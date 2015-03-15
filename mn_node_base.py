@@ -58,10 +58,7 @@ def customNameChanged(self, context):
 	if not self.customNameIsUpdating:
 		self.customNameIsUpdating = True
 		if self.customNameIsVariable:
-			newCustomName = ""
-			for char in self.customName:
-				if char.isalpha(): newCustomName += char
-			self.customName = newCustomName
+			self.customName = makeVariableName(self.customName)
 		if self.uniqueCustomName:
 			customName = self.customName
 			self.customName = "temporary name to avoid some errors"
@@ -70,11 +67,22 @@ def customNameChanged(self, context):
 			self.node.customSocketNameChanged(self)
 		self.customNameIsUpdating = False
 		nodeTreeChanged()
+		
+def makeVariableName(name):
+	newName = ""
+	for i, char in enumerate(name):
+		if len(newName) == 0 and (char.isalpha() or char == "_"):
+			newName += char
+		elif len(newName) > 0 and (char.isalpha() or char.isnumeric() or char == "_"):
+			newName += char
+	return newName
+	
 def getNotUsedCustomName(node, prefix):
 	customName = prefix
 	while isCustomNameUsed(node, customName):
 		customName = prefix + getRandomString(3)
 	return customName
+	
 def isCustomNameUsed(node, name):
 	for socket in node.inputs:
 		if socket.customName == name: return True

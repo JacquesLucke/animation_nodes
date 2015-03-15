@@ -54,6 +54,7 @@ def getNodeNameDictionary():
 		("mn_ObjectTransformsOutput", "Transforms Output") ] ))
 		
 	nodes.append(("Boolean", [
+		("mn_BooleanInputNode", "Boolean"),
 		("mn_CompareNode", "Compare"),
 		("mn_InvertNode", "Invert"),
 		("mn_ConditionNode", "Condition")] ))
@@ -124,7 +125,8 @@ def getNodeNameDictionary():
 		
 	nodes.append(("Script", [
 		("mn_ExpressionNode", "Expression"),
-		("mn_ScriptNode", "Script") ] ))
+		("mn_ScriptNode", "Script"),
+		("mn_ScriptNode", "Script from Clipboard", {"makeFromClipboard" : repr(True) } )] ))
 		
 	nodes.append(("System", [
 		("mn_LoopCallerNode", "Loop"),

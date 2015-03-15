@@ -256,9 +256,6 @@ def getCustomNodesInCategory(category):
 		if getattr(nodeClass, "node_category", "None") == category:
 			nodeClassesInCategory.append(nodeClass)
 	return nodeClassesInCategory
-
-def getCustomNodes(self, context):
-	return [("mn_TimeInfoNode", "Time Info", "")]
 	
 bpy.types.Scene.customNodeCategory = bpy.props.EnumProperty(items = getCustomNodeCategoryItems, name = "Custom Categories")
 

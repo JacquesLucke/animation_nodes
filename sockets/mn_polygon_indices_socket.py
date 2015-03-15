@@ -7,7 +7,7 @@ class mn_PolygonIndicesSocket(mn_BaseSocket, mn_SocketProperties):
 	bl_label = "Polygon Indices Socket"
 	dataType = "Polygon Indices"
 	allowedInputTypes = ["Polygon Indices"]
-	drawColor = (0.5, 0.55, 0.23, 1)
+	drawColor = (0.5, 0.8, 0.4, 1)
 	
 	def drawInput(self, layout, node, text):
 		layout.label(text)
