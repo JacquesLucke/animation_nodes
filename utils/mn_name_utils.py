@@ -49,3 +49,34 @@ def getPossibleSocketName(node, name = "socket"):
 	while node.inputs.get(name + randomString + str(counter)) or node.outputs.get(name + randomString + str(counter)):
 		counter += 1
 	return name + randomString + str(counter)
+	
+def convertVariableNameToUI(sourceName):
+	tempName = ""
+
+	for i, char in enumerate(sourceName):
+		if i == 0:
+			tempName += char.upper()
+			continue
+		lastChar = tempName[-1]
+		if lastChar == " ":
+			tempName += char.upper()
+		elif lastChar.isalpha() and char.isnumeric():
+			tempName += " " + char.upper()
+		elif lastChar.isnumeric() and char.isalpha():
+			tempName += " " + char.upper()
+		elif lastChar.islower() and char.isupper():
+			tempName += " " + char.upper()
+		elif char == "_":
+			tempName += " "
+		else:
+			tempName += char
+			
+	bindingWords = ["and", "of", "to", "from"]
+	words = tempName.split()
+	newName = ""
+	for word in words:
+		if word.lower() in bindingWords:
+			word = word.lower()
+		newName += " " + word
+		
+	return newName

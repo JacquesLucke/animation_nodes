@@ -4,7 +4,7 @@ from animation_nodes.mn_node_base import AnimationNode
 from animation_nodes.mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 from animation_nodes.mn_utils import *
 from animation_nodes.utils.mn_node_utils import NodeTreeInfo
-from animation_nodes.utils.mn_name_utils import getPossibleSocketName
+from animation_nodes.utils.mn_name_utils import getPossibleSocketName, convertVariableNameToUI
 from animation_nodes.sockets.mn_socket_info import getSocketNameItems, getSocketNameByDataType
 
 emptySocketName = "New Socket"
@@ -25,12 +25,18 @@ class mn_ScriptNode(Node, AnimationNode):
 			else:
 				socket.editableCustomName = not hide
 				socket.removeable = not hide
+				self.customSocketNameChanged(socket)
+				
+	def enableUINameConversionChanged(self, context):
+		for socket in list(self.inputs) + list(self.outputs):
+			self.customSocketNameChanged(socket)
 	
 	textBlockName = bpy.props.StringProperty(name = "Script", default = "", description = "Choose the script you want to execute in this node")
 	errorMessage = bpy.props.StringProperty(name = "Error Message", default = "")
 	selectedSocketType = bpy.props.EnumProperty(name = "Selected Socket Type", items = getSocketNameItems)
 	makeFromClipboard = bpy.props.BoolProperty(default = False, update = makeFromClipboardChanged)
 	hideEditableElements = bpy.props.BoolProperty(name = "Hide Editable Elements", default = False, update = hideEditableElementsChanged)
+	enableUINameConversion = bpy.props.BoolProperty(name = "Auto Socket Names", default = True, update = enableUINameConversionChanged)
 	
 	def init(self, context):
 		forbidCompiling()
@@ -72,7 +78,9 @@ class mn_ScriptNode(Node, AnimationNode):
 		operator.nodeTreeName = self.id_data.name
 		operator.nodeName = self.name
 		
-		layout.prop(self, "hideEditableElements")
+		col = layout.column(align = True)
+		col.prop(self, "hideEditableElements")
+		col.prop(self, "enableUINameConversion")
 		
 	def update(self):
 		forbidCompiling()
@@ -183,7 +191,10 @@ class mn_ScriptNode(Node, AnimationNode):
 		
 	def customSocketNameChanged(self, socket):
 		forbidCompiling()
-		socket.name = socket.customName
+		if self.enableUINameConversion:
+			socket.name = convertVariableNameToUI(socket.customName)
+		else:
+			socket.name = socket.customName
 		allowCompiling()
 		
 	def getTextBlockWithText(self, text):
