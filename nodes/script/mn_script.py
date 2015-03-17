@@ -200,7 +200,7 @@ class mn_ScriptNode(Node, AnimationNode):
 		
 	def getTextBlockWithText(self, text):
 		for textBlock in bpy.data.texts:
-			if len(textBlock.as_string()) == len(text):
+			if textBlock.as_string() == text:
 				return textBlock
 		textBlock = bpy.data.texts.new("script")
 		textBlock.from_string(text)
