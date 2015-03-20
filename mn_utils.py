@@ -51,6 +51,13 @@ def isAnimationPlaying():
 	try:	
 		return bpy.context.screen.is_animation_playing
 	except:	return False
+def isViewportRenderingActive():
+	for area in bpy.context.screen.areas:
+		for space in area.spaces:
+			if space.type == "VIEW_3D":
+				if space.viewport_shade == "RENDERED":
+					return True
+	return False
 def nameToPath(name):
 	return '["' + name + '"]'
 def printTimeSpan(name, timeSpan, extraInfo = ""):

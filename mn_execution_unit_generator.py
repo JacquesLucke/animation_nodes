@@ -57,6 +57,10 @@ class ExecutionUnit:
 			# use skip frames
 			if isAnimationPlaying() and getCurrentFrame() % (max(skipFrames, 0) + 1) != 0:
 				onFrameChange = False
+		
+		# don't use scene update when viewport rendering is enabled
+		if event == "SCENE" and isViewportRenderingActive():
+			onSceneUpdate = False
 			
 		# reset counter on force execution
 		if forceExecution:
