@@ -176,7 +176,7 @@ class mn_ObjectInstancer(Node, AnimationNode):
 			
 	def newInstance(self, sourceObject):
 		instanceData = self.getSourceObjectData(sourceObject)
-		if self.copyObjectProperties:
+		if self.copyObjectProperties and self.copyFromSource:
 			newObject = sourceObject.copy()
 			newObject.data = instanceData
 		else:
