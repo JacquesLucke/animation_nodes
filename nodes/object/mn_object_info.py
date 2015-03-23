@@ -7,6 +7,7 @@ from animation_nodes.utils.mn_object_utils import *
 from animation_nodes.utils.mn_fcurve_utils import *
 from bpy.props import BoolProperty
 from operator import sub
+from mathutils import Vector
 
 class mn_ObjectInfoNode(Node, AnimationNode):
 	bl_idname = "mn_ObjectInfoNode"
@@ -45,12 +46,12 @@ class mn_ObjectInfoNode(Node, AnimationNode):
 				"Scale Velocity" : "scaleVelocity"}
 		
 	def execute(self, useOutput, object, frame):
-		location = [0, 0, 0]
-		rotation = [0, 0, 0]
-		scale = [1, 1, 1]
-		locVelocity = [0, 0, 0]
-		rotVelocity = [0, 0, 0]
-		scaleVelocity = [0, 0, 0]
+		location = Vector((0, 0, 0))
+		rotation = Vector((0, 0, 0))
+		scale = Vector((1, 1, 1))
+		locVelocity = Vector((0, 0, 0))
+		rotVelocity = Vector((0, 0, 0))
+		scaleVelocity = Vector((0, 0, 0))
 		
 		if object is None:
 			return location, rotation, scale, locVelocity, rotVelocity, scaleVelocity
@@ -99,5 +100,5 @@ class mn_ObjectInfoNode(Node, AnimationNode):
 			elif useOutput["Scale"]:
 				scale = getArrayValueAtFrame(object, "scale", frame)
 		
-		return location, rotation, scale, locVelocity, rotVelocity, scaleVelocity
+		return location, Vector(rotation), scale, Vector(locVelocity), Vector(rotVelocity), Vector(scaleVelocity)
 
