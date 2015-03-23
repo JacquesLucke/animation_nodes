@@ -13,6 +13,7 @@ class mn_ObjectMeshInfo(Node, AnimationNode):
 	outputUseParameterName = "useOutput"
 	
 	usePerObjectCache = bpy.props.BoolProperty(name = "Use Cache", default = False, description = "Warning: Modifications to the data will overwrite the cache.")
+	applyModifiers = bpy.props.BoolProperty(name = "Apply Modifiers", default = False, description = "Output the mesh with applied modifiers.")
 	
 	def init(self, context):
 		forbidCompiling()
@@ -23,6 +24,7 @@ class mn_ObjectMeshInfo(Node, AnimationNode):
 		allowCompiling()
 		
 	def draw_buttons(self, context, layout):
+		layout.prop(self, "applyModifiers")
 		layout.prop(self, "usePerObjectCache")
 		
 	def getInputSocketNames(self):
@@ -41,13 +43,20 @@ class mn_ObjectMeshInfo(Node, AnimationNode):
 		polygons = []
 		vertices = []
 		meshData = MeshData()
+		if self.applyModifiers:
+			mesh = object.to_mesh(scene = bpy.context.scene, apply_modifiers = True, settings = "PREVIEW")
+		else:
+			mesh = object.data
 		
 		if useOutput["Polygons"]:		
-			polygons = cacheFunctionResult(cache, object.name + "POLYGONS", getPolygonsFromMesh, [object.data], self.usePerObjectCache)
+			polygons = cacheFunctionResult(cache, object.name + "POLYGONS", getPolygonsFromMesh, [mesh], self.usePerObjectCache)
 		if useOutput["Vertices"]:
-			vertices = cacheFunctionResult(cache, object.name + "VERTICES", getVerticesFromMesh, [object.data], self.usePerObjectCache)
+			vertices = cacheFunctionResult(cache, object.name + "VERTICES", getVerticesFromMesh, [mesh], self.usePerObjectCache)
 		if useOutput["Mesh Data"]:
-			meshData = cacheFunctionResult(cache, object.name + "MESH_DATA", getMeshDataFromMesh, [object.data], self.usePerObjectCache)
+			meshData = cacheFunctionResult(cache, object.name + "MESH_DATA", getMeshDataFromMesh, [mesh], self.usePerObjectCache)
+			
+		if self.applyModifiers:
+			bpy.data.meshes.remove(mesh)
 			
 		return polygons, vertices, meshData
 		
