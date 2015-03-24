@@ -26,7 +26,8 @@ def updateAnimationTrees(event = "NONE", sender = None):
 			
 		try:
 			bpy.context.scene.update()
-			redraw_areas_if_possible()
+			if bpy.context.scene.mn_settings.update.redrawViewport:
+				redraw_areas_if_possible()
 		except: pass
 			
 		allowCompiling()

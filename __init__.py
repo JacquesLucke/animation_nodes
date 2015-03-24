@@ -81,6 +81,7 @@ class GlobalUpdateSettings(bpy.types.PropertyGroup):
 	propertyChange = BoolProperty(default = True, name = "Property Change")
 	treeChange = BoolProperty(default = True, name = "Tree Change")
 	skipFramesAmount = IntProperty(default = 0, name = "Skip Frames", min = 0, soft_max = 10)
+	redrawViewport = BoolProperty(default = True, name = "Redraw Viewport", description = "Redraw the UI after each execution. Turning it off gives a better performance but worse realtime feedback.")
 	
 class DeveloperSettings(bpy.types.PropertyGroup):
 	printUpdateTime = BoolProperty(default = False, name = "Print Global Update Time")
