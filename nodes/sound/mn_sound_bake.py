@@ -21,6 +21,7 @@ class mn_SoundBakeNode(Node, AnimationNode):
 	bakedSound = bpy.props.CollectionProperty(type = mn_BakedSoundPropertyGroup)
 	soundObjectName = bpy.props.StringProperty()
 	filePath = bpy.props.StringProperty()
+	setSyncMode = bpy.props.BoolProperty(name = "Set Audio Sync Mode", default = True)
 	
 	def init(self, context):
 		forbidCompiling()
@@ -46,6 +47,9 @@ class mn_SoundBakeNode(Node, AnimationNode):
 		loadSound.filePath = self.filePath
 		
 		layout.separator()
+		
+	def draw_buttons_ext(self, context, layout):
+		layout.prop(self, "setSyncMode")
 		
 	def getStrengthList(self, frame):
 		identifier = self.id_data.name + self.name
@@ -115,7 +119,8 @@ class mn_SoundBakeNode(Node, AnimationNode):
 		soundObject.hide = True
 		self.name = os.path.basename(self.filePath)
 		loadSound(self.filePath)
-		scene.sync_mode = "AUDIO_SYNC"
+		if self.setSyncMode:
+			scene.sync_mode = "AUDIO_SYNC"
 		scene.frame_current = oldFrame
 		allowCompiling()
 		nodeTreeChanged()
