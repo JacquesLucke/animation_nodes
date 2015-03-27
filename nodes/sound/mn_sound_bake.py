@@ -1,4 +1,4 @@
-import bpy, math, os
+import bpy, math, os, re
 from bpy.types import Node
 from animation_nodes.mn_node_base import AnimationNode
 from animation_nodes.mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
@@ -102,6 +102,8 @@ class mn_SoundBakeNode(Node, AnimationNode):
 		return strenghts
 		
 	def bakeSound(self):
+		if self.filePath == "":
+			return
 		forbidCompiling()
 		scene = bpy.context.scene
 		oldFrame = scene.frame_current
@@ -117,7 +119,7 @@ class mn_SoundBakeNode(Node, AnimationNode):
 			wm.progress_update(index + 1.0)
 		wm.progress_end()
 		soundObject.hide = True
-		self.name = os.path.basename(self.filePath)
+		self.name = re.sub(r"\W+", "", os.path.basename(self.filePath))
 		loadSound(self.filePath)
 		if self.setSyncMode:
 			scene.sync_mode = "AUDIO_SYNC"
