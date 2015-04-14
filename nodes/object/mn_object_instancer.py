@@ -144,8 +144,13 @@ class mn_ObjectInstancer(Node, AnimationNode):
 		if object.users == 0:
 			data = object.data
 			type = object.type
+			action = None
+			try: action = object.animation_data.action
+			except: pass
 			bpy.data.objects.remove(object)
 			self.removeObjectData(data, type)
+			if action.users == 0:
+				bpy.data.actions.remove(action)
 			
 	def removeObjectData(self, data, type):
 		if data.users == 0:
@@ -179,6 +184,8 @@ class mn_ObjectInstancer(Node, AnimationNode):
 		if self.copyObjectProperties and self.copyFromSource:
 			newObject = sourceObject.copy()
 			newObject.data = instanceData
+			try: newObject.animation_data.action = sourceObject.animation_data.action.copy()
+			except: pass
 		else:
 			newObject = bpy.data.objects.new(getPossibleObjectName("instance"), instanceData)
 			
