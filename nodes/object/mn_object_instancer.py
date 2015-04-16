@@ -149,8 +149,9 @@ class mn_ObjectInstancer(Node, AnimationNode):
 			except: pass
 			bpy.data.objects.remove(object)
 			self.removeObjectData(data, type)
-			if action.users == 0:
-				bpy.data.actions.remove(action)
+			if action:
+				if action.users == 0:
+					bpy.data.actions.remove(action)
 			
 	def removeObjectData(self, data, type):
 		if data.users == 0:
