@@ -24,3 +24,4 @@ class mn_MakeObjectSmooth(Node, AnimationNode):
 		if getattr(object, "type") == "MESH":
 			for polygon in object.data.polygons:
 				polygon.use_smooth = smooth
+		return object
