@@ -18,6 +18,11 @@ class AnimationNodesPerformance(bpy.types.Panel):
 	def draw(self, context):
 		layout = self.layout
 		scene = context.scene
+
+		col = layout.column()
+		col.scale_y = 1.3
+		col.operator("mn.force_full_update", text = "Force Update", icon = "PLAY")
+		
 		layout.prop(scene.mn_settings.update, "frameChange", text = "Frames Update")
 		layout.prop(scene.mn_settings.update, "sceneUpdate", text = "Scene Update")
 		layout.prop(scene.mn_settings.update, "propertyChange", text = "Property Update")
@@ -26,7 +31,7 @@ class AnimationNodesPerformance(bpy.types.Panel):
 	
 class CustomAnimationNodes(bpy.types.Panel):
 	bl_idname = "mn.custom_nodes_panel"
-	bl_label = "Custom Nodes"
+	bl_label = "Unregistered Nodes"
 	bl_space_type = "NODE_EDITOR"
 	bl_region_type = "TOOLS"
 	bl_category = "Settings"
@@ -59,14 +64,10 @@ class AnimationNodesDeveloperPanel(bpy.types.Panel):
 	def draw(self, context):
 		layout = self.layout
 		scene = context.scene
-		col = layout.column(align = True)
-		col.operator("mn.load_normal_node_template", "Load Template")
-		col.operator("mn.append_auto_update_code")
 		
 		col = layout.column(align = True)
-		col.operator("mn.force_full_update")
-		col.operator("mn.print_node_tree_execution_string")
 		col.operator("mn.unit_execution_code_in_text_block")
+		col.operator("mn.print_node_tree_execution_string")
 		
 		col = layout.column(align = True)
 		col.prop(scene.mn_settings.developer, "printUpdateTime", text = "Print Update Time")
@@ -153,6 +154,7 @@ class KeyframePanel(bpy.types.Panel):
 class ForceNodeTreeUpdate(bpy.types.Operator):
 	bl_idname = "mn.force_full_update"
 	bl_label = "Force Node Tree Update"
+	bl_description = "Recalculate the nodes / Start the execution again after an error happened"
 
 	def execute(self, context):
 		resetCompileBlocker()
@@ -163,6 +165,7 @@ class ForceNodeTreeUpdate(bpy.types.Operator):
 class PrintNodeTreeExecutionStrings(bpy.types.Operator):
 	bl_idname = "mn.print_node_tree_execution_string"
 	bl_label = "Print Node Tree Code"
+	bl_description = "Print the auto generated python code into the console"
 
 	def execute(self, context):
 		print()
@@ -176,45 +179,14 @@ class PrintNodeTreeExecutionStrings(bpy.types.Operator):
 class UnitExecutionCodeInTextBlock(bpy.types.Operator):
 	bl_idname = "mn.unit_execution_code_in_text_block"
 	bl_label = "Code in Text Block"
-
+	bl_description = "Create a text block and insert the auto generated python code"
+	
 	def execute(self, context):
 		codeString = ("\n\n#"+ "-"*50 + "\n\n").join(getCodeStrings())
 		textBlock = bpy.data.texts.get("Unit Execution Code")
 		if textBlock is None:
 			textBlock = bpy.data.texts.new("Unit Execution Code")
 		textBlock.from_string(codeString)
-		return {'FINISHED'}
-		
-class LoadNormalNodeTemplate(bpy.types.Operator):
-	bl_idname = "mn.load_normal_node_template"
-	bl_label = "Load Normal Node Template"
-
-	def execute(self, context):
-		from animation_nodes.nodes.mn_node_template import getNormalNodeTemplate, getAutoRegisterCode
-		textBlockName = "mn_node_template.py"
-		textBlock = bpy.data.texts.get(textBlockName)
-		if textBlock is None:
-			textBlock = bpy.data.texts.new(textBlockName)
-		textBlock.clear()
-		text = getNormalNodeTemplate() + getAutoRegisterCode()
-		textBlock.from_string(text)
-		textBlock.use_tabs_as_spaces = True
-		return {'FINISHED'}
-		
-class AppendAutoUpdateCode(bpy.types.Operator):
-	bl_idname = "mn.append_auto_update_code"
-	bl_label = "Append Auto Update Code"
-
-	def execute(self, context):
-		from animation_nodes.nodes.mn_node_template import getAutoRegisterCode
-		for area in bpy.context.screen.areas:
-			for space in area.spaces:
-				if space.type == "TEXT_EDITOR":
-					if space.text is not None:
-						textString = space.text.as_string()
-						textString += getAutoRegisterCode()
-						space.text.clear()
-						space.text.write(textString)
 		return {'FINISHED'}
 	
 

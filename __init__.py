@@ -76,11 +76,11 @@ import bpy
 
 from animation_nodes.mn_execution import nodeTreeChanged
 class GlobalUpdateSettings(bpy.types.PropertyGroup):
-	frameChange = BoolProperty(default = True, name = "Frame Change")
-	sceneUpdate = BoolProperty(default = True, name = "Scene Update")
-	propertyChange = BoolProperty(default = True, name = "Property Change")
+	frameChange = BoolProperty(default = True, name = "Frame Change", description = "Recalculate the nodes when the frame has been changed")
+	sceneUpdate = BoolProperty(default = True, name = "Scene Update", description = "Recalculate the nodes continuously")
+	propertyChange = BoolProperty(default = True, name = "Property Change", description = "Recalculate the nodes when a property of a node changed")
 	treeChange = BoolProperty(default = True, name = "Tree Change")
-	skipFramesAmount = IntProperty(default = 0, name = "Skip Frames", min = 0, soft_max = 10)
+	skipFramesAmount = IntProperty(default = 0, name = "Skip Frames", min = 0, soft_max = 10, description = "Only recalculate the nodes every nth frame")
 	redrawViewport = BoolProperty(default = True, name = "Redraw Viewport", description = "Redraw the UI after each execution. Turning it off gives a better performance but worse realtime feedback.")
 	
 class DeveloperSettings(bpy.types.PropertyGroup):
