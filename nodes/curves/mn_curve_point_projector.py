@@ -26,19 +26,34 @@ class mn_CurvePointProjectorNode(Node, AnimationNode):
     def getOutputSocketNames(self):
         return {"Parameter" : "parameter"}
         
-    def execute(self, point, resolution, curve):
-        curveCurve = Curves.Curve(curve)
-        samplesWorld = curveCurve.SampleWorld(resolution)
-        deltaParameter = float(1.0 / float(resolution - 1))
+    def canExecute(self, point, resolution, curve):
+        if point is None: return False
+        if resolution is None: return False
+        if resolution < 2: return False
+        if curve is None: return False
+        if not Curves.IsBezierCurve(curve): return False
         
+        return True
+    
+    def execute(self, point, resolution, curve):
         rvParameter = 0.0
-        rvLength2 = (samplesWorld[0] - point).length_squared
-        for iSample in range(1, resolution):
-            currParameter = deltaParameter * float(iSample)
-            currLength2 = (samplesWorld[iSample] - point).length_squared
-            if currLength2 < rvLength2:
-                rvLength2 = currLength2
-                rvParameter = currParameter
+        if not self.canExecute(point, resolution, curve):
+            return rvParameter
+        
+        try:
+            curveCurve = Curves.Curve(curve)
+            samplesWorld = curveCurve.SampleWorld(resolution)
+            deltaParameter = float(1.0 / float(resolution - 1))
+            
+            rvParameter = 0.0
+            rvLength2 = (samplesWorld[0] - point).length_squared
+            for iSample in range(1, resolution):
+                currParameter = deltaParameter * float(iSample)
+                currLength2 = (samplesWorld[iSample] - point).length_squared
+                if currLength2 < rvLength2:
+                    rvLength2 = currLength2
+                    rvParameter = currParameter
+        except: pass
         
         return rvParameter
    

@@ -4,6 +4,23 @@ from mathutils import *
 import bpy
 
 
+# utility functions
+def IsCurve(blenderObject):
+    if blenderObject is None: return False
+    if blenderObject.type == 'CURVE': return True
+    
+    return False
+    
+def IsBezierCurve(blenderObject):
+    if blenderObject is None: return False
+    if not IsCurve(blenderObject): return False
+    
+    for spline in blenderObject.data.splines:
+        if spline.type != 'BEZIER': return False
+    
+    return True
+    
+
 class BezierPoint:
     @staticmethod
     def FromBlenderBezierPoint(blenderBezierPoint):
@@ -271,10 +288,21 @@ class Curve:
         if attrName == "nrSplines":
             return len(self.splines)
         
+        if attrName == "blenderNrSplines":
+            return len(self.curveData.splines)
+        
+        if attrName == "blenderSplineTypes":
+            rvTypes = []
+            
+            for spline in self.curveData.splines: rvTypes.append(spline.type)
+            
+            return rvTypes
+            
+        
         if attrName == "length":
             return self.CalcLength()
         
-        if attrName == "lengthW":
+        if attrName == "lengthWorld":
             return self.CalcLengthWorld()
         
         if attrName == "worldMatrix":

@@ -30,9 +30,29 @@ class mn_CurveRevolveNode(Node, AnimationNode):
         return {"Vertex World Locations" : "vertices",
                 "Polygon Indices" : "polygons"}
         
+    def canExecute(self, resAlong, resAcross, axis, profile):
+        if resAlong is None: return False
+        if resAcross is None: return False
+        if axis is None: return False
+        if profile is None: return False
+        
+        if resAlong < 2: return False
+        if resAcross < 2: return False
+        if not Curves.IsBezierCurve(axis): return False
+        if not Curves.IsBezierCurve(profile): return False
+        
+        return True
+        
     def execute(self, resAlong, resAcross, axis, profile):
-        revolvedSurface = Surfaces.RevolvedSurface(axis, profile)
-        vertices, polygons = revolvedSurface.Calculate(resAlong, resAcross)
+        vertices = []
+        polygons = []
+        if not self.canExecute(resAlong, resAcross, axis, profile):
+            return vertices, polygons
+        
+        try:
+            revolvedSurface = Surfaces.RevolvedSurface(axis, profile)
+            vertices, polygons = revolvedSurface.Calculate(resAlong, resAcross)
+        except: pass
         
         return vertices, polygons
    

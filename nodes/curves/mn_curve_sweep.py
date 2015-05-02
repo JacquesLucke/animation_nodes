@@ -30,9 +30,29 @@ class mn_CurveSweepNode(Node, AnimationNode):
         return {"Vertex World Locations" : "vertices",
                 "Polygon Indices" : "polygons"}
         
+    def canExecute(self, resAlong, resAcross, rail, profile):
+        if resAlong is None: return False
+        if resAcross is None: return False
+        if rail is None: return False
+        if profile is None: return False
+        
+        if resAlong < 2: return False
+        if resAcross < 2: return False
+        if not Curves.IsBezierCurve(rail): return False
+        if not Curves.IsBezierCurve(profile): return False
+        
+        return True
+        
     def execute(self, resAlong, resAcross, rail, profile):
-        sweptSurface = Surfaces.SweptSurface(rail, profile)
-        vertices, polygons = sweptSurface.Calculate(resAlong, resAcross)
+        vertices = []
+        polygons = []
+        if not self.canExecute(resAlong, resAcross, rail, profile):
+            return vertices, polygons
+        
+        try:
+            sweptSurface = Surfaces.SweptSurface(rail, profile)
+            vertices, polygons = sweptSurface.Calculate(resAlong, resAcross)
+        except: pass
         
         return vertices, polygons
    

@@ -32,9 +32,31 @@ class mn_CurveBirailNode(Node, AnimationNode):
         return {"Vertex World Locations" : "vertices",
                 "Polygon Indices" : "polygons"}
         
+    def canExecute(self, resAlong, resAcross, rail1, rail2, profile):
+        if resAlong is None: return False
+        if resAcross is None: return False
+        if rail1 is None: return False
+        if rail2 is None: return False
+        if profile is None: return False
+        
+        if resAlong < 2: return False
+        if resAcross < 2: return False
+        if not Curves.IsBezierCurve(rail1): return False
+        if not Curves.IsBezierCurve(rail2): return False
+        if not Curves.IsBezierCurve(profile): return False
+        
+        return True
+        
     def execute(self, resAlong, resAcross, rail1, rail2, profile):
-        birailedSurface = Surfaces.BirailedSurface(rail1, rail2, profile)
-        vertices, polygons = birailedSurface.Calculate(resAlong, resAcross)
+        vertices = []
+        polygons = []
+        if not self.canExecute(resAlong, resAcross, rail1, rail2, profile):
+            return vertices, polygons
+        
+        try:
+            birailedSurface = Surfaces.BirailedSurface(rail1, rail2, profile)
+            vertices, polygons = birailedSurface.Calculate(resAlong, resAcross)
+        except: pass
         
         return vertices, polygons
    
