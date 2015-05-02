@@ -53,6 +53,17 @@ def getNodeNameDictionary():
 		("mn_ObjectMatrixOutputNode", "Object Matrix Output"),
 		("mn_ObjectTransformsOutput", "Transforms Output") ] ))
 		
+	nodes.append(("Curve", [
+		("mn_CurveInfoNode", "Curve Info"),
+		("mn_CurveLoftNode", "Curve Loft"),
+		("mn_CurveRevolveNode", "Curve Revolve"),
+		("mn_CurveSweepNode", "Curve Sweep"),
+		("mn_CurveSweepAndMorphNode", "Curve SweepAndMorph"),
+		("mn_CurveBirailNode", "Curve Birail"),
+		("mn_CurveBirailAndMorphNode", "Curve BirailAndMorph"),
+		("mn_CurveEvaluatorNode", "Curve Evaluator"),
+		("mn_CurvePointProjectorNode", "Curve PointProjector") ] ))
+		
 	nodes.append(("Boolean", [
 		("mn_BooleanInputNode", "Boolean"),
 		("mn_CompareNode", "Compare"),
