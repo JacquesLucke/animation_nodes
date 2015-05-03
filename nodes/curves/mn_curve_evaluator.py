@@ -10,16 +10,16 @@ from . import Surfaces
 
 class mn_CurveEvaluatorNode(Node, AnimationNode):
     bl_idname = "mn_CurveEvaluatorNode"
-    bl_label = "Evaluator Curve"
+    bl_label = "Curve Evaluator"
     
     def init(self, context):
         forbidCompiling()
         self.inputs.new("mn_FloatSocket", "Parameter").showName = True
         self.inputs.new("mn_ObjectSocket", "Curve").showName = True
-        self.outputs.new("mn_VectorSocket", "Point")
-        self.outputs.new("mn_VectorSocket", "PointWorld")
-        self.outputs.new("mn_VectorSocket", "Derivative")
-        self.outputs.new("mn_VectorSocket", "DerivativeWorld")
+        self.outputs.new("mn_VectorSocket", "Local Point")
+        self.outputs.new("mn_VectorSocket", "World Point")
+        self.outputs.new("mn_VectorSocket", "Local Derivative")
+        self.outputs.new("mn_VectorSocket", "World Derivative")
         allowCompiling()
         
     def getInputSocketNames(self):
@@ -27,16 +27,12 @@ class mn_CurveEvaluatorNode(Node, AnimationNode):
                 "Curve" : "curve"}
         
     def getOutputSocketNames(self):
-        return {"Point" : "point",
-                "PointWorld" : "pointWorld",
-                "Derivative" : "derivative",
-                "DerivativeWorld" : "derivativeWorld"}
+        return {"Local Point" : "point",
+                "World Point" : "pointWorld",
+                "Local Derivative" : "derivative",
+                "World Derivative" : "derivativeWorld"}
         
     def canExecute(self, parameter, curve):
-        if parameter is None: return False
-        # do we not execute when par < 0 or par > 1?
-        
-        if curve is None: return False
         if not Curves.IsBezierCurve(curve): return False
         
         return True
@@ -49,7 +45,6 @@ class mn_CurveEvaluatorNode(Node, AnimationNode):
         if not self.canExecute(parameter, curve):
             return point, pointWorld, derivative, derivativeWorld
         
-        # is this ok?
         if parameter < 0.0: parameter = 0.0
         if parameter > 1.0: parameter = 1.0
 

@@ -8,7 +8,7 @@ from . import Surfaces
 
 class mn_CurveSweepNode(Node, AnimationNode):
     bl_idname = "mn_CurveSweepNode"
-    bl_label = "Sweep Curves"
+    bl_label = "Sweep"
     
     def init(self, context):
         forbidCompiling()
@@ -31,11 +31,6 @@ class mn_CurveSweepNode(Node, AnimationNode):
                 "Polygon Indices" : "polygons"}
         
     def canExecute(self, resAlong, resAcross, rail, profile):
-        if resAlong is None: return False
-        if resAcross is None: return False
-        if rail is None: return False
-        if profile is None: return False
-        
         if resAlong < 2: return False
         if resAcross < 2: return False
         if not Curves.IsBezierCurve(rail): return False

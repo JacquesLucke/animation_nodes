@@ -8,7 +8,7 @@ from . import Surfaces
 
 class mn_CurveRevolveNode(Node, AnimationNode):
     bl_idname = "mn_CurveRevolveNode"
-    bl_label = "Revolve Curves"
+    bl_label = "Revolve"
     
     def init(self, context):
         forbidCompiling()
@@ -31,11 +31,6 @@ class mn_CurveRevolveNode(Node, AnimationNode):
                 "Polygon Indices" : "polygons"}
         
     def canExecute(self, resAlong, resAcross, axis, profile):
-        if resAlong is None: return False
-        if resAcross is None: return False
-        if axis is None: return False
-        if profile is None: return False
-        
         if resAlong < 2: return False
         if resAcross < 2: return False
         if not Curves.IsBezierCurve(axis): return False

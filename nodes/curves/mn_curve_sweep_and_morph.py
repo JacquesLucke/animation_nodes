@@ -8,15 +8,15 @@ from . import Surfaces
 
 class mn_CurveSweepAndMorphNode(Node, AnimationNode):
     bl_idname = "mn_CurveSweepAndMorphNode"
-    bl_label = "SweepAndMorph Curves"
+    bl_label = "Sweep & Morph"
     
     def init(self, context):
         forbidCompiling()
         self.inputs.new("mn_IntegerSocket", "Resolution Along").showName = True
         self.inputs.new("mn_IntegerSocket", "Resolution Across").showName = True
         self.inputs.new("mn_ObjectSocket", "Rail").showName = True
-        self.inputs.new("mn_ObjectSocket", "BeginProfile").showName = True
-        self.inputs.new("mn_ObjectSocket", "EndProfile").showName = True
+        self.inputs.new("mn_ObjectSocket", "Begin Profile").showName = True
+        self.inputs.new("mn_ObjectSocket", "End Profile").showName = True
         self.outputs.new("mn_VectorListSocket", "Vertex World Locations")
         self.outputs.new("mn_PolygonIndicesListSocket", "Polygon Indices")
         allowCompiling()
@@ -25,20 +25,14 @@ class mn_CurveSweepAndMorphNode(Node, AnimationNode):
         return {"Resolution Along" : "resAlong",
                 "Resolution Across" : "resAcross",
                 "Rail" : "rail",
-                "BeginProfile" : "beginProfile",
-                "EndProfile" : "endProfile"}
+                "Begin Profile" : "beginProfile",
+                "End Profile" : "endProfile"}
         
     def getOutputSocketNames(self):
         return {"Vertex World Locations" : "vertices",
                 "Polygon Indices" : "polygons"}
         
     def canExecute(self, resAlong, resAcross, rail, beginProfile, endProfile):
-        if resAlong is None: return False
-        if resAcross is None: return False
-        if rail is None: return False
-        if beginProfile is None: return False
-        if endProfile is None: return False
-        
         if resAlong < 2: return False
         if resAcross < 2: return False
         if not Curves.IsBezierCurve(rail): return False

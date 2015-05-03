@@ -8,18 +8,18 @@ from . import Surfaces
 
 class mn_CurvePointProjectorNode(Node, AnimationNode):
     bl_idname = "mn_CurvePointProjectorNode"
-    bl_label = "PointProjector Curve"
+    bl_label = "Curve Point Projector"
     
     def init(self, context):
         forbidCompiling()
-        self.inputs.new("mn_VectorSocket", "Point").showName = True
+        self.inputs.new("mn_VectorSocket", "World Point").showName = True
         self.inputs.new("mn_IntegerSocket", "Resolution").showName = True
         self.inputs.new("mn_ObjectSocket", "Curve").showName = True
         self.outputs.new("mn_FloatSocket", "Parameter")
         allowCompiling()
         
     def getInputSocketNames(self):
-        return {"Point" : "point",
+        return {"World Point" : "point",
                 "Resolution" : "resolution",
                 "Curve" : "curve"}
         
@@ -27,10 +27,7 @@ class mn_CurvePointProjectorNode(Node, AnimationNode):
         return {"Parameter" : "parameter"}
         
     def canExecute(self, point, resolution, curve):
-        if point is None: return False
-        if resolution is None: return False
         if resolution < 2: return False
-        if curve is None: return False
         if not Curves.IsBezierCurve(curve): return False
         
         return True

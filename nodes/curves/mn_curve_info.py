@@ -12,22 +12,21 @@ class mn_CurveInfoNode(Node, AnimationNode):
     def init(self, context):
         forbidCompiling()
         self.inputs.new("mn_ObjectSocket", "Curve").showName = True
-        self.outputs.new("mn_IntegerSocket", "NrSplines")
-        self.outputs.new("mn_StringListSocket", "SplineTypes")
-        self.outputs.new("mn_FloatSocket", "Length")
-        self.outputs.new("mn_FloatSocket", "LengthWorld")
+        self.outputs.new("mn_IntegerSocket", "Number of Splines")
+        self.outputs.new("mn_StringListSocket", "Types of Splines")
+        self.outputs.new("mn_FloatSocket", "Local Length")
+        self.outputs.new("mn_FloatSocket", "World Length")
         allowCompiling()
         
     def getInputSocketNames(self):
         return {"Curve" : "curve"}
     def getOutputSocketNames(self):
-        return {"NrSplines" : "nrSplines",
-                "SplineTypes" : "splineTypes",
-                "Length" : "length",
-                "LengthWorld" : "lengthWorld"}
+        return {"Number of Splines" : "nrSplines",
+                "Types of Splines" : "splineTypes",
+                "Local Length" : "length",
+                "World Length" : "lengthWorld"}
         
     def canExecute(self, curve):
-        if curve is None: return False
         if not Curves.IsBezierCurve(curve): return False
         
         return True
@@ -44,8 +43,8 @@ class mn_CurveInfoNode(Node, AnimationNode):
             curveCurve = Curves.Curve(curve)
             nrSplines = curveCurve.blenderNrSplines
             splineTypes = curveCurve.blenderSplineTypes
-            length = curveCurve.length
-            lengthWorld = curveCurve.lengthWorld
+            length = curveCurve.CalcLengthWithBlenderResolution()
+            lengthWorld = curveCurve.CalcLengthWorldWithBlenderResolution()
         except: pass
             
         return nrSplines, splineTypes, length, lengthWorld

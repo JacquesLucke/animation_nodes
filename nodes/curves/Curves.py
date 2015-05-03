@@ -12,7 +12,6 @@ def IsCurve(blenderObject):
     return False
     
 def IsBezierCurve(blenderObject):
-    if blenderObject is None: return False
     if not IsCurve(blenderObject): return False
     
     for spline in blenderObject.data.splines:
@@ -162,23 +161,25 @@ class BezierSegment:
 # TODO: remove bez-segments from definition, as blender splines don't have them (only bez-points)
 # ----- -- could still be useful in other calculations, though..
 class BezierSpline:
-    @staticmethod
-    def FromBlenderBezierSpline(blenderBezierSpline):
+    def __init__(self, blenderBezierSpline):
+        self.blenderBezierSpline = blenderBezierSpline
+        
         bezPoints = []
         
         nrBezPoints = len(blenderBezierSpline.bezier_points)
         for iBezierPoint in range(nrBezPoints):
             bezPoints.append(BezierPoint.FromBlenderBezierPoint(blenderBezierSpline.bezier_points[iBezierPoint]))
             
-        return BezierSpline(bezPoints, blenderBezierSpline.use_cyclic_u)
-            
-    def __init__(self, bezPoints, cyclic = False):
-        self.isCyclic = cyclic
-        
         self.bezierPoints = []
         for ip in range(len(bezPoints)): self.bezierPoints.append(bezPoints[ip])
                 
     def __getattr__(self, attrName):
+        if attrName == "blenderResolution":
+            return self.blenderBezierSpline.resolution_u
+        
+        if attrName == "isCyclic":
+            return self.blenderBezierSpline.use_cyclic_u
+        
         if attrName == "nrBezierPoints":
             return len(self.bezierPoints)
         
@@ -257,6 +258,12 @@ class BezierSpline:
             rvLength += segment.CalcLengthTransformed(nrSamplesPerSegment, matrix)
         
         return rvLength
+    
+    def CalcLengthWithBlenderResolution(self):
+        return self.CalcLength(self.blenderResolution)
+        
+    def CalcLengthTransformedWithBlenderResolution(self, matrix):
+        return self.CalcLengthTransformed(self.blenderResolution, matrix)
         
         
 
@@ -275,7 +282,7 @@ class Curve:
                 print("## WARNING: only bezier splines are supported, atm; other types are ignored")
                 continue
             
-            try: newSpline = BezierSpline.FromBlenderBezierSpline(spline)
+            try: newSpline = BezierSpline(spline)
             except: 
                 print("## EXCEPTION: newSpline = BezierSpline.FromBlenderBezierSpline(spline)")
                 continue
@@ -436,6 +443,20 @@ class Curve:
         rvLength = 0.0
         for spline in self.splines:
             rvLength += spline.CalcLengthTransformed(spline.resolution, self.worldMatrix)
+        
+        return rvLength
+    
+    def CalcLengthWithBlenderResolution(self):
+        rvLength = 0.0
+        for spline in self.splines:
+            rvLength += spline.CalcLengthWithBlenderResolution()
+        
+        return rvLength
+    
+    def CalcLengthWorldWithBlenderResolution(self):
+        rvLength = 0.0
+        for spline in self.splines:
+            rvLength += spline.CalcLengthTransformedWithBlenderResolution(self.worldMatrix)
         
         return rvLength
         
