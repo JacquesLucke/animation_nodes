@@ -26,8 +26,8 @@ class AnimationNodesPerformance(bpy.types.Panel):
 		layout.prop(scene.mn_settings.update, "frameChange", text = "Frames Update")
 		layout.prop(scene.mn_settings.update, "sceneUpdate", text = "Scene Update")
 		layout.prop(scene.mn_settings.update, "propertyChange", text = "Property Update")
+		layout.prop(scene.mn_settings.update, "resetCompileBlockerWhileRendering", text = "Render Update")
 		layout.prop(scene.mn_settings.update, "skipFramesAmount")
-		layout.prop(scene.mn_settings.update, "resetCompileBlockerWhileRendering")
 		layout.prop(scene.mn_settings.update, "redrawViewport")
 	
 class CustomAnimationNodes(bpy.types.Panel):
