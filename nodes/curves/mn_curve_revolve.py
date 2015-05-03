@@ -12,10 +12,10 @@ class mn_CurveRevolveNode(Node, AnimationNode):
     
     def init(self, context):
         forbidCompiling()
-        self.inputs.new("mn_IntegerSocket", "Resolution Along").showName = True
-        self.inputs.new("mn_IntegerSocket", "Resolution Across").showName = True
-        self.inputs.new("mn_ObjectSocket", "Axis").showName = True
-        self.inputs.new("mn_ObjectSocket", "Profile").showName = True
+        self.inputs.new("mn_IntegerSocket", "Resolution Along").number = 16
+        self.inputs.new("mn_IntegerSocket", "Resolution Across").number = 16
+        self.inputs.new("mn_ObjectSocket", "Axis")
+        self.inputs.new("mn_ObjectSocket", "Profile")
         self.outputs.new("mn_VectorListSocket", "Vertex World Locations")
         self.outputs.new("mn_PolygonIndicesListSocket", "Polygon Indices")
         allowCompiling()

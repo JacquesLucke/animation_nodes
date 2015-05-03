@@ -12,11 +12,11 @@ class mn_CurveSweepAndMorphNode(Node, AnimationNode):
     
     def init(self, context):
         forbidCompiling()
-        self.inputs.new("mn_IntegerSocket", "Resolution Along").showName = True
-        self.inputs.new("mn_IntegerSocket", "Resolution Across").showName = True
-        self.inputs.new("mn_ObjectSocket", "Rail").showName = True
-        self.inputs.new("mn_ObjectSocket", "Begin Profile").showName = True
-        self.inputs.new("mn_ObjectSocket", "End Profile").showName = True
+        self.inputs.new("mn_IntegerSocket", "Resolution Along").number = 16
+        self.inputs.new("mn_IntegerSocket", "Resolution Across").number = 16
+        self.inputs.new("mn_ObjectSocket", "Rail")
+        self.inputs.new("mn_ObjectSocket", "Begin Profile")
+        self.inputs.new("mn_ObjectSocket", "End Profile")
         self.outputs.new("mn_VectorListSocket", "Vertex World Locations")
         self.outputs.new("mn_PolygonIndicesListSocket", "Polygon Indices")
         allowCompiling()

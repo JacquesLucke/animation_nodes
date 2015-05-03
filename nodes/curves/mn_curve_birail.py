@@ -12,11 +12,11 @@ class mn_CurveBirailNode(Node, AnimationNode):
     
     def init(self, context):
         forbidCompiling()
-        self.inputs.new("mn_IntegerSocket", "Resolution Along").showName = True
-        self.inputs.new("mn_IntegerSocket", "Resolution Across").showName = True
-        self.inputs.new("mn_ObjectSocket", "Rail 1").showName = True
-        self.inputs.new("mn_ObjectSocket", "Rail 2").showName = True
-        self.inputs.new("mn_ObjectSocket", "Profile").showName = True
+        self.inputs.new("mn_IntegerSocket", "Resolution Along").number = 16
+        self.inputs.new("mn_IntegerSocket", "Resolution Across").number = 16
+        self.inputs.new("mn_ObjectSocket", "Rail 1")
+        self.inputs.new("mn_ObjectSocket", "Rail 2")
+        self.inputs.new("mn_ObjectSocket", "Profile")
         self.outputs.new("mn_VectorListSocket", "Vertex World Locations")
         self.outputs.new("mn_PolygonIndicesListSocket", "Polygon Indices")
         allowCompiling()

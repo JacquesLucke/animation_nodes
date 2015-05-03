@@ -12,9 +12,9 @@ class mn_CurvePointProjectorNode(Node, AnimationNode):
     
     def init(self, context):
         forbidCompiling()
-        self.inputs.new("mn_VectorSocket", "World Point").showName = True
-        self.inputs.new("mn_IntegerSocket", "Resolution").showName = True
-        self.inputs.new("mn_ObjectSocket", "Curve").showName = True
+        self.inputs.new("mn_VectorSocket", "World Point")
+        self.inputs.new("mn_IntegerSocket", "Resolution").number = 64
+        self.inputs.new("mn_ObjectSocket", "Curve")
         self.outputs.new("mn_FloatSocket", "Parameter")
         allowCompiling()
         

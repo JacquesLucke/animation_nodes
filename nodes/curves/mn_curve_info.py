@@ -11,7 +11,7 @@ class mn_CurveInfoNode(Node, AnimationNode):
     
     def init(self, context):
         forbidCompiling()
-        self.inputs.new("mn_ObjectSocket", "Curve").showName = True
+        self.inputs.new("mn_ObjectSocket", "Curve")
         self.outputs.new("mn_IntegerSocket", "Number of Splines")
         self.outputs.new("mn_StringListSocket", "Types of Splines")
         self.outputs.new("mn_FloatSocket", "Local Length")
