@@ -1,4 +1,4 @@
-import bpy
+﻿import bpy
 import bmesh
 
 from . import Math

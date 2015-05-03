@@ -1,4 +1,4 @@
-import math
+﻿import math
 from mathutils import *
 
 
@@ -138,7 +138,7 @@ def CalcRotationMatrix(v3From, v3To):
     
 
 
-# if resolution == 4, the last point is at 270�, so you may need to 'make it cyclic' yourself
+# if resolution == 4, the last point is at 270°, so you may need to 'make it cyclic' yourself
 def GenerateCircle(center, radius, dirX, dirY, resolution):
     currAng = 0.0
     deltaAng = (math.pi * 2.0) / float(resolution)
