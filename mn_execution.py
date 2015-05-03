@@ -1,4 +1,4 @@
-import bpy, time
+import bpy, time, traceback, sys
 from bpy.app.handlers import persistent
 from animation_nodes.mn_utils import *
 from animation_nodes.mn_cache import clearExecutionCache
@@ -39,12 +39,20 @@ def secureExecution(event, sender):
 		generateExecutionUnits()
 		forbidCompiling()
 		try: executeUnits(event, sender)
-		except Exception as e: print(e)
+		except Exception as e: 
+			exc_type, exc_value, exc_traceback = sys.exc_info()
+			traceback.print_tb(exc_traceback)
 		
 		
 def executeUnits(event, sender):
 	for executionUnit in executionUnits:
 		executionUnit.execute(event, sender)
+		
+def redraw_areas_if_possible():
+	try:
+		for area in bpy.context.screen.areas:
+			area.tag_redraw()
+	except: pass		
 			
 def allowCompiling():
 	global COMPILE_BLOCKER
@@ -56,7 +64,6 @@ def resetCompileBlocker():
 	global COMPILE_BLOCKER
 	COMPILE_BLOCKER = 0
 			
-		
 		
 # generate Scripts
 ################################
@@ -82,13 +89,13 @@ def getCodeStrings():
 	return codeStrings
 	
 	
-	
 # handlers to start the update
 ##############################
 
-	
 @persistent
 def frameChangeHandler(scene):
+	if is_rendering and scene.mn_settings.update.resetCompileBlockerWhileRendering: 
+		resetCompileBlocker()
 	updateAnimationTrees("FRAME")
 @persistent
 def sceneUpdateHandler(scene):
@@ -109,12 +116,23 @@ def forceExecution(sender = None):
 	generateExecutionUnits()
 	updateAnimationTrees("FORCE", sender)
 	
-def redraw_areas_if_possible():
-	try:
-		for area in bpy.context.screen.areas:
-			area.tag_redraw()
-	except: pass
-	
 bpy.app.handlers.frame_change_post.append(frameChangeHandler)
 bpy.app.handlers.scene_update_post.append(sceneUpdateHandler)
-bpy.app.handlers.load_post.append(fileLoadHandler)
+bpy.app.handlers.load_post.append(fileLoadHandler)	
+	
+	
+# check rendering status
+##############################	
+	
+is_rendering = False
+@persistent
+def rendering_starts(scene):
+	global is_rendering
+	is_rendering = True
+@persistent
+def rendering_ends(scene):
+	global is_rendering
+	is_rendering = False
+
+bpy.app.handlers.render_pre.append(rendering_starts)    
+bpy.app.handlers.render_post.append(rendering_ends)

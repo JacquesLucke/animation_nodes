@@ -82,6 +82,7 @@ class GlobalUpdateSettings(bpy.types.PropertyGroup):
 	treeChange = BoolProperty(default = True, name = "Tree Change")
 	skipFramesAmount = IntProperty(default = 0, name = "Skip Frames", min = 0, soft_max = 10, description = "Only recalculate the nodes every nth frame")
 	redrawViewport = BoolProperty(default = True, name = "Redraw Viewport", description = "Redraw the UI after each execution. Turning it off gives a better performance but worse realtime feedback.")
+	resetCompileBlockerWhileRendering = BoolProperty(default = True, name = "Force Update While Rendering", description = "Force the node tree to execute if the frame changes and Blender is rendering currently (nodes which change the frame may lock the UI)")
 	
 class DeveloperSettings(bpy.types.PropertyGroup):
 	printUpdateTime = BoolProperty(default = False, name = "Print Global Update Time")
