@@ -46,15 +46,15 @@ class mn_ObjectInfoNode(Node, AnimationNode):
 				"Scale Velocity" : "scaleVelocity"}
 		
 	def execute(self, useOutput, object, frame):
-		location = Vector((0, 0, 0))
-		rotation = Vector((0, 0, 0))
-		scale = Vector((1, 1, 1))
-		locVelocity = Vector((0, 0, 0))
-		rotVelocity = Vector((0, 0, 0))
-		scaleVelocity = Vector((0, 0, 0))
+		location = (0, 0, 0)
+		rotation = (0, 0, 0)
+		scale = (1, 1, 1)
+		locVelocity = (0, 0, 0)
+		rotVelocity = (0, 0, 0)
+		scaleVelocity = (0, 0, 0)
 		
 		if object is None:
-			return location, rotation, scale, locVelocity, rotVelocity, scaleVelocity
+			return Vector(location), Vector(rotation), Vector(scale), Vector(locVelocity), Vector(rotVelocity), Vector(scaleVelocity)
 			
 		currentFrame = getCurrentFrame()
 		if self.frameTypesProperty == "OFFSET":
@@ -100,5 +100,5 @@ class mn_ObjectInfoNode(Node, AnimationNode):
 			elif useOutput["Scale"]:
 				scale = getArrayValueAtFrame(object, "scale", frame)
 		
-		return location, Vector(rotation), scale, Vector(locVelocity), Vector(rotVelocity), Vector(scaleVelocity)
+		return Vector(location), Vector(rotation), Vector(scale), Vector(locVelocity), Vector(rotVelocity), Vector(scaleVelocity)
 
