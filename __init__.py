@@ -89,7 +89,7 @@ class DeveloperSettings(bpy.types.PropertyGroup):
     printGenerationTime = BoolProperty(default = False, name = "Print Script Generation Time")
     executionProfiling = BoolProperty(default = False, name = "Node Execution Profiling", update = nodeTreeChanged)
 
-import animation_nodes.mn_keyframes
+from . import mn_keyframes 
 class Keyframes(bpy.types.PropertyGroup):
     name = StringProperty(default = "", name = "Keyframe Name")
     type = EnumProperty(items = mn_keyframes.getKeyframeTypeItems(), name = "Keyframe Type")
