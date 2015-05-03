@@ -23,10 +23,11 @@ class AnimationNodesPerformance(bpy.types.Panel):
 		col.scale_y = 1.3
 		col.operator("mn.force_full_update", text = "Force Update", icon = "PLAY")
 		
-		layout.prop(scene.mn_settings.update, "frameChange", text = "Frames Update")
-		layout.prop(scene.mn_settings.update, "sceneUpdate", text = "Scene Update")
-		layout.prop(scene.mn_settings.update, "propertyChange", text = "Property Update")
-		layout.prop(scene.mn_settings.update, "resetCompileBlockerWhileRendering", text = "Render Update")
+		col = layout.column(align = True)
+		col.prop(scene.mn_settings.update, "frameChange", text = "Frame Changed")
+		col.prop(scene.mn_settings.update, "sceneUpdate", text = "Scene Changed")
+		col.prop(scene.mn_settings.update, "propertyChange", text = "Property Changed")
+		col.prop(scene.mn_settings.update, "resetCompileBlockerWhileRendering", text = "Is Rendering")
 		layout.prop(scene.mn_settings.update, "skipFramesAmount")
 		layout.prop(scene.mn_settings.update, "redrawViewport")
 	
