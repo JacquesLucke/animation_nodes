@@ -33,7 +33,7 @@ bl_info = {
 	"version":     (0, 0, 1),
 	"blender":     (2, 7, 2),
 	"location":    "Node Editor",
-	"category":    "Animation",
+	"category":    "Node",
 	"warning":     "alpha"
 	}
 	
