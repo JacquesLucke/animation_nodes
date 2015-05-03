@@ -6,29 +6,28 @@ from animation_nodes.mn_utils import *
 
 
 class mn_TextBlockReader(Node, AnimationNode):
-	bl_idname = "mn_TextBlockReader"
-	bl_label = "Text Block Reader"
-	outputUseParameterName = "useOutput"
-	
-	def init(self, context):
-		forbidCompiling()
-		self.inputs.new("mn_TextBlockSocket", "Text Block").showName = False
-		self.outputs.new("mn_StringSocket", "Text")
-		self.outputs.new("mn_StringListSocket", "Lines")
-		allowCompiling()
-		
-	def getInputSocketNames(self):
-		return {"Text Block" : "textBlock"}
-	def getOutputSocketNames(self):
-		return {"Text" : "text",
-				"Lines" : "lines"}
+    bl_idname = "mn_TextBlockReader"
+    bl_label = "Text Block Reader"
+    outputUseParameterName = "useOutput"
+    
+    def init(self, context):
+        forbidCompiling()
+        self.inputs.new("mn_TextBlockSocket", "Text Block").showName = False
+        self.outputs.new("mn_StringSocket", "Text")
+        self.outputs.new("mn_StringListSocket", "Lines")
+        allowCompiling()
+        
+    def getInputSocketNames(self):
+        return {"Text Block" : "textBlock"}
+    def getOutputSocketNames(self):
+        return {"Text" : "text",
+                "Lines" : "lines"}
 
-	def execute(self, useOutput, textBlock):
-		text = ""
-		if textBlock is not None:
-			text = textBlock.as_string()
-			
-		if useOutput["Lines"]: return text, text.split("\n")
-		else: return text, []
-		
-
+    def execute(self, useOutput, textBlock):
+        text = ""
+        if textBlock is not None:
+            text = textBlock.as_string()
+            
+        if useOutput["Lines"]: return text, text.split("\n")
+        else: return text, []
+        

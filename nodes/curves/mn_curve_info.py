@@ -8,7 +8,7 @@ from . import Curves
 class mn_CurveInfoNode(Node, AnimationNode):
     bl_idname = "mn_CurveInfoNode"
     bl_label = "Curve Info"
-    
+
     def init(self, context):
         forbidCompiling()
         self.inputs.new("mn_ObjectSocket", "Curve")
@@ -17,7 +17,7 @@ class mn_CurveInfoNode(Node, AnimationNode):
         self.outputs.new("mn_FloatSocket", "Local Length")
         self.outputs.new("mn_FloatSocket", "World Length")
         allowCompiling()
-        
+
     def getInputSocketNames(self):
         return {"Curve" : "curve"}
     def getOutputSocketNames(self):
@@ -25,12 +25,12 @@ class mn_CurveInfoNode(Node, AnimationNode):
                 "Types of Splines" : "splineTypes",
                 "Local Length" : "length",
                 "World Length" : "lengthWorld"}
-        
+
     def canExecute(self, curve):
         if not Curves.IsBezierCurve(curve): return False
-        
+
         return True
-        
+
     def execute(self, curve):
         nrSplines = 0
         splineTypes = []
@@ -38,7 +38,7 @@ class mn_CurveInfoNode(Node, AnimationNode):
         lengthWorld = 0.0
         if not self.canExecute(curve):
             return nrSplines, splineTypes, length, lengthWorld
-        
+
         try:
             curveCurve = Curves.Curve(curve)
             nrSplines = curveCurve.blenderNrSplines
@@ -46,6 +46,5 @@ class mn_CurveInfoNode(Node, AnimationNode):
             length = curveCurve.CalcLengthWithBlenderResolution()
             lengthWorld = curveCurve.CalcLengthWorldWithBlenderResolution()
         except: pass
-            
+
         return nrSplines, splineTypes, length, lengthWorld
-        

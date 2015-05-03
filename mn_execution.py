@@ -11,128 +11,128 @@ COMPILE_BLOCKER = 0
 executionUnits = []
 
 def updateAnimationTrees(event = "NONE", sender = None):
-	if COMPILE_BLOCKER == 0:
-		forbidCompiling()
-		
-		start = time.clock()
-		
-		secureExecution(event, sender)
-		clearExecutionCache()
-		
-		timeSpan = time.clock() - start
-		
-		if bpy.context.scene.mn_settings.developer.printUpdateTime:
-			printTimeSpan("Update Time ", timeSpan)
-			
-		try:
-			bpy.context.scene.update()
-			if bpy.context.scene.mn_settings.update.redrawViewport:
-				redraw_areas_if_possible()
-		except: pass
-			
-		allowCompiling()
-		
+    if COMPILE_BLOCKER == 0:
+        forbidCompiling()
+        
+        start = time.clock()
+        
+        secureExecution(event, sender)
+        clearExecutionCache()
+        
+        timeSpan = time.clock() - start
+        
+        if bpy.context.scene.mn_settings.developer.printUpdateTime:
+            printTimeSpan("Update Time ", timeSpan)
+            
+        try:
+            bpy.context.scene.update()
+            if bpy.context.scene.mn_settings.update.redrawViewport:
+                redraw_areas_if_possible()
+        except: pass
+            
+        allowCompiling()
+        
 def secureExecution(event, sender):
-	try: executeUnits(event, sender)
-	except:
-		resetCompileBlocker()
-		generateExecutionUnits()
-		forbidCompiling()
-		try: executeUnits(event, sender)
-		except Exception as e: 
-			exc_type, exc_value, exc_traceback = sys.exc_info()
-			traceback.print_tb(exc_traceback)
-		
-		
+    try: executeUnits(event, sender)
+    except:
+        resetCompileBlocker()
+        generateExecutionUnits()
+        forbidCompiling()
+        try: executeUnits(event, sender)
+        except Exception as e:
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            traceback.print_tb(exc_traceback)
+        
+        
 def executeUnits(event, sender):
-	for executionUnit in executionUnits:
-		executionUnit.execute(event, sender)
-		
+    for executionUnit in executionUnits:
+        executionUnit.execute(event, sender)
+        
 def redraw_areas_if_possible():
-	try:
-		for area in bpy.context.screen.areas:
-			area.tag_redraw()
-	except: pass		
-			
+    try:
+        for area in bpy.context.screen.areas:
+            area.tag_redraw()
+    except: pass
+            
 def allowCompiling():
-	global COMPILE_BLOCKER
-	COMPILE_BLOCKER = max(COMPILE_BLOCKER - 1, 0)
+    global COMPILE_BLOCKER
+    COMPILE_BLOCKER = max(COMPILE_BLOCKER - 1, 0)
 def forbidCompiling():
-	global COMPILE_BLOCKER
-	COMPILE_BLOCKER += 1
+    global COMPILE_BLOCKER
+    COMPILE_BLOCKER += 1
 def resetCompileBlocker():
-	global COMPILE_BLOCKER
-	COMPILE_BLOCKER = 0
-			
-		
+    global COMPILE_BLOCKER
+    COMPILE_BLOCKER = 0
+            
+        
 # generate Scripts
 ################################
 
 def generateExecutionUnits():
-	global executionUnits
-	
-	if COMPILE_BLOCKER == 0:
-		forbidCompiling()
-		
-		start = time.clock()
-		executionUnits = getExecutionUnits()
-		timeSpan = time.clock() - start
-		if bpy.context.scene.mn_settings.developer.printGenerationTime:
-			print("Script Gen. " + str(round(timeSpan, 7)) + " s  -  " + str(round(1/timeSpan, 5)) + " fps")
-		
-		allowCompiling()
-		
+    global executionUnits
+    
+    if COMPILE_BLOCKER == 0:
+        forbidCompiling()
+        
+        start = time.clock()
+        executionUnits = getExecutionUnits()
+        timeSpan = time.clock() - start
+        if bpy.context.scene.mn_settings.developer.printGenerationTime:
+            print("Script Gen. " + str(round(timeSpan, 7)) + " s  -  " + str(round(1/timeSpan, 5)) + " fps")
+        
+        allowCompiling()
+        
 def getCodeStrings():
-	codeStrings = []
-	for executionUnit in executionUnits:
-		codeStrings.append(executionUnit.executionCode)
-	return codeStrings
-	
-	
+    codeStrings = []
+    for executionUnit in executionUnits:
+        codeStrings.append(executionUnit.executionCode)
+    return codeStrings
+    
+    
 # handlers to start the update
 ##############################
 
 @persistent
 def frameChangeHandler(scene):
-	if is_rendering and scene.mn_settings.update.resetCompileBlockerWhileRendering: 
-		resetCompileBlocker()
-	updateAnimationTrees("FRAME")
+    if is_rendering and scene.mn_settings.update.resetCompileBlockerWhileRendering:
+        resetCompileBlocker()
+    updateAnimationTrees("FRAME")
 @persistent
 def sceneUpdateHandler(scene):
-	updateSelectionSorting()
-	updateAnimationTrees("SCENE")
+    updateSelectionSorting()
+    updateAnimationTrees("SCENE")
 @persistent
 def fileLoadHandler(scene):
-	generateExecutionUnits()
+    generateExecutionUnits()
 def nodePropertyChanged(self, context):
-	updateAnimationTrees("PROPERTY")
+    updateAnimationTrees("PROPERTY")
 def settingPropertyChanged(self, context):
-	generateExecutionUnits()
-	updateAnimationTrees("PROPERTY")
+    generateExecutionUnits()
+    updateAnimationTrees("PROPERTY")
 def nodeTreeChanged(self = None, context = None):
-	generateExecutionUnits()
-	updateAnimationTrees("TREE")
+    generateExecutionUnits()
+    updateAnimationTrees("TREE")
 def forceExecution(sender = None):
-	generateExecutionUnits()
-	updateAnimationTrees("FORCE", sender)
-	
+    generateExecutionUnits()
+    updateAnimationTrees("FORCE", sender)
+    
 bpy.app.handlers.frame_change_post.append(frameChangeHandler)
 bpy.app.handlers.scene_update_post.append(sceneUpdateHandler)
-bpy.app.handlers.load_post.append(fileLoadHandler)	
-	
-	
+bpy.app.handlers.load_post.append(fileLoadHandler)
+    
+    
 # check rendering status
-##############################	
-	
+##############################
+    
 is_rendering = False
 @persistent
 def rendering_starts(scene):
-	global is_rendering
-	is_rendering = True
+    global is_rendering
+    is_rendering = True
 @persistent
 def rendering_ends(scene):
-	global is_rendering
-	is_rendering = False
+    global is_rendering
+    is_rendering = False
 
-bpy.app.handlers.render_pre.append(rendering_starts)    
+bpy.app.handlers.render_pre.append(rendering_starts)
 bpy.app.handlers.render_post.append(rendering_ends)

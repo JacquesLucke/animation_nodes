@@ -7,38 +7,38 @@ import random
 executionCache = {}
 
 def clearExecutionCache():
-	global executionCache
-	executionCache = {}
-	
+    global executionCache
+    executionCache = {}
+    
 def setExecutionCache(identifier, object):
-	global executionCache
-	executionCache[identifier] = object
-	
+    global executionCache
+    executionCache[identifier] = object
+    
 def getExecutionCache(identifier):
-	return executionCache.get(identifier)
-	
-	
+    return executionCache.get(identifier)
+    
+    
 # generic long time cache
 ###############################
 
 longTimeCache = {}
 
 def clearLongTimeCache():
-	global longTimeCache
-	longTimeCache = {}
-	
+    global longTimeCache
+    longTimeCache = {}
+    
 def setLongTimeCache(identifier, object):
-	global longTimeCache
-	longTimeCache[identifier] = object
-	
+    global longTimeCache
+    longTimeCache[identifier] = object
+    
 def getLongTimeCache(identifier):
-	return longTimeCache.get(identifier)
-	
+    return longTimeCache.get(identifier)
+    
 def cacheFunctionResult(cacheDic, identifier, function, args, useCache):
-	if not useCache or identifier not in cacheDic:
-		cacheDic[identifier] = function(*args)
-	return cacheDic[identifier]
-	
+    if not useCache or identifier not in cacheDic:
+        cacheDic[identifier] = function(*args)
+    return cacheDic[identifier]
+    
 
 # random number cache
 ###############################
@@ -47,10 +47,10 @@ randomNumberCacheSize = 7919
 randomNumberCache = []
 random.seed(5827)
 for i in range(randomNumberCacheSize):
-	randomNumberCache.append(random.random())
-	
-	
+    randomNumberCache.append(random.random())
+    
+    
 def getRandom(seed):
-	return randomNumberCache[seed % randomNumberCacheSize]
+    return randomNumberCache[seed % randomNumberCacheSize]
 def getUniformRandom(seed, min, max):
-	return min + randomNumberCache[seed % randomNumberCacheSize] * (max - min)
+    return min + randomNumberCache[seed % randomNumberCacheSize] * (max - min)
