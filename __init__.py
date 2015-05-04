@@ -19,9 +19,6 @@ Created by Jacques Lucke
 '''
 
 
-import importlib, sys, os
-from bpy.props import *
-
 bl_info = {
     "name":        "Animation Nodes",
     "description": "Node system for more flexible animations.",
@@ -37,42 +34,20 @@ bl_info = {
     
 # load and reload submodules
 ##################################    
-    
-import sys, pkgutil
+
+import sys
 sys.modules["animation_nodes"] = sys.modules[__name__]
-
-def get_submodule_names(path = __path__[0], root = ""):
-    module_names = []
-    for importer, module_name, is_package in pkgutil.iter_modules([path]):
-        if is_package:
-            sub_path = path + "\\" + module_name
-            sub_root = root + module_name + "."
-            module_names.extend(get_submodule_names(sub_path, sub_root))
-        else: 
-            module_names.append(root + module_name)
-    return module_names 
-
-def import_submodules(names):
-    modules = []
-    for name in names:
-        modules.append(importlib.import_module("." + name, __name__))
-    return modules
     
-def reload_modules(modules):
-    for module in modules:
-        importlib.reload(module)
-        
-names = get_submodule_names()
-modules = import_submodules(names)        
-if "bpy" in locals(): 
-    reload_modules(modules) 
+from . import developer_utils
+modules = developer_utils.setup_addon_modules(__path__, __name__)
 
        
        
 # properties
 ##################################
 
-import bpy        
+import bpy      
+from bpy.props import *  
 from . mn_execution import nodeTreeChanged
 from . import mn_keyframes 
 
