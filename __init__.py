@@ -26,25 +26,28 @@ bl_info = {
     "name":        "Animation Nodes",
     "description": "Node system for more flexible animations.",
     "author":      "Jacques Lucke",
-    "version":     (0, 0, 2),
+    "version":     (0, 0, 3),
     "blender":     (2, 7, 2),
     "location":    "Node Editor",
     "category":    "Node",
-    "warning":     "alpha"
+    "warning":     "Stable, but some things may change in the future."
     }
     
     
     
+# load and reload submodules
+##################################    
+    
 import sys, pkgutil
 sys.modules["animation_nodes"] = sys.modules[__name__]
 
-def get_submodule_names(path = __path__, root = ""):
+def get_submodule_names(path = __path__[0], root = ""):
     module_names = []
-    for importer, module_name, is_package in pkgutil.iter_modules(path):
+    for importer, module_name, is_package in pkgutil.iter_modules([path]):
         if is_package:
-            sub_path = path[:]
-            sub_path[0] += "\\" + module_name
-            module_names.extend(get_submodule_names(sub_path, root + module_name + "."))
+            sub_path = path + "\\" + module_name
+            sub_root = root + module_name + "."
+            module_names.extend(get_submodule_names(sub_path, sub_root))
         else: 
             module_names.append(root + module_name)
     return module_names 
@@ -63,9 +66,12 @@ names = get_submodule_names()
 modules = import_submodules(names)        
 if "bpy" in locals(): 
     reload_modules(modules) 
-    print("reload")
 
-        
+       
+       
+# properties
+##################################
+
 import bpy        
 from . mn_execution import nodeTreeChanged
 from . import mn_keyframes 
@@ -99,6 +105,7 @@ class AnimationNodesSettings(bpy.types.PropertyGroup):
     update = PointerProperty(type = GlobalUpdateSettings, name = "Update Settings")
     developer = PointerProperty(type = DeveloperSettings, name = "Developer Settings")
     keyframes = PointerProperty(type = KeyframesSettings, name = "Keyframes")
+    
     
     
 # register
