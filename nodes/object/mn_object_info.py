@@ -14,10 +14,16 @@ class mn_ObjectInfoNode(Node, AnimationNode):
     bl_label = "Object Info"
     outputUseParameterName = "useOutput"
     
+    def hideStatusChanged(self, context):
+        self.outputs["Location Velocity"].hide = not self.showVelocitySockets
+        self.outputs["Rotation Velocity"].hide = not self.showVelocitySockets
+        self.outputs["Scale Velocity"].hide = not self.showVelocitySockets
+    
     frameTypes = [
         ("OFFSET", "Offset", ""),
         ("ABSOLUTE", "Absolute", "") ]
     frameTypesProperty = bpy.props.EnumProperty(name = "Frame Type", items = frameTypes, default = "OFFSET")
+    showVelocitySockets = bpy.props.BoolProperty(name = "Show Velocity Sockets", default = False, update = hideStatusChanged)    
     
     def init(self, context):
         forbidCompiling()
@@ -26,13 +32,16 @@ class mn_ObjectInfoNode(Node, AnimationNode):
         self.outputs.new("mn_VectorSocket", "Location")
         self.outputs.new("mn_VectorSocket", "Rotation")
         self.outputs.new("mn_VectorSocket", "Scale")
-        self.outputs.new("mn_VectorSocket", "Location Velocity")
-        self.outputs.new("mn_VectorSocket", "Rotation Velocity")
-        self.outputs.new("mn_VectorSocket", "Scale Velocity")
+        self.outputs.new("mn_VectorSocket", "Location Velocity").hide = True
+        self.outputs.new("mn_VectorSocket", "Rotation Velocity").hide = True
+        self.outputs.new("mn_VectorSocket", "Scale Velocity").hide = True
         allowCompiling()
         
     def draw_buttons(self, context, layout):
         layout.prop(self, "frameTypesProperty")
+        
+    def draw_buttons_ext(self, context, layout):
+        layout.prop(self, "showVelocitySockets")
         
     def getInputSocketNames(self):
         return {"Object" : "object",
