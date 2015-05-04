@@ -1,11 +1,11 @@
 import bpy, time, traceback, sys
 from bpy.app.handlers import persistent
-from animation_nodes.mn_utils import *
-from animation_nodes.mn_cache import clearExecutionCache
-from animation_nodes.mn_execution_unit_generator import getExecutionUnits
 from bpy.props import *
-from animation_nodes.utils.mn_selection_utils import *
-from animation_nodes.utils.mn_node_utils import *
+from . mn_utils import *
+from . mn_cache import clearExecutionCache
+from . utils.mn_selection_utils import *
+from . utils.mn_node_utils import *
+from . mn_execution_unit_generator import getExecutionUnits
 
 COMPILE_BLOCKER = 0
 executionUnits = []
@@ -116,10 +116,6 @@ def forceExecution(sender = None):
     generateExecutionUnits()
     updateAnimationTrees("FORCE", sender)
     
-bpy.app.handlers.frame_change_post.append(frameChangeHandler)
-bpy.app.handlers.scene_update_post.append(sceneUpdateHandler)
-bpy.app.handlers.load_post.append(fileLoadHandler)
-    
     
 # check rendering status
 ##############################
@@ -133,6 +129,18 @@ def rendering_starts(scene):
 def rendering_ends(scene):
     global is_rendering
     is_rendering = False
-
-bpy.app.handlers.render_pre.append(rendering_starts)
-bpy.app.handlers.render_post.append(rendering_ends)
+    
+    
+def register_handlers():    
+    bpy.app.handlers.frame_change_post.append(frameChangeHandler)
+    bpy.app.handlers.scene_update_post.append(sceneUpdateHandler)
+    bpy.app.handlers.load_post.append(fileLoadHandler)
+    bpy.app.handlers.render_pre.append(rendering_starts)
+    bpy.app.handlers.render_post.append(rendering_ends)
+    
+def unregister_handlers():
+    bpy.app.handlers.frame_change_post.remove(frameChangeHandler)
+    bpy.app.handlers.scene_update_post.remove(sceneUpdateHandler)
+    bpy.app.handlers.load_post.remove(fileLoadHandler)
+    bpy.app.handlers.render_pre.remove(rendering_starts)
+    bpy.app.handlers.render_post.remove(rendering_ends)
