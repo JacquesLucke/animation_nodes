@@ -11,7 +11,7 @@ COMPILE_BLOCKER = 0
 executionUnits = []
 
 def updateAnimationTrees(event = "NONE", sender = None):
-    if COMPILE_BLOCKER == 0:
+    if COMPILE_BLOCKER == 0 and len(executionUnits) > 0:
         forbidCompiling()
         
         start = time.clock()
@@ -23,7 +23,7 @@ def updateAnimationTrees(event = "NONE", sender = None):
         
         if bpy.context.scene.mn_settings.developer.printUpdateTime:
             printTimeSpan("Update Time ", timeSpan)
-            
+                  
         try:
             bpy.context.scene.update()
             if bpy.context.scene.mn_settings.update.redrawViewport:
