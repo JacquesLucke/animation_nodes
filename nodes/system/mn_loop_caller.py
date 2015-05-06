@@ -124,6 +124,7 @@ class AddLoopNodeMenu(bpy.types.Menu):
     
     def draw(self, context):
         layout = self.layout
+        layout.operator_context = "INVOKE_DEFAULT"
         for loopType in loopTypes:
             newNode = layout.operator("node.add_node", text = loopType[0])
             newNode.use_transform = True
