@@ -11,15 +11,15 @@ class mn_CurveRevolveNode(Node, AnimationNode):
     bl_label = "Revolve"
         
     def updateSocketVisibility(self):
-        self.inputs["Resolution Projection"].hide = (self.mode == "Fast")
+        self.inputs["Resolution Projection"].hide = (self.mode == "Same Parameter")
     
     def modeChanged(self, context):
         self.updateSocketVisibility()
         nodeTreeChanged()
     
-    modes = ["Fast", "Projected"]
+    modes = ["Same Parameter", "Project Profile"]
     modes_items = [(t, t, "") for t in modes]
-    mode = bpy.props.EnumProperty(name = "Mode", items = modes_items, default = "Fast", update = modeChanged)
+    mode = bpy.props.EnumProperty(name = "Mode", items = modes_items, default = "Project Profile", update = modeChanged)
         
     def draw_buttons(self, context, layout):
         layout.prop(self, "mode")
@@ -49,7 +49,7 @@ class mn_CurveRevolveNode(Node, AnimationNode):
     def canExecute(self, resAlong, resAcross, resProjection, axis, profile):
         if resAlong < 2: return False
         if resAcross < 2: return False
-        if self.mode == "Projected":
+        if self.mode == "Project Profile":
             if resProjection < 2: return False
         if not Curves.IsBezierCurve(axis): return False
         if not Curves.IsBezierCurve(profile): return False
@@ -63,11 +63,11 @@ class mn_CurveRevolveNode(Node, AnimationNode):
             return vertices, polygons
 
         try:
-            if self.mode == "Fast":
+            if self.mode == "Same Parameter":
                 revolvedSurface = Surfaces.RevolvedSurface(axis, profile)
                 vertices, polygons = revolvedSurface.Calculate(resAlong, resAcross)
                 return vertices, polygons
-            if self.mode == "Projected":
+            if self.mode == "Project Profile":
                 revolvedProjectedSurface = Surfaces.RevolvedProjectedSurface(axis, profile)
                 vertices, polygons = revolvedProjectedSurface.Calculate(resAlong, resAcross, resProjection)
         except: pass
