@@ -2,7 +2,6 @@ import bpy, time
 from bpy.types import Node
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
-from ... utils.mn_object_utils import *
 from ... utils.mn_fcurve_utils import *
 from ... mn_utils import *
 from ... mn_cache import *
