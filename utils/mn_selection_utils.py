@@ -1,5 +1,5 @@
 import bpy
-from animation_nodes.mn_utils import *
+from .. mn_utils import *
 
 enableSelectionSorting = True
 sortedSelectionNames = []

@@ -1,5 +1,5 @@
-from animation_nodes.mn_utils import *
-from animation_nodes.mn_cache import *
+from .. mn_utils import *
+from .. mn_cache import *
 from mathutils import *
 
 # perlin noise
