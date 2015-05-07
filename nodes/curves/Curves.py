@@ -21,14 +21,10 @@ def IsBezierCurve(blenderObject):
     
 deltaParameter = 0.001
 def ParameterIsZero(parameter):
-    if parameter < deltaParameter: return True
-    
-    return False
+    return parameter < deltaParameter
 
 def ParameterIsOne(parameter):
-    if parameter + deltaParameter > 1.0: return True
-    
-    return False
+    return parameter + deltaParameter > 1.0
 
 
 class BezierPoint:
