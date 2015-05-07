@@ -1,6 +1,6 @@
 import bpy, bmesh
 from mathutils import Vector
-from animation_nodes.mn_utils import *
+from .. mn_utils import *
 
 class MeshData:
     def __init__(self,

@@ -1,7 +1,7 @@
 import bpy
-from animation_nodes.mn_execution import nodePropertyChanged
-from animation_nodes.mn_node_base import *
-from animation_nodes.utils.mn_interpolation_utils import *
+from .. mn_execution import nodePropertyChanged
+from .. mn_node_base import *
+from .. utils.mn_interpolation_utils import *
 
 topCategoryItems = [("LINEAR", "Linear", ""),
                     ("EXPONENTIAL", "Exponential", ""),

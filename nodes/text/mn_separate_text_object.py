@@ -1,11 +1,11 @@
 import bpy, random
-from animation_nodes.mn_utils import *
+from ... mn_utils import *
 from bpy.types import Node
-from animation_nodes.mn_node_base import AnimationNode
-from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from ... mn_node_base import AnimationNode
+from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from mathutils import Vector, Matrix
-from animation_nodes.mn_keyframes import setKeyframe
-from animation_nodes.nodes.mn_node_helper import getMainObjectContainer
+from ... mn_keyframes import setKeyframe
+from ... nodes.mn_node_helper import getMainObjectContainer
 
 idPropertyName = "text separation node id"
 indexPropertyName = "text separation node index"

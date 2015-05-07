@@ -1,8 +1,8 @@
 import bpy
 from bpy.props import *
-from animation_nodes.mn_execution import nodeTreeChanged
+from . mn_execution import nodeTreeChanged
 from bpy.types import NodeTree, Node, NodeSocket
-from animation_nodes.mn_utils import *
+from . mn_utils import *
 
 class mn_AnimationNodeTree(bpy.types.NodeTree):
     bl_idname = "mn_AnimationNodeTree"

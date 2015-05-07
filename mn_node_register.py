@@ -1,5 +1,5 @@
 import bpy
-from animation_nodes.nodes.mn_node_list import getNodeNameDictionary
+from . nodes.mn_node_list import getNodeNameDictionary
 from nodeitems_utils import NodeCategory, NodeItem, _node_categories
 from nodeitems_utils import register_node_categories, unregister_node_categories
 

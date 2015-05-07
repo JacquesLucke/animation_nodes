@@ -1,6 +1,6 @@
 import bpy, time
-from animation_nodes.utils.mn_node_utils import *
-from animation_nodes.mn_utils import *
+from . utils.mn_node_utils import *
+from . mn_utils import *
 
 normalNetworks = []
 loopNetworks = {}
