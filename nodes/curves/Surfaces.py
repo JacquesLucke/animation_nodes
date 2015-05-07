@@ -84,6 +84,62 @@ class RevolvedSurface:
         return rvVertices, rvFaces
 
 
+class RevolvedProjectedSurface:
+    def __init__(self, blenderObjectAxis, blenderObjectProfile):
+        self.curveAxis = Curves.Curve(blenderObjectAxis)
+        self.curveProfile = Curves.Curve(blenderObjectProfile)
+
+    def Calculate(self, resAlong, resAcross, resProjection):
+        worldPointsProfile = self.curveProfile.SampleWorld(resAlong)
+        worldPointsAxis = []
+        worldDerivativesAxis = []
+        for iAlong in range(resAlong):
+            pointProfile = worldPointsProfile[iAlong]
+            parAxis = self.curveAxis.CalcProjection(pointProfile, resProjection)
+            worldDerivativeAxis = self.curveAxis.CalcDerivativeWorld(parAxis)
+            worldDerivativesAxis.append(worldDerivativeAxis)
+            
+            worldPointAxis = self.curveAxis.CalcPointWorld(parAxis)
+            if Curves.ParameterIsZero(parAxis): worldPointAxis = Math.CalcProjectionPointToLine(pointProfile, worldPointAxis, worldDerivativeAxis.normalized())
+            elif Curves.ParameterIsOne(parAxis): worldPointAxis = Math.CalcProjectionPointToLine(pointProfile, worldPointAxis, worldDerivativeAxis.normalized())
+            worldPointsAxis.append(worldPointAxis)
+        
+        rvVertices = []
+        for iAlong in range(resAlong):
+            center = worldPointsAxis[iAlong]
+            pointProfile = worldPointsProfile[iAlong]
+            dirX = (pointProfile - center)
+            radius = dirX.magnitude
+            dirY = worldDerivativesAxis[iAlong].cross(dirX).normalized()
+            dirX.normalize()
+
+            currPointsAcross = Math.GenerateCircle(center, radius, dirX, dirY, resAcross)
+            for iAcross in range(resAcross):
+                rvVertices.append(currPointsAcross[iAcross])
+
+        rvFaces = []
+        for iAlong in range(resAlong - 1):
+            currAlong = iAlong * resAcross
+            nextAlong = currAlong + resAcross
+            for iAcross in range(resAcross - 1):
+                indexBL = currAlong + iAcross
+                indexTL = indexBL + 1
+                indexBR = nextAlong + iAcross
+                indexTR = indexBR + 1
+
+                rvFaces.append([indexBL, indexBR, indexTR, indexTL])
+
+        for iAlong in range(resAlong - 1):
+            indexTL = iAlong * resAcross
+            indexTR = indexTL + resAcross
+            indexBL = indexTL + resAcross - 1
+            indexBR = indexTR + resAcross - 1
+
+            rvFaces.append([indexBL, indexBR, indexTR, indexTL])
+
+        return rvVertices, rvFaces
+
+
 class SweptSurface:
     def __init__(self, blenderObjectRail, blenderObjectProfile):
         self.curveRail = Curves.Curve(blenderObjectRail)
