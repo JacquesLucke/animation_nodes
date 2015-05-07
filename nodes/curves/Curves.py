@@ -18,6 +18,17 @@ def IsBezierCurve(blenderObject):
         if spline.type != 'BEZIER': return False
 
     return True
+    
+deltaParameter = 0.001
+def ParameterIsZero(parameter):
+    if parameter < deltaParameter: return True
+    
+    return False
+
+def ParameterIsOne(parameter):
+    if parameter + deltaParameter > 1.0: return True
+    
+    return False
 
 
 class BezierPoint:
@@ -431,6 +442,21 @@ class Curve:
         return rvList
 
 
+    def CalcProjection(self, point, resolution):
+        samplesWorld = self.SampleWorld(resolution)
+        deltaParameter = float(1.0 / float(resolution - 1))
+
+        rvParameter = 0.0
+        rvLength2 = (samplesWorld[0] - point).length_squared
+        for iSample in range(1, resolution):
+            currParameter = deltaParameter * float(iSample)
+            currLength2 = (samplesWorld[iSample] - point).length_squared
+            if currLength2 < rvLength2:
+                rvLength2 = currLength2
+                rvParameter = currParameter
+                
+        return rvParameter
+        
 
     def CalcLength(self):
         rvLength = 0.0

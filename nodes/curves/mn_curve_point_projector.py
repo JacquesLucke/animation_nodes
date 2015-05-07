@@ -39,17 +39,7 @@ class mn_CurvePointProjectorNode(Node, AnimationNode):
 
         try:
             curveCurve = Curves.Curve(curve)
-            samplesWorld = curveCurve.SampleWorld(resolution)
-            deltaParameter = float(1.0 / float(resolution - 1))
-
-            rvParameter = 0.0
-            rvLength2 = (samplesWorld[0] - point).length_squared
-            for iSample in range(1, resolution):
-                currParameter = deltaParameter * float(iSample)
-                currLength2 = (samplesWorld[iSample] - point).length_squared
-                if currLength2 < rvLength2:
-                    rvLength2 = currLength2
-                    rvParameter = currParameter
+            rvParameter = curveCurve.CalcProjection(point, resolution)
         except: pass
 
         return rvParameter
