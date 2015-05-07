@@ -1,8 +1,8 @@
 import bpy, random
 from bpy.types import Node
-from animation_nodes.mn_cache import getUniformRandom
-from animation_nodes.mn_node_base import AnimationNode
-from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from ... mn_cache import getUniformRandom
+from ... mn_node_base import AnimationNode
+from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 class mn_RandomNumberNode(Node, AnimationNode):
     bl_idname = "mn_RandomNumberNode"

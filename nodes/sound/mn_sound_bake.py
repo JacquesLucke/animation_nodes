@@ -1,12 +1,12 @@
 import bpy, math, os, re
 from bpy.types import Node
-from animation_nodes.mn_node_base import AnimationNode
-from animation_nodes.mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
-from animation_nodes.mn_utils import *
-from animation_nodes.utils.mn_object_utils import *
-from animation_nodes.utils.mn_fcurve_utils import *
-from animation_nodes.nodes.mn_node_helper import *
-from animation_nodes.mn_cache import *
+from ... mn_node_base import AnimationNode
+from ... mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
+from ... mn_utils import *
+from ... utils.mn_object_utils import *
+from ... utils.mn_fcurve_utils import *
+from ... nodes.mn_node_helper import *
+from ... mn_cache import *
 
 class mn_BakedSoundPropertyGroup(bpy.types.PropertyGroup):
     low = bpy.props.FloatProperty(name = "Lowest Frequency", default = 10.0)

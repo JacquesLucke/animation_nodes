@@ -1,11 +1,11 @@
 import bpy, time
 from bpy.types import Node
-from animation_nodes.mn_node_base import AnimationNode
-from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
-from animation_nodes.mn_utils import *
-from animation_nodes.nodes.mn_node_helper import *
-from animation_nodes.utils.mn_name_utils import *
-from animation_nodes.mn_cache import *
+from ... mn_node_base import AnimationNode
+from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from ... mn_utils import *
+from ... nodes.mn_node_helper import *
+from ... utils.mn_name_utils import *
+from ... mn_cache import *
 
 objectTypes = ["Mesh", "Text", "Camera", "Point Lamp"]
 objectTypeItems = [(type, type, "") for type in objectTypes]
