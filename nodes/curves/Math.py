@@ -136,7 +136,13 @@ def CalcRotationMatrix(v3From, v3To):
     return Matrix.Rotation(angle, 4, cross)        # normalize axis?
 
 
-
+# lineDir is supposed to be normalized
+def CalcProjectionPointToLine(point, linePos, lineDir):
+    pos2point = point - linePos
+    dotProduct = lineDir.dot(pos2point)
+    rvPoint = linePos + (lineDir * dotProduct)
+    
+    return rvPoint
 
 # if resolution == 4, the last point is at 270°, so you may need to 'make it cyclic' yourself
 def GenerateCircle(center, radius, dirX, dirY, resolution):
