@@ -62,6 +62,12 @@ class ConvertToVector(LinkCorrection):
         return origin.dataType in ["Integer", "Float"] and target.dataType == "Vector"
     def insert(self, nodeTree, origin, target):
         insertNode(nodeTree, "mn_CombineVector", origin, target)
+        
+class ConvertVectorToNumber(LinkCorrection):
+    def check(self, origin, target):
+        return origin.dataType == "Vector" and target.dataType == "Float"
+    def insert(self, nodeTree, origin, target):
+        insertNode(nodeTree, "mn_SeparateVector", origin, target)        
 
 class ConvertToBasicTypes(LinkCorrection):
     def check(self, origin, target):
@@ -85,4 +91,9 @@ def insertNode(nodeTree, nodeType, origin, target):
 def getSocketCenter(socket1, socket2):
     return (socket1.node.location + socket2.node.location) / 2
     
-linkCorrectors = [cls() for cls in LinkCorrection.__subclasses__()]    
+linkCorrectors = [
+    ConvertMeshDataToMesh(),
+    ConvertVertexLocationsToMesh(),
+    ConvertToVector(),
+    ConvertVectorToNumber(),
+    ConvertToBasicTypes()]
