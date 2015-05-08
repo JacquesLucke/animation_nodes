@@ -17,8 +17,8 @@ class mn_CurveRevolveNode(Node, AnimationNode):
         self.updateSocketVisibility()
         nodeTreeChanged()
     
-    modes = ["Same Parameter", "Project Profile"]
-    modes_items = [(t, t, "") for t in modes]
+    modes_items = [ ("Same Parameter", "Same Parameter", "Uses the same parameter to calculate points on the Axis & Profile. May be fast, but might look weird."),
+                    ("Project Profile", "Project Profile", "Projects sampled points on the Profile onto the Axis. May take longer, but probably looks better.")]
     mode = bpy.props.EnumProperty(name = "Mode", items = modes_items, default = "Project Profile", update = modeChanged)
         
     def draw_buttons(self, context, layout):
