@@ -36,7 +36,7 @@ bl_info = {
 ##################################    
     
 from . import developer_utils
-modules = developer_utils.setup_addon_modules(__path__, __name__)
+modules = developer_utils.setup_addon_modules(__path__, __name__, "bpy" in locals())
 
        
        

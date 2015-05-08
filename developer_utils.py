@@ -2,9 +2,7 @@ import sys
 import pkgutil
 import importlib
 
-reload_event = False
-
-def setup_addon_modules(path, package_name):
+def setup_addon_modules(path, package_name, reload = False):
     """
     Imports and reloads all modules in this addon. 
     
@@ -34,8 +32,7 @@ def setup_addon_modules(path, package_name):
     
     names = get_submodule_names()
     modules = import_submodules(names)        
-    if reload_event: 
+    if reload: 
+        print("reload")
         reload_modules(modules) 
     return modules
-    
-reload_event = True
