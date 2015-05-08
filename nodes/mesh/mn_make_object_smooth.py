@@ -21,7 +21,7 @@ class mn_MakeObjectSmooth(Node, AnimationNode):
         return {"Object" : "object"}
         
     def execute(self, object, smooth):
-        if getattr(object, "type") == "MESH":
+        if getattr(object, "type", "") == "MESH":
             for polygon in object.data.polygons:
                 polygon.use_smooth = smooth
         return object
