@@ -205,6 +205,14 @@ class NodeTreeInfo:
                 foundNodes.extend(network.nodes)
                 networks.append(network)
         return networks
+        
+    def get_linked_socket_pairs(self):
+        pairs = []
+        for node in self.nodes:
+            for socket in node.outputs:
+                targets = self.getDataTargetSockets(socket)
+                pairs.extend([(socket, target) for target in targets])
+        return pairs
     
 class NodeNetwork:
     def __init__(self, nodes):
