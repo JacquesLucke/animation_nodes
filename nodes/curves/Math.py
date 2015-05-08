@@ -1,6 +1,17 @@
 ﻿import math
+import numpy
 from mathutils import *
 
+
+defaultDeltaImaginary = 0.00001
+def ComplexToRealFloat(complex, deltaImaginary = defaultDeltaImaginary):
+    try:
+        if type(complex) is numpy.float_: return float(complex)
+        
+        if type(complex) is numpy.complex_:
+            if math.fabs(complex.imag) < deltaImaginary: return float(complex.real)
+    except: return None
+        
 
 def IsSamePoint(v31, v32, limitDistance):
     if (v31 - v32).magnitude < limitDistance: return True

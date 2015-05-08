@@ -26,9 +26,9 @@ class mn_CurveRevolveNode(Node, AnimationNode):
 
     def init(self, context):
         forbidCompiling()
-        self.inputs.new("mn_IntegerSocket", "Resolution Along").number = 16
-        self.inputs.new("mn_IntegerSocket", "Resolution Across").number = 16
-        self.inputs.new("mn_IntegerSocket", "Resolution Projection").number = 64
+        self.inputs.new("mn_IntegerSocket", "Resolution Along").number = Surfaces.defaultResolutionSynthesis
+        self.inputs.new("mn_IntegerSocket", "Resolution Across").number = Surfaces.defaultResolutionSynthesis
+        self.inputs.new("mn_IntegerSocket", "Resolution Projection").number = Curves.defaultResolutionAnalysis
         self.inputs.new("mn_ObjectSocket", "Axis")
         self.inputs.new("mn_ObjectSocket", "Profile")
         self.outputs.new("mn_VectorListSocket", "Vertex World Locations")

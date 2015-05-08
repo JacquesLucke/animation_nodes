@@ -14,7 +14,7 @@ class mn_CurveEvaluatorNode(Node, AnimationNode):
 
     def init(self, context):
         forbidCompiling()
-        self.inputs.new("mn_FloatSocket", "Parameter").number = 0.5
+        self.inputs.new("mn_FloatSocket", "Parameter").number = Curves.defaultParameter
         self.inputs.new("mn_ObjectSocket", "Curve")
         self.outputs.new("mn_VectorSocket", "Local Point")
         self.outputs.new("mn_VectorSocket", "World Point")
