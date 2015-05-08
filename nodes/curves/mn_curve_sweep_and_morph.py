@@ -12,8 +12,8 @@ class mn_CurveSweepAndMorphNode(Node, AnimationNode):
 
     def init(self, context):
         forbidCompiling()
-        self.inputs.new("mn_IntegerSocket", "Resolution Along").number = 16
-        self.inputs.new("mn_IntegerSocket", "Resolution Across").number = 16
+        self.inputs.new("mn_IntegerSocket", "Resolution Along").number = Surfaces.defaultResolutionSynthesis
+        self.inputs.new("mn_IntegerSocket", "Resolution Across").number = Surfaces.defaultResolutionSynthesis
         self.inputs.new("mn_ObjectSocket", "Rail")
         self.inputs.new("mn_ObjectSocket", "Begin Profile")
         self.inputs.new("mn_ObjectSocket", "End Profile")

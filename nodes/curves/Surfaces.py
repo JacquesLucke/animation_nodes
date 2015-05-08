@@ -4,6 +4,11 @@ import bmesh
 from . import Math
 from . import Curves
 
+
+# utility properties & functions
+defaultResolutionSynthesis = 16
+
+
 class LoftedSurface:
     def __init__(self, blenderObjectRail1, blenderObjectRail2):
         self.curveRail1 = Curves.Curve(blenderObjectRail1)

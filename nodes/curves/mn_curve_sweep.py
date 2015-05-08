@@ -12,8 +12,8 @@ class mn_CurveSweepNode(Node, AnimationNode):
 
     def init(self, context):
         forbidCompiling()
-        self.inputs.new("mn_IntegerSocket", "Resolution Along").number = 16
-        self.inputs.new("mn_IntegerSocket", "Resolution Across").number = 16
+        self.inputs.new("mn_IntegerSocket", "Resolution Along").number = Surfaces.defaultResolutionSynthesis
+        self.inputs.new("mn_IntegerSocket", "Resolution Across").number = Surfaces.defaultResolutionSynthesis
         self.inputs.new("mn_ObjectSocket", "Rail")
         self.inputs.new("mn_ObjectSocket", "Profile")
         self.outputs.new("mn_VectorListSocket", "Vertex World Locations")
