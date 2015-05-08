@@ -1,4 +1,5 @@
 import bpy
+from mathutils import Vector
 from . utils.mn_node_utils import *
 
 def correctForbiddenNodeLinks():
@@ -33,6 +34,26 @@ def removeLink(origin, target):
 class LinkCorrection:
     # subclasses need a check and insert function
     pass
+    
+class ConvertMeshDataToMesh(LinkCorrection):
+    def check(self, origin, target):
+        return origin.dataType == "Mesh Data" and target.dataType == "Mesh"
+    def insert(self, nodeTree, origin, target):
+        insertNode(nodeTree, "mn_CreateMeshFromData", origin, target)
+
+class ConvertVertexLocationsToMesh(LinkCorrection):
+    def check(self, origin, target):
+        return origin.dataType == "Vector List" and target.dataType == "Mesh"
+    def insert(self, nodeTree, origin, target):
+        center = getSocketCenter(origin, target)
+            
+        toMeshData = nodeTree.nodes.new("mn_CombineMeshData")
+        toMesh = nodeTree.nodes.new("mn_CreateMeshFromData")
+        
+        
+        nodeTree.links.new(toMeshData.inputs[0], origin)
+        nodeTree.links.new(toMesh.inputs[0], toMeshData.outputs[0])
+        nodeTree.links.new(toMesh.outputs[0], target)
            
 class ConvertToVector(LinkCorrection):
     def check(self, origin, target):
@@ -52,11 +73,14 @@ def insertNode(nodeTree, nodeType, origin, target):
     node = nodeTree.nodes.new(nodeType)
     node.select = False
     
-    location = (origin.node.location + target.node.location) / 2
-    node.location = location
+    location = getSocketCenter(origin, target)
+    node.location = location 
     
     nodeTree.links.new(node.inputs[0], origin)
     nodeTree.links.new(target, node.outputs[0])
     return node
+    
+def getSocketCenter(socket1, socket2):
+    return (socket1.node.location + socket2.node.location) / 2
     
 linkCorrectors = [cls() for cls in LinkCorrection.__subclasses__()]    
