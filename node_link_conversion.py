@@ -50,6 +50,8 @@ class ConvertVertexLocationsToMesh(LinkCorrection):
         toMeshData = nodeTree.nodes.new("mn_CombineMeshData")
         toMesh = nodeTree.nodes.new("mn_CreateMeshFromData")
         
+        toMeshData.location = center - Vector((90, 0))
+        toMesh.location = center + Vector((90, 0))
         
         nodeTree.links.new(toMeshData.inputs[0], origin)
         nodeTree.links.new(toMesh.inputs[0], toMeshData.outputs[0])
