@@ -11,15 +11,14 @@ class mn_CurvePointProjectorNode(Node, AnimationNode):
     bl_label = "Curve Point Projector"
         
     def updateSocketVisibility(self):
-        self.inputs["Sampling Resolution"].hide = not (self.mode == "Piecewise Linear")
+        self.inputs["Sampling Resolution"].hide = not (self.mode == "Sampled")
     
     def modeChanged(self, context):
         self.updateSocketVisibility()
         nodeTreeChanged()
     
-    modes_items = [ ("Piecewise Linear", "Piecewise Linear", "Samples a given number of points and sums up the distance between consecutive samples"), 
                     ("Analytic", "Analytic", "WIP. Calculates the projection analytically -- eg, by finding the roots of some higher order numpy.Polynomial")]
-    mode = bpy.props.EnumProperty(name = "Mode", items = modes_items, default = "Piecewise Linear", update = modeChanged)
+    mode = bpy.props.EnumProperty(name = "Mode", items = modes_items, default = "Sampled", update = modeChanged)
         
     def draw_buttons(self, context, layout):
         layout.prop(self, "mode")
@@ -41,7 +40,7 @@ class mn_CurvePointProjectorNode(Node, AnimationNode):
         return {"Parameter" : "parameter"}
 
     def canExecute(self, point, samplingResolution, curve):
-        if self.mode == "Piecewise Linear":
+        if self.mode == "Sampled":
             if samplingResolution < 2: return False
         if not Curves.IsBezierCurve(curve): return False
 
@@ -54,7 +53,7 @@ class mn_CurvePointProjectorNode(Node, AnimationNode):
 
         try:
             curveCurve = Curves.Curve(curve)
-            if self.mode == "Piecewise Linear":
+            if self.mode == "Sampled":
                 rvParameter = curveCurve.CalcProjection(point, samplingResolution)
                 return rvParameter
             if self.mode == "Analytic":
