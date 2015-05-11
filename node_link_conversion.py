@@ -67,7 +67,13 @@ class ConvertVectorToNumber(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType == "Vector" and target.dataType == "Float"
     def insert(self, nodeTree, origin, target):
-        insertNode(nodeTree, "mn_SeparateVector", origin, target)        
+        insertNode(nodeTree, "mn_SeparateVector", origin, target)
+
+class ConvertTextBlockToString(LinkCorrection):
+    def check(self, origin, target):
+        return origin.dataType == "Text Block" and target.dataType == "String"
+    def insert(self, nodeTree, origin, target):
+        insertNode(nodeTree, "mn_TextBlockReader", origin, target)     
 
 class ConvertToBasicTypes(LinkCorrection):
     def check(self, origin, target):
@@ -96,4 +102,5 @@ linkCorrectors = [
     ConvertVertexLocationsToMesh(),
     ConvertToVector(),
     ConvertVectorToNumber(),
+	ConvertTextBlockToString(),
     ConvertToBasicTypes()]
