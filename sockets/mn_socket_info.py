@@ -1,5 +1,3 @@
-from .. import mn_node_base
-
 listChains = [
     ["mn_FloatSocket", "mn_FloatListSocket"],
     ["mn_VectorSocket", "mn_VectorListSocket"],
@@ -53,4 +51,5 @@ def getSocketNames():
     return [socketClass.dataType for socketClass in getSocketClasses()]
     
 def getSocketClasses():
+    from .. import mn_node_base
     return mn_node_base.mn_BaseSocket.__subclasses__()

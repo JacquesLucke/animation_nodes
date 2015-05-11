@@ -34,6 +34,5 @@ def setup_addon_modules(path, package_name, reload = False):
     names = get_submodule_names()
     modules = import_submodules(names)        
     if reload: 
-        print("reload")
         reload_modules(modules) 
     return modules

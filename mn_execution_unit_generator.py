@@ -1,6 +1,7 @@
 import bpy, time, os, sys
 from . utils.mn_node_utils import *
 from . mn_utils import *
+from . node_link_conversion import correctForbiddenNodeLinks
 
 normalNetworks = []
 loopNetworks = {}
@@ -90,7 +91,7 @@ def getExecutionUnits():
     global useProfiling, idCounter, treeInfo
     useProfiling = bpy.context.scene.mn_settings.developer.executionProfiling
     idCounter = 0
-    cleanupNodeTrees()
+    correctForbiddenNodeLinks()
     treeInfo = NodeTreeInfo(getAnimationNodeTrees())
     networks = getNodeNetworks()
     prepareNetworks(networks)
@@ -614,65 +615,3 @@ def getDirectDependencies(node):
             node = originSocket.node
             directDependencies.append(node)
     return directDependencies
-    
-    
-# cleanup of node trees
-################################
-
-convertRules = {}
-convertRules[("Float", "Integer")] = "mn_ConvertNode"
-convertRules[("Generic", "Integer")] = "mn_ConvertNode"
-convertRules[("Float", "String")] = "mn_ConvertNode"
-convertRules[("Generic", "Float")] = "mn_ConvertNode"
-convertRules[("Integer", "String")] = "mn_ConvertNode"
-convertRules[("Float", "Vector")] = "mn_CombineVector"
-convertRules[("Integer", "Vector")] = "mn_CombineVector"
-convertRules[("Vector", "Float")] = "mn_SeparateVector"
-convertRules[("Text Block", "String")] = "mn_TextBlockReader"
-convertRules[("Vector", "Matrix")] = "mn_TranslationMatrix"
-convertRules[("Mesh Data", "Mesh")] = "mn_CreateMeshFromData"
-
-for dataType in ["Object", "Vertex", "Polygon", "Float", "Vector", "String"]:
-    convertRules[(dataType + " List", "Integer")] = "mn_GetListLengthNode"
-        
-def cleanupNodeTrees():
-    nodeTrees = getAnimationNodeTrees()
-    for nodeTree in nodeTrees:
-        cleanupNodeTree(nodeTree)
-def cleanupNodeTree(nodeTree):
-    originalLinks = list(nodeTree.links)
-    for link in originalLinks:
-        toSocket = link.to_socket
-        fromSocket = link.from_socket
-        if toSocket.node.type == "REROUTE":
-            continue
-        if fromSocket.node.type == "REROUTE": originSocket = getOriginSocket(toSocket)
-        else: originSocket = fromSocket
-        if isOtherOriginSocket(toSocket, originSocket):
-            if originSocket.dataType not in toSocket.allowedInputTypes and toSocket.allowedInputTypes[0] != "all":
-                handleNotAllowedLink(nodeTree, link, fromSocket, toSocket, originSocket)
-def handleNotAllowedLink(nodeTree, link, fromSocket, toSocket, originSocket):
-    fromType = originSocket.dataType
-    toType = toSocket.dataType
-    nodeTree.links.remove(link)
-    if fromType == "Generic":
-        convertNodeType = "mn_ConvertNode"
-    else:convertNodeType = convertRules.get((fromType, toType))
-    if convertNodeType is not None:
-        insertConversionNode(nodeTree, convertNodeType, fromSocket, toSocket, originSocket)
-def insertConversionNode(nodeTree, convertNodeType, fromSocket, toSocket, originSocket):
-    node = nodeTree.nodes.new(convertNodeType)
-    node.hide = True
-    node.select = False
-    
-    if convertNodeType == "mn_ConvertNode":
-        node.convertType = toSocket.dataType
-        node.buildOutputSocket()
-    
-    x1, y1 = toSocket.node.location
-    x2, y2 = list(fromSocket.node.location)
-    node.location = [(x1+x2)/2+20, (y1+y2)/2-50]
-    
-    nodeTree.links.new(node.inputs[0], fromSocket)
-    nodeTree.links.new(toSocket, node.outputs[0])
-        
