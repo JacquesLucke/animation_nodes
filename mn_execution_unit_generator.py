@@ -1,4 +1,4 @@
-import bpy, time
+import bpy, time, os, sys
 from . utils.mn_node_utils import *
 from . mn_utils import *
 
@@ -8,6 +8,7 @@ groupNetworks = {}
 invalidNetworks = []
 treeInfo = None
 useProfiling = False
+addonName = os.path.basename(os.path.dirname(__file__))
 
 class ExecutionUnit:
 
@@ -151,7 +152,7 @@ def getNodeNetworks():
 class NetworkCodeGenerator:
     def __init__(self, network):
         self.network = network
-        self.modules = set(["bpy", "time"])
+        self.modules = set(["bpy", "time", "sys"])
         self.functions = {}
         self.neededSocketReferences = []
         self.nodeTreeNames = {}
@@ -168,6 +169,7 @@ class NetworkCodeGenerator:
         
         codeParts = []
         codeParts.append("import " + ", ".join(self.modules))
+        codeParts.append("animation_nodes = sys.modules['{}']".format(addonName))
         codeParts.append(self.getNodeTreeReferencingCode())
         codeParts.append(self.getNodeReferencingCode())
         codeParts.append(self.getNodeExecuteReferencingCode())
