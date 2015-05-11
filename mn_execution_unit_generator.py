@@ -615,23 +615,3 @@ def getDirectDependencies(node):
             node = originSocket.node
             directDependencies.append(node)
     return directDependencies
-    
-    
-# cleanup of node trees
-################################
-
-convertRules = {}
-convertRules[("Float", "Integer")] = "mn_ConvertNode"
-convertRules[("Generic", "Integer")] = "mn_ConvertNode"
-convertRules[("Float", "String")] = "mn_ConvertNode"
-convertRules[("Generic", "Float")] = "mn_ConvertNode"
-convertRules[("Integer", "String")] = "mn_ConvertNode"
-convertRules[("Float", "Vector")] = "mn_CombineVector"
-convertRules[("Integer", "Vector")] = "mn_CombineVector"
-convertRules[("Vector", "Float")] = "mn_SeparateVector"
-convertRules[("Text Block", "String")] = "mn_TextBlockReader"
-convertRules[("Vector", "Matrix")] = "mn_TranslationMatrix"
-convertRules[("Mesh Data", "Mesh")] = "mn_CreateMeshFromData"
-
-for dataType in ["Object", "Vertex", "Polygon", "Float", "Vector", "String"]:
-    convertRules[(dataType + " List", "Integer")] = "mn_GetListLengthNode"
