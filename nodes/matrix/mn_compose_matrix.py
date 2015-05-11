@@ -28,7 +28,7 @@ class mn_ComposeMatrix(Node, AnimationNode):
     def useInLineExecution(self):
         return True
     def getInLineExecutionString(self, outputUse):
-        return "$matrix$ = ... utils.mn_math_utils.composeMatrix(%position%, %rotation%, %scale%)"
+        return "$matrix$ = animation_nodes.utils.mn_math_utils.composeMatrix(%position%, %rotation%, %scale%)"
         
     def getModuleList(self):
-        return ["... utils.mn_math_utils"]
+        return []

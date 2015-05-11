@@ -1,3 +1,4 @@
+import os
 import sys
 import pkgutil
 import importlib
@@ -13,7 +14,7 @@ def setup_addon_modules(path, package_name, reload = False):
         module_names = []
         for importer, module_name, is_package in pkgutil.iter_modules([path]):
             if is_package:
-                sub_path = path + "\\" + module_name
+                sub_path = os.path.join(path, module_name)
                 sub_root = root + module_name + "."
                 module_names.extend(get_submodule_names(sub_path, sub_root))
             else: 
