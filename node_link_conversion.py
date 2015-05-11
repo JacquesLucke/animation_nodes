@@ -79,7 +79,13 @@ class ConvertVectorToMatrix(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType == "Vector" and target.dataType == "Matrix"
     def insert(self, nodeTree, origin, target):
-        insertNode(nodeTree, "mn_TranslationMatrix", origin, target)  		
+        insertNode(nodeTree, "mn_TranslationMatrix", origin, target)  
+
+class ConvertListToLength(LinkCorrection):
+    def check(self, origin, target):
+        return "List" in origin.dataType and target.dataType == "Integer"
+    def insert(self, nodeTree, origin, target):
+        insertNode(nodeTree, "mn_GetListLengthNode", origin, target)          
 
 class ConvertToBasicTypes(LinkCorrection):
     def check(self, origin, target):
@@ -108,6 +114,7 @@ linkCorrectors = [
     ConvertVertexLocationsToMesh(),
     ConvertToVector(),
     ConvertVectorToNumber(),
-	ConvertTextBlockToString(),
-	ConvertVectorToMatrix(),
+    ConvertTextBlockToString(),
+    ConvertVectorToMatrix(),
+	ConvertListToLength(),
     ConvertToBasicTypes()]
