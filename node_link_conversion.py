@@ -73,7 +73,13 @@ class ConvertTextBlockToString(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType == "Text Block" and target.dataType == "String"
     def insert(self, nodeTree, origin, target):
-        insertNode(nodeTree, "mn_TextBlockReader", origin, target)     
+        insertNode(nodeTree, "mn_TextBlockReader", origin, target)  
+
+class ConvertVectorToMatrix(LinkCorrection):
+    def check(self, origin, target):
+        return origin.dataType == "Vector" and target.dataType == "Matrix"
+    def insert(self, nodeTree, origin, target):
+        insertNode(nodeTree, "mn_TranslationMatrix", origin, target)  		
 
 class ConvertToBasicTypes(LinkCorrection):
     def check(self, origin, target):
@@ -103,4 +109,5 @@ linkCorrectors = [
     ConvertToVector(),
     ConvertVectorToNumber(),
 	ConvertTextBlockToString(),
+	ConvertVectorToMatrix(),
     ConvertToBasicTypes()]
