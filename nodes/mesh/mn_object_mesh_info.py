@@ -25,6 +25,8 @@ class mn_ObjectMeshInfo(Node, AnimationNode):
         
     def draw_buttons(self, context, layout):
         layout.prop(self, "applyModifiers")
+        
+    def draw_buttons_ext(self, context, layout):
         layout.prop(self, "usePerObjectCache")
         
     def getInputSocketNames(self):
