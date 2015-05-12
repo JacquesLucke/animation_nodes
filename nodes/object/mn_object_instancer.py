@@ -17,6 +17,7 @@ class mn_ObjectNamePropertyGroup(bpy.types.PropertyGroup):
 class mn_ObjectInstancer(Node, AnimationNode):
     bl_idname = "mn_ObjectInstancer"
     bl_label = "Object Instancer"
+    search_tags = ["Object Replicator (old)"]
     
     def copyFromSourceChanged(self, context):
         self.inputs["Source"].hide = not self.copyFromSource

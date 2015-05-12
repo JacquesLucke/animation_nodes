@@ -83,6 +83,23 @@ class AnimationNodesSettings(bpy.types.PropertyGroup):
 # register
 ##################################
 
+addon_keymaps = []
+def register_keymaps():
+    global addon_keymaps
+    wm = bpy.context.window_manager
+    km = wm.keyconfigs.addon.keymaps.new(name = "Node Editor", space_type = "NODE_EDITOR")
+    kmi = km.keymap_items.new("mn.insert_node", type = "SPACE", value = "PRESS", ctrl = True)
+    addon_keymaps.append(km)
+    
+def unregister_keymaps():
+    global addon_keymaps
+    wm = bpy.context.window_manager
+    for km in addon_keymaps:
+        for kmi in km.keymap_items:
+            km.keymap_items.remove(kmi)
+        wm.keyconfigs.addon.keymaps.remove(km)
+    addon_keymaps.clear()
+
 from . mn_node_register import register_node_menu, unregister_node_menu
 from . mn_execution import register_handlers, unregister_handlers
 
@@ -90,11 +107,13 @@ def register():
     bpy.utils.register_module(__name__)
     register_handlers()
     register_node_menu()
+    register_keymaps()
     bpy.types.Scene.mn_settings = PointerProperty(type = AnimationNodesSettings, name = "Animation Node Settings")
     
     print("Registered Animation Nodes with {} modules.".format(len(modules)))
     
 def unregister():
+    unregister_keymaps()
     bpy.utils.unregister_module(__name__)
     unregister_handlers()
     unregister_node_menu()
