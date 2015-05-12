@@ -8,30 +8,30 @@ def drawMenu(self, context):
     
     layout.operator("mn.insert_node", text = "Search", icon = "VIEWZOOM")
     layout.separator()
-    layout.menu("animation_nodes.number_menu", text = "Number")
-    layout.menu("animation_nodes.vector_menu", text = "Vector")
-    layout.menu("animation_nodes.matrix_menu", text = "Matrix")
-    layout.menu("animation_nodes.text_menu", text = "Text")
-    layout.menu("animation_nodes.boolean_menu", text = "Boolean")
-    layout.menu("animation_nodes.color_menu", text = "Color")
-    layout.menu("animation_nodes.list_menu", text = "List")
+    layout.menu("mn.number_menu", text = "Number")
+    layout.menu("mn.vector_menu", text = "Vector")
+    layout.menu("mn.matrix_menu", text = "Matrix")
+    layout.menu("mn.text_menu", text = "Text")
+    layout.menu("mn.boolean_menu", text = "Boolean")
+    layout.menu("mn.color_menu", text = "Color")
+    layout.menu("mn.list_menu", text = "List")
     layout.separator()
-    layout.menu("animation_nodes.object_menu", text = "Object")
-    layout.menu("animation_nodes.mesh_menu", text = "Mesh")
-    layout.menu("animation_nodes.curve_menu", text = "Curve")
+    layout.menu("mn.object_menu", text = "Object")
+    layout.menu("mn.mesh_menu", text = "Mesh")
+    layout.menu("mn.curve_menu", text = "Curve")
     layout.separator()
-    layout.menu("animation_nodes.sound_menu", text = "Sound")
-    layout.menu("animation_nodes.material_menu", text = "Material")
-    layout.menu("animation_nodes.animation_menu", text = "Animation")
+    layout.menu("mn.sound_menu", text = "Sound")
+    layout.menu("mn.material_menu", text = "Material")
+    layout.menu("mn.animation_menu", text = "Animation")
     layout.separator()
-    layout.menu("animation_nodes.script_menu", text = "Script")
-    layout.menu("animation_nodes.debug_menu", text = "Debug")
-    layout.menu("animation_nodes.system_menu", text = "System")      
+    layout.menu("mn.script_menu", text = "Script")
+    layout.menu("mn.debug_menu", text = "Debug")
+    layout.menu("mn.system_menu", text = "System")      
         
         
         
 class NumberMenu(bpy.types.Menu):
-    bl_idname = "animation_nodes.number_menu"
+    bl_idname = "mn.number_menu"
     bl_label = "Number Menu"
     
     def draw(self, context):
@@ -46,7 +46,7 @@ class NumberMenu(bpy.types.Menu):
         insertNode(layout, "mn_FloatMathNode", "Math")
         
 class VectorMenu(bpy.types.Menu):
-    bl_idname = "animation_nodes.vector_menu"
+    bl_idname = "mn.vector_menu"
     bl_label = "Vector Menu"
     
     def draw(self, context):
@@ -63,7 +63,7 @@ class VectorMenu(bpy.types.Menu):
         insertNode(layout, "mn_DirectionToRotation", "Direction to Rotation")       
                 
 class MatrixMenu(bpy.types.Menu):
-    bl_idname = "animation_nodes.matrix_menu"
+    bl_idname = "mn.matrix_menu"
     bl_label = "Matrix Menu"
     
     def draw(self, context):
@@ -80,7 +80,7 @@ class MatrixMenu(bpy.types.Menu):
         insertNode(layout, "mn_MatrixMath", "Math")                     
                 
 class TextMenu(bpy.types.Menu):
-    bl_idname = "animation_nodes.text_menu"
+    bl_idname = "mn.text_menu"
     bl_label = "Text Menu"
     
     def draw(self, context):
@@ -100,7 +100,7 @@ class TextMenu(bpy.types.Menu):
         insertNode(layout, "mn_TextOutputNode", "Text Object Output")   
         
 class BooleanMenu(bpy.types.Menu):
-    bl_idname = "animation_nodes.boolean_menu"
+    bl_idname = "mn.boolean_menu"
     bl_label = "Boolean Menu"
     
     def draw(self, context):
@@ -111,7 +111,7 @@ class BooleanMenu(bpy.types.Menu):
         insertNode(layout, "mn_ConditionNode", "Condition") 
 
 class ColorMenu(bpy.types.Menu):
-    bl_idname = "animation_nodes.color_menu"
+    bl_idname = "mn.color_menu"
     bl_label = "Color Menu"
     
     def draw(self, context):
@@ -122,7 +122,7 @@ class ColorMenu(bpy.types.Menu):
         insertNode(layout, "mn_SetVertexColor", "Set Vertex Color")         
         
 class ListMenu(bpy.types.Menu):
-    bl_idname = "animation_nodes.list_menu"
+    bl_idname = "mn.list_menu"
     bl_label = "List Menu"
     
     def draw(self, context):
@@ -136,7 +136,7 @@ class ListMenu(bpy.types.Menu):
         insertNode(layout, "mn_ReverseListNode", "Reverse")             
         
 class ObjectMenu(bpy.types.Menu):
-    bl_idname = "animation_nodes.object_menu"
+    bl_idname = "mn.object_menu"
     bl_label = "Object Menu"
     
     def draw(self, context):
@@ -156,7 +156,7 @@ class ObjectMenu(bpy.types.Menu):
         insertNode(layout, "mn_ObjectInstancer", "Instancer") 
         
 class MeshMenu(bpy.types.Menu):
-    bl_idname = "animation_nodes.mesh_menu"
+    bl_idname = "mn.mesh_menu"
     bl_label = "Mesh Menu"
     
     def draw(self, context):
@@ -178,7 +178,7 @@ class MeshMenu(bpy.types.Menu):
         insertNode(layout, "mn_SetMeshOnObject", "Set Mesh on Object") 
         
 class CurveMenu(bpy.types.Menu):
-    bl_idname = "animation_nodes.curve_menu"
+    bl_idname = "mn.curve_menu"
     bl_label = "Curve Menu"
     
     def draw(self, context):
@@ -194,7 +194,7 @@ class CurveMenu(bpy.types.Menu):
         insertNode(layout, "mn_CurveBirailAndMorphNode", "Birail & Morph")                                              
                                   
 class SoundMenu(bpy.types.Menu):
-    bl_idname = "animation_nodes.sound_menu"
+    bl_idname = "mn.sound_menu"
     bl_label = "Sound Menu"
     
     def draw(self, context):
@@ -204,7 +204,7 @@ class SoundMenu(bpy.types.Menu):
         insertNode(layout, "mn_SoundBakeInput", "Bake Input")                                                    
                 
 class MaterialMenu(bpy.types.Menu):
-    bl_idname = "animation_nodes.material_menu"
+    bl_idname = "mn.material_menu"
     bl_label = "Material Menu"
     
     def draw(self, context):
@@ -213,7 +213,7 @@ class MaterialMenu(bpy.types.Menu):
         insertNode(layout, "mn_ViewportColorNode", "Viewport Color")                
                 
 class AnimationMenu(bpy.types.Menu):
-    bl_idname = "animation_nodes.animation_menu"
+    bl_idname = "mn.animation_menu"
     bl_label = "Animation Menu"
     
     def draw(self, context):
@@ -226,7 +226,7 @@ class AnimationMenu(bpy.types.Menu):
         insertNode(layout, "mn_MixInterpolation", "Mix Interpolations")   
         
 class ScriptMenu(bpy.types.Menu):
-    bl_idname = "animation_nodes.script_menu"
+    bl_idname = "mn.script_menu"
     bl_label = "Script Menu"
     
     def draw(self, context):
@@ -236,7 +236,7 @@ class ScriptMenu(bpy.types.Menu):
         insertNode(layout, "mn_ScriptNode", "Script from Clipboard", {"makeFromClipboard" : repr(True) })
         
 class DebugMenu(bpy.types.Menu):
-    bl_idname = "animation_nodes.debug_menu"
+    bl_idname = "mn.debug_menu"
     bl_label = "Debug Menu"
     
     def draw(self, context):
@@ -245,7 +245,7 @@ class DebugMenu(bpy.types.Menu):
         insertNode(layout, "mn_DebugVectorOutputNode", "Vector Socket")          
         
 class SystemMenu(bpy.types.Menu):
-    bl_idname = "animation_nodes.system_menu"
+    bl_idname = "mn.system_menu"
     bl_label = "System Menu"
     
     def draw(self, context):
