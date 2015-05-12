@@ -7,6 +7,7 @@ from ... mn_utils import *
 class mn_TimeInfoNode(Node, AnimationNode):
     bl_idname = "mn_TimeInfoNode"
     bl_label = "Time Info"
+    search_tags = ["Frame"]
     isDetermined = True
     
     def init(self, context):
