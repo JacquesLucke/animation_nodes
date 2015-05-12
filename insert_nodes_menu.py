@@ -24,6 +24,7 @@ def drawMenu(self, context):
     layout.menu("animation_nodes.animation_menu", text = "Animation")
     layout.separator()
     layout.menu("animation_nodes.script_menu", text = "Script")
+    layout.menu("animation_nodes.debug_menu", text = "Debug")
     layout.menu("animation_nodes.system_menu", text = "System")      
         
         
@@ -223,6 +224,15 @@ class ScriptMenu(bpy.types.Menu):
         insertNode(layout, "mn_ExpressionNode", "Expression")           
         insertNode(layout, "mn_ScriptNode", "Script")           
         insertNode(layout, "mn_ScriptNode", "Script from Clipboard", {"makeFromClipboard" : repr(True) })
+        
+class DebugMenu(bpy.types.Menu):
+    bl_idname = "animation_nodes.debug_menu"
+    bl_label = "Debug Menu"
+    
+    def draw(self, context):
+        layout = self.layout
+        insertNode(layout, "mn_DebugOutputNode", "Generic Socket")          
+        insertNode(layout, "mn_DebugVectorOutputNode", "Vector Socket")          
         
 class SystemMenu(bpy.types.Menu):
     bl_idname = "animation_nodes.system_menu"
