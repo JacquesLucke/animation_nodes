@@ -1,13 +1,18 @@
 import bpy
+from collections import defaultdict
 
 searchDict = {}
+importanceMap = defaultdict(int)
 
 def getItems(self, context):
+    def getSortKey(item):
+        key = str(10000 - importanceMap[item[0]]).zfill(5) + item[1]
+        return key
     updateSearchDict()
     items = []
     for key, value in searchDict.items():
         items.append((value, key, ""))
-    items = sorted(items, key = lambda x: x[1])
+    items = sorted(items, key = getSortKey)
     return items
 
 class InsertNodeOperator(bpy.types.Operator):
@@ -28,6 +33,7 @@ class InsertNodeOperator(bpy.types.Operator):
         
     def execute(self, context):
         bpy.ops.node.add_and_link_node("INVOKE_DEFAULT", type = self.item, use_transform = True)
+        importanceMap[self.item] += 1
         return {"FINISHED"}
     
 def getNodeTree():
