@@ -41,6 +41,12 @@ class ConvertMeshDataToMesh(LinkCorrection):
     def insert(self, nodeTree, origin, target):
         insertNode(nodeTree, "mn_CreateMeshFromData", origin, target)
         
+class ConvertMeshDataToVertexLocations(LinkCorrection):
+    def check(self, origin, target):
+        return origin.dataType == "Mesh Data" and target.dataType == "Vector List"
+    def insert(self, nodeTree, origin, target):
+        insertNode(nodeTree, "mn_SeparateMeshData", origin, target)        
+        
 class ConvertVertexLocationsToMeshData(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType == "Vector List" and target.dataType == "Mesh Data"
@@ -124,6 +130,7 @@ def getSocketCenter(socket1, socket2):
     
 linkCorrectors = [
     ConvertMeshDataToMesh(),
+    ConvertMeshDataToVertexLocations(),
     ConvertVertexLocationsToMeshData(),
     ConvertVertexLocationsToMesh(),
     ConvertToVector(),
