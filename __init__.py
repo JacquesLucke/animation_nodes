@@ -88,7 +88,7 @@ def register_keymaps():
     global addon_keymaps
     wm = bpy.context.window_manager
     km = wm.keyconfigs.addon.keymaps.new(name = "Node Editor", space_type = "NODE_EDITOR")
-    kmi = km.keymap_items.new("mn.insert_node", type = "SPACE", value = "PRESS", ctrl = True)
+    kmi = km.keymap_items.new("mn.insert_node", type = "A", value = "PRESS", ctrl = True)
     addon_keymaps.append(km)
     
 def unregister_keymaps():
