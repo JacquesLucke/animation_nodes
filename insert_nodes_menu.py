@@ -1,16 +1,13 @@
 import bpy
+from . utils.mn_node_utils import getAnimationNodeTrees
         
 def drawMenu(self, context):
     if context.space_data.tree_type != "mn_AnimationNodeTree": return
-    nodeTree = context.space_data.node_tree
     
     layout = self.layout
     layout.operator_context = "INVOKE_DEFAULT"
     
-    if not nodeTree:
-        col = layout.column()
-        col.scale_y = 1.6
-        col.operator("mn.create_node_tree", text = "New Node Tree", icon = "PLUS")
+    drawNodeTreeChooser(layout, context)    
     
     layout.operator("mn.insert_node", text = "Search", icon = "VIEWZOOM")
     layout.separator()
@@ -32,7 +29,21 @@ def drawMenu(self, context):
     layout.separator()
     layout.menu("mn.script_menu", text = "Script")
     layout.menu("mn.debug_menu", text = "Debug")
-    layout.menu("mn.system_menu", text = "System")      
+    layout.menu("mn.system_menu", text = "System") 
+
+def drawNodeTreeChooser(layout, context):
+    activeNodeTree = context.space_data.node_tree
+    nodeTrees = getAnimationNodeTrees()
+    
+    if not activeNodeTree:
+        col = layout.column()
+        col.scale_y = 1.6
+        if len(nodeTrees) == 0:
+            col.operator("mn.create_node_tree", text = "New Node Tree", icon = "PLUS")
+        else:
+            for nodeTree in nodeTrees:
+                props = col.operator("mn.select_node_tree", text = "Select '{}'".format(nodeTree.name), icon = "EYEDROPPER")
+                props.nodeTreeName = nodeTree.name    
     
         
 class NumberMenu(bpy.types.Menu):
@@ -285,7 +296,22 @@ class CreateNodeTree(bpy.types.Operator):
         nodeTree = bpy.data.node_groups.new(name = "Node Tree", type = "mn_AnimationNodeTree")
         context.space_data.node_tree = nodeTree
         context.area.tag_redraw()
-        return {"FINISHED"}    
+        return {"FINISHED"}
+
+        
+class SelectNodeTree(bpy.types.Operator):
+    bl_idname = "mn.select_node_tree"
+    bl_label = "Select Node Tree"
+    bl_description = "Select a Animation Node tree"
+    bl_options = {"REGISTER"}
+    
+    nodeTreeName = bpy.props.StringProperty(default = "")
+    
+    def execute(self, context):
+        nodeTree = bpy.data.node_groups.get(self.nodeTreeName)
+        context.space_data.node_tree = nodeTree
+        context.area.tag_redraw()
+        return {"FINISHED"}
 
     
 def registerMenu():
