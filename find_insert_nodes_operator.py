@@ -37,7 +37,7 @@ class InsertNodeOperator(bpy.types.Operator):
         return {"FINISHED"}
     
 def getNodeTree():
-    return getattr(bpy.context.space_data, "edit_tree", None)
+    return getattr(bpy.context.space_data, "node_tree", None)
    
 def updateSearchDict():
     global searchDict
