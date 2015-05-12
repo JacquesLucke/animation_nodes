@@ -28,6 +28,9 @@ class mn_FindCloseVertices(Node, AnimationNode):
         return {"Edges" : "edges"}
         
     def execute(self, vertices, clusters, connections, minDistance, maxDistance):
+        minDistance = max(0, minDistance)
+        maxDistance = max(minDistance, maxDistance)
+        
         verticesAmount = len(vertices)
         kdTree = KDTree(verticesAmount)
         for i, vector in enumerate(vertices):
