@@ -2,9 +2,15 @@ import bpy
         
 def drawMenu(self, context):
     if context.space_data.tree_type != "mn_AnimationNodeTree": return
+    nodeTree = context.space_data.node_tree
     
     layout = self.layout
     layout.operator_context = "INVOKE_DEFAULT"
+    
+    if not nodeTree:
+        col = layout.column()
+        col.scale_y = 1.6
+        col.operator("mn.create_node_tree", text = "New Node Tree", icon = "PLUS")
     
     layout.operator("mn.insert_node", text = "Search", icon = "VIEWZOOM")
     layout.separator()
@@ -27,8 +33,7 @@ def drawMenu(self, context):
     layout.menu("mn.script_menu", text = "Script")
     layout.menu("mn.debug_menu", text = "Debug")
     layout.menu("mn.system_menu", text = "System")      
-        
-        
+    
         
 class NumberMenu(bpy.types.Menu):
     bl_idname = "mn.number_menu"
@@ -268,6 +273,19 @@ def insertNode(layout, type, text, settings = {}):
         item.name = name
         item.value = value
     return operator
+    
+    
+class CreateNodeTree(bpy.types.Operator):
+    bl_idname = "mn.create_node_tree"
+    bl_label = "Create Node Tree"
+    bl_description = "Create a new Animation Node tree"
+    bl_options = {"REGISTER"}
+    
+    def execute(self, context):
+        nodeTree = bpy.data.node_groups.new(name = "Node Tree", type = "mn_AnimationNodeTree")
+        context.space_data.node_tree = nodeTree
+        context.area.tag_redraw()
+        return {"FINISHED"}    
 
     
 def registerMenu():
