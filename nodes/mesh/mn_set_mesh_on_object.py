@@ -10,7 +10,9 @@ class mn_SetMeshOnObject(Node, AnimationNode):
     
     def init(self, context):
         forbidCompiling()
-        self.inputs.new("mn_ObjectSocket", "Object").showName = False
+        socket = self.inputs.new("mn_ObjectSocket", "Object")
+        socket.showName = False
+        socket.createObject = True
         self.inputs.new("mn_MeshSocket", "Mesh")
         self.outputs.new("mn_ObjectSocket", "Object")
         allowCompiling()
