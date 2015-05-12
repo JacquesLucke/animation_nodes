@@ -81,7 +81,6 @@ class mn_CurveRevolveNode(Node, AnimationNode):
                 if self.projection_mode == "Analytic":
                     revolvedProjectedSurface = Surfaces.RevolvedProjectedSurface(axis, profile)
                     vertices, polygons = revolvedProjectedSurface.CalculateAnalytic(resAlong, resAcross)
-        except: 
-            print("### except")
-
+        except: pass
+        
         return vertices, polygons
