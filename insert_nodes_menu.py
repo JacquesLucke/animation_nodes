@@ -13,6 +13,7 @@ def drawMenu(self, context):
     layout.menu("animation_nodes.matrix_menu", text = "Matrix")
     layout.menu("animation_nodes.text_menu", text = "Text")
     layout.menu("animation_nodes.boolean_menu", text = "Boolean")
+    layout.menu("animation_nodes.color_menu", text = "Color")
     layout.menu("animation_nodes.list_menu", text = "List")
     layout.separator()
     layout.menu("animation_nodes.object_menu", text = "Object")
@@ -20,7 +21,7 @@ def drawMenu(self, context):
     layout.menu("animation_nodes.curve_menu", text = "Curve")
     layout.separator()
     layout.menu("animation_nodes.sound_menu", text = "Sound")
-    layout.menu("animation_nodes.color_menu", text = "Color")
+    layout.menu("animation_nodes.material_menu", text = "Material")
     layout.menu("animation_nodes.animation_menu", text = "Animation")
     layout.separator()
     layout.menu("animation_nodes.script_menu", text = "Script")
@@ -107,7 +108,18 @@ class BooleanMenu(bpy.types.Menu):
         insertNode(layout, "mn_BooleanInputNode", "Boolean")                         
         insertNode(layout, "mn_InvertNode", "Invert")                         
         insertNode(layout, "mn_CompareNode", "Compare")                         
-        insertNode(layout, "mn_ConditionNode", "Condition")    
+        insertNode(layout, "mn_ConditionNode", "Condition") 
+
+class ColorMenu(bpy.types.Menu):
+    bl_idname = "animation_nodes.color_menu"
+    bl_label = "Color Menu"
+    
+    def draw(self, context):
+        layout = self.layout
+        insertNode(layout, "mn_ColorInputNode", "RGB")                                   
+        insertNode(layout, "mn_CombineColor", "Combine RGBA")                                   
+        insertNode(layout, "mn_ColorMix", "Mix")                  
+        insertNode(layout, "mn_SetVertexColor", "Set Vertex Color")         
         
 class ListMenu(bpy.types.Menu):
     bl_idname = "animation_nodes.list_menu"
@@ -189,18 +201,16 @@ class SoundMenu(bpy.types.Menu):
         layout = self.layout
         insertNode(layout, "mn_SoundBakeNode", "Bake")                                   
         insertNode(layout, "mn_SoundBakeReaderNode", "Baked Sound Reader")                                   
-        insertNode(layout, "mn_SoundBakeInput", "Bake Input")                                   
+        insertNode(layout, "mn_SoundBakeInput", "Bake Input")                                                    
                 
-class ColorMenu(bpy.types.Menu):
-    bl_idname = "animation_nodes.color_menu"
-    bl_label = "Color Menu"
+class MaterialMenu(bpy.types.Menu):
+    bl_idname = "animation_nodes.material_menu"
+    bl_label = "Material Menu"
     
     def draw(self, context):
         layout = self.layout
-        insertNode(layout, "mn_ColorInputNode", "RGB")                                   
-        insertNode(layout, "mn_CombineColor", "Combine RGBA")                                   
-        insertNode(layout, "mn_ColorMix", "Mix")                  
-        insertNode(layout, "mn_SetVertexColor", "Set Vertex Color")                  
+        insertNode(layout, "mn_CyclesMaterialOutputNode", "Cycles Material Output")                
+        insertNode(layout, "mn_ViewportColorNode", "Viewport Color")                
                 
 class AnimationMenu(bpy.types.Menu):
     bl_idname = "animation_nodes.animation_menu"
