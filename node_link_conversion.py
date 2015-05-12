@@ -40,6 +40,12 @@ class ConvertMeshDataToMesh(LinkCorrection):
         return origin.dataType == "Mesh Data" and target.dataType == "Mesh"
     def insert(self, nodeTree, origin, target):
         insertNode(nodeTree, "mn_CreateMeshFromData", origin, target)
+        
+class ConvertVertexLocationsToMeshData(LinkCorrection):
+    def check(self, origin, target):
+        return origin.dataType == "Vector List" and target.dataType == "Mesh Data"
+    def insert(self, nodeTree, origin, target):
+        insertNode(nodeTree, "mn_CombineMeshData", origin, target)        
 
 class ConvertVertexLocationsToMesh(LinkCorrection):
     def check(self, origin, target):
@@ -94,6 +100,13 @@ class ConvertToBasicTypes(LinkCorrection):
         node = insertNode(nodeTree, "mn_ConvertNode", origin, target)
         node.update()
         
+class ConvertFromGeneric(LinkCorrection):
+    def check(self, origin, target):
+        return origin.dataType == "Generic"
+    def insert(self, nodeTree, origin, target):
+        node = insertNode(nodeTree, "mn_ConvertNode", origin, target)
+        node.update()        
+        
         
 def insertNode(nodeTree, nodeType, origin, target):
     node = nodeTree.nodes.new(nodeType)
@@ -111,10 +124,12 @@ def getSocketCenter(socket1, socket2):
     
 linkCorrectors = [
     ConvertMeshDataToMesh(),
+    ConvertVertexLocationsToMeshData(),
     ConvertVertexLocationsToMesh(),
     ConvertToVector(),
     ConvertVectorToNumber(),
     ConvertTextBlockToString(),
     ConvertVectorToMatrix(),
 	ConvertListToLength(),
-    ConvertToBasicTypes()]
+    ConvertToBasicTypes(),
+    ConvertFromGeneric() ]
