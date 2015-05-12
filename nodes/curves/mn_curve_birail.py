@@ -17,6 +17,7 @@ class mn_CurveBirailNode(Node, AnimationNode):
         self.inputs.new("mn_ObjectSocket", "Rail 1")
         self.inputs.new("mn_ObjectSocket", "Rail 2")
         self.inputs.new("mn_ObjectSocket", "Profile")
+        self.inputs.new("mn_ObjectSocket", "End Profile (Optional)")
         self.outputs.new("mn_VectorListSocket", "Vertex World Locations")
         self.outputs.new("mn_PolygonIndicesListSocket", "Polygon Indices")
         allowCompiling()
@@ -26,13 +27,14 @@ class mn_CurveBirailNode(Node, AnimationNode):
                 "Resolution Across" : "resAcross",
                 "Rail 1" : "rail1",
                 "Rail 2" : "rail2",
-                "Profile" : "profile"}
+                "Profile" : "profile",
+                "End Profile (Optional)" : "endProfile"}
 
     def getOutputSocketNames(self):
         return {"Vertex World Locations" : "vertices",
                 "Polygon Indices" : "polygons"}
 
-    def canExecute(self, resAlong, resAcross, rail1, rail2, profile):
+    def canExecute(self, resAlong, resAcross, rail1, rail2, profile, endProfile):
         if resAlong < 2: return False
         if resAcross < 2: return False
         if not Curves.IsBezierCurve(rail1): return False
@@ -41,15 +43,19 @@ class mn_CurveBirailNode(Node, AnimationNode):
 
         return True
 
-    def execute(self, resAlong, resAcross, rail1, rail2, profile):
+    def execute(self, resAlong, resAcross, rail1, rail2, profile, endProfile):
         vertices = []
         polygons = []
-        if not self.canExecute(resAlong, resAcross, rail1, rail2, profile):
+        if not self.canExecute(resAlong, resAcross, rail1, rail2, profile, endProfile):
             return vertices, polygons
 
         try:
-            birailedSurface = Surfaces.BirailedSurface(rail1, rail2, profile)
-            vertices, polygons = birailedSurface.Calculate(resAlong, resAcross)
+            if not Curves.IsBezierCurve(endProfile):
+                birailedSurface = Surfaces.BirailedSurface(rail1, rail2, profile)
+                vertices, polygons = birailedSurface.Calculate(resAlong, resAcross)
+            else:
+                birailedAndMorphedSurface = Surfaces.BirailedAndMorphedSurface(rail1, rail2, profile, endProfile)
+                vertices, polygons = birailedAndMorphedSurface.Calculate(resAlong, resAcross)
         except: pass
 
         return vertices, polygons
