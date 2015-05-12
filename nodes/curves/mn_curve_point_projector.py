@@ -17,8 +17,9 @@ class mn_CurvePointProjectorNode(Node, AnimationNode):
         self.updateSocketVisibility()
         nodeTreeChanged()
     
+    modes_items = [ ("Sampled", "Sampled", "Samples a given number of points and outputs the sample/parameter closest to the projecting point"), 
                     ("Analytic", "Analytic", "WIP. Calculates the projection analytically -- eg, by finding the roots of some higher order numpy.Polynomial")]
-    mode = bpy.props.EnumProperty(name = "Mode", items = modes_items, default = "Sampled", update = modeChanged)
+    mode = bpy.props.EnumProperty(name = "Mode", items = modes_items, default = "Analytic", update = modeChanged)
         
     def draw_buttons(self, context, layout):
         layout.prop(self, "mode")
