@@ -11,6 +11,7 @@ class mn_FilterParticles(Node, AnimationNode):
     
     outputUnborn = BoolProperty(name = "Output Unborn Particles", default = False)
     outputAlive = BoolProperty(name = "Output Alive Particles", default = True)
+    outputDying = BoolProperty(name = "Output Dying Particles", default = False)
     outputDead = BoolProperty(name = "Output Dead Particles", default = False)
     
     def init(self, context):
@@ -23,6 +24,7 @@ class mn_FilterParticles(Node, AnimationNode):
         col = layout.column()
         col.prop(self, "outputUnborn", text = "Unborn")
         col.prop(self, "outputAlive", text = "Alive")
+        col.prop(self, "outputDying", text = "Dying")
         col.prop(self, "outputDead", text = "Dead")
         
     def getInputSocketNames(self):
@@ -35,6 +37,7 @@ class mn_FilterParticles(Node, AnimationNode):
         for particle in particles:
             if particle.alive_state == "UNBORN" and self.outputUnborn or \
                 particle.alive_state == "ALIVE" and self.outputAlive or \
+                particle.alive_state == "DYING" and self.outputDead or \
                 particle.alive_state == "DEAD" and self.outputDead:
                 filteredParticles.append(particle)
         return filteredParticles
