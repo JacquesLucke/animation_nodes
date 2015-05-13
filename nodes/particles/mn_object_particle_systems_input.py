@@ -6,18 +6,18 @@ from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompilin
 
 class mn_ObjectParticleSystemsInput(Node, AnimationNode):
     bl_idname = "mn_ObjectParticleSystemsInput"
-    bl_label = "Object Particle Systems Input"
+    bl_label = "Particle Systems Input"
     
     def init(self, context):
         forbidCompiling()
         self.inputs.new("mn_ObjectSocket", "Object").showName = False
-        self.outputs.new("mn_ParticleSystemSocket", "Active Particle System")
+        self.outputs.new("mn_ParticleSystemSocket", "Active")
         allowCompiling()
         
     def getInputSocketNames(self):
         return {"Object" : "object"}
     def getOutputSocketNames(self):
-        return {"Active Particle System" : "active"}
+        return {"Active" : "active"}
 
     def execute(self, object):
         if not object: return None
