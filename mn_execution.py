@@ -42,6 +42,7 @@ def secureExecution(event, sender):
         except Exception as e:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             traceback.print_tb(exc_traceback)
+            print(e)
         
         
 def executeUnits(event, sender):
