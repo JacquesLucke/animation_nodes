@@ -25,8 +25,8 @@ def updateAnimationTrees(event = "NONE", sender = None):
             printTimeSpan("Update Time ", timeSpan)
                   
         try:
-            bpy.context.scene.update()
             if bpy.context.scene.mn_settings.update.redrawViewport:
+                bpy.context.scene.update()
                 redraw_areas_if_possible()
         except: pass
             
