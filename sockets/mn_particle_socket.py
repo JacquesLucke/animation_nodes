@@ -7,7 +7,7 @@ class mn_ParticleSocket(mn_BaseSocket, mn_SocketProperties):
     bl_label = "Particle Socket"
     dataType = "Particle"
     allowedInputTypes = ["Particle"]
-    drawColor = (0.4, 0.2, 0.0, 1)
+    drawColor = (0.5, 0.3, 0.1, 1)
     
     def drawInput(self, layout, node, text):
         layout.label(text)
