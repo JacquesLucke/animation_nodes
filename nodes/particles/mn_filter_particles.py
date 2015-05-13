@@ -10,7 +10,7 @@ class mn_FilterParticles(Node, AnimationNode):
     bl_label = "Filter Particles"
     
     outputUnborn = BoolProperty(name = "Output Unborn Particles", default = False)
-    outputAlive = BoolProperty(name = "Output Alive Particles", default = False)
+    outputAlive = BoolProperty(name = "Output Alive Particles", default = True)
     outputDead = BoolProperty(name = "Output Dead Particles", default = False)
     
     def init(self, context):
