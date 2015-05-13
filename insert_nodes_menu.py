@@ -181,6 +181,7 @@ class MeshMenu(bpy.types.Menu):
         insertNode(layout, "mn_SeparateMeshData", "Separate Mesh Data")                                     
         insertNode(layout, "mn_CombineMeshData", "Combine Mesh Data") 
         insertNode(layout, "mn_AppendToMeshData", "Append to Mesh Data")
+        layout.menu("mn.mesh_workers_menu", text = "Mesh Workers")
         layout.separator()                                  
         insertNode(layout, "mn_VertexInfo", "Vertex Info")                                     
         insertNode(layout, "mn_PolygonInfo", "Polygon Info")                                     
@@ -192,6 +193,15 @@ class MeshMenu(bpy.types.Menu):
         insertNode(layout, "mn_MeshRecalculateFaceNormals", "Recalculate Normals")                                     
         insertNode(layout, "mn_MakeObjectSmooth", "Smooth Object")                                     
         insertNode(layout, "mn_SetMeshOnObject", "Set Mesh on Object") 
+        
+class MeshWorkersMenu(bpy.types.Menu):
+    bl_idname = "mn.mesh_workers_menu"
+    bl_label = "Mesh Workers Menu"
+    
+    def draw(self, context):
+        layout = self.layout
+        insertNode(layout, "mn_FindCloseVertices", "Find Close Vertices")         
+        insertNode(layout, "mn_EdgesToPlanes", "Edges to Planes")         
         
 class CurveMenu(bpy.types.Menu):
     bl_idname = "mn.curve_menu"
