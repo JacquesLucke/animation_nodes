@@ -51,7 +51,13 @@ class ConvertVertexLocationsToMeshData(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType == "Vector List" and target.dataType == "Mesh Data"
     def insert(self, nodeTree, origin, target):
-        insertNode(nodeTree, "mn_CombineMeshData", origin, target)        
+        insertNode(nodeTree, "mn_CombineMeshData", origin, target)    
+
+class ConvertPolygonListIndicesToEdgeListIndices(LinkCorrection):
+    def check(self, origin, target):
+        return origin.dataType == "Polygon Indices List" and target.dataType == "Edge Indices List"
+    def insert(self, nodeTree, origin, target):
+        insertNode(nodeTree, "mn_EdgesOfPolygons", origin, target)         
 
 class ConvertVertexLocationsToMesh(LinkCorrection):
     def check(self, origin, target):
@@ -132,6 +138,7 @@ linkCorrectors = [
     ConvertMeshDataToMesh(),
     ConvertMeshDataToVertexLocations(),
     ConvertVertexLocationsToMeshData(),
+    ConvertPolygonListIndicesToEdgeListIndices(),
     ConvertVertexLocationsToMesh(),
     ConvertToVector(),
     ConvertVectorToNumber(),
