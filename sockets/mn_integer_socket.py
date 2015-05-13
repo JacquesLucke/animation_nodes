@@ -1,6 +1,6 @@
 import bpy
-from animation_nodes.mn_execution import nodePropertyChanged
-from animation_nodes.mn_node_base import *
+from .. mn_execution import nodePropertyChanged
+from .. mn_node_base import *
 
 def getValue(self):
     return min(max(self.min, self.get("number", 0)), self.max)

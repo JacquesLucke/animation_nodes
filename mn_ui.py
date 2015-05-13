@@ -1,8 +1,8 @@
 import bpy
-from animation_nodes.mn_execution import getCodeStrings, resetCompileBlocker, updateAnimationTrees, generateExecutionUnits
-from animation_nodes.mn_keyframes import *
-from animation_nodes.mn_utils import *
-from animation_nodes.utils.mn_selection_utils import *
+from . mn_execution import getCodeStrings, resetCompileBlocker, updateAnimationTrees, generateExecutionUnits
+from . mn_keyframes import *
+from . mn_utils import *
+from . utils.mn_selection_utils import *
 
 class AnimationNodesPerformance(bpy.types.Panel):
     bl_idname = "mn.performance_panel"
@@ -30,27 +30,6 @@ class AnimationNodesPerformance(bpy.types.Panel):
         col.prop(scene.mn_settings.update, "resetCompileBlockerWhileRendering", text = "Is Rendering")
         layout.prop(scene.mn_settings.update, "skipFramesAmount")
         layout.prop(scene.mn_settings.update, "redrawViewport")
-    
-class CustomAnimationNodes(bpy.types.Panel):
-    bl_idname = "mn.custom_nodes_panel"
-    bl_label = "Unregistered Nodes"
-    bl_space_type = "NODE_EDITOR"
-    bl_region_type = "TOOLS"
-    bl_category = "Settings"
-    
-    @classmethod
-    def poll(self, context):
-        return context.space_data.tree_type == "mn_AnimationNodeTree"
-    
-    def draw(self, context):
-        layout = self.layout
-        scene = context.scene
-        layout.prop(scene, "customNodeCategory", text = "Category")
-        customNodeClasses = getCustomNodesInCategory(scene.customNodeCategory)
-        for nodeClass in customNodeClasses:
-            newNode = layout.operator("node.add_node", text = nodeClass.bl_label)
-            newNode.type = nodeClass.bl_idname
-            newNode.use_transform = True
     
 class AnimationNodesDeveloperPanel(bpy.types.Panel):
     bl_idname = "mn.developer_panel"
@@ -190,46 +169,3 @@ class UnitExecutionCodeInTextBlock(bpy.types.Operator):
             textBlock = bpy.data.texts.new("Unit Execution Code")
         textBlock.from_string(codeString)
         return {'FINISHED'}
-    
-
-# custom nodes
-##############################
-    
-
-def getAllAnimationNodeClasses():
-    from animation_nodes.mn_node_base import AnimationNode
-    return AnimationNode.__subclasses__()
-def getCustomNodeClasses():
-    from animation_nodes.mn_node_register import getAllNodeIdNames
-    officialNodeNames = getAllNodeIdNames()
-    nodeClasses = []
-    foundNames = []
-    for nodeClass in getAllAnimationNodeClasses():
-        if nodeClass.bl_idname not in officialNodeNames and nodeClass.bl_idname not in foundNames:
-            nodeClasses.append(nodeClass)
-            foundNames.append(nodeClass.bl_idname)
-    return nodeClasses
-def getCustomCategories():
-    nodeClasses = getCustomNodeClasses()
-    categories = set()
-    for nodeClass in nodeClasses:
-        category = getattr(nodeClass, "node_category", "None")
-        categories.update([category])
-    if len(categories) == 0: categories.update(["None"])
-    return categories
-def getCustomNodeCategoryItems(self, context):
-    categories = getCustomCategories()
-    items = []
-    for category in categories:
-        items.append((category, category, ""))
-    return items
-    
-def getCustomNodesInCategory(category):
-    nodeClasses = getCustomNodeClasses()
-    nodeClassesInCategory = []
-    for nodeClass in nodeClasses:
-        if getattr(nodeClass, "node_category", "None") == category:
-            nodeClassesInCategory.append(nodeClass)
-    return nodeClassesInCategory
-    
-bpy.types.Scene.customNodeCategory = bpy.props.EnumProperty(items = getCustomNodeCategoryItems, name = "Custom Categories")

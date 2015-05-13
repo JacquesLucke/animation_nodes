@@ -1,7 +1,7 @@
 import bpy
 from bpy.types import Node
-from animation_nodes.mn_node_base import AnimationNode
-from animation_nodes.mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
+from ... mn_node_base import AnimationNode
+from ... mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 
 compare_types = ["A = B", "A != B", "A < B", "A <= B", "A > B", "A >= B", "A is B"]
 compare_types_items = [(t, t, "") for t in compare_types]

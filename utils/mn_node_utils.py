@@ -1,5 +1,5 @@
 import bpy
-from animation_nodes.mn_utils import *
+from .. mn_utils import *
 
 def getAttributesFromNodesWithType(nodeType, attribute):
     data = []
@@ -205,6 +205,14 @@ class NodeTreeInfo:
                 foundNodes.extend(network.nodes)
                 networks.append(network)
         return networks
+        
+    def get_linked_socket_pairs(self):
+        pairs = []
+        for node in self.nodes:
+            for socket in node.outputs:
+                targets = self.getDataTargetSockets(socket)
+                pairs.extend([(socket, target) for target in targets])
+        return pairs
     
 class NodeNetwork:
     def __init__(self, nodes):

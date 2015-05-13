@@ -1,7 +1,7 @@
 import bpy
 from bpy.types import Node
-from animation_nodes.mn_node_base import AnimationNode
-from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from ... mn_node_base import AnimationNode
+from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 class mn_SetListElementNode(Node, AnimationNode):
     bl_idname = "mn_SetListElementNode"
@@ -28,13 +28,18 @@ class mn_SetListElementNode(Node, AnimationNode):
         layout.prop(self, "listTypesProperty")
         layout.prop(self, "clampIndex", text = "Clamp Index")
         
-    def execute(self, input):
-        output = {}
-        list = input["List"]
-        index = max(min(input["Index"], len(list) - 1), 0)
-        list[index] = input["Value"]
-        output["List"] = list
-        return output
+    def getInputSocketNames(self):
+        return {"List" : "list",
+                "Value" : "value",
+                "Index" : "index"}
+
+    def getOutputSocketNames(self):
+        return {"List" : "list"}
+        
+    def execute(self, list, value, index):
+        if 0 <= index < len(list):
+            list[index] = value
+        return list
         
     def setSocketType(self, type):
         forbidCompiling()

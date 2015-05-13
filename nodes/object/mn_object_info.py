@@ -1,10 +1,9 @@
 import bpy
 from bpy.types import Node
-from animation_nodes.mn_node_base import AnimationNode
-from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
-from animation_nodes.mn_utils import *
-from animation_nodes.utils.mn_object_utils import *
-from animation_nodes.utils.mn_fcurve_utils import *
+from ... mn_node_base import AnimationNode
+from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from ... mn_utils import *
+from ... utils.mn_fcurve_utils import *
 from bpy.props import BoolProperty
 from operator import sub
 from mathutils import Vector

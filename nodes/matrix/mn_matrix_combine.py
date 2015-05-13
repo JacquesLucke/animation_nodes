@@ -1,10 +1,10 @@
 import bpy
 from bpy.types import Node
 from mathutils import *
-from animation_nodes.mn_utils import *
-from animation_nodes.utils.mn_node_utils import *
-from animation_nodes.mn_node_base import AnimationNode
-from animation_nodes.mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
+from ... mn_utils import *
+from ... utils.mn_node_utils import *
+from ... mn_node_base import AnimationNode
+from ... mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 
 class mn_MatrixCombine(Node, AnimationNode):
     bl_idname = "mn_MatrixCombine"

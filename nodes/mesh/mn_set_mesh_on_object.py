@@ -1,8 +1,8 @@
 import bpy, bmesh
 from bpy.types import Node
-from animation_nodes.mn_node_base import AnimationNode
-from animation_nodes.mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
-from animation_nodes.utils.mn_mesh_utils import *
+from ... mn_node_base import AnimationNode
+from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from ... utils.mn_mesh_utils import *
 
 class mn_SetMeshOnObject(Node, AnimationNode):
     bl_idname = "mn_SetMeshOnObject"
@@ -10,7 +10,9 @@ class mn_SetMeshOnObject(Node, AnimationNode):
     
     def init(self, context):
         forbidCompiling()
-        self.inputs.new("mn_ObjectSocket", "Object").showName = False
+        socket = self.inputs.new("mn_ObjectSocket", "Object")
+        socket.showName = False
+        socket.createObject = True
         self.inputs.new("mn_MeshSocket", "Mesh")
         self.outputs.new("mn_ObjectSocket", "Object")
         allowCompiling()

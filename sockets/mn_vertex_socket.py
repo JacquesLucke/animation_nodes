@@ -1,7 +1,7 @@
 import bpy
-from animation_nodes.mn_execution import nodePropertyChanged
-from animation_nodes.mn_node_base import *
-from animation_nodes.utils.mn_mesh_utils import Vertex
+from .. mn_execution import nodePropertyChanged
+from .. mn_node_base import *
+from .. utils.mn_mesh_utils import Vertex
 
 class mn_VertexSocket(mn_BaseSocket, mn_SocketProperties):
     bl_idname = "mn_VertexSocket"

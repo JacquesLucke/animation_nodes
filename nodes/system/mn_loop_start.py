@@ -1,10 +1,10 @@
 import bpy
 from bpy.types import Node
-from animation_nodes.mn_node_base import AnimationNode
-from animation_nodes.mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
-from animation_nodes.mn_utils import *
-from animation_nodes.utils.mn_node_utils import *
-from animation_nodes.sockets.mn_socket_info import *
+from ... mn_node_base import AnimationNode
+from ... mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
+from ... mn_utils import *
+from ... utils.mn_node_utils import *
+from ... sockets.mn_socket_info import *
 
 newListSocketName = "New List"
 newOptionSocketName = "New Option"
@@ -31,6 +31,7 @@ class mn_LoopStartNode(Node, AnimationNode):
     loopName = bpy.props.StringProperty(default = "Object Loop", update = loopNameChanged)
     nameIsChanging = bpy.props.BoolProperty(default = False)
     preset = bpy.props.StringProperty(default = "", update = presetChanged)
+    selectedSocketType = bpy.props.EnumProperty(name = "Selected Socket Type", items = getSocketNameItems, description = "Choose the type that the loop starter node will have")
     
     def init(self, context):
         forbidCompiling()
@@ -53,6 +54,23 @@ class mn_LoopStartNode(Node, AnimationNode):
         setting = newNode.settings.add()
         setting.name = "activeLoop"
         setting.value = repr(self.loopName)
+        
+    def draw_buttons_ext(self, context, layout):
+        col = layout.column(align = True)
+        col.label("New Socket")
+        col.prop(self, "selectedSocketType", text = "")
+        
+        row = col.row(align = True)
+        
+        operator = row.operator("mn.append_socket_to_loop_node", text = "List")
+        operator.nodeTreeName = self.id_data.name
+        operator.nodeName = self.name
+        operator.isListSocket = True
+        
+        operator = row.operator("mn.append_socket_to_loop_node", text = "Option")
+        operator.nodeTreeName = self.id_data.name
+        operator.nodeName = self.name
+        operator.isListSocket = False
         
     def execute(self, input):
         return input
@@ -186,3 +204,26 @@ class mn_LoopStartNode(Node, AnimationNode):
         
     def free(self):
         self.clearCallerNodes()
+
+        
+class AppendSocket(bpy.types.Operator):
+    bl_idname = "mn.append_socket_to_loop_node"
+    bl_label = "Append Socket to Loop Node"
+    bl_description = "Append a new socket to this loop"
+    
+    nodeTreeName = bpy.props.StringProperty()
+    nodeName = bpy.props.StringProperty()
+    isListSocket = bpy.props.BoolProperty()
+
+    def execute(self, context):
+        node = getNode(self.nodeTreeName, self.nodeName)
+        type = getSocketNameByDataType(node.selectedSocketType)
+        newSocket = node.newOutputSocket(type, "socket")
+        if self.isListSocket:
+            newSocket.loopAsList = True
+            index = node.outputs.find(newListSocketName)
+        else:
+            index = node.outputs.find(newOptionSocketName)
+        node.outputs.move(len(node.outputs)-1, index)
+        node.updateCallerNodes()
+        return {'FINISHED'}        

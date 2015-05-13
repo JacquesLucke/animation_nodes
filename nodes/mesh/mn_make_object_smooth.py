@@ -1,7 +1,7 @@
 import bpy
 from bpy.types import Node
-from animation_nodes.mn_node_base import AnimationNode
-from animation_nodes.mn_execution import allowCompiling, forbidCompiling
+from ... mn_node_base import AnimationNode
+from ... mn_execution import allowCompiling, forbidCompiling
 
 class mn_MakeObjectSmooth(Node, AnimationNode):
     bl_idname = "mn_MakeObjectSmooth"
@@ -21,7 +21,7 @@ class mn_MakeObjectSmooth(Node, AnimationNode):
         return {"Object" : "object"}
         
     def execute(self, object, smooth):
-        if getattr(object, "type") == "MESH":
+        if getattr(object, "type", "") == "MESH":
             for polygon in object.data.polygons:
                 polygon.use_smooth = smooth
         return object

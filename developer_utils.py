@@ -1,10 +1,9 @@
+import os
 import sys
 import pkgutil
 import importlib
 
-reload_event = False
-
-def setup_addon_modules(path, package_name):
+def setup_addon_modules(path, package_name, reload = False):
     """
     Imports and reloads all modules in this addon. 
     
@@ -15,7 +14,7 @@ def setup_addon_modules(path, package_name):
         module_names = []
         for importer, module_name, is_package in pkgutil.iter_modules([path]):
             if is_package:
-                sub_path = path + "\\" + module_name
+                sub_path = os.path.join(path, module_name)
                 sub_root = root + module_name + "."
                 module_names.extend(get_submodule_names(sub_path, sub_root))
             else: 
@@ -34,8 +33,6 @@ def setup_addon_modules(path, package_name):
     
     names = get_submodule_names()
     modules = import_submodules(names)        
-    if reload_event: 
+    if reload: 
         reload_modules(modules) 
     return modules
-    
-reload_event = True

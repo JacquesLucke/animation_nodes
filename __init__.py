@@ -23,7 +23,7 @@ bl_info = {
     "name":        "Animation Nodes",
     "description": "Node system for more flexible animations.",
     "author":      "Jacques Lucke",
-    "version":     (0, 0, 3),
+    "version":     (0, 0, 5),
     "blender":     (2, 7, 2),
     "location":    "Node Editor",
     "category":    "Node",
@@ -34,12 +34,9 @@ bl_info = {
     
 # load and reload submodules
 ##################################    
-
-import sys
-sys.modules["animation_nodes"] = sys.modules[__name__]
     
 from . import developer_utils
-modules = developer_utils.setup_addon_modules(__path__, __name__)
+modules = developer_utils.setup_addon_modules(__path__, __name__, "bpy" in locals())
 
        
        
@@ -86,20 +83,39 @@ class AnimationNodesSettings(bpy.types.PropertyGroup):
 # register
 ##################################
 
-from . mn_node_register import register_node_menu, unregister_node_menu
+addon_keymaps = []
+def register_keymaps():
+    global addon_keymaps
+    wm = bpy.context.window_manager
+    km = wm.keyconfigs.addon.keymaps.new(name = "Node Editor", space_type = "NODE_EDITOR")
+    kmi = km.keymap_items.new("mn.insert_node", type = "A", value = "PRESS", ctrl = True)
+    addon_keymaps.append(km)
+    
+def unregister_keymaps():
+    global addon_keymaps
+    wm = bpy.context.window_manager
+    for km in addon_keymaps:
+        for kmi in km.keymap_items:
+            km.keymap_items.remove(kmi)
+        wm.keyconfigs.addon.keymaps.remove(km)
+    addon_keymaps.clear()
+
+from . insert_nodes_menu import registerMenu, unregisterMenu
 from . mn_execution import register_handlers, unregister_handlers
 
 def register():
     bpy.utils.register_module(__name__)
     register_handlers()
-    register_node_menu()
+    registerMenu()
+    register_keymaps()
     bpy.types.Scene.mn_settings = PointerProperty(type = AnimationNodesSettings, name = "Animation Node Settings")
     
     print("Registered Animation Nodes with {} modules.".format(len(modules)))
     
 def unregister():
+    unregister_keymaps()
     bpy.utils.unregister_module(__name__)
     unregister_handlers()
-    unregister_node_menu()
+    unregisterMenu()
     
     print("Unregistered Animation Nodes")
