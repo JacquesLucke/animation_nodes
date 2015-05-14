@@ -47,5 +47,5 @@ class mn_FindCloseVertices(Node, AnimationNode):
                         edge = (foundIndex, searchIndex)
                     edges.append(edge)
                     added += 1
-                    if added > connections: break
+                    if added >= connections: break
         return list(set(edges))
