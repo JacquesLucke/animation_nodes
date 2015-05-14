@@ -2,9 +2,15 @@
 from mathutils import *
 
 import bpy
+import numpy
 
 
-# utility functions
+# utility properties & functions
+defaultParameter = 0.5
+defaultResolutionAnalysis = 128
+deltaParameter = 0.001
+deltaParameterImaginary = Math.defaultDeltaImaginary
+
 def IsCurve(blenderObject):
     if blenderObject is None: return False
     if blenderObject.type == 'CURVE': return True
@@ -19,12 +25,37 @@ def IsBezierCurve(blenderObject):
 
     return True
     
-deltaParameter = 0.001
 def ParameterIsZero(parameter):
     return parameter < deltaParameter
 
 def ParameterIsOne(parameter):
     return parameter + deltaParameter > 1.0
+
+def RootsToParameters(roots):
+    realRoots = []
+    for root in roots:
+        realRoot = Math.ComplexToRealFloat(root, deltaImaginary = deltaParameterImaginary)
+        if realRoot is None: continue
+        
+        realRoots.append(realRoot)
+    
+    rvParameters = []
+    doZero = False
+    doOne = False
+    for realRoot in realRoots:
+        if ParameterIsZero(realRoot):
+            doZero = True
+            continue
+        if ParameterIsOne(realRoot):
+            doOne = True
+            continue
+            
+        rvParameters.append(realRoot)
+        
+    if doZero: rvParameters.append(0.0)
+    if doOne: rvParameters.append(1.0)
+    
+    return rvParameters
 
 
 class BezierPoint:
@@ -107,6 +138,48 @@ class BezierSegment:
 
         return rvPoint
 
+    # http://jazzros.blogspot.be/2011/03/projecting-point-on-bezier-curve.html
+    def CalcProjectionByPoly5(self, point, matrix = Matrix.Identity):
+        p0 = (matrix * self.ctrlPnt0) - point
+        p1 = (matrix * self.ctrlPnt1) - point
+        p2 = (matrix * self.ctrlPnt2) - point
+        p3 = (matrix * self.ctrlPnt3) - point
+        
+        a = p3 + p2 * (-3.0) + p1 * (+3.0) - p0
+        b = p2 * (+3.0) + p1 * (-6.0) + p0 * (+3.0)
+        c = (p1 - p0) * (+3.0)
+        
+        q5 = a.dot(a) * 3.0
+        q4 = a.dot(b) * 5.0
+        q3 = a.dot(c) * 4.0 + b.dot(b) * 2.0
+        q2 = b.dot(c) * 3.0 + a.dot(p0) * 3.0
+        q1 = c.dot(c) + b.dot(p0) * 2.0
+        q0 = c.dot(p0)
+        
+        rvParameter = 0.0
+        rvDistance2 = -1.0
+        
+        poly = numpy.polynomial.Polynomial([q0, q1, q2, q3, q4, q5], [0.0, 1.0], [0.0, 1.0])
+        roots = poly.roots()
+        if len(roots) < 1:
+            return rvParameter, rvDistance2
+        
+        parameters = RootsToParameters(roots)
+        nrParameters = len(parameters)
+        if len(parameters) < 1: return rvParameter, rvDistance2
+        
+        rvParameter = parameters[0]
+        pointOnCurve = matrix * self.CalcPoint(rvParameter)
+        rvDistance2 = (pointOnCurve - point).length_squared
+        for iParameter in range(1, nrParameters):
+            currParameter = parameters[iParameter]
+            pointOnCurve = matrix * self.CalcPoint(currParameter)
+            currDistance2 = (pointOnCurve - point).length_squared
+            if currDistance2 < rvDistance2:
+                rvParameter = currParameter
+                rvDistance2 = currDistance2
+                
+        return rvParameter, rvDistance2
 
     def CalcLength(self, nrSamples = 2):
         nrSamplesFloat = float(nrSamples)
@@ -216,34 +289,72 @@ class BezierSpline:
 
         return None
 
+        
+    def CalcSegmentIndexAndParameter(self, splineParameter):
+        nrSegments = self.nrSegments
 
+        segmentIndex = int(nrSegments * splineParameter)
+        if segmentIndex < 0: segmentIndex = 0
+        if segmentIndex > (nrSegments - 1): segmentIndex = nrSegments - 1
+
+        segmentParameter = nrSegments * splineParameter - segmentIndex
+        if segmentParameter < 0.0: segmentParameter = 0.0
+        if segmentParameter > 1.0: segmentParameter = 1.0
+        
+        return segmentIndex, segmentParameter
+
+    def CalcParameter(self, segmentIndex, segmentParameter):
+        try: return (segmentParameter + float(segmentIndex)) / float(self.nrSegments)
+        except: return defaultParameter
+
+    def CalcPointOnSegment(self, segmentIndex, segmentParameter):
+        try: return self.segments[segmentIndex].CalcPoint(segmentParameter)
+        except: return None
+
+    def CalcDerivativeOnSegment(self, segmentIndex, segmentParameter):
+        try: return self.segments[segmentIndex].CalcDerivative(segmentParameter)
+        except: return None
+
+        
     def CalcPoint(self, parameter):
-        nrSegs = self.nrSegments
+        segmentIndex, segmentParameter = self.CalcSegmentIndexAndParameter(parameter)
 
-        segmentIndex = int(nrSegs * parameter)
-        if segmentIndex < 0: segmentIndex = 0
-        if segmentIndex > (nrSegs - 1): segmentIndex = nrSegs - 1
-
-        segmentParameter = nrSegs * parameter - segmentIndex
-        if segmentParameter < 0.0: segmentParameter = 0.0
-        if segmentParameter > 1.0: segmentParameter = 1.0
-
-        return self.segments[segmentIndex].CalcPoint(parameter = segmentParameter)
-
+        return self.CalcPointOnSegment(segmentIndex, segmentParameter)
+        
     def CalcDerivative(self, parameter):
-        nrSegs = self.nrSegments
+        segmentIndex, segmentParameter = self.CalcSegmentIndexAndParameter(parameter)
 
-        segmentIndex = int(nrSegs * parameter)
-        if segmentIndex < 0: segmentIndex = 0
-        if segmentIndex > (nrSegs - 1): segmentIndex = nrSegs - 1
+        return self.CalcDerivativeOnSegment(segmentIndex, segmentParameter)
 
-        segmentParameter = nrSegs * parameter - segmentIndex
-        if segmentParameter < 0.0: segmentParameter = 0.0
-        if segmentParameter > 1.0: segmentParameter = 1.0
+    def CalcProjectionByPoly5(self, point, matrix = Matrix.Identity):
+        rvSegmentIndex = 0
+        rvSegmentParameter = defaultParameter
+        rvDistance2 = -1.0
+        
+        segments = self.segments
+        nrSegments = len(segments)
+        if nrSegments < 1: return rvSegmentIndex, rvSegmentParameter, rvDistance2
+        
+        segment = segments[rvSegmentIndex]
+        rvSegmentParameter, rvDistance2 = segment.CalcProjectionByPoly5(point, matrix)
+        for iSegment in range(1, nrSegments):
+            segment = segments[iSegment]
+            currSegmentParameter, currDistance2 = segment.CalcProjectionByPoly5(point, matrix)
+            
+            if rvDistance2 < 0.0:
+                rvSegmentIndex = iSegment
+                rvSegmentParameter = currSegmentParameter
+                rvDistance2 = currDistance2
+                continue
+                
+            if currDistance2 < rvDistance2:
+                rvSegmentIndex = iSegment
+                rvSegmentParameter = currSegmentParameter
+                rvDistance2 = currDistance2
+                
+        return rvSegmentIndex, rvSegmentParameter, rvDistance2
 
-        return self.segments[segmentIndex].CalcDerivative(parameter = segmentParameter)
-
-
+        
     def CalcLength(self, resolution):
         try: nrSamplesPerSegment = int(resolution / self.nrSegments)
         except: nrSamplesPerSegment = 2
@@ -360,33 +471,49 @@ class Curve:
                 blBezPoint.handle_right = bezPoint.handle_right
 
 
-    def CalcSplineIndexAndParameter(self, parameter):
+    def CalcSplineIndexAndParameter(self, curveParameter):
         nrSpl = self.nrSplines
         if nrSpl < 1: return 0, 0.5
 
-        if nrSpl < 1:
+        if nrSpl is 1:
             splineIndex = 0
-            splineParameter = parameter
+            splineParameter = curveParameter
         else:
-            splineIndex = int(nrSpl * parameter)
+            splineIndex = int(nrSpl * curveParameter)
             if splineIndex < 0: splineIndex = 0
             if splineIndex > (nrSpl - 1): splineIndex = nrSpl - 1
 
-            splineParameter = nrSpl * parameter - splineIndex
+            splineParameter = nrSpl * curveParameter - splineIndex
             if splineParameter < 0.0: splineParameter = 0.0
             if splineParameter > 1.0: splineParameter = 1.0
 
         return splineIndex, splineParameter
 
+    def CalcParameter(self, splineIndex, splineParameter):
+        try: return (splineParameter + float(splineIndex)) / float(self.nrSplines)
+        except: return defaultParameter
+
+        
+    def CalcPointOnSpline(self, splineIndex, splineParameter):
+        try: return self.splines[splineIndex].CalcPoint(splineParameter)
+        except: return None
+
+    def CalcPointOnSplineWorld(self, splineIndex, splineParameter):
+        pointOnSpline = self.CalcPointOnSpline(splineIndex, splineParameter)
+        if pointOnSpline is None: return None
+        
+        return self.worldMatrix * pointOnSpline
+    
     def CalcPoint(self, parameter):
         splineIndex, splineParameter = self.CalcSplineIndexAndParameter(parameter)
 
-        spl = self.splines[splineIndex]
-        return spl.CalcPoint(splineParameter)
+        return self.CalcPointOnSpline(splineIndex, splineParameter)
 
     def CalcPointWorld(self, parameter):
-        return self.worldMatrix * self.CalcPoint(parameter)
+        splineIndex, splineParameter = self.CalcSplineIndexAndParameter(parameter)
 
+        return self.CalcPointOnSplineWorld(splineIndex, splineParameter)
+        
     def Sample(self, resolution):
         rvList = []
 
@@ -407,14 +534,26 @@ class Curve:
 
         return rvList
 
+        
+    def CalcDerivativeOnSpline(self, splineIndex, splineParameter):
+        try: return self.splines[splineIndex].CalcDerivative(splineParameter)
+        except: return None
+
+    def CalcDerivativeOnSplineWorld(self, splineIndex, splineParameter):
+        derivativeOnSpline = self.CalcDerivativeOnSpline(splineIndex, splineParameter)
+        if derivativeOnSpline is None: return None
+        
+        return self.worldMatrix3x3 * derivativeOnSpline
+
     def CalcDerivative(self, parameter):
         splineIndex, splineParameter = self.CalcSplineIndexAndParameter(parameter)
 
-        spl = self.splines[splineIndex]
-        return spl.CalcDerivative(splineParameter)
+        return self.CalcDerivativeOnSpline(splineIndex, splineParameter)
 
     def CalcDerivativeWorld(self, parameter):
-        return self.worldMatrix3x3 * self.CalcDerivative(parameter)
+        splineIndex, splineParameter = self.CalcSplineIndexAndParameter(parameter)
+
+        return self.CalcDerivativeOnSplineWorld(splineIndex, splineParameter)
 
     def SampleDerivatives(self, resolution):
         rvList = []
@@ -452,6 +591,36 @@ class Curve:
                 rvParameter = currParameter
                 
         return rvParameter
+
+    def CalcProjectionByPoly5(self, point):
+        rvSplineIndex = 0
+        rvSplineParameter = defaultParameter
+        rvDistance2 = -1.0
+        
+        nrSplines = self.nrSplines
+        if nrSplines < 1: return rvSplineIndex, rvSplineParameter, rvDistance2
+        
+        worldMatrix = self.worldMatrix
+        spline = self.splines[rvSplineIndex]
+        currSegmentIndex, currSegmentParameter, currDistance2 = spline.CalcProjectionByPoly5(point, worldMatrix)
+        rvSplineParameter = spline.CalcParameter(currSegmentIndex, currSegmentParameter)
+        rvDistance2 = currDistance2
+        for iSpline in range(1, nrSplines):
+            spline = self.splines[iSpline]
+            currSegmentIndex, currSegmentParameter, currDistance2 = spline.CalcProjectionByPoly5(point, worldMatrix)
+            
+            if rvDistance2 < 0.0:
+                rvSplineIndex = iSpline
+                rvSplineParameter = spline.CalcParameter(currSegmentIndex, currSegmentParameter)
+                rvDistance2 = currDistance2
+                continue
+                
+            if currDistance2 < rvDistance2:
+                rvSplineIndex = iSpline
+                rvSplineParameter = spline.CalcParameter(currSegmentIndex, currSegmentParameter)
+                rvDistance2 = currDistance2
+                
+        return rvSplineIndex, rvSplineParameter, rvDistance2
         
 
     def CalcLength(self):

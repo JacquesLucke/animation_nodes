@@ -212,12 +212,11 @@ class CurveMenu(bpy.types.Menu):
         insertNode(layout, "mn_CurveInfoNode", "Curve Info")                                              
         insertNode(layout, "mn_CurveEvaluatorNode", "Curve Evaluator")                                              
         insertNode(layout, "mn_CurvePointProjectorNode", "Curve Point Projector")                                              
+        layout.separator()                                    
         insertNode(layout, "mn_CurveLoftNode", "Loft")                                              
         insertNode(layout, "mn_CurveRevolveNode", "Revolve")                                              
         insertNode(layout, "mn_CurveSweepNode", "Sweep")                                              
-        insertNode(layout, "mn_CurveSweepAndMorphNode", "Sweep & Morph")                                              
         insertNode(layout, "mn_CurveBirailNode", "Birail")                                              
-        insertNode(layout, "mn_CurveBirailAndMorphNode", "Birail & Morph")                                              
                                   
 class SoundMenu(bpy.types.Menu):
     bl_idname = "mn.sound_menu"

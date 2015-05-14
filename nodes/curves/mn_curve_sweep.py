@@ -12,10 +12,11 @@ class mn_CurveSweepNode(Node, AnimationNode):
 
     def init(self, context):
         forbidCompiling()
-        self.inputs.new("mn_IntegerSocket", "Resolution Along").number = 16
-        self.inputs.new("mn_IntegerSocket", "Resolution Across").number = 16
+        self.inputs.new("mn_IntegerSocket", "Resolution Along").number = Surfaces.defaultResolutionSynthesis
+        self.inputs.new("mn_IntegerSocket", "Resolution Across").number = Surfaces.defaultResolutionSynthesis
         self.inputs.new("mn_ObjectSocket", "Rail")
         self.inputs.new("mn_ObjectSocket", "Profile")
+        self.inputs.new("mn_ObjectSocket", "End Profile (Optional)")
         self.outputs.new("mn_VectorListSocket", "Vertex World Locations")
         self.outputs.new("mn_PolygonIndicesListSocket", "Polygon Indices")
         allowCompiling()
@@ -24,13 +25,14 @@ class mn_CurveSweepNode(Node, AnimationNode):
         return {"Resolution Along" : "resAlong",
                 "Resolution Across" : "resAcross",
                 "Rail" : "rail",
-                "Profile" : "profile"}
+                "Profile" : "profile",
+                "End Profile (Optional)" : "endProfile"}
 
     def getOutputSocketNames(self):
         return {"Vertex World Locations" : "vertices",
                 "Polygon Indices" : "polygons"}
 
-    def canExecute(self, resAlong, resAcross, rail, profile):
+    def canExecute(self, resAlong, resAcross, rail, profile, endProfile):
         if resAlong < 2: return False
         if resAcross < 2: return False
         if not Curves.IsBezierCurve(rail): return False
@@ -38,15 +40,19 @@ class mn_CurveSweepNode(Node, AnimationNode):
 
         return True
 
-    def execute(self, resAlong, resAcross, rail, profile):
+    def execute(self, resAlong, resAcross, rail, profile, endProfile):
         vertices = []
         polygons = []
-        if not self.canExecute(resAlong, resAcross, rail, profile):
+        if not self.canExecute(resAlong, resAcross, rail, profile, endProfile):
             return vertices, polygons
 
         try:
-            sweptSurface = Surfaces.SweptSurface(rail, profile)
-            vertices, polygons = sweptSurface.Calculate(resAlong, resAcross)
+            if not Curves.IsBezierCurve(endProfile):
+                sweptSurface = Surfaces.SweptSurface(rail, profile)
+                vertices, polygons = sweptSurface.Calculate(resAlong, resAcross)
+            else:
+                sweptAndMorphedSurface = Surfaces.SweptAndMorphedSurface(rail, profile, endProfile)
+                vertices, polygons = sweptAndMorphedSurface.Calculate(resAlong, resAcross)
         except: pass
 
         return vertices, polygons

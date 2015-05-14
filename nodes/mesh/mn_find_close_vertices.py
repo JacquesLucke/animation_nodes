@@ -41,11 +41,11 @@ class mn_FindCloseVertices(Node, AnimationNode):
             added = 0
             for (vector, foundIndex, distance) in kdTree.find_range(vertices[searchIndex], maxDistance):
                 if searchIndex != foundIndex and distance > minDistance:
+                    if added >= connections: break
                     if foundIndex > searchIndex:
                         edge = (searchIndex, foundIndex)
                     else:
                         edge = (foundIndex, searchIndex)
                     edges.append(edge)
                     added += 1
-                    if added > connections: break
         return list(set(edges))
