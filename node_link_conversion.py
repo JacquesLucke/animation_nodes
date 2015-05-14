@@ -137,21 +137,20 @@ def insertLinkedNode(nodeTree, nodeType, origin, target):
     insertBasicLinking(nodeTree, origin, node, target)
     return node
     
+def insertNode(nodeTree, nodeType, leftSocket, rightSocket):
+    nodes = insertNodes(nodeTree, [nodeType], leftSocket, rightSocket)
+    return nodes[0]
+    
 def insertNodes(nodeTree, nodeTypes, leftSocket, rightSocket):
     center = getSocketCenter(leftSocket, rightSocket)
     amount = len(nodeTypes)
     nodes = []
     for i, nodeType in enumerate(nodeTypes):
         node = nodeTree.nodes.new(nodeType)
+        node.select = False
         node.location = center + Vector((180 * (i - (amount - 1) / 2), 0))
         nodes.append(node)
     return nodes
-    
-def insertNode(nodeTree, nodeType, leftSocket, rightSocket):
-    node = nodeTree.nodes.new(nodeType)
-    node.select = False
-    node.location = getSocketCenter(leftSocket, rightSocket)
-    return node
     
 def insertBasicLinking(nodeTree, originSocket, node, targetSocket):
     nodeTree.links.new(node.inputs[0], originSocket)
