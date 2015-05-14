@@ -25,7 +25,6 @@ class mn_ParticleInfo(Node, AnimationNode):
         self.outputs.new("mn_FloatSocket", "Lifetime").hide = True
         self.outputs.new("mn_FloatSocket", "Birth Time").hide = True
         self.outputs.new("mn_FloatSocket", "Die Time").hide = True
-        
         self.outputs.new("mn_VectorSocket", "Previous Location").hide = True
         self.outputs.new("mn_VectorSocket", "Previous Rotation").hide = True
         self.outputs.new("mn_VectorSocket", "Previous Velocity").hide = True
