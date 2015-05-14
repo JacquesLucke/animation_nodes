@@ -25,6 +25,11 @@ class mn_ParticleInfo(Node, AnimationNode):
         self.outputs.new("mn_FloatSocket", "Lifetime").hide = True
         self.outputs.new("mn_FloatSocket", "Birth Time").hide = True
         self.outputs.new("mn_FloatSocket", "Die Time").hide = True
+        
+        self.outputs.new("mn_VectorSocket", "Previous Location").hide = True
+        self.outputs.new("mn_VectorSocket", "Previous Rotation").hide = True
+        self.outputs.new("mn_VectorSocket", "Previous Velocity").hide = True
+        self.outputs.new("mn_VectorSocket", "Previous Angular Velocity").hide = True
         allowCompiling()
         
     def getInputSocketNames(self):
@@ -41,7 +46,11 @@ class mn_ParticleInfo(Node, AnimationNode):
                 "Is Visible" : "isVisible",
                 "Lifetime" : "lifetime",
                 "Birth Time" : "birthTime",
-                "Die Time" : "dieTime"}
+                "Die Time" : "dieTime",
+                "Previous Location" : "previousLocation",
+                "Previous Rotation" : "previousRotation",
+                "Previous Velocity" : "previousVelocity",
+                "Previous Angular Velocity" : "previousAngularVelocity"}
         
     def useInLineExecution(self):
         return True
@@ -62,6 +71,10 @@ class mn_ParticleInfo(Node, AnimationNode):
         if outputUse["Birth Time"]: codeLines.append("    $birthTime$ = %particle%.birth_time")
         if outputUse["Die Time"]: codeLines.append("    $dieTime$ = %particle%.die_time")
         if outputUse["Age"]: codeLines.append("    $age$ = max(0, scene.frame_current - %particle%.birth_time)")
+        if outputUse["Previous Location"]: codeLines.append("    $previousLocation$ = %particle%.prev_location")
+        if outputUse["Previous Rotation"]: codeLines.append("    $previousRotation$ = mathutils.Vector(%particle%.prev_rotation.to_euler())")
+        if outputUse["Previous Velocity"]: codeLines.append("    $previousVelocity$ = %particle%.prev_velocity")
+        if outputUse["Previous Angular Velocity"]: codeLines.append("    $previousAngularVelocity$ = %particle%.prev_angular_velocity")
         codeLines.append("    pass")
         
         codeLines.append("else:")
@@ -77,6 +90,10 @@ class mn_ParticleInfo(Node, AnimationNode):
         if outputUse["Birth Time"]: codeLines.append("    $birthTime$ = 0")
         if outputUse["Die Time"]: codeLines.append("    $dieTime$ = 0")
         if outputUse["Age"]: codeLines.append("    $age$ = 0")
+        if outputUse["Previous Location"]: codeLines.append("    $previousLocation$ = mathutils.Vector((0, 0, 0))")
+        if outputUse["Previous Rotation"]: codeLines.append("    $previousRotation$ = mathutils.Vector((0, 0, 0))")
+        if outputUse["Previous Velocity"]: codeLines.append("    $previousVelocity$ = mathutils.Vector((0, 0, 0))")
+        if outputUse["Previous Angular Velocity"]: codeLines.append("    $previousAngularVelocity$ = mathutils.Vector((0, 0, 0))")
         codeLines.append("    pass")        
         
         return "\n".join(codeLines)
