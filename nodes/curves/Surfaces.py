@@ -4,6 +4,11 @@ import bmesh
 from . import Math
 from . import Curves
 
+
+# utility properties & functions
+defaultResolutionSynthesis = 16
+
+
 class LoftedSurface:
     def __init__(self, blenderObjectRail1, blenderObjectRail2):
         self.curveRail1 = Curves.Curve(blenderObjectRail1)
@@ -96,6 +101,57 @@ class RevolvedProjectedSurface:
         for iAlong in range(resAlong):
             pointProfile = worldPointsProfile[iAlong]
             parAxis = self.curveAxis.CalcProjection(pointProfile, resProjection)
+            worldDerivativeAxis = self.curveAxis.CalcDerivativeWorld(parAxis)
+            worldDerivativesAxis.append(worldDerivativeAxis)
+            
+            worldPointAxis = self.curveAxis.CalcPointWorld(parAxis)
+            if Curves.ParameterIsZero(parAxis): worldPointAxis = Math.CalcProjectionPointToLine(pointProfile, worldPointAxis, worldDerivativeAxis.normalized())
+            elif Curves.ParameterIsOne(parAxis): worldPointAxis = Math.CalcProjectionPointToLine(pointProfile, worldPointAxis, worldDerivativeAxis.normalized())
+            worldPointsAxis.append(worldPointAxis)
+        
+        rvVertices = []
+        for iAlong in range(resAlong):
+            center = worldPointsAxis[iAlong]
+            pointProfile = worldPointsProfile[iAlong]
+            dirX = (pointProfile - center)
+            radius = dirX.magnitude
+            dirY = worldDerivativesAxis[iAlong].cross(dirX).normalized()
+            dirX.normalize()
+
+            currPointsAcross = Math.GenerateCircle(center, radius, dirX, dirY, resAcross)
+            for iAcross in range(resAcross):
+                rvVertices.append(currPointsAcross[iAcross])
+
+        rvFaces = []
+        for iAlong in range(resAlong - 1):
+            currAlong = iAlong * resAcross
+            nextAlong = currAlong + resAcross
+            for iAcross in range(resAcross - 1):
+                indexBL = currAlong + iAcross
+                indexTL = indexBL + 1
+                indexBR = nextAlong + iAcross
+                indexTR = indexBR + 1
+
+                rvFaces.append([indexBL, indexBR, indexTR, indexTL])
+
+        for iAlong in range(resAlong - 1):
+            indexTL = iAlong * resAcross
+            indexTR = indexTL + resAcross
+            indexBL = indexTL + resAcross - 1
+            indexBR = indexTR + resAcross - 1
+
+            rvFaces.append([indexBL, indexBR, indexTR, indexTL])
+
+        return rvVertices, rvFaces
+
+    def CalculateAnalytic(self, resAlong, resAcross):
+        worldPointsProfile = self.curveProfile.SampleWorld(resAlong)
+        worldPointsAxis = []
+        worldDerivativesAxis = []
+        for iAlong in range(resAlong):
+            pointProfile = worldPointsProfile[iAlong]
+            currSplineIndex, currSplineParameter, currDistance2 = self.curveAxis.CalcProjectionByPoly5(pointProfile)
+            parAxis = self.curveAxis.CalcParameter(currSplineIndex, currSplineParameter)
             worldDerivativeAxis = self.curveAxis.CalcDerivativeWorld(parAxis)
             worldDerivativesAxis.append(worldDerivativeAxis)
             
