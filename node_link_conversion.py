@@ -36,6 +36,16 @@ class LinkCorrection:
     # subclasses need a check and insert function
     pass
     
+class ConvertParticleSystemToParticle(LinkCorrection):
+    def check(self, origin, target):
+        return origin.dataType == "Particle System" and target.dataType == "Particle"
+    def insert(self, nodeTree, origin, target):
+        systemInfo, listElement = insertNodes(nodeTree, ["mn_ParticleSystemInfo", "mn_GetListElementNode"], origin, target)
+        listElement.generateSockets(listIdName = "mn_ParticleListSocket")
+        nodeTree.links.new(systemInfo.inputs[0], origin)
+        nodeTree.links.new(listElement.inputs[0], systemInfo.outputs[0])
+        nodeTree.links.new(listElement.outputs[0], target)
+    
 class ConvertListToElement(LinkCorrection):
     def check(self, origin, target):
         return getBaseSocketType(origin.bl_idname) == target.bl_idname
@@ -72,14 +82,7 @@ class ConvertVertexLocationsToMesh(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType == "Vector List" and target.dataType == "Mesh"
     def insert(self, nodeTree, origin, target):
-        center = getSocketCenter(origin, target)
-            
-        toMeshData = nodeTree.nodes.new("mn_CombineMeshData")
-        toMesh = nodeTree.nodes.new("mn_CreateMeshFromData")
-        
-        toMeshData.location = center - Vector((90, 0))
-        toMesh.location = center + Vector((90, 0))
-        
+        toMeshData, toMesh = insertNodes(nodeTree, ["mn_CombineMeshData", "mn_CreateMeshFromData"], origin, target)
         nodeTree.links.new(toMeshData.inputs[0], origin)
         nodeTree.links.new(toMesh.inputs[0], toMeshData.outputs[0])
         nodeTree.links.new(toMesh.outputs[0], target)
@@ -134,11 +137,20 @@ def insertLinkedNode(nodeTree, nodeType, origin, target):
     insertBasicLinking(nodeTree, origin, node, target)
     return node
     
+def insertNodes(nodeTree, nodeTypes, leftSocket, rightSocket):
+    center = getSocketCenter(leftSocket, rightSocket)
+    amount = len(nodeTypes)
+    nodes = []
+    for i, nodeType in enumerate(nodeTypes):
+        node = nodeTree.nodes.new(nodeType)
+        node.location = center + Vector((180 * (i - (amount - 1) / 2), 0))
+        nodes.append(node)
+    return nodes
+    
 def insertNode(nodeTree, nodeType, leftSocket, rightSocket):
     node = nodeTree.nodes.new(nodeType)
     node.select = False
-    location = getSocketCenter(leftSocket, rightSocket)
-    node.location = location
+    node.location = getSocketCenter(leftSocket, rightSocket)
     return node
     
 def insertBasicLinking(nodeTree, originSocket, node, targetSocket):
@@ -149,6 +161,7 @@ def getSocketCenter(socket1, socket2):
     return (socket1.node.location + socket2.node.location) / 2
     
 linkCorrectors = [
+    ConvertParticleSystemToParticle(),
     ConvertListToElement(),
     ConvertMeshDataToMesh(),
     ConvertMeshDataToVertexLocations(),
