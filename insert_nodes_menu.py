@@ -194,6 +194,7 @@ class MeshMenu(bpy.types.Menu):
         insertNode(layout, "mn_SetMeshOnObject", "Set Mesh on Object") 
         layout.separator()                                    
         insertNode(layout, "mn_MeshGenerationVoronoiNode", "Generate Voronoi Diagram") 
+        insertNode(layout, "mn_MeshGenerationHeightFunctionNode", "Generate Height Function") 
         
 class CurveMenu(bpy.types.Menu):
     bl_idname = "mn.curve_menu"
