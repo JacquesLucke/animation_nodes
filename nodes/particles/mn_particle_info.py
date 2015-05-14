@@ -15,16 +15,16 @@ class mn_ParticleInfo(Node, AnimationNode):
         self.inputs.new("mn_ParticleSocket", "Particle")
         self.outputs.new("mn_VectorSocket", "Location")
         self.outputs.new("mn_VectorSocket", "Rotation")
-        self.outputs.new("mn_VectorSocket", "Velocity")
-        self.outputs.new("mn_VectorSocket", "Angular Velocity")
-        self.outputs.new("mn_FloatSocket", "Size")
-        self.outputs.new("mn_StringSocket", "Alive State")
-        self.outputs.new("mn_BooleanSocket", "Is Exist")
-        self.outputs.new("mn_BooleanSocket", "Is Visible")
-        self.outputs.new("mn_FloatSocket", "Lifetime")
-        self.outputs.new("mn_FloatSocket", "Birth Time")
-        self.outputs.new("mn_FloatSocket", "Die Time")
         self.outputs.new("mn_FloatSocket", "Age")
+        self.outputs.new("mn_VectorSocket", "Velocity").hide = True
+        self.outputs.new("mn_VectorSocket", "Angular Velocity").hide = True
+        self.outputs.new("mn_FloatSocket", "Size").hide = True
+        self.outputs.new("mn_StringSocket", "Alive State").hide = True
+        self.outputs.new("mn_BooleanSocket", "Is Exist").hide = True
+        self.outputs.new("mn_BooleanSocket", "Is Visible").hide = True
+        self.outputs.new("mn_FloatSocket", "Lifetime").hide = True
+        self.outputs.new("mn_FloatSocket", "Birth Time").hide = True
+        self.outputs.new("mn_FloatSocket", "Die Time").hide = True
         allowCompiling()
         
     def getInputSocketNames(self):
@@ -32,6 +32,7 @@ class mn_ParticleInfo(Node, AnimationNode):
     def getOutputSocketNames(self):
         return {"Location" : "location",
                 "Rotation" : "rotation",
+                "Age" : "age",
                 "Velocity" : "velocity",
                 "Angular Velocity" : "angularVelocity",
                 "Size" : "size",
@@ -40,8 +41,7 @@ class mn_ParticleInfo(Node, AnimationNode):
                 "Is Visible" : "isVisible",
                 "Lifetime" : "lifetime",
                 "Birth Time" : "birthTime",
-                "Die Time" : "dieTime",
-                "Age" : "age"}
+                "Die Time" : "dieTime"}
         
     def useInLineExecution(self):
         return True
