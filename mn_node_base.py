@@ -92,6 +92,11 @@ def isCustomNameUsed(node, name):
     return False
     
     
+def getSocketVisibility(socket):
+    return not socket.hide
+def setSocketVisibility(socket, value):
+    socket.hide = not value
+    
 class mn_SocketProperties:
     editableCustomName = BoolProperty(default = False)
     customName = StringProperty(default = "custom name", update = customNameChanged)
@@ -103,6 +108,7 @@ class mn_SocketProperties:
     callNodeToRemove = BoolProperty(default = False)
     callNodeWhenCustomNameChanged = BoolProperty(default = False)
     loopAsList = BoolProperty(default = False)
+    show = BoolProperty(default = True, get = getSocketVisibility, set = setSocketVisibility)
     
         
 class RemoveSocketOperator(bpy.types.Operator):
