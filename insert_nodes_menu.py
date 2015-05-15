@@ -77,6 +77,7 @@ class VectorMenu(bpy.types.Menu):
         insertNode(layout, "mn_VectorDistanceNode", "Distance")       
         insertNode(layout, "mn_TransfromVector", "Transform")       
         insertNode(layout, "mn_VectorMathNode", "Math")       
+        insertNode(layout, "mn_VectorFromValue", "From Value")       
         insertNode(layout, "mn_DirectionToRotation", "Direction to Rotation")       
                 
 class MatrixMenu(bpy.types.Menu):
