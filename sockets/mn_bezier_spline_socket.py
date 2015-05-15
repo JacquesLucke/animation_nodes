@@ -10,11 +10,23 @@ class mn_BezierSplineSocket(mn_BaseSocket, mn_SocketProperties):
     allowedInputTypes = ["Bezier Spline"]
     drawColor = (0.5, 0.7, 0.18, 1)
     
+    objectName = bpy.props.StringProperty(default = "")
+    
     def drawInput(self, layout, node, text):
-        layout.label(text)
+        row = layout.row(align = True)
+        row.prop_search(self, "objectName",  bpy.context.scene, "objects", icon="NONE", text = "")
+        props = row.operator("mn.assign_active_object_to_socket", text = "", icon = "EYEDROPPER")
+        props.nodeTreeName = node.id_data.name
+        props.nodeName = node.name
+        props.isOutput = self.is_output
+        props.socketName = self.name
+        props.target = "objectName"
         
     def getValue(self):
-        return BezierSpline()
+        try:
+            object = bpy.data.objects.get(self.objectName)
+            return BezierSpline.fromBlenderSpline(object.data.splines[0])
+        except: return BezierSpline()
         
     def setStoreableValue(self, data):
         pass
