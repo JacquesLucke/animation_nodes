@@ -6,7 +6,9 @@ listChains = [
     ["mn_VertexSocket", "mn_VertexListSocket"],
     ["mn_PolygonSocket", "mn_PolygonListSocket"],
     ["mn_EdgeIndicesSocket", "mn_EdgeIndicesListSocket"],
-    ["mn_PolygonIndicesSocket", "mn_PolygonIndicesListSocket"] ]
+    ["mn_PolygonIndicesSocket", "mn_PolygonIndicesListSocket"],
+    ["mn_ParticleSocket", "mn_ParticleListSocket"],
+    ["mn_ParticleSystemSocket", "mn_ParticleSystemListSocket"]]
     
 def getBaseSocketType(socketType):
     for listChain in listChains:

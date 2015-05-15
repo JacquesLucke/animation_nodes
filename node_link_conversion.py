@@ -36,6 +36,16 @@ class LinkCorrection:
     # subclasses need a check and insert function
     pass
     
+class ConvertParticleSystemToParticle(LinkCorrection):
+    def check(self, origin, target):
+        return origin.dataType == "Particle System" and target.dataType == "Particle"
+    def insert(self, nodeTree, origin, target):
+        systemInfo, listElement = insertNodes(nodeTree, ["mn_ParticleSystemInfo", "mn_GetListElementNode"], origin, target)
+        listElement.generateSockets(listIdName = "mn_ParticleListSocket")
+        nodeTree.links.new(systemInfo.inputs[0], origin)
+        nodeTree.links.new(listElement.inputs[0], systemInfo.outputs[0])
+        nodeTree.links.new(listElement.outputs[0], target)
+    
 class ConvertListToElement(LinkCorrection):
     def check(self, origin, target):
         return getBaseSocketType(origin.bl_idname) == target.bl_idname
@@ -60,21 +70,21 @@ class ConvertVertexLocationsToMeshData(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType == "Vector List" and target.dataType == "Mesh Data"
     def insert(self, nodeTree, origin, target):
-        insertLinkedNode(nodeTree, "mn_CombineMeshData", origin, target)        
+        insertLinkedNode(nodeTree, "mn_CombineMeshData", origin, target)    
 
-class ConvertVertexLocationsToMesh(LinkCorrection):
+class ConvertPolygonListIndicesToEdgeListIndices(LinkCorrection):
     def check(self, origin, target):
-        return origin.dataType == "Vector List" and target.dataType == "Mesh"
+        return origin.dataType == "Polygon Indices List" and target.dataType == "Edge Indices List"
     def insert(self, nodeTree, origin, target):
-        center = getSocketCenter(origin, target)
-            
-        toMeshData = nodeTree.nodes.new("mn_CombineMeshData")
-        toMesh = nodeTree.nodes.new("mn_CreateMeshFromData")
-        
-        toMeshData.location = center - Vector((90, 0))
-        toMesh.location = center + Vector((90, 0))
-        
-        nodeTree.links.new(toMeshData.inputs[0], origin)
+        insertLinkedNode(nodeTree, "mn_EdgesOfPolygons", origin, target)
+
+class ConvertSeparatedMathDataToMesh(LinkCorrection):
+    separatedMeshDataTypes = ["Vector List", "Edge Indices List", "Polygon Indices List"]
+    def check(self, origin, target):
+        return origin.dataType in self.separatedMeshDataTypes and target.dataType == "Mesh"
+    def insert(self, nodeTree, origin, target):
+        toMeshData, toMesh = insertNodes(nodeTree, ["mn_CombineMeshData", "mn_CreateMeshFromData"], origin, target)
+        nodeTree.links.new(toMeshData.inputs[self.separatedMeshDataTypes.index(origin.dataType)], origin)
         nodeTree.links.new(toMesh.inputs[0], toMeshData.outputs[0])
         nodeTree.links.new(toMesh.outputs[0], target)
            
@@ -129,11 +139,19 @@ def insertLinkedNode(nodeTree, nodeType, origin, target):
     return node
     
 def insertNode(nodeTree, nodeType, leftSocket, rightSocket):
-    node = nodeTree.nodes.new(nodeType)
-    node.select = False
-    location = getSocketCenter(leftSocket, rightSocket)
-    node.location = location
-    return node
+    nodes = insertNodes(nodeTree, [nodeType], leftSocket, rightSocket)
+    return nodes[0]
+    
+def insertNodes(nodeTree, nodeTypes, leftSocket, rightSocket):
+    center = getSocketCenter(leftSocket, rightSocket)
+    amount = len(nodeTypes)
+    nodes = []
+    for i, nodeType in enumerate(nodeTypes):
+        node = nodeTree.nodes.new(nodeType)
+        node.select = False
+        node.location = center + Vector((180 * (i - (amount - 1) / 2), 0))
+        nodes.append(node)
+    return nodes
     
 def insertBasicLinking(nodeTree, originSocket, node, targetSocket):
     nodeTree.links.new(node.inputs[0], originSocket)
@@ -143,11 +161,13 @@ def getSocketCenter(socket1, socket2):
     return (socket1.node.location + socket2.node.location) / 2
     
 linkCorrectors = [
+    ConvertParticleSystemToParticle(),
     ConvertListToElement(),
     ConvertMeshDataToMesh(),
     ConvertMeshDataToVertexLocations(),
     ConvertVertexLocationsToMeshData(),
-    ConvertVertexLocationsToMesh(),
+    ConvertPolygonListIndicesToEdgeListIndices(),
+    ConvertSeparatedMathDataToMesh(),
     ConvertToVector(),
     ConvertVectorToNumber(),
     ConvertTextBlockToString(),

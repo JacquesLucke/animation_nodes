@@ -30,7 +30,6 @@ class mn_TimeInfoNode(Node, AnimationNode):
         return True
     def getInLineExecutionString(self, outputUse):
         codeLines = []
-        codeLines.append("scene = bpy.context.scene")
         if outputUse["Frame"]: codeLines.append("$frame$ = scene.frame_current_final")
         if outputUse["Start Frame"]: codeLines.append("$start_frame$ = scene.frame_start")
         if outputUse["End Frame"]: codeLines.append("$end_frame$ = scene.frame_end")

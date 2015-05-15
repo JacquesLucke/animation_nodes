@@ -92,6 +92,13 @@ def isCustomNameUsed(node, name):
     return False
     
     
+def getSocketVisibility(socket):
+    return not socket.hide
+def setSocketVisibility(socket, value):
+    socket.hide = not value
+    
+bpy.types.NodeSocket.show = BoolProperty(default = True, get = getSocketVisibility, set = setSocketVisibility)    
+    
 class mn_SocketProperties:
     editableCustomName = BoolProperty(default = False)
     customName = StringProperty(default = "custom name", update = customNameChanged)
