@@ -187,6 +187,7 @@ class MeshMenu(bpy.types.Menu):
         insertNode(layout, "mn_CreateMeshFromData", "Mesh from Data")                                   
         insertNode(layout, "mn_SetMeshOnObject", "Set Mesh on Object")
         layout.menu("mn.mesh_finalizing_menu", text = "Mesh Finalizing")
+        layout.menu("mn.mesh_generators_menu", text = "Mesh Generators")
         layout.separator()                                  
         insertNode(layout, "mn_VertexInfo", "Vertex Info")                                     
         insertNode(layout, "mn_PolygonInfo", "Polygon Info")                                     
@@ -211,6 +212,13 @@ class MeshFinalizingMenu(bpy.types.Menu):
         insertNode(layout, "mn_MeshRemoveDoubles", "Remove Doubles")         
         insertNode(layout, "mn_MeshRecalculateFaceNormals", "Recalculate Normals")         
         insertNode(layout, "mn_MakeObjectSmooth", "Smooth Object")         
+
+class MeshGeneratorsMenu(bpy.types.Menu):
+    bl_idname = "mn.mesh_generators_menu"
+    bl_label = "Mesh Generators Menu"
+    
+    def draw(self, context):
+        layout = self.layout
         
 class CurveMenu(bpy.types.Menu):
     bl_idname = "mn.curve_menu"
