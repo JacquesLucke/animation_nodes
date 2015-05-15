@@ -323,7 +323,7 @@ class CreateNodeTree(bpy.types.Operator):
     bl_options = {"REGISTER"}
     
     def execute(self, context):
-        nodeTree = bpy.data.node_groups.new(name = "Node Tree", type = "mn_AnimationNodeTree")
+        nodeTree = bpy.data.node_groups.new(name = "NodeTree", type = "mn_AnimationNodeTree")
         context.space_data.node_tree = nodeTree
         context.area.tag_redraw()
         return {"FINISHED"}
