@@ -26,6 +26,7 @@ def drawMenu(self, context):
     layout.menu("mn.sound_menu", text = "Sound")
     layout.menu("mn.material_menu", text = "Material")
     layout.menu("mn.animation_menu", text = "Animation")
+    layout.menu("mn.particles_menu", text = "Particles")
     layout.separator()
     layout.menu("mn.script_menu", text = "Script")
     layout.menu("mn.debug_menu", text = "Debug")
@@ -249,6 +250,18 @@ class AnimationMenu(bpy.types.Menu):
         insertNode(layout, "mn_InterpolationNode", "Interpolation")     
         insertNode(layout, "mn_EvaluateInterpolation", "Evaluate Interpolation")     
         insertNode(layout, "mn_MixInterpolation", "Mix Interpolations")   
+        
+class ParticlesMenu(bpy.types.Menu):
+    bl_idname = "mn.particles_menu"
+    bl_label = "Particles Menu"
+    
+    def draw(self, context):
+        layout = self.layout
+        insertNode(layout, "mn_ParticleSystemsInput", "Particle Systems Input")              
+        insertNode(layout, "mn_ParticleSystemInfo", "Particle Systems Info")              
+        insertNode(layout, "mn_FilterParticles", "Filter Particles")              
+        insertNode(layout, "mn_ParticlesInfo", "Particles Info")              
+        insertNode(layout, "mn_ParticleInfo", "Particle Info")              
         
 class ScriptMenu(bpy.types.Menu):
     bl_idname = "mn.script_menu"
