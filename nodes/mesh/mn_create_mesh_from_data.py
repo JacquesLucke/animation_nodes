@@ -2,7 +2,7 @@ import bpy, bmesh
 from bpy.types import Node
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
-from ... utils.mn_mesh_utils import *
+from ... data_structures.mesh import *
 import bmesh
 
 class mn_CreateMeshFromData(Node, AnimationNode):

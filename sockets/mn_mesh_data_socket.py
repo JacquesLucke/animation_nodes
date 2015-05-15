@@ -1,7 +1,7 @@
 import bpy
 from .. mn_execution import nodePropertyChanged
 from .. mn_node_base import *
-from .. utils.mn_mesh_utils import MeshData
+from .. data_structures.mesh import MeshData
 
 class mn_MeshDataSocket(mn_BaseSocket, mn_SocketProperties):
     bl_idname = "mn_MeshDataSocket"

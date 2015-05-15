@@ -1,7 +1,7 @@
 import bpy
 from .. mn_execution import nodePropertyChanged
 from .. mn_node_base import *
-from .. utils.mn_mesh_utils import Polygon
+from .. data_structures.mesh import Polygon
 
 class mn_PolygonSocket(mn_BaseSocket, mn_SocketProperties):
     bl_idname = "mn_PolygonSocket"

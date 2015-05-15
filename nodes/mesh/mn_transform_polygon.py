@@ -2,7 +2,7 @@ import bpy
 from bpy.types import Node
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
-from ... utils.mn_mesh_utils import *
+from ... data_structures.mesh import *
 from mathutils import Matrix
 
 class mn_TransformPolygon(Node, AnimationNode):
