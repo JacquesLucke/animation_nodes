@@ -78,12 +78,13 @@ class ConvertPolygonListIndicesToEdgeListIndices(LinkCorrection):
     def insert(self, nodeTree, origin, target):
         insertLinkedNode(nodeTree, "mn_EdgesOfPolygons", origin, target)
 
-class ConvertVertexLocationsToMesh(LinkCorrection):
+class ConvertSeparatedMathDataToMesh(LinkCorrection):
+    separatedMeshDataTypes = ["Vector List", "Edge Indices List", "Polygon Indices List"]
     def check(self, origin, target):
-        return origin.dataType == "Vector List" and target.dataType == "Mesh"
+        return origin.dataType in self.separatedMeshDataTypes and target.dataType == "Mesh"
     def insert(self, nodeTree, origin, target):
         toMeshData, toMesh = insertNodes(nodeTree, ["mn_CombineMeshData", "mn_CreateMeshFromData"], origin, target)
-        nodeTree.links.new(toMeshData.inputs[0], origin)
+        nodeTree.links.new(toMeshData.inputs[self.separatedMeshDataTypes.index(origin.dataType)], origin)
         nodeTree.links.new(toMesh.inputs[0], toMeshData.outputs[0])
         nodeTree.links.new(toMesh.outputs[0], target)
            
@@ -166,7 +167,7 @@ linkCorrectors = [
     ConvertMeshDataToVertexLocations(),
     ConvertVertexLocationsToMeshData(),
     ConvertPolygonListIndicesToEdgeListIndices(),
-    ConvertVertexLocationsToMesh(),
+    ConvertSeparatedMathDataToMesh(),
     ConvertToVector(),
     ConvertVectorToNumber(),
     ConvertTextBlockToString(),
