@@ -21,6 +21,6 @@ class mn_ParticleSystemInfo(Node, AnimationNode):
 
     def execute(self, particleSystem):
         if not particleSystem: return []
-        return particleSystem.particles
+        return list(particleSystem.particles)
         
 
