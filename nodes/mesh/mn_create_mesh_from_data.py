@@ -9,6 +9,8 @@ class mn_CreateMeshFromData(Node, AnimationNode):
     bl_idname = "mn_CreateMeshFromData"
     bl_label = "Create Mesh"
     
+    errorMessage = bpy.props.StringProperty(default = "")
+    
     def init(self, context):
         forbidCompiling()
         self.inputs.new("mn_MeshDataSocket", "Mesh Data")
@@ -16,7 +18,8 @@ class mn_CreateMeshFromData(Node, AnimationNode):
         allowCompiling()
         
     def draw_buttons(self, context, layout):
-        pass
+        if self.errorMessage != "":
+            layout.label(self.errorMessage, icon = "ERROR")
         
     def getInputSocketNames(self):
         return {"Mesh Data" : "meshData"}
@@ -24,7 +27,13 @@ class mn_CreateMeshFromData(Node, AnimationNode):
         return {"Mesh" : "mesh"}
         
     def execute(self, meshData):
-        return getBMeshFromMeshData(meshData)
+        try:
+            bm = getBMeshFromMeshData(meshData)
+            self.errorMessage = ""
+        except IndexError as e:
+            bm = bmesh.new()
+            self.errorMessage = "Missing vertices"
+        return bm
             
 def getBMeshFromMeshData(meshData):
     bm = bmesh.new()
