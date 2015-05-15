@@ -182,27 +182,35 @@ class MeshMenu(bpy.types.Menu):
         insertNode(layout, "mn_SeparateMeshData", "Separate Mesh Data")                                     
         insertNode(layout, "mn_CombineMeshData", "Combine Mesh Data") 
         insertNode(layout, "mn_AppendToMeshData", "Append to Mesh Data")
-        layout.menu("mn.mesh_workers_menu", text = "Mesh Workers")
+        layout.menu("mn.mesh_operators_menu", text = "Mesh Operators")
+        layout.separator()                                    
+        insertNode(layout, "mn_CreateMeshFromData", "Mesh from Data")                                   
+        insertNode(layout, "mn_SetMeshOnObject", "Set Mesh on Object")
+        layout.menu("mn.mesh_finalizing_menu", text = "Mesh Finalizing")
         layout.separator()                                  
         insertNode(layout, "mn_VertexInfo", "Vertex Info")                                     
         insertNode(layout, "mn_PolygonInfo", "Polygon Info")                                     
         insertNode(layout, "mn_TransformVertex", "Transform Vertex")                                     
-        insertNode(layout, "mn_TransformPolygon", "Transform Polygon")  
-        layout.separator()                                    
-        insertNode(layout, "mn_CreateMeshFromData", "Mesh from Data")                                     
-        insertNode(layout, "mn_MeshRemoveDoubles", "Remove Doubles")                                     
-        insertNode(layout, "mn_MeshRecalculateFaceNormals", "Recalculate Normals")                                     
-        insertNode(layout, "mn_MakeObjectSmooth", "Smooth Object")                                     
-        insertNode(layout, "mn_SetMeshOnObject", "Set Mesh on Object") 
+        insertNode(layout, "mn_TransformPolygon", "Transform Polygon") 
         
-class MeshWorkersMenu(bpy.types.Menu):
-    bl_idname = "mn.mesh_workers_menu"
-    bl_label = "Mesh Workers Menu"
+class MeshOperatorsMenu(bpy.types.Menu):
+    bl_idname = "mn.mesh_operators_menu"
+    bl_label = "Mesh Operators Menu"
     
     def draw(self, context):
         layout = self.layout
         insertNode(layout, "mn_FindCloseVertices", "Find Close Vertices")         
-        insertNode(layout, "mn_EdgesToPlanes", "Edges to Planes")         
+        insertNode(layout, "mn_EdgesToPlanes", "Edges to Planes")      
+
+class MeshFinalizingMenu(bpy.types.Menu):
+    bl_idname = "mn.mesh_finalizing_menu"
+    bl_label = "Mesh Finalizing Menu"
+    
+    def draw(self, context):
+        layout = self.layout
+        insertNode(layout, "mn_MeshRemoveDoubles", "Remove Doubles")         
+        insertNode(layout, "mn_MeshRecalculateFaceNormals", "Recalculate Normals")         
+        insertNode(layout, "mn_MakeObjectSmooth", "Smooth Object")         
         
 class CurveMenu(bpy.types.Menu):
     bl_idname = "mn.curve_menu"
