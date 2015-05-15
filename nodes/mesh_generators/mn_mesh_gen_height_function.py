@@ -78,5 +78,21 @@ class mn_MeshGenerationHeightFunctionNode(Node, AnimationNode):
         except: pass
             
         return vertices, polygons
+        
+        
+class AssignPreset(bpy.types.Operator):
+    bl_idname = "mn.assign_preset_mesh_gen_height_function"
+    bl_label = "Assign"
+    bl_description = "Assign the selected preset to the selected node"
+    
+    nodeTreeName = bpy.props.StringProperty()
+    nodeName = bpy.props.StringProperty()
 
+    def invoke(self, context, event):
+        node = getNode(self.nodeTreeName, self.nodeName)
+
+        # TODO
+        print("AssignPreset.invoke()")
+            
+        return {'FINISHED'}
     
