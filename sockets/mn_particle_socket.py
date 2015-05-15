@@ -1,20 +1,19 @@
 import bpy
 from .. mn_execution import nodePropertyChanged
 from .. mn_node_base import *
-from .. data_structures.mesh import Vertex
 
-class mn_VertexSocket(mn_BaseSocket, mn_SocketProperties):
-    bl_idname = "mn_VertexSocket"
-    bl_label = "Vertex Socket"
-    dataType = "Vertex"
-    allowedInputTypes = ["Vertex"]
-    drawColor = (0.6, 0.8, 0.36, 1)
+class mn_ParticleSocket(mn_BaseSocket, mn_SocketProperties):
+    bl_idname = "mn_ParticleSocket"
+    bl_label = "Particle Socket"
+    dataType = "Particle"
+    allowedInputTypes = ["Particle"]
+    drawColor = (0.5, 0.3, 0.1, 1)
     
     def drawInput(self, layout, node, text):
         layout.label(text)
         
     def getValue(self):
-        return Vertex()
+        return None
         
     def setStoreableValue(self, data):
         pass

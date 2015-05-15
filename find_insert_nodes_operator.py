@@ -1,5 +1,6 @@
 import bpy
 from collections import defaultdict
+from . utils.mn_node_utils import getAnimationNodeTrees
 
 searchDict = {}
 importanceMap = defaultdict(int)
@@ -23,18 +24,27 @@ class InsertNodeOperator(bpy.types.Operator):
     
     item = bpy.props.EnumProperty(items = getItems)
     
-    @classmethod
-    def poll(cls, context):
-        return getNodeTree()
-    
     def invoke(self, context, event):
-        context.window_manager.invoke_search_popup(self)
+        if getNodeTree():
+            context.window_manager.invoke_search_popup(self)
+        else:
+            context.window_manager.popup_menu(drawNodeTreeChooser, title = "Select Node Tree")
         return {"CANCELLED"}
         
     def execute(self, context):
         bpy.ops.node.add_and_link_node("INVOKE_DEFAULT", type = self.item, use_transform = True)
         importanceMap[self.item] += 1
         return {"FINISHED"}
+        
+def drawNodeTreeChooser(self, context):
+    layout = self.layout
+    nodeTrees = getAnimationNodeTrees()
+    if len(nodeTrees) == 0:
+        layout.operator("mn.create_node_tree", text = "New Node Tree", icon = "PLUS")
+    else:
+        for nodeTree in nodeTrees:
+            props = layout.operator("mn.select_node_tree", text = "Select '{}'".format(nodeTree.name), icon = "EYEDROPPER")
+            props.nodeTreeName = nodeTree.name  
     
 def getNodeTree():
     return getattr(bpy.context.space_data, "node_tree", None)

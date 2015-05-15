@@ -28,6 +28,7 @@ class mn_BaseSocket(NodeSocket):
     bl_label = "Base Socket"
     
     def draw(self, context, layout, node, text):
+        displayText = self.customName if self.displayCustomName else text
         if self.editableCustomName:
             row = layout.row(align = True)
             row.prop(self, "customName", text = "")
@@ -40,9 +41,9 @@ class mn_BaseSocket(NodeSocket):
         else:
             row = layout.row()
             if not self.is_output and not isSocketLinked(self):
-                self.drawInput(row, node, text)
+                self.drawInput(row, node, displayText)
             else:
-                row.label(text)
+                row.label(displayText)
             if self.removeable:
                 removeSocket = row.operator("mn.remove_socket", text = "", icon = "X")
                 removeSocket.nodeTreeName = node.id_data.name
@@ -91,9 +92,17 @@ def isCustomNameUsed(node, name):
     return False
     
     
+def getSocketVisibility(socket):
+    return not socket.hide
+def setSocketVisibility(socket, value):
+    socket.hide = not value
+    
+bpy.types.NodeSocket.show = BoolProperty(default = True, get = getSocketVisibility, set = setSocketVisibility)    
+    
 class mn_SocketProperties:
     editableCustomName = BoolProperty(default = False)
     customName = StringProperty(default = "custom name", update = customNameChanged)
+    displayCustomName = BoolProperty(default = False)
     uniqueCustomName = BoolProperty(default = True)
     customNameIsVariable = BoolProperty(default = False)
     customNameIsUpdating = BoolProperty(default = False)

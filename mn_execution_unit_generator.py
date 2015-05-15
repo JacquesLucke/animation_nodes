@@ -171,6 +171,7 @@ class NetworkCodeGenerator:
         codeParts = []
         codeParts.append("import " + ", ".join(self.modules))
         codeParts.append("animation_nodes = sys.modules['{}']".format(addonName))
+        codeParts.append("scene = bpy.context.scene")
         codeParts.append(self.getNodeTreeReferencingCode())
         codeParts.append(self.getNodeReferencingCode())
         codeParts.append(self.getNodeExecuteReferencingCode())
