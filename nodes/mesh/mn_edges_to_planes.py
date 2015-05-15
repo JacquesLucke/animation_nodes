@@ -15,6 +15,9 @@ class mn_EdgesToPlanes(Node, AnimationNode):
         self.inputs.new("mn_VectorListSocket", "Vertices")
         self.inputs.new("mn_EdgeIndicesListSocket", "Edges")
         self.inputs.new("mn_FloatSocket", "Width").number = 0.01
+        socket = self.inputs.new("mn_VectorSocket", "Up Vector")
+        socket.vector = Vector((0.001, 0.001, 0.999))
+        socket.hide = True
         self.outputs.new("mn_VectorListSocket", "Vertices")
         self.outputs.new("mn_PolygonIndicesListSocket", "Polygons")
         self.width += 10
@@ -26,16 +29,15 @@ class mn_EdgesToPlanes(Node, AnimationNode):
     def getInputSocketNames(self):
         return {"Vertices" : "vertices",
                 "Edges" : "edges",
-                "Width" : "width"}
+                "Width" : "width",
+                "Up Vector" : "upVector"}
     def getOutputSocketNames(self):
         return {"Vertices" : "vertices",
                 "Polygons" : "polygons"}
         
-    def execute(self, vertices, edges, width):
+    def execute(self, vertices, edges, width, upVector):
         newVertices = []
         polygons = []
-        
-        upVector = Vector((0.001, 0.001, 0.999))
         
         if self.calculateDirection:
             for index1, index2 in edges:
