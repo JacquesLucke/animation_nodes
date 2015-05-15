@@ -2,8 +2,8 @@ from mathutils import Vector
 
 
 class BezierCurve:
-    def __init__(self):
-        self.splines = []
+    def __init__(self, splines = []):
+        self.splines = splines
         
     @staticmethod
     def fromBlenderCurveData(blenderCurve):
@@ -11,11 +11,14 @@ class BezierCurve:
         for blenderSpline in blenderCurve.splines:
             spline = BezierSpline.fromBlenderSpline(blenderSpline)
             curve.splines.append(spline)
+            
+    def copy(self):
+        return BezierCurve([spline.copy() for spline in self.splines])
         
         
 class BezierSpline:
-    def __init__(self):
-        self.points = []
+    def __init__(self, points = []):
+        self.points = points
         
     @staticmethod
     def fromBlenderSpline(blenderSpline):
@@ -23,6 +26,9 @@ class BezierSpline:
         for blenderPoint in blenderSpline.bezier_points:
             point = BezierPoint.fromBlenderPoint(blenderPoint)
             spline.points.append(point)
+            
+    def copy(self):
+        return BezierSpline([point.copy() for point in self.points])
         
         
 class BezierPoint:
@@ -39,3 +45,6 @@ class BezierPoint:
         point.location = blenderPoint.co
         point.leftHandle = blenderPoint.handle_left
         point.rightHandle = blenderPoint.handle_right
+        
+    def copy(self):
+        return BezierCurve(self.location.copy(), self.leftHandle.copy(), self.rightHandle.copy())
