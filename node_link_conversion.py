@@ -45,6 +45,12 @@ class ConvertParticleSystemToParticle(LinkCorrection):
         nodeTree.links.new(systemInfo.inputs[0], origin)
         nodeTree.links.new(listElement.inputs[0], systemInfo.outputs[0])
         nodeTree.links.new(listElement.outputs[0], target)
+        
+class ConvertParticleSystemToParticles(LinkCorrection):
+    def check(self, origin, target):
+        return origin.dataType == "Particle System" and target.dataType == "Particle List"
+    def insert(self, nodeTree, origin, target):
+        insertLinkedNode(nodeTree, "mn_ParticleSystemInfo", origin, target)        
     
 class ConvertListToElement(LinkCorrection):
     def check(self, origin, target):
@@ -162,6 +168,7 @@ def getSocketCenter(socket1, socket2):
     
 linkCorrectors = [
     ConvertParticleSystemToParticle(),
+    ConvertParticleSystemToParticles(),
     ConvertListToElement(),
     ConvertMeshDataToMesh(),
     ConvertMeshDataToVertexLocations(),
