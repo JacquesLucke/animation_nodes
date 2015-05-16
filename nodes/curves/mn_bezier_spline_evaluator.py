@@ -10,9 +10,10 @@ class mn_BezierSplineEvaluator(Node, AnimationNode):
 
     def init(self, context):
         forbidCompiling()
-        self.inputs.new("mn_BezierSplineSocket", "Spline")
+        self.inputs.new("mn_BezierSplineSocket", "Spline").showName = False
         self.inputs.new("mn_FloatSocket", "Parameter")
         self.outputs.new("mn_VectorSocket", "Location")
+        self.outputs.new("mn_VectorSocket", "Tangent")
         allowCompiling()
 
     def getInputSocketNames(self):
@@ -20,11 +21,12 @@ class mn_BezierSplineEvaluator(Node, AnimationNode):
                 "Parameter" : "parameter"}
 
     def getOutputSocketNames(self):
-        return {"Location" : "location"}
+        return {"Location" : "location",
+                "Tangent" : "tangent"}
 
     def execute(self, spline, parameter):
         spline.updateSegments()
         if len(spline.segments) > 0:
-            return spline.evaluate(parameter)
+            return spline.evaluate(parameter), spline.evaluateTangent(parameter)
         else:
-            return Vector((0, 0, 0))
+            return Vector((0, 0, 0)), Vector((0, 0, 0))

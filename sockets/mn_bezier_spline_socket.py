@@ -11,9 +11,12 @@ class mn_BezierSplineSocket(mn_BaseSocket, mn_SocketProperties):
     drawColor = (0.74, 0.36, 1.0, 1.0)
     
     objectName = bpy.props.StringProperty(default = "", description = "Use the first spline from this object", update = nodePropertyChanged)
+    showName = bpy.props.BoolProperty(default = True)
     
     def drawInput(self, layout, node, text):
         row = layout.row(align = True)
+        if self.showName:
+            row.label(text)
         row.prop_search(self, "objectName",  bpy.context.scene, "objects", icon="NONE", text = "")
         props = row.operator("mn.assign_active_object_to_socket", text = "", icon = "EYEDROPPER")
         props.nodeTreeName = node.id_data.name
