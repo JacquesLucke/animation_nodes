@@ -500,7 +500,9 @@ class NetworkCodeGenerator:
 def getNodeOutputString(node):
     if usesFastCall(node):
         outputSocketNames = node.getOutputSocketNames()
-        if len(outputSocketNames) != len(node.outputs): raise Exception()
+        if len(outputSocketNames) != len(node.outputs): 
+            print(node.name)
+            raise Exception()
         if len(node.outputs) != 0:
             outputParts = []
             for socket in node.outputs:
