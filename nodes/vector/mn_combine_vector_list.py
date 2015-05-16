@@ -33,7 +33,6 @@ class mn_CombineVectorList(Node, AnimationNode):
     def execute(self, listX, listY, listZ):
         vectorList = []
         if not self.canExecute(listX, listY, listZ):
-            print("### NOT mn_CombineVectorList.canExecute()")
             return vectorList
             
         try:
