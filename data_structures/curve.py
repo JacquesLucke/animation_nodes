@@ -55,6 +55,13 @@ class BezierSpline:
             self.segments.append(BezierSegment(left, right))
         if self.isCyclic:
             self.segments.append(BezierSegment(self.points[-1], self.points[0]))
+            
+    def getSamples(amount):
+        samples = []
+        for i in range(amount - 1):
+            samples.append(self.evaluate(i / (amount - 1)))
+        samples.append(self.evaluate(1))
+        return samples
         
     def evaluate(self, parameter):
         par = min(max(parameter, 0), 0.9999) * len(self.segments)
@@ -68,7 +75,7 @@ class BezierSpline:
         length = 0
         for segment in self.segments:
             length += segment.calculateLength(samplesPerSegment)
-        return length
+        return length        
                 
         
 class BezierSegment:
@@ -93,8 +100,8 @@ class BezierSegment:
     def calculateLength(self, samples = 5):
         length = 0
         last = self.evaluate(0)
-        for i in range(samples):
-            parameter = (i + 1) / samples
+        for i in range(samples - 1):
+            parameter = (i + 1) / (samples - 1)
             current = self.evaluate(parameter)
             length += (current - last).length
             last = current
