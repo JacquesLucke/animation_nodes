@@ -34,9 +34,9 @@ class mn_BezierSplineSocket(mn_BaseSocket, mn_SocketProperties):
         except: return BezierSpline()
         
     def setStoreableValue(self, data):
-        pass
+        self.objectName  = data
     def getStoreableValue(self):
-        pass
+        return self.objectName
 
     def getCopyValueFunctionString(self):
         return "return value.copy()"

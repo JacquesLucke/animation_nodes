@@ -35,6 +35,7 @@ class mn_ProjectOnBezierSpline(Node, AnimationNode):
         spline.updateSegments()
         if spline.hasSegments:
             parameter = spline.findNearestSampledParameter(point, self.resolution)
+            parameter = spline.findNearestParameter(point)
             location = spline.evaluate(parameter)
             distance = (point - location).length
             return parameter, distance, location

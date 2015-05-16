@@ -1,6 +1,11 @@
+# this is based on some great work by Guy Lateur
+
+import numpy
 from mathutils import Vector, Matrix
+from numpy.polynomial import Polynomial
 
 identityMatrix = Matrix.Identity(4)
+delta = 0.00001
 
 class BezierCurve:
     def __init__(self):
@@ -78,16 +83,12 @@ class BezierSpline:
         return length  
 
     def findNearestSampledParameter(self, point, resolution = 50):
-        nearestParameter = 0.0
-        nearestDistance = 100000000
-        for i in range(resolution):
-            parameter = i / (resolution - 1)
-            sample = self.evaluate(parameter)
-            distance = (sample - point).length_squared
-            if distance < nearestDistance:
-                nearestParameter = parameter
-                nearestDistance = distance
-        return nearestParameter
+        parameters = [i / (resolution - 1) for i in range(resolution)]
+        return chooseNearestParameter(self, point, parameters)
+        
+    def findNearestParameter(self, point):
+        parameters = [(i + segment.findNearestParameter(point)) / len(self.segments) for i, segment in enumerate(self.segments)]
+        return chooseNearestParameter(self, point, parameters)
         
     @property
     def hasSegments(self):
@@ -123,6 +124,37 @@ class BezierSegment:
             last = current
         return length
         
+    def findNearestParameter(self, point):
+        return chooseNearestParameter(self, point, self.findRootParameters(point))
+    
+    # http://jazzros.blogspot.be/2011/03/projecting-point-on-bezier-curve.html    
+    def findRootParameters(self, point):
+        left = self.left
+        right = self.right
+        
+        p0 = left.location - point
+        p1 = left.rightHandle - point
+        p2 = right.leftHandle - point
+        p3 = right.location - point
+        
+        a = p3 - 3 * p2 + 3 * p1 - p0
+        b = 3 * p2 - 6 * p1 + 3 * p0
+        c = 3 * (p1 - p0)
+        
+        coeffs = [0] * 6
+        coeffs[0] = c.dot(p0)
+        coeffs[1] = c.dot(c) + b.dot(p0) * 2.0
+        coeffs[2] = b.dot(c) * 3.0 + a.dot(p0) * 3.0
+        coeffs[3] = a.dot(c) * 4.0 + b.dot(b) * 2.0
+        coeffs[4] = a.dot(b) * 5.0
+        coeffs[5] = a.dot(a) * 3.0
+        
+        poly = Polynomial(coeffs, [0.0, 1.0], [0.0, 1.0])
+        roots = poly.roots()
+        realRoots = [min(max(root.real, 0), 1) for root in roots]
+
+        return realRoots
+        
         
 class BezierPoint:
     def __init__(self):
@@ -149,3 +181,12 @@ class BezierPoint:
         self.location = matrix * self.location
         self.leftHandle = matrix * self.leftHandle
         self.rightHandle = matrix * self.rightHandle
+        
+        
+        
+# utility functions
+##############################
+
+def chooseNearestParameter(curveElement, point, parameters):
+    sampledData = [(parameter, (point - curveElement.evaluate(parameter)).length_squared) for parameter in parameters]
+    return min(sampledData, key = lambda item: item[1])[0]        
