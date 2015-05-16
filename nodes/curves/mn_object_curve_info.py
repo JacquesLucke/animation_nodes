@@ -22,5 +22,5 @@ class mn_ObjectCurveInfo(Node, AnimationNode):
 
     def execute(self, object):
         if getattr(object, "type", "") != "CURVE":
-            return BezierCurve(splines = [])
+            return BezierCurve()
         return BezierCurve.fromBlenderCurveData(object.data)
