@@ -68,6 +68,13 @@ class BezierSpline:
         samples.append(self.evaluate(1))
         return samples
         
+    def getTangentSamples(self, amount):
+        tangents = []
+        for i in range(max(amount - 1, 0)):
+            tangents.append(self.evaluateTangent(i / (amount - 1)))
+        tangents.append(self.evaluateTangent(1))
+        return tangents
+        
     def evaluate(self, parameter):
         par = min(max(parameter, 0), 0.9999) * len(self.segments)
         return self.segments[int(par)].evaluate(par - int(par))

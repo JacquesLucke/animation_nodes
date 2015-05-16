@@ -3,16 +3,16 @@ from bpy.types import Node
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from ... data_structures.curve import *
-from ... utils.curve_to_mesh import generateLoftedSurface
+from ... utils.curve_to_mesh import generateRevolvedSurface_SameParameter
 
-class mn_LoftBezierSplines(Node, AnimationNode):
-    bl_idname = "mn_LoftBezierSplines"
-    bl_label = "Loft Bezier Splines"
+class mn_RevolveBezierSplines(Node, AnimationNode):
+    bl_idname = "mn_RevolveBezierSplines"
+    bl_label = "Revolve Bezier Splines"
     
     def init(self, context):
         forbidCompiling()
-        self.inputs.new("mn_BezierSplineSocket", "Spline 1").showName = False
-        self.inputs.new("mn_BezierSplineSocket", "Spline 2").showName = False
+        self.inputs.new("mn_BezierSplineSocket", "Axis")
+        self.inputs.new("mn_BezierSplineSocket", "Profile")
         socket = self.inputs.new("mn_IntegerSocket", "Spline Samples")
         socket.number = 16
         socket.setMinMax(2, 100000)
@@ -24,8 +24,8 @@ class mn_LoftBezierSplines(Node, AnimationNode):
         allowCompiling()
 
     def getInputSocketNames(self):
-        return {"Spline 1" : "spline1",
-                "Spline 2" : "spline2",
+        return {"Axis" : "axis",
+                "Profile" : "profile",
                 "Spline Samples" : "splineSamples",
                 "Surface Samples" : "surfaceSamples"}
 
@@ -33,11 +33,11 @@ class mn_LoftBezierSplines(Node, AnimationNode):
         return {"Vertices" : "vertices",
                 "Polygons" : "polygons"}
 
-    def execute(self, spline1, spline2, splineSamples, surfaceSamples):
-        spline1.updateSegments()
-        spline2.updateSegments()
+    def execute(self, axis, profile, splineSamples, surfaceSamples):
+        axis.updateSegments()
+        profile.updateSegments()
         
-        if spline1.hasSegments and spline2.hasSegments and splineSamples >= 2 and surfaceSamples >= 2:
-            return generateLoftedSurface(spline1, spline2, splineSamples, surfaceSamples)
+        if axis.hasSegments and profile.hasSegments and splineSamples >= 2 and surfaceSamples >= 2:
+            return generateRevolvedSurface_SameParameter(axis, profile, splineSamples, surfaceSamples)
         else:
             return [], []
