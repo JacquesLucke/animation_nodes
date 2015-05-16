@@ -63,7 +63,7 @@ class BezierSpline:
             
     def getSamples(self, amount):
         samples = []
-        for i in range(amount - 1):
+        for i in range(max(amount - 1, 0)):
             samples.append(self.evaluate(i / (amount - 1)))
         samples.append(self.evaluate(1))
         return samples

@@ -226,6 +226,7 @@ class BezierCurveMenu(bpy.types.Menu):
         layout.separator()
         insertNode(layout, "mn_BezierSplineEvaluator", "Spline Evaluator")                                               
         insertNode(layout, "mn_ProjectOnBezierSpline", "Project on Spline")                                               
+        insertNode(layout, "mn_SampleBezierSpline", "Sample Spline")                                               
                                   
 class SoundMenu(bpy.types.Menu):
     bl_idname = "mn.sound_menu"
