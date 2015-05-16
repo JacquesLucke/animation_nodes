@@ -40,7 +40,6 @@ class mn_MeshGenerationQuadIndexList(Node, AnimationNode):
     def execute(self, samplesU, samplesV):
         polygonIndices = []
         if not self.canExecute(samplesU, samplesV):
-            print("### NOT mn_MeshGenerationQuadIndexList.canExecute(samplesU, samplesV)")
             return polygonIndices
         
         try:
@@ -55,10 +54,31 @@ class mn_MeshGenerationQuadIndexList(Node, AnimationNode):
 
                     polygonIndices.append([indexBL, indexBR, indexTR, indexTL])
                     
-            if self.closeU: print("### TODO: mn_MeshGenerationQuadIndexList.closeU")
-            if self.closeV: print("### TODO: mn_MeshGenerationQuadIndexList.closeV")
-        except:
-            print("### EXCEPT: mn_MeshGenerationQuadIndexList.execute(self, samplesU, samplesV)")
-            return polygonIndices
+            if self.closeU: 
+                for iV in range(samplesV - 1):
+                    indexBL = (samplesU - 1) * samplesV + iV
+                    indexTL = indexBL + 1
+                    indexBR = iV
+                    indexTR = indexBR + 1
+
+                    polygonIndices.append([indexBL, indexBR, indexTR, indexTL])
+                
+            if self.closeV:
+                for iU in range(samplesU - 1):
+                    indexTL = iU * samplesV
+                    indexTR = indexTL + samplesV
+                    indexBL = indexTL + samplesV - 1
+                    indexBR = indexTR + samplesV - 1
+                    
+                    polygonIndices.append([indexBL, indexBR, indexTR, indexTL])
+                    
+                if self.closeU: 
+                    indexBL = samplesU * samplesV - 1
+                    indexTL = (samplesU - 1) * samplesV
+                    indexBR = (samplesV - 1)
+                    indexTR = 0
+
+                    polygonIndices.append([indexBL, indexBR, indexTR, indexTL])
+        except: return polygonIndices
         
         return polygonIndices
