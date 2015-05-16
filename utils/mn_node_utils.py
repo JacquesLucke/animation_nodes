@@ -78,6 +78,41 @@ def updateDependencyNode(socket):
                 
 def isNodeRemoved(node):
     return getattr(node, "isRemoved", False)
+    
+def updateOldSocket(oldSocket, newName):
+    if not oldSocket: return
+    
+    oldName = oldSocket.name
+    node = oldSocket.node
+    nodeSockets = node.outputs if oldSocket.is_output else node.inputs
+    index = list(nodeSockets).index(oldSocket)
+    linkedSockets = getLinkedSockets(oldSocket)
+    
+    newSocket = nodeSockets.new(oldSocket.bl_idname, newName)
+    newSocket.copySettingsFrom(oldSocket)
+    newSocket.name = newName
+    
+    nodeSockets.remove(oldSocket)
+    nodeSockets.move(len(nodeSockets) - 1, index)
+    linkSocketWithOthers(newSocket, linkedSockets)
+    
+    print("replaced socket in '{}' node: {} -> {}".format(newSocket.node.name, oldName, newSocket.name))
+    
+def getLinkedSockets(socket):
+    sockets = []
+    for link in socket.links:
+        sockets.append(link.to_socket if socket.is_output else link.from_socket)
+    return sockets    
+    
+def linkSocketWithOthers(socket, sockets):
+    for otherSocket in sockets:
+        if socket.is_output:
+            from_socket = socket
+            to_socket = otherSocket
+        else:
+            from_socket = otherSocket
+            to_socket = socket
+        socket.node.id_data.links.new(to_socket, from_socket)    
                 
                 
 class NodeTreeInfo:

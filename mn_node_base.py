@@ -54,6 +54,13 @@ class mn_BaseSocket(NodeSocket):
     def draw_color(self, context, node):
         return self.drawColor
         
+    def copySettingsFrom(self, node):
+        self.setStoreableValue(node.getStoreableValue())
+        attributes = [prop.identifier for prop in self.bl_rna.properties if not prop.is_readonly]
+        for attribute in attributes:
+            get = getattr(node, attribute, None)
+            setattr(self, attribute, get)
+        
         
 def customNameChanged(self, context):
     if not self.customNameIsUpdating:
@@ -110,7 +117,7 @@ class mn_SocketProperties:
     callNodeToRemove = BoolProperty(default = False)
     callNodeWhenCustomNameChanged = BoolProperty(default = False)
     loopAsList = BoolProperty(default = False)
-    
+       
         
 class RemoveSocketOperator(bpy.types.Operator):
     bl_idname = "mn.remove_socket"

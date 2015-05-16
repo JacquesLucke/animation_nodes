@@ -5,6 +5,7 @@ from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompilin
 from ... mn_utils import *
 from ... nodes.mn_node_helper import *
 from ... mn_cache import *
+from ... utils.mn_node_utils import updateOldSocket
 
 
 class mn_SoundBakeReaderNode(Node, AnimationNode):
@@ -25,13 +26,17 @@ class mn_SoundBakeReaderNode(Node, AnimationNode):
         self.outputs.new("mn_FloatSocket", "Strength")
         allowCompiling()
         
+    def updateOlderNode(self):
+        forbidCompiling()
+        updateOldSocket(self.inputs.get("Frequence"), "Frequency")
+        allowCompiling()
+        
     def draw_buttons(self, context, layout):
         layout.prop(self, "frameType", text = "Frame Type")
         
     def getInputSocketNames(self):
         return {"Sound" : "bakeNode",
                 "Frequency" : "frequency",
-                "Frequence" : "frequency", # for older files
                 "Frame" : "frame"}
     def getOutputSocketNames(self):
         return {"Strengths" : "strengths",
