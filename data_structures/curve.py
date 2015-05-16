@@ -75,7 +75,19 @@ class BezierSpline:
         length = 0
         for segment in self.segments:
             length += segment.calculateLength(samplesPerSegment)
-        return length    
+        return length  
+
+    def findNearestSampledParameter(self, point, resolution = 50):
+        nearestParameter = 0.0
+        nearestDistance = 100000000
+        for i in range(resolution):
+            parameter = i / (resolution - 1)
+            sample = self.evaluate(parameter)
+            distance = (sample - point).length_squared
+            if distance < nearestDistance:
+                nearestParameter = parameter
+                nearestDistance = distance
+        return nearestParameter
         
     @property
     def hasSegments(self):
