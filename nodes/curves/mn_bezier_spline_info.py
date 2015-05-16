@@ -12,7 +12,7 @@ class mn_BezierSplineInfo(Node, AnimationNode):
 
     def init(self, context):
         forbidCompiling()
-        self.inputs.new("mn_BezierSplineSocket", "Spline")
+        self.inputs.new("mn_BezierSplineSocket", "Spline").showName = False
         self.outputs.new("mn_BezierPointListSocket", "Points")
         self.outputs.new("mn_FloatSocket", "Length")
         allowCompiling()
