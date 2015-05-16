@@ -97,6 +97,26 @@ class BezierSpline:
         parameters = [(i + segment.findNearestParameter(point)) / len(self.segments) for i, segment in enumerate(self.segments)]
         return chooseNearestParameter(self, point, parameters)
         
+    def findNearestPointAndTangentExtended(self, point):
+        parameter = self.findNearestParameter(point)
+        splineProjection = self.evaluate(parameter)
+        splineTangent = self.evaluateTangent(parameter)
+        possibleProjectionData = [(splineProjection, splineTangent)]
+        
+        startPoint = self.evaluate(0)
+        startTangent = self.evaluateTangent(0)
+        startLineProjection = findNearestPointOnLine(startPoint, startTangent, point)
+        if (startLineProjection.x - startPoint.x) / startTangent.x <= 0:
+            possibleProjectionData.append((startLineProjection, startTangent))
+        
+        endPoint = self.evaluate(1)
+        endTangent = self.evaluateTangent(1)
+        endLineProjection = findNearestPointOnLine(endPoint, endTangent, point)
+        if (endLineProjection.x - endPoint.x) / endTangent.x >= 0: 
+            possibleProjectionData.append((endLineProjection, endTangent))
+        
+        return min(possibleProjectionData, key = lambda item: (point - item[0]).length_squared)
+        
     @property
     def hasSegments(self):
         return len(self.segments) > 0
@@ -196,4 +216,9 @@ class BezierPoint:
 
 def chooseNearestParameter(curveElement, point, parameters):
     sampledData = [(parameter, (point - curveElement.evaluate(parameter)).length_squared) for parameter in parameters]
-    return min(sampledData, key = lambda item: item[1])[0]        
+    return min(sampledData, key = lambda item: item[1])[0]   
+
+def findNearestPointOnLine(linePosition, lineDirection, point):
+    lineDirection = lineDirection.normalized()
+    dotProduct = lineDirection.dot(point - linePosition)
+    return linePosition + (lineDirection * dotProduct)
