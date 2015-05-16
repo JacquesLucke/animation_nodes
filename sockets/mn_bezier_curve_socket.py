@@ -25,7 +25,9 @@ class mn_BezierCurveSocket(mn_BaseSocket, mn_SocketProperties):
     def getValue(self):
         try:
             object = bpy.data.objects.get(self.objectName)
-            return BezierCurve.fromBlenderCurveData(object.data)
+            curve = BezierCurve.fromBlenderCurveData(object.data)
+            curve.transform(object.matrix_world)
+            return curve
         except: return BezierCurve()
         
     def setStoreableValue(self, data):

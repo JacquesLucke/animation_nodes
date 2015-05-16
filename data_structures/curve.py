@@ -1,5 +1,6 @@
-from mathutils import Vector
+from mathutils import Vector, Matrix
 
+identityMatrix = Matrix.Identity(4)
 
 class BezierCurve:
     def __init__(self):
@@ -18,6 +19,10 @@ class BezierCurve:
         curve = BezierCurve()
         curve.splines = [spline.copy() for spline in self.splines]
         return curve
+        
+    def transform(self, matrix = identityMatrix):
+        for spline in self.splines:
+            spline.transform(matrix)
         
         
 class BezierSpline:
@@ -39,6 +44,10 @@ class BezierSpline:
         spline = BezierSpline()
         spline.points = [point.copy() for point in self.points]
         return spline
+        
+    def transform(self, matrix = identityMatrix):
+        for point in self.points:
+            point.transform(matrix)
         
     def updateSegments(self):
         self.segments = []
@@ -91,6 +100,7 @@ class BezierSegment:
             last = current
         return length
         
+        
 class BezierPoint:
     def __init__(self):
         self.location = Vector((0, 0, 0))
@@ -110,4 +120,9 @@ class BezierPoint:
         point.location = self.location.copy()
         point.leftHandle = self.leftHandle.copy()
         point.rightHandle = self.rightHandle.copy()
-        return point        
+        return point    
+
+    def transform(self, matrix = identityMatrix):
+        self.location = matrix * self.location
+        self.leftHandle = matrix * self.leftHandle
+        self.rightHandle = matrix * self.rightHandle

@@ -28,7 +28,9 @@ class mn_BezierSplineSocket(mn_BaseSocket, mn_SocketProperties):
     def getValue(self):
         try:
             object = bpy.data.objects.get(self.objectName)
-            return BezierSpline.fromBlenderSpline(object.data.splines[0])
+            spline = BezierSpline.fromBlenderSpline(object.data.splines[0])
+            spline.transform(object.matrix_world)
+            return spline
         except: return BezierSpline()
         
     def setStoreableValue(self, data):
