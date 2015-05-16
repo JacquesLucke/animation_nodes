@@ -262,6 +262,30 @@ class MathMenu2D(bpy.types.Menu):
         layout = self.layout
         insertNode(layout, "mn_Math2DFunctionSamplerNode", "2D Function Sampler")                                              
         layout.menu("mn.math_menu_2d_coordinates", text = "Coordinates")
+        
+class MathMenu3DCoordinates(bpy.types.Menu):
+    bl_idname = "mn.math_menu_3d_coordinates"
+    bl_label = "Math Menu 3D Coordinates"
+    
+    def draw(self, context):
+        layout = self.layout
+        insertNode(layout, "mn_Math3DCoordinatesCartesianToSpherical", "Cartesian To Spherical")                                              
+        insertNode(layout, "mn_Math3DCoordinatesCartesianToSphericalList", "Cartesian To Spherical List")                                              
+        insertNode(layout, "mn_Math3DCoordinatesSphericalToCartesian", "Spherical To Cartesian")                                              
+        insertNode(layout, "mn_Math3DCoordinatesSphericalToCartesianList", "Spherical To Cartesian List")                                              
+        layout.separator()
+        insertNode(layout, "mn_Math3DCoordinatesCartesianToCylindrical", "Cartesian To Cylindrical")                                              
+        insertNode(layout, "mn_Math3DCoordinatesCartesianToCylindricalList", "Cartesian To Cylindrical List")                                              
+        insertNode(layout, "mn_Math3DCoordinatesCylindricalToCartesian", "Cylindrical To Cartesian")                                              
+        insertNode(layout, "mn_Math3DCoordinatesCylindricalToCartesianList", "Cylindrical To Cartesian List")                                              
+                                  
+class MathMenu3D(bpy.types.Menu):
+    bl_idname = "mn.math_menu_3d"
+    bl_label = "Math Menu 3D"
+    
+    def draw(self, context):
+        layout = self.layout
+        layout.menu("mn.math_menu_3d_coordinates", text = "Coordinates")
                                   
 class MathMenu(bpy.types.Menu):
     bl_idname = "mn.math_menu"
@@ -270,6 +294,7 @@ class MathMenu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         layout.menu("mn.math_menu_2d", text = "2D")
+        layout.menu("mn.math_menu_3d", text = "3D")
                                   
 class SoundMenu(bpy.types.Menu):
     bl_idname = "mn.sound_menu"
