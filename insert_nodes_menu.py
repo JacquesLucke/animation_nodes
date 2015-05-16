@@ -219,6 +219,7 @@ class BezierCurveMenu(bpy.types.Menu):
     
     def draw(self, context):
         layout = self.layout
+        insertNode(layout, "mn_BezierCurveFromObject", "Curve from Object")                                              
         insertNode(layout, "mn_BezierCurveInfo", "Curve Info")                                              
         insertNode(layout, "mn_BezierSplineInfo", "Spline Info")                                              
         insertNode(layout, "mn_BezierPointInfo", "Point Info")                                               
