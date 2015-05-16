@@ -23,10 +23,13 @@ class BezierCurve:
 class BezierSpline:
     def __init__(self):
         self.points = []
+        self.segments = []
+        self.isCyclic = False
         
     @staticmethod
     def fromBlenderSpline(blenderSpline):
         spline = BezierSpline()
+        spline.isCyclic = blenderSpline.use_cyclic_u
         for blenderPoint in blenderSpline.bezier_points:
             point = BezierPoint.fromBlenderPoint(blenderPoint)
             spline.points.append(point)
@@ -36,6 +39,18 @@ class BezierSpline:
         spline = BezierSpline()
         spline.points = [point.copy() for point in self.points]
         return spline
+        
+    def updateSegments(self):
+        self.segments = []
+        for left, right in zip(self.points[:-1], self.points[1:]):
+            self.segments.append(BezierSegment(left, right))
+        if self.isCyclic:
+            self.segments.append(BezierSegment(self.points[-1], self.points[0]))
+        
+    def evaluate(self, parameter):
+        par = min(max(parameter, 0), 0.9999) * len(self.segments)
+        return self.segments[int(par)].evaluate(par - int(par))
+        
         
         
 class BezierPoint:
@@ -58,3 +73,23 @@ class BezierPoint:
         point.leftHandle = self.leftHandle.copy()
         point.rightHandle = self.rightHandle.copy()
         return point
+        
+        
+class BezierSegment:
+    def __init__(self, left, right):
+        self.left = left
+        self.right = right
+        
+        self.coeffs = [
+            left.location,
+            left.location * (-3.0) + left.rightHandle * (+3.0),
+            left.location * (+3.0) + left.rightHandle * (-6.0) + right.leftHandle * (+3.0),
+            left.location * (-1.0) + left.rightHandle * (+3.0) + right.leftHandle * (-3.0) + right.location]
+            
+    def evaluate(self, parameter):
+        c = self.coeffs
+        return c[0] + c[1] * parameter + c[2] * parameter ** 2 + c[3] * parameter ** 3
+        
+    def evaluateTangent(self, parameter):
+        c = self.coeffs
+        return c[1] + c[2] * 2 * parameter + c[3] * 3 * parameter ** 2
