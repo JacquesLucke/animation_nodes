@@ -8,7 +8,7 @@ class mn_BezierPointSocket(mn_BaseSocket, mn_SocketProperties):
     bl_label = "Bezier Point Socket"
     dataType = "Bezier Point"
     allowedInputTypes = ["Bezier Point"]
-    drawColor = (0.5, 0.7, 0.3, 1)
+    drawColor = (0.98, 0.7, 1.0, 1)
     
     def drawInput(self, layout, node, text):
         layout.label(text)

@@ -8,7 +8,7 @@ class mn_BezierCurveSocket(mn_BaseSocket, mn_SocketProperties):
     bl_label = "Bezier Curve Socket"
     dataType = "Bezier Curve"
     allowedInputTypes = ["Bezier Curve"]
-    drawColor = (0.3, 0.7, 0.18, 1)
+    drawColor = (0.38, 0.03, 1.0, 1.0)
     
     objectName = bpy.props.StringProperty(default = "", description = "Use the curve from this object", update = nodePropertyChanged)
     

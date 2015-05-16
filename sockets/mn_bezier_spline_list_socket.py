@@ -7,7 +7,7 @@ class mn_BezierSplineListSocket(mn_BaseSocket, mn_SocketProperties):
     bl_label = "Bezier Spline List Socket"
     dataType = "Bezier Spline List"
     allowedInputTypes = ["Bezier Spline List"]
-    drawColor = (0.3, 0.7, 1, 0.6)
+    drawColor = (0.5, 0.28, 1.0, 1.0)
     
     def drawInput(self, layout, node, text):
         layout.label(text)
