@@ -19,7 +19,7 @@ class mn_SoundBakeReaderNode(Node, AnimationNode):
     def init(self, context):
         forbidCompiling()
         self.inputs.new("mn_BakedSoundSocket", "Sound")
-        self.inputs.new("mn_FloatSocket", "Frequence")
+        self.inputs.new("mn_FloatSocket", "Frequency")
         self.inputs.new("mn_FloatSocket", "Frame")
         self.outputs.new("mn_FloatListSocket", "Strengths")
         self.outputs.new("mn_FloatSocket", "Strength")
@@ -30,13 +30,13 @@ class mn_SoundBakeReaderNode(Node, AnimationNode):
         
     def getInputSocketNames(self):
         return {"Sound" : "bakeNode",
-                "Frequence" : "frequence",
+                "Frequency" : "frequency",
                 "Frame" : "frame"}
     def getOutputSocketNames(self):
         return {"Strengths" : "strengths",
                 "Strength" : "strength"}
         
-    def execute(self, frequence, frame, bakeNode):
+    def execute(self, frequency, frame, bakeNode):
         currentFrame = getCurrentFrame()
         if self.frameType == "OFFSET":
             frame += currentFrame
@@ -44,15 +44,15 @@ class mn_SoundBakeReaderNode(Node, AnimationNode):
         strenghts = []
         if bakeNode is not None:
             strenghts = bakeNode.getStrengthList(frame)
-        return strenghts, self.getStrengthOfFrequence(strenghts, frequence)
+        return strenghts, self.getStrengthOfFrequency(strenghts, frequency)
         
-    def getStrengthOfFrequence(self, strengths, frequenceIndicator):
+    def getStrengthOfFrequency(self, strengths, frequencyIndicator):
         if len(strengths) > 0:
             length = len(strengths)
-            frequenceIndicator *= length
-            lower = strengths[max(min(math.floor(frequenceIndicator), length - 1), 0)]
-            upper = strengths[max(min(math.ceil(frequenceIndicator), length - 1), 0)]
-            influence = frequenceIndicator % 1.0
+            frequencyIndicator *= length
+            lower = strengths[max(min(math.floor(frequencyIndicator), length - 1), 0)]
+            upper = strengths[max(min(math.ceil(frequencyIndicator), length - 1), 0)]
+            influence = frequencyIndicator % 1.0
             influence = self.interpolation(influence)
             return lower * (1 - influence) + upper * influence
         return 0.0
