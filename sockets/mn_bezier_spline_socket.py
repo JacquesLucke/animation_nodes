@@ -10,7 +10,7 @@ class mn_BezierSplineSocket(mn_BaseSocket, mn_SocketProperties):
     allowedInputTypes = ["Bezier Spline"]
     drawColor = (0.5, 0.7, 0.18, 1)
     
-    objectName = bpy.props.StringProperty(default = "")
+    objectName = bpy.props.StringProperty(default = "", description = "Use the first spline from this object")
     
     def drawInput(self, layout, node, text):
         row = layout.row(align = True)
