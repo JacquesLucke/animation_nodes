@@ -19,6 +19,10 @@ def generateRevolvedSurface_SameParameter(axis, profile, splineSamples, surfaceS
     axisSamples = axis.getSamples(splineSamples)
     profileSamples = profile.getSamples(splineSamples)
     tangents = axis.getTangentSamples(splineSamples)
+    return generateRevolvedSurface(axisSamples, profileSamples, tangents, surfaceSamples)
+    
+def generateRevolvedSurface(axisSamples, profileSamples, tangents, surfaceSamples):
+    splineSamples = len(axisSamples)
 
     vertices = []
     for center, profilePoint, tangent in zip(axisSamples, profileSamples, tangents):
@@ -33,7 +37,7 @@ def generateRevolvedSurface_SameParameter(axis, profile, splineSamples, surfaceS
     for i in range(0, (splineSamples - 1) * surfaceSamples, surfaceSamples):
         polygons.append((i, i + surfaceSamples, i + 2 * surfaceSamples - 1, i + surfaceSamples - 1))
     
-    return vertices, polygons
+    return vertices, polygons    
     
 def generatedPolygonGridIndices(width, height):
     polygons = []
