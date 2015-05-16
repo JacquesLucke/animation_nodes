@@ -15,6 +15,7 @@ class mn_ProjectOnBezierSpline(Node, AnimationNode):
         self.inputs.new("mn_BezierSplineSocket", "Spline").showName = False
         self.inputs.new("mn_VectorSocket", "Point")
         self.outputs.new("mn_FloatSocket", "Parameter")
+        self.outputs.new("mn_FloatSocket", "Distance")
         self.outputs.new("mn_VectorSocket", "Location")
         allowCompiling()
         
@@ -27,6 +28,7 @@ class mn_ProjectOnBezierSpline(Node, AnimationNode):
 
     def getOutputSocketNames(self):
         return {"Parameter" : "parameter",
+                "Distance" : "distance",
                 "Location" : "location"}
 
     def execute(self, spline, point):
@@ -34,6 +36,7 @@ class mn_ProjectOnBezierSpline(Node, AnimationNode):
         if spline.hasSegments:
             parameter = spline.findNearestSampledParameter(point, self.resolution)
             location = spline.evaluate(parameter)
-            return parameter, location
+            distance = (point - location).length
+            return parameter, distance, location
         else:
-            return 0.0, Vector((0, 0, 0))
+            return 0.0, 0.0, Vector((0, 0, 0))
