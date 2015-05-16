@@ -21,7 +21,7 @@ def drawMenu(self, context):
     layout.separator()
     layout.menu("mn.object_menu", text = "Object")
     layout.menu("mn.mesh_menu", text = "Mesh")
-    layout.menu("mn.curve_menu", text = "Curve")
+    layout.menu("mn.bezier_curve_menu", text = "Bezier Curves")
     layout.separator()
     layout.menu("mn.sound_menu", text = "Sound")
     layout.menu("mn.material_menu", text = "Material")
@@ -213,20 +213,15 @@ class MeshFinalizingMenu(bpy.types.Menu):
         insertNode(layout, "mn_MeshRecalculateFaceNormals", "Recalculate Normals")         
         insertNode(layout, "mn_MakeObjectSmooth", "Smooth Object")         
         
-class CurveMenu(bpy.types.Menu):
-    bl_idname = "mn.curve_menu"
-    bl_label = "Curve Menu"
+class BezierCurveMenu(bpy.types.Menu):
+    bl_idname = "mn.bezier_curve_menu"
+    bl_label = "Bezier Curves Menu"
     
     def draw(self, context):
         layout = self.layout
-        insertNode(layout, "mn_CurveInfoNode", "Curve Info")                                              
-        insertNode(layout, "mn_CurveEvaluatorNode", "Curve Evaluator")                                              
-        insertNode(layout, "mn_CurvePointProjectorNode", "Curve Point Projector")                                              
-        layout.separator()                                    
-        insertNode(layout, "mn_CurveLoftNode", "Loft")                                              
-        insertNode(layout, "mn_CurveRevolveNode", "Revolve")                                              
-        insertNode(layout, "mn_CurveSweepNode", "Sweep")                                              
-        insertNode(layout, "mn_CurveBirailNode", "Birail")                                              
+        insertNode(layout, "mn_BezierCurveInfo", "Curve Info")                                              
+        insertNode(layout, "mn_BezierSplineInfo", "Spline Info")                                              
+        insertNode(layout, "mn_BezierPointInfo", "Point Info")                                               
                                   
 class SoundMenu(bpy.types.Menu):
     bl_idname = "mn.sound_menu"
