@@ -56,7 +56,7 @@ class BezierSpline:
         if self.isCyclic:
             self.segments.append(BezierSegment(self.points[-1], self.points[0]))
             
-    def getSamples(amount):
+    def getSamples(self, amount):
         samples = []
         for i in range(amount - 1):
             samples.append(self.evaluate(i / (amount - 1)))
@@ -75,7 +75,11 @@ class BezierSpline:
         length = 0
         for segment in self.segments:
             length += segment.calculateLength(samplesPerSegment)
-        return length        
+        return length    
+        
+    @property
+    def hasSegments(self):
+        return len(self.segments) > 0
                 
         
 class BezierSegment:
