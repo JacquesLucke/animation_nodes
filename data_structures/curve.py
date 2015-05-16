@@ -48,6 +48,7 @@ class BezierSpline:
     def copy(self):
         spline = BezierSpline()
         spline.points = [point.copy() for point in self.points]
+        spline.isCyclic = self.isCyclic
         return spline
         
     def transform(self, matrix = identityMatrix):
@@ -58,6 +59,7 @@ class BezierSpline:
         self.segments = []
         for left, right in zip(self.points[:-1], self.points[1:]):
             self.segments.append(BezierSegment(left, right))
+            
         if self.isCyclic:
             self.segments.append(BezierSegment(self.points[-1], self.points[0]))
             
@@ -97,23 +99,24 @@ class BezierSpline:
         parameters = [(i + segment.findNearestParameter(point)) / len(self.segments) for i, segment in enumerate(self.segments)]
         return chooseNearestParameter(self, point, parameters)
         
-    def findNearestPointAndTangentExtended(self, point):
+    def findNearestPointAndTangentOnExtendedSpline(self, point):
         parameter = self.findNearestParameter(point)
         splineProjection = self.evaluate(parameter)
         splineTangent = self.evaluateTangent(parameter)
         possibleProjectionData = [(splineProjection, splineTangent)]
         
-        startPoint = self.evaluate(0)
-        startTangent = self.evaluateTangent(0)
-        startLineProjection = findNearestPointOnLine(startPoint, startTangent, point)
-        if (startLineProjection.x - startPoint.x) / startTangent.x <= 0:
-            possibleProjectionData.append((startLineProjection, startTangent))
-        
-        endPoint = self.evaluate(1)
-        endTangent = self.evaluateTangent(1)
-        endLineProjection = findNearestPointOnLine(endPoint, endTangent, point)
-        if (endLineProjection.x - endPoint.x) / endTangent.x >= 0: 
-            possibleProjectionData.append((endLineProjection, endTangent))
+        if not self.isCyclic:
+            startPoint = self.evaluate(0)
+            startTangent = self.evaluateTangent(0)
+            startLineProjection = findNearestPointOnLine(startPoint, startTangent, point)
+            if (startLineProjection.x - startPoint.x) / startTangent.x <= 0:
+                possibleProjectionData.append((startLineProjection, startTangent))
+            
+            endPoint = self.evaluate(1)
+            endTangent = self.evaluateTangent(1)
+            endLineProjection = findNearestPointOnLine(endPoint, endTangent, point)
+            if (endLineProjection.x - endPoint.x) / endTangent.x >= 0: 
+                possibleProjectionData.append((endLineProjection, endTangent))
         
         return min(possibleProjectionData, key = lambda item: (point - item[0]).length_squared)
         

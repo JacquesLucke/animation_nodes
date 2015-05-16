@@ -52,7 +52,7 @@ class mn_ProjectOnBezierSpline(Node, AnimationNode):
         spline.updateSegments()
         if spline.hasSegments:
             if self.projectionType == "ANALYTIC" and self.extendSpline:
-                location, tangent = spline.findNearestPointAndTangentExtended(point)
+                location, tangent = spline.findNearestPointAndTangentOnExtendedSpline(point)
                 parameter = 0.0
             else:
                 if self.projectionType == "SAMPLED":
