@@ -31,6 +31,7 @@ class mn_SoundBakeReaderNode(Node, AnimationNode):
     def getInputSocketNames(self):
         return {"Sound" : "bakeNode",
                 "Frequency" : "frequency",
+                "Frequence" : "frequency", # for older files
                 "Frame" : "frame"}
     def getOutputSocketNames(self):
         return {"Strengths" : "strengths",
