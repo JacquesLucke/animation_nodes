@@ -89,6 +89,12 @@ def getCodeStrings():
         codeStrings.append(executionUnit.executionCode)
     return codeStrings
     
+def updateOlderNodes():
+    for nodeTree in getAnimationNodeTrees():
+        for node in nodeTree.nodes:
+            if hasattr(node, "updateOlderNode"):
+                node.updateOlderNode()
+    
     
 # handlers to start the update
 ##############################
@@ -104,6 +110,7 @@ def sceneUpdateHandler(scene):
     updateAnimationTrees("SCENE")
 @persistent
 def fileLoadHandler(scene):
+    updateOlderNodes()
     generateExecutionUnits()
 def nodePropertyChanged(self, context):
     updateAnimationTrees("PROPERTY")
