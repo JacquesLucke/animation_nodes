@@ -2,6 +2,7 @@ import bpy
 from bpy.types import Node
 import mathutils
 import math
+from math import *
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
