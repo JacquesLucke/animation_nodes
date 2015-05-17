@@ -11,8 +11,7 @@ class mn_LoftBezierSplines(Node, AnimationNode):
     
     def init(self, context):
         forbidCompiling()
-        self.inputs.new("mn_BezierSplineSocket", "Spline 1").showName = False
-        self.inputs.new("mn_BezierSplineSocket", "Spline 2").showName = False
+        self.inputs.new("mn_BezierSplineListSocket", "Splines").showName = False
         socket = self.inputs.new("mn_IntegerSocket", "Spline Samples")
         socket.number = 16
         socket.setMinMax(2, 100000)
@@ -24,8 +23,7 @@ class mn_LoftBezierSplines(Node, AnimationNode):
         allowCompiling()
 
     def getInputSocketNames(self):
-        return {"Spline 1" : "spline1",
-                "Spline 2" : "spline2",
+        return {"Splines" : "splines",
                 "Spline Samples" : "splineSamples",
                 "Surface Samples" : "surfaceSamples"}
 
@@ -33,11 +31,11 @@ class mn_LoftBezierSplines(Node, AnimationNode):
         return {"Vertices" : "vertices",
                 "Polygons" : "polygons"}
 
-    def execute(self, spline1, spline2, splineSamples, surfaceSamples):
-        spline1.updateSegments()
-        spline2.updateSegments()
+    def execute(self, splines, splineSamples, surfaceSamples):
+        for spline in splines:
+            spline.updateSegments()
         
-        if spline1.hasSegments and spline2.hasSegments and splineSamples >= 2 and surfaceSamples >= 2:
-            return generateLoftedSurface(spline1, spline2, splineSamples, surfaceSamples)
+        if len(splines) >= 2 and splineSamples >= 2 and surfaceSamples >= 2:
+            return generateLoftedSurface(splines, splineSamples, surfaceSamples)
         else:
             return [], []
