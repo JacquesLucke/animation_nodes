@@ -2,7 +2,7 @@ import math
 from mathutils import Vector
 from .. data_structures.curve import BezierSpline, BezierPoint
 
-def generateLoftedSurface(splines, splineSamples, surfaceSamples, type = "LINEAR"):
+def generateLoftedSurface(splines, splineSamples, surfaceSamples, type = "LINEAR", smoothness = 1):
     samples = [spline.getSamples(splineSamples) for spline in splines]
     vertices = []
     
@@ -15,16 +15,18 @@ def generateLoftedSurface(splines, splineSamples, surfaceSamples, type = "LINEAR
                 bezierPoint.leftHandle = point + Vector((1, 0, 0))
                 bezierPoint.rightHandle = point + Vector((-1, 0, 0))
                 spline.points.append(bezierPoint)
+            spline.calculateSmoothHandles(smoothness)
             spline.updateSegments()
-            vertices = spline.getSamples(surfaceSamples)
+            vertices.extend(spline.getSamples(surfaceSamples))
             
     if type == "LINEAR":
         amount = len(splines)
         parameters = [min(i / (surfaceSamples - 1) * (amount - 1), amount - 1.00001) for i in range(surfaceSamples)]
         influences = [parameter - int(parameter) for parameter in parameters]
+        pointIndices = [(int(parameter), int(parameter) + 1) for parameter in parameters]
         for points in zip(*samples):
-            for parameter, influence in zip(parameters, influences):
-                vertices.append(points[int(parameter)] * influence + points[int(parameter) + 1] * (1 - influence))
+            for (start, end), influence in zip(pointIndices, influences):
+                vertices.append(points[start] * (1 - influence) + points[end] * influence)
             
     polygons = generatedPolygonGridIndices(splineSamples, surfaceSamples)
             

@@ -120,6 +120,13 @@ class BezierSpline:
         
         return min(possibleProjectionData, key = lambda item: (point - item[0]).length_squared)
         
+    def calculateSmoothHandles(self, strength = 1):
+        points = self.points
+        points[0].calculateSmoothHandles(points[0].location, points[1].location, strength)
+        points[-1].calculateSmoothHandles(points[-2].location, points[-1].location, strength)
+        for before, point, after in zip(points[:-2], points[1:-1], points[2:]):
+            point.calculateSmoothHandles(before.location, after.location, strength)
+        
     @property
     def hasSegments(self):
         return len(self.segments) > 0
@@ -211,7 +218,16 @@ class BezierPoint:
         self.location = matrix * self.location
         self.leftHandle = matrix * self.leftHandle
         self.rightHandle = matrix * self.rightHandle
-        
+          
+    # http://www.antigrain.com/research/bezier_interpolation/          
+    def calculateSmoothHandles(self, before, after, strength = 1):
+        distanceBefore = (self.location - before).length
+        distanceAfter = (self.location - after).length
+        proportion = distanceBefore / (distanceBefore + distanceAfter)
+        handleDirection = (after - before).normalized()
+        self.leftHandle = self.location - handleDirection * proportion * strength
+        self.rightHandle = self.location + handleDirection * proportion * strength
+            
         
         
 # utility functions
