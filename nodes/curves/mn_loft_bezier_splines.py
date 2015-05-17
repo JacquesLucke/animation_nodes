@@ -1,9 +1,10 @@
 import bpy
 from bpy.types import Node
+from bpy.props import *
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from ... data_structures.curve import *
-from ... utils.curve_to_mesh import generateLoftedSurface
+from ... algorithms.mesh_generation.from_splines import loftSplines
 
 interpolationTypeItems = [
     ("LINEAR", "Linear", ""),
@@ -17,7 +18,7 @@ class mn_LoftBezierSplines(Node, AnimationNode):
         self.inputs["Smoothness"].hide = self.interpolationType != "BEZIER"
         nodePropertyChanged(self, context)
     
-    interpolationType = bpy.props.EnumProperty(name = "Interpolation Type", items = interpolationTypeItems, update = settingsChanged)
+    interpolationType = EnumProperty(name = "Interpolation Type", items = interpolationTypeItems, update = settingsChanged)
     
     def init(self, context):
         forbidCompiling()
@@ -28,6 +29,7 @@ class mn_LoftBezierSplines(Node, AnimationNode):
         socket = self.inputs.new("mn_IntegerSocket", "Surface Samples")
         socket.number = 16
         socket.setMinMax(2, 100000)
+        socket = self.inputs.new("mn_BooleanSocket", "Cyclic").value = False
         socket = self.inputs.new("mn_FloatSocket", "Smoothness").number = 1
         self.outputs.new("mn_VectorListSocket", "Vertices")
         self.outputs.new("mn_PolygonIndicesListSocket", "Polygons")
@@ -40,17 +42,26 @@ class mn_LoftBezierSplines(Node, AnimationNode):
         return {"Splines" : "splines",
                 "Spline Samples" : "splineSamples",
                 "Surface Samples" : "surfaceSamples",
+                "Cyclic" : "cyclic",
                 "Smoothness" : "smoothness"}
 
     def getOutputSocketNames(self):
         return {"Vertices" : "vertices",
                 "Polygons" : "polygons"}
 
-    def execute(self, splines, splineSamples, surfaceSamples, smoothness):
+    def execute(self, splines, splineSamples, surfaceSamples, cyclic, smoothness):
+        def canExecute():
+            if splineSamples < 2: return False
+            if surfaceSamples < 2: return False
+            if len(splines) < 2: return False
+            for spline in splines:
+                if not spline.hasSegments: return False
+            return True
+            
         for spline in splines:
             spline.updateSegments()
         
-        if len(splines) >= 2 and splineSamples >= 2 and surfaceSamples >= 2:
-            return generateLoftedSurface(splines, splineSamples, surfaceSamples, type = self.interpolationType, smoothness = smoothness)
+        if canExecute():
+            return loftSplines(splines, splineSamples, surfaceSamples, type = self.interpolationType, cyclic = cyclic, smoothness = smoothness)
         else:
             return [], []

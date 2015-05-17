@@ -121,16 +121,46 @@ class BezierSpline:
         return min(possibleProjectionData, key = lambda item: (point - item[0]).length_squared)
         
     def calculateSmoothHandles(self, strength = 1):
+        interpolationSegments = self.getInterpolationSegments()
+                
+        for segment in interpolationSegments:
+            segment.calculateSmoothHandles(strength)
+            
+    def getInterpolationSegments(self):
         points = self.points
-        points[0].calculateSmoothHandles(points[0].location, points[1].location, strength)
-        points[-1].calculateSmoothHandles(points[-2].location, points[-1].location, strength)
-        for before, point, after in zip(points[:-2], points[1:-1], points[2:]):
-            point.calculateSmoothHandles(before.location, after.location, strength)
+        interpolationSegments = []
+        if self.isCyclic:
+            for i, point in enumerate(points):
+                segment = BezierNeighbors(points[i-2].location, points[i-1], point.location)
+                interpolationSegments.append(segment)
+        else:
+            interpolationSegments.append(BezierNeighbors(points[0].location, points[0], points[1].location))
+            interpolationSegments.append(BezierNeighbors(points[-2].location, points[-1], points[-1].location))
+            for before, point, after in zip(points[:-2], points[1:-1], points[2:]):
+                interpolationSegments.append(BezierNeighbors(before.location, point, after.location))
+        return interpolationSegments
         
     @property
     def hasSegments(self):
         return len(self.segments) > 0
                 
+                                
+class BezierNeighbors:                
+    def __init__(self, leftLocation, point, rightLocation):
+        self.point = point
+        self.leftLocation = leftLocation
+        self.rightLocation = rightLocation
+        
+    # http://www.antigrain.com/research/bezier_interpolation/          
+    def calculateSmoothHandles(self, strength = 1):
+        co = self.point.location
+        distanceBefore = (co - self.leftLocation).length
+        distanceAfter = (co - self.rightLocation).length
+        proportion = distanceBefore / (distanceBefore + distanceAfter)
+        handleDirection = (self.rightLocation - self.leftLocation).normalized()
+        self.point.leftHandle = co - handleDirection * proportion * strength
+        self.point.rightHandle = co + handleDirection * proportion * strength
+        
         
 class BezierSegment:
     def __init__(self, left, right):
@@ -207,6 +237,12 @@ class BezierPoint:
         point.rightHandle = blenderPoint.handle_right
         return point
         
+    @staticmethod
+    def fromLocation(location):
+        point = BezierPoint()
+        point.location = location
+        return point
+        
     def copy(self):
         point = BezierPoint()
         point.location = self.location.copy()
@@ -218,15 +254,6 @@ class BezierPoint:
         self.location = matrix * self.location
         self.leftHandle = matrix * self.leftHandle
         self.rightHandle = matrix * self.rightHandle
-          
-    # http://www.antigrain.com/research/bezier_interpolation/          
-    def calculateSmoothHandles(self, before, after, strength = 1):
-        distanceBefore = (self.location - before).length
-        distanceAfter = (self.location - after).length
-        proportion = distanceBefore / (distanceBefore + distanceAfter)
-        handleDirection = (after - before).normalized()
-        self.leftHandle = self.location - handleDirection * proportion * strength
-        self.rightHandle = self.location + handleDirection * proportion * strength
             
         
         

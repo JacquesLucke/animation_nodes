@@ -1,36 +1,4 @@
 import math
-from mathutils import Vector
-from .. data_structures.curve import BezierSpline, BezierPoint
-
-def generateLoftedSurface(splines, splineSamples, surfaceSamples, type = "LINEAR", smoothness = 1):
-    samples = [spline.getSamples(splineSamples) for spline in splines]
-    vertices = []
-    
-    if type == "BEZIER":
-        for points in zip(*samples):
-            spline = BezierSpline()
-            for point in points:
-                bezierPoint = BezierPoint()
-                bezierPoint.location = point
-                bezierPoint.leftHandle = point + Vector((1, 0, 0))
-                bezierPoint.rightHandle = point + Vector((-1, 0, 0))
-                spline.points.append(bezierPoint)
-            spline.calculateSmoothHandles(smoothness)
-            spline.updateSegments()
-            vertices.extend(spline.getSamples(surfaceSamples))
-            
-    if type == "LINEAR":
-        amount = len(splines)
-        parameters = [min(i / (surfaceSamples - 1) * (amount - 1), amount - 1.00001) for i in range(surfaceSamples)]
-        influences = [parameter - int(parameter) for parameter in parameters]
-        pointIndices = [(int(parameter), int(parameter) + 1) for parameter in parameters]
-        for points in zip(*samples):
-            for (start, end), influence in zip(pointIndices, influences):
-                vertices.append(points[start] * (1 - influence) + points[end] * influence)
-            
-    polygons = generatedPolygonGridIndices(splineSamples, surfaceSamples)
-            
-    return vertices, polygons
     
 def generateRevolvedSurface_SameParameter(axis, profile, splineSamples, surfaceSamples):
     axisSamples = axis.getSamples(splineSamples)
