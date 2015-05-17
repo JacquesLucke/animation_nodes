@@ -33,7 +33,6 @@ class mn_ObjectSocket(mn_BaseSocket, mn_SocketProperties):
         selector.isOutput = self.is_output
         selector.socketName = self.name
         selector.target = "objectName"
-        col.separator()
         
     def getValue(self):
         return bpy.data.objects.get(self.objectName)
