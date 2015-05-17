@@ -39,7 +39,7 @@ class mn_BaseSocket(NodeSocket):
                 removeSocket.isOutputSocket = self.is_output
                 removeSocket.socketIdentifier = self.identifier
         else:
-            row = layout.row()
+            row = layout.row(align = False)
             if not self.is_output and not isSocketLinked(self):
                 self.drawInput(row, node, displayText)
             else:
