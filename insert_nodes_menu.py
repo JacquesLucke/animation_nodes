@@ -225,7 +225,7 @@ class MeshGeneratorsMenu(bpy.types.Menu):
         layout = self.layout
         insertNode(layout, "mn_MeshGenerationQuadIndexList", "Quad Index List") 
         layout.separator()                                    
-        insertNode(layout, "mn_MeshGenerationVoronoiNode", "Voronoi Diagram") 
+        insertNode(layout, "mn_MeshGenerationVoronoiDelaunayNode", "Voronoi/Delaunay") 
         insertNode(layout, "mn_MeshGenerationHeightFunctionNode", "Height Function") 
         
 class CurveMenu(bpy.types.Menu):

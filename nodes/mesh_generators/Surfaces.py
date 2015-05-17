@@ -1,5 +1,6 @@
 import bpy
 import bmesh
+import mathutils
 from mathutils import *
 from math import *
 
@@ -92,7 +93,7 @@ class VoronoiSurface:
         self.xbuff = xbuff
         self.ybuff = ybuff
 
-    def Calculate(self, offsetEdges, offsetEdgesMin, offsetEdgesMax):
+    def Calculate(self):
         rvVertices = []
         rvFaces = []
         
