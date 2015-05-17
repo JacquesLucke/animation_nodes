@@ -1,5 +1,5 @@
 from ... data_structures.curve import BezierSpline, BezierPoint
-from . indices_utils import gridQuadPolygonIndices
+from . indices_utils import gridQuadPolygonIndices, gridEndEdgesQuadPolygonIndices
 
 def loftSplines(splines, nSplineSamples, nSurfaceSamples, type = "LINEAR", cyclic = False, smoothness = 1):        
     samples = [spline.getSamples(nSplineSamples) for spline in splines]
@@ -34,8 +34,7 @@ def loftSplines(splines, nSplineSamples, nSurfaceSamples, type = "LINEAR", cycli
     if cyclic:
         nSurfaceSamples -= 1
         polygons = gridQuadPolygonIndices(nSplineSamples, nSurfaceSamples)
-        for i in range(0, (nSplineSamples - 1) * nSurfaceSamples, nSurfaceSamples):
-            polygons.append((i, i + nSurfaceSamples, i + 2 * nSurfaceSamples - 1, i + nSurfaceSamples - 1))
+        polygons.extend(gridEndEdgesQuadPolygonIndices(nSplineSamples, nSurfaceSamples))
     else:
         polygons = gridQuadPolygonIndices(nSplineSamples, nSurfaceSamples)
             
