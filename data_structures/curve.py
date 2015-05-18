@@ -70,6 +70,29 @@ class BezierSpline:
         if self.isCyclic:
             self.segments.append(BezierSegment(self.points[-1], self.points[0]))
             
+    # get multiple samples
+    #############################
+             
+    def getSamples(self, amount):
+        return self.sampleFunction(self.evaluate, amount)
+        
+    def getTangentSamples(self, amount):
+        return self.sampleFunction(self.evaluateTangent, amount)
+        
+    def sampleFunction(self, function, amount):
+        samples = []
+        for i in range(max(amount - 1, 0)):
+            samples.append(function(i / (amount - 1)))
+        samples.append(function(1))
+        return samples
+        
+    def getSamplesWithInterpolation(self, amount, interpolation):
+        samples = []
+        for i in range(max(amount - 1, 0)):
+            samples.append(self.evaluateWithInterpolation(i / (amount - 1), interpolation))
+        samples.append(self.evaluateWithInterpolation(1, interpolation))
+        return samples
+        
     # another algorithm is possibly better
     # and a method to calculate a given number of equally spaced vectors is needed
     # http://math.stackexchange.com/questions/321293/find-coordinates-of-equidistant-points-in-bezier-curve
@@ -86,22 +109,9 @@ class BezierSpline:
                 influence = d1 / (d1 + d2)
                 points.append(sample * influence + samples[i - 1] * (1 - influence))
         return points
-            
-    def getSamples(self, amount):
-        return self.sampleFunction(self.evaluate, amount)
         
-    def getTangentSamples(self, amount):
-        return self.sampleFunction(self.evaluateTangent, amount)
-        
-    def getLinearSamples(self, amount):
-        return self.sampleFunction(self.evaluateLinear, amount)
-        
-    def sampleFunction(self, function, amount):
-        samples = []
-        for i in range(max(amount - 1, 0)):
-            samples.append(function(i / (amount - 1)))
-        samples.append(function(1))
-        return samples
+    # evaluate at parameter
+    #############################
         
     def evaluate(self, parameter):
         par = self.toSegmentsParameter(parameter)
@@ -111,9 +121,9 @@ class BezierSpline:
         par = self.toSegmentsParameter(parameter)
         return self.segments[int(par)].evaluateTangent(par - int(par))
         
-    def evaluateLinear(self, parameter):
+    def evaluateWithInterpolation(self, parameter, interpolation):
         par = self.toSegmentsParameter(parameter)
-        return self.segments[int(par)].evaluateLinear(par - int(par))
+        return self.segments[int(par)].evaluateWithInterpolation(par - int(par), interpolation)
         
     def toSegmentsParameter(self, parameter):
         return min(max(parameter, 0), 0.9999) * len(self.segments)
@@ -154,24 +164,23 @@ class BezierSpline:
         return min(possibleProjectionData, key = lambda item: (point - item[0]).length_squared)
         
     def calculateSmoothHandles(self, strength = 1):
-        interpolationSegments = self.getInterpolationSegments()
-                
-        for segment in interpolationSegments:
+        neighborSegments = self.getNeighborSegments()
+        for segment in neighborSegments:
             segment.calculateSmoothHandles(strength)
             
-    def getInterpolationSegments(self):
+    def getNeighborSegments(self):
         points = self.points
-        interpolationSegments = []
+        neighborSegments = []
         if self.isCyclic:
             for i, point in enumerate(points):
                 segment = BezierNeighbors(points[i-2].location, points[i-1], point.location)
-                interpolationSegments.append(segment)
+                neighborSegments.append(segment)
         else:
-            interpolationSegments.append(BezierNeighbors(points[0].location, points[0], points[1].location))
-            interpolationSegments.append(BezierNeighbors(points[-2].location, points[-1], points[-1].location))
+            neighborSegments.append(BezierNeighbors(points[0].location, points[0], points[1].location))
+            neighborSegments.append(BezierNeighbors(points[-2].location, points[-1], points[-1].location))
             for before, point, after in zip(points[:-2], points[1:-1], points[2:]):
-                interpolationSegments.append(BezierNeighbors(before.location, point, after.location))
-        return interpolationSegments
+                neighborSegments.append(BezierNeighbors(before.location, point, after.location))
+        return neighborSegments
         
     @property
     def hasSegments(self):
@@ -214,7 +223,8 @@ class BezierSegment:
         c = self.coeffs
         return c[1] + c[2] * 2 * parameter + c[3] * 3 * parameter ** 2
         
-    def evaluateLinear(self, parameter):
+    def evaluateWithInterpolation(self, parameter, interpolation):
+        parameter = interpolation[0](parameter, interpolation[1])
         return self.left.location * (1 - parameter) + self.right.location * parameter
         
     def calculateLength(self, samples = 5):
