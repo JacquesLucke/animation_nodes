@@ -3,7 +3,7 @@ from bpy.types import Node
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from ... data_structures.curve import *
-from ... utils.curve_to_mesh import generateRevolvedSurface_SameParameter
+from ... algorithms.mesh_generation.from_splines import revolveProfileAroundAxis
 
 class mn_RevolveBezierSplines(Node, AnimationNode):
     bl_idname = "mn_RevolveBezierSplines"
@@ -38,6 +38,6 @@ class mn_RevolveBezierSplines(Node, AnimationNode):
         profile.updateSegments()
         
         if axis.hasSegments and profile.hasSegments and splineSamples >= 2 and surfaceSamples >= 2:
-            return generateRevolvedSurface_SameParameter(axis, profile, splineSamples, surfaceSamples)
+            return revolveProfileAroundAxis(axis, profile, splineSamples, surfaceSamples)
         else:
             return [], []
