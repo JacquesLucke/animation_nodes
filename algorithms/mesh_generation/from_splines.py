@@ -1,5 +1,5 @@
 from ... data_structures.curve import BezierSpline, BezierPoint
-from ... utils.mn_interpolation_utils import linear
+from .. interpolation import linear
 from . indices_utils import gridQuadPolygonIndices, tubeQuadPolygonIndices
 from . basic_shapes import tubeVertices
 

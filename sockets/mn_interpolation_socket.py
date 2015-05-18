@@ -1,7 +1,7 @@
 import bpy
 from .. mn_execution import nodePropertyChanged
 from .. mn_node_base import *
-from .. utils.mn_interpolation_utils import *
+from .. algorithms.interpolation import *
 
 topCategoryItems = [("LINEAR", "Linear", ""),
                     ("EXPONENTIAL", "Exponential", ""),

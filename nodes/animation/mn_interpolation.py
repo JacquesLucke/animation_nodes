@@ -4,7 +4,7 @@ from ... mn_cache import getUniformRandom
 from ... mn_node_base import AnimationNode
 from ... mn_utils import *
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
-from ... utils.mn_interpolation_utils import *
+from ... algorithms.interpolation import *
 from ... nodes.mn_node_helper import *
 
 topCategoryItems = [("LINEAR", "Linear", ""),
