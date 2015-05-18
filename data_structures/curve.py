@@ -70,6 +70,23 @@ class BezierSpline:
         if self.isCyclic:
             self.segments.append(BezierSegment(self.points[-1], self.points[0]))
             
+    # another algorithm is possibly better
+    # and a method to calculate a given number of equally spaced vectors is needed
+    # http://math.stackexchange.com/questions/321293/find-coordinates-of-equidistant-points-in-bezier-curve
+    def getEqualDistanceSamples(self, distance, resolution = 100):
+        distance = distance ** 2
+        samples = self.getSamples(resolution)
+        points = [samples[0]]
+        for i, sample in enumerate(samples[1:]):
+            distanceToLastSample = (sample - points[-1]).length_squared
+            if distanceToLastSample > distance:
+                lastDistanceToLastSample = (points[-1] - samples[i - 1]).length_squared
+                d1 = distance - lastDistanceToLastSample
+                d2 = distanceToLastSample - distance
+                influence = d1 / (d1 + d2)
+                points.append(sample * influence + samples[i - 1] * (1 - influence))
+        return points
+            
     def getSamples(self, amount):
         return self.sampleFunction(self.evaluate, amount)
         
