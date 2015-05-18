@@ -71,26 +71,35 @@ class BezierSpline:
             self.segments.append(BezierSegment(self.points[-1], self.points[0]))
             
     def getSamples(self, amount):
-        samples = []
-        for i in range(max(amount - 1, 0)):
-            samples.append(self.evaluate(i / (amount - 1)))
-        samples.append(self.evaluate(1))
-        return samples
+        return self.sampleFunction(self.evaluate, amount)
         
     def getTangentSamples(self, amount):
-        tangents = []
+        return self.sampleFunction(self.evaluateTangent, amount)
+        
+    def getLinearSamples(self, amount):
+        return self.sampleFunction(self.evaluateLinear, amount)
+        
+    def sampleFunction(self, function, amount):
+        samples = []
         for i in range(max(amount - 1, 0)):
-            tangents.append(self.evaluateTangent(i / (amount - 1)))
-        tangents.append(self.evaluateTangent(1))
-        return tangents
+            samples.append(function(i / (amount - 1)))
+        samples.append(function(1))
+        return samples
         
     def evaluate(self, parameter):
-        par = min(max(parameter, 0), 0.9999) * len(self.segments)
+        par = self.toSegmentsParameter(parameter)
         return self.segments[int(par)].evaluate(par - int(par))
         
     def evaluateTangent(self, parameter):
-        par = min(max(parameter, 0), 0.9999) * len(self.segments)
+        par = self.toSegmentsParameter(parameter)
         return self.segments[int(par)].evaluateTangent(par - int(par))
+        
+    def evaluateLinear(self, parameter):
+        par = self.toSegmentsParameter(parameter)
+        return self.segments[int(par)].evaluateLinear(par - int(par))
+        
+    def toSegmentsParameter(self, parameter):
+        return min(max(parameter, 0), 0.9999) * len(self.segments)
         
     def calculateLength(self, samplesPerSegment = 5):
         length = 0
@@ -187,6 +196,9 @@ class BezierSegment:
     def evaluateTangent(self, parameter):
         c = self.coeffs
         return c[1] + c[2] * 2 * parameter + c[3] * 3 * parameter ** 2
+        
+    def evaluateLinear(self, parameter):
+        return self.left.location * (1 - parameter) + self.right.location * parameter
         
     def calculateLength(self, samples = 5):
         length = 0

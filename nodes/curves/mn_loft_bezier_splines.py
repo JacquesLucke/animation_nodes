@@ -33,6 +33,7 @@ class mn_LoftBezierSplines(Node, AnimationNode):
         socket = self.inputs.new("mn_FloatSocket", "Smoothness").number = 1
         self.outputs.new("mn_VectorListSocket", "Vertices")
         self.outputs.new("mn_PolygonIndicesListSocket", "Polygons")
+        self.settingsChanged(context)
         allowCompiling()
         
     def draw_buttons(self, context, layout):
