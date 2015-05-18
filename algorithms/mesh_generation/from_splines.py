@@ -52,6 +52,14 @@ def revolveProfileAroundAxis(axis, profile, nSplineSamples, nSurfaceSamples, typ
         axisSamples = axis.getSamples(nSplineSamples)
         profileSamples = profile.getSamples(nSplineSamples)
         tangents = axis.getTangentSamples(nSplineSamples)
+    if type == "PROJECT":
+        profileSamples = profile.getSamples(nSplineSamples)
+        axisSamples = []
+        tangents = []
+        for point in profileSamples:
+            location, tangent = axis.findNearestPointAndTangentOnExtendedSpline(point)
+            axisSamples.append(location)
+            tangents.append(tangent)
         
     vertices = generateTubeVertices(axisSamples, profileSamples, tangents, nSurfaceSamples)
     polygons = tubeQuadPolygonIndices(nSplineSamples, nSurfaceSamples)
