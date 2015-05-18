@@ -44,6 +44,13 @@ class BezierSpline:
             point = BezierPoint.fromBlenderPoint(blenderPoint)
             spline.points.append(point)
         return spline
+        
+    @staticmethod
+    def fromLocations(locations):
+        spline = BezierSpline()
+        for location in locations:
+            spline.points.append(BezierPoint.fromLocation(location))
+        return spline
             
     def copy(self):
         spline = BezierSpline()
