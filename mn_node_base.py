@@ -126,6 +126,7 @@ class mn_SocketProperties:
     callNodeWhenCustomNameChanged = BoolProperty(default = False)
     loopAsList = BoolProperty(default = False)
     moveable = BoolProperty(default = False)
+    moveGroup = IntProperty(default = 0)
        
         
 class RemoveSocketOperator(bpy.types.Operator):
@@ -159,10 +160,10 @@ class MoveSocketOperator(bpy.types.Operator):
     
     def execute(self, context):
         node = getNode(self.nodeTreeName, self.nodeName)
-        socket = getSocketByIdentifier(node, self.isOutputSocket, self.socketIdentifier)
+        moveSocket = getSocketByIdentifier(node, self.isOutputSocket, self.socketIdentifier)
         sockets = node.outputs if self.isOutputSocket else node.inputs
-        moveableSocketIndices = [index for index, socket in enumerate(sockets) if socket.moveable]
-        currentIndex = list(sockets).index(socket)
+        moveableSocketIndices = [index for index, socket in enumerate(sockets) if socket.moveable and socket.moveGroup == moveSocket.moveGroup]
+        currentIndex = list(sockets).index(moveSocket)
         
         targetIndex = -1
         for index in moveableSocketIndices:
