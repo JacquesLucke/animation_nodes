@@ -1,10 +1,21 @@
 import math
 
-def alignedCircleVertices(center, radius, resolution, directionX, directionY):
+def tubeVertices(centerPoints, ringPoints, tangents, resolution):
     vertices = []
-    angleMultiplier = 2 * math.pi / resolution
+    for center, pointOnCircle, tangent in zip(centerPoints, ringPoints, tangents):
+        vertices.extend(alignedCircleVertices(center, pointOnCircle, tangent, resolution))
+    return vertices
+
+def alignedCircleVertices(center, pointOnCircle, tangent, resolution):
+    dirX = pointOnCircle - center
+    radius = dirX.length
+    dirY = tangent.cross(dirX).normalized()
+    dirX.normalize()
+    
+    vertices = []
+    angleFactor = 2 * math.pi / resolution
     for i in range(resolution):
-        angle = i * angleMultiplier
-        vector = center + radius * math.cos(angle) * directionX + radius * math.sin(angle) * directionY
-        vertices.append(vector)
+        angle = i * angleFactor
+        vertex = center + radius * (math.cos(angle) * dirX + math.sin(angle) * dirY)
+        vertices.append(vertex)
     return vertices

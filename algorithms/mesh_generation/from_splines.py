@@ -1,6 +1,6 @@
 from ... data_structures.curve import BezierSpline, BezierPoint
 from . indices_utils import gridQuadPolygonIndices, tubeQuadPolygonIndices
-from . basic_shapes import alignedCircleVertices
+from . basic_shapes import tubeVertices
 
 # Loft
 ###################################
@@ -61,17 +61,7 @@ def revolveProfileAroundAxis(axis, profile, nSplineSamples, nSurfaceSamples, typ
             axisSamples.append(location)
             tangents.append(tangent)
         
-    vertices = generateTubeVertices(axisSamples, profileSamples, tangents, nSurfaceSamples)
+    vertices = tubeVertices(axisSamples, profileSamples, tangents, nSurfaceSamples)
     polygons = tubeQuadPolygonIndices(nSplineSamples, nSurfaceSamples)
     
     return vertices, polygons
-    
-def generateTubeVertices(axisSamples, profileSamples, tangents, nSurfaceSamples):
-    vertices = []
-    for center, profile, tangent in zip(axisSamples, profileSamples, tangents):
-        directionX = profile - center
-        radius = directionX.length
-        directionY = tangent.cross(directionX).normalized()
-        directionX.normalize()
-        vertices.extend(alignedCircleVertices(center, radius, nSurfaceSamples, directionX, directionY))
-    return vertices
