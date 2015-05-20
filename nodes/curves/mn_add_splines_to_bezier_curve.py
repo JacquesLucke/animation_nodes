@@ -10,7 +10,7 @@ class mn_AddSplinesToBezierCurve(Node, AnimationNode):
     
     def init(self, context):
         forbidCompiling()
-        self.inputs.new("mn_BezierCurveSocket", "Curve").showName = False
+        self.inputs.new("mn_BezierCurveSocket", "Curve").showObjectInput = False
         self.inputs.new("mn_BezierSplineListSocket", "Splines").showName = False
         self.outputs.new("mn_BezierCurveSocket", "Curve")
         allowCompiling()
