@@ -10,7 +10,7 @@ class mn_SmoothBezierSpline(Node, AnimationNode):
     def init(self, context):
         forbidCompiling()
         self.inputs.new("mn_BezierSplineSocket", "Spline").showObjectInput = False
-        self.inputs.new("mn_FloatSocket", "Smoothness")
+        self.inputs.new("mn_FloatSocket", "Smoothness").number = 1.0
         self.outputs.new("mn_BezierSplineSocket", "Spline")
         allowCompiling()
         
