@@ -198,7 +198,7 @@ class BezierNeighbors:
         co = self.point.location
         distanceBefore = (co - self.leftLocation).length
         distanceAfter = (co - self.rightLocation).length
-        proportion = distanceBefore / (distanceBefore + distanceAfter)
+        proportion = distanceBefore / max(distanceBefore + distanceAfter, 0.00001)
         handleDirection = (self.rightLocation - self.leftLocation).normalized()
         self.point.leftHandle = co - handleDirection * proportion * strength
         self.point.rightHandle = co + handleDirection * proportion * strength
