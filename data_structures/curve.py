@@ -79,18 +79,14 @@ class BezierSpline:
     def getTangentSamples(self, amount):
         return self.sampleFunction(self.evaluateTangent, amount)
         
+    def getLinearSamples(self, amount):
+        return self.sampleFunction(self.evaluateLinear, amount) 
+        
     def sampleFunction(self, function, amount):
         samples = []
         for i in range(max(amount - 1, 0)):
             samples.append(function(i / (amount - 1)))
         samples.append(function(1))
-        return samples
-        
-    def getSamplesWithInterpolation(self, amount, interpolation):
-        samples = []
-        for i in range(max(amount - 1, 0)):
-            samples.append(self.evaluateWithInterpolation(i / (amount - 1), interpolation))
-        samples.append(self.evaluateWithInterpolation(1, interpolation))
         return samples
         
     # another algorithm is possibly better
@@ -121,9 +117,9 @@ class BezierSpline:
         par = self.toSegmentsParameter(parameter)
         return self.segments[int(par)].evaluateTangent(par - int(par))
         
-    def evaluateWithInterpolation(self, parameter, interpolation):
+    def evaluateLinear(self, parameter):
         par = self.toSegmentsParameter(parameter)
-        return self.segments[int(par)].evaluateWithInterpolation(par - int(par), interpolation)
+        return self.segments[int(par)].evaluateLinear(par - int(par))
         
     def toSegmentsParameter(self, parameter):
         return min(max(parameter, 0), 0.9999) * len(self.segments)
@@ -223,8 +219,7 @@ class BezierSegment:
         c = self.coeffs
         return c[1] + c[2] * 2 * parameter + c[3] * 3 * parameter ** 2
         
-    def evaluateWithInterpolation(self, parameter, interpolation):
-        parameter = interpolation[0](parameter, interpolation[1])
+    def evaluateLinear(self, parameter):
         return self.left.location * (1 - parameter) + self.right.location * parameter
         
     def calculateLength(self, samples = 5):
