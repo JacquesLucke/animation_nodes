@@ -3,9 +3,9 @@ from bpy.types import Node
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
-class mn_AddPointsToBezierCurve(Node, AnimationNode):
-    bl_idname = "mn_AddPointToBezierCurve"
-    bl_label = "Add Points to Bezier Curve"
+class mn_AddPointsToBezierSpline(Node, AnimationNode):
+    bl_idname = "mn_AddPointToBezierSpline"
+    bl_label = "Add Points to Bezier Spline"
     
     def init(self, context):
         forbidCompiling()
