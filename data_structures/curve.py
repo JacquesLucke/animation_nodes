@@ -166,6 +166,7 @@ class BezierSpline:
             
     def getNeighborSegments(self):
         points = self.points
+        if len(points) < 2: return []
         neighborSegments = []
         if self.isCyclic:
             for i, point in enumerate(points):
