@@ -2,7 +2,6 @@ import bpy, bmesh
 from bpy.types import Node
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
-from ... data_structures.mesh import *
 
 class mn_AddSplinesToBezierCurve(Node, AnimationNode):
     bl_idname = "mn_AddSplinesToBezierCurve"
