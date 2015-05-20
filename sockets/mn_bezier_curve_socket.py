@@ -11,6 +11,7 @@ class mn_BezierCurveSocket(mn_BaseSocket, mn_SocketProperties):
     drawColor = (0.38, 0.03, 1.0, 1.0)
     
     objectName = bpy.props.StringProperty(default = "", description = "Use the curve from this object", update = nodePropertyChanged)
+    useWorldSpace = bpy.props.BoolProperty(default = True, description = "Convert points to world space")
     
     def drawInput(self, layout, node, text):
         row = layout.row(align = True)
@@ -21,12 +22,13 @@ class mn_BezierCurveSocket(mn_BaseSocket, mn_SocketProperties):
         props.isOutput = self.is_output
         props.socketName = self.name
         props.target = "objectName"
+        row.prop(self, "useWorldSpace", text = "", icon = "WORLD")
         
     def getValue(self):
         try:
             object = bpy.data.objects.get(self.objectName)
             curve = BezierCurve.fromBlenderCurveData(object.data)
-            curve.transform(object.matrix_world)
+            if self.useWorldSpace: curve.transform(object.matrix_world)
             return curve
         except: return BezierCurve()
         

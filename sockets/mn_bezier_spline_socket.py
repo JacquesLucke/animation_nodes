@@ -12,6 +12,7 @@ class mn_BezierSplineSocket(mn_BaseSocket, mn_SocketProperties):
     
     objectName = bpy.props.StringProperty(default = "", description = "Use the first spline from this object", update = nodePropertyChanged)
     showName = bpy.props.BoolProperty(default = True)
+    useWorldSpace = bpy.props.BoolProperty(default = True, description = "Convert points to world space")
     
     def drawInput(self, layout, node, text):
         row = layout.row(align = True)
@@ -24,12 +25,13 @@ class mn_BezierSplineSocket(mn_BaseSocket, mn_SocketProperties):
         props.isOutput = self.is_output
         props.socketName = self.name
         props.target = "objectName"
+        row.prop(self, "useWorldSpace", text = "", icon = "WORLD")
         
     def getValue(self):
         try:
             object = bpy.data.objects.get(self.objectName)
             spline = BezierSpline.fromBlenderSpline(object.data.splines[0])
-            spline.transform(object.matrix_world)
+            if self.useWorldSpace: spline.transform(object.matrix_world)
             return spline
         except: return BezierSpline()
         
