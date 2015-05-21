@@ -6,12 +6,63 @@ from numpy.polynomial import Polynomial
 
 identityMatrix = Matrix.Identity(4)
 delta = 0.00001
+
+class Spline:
+    # another algorithm is possibly better
+    # and a method to calculate a given number of equally spaced vectors is needed
+    # http://math.stackexchange.com/questions/321293/find-coordinates-of-equidistant-points-in-bezier-curve
+    def getEqualDistanceSamples(self, distance, resolution = 100):
+        distance = distance ** 2
+        samples = self.getSamples(resolution)
+        points = [samples[0]]
+        for i, sample in enumerate(samples[1:]):
+            distanceToLastSample = (sample - points[-1]).length_squared
+            if distanceToLastSample > distance:
+                lastDistanceToLastSample = (points[-1] - samples[i - 1]).length_squared
+                d1 = distance - lastDistanceToLastSample
+                d2 = distanceToLastSample - distance
+                influence = d1 / (d1 + d2)
+                points.append(sample * influence + samples[i - 1] * (1 - influence))
+        return points
         
-class BezierSpline:
+    # Attributes every subclass should have:
+    def copy(self):
+        raise NotImplementedError("'copy' function not implemented")
+        
+    def getSamples(self):
+        raise NotImplementedError("'getSamples' function not implemented")
+        
+    def getTangentSamples(self):
+        raise NotImplementedError("'getTangentSamples' function not implemented")
+        
+    def evaluate(self, parameter):
+        raise NotImplementedError("'evaluate' function not implemented")
+        
+    def evaluateTangent(self, parameter):
+        raise NotImplementedError("'evaluateTangent' function not implemented")
+        
+    def project(self, coordinates):
+        raise NotImplementedError("'project' function not implemented")
+        
+    def projectExtended(self, coordinates):
+        # also project on the straight lines if you extend the spline
+        raise NotImplementedError("'project' function not implemented")
+        
+    def getLength(self):
+        raise NotImplementedError("'getLength' function not implemented")
+        
+    @property
+    def hasLength(self):
+        raise NotImplementedError("'hasLength' property not implemented")
+        
+        
+        
+class BezierSpline(Spline):
     def __init__(self):
         self.points = []
-        self.segments = []
         self.isCyclic = False
+        self.type = "BEZIER"
+        self.segments = []
         
     @classmethod
     def fromBlenderCurveData(cls, blenderCurve):
@@ -37,16 +88,16 @@ class BezierSpline:
         for location in locations:
             spline.points.append(BezierPoint.fromLocation(location))
         return spline
+        
+    def transform(self, matrix):
+        for point in self.points:
+            point.transform(matrix)
             
     def copy(self):
         spline = BezierSpline()
         spline.points = [point.copy() for point in self.points]
         spline.isCyclic = self.isCyclic
         return spline
-        
-    def transform(self, matrix = identityMatrix):
-        for point in self.points:
-            point.transform(matrix)
         
     def updateSegments(self):
         self.segments = []
@@ -75,23 +126,6 @@ class BezierSpline:
         samples.append(function(1))
         return samples
         
-    # another algorithm is possibly better
-    # and a method to calculate a given number of equally spaced vectors is needed
-    # http://math.stackexchange.com/questions/321293/find-coordinates-of-equidistant-points-in-bezier-curve
-    def getEqualDistanceSamples(self, distance, resolution = 100):
-        distance = distance ** 2
-        samples = self.getSamples(resolution)
-        points = [samples[0]]
-        for i, sample in enumerate(samples[1:]):
-            distanceToLastSample = (sample - points[-1]).length_squared
-            if distanceToLastSample > distance:
-                lastDistanceToLastSample = (points[-1] - samples[i - 1]).length_squared
-                d1 = distance - lastDistanceToLastSample
-                d2 = distanceToLastSample - distance
-                influence = d1 / (d1 + d2)
-                points.append(sample * influence + samples[i - 1] * (1 - influence))
-        return points
-        
     # evaluate at parameter
     #############################
         
@@ -116,16 +150,16 @@ class BezierSpline:
             length += segment.calculateLength(samplesPerSegment)
         return length  
 
-    def findNearestSampledParameter(self, point, resolution = 50):
+    def findNearestSampledParameter(self, coordinates, resolution = 50):
         parameters = [i / (resolution - 1) for i in range(resolution)]
-        return chooseNearestParameter(self, point, parameters)
+        return chooseNearestParameter(self, coordinates, parameters)
         
-    def findNearestParameter(self, point):
-        parameters = [(i + segment.findNearestParameter(point)) / len(self.segments) for i, segment in enumerate(self.segments)]
-        return chooseNearestParameter(self, point, parameters)
+    def project(self, coordinates):
+        parameters = [(i + segment.findNearestParameter(coordinates)) / len(self.segments) for i, segment in enumerate(self.segments)]
+        return chooseNearestParameter(self, coordinates, parameters)
         
-    def findNearestPointAndTangentOnExtendedSpline(self, point):
-        parameter = self.findNearestParameter(point)
+    def projectExtended(self, coordinates):
+        parameter = self.findNearestParameter(coordinates)
         splineProjection = self.evaluate(parameter)
         splineTangent = self.evaluateTangent(parameter)
         possibleProjectionData = [(splineProjection, splineTangent)]
@@ -133,17 +167,17 @@ class BezierSpline:
         if not self.isCyclic:
             startPoint = self.evaluate(0)
             startTangent = self.evaluateTangent(0)
-            startLineProjection = findNearestPointOnLine(startPoint, startTangent, point)
+            startLineProjection = findNearestPointOnLine(startPoint, startTangent, coordinates)
             if (startLineProjection.x - startPoint.x) / startTangent.x <= 0:
                 possibleProjectionData.append((startLineProjection, startTangent))
             
             endPoint = self.evaluate(1)
             endTangent = self.evaluateTangent(1)
-            endLineProjection = findNearestPointOnLine(endPoint, endTangent, point)
+            endLineProjection = findNearestPointOnLine(endPoint, endTangent, coordinates)
             if (endLineProjection.x - endPoint.x) / endTangent.x >= 0: 
                 possibleProjectionData.append((endLineProjection, endTangent))
         
-        return min(possibleProjectionData, key = lambda item: (point - item[0]).length_squared)
+        return min(possibleProjectionData, key = lambda item: (coordinates - item[0]).length_squared)
         
     def calculateSmoothHandles(self, strength = 1):
         neighborSegments = self.getNeighborSegments()
@@ -219,18 +253,18 @@ class BezierSegment:
             last = current
         return length
         
-    def findNearestParameter(self, point):
-        return chooseNearestParameter(self, point, self.findRootParameters(point))
+    def findNearestParameter(self, coordinates):
+        return chooseNearestParameter(self, coordinates, self.findRootParameters(coordinates))
     
     # http://jazzros.blogspot.be/2011/03/projecting-point-on-bezier-curve.html    
-    def findRootParameters(self, point):
+    def findRootParameters(self, coordinates):
         left = self.left
         right = self.right
         
-        p0 = left.location - point
-        p1 = left.rightHandle - point
-        p2 = right.leftHandle - point
-        p3 = right.location - point
+        p0 = left.location - coordinates
+        p1 = left.rightHandle - coordinates
+        p2 = right.leftHandle - coordinates
+        p3 = right.location - coordinates
         
         a = p3 - 3 * p2 + 3 * p1 - p0
         b = 3 * p2 - 6 * p1 + 3 * p0

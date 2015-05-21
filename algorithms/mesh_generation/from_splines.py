@@ -41,7 +41,7 @@ def revolveProfileAroundAxis(axis, profile, nSplineSamples, nSurfaceSamples, typ
         axisSamples = []
         tangents = []
         for point in profileSamples:
-            location, tangent = axis.findNearestPointAndTangentOnExtendedSpline(point)
+            location, tangent = axis.projectExtended(point)
             axisSamples.append(location)
             tangents.append(tangent)
         
