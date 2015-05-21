@@ -22,7 +22,7 @@ class mn_LoftBezierSplines(Node, AnimationNode):
     
     def init(self, context):
         forbidCompiling()
-        self.inputs.new("mn_BezierSplineListSocket", "Splines").showName = False
+        self.inputs.new("mn_BezierSplineListSocket", "Splines")
         socket = self.inputs.new("mn_IntegerSocket", "Spline Samples")
         socket.number = 16
         socket.setMinMax(2, 100000)
@@ -33,6 +33,7 @@ class mn_LoftBezierSplines(Node, AnimationNode):
         socket = self.inputs.new("mn_FloatSocket", "Smoothness").number = 1
         self.outputs.new("mn_VectorListSocket", "Vertices")
         self.outputs.new("mn_PolygonIndicesListSocket", "Polygons")
+        self.width += 30
         self.settingsChanged(context)
         allowCompiling()
         
