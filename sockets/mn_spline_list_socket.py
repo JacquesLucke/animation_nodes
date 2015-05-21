@@ -1,16 +1,16 @@
 import bpy
 from .. mn_execution import nodePropertyChanged
 from .. mn_node_base import *
-from .. data_structures.curve import BezierSpline
+from .. data_structures.curve import getSplinesFromBlenderCurveData
 
-class mn_BezierSplineSocket(mn_BaseSocket, mn_SocketProperties):
-    bl_idname = "mn_BezierSplineSocket"
-    bl_label = "Bezier Spline Socket"
-    dataType = "Bezier Spline"
-    allowedInputTypes = ["Bezier Spline"]
-    drawColor = (0.74, 0.36, 1.0, 1.0)
+class mn_SplineListSocket(mn_BaseSocket, mn_SocketProperties):
+    bl_idname = "mn_SplineListSocket"
+    bl_label = "Spline List Socket"
+    dataType = " Spline List"
+    allowedInputTypes = ["Spline List"]
+    drawColor = (0.5, 0.28, 1.0, 1.0)
     
-    objectName = bpy.props.StringProperty(default = "", description = "Use the first spline from this object", update = nodePropertyChanged)
+    objectName = bpy.props.StringProperty(default = "", description = "Use the splines from this object", update = nodePropertyChanged)
     showName = bpy.props.BoolProperty(default = True)
     useWorldSpace = bpy.props.BoolProperty(default = True, description = "Convert points to world space")
     showObjectInput = BoolProperty(default = True)
@@ -18,7 +18,7 @@ class mn_BezierSplineSocket(mn_BaseSocket, mn_SocketProperties):
     def drawInput(self, layout, node, text):
         row = layout.row(align = True)
         
-        if self.showName: row.label(text)
+        if self.showName:row.label(text)
         
         if self.showObjectInput:
             row.prop_search(self, "objectName",  bpy.context.scene, "objects", icon="NONE", text = "")
@@ -33,15 +33,17 @@ class mn_BezierSplineSocket(mn_BaseSocket, mn_SocketProperties):
     def getValue(self):
         try:
             object = bpy.data.objects.get(self.objectName)
-            spline = BezierSpline.fromBlenderSpline(object.data.splines[0])
-            if self.useWorldSpace: spline.transform(object.matrix_world)
-            return spline
-        except: return BezierSpline()
+            splines = getSplinesFromBlenderCurveData(object.data)
+            if self.useWorldSpace:
+                for spline in splines:
+                    spline.transform(object.matrix_world)
+        except: splines = []
+        return splines
         
     def setStoreableValue(self, data):
         self.objectName, self.useWorldSpace = data
     def getStoreableValue(self):
         return (self.objectName, self.useWorldSpace)
-
+        
     def getCopyValueFunctionString(self):
-        return "return value.copy()"
+        return "return [element.copy() for element in value]"

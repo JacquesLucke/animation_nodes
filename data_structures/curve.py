@@ -7,6 +7,16 @@ from numpy.polynomial import Polynomial
 identityMatrix = Matrix.Identity(4)
 delta = 0.00001
 
+
+def getSplinesFromBlenderCurveData(blenderCurve):
+    splines = []
+    for blenderSpline in blenderCurve.splines:
+        if blenderSpline.type == "BEZIER":
+            spline = BezierSpline.fromBlenderSpline(blenderSpline)
+            splines.append(spline)
+    return splines
+    
+
 class Spline:
     # another algorithm is possibly better
     # and a method to calculate a given number of equally spaced vectors is needed

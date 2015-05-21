@@ -2,18 +2,18 @@ import bpy
 from bpy.types import Node
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
-from ... data_structures.curve import *
+from ... data_structures.curve import getSplinesFromBlenderCurveData
 
-class mn_BezierSplinesFromObject(Node, AnimationNode):
-    bl_idname = "mn_BezierSplinesFromObject"
-    bl_label = "Bezier Splines from Object"
+class mn_SplinesFromObject(Node, AnimationNode):
+    bl_idname = "mn_SplinesFromObject"
+    bl_label = "Splines from Object"
     
     useWorldSpace = bpy.props.BoolProperty(name = "Use World Space", description = "Transform curve to world space", update = nodePropertyChanged)
 
     def init(self, context):
         forbidCompiling()
         self.inputs.new("mn_ObjectSocket", "Object").showName = False
-        self.outputs.new("mn_BezierSplineListSocket", "Bezier Splines")
+        self.outputs.new("mn_SplineListSocket", "Splines")
         allowCompiling()
         
     def draw_buttons(self, context, layout):
@@ -23,13 +23,13 @@ class mn_BezierSplinesFromObject(Node, AnimationNode):
         return {"Object" : "object"}
 
     def getOutputSocketNames(self):
-        return {"Bezier Splines" : "bezierSplines"}
+        return {"Splines" : "splines"}
 
     def execute(self, object):
         if getattr(object, "type", "") != "CURVE":
             return []
             
-        splines = BezierSpline.fromBlenderCurveData(object.data)
+        splines = getSplinesFromBlenderCurveData(object.data)
         if self.useWorldSpace:
             for spline in splines:
                 spline.transform(object.matrix_world)

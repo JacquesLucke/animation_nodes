@@ -4,13 +4,13 @@ from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from ... data_structures.curve import *
 
-class mn_BezierSplineEvaluator(Node, AnimationNode):
-    bl_idname = "mn_BezierSplineEvaluator"
-    bl_label = "Bezier Spline Evaluator"
+class mn_SplineEvaluator(Node, AnimationNode):
+    bl_idname = "mn_SplineEvaluator"
+    bl_label = "Spline Evaluator"
 
     def init(self, context):
         forbidCompiling()
-        self.inputs.new("mn_BezierSplineSocket", "Spline").showName = False
+        self.inputs.new("mn_SplineSocket", "Spline").showName = False
         self.inputs.new("mn_FloatSocket", "Parameter")
         self.outputs.new("mn_VectorSocket", "Location")
         self.outputs.new("mn_VectorSocket", "Tangent")
