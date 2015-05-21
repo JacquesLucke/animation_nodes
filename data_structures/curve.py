@@ -6,35 +6,21 @@ from numpy.polynomial import Polynomial
 
 identityMatrix = Matrix.Identity(4)
 delta = 0.00001
-
-class BezierCurve:
-    def __init__(self):
-        self.splines = []
-        
-    @staticmethod
-    def fromBlenderCurveData(blenderCurve):
-        curve = BezierCurve()
-        for blenderSpline in blenderCurve.splines:
-            if blenderSpline.type == "BEZIER":
-                spline = BezierSpline.fromBlenderSpline(blenderSpline)
-                curve.splines.append(spline)
-        return curve
-            
-    def copy(self):
-        curve = BezierCurve()
-        curve.splines = [spline.copy() for spline in self.splines]
-        return curve
-        
-    def transform(self, matrix = identityMatrix):
-        for spline in self.splines:
-            spline.transform(matrix)
-        
         
 class BezierSpline:
     def __init__(self):
         self.points = []
         self.segments = []
         self.isCyclic = False
+        
+    @classmethod
+    def fromBlenderCurveData(cls, blenderCurve):
+        splines = []
+        for blenderSpline in blenderCurve.splines:
+            if blenderSpline.type == "BEZIER":
+                spline = cls.fromBlenderSpline(blenderSpline)
+                splines.append(spline)
+        return splines
         
     @staticmethod
     def fromBlenderSpline(blenderSpline):

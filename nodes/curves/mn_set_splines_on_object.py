@@ -4,15 +4,14 @@ from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from ... data_structures.mesh import *
 
-class mn_SetCurveOnObject(Node, AnimationNode):
-    bl_idname = "mn_SetCurveOnObject"
-    bl_label = "Set Curve on Object"
+class mn_SetSplinesOnObject(Node, AnimationNode):
+    bl_idname = "mn_SetSplinesOnObject"
+    bl_label = "Set Splines on Object"
     
     def init(self, context):
         forbidCompiling()
-        socket = self.inputs.new("mn_ObjectSocket", "Object")
-        socket.showName = False
-        self.inputs.new("mn_BezierCurveSocket", "Curve")
+        socket = self.inputs.new("mn_ObjectSocket", "Object").showName = False
+        self.inputs.new("mn_BezierSplineListSocket", "Splines").showObjectInput = False
         self.outputs.new("mn_ObjectSocket", "Object")
         allowCompiling()
         
@@ -21,11 +20,11 @@ class mn_SetCurveOnObject(Node, AnimationNode):
         
     def getInputSocketNames(self):
         return {"Object" : "object",
-                "Curve" : "curve"}
+                "Splines" : "splines"}
     def getOutputSocketNames(self):
         return {"Object" : "object"}
         
-    def execute(self, object, curve):
+    def execute(self, object, splines):
         if object is None: return object
         if object.type == "CURVE":
             if object.mode != "OBJECT":
@@ -33,7 +32,7 @@ class mn_SetCurveOnObject(Node, AnimationNode):
             if object.mode == "OBJECT":
                 data = object.data
                 data.splines.clear()
-                for spline in curve.splines:
+                for spline in splines:
                     bSpline = data.splines.new("BEZIER")
                     bSpline.use_cyclic_u = spline.isCyclic
                     bSpline.bezier_points.add(len(spline.points)-1);

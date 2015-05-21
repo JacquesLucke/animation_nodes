@@ -17,9 +17,10 @@ class mn_BezierSplineSocket(mn_BaseSocket, mn_SocketProperties):
     
     def drawInput(self, layout, node, text):
         row = layout.row(align = True)
+        
+        if self.showName: row.label(text)
+        
         if self.showObjectInput:
-            if self.showName:
-                row.label(text)
             row.prop_search(self, "objectName",  bpy.context.scene, "objects", icon="NONE", text = "")
             props = row.operator("mn.assign_active_object_to_socket", text = "", icon = "EYEDROPPER")
             props.nodeTreeName = node.id_data.name
@@ -28,8 +29,6 @@ class mn_BezierSplineSocket(mn_BaseSocket, mn_SocketProperties):
             props.socketName = self.name
             props.target = "objectName"
             row.prop(self, "useWorldSpace", text = "", icon = "WORLD")
-        else:
-            row.label(text)
         
     def getValue(self):
         try:
@@ -40,9 +39,9 @@ class mn_BezierSplineSocket(mn_BaseSocket, mn_SocketProperties):
         except: return BezierSpline()
         
     def setStoreableValue(self, data):
-        self.objectName  = data
+        self.objectName, self.useWorldSpace = data
     def getStoreableValue(self):
-        return self.objectName
+        return (self.objectName, self.useWorldSpace)
 
     def getCopyValueFunctionString(self):
         return "return value.copy()"
