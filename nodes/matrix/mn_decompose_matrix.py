@@ -31,6 +31,8 @@ class mn_DecomposeMatrix(Node, AnimationNode):
     def getInLineExecutionString(self, outputUse):
         codeLines = []
         if outputUse["Translation"]: codeLines.append("$translation$ = %matrix%.to_translation()")
-        if outputUse["Rotation"]: codeLines.append("$rotation$ = %matrix%.to_euler()")
+        if outputUse["Rotation"]: codeLines.append("$rotation$ = mathutils.Vector((%matrix%.to_euler()))")
         if outputUse["Scale"]: codeLines.append("$scale$ = %matrix%.to_scale()")
         return "\n".join(codeLines)
+    def getModuleList(self):
+        return ["mathutils"]
