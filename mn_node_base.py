@@ -37,6 +37,7 @@ class mn_BaseSocket(NodeSocket):
             if not self.is_output and not isSocketLinked(self):
                 self.drawInput(row, node, displayText)
             else:
+                row.alignment = "RIGHT"
                 row.label(displayText)
                 
         if self.moveable:
