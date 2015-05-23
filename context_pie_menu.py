@@ -13,6 +13,14 @@ class ContextPie(bpy.types.Menu):
         pie = self.layout.menu_pie()
         pie.operator("mn.insert_debug_node")
         
+        outputDataType = getFirstOutputTypeOfActiveSocket()
+        if outputDataType in ["Integer", "Float"]:
+            pie.operator("mn.insert_linked_node", text = "Math").nodeType = "mn_FloatMathNode"
+        if outputDataType == "Object":
+            pie.operator("mn.insert_linked_node", text = "Transforms Output").nodeType = "mn_ObjectTransformsOutput"
+        
+        
+        
 class InsertDebugNode(bpy.types.Operator):
     bl_idname = "mn.insert_debug_node"
     bl_label = "Insert Debug Node"
@@ -44,10 +52,35 @@ class InsertDebugNode(bpy.types.Operator):
                 props.socketIndex = i
             
     def execute(self, context):
-        nodeTree = context.space_data.edit_tree
-        originNode = nodeTree.nodes.active
+        nodeTree = getActiveAnimationNodeTree()
+        originNode = getActiveNode()
         node = insertNode("mn_DebugOutputNode")
         nodeTree.links.new(node.inputs[0], originNode.outputs[self.socketIndex])
+        onlySelect(node)
+        bpy.ops.transform.translate("INVOKE_DEFAULT")
+        return{"FINISHED"} 
+        
+class InsertLinkedNode(bpy.types.Operator):
+    bl_idname = "mn.insert_linked_node"
+    bl_label = "Insert Linked Node"
+    bl_description = ""
+    bl_options = {"REGISTER"}
+    
+    originIndex = IntProperty(default = 0)
+    targetIndex = IntProperty(default = 0)
+    nodeType = StringProperty(default = "")
+    
+    @classmethod
+    def poll(cls, context):
+        return activeNodeHasOutputs() and animationNodeTreeActive()   
+
+    def invoke(self, context, event):
+        storeCursorLocation(event)
+        
+        nodeTree = getActiveAnimationNodeTree()
+        originNode = getActiveNode()
+        node = insertNode(self.nodeType)
+        nodeTree.links.new(node.inputs[self.targetIndex], originNode.outputs[self.originIndex])
         onlySelect(node)
         bpy.ops.transform.translate("INVOKE_DEFAULT")
         return{"FINISHED"} 
@@ -60,14 +93,21 @@ def insertNode(type):
     node.location = space.cursor_location
     return node
     
+def storeCursorLocation(event):
+    space = bpy.context.space_data
+    nodeTree = space.node_tree
+    space.cursor_location_from_region(event.mouse_region_x, event.mouse_region_y)    
+    
 def onlySelect(node):
     bpy.ops.node.select_all(action = "DESELECT")
     node.select = True
     node.id_data.nodes.active = node 
     
-def animationNodeTreeActive():
-    try: return bpy.context.space_data.edit_tree.bl_idname == "mn_AnimationNodeTree"
-    except: return False
+    
+def getFirstOutputTypeOfActiveSocket():    
+    if not activeNodeHasOutputs(): return ""
+    socket = getActiveNode().outputs[0]
+    return socket.dataType
     
 def activeNodeHasOutputs():
     if not activeNodeExists(): return False
@@ -81,7 +121,13 @@ def activeNodeExists():
 def getActiveNode():
     return getattr(bpy.context, "active_node", None)
     
-def storeCursorLocation(event):
-    space = bpy.context.space_data
-    nodeTree = space.node_tree
-    space.cursor_location_from_region(event.mouse_region_x, event.mouse_region_y)
+def animationNodeTreeActive():
+    try: return getActiveAnimationNodeTree() is not None
+    except: return False    
+    
+def getActiveAnimationNodeTree():
+    try:
+        nodeTree = bpy.context.space_data.edit_tree
+        if nodeTree.bl_idname == "mn_AnimationNodeTree": return nodeTree
+    except: pass
+    return None
