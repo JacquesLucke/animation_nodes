@@ -23,7 +23,7 @@ class InsertDebugNode(bpy.types.Operator):
     
     @classmethod
     def poll(cls, context):
-        return context.active_node and animationNodeTreeActive()
+        return activeNodeHasOutputs() and animationNodeTreeActive()
         
     def invoke(self, context, event):
         storeCursorLocation(event)
@@ -68,6 +68,18 @@ def onlySelect(node):
 def animationNodeTreeActive():
     try: return bpy.context.space_data.edit_tree.bl_idname == "mn_AnimationNodeTree"
     except: return False
+    
+def activeNodeHasOutputs():
+    if not activeNodeExists(): return False
+    node = getActiveNode()
+    return len(node.outputs) > 0
+    
+def activeNodeExists():
+    try: return getActiveNode() is not None
+    except: return False
+    
+def getActiveNode():
+    return getattr(bpy.context, "active_node", None)
     
 def storeCursorLocation(event):
     space = bpy.context.space_data
