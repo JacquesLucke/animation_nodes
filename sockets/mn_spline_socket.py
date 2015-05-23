@@ -1,7 +1,8 @@
 import bpy
 from .. mn_execution import nodePropertyChanged
 from .. mn_node_base import *
-from .. data_structures.curve import BezierSpline, getSplinesFromBlenderCurveData
+from .. data_structures.splines.from_blender import createSplinesFromBlenderObject
+from ..data_structures.splines.bezier_spline import BezierSpline
 
 class mn_SplineSocket(mn_BaseSocket, mn_SocketProperties):
     bl_idname = "mn_SplineSocket"
@@ -12,7 +13,7 @@ class mn_SplineSocket(mn_BaseSocket, mn_SocketProperties):
     
     objectName = bpy.props.StringProperty(default = "", description = "Use the first spline from this object", update = nodePropertyChanged)
     showName = bpy.props.BoolProperty(default = True)
-    useWorldSpace = bpy.props.BoolProperty(default = True, description = "Convert points to world space")
+    useWorldSpace = bpy.props.BoolProperty(default = True, description = "Convert points to world space", update = nodePropertyChanged)
     showObjectInput = BoolProperty(default = True)
     
     def drawInput(self, layout, node, text):
@@ -31,13 +32,13 @@ class mn_SplineSocket(mn_BaseSocket, mn_SocketProperties):
             row.prop(self, "useWorldSpace", text = "", icon = "WORLD")
         
     def getValue(self):
-        try:
-            object = bpy.data.objects.get(self.objectName)
-            splines = getSplinesFromBlenderCurveData(object.data)
-            spline = splines[0]
-            if self.useWorldSpace: spline.transform(object.matrix_world)
-            return spline
-        except: return BezierSpline()
+        object = bpy.data.objects.get(self.objectName)
+        splines = createSplinesFromBlenderObject(object)
+        if self.useWorldSpace:
+            for spline in splines:
+                spline.transform(object.matrix_world)
+        if len(splines) > 0: return splines[0]
+        else: return BezierSpline()
         
     def setStoreableValue(self, data):
         self.objectName, self.useWorldSpace = data

@@ -1,8 +1,8 @@
 import bpy
 from bpy.types import Node
+from mathutils import Vector
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
-from ... data_structures.curve import *
 
 class mn_SplineEvaluator(Node, AnimationNode):
     bl_idname = "mn_SplineEvaluator"
@@ -25,8 +25,8 @@ class mn_SplineEvaluator(Node, AnimationNode):
                 "Tangent" : "tangent"}
 
     def execute(self, spline, parameter):
-        spline.updateSegments()
-        if len(spline.segments) > 0:
+        spline.update()
+        if spline.isEvaluable:
             return spline.evaluate(parameter), spline.evaluateTangent(parameter)
         else:
             return Vector((0, 0, 0)), Vector((0, 0, 0))

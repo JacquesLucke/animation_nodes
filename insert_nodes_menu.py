@@ -21,7 +21,7 @@ def drawMenu(self, context):
     layout.separator()
     layout.menu("mn.object_menu", text = "Object")
     layout.menu("mn.mesh_menu", text = "Mesh")
-    layout.menu("mn.bezier_curve_menu", text = "Bezier Curves")
+    layout.menu("mn.spline_menu", text = "Spline")
     layout.separator()
     layout.menu("mn.sound_menu", text = "Sound")
     layout.menu("mn.material_menu", text = "Material")
@@ -213,19 +213,13 @@ class MeshFinalizingMenu(bpy.types.Menu):
         insertNode(layout, "mn_MeshRecalculateFaceNormals", "Recalculate Normals")         
         insertNode(layout, "mn_MakeObjectSmooth", "Smooth Object")         
         
-class BezierCurveMenu(bpy.types.Menu):
-    bl_idname = "mn.bezier_curve_menu"
-    bl_label = "Bezier Curves Menu"
+class SplineMenu(bpy.types.Menu):
+    bl_idname = "mn.spline_menu"
+    bl_label = "Spline Menu"
     
     def draw(self, context):
         layout = self.layout                                             
-        insertNode(layout, "mn_BezierSplinesFromObject", "Splines from Object")                                              
-        insertNode(layout, "mn_BezierSplineInfo", "Spline Info")                                              
-        insertNode(layout, "mn_BezierPointInfo", "Point Info")  
-        layout.separator()
-        insertNode(layout, "mn_BezierSplineEvaluator", "Spline Evaluator")                                               
-        insertNode(layout, "mn_ProjectOnBezierSpline", "Project on Spline")                                               
-        insertNode(layout, "mn_SampleBezierSpline", "Sample Spline")                                               
+        insertNode(layout, "mn_SplineEvaluator", "Spline Evaluator")                                                 
                                   
 class SoundMenu(bpy.types.Menu):
     bl_idname = "mn.sound_menu"
