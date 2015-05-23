@@ -35,7 +35,7 @@ class mn_DirectionToRotation(Node, AnimationNode):
         if self.trackAxis == self.upAxis:
             if self.trackAxis == "Z": self.upAxis = "X"
             else: self.trackAxis = "Z"
-        out = direction.to_track_quat(self.trackAxis, self.upAxis).to_euler()
+        out = Vector((direction.to_track_quat(self.trackAxis, self.upAxis).to_euler()))
         return out
         
 
