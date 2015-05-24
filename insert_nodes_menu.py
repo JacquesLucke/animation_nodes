@@ -219,7 +219,10 @@ class SplineMenu(bpy.types.Menu):
     
     def draw(self, context):
         layout = self.layout                                             
-        insertNode(layout, "mn_SplineEvaluator", "Spline Evaluator")                                                 
+        insertNode(layout, "mn_SplineEvaluator", "Evaluate")                                                 
+        insertNode(layout, "mn_ProjectOnSpline", "Project")
+        layout.separator()
+        insertNode(layout, "mn_LoftSplines", "Loft")
                                   
 class SoundMenu(bpy.types.Menu):
     bl_idname = "mn.sound_menu"
