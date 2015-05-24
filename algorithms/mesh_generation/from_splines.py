@@ -12,10 +12,11 @@ def loftSplines(splines, nSplineSamples, nSurfaceSamples, type = "LINEAR", cycli
     for points in zip(*samples):
         if type == "BEZIER":
             spline = BezierSpline.fromLocations(points)
+            spline.isCyclic = cyclic
             spline.calculateSmoothHandles(smoothness)
         elif type == "LINEAR":
             spline = PolySpline.fromLocations(points)
-        spline.isCyclic = cyclic
+            spline.isCyclic = cyclic
         spline.update()
         vertices.extend(spline.getSamples(nSurfaceSamples + int(cyclic)))
         if cyclic: del vertices[-1]
