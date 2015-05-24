@@ -59,6 +59,15 @@ class ConvertListToElement(LinkCorrection):
         node = insertNode(nodeTree, "mn_GetListElementNode", origin, target)
         node.generateSockets(listIdName = origin.bl_idname)
         insertBasicLinking(nodeTree, origin, node, target)
+        
+class ConvertElementToList(LinkCorrection):
+    def check(self, origin, target):
+        return origin.bl_idname == getBaseSocketType(target.bl_idname)
+    def insert(self, nodeTree, origin, target):
+        node = insertNode(nodeTree, "mn_AppendListNode", origin, target)
+        node.generateSockets(listIdName = target.bl_idname)
+        nodeTree.links.new(node.inputs[1], origin)
+        nodeTree.links.new(node.outputs[0], target)
     
 class ConvertMeshDataToMesh(LinkCorrection):
     def check(self, origin, target):
@@ -170,6 +179,7 @@ linkCorrectors = [
     ConvertParticleSystemToParticle(),
     ConvertParticleSystemToParticles(),
     ConvertListToElement(),
+    ConvertElementToList(),
     ConvertMeshDataToMesh(),
     ConvertMeshDataToVertexLocations(),
     ConvertVertexLocationsToMeshData(),
