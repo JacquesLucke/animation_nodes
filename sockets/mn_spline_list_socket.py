@@ -6,7 +6,7 @@ from .. data_structures.splines.from_blender import createSplinesFromBlenderObje
 class mn_SplineListSocket(mn_BaseSocket, mn_SocketProperties):
     bl_idname = "mn_SplineListSocket"
     bl_label = "Spline List Socket"
-    dataType = " Spline List"
+    dataType = "Spline List"
     allowedInputTypes = ["Spline List"]
     drawColor = (0.5, 0.28, 1.0, 1.0)
     
