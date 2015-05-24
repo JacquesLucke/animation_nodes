@@ -58,7 +58,7 @@ class Spline:
     # it's enough when a subclass implements 'getProjectedParameters'
     def project(self, coordinates):
         parameters = self.getProjectedParameters(coordinates)
-        sampledData = [(parameter, (coordinates - self.evaluate(par)).length_squared) for par in parameters]       
+        sampledData = [(par, (coordinates - self.evaluate(par)).length_squared) for par in parameters]       
         return min(sampledData, key = lambda item: item[1])[0]
     def getProjectedParameters(self, coordinates):
         return [0.0]

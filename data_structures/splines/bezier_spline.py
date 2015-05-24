@@ -48,7 +48,7 @@ class BezierSpline(Spline):
         parameters = []
         for i, segment in enumerate(self.segments):
             for parameter in segment.findRootParameters(coordinates):
-                parameters.append((parameter + i) / len(segments))
+                parameters.append((parameter + i) / len(self.segments))
         return parameters
         
     def calculateSmoothHandles(self, strength = 1):

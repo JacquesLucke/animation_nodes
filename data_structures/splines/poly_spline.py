@@ -49,7 +49,7 @@ class PolySpline(Spline):
         parameters = []
         for i, segment in enumerate(self.segments):
             parameter = segment.project(coordinates)
-            parameters.append((parameter + i) / len(segments))
+            parameters.append((parameter + i) / len(self.segments))
         return parameters
         
         
