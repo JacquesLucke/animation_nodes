@@ -50,7 +50,21 @@ class mn_LoftSplines(Node, AnimationNode):
                 "Polygons" : "polygons"}
 
     def execute(self, splines, splineSamples, surfaceSamples, cyclic, smoothness):
+        def canExecute():
+            for spline in splines:
+                if not spline.isEvaluable: return False
+            if len(splines) < 2: return False
+            if splineSamples < 2: return False
+            if surfaceSamples < 2: return False
+            if cyclic and surfaceSamples < 3: return False
+            return True
+            
         for spline in splines:
             spline.update()
-            
-        return loftSplines(splines, splineSamples, surfaceSamples, self.interpolationType, cyclic, smoothness)
+        
+        if canExecute():
+            vertices, polygons = loftSplines(splines, 
+                                             splineSamples, surfaceSamples, 
+                                             self.interpolationType, cyclic, smoothness)
+            return vertices, polygons
+        else: return [], []
