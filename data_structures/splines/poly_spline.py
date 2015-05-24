@@ -8,6 +8,12 @@ class PolySpline(Spline):
         self.isCyclic = False
         self.segments = []
         
+    @staticmethod
+    def fromLocations(locations):
+        spline = PolySpline()
+        spline.points = locations
+        return spline
+        
     def copy(self):
         spline = PolySpline()
         spline.points = [point.copy() for point in self.points]

@@ -1,4 +1,5 @@
 from ... data_structures.splines.bezier_spline import BezierSpline
+from ... data_structures.splines.poly_spline import PolySpline
 from . indices_utils import gridQuadPolygonIndices, tubeQuadPolygonIndices
 from . basic_shapes import tubeVertices
 
@@ -6,18 +7,17 @@ from . basic_shapes import tubeVertices
 ###################################
 
 def loftSplines(splines, nSplineSamples, nSurfaceSamples, type = "LINEAR", cyclic = False, smoothness = 1):
-    if type == "BEZIER": sampleFunctionName = "getSamples"
-    if type == "LINEAR": sampleFunctionName = "getLinearSamples"
-
     vertices = []
     samples = [spline.getSamples(nSplineSamples) for spline in splines]
     for points in zip(*samples):
-        spline = BezierSpline.fromLocations(points)
+        if type == "BEZIER":
+            spline = BezierSpline.fromLocations(points)
+            spline.calculateSmoothHandles(smoothness)
+        elif type == "LINEAR":
+            spline = PolySpline.fromLocations(points)
         spline.isCyclic = cyclic
-        if type == "BEZIER": spline.calculateSmoothHandles(smoothness)
-        spline.updateSegments()
-        function = getattr(spline, sampleFunctionName)
-        vertices.extend(function(nSurfaceSamples + int(cyclic)))
+        spline.update()
+        vertices.extend(spline.getSamples(nSurfaceSamples + int(cyclic)))
         if cyclic: del vertices[-1]
       
     if cyclic:

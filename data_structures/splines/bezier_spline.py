@@ -11,6 +11,14 @@ class BezierSpline(Spline):
         self.isCyclic = False
         self.segments = []
         
+    @staticmethod
+    def fromLocations(locations):
+        spline = BezierSpline()
+        for location in locations:
+            point = BezierPoint(location, location.copy(), location.copy())
+            self.points.append(point)
+        return spline
+        
     def copy(self):
         spline = BezierSpline()
         spline.isCyclic = self.isCyclic
