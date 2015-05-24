@@ -114,11 +114,11 @@ class BezierSegment:
             
     def evaluate(self, parameter):
         c = self.coeffs
-        return c[0] + c[1] * parameter + c[2] * parameter ** 2 + c[3] * parameter ** 3
+        return c[0] + parameter * (c[1] + parameter * (c[2] + parameter * c[3]))
         
     def evaluateTangent(self, parameter):
         c = self.coeffs
-        return c[1] + c[2] * 2 * parameter + c[3] * 3 * parameter ** 2
+        return c[1] + parameter * (c[2] * 2 + parameter * c[3] * 3)
         
     # http://jazzros.blogspot.be/2011/03/projecting-point-on-bezier-curve.html   
     # calculate possible parameters which can be the closest to a given point
@@ -145,7 +145,7 @@ class BezierSegment:
         
         poly = Polynomial(coeffs, [0.0, 1.0], [0.0, 1.0])
         roots = poly.roots()
-        realRoots = [min(max(root.real, 0), 1) for root in roots]
+        realRoots = [float(min(max(root.real, 0), 1)) for root in roots]
 
         return realRoots 
         
