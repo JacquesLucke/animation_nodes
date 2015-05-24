@@ -1,4 +1,4 @@
-import bpy
+from mathutils import Vector
 
 def setSplinesOnBlenderObject(object, splines):
     if object is None: return
@@ -35,4 +35,4 @@ def appendPolySpline(bSplines, spline):
     bSpline.points.add(len(spline.points) - 1)
     
     for i, point in enumerate(spline.points):
-        bSpline.points[i].co = point
+        bSpline.points[i].co = Vector((list(point) + [0]))
