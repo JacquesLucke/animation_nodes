@@ -16,7 +16,7 @@ class BezierSpline(Spline):
         spline = BezierSpline()
         for location in locations:
             point = BezierPoint(location, location.copy(), location.copy())
-            self.points.append(point)
+            spline.points.append(point)
         return spline
         
     def copy(self):
