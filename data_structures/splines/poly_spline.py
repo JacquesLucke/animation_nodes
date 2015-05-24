@@ -31,7 +31,6 @@ class PolySpline(Spline):
                 self.segments.append(PolySegment(self.points[-1], self.points[0]))
                 
         recreateSegments()
-        print(self.points)
         self.isEvaluable = len(self.segments) > 0
         
     def getLength(self, resolution = 0):
