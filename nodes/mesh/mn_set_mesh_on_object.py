@@ -6,7 +6,7 @@ from ... data_structures.mesh import *
 
 class mn_SetMeshOnObject(Node, AnimationNode):
     bl_idname = "mn_SetMeshOnObject"
-    bl_label = "Set Mesh"
+    bl_label = "Set Mesh on Object"
     
     def init(self, context):
         forbidCompiling()
