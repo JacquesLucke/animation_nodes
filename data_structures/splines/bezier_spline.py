@@ -51,7 +51,7 @@ class BezierSpline(Spline):
                 parameters.append((parameter + i) / len(self.segments))
         return parameters
         
-    def calculateSmoothHandles(self, strength = 1):
+    def calculateSmoothHandles(self, strength = 0.3333):
         neighborSegments = self.getNeighborSegments()
         for segment in neighborSegments:
             segment.calculateSmoothHandles(strength)
@@ -156,12 +156,26 @@ class BezierNeighbors:
         self.leftLocation = leftLocation
         self.rightLocation = rightLocation
         
+    # http://stackoverflow.com/questions/13037606/how-does-inkscape-calculate-the-coordinates-for-control-points-for-smooth-edges/13425159#13425159
+    def calculateSmoothHandles(self, strength = 0.3333):
+        vecLeft = self.leftLocation - self.point.location
+        vecRight = self.rightLocation - self.point.location
+        
+        lenLeft = vecLeft.length
+        lenRight = vecRight.length
+        
+        if lenLeft > 0 and lenRight > 0:
+            dir = ((lenLeft / lenRight) * vecRight - vecLeft).normalized()
+            
+            self.point.leftHandle = self.point.location - dir * lenLeft * strength
+            self.point.rightHandle = self.point.location + dir * lenRight * strength
+            
     # http://www.antigrain.com/research/bezier_interpolation/          
-    def calculateSmoothHandles(self, strength = 1):
+    def calculateSmoothHandlesOLD(self, strength = 1):
         co = self.point.location
         distanceBefore = (co - self.leftLocation).length
         distanceAfter = (co - self.rightLocation).length
         proportion = distanceBefore / max(distanceBefore + distanceAfter, 0.00001)
         handleDirection = (self.rightLocation - self.leftLocation).normalized()
         self.point.leftHandle = co - handleDirection * proportion * strength
-        self.point.rightHandle = co + handleDirection * proportion * strength        
+        self.point.rightHandle = co + handleDirection * proportion * strength 

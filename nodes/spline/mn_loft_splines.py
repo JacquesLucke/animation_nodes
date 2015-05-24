@@ -28,7 +28,7 @@ class mn_LoftSplines(Node, AnimationNode):
             socket.number = 16
             socket.setMinMax(2, 100000)
         self.inputs.new("mn_BooleanSocket", "Cyclic").value = False
-        self.inputs.new("mn_FloatSocket", "Smoothness").number = 1.0
+        self.inputs.new("mn_FloatSocket", "Smoothness").number = 0.3333
         self.outputs.new("mn_VectorListSocket", "Vertices")
         self.outputs.new("mn_PolygonIndicesListSocket", "Polygons")
         self.width += 20
