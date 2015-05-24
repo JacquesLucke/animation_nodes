@@ -36,6 +36,10 @@ class Spline:
         return Vector((0, 0, 1))
         
         
+    def appendPoints(self, points):
+        for point in points:
+            self.appendPoint(point)
+        
     def getSamples(self, amount):
         a = amount - 1
         return [self.evaluate(i / a) for i in range(amount)]
