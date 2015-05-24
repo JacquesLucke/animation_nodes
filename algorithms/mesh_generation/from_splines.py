@@ -1,4 +1,4 @@
-from ... data_structures.curve import BezierSpline, BezierPoint
+from ... data_structures.splines.bezier_spline import BezierSpline
 from . indices_utils import gridQuadPolygonIndices, tubeQuadPolygonIndices
 from . basic_shapes import tubeVertices
 

@@ -14,7 +14,7 @@ class Spline:
     def copy(self):
         return copy.deepcopy(self)
         
-        
+       
     def transform(self, matrix):
         return self
         

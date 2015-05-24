@@ -85,7 +85,7 @@ class BezierPoint:
         self.rightHandle = rightHandle
         
     def copy(self):
-        return BezierPoint(self.location, self.leftHandle, self.rightHandle)
+        return BezierPoint(self.location.copy(), self.leftHandle.copy(), self.rightHandle.copy())
         
     def transform(self, matrix):
         self.location = matrix * self.location
