@@ -81,11 +81,10 @@ class PolySegment:
         return (self.left - left.right).length
         
     def project(self, coordinates):
-        projection = findNearestPointOnLine(self.left, self.tangent, coordinates)
-        parameter = (projection.x - self.left.x) / self.tangent.x
-        return min(max(parameter, 0), 1)
-        
-def findNearestPointOnLine(linePosition, lineDirection, point):
+        return findNearestParameterOnLine(self.left, self.tangent, coordinates)
+
+def findNearestParameterOnLine(linePosition, lineDirection, point):
+    directionLength = lineDirection.length
     lineDirection = lineDirection.normalized()
-    dotProduct = lineDirection.dot(point - linePosition)
-    return linePosition + (lineDirection * dotProduct)        
+    parameter = (lineDirection.dot(point - linePosition)) / directionLength
+    return parameter    
