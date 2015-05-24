@@ -226,6 +226,7 @@ class SplineMenu(bpy.types.Menu):
         insertNode(layout, "mn_SetSplinesOnObject", "Set Splines on Object")
         layout.separator()
         insertNode(layout, "mn_LoftSplines", "Loft")
+        insertNode(layout, "mn_RevolveSpline", "Revolve")
                                   
 class SoundMenu(bpy.types.Menu):
     bl_idname = "mn.sound_menu"
