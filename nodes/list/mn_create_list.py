@@ -34,23 +34,22 @@ class mn_CreateList(Node, AnimationNode):
         allowCompiling()
         
     def draw_buttons(self, context, layout):
-        props = layout.operator("mn.append_socket_to_list_create_node", text = "New Input", icon = "PLUS")
-        props.nodeTreeName = self.id_data.name
-        props.nodeName = self.name
+        self.callFunctionFromUI(layout, "newInputSocket", text = "New Input", icon = "PLUS")
         layout.prop(self, "manageSockets")
         
     def draw_buttons_ext(self, context, layout):
         col = layout.column(align = True)
         col.prop(self, "selectedListType", text = "")
-        props = col.operator("mn.assign_selected_type_to_list_create_node", text = "Assign")
-        props.nodeTreeName = self.id_data.name
-        props.nodeName = self.name
+        self.callFunctionFromUI(col, "assignSelectedListType", text = "Assign")
         
     def execute(self, inputs):
         elements = []
         for socket in self.inputs:
             elements.append(inputs[socket.identifier])
         return {"List" : elements}
+        
+    def assignSelectedListType(self):
+        self.assignListType(self.selectedListType)
         
     def assignListType(self, idName, inputAmount = 2):
         self.listType = idName
@@ -76,34 +75,4 @@ class mn_CreateList(Node, AnimationNode):
         socket.removeable = self.manageSockets
         socket.moveable = self.manageSockets
         if hasattr(socket, "showName"):
-            socket.showName = False
-        
-        
-class AssignListType(bpy.types.Operator):
-    bl_idname = "mn.assign_selected_type_to_list_create_node"
-    bl_label = "Assign List Type"
-    bl_description = "Remove all sockets and set the selected socket type"
-    bl_options = {"REGISTER"}
-    
-    nodeTreeName = bpy.props.StringProperty()
-    nodeName = bpy.props.StringProperty()
-    
-    def execute(self, context):
-        node = getNode(self.nodeTreeName, self.nodeName)
-        node.assignListType(node.selectedListType)
-        return {"FINISHED"}
-                
-                
-class AppendSocket(bpy.types.Operator):
-    bl_idname = "mn.append_socket_to_list_create_node"
-    bl_label = "Append Socket"
-    bl_description = "Create a new input socket"
-    bl_options = {"REGISTER"}
-    
-    nodeTreeName = bpy.props.StringProperty()
-    nodeName = bpy.props.StringProperty()
-    
-    def execute(self, context):
-        node = getNode(self.nodeTreeName, self.nodeName)
-        node.newInputSocket()
-        return {"FINISHED"}                
+            socket.showName = False             
