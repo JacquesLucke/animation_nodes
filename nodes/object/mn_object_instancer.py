@@ -7,7 +7,7 @@ from ... nodes.mn_node_helper import *
 from ... utils.mn_name_utils import *
 from ... mn_cache import *
 
-objectTypes = ["Mesh", "Text", "Camera", "Point Lamp"]
+objectTypes = ["Mesh", "Text", "Camera", "Point Lamp", "Curve"]
 objectTypeItems = [(type, type, "") for type in objectTypes]
 
 class mn_ObjectNamePropertyGroup(bpy.types.PropertyGroup):
@@ -170,7 +170,7 @@ class mn_ObjectInstancer(Node, AnimationNode):
                 bpy.data.lattices.remove(data)
             elif type == "LAMP":
                 bpy.data.lamps.remove(data)
-            elif type == "SPEADER":
+            elif type == "SPEAKER":
                 bpy.data.speakers.remove(data)
             
     def appendNewObject(self, sourceObject):
@@ -210,6 +210,8 @@ class mn_ObjectInstancer(Node, AnimationNode):
                 return bpy.data.cameras.new(getPossibleCameraName("instance camera"))
             elif self.objectType == "Point Lamp":
                 return bpy.data.lamps.new(getPossibleLampName("instance lamp"), type = "POINT")
+            elif self.objectType == "Curve":
+                return bpy.data.curves.new(getPossibleCurveName("instance curve"), type = "CURVE")
         return None
         
     def unlinkInstance(self, object):
