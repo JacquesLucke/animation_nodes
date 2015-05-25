@@ -27,16 +27,12 @@ class mn_DebugOutputNode(Node, AnimationNode):
     def draw_buttons(self, context, layout):
         if self.showIterableInRows:
             elements = self.debugOutputString.split(self.lineSeparator)
-            
             if self.startRow > 0: layout.label("--- {} elements above ---".format(min(self.startRow, len(elements))))
-            
             col = layout.column(align = True)
-            
             endRow = self.startRow + self.maxRowAmount
             for i, element in enumerate(elements):
                 if self.startRow <= i < endRow:
                     col.label("{}: {}".format(i, element))
-                    
             if endRow < len(elements): layout.label("--- {} elements below ---".format(len(elements) - endRow))
         else:
             layout.label(self.debugOutputString)
@@ -49,10 +45,7 @@ class mn_DebugOutputNode(Node, AnimationNode):
         subcol.prop(self, "startRow")
         subcol.prop(self, "maxRowAmount")
             
-        layout.separator()
         layout.prop(self, "printDebugString", text = "Print")
-        
-        layout.separator()
         layout.prop(self, "bl_width_max", text = "Max Node Width")
         
     def execute(self, input):
