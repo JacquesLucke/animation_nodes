@@ -15,7 +15,8 @@ possibleProperties = {
     "bevel_object" : ("Bevel Object", "Object"),
     "resolution_u" : ("Preview Resolution", "Integer"),
     "bevel_factor_start" : ("Bevel Start", "Float"),
-    "bevel_factor_end" : ("Bevel End", "Float") }
+    "bevel_factor_end" : ("Bevel End", "Float"),
+    "fill_mode" : ("Fill Mode", "String")}
 
 class mn_CurveProperties(Node, AnimationNode):
     bl_idname = "mn_CurveProperties"
