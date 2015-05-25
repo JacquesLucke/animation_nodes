@@ -47,9 +47,7 @@ class mn_LoopCallerNode(Node, AnimationNode):
         col.operator("wm.call_menu", text = "New Loop").name = "mn.add_loop_node_menu"
         row = col.row(align = True)
         row.prop(self, "selectedLoop", text = "")
-        setActive = row.operator("mn.update_active_loop", text = "", icon = "FILE_REFRESH")
-        setActive.nodeTreeName = self.id_data.name
-        setActive.nodeName = self.name
+        self.callFunctionFromUI(row, "updateActiveLoop", text = "", icon = "FILE_REFRESH")
         layout.label("Active: \"" + self.activeLoop + "\"")
         
         if self.getStartNode() is None:
@@ -106,17 +104,6 @@ class mn_LoopCallerNode(Node, AnimationNode):
         self.updateSockets()
         nodeTreeChanged()
 
-class UpdateActiveLoop(bpy.types.Operator):
-    bl_idname = "mn.update_active_loop"
-    bl_label = "Update Active Loop"
-    
-    nodeTreeName = bpy.props.StringProperty()
-    nodeName = bpy.props.StringProperty()
-    
-    def execute(self, context):
-        node = getNode(self.nodeTreeName, self.nodeName)
-        node.updateActiveLoop()
-        return {'FINISHED'}
         
 class AddLoopNodeMenu(bpy.types.Menu):
     bl_idname = "mn.add_loop_node_menu"
