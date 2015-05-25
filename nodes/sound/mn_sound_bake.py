@@ -39,9 +39,8 @@ class mn_SoundBakeNode(Node, AnimationNode):
         selectPath.nodeName = self.name
         
         row = layout.row(align = True)
-        bake = row.operator("mn.bake_sound_to_node", "Bake")
-        bake.nodeTreeName = self.id_data.name
-        bake.nodeName = self.name
+        self.callFunctionFromUI(row, "bakeSound", text = "Bake")
+        
         loadSound = row.operator("mn.set_sound_in_sequence_editor", "Load Sound")
         loadSound.filePath = self.filePath
         
@@ -181,17 +180,6 @@ class mn_SoundBakeNode(Node, AnimationNode):
         identifier = self.id_data.name + self.name
         setLongTimeCache(identifier, None)
         
-class BakeSoundToNode(bpy.types.Operator):
-    bl_idname = "mn.bake_sound_to_node"
-    bl_label = "Bake Sound to Node"
-    
-    nodeTreeName = bpy.props.StringProperty()
-    nodeName = bpy.props.StringProperty()
-    
-    def execute(self, context):
-        node = getNode(self.nodeTreeName, self.nodeName)
-        node.bakeSound()
-        return {'FINISHED'}
         
 class SelectSoundFilePath(bpy.types.Operator):
     bl_idname = "mn.select_sound_file_path"
