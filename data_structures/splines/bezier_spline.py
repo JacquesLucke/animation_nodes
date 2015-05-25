@@ -32,6 +32,9 @@ class BezierSpline(Spline):
     def appendPoint(self, coordinates):
         self.appendBezierPoint(coordinates, coordinates.copy(), coordinates.copy())
         
+    def getPoints(self):
+        return [point.location for point in self.points]
+        
     def appendBezierPoint(self, location, leftHandle, rightHandle):
         point = BezierPoint(location, leftHandle, rightHandle)
         self.points.append(point)

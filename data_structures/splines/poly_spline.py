@@ -31,6 +31,9 @@ class PolySpline(Spline):
     def appendPoint(self, coordinates):
         self.points.append(coordinates)
         
+    def getPoints(self):
+        return self.points
+        
     def update(self):
         def recreateSegments():
             self.segments = []

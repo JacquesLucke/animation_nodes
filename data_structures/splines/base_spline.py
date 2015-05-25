@@ -22,6 +22,9 @@ class Spline:
     def appendPoint(self, coordinates):
         return None
         
+    def getPoints(self):
+        return []
+        
         
     # call this before evaluating the spline
     def update(self):
