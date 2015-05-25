@@ -17,6 +17,8 @@ possibleProperties = {
     "bevel_factor_start" : ("Bevel Start", "Float", 0),
     "bevel_factor_end" : ("Bevel End", "Float", 1),
     "fill_mode" : ("Fill Mode", "String", "FULL")}
+    
+fillModes = ("FULL", "BACK", "FRONT", "HALF")  
 
 class mn_CurveProperties(Node, AnimationNode):
     bl_idname = "mn_CurveProperties"
@@ -39,6 +41,8 @@ class mn_CurveProperties(Node, AnimationNode):
     selectedPath = EnumProperty(name = "Type", items = getPossiblePropertyItems)
     manageSockets = BoolProperty(name = "Manage Sockets", default = False, update = settingChanged, description = "Allows to move or remove sockets")
     
+    errorMessage = StringProperty(default = "")
+    
     def init(self, context):
         forbidCompiling()
         self.inputs.new("mn_ObjectSocket", "Object").showName = False   
@@ -55,13 +59,29 @@ class mn_CurveProperties(Node, AnimationNode):
         
         layout.prop(self, "manageSockets")
         
+        if self.errorMessage != "":
+            layout.label(self.errorMessage, icon = "ERROR")
+        
     def execute(self, inputs):
         object = inputs["Object"]
-        if getattr(object, "type", "") == "CURVE":
-            for path, value in inputs.items():
-                if path == "Object": continue
-                setattr(object.data, path, value)
-        return {"Object" : object}
+        outputs = {"Object" : object}
+        
+        self.errorMessage = ""
+        if not object: return outputs
+        if object.type != "CURVE":
+            self.errorMessage = "Object is no curve"
+            return outputs
+        if object.data.dimensions == "2D": 
+            self.errorMessage = "Curve has to be 3D"
+            return outputs
+        if inputs.get("fill_mode", "FULL") not in fillModes:
+            self.errorMessage = "Invalid fill mode"
+            return outputs
+        
+        for path, value in inputs.items():
+            if path == "Object": continue
+            setattr(object.data, path, value)
+        return outputs
         
     def newSocketFromSelection(self):
         path = self.selectedPath

@@ -1,4 +1,5 @@
 import bpy
+from bpy.props import *
 from .. mn_execution import nodePropertyChanged
 from .. mn_node_base import *
 
@@ -9,9 +10,9 @@ class mn_ObjectSocket(mn_BaseSocket, mn_SocketProperties):
     allowedInputTypes = ["Object"]
     drawColor = (0, 0, 0, 1)
     
-    objectName = bpy.props.StringProperty(update = nodePropertyChanged)
-    showName = bpy.props.BoolProperty(default = True)
-    createObject = bpy.props.BoolProperty(default = False)
+    objectName = StringProperty(update = nodePropertyChanged)
+    showName = BoolProperty(default = True)
+    objectCreationType = StringProperty(default = "")
     
     def drawInput(self, layout, node, text):
         col = layout.column()
@@ -20,12 +21,13 @@ class mn_ObjectSocket(mn_BaseSocket, mn_SocketProperties):
             row.label(text)
         row.prop_search(self, "objectName",  bpy.context.scene, "objects", icon="NONE", text = "")
         
-        if self.createObject:
+        if self.objectCreationType != "":
             creator = row.operator("mn.assign_new_empty_mesh_object_to_socket", text = "", icon = "PLUS")
             creator.nodeTreeName = node.id_data.name
             creator.nodeName = node.name
             creator.isOutput = self.is_output
             creator.socketName = self.name
+            creator.objectType = self.objectCreationType
         
         selector = row.operator("mn.assign_active_object_to_socket", text = "", icon = "EYEDROPPER")
         selector.nodeTreeName = node.id_data.name
@@ -67,17 +69,24 @@ class AssignActiveObjectToNode(bpy.types.Operator):
 class CreateEmptyMeshObject(bpy.types.Operator):
     bl_idname = "mn.assign_new_empty_mesh_object_to_socket"
     bl_label = "Create Empty Mesh Object"
-    bl_description = "Create empty mesh object and assign to this socket"
+    bl_description = "Create new object and assign to this socket"
     bl_options = {"REGISTER"}
     
-    nodeTreeName = bpy.props.StringProperty()
-    nodeName = bpy.props.StringProperty()
-    isOutput = bpy.props.BoolProperty()
-    socketName = bpy.props.StringProperty()
+    nodeTreeName = StringProperty()
+    nodeName = StringProperty()
+    isOutput = BoolProperty()
+    socketName = StringProperty()
+    
+    objectType = StringProperty()
     
     def execute(self, context):
-        mesh = bpy.data.meshes.new("Mesh")
-        object = bpy.data.objects.new("Object", mesh)
+        data = None
+        if self.objectType == "MESH": data = bpy.data.meshes.new("Mesh")
+        if self.objectType == "CURVE": 
+            data = bpy.data.curves.new("Curve", "CURVE")
+            data.dimensions = "3D"
+            data.fill_mode = "FULL"
+        object = bpy.data.objects.new("Target", data)
         context.scene.objects.link(object)
         
         node = getNode(self.nodeTreeName, self.nodeName)

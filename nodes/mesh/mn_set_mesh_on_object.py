@@ -12,7 +12,7 @@ class mn_SetMeshOnObject(Node, AnimationNode):
         forbidCompiling()
         socket = self.inputs.new("mn_ObjectSocket", "Object")
         socket.showName = False
-        socket.createObject = True
+        socket.objectCreationType = "MESH"
         self.inputs.new("mn_MeshSocket", "Mesh")
         self.outputs.new("mn_ObjectSocket", "Object")
         allowCompiling()

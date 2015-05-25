@@ -10,7 +10,9 @@ class mn_SetSplinesOnObject(Node, AnimationNode):
     
     def init(self, context):
         forbidCompiling()
-        self.inputs.new("mn_ObjectSocket", "Object").showName = False
+        socket = self.inputs.new("mn_ObjectSocket", "Object")
+        socket.showName = False
+        socket.objectCreationType = "CURVE"
         self.inputs.new("mn_SplineListSocket", "Splines").showObjectInput = False
         self.outputs.new("mn_ObjectSocket", "Object")
         allowCompiling()
