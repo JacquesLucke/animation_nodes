@@ -24,6 +24,9 @@ class PolySpline(Spline):
         for point in self.points:
             newPoints.append(matrix * point)
         self.points = newPoints
+        
+    def appendPoints(self, points):
+        self.points.extend(points)
             
     def appendPoint(self, coordinates):
         self.points.append(coordinates)
