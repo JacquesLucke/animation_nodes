@@ -28,14 +28,8 @@ class mn_MultiFloatMathNode(Node, AnimationNode):
         layout.prop(self, "operation", text = "Operation")
     
         row = layout.row(align = True)
-    
-        newSocket = row.operator("mn.add_multi_math_socket", text = "New", icon = "PLUS")
-        newSocket.nodeTreeName = self.id_data.name
-        newSocket.nodeName = self.name
-        
-        removeSocket = row.operator("mn.remove_multi_math_socket", text = "Remove", icon = "X")
-        removeSocket.nodeTreeName = self.id_data.name
-        removeSocket.nodeName = self.name
+        self.callFunctionFromUI(row, "newInputSocket", text = "New", icon = "PLUS")
+        self.callFunctionFromUI(row, "removeInputSocket", text = "Remove", icon = "X")
         
     def update(self):
         forbidCompiling()
@@ -86,28 +80,3 @@ class mn_MultiFloatMathNode(Node, AnimationNode):
         if len(self.inputs) > 2:
             self.inputs.remove(self.inputs[len(self.inputs) - 2])
         allowCompiling()
-        
-
-class AddMultiMathSocket(bpy.types.Operator):
-    bl_idname = "mn.add_multi_math_socket"
-    bl_label = "Add Multi Math Socket"
-    
-    nodeTreeName = bpy.props.StringProperty()
-    nodeName = bpy.props.StringProperty()
-    
-    def execute(self, context):
-        node = getNode(self.nodeTreeName, self.nodeName)
-        node.newInputSocket()
-        return {'FINISHED'}
-        
-class RemoveMultiMathSocket(bpy.types.Operator):
-    bl_idname = "mn.remove_multi_math_socket"
-    bl_label = "Remove Multi Math Socket"
-    
-    nodeTreeName = bpy.props.StringProperty()
-    nodeName = bpy.props.StringProperty()
-    
-    def execute(self, context):
-        node = getNode(self.nodeTreeName, self.nodeName)
-        node.removeInputSocket()
-        return {'FINISHED'}
