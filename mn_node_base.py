@@ -4,6 +4,10 @@ from . mn_execution import nodeTreeChanged
 from bpy.types import NodeTree, Node, NodeSocket
 from . mn_utils import *
 
+
+# Node Tree
+##################################
+
 class mn_AnimationNodeTree(bpy.types.NodeTree):
     bl_idname = "mn_AnimationNodeTree"
     bl_label = "Animation";
@@ -13,7 +17,11 @@ class mn_AnimationNodeTree(bpy.types.NodeTree):
     
     def update(self):
         nodeTreeChanged()
-        
+    
+
+
+# Node
+##################################    
         
         
 class AnimationNode:
@@ -21,7 +29,30 @@ class AnimationNode:
     def poll(cls, nodeTree):
         return nodeTree.bl_idname == "mn_AnimationNodeTree"
         
+    def callFunctionFromUI(self, layout, functionName, text = "", icon = ""):
+        props = layout.operator("mn.call_node_function", text = text, icon = icon)
+        props.nodeTreeName = self.id_data.name
+        props.nodeName = self.name
+        props.functionName = functionName
+        
+        
+class CallNodeFunction(bpy.types.Operator):
+    bl_idname = "mn.call_node_function"
+    bl_label = "Remove Socket"
+    
+    nodeTreeName = StringProperty()
+    nodeName = StringProperty()
+    functionName = StringProperty()
+    
+    def execute(self, context):
+        node = getNode(self.nodeTreeName, self.nodeName)
+        getattr(node, self.functionName)()
+        return {'FINISHED'}        
+        
 
+        
+# Node Socket
+##################################        
         
 class mn_BaseSocket(NodeSocket):
     bl_idname = "mn_BaseSocket"
