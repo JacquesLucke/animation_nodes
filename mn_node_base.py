@@ -29,7 +29,7 @@ class AnimationNode:
     def poll(cls, nodeTree):
         return nodeTree.bl_idname == "mn_AnimationNodeTree"
         
-    def callFunctionFromUI(self, layout, functionName, text = "", icon = ""):
+    def callFunctionFromUI(self, layout, functionName, text = "", icon = "NONE"):
         props = layout.operator("mn.call_node_function", text = text, icon = icon)
         props.nodeTreeName = self.id_data.name
         props.nodeName = self.name
