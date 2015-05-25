@@ -13,11 +13,14 @@ class mn_DebugOutputNode(Node, AnimationNode):
     def init(self, context):
         forbidCompiling()
         self.inputs.new("mn_GenericSocket", "Data")
+        self.bl_width_max = 10000
         allowCompiling()
         
     def draw_buttons(self, context, layout):
-        layout.prop(self, "printDebugString", text = "Print")
         layout.label(self.debugOutputString)
+        
+    def draw_buttons_ext(self, context, layout):
+        layout.prop(self, "printDebugString", text = "Print")
         
     def execute(self, input):
         self.debugOutputString = str(input["Data"])
