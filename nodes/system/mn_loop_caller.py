@@ -93,7 +93,7 @@ class mn_LoopCallerNode(Node, AnimationNode):
         allowCompiling()
             
     def getSocketTypeForListSocket(self, socketType):
-        listSocketType = getListSocketType(socketType)
+        listSocketType = getListSocketIdName(socketType)
         if listSocketType == None: return "mn_GenericSocket"
         return listSocketType
 

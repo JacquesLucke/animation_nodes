@@ -37,13 +37,13 @@ class mn_GetListElementNode(Node, AnimationNode):
             self.generateSockets(originSocket.bl_idname)
             nodeTree.links.new(self.inputs.get("List"), originSocket)
         if originSocket is None and len(targetSockets) == 1:
-            self.generateSockets(getListSocketType(targetSockets[0].bl_idname))
+            self.generateSockets(getListSocketIdName(targetSockets[0].bl_idname))
             nodeTree.links.new(targetSockets[0], self.outputs.get("Element"))
         allowCompiling()
         
     def generateSockets(self, listIdName = "mn_ObjectListSocket"):
         if listIdName is None: return
-        baseIdName = getBaseSocketType(listIdName)
+        baseIdName = getListBaseSocketIdName(listIdName)
         if baseIdName is None: return
         if listIdName == getattr(self.inputs.get("List"), "bl_idname", None): return
         

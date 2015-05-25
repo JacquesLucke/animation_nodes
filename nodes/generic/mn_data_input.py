@@ -3,13 +3,13 @@ from bpy.types import Node
 from bpy.props import *
 from ... mn_node_base import AnimationNode
 from ... utils.mn_node_utils import *
-from ... sockets.mn_socket_info import getSocketNameItems, getSocketNameByDataType
+from ... sockets.mn_socket_info import getSocketDataTypeItems, getIdNameFromDataType
 from ... mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 
 def getListTypeItems(self, context):
     listTypeItems = []
-    for idName in getListDataTypes():
-        baseIdName = getBaseSocketType(idName)
+    for idName in getListSocketIdNames():
+        baseIdName = getListBaseSocketIdName(idName)
         cls = getSocketClassFromIdName(baseIdName)
         item = (idName, cls.dataType, "")
         listTypeItems.append(item)
@@ -19,7 +19,7 @@ class mn_DataInput(Node, AnimationNode):
     bl_idname = "mn_DataInput"
     bl_label = "Data Input"
     
-    selectedType = EnumProperty(name = "Type", items = getSocketNameItems)
+    selectedType = EnumProperty(name = "Type", items = getSocketDataTypeItems)
     assignedType = StringProperty(default = "Float")
     
     def init(self, context):
@@ -53,7 +53,7 @@ class mn_DataInput(Node, AnimationNode):
         self.inputs.clear()
         self.outputs.clear()
         
-        idName = getSocketNameByDataType(self.assignedType)
+        idName = getIdNameFromDataType(self.assignedType)
         socket = self.inputs.new(idName, "Input")
         self.setupSocket(socket)
         socket = self.outputs.new(idName, "Output")

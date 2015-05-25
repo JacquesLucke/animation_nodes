@@ -47,7 +47,7 @@ class mn_ConvertNode(Node, AnimationNode):
         forbidCompiling()
         connections = getConnectionDictionaries(self)
         self.outputs.clear()
-        self.outputs.new(getSocketNameByDataType(self.convertType), "New")
+        self.outputs.new(getIdNameFromDataType(self.convertType), "New")
         tryToSetConnectionDictionaries(self, connections)
         allowCompiling()
         

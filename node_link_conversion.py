@@ -1,7 +1,7 @@
 import bpy
 from mathutils import Vector
 from . utils.mn_node_utils import *
-from . sockets.mn_socket_info import getBaseSocketType
+from . sockets.mn_socket_info import getListBaseSocketIdName
 
 def correctForbiddenNodeLinks():
     nodeTree = NodeTreeInfo(getAnimationNodeTrees())
@@ -54,7 +54,7 @@ class ConvertParticleSystemToParticles(LinkCorrection):
     
 class ConvertListToElement(LinkCorrection):
     def check(self, origin, target):
-        return getBaseSocketType(origin.bl_idname) == target.bl_idname
+        return getListBaseSocketIdName(origin.bl_idname) == target.bl_idname
     def insert(self, nodeTree, origin, target):
         node = insertNode(nodeTree, "mn_GetListElementNode", origin, target)
         node.generateSockets(listIdName = origin.bl_idname)
@@ -62,7 +62,7 @@ class ConvertListToElement(LinkCorrection):
         
 class ConvertElementToList(LinkCorrection):
     def check(self, origin, target):
-        return origin.bl_idname == getBaseSocketType(target.bl_idname)
+        return origin.bl_idname == getListBaseSocketIdName(target.bl_idname)
     def insert(self, nodeTree, origin, target):
         node = insertNode(nodeTree, "mn_CreateList", origin, target)
         node.assignListType(target.bl_idname, inputAmount = 1)

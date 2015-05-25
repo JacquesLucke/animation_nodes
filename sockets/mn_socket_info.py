@@ -11,28 +11,28 @@ listChains = [
     ["mn_ParticleSystemSocket", "mn_ParticleSystemListSocket"],
     ["mn_SplineSocket", "mn_SplineListSocket"] ]
     
-def getBaseSocketType(socketType):
+def getListBaseSocketIdName(idName):
     for listChain in listChains:
-        if socketType in listChain:
-            index = listChain.index(socketType)
+        if idName in listChain:
+            index = listChain.index(idName)
             if index == 0: return None
             else: return listChain[index - 1]
     
-def getListSocketType(socketType):
+def getListSocketIdName(idName):
     for listChain in listChains:
-        if socketType in listChain:
-            index = listChain.index(socketType)
+        if idName in listChain:
+            index = listChain.index(idName)
             if index == len(listChain) - 1: return None
             return listChain[index + 1]
     return None
     
-def isListSocketType(socketType):
-    return not getBaseSocketType(socketType) == None
+def isListSocketIdName(socketType):
+    return not getListBaseSocketIdName(socketType) == None
     
-def hasListSocketType(socketType):
-    return not getListSocketType(socketType) == None
+def hasListSocket(socketType):
+    return not getListSocketIdName(socketType) == None
     
-def getSocketNameByDataType(dataType):
+def getIdNameFromDataType(dataType):
     for subClass in getSocketClasses():
         if getattr(subClass, "dataType") == dataType: return subClass.bl_idname
     return None
@@ -42,7 +42,7 @@ def getSocketClassFromIdName(idName):
         if cls.bl_idname == idName: return cls
     return None
     
-def getListDataTypes():
+def getListSocketIdNames():
     types = []
     for listChain in listChains:
         for i, type in enumerate(listChain):
@@ -50,12 +50,12 @@ def getListDataTypes():
                 types.append(type)
     return types
 
-def getSocketNameItems(self, context):
-    socketNames = getSocketNames()
+def getSocketDataTypeItems(self, context):
+    socketNames = getSocketDataTypes()
     socketNames.sort()
     return [(name, name, "") for name in socketNames]
         
-def getSocketNames():
+def getSocketDataTypes():
     return [socketClass.dataType for socketClass in getSocketClasses()]
     
 def getSocketClasses():

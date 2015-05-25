@@ -8,8 +8,8 @@ from ... mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompilin
 
 def getListTypeItems(self, context):
     listTypeItems = []
-    for idName in getListDataTypes():
-        baseIdName = getBaseSocketType(idName)
+    for idName in getListSocketIdNames():
+        baseIdName = getListBaseSocketIdName(idName)
         cls = getSocketClassFromIdName(baseIdName)
         item = (idName, cls.dataType, "")
         listTypeItems.append(item)
@@ -68,7 +68,7 @@ class mn_CreateList(Node, AnimationNode):
         nodeTreeChanged()
         
     def newInputSocket(self):
-        baseIdName = getBaseSocketType(self.listType)
+        baseIdName = getListBaseSocketIdName(self.listType)
         socket = self.inputs.new(baseIdName, getNotUsedSocketName(self, "Element"))
         socket.displayCustomName = True
         socket.uniqueCustomName = False
