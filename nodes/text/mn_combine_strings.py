@@ -21,13 +21,8 @@ class mn_CombineStringsNode(Node, AnimationNode):
     def draw_buttons(self, context, layout):
         row = layout.row(align = True)
     
-        newSocket = row.operator("mn.add_combine_strings_socket", text = "New", icon = "PLUS")
-        newSocket.nodeTreeName = self.id_data.name
-        newSocket.nodeName = self.name
-        
-        removeSocket = row.operator("mn.remove_combine_strings_socket", text = "Remove", icon = "X")
-        removeSocket.nodeTreeName = self.id_data.name
-        removeSocket.nodeName = self.name
+        self.callFunctionFromUI(row, "newInputSocket", text = "New", icon = "PLUS")
+        self.callFunctionFromUI(row, "removeInputSocket", text = "Remove", icon = "X")
         
     def update(self):
         forbidCompiling()
@@ -75,30 +70,3 @@ class mn_CombineStringsNode(Node, AnimationNode):
             self.inputs.remove(self.inputs[len(self.inputs) - 2])
         allowCompiling()
         nodeTreeChanged()
-        
-        
-        
-class AddCombineStringsSocket(bpy.types.Operator):
-    bl_idname = "mn.add_combine_strings_socket"
-    bl_label = "Add Multi Math Socket"
-    
-    nodeTreeName = bpy.props.StringProperty()
-    nodeName = bpy.props.StringProperty()
-    
-    def execute(self, context):
-        node = getNode(self.nodeTreeName, self.nodeName)
-        node.newInputSocket()
-        return {'FINISHED'}
-        
-class RemoveCombineStringsSocket(bpy.types.Operator):
-    bl_idname = "mn.remove_combine_strings_socket"
-    bl_label = "Remove Multi Math Socket"
-    
-    nodeTreeName = bpy.props.StringProperty()
-    nodeName = bpy.props.StringProperty()
-    
-    def execute(self, context):
-        node = getNode(self.nodeTreeName, self.nodeName)
-        node.removeInputSocket()
-        return {'FINISHED'}
-
