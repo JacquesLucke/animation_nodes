@@ -29,7 +29,8 @@ class mn_SplineSocket(mn_BaseSocket, mn_SocketProperties):
             props.isOutput = self.is_output
             props.socketName = self.name
             props.target = "objectName"
-            row.prop(self, "useWorldSpace", text = "", icon = "WORLD")
+            if self.objectName != "":
+                row.prop(self, "useWorldSpace", text = "", icon = "WORLD")
         
     def getValue(self):
         object = bpy.data.objects.get(self.objectName)
