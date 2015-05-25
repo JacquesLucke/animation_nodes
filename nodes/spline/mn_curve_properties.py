@@ -53,9 +53,7 @@ class mn_CurveProperties(Node, AnimationNode):
     def draw_buttons(self, context, layout):
         row = layout.row(align = True)
         row.prop(self, "selectedPath", text = "")
-        props = row.operator("mn.append_curve_property_socket", text = "", icon = "PLUS")
-        props.nodeTreeName = self.id_data.name
-        props.nodeName = self.name
+        self.callFunctionFromUI(row, "newSocketFromSelection", text = "", icon = "PLUS")
         
         layout.prop(self, "manageSockets")
         
@@ -99,18 +97,4 @@ class mn_CurveProperties(Node, AnimationNode):
         # extra case to create an enum property
         if path == "fill_mode":
             socket.useEnum = True
-            socket.setEnumItems([("FULL",), ("BACK",), ("FRONT",), ("HALF",)])
-        
-class AppendSocket(bpy.types.Operator):
-    bl_idname = "mn.append_curve_property_socket"
-    bl_label = "Append Socket"
-    bl_description = "Create a new socket for the selected property"
-    bl_options = {"REGISTER"}
-    
-    nodeTreeName = bpy.props.StringProperty()
-    nodeName = bpy.props.StringProperty()
-    
-    def execute(self, context):
-        node = getNode(self.nodeTreeName, self.nodeName)
-        node.newSocketFromSelection()
-        return {"FINISHED"}          
+            socket.setEnumItems([("FULL",), ("BACK",), ("FRONT",), ("HALF",)])        
