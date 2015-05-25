@@ -222,13 +222,18 @@ class SplineMenu(bpy.types.Menu):
         layout = self.layout                                             
         insertNode(layout, "mn_SplineEvaluator", "Evaluate")                                                 
         insertNode(layout, "mn_ProjectOnSpline", "Project")
+        insertNode(layout, "mn_GetSplinePoints", "Get Spline Points")
+        insertNode(layout, "mn_AppendPointToSpline", "Append Point to Spline")
+        layout.separator()
         insertNode(layout, "mn_CreateSpline", "Create Spline")
+        insertNode(layout, "mn_SmoothBezierSpline", "Smooth Bezier Spline")
         insertNode(layout, "mn_SplinesFromObject", "Splines from Object")
         insertNode(layout, "mn_SetSplinesOnObject", "Set Splines on Object")
-        insertNode(layout, "mn_AppendPointToSpline", "Append Point to Spline")
         layout.separator()
         insertNode(layout, "mn_LoftSplines", "Loft")
         insertNode(layout, "mn_RevolveSpline", "Revolve")
+        layout.separator()
+        insertNode(layout, "mn_CurveProperties", "Curve Properties")
                                   
 class SoundMenu(bpy.types.Menu):
     bl_idname = "mn.sound_menu"
