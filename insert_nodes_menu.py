@@ -145,6 +145,7 @@ class ListMenu(bpy.types.Menu):
     
     def draw(self, context):
         layout = self.layout
+        insertNode(layout, "mn_CreateList", "Create List")             
         insertNode(layout, "mn_GetListElementNode", "Get Element")             
         insertNode(layout, "mn_SetListElementNode", "Set Element")             
         insertNode(layout, "mn_GetListLengthNode", "Length")              
