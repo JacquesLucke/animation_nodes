@@ -46,9 +46,7 @@ class mn_SeparateTextObject(Node, AnimationNode):
         layout.prop(self, "convertToMesh")
         layout.prop_search(self, "materialName", bpy.data, "materials", text="Material", icon="MATERIAL_DATA")
         
-        update = layout.operator("mn.update_text_separation_node", text = "Update", icon = "FILE_REFRESH")
-        update.nodeTreeName = self.id_data.name
-        update.nodeName = self.name
+        self.callFunctionFromUI(layout, "updateSeparation", text = "Update", icon = "FILE_REFRESH")
         
     def draw_buttons_ext(self, context, layout):
         layout.prop(self, "parentLetters")
@@ -201,18 +199,6 @@ def setMaterialOnObjects(objects, material):
     for object in objects:
         object.active_material = material
         
-class UpdateTextSeparationNode(bpy.types.Operator):
-    bl_idname = "mn.update_text_separation_node"
-    bl_label = "Update Text Separation"
-    
-    nodeTreeName = bpy.props.StringProperty()
-    nodeName = bpy.props.StringProperty()
-        
-    def execute(self, context):
-        obj = getActive()
-        node = getNode(self.nodeTreeName, self.nodeName)
-        node.updateSeparation()
-        return {'FINISHED'}
 
 class AssignActiveObjectToTextSeparationNode(bpy.types.Operator):
     bl_idname = "mn.assign_active_object_to_text_separation_node"
