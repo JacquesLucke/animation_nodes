@@ -52,17 +52,17 @@ class mn_CreateList(Node, AnimationNode):
             elements.append(inputs[socket.identifier])
         return {"List" : elements}
         
-    def assignListType(self, idName):
+    def assignListType(self, idName, inputAmount = 2):
         self.listType = idName
-        self.recreateSockets()
+        self.recreateSockets(inputAmount)
         
-    def recreateSockets(self):
+    def recreateSockets(self, inputAmount = 2):
         forbidCompiling()
         self.inputs.clear()
         self.outputs.clear()
         
-        self.newInputSocket()
-        self.newInputSocket()
+        for i in range(inputAmount):
+            self.newInputSocket()
         self.outputs.new(self.listType, "List")
         allowCompiling()
         nodeTreeChanged()
