@@ -59,7 +59,7 @@ class mn_ObjectInstancer(Node, AnimationNode):
             description = "Reset the source data on all instances")
         self.callFunctionFromUI(layout, "unlinkInstancesFromNode", 
             text = "Unlink Instances from Node", 
-            description = "Reset the source data on all instances")
+            description = "This will make sure that the objects won't be removed if you remove the Replicate Node.")
         
     def getInputSocketNames(self):
         return {"Instances" : "instancesAmount",

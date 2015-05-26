@@ -46,7 +46,10 @@ class mn_SeparateTextObject(Node, AnimationNode):
         layout.prop(self, "convertToMesh")
         layout.prop_search(self, "materialName", bpy.data, "materials", text="Material", icon="MATERIAL_DATA")
         
-        self.callFunctionFromUI(layout, "updateSeparation", text = "Update", icon = "FILE_REFRESH")
+        self.callFunctionFromUI(layout, "updateSeparation",
+            text = "Update", 
+            description = "Recreate the individual characters from the source object",
+            icon = "FILE_REFRESH")
         
     def draw_buttons_ext(self, context, layout):
         layout.prop(self, "parentLetters")

@@ -71,8 +71,11 @@ def createMissingOperators(scene):
     
 def createNodeFunctionCallOperator(description):
     if description not in nodeFunctionCallOperators:
+    
         id = str(len(nodeFunctionCallOperators))
         idName = "mn.call_node_function_" + id
+        nodeFunctionCallOperators[description] = idName
+        
         operatorType = type("CallNodeFunction_" + id, (bpy.types.Operator,), {
             "bl_idname" : idName,
             "bl_label" : "Call Node Function",
@@ -81,8 +84,8 @@ def createNodeFunctionCallOperator(description):
         operatorType.nodeTreeName = StringProperty()
         operatorType.nodeName = StringProperty()
         operatorType.functionName = StringProperty()
+        
         bpy.utils.register_class(operatorType)
-        nodeFunctionCallOperators[description] = idName
     
 
     
