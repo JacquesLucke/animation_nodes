@@ -53,7 +53,10 @@ class mn_CurveProperties(Node, AnimationNode):
     def draw_buttons(self, context, layout):
         row = layout.row(align = True)
         row.prop(self, "selectedPath", text = "")
-        self.callFunctionFromUI(row, "newSocketFromSelection", text = "", icon = "PLUS")
+        self.callFunctionFromUI(row, "newSocketFromSelection",
+            text = "", 
+            description = "Create a new socket for the selected property", 
+            icon = "PLUS")
         
         layout.prop(self, "manageSockets")
         
