@@ -42,6 +42,7 @@ class BezierSpline(Spline):
     def update(self):
         def recreateSegments():
             self.segments = []
+            if len(self.points) < 2: return
             for left, right in zip(self.points[:-1], self.points[1:]):
                 self.segments.append(BezierSegment(left, right))
             if self.isCyclic:

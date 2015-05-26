@@ -55,6 +55,7 @@ class Spline:
     
     # the resolution may not be needed in every subclass
     def getLength(self, resolution = 50):
+        if not self.isEvaluable: return 0.0
         samples = self.getSamples(resolution)
         length = 0.0
         for i in range(resolution - 1):

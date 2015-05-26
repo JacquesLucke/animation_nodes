@@ -16,6 +16,7 @@ class PolySpline(Spline):
         
     def copy(self):
         spline = PolySpline()
+        spline.isCyclic = self.isCyclic
         spline.points = [point.copy() for point in self.points]
         return spline
     
@@ -37,6 +38,7 @@ class PolySpline(Spline):
     def update(self):
         def recreateSegments():
             self.segments = []
+            if len(self.points) < 2: return
             for left, right in zip(self.points[:-1], self.points[1:]):
                 self.segments.append(PolySegment(left, right))
             if self.isCyclic:
@@ -84,7 +86,7 @@ class PolySegment:
         return self.left * (1 - parameter) + self.right * parameter
         
     def getLength(self):
-        return (self.left - left.right).length
+        return (self.left - self.right).length
         
     def project(self, coordinates):
         return findNearestParameterOnLine(self.left, self.tangent, coordinates)
