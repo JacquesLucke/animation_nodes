@@ -111,7 +111,8 @@ class TextMenu(bpy.types.Menu):
         insertNode(layout, "mn_CombineStringsNode", "Combine")                   
         insertNode(layout, "mn_ReplicateStringsNode", "Replicate")                   
         insertNode(layout, "mn_SubstringNode", "Trim Text")                   
-        insertNode(layout, "mn_StringAnalyzeNode", "Analyze Text")   
+        insertNode(layout, "mn_StringAnalyzeNode", "Analyze Text")
+        layout.separator()
         insertNode(layout, "mn_TextBlockReader", "Text Block Reader")                     
         insertNode(layout, "mn_TextBlockWriter", "Text Block Writer") 
         insertNode(layout, "mn_SeparateTextObject", "Separate Text Object")                
@@ -146,13 +147,13 @@ class ListMenu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         insertNode(layout, "mn_CreateList", "Create List")             
+        insertNode(layout, "mn_AppendListNode", "Append to List")             
+        insertNode(layout, "mn_GetListLengthNode", "Length")   
+        insertNode(layout, "mn_ShuffleListNode", "Shuffle")             
+        insertNode(layout, "mn_ReverseListNode", "Reverse")  
+        insertNode(layout, "mn_CombineListsNode", "Combine Lists")  
         insertNode(layout, "mn_GetListElementNode", "Get Element")             
         insertNode(layout, "mn_SetListElementNode", "Set Element")             
-        insertNode(layout, "mn_GetListLengthNode", "Length")              
-        insertNode(layout, "mn_CombineListsNode", "Combine Lists")             
-        insertNode(layout, "mn_AppendListNode", "Append to List")             
-        insertNode(layout, "mn_ShuffleListNode", "Shuffle")             
-        insertNode(layout, "mn_ReverseListNode", "Reverse")             
         
 class ObjectMenu(bpy.types.Menu):
     bl_idname = "mn.object_menu"
