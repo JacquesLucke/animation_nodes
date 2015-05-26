@@ -54,8 +54,12 @@ class mn_ObjectInstancer(Node, AnimationNode):
     def draw_buttons_ext(self, context, layout):
         layout.prop(self, "parentInstances")
     
-        self.callFunctionFromUI(layout, "resetObjectDataOnAllInstances", text = "Reset Source Data")
-        self.callFunctionFromUI(layout, "unlinkInstancesFromNode", text = "Unlink Instances from Node")
+        self.callFunctionFromUI(layout, "resetObjectDataOnAllInstances", 
+            text = "Reset Source Data", 
+            description = "Reset the source data on all instances")
+        self.callFunctionFromUI(layout, "unlinkInstancesFromNode", 
+            text = "Unlink Instances from Node", 
+            description = "Reset the source data on all instances")
         
     def getInputSocketNames(self):
         return {"Instances" : "instancesAmount",
