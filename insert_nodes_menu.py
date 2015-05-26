@@ -226,6 +226,7 @@ class SplineMenu(bpy.types.Menu):
         insertNode(layout, "mn_AppendPointToSpline", "Append Point to Spline")
         layout.separator()
         insertNode(layout, "mn_CreateSpline", "Create Spline")
+        insertNode(layout, "mn_MakeSplineCyclic", "Make Spline Cyclic")
         insertNode(layout, "mn_SmoothBezierSpline", "Smooth Bezier Spline")
         insertNode(layout, "mn_SplinesFromObject", "Splines from Object")
         insertNode(layout, "mn_SetSplinesOnObject", "Set Splines on Object")
