@@ -160,18 +160,21 @@ class ObjectMenu(bpy.types.Menu):
     
     def draw(self, context):
         layout = self.layout
-        insertNode(layout, "mn_ObjectInputNode", "Object")                            
-        insertNode(layout, "mn_ObjectListInputNode", "Object List")                            
-        insertNode(layout, "mn_ObjectGroupInput", "Object Group")                     
         insertNode(layout, "mn_ObjectInfoNode", "Transforms Input") 
-        insertNode(layout, "mn_ObjectTransformsOutput", "Transforms Output")                             
+        insertNode(layout, "mn_ObjectTransformsOutput", "Transforms Output")
         insertNode(layout, "mn_ObjectMatrixInput", "Matrix input")   
         insertNode(layout, "mn_ObjectMatrixOutputNode", "Matrix Output")  
         insertNode(layout, "mn_ObjectAttributeInputNode", "Attribute Input")                            
-        insertNode(layout, "mn_ObjectAttributeOutputNode", "Attribute Output")                           
+        insertNode(layout, "mn_ObjectAttributeOutputNode", "Attribute Output")  
+        layout.separator()
+        insertNode(layout, "mn_ObjectInputNode", "Object")                            
+        insertNode(layout, "mn_ObjectListInputNode", "Object List")                            
+        insertNode(layout, "mn_ObjectGroupInput", "Object Group")
+        layout.separator()
         insertNode(layout, "mn_ObjectKeyframeInput", "AN Keyframe")                            
         insertNode(layout, "mn_CopyObjectData", "Copy Data")  
-        insertNode(layout, "mn_CopyTransformsNode", "Copy Transforms")                            
+        insertNode(layout, "mn_CopyTransformsNode", "Copy Transforms")  
+        layout.separator()
         insertNode(layout, "mn_ObjectInstancer", "Instancer") 
         
 class MeshMenu(bpy.types.Menu):
