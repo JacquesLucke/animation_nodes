@@ -34,13 +34,18 @@ class mn_CreateList(Node, AnimationNode):
         allowCompiling()
         
     def draw_buttons(self, context, layout):
-        self.callFunctionFromUI(layout, "newInputSocket", text = "New Input", icon = "PLUS")
+        self.callFunctionFromUI(layout, "newInputSocket",
+            text = "New Input",
+            description = "Create a new input socket",
+            icon = "PLUS")
         layout.prop(self, "manageSockets")
         
     def draw_buttons_ext(self, context, layout):
         col = layout.column(align = True)
         col.prop(self, "selectedListType", text = "")
-        self.callFunctionFromUI(col, "assignSelectedListType", text = "Assign")
+        self.callFunctionFromUI(col, "assignSelectedListType", 
+            text = "Assign", 
+            description = "Remove all sockets and set the selected socket type")
         
     def execute(self, inputs):
         elements = []
