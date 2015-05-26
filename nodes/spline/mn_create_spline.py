@@ -19,6 +19,7 @@ class mn_CreateSpline(Node, AnimationNode):
     def init(self, context):
         forbidCompiling()
         self.inputs.new("mn_VectorListSocket", "Points")
+        self.inputs.new("mn_BooleanSocket", "Cyclic")
         self.outputs.new("mn_SplineSocket", "Spline")
         allowCompiling()
         
@@ -26,13 +27,15 @@ class mn_CreateSpline(Node, AnimationNode):
         layout.prop(self, "splineType", text = "")
         
     def getInputSocketNames(self):
-        return {"Points" : "points"}
+        return {"Points" : "points",
+                "Cyclic" : "cyclic"}
 
     def getOutputSocketNames(self):
         return {"Spline" : "spline"}
 
-    def execute(self, points):
+    def execute(self, points, cyclic):
         if self.splineType == "BEZIER": spline = BezierSpline()
         if self.splineType == "POLY": spline = PolySpline()
         spline.appendPoints(points)
+        spline.isCyclic = cyclic
         return spline

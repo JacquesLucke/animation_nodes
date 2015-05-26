@@ -7,7 +7,7 @@ class mn_BooleanSocket(mn_BaseSocket, mn_SocketProperties):
     bl_label = "Boolean Socket"
     dataType = "Boolean"
     allowedInputTypes = ["Boolean"]
-    drawColor = (0.5, 0.5, 0.2, 1)
+    drawColor = (0.7, 0.7, 0.4, 1)
     
     value = bpy.props.BoolProperty(default = True, update = nodePropertyChanged)
     
