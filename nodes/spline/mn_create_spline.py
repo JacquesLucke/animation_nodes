@@ -14,7 +14,7 @@ class mn_CreateSpline(Node, AnimationNode):
     bl_idname = "mn_CreateSpline"
     bl_label = "Create Spline"
     
-    splineType = EnumProperty(name = "Spline Type", items = splineTypeItems)
+    splineType = EnumProperty(name = "Spline Type", items = splineTypeItems, update = nodePropertyChanged)
     
     def init(self, context):
         forbidCompiling()

@@ -11,7 +11,7 @@ class mn_MakeSplineCyclic(Node, AnimationNode):
         forbidCompiling()
         self.inputs.new("mn_SplineSocket", "Spline").showName = False
         self.inputs.new("mn_BooleanSocket", "Cyclic").value = True
-        self.outputs.new("mn_SplineSocket", "Spline").showName = False
+        self.outputs.new("mn_SplineSocket", "Spline")
         allowCompiling()
         
     def getInputSocketNames(self):
