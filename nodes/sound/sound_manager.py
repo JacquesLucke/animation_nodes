@@ -30,6 +30,7 @@ class mn_SoundManager(Node, AnimationNode):
         
     def draw_buttons(self, context, layout):
         self.callFunctionFromUI(layout, "loadNewSound", text = "Load New", description = "Choose a sound file with the file browser and load it", icon = "PLUS")
+        self.callFunctionFromUI(layout, "autoSetEndFrame", text = "Set End Frame", description = "Set the end frame based on the last frame of all loaded sound sequences.", icon = "PLUS")
         
         editor = context.scene.sequence_editor
         if not editor: return
@@ -40,6 +41,7 @@ class mn_SoundManager(Node, AnimationNode):
             box = col.box()
             box.prop(sequence, "name")
             box.prop(sequence, "frame_start")
+            box.prop(sequence, "mute")
             props = box.operator("mn.remove_sound_sequence")
             props.index = i
         
@@ -47,27 +49,19 @@ class mn_SoundManager(Node, AnimationNode):
         bpy.ops.mn.load_sound_file("INVOKE_DEFAULT", nodeTreeName = self.id_data.name, nodeName = self.name)
         
     def loadSoundFile(self, filepath):
-        editor = self.getSequenceEditor()
-        channel = self.getEmptyChannel(editor)
+        editor = getSequenceEditor()
+        channel = getEmptyChannel(editor)
         sound = editor.sequences.new_sound(os.path.basename(filepath), filepath, channel, 1)
-        print(sound)
         
-    def getSequenceEditor(self):
+    def autoSetEndFrame(self):
+        sequences = getSoundSequences()
+        if len(sequences) == 0: return
+        
         scene = bpy.context.scene
-        if not scene.sequence_editor:
-            scene.sequence_editor_create()
-        return scene.sequence_editor
+        lastSequenceFrame = max([sequence.frame_final_end for sequence in sequences])
+        minEndFrame = scene.frame_start + 1
+        scene.frame_end = max(minEndFrame, lastSequenceFrame)
         
-    def getEmptyChannel(self, editor):
-        channels = [True] * 32
-        for sequence in editor.sequences:
-            channels[sequence.channel - 1] = False
-        for i, channel in enumerate(channels):
-            if channel:
-                return i + 1
-        raise Exception("No free sequencer channel")
-               
-            
         
 class LoadSoundFile(bpy.types.Operator):
     bl_idname = "mn.load_sound_file"
@@ -90,6 +84,7 @@ class LoadSoundFile(bpy.types.Operator):
             raise Exception("No valid file name extension")
         return {'FINISHED'}
 
+        
 class RemoveSoundSequence(bpy.types.Operator):
     bl_idname = "mn.remove_sound_sequence"
     bl_label = "Remove Sound Sequence"
@@ -103,11 +98,17 @@ class RemoveSoundSequence(bpy.types.Operator):
         editor.sequences.remove(sequence)
         if sound.users == 0:
             bpy.data.sounds.remove(sound)
-        return {'FINISHED'}      
+        return {'FINISHED'}
 
 
-
-
+def getEmptyChannel(editor):
+    channels = [True] * 32
+    for sequence in editor.sequences:
+        channels[sequence.channel - 1] = False
+    for i, channel in enumerate(channels):
+        if channel:
+            return i + 1
+    raise Exception("No free sequencer channel")
 
 def getSoundSequences():
     editor = bpy.context.scene.sequence_editor
