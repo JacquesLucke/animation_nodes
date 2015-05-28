@@ -293,6 +293,9 @@ class MathMenu(bpy.types.Menu):
     
     def draw(self, context):
         layout = self.layout
+        insertNode(layout, "mn_MathNumberOperatorNode", "Number Operator")                                              
+        insertNode(layout, "mn_MathUniformSamplerNode", "Uniform Sampler")                                              
+        layout.separator()
         layout.menu("mn.math_menu_2d", text = "2D")
         layout.menu("mn.math_menu_3d", text = "3D")
                                   
