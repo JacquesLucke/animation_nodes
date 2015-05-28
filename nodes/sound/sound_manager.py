@@ -30,7 +30,8 @@ class mn_SoundManager(Node, AnimationNode):
         
     def draw_buttons(self, context, layout):
         self.callFunctionFromUI(layout, "loadNewSound", text = "Load New", description = "Choose a sound file with the file browser and load it", icon = "PLUS")
-        self.callFunctionFromUI(layout, "autoSetEndFrame", text = "Set End Frame", description = "Set the end frame based on the last frame of all loaded sound sequences.", icon = "PLUS")
+        self.callFunctionFromUI(layout, "autoSetEndFrame", text = "Set End Frame", description = "Set the end frame based on the last frame of all loaded sound sequences")
+        self.callFunctionFromUI(layout, "cacheSounds", text = "Cache Sounds", description = "Load the sounds into RAM for faster and better timed playback")
         
         editor = context.scene.sequence_editor
         if not editor: return
@@ -39,9 +40,11 @@ class mn_SoundManager(Node, AnimationNode):
         col = layout.column(align = False)
         for i, sequence in enumerate(soundSequences):
             box = col.box()
-            box.prop(sequence, "name")
+            row = box.row(align = True)
+            row.prop(sequence.sound, "name", text = "")
+            row.prop(sequence, "mute", text = "")
+            box.label("File: {}".format(os.path.basename(sequence.sound.filepath)))
             box.prop(sequence, "frame_start")
-            box.prop(sequence, "mute")
             props = box.operator("mn.remove_sound_sequence")
             props.index = i
         
@@ -61,6 +64,14 @@ class mn_SoundManager(Node, AnimationNode):
         lastSequenceFrame = max([sequence.frame_final_end for sequence in sequences])
         minEndFrame = scene.frame_start + 1
         scene.frame_end = max(minEndFrame, lastSequenceFrame)
+        
+    def cacheSounds(self):
+        sequences = getSoundSequences()
+        sounds = list(set([sequence.sound for sequence in sequences]))
+        for sound in sounds:
+            if not sound.use_memory_cache:
+                sound.use_memory_cache = True
+             
         
         
 class LoadSoundFile(bpy.types.Operator):
