@@ -5,18 +5,16 @@ from bpy.types import Node
 from ... mn_utils import getNode
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from ... utils.mn_node_utils import getAttributesFromNodesWithType
 
 # https://developer.blender.org/diffusion/B/browse/master/source/blender/imbuf/intern/util.c;23c7d14afdb0e5b6d56d4776b487bff6ab5d232c$165
 soundFileTypes = ["wav", "ogg", "oga", "mp3", "mp2", "ac3", "aac", "flac", "wma", "eac3", "aif", "aiff", "m4a", "mka"]
 
-class SoundStripData(bpy.types.PropertyGroup):
-    filepath = StringProperty()
-
-class mn_SoundManager(Node, AnimationNode):
-    bl_idname = "mn_SoundManager"
-    bl_label = "Sound Manager"
+class mn_SoundStripManager(Node, AnimationNode):
+    bl_idname = "mn_SoundStripManager"
+    bl_label = "Sound Strip Manager"
     
-    loadedSounds = CollectionProperty(type = SoundStripData)
+    filepath = StringProperty()
     
     def init(self, context):
         self.use_custom_color = True
@@ -29,32 +27,54 @@ class mn_SoundManager(Node, AnimationNode):
         return {}
         
     def draw_buttons(self, context, layout):
-        self.callFunctionFromUI(layout, "loadNewSound", text = "Load New", description = "Choose a sound file with the file browser and load it", icon = "PLUS")
+        if self.filepath == "":
+            col = layout.column()
+            col.scale_y = 1.5
+            self.callFunctionFromUI(col, "loadNewSound", text = "Load", description = "Choose a sound file with the file browser and load it", icon = "IMPORT")
+            
+            pathsInOtherNodes = getAttributesFromNodesWithType("mn_SoundStripManager", "filepath")
+            
+            for sequence in getSoundSequences():
+                path = sequence.sound.filepath
+                if path not in pathsInOtherNodes:
+                    props = layout.operator("mn.set_sound_path_on_node", text = sequence.sound.name)
+                    props.nodeTreeName = self.id_data.name
+                    props.nodeName = self.name
+                    props.path = sequence.sound.filepath
+        
+        if self.filepath != "":
+            layout.label(self.filename)
+            
+        return
+        
         self.callFunctionFromUI(layout, "autoSetEndFrame", text = "Set End Frame", description = "Set the end frame based on the last frame of all loaded sound sequences")
         self.callFunctionFromUI(layout, "cacheSounds", text = "Cache Sounds", description = "Load the sounds into RAM for faster and better timed playback")
         
-        editor = context.scene.sequence_editor
-        if not editor: return
-        soundSequences = [sequence for sequence in editor.sequences if sequence.type == "SOUND"]
-        
-        col = layout.column(align = False)
-        for i, sequence in enumerate(soundSequences):
-            box = col.box()
-            row = box.row(align = True)
-            row.prop(sequence.sound, "name", text = "")
-            row.prop(sequence, "mute", text = "")
-            box.label("File: {}".format(os.path.basename(sequence.sound.filepath)))
-            box.prop(sequence, "frame_start")
-            props = box.operator("mn.remove_sound_sequence")
-            props.index = i
+        sequence = self.getSoundSequence()
+        if not sequence: return
+        layout.prop(sequence, "name")
+        layout.prop(sequence, "mute")
+            
+    def getSoundSequence(self):
+        sequences = getSoundSequences()
+        for sequence in sequences:
+            if sequence.sound.filepath == self.filepath:
+                return sequence
+        return None
         
     def loadNewSound(self):
         bpy.ops.mn.load_sound_file("INVOKE_DEFAULT", nodeTreeName = self.id_data.name, nodeName = self.name)
         
     def loadSoundFile(self, filepath):
+        self.filepath = filepath
         editor = getSequenceEditor()
         channel = getEmptyChannel(editor)
-        sound = editor.sequences.new_sound(os.path.basename(filepath), filepath, channel, 1)
+        sound = editor.sequences.new_sound(self.filename, filepath, channel, 1)
+        
+        
+    @property
+    def filename(self):
+        return os.path.basename(self.filepath)
         
     def autoSetEndFrame(self):
         sequences = getSoundSequences()
@@ -72,6 +92,8 @@ class mn_SoundManager(Node, AnimationNode):
             if not sound.use_memory_cache:
                 sound.use_memory_cache = True
              
+    def copy(self, node):
+        self.filepath = ""
         
         
 class LoadSoundFile(bpy.types.Operator):
@@ -100,15 +122,30 @@ class RemoveSoundSequence(bpy.types.Operator):
     bl_idname = "mn.remove_sound_sequence"
     bl_label = "Remove Sound Sequence"
     
-    index = bpy.props.IntProperty()
+    path = bpy.props.StringProperty()
         
     def execute(self, context):
         editor = getSequenceEditor()
-        sequence = getSoundSequences()[self.index]
-        sound = sequence.sound
-        editor.sequences.remove(sequence)
+        for sequence in sequences:
+            if sequence.sound.filepath == self.path:
+                sounds = sequence.sound
+                editor.sequences.remove(sequence)
         if sound.users == 0:
             bpy.data.sounds.remove(sound)
+        return {'FINISHED'}
+        
+class SetSoundPathOnNode(bpy.types.Operator):
+    bl_idname = "mn.set_sound_path_on_node"
+    bl_label = "Set sound path"
+    
+    nodeTreeName = bpy.props.StringProperty()
+    nodeName = bpy.props.StringProperty()
+    
+    path = bpy.props.StringProperty()
+        
+    def execute(self, context):
+        node = getNode(self.nodeTreeName, self.nodeName)
+        node.filepath = self.path
         return {'FINISHED'}
 
 
