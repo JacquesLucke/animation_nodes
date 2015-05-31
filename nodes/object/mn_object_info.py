@@ -3,7 +3,7 @@ from bpy.types import Node
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from ... mn_utils import *
-from ... utils.mn_fcurve_utils import *
+from ... utils.fcurve import *
 from bpy.props import BoolProperty
 from operator import sub
 from mathutils import Vector
