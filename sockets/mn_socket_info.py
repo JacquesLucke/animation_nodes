@@ -1,5 +1,6 @@
 listChains = [
     ["mn_FloatSocket", "mn_FloatListSocket"],
+    ["mn_IntegerSocket", "mn_IntegerListSocket"],
     ["mn_VectorSocket", "mn_VectorListSocket"],
     ["mn_ObjectSocket", "mn_ObjectListSocket"],
     ["mn_StringSocket", "mn_StringListSocket"],
