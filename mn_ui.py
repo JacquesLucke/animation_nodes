@@ -2,7 +2,6 @@ import bpy
 from . mn_execution import getCodeStrings, resetCompileBlocker, updateAnimationTrees, generateExecutionUnits
 from . mn_keyframes import *
 from . mn_utils import *
-from . utils.mn_selection_utils import *
 
 class AnimationNodesPerformance(bpy.types.Panel):
     bl_idname = "mn.performance_panel"

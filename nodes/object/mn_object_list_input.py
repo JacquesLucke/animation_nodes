@@ -2,8 +2,8 @@ import bpy
 from bpy.types import Node
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged
+from ... utils.selection import getSortedSelectedObjectNames
 from ... mn_utils import *
-from ... utils.mn_selection_utils import *
 
 class mn_ObjectPropertyGroup(bpy.types.PropertyGroup):
     object = bpy.props.StringProperty(name = "Object", default = "", update = nodePropertyChanged)

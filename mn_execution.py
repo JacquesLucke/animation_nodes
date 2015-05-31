@@ -3,8 +3,8 @@ from bpy.app.handlers import persistent
 from bpy.props import *
 from . mn_utils import *
 from . mn_cache import clearExecutionCache
-from . utils.mn_selection_utils import *
 from . utils.mn_node_utils import *
+from . utils.selection import updateSelectionSorting
 from . mn_execution_unit_generator import getExecutionUnits
 
 COMPILE_BLOCKER = 0
