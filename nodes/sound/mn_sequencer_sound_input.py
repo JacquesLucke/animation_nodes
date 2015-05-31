@@ -1,11 +1,14 @@
 import bpy
 import os
+import math
+from mathutils import Vector
 from bpy.props import *
 from bpy.types import Node
 from ... mn_utils import getNode
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
-from ... utils.mn_node_utils import getAttributesFromNodesWithType
+from ... utils.fcurve import getSingleFCurveWithDataPath
+from ... algorithms import interpolation
 
 # https://developer.blender.org/diffusion/B/browse/master/source/blender/imbuf/intern/util.c;23c7d14afdb0e5b6d56d4776b487bff6ab5d232c$165
 soundFileTypes = ["wav", "ogg", "oga", "mp3", "mp2", "ac3", "aac", "flac", "wma", "eac3", "aif", "aiff", "m4a", "mka"]
@@ -23,10 +26,12 @@ bakeSettings = [
     BakeSetting(40, 80),
     BakeSetting(80, 250),
     BakeSetting(250, 600),
-    BakeSetting(600, 4000),
+    BakeSetting(600, 2000),
+    BakeSetting(2000, 4000),
     BakeSetting(4000, 6000),
     BakeSetting(6000, 8000),
     BakeSetting(8000, 20000) ]
+strengthListLength = len(bakeSettings)
     
 
 class mn_SequencerSoundInput(Node, AnimationNode):
@@ -37,17 +42,18 @@ class mn_SequencerSoundInput(Node, AnimationNode):
     bakeInfo = StringProperty(default = "")
     bakeProgress = IntProperty(min = 0, max = 100)
     
-    channels = FloatVectorProperty(size = 32, update = nodePropertyChanged, default = [True] + [False] * 31)
+    channels = FloatVectorProperty(size = 32, update = nodePropertyChanged, default = [True] + [False] * 31, min = 0)
     displayChannelAmount = IntProperty(default = 3, min = 0, max = 32)
     
     def init(self, context):
         self.use_custom_color = True
         self.color = (0.4, 0.9, 0.4)
-        self.width = 400
+        self.width = 300
         forbidCompiling()
         self.inputs.new("mn_FloatSocket", "Frame")
-        self.inputs.new("mn_IntegerSocket", "Frequency")
+        self.inputs.new("mn_FloatSocket", "Frequency")
         self.outputs.new("mn_FloatSocket", "Strength")
+        self.outputs.new("mn_FloatListSocket", "Strengths")
         allowCompiling()
         
     def getInputSocketNames(self):
@@ -55,7 +61,8 @@ class mn_SequencerSoundInput(Node, AnimationNode):
                 "Frequency" : "frequency"}
                 
     def getOutputSocketNames(self):
-        return {"Strength" : "strength"}
+        return {"Strength" : "strength",
+                "Strengths" : "strengths"}
         
     def draw_buttons(self, context, layout):
         row = layout.row(align = True)
@@ -78,48 +85,75 @@ class mn_SequencerSoundInput(Node, AnimationNode):
         layout.prop(self, "displayChannelAmount")
         
     def execute(self, frame, frequency):
-        strength = 0
-        for sequence in getSoundSequences():
-            if sequence.frame_final_start <= frame <= sequence.frame_final_end:
-                strength += bakedData.getSoundStrength(sequence, frame - sequence.frame_start, frequency)
-        return strength
+        strengths = Vector.Fill(strengthListLength, 0)
+        for i, channelStrength in enumerate(self.channels):
+            if channelStrength > 0:
+                strengthList = sequencerData.getChannelStrengthList(channel = i + 1, frame = frame)
+                strengths += strengthList * channelStrength
+        strength = self.getFrequencyStrength(strengths, frequency)
+        return strength, strengths
+        
+    def getFrequencyStrength(self, strengthList, frequencyIndicator):
+        frequencyIndicator *= strengthListLength
+        lower = strengthList[max(min(math.floor(frequencyIndicator), strengthListLength - 1), 0)]
+        upper = strengthList[max(min(math.ceil(frequencyIndicator), strengthListLength - 1), 0)]
+        influence = frequencyIndicator % 1.0
+        influence = interpolation.quadraticInOut(influence)
+        return lower * (1 - influence) + upper * influence
+        
+        
     
-from ... utils.fcurve import getSingleValueAtFrame        
-        
-class BakedData:
+    
+class SequencerData:
     def __init__(self):
-        self.reset()
+        self.channels = {}
         
-    def reset(self):
-        self.sequenceData = {}
-        self.fileBakeData = {}
+    def getChannelStrengthList(self, channel, frame):
+        frame = int(frame)
+        if channel in self.channels:
+            return self.channels[channel].getStrengthList(frame)
+        return Vector.Fill(strengthListLength, 0)
         
     def update(self):
-        self.reset()
-        
-        paths = getSoundFilePathsInSequencer()
-        for path in paths:
-            self.fileBakeData[path] = FileBakeData(path)
-        
+        self.channels.clear()
         soundSequences = getSoundSequences()
         for sequence in soundSequences:
-            self.sequenceData[sequence.name] = self.fileBakeData[sequence.sound.filepath]
-            
-    def getSoundStrength(self, sequence, frame, frequency):
-        fileData = self.sequenceData.get(sequence.name)
-        if not fileData: return 0.0
+            channel = sequence.channel
+            if channel not in self.channels:
+                self.channels[channel] = ChannelData()
+            self.channels[channel].insert(sequence)
+        
+        
+class ChannelData:
+    def __init__(self):
+        self.frames = []
+        
+    def getStrengthList(self, frame):
+        if frame < len(self.frames):
+            return self.frames[frame]
+        return Vector.Fill(strengthListLength, 0)
+        
+    def insert(self, sequence):
+        self.insertMissingFrames(sequence.frame_final_end)
         dataHolder = getDataHolder()
-        bakeSetting = bakeSettings[frequency]
-        dataPath = toDataPath(getBakeID(sequence.sound.filepath, bakeSetting))
-        return getSingleValueAtFrame(dataHolder, dataPath, frame)
-            
-class FileBakeData:
-    def __init__(self, filepath):
-        self.bakeIDs = []
-        for bakeSetting in bakeSettings:
-            self.bakeIDs.append(getBakeID(filepath, bakeSetting))
-            
-bakedData = BakedData()             
+        
+        for i, setting in enumerate(bakeSettings):
+            bakeID = getBakeID(sequence.sound.filepath, setting)
+            path = toDataPath(bakeID)
+            fcurve = getSingleFCurveWithDataPath(dataHolder, path, storeInCache = False)
+            if not fcurve: continue
+            for frame in range(sequence.frame_final_start, sequence.frame_final_end + 1):
+                soundFrame = frame - sequence.frame_start
+                self.frames[frame][i] += fcurve.evaluate(soundFrame)
+        
+        
+    def insertMissingFrames(self, endFrame):
+        if endFrame >= len(self.frames):
+            for i in range(endFrame - len(self.frames) + 1):
+                self.frames.append(Vector.Fill(strengthListLength, 0))
+           
+
+sequencerData = SequencerData()
         
 
 class ClearBakedData(bpy.types.Operator):
@@ -186,7 +220,7 @@ class BakeSounds(bpy.types.Operator):
         node = getNode(self.nodeTreeName, self.nodeName)
         node.isBaking = False
         bpy.context.window_manager.event_timer_remove(self.timer)
-        bakedData.update()
+        sequencerData.update()
         return {"FINISHED"}
         
         
@@ -260,7 +294,7 @@ class WaitTask(Task):
         
 class BakeFrequencyTask(Task):
     def __init__(self, filepath, bakeSetting, rebake = False):
-        self.timeWeight = 20
+        self.timeWeight = 100
         self.filepath = filepath
         self.bakeSetting = bakeSetting
         self.bakeID = getBakeID(filepath, bakeSetting)

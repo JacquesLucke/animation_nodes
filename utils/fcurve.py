@@ -74,13 +74,13 @@ def getFCurvesWithDataPath(object, dataPath):
     return cache
     
 
-def getSingleFCurveWithDataPath(object, dataPath):
+def getSingleFCurveWithDataPath(object, dataPath, storeInCache = True):
     identifier = object.type + object.name + dataPath + "first"
     cache = getExecutionCache(identifier)
     if cache is None:
         if object.animation_data is not None:
             for fCurve in object.animation_data.action.fcurves:
                 if fCurve.data_path == dataPath:
-                    setExecutionCache(identifier, fCurve)
+                    if storeInCache: setExecutionCache(identifier, fCurve)
                     return fCurve
-    return None
+    return cache

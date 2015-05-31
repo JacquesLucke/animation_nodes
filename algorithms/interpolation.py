@@ -3,6 +3,11 @@ import math
 def linear(x, settings = None):
     return x
     
+def quadraticInOut(x, settings = None):
+    x *= 2
+    if x < 1: return x ** 2 / 2
+    return 1 - (2 - x) ** 2 / 2
+    
 def expoEaseOut(x, settings = None):
     return 1 - math.pow(2, -10*x)
 def expoEaseIn(x, settings = None):
