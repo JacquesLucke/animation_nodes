@@ -19,7 +19,7 @@ def newFCurveForCustomProperty(object, propertyName, defaultValue):
 def removeCustomProperty(object, propertyName):
     if propertyName in object:
         del object[propertyName]
-        removeFCurveWithDataPath(object, toDataPath(propertyName))        
+    removeFCurveWithDataPath(object, toDataPath(propertyName))        
         
     
 # get value in one frame
