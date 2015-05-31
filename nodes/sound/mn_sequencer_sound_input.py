@@ -184,6 +184,7 @@ class ChannelData:
             path = toDataPath(bakeID)
             fcurve = getSingleFCurveWithDataPath(dataHolder, path, storeInCache = False)
             if not fcurve: continue
+            if not getattr(fcurve, "is_valid", False): continue
             for frame in range(sequence.frame_final_start, sequence.frame_final_end + 1):
                 soundFrame = frame - sequence.frame_start
                 self.frames[frame][i] += fcurve.evaluate(soundFrame)
