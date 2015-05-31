@@ -221,6 +221,7 @@ class ClearBakedData(bpy.types.Operator):
         sequencerData.reset()
         return {"FINISHED"}
         
+        
 class BakeSounds(bpy.types.Operator):
     bl_idname = "mn.bake_sounds"
     bl_label = "Bake Sounds"
