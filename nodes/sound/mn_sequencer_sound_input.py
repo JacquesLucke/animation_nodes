@@ -46,13 +46,18 @@ class mn_SequencerSoundInput(Node, AnimationNode):
     channels = FloatVectorProperty(size = 32, update = nodePropertyChanged, default = [True] + [False] * 31, min = 0)
     displayChannelAmount = IntProperty(default = 3, min = 0, max = 32, description = "Amount of channels displayed inside of the node")
     
+    frameTypes = [
+        ("OFFSET", "Offset", ""),
+        ("ABSOLUTE", "Absolute", "") ]
+    frameType = bpy.props.EnumProperty(name = "Frame Type", items = frameTypes, default = "OFFSET")
+    
     def init(self, context):
         self.use_custom_color = True
         self.color = (0.4, 0.9, 0.4)
         self.width = 200
         forbidCompiling()
         self.inputs.new("mn_FloatSocket", "Frame")
-        self.inputs.new("mn_FloatSocket", "Frequency")
+        self.inputs.new("mn_FloatSocket", "Frequency").number = 0.4
         self.outputs.new("mn_FloatSocket", "Strength")
         self.outputs.new("mn_FloatListSocket", "Strengths")
         allowCompiling()
@@ -86,17 +91,22 @@ class mn_SequencerSoundInput(Node, AnimationNode):
         for i in range(self.displayChannelAmount):
             col.prop(self, "channels", index = i, text = "Channel {}".format(i+1))
             
+        layout.prop(self, "frameType")
+            
     def draw_buttons_ext(self, context, layout):
         layout.prop(self, "displayChannelAmount", text = "Amount of Channels")
         
     def execute(self, frame, frequency):
+        if self.frameType == "OFFSET":
+            frame += bpy.context.scene.frame_current
+    
         strengths = Vector.Fill(strengthListLength, 0)
         for i, channelStrength in enumerate(self.channels):
             if channelStrength > 0:
                 strengthList = sequencerData.getChannelStrengthList(channel = i + 1, frame = frame)
                 strengths += strengthList * channelStrength
         strength = self.getFrequencyStrength(strengths, frequency)
-        return strength, strengths
+        return strength, list(strengths)
         
     def getFrequencyStrength(self, strengthList, frequencyIndicator):
         frequencyIndicator *= strengthListLength
@@ -194,6 +204,7 @@ class ClearBakedData(bpy.types.Operator):
         for key, value in dataHolder.items():
             if key.startswith("SOUND"):
                 removeCustomProperty(dataHolder, key)
+        sequencerData.update()
         return {"FINISHED"}
         
 class BakeSounds(bpy.types.Operator):
@@ -339,10 +350,14 @@ class BakeFrequencyTask(Task):
         deselectAllFCurves(dataHolder)
         newFCurveForCustomFloatProperty(dataHolder, self.bakeID)
         self.setValidContext()
+        
         bpy.ops.graph.sound_bake(
             filepath = self.filepath,
             low = self.bakeSetting.low,
             high = self.bakeSetting.high)
+            
+        dataHolder.hide = True
+        bpy.context.scene.objects.active = None
         return "FINISHED"
         
     def setValidContext(self):
