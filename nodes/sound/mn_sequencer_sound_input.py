@@ -38,6 +38,10 @@ bakeSettings = [
     BakeSetting(8000, 20000) ]
 strengthListLength = len(bakeSettings)
     
+    
+class AdditionalBakeData(bpy.types.PropertyGroup):
+    attack = FloatProperty(default = 0.005, description = "Lower values -> faster rising curve", min = 0, max = 2)
+    release = FloatProperty(default = 0.2, description = "Lower values -> faster falling curve", min = 0, max = 5)
 
 class mn_SequencerSoundInput(Node, AnimationNode):
     bl_idname = "mn_SequencerSoundInput"
@@ -46,6 +50,8 @@ class mn_SequencerSoundInput(Node, AnimationNode):
     isBaking = BoolProperty(default = False)
     bakeInfo = StringProperty(default = "")
     bakeProgress = IntProperty(min = 0, max = 100)
+    
+    bakeData = PointerProperty(type = AdditionalBakeData)
     
     channels = FloatVectorProperty(size = 32, update = nodePropertyChanged, default = [True] + [False] * 31, min = 0)
     displayChannelAmount = IntProperty(default = 3, min = 0, max = 32, description = "Amount of channels displayed inside of the node")
@@ -80,6 +86,8 @@ class mn_SequencerSoundInput(Node, AnimationNode):
         props = row.operator("mn.bake_sounds", icon = icon)
         props.nodeTreeName = self.id_data.name
         props.nodeName = self.name
+        props.bakeData.attack = self.bakeData.attack
+        props.bakeData.release = self.bakeData.release
         row.operator("mn.clear_baked_data", text = "", icon = "X")
         
         if self.isBaking:
@@ -93,6 +101,10 @@ class mn_SequencerSoundInput(Node, AnimationNode):
         layout.prop(self, "frameType")
             
     def draw_buttons_ext(self, context, layout):
+        col = layout.column(align = True)
+        col.prop(self.bakeData, "attack", text = "Attack Time")
+        col.prop(self.bakeData, "release", text = "Release Time")
+        
         layout.prop(self, "displayChannelAmount", text = "Amount of Channels")
         
     def execute(self, frame, frequency):
@@ -232,6 +244,8 @@ class BakeSounds(bpy.types.Operator):
     nodeTreeName = StringProperty()
     nodeName = StringProperty()
     
+    bakeData = PointerProperty(type = AdditionalBakeData)
+    
     def invoke(self, context, event):
         context.window_manager.modal_handler_add(self)
         self.timer = context.window_manager.event_timer_add(0.001, context.window)
@@ -244,7 +258,7 @@ class BakeSounds(bpy.types.Operator):
         for path in filepaths:
             for bakeSetting in bakeSettings:
                 waitTask = WaitTask(25)
-                bakeTask = BakeFrequencyTask(path, bakeSetting, rebake)
+                bakeTask = BakeFrequencyTask(path, bakeSetting, self.bakeData, rebake)
                 if rebake or not bakeTask.bakedDataExists:
                     self.taskManager.appendTasks(waitTask, bakeTask)
         
@@ -287,12 +301,13 @@ class WaitTask(Task):
         return "FINISHED" if self.amount == 0 else "CONTINUE"
         
 class BakeFrequencyTask(Task):
-    def __init__(self, filepath, bakeSetting, rebake = False):
+    def __init__(self, filepath, bakeSetting, bakeData, rebake = False):
         self.timeWeight = 100
         self.filepath = filepath
         self.bakeSetting = bakeSetting
         self.bakeID = toBakeID(filepath, bakeSetting)
         self.description = "{} : {} - {}".format(os.path.basename(filepath), bakeSetting.low, bakeSetting.high)
+        self.bakeData = bakeData
         self.rebake = rebake
         
     @property
@@ -310,7 +325,9 @@ class BakeFrequencyTask(Task):
         bpy.ops.graph.sound_bake(
             filepath = self.filepath,
             low = self.bakeSetting.low,
-            high = self.bakeSetting.high)
+            high = self.bakeSetting.high,
+            attack = self.bakeData.attack,
+            release = self.bakeData.release)
             
         dataHolder.hide = True
         bpy.context.scene.objects.active = None
