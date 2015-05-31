@@ -75,15 +75,10 @@ class mn_SequencerSoundInput(Node, AnimationNode):
         
     def draw_buttons(self, context, layout):
         row = layout.row(align = True)
-        
-        isCacheUpToDate = not sequencerData.hasChanged
-        if isCacheUpToDate: icon = "FILE_TICK"
-        else: icon = "ERROR"
-        
+        icon = "ERROR" if sequencerData.hasChanged else "FILE_TICK"
         props = row.operator("mn.bake_sounds", icon = icon)
         props.nodeTreeName = self.id_data.name
         props.nodeName = self.name
-        
         row.operator("mn.clear_baked_data", text = "", icon = "X")
         
         if self.isBaking:
