@@ -128,6 +128,9 @@ class mn_SequencerSoundInput(Node, AnimationNode):
     
 class SequencerData:
     def __init__(self):
+        self.reset()
+        
+    def reset(self):
         self.channels = {}
         self.hash = ""
         
@@ -214,7 +217,7 @@ class ClearBakedData(bpy.types.Operator):
         for key, value in dataHolder.items():
             if key.startswith("SOUND"):
                 removeCustomProperty(dataHolder, key)
-        sequencerData.update()
+        sequencerData.reset()
         return {"FINISHED"}
         
 class BakeSounds(bpy.types.Operator):
@@ -225,6 +228,22 @@ class BakeSounds(bpy.types.Operator):
     
     nodeTreeName = StringProperty()
     nodeName = StringProperty()
+    
+    def invoke(self, context, event):
+        context.window_manager.modal_handler_add(self)
+        self.timer = context.window_manager.event_timer_add(0.001, context.window)
+        self.createTasks(rebake = event.ctrl)
+        return {"RUNNING_MODAL"}
+        
+    def createTasks(self, rebake):
+        self.taskManager = TaskManager()
+        filepaths = getSoundFilePathsInSequencer()
+        for path in filepaths:
+            for bakeSetting in bakeSettings:
+                waitTask = WaitTask(25)
+                bakeTask = BakeFrequencyTask(path, bakeSetting, rebake)
+                if rebake or not bakeTask.bakedDataExists:
+                    self.taskManager.appendTasks(waitTask, bakeTask)
         
     def modal(self, context, event):
         if event.type == "ESC": return self.finish()
@@ -243,27 +262,6 @@ class BakeSounds(bpy.types.Operator):
         
         return {"RUNNING_MODAL"} if status == "CONTINUE" else self.finish()
     
-    def invoke(self, context, event):
-        context.window_manager.modal_handler_add(self)
-        
-        rebake = event.ctrl
-        
-        tm = TaskManager()
-        
-        filepaths = getSoundFilePathsInSequencer()
-        for path in filepaths:
-            for bakeSetting in bakeSettings:
-                waitTask = WaitTask(25)
-                bakeTask = BakeFrequencyTask(path, bakeSetting, rebake)
-                if rebake or not bakeTask.bakedDataExists:
-                    tm.appendTasks(waitTask, bakeTask)
-        
-        self.taskManager = tm
-        
-        self.timer = context.window_manager.event_timer_add(0.001, context.window)
-        
-        return {"RUNNING_MODAL"}
-        
     def finish(self):
         node = getNode(self.nodeTreeName, self.nodeName)
         node.isBaking = False
@@ -355,8 +353,9 @@ def getSoundSequences():
     
 def selectOnly(object):
     bpy.ops.object.select_all(action = "DESELECT")
-    object.select = True
+    object.hide_select = False
     object.hide = False
+    object.select = True
     bpy.context.scene.objects.active = object    
 
     

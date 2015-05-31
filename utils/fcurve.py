@@ -86,7 +86,7 @@ def getFCurveWithIndex(fCurves, index):
 ########################
 
 def removeFCurveWithDataPath(object, dataPath):
-    fcurve = getSingleFCurveWithDataPath(dataPath)
+    fcurve = getSingleFCurveWithDataPath(object, dataPath)
     if fcurve:
         object.animation_data.action.fcurves.remove(fcurve)
 
