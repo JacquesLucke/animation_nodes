@@ -103,7 +103,14 @@ class mn_SequencerSoundInput(Node, AnimationNode):
         strengths = Vector.Fill(strengthListLength, 0)
         for i, channelStrength in enumerate(self.channels):
             if channelStrength > 0:
-                strengthList = sequencerData.getChannelStrengthList(channel = i + 1, frame = frame)
+                if frame == int(frame):
+                    strengthList = sequencerData.getChannelStrengthList(channel = i + 1, frame = frame)
+                else:
+                    # for motion blur / subframes
+                    strengthList1 = sequencerData.getChannelStrengthList(channel = i + 1, frame = int(frame))
+                    strengthList2 = sequencerData.getChannelStrengthList(channel = i + 1, frame = int(frame) + 1)
+                    influence = frame % 1
+                    strengthList = strengthList1 * (1 - influence) + strengthList2 * influence
                 strengths += strengthList * channelStrength
         strength = self.getFrequencyStrength(strengths, frequency)
         return strength, list(strengths)
