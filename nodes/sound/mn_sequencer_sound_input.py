@@ -8,8 +8,13 @@ from bpy.app.handlers import persistent
 from ... mn_utils import getNode
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
-from ... utils.fcurve import getSingleFCurveWithDataPath
 from ... algorithms import interpolation
+from ... utils.mn_name_utils import toDataPath
+from ... utils.fcurve import (getSingleFCurveWithDataPath, 
+                              removeFCurveWithDataPath,
+                              deselectAllFCurves,
+                              newFCurveForCustomProperty,
+                              removeCustomProperty)
 
 dataHolderName = "Sound Data Holder"
 
@@ -122,6 +127,8 @@ class mn_SequencerSoundInput(Node, AnimationNode):
         
         
     
+# Cache Sound Data
+###########################    
     
 class SequencerData:
     def __init__(self):
@@ -174,7 +181,7 @@ class ChannelData:
         dataHolder = getDataHolder()
         
         for i, setting in enumerate(bakeSettings):
-            bakeID = getBakeID(sequence.sound.filepath, setting)
+            bakeID = toBakeID(sequence.sound.filepath, setting)
             path = toDataPath(bakeID)
             fcurve = getSingleFCurveWithDataPath(dataHolder, path, storeInCache = False)
             if not fcurve: continue
@@ -182,20 +189,23 @@ class ChannelData:
                 soundFrame = frame - sequence.frame_start
                 self.frames[frame][i] += fcurve.evaluate(soundFrame)
         
-        
     def insertMissingFrames(self, endFrame):
         if endFrame >= len(self.frames):
             for i in range(endFrame - len(self.frames) + 1):
-                self.frames.append(Vector.Fill(strengthListLength, 0))
+                self.frames.append(Vector.Fill(strengthListLength, 0))   
 
-           
-
+# all cache data is stored in this variable                
 sequencerData = SequencerData()
 
 @persistent
 def updateSequencerData(scene):
+    # update the cache when the file is loaded
     sequencerData.update()
-        
+    
+    
+    
+# Operators
+###########################
 
 class ClearBakedData(bpy.types.Operator):
     bl_idname = "mn.clear_baked_data"
@@ -266,6 +276,9 @@ class BakeSounds(bpy.types.Operator):
         return {"FINISHED"}
         
         
+        
+# Task Manager
+###########################        
         
 class TaskManager:
     def __init__(self):
@@ -339,7 +352,7 @@ class BakeFrequencyTask(Task):
         self.timeWeight = 100
         self.filepath = filepath
         self.bakeSetting = bakeSetting
-        self.bakeID = getBakeID(filepath, bakeSetting)
+        self.bakeID = toBakeID(filepath, bakeSetting)
         self.description = "{} : {} - {}".format(os.path.basename(filepath), bakeSetting.low, bakeSetting.high)
         self.rebake = rebake
         
@@ -352,7 +365,7 @@ class BakeFrequencyTask(Task):
         dataHolder = getDataHolder()
         selectOnly(dataHolder)
         deselectAllFCurves(dataHolder)
-        newFCurveForCustomFloatProperty(dataHolder, self.bakeID)
+        newFCurveForCustomProperty(dataHolder, self.bakeID, 0.0)
         self.setValidContext()
         
         bpy.ops.graph.sound_bake(
@@ -369,27 +382,10 @@ class BakeFrequencyTask(Task):
         bpy.context.area.type = "GRAPH_EDITOR"
         
         
-def selectOnly(object):
-    bpy.ops.object.select_all(action = "DESELECT")
-    object.select = True
-    object.hide = False
-    bpy.context.scene.objects.active = object
         
-def newFCurveForCustomFloatProperty(object, name):
-    removeCustomProperty(object, name)
-    object[name] = 0.5
-    object.keyframe_insert(frame = 0, data_path = toDataPath(name))
-        
-def removeCustomProperty(object, name):
-    if name in object:
-        del object[name]
-        removeFCurveWithDataPath(object, toDataPath(name))
-        
-        
-        
-def getBakeID(filepath, bakeSetting):
-    return "SOUND" + os.path.basename(filepath) + str(bakeSetting.low) + "-" + str(bakeSetting.high)
-        
+# Utils
+###########################          
+          
 def getDataHolder():
     object = bpy.context.scene.objects.get(dataHolderName)
     if object: return object
@@ -398,6 +394,12 @@ def getDataHolder():
     bpy.context.scene.objects.link(object)
     return object
     
+def toBakeID(filepath, bakeSetting):
+    # must not be longer than 63 characters
+    # changing this requires rebaking in all files
+    return "SOUND" + os.path.basename(filepath)[-40:] + str(bakeSetting.low) + "-" + str(bakeSetting.high)    
+    
+    
 def getSoundFilePathsInSequencer():
     paths = [sound.filepath for sound in getSoundsInSequencer()]
     return list(set(paths))
@@ -405,50 +407,19 @@ def getSoundFilePathsInSequencer():
 def getSoundsInSequencer():
     soundSequences = getSoundSequences()
     sounds = [sequence.sound for sequence in soundSequences]
-    return list(set(sounds))        
-       
-        
-        
-        
-def toDataPath(name):
-    return '["{}"]'.format(name)
-
-def deselectAllFCurves(object):
-    for fcurve in getFCurves(object):
-        fcurve.select = False
-    
-def removeFCurveWithDataPath(object, datapath):
-    foundFCurve = None
-    for fcurve in getFCurves(object):
-        if fcurve.data_path == datapath:
-            foundFCurve = fcurve
-            break
-    if foundFCurve:
-        object.animation_data.action.fcurves.remove(fcurve)
-        
-def getFCurves(object):
-    try: return object.animation_data.action.fcurves
-    except: return []
-        
-def getEmptyChannel(editor):
-    channels = [True] * 32
-    for sequence in editor.sequences:
-        channels[sequence.channel - 1] = False
-    for i, channel in enumerate(channels):
-        if channel:
-            return i + 1
-    raise Exception("No free sequencer channel")
+    return list(set(sounds))      
 
 def getSoundSequences():
     editor = bpy.context.scene.sequence_editor
     if not editor: return []
-    return [sequence for sequence in editor.sequences if sequence.type == "SOUND"]
-        
-def getSequenceEditor():
-    scene = bpy.context.scene
-    if not scene.sequence_editor:
-        scene.sequence_editor_create()
-    return scene.sequence_editor   
+    return [sequence for sequence in editor.sequences if sequence.type == "SOUND"] 
+    
+    
+def selectOnly(object):
+    bpy.ops.object.select_all(action = "DESELECT")
+    object.select = True
+    object.hide = False
+    bpy.context.scene.objects.active = object    
 
     
 

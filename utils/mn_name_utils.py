@@ -1,6 +1,9 @@
 import bpy
 from .. mn_utils import *
 
+def toDataPath(name):
+    return '["{}"]'.format(name)
+
 def getPossibleObjectName(name = "object"):
     randomString = getRandomString(3)
     counter = 1
