@@ -11,6 +11,7 @@ from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompilin
 from ... algorithms import interpolation
 from ... utils.mn_name_utils import toDataPath
 from ... utils.task_manager import TaskManager, Task
+from ... utils.sequence_editor import getSoundFilePathsInSequencer, getSoundSequences
 from ... utils.fcurve import (getSingleFCurveWithDataPath, 
                               removeFCurveWithDataPath,
                               deselectAllFCurves,
@@ -301,7 +302,7 @@ class BakeFrequencyTask(Task):
         
     def execute(self, event):
         dataHolder = getDataHolder()
-        selectOnly(dataHolder)
+        makeAloneVisibleInGraphEditor(dataHolder)
         deselectAllFCurves(dataHolder)
         newFCurveForCustomProperty(dataHolder, self.bakeID, 0.0)
         self.setValidContext()
@@ -337,23 +338,7 @@ def toBakeID(filepath, bakeSetting):
     # changing this requires rebaking in all files
     return "SOUND" + os.path.basename(filepath)[-40:] + str(bakeSetting.low) + "-" + str(bakeSetting.high)    
     
-    
-def getSoundFilePathsInSequencer():
-    paths = [sound.filepath for sound in getSoundsInSequencer()]
-    return list(set(paths))
-    
-def getSoundsInSequencer():
-    soundSequences = getSoundSequences()
-    sounds = [sequence.sound for sequence in soundSequences]
-    return list(set(sounds))      
-
-def getSoundSequences():
-    editor = bpy.context.scene.sequence_editor
-    if not editor: return []
-    return [sequence for sequence in editor.sequences if sequence.type == "SOUND"] 
-    
-    
-def selectOnly(object):
+def makeAloneVisibleInGraphEditor(object):
     bpy.ops.object.select_all(action = "DESELECT")
     object.hide_select = False
     object.hide = False
