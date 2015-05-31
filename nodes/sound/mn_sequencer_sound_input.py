@@ -11,9 +11,6 @@ from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompilin
 from ... utils.fcurve import getSingleFCurveWithDataPath
 from ... algorithms import interpolation
 
-# https://developer.blender.org/diffusion/B/browse/master/source/blender/imbuf/intern/util.c;23c7d14afdb0e5b6d56d4776b487bff6ab5d232c$165
-soundFileTypes = ["wav", "ogg", "oga", "mp3", "mp2", "ac3", "aac", "flac", "wma", "eac3", "aif", "aiff", "m4a", "mka"]
-
 dataHolderName = "Sound Data Holder"
 
 class BakeSetting:
