@@ -105,11 +105,13 @@ def unregister_keymaps():
 from . insert_nodes_menu import registerMenu, unregisterMenu
 from . import mn_execution as execution
 from . import mn_node_base as node_base
+from . nodes.sound import mn_sequencer_sound_input as sequencer_sound
 
 def register():
     bpy.utils.register_module(__name__)
     execution.register_handlers()
     node_base.register_handlers()
+    sequencer_sound.register_handlers()
     registerMenu()
     register_keymaps()
     bpy.types.Scene.mn_settings = PointerProperty(type = AnimationNodesSettings, name = "Animation Node Settings")
@@ -121,6 +123,7 @@ def unregister():
     bpy.utils.unregister_module(__name__)
     execution.unregister_handlers()
     node_base.unregister_handlers()
+    sequencer_sound.unregister_handlers()
     unregisterMenu()
     
     print("Unregistered Animation Nodes")

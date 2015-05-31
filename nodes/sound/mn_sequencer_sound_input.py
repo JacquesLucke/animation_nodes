@@ -4,6 +4,7 @@ import math
 from mathutils import Vector
 from bpy.props import *
 from bpy.types import Node
+from bpy.app.handlers import persistent
 from ... mn_utils import getNode
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
@@ -43,12 +44,12 @@ class mn_SequencerSoundInput(Node, AnimationNode):
     bakeProgress = IntProperty(min = 0, max = 100)
     
     channels = FloatVectorProperty(size = 32, update = nodePropertyChanged, default = [True] + [False] * 31, min = 0)
-    displayChannelAmount = IntProperty(default = 3, min = 0, max = 32)
+    displayChannelAmount = IntProperty(default = 3, min = 0, max = 32, description = "Amount of channels displayed inside of the node")
     
     def init(self, context):
         self.use_custom_color = True
         self.color = (0.4, 0.9, 0.4)
-        self.width = 300
+        self.width = 200
         forbidCompiling()
         self.inputs.new("mn_FloatSocket", "Frame")
         self.inputs.new("mn_FloatSocket", "Frequency")
@@ -67,7 +68,11 @@ class mn_SequencerSoundInput(Node, AnimationNode):
     def draw_buttons(self, context, layout):
         row = layout.row(align = True)
         
-        props = row.operator("mn.bake_sounds")
+        isCacheUpToDate = not sequencerData.hasChanged
+        if isCacheUpToDate: icon = "FILE_TICK"
+        else: icon = "ERROR"
+        
+        props = row.operator("mn.bake_sounds", icon = icon)
         props.nodeTreeName = self.id_data.name
         props.nodeName = self.name
         
@@ -82,7 +87,7 @@ class mn_SequencerSoundInput(Node, AnimationNode):
             col.prop(self, "channels", index = i, text = "Channel {}".format(i+1))
             
     def draw_buttons_ext(self, context, layout):
-        layout.prop(self, "displayChannelAmount")
+        layout.prop(self, "displayChannelAmount", text = "Amount of Channels")
         
     def execute(self, frame, frequency):
         strengths = Vector.Fill(strengthListLength, 0)
@@ -107,6 +112,7 @@ class mn_SequencerSoundInput(Node, AnimationNode):
 class SequencerData:
     def __init__(self):
         self.channels = {}
+        self.hash = ""
         
     def getChannelStrengthList(self, channel, frame):
         frame = int(frame)
@@ -122,6 +128,22 @@ class SequencerData:
             if channel not in self.channels:
                 self.channels[channel] = ChannelData()
             self.channels[channel].insert(sequence)
+        self.hash = self.calculateSequencerHash()
+       
+    @property
+    def hasChanged(self):
+        return self.hash != self.calculateSequencerHash()
+        
+    def calculateSequencerHash(self):
+        elements = []
+        soundSequences = getSoundSequences()
+        for sequence in soundSequences:
+            elements.append(sequence.sound.filepath)
+            elements.append(sequence.channel)
+            elements.append(sequence.frame_start)
+            elements.append(sequence.frame_final_start)
+            elements.append(sequence.frame_final_end)
+        return "".join([str(element) for element in elements])
         
         
 class ChannelData:
@@ -151,9 +173,14 @@ class ChannelData:
         if endFrame >= len(self.frames):
             for i in range(endFrame - len(self.frames) + 1):
                 self.frames.append(Vector.Fill(strengthListLength, 0))
+
            
 
 sequencerData = SequencerData()
+
+@persistent
+def updateSequencerData(scene):
+    sequencerData.update()
         
 
 class ClearBakedData(bpy.types.Operator):
@@ -402,4 +429,15 @@ def getSequenceEditor():
     scene = bpy.context.scene
     if not scene.sequence_editor:
         scene.sequence_editor_create()
-    return scene.sequence_editor         
+    return scene.sequence_editor   
+
+    
+
+# Register
+################################## 
+
+def register_handlers():    
+    bpy.app.handlers.load_post.append(updateSequencerData)
+    
+def unregister_handlers():
+    bpy.app.handlers.load_post.remove(updateSequencerData)       
