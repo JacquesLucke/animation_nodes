@@ -3,6 +3,7 @@ from bpy.types import Node
 from bpy.props import *
 from ... mn_node_base import AnimationNode
 from ... utils.mn_node_utils import *
+from ... utils.selection import getSortedSelectedObjectNames
 from ... sockets.mn_socket_info import *
 from ... mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 
@@ -46,6 +47,8 @@ class mn_CreateList(Node, AnimationNode):
         self.callFunctionFromUI(col, "assignSelectedListType", 
             text = "Assign", 
             description = "Remove all sockets and set the selected socket type")
+            
+        self.drawTypeSpecificButtonsExt(layout)
         
     def execute(self, inputs):
         elements = []
@@ -80,4 +83,19 @@ class mn_CreateList(Node, AnimationNode):
         socket.removeable = self.manageSockets
         socket.moveable = self.manageSockets
         if hasattr(socket, "showName"):
-            socket.showName = False             
+            socket.showName = False  
+        return socket
+
+
+    # type specific stuff
+    #############################
+    
+    def drawTypeSpecificButtonsExt(self, layout):
+        if self.listType == "mn_ObjectListSocket":
+            self.callFunctionFromUI(layout, "createInputsFromSelection", text = "From Selection", icon = "PLUS")
+            
+    def createInputsFromSelection(self):
+        names = getSortedSelectedObjectNames()
+        for name in names:
+            socket = self.newInputSocket()
+            socket.objectName = name
