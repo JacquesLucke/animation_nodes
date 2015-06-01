@@ -1,8 +1,29 @@
 import bpy
 from .. mn_utils import *
 from .. mn_cache import *
+from . mn_name_utils import toDataPath
+
+
+# Misc
+###########################
+
+def deselectAllFCurves(object):
+    for fcurve in getAllFCurves(object):
+        fcurve.select = False
+        
+def newFCurveForCustomProperty(object, propertyName, defaultValue):
+    removeCustomProperty(object, propertyName)
+    object[propertyName] = defaultValue
+    object.keyframe_insert(frame = 0, data_path = toDataPath(propertyName))
+        
+def removeCustomProperty(object, propertyName):
+    if propertyName in object:
+        del object[propertyName]
+    removeFCurveWithDataPath(object, toDataPath(propertyName))        
+        
     
 # get value in one frame
+###########################
 
 def getArrayValueAtFrame(object, dataPath, frame, arraySize = 3):
     fCurves = getFCurvesWithDataPath(object, dataPath)
@@ -35,7 +56,9 @@ def getMultipleValuesOfArrayAtFrame(object, dataPath, indices, frame):
     return values
     
     
+    
 # get values of multiple frames
+###################################
 
 def getArrayValueAtMultipleFrames(object, dataPath, frames, arraySize = 3):
     values = [0] * len(frames)
@@ -58,29 +81,47 @@ def getFCurveWithIndex(fCurves, index):
     return None
     
     
-# find fcurves
+    
+# remove fcurves
+########################
 
-def getFCurvesWithDataPath(object, dataPath):
+def removeFCurveWithDataPath(object, dataPath):
+    fcurve = getSingleFCurveWithDataPath(object, dataPath)
+    try: object.animation_data.action.fcurves.remove(fcurve)
+    except: pass
+    
+    
+# search fcurves
+########################
+
+def getFCurvesWithDataPath(object, dataPath, storeInCache = True):
     identifier = object.type + object.name + dataPath
     cache = getExecutionCache(identifier)
     if cache is None:
         fCurves = []
-        if object.animation_data is not None:
-            for fCurve in object.animation_data.action.fcurves:
-                if fCurve.data_path == dataPath:
-                    fCurves.append(fCurve)
+        for fCurve in getAllFCurves(object):
+            if fCurve.data_path == dataPath:
+                fCurves.append(fCurve)
         cache = fCurves
-        setExecutionCache(identifier, cache)
+        if storeInCache: setExecutionCache(identifier, cache)
     return cache
     
 
-def getSingleFCurveWithDataPath(object, dataPath):
+def getSingleFCurveWithDataPath(object, dataPath, storeInCache = True):
     identifier = object.type + object.name + dataPath + "first"
     cache = getExecutionCache(identifier)
     if cache is None:
-        if object.animation_data is not None:
-            for fCurve in object.animation_data.action.fcurves:
-                if fCurve.data_path == dataPath:
-                    setExecutionCache(identifier, fCurve)
-                    return fCurve
-    return None
+        for fCurve in getAllFCurves(object):
+            if fCurve.data_path == dataPath:
+                if storeInCache: setExecutionCache(identifier, fCurve)
+                return fCurve
+    return cache
+    
+    
+    
+# get fcurves
+######################
+
+def getAllFCurves(object):
+    try: return object.animation_data.action.fcurves
+    except: return []
