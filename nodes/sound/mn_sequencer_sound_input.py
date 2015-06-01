@@ -52,7 +52,7 @@ class mn_SequencerSoundInput(Node, AnimationNode):
     bakeProgress = IntProperty(min = 0, max = 100)
     bakeData = PointerProperty(type = BakeData)
     
-    channels = FloatVectorProperty(size = 32, update = nodePropertyChanged, default = [True] + [False] * 31, min = 0)
+    channels = FloatVectorProperty(size = 32, update = nodePropertyChanged, default = [True] + [False] * 31, min = 0, description = "Influence of the different sequence editor channels on the output")
     displayChannelAmount = IntProperty(default = 3, min = 0, max = 32, description = "Amount of channels displayed inside of the node")
     
     frameTypes = [
