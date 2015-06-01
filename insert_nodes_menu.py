@@ -22,6 +22,7 @@ def drawMenu(self, context):
     layout.menu("mn.object_menu", text = "Object")
     layout.menu("mn.mesh_menu", text = "Mesh")
     layout.menu("mn.curve_menu", text = "Curve")
+    layout.menu("mn.math_menu", text = "Math")
     layout.separator()
     layout.menu("mn.sound_menu", text = "Sound")
     layout.menu("mn.material_menu", text = "Material")
@@ -69,7 +70,10 @@ class VectorMenu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         insertNode(layout, "mn_CombineVector", "Combine")       
+        insertNode(layout, "mn_CombineVectorList", "Combine List")       
         insertNode(layout, "mn_SeparateVector", "Separate")       
+        insertNode(layout, "mn_SeparateVectorList", "Separate List")       
+        layout.separator()
         insertNode(layout, "mn_RandomVectorNode", "Random")       
         insertNode(layout, "mn_VectorWiggle", "Wiggle")       
         insertNode(layout, "mn_AnimateVectorNode", "Animate")       
@@ -188,6 +192,7 @@ class MeshMenu(bpy.types.Menu):
         insertNode(layout, "mn_CreateMeshFromData", "Mesh from Data")                                   
         insertNode(layout, "mn_SetMeshOnObject", "Set Mesh on Object")
         layout.menu("mn.mesh_finalizing_menu", text = "Mesh Finalizing")
+        layout.menu("mn.mesh_generators_menu", text = "Mesh Generators")
         layout.separator()                                  
         insertNode(layout, "mn_VertexInfo", "Vertex Info")                                     
         insertNode(layout, "mn_PolygonInfo", "Polygon Info")                                     
@@ -212,6 +217,17 @@ class MeshFinalizingMenu(bpy.types.Menu):
         insertNode(layout, "mn_MeshRemoveDoubles", "Remove Doubles")         
         insertNode(layout, "mn_MeshRecalculateFaceNormals", "Recalculate Normals")         
         insertNode(layout, "mn_MakeObjectSmooth", "Smooth Object")         
+
+class MeshGeneratorsMenu(bpy.types.Menu):
+    bl_idname = "mn.mesh_generators_menu"
+    bl_label = "Mesh Generators Menu"
+    
+    def draw(self, context):
+        layout = self.layout
+        insertNode(layout, "mn_MeshGenerationQuadIndexList", "Quad Index List") 
+        layout.separator()                                    
+        insertNode(layout, "mn_MeshGenerationVoronoiDelaunayNode", "Voronoi/Delaunay") 
+        insertNode(layout, "mn_MeshGenerationHeightFunctionNode", "Height Function") 
         
 class CurveMenu(bpy.types.Menu):
     bl_idname = "mn.curve_menu"
@@ -227,6 +243,62 @@ class CurveMenu(bpy.types.Menu):
         insertNode(layout, "mn_CurveRevolveNode", "Revolve")                                              
         insertNode(layout, "mn_CurveSweepNode", "Sweep")                                              
         insertNode(layout, "mn_CurveBirailNode", "Birail")                                              
+        
+class MathMenu2DCoordinates(bpy.types.Menu):
+    bl_idname = "mn.math_menu_2d_coordinates"
+    bl_label = "Math Menu 2D Coordinates"
+    
+    def draw(self, context):
+        layout = self.layout
+        insertNode(layout, "mn_Math2DCoordinatesCartesianToPolar", "Cartesian To Polar")                                              
+        insertNode(layout, "mn_Math2DCoordinatesCartesianToPolarList", "Cartesian To Polar List")                                              
+        insertNode(layout, "mn_Math2DCoordinatesPolarToCartesian", "Polar To Cartesian")                                              
+        insertNode(layout, "mn_Math2DCoordinatesPolarToCartesianList", "Polar To Cartesian List")                                              
+                                  
+class MathMenu2D(bpy.types.Menu):
+    bl_idname = "mn.math_menu_2d"
+    bl_label = "Math Menu 2D"
+    
+    def draw(self, context):
+        layout = self.layout
+        insertNode(layout, "mn_Math2DFunctionSamplerNode", "2D Function Sampler")                                              
+        layout.menu("mn.math_menu_2d_coordinates", text = "Coordinates")
+        
+class MathMenu3DCoordinates(bpy.types.Menu):
+    bl_idname = "mn.math_menu_3d_coordinates"
+    bl_label = "Math Menu 3D Coordinates"
+    
+    def draw(self, context):
+        layout = self.layout
+        insertNode(layout, "mn_Math3DCoordinatesCartesianToSpherical", "Cartesian To Spherical")                                              
+        insertNode(layout, "mn_Math3DCoordinatesCartesianToSphericalList", "Cartesian To Spherical List")                                              
+        insertNode(layout, "mn_Math3DCoordinatesSphericalToCartesian", "Spherical To Cartesian")                                              
+        insertNode(layout, "mn_Math3DCoordinatesSphericalToCartesianList", "Spherical To Cartesian List")                                              
+        layout.separator()
+        insertNode(layout, "mn_Math3DCoordinatesCartesianToCylindrical", "Cartesian To Cylindrical")                                              
+        insertNode(layout, "mn_Math3DCoordinatesCartesianToCylindricalList", "Cartesian To Cylindrical List")                                              
+        insertNode(layout, "mn_Math3DCoordinatesCylindricalToCartesian", "Cylindrical To Cartesian")                                              
+        insertNode(layout, "mn_Math3DCoordinatesCylindricalToCartesianList", "Cylindrical To Cartesian List")                                              
+                                  
+class MathMenu3D(bpy.types.Menu):
+    bl_idname = "mn.math_menu_3d"
+    bl_label = "Math Menu 3D"
+    
+    def draw(self, context):
+        layout = self.layout
+        layout.menu("mn.math_menu_3d_coordinates", text = "Coordinates")
+                                  
+class MathMenu(bpy.types.Menu):
+    bl_idname = "mn.math_menu"
+    bl_label = "Math Menu"
+    
+    def draw(self, context):
+        layout = self.layout
+        insertNode(layout, "mn_MathNumberOperatorNode", "Number Operator")                                              
+        insertNode(layout, "mn_MathUniformSamplerNode", "Uniform Sampler")                                              
+        layout.separator()
+        layout.menu("mn.math_menu_2d", text = "2D")
+        layout.menu("mn.math_menu_3d", text = "3D")
                                   
 class SoundMenu(bpy.types.Menu):
     bl_idname = "mn.sound_menu"
