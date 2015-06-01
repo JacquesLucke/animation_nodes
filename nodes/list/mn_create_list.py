@@ -24,10 +24,13 @@ class mn_CreateList(Node, AnimationNode):
         for socket in self.inputs:
             socket.moveable = self.manageSockets
             socket.removeable = self.manageSockets
+            socket.hide = self.hideInputs
     
     selectedListType = EnumProperty(name = "List Type", items = getListTypeItems)
     listType = StringProperty(default = "mn_FloatListSocket")
     manageSockets = BoolProperty(name = "Manage Sockets", default = False, description = "Allows to (re)move the input sockets", update = settingChanged)
+    
+    hideInputs = BoolProperty(name = "Hide Inputs", default = False, update = settingChanged)
     
     def init(self, context):
         forbidCompiling()
@@ -47,6 +50,8 @@ class mn_CreateList(Node, AnimationNode):
         self.callFunctionFromUI(col, "assignSelectedListType", 
             text = "Assign", 
             description = "Remove all sockets and set the selected socket type")
+            
+        layout.prop(self, "hideInputs")
             
         self.drawTypeSpecificButtonsExt(layout)
         
