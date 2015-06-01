@@ -20,23 +20,23 @@ from ... utils.fcurve import (getSingleFCurveWithDataPath,
 
 dataHolderName = "Sound Data Holder"
 
-class BakeSetting:
+class BakeFrequencyRange:
     def __init__(self, low = 0, high = 20000):
         self.low = low
         self.high = high
 
-bakeSettings = [
-    BakeSetting(0, 20),
-    BakeSetting(20, 40),
-    BakeSetting(40, 80),
-    BakeSetting(80, 250),
-    BakeSetting(250, 600),
-    BakeSetting(600, 2000),
-    BakeSetting(2000, 4000),
-    BakeSetting(4000, 6000),
-    BakeSetting(6000, 8000),
-    BakeSetting(8000, 20000) ]
-strengthListLength = len(bakeSettings)
+bakeFrequencyRanges = [
+    BakeFrequencyRange(0, 20),
+    BakeFrequencyRange(20, 40),
+    BakeFrequencyRange(40, 80),
+    BakeFrequencyRange(80, 250),
+    BakeFrequencyRange(250, 600),
+    BakeFrequencyRange(600, 2000),
+    BakeFrequencyRange(2000, 4000),
+    BakeFrequencyRange(4000, 6000),
+    BakeFrequencyRange(6000, 8000),
+    BakeFrequencyRange(8000, 20000) ]
+strengthListLength = len(bakeFrequencyRanges)
     
     
 class AdditionalBakeData(bpy.types.PropertyGroup):
@@ -192,8 +192,8 @@ class ChannelData:
         self.insertMissingFrames(sequence.frame_final_end)
         dataHolder = getDataHolder()
         
-        for i, setting in enumerate(bakeSettings):
-            bakeID = toBakeID(sequence.sound.filepath, setting)
+        for i, frequencyRange in enumerate(bakeFrequencyRanges):
+            bakeID = toBakeID(sequence.sound.filepath, frequencyRange)
             path = toDataPath(bakeID)
             fcurve = getSingleFCurveWithDataPath(dataHolder, path, storeInCache = False)
             if not fcurve: continue
@@ -256,9 +256,9 @@ class BakeSounds(bpy.types.Operator):
         self.taskManager = TaskManager()
         filepaths = getSoundFilePathsInSequencer()
         for path in filepaths:
-            for bakeSetting in bakeSettings:
+            for bakeFrequencyRange in bakeFrequencyRanges:
                 waitTask = WaitTask(25)
-                bakeTask = BakeFrequencyTask(path, bakeSetting, self.bakeData, rebake)
+                bakeTask = BakeFrequencyTask(path, bakeFrequencyRange, self.bakeData, rebake)
                 if rebake or not bakeTask.bakedDataExists:
                     self.taskManager.appendTasks(waitTask, bakeTask)
         
@@ -301,12 +301,12 @@ class WaitTask(Task):
         return "FINISHED" if self.amount == 0 else "CONTINUE"
         
 class BakeFrequencyTask(Task):
-    def __init__(self, filepath, bakeSetting, bakeData, rebake = False):
+    def __init__(self, filepath, bakeFrequencyRange, bakeData, rebake = False):
         self.timeWeight = 100
         self.filepath = filepath
-        self.bakeSetting = bakeSetting
-        self.bakeID = toBakeID(filepath, bakeSetting)
-        self.description = "{} : {} - {}".format(os.path.basename(filepath), bakeSetting.low, bakeSetting.high)
+        self.bakeFrequencyRange = bakeFrequencyRange
+        self.bakeID = toBakeID(filepath, bakeFrequencyRange)
+        self.description = "{} : {} - {}".format(os.path.basename(filepath), bakeFrequencyRange.low, bakeFrequencyRange.high)
         self.bakeData = bakeData
         self.rebake = rebake
         
@@ -324,8 +324,8 @@ class BakeFrequencyTask(Task):
         
         bpy.ops.graph.sound_bake(
             filepath = self.filepath,
-            low = self.bakeSetting.low,
-            high = self.bakeSetting.high,
+            low = self.bakeFrequencyRange.low,
+            high = self.bakeFrequencyRange.high,
             attack = self.bakeData.attack,
             release = self.bakeData.release)
             
@@ -350,10 +350,10 @@ def getDataHolder():
     bpy.context.scene.objects.link(object)
     return object
     
-def toBakeID(filepath, bakeSetting):
+def toBakeID(filepath, bakeFrequencyRange):
     # must not be longer than 63 characters
     # changing this requires rebaking in all files
-    return "SOUND" + os.path.basename(filepath)[-40:] + str(bakeSetting.low) + "-" + str(bakeSetting.high)    
+    return "SOUND" + os.path.basename(filepath)[-40:] + str(bakeFrequencyRange.low) + "-" + str(bakeFrequencyRange.high)    
     
 def makeAloneVisibleInGraphEditor(object):
     bpy.ops.object.select_all(action = "DESELECT")
