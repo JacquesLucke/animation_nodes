@@ -39,7 +39,7 @@ bakeFrequencyRanges = [
 strengthListLength = len(bakeFrequencyRanges)
     
     
-class AdditionalBakeData(bpy.types.PropertyGroup):
+class BakeData(bpy.types.PropertyGroup):
     attack = FloatProperty(default = 0.005, description = "Lower values -> faster rising curve", min = 0, max = 2)
     release = FloatProperty(default = 0.2, description = "Lower values -> faster falling curve", min = 0, max = 5)
 
@@ -50,8 +50,7 @@ class mn_SequencerSoundInput(Node, AnimationNode):
     isBaking = BoolProperty(default = False)
     bakeInfo = StringProperty(default = "")
     bakeProgress = IntProperty(min = 0, max = 100)
-    
-    bakeData = PointerProperty(type = AdditionalBakeData)
+    bakeData = PointerProperty(type = BakeData)
     
     channels = FloatVectorProperty(size = 32, update = nodePropertyChanged, default = [True] + [False] * 31, min = 0)
     displayChannelAmount = IntProperty(default = 3, min = 0, max = 32, description = "Amount of channels displayed inside of the node")
@@ -244,7 +243,7 @@ class BakeSounds(bpy.types.Operator):
     nodeTreeName = StringProperty()
     nodeName = StringProperty()
     
-    bakeData = PointerProperty(type = AdditionalBakeData)
+    bakeData = PointerProperty(type = BakeData)
     
     def invoke(self, context, event):
         context.window_manager.modal_handler_add(self)
