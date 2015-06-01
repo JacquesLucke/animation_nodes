@@ -19,7 +19,7 @@ class mn_CreateSpline(Node, AnimationNode):
     def init(self, context):
         forbidCompiling()
         self.inputs.new("mn_VectorListSocket", "Points")
-        self.inputs.new("mn_BooleanSocket", "Cyclic")
+        self.inputs.new("mn_BooleanSocket", "Cyclic").value = False
         self.outputs.new("mn_SplineSocket", "Spline")
         allowCompiling()
         
