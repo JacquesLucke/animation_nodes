@@ -1,7 +1,8 @@
 import bpy
+from . path import toAbsolutePath
 
 def getSoundFilePathsInSequencer():
-    paths = [sound.filepath for sound in getSoundsInSequencer()]
+    paths = [toAbsolutePath(sound.filepath, library = sound.library) for sound in getSoundsInSequencer()]
     return list(set(paths))
     
 def getSoundsInSequencer():
