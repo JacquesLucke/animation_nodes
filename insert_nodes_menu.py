@@ -163,7 +163,7 @@ class ObjectMenu(bpy.types.Menu):
         layout = self.layout
         insertNode(layout, "mn_ObjectInfoNode", "Transforms Input") 
         insertNode(layout, "mn_ObjectTransformsOutput", "Transforms Output")
-        insertNode(layout, "mn_ObjectMatrixInput", "Matrix input")   
+        insertNode(layout, "mn_ObjectMatrixInput", "Matrix Input")   
         insertNode(layout, "mn_ObjectMatrixOutputNode", "Matrix Output")  
         insertNode(layout, "mn_ObjectAttributeInputNode", "Attribute Input")                            
         insertNode(layout, "mn_ObjectAttributeOutputNode", "Attribute Output")  
