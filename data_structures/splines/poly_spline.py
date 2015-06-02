@@ -1,4 +1,5 @@
 from . base_spline import Spline
+from ... utils.math import findNearestParameterOnLine
 
 
 class PolySpline(Spline):
@@ -150,9 +151,3 @@ class PolySegment:
         
     def project(self, coordinates):
         return findNearestParameterOnLine(self.left, self.tangent, coordinates)
-
-def findNearestParameterOnLine(linePosition, lineDirection, point):
-    directionLength = lineDirection.length
-    lineDirection = lineDirection.normalized()
-    parameter = (lineDirection.dot(point - linePosition)) / directionLength
-    return parameter    
