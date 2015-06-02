@@ -3,7 +3,7 @@ from bpy.types import Node
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 from ... mn_keyframes import *
-from ... utils.mn_math_utils import *
+from ... utils.math import *
 
 currentTypes = {}
 
