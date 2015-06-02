@@ -43,14 +43,21 @@ class Spline:
         for point in points:
             self.appendPoint(point)
         
-    def getSamples(self, amount):
-        a = amount - 1
-        return [self.evaluate(i / a) for i in range(amount)]
+        
+    def getSamples(self, amount, start = 0.0, end = 1.0):
+        parameters = self.getParameters(amount, start, end)
+        return [self.evaluate(par) for par in parameters]
         
         
-    def getTangentSamples(self, amount):
-        a = amount - 1
-        return [self.evaluateTangent(i / a) for i in range(amount)]
+    def getTangentSamples(self, amount, start = 0.0, end = 1.0):
+        parameters = self.getParameters(amount, start, end)
+        return [self.evaluateTangent(par) for par in parameters]
+        
+        
+    def getParameters(self, amount, start = 0.0, end = 1.0):
+        if start > end: start, end = end, start
+        factor = (end - start) / (amount - 1)
+        return [i * factor + start for i in range(amount)]
     
     
     # the resolution may not be needed in every subclass
