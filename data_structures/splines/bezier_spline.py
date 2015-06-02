@@ -93,7 +93,7 @@ class BezierSpline(Spline):
         return self.segments[int(par)].evaluateTangent(par - int(par))
         
     def toSegmentsParameter(self, parameter):
-        return min(max(parameter, 0), 0.9999) * len(self.segments)
+        return min(max(parameter, 0), 0.99999) * len(self.segments)
         
     
 class BezierPoint:

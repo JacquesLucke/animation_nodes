@@ -76,7 +76,56 @@ class PolySpline(Spline):
         return self.segments[int(par)].tangent
         
     def toSegmentsParameter(self, parameter):
-        return min(max(parameter, 0), 0.9999) * len(self.segments)
+        return min(max(parameter, 0), 0.99999) * len(self.segments)
+        
+        
+    # point distribution
+    #############################
+    
+    def getEqualDistanceParameters(self, amount):
+        if amount < 2: return [0.0]
+        if not self.isEvaluable: return [0.0]
+
+        totalLength = self.getLength()
+        distancePerStep = totalLength / amount
+        
+        parameters = [0.0]
+        lastControlPoint = self.points[0]
+        lastVector = self.points[0]
+        previousDistance = 0.0
+        
+        targetPoints = self.points[1:]
+        targetPointAmount = len(targetPoints)
+        
+        for i, point in enumerate(targetPoints):
+            while True:
+                distanceToLastVector = (point - lastVector).length
+                totalDistance = distanceToLastVector + previousDistance
+                
+                if totalDistance >= distancePerStep:
+                    # find vector with correct distance
+                    surplusDistance = totalDistance - distancePerStep    
+                    influence = surplusDistance / distanceToLastVector
+                    sampledVector = lastVector * influence + point * (1 - influence)
+                    
+                    # calculate parameter of the sampled vector
+                    d1 = (sampledVector - lastControlPoint).length
+                    d2 = (point - lastControlPoint).length
+                    parameter = (i + d1 / d2) / targetPointAmount
+                    parameters.append(parameter)
+                    
+                    previousDistance = 0.0
+                    lastVector = sampledVector
+                else:
+                    previousDistance += distanceToLastVector
+                    lastVector = point
+                    break
+            lastControlPoint = point
+                
+        # append parameter 1.0 sometimes because of math inaccuracy
+        if parameters[-1] < 0.999999:
+            parameters.append(1.0)
+        return parameters
         
         
 class PolySegment:
