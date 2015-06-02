@@ -7,6 +7,7 @@ class PolySpline(Spline):
         self.points = []
         self.isCyclic = False
         self.segments = []
+        self.segmentAmount = 0
         self.isChanged = True
         
     @staticmethod
@@ -44,6 +45,7 @@ class PolySpline(Spline):
                 self.segments.append(PolySegment(left, right))
             if self.isCyclic:
                 self.segments.append(PolySegment(self.points[-1], self.points[0]))
+            self.segmentAmount = len(self.segments)
              
         if self.isChanged:
             recreateSegments()
@@ -69,15 +71,20 @@ class PolySpline(Spline):
     #############################    
     
     def evaluate(self, parameter):
-        par = self.toSegmentsParameter(parameter)
-        return self.segments[int(par)].evaluate(par - int(par))
+        index, p = self.toSegmentsIndexAndParameter(parameter)
+        return self.segments[index].evaluate(p)
         
     def evaluateTangent(self, parameter):
-        par = self.toSegmentsParameter(parameter)
-        return self.segments[int(par)].tangent
+        index, p = self.toSegmentsIndexAndParameter(parameter)
+        return self.segments[index].tangent
         
-    def toSegmentsParameter(self, parameter):
-        return min(max(parameter, 0), 0.9999) * len(self.segments)
+    def toSegmentsIndexAndParameter(self, parameter):
+        p = max(parameter, 0.0) * self.segmentAmount
+        floorP = int(p)
+        if floorP < self.segmentAmount: 
+            return floorP, p - floorP
+        else:
+            return self.segmentAmount - 1, 1
         
         
     # point distribution
