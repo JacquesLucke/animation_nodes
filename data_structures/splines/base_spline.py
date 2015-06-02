@@ -78,7 +78,7 @@ class Spline:
         sampledData = [(par, (coordinates - self.evaluate(par)).length_squared) for par in parameters]       
         return min(sampledData, key = lambda item: item[1])[0]
     def getProjectedParameters(self, coordinates):
-        return [0.0]
+        return [i / 100 for i in range(101)]
         
     
     # find the nearest point and tangent on the spline + the straight lines at the end
@@ -109,19 +109,16 @@ class Spline:
         return min(projectionData, key = lambda item: (coordinates - item[0]).length_squared)
         
         
-    # another algorithm is possibly better
-    # and a method to calculate a given number of equally spaced vectors is needed
-    # http://math.stackexchange.com/questions/321293/find-coordinates-of-equidistant-points-in-bezier-curve
-    def samplePointsWithDistance(self, distance, resolution = 100):
-        distance = distance ** 2
+    def getUniformPolyApproximation(self, resolution = 100):
+        from . poly_spline import PolySpline
         samples = self.getSamples(resolution)
-        points = [samples[0]]
-        for i, sample in enumerate(samples[1:]):
-            distanceToLastSample = (sample - points[-1]).length_squared
-            if distanceToLastSample > distance:
-                lastDistanceToLastSample = (points[-1] - samples[i - 1]).length_squared
-                d1 = distance - lastDistanceToLastSample
-                d2 = distanceToLastSample - distance
-                influence = d1 / (d1 + d2)
-                points.append(sample * influence + samples[i - 1] * (1 - influence))
-        return points
+        
+        polySpline = PolySpline()
+        polySpline.appendPoints(samples)
+        polySpline.update()
+        
+        uniformPolySpline = PolySpline()
+        equalDistanceParameters = polySpline.getEqualDistanceParameters(resolution)
+        for parameter in equalDistanceParameters:
+            uniformPolySpline.appendPoint(polySpline.evaluate(parameter))
+        return uniformPolySpline
