@@ -53,20 +53,30 @@ class Spline:
         parameters = self.getParameters(amount, start, end)
         return [self.evaluate(par) for par in parameters]
         
-        
     def getTangentSamples(self, amount, start = 0.0, end = 1.0):
         parameters = self.getParameters(amount, start, end)
         return [self.evaluateTangent(par) for par in parameters]
         
+    def getUniformSamples(self, amount, start = 0.0, end = 1.0):
+        parameters = self.toUniformParameters(amount, start, end)
+        return [self.evaluate(par) for par in parameters]
+        
+    def getUniformTangentSamples(self, amount, start = 0.0, end = 1.0):
+        parameters = self.toUniformParameters(amount, start, end)
+        return [self.evaluateTangent(par) for par in parameters]
+        
+        
+    def toUniformParameters(self, amount, start = 0.0, end = 1.0):
+        return [self.toUniformParameter(par) for par in self.getParameters(amount, start, end)]
         
     def getParameters(self, amount, start = 0.0, end = 1.0):
         if start > end: start, end = end, start
         factor = (end - start) / (amount - 1)
         return [i * factor + start for i in range(amount)]
         
-        
     def toUniformParameter(self, parameter):
         return self.uniformConverter.lookUp(parameter)
+        
         
     
     # the resolution may not be needed in every subclass

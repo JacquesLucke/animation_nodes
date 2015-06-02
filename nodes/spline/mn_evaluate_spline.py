@@ -2,20 +2,14 @@ import bpy
 from bpy.props import *
 from bpy.types import Node
 from mathutils import Vector
+from . mn_spline_parameter_evaluate_node_base import SplineParameterEvaluateNodeBase
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
-parameterTypeItems = [
-    ("RESOLUTION", "Resolution", ""),
-    ("LENGTH", "Length", "")]
-
-class mn_EvaluateSpline(Node, AnimationNode):
+class mn_EvaluateSpline(Node, AnimationNode, SplineParameterEvaluateNodeBase):
     bl_idname = "mn_EvaluateSpline"
     bl_label = "Evaluate Spline"
     
-    parameterType = EnumProperty(name = "Parameter Type", default = "LENGTH", items = parameterTypeItems)
-    resolution = IntProperty(name = "Resolution", default = 100, min = 2, description = "Increase to have a more accurate evaluation if the type is set to Length")
-
     def init(self, context):
         forbidCompiling()
         self.inputs.new("mn_SplineSocket", "Spline").showName = False
