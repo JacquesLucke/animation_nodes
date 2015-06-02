@@ -29,6 +29,6 @@ class mn_EvaluateSpline(Node, AnimationNode):
     def execute(self, spline, parameter):
         spline.update()
         if spline.isEvaluable:
-            return spline.evaluate(parameter), spline.evaluateTangent(parameter)
+            return spline.evaluate(parameter), spline.evaluateTangent(parameter), spline.getLength()
         else:
             return Vector((0, 0, 0)), Vector((0, 0, 0)), 0.0
