@@ -225,7 +225,7 @@ class SplineMenu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout                                             
         insertNode(layout, "mn_SplineInfo", "Info")
-        insertNode(layout, "mn_SplineEvaluator", "Evaluate")                                                 
+        insertNode(layout, "mn_EvaluateSpline", "Evaluate")                                                 
         insertNode(layout, "mn_ProjectOnSpline", "Project")
         insertNode(layout, "mn_AppendPointToSpline", "Append Point")
         layout.separator()
