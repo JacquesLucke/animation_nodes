@@ -141,11 +141,10 @@ class ParameterConverter:
         self.length = len(parameterList)
         
     def lookUp(self, parameter):
-        p = min(max(parameter, 0), 1)
-        p = min(p * self.length, self.length - 1)
+        p = min(max(parameter * self.length, 0), self.length - 1)
         before = int(p)
         after = min(before + 1, self.length - 1)
-        influence = p - int(p)
+        influence = p - before
         return self.parameters[before] * (1 - influence) + self.parameters[after] * influence
         
     @property
