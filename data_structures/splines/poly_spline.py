@@ -48,6 +48,7 @@ class PolySpline(Spline):
         if self.isChanged:
             recreateSegments()
             self.isEvaluable = len(self.segments) > 0
+            self.uniformParameterConverter = None
             self.isChanged = False
         
     def getLength(self, resolution = 0):

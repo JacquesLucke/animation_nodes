@@ -11,6 +11,8 @@ class Spline:
             return True
         if name == "isChanged":
             return True
+        if name == "uniformConverter":
+            return None
         
         
     def copy(self):
@@ -60,7 +62,11 @@ class Spline:
         if start > end: start, end = end, start
         factor = (end - start) / (amount - 1)
         return [i * factor + start for i in range(amount)]
-    
+        
+        
+    def toUniformParameter(self, parameter):
+        return self.uniformConverter.lookUp(parameter)
+        
     
     # the resolution may not be needed in every subclass
     def getLength(self, resolution = 50):
@@ -93,6 +99,7 @@ class Spline:
         splineTangent = self.evaluateTangent(parameter)
         projectionData = [(splineProjection, splineTangent)]
         
+        # TODO: can cause division by zero here
         if not self.isCyclic:
             startPoint = self.evaluate(0)
             startTangent = self.evaluateTangent(0)
@@ -109,7 +116,11 @@ class Spline:
         return min(projectionData, key = lambda item: (coordinates - item[0]).length_squared)
         
         
-    def getUniformPolyApproximation(self, resolution = 100):
+    def ensureUniformConverter(self, resolution = 100):
+        if getattr(self.uniformConverter, "resolution", 0) < resolution:
+            self.newUniformConverter(resolution)
+       
+    def newUniformConverter(self, resolution = 100):
         from . poly_spline import PolySpline
         samples = self.getSamples(resolution)
         
@@ -119,6 +130,24 @@ class Spline:
         
         uniformPolySpline = PolySpline()
         equalDistanceParameters = polySpline.getEqualDistanceParameters(resolution)
-        for parameter in equalDistanceParameters:
-            uniformPolySpline.appendPoint(polySpline.evaluate(parameter))
-        return uniformPolySpline
+        converter = ParameterConverter(equalDistanceParameters)
+        self.uniformConverter = converter
+        
+        
+        
+class ParameterConverter:
+    def __init__(self, parameterList):
+        self.parameters = parameterList
+        self.length = len(parameterList)
+        
+    def lookUp(self, parameter):
+        p = min(max(parameter, 0), 1)
+        p = min(p * self.length, self.length - 1)
+        before = int(p)
+        after = min(before + 1, self.length - 1)
+        influence = p - int(p)
+        return self.parameters[before] * (1 - influence) + self.parameters[after] * influence
+        
+    @property
+    def resolution(self):
+        return self.length - 1
