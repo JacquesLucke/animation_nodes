@@ -7,6 +7,7 @@ class PolySpline(Spline):
         self.points = []
         self.isCyclic = False
         self.segments = []
+        self.isChanged = True
         
     @staticmethod
     def fromLocations(locations):
@@ -43,9 +44,11 @@ class PolySpline(Spline):
                 self.segments.append(PolySegment(left, right))
             if self.isCyclic:
                 self.segments.append(PolySegment(self.points[-1], self.points[0]))
-                
-        recreateSegments()
-        self.isEvaluable = len(self.segments) > 0
+             
+        if self.isChanged:
+            recreateSegments()
+            self.isEvaluable = len(self.segments) > 0
+            self.isChanged = False
         
     def getLength(self, resolution = 0):
         length = 0

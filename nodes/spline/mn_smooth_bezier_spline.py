@@ -28,4 +28,5 @@ class mn_SmoothBezierSpline(Node, AnimationNode):
     def execute(self, spline, smoothness):
         if spline.type == "BEZIER":
             spline.calculateSmoothHandles(smoothness)
+            spline.isChanged = True
         return spline

@@ -23,4 +23,5 @@ class mn_MakeSplineCyclic(Node, AnimationNode):
 
     def execute(self, spline, cyclic):
         spline.isCyclic = cyclic
+        spline.isChanged = True
         return spline

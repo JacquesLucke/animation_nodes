@@ -9,6 +9,8 @@ class Spline:
             return False
         if name == "isEvaluable":
             return True
+        if name == "isChanged":
+            return True
         
         
     def copy(self):
