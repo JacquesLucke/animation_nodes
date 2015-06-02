@@ -1,5 +1,6 @@
 import copy
 from mathutils import Vector
+from ... utils.math import findNearestParameterOnLine
 
 class Spline:
     def __getattr__(self, name):
@@ -103,14 +104,16 @@ class Spline:
         if not self.isCyclic:
             startPoint = self.evaluate(0)
             startTangent = self.evaluateTangent(0)
-            startLineProjection = findNearestPointOnLine(startPoint, startTangent, coordinates)
-            if (startLineProjection.x - startPoint.x) / startTangent.x <= 0:
+            parameter = findNearestParameterOnLine(startPoint, startTangent, coordinates)
+            if parameter <= 0:
+                startLineProjection = startPoint + parameter * startTangent
                 projectionData.append((startLineProjection, startTangent))
             
             endPoint = self.evaluate(1)
             endTangent = self.evaluateTangent(1)
-            endLineProjection = findNearestPointOnLine(endPoint, endTangent, coordinates)
-            if (endLineProjection.x - endPoint.x) / endTangent.x >= 0: 
+            parameter = findNearestParameterOnLine(endPoint, endTangent, coordinates)
+            if parameter >= 0: 
+                endLineProjection = endPoint + parameter * endTangent
                 projectionData.append((endLineProjection, endTangent))
         
         return min(projectionData, key = lambda item: (coordinates - item[0]).length_squared)
