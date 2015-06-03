@@ -12,6 +12,7 @@ from ... algorithms import interpolation
 from ... utils.mn_name_utils import toDataPath
 from ... utils.task_manager import TaskManager, Task
 from ... utils.sequence_editor import getSoundsInSequencer, getSoundSequences
+from ... utils.path import toAbsolutePath
 from ... utils.fcurve import (getSingleFCurveWithDataPath, 
                               removeFCurveWithDataPath,
                               deselectAllFCurves,
@@ -236,11 +237,10 @@ class ClearBakedData(bpy.types.Operator):
     bl_options = {"REGISTER"}
     
     def execute(self, context):
-        dataHolder = getDataHolder()
-        for key, value in dataHolder.items():
-            if key.startswith("SOUND"):
-                removeCustomProperty(dataHolder, key)
-        sequencerData.reset()
+        sounds = getSoundsInSequencer()
+        for sound in sounds:
+            sound.bakeData.clear()
+        sequencerData.update()
         return {"FINISHED"}
         
         
@@ -275,9 +275,11 @@ class BakeSounds(bpy.types.Operator):
     def modal(self, context, event):
         if event.type == "ESC": return self.finish()
         
-        status = self.taskManager.execute(event)
+        try: status = self.taskManager.execute(event)
+        except MissingSoundFileException:
+            self.report({"ERROR"}, "Sound file not found and it is not packed into the .blend file")
+            return self.finish()
         description = self.taskManager.nextDescription
-        context.area.type = "NODE_EDITOR"
         
         node = getNode(self.nodeTreeName, self.nodeName)
         node.isBaking = True
@@ -292,6 +294,7 @@ class BakeSounds(bpy.types.Operator):
     def finish(self):
         node = getNode(self.nodeTreeName, self.nodeName)
         node.isBaking = False
+        bpy.context.area.type = "NODE_EDITOR"
         bpy.context.window_manager.event_timer_remove(self.timer)
         sequencerData.update()
         return {"FINISHED"}
@@ -328,16 +331,32 @@ class BakeSoundObject(Task):
         
     def execute(self, event):
         sound = self.sound
+        
+        filepath = toAbsolutePath(sound.filepath, library = sound.library)
+        useUnpacking = False
+        if not os.path.exists(filepath):
+            if sound.packed_file:
+                filepath = os.path.join(os.path.dirname(__file__), "TEMPORARY SOUND FILE")
+                file = open(filepath, "w+b")
+                file.write(sound.packed_file.data)
+                file.close()
+                useUnpacking = True
+            else:
+                raise MissingSoundFileException
+        
         object = self.createActiveObject()
         bpy.context.scene.frame_current = 0
         bpy.context.area.type = "GRAPH_EDITOR"
         
         bpy.ops.graph.sound_bake(
-            filepath = sound.filepath,
+            filepath = filepath,
             low = self.low,
             high = self.high,
             attack = self.attack,
             release = self.release)
+            
+        if useUnpacking:
+            os.remove(filepath)
             
         bakeItem = self.getEmptyBakeItem()
         fcurve = getSingleFCurveWithDataPath(object, "location")
@@ -380,6 +399,9 @@ def getSoundBakeItemFromFrequency(sound, low, high):
         if item.low == low and item.high == high:
             return item
     return None
+    
+class MissingSoundFileException(Exception):
+    pass
 
     
 
