@@ -139,7 +139,7 @@ class mn_ScriptNode(Node, AnimationNode):
             scriptLocals[socket.customName] = inputs[socket.identifier]
         
         try:
-            exec(self.getScript(), scriptLocals, scriptLocals)
+            exec(self.getScript(), {}, scriptLocals)
             for socket in self.outputs:
                 if socket.name == emptySocketName: continue
                 outputs[socket.identifier] = scriptLocals[socket.customName]
