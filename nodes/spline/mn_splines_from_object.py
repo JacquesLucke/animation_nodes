@@ -8,11 +8,16 @@ class mn_SplinesFromObject(Node, AnimationNode):
     bl_idname = "mn_SplinesFromObject"
     bl_label = "Splines from Object"
     
+    useWorldTransform = bpy.props.BoolProperty(name = "Use World Transform", default = True, description = "Use the position in global space")
+    
     def init(self, context):
         forbidCompiling()
         self.inputs.new("mn_ObjectSocket", "Object").showName = False
         self.outputs.new("mn_SplineListSocket", "Splines")
         allowCompiling()
+        
+    def draw_buttons(self, context, layout):
+        layout.prop(self, "useWorldTransform")
         
     def getInputSocketNames(self):
         return {"Object" : "object"}
@@ -22,4 +27,7 @@ class mn_SplinesFromObject(Node, AnimationNode):
 
     def execute(self, object):
         splines = createSplinesFromBlenderObject(object)
+        if self.useWorldTransform:
+            for spline in splines:
+                spline.transform(object.matrix_world)
         return splines
