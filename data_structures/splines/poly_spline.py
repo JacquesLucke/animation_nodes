@@ -107,6 +107,8 @@ class PolySpline(Spline):
         targetPointAmount = len(targetPoints)
         
         for i, point in enumerate(targetPoints):
+            if point == lastVector: continue
+            
             while True:
                 distanceToLastVector = (point - lastVector).length
                 totalDistance = distanceToLastVector + previousDistance
@@ -120,6 +122,7 @@ class PolySpline(Spline):
                     # calculate parameter of the sampled vector
                     d1 = (sampledVector - lastControlPoint).length
                     d2 = (point - lastControlPoint).length
+                    
                     parameter = (i + d1 / d2) / targetPointAmount
                     parameters.append(parameter)
                     

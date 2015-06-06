@@ -9,7 +9,7 @@ class Spline:
         if name == "isCyclic":
             return False
         if name == "isEvaluable":
-            return True
+            return False
         if name == "isChanged":
             return True
         if name == "uniformConverter":
