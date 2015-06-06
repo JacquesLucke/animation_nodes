@@ -54,31 +54,37 @@ class AnimationNodesDeveloperPanel(bpy.types.Panel):
         col.prop(scene.mn_settings.developer, "printGenerationTime", text = "Print Generation Time")
         col.prop(scene.mn_settings.developer, "executionProfiling", text = "Node Execution Profiling")
         
-class SocketVisibilityPanel(bpy.types.Panel):
-    bl_idname = "mn.socket_visibility_panel"
-    bl_label = "Socket Visibility"
+class NodePropertiesPanel(bpy.types.Panel):
+    bl_idname = "mn.node_properties_panel"
+    bl_label = "Node and Socket Settings"
     bl_space_type = "NODE_EDITOR"   
     bl_region_type = "UI"
     
     @classmethod
     def poll(self, context):
-        return context.active_node
+        return self.node
         
     def draw(self, context):
         layout = self.layout
-        node = context.active_node
+        layout.prop(self.node, "bl_width_max", text = "Max Width")
+        self.drawSocketVisibility(layout)
         
+    def drawSocketVisibility(self, layout):
         row = layout.row(align = False)
         
         col = row.column(align = True)
         col.label("Inputs:")
-        for socket in node.inputs:
+        for socket in self.node.inputs:
             col.prop(socket, "show", text = socket.name)
             
         col = row.column(align = True)
         col.label("Outputs:")
-        for socket in node.outputs:
+        for socket in self.node.outputs:
             col.prop(socket, "show", text = socket.name)
+            
+    @property
+    def node(self):
+        return bpy.context.active_node
         
 class KeyframeManagerPanel(bpy.types.Panel):
     bl_idname = "mn.keyframes_manager"
