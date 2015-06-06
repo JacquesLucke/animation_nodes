@@ -61,8 +61,8 @@ class NodePropertiesPanel(bpy.types.Panel):
     bl_region_type = "UI"
     
     @classmethod
-    def poll(self, context):
-        return self.node
+    def poll(cls, context):
+        return context.active_node
         
     def draw(self, context):
         layout = self.layout
