@@ -2,6 +2,15 @@ import copy
 from mathutils import Vector
 from ... utils.math import findNearestParameterOnLine
 
+'''
+How to use Splines:
+- Don't create an instance of the base Spline class. Use PolySpline or BezierSpline instead
+- set the isChanged property to False after you edited the spline
+- call the update function on the spline before evaluation, projection, ...
+- check the isEvaluable after updating the spline. There may be exceptions when you evaluate the spline when it isn't evaluable
+- call the ensureUniformConverter function before converting normal parameters to parameters which have the same distances
+'''
+
 class Spline:
     def __getattr__(self, name):
         if name == "type":
@@ -79,7 +88,8 @@ class Spline:
         if start > end: start, end = end, start
         factor = (end - start) / (amount - 1)
         return [i * factor + start for i in range(amount)]
-        
+    
+    # call ensureUniformConverter first
     def toUniformParameter(self, parameter):
         return self.uniformConverter.lookUp(parameter)
         
@@ -159,7 +169,7 @@ class Spline:
         self.uniformConverter = converter
         
         
-        
+# Mainly used to get parameters which have the same distance on the spline       
 class ParameterConverter:
     def __init__(self, parameterList):
         self.parameters = parameterList
