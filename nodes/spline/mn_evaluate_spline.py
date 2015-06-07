@@ -16,7 +16,6 @@ class mn_EvaluateSpline(Node, AnimationNode, SplineParameterEvaluateNodeBase):
         self.inputs.new("mn_FloatSocket", "Parameter").number = 1.0
         self.outputs.new("mn_VectorSocket", "Location")
         self.outputs.new("mn_VectorSocket", "Tangent")
-        self.outputs.new("mn_FloatSocket", "Length")
         allowCompiling()
         
     def draw_buttons(self, context, layout):
@@ -33,8 +32,7 @@ class mn_EvaluateSpline(Node, AnimationNode, SplineParameterEvaluateNodeBase):
 
     def getOutputSocketNames(self):
         return {"Location" : "location",
-                "Tangent" : "tangent",
-                "Length" : "length"}
+                "Tangent" : "tangent"}
 
     def execute(self, spline, parameter):
         spline.update()
@@ -42,6 +40,6 @@ class mn_EvaluateSpline(Node, AnimationNode, SplineParameterEvaluateNodeBase):
             if self.parameterType == "LENGTH":
                 spline.ensureUniformConverter(self.resolution)
                 parameter = spline.toUniformParameter(parameter)
-            return spline.evaluate(parameter), spline.evaluateTangent(parameter), spline.getLength()
+            return spline.evaluate(parameter), spline.evaluateTangent(parameter)
         else:
-            return Vector((0, 0, 0)), Vector((0, 0, 0)), 0.0
+            return Vector((0, 0, 0)), Vector((0, 0, 0))

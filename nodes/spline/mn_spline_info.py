@@ -11,7 +11,6 @@ class mn_SplineInfo(Node, AnimationNode):
         forbidCompiling()
         self.inputs.new("mn_SplineSocket", "Spline").showName = False
         self.outputs.new("mn_VectorListSocket", "Points")
-        self.outputs.new("mn_FloatSocket", "Length")
         self.outputs.new("mn_BooleanSocket", "Cyclic")
         allowCompiling()
         
@@ -20,9 +19,8 @@ class mn_SplineInfo(Node, AnimationNode):
 
     def getOutputSocketNames(self):
         return {"Points" : "points",
-                "Length" : "length",
                 "Cyclic" : "cyclic"}
 
     def execute(self, spline):
         spline.update()
-        return spline.getPoints(), spline.getLength(), spline.isCyclic
+        return spline.getPoints(), spline.isCyclic

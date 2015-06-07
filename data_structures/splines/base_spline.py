@@ -70,6 +70,12 @@ class Spline:
         return [self.toUniformParameter(par) for par in self.getParameters(amount, start, end)]
         
     def getParameters(self, amount, start = 0.0, end = 1.0):
+        start = min(max(start, 0.0), 1.0)
+        end = min(max(end, 0.0), 1.0)
+    
+        if amount == 0: return []
+        if amount == 1: return [(start + end) / 2]
+        
         if start > end: start, end = end, start
         factor = (end - start) / (amount - 1)
         return [i * factor + start for i in range(amount)]
@@ -81,13 +87,19 @@ class Spline:
     
     # the resolution may not be needed in every subclass
     def getLength(self, resolution = 50):
-        if not self.isEvaluable: return 0.0
-        samples = self.getSamples(resolution)
-        length = 0.0
-        for i in range(resolution - 1):
-            length += (samples[i] - samples[i+1]).length
-        return length
+        return self.getPartialLength(resolution, 0.0, 1.0)
         
+    def getPartialLength(self, resolution = 50, start = 0.0, end = 1.0):
+        if not self.isEvaluable: return 0.0
+        samples = self.getSamples(resolution, start, end)
+        return self.calculateDistanceSum(samples)
+        
+    def calculateDistanceSum(self, vectors):
+        distance = 0.0
+        for i in range(len(vectors) - 1):
+            distance += (vectors[i] - vectors[i+1]).length
+        return distance
+            
         
     # it's enough when a subclass implements 'getProjectedParameters'
     def project(self, coordinates):
