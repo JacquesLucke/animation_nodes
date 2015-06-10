@@ -1,6 +1,6 @@
 import copy
 from mathutils import Vector
-from ... utils.math import findNearestParameterOnLine
+from . utils import findNearestParameterOnLine
 
 '''
 How to use Splines:

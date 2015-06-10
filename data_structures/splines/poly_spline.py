@@ -1,5 +1,5 @@
 from . base_spline import Spline
-from ... utils.math import findNearestParameterOnLine
+from . utils import findNearestParameterOnLine
 
 
 class PolySpline(Spline):
