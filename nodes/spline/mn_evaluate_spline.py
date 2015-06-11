@@ -13,7 +13,7 @@ class mn_EvaluateSpline(Node, AnimationNode, SplineParameterEvaluateNodeBase):
     def init(self, context):
         forbidCompiling()
         self.inputs.new("mn_SplineSocket", "Spline").showName = False
-        self.inputs.new("mn_FloatSocket", "Parameter").number = 1.0
+        self.inputs.new("mn_FloatSocket", "Parameter").number = 0.0
         self.outputs.new("mn_VectorSocket", "Location")
         self.outputs.new("mn_VectorSocket", "Tangent")
         allowCompiling()
