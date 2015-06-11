@@ -153,6 +153,19 @@ class Spline:
         return min(projectionData, key = lambda item: (coordinates - item[0]).length_squared)
         
         
+    
+    def getTrimmedVersion(self, start, end):
+        from . poly_spline import PolySpline
+        
+        self.update()
+        if not self.isEvaluable: return self.copy()
+        
+        trimmedSpline = PolySpline()
+        trimmedSpline.appendPoints(self.getSamples(100, start, end))
+        return trimmedSpline
+       
+        
+        
     def ensureUniformConverter(self, resolution = 100):
         if getattr(self.uniformConverter, "resolution", 0) < resolution:
             self.newUniformConverter(resolution)
