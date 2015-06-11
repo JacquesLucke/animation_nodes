@@ -78,7 +78,8 @@ class mn_LoftSplines(Node, AnimationNode):
             if len(splines) < 2: return False
             if splineSamples < 2: return False
             if surfaceSamples < 2: return False
-            if cyclic and surfaceSamples < 3: return False
+            isRealCyclic = cyclic and start == 0.0 and end == 1.0
+            if isRealCyclic and surfaceSamples < 3: return False
             return True
             
         for spline in splines:

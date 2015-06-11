@@ -14,6 +14,8 @@ def loftSplines(splines,
                 
     vertices = []
     
+    isRealCyclic = cyclic and startSurfaceParameter <= 0.0 and endSurfaceParameter >= 1.0
+    
     if splineDistributionType == "RESOLUTION":
         samples = [spline.getSamples(nSplineSamples) for spline in splines]
     elif splineDistributionType == "UNIFORM":
@@ -29,16 +31,16 @@ def loftSplines(splines,
             spline.isCyclic = cyclic
         spline.update()
         
-        amount = nSurfaceSamples + int(cyclic)
+        amount = nSurfaceSamples + int(isRealCyclic)
         
         if surfaceDistributionType == "RESOLUTION":
             vertices.extend(spline.getSamples(amount, start = startSurfaceParameter, end = endSurfaceParameter))
         elif surfaceDistributionType == "UNIFORM":
             vertices.extend(spline.getUniformSamples(amount, resolution = uniformConverterResolution, start = startSurfaceParameter, end = endSurfaceParameter))
             
-        if cyclic: del vertices[-1]
+        if isRealCyclic: del vertices[-1]
       
-    if cyclic:
+    if isRealCyclic:
         polygons = tubeQuadPolygonIndices(nSplineSamples, nSurfaceSamples)
     else:
         polygons = gridQuadPolygonIndices(nSplineSamples, nSurfaceSamples)
