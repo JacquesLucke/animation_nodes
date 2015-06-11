@@ -1,5 +1,6 @@
 import bpy
 from bpy.props import *
+from . mn_utils import getNode
 
 '''
                 ###############
@@ -111,6 +112,8 @@ class InsertDebugNode(bpy.types.Operator):
     bl_options = {"REGISTER"}
     
     socketIndex = IntProperty(default = 0)
+    nodeTreeName = StringProperty()
+    nodeName = StringProperty()
     
     @classmethod
     def poll(cls, context):
@@ -118,30 +121,57 @@ class InsertDebugNode(bpy.types.Operator):
         
     def invoke(self, context, event):
         storeCursorLocation(event)
-        amount = len(context.active_node.outputs)
-        if amount == 1:
-            self.socketIndex = 0
-            self.execute(context)
-        elif amount >= 2:
-            context.window_manager.popup_menu(self.drawSocketChooser, title = "Choose Socket")
+        node = context.active_node
+        bpy.ops.mn.choose_socket_and_execute_operator("INVOKE_DEFAULT",
+            operatorName = "mn.insert_debug_node",
+            nodeTreeName = node.id_data.name,
+            nodeName = node.name, 
+            chooseOutputSocket = True)
         return {"FINISHED"}
-        
-    def drawSocketChooser(tmp, self, context):
-        col = self.layout.column()
-        col.operator_context = "EXEC_DEFAULT"
-        for i, socket in enumerate(context.active_node.outputs):
-            if not socket.hide:
-                props = col.operator("mn.insert_debug_node", text = socket.name)
-                props.socketIndex = i
             
     def execute(self, context):
         nodeTree = getActiveAnimationNodeTree()
-        originNode = getActiveNode()
+        originNode = getNode(self.nodeTreeName, self.nodeName)
         node = insertNode("mn_DebugOutputNode")
         nodeTree.links.new(node.inputs[0], originNode.outputs[self.socketIndex])
         onlySelect(node)
         bpy.ops.transform.translate("INVOKE_DEFAULT")
         return{"FINISHED"} 
+        
+        
+class ChooseSocketAndExecuteOperator(bpy.types.Operator):
+    bl_idname = "mn.choose_socket_and_execute_operator"
+    bl_label = "Choose Socket and Execute Operator"
+    bl_description = ""
+    bl_options = {"REGISTER"}   
+
+    operatorName = StringProperty()
+    nodeTreeName = StringProperty()
+    nodeName = StringProperty()
+    chooseOutputSocket = BoolProperty()
+    
+    def invoke(self, context, event):
+        node = getNode(self.nodeTreeName, self.nodeName)
+        sockets = node.outputs if self.chooseOutputSocket else node.inputs
+        amount = len(sockets)
+        if amount == 1:
+            exec("bpy.ops.{}('EXEC_DEFAULT', socketIndex = 0, nodeTreeName = {}, nodeName = {})".format(self.operatorName, repr(self.nodeTreeName), repr(self.nodeName)))
+        elif amount >= 2:
+            context.window_manager.popup_menu(self.drawSocketChooser, title = "Choose Socket")
+        return {"FINISHED"}
+        
+    def drawSocketChooser(self, menu, context):
+        node = getNode(self.nodeTreeName, self.nodeName)
+        sockets = node.outputs if self.chooseOutputSocket else node.inputs
+    
+        col = menu.layout.column()
+        col.operator_context = "EXEC_DEFAULT"
+        for i, socket in enumerate(sockets):
+            if not socket.hide:
+                props = col.operator(self.operatorName, text = socket.name)
+                props.socketIndex = i
+                props.nodeTreeName = self.nodeTreeName
+                props.nodeName = self.nodeName
         
 
 class LinkedIndices(bpy.types.PropertyGroup):
