@@ -1,13 +1,14 @@
 import bpy
 from bpy.props import *
 from . mn_utils import getNode
+from . sockets.mn_socket_info import getDataTypeFromIdName
 
 '''
                 ###############
                 
     #########                      Second active node suggestion
     
-#########                               First active node suggestion
+ Data Input                               First active node suggestion
 
     #########                      All other active node suggestions
     
@@ -31,7 +32,10 @@ class ContextPie(bpy.types.Menu):
         return animationNodeTreeActive()
     
     def drawLeft(self, context, layout):
-        self.empty(layout)
+        if activeNodeHasInputs():
+            layout.operator("mn.insert_data_input_node", text = "Data Input")
+        else: 
+            self.empty(layout)
         
     def drawRight(self, context, layout):
         if len(self.activeNodeSuggestions) > 0:
@@ -41,7 +45,7 @@ class ContextPie(bpy.types.Menu):
         
     def drawBottom(self, context, layout):
         if activeNodeHasOutputs():
-            layout.operator("mn.insert_debug_node")
+            layout.operator("mn.insert_debug_node", text = "Debug")
         else: 
             self.empty(layout)
         
@@ -134,9 +138,47 @@ class InsertDebugNode(bpy.types.Operator):
         originNode = getNode(self.nodeTreeName, self.nodeName)
         node = insertNode("mn_DebugOutputNode")
         nodeTree.links.new(node.inputs[0], originNode.outputs[self.socketIndex])
-        onlySelect(node)
-        bpy.ops.transform.translate("INVOKE_DEFAULT")
-        return{"FINISHED"} 
+        moveNode(node)
+        return{"FINISHED"}
+        
+        
+class InsertDataInputNode(bpy.types.Operator):
+    bl_idname = "mn.insert_data_input_node"
+    bl_label = "Insert Data Input Node"
+    bl_description = ""
+    bl_options = {"REGISTER"}
+    
+    socketIndex = IntProperty(default = 0)
+    nodeTreeName = StringProperty()
+    nodeName = StringProperty()
+    
+    @classmethod
+    def poll(cls, context):
+        return activeNodeHasInputs() and animationNodeTreeActive()
+        
+    def invoke(self, context, event):
+        storeCursorLocation(event)
+        node = context.active_node
+        bpy.ops.mn.choose_socket_and_execute_operator("INVOKE_DEFAULT",
+            operatorName = "mn.insert_data_input_node",
+            nodeTreeName = node.id_data.name,
+            nodeName = node.name, 
+            chooseOutputSocket = False)
+        return {"FINISHED"}
+            
+    def execute(self, context):
+        nodeTree = getActiveAnimationNodeTree()
+        targetNode = getNode(self.nodeTreeName, self.nodeName)
+        targetSocket = targetNode.inputs[self.socketIndex]
+        data = targetSocket.getStoreableValue()
+        
+        node = insertNode("mn_DataInput")
+        node.assignSocketType(getDataTypeFromIdName(targetSocket.bl_idname))
+        node.inputs[0].setStoreableValue(data)
+        
+        nodeTree.links.new(targetSocket, node.outputs[0])
+        moveNode(node)
+        return{"FINISHED"}        
         
         
 class ChooseSocketAndExecuteOperator(bpy.types.Operator):
@@ -199,8 +241,8 @@ class InsertLinkedNode(bpy.types.Operator):
         node = insertNode(self.nodeType)
         for item in self.links:
             nodeTree.links.new(node.inputs[item.target], originNode.outputs[item.origin])
-        onlySelect(node)
-        bpy.ops.transform.translate("INVOKE_DEFAULT")
+        
+        moveNode(node)
         return{"FINISHED"} 
       
                 
@@ -210,6 +252,10 @@ def insertNode(type):
     node = nodeTree.nodes.new(type)
     node.location = space.cursor_location
     return node
+    
+def moveNode(node):
+    onlySelect(node)
+    bpy.ops.transform.translate("INVOKE_DEFAULT")
     
 def storeCursorLocation(event):
     space = bpy.context.space_data
@@ -230,7 +276,12 @@ def getNodeNameFromIdName(idName):
 def activeNodeHasOutputs():
     if not activeNodeExists(): return False
     node = getActiveNode()
-    return len(node.outputs) > 0   
+    return len(node.outputs) > 0  
+
+def activeNodeHasInputs():
+    if not activeNodeExists(): return False
+    node = getActiveNode()
+    return len(node.inputs) > 0     
     
 def activeNodeExists():
     try: return getActiveNode() is not None
