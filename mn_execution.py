@@ -6,6 +6,7 @@ from . mn_cache import clearExecutionCache
 from . utils.mn_node_utils import *
 from . utils.selection import updateSelectionSorting
 from . mn_execution_unit_generator import getExecutionUnits
+from . manage_broken_files import containsBrokenNodes
 
 COMPILE_BLOCKER = 0
 executionUnits = []
@@ -72,6 +73,10 @@ def resetCompileBlocker():
 def generateExecutionUnits():
     global executionUnits
     
+    if containsBrokenNodes():
+        executionUnits = []
+        return
+    
     if COMPILE_BLOCKER == 0:
         forbidCompiling()
         
@@ -89,12 +94,6 @@ def getCodeStrings():
         codeStrings.append(executionUnit.executionCode)
     return codeStrings
     
-def updateOlderNodes():
-    for nodeTree in getAnimationNodeTrees():
-        for node in nodeTree.nodes:
-            if hasattr(node, "updateOlderNode"):
-                node.updateOlderNode()
-    
     
 # handlers to start the update
 ##############################
@@ -110,7 +109,6 @@ def sceneUpdateHandler(scene):
     updateAnimationTrees("SCENE")
 @persistent
 def fileLoadHandler(scene):
-    updateOlderNodes()
     generateExecutionUnits()
 def nodePropertyChanged(self, context):
     updateAnimationTrees("PROPERTY")
