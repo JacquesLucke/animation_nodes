@@ -49,12 +49,10 @@ class mn_GetSplineSamples(Node, AnimationNode, SplineParameterEvaluateNodeBase):
         positions = []
         tangents = []
         if spline.isEvaluable:
-            if self.parameterType == "LENGTH":
-                spline.ensureUniformConverter(self.resolution)
             if useOutput["Positions"]:
-                if self.parameterType == "LENGTH": positions = spline.getUniformSamples(amount, start = start, end = end)
+                if self.parameterType == "LENGTH": positions = spline.getUniformSamples(amount, start = start, end = end, resolution = self.resolution)
                 else: positions = spline.getSamples(amount, start = start, end = end)
             if useOutput["Tangents"]:
-                if self.parameterType == "LENGTH": tangents = spline.getUniformTangentSamples(amount, start = start, end = end)
+                if self.parameterType == "LENGTH": tangents = spline.getUniformTangentSamples(amount, start = start, end = end, resolution = self.resolution)
                 else: tangents = spline.getTangentSamples(amount, start = start, end = end)
         return positions, tangents
