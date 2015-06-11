@@ -156,7 +156,6 @@ class Spline:
     def ensureUniformConverter(self, resolution = 100):
         if getattr(self.uniformConverter, "resolution", 0) < resolution:
             self.newUniformConverter(resolution)
-            print(self.uniformConverter.resolution)
        
     def newUniformConverter(self, resolution = 100):
         from . poly_spline import PolySpline
