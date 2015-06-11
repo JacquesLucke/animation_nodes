@@ -62,6 +62,7 @@ class NumberMenu(bpy.types.Menu):
         insertNode(layout, "mn_AnimateFloatNode", "Animate")
         layout.separator()
         insertNode(layout, "mn_FloatClamp", "Clamp")
+        insertNode(layout, "mn_ConvertAngle", "Convert Angle")
         insertNode(layout, "mn_FloatMathNode", "Math")
         
 class VectorMenu(bpy.types.Menu):
