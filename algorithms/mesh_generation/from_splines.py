@@ -6,9 +6,18 @@ from . basic_shapes import tubeVertices
 # Loft
 ###################################
 
-def loftSplines(splines, nSplineSamples, nSurfaceSamples, type = "LINEAR", cyclic = False, smoothness = 1):
+def loftSplines(splines, 
+                nSplineSamples, nSurfaceSamples, 
+                type = "LINEAR", cyclic = False, smoothness = 1, 
+                uniformConverterResolution = 100, splineDistributionType = "RESOLUTION", surfaceDistributionType = "RESOLUTION"):
+                
     vertices = []
-    samples = [spline.getSamples(nSplineSamples) for spline in splines]
+    
+    if splineDistributionType == "RESOLUTION":
+        samples = [spline.getSamples(nSplineSamples) for spline in splines]
+    elif splineDistributionType == "UNIFORM":
+        samples = [spline.getUniformSamples(nSplineSamples, resolution = uniformConverterResolution) for spline in splines]
+    
     for points in zip(*samples):
         if type == "BEZIER":
             spline = BezierSpline.fromLocations(points)
@@ -18,7 +27,14 @@ def loftSplines(splines, nSplineSamples, nSurfaceSamples, type = "LINEAR", cycli
             spline = PolySpline.fromLocations(points)
             spline.isCyclic = cyclic
         spline.update()
-        vertices.extend(spline.getSamples(nSurfaceSamples + int(cyclic)))
+        
+        amount = nSurfaceSamples + int(cyclic)
+        
+        if surfaceDistributionType == "RESOLUTION":
+            vertices.extend(spline.getSamples(amount))
+        elif surfaceDistributionType == "UNIFORM":
+            vertices.extend(spline.getUniformSamples(amount, resolution = uniformConverterResolution))
+            
         if cyclic: del vertices[-1]
       
     if cyclic:

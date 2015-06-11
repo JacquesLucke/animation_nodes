@@ -8,7 +8,11 @@ from ... algorithms.mesh_generation.from_splines import loftSplines
 interpolationTypeItems = [
     ("LINEAR", "Linear", ""),
     ("BEZIER", "Bezier", "")]
-
+    
+sampleDistributionTypeItems = [
+    ("RESOLUTION", "Resolution", ""),
+    ("UNIFORM", "Uniform", "")]    
+    
 class mn_LoftSplines(Node, AnimationNode):
     bl_idname = "mn_LoftSplines"
     bl_label = "Loft Splines"
@@ -18,6 +22,10 @@ class mn_LoftSplines(Node, AnimationNode):
         nodePropertyChanged(self, context)
         
     interpolationType = EnumProperty(name = "Interpolation Type", default = "BEZIER", items = interpolationTypeItems, update = settingChanged)
+    
+    resolution = IntProperty(name = "Resolution", default = 100, min = 2, description = "Increase to have a more accurate evaluation", update = nodePropertyChanged)
+    splineDistributionType = EnumProperty(name = "Spline Distribution", default = "RESOLUTION", items = sampleDistributionTypeItems, update = nodePropertyChanged)
+    surfaceDistributionType = EnumProperty(name = "Surface Distribution", default = "RESOLUTION", items = sampleDistributionTypeItems, update = nodePropertyChanged)
         
     def init(self, context):
         forbidCompiling()
@@ -37,6 +45,12 @@ class mn_LoftSplines(Node, AnimationNode):
         
     def draw_buttons(self, context, layout):
         layout.prop(self, "interpolationType", text = "")
+        
+    def draw_buttons_ext(self, context, layout):
+        col = layout.column()
+        col.prop(self, "splineDistributionType")
+        col.prop(self, "surfaceDistributionType")
+        col.prop(self, "resolution")
 
     def getInputSocketNames(self):
         return {"Splines" : "splines",
@@ -64,7 +78,13 @@ class mn_LoftSplines(Node, AnimationNode):
         
         if canExecute():
             vertices, polygons = loftSplines(splines, 
-                                             splineSamples, surfaceSamples, 
-                                             self.interpolationType, cyclic, smoothness)
+                                             splineSamples,
+                                             surfaceSamples, 
+                                             self.interpolationType,
+                                             cyclic,
+                                             smoothness,
+                                             uniformConverterResolution = self.resolution,
+                                             splineDistributionType = self.splineDistributionType,
+                                             surfaceDistributionType = self.surfaceDistributionType)
             return vertices, polygons
         else: return [], []

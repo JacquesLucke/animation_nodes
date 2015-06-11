@@ -66,11 +66,13 @@ class Spline:
         parameters = self.getParameters(amount, start, end)
         return [self.evaluateTangent(par) for par in parameters]
         
-    def getUniformSamples(self, amount, start = 0.0, end = 1.0):
+    def getUniformSamples(self, amount, start = 0.0, end = 1.0, resolution = 100):
+        self.ensureUniformConverter(resolution)
         parameters = self.toUniformParameters(amount, start, end)
         return [self.evaluate(par) for par in parameters]
         
-    def getUniformTangentSamples(self, amount, start = 0.0, end = 1.0):
+    def getUniformTangentSamples(self, amount, start = 0.0, end = 1.0, resolution = 100):
+        self.ensureUniformConverter(resolution)
         parameters = self.toUniformParameters(amount, start, end)
         return [self.evaluateTangent(par) for par in parameters]
         
