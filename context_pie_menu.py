@@ -1,24 +1,107 @@
 import bpy
 from bpy.props import *
 
+'''
+                ###############
+                
+    #########                      Second active node suggestion
+    
+#########                               First active node suggestion
+
+    Debug Node                     All other active node suggestions
+    
+                ###############
+                
+How to implement suggestions on a per node basis:
+1. Create a 'getNextNodeSuggestions(self)' function inside the node
+2. Return a list that looks like this:
+    [("mn_FloatMathNode", (0, 0)),                      # First suggestion
+     ("mn_CombineVector", (0, 0)),                      # Second suggestion
+     ("mn_FloatClamp", (0, 0)),                         # ... can be an unlimited amount of suggestions
+     ("mn_CombineVector", (0, 0), (0, 1), (0, 2))]      # the tuples indicate which sockets to connect: (output index, input index)
+'''
+
 class ContextPie(bpy.types.Menu):
     bl_idname = "mn.context_pie"
     bl_label = "Context Pie"
     
     @classmethod
     def poll(cls, context):
-        return context.active_node and animationNodeTreeActive()
+        return animationNodeTreeActive()
     
+    def drawLeft(self, context, layout):
+        self.empty(layout)
+        
+    def drawRight(self, context, layout):
+        if len(self.activeNodeSuggestions) > 0:
+            self.drawInsertNodeOperator(layout, self.activeNodeSuggestions[0])
+        else:
+            self.empty(layout)
+        
+    def drawBottom(self, context, layout):
+        self.empty(layout)
+        
+    def drawTop(self, context, layout):
+        self.empty(layout)
+        
+    def drawTopLeft(self, context, layout):
+        self.empty(layout)
+        
+    def drawTopRight(self, context, layout):
+        if len(self.activeNodeSuggestions) > 1:
+            self.drawInsertNodeOperator(layout, self.activeNodeSuggestions[1])
+        else:
+            self.empty(layout)
+        
+    def drawBottomLeft(self, context, layout):
+        if activeNodeHasOutputs():
+            layout.operator("mn.insert_debug_node")
+        else: 
+            self.empty(layout)
+        
+    def drawBottomRight(self, context, layout):
+        amount = len(self.activeNodeSuggestions)
+        if amount == 3:
+            self.drawInsertNodeOperator(layout, self.activeNodeSuggestions[2])
+        elif amount > 3:
+            col = layout.column()
+            for suggestion in self.activeNodeSuggestions[2:]:
+                self.drawInsertNodeOperator(col, suggestion)
+        else:
+            self.empty(layout)
+        
+        
     def draw(self, context):
+        self.prepare(context)
+        
         pie = self.layout.menu_pie()
-        pie.operator("mn.insert_debug_node")
+        self.drawLeft(context, pie)
+        self.drawRight(context, pie)
+        self.drawBottom(context, pie)
+        self.drawTop(context, pie)
+        self.drawTopLeft(context, pie)
+        self.drawTopRight(context, pie)
+        self.drawBottomLeft(context, pie)
+        self.drawBottomRight(context, pie)
         
-        outputDataType = getFirstOutputTypeOfActiveSocket()
-        if outputDataType in ["Integer", "Float"]:
-            pie.operator("mn.insert_linked_node", text = "Math").nodeType = "mn_FloatMathNode"
-        if outputDataType == "Object":
-            pie.operator("mn.insert_linked_node", text = "Transforms Output").nodeType = "mn_ObjectTransformsOutput"
+    def prepare(self, context):
+        node = context.active_node
+        try: self.activeNodeSuggestions = node.getNextNodeSuggestions()
+        except: self.activeNodeSuggestions = []
         
+    def empty(self, layout):
+        layout.row().label("")
+        
+    def drawInsertNodeOperator(self, layout, data):
+        nodeIdName = data[0]
+        links = data[1:]
+        
+        props = layout.operator("mn.insert_linked_node", text = getNodeNameFromIdName(nodeIdName))
+        props.nodeType = nodeIdName
+        for origin, target in links:
+            item = props.links.add()
+            item.origin = origin
+            item.target = target
         
         
 class InsertDebugNode(bpy.types.Operator):
@@ -60,15 +143,19 @@ class InsertDebugNode(bpy.types.Operator):
         bpy.ops.transform.translate("INVOKE_DEFAULT")
         return{"FINISHED"} 
         
+
+class LinkedIndices(bpy.types.PropertyGroup):
+    origin = IntProperty(default = 0)
+    target = IntProperty(default = 0)
+        
 class InsertLinkedNode(bpy.types.Operator):
     bl_idname = "mn.insert_linked_node"
     bl_label = "Insert Linked Node"
     bl_description = ""
     bl_options = {"REGISTER"}
     
-    originIndex = IntProperty(default = 0)
-    targetIndex = IntProperty(default = 0)
     nodeType = StringProperty(default = "")
+    links = CollectionProperty(type = LinkedIndices)
     
     @classmethod
     def poll(cls, context):
@@ -80,7 +167,8 @@ class InsertLinkedNode(bpy.types.Operator):
         nodeTree = getActiveAnimationNodeTree()
         originNode = getActiveNode()
         node = insertNode(self.nodeType)
-        nodeTree.links.new(node.inputs[self.targetIndex], originNode.outputs[self.originIndex])
+        for item in self.links:
+            nodeTree.links.new(node.inputs[item.target], originNode.outputs[item.origin])
         onlySelect(node)
         bpy.ops.transform.translate("INVOKE_DEFAULT")
         return{"FINISHED"} 
@@ -104,15 +192,15 @@ def onlySelect(node):
     node.id_data.nodes.active = node 
     
     
-def getFirstOutputTypeOfActiveSocket():    
-    if not activeNodeHasOutputs(): return ""
-    socket = getActiveNode().outputs[0]
-    return socket.dataType
+def getNodeNameFromIdName(idName):
+    try: return getattr(bpy.types, idName).bl_label
+    except: return ""
+    
     
 def activeNodeHasOutputs():
     if not activeNodeExists(): return False
     node = getActiveNode()
-    return len(node.outputs) > 0
+    return len(node.outputs) > 0   
     
 def activeNodeExists():
     try: return getActiveNode() is not None
