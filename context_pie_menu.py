@@ -9,9 +9,9 @@ from . mn_utils import getNode
     
 #########                               First active node suggestion
 
-    Debug Node                     All other active node suggestions
+    #########                      All other active node suggestions
     
-                ###############
+                  Debug Node
                 
 How to implement suggestions on a per node basis:
 1. Create a 'getNextNodeSuggestions(self)' function inside the node
@@ -40,7 +40,10 @@ class ContextPie(bpy.types.Menu):
             self.empty(layout)
         
     def drawBottom(self, context, layout):
-        self.empty(layout)
+        if activeNodeHasOutputs():
+            layout.operator("mn.insert_debug_node")
+        else: 
+            self.empty(layout)
         
     def drawTop(self, context, layout):
         self.empty(layout)
@@ -55,10 +58,7 @@ class ContextPie(bpy.types.Menu):
             self.empty(layout)
         
     def drawBottomLeft(self, context, layout):
-        if activeNodeHasOutputs():
-            layout.operator("mn.insert_debug_node")
-        else: 
-            self.empty(layout)
+        self.empty(layout)
         
     def drawBottomRight(self, context, layout):
         amount = len(self.activeNodeSuggestions)
