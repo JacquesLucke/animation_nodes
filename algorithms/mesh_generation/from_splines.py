@@ -9,7 +9,8 @@ from . basic_shapes import tubeVertices
 def loftSplines(splines, 
                 nSplineSamples, nSurfaceSamples, 
                 type = "LINEAR", cyclic = False, smoothness = 1, 
-                uniformConverterResolution = 100, splineDistributionType = "RESOLUTION", surfaceDistributionType = "RESOLUTION"):
+                uniformConverterResolution = 100, splineDistributionType = "RESOLUTION", surfaceDistributionType = "RESOLUTION",
+                startSurfaceParameter = 0.0, endSurfaceParameter = 1.0):
                 
     vertices = []
     
@@ -31,9 +32,9 @@ def loftSplines(splines,
         amount = nSurfaceSamples + int(cyclic)
         
         if surfaceDistributionType == "RESOLUTION":
-            vertices.extend(spline.getSamples(amount))
+            vertices.extend(spline.getSamples(amount, start = startSurfaceParameter, end = endSurfaceParameter))
         elif surfaceDistributionType == "UNIFORM":
-            vertices.extend(spline.getUniformSamples(amount, resolution = uniformConverterResolution))
+            vertices.extend(spline.getUniformSamples(amount, resolution = uniformConverterResolution, start = startSurfaceParameter, end = endSurfaceParameter))
             
         if cyclic: del vertices[-1]
       
