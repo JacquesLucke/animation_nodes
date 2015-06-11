@@ -24,7 +24,7 @@ class mn_GetSplineLength(Node, AnimationNode, SplineParameterEvaluateNodeBase):
         
     def draw_buttons_ext(self, context, layout):
         col = layout.column()
-        col.active = self.parameterType == "LENGTH"
+        col.active = self.parameterType == "UNIFORM"
         col.prop(self, "resolution")
         
     def getInputSocketNames(self):
@@ -42,7 +42,7 @@ class mn_GetSplineLength(Node, AnimationNode, SplineParameterEvaluateNodeBase):
                 # to get a more exact result on polysplines currently
                 return spline.getLength(self.resolution)
                 
-            if self.parameterType == "LENGTH":
+            if self.parameterType == "UNIFORM":
                 spline.ensureUniformConverter(self.resolution)
                 start = spline.toUniformParameter(start)
                 end = spline.toUniformParameter(end)

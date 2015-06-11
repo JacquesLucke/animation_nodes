@@ -23,7 +23,7 @@ class mn_EvaluateSpline(Node, AnimationNode, SplineParameterEvaluateNodeBase):
         
     def draw_buttons_ext(self, context, layout):
         col = layout.column()
-        col.active = self.parameterType == "LENGTH"
+        col.active = self.parameterType == "UNIFORM"
         col.prop(self, "resolution")
 
     def getInputSocketNames(self):
@@ -37,7 +37,7 @@ class mn_EvaluateSpline(Node, AnimationNode, SplineParameterEvaluateNodeBase):
     def execute(self, spline, parameter):
         spline.update()
         if spline.isEvaluable:
-            if self.parameterType == "LENGTH":
+            if self.parameterType == "UNIFORM":
                 spline.ensureUniformConverter(self.resolution)
                 parameter = spline.toUniformParameter(parameter)
             return spline.evaluate(parameter), spline.evaluateTangent(parameter)

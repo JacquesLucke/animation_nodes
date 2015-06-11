@@ -31,7 +31,7 @@ class mn_GetSplineSamples(Node, AnimationNode, SplineParameterEvaluateNodeBase):
         
     def draw_buttons_ext(self, context, layout):
         col = layout.column()
-        col.active = self.parameterType == "LENGTH"
+        col.active = self.parameterType == "UNIFORM"
         col.prop(self, "resolution")
         
     def getInputSocketNames(self):
@@ -50,9 +50,9 @@ class mn_GetSplineSamples(Node, AnimationNode, SplineParameterEvaluateNodeBase):
         tangents = []
         if spline.isEvaluable:
             if useOutput["Positions"]:
-                if self.parameterType == "LENGTH": positions = spline.getUniformSamples(amount, start = start, end = end, resolution = self.resolution)
+                if self.parameterType == "UNIFORM": positions = spline.getUniformSamples(amount, start = start, end = end, resolution = self.resolution)
                 else: positions = spline.getSamples(amount, start = start, end = end)
             if useOutput["Tangents"]:
-                if self.parameterType == "LENGTH": tangents = spline.getUniformTangentSamples(amount, start = start, end = end, resolution = self.resolution)
+                if self.parameterType == "UNIFORM": tangents = spline.getUniformTangentSamples(amount, start = start, end = end, resolution = self.resolution)
                 else: tangents = spline.getTangentSamples(amount, start = start, end = end)
         return positions, tangents
