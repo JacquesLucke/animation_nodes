@@ -33,9 +33,11 @@ class mn_TrimText(Node, AnimationNode):
         return {"Text" : "text"}
         
     def execute(self, text, start, end):
-        if self.autoEnd: end = len(text)
+        textLength = len(text)
+    
+        if self.autoEnd: end = textLength
         
-        start = min(max(0, start), len(text))
-        end = min(max(0, end), len(text))
+        start = min(max(-textLength, start), textLength)
+        end = min(max(-textLength, end), textLength)
         
         return text[start:end]
