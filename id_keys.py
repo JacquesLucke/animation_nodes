@@ -103,23 +103,23 @@ class TransformsIDType:
 
     @staticmethod
     def exists(object, name):
-        return hasProp(object, prefix + name + "location") and \
-               hasProp(object, prefix + name + "rotation") and \
-               hasProp(object, prefix + name + "scale")
+        return hasProp(object, prefix + name + " Location") and \
+               hasProp(object, prefix + name + " Rotation") and \
+               hasProp(object, prefix + name + " Scale")
 
     @staticmethod
     def read(object, name):
-        location = getProp(object, prefix + name + "location", (0, 0, 0))
-        rotation = getProp(object, prefix + name + "rotation", (0, 0, 0))
-        scale = getProp(object, prefix + name + "scale", (1, 1, 1))
+        location = getProp(object, prefix + name + " Location", (0, 0, 0))
+        rotation = getProp(object, prefix + name + " Rotation", (0, 0, 0))
+        scale = getProp(object, prefix + name + " Scale", (1, 1, 1))
         
         return Vector(location), Vector(rotation), Vector(scale)
         
     @staticmethod
     def write(object, name, data):
-        setProp(object, prefix + name + "location", data[0])
-        setProp(object, prefix + name + "rotation", data[1])
-        setProp(object, prefix + name + "scale", data[2])
+        setProp(object, prefix + name + " Location", data[0])
+        setProp(object, prefix + name + " Rotation", data[1])
+        setProp(object, prefix + name + " Scale", data[2])
         
     @staticmethod
     def draw(layout, object, name):
@@ -127,84 +127,50 @@ class TransformsIDType:
         
         col = row.column(align = True)
         col.label("Location")
-        col.prop(object, toPath(prefix + name + "location"), text = "")
+        col.prop(object, toPath(prefix + name + " Location"), text = "")
         
         col = row.column(align = True)
         col.label("Rotation")
-        col.prop(object, toPath(prefix + name + "rotation"), text = "")
+        col.prop(object, toPath(prefix + name + " Rotation"), text = "")
         
         col = row.column(align = True)
         col.label("Scale")
-        col.prop(object, toPath(prefix + name + "scale"), text = "")
+        col.prop(object, toPath(prefix + name + " Scale"), text = "")
         
         
-class FloatIDType:
+class SimpleIDType:
+    default = ""
+
     @classmethod
     def create(cls, object, name):
-        cls.write(object, name, 1.0)
+        cls.write(object, name, cls.default)
 
     @staticmethod
     def exists(object, name):
         return hasProp(object, prefix + name)
 
-    @staticmethod
-    def read(object, name):
-        float = getProp(object, prefix + name, 0.0)
-        return float
-        
-    @staticmethod
-    def write(object, name, data):
-        setProp(object, prefix + name, data)
-        
-    @staticmethod
-    def draw(layout, object, name):
-        layout.prop(object, toPath(prefix + name), text = "") 
-
-
-class StringIDType:
     @classmethod
-    def create(cls, object, name):
-        cls.write(object, name, "")
-
-    @staticmethod
-    def exists(object, name):
-        return hasProp(object, prefix + name)
-
-    @staticmethod
-    def read(object, name):
-        string = getProp(object, prefix + name, "")
-        return string
+    def read(cls, object, name):
+        value = getProp(object, prefix + name, cls.default)
+        return value
         
     @staticmethod
     def write(object, name, data):
         setProp(object, prefix + name, data)
         
-    @staticmethod
-    def draw(layout, object, name):
-        layout.prop(object, toPath(prefix + name), text = "")
-
-        
-class IntegerIDType:
     @classmethod
-    def create(cls, object, name):
-        cls.write(object, name, 0)
-
-    @staticmethod
-    def exists(object, name):
-        return hasProp(object, prefix + name)
-
-    @staticmethod
-    def read(object, name):
-        integer = getProp(object, prefix + name, 0)
-        return integer
+    def draw(cls, layout, object, name):
+        layout.prop(object, toPath(prefix + name), text = "")      
         
-    @staticmethod
-    def write(object, name, data):
-        setProp(object, prefix + name, data)
         
-    @staticmethod
-    def draw(layout, object, name):
-        layout.prop(object, toPath(prefix + name), text = "")          
+class FloatIDType(SimpleIDType):
+    default = 0.0
+
+class StringIDType(SimpleIDType):
+    default = ""
+
+class IntegerIDType(SimpleIDType):
+    default = 0     
         
         
 idTypes = { "Transforms" : TransformsIDType,
