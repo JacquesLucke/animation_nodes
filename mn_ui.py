@@ -116,7 +116,7 @@ class IDKeysManagerPanel(bpy.types.Panel):
     bl_label = "ID Keys Manager"
     bl_space_type = "VIEW_3D"
     bl_region_type = "TOOLS"
-    bl_category = "Animation Nodes"
+    bl_category = "AN"
         
     def draw(self, context):
         layout = self.layout
@@ -137,11 +137,11 @@ class IDKeysManagerPanel(bpy.types.Panel):
         row.operator("mn.new_id_key", icon = "SAVE_COPY", text = "")
         
 class IDKeyPanel(bpy.types.Panel):
-    bl_idname = "mn.keyframes"
-    bl_label = "Keyframes"
+    bl_idname = "mn.id_keys"
+    bl_label = "ID Keys for Active Object"
     bl_space_type = "VIEW_3D"
     bl_region_type = "TOOLS"
-    bl_category = "Animation Nodes"
+    bl_category = "AN"
         
     @classmethod
     def poll(cls, context):
@@ -166,7 +166,7 @@ class IDKeyPanel(bpy.types.Panel):
                 typeClass.draw(box, object, keyName)
             else:
                 row = box.row()
-                row.label("Does not exist", icon = "ERROR")
+                row.label("Does not exist")
                 props = row.operator("mn.create_key_on_object")
                 props.name = keyName
                 props.type = keyType

@@ -97,6 +97,38 @@ class CreateKeyOnObject(bpy.types.Operator):
         return {'FINISHED'}
         
         
+class SetCurrentTransforms(bpy.types.Operator):
+    bl_idname = "mn.set_current_transforms"
+    bl_label = "Set Current Transforms"
+    bl_description = "Set current transforms (World icon means to do this for all selected objects)"
+    
+    name = StringProperty()
+    allSelectedObjects = BoolProperty()
+    
+    def execute(self, context):
+        if self.allSelectedObjects: objects = context.selected_objects
+        else: objects = [context.active_object]
+        
+        for object in objects:
+            TransformsIDType.write(object, self.name, (object.location, object.rotation_euler, object.scale))
+        return {'FINISHED'}
+        
+        
+class SetCurrentTexts(bpy.types.Operator):
+    bl_idname = "mn.set_current_texts"
+    bl_label = "Set Current Texts"
+    bl_description = "Set current texts (World icon means to do this for all selected objects)"
+    
+    name = StringProperty()
+    allSelectedObjects = BoolProperty()
+    
+    def execute(self, context):
+        if self.allSelectedObjects: objects = context.selected_objects
+        else: objects = [context.active_object]
+        
+        for object in objects:
+            StringIDType.write(object, self.name, getattr(object.data, "body", ""))
+        return {'FINISHED'}        
     
     
 class TransformsIDType:
@@ -140,6 +172,14 @@ class TransformsIDType:
         col.label("Scale")
         col.prop(object, toPath(prefix + name + " Scale"), text = "")
         
+        row = layout.row(align = True)
+        props = row.operator("mn.set_current_transforms", text = "Use Current Transforms")
+        props.name = name
+        props.allSelectedObjects = False
+        props = row.operator("mn.set_current_transforms", icon = "WORLD", text = "")
+        props.name = name
+        props.allSelectedObjects = True
+        
         
 class SimpleIDType:
     default = ""
@@ -171,6 +211,18 @@ class FloatIDType(SimpleIDType):
 
 class StringIDType(SimpleIDType):
     default = ""
+    
+    @classmethod
+    def draw(cls, layout, object, name):
+        layout.prop(object, toPath(prefix + name), text = "")
+        
+        row = layout.row(align = True)
+        props = row.operator("mn.set_current_texts", text = "Use Current Texts")
+        props.name = name
+        props.allSelectedObjects = False
+        props = row.operator("mn.set_current_texts", icon = "WORLD", text = "")
+        props.name = name
+        props.allSelectedObjects = True
 
 class IntegerIDType(SimpleIDType):
     default = 0     
