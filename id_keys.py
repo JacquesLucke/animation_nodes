@@ -158,11 +158,36 @@ class FloatIDType:
         
     @staticmethod
     def draw(layout, object, name):
-        layout.prop(object, toPath(prefix + name), text = "")       
+        layout.prop(object, toPath(prefix + name), text = "") 
+
+
+class StringIDType:
+    @classmethod
+    def create(cls, object, name):
+        cls.write(object, name, "")
+
+    @staticmethod
+    def exists(object, name):
+        return hasProp(object, prefix + name)
+
+    @staticmethod
+    def read(object, name):
+        string = getProp(object, prefix + name, "")
+        return string
+        
+    @staticmethod
+    def write(object, name, data):
+        setProp(object, prefix + name, data)
+        
+    @staticmethod
+    def draw(layout, object, name):
+        layout.prop(object, toPath(prefix + name), text = "")        
         
         
 idTypes = { "Transforms" : TransformsIDType,
-            "Float" : FloatIDType}   
+            "Float" : FloatIDType,
+            "String" : StringIDType }   
 idTypeItems = [
     ("Transforms", "Transforms", "Contains 3 vectors for location, rotation and scale"),
-    ("Float", "Float", "A single real number")]     
+    ("Float", "Float", "A single real number"),
+    ("String", "String", "A text field")]     
