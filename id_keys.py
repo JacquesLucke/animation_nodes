@@ -1,5 +1,6 @@
 import bpy
 from mathutils import Vector
+from bpy.props import *
 from . mn_utils import nameToPath as toPath
 
 prefix = "AN "
@@ -67,7 +68,7 @@ class RemoveIDKey(bpy.types.Operator):
     bl_label = "Remove ID Key"
     bl_description = "Remove this key"
     
-    name = bpy.props.StringProperty()
+    name = StringProperty()
     
     def invoke(self, context, event):
         return context.window_manager.invoke_confirm(self, event)
@@ -85,15 +86,17 @@ class CreateKeyOnObject(bpy.types.Operator):
     bl_label = "Create Key on Object"
     bl_description = ""
     
-    name = bpy.props.StringProperty()
-    type = bpy.props.StringProperty()
-    objectName =  bpy.props.StringProperty()
+    name = StringProperty()
+    type = StringProperty()
+    objectName = StringProperty()
     
     def execute(self, context):
         typeClass = getIDTypeClass(self.type)
         typeClass.create(bpy.data.objects.get(self.objectName), self.name)
         context.area.tag_redraw()
-        return {'FINISHED'}        
+        return {'FINISHED'}
+        
+        
     
     
 class TransformsIDType:
