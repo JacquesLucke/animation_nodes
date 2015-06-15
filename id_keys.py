@@ -36,6 +36,11 @@ def setProp(object, name, data):
 def hasProp(object, name):
     return hasattr(object, toPath(name))
     
+def getIDKeyData(object, name, type = None):
+    if not type: type = getIDType(name)
+    typeClass = getIDTypeClass(type)
+    return typeClass.read(object, name)
+    
 class NewIdKey(bpy.types.Operator):
     bl_idname = "mn.new_id_key"
     bl_label = "New ID Key"
@@ -43,7 +48,8 @@ class NewIdKey(bpy.types.Operator):
     
     @classmethod
     def poll(cls, context):
-        return not cls.nameExists(cls.getNewKeyData()[0])
+        name = cls.getNewKeyData()[0]
+        return not cls.nameExists(name) and name != "" and "|" not in name
     
     def execute(self, context):
         name, type = self.getNewKeyData()
