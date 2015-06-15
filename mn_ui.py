@@ -165,8 +165,9 @@ class IDKeyPanel(bpy.types.Panel):
             if typeClass.exists(object, keyName):
                 typeClass.draw(box, object, keyName)
             else:
-                box.label("Does not exist", icon = "ERROR")
-                props = box.operator("mn.create_key_on_object")
+                row = box.row()
+                row.label("Does not exist", icon = "ERROR")
+                props = row.operator("mn.create_key_on_object")
                 props.name = keyName
                 props.type = keyType
                 props.objectName = object.name
