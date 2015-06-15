@@ -1,6 +1,6 @@
 import bpy
 from . mn_execution import getCodeStrings, resetCompileBlocker, updateAnimationTrees, generateExecutionUnits
-from . mn_keyframes import *
+from . id_keys import getIDKeys, getIDType, getIDTypeClass
 from . mn_utils import *
 from . manage_broken_files import getBrokenNodes, findAndUpdateBrokenNodes, containsBrokenNodes
 
@@ -111,81 +111,65 @@ class NodePropertiesPanel(bpy.types.Panel):
     def node(self):
         return bpy.context.active_node
         
-class KeyframeManagerPanel(bpy.types.Panel):
-    bl_idname = "mn.keyframes_manager"
-    bl_label = "Keyframes Manager"
+class IDKeysManagerPanel(bpy.types.Panel):
+    bl_idname = "mn.id_keys_manager"
+    bl_label = "ID Keys Manager"
     bl_space_type = "VIEW_3D"
     bl_region_type = "TOOLS"
     bl_category = "Animation Nodes"
         
     def draw(self, context):
         layout = self.layout
-        scene = context.scene
+        idKeySettings = context.scene.mn_settings.idKeys
         
-        keyframes = getKeyframes()
         box = layout.box()
-        col = box.column(align = True)
-        for i, keyframe in enumerate(keyframes):
-            row = col.row(align = True)
-            row.label(keyframe[0])
-            row.label(keyframe[1])
-            if i > 0:
-                remove = row.operator("mn.remove_keyframe", text = "Remove", icon = "X")
-                remove.keyframeName = keyframe[0]
-                
-        row = layout.row(align = True)
-        row.prop(scene.mn_settings.keyframes, "selectedType", text = "")
-        row.prop(scene.mn_settings.keyframes, "newName", text = "")
-        new = row.operator("mn.new_keyframe", text = "Create", icon = "PLUS")
-        new.keyframeName = scene.mn_settings.keyframes.newName
-        new.keyframeType = scene.mn_settings.keyframes.selectedType
         
-class KeyframePanel(bpy.types.Panel):
+        for keyName, keyType in getIDKeys():
+            row = box.row()
+            row.label(keyName)
+            row.label(keyType)
+            props = row.operator("mn.remove_id_key", icon = "X", text = "")
+            props.name = keyName
+            
+        row = layout.row(align = True)
+        row.prop(idKeySettings, "new_key_name", text = "")
+        row.prop(idKeySettings, "new_key_type", text = "")
+        row.operator("mn.new_id_key", icon = "SAVE_COPY", text = "")
+        
+class IDKeyPanel(bpy.types.Panel):
     bl_idname = "mn.keyframes"
     bl_label = "Keyframes"
     bl_space_type = "VIEW_3D"
     bl_region_type = "TOOLS"
     bl_category = "Animation Nodes"
         
+    @classmethod
+    def poll(cls, context):
+        return context.active_object
+        
     def draw(self, context):
         layout = self.layout
-        scene = context.scene
-        objects = getSortedSelectedObjects()
+        object = context.active_object
         
-        layout.prop(scene.mn_settings.keyframes, "selectedName", text = "Keyframe")
-        
-        name = scene.mn_settings.keyframes.selectedName
-        type = getKeyframeType(name)
-        
-        row = layout.row()
-        
-        if type == "Float":
-            layout.prop(context.scene.mn_settings.keyframes, "selectedPath", text = "Path")
-            setKeyframe = layout.operator("mn.set_float_keyframe", text = "Set Value From Path")
-            setKeyframe.keyframeName = name
-            setKeyframe.dataPath = context.scene.mn_settings.keyframes.selectedPath
-        elif type == "Transforms":
-            setTransformsKeyframe = layout.operator("mn.set_transforms_keyframe", text = "Set From Current", icon = "PASTEDOWN")
-            setTransformsKeyframe.keyframeName = name
-            layout.operator("mn.reset_object_transformations", text = "Set Initial Transforms on Object", icon = "PASTEFLIPUP")
-        elif type == "Vector":
-            layout.label("Set Vector From:")
-            row = layout.row(align = True)
-            for path in [("Location", "location"), ("Rotation", "rotation_euler"), ("Scale", "scale")]:
-                setKeyframe = row.operator("mn.set_vector_keyframe_from_path", text = path[0])
-                setKeyframe.keyframeName = name
-                setKeyframe.vectorPath = path[1]
-        
-        for object in objects:
+        for keyName, keyType in getIDKeys():
             box = layout.box()
             row = box.row()
-            row.prop(object, "name", text = "")
+            subRow = row.row()
+            subRow.alignment = "LEFT"
+            subRow.label(keyName)
+            subRow = row.row()
+            subRow.alignment = "RIGHT"
+            subRow.label(keyType)
             
-            remove = row.operator("mn.remove_keyframe_from_object", text = "Remove Keyframe")
-            remove.objectName = object.name
-            remove.keyframeName = name
-            
-            drawKeyframeInput(box, object, name)
+            typeClass = getIDTypeClass(keyType)
+            if typeClass.exists(object, keyName):
+                typeClass.draw(box, object, keyName)
+            else:
+                box.label("Does not exist", icon = "ERROR")
+                props = box.operator("mn.create_key_on_object")
+                props.name = keyName
+                props.type = keyType
+                props.objectName = object.name
         
         
 class ForceNodeTreeUpdate(bpy.types.Operator):

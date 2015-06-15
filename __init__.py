@@ -46,7 +46,7 @@ modules = developer_utils.setup_addon_modules(__path__, __name__, "bpy" in local
 import bpy      
 from bpy.props import *  
 from . mn_execution import nodeTreeChanged
-from . import mn_keyframes 
+from . id_keys import idTypeItems 
 
 class GlobalUpdateSettings(bpy.types.PropertyGroup):
     frameChange = BoolProperty(default = True, name = "Frame Change", description = "Recalculate the nodes when the frame has been changed")
@@ -61,22 +61,20 @@ class DeveloperSettings(bpy.types.PropertyGroup):
     printUpdateTime = BoolProperty(default = False, name = "Print Global Update Time")
     printGenerationTime = BoolProperty(default = False, name = "Print Script Generation Time")
     executionProfiling = BoolProperty(default = False, name = "Node Execution Profiling", update = nodeTreeChanged)
-
-class Keyframes(bpy.types.PropertyGroup):
-    name = StringProperty(default = "", name = "Keyframe Name")
-    type = EnumProperty(items = mn_keyframes.getKeyframeTypeItems(), name = "Keyframe Type")
+  
+class IDKeyType(bpy.types.PropertyGroup):
+    name = StringProperty()
+    type = StringProperty()
     
-class KeyframesSettings(bpy.types.PropertyGroup):
-    keys = CollectionProperty(type = Keyframes, name = "Keyframes")
-    selectedPath = StringProperty(default = "", name = "Selected Path")
-    selectedName = EnumProperty(items = mn_keyframes.getKeyframeNameItems, name = "Keyframe Name")
-    newName = StringProperty(default = "", name = "Name")
-    selectedType = EnumProperty(items = mn_keyframes.getKeyframeTypeItems(), name = "Keyframe Type")
+class IDKeySettings(bpy.types.PropertyGroup):
+    keys = CollectionProperty(type = IDKeyType)
+    new_key_name = StringProperty()
+    new_key_type = EnumProperty(items = idTypeItems, name = "Type")
     
 class AnimationNodesSettings(bpy.types.PropertyGroup):
     update = PointerProperty(type = GlobalUpdateSettings, name = "Update Settings")
     developer = PointerProperty(type = DeveloperSettings, name = "Developer Settings")
-    keyframes = PointerProperty(type = KeyframesSettings, name = "Keyframes")
+    idKeys = PointerProperty(type = IDKeySettings, name = "ID Keys")
     
     
     
