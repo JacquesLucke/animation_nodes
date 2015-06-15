@@ -118,7 +118,7 @@ class TextMenu(bpy.types.Menu):
         insertNode(layout, "mn_CombineStringsNode", "Combine")     
         layout.separator()
         insertNode(layout, "mn_ReplicateStringsNode", "Replicate")                   
-        insertNode(layout, "mn_SubstringNode", "Trim")                   
+        insertNode(layout, "mn_TrimText", "Trim")                   
         insertNode(layout, "mn_StringLengthNode", "Length")
         layout.separator()
         insertNode(layout, "mn_TextBlockReader", "Block Reader")                     
