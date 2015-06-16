@@ -227,7 +227,8 @@ class IDKeysManagerPanel(bpy.types.Panel):
         idKeys = getIDKeys()
         if len(idKeys) == 0:
             box.label("There is no ID Key")
-            
+            return
+        
         col = box.column(align = True)
         for item in idKeys:
             row = col.row()
