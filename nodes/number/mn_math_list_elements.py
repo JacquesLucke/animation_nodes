@@ -3,6 +3,7 @@ from bpy.types import Node
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from ... mn_utils import *
+import math
 
 class mn_MathListElementsNode(Node, AnimationNode):
     bl_idname = "mn_MathListElementsNode" 
@@ -20,6 +21,7 @@ class mn_MathListElementsNode(Node, AnimationNode):
     
     listOperations = [
         ("SUM", "Sum", ""),
+        ("MULTIPLY", "Multiply", ""),
         ("AVERAGE", "Average", ""),
         ("MINIMUM", "Minimum", ""),
         ("MAXIMUM", "Maximum", "")]#more?
@@ -31,7 +33,7 @@ class mn_MathListElementsNode(Node, AnimationNode):
         self.inputs.new("mn_FloatListSocket", "List")
         self.inputs.new("mn_IntegerSocket", "Start").number = 0
         self.inputs.new("mn_IntegerSocket", "End").number = 5
-        self.outputs.new("mn_FloatSocket", "Number").number = 0
+        self.outputs.new("mn_FloatSocket", "Number")
         allowCompiling()
         
     def draw_buttons(self, context, layout):
@@ -61,14 +63,18 @@ class mn_MathListElementsNode(Node, AnimationNode):
         start = min(max(minIndex, start), listLength)
         end = min(max(minIndex, end), listLength)
         
-        trimList = list[start:end]
+        trimList = list[start:end]    #I trim before math
         
         op = self.listOperationsProperty
         
-        #number = 0.0
-        if op == "SUM": number = sum(trimList)
-        elif op == "AVERAGE": number = sum(trimList)/len(trimList)
-        elif op == "MINIMUM": number = min(trimList)
-        elif op == "MAXIMUM": number = max(trimList)
+        number = 0.0
+        if op == "SUM": number = math.fsum(trimList)
+        elif op == "MULTIPLY": 
+            number = 1
+            for nr in trimList:
+                number *= nr    #nr for nr in trimList
+        elif op == "AVERAGE": number = math.fsum(trimList)/len(trimList) if len(trimList)>0 else 0
+        elif op == "MINIMUM": number = min(trimList) if len(trimList)>0 else 0
+        elif op == "MAXIMUM": number = max(trimList) if len(trimList)>0 else 0
         
         return number
