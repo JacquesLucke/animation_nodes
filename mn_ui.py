@@ -1,6 +1,5 @@
 import bpy
 from . mn_execution import getCodeStrings, resetCompileBlocker, updateAnimationTrees, generateExecutionUnits
-from . id_keys import getIDKeys, getIDType, getIDTypeClass
 from . mn_utils import *
 from . manage_broken_files import getBrokenNodes, findAndUpdateBrokenNodes, containsBrokenNodes
 
@@ -111,72 +110,7 @@ class NodePropertiesPanel(bpy.types.Panel):
     def node(self):
         return bpy.context.active_node
         
-class IDKeysManagerPanel(bpy.types.Panel):
-    bl_idname = "mn.id_keys_manager"
-    bl_label = "ID Keys Manager"
-    bl_space_type = "VIEW_3D"
-    bl_region_type = "TOOLS"
-    bl_category = "AN"
-        
-    def draw(self, context):
-        layout = self.layout
-        idKeySettings = context.scene.mn_settings.idKeys
-        
-        box = layout.box()
-        
-        for keyName, keyType in getIDKeys():
-            row = box.row()
-            row.label(keyName)
-            row.label(keyType)
-            props = row.operator("mn.remove_id_key", icon = "X", text = "")
-            props.name = keyName
-            
-        row = layout.row(align = True)
-        row.prop(idKeySettings, "new_key_name", text = "")
-        row.prop(idKeySettings, "new_key_type", text = "")
-        row.operator("mn.new_id_key", icon = "SAVE_COPY", text = "")
-        
-class IDKeyPanel(bpy.types.Panel):
-    bl_idname = "mn.id_keys"
-    bl_label = "ID Keys for Active Object"
-    bl_space_type = "VIEW_3D"
-    bl_region_type = "TOOLS"
-    bl_category = "AN"
-        
-    @classmethod
-    def poll(cls, context):
-        return context.active_object
-        
-    def draw(self, context):
-        layout = self.layout
-        object = context.active_object
-        
-        for keyName, keyType in getIDKeys():
-            box = layout.box()
-            row = box.row()
-            subRow = row.row()
-            subRow.alignment = "LEFT"
-            subRow.label(keyName)
-            subRow = row.row()
-            subRow.alignment = "RIGHT"
-            subRow.label(keyType)
-            props = row.operator("mn.remove_key_from_object", icon = "X", emboss = False, text = "")
-            props.name = keyName
-            props.type = keyType
-            props.objectName = object.name
-            
-            typeClass = getIDTypeClass(keyType)
-            if typeClass.exists(object, keyName):
-                typeClass.draw(box, object, keyName)
-            else:
-                row = box.row()
-                row.label("Does not exist")
-                props = row.operator("mn.create_key_on_object")
-                props.name = keyName
-                props.type = keyType
-                props.objectName = object.name
-            typeClass.drawOperators(box, object, keyName)
-        
+
         
 class ForceNodeTreeUpdate(bpy.types.Operator):
     bl_idname = "mn.force_full_update"
