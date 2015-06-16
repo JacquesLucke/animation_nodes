@@ -261,14 +261,8 @@ class IDKeyPanel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         object = context.active_object
-        selection = context.selected_objects
-        if len(selection) == 1:
-            self.drawKeysForObject(layout, selection[0])
-        elif len(selection) > 1:
-            for object in selection:
-                layout.label(object.name)
-                self.drawKeysForObject(layout, object)
-                layout.separator()
+        
+        self.drawKeysForObject(layout, object)
 
     def drawKeysForObject(self, layout, object):
         for item in getIDKeys():
@@ -304,6 +298,7 @@ class IDKeyPanel(bpy.types.Panel):
         props.objectName = object.name
         
         
+    
     
 # Operators
 ##############################
