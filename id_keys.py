@@ -259,34 +259,37 @@ class IDKeyPanel(bpy.types.Panel):
         
         for item in getIDKeys():
             keyName, keyType = item.name, item.type
-        
-            box = layout.box()
-            self.drawHeader(box, object, keyName, keyType)
             
             typeClass = getIDTypeClass(keyType)
-            if typeClass.exists(object, keyName):
+            keyExists = typeClass.exists(object, keyName)
+        
+            box = layout.box()
+            self.drawHeader(box, object, keyName, keyType, keyExists)
+            
+            if keyExists:
                 typeClass.draw(box, object, keyName)
-            else:
-                row = box.row()
-                row.label("Does not exist")
-                props = row.operator("mn.create_key_on_object")
-                props.name = keyName
-                props.type = keyType
-                props.objectName = object.name
             typeClass.drawOperators(box, object, keyName)    
     
-    def drawHeader(self, box, object, keyName, keyType):
+    def drawHeader(self, box, object, keyName, keyType, keyExists):
         row = box.row()
+        
         subRow = row.row()
         subRow.alignment = "LEFT"
         subRow.label(keyName)
+        
         subRow = row.row()
         subRow.alignment = "RIGHT"
         subRow.label(keyType)
-        props = row.operator("mn.remove_key_from_object", icon = "X", emboss = False, text = "")
+        
+        if keyExists:
+            props = row.operator("mn.remove_key_from_object", icon = "X", emboss = False, text = "")
+        else:
+            props = row.operator("mn.create_key_on_object", icon = "NEW", emboss = False,  text = "")
         props.name = keyName
         props.type = keyType
         props.objectName = object.name
+        
+        
     
     
 # Operators
