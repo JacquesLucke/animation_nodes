@@ -71,6 +71,7 @@ class IDKeySettings(bpy.types.PropertyGroup):
     keys = CollectionProperty(type = IDKeyType)
     newKeyName = StringProperty(default = "Initial Transforms")
     newKeyType = EnumProperty(items = idTypeItems, name = "Type", default = "Transforms")
+    showAdvanced = BoolProperty(name = "Show Advanced", default = True, description = "Show more options for each ID Key")
     
 class AnimationNodesSettings(bpy.types.PropertyGroup):
     update = PointerProperty(type = GlobalUpdateSettings, name = "Update Settings")

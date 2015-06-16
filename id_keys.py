@@ -111,7 +111,7 @@ class TransformsIDType:
         setProp(object, prefix + name + " Scale", data[2])
         
     @staticmethod
-    def draw(layout, object, name):
+    def draw(layout, object, name, advanced = False):
         row = layout.row()
         
         col = row.column(align = True)
@@ -162,8 +162,9 @@ class SimpleIDType:
         setProp(object, prefix + name, data)
         
     @classmethod
-    def draw(cls, layout, object, name):
-        layout.prop(object, toPath(prefix + name), text = "") 
+    def draw(cls, layout, object, name, advanced = False):
+        text = "" if advanced else name
+        layout.prop(object, toPath(prefix + name), text = text) 
 
     @staticmethod
     def drawOperators(layout, object, name):
@@ -173,12 +174,11 @@ class SimpleIDType:
 class FloatIDType(SimpleIDType):
     default = 0.0
 
+class IntegerIDType(SimpleIDType):
+    default = 0   
+
 class StringIDType(SimpleIDType):
     default = ""
-    
-    @classmethod
-    def draw(cls, layout, object, name):
-        layout.prop(object, toPath(prefix + name), text = "")
         
     @staticmethod
     def drawOperators(layout, object, name):
@@ -188,10 +188,7 @@ class StringIDType(SimpleIDType):
         props.allSelectedObjects = False
         props = row.operator("mn.set_current_texts", icon = "WORLD", text = "")
         props.name = name
-        props.allSelectedObjects = True
-
-class IntegerIDType(SimpleIDType):
-    default = 0     
+        props.allSelectedObjects = True    
         
         
 idTypes = { "Transforms" : TransformsIDType,
@@ -261,10 +258,15 @@ class IDKeyPanel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         object = context.active_object
+        settings = getIDKeySettings()
         
-        self.drawKeysForObject(layout, object)
+        layout.prop(settings, "showAdvanced")
+        layout.separator()
+        
+        if settings.showAdvanced: self.drawKeysForObjectAdvanced(layout, object)
+        else: self.drawKeysForObjectSimple(layout, object)
 
-    def drawKeysForObject(self, layout, object):
+    def drawKeysForObjectAdvanced(self, layout, object):
         for item in getIDKeys():
             if item.hide: continue
             box = layout.box()
@@ -274,9 +276,23 @@ class IDKeyPanel(bpy.types.Panel):
             keyExists = typeClass.exists(object, keyName)
         
             self.drawHeader(box, object, keyName, keyType, keyExists)            
-            if keyExists:
-                typeClass.draw(box, object, keyName)
+            if keyExists: 
+                typeClass.draw(box, object, keyName, advanced = True)
             typeClass.drawOperators(box, object, keyName)
+            
+    def drawKeysForObjectSimple(self, layout, object):
+        for item in getIDKeys():
+            if item.hide: continue
+            keyName, keyType = item.name, item.type
+            typeClass = getIDTypeClass(keyType)
+            keyExists = typeClass.exists(object, keyName)
+            if keyExists:
+                typeClass.draw(layout, object, keyName, advanced = False)
+            else: 
+                props = layout.operator("mn.create_key_on_object", icon = "NEW",  text = keyName)
+                props.name = keyName
+                props.type = keyType
+                props.objectName = object.name
     
     def drawHeader(self, box, object, keyName, keyType, keyExists):
         row = box.row()
