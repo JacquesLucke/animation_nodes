@@ -223,17 +223,7 @@ class IDKeyPanel(bpy.types.Panel):
         
         for keyName, keyType in getIDKeys():
             box = layout.box()
-            row = box.row()
-            subRow = row.row()
-            subRow.alignment = "LEFT"
-            subRow.label(keyName)
-            subRow = row.row()
-            subRow.alignment = "RIGHT"
-            subRow.label(keyType)
-            props = row.operator("mn.remove_key_from_object", icon = "X", emboss = False, text = "")
-            props.name = keyName
-            props.type = keyType
-            props.objectName = object.name
+            self.drawHeader(box, object, keyName, keyType)
             
             typeClass = getIDTypeClass(keyType)
             if typeClass.exists(object, keyName):
@@ -247,6 +237,18 @@ class IDKeyPanel(bpy.types.Panel):
                 props.objectName = object.name
             typeClass.drawOperators(box, object, keyName)    
     
+    def drawHeader(self, box, object, keyName, keyType):
+        row = box.row()
+        subRow = row.row()
+        subRow.alignment = "LEFT"
+        subRow.label(keyName)
+        subRow = row.row()
+        subRow.alignment = "RIGHT"
+        subRow.label(keyType)
+        props = row.operator("mn.remove_key_from_object", icon = "X", emboss = False, text = "")
+        props.name = keyName
+        props.type = keyType
+        props.objectName = object.name
     
     
 # Operators
