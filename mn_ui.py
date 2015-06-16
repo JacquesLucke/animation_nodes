@@ -2,6 +2,31 @@ import bpy
 from . mn_execution import getCodeStrings, resetCompileBlocker, updateAnimationTrees, generateExecutionUnits
 from . mn_keyframes import *
 from . mn_utils import *
+from . manage_broken_files import getBrokenNodes, findAndUpdateBrokenNodes, containsBrokenNodes
+
+class BrokenNodesPanel(bpy.types.Panel):
+    bl_idname = "mn.broken_nodes_panel"
+    bl_label = "Broken Nodes"
+    bl_space_type = "NODE_EDITOR"
+    bl_region_type = "TOOLS"
+    bl_category = "Settings"
+    
+    @classmethod
+    def poll(self, context):
+        return containsBrokenNodes() and context.space_data.tree_type == "mn_AnimationNodeTree"
+        
+    def draw(self, context):
+        layout = self.layout
+        
+        col = layout.column()
+        for nodeTreeName, nodeName in getBrokenNodes():
+            props = col.operator("mn.select_and_view_node", icon = "ERROR", text = "'{}' in '{}'".format(nodeName, nodeTreeName))
+            props.nodeTreeName = nodeTreeName
+            props.nodeName = nodeName
+        
+        layout.operator("mn.find_broken_nodes", text = "Find Missing Nodes", icon = "ZOOM_SELECTED")
+        
+    
 
 class AnimationNodesPerformance(bpy.types.Panel):
     bl_idname = "mn.performance_panel"
@@ -54,31 +79,37 @@ class AnimationNodesDeveloperPanel(bpy.types.Panel):
         col.prop(scene.mn_settings.developer, "printGenerationTime", text = "Print Generation Time")
         col.prop(scene.mn_settings.developer, "executionProfiling", text = "Node Execution Profiling")
         
-class SocketVisibilityPanel(bpy.types.Panel):
-    bl_idname = "mn.socket_visibility_panel"
-    bl_label = "Socket Visibility"
+class NodePropertiesPanel(bpy.types.Panel):
+    bl_idname = "mn.node_properties_panel"
+    bl_label = "Node and Socket Settings"
     bl_space_type = "NODE_EDITOR"   
     bl_region_type = "UI"
     
     @classmethod
-    def poll(self, context):
+    def poll(cls, context):
         return context.active_node
         
     def draw(self, context):
         layout = self.layout
-        node = context.active_node
+        layout.prop(self.node, "bl_width_max", text = "Max Width")
+        self.drawSocketVisibility(layout)
         
+    def drawSocketVisibility(self, layout):
         row = layout.row(align = False)
         
         col = row.column(align = True)
         col.label("Inputs:")
-        for socket in node.inputs:
+        for socket in self.node.inputs:
             col.prop(socket, "show", text = socket.name)
             
         col = row.column(align = True)
         col.label("Outputs:")
-        for socket in node.outputs:
+        for socket in self.node.outputs:
             col.prop(socket, "show", text = socket.name)
+            
+    @property
+    def node(self):
+        return bpy.context.active_node
         
 class KeyframeManagerPanel(bpy.types.Panel):
     bl_idname = "mn.keyframes_manager"

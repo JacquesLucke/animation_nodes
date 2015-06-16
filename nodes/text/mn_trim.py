@@ -12,6 +12,7 @@ class mn_TrimText(Node, AnimationNode):
         nodePropertyChanged(self, context)
     
     autoEnd = bpy.props.BoolProperty(default = False, description = "Use the length of the text as trim-end", update = settingChanged)
+    allowNegativeIndex = bpy.props.BoolProperty(default = False, description = "Negative indices start from the end")
     
     def init(self, context):
         forbidCompiling()
@@ -23,6 +24,7 @@ class mn_TrimText(Node, AnimationNode):
         
     def draw_buttons(self, context, layout):
         layout.prop(self, "autoEnd", text = "Auto End")
+        layout.prop(self, "allowNegativeIndex", text = "Negative Indices")
         
     def getInputSocketNames(self):
         return {"Text" : "text",
@@ -33,9 +35,12 @@ class mn_TrimText(Node, AnimationNode):
         return {"Text" : "text"}
         
     def execute(self, text, start, end):
-        if self.autoEnd: end = len(text)
+        textLength = len(text)
+    
+        if self.autoEnd: end = textLength
         
-        start = min(max(0, start), len(text))
-        end = min(max(0, end), len(text))
+        minIndex = -textLength if self.allowNegativeIndex else 0
+        start = min(max(minIndex, start), textLength)
+        end = min(max(minIndex, end), textLength)
         
         return text[start:end]

@@ -11,37 +11,42 @@ from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompilin
 from ... algorithms import interpolation
 from ... utils.mn_name_utils import toDataPath
 from ... utils.task_manager import TaskManager, Task
-from ... utils.sequence_editor import getSoundFilePathsInSequencer, getSoundSequences
+from ... utils.sequence_editor import getSoundsInSequencer, getSoundSequences
+from ... utils.path import toAbsolutePath
 from ... utils.fcurve import (getSingleFCurveWithDataPath, 
                               removeFCurveWithDataPath,
                               deselectAllFCurves,
                               newFCurveForCustomProperty,
                               removeCustomProperty)
 
-dataHolderName = "Sound Data Holder"
-
-class BakeFrequencyRange:
-    def __init__(self, low = 0, high = 20000):
-        self.low = low
-        self.high = high
-
-bakeFrequencyRanges = [
-    BakeFrequencyRange(0, 20),
-    BakeFrequencyRange(20, 40),
-    BakeFrequencyRange(40, 80),
-    BakeFrequencyRange(80, 250),
-    BakeFrequencyRange(250, 600),
-    BakeFrequencyRange(600, 2000),
-    BakeFrequencyRange(2000, 4000),
-    BakeFrequencyRange(4000, 6000),
-    BakeFrequencyRange(6000, 8000),
-    BakeFrequencyRange(8000, 20000) ]
-strengthListLength = len(bakeFrequencyRanges)
-    
-    
+                              
+class Sample(bpy.types.PropertyGroup):
+    strength = FloatProperty(precision = 6)
+bpy.utils.register_class(Sample)
 class BakeData(bpy.types.PropertyGroup):
-    attack = FloatProperty(default = 0.005, description = "Lower values -> faster rising curve", min = 0, max = 2)
-    release = FloatProperty(default = 0.2, description = "Lower values -> faster falling curve", min = 0, max = 5)
+    low = FloatProperty()
+    high = FloatProperty()
+    attack = FloatProperty
+    release = FloatProperty()
+    samples = CollectionProperty(type = Sample)
+    
+bpy.utils.register_class(BakeData)
+    
+bpy.types.Sound.bakeData = CollectionProperty(type = BakeData)    
+
+bakeFrequencies = [
+    (0, 20),
+    (20, 40),
+    (40, 80),
+    (80, 250),
+    (250, 600),
+    (600, 2000),
+    (2000, 4000),
+    (4000, 6000),
+    (6000, 8000),
+    (8000, 20000) ]
+strengthListLength = len(bakeFrequencies)
+    
 
 class mn_SequencerSoundInput(Node, AnimationNode):
     bl_idname = "mn_SequencerSoundInput"
@@ -50,7 +55,9 @@ class mn_SequencerSoundInput(Node, AnimationNode):
     isBaking = BoolProperty(default = False)
     bakeInfo = StringProperty(default = "")
     bakeProgress = IntProperty(min = 0, max = 100)
-    bakeData = PointerProperty(type = BakeData)
+    
+    attack = FloatProperty(default = 0.005, description = "Lower values -> faster rising curve", min = 0, max = 2)
+    release = FloatProperty(default = 0.2, description = "Lower values -> faster falling curve", min = 0, max = 5)
     
     channels = FloatVectorProperty(size = 32, update = nodePropertyChanged, default = [True] + [False] * 31, min = 0, description = "Influence of the different sequence editor channels on the output")
     displayChannelAmount = IntProperty(default = 3, min = 0, max = 32, description = "Amount of channels displayed inside of the node")
@@ -85,8 +92,8 @@ class mn_SequencerSoundInput(Node, AnimationNode):
         props = row.operator("mn.bake_sounds", icon = icon)
         props.nodeTreeName = self.id_data.name
         props.nodeName = self.name
-        props.bakeData.attack = self.bakeData.attack
-        props.bakeData.release = self.bakeData.release
+        props.attack = self.attack
+        props.release = self.release
         row.operator("mn.clear_baked_data", text = "", icon = "X")
         
         if self.isBaking:
@@ -101,8 +108,8 @@ class mn_SequencerSoundInput(Node, AnimationNode):
             
     def draw_buttons_ext(self, context, layout):
         col = layout.column(align = True)
-        col.prop(self.bakeData, "attack", text = "Attack Time")
-        col.prop(self.bakeData, "release", text = "Release Time")
+        col.prop(self, "attack", text = "Attack Time")
+        col.prop(self, "release", text = "Release Time")
         
         layout.prop(self, "displayChannelAmount", text = "Amount of Channels")
         
@@ -189,17 +196,21 @@ class ChannelData:
         
     def insert(self, sequence):
         self.insertMissingFrames(sequence.frame_final_end)
-        dataHolder = getDataHolder()
+        sound = sequence.sound
+        startFrame = sequence.frame_start
+        finalEndFrame = sequence.frame_final_end
         
-        for i, frequencyRange in enumerate(bakeFrequencyRanges):
-            bakeID = toBakeID(sequence.sound.filepath, frequencyRange)
-            path = toDataPath(bakeID)
-            fcurve = getSingleFCurveWithDataPath(dataHolder, path, storeInCache = False)
-            if not fcurve: continue
-            if not getattr(fcurve, "is_valid", False): continue
-            for frame in range(sequence.frame_final_start, sequence.frame_final_end + 1):
-                soundFrame = frame - sequence.frame_start
-                self.frames[frame][i] += fcurve.evaluate(soundFrame)
+        for i, (low, high )in enumerate(bakeFrequencies):
+            item = getSoundBakeItemFromFrequency(sound, low, high)
+            if item is None: continue
+            
+            samples = [sample.strength for sample in item.samples]
+            frameRangeStart = sequence.frame_final_start
+            frameRangeEnd = min(finalEndFrame + 1, startFrame + len(samples))
+            
+            for frame in range(frameRangeStart, frameRangeEnd):
+                soundFrame = frame - startFrame
+                self.frames[frame][i] += samples[soundFrame]
         
     def insertMissingFrames(self, endFrame):
         if endFrame >= len(self.frames):
@@ -226,11 +237,10 @@ class ClearBakedData(bpy.types.Operator):
     bl_options = {"REGISTER"}
     
     def execute(self, context):
-        dataHolder = getDataHolder()
-        for key, value in dataHolder.items():
-            if key.startswith("SOUND"):
-                removeCustomProperty(dataHolder, key)
-        sequencerData.reset()
+        sounds = getSoundsInSequencer()
+        for sound in sounds:
+            sound.bakeData.clear()
+        sequencerData.update()
         return {"FINISHED"}
         
         
@@ -243,7 +253,8 @@ class BakeSounds(bpy.types.Operator):
     nodeTreeName = StringProperty()
     nodeName = StringProperty()
     
-    bakeData = PointerProperty(type = BakeData)
+    attack = FloatProperty()
+    release = FloatProperty()
     
     def invoke(self, context, event):
         context.window_manager.modal_handler_add(self)
@@ -253,20 +264,22 @@ class BakeSounds(bpy.types.Operator):
         
     def createTasks(self, rebake):
         self.taskManager = TaskManager()
-        filepaths = getSoundFilePathsInSequencer()
-        for path in filepaths:
-            for bakeFrequencyRange in bakeFrequencyRanges:
+        sounds = getSoundsInSequencer()
+        for sound in sounds:
+            for low, high in bakeFrequencies:
                 waitTask = WaitTask(25)
-                bakeTask = BakeFrequencyTask(path, bakeFrequencyRange, self.bakeData, rebake)
-                if rebake or not bakeTask.bakedDataExists:
+                bakeTask = BakeSoundObject(sound.name, low, high, self.attack, self.release)
+                if not bakeTask.frequencyIsBaked or rebake:
                     self.taskManager.appendTasks(waitTask, bakeTask)
         
     def modal(self, context, event):
         if event.type == "ESC": return self.finish()
         
-        status = self.taskManager.execute(event)
+        try: status = self.taskManager.execute(event)
+        except MissingSoundFileException:
+            self.report({"ERROR"}, "Sound file not found and it is not packed into the .blend file")
+            return self.finish()
         description = self.taskManager.nextDescription
-        context.area.type = "NODE_EDITOR"
         
         node = getNode(self.nodeTreeName, self.nodeName)
         node.isBaking = True
@@ -281,6 +294,7 @@ class BakeSounds(bpy.types.Operator):
     def finish(self):
         node = getNode(self.nodeTreeName, self.nodeName)
         node.isBaking = False
+        bpy.context.area.type = "NODE_EDITOR"
         bpy.context.window_manager.event_timer_remove(self.timer)
         sequencerData.update()
         return {"FINISHED"}
@@ -299,67 +313,95 @@ class WaitTask(Task):
             self.amount -= 1
         return "FINISHED" if self.amount == 0 else "CONTINUE"
         
-class BakeFrequencyTask(Task):
-    def __init__(self, filepath, bakeFrequencyRange, bakeData, rebake = False):
+        
+class BakeSoundObject(Task):
+    def __init__(self, soundName, low, high, attack, release):
         self.timeWeight = 100
-        self.filepath = filepath
-        self.bakeFrequencyRange = bakeFrequencyRange
-        self.bakeID = toBakeID(filepath, bakeFrequencyRange)
-        self.description = "{} : {} - {}".format(os.path.basename(filepath), bakeFrequencyRange.low, bakeFrequencyRange.high)
-        self.bakeData = bakeData
-        self.rebake = rebake
+        self.soundName = soundName
+        self.low, self.high, self.attack, self.release = low, high, attack, release
+        self.description = "{} : {} - {}".format(soundName, low, high)
         
     @property
-    def bakedDataExists(self):
-        dataHolder = getDataHolder()
-        return self.bakeID in dataHolder
+    def frequencyIsBaked(self):
+        return self.getBakeItemWithSameFrequency() is not None
+         
+    @property
+    def sound(self):
+        return bpy.data.sounds.get(self.soundName)
         
     def execute(self, event):
-        dataHolder = getDataHolder()
-        makeAloneVisibleInGraphEditor(dataHolder)
-        deselectAllFCurves(dataHolder)
-        newFCurveForCustomProperty(dataHolder, self.bakeID, 0.0)
-        self.setValidContext()
+        sound = self.sound
         
-        bpy.ops.graph.sound_bake(
-            filepath = self.filepath,
-            low = self.bakeFrequencyRange.low,
-            high = self.bakeFrequencyRange.high,
-            attack = self.bakeData.attack,
-            release = self.bakeData.release)
-            
-        dataHolder.hide = True
-        bpy.context.scene.objects.active = None
-        return "FINISHED"
+        filepath = toAbsolutePath(sound.filepath, library = sound.library)
+        useUnpacking = False
+        if not os.path.exists(filepath):
+            if sound.packed_file:
+                filepath = os.path.join(os.path.dirname(__file__), "TEMPORARY SOUND FILE")
+                file = open(filepath, "w+b")
+                file.write(sound.packed_file.data)
+                file.close()
+                useUnpacking = True
+            else:
+                raise MissingSoundFileException
         
-    def setValidContext(self):
+        object = self.createActiveObject()
         bpy.context.scene.frame_current = 0
         bpy.context.area.type = "GRAPH_EDITOR"
         
+        bpy.ops.graph.sound_bake(
+            filepath = filepath,
+            low = self.low,
+            high = self.high,
+            attack = self.attack,
+            release = self.release)
+            
+        if useUnpacking:
+            os.remove(filepath)
+            
+        bakeItem = self.getEmptyBakeItem()
+        fcurve = getSingleFCurveWithDataPath(object, "location")
+        for sample in fcurve.sampled_points:
+            sampleItem = bakeItem.samples.add()
+            sampleItem.strength = sample.co.y
+            
+        bpy.context.scene.objects.unlink(object)
+        bpy.data.objects.remove(object)
+            
+        return "FINISHED"
         
+    def createActiveObject(self):
+        bpy.ops.object.add()
+        object = bpy.context.active_object
+        object.keyframe_insert(frame = 0, data_path = "location", index = 0)
+        return object
         
-# Utils
-###########################          
-          
-def getDataHolder():
-    object = bpy.context.scene.objects.get(dataHolderName)
-    if object: return object
-    object = bpy.data.objects.get(dataHolderName)
-    if not object: object = bpy.data.objects.new(dataHolderName, None)
-    bpy.context.scene.objects.link(object)
-    return object
+    def getEmptyBakeItem(self):
+        sound = self.sound
+        item = self.getBakeItemWithSameFrequency()
+        if not item: item = self.newItem()
+        item.samples.clear()
+        return item
+        
+    def getBakeItemWithSameFrequency(self):
+        return getSoundBakeItemFromFrequency(self.sound, self.low, self.high)
+            
+    def newItem(self):
+        item = self.sound.bakeData.add()
+        item.name = "{} - {}".format(self.low, self.high)
+        item.low = self.low
+        item.high = self.high
+        item.attack = self.attack
+        item.release = self.release
+        return item
+        
+def getSoundBakeItemFromFrequency(sound, low, high):
+    for item in sound.bakeData:
+        if item.low == low and item.high == high:
+            return item
+    return None
     
-def toBakeID(filepath, bakeFrequencyRange):
-    # must not be longer than 63 characters
-    # changing this requires rebaking in all files
-    return "SOUND" + os.path.basename(filepath)[-40:] + str(bakeFrequencyRange.low) + "-" + str(bakeFrequencyRange.high)    
-    
-def makeAloneVisibleInGraphEditor(object):
-    bpy.ops.object.select_all(action = "DESELECT")
-    object.hide_select = False
-    object.hide = False
-    object.select = True
-    bpy.context.scene.objects.active = object    
+class MissingSoundFileException(Exception):
+    pass
 
     
 

@@ -99,7 +99,7 @@ class mn_BaseSocket(NodeSocket):
     bl_label = "Base Socket"
     
     def draw(self, context, layout, node, text):
-        displayText = self.customName if self.displayCustomName else text
+        displayText = self.getDisplayedName()
         
         row = layout.row(align = True)
         if self.editableCustomName:
@@ -140,6 +140,10 @@ class mn_BaseSocket(NodeSocket):
         for attribute in attributes:
             get = getattr(node, attribute, None)
             setattr(self, attribute, get)
+            
+    def getDisplayedName(self):
+        if self.displayCustomName or self.editableCustomName: return self.customName
+        return self.name
         
         
 def customNameChanged(self, context):

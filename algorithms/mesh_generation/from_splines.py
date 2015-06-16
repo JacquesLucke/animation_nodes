@@ -6,9 +6,21 @@ from . basic_shapes import tubeVertices
 # Loft
 ###################################
 
-def loftSplines(splines, nSplineSamples, nSurfaceSamples, type = "LINEAR", cyclic = False, smoothness = 1):
+def loftSplines(splines, 
+                nSplineSamples, nSurfaceSamples, 
+                type = "LINEAR", cyclic = False, smoothness = 1, 
+                uniformConverterResolution = 100, splineDistributionType = "RESOLUTION", surfaceDistributionType = "RESOLUTION",
+                startSurfaceParameter = 0.0, endSurfaceParameter = 1.0):
+                
     vertices = []
-    samples = [spline.getSamples(nSplineSamples) for spline in splines]
+    
+    isRealCyclic = cyclic and startSurfaceParameter <= 0.0 and endSurfaceParameter >= 1.0
+    
+    if splineDistributionType == "RESOLUTION":
+        samples = [spline.getSamples(nSplineSamples) for spline in splines]
+    elif splineDistributionType == "UNIFORM":
+        samples = [spline.getUniformSamples(nSplineSamples, resolution = uniformConverterResolution) for spline in splines]
+    
     for points in zip(*samples):
         if type == "BEZIER":
             spline = BezierSpline.fromLocations(points)
@@ -18,10 +30,17 @@ def loftSplines(splines, nSplineSamples, nSurfaceSamples, type = "LINEAR", cycli
             spline = PolySpline.fromLocations(points)
             spline.isCyclic = cyclic
         spline.update()
-        vertices.extend(spline.getSamples(nSurfaceSamples + int(cyclic)))
-        if cyclic: del vertices[-1]
+        
+        amount = nSurfaceSamples + int(isRealCyclic)
+        
+        if surfaceDistributionType == "RESOLUTION":
+            vertices.extend(spline.getSamples(amount, start = startSurfaceParameter, end = endSurfaceParameter))
+        elif surfaceDistributionType == "UNIFORM":
+            vertices.extend(spline.getUniformSamples(amount, resolution = uniformConverterResolution, start = startSurfaceParameter, end = endSurfaceParameter))
+            
+        if isRealCyclic: del vertices[-1]
       
-    if cyclic:
+    if isRealCyclic:
         polygons = tubeQuadPolygonIndices(nSplineSamples, nSurfaceSamples)
     else:
         polygons = gridQuadPolygonIndices(nSplineSamples, nSurfaceSamples)

@@ -48,4 +48,5 @@ class mn_AppendPointToSpline(Node, AnimationNode):
             spline.appendBezierPoint(point, leftHandle, rightHandle)
         else:
             spline.appendPoint(point)
+        spline.isChanged = True
         return spline

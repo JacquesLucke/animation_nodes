@@ -1,3 +1,5 @@
+import bpy
+
 listChains = [
     ["mn_FloatSocket", "mn_FloatListSocket"],
     ["mn_IntegerSocket", "mn_IntegerListSocket"],
@@ -38,10 +40,20 @@ def getIdNameFromDataType(dataType):
         if getattr(subClass, "dataType") == dataType: return subClass.bl_idname
     return None
     
+def getDataTypeFromIdName(idName):
+    cls = getattr(bpy.types, idName)
+    return cls.dataType
+    
 def getSocketClassFromIdName(idName):
     for cls in getSocketClasses():
         if cls.bl_idname == idName: return cls
     return None
+    
+def getListBaseSocketIdNames():
+    idNames = []
+    for listChain in listChains:
+        idNames.extend(listChain[:-1])
+    return idNames
     
 def getListSocketIdNames():
     types = []

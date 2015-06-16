@@ -23,7 +23,7 @@ bl_info = {
     "name":        "Animation Nodes",
     "description": "Node system for more flexible animations.",
     "author":      "Jacques Lucke",
-    "version":     (0, 0, 6),
+    "version":     (0, 0, 7),
     "blender":     (2, 7, 4),
     "location":    "Node Editor",
     "category":    "Node",
@@ -103,12 +103,14 @@ def unregister_keymaps():
     addon_keymaps.clear()
 
 from . insert_nodes_menu import registerMenu, unregisterMenu
+from . import manage_broken_files as manage_broken_files
 from . import mn_execution as execution
 from . import mn_node_base as node_base
 from . nodes.sound import mn_sequencer_sound_input as sequencer_sound
 
 def register():
     bpy.utils.register_module(__name__)
+    manage_broken_files.register_handlers()
     execution.register_handlers()
     node_base.register_handlers()
     sequencer_sound.register_handlers()
@@ -121,6 +123,7 @@ def register():
 def unregister():
     unregister_keymaps()
     bpy.utils.unregister_module(__name__)
+    manage_broken_files.unregister_handlers()
     execution.unregister_handlers()
     node_base.unregister_handlers()
     sequencer_sound.unregister_handlers()
