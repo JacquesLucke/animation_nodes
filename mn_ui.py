@@ -171,6 +171,7 @@ class IDKeyPanel(bpy.types.Panel):
                 props.name = keyName
                 props.type = keyType
                 props.objectName = object.name
+            typeClass.drawOperators(box, object, keyName)
         
         
 class ForceNodeTreeUpdate(bpy.types.Operator):

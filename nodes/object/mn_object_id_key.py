@@ -4,7 +4,6 @@ from bpy.props import *
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 from ... id_keys import getIDKeyData, getIDKeys
-from ... utils.math import *
 
 
 class mn_ObjectIDKey(Node, AnimationNode):

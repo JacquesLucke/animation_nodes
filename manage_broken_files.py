@@ -4,7 +4,7 @@ from bpy.app.handlers import persistent
 from . utils.mn_node_utils import getAnimationNodeTrees
 from . mn_utils import getNode
 
-deprecatedNodeIdNames = ["mn_TransfromVector", "mn_SubstringNode"]
+deprecatedNodeIdNames = ["mn_TransfromVector", "mn_SubstringNode", "mn_ObjectKeyframeInput"]
 
 brokenNodes = []
 

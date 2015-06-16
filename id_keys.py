@@ -1,11 +1,24 @@
 import bpy
 from mathutils import Vector
 from bpy.props import *
-from . mn_utils import nameToPath as toPath
-
-prefix = "AN "
+from . utils.path import toIDPropertyPath as toPath
 
 
+# ID Keys
+##########################
+    
+def getIDKeyData(object, name, type = None):
+    if not type: type = getIDType(name)
+    typeClass = getIDTypeClass(type)
+    return typeClass.read(object, name)
+    
+def getIDType(name):
+    for keyName, keyType in getIDKeys():
+        if name == keyName: return keyType    
+    
+def getIDTypeClass(type):
+    return idTypes[type]    
+    
 def getIDKeys():
     scene = bpy.context.scene
     idKeys = getDefaultIDKeys()
@@ -14,128 +27,23 @@ def getIDKeys():
     return idKeys
 
 def getDefaultIDKeys():
-    return [("Initial Transforms", "Transforms")]
+    return [("Initial Transforms", "Transforms")]    
     
-def removeIDKey(name):
-    idKeys = bpy.context.scene.mn_settings.idKeys
-    for item in idKeys.keys:
-        if item.name == name:
-            idKeys.remove(item)
-    
-def getIDType(name):
-    for keyName, keyType in getIDKeys():
-        if name == keyName: return keyType
-    
-def getIDTypeClass(type):
-    return idTypes[type]
-    
+ 
+def hasProp(object, name):
+    return hasattr(object, toPath(name))
 def getProp(object, name, default):
     return getattr(object, toPath(name), default)
 def setProp(object, name, data):
     object[name] = data
-def hasProp(object, name):
-    return hasattr(object, toPath(name))
     
-def getIDKeyData(object, name, type = None):
-    if not type: type = getIDType(name)
-    typeClass = getIDTypeClass(type)
-    return typeClass.read(object, name)
     
-class NewIdKey(bpy.types.Operator):
-    bl_idname = "mn.new_id_key"
-    bl_label = "New ID Key"
-    bl_description = "New Key"
     
-    @classmethod
-    def poll(cls, context):
-        name = cls.getNewKeyData()[0]
-        return not cls.nameExists(name) and name != "" and "|" not in name
-    
-    def execute(self, context):
-        name, type = self.getNewKeyData()
-        idKeys = context.scene.mn_settings.idKeys
-        item = idKeys.keys.add()
-        item.name = name
-        item.type = type
-        context.area.tag_redraw()
-        return {'FINISHED'}    
-        
-    @classmethod
-    def nameExists(cls, name):
-        return getIDType(name) is not None
-        
-    @classmethod
-    def getNewKeyData(cls):
-        idKeySettings = bpy.context.scene.mn_settings.idKeys
-        return idKeySettings.new_key_name, idKeySettings.new_key_type
-    
-class RemoveIDKey(bpy.types.Operator):
-    bl_idname = "mn.remove_id_key"
-    bl_label = "Remove ID Key"
-    bl_description = "Remove this key"
-    
-    name = StringProperty()
-    
-    def invoke(self, context, event):
-        return context.window_manager.invoke_confirm(self, event)
+# ID Types
+############################  
 
-    def execute(self, context):
-        idKeys = context.scene.mn_settings.idKeys
-        for i, item in enumerate(idKeys.keys):
-            if item.name == self.name:
-                idKeys.keys.remove(i)
-        context.area.tag_redraw()
-        return {'FINISHED'}
-        
-class CreateKeyOnObject(bpy.types.Operator):
-    bl_idname = "mn.create_key_on_object"
-    bl_label = "Create Key on Object"
-    bl_description = ""
-    
-    name = StringProperty()
-    type = StringProperty()
-    objectName = StringProperty()
-    
-    def execute(self, context):
-        typeClass = getIDTypeClass(self.type)
-        typeClass.create(bpy.data.objects.get(self.objectName), self.name)
-        context.area.tag_redraw()
-        return {'FINISHED'}
-        
-        
-class SetCurrentTransforms(bpy.types.Operator):
-    bl_idname = "mn.set_current_transforms"
-    bl_label = "Set Current Transforms"
-    bl_description = "Set current transforms (World icon means to do this for all selected objects)"
-    
-    name = StringProperty()
-    allSelectedObjects = BoolProperty()
-    
-    def execute(self, context):
-        if self.allSelectedObjects: objects = context.selected_objects
-        else: objects = [context.active_object]
-        
-        for object in objects:
-            TransformsIDType.write(object, self.name, (object.location, object.rotation_euler, object.scale))
-        return {'FINISHED'}
-        
-        
-class SetCurrentTexts(bpy.types.Operator):
-    bl_idname = "mn.set_current_texts"
-    bl_label = "Set Current Texts"
-    bl_description = "Set current texts (World icon means to do this for all selected objects)"
-    
-    name = StringProperty()
-    allSelectedObjects = BoolProperty()
-    
-    def execute(self, context):
-        if self.allSelectedObjects: objects = context.selected_objects
-        else: objects = [context.active_object]
-        
-        for object in objects:
-            StringIDType.write(object, self.name, getattr(object.data, "body", ""))
-        return {'FINISHED'}        
-    
+# used for all custom id properties
+prefix = "AN "  
     
 class TransformsIDType:
     @classmethod
@@ -178,6 +86,8 @@ class TransformsIDType:
         col.label("Scale")
         col.prop(object, toPath(prefix + name + " Scale"), text = "")
         
+    @staticmethod
+    def drawOperators(layout, object, name):
         row = layout.row(align = True)
         props = row.operator("mn.set_current_transforms", text = "Use Current Transforms")
         props.name = name
@@ -244,3 +154,105 @@ idTypeItems = [
     ("Float", "Float", "A single real number"),
     ("String", "String", "A text field"),
     ("Integer", "Integer", "Number without decimals") ]     
+    
+    
+    
+# Operators
+##############################
+
+class NewIdKey(bpy.types.Operator):
+    bl_idname = "mn.new_id_key"
+    bl_label = "New ID Key"
+    bl_description = "New Key"
+    
+    @classmethod
+    def poll(cls, context):
+        name = cls.getNewKeyData()[0]
+        return not cls.nameExists(name) and name != "" and "|" not in name
+    
+    def execute(self, context):
+        name, type = self.getNewKeyData()
+        idKeys = context.scene.mn_settings.idKeys
+        item = idKeys.keys.add()
+        item.name = name
+        item.type = type
+        context.area.tag_redraw()
+        return {'FINISHED'}    
+        
+    @classmethod
+    def nameExists(cls, name):
+        return getIDType(name) is not None
+        
+    @classmethod
+    def getNewKeyData(cls):
+        idKeySettings = bpy.context.scene.mn_settings.idKeys
+        return idKeySettings.new_key_name, idKeySettings.new_key_type
+        
+    
+class RemoveIDKey(bpy.types.Operator):
+    bl_idname = "mn.remove_id_key"
+    bl_label = "Remove ID Key"
+    bl_description = "Remove this key"
+    
+    name = StringProperty()
+    
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
+
+    def execute(self, context):
+        idKeys = context.scene.mn_settings.idKeys
+        for i, item in enumerate(idKeys.keys):
+            if item.name == self.name:
+                idKeys.keys.remove(i)
+        context.area.tag_redraw()
+        return {'FINISHED'}
+        
+        
+class CreateKeyOnObject(bpy.types.Operator):
+    bl_idname = "mn.create_key_on_object"
+    bl_label = "Create Key on Object"
+    bl_description = ""
+    
+    name = StringProperty()
+    type = StringProperty()
+    objectName = StringProperty()
+    
+    def execute(self, context):
+        typeClass = getIDTypeClass(self.type)
+        typeClass.create(bpy.data.objects.get(self.objectName), self.name)
+        context.area.tag_redraw()
+        return {'FINISHED'}
+        
+        
+class SetCurrentTransforms(bpy.types.Operator):
+    bl_idname = "mn.set_current_transforms"
+    bl_label = "Set Current Transforms"
+    bl_description = "Set current transforms (World icon means to do this for all selected objects)"
+    
+    name = StringProperty()
+    allSelectedObjects = BoolProperty()
+    
+    def execute(self, context):
+        if self.allSelectedObjects: objects = context.selected_objects
+        else: objects = [context.active_object]
+        
+        for object in objects:
+            TransformsIDType.write(object, self.name, (object.location, object.rotation_euler, object.scale))
+        return {'FINISHED'}
+        
+        
+class SetCurrentTexts(bpy.types.Operator):
+    bl_idname = "mn.set_current_texts"
+    bl_label = "Set Current Texts"
+    bl_description = "Set current texts (World icon means to do this for all selected objects)"
+    
+    name = StringProperty()
+    allSelectedObjects = BoolProperty()
+    
+    def execute(self, context):
+        if self.allSelectedObjects: objects = context.selected_objects
+        else: objects = [context.active_object]
+        
+        for object in objects:
+            StringIDType.write(object, self.name, getattr(object.data, "body", ""))
+        return {'FINISHED'} 
