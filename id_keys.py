@@ -12,6 +12,10 @@ def getIDKeyData(object, name, type = None):
     typeClass = getIDTypeClass(type)
     return typeClass.read(object, name)
     
+def setIDKeyData(object, name, type, data):
+    typeClass = getIDTypeClass(type)
+    typeClass.write(object, name, data)
+    
 def getIDType(name):
     for keyName, keyType in getIDKeys():
         if name == keyName: return keyType    
