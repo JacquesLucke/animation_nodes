@@ -6,6 +6,10 @@ from . utils.path import toIDPropertyPath as toPath
 
 # ID Keys
 ##########################
+
+forcedIDKeyTypes = {
+    "Initial Transforms" : "Transforms",
+    "Initial Text" : "String" }
     
 def getIDKeyData(object, name, type = None):
     if not type: type = getIDType(name)
@@ -17,21 +21,42 @@ def setIDKeyData(object, name, type, data):
     typeClass.write(object, name, data)
     
 def getIDType(name):
-    for keyName, keyType in getIDKeys():
-        if name == keyName: return keyType    
+    for item in getIDKeys():
+        if name == item.name: return item.type    
     
 def getIDTypeClass(type):
     return idTypes[type]    
     
 def getIDKeys():
-    scene = bpy.context.scene
-    idKeys = getDefaultIDKeys()
-    for item in scene.mn_settings.idKeys.keys:
-        idKeys.append((item.name, item.type))
-    return idKeys
+    return getIDKeySettings().keys
+    
+def getIDKeySettings():
+    return bpy.context.scene.mn_settings.idKeys
 
-def getDefaultIDKeys():
-    return [("Initial Transforms", "Transforms")]    
+    
+def createIDKey(name, type):
+    if not isCreatable(name, type): return
+    idKeys = getIDKeys()
+    item = idKeys.add()
+    item.name = name
+    item.type = type
+    
+def isCreatable(name, type):
+    if idKeyExists(name): return False
+    if not isValidCombination(name, type): return False
+    return True
+    
+def idKeyExists(name):
+    for item in getIDKeys():
+        if item.name == name: return True
+    return False
+    
+def isValidCombination(name, type):
+    if "|" in name: return False
+    if "|" in type: return False
+    if name in forcedIDKeyTypes:
+        if forcedIDKeyTypes[name] != type: return False
+    return True
     
  
 def hasProp(object, name):
@@ -136,7 +161,11 @@ class SimpleIDType:
         
     @classmethod
     def draw(cls, layout, object, name):
-        layout.prop(object, toPath(prefix + name), text = "")      
+        layout.prop(object, toPath(prefix + name), text = "") 
+
+    @staticmethod
+    def drawOperators(layout, object, name):
+        pass
         
         
 class FloatIDType(SimpleIDType):
@@ -149,6 +178,8 @@ class StringIDType(SimpleIDType):
     def draw(cls, layout, object, name):
         layout.prop(object, toPath(prefix + name), text = "")
         
+    @staticmethod
+    def drawOperators(layout, object, name):
         row = layout.row(align = True)
         props = row.operator("mn.set_current_texts", text = "Use Current Texts")
         props.name = name
@@ -191,19 +222,24 @@ class IDKeysManagerPanel(bpy.types.Panel):
         
     def drawExistingKeysBox(self, layout):
         box = layout.box()
-        for keyName, keyType in getIDKeys():
+        idKeys = getIDKeys()
+        if len(idKeys) == 0:
+            box.label("There is no ID Key")
+        for item in idKeys:
             row = box.row()
-            row.label(keyName)
-            row.label(keyType)
+            row.label(item.name)
+            row.label(item.type)
+            hideIcon = "RESTRICT_VIEW_ON" if item.hide else "RESTRICT_VIEW_OFF"
+            row.prop(item, "hide", icon = hideIcon, emboss = False, icon_only = True)
             props = row.operator("mn.remove_id_key", icon = "X", text = "")
-            props.name = keyName
+            props.name = item.name
             
     def drawNewKeyRow(self, layout):
         idKeySettings = bpy.context.scene.mn_settings.idKeys   
         row = layout.row(align = True)
-        row.prop(idKeySettings, "new_key_name", text = "")
-        row.prop(idKeySettings, "new_key_type", text = "")
-        row.operator("mn.new_id_key", icon = "SAVE_COPY", text = "")
+        row.prop(idKeySettings, "newKeyName", text = "")
+        row.prop(idKeySettings, "newKeyType", text = "")
+        row.operator("mn.new_id_key", icon = "PLUS", text = "")
         
         
 class IDKeyPanel(bpy.types.Panel):
@@ -221,7 +257,9 @@ class IDKeyPanel(bpy.types.Panel):
         layout = self.layout
         object = context.active_object
         
-        for keyName, keyType in getIDKeys():
+        for item in getIDKeys():
+            keyName, keyType = item.name, item.type
+        
             box = layout.box()
             self.drawHeader(box, object, keyName, keyType)
             
@@ -261,26 +299,20 @@ class NewIdKey(bpy.types.Operator):
     
     @classmethod
     def poll(cls, context):
-        name = cls.getNewKeyData()[0]
-        return not cls.nameExists(name) and name != "" and "|" not in name
+        name, type = cls.getNewKeyData()
+        return isCreatable(name, type)
     
     def execute(self, context):
         name, type = self.getNewKeyData()
-        idKeys = context.scene.mn_settings.idKeys
-        item = idKeys.keys.add()
-        item.name = name
-        item.type = type
+        createIDKey(name, type)
+        getIDKeySettings().newKeyName = ""
         context.area.tag_redraw()
-        return {'FINISHED'}    
-        
-    @classmethod
-    def nameExists(cls, name):
-        return getIDType(name) is not None
+        return {'FINISHED'}
         
     @classmethod
     def getNewKeyData(cls):
-        idKeySettings = bpy.context.scene.mn_settings.idKeys
-        return idKeySettings.new_key_name, idKeySettings.new_key_type
+        idKeySettings = getIDKeySettings()
+        return idKeySettings.newKeyName, idKeySettings.newKeyType
         
     
 class RemoveIDKey(bpy.types.Operator):

@@ -65,11 +65,12 @@ class DeveloperSettings(bpy.types.PropertyGroup):
 class IDKeyType(bpy.types.PropertyGroup):
     name = StringProperty()
     type = StringProperty()
+    hide = BoolProperty(default = False)
     
 class IDKeySettings(bpy.types.PropertyGroup):
     keys = CollectionProperty(type = IDKeyType)
-    new_key_name = StringProperty()
-    new_key_type = EnumProperty(items = idTypeItems, name = "Type")
+    newKeyName = StringProperty(default = "Initial Transforms")
+    newKeyType = EnumProperty(items = idTypeItems, name = "Type", default = "Transforms")
     
 class AnimationNodesSettings(bpy.types.PropertyGroup):
     update = PointerProperty(type = GlobalUpdateSettings, name = "Update Settings")

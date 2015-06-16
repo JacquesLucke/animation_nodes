@@ -12,16 +12,25 @@ class mn_ObjectIDKey(Node, AnimationNode):
     outputUseParameterName = "useOutput"
     
     def selected_key_changed(self, context):
-        self.key_name, self.key_type = self.selected_key.split("|")
+        self.isKeySelected = self.selected_key != "NONE"
+        if self.isKeySelected:
+            self.keyName, self.keyType = self.selected_key.split("|")
         self.buildOutputSockets()
         nodeTreeChanged()
         
     def getIDKeyItems(self, context):
-        return [(name + "|" + type, name, type) for name, type in getIDKeys()]
+        items = []
+        for item in getIDKeys():
+            name, type = item.name, item.type
+            items.append((name + "|" + type, name, type))
+        if len(items) == 0:
+            items.append(("NONE", "No ID Key", ""))
+        return items
     
     selected_key = EnumProperty(items = getIDKeyItems, name = "ID Key", update = selected_key_changed)
-    key_name = StringProperty()
-    key_type = StringProperty()
+    keyName = StringProperty()
+    keyType = StringProperty()
+    isKeySelected = BoolProperty(default = False)
     
     def init(self, context):
         forbidCompiling()
@@ -35,15 +44,15 @@ class mn_ObjectIDKey(Node, AnimationNode):
     def buildOutputSockets(self):
         self.outputs.clear()
         forbidCompiling()
-        if self.key_type == "Transforms":
+        if self.keyType == "Transforms":
             self.outputs.new("mn_VectorSocket", "Location")
             self.outputs.new("mn_VectorSocket", "Rotation")
             self.outputs.new("mn_VectorSocket", "Scale")
-        if self.key_type == "Float":
+        if self.keyType == "Float":
             self.outputs.new("mn_FloatSocket", "Float")
-        if self.key_type == "Integer":
+        if self.keyType == "Integer":
             self.outputs.new("mn_IntegerSocket", "Integer")
-        if self.key_type == "String":
+        if self.keyType == "String":
             self.outputs.new("mn_StringSocket", "String")
         allowCompiling()
         
@@ -53,7 +62,9 @@ class mn_ObjectIDKey(Node, AnimationNode):
         return { socket.identifier : socket.identifier for socket in self.outputs }
         
     def execute(self, useOutput, object):
-        data = getIDKeyData(object, self.key_name, self.key_type)
+        if not self.isKeySelected: return
         
-        if self.key_type in ("Float", "Integer", "String"): return data
-        if self.key_type == "Transforms": return data[0], data[1], data[2]
+        data = getIDKeyData(object, self.keyName, self.keyType)
+        
+        if self.keyType in ("Float", "Integer", "String"): return data
+        if self.keyType == "Transforms": return data[0], data[1], data[2]
