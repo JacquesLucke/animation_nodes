@@ -11,7 +11,7 @@ class mn_GetListElementNode(Node, AnimationNode):
     
     #sometimes we need to limit min to 0, unlike where we have start/end
     #by default False, to not break existing trees
-    allowNegativeIndex = BoolProperty(default = False, description = "Allow negative index for reversed selection")
+    allowNegativeIndex = bpy.props.BoolProperty(default = False, description = "Allow negative index for reversed selection")
     
     def init(self, context):
         forbidCompiling()
