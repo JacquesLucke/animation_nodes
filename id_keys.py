@@ -340,7 +340,7 @@ class RemoveIDKey(bpy.types.Operator):
 class CreateKeyOnObject(bpy.types.Operator):
     bl_idname = "mn.create_key_on_object"
     bl_label = "Create Key on Object"
-    bl_description = ""
+    bl_description = "Create the key on this object"
     
     name = StringProperty()
     type = StringProperty()
@@ -356,11 +356,14 @@ class CreateKeyOnObject(bpy.types.Operator):
 class RemoveKeyFromObject(bpy.types.Operator):
     bl_idname = "mn.remove_key_from_object"
     bl_label = "Remove Key from Object"
-    bl_description = ""
+    bl_description = "Remove the key from this object"
     
     name = StringProperty()
     type = StringProperty()
     objectName = StringProperty()
+    
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
     
     def execute(self, context):
         typeClass = getIDTypeClass(self.type)
