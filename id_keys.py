@@ -36,6 +36,9 @@ def getProp(object, name, default):
     return getattr(object, toPath(name), default)
 def setProp(object, name, data):
     object[name] = data
+def removeProp(object, name):
+    if hasProp(object, name):
+        del object[name]
     
     
     
@@ -49,6 +52,12 @@ class TransformsIDType:
     @classmethod
     def create(cls, object, name):
         cls.write(object, name, ((0.0, 0.0, 0.0), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)))
+        
+    @staticmethod
+    def remove(object, name):
+        removeProp(object, prefix + name + " Location")
+        removeProp(object, prefix + name + " Rotation")
+        removeProp(object, prefix + name + " Scale")
 
     @staticmethod
     def exists(object, name):
@@ -103,6 +112,10 @@ class SimpleIDType:
     @classmethod
     def create(cls, object, name):
         cls.write(object, name, cls.default)
+        
+    @staticmethod
+    def remove(object, name):
+        removeProp(object, prefix + name)
 
     @staticmethod
     def exists(object, name):
@@ -222,6 +235,22 @@ class CreateKeyOnObject(bpy.types.Operator):
         typeClass.create(bpy.data.objects.get(self.objectName), self.name)
         context.area.tag_redraw()
         return {'FINISHED'}
+        
+        
+class RemoveKeyFromObject(bpy.types.Operator):
+    bl_idname = "mn.remove_key_from_object"
+    bl_label = "Remove Key from Object"
+    bl_description = ""
+    
+    name = StringProperty()
+    type = StringProperty()
+    objectName = StringProperty()
+    
+    def execute(self, context):
+        typeClass = getIDTypeClass(self.type)
+        typeClass.remove(bpy.data.objects.get(self.objectName), self.name)
+        context.area.tag_redraw()
+        return {'FINISHED'}        
         
         
 class SetCurrentTransforms(bpy.types.Operator):

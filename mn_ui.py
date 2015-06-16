@@ -160,6 +160,10 @@ class IDKeyPanel(bpy.types.Panel):
             subRow = row.row()
             subRow.alignment = "RIGHT"
             subRow.label(keyType)
+            props = row.operator("mn.remove_key_from_object", icon = "X", emboss = False, text = "")
+            props.name = keyName
+            props.type = keyType
+            props.objectName = object.name
             
             typeClass = getIDTypeClass(keyType)
             if typeClass.exists(object, keyName):
