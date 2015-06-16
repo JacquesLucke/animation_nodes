@@ -183,7 +183,7 @@ class ObjectMenu(bpy.types.Menu):
         insertNode(layout, "mn_ObjectAttributeInputNode", "Attribute Input")                            
         insertNode(layout, "mn_ObjectAttributeOutputNode", "Attribute Output")  
         layout.separator()
-        insertNode(layout, "mn_ObjectKeyframeInput", "AN Key Input")                            
+        insertNode(layout, "mn_ObjectIDKey", "ID Key")                            
         insertNode(layout, "mn_CopyObjectData", "Copy Data")  
         insertNode(layout, "mn_CopyTransformsNode", "Copy Transforms")  
         layout.separator()
