@@ -3,30 +3,21 @@ from bpy.types import Node
 from bpy.props import *
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
-from ... id_keys import getIDKeyData, getIDKeys
+from ... id_keys import getIDKeyInfo, getIDKeyItems
 
 
 class mn_ObjectIDKey(Node, AnimationNode):
     bl_idname = "mn_ObjectIDKey"
     bl_label = "Object ID Key"
     
-    def selected_key_changed(self, context):
-        self.isKeySelected = self.selected_key != "NONE"
+    def selectedKey_changed(self, context):
+        self.isKeySelected = self.selectedKey != "NONE"
         if self.isKeySelected:
-            self.keyName, self.keyType = self.selected_key.split("|")
+            self.keyName, self.keyType = self.selectedKey.split("|")
         self.buildOutputSockets()
         nodeTreeChanged()
-        
-    def getIDKeyItems(self, context):
-        items = []
-        for item in getIDKeys():
-            name, type = item.name, item.type
-            items.append((name + "|" + type, name, type))
-        if len(items) == 0:
-            items.append(("NONE", "No ID Key", ""))
-        return items
     
-    selected_key = EnumProperty(items = getIDKeyItems, name = "ID Key", update = selected_key_changed)
+    selectedKey = EnumProperty(items = getIDKeyItems, name = "ID Key", update = selectedKey_changed)
     keyName = StringProperty()
     keyType = StringProperty()
     isKeySelected = BoolProperty(default = False)
@@ -34,15 +25,17 @@ class mn_ObjectIDKey(Node, AnimationNode):
     def init(self, context):
         forbidCompiling()
         self.inputs.new("mn_ObjectSocket", "Object").showName = False
-        self.selected_key_changed(context)
+        self.selectedKey_changed(context)
         allowCompiling()
         
     def draw_buttons(self, context, layout):
-        layout.prop(self, "selected_key", text = "")
+        layout.prop(self, "selectedKey", text = "")
         
     def buildOutputSockets(self):
-        self.outputs.clear()
         forbidCompiling()
+        self.outputs.clear()
+        if self.isKeySelected:
+            self.outputs.new("mn_BooleanSocket", "Exists")
         if self.keyType == "Transforms":
             self.outputs.new("mn_VectorSocket", "Location")
             self.outputs.new("mn_VectorSocket", "Rotation")
@@ -63,7 +56,7 @@ class mn_ObjectIDKey(Node, AnimationNode):
     def execute(self, object):
         if not self.isKeySelected: return
         
-        data = getIDKeyData(object, self.keyName, self.keyType)
+        data, hasKey = getIDKeyInfo(object, self.keyName, self.keyType)
         
-        if self.keyType in ("Float", "Integer", "String"): return data
-        if self.keyType == "Transforms": return data[0], data[1], data[2]
+        if self.keyType in ("Float", "Integer", "String"): return hasKey, data
+        if self.keyType == "Transforms": return hasKey, data[0], data[1], data[2]

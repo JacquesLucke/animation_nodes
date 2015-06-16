@@ -11,6 +11,25 @@ forcedIDKeyTypes = {
     "Initial Transforms" : "Transforms",
     "Initial Text" : "String" }
     
+def getIDKeyItems(self, context):
+    items = []
+    for item in getIDKeys():
+        name, type = item.name, item.type
+        items.append((name + "|" + type, name, type))
+    if len(items) == 0:
+        items.append(("NONE", "No ID Key", ""))
+    return items    
+    
+def getIDKeyInfo(object, name, type = None):
+    if not type: type = getIDType(name)
+    typeClass = getIDTypeClass(type)
+    return typeClass.read(object, name), typeClass.exists(object, name)  
+    
+def hasIDKeyData(object, name, type = None):
+    if not type: type = getIDType(name)
+    typeClass = getIDTypeClass(type)
+    return typeClass.exists(object, name)
+    
 def getIDKeyData(object, name, type = None):
     if not type: type = getIDType(name)
     typeClass = getIDTypeClass(type)
