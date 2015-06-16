@@ -296,10 +296,9 @@ class IDKeyPanel(bpy.types.Panel):
         props.name = keyName
         props.type = keyType
         props.objectName = object.name
+
         
         
-    
-    
 # Operators
 ##############################
 
