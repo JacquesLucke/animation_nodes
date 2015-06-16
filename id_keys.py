@@ -54,6 +54,8 @@ def idKeyExists(name):
 def isValidCombination(name, type):
     if "|" in name: return False
     if "|" in type: return False
+    if name == "": return False
+    if type not in idTypes.keys(): return False
     if name in forcedIDKeyTypes:
         if forcedIDKeyTypes[name] != type: return False
     return True
@@ -225,13 +227,15 @@ class IDKeysManagerPanel(bpy.types.Panel):
         idKeys = getIDKeys()
         if len(idKeys) == 0:
             box.label("There is no ID Key")
+            
+        col = box.column(align = True)
         for item in idKeys:
-            row = box.row()
+            row = col.row()
             row.label(item.name)
             row.label(item.type)
             hideIcon = "RESTRICT_VIEW_ON" if item.hide else "RESTRICT_VIEW_OFF"
             row.prop(item, "hide", icon = hideIcon, emboss = False, icon_only = True)
-            props = row.operator("mn.remove_id_key", icon = "X", text = "")
+            props = row.operator("mn.remove_id_key", icon = "X", emboss = False, text = "")
             props.name = item.name
             
     def drawNewKeyRow(self, layout):
@@ -257,18 +261,21 @@ class IDKeyPanel(bpy.types.Panel):
         layout = self.layout
         object = context.active_object
         
+        self.drawKeysForObject(layout, object)
+
+    def drawKeysForObject(self, layout, object):
         for item in getIDKeys():
-            keyName, keyType = item.name, item.type
+            if item.hide: continue
+            box = layout.box()
             
+            keyName, keyType = item.name, item.type
             typeClass = getIDTypeClass(keyType)
             keyExists = typeClass.exists(object, keyName)
         
-            box = layout.box()
-            self.drawHeader(box, object, keyName, keyType, keyExists)
-            
+            self.drawHeader(box, object, keyName, keyType, keyExists)            
             if keyExists:
                 typeClass.draw(box, object, keyName)
-            typeClass.drawOperators(box, object, keyName)    
+            typeClass.drawOperators(box, object, keyName)
     
     def drawHeader(self, box, object, keyName, keyType, keyExists):
         row = box.row()
