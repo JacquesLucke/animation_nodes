@@ -44,8 +44,8 @@ class mn_DataInput(Node, AnimationNode):
     def getInLineExecutionString(self, outputUse):
         return "$output$ = %input%"
         
-    def assignSocketType(self, idName):
-        self.assignedType = idName
+    def assignSocketType(self, dataType):
+        self.assignedType = dataType
         self.recreateSockets()
         
     def recreateSockets(self):

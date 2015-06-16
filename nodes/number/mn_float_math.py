@@ -57,6 +57,11 @@ class mn_FloatMathNode(Node, AnimationNode):
     def draw_buttons(self, context, layout):
         layout.prop(self, "mathTypesProperty")
         
+    def getNextNodeSuggestions(self):
+        return [("mn_FloatMathNode", (0, 0)),
+                ("mn_CombineVector", (0, 0)),
+                ("mn_FloatClamp", (0, 0))]
+        
     def useInLineExecution(self):
         return True
     def getInLineExecutionString(self, outputUse):

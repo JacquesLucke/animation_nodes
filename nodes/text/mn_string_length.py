@@ -3,9 +3,9 @@ from bpy.types import Node
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
-class mn_StringAnalyzeNode(Node, AnimationNode):
-    bl_idname = "mn_StringAnalyzeNode"
-    bl_label = "Text Analyze"
+class mn_StringLengthNode(Node, AnimationNode):
+    bl_idname = "mn_StringLengthNode"
+    bl_label = "Text Length"
     
     def init(self, context):
         forbidCompiling()
@@ -13,7 +13,10 @@ class mn_StringAnalyzeNode(Node, AnimationNode):
         self.outputs.new("mn_IntegerSocket", "Length")
         allowCompiling()
         
-    def execute(self, input):
-        output = {}
-        output["Length"] = len(input["Text"])
-        return output
+    def getInputSocketNames(self):
+        return {"Text" : "text"}
+    def getOutputSocketNames(self):
+        return {"Length" : "length"}        
+        
+    def execute(self, text):
+        return len(text)

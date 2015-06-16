@@ -10,6 +10,8 @@ class BezierSpline(Spline):
         self.points = []
         self.isCyclic = False
         self.segments = []
+        self.segmentAmount = 0
+        self.isChanged = True
         
     @staticmethod
     def fromLocations(locations):
@@ -47,9 +49,13 @@ class BezierSpline(Spline):
                 self.segments.append(BezierSegment(left, right))
             if self.isCyclic:
                 self.segments.append(BezierSegment(self.points[-1], self.points[0]))
+            self.segmentAmount = len(self.segments)
                 
-        recreateSegments()
-        self.isEvaluable = len(self.segments) > 0
+        if self.isChanged:
+            recreateSegments()
+            self.isEvaluable = len(self.segments) > 0
+            self.uniformParameterConverter = None
+            self.isChanged = False
         
     def getProjectedParameters(self, coordinates):
         parameters = []
@@ -82,15 +88,20 @@ class BezierSpline(Spline):
     #############################    
     
     def evaluate(self, parameter):
-        par = self.toSegmentsParameter(parameter)
-        return self.segments[int(par)].evaluate(par - int(par))
+        index, p = self.toSegmentsIndexAndParameter(parameter)
+        return self.segments[index].evaluate(p)
         
     def evaluateTangent(self, parameter):
-        par = self.toSegmentsParameter(parameter)
-        return self.segments[int(par)].evaluateTangent(par - int(par))
+        index, p = self.toSegmentsIndexAndParameter(parameter)
+        return self.segments[index].evaluateTangent(p)
         
-    def toSegmentsParameter(self, parameter):
-        return min(max(parameter, 0), 0.9999) * len(self.segments)
+    def toSegmentsIndexAndParameter(self, parameter):
+        p = max(parameter, 0.0) * self.segmentAmount
+        floorP = int(p)
+        if floorP < self.segmentAmount: 
+            return floorP, p - floorP
+        else:
+            return self.segmentAmount - 1, 1
         
     
 class BezierPoint:

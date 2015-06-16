@@ -23,4 +23,5 @@ class mn_TransformSpline(Node, AnimationNode):
 
     def execute(self, spline, transformation):
         spline.transform(transformation)
+        spline.isChanged = True
         return spline
