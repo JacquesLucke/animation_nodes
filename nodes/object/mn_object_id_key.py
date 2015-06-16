@@ -9,7 +9,6 @@ from ... id_keys import getIDKeyData, getIDKeys
 class mn_ObjectIDKey(Node, AnimationNode):
     bl_idname = "mn_ObjectIDKey"
     bl_label = "Object ID Key"
-    outputUseParameterName = "useOutput"
     
     def selected_key_changed(self, context):
         self.isKeySelected = self.selected_key != "NONE"
@@ -61,7 +60,7 @@ class mn_ObjectIDKey(Node, AnimationNode):
     def getOutputSocketNames(self):
         return { socket.identifier : socket.identifier for socket in self.outputs }
         
-    def execute(self, useOutput, object):
+    def execute(self, object):
         if not self.isKeySelected: return
         
         data = getIDKeyData(object, self.keyName, self.keyType)
