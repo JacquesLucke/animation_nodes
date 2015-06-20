@@ -2,7 +2,7 @@ import bpy
 from mathutils import Vector
 from bpy.props import *
 from . utils.path import toIDPropertyPath as toPath
-from . utils.decorators import enumItemsGenerator
+from . utils.enum_items import enumItemsGenerator
 
 
 # ID Keys
@@ -16,35 +16,39 @@ forcedIDKeyTypes = {
 def getIDKeyItems(self, context):
     itemData = []
     for item in getIDKeys():
-        name, type = item.name, item.type
+        name, type, id = item.name, item.type, item.id
         itemData.append({
-            "id" : name + "|" + type, 
+            "id" : id + "|" + type, 
             "name" : name, 
-            "description" : type })
+            "description" : type})
     return itemData    
     
-def getIDKeyInfo(object, name, type = None):
-    if not type: type = getIDType(name)
+def getIDKeyInfo(object, id, type = None):
+    if not type: type = getIDType(id)
     typeClass = getIDTypeClass(type)
-    return typeClass.read(object, name), typeClass.exists(object, name)  
+    return typeClass.read(object, id), typeClass.exists(object, id)  
     
-def hasIDKeyData(object, name, type = None):
-    if not type: type = getIDType(name)
+def hasIDKeyData(object, id, type = None):
+    if not type: type = getIDType(id)
     typeClass = getIDTypeClass(type)
-    return typeClass.exists(object, name)
+    return typeClass.exists(object, id)
     
-def getIDKeyData(object, name, type = None):
-    if not type: type = getIDType(name)
+def getIDKeyData(object, id, type = None):
+    if not type: type = getIDType(id)
     typeClass = getIDTypeClass(type)
-    return typeClass.read(object, name)
+    return typeClass.read(object, id)
     
-def setIDKeyData(object, name, type, data):
+def setIDKeyData(object, id, type, data):
     typeClass = getIDTypeClass(type)
-    typeClass.write(object, name, data)
+    typeClass.write(object, id, data)
+ 
     
-def getIDType(name):
+def getIDType(id):
+    return getItem(id).type
+
+def getItem(id):
     for item in getIDKeys():
-        if name == item.name: return item.type    
+        if id == item.id: return item
     
 def getIDTypeClass(type):
     return idTypes[type]    
@@ -56,30 +60,31 @@ def getIDKeySettings():
     return bpy.context.scene.mn_settings.idKeys
 
     
-def createIDKey(name, type):
-    if not isCreatable(name, type): return
+def createIDKey(id, type):
+    if not isCreatable(id, type): return
     idKeys = getIDKeys()
     item = idKeys.add()
-    item.name = name
+    item.name = id
+    item.id = id
     item.type = type
     
-def isCreatable(name, type):
-    if idKeyExists(name): return False
-    if not isValidCombination(name, type): return False
+def isCreatable(id, type):
+    if idKeyExists(id): return False
+    if not isValidCombination(id, type): return False
     return True
     
-def idKeyExists(name):
+def idKeyExists(id):
     for item in getIDKeys():
-        if item.name == name: return True
+        if item.id == id: return True
     return False
     
-def isValidCombination(name, type):
-    if "|" in name: return False
+def isValidCombination(id, type):
+    if "|" in id: return False
     if "|" in type: return False
-    if name == "": return False
+    if id == "": return False
     if type not in idTypes.keys(): return False
-    if name in forcedIDKeyTypes:
-        if forcedIDKeyTypes[name] != type: return False
+    if id in forcedIDKeyTypes:
+        if forcedIDKeyTypes[id] != type: return False
     return True
     
  
@@ -103,59 +108,59 @@ prefix = "AN "
     
 class TransformsIDType:
     @classmethod
-    def create(cls, object, name):
-        cls.write(object, name, ((0.0, 0.0, 0.0), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)))
+    def create(cls, object, id):
+        cls.write(object, id, ((0.0, 0.0, 0.0), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)))
         
     @staticmethod
-    def remove(object, name):
-        removeProp(object, prefix + name + " Location")
-        removeProp(object, prefix + name + " Rotation")
-        removeProp(object, prefix + name + " Scale")
+    def remove(object, id):
+        removeProp(object, prefix + id + " Location")
+        removeProp(object, prefix + id + " Rotation")
+        removeProp(object, prefix + id + " Scale")
 
     @staticmethod
-    def exists(object, name):
-        return hasProp(object, prefix + name + " Location") and \
-               hasProp(object, prefix + name + " Rotation") and \
-               hasProp(object, prefix + name + " Scale")
+    def exists(object, id):
+        return hasProp(object, prefix + id + " Location") and \
+               hasProp(object, prefix + id + " Rotation") and \
+               hasProp(object, prefix + id + " Scale")
 
     @staticmethod
-    def read(object, name):
-        location = getProp(object, prefix + name + " Location", (0, 0, 0))
-        rotation = getProp(object, prefix + name + " Rotation", (0, 0, 0))
-        scale = getProp(object, prefix + name + " Scale", (1, 1, 1))
+    def read(object, id):
+        location = getProp(object, prefix + id + " Location", (0, 0, 0))
+        rotation = getProp(object, prefix + id + " Rotation", (0, 0, 0))
+        scale = getProp(object, prefix + id + " Scale", (1, 1, 1))
         
         return Vector(location), Vector(rotation), Vector(scale)
         
     @staticmethod
-    def write(object, name, data):
-        setProp(object, prefix + name + " Location", data[0])
-        setProp(object, prefix + name + " Rotation", data[1])
-        setProp(object, prefix + name + " Scale", data[2])
+    def write(object, id, data):
+        setProp(object, prefix + id + " Location", data[0])
+        setProp(object, prefix + id + " Rotation", data[1])
+        setProp(object, prefix + id + " Scale", data[2])
         
     @staticmethod
-    def draw(layout, object, name, advanced = False):
+    def draw(layout, object, id, advanced = False):
         row = layout.row()
         
         col = row.column(align = True)
         col.label("Location")
-        col.prop(object, toPath(prefix + name + " Location"), text = "")
+        col.prop(object, toPath(prefix + id + " Location"), text = "")
         
         col = row.column(align = True)
         col.label("Rotation")
-        col.prop(object, toPath(prefix + name + " Rotation"), text = "")
+        col.prop(object, toPath(prefix + id + " Rotation"), text = "")
         
         col = row.column(align = True)
         col.label("Scale")
-        col.prop(object, toPath(prefix + name + " Scale"), text = "")
+        col.prop(object, toPath(prefix + id + " Scale"), text = "")
         
     @staticmethod
-    def drawOperators(layout, object, name):
+    def drawOperators(layout, object, id):
         row = layout.row(align = True)
         props = row.operator("mn.set_current_transforms", text = "Use Current Transforms")
-        props.name = name
+        props.id = id
         props.allSelectedObjects = False
         props = row.operator("mn.set_current_transforms", icon = "WORLD", text = "")
-        props.name = name
+        props.id = id
         props.allSelectedObjects = True
         
         
@@ -163,33 +168,34 @@ class SimpleIDType:
     default = ""
 
     @classmethod
-    def create(cls, object, name):
-        cls.write(object, name, cls.default)
+    def create(cls, object, id):
+        cls.write(object, id, cls.default)
         
     @staticmethod
-    def remove(object, name):
-        removeProp(object, prefix + name)
+    def remove(object, id):
+        removeProp(object, prefix + id)
 
     @staticmethod
-    def exists(object, name):
-        return hasProp(object, prefix + name)
+    def exists(object, id):
+        return hasProp(object, prefix + id)
 
     @classmethod
-    def read(cls, object, name):
-        value = getProp(object, prefix + name, cls.default)
+    def read(cls, object, id):
+        value = getProp(object, prefix + id, cls.default)
         return value
         
     @staticmethod
-    def write(object, name, data):
-        setProp(object, prefix + name, data)
+    def write(object, id, data):
+        setProp(object, prefix + id, data)
         
     @classmethod
-    def draw(cls, layout, object, name, advanced = False):
-        text = "" if advanced else name
-        layout.prop(object, toPath(prefix + name), text = text) 
+    def draw(cls, layout, object, id, advanced = False):
+        item = getItem(id)
+        text = "" if advanced else item.name
+        layout.prop(object, toPath(prefix + id), text = text) 
 
     @staticmethod
-    def drawOperators(layout, object, name):
+    def drawOperators(layout, object, id):
         pass
         
         
@@ -203,13 +209,13 @@ class StringIDType(SimpleIDType):
     default = ""
         
     @staticmethod
-    def drawOperators(layout, object, name):
+    def drawOperators(layout, object, id):
         row = layout.row(align = True)
         props = row.operator("mn.set_current_texts", text = "Use Current Texts")
-        props.name = name
+        props.id = id
         props.allSelectedObjects = False
         props = row.operator("mn.set_current_texts", icon = "WORLD", text = "")
-        props.name = name
+        props.id = id
         props.allSelectedObjects = True    
         
         
@@ -256,7 +262,7 @@ class IDKeysManagerPanel(bpy.types.Panel):
             hideIcon = "RESTRICT_VIEW_ON" if item.hide else "RESTRICT_VIEW_OFF"
             row.prop(item, "hide", icon = hideIcon, emboss = False, icon_only = True)
             props = row.operator("mn.remove_id_key", icon = "X", emboss = False, text = "")
-            props.name = item.name
+            props.id = item.id
             
     def drawNewKeyRow(self, layout):
         idKeySettings = bpy.context.scene.mn_settings.idKeys   
@@ -293,30 +299,30 @@ class IDKeyPanel(bpy.types.Panel):
             if item.hide: continue
             box = layout.box()
             
-            keyName, keyType = item.name, item.type
+            keyName, keyType, keyID = item.name, item.type, item.id
             typeClass = getIDTypeClass(keyType)
-            keyExists = typeClass.exists(object, keyName)
+            keyExists = typeClass.exists(object, keyID)
         
-            self.drawHeader(box, object, keyName, keyType, keyExists)            
+            self.drawHeader(box, object, keyName, keyType, keyID, keyExists)            
             if keyExists: 
-                typeClass.draw(box, object, keyName, advanced = True)
-            typeClass.drawOperators(box, object, keyName)
+                typeClass.draw(box, object, keyID, advanced = True)
+            typeClass.drawOperators(box, object, keyID)
             
     def drawKeysForObjectSimple(self, layout, object):
         for item in getIDKeys():
             if item.hide: continue
-            keyName, keyType = item.name, item.type
+            keyName, keyType, keyID = item.name, item.type, item.id
             typeClass = getIDTypeClass(keyType)
-            keyExists = typeClass.exists(object, keyName)
+            keyExists = typeClass.exists(object, keyID)
             if keyExists:
-                typeClass.draw(layout, object, keyName, advanced = False)
+                typeClass.draw(layout, object, keyID, advanced = False)
             else: 
                 props = layout.operator("mn.create_key_on_object", icon = "NEW",  text = keyName)
-                props.name = keyName
+                props.id = keyID
                 props.type = keyType
                 props.objectName = object.name
     
-    def drawHeader(self, box, object, keyName, keyType, keyExists):
+    def drawHeader(self, box, object, keyName, keyType, keyID, keyExists):
         row = box.row()
         
         subRow = row.row()
@@ -331,7 +337,7 @@ class IDKeyPanel(bpy.types.Panel):
             props = row.operator("mn.remove_key_from_object", icon = "X", emboss = False, text = "")
         else:
             props = row.operator("mn.create_key_on_object", icon = "NEW", emboss = False,  text = "")
-        props.name = keyName
+        props.id = keyID
         props.type = keyType
         props.objectName = object.name
 
@@ -347,12 +353,12 @@ class NewIdKey(bpy.types.Operator):
     
     @classmethod
     def poll(cls, context):
-        name, type = cls.getNewKeyData()
-        return isCreatable(name, type)
+        id, type = cls.getNewKeyData()
+        return isCreatable(id, type)
     
     def execute(self, context):
-        name, type = self.getNewKeyData()
-        createIDKey(name, type)
+        id, type = self.getNewKeyData()
+        createIDKey(id, type)
         getIDKeySettings().newKeyName = ""
         context.area.tag_redraw()
         return {'FINISHED'}
@@ -368,7 +374,7 @@ class RemoveIDKey(bpy.types.Operator):
     bl_label = "Remove ID Key"
     bl_description = "Remove this key"
     
-    name = StringProperty()
+    id = StringProperty()
     
     def invoke(self, context, event):
         return context.window_manager.invoke_confirm(self, event)
@@ -376,7 +382,7 @@ class RemoveIDKey(bpy.types.Operator):
     def execute(self, context):
         idKeys = context.scene.mn_settings.idKeys
         for i, item in enumerate(idKeys.keys):
-            if item.name == self.name:
+            if item.id == self.id:
                 idKeys.keys.remove(i)
         context.area.tag_redraw()
         return {'FINISHED'}
@@ -387,13 +393,13 @@ class CreateKeyOnObject(bpy.types.Operator):
     bl_label = "Create Key on Object"
     bl_description = "Create the key on this object"
     
-    name = StringProperty()
+    id = StringProperty()
     type = StringProperty()
     objectName = StringProperty()
     
     def execute(self, context):
         typeClass = getIDTypeClass(self.type)
-        typeClass.create(bpy.data.objects.get(self.objectName), self.name)
+        typeClass.create(bpy.data.objects.get(self.objectName), self.id)
         context.area.tag_redraw()
         return {'FINISHED'}
         
@@ -403,7 +409,7 @@ class RemoveKeyFromObject(bpy.types.Operator):
     bl_label = "Remove Key from Object"
     bl_description = "Remove the key from this object"
     
-    name = StringProperty()
+    id = StringProperty()
     type = StringProperty()
     objectName = StringProperty()
     
@@ -412,7 +418,7 @@ class RemoveKeyFromObject(bpy.types.Operator):
     
     def execute(self, context):
         typeClass = getIDTypeClass(self.type)
-        typeClass.remove(bpy.data.objects.get(self.objectName), self.name)
+        typeClass.remove(bpy.data.objects.get(self.objectName), self.id)
         context.area.tag_redraw()
         return {'FINISHED'}        
         
@@ -422,7 +428,7 @@ class SetCurrentTransforms(bpy.types.Operator):
     bl_label = "Set Current Transforms"
     bl_description = "Set current transforms (World icon means to do this for all selected objects)"
     
-    name = StringProperty()
+    id = StringProperty()
     allSelectedObjects = BoolProperty()
     
     def execute(self, context):
@@ -430,7 +436,7 @@ class SetCurrentTransforms(bpy.types.Operator):
         else: objects = [context.active_object]
         
         for object in objects:
-            TransformsIDType.write(object, self.name, (object.location, object.rotation_euler, object.scale))
+            TransformsIDType.write(object, self.id, (object.location, object.rotation_euler, object.scale))
         return {'FINISHED'}
         
         
@@ -439,7 +445,7 @@ class SetCurrentTexts(bpy.types.Operator):
     bl_label = "Set Current Texts"
     bl_description = "Set current texts (World icon means to do this for all selected objects)"
     
-    name = StringProperty()
+    id = StringProperty()
     allSelectedObjects = BoolProperty()
     
     def execute(self, context):
@@ -447,5 +453,5 @@ class SetCurrentTexts(bpy.types.Operator):
         else: objects = [context.active_object]
         
         for object in objects:
-            StringIDType.write(object, self.name, getattr(object.data, "body", ""))
+            StringIDType.write(object, self.id, getattr(object.data, "body", ""))
         return {'FINISHED'} 

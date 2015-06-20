@@ -64,6 +64,7 @@ class DeveloperSettings(bpy.types.PropertyGroup):
   
 class IDKeyType(bpy.types.PropertyGroup):
     name = StringProperty()
+    id = StringProperty()
     type = StringProperty()
     hide = BoolProperty(default = False)
     

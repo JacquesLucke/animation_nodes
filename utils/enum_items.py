@@ -9,9 +9,12 @@ def enumItemsGenerator(function):
             if "name" not in data: data["name"] = data["id"]
             if "description" not in data: data["description"] = ""
             if "icon" not in data: data["icon"] = "NONE"
-            if "number" not in data: data["number"] = int(hash(data["id"]) % 1e9)
+            if "number" not in data: data["number"] = hashText(data["id"])
             items.append((data["id"], data["name"], data["description"], data["icon"], data["number"]))
         if len(items) == 0:
             items = [("NONE", "NONE", "")]
         return items
     return wrapper
+    
+def hashText(text):
+    return int(hash(text) % 1e9)
