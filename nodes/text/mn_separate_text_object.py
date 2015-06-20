@@ -4,7 +4,7 @@ from bpy.types import Node
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from mathutils import Vector, Matrix
-from ... mn_keyframes import setKeyframe
+from ... id_keys import setIDKeyData, createIDKey
 from ... nodes.mn_node_helper import getMainObjectContainer
 
 idPropertyName = "text separation node id"
@@ -70,11 +70,15 @@ class mn_SeparateTextObject(Node, AnimationNode):
         if source.data is None: return
         source.hide = False
         
+        createIDKey("Initial Transforms", "Transforms")
+        createIDKey("Initial Text", "String")
+        
         objects = splitTextObject(source)
         for i, object in enumerate(objects):
             object[idPropertyName] = self.currentID
             object[indexPropertyName] = i
-            setKeyframe(object, "Initial Transforms", (object.location, object.rotation_euler, object.scale))
+            setIDKeyData(object, "Initial Transforms", "Transforms", (object.location, object.rotation_euler, object.scale))
+            setIDKeyData(object, "Initial Text", "String", getattr(object.data, "body", ""))
         self.objectCount = len(objects)
         
         onlySelectList(objects)
