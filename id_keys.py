@@ -257,7 +257,7 @@ class IDKeysManagerPanel(bpy.types.Panel):
         col = box.column(align = True)
         for item in idKeys:
             row = col.row()
-            row.label(item.name)
+            row.prop(item, "name", text = "")
             row.label(item.type)
             hideIcon = "RESTRICT_VIEW_ON" if item.hide else "RESTRICT_VIEW_OFF"
             row.prop(item, "hide", icon = hideIcon, emboss = False, icon_only = True)
@@ -303,7 +303,7 @@ class IDKeyPanel(bpy.types.Panel):
             typeClass = getIDTypeClass(keyType)
             keyExists = typeClass.exists(object, keyID)
         
-            self.drawHeader(box, object, item, keyExists)            
+            self.drawHeader(box, object, keyName, keyType, keyID, keyExists)            
             if keyExists: 
                 typeClass.draw(box, object, keyID, advanced = True)
             typeClass.drawOperators(box, object, keyID)
@@ -322,14 +322,12 @@ class IDKeyPanel(bpy.types.Panel):
                 props.type = keyType
                 props.objectName = object.name
     
-    def drawHeader(self, box, object, item, keyExists):
-        keyName, keyType, keyID = item.name, item.type, item.id
-        
+    def drawHeader(self, box, object, keyName, keyType, keyID, keyExists):
         row = box.row()
         
         subRow = row.row()
         subRow.alignment = "LEFT"
-        subRow.prop(item, "name", text = "")
+        subRow.label(keyName)
         
         subRow = row.row()
         subRow.alignment = "RIGHT"
