@@ -12,10 +12,16 @@ class mn_ObjectIDKey(Node, AnimationNode):
     
     def selectedKey_changed(self, context):
         self.isKeySelected = self.selectedKey != "NONE"
+        
+        rebuild = True
         if self.isKeySelected:
-            self.keyName, self.keyType = self.selectedKey.split("|")
-        self.buildOutputSockets()
-        nodeTreeChanged()
+            name, type = self.selectedKey.split("|")
+            rebuild = self.keyName != name or self.keyType != type
+            self.keyName, self.keyType = name, type
+            
+        if rebuild:
+            self.buildOutputSockets()
+            nodeTreeChanged()
     
     selectedKey = EnumProperty(items = getIDKeyItems, name = "ID Key", update = selectedKey_changed)
     keyName = StringProperty()
@@ -36,16 +42,17 @@ class mn_ObjectIDKey(Node, AnimationNode):
         self.outputs.clear()
         if self.isKeySelected:
             self.outputs.new("mn_BooleanSocket", "Exists")
-        if self.keyType == "Transforms":
-            self.outputs.new("mn_VectorSocket", "Location")
-            self.outputs.new("mn_VectorSocket", "Rotation")
-            self.outputs.new("mn_VectorSocket", "Scale")
-        if self.keyType == "Float":
-            self.outputs.new("mn_FloatSocket", "Float")
-        if self.keyType == "Integer":
-            self.outputs.new("mn_IntegerSocket", "Integer")
-        if self.keyType == "String":
-            self.outputs.new("mn_StringSocket", "String")
+                        
+            if self.keyType == "Transforms":
+                self.outputs.new("mn_VectorSocket", "Location")
+                self.outputs.new("mn_VectorSocket", "Rotation")
+                self.outputs.new("mn_VectorSocket", "Scale")
+            if self.keyType == "Float":
+                self.outputs.new("mn_FloatSocket", "Float")
+            if self.keyType == "Integer":
+                self.outputs.new("mn_IntegerSocket", "Integer")
+            if self.keyType == "String":
+                self.outputs.new("mn_StringSocket", "String")
         allowCompiling()
         
     def getInputSocketNames(self):
