@@ -47,7 +47,7 @@ class mn_ConvertNode(Node, AnimationNode):
         forbidCompiling()
         connections = getConnectionDictionaries(self)
         self.outputs.clear()
-        self.outputs.new(getSocketNameByDataType(self.convertType), "New")
+        self.outputs.new(getIdNameFromDataType(self.convertType), "New")
         tryToSetConnectionDictionaries(self, connections)
         allowCompiling()
         
@@ -96,8 +96,8 @@ else: $new$ = None
             codeLines = []
             codeLines.append("try:")
             codeLines.append("    if hasattr(%old%[0], '__call__'): $new$ = %old%")
-            codeLines.append("    else: $new$ = (... utils.mn_interpolation_utils.linear, None)")
-            codeLines.append("except: $new$ = (... utils.mn_interpolation_utils.linear, None)")
+            codeLines.append("    else: $new$ = (animation_nodes.algorithms.interpolation.linear, None)")
+            codeLines.append("except: $new$ = (animation_nodes.algorithms.interpolation.linear, None)")
             return "\n".join(codeLines)
         elif t == "Vertex":
             codeLines = []
@@ -116,6 +116,5 @@ else: $new$ = None
             
     def getModuleList(self):
         t = self.convertType
-        if t == "Interpolation": return ["... utils.mn_interpolation_utils"]
         if t == "Vector": return ["mathutils"]
         return []

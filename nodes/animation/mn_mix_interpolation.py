@@ -2,7 +2,7 @@ import bpy
 from bpy.types import Node
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
-from ... utils.mn_interpolation_utils import *
+from ... algorithms.interpolation import *
 
 class mn_MixInterpolation(Node, AnimationNode):
     bl_idname = "mn_MixInterpolation"

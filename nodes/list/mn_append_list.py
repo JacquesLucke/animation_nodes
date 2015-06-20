@@ -41,7 +41,7 @@ class mn_AppendListNode(Node, AnimationNode):
             nodeTree.links.new(self.inputs.get("List"), listInput)
             
         if listInput is None and elementInput is not None and len(listOutputs) == 0:
-            self.generateSockets(getListSocketType(elementInput.bl_idname))
+            self.generateSockets(getListSocketIdName(elementInput.bl_idname))
             nodeTree.links.new(self.inputs.get("Element"), elementInput)
             
         if listInput is None and elementInput is None and len(listOutputs) == 1:
@@ -52,7 +52,7 @@ class mn_AppendListNode(Node, AnimationNode):
         
     def generateSockets(self, listIdName = "mn_ObjectListSocket"):
         if listIdName is None: return
-        baseIdName = getBaseSocketType(listIdName)
+        baseIdName = getListBaseSocketIdName(listIdName)
         if baseIdName is None: return
         if listIdName == getattr(self.inputs.get("List"), "bl_idname", None): return
         

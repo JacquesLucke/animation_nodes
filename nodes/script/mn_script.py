@@ -5,7 +5,7 @@ from ... mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompilin
 from ... mn_utils import *
 from ... utils.mn_node_utils import NodeTreeInfo
 from ... utils.mn_name_utils import getPossibleSocketName, convertVariableNameToUI
-from ... sockets.mn_socket_info import getSocketNameItems, getSocketNameByDataType
+from ... sockets.mn_socket_info import getSocketDataTypeItems, getIdNameFromDataType
 
 emptySocketName = "New Socket"
 
@@ -33,7 +33,7 @@ class mn_ScriptNode(Node, AnimationNode):
     
     textBlockName = bpy.props.StringProperty(name = "Script", default = "", description = "Choose the script you want to execute in this node")
     errorMessage = bpy.props.StringProperty(name = "Error Message", default = "")
-    selectedSocketType = bpy.props.EnumProperty(name = "Selected Socket Type", items = getSocketNameItems)
+    selectedSocketType = bpy.props.EnumProperty(name = "Selected Socket Type", items = getSocketDataTypeItems)
     makeFromClipboard = bpy.props.BoolProperty(default = False, update = makeFromClipboardChanged)
     hideEditableElements = bpy.props.BoolProperty(name = "Hide Editable Elements", default = False, update = hideEditableElementsChanged)
     enableUINameConversion = bpy.props.BoolProperty(name = "Auto Socket Names", default = True, update = enableUINameConversionChanged)
@@ -173,14 +173,14 @@ class mn_ScriptNode(Node, AnimationNode):
                     continue
                 match = re.search("\s*(\w+)\s*-\s*(.+)", line)
                 if match:
-                    self.appendSocket(self.inputs, getSocketNameByDataType(match.group(2).strip()), match.group(1))
+                    self.appendSocket(self.inputs, getIdNameFromDataType(match.group(2).strip()), match.group(1))
             elif state == "outputs":
                 if re.match("[Ss]cript:", line):
                     state = "script"
                     continue
                 match = re.search("\s*(\w+)\s*-\s*(.+)", line)
                 if match:
-                    self.appendSocket(self.outputs, getSocketNameByDataType(match.group(2).strip()), match.group(1))
+                    self.appendSocket(self.outputs, getIdNameFromDataType(match.group(2).strip()), match.group(1))
             elif state == "script":
                 scriptLines.append(line)
                 
@@ -246,7 +246,7 @@ class AppendSocket(bpy.types.Operator):
 
     def execute(self, context):
         node = getNode(self.nodeTreeName, self.nodeName)
-        type = getSocketNameByDataType(node.selectedSocketType)
+        type = getIdNameFromDataType(node.selectedSocketType)
         if self.makeOutputSocket:
             node.appendSocket(node.outputs, type, getPossibleSocketName(node, "socket"))
         else:

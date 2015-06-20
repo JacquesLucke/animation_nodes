@@ -30,9 +30,7 @@ class mn_GroupCaller(Node, AnimationNode):
     def draw_buttons(self, context, layout):
         row = layout.row(align = True)
         row.prop(self, "selectedGroup", text = "")
-        setActive = row.operator("mn.update_active_group", text = "", icon = "FILE_REFRESH")
-        setActive.nodeTreeName = self.id_data.name
-        setActive.nodeName = self.name
+        self.callFunctionFromUI(row, "updateActiveGroup", text = "", icon = "FILE_REFRESH")
         layout.label("Group: " + self.activeGroup)
         
     def updateSockets(self, socketStartValue = (None, None), inputRemoved = False, outputRemoved = False):
@@ -68,16 +66,3 @@ class mn_GroupCaller(Node, AnimationNode):
         
     def getInputNode(self):
         return getNodeFromTypeWithAttribute("mn_GroupInput", "groupName", self.activeGroup)
-        
-        
-class UpdateActiveGroup(bpy.types.Operator):
-    bl_idname = "mn.update_active_group"
-    bl_label = "Update Active Group"
-    
-    nodeTreeName = bpy.props.StringProperty()
-    nodeName = bpy.props.StringProperty()
-    
-    def execute(self, context):
-        node = getNode(self.nodeTreeName, self.nodeName)
-        node.updateActiveGroup()
-        return {'FINISHED'}

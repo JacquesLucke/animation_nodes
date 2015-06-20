@@ -49,7 +49,7 @@ random.shuffle($shuffledList$) """
     def generateSockets(self, listIdName = "mn_ObjectListSocket"):
         if listIdName is None: return
         if listIdName == getattr(self.inputs.get("List"), "bl_idname", None): return
-        if not isListSocketType(listIdName): return
+        if not isListSocketIdName(listIdName): return
         
         forbidCompiling()
         self.inputs.clear()

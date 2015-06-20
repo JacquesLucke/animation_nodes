@@ -11,10 +11,11 @@ class mn_VectorSocket(mn_BaseSocket, mn_SocketProperties):
     drawColor = (0.05, 0.05, 0.8, 0.7)
     
     vector = bpy.props.FloatVectorProperty(default = [0, 0, 0], update = nodePropertyChanged)
+    showName = bpy.props.BoolProperty(default = True)
     
     def drawInput(self, layout, node, text):
         col = layout.column(align = True)
-        col.label(text)
+        if self.showName: col.label(text)
         col.prop(self, "vector", index = 0, text = "X")
         col.prop(self, "vector", index = 1, text = "Y")
         col.prop(self, "vector", index = 2, text = "Z")

@@ -6,13 +6,13 @@ from ... data_structures.mesh import *
 
 class mn_SetMeshOnObject(Node, AnimationNode):
     bl_idname = "mn_SetMeshOnObject"
-    bl_label = "Set Mesh"
+    bl_label = "Set Mesh on Object"
     
     def init(self, context):
         forbidCompiling()
         socket = self.inputs.new("mn_ObjectSocket", "Object")
         socket.showName = False
-        socket.createObject = True
+        socket.objectCreationType = "MESH"
         self.inputs.new("mn_MeshSocket", "Mesh")
         self.outputs.new("mn_ObjectSocket", "Object")
         allowCompiling()

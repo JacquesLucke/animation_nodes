@@ -4,7 +4,7 @@ from bpy.types import Node
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from mathutils import Vector, Matrix
-from ... mn_keyframes import setKeyframe
+from ... id_keys import setIDKeyData, createIDKey
 from ... nodes.mn_node_helper import getMainObjectContainer
 
 idPropertyName = "text separation node id"
@@ -46,9 +46,10 @@ class mn_SeparateTextObject(Node, AnimationNode):
         layout.prop(self, "convertToMesh")
         layout.prop_search(self, "materialName", bpy.data, "materials", text="Material", icon="MATERIAL_DATA")
         
-        update = layout.operator("mn.update_text_separation_node", text = "Update", icon = "FILE_REFRESH")
-        update.nodeTreeName = self.id_data.name
-        update.nodeName = self.name
+        self.callFunctionFromUI(layout, "updateSeparation",
+            text = "Update", 
+            description = "Recreate the individual characters from the source object",
+            icon = "FILE_REFRESH")
         
     def draw_buttons_ext(self, context, layout):
         layout.prop(self, "parentLetters")
@@ -69,11 +70,15 @@ class mn_SeparateTextObject(Node, AnimationNode):
         if source.data is None: return
         source.hide = False
         
+        createIDKey("Initial Transforms", "Transforms")
+        createIDKey("Initial Text", "String")
+        
         objects = splitTextObject(source)
         for i, object in enumerate(objects):
             object[idPropertyName] = self.currentID
             object[indexPropertyName] = i
-            setKeyframe(object, "Initial Transforms", (object.location, object.rotation_euler, object.scale))
+            setIDKeyData(object, "Initial Transforms", "Transforms", (object.location, object.rotation_euler, object.scale))
+            setIDKeyData(object, "Initial Text", "String", getattr(object.data, "body", ""))
         self.objectCount = len(objects)
         
         onlySelectList(objects)
@@ -201,18 +206,6 @@ def setMaterialOnObjects(objects, material):
     for object in objects:
         object.active_material = material
         
-class UpdateTextSeparationNode(bpy.types.Operator):
-    bl_idname = "mn.update_text_separation_node"
-    bl_label = "Update Text Separation"
-    
-    nodeTreeName = bpy.props.StringProperty()
-    nodeName = bpy.props.StringProperty()
-        
-    def execute(self, context):
-        obj = getActive()
-        node = getNode(self.nodeTreeName, self.nodeName)
-        node.updateSeparation()
-        return {'FINISHED'}
 
 class AssignActiveObjectToTextSeparationNode(bpy.types.Operator):
     bl_idname = "mn.assign_active_object_to_text_separation_node"

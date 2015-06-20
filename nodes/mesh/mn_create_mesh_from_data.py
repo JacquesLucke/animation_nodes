@@ -33,6 +33,9 @@ class mn_CreateMeshFromData(Node, AnimationNode):
         except IndexError as e:
             bm = bmesh.new()
             self.errorMessage = "Missing vertices"
+        except ValueError as e:
+            bm = bmesh.new()
+            self.errorMessage = "Multiple identical edges or polygons"
         return bm
             
 def getBMeshFromMeshData(meshData):

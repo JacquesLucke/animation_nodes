@@ -21,7 +21,7 @@ def drawMenu(self, context):
     layout.separator()
     layout.menu("mn.object_menu", text = "Object")
     layout.menu("mn.mesh_menu", text = "Mesh")
-    layout.menu("mn.curve_menu", text = "Curve")
+    layout.menu("mn.spline_menu", text = "Spline")
     layout.separator()
     layout.menu("mn.sound_menu", text = "Sound")
     layout.menu("mn.material_menu", text = "Material")
@@ -29,7 +29,6 @@ def drawMenu(self, context):
     layout.menu("mn.particles_menu", text = "Particles")
     layout.separator()
     layout.menu("mn.script_menu", text = "Script")
-    layout.menu("mn.debug_menu", text = "Debug")
     layout.menu("mn.system_menu", text = "System") 
 
 def drawNodeTreeChooser(layout, context):
@@ -55,11 +54,15 @@ class NumberMenu(bpy.types.Menu):
         layout = self.layout
         insertNode(layout, "mn_IntegerInputNode", "Integer")
         insertNode(layout, "mn_FloatInputNode", "Float")
-        insertNode(layout, "mn_FloatListInputNode", "Float List")
-        insertNode(layout, "mn_RandomNumberNode", "Random")
+        insertNode(layout, "mn_FloatListInputNode", "List")
+        insertNode(layout, "mn_FloatRangeListNode", "Range")
+        layout.separator()
+        insertNode(layout, "mn_RandomNumberNode", "Randomize")
         insertNode(layout, "mn_FloatWiggle", "Wiggle")
         insertNode(layout, "mn_AnimateFloatNode", "Animate")
+        layout.separator()
         insertNode(layout, "mn_FloatClamp", "Clamp")
+        insertNode(layout, "mn_ConvertAngle", "Convert Angle")
         insertNode(layout, "mn_FloatMathNode", "Math")
         
 class VectorMenu(bpy.types.Menu):
@@ -68,17 +71,19 @@ class VectorMenu(bpy.types.Menu):
     
     def draw(self, context):
         layout = self.layout
+        insertNode(layout, "mn_SeparateVector", "Separate")   
         insertNode(layout, "mn_CombineVector", "Combine")       
-        insertNode(layout, "mn_SeparateVector", "Separate")       
-        insertNode(layout, "mn_RandomVectorNode", "Random")       
+        insertNode(layout, "mn_VectorFromValue", "From Value") 
+        layout.separator()
+        insertNode(layout, "mn_RandomVectorNode", "Randomize")       
         insertNode(layout, "mn_VectorWiggle", "Wiggle")       
-        insertNode(layout, "mn_AnimateVectorNode", "Animate")       
+        insertNode(layout, "mn_AnimateVectorNode", "Animate")  
+        layout.separator()
         insertNode(layout, "mn_VectorLengthNode", "Length")       
         insertNode(layout, "mn_VectorDistanceNode", "Distance")       
-        insertNode(layout, "mn_TransfromVector", "Transform")       
-        insertNode(layout, "mn_VectorMathNode", "Math")       
-        insertNode(layout, "mn_VectorFromValue", "From Value")       
+        insertNode(layout, "mn_VectorMathNode", "Math")  
         insertNode(layout, "mn_DirectionToRotation", "Direction to Rotation")       
+        insertNode(layout, "mn_TransformVector", "Transform")       
                 
 class MatrixMenu(bpy.types.Menu):
     bl_idname = "mn.matrix_menu"
@@ -86,13 +91,14 @@ class MatrixMenu(bpy.types.Menu):
     
     def draw(self, context):
         layout = self.layout
+        insertNode(layout, "mn_DecomposeMatrix", "Decompose") 
+        insertNode(layout, "mn_ComposeMatrix", "Compose")                       
+        layout.separator()
         insertNode(layout, "mn_TranslationMatrix", "Translation")                       
         insertNode(layout, "mn_RotationMatrix", "Rotation")                       
         insertNode(layout, "mn_ScaleMatrix", "Scale")
         insertNode(layout, "mn_MatrixCombine", "Combine")                     
-        layout.separator()
-        insertNode(layout, "mn_ComposeMatrix", "Compose")                       
-        insertNode(layout, "mn_DecomposeMatrix", "Decompose")                     
+        layout.separator()                   
         insertNode(layout, "mn_AnimateMatrixNode", "Animate")                     
         insertNode(layout, "mn_InvertMatrix", "Invert")                     
         insertNode(layout, "mn_MatrixMath", "Math")                     
@@ -103,19 +109,22 @@ class TextMenu(bpy.types.Menu):
     
     def draw(self, context):
         layout = self.layout
-        insertNode(layout, "mn_StringInputNode", "Text")                   
-        insertNode(layout, "mn_StringListInputNode", "Text List")                   
-        insertNode(layout, "mn_RandomStringNode", "Random")  
-        insertNode(layout, "mn_CharactersNode", "Characters")                   
+        insertNode(layout, "mn_StringInputNode", "Input")                   
+        insertNode(layout, "mn_StringListInputNode", "List")                   
+        insertNode(layout, "mn_RandomStringNode", "Randomize")  
+        insertNode(layout, "mn_CharactersNode", "Characters")  
+        layout.separator()
         insertNode(layout, "mn_SplitText", "Split")                   
-        insertNode(layout, "mn_CombineStringsNode", "Combine")                   
+        insertNode(layout, "mn_CombineStringsNode", "Combine")     
+        layout.separator()
         insertNode(layout, "mn_ReplicateStringsNode", "Replicate")                   
-        insertNode(layout, "mn_SubstringNode", "Trim Text")                   
-        insertNode(layout, "mn_StringAnalyzeNode", "Analyze Text")   
-        insertNode(layout, "mn_TextBlockReader", "Text Block Reader")                     
-        insertNode(layout, "mn_TextBlockWriter", "Text Block Writer") 
-        insertNode(layout, "mn_SeparateTextObject", "Separate Text Object")                
-        insertNode(layout, "mn_TextOutputNode", "Text Object Output")   
+        insertNode(layout, "mn_TrimText", "Trim")                   
+        insertNode(layout, "mn_StringLengthNode", "Length")
+        layout.separator()
+        insertNode(layout, "mn_TextBlockReader", "Block Reader")                     
+        insertNode(layout, "mn_TextBlockWriter", "Block Writer") 
+        insertNode(layout, "mn_SeparateTextObject", "Object Separate")                
+        insertNode(layout, "mn_TextOutputNode", "Object Output")   
         
 class BooleanMenu(bpy.types.Menu):
     bl_idname = "mn.boolean_menu"
@@ -146,12 +155,16 @@ class ListMenu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         insertNode(layout, "mn_GetListElementNode", "Get Element")             
-        insertNode(layout, "mn_SetListElementNode", "Set Element")             
-        insertNode(layout, "mn_GetListLengthNode", "Length")              
-        insertNode(layout, "mn_CombineListsNode", "Combine Lists")             
-        insertNode(layout, "mn_AppendListNode", "Append to List")             
+        insertNode(layout, "mn_SetListElementNode", "Set Element") 
+        layout.separator()
+        insertNode(layout, "mn_CreateList", "Create")             
+        insertNode(layout, "mn_AppendListNode", "Append")             
+        insertNode(layout, "mn_GetListLengthNode", "Get Length")
+        layout.separator()
         insertNode(layout, "mn_ShuffleListNode", "Shuffle")             
-        insertNode(layout, "mn_ReverseListNode", "Reverse")             
+        insertNode(layout, "mn_ReverseListNode", "Reverse")  
+        insertNode(layout, "mn_CombineListsNode", "Combine")  
+                    
         
 class ObjectMenu(bpy.types.Menu):
     bl_idname = "mn.object_menu"
@@ -159,18 +172,21 @@ class ObjectMenu(bpy.types.Menu):
     
     def draw(self, context):
         layout = self.layout
-        insertNode(layout, "mn_ObjectInputNode", "Object")                            
-        insertNode(layout, "mn_ObjectListInputNode", "Object List")                            
-        insertNode(layout, "mn_ObjectGroupInput", "Object Group")                     
+        insertNode(layout, "mn_ObjectInputNode", "Input")                            
+        insertNode(layout, "mn_ObjectListInputNode", "List")                            
+        insertNode(layout, "mn_ObjectGroupInput", "Group Input")
+        layout.separator()
         insertNode(layout, "mn_ObjectInfoNode", "Transforms Input") 
-        insertNode(layout, "mn_ObjectTransformsOutput", "Transforms Output")                             
-        insertNode(layout, "mn_ObjectMatrixInput", "Matrix input")   
+        insertNode(layout, "mn_ObjectTransformsOutput", "Transforms Output")
+        insertNode(layout, "mn_ObjectMatrixInput", "Matrix Input")   
         insertNode(layout, "mn_ObjectMatrixOutputNode", "Matrix Output")  
         insertNode(layout, "mn_ObjectAttributeInputNode", "Attribute Input")                            
-        insertNode(layout, "mn_ObjectAttributeOutputNode", "Attribute Output")                           
-        insertNode(layout, "mn_ObjectKeyframeInput", "AN Keyframe")                            
+        insertNode(layout, "mn_ObjectAttributeOutputNode", "Attribute Output")  
+        layout.separator()
+        insertNode(layout, "mn_ObjectIDKey", "ID Key")                            
         insertNode(layout, "mn_CopyObjectData", "Copy Data")  
-        insertNode(layout, "mn_CopyTransformsNode", "Copy Transforms")                            
+        insertNode(layout, "mn_CopyTransformsNode", "Copy Transforms")  
+        layout.separator()
         insertNode(layout, "mn_ObjectInstancer", "Instancer") 
         
 class MeshMenu(bpy.types.Menu):
@@ -179,15 +195,15 @@ class MeshMenu(bpy.types.Menu):
     
     def draw(self, context):
         layout = self.layout
-        insertNode(layout, "mn_ObjectMeshInfo", "Mesh Info")    
-        insertNode(layout, "mn_SeparateMeshData", "Separate Mesh Data")                                     
-        insertNode(layout, "mn_CombineMeshData", "Combine Mesh Data") 
-        insertNode(layout, "mn_AppendToMeshData", "Append to Mesh Data")
-        layout.menu("mn.mesh_operators_menu", text = "Mesh Operators")
+        insertNode(layout, "mn_ObjectMeshInfo", "Data Info")    
+        insertNode(layout, "mn_SeparateMeshData", "Separate")                                     
+        insertNode(layout, "mn_CombineMeshData", "Combine") 
+        insertNode(layout, "mn_AppendToMeshData", "Append")
+        layout.menu("mn.mesh_operators_menu", text = "Operators")
         layout.separator()                                    
-        insertNode(layout, "mn_CreateMeshFromData", "Mesh from Data")                                   
-        insertNode(layout, "mn_SetMeshOnObject", "Set Mesh on Object")
-        layout.menu("mn.mesh_finalizing_menu", text = "Mesh Finalizing")
+        insertNode(layout, "mn_CreateMeshFromData", "Create from Data")                                   
+        insertNode(layout, "mn_SetMeshOnObject", "Set on Object")
+        layout.menu("mn.mesh_finalizing_menu", text = "Tools")
         layout.separator()                                  
         insertNode(layout, "mn_VertexInfo", "Vertex Info")                                     
         insertNode(layout, "mn_PolygonInfo", "Polygon Info")                                     
@@ -213,20 +229,29 @@ class MeshFinalizingMenu(bpy.types.Menu):
         insertNode(layout, "mn_MeshRecalculateFaceNormals", "Recalculate Normals")         
         insertNode(layout, "mn_MakeObjectSmooth", "Smooth Object")         
         
-class CurveMenu(bpy.types.Menu):
-    bl_idname = "mn.curve_menu"
-    bl_label = "Curve Menu"
+class SplineMenu(bpy.types.Menu):
+    bl_idname = "mn.spline_menu"
+    bl_label = "Spline Menu"
     
     def draw(self, context):
         layout = self.layout
-        insertNode(layout, "mn_CurveInfoNode", "Curve Info")                                              
-        insertNode(layout, "mn_CurveEvaluatorNode", "Curve Evaluator")                                              
-        insertNode(layout, "mn_CurvePointProjectorNode", "Curve Point Projector")                                              
-        layout.separator()                                    
-        insertNode(layout, "mn_CurveLoftNode", "Loft")                                              
-        insertNode(layout, "mn_CurveRevolveNode", "Revolve")                                              
-        insertNode(layout, "mn_CurveSweepNode", "Sweep")                                              
-        insertNode(layout, "mn_CurveBirailNode", "Birail")                                              
+        insertNode(layout, "mn_SplinesFromObject", "Get from Object")
+        insertNode(layout, "mn_CreateSpline", "Create from Points")
+        insertNode(layout, "mn_AppendPointToSpline", "Append Point")
+        insertNode(layout, "mn_SmoothBezierSpline", "Smooth Bezier")
+        insertNode(layout, "mn_MakeSplineCyclic", "Make Cyclic")
+        insertNode(layout, "mn_TransformSpline", "Transform")
+        insertNode(layout, "mn_SetSplinesOnObject", "Set on Object")
+        insertNode(layout, "mn_CurveProperties", "Set Curve Properties")
+        layout.separator()
+        insertNode(layout, "mn_SplineInfo", "Info")
+        insertNode(layout, "mn_EvaluateSpline", "Evaluate")                                                 
+        insertNode(layout, "mn_ProjectOnSpline", "Project")
+        insertNode(layout, "mn_GetSplineLength", "Get Length")
+        insertNode(layout, "mn_GetSplineSamples", "Get Samples")
+        layout.separator()
+        insertNode(layout, "mn_LoftSplines", "Loft")
+        insertNode(layout, "mn_RevolveSpline", "Revolve")        
                                   
 class SoundMenu(bpy.types.Menu):
     bl_idname = "mn.sound_menu"
@@ -234,6 +259,8 @@ class SoundMenu(bpy.types.Menu):
     
     def draw(self, context):
         layout = self.layout
+        insertNode(layout, "mn_SequencerSoundInput", "Sequencer Sound Input")
+        layout.separator()
         insertNode(layout, "mn_SoundBakeNode", "Bake")                                   
         insertNode(layout, "mn_SoundBakeReaderNode", "Baked Sound Reader")                                   
         insertNode(layout, "mn_SoundBakeInput", "Bake Input")                                                    
@@ -266,10 +293,10 @@ class ParticlesMenu(bpy.types.Menu):
     
     def draw(self, context):
         layout = self.layout
-        insertNode(layout, "mn_ParticleSystemsInput", "Particle Systems Input")              
-        insertNode(layout, "mn_ParticleSystemInfo", "Particle Systems Info")              
-        insertNode(layout, "mn_FilterParticles", "Filter Particles")              
-        insertNode(layout, "mn_ParticlesInfo", "Particles Info")              
+        insertNode(layout, "mn_ParticleSystemsInput", "Systems Input")              
+        insertNode(layout, "mn_ParticleSystemInfo", "System Info")              
+        insertNode(layout, "mn_FilterParticles", "State Filter")              
+        insertNode(layout, "mn_ParticlesInfo", "Particle List Info")              
         insertNode(layout, "mn_ParticleInfo", "Particle Info")              
         
 class ScriptMenu(bpy.types.Menu):
@@ -280,16 +307,7 @@ class ScriptMenu(bpy.types.Menu):
         layout = self.layout
         insertNode(layout, "mn_ExpressionNode", "Expression")           
         insertNode(layout, "mn_ScriptNode", "Script")           
-        insertNode(layout, "mn_ScriptNode", "Script from Clipboard", {"makeFromClipboard" : repr(True) })
-        
-class DebugMenu(bpy.types.Menu):
-    bl_idname = "mn.debug_menu"
-    bl_label = "Debug Menu"
-    
-    def draw(self, context):
-        layout = self.layout
-        insertNode(layout, "mn_DebugOutputNode", "Generic Socket")          
-        insertNode(layout, "mn_DebugVectorOutputNode", "Vector Socket")          
+        insertNode(layout, "mn_ScriptNode", "Script from Clipboard", {"makeFromClipboard" : repr(True) })       
         
 class SystemMenu(bpy.types.Menu):
     bl_idname = "mn.system_menu"
@@ -297,10 +315,13 @@ class SystemMenu(bpy.types.Menu):
     
     def draw(self, context):
         layout = self.layout
-        insertNode(layout, "mn_LoopCallerNode", "Loop") 
-        insertNode(layout, "mn_GroupCaller", "Group Caller") 
+        insertNode(layout, "mn_LoopCallerNode", "Loop Call") 
+        insertNode(layout, "mn_GroupCaller", "Group Call") 
         insertNode(layout, "mn_GroupInput", "Group Input") 
         insertNode(layout, "mn_GroupOutput", "Group Output") 
+        layout.separator()
+        insertNode(layout, "mn_ConvertNode", "Convert")
+        insertNode(layout, "mn_DebugOutputNode", "Debug") 
         layout.separator()
         insertNode(layout, "mn_NetworkUpdateSettingsNode", "Update Settings") 
                 

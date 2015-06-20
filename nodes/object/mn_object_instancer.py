@@ -7,7 +7,7 @@ from ... nodes.mn_node_helper import *
 from ... utils.mn_name_utils import *
 from ... mn_cache import *
 
-objectTypes = ["Mesh", "Text", "Camera", "Point Lamp"]
+objectTypes = ["Mesh", "Text", "Camera", "Point Lamp", "Curve"]
 objectTypeItems = [(type, type, "") for type in objectTypes]
 
 class mn_ObjectNamePropertyGroup(bpy.types.PropertyGroup):
@@ -54,13 +54,12 @@ class mn_ObjectInstancer(Node, AnimationNode):
     def draw_buttons_ext(self, context, layout):
         layout.prop(self, "parentInstances")
     
-        setData = layout.operator("mn.reset_object_data_on_all_objects")
-        setData.nodeTreeName = self.id_data.name
-        setData.nodeName = self.name
-    
-        unlink = layout.operator("mn.unlink_instances_from_node")
-        unlink.nodeTreeName = self.id_data.name
-        unlink.nodeName = self.name
+        self.callFunctionFromUI(layout, "resetObjectDataOnAllInstances", 
+            text = "Reset Source Data", 
+            description = "Reset the source data on all instances")
+        self.callFunctionFromUI(layout, "unlinkInstancesFromNode", 
+            text = "Unlink Instances from Node", 
+            description = "This will make sure that the objects won't be removed if you remove the Replicate Node.")
         
     def getInputSocketNames(self):
         return {"Instances" : "instancesAmount",
@@ -170,7 +169,7 @@ class mn_ObjectInstancer(Node, AnimationNode):
                 bpy.data.lattices.remove(data)
             elif type == "LAMP":
                 bpy.data.lamps.remove(data)
-            elif type == "SPEADER":
+            elif type == "SPEAKER":
                 bpy.data.speakers.remove(data)
             
     def appendNewObject(self, sourceObject):
@@ -210,6 +209,8 @@ class mn_ObjectInstancer(Node, AnimationNode):
                 return bpy.data.cameras.new(getPossibleCameraName("instance camera"))
             elif self.objectType == "Point Lamp":
                 return bpy.data.lamps.new(getPossibleLampName("instance lamp"), type = "POINT")
+            elif self.objectType == "Curve":
+                return bpy.data.curves.new(getPossibleCurveName("instance curve"), type = "CURVE")
         return None
         
     def unlinkInstance(self, object):
@@ -229,29 +230,3 @@ class mn_ObjectInstancer(Node, AnimationNode):
             
     def copy(self, node):
         self.linkedObjects.clear()
-        
-class ResetObjectDataOnAllInstances(bpy.types.Operator):
-    bl_idname = "mn.reset_object_data_on_all_objects"
-    bl_label = "Reset Source Data"
-    bl_description = "Reset the source data on all instances"
-    
-    nodeTreeName = bpy.props.StringProperty()
-    nodeName = bpy.props.StringProperty()
-    
-    def execute(self, context):
-        node = getNode(self.nodeTreeName, self.nodeName)
-        node.resetObjectDataOnAllInstances()
-        return {'FINISHED'}
-        
-class UnlinkInstancesFromNode(bpy.types.Operator):
-    bl_idname = "mn.unlink_instances_from_node"
-    bl_label = "Unlink Instances from Node"
-    bl_description = "This will make sure that the objects won't be removed if you remove the Replicate Node."
-    
-    nodeTreeName = bpy.props.StringProperty()
-    nodeName = bpy.props.StringProperty()
-    
-    def execute(self, context):
-        node = getNode(self.nodeTreeName, self.nodeName)
-        node.unlinkInstancesFromNode()
-        return {'FINISHED'}

@@ -23,6 +23,7 @@ class mn_CopyObjectData(Node, AnimationNode):
     def execute(self, fromObject, toObject):
         if fromObject is not None and toObject is not None:
             if toObject.data != fromObject.data:
-                toObject.data = fromObject.data
+                if toObject.type == fromObject.type:
+                    toObject.data = fromObject.data
         return toObject
         

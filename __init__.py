@@ -23,8 +23,8 @@ bl_info = {
     "name":        "Animation Nodes",
     "description": "Node system for more flexible animations.",
     "author":      "Jacques Lucke",
-    "version":     (0, 0, 5),
-    "blender":     (2, 7, 2),
+    "version":     (0, 0, 7),
+    "blender":     (2, 7, 4),
     "location":    "Node Editor",
     "category":    "Node",
     "warning":     "Stable, but some things may change in the future."
@@ -46,7 +46,7 @@ modules = developer_utils.setup_addon_modules(__path__, __name__, "bpy" in local
 import bpy      
 from bpy.props import *  
 from . mn_execution import nodeTreeChanged
-from . import mn_keyframes 
+from . id_keys import idTypeItems 
 
 class GlobalUpdateSettings(bpy.types.PropertyGroup):
     frameChange = BoolProperty(default = True, name = "Frame Change", description = "Recalculate the nodes when the frame has been changed")
@@ -61,22 +61,23 @@ class DeveloperSettings(bpy.types.PropertyGroup):
     printUpdateTime = BoolProperty(default = False, name = "Print Global Update Time")
     printGenerationTime = BoolProperty(default = False, name = "Print Script Generation Time")
     executionProfiling = BoolProperty(default = False, name = "Node Execution Profiling", update = nodeTreeChanged)
-
-class Keyframes(bpy.types.PropertyGroup):
-    name = StringProperty(default = "", name = "Keyframe Name")
-    type = EnumProperty(items = mn_keyframes.getKeyframeTypeItems(), name = "Keyframe Type")
+  
+class IDKeyType(bpy.types.PropertyGroup):
+    name = StringProperty()
+    id = StringProperty()
+    type = StringProperty()
+    hide = BoolProperty(default = False)
     
-class KeyframesSettings(bpy.types.PropertyGroup):
-    keys = CollectionProperty(type = Keyframes, name = "Keyframes")
-    selectedPath = StringProperty(default = "", name = "Selected Path")
-    selectedName = EnumProperty(items = mn_keyframes.getKeyframeNameItems, name = "Keyframe Name")
-    newName = StringProperty(default = "", name = "Name")
-    selectedType = EnumProperty(items = mn_keyframes.getKeyframeTypeItems(), name = "Keyframe Type")
+class IDKeySettings(bpy.types.PropertyGroup):
+    keys = CollectionProperty(type = IDKeyType)
+    newKeyName = StringProperty(default = "Initial Transforms")
+    newKeyType = EnumProperty(items = idTypeItems, name = "Type", default = "Transforms")
+    showAdvanced = BoolProperty(name = "Show Advanced", default = True, description = "Show more options for each ID Key")
     
 class AnimationNodesSettings(bpy.types.PropertyGroup):
     update = PointerProperty(type = GlobalUpdateSettings, name = "Update Settings")
     developer = PointerProperty(type = DeveloperSettings, name = "Developer Settings")
-    keyframes = PointerProperty(type = KeyframesSettings, name = "Keyframes")
+    idKeys = PointerProperty(type = IDKeySettings, name = "ID Keys")
     
     
     
@@ -103,11 +104,17 @@ def unregister_keymaps():
     addon_keymaps.clear()
 
 from . insert_nodes_menu import registerMenu, unregisterMenu
-from . mn_execution import register_handlers, unregister_handlers
+from . import manage_broken_files as manage_broken_files
+from . import mn_execution as execution
+from . import mn_node_base as node_base
+from . nodes.sound import mn_sequencer_sound_input as sequencer_sound
 
 def register():
     bpy.utils.register_module(__name__)
-    register_handlers()
+    manage_broken_files.register_handlers()
+    execution.register_handlers()
+    node_base.register_handlers()
+    sequencer_sound.register_handlers()
     registerMenu()
     register_keymaps()
     bpy.types.Scene.mn_settings = PointerProperty(type = AnimationNodesSettings, name = "Animation Node Settings")
@@ -117,7 +124,10 @@ def register():
 def unregister():
     unregister_keymaps()
     bpy.utils.unregister_module(__name__)
-    unregister_handlers()
+    manage_broken_files.unregister_handlers()
+    execution.unregister_handlers()
+    node_base.unregister_handlers()
+    sequencer_sound.unregister_handlers()
     unregisterMenu()
     
     print("Unregistered Animation Nodes")

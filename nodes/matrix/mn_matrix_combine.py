@@ -1,5 +1,6 @@
 import bpy
 from bpy.types import Node
+from bpy.props import *
 from mathutils import *
 from ... mn_utils import *
 from ... utils.mn_node_utils import *
@@ -11,20 +12,24 @@ class mn_MatrixCombine(Node, AnimationNode):
     bl_label = "Combine Matrices"
     isDetermined = True
     
+    def settingChanged(self, context):
+        for socket in self.inputs:
+            if socket.name != "...":
+                socket.moveable = self.manageSockets
+                socket.removeable = self.manageSockets
+            
+    manageSockets = BoolProperty(name = "Manage Sockets", default = False, description = "Allows to (re)move the input sockets", update = settingChanged)
+    
     def init(self, context):
         forbidCompiling()
-        socket = self.inputs.new("mn_MatrixSocket", "Matrix")
-        socket.removeable = True
-        socket.callNodeToRemove = True
-        self.inputs.new("mn_MatrixSocket", "Matrix").removeable = True
-        socket.removeable = True
-        socket.callNodeToRemove = True
+        self.newInputSocket()
+        self.newInputSocket()
         self.inputs.new("mn_EmptySocket", "...").passiveSocketType = "mn_MatrixSocket"
         self.outputs.new("mn_MatrixSocket", "Result")
         allowCompiling()
         
     def draw_buttons(self, context, layout):
-        pass
+        layout.prop(self, "manageSockets")
         
     def update(self):
         forbidCompiling()
@@ -32,27 +37,31 @@ class mn_MatrixCombine(Node, AnimationNode):
         socket = self.inputs.get("...")
         updateDependencyNode(socket)
         
-        if socket is not None:
-            links = socket.links
-            if len(links) == 1:
-                link = links[0]
-                fromSocket = link.from_socket
-                originSocket = getOriginSocket(socket)
-                self.id_data.links.remove(link)
-                if originSocket is not None:
-                    if originSocket.dataType == "Matrix":
-                        self.inputs.remove(socket)
-                        newSocket = self.inputs.new("mn_MatrixSocket", "Matrix")
-                        newSocket.removeable = True
-                        newSocket.callNodeToRemove = True
-                        self.inputs.new("mn_EmptySocket", "...").passiveSocketType = "mn_MatrixSocket"
-                        self.id_data.links.new(newSocket, fromSocket)
+        if socket:
+            nodeTree = self.id_data
+            nodeTreeInfo = NodeTreeInfo(self.id_data)
+            origin = nodeTreeInfo.getDataOriginSocket(socket)
+            if getattr(origin, "dataType", "") in ["Matrix", "Vector"]:
+                linkOrigin = socket.links[0].from_socket
+                newSocket = self.newInputSocket()
+                nodeTree.links.new(newSocket, linkOrigin)
+                self.removeLinkFromEmptySocket()
+            elif getattr(origin, "dataType", "") != "":
+                self.removeLinkFromEmptySocket()
+            
         allowCompiling()
+    
+    def removeLinkFromEmptySocket(self):
+        try: self.id_data.links.remove(self.inputs.get("...").links[0])
+        except: pass
         
-    def removeSocket(self, socket):
-        forbidCompiling()
-        self.inputs.remove(socket)
-        allowCompiling()
+    def newInputSocket(self):
+        socket = self.inputs.new("mn_MatrixSocket", "Matrix")
+        socket.removeable = self.manageSockets
+        socket.moveable = self.manageSockets
+        amount = len(self.inputs)
+        self.inputs.move(amount - 1, amount - 2)
+        return socket
         
     def execute(self, input):
         result = Matrix.Identity(4)
