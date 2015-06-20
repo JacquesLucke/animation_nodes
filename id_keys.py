@@ -303,7 +303,7 @@ class IDKeyPanel(bpy.types.Panel):
             typeClass = getIDTypeClass(keyType)
             keyExists = typeClass.exists(object, keyID)
         
-            self.drawHeader(box, object, keyName, keyType, keyID, keyExists)            
+            self.drawHeader(box, object, item, keyExists)            
             if keyExists: 
                 typeClass.draw(box, object, keyID, advanced = True)
             typeClass.drawOperators(box, object, keyID)
@@ -322,12 +322,14 @@ class IDKeyPanel(bpy.types.Panel):
                 props.type = keyType
                 props.objectName = object.name
     
-    def drawHeader(self, box, object, keyName, keyType, keyID, keyExists):
+    def drawHeader(self, box, object, item, keyExists):
+        keyName, keyType, keyID = item.name, item.type, item.id
+        
         row = box.row()
         
         subRow = row.row()
         subRow.alignment = "LEFT"
-        subRow.label(keyName)
+        subRow.prop(item, "name", text = "")
         
         subRow = row.row()
         subRow.alignment = "RIGHT"
