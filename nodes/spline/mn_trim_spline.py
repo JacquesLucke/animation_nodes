@@ -2,8 +2,9 @@ import bpy
 from bpy.types import Node
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from . mn_spline_parameter_evaluate_node_base import SplineParameterEvaluateNodeBase
 
-class mn_TrimSpline(Node, AnimationNode):
+class mn_TrimSpline(Node, AnimationNode, SplineParameterEvaluateNodeBase):
     bl_idname = "mn_TrimSpline"
     bl_label = "Trim Spline"
     
@@ -15,6 +16,14 @@ class mn_TrimSpline(Node, AnimationNode):
         self.outputs.new("mn_SplineSocket", "Spline")
         allowCompiling()
         
+    def draw_buttons(self, context, layout):
+        layout.prop(self, "parameterType", text = "")
+        
+    def draw_buttons_ext(self, context, layout):
+        col = layout.column()
+        col.active = self.parameterType == "UNIFORM"
+        col.prop(self, "resolution")
+        
     def getInputSocketNames(self):
         return {"Spline" : "spline",
                 "Start" : "start",
@@ -25,4 +34,8 @@ class mn_TrimSpline(Node, AnimationNode):
 
     def execute(self, spline, start, end):
         spline.update()
+        if spline.isEvaluable and self.parameterType == "UNIFORM":
+            spline.ensureUniformConverter(self.resolution)
+            start = spline.toUniformParameter(start)
+            end = spline.toUniformParameter(end)
         return spline.getTrimmedVersion(start, end)
