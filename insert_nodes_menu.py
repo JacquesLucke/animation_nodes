@@ -162,6 +162,7 @@ class ListMenu(bpy.types.Menu):
         insertNode(layout, "mn_CreateList", "Create")             
         insertNode(layout, "mn_AppendListNode", "Append")             
         insertNode(layout, "mn_GetListLengthNode", "Get Length")
+        insertNode(layout, "mn_GetListElementIndexNode", "Get Element Index")         
         layout.separator()
         insertNode(layout, "mn_TrimList", "Trim")
         insertNode(layout, "mn_ShuffleListNode", "Shuffle")             
