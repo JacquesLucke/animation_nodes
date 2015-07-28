@@ -12,7 +12,8 @@ class mn_GetListElementIndexNode(Node, AnimationNode):
     def init(self, context):
         forbidCompiling()
         self.generateSockets()  #could use generic, just analize #if we use generic we skip all socket update
-        self.outputs.new("mn_IntegerListSocket", "Indices")
+        self.outputs.new("mn_IntegerSocket", "First Index")
+        self.outputs.new("mn_IntegerListSocket", "All Indices")
         self.outputs.new("mn_IntegerSocket", "Occurrences")
         allowCompiling()
         
@@ -20,12 +21,13 @@ class mn_GetListElementIndexNode(Node, AnimationNode):
         return {"List" : "list",
                 "Search" : "search"}
     def getOutputSocketNames(self):
-        return {"Indices" : "indices",
+        return {"First Index" : "first_index",
+                "All Indices" : "all_indices",
                 "Occurrences" : "occurrences"}
         
     def execute(self, list, search):  
-        indices = [i for i, x in enumerate(list) if x == search]    #some say count may be faster
-        return indices, len(indices)
+        all_indices = [i for i, x in enumerate(list) if x == search]    #some say count may be faster
+        return all_indices[0], all_indices, len(all_indices)
         
     def update(self):   
         nodeTree = self.id_data
