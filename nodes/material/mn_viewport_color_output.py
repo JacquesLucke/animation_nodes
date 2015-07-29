@@ -3,7 +3,7 @@ from ... mn_cache import getUniformRandom
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
-class mn_ViewportColorNode(bpy.types.bpy.types.Node):
+class mn_ViewportColorNode(bpy.types.Node):
     bl_idname = "mn_ViewportColorNode"
     bl_label = "Viewport Color"
     
