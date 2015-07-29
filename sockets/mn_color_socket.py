@@ -9,19 +9,19 @@ class mn_ColorSocket(mn_BaseSocket, mn_SocketProperties):
     allowedInputTypes = ["Color"]
     drawColor = (0.8, 0.8, 0.2, 1)
     
-    color = bpy.props.FloatVectorProperty(default = [0.5, 0.5, 0.5], subtype = "COLOR", soft_min = 0.0, soft_max = 1.0, update = nodePropertyChanged)
+    value = bpy.props.FloatVectorProperty(default = [0.5, 0.5, 0.5], subtype = "COLOR", soft_min = 0.0, soft_max = 1.0, update = nodePropertyChanged)
     
     def drawInput(self, layout, node, text):
-        layout.prop(self, "color", text = text)
+        layout.prop(self, "value", text = text)
         
     def getValue(self):
-        color = self.color
-        return [color[0], color[1], color[2], 1.0]
+        value = self.value
+        return [value[0], value[1], value[2], 1.0]
         
     def setStoreableValue(self, data):
-        self.color = data[:3]
+        self.value = data[:3]
     def getStoreableValue(self):
-        return self.color
+        return self.value
         
     def getCopyValueFunctionString(self):
         return "return value[:]"

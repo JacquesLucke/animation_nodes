@@ -13,7 +13,7 @@ class mn_SmoothBezierSpline(bpy.types.Node, AnimationNode):
     def init(self, context):
         forbidCompiling()
         self.inputs.new("mn_SplineSocket", "Spline").showObjectInput = False
-        self.inputs.new("mn_FloatSocket", "Smoothness").number = 0.3333
+        self.inputs.new("mn_FloatSocket", "Smoothness").value = 0.3333
         self.outputs.new("mn_SplineSocket", "Spline")
         allowCompiling()
         

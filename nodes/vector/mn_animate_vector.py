@@ -17,8 +17,8 @@ class mn_AnimateVectorNode(bpy.types.Node, AnimationNode):
         self.inputs.new("mn_VectorSocket", "End")
         self.inputs.new("mn_FloatSocket", "Time")
         self.inputs.new("mn_InterpolationSocket", "Interpolation").showName = False
-        self.inputs.new("mn_FloatSocket", "Duration").number = 20.0
-        self.inputs.new("mn_FloatSocket", "Delay").number = 0.0
+        self.inputs.new("mn_FloatSocket", "Duration").value = 20.0
+        self.inputs.new("mn_FloatSocket", "Delay").value = 0.0
         self.outputs.new("mn_VectorSocket", "Current")
         self.outputs.new("mn_FloatSocket", "New Time")
         self.outputs.new("mn_VectorSocket", "Difference")

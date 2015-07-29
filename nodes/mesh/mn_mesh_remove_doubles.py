@@ -10,7 +10,7 @@ class mn_MeshRemoveDoubles(bpy.types.Node, AnimationNode):
         forbidCompiling()
         self.inputs.new("mn_MeshSocket", "Mesh")
         socket = self.inputs.new("mn_FloatSocket", "Distance")
-        socket.number = 0.0001
+        socket.value = 0.0001
         socket.setMinMax(0.0, 10000.0)
         self.outputs.new("mn_MeshSocket", "Mesh")
         allowCompiling()

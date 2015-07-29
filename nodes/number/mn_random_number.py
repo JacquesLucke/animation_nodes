@@ -12,8 +12,8 @@ class RandomNumberNode(bpy.types.Node, AnimationNode):
     
     def create(self):
         self.inputs.new("mn_IntegerSocket", "Seed")
-        self.inputs.new("mn_FloatSocket", "Min").number = 0.0
-        self.inputs.new("mn_FloatSocket", "Max").number = 1.0
+        self.inputs.new("mn_FloatSocket", "Min").value = 0.0
+        self.inputs.new("mn_FloatSocket", "Max").value = 1.0
         self.outputs.new("mn_FloatSocket", "Number")
         
     def draw_buttons(self, context, layout):

@@ -44,7 +44,7 @@ class mn_FloatMathNode(bpy.types.Node, AnimationNode):
     def init(self, context):
         forbidCompiling()
         self.inputs.new("mn_FloatSocket", "A")
-        self.inputs.new("mn_FloatSocket", "B").number = 1.0
+        self.inputs.new("mn_FloatSocket", "B").value = 1.0
         self.outputs.new("mn_FloatSocket", "Result")
         allowCompiling()
         

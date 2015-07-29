@@ -16,8 +16,8 @@ class mn_TrimText(bpy.types.Node, AnimationNode):
     def init(self, context):
         forbidCompiling()
         self.inputs.new("mn_StringSocket", "Text")
-        self.inputs.new("mn_IntegerSocket", "Start").number = 0
-        self.inputs.new("mn_IntegerSocket", "End").number = 5
+        self.inputs.new("mn_IntegerSocket", "Start").value = 0
+        self.inputs.new("mn_IntegerSocket", "End").value = 5
         self.outputs.new("mn_StringSocket", "Text")
         allowCompiling()
         

@@ -19,7 +19,7 @@ class mn_ObjectTransformsOutput(bpy.types.Node, AnimationNode):
         self.inputs.new("mn_ObjectSocket", "Object").showName = False
         self.inputs.new("mn_VectorSocket", "Location")
         self.inputs.new("mn_VectorSocket", "Rotation")
-        self.inputs.new("mn_VectorSocket", "Scale").vector = (1, 1, 1)
+        self.inputs.new("mn_VectorSocket", "Scale").value = (1, 1, 1)
         self.outputs.new("mn_ObjectSocket", "Object")
         self.updateSocketVisibility()
         allowCompiling()

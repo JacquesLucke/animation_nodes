@@ -11,7 +11,7 @@ class mn_ScaleMatrix(bpy.types.Node, AnimationNode):
     
     def init(self, context):
         forbidCompiling()
-        self.inputs.new("mn_VectorSocket", "Scale").vector = [1, 1, 1]
+        self.inputs.new("mn_VectorSocket", "Scale").value = [1, 1, 1]
         self.outputs.new("mn_MatrixSocket", "Matrix")
         allowCompiling()
         
@@ -29,4 +29,4 @@ class mn_ScaleMatrix(bpy.types.Node, AnimationNode):
         return ["mathutils"]
         
     def copy(self, node):
-        self.inputs[0].vector = [1, 1, 1]
+        self.inputs[0].value = [1, 1, 1]

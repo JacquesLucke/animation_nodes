@@ -25,9 +25,9 @@ class mn_StringSocket(mn_BaseSocket, mn_SocketProperties):
         
     def enumChanged(self, context):
         if self.useEnum:
-            self.string = self.stringEnum
+            self.value = self.stringEnum
     
-    string = StringProperty(default = "", update = nodePropertyChanged)
+    value = StringProperty(default = "", update = nodePropertyChanged)
     showName = BoolProperty(default = True)
     stringEnum = EnumProperty(items = getEnumItems, name = "Possible Items", update = enumChanged)
     useEnum = BoolProperty(default = False)
@@ -38,15 +38,15 @@ class mn_StringSocket(mn_BaseSocket, mn_SocketProperties):
         if self.useEnum:
             layout.prop(self, "stringEnum", text = text)
         else:
-            layout.prop(self, "string", text = text)
+            layout.prop(self, "value", text = text)
         
     def getValue(self):
-        return self.string
+        return self.value
         
     def setStoreableValue(self, data):
-        self.string = data
+        self.value = data
     def getStoreableValue(self):
-        return self.string
+        return self.value
 
     def setEnumItems(self, enumItems):
         self.enumItems.clear()

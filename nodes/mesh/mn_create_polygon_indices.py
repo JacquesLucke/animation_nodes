@@ -29,7 +29,7 @@ class mn_CreatePolygonIndices(bpy.types.Node, AnimationNode):
         connections = getConnectionDictionaries(self)
         self.inputs.clear()
         for i in range(self.amount):
-            self.inputs.new("mn_IntegerSocket", "Index " + str(i)).number = i
+            self.inputs.new("mn_IntegerSocket", "Index " + str(i)).value = i
         tryToSetConnectionDictionaries(self, connections)
         allowCompiling()
                 

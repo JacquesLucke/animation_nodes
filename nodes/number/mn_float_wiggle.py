@@ -15,10 +15,10 @@ class mn_FloatWiggle(bpy.types.Node, AnimationNode):
         forbidCompiling()
         self.inputs.new("mn_FloatSocket", "Seed")
         self.inputs.new("mn_FloatSocket", "Evolution")
-        self.inputs.new("mn_FloatSocket", "Speed").number = 15.0
-        self.inputs.new("mn_FloatSocket", "Amplitude").number = 1
-        self.inputs.new("mn_FloatSocket", "Persistance").number = 0.3
-        self.inputs.new("mn_IntegerSocket", "Octaves").number = 2.0
+        self.inputs.new("mn_FloatSocket", "Speed").value = 15.0
+        self.inputs.new("mn_FloatSocket", "Amplitude").value = 1
+        self.inputs.new("mn_FloatSocket", "Persistance").value = 0.3
+        self.inputs.new("mn_IntegerSocket", "Octaves").value = 2.0
         self.outputs.new("mn_FloatSocket", "Noise")
         allowCompiling()
         

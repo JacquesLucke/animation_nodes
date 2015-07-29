@@ -15,10 +15,10 @@ class mn_VectorWiggle(bpy.types.Node, AnimationNode):
         forbidCompiling()
         self.inputs.new("mn_FloatSocket", "Seed")
         self.inputs.new("mn_FloatSocket", "Evolution")
-        self.inputs.new("mn_FloatSocket", "Speed").number = 15.0
-        self.inputs.new("mn_VectorSocket", "Amplitude").vector = [5, 5, 5]
-        self.inputs.new("mn_FloatSocket", "Persistance").number = 0.3
-        self.inputs.new("mn_IntegerSocket", "Octaves").number = 2.0
+        self.inputs.new("mn_FloatSocket", "Speed").value = 15.0
+        self.inputs.new("mn_VectorSocket", "Amplitude").value = [5, 5, 5]
+        self.inputs.new("mn_FloatSocket", "Persistance").value = 0.3
+        self.inputs.new("mn_IntegerSocket", "Octaves").value = 2
         self.outputs.new("mn_VectorSocket", "Vector")
         allowCompiling()
         

@@ -13,7 +13,7 @@ class mn_ComposeMatrix(bpy.types.Node, AnimationNode):
         forbidCompiling()
         self.inputs.new("mn_VectorSocket", "Position")
         self.inputs.new("mn_VectorSocket", "Rotation")
-        self.inputs.new("mn_VectorSocket", "Scale").vector = [1, 1, 1]
+        self.inputs.new("mn_VectorSocket", "Scale").value = [1, 1, 1]
         self.outputs.new("mn_MatrixSocket", "Matrix")
         allowCompiling()
         

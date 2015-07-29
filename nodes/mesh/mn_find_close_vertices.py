@@ -10,10 +10,10 @@ class mn_FindCloseVertices(bpy.types.Node, AnimationNode):
     def init(self, context):
         forbidCompiling()
         self.inputs.new("mn_VectorListSocket", "Vertices")
-        self.inputs.new("mn_IntegerSocket", "Clusters").number = 1000
-        self.inputs.new("mn_IntegerSocket", "Connections").number = 3
-        self.inputs.new("mn_FloatSocket", "Min Distance").number = 0.02
-        self.inputs.new("mn_FloatSocket", "Max Distance").number = 0.3
+        self.inputs.new("mn_IntegerSocket", "Clusters").value = 1000
+        self.inputs.new("mn_IntegerSocket", "Connections").value = 3
+        self.inputs.new("mn_FloatSocket", "Min Distance").value = 0.02
+        self.inputs.new("mn_FloatSocket", "Max Distance").value = 0.3
         self.outputs.new("mn_EdgeIndicesListSocket", "Edges")
         allowCompiling()
         

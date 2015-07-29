@@ -72,7 +72,7 @@ class mn_SequencerSoundInput(bpy.types.Node, AnimationNode):
         self.width = 200
         forbidCompiling()
         self.inputs.new("mn_FloatSocket", "Frame")
-        self.inputs.new("mn_FloatSocket", "Frequency").number = 0.4
+        self.inputs.new("mn_FloatSocket", "Frequency").value = 0.4
         self.outputs.new("mn_FloatSocket", "Strength")
         self.outputs.new("mn_FloatListSocket", "Strengths")
         allowCompiling()

@@ -14,7 +14,7 @@ class mn_RandomVectorNode(bpy.types.Node, AnimationNode):
     def init(self, context):
         forbidCompiling()
         self.inputs.new("mn_IntegerSocket", "Seed")
-        self.inputs.new("mn_FloatSocket", "Max Values").number = 5.0
+        self.inputs.new("mn_FloatSocket", "Max Values").value = 5.0
         self.outputs.new("mn_VectorSocket", "Vector")
         allowCompiling()
         

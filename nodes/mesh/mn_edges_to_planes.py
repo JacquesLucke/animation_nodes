@@ -15,7 +15,7 @@ class mn_EdgesToPlanes(bpy.types.Node, AnimationNode):
         self.inputs.new("mn_EdgeIndicesListSocket", "Edges")
         self.inputs.new("mn_FloatSocket", "Width").number = 0.01
         socket = self.inputs.new("mn_VectorSocket", "Up Vector")
-        socket.vector = Vector((0.001, 0.001, 0.999))
+        socket.value = Vector((0.001, 0.001, 0.999))
         socket.hide = True
         self.outputs.new("mn_VectorListSocket", "Vertices")
         self.outputs.new("mn_PolygonIndicesListSocket", "Polygons")

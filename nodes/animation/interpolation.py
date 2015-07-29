@@ -40,7 +40,7 @@ class InterpolationNode(bpy.types.Node, AnimationNode):
     curveNodeName = bpy.props.StringProperty(default = "")
     
     def create(self):
-        self.inputs.new("mn_FloatSocket", "Back").number = 1.70158
+        self.inputs.new("mn_FloatSocket", "Back").value = 1.70158
         self.outputs.new("mn_InterpolationSocket", "Interpolation")
         self.hideInputSockets()
         self.createCurveNode()

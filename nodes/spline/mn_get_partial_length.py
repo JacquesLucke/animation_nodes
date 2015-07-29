@@ -14,7 +14,7 @@ class mn_GetSplineLength(bpy.types.Node, AnimationNode, SplineParameterEvaluateN
         socket.setMinMax(0, 100000)
         socket = self.inputs.new("mn_FloatSocket", "End")
         socket.setMinMax(0, 100000)
-        socket.number = 1.0
+        socket.value = 1.0
         self.outputs.new("mn_FloatSocket", "Length")
         allowCompiling()
         

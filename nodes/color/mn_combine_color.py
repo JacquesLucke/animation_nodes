@@ -13,7 +13,7 @@ class mn_CombineColor(bpy.types.Node, AnimationNode):
         self.inputs.new("mn_FloatSocket", "Red")
         self.inputs.new("mn_FloatSocket", "Green")
         self.inputs.new("mn_FloatSocket", "Blue")
-        self.inputs.new("mn_FloatSocket", "Alpha").number = 1
+        self.inputs.new("mn_FloatSocket", "Alpha").value = 1
         self.outputs.new("mn_ColorSocket", "Color")
         allowCompiling()
 

@@ -9,8 +9,8 @@ class mn_RandomStringNode(bpy.types.Node, AnimationNode):
     def init(self, context):
         forbidCompiling()
         self.inputs.new("mn_IntegerSocket", "Seed")
-        self.inputs.new("mn_IntegerSocket", "Length").number = 5
-        self.inputs.new("mn_StringSocket", "Characters").string = "abcdefghijklmnopqrstuvwxyz"
+        self.inputs.new("mn_IntegerSocket", "Length").value = 5
+        self.inputs.new("mn_StringSocket", "Characters").value = "abcdefghijklmnopqrstuvwxyz"
         self.outputs.new("mn_StringSocket", "Text")
         allowCompiling()
         

@@ -38,16 +38,16 @@ class mn_TextOutputNode(bpy.types.Node, AnimationNode):
         self.inputs.new("mn_ObjectSocket", "Object").showName = False
         
         self.inputs.new("mn_StringSocket", "Text")
-        self.inputs.new("mn_FloatSocket", "Extrude").number = 0.0
-        self.inputs.new("mn_FloatSocket", "Shear").number = 0.0
-        self.inputs.new("mn_FloatSocket", "Size").number = 1.0
+        self.inputs.new("mn_FloatSocket", "Extrude").value = 0.0
+        self.inputs.new("mn_FloatSocket", "Shear").value = 0.0
+        self.inputs.new("mn_FloatSocket", "Size").value = 1.0
         
-        self.inputs.new("mn_FloatSocket", "Letter Spacing").number = 1.0
-        self.inputs.new("mn_FloatSocket", "Word Spacing").number = 1.0
-        self.inputs.new("mn_FloatSocket", "Line Spacing").number = 1.0
+        self.inputs.new("mn_FloatSocket", "Letter Spacing").value = 1.0
+        self.inputs.new("mn_FloatSocket", "Word Spacing").value = 1.0
+        self.inputs.new("mn_FloatSocket", "Line Spacing").value = 1.0
         
-        self.inputs.new("mn_FloatSocket", "X Offset").number = 0.0
-        self.inputs.new("mn_FloatSocket", "Y Offset").number = 0.0
+        self.inputs.new("mn_FloatSocket", "X Offset").value = 0.0
+        self.inputs.new("mn_FloatSocket", "Y Offset").value = 0.0
         self.setHideProperty()
         
         self.outputs.new("mn_ObjectSocket", "Object")

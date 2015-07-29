@@ -10,9 +10,9 @@ class mn_FloatRangeListNode(bpy.types.Node, AnimationNode):
     
     def init(self, context):
         forbidCompiling()
-        self.inputs.new("mn_IntegerSocket", "Amount").number = 5
+        self.inputs.new("mn_IntegerSocket", "Amount").value = 5
         self.inputs.new("mn_FloatSocket", "Start")
-        self.inputs.new("mn_FloatSocket", "Step").number = 1
+        self.inputs.new("mn_FloatSocket", "Step").value = 1
         self.outputs.new("mn_FloatListSocket", "List")
         allowCompiling()
         

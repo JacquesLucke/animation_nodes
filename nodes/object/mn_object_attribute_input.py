@@ -9,7 +9,7 @@ class mn_ObjectAttributeInputNode(bpy.types.Node, AnimationNode):
     def init(self, context):
         forbidCompiling()
         self.inputs.new("mn_ObjectSocket", "Object").showName = False
-        self.inputs.new("mn_StringSocket", "Attribute").string = ""
+        self.inputs.new("mn_StringSocket", "Attribute").value = ""
         self.outputs.new("mn_GenericSocket", "Value")
         allowCompiling()
         

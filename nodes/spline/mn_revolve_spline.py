@@ -20,10 +20,10 @@ class mn_RevolveSpline(bpy.types.Node, AnimationNode):
         self.inputs.new("mn_SplineSocket", "Profile")
         socket = self.inputs.new("mn_IntegerSocket", "Spline Samples")
         socket.setMinMax(2, 10000)
-        socket.number = 16
+        socket.value = 16
         socket = self.inputs.new("mn_IntegerSocket", "Surface Samples")
         socket.setMinMax(3, 10000)
-        socket.number = 16
+        socket.value = 16
         self.outputs.new("mn_VectorListSocket", "Vertices")
         self.outputs.new("mn_PolygonIndicesListSocket", "Polygons")
         self.width += 20

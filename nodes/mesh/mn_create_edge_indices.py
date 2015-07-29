@@ -11,8 +11,8 @@ class mn_CreateEdgeIndices(bpy.types.Node, AnimationNode):
     
     def init(self, context):
         forbidCompiling()
-        self.inputs.new("mn_IntegerSocket", "Index 1").number = 0
-        self.inputs.new("mn_IntegerSocket", "Index 2").number = 1
+        self.inputs.new("mn_IntegerSocket", "Index 1").value = 0
+        self.inputs.new("mn_IntegerSocket", "Index 2").value = 1
         self.outputs.new("mn_EdgeIndicesSocket", "Edge Indices")
         allowCompiling()
         

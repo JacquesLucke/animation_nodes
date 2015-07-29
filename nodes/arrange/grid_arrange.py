@@ -11,8 +11,8 @@ class GridArrange(bpy.types.Node, AnimationNode):
     
     def create(self):
         self.inputs.new("mn_IntegerSocket", "Index")
-        self.inputs.new("mn_IntegerSocket", "Width").number = 10
-        self.inputs.new("mn_FloatSocket", "Distance").number = 3
+        self.inputs.new("mn_IntegerSocket", "Width").value = 10
+        self.inputs.new("mn_FloatSocket", "Distance").value = 3
         self.outputs.new("mn_VectorSocket", "Vector")
         
     def getInputSocketNames(self):

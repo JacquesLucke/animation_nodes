@@ -14,12 +14,12 @@ class mn_GetSplineSamples(bpy.types.Node, AnimationNode, SplineParameterEvaluate
     def init(self, context):
         forbidCompiling()
         self.inputs.new("mn_SplineSocket", "Spline")
-        self.inputs.new("mn_IntegerSocket", "Amount").number = 50
+        self.inputs.new("mn_IntegerSocket", "Amount").value = 50
         socket = self.inputs.new("mn_FloatSocket", "Start")
-        socket.number = 0.0
+        socket.value = 0.0
         socket.setMinMax(0.0, 1.0)
         socket = self.inputs.new("mn_FloatSocket", "End")
-        socket.number = 1.0
+        socket.value = 1.0
         socket.setMinMax(0.0, 1.0)
         self.outputs.new("mn_VectorListSocket", "Positions")
         self.outputs.new("mn_VectorListSocket", "Tangents")

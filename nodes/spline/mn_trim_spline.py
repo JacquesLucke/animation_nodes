@@ -10,8 +10,8 @@ class mn_TrimSpline(bpy.types.Node, AnimationNode, SplineParameterEvaluateNodeBa
     def init(self, context):
         forbidCompiling()
         self.inputs.new("mn_SplineSocket", "Spline").showName = False
-        self.inputs.new("mn_FloatSocket", "Start").number = 0.0
-        self.inputs.new("mn_FloatSocket", "End").number = 1.0
+        self.inputs.new("mn_FloatSocket", "Start").value = 0.0
+        self.inputs.new("mn_FloatSocket", "End").value = 1.0
         self.outputs.new("mn_SplineSocket", "Spline")
         allowCompiling()
         

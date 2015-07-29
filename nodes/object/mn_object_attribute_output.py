@@ -11,7 +11,7 @@ class mn_ObjectAttributeOutputNode(bpy.types.Node, AnimationNode):
         forbidCompiling()
         self.width = 200
         self.inputs.new("mn_ObjectSocket", "Object").showName = False
-        self.inputs.new("mn_StringSocket", "Attribute").string = ""
+        self.inputs.new("mn_StringSocket", "Attribute").value = ""
         self.inputs.new("mn_GenericSocket", "Value")
         self.outputs.new("mn_ObjectSocket", "Object")
         allowCompiling()

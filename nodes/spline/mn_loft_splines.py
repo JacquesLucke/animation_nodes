@@ -32,15 +32,15 @@ class mn_LoftSplines(bpy.types.Node, AnimationNode):
         socket1 = self.inputs.new("mn_IntegerSocket", "Spline Samples")
         socket2 = self.inputs.new("mn_IntegerSocket", "Surface Samples")
         for socket in (socket1, socket2):
-            socket.number = 16
+            socket.value = 16
             socket.setMinMax(2, 100000)
         self.inputs.new("mn_BooleanSocket", "Cyclic").value = False
-        self.inputs.new("mn_FloatSocket", "Smoothness").number = 0.3333
+        self.inputs.new("mn_FloatSocket", "Smoothness").value = 0.3333
         socket = self.inputs.new("mn_FloatSocket", "Start")
-        socket.number, socket.hide = 0.0, True
+        socket.value, socket.hide = 0.0, True
         socket.setMinMax(0.0, 1.0)
         socket = self.inputs.new("mn_FloatSocket", "End")
-        socket.number, socket.hide = 1.0, True
+        socket.value, socket.hide = 1.0, True
         socket.setMinMax(0.0, 1.0)
         self.outputs.new("mn_VectorListSocket", "Vertices")
         self.outputs.new("mn_PolygonIndicesListSocket", "Polygons")
