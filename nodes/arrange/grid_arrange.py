@@ -1,12 +1,10 @@
-import bpy, random, mathutils
+import bpy
+from mathutils import Vector
 from ... base_types.node import AnimationNode
-from ... mn_execution import nodePropertyChanged
-
 
 class GridArrange(bpy.types.Node, AnimationNode):
     bl_idname = "mn_GridArrange"
     bl_label = "Grid Arrange"
-    node_category = "Arrange"
     isDetermined = True
     
     def create(self):
@@ -19,14 +17,13 @@ class GridArrange(bpy.types.Node, AnimationNode):
         return {"Index" : "index",
                 "Width" : "width",
                 "Distance" : "distance"}
+                
     def getOutputSocketNames(self):
         return {"Vector" : "vector"}
 
     def execute(self, index, width, distance):
         width = max(width, 1)
-        vector = mathutils.Vector((0, 0, 0))
-        vector[0] = index % width * distance
-        vector[1] = int(index / width) * distance
+        vector = Vector((0, 0, 0))
+        vector.x = index % width * distance
+        vector.y = int(index / width) * distance
         return vector
-        
-
