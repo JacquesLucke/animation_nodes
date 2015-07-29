@@ -1,21 +1,19 @@
 import bpy, random, mathutils
 from ... base_types.node import AnimationNode
-from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from ... mn_execution import nodePropertyChanged
 
 
-class mn_GridArrange(bpy.types.Node, AnimationNode):
+class GridArrange(bpy.types.Node, AnimationNode):
     bl_idname = "mn_GridArrange"
     bl_label = "Grid Arrange"
     node_category = "Arrange"
     isDetermined = True
     
-    def init(self, context):
-        forbidCompiling()
+    def create(self):
         self.inputs.new("mn_IntegerSocket", "Index")
         self.inputs.new("mn_IntegerSocket", "Width").number = 10
         self.inputs.new("mn_FloatSocket", "Distance").number = 3
         self.outputs.new("mn_VectorSocket", "Vector")
-        allowCompiling()
         
     def getInputSocketNames(self):
         return {"Index" : "index",
