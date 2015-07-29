@@ -1,6 +1,6 @@
 import bpy
 from ... base_types.node import AnimationNode
-from ... mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
+from ... mn_execution import nodeTreeChanged
 
 compare_types = ["A = B", "A != B", "A < B", "A <= B", "A > B", "A >= B", "A is B"]
 compare_types_items = [(t, t, "") for t in compare_types]
@@ -11,16 +11,15 @@ class mn_CompareNode(bpy.types.Node, AnimationNode):
     
     compareType = bpy.props.EnumProperty(name = "Compare Type", items = compare_types_items, update = nodeTreeChanged)
     
-    def init(self, context):
-        forbidCompiling()
+    def create(self):
         self.inputs.new("mn_GenericSocket", "A")
         self.inputs.new("mn_GenericSocket", "B")
         self.outputs.new("mn_BooleanSocket", "Result")
-        allowCompiling()
         
     def getInputSocketNames(self):
         return {"A" : "a",
                 "B" : "b"}
+                
     def getOutputSocketNames(self):
         return {"Result" : "result"}
         
@@ -32,10 +31,10 @@ class mn_CompareNode(bpy.types.Node, AnimationNode):
     def getInLineExecutionString(self, outputUse):
         type = self.compareType
         if type == "A = B":	return "$result$ = %a% == %b%"
-        if type == "A != B":	return "$result$ = %a% != %b%"
+        if type == "A != B": return "$result$ = %a% != %b%"
         if type == "A < B":	return "try: $result$ = %a% < %b% \nexcept: $result$ = False"
-        if type == "A <= B":	return "try: $result$ = %a% <= %b% \nexcept: $result$ = False"
+        if type == "A <= B": return "try: $result$ = %a% <= %b% \nexcept: $result$ = False"
         if type == "A > B":	return "try: $result$ = %a% > %b% \nexcept: $result$ = False"
-        if type == "A >= B":	return "try: $result$ = %a% >= %b% \nexcept: $result$ = False"
-        if type == "A is B":	return "$result$ = %a% is %b%"
+        if type == "A >= B": return "try: $result$ = %a% >= %b% \nexcept: $result$ = False"
+        if type == "A is B": return "$result$ = %a% is %b%"
         return "$result$ = False"
