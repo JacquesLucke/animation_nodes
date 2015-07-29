@@ -5,88 +5,8 @@ from . mn_execution import nodeTreeChanged
 from bpy.types import NodeTree, Node, NodeSocket
 from . mn_utils import *
 
-
-# Node Tree
-##################################
-
-class mn_AnimationNodeTree(bpy.types.NodeTree):
-    bl_idname = "mn_AnimationNodeTree"
-    bl_label = "Animation";
-    bl_icon = "ACTION"
-    
-    isAnimationNodeTree = bpy.props.BoolProperty(default = True)
-    
-    def update(self):
-        nodeTreeChanged()
-    
-
-
-# Node
-##################################    
-        
-        
-class AnimationNode:
-    @classmethod
-    def poll(cls, nodeTree):
-        return nodeTree.bl_idname == "mn_AnimationNodeTree"
-        
-    def callFunctionFromUI(self, layout, functionName, text = "", icon = "NONE", description = ""):
-        idName = getNodeFunctionCallOperatorName(description)
-        props = layout.operator(idName, text = text, icon = icon)
-        props.nodeTreeName = self.id_data.name
-        props.nodeName = self.name
-        props.functionName = functionName
-        
-nodeFunctionCallOperators = {}
-missingNodeOperators = []
-
-def getNodeFunctionCallOperatorName(description):
-    if description in nodeFunctionCallOperators:
-        return nodeFunctionCallOperators[description]
-    missingNodeOperators.append(description)
-    return "mn.call_node_function_fallback"
-
-class CallNodeFunctionFallback(bpy.types.Operator):
-    bl_idname = "mn.call_node_function_fallback"
-    bl_label = "Call Node Function"
-    
-    nodeTreeName = StringProperty()
-    nodeName = StringProperty()
-    functionName = StringProperty()
-    
-    def invoke(self, context, event):
-        invokeNodeFunctionCall(self, context, event)
- 
-def invokeNodeFunctionCall(self, context, event):
-    node = getNode(self.nodeTreeName, self.nodeName)
-    getattr(node, self.functionName)()
-    return {"FINISHED"}
-
-    
-@persistent    
-def createMissingOperators(scene):
-    for description in missingNodeOperators:
-        createNodeFunctionCallOperator(description)
-    missingNodeOperators.clear()
-    
-def createNodeFunctionCallOperator(description):
-    if description not in nodeFunctionCallOperators:
-    
-        id = str(len(nodeFunctionCallOperators))
-        idName = "mn.call_node_function_" + id
-        nodeFunctionCallOperators[description] = idName
-        
-        operatorType = type("CallNodeFunction_" + id, (bpy.types.Operator,), {
-            "bl_idname" : idName,
-            "bl_label" : "Call Node Function",
-            "bl_description" : description,
-            "invoke" : invokeNodeFunctionCall })
-        operatorType.nodeTreeName = StringProperty()
-        operatorType.nodeName = StringProperty()
-        operatorType.functionName = StringProperty()
-        
-        bpy.utils.register_class(operatorType)
-    
+from . base_types.node_tree import AnimationNodeTree as mn_AnimationNodeTree
+from . base_types.node import AnimationNode as AnimationNode
 
     
     
@@ -257,11 +177,4 @@ class MoveSocketOperator(bpy.types.Operator):
 
         
 
-# Register
-################################## 
-
-def register_handlers():    
-    bpy.app.handlers.scene_update_post.append(createMissingOperators)
-    
-def unregister_handlers():
-    bpy.app.handlers.scene_update_post.remove(createMissingOperators)      
+   
