@@ -4,7 +4,7 @@ from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from ... mn_utils import *
 
-class mn_ObjectInputNode(Node, AnimationNode):
+class mn_ObjectInputNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_ObjectInputNode"
     bl_label = "Object Input"
     

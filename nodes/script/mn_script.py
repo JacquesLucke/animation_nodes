@@ -9,7 +9,7 @@ from ... sockets.mn_socket_info import getSocketDataTypeItems, getIdNameFromData
 
 emptySocketName = "New Socket"
 
-class mn_ScriptNode(Node, AnimationNode):
+class mn_ScriptNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_ScriptNode"
     bl_label = "Script"
     

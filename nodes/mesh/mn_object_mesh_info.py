@@ -7,7 +7,7 @@ from ... mn_cache import *
 
 cacheIdentifier = "Object Mesh Data"
 
-class mn_ObjectMeshInfo(Node, AnimationNode):
+class mn_ObjectMeshInfo(bpy.types.Node, AnimationNode):
     bl_idname = "mn_ObjectMeshInfo"
     bl_label = "Object Mesh Info"
     outputUseParameterName = "useOutput"

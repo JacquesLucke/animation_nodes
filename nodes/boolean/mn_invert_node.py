@@ -4,7 +4,7 @@ from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 
 
-class mn_InvertNode(Node, AnimationNode):
+class mn_InvertNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_InvertNode"
     bl_label = "Invert Boolean"
     

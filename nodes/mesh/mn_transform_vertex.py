@@ -5,7 +5,7 @@ from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompilin
 from ... data_structures.mesh import *
 from mathutils import Matrix
 
-class mn_TransformVertex(Node, AnimationNode):
+class mn_TransformVertex(bpy.types.Node, AnimationNode):
     bl_idname = "mn_TransformVertex"
     bl_label = "Transform Vertex"
     

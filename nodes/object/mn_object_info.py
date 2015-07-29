@@ -8,7 +8,7 @@ from bpy.props import BoolProperty
 from operator import sub
 from mathutils import Vector
 
-class mn_ObjectInfoNode(Node, AnimationNode):
+class mn_ObjectInfoNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_ObjectInfoNode"
     bl_label = "Object Info"
     outputUseParameterName = "useOutput"

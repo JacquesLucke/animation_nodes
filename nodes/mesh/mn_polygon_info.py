@@ -4,7 +4,7 @@ from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from ... data_structures.mesh import *
 
-class mn_PolygonInfo(Node, AnimationNode):
+class mn_PolygonInfo(bpy.types.Node, AnimationNode):
     bl_idname = "mn_PolygonInfo"
     bl_label = "Polygon Info"
     

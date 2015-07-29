@@ -13,7 +13,7 @@ class UpdateSettings(bpy.types.PropertyGroup):
     unitName = bpy.props.StringProperty(default = "Unit", name = "Unit Name")
     printTime = bpy.props.BoolProperty(default = False, name = "Print Update Time")
     
-class mn_NetworkUpdateSettingsNode(Node, AnimationNode):
+class mn_NetworkUpdateSettingsNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_NetworkUpdateSettingsNode"
     bl_label = "Update Settings"
     needsExecution = False

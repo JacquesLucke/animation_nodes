@@ -8,7 +8,7 @@ def updateNode(node, context):
     nodeTreeChanged()
 
 
-class mn_VectorMathNode(Node, AnimationNode):
+class mn_VectorMathNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_VectorMathNode"
     bl_label = "Vector Math"
     isDetermined = True

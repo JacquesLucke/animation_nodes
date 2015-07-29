@@ -20,7 +20,7 @@ possibleProperties = {
     
 fillModes = ("FULL", "BACK", "FRONT", "HALF")  
 
-class mn_CurveProperties(Node, AnimationNode):
+class mn_CurveProperties(bpy.types.Node, AnimationNode):
     bl_idname = "mn_CurveProperties"
     bl_label = "Curve Properties"
     

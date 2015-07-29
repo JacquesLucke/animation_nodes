@@ -4,7 +4,7 @@ from ... mn_cache import getUniformRandom
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
-class mn_CopyObjectData(Node, AnimationNode):
+class mn_CopyObjectData(bpy.types.Node, AnimationNode):
     bl_idname = "mn_CopyObjectData"
     bl_label = "Copy Object Data"
     

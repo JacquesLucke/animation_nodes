@@ -5,7 +5,7 @@ from ... mn_execution import nodeTreeChanged, allowCompiling, forbidCompiling
 from ... mn_utils import *
 
 
-class mn_TextBlockReader(Node, AnimationNode):
+class mn_TextBlockReader(bpy.types.Node, AnimationNode):
     bl_idname = "mn_TextBlockReader"
     bl_label = "Text Block Reader"
     outputUseParameterName = "useOutput"

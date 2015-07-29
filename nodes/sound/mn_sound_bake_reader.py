@@ -8,7 +8,7 @@ from ... mn_cache import *
 from ... utils.mn_node_utils import updateOldSocket
 
 
-class mn_SoundBakeReaderNode(Node, AnimationNode):
+class mn_SoundBakeReaderNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_SoundBakeReaderNode"
     bl_label = "Sound Reader"
     

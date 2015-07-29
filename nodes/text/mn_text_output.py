@@ -14,7 +14,7 @@ options = [ ("useText", "Text"),
             ("useXOffset", "X Offset"),
             ("useYOffset", "Y Offset") ]
 
-class mn_TextOutputNode(Node, AnimationNode):
+class mn_TextOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_TextOutputNode"
     bl_label = "Text Output"
     

@@ -9,7 +9,7 @@ sourceTypeItems = [
     ("MESH_DATA", "Vertices and Indices", ""),
     ("POLYGONS", "Polygons", "") ]
 
-class mn_CombineMeshData(Node, AnimationNode):
+class mn_CombineMeshData(bpy.types.Node, AnimationNode):
     bl_idname = "mn_CombineMeshData"
     bl_label = "Combine Mesh Data"
     

@@ -11,7 +11,7 @@ allowedSocketTypes = {
     "NodeSocketFloat" : "mn_FloatSocket" }
                     
 
-class mn_CyclesMaterialOutputNode(Node, AnimationNode):
+class mn_CyclesMaterialOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_CyclesMaterialOutputNode"
     bl_label = "Cycles Material Output"
     

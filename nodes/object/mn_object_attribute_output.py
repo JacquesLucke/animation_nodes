@@ -4,7 +4,7 @@ from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 from ... mn_utils import *
 
-class mn_ObjectAttributeOutputNode(Node, AnimationNode):
+class mn_ObjectAttributeOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_ObjectAttributeOutputNode"
     bl_label = "Object Attribute Output"
     

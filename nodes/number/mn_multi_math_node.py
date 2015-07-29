@@ -5,7 +5,7 @@ from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from ... mn_utils import *
 
-class mn_MultiFloatMathNode(Node, AnimationNode):
+class mn_MultiFloatMathNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_MultiFloatMathNode"
     bl_label = "Multi Float Math"
     node_category = "Math"

@@ -3,7 +3,7 @@ from bpy.types import Node
 from ... mn_node_base import AnimationNode
 from ... mn_execution import allowCompiling, forbidCompiling
 
-class mn_MakeObjectSmooth(Node, AnimationNode):
+class mn_MakeObjectSmooth(bpy.types.Node, AnimationNode):
     bl_idname = "mn_MakeObjectSmooth"
     bl_label = "Make Object Smooth"
     

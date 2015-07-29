@@ -5,7 +5,7 @@ from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from mathutils import Vector
 
-class mn_VectorWiggle(Node, AnimationNode):
+class mn_VectorWiggle(bpy.types.Node, AnimationNode):
     bl_idname = "mn_VectorWiggle"
     bl_label = "Vector Wiggle"
     isDetermined = True

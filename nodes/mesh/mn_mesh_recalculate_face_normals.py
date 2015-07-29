@@ -3,7 +3,7 @@ from bpy.types import Node
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
-class mn_MeshRecalculateFaceNormals(Node, AnimationNode):
+class mn_MeshRecalculateFaceNormals(bpy.types.Node, AnimationNode):
     bl_idname = "mn_MeshRecalculateFaceNormals"
     bl_label = "Recalculate Normals"
     

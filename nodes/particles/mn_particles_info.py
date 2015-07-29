@@ -4,7 +4,7 @@ from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 
-class mn_ParticlesInfo(Node, AnimationNode):
+class mn_ParticlesInfo(bpy.types.Node, AnimationNode):
     bl_idname = "mn_ParticlesInfo"
     bl_label = "Particles Info"
     

@@ -13,7 +13,7 @@ def updateNode(node, context):
     nodeTreeChanged()
 
 
-class mn_FloatMathNode(Node, AnimationNode):
+class mn_FloatMathNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_FloatMathNode"
     bl_label = "Math"
     isDetermined = True

@@ -5,7 +5,7 @@ from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 
-class mn_DecomposeMatrix(Node, AnimationNode):
+class mn_DecomposeMatrix(bpy.types.Node, AnimationNode):
     bl_idname = "mn_DecomposeMatrix"
     bl_label = "Decompose Matrix"
     outputUseParameterName = "useOutput"

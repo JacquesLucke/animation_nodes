@@ -3,7 +3,7 @@ from bpy.types import Node
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 
-class mn_CombineVector(Node, AnimationNode):
+class mn_CombineVector(bpy.types.Node, AnimationNode):
     bl_idname = "mn_CombineVector"
     bl_label = "Combine Vector"
     isDetermined = True

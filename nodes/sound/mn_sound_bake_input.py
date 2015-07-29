@@ -7,7 +7,7 @@ from ... nodes.mn_node_helper import *
 from ... mn_cache import *
 
 
-class mn_SoundBakeInput(Node, AnimationNode):
+class mn_SoundBakeInput(bpy.types.Node, AnimationNode):
     bl_idname = "mn_SoundBakeInput"
     bl_label = "Sound Bake Input"
     

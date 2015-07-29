@@ -5,7 +5,7 @@ from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 
-class mn_FloatWiggle(Node, AnimationNode):
+class mn_FloatWiggle(bpy.types.Node, AnimationNode):
     bl_idname = "mn_FloatWiggle"
     bl_label = "Number Wiggle"
     isDetermined = True

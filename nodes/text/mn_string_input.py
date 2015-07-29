@@ -3,7 +3,7 @@ from bpy.types import Node
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
-class mn_StringInputNode(Node, AnimationNode):
+class mn_StringInputNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_StringInputNode"
     bl_label = "Text Input"
     

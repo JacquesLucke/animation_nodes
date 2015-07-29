@@ -4,7 +4,7 @@ from ... mn_node_base import AnimationNode
 from ... mn_execution import nodeTreeChanged, allowCompiling, forbidCompiling
 import math
 
-class mn_CreateEdgeIndices(Node, AnimationNode):
+class mn_CreateEdgeIndices(bpy.types.Node, AnimationNode):
     bl_idname = "mn_CreateEdgeIndices"
     bl_label = "Create Edge Indices"
     node_category = "Mesh"

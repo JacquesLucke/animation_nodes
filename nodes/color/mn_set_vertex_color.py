@@ -4,7 +4,7 @@ from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 
-class mn_SetVertexColor(Node, AnimationNode):
+class mn_SetVertexColor(bpy.types.Node, AnimationNode):
     bl_idname = "mn_SetVertexColor"
     bl_label = "Set Vertex Color"
     

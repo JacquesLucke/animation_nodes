@@ -5,7 +5,7 @@ from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from ... algorithms.interpolation import *
 
-class mn_AnimateFloatNode(Node, AnimationNode):
+class mn_AnimateFloatNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_AnimateFloatNode"
     bl_label = "Animate Number"
     outputUseParameterName = "useOutput"

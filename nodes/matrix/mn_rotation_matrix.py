@@ -6,7 +6,7 @@ from ... mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompilin
 
 axisItems = [("X", "X", ""), ("Y", "Y", ""), ("Z", "Z", "")]
 
-class mn_RotationMatrix(Node, AnimationNode):
+class mn_RotationMatrix(bpy.types.Node, AnimationNode):
     bl_idname = "mn_RotationMatrix"
     bl_label = "Rotation Matrix"
     isDetermined = True

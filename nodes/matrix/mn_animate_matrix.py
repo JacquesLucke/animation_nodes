@@ -5,7 +5,7 @@ from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from ... algorithms.interpolation import *
 
-class mn_AnimateMatrixNode(Node, AnimationNode):
+class mn_AnimateMatrixNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_AnimateMatrixNode"
     bl_label = "Animate Matrix"
     isDetermined = True

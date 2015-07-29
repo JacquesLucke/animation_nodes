@@ -5,7 +5,7 @@ from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 
-class mn_ObjectMatrixInput(Node, AnimationNode):
+class mn_ObjectMatrixInput(bpy.types.Node, AnimationNode):
     bl_idname = "mn_ObjectMatrixInput"
     bl_label = "Object Matrix Input"
     outputUseParameterName = "useOutput"

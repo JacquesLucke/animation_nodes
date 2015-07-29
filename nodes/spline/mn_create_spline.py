@@ -10,7 +10,7 @@ splineTypeItems = [
     ("BEZIER", "Bezier", "Each control point has two handles"),
     ("POLY", "Poly", "Linear interpolation between the spline points")]
 
-class mn_CreateSpline(Node, AnimationNode):
+class mn_CreateSpline(bpy.types.Node, AnimationNode):
     bl_idname = "mn_CreateSpline"
     bl_label = "Create Spline"
     

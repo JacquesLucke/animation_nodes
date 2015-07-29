@@ -6,7 +6,7 @@ from ... utils.fcurve import *
 from ... mn_utils import *
 from ... mn_cache import *
 
-class mn_CopyTransformsNode(Node, AnimationNode):
+class mn_CopyTransformsNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_CopyTransformsNode"
     bl_label = "Copy Transforms"
     

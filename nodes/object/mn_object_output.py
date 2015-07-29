@@ -3,7 +3,7 @@ from bpy.types import Node
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 
-class mn_ObjectTransformsOutput(Node, AnimationNode):
+class mn_ObjectTransformsOutput(bpy.types.Node, AnimationNode):
     bl_idname = "mn_ObjectTransformsOutput"
     bl_label = "Transforms Output"
     

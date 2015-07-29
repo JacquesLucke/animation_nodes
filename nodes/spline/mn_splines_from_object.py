@@ -4,7 +4,7 @@ from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from ... data_structures.splines.from_blender import createSplinesFromBlenderObject
 
-class mn_SplinesFromObject(Node, AnimationNode):
+class mn_SplinesFromObject(bpy.types.Node, AnimationNode):
     bl_idname = "mn_SplinesFromObject"
     bl_label = "Splines from Object"
     

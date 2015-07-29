@@ -5,7 +5,7 @@ from ... mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompilin
 from ... mn_utils import *
 from ... sockets.mn_socket_info import *
 
-class mn_ConvertNode(Node, AnimationNode):
+class mn_ConvertNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_ConvertNode"
     bl_label = "Convert"
     isDetermined = True

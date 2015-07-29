@@ -5,7 +5,7 @@ from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 
-class mn_TranslationMatrix(Node, AnimationNode):
+class mn_TranslationMatrix(bpy.types.Node, AnimationNode):
     bl_idname = "mn_TranslationMatrix"
     bl_label = "Translation Matrix"
     isDetermined = True

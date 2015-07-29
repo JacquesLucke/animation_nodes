@@ -6,7 +6,7 @@ from ... mn_utils import *
 
 defaultVariableNames = list("xyzwabcdefghijklmnopqrstuv")
 
-class mn_ExpressionNode(Node, AnimationNode):
+class mn_ExpressionNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_ExpressionNode"
     bl_label = "Expression"
     

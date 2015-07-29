@@ -5,7 +5,7 @@ from ... mn_execution import nodeTreeChanged, allowCompiling, forbidCompiling
 from ... mn_utils import *
 
 
-class mn_TextBlockWriter(Node, AnimationNode):
+class mn_TextBlockWriter(bpy.types.Node, AnimationNode):
     bl_idname = "mn_TextBlockWriter"
     bl_label = "Text Block Writer"
     

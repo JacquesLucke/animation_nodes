@@ -13,7 +13,7 @@ sampleDistributionTypeItems = [
     ("RESOLUTION", "Resolution", ""),
     ("UNIFORM", "Uniform", "")]    
     
-class mn_LoftSplines(Node, AnimationNode):
+class mn_LoftSplines(bpy.types.Node, AnimationNode):
     bl_idname = "mn_LoftSplines"
     bl_label = "Loft Splines"
     

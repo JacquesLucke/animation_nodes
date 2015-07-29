@@ -8,7 +8,7 @@ outputItems = [	("BASIS", "Basis", ""),
                 ("PARENT INVERSE", "Parent Inverse", ""),
                 ("WORLD", "World", "") ]
 
-class mn_ObjectMatrixOutputNode(Node, AnimationNode):
+class mn_ObjectMatrixOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_ObjectMatrixOutputNode"
     bl_label = "Object Matrix Output"
     

@@ -6,7 +6,7 @@ from ... mn_utils import *
 from ... utils.mn_node_utils import *
 
 
-class mn_CombineStringsNode(Node, AnimationNode):
+class mn_CombineStringsNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_CombineStringsNode"
     bl_label = "Combine Texts"
     

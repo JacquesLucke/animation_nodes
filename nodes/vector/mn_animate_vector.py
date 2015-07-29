@@ -6,7 +6,7 @@ from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompilin
 from ... algorithms.interpolation import *
 from mathutils import Vector
 
-class mn_AnimateVectorNode(Node, AnimationNode):
+class mn_AnimateVectorNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_AnimateVectorNode"
     bl_label = "Animate Vector"
     outputUseParameterName = "useOutput"

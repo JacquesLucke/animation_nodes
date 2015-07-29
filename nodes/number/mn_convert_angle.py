@@ -8,7 +8,7 @@ conversionTypeItems = [
     ("DEGREE_TO_RADIAN", "Degree to Radian", ""),
     ("RADIAN_TO_DEGREE", "Radian to Degree", "")]
 
-class mn_ConvertAngle(Node, AnimationNode):
+class mn_ConvertAngle(bpy.types.Node, AnimationNode):
     bl_idname = "mn_ConvertAngle"
     bl_label = "Convert Angle"
     isDetermined = True

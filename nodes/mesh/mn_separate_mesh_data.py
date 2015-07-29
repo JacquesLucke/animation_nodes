@@ -5,7 +5,7 @@ from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompilin
 from ... data_structures.mesh import *
 from ... mn_cache import *
 
-class mn_SeparateMeshData(Node, AnimationNode):
+class mn_SeparateMeshData(bpy.types.Node, AnimationNode):
     bl_idname = "mn_SeparateMeshData"
     bl_label = "Separate Mesh Data"
     

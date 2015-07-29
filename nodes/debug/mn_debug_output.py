@@ -4,7 +4,7 @@ from bpy.props import *
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
-class mn_DebugOutputNode(Node, AnimationNode):
+class mn_DebugOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_DebugOutputNode"
     bl_label = "Debug Output"
     

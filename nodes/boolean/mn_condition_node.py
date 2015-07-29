@@ -4,7 +4,7 @@ from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 
 
-class mn_ConditionNode(Node, AnimationNode):
+class mn_ConditionNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_ConditionNode"
     bl_label = "Condition"
     

@@ -5,7 +5,7 @@ from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 
-class mn_InvertMatrix(Node, AnimationNode):
+class mn_InvertMatrix(bpy.types.Node, AnimationNode):
     bl_idname = "mn_InvertMatrix"
     bl_label = "Invert Matrix"
     isDetermined = True

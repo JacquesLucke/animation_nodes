@@ -3,7 +3,7 @@ from bpy.types import Node
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
-class mn_TrimText(Node, AnimationNode):
+class mn_TrimText(bpy.types.Node, AnimationNode):
     bl_idname = "mn_TrimText"
     bl_label = "Trim Text"
     

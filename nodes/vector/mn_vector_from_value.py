@@ -3,7 +3,7 @@ from bpy.types import Node
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 
-class mn_VectorFromValue(Node, AnimationNode):
+class mn_VectorFromValue(bpy.types.Node, AnimationNode):
     bl_idname = "mn_VectorFromValue"
     bl_label = "Vector from Value"
     node_category = "Math"

@@ -8,7 +8,7 @@ from ... mn_utils import *
 class mn_ObjectPropertyGroup(bpy.types.PropertyGroup):
     object = bpy.props.StringProperty(name = "Object", default = "", update = nodePropertyChanged)
 
-class mn_ObjectListInputNode(Node, AnimationNode):
+class mn_ObjectListInputNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_ObjectListInputNode"
     bl_label = "Object List"
     

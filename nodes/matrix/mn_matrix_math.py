@@ -6,7 +6,7 @@ from ... mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompilin
 
 operationItems = [("MULTIPLY", "Multiply", "")]
 
-class mn_MatrixMath(Node, AnimationNode):
+class mn_MatrixMath(bpy.types.Node, AnimationNode):
     bl_idname = "mn_MatrixMath"
     bl_label = "Matrix Math"
     isDetermined = True

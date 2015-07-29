@@ -15,7 +15,7 @@ def getListTypeItems(self, context):
         listTypeItems.append(item)
     return listTypeItems
 
-class mn_DataInput(Node, AnimationNode):
+class mn_DataInput(bpy.types.Node, AnimationNode):
     bl_idname = "mn_DataInput"
     bl_label = "Data Input"
     

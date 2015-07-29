@@ -14,7 +14,7 @@ class mn_ObjectNamePropertyGroup(bpy.types.PropertyGroup):
     objectName = bpy.props.StringProperty(name = "Object Name", default = "", update = nodePropertyChanged)
     objectIndex = bpy.props.IntProperty(name = "Object Index", default = 0, update = nodePropertyChanged)
 
-class mn_ObjectInstancer(Node, AnimationNode):
+class mn_ObjectInstancer(bpy.types.Node, AnimationNode):
     bl_idname = "mn_ObjectInstancer"
     bl_label = "Object Instancer"
     search_tags = ["Object Replicator (old)"]

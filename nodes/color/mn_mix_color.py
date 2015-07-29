@@ -4,7 +4,7 @@ from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 
-class mn_ColorMix(Node, AnimationNode):
+class mn_ColorMix(bpy.types.Node, AnimationNode):
     bl_idname = "mn_ColorMix"
     bl_label = "Color Mix"
     isDetermined = True

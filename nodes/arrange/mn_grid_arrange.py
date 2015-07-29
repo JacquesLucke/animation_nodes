@@ -4,7 +4,7 @@ from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 
-class mn_GridArrange(Node, AnimationNode):
+class mn_GridArrange(bpy.types.Node, AnimationNode):
     bl_idname = "mn_GridArrange"
     bl_label = "Grid Arrange"
     node_category = "Arrange"

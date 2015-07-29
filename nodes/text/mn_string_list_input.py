@@ -7,7 +7,7 @@ from ... mn_utils import *
 class mn_StringPropertyGroup(bpy.types.PropertyGroup):
     string = bpy.props.StringProperty(name = "String", default = "", update = nodePropertyChanged)
 
-class mn_StringListInputNode(Node, AnimationNode):
+class mn_StringListInputNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_StringListInputNode"
     bl_label = "Text List"
     

@@ -4,7 +4,7 @@ from mathutils import Vector
 from ... mn_node_base import AnimationNode
 from ... mn_execution import allowCompiling, forbidCompiling, nodePropertyChanged
 
-class mn_EdgesOfPolygons(Node, AnimationNode):
+class mn_EdgesOfPolygons(bpy.types.Node, AnimationNode):
     bl_idname = "mn_EdgesOfPolygons"
     bl_label = "Edges of Polygons"
     

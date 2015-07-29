@@ -5,7 +5,7 @@ from ... mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompilin
 from ... data_structures.mesh import *
 import bmesh
 
-class mn_CreateMeshFromData(Node, AnimationNode):
+class mn_CreateMeshFromData(bpy.types.Node, AnimationNode):
     bl_idname = "mn_CreateMeshFromData"
     bl_label = "Create Mesh"
     

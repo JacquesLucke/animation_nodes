@@ -5,7 +5,7 @@ from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 
-class mn_ComposeMatrix(Node, AnimationNode):
+class mn_ComposeMatrix(bpy.types.Node, AnimationNode):
     bl_idname = "mn_ComposeMatrix"
     bl_label = "Compose Matrix"
     isDetermined = True

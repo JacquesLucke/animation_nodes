@@ -4,7 +4,7 @@ from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from ... mn_utils import *
 
-class mn_CombineListsNode(Node, AnimationNode):
+class mn_CombineListsNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_CombineListsNode"
     bl_label = "Combine Lists"
     

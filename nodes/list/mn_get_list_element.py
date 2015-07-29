@@ -5,7 +5,7 @@ from ... utils.mn_node_utils import *
 from ... sockets.mn_socket_info import *
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
-class mn_GetListElementNode(Node, AnimationNode):
+class mn_GetListElementNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_GetListElementNode"
     bl_label = "Get Element"
     

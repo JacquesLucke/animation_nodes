@@ -3,7 +3,7 @@ from bpy.types import Node
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
-class mn_StringLengthNode(Node, AnimationNode):
+class mn_StringLengthNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_StringLengthNode"
     bl_label = "Text Length"
     

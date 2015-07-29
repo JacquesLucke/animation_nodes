@@ -4,7 +4,7 @@ from mathutils import Vector
 from ... mn_node_base import AnimationNode
 from ... mn_execution import allowCompiling, forbidCompiling, nodePropertyChanged
 
-class mn_EdgesToPlanes(Node, AnimationNode):
+class mn_EdgesToPlanes(bpy.types.Node, AnimationNode):
     bl_idname = "mn_EdgesToPlanes"
     bl_label = "Edges to Planes"
     

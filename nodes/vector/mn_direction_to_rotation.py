@@ -7,7 +7,7 @@ from ... mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompilin
 trackAxisItems = [(axis, axis, "") for axis in ("X", "Y", "Z", "-X", "-Y", "-Z")]
 upAxisItems = [(axis, axis, "") for axis in ("X", "Y", "Z")]
 
-class mn_DirectionToRotation(Node, AnimationNode):
+class mn_DirectionToRotation(bpy.types.Node, AnimationNode):
     bl_idname = "mn_DirectionToRotation"
     bl_label = "Direction to Rotation"
     

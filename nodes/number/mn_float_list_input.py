@@ -7,7 +7,7 @@ from ... mn_utils import *
 class mn_FloatPropertyGroup(bpy.types.PropertyGroup):
     value = bpy.props.FloatProperty(name = "Value", default = 0, update = nodePropertyChanged)
 
-class mn_FloatListInputNode(Node, AnimationNode):
+class mn_FloatListInputNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_FloatListInputNode"
     bl_label = "Number List"
     

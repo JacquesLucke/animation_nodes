@@ -15,7 +15,7 @@ presets = {
     "VERTEX" : ([("mn_VertexSocket", "Vertex")], []),
     "VECTOR_LIST" : ([("mn_VectorSocket", "Source")], [("mn_VectorListSocket", "New List")]) }
 
-class mn_LoopStartNode(Node, AnimationNode):
+class mn_LoopStartNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_LoopStartNode"
     bl_label = "Loop Start"
     

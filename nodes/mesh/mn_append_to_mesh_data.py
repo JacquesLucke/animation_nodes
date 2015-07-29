@@ -5,7 +5,7 @@ from ... mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompilin
 from ... data_structures.mesh import *
 import bmesh
 
-class mn_AppendToMeshData(Node, AnimationNode):
+class mn_AppendToMeshData(bpy.types.Node, AnimationNode):
     bl_idname = "mn_AppendToMeshData"
     bl_label = "Append Mesh Data"
     

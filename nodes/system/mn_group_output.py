@@ -8,7 +8,7 @@ from ... sockets.mn_socket_info import *
 
 newOutputSocketName = "New Output"
 
-class mn_GroupOutput(Node, AnimationNode):
+class mn_GroupOutput(bpy.types.Node, AnimationNode):
     bl_idname = "mn_GroupOutput"
     bl_label = "Group Output"
     

@@ -3,7 +3,7 @@ from bpy.types import Node
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged
 
-class mn_ObjectGroupInput(Node, AnimationNode):
+class mn_ObjectGroupInput(bpy.types.Node, AnimationNode):
     bl_idname = "mn_ObjectGroupInput"
     bl_label = "Object Group Input"
     

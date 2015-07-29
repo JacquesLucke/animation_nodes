@@ -10,7 +10,7 @@ from ... nodes.mn_node_helper import getMainObjectContainer
 idPropertyName = "text separation node id"
 indexPropertyName = "text separation node index"
 
-class mn_SeparateTextObject(Node, AnimationNode):
+class mn_SeparateTextObject(bpy.types.Node, AnimationNode):
     bl_idname = "mn_SeparateTextObject"
     bl_label = "Separate Text Object"
     

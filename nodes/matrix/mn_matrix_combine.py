@@ -7,7 +7,7 @@ from ... utils.mn_node_utils import *
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 
-class mn_MatrixCombine(Node, AnimationNode):
+class mn_MatrixCombine(bpy.types.Node, AnimationNode):
     bl_idname = "mn_MatrixCombine"
     bl_label = "Combine Matrices"
     isDetermined = True

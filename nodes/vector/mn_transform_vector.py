@@ -3,7 +3,7 @@ from bpy.types import Node
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodeTreeChanged, allowCompiling, forbidCompiling
 
-class mn_TransformVector(Node, AnimationNode):
+class mn_TransformVector(bpy.types.Node, AnimationNode):
     bl_idname = "mn_TransformVector"
     bl_label = "Transform Vector"
     isDetermined = True

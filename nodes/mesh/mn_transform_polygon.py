@@ -5,7 +5,7 @@ from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompilin
 from ... data_structures.mesh import *
 from mathutils import Matrix
 
-class mn_TransformPolygon(Node, AnimationNode):
+class mn_TransformPolygon(bpy.types.Node, AnimationNode):
     bl_idname = "mn_TransformPolygon"
     bl_label = "Transform Polygon"
     

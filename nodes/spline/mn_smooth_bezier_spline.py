@@ -7,7 +7,7 @@ from ... data_structures.splines.bezier_spline import BezierSpline
 from ... data_structures.splines.poly_spline import PolySpline
 
 
-class mn_SmoothBezierSpline(Node, AnimationNode):
+class mn_SmoothBezierSpline(bpy.types.Node, AnimationNode):
     bl_idname = "mn_SmoothBezierSpline"
     bl_label = "Smooth Bezier Spline"
     

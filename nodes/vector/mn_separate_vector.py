@@ -3,7 +3,7 @@ from bpy.types import Node
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
-class mn_SeparateVector(Node, AnimationNode):
+class mn_SeparateVector(bpy.types.Node, AnimationNode):
     bl_idname = "mn_SeparateVector"
     bl_label = "Separate Vector"
     isDetermined = True

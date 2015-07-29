@@ -9,7 +9,7 @@ projectionTypeItems = [
     ("PARAMETER", "Same Parameter", ""),
     ("PROJECT", "Project", "") ]
 
-class mn_RevolveSpline(Node, AnimationNode):
+class mn_RevolveSpline(bpy.types.Node, AnimationNode):
     bl_idname = "mn_RevolveSpline"
     bl_label = "Revolve Spline"
         

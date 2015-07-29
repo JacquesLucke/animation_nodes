@@ -3,7 +3,7 @@ from bpy.types import Node
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
-class mn_FloatInputNode(Node, AnimationNode):
+class mn_FloatInputNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_FloatInputNode"
     bl_label = "Float Input"
     isDetermined = True

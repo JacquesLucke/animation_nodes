@@ -5,7 +5,7 @@ from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from mathutils import Vector
 
-class mn_RandomVectorNode(Node, AnimationNode):
+class mn_RandomVectorNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_RandomVectorNode"
     bl_label = "Random Vector"
     isDetermined = True

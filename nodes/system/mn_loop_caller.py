@@ -13,7 +13,7 @@ loopTypes = [
     ("Vertex", "VERTEX"),
     ("Vector List", "VECTOR_LIST") ]
 
-class mn_LoopCallerNode(Node, AnimationNode):
+class mn_LoopCallerNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_LoopCallerNode"
     bl_label = "Loop Call"
     

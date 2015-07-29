@@ -4,7 +4,7 @@ from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 
-class mn_CombineColor(Node, AnimationNode):
+class mn_CombineColor(bpy.types.Node, AnimationNode):
     bl_idname = "mn_CombineColor"
     bl_label = "Combine Color"
     isDetermined = True

@@ -13,7 +13,7 @@ class mn_BakedSoundPropertyGroup(bpy.types.PropertyGroup):
     path = bpy.props.StringProperty(name = "Path", default = "")
     propertyName = bpy.props.StringProperty(name = "Property Path", default = "")
 
-class mn_SoundBakeNode(Node, AnimationNode):
+class mn_SoundBakeNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_SoundBakeNode"
     bl_label = "Sound Bake"
     

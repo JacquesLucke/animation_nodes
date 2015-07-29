@@ -3,7 +3,7 @@ from bpy.types import Node
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
-class mn_BooleanInputNode(Node, AnimationNode):
+class mn_BooleanInputNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_BooleanInputNode"
     bl_label = "Boolean Input"
     isDetermined = True

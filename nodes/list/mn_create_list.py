@@ -16,7 +16,7 @@ def getListTypeItems(self, context):
         listTypeItems.append(item)
     return listTypeItems
 
-class mn_CreateList(Node, AnimationNode):
+class mn_CreateList(bpy.types.Node, AnimationNode):
     bl_idname = "mn_CreateList"
     bl_label = "Create List"
     

@@ -5,7 +5,7 @@ from mathutils import Vector
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
-class mn_ProjectOnSpline(Node, AnimationNode):
+class mn_ProjectOnSpline(bpy.types.Node, AnimationNode):
     bl_idname = "mn_ProjectOnSpline"
     bl_label = "Project on Spline"
     

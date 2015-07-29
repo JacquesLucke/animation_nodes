@@ -6,7 +6,7 @@ from ... mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompilin
 from ... id_keys import getIDKeyInfo, getIDKeyItems
 
 
-class mn_ObjectIDKey(Node, AnimationNode):
+class mn_ObjectIDKey(bpy.types.Node, AnimationNode):
     bl_idname = "mn_ObjectIDKey"
     bl_label = "Object ID Key"
     

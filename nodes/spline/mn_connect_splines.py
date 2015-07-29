@@ -4,7 +4,7 @@ from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from ... data_structures.splines.operations import connectSplines
 
-class mn_ConnectSplines(Node, AnimationNode):
+class mn_ConnectSplines(bpy.types.Node, AnimationNode):
     bl_idname = "mn_ConnectSplines"
     bl_label = "Connect Splines"
     

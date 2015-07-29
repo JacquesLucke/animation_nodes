@@ -4,7 +4,7 @@ from ... mn_node_base import AnimationNode
 from ... mn_execution import nodeTreeChanged, allowCompiling, forbidCompiling
 from ... mn_utils import *
 
-class mn_CreatePolygonIndices(Node, AnimationNode):
+class mn_CreatePolygonIndices(bpy.types.Node, AnimationNode):
     bl_idname = "mn_CreatePolygonIndices"
     bl_label = "Create Polygon Indices"
     node_category = "Mesh"
