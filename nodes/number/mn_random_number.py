@@ -3,7 +3,7 @@ from ... mn_cache import getUniformRandom
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged
 
-class mn_RandomNumberNode(bpy.types.Node, AnimationNode):
+class RandomNumberNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_RandomNumberNode"
     bl_label = "Random Number"
     isDetermined = True
