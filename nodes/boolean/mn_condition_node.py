@@ -1,25 +1,22 @@
 import bpy
 from ... base_types.node import AnimationNode
-from ... mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 
-
-class mn_ConditionNode(bpy.types.Node, AnimationNode):
+class ConditionNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_ConditionNode"
     bl_label = "Condition"
     
-    def init(self, context):
-        forbidCompiling()
+    def create(self):
         self.inputs.new("mn_BooleanSocket", "Condition")
         self.inputs.new("mn_GenericSocket", "If True")
         self.inputs.new("mn_GenericSocket", "If False")
         self.outputs.new("mn_GenericSocket", "Output")
         self.outputs.new("mn_GenericSocket", "Other")
-        allowCompiling()
         
     def getInputSocketNames(self):
         return {"Condition" : "condition",
                 "If True" : "ifTrue",
                 "If False" : "ifFalse"}
+                
     def getOutputSocketNames(self):
         return {"Output" : "output",
                 "Other" : "other"}

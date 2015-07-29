@@ -5,7 +5,7 @@ from ... mn_execution import nodeTreeChanged
 compare_types = ["A = B", "A != B", "A < B", "A <= B", "A > B", "A >= B", "A is B"]
 compare_types_items = [(t, t, "") for t in compare_types]
 
-class mn_CompareNode(bpy.types.Node, AnimationNode):
+class CompareNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_CompareNode"
     bl_label = "Compare"
     
