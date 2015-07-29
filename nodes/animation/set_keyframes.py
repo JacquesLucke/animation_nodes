@@ -1,7 +1,6 @@
 import bpy
-from bpy.types import Node
 from ... mn_node_base import AnimationNode
-from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from ... mn_execution import nodePropertyChanged
 from ... mn_utils import *
 
 pathTypes = ("Custom", "Location", "Rotation", "Scale", "LocRotScale")
@@ -11,7 +10,7 @@ class mn_KeyframePath(bpy.types.PropertyGroup):
     path = bpy.props.StringProperty(default = "", update = nodePropertyChanged, description = "Path to the property")
     index = bpy.props.IntProperty(default = -1, update = nodePropertyChanged, min = -1, soft_max = 2, description = "Used index if the path points to an array (-1 will set a keyframe on every index)")
 
-class mn_SetKeyframesNode(Node, AnimationNode):
+class SetKeyframesNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_SetKeyframesNode"
     bl_label = "Set Keyframes"
         
@@ -20,14 +19,12 @@ class mn_SetKeyframesNode(Node, AnimationNode):
     selectedPathType = bpy.props.EnumProperty(default = "Location", items = pathTypeItems, name = "Path Type")
     attributePath = bpy.props.StringProperty(default = "", name = "Attribute Path")
     
-    def init(self, context):
-        forbidCompiling()
+    def create(self):
         self.width = 200
         self.inputs.new("mn_BooleanSocket", "Enable").value = False
         self.inputs.new("mn_BooleanSocket", "Set Keyframe")
         self.inputs.new("mn_BooleanSocket", "Remove Unwanted")
         self.inputs.new("mn_ObjectSocket", "Object")
-        allowCompiling()
         
     def draw_buttons(self, context, layout):
         row = layout.row(align = True)
@@ -52,6 +49,7 @@ class mn_SetKeyframesNode(Node, AnimationNode):
                 "Set Keyframe" : "setKeyframe",
                 "Remove Unwanted" : "removeUnwanted",
                 "Object" : "object"}
+                
     def getOutputSocketNames(self):
         return {}
         

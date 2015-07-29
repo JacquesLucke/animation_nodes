@@ -1,24 +1,23 @@
 import bpy
-from bpy.types import Node
 from ... mn_node_base import AnimationNode
-from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
-from ... algorithms.interpolation import *
+from ... algorithms.interpolation import mixedInterpolation
 
-class mn_MixInterpolation(Node, AnimationNode):
+class MixInterpolation(bpy.types.Node, AnimationNode):
     bl_idname = "mn_MixInterpolation"
     bl_label = "Mix Interpolation"
     isDetermined = True
     
-    def init(self, context):
-        forbidCompiling()
+    def create(self):
         self.inputs.new("mn_FloatSocket", "Factor").setMinMax(0, 1)
         self.inputs.new("mn_InterpolationSocket", "Interpolation 1").showName = False
         self.inputs.new("mn_InterpolationSocket", "Interpolation 2").showName = False
         self.outputs.new("mn_InterpolationSocket", "Interpolation")
-        allowCompiling()
         
     def getInputSocketNames(self):
-        return {"Factor" : "factor", "Interpolation 1" : "a", "Interpolation 2" : "b"}
+        return {"Factor" : "factor",
+                "Interpolation 1" : "a",
+                "Interpolation 2" : "b"}
+                
     def getOutputSocketNames(self):
         return {"Interpolation" : "interpolation"}
         

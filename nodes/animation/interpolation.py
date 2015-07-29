@@ -1,9 +1,8 @@
 import bpy
-from bpy.types import Node
 from ... mn_cache import getUniformRandom
 from ... mn_node_base import AnimationNode
 from ... mn_utils import *
-from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from ... mn_execution import nodePropertyChanged
 from ... algorithms.interpolation import *
 from ... nodes.mn_node_helper import *
 
@@ -23,7 +22,7 @@ cubicCategoryItems = [("IN", "In", ""),
 backCategoryItems = [("IN", "In", ""),
                     ("OUT", "Out", "")]
 
-class mn_InterpolationNode(Node, AnimationNode):
+class InterpolationNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_InterpolationNode"
     bl_label = "Interpolation"
     isDetermined = True
@@ -40,13 +39,11 @@ class mn_InterpolationNode(Node, AnimationNode):
     
     curveNodeName = bpy.props.StringProperty(default = "")
     
-    def init(self, context):
-        forbidCompiling()
+    def create(self):
         self.inputs.new("mn_FloatSocket", "Back").number = 1.70158
         self.outputs.new("mn_InterpolationSocket", "Interpolation")
         self.hideInputSockets()
         self.createCurveNode()
-        allowCompiling()
         
     def draw_buttons(self, context, layout):
         layout.prop(self, "topCategory", text = "")
@@ -62,6 +59,7 @@ class mn_InterpolationNode(Node, AnimationNode):
         
     def getInputSocketNames(self):
         return {"Back" : "back"}
+        
     def getOutputSocketNames(self):
         return {"Interpolation" : "interpolation"}
         

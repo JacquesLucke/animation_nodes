@@ -1,22 +1,21 @@
 import bpy
-from bpy.types import Node
 from ... mn_node_base import AnimationNode
-from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from ... mn_execution import nodePropertyChanged
 
-class mn_EvaluateInterpolation(Node, AnimationNode):
+class EvaluateInterpolation(bpy.types.Node, AnimationNode):
     bl_idname = "mn_EvaluateInterpolation"
     bl_label = "Evaluate Interpolation"
     isDetermined = True
     
-    def init(self, context):
-        forbidCompiling()
+    def create(self):
         self.inputs.new("mn_InterpolationSocket", "Interpolation").showName = False
         self.inputs.new("mn_FloatSocket", "Position").setMinMax(0, 1)
         self.outputs.new("mn_FloatSocket", "Value")
-        allowCompiling()
         
     def getInputSocketNames(self):
-        return {"Interpolation" : "interpolation", "Position" : "position"}
+        return {"Interpolation" : "interpolation",
+                "Position" : "position"}
+                
     def getOutputSocketNames(self):
         return {"Value" : "value"}
         
