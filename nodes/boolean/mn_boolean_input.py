@@ -1,17 +1,14 @@
 import bpy
 from ... base_types.node import AnimationNode
-from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
-class mn_BooleanInputNode(bpy.types.Node, AnimationNode):
+class BooleanInputNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_BooleanInputNode"
     bl_label = "Boolean Input"
     isDetermined = True
     
-    def init(self, context):
-        forbidCompiling()
+    def create(self):
         self.inputs.new("mn_BooleanSocket", "Boolean")
         self.outputs.new("mn_BooleanSocket", "Boolean")
-        allowCompiling()
         
     def getInputSocketNames(self):
         return {"Boolean" : "boolean"}
