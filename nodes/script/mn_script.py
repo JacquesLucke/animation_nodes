@@ -37,6 +37,7 @@ class mn_ScriptNode(Node, AnimationNode):
     makeFromClipboard = bpy.props.BoolProperty(default = False, update = makeFromClipboardChanged)
     hideEditableElements = bpy.props.BoolProperty(name = "Hide Editable Elements", default = False, update = hideEditableElementsChanged)
     enableUINameConversion = bpy.props.BoolProperty(name = "Auto Socket Names", default = True, update = enableUINameConversionChanged)
+    showErrorMessage = bpy.props.BoolProperty(name = "Show Error Message", default = True)
     
     def init(self, context):
         forbidCompiling()
@@ -51,7 +52,7 @@ class mn_ScriptNode(Node, AnimationNode):
             operator.nodeTreeName = self.id_data.name
             operator.nodeName = self.name
             
-        if self.errorMessage != "":
+        if self.showErrorMessage and self.errorMessage != "":
             layout.label(self.errorMessage, icon = "ERROR")
             
         if not self.hideEditableElements:
@@ -81,6 +82,7 @@ class mn_ScriptNode(Node, AnimationNode):
         col = layout.column(align = True)
         col.prop(self, "hideEditableElements")
         col.prop(self, "enableUINameConversion")
+        col.prop(self, "showErrorMessage")
         
     def update(self):
         forbidCompiling()
