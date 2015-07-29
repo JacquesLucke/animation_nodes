@@ -1,6 +1,6 @@
 import bpy
 from mathutils.kdtree import KDTree
-from ... mn_node_base import AnimationNode
+from ... base_types.node import AnimationNode
 from ... mn_execution import allowCompiling, forbidCompiling
 
 class mn_FindCloseVertices(bpy.types.Node, AnimationNode):

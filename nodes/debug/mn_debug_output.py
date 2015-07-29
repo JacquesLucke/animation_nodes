@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import *
-from ... mn_node_base import AnimationNode
+from ... base_types.node import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 class mn_DebugOutputNode(bpy.types.Node, AnimationNode):

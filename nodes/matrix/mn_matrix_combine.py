@@ -3,7 +3,7 @@ from bpy.props import *
 from mathutils import *
 from ... mn_utils import *
 from ... utils.mn_node_utils import *
-from ... mn_node_base import AnimationNode
+from ... base_types.node import AnimationNode
 from ... mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 
 class mn_MatrixCombine(bpy.types.Node, AnimationNode):

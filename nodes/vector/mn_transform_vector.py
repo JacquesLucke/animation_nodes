@@ -1,5 +1,5 @@
 import bpy
-from ... mn_node_base import AnimationNode
+from ... base_types.node import AnimationNode
 from ... mn_execution import nodeTreeChanged, allowCompiling, forbidCompiling
 
 class mn_TransformVector(bpy.types.Node, AnimationNode):

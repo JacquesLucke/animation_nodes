@@ -1,6 +1,6 @@
 import bpy
 from ... mn_cache import getUniformRandom
-from ... mn_node_base import AnimationNode
+from ... base_types.node import AnimationNode
 from ... mn_utils import *
 from ... mn_execution import nodePropertyChanged
 from ... algorithms.interpolation import *

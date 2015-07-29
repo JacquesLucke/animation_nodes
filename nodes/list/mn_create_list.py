@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import *
-from ... mn_node_base import AnimationNode
+from ... base_types.node import AnimationNode
 from ... utils.mn_node_utils import *
 from ... utils.selection import getSortedSelectedObjectNames
 from ... sockets.mn_socket_info import *

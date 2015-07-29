@@ -1,5 +1,5 @@
 import bpy
-from ... mn_node_base import AnimationNode
+from ... base_types.node import AnimationNode
 from ... mn_execution import nodePropertyChanged
 from ... utils.selection import getSortedSelectedObjectNames
 from ... mn_utils import *

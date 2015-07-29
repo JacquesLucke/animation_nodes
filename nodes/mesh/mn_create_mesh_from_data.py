@@ -1,5 +1,5 @@
 import bpy, bmesh
-from ... mn_node_base import AnimationNode
+from ... base_types.node import AnimationNode
 from ... mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 from ... data_structures.mesh import *
 import bmesh

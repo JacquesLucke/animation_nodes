@@ -1,6 +1,6 @@
 import bpy, random
 from ... algorithms.perlin_noise import perlinNoise
-from ... mn_node_base import AnimationNode
+from ... base_types.node import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 

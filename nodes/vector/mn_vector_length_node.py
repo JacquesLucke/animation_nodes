@@ -1,6 +1,6 @@
 import bpy
 import mathutils
-from ... mn_node_base import AnimationNode
+from ... base_types.node import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 class mn_VectorLengthNode(bpy.types.Node, AnimationNode):

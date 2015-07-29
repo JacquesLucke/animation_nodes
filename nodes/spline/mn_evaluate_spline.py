@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from mathutils import Vector
 from . mn_spline_parameter_evaluate_node_base import SplineParameterEvaluateNodeBase
-from ... mn_node_base import AnimationNode
+from ... base_types.node import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 class mn_EvaluateSpline(bpy.types.Node, AnimationNode, SplineParameterEvaluateNodeBase):

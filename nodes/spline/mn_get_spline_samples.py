@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from . mn_spline_parameter_evaluate_node_base import SplineParameterEvaluateNodeBase
-from ... mn_node_base import AnimationNode
+from ... base_types.node import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from ... data_structures.splines.bezier_spline import BezierSpline
 from ... data_structures.splines.poly_spline import PolySpline

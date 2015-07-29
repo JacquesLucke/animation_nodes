@@ -1,6 +1,6 @@
 import bpy
 from mathutils import *
-from ... mn_node_base import AnimationNode
+from ... base_types.node import AnimationNode
 from ... mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 
 operationItems = [("MULTIPLY", "Multiply", "")]

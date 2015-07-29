@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import *
-from ... mn_node_base import AnimationNode
+from ... base_types.node import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from ... algorithms.mesh_generation.from_splines import revolveProfileAroundAxis
 

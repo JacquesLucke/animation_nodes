@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from mathutils import Vector
-from ... mn_node_base import AnimationNode
+from ... base_types.node import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 class mn_ProjectOnSpline(bpy.types.Node, AnimationNode):

@@ -1,5 +1,5 @@
 import bpy, math, os, re
-from ... mn_node_base import AnimationNode
+from ... base_types.node import AnimationNode
 from ... mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 from ... mn_utils import *
 from ... utils.fcurve import *

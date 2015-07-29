@@ -1,6 +1,6 @@
 import bpy
 from mathutils import Vector
-from ... mn_node_base import AnimationNode
+from ... base_types.node import AnimationNode
 from ... mn_execution import allowCompiling, forbidCompiling, nodePropertyChanged
 
 class mn_EdgesOfPolygons(bpy.types.Node, AnimationNode):

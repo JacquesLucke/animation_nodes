@@ -1,5 +1,5 @@
 import bpy
-from ... mn_node_base import AnimationNode
+from ... base_types.node import AnimationNode
 from ... mn_execution import nodePropertyChanged
 
 class EvaluateInterpolation(bpy.types.Node, AnimationNode):
