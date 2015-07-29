@@ -1,5 +1,4 @@
 import bpy
-from bpy.types import Node
 from bpy.props import *
 from mathutils import *
 from ... mn_utils import *

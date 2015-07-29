@@ -1,5 +1,4 @@
 import bpy, random, mathutils
-from bpy.types import Node
 from bpy.props import *
 from mathutils import Vector
 from ... mn_node_base import AnimationNode

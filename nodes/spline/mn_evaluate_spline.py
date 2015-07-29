@@ -1,12 +1,11 @@
 import bpy
 from bpy.props import *
-from bpy.types import Node
 from mathutils import Vector
 from . mn_spline_parameter_evaluate_node_base import SplineParameterEvaluateNodeBase
 from ... mn_node_base import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
-class mn_EvaluateSpline(Node, AnimationNode, SplineParameterEvaluateNodeBase):
+class mn_EvaluateSpline(bpy.types.Node, AnimationNode, SplineParameterEvaluateNodeBase):
     bl_idname = "mn_EvaluateSpline"
     bl_label = "Evaluate Spline"
     

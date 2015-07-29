@@ -1,5 +1,4 @@
 import bpy, random
-from bpy.types import Node
 from ... mn_node_base import AnimationNode
 from ... utils.mn_node_utils import *
 from ... sockets.mn_socket_info import *

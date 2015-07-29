@@ -1,5 +1,4 @@
 import bpy
-from bpy.types import Node
 from bpy.props import *
 from . mn_spline_parameter_evaluate_node_base import SplineParameterEvaluateNodeBase
 from ... mn_node_base import AnimationNode
@@ -7,7 +6,7 @@ from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompilin
 from ... data_structures.splines.bezier_spline import BezierSpline
 from ... data_structures.splines.poly_spline import PolySpline
 
-class mn_GetSplineSamples(Node, AnimationNode, SplineParameterEvaluateNodeBase):
+class mn_GetSplineSamples(bpy.types.Node, AnimationNode, SplineParameterEvaluateNodeBase):
     bl_idname = "mn_GetSplineSamples"
     bl_label = "Get Spline Samples"
     outputUseParameterName = "useOutput"

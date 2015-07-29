@@ -1,5 +1,4 @@
 import bpy
-from bpy.types import Node
 from bpy.props import *
 from ... mn_node_base import AnimationNode
 from ... utils.mn_node_utils import *

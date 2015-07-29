@@ -3,7 +3,6 @@ import os
 import math
 from mathutils import Vector
 from bpy.props import *
-from bpy.types import Node
 from bpy.app.handlers import persistent
 from ... mn_utils import getNode
 from ... mn_node_base import AnimationNode

@@ -1,5 +1,4 @@
 import bpy
-from bpy.types import Node
 from mathutils import Vector
 from ... mn_node_base import AnimationNode
 from ... mn_execution import allowCompiling, forbidCompiling, nodePropertyChanged
