@@ -26,7 +26,6 @@ class AnimationNodeTree(bpy.types.NodeTree):
         allowCompiling()
         if self.editsCounter > 0:
             treeChanged()
-            print("changed")
             
     @property
     def isInEditState(self):
