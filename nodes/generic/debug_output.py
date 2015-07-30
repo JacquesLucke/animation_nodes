@@ -1,11 +1,13 @@
 import bpy
 from bpy.props import *
 from ... base_types.node import AnimationNode
-from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
-class mn_DebugOutputNode(bpy.types.Node, AnimationNode):
+class DebugOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_DebugOutputNode"
     bl_label = "Debug Output"
+    
+    inputNames = { "Data" : "data" }
+    outputNames = {}
     
     # just a random sequence
     lineSeparator = "je2c4nw"
@@ -17,11 +19,9 @@ class mn_DebugOutputNode(bpy.types.Node, AnimationNode):
     
     debugOutputString = StringProperty(default = "")
     
-    def init(self, context):
-        forbidCompiling()
+    def create(self):
         self.inputs.new("mn_GenericSocket", "Data")
         self.bl_width_max = 10000
-        allowCompiling()
         
     def draw_buttons(self, context, layout):
         if self.showIterableInRows:
@@ -47,11 +47,9 @@ class mn_DebugOutputNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "printDebugString", text = "Print")
         layout.prop(self, "bl_width_max", text = "Max Node Width")
         
-    def execute(self, input):
-        data = input["Data"]
+    def execute(self, data):
         if self.showIterableInRows and hasattr(data, "__iter__"):
             self.debugOutputString = self.lineSeparator.join([str(element) for element in data])
         else:
             self.debugOutputString = str(data)
         if self.printDebugString: print(str(data))
-        return {}
