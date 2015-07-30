@@ -177,7 +177,7 @@ class NetworkCodeGenerator:
         codeParts.append(self.getNodeExecuteReferencingCode())
         codeParts.append(self.getSocketReferencingCode())
         codeParts.append(self.getSocketValueReferencingCode())
-        codeParts.append(self.getOutputUseDeclarationCode())
+        codeParts.append(self.getUsedOutputsDeclarationCode())
         codeParts.append(self.getTimerDefinitions())
         codeParts.append(self.getFunctionsCode())
         codeParts.append(self.getDeterminedNodesCode())
@@ -383,17 +383,17 @@ class NetworkCodeGenerator:
             codeLines.append(self.getSocketDeclarationString(socket))
         return "\n".join(codeLines)
         
-    def getOutputUseDeclarationCode(self):
+    def getUsedOutputsDeclarationCode(self):
         codeLines = []
         for node in self.outputUseNodes:
-            codeLines.append(getNodeOutputUseName(node) + " = " + getOutputUseDictionaryCode(node))
+            codeLines.append(getNodeOutputUseName(node) + " = " + repr(getUsedOutputs(node)))
         return "\n".join(codeLines)
 
     def generateInputListString(self, node):
         inputParts = []
-        useFastMethod = usesFastCall(node)
+        useFastMethod = hasSocketNames(node)
         inputSocketNames = None
-        if useFastMethod: inputSocketNames = node.getInputSocketNames()
+        if useFastMethod: inputSocketNames = getInputNames(node)
         for socket in node.inputs:
             originSocket = treeInfo.getDataOriginSocket(socket)
             if originSocket is not None:
@@ -438,15 +438,12 @@ class NetworkCodeGenerator:
     def getSocketDeclarationString(self, socket):
         return getInputSocketValueName(socket) + " = " + getSocketValueGetterString(socket)
     def getNodeExecutionLines(self, node):
-        useInLineExecution = False
-        if hasattr(node, "useInLineExecution"):
-            useInLineExecution = node.useInLineExecution()
-        if useInLineExecution:
+        if useExecutionCode(node):
             if hasattr(node, "getModuleList"):
                 self.modules.update(node.getModuleList())
-            inLineString = node.getInLineExecutionString(getOutputUseDictionary(node))
-            inputSocketNames = node.getInputSocketNames()
-            outputSocketNames = node.getOutputSocketNames()
+            inLineString = getExecutionCode(node, getUsedOutputs(node))
+            inputSocketNames = getInputNames(node)
+            outputSocketNames = getOutputNames(node)
             for identifier, name in inputSocketNames.items():
                 socket = node.inputs[identifier]
                 inLineString = inLineString.replace("%" + name + "%", self.getInputValueString(socket))
@@ -498,8 +495,8 @@ class NetworkCodeGenerator:
         return functionName
             
 def getNodeOutputString(node):
-    if usesFastCall(node):
-        outputSocketNames = node.getOutputSocketNames()
+    if hasSocketNames(node):
+        outputSocketNames = getOutputNames(node)
         if len(outputSocketNames) != len(node.outputs): 
             print(node.name)
             raise Exception()
@@ -510,40 +507,47 @@ def getNodeOutputString(node):
             return ", ".join(outputParts)
     return getNodeOutputName(node)
 
-def getOutputUseDictionaryCode(node):
-    codeParts = []
-    for socket in node.outputs:
-        codeParts.append('"' + socket.identifier + '" : ' + str(treeInfo.isOutputSocketUsed(socket)))
-    return "{" + ", ".join(codeParts) + "}"
-def getOutputUseDictionary(node):
-    outputUse = {}
-    for socket in node.outputs:
-        outputUse[socket.identifier] = treeInfo.isOutputSocketUsed(socket)
-    return outputUse
+def getUsedOutputs(node):
+    isUsed = treeInfo.isOutputSocketUsed
+    return {socket.identifier : isUsed(socket) for socket in node.outputs}
     
         
 def isExecuteableNode(node):
     return hasattr(node, "execute")
 def isInLineNode(node):
-    return hasattr(node, "getInLineExecutionString")
+    return useExecutionCode(node)
 def isLoopCallerNode(node):
     return node.bl_idname == "mn_LoopCallerNode"
 def isGroupCallerNode(node):
     return node.bl_idname == "mn_GroupCaller"
     
-def usesFastCall(node):
-    if hasattr(node, "getInputSocketNames"):
-        if hasattr(node, "getOutputSocketNames"): return True
-        else: raise Exception()
-    if hasattr(node, "getOutputSocketNames"): raise Exception()
-    return False
 def usesOutputUseParameter(node):
     return hasattr(node, "outputUseParameterName")
     
+def hasSocketNames(node):
+    if hasattr(node, "getInputSocketNames") and hasattr(node, "getOutputSocketNames"): return True
+    if hasattr(node, "inputNames") and hasattr(node, "outputNames"): return True
+    return False
+    
+def getInputNames(node):
+    if hasattr(node, "getInputSocketNames"): return node.getInputSocketNames()
+    return node.inputNames
+    
+def getOutputNames(node):
+    if hasattr(node, "getOutputSocketNames"): return node.getOutputSocketNames()
+    return node.outputNames    
+    
+def useExecutionCode(node):
+    return hasattr(node, "getInLineExecutionString") or hasattr(node, "getExecutionCode")
+    
+def getExecutionCode(node, usedOutputs):
+    if hasattr(node, "getInLineExecutionString"): return node.getInLineExecutionString(usedOutputs)
+    return node.getExecutionCode(usedOutputs)
+    
 
 def getOutputValueVariable(socket):
-    if usesFastCall(socket.node):
-        outputSocketNames = socket.node.getOutputSocketNames()
+    if hasSocketNames(socket.node):
+        outputSocketNames = getOutputNames(socket.node)
         return getNodeOutputName(socket.node) + "_" + outputSocketNames[socket.identifier]
     else:
         return getNodeOutputName(socket.node) + "['" + socket.identifier + "']"

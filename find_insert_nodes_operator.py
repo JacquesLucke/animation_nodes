@@ -56,7 +56,7 @@ def updateSearchDict():
     for cls in getNodeClasses():
         tags = []
         tags.append(cls.bl_label)
-        tags.extend(getattr(cls, "search_tags", []))
+        tags.extend(getattr(cls, "searchTags", []))
         for tag in tags:
             searchDict[tag] = cls.bl_idname
         

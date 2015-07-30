@@ -4,7 +4,13 @@ from ... base_types.node import AnimationNode
 class TimeInfoNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_TimeInfoNode"
     bl_label = "Time Info"
-    search_tags = ["Frame"]
+    searchTags = ["Frame"]
+    
+    inputNames = {}
+    outputNames = { "Frame" : "frame",
+                    "Start Frame" : "startFrame",
+                    "End Frame" : "endFrame",
+                    "Frame Rate" : "frameRate" }
     
     def create(self):
         self.outputs.new("mn_FloatSocket", "Frame")
@@ -12,22 +18,10 @@ class TimeInfoNode(bpy.types.Node, AnimationNode):
         self.outputs.new("mn_FloatSocket", "End Frame")
         self.outputs.new("mn_FloatSocket", "Frame Rate")
         
-    def getInputSocketNames(self):
-        return {}
-        
-    def getOutputSocketNames(self):
-        return {"Frame" : "frame",
-                "Start Frame" : "start_frame",
-                "End Frame" : "end_frame",
-                "Frame Rate" : "frame_rate"}
-        
-    def useInLineExecution(self):
-        return True
-        
-    def getInLineExecutionString(self, outputUse):
+    def getExecutionCode(self, usedOutputs):
         codeLines = []
-        if outputUse["Frame"]: codeLines.append("$frame$ = scene.frame_current_final")
-        if outputUse["Start Frame"]: codeLines.append("$start_frame$ = scene.frame_start")
-        if outputUse["End Frame"]: codeLines.append("$end_frame$ = scene.frame_end")
-        if outputUse["Frame Rate"]: codeLines.append("$frame_rate$ = scene.render.fps")
+        if usedOutputs["Frame"]: codeLines.append("$frame$ = scene.frame_current_final")
+        if usedOutputs["Start Frame"]: codeLines.append("$startFrame$ = scene.frame_start")
+        if usedOutputs["End Frame"]: codeLines.append("$endFrame$ = scene.frame_end")
+        if usedOutputs["Frame Rate"]: codeLines.append("$frameRate$ = scene.render.fps")
         return "\n".join(codeLines)
