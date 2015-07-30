@@ -130,7 +130,14 @@ class ConvertListToLength(LinkCorrection):
     def check(self, origin, target):
         return "List" in origin.dataType and target.dataType == "Integer"
     def insert(self, nodeTree, origin, target):
-        insertLinkedNode(nodeTree, "mn_GetListLengthNode", origin, target)          
+        insertLinkedNode(nodeTree, "mn_GetListLengthNode", origin, target)  
+
+class ConverFloatToInteger(LinkCorrection):
+    def check(self, origin, target):
+        return origin.dataType == "Float" and target.dataType == "Integer"
+    def insert(self, nodeTree, origin, target):
+        node = insertLinkedNode(nodeTree, "mn_FloatToInteger", origin, target)
+        node.update()
 
 class ConvertToBasicTypes(LinkCorrection):
     def check(self, origin, target):
@@ -189,5 +196,6 @@ linkCorrectors = [
     ConvertTextBlockToString(),
     ConvertVectorToMatrix(),
 	ConvertListToLength(),
+    ConverFloatToInteger(),
     ConvertToBasicTypes(),
     ConvertFromGeneric() ]
