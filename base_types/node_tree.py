@@ -9,8 +9,6 @@ class AnimationNodeTree(bpy.types.NodeTree):
     bl_label = "Animation";
     bl_icon = "ACTION"
     
-    isUpdating = BoolProperty(default = False)
-    
     editDeepness = IntProperty(default = 0)
     editsCounter = IntProperty(default = 0)
     
@@ -36,16 +34,9 @@ class AnimationNodeTree(bpy.types.NodeTree):
             self.editsCounter += 1
             return
             
-        treeChanged()
-        return
-        
-        
-        if not self.isUpdating:
-            self.isUpdating = True
-            self.updateTree()
-            self.isUpdating = False
+        self.startEdit()
+        for node in self.nodes:
+            if hasattr(node, "editorChanged"): node.editorChanged()
+        self.stopEdit()
             
-    def updateTree(self):
-        updateTreeInfo()
-        updateNodes(treeInfo)
-        createNetworkScripts(treeInfo)
+        treeChanged()

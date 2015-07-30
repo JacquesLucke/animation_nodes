@@ -13,6 +13,9 @@ class AnimationNode:
         self.create()
         self.id_data.stopEdit()
         
+    def update(self):
+        return
+        
     def copy(self, sourceNode):
         self.id_data.startEdit()
         if hasattr(self, "duplicate"):
