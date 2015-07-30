@@ -6,7 +6,7 @@ from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompilin
 
 class GetListElementNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_GetListElementNode"
-    bl_label = "Get Element"
+    bl_label = "Get List Element"
     
     inputNames = { "List" : "list",
                    "Index" : "index",
