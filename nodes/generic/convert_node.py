@@ -17,7 +17,7 @@ class ConvertNode(bpy.types.Node, AnimationNode):
         self.inputs.new("mn_GenericSocket", "Old")
         self.buildOutputSocket()
         
-    def editorChanged(self):
+    def edit(self):
         link = self.getFirstOutputLink()
         if link is not None:
             fromSocket = link.from_socket

@@ -10,9 +10,23 @@ optional properties:
     searchTags - list of names which will extend the search box to make the node better findable
     isDetermined - set to True if the node always has the same output with the same input
     
-'create' function:
-    has the same purpose as the __init__ function in python
-    normally used to create all sockets
+    
+Functions:
+    Note: Don't create one of the following functions: init, update, copy, free
+    use the following instead
+
+    create(self) function:
+        has the same purpose as the __init__ function in python
+        normally used to create all sockets
+        
+    edit(self) function:
+        is called every time the user changes the node tree
+
+    duplicate(self, sourceNode) function:
+        is called when the user copies a node
+
+    delete(self) function:
+        is called when the user removes a node
     
     
 Each node implements one of the following execution methods:
@@ -42,9 +56,3 @@ Each node implements one of the following execution methods:
         Note: the input variables are surrounded by '%' keys while outputs variables have '$' as prefix and suffix.
         The node can also have a 'getModuleList' function which returns a list of module names which should be imported before execution
         
-        
-Some function names are forbidden because they are used in the AnimationNode class and must not be overwritten:
-    init - use create(self) instead
-    update - use editorChanged(self) instead
-    copy - use duplicate(self, sourceNode) instead
-    free - use delete(self) instead

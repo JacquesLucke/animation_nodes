@@ -143,14 +143,14 @@ class ConvertToBasicTypes(LinkCorrection):
         return target.dataType in ["String", "Integer", "Float"]
     def insert(self, nodeTree, origin, target):
         node = insertLinkedNode(nodeTree, "mn_ConvertNode", origin, target)
-        node.editorChanged()
+        node.edit()
         
 class ConvertFromGeneric(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType == "Generic"
     def insert(self, nodeTree, origin, target):
         node = insertLinkedNode(nodeTree, "mn_ConvertNode", origin, target)
-        node.editorChanged()        
+        node.edit()        
         
         
 def insertLinkedNode(nodeTree, nodeType, origin, target):

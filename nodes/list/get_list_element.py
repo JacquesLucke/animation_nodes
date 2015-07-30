@@ -22,7 +22,7 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
             return list[index]
         return fallback
         
-    def editorChanged(self):
+    def edit(self):
         nodeTree = self.id_data
         treeInfo = NodeTreeInfo(nodeTree)
         originSocket = treeInfo.getDataOriginSocket(self.inputs.get("List"))

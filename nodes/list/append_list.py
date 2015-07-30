@@ -18,7 +18,7 @@ class AppendListNode(bpy.types.Node, AnimationNode):
         return "$list$ = %list%\n" + \
                 "$list$.append(%element%)"
                 
-    def editorChanged(self):
+    def edit(self):
         nodeTree = self.id_data
         treeInfo = NodeTreeInfo(nodeTree)
         
