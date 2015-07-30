@@ -1,35 +1,32 @@
 import bpy, random
 from ... base_types.node import AnimationNode
-from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from ... events import propertyChanged
 
 
-class mn_SetVertexColor(bpy.types.Node, AnimationNode):
+class SetVertexColor(bpy.types.Node, AnimationNode):
     bl_idname = "mn_SetVertexColor"
     bl_label = "Set Vertex Color"
     
-    enabled = bpy.props.BoolProperty(default = True, update = nodePropertyChanged)
-    vertexColorName = bpy.props.StringProperty(default = "Col", update = nodePropertyChanged)
+    inputNames = { "Object" : "object",
+                   "Color" : "color" }
+    outputNames = { "Object" : "object" }                   
+    
+    enabled = bpy.props.BoolProperty(default = True, update = propertyChanged)
+    vertexColorName = bpy.props.StringProperty(default = "Col", update = propertyChanged)
     checkIfColorIsSet = bpy.props.BoolProperty(default = True)
     
-    def init(self, context):
-        forbidCompiling()
+    def create(self):
         self.inputs.new("mn_ObjectSocket", "Object")
         self.inputs.new("mn_ColorSocket", "Color")
-        allowCompiling()
+        self.outputs.new("mn_ObjectSocket", "Object")
         
     def draw_buttons(self, context, layout):
         layout.prop(self, "enabled", text = "Enabled")
         layout.prop(self, "checkIfColorIsSet", text = "Check Color")
-        
-    def getInputSocketNames(self):
-        return {"Object" : "object",
-                "Color" : "color"}
-    def getOutputSocketNames(self):
-        return {}
 
     def execute(self, object, color):
-        if not self.enabled: return None
-        if object is None: return None
+        if not self.enabled: return object
+        if object is None: return object
         
         mesh = object.data
     
@@ -41,10 +38,8 @@ class mn_SetVertexColor(bpy.types.Node, AnimationNode):
         if self.checkIfColorIsSet:
             oldColor = colorLayer.data[0].color
             if abs(color[0] * 100 + color[1] * 10 + color[2] - oldColor[0] * 100 - oldColor[1] * 10 - oldColor[2]) < 0.001:
-                return None
+                return object
         
         for meshColor in colorLayer.data:
             meshColor.color = color
-        return None
-        
-
+        return object
