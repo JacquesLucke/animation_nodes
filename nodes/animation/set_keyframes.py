@@ -1,18 +1,24 @@
 import bpy
 from ... base_types.node import AnimationNode
-from ... mn_execution import nodePropertyChanged
+from ... events import propertyChanged
 from ... mn_utils import *
 
 pathTypes = ("Custom", "Location", "Rotation", "Scale", "LocRotScale")
 pathTypeItems = [(pathType, pathType, "") for pathType in pathTypes]
 
 class mn_KeyframePath(bpy.types.PropertyGroup):
-    path = bpy.props.StringProperty(default = "", update = nodePropertyChanged, description = "Path to the property")
-    index = bpy.props.IntProperty(default = -1, update = nodePropertyChanged, min = -1, soft_max = 2, description = "Used index if the path points to an array (-1 will set a keyframe on every index)")
+    path = bpy.props.StringProperty(default = "", update = propertyChanged, description = "Path to the property")
+    index = bpy.props.IntProperty(default = -1, update = propertyChanged, min = -1, soft_max = 2, description = "Used index if the path points to an array (-1 will set a keyframe on every index)")
 
 class SetKeyframesNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_SetKeyframesNode"
     bl_label = "Set Keyframes"
+    
+    inputNames = { "Enable" : "enable",
+                   "Set Keyframe" : "setKeyframe",
+                   "Remove Unwanted" : "removeUnwanted",
+                   "Object" : "object" }
+    outputNames = {}  
         
     paths = bpy.props.CollectionProperty(type = mn_KeyframePath)
     
@@ -43,15 +49,6 @@ class SetKeyframesNode(bpy.types.Node, AnimationNode):
             remove.nodeTreeName = self.id_data.name
             remove.nodeName = self.name
             remove.index = i
-        
-    def getInputSocketNames(self):
-        return {"Enable" : "enable",
-                "Set Keyframe" : "setKeyframe",
-                "Remove Unwanted" : "removeUnwanted",
-                "Object" : "object"}
-                
-    def getOutputSocketNames(self):
-        return {}
         
     def execute(self, enable, setKeyframe, removeUnwanted, object):
         if not enable: return
