@@ -15,7 +15,7 @@ def getListTypeItems(self, context):
         listTypeItems.append(item)
     return listTypeItems
 
-class mn_CreateList(bpy.types.Node, AnimationNode):
+class CreateList(bpy.types.Node, AnimationNode):
     bl_idname = "mn_CreateList"
     bl_label = "Create List"
     
@@ -31,10 +31,8 @@ class mn_CreateList(bpy.types.Node, AnimationNode):
     
     hideInputs = BoolProperty(name = "Hide Inputs", default = False, update = settingChanged)
     
-    def init(self, context):
-        forbidCompiling()
+    def create(self):
         self.recreateSockets()
-        allowCompiling()
         
     def draw_buttons(self, context, layout):
         self.callFunctionFromUI(layout, "newInputSocket",
@@ -68,15 +66,14 @@ class mn_CreateList(bpy.types.Node, AnimationNode):
         self.recreateSockets(inputAmount)
         
     def recreateSockets(self, inputAmount = 2):
-        forbidCompiling()
+        self.id_data.startEdit()
         self.inputs.clear()
         self.outputs.clear()
         
         for i in range(inputAmount):
             self.newInputSocket()
         self.outputs.new(self.listType, "List")
-        allowCompiling()
-        nodeTreeChanged()
+        self.id_data.stopEdit()
         
     def newInputSocket(self):
         baseIdName = getListBaseSocketIdName(self.listType)
