@@ -52,8 +52,8 @@ class NumberMenu(bpy.types.Menu):
     
     def draw(self, context):
         layout = self.layout
-        insertNode(layout, "mn_IntegerInputNode", "Integer")
-        insertNode(layout, "mn_FloatInputNode", "Float")
+        insertNode(layout, "mn_DataInput", "Integer", {"assignedType" : repr("Integer")})
+        insertNode(layout, "mn_DataInput", "Float", {"assignedType" : repr("Float")})
         insertNode(layout, "mn_FloatListInputNode", "List")
         insertNode(layout, "mn_FloatRangeListNode", "Range")
         layout.separator()
@@ -109,7 +109,7 @@ class TextMenu(bpy.types.Menu):
     
     def draw(self, context):
         layout = self.layout
-        insertNode(layout, "mn_StringInputNode", "Input")                   
+        insertNode(layout, "mn_DataInput", "Input", {"assignedType" : repr("String")})                  
         insertNode(layout, "mn_StringListInputNode", "List")                   
         insertNode(layout, "mn_RandomStringNode", "Randomize")  
         insertNode(layout, "mn_CharactersNode", "Characters")  
@@ -172,7 +172,7 @@ class ObjectMenu(bpy.types.Menu):
     
     def draw(self, context):
         layout = self.layout
-        insertNode(layout, "mn_ObjectInputNode", "Input")                            
+        insertNode(layout, "mn_DataInput", "Input", {"assignedType" : repr("Object")})                         
         insertNode(layout, "mn_ObjectListInputNode", "List")                            
         insertNode(layout, "mn_ObjectGroupInput", "Group Input")
         layout.separator()
