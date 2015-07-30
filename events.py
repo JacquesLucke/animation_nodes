@@ -5,3 +5,6 @@ def propertyChanged(self = None, context = None):
     
 def treeChanged(self = None, context = None):
     nodeTreeChanged()
+    
+def executionCodeChanged(self = None, context = None):
+    nodeTreeChanged()    
