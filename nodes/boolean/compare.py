@@ -23,7 +23,7 @@ class CompareNode(bpy.types.Node, AnimationNode):
     def draw_buttons(self, context, layout):
         layout.prop(self, "compareType", text = "Type")
         
-    def getExecutionCode(self, outputUse):
+    def getExecutionCode(self):
         type = self.compareType
         if type == "A = B":	return "$result$ = %a% == %b%"
         if type == "A != B": return "$result$ = %a% != %b%"

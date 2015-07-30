@@ -36,7 +36,7 @@ Each node implements one of the following execution methods:
         
     3. Code Execution:
         This type has no execute function. Instead a function called 'getExecutionCode' returns python code that will be executed later.
-        The function has 'self' and 'usedOutputs' as arguments. 'usedOutputs' is a dictionary of this form: { socket identifier : is linked? }
+        The function has 'self' and 'usedOutputs' (optional) as arguments. 'usedOutputs' is a dictionary of this form: { socket identifier : is linked? }
         The returned code has no default indentation but is allowed to be indented for if statements or similar.
         In the returned code should be the variable names specified in the 'input/outputNames' dictionary.
         Note: the input variables are surrounded by '%' keys while outputs variables have '$' as prefix and suffix.

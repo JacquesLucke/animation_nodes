@@ -1,4 +1,4 @@
-import bpy, time, os, sys
+import bpy, time, os, sys, inspect
 from . utils.mn_node_utils import *
 from . mn_utils import *
 from . node_link_conversion import correctForbiddenNodeLinks
@@ -541,8 +541,13 @@ def useExecutionCode(node):
     return hasattr(node, "getInLineExecutionString") or hasattr(node, "getExecutionCode")
     
 def getExecutionCode(node, usedOutputs):
-    if hasattr(node, "getInLineExecutionString"): return node.getInLineExecutionString(usedOutputs)
-    return node.getExecutionCode(usedOutputs)
+    function = node.getInLineExecutionString if hasattr(node, "getInLineExecutionString") else node.getExecutionCode
+    if getParameterCount(function) == 2:
+        return function(usedOutputs)
+    return function()
+    
+def getParameterCount(function):
+    return len(inspect.getargspec(function)[0])
     
 
 def getOutputValueVariable(socket):
