@@ -110,7 +110,7 @@ def sceneUpdateHandler(scene):
 @persistent
 def fileLoadHandler(scene):
     generateExecutionUnits()
-def nodePropertyChanged(self, context):
+def nodePropertyChanged(self = None, context = None):
     updateAnimationTrees("PROPERTY")
 def settingPropertyChanged(self, context):
     generateExecutionUnits()

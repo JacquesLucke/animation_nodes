@@ -2,6 +2,7 @@ import bpy
 from bpy.props import *
 from bpy.app.handlers import persistent
 from .. mn_execution import allowCompiling, forbidCompiling
+from .. utils.mn_node_utils import getNode
 
 class AnimationNode:
     @classmethod
@@ -11,6 +12,16 @@ class AnimationNode:
     def init(self, context):
         forbidCompiling()
         self.create()
+        allowCompiling()
+        
+    def copy(self, sourceNode):
+        forbidCompiling()
+        self.duplicate(sourceNode)
+        allowCompiling()
+        
+    def free(self):
+        forbidCompiling()
+        self.delete()
         allowCompiling()
         
     def callFunctionFromUI(self, layout, functionName, text = "", icon = "NONE", description = ""):

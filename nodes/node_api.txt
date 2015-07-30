@@ -45,5 +45,5 @@ Each node implements one of the following execution methods:
 Some function names are forbidden because they are used in the AnimationNode class and must not be overwritten:
     init - use create(self) instead
     update
-    copy
-    free
+    copy - use duplicate(self, sourceNode) instead
+    free - use delete(self) instead

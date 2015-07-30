@@ -1,10 +1,8 @@
 import bpy
-from ... mn_cache import getUniformRandom
 from ... base_types.node import AnimationNode
-from ... mn_utils import *
-from ... mn_execution import nodePropertyChanged
+from ... events import propertyChanged
+from ... nodes.mn_node_helper import getHelperMaterial, getNotUsedMaterialNodeName
 from ... algorithms.interpolation import *
-from ... nodes.mn_node_helper import *
 
 topCategoryItems = [("LINEAR", "Linear", ""),
                     ("EXPONENTIAL", "Exponential", ""),
@@ -27,15 +25,18 @@ class InterpolationNode(bpy.types.Node, AnimationNode):
     bl_label = "Interpolation"
     isDetermined = True
     
+    inputNames =  { "Back" : "back" }
+    outputNames = { "Interpolation" : "interpolation" }
+    
     def topCategoryChanged(self, context):
         self.hideInputSockets()
         if self.topCategory == "BACK": self.inputs["Back"].hide = False
-        nodePropertyChanged(self, context)
+        propertyChanged()
     
     topCategory = bpy.props.EnumProperty(items = topCategoryItems, default = "LINEAR", update = topCategoryChanged, name = "Category")
-    backCategory = bpy.props.EnumProperty(items = backCategoryItems, default = "OUT", update = nodePropertyChanged, name = "Back")
-    exponentialCategory = bpy.props.EnumProperty(items = exponentialCategoryItems, default = "OUT", update = nodePropertyChanged, name = "Exponential")
-    cubicCategory = bpy.props.EnumProperty(items = cubicCategoryItems, default = "OUT", update = nodePropertyChanged, name = "Cubic")
+    backCategory = bpy.props.EnumProperty(items = backCategoryItems, default = "OUT", update = propertyChanged, name = "Back")
+    exponentialCategory = bpy.props.EnumProperty(items = exponentialCategoryItems, default = "OUT", update = propertyChanged, name = "Exponential")
+    cubicCategory = bpy.props.EnumProperty(items = cubicCategoryItems, default = "OUT", update = propertyChanged, name = "Cubic")
     
     curveNodeName = bpy.props.StringProperty(default = "")
     
@@ -53,15 +54,7 @@ class InterpolationNode(bpy.types.Node, AnimationNode):
         if self.topCategory == "CUSTOM":
             node = self.getCurveNode()
             layout.template_curve_mapping(node, "mapping", type = "NONE")
-            resetEndPoints = layout.operator("mn.reset_custom_interpolation_end_points", text = "Reset End Points")
-            resetEndPoints.nodeTreeName = self.id_data.name
-            resetEndPoints.nodeName = self.name
-        
-    def getInputSocketNames(self):
-        return {"Back" : "back"}
-        
-    def getOutputSocketNames(self):
-        return {"Interpolation" : "interpolation"}
+            self.callFunctionFromUI(layout, "resetCurveEndPoints", text = "Reset End Points")
         
     def execute(self, back):
         if self.topCategory == "LINEAR": return (linear, None)
@@ -84,14 +77,15 @@ class InterpolationNode(bpy.types.Node, AnimationNode):
         for socket in self.inputs:
             socket.hide = True
             
-    def copy(self, node):
+    def duplicate(self, sourceNode):
         self.createCurveNode()
         curvePoints = self.getCurve().points
-        for i, point in enumerate(node.getCurve().points):
+        for i, point in enumerate(sourceNode.getCurve().points):
             if len(curvePoints) == i:
                 curvePoints.new(50, 50) #random start position
             curvePoints[i].location = point.location
-    def free(self):
+            
+    def delete(self):
         self.removeCurveNode()
         
     def getCurveNode(self):
@@ -125,16 +119,3 @@ class InterpolationNode(bpy.types.Node, AnimationNode):
         curvePoints = self.getCurve().points
         curvePoints[0].location = [0, 0.25]
         curvePoints[-1].location = [1, 0.75]
-        
-        
-class ResetEndPoints(bpy.types.Operator):
-    bl_idname = "mn.reset_custom_interpolation_end_points"
-    bl_label = "Reset End Points"
-    
-    nodeTreeName = bpy.props.StringProperty()
-    nodeName = bpy.props.StringProperty()
-
-    def execute(self, context):
-        node = getNode(self.nodeTreeName, self.nodeName)
-        node.resetCurveEndPoints()
-        return {'FINISHED'}
