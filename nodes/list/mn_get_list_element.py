@@ -9,6 +9,10 @@ class mn_GetListElementNode(Node, AnimationNode):
     bl_idname = "mn_GetListElementNode"
     bl_label = "Get Element"
     
+    #sometimes we need to limit min to 0, unlike where we have start/end
+    #by default False, to not break existing trees
+    allowNegativeIndex = bpy.props.BoolProperty(default = False, description = "Allow negative index for reversed selection")
+    
     def init(self, context):
         forbidCompiling()
         self.generateSockets()
@@ -21,8 +25,12 @@ class mn_GetListElementNode(Node, AnimationNode):
     def getOutputSocketNames(self):
         return {"Element" : "element"}
         
-    def execute(self, list, index, fallback):
-        if 0 <= index < len(list):
+    def draw_buttons(self, context, layout): 
+        layout.prop(self, "allowNegativeIndex", text = "Negative Index")
+        
+    def execute(self, list, index, fallback):  
+        minIndex = -len(list) if self.allowNegativeIndex else 0
+        if minIndex <= index < len(list): 
             return list[index]
         return fallback
         

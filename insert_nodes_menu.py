@@ -64,6 +64,7 @@ class NumberMenu(bpy.types.Menu):
         insertNode(layout, "mn_FloatClamp", "Clamp")
         insertNode(layout, "mn_ConvertAngle", "Convert Angle")
         insertNode(layout, "mn_FloatMathNode", "Math")
+        insertNode(layout, "mn_MathListElementsNode", "List Math") #it's only for float lists, may replace multi math
         
 class VectorMenu(bpy.types.Menu):
     bl_idname = "mn.vector_menu"
@@ -116,6 +117,7 @@ class TextMenu(bpy.types.Menu):
         layout.separator()
         insertNode(layout, "mn_SplitText", "Split")                   
         insertNode(layout, "mn_CombineStringsNode", "Combine")     
+        insertNode(layout, "mn_JoinTextList", "Join List")#may replace combine, with create list is more flexible, but combine is one node
         layout.separator()
         insertNode(layout, "mn_ReplicateStringsNode", "Replicate")                   
         insertNode(layout, "mn_TrimText", "Trim")                   
@@ -160,7 +162,9 @@ class ListMenu(bpy.types.Menu):
         insertNode(layout, "mn_CreateList", "Create")             
         insertNode(layout, "mn_AppendListNode", "Append")             
         insertNode(layout, "mn_GetListLengthNode", "Get Length")
+        insertNode(layout, "mn_GetListElementIndexNode", "Get Element Index")         
         layout.separator()
+        insertNode(layout, "mn_TrimList", "Trim")
         insertNode(layout, "mn_ShuffleListNode", "Shuffle")             
         insertNode(layout, "mn_ReverseListNode", "Reverse")  
         insertNode(layout, "mn_CombineListsNode", "Combine")  
