@@ -19,9 +19,12 @@ class mn_ReverseListNode(Node, AnimationNode):
     def getOutputSocketNames(self):
         return {"Reversed List" : "list"}
         
-    def execute(self, list):
-        list.reverse()
-        return list
+    def useInLineExecution(self):
+        return True
+    def getInLineExecutionString(self, outputUse):
+        return """
+$reversedList$ = %list%[:]
+list.reverse($reversedList$)"""
         
     def update(self):
         nodeTree = self.id_data
@@ -41,6 +44,7 @@ class mn_ReverseListNode(Node, AnimationNode):
     def generateSockets(self, listIdName = "mn_ObjectListSocket"):
         if listIdName is None: return
         if listIdName == getattr(self.inputs.get("List"), "bl_idname", None): return
+        if not isListSocketIdName(listIdName): return #added this
         
         forbidCompiling()
         self.inputs.clear()
