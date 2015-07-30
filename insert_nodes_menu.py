@@ -132,7 +132,7 @@ class BooleanMenu(bpy.types.Menu):
     
     def draw(self, context):
         layout = self.layout
-        insertNode(layout, "mn_BooleanInputNode", "Boolean")                         
+        insertNode(layout, "mn_DataInput", "Boolean", {"assignedType" : repr("Boolean")})                         
         insertNode(layout, "mn_InvertNode", "Invert")                         
         insertNode(layout, "mn_CompareNode", "Compare")                         
         insertNode(layout, "mn_ConditionNode", "Condition") 

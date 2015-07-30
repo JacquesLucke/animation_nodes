@@ -1,7 +1,6 @@
 import bpy
 from bpy.props import *
 from bpy.app.handlers import persistent
-from .. mn_execution import allowCompiling, forbidCompiling
 from .. utils.mn_node_utils import getNode
 
 class AnimationNode:
@@ -10,19 +9,21 @@ class AnimationNode:
         return nodeTree.bl_idname == "mn_AnimationNodeTree"
         
     def init(self, context):
-        forbidCompiling()
+        self.id_data.startEdit()
         self.create()
-        allowCompiling()
+        self.id_data.stopEdit()
         
     def copy(self, sourceNode):
-        forbidCompiling()
-        self.duplicate(sourceNode)
-        allowCompiling()
+        self.id_data.startEdit()
+        if hasattr(self, "duplicate"):
+            self.duplicate(sourceNode)
+        self.id_data.stopEdit()
         
     def free(self):
-        forbidCompiling()
-        self.delete()
-        allowCompiling()
+        self.id_data.startEdit()
+        if hasattr(self, "delete"):
+            self.delete()
+        self.id_data.stopEdit()
         
     def callFunctionFromUI(self, layout, functionName, text = "", icon = "NONE", description = ""):
         idName = getNodeFunctionCallOperatorName(description)
