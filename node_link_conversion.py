@@ -137,21 +137,20 @@ class ConverFloatToInteger(LinkCorrection):
         return origin.dataType == "Float" and target.dataType == "Integer"
     def insert(self, nodeTree, origin, target):
         node = insertLinkedNode(nodeTree, "mn_FloatToInteger", origin, target)
-        node.update()
 
 class ConvertToBasicTypes(LinkCorrection):
     def check(self, origin, target):
         return target.dataType in ["String", "Integer", "Float"]
     def insert(self, nodeTree, origin, target):
         node = insertLinkedNode(nodeTree, "mn_ConvertNode", origin, target)
-        node.update()
+        node.editorChanged()
         
 class ConvertFromGeneric(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType == "Generic"
     def insert(self, nodeTree, origin, target):
         node = insertLinkedNode(nodeTree, "mn_ConvertNode", origin, target)
-        node.update()        
+        node.editorChanged()        
         
         
 def insertLinkedNode(nodeTree, nodeType, origin, target):
