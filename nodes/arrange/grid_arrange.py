@@ -7,19 +7,16 @@ class GridArrange(bpy.types.Node, AnimationNode):
     bl_label = "Grid Arrange"
     isDetermined = True
     
+    inputNames = { "Index" : "index",
+                   "Width" : "width",
+                   "Distance" : "distance" }
+    outputNames = { "Vector" : "Vector" }                   
+    
     def create(self):
         self.inputs.new("mn_IntegerSocket", "Index")
         self.inputs.new("mn_IntegerSocket", "Width").value = 10
         self.inputs.new("mn_FloatSocket", "Distance").value = 3
         self.outputs.new("mn_VectorSocket", "Vector")
-        
-    def getInputSocketNames(self):
-        return {"Index" : "index",
-                "Width" : "width",
-                "Distance" : "distance"}
-                
-    def getOutputSocketNames(self):
-        return {"Vector" : "vector"}
 
     def execute(self, index, width, distance):
         width = max(width, 1)
