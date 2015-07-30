@@ -40,10 +40,11 @@ Each node implements one of the following execution methods:
         The returned code has no default indentation but is allowed to be indented for if statements or similar.
         In the returned code should be the variable names specified in the 'input/outputNames' dictionary.
         Note: the input variables are surrounded by '%' keys while outputs variables have '$' as prefix and suffix.
+        The node can also have a 'getModuleList' function which returns a list of module names which should be imported before execution
         
         
 Some function names are forbidden because they are used in the AnimationNode class and must not be overwritten:
     init - use create(self) instead
-    update
+    update - use editorChanged(self) instead
     copy - use duplicate(self, sourceNode) instead
     free - use delete(self) instead
