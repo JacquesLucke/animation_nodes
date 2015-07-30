@@ -5,50 +5,49 @@ from ... utils.mn_node_utils import *
 from ... sockets.mn_socket_info import *
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
-class mn_ReverseListNode(Node, AnimationNode):
-    bl_idname = "mn_ReverseListNode"
-    bl_label = "Reverse List"
+class mn_GetListElementIndexNode(Node, AnimationNode):
+    bl_idname = "mn_GetListElementIndexNode"
+    bl_label = "Get Element Index"    #Search List Element ?
     
     def init(self, context):
         forbidCompiling()
-        self.generateSockets()
+        self.generateSockets()  #could use generic, just analize #if we use generic we skip all socket update
+        self.outputs.new("mn_IntegerSocket", "First Index")
+        self.outputs.new("mn_IntegerListSocket", "All Indices")
+        self.outputs.new("mn_IntegerSocket", "Occurrences")
         allowCompiling()
         
     def getInputSocketNames(self):
-        return {"List" : "list"}
+        return {"List" : "list",
+                "Search" : "search"}
     def getOutputSocketNames(self):
-        return {"Reversed List" : "list"}
+        return {"First Index" : "first_index",
+                "All Indices" : "all_indices",
+                "Occurrences" : "occurrences"}
         
-    def useInLineExecution(self):
-        return True
-    def getInLineExecutionString(self, outputUse):
-        return """
-$reversedList$ = %list%[:]
-list.reverse($reversedList$)"""
+    def execute(self, list, search):  
+        all_indices = [i for i, x in enumerate(list) if x == search]    #some say count may be faster
+        return all_indices[0], all_indices, len(all_indices)
         
-    def update(self):
+    def update(self):   
         nodeTree = self.id_data
         treeInfo = NodeTreeInfo(nodeTree)
         originSocket = treeInfo.getDataOriginSocket(self.inputs.get("List"))
-        targetSockets = treeInfo.getDataTargetSockets(self.outputs.get("Reversed List"))
         
         forbidCompiling()
-        if originSocket is not None and len(targetSockets) == 0:
+        if originSocket is not None:
             self.generateSockets(originSocket.bl_idname)
             nodeTree.links.new(self.inputs.get("List"), originSocket)
-        if originSocket is None and len(targetSockets) == 1:
-            self.generateSockets(targetSockets[0].bl_idname)
-            nodeTree.links.new(targetSockets[0], self.outputs.get("Reversed List"))
         allowCompiling()
         
     def generateSockets(self, listIdName = "mn_ObjectListSocket"):
         if listIdName is None: return
+        baseIdName = getListBaseSocketIdName(listIdName)
+        if baseIdName is None: return
         if listIdName == getattr(self.inputs.get("List"), "bl_idname", None): return
-        if not isListSocketIdName(listIdName): return #added this
         
         forbidCompiling()
         self.inputs.clear()
-        self.outputs.clear()
         self.inputs.new(listIdName, "List")
-        self.outputs.new(listIdName, "Reversed List")
+        self.inputs.new(baseIdName, "Search")
         allowCompiling()
