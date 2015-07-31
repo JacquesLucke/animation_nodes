@@ -29,24 +29,24 @@ bl_info = {
     "category":    "Node",
     "warning":     "Stable, but some things may change in the future."
     }
-    
-    
-    
+
+
+
 # load and reload submodules
-##################################    
-    
+##################################
+
 from . import developer_utils
 modules = developer_utils.setup_addon_modules(__path__, __name__, "bpy" in locals())
 
-       
-       
+
+
 # properties
 ##################################
 
-import bpy      
-from bpy.props import *  
+import bpy
+from bpy.props import *
 from . mn_execution import nodeTreeChanged
-from . id_keys import idTypeItems 
+from . id_keys import idTypeItems
 
 class GlobalUpdateSettings(bpy.types.PropertyGroup):
     frameChange = BoolProperty(default = True, name = "Frame Change", description = "Recalculate the nodes when the frame has been changed")
@@ -56,31 +56,31 @@ class GlobalUpdateSettings(bpy.types.PropertyGroup):
     skipFramesAmount = IntProperty(default = 0, name = "Skip Frames", min = 0, soft_max = 10, description = "Only recalculate the nodes every nth frame")
     redrawViewport = BoolProperty(default = True, name = "Redraw Viewport", description = "Redraw the UI after each execution. Turning it off gives a better performance but worse realtime feedback.")
     resetCompileBlockerWhileRendering = BoolProperty(default = True, name = "Force Update While Rendering", description = "Force the node tree to execute if the frame changes and Blender is rendering currently (nodes which change the frame may lock the UI)")
-    
+
 class DeveloperSettings(bpy.types.PropertyGroup):
     printUpdateTime = BoolProperty(default = False, name = "Print Global Update Time")
     printGenerationTime = BoolProperty(default = False, name = "Print Script Generation Time")
     executionProfiling = BoolProperty(default = False, name = "Node Execution Profiling", update = nodeTreeChanged)
-  
+
 class IDKeyType(bpy.types.PropertyGroup):
     name = StringProperty()
     id = StringProperty()
     type = StringProperty()
     hide = BoolProperty(default = False)
-    
+
 class IDKeySettings(bpy.types.PropertyGroup):
     keys = CollectionProperty(type = IDKeyType)
     newKeyName = StringProperty(default = "Initial Transforms")
     newKeyType = EnumProperty(items = idTypeItems, name = "Type", default = "Transforms")
     showAdvanced = BoolProperty(name = "Show Advanced", default = True, description = "Show more options for each ID Key")
-    
+
 class AnimationNodesSettings(bpy.types.PropertyGroup):
     update = PointerProperty(type = GlobalUpdateSettings, name = "Update Settings")
     developer = PointerProperty(type = DeveloperSettings, name = "Developer Settings")
     idKeys = PointerProperty(type = IDKeySettings, name = "ID Keys")
-    
-    
-    
+
+
+
 # register
 ##################################
 
@@ -93,7 +93,7 @@ def register_keymaps():
     kmi = km.keymap_items.new("wm.call_menu_pie", type = "W", value = "PRESS")
     kmi.properties.name = "mn.context_pie"
     addon_keymaps.append(km)
-    
+
 def unregister_keymaps():
     global addon_keymaps
     wm = bpy.context.window_manager
@@ -106,28 +106,28 @@ def unregister_keymaps():
 from . insert_nodes_menu import registerMenu, unregisterMenu
 from . import manage_broken_files as manage_broken_files
 from . import mn_execution as execution
-from . base_types import node as node_base
+from . base_types import node_function_call
 from . nodes.sound import mn_sequencer_sound_input as sequencer_sound
 
 def register():
     bpy.utils.register_module(__name__)
     manage_broken_files.register_handlers()
     execution.register_handlers()
-    node_base.register_handlers()
+    node_function_call.register_handlers()
     sequencer_sound.register_handlers()
     registerMenu()
     register_keymaps()
     bpy.types.Scene.mn_settings = PointerProperty(type = AnimationNodesSettings, name = "Animation Node Settings")
-    
+
     print("Registered Animation Nodes with {} modules.".format(len(modules)))
-    
+
 def unregister():
     unregister_keymaps()
     bpy.utils.unregister_module(__name__)
     manage_broken_files.unregister_handlers()
     execution.unregister_handlers()
-    node_base.unregister_handlers()
+    node_function_call.unregister_handlers()
     sequencer_sound.unregister_handlers()
     unregisterMenu()
-    
+
     print("Unregistered Animation Nodes")
