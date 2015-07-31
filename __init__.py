@@ -106,6 +106,7 @@ def unregister_keymaps():
 from . insert_nodes_menu import registerMenu, unregisterMenu
 from . import manage_broken_files as manage_broken_files
 from . import mn_execution as execution
+from . base_types import node as node_base
 from . base_types import node_function_call
 from . nodes.sound import mn_sequencer_sound_input as sequencer_sound
 
@@ -113,6 +114,7 @@ def register():
     bpy.utils.register_module(__name__)
     manage_broken_files.register_handlers()
     execution.register_handlers()
+    node_base.register_handlers()
     node_function_call.register_handlers()
     sequencer_sound.register_handlers()
     registerMenu()
@@ -126,6 +128,7 @@ def unregister():
     bpy.utils.unregister_module(__name__)
     manage_broken_files.unregister_handlers()
     execution.unregister_handlers()
+    node_base.unregister_handlers()
     node_function_call.unregister_handlers()
     sequencer_sound.unregister_handlers()
     unregisterMenu()
