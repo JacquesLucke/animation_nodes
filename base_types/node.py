@@ -12,27 +12,41 @@ class AnimationNode:
     def poll(cls, nodeTree):
         return nodeTree.bl_idname == "mn_AnimationNodeTree"
 
+    # On creation
     def init(self, context):
         self.identifier = createIdentifier()
-        self.id_data.startEdit()
         self.create()
-        self.id_data.stopEdit()
 
+    def create(self):
+        '''Implement this in all subclasses'''
+        pass
+
+    # On node tree changes
     def update(self):
-        return
+        '''Don't use this function at all'''
+        pass
 
+    def edit(self):
+        """Optional function for subclasses"""
+        pass
+
+    # On node duplication
     def copy(self, sourceNode):
         self.identifier = createIdentifier()
-        self.id_data.startEdit()
-        if hasattr(self, "duplicate"):
-            self.duplicate(sourceNode)
-        self.id_data.stopEdit()
+        self.duplicate(sourceNode)
 
+    def duplicate(self, sourceNode):
+        """Optional function for subclasses"""
+        pass
+
+    # On node deletion
     def free(self):
-        self.id_data.startEdit()
-        if hasattr(self, "delete"):
-            self.delete()
-        self.id_data.stopEdit()
+        self.delete()
+
+    def delete(self):
+        """Optional function for subclasses"""
+        pass
+
 
     def callFunctionFromUI(self, layout, functionName, text = "", icon = "NONE", description = ""):
         idName = getNodeFunctionCallOperatorName(description)
@@ -40,6 +54,7 @@ class AnimationNode:
         props.nodeTreeName = self.id_data.name
         props.nodeName = self.name
         props.functionName = functionName
+
 
 @persistent
 def createMissingIdentifiers(scene = None):

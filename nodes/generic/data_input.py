@@ -7,46 +7,44 @@ from ... sockets.mn_socket_info import getSocketDataTypeItems, getIdNameFromData
 class DataInput(bpy.types.Node, AnimationNode):
     bl_idname = "mn_DataInput"
     bl_label = "Data Input"
-    
+
     inputNames = { "Input" : "input" }
     outputNames = { "Output" : "output" }
-    
+
     def assignedSocketChanged(self, context):
         self.recreateSockets()
-    
+
     selectedType = EnumProperty(name = "Type", items = getSocketDataTypeItems)
     assignedType = StringProperty(default = "Float", update = assignedSocketChanged)
-    
+
     def create(self):
         self.recreateSockets()
-        
+
     def draw_buttons_ext(self, context, layout):
         col = layout.column(align = True)
         col.prop(self, "selectedType", text = "")
         self.callFunctionFromUI(col, "assignSelectedType", text = "Assign", description = "Remove all sockets and set the selected socket type")
-        
+
     def getInLineExecutionString(self, outputUse):
         return "$output$ = %input%"
-        
+
     def assignSelectedType(self):
         self.assignSocketType(self.selectedType)
-        
+
     def assignSocketType(self, dataType):
         # this automatically recreates the sockets
         self.assignedType = dataType
-        
+
     def recreateSockets(self):
-        self.id_data.startEdit()
         self.inputs.clear()
         self.outputs.clear()
-        
+
         idName = getIdNameFromDataType(self.assignedType)
         socket = self.inputs.new(idName, "Input")
         self.setupSocket(socket)
         socket = self.outputs.new(idName, "Output")
         self.setupSocket(socket)
-        self.id_data.stopEdit()
-        
+
     def setupSocket(self, socket):
         socket.displayCustomName = True
         socket.uniqueCustomName = False
