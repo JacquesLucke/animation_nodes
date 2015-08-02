@@ -1,5 +1,6 @@
 import bpy, bmesh
 from ... base_types.node import AnimationNode
+from ... events import propertyChanged
 
 class MeshRecalculateFaceNormals(bpy.types.Node, AnimationNode):
     bl_idname = "mn_MeshRecalculateFaceNormals"
@@ -8,7 +9,7 @@ class MeshRecalculateFaceNormals(bpy.types.Node, AnimationNode):
     inputNames = { "Mesh" : "bm" }
     outputNames = { "Mesh" : "mesh" }
 
-    invert = bpy.props.BoolProperty(name = "Invert Normals", update = nodePropertyChanged)
+    invert = bpy.props.BoolProperty(name = "Invert Normals", update = propertyChanged)
 
     def create(self):
         self.inputs.new("mn_MeshSocket", "Mesh")
