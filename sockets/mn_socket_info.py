@@ -12,7 +12,8 @@ listChains = [
     ["mn_PolygonIndicesSocket", "mn_PolygonIndicesListSocket"],
     ["mn_ParticleSocket", "mn_ParticleListSocket"],
     ["mn_ParticleSystemSocket", "mn_ParticleSystemListSocket"],
-    ["mn_SplineSocket", "mn_SplineListSocket"] ]
+    ["mn_SplineSocket", "mn_SplineListSocket"],
+    ["mn_MatrixSocket", "mn_MatrixListSocket"] ]
 
 def getListBaseSocketIdName(idName):
     for listChain in listChains:
