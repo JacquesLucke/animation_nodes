@@ -1,9 +1,6 @@
 import bpy
 from bpy.props import *
 from ... base_types.node import AnimationNode
-from ... mn_execution import nodeTreeChanged, allowCompiling, forbidCompiling
-from ... mn_utils import *
-from ... events import executionCodeChanged
 
 class CreatePolygonIndices(bpy.types.Node, AnimationNode):
     bl_idname = "mn_CreatePolygonIndices"
