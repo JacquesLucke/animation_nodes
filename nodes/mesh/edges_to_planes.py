@@ -1,38 +1,38 @@
 import bpy
 from mathutils import Vector
 from ... base_types.node import AnimationNode
-from ... mn_execution import allowCompiling, forbidCompiling, nodePropertyChanged
+from ... events import propertyChanged
 
 class mn_EdgesToPlanes(bpy.types.Node, AnimationNode):
     bl_idname = "mn_EdgesToPlanes"
     bl_label = "Edges to Planes"
 
-    calculateDirection = bpy.props.BoolProperty(name = "Calculate Direction", default = False, update = nodePropertyChanged, description = "Calculate a rectangle instead of a parallelogram (takes more time)")
+    inputNames = { "Vertices" : "vertices",
+                   "Edges" : "edges",
+                   "Width" : "width",
+                   "Up Vector" : "upVector" }
 
-    def init(self, context):
-        forbidCompiling()
+    outputNames = { "Vertices" : "vertices",
+                    "Polygons" : "polygons" }
+
+    calculateDirection = bpy.props.BoolProperty(
+        name = "Calculate Direction",
+        description = "Calculate a rectangle instead of a parallelogram (takes more time)",
+        default = True, update = propertyChanged)
+
+    def create(self):
         self.inputs.new("mn_VectorListSocket", "Vertices")
         self.inputs.new("mn_EdgeIndicesListSocket", "Edges")
-        self.inputs.new("mn_FloatSocket", "Width").number = 0.01
+        self.inputs.new("mn_FloatSocket", "Width").value = 0.01
         socket = self.inputs.new("mn_VectorSocket", "Up Vector")
-        socket.value = Vector((0.001, 0.001, 0.999))
+        socket.value = (0.001, 0.001, 0.999)
         socket.hide = True
         self.outputs.new("mn_VectorListSocket", "Vertices")
         self.outputs.new("mn_PolygonIndicesListSocket", "Polygons")
         self.width += 10
-        allowCompiling()
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "calculateDirection")
-
-    def getInputSocketNames(self):
-        return {"Vertices" : "vertices",
-                "Edges" : "edges",
-                "Width" : "width",
-                "Up Vector" : "upVector"}
-    def getOutputSocketNames(self):
-        return {"Vertices" : "vertices",
-                "Polygons" : "polygons"}
 
     def execute(self, vertices, edges, width, upVector):
         newVertices = []
