@@ -1,29 +1,24 @@
-import bpy, bmesh
-from ... base_types.node import AnimationNode
-from ... mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
-from ... data_structures.mesh import *
+import bpy
 import bmesh
+from ... base_types.node import AnimationNode
 
-class mn_CreateMeshFromData(bpy.types.Node, AnimationNode):
+
+class CreateMeshFromData(bpy.types.Node, AnimationNode):
     bl_idname = "mn_CreateMeshFromData"
     bl_label = "Create Mesh"
 
+    inputNames = { "Mesh Data" : "meshData" }
+    outputNames = { "Mesh" : "mesh" }
+
     errorMessage = bpy.props.StringProperty(default = "")
 
-    def init(self, context):
-        forbidCompiling()
+    def create(self):
         self.inputs.new("mn_MeshDataSocket", "Mesh Data")
         self.outputs.new("mn_MeshSocket", "Mesh")
-        allowCompiling()
 
     def draw_buttons(self, context, layout):
         if self.errorMessage != "":
             layout.label(self.errorMessage, icon = "ERROR")
-
-    def getInputSocketNames(self):
-        return {"Mesh Data" : "meshData"}
-    def getOutputSocketNames(self):
-        return {"Mesh" : "mesh"}
 
     def execute(self, meshData):
         try:
@@ -36,6 +31,7 @@ class mn_CreateMeshFromData(bpy.types.Node, AnimationNode):
             bm = bmesh.new()
             self.errorMessage = "Multiple identical edges or polygons"
         return bm
+
 
 def getBMeshFromMeshData(meshData):
     bm = bmesh.new()
