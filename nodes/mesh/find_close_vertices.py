@@ -1,30 +1,26 @@
 import bpy
 from mathutils.kdtree import KDTree
 from ... base_types.node import AnimationNode
-from ... mn_execution import allowCompiling, forbidCompiling
 
-class mn_FindCloseVertices(bpy.types.Node, AnimationNode):
+class FindCloseVertices(bpy.types.Node, AnimationNode):
     bl_idname = "mn_FindCloseVertices"
     bl_label = "Find Close Vertices"
 
-    def init(self, context):
-        forbidCompiling()
+    inputNames = { "Vertices" : "vertices",
+                   "Clusters" : "clusters",
+                   "Connections" : "connections",
+                   "Min Distance" : "minDistance",
+                   "Max Distance" : "maxDistance" }
+
+    outputNames = { "Edges" : "edges" }
+
+    def create(self):
         self.inputs.new("mn_VectorListSocket", "Vertices")
         self.inputs.new("mn_IntegerSocket", "Clusters").value = 1000
         self.inputs.new("mn_IntegerSocket", "Connections").value = 3
         self.inputs.new("mn_FloatSocket", "Min Distance").value = 0.02
         self.inputs.new("mn_FloatSocket", "Max Distance").value = 0.3
         self.outputs.new("mn_EdgeIndicesListSocket", "Edges")
-        allowCompiling()
-
-    def getInputSocketNames(self):
-        return {"Vertices" : "vertices",
-                "Clusters" : "clusters",
-                "Connections" : "connections",
-                "Min Distance" : "minDistance",
-                "Max Distance" : "maxDistance"}
-    def getOutputSocketNames(self):
-        return {"Edges" : "edges"}
 
     def execute(self, vertices, clusters, connections, minDistance, maxDistance):
         minDistance = max(0, minDistance)
@@ -47,4 +43,5 @@ class mn_FindCloseVertices(bpy.types.Node, AnimationNode):
                         edge = (foundIndex, searchIndex)
                     edges.append(edge)
                     added += 1
+                    
         return list(set(edges))
