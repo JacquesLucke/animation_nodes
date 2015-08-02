@@ -1,39 +1,43 @@
 import bpy, time
 from ... base_types.node import AnimationNode
-from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
-from ... data_structures.mesh import *
-from ... mn_cache import *
+from ... data_structures.mesh import MeshData
+from ... mn_cache import getLongTimeCache, setLongTimeCache, cacheFunctionResult
+from ... events import propertyChanged
 
 cacheIdentifier = "Object Mesh Data"
 
-class mn_ObjectMeshInfo(bpy.types.Node, AnimationNode):
+class ObjectMeshInfo(bpy.types.Node, AnimationNode):
     bl_idname = "mn_ObjectMeshInfo"
     bl_label = "Object Mesh Info"
     outputUseParameterName = "useOutput"
 
-    usePerObjectCache = bpy.props.BoolProperty(name = "Use Cache", default = False, description = "Warning: Modifications to the data will overwrite the cache.")
-    applyModifiers = bpy.props.BoolProperty(name = "Apply Modifiers", default = False, description = "Output the mesh with applied modifiers.")
+    inputNames = { "Object" : "object" }
 
-    def init(self, context):
-        forbidCompiling()
+    outputNames = { "Polygons" : "polygons",
+                    "Vertices" : "vertices",
+                    "Mesh Data" : "meshData" }
+
+    usePerObjectCache = bpy.props.BoolProperty(
+        name = "Use Cache",
+        description = "Warning: Modifications to the data will overwrite the cache.",
+        default = False)
+
+    applyModifiers = bpy.props.BoolProperty(
+        name = "Apply Modifiers",
+        description = "Output the mesh with applied modifiers.",
+        default = False, update = propertyChanged)
+
+    def create(self):
         self.inputs.new("mn_ObjectSocket", "Object").showName = False
         self.outputs.new("mn_PolygonListSocket", "Polygons")
         self.outputs.new("mn_VertexListSocket", "Vertices")
         self.outputs.new("mn_MeshDataSocket", "Mesh Data")
-        allowCompiling()
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "applyModifiers")
 
     def draw_buttons_ext(self, context, layout):
         layout.prop(self, "usePerObjectCache")
-
-    def getInputSocketNames(self):
-        return {"Object" : "object"}
-    def getOutputSocketNames(self):
-        return {"Polygons" : "polygons",
-                "Vertices" : "vertices",
-                "Mesh Data" : "meshData"}
 
     def execute(self, object, useOutput):
         if getattr(object, "type", None) != "MESH":
