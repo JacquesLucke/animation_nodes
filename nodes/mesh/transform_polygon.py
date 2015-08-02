@@ -1,7 +1,6 @@
 import bpy
 from mathutils import Matrix
 from ... base_types.node import AnimationNode
-from ... data_structures.mesh import *
 
 class TransformPolygon(bpy.types.Node, AnimationNode):
     bl_idname = "mn_TransformPolygon"
