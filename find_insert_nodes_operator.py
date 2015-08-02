@@ -11,8 +11,8 @@ def getItems(self, context):
         return key
     updateSearchDict()
     items = []
-    for key, value in searchDict.items():
-        items.append((value, key, ""))
+    for key in searchDict.keys():
+        items.append((key, key, ""))
     items = sorted(items, key = getSortKey)
     return items
 
@@ -21,21 +21,22 @@ class InsertNodeOperator(bpy.types.Operator):
     bl_label = "Find and Insert Node"
     bl_options = {"REGISTER"}
     bl_property = "item"
-    
+
     item = bpy.props.EnumProperty(items = getItems)
-    
+
     def invoke(self, context, event):
         if getNodeTree():
             context.window_manager.invoke_search_popup(self)
         else:
             context.window_manager.popup_menu(drawNodeTreeChooser, title = "Select Node Tree")
         return {"CANCELLED"}
-        
+
     def execute(self, context):
-        bpy.ops.node.add_and_link_node("INVOKE_DEFAULT", type = self.item, use_transform = True)
+        nodeType, settings = searchDict[self.item]
+        bpy.ops.node.add_and_link_node("INVOKE_DEFAULT", type = nodeType, use_transform = True, settings = settings)
         importanceMap[self.item] += 1
         return {"FINISHED"}
-        
+
 def drawNodeTreeChooser(self, context):
     layout = self.layout
     nodeTrees = getAnimationNodeTrees()
@@ -44,22 +45,32 @@ def drawNodeTreeChooser(self, context):
     else:
         for nodeTree in nodeTrees:
             props = layout.operator("mn.select_node_tree", text = "Select '{}'".format(nodeTree.name), icon = "EYEDROPPER")
-            props.nodeTreeName = nodeTree.name  
-    
+            props.nodeTreeName = nodeTree.name
+
 def getNodeTree():
     return getattr(bpy.context.space_data, "node_tree", None)
-   
+
 def updateSearchDict():
     global searchDict
     searchDict = {}
-    
+
     for cls in getNodeClasses():
         tags = []
-        tags.append(cls.bl_label)
-        tags.extend(getattr(cls, "searchTags", []))
+        if not cls.onlySearchTags: tags.append(cls.bl_label)
+        tags.extend(cls.searchTags)
+        # each tag contains either only a name or a name and a settings dictionary
         for tag in tags:
-            searchDict[tag] = cls.bl_idname
-        
+            if isinstance(tag, str):
+                searchDict[tag] = (cls.bl_idname, [])
+            else:
+                searchDict[tag[0]] = (cls.bl_idname, createSettingsPropertyGroup(tag[1]))
+
+def createSettingsPropertyGroup(easyDict):
+    settings = []
+    for key, value in easyDict.items():
+        settings.append({"name" : key, "value" : value})
+    return settings
+
 def getNodeClasses():
     from . mn_node_base import AnimationNode
     return AnimationNode.__subclasses__()

@@ -8,6 +8,10 @@ from .. utils.mn_node_utils import getAnimationNodeTrees
 class AnimationNode:
     identifier = StringProperty(name = "Identifier", default = "")
 
+    searchTags = []
+    onlySearchTags = False
+    isDetermined = False
+
     @classmethod
     def poll(cls, nodeTree):
         return nodeTree.bl_idname == "mn_AnimationNodeTree"

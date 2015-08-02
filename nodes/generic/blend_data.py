@@ -9,11 +9,16 @@ class BlendDataNode(bpy.types.Node, AnimationNode):
     bl_label = "Blend Data"
     isDetermined = True
 
+    onlySearchTags = True
+    searchTags = [ ("Blend Matrices", {"dataType" : repr("Matrix")}),
+                   ("Blend Vectors", {"dataType" : repr("Vector")}),
+                   ("Blend Floats", {"dataType" : repr("Float")}) ]
+
     def dataTypeChanged(self, context):
         self.generateSockets()
         executionCodeChanged()
 
-    dataType = StringProperty(default = "Matrix", update = dataTypeChanged)
+    dataType = StringProperty(default = "Float", update = dataTypeChanged)
 
     inputNames = { "Factor" : "factor",
                    "Interpolation" : "interpolation",
