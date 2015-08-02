@@ -1,38 +1,31 @@
 import bpy
-from mathutils import *
 from ... base_types.node import AnimationNode
-from ... mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
+from ... events import executionCodeChanged
 
 axisItems = [("X", "X", ""), ("Y", "Y", ""), ("Z", "Z", "")]
 
-class mn_RotationMatrix(bpy.types.Node, AnimationNode):
+class RotationMatrix(bpy.types.Node, AnimationNode):
     bl_idname = "mn_RotationMatrix"
     bl_label = "Rotation Matrix"
     isDetermined = True
-    
-    axis = bpy.props.EnumProperty(items = axisItems, update = nodeTreeChanged)
-    
-    def init(self, context):
-        forbidCompiling()
+
+    inputNames = { "Angle" : "angle" }
+    outputNames = { "Matrix" : "matrix" }
+
+    axis = bpy.props.EnumProperty(items = axisItems, update = executionCodeChanged)
+
+    def create(self):
         self.inputs.new("mn_FloatSocket", "Angle")
         self.outputs.new("mn_MatrixSocket", "Matrix")
-        allowCompiling()
-        
+
     def draw_buttons(self, context, layout):
         layout.prop(self, "axis", expand = True)
-        
-    def getInputSocketNames(self):
-        return {"Angle" : "angle"}
-    def getOutputSocketNames(self):
-        return {"Matrix" : "matrix"}
 
-    def useInLineExecution(self):
-        return True
-    def getInLineExecutionString(self, outputUse):
+    def getExecutionCode(self, outputUse):
         return "$matrix$ = mathutils.Matrix.Rotation(%angle%, 4, '"+ self.axis +"')"
-        
+
     def getModuleList(self):
         return ["mathutils"]
-        
-    def copy(self, node):
-        self.inputs[0].number = 0
+
+    def duplicate(self, sourceNode):
+        self.inputs[0].value = 0
