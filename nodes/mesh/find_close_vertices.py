@@ -6,7 +6,7 @@ from ... mn_execution import allowCompiling, forbidCompiling
 class mn_FindCloseVertices(bpy.types.Node, AnimationNode):
     bl_idname = "mn_FindCloseVertices"
     bl_label = "Find Close Vertices"
-    
+
     def init(self, context):
         forbidCompiling()
         self.inputs.new("mn_VectorListSocket", "Vertices")
@@ -16,7 +16,7 @@ class mn_FindCloseVertices(bpy.types.Node, AnimationNode):
         self.inputs.new("mn_FloatSocket", "Max Distance").value = 0.3
         self.outputs.new("mn_EdgeIndicesListSocket", "Edges")
         allowCompiling()
-        
+
     def getInputSocketNames(self):
         return {"Vertices" : "vertices",
                 "Clusters" : "clusters",
@@ -25,11 +25,11 @@ class mn_FindCloseVertices(bpy.types.Node, AnimationNode):
                 "Max Distance" : "maxDistance"}
     def getOutputSocketNames(self):
         return {"Edges" : "edges"}
-        
+
     def execute(self, vertices, clusters, connections, minDistance, maxDistance):
         minDistance = max(0, minDistance)
         maxDistance = max(minDistance, maxDistance)
-        
+
         verticesAmount = len(vertices)
         kdTree = KDTree(verticesAmount)
         for i, vector in enumerate(vertices):

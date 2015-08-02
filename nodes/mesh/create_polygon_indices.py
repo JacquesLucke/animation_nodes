@@ -8,22 +8,22 @@ class mn_CreatePolygonIndices(bpy.types.Node, AnimationNode):
     bl_label = "Create Polygon Indices"
     node_category = "Mesh"
     isDetermined = True
-    
+
     def amountChanged(self, context):
         self.generateInputSockets()
         nodeTreeChanged()
-    
+
     amount = bpy.props.IntProperty(default = 3, name = "Vertex Amount", update = amountChanged, min = 3, soft_max = 10)
-    
+
     def init(self, context):
         forbidCompiling()
         self.generateInputSockets()
         self.outputs.new("mn_PolygonIndicesSocket", "Polygon Indices")
         allowCompiling()
-        
+
     def draw_buttons(self, context, layout):
         layout.prop(self, "amount")
-        
+
     def generateInputSockets(self):
         forbidCompiling()
         connections = getConnectionDictionaries(self)
@@ -32,7 +32,7 @@ class mn_CreatePolygonIndices(bpy.types.Node, AnimationNode):
             self.inputs.new("mn_IntegerSocket", "Index " + str(i)).value = i
         tryToSetConnectionDictionaries(self, connections)
         allowCompiling()
-                
+
     def getInputSocketNames(self):
         names = {}
         for i, socket in enumerate(self.inputs):
@@ -40,7 +40,7 @@ class mn_CreatePolygonIndices(bpy.types.Node, AnimationNode):
         return names
     def getOutputSocketNames(self):
         return {"Polygon Indices" : "polygonIndices"}
-        
+
     def useInLineExecution(self):
         return True
     def getInLineExecutionString(self, outputUse):

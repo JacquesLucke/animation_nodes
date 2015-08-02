@@ -5,7 +5,7 @@ from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompilin
 class mn_MeshRemoveDoubles(bpy.types.Node, AnimationNode):
     bl_idname = "mn_MeshRemoveDoubles"
     bl_label = "Mesh Remove Doubles"
-    
+
     def init(self, context):
         forbidCompiling()
         self.inputs.new("mn_MeshSocket", "Mesh")
@@ -14,13 +14,13 @@ class mn_MeshRemoveDoubles(bpy.types.Node, AnimationNode):
         socket.setMinMax(0.0, 10000.0)
         self.outputs.new("mn_MeshSocket", "Mesh")
         allowCompiling()
-        
+
     def getInputSocketNames(self):
         return {"Mesh" : "bm",
                 "Distance" : "distance"}
     def getOutputSocketNames(self):
         return {"Mesh" : "mesh"}
-        
+
     def execute(self, bm, distance):
         bmesh.ops.remove_doubles(bm, verts = bm.verts, dist = distance)
         return bm

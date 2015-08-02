@@ -6,7 +6,7 @@ from ... data_structures.mesh import *
 class mn_PolygonInfo(bpy.types.Node, AnimationNode):
     bl_idname = "mn_PolygonInfo"
     bl_label = "Polygon Info"
-    
+
     def init(self, context):
         forbidCompiling()
         self.inputs.new("mn_PolygonSocket", "Polygon")
@@ -16,7 +16,7 @@ class mn_PolygonInfo(bpy.types.Node, AnimationNode):
         self.outputs.new("mn_FloatSocket", "Area")
         self.outputs.new("mn_VertexListSocket", "Vertices")
         allowCompiling()
-        
+
     def getInputSocketNames(self):
         return {"Polygon" : "polygon"}
     def getOutputSocketNames(self):
@@ -25,6 +25,6 @@ class mn_PolygonInfo(bpy.types.Node, AnimationNode):
                 "Material Index" : "materialIndex",
                 "Area" : "area",
                 "Vertices" : "vertices"}
-        
+
     def execute(self, polygon):
         return polygon.center, polygon.normal, polygon.materialIndex, polygon.area, polygon.vertices
