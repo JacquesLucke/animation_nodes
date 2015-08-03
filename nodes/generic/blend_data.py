@@ -35,7 +35,7 @@ class BlendDataNode(bpy.types.Node, AnimationNode):
         self.outputs.clear()
 
         idName = getIdNameFromDataType(self.dataType)
-        self.inputs.new("mn_FloatSocket", "Factor")
+        self.inputs.new("mn_FloatSocket", "Factor").setMinMax(0.0, 1.0)
         self.inputs.new("mn_InterpolationSocket", "Interpolation").showName = False
         self.inputs.new(idName, "A")
         self.inputs.new(idName, "B")
