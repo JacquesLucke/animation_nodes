@@ -50,7 +50,7 @@ class ConvertParticleSystemToParticles(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType == "Particle System" and target.dataType == "Particle List"
     def insert(self, nodeTree, origin, target):
-        insertLinkedNode(nodeTree, "mn_GetParticles", origin, target)        
+        insertLinkedNode(nodeTree, "mn_GetParticles", origin, target)
 
 class ConvertListToElement(LinkCorrection):
     def check(self, origin, target):
@@ -65,7 +65,7 @@ class ConvertElementToList(LinkCorrection):
         return origin.bl_idname == getListBaseSocketIdName(target.bl_idname)
     def insert(self, nodeTree, origin, target):
         node = insertNode(nodeTree, "mn_CreateList", origin, target)
-        node.assignListType(target.bl_idname, inputAmount = 1)
+        node.assignListType(origin.dataType, inputAmount = 1)
         insertBasicLinking(nodeTree, origin, node, target)
 
 class ConvertMeshDataToMesh(LinkCorrection):
