@@ -1,37 +1,32 @@
 import bpy
+from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
-from ... mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 
 outputItems = [	("BASIS", "Basis", ""),
                 ("LOCAL", "Local", ""),
                 ("PARENT INVERSE", "Parent Inverse", ""),
                 ("WORLD", "World", "") ]
 
-class mn_ObjectMatrixOutputNode(bpy.types.Node, AnimationNode):
+class ObjectMatrixOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_ObjectMatrixOutputNode"
     bl_label = "Object Matrix Output"
-    
-    outputType = bpy.props.EnumProperty(items = outputItems, update = nodeTreeChanged, default = "WORLD")
-    
-    def init(self, context):
-        forbidCompiling()
+
+    inputNames = { "Object" : "object",
+                   "Matrix" : "matrix" }
+
+    outputNames = { "Object" : "object" }
+
+    outputType = bpy.props.EnumProperty(items = outputItems, update = executionCodeChanged, default = "WORLD")
+
+    def create(self):
         self.inputs.new("mn_ObjectSocket", "Object").showName = False
         self.inputs.new("mn_MatrixSocket", "Matrix")
         self.outputs.new("mn_ObjectSocket", "Object")
-        allowCompiling()
-        
+
     def draw_buttons(self, context, layout):
         layout.prop(self, "outputType", text = "Type")
-        
-    def getInputSocketNames(self):
-        return {"Object" : "object",
-                "Matrix" : "matrix"}
-    def getOutputSocketNames(self):
-        return {"Object" : "object"}
-        
-    def useInLineExecution(self):
-        return True
-    def getInLineExecutionString(self, outputUse):
+
+    def getExecutionCode(self):
         t = self.outputType
         codeLines = []
         codeLines.append("if %object% is not None:")
@@ -41,4 +36,3 @@ class mn_ObjectMatrixOutputNode(bpy.types.Node, AnimationNode):
         if t == "WORLD": codeLines.append("    %object%.matrix_world = %matrix%")
         codeLines.append("$object$ = %object%")
         return "\n".join(codeLines)
-
