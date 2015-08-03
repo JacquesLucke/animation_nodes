@@ -1,43 +1,36 @@
 import bpy, random
-from ... algorithms.perlin_noise import perlinNoise
+from ... events import propertyChanged
 from ... base_types.node import AnimationNode
-from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+from ... algorithms.perlin_noise import perlinNoise
 
 
-class mn_FloatWiggle(bpy.types.Node, AnimationNode):
+class FloatWiggle(bpy.types.Node, AnimationNode):
     bl_idname = "mn_FloatWiggle"
     bl_label = "Number Wiggle"
     isDetermined = True
-    
-    additionalSeed = bpy.props.IntProperty(update = nodePropertyChanged)
-    
-    def init(self, context):
-        forbidCompiling()
+
+    inputNames = { "Seed" : "seed",
+                   "Evolution" : "evolution",
+                   "Amplitude" : "amplitude",
+                   "Octaves" : "octaves",
+                   "Persistance" : "persistance" }
+
+    outputNames = { "Number" : "number" }
+
+    additionalSeed = bpy.props.IntProperty(update = propertyChanged)
+
+    def create(self):
         self.inputs.new("mn_FloatSocket", "Seed")
         self.inputs.new("mn_FloatSocket", "Evolution")
-        self.inputs.new("mn_FloatSocket", "Speed").value = 15.0
-        self.inputs.new("mn_FloatSocket", "Amplitude").value = 1
+        self.inputs.new("mn_FloatSocket", "Amplitude").value = 1.0
+        self.inputs.new("mn_IntegerSocket", "Octaves").value = 2
         self.inputs.new("mn_FloatSocket", "Persistance").value = 0.3
-        self.inputs.new("mn_IntegerSocket", "Octaves").value = 2.0
-        self.outputs.new("mn_FloatSocket", "Noise")
-        allowCompiling()
-        
+        self.outputs.new("mn_FloatSocket", "Number")
+
     def draw_buttons(self, context, layout):
         layout.prop(self, "additionalSeed", text = "Additional Seed")
-        
-    def getInputSocketNames(self):
-        return {"Seed" : "seed",
-                "Evolution" : "x",
-                "Speed" : "speed",
-                "Amplitude" : "amplitude",
-                "Persistance" : "persistance",
-                "Octaves" : "octaves"}
-    def getOutputSocketNames(self):
-        return {"Noise" : "noise"}
-        
-    def execute(self, seed, x, speed, amplitude, persistance, octaves):
-        x = x / speed + 2673 * seed + 823 * self.additionalSeed
-        total = perlinNoise(x, persistance, octaves)
-        return total * amplitude
-        
 
+    def execute(self, seed, evolution, amplitude, octaves, persistance):
+        evolution += 2673 * seed + 823 * self.additionalSeed
+        noise = perlinNoise(evolution, persistance, octaves)
+        return noise * amplitude
