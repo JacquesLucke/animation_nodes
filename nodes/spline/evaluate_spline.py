@@ -1,14 +1,14 @@
 import bpy
 from bpy.props import *
 from mathutils import Vector
-from . mn_spline_parameter_evaluate_node_base import SplineParameterEvaluateNodeBase
+from . spline_parameter_evaluate_node_base import SplineParameterEvaluateNodeBase
 from ... base_types.node import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 class mn_EvaluateSpline(bpy.types.Node, AnimationNode, SplineParameterEvaluateNodeBase):
     bl_idname = "mn_EvaluateSpline"
     bl_label = "Evaluate Spline"
-    
+
     def init(self, context):
         forbidCompiling()
         self.inputs.new("mn_SplineSocket", "Spline").showName = False
@@ -16,10 +16,10 @@ class mn_EvaluateSpline(bpy.types.Node, AnimationNode, SplineParameterEvaluateNo
         self.outputs.new("mn_VectorSocket", "Location")
         self.outputs.new("mn_VectorSocket", "Tangent")
         allowCompiling()
-        
+
     def draw_buttons(self, context, layout):
         layout.prop(self, "parameterType", text = "")
-        
+
     def draw_buttons_ext(self, context, layout):
         col = layout.column()
         col.active = self.parameterType == "UNIFORM"

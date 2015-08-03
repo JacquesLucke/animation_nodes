@@ -108,7 +108,7 @@ from . import manage_broken_files as manage_broken_files
 from . import mn_execution as execution
 from . base_types import node as node_base
 from . base_types import node_function_call
-from . nodes.sound import mn_sequencer_sound_input as sequencer_sound
+from . nodes.sound import sequencer_sound_input as sequencer_sound
 
 def register():
     bpy.utils.register_module(__name__)

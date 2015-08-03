@@ -1,7 +1,7 @@
 import bpy
 from ... base_types.node import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
-from . mn_spline_parameter_evaluate_node_base import SplineParameterEvaluateNodeBase
+from . spline_parameter_evaluate_node_base import SplineParameterEvaluateNodeBase
 
 class mn_TrimSpline(bpy.types.Node, AnimationNode, SplineParameterEvaluateNodeBase):
     bl_idname = "mn_TrimSpline"
