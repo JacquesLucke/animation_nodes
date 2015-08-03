@@ -33,15 +33,15 @@ def getNodesFromType(nodeType):
             if node.bl_idname == nodeType:
                 nodes.append(node)
     return nodes
-    
+
 def getAnimationNodeTrees():
     nodeTrees = []
     for nodeTree in bpy.data.node_groups:
         if nodeTree.bl_idname == "mn_AnimationNodeTree":
             nodeTrees.append(nodeTree)
     return nodeTrees
-    
-    
+
+
 def getNotUsedSocketName(node, prefix = "socket name"):
     socketName = prefix
     while isSocketNameUsed(node, socketName):
@@ -53,8 +53,8 @@ def isSocketNameUsed(node, name):
     for socket in node.inputs:
         if socket.name == name or socket.identifier == name: return True
     return False
-    
-    
+
+
 def getNotUsedCustomSocketName(node, prefix = "custom name"):
     customName = prefix
     while isCustomSocketNameUsed(node, customName):
@@ -64,14 +64,14 @@ def isCustomSocketNameUsed(node, customName):
     for socket in node.outputs:
         if socket.customName == customName: return True
     return False
-    
-    
+
+
 def removeLinksFromSocket(socket):
     if socket is None: return
     allLinks = socket.node.id_data.links
     for link in socket.links:
         allLinks.remove(link)
-    
+
 
 def updateDependencyNode(socket):
     if socket is not None:
@@ -79,35 +79,16 @@ def updateDependencyNode(socket):
             fromNode = socket.links[0].from_node
             if hasattr(fromNode, "update"):
                 fromNode.update()
-                
+
 def isNodeRemoved(node):
     return getattr(node, "isRemoved", False)
-    
-def updateOldSocket(oldSocket, newName):
-    if not oldSocket: return
-    
-    oldName = oldSocket.name
-    node = oldSocket.node
-    nodeSockets = node.outputs if oldSocket.is_output else node.inputs
-    index = list(nodeSockets).index(oldSocket)
-    linkedSockets = getLinkedSockets(oldSocket)
-    
-    newSocket = nodeSockets.new(oldSocket.bl_idname, newName)
-    newSocket.copySettingsFrom(oldSocket)
-    newSocket.name = newName
-    
-    nodeSockets.remove(oldSocket)
-    nodeSockets.move(len(nodeSockets) - 1, index)
-    linkSocketWithOthers(newSocket, linkedSockets)
-    
-    print("replaced socket in '{}' node: {} -> {}".format(newSocket.node.name, oldName, newSocket.name))
     
 def getLinkedSockets(socket):
     sockets = []
     for link in socket.links:
         sockets.append(link.to_socket if socket.is_output else link.from_socket)
-    return sockets    
-    
+    return sockets
+
 def linkSocketWithOthers(socket, sockets):
     for otherSocket in sockets:
         if socket.is_output:
@@ -116,9 +97,9 @@ def linkSocketWithOthers(socket, sockets):
         else:
             from_socket = otherSocket
             to_socket = socket
-        socket.node.id_data.links.new(to_socket, from_socket)    
-                
-                
+        socket.node.id_data.links.new(to_socket, from_socket)
+
+
 class NodeTreeInfo:
     def __init__(self, nodeTrees):
         if isinstance(nodeTrees, (list, tuple, set)):
@@ -131,28 +112,28 @@ class NodeTreeInfo:
             nodeTree = nodeTrees
             self.nodes = nodeTree.nodes
             self.links = nodeTree.links
-            
+
         self.removeDeletedObjects()
-        
+
         self.inputSockets = {}
         self.outputSockets = {}
         self.updateSettings = {}
-        
+
         self.createConnectionDics()
-        
+
     def removeDeletedObjects(self):
         newNodeList = []
         for node in self.nodes:
             if not isNodeRemoved(node):
                 newNodeList.append(node)
         self.nodes = newNodeList
-        
+
         newLinkList = []
         for link in self.links:
             if not (isNodeRemoved(link.from_node) or isNodeRemoved(link.to_node)):
                 newLinkList.append(link)
         self.links = newLinkList
-                
+
     def createConnectionDics(self):
         for link in self.links:
             fromSocket = link.from_socket
@@ -172,7 +153,7 @@ class NodeTreeInfo:
                 self.inputSockets[toSocket] = []
             self.outputSockets[fromSocket].append(toSocket)
             self.inputSockets[toSocket].append(fromSocket)
-            
+
     def getUpdateSettingsNode(self, node):
         return self.updateSettings.get(node)
     def isOutputSocketUsed(self, socket):
@@ -244,7 +225,7 @@ class NodeTreeInfo:
                 foundNodes.extend(network.nodes)
                 networks.append(network)
         return networks
-        
+
     def get_linked_socket_pairs(self):
         pairs = []
         for node in self.nodes:
@@ -252,18 +233,18 @@ class NodeTreeInfo:
                 targets = self.getDataTargetSockets(socket)
                 pairs.extend([(socket, target) for target in targets])
         return pairs
-    
+
 class NodeNetwork:
     def __init__(self, nodes):
         self.nodes = nodes
         self.type = self.getNetworkType()
-        
+
     def getLoopStartNode(self):
         if self.type != "Loop": return None
         for node in self.nodes:
             if node.bl_idname == "mn_LoopStartNode": return node
         return None
-        
+
     def getGroupInputNode(self):
         if self.type != "Group": return None
         for node in self.nodes:
@@ -274,7 +255,7 @@ class NodeNetwork:
         for node in self.nodes:
             if node.bl_idname == "mn_GroupOutput": return node
         return None
-        
+
     def getNetworkType(self):
         loopStartAmount = 0
         groupInputAmount = 0
@@ -296,13 +277,13 @@ class NodeNetwork:
             groupInputAmount == 1 and groupOutputAmount == 1 and totalSpecials == 2): return "Group"
         if groupOutputAmount == totalSpecials: return "Ignore"
         return "Invalid"
-                
-        
+
+
     @staticmethod
     def fromNode(node):
         nodeTreeInfo = NodeTreeInfo(node.id_data)
         return nodeTreeInfo.getNetworkWith(node)
-        
+
 def isReroute(object):
     if isinstance(object, bpy.types.Node):
         return object.bl_idname == "NodeReroute"

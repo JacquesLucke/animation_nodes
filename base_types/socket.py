@@ -1,8 +1,6 @@
 import bpy
-from bpy.app.handlers import persistent
 from bpy.props import *
-from .. mn_execution import nodeTreeChanged
-from bpy.types import NodeTree, Node, NodeSocket
+from .. events import treeChanged
 from .. mn_utils import *
 
 
@@ -19,7 +17,7 @@ def customNameChanged(self, context):
         if self.callNodeWhenCustomNameChanged:
             self.node.customSocketNameChanged(self)
         self.customNameIsUpdating = False
-        nodeTreeChanged()
+        treeChanged()
 
 def makeVariableName(name):
     newName = ""
@@ -137,19 +135,14 @@ class AnimationNodeSocket:
             removeSocket.isOutputSocket = self.is_output
             removeSocket.socketIdentifier = self.identifier
 
-    def draw_color(self, context, node):
-        return self.drawColor
-
-    def copySettingsFrom(self, node):
-        self.setStoreableValue(node.getStoreableValue())
-        attributes = [prop.identifier for prop in self.bl_rna.properties if not prop.is_readonly]
-        for attribute in attributes:
-            get = getattr(node, attribute, None)
-            setattr(self, attribute, get)
-
     def getDisplayedName(self):
         if self.displayCustomName or self.editableCustomName: return self.customName
         return self.name
+
+    def draw_color(self, context, node):
+        return self.drawColor
+
+
 
     editableCustomName = BoolProperty(default = False)
     customName = StringProperty(default = "custom name", update = customNameChanged)
@@ -162,4 +155,4 @@ class AnimationNodeSocket:
     callNodeWhenCustomNameChanged = BoolProperty(default = False)
     loopAsList = BoolProperty(default = False)
     moveable = BoolProperty(default = False)
-    moveGroup = IntProperty(default = 0)        
+    moveGroup = IntProperty(default = 0)
