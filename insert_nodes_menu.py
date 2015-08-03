@@ -124,9 +124,10 @@ class TextMenu(bpy.types.Menu):
         insertNode(layout, "mn_TrimText", "Trim")
         insertNode(layout, "mn_StringLengthNode", "Length")
         layout.separator()
+        insertNode(layout, "mn_SeparateTextObject", "Object Separate")
         insertNode(layout, "mn_TextBlockReader", "Block Reader")
         insertNode(layout, "mn_TextBlockWriter", "Block Writer")
-        insertNode(layout, "mn_SeparateTextObject", "Object Separate")
+        insertNode(layout, "mn_TextSequenceOutput", "Sequence Output")
         insertNode(layout, "mn_TextOutputNode", "Object Output")
 
 class BooleanMenu(bpy.types.Menu):
