@@ -3,7 +3,7 @@ import random
 from bpy.props import *
 from bpy.app.handlers import persistent
 from . node_function_call import getNodeFunctionCallOperatorName
-from .. utils.mn_node_utils import getAnimationNodeTrees
+from .. utils.nodes import getAnimationNodeTrees
 
 class AnimationNode:
     identifier = StringProperty(name = "Identifier", default = "")

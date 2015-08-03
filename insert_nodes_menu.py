@@ -1,5 +1,5 @@
 import bpy
-from . utils.mn_node_utils import getAnimationNodeTrees
+from . utils.nodes import getAnimationNodeTrees
 
 def drawMenu(self, context):
     if context.space_data.tree_type != "mn_AnimationNodeTree": return

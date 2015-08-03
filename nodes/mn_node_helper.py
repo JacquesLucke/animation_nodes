@@ -1,5 +1,5 @@
 import bpy
-from .. utils.mn_node_utils import *
+from .. utils.nodes import *
 from .. utils.names import *
 
 mainObjectContainerName = "Animation Nodes Object Container"

@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... base_types.node import AnimationNode
-from ... utils.mn_node_utils import getNotUsedSocketName
+from ... utils.nodes import getNotUsedSocketName
 from ... utils.selection import getSortedSelectedObjectNames
 from ... sockets.info import getBaseDataTypeItems, toIdName, toListIdName
 

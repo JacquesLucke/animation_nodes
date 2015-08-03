@@ -1,6 +1,6 @@
 import bpy
 from collections import defaultdict
-from . utils.mn_node_utils import getAnimationNodeTrees
+from . utils.nodes import getAnimationNodeTrees
 
 searchDict = {}
 importanceMap = defaultdict(int)

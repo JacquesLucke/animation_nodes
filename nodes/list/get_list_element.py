@@ -1,6 +1,6 @@
 import bpy
 from ... base_types.node import AnimationNode
-from ... utils.mn_node_utils import NodeTreeInfo
+from ... utils.nodes import NodeTreeInfo
 from ... sockets.info import toBaseIdName
 
 class GetListElementNode(bpy.types.Node, AnimationNode):

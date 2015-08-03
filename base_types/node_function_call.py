@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from bpy.app.handlers import persistent
-from .. utils.mn_node_utils import getNode
+from .. utils.nodes import getNode
 
 nodeFunctionCallOperators = {}
 missingNodeOperators = []

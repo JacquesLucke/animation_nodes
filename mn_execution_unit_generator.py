@@ -1,5 +1,5 @@
 import bpy, time, os, sys, inspect
-from . utils.mn_node_utils import *
+from . utils.nodes import *
 from . mn_utils import *
 from . node_link_conversion import correctForbiddenNodeLinks
 

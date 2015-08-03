@@ -1,6 +1,6 @@
 import bpy
 from mathutils import Vector
-from . utils.mn_node_utils import *
+from . utils.nodes import *
 from . sockets.info import toBaseIdName
 
 def correctForbiddenNodeLinks():

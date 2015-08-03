@@ -1,6 +1,6 @@
 import bpy
 from ... base_types.node import AnimationNode
-from ... utils.mn_node_utils import NodeTreeInfo
+from ... utils.nodes import NodeTreeInfo
 
 class ReverseListNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_ReverseListNode"
