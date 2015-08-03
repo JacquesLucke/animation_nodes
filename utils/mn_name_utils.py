@@ -1,4 +1,5 @@
 import bpy
+import re
 from .. mn_utils import *
 
 def toDataPath(name):
@@ -34,9 +35,12 @@ def getPossibleName(field, name = "element"):
     counter = 1
     while field.get(name + randomString + str(counter)):
         counter += 1
-    return name + randomString + str(counter)    
+    return name + randomString + str(counter)
 
-def convertVariableNameToUI(sourceName):
+def toVariableName(name):
+    return re.sub("\W+", "", name)
+
+def toInterfaceName(sourceName):
     tempName = ""
 
     for i, char in enumerate(sourceName):

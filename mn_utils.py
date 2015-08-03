@@ -67,13 +67,20 @@ def printTimeSpan(name, timeSpan, extraInfo = ""):
 # nodes and sockets
 ######################
 
+def getSocket(treeName, nodeName, isOutput, identifier):
+    node = getNode(treeName, nodeName)
+    sockets = node.outputs if isOutput else node.inputs
+    for socket in sockets:
+        if socket.identifier == identifier: return socket
 def getNode(treeName, nodeName):
     return bpy.data.node_groups[treeName].nodes[nodeName]
+
 def getSocketFromNode(node, isOutputSocket, name):
     if isOutputSocket:
         return node.outputs.get(name)
     else:
         return node.inputs.get(name)
+
 def getSocketByIdentifier(node, isOutputSocket, identifier):
     if isOutputSocket: return getSocketFromListByIdentifier(node.outputs, identifier)
     return getSocketFromListByIdentifier(node.inputs, identifier)

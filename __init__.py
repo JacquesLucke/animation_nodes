@@ -107,7 +107,9 @@ from . insert_nodes_menu import registerMenu, unregisterMenu
 from . import manage_broken_files as manage_broken_files
 from . import mn_execution as execution
 from . base_types import node as node_base
+from . base_types import socket as socket_base
 from . base_types import node_function_call
+from . base_types import socket_function_call
 from . nodes.sound import sequencer_sound_input as sequencer_sound
 
 def register():
@@ -115,7 +117,9 @@ def register():
     manage_broken_files.register_handlers()
     execution.register_handlers()
     node_base.register_handlers()
+    socket_base.register()
     node_function_call.register_handlers()
+    socket_function_call.register_handlers()
     sequencer_sound.register_handlers()
     registerMenu()
     register_keymaps()
@@ -129,7 +133,9 @@ def unregister():
     manage_broken_files.unregister_handlers()
     execution.unregister_handlers()
     node_base.unregister_handlers()
+    socket_base.unregister()
     node_function_call.unregister_handlers()
+    socket_function_call.unregister_handlers()
     sequencer_sound.unregister_handlers()
     unregisterMenu()
 

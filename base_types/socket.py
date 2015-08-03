@@ -1,104 +1,9 @@
 import bpy
 from bpy.props import *
 from .. events import treeChanged
-from .. mn_utils import *
-
-
-
-def customNameChanged(self, context):
-    if not self.customNameIsUpdating:
-        self.customNameIsUpdating = True
-        if self.customNameIsVariable:
-            self.customName = makeVariableName(self.customName)
-        if self.uniqueCustomName:
-            customName = self.customName
-            self.customName = "temporary name to avoid some errors"
-            self.customName = getNotUsedCustomName(self.node, prefix = customName)
-        if self.callNodeWhenCustomNameChanged:
-            self.node.customSocketNameChanged(self)
-        self.customNameIsUpdating = False
-        treeChanged()
-
-def makeVariableName(name):
-    newName = ""
-    for i, char in enumerate(name):
-        if len(newName) == 0 and (char.isalpha() or char == "_"):
-            newName += char
-        elif len(newName) > 0 and (char.isalpha() or char.isnumeric() or char == "_"):
-            newName += char
-    return newName
-
-def getNotUsedCustomName(node, prefix):
-    customName = prefix
-    while isCustomNameUsed(node, customName):
-        customName = prefix + getRandomString(3)
-    return customName
-
-def isCustomNameUsed(node, name):
-    for socket in node.inputs:
-        if socket.customName == name: return True
-    for socket in node.outputs:
-        if socket.customName == name: return True
-    return False
-
-
-def getSocketVisibility(socket):
-    return not socket.hide
-def setSocketVisibility(socket, value):
-    socket.hide = not value
-
-bpy.types.NodeSocket.show = BoolProperty(default = True, get = getSocketVisibility, set = setSocketVisibility)
-
-
-class RemoveSocketOperator(bpy.types.Operator):
-    bl_idname = "mn.remove_socket"
-    bl_label = "Remove Socket"
-
-    nodeTreeName = StringProperty()
-    nodeName = StringProperty()
-    isOutputSocket = BoolProperty()
-    socketIdentifier = StringProperty()
-
-    def execute(self, context):
-        node = getNode(self.nodeTreeName, self.nodeName)
-        socket = getSocketByIdentifier(node, self.isOutputSocket, self.socketIdentifier)
-        if socket.callNodeToRemove:
-            node.removeSocket(socket)
-        else:
-            if self.isOutputSocket: node.outputs.remove(socket)
-            else: node.inputs.remove(socket)
-        return {'FINISHED'}
-
-class MoveSocketOperator(bpy.types.Operator):
-    bl_idname = "mn.move_socket"
-    bl_label = "Move Socket"
-
-    nodeTreeName = StringProperty()
-    nodeName = StringProperty()
-    isOutputSocket = BoolProperty()
-    socketIdentifier = StringProperty()
-    moveUp = BoolProperty()
-
-    def execute(self, context):
-        node = getNode(self.nodeTreeName, self.nodeName)
-        moveSocket = getSocketByIdentifier(node, self.isOutputSocket, self.socketIdentifier)
-        sockets = node.outputs if self.isOutputSocket else node.inputs
-        moveableSocketIndices = [index for index, socket in enumerate(sockets) if socket.moveable and socket.moveGroup == moveSocket.moveGroup]
-        currentIndex = list(sockets).index(moveSocket)
-
-        targetIndex = -1
-        for index in moveableSocketIndices:
-            if self.moveUp and index < currentIndex:
-                targetIndex = index
-            if not self.moveUp and index > currentIndex:
-                targetIndex = index
-                break
-
-        if targetIndex != -1:
-            sockets.move(currentIndex, targetIndex)
-            if self.moveUp: sockets.move(targetIndex + 1, currentIndex)
-            else: sockets.move(targetIndex - 1, currentIndex)
-        return {'FINISHED'}
+from .. mn_utils import getRandomString, isSocketLinked
+from . socket_function_call import getSocketFunctionCallOperatorName
+from .. utils.mn_name_utils import toVariableName
 
 
 class AnimationNodeSocket:
@@ -117,23 +22,12 @@ class AnimationNodeSocket:
 
         if self.moveable:
             row.separator()
-            moveSockets = [
-                row.operator("mn.move_socket", text = "", icon = "TRIA_UP"),
-                row.operator("mn.move_socket", text = "", icon = "TRIA_DOWN")]
-            for i, socket in enumerate(moveSockets):
-                socket.nodeTreeName = node.id_data.name
-                socket.nodeName = node.name
-                socket.isOutputSocket = self.is_output
-                socket.socketIdentifier = self.identifier
-                socket.moveUp = i == 0
+            self.callFunctionFromUI(row, "moveSocketUp", icon = "TRIA_UP")
+            self.callFunctionFromUI(row, "moveSocketDown", icon = "TRIA_DOWN")
 
         if self.removeable:
             row.separator()
-            removeSocket = row.operator("mn.remove_socket", text = "", icon = "X")
-            removeSocket.nodeTreeName = node.id_data.name
-            removeSocket.nodeName = node.name
-            removeSocket.isOutputSocket = self.is_output
-            removeSocket.socketIdentifier = self.identifier
+            self.callFunctionFromUI(row, "removeSocket", icon = "X")
 
     def getDisplayedName(self):
         if self.displayCustomName or self.editableCustomName: return self.customName
@@ -142,7 +36,53 @@ class AnimationNodeSocket:
     def draw_color(self, context, node):
         return self.drawColor
 
+    def callFunctionFromUI(self, layout, functionName, text = "", icon = "NONE", description = ""):
+        idName = getSocketFunctionCallOperatorName(description)
+        props = layout.operator(idName, text = text, icon = icon)
+        props.nodeTreeName = self.node.id_data.name
+        props.nodeName = self.node.name
+        props.isOutput = self.is_output
+        props.identifier = self.identifier
+        props.functionName = functionName
 
+    def moveSocketUp(self):
+        self.moveSocket(moveUp = True)
+
+    def moveSocketDown(self):
+        self.moveSocket(moveUp = False)
+
+    def moveSocket(self, moveUp = True):
+        moveableSocketIndices = [index for index, socket in enumerate(self.sockets) if socket.moveable and socket.moveGroup == self.moveGroup]
+        currentIndex = list(self.sockets).index(self)
+
+        targetIndex = -1
+        for index in moveableSocketIndices:
+            if moveUp and index < currentIndex:
+                targetIndex = index
+            if not moveUp and index > currentIndex:
+                targetIndex = index
+                break
+
+        if targetIndex != -1:
+            self.sockets.move(currentIndex, targetIndex)
+            if moveUp: self.sockets.move(targetIndex + 1, currentIndex)
+        else: self.sockets.move(targetIndex - 1, currentIndex)
+        return {'FINISHED'}
+
+    def removeSocket(self):
+        if self.callNodeToRemove:
+            self.node.removeSocket(socket)
+        else:
+            self.sockets.remove(self)
+
+    @property
+    def sockets(self):
+        """Returns all sockets next to this one (all inputs or outputs)"""
+        return self.node.outputs if self.is_output else self.node.inputs
+
+
+    def customNameChanged(self, context):
+        updateCustomName(self)
 
     editableCustomName = BoolProperty(default = False)
     customName = StringProperty(default = "custom name", update = customNameChanged)
@@ -156,3 +96,51 @@ class AnimationNodeSocket:
     loopAsList = BoolProperty(default = False)
     moveable = BoolProperty(default = False)
     moveGroup = IntProperty(default = 0)
+
+isUpdating = False
+def updateCustomName(socket):
+    global isUpdating
+    if not isUpdating:
+        isUpdating = True
+        correctCustomName(socket)
+        treeChanged()
+        isUpdating = False
+
+def correctCustomName(socket):
+    if socket.customNameIsVariable:
+        socket.customName = toVariableName(socket.customName)
+    if socket.uniqueCustomName:
+        customName = socket.customName
+        socket.customName = "temporary name to avoid some errors"
+        socket.customName = getNotUsedCustomName(socket.node, prefix = customName)
+    if socket.callNodeWhenCustomNameChanged:
+        socket.node.customSocketNameChanged(socket)
+
+def getNotUsedCustomName(node, prefix):
+    customName = prefix
+    while isCustomNameUsed(node, customName):
+        customName = prefix + getRandomString(3)
+    return customName
+
+def isCustomNameUsed(node, name):
+    for socket in node.inputs:
+        if socket.customName == name: return True
+    for socket in node.outputs:
+        if socket.customName == name: return True
+    return False
+
+
+
+# Register
+##################################
+
+def getSocketVisibility(socket):
+    return not socket.hide
+def setSocketVisibility(socket, value):
+    socket.hide = not value
+
+def register():
+    bpy.types.NodeSocket.show = BoolProperty(default = True, get = getSocketVisibility, set = setSocketVisibility)
+
+def unregister():
+    del bpy.types.NodeSocket.show

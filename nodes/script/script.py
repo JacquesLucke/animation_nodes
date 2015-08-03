@@ -3,7 +3,7 @@ from bpy.props import *
 from ... mn_utils import getNode
 from ... base_types.node import AnimationNode
 from ... utils.mn_node_utils import NodeTreeInfo
-from ... utils.mn_name_utils import getPossibleSocketName, convertVariableNameToUI
+from ... utils.mn_name_utils import getPossibleSocketName, toInterfaceName
 from ... sockets.info import getSocketDataTypeItems, getIdNameFromDataType
 
 emptySocketName = "New Socket"
@@ -189,7 +189,7 @@ class ScriptNode(bpy.types.Node, AnimationNode):
     def customSocketNameChanged(self, socket):
         if socket.name != emptySocketName:
             if self.enableUINameConversion:
-                socket.name = convertVariableNameToUI(socket.customName)
+                socket.name = toInterfaceName(socket.customName)
             else:
                 socket.name = socket.customName
 
