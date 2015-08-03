@@ -9,27 +9,29 @@ class EnumItem(bpy.types.PropertyGroup):
     description = StringProperty(default = "")
     icon = StringProperty(default = "NONE")
 
-class mn_StringSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+class StringSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "mn_StringSocket"
     bl_label = "String Socket"
     dataType = "String"
     allowedInputTypes = ["String"]
     drawColor = (1, 1, 1, 1)
-    
+
     def getEnumItems(self, context):
         items = []
         for i, item in enumerate(self.enumItems):
             items.append((item.identifier, item.displayName, item.description, item.icon, i))
         if len(items) == 0: items.append(("NONE", "NONE", ""))
         return items
-        
+
     def enumChanged(self, context):
         if self.useEnum:
             self.value = self.stringEnum
-    
+
     value = StringProperty(default = "", update = nodePropertyChanged)
     showName = BoolProperty(default = True)
-    stringEnum = EnumProperty(items = getEnumItems, name = "Possible Items", update = enumChanged)
+
+    stringEnum = EnumProperty(name = "Possible Items",
+        items = getEnumItems, update = enumChanged)
     useEnum = BoolProperty(default = False)
     enumItems = CollectionProperty(type = EnumItem)
     
@@ -39,12 +41,13 @@ class mn_StringSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             layout.prop(self, "stringEnum", text = text)
         else:
             layout.prop(self, "value", text = text)
-        
+
     def getValue(self):
         return self.value
-        
+
     def setStoreableValue(self, data):
         self.value = data
+
     def getStoreableValue(self):
         return self.value
 

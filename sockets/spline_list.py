@@ -1,19 +1,25 @@
 import bpy
 from bpy.props import *
-from .. mn_execution import nodePropertyChanged
+from .. events import propertyChanged
 from .. base_types.socket import AnimationNodeSocket
 from .. data_structures.splines.from_blender import createSplinesFromBlenderObject
 
-class mn_SplineListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+class SplineListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "mn_SplineListSocket"
     bl_label = "Spline List Socket"
     dataType = "Spline List"
     allowedInputTypes = ["Spline List"]
     drawColor = (0.5, 0.28, 1.0, 1.0)
 
-    objectName = StringProperty(default = "", description = "Use the splines from this object", update = nodePropertyChanged)
+    objectName = StringProperty(default = "",
+        description = "Use the splines from this object",
+        update = propertyChanged)
+
+    useWorldSpace = BoolProperty(default = True,
+        description = "Convert points to world space",
+        update = propertyChanged)
+
     showName = BoolProperty(default = True)
-    useWorldSpace = BoolProperty(default = True, description = "Convert points to world space", update = nodePropertyChanged)
     showObjectInput = BoolProperty(default = True)
 
     def drawInput(self, layout, node, text):
@@ -23,12 +29,7 @@ class mn_SplineListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
         if self.showObjectInput:
             row.prop_search(self, "objectName",  bpy.context.scene, "objects", icon="NONE", text = "")
-            props = row.operator("mn.assign_active_object_to_socket", text = "", icon = "EYEDROPPER")
-            props.nodeTreeName = node.id_data.name
-            props.nodeName = node.name
-            props.isOutput = self.is_output
-            props.socketName = self.name
-            props.target = "objectName"
+            self.callFunctionFromUI(row, "assignActiveObject", icon = "EYEDROPPER")
             if self.objectName != "":
                 row.prop(self, "useWorldSpace", text = "", icon = "WORLD")
 
@@ -42,8 +43,14 @@ class mn_SplineListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def setStoreableValue(self, data):
         self.objectName, self.useWorldSpace = data
+
     def getStoreableValue(self):
         return (self.objectName, self.useWorldSpace)
 
     def getCopyValueFunctionString(self):
         return "return [element.copy() for element in value]"
+
+    def assignActiveObject(self):
+        object = bpy.context.active_object
+        if getattr(object, "type", "") == "CURVE":
+            self.objectName = object.name
