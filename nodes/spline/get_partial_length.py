@@ -1,14 +1,18 @@
 import bpy
 from ... base_types.node import AnimationNode
-from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from . spline_evaluation_base import SplineEvaluationBase
 
-class mn_GetSplineLength(bpy.types.Node, AnimationNode, SplineEvaluationBase):
+class GetSplineLength(bpy.types.Node, AnimationNode, SplineEvaluationBase):
     bl_idname = "mn_GetSplineLength"
     bl_label = "Get Spline Length"
 
-    def init(self, context):
-        forbidCompiling()
+    inputNames = { "Spline" : "spline",
+                   "Start" : "start",
+                   "End" : "end" }
+
+    outputNames = { "Length" : "length" }
+
+    def create(self):
         self.inputs.new("mn_SplineSocket", "Spline").showName = False
         socket = self.inputs.new("mn_FloatSocket", "Start")
         socket.setMinMax(0, 100000)
@@ -16,7 +20,6 @@ class mn_GetSplineLength(bpy.types.Node, AnimationNode, SplineEvaluationBase):
         socket.setMinMax(0, 100000)
         socket.value = 1.0
         self.outputs.new("mn_FloatSocket", "Length")
-        allowCompiling()
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "parameterType", text = "")
@@ -25,14 +28,6 @@ class mn_GetSplineLength(bpy.types.Node, AnimationNode, SplineEvaluationBase):
         col = layout.column()
         col.active = self.parameterType == "UNIFORM"
         col.prop(self, "resolution")
-
-    def getInputSocketNames(self):
-        return {"Spline" : "spline",
-                "Start" : "start",
-                "End" : "end"}
-
-    def getOutputSocketNames(self):
-        return {"Length" : "length"}
 
     def execute(self, spline, start, end):
         spline.update()
