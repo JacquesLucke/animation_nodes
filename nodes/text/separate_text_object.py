@@ -1,77 +1,79 @@
-import bpy, random
-from ... mn_utils import *
-from ... base_types.node import AnimationNode
-from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
+import bpy
+import random
+from bpy.props import *
 from mathutils import Vector, Matrix
+from ... mn_utils import getNode
+from ... base_types.node import AnimationNode
 from ... id_keys import setIDKeyData, createIDKey
 from ... nodes.mn_node_helper import getMainObjectContainer
 
 idPropertyName = "text separation node id"
 indexPropertyName = "text separation node index"
 
-class mn_SeparateTextObject(bpy.types.Node, AnimationNode):
+outputTypeItems = [
+    ("TEXT", "Text", ""),
+    ("CURVE", "Curve", ""),
+    ("MESH", "Mesh", "") ]
+
+class SeparateTextObject(bpy.types.Node, AnimationNode):
     bl_idname = "mn_SeparateTextObject"
     bl_label = "Separate Text Object"
-    
-    sourceObjectName = bpy.props.StringProperty(name = "Source Object")
-    currentID = bpy.props.IntProperty(default = 0);
-    objectCount = bpy.props.IntProperty(default = 0);
-    convertToMesh = bpy.props.BoolProperty(name = "Convert to Mesh", default = False)
-    parentLetters = bpy.props.BoolProperty(name = "Parent to Main Container", default = True)
-    materialName = bpy.props.StringProperty(name = "Material", default = "")
-    
-    def init(self, context):
-        forbidCompiling()
+
+    inputNames = {}
+    outputNames = { "Text Objects" : "textObjects" }
+
+    sourceObjectName = StringProperty(name = "Source Object")
+    currentID = IntProperty(default = 0);
+    objectCount = IntProperty(default = 0);
+    parentLetters = BoolProperty(name = "Parent to Main Container", default = True)
+    materialName = StringProperty(name = "Material", default = "")
+    outputType = EnumProperty(name = "Output Type", items = outputTypeItems)
+
+    def create(self):
         self.outputs.new("mn_ObjectListSocket", "Text Objects")
         self.width = 180
-        allowCompiling()
-        
-    def getInputSocketNames(self):
-        return {}
-    def getOutputSocketNames(self):
-        return {"Text Objects" : "textObjects"}
-        
+
     def draw_buttons(self, context, layout):
         row = layout.row(align = True)
         row.prop(self, "sourceObjectName", text = "Source")
         assign = row.operator("mn.assign_active_object_to_text_separation_node", icon = "EYEDROPPER", text = "")
         assign.nodeTreeName = self.id_data.name
         assign.nodeName = self.name
-        
+
         source = self.getSourceObject()
         if source is not None:
             row.prop(source, "hide", text = "")
-            
-        layout.prop(self, "convertToMesh")
+
         layout.prop_search(self, "materialName", bpy.data, "materials", text="Material", icon="MATERIAL_DATA")
-        
+        layout.prop(self, "outputType", expand = True)
+
         self.callFunctionFromUI(layout, "updateSeparation",
-            text = "Update", 
+            text = "Update",
             description = "Recreate the individual characters from the source object",
             icon = "FILE_REFRESH")
-        
+
     def draw_buttons_ext(self, context, layout):
         layout.prop(self, "parentLetters")
-        
+
     def execute(self):
         textObjects = [None] * self.objectCount
         for object in bpy.context.scene.objects:
             if self.isObjectPartOfThisNode(object):
                 textObjects[getattr(object, '["'+indexPropertyName+'"]', 0)] = object
         return textObjects
-        
+
     def updateSeparation(self):
         self.removeExistingObjects()
         self.createNewNodeID()
-        
+
         source = self.getSourceObject()
         if source is None: return
         if source.data is None: return
         source.hide = False
-        
+
         createIDKey("Initial Transforms", "Transforms")
         createIDKey("Initial Text", "String")
-        
+
         objects = splitTextObject(source)
         for i, object in enumerate(objects):
             object[idPropertyName] = self.currentID
@@ -79,20 +81,20 @@ class mn_SeparateTextObject(bpy.types.Node, AnimationNode):
             setIDKeyData(object, "Initial Transforms", "Transforms", (object.location, object.rotation_euler, object.scale))
             setIDKeyData(object, "Initial Text", "String", getattr(object.data, "body", ""))
         self.objectCount = len(objects)
-        
+
         onlySelectList(objects)
-        if self.convertToMesh:
-            convertSelectedObjectsToMeshes()
-        
+        if self.outputType in ("MESH", "CURVE"):
+            convertSelectedObjects(self.outputType)
+
         if self.parentLetters:
             parentObjectsToMainControler(objects)
-            
+
         material = bpy.data.materials.get(self.materialName)
         if material:
             setMaterialOnObjects(objects, material)
-        
+
         source.hide = True
-        
+
     def removeExistingObjects(self):
         objects = []
         for object in bpy.context.scene.objects:
@@ -100,27 +102,28 @@ class mn_SeparateTextObject(bpy.types.Node, AnimationNode):
                 objects.append(object)
         for object in objects:
             removeObject(object)
-        
+
     def createNewNodeID(self):
         self.currentID = round(random.random() * 100000)
-        
+
     def isObjectPartOfThisNode(self, object):
         return getattr(object, '["'+idPropertyName+'"]', -1) == self.currentID
+
     def getSourceObject(self):
         source = bpy.data.objects.get(self.sourceObjectName)
         if getattr(source, "type", "") == "FONT": return source
         return None
-        
-    def copy(self, node):
+
+    def duplicate(self, sourceNode):
         self.createNewNodeID()
-        
+
 def splitTextObject(source):
     text = cleanText(source.data.body)
-    
+
     splineCounter = 0
     sourceSplinePositions = getSplinePositions(source)
     objects = []
-    
+
     for i, character in enumerate(text):
         name = source.name + " part " + str(i).zfill(3)
         characterObject = newCharacterObject(name, source.data, character)
@@ -129,27 +132,27 @@ def splitTextObject(source):
         test = characterSplinePositions[0]
         setCharacterPosition(characterObject, source, sourceSplinePositions[splineCounter], characterSplinePositions[0])
         splineCounter += len(characterSplinePositions)
-        
+
         objects.append(characterObject)
-        
+
     return objects
-    
+
 def cleanText(text):
     for part in [" ", "\n", "\t", "\r"]:
         text = text.replace(part, "");
     return text
-        
+
 def newCharacterObject(name, sourceData, character):
     newTextData = sourceData.copy()
     newTextData.body = character
     characterObject = bpy.data.objects.new(name, newTextData)
     bpy.context.scene.objects.link(characterObject)
     return characterObject
-    
+
 def setCharacterPosition(characterObject, source, sourceSplinePosition, offsetPosition):
     characterOffset = sourceSplinePosition - offsetPosition
     characterObject.matrix_world = source.matrix_world * Matrix.Translation(characterOffset)
-        
+
 def getSplinePositions(textObject):
     onlySelect(textObject)
     curve = newCurveFromActiveObject()
@@ -170,23 +173,24 @@ def onlySelectList(objects):
         bpy.context.scene.objects.active = objects[0]
     for object in objects:
         object.select = True
-    
+
 def newCurveFromActiveObject():
     bpy.ops.object.convert(target = "CURVE", keep_original = True)
     return bpy.context.scene.objects.active
-    
+
 def removeCurve(curve):
     curveData = curve.data
     bpy.context.scene.objects.unlink(curve)
     bpy.data.objects.remove(curve)
     bpy.data.curves.remove(curveData)
-    
-def convertSelectedObjectsToMeshes():
+
+def convertSelectedObjects(type = "MESH"):
     bpy.context.area.type = "VIEW_3D"
-    bpy.ops.object.convert(target = "MESH")
+    bpy.ops.object.convert(target = type)
     bpy.context.area.type = "NODE_EDITOR"
-    
+
 def removeObject(object):
+    if object.mode != "OBJECT": bpy.ops.object.mode_set(mode = "OBJECT")
     bpy.context.scene.objects.unlink(object)
     objectType = object.type
     data = object.data
@@ -195,30 +199,30 @@ def removeObject(object):
         bpy.data.curves.remove(data)
     elif objectType == "MESH":
         bpy.data.meshes.remove(data)
-        
+
 def parentObjectsToMainControler(objects):
     mainControler = getMainObjectContainer()
     for object in objects:
         object.parent = mainControler
-        
+
 def setMaterialOnObjects(objects, material):
     for object in objects:
         object.active_material = material
-        
+
 
 class AssignActiveObjectToTextSeparationNode(bpy.types.Operator):
     bl_idname = "mn.assign_active_object_to_text_separation_node"
     bl_label = "Assign Active Object"
-    
-    nodeTreeName = bpy.props.StringProperty()
-    nodeName = bpy.props.StringProperty()
-    
+
+    nodeTreeName = StringProperty()
+    nodeName = StringProperty()
+
     @classmethod
     def poll(cls, context):
-        return getActive() is not None
-        
+        return context.active_object is not None
+
     def execute(self, context):
-        obj = getActive()
+        object = context.active_object
         node = getNode(self.nodeTreeName, self.nodeName)
-        node.sourceObjectName = obj.name
+        node.sourceObjectName = object.name
         return {'FINISHED'}
