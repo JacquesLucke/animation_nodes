@@ -1,28 +1,19 @@
 import bpy
-from bpy.props import *
 from ... base_types.node import AnimationNode
-from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
-from ... data_structures.splines.bezier_spline import BezierSpline
-from ... data_structures.splines.poly_spline import PolySpline
 
-
-class mn_SmoothBezierSpline(bpy.types.Node, AnimationNode):
+class SmoothBezierSpline(bpy.types.Node, AnimationNode):
     bl_idname = "mn_SmoothBezierSpline"
     bl_label = "Smooth Bezier Spline"
-    
-    def init(self, context):
-        forbidCompiling()
+
+    inputNames = { "Spline" : "spline",
+                   "Smoothness" : "smoothness" }
+
+    outputNames = { "Spline" : "spline" }
+
+    def create(self):
         self.inputs.new("mn_SplineSocket", "Spline").showObjectInput = False
         self.inputs.new("mn_FloatSocket", "Smoothness").value = 0.3333
         self.outputs.new("mn_SplineSocket", "Spline")
-        allowCompiling()
-        
-    def getInputSocketNames(self):
-        return {"Spline" : "spline",
-                "Smoothness" : "smoothness"}
-
-    def getOutputSocketNames(self):
-        return {"Spline" : "spline"}
 
     def execute(self, spline, smoothness):
         if spline.type == "BEZIER":
