@@ -1,14 +1,21 @@
 import bpy
 from ... base_types.node import AnimationNode
-from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
 
-class mn_ParticlesInfo(bpy.types.Node, AnimationNode):
+class ParticlesInfo(bpy.types.Node, AnimationNode):
     bl_idname = "mn_ParticlesInfo"
     bl_label = "Particles Info"
-    
-    def init(self, context):
-        forbidCompiling()
+
+    inputNames = { "Particles" : "particles" }
+
+    outputNames = { "Locations" : "locations",
+                    "Velocities" : "velocity",
+                    "Ages" : "ages",
+                    "Sizes" : "sizes",
+                    "Birth Times" : "birthTimes",
+                    "Die Times" : "dieTimes" }
+
+    def create(self):
         self.inputs.new("mn_ParticleListSocket", "Particles")
         self.outputs.new("mn_VectorListSocket", "Locations")
         self.outputs.new("mn_VectorListSocket", "Velocities").hide = True
@@ -16,27 +23,13 @@ class mn_ParticlesInfo(bpy.types.Node, AnimationNode):
         self.outputs.new("mn_FloatListSocket", "Sizes").hide = True
         self.outputs.new("mn_FloatListSocket", "Birth Times").hide = True
         self.outputs.new("mn_FloatListSocket", "Die Times").hide = True
-        allowCompiling()
-        
-    def getInputSocketNames(self):
-        return {"Particles" : "particles"}
-    def getOutputSocketNames(self):
-        return {"Locations" : "locations",
-                "Velocities" : "velocity",
-                "Ages" : "ages",
-                "Sizes" : "sizes",
-                "Birth Times" : "birthTimes",
-                "Die Times" : "dieTimes"}
-        
-    def useInLineExecution(self):
-        return True
-        
-    def getInLineExecutionString(self, outputUse):
+
+    def getExecutionCode(self, usedOutputs):
         codeLines = []
-        if outputUse["Locations"]: codeLines.append("$locations$ = [p.location for p in %particles%]")
-        if outputUse["Velocities"]: codeLines.append("$velocity$ = [p.velocity for p in %particles%]")
-        if outputUse["Ages"]: codeLines.append("$ages$ = [max(0, scene.frame_current - p.birth_time) for p in %particles%]")
-        if outputUse["Sizes"]: codeLines.append("$sizes$ = [p.size for p in %particles%]")
-        if outputUse["Birth Times"]: codeLines.append("$birthTimes$ = [p.birth_time for p in %particles%]")
-        if outputUse["Die Times"]: codeLines.append("$dieTimes$ = [p.die_time for p in %particles%]")
+        if usedOutputs["Locations"]: codeLines.append("$locations$ = [p.location for p in %particles%]")
+        if usedOutputs["Velocities"]: codeLines.append("$velocity$ = [p.velocity for p in %particles%]")
+        if usedOutputs["Ages"]: codeLines.append("$ages$ = [max(0, scene.frame_current - p.birth_time) for p in %particles%]")
+        if usedOutputs["Sizes"]: codeLines.append("$sizes$ = [p.size for p in %particles%]")
+        if usedOutputs["Birth Times"]: codeLines.append("$birthTimes$ = [p.birth_time for p in %particles%]")
+        if usedOutputs["Die Times"]: codeLines.append("$dieTimes$ = [p.die_time for p in %particles%]")
         return "\n".join(codeLines)
