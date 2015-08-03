@@ -1,7 +1,7 @@
 import bpy
 from mathutils import Vector
-from ... base_types.node import AnimationNode
 from ... events import propertyChanged
+from ... base_types.node import AnimationNode
 
 trackAxisItems = [(axis, axis, "") for axis in ("X", "Y", "Z", "-X", "-Y", "-Z")]
 upAxisItems = [(axis, axis, "") for axis in ("X", "Y", "Z")]
