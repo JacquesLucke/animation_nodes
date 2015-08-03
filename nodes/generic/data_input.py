@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... base_types.node import AnimationNode
-from ... sockets.info import getSocketDataTypeItems, getIdNameFromDataType
+from ... sockets.info import getSocketDataTypeItems, toIdName
 
 
 class DataInput(bpy.types.Node, AnimationNode):
@@ -39,7 +39,7 @@ class DataInput(bpy.types.Node, AnimationNode):
         self.inputs.clear()
         self.outputs.clear()
 
-        idName = getIdNameFromDataType(self.assignedType)
+        idName = toIdName(self.assignedType)
         socket = self.inputs.new(idName, "Input")
         self.setupSocket(socket)
         socket = self.outputs.new(idName, "Output")

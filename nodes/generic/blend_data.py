@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... base_types.node import AnimationNode
 from ... events import executionCodeChanged
-from ... sockets.info import getIdNameFromDataType
+from ... sockets.info import toIdName
 
 class BlendDataNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_BlendDataNode"
@@ -34,7 +34,7 @@ class BlendDataNode(bpy.types.Node, AnimationNode):
         self.inputs.clear()
         self.outputs.clear()
 
-        idName = getIdNameFromDataType(self.dataType)
+        idName = toIdName(self.dataType)
         self.inputs.new("mn_FloatSocket", "Factor").setMinMax(0.0, 1.0)
         self.inputs.new("mn_InterpolationSocket", "Interpolation").showName = False
         self.inputs.new(idName, "A")

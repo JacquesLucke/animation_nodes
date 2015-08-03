@@ -1,7 +1,7 @@
 import bpy
 from ... base_types.node import AnimationNode
 from ... utils.mn_node_utils import NodeTreeInfo
-from ... sockets.info import getListBaseSocketIdName, getListSocketIdName
+from ... sockets.info import toBaseIdName, toListIdName
 
 class AppendListNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_AppendListNode"
@@ -31,7 +31,7 @@ class AppendListNode(bpy.types.Node, AnimationNode):
             nodeTree.links.new(self.inputs.get("List"), listInput)
 
         if listInput is None and elementInput is not None and len(listOutputs) == 0:
-            self.generateSockets(getListSocketIdName(elementInput.bl_idname))
+            self.generateSockets(toListIdName(elementInput.bl_idname))
             nodeTree.links.new(self.inputs.get("Element"), elementInput)
 
         if listInput is None and elementInput is None and len(listOutputs) == 1:
@@ -40,7 +40,7 @@ class AppendListNode(bpy.types.Node, AnimationNode):
 
     def generateSockets(self, listIdName = "mn_ObjectListSocket"):
         if listIdName is None: return
-        baseIdName = getListBaseSocketIdName(listIdName)
+        baseIdName = toBaseIdName(listIdName)
         if baseIdName is None: return
         if listIdName == getattr(self.inputs.get("List"), "bl_idname", None): return
 

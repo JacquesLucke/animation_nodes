@@ -41,7 +41,7 @@ class ConvertNode(bpy.types.Node, AnimationNode):
     def buildOutputSocket(self):
         connections = getConnectionDictionaries(self)
         self.outputs.clear()
-        self.outputs.new(getIdNameFromDataType(self.convertType), "New")
+        self.outputs.new(toIdName(self.convertType), "New")
         tryToSetConnectionDictionaries(self, connections)
 
     def getInputSocketNames(self):

@@ -4,7 +4,7 @@ from ... mn_utils import getNode
 from ... base_types.node import AnimationNode
 from ... utils.mn_node_utils import NodeTreeInfo
 from ... utils.mn_name_utils import getPossibleSocketName, toInterfaceName
-from ... sockets.info import getSocketDataTypeItems, getIdNameFromDataType
+from ... sockets.info import getSocketDataTypeItems, toIdName
 
 emptySocketName = "New Socket"
 
@@ -170,14 +170,14 @@ class ScriptNode(bpy.types.Node, AnimationNode):
                     continue
                 match = re.search("\s*(\w+)\s*-\s*(.+)", line)
                 if match:
-                    self.appendSocket(self.inputs, getIdNameFromDataType(match.group(2).strip()), match.group(1))
+                    self.appendSocket(self.inputs, toIdName(match.group(2).strip()), match.group(1))
             elif state == "outputs":
                 if re.match("[Ss]cript:", line):
                     state = "script"
                     continue
                 match = re.search("\s*(\w+)\s*-\s*(.+)", line)
                 if match:
-                    self.appendSocket(self.outputs, getIdNameFromDataType(match.group(2).strip()), match.group(1))
+                    self.appendSocket(self.outputs, toIdName(match.group(2).strip()), match.group(1))
             elif state == "script":
                 scriptLines.append(line)
 
@@ -241,7 +241,7 @@ class AppendSocket(bpy.types.Operator):
 
     def execute(self, context):
         node = getNode(self.nodeTreeName, self.nodeName)
-        type = getIdNameFromDataType(node.selectedSocketType)
+        type = toIdName(node.selectedSocketType)
         if self.makeOutputSocket:
             node.appendSocket(node.outputs, type, getPossibleSocketName(node, "socket"))
         else:

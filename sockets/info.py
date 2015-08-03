@@ -15,14 +15,80 @@ listChains = [
     ["mn_SplineSocket", "mn_SplineListSocket"],
     ["mn_MatrixSocket", "mn_MatrixListSocket"] ]
 
-def getListBaseSocketIdName(idName):
+
+# Check if list or base socket exists
+def isList(input):
+    if not isIdName(input): input = toIdName(input)
+    return baseIdNameToListIdName(input) is not None
+
+def isBase(input):
+    if not isIdName(input): input = toIdName(input)
+    return listIdNameToBaseIdName(input) is not None
+
+
+# to Base
+def toBaseIdName(input):
+    if isIdName(input): return listIdNameToBaseIdName(input)
+    else: return listDataTypeToBaseIdName(input)
+
+def toBaseDataType(input):
+    if isIdName(input): return listIdNameToBaseDataType(input)
+    else: return listDataTypeToBaseDataType(input)
+
+# to List
+def toListIdName(input):
+    if isIdName(input): return baseIdNameToListIdName(input)
+    else: return baseDataTypeToListIdName(input)
+
+def toListDataType(input):
+    if isIdName(input): return baseIdNameToListDataType(input)
+    else: return baseDataTypeToListDataType(input)
+
+
+# Base Data Type <-> List Data Type
+def listDataTypeToBaseDataType(dataType):
+    listIdName = toIdName(dataType)
+    baseIdName = listIdNameToBaseIdName(listIdName)
+    baseDataType = toDataType(baseIdName)
+    return baseDataType
+
+def baseDataTypeToListDataType(dataType):
+    baseIdName = toIdName(dataType)
+    listIdName = baseIdNameToListIdName(baseIdName)
+    listDataType = toDataType(listIdName)
+    return listDataType
+
+# Base Id Name <-> List Data Type
+def listDataTypeToBaseIdName(dataType):
+    listIdName = toIdName(dataType)
+    baseIdName = listIdNameToBaseIdName(listIdName)
+    return baseIdName
+
+def baseIdNameToListDataType(idName):
+    listIdName = baseDataTypeToListIdName(idName)
+    listDataType = toDataType(listIdName)
+    return listDataType
+
+# Base Data Type <-> List Id Name
+def listIdNameToBaseDataType(idName):
+    baseIdName = listIdNameToBaseIdName(idName)
+    baseDataType = toDataType(baseIdName)
+    return baseDataType
+
+def baseDataTypeToListIdName(dataType):
+    baseIdName = toIdName(dataType)
+    listIdName = baseIdNameToListIdName(baseIdName)
+    return listIdName
+
+# Base Id Name <-> List Id Name
+def listIdNameToBaseIdName(idName):
     for listChain in listChains:
         if idName in listChain:
             index = listChain.index(idName)
             if index == 0: return None
             else: return listChain[index - 1]
 
-def getListSocketIdName(idName):
+def baseIdNameToListIdName(idName):
     for listChain in listChains:
         if idName in listChain:
             index = listChain.index(idName)
@@ -30,20 +96,22 @@ def getListSocketIdName(idName):
             return listChain[index + 1]
     return None
 
-def isListSocketIdName(socketType):
-    return not getListBaseSocketIdName(socketType) == None
-
-def hasListSocket(socketType):
-    return not getListSocketIdName(socketType) == None
-
-def getIdNameFromDataType(dataType):
+# Data Type <-> Id Name
+def toIdName(input):
+    if isIdName(input): return input
     for subClass in getSocketClasses():
-        if getattr(subClass, "dataType") == dataType: return subClass.bl_idname
+        if getattr(subClass, "dataType") == input: return subClass.bl_idname
     return None
 
-def getDataTypeFromIdName(idName):
-    cls = getattr(bpy.types, idName)
+def toDataType(input):
+    if not isIdName(input): return input
+    cls = getattr(bpy.types, input)
     return cls.dataType
+
+def isIdName(name):
+    return name.startswith("mn_")
+
+
 
 def getSocketClassFromIdName(idName):
     for cls in getSocketClasses():

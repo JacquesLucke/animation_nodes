@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... base_types.node import AnimationNode
-from ... sockets.info import getIdNameFromDataType
+from ... sockets.info import toIdName
 
 possibleProperties = {
     "bevel_depth" : ("Bevel Depth", "Float", 0),
@@ -86,7 +86,7 @@ class CurveProperties(bpy.types.Node, AnimationNode):
 
     def newSocket(self, path):
         name, dataType, default = possibleProperties[path]
-        socket = self.inputs.new(getIdNameFromDataType(dataType), path)
+        socket = self.inputs.new(toIdName(dataType), path)
         socket.setStoreableValue(default)
         socket.customName = name
         socket.nameSettings.display = True

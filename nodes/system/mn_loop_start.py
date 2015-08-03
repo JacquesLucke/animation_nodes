@@ -82,7 +82,7 @@ class mn_LoopStartNode(bpy.types.Node, AnimationNode):
         targetSocket = self.getValidTargetSocket(socket)
         if targetSocket is not None:
             socketType = self.getTargetSocketType(targetSocket)
-            if hasListSocket(socketType):
+            if isBase(socketType):
                 newSocket = self.newOutputSocket(socketType, namePrefix = targetSocket.name)
                 newSocket.loopAsList = True
                 self.id_data.links.new(targetSocket, newSocket)
@@ -217,7 +217,7 @@ class AppendSocket(bpy.types.Operator):
 
     def execute(self, context):
         node = getNode(self.nodeTreeName, self.nodeName)
-        type = getIdNameFromDataType(node.selectedSocketType)
+        type = toIdName(node.selectedSocketType)
         newSocket = node.newOutputSocket(type, "socket")
         if self.isListSocket:
             newSocket.loopAsList = True

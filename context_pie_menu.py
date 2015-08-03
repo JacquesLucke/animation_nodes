@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from . mn_utils import getNode
-from . sockets.info import getDataTypeFromIdName
+from . sockets.info import toDataType
 
 '''
                 ###############
@@ -173,7 +173,7 @@ class InsertDataInputNode(bpy.types.Operator):
         data = targetSocket.getStoreableValue()
 
         node = insertNode("mn_DataInput")
-        node.assignSocketType(getDataTypeFromIdName(targetSocket.bl_idname))
+        node.assignSocketType(toDataType(targetSocket.bl_idname))
         node.inputs[0].setStoreableValue(data)
 
         nodeTree.links.new(targetSocket, node.outputs[0])
