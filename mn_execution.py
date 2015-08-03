@@ -5,7 +5,7 @@ from . mn_utils import *
 from . cache import clearExecutionCache
 from . utils.nodes import *
 from . utils.selection import updateSelectionSorting
-from . mn_execution_unit_generator import getExecutionUnits
+from . execution_unit_generator import getExecutionUnits
 
 executionUnits = []
 isExecuting = False
