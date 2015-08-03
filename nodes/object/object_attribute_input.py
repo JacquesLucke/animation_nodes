@@ -12,7 +12,7 @@ class ObjectAttributeInputNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.inputs.new("mn_ObjectSocket", "Object").showName = False
-        self.inputs.new("mn_StringSocket", "Path").value = ""
+        self.inputs.new("mn_StringSocket", "Path")
         self.outputs.new("mn_GenericSocket", "Value")
 
     def execute(self, object, path):
