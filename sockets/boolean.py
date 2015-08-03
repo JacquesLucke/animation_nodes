@@ -1,4 +1,5 @@
 import bpy
+from bpy.props import *
 from .. events import propertyChanged
 from .. base_types.socket import AnimationNodeSocket
 
@@ -9,7 +10,7 @@ class BooleanSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Boolean"]
     drawColor = (0.7, 0.7, 0.4, 1)
 
-    value = bpy.props.BoolProperty(default = True, update = propertyChanged)
+    value = BoolProperty(default = True, update = propertyChanged)
 
     def drawInput(self, layout, node, text):
         layout.prop(self, "value", text = text)

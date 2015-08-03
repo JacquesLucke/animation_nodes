@@ -1,4 +1,5 @@
 import bpy
+from bpy.props import *
 from .. base_types.socket import AnimationNodeSocket
 
 class EmptySocket(bpy.types.NodeSocket, AnimationNodeSocket):
@@ -8,7 +9,7 @@ class EmptySocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["all"]
     drawColor = (0.0, 0.0, 0.0, 0.0)
 
-    passiveSocketType = bpy.props.StringProperty(default = "")
+    passiveSocketType = StringProperty(default = "")
 
     def drawInput(self, layout, node, text):
         layout.label(text)
