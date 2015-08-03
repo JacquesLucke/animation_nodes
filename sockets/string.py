@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import *
-from .. mn_execution import nodePropertyChanged
+from .. events import propertyChanged
 from .. base_types.socket import AnimationNodeSocket
 
 class EnumItem(bpy.types.PropertyGroup):
@@ -27,14 +27,14 @@ class StringSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         if self.useEnum:
             self.value = self.stringEnum
 
-    value = StringProperty(default = "", update = nodePropertyChanged)
+    value = StringProperty(default = "", update = propertyChanged)
     showName = BoolProperty(default = True)
 
     stringEnum = EnumProperty(name = "Possible Items",
         items = getEnumItems, update = enumChanged)
     useEnum = BoolProperty(default = False)
     enumItems = CollectionProperty(type = EnumItem)
-    
+
     def drawInput(self, layout, node, text):
         if not self.showName: text = ""
         if self.useEnum:
