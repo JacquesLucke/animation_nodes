@@ -1,6 +1,8 @@
 import bpy
 import random
+from bpy.props import *
 from mathutils import Vector
+from ... events import propertyChanged
 from ... mn_cache import getUniformRandom
 from ... base_types.node import AnimationNode
 
@@ -14,7 +16,7 @@ class RandomVectorNode(bpy.types.Node, AnimationNode):
 
     outputNames = { "Vector" : "randomVector" }
 
-    additionalSeed = bpy.props.IntProperty(update = nodePropertyChanged)
+    additionalSeed = IntProperty(update = propertyChanged)
 
     def create(self):
         self.inputs.new("mn_IntegerSocket", "Seed")
