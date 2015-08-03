@@ -1,30 +1,6 @@
 import bpy
 from . mn_execution import getCodeStrings, resetCompileBlocker, updateAnimationTrees, generateExecutionUnits
 from . mn_utils import *
-from . manage_broken_files import getBrokenNodes, findAndUpdateBrokenNodes, containsBrokenNodes
-
-class BrokenNodesPanel(bpy.types.Panel):
-    bl_idname = "mn.broken_nodes_panel"
-    bl_label = "Broken Nodes"
-    bl_space_type = "NODE_EDITOR"
-    bl_region_type = "TOOLS"
-    bl_category = "Settings"
-
-    @classmethod
-    def poll(self, context):
-        return containsBrokenNodes() and context.space_data.tree_type == "mn_AnimationNodeTree"
-
-    def draw(self, context):
-        layout = self.layout
-
-        col = layout.column()
-        for nodeTreeName, nodeName in getBrokenNodes():
-            props = col.operator("mn.select_and_view_node", icon = "ERROR", text = "'{}' in '{}'".format(nodeName, nodeTreeName))
-            props.nodeTreeName = nodeTreeName
-            props.nodeName = nodeName
-
-        layout.operator("mn.find_broken_nodes", text = "Find Missing Nodes", icon = "ZOOM_SELECTED")
-
 
 
 class AnimationNodesPerformance(bpy.types.Panel):

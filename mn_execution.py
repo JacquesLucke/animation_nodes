@@ -6,7 +6,6 @@ from . cache import clearExecutionCache
 from . utils.mn_node_utils import *
 from . utils.selection import updateSelectionSorting
 from . mn_execution_unit_generator import getExecutionUnits
-from . manage_broken_files import containsBrokenNodes
 
 executionUnits = []
 isExecuting = False
@@ -69,10 +68,6 @@ def resetCompileBlocker():
 
 def generateExecutionUnits():
     global executionUnits
-
-    if containsBrokenNodes():
-        executionUnits = []
-        return
 
     start = time.clock()
     executionUnits = getExecutionUnits()

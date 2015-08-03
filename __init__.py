@@ -103,9 +103,8 @@ def unregister_keymaps():
         wm.keyconfigs.addon.keymaps.remove(km)
     addon_keymaps.clear()
 
-from . insert_nodes_menu import registerMenu, unregisterMenu
-from . import manage_broken_files as manage_broken_files
 from . import mn_execution as execution
+from . insert_nodes_menu import registerMenu, unregisterMenu
 from . base_types import node as node_base
 from . base_types import socket as socket_base
 from . base_types import node_function_call
@@ -114,7 +113,6 @@ from . nodes.sound import sequencer_sound_input as sequencer_sound
 
 def register():
     bpy.utils.register_module(__name__)
-    manage_broken_files.register_handlers()
     execution.register_handlers()
     node_base.register_handlers()
     socket_base.register()
@@ -130,7 +128,6 @@ def register():
 def unregister():
     unregister_keymaps()
     bpy.utils.unregister_module(__name__)
-    manage_broken_files.unregister_handlers()
     execution.unregister_handlers()
     node_base.unregister_handlers()
     socket_base.unregister()
