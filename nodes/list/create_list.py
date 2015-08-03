@@ -36,6 +36,7 @@ class CreateList(bpy.types.Node, AnimationNode):
     hideInputs = BoolProperty(name = "Hide Inputs", default = False, update = settingChanged)
 
     def create(self):
+        self.selectedType = "Float"
         self.assignedType = "Float"
 
     def draw_buttons(self, context, layout):
