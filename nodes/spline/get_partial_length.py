@@ -1,9 +1,9 @@
 import bpy
 from ... base_types.node import AnimationNode
 from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
-from . spline_parameter_evaluate_node_base import SplineParameterEvaluateNodeBase
+from . spline_evaluation_base import SplineEvaluationBase
 
-class mn_GetSplineLength(bpy.types.Node, AnimationNode, SplineParameterEvaluateNodeBase):
+class mn_GetSplineLength(bpy.types.Node, AnimationNode, SplineEvaluationBase):
     bl_idname = "mn_GetSplineLength"
     bl_label = "Get Spline Length"
 
