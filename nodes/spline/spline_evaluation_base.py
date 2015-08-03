@@ -1,5 +1,4 @@
 from bpy.props import *
-from ... mn_execution import nodePropertyChanged
 from ... events import propertyChanged
 
 parameterTypeItems = [
@@ -16,7 +15,7 @@ class SplineEvaluationBase:
 
     resolution = IntProperty(
         name = "Resolution",
-        min = 2, 
+        min = 2,
         default = 100,
         update = propertyChanged,
         description = "Increase to have a more accurate evaluation if the type is set to Length")

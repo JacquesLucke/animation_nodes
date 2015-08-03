@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import *
-from .. mn_execution import nodePropertyChanged
+from .. events import propertyChanged
 from .. base_types.socket import AnimationNodeSocket
 
 def getValue(self):
@@ -17,7 +17,7 @@ class FloatSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     value = FloatProperty(default = 0.0,
         set = setValue, get = getValue,
-        update = nodePropertyChanged)
+        update = propertyChanged)
 
     showName = bpy.props.BoolProperty(default = True)
 
@@ -33,7 +33,7 @@ class FloatSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def setStoreableValue(self, data):
         self.value = data
-        
+
     def getStoreableValue(self):
         return self.value
 

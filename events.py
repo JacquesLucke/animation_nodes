@@ -1,4 +1,4 @@
-from . mn_execution import nodePropertyChanged, nodeTreeChanged
+from . old_execution import nodePropertyChanged, nodeTreeChanged
 
 def propertyChanged(self = None, context = None):
     nodePropertyChanged()

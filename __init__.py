@@ -45,7 +45,7 @@ modules = developer_utils.setup_addon_modules(__path__, __name__, "bpy" in local
 
 import bpy
 from bpy.props import *
-from . mn_execution import nodeTreeChanged
+from . old_execution import nodeTreeChanged
 from . id_keys import idTypeItems
 
 class GlobalUpdateSettings(bpy.types.PropertyGroup):
@@ -103,7 +103,7 @@ def unregister_keymaps():
         wm.keyconfigs.addon.keymaps.remove(km)
     addon_keymaps.clear()
 
-from . import mn_execution as execution
+from . import old_execution as execution
 from . insert_nodes_menu import registerMenu, unregisterMenu
 from . base_types import node as node_base
 from . base_types import socket as socket_base

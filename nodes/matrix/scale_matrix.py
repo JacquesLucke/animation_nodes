@@ -1,8 +1,5 @@
 import bpy
-from mathutils import *
 from ... base_types.node import AnimationNode
-from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
-
 
 class ScaleMatrix(bpy.types.Node, AnimationNode):
     bl_idname = "mn_ScaleMatrix"
