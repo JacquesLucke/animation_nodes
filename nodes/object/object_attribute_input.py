@@ -1,29 +1,25 @@
 import bpy
 from ... base_types.node import AnimationNode
-from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
-class mn_ObjectAttributeInputNode(bpy.types.Node, AnimationNode):
+class ObjectAttributeInputNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_ObjectAttributeInputNode"
     bl_label = "Object Attribute Input"
-    
-    def init(self, context):
-        forbidCompiling()
+
+    inputNames = { "Object" : "object",
+                   "Path" : "path"}
+
+    outputNames = { "Value" : "value" }
+
+    def create(self):
         self.inputs.new("mn_ObjectSocket", "Object").showName = False
-        self.inputs.new("mn_StringSocket", "Attribute").value = ""
+        self.inputs.new("mn_StringSocket", "Path").value = ""
         self.outputs.new("mn_GenericSocket", "Value")
-        allowCompiling()
-        
-    def getInputSocketNames(self):
-        return {"Object" : "object",
-                "Attribute" : "attribute"}
-    def getOutputSocketNames(self):
-        return {"Value" : "value"}
-        
-    def execute(self, object, attribute):
+
+    def execute(self, object, path):
         try:
-            if attribute.startswith("["):
-                return eval("object" + attribute)
+            if path.startswith("["):
+                return eval("object" + path)
             else:
-                return eval("object." + attribute)
+                return eval("object." + path)
         except:
             return None
