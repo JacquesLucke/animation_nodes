@@ -6,7 +6,6 @@ class TextBlockReader(bpy.types.Node, AnimationNode):
     bl_label = "Text Block Reader"
 
     inputNames = { "Text Block" : "textBlock" }
-
     outputNames = { "Text" : "text" }
 
     def create(self):
