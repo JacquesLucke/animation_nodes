@@ -20,6 +20,12 @@ class CreateList(bpy.types.Node, AnimationNode):
     bl_idname = "mn_CreateList"
     bl_label = "Create List"
 
+    @property
+    def inputNames(self):
+        return { socket.identifier : "element_" + str(i) for i, socket in enumerate(self.inputs) }
+
+    outputNames = { "List" : "list" }
+
     def settingChanged(self, context):
         for socket in self.inputs:
             socket.moveable = self.manageSockets
@@ -61,11 +67,8 @@ class CreateList(bpy.types.Node, AnimationNode):
 
         self.drawTypeSpecificButtonsExt(layout)
 
-    def execute(self, inputs):
-        elements = []
-        for socket in self.inputs:
-            elements.append(inputs[socket.identifier])
-        return {"List" : elements}
+    def getExecutionCode(self):
+        return "$list$ = [" + ", ".join(["%element_{}%".format(i) for i in range(len(self.inputs))]) + "]"
 
     def assignSelectedListType(self):
         self.assignedType = self.selectedType
