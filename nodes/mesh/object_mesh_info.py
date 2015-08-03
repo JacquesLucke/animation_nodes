@@ -1,7 +1,7 @@
 import bpy, time
 from ... base_types.node import AnimationNode
 from ... data_structures.mesh import MeshData, Vertex, Polygon
-from ... mn_cache import getLongTimeCache, setLongTimeCache, cacheFunctionResult
+from ... cache import getLongTimeCache, setLongTimeCache, cacheFunctionResult
 from ... events import propertyChanged
 
 cacheIdentifier = "Object Mesh Data"

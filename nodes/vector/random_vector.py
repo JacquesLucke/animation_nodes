@@ -3,7 +3,7 @@ import random
 from bpy.props import *
 from mathutils import Vector
 from ... events import propertyChanged
-from ... mn_cache import getUniformRandom
+from ... cache import getUniformRandom
 from ... base_types.node import AnimationNode
 
 class RandomVectorNode(bpy.types.Node, AnimationNode):

@@ -2,7 +2,7 @@ import bpy, time, traceback, sys
 from bpy.app.handlers import persistent
 from bpy.props import *
 from . mn_utils import *
-from . mn_cache import clearExecutionCache
+from . cache import clearExecutionCache
 from . utils.mn_node_utils import *
 from . utils.selection import updateSelectionSorting
 from . mn_execution_unit_generator import getExecutionUnits

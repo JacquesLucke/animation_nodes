@@ -1,6 +1,6 @@
 import bpy
 from ... events import propertyChanged
-from ... mn_cache import getUniformRandom
+from ... cache import getUniformRandom
 from ... base_types.node import AnimationNode
 
 class RandomNumberNode(bpy.types.Node, AnimationNode):
