@@ -1,7 +1,7 @@
 import bpy
 from .. base_types.socket import AnimationNodeSocket
 
-class mn_MatrixListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+class MatrixListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "mn_MatrixListSocket"
     bl_label = "Matrix List Socket"
     dataType = "Matrix List"
@@ -16,6 +16,7 @@ class mn_MatrixListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def setStoreableValue(self, data):
         pass
+        
     def getStoreableValue(self):
         return []
 
