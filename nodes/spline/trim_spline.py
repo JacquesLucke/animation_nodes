@@ -1,35 +1,30 @@
 import bpy
 from ... base_types.node import AnimationNode
-from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 from . spline_evaluation_base import SplineEvaluationBase
 
-class mn_TrimSpline(bpy.types.Node, AnimationNode, SplineEvaluationBase):
+class TrimSpline(bpy.types.Node, AnimationNode, SplineEvaluationBase):
     bl_idname = "mn_TrimSpline"
     bl_label = "Trim Spline"
-    
-    def init(self, context):
-        forbidCompiling()
+
+    inputNames = { "Spline" : "spline",
+                   "Start" : "start",
+                   "End" : "end" }
+
+    outputNames = { "Spline" : "spline" }
+
+    def create(self):
         self.inputs.new("mn_SplineSocket", "Spline").showName = False
         self.inputs.new("mn_FloatSocket", "Start").value = 0.0
         self.inputs.new("mn_FloatSocket", "End").value = 1.0
         self.outputs.new("mn_SplineSocket", "Spline")
-        allowCompiling()
         
     def draw_buttons(self, context, layout):
         layout.prop(self, "parameterType", text = "")
-        
+
     def draw_buttons_ext(self, context, layout):
         col = layout.column()
         col.active = self.parameterType == "UNIFORM"
         col.prop(self, "resolution")
-        
-    def getInputSocketNames(self):
-        return {"Spline" : "spline",
-                "Start" : "start",
-                "End" : "end"}
-
-    def getOutputSocketNames(self):
-        return {"Spline" : "spline"}
 
     def execute(self, spline, start, end):
         spline.update()
