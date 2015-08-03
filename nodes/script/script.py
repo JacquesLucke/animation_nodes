@@ -22,7 +22,7 @@ class ScriptNode(bpy.types.Node, AnimationNode):
             if socket.name == emptySocketName:
                 socket.hide = hide
             else:
-                socket.editableCustomName = not hide
+                socket.nameSettings.editable = not hide
                 socket.removeable = not hide
                 self.customSocketNameChanged(socket)
 
@@ -109,10 +109,10 @@ class ScriptNode(bpy.types.Node, AnimationNode):
         return socket
 
     def setupNewSocket(self, socket, name):
-        socket.editableCustomName = True
+        socket.nameSettings.editable = True
         socket.customName = name
-        socket.customNameIsVariable = True
-        socket.callNodeWhenCustomNameChanged = True
+        socket.nameSettings.variable = True
+        socket.nameSettings.callAfterChange = True
         socket.removeable = True
 
     def getSocketFromOtherNode(self, link):

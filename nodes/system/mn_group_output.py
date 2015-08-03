@@ -10,15 +10,15 @@ newOutputSocketName = "New Output"
 class mn_GroupOutput(bpy.types.Node, AnimationNode):
     bl_idname = "mn_GroupOutput"
     bl_label = "Group Output"
-    
+
     def init(self, context):
         forbidCompiling()
         self.inputs.new("mn_EmptySocket", newOutputSocketName)
         allowCompiling()
-        
+
     def execute(self, input):
         return input
-        
+
     def update(self):
         forbidCompiling()
         socket = self.inputs.get(newOutputSocketName)
@@ -33,7 +33,7 @@ class mn_GroupOutput(bpy.types.Node, AnimationNode):
         else:
             removeLinksFromSocket(socket)
         allowCompiling()
-    
+
     def getValidFromSocketAndRemoveLink(self, socket):
         if socket is None:
             return None
@@ -47,32 +47,33 @@ class mn_GroupOutput(bpy.types.Node, AnimationNode):
         if fromSocket.bl_idname == "mn_EmptySocket":
             return None
         return fromSocket
-        
+
     def newInputSocket(self, idName, namePrefix):
         socket = self.inputs.new(idName, getNotUsedSocketName(self, prefix = "socket"))
         socket.customName = getNotUsedCustomSocketName(self, prefix = namePrefix)
-        socket.editableCustomName = True
-        socket.callNodeWhenCustomNameChanged = True
+        socket.nameSettings.editable = True
+        socket.nameSettings.callAfterChange = True
+        socket.nameSettings.unique = True
         socket.removeable = True
         socket.callNodeToRemove = True
         return socket
-        
+
     def removeSocket(self, socket):
         self.inputs.remove(socket)
         self.updateCallerNodes()
-        
+
     def free(self):
         self.updateCallerNodes(outputRemoved = True)
-        
+
     def customSocketNameChanged(self, socket):
         self.updateCallerNodes()
-        
+
     def updateCallerNodes(self, outputRemoved = False):
         network = NodeNetwork.fromNode(self)
         inputNode = network.getGroupInputNode()
         if inputNode is not None:
             inputNode.updateCallerNodes(outputRemoved = outputRemoved)
-        
+
     def getSockets(self):
         sockets = []
         for socket in self.inputs:

@@ -89,7 +89,7 @@ class CurveProperties(bpy.types.Node, AnimationNode):
         socket = self.inputs.new(getIdNameFromDataType(dataType), path)
         socket.setStoreableValue(default)
         socket.customName = name
-        socket.displayCustomName = True
+        socket.nameSettings.display = True
         self.settingChanged()
 
         # extra case to create an enum property

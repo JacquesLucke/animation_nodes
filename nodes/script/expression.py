@@ -27,9 +27,9 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         socket = self.inputs.new("mn_GenericSocket", "x")
-        socket.editableCustomName = True
+        socket.nameSettings.editable = True
         socket.customName = "x"
-        socket.customNameIsVariable = True
+        socket.nameSettings.variable = True
         socket.removeable = True
         self.inputs.new("mn_EmptySocket", "...").passiveSocketType = "mn_GenericSocket"
         self.outputs.new("mn_GenericSocket", "Result")
@@ -48,8 +48,8 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
                 fromSocket = link.from_socket
                 self.inputs.remove(socket)
                 newSocket = self.inputs.new("mn_GenericSocket", self.getNotUsedSocketName())
-                newSocket.editableCustomName = True
-                newSocket.customNameIsVariable = True
+                newSocket.nameSettings.editable = True
+                newSocket.nameSettings.variable = True
                 newSocket.removeable = True
                 newSocket.customName = self.getNextCustomName()
                 self.inputs.new("mn_EmptySocket", "...").passiveSocketType = "mn_GenericSocket"

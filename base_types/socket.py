@@ -5,13 +5,33 @@ from .. mn_utils import getRandomString, isSocketLinked
 from . socket_function_call import getSocketFunctionCallOperatorName
 from .. utils.mn_name_utils import toVariableName
 
+class mn_CustomNameProperties(bpy.types.PropertyGroup):
+    unique = BoolProperty(default = False)
+    display = BoolProperty(default = False)
+    editable = BoolProperty(default = False)
+    variable = BoolProperty(default = False)
+    callAfterChange = BoolProperty(default = False)
 
 class AnimationNodeSocket:
+
+    def customNameChanged(self, context):
+        updateCustomName(self)
+
+    customName = StringProperty(default = "custom name", update = customNameChanged)
+    nameSettings = PointerProperty(type = mn_CustomNameProperties)
+
+    removeable = BoolProperty(default = False)
+    callNodeToRemove = BoolProperty(default = False)
+    moveable = BoolProperty(default = False)
+    moveGroup = IntProperty(default = 0)
+
+    loopAsList = BoolProperty(default = False)
+
     def draw(self, context, layout, node, text):
         displayText = self.getDisplayedName()
 
         row = layout.row(align = True)
-        if self.editableCustomName:
+        if self.nameSettings.editable:
             row.prop(self, "customName", text = "")
         else:
             if not self.is_output and not isSocketLinked(self):
@@ -30,7 +50,7 @@ class AnimationNodeSocket:
             self.callFunctionFromUI(row, "removeSocket", icon = "X")
 
     def getDisplayedName(self):
-        if self.displayCustomName or self.editableCustomName: return self.customName
+        if self.nameSettings.display or self.nameSettings.editable: return self.customName
         return self.name
 
     def draw_color(self, context, node):
@@ -81,21 +101,7 @@ class AnimationNodeSocket:
         return self.node.outputs if self.is_output else self.node.inputs
 
 
-    def customNameChanged(self, context):
-        updateCustomName(self)
 
-    editableCustomName = BoolProperty(default = False)
-    customName = StringProperty(default = "custom name", update = customNameChanged)
-    displayCustomName = BoolProperty(default = False)
-    uniqueCustomName = BoolProperty(default = True)
-    customNameIsVariable = BoolProperty(default = False)
-    customNameIsUpdating = BoolProperty(default = False)
-    removeable = BoolProperty(default = False)
-    callNodeToRemove = BoolProperty(default = False)
-    callNodeWhenCustomNameChanged = BoolProperty(default = False)
-    loopAsList = BoolProperty(default = False)
-    moveable = BoolProperty(default = False)
-    moveGroup = IntProperty(default = 0)
 
 isUpdating = False
 def updateCustomName(socket):
@@ -107,13 +113,13 @@ def updateCustomName(socket):
         isUpdating = False
 
 def correctCustomName(socket):
-    if socket.customNameIsVariable:
+    if socket.nameSettings.variable:
         socket.customName = toVariableName(socket.customName)
-    if socket.uniqueCustomName:
+    if socket.nameSettings.unique:
         customName = socket.customName
         socket.customName = "temporary name to avoid some errors"
         socket.customName = getNotUsedCustomName(socket.node, prefix = customName)
-    if socket.callNodeWhenCustomNameChanged:
+    if socket.nameSettings.callAfterChange:
         socket.node.customSocketNameChanged(socket)
 
 def getNotUsedCustomName(node, prefix):

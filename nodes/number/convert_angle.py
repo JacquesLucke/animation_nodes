@@ -34,8 +34,8 @@ class ConvertAngle(bpy.types.Node, AnimationNode):
         socket1 = self.inputs.new("mn_FloatSocket", "Angle")
         socket2 = self.outputs.new("mn_FloatSocket", "Angle")
         for socket in [socket1, socket2]:
-            socket.displayCustomName = True
-            socket.uniqueCustomName = False
+            socket.nameSettings.display = True
+            socket.nameSettings.unique = False
         self.conversionType = "DEGREE_TO_RADIAN"
 
     def draw_buttons(self, context, layout):
