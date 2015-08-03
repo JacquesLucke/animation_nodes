@@ -1,4 +1,5 @@
 import bpy, re
+from bpy.props import *
 from ... mn_utils import getNode
 from ... base_types.node import AnimationNode
 from ... utils.mn_node_utils import NodeTreeInfo
@@ -29,13 +30,13 @@ class ScriptNode(bpy.types.Node, AnimationNode):
         for socket in list(self.inputs) + list(self.outputs):
             self.customSocketNameChanged(socket)
 
-    textBlockName = bpy.props.StringProperty(name = "Script", default = "", description = "Choose the script you want to execute in this node")
-    errorMessage = bpy.props.StringProperty(name = "Error Message", default = "")
-    selectedSocketType = bpy.props.EnumProperty(name = "Selected Socket Type", items = getSocketDataTypeItems)
-    makeFromClipboard = bpy.props.BoolProperty(default = False, update = makeFromClipboardChanged)
-    hideEditableElements = bpy.props.BoolProperty(name = "Hide Editable Elements", default = False, update = hideEditableElementsChanged)
-    enableUINameConversion = bpy.props.BoolProperty(name = "Auto Socket Names", default = True, update = enableUINameConversionChanged)
-    showErrorMessage = bpy.props.BoolProperty(name = "Show Error Message", default = True)
+    textBlockName = StringProperty(name = "Script", default = "", description = "Choose the script you want to execute in this node")
+    errorMessage = StringProperty(name = "Error Message", default = "")
+    selectedSocketType = EnumProperty(name = "Selected Socket Type", items = getSocketDataTypeItems)
+    makeFromClipboard = BoolProperty(default = False, update = makeFromClipboardChanged)
+    hideEditableElements = BoolProperty(name = "Hide Editable Elements", default = False, update = hideEditableElementsChanged)
+    enableUINameConversion = BoolProperty(name = "Auto Socket Names", default = True, update = enableUINameConversionChanged)
+    showErrorMessage = BoolProperty(name = "Show Error Message", default = True)
 
     def create(self):
         self.createEmptySockets()
@@ -206,8 +207,8 @@ class OpenNewScript(bpy.types.Operator):
     bl_label = "New Keyframe"
     bl_description = "Create a new text block (hold ctrl to open a new text editor)"
 
-    nodeTreeName = bpy.props.StringProperty()
-    nodeName = bpy.props.StringProperty()
+    nodeTreeName = StringProperty()
+    nodeName = StringProperty()
 
     def invoke(self, context, event):
         node = getNode(self.nodeTreeName, self.nodeName)
@@ -234,9 +235,9 @@ class AppendSocket(bpy.types.Operator):
     bl_label = "Append Socket to Script Node"
     bl_description = "Append a new socket to this node"
 
-    nodeTreeName = bpy.props.StringProperty()
-    nodeName = bpy.props.StringProperty()
-    makeOutputSocket = bpy.props.BoolProperty()
+    nodeTreeName = StringProperty()
+    nodeName = StringProperty()
+    makeOutputSocket = BoolProperty()
 
     def execute(self, context):
         node = getNode(self.nodeTreeName, self.nodeName)
@@ -254,8 +255,8 @@ class ExportScriptNode(bpy.types.Operator):
     bl_label = "Export Script Node"
     bl_description = "Copy a text that describes the full script node"
 
-    nodeTreeName = bpy.props.StringProperty()
-    nodeName = bpy.props.StringProperty()
+    nodeTreeName = StringProperty()
+    nodeName = StringProperty()
 
     def execute(self, context):
         node = getNode(self.nodeTreeName, self.nodeName)
