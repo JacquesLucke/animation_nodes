@@ -1,19 +1,21 @@
 import bpy
 from ... base_types.node import AnimationNode
-from ... mn_execution import nodePropertyChanged, allowCompiling, forbidCompiling
 
-class mn_ReplicateStringsNode(bpy.types.Node, AnimationNode):
+class ReplicateStringsNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_ReplicateStringsNode"
     bl_label = "Replicate Text"
-    
-    def init(self, context):
-        forbidCompiling()
+
+    inputNames = { "Text" : "text",
+                   "Amount" : "amount" }
+
+    outputNames = { "Text" : "text" }
+
+    def create(self):
         self.inputs.new("mn_StringSocket", "Text")
-        self.inputs.new("mn_IntegerSocket", "Amount")
+        socket = self.inputs.new("mn_IntegerSocket", "Amount")
+        socket.setMinMax(0, 1000000)
+        socket.value = 2
         self.outputs.new("mn_StringSocket", "Text")
-        allowCompiling()
-        
-    def execute(self, input):
-        output = {}
-        output["Text"] = input["Text"] * input["Amount"]
-        return output
+
+    def getExecutionCode(self):
+        return "$text$ = %text% * %amount%"
