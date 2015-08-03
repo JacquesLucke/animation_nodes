@@ -30,7 +30,7 @@ class mn_LoopStartNode(bpy.types.Node, AnimationNode):
     loopName = bpy.props.StringProperty(default = "Object Loop", update = loopNameChanged)
     nameIsChanging = bpy.props.BoolProperty(default = False)
     preset = bpy.props.StringProperty(default = "", update = presetChanged)
-    selectedSocketType = bpy.props.EnumProperty(name = "Selected Socket Type", items = getSocketDataTypeItems, description = "Choose the type that the loop starter node will have")
+    selectedSocketType = bpy.props.EnumProperty(name = "Selected Socket Type", items = getDataTypeItems, description = "Choose the type that the loop starter node will have")
 
     def init(self, context):
         forbidCompiling()

@@ -1,7 +1,7 @@
 
 # the decorated function should return a list of dicts
 # the dicts have at least an 'id' key
-def enumItemsGenerator(function):
+def enumItemsFromDicts(function):
     def wrapper(self, context):
         items = []
         for data in function(self, context):
@@ -15,6 +15,16 @@ def enumItemsGenerator(function):
             items = [("NONE", "NONE", "")]
         return items
     return wrapper
-    
+
+def enumItemsFromList(function):
+    def wrapper(self, context):
+        items = []
+        for element in function(self, context):
+            items.append((element, element, "", "NONE", hashText(element)))
+        if len(items) == 0:
+            items = [("NONE", "NONE", "")]
+        return items
+    return wrapper
+
 def hashText(text):
     return int(hash(text) % 1e9)

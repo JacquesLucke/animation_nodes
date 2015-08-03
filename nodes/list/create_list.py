@@ -3,18 +3,7 @@ from bpy.props import *
 from ... base_types.node import AnimationNode
 from ... utils.mn_node_utils import getNotUsedSocketName
 from ... utils.selection import getSortedSelectedObjectNames
-from ... sockets.info import (getListBaseSocketIdNames,
-                                       getSocketClassFromIdName,
-                                       toIdName,
-                                       toListIdName)
-
-def getListTypeItems(self, context):
-    items = []
-    for baseIdName in getListBaseSocketIdNames():
-        socketClass = getSocketClassFromIdName(baseIdName)
-        dataType = socketClass.dataType
-        items.append((dataType, dataType, ""))
-    return items
+from ... sockets.info import getBaseDataTypeItems, toIdName, toListIdName
 
 class CreateList(bpy.types.Node, AnimationNode):
     bl_idname = "mn_CreateList"
@@ -38,7 +27,7 @@ class CreateList(bpy.types.Node, AnimationNode):
         self.listIdName = toListIdName(self.baseIdName)
         self.recreateSockets()
 
-    selectedType = EnumProperty(name = "Type", items = getListTypeItems)
+    selectedType = EnumProperty(name = "Type", items = getBaseDataTypeItems)
     assignedType = StringProperty(update = assignedTypeChanged)
     baseIdName = StringProperty()
     listIdName = StringProperty()

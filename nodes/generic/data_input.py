@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... base_types.node import AnimationNode
-from ... sockets.info import getSocketDataTypeItems, toIdName
+from ... sockets.info import getDataTypeItems, toIdName
 
 
 class DataInput(bpy.types.Node, AnimationNode):
@@ -14,7 +14,7 @@ class DataInput(bpy.types.Node, AnimationNode):
     def assignedSocketChanged(self, context):
         self.recreateSockets()
 
-    selectedType = EnumProperty(name = "Type", items = getSocketDataTypeItems)
+    selectedType = EnumProperty(name = "Type", items = getDataTypeItems)
     assignedType = StringProperty(default = "Float", update = assignedSocketChanged)
 
     def create(self):

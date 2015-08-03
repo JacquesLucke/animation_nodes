@@ -1,4 +1,6 @@
 import bpy
+from functools import lru_cache
+from .. utils.enum_items import enumItemsFromList
 
 listChains = [
     ["mn_FloatSocket", "mn_FloatListSocket"],
@@ -81,6 +83,7 @@ def baseDataTypeToListIdName(dataType):
     return listIdName
 
 # Base Id Name <-> List Id Name
+@lru_cache(maxsize = None)
 def listIdNameToBaseIdName(idName):
     for listChain in listChains:
         if idName in listChain:
@@ -88,6 +91,7 @@ def listIdNameToBaseIdName(idName):
             if index == 0: return None
             else: return listChain[index - 1]
 
+@lru_cache(maxsize = None)
 def baseIdNameToListIdName(idName):
     for listChain in listChains:
         if idName in listChain:
@@ -96,35 +100,42 @@ def baseIdNameToListIdName(idName):
             return listChain[index + 1]
     return None
 
-# Data Type <-> Id Name
-def toIdName(input):
-    if isIdName(input): return input
-    for subClass in getSocketClasses():
-        if getattr(subClass, "dataType") == input: return subClass.bl_idname
-    return None
-
-def toDataType(input):
-    if not isIdName(input): return input
-    cls = getattr(bpy.types, input)
-    return cls.dataType
-
-def isIdName(name):
-    return name.startswith("mn_")
-
-
 
 def getSocketClassFromIdName(idName):
     for cls in getSocketClasses():
         if cls.bl_idname == idName: return cls
     return None
 
-def getListBaseSocketIdNames():
+
+@enumItemsFromList
+def getListDataTypeItems(self, context):
+    return getListDataTypes()
+
+@enumItemsFromList
+def getBaseDataTypeItems(self, context):
+    return getBaseDataTypes()      
+
+@enumItemsFromList
+def getDataTypeItems(self, context):
+    return getDataTypes()
+
+def getListDataTypes():
+    return [toDataType(idName) for idName in getListIdNames()]
+
+def getBaseDataTypes():
+    return [toDataType(idName) for idName in getBaseIdNames()]
+
+def getDataTypes():
+    return [socketClass.dataType for socketClass in getSocketClasses()]
+
+
+def getBaseIdNames():
     idNames = []
     for listChain in listChains:
         idNames.extend(listChain[:-1])
     return idNames
 
-def getListSocketIdNames():
+def getListIdNames():
     types = []
     for listChain in listChains:
         for i, type in enumerate(listChain):
@@ -132,14 +143,24 @@ def getListSocketIdNames():
                 types.append(type)
     return types
 
-def getSocketDataTypeItems(self, context):
-    socketNames = getSocketDataTypes()
-    socketNames.sort()
-    return [(name, name, "") for name in socketNames]
 
-def getSocketDataTypes():
-    return [socketClass.dataType for socketClass in getSocketClasses()]
+# Data Type <-> Id Name
+@lru_cache(maxsize = None)
+def toIdName(input):
+    if isIdName(input): return input
+    for subClass in getSocketClasses():
+        if getattr(subClass, "dataType") == input: return subClass.bl_idname
+    return None
+
+@lru_cache(maxsize = None)
+def toDataType(input):
+    if not isIdName(input): return input
+    cls = getattr(bpy.types, input)
+    return cls.dataType
 
 def getSocketClasses():
     from .. base_types.socket import AnimationNodeSocket
     return AnimationNodeSocket.__subclasses__()
+
+def isIdName(name):
+    return name.startswith("mn_")

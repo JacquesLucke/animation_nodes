@@ -2,7 +2,7 @@ import bpy
 from mathutils import Vector
 from bpy.props import *
 from . utils.path import toIDPropertyPath as toPath
-from . utils.enum_items import enumItemsGenerator
+from . utils.enum_items import enumItemsFromDicts
 
 
 # ID Keys
@@ -12,7 +12,7 @@ forcedIDKeyTypes = {
     "Initial Transforms" : "Transforms",
     "Initial Text" : "String" }
     
-@enumItemsGenerator    
+@enumItemsFromDicts    
 def getIDKeyItems(self, context):
     itemData = []
     for item in getIDKeys():

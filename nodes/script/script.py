@@ -4,7 +4,7 @@ from ... mn_utils import getNode
 from ... base_types.node import AnimationNode
 from ... utils.mn_node_utils import NodeTreeInfo
 from ... utils.mn_name_utils import getPossibleSocketName, toInterfaceName
-from ... sockets.info import getSocketDataTypeItems, toIdName
+from ... sockets.info import getDataTypeItems, toIdName
 
 emptySocketName = "New Socket"
 
@@ -32,7 +32,7 @@ class ScriptNode(bpy.types.Node, AnimationNode):
 
     textBlockName = StringProperty(name = "Script", default = "", description = "Choose the script you want to execute in this node")
     errorMessage = StringProperty(name = "Error Message", default = "")
-    selectedSocketType = EnumProperty(name = "Selected Socket Type", items = getSocketDataTypeItems)
+    selectedSocketType = EnumProperty(name = "Selected Socket Type", items = getDataTypeItems)
     makeFromClipboard = BoolProperty(default = False, update = makeFromClipboardChanged)
     hideEditableElements = BoolProperty(name = "Hide Editable Elements", default = False, update = hideEditableElementsChanged)
     enableUINameConversion = BoolProperty(name = "Auto Socket Names", default = True, update = enableUINameConversionChanged)
