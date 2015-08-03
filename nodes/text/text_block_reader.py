@@ -1,32 +1,18 @@
 import bpy
 from ... base_types.node import AnimationNode
-from ... mn_execution import nodeTreeChanged, allowCompiling, forbidCompiling
-from ... mn_utils import *
 
-
-class mn_TextBlockReader(bpy.types.Node, AnimationNode):
+class TextBlockReader(bpy.types.Node, AnimationNode):
     bl_idname = "mn_TextBlockReader"
     bl_label = "Text Block Reader"
-    outputUseParameterName = "useOutput"
-    
-    def init(self, context):
-        forbidCompiling()
+
+    inputNames = { "Text Block" : "textBlock" }
+
+    outputNames = { "Text" : "text" }
+
+    def create(self):
         self.inputs.new("mn_TextBlockSocket", "Text Block").showName = False
         self.outputs.new("mn_StringSocket", "Text")
-        self.outputs.new("mn_StringListSocket", "Lines")
-        allowCompiling()
-        
-    def getInputSocketNames(self):
-        return {"Text Block" : "textBlock"}
-    def getOutputSocketNames(self):
-        return {"Text" : "text",
-                "Lines" : "lines"}
 
-    def execute(self, useOutput, textBlock):
-        text = ""
-        if textBlock is not None:
-            text = textBlock.as_string()
-            
-        if useOutput["Lines"]: return text, text.split("\n")
-        else: return text, []
-        
+    def execute(self, textBlock):
+        if textBlock is None: return ""
+        else: return textBlock.as_string()
