@@ -1,5 +1,4 @@
 import bpy
-from .. mn_utils import *
 
 enableSelectionSorting = True
 sortedSelectionNames = []
@@ -14,9 +13,9 @@ def getSortedSelectedObjectNames():
 
 def updateSelectionSorting():
     global sortedSelectionNames
-    
+
     selectedNames = getSelectedObjectNames()
-    
+
     if enableSelectionSorting:
         newSortedSelection = []
         for name in sortedSelectionNames:
@@ -28,9 +27,9 @@ def updateSelectionSorting():
         sortedSelectionNames = newSortedSelection
     else:
         sortedSelectionNames = selectedNames
-    
+
 def getSelectedObjectNames():
     selectedNames = []
-    for object in getSelectedObjects():
+    for object in bpy.context.selected_objects:
         selectedNames.append(object.name)
     return selectedNames

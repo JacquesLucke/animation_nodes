@@ -23,46 +23,9 @@ import bpy, random, ast
 # simple general functions
 ##########################
 
-def getActive():
-    return bpy.context.scene.objects.active
-def setActive(object):
-    bpy.context.scene.objects.active = object
-    object.select = True
-def getSelectedObjects():
-    try: return bpy.context.selected_objects
-    except: return []
-def deselectAll():
-    bpy.ops.object.select_all(action = "DESELECT")
-def deselectAllFCurves(object):
-    if object.animation_data is not None:
-        if object.animation_data.action is not None:
-            for fCurve in object.animation_data.action.fcurves:
-                fCurve.select = False
-def getCurrentFrame():
-    try: return bpy.context.scene.frame_current_final
-    except: return 1
-def getRandom(min, max):
-    return random.random() * (max - min) + min
 def getRandomString(length):
     return ''.join(random.choice("abcdefghijklmnopqrstuvwxyz") for _ in range(length))
-def clampInt(value, minValue, maxValue):
-    return int(max(min(value, maxValue), minValue))
-def isAnimationPlaying():
-    try:
-        return bpy.context.screen.is_animation_playing
-    except:	return False
-def isViewportRenderingActive():
-    if bpy.context.screen:
-        for area in bpy.context.screen.areas:
-            for space in area.spaces:
-                if space.type == "VIEW_3D":
-                    if space.viewport_shade == "RENDERED":
-                        return True
-    return False
-def nameToPath(name):
-    return '["' + name + '"]'
-def printTimeSpan(name, timeSpan, extraInfo = ""):
-    print(name + " " + str(round(timeSpan, 7)).rjust(13) + " s  -  " + str(round(1.0 / timeSpan, 5)).rjust(13) + " fps  " + extraInfo)
+
 
 # nodes and sockets
 ######################
@@ -72,24 +35,10 @@ def getSocket(treeName, nodeName, isOutput, identifier):
     sockets = node.outputs if isOutput else node.inputs
     for socket in sockets:
         if socket.identifier == identifier: return socket
+
 def getNode(treeName, nodeName):
     return bpy.data.node_groups[treeName].nodes[nodeName]
 
-def getSocketFromNode(node, isOutputSocket, name):
-    if isOutputSocket:
-        return node.outputs.get(name)
-    else:
-        return node.inputs.get(name)
-
-def getSocketByIdentifier(node, isOutputSocket, identifier):
-    if isOutputSocket: return getSocketFromListByIdentifier(node.outputs, identifier)
-    return getSocketFromListByIdentifier(node.inputs, identifier)
-def getSocketFromListByIdentifier(sockets, identifier):
-    for socket in sockets:
-        if socket.identifier == identifier: return socket
-    return None
-def getNodeIdentifier(node):
-    return node.id_data.name + node.name
 
 def getConnectionDictionaries(node):
     inputSocketConnections = {}
@@ -150,14 +99,3 @@ def getOriginSocket(socket):
 
 def hasLinks(socket):
     return len(socket.links) > 0
-
-
-# code
-########################
-
-def isValidCode(code):
-    try:
-        ast.parse(code)
-    except SyntaxError:
-        return False
-    return True

@@ -50,7 +50,7 @@ class SetKeyframesNode(bpy.types.Node, AnimationNode):
 
     def execute(self, enable, setKeyframe, removeUnwanted, object):
         if not enable: return
-        frame = getCurrentFrame()
+        frame = bpy.context.scene.frame_current
         if setKeyframe:
             for item in self.paths:
                 try:

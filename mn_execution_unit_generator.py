@@ -21,11 +21,11 @@ class ExecutionUnit:
         if getattr(updateSettingsNode, "bl_idname", "") == "mn_NetworkUpdateSettingsNode":
             self.updateSettingsNode = (updateSettingsNode.id_data.name, updateSettingsNode.name)
         else: self.updateSettingsNode = None
-        
+
     def execute(self, event = "NONE", sender = None):
         update = bpy.context.scene.mn_settings.update
         developer = bpy.context.scene.mn_settings.developer
-        
+
         onFrameChange = update.frameChange
         onSceneUpdate = update.sceneUpdate
         onPropertyChange = update.propertyChange
@@ -34,11 +34,11 @@ class ExecutionUnit:
         forceExecution = False
         printTime = False
         unitName = "Unit"
-        
+
         node = None
         if self.updateSettingsNode is not None:
             node = getNode(self.updateSettingsNode[0], self.updateSettingsNode[1])
-            
+
             onFrameChange = node.settings.frameChanged
             onSceneUpdate = node.settings.sceneUpdates
             onPropertyChange = node.settings.propertyChanged
@@ -46,46 +46,58 @@ class ExecutionUnit:
             skipFrames = node.settings.skipFramesAmount
             printTime = node.settings.printTime
             unitName = node.settings.unitName
-            
+
         if node is not None and node == sender and event == "FORCE":
             forceExecution = True
-            
+
         # don't use scene/property update when animation plays back
         if event in ["SCENE", "PROPERTY", "FRAME"]:
             if isAnimationPlaying() and onFrameChange and (onSceneUpdate or onPropertyChange):
                 onSceneUpdate = False
                 onPropertyChange = False
-                
+
             # use skip frames
-            if isAnimationPlaying() and getCurrentFrame() % (max(skipFrames, 0) + 1) != 0:
+            if isAnimationPlaying() and bpy.context.scene.frame_current % (max(skipFrames, 0) + 1) != 0:
                 onFrameChange = False
-        
+
         # don't use scene update when viewport rendering is enabled
         if event == "SCENE" and isViewportRenderingActive():
             onSceneUpdate = False
-            
+
         # reset counter on force execution
         if forceExecution:
             self.totalExecuteTime = 0.0
             self.executeAmount = 0
-            
+
         execute = event == "NONE" \
             or event == "FRAME" and onFrameChange \
             or event == "SCENE" and onSceneUpdate \
             or event == "PROPERTY" and onPropertyChange \
             or event == "TREE" and onTreeChange \
             or forceExecution
-            
+
         if execute:
             start = time.clock()
             exec(self.codeObject, {})
             timeSpan = time.clock() - start
             self.totalExecuteTime += timeSpan
             self.executeAmount += 1
-            if printTime:
-                printTimeSpan(unitName + " exec. ", self.totalExecuteTime / self.executeAmount, "counter: " + str(self.executeAmount))
             if node is not None:
                 node.executionTime = timeSpan
+
+def isAnimationPlaying():
+    try:
+        return bpy.context.screen.is_animation_playing
+    except:	return False
+
+def isViewportRenderingActive():
+    if bpy.context.screen:
+        for area in bpy.context.screen.areas:
+            for space in area.spaces:
+                if space.type == "VIEW_3D":
+                    if space.viewport_shade == "RENDERED":
+                        return True
+    return False
 
 def getExecutionUnits():
     global useProfiling, idCounter, treeInfo
@@ -104,7 +116,7 @@ def getExecutionUnits():
             executionUnits.append(executionUnit)
     else: print("There is at least one invalid network.")
     return executionUnits
-    
+
 def prepareNetworks(networks):
     global normalNetworks, loopNetworks, groupNetworks, invalidNetworks
     normalNetworks = []
@@ -121,8 +133,8 @@ def prepareNetworks(networks):
             groupNetworks[network.getGroupInputNode()] = network
         elif network.type == "Invalid":
             invalidNetworks.append(network)
-        
-            
+
+
 idCounter = 0
 bpy.types.Node.codeIndex = bpy.props.IntProperty()
 def setUniqueCodeIndexToEveryNode(nodes):
@@ -130,11 +142,11 @@ def setUniqueCodeIndexToEveryNode(nodes):
     for node in nodes:
         node.codeIndex = idCounter
         idCounter += 1
-        
+
 
 # get node networks (groups of connected nodes)
 ###############################################
-        
+
 def getNodeNetworks():
     networks = []
     nodeTrees = getAnimationNodeTrees()
@@ -145,8 +157,8 @@ def getNodeNetworks():
         networks.extend(nodeTreeInfo.getNetworks())
     return networks
 
-    
-    
+
+
 # network code generator class
 ########################################
 
@@ -161,13 +173,13 @@ class NetworkCodeGenerator:
         self.executeNodes = []
         self.outputUseNodes = []
         self.determinedNodesCode = []
-        
+
         self.updateSettingsNode = None
         self.generatedCode = ""
-        
+
     def generateCode(self):
         mainCode = self.getMainCode()
-        
+
         codeParts = []
         codeParts.append("import " + ", ".join(self.modules))
         codeParts.append("animation_nodes = sys.modules['{}']".format(addonName))
@@ -183,9 +195,9 @@ class NetworkCodeGenerator:
         codeParts.append(self.getDeterminedNodesCode())
         codeParts.append(mainCode)
         codeParts.append(self.getCodeToPrintProfilingResult())
-        
+
         self.generatedCode = "\n".join(codeParts)
-        
+
     def getMainCode(self):
         self.allNodesInTree.extend(self.network.nodes)
         orderedNodes = orderNodes(self.network.nodes)
@@ -195,7 +207,7 @@ class NetworkCodeGenerator:
                 self.updateSettingsNode = treeInfo.getUpdateSettingsNode(node)
             codeLines.extend(self.getNodeCodeLines(node))
         return "\n".join(codeLines)
-        
+
     def makeLoopCode(self, loopNetwork):
         startNode = loopNetwork.getLoopStartNode()
         if startNode not in self.functions:
@@ -218,10 +230,10 @@ class NetworkCodeGenerator:
     def setIndentationOnEveryLine(self, codeLines):
         for i, line in enumerate(codeLines):
             codeLines[i] = "    " + line
-            
+
     def getFunctionsCode(self):
         return "\n\n".join(self.functions.values()) + "\n"
-        
+
     def getNodeCodeLines(self, node):
         codeLines = []
         if isExecuteableNode(node) or isInLineNode(node):
@@ -231,7 +243,7 @@ class NetworkCodeGenerator:
         elif isGroupCallerNode(node):
             codeLines.extend(self.getGroupNodeCode(node))
         return codeLines
-        
+
     def getExecutableNodeCode(self, node):
         codeLines = []
         lines = self.getNodeExecutionLines(node)
@@ -248,7 +260,7 @@ class NetworkCodeGenerator:
         startNode = node.getStartNode()
         if startNode is not None:
             fromListSockets = startNode.getSocketDescriptions()[0]
-            
+
             if len(fromListSockets) == 0:
                 codeLines.append(getNodeInputName(node) + "['List Length'] = " + getNodeInputName(node) + "['Amount']")
                 codeLines.append("for " + getNodeInputName(node) + "['Index'] in range(" + getNodeInputName(node) + "['Amount']):")
@@ -257,39 +269,39 @@ class NetworkCodeGenerator:
                 codeLines.append("except: zippedList = []")
                 codeLines.append(getNodeInputName(node) + "['List Length'] = len(zippedList)")
                 codeLines.append(self.getEnumerateLoopHeader(node, fromListSockets))
-            
+
             codeLines.append("    " + getNodeFunctionName(startNode) + "(" + getNodeInputName(node) + ")")
             self.makeLoopCode(loopNetworks[startNode])
         codeLines.append(getNodeOutputName(node) + " = " + getNodeInputName(node))
         return codeLines
-        
+
     # zippedList = list(zip(list1, list2, list3))
     def getZipListCode(self, node, fromListSockets):
         codeParts = []
         codeParts.append("zippedList = list(zip(")
-        
+
         listVariables = []
         for socket in fromListSockets:
             listVariables.append(getNodeInputName(node) + "['" + socket.identifier + "list']")
-            
+
         codeParts.append(", ".join(listVariables))
         codeParts.append("))")
-        
+
         return "".join(codeParts)
     # for (input['Index'], (element1, element2, element3,)) in enumerate(zippedList):
     def getEnumerateLoopHeader(self, node, fromListSockets):
         codeParts = []
         codeParts.append("for (" + getNodeInputName(node) + "['Index']" + ", (")
-        
+
         listVariables = []
         for socket in fromListSockets:
             listVariables.append(getNodeInputName(node) + "['" + socket.identifier + "']")
-            
+
         codeParts.append(", ".join(listVariables))
         codeParts.append(",)) in enumerate(zippedList):")
-        
+
         return "".join(codeParts)
-        
+
     def getGroupNodeCode(self, node):
         codeLines = []
         inputNode = node.getInputNode()
@@ -297,7 +309,7 @@ class NetworkCodeGenerator:
             codeLines.append(getNodeOutputName(node) + " = " + getNodeFunctionName(inputNode) + "(" + self.generateInputListString(node) + ")")
             self.makeGroupCode(inputNode)
         return codeLines
-        
+
     def makeGroupCode(self, inputNode):
         groupNetwork = groupNetworks[inputNode]
         outputNode = groupNetwork.getGroupOutputNode()
@@ -319,7 +331,7 @@ class NetworkCodeGenerator:
             codeLines.append("    return " + self.generateInputListString(outputNode))
         else: codeLines.append("    pass")
         return "\n".join(codeLines)
-        
+
     def getTimerDefinitions(self):
         if useProfiling:
             codeLines = []
@@ -334,7 +346,7 @@ class NetworkCodeGenerator:
                 nodeTimerNames.append(getNodeTimerName(node))
             return "global " + ", ".join(nodeTimerNames)
         return ""
-        
+
     def getCodeToPrintProfilingResult(self):
         if useProfiling:
             codeLines = []
@@ -344,10 +356,10 @@ class NetworkCodeGenerator:
                 codeLines.append("print('  ' + str(round(" + getNodeTimerName(node) + ", 5)) + ' s')")
             return "\n" + "\n".join(codeLines)
         return ""
-        
+
     def getDeterminedNodesCode(self):
         return "\n".join(self.determinedNodesCode)
-        
+
     def getNodeTreeReferencingCode(self):
         nodeTrees = []
         for node in self.allNodesInTree:
@@ -358,31 +370,31 @@ class NetworkCodeGenerator:
             self.nodeTreeNames[nodeTree] = nodeTreeVarName
             codeLines.append(nodeTreeVarName + " = bpy.data.node_groups['" + nodeTree.name + "'].nodes")
         return "\n".join(codeLines)
-        
+
     def getNodeReferencingCode(self):
         codeLines = []
         for node in self.allNodesInTree:
             codeLines.append(self.getNodeDeclarationString(node))
         return "\n".join(codeLines)
-        
+
     def getNodeExecuteReferencingCode(self):
         codeLines = []
         for node in self.executeNodes:
             codeLines.append(self.getNodeFunctionDeclarationString(node))
         return "\n".join(codeLines)
-    
+
     def getSocketReferencingCode(self):
         codeLines = []
         for socket in self.neededSocketReferences:
             codeLines.append(getInputSocketName(socket) + " = " + getSocketReferenceString(socket))
         return "\n".join(codeLines)
-        
+
     def getSocketValueReferencingCode(self):
         codeLines = []
         for socket in self.neededSocketReferences:
             codeLines.append(self.getSocketDeclarationString(socket))
         return "\n".join(codeLines)
-        
+
     def getUsedOutputsDeclarationCode(self):
         codeLines = []
         for node in self.outputUseNodes:
@@ -410,7 +422,7 @@ class NetworkCodeGenerator:
                 return node.outputUseParameterName + " = " + getNodeOutputUseName(node)
         else:
             return self.joinInputParts(inputParts, useFastMethod)
-            
+
     def joinInputParts(self, inputParts, useFastMethod):
         if useFastMethod:
             return ", ".join(inputParts)
@@ -428,9 +440,9 @@ class NetworkCodeGenerator:
             return inputSocketNames[socket.identifier] + " = "
         else:
             return "'" + socket.identifier + "' : "
-        
-        
-        
+
+
+
     def getNodeDeclarationString(self, node):
         return getNodeVariableName(node) + " = " + self.nodeTreeNames[node.id_data] + "['"+node.name+"']"
     def getNodeFunctionDeclarationString(self, node):
@@ -455,30 +467,30 @@ class NetworkCodeGenerator:
         else:
             self.executeNodes.append(node)
             return [getNodeOutputString(node) + " = " + getNodeExecutionName(node) + "(" + self.generateInputListString(node) + ")"]
-            
+
     def getInputValueString(self, socket):
         originSocket = treeInfo.getDataOriginSocket(socket)
         inputVariableName = self.getInputValueVariable(socket, originSocket)
-        
+
         if self.copyValueBeforeUsing(socket, originSocket):
             functionName = self.makeCopyFunction(socket, originSocket)
             return functionName + "(" + inputVariableName + ")"
         else:
             return inputVariableName
-                
+
     def getInputValueVariable(self, socket, originSocket):
         if originSocket is None:
             return getInputSocketValueName(socket)
         else:
             return getOutputValueVariable(originSocket)
-            
+
     def copyValueBeforeUsing(self, socket, originSocket):
         if hasattr(socket, "getCopyValueFunctionString") or hasattr(originSocket, "getCopyValueFunctionString"):
             index = treeInfo.getTargetIndexFromOutputSocket(originSocket, socket)
             amount = len(treeInfo.getDataTargetSockets(originSocket))
             return originSocket is None or (amount >= 2)# and index < amount - 1)
         return False
-                
+
     def makeCopyFunction(self, socket, originSocket):
         codeLines = []
         if hasattr(originSocket, "getCopyValueFunctionString"):
@@ -493,11 +505,11 @@ class NetworkCodeGenerator:
         codeLines.extend(functionLines)
         self.functions[functionName] = "\n".join(codeLines)
         return functionName
-            
+
 def getNodeOutputString(node):
     if hasSocketNames(node):
         outputSocketNames = getOutputNames(node)
-        if len(outputSocketNames) != len(node.outputs): 
+        if len(outputSocketNames) != len(node.outputs):
             print(node.name)
             raise Exception()
         if len(node.outputs) != 0:
@@ -510,8 +522,8 @@ def getNodeOutputString(node):
 def getUsedOutputs(node):
     isUsed = treeInfo.isOutputSocketUsed
     return {socket.identifier : isUsed(socket) for socket in node.outputs}
-    
-        
+
+
 def isExecuteableNode(node):
     return hasattr(node, "execute")
 def isInLineNode(node):
@@ -520,35 +532,35 @@ def isLoopCallerNode(node):
     return node.bl_idname == "mn_LoopCallerNode"
 def isGroupCallerNode(node):
     return node.bl_idname == "mn_GroupCaller"
-    
+
 def usesOutputUseParameter(node):
     return hasattr(node, "outputUseParameterName")
-    
+
 def hasSocketNames(node):
     if hasattr(node, "getInputSocketNames") and hasattr(node, "getOutputSocketNames"): return True
     if hasattr(node, "inputNames") and hasattr(node, "outputNames"): return True
     return False
-    
+
 def getInputNames(node):
     if hasattr(node, "getInputSocketNames"): return node.getInputSocketNames()
     return node.inputNames
-    
+
 def getOutputNames(node):
     if hasattr(node, "getOutputSocketNames"): return node.getOutputSocketNames()
-    return node.outputNames    
-    
+    return node.outputNames
+
 def useExecutionCode(node):
     return hasattr(node, "getInLineExecutionString") or hasattr(node, "getExecutionCode")
-    
+
 def getExecutionCode(node, usedOutputs):
     function = node.getInLineExecutionString if hasattr(node, "getInLineExecutionString") else node.getExecutionCode
     if getParameterCount(function) == 2:
         return function(usedOutputs)
     return function()
-    
+
 def getParameterCount(function):
     return len(inspect.getargspec(function)[0])
-    
+
 
 def getOutputValueVariable(socket):
     if hasSocketNames(socket.node):
@@ -556,7 +568,7 @@ def getOutputValueVariable(socket):
         return getNodeOutputName(socket.node) + "_" + outputSocketNames[socket.identifier]
     else:
         return getNodeOutputName(socket.node) + "['" + socket.identifier + "']"
-        
+
 def isDeterminedNode(node):
     if getattr(node, "isDetermined", False):
         for socket in node.inputs:
@@ -565,7 +577,7 @@ def isDeterminedNode(node):
                 if not isDeterminedNode(originNode): return False
         return True
     return False
-        
+
 def getNodeVariableName(node):
     return "node_" + str(node.codeIndex)
 def getNodeInputName(node):
@@ -594,18 +606,18 @@ def getSocketValueGetterString(socket):
     return getInputSocketName(socket) + ".getValue()"
 def getCopyValueFunctionName(socket):
     return socket.bl_idname + "_copy"
-    
-    
-    
+
+
+
 # order nodes (network) to possible execution sequence
 ######################################################
-    
+
 def orderNodes(nodes):
     preOrderedList = []
     for node in nodes:
         preOrderedList.extend(getAllNodeDependencies(node))
         preOrderedList.append(node)
-    
+
     orderedList = []
     for node in preOrderedList:
         if node not in orderedList and node in nodes: orderedList.append(node)
@@ -618,7 +630,7 @@ def getAllNodeDependencies(node):
         dependencies.extend(getAllNodeDependencies(directDependency))
     dependencies.extend(directDependencies)
     return dependencies
-    
+
 def getDirectDependencies(node):
     directDependencies = []
     for socket in node.inputs:

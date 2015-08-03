@@ -205,7 +205,7 @@ class ObjectInstancer(bpy.types.Node, AnimationNode):
         return None
 
     def unlinkInstance(self, object):
-        if bpy.context.mode != "OBJECT" and getActive() == object:
+        if bpy.context.mode != "OBJECT" and bpy.context.active_object == object:
             bpy.ops.object.mode_set(mode = "OBJECT")
         bpy.context.scene.objects.unlink(object)
 

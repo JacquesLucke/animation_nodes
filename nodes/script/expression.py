@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
-from ... mn_utils import isValidCode, getRandomString
+from ... mn_utils import getRandomString
 
 defaultVariableNames = list("xyzwabcdefghijklmnopqrstuv")
 
@@ -104,3 +104,10 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
             if socket.name != "...":
                 customNames.append(socket.customName)
         return customNames
+
+def isValidCode(code):
+    try:
+        ast.parse(code)
+    except SyntaxError:
+        return False
+    return True

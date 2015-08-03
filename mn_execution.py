@@ -20,10 +20,6 @@ def updateAnimationTrees(event = "NONE", sender = None):
             secureExecution(event, sender)
             clearExecutionCache()
 
-            timeSpan = time.clock() - start
-
-            if bpy.context.scene.mn_settings.developer.printUpdateTime:
-                printTimeSpan("Update Time ", timeSpan)
 
             try:
                 bpy.context.scene.update()
