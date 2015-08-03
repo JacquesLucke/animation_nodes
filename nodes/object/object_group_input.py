@@ -1,27 +1,19 @@
 import bpy
+from ... events import propertyChanged
 from ... base_types.node import AnimationNode
-from ... mn_execution import nodePropertyChanged
 
-class mn_ObjectGroupInput(bpy.types.Node, AnimationNode):
+class ObjectGroupInput(bpy.types.Node, AnimationNode):
     bl_idname = "mn_ObjectGroupInput"
     bl_label = "Object Group Input"
-    
-    groupName = bpy.props.StringProperty(default = "", update = nodePropertyChanged)
-    
-    def init(self, context):
+
+    inputNames = { "Group" : "group" }
+    outputNames = { "Objects" : "objects" }
+
+    groupName = bpy.props.StringProperty(default = "", update = propertyChanged)
+
+    def create(self):
+        self.inputs.new("mn_ObjectGroupSocket", "Group").showName = False
         self.outputs.new("mn_ObjectListSocket", "Objects")
-        
-    def draw_buttons(self, context, layout):
-        layout.prop_search(self, "groupName", bpy.data, "groups", text = "")
-        
-    def getInputSocketNames(self):
-        return {}
-    def getOutputSocketNames(self):
-        return {"Objects" : "objects"}
-                
-    def execute(self):
-        group = bpy.data.groups.get(self.groupName)
-        objects = []
-        if group:
-            objects = group.objects
-        return objects
+
+    def execute(self, group):
+        return getattr(group, "objects", [])
