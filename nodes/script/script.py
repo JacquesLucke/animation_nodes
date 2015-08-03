@@ -3,7 +3,7 @@ from bpy.props import *
 from ... mn_utils import getNode
 from ... base_types.node import AnimationNode
 from ... utils.mn_node_utils import NodeTreeInfo
-from ... utils.mn_name_utils import getPossibleSocketName, toInterfaceName
+from ... utils.names import getPossibleSocketName, toInterfaceName
 from ... sockets.info import getDataTypeItems, toIdName
 
 emptySocketName = "New Socket"

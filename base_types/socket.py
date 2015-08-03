@@ -3,7 +3,7 @@ from bpy.props import *
 from .. events import treeChanged
 from .. mn_utils import getRandomString, isSocketLinked
 from . socket_function_call import getSocketFunctionCallOperatorName
-from .. utils.mn_name_utils import toVariableName
+from .. utils.names import toVariableName
 
 class mn_CustomNameProperties(bpy.types.PropertyGroup):
     unique = BoolProperty(default = False)

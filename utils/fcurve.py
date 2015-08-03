@@ -1,7 +1,7 @@
 import bpy
 from .. mn_utils import *
 from .. cache import *
-from . mn_name_utils import toDataPath
+from . names import toDataPath
 
 
 # Misc

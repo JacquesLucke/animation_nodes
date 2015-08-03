@@ -8,7 +8,7 @@ from ... mn_utils import getNode
 from ... events import propertyChanged
 from ... base_types.node import AnimationNode
 from ... algorithms import interpolation
-from ... utils.mn_name_utils import toDataPath
+from ... utils.names import toDataPath
 from ... utils.task_manager import TaskManager, Task
 from ... utils.sequence_editor import getSoundsInSequencer, getSoundSequences, getEmptyChannel, getOrCreateSequencer
 from ... utils.path import toAbsolutePath

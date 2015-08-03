@@ -2,7 +2,7 @@ import bpy, time
 from ... base_types.node import AnimationNode
 from ... events import propertyChanged
 from ... nodes.mn_node_helper import getMainObjectContainer
-from ... utils.mn_name_utils import (getPossibleObjectName,
+from ... utils.names import (getPossibleObjectName,
                                      getPossibleMeshName,
                                      getPossibleCurveName,
                                      getPossibleCameraName,
