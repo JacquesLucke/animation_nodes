@@ -1,19 +1,20 @@
 import bpy
 from bpy.props import *
 from ... base_types.node import AnimationNode
-from ... utils.mn_node_utils import *
+from ... utils.mn_node_utils import getNotUsedSocketName
 from ... utils.selection import getSortedSelectedObjectNames
-from ... sockets.mn_socket_info import *
-from ... mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
+from ... sockets.mn_socket_info import (getListBaseSocketIdNames,
+                                       getSocketClassFromIdName,
+                                       getIdNameFromDataType,
+                                       getListSocketIdName)
 
 def getListTypeItems(self, context):
-    listTypeItems = []
-    for idName in getListSocketIdNames():
-        baseIdName = getListBaseSocketIdName(idName)
-        cls = getSocketClassFromIdName(baseIdName)
-        item = (idName, cls.dataType, "")
-        listTypeItems.append(item)
-    return listTypeItems
+    items = []
+    for baseIdName in getListBaseSocketIdNames():
+        socketClass = getSocketClassFromIdName(baseIdName)
+        dataType = socketClass.dataType
+        items.append((dataType, dataType, ""))
+    return items
 
 class CreateList(bpy.types.Node, AnimationNode):
     bl_idname = "mn_CreateList"
@@ -25,14 +26,22 @@ class CreateList(bpy.types.Node, AnimationNode):
             socket.removeable = self.manageSockets
             socket.hide = self.hideInputs
 
-    selectedListType = EnumProperty(name = "List Type", items = getListTypeItems)
-    assignedListType = StringProperty(default = "mn_FloatListSocket")
-    manageSockets = BoolProperty(name = "Manage Sockets", default = False, description = "Allows to (re)move the input sockets", update = settingChanged)
+    def assignedTypeChanged(self, context):
+        baseDataType = self.assignedType
+        self.baseIdName = getIdNameFromDataType(baseDataType)
+        self.listIdName = getListSocketIdName(self.baseIdName)
+        self.recreateSockets()
 
+    selectedType = EnumProperty(name = "Type", items = getListTypeItems)
+    assignedType = StringProperty(update = assignedTypeChanged)
+    baseIdName = StringProperty()
+    listIdName = StringProperty()
+
+    manageSockets = BoolProperty(name = "Manage Sockets", default = False, description = "Allows to (re)move the input sockets", update = settingChanged)
     hideInputs = BoolProperty(name = "Hide Inputs", default = False, update = settingChanged)
 
     def create(self):
-        self.recreateSockets()
+        self.assignedType = "Float"
 
     def draw_buttons(self, context, layout):
         self.callFunctionFromUI(layout, "newInputSocket",
@@ -43,7 +52,7 @@ class CreateList(bpy.types.Node, AnimationNode):
 
     def draw_buttons_ext(self, context, layout):
         col = layout.column(align = True)
-        col.prop(self, "selectedListType", text = "")
+        col.prop(self, "selectedType", text = "")
         self.callFunctionFromUI(col, "assignSelectedListType",
             text = "Assign",
             description = "Remove all sockets and set the selected socket type")
@@ -59,10 +68,10 @@ class CreateList(bpy.types.Node, AnimationNode):
         return {"List" : elements}
 
     def assignSelectedListType(self):
-        self.assignListType(self.selectedListType)
+        self.assignedType = self.selectedType
 
     def assignListType(self, idName, inputAmount = 2):
-        self.assignedListType = idName
+        self.assignedType = idName
         self.recreateSockets(inputAmount)
 
     def recreateSockets(self, inputAmount = 2):
@@ -71,11 +80,10 @@ class CreateList(bpy.types.Node, AnimationNode):
 
         for i in range(inputAmount):
             self.newInputSocket()
-        self.outputs.new(self.assignedListType, "List")
+        self.outputs.new(self.listIdName, "List")
 
     def newInputSocket(self):
-        baseIdName = getListBaseSocketIdName(self.assignedListType)
-        socket = self.inputs.new(baseIdName, getNotUsedSocketName(self, "Element"))
+        socket = self.inputs.new(self.baseIdName, getNotUsedSocketName(self, "Element"))
         socket.displayCustomName = True
         socket.uniqueCustomName = False
         socket.customName = "Element"
@@ -90,7 +98,7 @@ class CreateList(bpy.types.Node, AnimationNode):
     #############################
 
     def drawTypeSpecificButtonsExt(self, layout):
-        if self.assignedListType == "mn_ObjectListSocket":
+        if self.assignedType == "Object":
             self.callFunctionFromUI(layout, "createInputsFromSelection", text = "From Selection", icon = "PLUS")
 
     def createInputsFromSelection(self):

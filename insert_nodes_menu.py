@@ -54,7 +54,8 @@ class NumberMenu(bpy.types.Menu):
         layout = self.layout
         insertNode(layout, "mn_DataInput", "Integer", {"assignedType" : repr("Integer")})
         insertNode(layout, "mn_DataInput", "Float", {"assignedType" : repr("Float")})
-        insertNode(layout, "mn_FloatListInputNode", "List")
+        insertNode(layout, "mn_CreateList", "Integer List", {"assignedType" : repr("Integer")})
+        insertNode(layout, "mn_CreateList", "Float List", {"assignedType" : repr("Float")})
         insertNode(layout, "mn_FloatRangeListNode", "Range")
         layout.separator()
         insertNode(layout, "mn_RandomNumberNode", "Randomize")
@@ -74,6 +75,7 @@ class VectorMenu(bpy.types.Menu):
         insertNode(layout, "mn_SeparateVector", "Separate")
         insertNode(layout, "mn_CombineVector", "Combine")
         insertNode(layout, "mn_VectorFromValue", "From Value")
+        insertNode(layout, "mn_CreateList", "List", {"assignedType" : repr("Vector")})
         layout.separator()
         insertNode(layout, "mn_RandomVectorNode", "Randomize")
         insertNode(layout, "mn_VectorWiggle", "Wiggle")
@@ -93,6 +95,7 @@ class MatrixMenu(bpy.types.Menu):
         layout = self.layout
         insertNode(layout, "mn_DecomposeMatrix", "Decompose")
         insertNode(layout, "mn_ComposeMatrix", "Compose")
+        insertNode(layout, "mn_CreateList", "List", {"assignedType" : repr("Matrix")})
         layout.separator()
         insertNode(layout, "mn_TranslationMatrix", "Translation")
         insertNode(layout, "mn_RotationMatrix", "Rotation")
@@ -110,7 +113,7 @@ class TextMenu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         insertNode(layout, "mn_DataInput", "Input", {"assignedType" : repr("String")})
-        insertNode(layout, "mn_StringListInputNode", "List")
+        insertNode(layout, "mn_CreateList", "List", {"assignedType" : repr("String")})
         insertNode(layout, "mn_RandomStringNode", "Randomize")
         insertNode(layout, "mn_CharactersNode", "Characters")
         layout.separator()
@@ -171,7 +174,7 @@ class ObjectMenu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         insertNode(layout, "mn_DataInput", "Input", {"assignedType" : repr("Object")})
-        insertNode(layout, "mn_ObjectListInputNode", "List")
+        insertNode(layout, "mn_CreateList", "List", {"assignedType" : repr("Object")})
         insertNode(layout, "mn_ObjectGroupInput", "Group Input")
         layout.separator()
         insertNode(layout, "mn_ObjectInfoNode", "Transforms Input")
@@ -235,6 +238,7 @@ class SplineMenu(bpy.types.Menu):
         layout = self.layout
         insertNode(layout, "mn_SplinesFromObject", "Get from Object")
         insertNode(layout, "mn_CreateSpline", "Create from Points")
+        insertNode(layout, "mn_CreateList", "List", {"assignedType" : repr("Spline")})
         insertNode(layout, "mn_AppendPointToSpline", "Append Point")
         insertNode(layout, "mn_SmoothBezierSpline", "Smooth Bezier")
         insertNode(layout, "mn_MakeSplineCyclic", "Make Cyclic")
