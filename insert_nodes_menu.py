@@ -315,15 +315,8 @@ class SystemMenu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        insertNode(layout, "mn_LoopCallerNode", "Loop Call")
-        insertNode(layout, "mn_GroupCaller", "Group Call")
-        insertNode(layout, "mn_GroupInput", "Group Input")
-        insertNode(layout, "mn_GroupOutput", "Group Output")
-        layout.separator()
         insertNode(layout, "mn_ConvertNode", "Convert")
         insertNode(layout, "mn_DebugOutputNode", "Debug")
-        layout.separator()
-        insertNode(layout, "mn_NetworkUpdateSettingsNode", "Update Settings")
 
 
 
