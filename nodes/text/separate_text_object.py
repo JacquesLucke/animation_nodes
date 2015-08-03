@@ -5,7 +5,7 @@ from mathutils import Vector, Matrix
 from ... mn_utils import getNode
 from ... base_types.node import AnimationNode
 from ... id_keys import setIDKeyData, createIDKey
-from ... nodes.mn_node_helper import getMainObjectContainer
+from ... nodes.container_provider import getMainObjectContainer
 
 idPropertyName = "text separation node id"
 indexPropertyName = "text separation node index"

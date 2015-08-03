@@ -1,7 +1,7 @@
 import bpy
 from ... base_types.node import AnimationNode
 from ... events import propertyChanged
-from ... nodes.mn_node_helper import getHelperMaterial, getNotUsedMaterialNodeName
+from ... nodes.container_provider import getHelperMaterial, getNotUsedMaterialNodeName
 from ... algorithms.interpolation import *
 
 topCategoryItems = [("LINEAR", "Linear", ""),
