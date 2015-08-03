@@ -5,7 +5,7 @@ from ... base_types.node import AnimationNode
 
 
 class FilterParticles(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_FilterParticles"
+    bl_idname = "an_FilterParticles"
     bl_label = "Filter Particles"
 
     inputNames = { "Particles" : "particles" }
@@ -17,8 +17,8 @@ class FilterParticles(bpy.types.Node, AnimationNode):
     outputDead = BoolProperty(name = "Output Dead Particles", default = False, update = propertyChanged)
 
     def create(self):
-        self.inputs.new("mn_ParticleListSocket", "Particles")
-        self.outputs.new("mn_ParticleListSocket", "Particles")
+        self.inputs.new("an_ParticleListSocket", "Particles")
+        self.outputs.new("an_ParticleListSocket", "Particles")
 
     def draw_buttons(self, context, layout):
         col = layout.column()

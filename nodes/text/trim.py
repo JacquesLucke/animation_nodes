@@ -3,7 +3,7 @@ from ... events import propertyChanged
 from ... base_types.node import AnimationNode
 
 class TrimText(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_TrimText"
+    bl_idname = "an_TrimText"
     bl_label = "Trim Text"
 
     inputNames = { "Text" : "text",
@@ -20,10 +20,10 @@ class TrimText(bpy.types.Node, AnimationNode):
     allowNegativeIndex = bpy.props.BoolProperty(default = False, description = "Negative indices start from the end", update = settingChanged)
 
     def create(self):
-        self.inputs.new("mn_StringSocket", "Text")
-        self.inputs.new("mn_IntegerSocket", "Start").value = 0
-        self.inputs.new("mn_IntegerSocket", "End").value = 5
-        self.outputs.new("mn_StringSocket", "Text")
+        self.inputs.new("an_StringSocket", "Text")
+        self.inputs.new("an_IntegerSocket", "Start").value = 0
+        self.inputs.new("an_IntegerSocket", "End").value = 5
+        self.outputs.new("an_StringSocket", "Text")
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "autoEnd", text = "Auto End")

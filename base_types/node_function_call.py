@@ -10,10 +10,10 @@ def getNodeFunctionCallOperatorName(description):
     if description in nodeFunctionCallOperators:
         return nodeFunctionCallOperators[description]
     missingNodeOperators.append(description)
-    return "mn.call_node_function_fallback"
+    return "an.call_node_function_fallback"
 
 class CallNodeFunctionFallback(bpy.types.Operator):
-    bl_idname = "mn.call_node_function_fallback"
+    bl_idname = "an.call_node_function_fallback"
     bl_label = "Call Node Function"
 
     nodeTreeName = StringProperty()
@@ -39,7 +39,7 @@ def createNodeFunctionCallOperator(description):
     if description not in nodeFunctionCallOperators:
 
         id = str(len(nodeFunctionCallOperators))
-        idName = "mn.call_node_function_" + id
+        idName = "an.call_node_function_" + id
         nodeFunctionCallOperators[description] = idName
 
         operatorType = type("CallNodeFunction_" + id, (bpy.types.Operator,), {

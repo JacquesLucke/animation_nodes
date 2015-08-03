@@ -2,7 +2,7 @@ import bpy
 from .. base_types.socket import AnimationNodeSocket
 
 class PolygonIndicesListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
-    bl_idname = "mn_PolygonIndicesListSocket"
+    bl_idname = "an_PolygonIndicesListSocket"
     bl_label = "Polygon Indices List Socket"
     dataType = "Polygon Indices List"
     allowedInputTypes = ["Polygon Indices List"]

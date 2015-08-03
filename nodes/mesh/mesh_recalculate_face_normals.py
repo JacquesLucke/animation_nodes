@@ -3,7 +3,7 @@ from ... base_types.node import AnimationNode
 from ... events import propertyChanged
 
 class MeshRecalculateFaceNormals(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_MeshRecalculateFaceNormals"
+    bl_idname = "an_MeshRecalculateFaceNormals"
     bl_label = "Recalculate Normals"
 
     inputNames = { "Mesh" : "bm" }
@@ -12,8 +12,8 @@ class MeshRecalculateFaceNormals(bpy.types.Node, AnimationNode):
     invert = bpy.props.BoolProperty(name = "Invert Normals", update = propertyChanged)
 
     def create(self):
-        self.inputs.new("mn_MeshSocket", "Mesh")
-        self.outputs.new("mn_MeshSocket", "Mesh")
+        self.inputs.new("an_MeshSocket", "Mesh")
+        self.outputs.new("an_MeshSocket", "Mesh")
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "invert")

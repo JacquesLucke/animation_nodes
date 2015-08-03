@@ -4,7 +4,7 @@ from ... utils.nodes import NodeTreeInfo
 from ... sockets.info import toBaseIdName, toListIdName
 
 class AppendListNode(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_AppendListNode"
+    bl_idname = "an_AppendListNode"
     bl_label = "Append to List"
 
     inputNames = { "List" : "list",
@@ -38,7 +38,7 @@ class AppendListNode(bpy.types.Node, AnimationNode):
             self.generateSockets(listOutputs[0].bl_idname)
             nodeTree.links.new(listOutputs[0], self.outputs.get("List"))
 
-    def generateSockets(self, listIdName = "mn_ObjectListSocket"):
+    def generateSockets(self, listIdName = "an_ObjectListSocket"):
         if listIdName is None: return
         baseIdName = toBaseIdName(listIdName)
         if baseIdName is None: return

@@ -23,7 +23,7 @@ def updateAnimationTrees(event = "NONE", sender = None):
 
             try:
                 bpy.context.scene.update()
-                if bpy.context.scene.mn_settings.update.redrawViewport:
+                if bpy.context.scene.an_settings.update.redrawViewport:
                     redraw_areas_if_possible()
             except: pass
 
@@ -68,7 +68,7 @@ def generateExecutionUnits():
     start = time.clock()
     executionUnits = getExecutionUnits()
     timeSpan = time.clock() - start
-    if bpy.context.scene.mn_settings.developer.printGenerationTime:
+    if bpy.context.scene.an_settings.developer.printGenerationTime:
         print("Script Gen. " + str(round(timeSpan, 7)) + " s  -  " + str(round(1/timeSpan, 5)) + " fps")
 
 

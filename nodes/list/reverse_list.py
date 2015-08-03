@@ -3,7 +3,7 @@ from ... base_types.node import AnimationNode
 from ... utils.nodes import NodeTreeInfo
 
 class ReverseListNode(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_ReverseListNode"
+    bl_idname = "an_ReverseListNode"
     bl_label = "Reverse List"
 
     inputNames = { "List" : "list" }
@@ -29,7 +29,7 @@ class ReverseListNode(bpy.types.Node, AnimationNode):
             self.generateSockets(targetSockets[0].bl_idname)
             nodeTree.links.new(targetSockets[0], self.outputs.get("Reversed List"))
 
-    def generateSockets(self, listIdName = "mn_ObjectListSocket"):
+    def generateSockets(self, listIdName = "an_ObjectListSocket"):
         if listIdName is None: return
         if listIdName == getattr(self.inputs.get("List"), "bl_idname", None): return
 

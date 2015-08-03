@@ -5,7 +5,7 @@ from ... events import executionCodeChanged
 operationItems = [("MULTIPLY", "Multiply", "")]
 
 class MatrixMath(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_MatrixMath"
+    bl_idname = "an_MatrixMath"
     bl_label = "Matrix Math"
     isDetermined = True
 
@@ -17,9 +17,9 @@ class MatrixMath(bpy.types.Node, AnimationNode):
     operation = bpy.props.EnumProperty(name = "Operation", items = operationItems, update = executionCodeChanged)
 
     def create(self):
-        self.inputs.new("mn_MatrixSocket", "A")
-        self.inputs.new("mn_MatrixSocket", "B")
-        self.outputs.new("mn_MatrixSocket", "Result")
+        self.inputs.new("an_MatrixSocket", "A")
+        self.inputs.new("an_MatrixSocket", "B")
+        self.outputs.new("an_MatrixSocket", "Result")
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "operation", text = "")

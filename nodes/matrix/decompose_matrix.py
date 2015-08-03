@@ -2,7 +2,7 @@ import bpy
 from ... base_types.node import AnimationNode
 
 class DecomposeMatrix(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_DecomposeMatrix"
+    bl_idname = "an_DecomposeMatrix"
     bl_label = "Decompose Matrix"
     isDetermined = True
 
@@ -13,10 +13,10 @@ class DecomposeMatrix(bpy.types.Node, AnimationNode):
                     "Scale" : "scale" }
 
     def create(self):
-        self.inputs.new("mn_MatrixSocket", "Matrix")
-        self.outputs.new("mn_VectorSocket", "Translation")
-        self.outputs.new("mn_VectorSocket", "Rotation")
-        self.outputs.new("mn_VectorSocket", "Scale")
+        self.inputs.new("an_MatrixSocket", "Matrix")
+        self.outputs.new("an_VectorSocket", "Translation")
+        self.outputs.new("an_VectorSocket", "Rotation")
+        self.outputs.new("an_VectorSocket", "Scale")
 
     def getExecutionCode(self, usedOutputs):
         codeLines = []

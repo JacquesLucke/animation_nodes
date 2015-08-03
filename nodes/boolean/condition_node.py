@@ -2,7 +2,7 @@ import bpy
 from ... base_types.node import AnimationNode
 
 class ConditionNode(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_ConditionNode"
+    bl_idname = "an_ConditionNode"
     bl_label = "Condition"
     
     inputNames = { "Condition" : "condition",
@@ -13,11 +13,11 @@ class ConditionNode(bpy.types.Node, AnimationNode):
                     "Other" : "other" }                  
     
     def create(self):
-        self.inputs.new("mn_BooleanSocket", "Condition")
-        self.inputs.new("mn_GenericSocket", "If True")
-        self.inputs.new("mn_GenericSocket", "If False")
-        self.outputs.new("mn_GenericSocket", "Output")
-        self.outputs.new("mn_GenericSocket", "Other")
+        self.inputs.new("an_BooleanSocket", "Condition")
+        self.inputs.new("an_GenericSocket", "If True")
+        self.inputs.new("an_GenericSocket", "If False")
+        self.outputs.new("an_GenericSocket", "Output")
+        self.outputs.new("an_GenericSocket", "Other")
         
     def getExecutionCode(self):
         return "$output$ = %ifTrue% if %condition% else %ifFalse%" + "\n" + \

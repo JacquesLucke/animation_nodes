@@ -4,7 +4,7 @@ from ... old_utils import getConnectionDictionaries, tryToSetConnectionDictionar
 from ... sockets.info import *
 
 class ConvertNode(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_ConvertNode"
+    bl_idname = "an_ConvertNode"
     bl_label = "Convert"
     isDetermined = True
 
@@ -14,7 +14,7 @@ class ConvertNode(bpy.types.Node, AnimationNode):
     convertType = bpy.props.StringProperty(default = "Integer")
 
     def create(self):
-        self.inputs.new("mn_GenericSocket", "Old")
+        self.inputs.new("an_GenericSocket", "Old")
         self.buildOutputSocket()
 
     def edit(self):

@@ -4,7 +4,7 @@ from .. events import propertyChanged
 from .. base_types.socket import AnimationNodeSocket
 
 class ColorSocket(bpy.types.NodeSocket, AnimationNodeSocket):
-    bl_idname = "mn_ColorSocket"
+    bl_idname = "an_ColorSocket"
     bl_label = "Color Socket"
     dataType = "Color"
     allowedInputTypes = ["Color"]

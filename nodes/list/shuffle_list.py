@@ -4,7 +4,7 @@ from ... utils.nodes import NodeTreeInfo
 from ... sockets.info import isList
 
 class ShuffleListNode(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_ShuffleListNode"
+    bl_idname = "an_ShuffleListNode"
     bl_label = "Shuffle List"
 
     inputNames = { "List" : "list",
@@ -36,7 +36,7 @@ class ShuffleListNode(bpy.types.Node, AnimationNode):
             self.generateSockets(targetSockets[0].bl_idname)
             nodeTree.links.new(targetSockets[0], self.outputs.get("Shuffled List"))
 
-    def generateSockets(self, listIdName = "mn_ObjectListSocket"):
+    def generateSockets(self, listIdName = "an_ObjectListSocket"):
         if listIdName is None: return
         if listIdName == getattr(self.inputs.get("List"), "bl_idname", None): return
         if not isList(listIdName): return
@@ -44,5 +44,5 @@ class ShuffleListNode(bpy.types.Node, AnimationNode):
         self.inputs.clear()
         self.outputs.clear()
         self.inputs.new(listIdName, "List")
-        self.inputs.new("mn_IntegerSocket", "Seed")
+        self.inputs.new("an_IntegerSocket", "Seed")
         self.outputs.new(listIdName, "Shuffled List")

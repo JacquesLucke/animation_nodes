@@ -2,8 +2,8 @@ import bpy
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 
-class mn_ObjectTransformsOutput(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_ObjectTransformsOutput"
+class an_ObjectTransformsOutput(bpy.types.Node, AnimationNode):
+    bl_idname = "an_ObjectTransformsOutput"
     bl_label = "Transforms Output"
 
     inputNames = { "Object" : "object",
@@ -22,11 +22,11 @@ class mn_ObjectTransformsOutput(bpy.types.Node, AnimationNode):
     useScale = bpy.props.BoolVectorProperty(update = checkedPropertiesChanged)
 
     def create(self):
-        self.inputs.new("mn_ObjectSocket", "Object").showName = False
-        self.inputs.new("mn_VectorSocket", "Location")
-        self.inputs.new("mn_VectorSocket", "Rotation")
-        self.inputs.new("mn_VectorSocket", "Scale").value = (1, 1, 1)
-        self.outputs.new("mn_ObjectSocket", "Object")
+        self.inputs.new("an_ObjectSocket", "Object").showName = False
+        self.inputs.new("an_VectorSocket", "Location")
+        self.inputs.new("an_VectorSocket", "Rotation")
+        self.inputs.new("an_VectorSocket", "Scale").value = (1, 1, 1)
+        self.outputs.new("an_ObjectSocket", "Object")
         self.updateSocketVisibility()
 
     def draw_buttons(self, context, layout):

@@ -2,7 +2,7 @@ import bpy
 from .. base_types.socket import AnimationNodeSocket
 
 class GenericSocket(bpy.types.NodeSocket, AnimationNodeSocket):
-    bl_idname = "mn_GenericSocket"
+    bl_idname = "an_GenericSocket"
     bl_label = "Generic Socket"
     dataType = "Generic"
     allowedInputTypes = ["all"]

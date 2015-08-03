@@ -7,7 +7,7 @@ from ... cache import getUniformRandom
 from ... base_types.node import AnimationNode
 
 class RandomVectorNode(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_RandomVectorNode"
+    bl_idname = "an_RandomVectorNode"
     bl_label = "Random Vector"
     isDetermined = True
 
@@ -19,9 +19,9 @@ class RandomVectorNode(bpy.types.Node, AnimationNode):
     additionalSeed = IntProperty(update = propertyChanged)
 
     def create(self):
-        self.inputs.new("mn_IntegerSocket", "Seed")
-        self.inputs.new("mn_FloatSocket", "Max Values").value = 5.0
-        self.outputs.new("mn_VectorSocket", "Vector")
+        self.inputs.new("an_IntegerSocket", "Seed")
+        self.inputs.new("an_FloatSocket", "Max Values").value = 5.0
+        self.outputs.new("an_VectorSocket", "Vector")
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "additionalSeed", text = "Additional Seed")

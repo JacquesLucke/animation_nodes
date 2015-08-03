@@ -14,7 +14,7 @@ class AnimationNode:
 
     @classmethod
     def poll(cls, nodeTree):
-        return nodeTree.bl_idname == "mn_AnimationNodeTree"
+        return nodeTree.bl_idname == "an_AnimationNodeTree"
 
     # On creation
     def init(self, context):

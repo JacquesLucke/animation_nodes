@@ -11,7 +11,7 @@ splitTypes = [
     ("Regexp", "Regexp", "") ]
 
 class SplitText(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_SplitText"
+    bl_idname = "an_SplitText"
     bl_label = "Split Text"
 
     inputNames = { "Text" : "text",
@@ -29,10 +29,10 @@ class SplitText(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.width = 190
-        self.inputs.new("mn_StringSocket", "Text")
-        self.inputs.new("mn_StringSocket", "Split By")
-        self.outputs.new("mn_StringListSocket", "Text List")
-        self.outputs.new("mn_IntegerSocket", "Length")
+        self.inputs.new("an_StringSocket", "Text")
+        self.inputs.new("an_StringSocket", "Split By")
+        self.outputs.new("an_StringListSocket", "Text List")
+        self.outputs.new("an_IntegerSocket", "Length")
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "splitType", text = "Type")

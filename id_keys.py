@@ -57,7 +57,7 @@ def getIDKeys():
     return getIDKeySettings().keys
     
 def getIDKeySettings():
-    return bpy.context.scene.mn_settings.idKeys
+    return bpy.context.scene.an_settings.idKeys
 
     
 def createIDKey(id, type):
@@ -156,10 +156,10 @@ class TransformsIDType:
     @staticmethod
     def drawOperators(layout, object, id):
         row = layout.row(align = True)
-        props = row.operator("mn.set_current_transforms", text = "Use Current Transforms")
+        props = row.operator("an.set_current_transforms", text = "Use Current Transforms")
         props.id = id
         props.allSelectedObjects = False
-        props = row.operator("mn.set_current_transforms", icon = "WORLD", text = "")
+        props = row.operator("an.set_current_transforms", icon = "WORLD", text = "")
         props.id = id
         props.allSelectedObjects = True
         
@@ -211,10 +211,10 @@ class StringIDType(SimpleIDType):
     @staticmethod
     def drawOperators(layout, object, id):
         row = layout.row(align = True)
-        props = row.operator("mn.set_current_texts", text = "Use Current Texts")
+        props = row.operator("an.set_current_texts", text = "Use Current Texts")
         props.id = id
         props.allSelectedObjects = False
-        props = row.operator("mn.set_current_texts", icon = "WORLD", text = "")
+        props = row.operator("an.set_current_texts", icon = "WORLD", text = "")
         props.id = id
         props.allSelectedObjects = True    
         
@@ -236,7 +236,7 @@ idTypeItems = [
 ##############################
 
 class IDKeysManagerPanel(bpy.types.Panel):
-    bl_idname = "mn.id_keys_manager"
+    bl_idname = "an.id_keys_manager"
     bl_label = "ID Keys Manager"
     bl_space_type = "VIEW_3D"
     bl_region_type = "TOOLS"
@@ -261,19 +261,19 @@ class IDKeysManagerPanel(bpy.types.Panel):
             row.label(item.type)
             hideIcon = "RESTRICT_VIEW_ON" if item.hide else "RESTRICT_VIEW_OFF"
             row.prop(item, "hide", icon = hideIcon, emboss = False, icon_only = True)
-            props = row.operator("mn.remove_id_key", icon = "X", emboss = False, text = "")
+            props = row.operator("an.remove_id_key", icon = "X", emboss = False, text = "")
             props.id = item.id
             
     def drawNewKeyRow(self, layout):
-        idKeySettings = bpy.context.scene.mn_settings.idKeys   
+        idKeySettings = bpy.context.scene.an_settings.idKeys   
         row = layout.row(align = True)
         row.prop(idKeySettings, "newKeyName", text = "")
         row.prop(idKeySettings, "newKeyType", text = "")
-        row.operator("mn.new_id_key", icon = "PLUS", text = "")
+        row.operator("an.new_id_key", icon = "PLUS", text = "")
         
         
 class IDKeyPanel(bpy.types.Panel):
-    bl_idname = "mn.id_keys"
+    bl_idname = "an.id_keys"
     bl_label = "ID Keys for Active Object"
     bl_space_type = "VIEW_3D"
     bl_region_type = "TOOLS"
@@ -317,7 +317,7 @@ class IDKeyPanel(bpy.types.Panel):
             if keyExists:
                 typeClass.draw(layout, object, keyID, advanced = False)
             else: 
-                props = layout.operator("mn.create_key_on_object", icon = "NEW",  text = keyName)
+                props = layout.operator("an.create_key_on_object", icon = "NEW",  text = keyName)
                 props.id = keyID
                 props.type = keyType
                 props.objectName = object.name
@@ -334,9 +334,9 @@ class IDKeyPanel(bpy.types.Panel):
         subRow.label(keyType)
         
         if keyExists:
-            props = row.operator("mn.remove_key_from_object", icon = "X", emboss = False, text = "")
+            props = row.operator("an.remove_key_from_object", icon = "X", emboss = False, text = "")
         else:
-            props = row.operator("mn.create_key_on_object", icon = "NEW", emboss = False,  text = "")
+            props = row.operator("an.create_key_on_object", icon = "NEW", emboss = False,  text = "")
         props.id = keyID
         props.type = keyType
         props.objectName = object.name
@@ -347,7 +347,7 @@ class IDKeyPanel(bpy.types.Panel):
 ##############################
 
 class NewIdKey(bpy.types.Operator):
-    bl_idname = "mn.new_id_key"
+    bl_idname = "an.new_id_key"
     bl_label = "New ID Key"
     bl_description = "New Key"
     
@@ -370,7 +370,7 @@ class NewIdKey(bpy.types.Operator):
         
     
 class RemoveIDKey(bpy.types.Operator):
-    bl_idname = "mn.remove_id_key"
+    bl_idname = "an.remove_id_key"
     bl_label = "Remove ID Key"
     bl_description = "Remove this key"
     
@@ -380,7 +380,7 @@ class RemoveIDKey(bpy.types.Operator):
         return context.window_manager.invoke_confirm(self, event)
 
     def execute(self, context):
-        idKeys = context.scene.mn_settings.idKeys
+        idKeys = context.scene.an_settings.idKeys
         for i, item in enumerate(idKeys.keys):
             if item.id == self.id:
                 idKeys.keys.remove(i)
@@ -389,7 +389,7 @@ class RemoveIDKey(bpy.types.Operator):
         
         
 class CreateKeyOnObject(bpy.types.Operator):
-    bl_idname = "mn.create_key_on_object"
+    bl_idname = "an.create_key_on_object"
     bl_label = "Create Key on Object"
     bl_description = "Create the key on this object"
     
@@ -405,7 +405,7 @@ class CreateKeyOnObject(bpy.types.Operator):
         
         
 class RemoveKeyFromObject(bpy.types.Operator):
-    bl_idname = "mn.remove_key_from_object"
+    bl_idname = "an.remove_key_from_object"
     bl_label = "Remove Key from Object"
     bl_description = "Remove the key from this object"
     
@@ -424,7 +424,7 @@ class RemoveKeyFromObject(bpy.types.Operator):
         
         
 class SetCurrentTransforms(bpy.types.Operator):
-    bl_idname = "mn.set_current_transforms"
+    bl_idname = "an.set_current_transforms"
     bl_label = "Set Current Transforms"
     bl_description = "Set current transforms (World icon means to do this for all selected objects)"
     
@@ -441,7 +441,7 @@ class SetCurrentTransforms(bpy.types.Operator):
         
         
 class SetCurrentTexts(bpy.types.Operator):
-    bl_idname = "mn.set_current_texts"
+    bl_idname = "an.set_current_texts"
     bl_label = "Set Current Texts"
     bl_description = "Set current texts (World icon means to do this for all selected objects)"
     

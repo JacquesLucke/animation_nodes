@@ -5,7 +5,7 @@ from ... events import executionCodeChanged
 from ... sockets.info import toIdName
 
 class BlendDataNode(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_BlendDataNode"
+    bl_idname = "an_BlendDataNode"
     bl_label = "Blend Data"
     isDetermined = True
 
@@ -35,8 +35,8 @@ class BlendDataNode(bpy.types.Node, AnimationNode):
         self.outputs.clear()
 
         idName = toIdName(self.dataType)
-        self.inputs.new("mn_FloatSocket", "Factor").setMinMax(0.0, 1.0)
-        self.inputs.new("mn_InterpolationSocket", "Interpolation").showName = False
+        self.inputs.new("an_FloatSocket", "Factor").setMinMax(0.0, 1.0)
+        self.inputs.new("an_InterpolationSocket", "Interpolation").showName = False
         self.inputs.new(idName, "A")
         self.inputs.new(idName, "B")
         self.outputs.new(idName, "Output")

@@ -9,7 +9,7 @@ projectionTypeItems = [
     ("PROJECT", "Project", "") ]
 
 class RevolveSpline(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_RevolveSpline"
+    bl_idname = "an_RevolveSpline"
     bl_label = "Revolve Spline"
 
     inputNames = { "Axis" : "axis",
@@ -23,16 +23,16 @@ class RevolveSpline(bpy.types.Node, AnimationNode):
     projectionType = EnumProperty(name = "Projection Type", default = "PROJECT", items = projectionTypeItems, update = propertyChanged)
 
     def create(self):
-        self.inputs.new("mn_SplineSocket", "Axis")
-        self.inputs.new("mn_SplineSocket", "Profile")
-        socket = self.inputs.new("mn_IntegerSocket", "Spline Samples")
+        self.inputs.new("an_SplineSocket", "Axis")
+        self.inputs.new("an_SplineSocket", "Profile")
+        socket = self.inputs.new("an_IntegerSocket", "Spline Samples")
         socket.setMinMax(2, 10000)
         socket.value = 16
-        socket = self.inputs.new("mn_IntegerSocket", "Surface Samples")
+        socket = self.inputs.new("an_IntegerSocket", "Surface Samples")
         socket.setMinMax(3, 10000)
         socket.value = 16
-        self.outputs.new("mn_VectorListSocket", "Vertices")
-        self.outputs.new("mn_PolygonIndicesListSocket", "Polygons")
+        self.outputs.new("an_VectorListSocket", "Vertices")
+        self.outputs.new("an_PolygonIndicesListSocket", "Polygons")
         self.width += 20
 
     def draw_buttons(self, context, layout):

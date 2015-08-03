@@ -3,7 +3,7 @@ from ... base_types.node import AnimationNode
 
 
 class ColorMix(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_ColorMix"
+    bl_idname = "an_ColorMix"
     bl_label = "Color Mix"
     isDetermined = True
     
@@ -14,10 +14,10 @@ class ColorMix(bpy.types.Node, AnimationNode):
     outputNames = { "Color" : "color" }                  
     
     def create(self):
-        self.inputs.new("mn_FloatSocket", "Factor")
-        self.inputs.new("mn_ColorSocket", "Color 1")
-        self.inputs.new("mn_ColorSocket", "Color 2")
-        self.outputs.new("mn_ColorSocket", "Color")
+        self.inputs.new("an_FloatSocket", "Factor")
+        self.inputs.new("an_ColorSocket", "Color 1")
+        self.inputs.new("an_ColorSocket", "Color 2")
+        self.outputs.new("an_ColorSocket", "Color")
 
     def execute(self, factor, a, b):
         newColor = [0, 0, 0, 0]

@@ -18,13 +18,13 @@ class ExecutionUnit:
         self.codeObject = compile(code, "<string>", "exec")
         self.executeAmount = 0
         self.totalExecuteTime = 0.0
-        if getattr(updateSettingsNode, "bl_idname", "") == "mn_NetworkUpdateSettingsNode":
+        if getattr(updateSettingsNode, "bl_idname", "") == "an_NetworkUpdateSettingsNode":
             self.updateSettingsNode = (updateSettingsNode.id_data.name, updateSettingsNode.name)
         else: self.updateSettingsNode = None
 
     def execute(self, event = "NONE", sender = None):
-        update = bpy.context.scene.mn_settings.update
-        developer = bpy.context.scene.mn_settings.developer
+        update = bpy.context.scene.an_settings.update
+        developer = bpy.context.scene.an_settings.developer
 
         onFrameChange = update.frameChange
         onSceneUpdate = update.sceneUpdate
@@ -101,7 +101,7 @@ def isViewportRenderingActive():
 
 def getExecutionUnits():
     global useProfiling, idCounter, treeInfo
-    useProfiling = bpy.context.scene.mn_settings.developer.executionProfiling
+    useProfiling = bpy.context.scene.an_settings.developer.executionProfiling
     idCounter = 0
     correctForbiddenNodeLinks()
     treeInfo = NodeTreeInfo(getAnimationNodeTrees())
@@ -529,9 +529,9 @@ def isExecuteableNode(node):
 def isInLineNode(node):
     return useExecutionCode(node)
 def isLoopCallerNode(node):
-    return node.bl_idname == "mn_LoopCallerNode"
+    return node.bl_idname == "an_LoopCallerNode"
 def isGroupCallerNode(node):
-    return node.bl_idname == "mn_GroupCaller"
+    return node.bl_idname == "an_GroupCaller"
 
 def usesOutputUseParameter(node):
     return hasattr(node, "outputUseParameterName")

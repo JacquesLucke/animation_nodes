@@ -3,19 +3,19 @@ from functools import lru_cache
 from .. utils.enum_items import enumItemsFromList
 
 listChains = [
-    ["mn_FloatSocket", "mn_FloatListSocket"],
-    ["mn_IntegerSocket", "mn_IntegerListSocket"],
-    ["mn_VectorSocket", "mn_VectorListSocket"],
-    ["mn_ObjectSocket", "mn_ObjectListSocket"],
-    ["mn_StringSocket", "mn_StringListSocket"],
-    ["mn_VertexSocket", "mn_VertexListSocket"],
-    ["mn_PolygonSocket", "mn_PolygonListSocket"],
-    ["mn_EdgeIndicesSocket", "mn_EdgeIndicesListSocket"],
-    ["mn_PolygonIndicesSocket", "mn_PolygonIndicesListSocket"],
-    ["mn_ParticleSocket", "mn_ParticleListSocket"],
-    ["mn_ParticleSystemSocket", "mn_ParticleSystemListSocket"],
-    ["mn_SplineSocket", "mn_SplineListSocket"],
-    ["mn_MatrixSocket", "mn_MatrixListSocket"] ]
+    ["an_FloatSocket", "an_FloatListSocket"],
+    ["an_IntegerSocket", "an_IntegerListSocket"],
+    ["an_VectorSocket", "an_VectorListSocket"],
+    ["an_ObjectSocket", "an_ObjectListSocket"],
+    ["an_StringSocket", "an_StringListSocket"],
+    ["an_VertexSocket", "an_VertexListSocket"],
+    ["an_PolygonSocket", "an_PolygonListSocket"],
+    ["an_EdgeIndicesSocket", "an_EdgeIndicesListSocket"],
+    ["an_PolygonIndicesSocket", "an_PolygonIndicesListSocket"],
+    ["an_ParticleSocket", "an_ParticleListSocket"],
+    ["an_ParticleSystemSocket", "an_ParticleSystemListSocket"],
+    ["an_SplineSocket", "an_SplineListSocket"],
+    ["an_MatrixSocket", "an_MatrixListSocket"] ]
 
 
 # Check if list or base socket exists
@@ -163,4 +163,4 @@ def getSocketClasses():
     return AnimationNodeSocket.__subclasses__()
 
 def isIdName(name):
-    return name.startswith("mn_")
+    return name.startswith("an_")

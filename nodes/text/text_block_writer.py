@@ -2,7 +2,7 @@ import bpy
 from ... base_types.node import AnimationNode
 
 class TextBlockWriter(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_TextBlockWriter"
+    bl_idname = "an_TextBlockWriter"
     bl_label = "Text Block Writer"
 
     inputNames = { "Text Block" : "textBlock",
@@ -12,10 +12,10 @@ class TextBlockWriter(bpy.types.Node, AnimationNode):
     outputNames = { "Text Block" : "textBlock" }
 
     def create(self):
-        self.inputs.new("mn_TextBlockSocket", "Text Block").showName = False
-        self.inputs.new("mn_StringSocket", "Text")
-        self.inputs.new("mn_BooleanSocket", "Enabled").hide = True
-        self.outputs.new("mn_TextBlockSocket", "Text Block")
+        self.inputs.new("an_TextBlockSocket", "Text Block").showName = False
+        self.inputs.new("an_StringSocket", "Text")
+        self.inputs.new("an_BooleanSocket", "Enabled").hide = True
+        self.outputs.new("an_TextBlockSocket", "Text Block")
 
     def execute(self, textBlock, text, enabled):
         if not enabled or textBlock is None: return textBlock

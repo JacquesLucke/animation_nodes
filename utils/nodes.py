@@ -37,7 +37,7 @@ def getNodesFromType(nodeType):
 def getAnimationNodeTrees():
     nodeTrees = []
     for nodeTree in bpy.data.node_groups:
-        if nodeTree.bl_idname == "mn_AnimationNodeTree":
+        if nodeTree.bl_idname == "an_AnimationNodeTree":
             nodeTrees.append(nodeTree)
     return nodeTrees
 
@@ -144,7 +144,7 @@ class NodeTreeInfo:
             if isOtherOriginSocket(toSocket, originSocket):
                 self.setConnection(originSocket, toSocket)
     def setConnection(self, fromSocket, toSocket):
-        if toSocket.bl_idname == "mn_NodeNetworkSocket":
+        if toSocket.bl_idname == "an_NodeNetworkSocket":
             self.updateSettings[fromSocket.node] = toSocket.node
         else:
             if fromSocket not in self.outputSockets:
@@ -242,18 +242,18 @@ class NodeNetwork:
     def getLoopStartNode(self):
         if self.type != "Loop": return None
         for node in self.nodes:
-            if node.bl_idname == "mn_LoopStartNode": return node
+            if node.bl_idname == "an_LoopStartNode": return node
         return None
 
     def getGroupInputNode(self):
         if self.type != "Group": return None
         for node in self.nodes:
-            if node.bl_idname == "mn_GroupInput": return node
+            if node.bl_idname == "an_GroupInput": return node
         return None
     def getGroupOutputNode(self):
         if self.type != "Group": return None
         for node in self.nodes:
-            if node.bl_idname == "mn_GroupOutput": return node
+            if node.bl_idname == "an_GroupOutput": return node
         return None
 
     def getNetworkType(self):
@@ -262,13 +262,13 @@ class NodeNetwork:
         groupOutputAmount = 0
         totalSpecials = 0
         for node in self.nodes:
-            if node.bl_idname == "mn_LoopStartNode":
+            if node.bl_idname == "an_LoopStartNode":
                 loopStartAmount += 1
                 totalSpecials = 1
-            elif node.bl_idname == "mn_GroupInput":
+            elif node.bl_idname == "an_GroupInput":
                 groupInputAmount += 1
                 totalSpecials += 1
-            elif node.bl_idname == "mn_GroupOutput":
+            elif node.bl_idname == "an_GroupOutput":
                 groupOutputAmount += 1
                 totalSpecials += 1
         if totalSpecials == 0: return "Normal"

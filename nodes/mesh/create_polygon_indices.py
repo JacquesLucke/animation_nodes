@@ -3,7 +3,7 @@ from bpy.props import *
 from ... base_types.node import AnimationNode
 
 class CreatePolygonIndices(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_CreatePolygonIndices"
+    bl_idname = "an_CreatePolygonIndices"
     bl_label = "Create Polygon Indices"
     isDetermined = True
 
@@ -13,8 +13,8 @@ class CreatePolygonIndices(bpy.types.Node, AnimationNode):
     errorMessage = StringProperty()
 
     def create(self):
-        self.inputs.new("mn_IntegerListSocket", "Indices")
-        self.outputs.new("mn_PolygonIndicesSocket", "Polygon Indices")
+        self.inputs.new("an_IntegerListSocket", "Indices")
+        self.outputs.new("an_PolygonIndicesSocket", "Polygon Indices")
 
     def draw_buttons(self, context, layout):
         if self.errorMessage != "":

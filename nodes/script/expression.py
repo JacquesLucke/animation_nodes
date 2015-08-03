@@ -7,7 +7,7 @@ from ... old_utils import getRandomString
 defaultVariableNames = list("xyzwabcdefghijklmnopqrstuv")
 
 class ExpressionNode(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_ExpressionNode"
+    bl_idname = "an_ExpressionNode"
     bl_label = "Expression"
 
     @property
@@ -26,13 +26,13 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
     isExpressionValid = BoolProperty(default = True)
 
     def create(self):
-        socket = self.inputs.new("mn_GenericSocket", "x")
+        socket = self.inputs.new("an_GenericSocket", "x")
         socket.nameSettings.editable = True
         socket.customName = "x"
         socket.nameSettings.variable = True
         socket.removeable = True
-        self.inputs.new("mn_EmptySocket", "...").passiveSocketType = "mn_GenericSocket"
-        self.outputs.new("mn_GenericSocket", "Result")
+        self.inputs.new("an_EmptySocket", "...").passiveSocketType = "an_GenericSocket"
+        self.outputs.new("an_GenericSocket", "Result")
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "expression", text = "")
@@ -47,12 +47,12 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
                 link = links[0]
                 fromSocket = link.from_socket
                 self.inputs.remove(socket)
-                newSocket = self.inputs.new("mn_GenericSocket", self.getNotUsedSocketName())
+                newSocket = self.inputs.new("an_GenericSocket", self.getNotUsedSocketName())
                 newSocket.nameSettings.editable = True
                 newSocket.nameSettings.variable = True
                 newSocket.removeable = True
                 newSocket.customName = self.getNextCustomName()
-                self.inputs.new("mn_EmptySocket", "...").passiveSocketType = "mn_GenericSocket"
+                self.inputs.new("an_EmptySocket", "...").passiveSocketType = "an_GenericSocket"
                 self.id_data.links.new(newSocket, fromSocket)
 
     def getNextCustomName(self):

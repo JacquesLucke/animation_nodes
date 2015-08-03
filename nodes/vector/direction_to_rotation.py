@@ -7,7 +7,7 @@ trackAxisItems = [(axis, axis, "") for axis in ("X", "Y", "Z", "-X", "-Y", "-Z")
 upAxisItems = [(axis, axis, "") for axis in ("X", "Y", "Z")]
 
 class DirectionToRotation(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_DirectionToRotation"
+    bl_idname = "an_DirectionToRotation"
     bl_label = "Direction to Rotation"
 
     inputNames = { "Direction" : "direction" }
@@ -17,8 +17,8 @@ class DirectionToRotation(bpy.types.Node, AnimationNode):
     upAxis = bpy.props.EnumProperty(items = upAxisItems, update = propertyChanged, default = "X")
 
     def create(self):
-        self.inputs.new("mn_VectorSocket", "Direction")
-        self.outputs.new("mn_VectorSocket", "Rotation")
+        self.inputs.new("an_VectorSocket", "Direction")
+        self.outputs.new("an_VectorSocket", "Rotation")
         self.width += 20
 
     def draw_buttons(self, context, layout):

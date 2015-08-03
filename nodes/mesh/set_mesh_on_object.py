@@ -2,7 +2,7 @@ import bpy, bmesh
 from ... base_types.node import AnimationNode
 
 class SetMeshOnObject(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_SetMeshOnObject"
+    bl_idname = "an_SetMeshOnObject"
     bl_label = "Set Mesh on Object"
 
     inputNames = { "Object" : "object",
@@ -11,11 +11,11 @@ class SetMeshOnObject(bpy.types.Node, AnimationNode):
     outputNames = { "Object" : "object" }
 
     def create(self):
-        socket = self.inputs.new("mn_ObjectSocket", "Object")
+        socket = self.inputs.new("an_ObjectSocket", "Object")
         socket.showName = False
         socket.objectCreationType = "MESH"
-        self.inputs.new("mn_MeshSocket", "Mesh")
-        self.outputs.new("mn_ObjectSocket", "Object")
+        self.inputs.new("an_MeshSocket", "Mesh")
+        self.outputs.new("an_ObjectSocket", "Object")
 
     def execute(self, object, bm):
         if object is None: return object

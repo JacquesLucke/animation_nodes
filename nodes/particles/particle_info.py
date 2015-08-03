@@ -3,7 +3,7 @@ from ... base_types.node import AnimationNode
 
 
 class ParticleInfo(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_ParticleInfo"
+    bl_idname = "an_ParticleInfo"
     bl_label = "Particle Info"
 
     inputNames = { "Particle" : "particle" }
@@ -25,23 +25,23 @@ class ParticleInfo(bpy.types.Node, AnimationNode):
                     "Previous Angular Velocity" : "previousAngularVelocity" }
 
     def create(self):
-        self.inputs.new("mn_ParticleSocket", "Particle")
-        self.outputs.new("mn_VectorSocket", "Location")
-        self.outputs.new("mn_VectorSocket", "Rotation")
-        self.outputs.new("mn_FloatSocket", "Age")
-        self.outputs.new("mn_VectorSocket", "Velocity").hide = True
-        self.outputs.new("mn_VectorSocket", "Angular Velocity").hide = True
-        self.outputs.new("mn_FloatSocket", "Size").hide = True
-        self.outputs.new("mn_StringSocket", "Alive State").hide = True
-        self.outputs.new("mn_BooleanSocket", "Is Exist").hide = True
-        self.outputs.new("mn_BooleanSocket", "Is Visible").hide = True
-        self.outputs.new("mn_FloatSocket", "Lifetime").hide = True
-        self.outputs.new("mn_FloatSocket", "Birth Time").hide = True
-        self.outputs.new("mn_FloatSocket", "Die Time").hide = True
-        self.outputs.new("mn_VectorSocket", "Previous Location").hide = True
-        self.outputs.new("mn_VectorSocket", "Previous Rotation").hide = True
-        self.outputs.new("mn_VectorSocket", "Previous Velocity").hide = True
-        self.outputs.new("mn_VectorSocket", "Previous Angular Velocity").hide = True
+        self.inputs.new("an_ParticleSocket", "Particle")
+        self.outputs.new("an_VectorSocket", "Location")
+        self.outputs.new("an_VectorSocket", "Rotation")
+        self.outputs.new("an_FloatSocket", "Age")
+        self.outputs.new("an_VectorSocket", "Velocity").hide = True
+        self.outputs.new("an_VectorSocket", "Angular Velocity").hide = True
+        self.outputs.new("an_FloatSocket", "Size").hide = True
+        self.outputs.new("an_StringSocket", "Alive State").hide = True
+        self.outputs.new("an_BooleanSocket", "Is Exist").hide = True
+        self.outputs.new("an_BooleanSocket", "Is Visible").hide = True
+        self.outputs.new("an_FloatSocket", "Lifetime").hide = True
+        self.outputs.new("an_FloatSocket", "Birth Time").hide = True
+        self.outputs.new("an_FloatSocket", "Die Time").hide = True
+        self.outputs.new("an_VectorSocket", "Previous Location").hide = True
+        self.outputs.new("an_VectorSocket", "Previous Rotation").hide = True
+        self.outputs.new("an_VectorSocket", "Previous Velocity").hide = True
+        self.outputs.new("an_VectorSocket", "Previous Angular Velocity").hide = True
 
     def getExecutionCode(self, usedOutputs):
         codeLines = []

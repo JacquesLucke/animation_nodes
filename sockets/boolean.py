@@ -4,7 +4,7 @@ from .. events import propertyChanged
 from .. base_types.socket import AnimationNodeSocket
 
 class BooleanSocket(bpy.types.NodeSocket, AnimationNodeSocket):
-    bl_idname = "mn_BooleanSocket"
+    bl_idname = "an_BooleanSocket"
     bl_label = "Boolean Socket"
     dataType = "Boolean"
     allowedInputTypes = ["Boolean"]

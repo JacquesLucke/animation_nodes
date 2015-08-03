@@ -7,7 +7,7 @@ from ... utils.fcurve import getArrayValueAtFrame
 
 
 class ObjectTransformsInput(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_ObjectTransformsInput"
+    bl_idname = "an_ObjectTransformsInput"
     bl_label = "Object Transforms Input"
     outputUseParameterName = "usedOutputs"
 
@@ -24,11 +24,11 @@ class ObjectTransformsInput(bpy.types.Node, AnimationNode):
     frameTypesProperty = bpy.props.EnumProperty(name = "Frame Type", items = frameTypes, default = "OFFSET", update = propertyChanged)
 
     def create(self):
-        self.inputs.new("mn_ObjectSocket", "Object").showName = False
-        self.inputs.new("mn_FloatSocket", "Frame")
-        self.outputs.new("mn_VectorSocket", "Location")
-        self.outputs.new("mn_VectorSocket", "Rotation")
-        self.outputs.new("mn_VectorSocket", "Scale")
+        self.inputs.new("an_ObjectSocket", "Object").showName = False
+        self.inputs.new("an_FloatSocket", "Frame")
+        self.outputs.new("an_VectorSocket", "Location")
+        self.outputs.new("an_VectorSocket", "Rotation")
+        self.outputs.new("an_VectorSocket", "Scale")
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "frameTypesProperty")

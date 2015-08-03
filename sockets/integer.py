@@ -8,7 +8,7 @@ def setValue(self, value):
     self["value"] = min(max(self.min, value), self.max)
 
 class IntegerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
-    bl_idname = "mn_IntegerSocket"
+    bl_idname = "an_IntegerSocket"
     bl_label = "Integer Socket"
     dataType = "Integer"
     allowedInputTypes = ["Integer"]

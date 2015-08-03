@@ -5,7 +5,7 @@ from .. old_utils import getRandomString, isSocketLinked
 from . socket_function_call import getSocketFunctionCallOperatorName
 from .. utils.names import toVariableName
 
-class mn_CustomNameProperties(bpy.types.PropertyGroup):
+class an_CustomNameProperties(bpy.types.PropertyGroup):
     unique = BoolProperty(default = False)
     display = BoolProperty(default = False)
     editable = BoolProperty(default = False)
@@ -18,7 +18,7 @@ class AnimationNodeSocket:
         updateCustomName(self)
 
     customName = StringProperty(default = "custom name", update = customNameChanged)
-    nameSettings = PointerProperty(type = mn_CustomNameProperties)
+    nameSettings = PointerProperty(type = an_CustomNameProperties)
 
     removeable = BoolProperty(default = False)
     callNodeToRemove = BoolProperty(default = False)

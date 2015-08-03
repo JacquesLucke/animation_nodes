@@ -18,7 +18,7 @@ possibleProperties = {
 fillModes = ("FULL", "BACK", "FRONT", "HALF")
 
 class CurveProperties(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_CurveProperties"
+    bl_idname = "an_CurveProperties"
     bl_label = "Curve Properties"
 
     def getPossiblePropertyItems(self, context):
@@ -41,8 +41,8 @@ class CurveProperties(bpy.types.Node, AnimationNode):
     errorMessage = StringProperty(default = "")
 
     def create(self):
-        self.inputs.new("mn_ObjectSocket", "Object").showName = False
-        self.outputs.new("mn_ObjectSocket", "Object")
+        self.inputs.new("an_ObjectSocket", "Object").showName = False
+        self.outputs.new("an_ObjectSocket", "Object")
         self.width += 20
 
     def draw_buttons(self, context, layout):

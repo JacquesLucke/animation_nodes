@@ -2,7 +2,7 @@ import bpy
 from ... base_types.node import AnimationNode
 
 class SplineInfo(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_SplineInfo"
+    bl_idname = "an_SplineInfo"
     bl_label = "Spline Info"
 
     inputNames = { "Spline" : "spline" }
@@ -11,9 +11,9 @@ class SplineInfo(bpy.types.Node, AnimationNode):
                     "Cyclic" : "cyclic" }
 
     def create(self):
-        self.inputs.new("mn_SplineSocket", "Spline").showName = False
-        self.outputs.new("mn_VectorListSocket", "Points")
-        self.outputs.new("mn_BooleanSocket", "Cyclic")
+        self.inputs.new("an_SplineSocket", "Spline").showName = False
+        self.outputs.new("an_VectorListSocket", "Points")
+        self.outputs.new("an_BooleanSocket", "Cyclic")
 
     def execute(self, spline):
         spline.update()

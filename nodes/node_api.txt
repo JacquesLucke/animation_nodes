@@ -3,7 +3,7 @@ Every node is a subclass of:
     animation_nodes.base_types.node.AnimationNode
     
 necessary properties:
-    bl_idname - 'mn_' + class name
+    bl_idname - 'an_' + class name
     bl_label - default name of the node
     
 optional properties:

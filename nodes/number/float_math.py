@@ -33,7 +33,7 @@ singleInputOperations = ("SINE", "COSINE", "TANGENT", "ARCSINE",
 
 
 class FloatMathNode(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_FloatMathNode"
+    bl_idname = "an_FloatMathNode"
     bl_label = "Math"
     isDetermined = True
 
@@ -53,17 +53,17 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
         update = operationChanged)
 
     def create(self):
-        self.inputs.new("mn_FloatSocket", "A")
-        self.inputs.new("mn_FloatSocket", "B").value = 1.0
-        self.outputs.new("mn_FloatSocket", "Result")
+        self.inputs.new("an_FloatSocket", "A")
+        self.inputs.new("an_FloatSocket", "B").value = 1.0
+        self.outputs.new("an_FloatSocket", "Result")
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "operation")
 
     def getNextNodeSuggestions(self):
-        return [("mn_FloatMathNode", (0, 0)),
-                ("mn_CombineVector", (0, 0)),
-                ("mn_FloatClamp", (0, 0))]
+        return [("an_FloatMathNode", (0, 0)),
+                ("an_CombineVector", (0, 0)),
+                ("an_FloatClamp", (0, 0))]
 
     def getExecutionCode(self):
         op = self.operation

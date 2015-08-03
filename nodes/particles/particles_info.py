@@ -3,7 +3,7 @@ from ... base_types.node import AnimationNode
 
 
 class ParticlesInfo(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_ParticlesInfo"
+    bl_idname = "an_ParticlesInfo"
     bl_label = "Particles Info"
 
     inputNames = { "Particles" : "particles" }
@@ -16,13 +16,13 @@ class ParticlesInfo(bpy.types.Node, AnimationNode):
                     "Die Times" : "dieTimes" }
 
     def create(self):
-        self.inputs.new("mn_ParticleListSocket", "Particles")
-        self.outputs.new("mn_VectorListSocket", "Locations")
-        self.outputs.new("mn_VectorListSocket", "Velocities").hide = True
-        self.outputs.new("mn_FloatListSocket", "Ages").hide = True
-        self.outputs.new("mn_FloatListSocket", "Sizes").hide = True
-        self.outputs.new("mn_FloatListSocket", "Birth Times").hide = True
-        self.outputs.new("mn_FloatListSocket", "Die Times").hide = True
+        self.inputs.new("an_ParticleListSocket", "Particles")
+        self.outputs.new("an_VectorListSocket", "Locations")
+        self.outputs.new("an_VectorListSocket", "Velocities").hide = True
+        self.outputs.new("an_FloatListSocket", "Ages").hide = True
+        self.outputs.new("an_FloatListSocket", "Sizes").hide = True
+        self.outputs.new("an_FloatListSocket", "Birth Times").hide = True
+        self.outputs.new("an_FloatListSocket", "Die Times").hide = True
 
     def getExecutionCode(self, usedOutputs):
         codeLines = []

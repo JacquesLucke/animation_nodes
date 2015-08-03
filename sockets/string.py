@@ -10,7 +10,7 @@ class EnumItem(bpy.types.PropertyGroup):
     icon = StringProperty(default = "NONE")
 
 class StringSocket(bpy.types.NodeSocket, AnimationNodeSocket):
-    bl_idname = "mn_StringSocket"
+    bl_idname = "an_StringSocket"
     bl_label = "String Socket"
     dataType = "String"
     allowedInputTypes = ["String"]

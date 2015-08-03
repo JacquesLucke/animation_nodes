@@ -5,7 +5,7 @@ from ... algorithms.perlin_noise import perlinNoise
 
 
 class FloatWiggle(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_FloatWiggle"
+    bl_idname = "an_FloatWiggle"
     bl_label = "Number Wiggle"
     isDetermined = True
 
@@ -20,12 +20,12 @@ class FloatWiggle(bpy.types.Node, AnimationNode):
     additionalSeed = bpy.props.IntProperty(update = propertyChanged)
 
     def create(self):
-        self.inputs.new("mn_FloatSocket", "Seed")
-        self.inputs.new("mn_FloatSocket", "Evolution")
-        self.inputs.new("mn_FloatSocket", "Amplitude").value = 1.0
-        self.inputs.new("mn_IntegerSocket", "Octaves").value = 2
-        self.inputs.new("mn_FloatSocket", "Persistance").value = 0.3
-        self.outputs.new("mn_FloatSocket", "Number")
+        self.inputs.new("an_FloatSocket", "Seed")
+        self.inputs.new("an_FloatSocket", "Evolution")
+        self.inputs.new("an_FloatSocket", "Amplitude").value = 1.0
+        self.inputs.new("an_IntegerSocket", "Octaves").value = 2
+        self.inputs.new("an_FloatSocket", "Persistance").value = 0.3
+        self.outputs.new("an_FloatSocket", "Number")
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "additionalSeed", text = "Additional Seed")

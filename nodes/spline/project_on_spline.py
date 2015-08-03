@@ -5,7 +5,7 @@ from ... events import propertyChanged
 from ... base_types.node import AnimationNode
 
 class ProjectOnSpline(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_ProjectOnSpline"
+    bl_idname = "an_ProjectOnSpline"
     bl_label = "Project on Spline"
 
     inputNames = { "Spline" : "spline",
@@ -25,11 +25,11 @@ class ProjectOnSpline(bpy.types.Node, AnimationNode):
         update = settingChanged)
 
     def create(self):
-        self.inputs.new("mn_SplineSocket", "Spline").showName = False
-        self.inputs.new("mn_VectorSocket", "Location")
-        self.outputs.new("mn_VectorSocket", "Position")
-        self.outputs.new("mn_VectorSocket", "Tangent")
-        self.outputs.new("mn_FloatSocket", "Parameter")
+        self.inputs.new("an_SplineSocket", "Spline").showName = False
+        self.inputs.new("an_VectorSocket", "Location")
+        self.outputs.new("an_VectorSocket", "Position")
+        self.outputs.new("an_VectorSocket", "Tangent")
+        self.outputs.new("an_FloatSocket", "Parameter")
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "extended", text = "Extended")

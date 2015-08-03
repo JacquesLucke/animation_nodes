@@ -3,7 +3,7 @@ from .. data_structures.mesh import Vertex
 from .. base_types.socket import AnimationNodeSocket
 
 class VertexSocket(bpy.types.NodeSocket, AnimationNodeSocket):
-    bl_idname = "mn_VertexSocket"
+    bl_idname = "an_VertexSocket"
     bl_label = "Vertex Socket"
     dataType = "Vertex"
     allowedInputTypes = ["Vertex"]

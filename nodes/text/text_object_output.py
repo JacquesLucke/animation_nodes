@@ -14,7 +14,7 @@ options = [ ("useText", "Text"),
             ("useYOffset", "Y Offset") ]
 
 class TextOutputNode(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_TextOutputNode"
+    bl_idname = "an_TextOutputNode"
     bl_label = "Text Output"
 
     inputNames = { "Object" : "object",
@@ -47,22 +47,22 @@ class TextOutputNode(bpy.types.Node, AnimationNode):
     useYOffset = BoolProperty(default = False, update = usePropertyChanged)
 
     def create(self):
-        self.inputs.new("mn_ObjectSocket", "Object").showName = False
+        self.inputs.new("an_ObjectSocket", "Object").showName = False
 
-        self.inputs.new("mn_StringSocket", "Text")
-        self.inputs.new("mn_FloatSocket", "Extrude").value = 0.0
-        self.inputs.new("mn_FloatSocket", "Shear").value = 0.0
-        self.inputs.new("mn_FloatSocket", "Size").value = 1.0
+        self.inputs.new("an_StringSocket", "Text")
+        self.inputs.new("an_FloatSocket", "Extrude").value = 0.0
+        self.inputs.new("an_FloatSocket", "Shear").value = 0.0
+        self.inputs.new("an_FloatSocket", "Size").value = 1.0
 
-        self.inputs.new("mn_FloatSocket", "Letter Spacing").value = 1.0
-        self.inputs.new("mn_FloatSocket", "Word Spacing").value = 1.0
-        self.inputs.new("mn_FloatSocket", "Line Spacing").value = 1.0
+        self.inputs.new("an_FloatSocket", "Letter Spacing").value = 1.0
+        self.inputs.new("an_FloatSocket", "Word Spacing").value = 1.0
+        self.inputs.new("an_FloatSocket", "Line Spacing").value = 1.0
 
-        self.inputs.new("mn_FloatSocket", "X Offset").value = 0.0
-        self.inputs.new("mn_FloatSocket", "Y Offset").value = 0.0
+        self.inputs.new("an_FloatSocket", "X Offset").value = 0.0
+        self.inputs.new("an_FloatSocket", "Y Offset").value = 0.0
         self.setHideProperty()
 
-        self.outputs.new("mn_ObjectSocket", "Object")
+        self.outputs.new("an_ObjectSocket", "Object")
 
     def draw_buttons(self, context, layout):
         col = layout.column(align = True)

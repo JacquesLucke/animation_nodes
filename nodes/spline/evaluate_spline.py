@@ -5,7 +5,7 @@ from ... base_types.node import AnimationNode
 from . spline_evaluation_base import SplineEvaluationBase
 
 class EvaluateSpline(bpy.types.Node, AnimationNode, SplineEvaluationBase):
-    bl_idname = "mn_EvaluateSpline"
+    bl_idname = "an_EvaluateSpline"
     bl_label = "Evaluate Spline"
 
     inputNames = { "Spline" : "spline",
@@ -15,10 +15,10 @@ class EvaluateSpline(bpy.types.Node, AnimationNode, SplineEvaluationBase):
                     "Tangent" : "tangent" }
 
     def create(self):
-        self.inputs.new("mn_SplineSocket", "Spline").showName = False
-        self.inputs.new("mn_FloatSocket", "Parameter").value = 0.0
-        self.outputs.new("mn_VectorSocket", "Location")
-        self.outputs.new("mn_VectorSocket", "Tangent")
+        self.inputs.new("an_SplineSocket", "Spline").showName = False
+        self.inputs.new("an_FloatSocket", "Parameter").value = 0.0
+        self.outputs.new("an_VectorSocket", "Location")
+        self.outputs.new("an_VectorSocket", "Tangent")
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "parameterType", text = "")

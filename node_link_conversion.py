@@ -40,8 +40,8 @@ class ConvertParticleSystemToParticle(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType == "Particle System" and target.dataType == "Particle"
     def insert(self, nodeTree, origin, target):
-        systemInfo, listElement = insertNodes(nodeTree, ["mn_GetParticles", "mn_GetListElementNode"], origin, target)
-        listElement.generateSockets(listIdName = "mn_ParticleListSocket")
+        systemInfo, listElement = insertNodes(nodeTree, ["an_GetParticles", "an_GetListElementNode"], origin, target)
+        listElement.generateSockets(listIdName = "an_ParticleListSocket")
         nodeTree.links.new(systemInfo.inputs[0], origin)
         nodeTree.links.new(listElement.inputs[0], systemInfo.outputs[0])
         nodeTree.links.new(listElement.outputs[0], target)
@@ -50,13 +50,13 @@ class ConvertParticleSystemToParticles(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType == "Particle System" and target.dataType == "Particle List"
     def insert(self, nodeTree, origin, target):
-        insertLinkedNode(nodeTree, "mn_GetParticles", origin, target)
+        insertLinkedNode(nodeTree, "an_GetParticles", origin, target)
 
 class ConvertListToElement(LinkCorrection):
     def check(self, origin, target):
         return toBaseIdName(origin.bl_idname) == target.bl_idname
     def insert(self, nodeTree, origin, target):
-        node = insertNode(nodeTree, "mn_GetListElementNode", origin, target)
+        node = insertNode(nodeTree, "an_GetListElementNode", origin, target)
         node.generateSockets(listIdName = origin.bl_idname)
         insertBasicLinking(nodeTree, origin, node, target)
 
@@ -64,7 +64,7 @@ class ConvertElementToList(LinkCorrection):
     def check(self, origin, target):
         return origin.bl_idname == toBaseIdName(target.bl_idname)
     def insert(self, nodeTree, origin, target):
-        node = insertNode(nodeTree, "mn_CreateList", origin, target)
+        node = insertNode(nodeTree, "an_CreateList", origin, target)
         node.assignListType(origin.dataType, inputAmount = 1)
         insertBasicLinking(nodeTree, origin, node, target)
 
@@ -72,32 +72,32 @@ class ConvertMeshDataToMesh(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType == "Mesh Data" and target.dataType == "Mesh"
     def insert(self, nodeTree, origin, target):
-        insertLinkedNode(nodeTree, "mn_CreateMeshFromData", origin, target)
+        insertLinkedNode(nodeTree, "an_CreateMeshFromData", origin, target)
 
 class ConvertMeshDataToVertexLocations(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType == "Mesh Data" and target.dataType == "Vector List"
     def insert(self, nodeTree, origin, target):
-        insertLinkedNode(nodeTree, "mn_SeparateMeshData", origin, target)
+        insertLinkedNode(nodeTree, "an_SeparateMeshData", origin, target)
 
 class ConvertVertexLocationsToMeshData(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType == "Vector List" and target.dataType == "Mesh Data"
     def insert(self, nodeTree, origin, target):
-        insertLinkedNode(nodeTree, "mn_CombineMeshData", origin, target)
+        insertLinkedNode(nodeTree, "an_CombineMeshData", origin, target)
 
 class ConvertPolygonListIndicesToEdgeListIndices(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType == "Polygon Indices List" and target.dataType == "Edge Indices List"
     def insert(self, nodeTree, origin, target):
-        insertLinkedNode(nodeTree, "mn_EdgesOfPolygons", origin, target)
+        insertLinkedNode(nodeTree, "an_EdgesOfPolygons", origin, target)
 
 class ConvertSeparatedMathDataToMesh(LinkCorrection):
     separatedMeshDataTypes = ["Vector List", "Edge Indices List", "Polygon Indices List"]
     def check(self, origin, target):
         return origin.dataType in self.separatedMeshDataTypes and target.dataType == "Mesh"
     def insert(self, nodeTree, origin, target):
-        toMeshData, toMesh = insertNodes(nodeTree, ["mn_CombineMeshData", "mn_CreateMeshFromData"], origin, target)
+        toMeshData, toMesh = insertNodes(nodeTree, ["an_CombineMeshData", "an_CreateMeshFromData"], origin, target)
         nodeTree.links.new(toMeshData.inputs[self.separatedMeshDataTypes.index(origin.dataType)], origin)
         nodeTree.links.new(toMesh.inputs[0], toMeshData.outputs[0])
         nodeTree.links.new(toMesh.outputs[0], target)
@@ -106,50 +106,50 @@ class ConvertToVector(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType in ["Integer", "Float"] and target.dataType == "Vector"
     def insert(self, nodeTree, origin, target):
-        insertLinkedNode(nodeTree, "mn_CombineVector", origin, target)
+        insertLinkedNode(nodeTree, "an_CombineVector", origin, target)
 
 class ConvertVectorToNumber(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType == "Vector" and target.dataType == "Float"
     def insert(self, nodeTree, origin, target):
-        insertLinkedNode(nodeTree, "mn_SeparateVector", origin, target)
+        insertLinkedNode(nodeTree, "an_SeparateVector", origin, target)
 
 class ConvertTextBlockToString(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType == "Text Block" and target.dataType == "String"
     def insert(self, nodeTree, origin, target):
-        insertLinkedNode(nodeTree, "mn_TextBlockReader", origin, target)
+        insertLinkedNode(nodeTree, "an_TextBlockReader", origin, target)
 
 class ConvertVectorToMatrix(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType == "Vector" and target.dataType == "Matrix"
     def insert(self, nodeTree, origin, target):
-        insertLinkedNode(nodeTree, "mn_TranslationMatrix", origin, target)
+        insertLinkedNode(nodeTree, "an_TranslationMatrix", origin, target)
 
 class ConvertListToLength(LinkCorrection):
     def check(self, origin, target):
         return "List" in origin.dataType and target.dataType == "Integer"
     def insert(self, nodeTree, origin, target):
-        insertLinkedNode(nodeTree, "mn_GetListLengthNode", origin, target)
+        insertLinkedNode(nodeTree, "an_GetListLengthNode", origin, target)
 
 class ConverFloatToInteger(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType == "Float" and target.dataType == "Integer"
     def insert(self, nodeTree, origin, target):
-        node = insertLinkedNode(nodeTree, "mn_FloatToInteger", origin, target)
+        node = insertLinkedNode(nodeTree, "an_FloatToInteger", origin, target)
 
 class ConvertToBasicTypes(LinkCorrection):
     def check(self, origin, target):
         return target.dataType in ["String", "Integer", "Float"]
     def insert(self, nodeTree, origin, target):
-        node = insertLinkedNode(nodeTree, "mn_ConvertNode", origin, target)
+        node = insertLinkedNode(nodeTree, "an_ConvertNode", origin, target)
         node.edit()
 
 class ConvertFromGeneric(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType == "Generic"
     def insert(self, nodeTree, origin, target):
-        node = insertLinkedNode(nodeTree, "mn_ConvertNode", origin, target)
+        node = insertLinkedNode(nodeTree, "an_ConvertNode", origin, target)
         node.edit()
 
 

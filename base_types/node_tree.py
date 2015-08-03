@@ -3,7 +3,7 @@ from bpy.props import *
 from .. events import treeChanged
 
 class AnimationNodeTree(bpy.types.NodeTree):
-    bl_idname = "mn_AnimationNodeTree"
+    bl_idname = "an_AnimationNodeTree"
     bl_label = "Animation";
     bl_icon = "ACTION"
 

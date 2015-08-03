@@ -3,7 +3,7 @@ from ... events import propertyChanged
 from ... base_types.node import AnimationNode
 
 class ObjectGroupInput(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_ObjectGroupInput"
+    bl_idname = "an_ObjectGroupInput"
     bl_label = "Object Group Input"
 
     inputNames = { "Group" : "group" }
@@ -12,8 +12,8 @@ class ObjectGroupInput(bpy.types.Node, AnimationNode):
     groupName = bpy.props.StringProperty(default = "", update = propertyChanged)
 
     def create(self):
-        self.inputs.new("mn_ObjectGroupSocket", "Group").showName = False
-        self.outputs.new("mn_ObjectListSocket", "Objects")
+        self.inputs.new("an_ObjectGroupSocket", "Group").showName = False
+        self.outputs.new("an_ObjectListSocket", "Objects")
 
     def execute(self, group):
         return getattr(group, "objects", [])

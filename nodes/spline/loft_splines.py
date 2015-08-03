@@ -13,7 +13,7 @@ sampleDistributionTypeItems = [
     ("UNIFORM", "Uniform", "")]
 
 class LoftSplines(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_LoftSplines"
+    bl_idname = "an_LoftSplines"
     bl_label = "Loft Splines"
 
     inputNames = { "Splines" : "splines",
@@ -38,22 +38,22 @@ class LoftSplines(bpy.types.Node, AnimationNode):
     surfaceDistributionType = EnumProperty(name = "Surface Distribution", default = "RESOLUTION", items = sampleDistributionTypeItems, update = propertyChanged)
 
     def create(self):
-        self.inputs.new("mn_SplineListSocket", "Splines")
-        socket1 = self.inputs.new("mn_IntegerSocket", "Spline Samples")
-        socket2 = self.inputs.new("mn_IntegerSocket", "Surface Samples")
+        self.inputs.new("an_SplineListSocket", "Splines")
+        socket1 = self.inputs.new("an_IntegerSocket", "Spline Samples")
+        socket2 = self.inputs.new("an_IntegerSocket", "Surface Samples")
         for socket in (socket1, socket2):
             socket.value = 16
             socket.setMinMax(2, 100000)
-        self.inputs.new("mn_BooleanSocket", "Cyclic").value = False
-        self.inputs.new("mn_FloatSocket", "Smoothness").value = 0.3333
-        socket = self.inputs.new("mn_FloatSocket", "Start")
+        self.inputs.new("an_BooleanSocket", "Cyclic").value = False
+        self.inputs.new("an_FloatSocket", "Smoothness").value = 0.3333
+        socket = self.inputs.new("an_FloatSocket", "Start")
         socket.value, socket.hide = 0.0, True
         socket.setMinMax(0.0, 1.0)
-        socket = self.inputs.new("mn_FloatSocket", "End")
+        socket = self.inputs.new("an_FloatSocket", "End")
         socket.value, socket.hide = 1.0, True
         socket.setMinMax(0.0, 1.0)
-        self.outputs.new("mn_VectorListSocket", "Vertices")
-        self.outputs.new("mn_PolygonIndicesListSocket", "Polygons")
+        self.outputs.new("an_VectorListSocket", "Vertices")
+        self.outputs.new("an_PolygonIndicesListSocket", "Polygons")
         self.width += 20
         self.settingChanged(bpy.context)
 

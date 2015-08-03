@@ -3,7 +3,7 @@ from bpy.props import *
 from ... base_types.node import AnimationNode
 
 class DebugOutputNode(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_DebugOutputNode"
+    bl_idname = "an_DebugOutputNode"
     bl_label = "Debug Output"
     
     inputNames = { "Data" : "data" }
@@ -20,7 +20,7 @@ class DebugOutputNode(bpy.types.Node, AnimationNode):
     debugOutputString = StringProperty(default = "")
     
     def create(self):
-        self.inputs.new("mn_GenericSocket", "Data")
+        self.inputs.new("an_GenericSocket", "Data")
         self.bl_width_max = 10000
         
     def draw_buttons(self, context, layout):

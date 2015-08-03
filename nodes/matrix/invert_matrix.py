@@ -2,7 +2,7 @@ import bpy
 from ... base_types.node import AnimationNode
 
 class InvertMatrix(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_InvertMatrix"
+    bl_idname = "an_InvertMatrix"
     bl_label = "Invert Matrix"
     isDetermined = True
 
@@ -10,8 +10,8 @@ class InvertMatrix(bpy.types.Node, AnimationNode):
     outputNames = { "Inverted Matrix" : "matrix" }
 
     def create(self):
-        self.inputs.new("mn_MatrixSocket", "Matrix")
-        self.outputs.new("mn_MatrixSocket", "Inverted Matrix")
+        self.inputs.new("an_MatrixSocket", "Matrix")
+        self.outputs.new("an_MatrixSocket", "Inverted Matrix")
 
     def draw_buttons(self, context, layout):
         layout.separator()

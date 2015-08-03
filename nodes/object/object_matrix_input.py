@@ -3,7 +3,7 @@ from ... base_types.node import AnimationNode
 
 
 class ObjectMatrixInput(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_ObjectMatrixInput"
+    bl_idname = "an_ObjectMatrixInput"
     bl_label = "Object Matrix Input"
 
     inputNames = { "Object" : "object" }
@@ -14,11 +14,11 @@ class ObjectMatrixInput(bpy.types.Node, AnimationNode):
                     "World" : "world" }
 
     def create(self):
-        self.inputs.new("mn_ObjectSocket", "Object").showName = False
-        self.outputs.new("mn_MatrixSocket", "Basis")
-        self.outputs.new("mn_MatrixSocket", "Local")
-        self.outputs.new("mn_MatrixSocket", "Parent Inverse")
-        self.outputs.new("mn_MatrixSocket", "World")
+        self.inputs.new("an_ObjectSocket", "Object").showName = False
+        self.outputs.new("an_MatrixSocket", "Basis")
+        self.outputs.new("an_MatrixSocket", "Local")
+        self.outputs.new("an_MatrixSocket", "Parent Inverse")
+        self.outputs.new("an_MatrixSocket", "World")
 
     def getExecutionCode(self, usedOutputs):
         codeLines = []

@@ -9,7 +9,7 @@ def setValue(self, value):
     self["value"] = min(max(self.min, value), self.max)
 
 class FloatSocket(bpy.types.NodeSocket, AnimationNodeSocket):
-    bl_idname = "mn_FloatSocket"
+    bl_idname = "an_FloatSocket"
     bl_label = "Float Socket"
     dataType = "Float"
     allowedInputTypes = ["Float", "Integer"]

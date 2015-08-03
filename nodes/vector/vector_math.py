@@ -10,7 +10,7 @@ operationItems = [
     ("CROSS", "Cross Product", "Calculate the cross/vector product, yielding a vector that is orthogonal to both input vectors") ]
 
 class VectorMathNode(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_VectorMathNode"
+    bl_idname = "an_VectorMathNode"
     bl_label = "Vector Math"
     isDetermined = True
 
@@ -22,9 +22,9 @@ class VectorMathNode(bpy.types.Node, AnimationNode):
     operation = bpy.props.EnumProperty(name = "Operation", items = operationItems, default = "ADD", update = executionCodeChanged)
 
     def create(self):
-        self.inputs.new("mn_VectorSocket", "A")
-        self.inputs.new("mn_VectorSocket", "B")
-        self.outputs.new("mn_VectorSocket", "Result")
+        self.inputs.new("an_VectorSocket", "A")
+        self.inputs.new("an_VectorSocket", "B")
+        self.outputs.new("an_VectorSocket", "Result")
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "operation")

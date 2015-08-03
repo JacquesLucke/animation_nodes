@@ -5,7 +5,7 @@ from ... sockets.info import getDataTypeItems, toIdName
 
 
 class DataInput(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_DataInput"
+    bl_idname = "an_DataInput"
     bl_label = "Data Input"
 
     inputNames = { "Input" : "input" }

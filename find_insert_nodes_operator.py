@@ -17,7 +17,7 @@ def getItems(self, context):
     return items
 
 class InsertNodeOperator(bpy.types.Operator):
-    bl_idname = "mn.insert_node"
+    bl_idname = "an.insert_node"
     bl_label = "Find and Insert Node"
     bl_options = {"REGISTER"}
     bl_property = "item"
@@ -41,10 +41,10 @@ def drawNodeTreeChooser(self, context):
     layout = self.layout
     nodeTrees = getAnimationNodeTrees()
     if len(nodeTrees) == 0:
-        layout.operator("mn.create_node_tree", text = "New Node Tree", icon = "PLUS")
+        layout.operator("an.create_node_tree", text = "New Node Tree", icon = "PLUS")
     else:
         for nodeTree in nodeTrees:
-            props = layout.operator("mn.select_node_tree", text = "Select '{}'".format(nodeTree.name), icon = "EYEDROPPER")
+            props = layout.operator("an.select_node_tree", text = "Select '{}'".format(nodeTree.name), icon = "EYEDROPPER")
             props.nodeTreeName = nodeTree.name
 
 def getNodeTree():

@@ -4,7 +4,7 @@ from .. events import propertyChanged
 from .. base_types.socket import AnimationNodeSocket
 
 class VectorSocket(bpy.types.NodeSocket, AnimationNodeSocket):
-    bl_idname = "mn_VectorSocket"
+    bl_idname = "an_VectorSocket"
     bl_label = "Vector Socket"
     dataType = "Vector"
     allowedInputTypes = ["Vector"]

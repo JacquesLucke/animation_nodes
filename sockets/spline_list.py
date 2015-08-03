@@ -5,7 +5,7 @@ from .. base_types.socket import AnimationNodeSocket
 from .. data_structures.splines.from_blender import createSplinesFromBlenderObject
 
 class SplineListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
-    bl_idname = "mn_SplineListSocket"
+    bl_idname = "an_SplineListSocket"
     bl_label = "Spline List Socket"
     dataType = "Spline List"
     allowedInputTypes = ["Spline List"]

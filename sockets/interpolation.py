@@ -22,7 +22,7 @@ backCategoryItems = [("IN", "In", ""),
                     ("OUT", "Out", "")]
 
 class InterpolationSocket(bpy.types.NodeSocket, AnimationNodeSocket):
-    bl_idname = "mn_InterpolationSocket"
+    bl_idname = "an_InterpolationSocket"
     bl_label = "Interpolation Socket"
     dataType = "Interpolation"
     allowedInputTypes = ["Interpolation"]

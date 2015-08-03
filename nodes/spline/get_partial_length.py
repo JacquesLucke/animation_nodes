@@ -3,7 +3,7 @@ from ... base_types.node import AnimationNode
 from . spline_evaluation_base import SplineEvaluationBase
 
 class GetSplineLength(bpy.types.Node, AnimationNode, SplineEvaluationBase):
-    bl_idname = "mn_GetSplineLength"
+    bl_idname = "an_GetSplineLength"
     bl_label = "Get Spline Length"
 
     inputNames = { "Spline" : "spline",
@@ -13,13 +13,13 @@ class GetSplineLength(bpy.types.Node, AnimationNode, SplineEvaluationBase):
     outputNames = { "Length" : "length" }
 
     def create(self):
-        self.inputs.new("mn_SplineSocket", "Spline").showName = False
-        socket = self.inputs.new("mn_FloatSocket", "Start")
+        self.inputs.new("an_SplineSocket", "Spline").showName = False
+        socket = self.inputs.new("an_FloatSocket", "Start")
         socket.setMinMax(0, 100000)
-        socket = self.inputs.new("mn_FloatSocket", "End")
+        socket = self.inputs.new("an_FloatSocket", "End")
         socket.setMinMax(0, 100000)
         socket.value = 1.0
-        self.outputs.new("mn_FloatSocket", "Length")
+        self.outputs.new("an_FloatSocket", "Length")
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "parameterType", text = "")

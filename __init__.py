@@ -89,9 +89,9 @@ def register_keymaps():
     global addon_keymaps
     wm = bpy.context.window_manager
     km = wm.keyconfigs.addon.keymaps.new(name = "Node Editor", space_type = "NODE_EDITOR")
-    kmi = km.keymap_items.new("mn.insert_node", type = "A", value = "PRESS", ctrl = True)
+    kmi = km.keymap_items.new("an.insert_node", type = "A", value = "PRESS", ctrl = True)
     kmi = km.keymap_items.new("wm.call_menu_pie", type = "W", value = "PRESS")
-    kmi.properties.name = "mn.context_pie"
+    kmi.properties.name = "an.context_pie"
     addon_keymaps.append(km)
 
 def unregister_keymaps():
@@ -121,7 +121,7 @@ def register():
     sequencer_sound.register_handlers()
     registerMenu()
     register_keymaps()
-    bpy.types.Scene.mn_settings = PointerProperty(type = AnimationNodesSettings, name = "Animation Node Settings")
+    bpy.types.Scene.an_settings = PointerProperty(type = AnimationNodesSettings, name = "Animation Node Settings")
 
     print("Registered Animation Nodes with {} modules.".format(len(modules)))
 

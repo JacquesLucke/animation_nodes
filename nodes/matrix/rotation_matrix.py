@@ -5,7 +5,7 @@ from ... events import executionCodeChanged
 axisItems = [("X", "X", ""), ("Y", "Y", ""), ("Z", "Z", "")]
 
 class RotationMatrix(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_RotationMatrix"
+    bl_idname = "an_RotationMatrix"
     bl_label = "Rotation Matrix"
     isDetermined = True
 
@@ -15,8 +15,8 @@ class RotationMatrix(bpy.types.Node, AnimationNode):
     axis = bpy.props.EnumProperty(items = axisItems, update = executionCodeChanged)
 
     def create(self):
-        self.inputs.new("mn_FloatSocket", "Angle")
-        self.outputs.new("mn_MatrixSocket", "Matrix")
+        self.inputs.new("an_FloatSocket", "Angle")
+        self.outputs.new("an_MatrixSocket", "Matrix")
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "axis", expand = True)

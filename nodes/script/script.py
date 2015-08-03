@@ -9,7 +9,7 @@ from ... sockets.info import getDataTypeItems, toIdName
 emptySocketName = "New Socket"
 
 class ScriptNode(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_ScriptNode"
+    bl_idname = "an_ScriptNode"
     bl_label = "Script"
 
     def makeFromClipboardChanged(self, context):
@@ -45,7 +45,7 @@ class ScriptNode(bpy.types.Node, AnimationNode):
         if not self.hideEditableElements:
             row = layout.row(align = True)
             row.prop_search(self, "textBlockName",  bpy.data, "texts", text = "")
-            operator = row.operator("mn.open_new_script", text = "", icon = "PLUS")
+            operator = row.operator("an.open_new_script", text = "", icon = "PLUS")
             operator.nodeTreeName = self.id_data.name
             operator.nodeName = self.name
 
@@ -62,17 +62,17 @@ class ScriptNode(bpy.types.Node, AnimationNode):
 
         row = col.row(align = True)
 
-        operator = row.operator("mn.append_socket_to_script_node", text = "Input")
+        operator = row.operator("an.append_socket_to_script_node", text = "Input")
         operator.nodeTreeName = self.id_data.name
         operator.nodeName = self.name
         operator.makeOutputSocket = False
 
-        operator = row.operator("mn.append_socket_to_script_node", text = "Output")
+        operator = row.operator("an.append_socket_to_script_node", text = "Output")
         operator.nodeTreeName = self.id_data.name
         operator.nodeName = self.name
         operator.makeOutputSocket = True
 
-        operator = layout.operator("mn.export_script_node")
+        operator = layout.operator("an.export_script_node")
         operator.nodeTreeName = self.id_data.name
         operator.nodeName = self.name
 
@@ -90,7 +90,7 @@ class ScriptNode(bpy.types.Node, AnimationNode):
                 if linkedDataSocket:
                     link = emptySocket.links[0]
                     type = linkedDataSocket.bl_idname
-                    if type != "mn_EmptySocket":
+                    if type != "an_EmptySocket":
                         newSocket = self.appendSocket(sockets, linkedDataSocket.bl_idname, linkedDataSocket.name)
                         linkedSocket = self.getSocketFromOtherNode(link)
                         self.id_data.links.remove(link)
@@ -98,8 +98,8 @@ class ScriptNode(bpy.types.Node, AnimationNode):
 
     def createEmptySockets(self):
         for sockets in (self.inputs, self.outputs):
-            socket = sockets.new("mn_EmptySocket", emptySocketName)
-            socket.passiveSocketType = "mn_GenericSocket"
+            socket = sockets.new("an_EmptySocket", emptySocketName)
+            socket.passiveSocketType = "an_GenericSocket"
             socket.customName = "EMPTYSOCKET"
 
     def appendSocket(self, sockets, type, name):
@@ -203,7 +203,7 @@ class ScriptNode(bpy.types.Node, AnimationNode):
 
 
 class OpenNewScript(bpy.types.Operator):
-    bl_idname = "mn.open_new_script"
+    bl_idname = "an.open_new_script"
     bl_label = "New Keyframe"
     bl_description = "Create a new text block (hold ctrl to open a new text editor)"
 
@@ -231,7 +231,7 @@ class OpenNewScript(bpy.types.Operator):
 
 
 class AppendSocket(bpy.types.Operator):
-    bl_idname = "mn.append_socket_to_script_node"
+    bl_idname = "an.append_socket_to_script_node"
     bl_label = "Append Socket to Script Node"
     bl_description = "Append a new socket to this node"
 
@@ -251,7 +251,7 @@ class AppendSocket(bpy.types.Operator):
 
 
 class ExportScriptNode(bpy.types.Operator):
-    bl_idname = "mn.export_script_node"
+    bl_idname = "an.export_script_node"
     bl_label = "Export Script Node"
     bl_description = "Copy a text that describes the full script node"
 

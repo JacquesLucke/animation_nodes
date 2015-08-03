@@ -2,7 +2,7 @@ import bpy
 from .. base_types.socket import AnimationNodeSocket
 
 class NodeNetworkSocket(bpy.types.NodeSocket, AnimationNodeSocket):
-    bl_idname = "mn_NodeNetworkSocket"
+    bl_idname = "an_NodeNetworkSocket"
     bl_label = "Node Network Socket"
     dataType = "Node Network"
     allowedInputTypes = ["all"]

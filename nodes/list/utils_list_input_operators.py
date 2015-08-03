@@ -1,8 +1,8 @@
 import bpy
 from ... old_utils import *
 
-class mn_NewPropertyListNode(bpy.types.Operator):
-    bl_idname = "mn.new_property_to_list_node"
+class an_NewPropertyListNode(bpy.types.Operator):
+    bl_idname = "an.new_property_to_list_node"
     bl_label = "New String Property to String List Node"
     
     nodeTreeName = bpy.props.StringProperty()
@@ -13,8 +13,8 @@ class mn_NewPropertyListNode(bpy.types.Operator):
         node.addItemToList()
         return {'FINISHED'}
         
-class mn_RemovePropertyFromListNode(bpy.types.Operator):
-    bl_idname = "mn.remove_property_from_list_node"
+class an_RemovePropertyFromListNode(bpy.types.Operator):
+    bl_idname = "an.remove_property_from_list_node"
     bl_label = "Remove String Property from String List Node"
     
     nodeTreeName = bpy.props.StringProperty()

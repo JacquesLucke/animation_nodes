@@ -1,16 +1,16 @@
 import bpy
 from ... base_types.node import AnimationNode
 
-class mn_EdgesOfPolygons(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_EdgesOfPolygons"
+class an_EdgesOfPolygons(bpy.types.Node, AnimationNode):
+    bl_idname = "an_EdgesOfPolygons"
     bl_label = "Edges of Polygons"
 
     inputNames = { "Polygons" : "polygons" }
     outputNames = { "Edges" : "Edges" }
 
     def create(self):
-        self.inputs.new("mn_PolygonIndicesListSocket", "Polygons")
-        self.outputs.new("mn_EdgeIndicesListSocket", "Edges")
+        self.inputs.new("an_PolygonIndicesListSocket", "Polygons")
+        self.outputs.new("an_EdgeIndicesListSocket", "Edges")
 
     def execute(self, polygons):
         edges = []

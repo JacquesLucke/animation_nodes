@@ -4,7 +4,7 @@ from .. events import propertyChanged
 from .. base_types.socket import AnimationNodeSocket
 
 class TextBlockSocket(bpy.types.NodeSocket, AnimationNodeSocket):
-    bl_idname = "mn_TextBlockSocket"
+    bl_idname = "an_TextBlockSocket"
     bl_label = "Text Block Socket"
     dataType = "Text Block"
     allowedInputTypes = ["Text Block"]

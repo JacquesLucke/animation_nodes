@@ -5,7 +5,7 @@ from ... base_types.node import AnimationNode
 from ... algorithms.perlin_noise import perlinNoise
 
 class VectorWiggle(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_VectorWiggle"
+    bl_idname = "an_VectorWiggle"
     bl_label = "Vector Wiggle"
     isDetermined = True
 
@@ -20,12 +20,12 @@ class VectorWiggle(bpy.types.Node, AnimationNode):
     additionalSeed = bpy.props.IntProperty(update = propertyChanged)
 
     def create(self):
-        self.inputs.new("mn_FloatSocket", "Seed")
-        self.inputs.new("mn_FloatSocket", "Evolution")
-        self.inputs.new("mn_VectorSocket", "Amplitude").value = [5, 5, 5]
-        self.inputs.new("mn_IntegerSocket", "Octaves").value = 2
-        self.inputs.new("mn_FloatSocket", "Persistance").value = 0.3
-        self.outputs.new("mn_VectorSocket", "Vector")
+        self.inputs.new("an_FloatSocket", "Seed")
+        self.inputs.new("an_FloatSocket", "Evolution")
+        self.inputs.new("an_VectorSocket", "Amplitude").value = [5, 5, 5]
+        self.inputs.new("an_IntegerSocket", "Octaves").value = 2
+        self.inputs.new("an_FloatSocket", "Persistance").value = 0.3
+        self.outputs.new("an_VectorSocket", "Vector")
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "additionalSeed", text = "Additional Seed")

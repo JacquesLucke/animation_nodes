@@ -7,7 +7,7 @@ from ... events import propertyChanged
 cacheIdentifier = "Object Mesh Data"
 
 class ObjectMeshInfo(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_ObjectMeshInfo"
+    bl_idname = "an_ObjectMeshInfo"
     bl_label = "Object Mesh Info"
     outputUseParameterName = "useOutput"
 
@@ -28,10 +28,10 @@ class ObjectMeshInfo(bpy.types.Node, AnimationNode):
         default = False, update = propertyChanged)
 
     def create(self):
-        self.inputs.new("mn_ObjectSocket", "Object").showName = False
-        self.outputs.new("mn_PolygonListSocket", "Polygons")
-        self.outputs.new("mn_VertexListSocket", "Vertices")
-        self.outputs.new("mn_MeshDataSocket", "Mesh Data")
+        self.inputs.new("an_ObjectSocket", "Object").showName = False
+        self.outputs.new("an_PolygonListSocket", "Polygons")
+        self.outputs.new("an_VertexListSocket", "Vertices")
+        self.outputs.new("an_MeshDataSocket", "Mesh Data")
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "applyModifiers")

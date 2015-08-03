@@ -3,7 +3,7 @@ from .. data_structures.mesh import MeshData
 from .. base_types.socket import AnimationNodeSocket
 
 class MeshDataSocket(bpy.types.NodeSocket, AnimationNodeSocket):
-    bl_idname = "mn_MeshDataSocket"
+    bl_idname = "an_MeshDataSocket"
     bl_label = "Mesh Data Socket"
     dataType = "Mesh Data"
     allowedInputTypes = ["Mesh Data"]

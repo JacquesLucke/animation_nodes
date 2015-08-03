@@ -3,7 +3,7 @@ from ... base_types.node import AnimationNode
 
 
 class TranslationMatrix(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_TranslationMatrix"
+    bl_idname = "an_TranslationMatrix"
     bl_label = "Translation Matrix"
     isDetermined = True
 
@@ -11,8 +11,8 @@ class TranslationMatrix(bpy.types.Node, AnimationNode):
     outputNames = { "Matrix" : "matrix" }
 
     def create(self):
-        self.inputs.new("mn_VectorSocket", "Translation")
-        self.outputs.new("mn_MatrixSocket", "Matrix")
+        self.inputs.new("an_VectorSocket", "Translation")
+        self.outputs.new("an_MatrixSocket", "Matrix")
 
     def getExecutionCode(self):
         return "$matrix$ = mathutils.Matrix.Translation(%translation%)"

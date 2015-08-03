@@ -6,7 +6,7 @@ from .. data_structures.splines.bezier_spline import BezierSpline
 from .. data_structures.splines.from_blender import createSplinesFromBlenderObject
 
 class SplineSocket(bpy.types.NodeSocket, AnimationNodeSocket):
-    bl_idname = "mn_SplineSocket"
+    bl_idname = "an_SplineSocket"
     bl_label = "Spline Socket"
     dataType = "Spline"
     allowedInputTypes = ["Spline"]

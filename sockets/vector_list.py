@@ -2,7 +2,7 @@ import bpy
 from .. base_types.socket import AnimationNodeSocket
 
 class VectorListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
-    bl_idname = "mn_VectorListSocket"
+    bl_idname = "an_VectorListSocket"
     bl_label = "Vector List Socket"
     dataType = "Vector List"
     allowedInputTypes = ["Vector List"]

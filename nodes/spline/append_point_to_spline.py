@@ -8,7 +8,7 @@ pointTypeItems = [
     ("BEZIER_POINT", "Bezier Point", "Add a point with handles")]
 
 class AppendPointToSpline(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_AppendPointToSpline"
+    bl_idname = "an_AppendPointToSpline"
     bl_label = "Append Point to Spline"
 
     inputNames = { "Spline" : "spline",
@@ -26,11 +26,11 @@ class AppendPointToSpline(bpy.types.Node, AnimationNode):
     pointType = EnumProperty(name = "Point Type", default = "POINT", items = pointTypeItems, update = settingChanged)
 
     def create(self):
-        self.inputs.new("mn_SplineSocket", "Spline")
-        self.inputs.new("mn_VectorSocket", "Point")
-        self.inputs.new("mn_VectorSocket", "Left Handle")
-        self.inputs.new("mn_VectorSocket", "Right Handle")
-        self.outputs.new("mn_SplineSocket", "Spline")
+        self.inputs.new("an_SplineSocket", "Spline")
+        self.inputs.new("an_VectorSocket", "Point")
+        self.inputs.new("an_VectorSocket", "Left Handle")
+        self.inputs.new("an_VectorSocket", "Right Handle")
+        self.outputs.new("an_SplineSocket", "Spline")
         self.settingChanged(bpy.context)
 
     def draw_buttons(self, context, layout):

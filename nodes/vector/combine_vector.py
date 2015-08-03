@@ -2,7 +2,7 @@ import bpy
 from ... base_types.node import AnimationNode
 
 class CombineVector(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_CombineVector"
+    bl_idname = "an_CombineVector"
     bl_label = "Combine Vector"
     isDetermined = True
 
@@ -13,10 +13,10 @@ class CombineVector(bpy.types.Node, AnimationNode):
     outputNames = { "Vector" : "vector" }
 
     def create(self):
-        self.inputs.new("mn_FloatSocket", "X")
-        self.inputs.new("mn_FloatSocket", "Y")
-        self.inputs.new("mn_FloatSocket", "Z")
-        self.outputs.new("mn_VectorSocket", "Vector")
+        self.inputs.new("an_FloatSocket", "X")
+        self.inputs.new("an_FloatSocket", "Y")
+        self.inputs.new("an_FloatSocket", "Z")
+        self.outputs.new("an_VectorSocket", "Vector")
 
     def getExecutionCode(self):
         return "$vector$ = mathutils.Vector((%x%, %y%, %z%))"

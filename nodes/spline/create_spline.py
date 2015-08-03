@@ -10,7 +10,7 @@ splineTypeItems = [
     ("POLY", "Poly", "Linear interpolation between the spline points")]
 
 class CreateSpline(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_CreateSpline"
+    bl_idname = "an_CreateSpline"
     bl_label = "Create Spline"
 
     inputNames = { "Points" : "points",
@@ -21,9 +21,9 @@ class CreateSpline(bpy.types.Node, AnimationNode):
     splineType = EnumProperty(name = "Spline Type", items = splineTypeItems, update = propertyChanged)
 
     def create(self):
-        self.inputs.new("mn_VectorListSocket", "Points")
-        self.inputs.new("mn_BooleanSocket", "Cyclic").value = False
-        self.outputs.new("mn_SplineSocket", "Spline")
+        self.inputs.new("an_VectorListSocket", "Points")
+        self.inputs.new("an_BooleanSocket", "Cyclic").value = False
+        self.outputs.new("an_SplineSocket", "Spline")
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "splineType", text = "")

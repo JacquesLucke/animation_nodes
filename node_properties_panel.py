@@ -1,7 +1,7 @@
 import bpy
 
 class NodePropertiesPanel(bpy.types.Panel):
-    bl_idname = "mn.node_properties_panel"
+    bl_idname = "an.node_properties_panel"
     bl_label = "Node and Socket Settings"
     bl_space_type = "NODE_EDITOR"
     bl_region_type = "UI"

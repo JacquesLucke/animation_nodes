@@ -16,7 +16,7 @@ outputTypeItems = [
     ("MESH", "Mesh", "") ]
 
 class SeparateTextObject(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_SeparateTextObject"
+    bl_idname = "an_SeparateTextObject"
     bl_label = "Separate Text Object"
 
     inputNames = {}
@@ -30,13 +30,13 @@ class SeparateTextObject(bpy.types.Node, AnimationNode):
     outputType = EnumProperty(name = "Output Type", items = outputTypeItems)
 
     def create(self):
-        self.outputs.new("mn_ObjectListSocket", "Text Objects")
+        self.outputs.new("an_ObjectListSocket", "Text Objects")
         self.width = 180
 
     def draw_buttons(self, context, layout):
         row = layout.row(align = True)
         row.prop(self, "sourceObjectName", text = "Source")
-        assign = row.operator("mn.assign_active_object_to_text_separation_node", icon = "EYEDROPPER", text = "")
+        assign = row.operator("an.assign_active_object_to_text_separation_node", icon = "EYEDROPPER", text = "")
         assign.nodeTreeName = self.id_data.name
         assign.nodeName = self.name
 
@@ -211,7 +211,7 @@ def setMaterialOnObjects(objects, material):
 
 
 class AssignActiveObjectToTextSeparationNode(bpy.types.Operator):
-    bl_idname = "mn.assign_active_object_to_text_separation_node"
+    bl_idname = "an.assign_active_object_to_text_separation_node"
     bl_label = "Assign Active Object"
 
     nodeTreeName = StringProperty()

@@ -2,7 +2,7 @@ import bpy
 from ... base_types.node import AnimationNode
 
 class ScaleMatrix(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_ScaleMatrix"
+    bl_idname = "an_ScaleMatrix"
     bl_label = "Scale Matrix"
     isDetermined = True
 
@@ -10,8 +10,8 @@ class ScaleMatrix(bpy.types.Node, AnimationNode):
     outputNames = { "Matrix" : "matrix" }
 
     def create(self):
-        self.inputs.new("mn_VectorSocket", "Scale").value = [1, 1, 1]
-        self.outputs.new("mn_MatrixSocket", "Matrix")
+        self.inputs.new("an_VectorSocket", "Scale").value = [1, 1, 1]
+        self.outputs.new("an_MatrixSocket", "Matrix")
 
     def getExecutionCode(self, outputUse):
         return ("$matrix$ ="

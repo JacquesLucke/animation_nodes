@@ -4,7 +4,7 @@ from ... utils.nodes import NodeTreeInfo
 from ... sockets.info import toBaseIdName
 
 class GetListElementNode(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_GetListElementNode"
+    bl_idname = "an_GetListElementNode"
     bl_label = "Get List Element"
 
     inputNames = { "List" : "list",
@@ -34,7 +34,7 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
             self.generateSockets(baseIdNameToListIdName(targetSockets[0].bl_idname))
             nodeTree.links.new(targetSockets[0], self.outputs.get("Element"))
 
-    def generateSockets(self, listIdName = "mn_ObjectListSocket"):
+    def generateSockets(self, listIdName = "an_ObjectListSocket"):
         if listIdName is None: return
         baseIdName = toBaseIdName(listIdName)
         if baseIdName is None: return
@@ -43,6 +43,6 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
         self.inputs.clear()
         self.outputs.clear()
         self.inputs.new(listIdName, "List")
-        self.inputs.new("mn_IntegerSocket", "Index")
+        self.inputs.new("an_IntegerSocket", "Index")
         self.inputs.new(baseIdName, "Fallback")
         self.outputs.new(baseIdName, "Element")

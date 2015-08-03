@@ -6,7 +6,7 @@ from ... utils.selection import getSortedSelectedObjectNames
 from ... sockets.info import getBaseDataTypeItems, toIdName, toListIdName
 
 class CreateList(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_CreateList"
+    bl_idname = "an_CreateList"
     bl_label = "Create List"
 
     @property

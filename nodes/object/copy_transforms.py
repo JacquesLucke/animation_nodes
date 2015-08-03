@@ -6,7 +6,7 @@ from ... utils.fcurve import (getArrayValueAtFrame,
                               getMultipleValuesOfArrayAtFrame)
 
 class CopyTransformsNode(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_CopyTransformsNode"
+    bl_idname = "an_CopyTransformsNode"
     bl_label = "Copy Transforms"
 
     inputNames = { "From" : "fromObject",
@@ -25,10 +25,10 @@ class CopyTransformsNode(bpy.types.Node, AnimationNode):
     frameTypesProperty = bpy.props.EnumProperty(name = "Frame Type", items = frameTypes, default = "OFFSET", update = propertyChanged)
 
     def create(self):
-        self.inputs.new("mn_ObjectSocket", "From")
-        self.inputs.new("mn_ObjectSocket", "To")
-        self.inputs.new("mn_FloatSocket", "Frame")
-        self.outputs.new("mn_ObjectSocket", "To")
+        self.inputs.new("an_ObjectSocket", "From")
+        self.inputs.new("an_ObjectSocket", "To")
+        self.inputs.new("an_FloatSocket", "Frame")
+        self.outputs.new("an_ObjectSocket", "To")
         self.width = 200
 
     def draw_buttons(self, context, layout):

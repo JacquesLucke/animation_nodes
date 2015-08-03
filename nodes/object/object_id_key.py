@@ -6,7 +6,7 @@ from ... id_keys import getIDKeyInfo, getIDKeyItems
 
 
 class ObjectIDKey(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_ObjectIDKey"
+    bl_idname = "an_ObjectIDKey"
     bl_label = "Object ID Key"
 
     inputNames = { "Object" : "object" }
@@ -33,7 +33,7 @@ class ObjectIDKey(bpy.types.Node, AnimationNode):
     keyType = StringProperty()
 
     def create(self):
-        self.inputs.new("mn_ObjectSocket", "Object").showName = False
+        self.inputs.new("an_ObjectSocket", "Object").showName = False
         self.selectedKeyChanged(context)
 
     def draw_buttons(self, context, layout):
@@ -42,17 +42,17 @@ class ObjectIDKey(bpy.types.Node, AnimationNode):
     def buildOutputSockets(self):
         self.outputs.clear()
         if self.isKeySelected:
-            self.outputs.new("mn_BooleanSocket", "Exists")
+            self.outputs.new("an_BooleanSocket", "Exists")
             if self.keyType == "Transforms":
-                self.outputs.new("mn_VectorSocket", "Location")
-                self.outputs.new("mn_VectorSocket", "Rotation")
-                self.outputs.new("mn_VectorSocket", "Scale")
+                self.outputs.new("an_VectorSocket", "Location")
+                self.outputs.new("an_VectorSocket", "Rotation")
+                self.outputs.new("an_VectorSocket", "Scale")
             if self.keyType == "Float":
-                self.outputs.new("mn_FloatSocket", "Float")
+                self.outputs.new("an_FloatSocket", "Float")
             if self.keyType == "Integer":
-                self.outputs.new("mn_IntegerSocket", "Integer")
+                self.outputs.new("an_IntegerSocket", "Integer")
             if self.keyType == "String":
-                self.outputs.new("mn_StringSocket", "String")
+                self.outputs.new("an_StringSocket", "String")
 
     def execute(self, object):
         if not self.isKeySelected: return

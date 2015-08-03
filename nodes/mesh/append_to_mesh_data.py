@@ -2,7 +2,7 @@ import bpy
 from ... base_types.node import AnimationNode
 
 class AppendToMeshData(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_AppendToMeshData"
+    bl_idname = "an_AppendToMeshData"
     bl_label = "Append Mesh Data"
 
     inputNames = { "Mesh Data" : "meshDataA",
@@ -11,9 +11,9 @@ class AppendToMeshData(bpy.types.Node, AnimationNode):
     outputNames = { "Joined Mesh Data" : "joinedMeshData" }            
 
     def create(self):
-        self.inputs.new("mn_MeshDataSocket", "Mesh Data")
-        self.inputs.new("mn_MeshDataSocket", "Other")
-        self.outputs.new("mn_MeshDataSocket", "Joined Mesh Data")
+        self.inputs.new("an_MeshDataSocket", "Mesh Data")
+        self.inputs.new("an_MeshDataSocket", "Other")
+        self.outputs.new("an_MeshDataSocket", "Joined Mesh Data")
 
     def execute(self, meshDataA, meshDataB):
         offset = len(meshDataA.vertices)

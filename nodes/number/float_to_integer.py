@@ -8,7 +8,7 @@ items = [("ROUND", "Round", ""),
          ("FLOOR", "Floor", "The largest integer that is smaller than the input (5.8 -> 5)")]
 
 class FloatToInteger(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_FloatToInteger"
+    bl_idname = "an_FloatToInteger"
     bl_label = "Float To Integer"
     isDetermined = True
     
@@ -18,8 +18,8 @@ class FloatToInteger(bpy.types.Node, AnimationNode):
     type = EnumProperty(name = "Conversion Type", items = items, default = "FLOOR", update = executionCodeChanged)
     
     def create(self):
-        self.inputs.new("mn_FloatSocket", "Float")
-        self.outputs.new("mn_IntegerSocket", "Integer")
+        self.inputs.new("an_FloatSocket", "Float")
+        self.outputs.new("an_IntegerSocket", "Integer")
         
     def draw_buttons_ext(self, context, layout):
         layout.prop(self, "type", text = "")

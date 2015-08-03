@@ -17,14 +17,14 @@ from . sockets.info import toDataType
 How to implement suggestions on a per node basis:
 1. Create a 'getNextNodeSuggestions(self)' function inside the node
 2. Return a list that looks like this:
-    [("mn_FloatMathNode", (0, 0)),                      # First suggestion
-     ("mn_CombineVector", (0, 0)),                      # Second suggestion
-     ("mn_FloatClamp", (0, 0)),                         # ... can be an unlimited amount of suggestions
-     ("mn_CombineVector", (0, 0), (0, 1), (0, 2))]      # the tuples indicate which sockets to connect: (output index, input index)
+    [("an_FloatMathNode", (0, 0)),                      # First suggestion
+     ("an_CombineVector", (0, 0)),                      # Second suggestion
+     ("an_FloatClamp", (0, 0)),                         # ... can be an unlimited amount of suggestions
+     ("an_CombineVector", (0, 0), (0, 1), (0, 2))]      # the tuples indicate which sockets to connect: (output index, input index)
 '''
 
 class ContextPie(bpy.types.Menu):
-    bl_idname = "mn.context_pie"
+    bl_idname = "an.context_pie"
     bl_label = "Context Pie"
 
     @classmethod
@@ -33,7 +33,7 @@ class ContextPie(bpy.types.Menu):
 
     def drawLeft(self, context, layout):
         if activeNodeHasInputs():
-            layout.operator("mn.insert_data_input_node", text = "Data Input")
+            layout.operator("an.insert_data_input_node", text = "Data Input")
         else:
             self.empty(layout)
 
@@ -45,7 +45,7 @@ class ContextPie(bpy.types.Menu):
 
     def drawBottom(self, context, layout):
         if activeNodeHasOutputs():
-            layout.operator("mn.insert_debug_node", text = "Debug")
+            layout.operator("an.insert_debug_node", text = "Debug")
         else:
             self.empty(layout)
 
@@ -101,7 +101,7 @@ class ContextPie(bpy.types.Menu):
         nodeIdName = data[0]
         links = data[1:]
 
-        props = layout.operator("mn.insert_linked_node", text = getNodeNameFromIdName(nodeIdName))
+        props = layout.operator("an.insert_linked_node", text = getNodeNameFromIdName(nodeIdName))
         props.nodeType = nodeIdName
         for origin, target in links:
             item = props.links.add()
@@ -110,7 +110,7 @@ class ContextPie(bpy.types.Menu):
 
 
 class InsertDebugNode(bpy.types.Operator):
-    bl_idname = "mn.insert_debug_node"
+    bl_idname = "an.insert_debug_node"
     bl_label = "Insert Debug Node"
     bl_description = ""
     bl_options = {"REGISTER"}
@@ -126,8 +126,8 @@ class InsertDebugNode(bpy.types.Operator):
     def invoke(self, context, event):
         storeCursorLocation(event)
         node = context.active_node
-        bpy.ops.mn.choose_socket_and_execute_operator("INVOKE_DEFAULT",
-            operatorName = "mn.insert_debug_node",
+        bpy.ops.an.choose_socket_and_execute_operator("INVOKE_DEFAULT",
+            operatorName = "an.insert_debug_node",
             nodeTreeName = node.id_data.name,
             nodeName = node.name,
             chooseOutputSocket = True)
@@ -136,14 +136,14 @@ class InsertDebugNode(bpy.types.Operator):
     def execute(self, context):
         nodeTree = getActiveAnimationNodeTree()
         originNode = getNode(self.nodeTreeName, self.nodeName)
-        node = insertNode("mn_DebugOutputNode")
+        node = insertNode("an_DebugOutputNode")
         nodeTree.links.new(node.inputs[0], originNode.outputs[self.socketIndex])
         moveNode(node)
         return{"FINISHED"}
 
 
 class InsertDataInputNode(bpy.types.Operator):
-    bl_idname = "mn.insert_data_input_node"
+    bl_idname = "an.insert_data_input_node"
     bl_label = "Insert Data Input Node"
     bl_description = ""
     bl_options = {"REGISTER"}
@@ -159,8 +159,8 @@ class InsertDataInputNode(bpy.types.Operator):
     def invoke(self, context, event):
         storeCursorLocation(event)
         node = context.active_node
-        bpy.ops.mn.choose_socket_and_execute_operator("INVOKE_DEFAULT",
-            operatorName = "mn.insert_data_input_node",
+        bpy.ops.an.choose_socket_and_execute_operator("INVOKE_DEFAULT",
+            operatorName = "an.insert_data_input_node",
             nodeTreeName = node.id_data.name,
             nodeName = node.name,
             chooseOutputSocket = False)
@@ -172,7 +172,7 @@ class InsertDataInputNode(bpy.types.Operator):
         targetSocket = targetNode.inputs[self.socketIndex]
         data = targetSocket.getStoreableValue()
 
-        node = insertNode("mn_DataInput")
+        node = insertNode("an_DataInput")
         node.assignSocketType(toDataType(targetSocket.bl_idname))
         node.inputs[0].setStoreableValue(data)
 
@@ -182,7 +182,7 @@ class InsertDataInputNode(bpy.types.Operator):
 
 
 class ChooseSocketAndExecuteOperator(bpy.types.Operator):
-    bl_idname = "mn.choose_socket_and_execute_operator"
+    bl_idname = "an.choose_socket_and_execute_operator"
     bl_label = "Choose Socket and Execute Operator"
     bl_description = ""
     bl_options = {"REGISTER"}
@@ -221,7 +221,7 @@ class LinkedIndices(bpy.types.PropertyGroup):
     target = IntProperty(default = 0)
 
 class InsertLinkedNode(bpy.types.Operator):
-    bl_idname = "mn.insert_linked_node"
+    bl_idname = "an.insert_linked_node"
     bl_label = "Insert Linked Node"
     bl_description = ""
     bl_options = {"REGISTER"}
@@ -297,6 +297,6 @@ def animationNodeTreeActive():
 def getActiveAnimationNodeTree():
     try:
         nodeTree = bpy.context.space_data.edit_tree
-        if nodeTree.bl_idname == "mn_AnimationNodeTree": return nodeTree
+        if nodeTree.bl_idname == "an_AnimationNodeTree": return nodeTree
     except: pass
     return None

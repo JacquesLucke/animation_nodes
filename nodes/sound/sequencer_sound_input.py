@@ -48,7 +48,7 @@ strengthListLength = len(bakeFrequencies)
 
 
 class SequencerSoundInput(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_SequencerSoundInput"
+    bl_idname = "an_SequencerSoundInput"
     bl_label = "Sequencer Sound Input"
 
     inputNames = { "Frame" : "frame",
@@ -81,12 +81,12 @@ class SequencerSoundInput(bpy.types.Node, AnimationNode):
         self.use_custom_color = True
         self.color = (0.4, 0.9, 0.4)
         self.width = 200
-        self.inputs.new("mn_FloatSocket", "Frame")
-        socket = self.inputs.new("mn_FloatSocket", "Frequency")
+        self.inputs.new("an_FloatSocket", "Frame")
+        socket = self.inputs.new("an_FloatSocket", "Frequency")
         socket.value = 0.4
         socket.hide = True
-        self.outputs.new("mn_FloatSocket", "Strength")
-        self.outputs.new("mn_FloatListSocket", "Strengths").hide = True
+        self.outputs.new("an_FloatSocket", "Strength")
+        self.outputs.new("an_FloatListSocket", "Strengths").hide = True
 
     def draw_buttons(self, context, layout):
         sequencesAmount = len(getattr(context.scene.sequence_editor, "sequences", []))
@@ -98,7 +98,7 @@ class SequencerSoundInput(bpy.types.Node, AnimationNode):
     def drawEasyUI(self, layout):
         col = layout.column()
         col.scale_y = 1.5
-        props = col.operator("mn.load_sound_into_sequence_editor", icon = "PLUS")
+        props = col.operator("an.load_sound_into_sequence_editor", icon = "PLUS")
         props.nodeTreeName = self.id_data.name
         props.nodeName = self.name
 
@@ -106,7 +106,7 @@ class SequencerSoundInput(bpy.types.Node, AnimationNode):
         row = layout.row(align = True)
         icon = "ERROR" if sequencerData.hasChanged else "FILE_TICK"
         self.callFunctionFromUI(row, "bakeSounds", text = "Bake Sounds", icon = icon)
-        row.operator("mn.clear_baked_data", text = "", icon = "X")
+        row.operator("an.clear_baked_data", text = "", icon = "X")
 
         if self.isBaking:
             layout.prop(self, "bakeProgress", text = "Progress", slider = True)
@@ -157,7 +157,7 @@ class SequencerSoundInput(bpy.types.Node, AnimationNode):
         return lower * (1 - influence) + upper * influence
 
     def bakeSounds(self):
-        bpy.ops.mn.bake_sounds("INVOKE_DEFAULT",
+        bpy.ops.an.bake_sounds("INVOKE_DEFAULT",
             nodeTreeName = self.id_data.name,
             nodeName = self.name,
             attack = self.attack,
@@ -254,7 +254,7 @@ def updateSequencerData(scene):
 ###########################
 
 class LoadSound(bpy.types.Operator):
-    bl_idname = "mn.load_sound_into_sequence_editor"
+    bl_idname = "an.load_sound_into_sequence_editor"
     bl_label = "Load Sound"
     bl_description = ""
     bl_options = {"REGISTER"}
@@ -277,7 +277,7 @@ class LoadSound(bpy.types.Operator):
         return {"FINISHED"}
 
 class ClearBakedData(bpy.types.Operator):
-    bl_idname = "mn.clear_baked_data"
+    bl_idname = "an.clear_baked_data"
     bl_label = "Clear Baked Data"
     bl_description = ""
     bl_options = {"REGISTER"}
@@ -291,7 +291,7 @@ class ClearBakedData(bpy.types.Operator):
 
 
 class BakeSounds(bpy.types.Operator):
-    bl_idname = "mn.bake_sounds"
+    bl_idname = "an.bake_sounds"
     bl_label = "Bake Sounds"
     bl_description = "Bake all sounds which are used in the sequence editor (hold CTRL to rebake existing data)"
     bl_options = {"REGISTER"}

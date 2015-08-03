@@ -4,7 +4,7 @@ from ... events import propertyChanged
 
 
 class SetVertexColor(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_SetVertexColor"
+    bl_idname = "an_SetVertexColor"
     bl_label = "Set Vertex Color"
     
     inputNames = { "Object" : "object",
@@ -16,9 +16,9 @@ class SetVertexColor(bpy.types.Node, AnimationNode):
     checkIfColorIsSet = bpy.props.BoolProperty(default = True)
     
     def create(self):
-        self.inputs.new("mn_ObjectSocket", "Object")
-        self.inputs.new("mn_ColorSocket", "Color")
-        self.outputs.new("mn_ObjectSocket", "Object")
+        self.inputs.new("an_ObjectSocket", "Object")
+        self.inputs.new("an_ColorSocket", "Color")
+        self.outputs.new("an_ObjectSocket", "Object")
         
     def draw_buttons(self, context, layout):
         layout.prop(self, "enabled", text = "Enabled")

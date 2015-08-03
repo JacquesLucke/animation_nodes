@@ -6,7 +6,7 @@ compare_types = ["A = B", "A != B", "A < B", "A <= B", "A > B", "A >= B", "A is 
 compare_types_items = [(t, t, "") for t in compare_types]
 
 class CompareNode(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_CompareNode"
+    bl_idname = "an_CompareNode"
     bl_label = "Compare"
     
     inputNames = { "A" : "a",
@@ -16,9 +16,9 @@ class CompareNode(bpy.types.Node, AnimationNode):
     compareType = bpy.props.EnumProperty(name = "Compare Type", items = compare_types_items, update = executionCodeChanged)
     
     def create(self):
-        self.inputs.new("mn_GenericSocket", "A")
-        self.inputs.new("mn_GenericSocket", "B")
-        self.outputs.new("mn_BooleanSocket", "Result")
+        self.inputs.new("an_GenericSocket", "A")
+        self.inputs.new("an_GenericSocket", "B")
+        self.outputs.new("an_BooleanSocket", "Result")
         
     def draw_buttons(self, context, layout):
         layout.prop(self, "compareType", text = "Type")

@@ -12,12 +12,12 @@ from ... utils.names import (getPossibleObjectName,
 objectTypes = ["Mesh", "Text", "Camera", "Point Lamp", "Curve"]
 objectTypeItems = [(type, type, "") for type in objectTypes]
 
-class mn_ObjectNamePropertyGroup(bpy.types.PropertyGroup):
+class an_ObjectNamePropertyGroup(bpy.types.PropertyGroup):
     objectName = bpy.props.StringProperty(name = "Object Name", default = "", update = propertyChanged)
     objectIndex = bpy.props.IntProperty(name = "Object Index", default = 0, update = propertyChanged)
 
 class ObjectInstancer(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_ObjectInstancer"
+    bl_idname = "an_ObjectInstancer"
     bl_label = "Object Instancer"
     searchTags = ["Object Replicator (old)"]
 
@@ -33,7 +33,7 @@ class ObjectInstancer(bpy.types.Node, AnimationNode):
     def resetInstancesEvent(self, context):
         self.resetInstances = True
 
-    linkedObjects = bpy.props.CollectionProperty(type = mn_ObjectNamePropertyGroup)
+    linkedObjects = bpy.props.CollectionProperty(type = an_ObjectNamePropertyGroup)
     resetInstances = bpy.props.BoolProperty(default = False, update = propertyChanged)
 
     copyFromSource = bpy.props.BoolProperty(default = True, name = "Copy from Source", update = copyFromSourceChanged)
@@ -44,9 +44,9 @@ class ObjectInstancer(bpy.types.Node, AnimationNode):
     parentInstances = bpy.props.BoolProperty(default = True, name = "Parent to Main Container", update = resetInstancesEvent)
 
     def create(self):
-        self.inputs.new("mn_IntegerSocket", "Instances").setMinMax(0, 100000)
-        self.inputs.new("mn_ObjectSocket", "Source").showName = False
-        self.outputs.new("mn_ObjectListSocket", "Objects")
+        self.inputs.new("an_IntegerSocket", "Instances").setMinMax(0, 100000)
+        self.inputs.new("an_ObjectSocket", "Source").showName = False
+        self.outputs.new("an_ObjectListSocket", "Objects")
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "copyFromSource")

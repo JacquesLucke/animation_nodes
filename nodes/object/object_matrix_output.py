@@ -8,7 +8,7 @@ outputItems = [	("BASIS", "Basis", ""),
                 ("WORLD", "World", "") ]
 
 class ObjectMatrixOutputNode(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_ObjectMatrixOutputNode"
+    bl_idname = "an_ObjectMatrixOutputNode"
     bl_label = "Object Matrix Output"
 
     inputNames = { "Object" : "object",
@@ -19,9 +19,9 @@ class ObjectMatrixOutputNode(bpy.types.Node, AnimationNode):
     outputType = bpy.props.EnumProperty(items = outputItems, update = executionCodeChanged, default = "WORLD")
 
     def create(self):
-        self.inputs.new("mn_ObjectSocket", "Object").showName = False
-        self.inputs.new("mn_MatrixSocket", "Matrix")
-        self.outputs.new("mn_ObjectSocket", "Object")
+        self.inputs.new("an_ObjectSocket", "Object").showName = False
+        self.inputs.new("an_MatrixSocket", "Matrix")
+        self.outputs.new("an_ObjectSocket", "Object")
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "outputType", text = "Type")

@@ -6,12 +6,12 @@ from ... old_utils import *
 pathTypes = ("Custom", "Location", "Rotation", "Scale", "LocRotScale")
 pathTypeItems = [(pathType, pathType, "") for pathType in pathTypes]
 
-class mn_KeyframePath(bpy.types.PropertyGroup):
+class an_KeyframePath(bpy.types.PropertyGroup):
     path = bpy.props.StringProperty(default = "", update = propertyChanged, description = "Path to the property")
     index = bpy.props.IntProperty(default = -1, update = propertyChanged, min = -1, soft_max = 2, description = "Used index if the path points to an array (-1 will set a keyframe on every index)")
 
 class SetKeyframesNode(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_SetKeyframesNode"
+    bl_idname = "an_SetKeyframesNode"
     bl_label = "Set Keyframes"
 
     inputNames = { "Enable" : "enable",
@@ -20,17 +20,17 @@ class SetKeyframesNode(bpy.types.Node, AnimationNode):
                    "Object" : "object" }
     outputNames = {}
 
-    paths = bpy.props.CollectionProperty(type = mn_KeyframePath)
+    paths = bpy.props.CollectionProperty(type = an_KeyframePath)
 
     selectedPathType = bpy.props.EnumProperty(default = "Location", items = pathTypeItems, name = "Path Type")
     attributePath = bpy.props.StringProperty(default = "", name = "Attribute Path")
 
     def create(self):
         self.width = 200
-        self.inputs.new("mn_BooleanSocket", "Enable").value = False
-        self.inputs.new("mn_BooleanSocket", "Set Keyframe")
-        self.inputs.new("mn_BooleanSocket", "Remove Unwanted")
-        self.inputs.new("mn_ObjectSocket", "Object")
+        self.inputs.new("an_BooleanSocket", "Enable").value = False
+        self.inputs.new("an_BooleanSocket", "Set Keyframe")
+        self.inputs.new("an_BooleanSocket", "Remove Unwanted")
+        self.inputs.new("an_ObjectSocket", "Object")
 
     def draw_buttons(self, context, layout):
         row = layout.row(align = True)
@@ -43,7 +43,7 @@ class SetKeyframesNode(bpy.types.Node, AnimationNode):
             split = row.split(align = True, percentage = 0.7)
             split.prop(item, "path", text = "")
             split.prop(item, "index", text = "")
-            remove = row.operator("mn.remove_property_from_list_node", icon = "X", text = "")
+            remove = row.operator("an.remove_property_from_list_node", icon = "X", text = "")
             remove.nodeTreeName = self.id_data.name
             remove.nodeName = self.name
             remove.index = i

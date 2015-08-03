@@ -4,14 +4,14 @@ from ... events import treeChanged
 from ... old_utils import hasLinks, getConnectionDictionaries, tryToSetConnectionDictionaries
 
 allowedSocketTypes = {
-    "NodeSocketVector" : "mn_VectorSocket",
-    "NodeSocketColor" : "mn_ColorSocket",
-    "NodeSocketFloatFactor" : "mn_FloatSocket",
-    "NodeSocketFloat" : "mn_FloatSocket" }
+    "NodeSocketVector" : "an_VectorSocket",
+    "NodeSocketColor" : "an_ColorSocket",
+    "NodeSocketFloatFactor" : "an_FloatSocket",
+    "NodeSocketFloat" : "an_FloatSocket" }
 
 
 class CyclesMaterialOutputNode(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_CyclesMaterialOutputNode"
+    bl_idname = "an_CyclesMaterialOutputNode"
     bl_label = "Cycles Material Output"
 
     def getPossibleSocketItems(self, context):
@@ -43,7 +43,7 @@ class CyclesMaterialOutputNode(bpy.types.Node, AnimationNode):
     socketIsChanging = bpy.props.BoolProperty()
 
     def create(self):
-        self.inputs.new("mn_GenericSocket", "Data")
+        self.inputs.new("an_GenericSocket", "Data")
 
     def draw_buttons(self, context, layout):
         layout.prop_search(self, 'materialName', bpy.data, 'materials', text='', icon='MATERIAL_DATA')
@@ -108,7 +108,7 @@ class CyclesMaterialOutputNode(bpy.types.Node, AnimationNode):
         connections = getConnectionDictionaries(self)
         self.inputs.clear()
         if socket is None:
-            self.inputs.new("mn_GenericSocket", "Data")
+            self.inputs.new("an_GenericSocket", "Data")
         else:
             data = socket.default_value
             self.inputs.new(allowedSocketTypes[socket.bl_idname], "Data")

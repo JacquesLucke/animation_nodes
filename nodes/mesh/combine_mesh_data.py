@@ -8,7 +8,7 @@ sourceTypeItems = [
     ("POLYGONS", "Polygons", "") ]
 
 class CombineMeshData(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_CombineMeshData"
+    bl_idname = "an_CombineMeshData"
     bl_label = "Combine Mesh Data"
 
     inputNames = { "Vertex Locations" : "vertexLocations",
@@ -25,12 +25,12 @@ class CombineMeshData(bpy.types.Node, AnimationNode):
     sourceType = bpy.props.EnumProperty(items = sourceTypeItems, default = "MESH_DATA", name = "Source Type", update = sourceTypeChanged)
 
     def create(self):
-        self.inputs.new("mn_VectorListSocket", "Vertex Locations")
-        self.inputs.new("mn_EdgeIndicesListSocket", "Edges Indices")
-        self.inputs.new("mn_PolygonIndicesListSocket", "Polygons Indices")
-        self.inputs.new("mn_PolygonListSocket", "Polygons")
+        self.inputs.new("an_VectorListSocket", "Vertex Locations")
+        self.inputs.new("an_EdgeIndicesListSocket", "Edges Indices")
+        self.inputs.new("an_PolygonIndicesListSocket", "Polygons Indices")
+        self.inputs.new("an_PolygonListSocket", "Polygons")
         self.updateHideStatus()
-        self.outputs.new("mn_MeshDataSocket", "Mesh Data")
+        self.outputs.new("an_MeshDataSocket", "Mesh Data")
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "sourceType")

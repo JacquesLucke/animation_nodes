@@ -2,7 +2,7 @@ import bpy
 from ... base_types.node import AnimationNode
 
 class TimeInfoNode(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_TimeInfoNode"
+    bl_idname = "an_TimeInfoNode"
     bl_label = "Time Info"
     searchTags = ["Frame"]
     
@@ -13,10 +13,10 @@ class TimeInfoNode(bpy.types.Node, AnimationNode):
                     "Frame Rate" : "frameRate" }
     
     def create(self):
-        self.outputs.new("mn_FloatSocket", "Frame")
-        self.outputs.new("mn_FloatSocket", "Start Frame")
-        self.outputs.new("mn_FloatSocket", "End Frame")
-        self.outputs.new("mn_FloatSocket", "Frame Rate")
+        self.outputs.new("an_FloatSocket", "Frame")
+        self.outputs.new("an_FloatSocket", "Start Frame")
+        self.outputs.new("an_FloatSocket", "End Frame")
+        self.outputs.new("an_FloatSocket", "Frame Rate")
         
     def getExecutionCode(self, usedOutputs):
         codeLines = []

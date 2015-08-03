@@ -4,7 +4,7 @@ from .. events import propertyChanged
 from .. base_types.socket import AnimationNodeSocket
 
 class ObjectGroupSocket(bpy.types.NodeSocket, AnimationNodeSocket):
-    bl_idname = "mn_ObjectGroupSocket"
+    bl_idname = "an_ObjectGroupSocket"
     bl_label = "Object Group Socket"
     dataType = "Object Group"
     allowedInputTypes = ["Object Group"]

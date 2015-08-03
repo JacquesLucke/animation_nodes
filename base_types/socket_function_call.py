@@ -10,10 +10,10 @@ def getSocketFunctionCallOperatorName(description):
     if description in socketFunctionCallOperators:
         return socketFunctionCallOperators[description]
     missingSocketOperators.append(description)
-    return "mn.call_socket_function_fallback"
+    return "an.call_socket_function_fallback"
 
 class CallSocketFunctionFallback(bpy.types.Operator):
-    bl_idname = "mn.call_socket_function_fallback"
+    bl_idname = "an.call_socket_function_fallback"
     bl_label = "Call Socket Function"
 
     nodeTreeName = StringProperty()
@@ -41,7 +41,7 @@ def createSocketFunctionCallOperator(description):
     if description not in socketFunctionCallOperators:
 
         id = str(len(socketFunctionCallOperators))
-        idName = "mn.call_socket_function_" + id
+        idName = "an.call_socket_function_" + id
         socketFunctionCallOperators[description] = idName
 
         operatorType = type("CallSocketFunction_" + id, (bpy.types.Operator,), {

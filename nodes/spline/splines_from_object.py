@@ -5,7 +5,7 @@ from ... base_types.node import AnimationNode
 from ... data_structures.splines.from_blender import createSplinesFromBlenderObject
 
 class SplinesFromObject(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_SplinesFromObject"
+    bl_idname = "an_SplinesFromObject"
     bl_label = "Splines from Object"
 
     inputNames = { "Object" : "object" }
@@ -17,8 +17,8 @@ class SplinesFromObject(bpy.types.Node, AnimationNode):
         default = True, update = propertyChanged)
 
     def create(self):
-        self.inputs.new("mn_ObjectSocket", "Object").showName = False
-        self.outputs.new("mn_SplineListSocket", "Splines")
+        self.inputs.new("an_ObjectSocket", "Object").showName = False
+        self.outputs.new("an_SplineListSocket", "Splines")
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "useWorldTransform")

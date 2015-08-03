@@ -4,7 +4,7 @@ from .. events import propertyChanged
 from .. base_types.socket import AnimationNodeSocket
 
 class SequenceSocket(bpy.types.NodeSocket, AnimationNodeSocket):
-    bl_idname = "mn_SequenceSocket"
+    bl_idname = "an_SequenceSocket"
     bl_label = "Sequence Socket"
     dataType = "Sequence"
     allowedInputTypes = ["Sequence"]

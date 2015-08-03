@@ -10,7 +10,7 @@ conversionTypeItems = [
 
 
 class ConvertAngle(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_ConvertAngle"
+    bl_idname = "an_ConvertAngle"
     bl_label = "Convert Angle"
     isDetermined = True
 
@@ -31,8 +31,8 @@ class ConvertAngle(bpy.types.Node, AnimationNode):
     conversionType = EnumProperty(name = "Conversion Type", items = conversionTypeItems, update = settingChanged)
 
     def create(self):
-        socket1 = self.inputs.new("mn_FloatSocket", "Angle")
-        socket2 = self.outputs.new("mn_FloatSocket", "Angle")
+        socket1 = self.inputs.new("an_FloatSocket", "Angle")
+        socket2 = self.outputs.new("an_FloatSocket", "Angle")
         for socket in [socket1, socket2]:
             socket.nameSettings.display = True
             socket.nameSettings.unique = False

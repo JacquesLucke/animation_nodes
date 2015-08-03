@@ -8,7 +8,7 @@ special = "!$%&/()=?*+#'-_.:,;" + '"'
 allChars = lower + upper + digits + special
 
 class CharactersNode(bpy.types.Node, AnimationNode):
-    bl_idname = "mn_CharactersNode"
+    bl_idname = "an_CharactersNode"
     bl_label = "Characters"
 
     inputNames = {}
@@ -20,11 +20,11 @@ class CharactersNode(bpy.types.Node, AnimationNode):
                     "All" : "all" }
 
     def create(self):
-        self.outputs.new("mn_StringSocket", "Lower Case")
-        self.outputs.new("mn_StringSocket", "Upper Case")
-        self.outputs.new("mn_StringSocket", "Digits")
-        self.outputs.new("mn_StringSocket", "Special")
-        self.outputs.new("mn_StringSocket", "All")
+        self.outputs.new("an_StringSocket", "Lower Case")
+        self.outputs.new("an_StringSocket", "Upper Case")
+        self.outputs.new("an_StringSocket", "Digits")
+        self.outputs.new("an_StringSocket", "Special")
+        self.outputs.new("an_StringSocket", "All")
 
     def execute(self):
         return lower, upper, digits, special, allChars
