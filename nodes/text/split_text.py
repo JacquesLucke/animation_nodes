@@ -1,7 +1,8 @@
 import bpy, re
+from bpy.props import *
 from ... base_types.node import AnimationNode
-from ... mn_execution import nodeTreeChanged, allowCompiling, forbidCompiling
 from ... mn_utils import *
+from ... events import propertyChanged
 
 splitTypes = [
     ("Characters", "Characters", ""),
@@ -9,38 +10,36 @@ splitTypes = [
     ("Lines", "Lines", ""),
     ("Regexp", "Regexp", "") ]
 
-class mn_SplitText(bpy.types.Node, AnimationNode):
+class SplitText(bpy.types.Node, AnimationNode):
     bl_idname = "mn_SplitText"
     bl_label = "Split Text"
-    
+
+    inputNames = { "Text" : "text",
+                   "Split By" : "splitBy" }
+
+    outputNames = { "Text List" : "textList",
+                    "Length" : "length" }
+
     def splitTypeChanges(self, context):
         self.setHideProperty()
-    
-    splitType = bpy.props.EnumProperty(name = "Split Type", default = "Regexp", items = splitTypes, update = splitTypeChanges)
-    keepDelimiters = bpy.props.BoolProperty(default = False)
-    
-    def init(self, context):
-        forbidCompiling()
+        propertyChanged()
+
+    splitType = EnumProperty(name = "Split Type", default = "Regexp", items = splitTypes, update = splitTypeChanges)
+    keepDelimiters = BoolProperty(default = False, update = propertyChanged)
+
+    def create(self):
+        self.width = 190
         self.inputs.new("mn_StringSocket", "Text")
         self.inputs.new("mn_StringSocket", "Split By")
         self.outputs.new("mn_StringListSocket", "Text List")
         self.outputs.new("mn_IntegerSocket", "Length")
-        allowCompiling()
-        
+
     def draw_buttons(self, context, layout):
         layout.prop(self, "splitType", text = "Type")
         if self.splitType == "Regexp": layout.prop(self, "keepDelimiters", text = "Keep Delimiters")
-        
+
     def setHideProperty(self):
         self.inputs["Split By"].hide = not self.splitType == "Regexp"
-
-        
-    def getInputSocketNames(self):
-        return {"Text" : "text",
-                "Split By" : "splitBy"}
-    def getOutputSocketNames(self):
-        return {"Text List" : "textList",
-                "Length" : "length"}
 
     def execute(self, text, splitBy):
         textList = []
