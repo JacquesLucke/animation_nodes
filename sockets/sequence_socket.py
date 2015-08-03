@@ -1,9 +1,9 @@
 import bpy
 from bpy.props import *
-from .. base_types.socket import AnimationNodeSocket
 from .. events import propertyChanged
+from .. base_types.socket import AnimationNodeSocket
 
-class mn_SequenceSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+class SequenceSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "mn_SequenceSocket"
     bl_label = "Sequence Socket"
     dataType = "Sequence"
@@ -19,12 +19,7 @@ class mn_SequenceSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             row.label(text)
         row.prop_search(self, "sequenceName",  bpy.context.scene.sequence_editor, "sequences", icon="NLA", text = "")
 
-        selector = row.operator("mn.assign_active_sequence_to_socket", text = "", icon = "EYEDROPPER")
-        selector.nodeTreeName = node.id_data.name
-        selector.nodeName = node.name
-        selector.isOutput = self.is_output
-        selector.socketName = self.name
-        selector.target = "sequenceName"
+        self.callFunctionFromUI(row, "assignActiveSequence", icon = "EYEDROPPER")
 
     def getValue(self):
         return bpy.context.scene.sequence_editor.sequences.get(self.sequenceName)
@@ -34,28 +29,10 @@ class mn_SequenceSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getStoreableValue(self):
         return self.sequenceName
 
+    def assignActiveSequence(self):
+        sequenceEditor = bpy.context.scene.sequence_editor
+        if not sequenceEditor: return
 
-class AssignActiveSequenceToSocket(bpy.types.Operator):
-    bl_idname = "mn.assign_active_sequence_to_socket"
-    bl_label = "Assign Active Sequence"
-
-    nodeTreeName = StringProperty()
-    nodeName = StringProperty()
-    target = StringProperty()
-    isOutput = BoolProperty()
-    socketName = StringProperty()
-
-    @classmethod
-    def poll(cls, context):
-        return getActive() is not None
-
-    def execute(self, context):
-        sequenceEditor = context.scene.sequence_editor
-        sequence = None
-        if sequenceEditor:
-            sequence = sequenceEditor.active_strip
-
-        node = getNode(self.nodeTreeName, self.nodeName)
-        socket = getSocketFromNode(node, self.isOutput, self.socketName)
-        setattr(socket, self.target, sequence.name)
-        return {'FINISHED'}
+        sequence = sequenceEditor.active_strip
+        if sequence:
+            self.sequenceName = sequence.name

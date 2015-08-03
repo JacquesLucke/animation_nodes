@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
-from .. base_types.socket import AnimationNodeSocket
 from .. events import propertyChanged
+from .. base_types.socket import AnimationNodeSocket
 
 class ObjectGroupSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "mn_ObjectGroupSocket"
