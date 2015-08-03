@@ -14,11 +14,5 @@ class FloatListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getValue(self):
         return []
 
-    def setStoreableValue(self, data):
-        pass
-        
-    def getStoreableValue(self):
-        return []
-
     def getCopyValueFunctionString(self):
         return "return value[:]"

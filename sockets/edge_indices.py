@@ -10,15 +10,9 @@ class EdgeIndicesSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def drawInput(self, layout, node, text):
         layout.label(text)
-        
+
     def getValue(self):
         return (0, 1)
-
-    def setStoreableValue(self, data):
-        pass
-
-    def getStoreableValue(self):
-        pass
 
     def getCopyValueFunctionString(self):
         return "return value[:]"

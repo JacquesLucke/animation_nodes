@@ -32,7 +32,7 @@ class IntegerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def setStoreableValue(self, data):
         self.value = data
-        
+
     def getStoreableValue(self):
         return self.value
 

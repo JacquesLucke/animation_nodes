@@ -1,16 +1,16 @@
 import bpy
 from bpy.props import *
-from .. mn_execution import nodePropertyChanged
+from .. events import propertyChanged
 from .. base_types.socket import AnimationNodeSocket
 
-class mn_ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "mn_ObjectSocket"
     bl_label = "Object Socket"
     dataType = "Object"
     allowedInputTypes = ["Object"]
     drawColor = (0, 0, 0, 1)
 
-    objectName = StringProperty(update = nodePropertyChanged)
+    objectName = StringProperty(update = propertyChanged)
     showName = BoolProperty(default = True)
     objectCreationType = StringProperty(default = "")
 
@@ -31,6 +31,7 @@ class mn_ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def setStoreableValue(self, data):
         self.objectName = data
+
     def getStoreableValue(self):
         return self.objectName
 

@@ -16,9 +16,3 @@ class EmptySocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def getValue(self):
         return None
-
-    def setStoreableValue(self, data):
-        pass
-
-    def getStoreableValue(self):
-        return None

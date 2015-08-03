@@ -56,6 +56,12 @@ class AnimationNodeSocket:
     def draw_color(self, context, node):
         return self.drawColor
 
+    def setStoreableValue(self, data):
+        pass
+
+    def getStoreableValue(self):
+        return
+
     def callFunctionFromUI(self, layout, functionName, text = "", icon = "NONE", description = ""):
         idName = getSocketFunctionCallOperatorName(description)
         props = layout.operator(idName, text = text, icon = icon)
