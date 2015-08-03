@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from . mn_utils import getNode
-from . sockets.mn_socket_info import getDataTypeFromIdName
+from . sockets.info import getDataTypeFromIdName
 
 '''
                 ###############

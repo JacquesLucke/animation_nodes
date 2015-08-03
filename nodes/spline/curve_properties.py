@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... base_types.node import AnimationNode
-from ... sockets.mn_socket_info import getIdNameFromDataType
+from ... sockets.info import getIdNameFromDataType
 
 possibleProperties = {
     "bevel_depth" : ("Bevel Depth", "Float", 0),

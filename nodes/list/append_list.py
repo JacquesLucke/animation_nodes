@@ -1,7 +1,7 @@
 import bpy
 from ... base_types.node import AnimationNode
 from ... utils.mn_node_utils import NodeTreeInfo
-from ... sockets.mn_socket_info import getListBaseSocketIdName, getListSocketIdName
+from ... sockets.info import getListBaseSocketIdName, getListSocketIdName
 
 class AppendListNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_AppendListNode"

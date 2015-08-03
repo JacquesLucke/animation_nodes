@@ -1,7 +1,7 @@
 import bpy
 from ... base_types.node import AnimationNode
 from ... utils.mn_node_utils import NodeTreeInfo
-from ... sockets.mn_socket_info import isListSocketIdName
+from ... sockets.info import isListSocketIdName
 
 class ShuffleListNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_ShuffleListNode"

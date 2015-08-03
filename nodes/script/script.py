@@ -4,7 +4,7 @@ from ... mn_utils import getNode
 from ... base_types.node import AnimationNode
 from ... utils.mn_node_utils import NodeTreeInfo
 from ... utils.mn_name_utils import getPossibleSocketName, convertVariableNameToUI
-from ... sockets.mn_socket_info import getSocketDataTypeItems, getIdNameFromDataType
+from ... sockets.info import getSocketDataTypeItems, getIdNameFromDataType
 
 emptySocketName = "New Socket"
 

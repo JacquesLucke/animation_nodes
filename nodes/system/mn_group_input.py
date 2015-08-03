@@ -3,7 +3,7 @@ from ... base_types.node import AnimationNode
 from ... mn_execution import nodePropertyChanged, nodeTreeChanged, allowCompiling, forbidCompiling
 from ... mn_utils import *
 from ... utils.mn_node_utils import *
-from ... sockets.mn_socket_info import *
+from ... sockets.info import *
 
 newInputSocketName = "New Input"
 

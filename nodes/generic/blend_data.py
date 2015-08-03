@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... base_types.node import AnimationNode
 from ... events import executionCodeChanged
-from ... sockets.mn_socket_info import getIdNameFromDataType
+from ... sockets.info import getIdNameFromDataType
 
 class BlendDataNode(bpy.types.Node, AnimationNode):
     bl_idname = "mn_BlendDataNode"

@@ -3,7 +3,7 @@ from bpy.props import *
 from ... base_types.node import AnimationNode
 from ... utils.mn_node_utils import getNotUsedSocketName
 from ... utils.selection import getSortedSelectedObjectNames
-from ... sockets.mn_socket_info import (getListBaseSocketIdNames,
+from ... sockets.info import (getListBaseSocketIdNames,
                                        getSocketClassFromIdName,
                                        getIdNameFromDataType,
                                        getListSocketIdName)

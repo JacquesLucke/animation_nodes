@@ -1,7 +1,7 @@
 import bpy
 from mathutils import Vector
 from . utils.mn_node_utils import *
-from . sockets.mn_socket_info import getListBaseSocketIdName
+from . sockets.info import getListBaseSocketIdName
 
 def correctForbiddenNodeLinks():
     nodeTree = NodeTreeInfo(getAnimationNodeTrees())
