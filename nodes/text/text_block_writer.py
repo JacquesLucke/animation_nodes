@@ -1,28 +1,23 @@
 import bpy
 from ... base_types.node import AnimationNode
-from ... mn_execution import nodeTreeChanged, allowCompiling, forbidCompiling
-from ... mn_utils import *
 
-
-class mn_TextBlockWriter(bpy.types.Node, AnimationNode):
+class TextBlockWriter(bpy.types.Node, AnimationNode):
     bl_idname = "mn_TextBlockWriter"
     bl_label = "Text Block Writer"
-    
-    def init(self, context):
-        forbidCompiling()
+
+    inputNames = { "Text Block" : "textBlock",
+                   "Text" : "text",
+                   "Enabled" : "enabled" }
+
+    outputNames = { "Text Block" : "textBlock" }
+
+    def create(self):
         self.inputs.new("mn_TextBlockSocket", "Text Block").showName = False
         self.inputs.new("mn_StringSocket", "Text")
+        self.inputs.new("mn_BooleanSocket", "Enabled").hide = True
         self.outputs.new("mn_TextBlockSocket", "Text Block")
-        allowCompiling()
-        
-    def getInputSocketNames(self):
-        return {"Text Block" : "textBlock",
-                "Text" : "text"}
-    def getOutputSocketNames(self):
-        return {"Text Block" : "textBlock"}
 
-    def execute(self, textBlock, text):
-        if textBlock is not None:
-            textBlock.from_string(text)
+    def execute(self, textBlock, text, enabled):
+        if not enabled or textBlock is None: return textBlock
+        textBlock.from_string(text)
         return textBlock
-        
