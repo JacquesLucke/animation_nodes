@@ -297,7 +297,7 @@ class ParticlesMenu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         insertNode(layout, "mn_ParticleSystemsInput", "Systems Input")
-        insertNode(layout, "mn_ParticleSystemInfo", "System Info")
+        insertNode(layout, "mn_GetParticles", "Get Particles")
         insertNode(layout, "mn_FilterParticles", "State Filter")
         insertNode(layout, "mn_ParticlesInfo", "Particle List Info")
         insertNode(layout, "mn_ParticleInfo", "Particle Info")
