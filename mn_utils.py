@@ -19,10 +19,10 @@ Created by Jacques Lucke
 '''
 
 import bpy, random, ast
-    
+
 # simple general functions
 ##########################
-    
+
 def getActive():
     return bpy.context.scene.objects.active
 def setActive(object):
@@ -63,7 +63,7 @@ def nameToPath(name):
     return '["' + name + '"]'
 def printTimeSpan(name, timeSpan, extraInfo = ""):
     print(name + " " + str(round(timeSpan, 7)).rjust(13) + " s  -  " + str(round(1.0 / timeSpan, 5)).rjust(13) + " fps  " + extraInfo)
-    
+
 # nodes and sockets
 ######################
 
@@ -83,7 +83,7 @@ def getSocketFromListByIdentifier(sockets, identifier):
     return None
 def getNodeIdentifier(node):
     return node.id_data.name + node.name
-    
+
 def getConnectionDictionaries(node):
     inputSocketConnections = {}
     outputSocketConnections = {}
@@ -117,17 +117,17 @@ def tryToSetConnectionDictionaries(node, connections):
         if nodeSocket is not None:
             for toSocket in outputConnections[identifier]:
                 nodeTree.links.new(toSocket, nodeSocket)
-    
+
 # socket origins
 ######################
-    
+
 def isSocketLinked(socket):
     origin = getOriginSocket(socket)
     return isOtherOriginSocket(socket, origin)
-    
+
 def isOtherOriginSocket(socket, origin):
     return origin is not None and origin.node.name != socket.node.name
-        
+
 def getOriginSocket(socket):
     if hasLinks(socket):
         fromSocket = socket.links[0].from_socket
@@ -140,11 +140,11 @@ def getOriginSocket(socket):
             return None
         else:
             return socket
-        
+
 def hasLinks(socket):
     return len(socket.links) > 0
-    
-    
+
+
 # code
 ########################
 
