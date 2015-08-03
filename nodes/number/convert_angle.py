@@ -1,17 +1,22 @@
 import bpy
 from bpy.props import *
 from ... base_types.node import AnimationNode
-from ... mn_execution import nodeTreeChanged, allowCompiling, forbidCompiling
+from ... events import executionCodeChanged
+
 
 conversionTypeItems = [
     ("DEGREE_TO_RADIAN", "Degree to Radian", ""),
     ("RADIAN_TO_DEGREE", "Radian to Degree", "")]
 
-class mn_ConvertAngle(bpy.types.Node, AnimationNode):
+
+class ConvertAngle(bpy.types.Node, AnimationNode):
     bl_idname = "mn_ConvertAngle"
     bl_label = "Convert Angle"
     isDetermined = True
-    
+
+    inputNames = { "Angle" : "angle" }
+    outputNames = { "Angle" : "angle" }
+
     def settingChanged(self, context):
         inSocket = self.inputs["Angle"]
         outSocket = self.outputs["Angle"]
@@ -21,32 +26,24 @@ class mn_ConvertAngle(bpy.types.Node, AnimationNode):
         else:
             inSocket.customName = "Radian"
             outSocket.customName = "Degree"
-        nodeTreeChanged()
-    
+        executionCodeChanged()
+
     conversionType = EnumProperty(name = "Conversion Type", items = conversionTypeItems, update = settingChanged)
-    
-    def init(self, context):
-        forbidCompiling()
+
+    def create(self):
         socket1 = self.inputs.new("mn_FloatSocket", "Angle")
         socket2 = self.outputs.new("mn_FloatSocket", "Angle")
         for socket in [socket1, socket2]:
             socket.displayCustomName = True
             socket.uniqueCustomName = False
         self.conversionType = "DEGREE_TO_RADIAN"
-        allowCompiling()
-        
-    def getInputSocketNames(self):
-        return {"Angle" : "angle"}
-    def getOutputSocketNames(self):
-        return {"Angle" : "angle"}
-        
+
     def draw_buttons(self, context, layout):
         layout.prop(self, "conversionType", text = "")
-        
-    def useInLineExecution(self):
-        return True
-    def getInLineExecutionString(self, outputUse):
+
+    def getExecutionCode(self, outputUse):
         if self.conversionType == "DEGREE_TO_RADIAN": return "$angle$ = %angle% / 180 * math.pi"
         if self.conversionType == "RADIAN_TO_DEGREE": return "$angle$ = %angle% * 180 / math.pi"
+
     def getModuleList(self):
         return ["math"]
