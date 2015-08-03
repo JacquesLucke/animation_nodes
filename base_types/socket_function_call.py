@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from bpy.app.handlers import persistent
-from .. mn_utils import getSocket
+from .. old_utils import getSocket
 
 socketFunctionCallOperators = {}
 missingSocketOperators = []

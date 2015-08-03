@@ -1,6 +1,6 @@
 import bpy
 from ... base_types.node import AnimationNode
-from ... mn_utils import getConnectionDictionaries, tryToSetConnectionDictionaries
+from ... old_utils import getConnectionDictionaries, tryToSetConnectionDictionaries
 from ... sockets.info import *
 
 class ConvertNode(bpy.types.Node, AnimationNode):

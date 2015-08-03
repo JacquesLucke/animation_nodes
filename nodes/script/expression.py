@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
-from ... mn_utils import getRandomString
+from ... old_utils import getRandomString
 
 defaultVariableNames = list("xyzwabcdefghijklmnopqrstuv")
 

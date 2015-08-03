@@ -1,6 +1,6 @@
 import bpy, time, os, sys, inspect
 from . utils.nodes import *
-from . mn_utils import *
+from . old_utils import *
 from . node_link_conversion import correctForbiddenNodeLinks
 
 normalNetworks = []

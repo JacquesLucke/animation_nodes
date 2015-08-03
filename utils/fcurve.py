@@ -1,5 +1,5 @@
 import bpy
-from .. mn_utils import *
+from .. old_utils import *
 from .. cache import *
 from . names import toDataPath
 

@@ -1,5 +1,5 @@
 import bpy
-from .. mn_utils import *
+from .. old_utils import *
 
 def getNode(treeName, nodeName):
     try: return bpy.data.node_groups[treeName].nodes[nodeName]

@@ -1,7 +1,7 @@
 import bpy, re
 from bpy.props import *
 from ... base_types.node import AnimationNode
-from ... mn_utils import *
+from ... old_utils import *
 from ... events import propertyChanged
 
 splitTypes = [

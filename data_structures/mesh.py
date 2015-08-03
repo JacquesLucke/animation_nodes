@@ -1,6 +1,6 @@
 import bpy, bmesh
 from mathutils import Vector
-from .. mn_utils import *
+from .. old_utils import *
 
 class MeshData:
     def __init__(self,

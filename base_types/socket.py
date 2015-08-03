@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from .. events import treeChanged
-from .. mn_utils import getRandomString, isSocketLinked
+from .. old_utils import getRandomString, isSocketLinked
 from . socket_function_call import getSocketFunctionCallOperatorName
 from .. utils.names import toVariableName
 

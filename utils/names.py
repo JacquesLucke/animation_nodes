@@ -1,6 +1,6 @@
 import bpy
 import re
-from .. mn_utils import *
+from .. old_utils import *
 
 def toDataPath(name):
     return '["{}"]'.format(name)

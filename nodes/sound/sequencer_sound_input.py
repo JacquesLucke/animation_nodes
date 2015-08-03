@@ -4,7 +4,7 @@ import math
 from mathutils import Vector
 from bpy.props import *
 from bpy.app.handlers import persistent
-from ... mn_utils import getNode
+from ... old_utils import getNode
 from ... events import propertyChanged
 from ... base_types.node import AnimationNode
 from ... algorithms import interpolation

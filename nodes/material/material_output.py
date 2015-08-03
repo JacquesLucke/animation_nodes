@@ -1,7 +1,7 @@
 import bpy
 from ... base_types.node import AnimationNode
 from ... events import treeChanged
-from ... mn_utils import hasLinks, getConnectionDictionaries, tryToSetConnectionDictionaries
+from ... old_utils import hasLinks, getConnectionDictionaries, tryToSetConnectionDictionaries
 
 allowedSocketTypes = {
     "NodeSocketVector" : "mn_VectorSocket",

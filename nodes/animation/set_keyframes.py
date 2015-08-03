@@ -1,7 +1,7 @@
 import bpy
 from ... base_types.node import AnimationNode
 from ... events import propertyChanged
-from ... mn_utils import *
+from ... old_utils import *
 
 pathTypes = ("Custom", "Location", "Rotation", "Scale", "LocRotScale")
 pathTypeItems = [(pathType, pathType, "") for pathType in pathTypes]

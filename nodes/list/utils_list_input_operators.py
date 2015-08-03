@@ -1,5 +1,5 @@
 import bpy
-from ... mn_utils import *
+from ... old_utils import *
 
 class mn_NewPropertyListNode(bpy.types.Operator):
     bl_idname = "mn.new_property_to_list_node"
