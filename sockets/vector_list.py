@@ -1,8 +1,8 @@
 import bpy
 from .. mn_execution import nodePropertyChanged
-from .. mn_node_base import *
+from .. base_types.socket import AnimationNodeSocket
 
-class mn_VectorListSocket(mn_BaseSocket, mn_SocketProperties):
+class mn_VectorListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "mn_VectorListSocket"
     bl_label = "Vector List Socket"
     dataType = "Vector List"

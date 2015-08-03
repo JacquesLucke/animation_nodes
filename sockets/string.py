@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from .. mn_execution import nodePropertyChanged
-from .. mn_node_base import *
+from .. base_types.socket import AnimationNodeSocket
 
 class EnumItem(bpy.types.PropertyGroup):
     displayName = StringProperty()
@@ -9,7 +9,7 @@ class EnumItem(bpy.types.PropertyGroup):
     description = StringProperty(default = "")
     icon = StringProperty(default = "NONE")
 
-class mn_StringSocket(mn_BaseSocket, mn_SocketProperties):
+class mn_StringSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "mn_StringSocket"
     bl_label = "String Socket"
     dataType = "String"

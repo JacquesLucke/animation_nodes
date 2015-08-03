@@ -1,8 +1,8 @@
 import bpy
 from .. mn_execution import nodePropertyChanged
-from .. mn_node_base import *
+from .. base_types.socket import AnimationNodeSocket
 
-class mn_EdgeIndicesListSocket(mn_BaseSocket, mn_SocketProperties):
+class mn_EdgeIndicesListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "mn_EdgeIndicesListSocket"
     bl_label = "Edge Indices List Socket"
     dataType = "Edge Indices List"

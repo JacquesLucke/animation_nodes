@@ -72,5 +72,5 @@ def createSettingsPropertyGroup(easyDict):
     return settings
 
 def getNodeClasses():
-    from . mn_node_base import AnimationNode
+    from . base_types.node import AnimationNode
     return AnimationNode.__subclasses__()

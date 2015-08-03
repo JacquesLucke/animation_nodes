@@ -1,8 +1,8 @@
 import bpy
 from .. mn_execution import nodePropertyChanged
-from .. mn_node_base import *
+from .. base_types.socket import AnimationNodeSocket
 
-class mn_FloatListSocket(mn_BaseSocket, mn_SocketProperties):
+class mn_FloatListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "mn_FloatListSocket"
     bl_label = "Float List Socket"
     dataType = "Float List"

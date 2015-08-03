@@ -1,8 +1,8 @@
 import bpy
 from .. mn_execution import nodePropertyChanged
-from .. mn_node_base import *
+from .. base_types.socket import AnimationNodeSocket
 
-class mn_TextBlockSocket(mn_BaseSocket, mn_SocketProperties):
+class mn_TextBlockSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "mn_TextBlockSocket"
     bl_label = "Text Block Socket"
     dataType = "Text Block"

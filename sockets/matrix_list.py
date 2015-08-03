@@ -1,7 +1,7 @@
 import bpy
-from .. mn_node_base import *
+from .. base_types.socket import AnimationNodeSocket
 
-class mn_MatrixListSocket(mn_BaseSocket, mn_SocketProperties):
+class mn_MatrixListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "mn_MatrixListSocket"
     bl_label = "Matrix List Socket"
     dataType = "Matrix List"

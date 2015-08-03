@@ -1,8 +1,8 @@
 import bpy
 from .. mn_execution import nodePropertyChanged
-from .. mn_node_base import *
+from .. base_types.socket import AnimationNodeSocket
 
-class mn_PolygonIndicesSocket(mn_BaseSocket, mn_SocketProperties):
+class mn_PolygonIndicesSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "mn_PolygonIndicesSocket"
     bl_label = "Polygon Indices Socket"
     dataType = "Polygon Indices"

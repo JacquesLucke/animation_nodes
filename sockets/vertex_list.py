@@ -1,9 +1,9 @@
 import bpy
 from .. mn_execution import nodePropertyChanged
-from .. mn_node_base import *
+from .. base_types.socket import AnimationNodeSocket
 from mathutils import Matrix
 
-class mn_VertexListSocket(mn_BaseSocket, mn_SocketProperties):
+class mn_VertexListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "mn_VertexListSocket"
     bl_label = "Vertex List Socket"
     dataType = "Vertex List"

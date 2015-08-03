@@ -73,5 +73,5 @@ def getSocketDataTypes():
     return [socketClass.dataType for socketClass in getSocketClasses()]
 
 def getSocketClasses():
-    from .. import mn_node_base
-    return mn_node_base.mn_BaseSocket.__subclasses__()
+    from .. base_types.socket import AnimationNodeSocket
+    return AnimationNodeSocket.__subclasses__()

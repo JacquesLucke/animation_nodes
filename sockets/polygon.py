@@ -1,9 +1,9 @@
 import bpy
 from .. mn_execution import nodePropertyChanged
-from .. mn_node_base import *
+from .. base_types.socket import AnimationNodeSocket
 from .. data_structures.mesh import Polygon
 
-class mn_PolygonSocket(mn_BaseSocket, mn_SocketProperties):
+class mn_PolygonSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "mn_PolygonSocket"
     bl_label = "Polygon Socket"
     dataType = "Polygon"

@@ -1,9 +1,9 @@
 import bpy
 from bpy.props import *
 from .. mn_execution import nodePropertyChanged
-from .. mn_node_base import *
+from .. base_types.socket import AnimationNodeSocket
 
-class mn_ObjectSocket(mn_BaseSocket, mn_SocketProperties):
+class mn_ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "mn_ObjectSocket"
     bl_label = "Object Socket"
     dataType = "Object"

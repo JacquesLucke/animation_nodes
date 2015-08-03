@@ -1,8 +1,8 @@
 import bpy
 from .. mn_execution import nodePropertyChanged
-from .. mn_node_base import *
+from .. base_types.socket import AnimationNodeSocket
 
-class mn_ParticleListSocket(mn_BaseSocket, mn_SocketProperties):
+class mn_ParticleListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "mn_ParticleListSocket"
     bl_label = "Particle List Socket"
     dataType = "Particle List"

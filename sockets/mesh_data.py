@@ -1,9 +1,9 @@
 import bpy
 from .. mn_execution import nodePropertyChanged
-from .. mn_node_base import *
+from .. base_types.socket import AnimationNodeSocket
 from .. data_structures.mesh import MeshData
 
-class mn_MeshDataSocket(mn_BaseSocket, mn_SocketProperties):
+class mn_MeshDataSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "mn_MeshDataSocket"
     bl_label = "Mesh Data Socket"
     dataType = "Mesh Data"

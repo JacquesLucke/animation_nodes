@@ -1,6 +1,6 @@
 import bpy
 from .. mn_execution import nodePropertyChanged
-from .. mn_node_base import *
+from .. base_types.socket import AnimationNodeSocket
 from .. algorithms.interpolation import *
 
 topCategoryItems = [("LINEAR", "Linear", ""),
@@ -18,7 +18,7 @@ cubicCategoryItems = [("IN", "In", ""),
 backCategoryItems = [("IN", "In", ""),
                     ("OUT", "Out", "")]
 
-class mn_InterpolationSocket(mn_BaseSocket, mn_SocketProperties):
+class mn_InterpolationSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "mn_InterpolationSocket"
     bl_label = "Interpolation Socket"
     dataType = "Interpolation"

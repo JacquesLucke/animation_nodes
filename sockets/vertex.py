@@ -1,9 +1,9 @@
 import bpy
 from .. mn_execution import nodePropertyChanged
-from .. mn_node_base import *
+from .. base_types.socket import AnimationNodeSocket
 from .. data_structures.mesh import Vertex
 
-class mn_VertexSocket(mn_BaseSocket, mn_SocketProperties):
+class mn_VertexSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "mn_VertexSocket"
     bl_label = "Vertex Socket"
     dataType = "Vertex"

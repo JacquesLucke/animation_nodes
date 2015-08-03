@@ -1,13 +1,13 @@
 import bpy
 from .. mn_execution import nodePropertyChanged
-from .. mn_node_base import *
+from .. base_types.socket import AnimationNodeSocket
 
 def getValue(self):
     return min(max(self.min, self.get("value", 0)), self.max)
 def setValue(self, value):
     self["value"] = min(max(self.min, value), self.max)
 
-class mn_FloatSocket(mn_BaseSocket, mn_SocketProperties):
+class mn_FloatSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "mn_FloatSocket"
     bl_label = "Float Socket"
     dataType = "Float"
