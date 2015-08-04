@@ -1,5 +1,6 @@
 import bpy
 from bpy.app.handlers import persistent
+from . utils.recursion import noRecusion
 
 class EventState:
     def __init__(self):
@@ -26,7 +27,7 @@ event = EventState()
 @persistent
 def sceneUpdated(scene):
     event.sceneChanged = True
-    print(event.getActives())
+    update(event.getActives())
     event.reset()
 
 @persistent
@@ -45,6 +46,11 @@ def executionCodeChanged(self = None, context = None):
 
 def treeChanged(self = None, context = None):
     event.treeChanged = True
+
+
+@noRecusion
+def update(events):
+    pass
 
 
 
