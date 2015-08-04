@@ -57,4 +57,5 @@ class SplineSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def toString(self):
         if self.showName: return self.getDisplayedName()
+        if self.objectName == "": return "--None--"
         return self.objectName
