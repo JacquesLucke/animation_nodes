@@ -1,6 +1,5 @@
 import bpy
 from ... base_types.node import AnimationNode
-from ... old_utils import hasLinks, getConnectionDictionaries, tryToSetConnectionDictionaries
 
 allowedSocketTypes = {
     "NodeSocketVector" : "an_VectorSocket",
@@ -103,7 +102,6 @@ class CyclesMaterialOutputNode(bpy.types.Node, AnimationNode):
 
     def setInputSocket(self):
         socket = self.getSelectedSocket()
-        connections = getConnectionDictionaries(self)
         self.inputs.clear()
         if socket is None:
             self.inputs.new("an_GenericSocket", "Data")
@@ -111,4 +109,3 @@ class CyclesMaterialOutputNode(bpy.types.Node, AnimationNode):
             data = socket.default_value
             self.inputs.new(allowedSocketTypes[socket.bl_idname], "Data")
             self.inputs["Data"].setStoreableValue(data)
-        tryToSetConnectionDictionaries(self, connections)

@@ -1,6 +1,5 @@
 import bpy
 from ... base_types.node import AnimationNode
-from ... old_utils import getConnectionDictionaries, tryToSetConnectionDictionaries
 from ... sockets.info import *
 
 class ConvertNode(bpy.types.Node, AnimationNode):
@@ -39,10 +38,8 @@ class ConvertNode(bpy.types.Node, AnimationNode):
         return []
 
     def buildOutputSocket(self):
-        connections = getConnectionDictionaries(self)
         self.outputs.clear()
         self.outputs.new(toIdName(self.convertType), "New")
-        tryToSetConnectionDictionaries(self, connections)
 
     def getInputSocketNames(self):
         return {"Old" : "old"}

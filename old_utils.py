@@ -18,54 +18,7 @@ Created by Jacques Lucke
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import bpy, random, ast
-
-# nodes and sockets
-######################
-
-def getSocket(treeName, nodeName, isOutput, identifier):
-    node = getNode(treeName, nodeName)
-    sockets = node.outputs if isOutput else node.inputs
-    for socket in sockets:
-        if socket.identifier == identifier: return socket
-
-def getNode(treeName, nodeName):
-    return bpy.data.node_groups[treeName].nodes[nodeName]
-
-
-def getConnectionDictionaries(node):
-    inputSocketConnections = {}
-    outputSocketConnections = {}
-    for socket in node.inputs:
-        value = socket.getStoreableValue()
-        if hasLinks(socket):
-            inputSocketConnections[socket.identifier] = (value, socket.links[0].from_socket, socket.bl_idname)
-        else:
-            inputSocketConnections[socket.identifier] = (value, None, socket.bl_idname)
-    for socket in node.outputs:
-        outputSocketConnections[socket.identifier] = []
-        for link in socket.links:
-            outputSocketConnections[socket.identifier].append(link.to_socket)
-    return (inputSocketConnections, outputSocketConnections)
-def tryToSetConnectionDictionaries(node, connections):
-    nodeTree = node.id_data
-    #inputs
-    inputConnections = connections[0]
-    for identifier in inputConnections:
-        nodeSocket = getSocketFromListByIdentifier(node.inputs, identifier)
-        if nodeSocket is not None:
-            if nodeSocket.bl_idname == inputConnections[identifier][2]:
-                nodeSocket.setStoreableValue(inputConnections[identifier][0])
-            if inputConnections[identifier][1] is not None:
-                nodeTree.links.new(nodeSocket, inputConnections[identifier][1])
-
-    #outputs
-    outputConnections = connections[1]
-    for identifier in outputConnections:
-        nodeSocket = getSocketFromListByIdentifier(node.outputs, identifier)
-        if nodeSocket is not None:
-            for toSocket in outputConnections[identifier]:
-                nodeTree.links.new(toSocket, nodeSocket)
+import bpy
 
 # socket origins
 ######################
