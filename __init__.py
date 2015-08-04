@@ -55,33 +55,15 @@ class AnimationNodesSettings(bpy.types.PropertyGroup):
 # register
 ##################################
 
-addon_keymaps = []
-def registerKeymaps():
-    global addon_keymaps
-    wm = bpy.context.window_manager
-    km = wm.keyconfigs.addon.keymaps.new(name = "Node Editor", space_type = "NODE_EDITOR")
-    kmi = km.keymap_items.new("an.insert_node", type = "A", value = "PRESS", ctrl = True)
-    kmi = km.keymap_items.new("wm.call_menu_pie", type = "W", value = "PRESS")
-    kmi.properties.name = "an.context_pie"
-    addon_keymaps.append(km)
-
-def unregisterKeymaps():
-    global addon_keymaps
-    wm = bpy.context.window_manager
-    for km in addon_keymaps:
-        for kmi in km.keymap_items:
-            km.keymap_items.remove(kmi)
-        wm.keyconfigs.addon.keymaps.remove(km)
-    addon_keymaps.clear()
-
+from . import keymap
 from . import events
-from . insert_nodes_menu import registerMenu, unregisterMenu
+from . utils import selection
 from . base_types import node as node_base
-from . base_types import socket as socket_base
 from . base_types import node_function_call
 from . base_types import socket_function_call
+from . base_types import socket as socket_base
+from . insert_nodes_menu import registerMenu, unregisterMenu
 from . nodes.sound import sequencer_sound_input as sequencer_sound
-from . utils import selection
 
 def register():
     bpy.utils.register_module(__name__)
@@ -95,7 +77,7 @@ def register():
     socket_function_call.registerHandlers()
 
     registerMenu()
-    registerKeymaps()
+    keymap.register()
 
     bpy.types.Scene.animationNodes = PointerProperty(type = AnimationNodesSettings, name = "Animation Nodes Settings")
 
@@ -113,7 +95,7 @@ def unregister():
     socket_function_call.unregisterHandlers()
 
     unregisterMenu()
-    unregisterKeymaps()
+    keymap.unregister()
 
     del bpy.types.Scene.animationNodes
 
