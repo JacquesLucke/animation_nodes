@@ -103,7 +103,7 @@ def unregister_keymaps():
         wm.keyconfigs.addon.keymaps.remove(km)
     addon_keymaps.clear()
 
-from . import old_execution as execution
+from . import events
 from . insert_nodes_menu import registerMenu, unregisterMenu
 from . base_types import node as node_base
 from . base_types import socket as socket_base
@@ -114,7 +114,7 @@ from . utils import selection
 
 def register():
     bpy.utils.register_module(__name__)
-    execution.register_handlers()
+    events.register_handlers()
     node_base.register_handlers()
     socket_base.register()
     node_function_call.register_handlers()
@@ -130,7 +130,7 @@ def register():
 def unregister():
     unregister_keymaps()
     bpy.utils.unregister_module(__name__)
-    execution.unregister_handlers()
+    events.unregister_handlers()
     node_base.unregister_handlers()
     socket_base.unregister()
     node_function_call.unregister_handlers()
