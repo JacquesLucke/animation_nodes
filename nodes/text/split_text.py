@@ -1,8 +1,7 @@
 import bpy, re
 from bpy.props import *
-from ... base_types.node import AnimationNode
-from ... old_utils import *
 from ... events import propertyChanged
+from ... base_types.node import AnimationNode
 
 splitTypes = [
     ("Characters", "Characters", ""),
@@ -24,7 +23,10 @@ class SplitText(bpy.types.Node, AnimationNode):
         self.setHideProperty()
         propertyChanged()
 
-    splitType = EnumProperty(name = "Split Type", default = "Regexp", items = splitTypes, update = splitTypeChanges)
+    splitType = EnumProperty(
+        name = "Split Type", default = "Regexp",
+        items = splitTypes, update = splitTypeChanges)
+
     keepDelimiters = BoolProperty(default = False, update = propertyChanged)
 
     def create(self):
@@ -36,7 +38,8 @@ class SplitText(bpy.types.Node, AnimationNode):
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "splitType", text = "Type")
-        if self.splitType == "Regexp": layout.prop(self, "keepDelimiters", text = "Keep Delimiters")
+        if self.splitType == "Regexp":
+            layout.prop(self, "keepDelimiters", text = "Keep Delimiters")
 
     def setHideProperty(self):
         self.inputs["Split By"].hide = not self.splitType == "Regexp"

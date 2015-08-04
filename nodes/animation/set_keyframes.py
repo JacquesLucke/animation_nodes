@@ -1,14 +1,14 @@
 import bpy
+from bpy.props import *
 from ... base_types.node import AnimationNode
 from ... events import propertyChanged
-from ... old_utils import *
 
 pathTypes = ("Custom", "Location", "Rotation", "Scale", "LocRotScale")
 pathTypeItems = [(pathType, pathType, "") for pathType in pathTypes]
 
 class an_KeyframePath(bpy.types.PropertyGroup):
-    path = bpy.props.StringProperty(default = "", update = propertyChanged, description = "Path to the property")
-    index = bpy.props.IntProperty(default = -1, update = propertyChanged, min = -1, soft_max = 2, description = "Used index if the path points to an array (-1 will set a keyframe on every index)")
+    path = StringProperty(default = "", update = propertyChanged, description = "Path to the property")
+    index = IntProperty(default = -1, update = propertyChanged, min = -1, soft_max = 2, description = "Used index if the path points to an array (-1 will set a keyframe on every index)")
 
 class SetKeyframesNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SetKeyframesNode"
@@ -20,10 +20,10 @@ class SetKeyframesNode(bpy.types.Node, AnimationNode):
                    "Object" : "object" }
     outputNames = {}
 
-    paths = bpy.props.CollectionProperty(type = an_KeyframePath)
+    paths = CollectionProperty(type = an_KeyframePath)
 
-    selectedPathType = bpy.props.EnumProperty(default = "Location", items = pathTypeItems, name = "Path Type")
-    attributePath = bpy.props.StringProperty(default = "", name = "Attribute Path")
+    selectedPathType = EnumProperty(default = "Location", items = pathTypeItems, name = "Path Type")
+    attributePath = StringProperty(default = "", name = "Attribute Path")
 
     def create(self):
         self.width = 200
