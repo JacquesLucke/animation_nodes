@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
-from ... old_utils import getRandomString
+from ... utils.names import getRandomString
 
 defaultVariableNames = list("xyzwabcdefghijklmnopqrstuv")
 
@@ -28,8 +28,9 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
     def create(self):
         socket = self.inputs.new("an_GenericSocket", "x")
         socket.nameSettings.editable = True
-        socket.customName = "x"
         socket.nameSettings.variable = True
+        socket.nameSettings.unique = True
+        socket.customName = "x"
         socket.removeable = True
         self.inputs.new("an_EmptySocket", "...").passiveSocketType = "an_GenericSocket"
         self.outputs.new("an_GenericSocket", "Result")
@@ -50,6 +51,7 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
                 newSocket = self.inputs.new("an_GenericSocket", self.getNotUsedSocketName())
                 newSocket.nameSettings.editable = True
                 newSocket.nameSettings.variable = True
+                newSocket.nameSettings.unique = True
                 newSocket.removeable = True
                 newSocket.customName = self.getNextCustomName()
                 self.inputs.new("an_EmptySocket", "...").passiveSocketType = "an_GenericSocket"

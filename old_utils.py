@@ -20,13 +20,6 @@ Created by Jacques Lucke
 
 import bpy, random, ast
 
-# simple general functions
-##########################
-
-def getRandomString(length):
-    return ''.join(random.choice("abcdefghijklmnopqrstuvwxyz") for _ in range(length))
-
-
 # nodes and sockets
 ######################
 

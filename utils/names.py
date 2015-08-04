@@ -1,6 +1,6 @@
-import bpy
 import re
-from .. old_utils import *
+import bpy
+import random
 
 def toDataPath(name):
     return '["{}"]'.format(name)
@@ -36,6 +36,9 @@ def getPossibleName(field, name = "element"):
     while field.get(name + randomString + str(counter)):
         counter += 1
     return name + randomString + str(counter)
+
+def getRandomString(length):
+    return ''.join(random.choice("abcdefghijklmnopqrstuvwxyz") for _ in range(length))
 
 def toVariableName(name):
     return re.sub("\W+", "", name)
