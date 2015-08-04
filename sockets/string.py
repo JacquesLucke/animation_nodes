@@ -60,3 +60,7 @@ class StringSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             else: item.displayName = enumItem[0]
             if len(enumItem) > 2: item.description = enumItem[2]
             if len(enumItem) > 3: item.icon = enumItem[3]
+
+    def toString(self):
+        if self.showName: return self.getDisplayedName()
+        return self.value

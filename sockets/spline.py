@@ -45,7 +45,7 @@ class SplineSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         self.objectName, self.useWorldSpace = data
 
     def getStoreableValue(self):
-        return (self.objectName, self.useWorldSpace)
+        return self.objectName, self.useWorldSpace
 
     def getCopyValueFunctionString(self):
         return "return value.copy()"
@@ -54,3 +54,7 @@ class SplineSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         object = bpy.context.active_object
         if getattr(object, "type", "") == "CURVE":
             self.objectName = object.name
+
+    def toString(self):
+        if self.showName: return self.getDisplayedName()
+        return self.objectName

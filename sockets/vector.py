@@ -1,4 +1,5 @@
 import bpy
+from bpy.props import *
 from mathutils import Vector
 from .. events import propertyChanged
 from .. base_types.socket import AnimationNodeSocket
@@ -10,8 +11,8 @@ class VectorSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Vector"]
     drawColor = (0.05, 0.05, 0.8, 0.7)
 
-    value = bpy.props.FloatVectorProperty(default = [0, 0, 0], update = propertyChanged)
-    showName = bpy.props.BoolProperty(default = True)
+    value = FloatVectorProperty(default = [0, 0, 0], update = propertyChanged)
+    showName = BoolProperty(default = True)
 
     def drawInput(self, layout, node, text):
         col = layout.column(align = True)
@@ -26,9 +27,13 @@ class VectorSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def setStoreableValue(self, data):
         self.value = data
-        
+
     def getStoreableValue(self):
         return self.value[:]
 
     def getCopyValueFunctionString(self):
         return "return value.copy()"
+
+    def toString(self):
+        if self.showName: return self.getDisplayedName()
+        return "({:.2f}, {:.2f}, {:.2f})".format(*self.value)

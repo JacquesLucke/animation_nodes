@@ -50,3 +50,7 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         object = bpy.data.objects.new("Target", data)
         bpy.context.scene.objects.link(object)
         self.objectName = object.name
+
+    def toString(self):
+        if self.showName: return self.getDisplayedName()
+        return self.objectName
