@@ -11,6 +11,7 @@ class AnimationNode:
     searchTags = []
     onlySearchTags = False
     isDetermined = False
+    isAnimationNode = True
 
     @classmethod
     def poll(cls, nodeTree):

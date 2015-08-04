@@ -110,10 +110,11 @@ class ScriptNode(bpy.types.Node, AnimationNode):
 
     def setupNewSocket(self, socket, name):
         socket.nameSettings.editable = True
-        socket.customName = name
         socket.nameSettings.variable = True
         socket.nameSettings.callAfterChange = True
+        socket.nameSettings.unique = True
         socket.removeable = True
+        socket.customName = name
 
     def getSocketFromOtherNode(self, link):
         if link.from_node == self:

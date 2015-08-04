@@ -39,7 +39,7 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
         if not self.isExpressionValid:
             layout.label("invalid expression", icon = "ERROR")
 
-    def update(self):
+    def edit(self):
         socket = self.inputs.get("...")
         if socket is not None:
             links = socket.links

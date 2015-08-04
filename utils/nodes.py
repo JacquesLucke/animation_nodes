@@ -34,6 +34,12 @@ def getNodesFromType(nodeType):
                 nodes.append(node)
     return nodes
 
+def iterAnimationNodes():
+    for nodeTree in getAnimationNodeTrees():
+        for node in nodeTree.nodes:
+            if getattr(node, "isAnimationNode", False):
+                yield node
+
 def getAnimationNodeTrees():
     nodeTrees = []
     for nodeTree in bpy.data.node_groups:
@@ -82,7 +88,7 @@ def updateDependencyNode(socket):
 
 def isNodeRemoved(node):
     return getattr(node, "isRemoved", False)
-    
+
 def getLinkedSockets(socket):
     sockets = []
     for link in socket.links:
