@@ -17,10 +17,10 @@ def renderIsEnding(scene):
     _isRendering = False
 
 
-def register_handlers():
+def registerHandlers():
     bpy.app.handlers.render_pre.append(renderIsStarting)
     bpy.app.handlers.render_post.append(renderIsEnding)
 
-def unregister_handlers():
+def unregisterHandlers():
     bpy.app.handlers.render_pre.remove(renderIsStarting)
     bpy.app.handlers.render_post.remove(renderIsEnding)

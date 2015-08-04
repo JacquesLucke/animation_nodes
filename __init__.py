@@ -45,38 +45,9 @@ modules = developer_utils.setup_addon_modules(__path__, __name__, "bpy" in local
 
 import bpy
 from bpy.props import *
-from . events import executionCodeChanged
-from . id_keys import idTypeItems
-
-class GlobalUpdateSettings(bpy.types.PropertyGroup):
-    frameChange = BoolProperty(default = True, name = "Frame Change", description = "Recalculate the nodes when the frame has been changed")
-    sceneUpdate = BoolProperty(default = True, name = "Scene Update", description = "Recalculate the nodes continuously")
-    propertyChange = BoolProperty(default = True, name = "Property Change", description = "Recalculate the nodes when a property of a node changed")
-    treeChange = BoolProperty(default = True, name = "Tree Change")
-    skipFramesAmount = IntProperty(default = 0, name = "Skip Frames", min = 0, soft_max = 10, description = "Only recalculate the nodes every nth frame")
-    redrawViewport = BoolProperty(default = True, name = "Redraw Viewport", description = "Redraw the UI after each execution. Turning it off gives a better performance but worse realtime feedback.")
-    resetCompileBlockerWhileRendering = BoolProperty(default = True, name = "Force Update While Rendering", description = "Force the node tree to execute if the frame changes and Blender is rendering currently (nodes which change the frame may lock the UI)")
-
-class DeveloperSettings(bpy.types.PropertyGroup):
-    printUpdateTime = BoolProperty(default = False, name = "Print Global Update Time")
-    printGenerationTime = BoolProperty(default = False, name = "Print Script Generation Time")
-    executionProfiling = BoolProperty(default = False, name = "Node Execution Profiling", update = executionCodeChanged)
-
-class IDKeyType(bpy.types.PropertyGroup):
-    name = StringProperty()
-    id = StringProperty()
-    type = StringProperty()
-    hide = BoolProperty(default = False)
-
-class IDKeySettings(bpy.types.PropertyGroup):
-    keys = CollectionProperty(type = IDKeyType)
-    newKeyName = StringProperty(default = "Initial Transforms")
-    newKeyType = EnumProperty(items = idTypeItems, name = "Type", default = "Transforms")
-    showAdvanced = BoolProperty(name = "Show Advanced", default = True, description = "Show more options for each ID Key")
+from . id_keys import IDKeySettings
 
 class AnimationNodesSettings(bpy.types.PropertyGroup):
-    update = PointerProperty(type = GlobalUpdateSettings, name = "Update Settings")
-    developer = PointerProperty(type = DeveloperSettings, name = "Developer Settings")
     idKeys = PointerProperty(type = IDKeySettings, name = "ID Keys")
 
 
@@ -85,7 +56,7 @@ class AnimationNodesSettings(bpy.types.PropertyGroup):
 ##################################
 
 addon_keymaps = []
-def register_keymaps():
+def registerKeymaps():
     global addon_keymaps
     wm = bpy.context.window_manager
     km = wm.keyconfigs.addon.keymaps.new(name = "Node Editor", space_type = "NODE_EDITOR")
@@ -94,7 +65,7 @@ def register_keymaps():
     kmi.properties.name = "an.context_pie"
     addon_keymaps.append(km)
 
-def unregister_keymaps():
+def unregisterKeymaps():
     global addon_keymaps
     wm = bpy.context.window_manager
     for km in addon_keymaps:
@@ -114,29 +85,36 @@ from . utils import selection
 
 def register():
     bpy.utils.register_module(__name__)
-    events.register_handlers()
-    node_base.register_handlers()
+
     socket_base.register()
-    node_function_call.register_handlers()
-    socket_function_call.register_handlers()
-    sequencer_sound.register_handlers()
-    selection.register_handlers()
+    events.registerHandlers()
+    node_base.registerHandlers()
+    selection.registerHandlers()
+    sequencer_sound.registerHandlers()
+    node_function_call.registerHandlers()
+    socket_function_call.registerHandlers()
+
     registerMenu()
-    register_keymaps()
-    bpy.types.Scene.an_settings = PointerProperty(type = AnimationNodesSettings, name = "Animation Node Settings")
+    registerKeymaps()
+
+    bpy.types.Scene.animationNodes = PointerProperty(type = AnimationNodesSettings, name = "Animation Nodes Settings")
 
     print("Registered Animation Nodes with {} modules.".format(len(modules)))
 
 def unregister():
-    unregister_keymaps()
     bpy.utils.unregister_module(__name__)
-    events.unregister_handlers()
-    node_base.unregister_handlers()
+
     socket_base.unregister()
-    node_function_call.unregister_handlers()
-    socket_function_call.unregister_handlers()
-    sequencer_sound.unregister_handlers()
-    selection.unregister_handlers()
+    events.unregisterHandlers()
+    node_base.unregisterHandlers()
+    selection.unregisterHandlers()
+    sequencer_sound.unregisterHandlers()
+    node_function_call.unregisterHandlers()
+    socket_function_call.unregisterHandlers()
+
     unregisterMenu()
+    unregisterKeymaps()
+
+    del bpy.types.Scene.animationNodes
 
     print("Unregistered Animation Nodes")

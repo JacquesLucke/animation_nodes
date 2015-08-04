@@ -42,8 +42,8 @@ def getSelectedObjectNames():
 # Register
 ##################################
 
-def register_handlers():
+def registerHandlers():
     bpy.app.handlers.scene_update_post.append(updateSelectionSorting)
 
-def unregister_handlers():
+def unregisterHandlers():
     bpy.app.handlers.scene_update_post.remove(updateSelectionSorting)

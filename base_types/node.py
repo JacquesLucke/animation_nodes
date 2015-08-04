@@ -82,8 +82,8 @@ def createIdentifier():
 # Register
 ##################################
 
-def register_handlers():
+def registerHandlers():
     bpy.app.handlers.load_post.append(createMissingIdentifiers)
 
-def unregister_handlers():
+def unregisterHandlers():
     bpy.app.handlers.load_post.remove(createMissingIdentifiers)

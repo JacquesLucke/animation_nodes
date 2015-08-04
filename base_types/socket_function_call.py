@@ -61,8 +61,8 @@ def createSocketFunctionCallOperator(description):
 # Register
 ##################################
 
-def register_handlers():
+def registerHandlers():
     bpy.app.handlers.scene_update_post.append(createMissingOperators)
 
-def unregister_handlers():
+def unregisterHandlers():
     bpy.app.handlers.scene_update_post.remove(createMissingOperators)

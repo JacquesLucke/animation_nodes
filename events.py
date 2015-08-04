@@ -57,12 +57,12 @@ def update(events):
 # Register
 ##################################
 
-def register_handlers():
+def registerHandlers():
     bpy.app.handlers.scene_update_post.append(sceneUpdated)
     bpy.app.handlers.frame_change_post.append(frameChanged)
     bpy.app.handlers.load_post.append(fileLoaded)
 
-def unregister_handlers():
+def unregisterHandlers():
     bpy.app.handlers.frame_change_post.remove(frameChanged)
     bpy.app.handlers.scene_update_post.remove(sceneUpdated)
     bpy.app.handlers.load_post.remove(fileLoaded)
