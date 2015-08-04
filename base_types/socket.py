@@ -25,8 +25,6 @@ class AnimationNodeSocket:
     moveable = BoolProperty(default = False)
     moveGroup = IntProperty(default = 0)
 
-    loopAsList = BoolProperty(default = False)
-
     def draw(self, context, layout, node, text):
         displayText = self.getDisplayedName()
 
@@ -151,7 +149,7 @@ def getSocketVisibility(socket):
 
 def setSocketVisibility(socket, value):
     socket.hide = not value
-    
+
 
 def register():
     bpy.types.NodeSocket.show = BoolProperty(default = True, get = getSocketVisibility, set = setSocketVisibility)
