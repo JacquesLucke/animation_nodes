@@ -17,9 +17,14 @@ class SequenceSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         row = layout.row(align = True)
         if self.showName:
             row.label(text)
-        row.prop_search(self, "sequenceName",  bpy.context.scene.sequence_editor, "sequences", icon="NLA", text = "")
 
-        self.callFunctionFromUI(row, "assignActiveSequence", icon = "EYEDROPPER")
+        editor = bpy.context.scene.sequence_editor
+        if editor:
+            row.prop_search(self, "sequenceName",  editor, "sequences", icon="NLA", text = "")
+            self.callFunctionFromUI(row, "assignActiveSequence", icon = "EYEDROPPER")
+        else:
+            row.label("No Sequence Editor")
+
 
     def getValue(self):
         return bpy.context.scene.sequence_editor.sequences.get(self.sequenceName)
