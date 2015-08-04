@@ -148,8 +148,10 @@ def isCustomNameUsed(node, name):
 
 def getSocketVisibility(socket):
     return not socket.hide
+
 def setSocketVisibility(socket, value):
     socket.hide = not value
+    
 
 def register():
     bpy.types.NodeSocket.show = BoolProperty(default = True, get = getSocketVisibility, set = setSocketVisibility)
