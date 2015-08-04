@@ -1,6 +1,6 @@
 import bpy
 from bpy.app.handlers import persistent
-from . utils.recursion import noRecusion
+from . utils.recursion import noRecursion
 
 class EventState:
     def __init__(self):
@@ -48,7 +48,7 @@ def treeChanged(self = None, context = None):
     event.treeChanged = True
 
 
-@noRecusion
+@noRecursion
 def update(events):
     pass
 

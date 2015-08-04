@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from .. events import treeChanged
-from .. utils.recursion import noRecusion
+from .. utils.recursion import noRecursion
 from .. utils.nodes import iterAnimationNodes
 
 class AnimationNodeTree(bpy.types.NodeTree):
@@ -13,7 +13,7 @@ class AnimationNodeTree(bpy.types.NodeTree):
         update()
         treeChanged()
 
-@noRecusion
+@noRecursion
 def update():
     updateAllNodes()
 

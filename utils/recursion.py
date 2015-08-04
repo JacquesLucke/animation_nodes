@@ -1,6 +1,6 @@
 activeFunctions = set()
 
-def noRecusion(function):
+def noRecursion(function):
     """The decorated function should not return any values"""
     def wrapper(*args, **kwargs):
         identifier = id(function)
