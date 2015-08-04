@@ -114,6 +114,7 @@ class ScriptNode(bpy.types.Node, AnimationNode):
         socket.nameSettings.callAfterChange = True
         socket.nameSettings.unique = True
         socket.removeable = True
+        socket.moveable = True
         socket.customName = name
 
     def getSocketFromOtherNode(self, link):

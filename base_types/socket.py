@@ -21,9 +21,11 @@ class AnimationNodeSocket:
     nameSettings = PointerProperty(type = an_CustomNameProperties)
 
     removeable = BoolProperty(default = False)
-    callNodeToRemove = BoolProperty(default = False)
+    removeInNode = BoolProperty(default = False)
+
     moveable = BoolProperty(default = False)
     moveGroup = IntProperty(default = 0)
+    moveInNode = BoolProperty(default = False)
 
     def draw(self, context, layout, node, text):
         displayText = self.getDisplayedName()
@@ -32,24 +34,27 @@ class AnimationNodeSocket:
         if self.nameSettings.editable:
             row.prop(self, "customName", text = "")
         else:
-            if not self.is_output and not isSocketLinked(self):
+            if not self.is_output and not self.isLinked:
                 self.drawInput(row, node, displayText)
             else:
                 if self.is_output: row.alignment = "RIGHT"
                 row.label(displayText)
 
-        if self.moveable:
+        if self.moveable and self.moveInNode:
             row.separator()
             self.callFunctionFromUI(row, "moveSocketUp", icon = "TRIA_UP")
             self.callFunctionFromUI(row, "moveSocketDown", icon = "TRIA_DOWN")
 
-        if self.removeable:
+        if self.removeable and self.removeInNode:
             row.separator()
             self.callFunctionFromUI(row, "removeSocket", icon = "X")
 
     def getDisplayedName(self):
         if self.nameSettings.display or self.nameSettings.editable: return self.customName
         return self.name
+
+    def toString(self):
+        return self.getDisplayedName()
 
     def draw_color(self, context, node):
         return self.drawColor
@@ -60,9 +65,9 @@ class AnimationNodeSocket:
     def getStoreableValue(self):
         return
 
-    def callFunctionFromUI(self, layout, functionName, text = "", icon = "NONE", description = ""):
+    def callFunctionFromUI(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True):
         idName = getSocketFunctionCallOperatorName(description)
-        props = layout.operator(idName, text = text, icon = icon)
+        props = layout.operator(idName, text = text, icon = icon, emboss = emboss)
         props.nodeTreeName = self.node.id_data.name
         props.nodeName = self.node.name
         props.isOutput = self.is_output
@@ -76,6 +81,7 @@ class AnimationNodeSocket:
         self.moveSocket(moveUp = False)
 
     def moveSocket(self, moveUp = True):
+        if not self.moveable: return
         moveableSocketIndices = [index for index, socket in enumerate(self.sockets) if socket.moveable and socket.moveGroup == self.moveGroup]
         currentIndex = list(self.sockets).index(self)
 
@@ -90,19 +96,23 @@ class AnimationNodeSocket:
         if targetIndex != -1:
             self.sockets.move(currentIndex, targetIndex)
             if moveUp: self.sockets.move(targetIndex + 1, currentIndex)
-        else: self.sockets.move(targetIndex - 1, currentIndex)
-        return {'FINISHED'}
+            else: self.sockets.move(targetIndex - 1, currentIndex)
 
-    def removeSocket(self):
-        if self.callNodeToRemove:
-            self.node.removeSocket(socket)
-        else:
-            self.sockets.remove(self)
+    def remove(self):
+        self.node.removeSocket(self)
+
+    @property
+    def index(self):
+        return list(self.sockets).index(self)
 
     @property
     def sockets(self):
         """Returns all sockets next to this one (all inputs or outputs)"""
         return self.node.outputs if self.is_output else self.node.inputs
+
+    @property
+    def isLinked(self):
+        return isSocketLinked(self)
 
 
 

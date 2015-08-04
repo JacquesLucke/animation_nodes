@@ -15,12 +15,6 @@ class CreateList(bpy.types.Node, AnimationNode):
 
     outputNames = { "List" : "list" }
 
-    def settingChanged(self, context):
-        for socket in self.inputs:
-            socket.moveable = self.manageSockets
-            socket.removeable = self.manageSockets
-            socket.hide = self.hideInputs
-
     def assignedTypeChanged(self, context):
         baseDataType = self.assignedType
         self.baseIdName = toIdName(baseDataType)
@@ -32,8 +26,11 @@ class CreateList(bpy.types.Node, AnimationNode):
     baseIdName = StringProperty()
     listIdName = StringProperty()
 
-    manageSockets = BoolProperty(name = "Manage Sockets", default = False, description = "Allows to (re)move the input sockets", update = settingChanged)
-    hideInputs = BoolProperty(name = "Hide Inputs", default = False, update = settingChanged)
+    def hideStatusChanged(self, context):
+        for socket in self.inputs:
+            socket.hide = self.hideInputs
+
+    hideInputs = BoolProperty(name = "Hide Inputs", default = False, update = hideStatusChanged)
 
     def create(self):
         self.selectedType = "Float"
@@ -44,7 +41,6 @@ class CreateList(bpy.types.Node, AnimationNode):
             text = "New Input",
             description = "Create a new input socket",
             icon = "PLUS")
-        layout.prop(self, "manageSockets")
 
     def draw_buttons_ext(self, context, layout):
         col = layout.column(align = True)
@@ -78,10 +74,9 @@ class CreateList(bpy.types.Node, AnimationNode):
     def newInputSocket(self):
         socket = self.inputs.new(self.baseIdName, getNotUsedSocketName(self, "Element"))
         socket.nameSettings.display = True
-        socket.nameSettings.unique = False
         socket.customName = "Element"
-        socket.removeable = self.manageSockets
-        socket.moveable = self.manageSockets
+        socket.removeable = True
+        socket.moveable = True
         if hasattr(socket, "showName"):
             socket.showName = False
         return socket

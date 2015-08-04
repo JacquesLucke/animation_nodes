@@ -40,3 +40,7 @@ class FloatSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def setMinMax(self, min, max):
         self.min = min
         self.max = max
+
+    def toString(self):
+        if self.showName: return self.getDisplayedName()
+        return str(round(self.value, 3))

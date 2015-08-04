@@ -8,6 +8,9 @@ from .. utils.nodes import getAnimationNodeTrees
 class AnimationNode:
     identifier = StringProperty(name = "Identifier", default = "")
 
+    activeInputIndex = IntProperty()
+    activeOutputIndex = IntProperty()
+
     searchTags = []
     onlySearchTags = False
     isDetermined = False
@@ -59,6 +62,24 @@ class AnimationNode:
         props.nodeTreeName = self.id_data.name
         props.nodeName = self.name
         props.functionName = functionName
+
+    def removeSocket(self, socket):
+        index = socket.index
+        if socket.is_output:
+            if index < self.activeOutputIndex: self.activeOutputIndex -= 1
+        else:
+            if index < self.activeInputIndex: self.activeInputIndex -= 1
+        socket.sockets.remove(socket)
+
+    @property
+    def activeInputSocket(self):
+        if len(self.inputs) == 0: return None
+        return self.inputs[self.activeInputIndex]
+
+    @property
+    def activeOutputSocket(self):
+        if len(self.outputs) == 0: return None
+        return self.outputs[self.activeOutputIndex]
 
 
 @persistent
