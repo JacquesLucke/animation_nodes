@@ -19,29 +19,3 @@ Created by Jacques Lucke
 '''
 
 import bpy
-
-# socket origins
-######################
-
-def isSocketLinked(socket):
-    origin = getOriginSocket(socket)
-    return isOtherOriginSocket(socket, origin)
-
-def isOtherOriginSocket(socket, origin):
-    return origin is not None and origin.node.name != socket.node.name
-
-def getOriginSocket(socket):
-    if hasLinks(socket):
-        fromSocket = socket.links[0].from_socket
-        if fromSocket.node.type == "REROUTE":
-            return getOriginSocket(fromSocket.node.inputs[0])
-        else:
-            return fromSocket
-    else:
-        if socket.node.type == "REROUTE":
-            return None
-        else:
-            return socket
-
-def hasLinks(socket):
-    return len(socket.links) > 0

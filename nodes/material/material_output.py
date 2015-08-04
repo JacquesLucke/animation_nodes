@@ -66,7 +66,7 @@ class CyclesMaterialOutputNode(bpy.types.Node, AnimationNode):
     def edit(self):
         socket = self.inputs.get("Data")
         if socket is not None and not self.socketIsChanging:
-            if hasLinks(socket):
+            if len(socket.links) > 0:
                 fromType = self.inputs[0].links[0].from_socket.bl_idname
                 possibleIdentifiers = self.getInputIdentifiersFromSocketType(fromType)
                 if self.inputs["Data"].bl_idname != fromType and len(possibleIdentifiers) > 0:

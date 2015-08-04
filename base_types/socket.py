@@ -1,10 +1,9 @@
 import bpy
 from bpy.props import *
 from .. events import treeChanged
-from .. utils.names import getRandomString
-from .. old_utils import isSocketLinked
+from .. utils.nodes import isSocketLinked
+from .. utils.names import getRandomString, toVariableName
 from . socket_function_call import getSocketFunctionCallOperatorName
-from .. utils.names import toVariableName
 
 class an_CustomNameProperties(bpy.types.PropertyGroup):
     unique = BoolProperty(default = False)

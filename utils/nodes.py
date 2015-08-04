@@ -1,6 +1,5 @@
 import bpy
 from . names import getRandomString
-from .. old_utils import *
 
 def getSocket(treeName, nodeName, isOutput, identifier):
     node = getNode(treeName, nodeName)
@@ -302,3 +301,27 @@ def isReroute(object):
     if isinstance(object, bpy.types.NodeSocket):
         return object.node.bl_idname == "NodeReroute"
     return False
+
+
+# socket origins (deprecated)
+#############################
+
+def isSocketLinked(socket):
+    origin = getOriginSocket(socket)
+    return isOtherOriginSocket(socket, origin)
+
+def isOtherOriginSocket(socket, origin):
+    return origin is not None and origin.node.name != socket.node.name
+
+def getOriginSocket(socket):
+    if len(socket.links) > 0:
+        fromSocket = socket.links[0].from_socket
+        if fromSocket.node.type == "REROUTE":
+            return getOriginSocket(fromSocket.node.inputs[0])
+        else:
+            return fromSocket
+    else:
+        if socket.node.type == "REROUTE":
+            return None
+        else:
+            return socket
