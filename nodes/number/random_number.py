@@ -1,4 +1,5 @@
 import bpy
+import random
 from ... events import propertyChanged
 from ... cache import getUniformRandom
 from ... base_types.node import AnimationNode
@@ -28,5 +29,5 @@ class RandomNumberNode(bpy.types.Node, AnimationNode):
     def execute(self, seed, minValue, maxValue):
         return getUniformRandom(seed + 1193 * self.additionalSeed, minValue, maxValue)
 
-    def copy(self, node):
-        self.additionalSeed = int(random.random()*1000)
+    def duplicate(self, sourceNode):
+        self.additionalSeed = int(random.random() * 1000)

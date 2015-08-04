@@ -17,6 +17,10 @@ class NodePropertiesPanel(bpy.types.Panel):
         col.prop(self.node, "bl_width_max", text = "Max Width")
         self.drawSocketVisibility(layout)
 
+        if hasattr(self.node, "isAnimationNode"):
+            layout.separator()
+            layout.label("Identifier: " + self.node.identifier)
+
     def drawSocketVisibility(self, layout):
         row = layout.row(align = False)
 
