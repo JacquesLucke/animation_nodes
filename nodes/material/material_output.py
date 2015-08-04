@@ -1,6 +1,5 @@
 import bpy
 from ... base_types.node import AnimationNode
-from ... events import treeChanged
 from ... old_utils import hasLinks, getConnectionDictionaries, tryToSetConnectionDictionaries
 
 allowedSocketTypes = {
@@ -35,7 +34,6 @@ class CyclesMaterialOutputNode(bpy.types.Node, AnimationNode):
         self.socketIsChanging = True
         self.setInputSocket()
         self.socketIsChanging = False
-        treeChanged()
 
     materialName = bpy.props.StringProperty(update = selectedSocketChanged)
     nodeName = bpy.props.StringProperty(update = selectedSocketChanged)

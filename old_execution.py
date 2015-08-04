@@ -31,7 +31,6 @@ def updateAnimationTrees(event = "NONE", sender = None):
 def secureExecution(event, sender):
     try: executeUnits(event, sender)
     except:
-        resetCompileBlocker()
         generateExecutionUnits()
         try: executeUnits(event, sender)
         except Exception as e:
@@ -49,13 +48,6 @@ def redraw_areas_if_possible():
         for area in bpy.context.screen.areas:
             area.tag_redraw()
     except: pass
-
-def allowCompiling():
-    pass
-def forbidCompiling():
-    pass
-def resetCompileBlocker():
-    pass
 
 
 # generate Scripts
@@ -126,30 +118,12 @@ def forceExecution(sender = None):
     updateAnimationTrees("FORCE", sender)
 
 
-# check rendering status
-##############################
-
-is_rendering = False
-@persistent
-def rendering_starts(scene):
-    global is_rendering
-    is_rendering = True
-@persistent
-def rendering_ends(scene):
-    global is_rendering
-    is_rendering = False
-
-
 def register_handlers():
     bpy.app.handlers.frame_change_post.append(frameChangeHandler)
     bpy.app.handlers.scene_update_post.append(sceneUpdateHandler)
     bpy.app.handlers.load_post.append(fileLoadHandler)
-    bpy.app.handlers.render_pre.append(rendering_starts)
-    bpy.app.handlers.render_post.append(rendering_ends)
 
 def unregister_handlers():
     bpy.app.handlers.frame_change_post.remove(frameChangeHandler)
     bpy.app.handlers.scene_update_post.remove(sceneUpdateHandler)
     bpy.app.handlers.load_post.remove(fileLoadHandler)
-    bpy.app.handlers.render_pre.remove(rendering_starts)
-    bpy.app.handlers.render_post.remove(rendering_ends)
