@@ -45,7 +45,7 @@ modules = developer_utils.setup_addon_modules(__path__, __name__, "bpy" in local
 
 import bpy
 from bpy.props import *
-from . old_execution import nodeTreeChanged
+from . events import executionCodeChanged
 from . id_keys import idTypeItems
 
 class GlobalUpdateSettings(bpy.types.PropertyGroup):
@@ -60,7 +60,7 @@ class GlobalUpdateSettings(bpy.types.PropertyGroup):
 class DeveloperSettings(bpy.types.PropertyGroup):
     printUpdateTime = BoolProperty(default = False, name = "Print Global Update Time")
     printGenerationTime = BoolProperty(default = False, name = "Print Script Generation Time")
-    executionProfiling = BoolProperty(default = False, name = "Node Execution Profiling", update = nodeTreeChanged)
+    executionProfiling = BoolProperty(default = False, name = "Node Execution Profiling", update = executionCodeChanged)
 
 class IDKeyType(bpy.types.PropertyGroup):
     name = StringProperty()
@@ -110,6 +110,7 @@ from . base_types import socket as socket_base
 from . base_types import node_function_call
 from . base_types import socket_function_call
 from . nodes.sound import sequencer_sound_input as sequencer_sound
+from . utils import selection
 
 def register():
     bpy.utils.register_module(__name__)
@@ -119,6 +120,7 @@ def register():
     node_function_call.register_handlers()
     socket_function_call.register_handlers()
     sequencer_sound.register_handlers()
+    selection.register_handlers()
     registerMenu()
     register_keymaps()
     bpy.types.Scene.an_settings = PointerProperty(type = AnimationNodesSettings, name = "Animation Node Settings")
@@ -134,6 +136,7 @@ def unregister():
     node_function_call.unregister_handlers()
     socket_function_call.unregister_handlers()
     sequencer_sound.unregister_handlers()
+    selection.unregister_handlers()
     unregisterMenu()
 
     print("Unregistered Animation Nodes")

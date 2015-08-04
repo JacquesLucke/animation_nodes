@@ -4,7 +4,6 @@ from bpy.props import *
 from . old_utils import *
 from . cache import clearExecutionCache
 from . utils.nodes import *
-from . utils.selection import updateSelectionSorting
 from . execution_unit_generator import getExecutionUnits
 
 executionUnits = []
@@ -94,8 +93,6 @@ def frameChangeHandler(scene):
 @persistent
 def sceneUpdateHandler(scene):
     global treeChanged, propertyChanged, frameChanged
-
-    updateSelectionSorting()
 
     if treeChanged:
         generateExecutionUnits()

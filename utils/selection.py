@@ -1,4 +1,5 @@
 import bpy
+from bpy.app.handlers import persistent
 
 enableSelectionSorting = True
 sortedSelectionNames = []
@@ -8,10 +9,12 @@ def getSortedSelectedObjects():
     for name in getSortedSelectedObjectNames():
         objects.append(bpy.data.objects.get(name))
     return objects
+    
 def getSortedSelectedObjectNames():
     return sortedSelectionNames
 
-def updateSelectionSorting():
+@persistent
+def updateSelectionSorting(scene):
     global sortedSelectionNames
 
     selectedNames = getSelectedObjectNames()
@@ -33,3 +36,14 @@ def getSelectedObjectNames():
     for object in bpy.context.selected_objects:
         selectedNames.append(object.name)
     return selectedNames
+
+
+
+# Register
+##################################
+
+def register_handlers():
+    bpy.app.handlers.scene_update_post.append(updateSelectionSorting)
+
+def unregister_handlers():
+    bpy.app.handlers.scene_update_post.remove(updateSelectionSorting)
