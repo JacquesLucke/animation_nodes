@@ -2,9 +2,14 @@ import bpy
 from . names import getRandomString
 from .. old_utils import *
 
+def getSocket(treeName, nodeName, isOutput, identifier):
+    node = getNode(treeName, nodeName)
+    sockets = node.outputs if isOutput else node.inputs
+    for socket in sockets:
+        if socket.identifier == identifier: return socket
+
 def getNode(treeName, nodeName):
-    try: return bpy.data.node_groups[treeName].nodes[nodeName]
-    except: return None
+    return bpy.data.node_groups[treeName].nodes[nodeName]
 
 def getAttributesFromNodesWithType(nodeType, attribute):
     data = []

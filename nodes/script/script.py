@@ -1,6 +1,6 @@
 import bpy, re
 from bpy.props import *
-from ... old_utils import getNode
+from ... utils.nodes import getNode
 from ... base_types.node import AnimationNode
 from ... utils.nodes import NodeTreeInfo
 from ... utils.names import getPossibleSocketName, toInterfaceName

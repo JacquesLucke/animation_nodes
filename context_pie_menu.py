@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import *
-from . old_utils import getNode
+from . utils.nodes import getNode
 from . sockets.info import toDataType
 
 '''
