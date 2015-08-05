@@ -1,6 +1,7 @@
 import bpy
 from collections import defaultdict
 from . utils.nodes import iterAnimationNodes
+from . utils.timing import measureTime
 
 nodesByIdentifier = {}
 
@@ -17,9 +18,10 @@ def socketToID(socket):
 def nodeToID(node):
     return (node.id_data.name, node.name)
 
+
 class NodeNetwork:
     def __init__(self, nodeGroupInfo):
-        self.nodeInfo = nodeGroupInfo
+        self.info = nodeGroupInfo
 
 
 class NodeGroupInfo:
@@ -28,6 +30,7 @@ class NodeGroupInfo:
 
     def _reset(self):
         self.nodesByType = defaultdict(list)
+        self.typeByNode = defaultdict(None)
         self.linkedSockets = defaultdict(list)
         self.reroutePairs = defaultdict(list)
         self.socketsByNode = defaultdict(lambda: ([], []))
@@ -41,10 +44,11 @@ class NodeGroupInfo:
     def insertBlenderNodes(self, nodes):
         for node in nodes:
             nodeID = nodeToID(node)
-            self.nodesByType[node.bl_idname].append(nodeID)
             inputIDs = [socketToID(socket) for socket in node.inputs]
             outputIDs = [socketToID(socket) for socket in node.outputs]
             self.socketsByNode[nodeID] = (inputIDs, outputIDs)
+            self.nodesByType[node.bl_idname].append(nodeID)
+            self.typeByNode[nodeID] = node.bl_idname
             for socketID in inputIDs + outputIDs:
                 self.nodeBySocket[socketID] = nodeID
 
@@ -64,6 +68,34 @@ class NodeGroupInfo:
             self.linkedSockets[targetID].append(originID)
             self.linksByNode[originID[0]].append(linkID)
             self.linksByNode[targetID[0]].append(linkID)
+
+    def getSeparatedGroups(self):
+        groups = self.getLinkedGroups()
+        return [self.infoFromNodes(group) for group in groups]
+
+    def infoFromNodes(self, nodes):
+        groupInfo = NodeGroupInfo()
+        links = self.getLinksOfNodes(nodes)
+
+        for node in nodes:
+            type = self.typeByNode[node]
+            groupInfo.nodesByType[type].append(node)
+            groupInfo.typeByNode[node] = self.typeByNode[node]
+            inputs, outputs = self.socketsByNode[node]
+            groupInfo.socketsByNode[node] = (inputs, outputs)
+            for socket in inputs + outputs:
+                groupInfo.nodeBySocket[socket] = node
+
+        for link in links:
+            origin, target = link
+            groupInfo.linkedSockets[origin] = target
+            groupInfo.linkedSockets[target] = origin
+            inputNode = self.nodeBySocket[origin]
+            outputNode = self.nodeBySocket[target]
+            groupInfo.linksByNode[inputNode] = link
+            groupInfo.linksByNode[outputNode] = link
+
+        return groupInfo
 
     def getLinksOfNodes(self, nodes):
         links = set()
@@ -147,12 +179,17 @@ class TestTreeInfo(bpy.types.Operator):
     bl_label = "Test Tree Info"
 
     def execute(self, context):
-        info = NodeGroupInfo()
-        info.insertNodeTree(bpy.data.node_groups[0])
-        #info.getLinkedGroups()
-        pprint(info.getLinkedGroups())
+        import time
+        groups = test()
+        print(len(groups))
         return {"FINISHED"}
 
+@measureTime
+def test():
+    info = NodeGroupInfo()
+    info.insertNodeTree(bpy.data.node_groups[0])
+    groups = info.getSeparatedGroups()
+    return groups
 
 from pprint import PrettyPrinter
 def pprint(data):
