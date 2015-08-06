@@ -1,6 +1,6 @@
 import bpy
+from . import event_handler
 from bpy.app.handlers import persistent
-from . utils.recursion import noRecursion
 
 class EventState:
     def __init__(self):
@@ -30,7 +30,7 @@ treeUpdatedWhileWorking = False
 @persistent
 def sceneUpdated(scene):
     event.sceneChanged = True
-    update(event.getActives())
+    event_handler.update(event.getActives())
     event.reset()
 
 @persistent
@@ -51,37 +51,8 @@ def executionCodeChanged(self = None, context = None):
     treeChanged()
 
 def treeChanged(self = None, context = None):
-    global treeUpdatedWhileWorking
-    treeUpdatedWhileWorking = True
     event.treeChanged = True
-
-
-from . node_link_conversion import correctForbiddenNodeLinks
-from . import tree_info
-from . utils.nodes import iterAnimationNodes
-
-@noRecursion
-def update(events):
-    print(events)
-    if "Tree" in events:
-        updateNodes()
-        tree_info.update()
-        correctForbiddenNodeLinks()
-
-def updateNodes():
-    updateAllNodes()
-
-def updateAllNodes():
-    for node in iterAnimationNodes():
-        updateDataIfNecessary()
-        node.edit()
-
-def updateDataIfNecessary():
-    global treeUpdatedWhileWorking
-    if treeUpdatedWhileWorking:
-        tree_info.update()
-        treeUpdatedWhileWorking = False
-
+    event_handler.treeUpdated()
 
 
 # Register
