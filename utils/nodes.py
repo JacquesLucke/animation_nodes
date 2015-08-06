@@ -306,10 +306,6 @@ def isReroute(object):
 # socket origins (deprecated)
 #############################
 
-def isSocketLinked(socket):
-    origin = getOriginSocket(socket)
-    return isOtherOriginSocket(socket, origin)
-
 def isOtherOriginSocket(socket, origin):
     return origin is not None and origin.node.name != socket.node.name
 
