@@ -13,25 +13,4 @@ class AnimationNodeTree(bpy.types.NodeTree):
     bl_icon = "ACTION"
 
     def update(self):
-        global treeUpdated
-        treeUpdated = True
-
-        update()
         treeChanged()
-
-@noRecursion
-def update():
-    updateAllNodes()
-    updateDataIfNecessary()
-
-def updateAllNodes():
-    global treeUpdated
-    for node in iterAnimationNodes():
-        updateDataIfNecessary()
-        node.edit()
-
-def updateDataIfNecessary():
-    global treeUpdated
-    if treeUpdated:
-        tree_info.update()
-        treeUpdated = False
