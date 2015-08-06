@@ -24,13 +24,13 @@ class AppendListNode(bpy.types.Node, AnimationNode):
         self.assignType(listDataType)
 
     def getWantedDataType(self):
-        listInput = getOriginSocket(self.inputs["List"])
-        elementInput = getOriginSocket(self.inputs["Element"])
-        listOutputs = getTargetSockets(self.outputs["List"])
+        listInput = self.inputs["List"].dataOriginSocket
+        elementInput = self.inputs["Element"].dataOriginSocket
+        listOutputs = self.outputs["List"].dataTargetSockets
 
         if listInput is not None: return listInput.dataType
         if elementInput is not None: return toListDataType(elementInput.bl_idname)
-        if len(listOutputs) > 0: return listOutputs[0].dataType
+        if len(listOutputs) == 1: return listOutputs[0].dataType
         return self.inputs["List"].dataType
 
     @keepNodeLinks

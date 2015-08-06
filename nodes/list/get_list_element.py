@@ -1,7 +1,9 @@
 import bpy
+from bpy.props import *
 from ... base_types.node import AnimationNode
 from ... utils.nodes import NodeTreeInfo
-from ... sockets.info import toBaseIdName
+from ... sockets.info import toBaseIdName, getBaseDataTypeItems, toIdName, toListIdName, isBase, toBaseDataType
+from ... tree_info import keepNodeLinks
 
 class GetListElementNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GetListElementNode"
@@ -13,8 +15,25 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
 
     outputNames = { "Element" : "element" }
 
-    def create(self):
+    def assignedTypeChanged(self, context):
+        self.baseIdName = toIdName(self.assignedType)
+        self.listIdName = toListIdName(self.assignedType)
         self.generateSockets()
+
+    selectedType = EnumProperty(name = "Type", items = getBaseDataTypeItems)
+    assignedType = StringProperty(update = assignedTypeChanged)
+    baseIdName = StringProperty()
+    listIdName = StringProperty()
+
+    def create(self):
+        self.assignType("Object")
+
+    def draw_buttons_ext(self, context, layout):
+        col = layout.column(align = True)
+        col.prop(self, "selectedType", text = "")
+        self.callFunctionFromUI(col, "assignSelectedListType",
+            text = "Assign",
+            description = "Remove all sockets and set the selected socket type")
 
     def execute(self, list, index, fallback):
         if 0 <= index < len(list):
@@ -22,27 +41,32 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
         return fallback
 
     def edit(self):
-        nodeTree = self.id_data
-        treeInfo = NodeTreeInfo(nodeTree)
-        originSocket = treeInfo.getDataOriginSocket(self.inputs.get("List"))
-        targetSockets = treeInfo.getDataTargetSockets(self.outputs.get("Element"))
+        dataType = self.getWantedDataType()
+        self.assignType(dataType)
 
-        if originSocket is not None and len(targetSockets) == 0:
-            self.generateSockets(originSocket.bl_idname)
-            nodeTree.links.new(self.inputs.get("List"), originSocket)
-        if originSocket is None and len(targetSockets) == 1:
-            self.generateSockets(baseIdNameToListIdName(targetSockets[0].bl_idname))
-            nodeTree.links.new(targetSockets[0], self.outputs.get("Element"))
+    def getWantedDataType(self):
+        listInput = self.inputs["List"].dataOriginSocket
+        fallbackInput = self.inputs["Fallback"].dataOriginSocket
+        elementOutputs = self.outputs["Element"].dataTargetSockets
 
-    def generateSockets(self, listIdName = "an_ObjectListSocket"):
-        if listIdName is None: return
-        baseIdName = toBaseIdName(listIdName)
-        if baseIdName is None: return
-        if listIdName == getattr(self.inputs.get("List"), "bl_idname", None): return
+        if listInput is not None: return toBaseDataType(listInput.bl_idname)
+        if fallbackInput is not None: return fallbackInput.dataType
+        if len(elementOutputs) == 1: return elementOutputs[0].dataType
+        return self.outputs["Element"].dataType
 
+    def assignSelectedListType(self):
+        self.assignedType = self.selectedType
+
+    @keepNodeLinks
+    def assignType(self, baseDataType):
+        if not isBase(baseDataType): return
+        if baseDataType == self.assignedType: return
+        self.assignedType = baseDataType
+
+    def generateSockets(self):
         self.inputs.clear()
         self.outputs.clear()
-        self.inputs.new(listIdName, "List")
+        self.inputs.new(self.listIdName, "List")
         self.inputs.new("an_IntegerSocket", "Index")
-        self.inputs.new(baseIdName, "Fallback")
-        self.outputs.new(baseIdName, "Element")
+        self.inputs.new(self.baseIdName, "Fallback")
+        self.outputs.new(self.baseIdName, "Element")

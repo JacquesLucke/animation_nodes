@@ -59,7 +59,7 @@ class ConvertListToElement(LinkCorrection):
         return toBaseIdName(origin.bl_idname) == target.bl_idname
     def insert(self, nodeTree, origin, target, dataOrigin):
         node = insertNode(nodeTree, "an_GetListElementNode", origin, target)
-        node.generateSockets(listIdName = origin.bl_idname)
+        node.assignType(target.dataType)
         insertBasicLinking(nodeTree, origin, node, target)
 
 class ConvertElementToList(LinkCorrection):
