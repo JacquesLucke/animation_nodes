@@ -17,21 +17,25 @@ class NodePropertiesPanel(bpy.types.Panel):
         col.prop(self.node, "width", text = "Width")
         col.prop(self.node, "bl_width_max", text = "Max Width")
 
+        col = layout.column()
+
+        self.node.callFunctionFromUI(col, "toogleSocketEditing", text = "Toogle Socket Editing", icon = "SETTINGS")
+
         # Inputs
-        row = layout.row()
+        row = col.row()
         rows = len(self.node.inputs)
         row.template_list("an_SocketUiList", "", self.node, "inputs", self.node, "activeInputIndex", rows = rows, maxrows = rows)
-        col = row.column(align = True)
-        props = col.operator("an.move_input", text = "", icon = "TRIA_UP").moveUp = True
-        col.operator("an.move_input", text = "", icon = "TRIA_DOWN").moveUp = False
+        subcol = row.column(align = True)
+        props = subcol.operator("an.move_input", text = "", icon = "TRIA_UP").moveUp = True
+        subcol.operator("an.move_input", text = "", icon = "TRIA_DOWN").moveUp = False
 
         # Outputs
-        row = layout.row()
+        row = col.row()
         rows = len(self.node.outputs)
         row.template_list("an_SocketUiList", "", self.node, "outputs", self.node, "activeOutputIndex", rows = rows, maxrows = rows)
-        col = row.column(align = True)
-        col.operator("an.move_output", text = "", icon = "TRIA_UP").moveUp = True
-        col.operator("an.move_output", text = "", icon = "TRIA_DOWN").moveUp = False
+        subcol = row.column(align = True)
+        subcol.operator("an.move_output", text = "", icon = "TRIA_UP").moveUp = True
+        subcol.operator("an.move_output", text = "", icon = "TRIA_DOWN").moveUp = False
 
         layout.separator()
         layout.label("Identifier: " + self.node.identifier)

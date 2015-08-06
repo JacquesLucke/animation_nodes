@@ -71,6 +71,15 @@ class AnimationNode:
             if index < self.activeInputIndex: self.activeInputIndex -= 1
         socket.sockets.remove(socket)
 
+    def toogleSocketEditing(self):
+        if len(self.sockets) == 0: return
+        self.setSocketEditing(not self.sockets[0].editInNode)
+
+    def setSocketEditing(self, editInNode = False):
+        for socket in self.sockets:
+            socket.editInNode = editInNode
+        bpy.context.area.tag_redraw()
+
     @property
     def activeInputSocket(self):
         if len(self.inputs) == 0: return None
@@ -80,6 +89,10 @@ class AnimationNode:
     def activeOutputSocket(self):
         if len(self.outputs) == 0: return None
         return self.outputs[self.activeOutputIndex]
+
+    @property
+    def sockets(self):
+        return list(self.inputs) + list(self.outputs)
 
 
 @persistent
