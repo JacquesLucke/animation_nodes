@@ -4,6 +4,7 @@ from ... base_types.node import AnimationNode
 from ... utils.nodes import getNotUsedSocketName
 from ... utils.selection import getSortedSelectedObjectNames
 from ... sockets.info import getBaseDataTypeItems, toIdName, toListIdName
+from ... tree_info import getOriginSocket, getDirectOriginSocket
 
 class CreateList(bpy.types.Node, AnimationNode):
     bl_idname = "an_CreateList"
@@ -54,7 +55,15 @@ class CreateList(bpy.types.Node, AnimationNode):
         self.drawTypeSpecificButtonsExt(layout)
 
     def getExecutionCode(self):
-        return "$list$ = [" + ", ".join(["%element_{}%".format(i) for i in range(len(self.inputs))]) + "]"
+        return "$list$ = [" + ", ".join(["%element_{}%".format(i) for i, socket in enumerate(self.inputs) if socket.dataType != "Empty"]) + "]"
+
+    def edit(self):
+        emptySocket = self.inputs["..."]
+        directOrigin = getDirectOriginSocket(emptySocket)
+        if directOrigin is None: return
+        socket = self.newInputSocket()
+        self.id_data.links.new(socket, directOrigin)
+        emptySocket.removeConnectedLinks()
 
     def assignSelectedListType(self):
         self.assignedType = self.selectedType
@@ -67,6 +76,7 @@ class CreateList(bpy.types.Node, AnimationNode):
         self.inputs.clear()
         self.outputs.clear()
 
+        self.inputs.new("an_EmptySocket", "...").passiveType = self.listIdName
         for i in range(inputAmount):
             self.newInputSocket()
         self.outputs.new(self.listIdName, "List")
@@ -79,6 +89,7 @@ class CreateList(bpy.types.Node, AnimationNode):
         socket.moveable = True
         if hasattr(socket, "showName"):
             socket.showName = False
+        socket.moveUp()
         return socket
 
 

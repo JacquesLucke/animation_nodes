@@ -23,9 +23,7 @@ class AnimationNode:
     # On creation
     def init(self, context):
         self.identifier = createIdentifier()
-        self.id_data.startCreation()
         self.create()
-        self.id_data.endCreation()
 
     def create(self):
         '''Implement this in all subclasses'''

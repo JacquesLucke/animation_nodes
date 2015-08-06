@@ -33,7 +33,7 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
         socket.customName = "x"
         socket.moveable = True
         socket.removeable = True
-        self.inputs.new("an_EmptySocket", "...").passiveSocketType = "an_GenericSocket"
+        self.inputs.new("an_EmptySocket", "...").passiveType = "an_GenericSocket"
         self.outputs.new("an_GenericSocket", "Result")
 
     def draw_buttons(self, context, layout):
@@ -56,7 +56,7 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
                 newSocket.removeable = True
                 newSocket.moveable = True
                 newSocket.customName = self.getNextCustomName()
-                self.inputs.new("an_EmptySocket", "...").passiveSocketType = "an_GenericSocket"
+                self.inputs.new("an_EmptySocket", "...").passiveType = "an_GenericSocket"
                 self.id_data.links.new(newSocket, fromSocket)
 
     def getNextCustomName(self):

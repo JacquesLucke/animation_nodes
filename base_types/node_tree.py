@@ -12,24 +12,12 @@ class AnimationNodeTree(bpy.types.NodeTree):
     bl_label = "Animation";
     bl_icon = "ACTION"
 
-    isCreatingNode = BoolProperty()
-
     def update(self):
-        if self.isCreatingNode:
-            return
-
         global treeUpdated
         treeUpdated = True
 
         update()
         treeChanged()
-
-    def startCreation(self):
-        self.isCreatingNode = True
-
-    def endCreation(self):
-        self.isCreatingNode = False
-        self.update()
 
 @noRecursion
 def update():

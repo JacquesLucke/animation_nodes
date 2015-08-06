@@ -49,10 +49,12 @@ def treeChanged(self = None, context = None):
 
 
 from . node_link_conversion import correctForbiddenNodeLinks
+from . import tree_info
 
 @noRecursion
 def update(events):
     if "Tree" in events:
+        tree_info.update()
         correctForbiddenNodeLinks()
 
 

@@ -99,7 +99,7 @@ class ScriptNode(bpy.types.Node, AnimationNode):
     def createEmptySockets(self):
         for sockets in (self.inputs, self.outputs):
             socket = sockets.new("an_EmptySocket", emptySocketName)
-            socket.passiveSocketType = "an_GenericSocket"
+            socket.passiveType = "an_GenericSocket"
             socket.customName = "EMPTYSOCKET"
 
     def appendSocket(self, sockets, type, name):

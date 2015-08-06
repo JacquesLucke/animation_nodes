@@ -53,7 +53,7 @@ class SocketUiList(bpy.types.UIList):
         if socket.removeable:
             socket.callFunctionFromUI(layout, "remove", icon = "X", emboss = False)
 
-        icon = "RESTRICT_VIEW_ON" if socket.show else "RESTRICT_VIEW_OFF"
+        icon = "RESTRICT_VIEW_ON" if socket.hide else "RESTRICT_VIEW_OFF"
         layout.prop(socket, "hide", text = "", icon_only = True, icon = icon, emboss = False)
 
 
@@ -88,7 +88,7 @@ class MoveOutputSocket(bpy.types.Operator):
 
 def moveSocket(isOutput, moveUp):
     socket = getActiveSocket(isOutput)
-    socket.moveSocket(moveUp)
+    socket.moveSave(moveUp)
 
     node = socket.node
     if isOutput: node.activeOutputIndex = list(node.outputs).index(socket)

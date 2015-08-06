@@ -21,11 +21,9 @@ class AnimationNodeSocket:
     nameSettings = PointerProperty(type = an_CustomNameProperties)
 
     removeable = BoolProperty(default = False)
-    removeInNode = BoolProperty(default = False)
-
     moveable = BoolProperty(default = False)
     moveGroup = IntProperty(default = 0)
-    moveInNode = BoolProperty(default = False)
+    editInNode = BoolProperty(default = False)
 
     def draw(self, context, layout, node, text):
         displayText = self.getDisplayedName()
@@ -40,12 +38,12 @@ class AnimationNodeSocket:
                 if self.is_output: row.alignment = "RIGHT"
                 row.label(displayText)
 
-        if self.moveable and self.moveInNode:
+        if self.moveable and self.editInNode:
             row.separator()
-            self.callFunctionFromUI(row, "moveSocketUp", icon = "TRIA_UP")
-            self.callFunctionFromUI(row, "moveSocketDown", icon = "TRIA_DOWN")
+            self.callFunctionFromUI(row, "moveUpSave", icon = "TRIA_UP")
+            self.callFunctionFromUI(row, "moveDownSave", icon = "TRIA_DOWN")
 
-        if self.removeable and self.removeInNode:
+        if self.removeable and self.editInNode:
             row.separator()
             self.callFunctionFromUI(row, "removeSocket", icon = "X")
 
@@ -74,13 +72,22 @@ class AnimationNodeSocket:
         props.identifier = self.identifier
         props.functionName = functionName
 
-    def moveSocketUp(self):
-        self.moveSocket(moveUp = True)
+    def moveUp(self):
+        self.moveTo(self.index - 1)
 
-    def moveSocketDown(self):
-        self.moveSocket(moveUp = False)
+    def moveTo(self, index):
+        self.sockets.move(self.index, index)
 
-    def moveSocket(self, moveUp = True):
+    def moveUpSave(self):
+        """Cares about moveable sockets"""
+        self.moveSave(moveUp = True)
+
+    def moveDownSave(self):
+        """Cares about moveable sockets"""
+        self.moveSave(moveUp = False)
+
+    def moveSave(self, moveUp = True):
+        """Cares about moveable sockets"""
         if not self.moveable: return
         moveableSocketIndices = [index for index, socket in enumerate(self.sockets) if socket.moveable and socket.moveGroup == self.moveGroup]
         currentIndex = list(self.sockets).index(self)
@@ -100,6 +107,11 @@ class AnimationNodeSocket:
 
     def remove(self):
         self.node.removeSocket(self)
+
+    def removeConnectedLinks(self):
+        tree = self.node.id_data
+        for link in self.links:
+            tree.links.remove(link)
 
     @property
     def index(self):
