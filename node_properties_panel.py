@@ -1,48 +1,42 @@
 import bpy
 from bpy.props import *
 
-class NodePropertiesPanel(bpy.types.Panel):
-    bl_idname = "an.node_properties_panel"
-    bl_label = "Node and Socket Settings"
-    bl_space_type = "NODE_EDITOR"
-    bl_region_type = "UI"
+def draw(self, context):
+    node = bpy.context.active_node
+    if not hasattr(context.active_node, "isAnimationNode"): return
 
-    @classmethod
-    def poll(cls, context):
-        return hasattr(context.active_node, "isAnimationNode")
+    layout = self.layout
+    layout.separator()
 
-    def draw(self, context):
-        layout = self.layout
-        col = layout.column()
-        col.prop(self.node, "width", text = "Width")
-        col.prop(self.node, "bl_width_max", text = "Max Width")
+    col = layout.column()
+    col.prop(node, "width", text = "Width")
+    col.prop(node, "bl_width_max", text = "Max Width")
 
-        col = layout.column()
+    col = layout.column()
 
-        self.node.callFunctionFromUI(col, "toogleSocketEditing", text = "Toogle Socket Editing", icon = "SETTINGS")
+    node.callFunctionFromUI(col, "toogleSocketEditing",
+        text = "Toogle Socket Editing",
+        description = "Show buttons to move and remove individual sockets in the node",
+        icon = "SETTINGS")
 
-        # Inputs
-        row = col.row()
-        rows = len(self.node.inputs)
-        row.template_list("an_SocketUiList", "", self.node, "inputs", self.node, "activeInputIndex", rows = rows, maxrows = rows)
-        subcol = row.column(align = True)
-        props = subcol.operator("an.move_input", text = "", icon = "TRIA_UP").moveUp = True
-        subcol.operator("an.move_input", text = "", icon = "TRIA_DOWN").moveUp = False
+    # Inputs
+    row = col.row()
+    rows = len(node.inputs)
+    row.template_list("an_SocketUiList", "", node, "inputs", node, "activeInputIndex", rows = rows, maxrows = rows)
+    subcol = row.column(align = True)
+    props = subcol.operator("an.move_input", text = "", icon = "TRIA_UP").moveUp = True
+    subcol.operator("an.move_input", text = "", icon = "TRIA_DOWN").moveUp = False
 
-        # Outputs
-        row = col.row()
-        rows = len(self.node.outputs)
-        row.template_list("an_SocketUiList", "", self.node, "outputs", self.node, "activeOutputIndex", rows = rows, maxrows = rows)
-        subcol = row.column(align = True)
-        subcol.operator("an.move_output", text = "", icon = "TRIA_UP").moveUp = True
-        subcol.operator("an.move_output", text = "", icon = "TRIA_DOWN").moveUp = False
+    # Outputs
+    row = col.row()
+    rows = len(node.outputs)
+    row.template_list("an_SocketUiList", "", node, "outputs", node, "activeOutputIndex", rows = rows, maxrows = rows)
+    subcol = row.column(align = True)
+    subcol.operator("an.move_output", text = "", icon = "TRIA_UP").moveUp = True
+    subcol.operator("an.move_output", text = "", icon = "TRIA_DOWN").moveUp = False
 
-        layout.separator()
-        layout.label("Identifier: " + self.node.identifier)
-
-    @property
-    def node(self):
-        return bpy.context.active_node
+    layout.separator()
+    layout.label("Identifier: " + node.identifier)
 
 
 class SocketUiList(bpy.types.UIList):
@@ -104,3 +98,14 @@ def getActiveSocket(isOutput):
     if node is None: return
     if isOutput: return node.activeOutputSocket
     else: return node.activeInputSocket
+
+
+
+# Register
+##################################
+
+def register():
+    bpy.types.NODE_PT_active_node_generic.append(draw)
+
+def unregister():
+    bpy.types.NODE_PT_active_node_generic.remove(draw)

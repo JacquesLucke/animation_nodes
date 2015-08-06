@@ -63,12 +63,14 @@ from . base_types import node as node_base
 from . base_types import node_function_call
 from . base_types import socket_function_call
 from . base_types import socket as socket_base
+from . import node_properties_panel as node_panel
 from . insert_nodes_menu import registerMenu, unregisterMenu
 from . nodes.sound import sequencer_sound_input as sequencer_sound
 
 def register():
     bpy.utils.register_module(__name__)
 
+    node_panel.register()
     socket_base.register()
     events.registerHandlers()
     tree_info.registerHandlers()
@@ -88,6 +90,7 @@ def register():
 def unregister():
     bpy.utils.unregister_module(__name__)
 
+    node_panel.unregister()
     socket_base.unregister()
     events.unregisterHandlers()
     tree_info.unregisterHandlers()
