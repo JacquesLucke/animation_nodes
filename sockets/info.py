@@ -21,11 +21,11 @@ listChains = [
 # Check if list or base socket exists
 def isList(input):
     if not isIdName(input): input = toIdName(input)
-    return baseIdNameToListIdName(input) is not None
+    return listIdNameToBaseIdName(input) is not None
 
 def isBase(input):
     if not isIdName(input): input = toIdName(input)
-    return listIdNameToBaseIdName(input) is not None
+    return baseDataTypeToListIdName(input) is not None
 
 
 # to Base
@@ -113,7 +113,7 @@ def getListDataTypeItems(self, context):
 
 @enumItemsFromList
 def getBaseDataTypeItems(self, context):
-    return getBaseDataTypes()      
+    return getBaseDataTypes()
 
 @enumItemsFromList
 def getDataTypeItems(self, context):

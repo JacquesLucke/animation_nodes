@@ -106,6 +106,42 @@ def isSocketLinked(socket):
     socketID = socketToID(socket)
     return len(_data.linkedSockets[socketID]) > 0
 
+def getOriginSocket(socket):
+    linkedSockets = getLinkedSockets(socket)
+    if len(linkedSockets) > 0:
+        return linkedSockets[0]
+
+def getTargetSockets(socket):
+    return getLinkedSockets(socket)
+
+def getLinkedSockets(socket):
+    socketID = socketToID(socket)
+    return [idToSocket(linkedID) for linkedID in _data.linkedSockets[socketID]]
+
+def getNodeConnections(node):
+    nodeID = nodeToID(node)
+    inputIDs, outputIDs = _data.socketsByNode[nodeID]
+    connections = []
+    for socketID in inputIDs + outputIDs:
+        for linkedID in _data.linkedSocketsWithReroutes[socketID]:
+            connections.append((socketID, linkedID))
+    return connections
+
+def setConnections(connections):
+    for id1, id2 in connections:
+        socket1, socket2 = idToSocket(id1), idToSocket(id2)
+        if socket1.is_output: socket1, socket2 = socket2, socket1
+        tree = socket1.node.id_data
+        tree.links.new(socket1, socket2)
+
+def keepNodeLinks(function):
+    def wrapper(node, *args, **kwargs):
+        connections = getNodeConnections(node)
+        output = function(node, *args, **kwargs)
+        setConnections(connections)
+        return output
+    return wrapper
+
 
 
 
@@ -119,10 +155,10 @@ def nodeToID(node):
     return (node.id_data.name, node.name)
 
 def idToSocket(socketID):
-    return getSocket(*socketID)
+    return getSocket(socketID[0][0], socketID[0][1], socketID[1], socketID[2])
 
 def idToNode(nodeID):
-    return getNode(*nodeID)
+    return getNode(nodeID)
 
 
 from pprint import PrettyPrinter
