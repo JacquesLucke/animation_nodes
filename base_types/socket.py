@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from .. events import treeChanged
-from .. tree_info import isSocketLinked, getOriginSocket, getDirectOriginSocket
+from .. tree_info import isSocketLinked, getOriginSocket, getDirectOriginSocket, getTargetSockets
 from .. utils.names import getRandomString, toVariableName
 from . socket_function_call import getSocketFunctionCallOperatorName
 
@@ -129,6 +129,10 @@ class AnimationNodeSocket:
     @property
     def dataOriginSocket(self):
         return getOriginSocket(self)
+
+    @property
+    def dataTargetSockets(self):
+        return getTargetSockets(self)
 
     @property
     def directOriginSocket(self):

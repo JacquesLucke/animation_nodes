@@ -1,6 +1,8 @@
 import bpy
+from bpy.props import *
+from ... tree_info import keepNodeLinks
 from ... base_types.node import AnimationNode
-from ... sockets.info import *
+from ... sockets.info import getDataTypeItems, toIdName
 
 class ConvertNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ConvertNode"
@@ -10,44 +12,46 @@ class ConvertNode(bpy.types.Node, AnimationNode):
     inputNames = { "Old" : "old" }
     outputNames = { "New" : "new"}
 
-    convertType = bpy.props.StringProperty(default = "Integer")
+    def assignedTypeChanged(self, context):
+        self.targetIdName = toIdName(self.assignedType)
+        self.recreateOutputSocket()
+
+    selectedType = EnumProperty(name = "Type", items = getDataTypeItems)
+    assignedType = StringProperty(update = assignedTypeChanged)
+    targetIdName = StringProperty()
 
     def create(self):
         self.inputs.new("an_GenericSocket", "Old")
-        self.buildOutputSocket()
+        self.selectedType = "String"
+        self.assignedType = "String"
+
+    def draw_buttons_ext(self, context, layout):
+        col = layout.column(align = True)
+        col.prop(self, "selectedType", text = "")
+        self.callFunctionFromUI(col, "assignSelectedListType",
+            text = "Assign",
+            description = "Remove all sockets and set the selected socket type")
 
     def edit(self):
-        link = self.getFirstOutputLink()
-        if link is not None:
-            fromSocket = link.from_socket
-            toSocket = link.to_socket
-            if toSocket.node.type != "REROUTE":
-                if fromSocket.dataType != toSocket.dataType:
-                    self.convertType = toSocket.dataType
-                    self.buildOutputSocket()
+        socket = self.outputs[0]
+        targets = socket.dataTargetSockets
+        if len(targets) == 1:
+            self.assignType(targets[0].dataType)
 
-    def getFirstOutputLink(self):
-        links = self.getLinksFromOutputSocket()
-        if len(links) == 1: return links[0]
-        return None
+    def assignSelectedListType(self):
+        self.assignedType = self.selectedType
 
-    def getLinksFromOutputSocket(self):
-        socket = self.outputs.get("New")
-        if socket is not None:
-            return socket.links
-        return []
+    @keepNodeLinks
+    def assignType(self, dataType = "Float"):
+        self.assignedType = dataType
+        self.selectedType = dataType
 
-    def buildOutputSocket(self):
+    def recreateOutputSocket(self):
         self.outputs.clear()
-        self.outputs.new(toIdName(self.convertType), "New")
-
-    def getInputSocketNames(self):
-        return {"Old" : "old"}
-    def getOutputSocketNames(self):
-        return {"New" : "new"}
+        self.outputs.new(self.targetIdName, "New")
 
     def getExecutionCode(self):
-        t = self.convertType
+        t = self.assignedType
         if t == "Float": return ("try: $new$ = float(%old%) \n"
                                  "except: $new$ = 0")
         elif t == "Integer": return ("try: $new$ = int(%old%) \n"
@@ -60,6 +64,6 @@ class ConvertNode(bpy.types.Node, AnimationNode):
             return "$new$ = %old%"
 
     def getModuleList(self):
-        t = self.convertType
+        t = self.assignedType
         if t == "Vector": return ["mathutils"]
         return []

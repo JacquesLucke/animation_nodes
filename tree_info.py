@@ -110,7 +110,7 @@ def isSocketLinked(socket):
 def getDirectOriginSocket(socket):
     socketID = socketToID(socket)
     linkedSockets = _data.linkedSocketsWithReroutes[socketID]
-    if len(linkedSockets) > 0: return idToSocket(linkedSockets[0])    
+    if len(linkedSockets) > 0: return idToSocket(linkedSockets[0])
 
 def getOriginSocket(socket):
     linkedSockets = getLinkedSockets(socket)
