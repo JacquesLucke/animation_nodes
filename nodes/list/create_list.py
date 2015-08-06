@@ -1,10 +1,9 @@
 import bpy
 from bpy.props import *
 from ... base_types.node import AnimationNode
-from ... utils.nodes import getNotUsedSocketName
+from ... tree_info import getDirectOriginSocket
 from ... utils.selection import getSortedSelectedObjectNames
 from ... sockets.info import getBaseDataTypeItems, toIdName, toListIdName
-from ... tree_info import getOriginSocket, getDirectOriginSocket
 
 class CreateList(bpy.types.Node, AnimationNode):
     bl_idname = "an_CreateList"
@@ -59,10 +58,10 @@ class CreateList(bpy.types.Node, AnimationNode):
 
     def edit(self):
         emptySocket = self.inputs["..."]
-        directOrigin = getDirectOriginSocket(emptySocket)
-        if directOrigin is None: return
+        origin = getDirectOriginSocket(emptySocket)
+        if origin is None: return
         socket = self.newInputSocket()
-        self.id_data.links.new(socket, directOrigin)
+        self.id_data.links.new(socket, origin)
         emptySocket.removeConnectedLinks()
 
     def assignSelectedListType(self):
@@ -82,7 +81,7 @@ class CreateList(bpy.types.Node, AnimationNode):
         self.outputs.new(self.listIdName, "List")
 
     def newInputSocket(self):
-        socket = self.inputs.new(self.baseIdName, getNotUsedSocketName(self, "Element"))
+        socket = self.inputs.new(self.baseIdName, self.getNotUsedSocketName("Element"))
         socket.nameSettings.display = True
         socket.customName = "Element"
         socket.removeable = True

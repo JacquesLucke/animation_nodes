@@ -2,6 +2,7 @@ import bpy
 import random
 from bpy.props import *
 from bpy.app.handlers import persistent
+from .. utils.nodes import getNotUsedSocketName
 from . node_function_call import getNodeFunctionCallOperatorName
 from .. utils.nodes import getAnimationNodeTrees
 
@@ -79,6 +80,9 @@ class AnimationNode:
         for socket in self.sockets:
             socket.editInNode = editInNode
         bpy.context.area.tag_redraw()
+
+    def getNotUsedSocketName(self, prefix = "socket"):
+        return getNotUsedSocketName(self, prefix)
 
     @property
     def activeInputSocket(self):

@@ -45,7 +45,7 @@ class AnimationNodeSocket:
 
         if self.removeable and self.editInNode:
             row.separator()
-            self.callFunctionFromUI(row, "removeSocket", icon = "X")
+            self.callFunctionFromUI(row, "remove", icon = "X")
 
     def getDisplayedName(self):
         if self.nameSettings.display or self.nameSettings.editable: return self.customName
