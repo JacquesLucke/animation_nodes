@@ -18,9 +18,9 @@ class EventState:
         events = set()
         if self.treeChanged: events.add("Tree")
         if self.fileChanged: events.add("File")
+        if self.addonChanged: events.add("Addon")
         if self.sceneChanged: events.add("Scene")
         if self.frameChanged: events.add("Frame")
-        if self.addonChanged: events.add("Addon")
         if self.propertyChanged: events.add("Property")
         return events
 
@@ -40,9 +40,11 @@ def frameChanged(scene):
 @persistent
 def fileLoaded(scene):
     event.fileChanged = True
+    event_handler.treeNeedsUpdate()
 
 def addonChanged():
     event.addonChanged = True
+    event_handler.treeNeedsUpdate()
 
 def propertyChanged(self = None, context = None):
     event.propertyChanged = True
@@ -52,7 +54,7 @@ def executionCodeChanged(self = None, context = None):
 
 def treeChanged(self = None, context = None):
     event.treeChanged = True
-    event_handler.treeUpdated()
+    event_handler.treeNeedsUpdate()
 
 
 # Register

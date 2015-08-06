@@ -1,10 +1,8 @@
 import bpy
 from mathutils import Vector
-from . utils.timing import measureTime
 from . sockets.info import toBaseIdName
 from . tree_info import getAllDataLinks, getDirectOriginSocket
 
-@measureTime
 def correctForbiddenNodeLinks():
     dataLinks = getAllDataLinks()
     invalidLinks = filterInvalidLinks(dataLinks)
