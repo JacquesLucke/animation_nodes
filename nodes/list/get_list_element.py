@@ -57,12 +57,12 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
     def assignSelectedListType(self):
         self.assignedType = self.selectedType
 
-    @keepNodeLinks
     def assignType(self, baseDataType):
         if not isBase(baseDataType): return
         if baseDataType == self.assignedType: return
         self.assignedType = baseDataType
 
+    @keepNodeLinks
     def generateSockets(self):
         self.inputs.clear()
         self.outputs.clear()

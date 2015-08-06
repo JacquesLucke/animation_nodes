@@ -39,8 +39,8 @@ class AppendListNode(bpy.types.Node, AnimationNode):
                 "$list$.append(%element%)"
 
     def edit(self):
-        listDataType = self.getWantedDataType()
-        self.assignType(listDataType)
+        baseDataType = self.getWantedDataType()
+        self.assignType(baseDataType)
 
     def getWantedDataType(self):
         listInput = self.inputs["List"].dataOriginSocket
@@ -55,12 +55,12 @@ class AppendListNode(bpy.types.Node, AnimationNode):
     def assignSelectedListType(self):
         self.assignedType = self.selectedType
 
-    @keepNodeLinks
     def assignType(self, baseDataType):
         if not isBase(baseDataType): return
         if baseDataType == self.assignedType: return
         self.assignedType = baseDataType
 
+    @keepNodeLinks
     def generateSockets(self):
         self.inputs.clear()
         self.outputs.clear()
