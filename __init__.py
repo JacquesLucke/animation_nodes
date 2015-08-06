@@ -57,6 +57,7 @@ class AnimationNodesSettings(bpy.types.PropertyGroup):
 
 from . import keymap
 from . import events
+from . import tree_info
 from . utils import selection
 from . base_types import node as node_base
 from . base_types import node_function_call
@@ -70,6 +71,7 @@ def register():
 
     socket_base.register()
     events.registerHandlers()
+    tree_info.registerHandlers()
     node_base.registerHandlers()
     selection.registerHandlers()
     sequencer_sound.registerHandlers()
@@ -88,6 +90,7 @@ def unregister():
 
     socket_base.unregister()
     events.unregisterHandlers()
+    tree_info.unregisterHandlers()
     node_base.unregisterHandlers()
     selection.unregisterHandlers()
     sequencer_sound.unregisterHandlers()
