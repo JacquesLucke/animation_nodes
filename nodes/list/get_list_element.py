@@ -25,7 +25,8 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
     listIdName = StringProperty()
 
     def create(self):
-        self.assignType("Object")
+        self.assignedType = "Float"
+        self.selectedType = "Float"
 
     def draw_buttons_ext(self, context, layout):
         col = layout.column(align = True)
