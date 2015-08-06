@@ -18,30 +18,44 @@ listChains = [
     ["an_MatrixSocket", "an_MatrixListSocket"] ]
 
 
+
+def returnNoneOnFailure(function):
+    def wrapper(*args, **kwargs):
+        try: return function(*args, **kwargs)
+        except: return None
+    return wrapper
+
+
 # Check if list or base socket exists
+@returnNoneOnFailure
 def isList(input):
     if not isIdName(input): input = toIdName(input)
     return listIdNameToBaseIdName(input) is not None
 
+@returnNoneOnFailure
 def isBase(input):
     if not isIdName(input): input = toIdName(input)
     return baseDataTypeToListIdName(input) is not None
 
 
 # to Base
+@returnNoneOnFailure
 def toBaseIdName(input):
     if isIdName(input): return listIdNameToBaseIdName(input)
     else: return listDataTypeToBaseIdName(input)
 
+@returnNoneOnFailure
 def toBaseDataType(input):
     if isIdName(input): return listIdNameToBaseDataType(input)
     else: return listDataTypeToBaseDataType(input)
 
 # to List
+@returnNoneOnFailure
 def toListIdName(input):
     if isIdName(input): return baseIdNameToListIdName(input)
     else: return baseDataTypeToListIdName(input)
 
+@returnNoneOnFailure
 def toListDataType(input):
     if isIdName(input): return baseIdNameToListDataType(input)
     else: return baseDataTypeToListDataType(input)

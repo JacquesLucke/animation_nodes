@@ -66,6 +66,7 @@ class NodeData:
 
     def findLinksSkippingReroutes(self):
         for node in self.nodes:
+            if self.isRerouteNode(node): continue
             inputs, outputs = self.socketsByNode[node]
             for socket in inputs + outputs:
                 linkedSockets = self.getLinkedSockets(socket)
@@ -106,6 +107,11 @@ def isSocketLinked(socket):
     socketID = socketToID(socket)
     return len(_data.linkedSockets[socketID]) > 0
 
+def getDirectOriginSocket(socket):
+    socketID = socketToID(socket)
+    linkedSockets = _data.linkedSocketsWithReroutes[socketID]
+    if len(linkedSockets) > 0: return idToSocket(linkedSockets[0])    
+
 def getOriginSocket(socket):
     linkedSockets = getLinkedSockets(socket)
     if len(linkedSockets) > 0:
@@ -117,6 +123,14 @@ def getTargetSockets(socket):
 def getLinkedSockets(socket):
     socketID = socketToID(socket)
     return [idToSocket(linkedID) for linkedID in _data.linkedSockets[socketID]]
+
+def getAllDataLinks():
+    dataLinks = set()
+    for socketID, linkedIDs in _data.linkedSockets.items():
+        for linkedID in linkedIDs:
+            if not socketID[1]: socketID, linkedID = linkedID, socketID
+            dataLinks.add((idToSocket(socketID), idToSocket(linkedID)))
+    return list(dataLinks)
 
 def getNodeConnections(node):
     nodeID = nodeToID(node)

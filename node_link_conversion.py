@@ -1,29 +1,32 @@
 import bpy
 from mathutils import Vector
-from . utils.nodes import *
+from . utils.timing import measureTime
 from . sockets.info import toBaseIdName
+from . tree_info import getAllDataLinks, getDirectOriginSocket
 
+@measureTime
 def correctForbiddenNodeLinks():
-    nodeTree = NodeTreeInfo(getAnimationNodeTrees())
-    linked_sockets = nodeTree.get_linked_socket_pairs()
-    invalid_links = filterInvalidLinks(linked_sockets)
-    for pair in invalid_links:
-        nodeTree = pair[0].node.id_data
-        origin = pair[1].links[0].from_socket
-        is_corrected = False
-        for corrector in linkCorrectors:
-            if corrector.check(*pair):
-                corrector.insert(nodeTree, origin, pair[1])
-                is_corrected = True
-                break
-        if not is_corrected:
-            removeLink(*pair)
+    dataLinks = getAllDataLinks()
+    invalidLinks = filterInvalidLinks(dataLinks)
+    for dataOrigin, target in invalidLinks:
+        nodeTree = target.node.id_data
+        directOrigin = getDirectOriginSocket(target)
+        if not tryToCorrectLink(dataOrigin, directOrigin, target):
+            removeLink(directOrigin, target)
 
-def filterInvalidLinks(linked_sockets):
-    return [pair for pair in linked_sockets if not isConnectionValid(*pair)]
+def filterInvalidLinks(dataLinks):
+    return [dataLink for dataLink in dataLinks if not isConnectionValid(*dataLink)]
 
 def isConnectionValid(origin, target):
     return origin.dataType in target.allowedInputTypes or target.allowedInputTypes[0] == "all"
+
+def tryToCorrectLink(dataOrigin, directOrigin, target):
+    for corrector in linkCorrectors:
+        if corrector.check(dataOrigin, target):
+            nodeTree = target.node.id_data
+            corrector.insert(nodeTree, directOrigin, target)
+            return True
+    return False
 
 def removeLink(origin, target):
     nodeTree = origin.node.id_data

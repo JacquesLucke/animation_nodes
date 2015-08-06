@@ -116,7 +116,6 @@ class AnimationNodeSocket:
 
 
 
-
 isUpdating = False
 def updateCustomName(socket):
     global isUpdating
