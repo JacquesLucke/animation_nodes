@@ -1,7 +1,6 @@
 import bpy
 from bpy.props import *
 from ... base_types.node import AnimationNode
-from ... tree_info import getDirectOriginSocket
 from ... utils.selection import getSortedSelectedObjectNames
 from ... sockets.info import getBaseDataTypeItems, toIdName, toListIdName
 
@@ -58,7 +57,7 @@ class CreateList(bpy.types.Node, AnimationNode):
 
     def edit(self):
         emptySocket = self.inputs["..."]
-        origin = getDirectOriginSocket(emptySocket)
+        origin = emptySocket.directOriginSocket
         if origin is None: return
         socket = self.newInputSocket()
         self.id_data.links.new(socket, origin)
