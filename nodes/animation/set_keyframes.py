@@ -35,7 +35,7 @@ class SetKeyframesNode(bpy.types.Node, AnimationNode):
     def draw_buttons(self, context, layout):
         row = layout.row(align = True)
         row.prop(self, "selectedPathType", text = "")
-        self.callFunctionFromUI(row, "addKeyframePath", text = "", icon = "PLUS")
+        self.callFunctionFromUI(row, "addKeyframePath", icon = "PLUS")
 
         col = layout.column(align = True)
         for i, item in enumerate(self.paths):
@@ -43,10 +43,7 @@ class SetKeyframesNode(bpy.types.Node, AnimationNode):
             split = row.split(align = True, percentage = 0.7)
             split.prop(item, "path", text = "")
             split.prop(item, "index", text = "")
-            remove = row.operator("an.remove_property_from_list_node", icon = "X", text = "")
-            remove.nodeTreeName = self.id_data.name
-            remove.nodeName = self.name
-            remove.index = i
+            self.callFunctionFromUI(row, "removeItemFromList", icon = "X", data = str(i))
 
     def execute(self, enable, setKeyframe, removeUnwanted, object):
         if not enable: return
@@ -87,5 +84,5 @@ class SetKeyframesNode(bpy.types.Node, AnimationNode):
             self.newPath("rotation_euler")
             self.newPath("scale")
 
-    def removeItemFromList(self, index):
-        self.paths.remove(index)
+    def removeItemFromList(self, strIndex):
+        self.paths.remove(int(strIndex))

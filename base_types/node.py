@@ -57,12 +57,14 @@ class AnimationNode:
         pass
 
 
-    def callFunctionFromUI(self, layout, functionName, text = "", icon = "NONE", description = ""):
+    def callFunctionFromUI(self, layout, functionName, text = "", icon = "NONE", description = "", data = None):
         idName = getNodeFunctionCallOperatorName(description)
         props = layout.operator(idName, text = text, icon = icon)
         props.nodeTreeName = self.id_data.name
         props.nodeName = self.name
         props.functionName = functionName
+        props.callWithData = data is not None
+        props.data = str(data)
 
     def removeSocket(self, socket):
         index = socket.index

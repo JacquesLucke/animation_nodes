@@ -1,4 +1,5 @@
 import bpy
+import inspect
 from bpy.props import *
 from bpy.app.handlers import persistent
 from .. utils.nodes import getNode
@@ -19,13 +20,17 @@ class CallNodeFunctionFallback(bpy.types.Operator):
     nodeTreeName = StringProperty()
     nodeName = StringProperty()
     functionName = StringProperty()
+    callWithData = BoolProperty(default = False)
+    data = StringProperty()
 
     def invoke(self, context, event):
         invokeNodeFunctionCall(self, context, event)
 
 def invokeNodeFunctionCall(self, context, event):
     node = getNode(self.nodeTreeName, self.nodeName)
-    getattr(node, self.functionName)()
+    function = getattr(node, self.functionName)
+    if self.callWithData: function(self.data)
+    else: function()
     return {"FINISHED"}
 
 
@@ -50,6 +55,8 @@ def createNodeFunctionCallOperator(description):
         operatorType.nodeTreeName = StringProperty()
         operatorType.nodeName = StringProperty()
         operatorType.functionName = StringProperty()
+        operatorType.callWithData = BoolProperty(default = False)
+        operatorType.data = StringProperty()
 
         bpy.utils.register_class(operatorType)
 
