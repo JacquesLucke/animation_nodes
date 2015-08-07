@@ -64,7 +64,7 @@ from . base_types import node_function_call
 from . base_types import socket_function_call
 from . base_types import socket as socket_base
 from . import node_properties_panel as node_panel
-from . insert_nodes_menu import registerMenu, unregisterMenu
+from . node_menu import registerMenu, unregisterMenu
 from . nodes.sound import sequencer_sound_input as sequencer_sound
 
 def register():
