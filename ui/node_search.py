@@ -1,6 +1,7 @@
 import bpy
 from collections import defaultdict
-from . utils.nodes import getAnimationNodeTrees
+from .. base_types.node import AnimationNode
+from .. utils.nodes import getAnimationNodeTrees
 
 searchDict = {}
 importanceMap = defaultdict(int)
@@ -72,5 +73,4 @@ def createSettingsPropertyGroup(easyDict):
     return settings
 
 def getNodeClasses():
-    from . base_types.node import AnimationNode
     return AnimationNode.__subclasses__()

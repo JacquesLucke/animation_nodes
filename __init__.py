@@ -58,13 +58,13 @@ class AnimationNodesSettings(bpy.types.PropertyGroup):
 from . import keymap
 from . import events
 from . import tree_info
+from . ui import node_panel
 from . utils import selection
 from . base_types import node as node_base
 from . base_types import node_function_call
 from . base_types import socket_function_call
 from . base_types import socket as socket_base
-from . import node_properties_panel as node_panel
-from . node_menu import registerMenu, unregisterMenu
+from . ui.node_menu import registerMenu, unregisterMenu
 from . nodes.sound import sequencer_sound_input as sequencer_sound
 
 def register():
