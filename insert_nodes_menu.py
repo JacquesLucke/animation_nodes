@@ -158,10 +158,11 @@ class ListMenu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        insertNode(layout, "an_GetListElementNode", "Get Element")
-        layout.separator()
         insertNode(layout, "an_CreateList", "Create")
+        insertNode(layout, "an_combine_lists_node", "Combine")
         insertNode(layout, "an_AppendListNode", "Append")
+        layout.separator()
+        insertNode(layout, "an_GetListElementNode", "Get Element")
         insertNode(layout, "an_GetListLengthNode", "Get Length")
         layout.separator()
         insertNode(layout, "an_ShuffleListNode", "Shuffle")
