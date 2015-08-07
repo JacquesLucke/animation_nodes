@@ -39,7 +39,7 @@ class ReverseListNode(bpy.types.Node, AnimationNode):
 
     def assignType(self, listDataType):
         if not isList(listDataType): return
-        if listDataType == self.assignType: return
+        if listDataType == self.assignedType: return
         self.assignedType = listDataType
 
     @keepNodeLinks
