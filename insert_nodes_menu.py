@@ -139,7 +139,7 @@ class BooleanMenu(bpy.types.Menu):
         insertNode(layout, "an_DataInput", "Boolean", {"assignedType" : repr("Boolean")})
         insertNode(layout, "an_InvertNode", "Invert")
         insertNode(layout, "an_CompareNode", "Compare")
-        insertNode(layout, "an_ConditionNode", "Condition")
+        insertNode(layout, "an_SwitchNode", "Switch")
 
 class ColorMenu(bpy.types.Menu):
     bl_idname = "an.color_menu"
