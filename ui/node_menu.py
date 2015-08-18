@@ -28,7 +28,6 @@ def drawMenu(self, context):
     layout.menu("an.animation_menu", text = "Animation")
     layout.menu("an.particles_menu", text = "Particles")
     layout.separator()
-    layout.menu("an.script_menu", text = "Script")
     layout.menu("an.system_menu", text = "System")
 
 def drawNodeTreeChooser(layout, context):
@@ -299,16 +298,6 @@ class ParticlesMenu(bpy.types.Menu):
         insertNode(layout, "an_FilterParticles", "State Filter")
         insertNode(layout, "an_ParticlesInfo", "Particle List Info")
         insertNode(layout, "an_ParticleInfo", "Particle Info")
-
-class ScriptMenu(bpy.types.Menu):
-    bl_idname = "an.script_menu"
-    bl_label = "Script Menu"
-
-    def draw(self, context):
-        layout = self.layout
-        insertNode(layout, "an_ExpressionNode", "Expression")
-        insertNode(layout, "an_ScriptNode", "Script")
-        insertNode(layout, "an_ScriptNode", "Script from Clipboard", {"makeFromClipboard" : repr(True) })
 
 class SystemMenu(bpy.types.Menu):
     bl_idname = "an.system_menu"
