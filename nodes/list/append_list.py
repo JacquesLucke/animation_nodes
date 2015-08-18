@@ -27,7 +27,7 @@ class AppendListNode(bpy.types.Node, AnimationNode):
         self.assignedType = "Float"
         self.selectedType = "Float"
 
-    def draw_buttons_ext(self, context, layout):
+    def drawAdvanced(self, layout):
         col = layout.column(align = True)
         col.prop(self, "selectedType", text = "")
         self.callFunctionFromUI(col, "assignSelectedListType",

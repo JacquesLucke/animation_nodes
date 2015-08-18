@@ -118,7 +118,7 @@ class SequencerSoundInput(bpy.types.Node, AnimationNode):
 
         layout.prop(self, "frameType")
 
-    def draw_buttons_ext(self, context, layout):
+    def drawAdvanced(self, layout):
         layout.prop(self, "fullFrequencyRange")
         col = layout.column(align = True)
         col.prop(self, "attack", text = "Attack Time")

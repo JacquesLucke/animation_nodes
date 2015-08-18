@@ -30,7 +30,7 @@ class GetSplineSamples(bpy.types.Node, AnimationNode, SplineEvaluationBase):
     def draw(self, layout):
         layout.prop(self, "parameterType", text = "")
 
-    def draw_buttons_ext(self, context, layout):
+    def drawAdvanced(self, layout):
         col = layout.column()
         col.active = self.parameterType == "UNIFORM"
         col.prop(self, "resolution")

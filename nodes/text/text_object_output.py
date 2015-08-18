@@ -70,7 +70,7 @@ class TextOutputNode(bpy.types.Node, AnimationNode):
         for i, option in enumerate(options[:3]):
             col.prop(self, option[0], text = option[1])
 
-    def draw_buttons_ext(self, context, layout):
+    def drawAdvanced(self, layout):
         col = layout.column(align = True)
 
         for i, option in enumerate(options):

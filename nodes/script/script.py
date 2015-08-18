@@ -55,7 +55,7 @@ class ScriptNode(bpy.types.Node, AnimationNode):
         if not self.hideEditableElements:
             layout.separator()
 
-    def draw_buttons_ext(self, context, layout):
+    def drawAdvanced(self, layout):
         col = layout.column(align = True)
         col.label("New Socket")
         col.prop(self, "selectedSocketType", text = "")

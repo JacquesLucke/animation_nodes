@@ -62,6 +62,9 @@ class AnimationNode:
     def draw(self, layout):
         pass
 
+    def drawAdvanced(self, layout):
+        layout.label("Has no advanced settings")
+
 
     def callFunctionFromUI(self, layout, functionName, text = "", icon = "NONE", description = "", data = None):
         idName = getNodeFunctionCallOperatorName(description)

@@ -21,7 +21,7 @@ class FloatToInteger(bpy.types.Node, AnimationNode):
         self.inputs.new("an_FloatSocket", "Float")
         self.outputs.new("an_IntegerSocket", "Integer")
         
-    def draw_buttons_ext(self, context, layout):
+    def drawAdvanced(self, layout):
         layout.prop(self, "type", text = "")
 
     def getExecutionCode(self):

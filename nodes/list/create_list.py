@@ -41,7 +41,7 @@ class CreateList(bpy.types.Node, AnimationNode):
             description = "Create a new input socket",
             icon = "PLUS")
 
-    def draw_buttons_ext(self, context, layout):
+    def drawAdvanced(self, layout):
         col = layout.column(align = True)
         col.prop(self, "selectedType", text = "")
         self.callFunctionFromUI(col, "assignSelectedListType",

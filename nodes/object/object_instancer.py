@@ -56,7 +56,7 @@ class ObjectInstancer(bpy.types.Node, AnimationNode):
         else:
             layout.prop(self, "objectType", text = "")
 
-    def draw_buttons_ext(self, context, layout):
+    def drawAdvanced(self, layout):
         layout.prop(self, "parentInstances")
 
         self.callFunctionFromUI(layout, "resetObjectDataOnAllInstances",

@@ -52,7 +52,7 @@ class SeparateTextObject(bpy.types.Node, AnimationNode):
             description = "Recreate the individual characters from the source object",
             icon = "FILE_REFRESH")
 
-    def draw_buttons_ext(self, context, layout):
+    def drawAdvanced(self, layout):
         layout.prop(self, "parentLetters")
 
     def execute(self):

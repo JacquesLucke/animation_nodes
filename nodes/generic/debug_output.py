@@ -36,7 +36,7 @@ class DebugOutputNode(bpy.types.Node, AnimationNode):
         else:
             layout.label(self.debugOutputString)
         
-    def draw_buttons_ext(self, context, layout):
+    def drawAdvanced(self, layout):
         col = layout.column()
         col.prop(self, "showIterableInRows", text = "Show in Rows")
         subcol = col.column(align = True)

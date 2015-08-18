@@ -33,7 +33,7 @@ class CombineLists(bpy.types.Node, AnimationNode):
             description = "Create a new input socket",
             icon = "PLUS")
 
-    def draw_buttons_ext(self, context, layout):
+    def drawAdvanced(self, layout):
         layout.prop(self, "selectedType")
         self.callFunctionFromUI(layout, "assignSelectedListType",
             text = "Assign",

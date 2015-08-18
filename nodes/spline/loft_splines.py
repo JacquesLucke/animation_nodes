@@ -60,7 +60,7 @@ class LoftSplines(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.prop(self, "interpolationType", text = "")
 
-    def draw_buttons_ext(self, context, layout):
+    def drawAdvanced(self, layout):
         col = layout.column()
         col.prop(self, "splineDistributionType")
         col.prop(self, "surfaceDistributionType")

@@ -36,7 +36,7 @@ class ObjectMeshInfo(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.prop(self, "applyModifiers")
 
-    def draw_buttons_ext(self, context, layout):
+    def drawAdvanced(self, layout):
         layout.prop(self, "usePerObjectCache")
 
     def execute(self, object, useOutput):

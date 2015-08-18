@@ -25,7 +25,7 @@ class ConvertNode(bpy.types.Node, AnimationNode):
         self.selectedType = "String"
         self.assignedType = "String"
 
-    def draw_buttons_ext(self, context, layout):
+    def drawAdvanced(self, layout):
         col = layout.column(align = True)
         col.prop(self, "selectedType", text = "")
         self.callFunctionFromUI(col, "assignSelectedListType",
