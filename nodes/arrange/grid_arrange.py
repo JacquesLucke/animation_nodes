@@ -5,18 +5,13 @@ from ... base_types.node import AnimationNode
 class GridArrange(bpy.types.Node, AnimationNode):
     bl_idname = "an_GridArrange"
     bl_label = "Grid Arrange"
-    isDetermined = True
-    
-    inputNames = { "Index" : "index",
-                   "Width" : "width",
-                   "Distance" : "distance" }
-    outputNames = { "Vector" : "Vector" }                   
-    
+    isDetermined = True                
+
     def create(self):
-        self.inputs.new("an_IntegerSocket", "Index")
-        self.inputs.new("an_IntegerSocket", "Width").value = 10
-        self.inputs.new("an_FloatSocket", "Distance").value = 3
-        self.outputs.new("an_VectorSocket", "Vector")
+        self.inputs.new("an_IntegerSocket", "Index", "index")
+        self.inputs.new("an_IntegerSocket", "Width", "width").value = 10
+        self.inputs.new("an_FloatSocket", "Distance", "distance").value = 3
+        self.outputs.new("an_VectorSocket", "Vector", "vector")
 
     def execute(self, index, width, distance):
         width = max(width, 1)

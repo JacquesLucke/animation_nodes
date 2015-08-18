@@ -8,13 +8,6 @@ class SwitchNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SwitchNode"
     bl_label = "Switch"
 
-    inputNames = { "Condition" : "condition",
-                   "If True" : "ifTrue",
-                   "If False" : "ifFalse" }
-
-    outputNames = { "Output" : "output",
-                    "Other" : "other" }
-
     def assignedTypeChanged(self, context):
         self.socketIdName = toIdName(self.assignedType)
         self.generateSockets()
@@ -39,17 +32,17 @@ class SwitchNode(bpy.types.Node, AnimationNode):
         if dataType == self.assignedType: return
         self.assignedType = dataType
 
-    def getExecutionCode(self):
-        return "$output$ = %ifTrue% if %condition% else %ifFalse%" + "\n" + \
-               "$other$ = %ifFalse% if %condition% else %ifTrue%"
+    def getExecutionCodeLines(self):
+        return ("output = ifTrue if condition else ifFalse",
+                "other = ifFalse if condition else ifTrue")
 
     @keepNodeLinks
     def generateSockets(self):
         self.inputs.clear()
         self.outputs.clear()
-        
-        self.inputs.new("an_BooleanSocket", "Condition")
-        self.inputs.new(self.socketIdName, "If True")
-        self.inputs.new(self.socketIdName, "If False")
-        self.outputs.new(self.socketIdName, "Output")
-        self.outputs.new(self.socketIdName, "Other").hide = True
+
+        self.inputs.new("an_BooleanSocket", "Condition", "condition")
+        self.inputs.new(self.socketIdName, "If True", "ifTrue")
+        self.inputs.new(self.socketIdName, "If False", "ifFalse")
+        self.outputs.new(self.socketIdName, "Output", "output")
+        self.outputs.new(self.socketIdName, "Other", "other").hide = True

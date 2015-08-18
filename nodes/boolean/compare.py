@@ -12,10 +12,6 @@ class CompareNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CompareNode"
     bl_label = "Compare"
 
-    inputNames = { "A" : "a",
-                   "B" : "b" }
-    outputNames = { "Result" : "result" }
-
     def assignedTypeChanged(self, context):
         self.inputIdName = toIdName(self.assignedType)
         self.generateSockets()
@@ -26,21 +22,21 @@ class CompareNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.assignedType = "Float"
-        self.outputs.new("an_BooleanSocket", "Result")
+        self.outputs.new("an_BooleanSocket", "Result", "result")
 
     def draw(self, layout):
         layout.prop(self, "compareType", text = "Type")
 
     def getExecutionCode(self):
         type = self.compareType
-        if type == "A = B":	return "$result$ = %a% == %b%"
-        if type == "A != B": return "$result$ = %a% != %b%"
-        if type == "A < B":	return "try: $result$ = %a% < %b% \nexcept: $result$ = False"
-        if type == "A <= B": return "try: $result$ = %a% <= %b% \nexcept: $result$ = False"
-        if type == "A > B":	return "try: $result$ = %a% > %b% \nexcept: $result$ = False"
-        if type == "A >= B": return "try: $result$ = %a% >= %b% \nexcept: $result$ = False"
-        if type == "A is B": return "$result$ = %a% is %b%"
-        return "$result$ = False"
+        if type == "A = B":	return "result = a == b"
+        if type == "A != B": return "result = a != b"
+        if type == "A < B":	return "try: result = a < b \nexcept: result = False"
+        if type == "A <= B": return "try: result = a <= b \nexcept: result = False"
+        if type == "A > B":	return "try: result = a > b \nexcept: result = False"
+        if type == "A >= B": return "try: result = a >= b \nexcept: result = False"
+        if type == "A is B": return "result = a is b"
+        return "result = False"
 
     def edit(self):
         dataType = self.getWantedDataType()
@@ -61,5 +57,5 @@ class CompareNode(bpy.types.Node, AnimationNode):
     @keepNodeLinks
     def generateSockets(self):
         self.inputs.clear()
-        self.inputs.new(self.inputIdName, "A")
-        self.inputs.new(self.inputIdName, "B")
+        self.inputs.new(self.inputIdName, "A", "a")
+        self.inputs.new(self.inputIdName, "B", "b")
