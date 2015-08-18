@@ -89,7 +89,7 @@ class SequencerSoundInput(bpy.types.Node, AnimationNode):
         self.outputs.new("an_FloatListSocket", "Strengths").hide = True
 
     def draw(self, layout):
-        sequencesAmount = len(getattr(context.scene.sequence_editor, "sequences", []))
+        sequencesAmount = len(getattr(bpy.context.scene.sequence_editor, "sequences", []))
         if sequencesAmount == 0:
             self.drawEasyUI(layout)
         else:

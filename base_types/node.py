@@ -59,6 +59,9 @@ class AnimationNode:
     def draw_buttons(self, context, layout):
         self.draw(layout)
 
+    def draw(self, layout):
+        pass
+
 
     def callFunctionFromUI(self, layout, functionName, text = "", icon = "NONE", description = "", data = None):
         idName = getNodeFunctionCallOperatorName(description)

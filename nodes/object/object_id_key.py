@@ -34,7 +34,7 @@ class ObjectIDKey(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.inputs.new("an_ObjectSocket", "Object").showName = False
-        self.selectedKeyChanged(context)
+        self.selectedKeyChanged(bpy.context)
 
     def draw(self, layout):
         layout.prop(self, "selectedKey", text = "")
