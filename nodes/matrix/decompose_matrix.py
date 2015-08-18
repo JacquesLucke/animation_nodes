@@ -6,24 +6,18 @@ class DecomposeMatrix(bpy.types.Node, AnimationNode):
     bl_label = "Decompose Matrix"
     isDetermined = True
 
-    inputNames = { "Matrix" : "matrix" }
-
-    outputNames = { "Translation" : "translation",
-                    "Rotation" : "rotation",
-                    "Scale" : "scale" }
-
     def create(self):
-        self.inputs.new("an_MatrixSocket", "Matrix")
-        self.outputs.new("an_VectorSocket", "Translation")
-        self.outputs.new("an_VectorSocket", "Rotation")
-        self.outputs.new("an_VectorSocket", "Scale")
+        self.inputs.new("an_MatrixSocket", "Matrix", "matrix")
+        self.outputs.new("an_VectorSocket", "Translation", "translation")
+        self.outputs.new("an_VectorSocket", "Rotation", "rotation")
+        self.outputs.new("an_VectorSocket", "Scale", "scale")
 
-    def getExecutionCode(self, usedOutputs):
-        codeLines = []
-        if usedOutputs["Translation"]: codeLines.append("$translation$ = %matrix%.to_translation()")
-        if usedOutputs["Rotation"]: codeLines.append("$rotation$ = mathutils.Vector((%matrix%.to_euler()))")
-        if usedOutputs["Scale"]: codeLines.append("$scale$ = %matrix%.to_scale()")
-        return "\n".join(codeLines)
+    def getExecutionCodeLines(self, usedOutputs):
+        lines = []
+        if usedOutputs["Translation"]: lines.append("translation = matrix.to_translation()")
+        if usedOutputs["Rotation"]: lines.append("rotation = mathutils.Vector((matrix.to_euler()))")
+        if usedOutputs["Scale"]: lines.append("scale = matrix.to_scale()")
+        return lines
 
     def getModuleList(self):
         return ["mathutils"]

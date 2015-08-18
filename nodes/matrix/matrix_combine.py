@@ -9,12 +9,9 @@ class MatrixCombine(bpy.types.Node, AnimationNode):
     bl_label = "Combine Matrices"
     isDetermined = True
 
-    inputNames = { "Matrices" : "matrices" }
-    outputNames = { "Result" : "result" }
-
     def create(self):
-        self.inputs.new("an_MatrixListSocket", "Matrices")
-        self.outputs.new("an_MatrixSocket", "Result")
+        self.inputs.new("an_MatrixListSocket", "Matrices", "matrices")
+        self.outputs.new("an_MatrixSocket", "Result", "result")
 
     def execute(self, matrices):
         return functools.reduce(operator.mul, reversed(matrices), Matrix.Identity(4))

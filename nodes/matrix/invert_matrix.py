@@ -6,18 +6,15 @@ class InvertMatrix(bpy.types.Node, AnimationNode):
     bl_label = "Invert Matrix"
     isDetermined = True
 
-    inputNames = { "Matrix" : "matrix" }
-    outputNames = { "Inverted Matrix" : "matrix" }
-
     def create(self):
-        self.inputs.new("an_MatrixSocket", "Matrix")
-        self.outputs.new("an_MatrixSocket", "Inverted Matrix")
+        self.inputs.new("an_MatrixSocket", "Matrix", "matrix")
+        self.outputs.new("an_MatrixSocket", "Inverted Matrix", "invertedMatrix")
 
     def draw(self, layout):
         layout.separator()
 
     def getExecutionCode(self, outputUse):
-        return "$matrix$ = %matrix%.inverted(mathutils.Matrix.Identity(4))"
+        return "invertedMatrix = matrix.inverted(mathutils.Matrix.Identity(4))"
 
     def getModuleList(self):
         return ["mathutils"]

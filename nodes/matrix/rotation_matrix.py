@@ -1,4 +1,5 @@
 import bpy
+from bpy.props import *
 from ... base_types.node import AnimationNode
 from ... events import executionCodeChanged
 
@@ -9,20 +10,17 @@ class RotationMatrix(bpy.types.Node, AnimationNode):
     bl_label = "Rotation Matrix"
     isDetermined = True
 
-    inputNames = { "Angle" : "angle" }
-    outputNames = { "Matrix" : "matrix" }
-
-    axis = bpy.props.EnumProperty(items = axisItems, update = executionCodeChanged)
+    axis = EnumProperty(items = axisItems, update = executionCodeChanged)
 
     def create(self):
-        self.inputs.new("an_FloatSocket", "Angle")
-        self.outputs.new("an_MatrixSocket", "Matrix")
+        self.inputs.new("an_FloatSocket", "Angle", "angle")
+        self.outputs.new("an_MatrixSocket", "Matrix", "matrix")
 
     def draw(self, layout):
         layout.prop(self, "axis", expand = True)
 
     def getExecutionCode(self, outputUse):
-        return "$matrix$ = mathutils.Matrix.Rotation(%angle%, 4, '"+ self.axis +"')"
+        return "matrix = mathutils.Matrix.Rotation(angle, 4, '{}')".format(self.axis)
 
     def getModuleList(self):
         return ["mathutils"]
