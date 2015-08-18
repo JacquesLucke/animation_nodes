@@ -20,8 +20,8 @@ class SeparateTextObject(bpy.types.Node, AnimationNode):
     bl_label = "Separate Text Object"
 
     sourceObjectName = StringProperty(name = "Source Object")
-    currentID = IntProperty(default = 0);
-    objectCount = IntProperty(default = 0);
+    currentID = IntProperty(default = 0)
+    objectCount = IntProperty(default = 0)
     parentLetters = BoolProperty(name = "Parent to Main Container", default = True)
     materialName = StringProperty(name = "Material", default = "")
     outputType = EnumProperty(name = "Output Type", items = outputTypeItems)
@@ -136,7 +136,7 @@ def splitTextObject(source):
 
 def cleanText(text):
     for part in [" ", "\n", "\t", "\r"]:
-        text = text.replace(part, "");
+        text = text.replace(part, "")
     return text
 
 def newCharacterObject(name, sourceData, character):

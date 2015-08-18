@@ -61,7 +61,7 @@ class TextOutputNode(bpy.types.Node, AnimationNode):
         col = layout.column(align = True)
 
         for i, option in enumerate(options):
-            if i in [4, 7]: col.separator(); col.separator()
+            if i in [4, 7]: col.separator(): col.separator()
             col.prop(self, option[0], text = option[1])
 
     def setHideProperty(self):
