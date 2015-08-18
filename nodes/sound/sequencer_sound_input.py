@@ -30,7 +30,6 @@ class BakeData(bpy.types.PropertyGroup):
     samples = CollectionProperty(type = Sample)
 
 bpy.utils.register_class(BakeData)
-
 bpy.types.Sound.bakeData = CollectionProperty(type = BakeData)
 
 bakeFrequencies = [
@@ -51,12 +50,6 @@ class SequencerSoundInput(bpy.types.Node, AnimationNode):
     bl_idname = "an_SequencerSoundInput"
     bl_label = "Sequencer Sound Input"
 
-    inputNames = { "Frame" : "frame",
-                   "Frequency" : "frequency" }
-
-    outputNames = { "Strength" : "strength",
-                    "Strengths" : "strengths" }
-
     def settingChanged(self, context):
         self.inputs["Frequency"].hide = self.fullFrequencyRange
 
@@ -75,18 +68,18 @@ class SequencerSoundInput(bpy.types.Node, AnimationNode):
     frameTypes = [
         ("OFFSET", "Offset", ""),
         ("ABSOLUTE", "Absolute", "") ]
-    frameType = bpy.props.EnumProperty(name = "Frame Type", items = frameTypes, default = "OFFSET")
+    frameType = EnumProperty(name = "Frame Type", items = frameTypes, default = "OFFSET")
 
     def create(self):
         self.use_custom_color = True
         self.color = (0.4, 0.9, 0.4)
         self.width = 200
-        self.inputs.new("an_FloatSocket", "Frame")
-        socket = self.inputs.new("an_FloatSocket", "Frequency")
+        self.inputs.new("an_FloatSocket", "Frame", "frame")
+        socket = self.inputs.new("an_FloatSocket", "Frequency", "frequency")
         socket.value = 0.4
         socket.hide = True
-        self.outputs.new("an_FloatSocket", "Strength")
-        self.outputs.new("an_FloatListSocket", "Strengths").hide = True
+        self.outputs.new("an_FloatSocket", "Strength", "strength")
+        self.outputs.new("an_FloatListSocket", "Strengths", "strengths").hide = True
 
     def draw(self, layout):
         sequencesAmount = len(getattr(bpy.context.scene.sequence_editor, "sequences", []))
