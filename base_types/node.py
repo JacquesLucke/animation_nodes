@@ -1,3 +1,4 @@
+import re
 import bpy
 import random
 from bpy.props import *
@@ -95,6 +96,10 @@ class AnimationNode:
     def getNotUsedSocketName(self, prefix = "socket"):
         return getNotUsedSocketName(self, prefix)
 
+    def getLinkedOutputIdentifiers(self):
+        linkedIdentifiers = [socket.identifier for socket in self.outputs if socket.isLinked]
+        return linkedIdentifiers
+
     @property
     def activeInputSocket(self):
         if len(self.inputs) == 0: return None
@@ -117,6 +122,46 @@ class AnimationNode:
     def outputNames(self):
         return {socket.identifier : socket.identifier for socket in self.outputs}
 
+    def getExecutionCodeString(self):
+        code = self.getExecutionCode()
+        if isinstance(code, (list, tuple)):
+            return "\n".join(code)
+        return code
+
+    def getTaggedExecutionCodeLines(self):
+        """
+        tags:
+            % - input variables
+            $ - output variables
+            # - self
+        """
+        inputNames = self.inputNames
+        outputNames = self.outputNames
+
+        if hasattr(self, "execute"):
+            keywordParameters = ["{0} = %{0}%".format(inputNames[socket.identifier]) for socket in self.inputs]
+            parameterString = ", ".join(keywordParameters)
+
+            outputVariables = ["${}$".format(outputNames[socket.identifier]) for socket in self.outputs]
+            outputString = ", ".join(outputVariables)
+
+            executionString = outputString + " = #self#.execute(" + parameterString + ")"
+            return [executionString]
+        else:
+            code = self.getExecutionCodeString()
+            for inputName in inputNames:
+                code = tagVariableName(code, inputName, "%")
+            for outputName in outputNames:
+                code = tagVariableName(code, outputName, "$")
+            code = tagVariableName(code, "self", "#")
+            return code.split("\n")
+
+def tagVariableName(code, name, tag):
+    """
+    Find all occurences of 'name' in 'code' and set 'tag' before and after it.
+    The occurence must not have a dot before it.
+    """
+    return re.sub(r"([^\.]|^)\b({})\b".format(name), r"\1{0}\2{0}".format(tag), code)
 
 @persistent
 def createMissingIdentifiers(scene = None):

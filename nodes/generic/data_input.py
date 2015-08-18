@@ -22,7 +22,7 @@ class DataInput(bpy.types.Node, AnimationNode):
         col.prop(self, "selectedType", text = "")
         self.functionOperator(col, "assignSelectedType", text = "Assign", description = "Remove all sockets and set the selected socket type")
 
-    def getInLineExecutionString(self, outputUse):
+    def getExecutionCode(self):
         return "output = input"
 
     def assignSelectedType(self):
