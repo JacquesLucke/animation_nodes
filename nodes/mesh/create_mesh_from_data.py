@@ -16,7 +16,7 @@ class CreateMeshFromData(bpy.types.Node, AnimationNode):
         self.inputs.new("an_MeshDataSocket", "Mesh Data")
         self.outputs.new("an_MeshSocket", "Mesh")
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         if self.errorMessage != "":
             layout.label(self.errorMessage, icon = "ERROR")
 

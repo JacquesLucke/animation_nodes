@@ -32,7 +32,7 @@ class CombineMeshData(bpy.types.Node, AnimationNode):
         self.updateHideStatus()
         self.outputs.new("an_MeshDataSocket", "Mesh Data")
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         layout.prop(self, "sourceType")
 
     def execute(self, vertexLocations, edgesIndices, polygonsIndices, polygons):

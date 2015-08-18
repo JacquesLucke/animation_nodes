@@ -33,7 +33,7 @@ class SeparateTextObject(bpy.types.Node, AnimationNode):
         self.outputs.new("an_ObjectListSocket", "Text Objects")
         self.width = 180
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         row = layout.row(align = True)
         row.prop(self, "sourceObjectName", text = "Source")
         assign = row.operator("an.assign_active_object_to_text_separation_node", icon = "EYEDROPPER", text = "")

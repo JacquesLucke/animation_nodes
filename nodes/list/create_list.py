@@ -35,7 +35,7 @@ class CreateList(bpy.types.Node, AnimationNode):
         self.selectedType = "Float"
         self.assignedType = "Float"
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         self.callFunctionFromUI(layout, "newInputSocket",
             text = "New Input",
             description = "Create a new input socket",

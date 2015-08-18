@@ -41,7 +41,7 @@ class ScriptNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.createEmptySockets()
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         if not self.hideEditableElements:
             row = layout.row(align = True)
             row.prop_search(self, "textBlockName",  bpy.data, "texts", text = "")

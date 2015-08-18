@@ -28,7 +28,7 @@ class CompareNode(bpy.types.Node, AnimationNode):
         self.assignedType = "Float"
         self.outputs.new("an_BooleanSocket", "Result")
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         layout.prop(self, "compareType", text = "Type")
 
     def getExecutionCode(self):

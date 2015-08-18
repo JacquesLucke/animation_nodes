@@ -32,7 +32,7 @@ class SetKeyframesNode(bpy.types.Node, AnimationNode):
         self.inputs.new("an_BooleanSocket", "Remove Unwanted")
         self.inputs.new("an_ObjectSocket", "Object")
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         row = layout.row(align = True)
         row.prop(self, "selectedPathType", text = "")
         self.callFunctionFromUI(row, "addKeyframePath", icon = "PLUS")

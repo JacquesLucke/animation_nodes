@@ -20,7 +20,7 @@ class SetVertexColor(bpy.types.Node, AnimationNode):
         self.inputs.new("an_ColorSocket", "Color")
         self.outputs.new("an_ObjectSocket", "Object")
         
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         layout.prop(self, "enabled", text = "Enabled")
         layout.prop(self, "checkIfColorIsSet", text = "Check Color")
 

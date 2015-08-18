@@ -25,7 +25,7 @@ class CreateSpline(bpy.types.Node, AnimationNode):
         self.inputs.new("an_BooleanSocket", "Cyclic").value = False
         self.outputs.new("an_SplineSocket", "Spline")
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         layout.prop(self, "splineType", text = "")
 
     def execute(self, points, cyclic):

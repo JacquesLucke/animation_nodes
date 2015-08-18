@@ -20,7 +20,7 @@ class FilterParticles(bpy.types.Node, AnimationNode):
         self.inputs.new("an_ParticleListSocket", "Particles")
         self.outputs.new("an_ParticleListSocket", "Particles")
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         col = layout.column()
         col.prop(self, "outputUnborn", text = "Unborn")
         col.prop(self, "outputAlive", text = "Alive")

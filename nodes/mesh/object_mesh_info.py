@@ -33,7 +33,7 @@ class ObjectMeshInfo(bpy.types.Node, AnimationNode):
         self.outputs.new("an_VertexListSocket", "Vertices")
         self.outputs.new("an_MeshDataSocket", "Mesh Data")
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         layout.prop(self, "applyModifiers")
 
     def draw_buttons_ext(self, context, layout):

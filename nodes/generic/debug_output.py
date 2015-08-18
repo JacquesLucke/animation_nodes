@@ -23,7 +23,7 @@ class DebugOutputNode(bpy.types.Node, AnimationNode):
         self.inputs.new("an_GenericSocket", "Data")
         self.bl_width_max = 10000
         
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         if self.showIterableInRows:
             elements = self.debugOutputString.split(self.lineSeparator)
             if self.startRow > 0: layout.label("--- {} elements above ---".format(min(self.startRow, len(elements))))

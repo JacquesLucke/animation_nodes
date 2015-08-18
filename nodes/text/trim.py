@@ -25,7 +25,7 @@ class TrimText(bpy.types.Node, AnimationNode):
         self.inputs.new("an_IntegerSocket", "End").value = 5
         self.outputs.new("an_StringSocket", "Text")
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         layout.prop(self, "autoEnd", text = "Auto End")
         layout.prop(self, "allowNegativeIndex", text = "Negative Indices")
 

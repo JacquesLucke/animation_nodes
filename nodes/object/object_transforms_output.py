@@ -29,7 +29,7 @@ class an_ObjectTransformsOutput(bpy.types.Node, AnimationNode):
         self.outputs.new("an_ObjectSocket", "Object")
         self.updateSocketVisibility()
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         col = layout.column(align = True)
 
         row = col.row(align = True)

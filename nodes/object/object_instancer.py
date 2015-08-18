@@ -48,7 +48,7 @@ class ObjectInstancer(bpy.types.Node, AnimationNode):
         self.inputs.new("an_ObjectSocket", "Source").showName = False
         self.outputs.new("an_ObjectListSocket", "Objects")
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         layout.prop(self, "copyFromSource")
         if self.copyFromSource:
             layout.prop(self, "copyObjectProperties", text = "Copy Full Object")

@@ -31,7 +31,7 @@ class ProjectOnSpline(bpy.types.Node, AnimationNode):
         self.outputs.new("an_VectorSocket", "Tangent")
         self.outputs.new("an_FloatSocket", "Parameter")
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         layout.prop(self, "extended", text = "Extended")
 
     def execute(self, spline, location):

@@ -56,6 +56,9 @@ class AnimationNode:
         """Optional function for subclasses"""
         pass
 
+    def draw_buttons(self, context, layout):
+        self.draw(layout)
+
 
     def callFunctionFromUI(self, layout, functionName, text = "", icon = "NONE", description = "", data = None):
         idName = getNodeFunctionCallOperatorName(description)

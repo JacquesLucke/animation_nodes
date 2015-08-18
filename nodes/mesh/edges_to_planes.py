@@ -31,7 +31,7 @@ class an_EdgesToPlanes(bpy.types.Node, AnimationNode):
         self.outputs.new("an_PolygonIndicesListSocket", "Polygons")
         self.width += 10
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         layout.prop(self, "calculateDirection")
 
     def execute(self, vertices, edges, width, upVector):

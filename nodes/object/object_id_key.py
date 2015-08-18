@@ -36,7 +36,7 @@ class ObjectIDKey(bpy.types.Node, AnimationNode):
         self.inputs.new("an_ObjectSocket", "Object").showName = False
         self.selectedKeyChanged(context)
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         layout.prop(self, "selectedKey", text = "")
 
     def buildOutputSockets(self):

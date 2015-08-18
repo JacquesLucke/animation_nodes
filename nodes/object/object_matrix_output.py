@@ -23,7 +23,7 @@ class ObjectMatrixOutputNode(bpy.types.Node, AnimationNode):
         self.inputs.new("an_MatrixSocket", "Matrix")
         self.outputs.new("an_ObjectSocket", "Object")
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         layout.prop(self, "outputType", text = "Type")
 
     def getExecutionCode(self):

@@ -14,7 +14,7 @@ class ViewportColorNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.inputs.new("an_ColorSocket", "Color")
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         layout.prop_search(self, 'materialName', bpy.data, 'materials', text='', icon='MATERIAL_DATA')
 
     def execute(self, color):

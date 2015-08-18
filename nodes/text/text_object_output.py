@@ -64,7 +64,7 @@ class TextOutputNode(bpy.types.Node, AnimationNode):
 
         self.outputs.new("an_ObjectSocket", "Object")
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         col = layout.column(align = True)
 
         for i, option in enumerate(options[:3]):

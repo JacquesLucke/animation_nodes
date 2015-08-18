@@ -57,7 +57,7 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
         self.inputs.new("an_FloatSocket", "B").value = 1.0
         self.outputs.new("an_FloatSocket", "Result")
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         layout.prop(self, "operation")
 
     def getNextNodeSuggestions(self):

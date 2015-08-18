@@ -21,7 +21,7 @@ class GetSplineLength(bpy.types.Node, AnimationNode, SplineEvaluationBase):
         socket.value = 1.0
         self.outputs.new("an_FloatSocket", "Length")
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         layout.prop(self, "parameterType", text = "")
 
     def draw_buttons_ext(self, context, layout):

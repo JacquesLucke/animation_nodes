@@ -35,7 +35,7 @@ class RevolveSpline(bpy.types.Node, AnimationNode):
         self.outputs.new("an_PolygonIndicesListSocket", "Polygons")
         self.width += 20
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         layout.prop(self, "projectionType", text = "")
 
     def execute(self, axis, profile, splineSamples, surfaceSamples):

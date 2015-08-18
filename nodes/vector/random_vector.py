@@ -23,7 +23,7 @@ class RandomVectorNode(bpy.types.Node, AnimationNode):
         self.inputs.new("an_FloatSocket", "Max Values").value = 5.0
         self.outputs.new("an_VectorSocket", "Vector")
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         layout.prop(self, "additionalSeed", text = "Additional Seed")
 
     def execute(self, seed, maxValues):

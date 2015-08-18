@@ -42,7 +42,7 @@ class CyclesMaterialOutputNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.inputs.new("an_GenericSocket", "Data")
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         layout.prop_search(self, 'materialName', bpy.data, 'materials', text='', icon='MATERIAL_DATA')
         material = bpy.data.materials.get(self.materialName)
         if material is not None:

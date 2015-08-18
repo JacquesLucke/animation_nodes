@@ -36,7 +36,7 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
         self.inputs.new("an_EmptySocket", "...").passiveType = "an_GenericSocket"
         self.outputs.new("an_GenericSocket", "Result")
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         layout.prop(self, "expression", text = "")
         if not self.isExpressionValid:
             layout.label("invalid expression", icon = "ERROR")

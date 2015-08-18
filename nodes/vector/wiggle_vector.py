@@ -27,7 +27,7 @@ class VectorWiggle(bpy.types.Node, AnimationNode):
         self.inputs.new("an_FloatSocket", "Persistance").value = 0.3
         self.outputs.new("an_VectorSocket", "Vector")
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         layout.prop(self, "additionalSeed", text = "Additional Seed")
 
     def execute(self, seed, evolution, amplitude, octaves, persistance):

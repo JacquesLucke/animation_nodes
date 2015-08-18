@@ -26,7 +26,7 @@ class VectorMathNode(bpy.types.Node, AnimationNode):
         self.inputs.new("an_VectorSocket", "B")
         self.outputs.new("an_VectorSocket", "Result")
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         layout.prop(self, "operation")
 
     def getExecutionCode(self):

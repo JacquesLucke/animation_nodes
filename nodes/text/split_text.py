@@ -36,7 +36,7 @@ class SplitText(bpy.types.Node, AnimationNode):
         self.outputs.new("an_StringListSocket", "Text List")
         self.outputs.new("an_IntegerSocket", "Length")
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         layout.prop(self, "splitType", text = "Type")
         if self.splitType == "Regexp":
             layout.prop(self, "keepDelimiters", text = "Keep Delimiters")

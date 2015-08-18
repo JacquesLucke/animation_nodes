@@ -38,7 +38,7 @@ class ConvertAngle(bpy.types.Node, AnimationNode):
             socket.nameSettings.unique = False
         self.conversionType = "DEGREE_TO_RADIAN"
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         layout.prop(self, "conversionType", text = "")
 
     def getExecutionCode(self, outputUse):

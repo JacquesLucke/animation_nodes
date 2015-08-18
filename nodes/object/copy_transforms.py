@@ -31,7 +31,7 @@ class CopyTransformsNode(bpy.types.Node, AnimationNode):
         self.outputs.new("an_ObjectSocket", "To")
         self.width = 200
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         col = layout.column(align = True)
 
         row = col.row(align = True)

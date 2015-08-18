@@ -16,7 +16,7 @@ class CreatePolygonIndices(bpy.types.Node, AnimationNode):
         self.inputs.new("an_IntegerListSocket", "Indices")
         self.outputs.new("an_PolygonIndicesSocket", "Polygon Indices")
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         if self.errorMessage != "":
             layout.label(self.errorMessage, icon = "ERROR")
 

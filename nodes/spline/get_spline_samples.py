@@ -27,7 +27,7 @@ class GetSplineSamples(bpy.types.Node, AnimationNode, SplineEvaluationBase):
         self.outputs.new("an_VectorListSocket", "Positions")
         self.outputs.new("an_VectorListSocket", "Tangents")
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         layout.prop(self, "parameterType", text = "")
 
     def draw_buttons_ext(self, context, layout):

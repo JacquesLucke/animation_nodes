@@ -15,7 +15,7 @@ class ColorInputNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.outputs.new("an_ColorSocket", "Color")
         
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         layout.template_color_picker(self, "colorProperty", value_slider = True)
         
     def execute(self):

@@ -33,7 +33,7 @@ class AppendPointToSpline(bpy.types.Node, AnimationNode):
         self.outputs.new("an_SplineSocket", "Spline")
         self.settingChanged(bpy.context)
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         layout.prop(self, "pointType", text = "")
 
     def execute(self, spline, point, leftHandle, rightHandle):

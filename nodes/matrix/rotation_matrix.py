@@ -18,7 +18,7 @@ class RotationMatrix(bpy.types.Node, AnimationNode):
         self.inputs.new("an_FloatSocket", "Angle")
         self.outputs.new("an_MatrixSocket", "Matrix")
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         layout.prop(self, "axis", expand = True)
 
     def getExecutionCode(self, outputUse):

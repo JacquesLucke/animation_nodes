@@ -45,7 +45,7 @@ class CurveProperties(bpy.types.Node, AnimationNode):
         self.outputs.new("an_ObjectSocket", "Object")
         self.width += 20
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         row = layout.row(align = True)
         row.prop(self, "selectedPath", text = "")
         self.callFunctionFromUI(row, "newSocketFromSelection",

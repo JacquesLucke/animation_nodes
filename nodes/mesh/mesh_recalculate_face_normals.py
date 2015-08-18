@@ -15,7 +15,7 @@ class MeshRecalculateFaceNormals(bpy.types.Node, AnimationNode):
         self.inputs.new("an_MeshSocket", "Mesh")
         self.outputs.new("an_MeshSocket", "Mesh")
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         layout.prop(self, "invert")
 
     def execute(self, bm):

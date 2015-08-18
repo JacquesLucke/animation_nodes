@@ -30,7 +30,7 @@ class ObjectTransformsInput(bpy.types.Node, AnimationNode):
         self.outputs.new("an_VectorSocket", "Rotation")
         self.outputs.new("an_VectorSocket", "Scale")
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         layout.prop(self, "frameTypesProperty")
 
     def execute(self, usedOutputs, object, frame):

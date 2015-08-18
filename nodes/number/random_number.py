@@ -23,7 +23,7 @@ class RandomNumberNode(bpy.types.Node, AnimationNode):
         self.inputs.new("an_FloatSocket", "Max").value = 1.0
         self.outputs.new("an_FloatSocket", "Number")
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         layout.prop(self, "additionalSeed", text = "Additional Seed")
 
     def execute(self, seed, minValue, maxValue):

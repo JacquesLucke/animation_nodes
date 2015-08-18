@@ -21,7 +21,7 @@ class MatrixMath(bpy.types.Node, AnimationNode):
         self.inputs.new("an_MatrixSocket", "B")
         self.outputs.new("an_MatrixSocket", "Result")
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         layout.prop(self, "operation", text = "")
 
     def getExecutionCode(self):

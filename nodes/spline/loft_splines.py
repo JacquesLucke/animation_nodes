@@ -57,7 +57,7 @@ class LoftSplines(bpy.types.Node, AnimationNode):
         self.width += 20
         self.settingChanged(bpy.context)
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         layout.prop(self, "interpolationType", text = "")
 
     def draw_buttons_ext(self, context, layout):

@@ -21,7 +21,7 @@ class DirectionToRotation(bpy.types.Node, AnimationNode):
         self.outputs.new("an_VectorSocket", "Rotation")
         self.width += 20
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         layout.prop(self, "trackAxis", expand = True)
         layout.prop(self, "upAxis", expand = True)
 

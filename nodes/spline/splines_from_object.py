@@ -20,7 +20,7 @@ class SplinesFromObject(bpy.types.Node, AnimationNode):
         self.inputs.new("an_ObjectSocket", "Object").showName = False
         self.outputs.new("an_SplineListSocket", "Splines")
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         layout.prop(self, "useWorldTransform")
 
     def execute(self, object):

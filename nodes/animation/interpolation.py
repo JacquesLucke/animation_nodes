@@ -60,7 +60,7 @@ class InterpolationNode(bpy.types.Node, AnimationNode):
         self.hideInputSockets()
         self.createCurveNode()
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         layout.prop(self, "topCategory", text = "")
         if self.topCategory == "BACK": layout.prop(self, "backCategory", text = "")
         if self.topCategory == "EXPONENTIAL": layout.prop(self, "exponentialCategory", text = "")

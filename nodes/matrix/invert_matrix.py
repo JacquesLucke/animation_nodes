@@ -13,7 +13,7 @@ class InvertMatrix(bpy.types.Node, AnimationNode):
         self.inputs.new("an_MatrixSocket", "Matrix")
         self.outputs.new("an_MatrixSocket", "Inverted Matrix")
 
-    def draw_buttons(self, context, layout):
+    def draw(self, layout):
         layout.separator()
 
     def getExecutionCode(self, outputUse):
