@@ -32,7 +32,7 @@ class SwitchNode(bpy.types.Node, AnimationNode):
         if dataType == self.assignedType: return
         self.assignedType = dataType
 
-    def getExecutionCodeLines(self):
+    def getExecutionCode(self):
         return ("output = ifTrue if condition else ifFalse",
                 "other = ifFalse if condition else ifTrue")
 

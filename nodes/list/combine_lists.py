@@ -37,7 +37,7 @@ class CombineLists(bpy.types.Node, AnimationNode):
     def inputNames(self):
         return { socket.identifier : "list_" + str(i) for i, socket in enumerate(self.inputs) }
 
-    def getExecutionCodeLines(self):
+    def getExecutionCode(self):
         lines = []
         lines.append("outList = []")
         for i, socket in self.inputs:

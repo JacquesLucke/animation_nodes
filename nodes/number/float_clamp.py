@@ -13,10 +13,10 @@ class FloatClamp(bpy.types.Node, AnimationNode):
     outputNames = { "Value" : "value" }
 
     def create(self):
-        self.inputs.new("an_FloatSocket", "Value")
-        self.inputs.new("an_FloatSocket", "Min").value = 0.0
-        self.inputs.new("an_FloatSocket", "Max").value = 1.0
-        self.outputs.new("an_FloatSocket", "Value")
+        self.inputs.new("an_FloatSocket", "Value", "value")
+        self.inputs.new("an_FloatSocket", "Min", "minValue").value = 0.0
+        self.inputs.new("an_FloatSocket", "Max", "maxValue").value = 1.0
+        self.outputs.new("an_FloatSocket", "Value", "outValue")
 
     def getExecutionCode(self):
-        return "$value$ = min(max(%value%, %minValue%), %maxValue%)"
+        return "outValue = min(max(value, minValue), maxValue)"

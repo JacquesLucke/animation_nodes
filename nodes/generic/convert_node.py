@@ -47,7 +47,7 @@ class ConvertNode(bpy.types.Node, AnimationNode):
         self.outputs.clear()
         self.outputs.new(self.targetIdName, "New", "new")
 
-    def getExecutionCodeLines(self):
+    def getExecutionCode(self):
         t = self.assignedType
         if t == "Float": return ("try: new = float(old)",
                                  "except: new = 0")

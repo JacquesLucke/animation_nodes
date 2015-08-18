@@ -12,7 +12,7 @@ class TimeInfoNode(bpy.types.Node, AnimationNode):
         self.outputs.new("an_FloatSocket", "End Frame", "endFrame")
         self.outputs.new("an_FloatSocket", "Frame Rate", "frameRate")
 
-    def getExecutionCodeLines(self, usedOutputs):
+    def getExecutionCode(self, usedOutputs):
         lines = []
         if usedOutputs["Frame"]: lines.append("frame = scene.frame_current_final")
         if usedOutputs["Start Frame"]: lines.append("startFrame = scene.frame_start")

@@ -29,7 +29,7 @@ class AppendListNode(bpy.types.Node, AnimationNode):
             text = "Assign",
             description = "Remove all sockets and set the selected socket type")
 
-    def getExecutionCodeLines(self):
+    def getExecutionCode(self):
         return ("outList = inList",
                 "outList.append(element)")
 

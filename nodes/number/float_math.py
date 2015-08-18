@@ -37,11 +37,6 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
     bl_label = "Math"
     isDetermined = True
 
-    inputNames = { "A" : "a",
-                   "B" : "b" }
-
-    outputNames = { "Result" : "result" }
-
     def operationChanged(node, context):
         node.inputs[1].hide = node.operation in singleInputOperations
         executionCodeChanged()
@@ -53,9 +48,9 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
         update = operationChanged)
 
     def create(self):
-        self.inputs.new("an_FloatSocket", "A")
-        self.inputs.new("an_FloatSocket", "B").value = 1.0
-        self.outputs.new("an_FloatSocket", "Result")
+        self.inputs.new("an_FloatSocket", "A", "a")
+        self.inputs.new("an_FloatSocket", "B", "b").value = 1.0
+        self.outputs.new("an_FloatSocket", "Result", "result")
 
     def draw(self, layout):
         layout.prop(self, "operation")
@@ -67,30 +62,30 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         op = self.operation
-        if op == "ADD": return "$result$ = %a% + %b%"
-        elif op == "SUBTRACT": return "$result$ = %a% - %b%"
-        elif op == "MULITPLY": return "$result$ = %a% * %b%"
-        elif op == "DIVIDE": return ("if %b% == 0: $result$ = 0 \n"
-                                     "else: $result$ = %a% / %b%")
-        elif op == "SINE": return "$result$ = math.sin(%a%)"
-        elif op == "COSINE": return "$result$ = math.cos(%a%)"
-        elif op == "TANGENT": return "$result$ = math.tan(%a%)"
-        elif op == "ARCSINE": return "$result$ = math.asin(min(max(%a%, -1), 1))"
-        elif op == "ARCCOSINE": return "$result$ = math.acos(min(max(%a%, -1), 1))"
-        elif op == "ARCTANGENT": return "$result$ = math.atan(%a%)"
-        elif op == "POWER": return "$result$ = math.pow(%a%, %b%)"
-        elif op == "LOGARITHM": return ("if %b% <= 0 or %b% == 1: $result$ = math.log(%a%) \n"
-                                        "else: $result$ = math.log(%a%, %b%)")
-        elif op == "MINIMUM": return "$result$ = min(%a%, %b%)"
-        elif op == "MAXIMUM": return "$result$ = max(%a%, %b%)"
-        elif op == "ROUND": return "$result$ = round(%a%, int(%b%))"
-        elif op == "LESSTHAN": return "$result$ = %a% < %b%"
-        elif op == "GREATHERTHAN": return "$result$ = %a% > %b%"
-        elif op == "ABSOLUTE": return "$result$ = abs(%a%)"
-        elif op == "MODULO": return ("if %b% == 0: $result$ = 0 \n"
-                                     "else: $result$ = %a% % %b%")
-        elif op == "FLOOR": return "$result$ = math.floor(%a%)"
-        elif op == "CEILING": return "$result$ = math.ceil(%a%)"
+        if op == "ADD": return "result = a + b"
+        elif op == "SUBTRACT": return "result = a - b"
+        elif op == "MULITPLY": return "result = a * b"
+        elif op == "DIVIDE": return ("if b == 0: result = 0",
+                                     "else: result = a / b")
+        elif op == "SINE": return "result = math.sin(a)"
+        elif op == "COSINE": return "result = math.cos(a)"
+        elif op == "TANGENT": return "result = math.tan(a)"
+        elif op == "ARCSINE": return "result = math.asin(min(max(a, -1), 1))"
+        elif op == "ARCCOSINE": return "result = math.acos(min(max(a, -1), 1))"
+        elif op == "ARCTANGENT": return "result = math.atan(a)"
+        elif op == "POWER": return "result = math.pow(a, b)"
+        elif op == "LOGARITHM": return ("if b <= 0 or b == 1: result = math.log(a)",
+                                        "else: result = math.log(a, b)")
+        elif op == "MINIMUM": return "result = min(a, b)"
+        elif op == "MAXIMUM": return "result = max(a, b)"
+        elif op == "ROUND": return "result = round(a, int(b))"
+        elif op == "LESSTHAN": return "result = a < b"
+        elif op == "GREATHERTHAN": return "result = a > b"
+        elif op == "ABSOLUTE": return "result = abs(a)"
+        elif op == "MODULO": return ("if b == 0: result = 0",
+                                     "else: result = a  b")
+        elif op == "FLOOR": return "result = math.floor(a)"
+        elif op == "CEILING": return "result = math.ceil(a)"
 
     def getModuleList(self):
         return ["math"]

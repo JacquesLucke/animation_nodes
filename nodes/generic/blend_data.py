@@ -34,7 +34,7 @@ class BlendDataNode(bpy.types.Node, AnimationNode):
         self.inputs.new(idName, "B", "b")
         self.outputs.new(idName, "Output", "output")
 
-    def getExecutionCodeLines(self):
+    def getExecutionCode(self):
         lines = []
         lines.append("factor = min(max(factor, 0.0), 1.0)")
         lines.append("influence = interpolation[0](factor, interpolation[1])")

@@ -21,7 +21,7 @@ class ShuffleListNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.assignedType = "Object List"
 
-    def getExecutionCodeLines(self):
+    def getExecutionCode(self):
         return ("random.seed(seed)",
                 "shuffledList = inList",
                 "random.shuffle(shuffledList)")
