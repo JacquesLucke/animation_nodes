@@ -109,6 +109,14 @@ class AnimationNode:
     def sockets(self):
         return list(self.inputs) + list(self.outputs)
 
+    @property
+    def inputNames(self):
+        return {socket.name : socket.identifier for socket in self.inputs}
+
+    @property
+    def outputNames(self):
+        return {socket.name : socket.identifier for socket in self.outputs}
+
 
 @persistent
 def createMissingIdentifiers(scene = None):

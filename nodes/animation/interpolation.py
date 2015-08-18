@@ -28,9 +28,6 @@ class InterpolationNode(bpy.types.Node, AnimationNode):
     bl_label = "Interpolation"
     isDetermined = True
 
-    inputNames =  { "Back" : "back" }
-    outputNames = { "Interpolation" : "interpolation" }
-
     def topCategoryChanged(self, context):
         self.hideInputSockets()
         if self.topCategory == "BACK": self.inputs["Back"].hide = False
@@ -55,8 +52,8 @@ class InterpolationNode(bpy.types.Node, AnimationNode):
     curveNodeName = bpy.props.StringProperty(default = "")
 
     def create(self):
-        self.inputs.new("an_FloatSocket", "Back").value = 1.70158
-        self.outputs.new("an_InterpolationSocket", "Interpolation")
+        self.inputs.new("an_FloatSocket", "Back", "back").value = 1.70158
+        self.outputs.new("an_InterpolationSocket", "Interpolation", "interpolation")
         self.hideInputSockets()
         self.createCurveNode()
 

@@ -14,12 +14,6 @@ class SetKeyframesNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SetKeyframesNode"
     bl_label = "Set Keyframes"
 
-    inputNames = { "Enable" : "enable",
-                   "Set Keyframe" : "setKeyframe",
-                   "Remove Unwanted" : "removeUnwanted",
-                   "Object" : "object" }
-    outputNames = {}
-
     paths = CollectionProperty(type = an_KeyframePath)
 
     selectedPathType = EnumProperty(default = "Location", items = pathTypeItems, name = "Path Type")
@@ -27,10 +21,10 @@ class SetKeyframesNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.width = 200
-        self.inputs.new("an_BooleanSocket", "Enable").value = False
-        self.inputs.new("an_BooleanSocket", "Set Keyframe")
-        self.inputs.new("an_BooleanSocket", "Remove Unwanted")
-        self.inputs.new("an_ObjectSocket", "Object")
+        self.inputs.new("an_BooleanSocket", "Enable", "enable").value = False
+        self.inputs.new("an_BooleanSocket", "Set Keyframe", "setKeyframe")
+        self.inputs.new("an_BooleanSocket", "Remove Unwanted", "removeUnwanted")
+        self.inputs.new("an_ObjectSocket", "Object", "object")
 
     def draw(self, layout):
         row = layout.row(align = True)
