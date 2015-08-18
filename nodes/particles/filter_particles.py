@@ -3,13 +3,9 @@ from bpy.props import *
 from ... events import propertyChanged
 from ... base_types.node import AnimationNode
 
-
 class FilterParticles(bpy.types.Node, AnimationNode):
     bl_idname = "an_FilterParticles"
     bl_label = "Filter Particles"
-
-    inputNames = { "Particles" : "particles" }
-    outputNames = { "Particles" : "filteredParticles" }
 
     outputUnborn = BoolProperty(name = "Output Unborn Particles", default = False, update = propertyChanged)
     outputAlive = BoolProperty(name = "Output Alive Particles", default = True, update = propertyChanged)
@@ -17,8 +13,8 @@ class FilterParticles(bpy.types.Node, AnimationNode):
     outputDead = BoolProperty(name = "Output Dead Particles", default = False, update = propertyChanged)
 
     def create(self):
-        self.inputs.new("an_ParticleListSocket", "Particles")
-        self.outputs.new("an_ParticleListSocket", "Particles")
+        self.inputs.new("an_ParticleListSocket", "Particles", "particles")
+        self.outputs.new("an_ParticleListSocket", "Particles", "filteredParticles")
 
     def draw(self, layout):
         col = layout.column()

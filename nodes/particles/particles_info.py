@@ -6,23 +6,14 @@ class ParticlesInfo(bpy.types.Node, AnimationNode):
     bl_idname = "an_ParticlesInfo"
     bl_label = "Particles Info"
 
-    inputNames = { "Particles" : "particles" }
-
-    outputNames = { "Locations" : "locations",
-                    "Velocities" : "velocity",
-                    "Ages" : "ages",
-                    "Sizes" : "sizes",
-                    "Birth Times" : "birthTimes",
-                    "Die Times" : "dieTimes" }
-
     def create(self):
-        self.inputs.new("an_ParticleListSocket", "Particles")
-        self.outputs.new("an_VectorListSocket", "Locations")
-        self.outputs.new("an_VectorListSocket", "Velocities").hide = True
-        self.outputs.new("an_FloatListSocket", "Ages").hide = True
-        self.outputs.new("an_FloatListSocket", "Sizes").hide = True
-        self.outputs.new("an_FloatListSocket", "Birth Times").hide = True
-        self.outputs.new("an_FloatListSocket", "Die Times").hide = True
+        self.inputs.new("an_ParticleListSocket", "Particles", "particles")
+        self.outputs.new("an_VectorListSocket", "Locations", "locations")
+        self.outputs.new("an_VectorListSocket", "Velocities", "Velocities").hide = True
+        self.outputs.new("an_FloatListSocket", "Ages", "ages").hide = True
+        self.outputs.new("an_FloatListSocket", "Sizes", "sizes").hide = True
+        self.outputs.new("an_FloatListSocket", "Birth Times", "birthTimes").hide = True
+        self.outputs.new("an_FloatListSocket", "Die Times", "dieTimes").hide = True
 
     def getExecutionCode(self, usedOutputs):
         codeLines = []
