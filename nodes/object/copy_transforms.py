@@ -1,4 +1,5 @@
 import bpy
+from bpy.props import *
 from ... events import propertyChanged
 from ... base_types.node import AnimationNode
 from ... utils.fcurve import (getArrayValueAtFrame,
@@ -9,26 +10,20 @@ class CopyTransformsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CopyTransformsNode"
     bl_label = "Copy Transforms"
 
-    inputNames = { "From" : "fromObject",
-                   "To" : "toObject",
-                   "Frame" : "frame" }
-
-    outputNames = { "To" : "toObject" }
-
-    useLocation = bpy.props.BoolVectorProperty(update = propertyChanged)
-    useRotation = bpy.props.BoolVectorProperty(update = propertyChanged)
-    useScale = bpy.props.BoolVectorProperty(update = propertyChanged)
+    useLocation = BoolVectorProperty(update = propertyChanged)
+    useRotation = BoolVectorProperty(update = propertyChanged)
+    useScale = BoolVectorProperty(update = propertyChanged)
 
     frameTypes = [
         ("OFFSET", "Offset", ""),
         ("ABSOLUTE", "Absolute", "") ]
-    frameTypesProperty = bpy.props.EnumProperty(name = "Frame Type", items = frameTypes, default = "OFFSET", update = propertyChanged)
+    frameTypesProperty = EnumProperty(name = "Frame Type", items = frameTypes, default = "OFFSET", update = propertyChanged)
 
     def create(self):
-        self.inputs.new("an_ObjectSocket", "From")
-        self.inputs.new("an_ObjectSocket", "To")
-        self.inputs.new("an_FloatSocket", "Frame")
-        self.outputs.new("an_ObjectSocket", "To")
+        self.inputs.new("an_ObjectSocket", "From", "fromObject")
+        self.inputs.new("an_ObjectSocket", "To", "toObject")
+        self.inputs.new("an_FloatSocket", "Frame", "frame")
+        self.outputs.new("an_ObjectSocket", "To", "outObject")
         self.width = 200
 
     def draw(self, layout):

@@ -1,4 +1,5 @@
 import bpy
+from bpy.props import *
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 
@@ -6,27 +7,20 @@ class an_ObjectTransformsOutput(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectTransformsOutput"
     bl_label = "Transforms Output"
 
-    inputNames = { "Object" : "object",
-                   "Location" : "location",
-                   "Rotation" : "rotation",
-                   "Scale" : "scale" }
-
-    outputNames = { "Object" : "object" }
-
     def checkedPropertiesChanged(self, context):
         self.updateSocketVisibility()
         executionCodeChanged()
 
-    useLocation = bpy.props.BoolVectorProperty(update = checkedPropertiesChanged)
-    useRotation = bpy.props.BoolVectorProperty(update = checkedPropertiesChanged)
-    useScale = bpy.props.BoolVectorProperty(update = checkedPropertiesChanged)
+    useLocation = BoolVectorProperty(update = checkedPropertiesChanged)
+    useRotation = BoolVectorProperty(update = checkedPropertiesChanged)
+    useScale = BoolVectorProperty(update = checkedPropertiesChanged)
 
     def create(self):
-        self.inputs.new("an_ObjectSocket", "Object").showName = False
-        self.inputs.new("an_VectorSocket", "Location")
-        self.inputs.new("an_VectorSocket", "Rotation")
-        self.inputs.new("an_VectorSocket", "Scale").value = (1, 1, 1)
-        self.outputs.new("an_ObjectSocket", "Object")
+        self.inputs.new("an_ObjectSocket", "Object", "object").showName = False
+        self.inputs.new("an_VectorSocket", "Location", "location")
+        self.inputs.new("an_VectorSocket", "Rotation", "rotation")
+        self.inputs.new("an_VectorSocket", "Scale", "scale").value = (1, 1, 1)
+        self.outputs.new("an_ObjectSocket", "Object", "outObject")
         self.updateSocketVisibility()
 
     def draw(self, layout):
@@ -58,34 +52,34 @@ class an_ObjectTransformsOutput(bpy.types.Node, AnimationNode):
         useRot = self.useRotation
         useScale = self.useScale
 
-        codeLines = []
-        codeLines.append("if %object% is not None:")
+        lines = []
+        lines.append("if object is not None:")
 
-        # location
+        # Location
         if useLoc[0] and useLoc[1] and useLoc[2]:
-            codeLines.append("    %object%.location = %location%")
+            lines.append("    object.location = location")
         else:
             for i in range(3):
-                if useLoc[i]: codeLines.append("    %object%.location["+str(i)+"] = %location%["+str(i)+"]")
+                if useLoc[i]: lines.append("    object.location["+str(i)+"] = location["+str(i)+"]")
 
-        # rotation
+        # Rotation
         if useRot[0] and useRot[1] and useRot[2]:
-            codeLines.append("    %object%.rotation_euler = %rotation%")
+            lines.append("    object.rotation_euler = rotation")
         else:
             for i in range(3):
-                if useRot[i]: codeLines.append("    %object%.rotation_euler["+str(i)+"] = %rotation%["+str(i)+"]")
+                if useRot[i]: lines.append("    object.rotation_euler["+str(i)+"] = rotation["+str(i)+"]")
 
-        # scale
+        # Scale
         if useScale[0] and useScale[1] and useScale[2]:
-            codeLines.append("    %object%.scale = %scale%")
+            lines.append("    object.scale = scale")
         else:
             for i in range(3):
-                if useScale[i]: codeLines.append("    %object%.scale["+str(i)+"] = %scale%["+str(i)+"]")
+                if useScale[i]: lines.append("    object.scale["+str(i)+"] = scale["+str(i)+"]")
 
         if not any((useLoc[0], useLoc[1], useLoc[2],
                    useRot[0], useRot[1], useRot[2],
                    useScale[0], useScale[1], useScale[2])):
-            codeLines = []
+            lines = []
 
-        codeLines.append("$object$ = %object%")
-        return "\n".join(codeLines)
+        lines.append("outObject = object")
+        return lines

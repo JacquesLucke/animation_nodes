@@ -5,15 +5,10 @@ class ObjectAttributeInputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectAttributeInputNode"
     bl_label = "Object Attribute Input"
 
-    inputNames = { "Object" : "object",
-                   "Path" : "path"}
-
-    outputNames = { "Value" : "value" }
-
     def create(self):
-        self.inputs.new("an_ObjectSocket", "Object").showName = False
-        self.inputs.new("an_StringSocket", "Path")
-        self.outputs.new("an_GenericSocket", "Value")
+        self.inputs.new("an_ObjectSocket", "Object", "object").showName = False
+        self.inputs.new("an_StringSocket", "Path", "path")
+        self.outputs.new("an_GenericSocket", "Value", "value")
 
     def execute(self, object, path):
         try:

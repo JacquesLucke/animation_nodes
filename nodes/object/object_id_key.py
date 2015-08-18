@@ -9,12 +9,6 @@ class ObjectIDKey(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectIDKey"
     bl_label = "Object ID Key"
 
-    inputNames = { "Object" : "object" }
-
-    @property
-    def outputNames(self):
-        return { socket.identifier : socket.identifier for socket in self.outputs }
-
     def selectedKeyChanged(self, context):
         self.isKeySelected = self.selectedKey != "NONE"
 
@@ -33,7 +27,7 @@ class ObjectIDKey(bpy.types.Node, AnimationNode):
     keyType = StringProperty()
 
     def create(self):
-        self.inputs.new("an_ObjectSocket", "Object").showName = False
+        self.inputs.new("an_ObjectSocket", "Object", "object").showName = False
         self.selectedKeyChanged(bpy.context)
 
     def draw(self, layout):
@@ -42,17 +36,17 @@ class ObjectIDKey(bpy.types.Node, AnimationNode):
     def buildOutputSockets(self):
         self.outputs.clear()
         if self.isKeySelected:
-            self.outputs.new("an_BooleanSocket", "Exists")
+            self.outputs.new("an_BooleanSocket", "Exists", "exists")
             if self.keyType == "Transforms":
-                self.outputs.new("an_VectorSocket", "Location")
-                self.outputs.new("an_VectorSocket", "Rotation")
-                self.outputs.new("an_VectorSocket", "Scale")
+                self.outputs.new("an_VectorSocket", "Location", "location")
+                self.outputs.new("an_VectorSocket", "Rotation", "rotation")
+                self.outputs.new("an_VectorSocket", "Scale", "scale")
             if self.keyType == "Float":
-                self.outputs.new("an_FloatSocket", "Float")
+                self.outputs.new("an_FloatSocket", "Float", "float")
             if self.keyType == "Integer":
-                self.outputs.new("an_IntegerSocket", "Integer")
+                self.outputs.new("an_IntegerSocket", "Integer", "integer")
             if self.keyType == "String":
-                self.outputs.new("an_StringSocket", "String")
+                self.outputs.new("an_StringSocket", "String", "string")
 
     def execute(self, object):
         if not self.isKeySelected: return

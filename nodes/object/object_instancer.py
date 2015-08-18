@@ -1,6 +1,7 @@
-import bpy, time
-from ... base_types.node import AnimationNode
+import bpy
+from bpy.props import *
 from ... events import propertyChanged
+from ... base_types.node import AnimationNode
 from ... nodes.container_provider import getMainObjectContainer
 from ... utils.names import (getPossibleObjectName,
                                      getPossibleMeshName,
@@ -13,18 +14,13 @@ objectTypes = ["Mesh", "Text", "Camera", "Point Lamp", "Curve"]
 objectTypeItems = [(type, type, "") for type in objectTypes]
 
 class an_ObjectNamePropertyGroup(bpy.types.PropertyGroup):
-    objectName = bpy.props.StringProperty(name = "Object Name", default = "", update = propertyChanged)
-    objectIndex = bpy.props.IntProperty(name = "Object Index", default = 0, update = propertyChanged)
+    objectName = StringProperty(name = "Object Name", default = "", update = propertyChanged)
+    objectIndex = IntProperty(name = "Object Index", default = 0, update = propertyChanged)
 
 class ObjectInstancer(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectInstancer"
     bl_label = "Object Instancer"
     searchTags = ["Object Replicator (old)"]
-
-    inputNames = { "Instances" : "instancesAmount",
-                   "Source" : "sourceObject" }
-
-    outputNames = { "Objects" : "objects" }
 
     def copyFromSourceChanged(self, context):
         self.inputs["Source"].hide = not self.copyFromSource
@@ -33,20 +29,20 @@ class ObjectInstancer(bpy.types.Node, AnimationNode):
     def resetInstancesEvent(self, context):
         self.resetInstances = True
 
-    linkedObjects = bpy.props.CollectionProperty(type = an_ObjectNamePropertyGroup)
-    resetInstances = bpy.props.BoolProperty(default = False, update = propertyChanged)
+    linkedObjects = CollectionProperty(type = an_ObjectNamePropertyGroup)
+    resetInstances = BoolProperty(default = False, update = propertyChanged)
 
-    copyFromSource = bpy.props.BoolProperty(default = True, name = "Copy from Source", update = copyFromSourceChanged)
-    deepCopy = bpy.props.BoolProperty(default = False, update = resetInstancesEvent, name = "Deep Copy", description = "Make the instances independent of the source object (e.g. copy mesh)")
-    objectType = bpy.props.EnumProperty(default = "Mesh", name = "Object Type", items = objectTypeItems, update = resetInstancesEvent)
-    copyObjectProperties = bpy.props.BoolProperty(default = False, update = resetInstancesEvent, description = "Enable this to copy modifiers/constrains/... from the source objec.)")
+    copyFromSource = BoolProperty(default = True, name = "Copy from Source", update = copyFromSourceChanged)
+    deepCopy = BoolProperty(default = False, update = resetInstancesEvent, name = "Deep Copy", description = "Make the instances independent of the source object (e.g. copy mesh)")
+    objectType = EnumProperty(default = "Mesh", name = "Object Type", items = objectTypeItems, update = resetInstancesEvent)
+    copyObjectProperties = BoolProperty(default = False, update = resetInstancesEvent, description = "Enable this to copy modifiers/constrains/... from the source objec.)")
 
-    parentInstances = bpy.props.BoolProperty(default = True, name = "Parent to Main Container", update = resetInstancesEvent)
+    parentInstances = BoolProperty(default = True, name = "Parent to Main Container", update = resetInstancesEvent)
 
     def create(self):
-        self.inputs.new("an_IntegerSocket", "Instances").setMinMax(0, 100000)
-        self.inputs.new("an_ObjectSocket", "Source").showName = False
-        self.outputs.new("an_ObjectListSocket", "Objects")
+        self.inputs.new("an_IntegerSocket", "Instances", "instancesAmount").setMinMax(0, 100000)
+        self.inputs.new("an_ObjectSocket", "Source", "sourceObject").showName = False
+        self.outputs.new("an_ObjectListSocket", "Objects", "objects")
 
     def draw(self, layout):
         layout.prop(self, "copyFromSource")

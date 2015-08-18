@@ -111,11 +111,11 @@ class AnimationNode:
 
     @property
     def inputNames(self):
-        return {socket.name : socket.identifier for socket in self.inputs}
+        return {socket.identifier : socket.identifier for socket in self.inputs}
 
     @property
     def outputNames(self):
-        return {socket.name : socket.identifier for socket in self.outputs}
+        return {socket.identifier : socket.identifier for socket in self.outputs}
 
 
 @persistent
