@@ -1,5 +1,6 @@
 import bpy
 import bmesh
+from bpy.props import *
 from ... base_types.node import AnimationNode
 
 
@@ -7,14 +8,11 @@ class CreateMeshFromData(bpy.types.Node, AnimationNode):
     bl_idname = "an_CreateMeshFromData"
     bl_label = "Create Mesh"
 
-    inputNames = { "Mesh Data" : "meshData" }
-    outputNames = { "Mesh" : "mesh" }
-
-    errorMessage = bpy.props.StringProperty(default = "")
+    errorMessage = StringProperty(default = "")
 
     def create(self):
-        self.inputs.new("an_MeshDataSocket", "Mesh Data")
-        self.outputs.new("an_MeshSocket", "Mesh")
+        self.inputs.new("an_MeshDataSocket", "Mesh Data", "meshData")
+        self.outputs.new("an_MeshSocket", "Mesh", "mesh")
 
     def draw(self, layout):
         if self.errorMessage != "":

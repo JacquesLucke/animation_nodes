@@ -1,7 +1,8 @@
 import bpy
+from bpy.props import *
+from ... events import propertyChanged
 from ... base_types.node import AnimationNode
 from ... data_structures.mesh import MeshData
-from ... events import propertyChanged
 
 sourceTypeItems = [
     ("MESH_DATA", "Vertices and Indices", ""),
@@ -11,26 +12,19 @@ class CombineMeshData(bpy.types.Node, AnimationNode):
     bl_idname = "an_CombineMeshData"
     bl_label = "Combine Mesh Data"
 
-    inputNames = { "Vertex Locations" : "vertexLocations",
-                   "Edges Indices" : "edgesIndices",
-                   "Polygons Indices" : "polygonsIndices",
-                   "Polygons" : "polygons" }
-
-    outputNames = { "Mesh Data" : "meshData" }
-
     def sourceTypeChanged(self, context):
         self.updateHideStatus()
         propertyChanged(self, context)
 
-    sourceType = bpy.props.EnumProperty(items = sourceTypeItems, default = "MESH_DATA", name = "Source Type", update = sourceTypeChanged)
+    sourceType = EnumProperty(items = sourceTypeItems, default = "MESH_DATA", name = "Source Type", update = sourceTypeChanged)
 
     def create(self):
-        self.inputs.new("an_VectorListSocket", "Vertex Locations")
-        self.inputs.new("an_EdgeIndicesListSocket", "Edges Indices")
-        self.inputs.new("an_PolygonIndicesListSocket", "Polygons Indices")
-        self.inputs.new("an_PolygonListSocket", "Polygons")
+        self.inputs.new("an_VectorListSocket", "Vertex Locations", "vertexLocations")
+        self.inputs.new("an_EdgeIndicesListSocket", "Edges Indices", "edgesIndices")
+        self.inputs.new("an_PolygonIndicesListSocket", "Polygons Indices", "polygonsIndices")
+        self.inputs.new("an_PolygonListSocket", "Polygons", "polygons")
         self.updateHideStatus()
-        self.outputs.new("an_MeshDataSocket", "Mesh Data")
+        self.outputs.new("an_MeshDataSocket", "Mesh Data", "meshData")
 
     def draw(self, layout):
         layout.prop(self, "sourceType")

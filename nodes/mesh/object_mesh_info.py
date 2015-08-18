@@ -1,4 +1,5 @@
 import bpy, time
+from bpy.props import *
 from ... base_types.node import AnimationNode
 from ... data_structures.mesh import MeshData, Vertex, Polygon
 from ... cache import getLongTimeCache, setLongTimeCache, cacheFunctionResult
@@ -11,27 +12,21 @@ class ObjectMeshInfo(bpy.types.Node, AnimationNode):
     bl_label = "Object Mesh Info"
     outputUseParameterName = "useOutput"
 
-    inputNames = { "Object" : "object" }
-
-    outputNames = { "Polygons" : "polygons",
-                    "Vertices" : "vertices",
-                    "Mesh Data" : "meshData" }
-
-    usePerObjectCache = bpy.props.BoolProperty(
+    usePerObjectCache = BoolProperty(
         name = "Use Cache",
         description = "Warning: Modifications to the data will overwrite the cache.",
         default = False)
 
-    applyModifiers = bpy.props.BoolProperty(
+    applyModifiers = BoolProperty(
         name = "Apply Modifiers",
         description = "Output the mesh with applied modifiers.",
         default = False, update = propertyChanged)
 
     def create(self):
-        self.inputs.new("an_ObjectSocket", "Object").showName = False
-        self.outputs.new("an_PolygonListSocket", "Polygons")
-        self.outputs.new("an_VertexListSocket", "Vertices")
-        self.outputs.new("an_MeshDataSocket", "Mesh Data")
+        self.inputs.new("an_ObjectSocket", "Object", "object").showName = False
+        self.outputs.new("an_PolygonListSocket", "Polygons", "polygons")
+        self.outputs.new("an_VertexListSocket", "Vertices", "vertices")
+        self.outputs.new("an_MeshDataSocket", "Mesh Data", "meshData")
 
     def draw(self, layout):
         layout.prop(self, "applyModifiers")

@@ -7,14 +7,11 @@ class CreatePolygonIndices(bpy.types.Node, AnimationNode):
     bl_label = "Create Polygon Indices"
     isDetermined = True
 
-    inputNames = { "Indices" : "indices" }
-    outputNames = { "Polygon Indices" : "polygonIndices" }
-
     errorMessage = StringProperty()
 
     def create(self):
-        self.inputs.new("an_IntegerListSocket", "Indices")
-        self.outputs.new("an_PolygonIndicesSocket", "Polygon Indices")
+        self.inputs.new("an_IntegerListSocket", "Indices", "indices")
+        self.outputs.new("an_PolygonIndicesSocket", "Polygon Indices", "polygonIndices")
 
     def draw(self, layout):
         if self.errorMessage != "":

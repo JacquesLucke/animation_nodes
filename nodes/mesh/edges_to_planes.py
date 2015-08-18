@@ -1,4 +1,5 @@
 import bpy
+from bpy.props import *
 from mathutils import Vector
 from ... base_types.node import AnimationNode
 from ... events import propertyChanged
@@ -7,28 +8,20 @@ class an_EdgesToPlanes(bpy.types.Node, AnimationNode):
     bl_idname = "an_EdgesToPlanes"
     bl_label = "Edges to Planes"
 
-    inputNames = { "Vertices" : "vertices",
-                   "Edges" : "edges",
-                   "Width" : "width",
-                   "Up Vector" : "upVector" }
-
-    outputNames = { "Vertices" : "vertices",
-                    "Polygons" : "polygons" }
-
-    calculateDirection = bpy.props.BoolProperty(
+    calculateDirection = BoolProperty(
         name = "Calculate Direction",
         description = "Calculate a rectangle instead of a parallelogram (takes more time)",
         default = True, update = propertyChanged)
 
     def create(self):
-        self.inputs.new("an_VectorListSocket", "Vertices")
-        self.inputs.new("an_EdgeIndicesListSocket", "Edges")
-        self.inputs.new("an_FloatSocket", "Width").value = 0.01
-        socket = self.inputs.new("an_VectorSocket", "Up Vector")
+        self.inputs.new("an_VectorListSocket", "Vertices", "vertices")
+        self.inputs.new("an_EdgeIndicesListSocket", "Edges", "edges")
+        self.inputs.new("an_FloatSocket", "Width", "width").value = 0.01
+        socket = self.inputs.new("an_VectorSocket", "Up Vector", "upVector")
         socket.value = (0.001, 0.001, 0.999)
         socket.hide = True
-        self.outputs.new("an_VectorListSocket", "Vertices")
-        self.outputs.new("an_PolygonIndicesListSocket", "Polygons")
+        self.outputs.new("an_VectorListSocket", "Vertices", "outVertices")
+        self.outputs.new("an_PolygonIndicesListSocket", "Polygons", "polygons")
         self.width += 10
 
     def draw(self, layout):

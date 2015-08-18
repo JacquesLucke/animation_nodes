@@ -5,15 +5,10 @@ class MakeObjectSmooth(bpy.types.Node, AnimationNode):
     bl_idname = "an_MakeObjectSmooth"
     bl_label = "Make Object Smooth"
 
-    inputNames = { "Object" : "object",
-                   "Smooth" : "smooth" }
-
-    outputNames = { "Object" : "object" }
-
     def create(self):
-        self.inputs.new("an_ObjectSocket", "Object").showName = False
-        self.inputs.new("an_BooleanSocket", "Smooth")
-        self.outputs.new("an_ObjectSocket", "Object")
+        self.inputs.new("an_ObjectSocket", "Object", "object").showName = False
+        self.inputs.new("an_BooleanSocket", "Smooth", "smooth")
+        self.outputs.new("an_ObjectSocket", "Object", "outObject")
 
     def execute(self, object, smooth):
         if getattr(object, "type", "") == "MESH":

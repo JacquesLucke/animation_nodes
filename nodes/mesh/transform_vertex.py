@@ -5,15 +5,10 @@ class TransformVertex(bpy.types.Node, AnimationNode):
     bl_idname = "an_TransformVertex"
     bl_label = "Transform Vertex"
 
-    inputNames = { "Vertex" : "vertex",
-                   "Matrix" : "matrix" }
-
-    outputNames = { "Vertex" : "vertex" }
-
     def create(self):
-        self.inputs.new("an_VertexSocket", "Vertex")
-        self.inputs.new("an_MatrixSocket", "Matrix")
-        self.outputs.new("an_VertexSocket", "Vertex")
+        self.inputs.new("an_VertexSocket", "Vertex", "vertex")
+        self.inputs.new("an_MatrixSocket", "Matrix", "matrix")
+        self.outputs.new("an_VertexSocket", "Vertex", "outVertex")
 
     def execute(self, vertex, matrix):
         vertex.location = matrix * vertex.location
