@@ -29,7 +29,7 @@ class SplineListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
         if self.showObjectInput:
             row.prop_search(self, "objectName",  bpy.context.scene, "objects", icon="NONE", text = "")
-            self.callFunctionFromUI(row, "assignActiveObject", icon = "EYEDROPPER")
+            self.functionOperator(row, "assignActiveObject", icon = "EYEDROPPER")
             if self.objectName != "":
                 row.prop(self, "useWorldSpace", text = "", icon = "WORLD")
 

@@ -65,7 +65,7 @@ class InterpolationNode(bpy.types.Node, AnimationNode):
         if self.topCategory == "CUSTOM":
             node = self.getCurveNode()
             layout.template_curve_mapping(node, "mapping", type = "NONE")
-            self.callFunctionFromUI(layout, "resetCurveEndPoints", text = "Reset End Points")
+            self.functionOperator(layout, "resetCurveEndPoints", text = "Reset End Points")
 
     def execute(self, back):
         if self.topCategory == "LINEAR": return (linear, None)

@@ -30,7 +30,7 @@ class CreateList(bpy.types.Node, AnimationNode):
         self.assignedType = "Float"
 
     def draw(self, layout):
-        self.callFunctionFromUI(layout, "newInputSocket",
+        self.functionOperator(layout, "newInputSocket",
             text = "New Input",
             description = "Create a new input socket",
             icon = "PLUS")
@@ -38,7 +38,7 @@ class CreateList(bpy.types.Node, AnimationNode):
     def drawAdvanced(self, layout):
         col = layout.column(align = True)
         col.prop(self, "selectedType", text = "")
-        self.callFunctionFromUI(col, "assignSelectedListType",
+        self.functionOperator(col, "assignSelectedListType",
             text = "Assign",
             description = "Remove all sockets and set the selected socket type")
 
@@ -94,7 +94,7 @@ class CreateList(bpy.types.Node, AnimationNode):
 
     def drawTypeSpecificButtonsExt(self, layout):
         if self.assignedType == "Object":
-            self.callFunctionFromUI(layout, "createInputsFromSelection", text = "From Selection", icon = "PLUS")
+            self.functionOperator(layout, "createInputsFromSelection", text = "From Selection", icon = "PLUS")
 
     def createInputsFromSelection(self):
         names = getSortedSelectedObjectNames()

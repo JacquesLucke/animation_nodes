@@ -66,7 +66,7 @@ class AnimationNode:
         layout.label("Has no advanced settings")
 
 
-    def callFunctionFromUI(self, layout, functionName, text = "", icon = "NONE", description = "", data = None):
+    def functionOperator(self, layout, functionName, text = "", icon = "NONE", description = "", data = None):
         idName = getNodeFunctionCallOperatorName(description)
         props = layout.operator(idName, text = text, icon = icon)
         props.nodeTreeName = self.id_data.name

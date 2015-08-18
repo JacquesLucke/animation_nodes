@@ -20,7 +20,7 @@ class DataInput(bpy.types.Node, AnimationNode):
     def drawAdvanced(self, layout):
         col = layout.column(align = True)
         col.prop(self, "selectedType", text = "")
-        self.callFunctionFromUI(col, "assignSelectedType", text = "Assign", description = "Remove all sockets and set the selected socket type")
+        self.functionOperator(col, "assignSelectedType", text = "Assign", description = "Remove all sockets and set the selected socket type")
 
     def getInLineExecutionString(self, outputUse):
         return "output = input"

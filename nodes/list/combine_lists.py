@@ -22,14 +22,14 @@ class CombineLists(bpy.types.Node, AnimationNode):
         self.assignedType = "Float"
 
     def draw(self, layout):
-        self.callFunctionFromUI(layout, "newInputSocket",
+        self.functionOperator(layout, "newInputSocket",
             text = "New Input",
             description = "Create a new input socket",
             icon = "PLUS")
 
     def drawAdvanced(self, layout):
         layout.prop(self, "selectedType")
-        self.callFunctionFromUI(layout, "assignSelectedListType",
+        self.functionOperator(layout, "assignSelectedListType",
             text = "Assign",
             description = "Remove all sockets and set the selected socket type")
 

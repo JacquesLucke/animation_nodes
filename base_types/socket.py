@@ -40,12 +40,12 @@ class AnimationNodeSocket:
 
         if self.moveable and self.editInNode:
             row.separator()
-            self.callFunctionFromUI(row, "moveUpSave", icon = "TRIA_UP")
-            self.callFunctionFromUI(row, "moveDownSave", icon = "TRIA_DOWN")
+            self.functionOperator(row, "moveUpSave", icon = "TRIA_UP")
+            self.functionOperator(row, "moveDownSave", icon = "TRIA_DOWN")
 
         if self.removeable and self.editInNode:
             row.separator()
-            self.callFunctionFromUI(row, "remove", icon = "X")
+            self.functionOperator(row, "remove", icon = "X")
 
     def getDisplayedName(self):
         if self.nameSettings.display or self.nameSettings.editable: return self.customName
@@ -63,7 +63,7 @@ class AnimationNodeSocket:
     def getStoreableValue(self):
         return
 
-    def callFunctionFromUI(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True):
+    def functionOperator(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True):
         idName = getSocketFunctionCallOperatorName(description)
         props = layout.operator(idName, text = text, icon = icon, emboss = emboss)
         props.nodeTreeName = self.node.id_data.name

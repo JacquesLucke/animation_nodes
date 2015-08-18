@@ -14,7 +14,7 @@ def draw(self, context):
 
     col = layout.column()
 
-    node.callFunctionFromUI(col, "toogleSocketEditing",
+    node.functionOperator(col, "toogleSocketEditing",
         text = "Toogle Socket Editing",
         description = "Show buttons to move and remove individual sockets in the node",
         icon = "SETTINGS")
@@ -49,7 +49,7 @@ class SocketUiList(bpy.types.UIList):
         else: layout.label(socket.toString())
 
         if socket.removeable:
-            socket.callFunctionFromUI(layout, "remove", icon = "X", emboss = False)
+            socket.functionOperator(layout, "remove", icon = "X", emboss = False)
 
         icon = "RESTRICT_VIEW_ON" if socket.hide else "RESTRICT_VIEW_OFF"
         layout.prop(socket, "hide", text = "", icon_only = True, icon = icon, emboss = False)
