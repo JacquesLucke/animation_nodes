@@ -1,4 +1,5 @@
 import bpy
+from bpy.props import *
 from ... events import propertyChanged
 from ... base_types.node import AnimationNode
 
@@ -6,24 +7,23 @@ class TrimText(bpy.types.Node, AnimationNode):
     bl_idname = "an_TrimText"
     bl_label = "Trim Text"
 
-    inputNames = { "Text" : "text",
-                   "Start" : "start",
-                   "End" : "end" }
-
-    outputNames = { "Text" : "text" }
-
     def settingChanged(self, context):
         self.inputs["End"].hide = self.autoEnd
         propertyChanged()
 
-    autoEnd = bpy.props.BoolProperty(default = False, description = "Use the length of the text as trim-end", update = settingChanged)
-    allowNegativeIndex = bpy.props.BoolProperty(default = False, description = "Negative indices start from the end", update = settingChanged)
+    autoEnd = BoolProperty(
+        default = False, update = settingChanged,
+        description = "Use the length of the text as trim-end")
+
+    allowNegativeIndex = BoolProperty(
+        default = False, update = settingChanged,
+        description = "Negative indices start from the end")
 
     def create(self):
-        self.inputs.new("an_StringSocket", "Text")
-        self.inputs.new("an_IntegerSocket", "Start").value = 0
-        self.inputs.new("an_IntegerSocket", "End").value = 5
-        self.outputs.new("an_StringSocket", "Text")
+        self.inputs.new("an_StringSocket", "Text", "text")
+        self.inputs.new("an_IntegerSocket", "Start", "start").value = 0
+        self.inputs.new("an_IntegerSocket", "End", "end").value = 5
+        self.outputs.new("an_StringSocket", "Text", "outText")
 
     def draw(self, layout):
         layout.prop(self, "autoEnd", text = "Auto End")

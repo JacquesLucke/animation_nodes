@@ -19,9 +19,6 @@ class SeparateTextObject(bpy.types.Node, AnimationNode):
     bl_idname = "an_SeparateTextObject"
     bl_label = "Separate Text Object"
 
-    inputNames = {}
-    outputNames = { "Text Objects" : "textObjects" }
-
     sourceObjectName = StringProperty(name = "Source Object")
     currentID = IntProperty(default = 0);
     objectCount = IntProperty(default = 0);
@@ -30,7 +27,7 @@ class SeparateTextObject(bpy.types.Node, AnimationNode):
     outputType = EnumProperty(name = "Output Type", items = outputTypeItems)
 
     def create(self):
-        self.outputs.new("an_ObjectListSocket", "Text Objects")
+        self.outputs.new("an_ObjectListSocket", "Text Objects", "textObjects")
         self.width = 180
 
     def draw(self, layout):

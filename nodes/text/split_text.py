@@ -13,12 +13,6 @@ class SplitText(bpy.types.Node, AnimationNode):
     bl_idname = "an_SplitText"
     bl_label = "Split Text"
 
-    inputNames = { "Text" : "text",
-                   "Split By" : "splitBy" }
-
-    outputNames = { "Text List" : "textList",
-                    "Length" : "length" }
-
     def splitTypeChanges(self, context):
         self.setHideProperty()
         propertyChanged()
@@ -31,10 +25,10 @@ class SplitText(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.width = 190
-        self.inputs.new("an_StringSocket", "Text")
-        self.inputs.new("an_StringSocket", "Split By")
-        self.outputs.new("an_StringListSocket", "Text List")
-        self.outputs.new("an_IntegerSocket", "Length")
+        self.inputs.new("an_StringSocket", "Text", "text")
+        self.inputs.new("an_StringSocket", "Split By", "splitBy")
+        self.outputs.new("an_StringListSocket", "Text List", "textList")
+        self.outputs.new("an_IntegerSocket", "Length", "length")
 
     def draw(self, layout):
         layout.prop(self, "splitType", text = "Type")

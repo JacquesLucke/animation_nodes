@@ -16,17 +16,17 @@ class TextSequenceOutput(bpy.types.Node, AnimationNode):
     outputNames = { "Sequence" : "sequence" }
 
     def create(self):
-        self.inputs.new("an_SequenceSocket", "Sequence").showName = False
-        self.inputs.new("an_StringSocket", "Text")
-        self.inputs.new("an_IntegerSocket", "Size").number = 200
-        self.inputs.new("an_BooleanSocket", "Shadow").value = False
-        socket = self.inputs.new("an_StringSocket", "Align")
+        self.inputs.new("an_SequenceSocket", "Sequence", "sequence").showName = False
+        self.inputs.new("an_StringSocket", "Text", "text")
+        self.inputs.new("an_IntegerSocket", "Size", "size").number = 200
+        self.inputs.new("an_BooleanSocket", "Shadow", "shadow").value = False
+        socket = self.inputs.new("an_StringSocket", "Align", "align")
         socket.useEnum = True
         socket.setEnumItems([("CENTER", "Center"), ("LEFT", "Left"), ("RIGHT", "Right")])
         socket.string = "CENTER"
-        self.inputs.new("an_FloatSocket", "X Location").number = 0.5
-        self.inputs.new("an_FloatSocket", "Y Location").number = 0.0
-        self.outputs.new("an_SequenceSocket", "Sequence")
+        self.inputs.new("an_FloatSocket", "X Location", "xLocation").number = 0.5
+        self.inputs.new("an_FloatSocket", "Y Location", "yLocation").number = 0.0
+        self.outputs.new("an_SequenceSocket", "Sequence", "outSequence")
 
     def execute(self, sequence, text, size, shadow, align, xLocation, yLocation):
         if getattr(sequence, "type", "") != "TEXT": return sequence

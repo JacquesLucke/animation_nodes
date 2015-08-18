@@ -11,20 +11,12 @@ class CharactersNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CharactersNode"
     bl_label = "Characters"
 
-    inputNames = {}
-
-    outputNames = { "Lower Case" : "lower",
-                    "Upper Case" : "upper",
-                    "Digits" : "digits",
-                    "Special" : "special",
-                    "All" : "all" }
-
     def create(self):
-        self.outputs.new("an_StringSocket", "Lower Case")
-        self.outputs.new("an_StringSocket", "Upper Case")
-        self.outputs.new("an_StringSocket", "Digits")
-        self.outputs.new("an_StringSocket", "Special")
-        self.outputs.new("an_StringSocket", "All")
+        self.outputs.new("an_StringSocket", "Lower Case", "lower")
+        self.outputs.new("an_StringSocket", "Upper Case", "upper")
+        self.outputs.new("an_StringSocket", "Digits", "digits")
+        self.outputs.new("an_StringSocket", "Special", "special")
+        self.outputs.new("an_StringSocket", "All", "all")
 
     def execute(self):
         return lower, upper, digits, special, allChars
