@@ -10,7 +10,7 @@ class ScaleMatrix(bpy.types.Node, AnimationNode):
         self.inputs.new("an_VectorSocket", "Scale", "scale").value = [1, 1, 1]
         self.outputs.new("an_MatrixSocket", "Matrix", "matrix")
 
-    def getExecutionCode(self, outputUse):
+    def getExecutionCode(self):
         return ("matrix ="
                 " mathutils.Matrix.Scale(scale[0], 4, (1, 0, 0)) * "
                 " mathutils.Matrix.Scale(scale[1], 4, (0, 1, 0)) * "

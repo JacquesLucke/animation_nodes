@@ -13,7 +13,7 @@ class InvertMatrix(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.separator()
 
-    def getExecutionCode(self, outputUse):
+    def getExecutionCode(self):
         return "invertedMatrix = matrix.inverted(mathutils.Matrix.Identity(4))"
 
     def getModuleList(self):

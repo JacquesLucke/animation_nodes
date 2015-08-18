@@ -11,5 +11,5 @@ class CreateEdgeIndices(bpy.types.Node, AnimationNode):
         self.inputs.new("an_IntegerSocket", "Index 2", "index2").value = 1
         self.outputs.new("an_EdgeIndicesSocket", "Edge Indices", "edgeIndices")
 
-    def getExecutionCode(self, outputUse):
+    def getExecutionCode(self):
         return "edgeIndices = (index1, index2)"

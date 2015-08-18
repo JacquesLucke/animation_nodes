@@ -19,7 +19,7 @@ class RotationMatrix(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.prop(self, "axis", expand = True)
 
-    def getExecutionCode(self, outputUse):
+    def getExecutionCode(self):
         return "matrix = mathutils.Matrix.Rotation(angle, 4, '{}')".format(self.axis)
 
     def getModuleList(self):

@@ -70,7 +70,7 @@ class TextOutputNode(bpy.types.Node, AnimationNode):
         for option in options:
             self.inputs[option[1]].hide = not getattr(self, option[0])
 
-    def getExecutionCode(self, usedOutputs):
+    def getExecutionCode(self):
         lines = []
         lines.append("outObject = object")
         lines.append("if object is not None:")

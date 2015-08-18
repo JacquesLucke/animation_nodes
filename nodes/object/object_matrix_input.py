@@ -13,13 +13,14 @@ class ObjectMatrixInput(bpy.types.Node, AnimationNode):
         self.outputs.new("an_MatrixSocket", "Parent Inverse", "parentInverse")
         self.outputs.new("an_MatrixSocket", "World", "world")
 
-    def getExecutionCode(self, usedOutputs):
+    def getExecutionCode(self):
+        usedOutputs = self.getUsedOutputsDict()
         lines = []
         lines.append("try:")
-        if usedOutputs["Basis"]: lines.append("    basis = object.matrix_basis")
-        if usedOutputs["Local"]: lines.append("    local = object.matrix_local")
-        if usedOutputs["Parent Inverse"]: lines.append("    parentInverse = object.matrix_parent_inverse")
-        if usedOutputs["World"]: lines.append("    world = object.matrix_world")
+        if usedOutputs["basis"]: lines.append("    basis = object.matrix_basis")
+        if usedOutputs["local"]: lines.append("    local = object.matrix_local")
+        if usedOutputs["parentInverse"]: lines.append("    parentInverse = object.matrix_parent_inverse")
+        if usedOutputs["world"]: lines.append("    world = object.matrix_world")
         lines.append("    pass")
         lines.append("except:")
         lines.append("    basis = mathutils.Matrix.Identity(4)")

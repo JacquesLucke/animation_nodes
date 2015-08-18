@@ -96,9 +96,9 @@ class AnimationNode:
     def getNotUsedSocketName(self, prefix = "socket"):
         return getNotUsedSocketName(self, prefix)
 
-    def getLinkedOutputIdentifiers(self):
-        linkedIdentifiers = [socket.identifier for socket in self.outputs if socket.isLinked]
-        return linkedIdentifiers
+    def getUsedOutputsDict(self):
+        usedOutputs = {socket.identifier : socket.isLinked for socket in self.outputs}
+        return usedOutputs
 
     @property
     def activeInputSocket(self):
