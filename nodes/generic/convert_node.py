@@ -9,9 +9,6 @@ class ConvertNode(bpy.types.Node, AnimationNode):
     bl_label = "Convert"
     isDetermined = True
 
-    inputNames = { "Old" : "old" }
-    outputNames = { "New" : "new"}
-
     def assignedTypeChanged(self, context):
         self.targetIdName = toIdName(self.assignedType)
         self.recreateOutputSocket()
@@ -21,7 +18,7 @@ class ConvertNode(bpy.types.Node, AnimationNode):
     targetIdName = StringProperty()
 
     def create(self):
-        self.inputs.new("an_GenericSocket", "Old")
+        self.inputs.new("an_GenericSocket", "Old", "old")
         self.selectedType = "String"
         self.assignedType = "String"
 
@@ -48,20 +45,20 @@ class ConvertNode(bpy.types.Node, AnimationNode):
 
     def recreateOutputSocket(self):
         self.outputs.clear()
-        self.outputs.new(self.targetIdName, "New")
+        self.outputs.new(self.targetIdName, "New", "new")
 
-    def getExecutionCode(self):
+    def getExecutionCodeLines(self):
         t = self.assignedType
-        if t == "Float": return ("try: $new$ = float(%old%) \n"
-                                 "except: $new$ = 0")
-        elif t == "Integer": return ("try: $new$ = int(%old%) \n"
-                                     "except: $new$ = 0")
-        elif t == "String": return ("try: $new$ = str(%old%) \n"
-                                    "except: $new$ = ''")
-        elif t == "Vector": return ("try: $new$ = mathutils.Vector(%old%) \n"
-                                    "except: $new$ = mathutils.Vector((0, 0, 0))")
+        if t == "Float": return ("try: new = float(old)",
+                                 "except: new = 0")
+        elif t == "Integer": return ("try: new = int(old)",
+                                     "except: new = 0")
+        elif t == "String": return ("try: new = str(old)",
+                                    "except: new = ''")
+        elif t == "Vector": return ("try: new = mathutils.Vector(old)",
+                                    "except: new = mathutils.Vector((0, 0, 0))")
         else:
-            return "$new$ = %old%"
+            return ("new = old")
 
     def getModuleList(self):
         t = self.assignedType

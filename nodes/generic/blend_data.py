@@ -20,13 +20,6 @@ class BlendDataNode(bpy.types.Node, AnimationNode):
 
     dataType = StringProperty(default = "Float", update = dataTypeChanged)
 
-    inputNames = { "Factor" : "factor",
-                   "Interpolation" : "interpolation",
-                   "A" : "a",
-                   "B" : "b" }
-
-    outputNames = { "Output" : "output" }
-
     def create(self):
         self.generateSockets()
 
@@ -35,18 +28,18 @@ class BlendDataNode(bpy.types.Node, AnimationNode):
         self.outputs.clear()
 
         idName = toIdName(self.dataType)
-        self.inputs.new("an_FloatSocket", "Factor").setMinMax(0.0, 1.0)
-        self.inputs.new("an_InterpolationSocket", "Interpolation").showName = False
-        self.inputs.new(idName, "A")
-        self.inputs.new(idName, "B")
-        self.outputs.new(idName, "Output")
+        self.inputs.new("an_FloatSocket", "Factor", "factor").setMinMax(0.0, 1.0)
+        self.inputs.new("an_InterpolationSocket", "Interpolation", "interpolation").showName = False
+        self.inputs.new(idName, "A", "a")
+        self.inputs.new(idName, "B", "b")
+        self.outputs.new(idName, "Output", "output")
 
-    def getExecutionCode(self):
+    def getExecutionCodeLines(self):
         lines = []
-        lines.append("%factor% = min(max(%factor%, 0.0), 1.0)")
-        lines.append("influence = %interpolation%[0](%factor%, %interpolation%[1])")
+        lines.append("factor = min(max(factor, 0.0), 1.0)")
+        lines.append("influence = interpolation[0](factor, interpolation[1])")
 
-        if self.dataType in ("Float", "Vector"): lines.append("$output$ = %a% * (1 - influence) + %b% * influence")
-        if self.dataType == "Matrix": lines.append("$output$ = %a%.lerp(%b%, influence)")
+        if self.dataType in ("Float", "Vector"): lines.append("output = a * (1 - influence) + b * influence")
+        if self.dataType == "Matrix": lines.append("output = a.lerp(b, influence)")
 
-        return "\n".join(lines)
+        return lines
