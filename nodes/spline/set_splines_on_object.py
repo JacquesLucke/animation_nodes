@@ -6,17 +6,12 @@ class SetSplinesOnObject(bpy.types.Node, AnimationNode):
     bl_idname = "an_SetSplinesOnObject"
     bl_label = "Set Splines on Object"
 
-    inputNames = { "Object" : "object",
-                   "Splines" : "splines" }
-
-    outputNames = { "Object" : "object" }
-
     def create(self):
-        socket = self.inputs.new("an_ObjectSocket", "Object")
+        socket = self.inputs.new("an_ObjectSocket", "Object", "object")
         socket.showName = False
         socket.objectCreationType = "CURVE"
-        self.inputs.new("an_SplineListSocket", "Splines").showObjectInput = False
-        self.outputs.new("an_ObjectSocket", "Object")
+        self.inputs.new("an_SplineListSocket", "Splines", "splines").showObjectInput = False
+        self.outputs.new("an_ObjectSocket", "Object", "outObject")
 
     def execute(self, object, splines):
         setSplinesOnBlenderObject(object, splines)

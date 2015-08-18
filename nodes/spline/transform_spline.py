@@ -5,17 +5,12 @@ class TransformSpline(bpy.types.Node, AnimationNode):
     bl_idname = "an_TransformSpline"
     bl_label = "Transform Spline"
 
-    inputNames = { "Spline" : "spline",
-                   "Transformation" : "transformation" }
-
-    outputNames = { "Spline" : "spline" }
-
     def create(self):
-        self.inputs.new("an_SplineSocket", "Spline").showName = False
-        self.inputs.new("an_MatrixSocket", "Transformation")
-        self.outputs.new("an_SplineSocket", "Spline")
+        self.inputs.new("an_SplineSocket", "Spline", "spline").showName = False
+        self.inputs.new("an_MatrixSocket", "Transformation", "matrix")
+        self.outputs.new("an_SplineSocket", "Spline", "outSpline")
 
-    def execute(self, spline, transformation):
-        spline.transform(transformation)
+    def execute(self, spline, matrix):
+        spline.transform(matrix)
         spline.isChanged = True
         return spline

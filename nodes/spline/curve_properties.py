@@ -20,6 +20,7 @@ fillModes = ("FULL", "BACK", "FRONT", "HALF")
 class CurveProperties(bpy.types.Node, AnimationNode):
     bl_idname = "an_CurveProperties"
     bl_label = "Curve Properties"
+    useDictionaryExecution = True
 
     def getPossiblePropertyItems(self, context):
         items = []

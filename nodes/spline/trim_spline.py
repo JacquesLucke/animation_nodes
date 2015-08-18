@@ -6,18 +6,12 @@ class TrimSpline(bpy.types.Node, AnimationNode, SplineEvaluationBase):
     bl_idname = "an_TrimSpline"
     bl_label = "Trim Spline"
 
-    inputNames = { "Spline" : "spline",
-                   "Start" : "start",
-                   "End" : "end" }
-
-    outputNames = { "Spline" : "spline" }
-
     def create(self):
-        self.inputs.new("an_SplineSocket", "Spline").showName = False
-        self.inputs.new("an_FloatSocket", "Start").value = 0.0
-        self.inputs.new("an_FloatSocket", "End").value = 1.0
-        self.outputs.new("an_SplineSocket", "Spline")
-        
+        self.inputs.new("an_SplineSocket", "Spline", "spline").showName = False
+        self.inputs.new("an_FloatSocket", "Start", "start").value = 0.0
+        self.inputs.new("an_FloatSocket", "End", "end").value = 1.0
+        self.outputs.new("an_SplineSocket", "Spline", "trimmedSpline")
+
     def draw(self, layout):
         layout.prop(self, "parameterType", text = "")
 

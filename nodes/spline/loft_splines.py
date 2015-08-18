@@ -16,17 +16,6 @@ class LoftSplines(bpy.types.Node, AnimationNode):
     bl_idname = "an_LoftSplines"
     bl_label = "Loft Splines"
 
-    inputNames = { "Splines" : "splines",
-                   "Spline Samples" : "splineSamples",
-                   "Surface Samples" : "surfaceSamples",
-                   "Cyclic" : "cyclic",
-                   "Smoothness" : "smoothness",
-                   "Start" : "start",
-                   "End" : "end" }
-
-    outputNames = { "Vertices" : "vertices",
-                    "Polygons" : "polygons" }
-
     def settingChanged(self, context):
         self.inputs["Smoothness"].hide = self.interpolationType != "BEZIER"
         propertyChanged(self, context)
@@ -38,22 +27,22 @@ class LoftSplines(bpy.types.Node, AnimationNode):
     surfaceDistributionType = EnumProperty(name = "Surface Distribution", default = "RESOLUTION", items = sampleDistributionTypeItems, update = propertyChanged)
 
     def create(self):
-        self.inputs.new("an_SplineListSocket", "Splines")
-        socket1 = self.inputs.new("an_IntegerSocket", "Spline Samples")
-        socket2 = self.inputs.new("an_IntegerSocket", "Surface Samples")
+        self.inputs.new("an_SplineListSocket", "Splines", "splines")
+        socket1 = self.inputs.new("an_IntegerSocket", "Spline Samples", "splineSamples")
+        socket2 = self.inputs.new("an_IntegerSocket", "Surface Samples", "surfaceSamples")
         for socket in (socket1, socket2):
             socket.value = 16
             socket.setMinMax(2, 100000)
-        self.inputs.new("an_BooleanSocket", "Cyclic").value = False
-        self.inputs.new("an_FloatSocket", "Smoothness").value = 0.3333
-        socket = self.inputs.new("an_FloatSocket", "Start")
+        self.inputs.new("an_BooleanSocket", "Cyclic", "cyclic").value = False
+        self.inputs.new("an_FloatSocket", "Smoothness", "smoothness").value = 0.3333
+        socket = self.inputs.new("an_FloatSocket", "Start", "start")
         socket.value, socket.hide = 0.0, True
         socket.setMinMax(0.0, 1.0)
-        socket = self.inputs.new("an_FloatSocket", "End")
+        socket = self.inputs.new("an_FloatSocket", "End", "end")
         socket.value, socket.hide = 1.0, True
         socket.setMinMax(0.0, 1.0)
-        self.outputs.new("an_VectorListSocket", "Vertices")
-        self.outputs.new("an_PolygonIndicesListSocket", "Polygons")
+        self.outputs.new("an_VectorListSocket", "Vertices", "vertices")
+        self.outputs.new("an_PolygonIndicesListSocket", "Polygons", "polygons")
         self.width += 20
         self.settingChanged(bpy.context)
 

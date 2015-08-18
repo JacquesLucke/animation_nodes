@@ -8,17 +8,14 @@ class SplinesFromObject(bpy.types.Node, AnimationNode):
     bl_idname = "an_SplinesFromObject"
     bl_label = "Splines from Object"
 
-    inputNames = { "Object" : "object" }
-    outputNames = { "Splines" : "splines" }
-
     useWorldTransform = BoolProperty(
         name = "Use World Transform",
         description = "Use the position in global space",
         default = True, update = propertyChanged)
 
     def create(self):
-        self.inputs.new("an_ObjectSocket", "Object").showName = False
-        self.outputs.new("an_SplineListSocket", "Splines")
+        self.inputs.new("an_ObjectSocket", "Object", "objects").showName = False
+        self.outputs.new("an_SplineListSocket", "Splines", "splines")
 
     def draw(self, layout):
         layout.prop(self, "useWorldTransform")
