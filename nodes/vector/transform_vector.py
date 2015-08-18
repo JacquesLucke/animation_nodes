@@ -6,18 +6,10 @@ class TransformVector(bpy.types.Node, AnimationNode):
     bl_label = "Transform Vector"
     isDetermined = True
 
-    inputNames = { "Vector" : "vector",
-                   "Matrix" : "matrix" }
-
-    outputNames = { "Vector" : "vector" }
-
     def create(self):
-        self.inputs.new("an_VectorSocket", "Vector")
-        self.inputs.new("an_MatrixSocket", "Matrix")
-        self.outputs.new("an_VectorSocket", "Vector")
+        self.inputs.new("an_VectorSocket", "Vector", "vector")
+        self.inputs.new("an_MatrixSocket", "Matrix", "matrix")
+        self.outputs.new("an_VectorSocket", "Vector", "transformedVector")
 
     def getExecutionCode(self):
-        return "$vector$ = %matrix% * mathutils.Vector(%vector%)"
-        
-    def getModuleList(self):
-        return ["mathutils"]
+        return "transformedVector = matrix * vector"

@@ -1,4 +1,5 @@
 import bpy
+from bpy.props import *
 from mathutils import Vector
 from ... events import propertyChanged
 from ... base_types.node import AnimationNode
@@ -9,23 +10,15 @@ class VectorWiggle(bpy.types.Node, AnimationNode):
     bl_label = "Vector Wiggle"
     isDetermined = True
 
-    inputNames = { "Seed" : "seed",
-                   "Evolution" : "evolution",
-                   "Amplitude" : "amplitude",
-                   "Octaves" : "octaves",
-                   "Persistance" : "persistance" }
-
-    outputNames = { "Vector" : "vector" }
-
-    additionalSeed = bpy.props.IntProperty(update = propertyChanged)
+    additionalSeed = IntProperty(update = propertyChanged)
 
     def create(self):
-        self.inputs.new("an_FloatSocket", "Seed")
-        self.inputs.new("an_FloatSocket", "Evolution")
-        self.inputs.new("an_VectorSocket", "Amplitude").value = [5, 5, 5]
-        self.inputs.new("an_IntegerSocket", "Octaves").value = 2
-        self.inputs.new("an_FloatSocket", "Persistance").value = 0.3
-        self.outputs.new("an_VectorSocket", "Vector")
+        self.inputs.new("an_FloatSocket", "Seed", "seed")
+        self.inputs.new("an_FloatSocket", "Evolution", "evolution")
+        self.inputs.new("an_VectorSocket", "Amplitude", "amplitude").value = [5, 5, 5]
+        self.inputs.new("an_IntegerSocket", "Octaves", "octaves").value = 2
+        self.inputs.new("an_FloatSocket", "Persistance", "persistance").value = 0.3
+        self.outputs.new("an_VectorSocket", "Vector", "vector")
 
     def draw(self, layout):
         layout.prop(self, "additionalSeed", text = "Additional Seed")

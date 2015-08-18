@@ -6,15 +6,10 @@ class VectorDistanceNode(bpy.types.Node, AnimationNode):
     bl_label = "Vector Distance"
     isDetermined = True
 
-    inputNames = { "A" : "a",
-                   "B" : "b" }
-
-    outputNames = { "Distance" : "distance" }
-
     def create(self):
-        self.inputs.new("an_VectorSocket", "A")
-        self.inputs.new("an_VectorSocket", "B")
-        self.outputs.new("an_FloatSocket", "Distance")
+        self.inputs.new("an_VectorSocket", "A", "a")
+        self.inputs.new("an_VectorSocket", "B", "b")
+        self.outputs.new("an_FloatSocket", "Distance", "distance")
 
     def getExecutionCode(self):
-        return "$distance$ = (%a% - %b%).length"
+        return "distance = (a - b).length"

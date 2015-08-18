@@ -10,15 +10,12 @@ class DirectionToRotation(bpy.types.Node, AnimationNode):
     bl_idname = "an_DirectionToRotation"
     bl_label = "Direction to Rotation"
 
-    inputNames = { "Direction" : "direction" }
-    outputNames = { "Rotation" : "rotation" }
-
     trackAxis = bpy.props.EnumProperty(items = trackAxisItems, update = propertyChanged, default = "Z")
     upAxis = bpy.props.EnumProperty(items = upAxisItems, update = propertyChanged, default = "X")
 
     def create(self):
-        self.inputs.new("an_VectorSocket", "Direction")
-        self.outputs.new("an_VectorSocket", "Rotation")
+        self.inputs.new("an_VectorSocket", "Direction", "direction")
+        self.outputs.new("an_VectorSocket", "Rotation", "rotation")
         self.width += 20
 
     def draw(self, layout):

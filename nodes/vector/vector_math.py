@@ -1,4 +1,5 @@
 import bpy
+from bpy.props import *
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 
@@ -14,31 +15,26 @@ class VectorMathNode(bpy.types.Node, AnimationNode):
     bl_label = "Vector Math"
     isDetermined = True
 
-    inputNames = { "A" : "a",
-                   "B" : "b" }
-
-    outputNames = { "Result" : "result" }
-
-    operation = bpy.props.EnumProperty(name = "Operation", items = operationItems, default = "ADD", update = executionCodeChanged)
+    operation = EnumProperty(name = "Operation", items = operationItems, default = "ADD", update = executionCodeChanged)
 
     def create(self):
-        self.inputs.new("an_VectorSocket", "A")
-        self.inputs.new("an_VectorSocket", "B")
-        self.outputs.new("an_VectorSocket", "Result")
+        self.inputs.new("an_VectorSocket", "A", "a")
+        self.inputs.new("an_VectorSocket", "B", "b")
+        self.outputs.new("an_VectorSocket", "Result", "result")
 
     def draw(self, layout):
         layout.prop(self, "operation")
 
     def getExecutionCode(self):
         op = self.operation
-        if op == "ADD": return "$result$ = %a% + %b%"
-        elif op == "SUBTRACT": return "$result$ = %a% - %b%"
-        elif op == "MULTIPLY": return "$result$ = mathutils.Vector((%a%[0] * %b%[0], %a%[1] * %b%[1], %a%[2] * %b%[2]))"
-        elif op == "CROSS": return "$result$ = %a%.cross(%b%)"
-        elif op == "DIVIDE": return ("$result$ = mathutils.Vector((0, 0, 0)) \n"
-                                     "if %b%[0] != 0: $result$[0] = %a%[0] / %b%[0] \n"
-                                     "if %b%[1] != 0: $result$[1] = %a%[1] / %b%[1] \n"
-                                     "if %b%[2] != 0: $result$[2] = %a%[2] / %b%[2]")
-                                     
+        if op == "ADD": return "result = a + b"
+        elif op == "SUBTRACT": return "result = a - b"
+        elif op == "MULTIPLY": return "result = mathutils.Vector((a[0] * b[0], a[1] * b[1], a[2] * b[2]))"
+        elif op == "CROSS": return "result = a.cross(b)"
+        elif op == "DIVIDE": return ("result = mathutils.Vector((0, 0, 0))",
+                                     "if b[0] != 0: result[0] = a[0] / b[0]",
+                                     "if b[1] != 0: result[1] = a[1] / b[1]",
+                                     "if b[2] != 0: result[2] = a[2] / b[2]")
+
     def getModuleList(self):
         return ["mathutils"]
