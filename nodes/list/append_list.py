@@ -8,11 +8,6 @@ class AppendListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_AppendListNode"
     bl_label = "Append to List"
 
-    inputNames = { "List" : "list",
-                   "Element" : "element" }
-
-    outputNames = { "List" : "list" }
-
     def assignedTypeChanged(self, context):
         self.baseIdName = toIdName(self.assignedType)
         self.listIdName = toListIdName(self.assignedType)
@@ -34,9 +29,9 @@ class AppendListNode(bpy.types.Node, AnimationNode):
             text = "Assign",
             description = "Remove all sockets and set the selected socket type")
 
-    def getExecutionCode(self):
-        return "$list$ = %list%\n" + \
-                "$list$.append(%element%)"
+    def getExecutionCodeLines(self):
+        return ("outList = inList",
+                "outList.append(element)")
 
     def edit(self):
         baseDataType = self.getWantedDataType()
@@ -64,6 +59,6 @@ class AppendListNode(bpy.types.Node, AnimationNode):
     def generateSockets(self):
         self.inputs.clear()
         self.outputs.clear()
-        self.inputs.new(self.listIdName, "List")
-        self.inputs.new(self.baseIdName, "Element")
-        self.outputs.new(self.listIdName, "List")
+        self.inputs.new(self.listIdName, "List", "inList")
+        self.inputs.new(self.baseIdName, "Element", "element")
+        self.outputs.new(self.listIdName, "List", "outList")

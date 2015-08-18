@@ -21,10 +21,13 @@ class ShuffleListNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.assignedType = "Object List"
 
-    def getExecutionCode(self, outputUse):
-        return ("random.seed(%seed%) \n"
-                "$shuffledList$ = %list%[:] \n"
-                "random.shuffle($shuffledList$)")
+    def getExecutionCodeLines(self):
+        return ("random.seed(seed)",
+                "shuffledList = inList",
+                "random.shuffle(shuffledList)")
+
+    def getModuleList(self):
+        return ["random"]
 
     def edit(self):
         listDataType = self.getWantedDataType()
@@ -47,6 +50,6 @@ class ShuffleListNode(bpy.types.Node, AnimationNode):
     def generateSockets(self):
         self.inputs.clear()
         self.outputs.clear()
-        self.inputs.new(self.listIdName, "List")
-        self.inputs.new("an_IntegerSocket", "Seed")
-        self.outputs.new(self.listIdName, "Shuffled List")
+        self.inputs.new(self.listIdName, "List", "inList")
+        self.inputs.new("an_IntegerSocket", "Seed", "seed")
+        self.outputs.new(self.listIdName, "Shuffled List", "shuffledList")

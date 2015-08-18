@@ -8,12 +8,6 @@ class CreateList(bpy.types.Node, AnimationNode):
     bl_idname = "an_CreateList"
     bl_label = "Create List"
 
-    @property
-    def inputNames(self):
-        return { socket.identifier : "element_" + str(i) for i, socket in enumerate(self.inputs) }
-
-    outputNames = { "List" : "list" }
-
     def assignedTypeChanged(self, context):
         baseDataType = self.assignedType
         self.baseIdName = toIdName(baseDataType)
@@ -52,8 +46,12 @@ class CreateList(bpy.types.Node, AnimationNode):
 
         self.drawTypeSpecificButtonsExt(layout)
 
+    @property
+    def inputNames(self):
+        return { socket.identifier : "element_" + str(i) for i, socket in enumerate(self.inputs) }
+
     def getExecutionCode(self):
-        return "$list$ = [" + ", ".join(["%element_{}%".format(i) for i, socket in enumerate(self.inputs) if socket.dataType != "Empty"]) + "]"
+        return "outList = [" + ", ".join(["element_" + str(i) for i, socket in enumerate(self.inputs) if socket.dataType != "Empty"]) + "]"
 
     def edit(self):
         emptySocket = self.inputs["..."]
@@ -77,10 +75,10 @@ class CreateList(bpy.types.Node, AnimationNode):
         self.inputs.new("an_EmptySocket", "...").passiveType = self.listIdName
         for i in range(inputAmount):
             self.newInputSocket()
-        self.outputs.new(self.listIdName, "List")
+        self.outputs.new(self.listIdName, "List", "outList")
 
     def newInputSocket(self):
-        socket = self.inputs.new(self.baseIdName, self.getNotUsedSocketName("Element"))
+        socket = self.inputs.new(self.baseIdName, "Element")
         socket.nameSettings.display = True
         socket.customName = "Element"
         socket.removeable = True

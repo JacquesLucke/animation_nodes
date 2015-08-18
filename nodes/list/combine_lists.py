@@ -8,12 +8,6 @@ class CombineLists(bpy.types.Node, AnimationNode):
     bl_idname = "an_combine_lists_node"
     bl_label = "Combine Lists"
 
-    @property
-    def inputNames(self):
-        return { socket.identifier : "list_" + str(i) for i, socket in enumerate(self.inputs) }
-
-    outputNames = { "List" : "list" }
-
     def assignedTypeChanged(self, context):
         self.listIdName = toListIdName(self.assignedType)
         self.recreateSockets()
@@ -39,13 +33,17 @@ class CombineLists(bpy.types.Node, AnimationNode):
             text = "Assign",
             description = "Remove all sockets and set the selected socket type")
 
-    def getExecutionCode(self):
+    @property
+    def inputNames(self):
+        return { socket.identifier : "list_" + str(i) for i, socket in enumerate(self.inputs) }
+
+    def getExecutionCodeLines(self):
         lines = []
-        lines.append("$list$ = []")
+        lines.append("outList = []")
         for i, socket in self.inputs:
             if socket.name == "...": continue
-            lines.append("$list$.extend(%{}%)".format("list_" + str(i)))
-        return "\n".join(lines)
+            lines.append("outList.extend({})".format("list_" + str(i)))
+        return lines
 
     def edit(self):
         emptySocket = self.inputs["..."]
@@ -65,7 +63,7 @@ class CombineLists(bpy.types.Node, AnimationNode):
         self.inputs.new("an_EmptySocket", "...").passiveType = self.listIdName
         for _ in range(inputAmount):
             self.newInputSocket()
-        self.outputs.new(self.listIdName, "List")
+        self.outputs.new(self.listIdName, "List", "outList")
 
     def newInputSocket(self):
         socket = self.inputs.new(self.listIdName, self.getNotUsedSocketName("List"))

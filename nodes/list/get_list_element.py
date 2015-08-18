@@ -8,12 +8,6 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GetListElementNode"
     bl_label = "Get List Element"
 
-    inputNames = { "List" : "list",
-                   "Index" : "index",
-                   "Fallback" : "fallback" }
-
-    outputNames = { "Element" : "element" }
-
     def assignedTypeChanged(self, context):
         self.baseIdName = toIdName(self.assignedType)
         self.listIdName = toListIdName(self.assignedType)
@@ -66,7 +60,7 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
     def generateSockets(self):
         self.inputs.clear()
         self.outputs.clear()
-        self.inputs.new(self.listIdName, "List")
-        self.inputs.new("an_IntegerSocket", "Index")
-        self.inputs.new(self.baseIdName, "Fallback")
-        self.outputs.new(self.baseIdName, "Element")
+        self.inputs.new(self.listIdName, "List", "list")
+        self.inputs.new("an_IntegerSocket", "Index", "index")
+        self.inputs.new(self.baseIdName, "Fallback", "fallback")
+        self.outputs.new(self.baseIdName, "Element", "element")
