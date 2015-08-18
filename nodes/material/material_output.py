@@ -1,4 +1,5 @@
 import bpy
+from bpy.props import *
 from ... base_types.node import AnimationNode
 
 allowedSocketTypes = {
@@ -34,13 +35,13 @@ class CyclesMaterialOutputNode(bpy.types.Node, AnimationNode):
         self.setInputSocket()
         self.socketIsChanging = False
 
-    materialName = bpy.props.StringProperty(update = selectedSocketChanged)
-    nodeName = bpy.props.StringProperty(update = selectedSocketChanged)
-    socketIdentifier = bpy.props.EnumProperty(items = getPossibleSocketItems, name = "Socket", update = selectedSocketChanged)
-    socketIsChanging = bpy.props.BoolProperty()
+    materialName = StringProperty(update = selectedSocketChanged)
+    nodeName = StringProperty(update = selectedSocketChanged)
+    socketIdentifier = EnumProperty(items = getPossibleSocketItems, name = "Socket", update = selectedSocketChanged)
+    socketIsChanging = BoolProperty()
 
     def create(self):
-        self.inputs.new("an_GenericSocket", "Data")
+        self.inputs.new("an_GenericSocket", "Data", "data")
 
     def draw(self, layout):
         layout.prop_search(self, 'materialName', bpy.data, 'materials', text='', icon='MATERIAL_DATA')
@@ -52,16 +53,11 @@ class CyclesMaterialOutputNode(bpy.types.Node, AnimationNode):
             if node is not None:
                 layout.prop(self, "socketIdentifier", text = "")
 
-    def execute(self, input):
-        output = {}
-        data = input["Data"]
+    def execute(self, data):
         socket = self.getSelectedSocket()
         if socket is not None:
-            try:
-                socket.default_value = data
-            except:
-                pass
-        return output
+            try: socket.default_value = data
+            except: pass
 
     def edit(self):
         socket = self.inputs.get("Data")

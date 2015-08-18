@@ -1,18 +1,16 @@
 import bpy
-from ... base_types.node import AnimationNode
+from bpy.props import *
 from ... events import propertyChanged
+from ... base_types.node import AnimationNode
 
 class ViewportColorNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ViewportColorNode"
     bl_label = "Viewport Color"
 
-    inputNames = { "Color" : "color" }
-    outputNames = {}
-
-    materialName = bpy.props.StringProperty(update = propertyChanged)
+    materialName = StringProperty(update = propertyChanged)
 
     def create(self):
-        self.inputs.new("an_ColorSocket", "Color")
+        self.inputs.new("an_ColorSocket", "Color", "color")
 
     def draw(self, layout):
         layout.prop_search(self, 'materialName', bpy.data, 'materials', text='', icon='MATERIAL_DATA')
