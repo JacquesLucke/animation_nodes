@@ -15,4 +15,3 @@ class NodeSettingsPanel(bpy.types.Panel):
     def draw(self, context):
         node = bpy.context.active_node
         node.drawAdvanced(self.layout)
-        print(node.getTaggedExecutionCodeLines())
