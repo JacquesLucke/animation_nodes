@@ -113,7 +113,7 @@ class NodeNetworks:
             networksByIdentifier[network.identifier].append(network)
 
         for identifier, networks in networksByIdentifier.items():
-            if identifier == "": self.networks.extend(networks)
+            if identifier is None: self.networks.extend(networks)
             else: self.networks.append(NodeNetwork.join(networks))
 
     def getNodeGroups(self):
@@ -150,7 +150,10 @@ class NodeNetworks:
 class NodeNetwork:
     def __init__(self, nodeIDs):
         self.nodeIDs = nodeIDs
-        self.identifier = ""
+        self.type = "Invalid"
+        self.identifier = None
+        self.groupInputID = None
+        self.groupOutputID = None
         self.analyse()
 
     def analyse(self):

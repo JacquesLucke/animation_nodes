@@ -109,6 +109,10 @@ class AnimationNode:
             setattr(socket.display, name, state)
 
     @property
+    def nodeTree(self):
+        return self.id_data
+
+    @property
     def inputsByIdentifier(self):
         return {socket.identifier : socket for socket in self.inputs}
 

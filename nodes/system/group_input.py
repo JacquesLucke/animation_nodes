@@ -15,7 +15,8 @@ class GroupInput(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.separator()
         layout.prop(self, "subprogramName", text = "", icon = "GROUP_VERTEX")
-        self.functionOperator(layout, "createGroupOutputNode", text = "Output Node", icon = "PLUS")
+        if self.outputNode is None:
+            self.functionOperator(layout, "createGroupOutputNode", text = "Output Node", icon = "PLUS")
 
     def edit(self):
         for target in self.newParameterSocket.dataTargetSockets:
@@ -41,6 +42,10 @@ class GroupInput(bpy.types.Node, AnimationNode):
     def newParameterSocket(self):
         return self.outputs[-1]
 
+    @property
+    def outputNode(self):
+        return self.network.groupOutputNode
+        
     def createGroupOutputNode(self):
         settings = [{"name" : "groupInputIdentifier", "value" : repr(self.identifier)}]
         bpy.ops.node.add_and_link_node("INVOKE_DEFAULT", use_transform = True, settings = settings, type = "an_GroupOutput")
