@@ -71,6 +71,7 @@ class CombineLists(bpy.types.Node, AnimationNode):
         socket.customName = "List"
         socket.removeable = True
         socket.moveable = True
+        socket.nameSettings.editable = True
         if hasattr(socket, "showName"):
             socket.showName = False
         socket.moveUp()

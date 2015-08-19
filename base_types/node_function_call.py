@@ -31,6 +31,7 @@ def invokeNodeFunctionCall(self, context, event):
     function = getattr(node, self.functionName)
     if self.callWithData: function(self.data)
     else: function()
+    bpy.context.area.tag_redraw()
     return {"FINISHED"}
 
 

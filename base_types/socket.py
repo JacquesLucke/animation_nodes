@@ -5,12 +5,19 @@ from .. tree_info import isSocketLinked, getOriginSocket, getDirectOriginSocket,
 from .. utils.names import getRandomString, toVariableName
 from . socket_function_call import getSocketFunctionCallOperatorName
 
-class an_CustomNameProperties(bpy.types.PropertyGroup):
+class CustomNameProperties(bpy.types.PropertyGroup):
+    bl_idname = "an_CustomNameProperties"
     unique = BoolProperty(default = False)
     display = BoolProperty(default = False)
     editable = BoolProperty(default = False)
     variable = BoolProperty(default = False)
     callAfterChange = BoolProperty(default = False)
+
+class SocketEditDisplayProperties(bpy.types.PropertyGroup):
+    bl_idname = "an_SocketEditDisplayProperties"
+    customNameInput = BoolProperty(default = False)
+    moveOperators = BoolProperty(default = False)
+    removeOperator = BoolProperty(default = False)
 
 class AnimationNodeSocket:
 
@@ -18,18 +25,18 @@ class AnimationNodeSocket:
         updateCustomName(self)
 
     customName = StringProperty(default = "custom name", update = customNameChanged)
-    nameSettings = PointerProperty(type = an_CustomNameProperties)
+    nameSettings = PointerProperty(type = CustomNameProperties)
+    display = PointerProperty(type = SocketEditDisplayProperties)
 
     removeable = BoolProperty(default = False)
     moveable = BoolProperty(default = False)
     moveGroup = IntProperty(default = 0)
-    editInNode = BoolProperty(default = False)
 
     def draw(self, context, layout, node, text):
         displayText = self.getDisplayedName()
 
         row = layout.row(align = True)
-        if self.nameSettings.editable:
+        if self.nameSettings.editable and self.display.customNameInput:
             row.prop(self, "customName", text = "")
         else:
             if not self.is_output and not self.isLinked:
@@ -38,12 +45,12 @@ class AnimationNodeSocket:
                 if self.is_output: row.alignment = "RIGHT"
                 row.label(displayText)
 
-        if self.moveable and self.editInNode:
+        if self.moveable and self.display.moveOperators:
             row.separator()
             self.functionOperator(row, "moveUpSave", icon = "TRIA_UP")
             self.functionOperator(row, "moveDownSave", icon = "TRIA_DOWN")
 
-        if self.removeable and self.editInNode:
+        if self.removeable and self.display.removeOperator:
             row.separator()
             self.functionOperator(row, "remove", icon = "X")
 
@@ -112,6 +119,11 @@ class AnimationNodeSocket:
         tree = self.node.id_data
         for link in self.links:
             tree.links.remove(link)
+
+    def disableSocketEditingInNode(self):
+        self.display.customNameInput = False
+        self.display.moveOperators = False
+        self.display.removeOperator = False
 
     @property
     def index(self):

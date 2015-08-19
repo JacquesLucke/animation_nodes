@@ -85,18 +85,28 @@ class AnimationNode:
             if index < self.activeInputIndex: self.activeInputIndex -= 1
         socket.sockets.remove(socket)
 
-    def toogleSocketEditing(self):
-        if len(self.sockets) == 0: return
-        self.setSocketEditing(not self.sockets[0].editInNode)
-
-    def setSocketEditing(self, editInNode = False):
-        for socket in self.sockets:
-            socket.editInNode = editInNode
-        bpy.context.area.tag_redraw()
-
     def getUsedOutputsDict(self):
         usedOutputs = {socket.identifier : socket.isLinked for socket in self.outputs}
         return usedOutputs
+
+    def disableSocketEditingInNode(self):
+        for socket in self.sockets:
+            socket.disableSocketEditingInNode()
+
+    def toogleCustomNameInputVisibility(self):
+        self.toogleSocketDisplayProperty("customNameInput")
+
+    def toogleMoveOperatorsVisibility(self):
+        self.toogleSocketDisplayProperty("moveOperators")
+
+    def toogleRemoveOperatorVisibility(self):
+        self.toogleSocketDisplayProperty("removeOperator")
+
+    def toogleSocketDisplayProperty(self, name):
+        if len(self.sockets) == 0: return
+        state = not getattr(self.sockets[0].display, name)
+        for socket in self.sockets:
+            setattr(socket.display, name, state)
 
     @property
     def inputsByIdentifier(self):

@@ -28,6 +28,7 @@ class CallSocketFunctionFallback(bpy.types.Operator):
 def invokeSocketFunctionCall(self, context, event):
     socket = getSocket(self.nodeTreeName, self.nodeName, self.isOutput, self.identifier)
     getattr(socket, self.functionName)()
+    bpy.context.area.tag_redraw()
     return {"FINISHED"}
 
 

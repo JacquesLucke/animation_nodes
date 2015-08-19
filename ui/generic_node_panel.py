@@ -12,13 +12,6 @@ def draw(self, context):
     col.prop(node, "width", text = "Width")
     col.prop(node, "bl_width_max", text = "Max Width")
 
-    col = layout.column()
-
-    node.functionOperator(col, "toogleSocketEditing",
-        text = "Toogle Socket Editing",
-        description = "Show buttons to move and remove individual sockets in the node",
-        icon = "SETTINGS")
-
     # Inputs
     row = col.row()
     rows = len(node.inputs)
@@ -34,6 +27,15 @@ def draw(self, context):
     subcol = row.column(align = True)
     subcol.operator("an.move_output", text = "", icon = "TRIA_UP").moveUp = True
     subcol.operator("an.move_output", text = "", icon = "TRIA_DOWN").moveUp = False
+
+
+    col = layout.column(align = True)
+    col.label("Toogle Operation Visibility:")
+    row = col.row(align = True)
+    node.functionOperator(row, "toogleCustomNameInputVisibility", text = "Name")
+    node.functionOperator(row, "toogleMoveOperatorsVisibility", text = "Move")
+    node.functionOperator(row, "toogleRemoveOperatorVisibility", text = "Remove")
+    node.functionOperator(row, "disableSocketEditingInNode", icon = "FULLSCREEN")
 
     layout.separator()
     layout.label("Identifier: " + node.identifier)
