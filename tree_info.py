@@ -175,14 +175,16 @@ class NodeNetwork:
         elif groupInAmount == 0 and groupOutAmount == 1:
             self.type = "Invalid"
             self.identifier = idToNode(groupOutputs[0]).groupInputIdentifier
-        elif groupInAmount == 1:
+        elif groupInAmount == 1 and groupOutAmount == 0:
             self.type = "Group"
             self.identifier = idToNode(groupInputs[0]).identifier
             self.groupInputID = groupInputs[0]
-            if groupOutAmount == 1:
+        elif groupInAmount == 1 and groupOutAmount == 1:
+            if idToNode(groupInputs[0]).identifier == idToNode(groupInputs[0]).identifier:
+                self.type = "Group"
+                self.identifier = idToNode(groupInputs[0]).identifier
+                self.groupInputID = groupInputs[0]
                 self.groupOutputID = groupOutputs[0]
-            else:
-                self.groupOutputID = None
 
     @staticmethod
     def join(networks):
