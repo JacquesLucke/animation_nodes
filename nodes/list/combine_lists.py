@@ -66,7 +66,7 @@ class CombineLists(bpy.types.Node, AnimationNode):
         self.outputs.new(self.listIdName, "List", "outList")
 
     def newInputSocket(self):
-        socket = self.inputs.new(self.listIdName, self.getNotUsedSocketName("List"))
+        socket = self.inputs.new(self.listIdName, "List")
         socket.nameSettings.display = True
         socket.customName = "List"
         socket.removeable = True

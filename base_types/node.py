@@ -4,7 +4,6 @@ import time
 import random
 from bpy.props import *
 from bpy.app.handlers import persistent
-from .. utils.nodes import getNotUsedSocketName
 from . node_function_call import getNodeFunctionCallOperatorName
 from .. utils.nodes import getAnimationNodeTrees
 from .. tree_info import getNetworkWithNode
@@ -94,9 +93,6 @@ class AnimationNode:
         for socket in self.sockets:
             socket.editInNode = editInNode
         bpy.context.area.tag_redraw()
-
-    def getNotUsedSocketName(self, prefix = "socket"):
-        return getNotUsedSocketName(self, prefix)
 
     def getUsedOutputsDict(self):
         usedOutputs = {socket.identifier : socket.isLinked for socket in self.outputs}
