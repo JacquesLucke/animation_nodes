@@ -26,6 +26,7 @@ class GroupInput(bpy.types.Node, AnimationNode):
 
     def newParameter(self, idName, name, defaultValue = None):
         socket = self.outputs.new(idName, name, "parameter")
+        socket.setStoreableValue(defaultValue)
         socket.customName = name
         socket.moveable = True
         socket.removeable = True
