@@ -38,11 +38,12 @@ class ConvertNode(bpy.types.Node, AnimationNode):
     def assignSelectedListType(self):
         self.assignedType = self.selectedType
 
-    @keepNodeLinks
     def assignType(self, dataType = "Float"):
+        if self.assignedType == dataType: return
         self.assignedType = dataType
         self.selectedType = dataType
 
+    @keepNodeLinks
     def recreateOutputSocket(self):
         self.outputs.clear()
         self.outputs.new(self.targetIdName, "New", "new")
