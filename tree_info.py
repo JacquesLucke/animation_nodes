@@ -91,17 +91,85 @@ class NodeData:
     def isRerouteNode(self, id):
         return id in self.nodesByType["NodeReroute"]
 
+class NodeNetworks:
+    def __init__(self):
+        self._reset()
+
+    def _reset(self):
+        self.networks = []
+
+    def getNetworkWithNode(self, node):
+        for network in self.networks:
+            if network.contains(node): return network
+
+    def update(self):
+        self._reset()
+
+        nodeGroups = self.getNodeGroups()
+        for nodeGroup in nodeGroups:
+            network = NodeNetwork(nodeGroup)
+            self.networks.append(network)
+
+    def getNodeGroups(self):
+        groups = []
+        foundNodes = set()
+        for node in _data.nodes:
+            if node not in foundNodes:
+                nodeGroup = self.getAllConnectedNodes(node)
+                foundNodes.update(nodeGroup)
+                groups.append(nodeGroup)
+        return groups
+
+    def getAllConnectedNodes(self, nodeInGroup):
+        connectedNodes = set()
+        uncheckedNodes = {nodeInGroup}
+        while len(uncheckedNodes) > 0:
+            node = uncheckedNodes.pop()
+            connectedNodes.add(node)
+            linkedNodes = self.getDirectlyLinkedNodes(node)
+            for linkedNode in linkedNodes:
+                if linkedNode not in uncheckedNodes and linkedNode not in connectedNodes:
+                    uncheckedNodes.add(linkedNode)
+        return list(connectedNodes)
+
+    def getDirectlyLinkedNodes(self, node):
+        nodes = set()
+        inputs, outputs = _data.socketsByNode[node]
+        for socket in inputs + outputs:
+            for linkedSocket in _data.linkedSocketsWithReroutes[socket]:
+                nodes.add(linkedSocket[0])
+        return nodes
+
+
+class NodeNetwork:
+    def __init__(self, nodeIDs):
+        self.nodeIDs = nodeIDs
+        self.type = "MAIN"
+        self.identifier = ""
+
+    def contains(self, nodeID):
+        return nodeID in self.nodeIDs
+
+    def getNodes(self):
+        return [idToNode(nodeID) for nodeID in self.nodeIDs]
+
 
 _data = NodeData()
+_networks = NodeNetworks()
 
 
 
 # Public API
 ##################################
 
+def getNetworkWithNode(node):
+    return _networks.getNetworkWithNode(nodeToID(node))
+
 @measureTime
 def update():
     _data.update()
+    _networks.update()
+
 
 def isSocketLinked(socket):
     socketID = socketToID(socket)
@@ -172,7 +240,7 @@ def idToSocket(socketID):
     return getSocket(socketID[0][0], socketID[0][1], socketID[1], socketID[2])
 
 def idToNode(nodeID):
-    return getNode(nodeID)
+    return getNode(*nodeID)
 
 
 from pprint import PrettyPrinter
