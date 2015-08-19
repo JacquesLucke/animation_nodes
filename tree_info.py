@@ -223,9 +223,6 @@ _networks = NodeNetworks()
 # Public API
 ##################################
 
-def getNetworkWithNode(node):
-    return _networks.getNetworkWithNode(nodeToID(node))
-
 @measureTime
 def update():
     _data.update()
@@ -285,6 +282,11 @@ def keepNodeLinks(function):
         return output
     return wrapper
 
+def getNetworkWithNode(node):
+    return _networks.getNetworkWithNode(nodeToID(node))
+
+def getNetworks():
+    return _networks.networks
 
 
 

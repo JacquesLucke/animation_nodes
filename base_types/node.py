@@ -10,6 +10,7 @@ from .. tree_info import getNetworkWithNode
 
 class AnimationNode:
     identifier = StringProperty(name = "Identifier", default = "")
+    inInvalidNetwork = BoolProperty(name = "In Invalid Network", default = False)
 
     activeInputIndex = IntProperty()
     activeOutputIndex = IntProperty()
@@ -59,6 +60,7 @@ class AnimationNode:
         pass
 
     def draw_buttons(self, context, layout):
+        if self.inInvalidNetwork: layout.label("Invalid Network", icon = "ERROR")
         self.draw(layout)
 
     def draw(self, layout):

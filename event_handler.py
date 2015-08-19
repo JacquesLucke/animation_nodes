@@ -8,6 +8,7 @@ from . utils.timing import measureTime
 def update(events):
     if events.intersection({"File", "Addon", "Tree"}):
         correctNodeTree()
+        markNodesInInvalidNetworks()
 
 
 @measureTime
@@ -32,3 +33,9 @@ def updateDataIfNecessary():
     if treeUpdatedWhileWorking:
         tree_info.update()
         treeUpdatedWhileWorking = False
+
+def markNodesInInvalidNetworks():
+    for network in tree_info.getNetworks():
+        isInvalid = network.type == "Invalid"
+        for node in network.getAnimationNodes():
+            node.inInvalidNetwork = isInvalid
