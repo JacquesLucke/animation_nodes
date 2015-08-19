@@ -106,9 +106,15 @@ class NodeNetworks:
         self._reset()
 
         nodeGroups = self.getNodeGroups()
-        for nodeGroup in nodeGroups:
-            network = NodeNetwork(nodeGroup)
-            self.networks.append(network)
+        
+        networksByIdentifier = defaultdict(list)
+        for nodes in nodeGroups:
+            network = NodeNetwork(nodes)
+            networksByIdentifier[network.identifier].append(network)
+
+        for identifier, networks in networksByIdentifier.items():
+            if identifier == "": self.networks.extend(networks)
+            else: self.networks.append(NodeNetwork.join(networks))
 
     def getNodeGroups(self):
         groups = []
@@ -144,8 +150,35 @@ class NodeNetworks:
 class NodeNetwork:
     def __init__(self, nodeIDs):
         self.nodeIDs = nodeIDs
-        self.type = "MAIN"
         self.identifier = ""
+        self.analyse()
+
+    def analyse(self):
+        groupInputs = []
+        groupOutputs = []
+        for nodeID in self.nodeIDs:
+            if nodeID in _data.nodesByType["an_GroupInput"]:
+                groupInputs.append(nodeID)
+            if nodeID in _data.nodesByType["an_GroupOutput"]:
+                groupOutputs.append(nodeID)
+
+        if len(groupInputs) == 0 and len(groupOutputs) == 0:
+            self.type = "Main"
+        elif len(groupInputs) > 1 or len(groupOutputs) > 1:
+            self.type = "Invalid"
+        elif len(groupInputs) == 0 and len(groupOutputs) == 1:
+            self.type = "Invalid"
+            self.identifier = idToNode(groupOutputs[0]).groupInputIdentifier
+        elif len(groupInputs) == 1:
+            self.type = "Group"
+            self.identifier = idToNode(groupInputs[0]).identifier
+
+    @staticmethod
+    def join(networks):
+        nodeIDs = []
+        for network in networks:
+            nodeIDs.extend(network.nodeIDs)
+        return NodeNetwork(nodeIDs)
 
     def contains(self, nodeID):
         return nodeID in self.nodeIDs
