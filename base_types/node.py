@@ -6,6 +6,7 @@ from bpy.app.handlers import persistent
 from .. utils.nodes import getNotUsedSocketName
 from . node_function_call import getNodeFunctionCallOperatorName
 from .. utils.nodes import getAnimationNodeTrees
+from .. tree_info import getNetworkWithNode
 
 class AnimationNode:
     identifier = StringProperty(name = "Identifier", default = "")
@@ -109,6 +110,10 @@ class AnimationNode:
     def activeOutputSocket(self):
         if len(self.outputs) == 0: return None
         return self.outputs[self.activeOutputIndex]
+
+    @property
+    def network(self):
+        return getNetworkWithNode(self)
 
     @property
     def sockets(self):
