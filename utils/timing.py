@@ -5,6 +5,7 @@ def measureTime(function):
         start = time.clock()
         output = function(*args, **kwargs)
         end = time.clock()
-        print("Time: {:.5f} - Function: {}".format(end - start, function.__name__))
+        duration = end - start
+        print("Time: {:.5f} - fps : {:.2f} - Function: {}".format(duration, 1 / duration, function.__name__))
         return output
     return wrapper

@@ -1,5 +1,6 @@
 import re
 import bpy
+import time
 import random
 from bpy.props import *
 from bpy.app.handlers import persistent
@@ -102,6 +103,18 @@ class AnimationNode:
         return usedOutputs
 
     @property
+    def inputsByIdentifier(self):
+        return {socket.identifier : socket for socket in self.inputs}
+
+    @property
+    def outputsByIdentifier(self):
+        return {socket.identifier : socket for socket in self.outputs}
+
+    @property
+    def linkedOutputs(self):
+        return [socket for socket in self.outputs if socket.isLinked]
+
+    @property
     def activeInputSocket(self):
         if len(self.inputs) == 0: return None
         return self.inputs[self.activeInputIndex]
@@ -110,6 +123,17 @@ class AnimationNode:
     def activeOutputSocket(self):
         if len(self.outputs) == 0: return None
         return self.outputs[self.activeOutputIndex]
+
+    @property
+    def originNodes(self):
+        nodes = set()
+        for socket in self.inputs:
+            nodes.update(socket.linkedNodes)
+        return list(nodes)
+
+    @property
+    def unlinkedInputs(self):
+        return [socket for socket in self.inputs if not socket.isLinked]
 
     @property
     def network(self):
@@ -126,6 +150,9 @@ class AnimationNode:
     @property
     def outputNames(self):
         return {socket.identifier : socket.identifier for socket in self.outputs}
+
+    def getModuleList(self):
+        return []
 
     def getExecutionCodeString(self):
         code = self.getExecutionCode()
@@ -147,11 +174,13 @@ class AnimationNode:
             keywordParameters = ["{0} = %{0}%".format(inputNames[socket.identifier]) for socket in self.inputs]
             parameterString = ", ".join(keywordParameters)
 
+            executionString = "#self#.execute(" + parameterString + ")"
+
             outputVariables = ["${}$".format(outputNames[socket.identifier]) for socket in self.outputs]
             outputString = ", ".join(outputVariables)
 
-            executionString = outputString + " = #self#.execute(" + parameterString + ")"
-            return [executionString]
+            if outputString == "": return [executionString]
+            return [outputString + " = "+ executionString]
         else:
             code = self.getExecutionCodeString()
             for inputName in inputNames:
@@ -182,7 +211,8 @@ def createMissingIdentifiers(scene = None):
 def createIdentifier():
     identifierLength = 15
     characters = "abcdefghijklmnopqrstuvwxyz" + "0123456789"
-    return ''.join(random.choice(characters) for _ in range(identifierLength))
+    choice = random.SystemRandom().choice
+    return "_" + ''.join(choice(characters) for _ in range(identifierLength))
 
 
 

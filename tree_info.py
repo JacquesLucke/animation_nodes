@@ -153,6 +153,13 @@ class NodeNetwork:
     def getNodes(self):
         return [idToNode(nodeID) for nodeID in self.nodeIDs]
 
+    def getAnimationNodes(self):
+        return [node for node in self.getNodes() if hasattr(node, "isAnimationNode")]
+
+    @property
+    def treeName(self):
+        return self.nodeIDs[0][0]
+
 
 _data = NodeData()
 _networks = NodeNetworks()

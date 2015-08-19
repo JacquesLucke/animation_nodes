@@ -9,6 +9,19 @@ def update(events):
     if events.intersection({"File", "Addon", "Tree"}):
         correctNodeTree()
 
+    from . code_generator import generateCode
+    network = tree_info._networks.networks[0]
+    preparation, execution = generateCode(network)
+
+    if "Tree" in events or "Addon" in events:
+        print("#"*1000)
+        print(execution)
+
+    data = {}
+    exec(preparation, data, data)
+    #print(data["_factor_d9"])
+    exec(execution, data, data)
+
 
 @measureTime
 def correctNodeTree():

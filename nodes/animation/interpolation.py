@@ -5,7 +5,7 @@ from ... events import propertyChanged
 from ... nodes.container_provider import getHelperMaterial, getNotUsedMaterialNodeName
 from ... algorithms.interpolation import (linear, expoEaseIn, expoEaseOut,
                                      cubicEaseIn, cubicEaseOut, cubicEaseInOut,
-                                     backEaseIn, backEaseOut)
+                                     backEaseIn, backEaseOut, curveInterpolation)
 
 topCategoryItems = [("LINEAR", "Linear", ""),
                     ("EXPONENTIAL", "Exponential", ""),
