@@ -106,7 +106,7 @@ class NodeNetworks:
         self._reset()
 
         nodeGroups = self.getNodeGroups()
-        
+
         networksByIdentifier = defaultdict(list)
         for nodes in nodeGroups:
             network = NodeNetwork(nodes)
@@ -162,16 +162,24 @@ class NodeNetwork:
             if nodeID in _data.nodesByType["an_GroupOutput"]:
                 groupOutputs.append(nodeID)
 
-        if len(groupInputs) == 0 and len(groupOutputs) == 0:
+        groupInAmount = len(groupInputs)
+        groupOutAmount = len(groupOutputs)
+
+        if groupInAmount == 0 and groupOutAmount == 0:
             self.type = "Main"
-        elif len(groupInputs) > 1 or len(groupOutputs) > 1:
+        elif groupInAmount > 1 or groupOutAmount > 1:
             self.type = "Invalid"
-        elif len(groupInputs) == 0 and len(groupOutputs) == 1:
+        elif groupInAmount == 0 and groupOutAmount == 1:
             self.type = "Invalid"
             self.identifier = idToNode(groupOutputs[0]).groupInputIdentifier
-        elif len(groupInputs) == 1:
+        elif groupInAmount == 1:
             self.type = "Group"
             self.identifier = idToNode(groupInputs[0]).identifier
+            self.groupInputID = groupInputs[0]
+            if groupOutAmount == 1:
+                self.groupOutputID = groupOutputs[0]
+            else:
+                self.groupOutputID = None
 
     @staticmethod
     def join(networks):
@@ -192,6 +200,16 @@ class NodeNetwork:
     @property
     def treeName(self):
         return self.nodeIDs[0][0]
+
+    @property
+    def groupInputNode(self):
+        if self.groupInputID is None: return None
+        return idToNode(self.groupInputID)
+
+    @property
+    def groupOutputNode(self):
+        if self.groupOutputID is None: return None
+        return idToNode(self.groupOutputID)
 
 
 _data = NodeData()

@@ -12,7 +12,9 @@ class GroupOutput(bpy.types.Node, AnimationNode):
         self.inputs.new("an_EmptySocket", "New Return")
 
     def draw(self, layout):
-        layout.label("ID: " + self.groupInputIdentifier)
+        inputNode = self.network.groupInputNode
+        if inputNode:
+            layout.label("Group: " + inputNode.subprogramName)
 
     def edit(self):
         dataOrigin = self.newReturnSocket.dataOriginSocket
