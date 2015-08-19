@@ -12,21 +12,21 @@ def draw(self, context):
     col.prop(node, "width", text = "Width")
     col.prop(node, "bl_width_max", text = "Max Width")
 
-    # Inputs
-    row = col.row()
-    rows = len(node.inputs)
-    row.template_list("an_SocketUiList", "", node, "inputs", node, "activeInputIndex", rows = rows, maxrows = rows)
-    subcol = row.column(align = True)
-    props = subcol.operator("an.move_input", text = "", icon = "TRIA_UP").moveUp = True
-    subcol.operator("an.move_input", text = "", icon = "TRIA_DOWN").moveUp = False
-
-    # Outputs
-    row = col.row()
-    rows = len(node.outputs)
-    row.template_list("an_SocketUiList", "", node, "outputs", node, "activeOutputIndex", rows = rows, maxrows = rows)
-    subcol = row.column(align = True)
-    subcol.operator("an.move_output", text = "", icon = "TRIA_UP").moveUp = True
-    subcol.operator("an.move_output", text = "", icon = "TRIA_DOWN").moveUp = False
+    if len(node.inputs) > 0:
+        row = col.row()
+        rows = len(node.inputs)
+        row.template_list("an_SocketUiList", "", node, "inputs", node, "activeInputIndex", rows = rows, maxrows = rows)
+        subcol = row.column(align = True)
+        props = subcol.operator("an.move_input", text = "", icon = "TRIA_UP").moveUp = True
+        subcol.operator("an.move_input", text = "", icon = "TRIA_DOWN").moveUp = False
+        
+    if len(node.outputs) > 0:
+        row = col.row()
+        rows = len(node.outputs)
+        row.template_list("an_SocketUiList", "", node, "outputs", node, "activeOutputIndex", rows = rows, maxrows = rows)
+        subcol = row.column(align = True)
+        subcol.operator("an.move_output", text = "", icon = "TRIA_UP").moveUp = True
+        subcol.operator("an.move_output", text = "", icon = "TRIA_DOWN").moveUp = False
 
 
     col = layout.column(align = True)
