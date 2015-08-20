@@ -18,9 +18,9 @@ class MainExecutionUnit:
         nodes = sortNodes(nodes)
         preparation = PreparationScriptGenerator(nodes)
         self.prepareScript = preparation.generate()
-        self.executeScript = getExecutionScript(nodes, preparation.socketVariables)
+        self.executeScript = self.getExecutionScript(nodes, preparation.socketVariables)
 
-    def getExecutionScript(nodes, socketVariables):
+    def getExecutionScript(self, nodes, socketVariables):
         lines = []
         for node in nodes:
             lines.extend(getNodeExecutionLines(node, socketVariables))
