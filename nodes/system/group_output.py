@@ -1,6 +1,7 @@
 import bpy
 from bpy.props import *
 from ... events import treeChanged
+from . utils import updateCallerNodes
 from ... base_types.node import AnimationNode
 
 class GroupOutput(bpy.types.Node, AnimationNode):
@@ -47,6 +48,16 @@ class GroupOutput(bpy.types.Node, AnimationNode):
         node = self.nodeTree.nodes[-1]
         self.groupInputIdentifier = node.identifier
         bpy.ops.node.translate_attach("INVOKE_DEFAULT")
+
+    def socketChanged(self):
+        self.updateCallerNodes()
+
+    def delete(self):
+        self.inputs.clear()
+        self.updateCallerNodes()
+
+    def updateCallerNodes(self):
+        updateCallerNodes(self.groupInputIdentifier)
 
     @property
     def newReturnSocket(self):

@@ -12,7 +12,6 @@ class CustomNameProperties(bpy.types.PropertyGroup):
     display = BoolProperty(default = False)
     editable = BoolProperty(default = False)
     variable = BoolProperty(default = False)
-    callAfterChange = BoolProperty(default = False)
 
 class SocketEditDisplayProperties(bpy.types.PropertyGroup):
     bl_idname = "an_SocketEditDisplayProperties"
@@ -30,8 +29,9 @@ class AnimationNodeSocket:
     display = PointerProperty(type = SocketEditDisplayProperties)
 
     removeable = BoolProperty(default = False)
-    moveable = BoolProperty(default = False)
+
     moveGroup = IntProperty(default = 0)
+    moveable = BoolProperty(default = False)
 
     def draw(self, context, layout, node, text):
         displayText = self.getDisplayedName()
@@ -86,6 +86,7 @@ class AnimationNodeSocket:
     def moveTo(self, index):
         if self.index != index:
             self.sockets.move(self.index, index)
+            self.node.socketMoved()
 
     def moveUpSave(self):
         """Cares about moveable sockets"""
@@ -113,9 +114,12 @@ class AnimationNodeSocket:
             self.sockets.move(currentIndex, targetIndex)
             if moveUp: self.sockets.move(targetIndex + 1, currentIndex)
             else: self.sockets.move(targetIndex - 1, currentIndex)
+            self.node.socketMoved()
 
     def remove(self):
-        self.node.removeSocket(self)
+        node = self.node
+        node.removeSocket(self)
+        node.socketRemoved()
 
     def linkWith(self, socket):
         if self.isOutput: self.nodeTree.links.new(socket, self)
@@ -186,8 +190,7 @@ def correctCustomName(socket):
         customName = socket.customName
         socket.customName = "temporary name to avoid some errors"
         socket.customName = getNotUsedCustomName(socket.node, prefix = customName)
-    if socket.nameSettings.callAfterChange:
-        socket.node.customSocketNameChanged(socket)
+    socket.node.customSocketNameChanged(socket)
 
 def getNotUsedCustomName(node, prefix):
     customName = prefix

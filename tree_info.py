@@ -238,6 +238,10 @@ def update():
 def getNodeFromIdentifier(identifier):
     return idToNode(_data.nodeByIdentifier[identifier])
 
+def getNodesByType(idName):
+    return [idToNode(nodeID) for nodeID in _data.nodesByType[idName]]
+
+
 def isSocketLinked(socket):
     socketID = socketToID(socket)
     return len(_data.linkedSockets[socketID]) > 0

@@ -2,6 +2,7 @@ import bpy
 from bpy.props import *
 from ... events import treeChanged
 from ... base_types.node import AnimationNode
+from . utils import updateCallerNodes
 from . subprogram_sockets import SubprogramData
 
 class GroupInput(bpy.types.Node, AnimationNode):
@@ -48,16 +49,23 @@ class GroupInput(bpy.types.Node, AnimationNode):
         socket.display.removeOperator = True
         return socket
 
+    def socketChanged(self):
+        self.updateCallerNodes()
+
+    def delete(self):
+        self.outputs.clear()
+        self.updateCallerNodes()
+
+    def updateCallerNodes(self):
+        updateCallerNodes(self.identifier)
+
     def getSocketData(self):
         data = SubprogramData()
-
         for socket in self.outputs[:-1]:
             data.newInputFromSocket(socket)
-
         if self.outputNode is not None:
             for socket in self.outputNode.inputs[:-1]:
                 data.newOutputFromSocket(socket)
-
         return data
 
     @property

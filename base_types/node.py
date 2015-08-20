@@ -24,44 +24,21 @@ class AnimationNode:
     def poll(cls, nodeTree):
         return nodeTree.bl_idname == "an_AnimationNodeTree"
 
-    # On creation
-    def init(self, context):
-        self.identifier = createIdentifier()
-        self.create()
+
+    # functions subclasses can override
+    ######################################
 
     def create(self):
-        '''Implement this in all subclasses'''
-        pass
-
-    # On node tree changes
-    def update(self):
-        '''Don't use this function at all'''
         pass
 
     def edit(self):
-        """Optional function for subclasses"""
         pass
-
-    # On node duplication
-    def copy(self, sourceNode):
-        self.identifier = createIdentifier()
-        self.duplicate(sourceNode)
 
     def duplicate(self, sourceNode):
-        """Optional function for subclasses"""
         pass
-
-    # On node deletion
-    def free(self):
-        self.delete()
 
     def delete(self):
-        """Optional function for subclasses"""
         pass
-
-    def draw_buttons(self, context, layout):
-        if self.inInvalidNetwork: layout.label("Invalid Network", icon = "ERROR")
-        self.draw(layout)
 
     def draw(self, layout):
         pass
@@ -69,6 +46,44 @@ class AnimationNode:
     def drawAdvanced(self, layout):
         layout.label("Has no advanced settings")
 
+    def socketRemoved(self):
+        self.socketChanged()
+
+    def socketMoved(self):
+        self.socketChanged()
+
+    def customSocketNameChanged(self, socket):
+        self.socketChanged()
+
+    def socketChanged(self):
+        """
+        Use this function when you don't need
+        to know what happened exactly to the sockets
+        """
+        pass
+
+
+    # Don't override these functions
+    ######################################
+
+    def init(self, context):
+        self.identifier = createIdentifier()
+        self.create()
+
+    def update(self):
+        '''Don't use this function at all!!'''
+        pass
+
+    def copy(self, sourceNode):
+        self.identifier = createIdentifier()
+        self.duplicate(sourceNode)
+
+    def free(self):
+        self.delete()
+
+    def draw_buttons(self, context, layout):
+        if self.inInvalidNetwork: layout.label("Invalid Network", icon = "ERROR")
+        self.draw(layout)
 
     def functionOperator(self, layout, functionName, text = "", icon = "NONE", description = "", data = None):
         idName = getNodeFunctionCallOperatorName(description)

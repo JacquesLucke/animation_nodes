@@ -23,10 +23,7 @@ class SubprogramCaller(bpy.types.Node, AnimationNode):
         else:
             layout.prop(self, "selectedSubprogram", text = "", icon = "GROUP_VERTEX")
 
-    def edit(self):
-        self.createSockets()
-
-    def createSockets(self):
+    def updateSockets(self):
         subprogram = self.subprogramNode
         if subprogram is None: self.clearSockets()
         else: subprogram.getSocketData().apply(self)
