@@ -1,8 +1,9 @@
 import bpy
 from bpy.props import *
 from .. events import treeChanged
-from .. tree_info import isSocketLinked, getOriginSocket, getDirectOriginSocket, getTargetSockets, getLinkedSockets
+from .. utils.recursion import noRecursion
 from .. utils.names import getRandomString, toVariableName
+from .. tree_info import isSocketLinked, getOriginSocket, getDirectOriginSocket, getTargetSockets, getLinkedSockets
 from . socket_function_call import getSocketFunctionCallOperatorName
 
 class CustomNameProperties(bpy.types.PropertyGroup):
@@ -83,7 +84,8 @@ class AnimationNodeSocket:
         self.moveTo(self.index - 1)
 
     def moveTo(self, index):
-        self.sockets.move(self.index, index)
+        if self.index != index:
+            self.sockets.move(self.index, index)
 
     def moveUpSave(self):
         """Cares about moveable sockets"""
@@ -173,14 +175,9 @@ class AnimationNodeSocket:
 
 
 
-isUpdating = False
+@noRecursion
 def updateCustomName(socket):
-    global isUpdating
-    if not isUpdating:
-        isUpdating = True
-        correctCustomName(socket)
-        treeChanged()
-        isUpdating = False
+    correctCustomName(socket)
 
 def correctCustomName(socket):
     if socket.nameSettings.variable:

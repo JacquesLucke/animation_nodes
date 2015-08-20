@@ -177,12 +177,16 @@ class NodeNetwork:
             self.identifier = idToNode(groupOutputs[0]).groupInputIdentifier
         elif groupInAmount == 1 and groupOutAmount == 0:
             self.type = "Group"
-            self.identifier = idToNode(groupInputs[0]).identifier
+            owner = idToNode(groupInputs[0])
+            self.identifier = owner.identifier
+            self.name = owner.subprogramName
             self.groupInputID = groupInputs[0]
         elif groupInAmount == 1 and groupOutAmount == 1:
             if idToNode(groupInputs[0]).identifier == idToNode(groupInputs[0]).identifier:
                 self.type = "Group"
-                self.identifier = idToNode(groupInputs[0]).identifier
+                owner = idToNode(groupInputs[0])
+                self.identifier = owner.identifier
+                self.name = owner.subprogramName
                 self.groupInputID = groupInputs[0]
                 self.groupOutputID = groupOutputs[0]
 
@@ -230,6 +234,9 @@ def update():
     _data.update()
     _networks.update()
 
+
+def getNodeFromIdentifier(identifier):
+    return idToNode(_data.nodeByIdentifier[identifier])
 
 def isSocketLinked(socket):
     socketID = socketToID(socket)
@@ -290,6 +297,11 @@ def getNetworkWithNode(node):
 def getNetworks():
     return _networks.networks
 
+def getSubprogramNetworks():
+    return getNetworksByType("Group")
+
+def getNetworksByType(groupType = "Main"):
+    return [network for network in _networks.networks if network.type == groupType]
 
 
 # Utilities

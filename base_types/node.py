@@ -79,6 +79,10 @@ class AnimationNode:
         props.callWithData = data is not None
         props.data = str(data)
 
+    def clearSockets(self):
+        self.inputs.clear()
+        self.outputs.clear()
+
     def removeSocket(self, socket):
         index = socket.index
         if socket.is_output:
