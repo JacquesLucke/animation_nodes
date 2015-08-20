@@ -52,7 +52,7 @@ class GroupInput(bpy.types.Node, AnimationNode):
         socket.customName = name
         socket.moveable = True
         socket.removeable = True
-        socket.nameSettings.display = True
+        socket.displayCustomName = True
         socket.nameSettings.editable = True
         socket.display.customNameInput = True
         socket.display.removeOperator = True

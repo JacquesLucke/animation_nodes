@@ -9,7 +9,6 @@ from . socket_function_call import getSocketFunctionCallOperatorName
 class CustomNameProperties(bpy.types.PropertyGroup):
     bl_idname = "an_CustomNameProperties"
     unique = BoolProperty(default = False)
-    display = BoolProperty(default = False)
     editable = BoolProperty(default = False)
     variable = BoolProperty(default = False)
 
@@ -25,6 +24,7 @@ class AnimationNodeSocket:
         updateCustomName(self)
 
     customName = StringProperty(default = "custom name", update = customNameChanged)
+    displayCustomName = BoolProperty(default = False)
     nameSettings = PointerProperty(type = CustomNameProperties)
     display = PointerProperty(type = SocketEditDisplayProperties)
 
@@ -56,7 +56,8 @@ class AnimationNodeSocket:
             self.functionOperator(row, "remove", icon = "X")
 
     def getDisplayedName(self):
-        if self.nameSettings.display or self.nameSettings.editable: return self.customName
+        if self.displayCustomName or (self.nameSettings.editable and self.display.customNameInput):
+            return self.customName
         return self.name
 
     def toString(self):

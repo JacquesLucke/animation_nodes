@@ -43,7 +43,7 @@ class SubprogramData:
         newSocket = nodeSockets.new(data.idName, data.identifier, data.identifier)
         newSocket.setStoreableValue(data.defaultValue)
         newSocket.customName = data.customName
-        newSocket.nameSettings.display = True
+        newSocket.displayCustomName = True
         return newSocket
 
     def removeUnusedSockets(self, nodeSockets, socketData):

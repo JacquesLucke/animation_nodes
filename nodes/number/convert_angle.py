@@ -29,7 +29,7 @@ class ConvertAngle(bpy.types.Node, AnimationNode):
         socket1 = self.inputs.new("an_FloatSocket", "Angle", "inAngle")
         socket2 = self.outputs.new("an_FloatSocket", "Angle", "outAngle")
         for socket in [socket1, socket2]:
-            socket.nameSettings.display = True
+            socket.displayCustomName = True
             socket.nameSettings.unique = False
         self.conversionType = "DEGREE_TO_RADIAN"
 

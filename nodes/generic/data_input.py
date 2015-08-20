@@ -43,7 +43,7 @@ class DataInput(bpy.types.Node, AnimationNode):
         self.setupSocket(socket)
 
     def setupSocket(self, socket):
-        socket.nameSettings.display = True
+        socket.displayCustomName = True
         socket.nameSettings.unique = False
         socket.customName = self.assignedType
         if hasattr(socket, "showName"): socket.showName = False
