@@ -3,6 +3,7 @@ from bpy.props import *
 from ... base_types.node import AnimationNode
 from ... tree_info import getSubprogramNetworks, getNodeByIdentifier, getNetworkByIdentifier
 from ... utils.enum_items import enumItemsFromDicts
+from ... sockets.info import toDataType
 
 class SubprogramCaller(bpy.types.Node, AnimationNode):
     bl_idname = "an_SubprogramCaller"
@@ -56,6 +57,7 @@ class SubprogramCaller(bpy.types.Node, AnimationNode):
         inputNode.select = True
         bpy.ops.node.translate_attach("INVOKE_DEFAULT")
 
+
 @enumItemsFromDicts
 def getSubprogramItems(self, context):
     itemDict = []
@@ -85,9 +87,39 @@ class ChangeSubprogram(bpy.types.Operator):
         except: pass # when the old subprogram identifier doesn't exist
         return context.window_manager.invoke_props_dialog(self, width = 400)
 
+    def check(self, context):
+        return True
+
     def draw(self, context):
         layout = self.layout
-        layout.prop(self, "subprogram")
+        layout.prop(self, "subprogram", expand = self.expandSubprograms)
+
+        network = getNetworkByIdentifier(self.subprogram)
+        if network:
+            layout.label("Desription: " + network.description)
+            layout.separator()
+            socketData = network.groupInputNode.getSocketData()
+
+            col = layout.column()
+            col.label("Inputs:")
+            self.drawSockets(col, socketData.inputs)
+
+            col = layout.column()
+            col.label("Outputs:")
+            self.drawSockets(col, socketData.outputs)
+
+    def drawSockets(self, layout, sockets):
+        col = layout.column(align = True)
+        for data in sockets:
+            row = col.row()
+            row.label(" "*8 + data.customName)
+            row.label("<  {}  >".format(toDataType(data.idName)))
+
+    @property
+    def expandSubprograms(self):
+        networks = getSubprogramNetworks()
+        names = "".join([network.name for network in networks])
+        return len(names) < 40
 
     def execute(self, context):
         node = getNodeByIdentifier(self.nodeIdentifier)
