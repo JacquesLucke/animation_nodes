@@ -1,6 +1,7 @@
 import bpy
 from bpy.props import *
 from .. events import treeChanged
+from .. execution.units import getMainUnitsByNodeTree
 
 class AutoExecutionProperties(bpy.types.PropertyGroup):
     bl_idname = "an_AutoExecutionProperties"
@@ -30,3 +31,21 @@ class AnimationNodeTree(bpy.types.NodeTree):
 
     def update(self):
         treeChanged()
+
+    def canAutoExecute(self, events):
+        a = self.autoExecution
+        if not a.enabled: return False
+        if a.sceneUpdate and "Scene" in events: return True
+        if a.frameChanged and "Frame" in events: return True
+        if a.propertyChanged and "Property" in events: return True
+        if a.treeChanged and "Tree" in events: return True
+        if events.intersection({"File", "Addon"}) and (a.sceneUpdate or a.frameChanged or a.propertyChanged or a.treeChanged): return True
+        return False
+
+    def execute(self):
+        for unit in self.mainUnits:
+            unit.execute()
+
+    @property
+    def mainUnits(self):
+        return getMainUnitsByNodeTree(self)

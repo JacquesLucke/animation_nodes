@@ -3,13 +3,14 @@ from . utils.nodes import iterAnimationNodes
 from . utils.recursion import noRecursion
 from . node_link_conversion import correctForbiddenNodeLinks
 from . utils.timing import measureTime
+from . execution.units import createExecutionUnits
 
 @noRecursion
 def update(events):
     if events.intersection({"File", "Addon", "Tree"}):
         correctNodeTree()
         markNodesInInvalidNetworks()
-
+        createExecutionUnits()
 
 @measureTime
 def correctNodeTree():
