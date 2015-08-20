@@ -58,11 +58,7 @@ class GroupOutput(bpy.types.Node, AnimationNode):
 
     def updateCallerNodes(self):
         updateCallerNodes(self.groupInputIdentifier)
-
+        
     @property
     def newReturnSocket(self):
         return self.inputs[-1]
-
-    @property
-    def groupInput(self):
-        return self.network.groupInputNode

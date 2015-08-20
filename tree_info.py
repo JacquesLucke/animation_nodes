@@ -185,7 +185,7 @@ class NodeNetwork:
             self.description = owner.subprogramDescription
             self.groupInputID = groupInputs[0]
         elif groupInAmount == 1 and groupOutAmount == 1:
-            if idToNode(groupInputs[0]).identifier == idToNode(groupInputs[0]).identifier:
+            if idToNode(groupInputs[0]).identifier == idToNode(groupOutputs[0]).groupInputIdentifier:
                 self.type = "Group"
                 owner = idToNode(groupInputs[0])
                 self.identifier = owner.identifier
@@ -193,6 +193,8 @@ class NodeNetwork:
                 self.description = owner.subprogramDescription
                 self.groupInputID = groupInputs[0]
                 self.groupOutputID = groupOutputs[0]
+            else:
+                self.type = "Invalid"
 
     @staticmethod
     def join(networks):
@@ -239,7 +241,7 @@ def update():
     _networks.update()
 
 
-def getNodeFromIdentifier(identifier):
+def getNodeByIdentifier(identifier):
     return idToNode(_data.nodeByIdentifier[identifier])
 
 def getNodesByType(idName):

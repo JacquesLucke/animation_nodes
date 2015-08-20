@@ -1,18 +1,8 @@
 import bpy
 from bpy.props import *
 from ... base_types.node import AnimationNode
-from ... tree_info import getSubprogramNetworks, getNodeFromIdentifier, getNetworkByIdentifier
+from ... tree_info import getSubprogramNetworks, getNodeByIdentifier, getNetworkByIdentifier
 from ... utils.enum_items import enumItemsFromDicts
-
-@enumItemsFromDicts
-def getSubprogramItems(self, context):
-    itemDict = []
-    for network in getSubprogramNetworks():
-        itemDict.append({
-            "id" : network.identifier,
-            "name" : network.name,
-            "description" : network.description})
-    return itemDict
 
 class SubprogramCaller(bpy.types.Node, AnimationNode):
     bl_idname = "an_SubprogramCaller"
@@ -21,33 +11,22 @@ class SubprogramCaller(bpy.types.Node, AnimationNode):
     def subprogramIdentifierChanged(self, context):
         self.updateSockets()
 
-    def selectedSubprogramChanged(self, context):
-        self.subprogramIdentifier = self.selectedSubprogram
-
     subprogramIdentifier = StringProperty(name = "Subprogram Identifier", default = "", update = subprogramIdentifierChanged)
-    selectedSubprogram = EnumProperty(name = "Subprogram", items = getSubprogramItems, update = selectedSubprogramChanged)
 
     def draw(self, layout):
         networks = getSubprogramNetworks()
         network = self.subprogramNetwork
 
         layout.separator()
+        col = layout.column()
+        col.scale_y = 1.6
         if len(networks) == 0:
-            col = layout.column()
-            col.scale_y = 1.6
             self.functionOperator(col, "createNewGroup", text = "Group", icon = "PLUS")
-        elif network is None:
-            layout.prop(self, "selectedSubprogram", text = "", icon = "GROUP_VERTEX")
         else:
-            layout.label(network.name, icon = "GROUP_VERTEX")
+            text, icon = (network.name, "GROUP_VERTEX") if network else ("Choose", "TRIA_RIGHT")
+            props = col.operator("an.change_subprogram", text = text, icon = icon)
+            props.nodeIdentifier = self.identifier
         layout.separator()
-
-    def drawAdvanced(self, layout):
-        networks = getSubprogramNetworks()
-        if len(networks) == 0:
-            self.functionOperator(layout, "createNewGroup", text = "Group", icon = "PLUS")
-        else:
-            layout.prop(self, "selectedSubprogram", text = "", icon = "GROUP_VERTEX")
 
     def updateSockets(self):
         subprogram = self.subprogramNode
@@ -56,7 +35,7 @@ class SubprogramCaller(bpy.types.Node, AnimationNode):
 
     @property
     def subprogramNode(self):
-        try: return getNodeFromIdentifier(self.subprogramIdentifier)
+        try: return getNodeByIdentifier(self.subprogramIdentifier)
         except: return None
 
     @property
@@ -76,3 +55,41 @@ class SubprogramCaller(bpy.types.Node, AnimationNode):
         outputNode.groupInputIdentifier = inputNode.identifier
         inputNode.select = True
         bpy.ops.node.translate_attach("INVOKE_DEFAULT")
+
+@enumItemsFromDicts
+def getSubprogramItems(self, context):
+    itemDict = []
+    for network in getSubprogramNetworks():
+        itemDict.append({
+            "id" : network.identifier,
+            "name" : network.name,
+            "description" : network.description})
+    return itemDict
+
+class ChangeSubprogram(bpy.types.Operator):
+    bl_idname = "an.change_subprogram"
+    bl_label = "Change Subprogram"
+    bl_description = "Change Subprogram"
+
+    nodeIdentifier = StringProperty()
+    subprogram = EnumProperty(name = "Subprogram", items = getSubprogramItems)
+
+    @classmethod
+    def poll(cls, context):
+        networks = getSubprogramNetworks()
+        return len(networks) > 0
+
+    def invoke(self, context, event):
+        node = getNodeByIdentifier(self.nodeIdentifier)
+        if node.subprogramIdentifier != "":
+            self.subprogram = node.subprogramIdentifier
+        return context.window_manager.invoke_props_dialog(self, width = 400)
+
+    def draw(self, context):
+        layout = self.layout
+        layout.prop(self, "subprogram")
+
+    def execute(self, context):
+        node = getNodeByIdentifier(self.nodeIdentifier)
+        node.subprogramIdentifier = self.subprogram
+        return {"FINISHED"}
