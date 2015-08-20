@@ -38,19 +38,3 @@ class MainExecutionUnit:
 
 def compileCode(script):
     return compile(script, "<string>", "exec")
-
-
-
-
-import bpy
-from .. import tree_info
-class lala(bpy.types.Operator):
-    bl_idname = "an.lala"
-    bl_label = "Create Scripts"
-
-    def execute(self, context):
-        networks = tree_info.getNetworksByType("Main")
-        for network in networks:
-            u = MainExecutionUnit(network)
-            u.execute()
-        return {"FINISHED"}
