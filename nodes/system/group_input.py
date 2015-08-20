@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import *
-from ... events import treeChanged
+from ... events import networkChanged
 from ... base_types.node import AnimationNode
 from . utils import updateCallerNodes
 from . subprogram_sockets import SubprogramData
@@ -9,12 +9,13 @@ class GroupInput(bpy.types.Node, AnimationNode):
     bl_idname = "an_GroupInput"
     bl_label = "Group Input"
 
-    def subprogramNameChanged(self, context):
-        treeChanged()
-
     subprogramName = StringProperty(name = "Subprogram Name", default = "Group",
         description = "Subprogram name to identify this group elsewhere",
-        update = subprogramNameChanged)
+        update = networkChanged)
+
+    subprogramDescription = StringProperty(name = "Description", default = "",
+        description = "Short description about what this group does",
+        update = networkChanged)
 
     def create(self):
         self.outputs.new("an_EmptySocket", "New Parameter")
@@ -26,8 +27,15 @@ class GroupInput(bpy.types.Node, AnimationNode):
             self.functionOperator(layout, "createGroupOutputNode", text = "Output Node", icon = "PLUS")
 
     def drawAdvanced(self, layout):
+        col = layout.column()
+        col.label("Description:")
+        col.prop(self, "subprogramDescription", text = "")
+
+        col = layout.column()
+        col.label("Socket Defaults:")
+        box = col.box()
         for socket in list(self.outputs)[:-1]:
-            socket.drawInput(layout, self, socket.getDisplayedName())
+            socket.drawInput(box, self, socket.getDisplayedName())
 
     def edit(self):
         for target in self.newParameterSocket.dataTargetSockets:

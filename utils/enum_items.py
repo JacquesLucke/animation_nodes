@@ -2,6 +2,10 @@
 # the decorated function should return a list of dicts
 # the dicts have at least an 'id' key
 def enumItemsFromDicts(function):
+    """
+    the decorated function should return a list of dicts
+    the dicts have at least an 'id' key
+    """
     def wrapper(self, context):
         items = []
         for data in function(self, context):
@@ -13,6 +17,7 @@ def enumItemsFromDicts(function):
             items.append((data["id"], data["name"], data["description"], data["icon"], data["number"]))
         if len(items) == 0:
             items = [("NONE", "NONE", "")]
+        print(items)
         return items
     return wrapper
 

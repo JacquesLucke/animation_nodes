@@ -2,12 +2,17 @@ import bpy
 from bpy.props import *
 from ... base_types.node import AnimationNode
 from ... tree_info import getSubprogramNetworks, getNodeFromIdentifier
+from ... utils.enum_items import enumItemsFromDicts
 
+@enumItemsFromDicts
 def getSubprogramItems(self, context):
-    items = []
+    itemDict = []
     for network in getSubprogramNetworks():
-        items.append((network.identifier, network.name, ""))
-    return items
+        itemDict.append({
+            "id" : network.identifier,
+            "name" : network.name,
+            "description" : network.description})
+    return itemDict
 
 class SubprogramCaller(bpy.types.Node, AnimationNode):
     bl_idname = "an_SubprogramCaller"

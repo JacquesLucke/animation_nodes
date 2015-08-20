@@ -151,6 +151,8 @@ class NodeNetwork:
     def __init__(self, nodeIDs):
         self.nodeIDs = nodeIDs
         self.type = "Invalid"
+        self.name = ""
+        self.description = ""
         self.identifier = None
         self.groupInputID = None
         self.groupOutputID = None
@@ -180,6 +182,7 @@ class NodeNetwork:
             owner = idToNode(groupInputs[0])
             self.identifier = owner.identifier
             self.name = owner.subprogramName
+            self.description = owner.subprogramDescription
             self.groupInputID = groupInputs[0]
         elif groupInAmount == 1 and groupOutAmount == 1:
             if idToNode(groupInputs[0]).identifier == idToNode(groupInputs[0]).identifier:
@@ -187,6 +190,7 @@ class NodeNetwork:
                 owner = idToNode(groupInputs[0])
                 self.identifier = owner.identifier
                 self.name = owner.subprogramName
+                self.description = owner.subprogramDescription
                 self.groupInputID = groupInputs[0]
                 self.groupOutputID = groupOutputs[0]
 

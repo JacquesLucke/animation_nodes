@@ -52,6 +52,9 @@ def propertyChanged(self = None, context = None):
 def executionCodeChanged(self = None, context = None):
     treeChanged()
 
+def networkChanged(self = None, context = None):
+    treeChanged()
+
 def treeChanged(self = None, context = None):
     event.treeChanged = True
     event_handler.treeNeedsUpdate()
