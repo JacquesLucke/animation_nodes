@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... base_types.node import AnimationNode
-from ... tree_info import getSubprogramNetworks, getNodeFromIdentifier
+from ... tree_info import getSubprogramNetworks, getNodeFromIdentifier, getNetworkByIdentifier
 from ... utils.enum_items import enumItemsFromDicts
 
 @enumItemsFromDicts
@@ -18,10 +18,31 @@ class SubprogramCaller(bpy.types.Node, AnimationNode):
     bl_idname = "an_SubprogramCaller"
     bl_label = "Subprogram Caller"
 
-    subprogramIdentifier = StringProperty(name = "Subprogram Identifier", default = "")
-    selectedSubprogram = EnumProperty(name = "Subprogram", items = getSubprogramItems)
+    def subprogramIdentifierChanged(self, context):
+        self.updateSockets()
+
+    def selectedSubprogramChanged(self, context):
+        self.subprogramIdentifier = self.selectedSubprogram
+
+    subprogramIdentifier = StringProperty(name = "Subprogram Identifier", default = "", update = subprogramIdentifierChanged)
+    selectedSubprogram = EnumProperty(name = "Subprogram", items = getSubprogramItems, update = selectedSubprogramChanged)
 
     def draw(self, layout):
+        networks = getSubprogramNetworks()
+        network = self.subprogramNetwork
+
+        layout.separator()
+        if len(networks) == 0:
+            col = layout.column()
+            col.scale_y = 1.6
+            self.functionOperator(col, "createNewGroup", text = "Group", icon = "PLUS")
+        elif network is None:
+            layout.prop(self, "selectedSubprogram", text = "", icon = "GROUP_VERTEX")
+        else:
+            layout.label(network.name, icon = "GROUP_VERTEX")
+        layout.separator()
+
+    def drawAdvanced(self, layout):
         networks = getSubprogramNetworks()
         if len(networks) == 0:
             self.functionOperator(layout, "createNewGroup", text = "Group", icon = "PLUS")
@@ -37,6 +58,10 @@ class SubprogramCaller(bpy.types.Node, AnimationNode):
     def subprogramNode(self):
         try: return getNodeFromIdentifier(self.subprogramIdentifier)
         except: return None
+
+    @property
+    def subprogramNetwork(self):
+        return getNetworkByIdentifier(self.subprogramIdentifier)
 
     def createNewGroup(self):
         bpy.ops.node.add_and_link_node(type = "an_GroupInput")

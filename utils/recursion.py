@@ -10,3 +10,14 @@ def noRecursion(function):
             activeFunctions.remove(identifier)
             return result
     return wrapper
+
+def noCallbackRecursion(function):
+    """The decorated function should not return any values"""
+    def wrapper(self, context):
+        identifier = id(function)
+        if identifier not in activeFunctions:
+            activeFunctions.add(identifier)
+            result = function(self, context)
+            activeFunctions.remove(identifier)
+            return result
+    return wrapper

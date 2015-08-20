@@ -17,7 +17,6 @@ def enumItemsFromDicts(function):
             items.append((data["id"], data["name"], data["description"], data["icon"], data["number"]))
         if len(items) == 0:
             items = [("NONE", "NONE", "")]
-        print(items)
         return items
     return wrapper
 

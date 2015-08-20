@@ -311,6 +311,11 @@ def getSubprogramNetworks():
 def getNetworksByType(groupType = "Main"):
     return [network for network in _networks.networks if network.type == groupType]
 
+def getNetworkByIdentifier(identifier):
+    for network in getNetworks():
+        if network.identifier == identifier: return network
+    return None
+
 
 # Utilities
 ###################################
