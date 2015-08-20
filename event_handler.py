@@ -4,6 +4,7 @@ from . utils.recursion import noRecursion
 from . node_link_conversion import correctForbiddenNodeLinks
 from . utils.timing import measureTime
 from . execution.units import createExecutionUnits
+from . execution.auto_execution import autoExecuteMainUnits
 
 @noRecursion
 def update(events):
@@ -11,6 +12,8 @@ def update(events):
         correctNodeTree()
         markNodesInInvalidNetworks()
         createExecutionUnits()
+
+    autoExecuteMainUnits(events)
 
 @measureTime
 def correctNodeTree():
