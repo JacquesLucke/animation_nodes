@@ -15,11 +15,21 @@ class GroupOutput(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.inputs.new("an_EmptySocket", "New Return")
+        self.width = 180
 
     def draw(self, layout):
+        if self.inInvalidNetwork:
+            col = layout.column()
+            col.scale_y = 1.5
+            self.functionOperator(col, "useGroupInputInNetwork", text = "Use Input in Network",
+                description = "Scan the network of this node for group input nodes", icon = "QUESTION")
+
+        layout.separator()
+
         inputNode = self.network.groupInputNode
-        if inputNode: layout.label("Group: " + inputNode.subprogramName)
+        if inputNode: layout.label(inputNode.subprogramName, icon = "GROUP_VERTEX")
         else: self.functionOperator(layout, "createGroupInputNode", text = "Input Node", icon = "PLUS")
+        layout.separator()
 
     def edit(self):
         dataOrigin = self.newReturnSocket.dataOriginSocket
@@ -58,7 +68,13 @@ class GroupOutput(bpy.types.Node, AnimationNode):
 
     def updateCallerNodes(self):
         updateCallerNodes(self.groupInputIdentifier)
-        
+
+    def useGroupInputInNetwork(self):
+        network = self.network
+        for node in network.getNodes():
+            if node.bl_idname == "an_GroupInput":
+                self.groupInputIdentifier = node.identifier
+
     @property
     def newReturnSocket(self):
         return self.inputs[-1]

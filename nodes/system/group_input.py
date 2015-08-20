@@ -19,6 +19,7 @@ class GroupInput(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.outputs.new("an_EmptySocket", "New Parameter")
+        self.width = 180
 
     def draw(self, layout):
         layout.separator()
