@@ -18,9 +18,11 @@ class AutoExecutionPanel(bpy.types.Panel):
         self.layout.prop(tree.autoExecution, "enabled", text = "")
 
     def draw(self, context):
-        autoExecution = context.space_data.edit_tree.autoExecution
+        layout = self.layout
+        tree = context.space_data.edit_tree
+        autoExecution = tree.autoExecution
 
-        col = self.layout.column()
+        col = layout.column()
         col.active = autoExecution.enabled
         col.prop(autoExecution, "sceneUpdate", text = "Always")
         col.separator()
@@ -30,6 +32,9 @@ class AutoExecutionPanel(bpy.types.Panel):
         col.prop(autoExecution, "treeChanged", text = "Tree Changed")
         col.prop(autoExecution, "frameChanged", text = "Frame Changed")
         col.prop(autoExecution, "propertyChanged", text = "Property Changed")
+
+        layout.prop(autoExecution, "minTimeDifference", text = "Min Time Difference", slider = True)
+        layout.label("Execution Time: {:.5f} ms".format(tree.executionTime * 1000))
 
     @classmethod
     def getTree(cls):

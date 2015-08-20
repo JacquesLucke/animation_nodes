@@ -6,7 +6,7 @@ def autoExecuteMainUnits(events):
     executed = False
     for nodeTree in getAnimationNodeTrees():
         if nodeTree.canAutoExecute(events):
-            nodeTree.execute()
+            nodeTree.autoExecute()
             executed = True
     return executed
 
