@@ -9,7 +9,7 @@ def getSortedSelectedObjects():
     for name in getSortedSelectedObjectNames():
         objects.append(bpy.data.objects.get(name))
     return objects
-    
+
 def getSortedSelectedObjectNames():
     return sortedSelectionNames
 
@@ -33,7 +33,7 @@ def updateSelectionSorting(scene):
 
 def getSelectedObjectNames():
     selectedNames = []
-    for object in bpy.context.selected_objects:
+    for object in getattr(bpy.context, "selected_objects", []):
         selectedNames.append(object.name)
     return selectedNames
 
