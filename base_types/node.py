@@ -9,16 +9,19 @@ from .. utils.nodes import getAnimationNodeTrees
 from .. tree_info import getNetworkWithNode
 
 class AnimationNode:
+    isAnimationNode = True
+
+    # unique string for each node; don't change it at all
     identifier = StringProperty(name = "Identifier", default = "")
     inInvalidNetwork = BoolProperty(name = "In Invalid Network", default = False)
 
+    # used for the listboxes in the sidebar
     activeInputIndex = IntProperty()
     activeOutputIndex = IntProperty()
 
     searchTags = []
     onlySearchTags = False
     isDetermined = False
-    isAnimationNode = True
 
     @classmethod
     def poll(cls, nodeTree):
