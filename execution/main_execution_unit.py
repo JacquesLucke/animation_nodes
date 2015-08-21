@@ -19,6 +19,9 @@ class MainExecutionUnit:
         exec(self.prepareCodeObject, self.executionData, self.executionData)
         self.execute = self.executeUnit
 
+    def insertExecutionData(self, data):
+        self.executionData.update(data)
+
     def finish(self):
         self.executionData.clear()
         self.execute = self.raiseNotPreparedException
@@ -28,6 +31,9 @@ class MainExecutionUnit:
 
     def raiseNotPreparedException(self):
         raise Exception()
+
+    def getCode(self):
+        return self.prepareScript + "\n"*5 + self.executeScript
 
 
 

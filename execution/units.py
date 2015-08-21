@@ -32,6 +32,13 @@ def prepareExecutionUnits():
     for unit in getExecutionUnits():
         unit.prepare()
 
+    subprograms = {}
+    for identifier, unit in _subprogramUnitsByIdentifier.items():
+        subprograms["_subprogram" + identifier] = unit.execute
+
+    for unit in getExecutionUnits():
+        unit.insertExecutionData(subprograms)
+
 def finishExecutionUnits():
     for unit in getExecutionUnits():
         unit.finish()
@@ -42,7 +49,11 @@ def getMainUnitsByNodeTree(nodeTree):
 
 def getSubprogramUnitByIdentifier(identifier):
     return _subprogramUnitsByIdentifier.get(identifier)
-    
+
+def getExecutionUnitByNetwork(network):
+    for unit in getExecutionUnits():
+        if unit.network == network: return unit
+
 def getExecutionUnits():
     units = []
     for mainUnits in _mainUnitsByNodeTree.values():

@@ -19,12 +19,18 @@ class GroupExecutionUnit(SubprogramExecutionUnit):
         exec(self.prepareCodeObject, self.executionData, self.executionData)
         self.execute = self.executionData["main"]
 
+    def insertExecutionData(self, data):
+        self.executionData.update(data)
+
     def finish(self):
         self.executionData.clear()
         self.execute = self.raiseNotPreparedException
 
     def raiseNotPreparedException(self):
         raise Exception()
+
+    def getCode(self):
+        return self.prepareScript
 
 
 
