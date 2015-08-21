@@ -1,6 +1,5 @@
 from . node_sorting import sortNodes
-from . code_generator import getNodeExecutionLines
-from . code_generator import PreparationScriptGenerator
+from . code_generator import PreparationScriptGenerator, getNodeExecutionLines
 
 class MainExecutionUnit:
     def __init__(self, network):
@@ -12,6 +11,25 @@ class MainExecutionUnit:
 
         self.generateScripts()
         self.compileScripts()
+        self.execute = self.raiseNotPreparedException
+        
+
+    def prepare(self):
+        self.executionData = {}
+        exec(self.prepareCodeObject, self.executionData, self.executionData)
+        self.execute = self.executeUnit
+
+    def finish(self):
+        self.executionData.clear()
+        self.execute = self.raiseNotPreparedException
+
+    def executeUnit(self):
+        exec(self.executeCodeObject, self.executionData, self.executionData)
+
+    def raiseNotPreparedException(self):
+        raise Exception()
+
+
 
     def generateScripts(self):
         nodes = self.network.getNodes()
@@ -30,11 +48,7 @@ class MainExecutionUnit:
         self.prepareCodeObject = compileCode(self.prepareScript)
         self.executeCodeObject = compileCode(self.executeScript)
 
-    def execute(self):
-        data = {}
-        exec(self.prepareCodeObject, data, data)
-        exec(self.executeCodeObject, data, data)
-        data.clear()
+
 
 def compileCode(script):
     return compile(script, "<string>", "exec")

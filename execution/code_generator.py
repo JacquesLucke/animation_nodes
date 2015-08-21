@@ -58,9 +58,7 @@ class PreparationScriptGenerator:
 def getNodeExecutionLines(node, socketVariables):
     lines = node.getTaggedExecutionCodeLines()
     lines = [replaceTaggedLine(line, node, socketVariables) for line in lines]
-    for socket in node.linkedOutputs:
-        for target in socket.dataTargetSockets:
-            socketVariables[target] = socketVariables[socket]
+    linkAllTargetSocketVariables(node, socketVariables)
     return lines
 
 def replaceTaggedLine(line, node, socketVariables):
@@ -73,6 +71,15 @@ def replaceTaggedLine(line, node, socketVariables):
         line = line.replace("${}$".format(identifier), socketVariables[socket])
     return line
 
+def linkAllTargetSocketVariables(node, socketVariables):
+    for socket in node.linkedOutputs:
+        linkTargetSocketVariables(socket, socketVariables)
+
+def linkTargetSocketVariables(socket, socketVariables):
+    for target in socket.dataTargetSockets:
+        socketVariables[target] = socketVariables[socket]
+
 def insertSocketVariable(socketVariables, socket):
-    variable = "_{}{}".format(socket.identifier, socket.node.identifier[:4])
+    socketID = socket.identifier if socket.identifier.isidentifier() else "_socket_{}_{}".format(socket.isOutput, socket.index)
+    variable = "_{}{}".format(socketID, socket.node.identifier[:4])
     socketVariables[socket] = variable

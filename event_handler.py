@@ -3,7 +3,7 @@ from . utils.nodes import iterAnimationNodes
 from . utils.recursion import noRecursion
 from . node_link_conversion import correctForbiddenNodeLinks
 from . utils.timing import measureTime
-from . execution.units import createExecutionUnits
+from . execution.units import createExecutionUnits, prepareExecutionUnits, finishExecutionUnits
 from . execution.auto_execution import autoExecuteMainUnits, afterExecution
 
 @noRecursion
@@ -13,8 +13,10 @@ def update(events):
         markNodesInInvalidNetworks()
         createExecutionUnits()
 
+    prepareExecutionUnits()
     executed = autoExecuteMainUnits(events)
     if executed: afterExecution()
+    finishExecutionUnits()
 
 @measureTime
 def correctNodeTree():
