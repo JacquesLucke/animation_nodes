@@ -2,86 +2,114 @@ import os
 from collections import defaultdict
 from .. preferences import addonName
 
-class PreparationScriptGenerator:
-    def __init__(self, nodes):
-        self.nodes = nodes
-        self.script = ""
-        self.socketVariables = defaultdict()
 
-    def generate(self):
-        lines = []
-        add = lines.append
-        extend = lines.extend
+# Initial Socket Variables
+##########################################
 
-        add(self.getImportStatement())
-        add("")
-        add("animation_nodes = sys.modules.get({})".format(repr(addonName)))
-        add("scene = bpy.context.scene")
-        add("nodes = bpy.data.node_groups[{}].nodes".format(repr(self.nodes[0].nodeTree.name)))
-        add("")
-        extend(self.getNodePreparationLines())
+def getInitialSocketVariables(nodes):
+    socketVariables = {}
+    for node in nodes:
+        for socket in node.sockets:
+            socketVariables[socket] = getSocketVariableName(socket)
+    return socketVariables
 
-        return "\n".join(lines)
+def getSocketVariableName(socket):
+    socketID = socket.identifier if socket.identifier.isidentifier() else "_socket_{}_{}".format(socket.isOutput, socket.index)
+    return "_{}{}".format(socketID, socket.node.identifier[:4])
 
-    def getImportStatement(self):
-        neededModules = {"bpy", "sys"}
-        neededModules.update(self.getModulesNeededByNodes())
-        return "import " + ", ".join(neededModules)
 
-    def getModulesNeededByNodes(self):
-        moduleNames = set()
-        for node in self.nodes:
-            moduleNames.update(node.getModuleList())
-        return list(moduleNames)
 
-    def getNodePreparationLines(self):
-        lines = []
-        for node in self.nodes:
-            lines.append(self.getNodePreparationLine(node))
-            lines.extend(self.getInputsPreparationLines(node))
-            lines.append("")
-        return lines
+# Setup Code
+##########################################
 
-    def getNodePreparationLine(self, node):
-        return "{} = nodes[{}]".format(node.identifier, repr(node.name))
+def getSetupCode(nodes, socketVariables):
+    lines = []
+    lines.append(get_ImportModules(nodes))
+    lines.append(get_ImportAnimationNodes())
+    lines.extend(get_GetNodeReferences(nodes))
+    lines.extend(get_GetSocketValues(nodes, socketVariables))
+    return "\n".join(lines)
 
-    def getInputsPreparationLines(self, node):
-        lines = []
+
+def get_ImportModules(nodes):
+    neededModules = {"bpy", "sys"}
+    neededModules.update(getModulesNeededByNodes(nodes))
+    modulesString = ", ".join(neededModules)
+    return "import " + modulesString
+
+def getModulesNeededByNodes(nodes):
+    moduleNames = set()
+    for node in nodes:
+        moduleNames.update(node.getModuleList())
+    return list(moduleNames)
+
+
+def get_ImportAnimationNodes():
+    '''
+    This needs a special import because the module name can be
+    different because the package folder has another name.
+    Github extends the name with '-master'
+    '''
+    return "animation_nodes = sys.modules.get({})".format(repr(addonName))
+
+
+def get_GetNodeReferences(nodes):
+    lines = []
+    lines.append("nodes = bpy.data.node_groups[{}].nodes".format(repr(nodes[0].nodeTree.name)))
+    for node in nodes:
+        lines.append("{} = nodes[{}]".format(node.identifier, repr(node.name)))
+    return lines
+
+
+def get_GetSocketValues(nodes, socketVariables):
+    lines = []
+    for node in nodes:
         for socket in node.unlinkedInputs:
-            self.generateSocketVariable(socket)
             lines.append("{} = {}.inputs[{}].getValue()".format(
-                self.socketVariables[socket], node.identifier, socket.index))
-        return lines
+                socketVariables[socket], node.identifier, socket.index))
+    return lines
 
-    def generateSocketVariable(self, socket):
-        insertSocketVariable(self.socketVariables, socket)
 
+
+# Node Execution Code
+##########################################
 
 def getNodeExecutionLines(node, socketVariables):
     lines = node.getTaggedExecutionCodeLines()
     lines = [replaceTaggedLine(line, node, socketVariables) for line in lines]
-    linkAllTargetSocketVariables(node, socketVariables)
     return lines
 
+
 def replaceTaggedLine(line, node, socketVariables):
-    line = line.replace("#self#", node.identifier)
-    for name, identifier in node.inputNames.items():
-        line = line.replace("%{}%".format(identifier), socketVariables[node.inputsByIdentifier[name]])
-    for name, identifier in node.outputNames.items():
-        socket = node.outputsByIdentifier[name]
-        insertSocketVariable(socketVariables, socket)
-        line = line.replace("${}$".format(identifier), socketVariables[socket])
+    line = replace_NumberSign_NodeReference(line, node)
+    line = replace_PercentSign_InputSocketVariable(line, node, socketVariables)
+    line = replace_DollarSign_OutputSocketVariable(line, node, socketVariables)
     return line
 
-def linkAllTargetSocketVariables(node, socketVariables):
-    for socket in node.linkedOutputs:
-        linkTargetSocketVariables(socket, socketVariables)
+def replace_NumberSign_NodeReference(line, node):
+    return line.replace("#self#", node.identifier)
 
-def linkTargetSocketVariables(socket, socketVariables):
+def replace_PercentSign_InputSocketVariable(line, node, socketVariables):
+    nodeInputs = node.inputsByIdentifier
+    for name, identifier in node.inputNames.items():
+        line = line.replace("%{}%".format(identifier), socketVariables[nodeInputs[name]])
+    return line
+
+def replace_DollarSign_OutputSocketVariable(line, node, socketVariables):
+    nodeOutputs = node.outputsByIdentifier
+    for name, identifier in node.outputNames.items():
+        line = line.replace("${}$".format(identifier), socketVariables[nodeOutputs[name]])
+    return line
+
+
+
+# Modify Socket Variables
+##########################################
+
+def linkOutputSocketsToTargets(node, socketVariables):
+    for socket in node.linkedOutputs:
+        linkSocketToTargets(socket, socketVariables)
+
+def linkSocketToTargets(socket, socketVariables):
     for target in socket.dataTargetSockets:
         socketVariables[target] = socketVariables[socket]
-
-def insertSocketVariable(socketVariables, socket):
-    socketID = socket.identifier if socket.identifier.isidentifier() else "_socket_{}_{}".format(socket.isOutput, socket.index)
-    variable = "_{}{}".format(socketID, socket.node.identifier[:4])
-    socketVariables[socket] = variable
