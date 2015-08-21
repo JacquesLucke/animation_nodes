@@ -307,8 +307,8 @@ def getNetworks():
 def getSubprogramNetworks():
     return getNetworksByType("Group")
 
-def getNetworksByType(groupType = "Main"):
-    return [network for network in _networks.networks if network.type == groupType]
+def getNetworksByType(type = "Main"):
+    return [network for network in _networks.networks if network.type == type]
 
 def getNetworkByIdentifier(identifier):
     for network in getNetworks():
