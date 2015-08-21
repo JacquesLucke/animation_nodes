@@ -79,7 +79,6 @@ def getNodeExecutionLines(node, socketVariables):
     lines = [replaceTaggedLine(line, node, socketVariables) for line in lines]
     return lines
 
-
 def replaceTaggedLine(line, node, socketVariables):
     line = replace_NumberSign_NodeReference(line, node)
     line = replace_PercentSign_InputSocketVariable(line, node, socketVariables)
