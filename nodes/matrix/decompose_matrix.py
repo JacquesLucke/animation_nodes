@@ -17,7 +17,7 @@ class DecomposeMatrix(bpy.types.Node, AnimationNode):
         lines = []
         if usedOutputs["translation"]: lines.append("translation = matrix.to_translation()")
         if usedOutputs["rotation"]: lines.append("rotation = mathutils.Vector((matrix.to_euler()))")
-        if usedOutputs["Scale"]: lines.append("scale = matrix.to_scale()")
+        if usedOutputs["scale"]: lines.append("scale = matrix.to_scale()")
         return lines
 
     def getModuleList(self):
