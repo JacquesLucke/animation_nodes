@@ -205,7 +205,7 @@ class AnimationNode:
         outputNames = self.outputNames
 
         if hasattr(self, "execute"):
-            keywordParameters = ["{0} = %{0}%".format(inputNames[socket.identifier]) for socket in self.inputs]
+            keywordParameters = ["%{0}%".format(inputNames[socket.identifier]) for socket in self.inputs]
             parameterString = ", ".join(keywordParameters)
 
             executionString = "#self#.execute(" + parameterString + ")"
@@ -217,9 +217,9 @@ class AnimationNode:
             return [outputString + " = "+ executionString]
         else:
             code = self.getExecutionCodeString()
-            for inputName in inputNames:
+            for inputName in inputNames.values():
                 code = tagVariableName(code, inputName, "%")
-            for outputName in outputNames:
+            for outputName in outputNames.values():
                 code = tagVariableName(code, outputName, "$")
             code = tagVariableName(code, "self", "#")
             return code.split("\n")
@@ -229,7 +229,8 @@ def tagVariableName(code, name, tag):
     Find all occurences of 'name' in 'code' and set 'tag' before and after it.
     The occurence must not have a dot before it.
     """
-    return re.sub(r"([^\.]|^)\b({})\b".format(name), r"\1{0}\2{0}".format(tag), code)
+    code = re.sub(r"([^\.]|^)\b({})\b".format(name), r"\1{0}\2{0}".format(tag), code)
+    return code
 
 @persistent
 def createMissingIdentifiers(scene = None):
