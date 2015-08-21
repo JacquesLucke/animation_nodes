@@ -15,10 +15,22 @@ class SubprogramCaller(bpy.types.Node, AnimationNode):
 
     subprogramIdentifier = StringProperty(name = "Subprogram Identifier", default = "", update = subprogramIdentifierChanged)
 
-    def execute(self, *args):
-        unit = getSubprogramUnitByIdentifier(self.subprogramIdentifier)
-        if unit is None: return
-        return unit.execute(*args)
+    @property
+    def inputNames(self):
+        return { socket.identifier : "input_" + str(i) for i, socket in enumerate(self.inputs)}
+
+    @property
+    def outputNames(self):
+        return { socket.identifier : "output_" + str(i) for i, socket in enumerate(self.outputs)}
+
+    def getExecutionCode(self):
+        if self.subprogramNode is None: return ""
+
+        parameterString = ", ".join(["input_" + str(i) for i in range(len(self.inputs))])
+        outputString = ", ".join(["output_" + str(i) for i in range(len(self.outputs))])
+
+        if outputString == "": return "_subprogram{}({})".format(self.subprogramIdentifier, parameterString)
+        return "{} = _subprogram{}({})".format(outputString, self.subprogramIdentifier, parameterString)
 
     def draw(self, layout):
         networks = getSubprogramNetworks()
