@@ -1,10 +1,5 @@
 import bpy
-
-class AnimationNodeOperator:
-    @classmethod
-    def poll(cls, context):
-        node = context.active_node
-        return hasattr(node, "isAnimationNode")
+from . an_operator import AnimationNodeOperator
 
 class SelectActiveNetwork(bpy.types.Operator, AnimationNodeOperator):
     bl_idname = "an.select_active_network"
