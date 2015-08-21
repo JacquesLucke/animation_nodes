@@ -4,6 +4,7 @@ from ... base_types.node import AnimationNode
 from ... tree_info import getSubprogramNetworks, getNodeByIdentifier, getNetworkByIdentifier
 from ... utils.enum_items import enumItemsFromDicts
 from ... sockets.info import toDataType
+from ... execution.units import getSubprogramUnitByIdentifier
 
 class SubprogramCaller(bpy.types.Node, AnimationNode):
     bl_idname = "an_SubprogramCaller"
@@ -13,6 +14,11 @@ class SubprogramCaller(bpy.types.Node, AnimationNode):
         self.updateSockets()
 
     subprogramIdentifier = StringProperty(name = "Subprogram Identifier", default = "", update = subprogramIdentifierChanged)
+
+    def execute(self, *args):
+        unit = getSubprogramUnitByIdentifier(self.subprogramIdentifier)
+        if unit is None: return
+        return unit.execute(*args)
 
     def draw(self, layout):
         networks = getSubprogramNetworks()

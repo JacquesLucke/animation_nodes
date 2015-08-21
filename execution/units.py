@@ -4,7 +4,7 @@ from . group_execution_unit import GroupExecutionUnit
 from .. tree_info import getNetworksByType, getSubprogramNetworks
 
 _mainUnitsByNodeTree = defaultdict(list)
-_subprogramUnitsByIdentifier = defaultdict(None)
+_subprogramUnitsByIdentifier = {}
 
 def createExecutionUnits():
     reset()
@@ -40,6 +40,9 @@ def finishExecutionUnits():
 def getMainUnitsByNodeTree(nodeTree):
     return _mainUnitsByNodeTree[nodeTree.name]
 
+def getSubprogramUnitByIdentifier(identifier):
+    return _subprogramUnitsByIdentifier.get(identifier)
+    
 def getExecutionUnits():
     units = []
     for mainUnits in _mainUnitsByNodeTree.values():
