@@ -197,9 +197,9 @@ class AnimationNode:
     def getTaggedExecutionCodeLines(self):
         """
         tags:
+            # - self
             % - input variables
             $ - output variables
-            # - self
         """
         inputNames = self.inputNames
         outputNames = self.outputNames
