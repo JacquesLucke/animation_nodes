@@ -1,5 +1,6 @@
 from . node_sorting import sortNodes
 from . subprogram_execution_unit import SubprogramExecutionUnit
+from .. exceptions import ExecutionUnitNotSetup
 from . code_generator import (getInitialSocketVariables,
                               getSetupCode,
                               getNodeExecutionLines,
@@ -8,29 +9,26 @@ from . code_generator import (getInitialSocketVariables,
 class GroupExecutionUnit(SubprogramExecutionUnit):
     def __init__(self, network):
         self.network = network
-
         self.setupScript = ""
         self.setupCodeObject = None
 
         self.generateScript()
         self.compileScript()
-        self.execute = self.raiseNotPreparedException
+        self.execute = self.raiseNotSetupException
 
 
-    def prepare(self):
+    def setup(self):
         self.executionData = {}
         exec(self.setupCodeObject, self.executionData, self.executionData)
         self.execute = self.executionData["main"]
 
-    def insertExecutionData(self, data):
+    def insertSubprogramFunctions(self, data):
         self.executionData.update(data)
 
     def finish(self):
         self.executionData.clear()
-        self.execute = self.raiseNotPreparedException
+        self.execute = self.raiseNotSetupException
 
-    def raiseNotPreparedException(self):
-        raise Exception()
 
     def getCode(self):
         return self.setupScript
@@ -76,6 +74,12 @@ class GroupExecutionUnit(SubprogramExecutionUnit):
 
     def compileScript(self):
         self.setupCodeObject = compile(self.setupScript, "<string>", "exec")
+
+
+
+    def raiseNotSetupException(self):
+        raise ExecutionUnitNotSetup()
+
 
 def indent(lines):
     return [" "*4 + line for line in lines]

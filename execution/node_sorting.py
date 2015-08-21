@@ -1,3 +1,5 @@
+from .. exceptions import NodeRecursionDetected
+
 def sortNodes(nodes):
     """
     The nodes in the returned list can be executed successively.
@@ -23,6 +25,3 @@ def getAllDependencies(node, recursionStart = None):
         dependencies.extend(getAllDependencies(dataOrigin, recursionStart = node))
     dependencies.extend(dataOrigins)
     return dependencies
-
-class NodeRecursionDetected(Exception):
-    pass

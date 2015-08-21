@@ -28,16 +28,16 @@ def createSubprogramUnits():
 
 
 
-def prepareExecutionUnits():
+def setupExecutionUnits():
     for unit in getExecutionUnits():
-        unit.prepare()
+        unit.setup()
 
     subprograms = {}
     for identifier, unit in _subprogramUnitsByIdentifier.items():
         subprograms["_subprogram" + identifier] = unit.execute
 
     for unit in getExecutionUnits():
-        unit.insertExecutionData(subprograms)
+        unit.insertSubprogramFunctions(subprograms)
 
 def finishExecutionUnits():
     for unit in getExecutionUnits():

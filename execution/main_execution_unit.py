@@ -1,4 +1,5 @@
 from . node_sorting import sortNodes
+from .. exceptions import ExecutionUnitNotSetup
 from . code_generator import (getInitialSocketVariables,
                               getSetupCode,
                               getNodeExecutionLines,
@@ -14,26 +15,24 @@ class MainExecutionUnit:
 
         self.generateScripts()
         self.compileScripts()
-        self.execute = self.raiseNotPreparedException
+        self.execute = self.raiseNotSetupException
 
 
-    def prepare(self):
+    def setup(self):
         self.executionData = {}
         exec(self.setupCodeObject, self.executionData, self.executionData)
         self.execute = self.executeUnit
 
-    def insertExecutionData(self, data):
+    def insertSubprogramFunctions(self, data):
         self.executionData.update(data)
 
     def finish(self):
         self.executionData.clear()
-        self.execute = self.raiseNotPreparedException
+        self.execute = self.raiseNotSetupException
 
     def executeUnit(self):
         exec(self.executeCodeObject, self.executionData, self.executionData)
 
-    def raiseNotPreparedException(self):
-        raise Exception()
 
     def getCode(self):
         return self.setupScript + "\n"*5 + self.executeScript
@@ -58,3 +57,8 @@ class MainExecutionUnit:
     def compileScripts(self):
         self.setupCodeObject = compile(self.setupScript, "<setup>", "exec")
         self.executeCodeObject = compile(self.executeScript, "<execute>", "exec")
+
+
+
+    def raiseNotSetupException(self, *args, **kwargs):
+        raise ExecutionUnitNotSetup()
