@@ -161,16 +161,23 @@ class NodeNetwork:
     def analyse(self):
         groupInputs = []
         groupOutputs = []
+        containsNodeFrame = False
+
         for nodeID in self.nodeIDs:
             if nodeID in _data.nodesByType["an_GroupInput"]:
                 groupInputs.append(nodeID)
             if nodeID in _data.nodesByType["an_GroupOutput"]:
                 groupOutputs.append(nodeID)
+            if nodeID in _data.nodesByType["NodeFrame"]:
+                containsNodeFrame = True
+                break
 
         groupInAmount = len(groupInputs)
         groupOutAmount = len(groupOutputs)
 
-        if groupInAmount == 0 and groupOutAmount == 0:
+        if containsNodeFrame:
+            self.type = "Invalid"
+        elif groupInAmount == 0 and groupOutAmount == 0:
             self.type = "Main"
         elif groupInAmount > 1 or groupOutAmount > 1:
             self.type = "Invalid"
