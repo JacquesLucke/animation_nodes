@@ -1,5 +1,6 @@
 import os
 from collections import defaultdict
+from .. preferences import addonName
 
 class PreparationScriptGenerator:
     def __init__(self, nodes):
@@ -14,6 +15,7 @@ class PreparationScriptGenerator:
 
         add(self.getImportStatement())
         add("")
+        add("animation_nodes = sys.modules.get({})".format(repr(addonName)))
         add("scene = bpy.context.scene")
         add("nodes = bpy.data.node_groups[{}].nodes".format(repr(self.nodes[0].nodeTree.name)))
         add("")
