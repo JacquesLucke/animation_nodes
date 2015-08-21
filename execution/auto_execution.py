@@ -18,5 +18,6 @@ def afterExecution():
         redrawAll()
 
 def redrawAll():
+    if bpy.context.screen is None: return
     for area in bpy.context.screen.areas:
         area.tag_redraw()

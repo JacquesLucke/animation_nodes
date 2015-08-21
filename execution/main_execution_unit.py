@@ -12,7 +12,7 @@ class MainExecutionUnit:
         self.generateScripts()
         self.compileScripts()
         self.execute = self.raiseNotPreparedException
-        
+
 
     def prepare(self):
         self.executionData = {}
@@ -32,7 +32,7 @@ class MainExecutionUnit:
 
 
     def generateScripts(self):
-        nodes = self.network.getNodes()
+        nodes = self.network.getAnimationNodes()
         nodes = sortNodes(nodes)
         preparation = PreparationScriptGenerator(nodes)
         self.prepareScript = preparation.generate()

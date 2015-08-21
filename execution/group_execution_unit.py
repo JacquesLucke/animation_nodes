@@ -29,7 +29,7 @@ class GroupExecutionUnit(SubprogramExecutionUnit):
 
 
     def generateScript(self):
-        nodes = self.network.getNodes()
+        nodes = self.network.getAnimationNodes()
         nodes = sortNodes(nodes)
 
         preparation = PreparationScriptGenerator(nodes)
