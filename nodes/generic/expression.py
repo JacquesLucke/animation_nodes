@@ -23,6 +23,7 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.width = 200
         socket = self.inputs.new("an_NodeControlSocket", "New Input")
+        socket.drawCallback = "drawNewInputSocket"
         self.outputs.new("an_GenericSocket", "Result", "result")
 
     def draw(self, layout):
@@ -31,6 +32,14 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
             layout.label("Syntax Error", icon = "ERROR")
         if self.executionError != "":
             layout.label(self.executionError, icon = "ERROR")
+
+    def drawNewInputSocket(self, layout):
+        row = layout.row()
+        row.alignment = "LEFT"
+        self.functionOperator(row, "chooseNewInputType", text = "New Input", emboss = False)
+
+    def chooseNewInputType(self):
+        self.chooseSocketDataType("newInputSocket")
 
     @property
     def inputNames(self):
