@@ -75,8 +75,9 @@ def get_GetSocketValues(nodes, socketVariables):
 ##########################################
 
 def getNodeExecutionLines(node, socketVariables):
-    lines = node.getTaggedExecutionCodeLines()
-    lines = [replaceTaggedLine(line, node, socketVariables) for line in lines]
+    lines = ["\n", "# Node: {} - {}".format(repr(node.nodeTree.name), repr(node.name))]
+    taggedLines = node.getTaggedExecutionCodeLines()
+    lines.extend([replaceTaggedLine(line, node, socketVariables) for line in taggedLines])
     return lines
 
 def replaceTaggedLine(line, node, socketVariables):

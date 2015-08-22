@@ -33,8 +33,8 @@ class GroupExecutionUnit(SubprogramExecutionUnit):
         self.execute = self.raiseNotSetupException
 
 
-    def getCode(self):
-        return self.setupScript
+    def getCodes(self):
+        return [self.setupScript]
 
 
 

@@ -11,6 +11,8 @@ class PrintExecutionCode(bpy.types.Operator, AnimationNodeOperator):
         network = context.active_node.network
         unit = getExecutionUnitByNetwork(network)
         print("\n"*5)
-        for i, line in enumerate(unit.getCode().split("\n")):
-            print("{:3}.  {}".format(i + 1, line))
+        for code in unit.getCodes():
+            print("\n"*2)
+            for i, line in enumerate(code.split("\n")):
+                print("{:3}.  {}".format(i + 1, line))
         return {"FINISHED"}

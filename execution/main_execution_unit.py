@@ -43,8 +43,8 @@ class MainExecutionUnit:
             problems.report(message = "Error during execution (see console)", forbidExecution = True)
 
 
-    def getCode(self):
-        return self.setupScript + "\n"*5 + self.executeScript
+    def getCodes(self):
+        return [self.setupScript, self.executeScript]
 
 
 
