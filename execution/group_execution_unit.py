@@ -1,3 +1,5 @@
+from .. import problems
+from . compile_scripts import compileScript
 from . node_sorting import sortNodes
 from . subprogram_execution_unit import SubprogramExecutionUnit
 from .. exceptions import ExecutionUnitNotSetup
@@ -74,8 +76,7 @@ class GroupExecutionUnit(SubprogramExecutionUnit):
         return "return " + returnList
 
     def compileScript(self):
-        self.setupCodeObject = compile(self.setupScript, "<string>", "exec")
-
+        self.setupCodeObject = compileScript(self.setupScript)
 
 
     def raiseNotSetupException(self):

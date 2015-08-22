@@ -1,4 +1,6 @@
+from .. import problems
 from . node_sorting import sortNodes
+from . compile_scripts import compileScript
 from .. exceptions import ExecutionUnitNotSetup
 from . code_generator import (getInitialSocketVariables,
                               getSetupCode,
@@ -56,9 +58,8 @@ class MainExecutionUnit:
         return "\n".join(lines)
 
     def compileScripts(self):
-        self.setupCodeObject = compile(self.setupScript, "<setup>", "exec")
-        self.executeCodeObject = compile(self.executeScript, "<execute>", "exec")
-
+        self.setupCodeObject = compileScript(self.setupScript)
+        self.executeCodeObject = compileScript(self.executeScript)
 
 
     def raiseNotSetupException(self, *args, **kwargs):

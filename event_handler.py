@@ -1,5 +1,4 @@
 from . import problems
-from . problems import Problem
 from . import tree_info
 from . utils.nodes import iterAnimationNodes
 from . utils.recursion import noRecursion
@@ -14,7 +13,7 @@ def update(events):
         problems.reset()
         correctNodeTree()
         if len(tree_info.getNetworksByType("Invalid")) > 0:
-            problems.report(Problem(message = "At least one invalid network exists", forbidExecution = True))
+            problems.report(message = "At least one invalid network exists", forbidExecution = True)
         markNodesInInvalidNetworks()
         createExecutionUnits()
 

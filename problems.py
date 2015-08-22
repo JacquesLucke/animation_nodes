@@ -3,7 +3,8 @@ currentProblems = []
 def reset():
     currentProblems.clear()
 
-def report(problem):
+def report(message = "", forbidUnitCreation = False, forbidExecution = False):
+    problem = Problem(message, forbidUnitCreation, forbidExecution)
     currentProblems.append(problem)
 
 def canCreateExecutionUnits():
@@ -17,7 +18,7 @@ def canExecute():
     return True
 
 def getProblems():
-    return currentProblems    
+    return currentProblems
 
 
 class Problem:
