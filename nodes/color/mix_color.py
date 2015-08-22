@@ -7,7 +7,7 @@ class ColorMix(bpy.types.Node, AnimationNode):
     isDetermined = True
 
     def create(self):
-        self.inputs.new("an_FloatSocket", "Factor", "factor")
+        self.inputs.new("an_FloatSocket", "Factor", "factor").setMinMax(0.0, 1.0)
         self.inputs.new("an_ColorSocket", "Color 1", "a")
         self.inputs.new("an_ColorSocket", "Color 2", "b")
         self.outputs.new("an_ColorSocket", "Color", "color")
