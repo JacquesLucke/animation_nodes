@@ -11,6 +11,7 @@ class GroupExecutionUnit(SubprogramExecutionUnit):
         self.network = network
         self.setupScript = ""
         self.setupCodeObject = None
+        self.executionData = {}
 
         self.generateScript()
         self.compileScript()

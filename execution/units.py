@@ -2,6 +2,7 @@ from collections import defaultdict
 from . main_execution_unit import MainExecutionUnit
 from . group_execution_unit import GroupExecutionUnit
 from .. tree_info import getNetworksByType, getSubprogramNetworks
+from .. import problems
 
 _mainUnitsByNodeTree = defaultdict(list)
 _subprogramUnitsByIdentifier = {}
@@ -29,6 +30,8 @@ def createSubprogramUnits():
 
 
 def setupExecutionUnits():
+    if not problems.canExecute(): return
+
     for unit in getExecutionUnits():
         unit.setup()
 

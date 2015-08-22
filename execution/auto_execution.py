@@ -1,8 +1,11 @@
 import bpy
+from .. import problems
 from .. utils.nodes import getAnimationNodeTrees
 from .. preferences import getPreferences
 
 def autoExecuteMainUnits(events):
+    if not problems.canExecute(): return False
+    
     executed = False
     for nodeTree in getAnimationNodeTrees():
         if nodeTree.canAutoExecute(events):

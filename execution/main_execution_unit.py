@@ -12,6 +12,7 @@ class MainExecutionUnit:
         self.executeScript = ""
         self.setupCodeObject = None
         self.executeCodeObject = None
+        self.executionData = {}
 
         self.generateScripts()
         self.compileScripts()
