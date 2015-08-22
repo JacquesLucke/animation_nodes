@@ -1,3 +1,4 @@
+import traceback
 from collections import defaultdict
 from . main_execution_unit import MainExecutionUnit
 from . group_execution_unit import GroupExecutionUnit
@@ -9,8 +10,13 @@ _subprogramUnitsByIdentifier = {}
 
 def createExecutionUnits():
     reset()
-    createMainUnits()
-    createSubprogramUnits()
+    try:
+        createMainUnits()
+        createSubprogramUnits()
+    except:
+        print("\n"*5)
+        traceback.print_exc()
+        problems.report("Error during code creation (see console)", forbidExecution = True)
 
 def reset():
     _mainUnitsByNodeTree.clear()
