@@ -229,7 +229,7 @@ def tagVariableName(code, name, tag):
     Find all occurences of 'name' in 'code' and set 'tag' before and after it.
     The occurence must not have a dot before it.
     """
-    code = re.sub(r"([^\.]|^)\b({})\b".format(name), r"\1{0}\2{0}".format(tag), code)
+    code = re.sub(r"([^\.\"']|^)\b({})\b".format(name), r"\1{0}\2{0}".format(tag), code)
     return code
 
 @persistent

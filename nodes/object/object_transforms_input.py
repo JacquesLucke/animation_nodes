@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from mathutils import Vector
-from ... events import propertyChanged
+from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 from ... utils.fcurve import getArrayValueAtFrame
 
@@ -14,9 +14,9 @@ class ObjectTransformsInput(bpy.types.Node, AnimationNode):
     bl_label = "Object Transforms Input"
     outputUseParameterName = "usedOutputs"
 
-    frameTypesProperty = EnumProperty(
+    frameType = EnumProperty(
         name = "Frame Type", default = "OFFSET",
-        items = frameTypes, update = propertyChanged)
+        items = frameTypes, update = executionCodeChanged)
 
     def create(self):
         self.inputs.new("an_ObjectSocket", "Object", "object").showName = False
@@ -26,30 +26,35 @@ class ObjectTransformsInput(bpy.types.Node, AnimationNode):
         self.outputs.new("an_VectorSocket", "Scale", "scale")
 
     def draw(self, layout):
-        layout.prop(self, "frameTypesProperty")
+        layout.prop(self, "frameType")
 
-    def execute(self, usedOutputs, object, frame):
-        location = (0, 0, 0)
-        rotation = (0, 0, 0)
-        scale = (1, 1, 1)
+    def getExecutionCode(self):
+        usedOutputs = self.getUsedOutputsDict()
+        if not (usedOutputs["location"] or usedOutputs["rotation"] or usedOutputs["scale"]): return []
 
-        if object is None:
-            return Vector(location), Vector(rotation), Vector(scale)
+        frameInput = self.inputs["Frame"]
 
-        currentFrame = bpy.context.scene.frame_current
-        if self.frameTypesProperty == "OFFSET":
-            frame += currentFrame
+        lines = []
+        add = lines.append
 
-        if frame == currentFrame:
-            location = object.location
-            rotation = object.rotation_euler
-            scale = object.scale
+        add("try:")
+        if frameInput.isUnlinked and frameInput.value == 0.0 and self.frameType == "OFFSET":
+            if usedOutputs["location"]: add("    location = object.location")
+            if usedOutputs["rotation"]: add("    rotation = mathutils.Vector(object.rotation_euler)")
+            if usedOutputs["scale"]: add("    scale = object.scale")
         else:
-            if usedOutputs["Location"]:
-                location = getArrayValueAtFrame(object, "location", frame)
-            if usedOutputs["Rotation"]:
-                rotation = getArrayValueAtFrame(object, "rotation_euler", frame)
-            if usedOutputs["Scale"]:
-                scale = getArrayValueAtFrame(object, "scale", frame)
+            if self.frameType == "OFFSET":
+                add("    frame += bpy.context.scene.frame_current")
+            if usedOutputs["location"]: add("    location = mathutils.Vector(animation_nodes.utils.fcurve.getArrayValueAtFrame(object, 'location', frame))")
+            if usedOutputs["rotation"]: add("    rotation = mathutils.Vector(animation_nodes.utils.fcurve.getArrayValueAtFrame(object, 'rotation_euler', frame))")
+            if usedOutputs["scale"]: add("    scale = mathutils.Vector(animation_nodes.utils.fcurve.getArrayValueAtFrame(object, 'scale', frame))")
 
-        return Vector(location), Vector(rotation), Vector(scale)
+        add("except:")
+        add("    location = mathutils.Vector((0, 0, 0))")
+        add("    rotation = mathutils.Vector((0, 0, 0))")
+        add("    scale = mathutils.Vector((0, 0, 0))")
+
+        return lines
+
+    def getModuleList(self):
+        return ["mathutils"]
