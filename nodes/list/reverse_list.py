@@ -18,9 +18,8 @@ class ReverseListNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.assignedType = "Object List"
 
-    def execute(self, inList):
-        inList.reverse()
-        return inList
+    def getExecutionCode(self):
+        return "reversedList = list(reversed(inList))"
 
     def edit(self):
         listDataType = self.getWantedDataType()
