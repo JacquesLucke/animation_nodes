@@ -8,9 +8,6 @@ class ShuffleListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ShuffleListNode"
     bl_label = "Shuffle List"
 
-    inputNames = { "List" : "list" }
-    outputNames = { "Shuffled List" : "shuffledList" }
-
     def assignedTypeChanged(self, context):
         self.listIdName = toIdName(self.assignedType)
         self.generateSockets()
