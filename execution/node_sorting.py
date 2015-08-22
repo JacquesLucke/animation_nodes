@@ -18,10 +18,11 @@ def removeDuplicates(elements):
     return [element for element in elements if not(element in seen or see(element))]
 
 def getAllDependencies(node, recursionStart = None):
+    if recursionStart is None: recursionStart = node
     dependencies = []
     dataOrigins = node.originNodes
     for dataOrigin in dataOrigins:
         if dataOrigin == recursionStart: raise NodeRecursionDetected()
-        dependencies.extend(getAllDependencies(dataOrigin, recursionStart = node))
+        dependencies.extend(getAllDependencies(dataOrigin, recursionStart))
     dependencies.extend(dataOrigins)
     return dependencies
