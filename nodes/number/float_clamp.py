@@ -6,12 +6,6 @@ class FloatClamp(bpy.types.Node, AnimationNode):
     bl_label = "Clamp"
     isDetermined = True
 
-    inputNames = {  "Value" : "value",
-                    "Min" : "minValue",
-                    "Max" : "maxValue" }
-
-    outputNames = { "Value" : "value" }
-
     def create(self):
         self.inputs.new("an_FloatSocket", "Value", "value")
         self.inputs.new("an_FloatSocket", "Min", "minValue").value = 0.0
