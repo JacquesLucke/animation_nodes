@@ -71,8 +71,6 @@ class SequencerSoundInput(bpy.types.Node, AnimationNode):
     frameType = EnumProperty(name = "Frame Type", items = frameTypes, default = "OFFSET")
 
     def create(self):
-        self.use_custom_color = True
-        self.color = (0.4, 0.9, 0.4)
         self.width = 200
         self.inputs.new("an_FloatSocket", "Frame", "frame")
         socket = self.inputs.new("an_FloatSocket", "Frequency", "frequency")
