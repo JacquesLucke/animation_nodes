@@ -17,6 +17,7 @@ class SocketEditDisplayProperties(bpy.types.PropertyGroup):
     customNameInput = BoolProperty(default = False)
     moveOperators = BoolProperty(default = False)
     removeOperator = BoolProperty(default = False)
+    margin = IntProperty(default = 0)
 
 class AnimationNodeSocket:
 
@@ -36,7 +37,10 @@ class AnimationNodeSocket:
     def draw(self, context, layout, node, text):
         displayText = self.getDisplayedName()
 
-        row = layout.row(align = True)
+        col = layout.column()
+        self.drawMargin(col)
+
+        row = col.row(align = True)
         if self.nameSettings.editable and self.display.customNameInput:
             row.prop(self, "customName", text = "")
         else:
@@ -55,6 +59,8 @@ class AnimationNodeSocket:
             row.separator()
             self.functionOperator(row, "remove", icon = "X")
 
+        self.drawMargin(col)
+
     def getDisplayedName(self):
         if self.displayCustomName or (self.nameSettings.editable and self.display.customNameInput):
             return self.customName
@@ -62,6 +68,10 @@ class AnimationNodeSocket:
 
     def toString(self):
         return self.getDisplayedName()
+
+    def drawMargin(self, layout):
+        for _ in range(self.display.margin):
+            layout.separator()
 
     def draw_color(self, context, node):
         return self.drawColor

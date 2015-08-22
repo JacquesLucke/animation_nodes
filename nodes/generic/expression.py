@@ -22,7 +22,10 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.width = 200
-        self.inputs.new("an_EmptySocket", "New Input", "empty")
+        socket = self.inputs.new("an_EmptySocket", "New Input", "empty")
+        socket.socketGroup = "ALL"
+        socket.newSocketCallbackName = "newInputSocket"
+        socket.display.margin = 1
         self.outputs.new("an_GenericSocket", "Result", "result")
 
     def draw(self, layout):
@@ -56,11 +59,11 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
         if directOrigin is None: return
         dataOrigin = emptySocket.dataOriginSocket
         if dataOrigin.dataType == "Empty": return
-        socket = self.newInputSocket(dataOrigin.dataType, dataOrigin.getDisplayedName())
+        socket = self.newInputSocket(dataOrigin.dataType)
         emptySocket.removeConnectedLinks()
         socket.linkWith(directOrigin)
 
-    def newInputSocket(self, dataType, name = "Socket"):
+    def newInputSocket(self, dataType):
         name = self.getNewSocketName()
         socket = self.inputs.new(toIdName(dataType), name, "input")
         socket.nameSettings.editable = True
