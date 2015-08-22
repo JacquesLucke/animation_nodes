@@ -187,7 +187,6 @@ class ObjectMenu(bpy.types.Menu):
         layout.separator()
         insertNode(layout, "an_ObjectIDKey", "ID Key")
         insertNode(layout, "an_CopyObjectData", "Copy Data")
-        insertNode(layout, "an_CopyTransformsNode", "Copy Transforms")
         layout.separator()
         insertNode(layout, "an_ObjectInstancer", "Instancer")
 
