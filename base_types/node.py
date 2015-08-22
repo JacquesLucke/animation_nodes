@@ -145,6 +145,10 @@ class AnimationNode:
         return {socket.identifier : socket for socket in self.outputs}
 
     @property
+    def inputsByCustomName(self):
+        return {socket.customName : socket for socket in self.inputs}
+
+    @property
     def linkedOutputs(self):
         return [socket for socket in self.outputs if socket.isLinked]
 
