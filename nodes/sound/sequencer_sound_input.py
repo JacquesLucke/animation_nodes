@@ -57,7 +57,7 @@ class SequencerSoundInput(bpy.types.Node, AnimationNode):
     bakeInfo = StringProperty(default = "")
     bakeProgress = IntProperty(min = 0, max = 100)
 
-    fullFrequencyRange = BoolProperty(default = True, update = settingChanged)
+    fullFrequencyRange = BoolProperty(name = "Full Frequency Range", default = True, update = settingChanged)
 
     attack = FloatProperty(default = 0.005, description = "Lower values -> faster rising curve", min = 0, max = 2)
     release = FloatProperty(default = 0.2, description = "Lower values -> faster falling curve", min = 0, max = 5)
