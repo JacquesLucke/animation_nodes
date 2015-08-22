@@ -19,10 +19,12 @@ class EmptySocket(bpy.types.NodeSocket, AnimationNodeSocket):
     emboss = BoolProperty(default = True)
 
     def drawInput(self, layout, node, text):
-        if self.socketGroup == "" or self.newSocketCallbackName == "":
+        if self.newSocketCallbackName == "":
             layout.label(text)
-        else:
+        elif self.socketGroup != "":
             self.functionOperator(layout, "chooseSocketType", text = text, emboss = self.emboss)
+        else:
+            self.functionOperator(layout, "callNewSocketCallback", text = text, emboss = self.emboss)
 
     def getValue(self):
         return None
@@ -36,6 +38,10 @@ class EmptySocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def socketTypeChoosed(self, dataType):
         function = getattr(self.node, self.newSocketCallbackName)
         function(dataType)
+
+    def callNewSocketCallback(self):
+        function = getattr(self.node, self.newSocketCallbackName)
+        function()
 
 
 socketGroupItems = [
