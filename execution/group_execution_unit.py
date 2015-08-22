@@ -2,7 +2,7 @@ from .. import problems
 from . compile_scripts import compileScript
 from . node_sorting import sortNodes
 from . subprogram_execution_unit import SubprogramExecutionUnit
-from .. exceptions import ExecutionUnitNotSetup
+from .. exceptions import ExecutionUnitNotSetup, NodeRecursionDetected
 from . code_generator import (getInitialSocketVariables,
                               getSetupCode,
                               getNodeExecutionLines,
@@ -40,7 +40,12 @@ class GroupExecutionUnit(SubprogramExecutionUnit):
 
     def generateScript(self):
         nodes = self.network.getAnimationNodes()
-        nodes = sortNodes(nodes)
+
+        try:
+            nodes = sortNodes(nodes)
+        except NodeRecursionDetected:
+            problems.report(message = "Link Recursion in {}".format(repr(self.network.name)), forbidExecution = True)
+            return
 
         socketVariables = getInitialSocketVariables(nodes)
         self.setupScript = getSetupCode(nodes, socketVariables)
