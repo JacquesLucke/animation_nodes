@@ -10,4 +10,4 @@ class ObjectGroupInput(bpy.types.Node, AnimationNode):
         self.outputs.new("an_ObjectListSocket", "Objects", "objects")
 
     def execute(self, group):
-        return getattr(group, "objects", [])
+        return list(getattr(group, "objects", []))
