@@ -40,7 +40,7 @@ class CombineLists(bpy.types.Node, AnimationNode):
     def getExecutionCode(self):
         lines = []
         lines.append("outList = []")
-        for i, socket in self.inputs:
+        for i, socket in enumerate(self.inputs):
             if socket.name == "...": continue
             lines.append("outList.extend({})".format("list_" + str(i)))
         return lines
