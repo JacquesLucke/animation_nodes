@@ -19,6 +19,7 @@ class ProblemsPanel(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
+        layout.operator("wm.console_toggle", text = "Toogle Console")
         for problem in problems.getProblems():
             layout.label(problem.message)
 
