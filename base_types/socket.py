@@ -158,6 +158,10 @@ class AnimationNodeSocket:
         return isSocketLinked(self)
 
     @property
+    def isUnlinked(self):
+        return not self.isLinked
+
+    @property
     def linkedNodes(self):
         nodes = [socket.node for socket in self.linkedDataSockets]
         return list(set(nodes))
