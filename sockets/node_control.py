@@ -10,10 +10,10 @@ class NodeControlSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     drawColor = (0.0, 0.0, 0.0, 0.0)
 
     drawNameOnly = BoolProperty(default = True)
-    drawCallback = StringProperty()
+    drawCallback = StringProperty(default = "")
 
     def draw(self, context, layout, node, text):
-        if self.drawNameOnly:
+        if self.drawCallback == "":
             layout.label(self.name)
         else:
             function = getattr(node, self.drawCallback)
