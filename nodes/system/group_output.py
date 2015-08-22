@@ -3,6 +3,7 @@ from bpy.props import *
 from ... events import treeChanged
 from . utils import updateCallerNodes
 from ... base_types.node import AnimationNode
+from ... sockets.info import toIdName
 
 class GroupOutput(bpy.types.Node, AnimationNode):
     bl_idname = "an_GroupOutput"
@@ -14,7 +15,8 @@ class GroupOutput(bpy.types.Node, AnimationNode):
     groupInputIdentifier = StringProperty(update = inputNodeIdentifierChanged)
 
     def create(self):
-        self.inputs.new("an_NodeControlSocket", "New Return")
+        socket = self.inputs.new("an_NodeControlSocket", "New Return")
+        socket.drawCallback = "drawNewReturnSocket"
         self.width = 180
 
     def draw(self, layout):
@@ -31,19 +33,26 @@ class GroupOutput(bpy.types.Node, AnimationNode):
         else: self.functionOperator(layout, "createGroupInputNode", text = "Input Node", icon = "PLUS")
         layout.separator()
 
+    def drawNewReturnSocket(self, layout):
+        row = layout.row()
+        row.alignment = "LEFT"
+        self.functionOperator(row, "chooseNewReturnType", text = "New Return", emboss = False)
+
+    def chooseNewReturnType(self):
+        self.chooseSocketDataType("newReturn")
+
     def edit(self):
         dataOrigin = self.newReturnSocket.dataOriginSocket
         directOrigin = self.newReturnSocket.directOriginSocket
 
         if not dataOrigin: return
         if dataOrigin.dataType == "Node Control": return
-        socket = self.newReturn(dataOrigin.bl_idname, dataOrigin.getDisplayedName())
+        socket = self.newReturn(dataOrigin.dataType, dataOrigin.getDisplayedName())
         socket.linkWith(directOrigin)
-        socket.moveUp()
         self.newReturnSocket.removeConnectedLinks()
 
-    def newReturn(self, idName, name):
-        socket = self.inputs.new(idName, name, "return")
+    def newReturn(self, dataType, name = "Socket"):
+        socket = self.inputs.new(toIdName(dataType), name, "return")
         socket.customName = name
         socket.moveable = True
         socket.removeable = True
@@ -51,6 +60,7 @@ class GroupOutput(bpy.types.Node, AnimationNode):
         socket.nameSettings.editable = True
         socket.display.customNameInput = True
         socket.display.removeOperator = True
+        socket.moveUp()
         return socket
 
     def createGroupInputNode(self):
