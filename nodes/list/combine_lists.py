@@ -60,7 +60,7 @@ class CombineLists(bpy.types.Node, AnimationNode):
         self.inputs.clear()
         self.outputs.clear()
 
-        self.inputs.new("an_EmptySocket", "...").passiveType = self.listIdName
+        self.inputs.new("an_NodeControlSocket", "...")
         for _ in range(inputAmount):
             self.newInputSocket()
         self.outputs.new(self.listIdName, "List", "outList")

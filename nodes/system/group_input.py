@@ -18,7 +18,8 @@ class GroupInput(bpy.types.Node, AnimationNode):
         update = networkChanged)
 
     def create(self):
-        self.outputs.new("an_EmptySocket", "New Parameter")
+        socket = self.outputs.new("an_NodeControlSocket", "New Parameter")
+        socket.drawCallback = "drawNewParameterSocket"
         self.width = 180
 
     def draw(self, layout):
@@ -38,17 +39,20 @@ class GroupInput(bpy.types.Node, AnimationNode):
         for socket in list(self.outputs)[:-1]:
             socket.drawInput(box, self, socket.getDisplayedName())
 
+    def drawNewParameterSocket(self, layout):
+        self.functionOperator(layout, "adf", text = "New Parameter")
+
     def edit(self):
         for target in self.newParameterSocket.dataTargetSockets:
-            if target.dataType == "Empty": continue
+            if target.dataType == "Node Control": continue
             socket = self.newParameter(target.bl_idname, target.getDisplayedName(), target.getStoreableValue())
             socket.linkWith(target)
             socket.moveUp()
         self.newParameterSocket.removeConnectedLinks()
 
-    def newParameter(self, idName, name, defaultValue):
+    def newParameter(self, idName, name, defaultValue = None):
         socket = self.outputs.new(idName, name, "parameter")
-        socket.setStoreableValue(defaultValue)
+        if defaultValue is not None: socket.setStoreableValue(defaultValue)
         socket.customName = name
         socket.moveable = True
         socket.removeable = True

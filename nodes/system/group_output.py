@@ -14,7 +14,7 @@ class GroupOutput(bpy.types.Node, AnimationNode):
     groupInputIdentifier = StringProperty(update = inputNodeIdentifierChanged)
 
     def create(self):
-        self.inputs.new("an_EmptySocket", "New Return")
+        self.inputs.new("an_NodeControlSocket", "New Return")
         self.width = 180
 
     def draw(self, layout):
@@ -36,7 +36,7 @@ class GroupOutput(bpy.types.Node, AnimationNode):
         directOrigin = self.newReturnSocket.directOriginSocket
 
         if not dataOrigin: return
-        if dataOrigin.dataType == "Empty": return
+        if dataOrigin.dataType == "Node Control": return
         socket = self.newReturn(dataOrigin.bl_idname, dataOrigin.getDisplayedName())
         socket.linkWith(directOrigin)
         socket.moveUp()

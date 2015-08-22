@@ -51,7 +51,7 @@ class CreateList(bpy.types.Node, AnimationNode):
         return { socket.identifier : "element_" + str(i) for i, socket in enumerate(self.inputs) }
 
     def getExecutionCode(self):
-        return "outList = [" + ", ".join(["element_" + str(i) for i, socket in enumerate(self.inputs) if socket.dataType != "Empty"]) + "]"
+        return "outList = [" + ", ".join(["element_" + str(i) for i, socket in enumerate(self.inputs) if socket.dataType != "Node Control"]) + "]"
 
     def edit(self):
         emptySocket = self.inputs["..."]
@@ -72,7 +72,7 @@ class CreateList(bpy.types.Node, AnimationNode):
         self.inputs.clear()
         self.outputs.clear()
 
-        self.inputs.new("an_EmptySocket", "...").passiveType = self.listIdName
+        self.inputs.new("an_NodeControlSocket", "...")
         for i in range(inputAmount):
             self.newInputSocket()
         self.outputs.new(self.listIdName, "List", "outList")
