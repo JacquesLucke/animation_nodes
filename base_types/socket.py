@@ -76,6 +76,13 @@ class AnimationNodeSocket:
     def draw_color(self, context, node):
         return self.drawColor
 
+    def copyDisplaySettingsFrom(self, other):
+        self.displayCustomName = other.displayCustomName
+        self.display.customNameInput = other.display.customNameInput
+        self.display.moveOperators = other.display.moveOperators
+        self.display.removeOperator = other.display.removeOperator
+        self.display.margin = other.display.margin
+
     def setStoreableValue(self, data):
         pass
 

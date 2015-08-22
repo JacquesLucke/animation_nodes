@@ -75,6 +75,8 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
         socket.moveable = True
         socket.removeable = True
         socket.moveUp()
+        if len(self.inputs) > 2:
+            socket.copyDisplaySettingsFrom(self.inputs[0])
         return socket
 
     def getNewSocketName(self):
