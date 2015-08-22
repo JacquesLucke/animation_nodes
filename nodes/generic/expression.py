@@ -23,8 +23,9 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.width = 200
         socket = self.inputs.new("an_EmptySocket", "New Input", "empty")
-        socket.socketGroup = "ALL"
         socket.newSocketCallbackName = "newInputSocket"
+        socket.socketGroup = "ALL"
+        socket.emboss = False
         socket.display.margin = 1
         self.outputs.new("an_GenericSocket", "Result", "result")
 

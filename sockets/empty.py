@@ -13,7 +13,7 @@ class EmptySocket(bpy.types.NodeSocket, AnimationNodeSocket):
     drawColor = (0.0, 0.0, 0.0, 0.0)
 
     passiveType = StringProperty(default = "")
-    
+
     socketGroup = StringProperty(default = "")
     newSocketCallbackName = StringProperty(default = "")
     emboss = BoolProperty(default = True)
