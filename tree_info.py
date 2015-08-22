@@ -235,6 +235,16 @@ _data = NodeData()
 _networks = NodeNetworks()
 
 
+def updateAndRetryOnException(function):
+    def wrapper(*args, **kwargs):
+        try:
+            output = function(*args, **kwargs)
+        except:
+            update()
+            output = function(*args, **kwargs)
+        return output
+    return wrapper
+
 
 # Public API
 ##################################
@@ -248,6 +258,7 @@ def update():
 def getNodeByIdentifier(identifier):
     return idToNode(_data.nodeByIdentifier[identifier])
 
+@updateAndRetryOnException
 def getNodesByType(idName):
     return [idToNode(nodeID) for nodeID in _data.nodesByType[idName]]
 
