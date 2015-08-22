@@ -41,7 +41,7 @@ class ParticleInfo(bpy.types.Node, AnimationNode):
         if usedOutputs["lifetime"]: lines.append("    lifetime = particle.lifetime")
         if usedOutputs["birthTime"]: lines.append("    birthTime = particle.birth_time")
         if usedOutputs["dieTime"]: lines.append("    dieTime = particle.die_time")
-        if usedOutputs["age"]: lines.append("    age = max(0, scene.frame_current - particle.birth_time)")
+        if usedOutputs["age"]: lines.append("    age = max(0, bpy.context.scene.frame_current - particle.birth_time)")
         if usedOutputs["previousLocation"]: lines.append("    previousLocation = particle.prev_location")
         if usedOutputs["previousRotation"]: lines.append("    previousRotation = mathutils.Vector(particle.prev_rotation.to_euler())")
         if usedOutputs["previousVelocity"]: lines.append("    previousVelocity = particle.prev_velocity")
