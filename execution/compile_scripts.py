@@ -1,9 +1,9 @@
 import sys
 from .. import problems
 
-def compileScript(script):
+def compileScript(script, name = "<string>"):
     try:
-        return compile(script, "<string>", "exec")
+        return compile(script, name, "exec")
     except SyntaxError:
         exc_type, exc_value, exc_traceback = sys.exc_info()
         lineNumber = exc_value.lineno

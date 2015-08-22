@@ -1,3 +1,4 @@
+import sys, traceback
 from .. import problems
 from . node_sorting import sortNodes
 from . compile_scripts import compileScript
@@ -34,7 +35,12 @@ class MainExecutionUnit:
         self.execute = self.raiseNotSetupException
 
     def executeUnit(self):
-        exec(self.executeCodeObject, self.executionData, self.executionData)
+        try:
+            exec(self.executeCodeObject, self.executionData, self.executionData)
+        except:
+            print("\n"*5)
+            traceback.print_exc()
+            problems.report(message = "Error during execution (see console)", forbidExecution = True)
 
 
     def getCode(self):
@@ -63,8 +69,8 @@ class MainExecutionUnit:
         return "\n".join(lines)
 
     def compileScripts(self):
-        self.setupCodeObject = compileScript(self.setupScript)
-        self.executeCodeObject = compileScript(self.executeScript)
+        self.setupCodeObject = compileScript(self.setupScript, name = "setup: {}".format(repr(self.network.treeName)))
+        self.executeCodeObject = compileScript(self.executeScript, name = "execution: {}".format(repr(self.network.treeName)))
 
 
     def raiseNotSetupException(self, *args, **kwargs):

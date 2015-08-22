@@ -81,7 +81,7 @@ class GroupExecutionUnit(SubprogramExecutionUnit):
         return "return " + returnList
 
     def compileScript(self):
-        self.setupCodeObject = compileScript(self.setupScript)
+        self.setupCodeObject = compileScript(self.setupScript, name = "group: {}".format(repr(self.network.name)))
 
 
     def raiseNotSetupException(self):
