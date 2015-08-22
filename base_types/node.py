@@ -88,9 +88,9 @@ class AnimationNode:
         if self.inInvalidNetwork: layout.label("Invalid Network", icon = "ERROR")
         self.draw(layout)
 
-    def functionOperator(self, layout, functionName, text = "", icon = "NONE", description = "", data = None):
+    def functionOperator(self, layout, functionName, text = "", icon = "NONE", description = "", data = None, emboss = True):
         idName = getNodeFunctionCallOperatorName(description)
-        props = layout.operator(idName, text = text, icon = icon)
+        props = layout.operator(idName, text = text, icon = icon, emboss = emboss)
         props.nodeTreeName = self.id_data.name
         props.nodeName = self.name
         props.functionName = functionName
@@ -131,6 +131,12 @@ class AnimationNode:
         state = not getattr(self.sockets[0].display, name)
         for socket in self.sockets:
             setattr(socket.display, name, state)
+
+    def chooseSocketDataType(self, callback, socketGroup = "ALL"):
+        bpy.ops.an.choose_socket_type("INVOKE_DEFAULT",
+            nodeIdentifier = self.identifier,
+            socketGroup = socketGroup,
+            callback = callback)
 
     @property
     def nodeTree(self):

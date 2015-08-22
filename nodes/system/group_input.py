@@ -4,6 +4,7 @@ from ... events import networkChanged
 from ... base_types.node import AnimationNode
 from . utils import updateCallerNodes
 from . subprogram_sockets import SubprogramData
+from ... sockets.info import toIdName
 
 class GroupInput(bpy.types.Node, AnimationNode):
     bl_idname = "an_GroupInput"
@@ -40,18 +41,20 @@ class GroupInput(bpy.types.Node, AnimationNode):
             socket.drawInput(box, self, socket.getDisplayedName())
 
     def drawNewParameterSocket(self, layout):
-        self.functionOperator(layout, "adf", text = "New Parameter")
+        self.functionOperator(layout, "chooseNewParameterType", text = "New Parameter", emboss = False)
+
+    def chooseNewParameterType(self):
+        self.chooseSocketDataType("newParameter")
 
     def edit(self):
         for target in self.newParameterSocket.dataTargetSockets:
             if target.dataType == "Node Control": continue
-            socket = self.newParameter(target.bl_idname, target.getDisplayedName(), target.getStoreableValue())
+            socket = self.newParameter(target.dataType, target.getDisplayedName(), target.getStoreableValue())
             socket.linkWith(target)
-            socket.moveUp()
         self.newParameterSocket.removeConnectedLinks()
 
-    def newParameter(self, idName, name, defaultValue = None):
-        socket = self.outputs.new(idName, name, "parameter")
+    def newParameter(self, dataType, name = "Socket", defaultValue = None):
+        socket = self.outputs.new(toIdName(dataType), name, "parameter")
         if defaultValue is not None: socket.setStoreableValue(defaultValue)
         socket.customName = name
         socket.moveable = True
@@ -60,6 +63,7 @@ class GroupInput(bpy.types.Node, AnimationNode):
         socket.nameSettings.editable = True
         socket.display.customNameInput = True
         socket.display.removeOperator = True
+        socket.moveUp()
         return socket
 
     def socketChanged(self):
