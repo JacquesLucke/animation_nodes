@@ -23,7 +23,8 @@ class DataInput(bpy.types.Node, AnimationNode):
         self.functionOperator(col, "assignSelectedType", text = "Assign", description = "Remove all sockets and set the selected socket type")
 
     def getExecutionCode(self):
-        return "output = input"
+        # needs no execut
+        return []
 
     def assignSelectedType(self):
         self.assignSocketType(self.selectedType)
@@ -37,10 +38,10 @@ class DataInput(bpy.types.Node, AnimationNode):
         self.outputs.clear()
 
         idName = toIdName(self.assignedType)
-        socket = self.inputs.new(idName, "Input", "input")
+        socket = self.inputs.new(idName, "Input", "value")
         socket.dataIsModified = True
         self.setupSocket(socket)
-        socket = self.outputs.new(idName, "Output", "output")
+        socket = self.outputs.new(idName, "Output", "value")
         self.setupSocket(socket)
 
     def setupSocket(self, socket):

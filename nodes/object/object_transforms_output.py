@@ -20,7 +20,7 @@ class an_ObjectTransformsOutput(bpy.types.Node, AnimationNode):
         self.inputs.new("an_VectorSocket", "Location", "location")
         self.inputs.new("an_VectorSocket", "Rotation", "rotation")
         self.inputs.new("an_VectorSocket", "Scale", "scale").value = (1, 1, 1)
-        self.outputs.new("an_ObjectSocket", "Object", "outObject")
+        self.outputs.new("an_ObjectSocket", "Object", "object")
         self.updateSocketVisibility()
 
     def draw(self, layout):
@@ -80,6 +80,4 @@ class an_ObjectTransformsOutput(bpy.types.Node, AnimationNode):
                    useRot[0], useRot[1], useRot[2],
                    useScale[0], useScale[1], useScale[2])):
             lines = []
-
-        lines.append("outObject = object")
         return lines

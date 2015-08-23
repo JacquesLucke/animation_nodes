@@ -117,10 +117,16 @@ def replace_DollarSign_OutputSocketVariable(line, node, socketVariables):
 ##########################################
 
 def linkOutputSocketsToTargets(node, socketVariables):
+    resolveInnerLinks(node, socketVariables)
     lines = []
     for socket in node.linkedOutputs:
         lines.extend(linkSocketToTargets(socket, socketVariables))
     return lines
+
+def resolveInnerLinks(node, socketVariables):
+    inputs, outputs = node.inputsByIdentifier, node.outputsByIdentifier
+    for inputName, outputName in node.innerLinks:
+        socketVariables[outputs[outputName]] = socketVariables[inputs[inputName]]
 
 def linkSocketToTargets(socket, socketVariables):
     lines = []

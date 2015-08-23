@@ -30,8 +30,7 @@ class AppendListNode(bpy.types.Node, AnimationNode):
             description = "Remove all sockets and set the selected socket type")
 
     def getExecutionCode(self):
-        return ("outList = inList",
-                "outList.append(element)")
+        return ("list.append(element)")
 
     def edit(self):
         baseDataType = self.getWantedDataType()
@@ -59,6 +58,6 @@ class AppendListNode(bpy.types.Node, AnimationNode):
     def generateSockets(self):
         self.inputs.clear()
         self.outputs.clear()
-        self.inputs.new(self.listIdName, "List", "inList").dataIsModified  = True
+        self.inputs.new(self.listIdName, "List", "list").dataIsModified  = True
         self.inputs.new(self.baseIdName, "Element", "element").dataIsModified = True
-        self.outputs.new(self.listIdName, "List", "outList")
+        self.outputs.new(self.listIdName, "List", "list")

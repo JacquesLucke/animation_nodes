@@ -100,8 +100,9 @@ class ChangeSubprogram(bpy.types.Operator):
         return len(networks) > 0
 
     def invoke(self, context, event):
-        node = getNodeByIdentifier(self.nodeIdentifier)
-        try: self.subprogram = node.subprogramIdentifier
+        try:
+            node = getNodeByIdentifier(self.nodeIdentifier)
+            self.subprogram = node.subprogramIdentifier
         except: pass # when the old subprogram identifier doesn't exist
         return context.window_manager.invoke_props_dialog(self, width = 400)
 

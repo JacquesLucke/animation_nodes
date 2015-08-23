@@ -7,6 +7,7 @@ from bpy.app.handlers import persistent
 from . node_function_call import getNodeFunctionCallOperatorName
 from .. utils.nodes import getAnimationNodeTrees
 from .. tree_info import getNetworkWithNode
+from collections import defaultdict
 
 class AnimationNode:
     isAnimationNode = True
@@ -64,6 +65,12 @@ class AnimationNode:
         to know what happened exactly to the sockets
         """
         pass
+
+    def getExecutionCode(self):
+        return []
+
+    def getModuleList(self):
+        return []
 
 
     # Don't override these functions
@@ -195,8 +202,18 @@ class AnimationNode:
     def outputNames(self):
         return {socket.identifier : socket.identifier for socket in self.outputs}
 
-    def getModuleList(self):
-        return []
+    @property
+    def innerLinks(self):
+        names = defaultdict(list)
+        for identifier, inputName in self.inputNames.items():
+            names[inputName].append(identifier)
+        for identifier, outputName in self.outputNames.items():
+            names[outputName].append(identifier)
+
+        links = []
+        for name, identifiers in names.items():
+            if len(identifiers) == 2: links.append(identifiers)
+        return links
 
     def getExecutionCodeString(self):
         code = self.getExecutionCode()
@@ -239,7 +256,7 @@ def tagVariableName(code, name, tag):
     Find all occurences of 'name' in 'code' and set 'tag' before and after it.
     The occurence must not have a dot before it.
     """
-    code = re.sub(r"([^\.\"']|^)\b({})\b".format(name), r"\1{0}\2{0}".format(tag), code)
+    code = re.sub(r"([^\.\"\%']|^)\b({})\b".format(name), r"\1{0}\2{0}".format(tag), code)
     return code
 
 @persistent
