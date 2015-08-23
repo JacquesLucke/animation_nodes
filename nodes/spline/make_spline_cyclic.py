@@ -6,7 +6,9 @@ class MakeSplineCyclic(bpy.types.Node, AnimationNode):
     bl_label = "Make Spline Cyclic"
 
     def create(self):
-        self.inputs.new("an_SplineSocket", "Spline", "spline").showName = False
+        socket = self.inputs.new("an_SplineSocket", "Spline", "spline")
+        socket.dataIsModified = True
+        socket.showName = False
         self.inputs.new("an_BooleanSocket", "Cyclic", "cylic").value = True
         self.outputs.new("an_SplineSocket", "Spline", "outSpline")
 

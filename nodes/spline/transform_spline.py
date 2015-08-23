@@ -6,7 +6,9 @@ class TransformSpline(bpy.types.Node, AnimationNode):
     bl_label = "Transform Spline"
 
     def create(self):
-        self.inputs.new("an_SplineSocket", "Spline", "spline").showName = False
+        socket = self.inputs.new("an_SplineSocket", "Spline", "spline")
+        socket.dataIsModified = True
+        socket.showName = False
         self.inputs.new("an_MatrixSocket", "Transformation", "matrix")
         self.outputs.new("an_SplineSocket", "Spline", "outSpline")
 

@@ -6,7 +6,9 @@ class SmoothBezierSpline(bpy.types.Node, AnimationNode):
     bl_label = "Smooth Bezier Spline"
 
     def create(self):
-        self.inputs.new("an_SplineSocket", "Spline", "spline").showObjectInput = False
+        socket = self.inputs.new("an_SplineSocket", "Spline", "spline")
+        socket.showObjectInput = False
+        socket.dataIsModified = True
         self.inputs.new("an_FloatSocket", "Smoothness", "smoothness").value = 0.3333
         self.outputs.new("an_SplineSocket", "Spline", "outSpline")
 

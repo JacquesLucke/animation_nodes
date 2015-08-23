@@ -19,7 +19,7 @@ class AppendPointToSpline(bpy.types.Node, AnimationNode):
     pointType = EnumProperty(name = "Point Type", default = "POINT", items = pointTypeItems, update = settingChanged)
 
     def create(self):
-        self.inputs.new("an_SplineSocket", "Spline", "spline")
+        self.inputs.new("an_SplineSocket", "Spline", "spline").dataIsModified = True
         self.inputs.new("an_VectorSocket", "Point", "point")
         self.inputs.new("an_VectorSocket", "Left Handle", "leftHandle")
         self.inputs.new("an_VectorSocket", "Right Handle", "rightHandle")
