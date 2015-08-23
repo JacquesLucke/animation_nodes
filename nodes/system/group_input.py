@@ -1,10 +1,10 @@
 import bpy
 from bpy.props import *
+from . utils import updateCallerNodes
+from ... sockets.info import toIdName
 from ... events import networkChanged
 from ... base_types.node import AnimationNode
-from . utils import updateCallerNodes
 from . subprogram_sockets import SubprogramData
-from ... sockets.info import toIdName
 
 class GroupInput(bpy.types.Node, AnimationNode):
     bl_idname = "an_GroupInput"
