@@ -65,7 +65,7 @@ class MainExecutionUnit:
         lines = []
         for node in nodes:
             lines.extend(getNodeExecutionLines(node, socketVariables))
-            linkOutputSocketsToTargets(node, socketVariables)
+            lines.extend(linkOutputSocketsToTargets(node, socketVariables))
         return "\n".join(lines)
 
     def compileScripts(self):

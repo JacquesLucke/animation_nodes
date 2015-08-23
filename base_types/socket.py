@@ -30,9 +30,10 @@ class AnimationNodeSocket:
     display = PointerProperty(type = SocketEditDisplayProperties)
 
     removeable = BoolProperty(default = False)
-
     moveGroup = IntProperty(default = 0)
     moveable = BoolProperty(default = False)
+
+    dataIsModified = BoolProperty(default = False)
 
     def draw(self, context, layout, node, text):
         displayText = self.getDisplayedName()
@@ -201,6 +202,10 @@ class AnimationNodeSocket:
     @property
     def directOriginSocket(self):
         return getDirectOriginSocket(self)
+
+    @property
+    def isCopyable(self):
+        return hasattr(self, "getCopyStatement")
 
 
 

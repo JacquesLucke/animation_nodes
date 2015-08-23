@@ -64,15 +64,15 @@ class GroupExecutionUnit(SubprogramExecutionUnit):
 
         parameterList = ", ".join([socketVariables[socket] for socket in inputNode.sockets[:-1]])
         header = "def main({}):".format(parameterList)
-        linkOutputSocketsToTargets(inputNode, socketVariables)
         return header
 
     def getExecutionScriptLines(self, nodes, socketVariables):
         lines = []
+        lines.extend(linkOutputSocketsToTargets(self.network.groupInputNode, socketVariables))
         for node in nodes:
             if node.bl_idname in ("an_GroupInput", "an_GroupOutput"): continue
             lines.extend(getNodeExecutionLines(node, socketVariables))
-            linkOutputSocketsToTargets(node, socketVariables)
+            lines.extend(linkOutputSocketsToTargets(node, socketVariables))
         return lines
 
     def getReturnStatement(self, outputNode, socketVariables):

@@ -79,6 +79,7 @@ class CreateList(bpy.types.Node, AnimationNode):
 
     def newInputSocket(self):
         socket = self.inputs.new(self.baseIdName, "Element")
+        socket.dataIsModified = True
         socket.displayCustomName = True
         socket.customName = "Element"
         socket.removeable = True

@@ -107,9 +107,30 @@ def replace_DollarSign_OutputSocketVariable(line, node, socketVariables):
 ##########################################
 
 def linkOutputSocketsToTargets(node, socketVariables):
+    lines = []
     for socket in node.linkedOutputs:
-        linkSocketToTargets(socket, socketVariables)
+        lines.extend(linkSocketToTargets(socket, socketVariables))
+    return lines
 
 def linkSocketToTargets(socket, socketVariables):
+    lines = []
+
+    targets = socket.dataTargetSockets
+    needACopy = getTargetsThatNeedACopy(socket, targets)
+
     for target in socket.dataTargetSockets:
-        socketVariables[target] = socketVariables[socket]
+        if target in needACopy:
+            copyStatement = socket.getCopyStatement().replace("value", socketVariables[socket])
+            copyCode = "{} = {}".format(socketVariables[target], copyStatement)
+            lines.append(copyCode)
+        else:
+            socketVariables[target] = socketVariables[socket]
+
+    return lines
+
+def getTargetsThatNeedACopy(socket, targets):
+    if not socket.isCopyable: return []
+    if len(targets) == 1: return []
+    modifiedTargets = [target for target in targets if target.dataIsModified]
+    if len(targets) > len(modifiedTargets): return modifiedTargets
+    else: return modifiedTargets[1:]
