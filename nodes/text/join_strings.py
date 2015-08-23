@@ -11,4 +11,4 @@ class JoinStrings(bpy.types.Node, AnimationNode):
         self.outputs.new("an_StringSocket", "Text", "text")
 
     def getExecutionCode(self):
-        return "$text$ = %separator%.join(%texts%)"
+        return "text = separator.join(texts)"
