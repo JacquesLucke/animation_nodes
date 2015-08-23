@@ -4,10 +4,12 @@ from . main_execution_unit import MainExecutionUnit
 from . group_execution_unit import GroupExecutionUnit
 from .. tree_info import getNetworksByType, getSubprogramNetworks
 from .. import problems
+from .. utils.timing import measureTime
 
 _mainUnitsByNodeTree = defaultdict(list)
 _subprogramUnitsByIdentifier = {}
 
+@measureTime
 def createExecutionUnits():
     reset()
     try:
