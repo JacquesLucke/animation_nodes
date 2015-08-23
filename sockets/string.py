@@ -27,7 +27,7 @@ class StringSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         if self.useEnum:
             self.value = self.stringEnum
 
-    value = StringProperty(default = "", update = propertyChanged)
+    value = StringProperty(default = "", update = propertyChanged, options = {"TEXTEDIT_UPDATE"})
     showName = BoolProperty(default = True)
 
     stringEnum = EnumProperty(name = "Possible Items",
