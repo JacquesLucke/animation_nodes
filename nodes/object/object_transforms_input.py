@@ -12,7 +12,6 @@ frameTypes = [
 class ObjectTransformsInput(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectTransformsInput"
     bl_label = "Object Transforms Input"
-    outputUseParameterName = "usedOutputs"
 
     frameType = EnumProperty(
         name = "Frame Type", default = "OFFSET",
