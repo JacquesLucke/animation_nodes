@@ -35,7 +35,7 @@ class GroupInput(bpy.types.Node, AnimationNode):
         col.prop(self, "subprogramDescription", text = "")
 
         col = layout.column()
-        col.label("Socket Defaults:")
+        col.label("Parameter Defaults:")
         box = col.box()
         for socket in list(self.outputs)[:-1]:
             socket.drawInput(box, self, socket.getDisplayedName())

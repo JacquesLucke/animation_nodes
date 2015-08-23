@@ -21,7 +21,7 @@ def enumItemsFromDicts(function):
     return wrapper
 
 def enumItemsFromList(function):
-    def wrapper(self, context):
+    def wrapper(self = None, context = None):
         items = []
         for element in function(self, context):
             items.append((element, element, "", "NONE", hashText(element)))
