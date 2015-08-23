@@ -109,12 +109,18 @@ class NodeNetworks:
 
         networksByIdentifier = defaultdict(list)
         for nodes in nodeGroups:
+            if not self.groupContainsAnimationNodes(nodes): continue
             network = NodeNetwork(nodes)
             networksByIdentifier[network.identifier].append(network)
 
         for identifier, networks in networksByIdentifier.items():
             if identifier is None: self.networks.extend(networks)
             else: self.networks.append(NodeNetwork.join(networks))
+
+    def groupContainsAnimationNodes(self, nodes):
+        for node in nodes:
+            if _data.typeByNode[node] not in ("NodeFrame", "NodeReroute"): return True
+        return False
 
     def getNodeGroups(self):
         groups = []
@@ -161,23 +167,16 @@ class NodeNetwork:
     def analyse(self):
         groupInputs = []
         groupOutputs = []
-        containsNodeFrame = False
-
         for nodeID in self.nodeIDs:
             if nodeID in _data.nodesByType["an_GroupInput"]:
                 groupInputs.append(nodeID)
             if nodeID in _data.nodesByType["an_GroupOutput"]:
                 groupOutputs.append(nodeID)
-            if nodeID in _data.nodesByType["NodeFrame"]:
-                containsNodeFrame = True
-                break
 
         groupInAmount = len(groupInputs)
         groupOutAmount = len(groupOutputs)
 
-        if containsNodeFrame:
-            self.type = "Invalid"
-        elif groupInAmount == 0 and groupOutAmount == 0:
+        if groupInAmount == 0 and groupOutAmount == 0:
             self.type = "Main"
         elif groupInAmount > 1 or groupOutAmount > 1:
             self.type = "Invalid"
