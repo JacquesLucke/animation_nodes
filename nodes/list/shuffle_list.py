@@ -20,8 +20,7 @@ class ShuffleListNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         return ("random.seed(seed)",
-                "shuffledList = inList",
-                "random.shuffle(shuffledList)")
+                "random.shuffle(list)")
 
     def getModuleList(self):
         return ["random"]
@@ -47,6 +46,6 @@ class ShuffleListNode(bpy.types.Node, AnimationNode):
     def generateSockets(self):
         self.inputs.clear()
         self.outputs.clear()
-        self.inputs.new(self.listIdName, "List", "inList").dataIsModified = True
+        self.inputs.new(self.listIdName, "List", "list").dataIsModified = True
         self.inputs.new("an_IntegerSocket", "Seed", "seed")
-        self.outputs.new(self.listIdName, "Shuffled List", "shuffledList")
+        self.outputs.new(self.listIdName, "Shuffled List", "list")
