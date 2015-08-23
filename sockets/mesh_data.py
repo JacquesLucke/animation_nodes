@@ -15,5 +15,5 @@ class MeshDataSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getValue(self):
         return MeshData([], [], [])
 
-    def getCopyValueFunctionString(self):
-        return "return value.copy()"
+    def getCopyStatement(self):
+        return "value.copy()"

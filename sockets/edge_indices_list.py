@@ -14,5 +14,5 @@ class EdgeIndicesListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getValue(self):
         return []
 
-    def getCopyValueFunctionString(self):
-        return "return [edgeIndices[:] for edgeIndices in value]"
+    def getCopyStatement(self):
+        return "[edgeIndices[:] for edgeIndices in value]"

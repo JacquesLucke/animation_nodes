@@ -14,5 +14,5 @@ class MatrixListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getValue(self):
         return []
 
-    def getCopyValueFunctionString(self):
-        return "return [element.copy() for element in value]"
+    def getCopyStatement(self):
+        return "[element.copy() for element in value]"

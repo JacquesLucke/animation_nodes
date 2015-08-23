@@ -14,5 +14,5 @@ class EdgeIndicesSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getValue(self):
         return (0, 1)
 
-    def getCopyValueFunctionString(self):
-        return "return value[:]"
+    def getCopyStatement(self):
+        return "value[:]"

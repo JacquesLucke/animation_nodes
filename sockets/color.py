@@ -27,5 +27,5 @@ class ColorSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getStoreableValue(self):
         return self.value
 
-    def getCopyValueFunctionString(self):
-        return "return value[:]"
+    def getCopyStatement(self):
+        return "value[:]"

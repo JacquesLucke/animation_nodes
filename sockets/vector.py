@@ -31,8 +31,8 @@ class VectorSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getStoreableValue(self):
         return self.value[:]
 
-    def getCopyValueFunctionString(self):
-        return "return value.copy()"
+    def getCopyStatement(self):
+        return "value.copy()"
 
     def toString(self):
         if self.showName: return self.getDisplayedName()
