@@ -5,7 +5,6 @@ from . spline_evaluation_base import SplineEvaluationBase
 class GetSplineSamples(bpy.types.Node, AnimationNode, SplineEvaluationBase):
     bl_idname = "an_GetSplineSamples"
     bl_label = "Get Spline Samples"
-    outputUseParameterName = "usedOutputs"
 
     def create(self):
         self.inputs.new("an_SplineSocket", "Spline", "spline")
@@ -27,15 +26,22 @@ class GetSplineSamples(bpy.types.Node, AnimationNode, SplineEvaluationBase):
         col.active = self.parameterType == "UNIFORM"
         col.prop(self, "resolution")
 
-    def execute(self, usedOutputs, spline, amount, start, end):
-        spline.update()
-        positions = []
-        tangents = []
-        if spline.isEvaluable:
-            if usedOutputs["Positions"]:
-                if self.parameterType == "UNIFORM": positions = spline.getUniformSamples(amount, start = start, end = end, resolution = self.resolution)
-                else: positions = spline.getSamples(amount, start = start, end = end)
-            if usedOutputs["Tangents"]:
-                if self.parameterType == "UNIFORM": tangents = spline.getUniformTangentSamples(amount, start = start, end = end, resolution = self.resolution)
-                else: tangents = spline.getTangentSamples(amount, start = start, end = end)
-        return positions, tangents
+    def getExecutionCode(self):
+        usedOutputs = self.getUsedOutputsDict()
+        if not (usedOutputs["positions"] or usedOutputs["tangents"]): return []
+
+        lines = []
+        add = lines.append
+        add("spline.update()")
+        add("if spline.isEvaluable:")
+
+        if self.parameterType == "UNIFORM":
+            if usedOutputs["positions"]: add("    positions = spline.getUniformSamples(amount, start, end, self.resolution)")
+            if usedOutputs["tangents"]: add("    tangents = spline.getUniformTangentSamples(amount, start, end, self.resolution)")
+        elif self.parameterType == "RESOLUTION":
+            if usedOutputs["positions"]: add("    positions = spline.getSamples(amount, start, end)")
+            if usedOutputs["tangents"]: add("    tangents = spline.getTangentSamples(amount, start, end)")
+
+        add("else: positions, tangents = [], []")
+
+        return lines

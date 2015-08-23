@@ -1,5 +1,5 @@
 from bpy.props import *
-from ... events import propertyChanged
+from ... events import propertyChanged, executionCodeChanged
 
 parameterTypeItems = [
     ("RESOLUTION", "Resolution", ""),
@@ -7,11 +7,15 @@ parameterTypeItems = [
 
 class SplineEvaluationBase:
 
+    def parameterTypeChanged(self, context):
+        propertyChanged()
+        executionCodeChanged()
+
     parameterType = EnumProperty(
         name = "Parameter Type",
         default = "UNIFORM",
         items = parameterTypeItems,
-        update = propertyChanged)
+        update = parameterTypeChanged)
 
     resolution = IntProperty(
         name = "Resolution",
