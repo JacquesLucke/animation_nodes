@@ -232,8 +232,8 @@ class AnimationNode:
         outputNames = self.outputNames
 
         if hasattr(self, "execute"):
-            keywordParameters = ["%{0}%".format(inputNames[socket.identifier]) for socket in self.inputs]
-            parameterString = ", ".join(keywordParameters)
+            parameters = ["%{0}%".format(inputNames[socket.identifier]) for socket in self.inputs]
+            parameterString = ", ".join(parameters)
 
             executionString = "#self#.execute(" + parameterString + ")"
 
