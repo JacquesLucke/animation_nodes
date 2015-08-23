@@ -74,6 +74,16 @@ def get_GetSocketValues(nodes, socketVariables):
 # Node Execution Code
 ##########################################
 
+def getInputCopySocketValuesLines(nodes, socketVariables):
+    lines = []
+    for node in nodes:
+        for socket in node.inputs:
+            if socket.dataIsModified and socket.isCopyable and socket.isUnlinked:
+                newName = socketVariables[socket] + "_copy"
+                lines.append(getCopyLine(socket, newName, socketVariables))
+                socketVariables[socket] = newName
+    return lines
+
 def getNodeExecutionLines(node, socketVariables):
     lines = ["\n", "# Node: {} - {}".format(repr(node.nodeTree.name), repr(node.name))]
     taggedLines = node.getTaggedExecutionCodeLines()
@@ -120,9 +130,7 @@ def linkSocketToTargets(socket, socketVariables):
 
     for target in socket.dataTargetSockets:
         if target in needACopy:
-            copyStatement = socket.getCopyStatement().replace("value", socketVariables[socket])
-            copyCode = "{} = {}".format(socketVariables[target], copyStatement)
-            lines.append(copyCode)
+            lines.append(getCopyLine(socket, socketVariables[target], socketVariables))
         else:
             socketVariables[target] = socketVariables[socket]
 
@@ -134,3 +142,8 @@ def getTargetsThatNeedACopy(socket, targets):
     modifiedTargets = [target for target in targets if target.dataIsModified]
     if len(targets) > len(modifiedTargets): return modifiedTargets
     else: return modifiedTargets[1:]
+
+def getCopyLine(fromSocket, targetName, socketVariables):
+    copyStatement = fromSocket.getCopyStatement().replace("value", socketVariables[fromSocket])
+    copyCode = "{} = {}".format(targetName, copyStatement)
+    return copyCode

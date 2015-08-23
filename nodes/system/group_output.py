@@ -53,6 +53,7 @@ class GroupOutput(bpy.types.Node, AnimationNode):
 
     def newReturn(self, dataType, name = "Socket"):
         socket = self.inputs.new(toIdName(dataType), name, "return")
+        socket.dataIsModified = True
         socket.customName = name
         socket.moveable = True
         socket.removeable = True
