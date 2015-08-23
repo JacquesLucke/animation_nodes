@@ -1,4 +1,5 @@
 import bpy
+from mathutils import Vector
 from .. data_structures.mesh import Vertex
 from .. base_types.socket import AnimationNodeSocket
 
@@ -13,4 +14,10 @@ class VertexSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         layout.label(text)
 
     def getValue(self):
-        return Vertex()
+        return Vertex(
+            location = Vector((0, 0, 0)),
+            normal = Vector((0, 0, 1)),
+            groupWeights = [])
+
+    def getCopyStatement(self):
+        return "value.copy()"

@@ -6,7 +6,7 @@ class VertexInfo(bpy.types.Node, AnimationNode):
     bl_label = "Vertex Info"
 
     def create(self):
-        self.inputs.new("an_VertexSocket", "Vertex", "vertex")
+        self.inputs.new("an_VertexSocket", "Vertex", "vertex").dataIsModified = True
         self.outputs.new("an_VectorSocket", "Location", "location")
         self.outputs.new("an_VectorSocket", "Normal", "normal")
         self.outputs.new("an_FloatListSocket", "Group Weights", "groupWeights")

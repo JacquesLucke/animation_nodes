@@ -7,7 +7,7 @@ class TransformPolygon(bpy.types.Node, AnimationNode):
     bl_label = "Transform Polygon"
 
     def create(self):
-        self.inputs.new("an_PolygonSocket", "Polygon", "polygon")
+        self.inputs.new("an_PolygonSocket", "Polygon", "polygon").dataIsModified = True
         self.inputs.new("an_MatrixSocket", "Matrix", "matrix")
         self.outputs.new("an_PolygonSocket", "Polygon", "outPolygon")
 

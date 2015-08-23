@@ -6,7 +6,7 @@ class TransformVertex(bpy.types.Node, AnimationNode):
     bl_label = "Transform Vertex"
 
     def create(self):
-        self.inputs.new("an_VertexSocket", "Vertex", "vertex")
+        self.inputs.new("an_VertexSocket", "Vertex", "vertex").dataIsModified = True
         self.inputs.new("an_MatrixSocket", "Matrix", "matrix")
         self.outputs.new("an_VertexSocket", "Vertex", "outVertex")
 

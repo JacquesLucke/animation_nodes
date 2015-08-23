@@ -19,10 +19,10 @@ class CombineMeshData(bpy.types.Node, AnimationNode):
     sourceType = EnumProperty(items = sourceTypeItems, default = "MESH_DATA", name = "Source Type", update = sourceTypeChanged)
 
     def create(self):
-        self.inputs.new("an_VectorListSocket", "Vertex Locations", "vertexLocations")
-        self.inputs.new("an_EdgeIndicesListSocket", "Edges Indices", "edgesIndices")
-        self.inputs.new("an_PolygonIndicesListSocket", "Polygons Indices", "polygonsIndices")
-        self.inputs.new("an_PolygonListSocket", "Polygons", "polygons")
+        self.inputs.new("an_VectorListSocket", "Vertex Locations", "vertexLocations").dataIsModified = True
+        self.inputs.new("an_EdgeIndicesListSocket", "Edges Indices", "edgesIndices").dataIsModified = True
+        self.inputs.new("an_PolygonIndicesListSocket", "Polygons Indices", "polygonsIndices").dataIsModified = True
+        self.inputs.new("an_PolygonListSocket", "Polygons", "polygons").dataIsModified = True
         self.updateHideStatus()
         self.outputs.new("an_MeshDataSocket", "Mesh Data", "meshData")
 

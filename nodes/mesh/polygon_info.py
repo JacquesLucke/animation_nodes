@@ -6,7 +6,8 @@ class PolygonInfo(bpy.types.Node, AnimationNode):
     bl_label = "Polygon Info"
 
     def create(self):
-        self.inputs.new("an_PolygonSocket", "Polygon", "polygon")
+        # can be modified when another node modifies the center or normal vector
+        self.inputs.new("an_PolygonSocket", "Polygon", "polygon").dataIsModified = True
         self.outputs.new("an_VectorSocket", "Center", "center")
         self.outputs.new("an_VectorSocket", "Normal", "normal")
         self.outputs.new("an_VectorSocket", "Material Index", "materialIndex")

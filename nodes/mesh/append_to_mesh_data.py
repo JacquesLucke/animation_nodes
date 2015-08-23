@@ -3,11 +3,11 @@ from ... base_types.node import AnimationNode
 
 class AppendToMeshData(bpy.types.Node, AnimationNode):
     bl_idname = "an_AppendToMeshData"
-    bl_label = "Append Mesh Data"         
+    bl_label = "Append Mesh Data"
 
     def create(self):
-        self.inputs.new("an_MeshDataSocket", "Mesh Data", "meshDataA")
-        self.inputs.new("an_MeshDataSocket", "Other", "meshDataB")
+        self.inputs.new("an_MeshDataSocket", "Mesh Data", "meshDataA").dataIsModified = True
+        self.inputs.new("an_MeshDataSocket", "Other", "meshDataB").dataIsModified = True
         self.outputs.new("an_MeshDataSocket", "Joined Mesh Data", "joinedMeshData")
 
     def execute(self, meshDataA, meshDataB):

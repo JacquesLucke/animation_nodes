@@ -10,7 +10,7 @@ class MeshRecalculateFaceNormals(bpy.types.Node, AnimationNode):
     invert = BoolProperty(name = "Invert Normals", update = propertyChanged)
 
     def create(self):
-        self.inputs.new("an_MeshSocket", "Mesh", "bm")
+        self.inputs.new("an_MeshSocket", "Mesh", "bm").dataIsModified = True
         self.outputs.new("an_MeshSocket", "Mesh", "mesh")
 
     def draw(self, layout):

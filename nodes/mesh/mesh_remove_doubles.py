@@ -7,7 +7,7 @@ class MeshRemoveDoubles(bpy.types.Node, AnimationNode):
     bl_label = "Mesh Remove Doubles"
 
     def create(self):
-        self.inputs.new("an_MeshSocket", "Mesh", "bm")
+        self.inputs.new("an_MeshSocket", "Mesh", "bm").dataIsModified = True
         socket = self.inputs.new("an_FloatSocket", "Distance", "distance")
         socket.value = 0.0001
         socket.setMinMax(0.0, 10000.0)
