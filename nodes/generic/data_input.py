@@ -38,6 +38,7 @@ class DataInput(bpy.types.Node, AnimationNode):
 
         idName = toIdName(self.assignedType)
         socket = self.inputs.new(idName, "Input", "input")
+        socket.dataIsModified = True
         self.setupSocket(socket)
         socket = self.outputs.new(idName, "Output", "output")
         self.setupSocket(socket)

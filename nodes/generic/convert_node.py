@@ -18,7 +18,7 @@ class ConvertNode(bpy.types.Node, AnimationNode):
     targetIdName = StringProperty()
 
     def create(self):
-        self.inputs.new("an_GenericSocket", "Old", "old")
+        self.inputs.new("an_GenericSocket", "Old", "old").dataIsModified = True
         self.selectedType = "String"
         self.assignedType = "String"
 

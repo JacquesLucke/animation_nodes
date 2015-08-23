@@ -72,6 +72,7 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
     def newInputSocket(self, dataType):
         name = self.getNewSocketName()
         socket = self.inputs.new(toIdName(dataType), name, "input")
+        socket.dataIsModified = True
         socket.nameSettings.editable = True
         socket.nameSettings.variable = True
         socket.nameSettings.unique = True
