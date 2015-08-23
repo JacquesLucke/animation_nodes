@@ -2,6 +2,8 @@ import bpy
 from bpy.props import *
 from ... base_types.node import AnimationNode
 
+debugTextBlockName = "AN Debug"
+
 class DebugOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_DebugOutputNode"
     bl_label = "Debug Output"
@@ -9,7 +11,9 @@ class DebugOutputNode(bpy.types.Node, AnimationNode):
     # just a random sequence
     lineSeparator = "je2c4nw"
 
-    printDebugString = BoolProperty(default = False, description = "Print to the console")
+    printDebugString = BoolProperty(default = False, name = "Print in Console")
+    writeToTextBlock = BoolProperty(default = False, name = "Write to Text Block")
+
     showIterableInRows = BoolProperty(default = False, description = "Display individual elements in rows")
     startRow = IntProperty(default = 0, name = "Start Rows", min = 0)
     maxRowAmount = IntProperty(default = 10, name = "Maximum Rows", min = 1)
@@ -41,8 +45,8 @@ class DebugOutputNode(bpy.types.Node, AnimationNode):
         subcol.prop(self, "startRow")
         subcol.prop(self, "maxRowAmount")
 
-        layout.prop(self, "printDebugString", text = "Print")
-        layout.prop(self, "bl_width_max", text = "Max Node Width")
+        layout.prop(self, "printDebugString")
+        layout.prop(self, "writeToTextBlock")
 
     def execute(self, data):
         if self.showIterableInRows and hasattr(data, "__iter__"):
@@ -50,3 +54,14 @@ class DebugOutputNode(bpy.types.Node, AnimationNode):
         else:
             self.debugOutputString = str(data)
         if self.printDebugString: print(str(data))
+        if self.writeToTextBlock:
+            text = bpy.data.texts.get(debugTextBlockName)
+            text.write(str(data))
+            text.write("\n")
+
+
+def clearDebugTextBlock():
+    text = bpy.data.texts.get(debugTextBlockName)
+    if text is None:
+        text = bpy.data.texts.new(debugTextBlockName)
+    text.clear()

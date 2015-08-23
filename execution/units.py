@@ -5,6 +5,7 @@ from . group_execution_unit import GroupExecutionUnit
 from .. tree_info import getNetworksByType, getSubprogramNetworks
 from .. import problems
 from .. utils.timing import measureTime
+from .. nodes.generic.debug_output import clearDebugTextBlock
 
 _mainUnitsByNodeTree = defaultdict(list)
 _subprogramUnitsByIdentifier = {}
@@ -36,7 +37,6 @@ def createSubprogramUnits():
         _subprogramUnitsByIdentifier[network.identifier] = unit
 
 
-
 def setupExecutionUnits():
     if not problems.canExecute(): return
 
@@ -49,6 +49,8 @@ def setupExecutionUnits():
 
     for unit in getExecutionUnits():
         unit.insertSubprogramFunctions(subprograms)
+
+    clearDebugTextBlock()
 
 def finishExecutionUnits():
     for unit in getExecutionUnits():
