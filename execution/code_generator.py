@@ -1,6 +1,6 @@
 import os
 from collections import defaultdict
-from .. preferences import addonName
+from .. preferences import addonName, generateCompactCode
 
 
 # Initial Socket Variables
@@ -76,11 +76,15 @@ def get_GetSocketValues(nodes, socketVariables):
 ##########################################
 
 def getNodeExecutionLines(node, socketVariables):
-    lines = ["\n", "# Node: {} - {}".format(repr(node.nodeTree.name), repr(node.name))]
+    lines = []
+    if not generateCompactCode(): lines.extend(getNodeCommentLines(node))
     lines.extend(getInputCopyLines(node, socketVariables))
     taggedLines = node.getTaggedExecutionCodeLines()
     lines.extend([replaceTaggedLine(line, node, socketVariables) for line in taggedLines])
     return lines
+
+def getNodeCommentLines(node):
+    return ["\n", "# Node: {} - {}".format(repr(node.nodeTree.name), repr(node.name))]
 
 def getInputCopyLines(node, socketVariables):
     lines = []

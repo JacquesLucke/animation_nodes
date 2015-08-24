@@ -13,6 +13,10 @@ class AddonPreferences(bpy.types.AddonPreferences):
     sceneUpdateAfterAutoExecution = BoolProperty(
         name = "Scene Update After Auto Execution", default = True)
 
+    generateCompactCode = BoolProperty(
+        name = "Generate Compact Code", default = False,
+        description = "Avoid comments and blank lines (this has no impact on performance)")
+
     def draw(self, context):
         layout = self.layout
 
@@ -21,5 +25,12 @@ class AddonPreferences(bpy.types.AddonPreferences):
         col.prop(self, "redrawAllAfterAutoExecution", text = "Redraw All")
         col.prop(self, "sceneUpdateAfterAutoExecution", text = "Scene Update")
 
+        col = layout.column(align = True)
+        col.label("Execution Code:")
+        col.prop(self, "generateCompactCode")
+
 def getPreferences():
     return bpy.context.user_preferences.addons.get(addonName).preferences
+
+def generateCompactCode():
+    return getPreferences().generateCompactCode
