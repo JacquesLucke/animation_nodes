@@ -15,11 +15,12 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     objectCreationType = StringProperty(default = "")
 
     def drawInput(self, layout, node, text):
-        col = layout.column()
-        row = col.row(align = True)
-        if self.showName:
-            row.label(text)
-        row.prop_search(self, "objectName",  bpy.context.scene, "objects", icon="NONE", text = "")
+        if not self.showName: text = ""
+        self.drawAsProperty(layout, text)
+
+    def drawAsProperty(self, layout, text):
+        row = layout.row(align = True)
+        row.prop_search(self, "objectName",  bpy.context.scene, "objects", icon="NONE", text = text)
 
         if self.objectCreationType != "":
             self.functionOperator(row, "createObject", icon = "PLUS")

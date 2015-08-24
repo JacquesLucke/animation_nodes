@@ -13,6 +13,8 @@ class DataInput(bpy.types.Node, AnimationNode):
 
     selectedType = EnumProperty(name = "Type", items = getDataTypeItems)
     assignedType = StringProperty(default = "Float", update = assignedSocketChanged)
+    showInViewport = BoolProperty(default = False, name = "Show in Viewport",
+        description = "Draw the input of that node in the 'AN' category of the 3D view (Use the node label as name)")
 
     def create(self):
         self.recreateSockets()
@@ -21,6 +23,10 @@ class DataInput(bpy.types.Node, AnimationNode):
         col = layout.column(align = True)
         col.prop(self, "selectedType", text = "")
         self.functionOperator(col, "assignSelectedType", text = "Assign", description = "Remove all sockets and set the selected socket type")
+
+        col = layout.column()
+        col.active = hasattr(self.inputs[0], "drawAsProperty")
+        col.prop(self, "showInViewport")
 
     def getExecutionCode(self):
         # needs no execut

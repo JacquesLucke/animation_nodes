@@ -25,6 +25,9 @@ class IntegerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def drawInput(self, layout, node, text):
         if not self.showName: text = ""
+        self.drawAsProperty(layout, text)
+
+    def drawAsProperty(self, layout, text):
         layout.prop(self, "value", text = text)
 
     def getValue(self):

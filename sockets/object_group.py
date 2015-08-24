@@ -14,11 +14,11 @@ class ObjectGroupSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     showName = BoolProperty(default = True)
 
     def drawInput(self, layout, node, text):
-        col = layout.column()
-        row = col.row(align = True)
-        if self.showName:
-            row.label(text)
-        row.prop_search(self, "groupName", bpy.data, "groups", text = "")
+        if not self.showName: text = ""
+        self.drawAsProperty(layout, text)
+
+    def drawAsProperty(self, layout, text):
+        layout.prop_search(self, "groupName", bpy.data, "groups", text = text)
 
     def getValue(self):
         return bpy.data.groups.get(self.groupName)

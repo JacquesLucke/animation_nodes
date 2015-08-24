@@ -14,20 +14,24 @@ class SequenceSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     showName = BoolProperty(default = True)
 
     def drawInput(self, layout, node, text):
+        if not self.showName: text = ""
+        self.drawAsProperty(layout, text)
+
+    def drawAsProperty(self, layout, text):
         row = layout.row(align = True)
-        if self.showName:
-            row.label(text)
 
         editor = bpy.context.scene.sequence_editor
         if editor:
-            row.prop_search(self, "sequenceName",  editor, "sequences", icon="NLA", text = "")
+            row.prop_search(self, "sequenceName",  editor, "sequences", icon="NLA", text = text)
             self.functionOperator(row, "assignActiveSequence", icon = "EYEDROPPER")
         else:
             row.label("No Sequence Editor")
 
 
     def getValue(self):
-        return bpy.context.scene.sequence_editor.sequences.get(self.sequenceName)
+        editor = bpy.context.scene.sequence_editor
+        if editor: return editor.sequences.get(self.sequenceName)
+        return None
 
     def setStoreableValue(self, data):
         self.sequenceName = data

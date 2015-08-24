@@ -14,16 +14,17 @@ class TextBlockSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     showName = BoolProperty(default = True)
 
     def drawInput(self, layout, node, text):
-        row = layout.row(align = True)
         if not self.showName: text = ""
+        self.drawAsProperty(layout, text)
 
-        row.prop_search(self, "textBlockName",  bpy.data, "texts", icon="NONE", text = text)
+    def drawAsProperty(self, layout, text):
+        layout.prop_search(self, "textBlockName",  bpy.data, "texts", text = text)
 
     def getValue(self):
         return bpy.data.texts.get(self.textBlockName)
 
     def setStoreableValue(self, data):
         self.textBlockName = data
-        
+
     def getStoreableValue(self):
         return self.textBlockName

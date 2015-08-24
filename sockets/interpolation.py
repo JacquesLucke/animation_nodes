@@ -47,8 +47,13 @@ class InterpolationSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     showName = BoolProperty(default = True)
 
     def drawInput(self, layout, node, text):
+        if not self.showName: text = ""
+        self.drawAsProperty(layout, text)
+
+
+    def drawAsProperty(self, layout, text):
         col = layout.column(align = True)
-        if self.showName: col.label(text)
+        if text != "": col.label(text)
 
         row = col.row(align = True)
         row.prop(self, "topCategory", text = "")

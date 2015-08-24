@@ -17,10 +17,18 @@ class VectorSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def drawInput(self, layout, node, text):
         col = layout.column(align = True)
         if self.showName: col.label(text)
-        col.prop(self, "value", index = 0, text = "X")
-        col.prop(self, "value", index = 1, text = "Y")
-        col.prop(self, "value", index = 2, text = "Z")
+        self.drawVector(col)
         col.separator()
+
+    def drawAsProperty(self, layout, text):
+        col = layout.column(align = True)
+        col.label(text + ":")
+        self.drawVector(col)
+
+    def drawVector(self, layout):
+        layout.prop(self, "value", index = 0, text = "X")
+        layout.prop(self, "value", index = 1, text = "Y")
+        layout.prop(self, "value", index = 2, text = "Z")
 
     def getValue(self):
         return Vector(self.value)

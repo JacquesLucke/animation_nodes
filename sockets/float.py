@@ -28,6 +28,9 @@ class FloatSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         if not self.showName: text = ""
         layout.prop(self, "value", text = text)
 
+    def drawAsProperty(self, layout, text):
+        layout.prop(self, "value", text = text)
+
     def getValue(self):
         return self.value
 

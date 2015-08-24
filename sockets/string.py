@@ -37,6 +37,9 @@ class StringSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def drawInput(self, layout, node, text):
         if not self.showName: text = ""
+        self.drawAsProperty(layout, text)
+
+    def drawAsProperty(self, layout, text):
         if self.useEnum:
             layout.prop(self, "stringEnum", text = text)
         else:

@@ -24,13 +24,16 @@ class SplineSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     showObjectInput = BoolProperty(default = True)
 
     def drawInput(self, layout, node, text):
+        if not self.showName: text = ""
+        if self.showObjectInput: self.drawAsProperty(layout, text)
+        else: layout.label(text)
+
+    def drawAsProperty(self, layout, text):
         row = layout.row(align = True)
-        if self.showName: row.label(text)
-        if self.showObjectInput:
-            row.prop_search(self, "objectName",  bpy.context.scene, "objects", icon="NONE", text = "")
-            self.functionOperator(row, "assignActiveObject", icon = "EYEDROPPER")
-            if self.objectName != "":
-                row.prop(self, "useWorldSpace", text = "", icon = "WORLD")
+        row.prop_search(self, "objectName",  bpy.context.scene, "objects", icon="NONE", text = text)
+        self.functionOperator(row, "assignActiveObject", icon = "EYEDROPPER")
+        if self.objectName != "":
+            row.prop(self, "useWorldSpace", text = "", icon = "WORLD")
 
     def getValue(self):
         object = bpy.data.objects.get(self.objectName)
