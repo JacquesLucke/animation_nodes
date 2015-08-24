@@ -197,6 +197,10 @@ class AnimationNodeSocket:
     def isCopyable(self):
         return hasattr(self, "getCopyStatement")
 
+    @property
+    def hasValueCode(self):
+        return hasattr(self, "getValueCode")
+
 
 
 @noRecursion

@@ -65,8 +65,9 @@ def get_GetSocketValues(nodes, socketVariables):
     lines = []
     for node in nodes:
         for socket in node.unlinkedInputs:
-            lines.append("{} = {}.inputs[{}].getValue()".format(
-                socketVariables[socket], node.identifier, socket.index))
+            if socket.hasValueCode: line = "{} = {}".format(socketVariables[socket], socket.getValueCode())
+            else: line = "{} = {}.inputs[{}].getValue()".format(socketVariables[socket], node.identifier, socket.index)
+            lines.append(line)
     return lines
 
 
@@ -86,7 +87,9 @@ def getInputCopyLines(node, socketVariables):
     for socket in node.inputs:
         if socket.dataIsModified and socket.isCopyable and socket.isUnlinked:
             newName = socketVariables[socket] + "_copy"
-            lines.append(getCopyLine(socket, newName, socketVariables))
+            if socket.hasValueCode: line = "{} = {}".format(newName, socket.getValueCode())
+            else: line = getCopyLine(socket, newName, socketVariables)
+            lines.append(line)
             socketVariables[socket] = newName
     return lines
 
