@@ -10,6 +10,9 @@ class VertexListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def drawInput(self, layout, node, text):
         layout.label(text)
-        
+
     def getValue(self):
         return []
+
+    def getValueCode(self):
+        return "[]"

@@ -14,5 +14,8 @@ class VectorListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getValue(self):
         return []
 
+    def getValueCode(self):
+        return "[]"
+
     def getCopyStatement(self):
         return "[element.copy() for element in value]"

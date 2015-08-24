@@ -14,5 +14,8 @@ class PolygonIndicesListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getValue(self):
         return []
 
+    def getValueCode(self):
+        return "[]"
+
     def getCopyStatement(self):
         return "[polygonIndices[:] for polygonIndices in value]"
