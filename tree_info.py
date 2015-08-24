@@ -242,6 +242,11 @@ class NodeNetwork:
         if self.groupOutputID is None: return None
         return idToNode(self.groupOutputID)
 
+    @property
+    def loopInputNode(self):
+        if self.loopInputID is None: return None
+        return idToNode(self.loopInputID)
+
 
 _data = NodeData()
 _networks = NodeNetworks()
@@ -335,7 +340,7 @@ def getNetworks():
     return _networks.networks
 
 def getSubprogramNetworks():
-    return getNetworksByType("Group")
+    return [network for network in _networks.networks if network.type in ("Group", "Loop")]
 
 def getNetworksByType(type = "Main"):
     return [network for network in _networks.networks if network.type == type]

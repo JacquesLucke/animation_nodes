@@ -3,6 +3,14 @@ class SubprogramData:
         self.inputs = []
         self.outputs = []
 
+    def newInput(self, idName, identifier, customName, defaultValue):
+        data = SocketData(idName, identifier, customName, defaultValue)
+        self.inputs.append(data)
+
+    def newOutput(self, idName, identifier, customName, defaultValue):
+        data = SocketData(idName, identifier, customName, defaultValue)
+        self.outputs.append(data)
+
     def newInputFromSocket(self, socket):
         self.inputs.append(SocketData.fromSocket(socket))
 

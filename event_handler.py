@@ -15,7 +15,7 @@ def update(events):
         if len(tree_info.getNetworksByType("Invalid")) > 0:
             problems.report(message = "At least one invalid network exists", forbidExecution = True)
         markNodesInInvalidNetworks()
-        createExecutionUnits()
+        #createExecutionUnits()
 
     setupExecutionUnits()
     executed = autoExecuteMainUnits(events)

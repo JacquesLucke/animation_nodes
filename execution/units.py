@@ -34,6 +34,8 @@ def createSubprogramUnits():
     for network in getSubprogramNetworks():
         if network.type == "Group":
             unit = GroupExecutionUnit(network)
+        if network.type == "Loop":
+            unit = LoopExecutionUnit(network)
         _subprogramUnitsByIdentifier[network.identifier] = unit
 
 

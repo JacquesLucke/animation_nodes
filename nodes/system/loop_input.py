@@ -4,7 +4,7 @@ from . utils import updateCallerNodes
 from ... events import networkChanged
 from ... base_types.node import AnimationNode
 from . subprogram_sockets import SubprogramData
-from ... sockets.info import toBaseIdName, toListDataType, toIdName, isBase
+from ... sockets.info import toBaseIdName, toListDataType, toIdName, isBase, toListIdName, toBaseDataType
 
 class LoopInput(bpy.types.Node, AnimationNode):
     bl_idname = "an_LoopInput"
@@ -80,13 +80,15 @@ class LoopInput(bpy.types.Node, AnimationNode):
         self.chooseSocketDataType("newParameter", socketGroup = "ALL")
 
 
-    def newIterator(self, listDataType, name = "Socket"):
+    def newIterator(self, listDataType, name = None):
+        if name is None: name = toBaseDataType(listDataType)
         socket = self.outputs.new(toBaseIdName(listDataType), name, "iterator")
         socket.moveTo(self.newIteratorSocket.index)
         self.setupSocket(socket, name, moveGroup = 1)
         return socket
 
-    def newParameter(self, dataType, name = "Socket", defaultValue = None):
+    def newParameter(self, dataType, name = None, defaultValue = None):
+        if name is None: name = dataType
         socket = self.outputs.new(toIdName(dataType), name, "parameter")
         socket.moveTo(self.newParameterSocket.index)
         self.setupSocket(socket, name, moveGroup = 2)
@@ -101,6 +103,29 @@ class LoopInput(bpy.types.Node, AnimationNode):
         socket.nameSettings.editable = True
         socket.display.customNameInput = True
         socket.display.removeOperator = True
+
+
+    def socketChanged(self):
+        self.updateCallerNodes()
+
+    def delete(self):
+        self.outputs.clear()
+        self.updateCallerNodes()
+
+    def updateCallerNodes(self):
+        updateCallerNodes(self.identifier)
+
+    def getSocketData(self):
+        data = SubprogramData()
+        iteratorSockets = self.getIteratorSockets()
+        if len(iteratorSockets) == 0:
+            data.newInput("an_IntegerSocket", "loop_iterations", "Iterations", 0)
+        else:
+            for socket in iteratorSockets:
+                data.newInput(toListIdName(socket.bl_idname), socket.identifier, socket.customName + " List", [])
+        for socket in self.getParameterSockets():
+            data.newInputFromSocket(socket)
+        return data
 
 
     @property
