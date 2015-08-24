@@ -1,3 +1,4 @@
+import re
 import bpy
 import ast
 from bpy.props import *
@@ -20,6 +21,9 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
     containsSyntaxError = BoolProperty()
     executionError = StringProperty()
 
+    moduleNames = StringProperty(name = "Modules", update = executionCodeChanged,
+        description = "Comma separated module names which can be used inside the expression")
+
     def create(self):
         self.width = 200
         socket = self.inputs.new("an_NodeControlSocket", "New Input")
@@ -34,6 +38,9 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
             row = layout.row()
             row.label(self.executionError, icon = "ERROR")
             self.functionOperator(row, "clearErrorMessage", icon = "X", emboss = False)
+
+    def drawAdvanced(self, layout):
+        layout.prop(self, "moduleNames")
 
     def drawNewInputSocket(self, layout):
         row = layout.row()
@@ -59,7 +66,9 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
         return lines
 
     def getModuleList(self):
-        return ["sys"]
+        moduleNames = re.split("\W+", self.moduleNames)
+        modules = [module for module in moduleNames if module != ""]
+        return ["sys"] + modules
 
     def clearErrorMessage(self):
         self.executionError = ""

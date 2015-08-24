@@ -40,17 +40,22 @@ def createSubprogramUnits():
 
 
 def setupExecutionUnits():
-    if not problems.canExecute(): return
+    try:
+        if not problems.canExecute(): return
 
-    for unit in getExecutionUnits():
-        unit.setup()
+        for unit in getExecutionUnits():
+            unit.setup()
 
-    subprograms = {}
-    for identifier, unit in _subprogramUnitsByIdentifier.items():
-        subprograms["_subprogram" + identifier] = unit.execute
+        subprograms = {}
+        for identifier, unit in _subprogramUnitsByIdentifier.items():
+            subprograms["_subprogram" + identifier] = unit.execute
 
-    for unit in getExecutionUnits():
-        unit.insertSubprogramFunctions(subprograms)
+        for unit in getExecutionUnits():
+            unit.insertSubprogramFunctions(subprograms)
+    except:
+        print("\n"*5)
+        traceback.print_exc()
+        problems.report("Running setup code failed (see console)", forbidExecution = True)
 
 def finishExecutionUnits():
     for unit in getExecutionUnits():
