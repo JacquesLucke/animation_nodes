@@ -31,7 +31,9 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
         if self.containsSyntaxError:
             layout.label("Syntax Error", icon = "ERROR")
         if self.executionError != "":
-            layout.label(self.executionError, icon = "ERROR")
+            row = layout.row()
+            row.label(self.executionError, icon = "ERROR")
+            self.functionOperator(row, "clearErrorMessage", icon = "X", emboss = False)
 
     def drawNewInputSocket(self, layout):
         row = layout.row()
@@ -58,6 +60,9 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
 
     def getModuleList(self):
         return ["sys"]
+
+    def clearErrorMessage(self):
+        self.executionError = ""
 
     def edit(self):
         emptySocket = self.inputs["New Input"]

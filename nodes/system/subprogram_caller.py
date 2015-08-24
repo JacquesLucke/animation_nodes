@@ -5,6 +5,7 @@ from ... tree_info import getSubprogramNetworks, getNodeByIdentifier, getNetwork
 from ... utils.enum_items import enumItemsFromDicts
 from ... sockets.info import toDataType
 from ... execution.units import getSubprogramUnitByIdentifier
+from ... events import executionCodeChanged
 
 class SubprogramCaller(bpy.types.Node, AnimationNode):
     bl_idname = "an_SubprogramCaller"
@@ -12,6 +13,7 @@ class SubprogramCaller(bpy.types.Node, AnimationNode):
 
     def subprogramIdentifierChanged(self, context):
         self.updateSockets()
+        executionCodeChanged()
 
     subprogramIdentifier = StringProperty(name = "Subprogram Identifier", default = "", update = subprogramIdentifierChanged)
 
