@@ -61,10 +61,11 @@ class LoopExecutionUnit(SubprogramExecutionUnit):
         else:
             return self.get_IterationsAmount(inputNode, nodes, socketVariables)
 
+
     def get_IterationsAmount(self, inputNode, nodes, socketVariables):
         header = self.get_IterationsAmount_Header(inputNode, socketVariables)
         prepareLoop = indent(self.get_IterationsAmount_PrepareLoop(inputNode, socketVariables))
-        loopBody = indent(self.get_IterationsAmount_LoopBody(nodes, socketVariables), amount = 2)
+        loopBody = indent(self.get_LoopBody(inputNode, nodes, socketVariables), amount = 2)
         return joinLines([header] + prepareLoop + loopBody)
 
     def get_IterationsAmount_Header(self, inputNode, socketVariables):
@@ -82,17 +83,58 @@ class LoopExecutionUnit(SubprogramExecutionUnit):
         lines = []
         socketVariables[inputNode.indexSocket] = "current_loop_index"
         lines.append("for current_loop_index in range(loop_iterations):")
-        lines.extend(indent(linkOutputSocketsToTargets(inputNode, socketVariables)))
         return lines
 
-    def get_IterationsAmount_LoopBody(self, nodes, socketVariables):
+
+    def get_IteratorLength(self, inputNode, nodes, socketVariables):
+        header = self.get_IteratorLength_Header(inputNode, socketVariables)
+        prepareLoop = indent(self.get_IteratorLength_PrepareLoop(inputNode, socketVariables))
+        loopBody = indent(self.get_LoopBody(inputNode, nodes, socketVariables), amount = 2)
+        return joinLines([header] + prepareLoop + loopBody)
+
+    def get_IteratorLength_Header(self, inputNode, socketVariables):
+        parameterNames = []
+        for i, socket in enumerate(inputNode.getIteratorSockets()):
+            name = "loop_iterator_" + str(i)
+            parameterNames.append(name)
+        for i, socket in enumerate(inputNode.getParameterSockets()):
+            name = "loop_parameter_" + str(i)
+            socketVariables[socket] = name
+            parameterNames.append(name)
+
+        header = "def main({}):".format(", ".join(parameterNames))
+        return header
+
+    def get_IteratorLength_PrepareLoop(self, inputNode, socketVariables):
         lines = []
+
+        iterators = inputNode.getIteratorSockets()
+        iteratorNames = ["loop_iterator_" + str(i) for i in range(len(iterators))]
+        zipLine = "loop_zipped_list = zip({})".format(", ".join(iteratorNames))
+
+        names = []
+        for i, socket in enumerate(iterators):
+            name = "loop_iterator_element_" + str(i)
+            socketVariables[socket] = name
+            names.append(name)
+        loopLine = "for current_loop_index, ({}, ) in enumerate(loop_zipped_list):".format(", ".join(names))
+        socketVariables[inputNode.indexSocket] = "current_loop_index"
+
+        lines.append(zipLine)
+        lines.append(loopLine)
+        return lines
+
+    def get_LoopBody(self, inputNode, nodes, socketVariables):
+        lines = []
+        lines.extend(indent(linkOutputSocketsToTargets(inputNode, socketVariables)))
         for node in nodes:
             if node.bl_idname in ("an_LoopInput", ): continue
             lines.extend(getNodeExecutionLines(node, socketVariables))
             lines.extend(linkOutputSocketsToTargets(node, socketVariables))
         lines.append("pass")
         return lines
+
+
 
     def compileScript(self):
         self.setupCodeObject = compileScript(self.setupScript, name = "group: {}".format(repr(self.network.name)))
