@@ -17,8 +17,8 @@ class LoopExecutionUnit(SubprogramExecutionUnit):
         self.executionData = {}
 
         self.generateScript()
-        #self.compileScript()
-        #self.execute = self.raiseNotSetupException
+        self.compileScript()
+        self.execute = self.raiseNotSetupException
 
 
     def setup(self):
@@ -54,27 +54,46 @@ class LoopExecutionUnit(SubprogramExecutionUnit):
         self.setupScript += self.getFunctionGenerationScript(nodes, socketVariables)
 
     def getFunctionGenerationScript(self, nodes, socketVariables):
-        headerStatement = self.getFunctionHeader(self.network.loopInputNode, socketVariables)
-        executionScript = "\n".join(indent(self.getExecutionScriptLines(nodes, socketVariables)))
-        returnStatement = "\n" + " "*4 + self.getReturnStatement(self.network.groupOutputNode, socketVariables)
-        return "\n".join([headerStatement, executionScript, returnStatement])
+        inputNode = self.network.loopInputNode
+        headerStatement = self.getFunctionHeader(inputNode, socketVariables)
+        executionScript = "\n".join(indent(self.getExecutionScriptLines(inputNode, nodes, socketVariables)))
+        #returnStatement = "\n" + " "*4 + self.getReturnStatement(self.network.groupOutputNode, socketVariables)
+        #return "\n".join([headerStatement, executionScript, returnStatement])
+        return "\n".join([headerStatement, executionScript])
 
     def getFunctionHeader(self, inputNode, socketVariables):
-        for i, socket in enumerate(inputNode.outputs):
-            socketVariables[socket] = "loop_input_" + str(i)
+        parameters = []
+        data = inputNode.getSocketData()
+        for i in range(len(data.inputs)):
+            parameters.append("loop_input_" + str(i))
 
-        parameterList = ", ".join([socketVariables[socket] for socket in inputNode.sockets[:-1]])
-        header = "def main({}):".format(parameterList)
+        header = "def main({}):".format(", ".join(parameters))
         return header
 
-    def getExecutionScriptLines(self, nodes, socketVariables):
+    def getExecutionScriptLines(self, inputNode, nodes, socketVariables):
         lines = []
-        lines.extend(getInputCopySocketValuesLines(nodes, socketVariables))
-        lines.extend(linkOutputSocketsToTargets(self.network.groupInputNode, socketVariables))
-        for node in nodes:
-            if node.bl_idname in ("an_GroupInput", "an_GroupOutput"): continue
-            lines.extend(getNodeExecutionLines(node, socketVariables))
-            lines.extend(linkOutputSocketsToTargets(node, socketVariables))
+        add = lines.append
+
+        parameters = inputNode.getParameterSockets()
+        iterators = inputNode.getIteratorSockets()
+
+        if len(iterators) == 0:
+            for i, socket in enumerate(parameters):
+                socketVariables[socket] = "loop_input_" + str(i + 1)
+            socketVariables[inputNode.indexSocket] = "current_loop_index"
+            socketVariables[inputNode.iterationsSocket] = "loop_iterations"
+            add("loop_iterations = loop_input_0")
+            add("for current_loop_index in range(loop_input_0):")
+            lines.extend(indent(linkOutputSocketsToTargets(inputNode, socketVariables)))
+
+            loopLines = []
+            for node in nodes:
+                if node.bl_idname in ("an_LoopInput", ): continue
+                loopLines.extend(getNodeExecutionLines(node, socketVariables))
+                loopLines.extend(linkOutputSocketsToTargets(node, socketVariables))
+
+            lines.extend(indent(loopLines))
+
         return lines
 
     def getReturnStatement(self, outputNode, socketVariables):

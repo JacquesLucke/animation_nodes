@@ -20,7 +20,7 @@ class LoopInput(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.outputs.new("an_IntegerSocket", "Index")
-        self.outputs.new("an_IntegerSocket", "List Length")
+        self.outputs.new("an_IntegerSocket", "Iterations")
         socket = self.outputs.new("an_NodeControlSocket", "New Iterator")
         socket.drawCallback = "drawNewIteratorSocket"
         socket = self.outputs.new("an_NodeControlSocket", "New Parameter")
@@ -117,6 +117,7 @@ class LoopInput(bpy.types.Node, AnimationNode):
 
     def getSocketData(self):
         data = SubprogramData()
+        if len(self.outputs) == 0: return data
         iteratorSockets = self.getIteratorSockets()
         if len(iteratorSockets) == 0:
             data.newInput("an_IntegerSocket", "loop_iterations", "Iterations", 0)
@@ -135,6 +136,14 @@ class LoopInput(bpy.types.Node, AnimationNode):
     @property
     def newParameterSocket(self):
         return self.outputs["New Parameter"]
+
+    @property
+    def indexSocket(self):
+        return self.outputs["Index"]
+
+    @property
+    def iterationsSocket(self):
+        return self.outputs["Iterations"]
 
     def getIteratorSockets(self):
         return self.outputs[2:self.newIteratorSocket.index]

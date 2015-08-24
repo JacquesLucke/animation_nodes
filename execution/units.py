@@ -2,6 +2,7 @@ import traceback
 from collections import defaultdict
 from . main_execution_unit import MainExecutionUnit
 from . group_execution_unit import GroupExecutionUnit
+from . loop_execution_unit import LoopExecutionUnit
 from .. tree_info import getNetworksByType, getSubprogramNetworks
 from .. import problems
 from .. utils.timing import measureTime
