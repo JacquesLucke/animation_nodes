@@ -36,9 +36,9 @@ class DebugNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         names = ["data_" + str(i) for i in range(len(self.inputs))]
-        return "self.writeDebugCache([{}])".format(", ".join(names))
+        return "self.writeDebugData([{}])".format(", ".join(names))
 
-    def writeDebugCache(self, dataList):
+    def writeDebugData(self, dataList):
         texts = []
         for data, socket in zip(dataList, self.inputs):
             if isinstance(data, float): text = str(round(data, 5))
@@ -47,9 +47,16 @@ class DebugNode(bpy.types.Node, AnimationNode):
             texts.append(text.rjust(socket["dataWidth"]))
         if self.printData: print(" ".join(texts))
         if self.writeData:
-            textBlock = bpy.data.texts[textBlockName]
+            textBlock = getDebugTextBlock(self.nodeTree)
             textBlock.write(" ".join(texts))
             textBlock.write("\n")
 
-def clearDebugData():
-    bpy.data.texts[textBlockName].clear()
+def clearDebugTextBlock(nodeTree):
+    getDebugTextBlock(nodeTree).clear()
+
+def getDebugTextBlock(nodeTree):
+    name = "Debug: " + repr(nodeTree.name)
+    text = bpy.data.texts.get(name)
+    if text is None:
+        text = bpy.data.texts.new(name)
+    return text

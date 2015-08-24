@@ -6,7 +6,6 @@ from . loop_execution_unit import LoopExecutionUnit
 from .. tree_info import getNetworksByType, getSubprogramNetworks
 from .. import problems
 from .. utils.timing import measureTime
-from .. nodes.generic.debug_output import clearDebugData
 
 _mainUnitsByNodeTree = defaultdict(list)
 _subprogramUnitsByIdentifier = {}
@@ -52,8 +51,6 @@ def setupExecutionUnits():
 
     for unit in getExecutionUnits():
         unit.insertSubprogramFunctions(subprograms)
-
-    clearDebugData()
 
 def finishExecutionUnits():
     for unit in getExecutionUnits():
