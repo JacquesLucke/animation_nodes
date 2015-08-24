@@ -11,10 +11,20 @@ class NodeControlSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     drawNameOnly = BoolProperty(default = True)
     drawCallback = StringProperty(default = "")
+    margin = FloatProperty(default = 0.0001, min = 0.0001)
 
     def draw(self, context, layout, node, text):
+        col = layout.column()
+        subcol = col.column()
+        subcol.label("")
+        subcol.scale_y = self.margin
+
         if self.drawCallback == "":
-            layout.label(self.name)
+            col.label(self.name)
         else:
             function = getattr(node, self.drawCallback)
-            function(layout)
+            function(col)
+
+        subcol = col.column()
+        subcol.label("")
+        subcol.scale_y = self.margin

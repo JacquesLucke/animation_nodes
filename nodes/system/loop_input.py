@@ -23,8 +23,10 @@ class LoopInput(bpy.types.Node, AnimationNode):
         self.outputs.new("an_IntegerSocket", "Iterations")
         socket = self.outputs.new("an_NodeControlSocket", "New Iterator")
         socket.drawCallback = "drawNewIteratorSocket"
+        socket.margin = 0.15
         socket = self.outputs.new("an_NodeControlSocket", "New Parameter")
         socket.drawCallback = "drawNewParameterSocket"
+        socket.margin = 0.15
         self.width = 180
 
     def draw(self, layout):
@@ -45,7 +47,9 @@ class LoopInput(bpy.types.Node, AnimationNode):
         col = layout.column()
         col.label("Copy for each Iteration:")
         for socket in self.getParameterSockets():
-            col.prop(socket, "copyAlways", text = socket.customName)
+            row = col.row()
+            row.active = socket.isCopyable
+            row.prop(socket, "copyAlways", text = socket.customName)
 
     def edit(self):
         for target in self.newIteratorSocket.dataTargetSockets:
@@ -65,18 +69,23 @@ class LoopInput(bpy.types.Node, AnimationNode):
 
 
     def drawNewIteratorSocket(self, layout):
-        self.drawOperatorInMargin(layout, "chooseNewIteratorType", "New Iterator")
+        row = layout.row()
+        subrow = row.row()
+        subrow.alignment = "LEFT"
+        self.functionOperator(subrow, "chooseNewIteratorType", icon = "ZOOMIN", emboss = False)
+        subrow = row.row()
+        subrow.alignment = "RIGHT"
+        subrow.label("New Iterator")
 
     def drawNewParameterSocket(self, layout):
-        self.drawOperatorInMargin(layout, "chooseNewParameterType", "New Parameter")
+        row = layout.row()
+        subrow = row.row()
+        subrow.alignment = "LEFT"
+        self.functionOperator(subrow, "chooseNewParameterType", icon = "ZOOMIN", emboss = False)
+        subrow = row.row()
+        subrow.alignment = "RIGHT"
+        subrow.label("New Parameter")
 
-    def drawOperatorInMargin(self, layout, functionName, text):
-        col = layout.column()
-        col.alignment = "RIGHT"
-        col.separator()
-        self.functionOperator(col, functionName, text = text, emboss = False)
-        col.separator()
-        col.scale_y = 0.8
 
     def chooseNewIteratorType(self):
         self.chooseSocketDataType("newIterator", socketGroup = "LIST")
