@@ -111,5 +111,8 @@ class LoopInput(bpy.types.Node, AnimationNode):
     def newParameterSocket(self):
         return self.outputs["New Parameter"]
 
+    def getIteratorSockets(self):
+        return self.outputs[2:self.newIteratorSocket.index]
+
     def getParameterSockets(self):
         return self.outputs[self.newIteratorSocket.index + 1:self.newParameterSocket.index]
