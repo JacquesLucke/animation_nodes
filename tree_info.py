@@ -167,37 +167,50 @@ class NodeNetwork:
     def analyse(self):
         groupInputs = []
         groupOutputs = []
+        loopInputs = []
+
         for nodeID in self.nodeIDs:
-            if nodeID in _data.nodesByType["an_GroupInput"]:
+            idName = _data.typeByNode[nodeID]
+            if idName == "an_GroupInput":
                 groupInputs.append(nodeID)
-            if nodeID in _data.nodesByType["an_GroupOutput"]:
+            elif idName == "an_GroupOutput":
                 groupOutputs.append(nodeID)
+            elif idName == "an_LoopInput":
+                loopInputs.append(nodeID)
 
         groupInAmount = len(groupInputs)
         groupOutAmount = len(groupOutputs)
+        loopInAmount = len(loopInputs)
 
-        if groupInAmount == 0 and groupOutAmount == 0:
+        self.type = "Invalid"
+
+        if groupInAmount + groupOutAmount + loopInAmount == 0:
             self.type = "Main"
-        elif groupInAmount > 1 or groupOutAmount > 1:
-            self.type = "Invalid"
-        elif groupInAmount == 0 and groupOutAmount == 1:
-            self.type = "Invalid"
-            self.identifier = idToNode(groupOutputs[0]).groupInputIdentifier
-        elif groupInAmount == 1 and groupOutAmount == 0:
-            self.type = "Group"
-        elif groupInAmount == 1 and groupOutAmount == 1:
-            if idToNode(groupInputs[0]).identifier == idToNode(groupOutputs[0]).groupInputIdentifier:
+        elif loopInAmount == 0:
+            if groupInAmount == 0 and groupOutAmount == 1:
+                self.identifier = idToNode(groupOutputs[0]).groupInputIdentifier
+            elif groupInAmount == 1 and groupOutAmount == 0:
                 self.type = "Group"
-                self.groupOutputID = groupOutputs[0]
-            else:
-                self.type = "Invalid"
+            elif groupInAmount == 1 and groupOutAmount == 1:
+                if idToNode(groupInputs[0]).identifier == idToNode(groupOutputs[0]).groupInputIdentifier:
+                    self.type = "Group"
+                    self.groupOutputID = groupOutputs[0]
+        elif groupInAmount + groupOutAmount == 0:
+            if loopInAmount == 1:
+                self.type = "Loop"
 
         if self.type == "Group":
             owner = idToNode(groupInputs[0])
+            self.groupInputID = groupInputs[0]
+
+        if self.type == "Loop":
+            owner = idToNode(loopInputs[0])
+            self.loopInputID = loopInputs[0]
+
+        if self.type in ("Group", "Loop"):
             self.identifier = owner.identifier
             self.name = owner.subprogramName
             self.description = owner.subprogramDescription
-            self.groupInputID = groupInputs[0]
 
     @staticmethod
     def join(networks):
