@@ -145,6 +145,10 @@ class LoopInput(bpy.types.Node, AnimationNode):
     def iterationsSocket(self):
         return self.outputs["Iterations"]
 
+    @property
+    def iterateThroughLists(self):
+        return len(self.getIteratorSockets()) > 0
+
     def getIteratorSockets(self):
         return self.outputs[2:self.newIteratorSocket.index]
 

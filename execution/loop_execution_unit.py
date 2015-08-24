@@ -55,51 +55,44 @@ class LoopExecutionUnit(SubprogramExecutionUnit):
 
     def getFunctionGenerationScript(self, nodes, socketVariables):
         inputNode = self.network.loopInputNode
-        headerStatement = self.getFunctionHeader(inputNode, socketVariables)
-        executionScript = "\n".join(indent(self.getExecutionScriptLines(inputNode, nodes, socketVariables)))
-        #returnStatement = "\n" + " "*4 + self.getReturnStatement(self.network.groupOutputNode, socketVariables)
-        #return "\n".join([headerStatement, executionScript, returnStatement])
-        return "\n".join([headerStatement, executionScript])
 
-    def getFunctionHeader(self, inputNode, socketVariables):
-        parameters = []
-        data = inputNode.getSocketData()
-        for i in range(len(data.inputs)):
-            parameters.append("loop_input_" + str(i))
+        if inputNode.iterateThroughLists:
+            return self.get_IteratorLength(inputNode, nodes, socketVariables)
+        else:
+            return self.get_IterationsAmount(inputNode, nodes, socketVariables)
 
-        header = "def main({}):".format(", ".join(parameters))
+    def get_IterationsAmount(self, inputNode, nodes, socketVariables):
+        header = self.get_IterationsAmount_Header(inputNode, socketVariables)
+        prepareLoop = indent(self.get_IterationsAmount_PrepareLoop(inputNode, socketVariables))
+        loopBody = indent(self.get_IterationsAmount_LoopBody(nodes, socketVariables), amount = 2)
+        return joinLines([header] + prepareLoop + loopBody)
+
+    def get_IterationsAmount_Header(self, inputNode, socketVariables):
+        socketVariables[inputNode.iterationsSocket] = "loop_iterations"
+        parameterNames = ["loop_iterations"]
+        for i, socket in enumerate(inputNode.getParameterSockets()):
+            name = "loop_parameter_" + str(i)
+            socketVariables[socket] = name
+            parameterNames.append(name)
+
+        header = "def main({}):".format(", ".join(parameterNames))
         return header
 
-    def getExecutionScriptLines(self, inputNode, nodes, socketVariables):
+    def get_IterationsAmount_PrepareLoop(self, inputNode, socketVariables):
         lines = []
-        add = lines.append
-
-        parameters = inputNode.getParameterSockets()
-        iterators = inputNode.getIteratorSockets()
-
-        if len(iterators) == 0:
-            for i, socket in enumerate(parameters):
-                socketVariables[socket] = "loop_input_" + str(i + 1)
-            socketVariables[inputNode.indexSocket] = "current_loop_index"
-            socketVariables[inputNode.iterationsSocket] = "loop_iterations"
-            add("loop_iterations = loop_input_0")
-            add("for current_loop_index in range(loop_input_0):")
-            lines.extend(indent(linkOutputSocketsToTargets(inputNode, socketVariables)))
-
-            loopLines = []
-            for node in nodes:
-                if node.bl_idname in ("an_LoopInput", ): continue
-                loopLines.extend(getNodeExecutionLines(node, socketVariables))
-                loopLines.extend(linkOutputSocketsToTargets(node, socketVariables))
-
-            lines.extend(indent(loopLines))
-
+        socketVariables[inputNode.indexSocket] = "current_loop_index"
+        lines.append("for current_loop_index in range(loop_iterations):")
+        lines.extend(indent(linkOutputSocketsToTargets(inputNode, socketVariables)))
         return lines
 
-    def getReturnStatement(self, outputNode, socketVariables):
-        if outputNode is None: return "return"
-        returnList = ", ".join([socketVariables[socket] for socket in outputNode.inputs[:-1]])
-        return "return " + returnList
+    def get_IterationsAmount_LoopBody(self, nodes, socketVariables):
+        lines = []
+        for node in nodes:
+            if node.bl_idname in ("an_LoopInput", ): continue
+            lines.extend(getNodeExecutionLines(node, socketVariables))
+            lines.extend(linkOutputSocketsToTargets(node, socketVariables))
+        lines.append("pass")
+        return lines
 
     def compileScript(self):
         self.setupCodeObject = compileScript(self.setupScript, name = "group: {}".format(repr(self.network.name)))
@@ -108,6 +101,8 @@ class LoopExecutionUnit(SubprogramExecutionUnit):
     def raiseNotSetupException(self):
         raise ExecutionUnitNotSetup()
 
+def joinLines(lines):
+    return "\n".join(lines)
 
-def indent(lines):
-    return [" "*4 + line for line in lines]
+def indent(lines, amount = 1):
+    return [" " * (4 * amount) + line for line in lines]
