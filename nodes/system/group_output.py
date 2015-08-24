@@ -17,6 +17,7 @@ class GroupOutput(bpy.types.Node, AnimationNode):
     def create(self):
         socket = self.inputs.new("an_NodeControlSocket", "New Return")
         socket.drawCallback = "drawNewReturnSocket"
+        socket.margin = 0.15
         self.width = 180
 
     def draw(self, layout):
@@ -35,8 +36,12 @@ class GroupOutput(bpy.types.Node, AnimationNode):
 
     def drawNewReturnSocket(self, layout):
         row = layout.row()
-        row.alignment = "LEFT"
-        self.functionOperator(row, "chooseNewReturnType", text = "New Return", emboss = False)
+        subrow = row.row()
+        subrow.alignment = "LEFT"
+        subrow.label("New Return")
+        subrow = row.row()
+        subrow.alignment = "RIGHT"
+        self.functionOperator(subrow, "chooseNewReturnType", icon = "ZOOMIN", emboss = False)
 
     def chooseNewReturnType(self):
         self.chooseSocketDataType("newReturn")
@@ -51,7 +56,8 @@ class GroupOutput(bpy.types.Node, AnimationNode):
         socket.linkWith(directOrigin)
         self.newReturnSocket.removeConnectedLinks()
 
-    def newReturn(self, dataType, name = "Socket"):
+    def newReturn(self, dataType, name = None):
+        if name is None: name = dataType
         socket = self.inputs.new(toIdName(dataType), name, "return")
         socket.dataIsModified = True
         socket.customName = name

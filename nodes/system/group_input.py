@@ -21,6 +21,7 @@ class GroupInput(bpy.types.Node, AnimationNode):
     def create(self):
         socket = self.outputs.new("an_NodeControlSocket", "New Parameter")
         socket.drawCallback = "drawNewParameterSocket"
+        socket.margin = 0.15
         self.width = 180
 
     def draw(self, layout):
@@ -41,7 +42,13 @@ class GroupInput(bpy.types.Node, AnimationNode):
             socket.drawInput(box, self, socket.getDisplayedName())
 
     def drawNewParameterSocket(self, layout):
-        self.functionOperator(layout, "chooseNewParameterType", text = "New Parameter", emboss = False)
+        row = layout.row()
+        subrow = row.row()
+        subrow.alignment = "LEFT"
+        self.functionOperator(subrow, "chooseNewParameterType", icon = "ZOOMIN", emboss = False)
+        subrow = row.row()
+        subrow.alignment = "RIGHT"
+        subrow.label("New Parameter")
 
     def chooseNewParameterType(self):
         self.chooseSocketDataType("newParameter")
@@ -53,7 +60,8 @@ class GroupInput(bpy.types.Node, AnimationNode):
             socket.linkWith(target)
         self.newParameterSocket.removeConnectedLinks()
 
-    def newParameter(self, dataType, name = "Socket", defaultValue = None):
+    def newParameter(self, dataType, name = None, defaultValue = None):
+        if name is None: name = dataType
         socket = self.outputs.new(toIdName(dataType), name, "parameter")
         if defaultValue is not None: socket.setStoreableValue(defaultValue)
         socket.customName = name
