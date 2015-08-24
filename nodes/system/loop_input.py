@@ -19,6 +19,8 @@ class LoopInput(bpy.types.Node, AnimationNode):
         update = networkChanged)
 
     def create(self):
+        self.outputs.new("an_IntegerSocket", "Index")
+        self.outputs.new("an_IntegerSocket", "List Length")
         socket = self.outputs.new("an_NodeControlSocket", "New Iterator")
         socket.drawCallback = "drawNewIteratorSocket"
         socket = self.outputs.new("an_NodeControlSocket", "New Parameter")
