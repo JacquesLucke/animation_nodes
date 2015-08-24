@@ -109,7 +109,8 @@ class LoopExecutionUnit(SubprogramExecutionUnit):
 
         iterators = inputNode.getIteratorSockets()
         iteratorNames = ["loop_iterator_" + str(i) for i in range(len(iterators))]
-        zipLine = "loop_zipped_list = zip({})".format(", ".join(iteratorNames))
+        zipLine = "loop_zipped_list = list(zip({}))".format(", ".join(iteratorNames))
+        iterationsLine = "loop_iterations = len(loop_zipped_list)"
 
         names = []
         for i, socket in enumerate(iterators):
@@ -117,9 +118,12 @@ class LoopExecutionUnit(SubprogramExecutionUnit):
             socketVariables[socket] = name
             names.append(name)
         loopLine = "for current_loop_index, ({}, ) in enumerate(loop_zipped_list):".format(", ".join(names))
+
         socketVariables[inputNode.indexSocket] = "current_loop_index"
+        socketVariables[inputNode.iterationsSocket] = "loop_iterations"
 
         lines.append(zipLine)
+        lines.append(iterationsLine)
         lines.append(loopLine)
         return lines
 
