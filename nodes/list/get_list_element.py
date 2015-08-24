@@ -29,10 +29,8 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
             text = "Assign",
             description = "Remove all sockets and set the selected socket type")
 
-    def execute(self, list, index, fallback):
-        if 0 <= index < len(list):
-            return list[index]
-        return fallback
+    def getExecutionCode(self):
+        return "element = list[index] if 0 <= index < len(list) else fallback"
 
     def edit(self):
         dataType = self.getWantedDataType()
