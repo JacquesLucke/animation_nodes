@@ -6,8 +6,7 @@ from .. exceptions import ExecutionUnitNotSetup, NodeRecursionDetected
 from . code_generator import (getInitialSocketVariables,
                               getSetupCode,
                               getNodeExecutionLines,
-                              linkOutputSocketsToTargets,
-                              getInputCopySocketValuesLines)
+                              linkOutputSocketsToTargets)
 
 class LoopExecutionUnit(SubprogramExecutionUnit):
     def __init__(self, network):

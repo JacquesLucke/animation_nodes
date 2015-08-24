@@ -6,8 +6,7 @@ from .. exceptions import ExecutionUnitNotSetup, NodeRecursionDetected
 from . code_generator import (getInitialSocketVariables,
                               getSetupCode,
                               getNodeExecutionLines,
-                              linkOutputSocketsToTargets,
-                              getInputCopySocketValuesLines)
+                              linkOutputSocketsToTargets)
 
 class GroupExecutionUnit(SubprogramExecutionUnit):
     def __init__(self, network):
@@ -69,7 +68,6 @@ class GroupExecutionUnit(SubprogramExecutionUnit):
 
     def getExecutionScriptLines(self, nodes, socketVariables):
         lines = []
-        lines.extend(getInputCopySocketValuesLines(nodes, socketVariables))
         lines.extend(linkOutputSocketsToTargets(self.network.groupInputNode, socketVariables))
         for node in nodes:
             if node.bl_idname in ("an_GroupInput", "an_GroupOutput"): continue

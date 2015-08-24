@@ -74,20 +74,20 @@ def get_GetSocketValues(nodes, socketVariables):
 # Node Execution Code
 ##########################################
 
-def getInputCopySocketValuesLines(nodes, socketVariables):
-    lines = []
-    for node in nodes:
-        for socket in node.inputs:
-            if socket.dataIsModified and socket.isCopyable and socket.isUnlinked:
-                newName = socketVariables[socket] + "_copy"
-                lines.append(getCopyLine(socket, newName, socketVariables))
-                socketVariables[socket] = newName
-    return lines
-
 def getNodeExecutionLines(node, socketVariables):
     lines = ["\n", "# Node: {} - {}".format(repr(node.nodeTree.name), repr(node.name))]
+    lines.extend(getInputCopyLines(node, socketVariables))
     taggedLines = node.getTaggedExecutionCodeLines()
     lines.extend([replaceTaggedLine(line, node, socketVariables) for line in taggedLines])
+    return lines
+
+def getInputCopyLines(node, socketVariables):
+    lines = []
+    for socket in node.inputs:
+        if socket.dataIsModified and socket.isCopyable and socket.isUnlinked:
+            newName = socketVariables[socket] + "_copy"
+            lines.append(getCopyLine(socket, newName, socketVariables))
+            socketVariables[socket] = newName
     return lines
 
 def replaceTaggedLine(line, node, socketVariables):
