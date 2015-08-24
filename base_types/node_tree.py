@@ -3,7 +3,7 @@ import time
 from bpy.props import *
 from .. events import treeChanged
 from .. execution.units import getMainUnitsByNodeTree
-from .. nodes.generic.debug_output import clearDebugTextBlock
+from .. nodes.generic.debug import clearDebugTextBlock
 
 class AutoExecutionProperties(bpy.types.PropertyGroup):
     bl_idname = "an_AutoExecutionProperties"

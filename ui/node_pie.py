@@ -136,7 +136,7 @@ class InsertDebugNode(bpy.types.Operator):
     def execute(self, context):
         nodeTree = getActiveAnimationNodeTree()
         originNode = getNode(self.nodeTreeName, self.nodeName)
-        node = insertNode("an_DebugOutputNode")
+        node = insertNode("an_DebugNode")
         nodeTree.links.new(node.inputs[0], originNode.outputs[self.socketIndex])
         moveNode(node)
         return{"FINISHED"}
