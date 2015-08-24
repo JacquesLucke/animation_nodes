@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import *
-from .. events import treeChanged
+from .. events import treeChanged, executionCodeChanged
 from .. utils.recursion import noRecursion
 from .. utils.names import getRandomString, toVariableName
 from .. tree_info import isSocketLinked, getOriginSocket, getDirectOriginSocket, getTargetSockets, getLinkedSockets
@@ -33,6 +33,7 @@ class AnimationNodeSocket:
     moveable = BoolProperty(default = False)
 
     dataIsModified = BoolProperty(default = False)
+    copyAlways = BoolProperty(default = False, update = executionCodeChanged)
 
     def draw(self, context, layout, node, text):
         displayText = self.getDisplayedName()

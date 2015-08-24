@@ -144,8 +144,9 @@ def linkSocketToTargets(socket, socketVariables):
 
 def getTargetsThatNeedACopy(socket, targets):
     if not socket.isCopyable: return []
-    if len(targets) == 1: return []
     modifiedTargets = [target for target in targets if target.dataIsModified]
+    if socket.copyAlways: return modifiedTargets
+    if len(targets) == 1: return []
     if len(targets) > len(modifiedTargets): return modifiedTargets
     else: return modifiedTargets[1:]
 

@@ -126,7 +126,7 @@ class LoopExecutionUnit(SubprogramExecutionUnit):
 
     def get_LoopBody(self, inputNode, nodes, socketVariables):
         lines = []
-        lines.extend(indent(linkOutputSocketsToTargets(inputNode, socketVariables)))
+        lines.extend(linkOutputSocketsToTargets(inputNode, socketVariables))
         for node in nodes:
             if node.bl_idname in ("an_LoopInput", ): continue
             lines.extend(getNodeExecutionLines(node, socketVariables))

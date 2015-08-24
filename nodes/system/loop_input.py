@@ -42,6 +42,11 @@ class LoopInput(bpy.types.Node, AnimationNode):
         for socket in self.getParameterSockets():
             socket.drawInput(box, self, socket.getDisplayedName())
 
+        col = layout.column()
+        col.label("Copy for each Iteration:")
+        for socket in self.getParameterSockets():
+            col.prop(socket, "copyAlways", text = socket.customName)
+
     def edit(self):
         for target in self.newIteratorSocket.dataTargetSockets:
             if target.dataType == "Node Control": continue
@@ -90,7 +95,9 @@ class LoopInput(bpy.types.Node, AnimationNode):
     def newParameter(self, dataType, name = None, defaultValue = None):
         if name is None: name = dataType
         socket = self.outputs.new(toIdName(dataType), name, "parameter")
+        if defaultValue: socket.setStoreableValue(defaultValue)
         socket.moveTo(self.newParameterSocket.index)
+        socket.copyAlways = True
         self.setupSocket(socket, name, moveGroup = 2)
         return socket
 
