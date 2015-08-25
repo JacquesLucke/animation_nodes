@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... events import treeChanged
-from . utils import updateCallerNodes
+from . utils import updateSubprogramInvokerNodes
 from ... base_types.node import AnimationNode
 from ... sockets.info import toIdName
 
@@ -77,12 +77,12 @@ class GroupOutput(bpy.types.Node, AnimationNode):
         bpy.ops.node.translate_attach("INVOKE_DEFAULT")
 
     def socketChanged(self):
-        updateCallerNodes()
+        updateSubprogramInvokerNodes()
 
     def delete(self):
         self.inputs.clear()
-        updateCallerNodes()
-        
+        updateSubprogramInvokerNodes()
+
     def useGroupInputInNetwork(self):
         network = self.network
         for node in network.getNodes():

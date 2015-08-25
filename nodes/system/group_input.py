@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import *
-from . utils import updateCallerNodes
+from . utils import updateSubprogramInvokerNodes
 from ... sockets.info import toIdName
 from ... events import networkChanged
 from ... base_types.node import AnimationNode
@@ -75,11 +75,11 @@ class GroupInput(bpy.types.Node, AnimationNode):
         return socket
 
     def socketChanged(self):
-        updateCallerNodes()
+        updateSubprogramInvokerNodes()
 
     def delete(self):
         self.outputs.clear()
-        updateCallerNodes()
+        updateSubprogramInvokerNodes()
 
     def getSocketData(self):
         data = SubprogramData()

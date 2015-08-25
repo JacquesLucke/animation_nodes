@@ -172,7 +172,7 @@ class NodeNetwork:
         groupOutputs = []
         loopInputs = []
         generatorOutputs = []
-        calledIdentifiers = set()
+        invokedIdentifiers = set()
 
         for nodeID in self.nodeIDs:
             idName = _data.typeByNode[nodeID]
@@ -184,8 +184,8 @@ class NodeNetwork:
                 loopInputs.append(nodeID)
             elif idName == "an_LoopGeneratorOutput":
                 generatorOutputs.append(nodeID)
-            elif idName == "an_SubprogramCaller":
-                calledIdentifiers.add(idToNode(nodeID).subprogramIdentifier)
+            elif idName == "an_InvokeSubprogramNode":
+                invokedIdentifiers.add(idToNode(nodeID).subprogramIdentifier)
 
         groupInAmount = len(groupInputs)
         groupOutAmount = len(groupOutputs)
@@ -230,9 +230,9 @@ class NodeNetwork:
             self.description = owner.subprogramDescription
 
             if forbidSubprogramRecursion():
-                if self.identifier in calledIdentifiers:
+                if self.identifier in invokedIdentifiers:
                     self.type = "Invalid"
-                    problems.report("{} calls itself".format(repr(self.name)), forbidUnitCreation = True, forbidExecution = True)
+                    problems.report("{} invokes itself".format(repr(self.name)), forbidUnitCreation = True, forbidExecution = True)
 
     @staticmethod
     def join(networks):

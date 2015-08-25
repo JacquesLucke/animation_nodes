@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from operator import attrgetter
-from . utils import updateCallerNodes
+from . utils import updateSubprogramInvokerNodes
 from ... events import networkChanged
 from ... base_types.node import AnimationNode
 from . subprogram_sockets import SubprogramData
@@ -124,11 +124,11 @@ class LoopInput(bpy.types.Node, AnimationNode):
 
 
     def socketChanged(self):
-        updateCallerNodes()
+        updateSubprogramInvokerNodes()
 
     def delete(self):
         self.outputs.clear()
-        updateCallerNodes()
+        updateSubprogramInvokerNodes()
 
 
     def getSocketData(self):
@@ -162,7 +162,7 @@ class LoopInput(bpy.types.Node, AnimationNode):
     def createGeneratorOutputNode(self):
         settings = [{"name" : "loopInputIdentifier", "value" : repr(self.identifier)}]
         bpy.ops.node.add_and_link_node("INVOKE_DEFAULT", use_transform = True, settings = settings, type = "an_LoopGeneratorOutput")
-        updateCallerNodes()
+        updateSubprogramInvokerNodes()
 
 
     @property

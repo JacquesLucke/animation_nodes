@@ -19,7 +19,7 @@ class AddonPreferences(bpy.types.AddonPreferences):
 
     forbidSubprogramRecursion = BoolProperty(
         name = "Forbid Subprogram Recursion", default = True,
-        description = "A subprogram caller node must not be in the same network that it calls")
+        description = "A subprogram invoker node must not be in the same network that it calls")
 
     def draw(self, context):
         layout = self.layout

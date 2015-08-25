@@ -7,9 +7,9 @@ from ... sockets.info import toDataType
 from ... execution.units import getSubprogramUnitByIdentifier
 from ... events import executionCodeChanged
 
-class SubprogramCaller(bpy.types.Node, AnimationNode):
-    bl_idname = "an_SubprogramCaller"
-    bl_label = "Subprogram Caller"
+class InvokeSubprogram(bpy.types.Node, AnimationNode):
+    bl_idname = "an_InvokeSubprogramNode"
+    bl_label = "Invoke Subprogram"
 
     def subprogramIdentifierChanged(self, context):
         self.updateSockets()
