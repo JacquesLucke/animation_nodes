@@ -25,7 +25,7 @@ class SplineListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def drawInput(self, layout, node, text):
         if not self.showName: text = ""
         if self.showObjectInput: self.drawAsProperty(layout, text)
-        else: self.label(text)
+        else: layout.label(text)
 
     def drawAsProperty(self, layout, text):
         row = layout.row(align = True)
