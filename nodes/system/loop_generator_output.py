@@ -1,5 +1,7 @@
 import bpy
 from bpy.props import *
+from ... events import treeChanged
+from . utils import updateCallerNodes
 from ... base_types.node import AnimationNode
 from ... sockets.info import toIdName, toBaseDataType
 from ... tree_info import keepNodeLinks, getNodeByIdentifier
@@ -14,18 +16,27 @@ class LoopGeneratorOutput(bpy.types.Node, AnimationNode):
 
     def dataTypeChanged(self, context):
         self.generateSockets()
+        self.updateCallerNodes()
 
     def nameChanged(self, context):
         self.label = self.outputName
+        self.updateCallerNodes()
+
+    def loopInputIdentifierChanged(self, context):
+        self.updateCallerNodes()
+        treeChanged()
 
     listDataType = StringProperty(update = dataTypeChanged)
     addType = EnumProperty(name = "Add Type", items = addTypeItems, update = dataTypeChanged)
     outputName = StringProperty(name = "Generator Name", update = nameChanged)
-    loopInputIdentifier = StringProperty()
+    loopInputIdentifier = StringProperty(update = loopInputIdentifierChanged)
+    sortIndex = IntProperty(default = 0)
+    removed = BoolProperty(default = False)
 
     def create(self):
         self.listDataType = "Vector List"
         self.outputName = "Generator Name"
+        self.sortIndex = id(self)
 
     def draw(self, layout):
         node = self.loopInputNode
@@ -47,16 +58,31 @@ class LoopGeneratorOutput(bpy.types.Node, AnimationNode):
     def generateSockets(self):
         self.inputs.clear()
 
-        socket = self.inputs.new("an_BooleanSocket", "Activate")
+        socket = self.inputs.new("an_BooleanSocket", "Activate", "activate")
         socket.value = True
         socket.hide = True
 
         if self.addType == "APPEND": dataType = toBaseDataType(self.listDataType)
         elif self.addType == "EXTEND": dataType = self.listDataType
-        socket = self.inputs.new(toIdName(dataType), dataType)
+        socket = self.inputs.new(toIdName(dataType), dataType, "input")
         socket.display.nameOnly = True
+
+    def delete(self):
+        self.removed = True
+        self.updateCallerNodes()
+
+    def updateCallerNodes(self):
+        updateCallerNodes(self.loopInputIdentifier)
 
     @property
     def loopInputNode(self):
         try: return getNodeByIdentifier(self.loopInputIdentifier)
         except: return None
+
+    @property
+    def activateSocket(self):
+        return self.inputs[0]
+
+    @property
+    def addSocket(self):
+        return self.inputs[1]

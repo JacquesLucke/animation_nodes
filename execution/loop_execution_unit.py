@@ -63,9 +63,11 @@ class LoopExecutionUnit(SubprogramExecutionUnit):
 
     def get_IterationsAmount(self, inputNode, nodes, socketVariables):
         header = self.get_IterationsAmount_Header(inputNode, socketVariables)
+        generators = indent(self.get_InitializeGenerators(inputNode, socketVariables))
         prepareLoop = indent(self.get_IterationsAmount_PrepareLoop(inputNode, socketVariables))
         loopBody = indent(self.get_LoopBody(inputNode, nodes, socketVariables), amount = 2)
-        return joinLines([header] + prepareLoop + loopBody)
+        returnStatement = indent([self.get_ReturnStatement(inputNode, socketVariables)])
+        return joinLines([header] + generators + prepareLoop + loopBody + returnStatement)
 
     def get_IterationsAmount_Header(self, inputNode, socketVariables):
         socketVariables[inputNode.iterationsSocket] = "loop_iterations"
@@ -87,9 +89,11 @@ class LoopExecutionUnit(SubprogramExecutionUnit):
 
     def get_IteratorLength(self, inputNode, nodes, socketVariables):
         header = self.get_IteratorLength_Header(inputNode, socketVariables)
+        generators = indent(self.get_InitializeGenerators(inputNode, socketVariables))
         prepareLoop = indent(self.get_IteratorLength_PrepareLoop(inputNode, socketVariables))
         loopBody = indent(self.get_LoopBody(inputNode, nodes, socketVariables), amount = 2)
-        return joinLines([header] + prepareLoop + loopBody)
+        returnStatement = indent([self.get_ReturnStatement(inputNode, socketVariables)])
+        return joinLines([header] + generators + prepareLoop + loopBody + returnStatement)
 
     def get_IteratorLength_Header(self, inputNode, socketVariables):
         parameterNames = []
@@ -127,15 +131,40 @@ class LoopExecutionUnit(SubprogramExecutionUnit):
         lines.append(loopLine)
         return lines
 
+
+    def get_InitializeGenerators(self, inputNode, socketVariables):
+        lines = []
+        for i, node in enumerate(inputNode.getGeneratorNodes()):
+            name = "loop_generator_output_" + str(i)
+            socketVariables[node] = name
+            lines.append("{} = []".format(name))
+        return lines
+
+
     def get_LoopBody(self, inputNode, nodes, socketVariables):
         lines = []
         lines.extend(linkOutputSocketsToTargets(inputNode, socketVariables))
         for node in nodes:
-            if node.bl_idname in ("an_LoopInput", ): continue
+            if node.bl_idname in ("an_LoopInput", "an_LoopGeneratorOutput"): continue
             lines.extend(getNodeExecutionLines(node, socketVariables))
             lines.extend(linkOutputSocketsToTargets(node, socketVariables))
+        lines.extend(self.get_AddToGenerators(inputNode, socketVariables))
         lines.append("pass")
         return lines
+
+    def get_AddToGenerators(self, inputNode, socketVariables):
+        lines = []
+        for node in inputNode.getGeneratorNodes():
+            operation = "append" if node.addType == "APPEND" else "extend"
+            lines.append("if {}:".format(socketVariables[node.activateSocket]))
+            lines.append("    {}.{}({})".format(socketVariables[node], operation, socketVariables[node.addSocket]))
+        return lines
+
+
+
+    def get_ReturnStatement(self, inputNode, socketVariables):
+        names = [socketVariables[node] for node in inputNode.getGeneratorNodes()]
+        return "return {}".format(", ".join(names))
 
 
 

@@ -49,7 +49,7 @@ class SubprogramData:
 
     def newSocketFromData(self, nodeSockets, data):
         newSocket = nodeSockets.new(data.idName, data.identifier, data.identifier)
-        newSocket.setStoreableValue(data.defaultValue)
+        if newSocket.isInput: newSocket.setStoreableValue(data.defaultValue)
         newSocket.customName = data.customName
         newSocket.displayCustomName = True
         return newSocket

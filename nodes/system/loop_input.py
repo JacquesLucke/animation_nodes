@@ -1,5 +1,6 @@
 import bpy
 from bpy.props import *
+from operator import attrgetter
 from . utils import updateCallerNodes
 from ... events import networkChanged
 from ... base_types.node import AnimationNode
@@ -143,11 +144,15 @@ class LoopInput(bpy.types.Node, AnimationNode):
                 data.newInput(toListIdName(socket.bl_idname), socket.identifier, socket.customName + " List", [])
         for socket in self.getParameterSockets():
             data.newInputFromSocket(socket)
+        for node in self.getGeneratorNodes():
+            if node.removed: continue
+            data.newOutput(toIdName(node.listDataType), node.identifier, node.outputName, None)
         return data
 
     def createGeneratorOutputNode(self):
         settings = [{"name" : "loopInputIdentifier", "value" : repr(self.identifier)}]
         bpy.ops.node.add_and_link_node("INVOKE_DEFAULT", use_transform = True, settings = settings, type = "an_LoopGeneratorOutput")
+        self.updateCallerNodes()
 
 
     @property
@@ -175,3 +180,8 @@ class LoopInput(bpy.types.Node, AnimationNode):
 
     def getParameterSockets(self):
         return self.outputs[self.newIteratorSocket.index + 1:self.newParameterSocket.index]
+
+    def getGeneratorNodes(self):
+        nodes = self.network.generatorOutputNodes
+        nodes.sort(key = attrgetter("sortIndex"))
+        return nodes

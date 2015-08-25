@@ -155,6 +155,10 @@ class AnimationNodeSocket:
         return self.is_output
 
     @property
+    def isInput(self):
+        return not self.is_output
+
+    @property
     def nodeTree(self):
         return self.node.id_data
 

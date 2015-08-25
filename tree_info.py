@@ -162,6 +162,7 @@ class NodeNetwork:
         self.identifier = None
         self.groupInputID = None
         self.groupOutputID = None
+        self.generatorOutputIDs = []
         self.analyse()
 
     def analyse(self):
@@ -254,6 +255,10 @@ class NodeNetwork:
     def loopInputNode(self):
         if self.loopInputID is None: return None
         return idToNode(self.loopInputID)
+
+    @property
+    def generatorOutputNodes(self):
+        return [idToNode(nodeID) for nodeID in self.generatorOutputIDs]
 
 
 _data = NodeData()
