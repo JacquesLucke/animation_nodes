@@ -1,10 +1,10 @@
 import bpy
 from bpy.props import *
-from . utils import updateSubprogramInvokerNodes
 from ... sockets.info import toIdName
 from ... events import networkChanged
 from ... base_types.node import AnimationNode
 from . subprogram_sockets import SubprogramData
+from . utils import updateSubprogramInvokerNodes
 
 class GroupInput(bpy.types.Node, AnimationNode):
     bl_idname = "an_GroupInput"

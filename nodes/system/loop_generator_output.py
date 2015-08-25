@@ -71,6 +71,9 @@ class LoopGeneratorOutput(bpy.types.Node, AnimationNode):
         self.removed = True
         updateSubprogramInvokerNodes()
 
+    def duplicate(self, source):
+        updateSubprogramInvokerNodes()
+
     @property
     def loopInputNode(self):
         try: return getNodeByIdentifier(self.loopInputIdentifier)

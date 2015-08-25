@@ -1,5 +1,6 @@
-from ... tree_info import getNodesByType
+from ... import tree_info
 
 def updateSubprogramInvokerNodes():
-    for node in getNodesByType("an_InvokeSubprogramNode"):
+    tree_info.update()
+    for node in tree_info.getNodesByType("an_InvokeSubprogramNode"):
         node.updateSockets()

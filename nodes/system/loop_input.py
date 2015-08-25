@@ -1,11 +1,12 @@
 import bpy
 from bpy.props import *
 from operator import attrgetter
-from . utils import updateSubprogramInvokerNodes
 from ... events import networkChanged
 from ... base_types.node import AnimationNode
 from . subprogram_sockets import SubprogramData
-from ... sockets.info import toBaseIdName, toListDataType, toIdName, isBase, toListIdName, toBaseDataType
+from . utils import updateSubprogramInvokerNodes
+from ... sockets.info import (toBaseIdName, toListDataType,
+                        toIdName, isBase, toListIdName, toBaseDataType)
 
 class LoopInput(bpy.types.Node, AnimationNode):
     bl_idname = "an_LoopInput"

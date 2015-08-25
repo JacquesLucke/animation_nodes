@@ -1,9 +1,9 @@
 import bpy
 from bpy.props import *
 from ... events import treeChanged
-from . utils import updateSubprogramInvokerNodes
-from ... base_types.node import AnimationNode
 from ... sockets.info import toIdName
+from ... base_types.node import AnimationNode
+from . utils import updateSubprogramInvokerNodes
 
 class GroupOutput(bpy.types.Node, AnimationNode):
     bl_idname = "an_GroupOutput"
