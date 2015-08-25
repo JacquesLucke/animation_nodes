@@ -2,8 +2,8 @@ import bpy
 import random
 from bpy.props import *
 from ... events import propertyChanged
-from ... cache import getUniformRandom
 from ... base_types.node import AnimationNode
+from ... algorithms.random import getUniformRandom
 
 class RandomNumberNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_RandomNumberNode"

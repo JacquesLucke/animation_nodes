@@ -2,9 +2,6 @@ import bpy
 from bpy.props import *
 from ... base_types.node import AnimationNode
 
-textBlockName = "AN Debug"
-debugDataCache = {}
-
 class DebugNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_DebugNode"
     bl_label = "Debug"
