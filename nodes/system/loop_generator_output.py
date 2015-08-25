@@ -28,10 +28,11 @@ class LoopGeneratorOutput(bpy.types.Node, AnimationNode):
 
     listDataType = StringProperty(update = dataTypeChanged)
     addType = EnumProperty(name = "Add Type", items = addTypeItems, update = dataTypeChanged)
+
     outputName = StringProperty(name = "Generator Name", update = nameChanged)
     loopInputIdentifier = StringProperty(update = loopInputIdentifierChanged)
-    sortIndex = IntProperty(default = 0)
     removed = BoolProperty(default = False)
+    sortIndex = IntProperty(default = 0)
 
     def create(self):
         self.listDataType = "Vector List"
@@ -40,13 +41,12 @@ class LoopGeneratorOutput(bpy.types.Node, AnimationNode):
 
     def draw(self, layout):
         node = self.loopInputNode
-        if node:
-            layout.label(node.subprogramName, icon = "GROUP_VERTEX")
+        if node: layout.label(node.subprogramName, icon = "GROUP_VERTEX")
 
     def drawAdvanced(self, layout):
         layout.prop(self, "outputName", text = "Name")
         layout.prop(self, "addType")
-        self.functionOperator(layout, "chooseNewGeneratorType", text = "Change Type")
+        self.functionOperator(layout, "chooseNewGeneratorType", text = "Change Type", icon = "TRIA_RIGHT")
 
     def chooseNewGeneratorType(self):
         self.chooseSocketDataType("setListDataType", socketGroup = "LIST")
@@ -58,7 +58,7 @@ class LoopGeneratorOutput(bpy.types.Node, AnimationNode):
     def generateSockets(self):
         self.inputs.clear()
 
-        socket = self.inputs.new("an_BooleanSocket", "Activate", "activate")
+        socket = self.inputs.new("an_BooleanSocket", "Enabled", "enabled")
         socket.value = True
         socket.hide = True
 
@@ -77,7 +77,7 @@ class LoopGeneratorOutput(bpy.types.Node, AnimationNode):
         except: return None
 
     @property
-    def activateSocket(self):
+    def enabledSocket(self):
         return self.inputs[0]
 
     @property

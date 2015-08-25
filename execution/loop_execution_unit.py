@@ -156,7 +156,7 @@ class LoopExecutionUnit(SubprogramExecutionUnit):
         lines = []
         for node in inputNode.getGeneratorNodes():
             operation = "append" if node.addType == "APPEND" else "extend"
-            lines.append("if {}:".format(socketVariables[node.activateSocket]))
+            lines.append("if {}:".format(socketVariables[node.enabledSocket]))
             lines.append("    {}.{}({})".format(socketVariables[node], operation, socketVariables[node.addSocket]))
         return lines
 
