@@ -59,4 +59,4 @@ class LoopGeneratorOutput(bpy.types.Node, AnimationNode):
     @property
     def loopInputNode(self):
         try: return getNodeByIdentifier(self.loopInputIdentifier)
-        else: return None
+        except: return None

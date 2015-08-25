@@ -168,6 +168,7 @@ class NodeNetwork:
         groupInputs = []
         groupOutputs = []
         loopInputs = []
+        generatorOutputs = []
 
         for nodeID in self.nodeIDs:
             idName = _data.typeByNode[nodeID]
@@ -177,16 +178,19 @@ class NodeNetwork:
                 groupOutputs.append(nodeID)
             elif idName == "an_LoopInput":
                 loopInputs.append(nodeID)
+            elif idName == "an_LoopGeneratorOutput":
+                generatorOutputs.append(nodeID)
 
         groupInAmount = len(groupInputs)
         groupOutAmount = len(groupOutputs)
         loopInAmount = len(loopInputs)
+        generatorAmount = len(generatorOutputs)
 
         self.type = "Invalid"
 
-        if groupInAmount + groupOutAmount + loopInAmount == 0:
+        if groupInAmount + groupOutAmount + loopInAmount + generatorAmount == 0:
             self.type = "Main"
-        elif loopInAmount == 0:
+        elif loopInAmount + generatorAmount == 0:
             if groupInAmount == 0 and groupOutAmount == 1:
                 self.identifier = idToNode(groupOutputs[0]).groupInputIdentifier
             elif groupInAmount == 1 and groupOutAmount == 0:
@@ -196,7 +200,10 @@ class NodeNetwork:
                     self.type = "Group"
                     self.groupOutputID = groupOutputs[0]
         elif groupInAmount + groupOutAmount == 0:
-            if loopInAmount == 1:
+            generatorOwners = list({idToNode(nodeID).loopInputIdentifier for nodeID in generatorOutputs})
+            if loopInAmount == 0 and len(generatorOwners) == 1:
+                self.identifier = generatorOwners[0]
+            if loopInAmount == 1 and len(generatorOwners) <= 1:
                 self.type = "Loop"
 
         if self.type == "Group":
@@ -206,6 +213,7 @@ class NodeNetwork:
         if self.type == "Loop":
             owner = idToNode(loopInputs[0])
             self.loopInputID = loopInputs[0]
+            self.generatorOutputIDs = generatorOutputs
 
         if self.type in ("Group", "Loop"):
             self.identifier = owner.identifier

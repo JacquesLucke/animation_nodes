@@ -32,6 +32,7 @@ class LoopInput(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.separator()
         layout.prop(self, "subprogramName", text = "", icon = "GROUP_VERTEX")
+        self.functionOperator(layout, "createGeneratorOutputNode", text = "New Generator")
 
     def drawAdvanced(self, layout):
         col = layout.column()
@@ -143,6 +144,10 @@ class LoopInput(bpy.types.Node, AnimationNode):
         for socket in self.getParameterSockets():
             data.newInputFromSocket(socket)
         return data
+
+    def createGeneratorOutputNode(self):
+        settings = [{"name" : "loopInputIdentifier", "value" : repr(self.identifier)}]
+        bpy.ops.node.add_and_link_node("INVOKE_DEFAULT", use_transform = True, settings = settings, type = "an_LoopGeneratorOutput")
 
 
     @property
