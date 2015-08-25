@@ -90,7 +90,7 @@ class SequencerSoundInput(bpy.types.Node, AnimationNode):
         col = layout.column()
         col.scale_y = 1.5
         props = col.operator("an.load_sound_into_sequence_editor", icon = "PLUS")
-        props.nodeTreeName = self.nodeTree.name
+        props.nodeTreeName = self.id_data.name
         props.nodeName = self.name
 
     def drawComplexUI(self, layout):
@@ -149,7 +149,7 @@ class SequencerSoundInput(bpy.types.Node, AnimationNode):
 
     def bakeSounds(self):
         bpy.ops.an.bake_sounds("INVOKE_DEFAULT",
-            nodeTreeName = self.nodeTree.name,
+            nodeTreeName = self.id_data.name,
             nodeName = self.name,
             attack = self.attack,
             release = self.release)

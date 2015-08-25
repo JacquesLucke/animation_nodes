@@ -144,7 +144,7 @@ class AnimationNodeSocket:
         else: self.nodeTree.links.new(self, socket)
 
     def removeConnectedLinks(self):
-        tree = self.nodeTree
+        tree = self.node.id_data
         for link in self.links:
             tree.links.remove(link)
 
@@ -163,7 +163,7 @@ class AnimationNodeSocket:
 
     @property
     def nodeTree(self):
-        return self.nodeTree
+        return self.node.id_data
 
     @property
     def index(self):

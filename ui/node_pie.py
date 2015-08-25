@@ -128,7 +128,7 @@ class InsertDebugNode(bpy.types.Operator):
         node = context.active_node
         bpy.ops.an.choose_socket_and_execute_operator("INVOKE_DEFAULT",
             operatorName = "an.insert_debug_node",
-            nodeTreeName = nodeTree.name,
+            nodeTreeName = node.id_data.name,
             nodeName = node.name,
             chooseOutputSocket = True)
         return {"FINISHED"}
@@ -161,7 +161,7 @@ class InsertDataInputNode(bpy.types.Operator):
         node = context.active_node
         bpy.ops.an.choose_socket_and_execute_operator("INVOKE_DEFAULT",
             operatorName = "an.insert_data_input_node",
-            nodeTreeName = nodeTree.name,
+            nodeTreeName = node.id_data.name,
             nodeName = node.name,
             chooseOutputSocket = False)
         return {"FINISHED"}
@@ -265,7 +265,7 @@ def storeCursorLocation(event):
 def onlySelect(node):
     bpy.ops.node.select_all(action = "DESELECT")
     node.select = True
-    nodeTree.nodes.active = node
+    node.id_data.nodes.active = node
 
 
 def getNodeNameFromIdName(idName):

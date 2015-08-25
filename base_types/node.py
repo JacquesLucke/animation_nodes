@@ -148,7 +148,7 @@ class AnimationNode:
 
     @property
     def nodeTree(self):
-        return self.nodeTree
+        return self.id_data
 
     @property
     def inputsByIdentifier(self):

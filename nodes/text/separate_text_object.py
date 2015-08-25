@@ -34,7 +34,7 @@ class SeparateTextObject(bpy.types.Node, AnimationNode):
         row = layout.row(align = True)
         row.prop(self, "sourceObjectName", text = "Source")
         assign = row.operator("an.assign_active_object_to_text_separation_node", icon = "EYEDROPPER", text = "")
-        assign.nodeTreeName = self.nodeTree.name
+        assign.nodeTreeName = self.id_data.name
         assign.nodeName = self.name
 
         source = self.getSourceObject()
