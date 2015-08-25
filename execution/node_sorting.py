@@ -1,4 +1,4 @@
-from .. exceptions import NodeRecursionDetected
+from .. problems import NodeRecursionDetected
 
 def sortNodes(nodes):
     """

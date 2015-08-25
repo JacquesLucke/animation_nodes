@@ -2,7 +2,7 @@ import sys, traceback
 from .. import problems
 from . node_sorting import sortNodes
 from . compile_scripts import compileScript
-from .. exceptions import ExecutionUnitNotSetup, NodeRecursionDetected
+from .. problems import ExecutionUnitNotSetup, NodeRecursionDetected
 from . code_generator import (getInitialSocketVariables,
                               getSetupCode,
                               getNodeExecutionLines,

@@ -26,3 +26,14 @@ class Problem:
         self.message = message
         self.forbidUnitCreation = forbidUnitCreation
         self.forbidExecution = forbidExecution
+
+
+
+# Exceptions
+########################################        
+
+class ExecutionUnitNotSetup(Exception):
+    pass
+
+class NodeRecursionDetected(Exception):
+    pass

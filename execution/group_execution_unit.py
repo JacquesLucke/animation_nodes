@@ -2,7 +2,7 @@ from .. import problems
 from . compile_scripts import compileScript
 from . node_sorting import sortNodes
 from . subprogram_execution_unit import SubprogramExecutionUnit
-from .. exceptions import ExecutionUnitNotSetup, NodeRecursionDetected
+from .. problems import ExecutionUnitNotSetup, NodeRecursionDetected
 from . code_generator import (getInitialSocketVariables,
                               getSetupCode,
                               getNodeExecutionLines,
