@@ -42,11 +42,11 @@ class ObjectTransformsInput(bpy.types.Node, AnimationNode):
             if usedOutputs["rotation"]: add("    rotation = mathutils.Vector(object.rotation_euler)")
             if usedOutputs["scale"]: add("    scale = object.scale")
         else:
-            if self.frameType == "OFFSET":
-                add("    frame += bpy.context.scene.frame_current")
-            if usedOutputs["location"]: add("    location = mathutils.Vector(animation_nodes.utils.fcurve.getArrayValueAtFrame(object, 'location', frame))")
-            if usedOutputs["rotation"]: add("    rotation = mathutils.Vector(animation_nodes.utils.fcurve.getArrayValueAtFrame(object, 'rotation_euler', frame))")
-            if usedOutputs["scale"]: add("    scale = mathutils.Vector(animation_nodes.utils.fcurve.getArrayValueAtFrame(object, 'scale', frame))")
+            if self.frameType == "OFFSET": add("    evaluationFrame = frame + bpy.context.scene.frame_current")
+            else: add("    evaluationFrame = frame")
+            if usedOutputs["location"]: add("    location = mathutils.Vector(animation_nodes.utils.fcurve.getArrayValueAtFrame(object, 'location', evaluationFrame))")
+            if usedOutputs["rotation"]: add("    rotation = mathutils.Vector(animation_nodes.utils.fcurve.getArrayValueAtFrame(object, 'rotation_euler', evaluationFrame))")
+            if usedOutputs["scale"]: add("    scale = mathutils.Vector(animation_nodes.utils.fcurve.getArrayValueAtFrame(object, 'scale', evaluationFrame))")
 
         add("except:")
         add("    location = mathutils.Vector((0, 0, 0))")
