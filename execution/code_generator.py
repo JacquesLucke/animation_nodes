@@ -6,12 +6,12 @@ from .. preferences import addonName, generateCompactCode
 # Initial Socket Variables
 ##########################################
 
-def getInitialSocketVariables(nodes):
-    socketVariables = {}
+def getInitialVariables(nodes):
+    variables = {}
     for node in nodes:
         for socket in node.sockets:
-            socketVariables[socket] = getSocketVariableName(socket)
-    return socketVariables
+            variables[socket] = getSocketVariableName(socket)
+    return variables
 
 def getSocketVariableName(socket):
     socketID = socket.identifier if socket.identifier.isidentifier() else "_socket_{}_{}".format(socket.isOutput, socket.index)
@@ -22,12 +22,12 @@ def getSocketVariableName(socket):
 # Setup Code
 ##########################################
 
-def getSetupCode(nodes, socketVariables):
+def getSetupCode(nodes, variables):
     lines = []
     lines.append(get_ImportModules(nodes))
     lines.append(get_ImportAnimationNodes())
     lines.extend(get_GetNodeReferences(nodes))
-    lines.extend(get_GetSocketValues(nodes, socketVariables))
+    lines.extend(get_GetSocketValues(nodes, variables))
     return "\n".join(lines)
 
 
@@ -61,12 +61,12 @@ def get_GetNodeReferences(nodes):
     return lines
 
 
-def get_GetSocketValues(nodes, socketVariables):
+def get_GetSocketValues(nodes, variables):
     lines = []
     for node in nodes:
         for socket in node.unlinkedInputs:
-            if socket.hasValueCode: line = "{} = {}".format(socketVariables[socket], socket.getValueCode())
-            else: line = "{} = {}.inputs[{}].getValue()".format(socketVariables[socket], node.identifier, socket.index)
+            if socket.hasValueCode: line = "{} = {}".format(variables[socket], socket.getValueCode())
+            else: line = "{} = {}.inputs[{}].getValue()".format(variables[socket], node.identifier, socket.index)
             lines.append(line)
     return lines
 
@@ -75,47 +75,47 @@ def get_GetSocketValues(nodes, socketVariables):
 # Node Execution Code
 ##########################################
 
-def getNodeExecutionLines(node, socketVariables):
+def getNodeExecutionLines(node, variables):
     lines = []
     if not generateCompactCode(): lines.extend(getNodeCommentLines(node))
-    lines.extend(getInputCopyLines(node, socketVariables))
+    lines.extend(getInputCopyLines(node, variables))
     taggedLines = node.getTaggedExecutionCodeLines()
-    lines.extend([replaceTaggedLine(line, node, socketVariables) for line in taggedLines])
+    lines.extend([replaceTaggedLine(line, node, variables) for line in taggedLines])
     return lines
 
 def getNodeCommentLines(node):
     return ["\n", "# Node: {} - {}".format(repr(node.nodeTree.name), repr(node.name))]
 
-def getInputCopyLines(node, socketVariables):
+def getInputCopyLines(node, variables):
     lines = []
     for socket in node.inputs:
         if socket.dataIsModified and socket.isCopyable and socket.isUnlinked:
-            newName = socketVariables[socket] + "_copy"
+            newName = variables[socket] + "_copy"
             if socket.hasValueCode: line = "{} = {}".format(newName, socket.getValueCode())
-            else: line = getCopyLine(socket, newName, socketVariables)
+            else: line = getCopyLine(socket, newName, variables)
             lines.append(line)
-            socketVariables[socket] = newName
+            variables[socket] = newName
     return lines
 
-def replaceTaggedLine(line, node, socketVariables):
+def replaceTaggedLine(line, node, variables):
     line = replace_NumberSign_NodeReference(line, node)
-    line = replace_PercentSign_InputSocketVariable(line, node, socketVariables)
-    line = replace_DollarSign_OutputSocketVariable(line, node, socketVariables)
+    line = replace_PercentSign_InputSocketVariable(line, node, variables)
+    line = replace_DollarSign_OutputSocketVariable(line, node, variables)
     return line
 
 def replace_NumberSign_NodeReference(line, node):
     return line.replace("#self#", node.identifier)
 
-def replace_PercentSign_InputSocketVariable(line, node, socketVariables):
+def replace_PercentSign_InputSocketVariable(line, node, variables):
     nodeInputs = node.inputsByIdentifier
     for name, identifier in node.inputNames.items():
-        line = line.replace("%{}%".format(identifier), socketVariables[nodeInputs[name]])
+        line = line.replace("%{}%".format(identifier), variables[nodeInputs[name]])
     return line
 
-def replace_DollarSign_OutputSocketVariable(line, node, socketVariables):
+def replace_DollarSign_OutputSocketVariable(line, node, variables):
     nodeOutputs = node.outputsByIdentifier
     for name, identifier in node.outputNames.items():
-        line = line.replace("${}$".format(identifier), socketVariables[nodeOutputs[name]])
+        line = line.replace("${}$".format(identifier), variables[nodeOutputs[name]])
     return line
 
 
@@ -123,19 +123,19 @@ def replace_DollarSign_OutputSocketVariable(line, node, socketVariables):
 # Modify Socket Variables
 ##########################################
 
-def linkOutputSocketsToTargets(node, socketVariables):
-    resolveInnerLinks(node, socketVariables)
+def linkOutputSocketsToTargets(node, variables):
+    resolveInnerLinks(node, variables)
     lines = []
     for socket in node.linkedOutputs:
-        lines.extend(linkSocketToTargets(socket, socketVariables))
+        lines.extend(linkSocketToTargets(socket, variables))
     return lines
 
-def resolveInnerLinks(node, socketVariables):
+def resolveInnerLinks(node, variables):
     inputs, outputs = node.inputsByIdentifier, node.outputsByIdentifier
     for inputName, outputName in node.innerLinks:
-        socketVariables[outputs[outputName]] = socketVariables[inputs[inputName]]
+        variables[outputs[outputName]] = variables[inputs[inputName]]
 
-def linkSocketToTargets(socket, socketVariables):
+def linkSocketToTargets(socket, variables):
     lines = []
 
     targets = socket.dataTargetSockets
@@ -143,9 +143,9 @@ def linkSocketToTargets(socket, socketVariables):
 
     for target in socket.dataTargetSockets:
         if target in needACopy:
-            lines.append(getCopyLine(socket, socketVariables[target], socketVariables))
+            lines.append(getCopyLine(socket, variables[target], variables))
         else:
-            socketVariables[target] = socketVariables[socket]
+            variables[target] = variables[socket]
 
     return lines
 
@@ -157,7 +157,7 @@ def getTargetsThatNeedACopy(socket, targets):
     if len(targets) > len(modifiedTargets): return modifiedTargets
     else: return modifiedTargets[1:]
 
-def getCopyLine(fromSocket, targetName, socketVariables):
-    copyStatement = fromSocket.getCopyStatement().replace("value", socketVariables[fromSocket])
+def getCopyLine(fromSocket, targetName, variables):
+    copyStatement = fromSocket.getCopyStatement().replace("value", variables[fromSocket])
     copyCode = "{} = {}".format(targetName, copyStatement)
     return copyCode

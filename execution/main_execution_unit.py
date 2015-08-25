@@ -3,7 +3,7 @@ from .. import problems
 from . node_sorting import sortNodes
 from . compile_scripts import compileScript
 from .. problems import ExecutionUnitNotSetup, NodeRecursionDetected
-from . code_generator import (getInitialSocketVariables,
+from . code_generator import (getInitialVariables,
                               getSetupCode,
                               getNodeExecutionLines,
                               linkOutputSocketsToTargets)
@@ -57,15 +57,15 @@ class MainExecutionUnit:
             problems.report(message = "Link Recursion in {}".format(repr(self.network.treeName)), forbidExecution = True)
             return
 
-        socketVariables = getInitialSocketVariables(nodes)
-        self.setupScript = getSetupCode(nodes, socketVariables)
-        self.executeScript = self.getExecutionScript(nodes, socketVariables)
+        variables = getInitialVariables(nodes)
+        self.setupScript = getSetupCode(nodes, variables)
+        self.executeScript = self.getExecutionScript(nodes, variables)
 
-    def getExecutionScript(self, nodes, socketVariables):
+    def getExecutionScript(self, nodes, variables):
         lines = []
         for node in nodes:
-            lines.extend(getNodeExecutionLines(node, socketVariables))
-            lines.extend(linkOutputSocketsToTargets(node, socketVariables))
+            lines.extend(getNodeExecutionLines(node, variables))
+            lines.extend(linkOutputSocketsToTargets(node, variables))
         return "\n".join(lines)
 
     def compileScripts(self):
