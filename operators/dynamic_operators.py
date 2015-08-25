@@ -60,7 +60,7 @@ fallbackOperator = createOperatorWithDescription("")
 ##################################
 
 def registerHandlers():
-    #bpy.utils.register_class(fallbackOperator)
+    bpy.utils.register_class(fallbackOperator)
     bpy.app.handlers.scene_update_post.append(createMissingOperators)
 
 def unregisterHandlers():
