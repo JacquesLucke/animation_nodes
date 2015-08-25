@@ -1,10 +1,10 @@
 import bpy
 from bpy.props import *
-from .. events import treeChanged, executionCodeChanged
 from .. utils.recursion import noRecursion
+from .. events import treeChanged, executionCodeChanged
 from .. utils.names import getRandomString, toVariableName
+from .. operators.dynamic_operators import getInvokeFunctionOperator
 from .. tree_info import isSocketLinked, getOriginSocket, getDirectOriginSocket, getTargetSockets, getLinkedSockets
-from . socket_function_call import getInvokeSocketFunctionOperator
 
 class CustomNameProperties(bpy.types.PropertyGroup):
     bl_idname = "an_CustomNameProperties"
@@ -86,14 +86,17 @@ class AnimationNodeSocket:
     def getStoreableValue(self):
         return
 
-    def invokeFunction(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True):
-        idName = getInvokeSocketFunctionOperator(description)
+    def invokeFunction(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True, data = None):
+        idName = getInvokeFunctionOperator(description)
         props = layout.operator(idName, text = text, icon = icon, emboss = emboss)
-        props.nodeTreeName = self.node.id_data.name
+        props.classType = "SOCKET"
+        props.treeName = self.nodeTree.name
         props.nodeName = self.node.name
-        props.isOutput = self.is_output
+        props.isOutput = self.isOutput
         props.identifier = self.identifier
         props.functionName = functionName
+        props.invokeWithData = data is not None
+        props.data = str(data)
 
     def moveUp(self):
         self.moveTo(self.index - 1)

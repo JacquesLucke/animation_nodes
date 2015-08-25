@@ -3,11 +3,11 @@ import bpy
 import time
 import random
 from bpy.props import *
-from bpy.app.handlers import persistent
-from . node_function_call import getInvokeNodeFunctionOperator
-from .. utils.nodes import getAnimationNodeTrees
-from .. tree_info import getNetworkWithNode
 from collections import defaultdict
+from bpy.app.handlers import persistent
+from .. tree_info import getNetworkWithNode
+from .. utils.nodes import getAnimationNodeTrees
+from .. operators.dynamic_operators import getInvokeFunctionOperator
 
 class AnimationNode:
     isAnimationNode = True
@@ -96,9 +96,10 @@ class AnimationNode:
         self.draw(layout)
 
     def invokeFunction(self, layout, functionName, text = "", icon = "NONE", description = "", data = None, emboss = True):
-        idName = getInvokeNodeFunctionOperator(description)
+        idName = getInvokeFunctionOperator(description)
         props = layout.operator(idName, text = text, icon = icon, emboss = emboss)
-        props.nodeTreeName = self.id_data.name
+        props.classType = "NODE"
+        props.treeName = self.nodeTree.name
         props.nodeName = self.name
         props.functionName = functionName
         props.invokeWithData = data is not None
