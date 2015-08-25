@@ -108,14 +108,14 @@ def replace_NumberSign_NodeReference(line, node):
 
 def replace_PercentSign_InputSocketVariable(line, node, variables):
     nodeInputs = node.inputsByIdentifier
-    for name, identifier in node.inputNames.items():
-        line = line.replace("%{}%".format(identifier), variables[nodeInputs[name]])
+    for name, variable in node.inputVariables.items():
+        line = line.replace("%{}%".format(variable), variables[nodeInputs[name]])
     return line
 
 def replace_DollarSign_OutputSocketVariable(line, node, variables):
     nodeOutputs = node.outputsByIdentifier
-    for name, identifier in node.outputNames.items():
-        line = line.replace("${}$".format(identifier), variables[nodeOutputs[name]])
+    for name, variable in node.outputVariables.items():
+        line = line.replace("${}$".format(variable), variables[nodeOutputs[name]])
     return line
 
 

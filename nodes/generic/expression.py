@@ -51,7 +51,7 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
         self.chooseSocketDataType("newInputSocket")
 
     @property
-    def inputNames(self):
+    def inputVariables(self):
         return {socket.identifier : socket.customName for socket in self.inputs}
 
     def getExecutionCode(self):

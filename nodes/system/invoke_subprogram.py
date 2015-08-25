@@ -18,11 +18,11 @@ class InvokeSubprogram(bpy.types.Node, AnimationNode):
     subprogramIdentifier = StringProperty(name = "Subprogram Identifier", default = "", update = subprogramIdentifierChanged)
 
     @property
-    def inputNames(self):
+    def inputVariables(self):
         return { socket.identifier : "input_" + str(i) for i, socket in enumerate(self.inputs)}
 
     @property
-    def outputNames(self):
+    def outputVariables(self):
         return { socket.identifier : "output_" + str(i) for i, socket in enumerate(self.outputs)}
 
     def getExecutionCode(self):

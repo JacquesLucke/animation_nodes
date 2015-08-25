@@ -30,7 +30,7 @@ class DebugNode(bpy.types.Node, AnimationNode):
             col.prop(socket, '["dataWidth"]', text = "Width " + str(i + 1))
 
     @property
-    def inputNames(self):
+    def inputVariables(self):
         return {socket.identifier : "data_" + str(i) for i, socket in enumerate(self.inputs)}
 
     def getExecutionCode(self):

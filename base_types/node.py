@@ -196,20 +196,20 @@ class AnimationNode:
         return list(self.inputs) + list(self.outputs)
 
     @property
-    def inputNames(self):
+    def inputVariables(self):
         return {socket.identifier : socket.identifier for socket in self.inputs}
 
     @property
-    def outputNames(self):
+    def outputVariables(self):
         return {socket.identifier : socket.identifier for socket in self.outputs}
 
     @property
     def innerLinks(self):
         names = defaultdict(list)
-        for identifier, inputName in self.inputNames.items():
-            names[inputName].append(identifier)
-        for identifier, outputName in self.outputNames.items():
-            names[outputName].append(identifier)
+        for identifier, variable in self.inputVariables.items():
+            names[variable].append(identifier)
+        for identifier, variable in self.outputVariables.items():
+            names[variable].append(identifier)
 
         links = []
         for name, identifiers in names.items():
@@ -229,26 +229,26 @@ class AnimationNode:
             % - input variables
             $ - output variables
         """
-        inputNames = self.inputNames
-        outputNames = self.outputNames
+        inputVariables = self.inputVariables
+        outputVariables = self.outputVariables
 
         if hasattr(self, "execute"):
-            parameters = ["%{0}%".format(inputNames[socket.identifier]) for socket in self.inputs]
+            parameters = ["%{0}%".format(inputVariables[socket.identifier]) for socket in self.inputs]
             parameterString = ", ".join(parameters)
 
             executionString = "#self#.execute(" + parameterString + ")"
 
-            outputVariables = ["${}$".format(outputNames[socket.identifier]) for socket in self.outputs]
+            outputVariables = ["${}$".format(outputVariables[socket.identifier]) for socket in self.outputs]
             outputString = ", ".join(outputVariables)
 
             if outputString == "": return [executionString]
             return [outputString + " = "+ executionString]
         else:
             code = self.getExecutionCodeString()
-            for inputName in inputNames.values():
-                code = tagVariableName(code, inputName, "%")
-            for outputName in outputNames.values():
-                code = tagVariableName(code, outputName, "$")
+            for variable in inputVariables.values():
+                code = tagVariableName(code, variable, "%")
+            for variable in outputVariables.values():
+                code = tagVariableName(code, variable, "$")
             code = tagVariableName(code, "self", "#")
             return code.split("\n")
 

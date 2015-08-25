@@ -34,7 +34,7 @@ class CombineLists(bpy.types.Node, AnimationNode):
             description = "Remove all sockets and set the selected socket type")
 
     @property
-    def inputNames(self):
+    def inputVariables(self):
         return { socket.identifier : "list_" + str(i) for i, socket in enumerate(self.inputs) }
 
     def getExecutionCode(self):

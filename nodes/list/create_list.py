@@ -47,7 +47,7 @@ class CreateList(bpy.types.Node, AnimationNode):
         self.drawTypeSpecificButtonsExt(layout)
 
     @property
-    def inputNames(self):
+    def inputVariables(self):
         return { socket.identifier : "element_" + str(i) for i, socket in enumerate(self.inputs) }
 
     def getExecutionCode(self):
