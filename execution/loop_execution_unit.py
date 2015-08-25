@@ -41,8 +41,7 @@ class LoopExecutionUnit(SubprogramExecutionUnit):
     def generateScript(self):
         nodes = self.network.getAnimationNodes()
 
-        try:
-            nodes = sortNodes(nodes)
+        try: nodes = sortNodes(nodes)
         except NodeRecursionDetected:
             problems.report(message = "Link Recursion in {}".format(repr(self.network.name)), forbidExecution = True)
             return
