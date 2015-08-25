@@ -45,10 +45,10 @@ class AnimationNodeSocket:
         elif self.nameSettings.editable and self.display.customNameInput:
             row.prop(self, "customName", text = "")
         else:
-            if not self.is_output and not self.isLinked:
+            if self.isInput and self.isUnlinked:
                 self.drawInput(row, node, displayText)
             else:
-                if self.is_output: row.alignment = "RIGHT"
+                if self.isOutput: row.alignment = "RIGHT"
                 row.label(displayText)
 
         if self.moveable and self.display.moveOperators:
@@ -172,7 +172,7 @@ class AnimationNodeSocket:
     @property
     def sockets(self):
         """Returns all sockets next to this one (all inputs or outputs)"""
-        return self.node.outputs if self.is_output else self.node.inputs
+        return self.node.outputs if self.isOutput else self.node.inputs
 
     @property
     def isLinked(self):

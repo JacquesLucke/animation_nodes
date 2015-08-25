@@ -19,7 +19,7 @@ def draw(self, context):
         subcol = row.column(align = True)
         props = subcol.operator("an.move_input", text = "", icon = "TRIA_UP").moveUp = True
         subcol.operator("an.move_input", text = "", icon = "TRIA_DOWN").moveUp = False
-        
+
     if len(node.outputs) > 0:
         row = col.row()
         rows = len(node.outputs)
@@ -47,7 +47,7 @@ class SocketUiList(bpy.types.UIList):
     def draw_item(self, context, layout, node, socket, icon, activeData, activePropname):
         if socket.nameSettings.editable:
             layout.prop(socket, "customName", emboss = False, text = "")
-        elif socket.isLinked or socket.is_output: layout.label(socket.getDisplayedName())
+        elif socket.isLinked or socket.isOutput: layout.label(socket.getDisplayedName())
         else: layout.label(socket.toString())
 
         if socket.removeable:
