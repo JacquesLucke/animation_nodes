@@ -1,5 +1,4 @@
 import bpy
-from .. cache import *
 from . names import toDataPath
 
 
@@ -19,6 +18,7 @@ def removeCustomProperty(object, propertyName):
     if propertyName in object:
         del object[propertyName]
     removeFCurveWithDataPath(object, toDataPath(propertyName))
+
 
 
 # get value in one frame
@@ -90,31 +90,36 @@ def removeFCurveWithDataPath(object, dataPath):
     except: pass
 
 
+
 # search fcurves
 ########################
 
+cache = {}
+
+def clearCache():
+    cache.clear()
+    print("#"*50)
+
 def getFCurvesWithDataPath(object, dataPath, storeInCache = True):
-    identifier = object.type + object.name + dataPath
-    cache = getExecutionCache(identifier)
-    if cache is None:
-        fCurves = []
-        for fCurve in getAllFCurves(object):
-            if fCurve.data_path == dataPath:
-                fCurves.append(fCurve)
-        cache = fCurves
-        if storeInCache: setExecutionCache(identifier, cache)
-    return cache
+    identifier = (object.type, object.name, dataPath)
+    if identifier in cache: return cache[identifier]
+
+    fCurves = []
+    for fCurve in getAllFCurves(object):
+        if fCurve.data_path == dataPath:
+            fCurves.append(fCurve)
+    cache[identifier] = fCurves
+    return fCurves
 
 
 def getSingleFCurveWithDataPath(object, dataPath, storeInCache = True):
-    identifier = object.type + object.name + dataPath + "first"
-    cache = getExecutionCache(identifier)
-    if cache is None:
-        for fCurve in getAllFCurves(object):
-            if fCurve.data_path == dataPath:
-                if storeInCache: setExecutionCache(identifier, fCurve)
-                return fCurve
-    return cache
+    identifier = (object.type, object.name, dataPath, "first")
+    if identifier in cache: return cache[identifier]
+
+    for fCurve in getAllFCurves(object):
+        if fCurve.data_path == dataPath:
+            cache[identifier] = fCurve
+            return fCurve
 
 
 

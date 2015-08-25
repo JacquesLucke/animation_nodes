@@ -1,10 +1,11 @@
 import traceback
+from .. import problems
 from collections import defaultdict
+from . cache import clearExecutionCache
 from . main_execution_unit import MainExecutionUnit
 from . group_execution_unit import GroupExecutionUnit
 from . loop_execution_unit import LoopExecutionUnit
 from .. tree_info import getNetworksByType, getSubprogramNetworks
-from .. import problems
 from .. utils.timing import measureTime
 
 _mainUnitsByNodeTree = defaultdict(list)
@@ -60,6 +61,8 @@ def setupExecutionUnits():
 def finishExecutionUnits():
     for unit in getExecutionUnits():
         unit.finish()
+
+    clearExecutionCache()
 
 
 def getMainUnitsByNodeTree(nodeTree):
