@@ -1,7 +1,9 @@
 import bpy
+from . import problems
 from collections import defaultdict
 from . utils.timing import measureTime
 from bpy.app.handlers import persistent
+from . preferences import forbidSubprogramRecursion
 from . utils.nodes import getAnimationNodeTrees, getNode, getSocket
 
 # Global Node Data
@@ -170,6 +172,7 @@ class NodeNetwork:
         groupOutputs = []
         loopInputs = []
         generatorOutputs = []
+        calledIdentifiers = set()
 
         for nodeID in self.nodeIDs:
             idName = _data.typeByNode[nodeID]
@@ -181,6 +184,8 @@ class NodeNetwork:
                 loopInputs.append(nodeID)
             elif idName == "an_LoopGeneratorOutput":
                 generatorOutputs.append(nodeID)
+            elif idName == "an_SubprogramCaller":
+                calledIdentifiers.add(idToNode(nodeID).subprogramIdentifier)
 
         groupInAmount = len(groupInputs)
         groupOutAmount = len(groupOutputs)
@@ -220,6 +225,11 @@ class NodeNetwork:
             self.identifier = owner.identifier
             self.name = owner.subprogramName
             self.description = owner.subprogramDescription
+
+            if forbidSubprogramRecursion():
+                if self.identifier in calledIdentifiers:
+                    self.type = "Invalid"
+                    problems.report("{} calls itself".format(repr(self.name)), forbidUnitCreation = True, forbidExecution = True)
 
     @staticmethod
     def join(networks):

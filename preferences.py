@@ -17,6 +17,10 @@ class AddonPreferences(bpy.types.AddonPreferences):
         name = "Generate Compact Code", default = False,
         description = "Avoid comments and blank lines (this has no impact on performance)")
 
+    forbidSubprogramRecursion = BoolProperty(
+        name = "Forbid Subprogram Recursion", default = True,
+        description = "A subprogram caller node must not be in the same network that it calls")
+
     def draw(self, context):
         layout = self.layout
 
@@ -34,3 +38,6 @@ def getPreferences():
 
 def generateCompactCode():
     return getPreferences().generateCompactCode
+
+def forbidSubprogramRecursion():
+    return getPreferences().forbidSubprogramRecursion
