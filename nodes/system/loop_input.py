@@ -130,26 +130,38 @@ class LoopInput(bpy.types.Node, AnimationNode):
         self.outputs.clear()
         updateCallerNodes()
 
+
     def getSocketData(self):
         data = SubprogramData()
         if len(self.outputs) == 0: return data
+
+        self.insertIteratorData(data)
+        self.insertParameterData(data)
+        self.insertGeneratorData(data)
+
+        return data
+
+    def insertIteratorData(self, data):
         iteratorSockets = self.getIteratorSockets()
         if len(iteratorSockets) == 0:
             data.newInput("an_IntegerSocket", "loop_iterations", "Iterations", 0)
         else:
             for socket in iteratorSockets:
                 data.newInput(toListIdName(socket.bl_idname), socket.identifier, socket.customName + " List", [])
+
+    def insertParameterData(self, data):
         for socket in self.getParameterSockets():
             data.newInputFromSocket(socket)
+
+    def insertGeneratorData(self, data):
         for node in self.getGeneratorNodes():
             if node.removed: continue
             data.newOutput(toIdName(node.listDataType), node.identifier, node.outputName, None)
-        return data
+
 
     def createGeneratorOutputNode(self):
         settings = [{"name" : "loopInputIdentifier", "value" : repr(self.identifier)}]
         bpy.ops.node.add_and_link_node("INVOKE_DEFAULT", use_transform = True, settings = settings, type = "an_LoopGeneratorOutput")
-        self.nodeTree.nodes[-1].chooseNewGeneratorType()
         updateCallerNodes()
 
 
