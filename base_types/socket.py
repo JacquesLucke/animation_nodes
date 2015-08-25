@@ -12,11 +12,12 @@ class CustomNameProperties(bpy.types.PropertyGroup):
     editable = BoolProperty(default = False)
     variable = BoolProperty(default = False)
 
-class SocketEditDisplayProperties(bpy.types.PropertyGroup):
-    bl_idname = "an_SocketEditDisplayProperties"
+class SocketDisplayProperties(bpy.types.PropertyGroup):
+    bl_idname = "an_SocketDisplayProperties"
     customNameInput = BoolProperty(default = False)
     moveOperators = BoolProperty(default = False)
     removeOperator = BoolProperty(default = False)
+    nameOnly = BoolProperty(default = False)
 
 class AnimationNodeSocket:
 
@@ -26,7 +27,7 @@ class AnimationNodeSocket:
     customName = StringProperty(default = "custom name", update = customNameChanged)
     displayCustomName = BoolProperty(default = False)
     nameSettings = PointerProperty(type = CustomNameProperties)
-    display = PointerProperty(type = SocketEditDisplayProperties)
+    display = PointerProperty(type = SocketDisplayProperties)
 
     removeable = BoolProperty(default = False)
     moveGroup = IntProperty(default = 0)
@@ -39,7 +40,9 @@ class AnimationNodeSocket:
         displayText = self.getDisplayedName()
 
         row = layout.row(align = True)
-        if self.nameSettings.editable and self.display.customNameInput:
+        if self.display.nameOnly:
+            row.label(displayText)
+        elif self.nameSettings.editable and self.display.customNameInput:
             row.prop(self, "customName", text = "")
         else:
             if not self.is_output and not self.isLinked:
