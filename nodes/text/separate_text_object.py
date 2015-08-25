@@ -44,7 +44,7 @@ class SeparateTextObject(bpy.types.Node, AnimationNode):
         layout.prop_search(self, "materialName", bpy.data, "materials", text="Material", icon="MATERIAL_DATA")
         layout.prop(self, "outputType", expand = True)
 
-        self.functionOperator(layout, "updateSeparation",
+        self.invokeFunction(layout, "updateSeparation",
             text = "Update",
             description = "Recreate the individual characters from the source object",
             icon = "FILE_REFRESH")

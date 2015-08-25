@@ -42,7 +42,7 @@ class InvokeSubprogram(bpy.types.Node, AnimationNode):
         col = layout.column()
         col.scale_y = 1.6
         if len(networks) == 0:
-            self.functionOperator(col, "createNewGroup", text = "Group", icon = "PLUS")
+            self.invokeFunction(col, "createNewGroup", text = "Group", icon = "PLUS")
         else:
             text, icon = (network.name, "GROUP_VERTEX") if network else ("Choose", "TRIA_RIGHT")
             props = col.operator("an.change_subprogram", text = text, icon = icon)

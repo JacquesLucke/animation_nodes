@@ -49,7 +49,7 @@ class CurveProperties(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         row = layout.row(align = True)
         row.prop(self, "selectedPath", text = "")
-        self.functionOperator(row, "newSocketFromSelection",
+        self.invokeFunction(row, "newSocketFromSelection",
             text = "",
             description = "Create a new socket for the selected property",
             icon = "PLUS")

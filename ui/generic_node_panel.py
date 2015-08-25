@@ -32,10 +32,10 @@ def draw(self, context):
     col = layout.column(align = True)
     col.label("Toogle Operation Visibility:")
     row = col.row(align = True)
-    node.functionOperator(row, "toogleCustomNameInputVisibility", text = "Name")
-    node.functionOperator(row, "toogleMoveOperatorsVisibility", text = "Move")
-    node.functionOperator(row, "toogleRemoveOperatorVisibility", text = "Remove")
-    node.functionOperator(row, "disableSocketEditingInNode", icon = "FULLSCREEN")
+    node.invokeFunction(row, "toogleCustomNameInputVisibility", text = "Name")
+    node.invokeFunction(row, "toogleMoveOperatorsVisibility", text = "Move")
+    node.invokeFunction(row, "toogleRemoveOperatorVisibility", text = "Remove")
+    node.invokeFunction(row, "disableSocketEditingInNode", icon = "FULLSCREEN")
 
     layout.separator()
     layout.label("Identifier: " + node.identifier)
@@ -51,7 +51,7 @@ class SocketUiList(bpy.types.UIList):
         else: layout.label(socket.toString())
 
         if socket.removeable:
-            socket.functionOperator(layout, "remove", icon = "X", emboss = False)
+            socket.invokeFunction(layout, "remove", icon = "X", emboss = False)
 
         icon = "RESTRICT_VIEW_ON" if socket.hide else "RESTRICT_VIEW_OFF"
         layout.prop(socket, "hide", text = "", icon_only = True, icon = icon, emboss = False)

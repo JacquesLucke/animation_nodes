@@ -24,14 +24,14 @@ class GroupOutput(bpy.types.Node, AnimationNode):
         if self.inInvalidNetwork:
             col = layout.column()
             col.scale_y = 1.5
-            self.functionOperator(col, "useGroupInputInNetwork", text = "Use Input in Network",
+            self.invokeFunction(col, "useGroupInputInNetwork", text = "Use Input in Network",
                 description = "Scan the network of this node for group input nodes", icon = "QUESTION")
 
         layout.separator()
 
         inputNode = self.network.groupInputNode
         if inputNode: layout.label(inputNode.subprogramName, icon = "GROUP_VERTEX")
-        else: self.functionOperator(layout, "createGroupInputNode", text = "Input Node", icon = "PLUS")
+        else: self.invokeFunction(layout, "createGroupInputNode", text = "Input Node", icon = "PLUS")
         layout.separator()
 
     def drawNewReturnSocket(self, layout):
@@ -41,7 +41,7 @@ class GroupOutput(bpy.types.Node, AnimationNode):
         subrow.label("New Return")
         subrow = row.row()
         subrow.alignment = "RIGHT"
-        self.functionOperator(subrow, "chooseNewReturnType", icon = "ZOOMIN", emboss = False)
+        self.invokeFunction(subrow, "chooseNewReturnType", icon = "ZOOMIN", emboss = False)
 
     def chooseNewReturnType(self):
         self.chooseSocketDataType("newReturn")

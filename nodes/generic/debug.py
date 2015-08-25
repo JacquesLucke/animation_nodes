@@ -22,7 +22,7 @@ class DebugNode(bpy.types.Node, AnimationNode):
         socket["dataWidth"] = 10
 
     def drawAdvanced(self, layout):
-        self.functionOperator(layout, "newInput", text = "New Input", icon = "PLUS")
+        self.invokeFunction(layout, "newInput", text = "New Input", icon = "PLUS")
         layout.prop(self, "printData")
         layout.prop(self, "writeData")
 

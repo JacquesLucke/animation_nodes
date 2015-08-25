@@ -55,10 +55,10 @@ class ObjectInstancer(bpy.types.Node, AnimationNode):
     def drawAdvanced(self, layout):
         layout.prop(self, "parentInstances")
 
-        self.functionOperator(layout, "resetObjectDataOnAllInstances",
+        self.invokeFunction(layout, "resetObjectDataOnAllInstances",
             text = "Reset Source Data",
             description = "Reset the source data on all instances")
-        self.functionOperator(layout, "unlinkInstancesFromNode",
+        self.invokeFunction(layout, "unlinkInstancesFromNode",
             text = "Unlink Instances from Node",
             description = "This will make sure that the objects won't be removed if you remove the Replicate Node.")
 

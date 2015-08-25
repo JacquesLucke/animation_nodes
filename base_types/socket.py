@@ -4,7 +4,7 @@ from .. events import treeChanged, executionCodeChanged
 from .. utils.recursion import noRecursion
 from .. utils.names import getRandomString, toVariableName
 from .. tree_info import isSocketLinked, getOriginSocket, getDirectOriginSocket, getTargetSockets, getLinkedSockets
-from . socket_function_call import getSocketFunctionCallOperatorName
+from . socket_function_call import getInvokeSocketFunctionOperator
 
 class CustomNameProperties(bpy.types.PropertyGroup):
     bl_idname = "an_CustomNameProperties"
@@ -53,12 +53,12 @@ class AnimationNodeSocket:
 
         if self.moveable and self.display.moveOperators:
             row.separator()
-            self.functionOperator(row, "moveUpSave", icon = "TRIA_UP")
-            self.functionOperator(row, "moveDownSave", icon = "TRIA_DOWN")
+            self.invokeFunction(row, "moveUpSave", icon = "TRIA_UP")
+            self.invokeFunction(row, "moveDownSave", icon = "TRIA_DOWN")
 
         if self.removeable and self.display.removeOperator:
             row.separator()
-            self.functionOperator(row, "remove", icon = "X")
+            self.invokeFunction(row, "remove", icon = "X")
 
     def getDisplayedName(self):
         if self.displayCustomName or (self.nameSettings.editable and self.display.customNameInput):
@@ -86,8 +86,8 @@ class AnimationNodeSocket:
     def getStoreableValue(self):
         return
 
-    def functionOperator(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True):
-        idName = getSocketFunctionCallOperatorName(description)
+    def invokeFunction(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True):
+        idName = getInvokeSocketFunctionOperator(description)
         props = layout.operator(idName, text = text, icon = icon, emboss = emboss)
         props.nodeTreeName = self.node.id_data.name
         props.nodeName = self.node.name

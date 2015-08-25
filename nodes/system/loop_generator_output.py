@@ -46,7 +46,7 @@ class LoopGeneratorOutput(bpy.types.Node, AnimationNode):
     def drawAdvanced(self, layout):
         layout.prop(self, "outputName", text = "Name")
         layout.prop(self, "addType")
-        self.functionOperator(layout, "chooseNewGeneratorType", text = "Change Type", icon = "TRIA_RIGHT")
+        self.invokeFunction(layout, "chooseNewGeneratorType", text = "Change Type", icon = "TRIA_RIGHT")
 
     def chooseNewGeneratorType(self):
         self.chooseSocketDataType("setListDataType", socketGroup = "LIST")

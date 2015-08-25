@@ -28,7 +28,7 @@ class GroupInput(bpy.types.Node, AnimationNode):
         layout.separator()
         layout.prop(self, "subprogramName", text = "", icon = "GROUP_VERTEX")
         if self.outputNode is None:
-            self.functionOperator(layout, "createGroupOutputNode", text = "Output Node", icon = "PLUS")
+            self.invokeFunction(layout, "createGroupOutputNode", text = "Output Node", icon = "PLUS")
 
     def drawAdvanced(self, layout):
         col = layout.column()
@@ -45,7 +45,7 @@ class GroupInput(bpy.types.Node, AnimationNode):
         row = layout.row()
         subrow = row.row()
         subrow.alignment = "LEFT"
-        self.functionOperator(subrow, "chooseNewParameterType", icon = "ZOOMIN", emboss = False)
+        self.invokeFunction(subrow, "chooseNewParameterType", icon = "ZOOMIN", emboss = False)
         subrow = row.row()
         subrow.alignment = "RIGHT"
         subrow.label("New Parameter")

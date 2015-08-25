@@ -23,9 +23,9 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         row.prop_search(self, "objectName",  bpy.context.scene, "objects", icon="NONE", text = text)
 
         if self.objectCreationType != "":
-            self.functionOperator(row, "createObject", icon = "PLUS")
+            self.invokeFunction(row, "createObject", icon = "PLUS")
 
-        self.functionOperator(row, "assignActiveObject", icon = "EYEDROPPER")
+        self.invokeFunction(row, "assignActiveObject", icon = "EYEDROPPER")
 
     def getValue(self):
         return bpy.data.objects.get(self.objectName)

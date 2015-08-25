@@ -96,7 +96,7 @@ class SequencerSoundInput(bpy.types.Node, AnimationNode):
     def drawComplexUI(self, layout):
         row = layout.row(align = True)
         icon = "ERROR" if sequencerData.hasChanged else "FILE_TICK"
-        self.functionOperator(row, "bakeSounds", text = "Bake Sounds", icon = icon)
+        self.invokeFunction(row, "bakeSounds", text = "Bake Sounds", icon = icon)
         row.operator("an.clear_baked_data", text = "", icon = "X")
 
         if self.isBaking:

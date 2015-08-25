@@ -33,7 +33,7 @@ class LoopInput(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.separator()
         layout.prop(self, "subprogramName", text = "", icon = "GROUP_VERTEX")
-        self.functionOperator(layout, "createGeneratorOutputNode", text = "New Generator")
+        self.invokeFunction(layout, "createGeneratorOutputNode", text = "New Generator")
 
     def drawAdvanced(self, layout):
         col = layout.column()
@@ -74,7 +74,7 @@ class LoopInput(bpy.types.Node, AnimationNode):
         row = layout.row()
         subrow = row.row()
         subrow.alignment = "LEFT"
-        self.functionOperator(subrow, "chooseNewIteratorType", icon = "ZOOMIN", emboss = False)
+        self.invokeFunction(subrow, "chooseNewIteratorType", icon = "ZOOMIN", emboss = False)
         subrow = row.row()
         subrow.alignment = "RIGHT"
         subrow.label("New Iterator")
@@ -83,7 +83,7 @@ class LoopInput(bpy.types.Node, AnimationNode):
         row = layout.row()
         subrow = row.row()
         subrow.alignment = "LEFT"
-        self.functionOperator(subrow, "chooseNewParameterType", icon = "ZOOMIN", emboss = False)
+        self.invokeFunction(subrow, "chooseNewParameterType", icon = "ZOOMIN", emboss = False)
         subrow = row.row()
         subrow.alignment = "RIGHT"
         subrow.label("New Parameter")

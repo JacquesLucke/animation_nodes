@@ -23,7 +23,7 @@ class SequenceSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         editor = bpy.context.scene.sequence_editor
         if editor:
             row.prop_search(self, "sequenceName",  editor, "sequences", icon="NLA", text = text)
-            self.functionOperator(row, "assignActiveSequence", icon = "EYEDROPPER")
+            self.invokeFunction(row, "assignActiveSequence", icon = "EYEDROPPER")
         else:
             row.label("No Sequence Editor")
 

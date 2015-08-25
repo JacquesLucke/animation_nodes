@@ -37,7 +37,7 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
         if self.executionError != "":
             row = layout.row()
             row.label(self.executionError, icon = "ERROR")
-            self.functionOperator(row, "clearErrorMessage", icon = "X", emboss = False)
+            self.invokeFunction(row, "clearErrorMessage", icon = "X", emboss = False)
 
     def drawAdvanced(self, layout):
         layout.prop(self, "moduleNames")
@@ -45,7 +45,7 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
     def drawNewInputSocket(self, layout):
         row = layout.row()
         row.alignment = "LEFT"
-        self.functionOperator(row, "chooseNewInputType", text = "New Input", emboss = False)
+        self.invokeFunction(row, "chooseNewInputType", text = "New Input", emboss = False)
 
     def chooseNewInputType(self):
         self.chooseSocketDataType("newInputSocket")

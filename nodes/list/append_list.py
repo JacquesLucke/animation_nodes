@@ -25,7 +25,7 @@ class AppendListNode(bpy.types.Node, AnimationNode):
     def drawAdvanced(self, layout):
         col = layout.column(align = True)
         col.prop(self, "selectedType", text = "")
-        self.functionOperator(col, "assignSelectedListType",
+        self.invokeFunction(col, "assignSelectedListType",
             text = "Assign",
             description = "Remove all sockets and set the selected socket type")
 

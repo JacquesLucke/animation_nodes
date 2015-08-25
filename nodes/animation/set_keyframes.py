@@ -29,7 +29,7 @@ class SetKeyframesNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         row = layout.row(align = True)
         row.prop(self, "selectedPathType", text = "")
-        self.functionOperator(row, "addKeyframePath", icon = "PLUS")
+        self.invokeFunction(row, "addKeyframePath", icon = "PLUS")
 
         col = layout.column(align = True)
         for i, item in enumerate(self.paths):
@@ -37,7 +37,7 @@ class SetKeyframesNode(bpy.types.Node, AnimationNode):
             split = row.split(align = True, percentage = 0.7)
             split.prop(item, "path", text = "")
             split.prop(item, "index", text = "")
-            self.functionOperator(row, "removeItemFromList", icon = "X", data = str(i))
+            self.invokeFunction(row, "removeItemFromList", icon = "X", data = str(i))
 
     def execute(self, enable, setKeyframe, removeUnwanted, object):
         if not enable: return

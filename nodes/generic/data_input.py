@@ -22,7 +22,7 @@ class DataInput(bpy.types.Node, AnimationNode):
     def drawAdvanced(self, layout):
         col = layout.column(align = True)
         col.prop(self, "selectedType", text = "")
-        self.functionOperator(col, "assignSelectedType", text = "Assign", description = "Remove all sockets and set the selected socket type")
+        self.invokeFunction(col, "assignSelectedType", text = "Assign", description = "Remove all sockets and set the selected socket type")
 
         col = layout.column()
         col.active = hasattr(self.inputs[0], "drawAsProperty")

@@ -4,7 +4,7 @@ import time
 import random
 from bpy.props import *
 from bpy.app.handlers import persistent
-from . node_function_call import getNodeFunctionCallOperatorName
+from . node_function_call import getInvokeNodeFunctionOperator
 from .. utils.nodes import getAnimationNodeTrees
 from .. tree_info import getNetworkWithNode
 from collections import defaultdict
@@ -95,13 +95,13 @@ class AnimationNode:
         if self.inInvalidNetwork: layout.label("Invalid Network", icon = "ERROR")
         self.draw(layout)
 
-    def functionOperator(self, layout, functionName, text = "", icon = "NONE", description = "", data = None, emboss = True):
-        idName = getNodeFunctionCallOperatorName(description)
+    def invokeFunction(self, layout, functionName, text = "", icon = "NONE", description = "", data = None, emboss = True):
+        idName = getInvokeNodeFunctionOperator(description)
         props = layout.operator(idName, text = text, icon = icon, emboss = emboss)
         props.nodeTreeName = self.id_data.name
         props.nodeName = self.name
         props.functionName = functionName
-        props.callWithData = data is not None
+        props.invokeWithData = data is not None
         props.data = str(data)
 
     def clearSockets(self):

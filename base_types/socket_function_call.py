@@ -3,18 +3,18 @@ from bpy.props import *
 from bpy.app.handlers import persistent
 from .. utils.nodes import getSocket
 
-socketFunctionCallOperators = {}
-missingSocketOperators = []
+operatorsByDescription = {}
+missingDescriptions = []
 
-def getSocketFunctionCallOperatorName(description):
-    if description in socketFunctionCallOperators:
-        return socketFunctionCallOperators[description]
-    missingSocketOperators.append(description)
+def getInvokeSocketFunctionOperator(description):
+    if description in operatorsByDescription:
+        return operatorsByDescription[description]
+    missingDescriptions.append(description)
     return "an.call_socket_function_fallback"
 
-class CallSocketFunctionFallback(bpy.types.Operator):
-    bl_idname = "an.call_socket_function_fallback"
-    bl_label = "Call Socket Function"
+class InvokeSocketFunctionFallback(bpy.types.Operator):
+    bl_idname = "an.invoke_socket_function_fallback"
+    bl_label = "Invoke Socket Function"
 
     nodeTreeName = StringProperty()
     nodeName = StringProperty()
@@ -23,9 +23,9 @@ class CallSocketFunctionFallback(bpy.types.Operator):
     functionName = StringProperty()
 
     def invoke(self, context, event):
-        invokeSocketFunctionCall(self, context, event)
+        invokeSocketFunction(self, context, event)
 
-def invokeSocketFunctionCall(self, context, event):
+def invokeSocketFunction(self, context, event):
     socket = getSocket(self.nodeTreeName, self.nodeName, self.isOutput, self.identifier)
     getattr(socket, self.functionName)()
     bpy.context.area.tag_redraw()
@@ -34,29 +34,27 @@ def invokeSocketFunctionCall(self, context, event):
 
 @persistent
 def createMissingOperators(scene):
-    for description in missingSocketOperators:
-        createSocketFunctionCallOperator(description)
-    missingSocketOperators.clear()
+    for description in missingDescriptions:
+        createOperatorWithDescription(description)
+    missingDescriptions.clear()
 
-def createSocketFunctionCallOperator(description):
-    if description not in socketFunctionCallOperators:
+def createOperatorWithDescription(description):
+    operatorID = str(len(operatorsByDescription))
+    idName = "an.invoke_socket_function_" + operatorID
+    operatorsByDescription[description] = idName
 
-        id = str(len(socketFunctionCallOperators))
-        idName = "an.call_socket_function_" + id
-        socketFunctionCallOperators[description] = idName
+    operatorType = type("InvokeSocketFunction_" + operatorID, (bpy.types.Operator,), {
+        "bl_idname" : idName,
+        "bl_label" : "Invoke Socket Function",
+        "bl_description" : description,
+        "invoke" : invokeSocketFunction })
+    operatorType.nodeTreeName = StringProperty()
+    operatorType.nodeName = StringProperty()
+    operatorType.isOutput = BoolProperty()
+    operatorType.identifier = StringProperty()
+    operatorType.functionName = StringProperty()
 
-        operatorType = type("CallSocketFunction_" + id, (bpy.types.Operator,), {
-            "bl_idname" : idName,
-            "bl_label" : "Call Socket Function",
-            "bl_description" : description,
-            "invoke" : invokeSocketFunctionCall })
-        operatorType.nodeTreeName = StringProperty()
-        operatorType.nodeName = StringProperty()
-        operatorType.isOutput = BoolProperty()
-        operatorType.identifier = StringProperty()
-        operatorType.functionName = StringProperty()
-
-        bpy.utils.register_class(operatorType)
+    bpy.utils.register_class(operatorType)
 
 
 # Register

@@ -31,7 +31,7 @@ class SplineSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def drawAsProperty(self, layout, text):
         row = layout.row(align = True)
         row.prop_search(self, "objectName",  bpy.context.scene, "objects", icon="NONE", text = text)
-        self.functionOperator(row, "assignActiveObject", icon = "EYEDROPPER")
+        self.invokeFunction(row, "assignActiveObject", icon = "EYEDROPPER")
         if self.objectName != "":
             row.prop(self, "useWorldSpace", text = "", icon = "WORLD")
 
