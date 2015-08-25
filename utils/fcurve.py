@@ -98,7 +98,6 @@ cache = {}
 
 def clearCache():
     cache.clear()
-    print("#"*50)
 
 def getFCurvesWithDataPath(object, dataPath, storeInCache = True):
     identifier = (object.type, object.name, dataPath)
