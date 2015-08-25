@@ -348,7 +348,7 @@ def setConnections(connections):
     for id1, id2 in connections:
         socket1, socket2 = idToSocket(id1), idToSocket(id2)
         if socket1.is_output: socket1, socket2 = socket2, socket1
-        tree = socket1.node.id_data
+        tree = socket1.nodeTree
         tree.links.new(socket1, socket2)
 
 def keepNodeLinks(function):
@@ -384,7 +384,7 @@ def socketToID(socket):
     return (nodeToID(socket.node), socket.is_output, socket.identifier)
 
 def nodeToID(node):
-    return (node.id_data.name, node.name)
+    return (nodeTree.name, node.name)
 
 def idToSocket(socketID):
     return getSocket(socketID[0][0], socketID[0][1], socketID[1], socketID[2])

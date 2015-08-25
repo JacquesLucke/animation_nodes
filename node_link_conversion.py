@@ -8,7 +8,7 @@ def correctForbiddenNodeLinks():
     dataLinks = getAllDataLinks()
     invalidLinks = filterInvalidLinks(dataLinks)
     for dataOrigin, target in invalidLinks:
-        nodeTree = target.node.id_data
+        nodeTree = target.nodeTree
         directOrigin = getDirectOriginSocket(target)
         if not tryToCorrectLink(dataOrigin, directOrigin, target):
             removeLink(directOrigin, target)
@@ -22,13 +22,13 @@ def isConnectionValid(origin, target):
 def tryToCorrectLink(dataOrigin, directOrigin, target):
     for corrector in linkCorrectors:
         if corrector.check(dataOrigin, target):
-            nodeTree = target.node.id_data
+            nodeTree = target.nodeTree
             corrector.insert(nodeTree, directOrigin, target, dataOrigin)
             return True
     return False
 
 def removeLink(origin, target):
-    nodeTree = origin.node.id_data
+    nodeTree = origin.nodeTree
     for link in nodeTree.links:
         if link.from_socket == origin and link.to_socket == target:
             nodeTree.links.remove(link)
