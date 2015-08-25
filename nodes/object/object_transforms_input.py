@@ -13,19 +13,30 @@ class ObjectTransformsInput(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectTransformsInput"
     bl_label = "Object Transforms Input"
 
+    def useCurrentTransformsChanged(self, context):
+        self.inputs["Frame"].hide = self.useCurrentTransforms
+        executionCodeChanged()
+
+    useCurrentTransforms = BoolProperty(
+        name = "Use Current Transforms", default = True,
+        update = useCurrentTransformsChanged)
+
     frameType = EnumProperty(
         name = "Frame Type", default = "OFFSET",
         items = frameTypes, update = executionCodeChanged)
 
     def create(self):
         self.inputs.new("an_ObjectSocket", "Object", "object").showName = False
-        self.inputs.new("an_FloatSocket", "Frame", "frame")
+        self.inputs.new("an_FloatSocket", "Frame", "frame").hide = True
         self.outputs.new("an_VectorSocket", "Location", "location")
         self.outputs.new("an_VectorSocket", "Rotation", "rotation")
         self.outputs.new("an_VectorSocket", "Scale", "scale")
 
-    def draw(self, layout):
-        layout.prop(self, "frameType")
+    def drawAdvanced(self, layout):
+        layout.prop(self, "useCurrentTransforms")
+        col = layout.column()
+        col.active = not self.useCurrentTransforms
+        col.prop(self, "frameType")
 
     def getExecutionCode(self):
         usedOutputs = self.getUsedOutputsDict()
@@ -37,7 +48,7 @@ class ObjectTransformsInput(bpy.types.Node, AnimationNode):
         add = lines.append
 
         add("try:")
-        if frameInput.isUnlinked and frameInput.value == 0.0 and self.frameType == "OFFSET":
+        if self.useCurrentTransforms:
             if usedOutputs["location"]: add("    location = object.location")
             if usedOutputs["rotation"]: add("    rotation = mathutils.Vector(object.rotation_euler)")
             if usedOutputs["scale"]: add("    scale = object.scale")
