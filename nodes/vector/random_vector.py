@@ -3,8 +3,8 @@ import random
 from bpy.props import *
 from mathutils import Vector
 from ... events import propertyChanged
-from ... cache import getUniformRandom
 from ... base_types.node import AnimationNode
+from ... algorithms.random import getUniformRandom
 
 class RandomVectorNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_RandomVectorNode"
