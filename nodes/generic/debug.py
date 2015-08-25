@@ -14,6 +14,8 @@ class DebugNode(bpy.types.Node, AnimationNode):
 
     def newInput(self):
         socket = self.inputs.new("an_GenericSocket", "Data", "data")
+        socket.displayCustomName = True
+        socket.customName = ""
         socket.removeable = True
         socket.moveable = True
         socket["dataWidth"] = 10
@@ -40,7 +42,7 @@ class DebugNode(bpy.types.Node, AnimationNode):
         for data, socket in zip(dataList, self.inputs):
             if isinstance(data, float): text = str(round(data, 5))
             else: text = str(data)
-            socket.name = text
+            socket.customName = text
             texts.append(text.rjust(socket["dataWidth"]))
         if self.printData: print(" ".join(texts))
         if self.writeData:
