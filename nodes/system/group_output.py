@@ -77,15 +77,12 @@ class GroupOutput(bpy.types.Node, AnimationNode):
         bpy.ops.node.translate_attach("INVOKE_DEFAULT")
 
     def socketChanged(self):
-        self.updateCallerNodes()
+        updateCallerNodes()
 
     def delete(self):
         self.inputs.clear()
-        self.updateCallerNodes()
-
-    def updateCallerNodes(self):
-        updateCallerNodes(self.groupInputIdentifier)
-
+        updateCallerNodes()
+        
     def useGroupInputInNetwork(self):
         network = self.network
         for node in network.getNodes():

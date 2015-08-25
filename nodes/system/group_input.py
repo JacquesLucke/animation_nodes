@@ -75,14 +75,11 @@ class GroupInput(bpy.types.Node, AnimationNode):
         return socket
 
     def socketChanged(self):
-        self.updateCallerNodes()
+        updateCallerNodes()
 
     def delete(self):
         self.outputs.clear()
-        self.updateCallerNodes()
-
-    def updateCallerNodes(self):
-        updateCallerNodes(self.identifier)
+        updateCallerNodes()
 
     def getSocketData(self):
         data = SubprogramData()

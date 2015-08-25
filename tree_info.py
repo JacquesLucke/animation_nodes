@@ -209,8 +209,11 @@ class NodeNetwork:
             generatorOwners = list({idToNode(nodeID).loopInputIdentifier for nodeID in generatorOutputs})
             if loopInAmount == 0 and len(generatorOwners) == 1:
                 self.identifier = generatorOwners[0]
-            if loopInAmount == 1 and len(generatorOwners) <= 1:
+            elif loopInAmount == 1 and len(generatorOwners) == 0:
                 self.type = "Loop"
+            elif loopInAmount == 1 and len(generatorOwners) == 1:
+                if idToNode(loopInputs[0]).identifier == generatorOwners[0]:
+                    self.type = "Loop"
 
         if self.type == "Group":
             owner = idToNode(groupInputs[0])

@@ -124,14 +124,11 @@ class LoopInput(bpy.types.Node, AnimationNode):
 
 
     def socketChanged(self):
-        self.updateCallerNodes()
+        updateCallerNodes()
 
     def delete(self):
         self.outputs.clear()
-        self.updateCallerNodes()
-
-    def updateCallerNodes(self):
-        updateCallerNodes(self.identifier)
+        updateCallerNodes()
 
     def getSocketData(self):
         data = SubprogramData()
@@ -152,7 +149,8 @@ class LoopInput(bpy.types.Node, AnimationNode):
     def createGeneratorOutputNode(self):
         settings = [{"name" : "loopInputIdentifier", "value" : repr(self.identifier)}]
         bpy.ops.node.add_and_link_node("INVOKE_DEFAULT", use_transform = True, settings = settings, type = "an_LoopGeneratorOutput")
-        self.updateCallerNodes()
+        self.nodeTree.nodes[-1].chooseNewGeneratorType()
+        updateCallerNodes()
 
 
     @property

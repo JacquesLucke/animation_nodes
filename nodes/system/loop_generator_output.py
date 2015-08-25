@@ -16,14 +16,14 @@ class LoopGeneratorOutput(bpy.types.Node, AnimationNode):
 
     def dataTypeChanged(self, context):
         self.generateSockets()
-        self.updateCallerNodes()
+        updateCallerNodes()
 
     def nameChanged(self, context):
         self.label = self.outputName
-        self.updateCallerNodes()
+        updateCallerNodes()
 
     def loopInputIdentifierChanged(self, context):
-        self.updateCallerNodes()
+        updateCallerNodes()
         treeChanged()
 
     listDataType = StringProperty(update = dataTypeChanged)
@@ -69,10 +69,7 @@ class LoopGeneratorOutput(bpy.types.Node, AnimationNode):
 
     def delete(self):
         self.removed = True
-        self.updateCallerNodes()
-
-    def updateCallerNodes(self):
-        updateCallerNodes(self.loopInputIdentifier)
+        updateCallerNodes()
 
     @property
     def loopInputNode(self):
