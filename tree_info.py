@@ -346,10 +346,8 @@ def getNodeConnections(node):
 
 def setConnections(connections):
     for id1, id2 in connections:
-        socket1, socket2 = idToSocket(id1), idToSocket(id2)
-        if socket1.isOutput: socket1, socket2 = socket2, socket1
-        tree = socket1.node.id_data
-        tree.links.new(socket1, socket2)
+        try: idToSocket(id1).linkWith(idToSocket(id2))
+        except: pass
 
 def keepNodeLinks(function):
     def wrapper(node, *args, **kwargs):
