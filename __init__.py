@@ -24,7 +24,7 @@ bl_info = {
     "description": "Node system for more flexible animations.",
     "author":      "Jacques Lucke",
     "version":     (0, 0, 7),
-    "blender":     (2, 7, 4),
+    "blender":     (2, 7, 5),
     "location":    "Node Editor",
     "category":    "Node",
     "warning":     "Stable, but some things may change in the future."
