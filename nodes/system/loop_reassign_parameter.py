@@ -2,10 +2,11 @@ import bpy
 from bpy.props import *
 from ... base_types.node import AnimationNode
 from ... tree_info import getNodeByIdentifier
+from ... utils.timing import measureTime
 
-class UpdateLoopParameterNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_UpdateLoopParameterNode"
-    bl_label = "Update Loop Parameter"
+class ReassignLoopParameter(bpy.types.Node, AnimationNode):
+    bl_idname = "an_ReassignLoopParameter"
+    bl_label = "Reassign Loop Parameter"
 
     def identifierChanged(self, context):
         socket = self.linkedParameterSocket
@@ -33,6 +34,7 @@ class UpdateLoopParameterNode(bpy.types.Node, AnimationNode):
         socket.display.nameOnly = True
 
     @property
+    @measureTime
     def linkedParameterSocket(self):
         try:
             inputNode = self.loopInputNode
