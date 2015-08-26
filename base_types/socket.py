@@ -53,8 +53,8 @@ class AnimationNodeSocket:
 
         if self.moveable and self.display.moveOperators:
             row.separator()
-            self.invokeFunction(row, "moveUpSave", icon = "TRIA_UP")
-            self.invokeFunction(row, "moveDownSave", icon = "TRIA_DOWN")
+            self.invokeFunction(row, "moveUpInGroup", icon = "TRIA_UP")
+            self.invokeFunction(row, "moveDownInGroup", icon = "TRIA_DOWN")
 
         if self.removeable and self.display.removeOperator:
             row.separator()
@@ -106,15 +106,15 @@ class AnimationNodeSocket:
             self.sockets.move(self.index, index)
             self.node.socketMoved()
 
-    def moveUpSave(self):
+    def moveUpInGroup(self):
         """Cares about moveable sockets"""
-        self.moveSave(moveUp = True)
+        self.moveInGroup(moveUp = True)
 
-    def moveDownSave(self):
+    def moveDownInGroup(self):
         """Cares about moveable sockets"""
-        self.moveSave(moveUp = False)
+        self.moveInGroup(moveUp = False)
 
-    def moveSave(self, moveUp = True):
+    def moveInGroup(self, moveUp = True):
         """Cares about moveable sockets"""
         if not self.moveable: return
         moveableSocketIndices = [index for index, socket in enumerate(self.sockets) if socket.moveable and socket.moveGroup == self.moveGroup]

@@ -88,7 +88,7 @@ class MoveOutputSocket(bpy.types.Operator):
 
 def moveSocket(isOutput, moveUp):
     socket = getActiveSocket(isOutput)
-    socket.moveSave(moveUp)
+    socket.moveInGroup(moveUp)
 
     node = socket.node
     if isOutput: node.activeOutputIndex = list(node.outputs).index(socket)
