@@ -14,18 +14,17 @@ class RandomVectorNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.inputs.new("an_IntegerSocket", "Seed", "seed")
-        self.inputs.new("an_FloatSocket", "Max Values", "maxValues").value = 5.0
+        self.inputs.new("an_FloatSocket", "Max Value", "maxValue").value = 5.0
         self.outputs.new("an_VectorSocket", "Vector", "randomVector")
 
     def draw(self, layout):
         layout.prop(self, "additionalSeed", text = "Additional Seed")
 
-    def execute(self, seed, maxValues):
-        max = maxValues/2
+    def execute(self, seed, maxValue):
         addSeed = 1193 * self.additionalSeed
-        return Vector((getUniformRandom(seed + addSeed, -max, max),
-                getUniformRandom(seed + 754 + addSeed, -max, max),
-                getUniformRandom(seed + 2345 + addSeed, -max, max)))
+        return Vector((getUniformRandom(seed + addSeed, -maxValue, maxValue),
+                getUniformRandom(seed + 7540 + addSeed, -maxValue, maxValue),
+                getUniformRandom(seed + 23450 + addSeed, -maxValue, maxValue)))
 
     def duplicate(self, sourceNode):
         self.additionalSeed = int(random.random() * 1000)

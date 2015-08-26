@@ -1,7 +1,7 @@
 from . random import getUniformRandom
 
 # setup a cache for faster results
-smoothNoiseCacheSize = 17919
+smoothNoiseCacheSize = 50000
 smoothNoiseCache = []
 for i in range(smoothNoiseCacheSize):
     smoothNoiseCache.append(getUniformRandom(i, -1, 1)/2.0 + getUniformRandom(i-1, -1, 1)/4.0 + getUniformRandom(i+1, -1, 1)/4.0)
