@@ -59,7 +59,7 @@ class NumberMenu(bpy.types.Menu):
         layout.separator()
         insertNode(layout, "an_RandomNumberNode", "Randomize")
         insertNode(layout, "an_FloatWiggleNode", "Wiggle")
-        insertNode(layout, "an_BlendDataNode", "Blend", {"dataType" : repr("Float")})
+        insertNode(layout, "an_MixDataNode", "Mix", {"dataType" : repr("Float")})
         layout.separator()
         insertNode(layout, "an_FloatClampNode", "Clamp")
         insertNode(layout, "an_ConvertAngleNode", "Convert Angle")
@@ -78,7 +78,7 @@ class VectorMenu(bpy.types.Menu):
         layout.separator()
         insertNode(layout, "an_RandomVectorNode", "Randomize")
         insertNode(layout, "an_VectorWiggleNode", "Wiggle")
-        insertNode(layout, "an_BlendDataNode", "Blend", {"dataType" : repr("Vector")})
+        insertNode(layout, "an_MixDataNode", "Mix", {"dataType" : repr("Vector")})
         layout.separator()
         insertNode(layout, "an_VectorLengthNode", "Length")
         insertNode(layout, "an_VectorDistanceNode", "Distance")
@@ -101,7 +101,7 @@ class MatrixMenu(bpy.types.Menu):
         insertNode(layout, "an_ScaleMatrixNode", "Scale")
         insertNode(layout, "an_MatrixCombineNode", "Combine")
         layout.separator()
-        insertNode(layout, "an_BlendDataNode", "Blend", {"dataType" : repr("Matrix")})
+        insertNode(layout, "an_MixDataNode", "Mix", {"dataType" : repr("Matrix")})
         insertNode(layout, "an_InvertMatrixNode", "Invert")
         insertNode(layout, "an_MatrixMathNode", "Math")
 
@@ -148,7 +148,7 @@ class ColorMenu(bpy.types.Menu):
         layout = self.layout
         insertNode(layout, "an_ColorInputNode", "RGB")
         insertNode(layout, "an_CombineColorNode", "Combine RGBA")
-        insertNode(layout, "an_ColorMixNode", "Mix")
+        insertNode(layout, "an_MixDataNode", "Mix", {"dataType" : repr("Color")})
         insertNode(layout, "an_SetVertexColorNode", "Set Vertex Color")
 
 class ListMenu(bpy.types.Menu):
