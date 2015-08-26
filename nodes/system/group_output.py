@@ -54,7 +54,7 @@ class GroupOutputNode(bpy.types.Node, AnimationNode):
         if dataOrigin.dataType == "Node Control": return
         socket = self.newReturn(dataOrigin.dataType, dataOrigin.getDisplayedName())
         socket.linkWith(directOrigin)
-        self.newReturnSocket.removeConnectedLinks()
+        self.newReturnSocket.removeLinks()
 
     def newReturn(self, dataType, name = None):
         if name is None: name = dataType

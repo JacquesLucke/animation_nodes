@@ -80,7 +80,7 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
         dataOrigin = emptySocket.dataOrigin
         if dataOrigin.dataType == "Node Control": return
         socket = self.newInputSocket(dataOrigin.dataType)
-        emptySocket.removeConnectedLinks()
+        emptySocket.removeLinks()
         socket.linkWith(directOrigin)
 
     def newInputSocket(self, dataType):

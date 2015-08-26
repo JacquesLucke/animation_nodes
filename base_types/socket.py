@@ -143,7 +143,7 @@ class AnimationNodeSocket:
         if self.isOutput: self.nodeTree.links.new(socket, self)
         else: self.nodeTree.links.new(self, socket)
 
-    def removeConnectedLinks(self):
+    def removeLinks(self):
         tree = self.nodeTree
         for link in self.links:
             tree.links.remove(link)

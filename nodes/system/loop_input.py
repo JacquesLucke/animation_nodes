@@ -67,8 +67,8 @@ class LoopInputNode(bpy.types.Node, AnimationNode):
             socket = self.newParameter(target.dataType, target.getDisplayedName(), target.getStoreableValue())
             socket.linkWith(target)
 
-        self.newIteratorSocket.removeConnectedLinks()
-        self.newParameterSocket.removeConnectedLinks()
+        self.newIteratorSocket.removeLinks()
+        self.newParameterSocket.removeLinks()
 
 
     def drawNewIteratorSocket(self, layout):

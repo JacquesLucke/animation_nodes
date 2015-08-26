@@ -303,7 +303,8 @@ class SystemMenu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         insertNode(layout, "an_ConvertNode", "Convert")
-        insertNode(layout, "an_DebugNode", "Debug")
+        insertNode(layout, "an_DebugLoopNode", "Debug Loop")
+        insertNode(layout, "an_DebugListNode", "Debug List")
 
 
 

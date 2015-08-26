@@ -59,7 +59,7 @@ class CreateListNode(bpy.types.Node, AnimationNode):
         if origin is None: return
         socket = self.newInputSocket()
         socket.linkWith(origin)
-        emptySocket.removeConnectedLinks()
+        emptySocket.removeLinks()
 
     def assignSelectedListType(self):
         self.assignedType = self.selectedType
