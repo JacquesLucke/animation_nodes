@@ -23,12 +23,8 @@ class LoopInputNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.outputs.new("an_IntegerSocket", "Index")
         self.outputs.new("an_IntegerSocket", "Iterations")
-        socket = self.outputs.new("an_NodeControlSocket", "New Iterator")
-        socket.drawCallback = "drawNewIteratorSocket"
-        socket.margin = 0.15
-        socket = self.outputs.new("an_NodeControlSocket", "New Parameter")
-        socket.drawCallback = "drawNewParameterSocket"
-        socket.margin = 0.15
+        self.outputs.new("an_NodeControlSocket", "New Iterator").margin = 0.15
+        self.outputs.new("an_NodeControlSocket", "New Parameter").margin = 0.15
         self.width = 180
 
     def draw(self, layout):
@@ -70,24 +66,17 @@ class LoopInputNode(bpy.types.Node, AnimationNode):
         self.newIteratorSocket.removeLinks()
         self.newParameterSocket.removeLinks()
 
+    def drawControlSocket(self, layout, socket):
+        isParameterSocket = socket == self.outputs[-1]
+        function = "chooseNewParameterType" if isParameterSocket else "chooseNewIteratorType"
 
-    def drawNewIteratorSocket(self, layout):
         row = layout.row()
         subrow = row.row()
         subrow.alignment = "LEFT"
-        self.invokeFunction(subrow, "chooseNewIteratorType", icon = "ZOOMIN", emboss = False)
+        self.invokeFunction(subrow, function, icon = "ZOOMIN", emboss = False)
         subrow = row.row()
         subrow.alignment = "RIGHT"
-        subrow.label("New Iterator")
-
-    def drawNewParameterSocket(self, layout):
-        row = layout.row()
-        subrow = row.row()
-        subrow.alignment = "LEFT"
-        self.invokeFunction(subrow, "chooseNewParameterType", icon = "ZOOMIN", emboss = False)
-        subrow = row.row()
-        subrow.alignment = "RIGHT"
-        subrow.label("New Parameter")
+        subrow.label(socket.name)
 
 
     def chooseNewIteratorType(self):

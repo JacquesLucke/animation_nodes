@@ -15,9 +15,7 @@ class GroupOutputNode(bpy.types.Node, AnimationNode):
     groupInputIdentifier = StringProperty(update = inputNodeIdentifierChanged)
 
     def create(self):
-        socket = self.inputs.new("an_NodeControlSocket", "New Return")
-        socket.drawCallback = "drawNewReturnSocket"
-        socket.margin = 0.15
+        socket = self.inputs.new("an_NodeControlSocket", "New Return").margin = 0.15
         self.width = 180
 
     def draw(self, layout):
@@ -34,7 +32,7 @@ class GroupOutputNode(bpy.types.Node, AnimationNode):
         else: self.invokeFunction(layout, "createGroupInputNode", text = "Input Node", icon = "PLUS")
         layout.separator()
 
-    def drawNewReturnSocket(self, layout):
+    def drawControlSocket(self, layout, socket):
         row = layout.row()
         subrow = row.row()
         subrow.alignment = "LEFT"

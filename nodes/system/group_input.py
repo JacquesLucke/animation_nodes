@@ -19,9 +19,7 @@ class GroupInputNode(bpy.types.Node, AnimationNode):
         update = networkChanged)
 
     def create(self):
-        socket = self.outputs.new("an_NodeControlSocket", "New Parameter")
-        socket.drawCallback = "drawNewParameterSocket"
-        socket.margin = 0.15
+        socket = self.outputs.new("an_NodeControlSocket", "New Parameter").margin = 0.15
         self.width = 180
 
     def draw(self, layout):
@@ -41,7 +39,7 @@ class GroupInputNode(bpy.types.Node, AnimationNode):
         for socket in list(self.outputs)[:-1]:
             socket.drawInput(box, self, socket.getDisplayedName())
 
-    def drawNewParameterSocket(self, layout):
+    def drawControlSocket(self, layout, socket):
         row = layout.row()
         subrow = row.row()
         subrow.alignment = "LEFT"

@@ -71,6 +71,10 @@ class AnimationNode:
     def getModuleList(self):
         return []
 
+    def drawControlSocket(self, layout, socket):
+        layout.alignment = "LEFT" if socket.isInput else "RIGHT"
+        layout.label(socket.name)
+
 
     # Don't override these functions
     ######################################
