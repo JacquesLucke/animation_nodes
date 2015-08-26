@@ -47,8 +47,8 @@ class GroupOutput(bpy.types.Node, AnimationNode):
         self.chooseSocketDataType("newReturn")
 
     def edit(self):
-        dataOrigin = self.newReturnSocket.dataOriginSocket
-        directOrigin = self.newReturnSocket.directOriginSocket
+        dataOrigin = self.newReturnSocket.dataOrigin
+        directOrigin = self.newReturnSocket.directOrigin
 
         if not dataOrigin: return
         if dataOrigin.dataType == "Node Control": return

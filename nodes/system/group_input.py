@@ -54,7 +54,7 @@ class GroupInput(bpy.types.Node, AnimationNode):
         self.chooseSocketDataType("newParameter")
 
     def edit(self):
-        for target in self.newParameterSocket.dataTargetSockets:
+        for target in self.newParameterSocket.dataTargets:
             if target.dataType == "Node Control": continue
             socket = self.newParameter(target.dataType, target.getDisplayedName(), target.getStoreableValue())
             socket.linkWith(target)

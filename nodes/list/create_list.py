@@ -55,7 +55,7 @@ class CreateList(bpy.types.Node, AnimationNode):
 
     def edit(self):
         emptySocket = self.inputs["..."]
-        origin = emptySocket.directOriginSocket
+        origin = emptySocket.directOrigin
         if origin is None: return
         socket = self.newInputSocket()
         socket.linkWith(origin)

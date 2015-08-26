@@ -31,7 +31,7 @@ class ConvertNode(bpy.types.Node, AnimationNode):
 
     def edit(self):
         socket = self.outputs[0]
-        targets = socket.dataTargetSockets
+        targets = socket.dataTargets
         if len(targets) == 1:
             self.assignType(targets[0].dataType)
 

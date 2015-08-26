@@ -192,15 +192,15 @@ class AnimationNodeSocket:
         return getLinkedSockets(self)
 
     @property
-    def dataOriginSocket(self):
+    def dataOrigin(self):
         return getOriginSocket(self)
 
     @property
-    def dataTargetSockets(self):
+    def dataTargets(self):
         return getTargetSockets(self)
 
     @property
-    def directOriginSocket(self):
+    def directOrigin(self):
         return getDirectOriginSocket(self)
 
     @property

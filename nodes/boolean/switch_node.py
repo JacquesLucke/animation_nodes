@@ -24,7 +24,7 @@ class SwitchNode(bpy.types.Node, AnimationNode):
 
     def getWantedDataType(self):
         for socket in (self.inputs[1], self.inputs[2], self.outputs[0], self.outputs[1]):
-            dataOrigin = socket.dataOriginSocket
+            dataOrigin = socket.dataOrigin
             if dataOrigin is not None: return dataOrigin.dataType
         return self.inputs[1].dataType
 

@@ -43,8 +43,8 @@ class CompareNode(bpy.types.Node, AnimationNode):
         self.assingType(dataType)
 
     def getWantedDataType(self):
-        inputA = self.inputs[0].dataOriginSocket
-        inputB = self.inputs[1].dataOriginSocket
+        inputA = self.inputs[0].dataOrigin
+        inputB = self.inputs[1].dataOrigin
 
         if inputA is not None: return inputA.dataType
         if inputB is not None: return inputB.dataType

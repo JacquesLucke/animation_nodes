@@ -75,9 +75,9 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
 
     def edit(self):
         emptySocket = self.inputs["New Input"]
-        directOrigin = emptySocket.directOriginSocket
+        directOrigin = emptySocket.directOrigin
         if directOrigin is None: return
-        dataOrigin = emptySocket.dataOriginSocket
+        dataOrigin = emptySocket.dataOrigin
         if dataOrigin.dataType == "Node Control": return
         socket = self.newInputSocket(dataOrigin.dataType)
         emptySocket.removeConnectedLinks()

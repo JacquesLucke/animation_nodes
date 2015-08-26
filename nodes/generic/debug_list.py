@@ -20,7 +20,7 @@ class DebugListNode(bpy.types.Node, AnimationNode):
 
     def edit(self):
         inputSocket = self.inputs[1]
-        dataOrigin = inputSocket.dataOriginSocket
+        dataOrigin = inputSocket.dataOrigin
         if dataOrigin is None: self.dataType = ""
         else: self.dataType = dataOrigin.dataType
 

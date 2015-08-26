@@ -138,10 +138,10 @@ def resolveInnerLinks(node, variables):
 def linkSocketToTargets(socket, variables):
     lines = []
 
-    targets = socket.dataTargetSockets
+    targets = socket.dataTargets
     needACopy = getTargetsThatNeedACopy(socket, targets)
 
-    for target in socket.dataTargetSockets:
+    for target in socket.dataTargets:
         if target in needACopy:
             lines.append(getCopyLine(socket, variables[target], variables))
         else:

@@ -30,8 +30,8 @@ class ShuffleListNode(bpy.types.Node, AnimationNode):
         self.assignType(listDataType)
 
     def getWantedDataType(self):
-        listInput = self.inputs[0].dataOriginSocket
-        listOutputs = self.outputs[0].dataTargetSockets
+        listInput = self.inputs[0].dataOrigin
+        listOutputs = self.outputs[0].dataTargets
 
         if listInput is not None: return listInput.dataType
         if len(listOutputs) == 1: return listOutputs[0].dataType

@@ -55,14 +55,14 @@ class LoopInput(bpy.types.Node, AnimationNode):
             row.prop(socket, "copyAlways", text = socket.customName)
 
     def edit(self):
-        for target in self.newIteratorSocket.dataTargetSockets:
+        for target in self.newIteratorSocket.dataTargets:
             if target.dataType == "Node Control": continue
             if not isBase(target.dataType): continue
             listDataType = toListDataType(target.dataType)
             socket = self.newIterator(listDataType, target.getDisplayedName())
             socket.linkWith(target)
 
-        for target in self.newParameterSocket.dataTargetSockets:
+        for target in self.newParameterSocket.dataTargets:
             if target.dataType == "Node Control": continue
             socket = self.newParameter(target.dataType, target.getDisplayedName(), target.getStoreableValue())
             socket.linkWith(target)

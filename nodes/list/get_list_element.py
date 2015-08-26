@@ -37,9 +37,9 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
         self.assignType(dataType)
 
     def getWantedDataType(self):
-        listInput = self.inputs["List"].dataOriginSocket
-        fallbackInput = self.inputs["Fallback"].dataOriginSocket
-        elementOutputs = self.outputs["Element"].dataTargetSockets
+        listInput = self.inputs["List"].dataOrigin
+        fallbackInput = self.inputs["Fallback"].dataOrigin
+        elementOutputs = self.outputs["Element"].dataTargets
 
         if listInput is not None: return toBaseDataType(listInput.bl_idname)
         if fallbackInput is not None: return fallbackInput.dataType
