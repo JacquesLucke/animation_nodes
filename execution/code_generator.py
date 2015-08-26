@@ -26,6 +26,7 @@ def getSetupCode(nodes, variables):
     lines = []
     lines.append(get_ImportModules(nodes))
     lines.append(get_ImportAnimationNodes())
+    lines.append(get_LoadRandomNumberCache())
     lines.extend(get_GetNodeReferences(nodes))
     lines.extend(get_GetSocketValues(nodes, variables))
     return "\n".join(lines)
@@ -51,6 +52,10 @@ def get_ImportAnimationNodes():
     Github extends the name with '-master'
     '''
     return "animation_nodes = sys.modules.get({})".format(repr(addonName))
+
+
+def get_LoadRandomNumberCache():
+    return "random_numbers = animation_nodes.algorithms.random.getRandomNumberCache()"    
 
 
 def get_GetNodeReferences(nodes):

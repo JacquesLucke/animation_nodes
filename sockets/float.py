@@ -1,4 +1,5 @@
 import bpy
+import sys
 from bpy.props import *
 from .. events import propertyChanged
 from .. base_types.socket import AnimationNodeSocket
@@ -19,10 +20,10 @@ class FloatSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         set = setValue, get = getValue,
         update = propertyChanged)
 
-    showName = bpy.props.BoolProperty(default = True)
+    showName = BoolProperty(default = True)
 
-    min = bpy.props.FloatProperty(default = -10000000)
-    max = bpy.props.FloatProperty(default = 10000000)
+    min = FloatProperty(default = sys.float_info.min)
+    max = FloatProperty(default = sys.float_info.max)
 
     def drawInput(self, layout, node, text):
         if not self.showName: text = ""

@@ -1,4 +1,5 @@
 import bpy
+from bpy.props import *
 from .. events import propertyChanged
 from .. base_types.socket import AnimationNodeSocket
 
@@ -14,14 +15,14 @@ class IntegerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Integer"]
     drawColor = (0.2, 0.2, 1.0, 1.0)
 
-    value = bpy.props.IntProperty(default = 0,
+    value = IntProperty(default = 0,
         set = setValue, get = getValue,
         update = propertyChanged)
 
-    showName = bpy.props.BoolProperty(default = True)
+    showName = BoolProperty(default = True)
 
-    min = bpy.props.IntProperty(default = -10000000)
-    max = bpy.props.IntProperty(default = 10000000)
+    min = IntProperty(default = -2**31)
+    max = IntProperty(default = 2**31-1)
 
     def drawInput(self, layout, node, text):
         if not self.showName: text = ""

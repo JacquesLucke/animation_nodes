@@ -1,14 +1,16 @@
 import random
+import numpy
+from .. utils.timing import measureTime
 
-randomNumberCacheSize = 17919
 randomNumberCache = []
-random.seed(5827)
+cacheSize = int(2e7)
+randomNumberCache = numpy.random.random(cacheSize)
 
-for i in range(randomNumberCacheSize):
-    randomNumberCache.append(random.random())
+def getRandomNumberCache():
+    return randomNumberCache
 
 def getRandom(seed):
-    return randomNumberCache[seed % randomNumberCacheSize]
+    return randomNumberCache[seed % cacheSize]
 
 def getUniformRandom(seed, min, max):
-    return min + randomNumberCache[seed % randomNumberCacheSize] * (max - min)
+    return min + randomNumberCache[seed % cacheSize] * (max - min)
