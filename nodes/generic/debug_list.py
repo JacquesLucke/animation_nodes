@@ -27,9 +27,9 @@ class DebugListNode(bpy.types.Node, AnimationNode):
     def execute(self, text, data):
         self.inputIsIterable = True
         if text is None: return
-        
+
         text.clear()
-        if self.dataType == "Float List":
+        if self.dataType in ("Float List", "Color"):
             text.write("\n".join([str(round(e, 4)) for e in data]))
         else:
             try: text.write("\n".join([str(e) for e in data]))

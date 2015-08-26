@@ -29,12 +29,12 @@ class InterpolationNode(bpy.types.Node, AnimationNode):
 
     def topCategoryChanged(self, context):
         self.hideInputSockets()
-        if self.topCategory == "BACK": self.inputs["Back"].hide = False
+        self.inputs["Back"].hide = self.topCategory != "BACK"
         propertyChanged()
 
     topCategory = EnumProperty(
         name = "Category", default = "LINEAR",
-        items = topCategoryItems, update = propertyChanged)
+        items = topCategoryItems, update = topCategoryChanged)
 
     backCategory = EnumProperty(
         name = "Back", default = "OUT",
