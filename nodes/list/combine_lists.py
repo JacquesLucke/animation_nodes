@@ -1,7 +1,6 @@
 import bpy
 from bpy.props import *
 from ... base_types.node import AnimationNode
-from ... tree_info import getDirectlyLinkedSocket
 from ... sockets.info import getBaseDataTypeItems, toListIdName
 
 class CombineListsNode(bpy.types.Node, AnimationNode):
@@ -47,7 +46,7 @@ class CombineListsNode(bpy.types.Node, AnimationNode):
 
     def edit(self):
         emptySocket = self.inputs["..."]
-        origin = getDirectlyLinkedSocket(emptySocket)
+        origin = emptySocket.directOrigin
         if origin is None: return
         socket = self.newInputSocket()
         socket.linkWith(origin)
