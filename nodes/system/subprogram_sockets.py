@@ -7,7 +7,7 @@ class SubprogramData:
         data = SocketData(idName, identifier, text, defaultValue)
         self.inputs.append(data)
 
-    def newOutput(self, idName, identifier, text, defaultValue):
+    def newOutput(self, idName, identifier, text, defaultValue = None):
         data = SocketData(idName, identifier, text, defaultValue)
         self.outputs.append(data)
 

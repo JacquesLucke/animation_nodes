@@ -4,7 +4,9 @@ from operator import attrgetter
 from ... events import networkChanged
 from ... utils.names import getRandomString
 from ... utils.layout import splitAlignment
+from ... tree_info import getNodeByIdentifier
 from ... base_types.node import AnimationNode
+from ... node_creator import InsertNodesTemplate
 from . subprogram_sockets import SubprogramData
 from . utils import updateSubprogramInvokerNodes
 from ... sockets.info import (toBaseIdName, toListDataType,
@@ -32,26 +34,48 @@ class LoopInputNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.separator()
         layout.prop(self, "subprogramName", text = "", icon = "GROUP_VERTEX")
-        self.invokeFunction(layout, "createGeneratorOutputNode", text = "New Generator")
 
     def drawAdvanced(self, layout):
         col = layout.column()
         col.label("Description:")
         col.prop(self, "subprogramDescription", text = "")
 
-        col = layout.column()
-        col.label("Parameter Defaults:")
-        box = col.box()
-        for socket in self.getParameterSockets():
-            socket.drawInput(box, self, socket.getDisplayedName())
+        layout.separator()
 
         col = layout.column()
-        col.label("Copy for each Iteration:")
-        for i, socket in enumerate(self.getParameterSockets()):
-            row = col.row()
-            row.active = socket.isCopyable
-            row.prop(socket, "copyAlways", text = socket.text)
-            self.invokeFunction(row, "createReassignParameterNode", icon = "PLUS", data = i)
+        col.label("Iterator Sockets:")
+        box = col.box()
+        for socket in self.getIteratorSockets():
+            box.prop(socket.loop, "useAsOutput", text = "Use {} as Output".format(repr(socket.text)))
+        self.invokeFunction(box, "chooseNewIteratorType", text = "New Iterator", icon = "PLUS")
+
+        layout.separator()
+
+        col = layout.column()
+        col.label("Parameter Sockets:")
+        box = col.box()
+        for socket in self.getParameterSockets():
+            subcol = box.column(align = False)
+            row = subcol.row()
+            row.label(repr(socket.text))
+            self.invokeFunction(row, "createReassignParameterNode", text = "Reassign Node", data = socket.identifier)
+            row = subcol.row()
+            row.prop(socket.loop, "useAsInput", text = "Input")
+            row.prop(socket.loop, "useAsOutput", text = "Output")
+            subrow = row.row()
+            subrow.active = socket.isCopyable
+            subrow.prop(socket, "copyAlways", text = "Copy")
+            socket.drawInput(subcol, self, text = "Default")
+        self.invokeFunction(box, "chooseNewParameterType", text = "New Parameter", icon = "PLUS")
+
+        layout.separator()
+
+        col = layout.column()
+        col.label("List Generators:")
+        box = col.box()
+        for node in self.getGeneratorNodes():
+            box.label("{} - {}".format(repr(node.outputName), node.listDataType))
+        self.invokeFunction(box, "chooseNewGeneratorType", text = "New Generator", icon = "PLUS")
 
     def edit(self):
         for target in self.newIteratorSocket.dataTargets:
@@ -84,6 +108,9 @@ class LoopInputNode(bpy.types.Node, AnimationNode):
     def chooseNewParameterType(self):
         self.chooseSocketDataType("newParameter", socketGroup = "ALL")
 
+    def chooseNewGeneratorType(self):
+        self.chooseSocketDataType("createGeneratorOutputNode", socketGroup = "LIST")
+
 
     def newIterator(self, listDataType, name = None):
         if name is None: name = toBaseDataType(listDataType)
@@ -97,7 +124,7 @@ class LoopInputNode(bpy.types.Node, AnimationNode):
         socket = self.outputs.new(toIdName(dataType), name, "parameter_" + getRandomString(5))
         if defaultValue: socket.setStoreableValue(defaultValue)
         socket.moveTo(self.newParameterSocket.index)
-        socket.copyAlways = True
+        socket.loop.copyAlways = True
         self.setupSocket(socket, name, moveGroup = 2)
         return socket
 
@@ -110,6 +137,8 @@ class LoopInputNode(bpy.types.Node, AnimationNode):
         socket.textProps.editable = True
         socket.display.textInput = True
         socket.display.removeOperator = True
+        socket.loop.useAsInput = True
+        if hasattr(socket, "showName"): socket.showName = False
 
 
     def socketChanged(self):
@@ -136,26 +165,28 @@ class LoopInputNode(bpy.types.Node, AnimationNode):
             data.newInput("an_IntegerSocket", "loop_iterations", "Iterations", 0)
         else:
             for socket in iteratorSockets:
-                data.newInput(toListIdName(socket.bl_idname), socket.identifier, socket.text + " List", [])
+                name = socket.text + " List"
+                data.newInput(toListIdName(socket.bl_idname), socket.identifier, name, [])
+                if socket.loop.useAsOutput:
+                    data.newOutput(toListIdName(socket.bl_idname), socket.identifier, name)
 
     def insertParameterData(self, data):
         for socket in self.getParameterSockets():
-            data.newInputFromSocket(socket)
+            if socket.loop.useAsInput: data.newInputFromSocket(socket)
+            if socket.loop.useAsOutput: data.newOutputFromSocket(socket)
 
     def insertGeneratorData(self, data):
         for node in self.getGeneratorNodes():
             if node.removed: continue
-            data.newOutput(toIdName(node.listDataType), node.identifier, node.outputName, None)
+            data.newOutput(toIdName(node.listDataType), node.identifier, node.outputName)
 
 
-    def createGeneratorOutputNode(self):
-        settings = [{"name" : "loopInputIdentifier", "value" : repr(self.identifier)}]
-        bpy.ops.node.add_and_link_node("INVOKE_DEFAULT", use_transform = True, settings = settings, type = "an_LoopGeneratorOutputNode")
+    def createGeneratorOutputNode(self, dataType):
+        GeneratorOutputTemplate(self, dataType)
         updateSubprogramInvokerNodes()
 
-    def createReassignParameterNode(self, strIndex):
-        settings = [{"name" : "loopInputIdentifier", "value" : repr(self.identifier)}, {"name" : "parameterIdentifier", "value" : repr(self.getParameterSockets()[int(strIndex)].identifier)}]
-        bpy.ops.node.add_and_link_node("INVOKE_DEFAULT", use_transform = True, settings = settings, type = "an_ReassignLoopParameterNode")
+    def createReassignParameterNode(self, socketIdentifier):
+        ReassignParameterTemplate(self.outputsByIdentifier[socketIdentifier])
         updateSubprogramInvokerNodes()
 
 
@@ -191,4 +222,18 @@ class LoopInputNode(bpy.types.Node, AnimationNode):
         return nodes
 
     def getReassignParameterNodes(self):
-        return self.network.updateParameterNodes
+        return [node for node in self.network.updateParameterNodes if node.linkedParameterSocket]
+
+
+
+class GeneratorOutputTemplate(InsertNodesTemplate):
+    def insert(self, loopInputNode, dataType):
+        node = self.newNode("an_LoopGeneratorOutputNode")
+        node.loopInputIdentifier = loopInputNode.identifier
+        node.listDataType = dataType
+
+class ReassignParameterTemplate(InsertNodesTemplate):
+    def insert(self, loopParameterSocket):
+        node = self.newNode("an_ReassignLoopParameterNode")
+        node.loopInputIdentifier = loopParameterSocket.node.identifier
+        node.parameterIdentifier = loopParameterSocket.identifier

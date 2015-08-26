@@ -5,6 +5,7 @@ from .. utils.recursion import noRecursion
 from .. events import treeChanged, executionCodeChanged
 from .. utils.names import getRandomString, toVariableName
 from .. operators.dynamic_operators import getInvokeFunctionOperator
+from .. nodes.system.utils import updateSubprogramInvokerNodes
 
 class SocketTextProperties(bpy.types.PropertyGroup):
     bl_idname = "an_SocketTextProperties"
@@ -20,6 +21,17 @@ class SocketDisplayProperties(bpy.types.PropertyGroup):
     moveOperators = BoolProperty(default = False)
     removeOperator = BoolProperty(default = False)
 
+class SocketLoopProperties(bpy.types.PropertyGroup):
+    bl_idname = "an_SocketLoopProperties"
+
+    def socketLoopPropertyChanged(self, context):
+        updateSubprogramInvokerNodes()
+        executionCodeChanged()
+
+    useAsInput = BoolProperty(default = False, update = socketLoopPropertyChanged)
+    useAsOutput = BoolProperty(default = False, update = socketLoopPropertyChanged)
+    copyAlways = BoolProperty(default = False, update = socketLoopPropertyChanged)
+
 class AnimationNodeSocket:
 
     def textChanged(self, context):
@@ -32,6 +44,7 @@ class AnimationNodeSocket:
 
     display = PointerProperty(type = SocketDisplayProperties)
     textProps = PointerProperty(type = SocketTextProperties)
+    loop = PointerProperty(type = SocketLoopProperties)
 
     dataIsModified = BoolProperty(default = False)
     copyAlways = BoolProperty(default = False, update = executionCodeChanged)

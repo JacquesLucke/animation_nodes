@@ -36,7 +36,7 @@ class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.listDataType = "Vector List"
-        self.outputName = "Generator Name"
+        self.outputName = "# Name #"
         self.sortIndex = id(self)
 
     def draw(self, layout):

@@ -6,7 +6,8 @@ from .. problems import ExecutionUnitNotSetup, NodeRecursionDetected
 from . code_generator import (getInitialVariables,
                               getSetupCode,
                               getNodeExecutionLines,
-                              linkOutputSocketsToTargets)
+                              linkOutputSocketsToTargets,
+                              getLoadSocketValueLine)
 
 class LoopExecutionUnit(SubprogramExecutionUnit):
     def __init__(self, network):
@@ -63,18 +64,20 @@ class LoopExecutionUnit(SubprogramExecutionUnit):
     def get_IterationsAmount(self, inputNode, nodes, variables):
         header = self.get_IterationsAmount_Header(inputNode, variables)
         generators = indent(self.get_InitializeGenerators(inputNode, variables))
+        parameters = indent(self.get_InitializeParameters(inputNode, variables))
         prepareLoop = indent(self.get_IterationsAmount_PrepareLoop(inputNode, variables))
         loopBody = indent(self.get_LoopBody(inputNode, nodes, variables), amount = 2)
         returnStatement = indent([self.get_ReturnStatement(inputNode, variables)])
-        return joinLines([header] + generators + prepareLoop + loopBody + returnStatement)
+        return joinLines([header] + generators + parameters + prepareLoop + loopBody + returnStatement)
 
     def get_IterationsAmount_Header(self, inputNode, variables):
         variables[inputNode.iterationsSocket] = "loop_iterations"
         parameterNames = ["loop_iterations"]
         for i, socket in enumerate(inputNode.getParameterSockets()):
-            name = "loop_parameter_" + str(i)
-            variables[socket] = name
-            parameterNames.append(name)
+            if socket.loop.useAsInput:
+                name = "loop_parameter_" + str(i)
+                variables[socket] = name
+                parameterNames.append(name)
 
         header = "def main({}):".format(", ".join(parameterNames))
         return header
@@ -89,10 +92,11 @@ class LoopExecutionUnit(SubprogramExecutionUnit):
     def get_IteratorLength(self, inputNode, nodes, variables):
         header = self.get_IteratorLength_Header(inputNode, variables)
         generators = indent(self.get_InitializeGenerators(inputNode, variables))
+        parameters = indent(self.get_InitializeParameters(inputNode, variables))
         prepareLoop = indent(self.get_IteratorLength_PrepareLoop(inputNode, variables))
         loopBody = indent(self.get_LoopBody(inputNode, nodes, variables), amount = 2)
         returnStatement = indent([self.get_ReturnStatement(inputNode, variables)])
-        return joinLines([header] + generators + prepareLoop + loopBody + returnStatement)
+        return joinLines([header] + generators + parameters + prepareLoop + loopBody + returnStatement)
 
     def get_IteratorLength_Header(self, inputNode, variables):
         parameterNames = []
@@ -100,9 +104,10 @@ class LoopExecutionUnit(SubprogramExecutionUnit):
             name = "loop_iterator_" + str(i)
             parameterNames.append(name)
         for i, socket in enumerate(inputNode.getParameterSockets()):
-            name = "loop_parameter_" + str(i)
-            variables[socket] = name
-            parameterNames.append(name)
+            if socket.loop.useAsInput:
+                name = "loop_parameter_" + str(i)
+                variables[socket] = name
+                parameterNames.append(name)
 
         header = "def main({}):".format(", ".join(parameterNames))
         return header
@@ -139,6 +144,13 @@ class LoopExecutionUnit(SubprogramExecutionUnit):
             lines.append("{} = []".format(name))
         return lines
 
+    def get_InitializeParameters(self, inputNode, variables):
+        lines = []
+        for socket in inputNode.getParameterSockets():
+            if not socket.loop.useAsInput:
+                lines.append(getLoadSocketValueLine(socket, variables))
+        return lines
+
 
     def get_LoopBody(self, inputNode, nodes, variables):
         lines = []
@@ -169,7 +181,10 @@ class LoopExecutionUnit(SubprogramExecutionUnit):
 
 
     def get_ReturnStatement(self, inputNode, variables):
-        names = [variables[node] for node in inputNode.getGeneratorNodes()]
+        names = []
+        names.extend(["loop_iterator_" + str(i) for i, socket in enumerate(inputNode.getIteratorSockets()) if socket.loop.useAsOutput])
+        names.extend([variables[node] for node in inputNode.getGeneratorNodes()])
+        names.extend([variables[socket] for socket in inputNode.getParameterSockets() if socket.loop.useAsOutput])
         return "return {}".format(", ".join(names))
 
 

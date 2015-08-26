@@ -65,10 +65,16 @@ def get_GetSocketValues(nodes, variables):
     lines = []
     for node in nodes:
         for socket in node.unlinkedInputs:
-            if socket.hasValueCode: line = "{} = {}".format(variables[socket], socket.getValueCode())
-            else: line = "{} = {}.inputs[{}].getValue()".format(variables[socket], node.identifier, socket.index)
-            lines.append(line)
+            lines.append(getLoadSocketValueLine(socket, variables))
     return lines
+
+
+def getLoadSocketValueLine(socket, variables):
+    if socket.hasValueCode:
+        return "{} = {}".format(variables[socket], socket.getValueCode())
+    else:
+        socketsName = "inputs" if socket.isInput else "outputs"
+        return "{} = {}.{}[{}].getValue()".format(variables[socket], socket.node.identifier, socketsName, socket.index)
 
 
 
@@ -152,7 +158,7 @@ def linkSocketToTargets(socket, variables):
 def getTargetsThatNeedACopy(socket, targets):
     if not socket.isCopyable: return []
     modifiedTargets = [target for target in targets if target.dataIsModified]
-    if socket.copyAlways: return modifiedTargets
+    if socket.loop.copyAlways: return modifiedTargets
     if len(targets) == 1: return []
     if len(targets) > len(modifiedTargets): return modifiedTargets
     else: return modifiedTargets[1:]
