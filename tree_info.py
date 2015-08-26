@@ -173,6 +173,7 @@ class NodeNetwork:
         groupOutputs = []
         loopInputs = []
         generatorOutputs = []
+        updateParameterOutputs = []
         invokedIdentifiers = set()
 
         for nodeID in self.nodeIDs:
@@ -185,6 +186,8 @@ class NodeNetwork:
                 loopInputs.append(nodeID)
             elif idName == "an_LoopGeneratorOutputNode":
                 generatorOutputs.append(nodeID)
+            elif idName == "an_UpdateLoopParameterNode":
+                updateParameterOutputs.append(nodeID)
             elif idName == "an_InvokeSubprogramNode":
                 invokedIdentifiers.add(idToNode(nodeID).subprogramIdentifier)
 
@@ -192,12 +195,13 @@ class NodeNetwork:
         groupOutAmount = len(groupOutputs)
         loopInAmount = len(loopInputs)
         generatorAmount = len(generatorOutputs)
+        updateParameterAmount = len(updateParameterOutputs)
 
         self.type = "Invalid"
 
-        if groupInAmount + groupOutAmount + loopInAmount + generatorAmount == 0:
+        if groupInAmount + groupOutAmount + loopInAmount + generatorAmount + updateParameterAmount == 0:
             self.type = "Main"
-        elif loopInAmount + generatorAmount == 0:
+        elif loopInAmount + generatorAmount + updateParameterAmount == 0:
             if groupInAmount == 0 and groupOutAmount == 1:
                 self.identifier = idToNode(groupOutputs[0]).groupInputIdentifier
             elif groupInAmount == 1 and groupOutAmount == 0:
@@ -207,13 +211,13 @@ class NodeNetwork:
                     self.type = "Group"
                     self.groupOutputID = groupOutputs[0]
         elif groupInAmount + groupOutAmount == 0:
-            generatorOwners = list({idToNode(nodeID).loopInputIdentifier for nodeID in generatorOutputs})
-            if loopInAmount == 0 and len(generatorOwners) == 1:
-                self.identifier = generatorOwners[0]
-            elif loopInAmount == 1 and len(generatorOwners) == 0:
+            possibleOwners = list({idToNode(nodeID).loopInputIdentifier for nodeID in generatorOutputs + updateParameterOutputs})
+            if loopInAmount == 0 and len(possibleOwners) == 1:
+                self.identifier = possibleOwners[0]
+            elif loopInAmount == 1 and len(possibleOwners) == 0:
                 self.type = "Loop"
-            elif loopInAmount == 1 and len(generatorOwners) == 1:
-                if idToNode(loopInputs[0]).identifier == generatorOwners[0]:
+            elif loopInAmount == 1 and len(possibleOwners) == 1:
+                if idToNode(loopInputs[0]).identifier == possibleOwners[0]:
                     self.type = "Loop"
 
         if self.type == "Group":
