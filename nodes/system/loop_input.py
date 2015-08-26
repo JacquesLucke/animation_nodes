@@ -2,6 +2,7 @@ import bpy
 from bpy.props import *
 from operator import attrgetter
 from ... events import networkChanged
+from ... utils.layout import splitAlignment
 from ... base_types.node import AnimationNode
 from . subprogram_sockets import SubprogramData
 from . utils import updateSubprogramInvokerNodes
@@ -70,13 +71,9 @@ class LoopInputNode(bpy.types.Node, AnimationNode):
         isParameterSocket = socket == self.outputs[-1]
         function = "chooseNewParameterType" if isParameterSocket else "chooseNewIteratorType"
 
-        row = layout.row()
-        subrow = row.row()
-        subrow.alignment = "LEFT"
-        self.invokeFunction(subrow, function, icon = "ZOOMIN", emboss = False)
-        subrow = row.row()
-        subrow.alignment = "RIGHT"
-        subrow.label(socket.name)
+        left, right = splitAlignment(layout)
+        self.invokeFunction(left, function, icon = "ZOOMIN", emboss = False)
+        right.label(socket.name)
 
 
     def chooseNewIteratorType(self):

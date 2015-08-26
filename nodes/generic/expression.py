@@ -3,6 +3,7 @@ import bpy
 import ast
 from bpy.props import *
 from ... sockets.info import toIdName
+from ... utils.layout import splitAlignment
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 
@@ -42,9 +43,9 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "moduleNames")
 
     def drawControlSocket(self, layout, socket):
-        row = layout.row()
-        row.alignment = "LEFT"
-        self.invokeFunction(row, "chooseNewInputType", text = "New Input", emboss = False)
+        left, right = splitAlignment(layout)
+        left.label(socket.name)
+        self.invokeFunction(right, "chooseNewInputType", icon = "ZOOMIN", emboss = False)
 
     def chooseNewInputType(self):
         self.chooseSocketDataType("newInputSocket")

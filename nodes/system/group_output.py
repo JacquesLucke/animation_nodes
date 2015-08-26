@@ -2,6 +2,7 @@ import bpy
 from bpy.props import *
 from ... events import treeChanged
 from ... sockets.info import toIdName
+from ... utils.layout import splitAlignment
 from ... base_types.node import AnimationNode
 from . utils import updateSubprogramInvokerNodes
 
@@ -33,13 +34,9 @@ class GroupOutputNode(bpy.types.Node, AnimationNode):
         layout.separator()
 
     def drawControlSocket(self, layout, socket):
-        row = layout.row()
-        subrow = row.row()
-        subrow.alignment = "LEFT"
-        subrow.label("New Return")
-        subrow = row.row()
-        subrow.alignment = "RIGHT"
-        self.invokeFunction(subrow, "chooseNewReturnType", icon = "ZOOMIN", emboss = False)
+        left, right = splitAlignment(layout)
+        left.label(socket.name)
+        self.invokeFunction(right, "chooseNewReturnType", icon = "ZOOMIN", emboss = False)
 
     def chooseNewReturnType(self):
         self.chooseSocketDataType("newReturn")

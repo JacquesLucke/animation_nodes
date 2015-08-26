@@ -2,6 +2,7 @@ import bpy
 from bpy.props import *
 from ... sockets.info import toIdName
 from ... events import networkChanged
+from ... utils.layout import splitAlignment
 from ... base_types.node import AnimationNode
 from . subprogram_sockets import SubprogramData
 from . utils import updateSubprogramInvokerNodes
@@ -40,13 +41,9 @@ class GroupInputNode(bpy.types.Node, AnimationNode):
             socket.drawInput(box, self, socket.getDisplayedName())
 
     def drawControlSocket(self, layout, socket):
-        row = layout.row()
-        subrow = row.row()
-        subrow.alignment = "LEFT"
-        self.invokeFunction(subrow, "chooseNewParameterType", icon = "ZOOMIN", emboss = False)
-        subrow = row.row()
-        subrow.alignment = "RIGHT"
-        subrow.label("New Parameter")
+        left, right = splitAlignment(layout)
+        self.invokeFunction(left, "chooseNewParameterType", icon = "ZOOMIN", emboss = False)
+        right.label(socket.name)
 
     def chooseNewParameterType(self):
         self.chooseSocketDataType("newParameter")
