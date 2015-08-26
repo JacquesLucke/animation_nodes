@@ -172,7 +172,7 @@ class InsertDataInputNode(bpy.types.Operator):
         targetSocket = targetNode.inputs[self.socketIndex]
         data = targetSocket.getStoreableValue()
 
-        node = insertNode("an_DataInput")
+        node = insertNode("an_DataInputNode")
         node.assignSocketType(toDataType(targetSocket.bl_idname))
         node.inputs[0].setStoreableValue(data)
 

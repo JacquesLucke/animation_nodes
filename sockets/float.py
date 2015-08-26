@@ -22,7 +22,7 @@ class FloatSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     showName = BoolProperty(default = True)
 
-    min = FloatProperty(default = sys.float_info.min)
+    min = FloatProperty(default = -1e10)
     max = FloatProperty(default = sys.float_info.max)
 
     def drawInput(self, layout, node, text):
