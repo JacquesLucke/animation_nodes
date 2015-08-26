@@ -19,5 +19,5 @@ class DecomposeMatrixNode(bpy.types.Node, AnimationNode):
         if usedOutputs["scale"]: lines.append("scale = matrix.to_scale()")
         return lines
 
-    def getModuleList(self):
+    def getUsedModules(self):
         return ["mathutils"]

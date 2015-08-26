@@ -65,7 +65,7 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
         lines.append("    self.executionError = str(sys.exc_info()[1])")
         return lines
 
-    def getModuleList(self):
+    def getUsedModules(self):
         moduleNames = re.split("\W+", self.moduleNames)
         modules = [module for module in moduleNames if module != ""]
         return ["sys"] + modules

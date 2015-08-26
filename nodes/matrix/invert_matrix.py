@@ -15,5 +15,5 @@ class InvertMatrixNode(bpy.types.Node, AnimationNode):
     def getExecutionCode(self):
         return "invertedMatrix = matrix.inverted(mathutils.Matrix.Identity(4))"
 
-    def getModuleList(self):
+    def getUsedModules(self):
         return ["mathutils"]

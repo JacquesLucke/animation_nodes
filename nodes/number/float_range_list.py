@@ -11,5 +11,5 @@ class FloatRangeListNode(bpy.types.Node, AnimationNode):
         self.inputs.new("an_FloatSocket", "Step", "step").value = 1
         self.outputs.new("an_FloatListSocket", "List", "list")
 
-    def execute(self, amount, start, step):
-        return [start + i * step for i in range(amount)]
+    def getExecutionCode(self):
+        return "list = [start + i * step for i in range(amount)]"

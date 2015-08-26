@@ -68,7 +68,7 @@ class AnimationNode:
     def getExecutionCode(self):
         return []
 
-    def getModuleList(self):
+    def getUsedModules(self):
         return []
 
     def drawControlSocket(self, layout, socket):

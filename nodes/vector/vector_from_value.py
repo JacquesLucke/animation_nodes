@@ -12,5 +12,5 @@ class VectorFromValueNode(bpy.types.Node, AnimationNode):
     def getExecutionCode(self):
         return "vector = mathutils.Vector((value, value, value))"
 
-    def getModuleList(self):
+    def getUsedModules(self):
         return ["mathutils"]

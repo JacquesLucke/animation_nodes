@@ -22,7 +22,7 @@ class ShuffleListNode(bpy.types.Node, AnimationNode):
         return ("random.seed(seed)",
                 "random.shuffle(list)")
 
-    def getModuleList(self):
+    def getUsedModules(self):
         return ["random"]
 
     def edit(self):

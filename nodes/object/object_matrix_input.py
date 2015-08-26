@@ -31,5 +31,5 @@ class ObjectMatrixInputNode(bpy.types.Node, AnimationNode):
 
         return lines
 
-    def getModuleList(self):
+    def getUsedModules(self):
         return ["mathutils"]

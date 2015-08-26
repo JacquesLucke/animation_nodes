@@ -28,5 +28,5 @@ class ListMathNode(bpy.types.Node, AnimationNode):
         if self.operation == "MIN": return "result = min(numbers) if len(numbers) > 0 else 0"
         if self.operation == "MAX": return "result = max(numbers) if len(numbers) > 0 else 0"
 
-    def getModuleList(self):
+    def getUsedModules(self):
         return ["operator", "functools"]

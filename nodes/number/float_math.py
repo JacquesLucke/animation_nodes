@@ -86,5 +86,5 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
         elif op == "FLOOR": return "result = math.floor(a)"
         elif op == "CEILING": return "result = math.ceil(a)"
 
-    def getModuleList(self):
+    def getUsedModules(self):
         return ["math"]

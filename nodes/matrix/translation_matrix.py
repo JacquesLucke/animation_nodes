@@ -12,7 +12,7 @@ class TranslationMatrixNode(bpy.types.Node, AnimationNode):
     def getExecutionCode(self):
         return "matrix = mathutils.Matrix.Translation(translation)"
 
-    def getModuleList(self):
+    def getUsedModules(self):
         return ["mathutils"]
 
     def duplicate(self, sourceNode):

@@ -21,7 +21,7 @@ class RotationMatrixNode(bpy.types.Node, AnimationNode):
     def getExecutionCode(self):
         return "matrix = mathutils.Matrix.Rotation(angle, 4, '{}')".format(self.axis)
 
-    def getModuleList(self):
+    def getUsedModules(self):
         return ["mathutils"]
 
     def duplicate(self, sourceNode):

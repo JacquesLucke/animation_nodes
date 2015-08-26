@@ -35,5 +35,5 @@ class VectorMathNode(bpy.types.Node, AnimationNode):
                                      "if b[1] != 0: result[1] = a[1] / b[1]",
                                      "if b[2] != 0: result[2] = a[2] / b[2]")
 
-    def getModuleList(self):
+    def getUsedModules(self):
         return ["mathutils"]

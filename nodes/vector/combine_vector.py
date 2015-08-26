@@ -14,5 +14,5 @@ class CombineVectorNode(bpy.types.Node, AnimationNode):
     def getExecutionCode(self):
         return "vector = mathutils.Vector((x, y, z))"
 
-    def getModuleList(self):
+    def getUsedModules(self):
         return ["mathutils"]

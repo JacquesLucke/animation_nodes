@@ -60,7 +60,7 @@ class ConvertNode(bpy.types.Node, AnimationNode):
         else:
             return ("new = old")
 
-    def getModuleList(self):
+    def getUsedModules(self):
         t = self.assignedType
         if t == "Vector": return ["mathutils"]
         return []

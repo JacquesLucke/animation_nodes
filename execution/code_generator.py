@@ -41,7 +41,7 @@ def get_ImportModules(nodes):
 def getModulesNeededByNodes(nodes):
     moduleNames = set()
     for node in nodes:
-        moduleNames.update(node.getModuleList())
+        moduleNames.update(node.getUsedModules())
     return list(moduleNames)
 
 

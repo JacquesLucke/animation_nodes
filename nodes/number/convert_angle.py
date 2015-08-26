@@ -38,5 +38,5 @@ class ConvertAngleNode(bpy.types.Node, AnimationNode):
         if self.conversionType == "DEGREE_TO_RADIAN": return "outAngle = inAngle / 180 * math.pi"
         if self.conversionType == "RADIAN_TO_DEGREE": return "outAngle = inAngle * 180 / math.pi"
 
-    def getModuleList(self):
+    def getUsedModules(self):
         return ["math"]

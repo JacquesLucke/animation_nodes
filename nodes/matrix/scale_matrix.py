@@ -15,7 +15,7 @@ class ScaleMatrixNode(bpy.types.Node, AnimationNode):
                 " mathutils.Matrix.Scale(scale[1], 4, (0, 1, 0)) * "
                 " mathutils.Matrix.Scale(scale[2], 4, (0, 0, 1))")
 
-    def getModuleList(self):
+    def getUsedModules(self):
         return ["mathutils"]
 
     def duplicate(self, sourceNode):

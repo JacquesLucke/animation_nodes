@@ -25,5 +25,5 @@ class FloatToIntegerNode(bpy.types.Node, AnimationNode):
         if self.type == "CEILING": return "integer = int(math.ceil(float))"
         if self.type == "FLOOR": return "integer = int(math.floor(float))"
 
-    def getModuleList(self):
+    def getUsedModules(self):
         return ["math"]
