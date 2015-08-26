@@ -166,6 +166,7 @@ class NodeNetwork:
         self.groupInputID = None
         self.groupOutputID = None
         self.generatorOutputIDs = []
+        self.updateParameterOutputIDs = []
         self.analyse()
 
     def analyse(self):
@@ -228,6 +229,7 @@ class NodeNetwork:
             owner = idToNode(loopInputs[0])
             self.loopInputID = loopInputs[0]
             self.generatorOutputIDs = generatorOutputs
+            self.updateParameterOutputIDs = updateParameterOutputs
 
         if self.type in ("Group", "Loop"):
             self.identifier = owner.identifier
@@ -277,6 +279,10 @@ class NodeNetwork:
     @property
     def generatorOutputNodes(self):
         return [idToNode(nodeID) for nodeID in self.generatorOutputIDs]
+
+    @property
+    def updateParameterNodes(self):
+        return [idToNode(nodeID) for nodeID in self.updateParameterOutputIDs]
 
 
 _data = NodeData()

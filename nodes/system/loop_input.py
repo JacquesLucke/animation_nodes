@@ -189,3 +189,6 @@ class LoopInputNode(bpy.types.Node, AnimationNode):
         nodes = self.network.generatorOutputNodes
         nodes.sort(key = attrgetter("sortIndex"))
         return nodes
+
+    def getUpdateParameterNodes(self):
+        return self.network.updateParameterNodes

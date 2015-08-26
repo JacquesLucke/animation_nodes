@@ -148,6 +148,7 @@ class LoopExecutionUnit(SubprogramExecutionUnit):
             lines.extend(getNodeExecutionLines(node, variables))
             lines.extend(linkOutputSocketsToTargets(node, variables))
         lines.extend(self.get_AddToGenerators(inputNode, variables))
+        lines.extend(self.get_UpdateParameters(inputNode, variables))
         lines.append("pass")
         return lines
 
@@ -157,6 +158,12 @@ class LoopExecutionUnit(SubprogramExecutionUnit):
             operation = "append" if node.addType == "APPEND" else "extend"
             lines.append("if {}:".format(variables[node.enabledSocket]))
             lines.append("    {}.{}({})".format(variables[node], operation, variables[node.addSocket]))
+        return lines
+
+    def get_UpdateParameters(self, inputNode, variables):
+        lines = []
+        for node in inputNode.getUpdateParameterNodes():
+            lines.append("{} = {}".format(variables[node.linkedParameterSocket], variables[node.inputs[0]]))
         return lines
 
 
