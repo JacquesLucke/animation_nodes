@@ -55,7 +55,7 @@ def get_ImportAnimationNodes():
 
 
 def get_LoadRandomNumberCache():
-    return "random_numbers = animation_nodes.algorithms.random.getRandomNumberCache()"    
+    return "random_number_cache = animation_nodes.algorithms.random.getRandomNumberCache()"
 
 
 def get_GetNodeReferences(nodes):

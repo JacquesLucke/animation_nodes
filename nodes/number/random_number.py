@@ -54,16 +54,16 @@ class RandomNumberNode(bpy.types.Node, AnimationNode):
         subcol.prop(self, "useMinValue")
 
     def getExecutionCode(self):
-        if self.useAdditonalSeed and self.checkSeed: seedCode = "(seed + self.additionalSeed * 1034) % len(random_numbers)"
+        if self.useAdditonalSeed and self.checkSeed: seedCode = "(seed + self.additionalSeed * 1034) % len(random_number_cache)"
         elif self.useAdditonalSeed and not self.checkSeed: seedCode = "seed + self.additionalSeed * 1034"
-        elif not self.useAdditonalSeed and self.checkSeed: seedCode = "seed % len(random_numbers)"
+        elif not self.useAdditonalSeed and self.checkSeed: seedCode = "seed % len(random_number_cache)"
         elif not self.useAdditonalSeed and not self.checkSeed: seedCode = "seed"
 
         if self.useMinValue and self.useMaxValue: changeCode = " * (maxValue - minValue) + minValue"
         elif not self.useMinValue and self.useMaxValue: changeCode = " * maxValue"
         else: changeCode = ""
 
-        return "number = random_numbers[{}]{}".format(seedCode, changeCode)
+        return "number = random_number_cache[{}]{}".format(seedCode, changeCode)
 
     def duplicate(self, sourceNode):
         self.randomizeAdditionalSeed()
