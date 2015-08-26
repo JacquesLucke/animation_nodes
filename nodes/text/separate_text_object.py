@@ -33,9 +33,8 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         row = layout.row(align = True)
         row.prop(self, "sourceObjectName", text = "Source")
-        assign = row.operator("an.assign_active_object_to_text_separation_node", icon = "EYEDROPPER", text = "")
-        assign.nodeTreeName = self.nodeTree.name
-        assign.nodeName = self.name
+
+        self.invokeFunction(row, "assignActiveObject", icon = "EYEDROPPER")
 
         source = self.getSourceObject()
         if source is not None:
@@ -51,6 +50,9 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
 
     def drawAdvanced(self, layout):
         layout.prop(self, "parentLetters")
+
+    def assignActiveObject(self):
+        self.sourceObjectName = getattr(bpy.context.active_object, "name", "")
 
     def execute(self):
         textObjects = [None] * self.objectCount
@@ -205,21 +207,3 @@ def parentObjectsToMainControler(objects):
 def setMaterialOnObjects(objects, material):
     for object in objects:
         object.active_material = material
-
-
-class AssignActiveObjectToTextSeparationNode(bpy.types.Operator):
-    bl_idname = "an.assign_active_object_to_text_separation_node"
-    bl_label = "Assign Active Object"
-
-    nodeTreeName = StringProperty()
-    nodeName = StringProperty()
-
-    @classmethod
-    def poll(cls, context):
-        return context.active_object is not None
-
-    def execute(self, context):
-        object = context.active_object
-        node = getNode(self.nodeTreeName, self.nodeName)
-        node.sourceObjectName = object.name
-        return {'FINISHED'}
