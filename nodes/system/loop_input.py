@@ -2,6 +2,7 @@ import bpy
 from bpy.props import *
 from operator import attrgetter
 from ... events import networkChanged
+from ... utils.names import getRandomString
 from ... utils.layout import splitAlignment
 from ... base_types.node import AnimationNode
 from . subprogram_sockets import SubprogramData
@@ -46,10 +47,11 @@ class LoopInputNode(bpy.types.Node, AnimationNode):
 
         col = layout.column()
         col.label("Copy for each Iteration:")
-        for socket in self.getParameterSockets():
+        for i, socket in enumerate(self.getParameterSockets()):
             row = col.row()
             row.active = socket.isCopyable
             row.prop(socket, "copyAlways", text = socket.text)
+            self.invokeFunction(row, "createUpdateParameterNode", icon = "PLUS", data = i)
 
     def edit(self):
         for target in self.newIteratorSocket.dataTargets:
@@ -85,14 +87,14 @@ class LoopInputNode(bpy.types.Node, AnimationNode):
 
     def newIterator(self, listDataType, name = None):
         if name is None: name = toBaseDataType(listDataType)
-        socket = self.outputs.new(toBaseIdName(listDataType), name, "iterator")
+        socket = self.outputs.new(toBaseIdName(listDataType), name, "iterator_" + getRandomString(5))
         socket.moveTo(self.newIteratorSocket.index)
         self.setupSocket(socket, name, moveGroup = 1)
         return socket
 
     def newParameter(self, dataType, name = None, defaultValue = None):
         if name is None: name = dataType
-        socket = self.outputs.new(toIdName(dataType), name, "parameter")
+        socket = self.outputs.new(toIdName(dataType), name, "parameter_" + getRandomString(5))
         if defaultValue: socket.setStoreableValue(defaultValue)
         socket.moveTo(self.newParameterSocket.index)
         socket.copyAlways = True
@@ -149,6 +151,11 @@ class LoopInputNode(bpy.types.Node, AnimationNode):
     def createGeneratorOutputNode(self):
         settings = [{"name" : "loopInputIdentifier", "value" : repr(self.identifier)}]
         bpy.ops.node.add_and_link_node("INVOKE_DEFAULT", use_transform = True, settings = settings, type = "an_LoopGeneratorOutputNode")
+        updateSubprogramInvokerNodes()
+
+    def createUpdateParameterNode(self, strIndex):
+        settings = [{"name" : "loopInputIdentifier", "value" : repr(self.identifier)}, {"name" : "parameterIdentifier", "value" : repr(self.getParameterSockets()[int(strIndex)].identifier)}]
+        bpy.ops.node.add_and_link_node("INVOKE_DEFAULT", use_transform = True, settings = settings, type = "an_UpdateLoopParameterNode")
         updateSubprogramInvokerNodes()
 
 
