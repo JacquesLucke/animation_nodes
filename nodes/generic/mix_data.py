@@ -37,13 +37,13 @@ class MixDataNode(bpy.types.Node, AnimationNode):
         self.inputs.new("an_FloatSocket", "Factor", "factor")
         self.inputs.new(idName, "A", "a")
         self.inputs.new(idName, "B", "b")
-        self.outputs.new(idName, "Output", "output")
+        self.outputs.new(idName, "Result", "result")
 
     def getExecutionCode(self):
         lines = []
         if self.clampFactor: lines.append("f = min(max(factor, 0.0), 1.0)")
         else: lines.append("f = factor")
-        if self.dataType in ("Float", "Vector"): lines.append("output = a * (1 - f) + b * f")
-        if self.dataType == "Matrix": lines.append("output = a.lerp(b, f)")
-        if self.dataType == "Color": lines.append("output = [v1 * (1 - f) + v2 * f for v1, v2 in zip(a, b)]")
+        if self.dataType in ("Float", "Vector"): lines.append("result = a * (1 - f) + b * f")
+        if self.dataType == "Matrix": lines.append("result = a.lerp(b, f)")
+        if self.dataType == "Color": lines.append("result = [v1 * (1 - f) + v2 * f for v1, v2 in zip(a, b)]")
         return lines
