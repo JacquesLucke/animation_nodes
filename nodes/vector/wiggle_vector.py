@@ -8,7 +8,6 @@ from ... algorithms.perlin_noise import perlinNoise
 class VectorWiggle(bpy.types.Node, AnimationNode):
     bl_idname = "an_VectorWiggle"
     bl_label = "Vector Wiggle"
-    isDetermined = True
 
     additionalSeed = IntProperty(update = propertyChanged)
 

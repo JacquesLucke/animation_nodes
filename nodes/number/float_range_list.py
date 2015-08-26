@@ -4,7 +4,6 @@ from ... base_types.node import AnimationNode
 class FloatRangeListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_FloatRangeListNode"
     bl_label = "Number Range"
-    isDetermined = True
 
     def create(self):
         self.inputs.new("an_IntegerSocket", "Amount", "amount").value = 5

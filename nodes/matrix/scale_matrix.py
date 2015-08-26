@@ -4,7 +4,6 @@ from ... base_types.node import AnimationNode
 class ScaleMatrix(bpy.types.Node, AnimationNode):
     bl_idname = "an_ScaleMatrix"
     bl_label = "Scale Matrix"
-    isDetermined = True
 
     def create(self):
         self.inputs.new("an_VectorSocket", "Scale", "scale").value = [1, 1, 1]

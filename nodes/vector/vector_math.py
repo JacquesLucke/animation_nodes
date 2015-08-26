@@ -13,7 +13,6 @@ operationItems = [
 class VectorMathNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_VectorMathNode"
     bl_label = "Vector Math"
-    isDetermined = True
 
     operation = EnumProperty(name = "Operation", items = operationItems, default = "ADD", update = executionCodeChanged)
 

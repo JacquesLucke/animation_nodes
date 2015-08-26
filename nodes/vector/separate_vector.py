@@ -4,7 +4,6 @@ from ... base_types.node import AnimationNode
 class SeparateVector(bpy.types.Node, AnimationNode):
     bl_idname = "an_SeparateVector"
     bl_label = "Separate Vector"
-    isDetermined = True
 
     def create(self):
         self.inputs.new("an_VectorSocket", "Vector", "vector")

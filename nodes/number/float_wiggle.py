@@ -7,7 +7,6 @@ from ... algorithms.perlin_noise import perlinNoise
 class FloatWiggle(bpy.types.Node, AnimationNode):
     bl_idname = "an_FloatWiggle"
     bl_label = "Number Wiggle"
-    isDetermined = True
 
     additionalSeed = IntProperty(update = propertyChanged)
 

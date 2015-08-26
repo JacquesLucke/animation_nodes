@@ -4,7 +4,6 @@ from ... base_types.node import AnimationNode
 class VectorDistanceNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_VectorDistanceNode"
     bl_label = "Vector Distance"
-    isDetermined = True
 
     def create(self):
         self.inputs.new("an_VectorSocket", "A", "a")

@@ -4,7 +4,6 @@ from ... base_types.node import AnimationNode
 class CreateEdgeIndices(bpy.types.Node, AnimationNode):
     bl_idname = "an_CreateEdgeIndices"
     bl_label = "Create Edge Indices"
-    isDetermined = True
 
     def create(self):
         self.inputs.new("an_IntegerSocket", "Index 1", "index1").value = 0

@@ -8,7 +8,6 @@ axisItems = [("X", "X", ""), ("Y", "Y", ""), ("Z", "Z", "")]
 class RotationMatrix(bpy.types.Node, AnimationNode):
     bl_idname = "an_RotationMatrix"
     bl_label = "Rotation Matrix"
-    isDetermined = True
 
     axis = EnumProperty(items = axisItems, update = executionCodeChanged)
 

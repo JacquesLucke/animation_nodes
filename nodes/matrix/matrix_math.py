@@ -8,7 +8,6 @@ operationItems = [("MULTIPLY", "Multiply", "")]
 class MatrixMath(bpy.types.Node, AnimationNode):
     bl_idname = "an_MatrixMath"
     bl_label = "Matrix Math"
-    isDetermined = True
 
     operation = EnumProperty(name = "Operation", items = operationItems, update = executionCodeChanged)
 

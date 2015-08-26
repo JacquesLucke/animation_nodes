@@ -35,7 +35,6 @@ singleInputOperations = ("SINE", "COSINE", "TANGENT", "ARCSINE",
 class FloatMathNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_FloatMathNode"
     bl_label = "Math"
-    isDetermined = True
 
     def operationChanged(node, context):
         node.inputs[1].hide = node.operation in singleInputOperations

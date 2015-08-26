@@ -8,7 +8,6 @@ from ... algorithms.random import getUniformRandom
 class RandomNumberNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_RandomNumberNode"
     bl_label = "Random Number"
-    isDetermined = True
 
     additionalSeed = IntProperty(update = propertyChanged)
 

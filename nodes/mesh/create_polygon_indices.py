@@ -5,7 +5,6 @@ from ... base_types.node import AnimationNode
 class CreatePolygonIndices(bpy.types.Node, AnimationNode):
     bl_idname = "an_CreatePolygonIndices"
     bl_label = "Create Polygon Indices"
-    isDetermined = True
 
     errorMessage = StringProperty()
 

@@ -10,7 +10,6 @@ conversionTypeItems = [
 class ConvertAngle(bpy.types.Node, AnimationNode):
     bl_idname = "an_ConvertAngle"
     bl_label = "Convert Angle"
-    isDetermined = True
 
     def settingChanged(self, context):
         inSocket = self.inputs["Angle"]

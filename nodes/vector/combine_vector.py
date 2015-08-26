@@ -4,7 +4,6 @@ from ... base_types.node import AnimationNode
 class CombineVector(bpy.types.Node, AnimationNode):
     bl_idname = "an_CombineVector"
     bl_label = "Combine Vector"
-    isDetermined = True
 
     def create(self):
         self.inputs.new("an_FloatSocket", "X", "x")

@@ -4,7 +4,6 @@ from ... base_types.node import AnimationNode
 class TranslationMatrix(bpy.types.Node, AnimationNode):
     bl_idname = "an_TranslationMatrix"
     bl_label = "Translation Matrix"
-    isDetermined = True
 
     def create(self):
         self.inputs.new("an_VectorSocket", "Translation", "translation")

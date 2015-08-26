@@ -4,7 +4,6 @@ from ... base_types.node import AnimationNode
 class FloatClamp(bpy.types.Node, AnimationNode):
     bl_idname = "an_FloatClamp"
     bl_label = "Clamp"
-    isDetermined = True
 
     def create(self):
         self.inputs.new("an_FloatSocket", "Value", "value")

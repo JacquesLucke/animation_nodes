@@ -5,7 +5,6 @@ from ... algorithms.interpolation import mixedInterpolation
 class MixInterpolation(bpy.types.Node, AnimationNode):
     bl_idname = "an_MixInterpolation"
     bl_label = "Mix Interpolation"
-    isDetermined = True
 
     def create(self):
         self.inputs.new("an_FloatSocket", "Factor", "factor").setMinMax(0, 1)

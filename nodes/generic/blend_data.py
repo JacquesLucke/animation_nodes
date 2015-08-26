@@ -7,7 +7,6 @@ from ... sockets.info import toIdName
 class BlendDataNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_BlendDataNode"
     bl_label = "Blend Data"
-    isDetermined = True
 
     onlySearchTags = True
     searchTags = [ ("Blend Matrices", {"dataType" : repr("Matrix")}),

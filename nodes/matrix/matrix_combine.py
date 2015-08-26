@@ -7,7 +7,6 @@ from ... base_types.node import AnimationNode
 class MatrixCombine(bpy.types.Node, AnimationNode):
     bl_idname = "an_MatrixCombine"
     bl_label = "Combine Matrices"
-    isDetermined = True
 
     def create(self):
         self.inputs.new("an_MatrixListSocket", "Matrices", "matrices")

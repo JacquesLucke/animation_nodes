@@ -4,7 +4,6 @@ from ... base_types.node import AnimationNode
 class EvaluateInterpolation(bpy.types.Node, AnimationNode):
     bl_idname = "an_EvaluateInterpolation"
     bl_label = "Evaluate Interpolation"
-    isDetermined = True
 
     def create(self):
         self.inputs.new("an_InterpolationSocket", "Interpolation", "interpolation").showName = False

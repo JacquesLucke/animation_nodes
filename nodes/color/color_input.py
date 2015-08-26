@@ -6,7 +6,6 @@ from ... base_types.node import AnimationNode
 class ColorInputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ColorInputNode"
     bl_label = "Color Input"
-    isDetermined = True
 
     colorProperty = FloatVectorProperty(
         default = [0.5, 0.5, 0.5], subtype = "COLOR",

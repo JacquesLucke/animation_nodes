@@ -9,7 +9,6 @@ from ... algorithms.random import getUniformRandom
 class RandomVectorNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_RandomVectorNode"
     bl_label = "Random Vector"
-    isDetermined = True
 
     additionalSeed = IntProperty(update = propertyChanged)
 

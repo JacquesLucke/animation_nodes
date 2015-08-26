@@ -4,7 +4,6 @@ from ... base_types.node import AnimationNode
 class DecomposeMatrix(bpy.types.Node, AnimationNode):
     bl_idname = "an_DecomposeMatrix"
     bl_label = "Decompose Matrix"
-    isDetermined = True
 
     def create(self):
         self.inputs.new("an_MatrixSocket", "Matrix", "matrix")

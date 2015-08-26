@@ -4,7 +4,6 @@ from ... base_types.node import AnimationNode
 class TransformVector(bpy.types.Node, AnimationNode):
     bl_idname = "an_TransformVector"
     bl_label = "Transform Vector"
-    isDetermined = True
 
     def create(self):
         self.inputs.new("an_VectorSocket", "Vector", "vector")
