@@ -2,8 +2,8 @@ import bpy
 from ... base_types.node import AnimationNode
 
 
-class ObjectMatrixInput(bpy.types.Node, AnimationNode):
-    bl_idname = "an_ObjectMatrixInput"
+class ObjectMatrixInputNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_ObjectMatrixInputNode"
     bl_label = "Object Matrix Input"
 
     def create(self):

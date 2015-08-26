@@ -6,8 +6,8 @@ from ... base_types.node import AnimationNode
 trackAxisItems = [(axis, axis, "") for axis in ("X", "Y", "Z", "-X", "-Y", "-Z")]
 upAxisItems = [(axis, axis, "") for axis in ("X", "Y", "Z")]
 
-class DirectionToRotation(bpy.types.Node, AnimationNode):
-    bl_idname = "an_DirectionToRotation"
+class DirectionToRotationNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_DirectionToRotationNode"
     bl_label = "Direction to Rotation"
 
     trackAxis = bpy.props.EnumProperty(items = trackAxisItems, update = propertyChanged, default = "Z")

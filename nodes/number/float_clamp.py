@@ -1,8 +1,8 @@
 import bpy, random
 from ... base_types.node import AnimationNode
 
-class FloatClamp(bpy.types.Node, AnimationNode):
-    bl_idname = "an_FloatClamp"
+class FloatClampNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_FloatClampNode"
     bl_label = "Clamp"
 
     def create(self):

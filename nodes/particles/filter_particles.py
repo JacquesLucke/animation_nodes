@@ -3,8 +3,8 @@ from bpy.props import *
 from ... events import propertyChanged
 from ... base_types.node import AnimationNode
 
-class FilterParticles(bpy.types.Node, AnimationNode):
-    bl_idname = "an_FilterParticles"
+class FilterParticlesNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_FilterParticlesNode"
     bl_label = "Filter Particles"
 
     outputUnborn = BoolProperty(name = "Output Unborn Particles", default = False, update = propertyChanged)

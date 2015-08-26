@@ -4,8 +4,8 @@ from bpy.props import *
 from ... base_types.node import AnimationNode
 
 
-class CreateMeshFromData(bpy.types.Node, AnimationNode):
-    bl_idname = "an_CreateMeshFromData"
+class CreateMeshFromDataNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_CreateMeshFromDataNode"
     bl_label = "Create Mesh"
 
     errorMessage = StringProperty(default = "")

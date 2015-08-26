@@ -4,8 +4,8 @@ from mathutils import Vector
 from ... base_types.node import AnimationNode
 from ... events import propertyChanged
 
-class an_EdgesToPlanes(bpy.types.Node, AnimationNode):
-    bl_idname = "an_EdgesToPlanes"
+class an_EdgesToPlanesNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_EdgesToPlanesNode"
     bl_label = "Edges to Planes"
 
     calculateDirection = BoolProperty(

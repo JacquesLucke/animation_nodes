@@ -4,8 +4,8 @@ from mathutils import Vector
 from ... base_types.node import AnimationNode
 from . spline_evaluation_base import SplineEvaluationBase
 
-class EvaluateSpline(bpy.types.Node, AnimationNode, SplineEvaluationBase):
-    bl_idname = "an_EvaluateSpline"
+class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
+    bl_idname = "an_EvaluateSplineNode"
     bl_label = "Evaluate Spline"
 
     def create(self):

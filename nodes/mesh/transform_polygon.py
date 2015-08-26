@@ -2,8 +2,8 @@ import bpy
 from mathutils import Matrix
 from ... base_types.node import AnimationNode
 
-class TransformPolygon(bpy.types.Node, AnimationNode):
-    bl_idname = "an_TransformPolygon"
+class TransformPolygonNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_TransformPolygonNode"
     bl_label = "Transform Polygon"
 
     def create(self):

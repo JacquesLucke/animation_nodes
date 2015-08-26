@@ -2,9 +2,9 @@ import bpy
 from mathutils import Vector
 from ... base_types.node import AnimationNode
 
-class GridArrange(bpy.types.Node, AnimationNode):
-    bl_idname = "an_GridArrange"
-    bl_label = "Grid Arrange"               
+class GridArrangeNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_GridArrangeNode"
+    bl_label = "Grid Arrange"
 
     def create(self):
         self.inputs.new("an_IntegerSocket", "Index", "index")

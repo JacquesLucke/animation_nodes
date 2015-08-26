@@ -1,8 +1,8 @@
 import bpy
 from ... base_types.node import AnimationNode
 
-class DecomposeMatrix(bpy.types.Node, AnimationNode):
-    bl_idname = "an_DecomposeMatrix"
+class DecomposeMatrixNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_DecomposeMatrixNode"
     bl_label = "Decompose Matrix"
 
     def create(self):

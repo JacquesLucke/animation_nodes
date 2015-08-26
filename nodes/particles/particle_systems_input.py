@@ -1,8 +1,8 @@
 import bpy, random, mathutils
 from ... base_types.node import AnimationNode
 
-class ParticleSystemsInput(bpy.types.Node, AnimationNode):
-    bl_idname = "an_ParticleSystemsInput"
+class ParticleSystemsInputNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_ParticleSystemsInputNode"
     bl_label = "Particle Systems Input"
 
     def create(self):

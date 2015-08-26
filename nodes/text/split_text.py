@@ -9,8 +9,8 @@ splitTypes = [
     ("Lines", "Lines", ""),
     ("Regexp", "Regexp", "") ]
 
-class SplitText(bpy.types.Node, AnimationNode):
-    bl_idname = "an_SplitText"
+class SplitTextNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_SplitTextNode"
     bl_label = "Split Text"
 
     def splitTypeChanges(self, context):

@@ -1,8 +1,8 @@
 import bpy
 from ... base_types.node import AnimationNode
 
-class SeparateVector(bpy.types.Node, AnimationNode):
-    bl_idname = "an_SeparateVector"
+class SeparateVectorNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_SeparateVectorNode"
     bl_label = "Separate Vector"
 
     def create(self):

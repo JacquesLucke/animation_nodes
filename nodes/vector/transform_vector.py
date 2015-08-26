@@ -1,8 +1,8 @@
 import bpy
 from ... base_types.node import AnimationNode
 
-class TransformVector(bpy.types.Node, AnimationNode):
-    bl_idname = "an_TransformVector"
+class TransformVectorNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_TransformVectorNode"
     bl_label = "Transform Vector"
 
     def create(self):

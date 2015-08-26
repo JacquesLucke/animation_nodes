@@ -1,8 +1,8 @@
 import bpy
 from ... base_types.node import AnimationNode
 
-class TextBlockWriter(bpy.types.Node, AnimationNode):
-    bl_idname = "an_TextBlockWriter"
+class TextBlockWriterNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_TextBlockWriterNode"
     bl_label = "Text Block Writer"
 
     def create(self):

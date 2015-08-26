@@ -1,8 +1,8 @@
 import bpy
 from ... base_types.node import AnimationNode
 
-class TextBlockReader(bpy.types.Node, AnimationNode):
-    bl_idname = "an_TextBlockReader"
+class TextBlockReaderNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_TextBlockReaderNode"
     bl_label = "Text Block Reader"
 
     def create(self):

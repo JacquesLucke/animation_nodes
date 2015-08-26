@@ -1,8 +1,8 @@
 import bpy
 from ... base_types.node import AnimationNode
 
-class TextSequenceOutput(bpy.types.Node, AnimationNode):
-    bl_idname = "an_TextSequenceOutput"
+class TextSequenceOutputNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_TextSequenceOutputNode"
     bl_label = "Text Sequence Output"
 
     def create(self):

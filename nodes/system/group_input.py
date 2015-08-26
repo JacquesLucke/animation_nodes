@@ -6,8 +6,8 @@ from ... base_types.node import AnimationNode
 from . subprogram_sockets import SubprogramData
 from . utils import updateSubprogramInvokerNodes
 
-class GroupInput(bpy.types.Node, AnimationNode):
-    bl_idname = "an_GroupInput"
+class GroupInputNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_GroupInputNode"
     bl_label = "Group Input"
 
     subprogramName = StringProperty(name = "Subprogram Name", default = "Group",

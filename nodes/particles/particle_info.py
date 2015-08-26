@@ -1,8 +1,8 @@
 import bpy
 from ... base_types.node import AnimationNode
 
-class ParticleInfo(bpy.types.Node, AnimationNode):
-    bl_idname = "an_ParticleInfo"
+class ParticleInfoNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_ParticleInfoNode"
     bl_label = "Particle Info"
 
     def create(self):

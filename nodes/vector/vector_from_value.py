@@ -1,8 +1,8 @@
 import bpy
 from ... base_types.node import AnimationNode
 
-class VectorFromValue(bpy.types.Node, AnimationNode):
-    bl_idname = "an_VectorFromValue"
+class VectorFromValueNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_VectorFromValueNode"
     bl_label = "Vector from Value"
 
     def create(self):

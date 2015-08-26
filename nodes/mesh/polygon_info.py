@@ -1,8 +1,8 @@
 import bpy
 from ... base_types.node import AnimationNode
 
-class PolygonInfo(bpy.types.Node, AnimationNode):
-    bl_idname = "an_PolygonInfo"
+class PolygonInfoNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_PolygonInfoNode"
     bl_label = "Polygon Info"
 
     def create(self):

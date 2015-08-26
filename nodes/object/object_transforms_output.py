@@ -3,8 +3,8 @@ from bpy.props import *
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 
-class an_ObjectTransformsOutput(bpy.types.Node, AnimationNode):
-    bl_idname = "an_ObjectTransformsOutput"
+class an_ObjectTransformsOutputNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_ObjectTransformsOutputNode"
     bl_label = "Object Transforms Output"
 
     def checkedPropertiesChanged(self, context):

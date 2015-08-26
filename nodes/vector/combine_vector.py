@@ -1,8 +1,8 @@
 import bpy
 from ... base_types.node import AnimationNode
 
-class CombineVector(bpy.types.Node, AnimationNode):
-    bl_idname = "an_CombineVector"
+class CombineVectorNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_CombineVectorNode"
     bl_label = "Combine Vector"
 
     def create(self):

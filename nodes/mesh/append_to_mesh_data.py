@@ -1,8 +1,8 @@
 import bpy
 from ... base_types.node import AnimationNode
 
-class AppendToMeshData(bpy.types.Node, AnimationNode):
-    bl_idname = "an_AppendToMeshData"
+class AppendToMeshDataNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_AppendToMeshDataNode"
     bl_label = "Append Mesh Data"
 
     def create(self):

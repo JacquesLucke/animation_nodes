@@ -2,8 +2,8 @@ import bpy, random
 from ... base_types.node import AnimationNode
 
 
-class CombineColor(bpy.types.Node, AnimationNode):
-    bl_idname = "an_CombineColor"
+class CombineColorNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_CombineColorNode"
     bl_label = "Combine Color"
 
     def create(self):

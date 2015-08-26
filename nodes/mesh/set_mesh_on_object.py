@@ -1,8 +1,8 @@
 import bpy, bmesh
 from ... base_types.node import AnimationNode
 
-class SetMeshOnObject(bpy.types.Node, AnimationNode):
-    bl_idname = "an_SetMeshOnObject"
+class SetMeshOnObjectNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_SetMeshOnObjectNode"
     bl_label = "Set Mesh on Object"
 
     def create(self):

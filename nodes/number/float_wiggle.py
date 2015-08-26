@@ -4,8 +4,8 @@ from ... events import propertyChanged
 from ... base_types.node import AnimationNode
 from ... algorithms.perlin_noise import perlinNoise
 
-class FloatWiggle(bpy.types.Node, AnimationNode):
-    bl_idname = "an_FloatWiggle"
+class FloatWiggleNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_FloatWiggleNode"
     bl_label = "Number Wiggle"
 
     additionalSeed = IntProperty(update = propertyChanged)

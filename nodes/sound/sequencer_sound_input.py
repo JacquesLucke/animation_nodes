@@ -46,8 +46,8 @@ bakeFrequencies = [
 strengthListLength = len(bakeFrequencies)
 
 
-class SequencerSoundInput(bpy.types.Node, AnimationNode):
-    bl_idname = "an_SequencerSoundInput"
+class SequencerSoundInputNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_SequencerSoundInputNode"
     bl_label = "Sequencer Sound Input"
 
     def settingChanged(self, context):

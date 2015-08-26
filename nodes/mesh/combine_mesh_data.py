@@ -8,8 +8,8 @@ sourceTypeItems = [
     ("MESH_DATA", "Vertices and Indices", ""),
     ("POLYGONS", "Polygons", "") ]
 
-class CombineMeshData(bpy.types.Node, AnimationNode):
-    bl_idname = "an_CombineMeshData"
+class CombineMeshDataNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_CombineMeshDataNode"
     bl_label = "Combine Mesh Data"
 
     def sourceTypeChanged(self, context):

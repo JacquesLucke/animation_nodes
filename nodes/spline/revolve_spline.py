@@ -8,8 +8,8 @@ projectionTypeItems = [
     ("PARAMETER", "Same Parameter", ""),
     ("PROJECT", "Project", "") ]
 
-class RevolveSpline(bpy.types.Node, AnimationNode):
-    bl_idname = "an_RevolveSpline"
+class RevolveSplineNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_RevolveSplineNode"
     bl_label = "Revolve Spline"
 
     projectionType = EnumProperty(name = "Projection Type", default = "PROJECT", items = projectionTypeItems, update = propertyChanged)

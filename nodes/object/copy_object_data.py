@@ -1,8 +1,8 @@
 import bpy
 from ... base_types.node import AnimationNode
 
-class CopyObjectData(bpy.types.Node, AnimationNode):
-    bl_idname = "an_CopyObjectData"
+class CopyObjectDataNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_CopyObjectDataNode"
     bl_label = "Copy Object Data"
 
     def create(self):

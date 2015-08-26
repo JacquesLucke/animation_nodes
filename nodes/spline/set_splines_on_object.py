@@ -2,8 +2,8 @@ import bpy
 from ... base_types.node import AnimationNode
 from ... data_structures.splines.to_blender import setSplinesOnBlenderObject
 
-class SetSplinesOnObject(bpy.types.Node, AnimationNode):
-    bl_idname = "an_SetSplinesOnObject"
+class SetSplinesOnObjectNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_SetSplinesOnObjectNode"
     bl_label = "Set Splines on Object"
 
     def create(self):

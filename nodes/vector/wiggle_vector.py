@@ -5,8 +5,8 @@ from ... events import propertyChanged
 from ... base_types.node import AnimationNode
 from ... algorithms.perlin_noise import perlinNoise
 
-class VectorWiggle(bpy.types.Node, AnimationNode):
-    bl_idname = "an_VectorWiggle"
+class VectorWiggleNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_VectorWiggleNode"
     bl_label = "Vector Wiggle"
 
     additionalSeed = IntProperty(update = propertyChanged)

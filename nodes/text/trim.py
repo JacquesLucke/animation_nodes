@@ -3,8 +3,8 @@ from bpy.props import *
 from ... events import propertyChanged
 from ... base_types.node import AnimationNode
 
-class TrimText(bpy.types.Node, AnimationNode):
-    bl_idname = "an_TrimText"
+class TrimTextNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_TrimTextNode"
     bl_label = "Trim Text"
 
     def settingChanged(self, context):

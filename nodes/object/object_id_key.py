@@ -5,8 +5,8 @@ from ... base_types.node import AnimationNode
 from ... id_keys import getIDKeyInfo, getIDKeyItems
 
 
-class ObjectIDKey(bpy.types.Node, AnimationNode):
-    bl_idname = "an_ObjectIDKey"
+class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_ObjectIDKeyNode"
     bl_label = "Object ID Key"
 
     def selectedKeyChanged(self, context):

@@ -1,8 +1,8 @@
 import bpy
 from ... base_types.node import AnimationNode
 
-class SmoothBezierSpline(bpy.types.Node, AnimationNode):
-    bl_idname = "an_SmoothBezierSpline"
+class SmoothBezierSplineNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_SmoothBezierSplineNode"
     bl_label = "Smooth Bezier Spline"
 
     def create(self):

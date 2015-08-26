@@ -1,8 +1,8 @@
 import bpy
 from ... base_types.node import AnimationNode
 
-class SeparateMeshData(bpy.types.Node, AnimationNode):
-    bl_idname = "an_SeparateMeshData"
+class SeparateMeshDataNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_SeparateMeshDataNode"
     bl_label = "Separate Mesh Data"
 
     def create(self):

@@ -1,8 +1,8 @@
 import bpy
 from ... base_types.node import AnimationNode
 
-class EvaluateInterpolation(bpy.types.Node, AnimationNode):
-    bl_idname = "an_EvaluateInterpolation"
+class EvaluateInterpolationNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_EvaluateInterpolationNode"
     bl_label = "Evaluate Interpolation"
 
     def create(self):

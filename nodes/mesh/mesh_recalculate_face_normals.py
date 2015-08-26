@@ -3,8 +3,8 @@ from bpy.props import *
 from ... base_types.node import AnimationNode
 from ... events import propertyChanged
 
-class MeshRecalculateFaceNormals(bpy.types.Node, AnimationNode):
-    bl_idname = "an_MeshRecalculateFaceNormals"
+class MeshRecalculateFaceNormalsNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_MeshRecalculateFaceNormalsNode"
     bl_label = "Recalculate Normals"
 
     invert = BoolProperty(name = "Invert Normals", update = propertyChanged)

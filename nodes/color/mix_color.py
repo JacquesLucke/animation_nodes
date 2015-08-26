@@ -1,10 +1,10 @@
 import bpy, random
 from ... base_types.node import AnimationNode
 
-class ColorMix(bpy.types.Node, AnimationNode):
-    bl_idname = "an_ColorMix"
+class ColorMixNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_ColorMixNode"
     bl_label = "Color Mix"
-    
+
     def create(self):
         self.inputs.new("an_FloatSocket", "Factor", "factor").setMinMax(0.0, 1.0)
         self.inputs.new("an_ColorSocket", "Color 1", "a")

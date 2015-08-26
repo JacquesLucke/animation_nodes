@@ -4,8 +4,8 @@ from mathutils import Vector
 from ... events import propertyChanged
 from ... base_types.node import AnimationNode
 
-class ProjectOnSpline(bpy.types.Node, AnimationNode):
-    bl_idname = "an_ProjectOnSpline"
+class ProjectOnSplineNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_ProjectOnSplineNode"
     bl_label = "Project on Spline"
 
     def settingChanged(self, context):

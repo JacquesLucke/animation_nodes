@@ -4,8 +4,8 @@ from ... base_types.node import AnimationNode
 from ... tree_info import getDirectOriginSocket
 from ... sockets.info import getBaseDataTypeItems, toListIdName
 
-class CombineLists(bpy.types.Node, AnimationNode):
-    bl_idname = "an_combine_lists_node"
+class CombineListsNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_CombineListsNode"
     bl_label = "Combine Lists"
 
     def assignedTypeChanged(self, context):

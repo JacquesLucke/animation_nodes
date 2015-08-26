@@ -1,8 +1,8 @@
 import bpy
 from ... base_types.node import AnimationNode
 
-class MakeObjectSmooth(bpy.types.Node, AnimationNode):
-    bl_idname = "an_MakeObjectSmooth"
+class MakeObjectSmoothNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_MakeObjectSmoothNode"
     bl_label = "Make Object Smooth"
 
     def create(self):

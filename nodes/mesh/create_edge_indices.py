@@ -1,8 +1,8 @@
 import bpy
 from ... base_types.node import AnimationNode
 
-class CreateEdgeIndices(bpy.types.Node, AnimationNode):
-    bl_idname = "an_CreateEdgeIndices"
+class CreateEdgeIndicesNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_CreateEdgeIndicesNode"
     bl_label = "Create Edge Indices"
 
     def create(self):

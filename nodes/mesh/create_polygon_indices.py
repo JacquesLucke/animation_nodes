@@ -2,8 +2,8 @@ import bpy
 from bpy.props import *
 from ... base_types.node import AnimationNode
 
-class CreatePolygonIndices(bpy.types.Node, AnimationNode):
-    bl_idname = "an_CreatePolygonIndices"
+class CreatePolygonIndicesNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_CreatePolygonIndicesNode"
     bl_label = "Create Polygon Indices"
 
     errorMessage = StringProperty()

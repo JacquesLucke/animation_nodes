@@ -1,8 +1,8 @@
 import bpy
 from ... base_types.node import AnimationNode
 
-class InvertMatrix(bpy.types.Node, AnimationNode):
-    bl_idname = "an_InvertMatrix"
+class InvertMatrixNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_InvertMatrixNode"
     bl_label = "Invert Matrix"
 
     def create(self):

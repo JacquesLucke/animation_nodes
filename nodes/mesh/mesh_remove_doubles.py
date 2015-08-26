@@ -2,8 +2,8 @@ import bpy
 import bmesh
 from ... base_types.node import AnimationNode
 
-class MeshRemoveDoubles(bpy.types.Node, AnimationNode):
-    bl_idname = "an_MeshRemoveDoubles"
+class MeshRemoveDoublesNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_MeshRemoveDoublesNode"
     bl_label = "Mesh Remove Doubles"
 
     def create(self):

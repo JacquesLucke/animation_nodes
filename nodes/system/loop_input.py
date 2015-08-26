@@ -8,8 +8,8 @@ from . utils import updateSubprogramInvokerNodes
 from ... sockets.info import (toBaseIdName, toListDataType,
                         toIdName, isBase, toListIdName, toBaseDataType)
 
-class LoopInput(bpy.types.Node, AnimationNode):
-    bl_idname = "an_LoopInput"
+class LoopInputNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_LoopInputNode"
     bl_label = "Loop Input"
 
     subprogramName = StringProperty(name = "Subprogram Name", default = "Loop",

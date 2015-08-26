@@ -2,7 +2,7 @@ import bpy
 from ... base_types.node import AnimationNode
 
 class GetParticlesNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_GetParticles"
+    bl_idname = "an_GetParticlesNode"
     bl_label = "Get Particles"
 
     def create(self):

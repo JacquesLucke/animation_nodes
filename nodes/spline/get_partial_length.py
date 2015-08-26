@@ -2,8 +2,8 @@ import bpy
 from ... base_types.node import AnimationNode
 from . spline_evaluation_base import SplineEvaluationBase
 
-class GetSplineLength(bpy.types.Node, AnimationNode, SplineEvaluationBase):
-    bl_idname = "an_GetSplineLength"
+class GetSplineLengthNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
+    bl_idname = "an_GetSplineLengthNode"
     bl_label = "Get Spline Length"
 
     def create(self):

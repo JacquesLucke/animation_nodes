@@ -2,8 +2,8 @@ import bpy
 from ... base_types.node import AnimationNode
 from . spline_evaluation_base import SplineEvaluationBase
 
-class GetSplineSamples(bpy.types.Node, AnimationNode, SplineEvaluationBase):
-    bl_idname = "an_GetSplineSamples"
+class GetSplineSamplesNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
+    bl_idname = "an_GetSplineSamplesNode"
     bl_label = "Get Spline Samples"
 
     def create(self):

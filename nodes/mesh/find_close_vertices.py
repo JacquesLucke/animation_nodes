@@ -2,8 +2,8 @@ import bpy
 from mathutils.kdtree import KDTree
 from ... base_types.node import AnimationNode
 
-class FindCloseVertices(bpy.types.Node, AnimationNode):
-    bl_idname = "an_FindCloseVertices"
+class FindCloseVerticesNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_FindCloseVerticesNode"
     bl_label = "Find Close Vertices"
 
     def create(self):

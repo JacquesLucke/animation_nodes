@@ -1,8 +1,8 @@
 import bpy
 from ... base_types.node import AnimationNode
 
-class ObjectGroupInput(bpy.types.Node, AnimationNode):
-    bl_idname = "an_ObjectGroupInput"
+class ObjectGroupInputNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_ObjectGroupInputNode"
     bl_label = "Object Group Input"
 
     def create(self):

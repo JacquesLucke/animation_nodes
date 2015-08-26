@@ -1,8 +1,8 @@
 import bpy
 from ... base_types.node import AnimationNode
 
-class VertexInfo(bpy.types.Node, AnimationNode):
-    bl_idname = "an_VertexInfo"
+class VertexInfoNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_VertexInfoNode"
     bl_label = "Vertex Info"
 
     def create(self):

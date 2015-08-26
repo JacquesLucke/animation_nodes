@@ -10,8 +10,8 @@ addTypeItems = [
     ("APPEND", "Append", "Add one element to the output list", "NONE", 0),
     ("EXTEND", "Extend", "Add a custom amount of elements to the output list", "NONE", 1) ]
 
-class LoopGeneratorOutput(bpy.types.Node, AnimationNode):
-    bl_idname = "an_LoopGeneratorOutput"
+class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_LoopGeneratorOutputNode"
     bl_label = "Loop Generator Output"
 
     def dataTypeChanged(self, context):

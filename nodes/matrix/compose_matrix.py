@@ -1,8 +1,8 @@
 import bpy
 from ... base_types.node import AnimationNode
 
-class ComposeMatrix(bpy.types.Node, AnimationNode):
-    bl_idname = "an_ComposeMatrix"
+class ComposeMatrixNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_ComposeMatrixNode"
     bl_label = "Compose Matrix"
 
     def create(self):

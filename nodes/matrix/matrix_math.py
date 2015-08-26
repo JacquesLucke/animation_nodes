@@ -5,8 +5,8 @@ from ... base_types.node import AnimationNode
 
 operationItems = [("MULTIPLY", "Multiply", "")]
 
-class MatrixMath(bpy.types.Node, AnimationNode):
-    bl_idname = "an_MatrixMath"
+class MatrixMathNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_MatrixMathNode"
     bl_label = "Matrix Math"
 
     operation = EnumProperty(name = "Operation", items = operationItems, update = executionCodeChanged)

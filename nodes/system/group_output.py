@@ -5,8 +5,8 @@ from ... sockets.info import toIdName
 from ... base_types.node import AnimationNode
 from . utils import updateSubprogramInvokerNodes
 
-class GroupOutput(bpy.types.Node, AnimationNode):
-    bl_idname = "an_GroupOutput"
+class GroupOutputNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_GroupOutputNode"
     bl_label = "Group Output"
 
     def inputNodeIdentifierChanged(self, context):
@@ -86,7 +86,7 @@ class GroupOutput(bpy.types.Node, AnimationNode):
     def useGroupInputInNetwork(self):
         network = self.network
         for node in network.getNodes():
-            if node.bl_idname == "an_GroupInput":
+            if node.bl_idname == "an_GroupInputNode":
                 self.groupInputIdentifier = node.identifier
 
     @property

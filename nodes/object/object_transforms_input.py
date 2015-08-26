@@ -9,8 +9,8 @@ frameTypes = [
     ("OFFSET", "Offset", ""),
     ("ABSOLUTE", "Absolute", "") ]
 
-class ObjectTransformsInput(bpy.types.Node, AnimationNode):
-    bl_idname = "an_ObjectTransformsInput"
+class ObjectTransformsInputNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_ObjectTransformsInputNode"
     bl_label = "Object Transforms Input"
 
     def useCurrentTransformsChanged(self, context):

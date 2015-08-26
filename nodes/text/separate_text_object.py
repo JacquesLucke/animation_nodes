@@ -15,8 +15,8 @@ outputTypeItems = [
     ("CURVE", "Curve", ""),
     ("MESH", "Mesh", "") ]
 
-class SeparateTextObject(bpy.types.Node, AnimationNode):
-    bl_idname = "an_SeparateTextObject"
+class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_SeparateTextObjectNode"
     bl_label = "Separate Text Object"
 
     sourceObjectName = StringProperty(name = "Source Object")

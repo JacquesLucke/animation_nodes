@@ -3,8 +3,8 @@ from ... base_types.node import AnimationNode
 from ... events import propertyChanged
 
 
-class SetVertexColor(bpy.types.Node, AnimationNode):
-    bl_idname = "an_SetVertexColor"
+class SetVertexColorNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_SetVertexColorNode"
     bl_label = "Set Vertex Color"
 
     enabled = bpy.props.BoolProperty(default = True, update = propertyChanged)

@@ -4,8 +4,8 @@ from ... base_types.node import AnimationNode
 from ... sockets.info import getDataTypeItems, toIdName
 
 
-class DataInput(bpy.types.Node, AnimationNode):
-    bl_idname = "an_DataInput"
+class DataInputNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_DataInputNode"
     bl_label = "Data Input"
 
     def assignedSocketChanged(self, context):

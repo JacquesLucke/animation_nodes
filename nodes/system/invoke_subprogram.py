@@ -7,7 +7,7 @@ from ... utils.enum_items import enumItemsFromDicts
 from ... execution.units import getSubprogramUnitByIdentifier
 from ... tree_info import getSubprogramNetworks, getNodeByIdentifier, getNetworkByIdentifier
 
-class InvokeSubprogram(bpy.types.Node, AnimationNode):
+class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_InvokeSubprogramNode"
     bl_label = "Invoke Subprogram"
 

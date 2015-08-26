@@ -4,8 +4,8 @@ from ... base_types.node import AnimationNode
 from ... utils.selection import getSortedSelectedObjectNames
 from ... sockets.info import getBaseDataTypeItems, toIdName, toListIdName
 
-class CreateList(bpy.types.Node, AnimationNode):
-    bl_idname = "an_CreateList"
+class CreateListNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_CreateListNode"
     bl_label = "Create List"
 
     def assignedTypeChanged(self, context):
