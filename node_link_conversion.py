@@ -2,14 +2,14 @@ import bpy
 from . import tree_info
 from mathutils import Vector
 from . sockets.info import toBaseIdName
-from . tree_info import getAllDataLinks, getDirectOriginSocket
+from . tree_info import getAllDataLinks, getDirectlyLinkedSocket
 
 def correctForbiddenNodeLinks():
     dataLinks = getAllDataLinks()
     invalidLinks = filterInvalidLinks(dataLinks)
     for dataOrigin, target in invalidLinks:
         nodeTree = target.nodeTree
-        directOrigin = getDirectOriginSocket(target)
+        directOrigin = getDirectlyLinkedSocket(target)
         if not tryToCorrectLink(dataOrigin, directOrigin, target):
             removeLink(directOrigin, target)
 

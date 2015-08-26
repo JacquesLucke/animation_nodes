@@ -310,22 +310,30 @@ def isSocketLinked(socket):
     socketID = socketToID(socket)
     return len(_data.linkedSockets[socketID]) > 0
 
-def getDirectOriginSocket(socket):
+
+def getDirectlyLinkedSockets(socket):
     socketID = socketToID(socket)
-    linkedSockets = _data.linkedSocketsWithReroutes[socketID]
-    if len(linkedSockets) > 0: return idToSocket(linkedSockets[0])
+    linkedIDs = _data.linkedSocketsWithReroutes[socketID]
+    return [idToSocket(linkedID) for linkedID in linkedIDs]
 
-def getOriginSocket(socket):
-    linkedSockets = getLinkedSockets(socket)
-    if len(linkedSockets) > 0:
-        return linkedSockets[0]
+def getDirectlyLinkedSocket(socket):
+    socketID = socketToID(socket)
+    linkedSocketIDs = _data.linkedSocketsWithReroutes[socketID]
+    if len(linkedSocketIDs) > 0:
+        return idToSocket(linkedSocketIDs[0])
 
-def getTargetSockets(socket):
-    return getLinkedSockets(socket)
 
 def getLinkedSockets(socket):
     socketID = socketToID(socket)
-    return [idToSocket(linkedID) for linkedID in _data.linkedSockets[socketID]]
+    linkedIDs = _data.linkedSockets[socketID]
+    return [idToSocket(linkedID) for linkedID in linkedIDs]
+
+def getLinkedSocket(socket):
+    socketID = socketToID(socket)
+    linkedIDs = _data.linkedSockets[socketID]
+    if len(linkedIDs) > 0:
+        return idToSocket(linkedIDs[0])
+
 
 def getAllDataLinks():
     dataLinks = set()

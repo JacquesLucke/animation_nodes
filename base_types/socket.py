@@ -1,10 +1,10 @@
 import bpy
 from bpy.props import *
+from .. import tree_info
 from .. utils.recursion import noRecursion
 from .. events import treeChanged, executionCodeChanged
 from .. utils.names import getRandomString, toVariableName
 from .. operators.dynamic_operators import getInvokeFunctionOperator
-from .. tree_info import isSocketLinked, getOriginSocket, getDirectOriginSocket, getTargetSockets, getLinkedSockets
 
 class SocketTextProperties(bpy.types.PropertyGroup):
     bl_idname = "an_SocketTextProperties"
@@ -176,7 +176,7 @@ class AnimationNodeSocket:
 
     @property
     def isLinked(self):
-        return isSocketLinked(self)
+        return tree_info.isSocketLinked(self)
 
     @property
     def isUnlinked(self):
@@ -184,24 +184,37 @@ class AnimationNodeSocket:
 
     @property
     def linkedNodes(self):
-        nodes = [socket.node for socket in self.linkedDataSockets]
+        nodes = [socket.node for socket in self.linkedSockets]
         return list(set(nodes))
 
-    @property
-    def linkedDataSockets(self):
-        return getLinkedSockets(self)
 
     @property
     def dataOrigin(self):
-        return getOriginSocket(self)
-
-    @property
-    def dataTargets(self):
-        return getTargetSockets(self)
+        sockets = self.linkedSockets
+        if len(sockets) > 0: return sockets[0]
 
     @property
     def directOrigin(self):
-        return getDirectOriginSocket(self)
+        sockets = self.directlyLinkedSockets
+        if len(sockets) > 0: return sockets[0]
+
+    @property
+    def dataTargets(self):
+        return self.linkedSockets
+
+    @property
+    def directTargets(self):
+        return self.directlyLinkedSockets
+
+
+    @property
+    def linkedSockets(self):
+        return tree_info.getLinkedSockets(self)
+
+    @property
+    def directlyLinkedSockets(self):
+        return tree_info.getDirectlyLinkedSockets(self)
+
 
     @property
     def isCopyable(self):
