@@ -5,7 +5,7 @@ import random
 from bpy.props import *
 from collections import defaultdict
 from bpy.app.handlers import persistent
-from .. tree_info import getNetworkWithNode
+from .. tree_info import getNetworkWithNode, getDirectlyLinkedSockets
 from .. utils.nodes import getAnimationNodeTrees
 from .. operators.dynamic_operators import getInvokeFunctionOperator
 
@@ -159,7 +159,9 @@ class AnimationNode:
             if followInputs: sockets.extend(node.inputs)
             if followOutputs: sockets.extend(node.outputs)
             for socket in sockets:
-                for node in socket.directlyLinkedNodes:
+                # cannot use a socket function because there are reroutes etc
+                for linkedSocket in getDirectlyLinkedSockets(socket):
+                    node = linkedSocket.node
                     if node not in nodes: nodesToCheck.add(node)
         nodes.remove(self)
         return list(nodes)

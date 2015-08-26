@@ -387,7 +387,7 @@ def getNetworkByIdentifier(identifier):
 ###################################
 
 def socketToID(socket):
-    return (nodeToID(socket.node), socket.isOutput, socket.identifier)
+    return (nodeToID(socket.node), socket.is_output, socket.identifier)
 
 def nodeToID(node):
     return (node.id_data.name, node.name)
