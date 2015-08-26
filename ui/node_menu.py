@@ -28,7 +28,7 @@ def drawMenu(self, context):
     layout.menu("an.animation_menu", text = "Animation")
     layout.menu("an.particles_menu", text = "Particles")
     layout.separator()
-    layout.menu("an.system_menu", text = "System")
+    layout.menu("an.debug_menu", text = "Debug")
 
 def drawNodeTreeChooser(layout, context):
     activeNodeTree = context.space_data.node_tree
@@ -296,13 +296,13 @@ class ParticlesMenu(bpy.types.Menu):
         insertNode(layout, "an_ParticlesInfoNode", "Particle List Info")
         insertNode(layout, "an_ParticleInfoNode", "Particle Info")
 
-class SystemMenu(bpy.types.Menu):
-    bl_idname = "an.system_menu"
-    bl_label = "System Menu"
+class DebugMenu(bpy.types.Menu):
+    bl_idname = "an.debug_menu"
+    bl_label = "Debug Menu"
 
     def draw(self, context):
         layout = self.layout
-        insertNode(layout, "an_ConvertNode", "Convert")
+        insertNode(layout, "an_DebugNode", "Debug")
         insertNode(layout, "an_DebugLoopNode", "Debug Loop")
         insertNode(layout, "an_DebugListNode", "Debug List")
 
