@@ -149,6 +149,22 @@ class AnimationNode:
             socketGroup = socketGroup,
             callback = callback)
 
+    def getNodesWhenFollowingLinks(self, followInputs = False, followOutputs = False):
+        nodes = set()
+        nodesToCheck = {self}
+        while nodesToCheck:
+            node = nodesToCheck.pop()
+            nodes.add(node)
+            sockets = []
+            if followInputs: sockets.extend(node.inputs)
+            if followOutputs: sockets.extend(node.outputs)
+            for socket in sockets:
+                for node in socket.directlyLinkedNodes:
+                    if node not in nodes: nodesToCheck.add(node)
+        nodes.remove(self)
+        return list(nodes)
+
+
     @property
     def nodeTree(self):
         return self.id_data

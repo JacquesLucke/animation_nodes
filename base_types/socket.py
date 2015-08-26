@@ -182,11 +182,6 @@ class AnimationNodeSocket:
     def isUnlinked(self):
         return not self.isLinked
 
-    @property
-    def linkedNodes(self):
-        nodes = [socket.node for socket in self.linkedSockets]
-        return list(set(nodes))
-
 
     @property
     def dataOrigin(self):
@@ -205,6 +200,16 @@ class AnimationNodeSocket:
     @property
     def directTargets(self):
         return self.directlyLinkedSockets
+
+    @property
+    def linkedNodes(self):
+        nodes = [socket.node for socket in self.linkedSockets]
+        return list(set(nodes))
+
+    @property
+    def directlyLinkedNodes(self):
+        nodes = [socket.node for socket in self.directlyLinkedSockets]
+        return list(set(nodes))
 
 
     @property
