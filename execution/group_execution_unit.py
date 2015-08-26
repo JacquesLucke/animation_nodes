@@ -70,7 +70,7 @@ class GroupExecutionUnit(SubprogramExecutionUnit):
         lines = []
         lines.extend(linkOutputSocketsToTargets(self.network.groupInputNode, variables))
         for node in nodes:
-            if node.bl_idname in ("an_GroupInput", "an_GroupOutput"): continue
+            if node.bl_idname in ("an_GroupInputNode", "an_GroupOutputNode"): continue
             lines.extend(getNodeExecutionLines(node, variables))
             lines.extend(linkOutputSocketsToTargets(node, variables))
         return lines

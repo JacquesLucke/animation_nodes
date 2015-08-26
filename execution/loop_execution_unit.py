@@ -144,7 +144,7 @@ class LoopExecutionUnit(SubprogramExecutionUnit):
         lines = []
         lines.extend(linkOutputSocketsToTargets(inputNode, variables))
         for node in nodes:
-            if node.bl_idname in ("an_LoopInput", "an_LoopGeneratorOutput"): continue
+            if node.bl_idname in ("an_LoopInputNode", "an_LoopGeneratorOutputNode"): continue
             lines.extend(getNodeExecutionLines(node, variables))
             lines.extend(linkOutputSocketsToTargets(node, variables))
         lines.extend(self.get_AddToGenerators(inputNode, variables))

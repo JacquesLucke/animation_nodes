@@ -71,7 +71,7 @@ class GroupOutputNode(bpy.types.Node, AnimationNode):
         return socket
 
     def createGroupInputNode(self):
-        bpy.ops.node.add_and_link_node(type = "an_GroupInput")
+        bpy.ops.node.add_and_link_node(type = "an_GroupInputNode")
         node = self.nodeTree.nodes[-1]
         self.groupInputIdentifier = node.identifier
         bpy.ops.node.translate_attach("INVOKE_DEFAULT")

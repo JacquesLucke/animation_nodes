@@ -64,12 +64,12 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
         return getNetworkByIdentifier(self.subprogramIdentifier)
 
     def createNewGroup(self):
-        bpy.ops.node.add_and_link_node(type = "an_GroupInput")
+        bpy.ops.node.add_and_link_node(type = "an_GroupInputNode")
         inputNode = self.nodeTree.nodes[-1]
         inputNode.location.x -= 200
         inputNode.location.y += 40
         self.subprogramIdentifier = inputNode.identifier
-        bpy.ops.node.add_and_link_node(type = "an_GroupOutput")
+        bpy.ops.node.add_and_link_node(type = "an_GroupOutputNode")
         outputNode = self.nodeTree.nodes[-1]
         outputNode.location.x += 60
         outputNode.location.y += 40

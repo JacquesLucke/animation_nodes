@@ -100,4 +100,4 @@ class GroupInputNode(bpy.types.Node, AnimationNode):
 
     def createGroupOutputNode(self):
         settings = [{"name" : "groupInputIdentifier", "value" : repr(self.identifier)}]
-        bpy.ops.node.add_and_link_node("INVOKE_DEFAULT", use_transform = True, settings = settings, type = "an_GroupOutput")
+        bpy.ops.node.add_and_link_node("INVOKE_DEFAULT", use_transform = True, settings = settings, type = "an_GroupOutputNode")

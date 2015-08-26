@@ -162,7 +162,7 @@ class LoopInputNode(bpy.types.Node, AnimationNode):
 
     def createGeneratorOutputNode(self):
         settings = [{"name" : "loopInputIdentifier", "value" : repr(self.identifier)}]
-        bpy.ops.node.add_and_link_node("INVOKE_DEFAULT", use_transform = True, settings = settings, type = "an_LoopGeneratorOutput")
+        bpy.ops.node.add_and_link_node("INVOKE_DEFAULT", use_transform = True, settings = settings, type = "an_LoopGeneratorOutputNode")
         updateSubprogramInvokerNodes()
 
 

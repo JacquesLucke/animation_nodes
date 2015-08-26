@@ -176,13 +176,13 @@ class NodeNetwork:
 
         for nodeID in self.nodeIDs:
             idName = _data.typeByNode[nodeID]
-            if idName == "an_GroupInput":
+            if idName == "an_GroupInputNode":
                 groupInputs.append(nodeID)
-            elif idName == "an_GroupOutput":
+            elif idName == "an_GroupOutputNode":
                 groupOutputs.append(nodeID)
-            elif idName == "an_LoopInput":
+            elif idName == "an_LoopInputNode":
                 loopInputs.append(nodeID)
-            elif idName == "an_LoopGeneratorOutput":
+            elif idName == "an_LoopGeneratorOutputNode":
                 generatorOutputs.append(nodeID)
             elif idName == "an_InvokeSubprogramNode":
                 invokedIdentifiers.add(idToNode(nodeID).subprogramIdentifier)
