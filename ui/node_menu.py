@@ -196,7 +196,6 @@ class MeshMenu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        insertNode(layout, "an_ObjectMeshInfoNode", "Data Info")
         insertNode(layout, "an_SeparateMeshDataNode", "Separate")
         insertNode(layout, "an_CombineMeshDataNode", "Combine")
         insertNode(layout, "an_AppendToMeshDataNode", "Append")
@@ -304,7 +303,7 @@ class SystemMenu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         insertNode(layout, "an_ConvertNode", "Convert")
-        insertNode(layout, "an_DebugOutputNode", "Debug")
+        insertNode(layout, "an_DebugNode", "Debug")
 
 
 
