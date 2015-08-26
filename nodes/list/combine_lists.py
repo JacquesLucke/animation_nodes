@@ -68,11 +68,11 @@ class CombineLists(bpy.types.Node, AnimationNode):
     def newInputSocket(self):
         socket = self.inputs.new(self.listIdName, "List")
         socket.dataIsModified = True
-        socket.displayCustomName = True
-        socket.customName = "List"
+        socket.display.text = True
+        socket.text = "List"
         socket.removeable = True
         socket.moveable = True
-        socket.nameSettings.editable = True
+        socket.textProps.editable = True
         if hasattr(socket, "showName"):
             socket.showName = False
         socket.moveUp()

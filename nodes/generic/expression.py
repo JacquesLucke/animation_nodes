@@ -52,7 +52,7 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
 
     @property
     def inputVariables(self):
-        return {socket.identifier : socket.customName for socket in self.inputs}
+        return {socket.identifier : socket.text for socket in self.inputs}
 
     def getExecutionCode(self):
         expression = self.expression.strip()
@@ -87,12 +87,12 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
         name = self.getNewSocketName()
         socket = self.inputs.new(toIdName(dataType), name, "input")
         socket.dataIsModified = True
-        socket.nameSettings.editable = True
-        socket.nameSettings.variable = True
-        socket.nameSettings.unique = True
-        socket.displayCustomName = True
-        socket.display.customNameInput = True
-        socket.customName = name
+        socket.textProps.editable = True
+        socket.textProps.variable = True
+        socket.textProps.unique = True
+        socket.display.text = True
+        socket.display.textInput = True
+        socket.text = name
         socket.moveable = True
         socket.removeable = True
         socket.moveUp()
@@ -101,7 +101,7 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
         return socket
 
     def getNewSocketName(self):
-        inputs = self.inputsByCustomName
+        inputs = self.inputsByText
         for name in variableNames:
             if name not in inputs: return name
         return "x"

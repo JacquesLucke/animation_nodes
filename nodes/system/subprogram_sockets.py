@@ -3,12 +3,12 @@ class SubprogramData:
         self.inputs = []
         self.outputs = []
 
-    def newInput(self, idName, identifier, customName, defaultValue):
-        data = SocketData(idName, identifier, customName, defaultValue)
+    def newInput(self, idName, identifier, text, defaultValue):
+        data = SocketData(idName, identifier, text, defaultValue)
         self.inputs.append(data)
 
-    def newOutput(self, idName, identifier, customName, defaultValue):
-        data = SocketData(idName, identifier, customName, defaultValue)
+    def newOutput(self, idName, identifier, text, defaultValue):
+        data = SocketData(idName, identifier, text, defaultValue)
         self.outputs.append(data)
 
     def newInputFromSocket(self, socket):
@@ -41,7 +41,7 @@ class SubprogramData:
             socket = oldSockets[data.identifier]
             if socket.bl_idname == data.idName:
                 socket.moveTo(targetIndex)
-                socket.customName = data.customName
+                socket.text = data.text
                 return True
             else:
                 socket.remove()
@@ -50,8 +50,8 @@ class SubprogramData:
     def newSocketFromData(self, nodeSockets, data):
         newSocket = nodeSockets.new(data.idName, data.identifier, data.identifier)
         if newSocket.isInput: newSocket.setStoreableValue(data.defaultValue)
-        newSocket.customName = data.customName
-        newSocket.displayCustomName = True
+        newSocket.text = data.text
+        newSocket.display.text = True
         return newSocket
 
     def removeUnusedSockets(self, nodeSockets, socketData):
@@ -59,15 +59,15 @@ class SubprogramData:
             socket.remove()
 
 class SocketData:
-    def __init__(self, idName, identifier, customName, defaultValue):
+    def __init__(self, idName, identifier, text, defaultValue):
         self.idName = idName
         self.identifier = identifier
-        self.customName = customName
+        self.text = text
         self.defaultValue = defaultValue
 
     @staticmethod
     def fromSocket(socket):
         return SocketData(socket.bl_idname,
                           socket.identifier,
-                          socket.customName,
+                          socket.text,
                           socket.getStoreableValue())

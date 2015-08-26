@@ -60,12 +60,12 @@ class GroupOutput(bpy.types.Node, AnimationNode):
         if name is None: name = dataType
         socket = self.inputs.new(toIdName(dataType), name, "return")
         socket.dataIsModified = True
-        socket.customName = name
+        socket.text = name
         socket.moveable = True
         socket.removeable = True
-        socket.displayCustomName = True
-        socket.nameSettings.editable = True
-        socket.display.customNameInput = True
+        socket.display.text = True
+        socket.textProps.editable = True
+        socket.display.textInput = True
         socket.display.removeOperator = True
         socket.moveUp()
         return socket

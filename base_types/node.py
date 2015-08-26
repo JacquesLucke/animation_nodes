@@ -125,8 +125,8 @@ class AnimationNode:
         for socket in self.sockets:
             socket.disableSocketEditingInNode()
 
-    def toogleCustomNameInputVisibility(self):
-        self.toogleSocketDisplayProperty("customNameInput")
+    def toogleTextInputVisibility(self):
+        self.toogleSocketDisplayProperty("textInput")
 
     def toogleMoveOperatorsVisibility(self):
         self.toogleSocketDisplayProperty("moveOperators")
@@ -159,8 +159,8 @@ class AnimationNode:
         return {socket.identifier : socket for socket in self.outputs}
 
     @property
-    def inputsByCustomName(self):
-        return {socket.customName : socket for socket in self.inputs}
+    def inputsByText(self):
+        return {socket.text : socket for socket in self.inputs}
 
     @property
     def linkedOutputs(self):

@@ -16,11 +16,11 @@ class ConvertAngle(bpy.types.Node, AnimationNode):
         inSocket = self.inputs["Angle"]
         outSocket = self.outputs["Angle"]
         if self.conversionType == "DEGREE_TO_RADIAN":
-            inSocket.customName = "Degree"
-            outSocket.customName = "Radian"
+            inSocket.text = "Degree"
+            outSocket.text = "Radian"
         else:
-            inSocket.customName = "Radian"
-            outSocket.customName = "Degree"
+            inSocket.text = "Radian"
+            outSocket.text = "Degree"
         executionCodeChanged()
 
     conversionType = EnumProperty(name = "Conversion Type", items = conversionTypeItems, update = settingChanged)
@@ -29,8 +29,7 @@ class ConvertAngle(bpy.types.Node, AnimationNode):
         socket1 = self.inputs.new("an_FloatSocket", "Angle", "inAngle")
         socket2 = self.outputs.new("an_FloatSocket", "Angle", "outAngle")
         for socket in [socket1, socket2]:
-            socket.displayCustomName = True
-            socket.nameSettings.unique = False
+            socket.display.text = True
         self.conversionType = "DEGREE_TO_RADIAN"
 
     def draw(self, layout):

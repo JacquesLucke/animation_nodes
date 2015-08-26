@@ -52,7 +52,7 @@ class LoopInput(bpy.types.Node, AnimationNode):
         for socket in self.getParameterSockets():
             row = col.row()
             row.active = socket.isCopyable
-            row.prop(socket, "copyAlways", text = socket.customName)
+            row.prop(socket, "copyAlways", text = socket.text)
 
     def edit(self):
         for target in self.newIteratorSocket.dataTargets:
@@ -114,13 +114,13 @@ class LoopInput(bpy.types.Node, AnimationNode):
         return socket
 
     def setupSocket(self, socket, name, moveGroup):
-        socket.customName = name
+        socket.text = name
         socket.moveGroup = moveGroup
         socket.moveable = True
         socket.removeable = True
-        socket.displayCustomName = True
-        socket.nameSettings.editable = True
-        socket.display.customNameInput = True
+        socket.display.text = True
+        socket.textProps.editable = True
+        socket.display.textInput = True
         socket.display.removeOperator = True
 
 
@@ -148,7 +148,7 @@ class LoopInput(bpy.types.Node, AnimationNode):
             data.newInput("an_IntegerSocket", "loop_iterations", "Iterations", 0)
         else:
             for socket in iteratorSockets:
-                data.newInput(toListIdName(socket.bl_idname), socket.identifier, socket.customName + " List", [])
+                data.newInput(toListIdName(socket.bl_idname), socket.identifier, socket.text + " List", [])
 
     def insertParameterData(self, data):
         for socket in self.getParameterSockets():

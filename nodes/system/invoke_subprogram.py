@@ -136,7 +136,7 @@ class ChangeSubprogram(bpy.types.Operator):
         col = layout.column(align = True)
         for data in sockets:
             row = col.row()
-            row.label(" "*8 + data.customName)
+            row.label(" "*8 + data.text)
             row.label("<  {}  >".format(toDataType(data.idName)))
 
     @property

@@ -6,32 +6,32 @@ from .. utils.names import getRandomString, toVariableName
 from .. operators.dynamic_operators import getInvokeFunctionOperator
 from .. tree_info import isSocketLinked, getOriginSocket, getDirectOriginSocket, getTargetSockets, getLinkedSockets
 
-class CustomNameProperties(bpy.types.PropertyGroup):
-    bl_idname = "an_CustomNameProperties"
+class SocketTextProperties(bpy.types.PropertyGroup):
+    bl_idname = "an_SocketTextProperties"
     unique = BoolProperty(default = False)
     editable = BoolProperty(default = False)
     variable = BoolProperty(default = False)
 
 class SocketDisplayProperties(bpy.types.PropertyGroup):
     bl_idname = "an_SocketDisplayProperties"
-    customNameInput = BoolProperty(default = False)
+    text = BoolProperty(default = False)
+    nameOnly = BoolProperty(default = False)
+    textInput = BoolProperty(default = False)
     moveOperators = BoolProperty(default = False)
     removeOperator = BoolProperty(default = False)
-    nameOnly = BoolProperty(default = False)
 
 class AnimationNodeSocket:
 
-    def customNameChanged(self, context):
-        updateCustomName(self)
+    def textChanged(self, context):
+        updateText(self)
 
-    customName = StringProperty(default = "custom name", update = customNameChanged)
-    displayCustomName = BoolProperty(default = False)
-    nameSettings = PointerProperty(type = CustomNameProperties)
-    display = PointerProperty(type = SocketDisplayProperties)
-
+    text = StringProperty(default = "custom name", update = textChanged)
     removeable = BoolProperty(default = False)
-    moveGroup = IntProperty(default = 0)
     moveable = BoolProperty(default = False)
+    moveGroup = IntProperty(default = 0)
+
+    display = PointerProperty(type = SocketDisplayProperties)
+    textProps = PointerProperty(type = SocketTextProperties)
 
     dataIsModified = BoolProperty(default = False)
     copyAlways = BoolProperty(default = False, update = executionCodeChanged)
@@ -42,8 +42,8 @@ class AnimationNodeSocket:
         row = layout.row(align = True)
         if self.display.nameOnly:
             row.label(displayText)
-        elif self.nameSettings.editable and self.display.customNameInput:
-            row.prop(self, "customName", text = "")
+        elif self.textProps.editable and self.display.textInput:
+            row.prop(self, "text", text = "")
         else:
             if self.isInput and self.isUnlinked:
                 self.drawInput(row, node, displayText)
@@ -61,8 +61,8 @@ class AnimationNodeSocket:
             self.invokeFunction(row, "remove", icon = "X")
 
     def getDisplayedName(self):
-        if self.displayCustomName or (self.nameSettings.editable and self.display.customNameInput):
-            return self.customName
+        if self.display.text or (self.textProps.editable and self.display.textInput):
+            return self.text
         return self.name
 
     def toString(self):
@@ -75,8 +75,8 @@ class AnimationNodeSocket:
         return None
 
     def copyDisplaySettingsFrom(self, other):
-        self.displayCustomName = other.displayCustomName
-        self.display.customNameInput = other.display.customNameInput
+        self.display.text = other.display.text
+        self.display.textInput = other.display.textInput
         self.display.moveOperators = other.display.moveOperators
         self.display.removeOperator = other.display.removeOperator
 
@@ -149,7 +149,7 @@ class AnimationNodeSocket:
             tree.links.remove(link)
 
     def disableSocketEditingInNode(self):
-        self.display.customNameInput = False
+        self.display.textInput = False
         self.display.moveOperators = False
         self.display.removeOperator = False
 
@@ -214,29 +214,27 @@ class AnimationNodeSocket:
 
 
 @noRecursion
-def updateCustomName(socket):
-    correctCustomName(socket)
+def updateText(socket):
+    correctText(socket)
 
-def correctCustomName(socket):
-    if socket.nameSettings.variable:
-        socket.customName = toVariableName(socket.customName)
-    if socket.nameSettings.unique:
-        customName = socket.customName
-        socket.customName = "temporary name to avoid some errors"
-        socket.customName = getNotUsedCustomName(socket.node, prefix = customName)
+def correctText(socket):
+    if socket.textProps.variable:
+        socket.text = toVariableName(socket.text)
+    if socket.textProps.unique:
+        text = socket.text
+        socket.text = "temporary name to avoid some errors"
+        socket.text = getNotUsedText(socket.node, prefix = text)
     socket.node.customSocketNameChanged(socket)
 
-def getNotUsedCustomName(node, prefix):
-    customName = prefix
-    while isCustomNameUsed(node, customName):
-        customName = prefix + getRandomString(3)
-    return customName
+def getNotUsedText(node, prefix):
+    text = prefix
+    while isTextUsed(node, text):
+        text = prefix + "_" + getRandomString(2)
+    return text
 
-def isCustomNameUsed(node, name):
-    for socket in node.inputs:
-        if socket.customName == name: return True
-    for socket in node.outputs:
-        if socket.customName == name: return True
+def isTextUsed(node, name):
+    for socket in node.sockets:
+        if socket.text == name: return True
     return False
 
 

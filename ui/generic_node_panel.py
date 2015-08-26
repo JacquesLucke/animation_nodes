@@ -32,7 +32,7 @@ def draw(self, context):
     col = layout.column(align = True)
     col.label("Toogle Operation Visibility:")
     row = col.row(align = True)
-    node.invokeFunction(row, "toogleCustomNameInputVisibility", text = "Name")
+    node.invokeFunction(row, "toogleTextInputVisibility", text = "Name")
     node.invokeFunction(row, "toogleMoveOperatorsVisibility", text = "Move")
     node.invokeFunction(row, "toogleRemoveOperatorVisibility", text = "Remove")
     node.invokeFunction(row, "disableSocketEditingInNode", icon = "FULLSCREEN")
@@ -45,8 +45,8 @@ class SocketUiList(bpy.types.UIList):
     bl_idname = "an_SocketUiList"
 
     def draw_item(self, context, layout, node, socket, icon, activeData, activePropname):
-        if socket.nameSettings.editable:
-            layout.prop(socket, "customName", emboss = False, text = "")
+        if socket.textProps.editable:
+            layout.prop(socket, "text", emboss = False, text = "")
         elif socket.isLinked or socket.isOutput: layout.label(socket.getDisplayedName())
         else: layout.label(socket.toString())
 
