@@ -144,11 +144,11 @@ class LoopExecutionUnit(SubprogramExecutionUnit):
         lines = []
         lines.extend(linkOutputSocketsToTargets(inputNode, variables))
         for node in nodes:
-            if node.bl_idname in ("an_LoopInputNode", "an_LoopGeneratorOutputNode"): continue
+            if node.bl_idname in ("an_LoopInputNode", "an_LoopGeneratorOutputNode", "an_ReassignLoopParameterNode"): continue
             lines.extend(getNodeExecutionLines(node, variables))
             lines.extend(linkOutputSocketsToTargets(node, variables))
         lines.extend(self.get_AddToGenerators(inputNode, variables))
-        lines.extend(self.get_UpdateParameters(inputNode, variables))
+        lines.extend(self.get_ReassignParameters(inputNode, variables))
         lines.append("pass")
         return lines
 
@@ -160,9 +160,9 @@ class LoopExecutionUnit(SubprogramExecutionUnit):
             lines.append("    {}.{}({})".format(variables[node], operation, variables[node.addSocket]))
         return lines
 
-    def get_UpdateParameters(self, inputNode, variables):
+    def get_ReassignParameters(self, inputNode, variables):
         lines = []
-        for node in inputNode.getUpdateParameterNodes():
+        for node in inputNode.getReassignParameterNodes():
             lines.append("{} = {}".format(variables[node.linkedParameterSocket], variables[node.inputs[0]]))
         return lines
 

@@ -51,7 +51,7 @@ class LoopInputNode(bpy.types.Node, AnimationNode):
             row = col.row()
             row.active = socket.isCopyable
             row.prop(socket, "copyAlways", text = socket.text)
-            self.invokeFunction(row, "createUpdateParameterNode", icon = "PLUS", data = i)
+            self.invokeFunction(row, "createReassignParameterNode", icon = "PLUS", data = i)
 
     def edit(self):
         for target in self.newIteratorSocket.dataTargets:
@@ -153,9 +153,9 @@ class LoopInputNode(bpy.types.Node, AnimationNode):
         bpy.ops.node.add_and_link_node("INVOKE_DEFAULT", use_transform = True, settings = settings, type = "an_LoopGeneratorOutputNode")
         updateSubprogramInvokerNodes()
 
-    def createUpdateParameterNode(self, strIndex):
+    def createReassignParameterNode(self, strIndex):
         settings = [{"name" : "loopInputIdentifier", "value" : repr(self.identifier)}, {"name" : "parameterIdentifier", "value" : repr(self.getParameterSockets()[int(strIndex)].identifier)}]
-        bpy.ops.node.add_and_link_node("INVOKE_DEFAULT", use_transform = True, settings = settings, type = "an_UpdateLoopParameterNode")
+        bpy.ops.node.add_and_link_node("INVOKE_DEFAULT", use_transform = True, settings = settings, type = "an_ReassignLoopParameterNode")
         updateSubprogramInvokerNodes()
 
 
@@ -190,5 +190,5 @@ class LoopInputNode(bpy.types.Node, AnimationNode):
         nodes.sort(key = attrgetter("sortIndex"))
         return nodes
 
-    def getUpdateParameterNodes(self):
+    def getReassignParameterNodes(self):
         return self.network.updateParameterNodes
