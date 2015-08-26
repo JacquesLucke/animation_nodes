@@ -93,6 +93,7 @@ class NodeData:
     def isRerouteNode(self, id):
         return id in self.nodesByType["NodeReroute"]
 
+
 class NodeNetworks:
     def __init__(self):
         self._reset()
