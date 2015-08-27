@@ -4,7 +4,6 @@ from ... sockets.info import toDataType
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 from ... utils.enum_items import enumItemsFromDicts
-from ... execution.units import getSubprogramUnitByIdentifier
 from ... tree_info import getSubprogramNetworks, getNodeByIdentifier, getNetworkByIdentifier
 
 class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
