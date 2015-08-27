@@ -34,7 +34,6 @@ class AutoExecutionPanel(bpy.types.Panel):
         col.prop(autoExecution, "propertyChanged", text = "Property Changed")
 
         layout.prop(autoExecution, "minTimeDifference", text = "Min Time Difference", slider = True)
-        layout.label("Execution Time: {:.5f} ms".format(tree.executionTime * 1000))
 
     @classmethod
     def getTree(cls):

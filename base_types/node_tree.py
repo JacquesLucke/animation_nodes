@@ -2,8 +2,8 @@ import bpy
 import time
 from bpy.props import *
 from .. events import treeChanged
-from .. execution.units import getMainUnitsByNodeTree
 from .. nodes.generic.debug_loop import clearDebugLoopTextBlocks
+from .. execution.units import getMainUnitsByNodeTree, setupExecutionUnits, finishExecutionUnits
 
 class AutoExecutionProperties(bpy.types.PropertyGroup):
     bl_idname = "an_AutoExecutionProperties"
@@ -51,18 +51,21 @@ class AnimationNodeTree(bpy.types.NodeTree):
         return False
 
     def autoExecute(self):
-        start = time.clock()
-
-        self.execute()
-
-        end = time.clock()
-        self.executionTime = end - start
-        self.autoExecution.lastExecutionTimestamp = end
+        self._execute()
+        self.autoExecution.lastExecutionTimestamp = time.clock()
 
     def execute(self):
+        setupExecutionUnits()
+        self._execute()
+        finishExecutionUnits()
+
+    def _execute(self):
+        start = time.clock()
         clearDebugLoopTextBlocks(self)
         for unit in self.mainUnits:
             unit.execute()
+        end = time.clock()
+        self.executionTime = end - start
 
     @property
     def mainUnits(self):
