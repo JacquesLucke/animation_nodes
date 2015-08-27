@@ -1,15 +1,16 @@
 import bpy
 from bpy.props import *
+from ... events import propertyChanged
 from ... base_types.node import AnimationNode
 
 class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectMeshDataNode"
     bl_label = "Object Mesh Data"
 
-    useWorldSpace = BoolProperty(name = "Use World Space", default = True,
+    useWorldSpace = BoolProperty(name = "Use World Space", default = True, update = propertyChanged,
         description = "Use real vertex locations (should be turned of when the vertices will be transformed later anyway)")
 
-    useModifiers = BoolProperty(name = "Use Modifiers", default = False,
+    useModifiers = BoolProperty(name = "Use Modifiers", default = False, update = propertyChanged,
         description = "Apply modifiers before importing the data")
 
     def create(self):
