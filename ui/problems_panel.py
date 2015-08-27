@@ -27,6 +27,8 @@ class ProblemsPanel(bpy.types.Panel):
         if sys.platform == "win32":
             col.operator("wm.console_toggle", text = "Toogle Console", icon = "CONSOLE")
 
+        layout.separator()
+        
         for problem in problems.getProblems():
             problem.draw(layout)
 

@@ -29,7 +29,7 @@ class DataInputNode(bpy.types.Node, AnimationNode):
         col.prop(self, "showInViewport")
 
     def getExecutionCode(self):
-        # needs no execut
+        # needs no execute
         return []
 
     def assignSelectedType(self):

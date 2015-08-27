@@ -49,8 +49,7 @@ class InvalidNetworksExist(Problem):
         return False
 
     def draw(self, layout):
-        amount = len(self.networks)
-        layout.label("{} invalid network{} exist".format(amount, "s" if amount > 1 else ""))
+        layout.label("At least one invalid network exists")
 
 class InvalidSyntax(Problem):
     def __init__(self, code):
@@ -60,7 +59,11 @@ class InvalidSyntax(Problem):
         return False
 
     def draw(self, layout):
-        layout.label("Invalid Syntax")
+        row = layout.row()
+        row.label("Invalid Syntax")
+        props = row.operator("an.print_text", text = "Print")
+        props.text = self.code
+        props.emptyLines = 5
 
 class ExceptionDuringExecution(Problem):
     def allowExecution(self):
@@ -91,7 +94,7 @@ class SubprogramInvokesItself(Problem):
         return False
 
     def draw(self, layout):
-        layout.label("Subprogram invokes itself")
+        layout.label("{} invokes itself".format(repr(self.network.name)))
 
 class NodeShouldNotBeUsedInAutoExecution(Problem):
     def __init__(self, nodeIdentifier):

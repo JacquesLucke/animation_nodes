@@ -8,6 +8,6 @@ def compileScript(script, name = "<string>"):
         lines = []
         lineNumber = sys.exc_info()[1].lineno
         for i, line in enumerate(script.split("\n")):
-            if i + 1 == lineNumber: lines.append(line + "        <-------------- Error happens here")
-            else: lines.append(line)
+            if i + 1 == lineNumber: lines.append(str(i+1) + ".  " + line + "        <-------------- Error happens here")
+            else: lines.append(str(i+1) + ".  " + line)
         InvalidSyntax(code = "\n".join(lines)).report()
