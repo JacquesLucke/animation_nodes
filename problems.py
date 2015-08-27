@@ -42,9 +42,6 @@ class NodeLinkRecursion(Problem):
         layout.label("Node Recursion")
 
 class InvalidNetworksExist(Problem):
-    def __init__(self, networks):
-        self.networks = networks
-
     def allowUnitCreation(self):
         return False
 

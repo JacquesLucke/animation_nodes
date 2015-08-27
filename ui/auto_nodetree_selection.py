@@ -24,7 +24,7 @@ def updateAutoNodeTreeSelection(scene):
 
 def getAnimationNodeEditorSpaces():
     spaces = []
-    for area in bpy.context.screen.areas:
+    for area in getattr(bpy.context.screen, "areas", []):
         if area.type == "NODE_EDITOR":
             space = area.spaces.active
             if space.tree_type == "an_AnimationNodeTree":

@@ -290,6 +290,7 @@ class NodeNetwork:
 
 _data = NodeData()
 _networks = NodeNetworks()
+_needsUpdate = True
 
 
 def updateAndRetryOnException(function):
@@ -310,6 +311,18 @@ def updateAndRetryOnException(function):
 def update():
     _data.update()
     _networks.update()
+
+    global _needsUpdate
+    _needsUpdate = False
+
+def updateIfNecessary():
+    if _needsUpdate:
+        update()
+
+def treeChanged():
+    global _needsUpdate
+    _needsUpdate = True
+
 
 
 def getNodeByIdentifier(identifier):

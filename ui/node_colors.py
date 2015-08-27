@@ -1,15 +1,9 @@
-from .. algorithms.random import getRandomColor
-from .. utils.timing import measureTime
 from .. import preferences
+from .. algorithms.random import getRandomColor
 
-def colorNetworks():
-    from .. import tree_info
-    for network in tree_info.getNetworks():
-        colorNetwork(network)
-
-def colorNetwork(network):
+def colorNetwork(network, nodes):
     networkColor = getNetworkColor(network)
-    for node in network.getNodes():
+    for node in nodes:
         if node.useNetworkColor:
             node.use_custom_color = True
             color = networkColor

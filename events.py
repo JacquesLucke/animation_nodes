@@ -1,6 +1,7 @@
 import bpy
 from . import event_handler
 from bpy.app.handlers import persistent
+from . import tree_info
 
 class EventState:
     def __init__(self):
@@ -27,7 +28,6 @@ class EventState:
         return events
 
 event = EventState()
-treeUpdatedWhileWorking = False
 
 @persistent
 def sceneUpdated(scene):
@@ -42,11 +42,11 @@ def frameChanged(scene):
 @persistent
 def fileLoaded(scene):
     event.fileChanged = True
-    event_handler.treeNeedsUpdate()
+    treeChanged()
 
 def addonChanged():
     event.addonChanged = True
-    event_handler.treeNeedsUpdate()
+    treeChanged()
 
 def propertyChanged(self = None, context = None):
     event.propertyChanged = True
@@ -59,7 +59,7 @@ def networkChanged(self = None, context = None):
 
 def treeChanged(self = None, context = None):
     event.treeChanged = True
-    event_handler.treeNeedsUpdate()
+    tree_info.treeChanged()
 
 @persistent
 def renderIsStarting(scene):

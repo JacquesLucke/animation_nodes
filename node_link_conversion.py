@@ -12,6 +12,7 @@ def correctForbiddenNodeLinks():
         directOrigin = getDirectlyLinkedSocket(target)
         if not tryToCorrectLink(dataOrigin, directOrigin, target):
             removeLink(directOrigin, target)
+    tree_info.updateIfNecessary()
 
 def filterInvalidLinks(dataLinks):
     return [dataLink for dataLink in dataLinks if not isConnectionValid(*dataLink)]
