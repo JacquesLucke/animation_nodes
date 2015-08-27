@@ -5,11 +5,12 @@ from . import events
 from . import tree_info
 from . utils import selection
 from . ui import generic_node_panel
+from . ui import auto_nodetree_selection
+from . operators import dynamic_operators
 from . base_types import node as node_base
 from . base_types import socket as socket_base
 from . ui.node_menu import registerMenu, unregisterMenu
 from . nodes.sound import sequencer_sound_input as sequencer_sound
-from . operators import dynamic_operators
 
 def registerFiles():
     socket_base.register()
@@ -20,6 +21,7 @@ def registerFiles():
     generic_node_panel.register()
     sequencer_sound.registerHandlers()
     dynamic_operators.registerHandlers()
+    auto_nodetree_selection.registerHandlers()
 
     registerMenu()
     keymap.register()
@@ -33,6 +35,7 @@ def unregisterFiles():
     generic_node_panel.unregister()
     sequencer_sound.unregisterHandlers()
     dynamic_operators.unregisterHandlers()
+    auto_nodetree_selection.unregisterHandlers()
 
     unregisterMenu()
     keymap.unregister()
