@@ -4,6 +4,34 @@ from bpy.props import *
 
 addonName = os.path.basename(os.path.dirname(__file__))
 
+class NodeColorProperties(bpy.types.PropertyGroup):
+    bl_idname = "an_NodeColorProperties"
+
+    def changeNodeColors(self, context):
+        from . ui.node_colors import colorNetworks
+        colorNetworks()
+
+    mainNetwork = FloatVectorProperty(name = "Main Network",
+        default = [0.7, 0.7, 0.7], subtype = "COLOR",
+        soft_min = 0.0, soft_max = 1.0,
+        update = changeNodeColors)
+
+    invalidNetwork = FloatVectorProperty(name = "Invalid Network",
+        default = [0.8, 0.28, 0.25], subtype = "COLOR",
+        soft_min = 0.0, soft_max = 1.0,
+        update = changeNodeColors)
+
+    subprogramValue = FloatProperty(
+        name = "Subprogram Value", default = 0.7,
+        soft_min = 0.0, soft_max = 1.0,
+        update = changeNodeColors)
+
+    subprogramSaturation = FloatProperty(
+        name = "Subprogram Saturation", default = 0.3,
+        soft_min = 0.0, soft_max = 1.0,
+        update = changeNodeColors)
+
+
 class AddonPreferences(bpy.types.AddonPreferences):
     bl_idname = addonName
 
@@ -21,17 +49,32 @@ class AddonPreferences(bpy.types.AddonPreferences):
         name = "Forbid Subprogram Recursion", default = True,
         description = "A subprogram invoker node must not be in the same network that it calls")
 
+    nodeColors = PointerProperty(type = NodeColorProperties)
+
     def draw(self, context):
         layout = self.layout
 
-        col = layout.column(align = True)
-        col.label("After Auto Execution:")
-        col.prop(self, "redrawAllAfterAutoExecution", text = "Redraw All")
-        col.prop(self, "sceneUpdateAfterAutoExecution", text = "Scene Update")
+        row = layout.row()
 
-        col = layout.column(align = True)
-        col.label("Execution Code:")
-        col.prop(self, "generateCompactCode")
+        col = row.column()
+
+        subcol = col.column(align = True)
+        subcol.label("After Auto Execution:")
+        subcol.prop(self, "redrawAllAfterAutoExecution", text = "Redraw All")
+        subcol.prop(self, "sceneUpdateAfterAutoExecution", text = "Scene Update")
+
+        subcol = col.column(align = True)
+        subcol.label("Execution Code:")
+        subcol.prop(self, "generateCompactCode")
+
+        col = row.column()
+
+        subcol = col.column(align = True)
+        subcol.label("Node Colors:")
+        subcol.row().prop(self.nodeColors, "invalidNetwork")
+        subcol.row().prop(self.nodeColors, "mainNetwork")
+        subcol.prop(self.nodeColors, "subprogramValue", slider = True)
+        subcol.prop(self.nodeColors, "subprogramSaturation", slider = True)
 
 def getPreferences():
     return bpy.context.user_preferences.addons.get(addonName).preferences
@@ -41,3 +84,6 @@ def generateCompactCode():
 
 def forbidSubprogramRecursion():
     return getPreferences().forbidSubprogramRecursion
+
+def nodeColors():
+    return getPreferences().nodeColors

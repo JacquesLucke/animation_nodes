@@ -6,6 +6,7 @@ from . node_link_conversion import correctForbiddenNodeLinks
 from . utils.timing import measureTime
 from . execution.units import createExecutionUnits, setupExecutionUnits, finishExecutionUnits
 from . execution.auto_execution import autoExecuteMainUnits, afterExecution
+from . ui.node_colors import colorNetworks
 
 @noRecursion
 def update(events):
@@ -15,6 +16,7 @@ def update(events):
         if len(tree_info.getNetworksByType("Invalid")) > 0:
             problems.report(message = "At least one invalid network exists", forbidExecution = True)
         markNodesInInvalidNetworks()
+        colorNetworks()
         createExecutionUnits()
 
     setupExecutionUnits()

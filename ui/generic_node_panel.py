@@ -8,9 +8,12 @@ def draw(self, context):
     layout = self.layout
     layout.separator()
 
-    col = layout.column()
+    col = layout.column(align = True)
     col.prop(node, "width", text = "Width")
     col.prop(node, "bl_width_max", text = "Max Width")
+    col.prop(node, "useNetworkColor")
+
+    col = layout.column(align = True)
 
     if len(node.inputs) > 0:
         row = col.row()

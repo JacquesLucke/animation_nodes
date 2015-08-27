@@ -15,6 +15,7 @@ class AnimationNode:
     # unique string for each node; don't change it at all
     identifier = StringProperty(name = "Identifier", default = "")
     inInvalidNetwork = BoolProperty(name = "In Invalid Network", default = False)
+    useNetworkColor = BoolProperty(name = "Use Network Color", default = True)
 
     # used for the listboxes in the sidebar
     activeInputIndex = IntProperty()
