@@ -47,7 +47,7 @@ class LoopInputNode(bpy.types.Node, AnimationNode):
         box = col.box()
         for socket in self.getIteratorSockets():
             box.prop(socket.loop, "useAsOutput", text = "Use {} as Output".format(repr(socket.text)))
-        self.invokeFunction(box, "chooseNewIteratorType", text = "New Iterator", icon = "PLUS")
+        self.invokeSocketTypeChooser(box, "newIterator", socketGroup = "LIST", text = "New Iterator", icon = "PLUS")
 
         layout.separator()
 
@@ -66,7 +66,7 @@ class LoopInputNode(bpy.types.Node, AnimationNode):
             subrow.active = socket.isCopyable
             subrow.prop(socket, "copyAlways", text = "Copy")
             socket.drawInput(subcol, self, text = "Default")
-        self.invokeFunction(box, "chooseNewParameterType", text = "New Parameter", icon = "PLUS")
+        self.invokeSocketTypeChooser(box, "newParameter", text = "New Parameter", icon = "PLUS")
 
         layout.separator()
 
@@ -75,7 +75,7 @@ class LoopInputNode(bpy.types.Node, AnimationNode):
         box = col.box()
         for node in self.getGeneratorNodes():
             box.label("{} - {}".format(repr(node.outputName), node.listDataType))
-        self.invokeFunction(box, "chooseNewGeneratorType", text = "New Generator", icon = "PLUS")
+        self.invokeSocketTypeChooser(box, "createGeneratorOutputNode", socketGroup = "LIST", text = "New Generator", icon = "PLUS")
 
     def edit(self):
         for target in self.newIteratorSocket.dataTargets:
@@ -100,16 +100,6 @@ class LoopInputNode(bpy.types.Node, AnimationNode):
         left, right = splitAlignment(layout)
         self.invokeFunction(left, function, icon = "ZOOMIN", emboss = False)
         right.label(socket.name)
-
-
-    def chooseNewIteratorType(self):
-        self.chooseSocketDataType("newIterator", socketGroup = "LIST")
-
-    def chooseNewParameterType(self):
-        self.chooseSocketDataType("newParameter", socketGroup = "ALL")
-
-    def chooseNewGeneratorType(self):
-        self.chooseSocketDataType("createGeneratorOutputNode", socketGroup = "LIST")
 
 
     def newIterator(self, listDataType, name = None):

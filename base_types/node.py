@@ -99,7 +99,7 @@ class AnimationNode:
         if self.inInvalidNetwork: layout.label("Invalid Network", icon = "ERROR")
         self.draw(layout)
 
-    def invokeFunction(self, layout, functionName, text = "", icon = "NONE", description = "", data = None, emboss = True):
+    def invokeFunction(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True, data = None):
         idName = getInvokeFunctionOperator(description)
         props = layout.operator(idName, text = text, icon = icon, emboss = emboss)
         props.classType = "NODE"
@@ -108,6 +108,17 @@ class AnimationNode:
         props.functionName = functionName
         props.invokeWithData = data is not None
         props.data = str(data)
+
+    def invokeSocketTypeChooser(self, layout, functionName, socketGroup = "ALL", text = "", icon = "NONE", description = "", emboss = True):
+        data = functionName + "," + socketGroup
+        self.invokeFunction(layout, "_chooseSocketDataType", text = text, icon = icon, description = description, emboss = emboss, data = data)
+
+    def _chooseSocketDataType(self, data):
+        callback, socketGroup = data.split(",")
+        bpy.ops.an.choose_socket_type("INVOKE_DEFAULT",
+            nodeIdentifier = self.identifier,
+            socketGroup = socketGroup,
+            callback = callback)
 
     def clearSockets(self):
         self.inputs.clear()
@@ -144,11 +155,6 @@ class AnimationNode:
         for socket in self.sockets:
             setattr(socket.display, name, state)
 
-    def chooseSocketDataType(self, callback, socketGroup = "ALL"):
-        bpy.ops.an.choose_socket_type("INVOKE_DEFAULT",
-            nodeIdentifier = self.identifier,
-            socketGroup = socketGroup,
-            callback = callback)
 
     def getNodesWhenFollowingLinks(self, followInputs = False, followOutputs = False):
         nodes = set()

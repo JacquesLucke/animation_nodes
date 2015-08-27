@@ -36,10 +36,7 @@ class GroupOutputNode(bpy.types.Node, AnimationNode):
     def drawControlSocket(self, layout, socket):
         left, right = splitAlignment(layout)
         left.label(socket.name)
-        self.invokeFunction(right, "chooseNewReturnType", icon = "ZOOMIN", emboss = False)
-
-    def chooseNewReturnType(self):
-        self.chooseSocketDataType("newReturn")
+        self.invokeSocketTypeChooser(right, "newReturn", icon = "ZOOMIN", emboss = False)
 
     def edit(self):
         dataOrigin = self.newReturnSocket.dataOrigin
