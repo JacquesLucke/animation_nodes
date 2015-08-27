@@ -26,8 +26,9 @@ class ProblemsPanel(bpy.types.Panel):
         subcol.operator("an.tag_retry_execution", text = "Retry", icon = "FILE_REFRESH")
         if sys.platform == "win32":
             col.operator("wm.console_toggle", text = "Toogle Console", icon = "CONSOLE")
+
         for problem in problems.getProblems():
-            layout.label(problem.message)
+            problem.draw(layout)
 
     @classmethod
     def getTree(cls):

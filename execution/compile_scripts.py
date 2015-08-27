@@ -1,16 +1,13 @@
 import sys
-from .. import problems
+from .. problems import InvalidSyntax
 
 def compileScript(script, name = "<string>"):
     try:
         return compile(script, name, "exec")
     except SyntaxError:
-        exc_type, exc_value, exc_traceback = sys.exc_info()
-        lineNumber = exc_value.lineno
-        print("\n"*5)
+        lines = []
+        lineNumber = sys.exc_info()[1].lineno
         for i, line in enumerate(script.split("\n")):
-            if i + 1 == lineNumber:
-                print(line + "        <-------------- Error happens here")
-            else:
-                print(line)
-        problems.report(message = "Invalid syntax (see console)", forbidExecution = True)
+            if i + 1 == lineNumber: lines.append(line + "        <-------------- Error happens here")
+            else: lines.append(line)
+        InvalidSyntax(code = "\n".join(lines)).report()

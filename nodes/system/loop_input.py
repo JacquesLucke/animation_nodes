@@ -95,10 +95,10 @@ class LoopInputNode(bpy.types.Node, AnimationNode):
 
     def drawControlSocket(self, layout, socket):
         isParameterSocket = socket == self.outputs[-1]
-        function = "chooseNewParameterType" if isParameterSocket else "chooseNewIteratorType"
+        function, socketGroup = ("newParameter", "ALL") if isParameterSocket else ("newIterator", "LIST")
 
         left, right = splitAlignment(layout)
-        self.invokeFunction(left, function, icon = "ZOOMIN", emboss = False)
+        self.invokeSocketTypeChooser(left, function, socketGroup = socketGroup, icon = "ZOOMIN", emboss = False)
         right.label(socket.name)
 
 

@@ -7,14 +7,15 @@ from . utils.timing import measureTime
 from . execution.units import createExecutionUnits, setupExecutionUnits, finishExecutionUnits
 from . execution.auto_execution import autoExecuteMainUnits, afterExecution
 from . ui.node_colors import colorNetworks
+from . problems import InvalidNetworksExist
 
 @noRecursion
 def update(events):
     if events.intersection({"File", "Addon", "Tree"}):
         problems.reset()
         correctNodeTree()
-        if len(tree_info.getNetworksByType("Invalid")) > 0:
-            problems.report(message = "At least one invalid network exists", forbidExecution = True)
+        invalidNetworks = tree_info.getNetworksByType("Invalid")
+        if len(invalidNetworks) > 0: InvalidNetworksExist(invalidNetworks).report()
         markNodesInInvalidNetworks()
         colorNetworks()
         enableUseFakeUser()

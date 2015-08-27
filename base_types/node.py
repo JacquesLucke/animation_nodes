@@ -23,6 +23,8 @@ class AnimationNode:
 
     searchTags = []
     onlySearchTags = False
+    # can contain: 'Forbid Execution', 'No Subprogram', 'No Auto Execution'
+    options = set()
 
     @classmethod
     def poll(cls, nodeTree):

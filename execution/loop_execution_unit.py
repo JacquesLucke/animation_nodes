@@ -1,8 +1,7 @@
-from .. import problems
-from . compile_scripts import compileScript
 from . node_sorting import sortNodes
+from . compile_scripts import compileScript
+from .. problems import ExecutionUnitNotSetup
 from . subprogram_execution_unit import SubprogramExecutionUnit
-from .. problems import ExecutionUnitNotSetup, NodeRecursionDetected
 from . code_generator import (getInitialVariables,
                               getSetupCode,
                               getNodeExecutionLines,
@@ -43,9 +42,7 @@ class LoopExecutionUnit(SubprogramExecutionUnit):
         nodes = self.network.getAnimationNodes()
 
         try: nodes = sortNodes(nodes)
-        except NodeRecursionDetected:
-            problems.report(message = "Link Recursion in {}".format(repr(self.network.name)), forbidExecution = True)
-            return
+        except: return
 
         variables = getInitialVariables(nodes)
         self.setupScript = getSetupCode(nodes, variables)

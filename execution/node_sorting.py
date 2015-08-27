@@ -1,4 +1,4 @@
-from .. problems import NodeRecursionDetected
+from .. problems import NodeLinkRecursion
 
 def sortNodes(nodes):
     """
@@ -22,7 +22,9 @@ def getAllDependencies(node, recursionStart = None):
     dependencies = []
     dataOrigins = node.originNodes
     for dataOrigin in dataOrigins:
-        if dataOrigin == recursionStart: raise NodeRecursionDetected()
+        if dataOrigin == recursionStart:
+            NodeLinkRecursion().report()
+            raise Exception()
         dependencies.extend(getAllDependencies(dataOrigin, recursionStart))
     dependencies.extend(dataOrigins)
     return dependencies

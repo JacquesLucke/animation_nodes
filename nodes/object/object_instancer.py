@@ -20,6 +20,7 @@ class an_ObjectNamePropertyGroup(bpy.types.PropertyGroup):
 class ObjectInstancerNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectInstancerNode"
     bl_label = "Object Instancer"
+    options = {"No Subprogram"}
     searchTags = ["Object Replicator (old)"]
 
     def copyFromSourceChanged(self, context):

@@ -2,7 +2,7 @@ import sys, traceback
 from .. import problems
 from . node_sorting import sortNodes
 from . compile_scripts import compileScript
-from .. problems import ExecutionUnitNotSetup, NodeRecursionDetected
+from .. problems import ExecutionUnitNotSetup, ExceptionDuringExecution
 from . code_generator import (getInitialVariables,
                               getSetupCode,
                               getNodeExecutionLines,
@@ -40,7 +40,7 @@ class MainExecutionUnit:
         except:
             print("\n"*5)
             traceback.print_exc()
-            problems.report(message = "Error during execution (see console)", forbidExecution = True)
+            ExceptionDuringExecution().report()
 
 
     def getCodes(self):
@@ -51,11 +51,8 @@ class MainExecutionUnit:
     def generateScripts(self):
         nodes = self.network.getAnimationNodes()
 
-        try:
-            nodes = sortNodes(nodes)
-        except NodeRecursionDetected:
-            problems.report(message = "Link Recursion in {}".format(repr(self.network.treeName)), forbidExecution = True)
-            return
+        try: nodes = sortNodes(nodes)
+        except: return
 
         variables = getInitialVariables(nodes)
         self.setupScript = getSetupCode(nodes, variables)

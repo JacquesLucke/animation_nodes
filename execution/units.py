@@ -1,4 +1,5 @@
 import traceback
+from .. problems import ExceptionDuringCodeCreation, CouldNotSetupExecutionUnits
 from .. import problems
 from collections import defaultdict
 from . cache import clearExecutionCache
@@ -20,7 +21,7 @@ def createExecutionUnits():
     except:
         print("\n"*5)
         traceback.print_exc()
-        problems.report("Error during code creation (see console)", forbidExecution = True)
+        ExceptionDuringCodeCreation().report()
 
 def reset():
     _mainUnitsByNodeTree.clear()
@@ -56,7 +57,7 @@ def setupExecutionUnits():
     except:
         print("\n"*5)
         traceback.print_exc()
-        problems.report("Running setup code failed (see console)", forbidExecution = True)
+        CouldNotSetupExecutionUnits().report()
 
 def finishExecutionUnits():
     for unit in getExecutionUnits():
