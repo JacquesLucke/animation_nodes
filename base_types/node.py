@@ -23,7 +23,7 @@ class AnimationNode:
 
     searchTags = []
     onlySearchTags = False
-    # can contain: 'Forbid Execution', 'No Subprogram', 'No Auto Execution'
+    # can contain: 'No Execution', 'No Subprogram', 'No Auto Execution'
     options = set()
 
     @classmethod

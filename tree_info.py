@@ -1,5 +1,4 @@
 import bpy
-from . problems import SubprogramInvokesItself
 from collections import defaultdict
 from . utils.timing import measureTime
 from bpy.app.handlers import persistent
@@ -242,7 +241,8 @@ class NodeNetwork:
             if forbidSubprogramRecursion():
                 if self.identifier in invokedIdentifiers:
                     self.type = "Invalid"
-                    SubprogramInvokesItself(self).report()
+                    from . import problems
+                    problems.SubprogramInvokesItself(self).report()
 
     @staticmethod
     def join(networks):

@@ -5,7 +5,7 @@ from ... sockets.info import toIdName
 class PrototypeNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_PrototypeNode"
     bl_label = "Prototype Node"
-    options = {"Forbid Execution"}
+    options = {"No Execution"}
 
     def draw(self, layout):
         if len(self.sockets) == 0:

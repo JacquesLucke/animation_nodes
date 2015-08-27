@@ -35,10 +35,12 @@ def checkNetworks():
     invalidNetworkExists = False
 
     for network in tree_info.getNetworks():
-        if network.type == "Invalid": invalidNetworkExists = True
+        if network.type == "Invalid":
+            invalidNetworkExists = True
         nodes = network.getAnimationNodes()
         markInvalidNodes(network, nodes)
         node_colors.colorNetwork(network, nodes)
+        checkNodeOptions(network, nodes)
 
     if invalidNetworkExists:
         problems.InvalidNetworksExist().report()
@@ -47,3 +49,12 @@ def markInvalidNodes(network, nodes):
     isInvalid = network.type == "Invalid"
     for node in nodes:
         node.inInvalidNetwork = isInvalid
+
+def checkNodeOptions(network, nodes):
+    for node in nodes:
+        if "No Execution" in node.options:
+            problems.NodeDoesNotSupportExecution(node.identifier).report()
+        if "No Subprogram" in node.options and network.type in ("Group", "Loop"):
+            problems.NodeMustNotBeInSubprogram(node.identifier).report()
+        if "No Auto Execution" in node.options:
+            problems.NodeShouldNotBeUsedInAutoExecution(node.identifier).report()

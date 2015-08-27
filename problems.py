@@ -1,3 +1,5 @@
+from . tree_info import getNodeByIdentifier
+
 currentProblems = []
 
 def reset():
@@ -11,6 +13,11 @@ def canCreateExecutionUnits():
 def canExecute():
     for problem in currentProblems:
         if not problem.allowExecution(): return False
+    return True
+
+def canAutoExecute():
+    for problem in currentProblems:
+        if not problem.allowAutoExecution(): return False
     return True
 
 def getProblems():
@@ -97,11 +104,12 @@ class NodeShouldNotBeUsedInAutoExecution(Problem):
     def __init__(self, nodeIdentifier):
         self.nodeIdentifier = nodeIdentifier
 
-    def allowAutoExecution(self, layout):
+    def allowAutoExecution(self):
         return False
 
     def draw(self, layout):
-        layout.label("A node should not be used with auto execution")
+        node = getNodeByIdentifier(self.nodeIdentifier)
+        layout.label("{} should not be used with auto execution".format(repr(node.name)))
 
 class NodeMustNotBeInSubprogram(Problem):
     def __init__(self, nodeIdentifier):
@@ -111,7 +119,8 @@ class NodeMustNotBeInSubprogram(Problem):
         return False
 
     def draw(self, layout):
-        layout.label("A node must not be in a subprogram")
+        node = getNodeByIdentifier(self.nodeIdentifier)
+        layout.label("{} must not be in a subprogram".format(repr(node.name)))
 
 class NodeDoesNotSupportExecution(Problem):
     def __init__(self, nodeIdentifier):
@@ -121,7 +130,8 @@ class NodeDoesNotSupportExecution(Problem):
         return False
 
     def draw(self, layout):
-        layout.label("A node does not support excecution")
+        node = getNodeByIdentifier(self.nodeIdentifier)
+        layout.label("{} does not support excecution".format(repr(node.name)))
 
 
 
