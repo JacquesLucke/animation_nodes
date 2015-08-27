@@ -1,4 +1,5 @@
 import bpy
+import sys
 from .. import problems
 
 class ProblemsPanel(bpy.types.Panel):
@@ -19,7 +20,12 @@ class ProblemsPanel(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
-        layout.operator("wm.console_toggle", text = "Toogle Console")
+        col = layout.column(align = True)
+        subcol = col.column(align = True)
+        subcol.scale_y = 1.5
+        subcol.operator("an.tag_retry_execution", text = "Retry", icon = "FILE_REFRESH")
+        if sys.platform == "win32":
+            col.operator("wm.console_toggle", text = "Toogle Console", icon = "CONSOLE")
         for problem in problems.getProblems():
             layout.label(problem.message)
 
