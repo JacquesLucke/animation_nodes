@@ -60,9 +60,11 @@ class AnimationNodeTree(bpy.types.NodeTree):
         finishExecutionUnits()
 
     def _execute(self):
-        start = time.clock()
+        units = self.mainUnits
+        if len(units) == 0: return
         clearDebugLoopTextBlocks(self)
-        for unit in self.mainUnits:
+        start = time.clock()
+        for unit in units:
             unit.execute()
         end = time.clock()
         self.executionTime = end - start
