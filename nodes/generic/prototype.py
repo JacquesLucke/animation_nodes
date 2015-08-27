@@ -30,5 +30,6 @@ class PrototypeNode(bpy.types.Node, AnimationNode):
         socket.text = socket.dataType
         socket.textProps.editable = True
         socket.display.textInput = True
+        socket.display.text = True
         socket.moveable = True
         socket.removeable = True

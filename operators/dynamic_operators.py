@@ -50,7 +50,7 @@ def invokeFunction(self, context):
     function = getattr(owner, self.functionName)
     if self.invokeWithData: function(self.data)
     else: function()
-
+    bpy.context.area.tag_redraw()
     return {"FINISHED"}
 
 fallbackOperator = createOperatorWithDescription("")
