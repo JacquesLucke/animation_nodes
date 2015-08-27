@@ -12,23 +12,25 @@ class NodeColorProperties(bpy.types.PropertyGroup):
         colorNetworks()
 
     mainNetwork = FloatVectorProperty(name = "Main Network",
+        description = "Color for all networks that are not in a subprogram",
         default = [0.7, 0.7, 0.7], subtype = "COLOR",
         soft_min = 0.0, soft_max = 1.0,
         update = changeNodeColors)
 
     invalidNetwork = FloatVectorProperty(name = "Invalid Network",
+        description = "Color for networks that stop the execution because they have an error",
         default = [0.8, 0.28, 0.25], subtype = "COLOR",
         soft_min = 0.0, soft_max = 1.0,
         update = changeNodeColors)
 
-    subprogramValue = FloatProperty(
-        name = "Subprogram Value", default = 0.7,
-        soft_min = 0.0, soft_max = 1.0,
+    subprogramValue = FloatProperty(name = "Subprogram Value",
+        description = "Lightness of random subnetwork colors",
+        default = 0.7, soft_min = 0.0, soft_max = 1.0,
         update = changeNodeColors)
 
-    subprogramSaturation = FloatProperty(
-        name = "Subprogram Saturation", default = 0.3,
-        soft_min = 0.0, soft_max = 1.0,
+    subprogramSaturation = FloatProperty(name = "Subprogram Saturation",
+        description = "Color intensity of random subnetwork colors",
+        default = 0.3, soft_min = 0.0, soft_max = 1.0,
         update = changeNodeColors)
 
 
@@ -71,8 +73,8 @@ class AddonPreferences(bpy.types.AddonPreferences):
 
         subcol = col.column(align = True)
         subcol.label("Node Colors:")
-        subcol.row().prop(self.nodeColors, "invalidNetwork")
         subcol.row().prop(self.nodeColors, "mainNetwork")
+        subcol.row().prop(self.nodeColors, "invalidNetwork")
         subcol.prop(self.nodeColors, "subprogramValue", slider = True)
         subcol.prop(self.nodeColors, "subprogramSaturation", slider = True)
 
