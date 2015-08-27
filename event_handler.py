@@ -1,6 +1,6 @@
 from . import problems
 from . import tree_info
-from . utils.nodes import iterAnimationNodes
+from . utils.nodes import iterAnimationNodes, getAnimationNodeTrees
 from . utils.recursion import noRecursion
 from . node_link_conversion import correctForbiddenNodeLinks
 from . utils.timing import measureTime
@@ -17,6 +17,7 @@ def update(events):
             problems.report(message = "At least one invalid network exists", forbidExecution = True)
         markNodesInInvalidNetworks()
         colorNetworks()
+        enableUseFakeUser()
         createExecutionUnits()
 
     setupExecutionUnits()
@@ -52,3 +53,7 @@ def markNodesInInvalidNetworks():
         isInvalid = network.type == "Invalid"
         for node in network.getAnimationNodes():
             node.inInvalidNetwork = isInvalid
+
+def enableUseFakeUser():
+    for tree in getAnimationNodeTrees():
+        tree.use_fake_user = True
