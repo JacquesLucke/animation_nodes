@@ -71,6 +71,13 @@ def getMainUnitsByNodeTree(nodeTree):
 def getSubprogramUnitByIdentifier(identifier):
     return _subprogramUnitsByIdentifier.get(identifier)
 
+def getSubprogramUnitsByName(name):
+    programs = []
+    for subprogram in _subprogramUnitsByIdentifier.values():
+        if subprogram.network.name == name:
+            programs.append(subprogram)
+    return programs
+
 def getExecutionUnitByNetwork(network):
     for unit in getExecutionUnits():
         if unit.network == network: return unit

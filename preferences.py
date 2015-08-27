@@ -30,7 +30,7 @@ class NodeColorProperties(bpy.types.PropertyGroup):
 
     subprogramSaturation = FloatProperty(name = "Subprogram Saturation",
         description = "Color intensity of random subnetwork colors",
-        default = 0.3, soft_min = 0.0, soft_max = 1.0,
+        default = 0.2, soft_min = 0.0, soft_max = 1.0,
         update = changeNodeColors)
 
 
