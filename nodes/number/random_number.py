@@ -69,4 +69,4 @@ class RandomNumberNode(bpy.types.Node, AnimationNode):
         self.randomizeAdditionalSeed()
 
     def randomizeAdditionalSeed(self):
-        self.additionalSeed = int(random.random() * 1000)
+        self.additionalSeed = int(random.random() * 100)
