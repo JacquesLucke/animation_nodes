@@ -69,6 +69,9 @@ def renderIsStarting(scene):
 def renderIsEnding(scene):
     event.isRendering = False
 
+def isRendering():
+    return event.isRendering
+
 
 
 # Register

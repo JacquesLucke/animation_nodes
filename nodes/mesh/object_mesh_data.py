@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import *
-from ... events import propertyChanged
+from ... events import propertyChanged, isRendering
 from ... base_types.node import AnimationNode
 
 class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
@@ -12,6 +12,8 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
 
     useModifiers = BoolProperty(name = "Use Modifiers", default = False, update = propertyChanged,
         description = "Apply modifiers before importing the data")
+
+
 
     def create(self):
         self.inputs.new("an_ObjectSocket", "Object", "object")
@@ -41,7 +43,9 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
 
 
     def getMesh(self, object):
-        if self.useModifiers: return object.to_mesh(scene = bpy.context.scene, apply_modifiers = True, settings = "PREVIEW")
+        if self.useModifiers:
+            settings = "RENDER" if isRendering() else "PREVIEW"
+            return object.to_mesh(scene = bpy.context.scene, apply_modifiers = True, settings = settings)
         return object.data
 
     def clearMesh(self, mesh):
