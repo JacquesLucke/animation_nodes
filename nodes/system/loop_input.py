@@ -58,13 +58,13 @@ class LoopInputNode(bpy.types.Node, AnimationNode):
             subcol = box.column(align = False)
             row = subcol.row()
             row.label(repr(socket.text))
-            self.invokeFunction(row, "createReassignParameterNode", text = "Reassign Node", data = socket.identifier)
+            self.invokeFunction(row, "createReassignParameterNode", text = "Reassign", data = socket.identifier)
             row = subcol.row()
             row.prop(socket.loop, "useAsInput", text = "Input")
             row.prop(socket.loop, "useAsOutput", text = "Output")
             subrow = row.row()
             subrow.active = socket.isCopyable
-            subrow.prop(socket, "copyAlways", text = "Copy")
+            subrow.prop(socket.loop, "copyAlways", text = "Copy")
             socket.drawInput(subcol, self, text = "Default")
         self.invokeSocketTypeChooser(box, "newParameter", text = "New Parameter", icon = "PLUS")
 

@@ -47,7 +47,6 @@ class AnimationNodeSocket:
     loop = PointerProperty(type = SocketLoopProperties)
 
     dataIsModified = BoolProperty(default = False)
-    copyAlways = BoolProperty(default = False, update = executionCodeChanged)
 
     def draw(self, context, layout, node, text):
         displayText = self.getDisplayedName()
