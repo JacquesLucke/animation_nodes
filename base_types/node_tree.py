@@ -38,6 +38,8 @@ class AnimationNodeTree(bpy.types.NodeTree):
     autoExecution = PointerProperty(type = AutoExecutionProperties)
     executionTime = FloatProperty(name = "Execution Time")
 
+    editNodeLabels = BoolProperty(name = "Edit Node Labels", default = False)
+
     def update(self):
         treeChanged()
 

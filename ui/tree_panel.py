@@ -23,6 +23,7 @@ class TreePanel(bpy.types.Panel):
         props.name = tree.name
 
         layout.separator()
+        layout.prop(tree, "editNodeLabels")
 
         time = tree.executionTime
         if time > 1.5: timeText = "{:.2f} s".format(tree.executionTime)

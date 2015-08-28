@@ -99,6 +99,7 @@ class AnimationNode:
 
     def draw_buttons(self, context, layout):
         if self.inInvalidNetwork: layout.label("Invalid Network", icon = "ERROR")
+        if self.nodeTree.editNodeLabels: layout.prop(self, "label", text = "")
         self.draw(layout)
 
     def invokeFunction(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True, data = None):
