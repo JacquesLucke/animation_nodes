@@ -23,7 +23,9 @@ class AutoExecutionProperties(bpy.types.PropertyGroup):
     treeChanged = BoolProperty(default = False, name = "Tree Changed",
         description = "Execute when the node tree changes (create/remove links and nodes)")
 
-    minTimeDifference = FloatProperty(default = 0.0, min = 0.0, soft_max = 1.0)
+    minTimeDifference = FloatProperty(name = "Min Time Difference",
+        description = "Auto execute not that often; E.g. only every 0.5 seconds",
+        default = 0.0, min = 0.0, soft_max = 1.0)
 
     lastExecutionTimestamp = FloatProperty(default = 0.0)
 

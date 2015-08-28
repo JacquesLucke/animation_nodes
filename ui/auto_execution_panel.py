@@ -33,7 +33,7 @@ class AutoExecutionPanel(bpy.types.Panel):
         col.prop(autoExecution, "frameChanged", text = "Frame Changed")
         col.prop(autoExecution, "propertyChanged", text = "Property Changed")
 
-        layout.prop(autoExecution, "minTimeDifference", text = "Min Time Difference", slider = True)
+        layout.prop(autoExecution, "minTimeDifference", slider = True)
 
     @classmethod
     def getTree(cls):
