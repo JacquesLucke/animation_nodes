@@ -1,6 +1,7 @@
 import bpy
 from bpy.props import *
 from ... tree_info import keepNodeLinks
+from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 from ... sockets.info import getBaseDataTypeItems, toIdName, toListIdName, isBase, toBaseDataType
 
@@ -18,11 +19,16 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
     baseIdName = StringProperty()
     listIdName = StringProperty()
 
+    allowNegativeIndex = BoolProperty(name = "Allow Negative Index",
+        description = "-2 means the second last list element",
+        update = executionCodeChanged, default = False)
+
     def create(self):
         self.assignedType = "Float"
         self.selectedType = "Float"
 
     def drawAdvanced(self, layout):
+        layout.prop(self, "allowNegativeIndex")
         col = layout.column(align = True)
         col.prop(self, "selectedType", text = "")
         self.invokeFunction(col, "assignSelectedListType",
@@ -30,6 +36,7 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
             description = "Remove all sockets and set the selected socket type")
 
     def getExecutionCode(self):
+        if self.allowNegativeIndex: return "element = list[index] if -len(list) <= index < len(list) else fallback"
         return "element = list[index] if 0 <= index < len(list) else fallback"
 
     def edit(self):
