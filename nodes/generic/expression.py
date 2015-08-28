@@ -22,6 +22,9 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
     containsSyntaxError = BoolProperty()
     executionError = StringProperty()
 
+    debugMode = BoolProperty(name = "Debug Mode", update = executionCodeChanged, default = True,
+        description = "Show detailed error messages in the node but is slower.")
+
     moduleNames = StringProperty(name = "Modules", update = executionCodeChanged,
         description = "Comma separated module names which can be used inside the expression")
 
@@ -40,6 +43,7 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
             self.invokeFunction(row, "clearErrorMessage", icon = "X", emboss = False)
 
     def drawAdvanced(self, layout):
+        layout.prop(self, "debugMode")
         layout.prop(self, "moduleNames")
 
     def drawControlSocket(self, layout, socket):
@@ -53,14 +57,17 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         expression = self.expression.strip()
-        if expression == "" or self.containsSyntaxError: return "result = None"
 
-        lines = []
-        lines.append("try: result = " + expression)
-        lines.append("except:")
-        lines.append("    result = None")
-        lines.append("    self.executionError = str(sys.exc_info()[1])")
-        return lines
+        if self.debugMode:
+            if expression == "" or self.containsSyntaxError:
+                return "result = None"
+            return ["try:",
+                    "    result = " + expression,
+                    "    self.executionError = ''",
+                    "except:",
+                    "    result = None",
+                    "    self.executionError = str(sys.exc_info()[1])"]
+        else: return "result = " + expression
 
     def getUsedModules(self):
         moduleNames = re.split("\W+", self.moduleNames)
