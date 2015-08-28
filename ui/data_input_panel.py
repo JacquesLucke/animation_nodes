@@ -10,7 +10,7 @@ class DataInputPanel(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
-        nodes = getNodesByType("an_DataInput")
+        nodes = getNodesByType("an_DataInputNode")
         for node in nodes:
             if not node.showInViewport: continue
             socket = node.inputs[0]
