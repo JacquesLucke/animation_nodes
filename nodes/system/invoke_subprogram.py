@@ -122,6 +122,8 @@ class ChangeSubprogram(bpy.types.Operator):
                 socketData = network.groupInputNode.getSocketData()
             if network.type == "Loop":
                 socketData = network.loopInputNode.getSocketData()
+            if network.type == "Script":
+                socketData = network.scriptNode.getSocketData()
 
             col = layout.column()
             col.label("Inputs:")

@@ -3,16 +3,17 @@ from bpy.props import *
 from ... sockets.info import toIdName
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
+from . subprogram_sockets import SubprogramData
+from . utils import updateSubprogramInvokerNodes
 
 class ScriptNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ScriptNode"
     bl_label = "Script"
-    options = {"No Execution"}
 
-    subprogramName = StringProperty()
+    subprogramName = StringProperty(default = "Script")
     subprogramDescription = StringProperty()
 
-    executionCode = StringProperty(default = "")
+    executionCode = StringProperty(default = "", update = executionCodeChanged)
     textBlockName = StringProperty(default = "")
 
     def create(self):
@@ -31,6 +32,13 @@ class ScriptNode(bpy.types.Node, AnimationNode):
         if text is not None:
             if self.executionCode != text:
                 layout.label("Update necessary", icon = "ERROR")
+
+        layout.prop(self, "subprogramName", text = "")
+
+    def drawAdvanced(self, layout):
+        col = layout.column()
+        col.label("Description:")
+        col.prop(self, "subprogramDescription", text = "")
 
     def drawControlSocket(self, layout, socket):
         if socket in list(self.inputs):
@@ -56,10 +64,27 @@ class ScriptNode(bpy.types.Node, AnimationNode):
         socket.textProps.unique = True
         socket.display.textInput = True
         socket.display.text = True
+        socket.display.removeOperator = True
         socket.moveable = True
         socket.removeable = True
         socket.moveUp()
         socket.text = socket.dataType
+
+    def socketChanged(self):
+        updateSubprogramInvokerNodes()
+
+    def delete(self):
+        self.inputs.clear()
+        self.outputs.clear()
+        updateSubprogramInvokerNodes()
+
+    def getSocketData(self):
+        data = SubprogramData()
+        for socket in self.inputs[:-1]:
+            data.newInputFromSocket(socket)
+        for socket in self.outputs[:-1]:
+            data.newOutputFromSocket(socket)
+        return data
 
     def writeToTextBlock(self):
         if not self.textBlock: return
@@ -68,7 +93,6 @@ class ScriptNode(bpy.types.Node, AnimationNode):
     def readFromTextBlock(self):
         if not self.textBlock: return
         self.executionCode = self.textInTextBlock
-        executionCodeChanged()
 
     @property
     def textInTextBlock(self):

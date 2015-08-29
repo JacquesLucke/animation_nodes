@@ -166,6 +166,7 @@ class NodeNetwork:
         self.groupOutputID = None
         self.generatorOutputIDs = []
         self.updateParameterOutputIDs = []
+        self.scriptNodeID = None
         self.analyse()
 
     def analyse(self):
@@ -230,6 +231,7 @@ class NodeNetwork:
 
         if self.type == "Script":
             owner = idToNode(scriptNodeID)
+            self.scriptNodeID = scriptNodeID
 
         if self.type == "Group":
             owner = idToNode(groupInputs[0])
@@ -295,6 +297,10 @@ class NodeNetwork:
     @property
     def updateParameterNodes(self):
         return [idToNode(nodeID) for nodeID in self.updateParameterOutputIDs]
+
+    @property
+    def scriptNode(self):
+        return idToNode(self.scriptNodeID)
 
 
 _data = NodeData()
@@ -408,7 +414,7 @@ def getNetworks():
     return _networks.networks
 
 def getSubprogramNetworks():
-    return [network for network in _networks.networks if network.type in ("Group", "Loop")]
+    return [network for network in _networks.networks if network.type in ("Group", "Loop", "Script")]
 
 def getNetworksByType(type = "Main"):
     return [network for network in _networks.networks if network.type == type]

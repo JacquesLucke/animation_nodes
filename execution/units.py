@@ -6,6 +6,7 @@ from . cache import clearExecutionCache
 from . main_execution_unit import MainExecutionUnit
 from . group_execution_unit import GroupExecutionUnit
 from . loop_execution_unit import LoopExecutionUnit
+from . script_execution_unit import ScriptExecutionUnit
 from .. tree_info import getNetworksByType, getSubprogramNetworks
 from .. utils.timing import measureTime
 
@@ -38,6 +39,8 @@ def createSubprogramUnits():
             unit = GroupExecutionUnit(network)
         if network.type == "Loop":
             unit = LoopExecutionUnit(network)
+        if network.type == "Script":
+            unit = ScriptExecutionUnit(network)
         _subprogramUnitsByIdentifier[network.identifier] = unit
 
 
