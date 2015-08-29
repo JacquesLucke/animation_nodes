@@ -15,7 +15,7 @@ def getNetworkColor(network):
     colors = getColors()
     if network.type == "Invalid": return colors.invalidNetwork
     if network.type == "Main": return colors.mainNetwork
-    if network.type in ("Group", "Loop"): return getRandomNetworkColor(network)
+    if network.type in ("Group", "Loop", "Script"): return getRandomNetworkColor(network)
 
 def getRandomNetworkColor(network):
     colors = getColors()

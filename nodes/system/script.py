@@ -1,5 +1,7 @@
 import bpy
+from bpy.props import *
 from ... sockets.info import toIdName
+from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 
 class ScriptNode(bpy.types.Node, AnimationNode):
@@ -7,10 +9,28 @@ class ScriptNode(bpy.types.Node, AnimationNode):
     bl_label = "Script"
     options = {"No Execution"}
 
+    subprogramName = StringProperty()
+    subprogramDescription = StringProperty()
+
+    executionCode = StringProperty(default = "")
+    textBlockName = StringProperty(default = "")
+
     def create(self):
         self.width = 200
         self.inputs.new("an_NodeControlSocket", "New Input", "newInput")
         self.outputs.new("an_NodeControlSocket", "New Output", "newOutput")
+
+    def draw(self, layout):
+        col = layout.column(align = True)
+        col.prop_search(self, "textBlockName",  bpy.data, "texts", text = "")
+        row = col.row(align = True)
+        self.invokeFunction(row, "writeToTextBlock", text = "Write")
+        self.invokeFunction(row, "readFromTextBlock", text = "Read")
+
+        text = self.textInTextBlock
+        if text is not None:
+            if self.executionCode != text:
+                layout.label("Update necessary", icon = "ERROR")
 
     def drawControlSocket(self, layout, socket):
         if socket in list(self.inputs):
@@ -40,3 +60,22 @@ class ScriptNode(bpy.types.Node, AnimationNode):
         socket.removeable = True
         socket.moveUp()
         socket.text = socket.dataType
+
+    def writeToTextBlock(self):
+        if not self.textBlock: return
+        self.textBlock.from_string(self.executionCode)
+
+    def readFromTextBlock(self):
+        if not self.textBlock: return
+        self.executionCode = self.textInTextBlock
+        executionCodeChanged()
+
+    @property
+    def textInTextBlock(self):
+        if self.textBlock:
+            return self.textBlock.as_string()
+        return None
+
+    @property
+    def textBlock(self):
+        return bpy.data.texts.get(self.textBlockName)

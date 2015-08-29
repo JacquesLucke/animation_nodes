@@ -174,6 +174,7 @@ class NodeNetwork:
         loopInputs = []
         generatorOutputs = []
         reassignParameterNodes = []
+        scriptNodeID = None
         invokedIdentifiers = set()
 
         for nodeID in self.nodeIDs:
@@ -188,6 +189,8 @@ class NodeNetwork:
                 generatorOutputs.append(nodeID)
             elif idName == "an_ReassignLoopParameterNode":
                 reassignParameterNodes.append(nodeID)
+            elif idName == "an_ScriptNode":
+                scriptNodeID = nodeID
             elif idName == "an_InvokeSubprogramNode":
                 invokedIdentifiers.add(idToNode(nodeID).subprogramIdentifier)
 
@@ -202,8 +205,10 @@ class NodeNetwork:
 
         self.type = "Invalid"
 
-        if groupNodeAmount + loopNodeAmount == 0:
+        if groupNodeAmount + loopNodeAmount == 0 and scriptNodeID is None:
             self.type = "Main"
+        elif scriptNodeID is not None:
+            self.type = "Script"
         elif loopNodeAmount == 0:
             if groupInAmount == 0 and groupOutAmount == 1:
                 self.identifier = idToNode(groupOutputs[0]).groupInputIdentifier
@@ -223,6 +228,9 @@ class NodeNetwork:
                 if idToNode(loopInputs[0]).identifier == possibleIdentifiers[0]:
                     self.type = "Loop"
 
+        if self.type == "Script":
+            owner = idToNode(scriptNodeID)
+
         if self.type == "Group":
             owner = idToNode(groupInputs[0])
             self.groupInputID = groupInputs[0]
@@ -233,7 +241,7 @@ class NodeNetwork:
             self.generatorOutputIDs = generatorOutputs
             self.updateParameterOutputIDs = reassignParameterNodes
 
-        if self.type in ("Group", "Loop"):
+        if self.type in ("Group", "Loop", "Script"):
             self.identifier = owner.identifier
             self.name = owner.subprogramName
             self.description = owner.subprogramDescription
@@ -243,6 +251,7 @@ class NodeNetwork:
                     self.type = "Invalid"
                     from . import problems
                     problems.SubprogramInvokesItself(self).report()
+
 
     @staticmethod
     def join(networks):
