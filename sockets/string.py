@@ -35,10 +35,8 @@ class StringSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     enumItems = CollectionProperty(type = EnumItem)
 
     def drawProperty(self, layout, text):
-        if self.useEnum:
-            layout.prop(self, "stringEnum", text = text)
-        else:
-            layout.prop(self, "value", text = text)
+        if self.useEnum: layout.prop(self, "stringEnum", text = text)
+        else: layout.prop(self, "value", text = text)
 
     def getValue(self):
         return self.value
@@ -50,6 +48,7 @@ class StringSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return self.value
 
     def setEnumItems(self, enumItems):
+        self.useEnum = len(enumItems) > 0
         self.enumItems.clear()
         for enumItem in enumItems:
             item = self.enumItems.add()

@@ -13,9 +13,9 @@ options = [ ("useText", "Text"),
             ("useXOffset", "X Offset"),
             ("useYOffset", "Y Offset") ]
 
-class TextOutputNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_TextOutputNode"
-    bl_label = "Text Output"
+class TextObjectOutputNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_TextObjectOutputNode"
+    bl_label = "Text Object Output"
 
     def usePropertyChanged(self, context):
         self.setHideProperty()
@@ -37,19 +37,19 @@ class TextOutputNode(bpy.types.Node, AnimationNode):
         self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
 
         self.inputs.new("an_StringSocket", "Text", "text")
-        self.inputs.new("an_FloatSocket", "Extrude", "extrude").value = 0.0
-        self.inputs.new("an_FloatSocket", "Shear", "shear").value = 0.0
+        self.inputs.new("an_FloatSocket", "Extrude", "extrude").setMinMax(0.0, 1e9)
+        self.inputs.new("an_FloatSocket", "Shear", "shear").setMinMax(-1.0, 1.0)
         self.inputs.new("an_FloatSocket", "Size", "size").value = 1.0
 
         self.inputs.new("an_FloatSocket", "Letter Spacing", "letterSpacing").value = 1.0
         self.inputs.new("an_FloatSocket", "Word Spacing", "wordSpacing").value = 1.0
         self.inputs.new("an_FloatSocket", "Line Spacing", "lineSpacing").value = 1.0
 
-        self.inputs.new("an_FloatSocket", "X Offset", "xOffset").value = 0.0
-        self.inputs.new("an_FloatSocket", "Y Offset", "yOffset").value = 0.0
+        self.inputs.new("an_FloatSocket", "X Offset", "xOffset")
+        self.inputs.new("an_FloatSocket", "Y Offset", "yOffset")
         self.setHideProperty()
 
-        self.outputs.new("an_ObjectSocket", "Object", "outObject")
+        self.outputs.new("an_ObjectSocket", "Object", "object")
 
     def draw(self, layout):
         col = layout.column(align = True)
@@ -72,24 +72,21 @@ class TextOutputNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         lines = []
-        lines.append("outObject = object")
-        lines.append("if object is not None:")
-        lines.append("    textObject = None")
-        lines.append("    if object.type == 'FONT': textObject = object.data")
-        lines.append("    if textObject is not None:")
+        lines.append("if getattr(object, 'type', '') == 'FONT':")
+        lines.append("    textObject = object.data")
 
-        if self.useText: lines.append(" "*8 + "textObject.body = text")
-        if self.useExtrude: lines.append(" "*8 + "textObject.extrude = extrude")
-        if self.useShear: lines.append(" "*8 + "textObject.shear = shear")
-        if self.useSize: lines.append(" "*8 + "textObject.size = size")
+        if self.useText: lines.append("    textObject.body = text")
+        if self.useExtrude: lines.append("    textObject.extrude = extrude")
+        if self.useShear: lines.append("    textObject.shear = shear")
+        if self.useSize: lines.append("    textObject.size = size")
 
-        if self.useLetterSpacing: lines.append(" "*8 + "textObject.space_character = letterSpacing")
-        if self.useWordSpacing: lines.append(" "*8 + "textObject.space_word = wordSpacing")
-        if self.useLineSpacing: lines.append(" "*8 + "textObject.space_line = lineSpacing")
+        if self.useLetterSpacing: lines.append("    textObject.space_character = letterSpacing")
+        if self.useWordSpacing: lines.append("    textObject.space_word = wordSpacing")
+        if self.useLineSpacing: lines.append("    textObject.space_line = lineSpacing")
 
-        if self.useXOffset: lines.append(" "*8 + "textObject.offset_x = xOffset")
-        if self.useYOffset: lines.append(" "*8 + "textObject.offset_y = yOffset")
+        if self.useXOffset: lines.append("    textObject.offset_x = xOffset")
+        if self.useYOffset: lines.append("    textObject.offset_y = yOffset")
 
-        lines.append(" "*8 + "pass")
+        lines.append("    pass")
 
         return lines

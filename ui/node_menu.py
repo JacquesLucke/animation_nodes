@@ -129,7 +129,7 @@ class TextMenu(bpy.types.Menu):
         insertNode(layout, "an_TextBlockReaderNode", "Block Reader")
         insertNode(layout, "an_TextBlockWriterNode", "Block Writer")
         insertNode(layout, "an_TextSequenceOutputNode", "Sequence Output")
-        insertNode(layout, "an_TextOutputNode", "Object Output")
+        insertNode(layout, "an_TextObjectOutputNode", "Object Output")
 
 class BooleanMenu(bpy.types.Menu):
     bl_idname = "an.boolean_menu"
