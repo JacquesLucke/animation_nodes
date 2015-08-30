@@ -1,8 +1,8 @@
 import re
 import bpy
-import ast
 from bpy.props import *
 from ... sockets.info import toIdName
+from ... utils.code import isCodeValid
 from ... utils.layout import splitAlignment
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
@@ -15,7 +15,7 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
 
     def settingChanged(self, context = None):
         self.executionError = ""
-        self.containsSyntaxError = not isExpressionValid(self.expression)
+        self.containsSyntaxError = not isCodeValid(self.expression)
         executionCodeChanged()
 
     expression = StringProperty(name = "Expression", update = settingChanged)
@@ -113,10 +113,3 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
     def socketChanged(self):
         self.settingChanged()
         executionCodeChanged()
-
-def isExpressionValid(expression):
-    try:
-        ast.parse(expression)
-        return True
-    except SyntaxError:
-        return False

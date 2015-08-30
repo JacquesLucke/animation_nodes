@@ -75,11 +75,13 @@ def get_GetSocketValues(nodes, variables):
 
 
 def getLoadSocketValueLine(socket, variables):
-    if socket.hasValueCode:
-        return "{} = {}".format(variables[socket], socket.getValueCode())
+    return "{} = {}".format(variables[socket], getSocketValueExpression(socket))
+
+def getSocketValueExpression(socket):
+    if socket.hasValueCode: return socket.getValueCode()
     else:
         socketsName = "inputs" if socket.isInput else "outputs"
-        return "{} = {}.{}[{}].getValue()".format(variables[socket], socket.node.identifier, socketsName, socket.index)
+        return "{}.{}[{}].getValue()".format(socket.node.identifier, socketsName, socket.index)
 
 
 

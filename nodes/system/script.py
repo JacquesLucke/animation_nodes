@@ -16,6 +16,9 @@ class ScriptNode(bpy.types.Node, AnimationNode):
     executionCode = StringProperty(default = "", update = executionCodeChanged)
     textBlockName = StringProperty(default = "")
 
+    debugMode = BoolProperty(name = "Debug Mode", default = True, update = executionCodeChanged)
+    errorMessage = StringProperty()
+
     def create(self):
         self.width = 200
         self.inputs.new("an_NodeControlSocket", "New Input", "newInput")
@@ -35,10 +38,14 @@ class ScriptNode(bpy.types.Node, AnimationNode):
 
         layout.prop(self, "subprogramName", text = "")
 
+        if self.errorMessage != "":
+            layout.label(self.errorMessage, icon = "ERROR")
+
     def drawAdvanced(self, layout):
         col = layout.column()
         col.label("Description:")
         col.prop(self, "subprogramDescription", text = "")
+        layout.prop(self, "debugMode")
 
     def drawControlSocket(self, layout, socket):
         if socket in list(self.inputs):
