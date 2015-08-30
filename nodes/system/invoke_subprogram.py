@@ -6,6 +6,12 @@ from ... base_types.node import AnimationNode
 from ... utils.enum_items import enumItemsFromDicts
 from ... tree_info import getSubprogramNetworks, getNodeByIdentifier, getNetworkByIdentifier
 
+cacheTypeItems = [
+    ("DISABLED", "Disabled", ""),
+    ("SINGLE", "Single", "Cache the result one time and output it always.")]
+
+oneTimeCache = {}
+
 class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_InvokeSubprogramNode"
     bl_label = "Invoke Subprogram"
@@ -15,6 +21,10 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
         executionCodeChanged()
 
     subprogramIdentifier = StringProperty(name = "Subprogram Identifier", default = "", update = subprogramIdentifierChanged)
+
+    cacheType = EnumProperty(name = "Cache Type", items = cacheTypeItems)
+    isOutputStorable = BoolProperty(default = False)
+    isCached = BoolProperty(default = False)
 
     @property
     def inputVariables(self):
@@ -30,8 +40,23 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
         parameterString = ", ".join(["input_" + str(i) for i in range(len(self.inputs))])
         outputString = ", ".join(["output_" + str(i) for i in range(len(self.outputs))])
 
-        if outputString == "": return "_subprogram{}({})".format(self.subprogramIdentifier, parameterString)
-        return "{} = _subprogram{}({})".format(outputString, self.subprogramIdentifier, parameterString)
+        lines = []
+        lines.append("useCache, groupOutputData = self.getCachedData({})".format(parameterString))
+        lines.append("if not useCache:")
+        lines.append("    groupOutputData = _subprogram{}({})".format(self.subprogramIdentifier, parameterString))
+        lines.append("    self.setCacheData(groupOutputData, {})".format(parameterString))
+        if outputString != "": lines.append("{} = groupOutputData".format(outputString))
+        return lines
+
+    def getCachedData(self, *args):
+        if not self.isCached or self.cacheType == "DISABLED" or self.identifier not in oneTimeCache: return False, None
+        return True, oneTimeCache[self.identifier]
+
+    def setCacheData(self, data, *args):
+        if self.isOutputStorable:
+            oneTimeCache[self.identifier] = data
+            self.isCached = True
+
 
     def draw(self, layout):
         networks = getSubprogramNetworks()
@@ -48,10 +73,28 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
             props.nodeIdentifier = self.identifier
         layout.separator()
 
+    def drawAdvanced(self, layout):
+        col = layout.column()
+        col.active = self.isOutputStorable
+        col.prop(self, "cacheType")
+
+
     def updateSockets(self):
         subprogram = self.subprogramNode
         if subprogram is None: self.clearSockets()
         else: subprogram.getSocketData().apply(self)
+        self.checkCachingPossibilities()
+        self.clearCache()
+
+    def checkCachingPossibilities(self):
+        self.isOutputStorable = True
+        for socket in self.outputs:
+            if not socket.storable: self.isOutputStorable = False
+
+    def clearCache(self):
+        oneTimeCache.pop(self.identifier, None)
+        self.isCached = False
+
 
     @property
     def subprogramNode(self):
