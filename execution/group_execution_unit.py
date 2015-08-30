@@ -1,13 +1,12 @@
 from . node_sorting import sortNodes
 from . compile_scripts import compileScript
 from .. problems import ExecutionUnitNotSetup
-from . subprogram_execution_unit import SubprogramExecutionUnit
 from . code_generator import (getInitialVariables,
                               getSetupCode,
                               getNodeExecutionLines,
                               linkOutputSocketsToTargets)
 
-class GroupExecutionUnit(SubprogramExecutionUnit):
+class GroupExecutionUnit:
     def __init__(self, network):
         self.network = network
         self.setupScript = ""
