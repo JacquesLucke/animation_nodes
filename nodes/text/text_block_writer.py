@@ -6,7 +6,7 @@ class TextBlockWriterNode(bpy.types.Node, AnimationNode):
     bl_label = "Text Block Writer"
 
     def create(self):
-        self.inputs.new("an_TextBlockSocket", "Text Block", "textBlock").showName = False
+        self.inputs.new("an_TextBlockSocket", "Text Block", "textBlock").defaultDrawType = "PROPERTY_ONLY"
         self.inputs.new("an_StringSocket", "Text", "text")
         self.inputs.new("an_BooleanSocket", "Enabled", "enabled").hide = True
         self.outputs.new("an_TextBlockSocket", "Text Block", "textBlock")

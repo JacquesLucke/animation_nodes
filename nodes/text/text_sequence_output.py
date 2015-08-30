@@ -6,7 +6,7 @@ class TextSequenceOutputNode(bpy.types.Node, AnimationNode):
     bl_label = "Text Sequence Output"
 
     def create(self):
-        self.inputs.new("an_SequenceSocket", "Sequence", "sequence").showName = False
+        self.inputs.new("an_SequenceSocket", "Sequence", "sequence").defaultDrawType = "PROPERTY_ONLY"
         self.inputs.new("an_StringSocket", "Text", "text")
         self.inputs.new("an_IntegerSocket", "Size", "size").number = 200
         self.inputs.new("an_BooleanSocket", "Shadow", "shadow").value = False

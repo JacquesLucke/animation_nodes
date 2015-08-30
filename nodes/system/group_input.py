@@ -32,7 +32,7 @@ class GroupInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         col.label("Parameter Defaults:")
         box = col.box()
         for socket in list(self.outputs)[:-1]:
-            socket.drawInput(box, self, socket.getDisplayedName())
+            if socket.hasProperty: socket.drawSocket(box, socket.text, drawType = "TEXT_PROPERTY")
 
     def drawControlSocket(self, layout, socket):
         left, right = splitAlignment(layout)

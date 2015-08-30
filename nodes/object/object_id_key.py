@@ -27,7 +27,7 @@ class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
     keyType = StringProperty()
 
     def create(self):
-        self.inputs.new("an_ObjectSocket", "Object", "object").showName = False
+        self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
         self.selectedKeyChanged(bpy.context)
 
     def draw(self, layout):

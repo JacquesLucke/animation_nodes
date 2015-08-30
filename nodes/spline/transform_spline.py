@@ -8,7 +8,7 @@ class TransformSplineNode(bpy.types.Node, AnimationNode):
     def create(self):
         socket = self.inputs.new("an_SplineSocket", "Spline", "spline")
         socket.dataIsModified = True
-        socket.showName = False
+        socket.defaultDrawType = "PROPERTY_ONLY"
         self.inputs.new("an_MatrixSocket", "Transformation", "matrix")
         self.outputs.new("an_SplineSocket", "Spline", "outSpline")
 

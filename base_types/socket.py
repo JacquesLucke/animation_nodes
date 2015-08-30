@@ -46,7 +46,7 @@ class AnimationNodeSocket:
     loop = PointerProperty(type = SocketLoopProperties)
 
     dataIsModified = BoolProperty(default = False)
-    defaultDrawType = "TEXT_PROPERTY"
+    defaultDrawType = StringProperty(default = "TEXT_PROPERTY")
 
     def draw(self, context, layout, node, text):
         displayText = self.getDisplayedName()

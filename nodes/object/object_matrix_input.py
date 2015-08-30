@@ -7,7 +7,7 @@ class ObjectMatrixInputNode(bpy.types.Node, AnimationNode):
     bl_label = "Object Matrix Input"
 
     def create(self):
-        self.inputs.new("an_ObjectSocket", "Object", "object").showName = False
+        self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
         self.outputs.new("an_MatrixSocket", "Basis", "basis")
         self.outputs.new("an_MatrixSocket", "Local", "local")
         self.outputs.new("an_MatrixSocket", "Parent Inverse", "parentInverse")

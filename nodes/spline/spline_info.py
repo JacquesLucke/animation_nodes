@@ -6,7 +6,7 @@ class SplineInfoNode(bpy.types.Node, AnimationNode):
     bl_label = "Spline Info"
 
     def create(self):
-        self.inputs.new("an_SplineSocket", "Spline", "spline").showName = False
+        self.inputs.new("an_SplineSocket", "Spline", "spline").defaultDrawType = "PROPERTY_ONLY"
         self.outputs.new("an_VectorListSocket", "Points", "points")
         self.outputs.new("an_BooleanSocket", "Cyclic", "cyclic")
 

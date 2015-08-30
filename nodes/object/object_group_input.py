@@ -6,7 +6,7 @@ class ObjectGroupInputNode(bpy.types.Node, AnimationNode):
     bl_label = "Object Group Input"
 
     def create(self):
-        self.inputs.new("an_ObjectGroupSocket", "Group", "group").showName = False
+        self.inputs.new("an_ObjectGroupSocket", "Group", "group").defaultDrawType = "PROPERTY_ONLY"
         self.outputs.new("an_ObjectListSocket", "Objects", "objects")
 
     def execute(self, group):

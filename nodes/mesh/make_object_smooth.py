@@ -6,7 +6,7 @@ class MakeObjectSmoothNode(bpy.types.Node, AnimationNode):
     bl_label = "Make Object Smooth"
 
     def create(self):
-        self.inputs.new("an_ObjectSocket", "Object", "object").showName = False
+        self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
         self.inputs.new("an_BooleanSocket", "Smooth", "smooth")
         self.outputs.new("an_ObjectSocket", "Object", "outObject")
 

@@ -59,7 +59,7 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
             subrow = row.row()
             subrow.active = socket.isCopyable
             subrow.prop(socket.loop, "copyAlways", text = "Copy")
-            socket.drawInput(subcol, self, text = "Default")
+            socket.drawSocket(subcol, text = "Default", drawType = "PROPERTY_ONLY")
         self.invokeSocketTypeChooser(box, "newParameter", text = "New Parameter", icon = "PLUS")
 
         layout.separator()
@@ -122,7 +122,6 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         socket.display.textInput = True
         socket.display.removeOperator = True
         socket.loop.useAsInput = True
-        if hasattr(socket, "showName"): socket.showName = False
 
 
     def socketChanged(self):

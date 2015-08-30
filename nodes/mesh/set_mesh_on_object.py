@@ -7,7 +7,7 @@ class SetMeshOnObjectNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         socket = self.inputs.new("an_ObjectSocket", "Object", "object")
-        socket.showName = False
+        socket.defaultDrawType = "PROPERTY_ONLY"
         socket.objectCreationType = "MESH"
         self.inputs.new("an_MeshSocket", "Mesh", "bm")
         self.outputs.new("an_ObjectSocket", "Object", "outObject")

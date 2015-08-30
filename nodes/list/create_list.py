@@ -84,8 +84,7 @@ class CreateListNode(bpy.types.Node, AnimationNode):
         socket.text = "Element"
         socket.removeable = True
         socket.moveable = True
-        if hasattr(socket, "showName"):
-            socket.showName = False
+        socket.defaultDrawType = "PREFER_PROPERTY"
         socket.moveUp()
         return socket
 

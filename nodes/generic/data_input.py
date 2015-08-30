@@ -53,4 +53,4 @@ class DataInputNode(bpy.types.Node, AnimationNode):
     def setupSocket(self, socket):
         socket.display.text = True
         socket.text = self.assignedType
-        if hasattr(socket, "showName"): socket.showName = False
+        socket.defaultDrawType = "PREFER_PROPERTY"

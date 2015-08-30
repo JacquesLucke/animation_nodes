@@ -26,7 +26,7 @@ class ObjectTransformsInputNode(bpy.types.Node, AnimationNode):
         items = frameTypes, update = executionCodeChanged)
 
     def create(self):
-        self.inputs.new("an_ObjectSocket", "Object", "object").showName = False
+        self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
         self.inputs.new("an_FloatSocket", "Frame", "frame").hide = True
         self.outputs.new("an_VectorSocket", "Location", "location")
         self.outputs.new("an_VectorSocket", "Rotation", "rotation")

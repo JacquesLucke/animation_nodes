@@ -8,8 +8,8 @@ class MixInterpolationNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.inputs.new("an_FloatSocket", "Factor", "factor").setMinMax(0, 1)
-        self.inputs.new("an_InterpolationSocket", "Interpolation 1", "a").showName = False
-        self.inputs.new("an_InterpolationSocket", "Interpolation 2", "b").showName = False
+        self.inputs.new("an_InterpolationSocket", "Interpolation 1", "a").defaultDrawType = "PROPERTY_ONLY"
+        self.inputs.new("an_InterpolationSocket", "Interpolation 2", "b").defaultDrawType = "PROPERTY_ONLY"
         self.outputs.new("an_InterpolationSocket", "Interpolation", "interpolation")
 
     def execute(self, factor, a, b):
