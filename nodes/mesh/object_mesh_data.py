@@ -26,17 +26,17 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "useWorldSpace")
 
     def getExecutionCode(self):
-        usedOutputs = self.getUsedOutputsDict()
-        if not (usedOutputs["vertices"] or
-                usedOutputs["edgeIndices"] or
-                usedOutputs["polygonIndices"]): return ""
+        isLinked = self.getLinkedOutputsDict()
+        if not (isLinked["vertices"] or
+                isLinked["edgeIndices"] or
+                isLinked["polygonIndices"]): return ""
 
         lines = []
         lines.append("if getattr(object, 'type', '') == 'MESH':")
         lines.append("    mesh = self.getMesh(object)")
-        if usedOutputs["vertices"]: lines.append("    vertices = self.getVertices(mesh, object)")
-        if usedOutputs["edgeIndices"]: lines.append("    edgeIndices = self.getEdges(mesh)")
-        if usedOutputs["polygonIndices"]: lines.append("    polygonIndices = self.getPolygons(mesh)")
+        if isLinked["vertices"]: lines.append("    vertices = self.getVertices(mesh, object)")
+        if isLinked["edgeIndices"]: lines.append("    edgeIndices = self.getEdges(mesh)")
+        if isLinked["polygonIndices"]: lines.append("    polygonIndices = self.getPolygons(mesh)")
         lines.append("    self.clearMesh(mesh)")
         lines.append("else: vertices, edgeIndices, polygonIndices = [], [], []")
         return lines

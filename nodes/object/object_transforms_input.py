@@ -39,8 +39,8 @@ class ObjectTransformsInputNode(bpy.types.Node, AnimationNode):
         col.prop(self, "frameType")
 
     def getExecutionCode(self):
-        usedOutputs = self.getUsedOutputsDict()
-        if not (usedOutputs["location"] or usedOutputs["rotation"] or usedOutputs["scale"]): return []
+        isLinked = self.getLinkedOutputsDict()
+        if not (isLinked["location"] or isLinked["rotation"] or isLinked["scale"]): return []
 
         frameInput = self.inputs["Frame"]
 
@@ -49,15 +49,15 @@ class ObjectTransformsInputNode(bpy.types.Node, AnimationNode):
 
         add("try:")
         if self.useCurrentTransforms:
-            if usedOutputs["location"]: add("    location = object.location")
-            if usedOutputs["rotation"]: add("    rotation = mathutils.Vector(object.rotation_euler)")
-            if usedOutputs["scale"]: add("    scale = object.scale")
+            if isLinked["location"]: add("    location = object.location")
+            if isLinked["rotation"]: add("    rotation = mathutils.Vector(object.rotation_euler)")
+            if isLinked["scale"]: add("    scale = object.scale")
         else:
             if self.frameType == "OFFSET": add("    evaluationFrame = frame + bpy.context.scene.frame_current")
             else: add("    evaluationFrame = frame")
-            if usedOutputs["location"]: add("    location = mathutils.Vector(animation_nodes.utils.fcurve.getArrayValueAtFrame(object, 'location', evaluationFrame))")
-            if usedOutputs["rotation"]: add("    rotation = mathutils.Vector(animation_nodes.utils.fcurve.getArrayValueAtFrame(object, 'rotation_euler', evaluationFrame))")
-            if usedOutputs["scale"]: add("    scale = mathutils.Vector(animation_nodes.utils.fcurve.getArrayValueAtFrame(object, 'scale', evaluationFrame))")
+            if isLinked["location"]: add("    location = mathutils.Vector(animation_nodes.utils.fcurve.getArrayValueAtFrame(object, 'location', evaluationFrame))")
+            if isLinked["rotation"]: add("    rotation = mathutils.Vector(animation_nodes.utils.fcurve.getArrayValueAtFrame(object, 'rotation_euler', evaluationFrame))")
+            if isLinked["scale"]: add("    scale = mathutils.Vector(animation_nodes.utils.fcurve.getArrayValueAtFrame(object, 'scale', evaluationFrame))")
 
         add("except:")
         add("    location = mathutils.Vector((0, 0, 0))")

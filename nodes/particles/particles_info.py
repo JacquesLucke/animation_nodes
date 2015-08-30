@@ -16,12 +16,12 @@ class ParticlesInfoNode(bpy.types.Node, AnimationNode):
         self.outputs.new("an_FloatListSocket", "Die Times", "dieTimes").hide = True
 
     def getExecutionCode(self):
-        usedOutputs = self.getUsedOutputsDict()
+        isLinked = self.getLinkedOutputsDict()
         lines = []
-        if usedOutputs["locations"]: lines.append("locations = [p.location for p in particles]")
-        if usedOutputs["velocities"]: lines.append("velocities = [p.velocity for p in particles]")
-        if usedOutputs["ages"]: lines.append("ages = [max(0, scene.frame_current - p.birth_time) for p in particles]")
-        if usedOutputs["sizes"]: lines.append("sizes = [p.size for p in particles]")
-        if usedOutputs["birthTimes"]: lines.append("birthTimes = [p.birth_time for p in particles]")
-        if usedOutputs["dieTimes"]: lines.append("dieTimes = [p.die_time for p in particles]")
+        if isLinked["locations"]: lines.append("locations = [p.location for p in particles]")
+        if isLinked["velocities"]: lines.append("velocities = [p.velocity for p in particles]")
+        if isLinked["ages"]: lines.append("ages = [max(0, scene.frame_current - p.birth_time) for p in particles]")
+        if isLinked["sizes"]: lines.append("sizes = [p.size for p in particles]")
+        if isLinked["birthTimes"]: lines.append("birthTimes = [p.birth_time for p in particles]")
+        if isLinked["dieTimes"]: lines.append("dieTimes = [p.die_time for p in particles]")
         return lines

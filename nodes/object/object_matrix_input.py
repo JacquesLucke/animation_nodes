@@ -14,20 +14,20 @@ class ObjectMatrixInputNode(bpy.types.Node, AnimationNode):
         self.outputs.new("an_MatrixSocket", "World", "world")
 
     def getExecutionCode(self):
-        if len(self.linkedOutputs) == 0: return ""
+        if len(self.isLinked) == 0: return ""
 
-        usedOutputs = self.getUsedOutputsDict()
+        isLinked = self.getLinkedOutputsDict()
         lines = []
         lines.append("if object is None:")
-        if usedOutputs["basis"]: lines.append("    basis = mathutils.Matrix.Identity(4)")
-        if usedOutputs["local"]: lines.append("    local = mathutils.Matrix.Identity(4)")
-        if usedOutputs["parentInverse"]: lines.append("    parentInverse = mathutils.Matrix.Identity(4)")
-        if usedOutputs["world"]: lines.append("    world = mathutils.Matrix.Identity(4)")
+        if isLinked["basis"]: lines.append("    basis = mathutils.Matrix.Identity(4)")
+        if isLinked["local"]: lines.append("    local = mathutils.Matrix.Identity(4)")
+        if isLinked["parentInverse"]: lines.append("    parentInverse = mathutils.Matrix.Identity(4)")
+        if isLinked["world"]: lines.append("    world = mathutils.Matrix.Identity(4)")
         lines.append("else:")
-        if usedOutputs["basis"]: lines.append("    basis = object.matrix_basis")
-        if usedOutputs["local"]: lines.append("    local = object.matrix_local")
-        if usedOutputs["parentInverse"]: lines.append("    parentInverse = object.matrix_parent_inverse")
-        if usedOutputs["world"]: lines.append("    world = object.matrix_world")
+        if isLinked["basis"]: lines.append("    basis = object.matrix_basis")
+        if isLinked["local"]: lines.append("    local = object.matrix_local")
+        if isLinked["parentInverse"]: lines.append("    parentInverse = object.matrix_parent_inverse")
+        if isLinked["world"]: lines.append("    world = object.matrix_world")
 
         return lines
 

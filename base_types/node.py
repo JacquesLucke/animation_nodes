@@ -139,9 +139,15 @@ class AnimationNode:
             if index < self.activeInputIndex: self.activeInputIndex -= 1
         socket.sockets.remove(socket)
 
-    def getUsedOutputsDict(self):
-        usedOutputs = {socket.identifier : socket.isLinked for socket in self.outputs}
-        return usedOutputs
+
+    def getLinkedInputsDict(self):
+        linkedInputs = {socket.identifier : socket.isLinked for socket in self.inputs}
+        return linkedInputs
+
+    def getLinkedOutputsDict(self):
+        linkedOutputs = {socket.identifier : socket.isLinked for socket in self.outputs}
+        return linkedOutputs
+
 
     def disableSocketEditingInNode(self):
         for socket in self.sockets:

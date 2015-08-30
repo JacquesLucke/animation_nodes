@@ -13,10 +13,10 @@ class TimeInfoNode(bpy.types.Node, AnimationNode):
         self.outputs.new("an_FloatSocket", "Frame Rate", "frameRate")
 
     def getExecutionCode(self):
-        usedOutputs = self.getUsedOutputsDict()
+        isLinked = self.getLinkedOutputsDict()
         lines = []
-        if usedOutputs["frame"]: lines.append("frame = bpy.context.scene.frame_current_final")
-        if usedOutputs["startFrame"]: lines.append("startFrame = bpy.context.scene.frame_start")
-        if usedOutputs["endFrame"]: lines.append("endFrame = bpy.context.scene.frame_end")
-        if usedOutputs["frameRate"]: lines.append("frameRate = bpy.context.scene.render.fps")
+        if isLinked["frame"]: lines.append("frame = bpy.context.scene.frame_current_final")
+        if isLinked["startFrame"]: lines.append("startFrame = bpy.context.scene.frame_start")
+        if isLinked["endFrame"]: lines.append("endFrame = bpy.context.scene.frame_end")
+        if isLinked["frameRate"]: lines.append("frameRate = bpy.context.scene.render.fps")
         return lines

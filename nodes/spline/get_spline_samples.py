@@ -27,8 +27,8 @@ class GetSplineSamplesNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
         col.prop(self, "resolution")
 
     def getExecutionCode(self):
-        usedOutputs = self.getUsedOutputsDict()
-        if not (usedOutputs["positions"] or usedOutputs["tangents"]): return []
+        isLinked = self.getLinkedOutputsDict()
+        if not (isLinked["positions"] or isLinked["tangents"]): return []
 
         lines = []
         add = lines.append
@@ -36,11 +36,11 @@ class GetSplineSamplesNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
         add("if spline.isEvaluable:")
 
         if self.parameterType == "UNIFORM":
-            if usedOutputs["positions"]: add("    positions = spline.getUniformSamples(amount, start, end, self.resolution)")
-            if usedOutputs["tangents"]: add("    tangents = spline.getUniformTangentSamples(amount, start, end, self.resolution)")
+            if isLinked["positions"]: add("    positions = spline.getUniformSamples(amount, start, end, self.resolution)")
+            if isLinked["tangents"]: add("    tangents = spline.getUniformTangentSamples(amount, start, end, self.resolution)")
         elif self.parameterType == "RESOLUTION":
-            if usedOutputs["positions"]: add("    positions = spline.getSamples(amount, start, end)")
-            if usedOutputs["tangents"]: add("    tangents = spline.getTangentSamples(amount, start, end)")
+            if isLinked["positions"]: add("    positions = spline.getSamples(amount, start, end)")
+            if isLinked["tangents"]: add("    tangents = spline.getTangentSamples(amount, start, end)")
 
         add("else: positions, tangents = [], []")
 

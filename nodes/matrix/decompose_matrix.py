@@ -12,11 +12,11 @@ class DecomposeMatrixNode(bpy.types.Node, AnimationNode):
         self.outputs.new("an_VectorSocket", "Scale", "scale")
 
     def getExecutionCode(self):
-        usedOutputs = self.getUsedOutputsDict()
+        isLinked = self.getLinkedOutputsDict()
         lines = []
-        if usedOutputs["translation"]: lines.append("translation = matrix.to_translation()")
-        if usedOutputs["rotation"]: lines.append("rotation = mathutils.Vector((matrix.to_euler()))")
-        if usedOutputs["scale"]: lines.append("scale = matrix.to_scale()")
+        if isLinked["translation"]: lines.append("translation = matrix.to_translation()")
+        if isLinked["rotation"]: lines.append("rotation = mathutils.Vector((matrix.to_euler()))")
+        if isLinked["scale"]: lines.append("scale = matrix.to_scale()")
         return lines
 
     def getUsedModules(self):
