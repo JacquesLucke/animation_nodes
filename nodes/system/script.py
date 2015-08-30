@@ -10,13 +10,17 @@ class ScriptNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ScriptNode"
     bl_label = "Script"
 
+    def debugModeChanged(self, context):
+        self.errorMessage = ""
+        executionCodeChanged()
+
     subprogramName = StringProperty(default = "Script")
     subprogramDescription = StringProperty()
 
     executionCode = StringProperty(default = "", update = executionCodeChanged)
     textBlockName = StringProperty(default = "")
 
-    debugMode = BoolProperty(name = "Debug Mode", default = True, update = executionCodeChanged)
+    debugMode = BoolProperty(name = "Debug Mode", default = True, update = debugModeChanged)
     errorMessage = StringProperty()
 
     def create(self):
@@ -26,15 +30,24 @@ class ScriptNode(bpy.types.Node, AnimationNode):
 
     def draw(self, layout):
         col = layout.column(align = True)
-        col.prop_search(self, "textBlockName",  bpy.data, "texts", text = "")
         row = col.row(align = True)
-        self.invokeFunction(row, "writeToTextBlock", text = "Write")
-        self.invokeFunction(row, "readFromTextBlock", text = "Read")
+        self.invokeFunction(row, "createNewTextBlock", icon = "ZOOMIN")
+        row.prop_search(self, "textBlockName",  bpy.data, "texts", text = "")
+        subrow = row.row(align = True)
+        subrow.active = self.textBlock is not None
+        self.invokeFunction(subrow, "writeToTextBlock", icon = "COPYDOWN",
+            description = "Write script code into the selected text block.")
 
+        subcol = col.column(align = True)
+        subcol.scale_y = 1.4
+        subcol.active = self.textBlock is not None
+
+        icon = "NONE"
         text = self.textInTextBlock
         if text is not None:
-            if self.executionCode != text:
-                layout.label("Update necessary", icon = "ERROR")
+            if self.executionCode != text: icon = "ERROR"
+
+        self.invokeFunction(subcol, "readFromTextBlock", text = "Read", icon = icon)
 
         layout.prop(self, "subprogramName", text = "")
 
@@ -93,6 +106,11 @@ class ScriptNode(bpy.types.Node, AnimationNode):
             data.newOutputFromSocket(socket)
         return data
 
+    def createNewTextBlock(self):
+        textBlock = bpy.data.texts.new(name = self.subprogramName)
+        self.textBlockName = textBlock.name
+        self.writeToTextBlock()
+
     def writeToTextBlock(self):
         if not self.textBlock: return
         self.textBlock.from_string(self.executionCode)
@@ -100,6 +118,7 @@ class ScriptNode(bpy.types.Node, AnimationNode):
     def readFromTextBlock(self):
         if not self.textBlock: return
         self.executionCode = self.textInTextBlock
+        self.errorMessage = ""
 
     @property
     def textInTextBlock(self):
