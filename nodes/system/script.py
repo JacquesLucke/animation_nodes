@@ -1,6 +1,7 @@
 import bpy
 from bpy.props import *
 from ... sockets.info import toIdName
+from ... utils.names import toInterfaceName
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 from . subprogram_sockets import SubprogramData
@@ -101,9 +102,11 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     def getSocketData(self):
         data = SubprogramData()
         for socket in self.inputs[:-1]:
-            data.newInputFromSocket(socket)
+            socketData = data.newInputFromSocket(socket)
+            socketData.text = toInterfaceName(socket.text)
         for socket in self.outputs[:-1]:
-            data.newOutputFromSocket(socket)
+            socketData = data.newOutputFromSocket(socket)
+            socketData.text = toInterfaceName(socket.text)
         return data
 
     def createNewTextBlock(self):

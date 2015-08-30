@@ -12,10 +12,14 @@ class SubprogramData:
         self.outputs.append(data)
 
     def newInputFromSocket(self, socket):
-        self.inputs.append(SocketData.fromSocket(socket))
+        socketData = SocketData.fromSocket(socket)
+        self.inputs.append(socketData)
+        return socketData
 
     def newOutputFromSocket(self, socket):
-        self.outputs.append(SocketData.fromSocket(socket))
+        socketData = SocketData.fromSocket(socket)
+        self.outputs.append(socketData)
+        return socketData
 
     def apply(self, node):
         self.applyInputs(node)
