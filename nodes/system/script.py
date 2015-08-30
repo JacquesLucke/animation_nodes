@@ -29,6 +29,8 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         self.outputs.new("an_NodeControlSocket", "New Output", "newOutput")
 
     def draw(self, layout):
+        layout.separator()
+
         col = layout.column(align = True)
         row = col.row(align = True)
         self.invokeFunction(row, "createNewTextBlock", icon = "ZOOMIN")
@@ -47,13 +49,15 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         if text is not None:
             if self.executionCode != text: icon = "ERROR"
 
-        self.invokeFunction(subcol, "readFromTextBlock", text = "Read", icon = icon,
+        self.invokeFunction(subcol, "readFromTextBlock", text = "Import Changes", icon = icon,
             description = "Import the changes from the selected text block")
 
-        layout.prop(self, "subprogramName", text = "")
+        layout.prop(self, "subprogramName", text = "", icon = "GROUP_VERTEX")
 
         if self.errorMessage != "":
             layout.label(self.errorMessage, icon = "ERROR")
+
+        layout.separator()
 
     def drawAdvanced(self, layout):
         col = layout.column()
