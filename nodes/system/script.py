@@ -36,7 +36,7 @@ class ScriptNode(bpy.types.Node, AnimationNode):
         subrow = row.row(align = True)
         subrow.active = self.textBlock is not None
         self.invokeFunction(subrow, "writeToTextBlock", icon = "COPYDOWN",
-            description = "Write script code into the selected text block.")
+            description = "Write script code into the selected text block")
 
         subcol = col.column(align = True)
         subcol.scale_y = 1.4
@@ -47,7 +47,8 @@ class ScriptNode(bpy.types.Node, AnimationNode):
         if text is not None:
             if self.executionCode != text: icon = "ERROR"
 
-        self.invokeFunction(subcol, "readFromTextBlock", text = "Read", icon = icon)
+        self.invokeFunction(subcol, "readFromTextBlock", text = "Read", icon = icon,
+            description = "Import the changes from the selected text block")
 
         layout.prop(self, "subprogramName", text = "")
 
