@@ -16,7 +16,6 @@ class SocketTextProperties(bpy.types.PropertyGroup):
 class SocketDisplayProperties(bpy.types.PropertyGroup):
     bl_idname = "an_SocketDisplayProperties"
     text = BoolProperty(default = False)
-    nameOnly = BoolProperty(default = False)
     textInput = BoolProperty(default = False)
     moveOperators = BoolProperty(default = False)
     removeOperator = BoolProperty(default = False)
@@ -47,18 +46,17 @@ class AnimationNodeSocket:
     loop = PointerProperty(type = SocketLoopProperties)
 
     dataIsModified = BoolProperty(default = False)
+    defaultDrawType = "TEXT_PROPERTY"
 
     def draw(self, context, layout, node, text):
         displayText = self.getDisplayedName()
 
         row = layout.row(align = True)
-        if self.display.nameOnly:
-            row.label(displayText)
-        elif self.textProps.editable and self.display.textInput:
+        if self.textProps.editable and self.display.textInput:
             row.prop(self, "text", text = "")
         else:
             if self.isInput and self.isUnlinked:
-                self.drawInput(row, node, displayText)
+                self.drawSocket(row, displayText, self.defaultDrawType)
             else:
                 if self.isOutput: row.alignment = "RIGHT"
                 row.label(displayText)
@@ -71,6 +69,27 @@ class AnimationNodeSocket:
         if self.removeable and self.display.removeOperator:
             row.separator()
             self.invokeFunction(row, "remove", icon = "X")
+
+    def drawSocket(self, layout, text, drawType = "TEXT_PROPERTY"):
+        '''
+        Draw Types:
+            TEXT_PROPERTY: Draw the text and the property if one exists
+            PREFER_PROPERTY: Uses PROPERTY_ONLY is one exists, otherwise TEXT_ONLY
+            PROPERTY_ONLY: Draw the property; If there is now property, draw nothing
+            TEXT_ONLY: Ignore the property; Just label the text
+        '''
+
+        if drawType == "PREFER_PROPERTY":
+            if self.hasProperty: drawType = "PROPERTY_ONLY"
+            else: drawType = "TEXT_ONLY"
+
+        if drawType == "TEXT_PROPERTY":
+            if self.hasProperty: self.drawProperty(layout, text)
+            else: layout.label(text)
+        elif drawType == "PROPERTY_ONLY":
+            if self.hasProperty: self.drawProperty(layout, text = "")
+        elif drawType == "TEXT_ONLY":
+            layout.label(text)
 
     def getDisplayedName(self):
         if self.display.text or (self.textProps.editable and self.display.textInput):
@@ -240,6 +259,10 @@ class AnimationNodeSocket:
     @property
     def hasValueCode(self):
         return hasattr(self, "getValueCode")
+
+    @property
+    def hasProperty(self):
+        return hasattr(self, "drawProperty")
 
 
 

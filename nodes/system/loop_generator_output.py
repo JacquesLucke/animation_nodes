@@ -62,7 +62,7 @@ class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
         if self.addType == "APPEND": dataType = toBaseDataType(self.listDataType)
         elif self.addType == "EXTEND": dataType = self.listDataType
         socket = self.inputs.new(toIdName(dataType), dataType, "input")
-        socket.display.nameOnly = True
+        socket.defaultDrawType = "TEXT_ONLY"
 
     def delete(self):
         self.removed = True
