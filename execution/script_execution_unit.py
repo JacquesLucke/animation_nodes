@@ -36,30 +36,32 @@ class ScriptExecutionUnit:
         variables = getInitialVariables([node])
         setupCode = getSetupCode([node], variables)
 
-        lines = []
-        lines.append(setupCode)
-        lines.append(self.getFunctionHeader(node))
+        finalCode = []
+        finalCode.append(setupCode)
+        finalCode.append(self.getFunctionHeader(node))
 
         if isCodeValid(userCode):
             codeLines = []
             codeLines.extend(userCode.split("\n"))
             codeLines.append(self.getReturnStatement(node))
 
-            if node.debugMode:
-                lines.append("    try:")
-                lines.append("        {}.errorMessage = ''".format(node.identifier))
-                lines.extend(indent(codeLines, amount = 2))
-                lines.append("    except:")
-                lines.append("        {}.errorMessage = str(sys.exc_info()[1])".format(node.identifier))
-                lines.append("        " + self.getDefaultReturnStatement(node))
-            else:
-                lines.extend(indent(codeLines))
+            if node.debugMode: finalCode.extend(indent(self.getDebugModeFunctionBody(codeLines, node)))
+            else: finalCode.extend(indent(codeLines))
         else:
-            lines.append("    {}.errorMessage = 'Syntax Error'".format(node.identifier))
-            lines.append("    " + self.getDefaultReturnStatement(node))
+            finalCode.append("    {}.errorMessage = 'Syntax Error'".format(node.identifier))
+            finalCode.append("    " + self.getDefaultReturnStatement(node))
 
-        self.setupScript = "\n".join(lines)
-        print(self.setupScript)
+        self.setupScript = "\n".join(finalCode)
+
+    def getDebugModeFunctionBody(self, codeLines, node):
+        lines = []
+        lines.append("try:")
+        lines.append("    {}.errorMessage = ''".format(node.identifier))
+        lines.extend(indent(codeLines))
+        lines.append("except:")
+        lines.append("    {}.errorMessage = str(sys.exc_info()[1])".format(node.identifier))
+        lines.append("    " + self.getDefaultReturnStatement(node))
+        return lines
 
     def getFunctionHeader(self, node):
         inputNames = [socket.text for socket in node.inputs[:-1]]
