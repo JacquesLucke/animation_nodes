@@ -1,6 +1,7 @@
 import re
 import bpy
 import random
+import keyword
 
 def toDataPath(name):
     return '["{}"]'.format(name)
@@ -41,7 +42,9 @@ def getRandomString(length):
     return ''.join(random.choice("abcdefghijklmnopqrstuvwxyz") for _ in range(length))
 
 def toVariableName(name):
-    return re.sub("\W+", "", name)
+    variable = re.sub("\W+", "", name)
+    if keyword.iskeyword(variable): variable += "_"
+    return variable
 
 def toInterfaceName(sourceName):
     tempName = ""
