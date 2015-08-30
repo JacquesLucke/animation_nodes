@@ -8,8 +8,8 @@ class PolygonIndicesSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Polygon Indices"]
     drawColor = (0.5, 0.8, 0.4, 1)
 
-    def getValue(self):
-        return (0, 1, 2)
+    def getValueCode(self):
+        return "(0, 1, 2)"
 
     def getCopyStatement(self):
         return "value[:]"

@@ -8,5 +8,5 @@ class GenericSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["all"]
     drawColor = (0.6, 0.3, 0.3, 0.7)
 
-    def getValue(self):
-        return None
+    def getValueCode(self):
+        return "None"

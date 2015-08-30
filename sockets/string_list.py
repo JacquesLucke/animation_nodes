@@ -8,9 +8,6 @@ class StringListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["String List"]
     drawColor = (1, 1, 1, 0.4)
 
-    def getValue(self):
-        return []
-
     def getValueCode(self):
         return "[]"
 

@@ -8,9 +8,6 @@ class MatrixListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Matrix List"]
     drawColor = (1, 0.7, 0.2, 1)
 
-    def getValue(self):
-        return []
-
     def getValueCode(self):
         return "[]"
 

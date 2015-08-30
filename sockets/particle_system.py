@@ -8,5 +8,5 @@ class ParticleSystemSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Particle System"]
     drawColor = (1.0, 0.8, 0.6, 1)
 
-    def getValue(self):
-        return None
+    def getValueCode(self):
+        return "None"

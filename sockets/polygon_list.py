@@ -8,8 +8,8 @@ class PolygonListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Polygon List"]
     drawColor = (0.25, 0.55, 0.23, 1)
 
-    def getValue(self):
-        return []
-
     def getValueCode(self):
         return "[]"
+
+    def getCopyStatement(self):
+        return "[element.copy() for element in value]"
