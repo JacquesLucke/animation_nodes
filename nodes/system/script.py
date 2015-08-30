@@ -5,17 +5,15 @@ from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 from . subprogram_sockets import SubprogramData
 from . utils import updateSubprogramInvokerNodes
+from . subprogram_base import SubprogramBaseNode
 
-class ScriptNode(bpy.types.Node, AnimationNode):
+class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     bl_idname = "an_ScriptNode"
     bl_label = "Script"
 
     def debugModeChanged(self, context):
         self.errorMessage = ""
         executionCodeChanged()
-
-    subprogramName = StringProperty(default = "Script")
-    subprogramDescription = StringProperty()
 
     executionCode = StringProperty(default = "", update = executionCodeChanged)
     textBlockName = StringProperty(default = "")
@@ -25,6 +23,7 @@ class ScriptNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.width = 200
+        self.subprogramName = "Script"
         self.inputs.new("an_NodeControlSocket", "New Input", "newInput")
         self.outputs.new("an_NodeControlSocket", "New Output", "newOutput")
 

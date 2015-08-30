@@ -6,25 +6,19 @@ from ... utils.names import getRandomString
 from ... utils.layout import splitAlignment
 from ... tree_info import getNodeByIdentifier
 from ... base_types.node import AnimationNode
-from ... node_creator import InsertNodesTemplate
 from . subprogram_sockets import SubprogramData
+from ... node_creator import InsertNodesTemplate
+from . subprogram_base import SubprogramBaseNode
 from . utils import updateSubprogramInvokerNodes
 from ... sockets.info import (toBaseIdName, toListDataType,
                         toIdName, isBase, toListIdName, toBaseDataType)
 
-class LoopInputNode(bpy.types.Node, AnimationNode):
+class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     bl_idname = "an_LoopInputNode"
     bl_label = "Loop Input"
 
-    subprogramName = StringProperty(name = "Subprogram Name", default = "Loop",
-        description = "Subprogram name to identify this group elsewhere",
-        update = networkChanged)
-
-    subprogramDescription = StringProperty(name = "Description", default = "",
-        description = "Short description about what this group does",
-        update = networkChanged)
-
     def create(self):
+        self.subprogramName = "Loop"
         self.outputs.new("an_IntegerSocket", "Index")
         self.outputs.new("an_IntegerSocket", "Iterations")
         self.outputs.new("an_NodeControlSocket", "New Iterator").margin = 0.15

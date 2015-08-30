@@ -6,20 +6,14 @@ from ... utils.layout import splitAlignment
 from ... base_types.node import AnimationNode
 from . subprogram_sockets import SubprogramData
 from . utils import updateSubprogramInvokerNodes
+from . subprogram_base import SubprogramBaseNode
 
-class GroupInputNode(bpy.types.Node, AnimationNode):
+class GroupInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     bl_idname = "an_GroupInputNode"
     bl_label = "Group Input"
 
-    subprogramName = StringProperty(name = "Subprogram Name", default = "Group",
-        description = "Subprogram name to identify this group elsewhere",
-        update = networkChanged)
-
-    subprogramDescription = StringProperty(name = "Description", default = "",
-        description = "Short description about what this group does",
-        update = networkChanged)
-
     def create(self):
+        self.subprogramName = "Group"
         socket = self.outputs.new("an_NodeControlSocket", "New Parameter").margin = 0.15
         self.width = 180
 
