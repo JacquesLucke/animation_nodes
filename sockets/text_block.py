@@ -9,9 +9,10 @@ class TextBlockSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     dataType = "Text Block"
     allowedInputTypes = ["Text Block"]
     drawColor = (0.5, 0.5, 0.5, 1)
+    storable = False
 
     textBlockName = StringProperty(update = propertyChanged)
-    
+
     def drawProperty(self, layout, text):
         layout.prop_search(self, "textBlockName",  bpy.data, "texts", text = text)
 

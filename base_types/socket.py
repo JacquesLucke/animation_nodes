@@ -32,6 +32,7 @@ class SocketLoopProperties(bpy.types.PropertyGroup):
     copyAlways = BoolProperty(default = False, update = socketLoopPropertyChanged)
 
 class AnimationNodeSocket:
+    storable = True
 
     def textChanged(self, context):
         updateText(self)

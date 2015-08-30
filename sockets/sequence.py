@@ -9,9 +9,10 @@ class SequenceSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     dataType = "Sequence"
     allowedInputTypes = ["Sequence"]
     drawColor = (0, 0.644, 0, 1)
+    storable = False
 
     sequenceName = StringProperty(update = propertyChanged)
-    
+
     def drawProperty(self, layout, text):
         row = layout.row(align = True)
 

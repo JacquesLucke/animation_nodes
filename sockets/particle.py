@@ -7,6 +7,7 @@ class ParticleSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     dataType = "Particle"
     allowedInputTypes = ["Particle"]
     drawColor = (0.5, 0.3, 0.1, 1)
+    storable = False
 
     def getValueCode(self):
         return "None"
