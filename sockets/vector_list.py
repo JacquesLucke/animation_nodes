@@ -8,9 +8,6 @@ class VectorListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Vector List"]
     drawColor = (0.3, 0.9, 1, 0.6)
 
-    def drawInput(self, layout, node, text):
-        layout.label(text)
-
     def getValue(self):
         return []
 

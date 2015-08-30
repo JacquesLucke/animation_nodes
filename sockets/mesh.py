@@ -9,9 +9,6 @@ class MeshSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Mesh"]
     drawColor = (0.1, 1.0, 0.1, 1)
 
-    def drawInput(self, layout, node, text):
-        layout.label(text)
-
     def getValue(self):
         return bmesh.new()
 

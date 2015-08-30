@@ -9,9 +9,6 @@ class PolygonSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Polygon"]
     drawColor = (0.14, 0.34, 0.19, 1)
 
-    def drawInput(self, layout, node, text):
-        layout.label(text)
-
     def getValue(self):
         return Polygon()
 

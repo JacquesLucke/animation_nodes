@@ -12,23 +12,13 @@ class VectorSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     drawColor = (0.05, 0.05, 0.8, 0.7)
 
     value = FloatVectorProperty(default = [0, 0, 0], update = propertyChanged)
-    showName = BoolProperty(default = True)
 
-    def drawInput(self, layout, node, text):
+    def drawProperty(self, layout, text):
         col = layout.column(align = True)
-        if self.showName: col.label(text)
-        self.drawVector(col)
-        col.separator()
-
-    def drawAsProperty(self, layout, text):
-        col = layout.column(align = True)
-        col.label(text + ":")
-        self.drawVector(col)
-
-    def drawVector(self, layout):
-        layout.prop(self, "value", index = 0, text = "X")
-        layout.prop(self, "value", index = 1, text = "Y")
-        layout.prop(self, "value", index = 2, text = "Z")
+        if text != "": col.label(text)
+        col.prop(self, "value", index = 0, text = "X")
+        col.prop(self, "value", index = 1, text = "Y")
+        col.prop(self, "value", index = 2, text = "Z")
 
     def getValue(self):
         return Vector(self.value)
@@ -41,7 +31,3 @@ class VectorSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def getCopyStatement(self):
         return "value.copy()"
-
-    def toString(self):
-        if self.showName: return self.getDisplayedName()
-        return "({:.2f}, {:.2f}, {:.2f})".format(*self.value)

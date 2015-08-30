@@ -11,13 +11,8 @@ class SequenceSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     drawColor = (0, 0.644, 0, 1)
 
     sequenceName = StringProperty(update = propertyChanged)
-    showName = BoolProperty(default = True)
-
-    def drawInput(self, layout, node, text):
-        if not self.showName: text = ""
-        self.drawAsProperty(layout, text)
-
-    def drawAsProperty(self, layout, text):
+    
+    def drawProperty(self, layout, text):
         row = layout.row(align = True)
 
         editor = bpy.context.scene.sequence_editor

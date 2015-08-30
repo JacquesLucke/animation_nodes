@@ -28,18 +28,13 @@ class StringSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             self.value = self.stringEnum
 
     value = StringProperty(default = "", update = propertyChanged, options = {"TEXTEDIT_UPDATE"})
-    showName = BoolProperty(default = True)
 
     stringEnum = EnumProperty(name = "Possible Items",
         items = getEnumItems, update = enumChanged)
     useEnum = BoolProperty(default = False)
     enumItems = CollectionProperty(type = EnumItem)
 
-    def drawInput(self, layout, node, text):
-        if not self.showName: text = ""
-        self.drawAsProperty(layout, text)
-
-    def drawAsProperty(self, layout, text):
+    def drawProperty(self, layout, text):
         if self.useEnum:
             layout.prop(self, "stringEnum", text = text)
         else:
@@ -63,7 +58,3 @@ class StringSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             else: item.displayName = enumItem[0]
             if len(enumItem) > 2: item.description = enumItem[2]
             if len(enumItem) > 3: item.icon = enumItem[3]
-
-    def toString(self):
-        if self.showName: return self.getDisplayedName()
-        return self.value

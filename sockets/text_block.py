@@ -11,13 +11,8 @@ class TextBlockSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     drawColor = (0.5, 0.5, 0.5, 1)
 
     textBlockName = StringProperty(update = propertyChanged)
-    showName = BoolProperty(default = True)
-
-    def drawInput(self, layout, node, text):
-        if not self.showName: text = ""
-        self.drawAsProperty(layout, text)
-
-    def drawAsProperty(self, layout, text):
+    
+    def drawProperty(self, layout, text):
         layout.prop_search(self, "textBlockName",  bpy.data, "texts", text = text)
 
     def getValue(self):

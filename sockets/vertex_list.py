@@ -8,9 +8,6 @@ class VertexListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Vertex List"]
     drawColor = (0.3, 1.0, 0.4, 1.0)
 
-    def drawInput(self, layout, node, text):
-        layout.label(text)
-
     def getValue(self):
         return []
 

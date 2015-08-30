@@ -8,9 +8,6 @@ class ParticleListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Particle List"]
     drawColor = (0.7, 0.5, 0.3, 1)
 
-    def drawInput(self, layout, node, text):
-        layout.label(text)
-
     def getValue(self):
         return []
 
