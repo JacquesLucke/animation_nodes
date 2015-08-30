@@ -73,11 +73,14 @@ class AnimationNodeSocket:
     def drawSocket(self, layout, text, drawType = "TEXT_PROPERTY"):
         '''
         Draw Types:
+            TEXT_PROPERTY_OR_NONE: Draw only if a property exists
             TEXT_PROPERTY: Draw the text and the property if one exists
             PREFER_PROPERTY: Uses PROPERTY_ONLY is one exists, otherwise TEXT_ONLY
             PROPERTY_ONLY: Draw the property; If there is now property, draw nothing
             TEXT_ONLY: Ignore the property; Just label the text
         '''
+        if drawType == "TEXT_PROPERTY_OR_NONE":
+            if self.hasProperty: drawType = "TEXT_PROPERTY"
 
         if drawType == "PREFER_PROPERTY":
             if self.hasProperty: drawType = "PROPERTY_ONLY"

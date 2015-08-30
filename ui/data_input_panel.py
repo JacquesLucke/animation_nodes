@@ -14,5 +14,4 @@ class DataInputPanel(bpy.types.Panel):
         for node in nodes:
             if not node.showInViewport: continue
             socket = node.inputs[0]
-            if not hasattr(socket, "drawAsProperty"): continue
-            socket.drawAsProperty(layout, node.label)
+            socket.drawSocket(layout, text = node.label, drawType = "TEXT_PROPERTY_OR_NONE")

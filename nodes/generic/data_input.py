@@ -25,7 +25,7 @@ class DataInputNode(bpy.types.Node, AnimationNode):
         self.invokeFunction(col, "assignSelectedType", text = "Assign", description = "Remove all sockets and set the selected socket type")
 
         col = layout.column()
-        col.active = hasattr(self.inputs[0], "drawAsProperty")
+        col.active = self.inputs[0].hasProperty
         col.prop(self, "showInViewport")
 
     def getExecutionCode(self):
