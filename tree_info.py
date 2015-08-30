@@ -276,6 +276,11 @@ class NodeNetwork:
         return self.nodeIDs[0][0]
 
     @property
+    def ownerNode(self):
+        try: return getNodeByIdentifier(self.identifier)
+        except: return None
+
+    @property
     def groupInputNode(self):
         if self.groupInputID is None: return None
         return idToNode(self.groupInputID)

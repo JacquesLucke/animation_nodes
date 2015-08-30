@@ -11,7 +11,7 @@ def draw(self, context):
     col = layout.column(align = True)
     col.prop(node, "width", text = "Width")
     col.prop(node, "bl_width_max", text = "Max Width")
-    col.prop(node, "useNetworkColor")
+    col.prop(node, "useAutoColor")
 
     col = layout.column(align = True)
 

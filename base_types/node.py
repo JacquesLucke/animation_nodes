@@ -5,17 +5,21 @@ import random
 from bpy.props import *
 from collections import defaultdict
 from bpy.app.handlers import persistent
-from .. tree_info import getNetworkWithNode, getDirectlyLinkedSockets
+from .. ui.node_colors import colorNetworks
 from .. utils.nodes import getAnimationNodeTrees
 from .. operators.dynamic_operators import getInvokeFunctionOperator
+from .. tree_info import getNetworkWithNode, getDirectlyLinkedSockets
 
 class AnimationNode:
     isAnimationNode = True
 
+    def useAutoColorChanged(self, context):
+        colorNetworks()
+
     # unique string for each node; don't change it at all
     identifier = StringProperty(name = "Identifier", default = "")
     inInvalidNetwork = BoolProperty(name = "In Invalid Network", default = False)
-    useNetworkColor = BoolProperty(name = "Use Network Color", default = True)
+    useAutoColor = BoolProperty(name = "Use Auto Color", default = True, update = useAutoColorChanged)
 
     # used for the listboxes in the sidebar
     activeInputIndex = IntProperty()
