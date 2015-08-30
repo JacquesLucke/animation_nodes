@@ -7,7 +7,7 @@ class TrimSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
     bl_label = "Trim Spline"
 
     def create(self):
-        self.inputs.new("an_SplineSocket", "Spline", "spline").showName = False
+        self.inputs.new("an_SplineSocket", "Spline", "spline").defaultDrawType = "PROPERTY_ONLY"
         self.inputs.new("an_FloatSocket", "Start", "start").value = 0.0
         self.inputs.new("an_FloatSocket", "End", "end").value = 1.0
         self.outputs.new("an_SplineSocket", "Spline", "trimmedSpline")

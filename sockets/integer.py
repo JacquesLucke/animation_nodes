@@ -19,16 +19,10 @@ class IntegerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         set = setValue, get = getValue,
         update = propertyChanged)
 
-    showName = BoolProperty(default = True)
-
     min = IntProperty(default = -2**31)
     max = IntProperty(default = 2**31-1)
 
-    def drawInput(self, layout, node, text):
-        if not self.showName: text = ""
-        self.drawAsProperty(layout, text)
-
-    def drawAsProperty(self, layout, text):
+    def drawProperty(self, layout, text):
         layout.prop(self, "value", text = text)
 
     def getValue(self):
@@ -43,7 +37,3 @@ class IntegerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def setMinMax(self, min, max):
         self.min = min
         self.max = max
-
-    def toString(self):
-        if self.showName: return self.getDisplayedName()
-        return str(self.value)

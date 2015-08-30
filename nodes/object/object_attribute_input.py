@@ -6,7 +6,7 @@ class ObjectAttributeInputNode(bpy.types.Node, AnimationNode):
     bl_label = "Object Attribute Input"
 
     def create(self):
-        self.inputs.new("an_ObjectSocket", "Object", "object").showName = False
+        self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
         self.inputs.new("an_StringSocket", "Path", "path")
         self.outputs.new("an_GenericSocket", "Value", "value")
 

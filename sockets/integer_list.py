@@ -8,9 +8,6 @@ class IntegerListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Integer List"]
     drawColor = (0.2, 0.0, 0.9, 1.0)
 
-    def drawInput(self, layout, node, text):
-        layout.label(text)
-
     def getValue(self):
         return []
 

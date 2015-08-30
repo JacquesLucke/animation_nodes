@@ -15,10 +15,7 @@ class ColorSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         soft_min = 0.0, soft_max = 1.0,
         update = propertyChanged)
 
-    def drawInput(self, layout, node, text):
-        self.drawAsProperty(layout, text)
-
-    def drawAsProperty(self, layout, text):
+    def drawProperty(self, layout, text):
         layout.prop(self, "value", text = text)
 
     def getValue(self):

@@ -42,7 +42,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.inputs.new("an_IntegerSocket", "Instances", "instancesAmount").setMinMax(0, 100000)
-        self.inputs.new("an_ObjectSocket", "Source", "sourceObject").showName = False
+        self.inputs.new("an_ObjectSocket", "Source", "sourceObject").defaultDrawType = "PROPERTY_ONLY"
         self.outputs.new("an_ObjectListSocket", "Objects", "objects")
 
     def draw(self, layout):

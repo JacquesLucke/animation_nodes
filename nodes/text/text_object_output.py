@@ -34,7 +34,7 @@ class TextOutputNode(bpy.types.Node, AnimationNode):
     useYOffset = BoolProperty(default = False, update = usePropertyChanged)
 
     def create(self):
-        self.inputs.new("an_ObjectSocket", "Object", "object").showName = False
+        self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
 
         self.inputs.new("an_StringSocket", "Text", "text")
         self.inputs.new("an_FloatSocket", "Extrude", "extrude").value = 0.0

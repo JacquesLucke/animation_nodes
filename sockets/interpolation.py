@@ -44,14 +44,7 @@ class InterpolationSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         name = "Cubic", default = "OUT",
         items = cubicCategoryItems, update = propertyChanged)
 
-    showName = BoolProperty(default = True)
-
-    def drawInput(self, layout, node, text):
-        if not self.showName: text = ""
-        self.drawAsProperty(layout, text)
-
-
-    def drawAsProperty(self, layout, text):
+    def drawProperty(self, layout, text):
         col = layout.column(align = True)
         if text != "": col.label(text)
 

@@ -12,10 +12,7 @@ class BooleanSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     value = BoolProperty(default = True, update = propertyChanged)
 
-    def drawInput(self, layout, node, text):
-        self.drawAsProperty(layout, text)
-
-    def drawAsProperty(self, layout, text):
+    def drawProperty(self, layout, text):
         layout.prop(self, "value", text = text)
 
     def getValue(self):

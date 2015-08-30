@@ -11,14 +11,9 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     drawColor = (0, 0, 0, 1)
 
     objectName = StringProperty(update = propertyChanged)
-    showName = BoolProperty(default = True)
     objectCreationType = StringProperty(default = "")
 
-    def drawInput(self, layout, node, text):
-        if not self.showName: text = ""
-        self.drawAsProperty(layout, text)
-
-    def drawAsProperty(self, layout, text):
+    def drawProperty(self, layout, text):
         row = layout.row(align = True)
         row.prop_search(self, "objectName",  bpy.context.scene, "objects", icon="NONE", text = text)
 
@@ -51,8 +46,3 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         object = bpy.data.objects.new("Target", data)
         bpy.context.scene.objects.link(object)
         self.objectName = object.name
-
-    def toString(self):
-        if self.showName: return self.getDisplayedName()
-        if self.objectName == "": return "--None--"
-        return self.objectName

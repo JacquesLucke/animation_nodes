@@ -14,7 +14,7 @@ class SplinesFromObjectNode(bpy.types.Node, AnimationNode):
         default = True, update = propertyChanged)
 
     def create(self):
-        self.inputs.new("an_ObjectSocket", "Object", "objects").showName = False
+        self.inputs.new("an_ObjectSocket", "Object", "objects").defaultDrawType = "PROPERTY_ONLY"
         self.outputs.new("an_SplineListSocket", "Splines", "splines")
 
     def draw(self, layout):

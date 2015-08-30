@@ -20,16 +20,10 @@ class FloatSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         set = setValue, get = getValue,
         update = propertyChanged)
 
-    showName = BoolProperty(default = True)
-
     min = FloatProperty(default = -1e10)
     max = FloatProperty(default = sys.float_info.max)
 
-    def drawInput(self, layout, node, text):
-        if not self.showName: text = ""
-        layout.prop(self, "value", text = text)
-
-    def drawAsProperty(self, layout, text):
+    def drawProperty(self, layout, text):
         layout.prop(self, "value", text = text)
 
     def getValue(self):
@@ -44,7 +38,3 @@ class FloatSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def setMinMax(self, min, max):
         self.min = min
         self.max = max
-
-    def toString(self):
-        if self.showName: return self.getDisplayedName()
-        return str(round(self.value, 3))

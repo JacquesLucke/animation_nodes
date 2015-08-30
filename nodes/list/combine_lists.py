@@ -72,7 +72,6 @@ class CombineListsNode(bpy.types.Node, AnimationNode):
         socket.removeable = True
         socket.moveable = True
         socket.textProps.editable = True
-        if hasattr(socket, "showName"):
-            socket.showName = False
+        socket.defaultDrawType = "PREFER_PROPERTY"
         socket.moveUp()
         return socket

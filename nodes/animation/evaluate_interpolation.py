@@ -6,7 +6,7 @@ class EvaluateInterpolationNode(bpy.types.Node, AnimationNode):
     bl_label = "Evaluate Interpolation"
 
     def create(self):
-        self.inputs.new("an_InterpolationSocket", "Interpolation", "interpolation").showName = False
+        self.inputs.new("an_InterpolationSocket", "Interpolation", "interpolation").defaultDrawType = "PROPERTY_ONLY"
         self.inputs.new("an_FloatSocket", "Position", "position").setMinMax(0, 1)
         self.outputs.new("an_FloatSocket", "Value", "value")
 

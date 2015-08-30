@@ -18,7 +18,7 @@ class ProjectOnSplineNode(bpy.types.Node, AnimationNode):
         update = settingChanged)
 
     def create(self):
-        self.inputs.new("an_SplineSocket", "Spline", "spline").showName = False
+        self.inputs.new("an_SplineSocket", "Spline", "spline").defaultDrawType = "PROPERTY_ONLY"
         self.inputs.new("an_VectorSocket", "Location", "location")
         self.outputs.new("an_VectorSocket", "Position", "position")
         self.outputs.new("an_VectorSocket", "Tangent", "tangent")

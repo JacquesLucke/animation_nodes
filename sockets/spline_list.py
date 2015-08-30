@@ -19,15 +19,9 @@ class SplineListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         description = "Convert points to world space",
         update = propertyChanged)
 
-    showName = BoolProperty(default = True)
     showObjectInput = BoolProperty(default = True)
 
-    def drawInput(self, layout, node, text):
-        if not self.showName: text = ""
-        if self.showObjectInput: self.drawAsProperty(layout, text)
-        else: layout.label(text)
-
-    def drawAsProperty(self, layout, text):
+    def drawProperty(self, layout, text):
         row = layout.row(align = True)
         row.prop_search(self, "objectName",  bpy.context.scene, "objects", icon="NONE", text = text)
         self.invokeFunction(row, "assignActiveObject", icon = "EYEDROPPER")
