@@ -21,10 +21,10 @@ class ColorSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getValue(self):
         return list(self.value) + [1.0]
 
-    def setStoreableValue(self, data):
+    def setProperty(self, data):
         self.value = data[:3]
 
-    def getStoreableValue(self):
+    def getProperty(self):
         return self.value
 
     def getCopyStatement(self):

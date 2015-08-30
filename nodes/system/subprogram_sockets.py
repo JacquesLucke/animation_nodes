@@ -53,7 +53,7 @@ class SubprogramData:
 
     def newSocketFromData(self, nodeSockets, data):
         newSocket = nodeSockets.new(data.idName, data.identifier, data.identifier)
-        if newSocket.isInput: newSocket.setStoreableValue(data.defaultValue)
+        if newSocket.isInput: newSocket.setProperty(data.defaultValue)
         newSocket.text = data.text
         newSocket.display.text = True
         return newSocket
@@ -74,4 +74,4 @@ class SocketData:
         return SocketData(socket.bl_idname,
                           socket.identifier,
                           socket.text,
-                          socket.getStoreableValue())
+                          socket.getProperty())

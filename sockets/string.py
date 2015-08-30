@@ -43,10 +43,10 @@ class StringSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getValue(self):
         return self.value
 
-    def setStoreableValue(self, data):
+    def setProperty(self, data):
         self.value = data
 
-    def getStoreableValue(self):
+    def getProperty(self):
         return self.value
 
     def setEnumItems(self, enumItems):

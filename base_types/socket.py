@@ -114,10 +114,10 @@ class AnimationNodeSocket:
         self.display.moveOperators = other.display.moveOperators
         self.display.removeOperator = other.display.removeOperator
 
-    def setStoreableValue(self, data):
+    def setProperty(self, data):
         pass
 
-    def getStoreableValue(self):
+    def getProperty(self):
         return
 
     def invokeFunction(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True, data = None):

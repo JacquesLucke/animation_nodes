@@ -28,9 +28,9 @@ class SequenceSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         if editor: return editor.sequences.get(self.sequenceName)
         return None
 
-    def setStoreableValue(self, data):
+    def setProperty(self, data):
         self.sequenceName = data
-    def getStoreableValue(self):
+    def getProperty(self):
         return self.sequenceName
 
     def assignActiveSequence(self):

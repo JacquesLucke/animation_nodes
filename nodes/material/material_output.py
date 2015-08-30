@@ -104,4 +104,4 @@ class CyclesMaterialOutputNode(bpy.types.Node, AnimationNode):
         else:
             data = socket.default_value
             self.inputs.new(allowedSocketTypes[socket.bl_idname], "Data")
-            self.inputs["Data"].setStoreableValue(data)
+            self.inputs["Data"].setProperty(data)

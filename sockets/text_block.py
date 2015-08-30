@@ -18,8 +18,8 @@ class TextBlockSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getValue(self):
         return bpy.data.texts.get(self.textBlockName)
 
-    def setStoreableValue(self, data):
+    def setProperty(self, data):
         self.textBlockName = data
 
-    def getStoreableValue(self):
+    def getProperty(self):
         return self.textBlockName

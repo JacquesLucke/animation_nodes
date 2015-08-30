@@ -38,10 +38,10 @@ class SplineSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         if len(splines) > 0: return splines[0]
         else: return BezierSpline()
 
-    def setStoreableValue(self, data):
+    def setProperty(self, data):
         self.objectName, self.useWorldSpace = data
 
-    def getStoreableValue(self):
+    def getProperty(self):
         return self.objectName, self.useWorldSpace
 
     def getCopyStatement(self):

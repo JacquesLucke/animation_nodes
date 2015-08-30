@@ -25,10 +25,10 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getValue(self):
         return bpy.data.objects.get(self.objectName)
 
-    def setStoreableValue(self, data):
+    def setProperty(self, data):
         self.objectName = data
 
-    def getStoreableValue(self):
+    def getProperty(self):
         return self.objectName
 
     def assignActiveObject(self):

@@ -170,11 +170,11 @@ class InsertDataInputNode(bpy.types.Operator):
         nodeTree = getActiveAnimationNodeTree()
         targetNode = getNode(self.nodeTreeName, self.nodeName)
         targetSocket = targetNode.inputs[self.socketIndex]
-        data = targetSocket.getStoreableValue()
+        data = targetSocket.getProperty()
 
         node = insertNode("an_DataInputNode")
         node.assignSocketType(toDataType(targetSocket.bl_idname))
-        node.inputs[0].setStoreableValue(data)
+        node.inputs[0].setProperty(data)
 
         nodeTree.links.new(targetSocket, node.outputs[0])
         moveNode(node)

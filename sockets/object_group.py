@@ -18,8 +18,8 @@ class ObjectGroupSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getValue(self):
         return bpy.data.groups.get(self.groupName)
 
-    def setStoreableValue(self, data):
+    def setProperty(self, data):
         self.groupName = data
 
-    def getStoreableValue(self):
+    def getProperty(self):
         return self.groupName

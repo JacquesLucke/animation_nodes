@@ -81,7 +81,7 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
 
         for target in self.newParameterSocket.dataTargets:
             if target.dataType == "Node Control": continue
-            socket = self.newParameter(target.dataType, target.getDisplayedName(), target.getStoreableValue())
+            socket = self.newParameter(target.dataType, target.getDisplayedName(), target.getProperty())
             socket.linkWith(target)
 
         self.newIteratorSocket.removeLinks()
@@ -106,7 +106,7 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     def newParameter(self, dataType, name = None, defaultValue = None):
         if name is None: name = dataType
         socket = self.outputs.new(toIdName(dataType), name, "parameter_" + getRandomString(5))
-        if defaultValue: socket.setStoreableValue(defaultValue)
+        if defaultValue: socket.setProperty(defaultValue)
         socket.moveTo(self.newParameterSocket.index)
         socket.loop.copyAlways = True
         self.setupSocket(socket, name, moveGroup = 2)

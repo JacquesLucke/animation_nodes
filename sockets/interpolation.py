@@ -72,8 +72,8 @@ class InterpolationSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             if self.backCategory == "OUT": return (backEaseOut, 1.70158)
         return (linear, None)
 
-    def setStoreableValue(self, data):
+    def setProperty(self, data):
         self.topCategory, self.backCategory, self.exponentialCategory, self.cubicCategory = data
 
-    def getStoreableValue(self):
+    def getProperty(self):
         return self.topCategory, self.backCategory, self.exponentialCategory, self.cubicCategory

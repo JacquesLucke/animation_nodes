@@ -42,14 +42,14 @@ class GroupInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     def edit(self):
         for target in self.newParameterSocket.dataTargets:
             if target.dataType == "Node Control": continue
-            socket = self.newParameter(target.dataType, target.getDisplayedName(), target.getStoreableValue())
+            socket = self.newParameter(target.dataType, target.getDisplayedName(), target.getProperty())
             socket.linkWith(target)
         self.newParameterSocket.removeLinks()
 
     def newParameter(self, dataType, name = None, defaultValue = None):
         if name is None: name = dataType
         socket = self.outputs.new(toIdName(dataType), name, "parameter")
-        if defaultValue is not None: socket.setStoreableValue(defaultValue)
+        if defaultValue is not None: socket.setProperty(defaultValue)
         socket.text = name
         socket.moveable = True
         socket.removeable = True
