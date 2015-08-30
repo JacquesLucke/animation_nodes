@@ -1,4 +1,5 @@
 import bpy
+from .. tree_info import getSubprogramNetworks
 from .. utils.nodes import getAnimationNodeTrees
 
 def drawMenu(self, context):
@@ -29,6 +30,7 @@ def drawMenu(self, context):
     layout.menu("an.particles_menu", text = "Particles")
     layout.separator()
     layout.menu("an.debug_menu", text = "Debug")
+    layout.menu("an.subprograms_menu", text = "Subprograms")
 
 def drawNodeTreeChooser(layout, context):
     activeNodeTree = context.space_data.node_tree
@@ -306,6 +308,14 @@ class DebugMenu(bpy.types.Menu):
         insertNode(layout, "an_DebugLoopNode", "Debug Loop")
         insertNode(layout, "an_DebugListNode", "Debug List")
 
+class SubprogramsMenu(bpy.types.Menu):
+    bl_idname = "an.subprograms_menu"
+    bl_label = "Subprograms Menu"
+
+    def draw(self, context):
+        layout = self.layout
+        for network in getSubprogramNetworks():
+            insertNode(layout, "an_InvokeSubprogramNode", network.name, {"subprogramIdentifier" : repr(network.identifier)})
 
 
 def insertNode(layout, type, text, settings = {}):
