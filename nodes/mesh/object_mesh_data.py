@@ -57,7 +57,7 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
             matrix = object.matrix_world
             return [matrix * v.co for v in mesh.vertices]
         else:
-            return [v.co for v in mesh.vertices]
+            return [v.co.copy() for v in mesh.vertices]
 
     def getEdges(self, mesh):
         return [tuple(edge.vertices) for edge in mesh.edges]
