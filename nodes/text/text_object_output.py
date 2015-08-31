@@ -74,4 +74,4 @@ class TextObjectOutputNode(bpy.types.Node, AnimationNode):
             textObject.align = align
             self.errorMessage = ""
         else:
-            self.errorMessage = "The align type is invalid. Look in the advanced panels to see the possibilities."
+            self.errorMessage = "The align type is invalid. Look in the advanced panels to see all possible values."

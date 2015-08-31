@@ -12,7 +12,8 @@ def writeText(layout, text, width = 30, icon = "NONE"):
     col = layout.column(align = True)
     col.scale_y = 0.85
     prefix = " "
-    for line in textwrap.wrap(text, width):
-        col.label(prefix + line, icon = icon)
-        if icon != "NONE": prefix = "     "
-        icon = "NONE"
+    for paragraph in text.split("\n"):
+        for line in textwrap.wrap(paragraph, width):
+            col.label(prefix + line, icon = icon)
+            if icon != "NONE": prefix = "     "
+            icon = "NONE"
