@@ -10,6 +10,7 @@ class ObjectGroupSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Object Group"]
     drawColor = (0.3, 0.1, 0.1, 0.8)
     storable = False
+    hashable = True
 
     groupName = StringProperty(update = propertyChanged)
 

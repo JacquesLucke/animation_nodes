@@ -10,6 +10,7 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Object"]
     drawColor = (0, 0, 0, 1)
     storable = False
+    hashable = True
 
     objectName = StringProperty(update = propertyChanged)
     objectCreationType = StringProperty(default = "")

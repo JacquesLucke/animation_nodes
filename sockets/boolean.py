@@ -9,6 +9,7 @@ class BooleanSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     dataType = "Boolean"
     allowedInputTypes = ["Boolean"]
     drawColor = (0.7, 0.7, 0.4, 1)
+    hashable = True
 
     value = BoolProperty(default = True, update = propertyChanged)
 

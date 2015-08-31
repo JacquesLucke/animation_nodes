@@ -33,6 +33,7 @@ class SocketLoopProperties(bpy.types.PropertyGroup):
 
 class AnimationNodeSocket:
     storable = True
+    hashable = False
 
     def textChanged(self, context):
         updateText(self)

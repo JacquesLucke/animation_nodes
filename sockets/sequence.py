@@ -10,6 +10,7 @@ class SequenceSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Sequence"]
     drawColor = (0, 0.644, 0, 1)
     storable = False
+    hashable = True
 
     sequenceName = StringProperty(update = propertyChanged)
 

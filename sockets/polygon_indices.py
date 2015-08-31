@@ -7,6 +7,7 @@ class PolygonIndicesSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     dataType = "Polygon Indices"
     allowedInputTypes = ["Polygon Indices"]
     drawColor = (0.5, 0.8, 0.4, 1)
+    hashable = True
 
     def getValueCode(self):
         return "(0, 1, 2)"
