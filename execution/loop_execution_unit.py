@@ -3,6 +3,7 @@ from . compile_scripts import compileScript
 from .. problems import ExecutionUnitNotSetup
 from . code_generator import (getInitialVariables,
                               getSetupCode,
+                              getCopyLine,
                               getNodeExecutionLines,
                               linkOutputSocketsToTargets,
                               getLoadSocketValueLine)
@@ -171,7 +172,9 @@ class LoopExecutionUnit:
     def get_ReassignParameters(self, inputNode, variables):
         lines = []
         for node in inputNode.getReassignParameterNodes():
-            lines.append("{} = {}".format(variables[node.linkedParameterSocket], variables[node.inputs[0]]))
+            socket = node.inputs[0]
+            if socket.isUnlinked and socket.isCopyable: lines.append(getCopyLine(socket, variables[node.linkedParameterSocket], variables))
+            else: lines.append("{} = {}".format(variables[node.linkedParameterSocket], variables[socket]))
         return lines
 
 
