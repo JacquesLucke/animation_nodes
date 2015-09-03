@@ -1,4 +1,5 @@
 import bpy
+from bpy.props import *
 from .. tree_info import getSubprogramNetworks
 from .. utils.nodes import getAnimationNodeTrees
 
@@ -348,7 +349,7 @@ class SelectNodeTree(bpy.types.Operator):
     bl_description = "Select a Animation Node tree"
     bl_options = {"REGISTER"}
 
-    nodeTreeName = bpy.props.StringProperty(default = "")
+    nodeTreeName = StringProperty(default = "")
 
     def execute(self, context):
         nodeTree = bpy.data.node_groups.get(self.nodeTreeName)

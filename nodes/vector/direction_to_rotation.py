@@ -1,4 +1,5 @@
 import bpy
+from bpy.props import *
 from mathutils import Vector
 from ... events import propertyChanged
 from ... base_types.node import AnimationNode
@@ -10,8 +11,8 @@ class DirectionToRotationNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_DirectionToRotationNode"
     bl_label = "Direction to Rotation"
 
-    trackAxis = bpy.props.EnumProperty(items = trackAxisItems, update = propertyChanged, default = "Z")
-    upAxis = bpy.props.EnumProperty(items = upAxisItems, update = propertyChanged, default = "X")
+    trackAxis = EnumProperty(items = trackAxisItems, update = propertyChanged, default = "Z")
+    upAxis = EnumProperty(items = upAxisItems, update = propertyChanged, default = "X")
 
     def create(self):
         self.inputs.new("an_VectorSocket", "Direction", "direction")

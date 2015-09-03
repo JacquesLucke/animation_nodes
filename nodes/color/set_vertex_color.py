@@ -1,4 +1,5 @@
-import bpy, random
+import bpy
+from bpy.props import *
 from ... base_types.node import AnimationNode
 from ... events import propertyChanged
 
@@ -7,9 +8,9 @@ class SetVertexColorNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SetVertexColorNode"
     bl_label = "Set Vertex Color"
 
-    enabled = bpy.props.BoolProperty(default = True, update = propertyChanged)
-    vertexColorName = bpy.props.StringProperty(default = "Col", update = propertyChanged)
-    checkIfColorIsSet = bpy.props.BoolProperty(default = True)
+    enabled = BoolProperty(default = True, update = propertyChanged)
+    vertexColorName = StringProperty(default = "Col", update = propertyChanged)
+    checkIfColorIsSet = BoolProperty(default = True)
 
     def create(self):
         self.inputs.new("an_ObjectSocket", "Object", "object")

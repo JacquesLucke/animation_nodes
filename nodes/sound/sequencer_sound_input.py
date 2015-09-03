@@ -253,7 +253,7 @@ class LoadSound(bpy.types.Operator):
     nodeTreeName = StringProperty()
     nodeName = StringProperty()
 
-    filepath = bpy.props.StringProperty(subtype = "FILE_PATH")
+    filepath = StringProperty(subtype = "FILE_PATH")
 
     def invoke(self, context, event):
         context.window_manager.fileselect_add(self)

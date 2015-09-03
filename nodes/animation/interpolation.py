@@ -48,7 +48,7 @@ class InterpolationNode(bpy.types.Node, AnimationNode):
         name = "Cubic", default = "OUT",
         items = cubicCategoryItems, update = propertyChanged)
 
-    curveNodeName = bpy.props.StringProperty(default = "")
+    curveNodeName = StringProperty(default = "")
 
     def create(self):
         self.inputs.new("an_FloatSocket", "Back", "back").value = 1.70158
