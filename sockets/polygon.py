@@ -12,5 +12,5 @@ class PolygonSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getValue(self):
         return Polygon()
 
-    def getCopyStatement(self):
+    def getCopyExpression(self):
         return "value.copy()"

@@ -13,5 +13,5 @@ class MeshSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getValue(self):
         return bmesh.new()
 
-    def getCopyStatement(self):
+    def getCopyExpression(self):
         return "value.copy()"

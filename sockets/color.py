@@ -27,5 +27,5 @@ class ColorSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getProperty(self):
         return self.value
 
-    def getCopyStatement(self):
+    def getCopyExpression(self):
         return "value[:]"

@@ -16,5 +16,5 @@ class VertexSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             normal = Vector((0, 0, 1)),
             groupWeights = [])
 
-    def getCopyStatement(self):
+    def getCopyExpression(self):
         return "value.copy()"

@@ -11,5 +11,5 @@ class IntegerListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getValueCode(self):
         return "[]"
 
-    def getCopyStatement(self):
+    def getCopyExpression(self):
         return "value[:]"

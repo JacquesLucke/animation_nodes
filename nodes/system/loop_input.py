@@ -137,8 +137,8 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         if len(self.outputs) == 0: return data
 
         self.insertIteratorData(data)
-        self.insertParameterData(data)
         self.insertGeneratorData(data)
+        self.insertParameterData(data)
 
         return data
 

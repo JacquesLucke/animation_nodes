@@ -171,6 +171,7 @@ def getTargetsThatNeedACopy(socket, targets):
     else: return modifiedTargets[1:]
 
 def getCopyLine(fromSocket, targetName, variables):
-    copyStatement = fromSocket.getCopyStatement().replace("value", variables[fromSocket])
-    copyCode = "{} = {}".format(targetName, copyStatement)
-    return copyCode
+    return "{} = {}".format(targetName, getCopyExpression(fromSocket, variables))
+
+def getCopyExpression(socket, variables):
+    return socket.getCopyExpression().replace("value", variables[socket])

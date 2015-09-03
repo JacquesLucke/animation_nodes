@@ -3,7 +3,7 @@ from . compile_scripts import compileScript
 from .. problems import ExecutionUnitNotSetup
 from . code_generator import (getInitialVariables,
                               getSetupCode,
-                              getCopyLine,
+                              getCopyExpression,
                               getNodeExecutionLines,
                               linkOutputSocketsToTargets,
                               getLoadSocketValueLine)
@@ -165,20 +165,20 @@ class LoopExecutionUnit:
         lines = []
         for node in inputNode.getGeneratorNodes():
             operation = "append" if node.addType == "APPEND" else "extend"
-            socket = node.addSocket
             lines.append("if {}:".format(variables[node.enabledSocket]))
-            if socket.isUnlinked and socket.isCopyable:
-                lines.append("    " + getCopyLine(socket, variables[socket], variables))
-            lines.append("    {}.{}({})".format(variables[node], operation, variables[node.addSocket]))
+            socket = node.addSocket
+            if socket.isUnlinked and socket.isCopyable: expression = getCopyExpression(socket, variables)
+            else: expression = variables[socket]
+            lines.append("    {}.{}({})".format(variables[node], operation, expression))
         return lines
 
     def get_ReassignParameters(self, inputNode, variables):
         lines = []
         for node in inputNode.getReassignParameterNodes():
             socket = node.inputs[0]
-            if socket.isUnlinked and socket.isCopyable:
-                lines.append(getCopyLine(socket, variables[socket], variables))
-            lines.append("{} = {}".format(variables[node.linkedParameterSocket], variables[socket]))
+            if socket.isUnlinked and socket.isCopyable: expression = getCopyExpression(socket, variables)
+            else: expression = variables[socket]
+            lines.append("{} = {}".format(variables[node.linkedParameterSocket], expression))
         return lines
 
 
