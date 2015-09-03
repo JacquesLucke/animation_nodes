@@ -1,11 +1,17 @@
 import bpy
 from bpy.props import *
 from ... base_types.node import AnimationNode
-from ... sockets.info import getBaseDataTypeItems, toListIdName
+from ... sockets.info import getBaseDataTypeItems, toListIdName, getListDataTypes, toBaseDataType
 
 class CombineListsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CombineListsNode"
     bl_label = "Combine Lists"
+    onlySearchTags = True
+
+    @classmethod
+    def getSearchTags(cls):
+        return [("Combine " + dataType, {"assignedType" : repr(toBaseDataType(dataType))})
+                for dataType in getListDataTypes()]
 
     def assignedTypeChanged(self, context):
         self.listIdName = toListIdName(self.assignedType)

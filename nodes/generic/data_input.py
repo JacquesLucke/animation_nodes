@@ -6,6 +6,7 @@ from ... sockets.info import getDataTypeItems, toIdName, getDataTypes
 class DataInputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_DataInputNode"
     bl_label = "Data Input"
+    onlySearchTags = True
 
     @classmethod
     def getSearchTags(cls):

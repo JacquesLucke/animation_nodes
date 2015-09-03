@@ -2,11 +2,17 @@ import bpy
 from bpy.props import *
 from ... base_types.node import AnimationNode
 from ... utils.selection import getSortedSelectedObjectNames
-from ... sockets.info import getBaseDataTypeItems, toIdName, toListIdName
+from ... sockets.info import getBaseDataTypeItems, toIdName, toListIdName, getListDataTypes, toBaseDataType
 
 class CreateListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CreateListNode"
     bl_label = "Create List"
+    onlySearchTags = True
+
+    @classmethod
+    def getSearchTags(cls):
+        return [("Create " + dataType, {"assignedType" : repr(toBaseDataType(dataType))})
+                for dataType in getListDataTypes()]
 
     def assignedTypeChanged(self, context):
         baseDataType = self.assignedType
