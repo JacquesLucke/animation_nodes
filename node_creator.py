@@ -1,6 +1,6 @@
 import bpy
 
-class InsertNodesTemplate:
+class NodeCreator:
     def __init__(self, *args, **kwargs):
         self.nodes = []
         self.insert(*args, **kwargs)

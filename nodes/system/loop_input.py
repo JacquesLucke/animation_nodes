@@ -7,7 +7,7 @@ from ... utils.layout import splitAlignment
 from ... tree_info import getNodeByIdentifier
 from ... base_types.node import AnimationNode
 from . subprogram_sockets import SubprogramData
-from ... node_creator import InsertNodesTemplate
+from ... node_creator import NodeCreator
 from . subprogram_base import SubprogramBaseNode
 from . utils import updateSubprogramInvokerNodes
 from ... sockets.info import (toBaseIdName, toListDataType,
@@ -209,13 +209,13 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
 
 
 
-class GeneratorOutputTemplate(InsertNodesTemplate):
+class GeneratorOutputTemplate(NodeCreator):
     def insert(self, loopInputNode, dataType):
         node = self.newNode("an_LoopGeneratorOutputNode")
         node.loopInputIdentifier = loopInputNode.identifier
         node.listDataType = dataType
 
-class ReassignParameterTemplate(InsertNodesTemplate):
+class ReassignParameterTemplate(NodeCreator):
     def insert(self, loopParameterSocket):
         node = self.newNode("an_ReassignLoopParameterNode")
         node.loopInputIdentifier = loopParameterSocket.node.identifier

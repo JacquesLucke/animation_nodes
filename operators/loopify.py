@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from . an_operator import AnimationNodeOperator
 from .. sockets.info import isBase, toListDataType
-from .. node_creator import InsertNodesTemplate
+from .. node_creator import NodeCreator
 
 class LoopifySocketProperties(bpy.types.PropertyGroup):
     useList = BoolProperty(default = True)
@@ -36,7 +36,7 @@ class Loopify(bpy.types.Operator, AnimationNodeOperator):
         return bpy.context.active_node
 
 
-class LoopifyTemplate(InsertNodesTemplate):
+class LoopifyTemplate(NodeCreator):
     def insert(self, socketSettings):
         node = bpy.context.active_node
         replacedNode = node.nodeTree.nodes.new("an_InvokeSubprogramNode")
