@@ -59,7 +59,7 @@ def iterSingleNodeItems():
     for node in getAnimationNodeClasses():
         if not node.onlySearchTags:
             yield SingleNodeInsertionItem(node.bl_idname, node.bl_label)
-        for customSearch in node.searchTags:
+        for customSearch in node.getSearchTags():
             if isinstance(customSearch, tuple):
                 yield SingleNodeInsertionItem(node.bl_idname, customSearch[0], customSearch[1])
             else:

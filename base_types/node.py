@@ -82,6 +82,10 @@ class AnimationNode:
         layout.alignment = "LEFT" if socket.isInput else "RIGHT"
         layout.label(socket.name)
 
+    @classmethod
+    def getSearchTags(cls):
+        return cls.searchTags
+
 
     # Don't override these functions
     ######################################
