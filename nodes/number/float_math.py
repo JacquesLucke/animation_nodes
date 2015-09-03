@@ -82,7 +82,7 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
         elif op == "GREATHERTHAN": return "result = a > b"
         elif op == "ABSOLUTE": return "result = abs(a)"
         elif op == "MODULO": return ("if b == 0: result = 0",
-                                     "else: result = a  b")
+                                     "else: result = a % b")
         elif op == "FLOOR": return "result = math.floor(a)"
         elif op == "CEILING": return "result = math.ceil(a)"
 
