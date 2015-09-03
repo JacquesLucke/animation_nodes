@@ -176,8 +176,8 @@ class AnimationNodeSocket:
         node.socketRemoved()
 
     def linkWith(self, socket):
-        if self.isOutput: self.nodeTree.links.new(socket, self)
-        else: self.nodeTree.links.new(self, socket)
+        if self.isOutput: return self.nodeTree.links.new(socket, self)
+        else: return self.nodeTree.links.new(self, socket)
 
     def removeLinks(self):
         tree = self.nodeTree

@@ -9,6 +9,9 @@ class InsertNodesTemplate:
     def insert(self, *args, **kwargs):
         pass
 
+    def take(self, node):
+        self.nodes.append(node)
+
     def newNode(self, type, x = 0, y = 0):
         bpy.ops.node.add_and_link_node(type = type)
         node = self.nodeTree.nodes[-1]
