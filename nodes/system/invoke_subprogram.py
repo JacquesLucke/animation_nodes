@@ -9,10 +9,12 @@ from ... tree_info import getSubprogramNetworks, getNodeByIdentifier, getNetwork
 cacheTypeItems = [
     ("DISABLED", "Disabled", ""),
     ("ONE_TIME", "One Time", "Cache the result one time and output it always."),
-    ("FRAME_BASED", "Once per Frame", "")]
+    ("FRAME_BASED", "Once per Frame", ""),
+    ("INPUT_BASED", "Once per Input", "")]
 
 oneTimeCache = {}
 frameBasedCache = {}
+inputBasedCache = {}
 
 class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_InvokeSubprogramNode"
@@ -30,6 +32,7 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
 
     cacheType = EnumProperty(name = "Cache Type", items = cacheTypeItems, update = cacheTypeChanged)
     isOutputStorable = BoolProperty(default = False)
+    isInputHashable = BoolProperty(default = False)
 
     @property
     def inputVariables(self):
@@ -65,6 +68,9 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
         if self.cacheType == "FRAME_BASED":
             try: return True, frameBasedCache[self.identifier][str(bpy.context.scene.frame_current)]
             except: pass
+        if self.cacheType == "INPUT_BASED":
+            try: return True, inputBasedCache[self.subprogramIdentifier][self.getArgsHash(args)]
+            except: pass
 
         return False, None
 
@@ -73,6 +79,12 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
         elif self.cacheType == "FRAME_BASED":
             if self.identifier not in frameBasedCache: frameBasedCache[self.identifier] = {}
             frameBasedCache[self.identifier][str(bpy.context.scene.frame_current)] = data
+        elif self.cacheType == "INPUT_BASED":
+            if self.subprogramIdentifier not in inputBasedCache: inputBasedCache[self.subprogramIdentifier] = {}
+            inputBasedCache[self.subprogramIdentifier][self.getArgsHash(args)] = data
+
+    def getArgsHash(self, *args):
+        return tuple(hash(arg) for arg in args)
 
 
     def draw(self, layout):
@@ -97,7 +109,8 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
         if not self.canCache:
             col = layout.column(align = True)
             layout.label("This caching method is not available:")
-            layout.label("  - The output is not storable")
+            if not self.isOutputStorable: layout.label("  - The output is not storable")
+            if not self.isInputHashable: layout.label("  - The input is not hashable")
 
         self.invokeFunction(layout, "clearCache", text = "Clear Cache")
 
@@ -110,13 +123,14 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
         self.clearCache()
 
     def checkCachingPossibilities(self):
-        self.isOutputStorable = True
-        for socket in self.outputs:
-            if not socket.storable: self.isOutputStorable = False
+        self.isInputHashable = all(socket.hashable for socket in self.inputs)
+        self.isOutputStorable = all(socket.storable for socket in self.outputs)
+
 
     def clearCache(self):
         oneTimeCache.pop(self.identifier, None)
         frameBasedCache.pop(self.identifier, None)
+        inputBasedCache.pop(self.subprogramIdentifier, None)
 
 
     @property
@@ -132,6 +146,7 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
     def canCache(self):
         if self.cacheType == "DISABLED": return True
         if self.cacheType in ("ONE_TIME", "FRAME_BASED") and self.isOutputStorable: return True
+        if self.cacheType == "INPUT_BASED" and self.isInputHashable and self.isOutputStorable: return True
         return False
 
     def createNewGroup(self):
