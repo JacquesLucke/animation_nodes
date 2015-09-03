@@ -165,7 +165,10 @@ class LoopExecutionUnit:
         lines = []
         for node in inputNode.getGeneratorNodes():
             operation = "append" if node.addType == "APPEND" else "extend"
+            socket = node.addSocket
             lines.append("if {}:".format(variables[node.enabledSocket]))
+            if socket.isUnlinked and socket.isCopyable:
+                lines.append("    " + getCopyLine(socket, variables[socket], variables))
             lines.append("    {}.{}({})".format(variables[node], operation, variables[node.addSocket]))
         return lines
 
@@ -173,8 +176,9 @@ class LoopExecutionUnit:
         lines = []
         for node in inputNode.getReassignParameterNodes():
             socket = node.inputs[0]
-            if socket.isUnlinked and socket.isCopyable: lines.append(getCopyLine(socket, variables[node.linkedParameterSocket], variables))
-            else: lines.append("{} = {}".format(variables[node.linkedParameterSocket], variables[socket]))
+            if socket.isUnlinked and socket.isCopyable:
+                lines.append(getCopyLine(socket, variables[socket], variables))
+            lines.append("{} = {}".format(variables[node.linkedParameterSocket], variables[socket]))
         return lines
 
 
