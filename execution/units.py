@@ -9,6 +9,7 @@ from . loop_execution_unit import LoopExecutionUnit
 from . script_execution_unit import ScriptExecutionUnit
 from .. tree_info import getNetworksByType, getSubprogramNetworks
 from .. utils.timing import measureTime
+from .. utils.nodes import getAnimationNodeTrees
 
 _mainUnitsByNodeTree = defaultdict(list)
 _subprogramUnitsByIdentifier = {}
@@ -46,6 +47,7 @@ def createSubprogramUnits():
 
 def setupExecutionUnits():
     try:
+        if len(getAnimationNodeTrees()) == 0: return
         if not problems.canExecute(): return
 
         for unit in getExecutionUnits():

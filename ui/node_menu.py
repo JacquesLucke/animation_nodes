@@ -9,9 +9,7 @@ def drawMenu(self, context):
     layout = self.layout
     layout.operator_context = "INVOKE_DEFAULT"
 
-    drawNodeTreeChooser(layout, context)
-
-    layout.operator("an.insert_node", text = "Search", icon = "VIEWZOOM")
+    layout.operator("an.node_search", text = "Search", icon = "VIEWZOOM")
     layout.separator()
     layout.menu("an.number_menu", text = "Number")
     layout.menu("an.vector_menu", text = "Vector")
@@ -328,34 +326,6 @@ def insertNode(layout, type, text, settings = {}):
         item.name = name
         item.value = value
     return operator
-
-
-class CreateNodeTree(bpy.types.Operator):
-    bl_idname = "an.create_node_tree"
-    bl_label = "Create Node Tree"
-    bl_description = "Create a new Animation Node tree"
-    bl_options = {"REGISTER"}
-
-    def execute(self, context):
-        nodeTree = bpy.data.node_groups.new(name = "NodeTree", type = "an_AnimationNodeTree")
-        context.space_data.node_tree = nodeTree
-        context.area.tag_redraw()
-        return {"FINISHED"}
-
-
-class SelectNodeTree(bpy.types.Operator):
-    bl_idname = "an.select_node_tree"
-    bl_label = "Select Node Tree"
-    bl_description = "Select a Animation Node tree"
-    bl_options = {"REGISTER"}
-
-    nodeTreeName = StringProperty(default = "")
-
-    def execute(self, context):
-        nodeTree = bpy.data.node_groups.get(self.nodeTreeName)
-        context.space_data.node_tree = nodeTree
-        context.area.tag_redraw()
-        return {"FINISHED"}
 
 
 def registerMenu():
