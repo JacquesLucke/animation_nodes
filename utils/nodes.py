@@ -21,3 +21,7 @@ def getAnimationNodeTrees():
         if nodeTree.bl_idname == "an_AnimationNodeTree":
             nodeTrees.append(nodeTree)
     return nodeTrees
+
+def getAnimationNodeClasses():
+    from .. base_types.node import AnimationNode
+    return AnimationNode.__subclasses__()

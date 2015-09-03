@@ -7,7 +7,7 @@ def register():
     km = wm.keyconfigs.addon.keymaps.new(name = "Node Editor", space_type = "NODE_EDITOR")
 
     # Open the ctrl-A search menu
-    kmi = km.keymap_items.new("an.insert_node", type = "A", value = "PRESS", ctrl = True)
+    kmi = km.keymap_items.new("an.node_search", type = "A", value = "PRESS", ctrl = True)
 
     # Open the context sensitive pie menu
     kmi = km.keymap_items.new("wm.call_menu_pie", type = "W", value = "PRESS")

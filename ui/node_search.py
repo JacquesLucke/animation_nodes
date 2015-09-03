@@ -1,76 +1,89 @@
 import bpy
-from collections import defaultdict
-from .. base_types.node import AnimationNode
-from .. utils.nodes import getAnimationNodeTrees
+import itertools
+from bpy.props import *
+from .. utils.enum_items import enumItemsFromDicts
+from .. utils.nodes import getAnimationNodeClasses
+from .. node_creator import NodeCreator
 
-searchDict = {}
-importanceMap = defaultdict(int)
+itemsByIdentifier = {}
 
-def getItems(self, context):
-    def getSortKey(item):
-        key = str(10000 - importanceMap[item[0]]).zfill(5) + item[1]
-        return key
-    updateSearchDict()
+@enumItemsFromDicts
+def getSearchItems(self, context):
+    itemsByIdentifier.clear()
     items = []
-    for key in searchDict.keys():
-        items.append((key, key, ""))
-    items = sorted(items, key = getSortKey)
+    for item in itertools.chain(iterSingleNodeItems()):
+        itemsByIdentifier[item.identifier] = item
+        items.append({"id" : item.identifier, "name" : item.searchTag})
     return items
 
-class InsertNodeOperator(bpy.types.Operator):
-    bl_idname = "an.insert_node"
-    bl_label = "Find and Insert Node"
+class NodeSearch(bpy.types.Operator):
+    bl_idname = "an.node_search"
+    bl_label = "Node Search"
     bl_options = {"REGISTER"}
     bl_property = "item"
 
-    item = bpy.props.EnumProperty(items = getItems)
+    item = EnumProperty(items = getSearchItems)
+
+    @classmethod
+    def poll(cls, context):
+        try: return context.space_data.node_tree.bl_idname == "an_AnimationNodeTree"
+        except: return False
 
     def invoke(self, context, event):
-        if getNodeTree():
-            context.window_manager.invoke_search_popup(self)
-        else:
-            context.window_manager.popup_menu(drawNodeTreeChooser, title = "Select Node Tree")
+        context.window_manager.invoke_search_popup(self)
         return {"CANCELLED"}
 
     def execute(self, context):
-        nodeType, settings = searchDict[self.item]
-        bpy.ops.node.add_and_link_node("INVOKE_DEFAULT", type = nodeType, use_transform = True, settings = settings)
-        importanceMap[self.item] += 1
+        itemsByIdentifier[self.item].insert()
         return {"FINISHED"}
 
-def drawNodeTreeChooser(self, context):
-    layout = self.layout
-    nodeTrees = getAnimationNodeTrees()
-    if len(nodeTrees) == 0:
-        layout.operator("an.create_node_tree", text = "New Node Tree", icon = "PLUS")
-    else:
-        for nodeTree in nodeTrees:
-            props = layout.operator("an.select_node_tree", text = "Select '{}'".format(nodeTree.name), icon = "EYEDROPPER")
-            props.nodeTreeName = nodeTree.name
 
-def getNodeTree():
-    return getattr(bpy.context.space_data, "node_tree", None)
+class InsertItem:
+    @property
+    def identifier(self):
+        return ""
 
-def updateSearchDict():
-    global searchDict
-    searchDict = {}
+    @property
+    def searchTag(self):
+        return ""
 
-    for cls in getNodeClasses():
-        tags = []
-        if not cls.onlySearchTags: tags.append(cls.bl_label)
-        tags.extend(cls.searchTags)
-        # each tag contains either only a name or a name and a settings dictionary
-        for tag in tags:
-            if isinstance(tag, str):
-                searchDict[tag] = (cls.bl_idname, [])
+    def insert(self):
+        pass
+
+
+
+# Single Nodes
+#################################
+
+def iterSingleNodeItems():
+    for node in getAnimationNodeClasses():
+        if not node.onlySearchTags:
+            yield SingleNodeInsertionItem(node.bl_idname, node.bl_label)
+        for customSearch in node.searchTags:
+            if isinstance(customSearch, tuple):
+                yield SingleNodeInsertionItem(node.bl_idname, customSearch[0], customSearch[1])
             else:
-                searchDict[tag[0]] = (cls.bl_idname, createSettingsPropertyGroup(tag[1]))
+                yield SingleNodeInsertionItem(node.bl_idname, customSearch)
 
-def createSettingsPropertyGroup(easyDict):
-    settings = []
-    for key, value in easyDict.items():
-        settings.append({"name" : key, "value" : value})
-    return settings
+class SingleNodeInsertionItem:
+    def __init__(self, idName, tag, settings = {}):
+        self.idName = idName
+        self.tag = tag
+        self.settings = settings
 
-def getNodeClasses():
-    return AnimationNode.__subclasses__()
+    @property
+    def identifier(self):
+        return "single node - " + self.tag
+
+    @property
+    def searchTag(self):
+        return self.tag
+
+    def insert(self):
+        InsertSingleNode(self.idName, self.settings)
+
+class InsertSingleNode(NodeCreator):
+    def insert(self, idName, settings):
+        node = self.newNode(idName)
+        for key, value in settings.items():
+            setattr(node, key, eval(value))
