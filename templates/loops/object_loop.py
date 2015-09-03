@@ -7,6 +7,7 @@ class TransformsOutputLoop(NodeCreator):
         activeNode = self.activeNode
 
         loopNode = self.newNode("an_LoopInputNode")
+        loopNode.subprogramName = "Transforms Output"
         objectIteratorSocket = loopNode.newIterator("Object List")
         transformsOutputNode = self.newNode("an_ObjectTransformsOutputNode", x = 500)
         objectIteratorSocket.linkWith(transformsOutputNode.inputs["Object"])

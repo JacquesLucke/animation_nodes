@@ -112,7 +112,7 @@ class TemplateInsertionItem:
 
     @property
     def searchTag(self):
-        return self.tag
+        return self.tag + " - Template"
 
     def insert(self):
         self.template()
