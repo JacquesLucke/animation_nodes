@@ -8,8 +8,6 @@ listChains = [
     ["an_VectorSocket", "an_VectorListSocket"],
     ["an_ObjectSocket", "an_ObjectListSocket"],
     ["an_StringSocket", "an_StringListSocket"],
-    ["an_VertexSocket", "an_VertexListSocket"],
-    ["an_PolygonSocket", "an_PolygonListSocket"],
     ["an_EdgeIndicesSocket", "an_EdgeIndicesListSocket"],
     ["an_PolygonIndicesSocket", "an_PolygonIndicesListSocket"],
     ["an_ParticleSocket", "an_ParticleListSocket"],
