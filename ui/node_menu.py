@@ -204,11 +204,6 @@ class MeshMenu(bpy.types.Menu):
         insertNode(layout, "an_CreateBMeshFromMeshData", "Create from Data")
         insertNode(layout, "an_SetBMeshOnObjectNode", "Set on Object")
         layout.menu("an_mesh_finalizing_menu", text = "Tools")
-        layout.separator()
-        insertNode(layout, "an_VertexInfoNode", "Vertex Info")
-        insertNode(layout, "an_PolygonInfoNode", "Polygon Info")
-        insertNode(layout, "an_TransformVertexNode", "Transform Vertex")
-        insertNode(layout, "an_TransformPolygonNode", "Transform Polygon")
 
 class MeshOperatorsMenu(bpy.types.Menu):
     bl_idname = "an_mesh_operators_menu"
