@@ -95,7 +95,6 @@ class InsertSingleNode(NodeCreator):
 
 def iterTemplateItems():
     for template in getNodeTemplates():
-        print(template)
         yield TemplateInsertionItem(template, template.label)
 
 def getNodeTemplates():
