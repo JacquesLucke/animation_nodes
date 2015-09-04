@@ -202,8 +202,13 @@ class MeshMenu(bpy.types.Menu):
         layout.menu("an_mesh_operators_menu", text = "Operators")
         layout.separator()
         insertNode(layout, "an_CreateBMeshFromMeshData", "Create from Data")
-        insertNode(layout, "an_SetBMeshOnObjectNode", "Set on Object")
         layout.menu("an_mesh_finalizing_menu", text = "Tools")
+        layout.separator()
+        layout.label("Set On Object:")
+        insertNode(layout, "an_SetVerticesOnObjectNode", "  Vertex Locations")
+        insertNode(layout, "an_SetMeshDataOnObjectNode", "  Mesh Data")
+        insertNode(layout, "an_SetBMeshOnObjectNode", "  BMesh")
+
 
 class MeshOperatorsMenu(bpy.types.Menu):
     bl_idname = "an_mesh_operators_menu"
