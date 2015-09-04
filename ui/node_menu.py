@@ -199,7 +199,6 @@ class MeshMenu(bpy.types.Menu):
         layout = self.layout
         insertNode(layout, "an_SeparateMeshDataNode", "Separate")
         insertNode(layout, "an_CombineMeshDataNode", "Combine")
-        insertNode(layout, "an_AppendToMeshDataNode", "Append")
         layout.menu("an_mesh_operators_menu", text = "Operators")
         layout.separator()
         insertNode(layout, "an_CreateBMeshFromMeshData", "Create from Data")
