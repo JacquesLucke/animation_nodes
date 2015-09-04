@@ -13,23 +13,23 @@ def draw(self, context):
     col.prop(node, "bl_width_max", text = "Max Width")
     col.prop(node, "useAutoColor")
 
-    col = layout.column(align = True)
+    row = layout.row(align = True)
 
-    if len(node.inputs) > 0:
-        row = col.row()
-        rows = len(node.inputs)
-        row.template_list("an_SocketUiList", "", node, "inputs", node, "activeInputIndex", rows = rows, maxrows = rows)
-        subcol = row.column(align = True)
-        props = subcol.operator("an.move_input", text = "", icon = "TRIA_UP").moveUp = True
-        subcol.operator("an.move_input", text = "", icon = "TRIA_DOWN").moveUp = False
+    size = max(len(node.inputs), len(node.outputs))
 
-    if len(node.outputs) > 0:
-        row = col.row()
-        rows = len(node.outputs)
-        row.template_list("an_SocketUiList", "", node, "outputs", node, "activeOutputIndex", rows = rows, maxrows = rows)
-        subcol = row.column(align = True)
-        subcol.operator("an.move_output", text = "", icon = "TRIA_UP").moveUp = True
-        subcol.operator("an.move_output", text = "", icon = "TRIA_DOWN").moveUp = False
+    col = row.column()
+    subrow = col.row(align = True)
+    subrow.label("Inputs")
+    subrow.operator("an.move_input", text = "", icon = "TRIA_UP").moveUp = True
+    subrow.operator("an.move_input", text = "", icon = "TRIA_DOWN").moveUp = False
+    col.template_list("an_SocketUiList", "", node, "inputs", node, "activeInputIndex", rows = size, maxrows = size)
+
+    col = row.column()
+    subrow = col.row(align = True)
+    subrow.label("Outputs")
+    subrow.operator("an.move_output", text = "", icon = "TRIA_UP").moveUp = True
+    subrow.operator("an.move_output", text = "", icon = "TRIA_DOWN").moveUp = False
+    col.template_list("an_SocketUiList", "", node, "outputs", node, "activeOutputIndex", rows = size, maxrows = size)
 
 
     col = layout.column(align = True)
