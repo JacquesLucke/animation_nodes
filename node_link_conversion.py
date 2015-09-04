@@ -75,7 +75,7 @@ class ConvertMeshDataToMesh(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType == "Mesh Data" and target.dataType == "Mesh"
     def insert(self, nodeTree, origin, target, dataOrigin):
-        insertLinkedNode(nodeTree, "an_CreateMeshFromDataNode", origin, target)
+        insertLinkedNode(nodeTree, "an_CreateBMeshFromMeshData", origin, target)
 
 class ConvertMeshDataToVertexLocations(LinkCorrection):
     def check(self, origin, target):
@@ -100,7 +100,7 @@ class ConvertSeparatedMathDataToMesh(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType in self.separatedMeshDataTypes and target.dataType == "Mesh"
     def insert(self, nodeTree, origin, target, dataOrigin):
-        toMeshData, toMesh = insertNodes(nodeTree, ["an_CombineMeshDataNode", "an_CreateMeshFromDataNode"], origin, target)
+        toMeshData, toMesh = insertNodes(nodeTree, ["an_CombineMeshDataNode", "an_CreateBMeshFromMeshData"], origin, target)
         nodeTree.links.new(toMeshData.inputs[self.separatedMeshDataTypes.index(origin.dataType)], origin)
         nodeTree.links.new(toMesh.inputs[0], toMeshData.outputs[0])
         nodeTree.links.new(toMesh.outputs[0], target)

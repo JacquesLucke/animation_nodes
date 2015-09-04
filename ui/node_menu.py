@@ -202,8 +202,8 @@ class MeshMenu(bpy.types.Menu):
         insertNode(layout, "an_AppendToMeshDataNode", "Append")
         layout.menu("an_mesh_operators_menu", text = "Operators")
         layout.separator()
-        insertNode(layout, "an_CreateMeshFromDataNode", "Create from Data")
-        insertNode(layout, "an_SetMeshOnObjectNode", "Set on Object")
+        insertNode(layout, "an_CreateBMeshFromMeshData", "Create from Data")
+        insertNode(layout, "an_SetBMeshOnObjectNode", "Set on Object")
         layout.menu("an_mesh_finalizing_menu", text = "Tools")
         layout.separator()
         insertNode(layout, "an_VertexInfoNode", "Vertex Info")
@@ -226,8 +226,8 @@ class MeshFinalizingMenu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        insertNode(layout, "an_MeshRemoveDoublesNode", "Remove Doubles")
-        insertNode(layout, "an_MeshRecalculateFaceNormalsNode", "Recalculate Normals")
+        insertNode(layout, "an_BMeshRemoveDoublesNode", "Remove Doubles")
+        insertNode(layout, "an_BMeshRecalculateFaceNormalsNode", "Recalculate Normals")
         insertNode(layout, "an_MakeObjectSmoothNode", "Smooth Object")
 
 class SplineMenu(bpy.types.Menu):
