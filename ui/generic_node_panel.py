@@ -14,22 +14,51 @@ def draw(self, context):
     col.prop(node, "useAutoColor")
 
     col = layout.column(align = True)
-
+    row = col.row(align = True)
+    
     if len(node.inputs) > 0:
-        row = col.row()
-        rows = len(node.inputs)
-        row.template_list("an_SocketUiList", "", node, "inputs", node, "activeInputIndex", rows = rows, maxrows = rows)
         subcol = row.column(align = True)
-        props = subcol.operator("an.move_input", text = "", icon = "TRIA_UP").moveUp = True
-        subcol.operator("an.move_input", text = "", icon = "TRIA_DOWN").moveUp = False
+        
+        subrow = subcol.row(align = True)
+        subrow.label("Inputs")
+        subrow.operator("an.move_input", text = "", icon = "TRIA_UP").moveUp = True
+        subrow.operator("an.move_input", text = "", icon = "TRIA_DOWN").moveUp = False
+        
+        subrow = subcol.row(align = True)
+        rows = len(node.inputs)
+        subrow.template_list("an_SocketUiList", "", node, "inputs", node, "activeInputIndex", rows = rows, maxrows = rows)
+        
+        if hasattr(node, "newInputSocket"):
+            subrow = subcol.row()
+            node.invokeFunction(subrow, "newInputSocket", text = "New Input",
+                description = "Create a new input socket", icon = "PLUS")
+        elif hasattr(node, "newInput"):
+            subrow = subcol.row()
+            node.invokeSocketTypeChooser(subrow, "newInput", text = "New Input",
+                description = "Create a new input socket", icon = "PLUS")
 
     if len(node.outputs) > 0:
-        row = col.row()
-        rows = len(node.outputs)
-        row.template_list("an_SocketUiList", "", node, "outputs", node, "activeOutputIndex", rows = rows, maxrows = rows)
         subcol = row.column(align = True)
-        subcol.operator("an.move_output", text = "", icon = "TRIA_UP").moveUp = True
-        subcol.operator("an.move_output", text = "", icon = "TRIA_DOWN").moveUp = False
+        
+        subrow = subcol.row(align = True)
+        subrow.label("Outputs")
+        props = subrow.operator("an.move_output", text = "", icon = "TRIA_UP").moveUp = True
+        subrow.operator("an.move_output", text = "", icon = "TRIA_DOWN").moveUp = False
+        
+        subrow = subcol.row(align = True)
+        rows = len(node.outputs)
+        subrow.template_list("an_SocketUiList", "", node, "outputs", node, "activeOutputIndex", rows = rows, maxrows = rows)
+        
+        if hasattr(node, "newOutputSocket"):
+            subrow = subcol.row(align = True)
+            node.invokeFunction(subrow, "newOutputSocket",
+                text = "New Output",
+                description = "Create a new output socket",
+                icon = "PLUS")
+        elif hasattr(node, "newOutput"):
+            subrow = subcol.row()
+            node.invokeSocketTypeChooser(subrow, "newOutput", text = "New Input",
+                description = "Create a new output socket", icon = "PLUS")
 
 
     col = layout.column(align = True)
