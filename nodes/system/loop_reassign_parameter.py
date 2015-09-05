@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... base_types.node import AnimationNode
-from ... tree_info import getNodeByIdentifier
+from ... tree_info import getNodeByIdentifier, keepNodeLinks
 
 class ReassignLoopParameterNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ReassignLoopParameterNode"
@@ -28,6 +28,15 @@ class ReassignLoopParameterNode(bpy.types.Node, AnimationNode):
         else:
             layout.label("Target does not exist", icon = "ERROR")
 
+    def edit(self):
+        network = self.network
+        if network.type != "Invalid": return
+        if network.loopInAmount != 1: return
+        loopInput = network.loopInputNode
+        if self.loopInputIdentifier == loopInput.identifier: return
+        self.loopInputIdentifier = loopInput.identifier
+
+    @keepNodeLinks
     def generateSocket(self):
         self.inputs.clear()
         socket = self.inputs.new(self.parameterIdName, "New Value", "newValue")
