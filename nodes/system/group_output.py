@@ -11,6 +11,7 @@ class GroupOutputNode(bpy.types.Node, AnimationNode):
     bl_label = "Group Output"
 
     def inputNodeIdentifierChanged(self, context):
+        updateSubprogramInvokerNodes()
         treeChanged()
 
     groupInputIdentifier = StringProperty(update = inputNodeIdentifierChanged)
@@ -39,6 +40,8 @@ class GroupOutputNode(bpy.types.Node, AnimationNode):
         self.invokeSocketTypeChooser(right, "newReturn", icon = "ZOOMIN", emboss = False)
 
     def edit(self):
+        self.changeInputIdentifierIfNecessary()
+
         dataOrigin = self.newReturnSocket.dataOrigin
         directOrigin = self.newReturnSocket.directOrigin
 
@@ -47,6 +50,14 @@ class GroupOutputNode(bpy.types.Node, AnimationNode):
         socket = self.newReturn(dataOrigin.dataType, dataOrigin.getDisplayedName())
         socket.linkWith(directOrigin)
         self.newReturnSocket.removeLinks()
+
+    def changeInputIdentifierIfNecessary(self):
+        network = self.network
+        if network.type != "Invalid": return
+        if network.groupInAmount != 1: return
+        inputNode = network.groupInputNode
+        if self.groupInputIdentifier == inputNode.identifier: return
+        self.groupInputIdentifier = inputNode.identifier
 
     def newReturn(self, dataType, name = None):
         if name is None: name = dataType
