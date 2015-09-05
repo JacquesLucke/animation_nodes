@@ -205,7 +205,7 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         return nodes
 
     def getReassignParameterNodes(self):
-        return [node for node in self.network.updateParameterNodes if node.linkedParameterSocket]
+        return [node for node in self.network.reassignParameterNodes if node.linkedParameterSocket]
 
 
 
