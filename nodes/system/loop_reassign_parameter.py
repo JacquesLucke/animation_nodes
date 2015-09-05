@@ -6,6 +6,7 @@ from ... tree_info import getNodeByIdentifier
 class ReassignLoopParameterNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ReassignLoopParameterNode"
     bl_label = "Reassign Loop Parameter"
+    onlySearchTags = True
 
     def identifierChanged(self, context):
         socket = self.linkedParameterSocket
