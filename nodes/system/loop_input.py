@@ -160,7 +160,6 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
 
     def insertGeneratorData(self, data):
         for node in self.getGeneratorNodes():
-            if node.removed: continue
             data.newOutput(toIdName(node.listDataType), node.identifier, node.outputName)
 
 

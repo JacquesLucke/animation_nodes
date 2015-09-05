@@ -32,7 +32,6 @@ class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
 
     outputName = StringProperty(name = "Generator Name", update = nameChanged)
     loopInputIdentifier = StringProperty(update = loopInputIdentifierChanged)
-    removed = BoolProperty(default = False)
     sortIndex = IntProperty(default = 0)
 
     def create(self):
@@ -73,7 +72,6 @@ class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
         socket.defaultDrawType = "TEXT_ONLY"
 
     def delete(self):
-        self.removed = True
         subprogramInterfaceChanged()
 
     def duplicate(self, source):
