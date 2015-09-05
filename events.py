@@ -23,8 +23,8 @@ class EventState:
         if self.addonChanged: events.add("Addon")
         if self.sceneChanged: events.add("Scene")
         if self.frameChanged: events.add("Frame")
-        if self.propertyChanged: events.add("Property")
         if self.isRendering: events.add("Render")
+        if self.propertyChanged: events.add("Property")
         return events
 
 event = EventState()
