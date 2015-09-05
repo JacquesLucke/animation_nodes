@@ -5,7 +5,9 @@ from . utils.nodes import iterAnimationNodes, getAnimationNodeTrees
 from . execution.units import createExecutionUnits
 from . node_link_conversion import correctForbiddenNodeLinks
 from . nodes.system import utils as subprograms
+from . utils.timing import measureTime
 
+@measureTime
 def updateEverything():
     '''
     Call when the node tree changed in a way that the execution code does

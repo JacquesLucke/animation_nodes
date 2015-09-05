@@ -8,13 +8,11 @@ from . group_execution_unit import GroupExecutionUnit
 from . loop_execution_unit import LoopExecutionUnit
 from . script_execution_unit import ScriptExecutionUnit
 from .. tree_info import getNetworksByType, getSubprogramNetworks
-from .. utils.timing import measureTime
 from .. utils.nodes import getAnimationNodeTrees
 
 _mainUnitsByNodeTree = defaultdict(list)
 _subprogramUnitsByIdentifier = {}
 
-@measureTime
 def createExecutionUnits():
     reset()
     try:
