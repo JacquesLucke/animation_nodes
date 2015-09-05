@@ -1,3 +1,4 @@
+import re
 import bpy
 from bpy.props import *
 from ... sockets.info import toIdName
@@ -66,6 +67,14 @@ class GroupInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     def delete(self):
         self.outputs.clear()
         updateSubprogramInvokerNodes()
+
+    def duplicate(self, sourceNode):
+        oldName = self.subprogramName
+        match = re.search("(.*) ([0-9]+)$", oldName)
+        if match:
+            self.subprogramName = match.group(1) + " " + str(int(match.group(2)) + 1)
+        else:
+            self.subprogramName = oldName + " 2"
 
     def getSocketData(self):
         data = SubprogramData()
