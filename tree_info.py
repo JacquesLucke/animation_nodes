@@ -168,37 +168,32 @@ class NodeNetwork:
     def analyse(self):
         self.findSystemNodes()
 
-        groupInAmount = len(self.groupInputIDs)
-        groupOutAmount = len(self.groupOutputIDs)
-        loopInAmount = len(self.loopInputIDs)
-        generatorAmount = len(self.generatorOutputIDs)
-        reassignParameterAmount = len(self.reassignParameterIDs)
-        scriptAmount = len(self.scriptIDs)
 
-        groupNodeAmount = groupInAmount + groupOutAmount
-        loopNodeAmount = loopInAmount + generatorAmount + reassignParameterAmount
+
+        groupNodeAmount = self.groupInAmount + self.groupOutAmount
+        loopNodeAmount = self.loopInAmount + self.generatorAmount + self.reassignParameterAmount
 
         self.type = "Invalid"
 
-        if groupNodeAmount + loopNodeAmount + scriptAmount == 0:
+        if groupNodeAmount + loopNodeAmount + self.scriptAmount == 0:
             self.type = "Main"
-        elif scriptAmount == 1:
+        elif self.scriptAmount == 1:
             self.type = "Script"
         elif loopNodeAmount == 0:
-            if groupInAmount == 0 and groupOutAmount == 1:
+            if self.groupInAmount == 0 and self.groupOutAmount == 1:
                 self.identifier = self.groupOutputNode.groupInputIdentifier
-            elif groupInAmount == 1 and groupOutAmount == 0:
+            elif self.groupInAmount == 1 and self.groupOutAmount == 0:
                 self.type = "Group"
-            elif groupInAmount == 1 and groupOutAmount == 1:
+            elif self.groupInAmount == 1 and self.groupOutAmount == 1:
                 if idToNode(self.groupInputIDs[0]).identifier == idToNode(self.groupOutputIDs[0]).groupInputIdentifier:
                     self.type = "Group"
         elif groupNodeAmount == 0:
             possibleIdentifiers = list({idToNode(nodeID).loopInputIdentifier for nodeID in self.generatorOutputIDs + self.reassignParameterIDs})
-            if loopInAmount == 0 and len(possibleIdentifiers) == 1:
+            if self.loopInAmount == 0 and len(possibleIdentifiers) == 1:
                 self.identifier = possibleIdentifiers[0]
-            elif loopInAmount == 1 and len(possibleIdentifiers) == 0:
+            elif self.loopInAmount == 1 and len(possibleIdentifiers) == 0:
                 self.type = "Loop"
-            elif loopInAmount == 1 and len(possibleIdentifiers) == 1:
+            elif self.loopInAmount == 1 and len(possibleIdentifiers) == 1:
                 if idToNode(loopInputs[0]).identifier == possibleIdentifiers[0]:
                     self.type = "Loop"
 
@@ -242,6 +237,13 @@ class NodeNetwork:
                 self.scriptIDs.append(nodeID)
             elif idName == "an_InvokeSubprogramNode":
                 self.invokeSubprogramIDs.append(nodeID)
+
+        self.groupInAmount = len(self.groupInputIDs)
+        self.groupOutAmount = len(self.groupOutputIDs)
+        self.loopInAmount = len(self.loopInputIDs)
+        self.generatorAmount = len(self.generatorOutputIDs)
+        self.reassignParameterAmount = len(self.reassignParameterIDs)
+        self.scriptAmount = len(self.scriptIDs)
 
     def getInvokedSubprogramIdentifiers(self):
         return list({idToNode(nodeID).subprogramIdentifier for nodeID in self.invokeSubprogramIDs})
