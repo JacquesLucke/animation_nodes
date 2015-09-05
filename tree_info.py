@@ -194,7 +194,7 @@ class NodeNetwork:
             elif self.loopInAmount == 1 and len(possibleIdentifiers) == 0:
                 self.type = "Loop"
             elif self.loopInAmount == 1 and len(possibleIdentifiers) == 1:
-                if idToNode(loopInputs[0]).identifier == possibleIdentifiers[0]:
+                if idToNode(self.loopInputIDs[0]).identifier == possibleIdentifiers[0]:
                     self.type = "Loop"
 
         if self.type == "Script": owner = self.scriptNode
