@@ -1,3 +1,4 @@
+import re
 import bpy
 from bpy.props import *
 from operator import attrgetter
@@ -130,6 +131,11 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     def delete(self):
         self.outputs.clear()
         subprogramInterfaceChanged()
+
+    def duplicate(self, sourceNode):
+        match = re.search("(.*) ([0-9]+)$", self.subprogramName)
+        if match: self.subprogramName = match.group(1) + " " + str(int(match.group(2)) + 1)
+        else: self.subprogramName += " 2"
 
 
     def getSocketData(self):

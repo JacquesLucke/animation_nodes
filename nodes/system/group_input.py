@@ -69,12 +69,9 @@ class GroupInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         subprogramInterfaceChanged()
 
     def duplicate(self, sourceNode):
-        oldName = self.subprogramName
-        match = re.search("(.*) ([0-9]+)$", oldName)
-        if match:
-            self.subprogramName = match.group(1) + " " + str(int(match.group(2)) + 1)
-        else:
-            self.subprogramName = oldName + " 2"
+        match = re.search("(.*) ([0-9]+)$", self.subprogramName)
+        if match: self.subprogramName = match.group(1) + " " + str(int(match.group(2)) + 1)
+        else: self.subprogramName += " 2"
 
     def getSocketData(self):
         data = SubprogramData()
