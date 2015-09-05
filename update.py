@@ -4,6 +4,7 @@ from . ui import node_colors
 from . utils.nodes import iterAnimationNodes, getAnimationNodeTrees
 from . execution.units import createExecutionUnits
 from . node_link_conversion import correctForbiddenNodeLinks
+from . nodes.system import utils as subprograms
 
 def updateEverything():
     '''
@@ -14,6 +15,7 @@ def updateEverything():
     enableUseFakeUser()
     callNodeEditFunctions()
     correctForbiddenNodeLinks()
+    subprograms.updateIfNecessary()
     checkNetworks()
     createExecutionUnits()
 

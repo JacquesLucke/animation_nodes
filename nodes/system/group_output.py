@@ -4,14 +4,14 @@ from ... events import treeChanged
 from ... sockets.info import toIdName
 from ... utils.layout import splitAlignment
 from ... base_types.node import AnimationNode
-from . utils import updateSubprogramInvokerNodes
+from . utils import subprogramInterfaceChanged
 
 class GroupOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GroupOutputNode"
     bl_label = "Group Output"
 
     def inputNodeIdentifierChanged(self, context):
-        updateSubprogramInvokerNodes()
+        subprogramInterfaceChanged()
         treeChanged()
 
     groupInputIdentifier = StringProperty(update = inputNodeIdentifierChanged)
@@ -80,11 +80,11 @@ class GroupOutputNode(bpy.types.Node, AnimationNode):
         bpy.ops.node.translate_attach("INVOKE_DEFAULT")
 
     def socketChanged(self):
-        updateSubprogramInvokerNodes()
+        subprogramInterfaceChanged()
 
     def delete(self):
         self.inputs.clear()
-        updateSubprogramInvokerNodes()
+        subprogramInterfaceChanged()
 
     def useGroupInputInNetwork(self):
         network = self.network

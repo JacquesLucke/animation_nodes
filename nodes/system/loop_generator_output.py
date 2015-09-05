@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... events import treeChanged
-from . utils import updateSubprogramInvokerNodes
+from . utils import subprogramInterfaceChanged
 from ... base_types.node import AnimationNode
 from ... sockets.info import toIdName, toBaseDataType
 from ... tree_info import keepNodeLinks, getNodeByIdentifier
@@ -15,15 +15,16 @@ class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
     bl_label = "Loop Generator Output"
 
     def dataTypeChanged(self, context):
+        self.outputName = self.listDataType
         self.generateSockets()
-        updateSubprogramInvokerNodes()
+        subprogramInterfaceChanged()
 
     def nameChanged(self, context):
         self.label = self.outputName
-        updateSubprogramInvokerNodes()
+        subprogramInterfaceChanged()
 
     def loopInputIdentifierChanged(self, context):
-        updateSubprogramInvokerNodes()
+        subprogramInterfaceChanged()
         treeChanged()
 
     listDataType = StringProperty(update = dataTypeChanged)
@@ -36,7 +37,6 @@ class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.listDataType = "Vector List"
-        self.outputName = "# Name #"
         self.sortIndex = id(self)
 
     def draw(self, layout):
@@ -47,6 +47,14 @@ class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "outputName", text = "Name")
         layout.prop(self, "addType")
         self.invokeSocketTypeChooser(layout, "setListDataType", socketGroup = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
+
+    def edit(self):
+        network = self.network
+        if network.type != "Invalid": return
+        if network.loopInAmount != 1: return
+        loopInput = network.loopInputNode
+        if self.loopInputIdentifier == loopInput.identifier: return
+        self.loopInputIdentifier = loopInput.identifier
 
     def setListDataType(self, dataType):
         self.listDataType = dataType
@@ -66,10 +74,10 @@ class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
 
     def delete(self):
         self.removed = True
-        updateSubprogramInvokerNodes()
+        subprogramInterfaceChanged()
 
     def duplicate(self, source):
-        updateSubprogramInvokerNodes()
+        subprogramInterfaceChanged()
 
     @property
     def loopInputNode(self):

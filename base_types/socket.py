@@ -5,7 +5,7 @@ from .. utils.recursion import noRecursion
 from .. events import treeChanged, executionCodeChanged
 from .. utils.names import getRandomString, toVariableName
 from .. operators.dynamic_operators import getInvokeFunctionOperator
-from .. nodes.system.utils import updateSubprogramInvokerNodes
+from .. nodes.system.utils import subprogramInterfaceChanged
 
 class SocketTextProperties(bpy.types.PropertyGroup):
     bl_idname = "an_SocketTextProperties"
@@ -24,7 +24,7 @@ class SocketLoopProperties(bpy.types.PropertyGroup):
     bl_idname = "an_SocketLoopProperties"
 
     def socketLoopPropertyChanged(self, context):
-        updateSubprogramInvokerNodes()
+        subprogramInterfaceChanged()
         executionCodeChanged()
 
     useAsInput = BoolProperty(default = False, update = socketLoopPropertyChanged)

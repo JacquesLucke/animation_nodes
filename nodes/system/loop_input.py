@@ -9,7 +9,7 @@ from ... base_types.node import AnimationNode
 from . subprogram_sockets import SubprogramData
 from ... node_creator import NodeCreator
 from . subprogram_base import SubprogramBaseNode
-from . utils import updateSubprogramInvokerNodes
+from . utils import subprogramInterfaceChanged
 from ... sockets.info import (toBaseIdName, toListDataType,
                         toIdName, isBase, toListIdName, toBaseDataType)
 
@@ -125,11 +125,11 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
 
 
     def socketChanged(self):
-        updateSubprogramInvokerNodes()
+        subprogramInterfaceChanged()
 
     def delete(self):
         self.outputs.clear()
-        updateSubprogramInvokerNodes()
+        subprogramInterfaceChanged()
 
 
     def getSocketData(self):
@@ -166,11 +166,11 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
 
     def createGeneratorOutputNode(self, dataType):
         GeneratorOutputTemplate(self, dataType)
-        updateSubprogramInvokerNodes()
+        subprogramInterfaceChanged()
 
     def createReassignParameterNode(self, socketIdentifier):
         ReassignParameterTemplate(self.outputsByIdentifier[socketIdentifier])
-        updateSubprogramInvokerNodes()
+        subprogramInterfaceChanged()
 
 
     @property

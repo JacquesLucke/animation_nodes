@@ -6,7 +6,7 @@ from ... events import networkChanged
 from ... utils.layout import splitAlignment
 from ... base_types.node import AnimationNode
 from . subprogram_sockets import SubprogramData
-from . utils import updateSubprogramInvokerNodes
+from . utils import subprogramInterfaceChanged
 from . subprogram_base import SubprogramBaseNode
 
 class GroupInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
@@ -62,11 +62,11 @@ class GroupInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         return socket
 
     def socketChanged(self):
-        updateSubprogramInvokerNodes()
+        subprogramInterfaceChanged()
 
     def delete(self):
         self.outputs.clear()
-        updateSubprogramInvokerNodes()
+        subprogramInterfaceChanged()
 
     def duplicate(self, sourceNode):
         oldName = self.subprogramName

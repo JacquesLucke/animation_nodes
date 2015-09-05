@@ -1,8 +1,21 @@
 from ... import tree_info
-from ... events import executionCodeChanged
 
-def updateSubprogramInvokerNodes():
-    tree_info.update()
+def _updateSubprogramInvokerNodes():
+    tree_info.updateIfNecessary()
     for node in tree_info.getNodesByType("an_InvokeSubprogramNode"):
         node.updateSockets()
-    executionCodeChanged()
+    tree_info.updateIfNecessary()
+
+
+subprogramChanged = False
+
+def updateIfNecessary():
+    global subprogramChanged
+    if subprogramChanged: _updateSubprogramInvokerNodes()
+    subprogramChanged = False
+
+def subprogramInterfaceChanged():
+    from ... events import treeChanged
+    global subprogramChanged
+    subprogramChanged = True
+    treeChanged()

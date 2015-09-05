@@ -5,7 +5,7 @@ from ... utils.names import toInterfaceName
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 from . subprogram_sockets import SubprogramData
-from . utils import updateSubprogramInvokerNodes
+from . utils import subprogramInterfaceChanged
 from . subprogram_base import SubprogramBaseNode
 
 class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
@@ -96,12 +96,12 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         socket.text = socket.dataType
 
     def socketChanged(self):
-        updateSubprogramInvokerNodes()
+        subprogramInterfaceChanged()
 
     def delete(self):
         self.inputs.clear()
         self.outputs.clear()
-        updateSubprogramInvokerNodes()
+        subprogramInterfaceChanged()
 
     def getSocketData(self):
         data = SubprogramData()
