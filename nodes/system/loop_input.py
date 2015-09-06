@@ -110,7 +110,7 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         socket = self.outputs.new(toIdName(dataType), name, "parameter_" + getRandomString(5))
         if defaultValue: socket.setProperty(defaultValue)
         socket.moveTo(self.newParameterSocket.index)
-        socket.loop.copyAlways = True
+        socket.loop.copyAlways = False
         self.setupSocket(socket, name, moveGroup = 2)
         return socket
 
