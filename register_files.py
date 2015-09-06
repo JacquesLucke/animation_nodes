@@ -11,7 +11,6 @@ from . operators import dynamic_operators
 from . base_types import node as node_base
 from . base_types import socket as socket_base
 from . ui.node_menu import registerMenu, unregisterMenu
-from . nodes.sound import sequencer_sound_input as sequencer_sound
 
 def registerFiles():
     socket_base.register()
@@ -21,7 +20,6 @@ def registerFiles():
     node_base.registerHandlers()
     selection.registerHandlers()
     generic_node_panel.register()
-    sequencer_sound.registerHandlers()
     dynamic_operators.registerHandlers()
     auto_nodetree_selection.registerHandlers()
 
@@ -36,7 +34,6 @@ def unregisterFiles():
     node_base.unregisterHandlers()
     selection.unregisterHandlers()
     generic_node_panel.unregister()
-    sequencer_sound.unregisterHandlers()
     dynamic_operators.unregisterHandlers()
     auto_nodetree_selection.unregisterHandlers()
 

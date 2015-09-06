@@ -23,7 +23,6 @@ def drawMenu(self, context):
     layout.menu("an_mesh_menu", text = "Mesh")
     layout.menu("an_spline_menu", text = "Spline")
     layout.separator()
-    layout.menu("an_sound_menu", text = "Sound")
     layout.menu("an_material_menu", text = "Material")
     layout.menu("an_animation_menu", text = "Animation")
     layout.menu("an_particles_menu", text = "Particles")
@@ -253,14 +252,6 @@ class SplineMenu(bpy.types.Menu):
         layout.separator()
         insertNode(layout, "an_LoftSplinesNode", "Loft")
         insertNode(layout, "an_RevolveSplineNode", "Revolve")
-
-class SoundMenu(bpy.types.Menu):
-    bl_idname = "an_sound_menu"
-    bl_label = "Sound Menu"
-
-    def draw(self, context):
-        layout = self.layout
-        insertNode(layout, "an_SequencerSoundInputNode", "Sequencer Sound Input")
 
 class MaterialMenu(bpy.types.Menu):
     bl_idname = "an_material_menu"
