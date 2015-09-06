@@ -2,9 +2,9 @@ import bpy
 from ... base_types.node import AnimationNode
 
 
-class ParticlesInfoNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_ParticlesInfoNode"
-    bl_label = "Particles Info"
+class ParticleListInfoNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_ParticleListInfoNode"
+    bl_label = "Particle List Info"
 
     def create(self):
         self.inputs.new("an_ParticleListSocket", "Particles", "particles")
