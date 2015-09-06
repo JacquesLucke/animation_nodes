@@ -12,20 +12,15 @@ class SliceListNode(bpy.types.Node, AnimationNode):
         self.listIdName = toListIdName(self.assignedType)
         self.generateSockets()
 
-    selectedType = EnumProperty(name = "Type", items = getBaseDataTypeItems)
     assignedType = StringProperty(update = assignedTypeChanged)
     listIdName = StringProperty()
 
     def create(self):
         self.assignedType = "Float"
-        self.selectedType = "Float"
 
     def drawAdvanced(self, layout):
-        col = layout.column(align = True)
-        col.prop(self, "selectedType", text = "")
-        self.invokeFunction(col, "assignSelectedListType",
-            text = "Assign",
-            description = "Remove all sockets and set the selected socket type")
+        self.invokeSocketTypeChooser(layout, "assignListDataType",
+            socketGroup = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
 
     def getExecutionCode(self):
         return "slicedList = list[start:end:step]"
@@ -42,8 +37,8 @@ class SliceListNode(bpy.types.Node, AnimationNode):
         if len(listOutputs) == 1: return toBaseDataType(listOutputs[0].bl_idname)
         return toBaseDataType(self.inputs["List"].bl_idname)
 
-    def assignSelectedListType(self):
-        self.assignedType = self.selectedType
+    def assignListDataType(self, listDataType):
+        self.assignType(toBaseDataType(listDataType))
 
     def assignType(self, baseDataType):
         if not isBase(baseDataType): return

@@ -20,7 +20,6 @@ class CreateListNode(bpy.types.Node, AnimationNode):
         self.listIdName = toListIdName(self.baseIdName)
         self.recreateSockets()
 
-    selectedType = EnumProperty(name = "Type", items = getBaseDataTypeItems)
     assignedType = StringProperty(update = assignedTypeChanged)
     baseIdName = StringProperty()
     listIdName = StringProperty()
@@ -32,7 +31,6 @@ class CreateListNode(bpy.types.Node, AnimationNode):
     hideInputs = BoolProperty(name = "Hide Inputs", default = False, update = hideStatusChanged)
 
     def create(self):
-        self.selectedType = "Float"
         self.assignedType = "Float"
 
     def draw(self, layout):
@@ -42,11 +40,8 @@ class CreateListNode(bpy.types.Node, AnimationNode):
             icon = "PLUS")
 
     def drawAdvanced(self, layout):
-        col = layout.column(align = True)
-        col.prop(self, "selectedType", text = "")
-        self.invokeFunction(col, "assignSelectedListType",
-            text = "Assign",
-            description = "Remove all sockets and set the selected socket type")
+        self.invokeSocketTypeChooser(layout, "assignListDataType",
+            socketGroup = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
 
         layout.prop(self, "hideInputs")
 
@@ -67,11 +62,11 @@ class CreateListNode(bpy.types.Node, AnimationNode):
         socket.linkWith(origin)
         emptySocket.removeLinks()
 
-    def assignSelectedListType(self):
-        self.assignedType = self.selectedType
+    def assignListDataType(self, listDataType):
+        self.assignedType = toBaseDataType(listDataType)
 
-    def assignListType(self, idName, inputAmount = 2):
-        self.assignedType = idName
+    def assignBaseDataType(self, baseDataType, inputAmount = 2):
+        self.assignedType = baseDataType
         self.recreateSockets(inputAmount)
 
     def recreateSockets(self, inputAmount = 2):

@@ -14,7 +14,6 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
         self.listIdName = toListIdName(self.assignedType)
         self.generateSockets()
 
-    selectedType = EnumProperty(name = "Type", items = getBaseDataTypeItems)
     assignedType = StringProperty(update = assignedTypeChanged)
     baseIdName = StringProperty()
     listIdName = StringProperty()
@@ -25,15 +24,11 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.assignedType = "Float"
-        self.selectedType = "Float"
 
     def drawAdvanced(self, layout):
         layout.prop(self, "allowNegativeIndex")
-        col = layout.column(align = True)
-        col.prop(self, "selectedType", text = "")
-        self.invokeFunction(col, "assignSelectedListType",
-            text = "Assign",
-            description = "Remove all sockets and set the selected socket type")
+        self.invokeSocketTypeChooser(layout, "assignListDataType",
+            socketGroup = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
 
     def getExecutionCode(self):
         if self.allowNegativeIndex: return "element = list[index] if -len(list) <= index < len(list) else fallback"
@@ -53,8 +48,8 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
         if len(elementOutputs) == 1: return elementOutputs[0].dataType
         return self.outputs["Element"].dataType
 
-    def assignSelectedListType(self):
-        self.assignedType = self.selectedType
+    def assignListDataType(self, listDataType):
+        self.assignType(toBaseDataType(listDataType))
 
     def assignType(self, baseDataType):
         if not isBase(baseDataType): return

@@ -17,13 +17,11 @@ class CombineListsNode(bpy.types.Node, AnimationNode):
         self.listIdName = toListIdName(self.assignedType)
         self.recreateSockets()
 
-    selectedType = EnumProperty(name = "Type", items = getBaseDataTypeItems)
     assignedType = StringProperty(update = assignedTypeChanged)
 
     listIdName = StringProperty()
 
     def create(self):
-        self.selectedType = "Float"
         self.assignedType = "Float"
 
     def draw(self, layout):
@@ -33,10 +31,8 @@ class CombineListsNode(bpy.types.Node, AnimationNode):
             icon = "PLUS")
 
     def drawAdvanced(self, layout):
-        layout.prop(self, "selectedType")
-        self.invokeFunction(layout, "assignSelectedListType",
-            text = "Assign",
-            description = "Remove all sockets and set the selected socket type")
+        self.invokeSocketTypeChooser(layout, "assignListDataType",
+            socketGroup = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
 
     @property
     def inputVariables(self):
@@ -58,8 +54,8 @@ class CombineListsNode(bpy.types.Node, AnimationNode):
         socket.linkWith(origin)
         emptySocket.removeLinks()
 
-    def assignSelectedListType(self):
-        self.assignedType = self.selectedType
+    def assignListDataType(self, listDataType):
+        self.assignedType = toBaseDataType(listDataType)
 
     def recreateSockets(self, inputAmount = 2):
         self.inputs.clear()
