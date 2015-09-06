@@ -4,9 +4,9 @@ from .. events import propertyChanged
 from .. base_types.socket import AnimationNodeSocket
 
 def getValue(self):
-    return min(max(self.min, self.get("value", 0)), self.max)
+    return min(max(self.minValue, self.get("value", 0)), self.maxValue)
 def setValue(self, value):
-    self["value"] = min(max(self.min, value), self.max)
+    self["value"] = min(max(self.minValue, value), self.maxValue)
 
 class IntegerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_IntegerSocket"
@@ -20,8 +20,8 @@ class IntegerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         set = setValue, get = getValue,
         update = propertyChanged)
 
-    min = IntProperty(default = -2**31)
-    max = IntProperty(default = 2**31-1)
+    minValue = IntProperty(default = -2**31)
+    maxValue = IntProperty(default = 2**31-1)
 
     def drawProperty(self, layout, text):
         layout.prop(self, "value", text = text)
@@ -35,6 +35,6 @@ class IntegerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getProperty(self):
         return self.value
 
-    def setMinMax(self, min, max):
-        self.min = min
-        self.max = max
+    def setRange(self, min, max):
+        self.minValue = min
+        self.maxValue = max

@@ -14,12 +14,12 @@ class GridMeshNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.width = 160
-        divisionSockets = [
+        divisionsSockets = [
             self.inputs.new("an_IntegerSocket", "X Divisions", "xDivisions"),
             self.inputs.new("an_IntegerSocket", "Y Divisions", "yDivisions") ]
-        for socket in divisionSockets:
+        for socket in divisionsSockets:
             socket.value = 5
-            socket.setMinMax(2, 10000000)
+            socket.minValue = 2
         self.inputs.new("an_FloatSocket", "X Distance", "xDistance").value = 1
         self.inputs.new("an_FloatSocket", "Y Distance", "yDistance").value = 1
         self.inputs.new("an_VectorSocket", "Offset", "offset").isDataModified = True

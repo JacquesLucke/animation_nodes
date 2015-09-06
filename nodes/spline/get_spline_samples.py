@@ -11,10 +11,10 @@ class GetSplineSamplesNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
         self.inputs.new("an_IntegerSocket", "Amount", "amount").value = 50
         socket = self.inputs.new("an_FloatSocket", "Start", "start")
         socket.value = 0.0
-        socket.setMinMax(0.0, 1.0)
+        socket.setRange(0.0, 1.0)
         socket = self.inputs.new("an_FloatSocket", "End", "end")
         socket.value = 1.0
-        socket.setMinMax(0.0, 1.0)
+        socket.setRange(0.0, 1.0)
         self.outputs.new("an_VectorListSocket", "Positions", "positions")
         self.outputs.new("an_VectorListSocket", "Tangents", "tangents")
 

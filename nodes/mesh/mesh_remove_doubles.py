@@ -10,7 +10,7 @@ class BMeshRemoveDoublesNode(bpy.types.Node, AnimationNode):
         self.inputs.new("an_BMeshSocket", "BMesh", "bm").dataIsModified = True
         socket = self.inputs.new("an_FloatSocket", "Distance", "distance")
         socket.value = 0.0001
-        socket.setMinMax(0.0, 10000.0)
+        socket.minValue = 0.0
         self.outputs.new("an_BMeshSocket", "BMesh", "bm")
 
     def getExecutionCode(self):

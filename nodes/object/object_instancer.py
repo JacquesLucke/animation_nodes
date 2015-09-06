@@ -41,7 +41,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
     parentInstances = BoolProperty(default = True, name = "Parent to Main Container", update = resetInstancesEvent)
 
     def create(self):
-        self.inputs.new("an_IntegerSocket", "Instances", "instancesAmount").setMinMax(0, 100000)
+        self.inputs.new("an_IntegerSocket", "Instances", "instancesAmount").minValue = 0
         self.inputs.new("an_ObjectSocket", "Source", "sourceObject").defaultDrawType = "PROPERTY_ONLY"
         self.outputs.new("an_ObjectListSocket", "Objects", "objects")
 

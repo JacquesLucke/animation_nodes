@@ -60,5 +60,5 @@ class SliceListNode(bpy.types.Node, AnimationNode):
         socket = self.inputs.new("an_IntegerSocket", "Step", "step")
         socket.value = 1
         socket.hide = True
-        socket.setMinMax(1, 1e7)
+        socket.minValue = 1
         self.outputs.new(self.listIdName, "List", "slicedList")
