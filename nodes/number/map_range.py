@@ -1,9 +1,15 @@
 import bpy
+from bpy.props import *
+from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 
 class MapRangeNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MapRangeNode"
     bl_label = "Map Range"
+
+    clamp = BoolProperty(name = "Clamp", default = True,
+        description = "The output will be between Output Min and Output Max",
+        update = executionCodeChanged)
 
     def create(self):
         self.inputs.new("an_FloatSocket", "Value", "value")
@@ -13,5 +19,13 @@ class MapRangeNode(bpy.types.Node, AnimationNode):
         self.inputs.new("an_FloatSocket", "Output Max", "outMax").value = 1
         self.outputs.new("an_FloatSocket", "Value", "newValue")
 
+    def draw(self, layout):
+        layout.prop(self, "clamp")
+
     def getExecutionCode(self):
-        return "newValue = outMin + (value - inMin) / (inMax - inMin) * (outMax - outMin)"
+        unclampedExpression = "outMin + (value - inMin) / (inMax - inMin) * (outMax - outMin)"
+        if self.clamp:
+            return ("start, end = (outMin, outMax) if outMin < outMax else (outMax, outMin)",
+                    "newValue = min(max({}, start), end)".format(unclampedExpression))
+        else:
+            return "newValue = " + unclampedExpression
