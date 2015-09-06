@@ -47,7 +47,8 @@ class AnimationNodeTree(bpy.types.NodeTree):
         def isAnimationPlaying():
             try: return bpy.context.screen.is_animation_playing
             except: return False
-            
+
+        if len(self.mainUnits) == 0: return False
         a = self.autoExecution
         if not a.enabled: return False
         if "Render" not in events and abs(time.clock() - a.lastExecutionTimestamp) < a.minTimeDifference: return False
