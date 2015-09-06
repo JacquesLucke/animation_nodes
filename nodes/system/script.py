@@ -24,6 +24,7 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
 
     def create(self):
         self.width = 200
+        self.randomizeNetworkColor()
         self.subprogramName = "Script"
         self.inputs.new("an_NodeControlSocket", "New Input", "newInput")
         self.outputs.new("an_NodeControlSocket", "New Output", "newOutput")
@@ -102,6 +103,9 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         self.inputs.clear()
         self.outputs.clear()
         subprogramInterfaceChanged()
+
+    def duplicate(self):
+        self.randomizeNetworkColor()
 
     def getSocketData(self):
         data = SubprogramData()

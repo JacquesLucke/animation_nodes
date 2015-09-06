@@ -14,6 +14,7 @@ class GroupInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     bl_label = "Group Input"
 
     def create(self):
+        self.randomizeNetworkColor()
         self.subprogramName = "Group"
         socket = self.outputs.new("an_NodeControlSocket", "New Parameter").margin = 0.15
         self.width = 180
@@ -69,6 +70,7 @@ class GroupInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         subprogramInterfaceChanged()
 
     def duplicate(self, sourceNode):
+        self.randomizeNetworkColor()
         match = re.search("(.*) ([0-9]+)$", self.subprogramName)
         if match: self.subprogramName = match.group(1) + " " + str(int(match.group(2)) + 1)
         else: self.subprogramName += " 2"

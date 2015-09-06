@@ -19,6 +19,7 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     bl_label = "Loop Input"
 
     def create(self):
+        self.randomizeNetworkColor()
         self.subprogramName = "Loop"
         self.outputs.new("an_IntegerSocket", "Index")
         self.outputs.new("an_IntegerSocket", "Iterations")
@@ -133,6 +134,7 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         subprogramInterfaceChanged()
 
     def duplicate(self, sourceNode):
+        self.randomizeNetworkColor()
         match = re.search("(.*) ([0-9]+)$", self.subprogramName)
         if match: self.subprogramName = match.group(1) + " " + str(int(match.group(2)) + 1)
         else: self.subprogramName += " 2"

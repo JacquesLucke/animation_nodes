@@ -13,13 +13,13 @@ from .. tree_info import getNetworkWithNode, getDirectlyLinkedSockets
 class AnimationNode:
     isAnimationNode = True
 
-    def useAutoColorChanged(self, context):
+    def useNetworkColorChanged(self, context):
         colorNetworks()
 
     # unique string for each node; don't change it at all
     identifier = StringProperty(name = "Identifier", default = "")
     inInvalidNetwork = BoolProperty(name = "In Invalid Network", default = False)
-    useAutoColor = BoolProperty(name = "Use Auto Color", default = True, update = useAutoColorChanged)
+    useNetworkColor = BoolProperty(name = "Use Network Color", default = True, update = useNetworkColorChanged)
 
     # used for the listboxes in the sidebar
     activeInputIndex = IntProperty()

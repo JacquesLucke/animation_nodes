@@ -11,16 +11,16 @@ randomNumberCache = numpy.random.random(cacheSize)
 def getRandomNumberCache():
     return randomNumberCache
 
-def getRandom(seed):
-    return randomNumberCache[seed % cacheSize]
-
 def getUniformRandom(seed, min, max):
     return min + randomNumberCache[seed % cacheSize] * (max - min)
 
-def getRandomColor(seed, hue = None, saturation = None, value = None):
-    if hue is None: hue = getRandom(seed)
-    if saturation is None: saturation = getRandom(seed + 1000)
-    if value is None: value = getRandom(seed + 2000)
+def getRandomColor(seed = None, hue = None, saturation = None, value = None):
+    if seed is None: random.seed()
+    else: random.seed(seed)
+
+    if hue is None: hue = random.random()
+    if saturation is None: saturation = random.random()
+    if value is None: value = random.random()
 
     color = mathutils.Color()
     color.hsv = hue, saturation, value

@@ -266,6 +266,10 @@ class NodeNetwork:
         return self.nodeIDs[0][0]
 
     @property
+    def isSubnetwork(self):
+        return self.type in ("Group", "Loop", "Script")
+
+    @property
     def ownerNode(self):
         try: return getNodeByIdentifier(self.identifier)
         except: return None
@@ -410,7 +414,7 @@ def getNetworks():
     return _networks.networks
 
 def getSubprogramNetworks():
-    return [network for network in _networks.networks if network.type in ("Group", "Loop", "Script")]
+    return [network for network in _networks.networks if network.isSubnetwork]
 
 def getNetworksByType(type = "Main"):
     return [network for network in _networks.networks if network.type == type]

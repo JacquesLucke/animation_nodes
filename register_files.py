@@ -3,6 +3,7 @@ import bpy
 from . import keymap
 from . import events
 from . import tree_info
+from . ui import node_colors
 from . utils import selection
 from . ui import generic_node_panel
 from . ui import auto_nodetree_selection
@@ -14,6 +15,7 @@ from . nodes.sound import sequencer_sound_input as sequencer_sound
 
 def registerFiles():
     socket_base.register()
+    node_colors.register()
     events.registerHandlers()
     tree_info.registerHandlers()
     node_base.registerHandlers()
@@ -28,6 +30,7 @@ def registerFiles():
 
 def unregisterFiles():
     socket_base.unregister()
+    node_colors.unregister()
     events.unregisterHandlers()
     tree_info.unregisterHandlers()
     node_base.unregisterHandlers()
