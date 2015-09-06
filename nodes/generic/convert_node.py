@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... tree_info import keepNodeLinks
 from ... base_types.node import AnimationNode
-from ... sockets.info import getDataTypeItems, toIdName
+from ... sockets.info import toIdName
 
 class ConvertNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ConvertNode"
@@ -12,21 +12,16 @@ class ConvertNode(bpy.types.Node, AnimationNode):
         self.targetIdName = toIdName(self.assignedType)
         self.recreateOutputSocket()
 
-    selectedType = EnumProperty(name = "Type", items = getDataTypeItems)
     assignedType = StringProperty(update = assignedTypeChanged)
     targetIdName = StringProperty()
 
     def create(self):
         self.inputs.new("an_GenericSocket", "Old", "old").dataIsModified = True
-        self.selectedType = "String"
         self.assignedType = "String"
 
     def drawAdvanced(self, layout):
-        col = layout.column(align = True)
-        col.prop(self, "selectedType", text = "")
-        self.invokeFunction(col, "assignSelectedListType",
-            text = "Assign",
-            description = "Remove all sockets and set the selected socket type")
+        self.invokeSocketTypeChooser(layout, "assignSocketType",
+            socketGroup = "ALL", text = "Change Type", icon = "TRIA_RIGHT")
 
     def edit(self):
         socket = self.outputs[0]
@@ -34,13 +29,12 @@ class ConvertNode(bpy.types.Node, AnimationNode):
         if len(targets) == 1:
             self.assignType(targets[0].dataType)
 
-    def assignSelectedListType(self):
-        self.assignedType = self.selectedType
+    def assignSocketType(self, dataType):
+        self.assignType(dataType)
 
     def assignType(self, dataType = "Float"):
         if self.assignedType == dataType: return
         self.assignedType = dataType
-        self.selectedType = dataType
 
     @keepNodeLinks
     def recreateOutputSocket(self):

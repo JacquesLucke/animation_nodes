@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... base_types.node import AnimationNode
-from ... sockets.info import getDataTypeItems, toIdName, getDataTypes
+from ... sockets.info import toIdName, getDataTypes
 
 class DataInputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_DataInputNode"
