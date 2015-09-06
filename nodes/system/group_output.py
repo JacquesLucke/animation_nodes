@@ -4,7 +4,7 @@ from ... events import treeChanged
 from ... sockets.info import toIdName
 from ... utils.layout import splitAlignment
 from ... base_types.node import AnimationNode
-from . utils import subprogramInterfaceChanged
+from . subprogram_sockets import subprogramInterfaceChanged
 
 class GroupOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GroupOutputNode"

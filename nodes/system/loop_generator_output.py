@@ -1,9 +1,9 @@
 import bpy
 from bpy.props import *
 from ... events import treeChanged
-from . utils import subprogramInterfaceChanged
 from ... base_types.node import AnimationNode
 from ... sockets.info import toIdName, toBaseDataType
+from . subprogram_sockets import subprogramInterfaceChanged
 from ... tree_info import keepNodeLinks, getNodeByIdentifier
 
 addTypeItems = [

@@ -4,9 +4,8 @@ from ... sockets.info import toIdName
 from ... utils.names import toInterfaceName
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
-from . subprogram_sockets import SubprogramData
-from . utils import subprogramInterfaceChanged
 from . subprogram_base import SubprogramBaseNode
+from . subprogram_sockets import SubprogramData, subprogramInterfaceChanged
 
 class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     bl_idname = "an_ScriptNode"

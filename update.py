@@ -4,7 +4,7 @@ from . ui import node_colors
 from . utils.nodes import iterAnimationNodes, getAnimationNodeTrees
 from . execution.units import createExecutionUnits
 from . node_link_conversion import correctForbiddenNodeLinks
-from . nodes.system import utils as subprograms
+from . nodes.system import subprogram_sockets
 from . utils.timing import measureTime
 
 @measureTime
@@ -17,7 +17,7 @@ def updateEverything():
     enableUseFakeUser()
     callNodeEditFunctions()
     correctForbiddenNodeLinks()
-    subprograms.updateIfNecessary()
+    subprogram_sockets.updateIfNecessary()
     checkNetworks()
     createExecutionUnits()
 

@@ -5,9 +5,8 @@ from ... sockets.info import toIdName
 from ... events import networkChanged
 from ... utils.layout import splitAlignment
 from ... base_types.node import AnimationNode
-from . subprogram_sockets import SubprogramData
-from . utils import subprogramInterfaceChanged
 from . subprogram_base import SubprogramBaseNode
+from . subprogram_sockets import SubprogramData, subprogramInterfaceChanged
 
 class GroupInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     bl_idname = "an_GroupInputNode"

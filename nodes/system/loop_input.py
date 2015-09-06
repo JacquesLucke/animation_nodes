@@ -7,12 +7,11 @@ from ... utils.names import getRandomString
 from ... utils.layout import splitAlignment
 from ... tree_info import getNodeByIdentifier
 from ... base_types.node import AnimationNode
-from . subprogram_sockets import SubprogramData
 from ... node_creator import NodeCreator
 from . subprogram_base import SubprogramBaseNode
-from . utils import subprogramInterfaceChanged
 from ... sockets.info import (toBaseIdName, toListDataType,
                         toIdName, isBase, toListIdName, toBaseDataType)
+from . subprogram_sockets import SubprogramData, subprogramInterfaceChanged
 
 class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     bl_idname = "an_LoopInputNode"
