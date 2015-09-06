@@ -14,7 +14,7 @@ def draw(self, context):
 
     row = layout.row(align = True)
 
-    size = max(len(node.inputs), len(node.outputs))
+    size = max(len(node.inputs), len(node.outputs), 1)
 
     col = row.column()
     subrow = col.row(align = True)
