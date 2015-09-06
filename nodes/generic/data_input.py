@@ -15,7 +15,6 @@ class DataInputNode(bpy.types.Node, AnimationNode):
     def assignedSocketChanged(self, context):
         self.recreateSockets()
 
-    selectedType = EnumProperty(name = "Type", items = getDataTypeItems)
     assignedType = StringProperty(default = "Float", update = assignedSocketChanged)
     showInViewport = BoolProperty(default = False, name = "Show in Viewport",
         description = "Draw the input of that node in the 'AN' category of the 3D view (Use the node label as name)")
@@ -24,20 +23,16 @@ class DataInputNode(bpy.types.Node, AnimationNode):
         self.recreateSockets()
 
     def drawAdvanced(self, layout):
-        col = layout.column(align = True)
-        col.prop(self, "selectedType", text = "")
-        self.invokeFunction(col, "assignSelectedType", text = "Assign", description = "Remove all sockets and set the selected socket type")
+        self.invokeSocketTypeChooser(layout, "assignSocketType",
+            socketGroup = "ALL", text = "Change Type", icon = "TRIA_RIGHT")
 
         col = layout.column()
         col.active = self.inputs[0].hasProperty
         col.prop(self, "showInViewport")
 
     def getExecutionCode(self):
-        # needs no execute
+        # needs no execution, because no value is changed
         return []
-
-    def assignSelectedType(self):
-        self.assignSocketType(self.selectedType)
 
     def assignSocketType(self, dataType):
         # this automatically recreates the sockets
