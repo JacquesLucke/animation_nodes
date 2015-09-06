@@ -64,4 +64,5 @@ def registerHandlers():
     bpy.app.handlers.scene_update_post.append(createMissingOperators)
 
 def unregisterHandlers():
+    bpy.utils.unregister_class(fallbackOperator)
     bpy.app.handlers.scene_update_post.remove(createMissingOperators)
