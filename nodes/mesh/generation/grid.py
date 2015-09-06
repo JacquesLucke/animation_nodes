@@ -38,7 +38,7 @@ class GridMeshNode(bpy.types.Node, AnimationNode):
         offset.y -= (yDivisions - 1) * yDistance / 2 if self.centerGrid else 0
 
         vertices = gridVertices(xDivisions, yDivisions, xDistance, yDistance, offset) if self.outputs[0].isLinked else []
-        edgeIndices = gridQuadPolygonIndices(xDivisions, yDivisions) if self.outputs[1].isLinked else []
+        edgeIndices = gridQuadEdgeIndices(xDivisions, yDivisions) if self.outputs[1].isLinked else []
         polygonIndices = gridQuadPolygonIndices(xDivisions, yDivisions) if self.outputs[2].isLinked else []
 
         return vertices, edgeIndices, polygonIndices
