@@ -118,8 +118,9 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
     def updateSockets(self):
         subprogram = self.subprogramNode
         if subprogram is None: self.clearSockets()
-        if subprogram.network.type == "Invalid": return
-        else: subprogram.getSocketData().apply(self)
+        else:
+            if subprogram.network.type == "Invalid": return
+            else: subprogram.getSocketData().apply(self)
         self.checkCachingPossibilities()
         self.clearCache()
 
