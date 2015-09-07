@@ -9,12 +9,12 @@ def enumItemsFromDicts(function):
     def wrapper(self, context):
         items = []
         for data in function(self, context):
-            if "id" not in data: raise Exception("'id' key is missing")
-            if "name" not in data: data["name"] = data["id"]
+            if "value" not in data: raise Exception("'value' key is missing")
+            if "name" not in data: data["name"] = data["value"]
             if "description" not in data: data["description"] = ""
             if "icon" not in data: data["icon"] = "NONE"
-            if "number" not in data: data["number"] = hashText(data["id"])
-            items.append((data["id"], data["name"], data["description"], data["icon"], data["number"]))
+            number = hashText(data["id"]) if "id" in data else hashText(data["value"])
+            items.append((data["value"], data["name"], data["description"], data["icon"], number))
         if len(items) == 0:
             items = [("NONE", "NONE", "")]
         return items

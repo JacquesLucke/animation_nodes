@@ -13,7 +13,7 @@ def getSearchItems(self, context):
     items = []
     for item in itertools.chain(iterSingleNodeItems(), iterTemplateItems()):
         itemsByIdentifier[item.identifier] = item
-        items.append({"id" : item.identifier, "name" : item.searchTag})
+        items.append({"value" : item.identifier, "name" : item.searchTag})
     return items
 
 class NodeSearch(bpy.types.Operator):

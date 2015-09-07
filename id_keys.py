@@ -18,7 +18,7 @@ def getIDKeyItems(self, context):
     for item in getIDKeys():
         name, type, id = item.name, item.type, item.id
         itemData.append({
-            "id" : id + "|" + type,
+            "value" : id + "|" + type,
             "name" : name,
             "description" : type})
     return itemData

@@ -171,7 +171,7 @@ def getSubprogramItems(self, context):
     itemDict = []
     for network in getSubprogramNetworks():
         itemDict.append({
-            "id" : network.identifier,
+            "value" : network.identifier,
             "name" : network.name,
             "description" : network.description})
     return itemDict
