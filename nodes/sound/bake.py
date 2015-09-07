@@ -20,8 +20,10 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
 
     soundName = EnumProperty(name = "Sound", items = getSoundSequenceItems)
 
-    low = FloatProperty(name = "Low", default = 0)
-    high = FloatProperty(name = "High", default = 20000)
+    activeBakeDataIndex = IntProperty()
+
+    low = IntProperty(name = "Low", default = 0)
+    high = IntProperty(name = "High", default = 20000)
     attack = FloatProperty(name = "Attack", default = 0.005, precision = 3)
     release = FloatProperty(name = "Release", default = 0.2, precision = 3)
 
@@ -50,7 +52,14 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
 
         col = box.column()
         col.scale_y = 1.3
+        col.active = getBakeDataItem(self.sound, self.low, self.high, self.attack, self.release) is None
         self.invokeFunction(col, "bakeSound", text = "Bake", icon = "GHOST")
+
+        items = self.sound.bakeData
+        if len(items) == 0: return
+        col = box.column()
+        col.label("Baked Data:")
+        col.template_list("an_BakeItemsUiList", "", self.sound, "bakeData", self, "activeBakeDataIndex", rows = len(items) + 1)
 
     def execute(self):
         return
@@ -68,10 +77,27 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
     def bakeSound(self):
         bake(self.sound, self.low, self.high, self.attack, self.release)
 
+    def removeSingleBakedData(self, index):
+        self.sound.bakeData.remove(int(index))
+
     @property
     def sound(self):
         return bpy.data.sounds.get(self.soundName)
 
+
+class BakeItemsUiList(bpy.types.UIList):
+    bl_idname = "an_BakeItemsUiList"
+
+    def draw_item(self, context, layout, sound, item, icon, node, activePropname):
+        layout.label(str(round(item.low)))
+        layout.label(str(round(item.high)))
+        layout.label(str(round(item.attack, 3)))
+        layout.label(str(round(item.release, 3)))
+        node.invokeFunction(layout, "removeSingleBakedData", icon = "X", emboss = False, data = list(sound.bakeData).index(item))
+
+
+# Sound Baking
+################################
 
 def bake(sound, low = 0.0, high = 100000, attack = 0.005, release = 0.2):
     object = createObjectWithFCurveAsTarget()
@@ -137,21 +163,33 @@ def saveBakedData(object, bakeDataItem):
 
 
 
-# register
+# Utils
+################################
+
+def getBakeDataItem(sound, low, high, attack, release):
+    for item in sound.bakeData:
+        if all([item.low == low,
+                item.high == high,
+                item.attack == attack,
+                item.release == release]): return item
+
+
+
+# Register
 ################################
 
 class Sample(bpy.types.PropertyGroup):
     strength = FloatProperty(precision = 6)
 
 class BakeData(bpy.types.PropertyGroup):
-    low = FloatProperty()
-    high = FloatProperty()
-    attack = FloatProperty(precision = 3)
-    release = FloatProperty(precision = 3)
-    samples = CollectionProperty(type = Sample)
+    low = IntProperty(name = "Low")
+    high = IntProperty(name = "High")
+    attack = FloatProperty(name = "Attack", precision = 3)
+    release = FloatProperty(name = "Release", precision = 3)
+    samples = CollectionProperty(name = "Samples", type = Sample)
 
 def register():
-    bpy.types.Sound.bakeData = CollectionProperty(type = BakeData)
+    bpy.types.Sound.bakeData = CollectionProperty(name = "Bake Data", type = BakeData)
 
 def unregister():
     del bpy.types.Sound.bakeData
