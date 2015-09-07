@@ -131,6 +131,14 @@ class AnimationNode:
             socketGroup = socketGroup,
             callback = callback)
 
+    def invokePathChooser(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True):
+        self.invokeFunction(layout, "_choosePath", text = text, icon = icon, description = description, emboss = emboss, data = functionName)
+
+    def _choosePath(self, data):
+        bpy.ops.an.choose_path("INVOKE_DEFAULT",
+            nodeIdentifier = self.identifier,
+            callback = data)
+
     def clearSockets(self):
         self.inputs.clear()
         self.outputs.clear()
