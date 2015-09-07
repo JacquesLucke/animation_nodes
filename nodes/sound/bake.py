@@ -100,6 +100,10 @@ class BakeItemsUiList(bpy.types.UIList):
 ################################
 
 def bake(sound, low = 0.0, high = 100000, attack = 0.005, release = 0.2):
+    if getBakeDataItem(sound, low, high, attack, release):
+        # This is already baked
+        return
+
     object = createObjectWithFCurveAsTarget()
     setStartTime()
     oldArea = switchArea("GRAPH_EDITOR")
