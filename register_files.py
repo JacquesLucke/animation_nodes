@@ -9,10 +9,12 @@ from . ui import generic_node_panel
 from . ui import auto_nodetree_selection
 from . operators import dynamic_operators
 from . base_types import node as node_base
+from . nodes.sound import bake as sound_bake
 from . base_types import socket as socket_base
 from . ui.node_menu import registerMenu, unregisterMenu
 
 def registerFiles():
+    sound_bake.register()
     socket_base.register()
     node_colors.register()
     events.registerHandlers()
@@ -27,6 +29,7 @@ def registerFiles():
     keymap.register()
 
 def unregisterFiles():
+    sound_bake.unregister()
     socket_base.unregister()
     node_colors.unregister()
     events.unregisterHandlers()
