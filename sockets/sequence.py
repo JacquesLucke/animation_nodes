@@ -32,6 +32,7 @@ class SequenceSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def setProperty(self, data):
         self.sequenceName = data
+        
     def getProperty(self):
         return self.sequenceName
 
