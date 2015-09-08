@@ -1,6 +1,7 @@
 import bpy
 import os
 from bpy.props import *
+from ... tree_info import getNodeByIdentifier
 from ... base_types.node import AnimationNode
 from ... utils.path import getAbsolutePathOfSound
 from ... utils.enum_items import enumItemsFromDicts
@@ -21,11 +22,14 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
     soundName = EnumProperty(name = "Sound", items = getSoundSequenceItems)
 
     activeBakeDataIndex = IntProperty()
+    activeEqualizerDataIndex = IntProperty()
 
     low = IntProperty(name = "Low", default = 0)
     high = IntProperty(name = "High", default = 20000)
     attack = FloatProperty(name = "Attack", default = 0.005, precision = 3)
     release = FloatProperty(name = "Release", default = 0.2, precision = 3)
+
+    bakeProgress = StringProperty()
 
     def create(self):
         self.width = 300
@@ -50,22 +54,32 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
         col.prop(self, "attack")
         col.prop(self, "release")
 
-        col = box.column()
-        col.scale_y = 1.3
-        col.active = getBakeDataItem(self.sound, self.low, self.high, self.attack, self.release) is None
-        self.invokeFunction(col, "bakeSound", text = "Bake", icon = "GHOST")
+        col = box.column(align = True)
+        subcol = col.column(align = True)
+        subcol.scale_y = 1.3
+        subcol.active = getBakeDataItem(self.sound, self.low, self.high, self.attack, self.release) is None
+        self.invokeFunction(subcol, "bakeSound", text = "Bake", icon = "GHOST")
+        self.invokeFunction(col, "bakeEqualizerData", text = "Bake Equalizer Data", icon = "RNDCURVE")
+
+        if self.bakeProgress != "":
+            box.label(self.bakeProgress, icon = "INFO")
 
         items = self.sound.bakeData
-        if len(items) == 0: return
-        col = box.column()
-        row = col.row()
-        row.label("Baked Data:")
-        self.invokeFunction(row, "moveItemUp", icon = "TRIA_UP")
-        self.invokeFunction(row, "moveItemDown", icon = "TRIA_DOWN")
-        col.template_list("an_BakeItemsUiList", "", self.sound, "bakeData", self, "activeBakeDataIndex", rows = len(items) + 1)
+        if len(items) > 0:
+            col = box.column()
+            row = col.row(align = True)
+            row.label("Baked Data:")
+            self.invokeFunction(row, "moveItemUp", icon = "TRIA_UP")
+            self.invokeFunction(row, "moveItemDown", icon = "TRIA_DOWN")
+            col.template_list("an_BakeItemsUiList", "", self.sound, "bakeData", self, "activeBakeDataIndex", rows = len(items) + 1)
 
-    def execute(self):
-        return
+        items = self.sound.equalizerData
+        if len(items) > 0:
+            col = box.column()
+            row = col.row()
+            row.label("Equalizer Data:")
+            col.template_list("an_EqualizerItemsUiList", "", self.sound, "equalizerData", self, "activeEqualizerDataIndex", rows = len(items) + 1)
+
 
     def loadSound(self, path):
         editor = getOrCreateSequencer()
@@ -78,10 +92,24 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
         self.soundName = sequence.sound.name
 
     def bakeSound(self):
-        bake(self.sound, self.low, self.high, self.attack, self.release)
+        sound, low, high, attack, release = self.sound, self.low, self.high, self.attack, self.release
+        if getBakeDataItem(sound, low, high, attack, release): return
+
+        soundData = bake(sound, low, high, attack, release)
+        bakeDataItem = createBakeDataItem(sound, low, high, attack, release)
+        addSavedSample = bakeDataItem.samples.add
+        for data in soundData:
+            addSavedSample().strength = data
+
+    def bakeEqualizerData(self):
+        bpy.ops.an.bake_sound_equalizer_data("INVOKE_DEFAULT",
+            nodeIdentifier = self.identifier,
+            soundName = self.soundName,
+            attack = self.attack,
+            release = self.release)
 
     def removeSingleBakedData(self, index):
-        self.sound.bakeData.remove(int(index))
+        soundData = self.sound.bakeData.remove(int(index))
 
     def moveItemUp(self):
         fromIndex = self.activeBakeDataIndex
@@ -113,15 +141,82 @@ class BakeItemsUiList(bpy.types.UIList):
         layout.label(str(round(item.release, 3)))
         node.invokeFunction(layout, "removeSingleBakedData", icon = "X", emboss = False, data = list(sound.bakeData).index(item))
 
+class EqualizerItemsUiList(bpy.types.UIList):
+    bl_idname = "an_EqualizerItemsUiList"
+
+    def draw_item(self, context, layout, sound, item, icon, node, activePropname):
+        layout.label("#" + str(list(sound.equalizerData).index(item)))
+        layout.label(str(round(item.attack, 3)))
+        layout.label(str(round(item.release, 3)))
+
+
+
+# Bake Equalizer Data
+################################
+
+frequencySteps = [0, 20, 40, 80, 250, 600, 2000, 4000, 6000, 8000, 20000]
+frequencyRanges = list(zip(frequencySteps[:-1], frequencySteps[1:]))
+
+class BakeEqualizerData(bpy.types.Operator):
+    bl_idname = "an.bake_sound_equalizer_data"
+    bl_label = "Bake Equalizer Data"
+
+    nodeIdentifier = StringProperty()
+
+    soundName = StringProperty()
+    attack = FloatProperty()
+    release = FloatProperty()
+
+    def invoke(self, context, event):
+        try: self.node = getNodeByIdentifier(self.nodeIdentifier)
+        except: self.node = None
+        self.sound = bpy.data.sounds[self.soundName]
+        self.currentIndex = 0
+        self.equalizerData = []
+        self.counter = 0
+        context.window_manager.modal_handler_add(self)
+        self.timer = context.window_manager.event_timer_add(0.001, context.window)
+        self.setNodeMessage("Baking Started")
+        return {"RUNNING_MODAL"}
+
+    def finish(self):
+        bpy.context.window_manager.event_timer_remove(self.timer)
+        self.setNodeMessage("")
+        return {"FINISHED"}
+
+    def modal(self, context, event):
+        if "ESC" == event.type: return self.finish()
+        self.counter += 1
+        if self.counter % 20 != 0: return {"RUNNING_MODAL"}
+
+        if self.currentIndex < len(frequencyRanges):
+            low, high = frequencyRanges[self.currentIndex]
+            data = bake(self.sound, low, high, self.attack, self.release)
+            self.equalizerData.append(data)
+            self.currentIndex += 1
+            self.setNodeMessage("Frequency range {}-{} baked".format(low, high))
+        else:
+            equalizerItem = self.sound.equalizerData.add()
+            equalizerItem.attack = self.attack
+            equalizerItem.release = self.release
+            for equalizerSampleData in zip(*self.equalizerData):
+                equalizerSampleItem = equalizerItem.samples.add()
+                for sample in equalizerSampleData:
+                    equalizerSampleItem.samples.add().strength = sample
+            return self.finish()
+
+        context.area.tag_redraw()
+        return {"RUNNING_MODAL"}
+
+    def setNodeMessage(self, message):
+        if self.node: self.node.bakeProgress = message
+
 
 # Sound Baking
 ################################
 
 def bake(sound, low = 0.0, high = 100000, attack = 0.005, release = 0.2):
-    if getBakeDataItem(sound, low, high, attack, release):
-        # This is already baked
-        return
-
+    '''Returns a float list containing the sampled data'''
     object = createObjectWithFCurveAsTarget()
     setStartTime()
     oldArea = switchArea("GRAPH_EDITOR")
@@ -135,10 +230,10 @@ def bake(sound, low = 0.0, high = 100000, attack = 0.005, release = 0.2):
         release = release)
 
     if usedUnpacking: os.remove(filepath)
-    item = createBakeDataItem(sound, low, high, attack, release)
-    saveBakedData(object, item)
+    soundData = getSamplesFromFCurve(object)
     removeObject(object)
     switchArea(oldArea)
+    return soundData
 
 def createObjectWithFCurveAsTarget():
     bpy.ops.object.add()
@@ -177,11 +272,9 @@ def createBakeDataItem(sound, low, high, attack, release):
     item.release = release
     return item
 
-def saveBakedData(object, bakeDataItem):
+def getSamplesFromFCurve(object):
     fcurve = getSingleFCurveWithDataPath(object, "location")
-    addSavedSample = bakeDataItem.samples.add
-    for sample in fcurve.sampled_points:
-        addSavedSample().strength = sample.co.y
+    return [sample.co.y for sample in fcurve.sampled_points]
 
 
 
@@ -200,18 +293,32 @@ def getBakeDataItem(sound, low, high, attack, release):
 # Register
 ################################
 
-class Sample(bpy.types.PropertyGroup):
+class SingleFrequencySample(bpy.types.PropertyGroup):
+    bl_idname = "an_SingleFrequencySample"
     strength = FloatProperty(precision = 6)
 
+class MultipleFrequenciesSample(bpy.types.PropertyGroup):
+    bl_idname = "an_MultipleFrequenciesSample"
+    samples = CollectionProperty(name = "Samples", type = SingleFrequencySample)
+
 class BakeData(bpy.types.PropertyGroup):
+    bl_idname = "an_SoundBakeData"
     low = IntProperty(name = "Low")
     high = IntProperty(name = "High")
     attack = FloatProperty(name = "Attack", precision = 3)
     release = FloatProperty(name = "Release", precision = 3)
-    samples = CollectionProperty(name = "Samples", type = Sample)
+    samples = CollectionProperty(name = "Samples", type = SingleFrequencySample)
+
+class EqualizerData(bpy.types.PropertyGroup):
+    bl_idname = "an_SoundEqualizerData"
+    attack = FloatProperty(name = "Attack", precision = 3)
+    release = FloatProperty(name = "Release", precision = 3)
+    samples = CollectionProperty(name = "Samples", type = MultipleFrequenciesSample)
 
 def register():
     bpy.types.Sound.bakeData = CollectionProperty(name = "Bake Data", type = BakeData)
+    bpy.types.Sound.equalizerData = CollectionProperty(name = "Equalizer Data", type = EqualizerData)
 
 def unregister():
     del bpy.types.Sound.bakeData
+    del bpy.types.Sound.equalizerData
