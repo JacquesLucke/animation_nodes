@@ -3,7 +3,7 @@ from bpy.props import *
 from ... base_types.node import AnimationNode
 from ... utils.enum_items import enumItemsFromDicts
 from ... utils.sequence_editor import getSoundSequences
-from . cache import getStrengthOfSequence
+from . cache import getStrengthOfSequence, getStrengthOfChannel, getStrengthOfAllSequences
 
 @enumItemsFromDicts
 def getSequenceSoundEnumItems(self, context):
@@ -26,7 +26,9 @@ class SoundInputNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "bakeData", text = "")
 
     def execute(self):
-        sequenceName, strIndex = self.bakeData.split("#-#")
+        #sequenceName, strIndex = self.bakeData.split("#-#")
         frame = bpy.context.scene.frame_current
-        sequence = bpy.context.scene.sequence_editor.sequences[sequenceName]
-        return getStrengthOfSequence(sequence, int(strIndex), frame)
+        #sequence = bpy.context.scene.sequence_editor.sequences[sequenceName]
+        #return getStrengthOfSequence(sequence, int(strIndex), frame)
+
+        return getStrengthOfAllSequences(bakeDataIndex = 0, frame = frame)
