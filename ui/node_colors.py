@@ -39,7 +39,7 @@ def draw(self, context):
     if node.bl_idname == "an_InvokeSubprogramNode": network = node.subprogramNetwork
     else: network = node.network
 
-    if getattr(network, "isSubnetwork", False): col.prop(network.ownerNode, "networkColor", text = "")
+    if network.isSubnetwork: col.prop(network.ownerNode, "networkColor", text = "")
     else: writeText(col, "Only subprograms have a custom network color", width = 25)
 
 # Register
