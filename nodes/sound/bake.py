@@ -58,7 +58,10 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
         items = self.sound.bakeData
         if len(items) == 0: return
         col = box.column()
-        col.label("Baked Data:")
+        row = col.row()
+        row.label("Baked Data:")
+        self.invokeFunction(row, "moveItemUp", icon = "TRIA_UP")
+        self.invokeFunction(row, "moveItemDown", icon = "TRIA_DOWN")
         col.template_list("an_BakeItemsUiList", "", self.sound, "bakeData", self, "activeBakeDataIndex", rows = len(items) + 1)
 
     def execute(self):
@@ -80,6 +83,20 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
     def removeSingleBakedData(self, index):
         self.sound.bakeData.remove(int(index))
 
+    def moveItemUp(self):
+        fromIndex = self.activeBakeDataIndex
+        toIndex = fromIndex - 1
+        self.moveItem(fromIndex, toIndex)
+
+    def moveItemDown(self):
+        fromIndex = self.activeBakeDataIndex
+        toIndex = fromIndex + 1
+        self.moveItem(fromIndex, toIndex)
+
+    def moveItem(self, fromIndex, toIndex):
+        self.sound.bakeData.move(fromIndex, toIndex)
+        self.activeBakeDataIndex = min(max(toIndex, 0), len(self.sound.bakeData) - 1)
+
     @property
     def sound(self):
         return bpy.data.sounds.get(self.soundName)
@@ -89,6 +106,7 @@ class BakeItemsUiList(bpy.types.UIList):
     bl_idname = "an_BakeItemsUiList"
 
     def draw_item(self, context, layout, sound, item, icon, node, activePropname):
+        layout.label("#" + str(list(sound.bakeData).index(item)))
         layout.label(str(round(item.low)))
         layout.label(str(round(item.high)))
         layout.label(str(round(item.attack, 3)))
