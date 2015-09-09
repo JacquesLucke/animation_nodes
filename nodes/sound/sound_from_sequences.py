@@ -32,7 +32,7 @@ class SequencesEvaluator:
     type = "Single"
 
     def __init__(self, sequences, index):
-        self.sequenceData = [(sequence, sequence.sound.bakeData[index]) for sequence in sequences if sequence]
+        self.sequenceData = [(sequence, sequence.sound.bakeData[index]) for sequence in sequences if getattr(sequence, "type", "") == "SOUND"]
 
     def evaluate(self, frame):
         evaluate = self.evaluateSequence
