@@ -6,6 +6,7 @@ class EvaluateSoundNode(bpy.types.Node, AnimationNode):
     bl_label = "Evaluate Sound"
 
     def create(self):
+        self.width = 175
         self.inputs.new("an_SoundSocket", "Sound", "sound")
         self.inputs.new("an_FloatSocket", "Frame", "frame")
         self.outputs.new("an_FloatSocket", "Strength", "strength")

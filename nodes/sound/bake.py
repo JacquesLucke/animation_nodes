@@ -1,6 +1,7 @@
 import bpy
 import os
 from bpy.props import *
+from ... utils.names import getRandomString
 from ... tree_info import getNodeByIdentifier
 from ... base_types.node import AnimationNode
 from ... utils.path import getAbsolutePathOfSound
@@ -218,7 +219,7 @@ class BakeEqualizerData(bpy.types.Operator):
 def bake(sound, low = 0.0, high = 100000, attack = 0.005, release = 0.2):
     '''Returns a float list containing the sampled data'''
     object = createObjectWithFCurveAsTarget()
-    setStartTime()
+    oldFrame = setCurrentFrame(0)
     oldArea = switchArea("GRAPH_EDITOR")
     usedUnpacking, filepath = getRealFilePath(sound)
 
@@ -232,6 +233,7 @@ def bake(sound, low = 0.0, high = 100000, attack = 0.005, release = 0.2):
     if usedUnpacking: os.remove(filepath)
     soundData = getSamplesFromFCurve(object)
     removeObject(object)
+    setCurrentFrame(oldFrame)
     switchArea(oldArea)
     return soundData
 
@@ -245,8 +247,10 @@ def removeObject(object):
     bpy.context.scene.objects.unlink(object)
     bpy.data.objects.remove(object)
 
-def setStartTime():
-    bpy.context.scene.frame_current = 0
+def setCurrentFrame(frame):
+    oldFrame = bpy.context.scene.frame_current
+    bpy.context.scene.frame_current = frame
+    return oldFrame
 
 def switchArea(targetType):
     area = bpy.context.area
@@ -270,6 +274,7 @@ def createBakeDataItem(sound, low, high, attack, release):
     item.high = high
     item.attack = attack
     item.release = release
+    item.identifier = getRandomString(10)
     return item
 
 def getSamplesFromFCurve(object):
@@ -308,6 +313,7 @@ class BakeData(bpy.types.PropertyGroup):
     attack = FloatProperty(name = "Attack", precision = 3)
     release = FloatProperty(name = "Release", precision = 3)
     samples = CollectionProperty(name = "Samples", type = SingleFrequencySample)
+    identifier = StringProperty(name = "Identifier", default = "")
 
 class EqualizerData(bpy.types.PropertyGroup):
     bl_idname = "an_SoundEqualizerData"
