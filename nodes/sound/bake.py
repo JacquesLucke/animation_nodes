@@ -108,7 +108,10 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
             release = self.release)
 
     def removeSingleBakedData(self, index):
-        soundData = self.sound.bakeData.remove(int(index))
+        self.sound.bakeData.remove(int(index))
+
+    def removeEqualizerBakedData(self, index):
+        self.sound.equalizerData.remove(int(index))
 
     def moveItemUp(self):
         fromIndex = self.activeBakeDataIndex
@@ -158,6 +161,7 @@ class EqualizerItemsUiList(bpy.types.UIList):
         layout.label("#" + str(list(sound.equalizerData).index(item)))
         layout.label(str(round(item.attack, 3)))
         layout.label(str(round(item.release, 3)))
+        node.invokeFunction(layout, "removeEqualizerBakedData", icon = "X", emboss = False, data = list(sound.equalizerData).index(item))
 
 
 
@@ -209,6 +213,7 @@ class BakeEqualizerData(bpy.types.Operator):
             equalizerItem = self.sound.equalizerData.add()
             equalizerItem.attack = self.attack
             equalizerItem.release = self.release
+            equalizerItem.frequencyAmount = len(frequencyRanges)
             for equalizerSampleData in zip(*self.equalizerData):
                 equalizerSampleItem = equalizerItem.samples.add()
                 for sample in equalizerSampleData:
@@ -328,6 +333,7 @@ class EqualizerData(bpy.types.PropertyGroup):
     bl_idname = "an_SoundEqualizerData"
     attack = FloatProperty(name = "Attack", precision = 3)
     release = FloatProperty(name = "Release", precision = 3)
+    frequencyAmount = IntProperty(name = "Frequency Amount")
     samples = CollectionProperty(name = "Samples", type = MultipleFrequenciesSample)
 
 def register():
