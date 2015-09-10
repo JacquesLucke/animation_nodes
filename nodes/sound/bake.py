@@ -5,22 +5,14 @@ from ... utils.names import getRandomString
 from ... tree_info import getNodeByIdentifier
 from ... base_types.node import AnimationNode
 from ... utils.path import getAbsolutePathOfSound
-from ... utils.enum_items import enumItemsFromDicts
 from ... utils.fcurve import getSingleFCurveWithDataPath
 from ... utils.sequence_editor import getOrCreateSequencer, getEmptyChannel, getSoundsInSequencer
-
-@enumItemsFromDicts
-def getSoundSequenceItems(self, context):
-    items = []
-    for sound in getSoundsInSequencer():
-        items.append({"value" : sound.name, "id" : sound.filepath})
-    return items
 
 class SoundBakeNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SoundBakeNode"
     bl_label = "Sound Bake"
 
-    soundName = EnumProperty(name = "Sound", items = getSoundSequenceItems)
+    soundName = StringProperty(name = "Sound")
 
     activeBakeDataIndex = IntProperty()
     activeEqualizerDataIndex = IntProperty()
@@ -42,13 +34,16 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
         self.invokePathChooser(col, "loadSound", text = "Load New Sound", icon = "NEW")
         layout.separator()
 
-        if self.sound is None: return
+        if len(bpy.data.sounds) == 0: return
 
         col = layout.column(align = True)
         row = col.row(align = True)
-        row.prop(self, "soundName", text = "")
+        row.prop_search(self, "soundName",  bpy.data, "sounds", text = "")
         self.invokeFunction(row, "removeSequencesWithActiveSound", icon = "X",
             description = "Remove sound sequences using this sound")
+
+        if self.sound is None: return
+
         box = col.box()
         row = box.row()
         col = row.column(align = True)
