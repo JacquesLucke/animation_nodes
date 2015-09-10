@@ -45,7 +45,10 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
         if self.sound is None: return
 
         col = layout.column(align = True)
-        col.prop(self, "soundName", text = "")
+        row = col.row(align = True)
+        row.prop(self, "soundName", text = "")
+        self.invokeFunction(row, "removeSequencesWithActiveSound", icon = "X",
+            description = "Remove sound sequences using this sound")
         box = col.box()
         row = box.row()
         col = row.column(align = True)
@@ -125,6 +128,17 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
     def moveItem(self, fromIndex, toIndex):
         self.sound.bakeData.move(fromIndex, toIndex)
         self.activeBakeDataIndex = min(max(toIndex, 0), len(self.sound.bakeData) - 1)
+
+    def removeSequencesWithActiveSound(self):
+        sound = self.sound
+        editor = getOrCreateSequencer()
+        if not editor: return
+        sequences = [sequence for sequence in editor.sequences if getattr(sequence, "sound", -1) == sound]
+        for sequence in sequences:
+            editor.sequences.remove(sequence)
+        if sound.users == 0:
+            bpy.data.sounds.remove(sound)
+
 
     @property
     def sound(self):
