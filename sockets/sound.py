@@ -41,9 +41,15 @@ class SoundSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         try:
             # update the property in the ui
             self.bakeData = self.bakeData
-            
+
             sequenceIndex, bakeIndex = self.bakeData.split("_")
             sequence = bpy.context.scene.sequence_editor.sequences[int(sequenceIndex)]
             evaluator = SequencesEvaluator([sequence], int(bakeIndex))
             return evaluator
         except: return None
+
+    def setProperty(self, data):
+        self.bakeData, self.type = data
+
+    def getProperty(self):
+        return self.bakeData, self.type
