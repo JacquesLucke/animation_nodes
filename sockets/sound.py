@@ -18,7 +18,7 @@ def getBakeDataItems(self, context):
         for bakeIndex, data in enumerate(sound.bakeData):
             items.append({
                 "id" : data.identifier,
-                "value" : "{}#{}".format(sequenceIndex, bakeIndex),
+                "value" : "{}_{}".format(sequenceIndex, bakeIndex),
                 "name" : "#{} - {}".format(bakeIndex, sequence.name),
                 "description" : "Low: {}  High: {}  Attack: {:.3f}  Release: {:.3f}".format(data.low, data.high, data.attack, data.release)
             })
@@ -39,7 +39,7 @@ class SoundSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def getValue(self):
         try:
-            sequenceIndex, bakeIndex = self.bakeData.split("#")
+            sequenceIndex, bakeIndex = self.bakeData.split("_")
             sequence = bpy.context.scene.sequence_editor.sequences[int(sequenceIndex)]
             evaluator = SequencesEvaluator([sequence], int(bakeIndex))
             return evaluator
