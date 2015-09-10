@@ -11,6 +11,9 @@ class EvaluateSoundNode(bpy.types.Node, AnimationNode):
         self.inputs.new("an_FloatSocket", "Frame", "frame")
         self.outputs.new("an_FloatSocket", "Strength", "strength")
 
+    def drawAdvanced(self, layout):
+        layout.prop(bpy.context.scene, "sync_mode")
+
     def execute(self, sound, frame):
         if sound is None: return 0
         if sound.type != "Single": return 0
