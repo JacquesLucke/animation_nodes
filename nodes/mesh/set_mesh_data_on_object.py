@@ -3,6 +3,7 @@ import bmesh
 import itertools
 from bpy.props import *
 from ... base_types.node import AnimationNode
+from ... utils.layout import writeText
 
 class SetMeshDataOnObjectNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SetMeshDataOnObjectNode"
@@ -13,6 +14,7 @@ class SetMeshDataOnObjectNode(bpy.types.Node, AnimationNode):
         description = "Check that the highest edge or polygon index is below the vertex amount")
 
     def create(self):
+        self.width = 170
         socket = self.inputs.new("an_ObjectSocket", "Object", "object")
         socket.defaultDrawType = "PROPERTY_ONLY"
         socket.objectCreationType = "MESH"
@@ -21,15 +23,17 @@ class SetMeshDataOnObjectNode(bpy.types.Node, AnimationNode):
 
     def draw(self, layout):
         if self.errorMessage != "":
-            layout.label(self.errorMessage, icon = "ERROR")
+            writeText(layout, self.errorMessage, icon = "ERROR", width = 20)
 
     def drawAdvanced(self, layout):
         layout.prop(self, "checkIndices")
 
     def execute(self, object, meshData):
         if object is None: return object
-        if object.type != "MESH": return object
-        if object.mode != "OBJECT": return object
+        if object.type != "MESH" or object.mode != "OBJECT":
+            self.errorMessage = "Object is in edit mode or is no mesh object"
+            return object
+
         bmesh.new().to_mesh(object.data)
 
         vertices, edges, polygons = meshData.vertices, meshData.edges, meshData.polygons
@@ -37,7 +41,7 @@ class SetMeshDataOnObjectNode(bpy.types.Node, AnimationNode):
             if not self.areIndicesValid(vertices, edges, polygons):
                 self.errorMessage = "Indices are invalid"
                 return object
-                
+
         object.data.from_pydata(vertices, edges, polygons)
         self.errorMessage = ""
         return object
