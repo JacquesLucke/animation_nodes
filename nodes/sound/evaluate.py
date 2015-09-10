@@ -35,5 +35,5 @@ class EvaluateSoundNode(bpy.types.Node, AnimationNode):
         if sound is None: return 0
         if sound.type != "Single": return 0
         if self.frameType == "OFFSET":
-            frame += bpy.context.scene.frame_current
-        return sound.evaluate(int(frame))
+            frame += bpy.context.scene.frame_current_final
+        return sound.evaluate(frame)

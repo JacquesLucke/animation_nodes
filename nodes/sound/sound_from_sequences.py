@@ -35,6 +35,16 @@ class SequencesEvaluator:
         self.sequenceData = [(sequence, sequence.sound.bakeData[index]) for sequence in sequences if getattr(sequence, "type", "") == "SOUND"]
 
     def evaluate(self, frame):
+        intFrame = int(frame)
+        if intFrame == frame:
+            return self.evaluateInt(intFrame)
+        else:
+            before = self.evaluateInt(intFrame)
+            after = self.evaluateInt(intFrame + 1)
+            influence = frame - intFrame
+            return before * (1 - influence) + after * influence
+
+    def evaluateInt(self, frame):
         evaluate = self.evaluateSequence
         return sum([evaluate(sequence, bakeData, frame) for sequence, bakeData in self.sequenceData])
 
