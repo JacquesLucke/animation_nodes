@@ -117,7 +117,8 @@ class Spline:
     def project(self, coordinates):
         parameters = self.getProjectedParameters(coordinates)
         sampledData = [(par, (coordinates - self.evaluate(par)).length_squared) for par in parameters]
-        return min(sampledData, key = lambda item: item[1])[0]
+        if len(sampledData) > 0: return min(sampledData, key = lambda item: item[1])[0]
+        else: return 0.0
     def getProjectedParameters(self, coordinates):
         return [i / 100 for i in range(101)]
 
