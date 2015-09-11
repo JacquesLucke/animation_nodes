@@ -67,7 +67,14 @@ class EqualizerSoundEvaluator:
         self.sequenceData = [(sequence, sequence.sound.equalizerData[index]) for sequence in sequences if getattr(sequence, "type", "") == "SOUND"]
 
     def evaluate(self, frame):
-        return self.evaluateInt(int(frame))
+        intFrame = int(frame)
+        if intFrame == frame:
+            return self.evaluateInt(intFrame)
+        else:
+            before = self.evaluateInt(intFrame)
+            after = self.evaluateInt(intFrame + 1)
+            influence = frame - intFrame
+            return [a * (1 - influence) + b * influence for a, b in zip(before, after)]
 
     def evaluateInt(self, frame):
         evaluate = self.evaluateSequence
