@@ -26,6 +26,7 @@ def drawMenu(self, context):
     layout.menu("an_material_menu", text = "Material")
     layout.menu("an_animation_menu", text = "Animation")
     layout.menu("an_particles_menu", text = "Particles")
+    layout.menu("an_sound_menu", text = "Sound")
     layout.separator()
     layout.menu("an_debug_menu", text = "Debug")
     layout.menu("an_subprograms_menu", text = "Subprograms")
@@ -286,6 +287,16 @@ class ParticlesMenu(bpy.types.Menu):
         insertNode(layout, "an_FilterParticlesNode", "State Filter")
         insertNode(layout, "an_ParticleListInfoNode", "Particle List Info")
         insertNode(layout, "an_ParticleInfoNode", "Particle Info")
+
+class SoundMenu(bpy.types.Menu):
+    bl_idname = "an_sound_menu"
+    bl_label = "Sound Menu"
+
+    def draw(self, context):
+        layout = self.layout
+        insertNode(layout, "an_SoundBakeNode", "Bake")
+        insertNode(layout, "an_SoundFromSequencesNode", "Sound from Sequences")
+        insertNode(layout, "an_EvaluateSoundNode", "Evaluate Sound")
 
 class DebugMenu(bpy.types.Menu):
     bl_idname = "an_debug_menu"
