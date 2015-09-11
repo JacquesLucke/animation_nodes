@@ -3,7 +3,6 @@ from bpy.props import *
 from .. events import propertyChanged
 from .. utils.enum_items import enumItemsFromDicts
 from .. base_types.socket import AnimationNodeSocket
-from .. utils.sequence_editor import getSoundSequences
 from .. nodes.sound.sound_from_sequences import SingleSoundEvaluator, EqualizerSoundEvaluator
 
 soundTypeItems = [
@@ -13,7 +12,8 @@ soundTypeItems = [
 @enumItemsFromDicts
 def getBakeDataItems(self, context):
     items = []
-    for sequenceIndex, sequence in enumerate(getSoundSequences()):
+    sequences = getattr(self.nodeTree.scene.sequence_editor, "sequences", [])
+    for sequenceIndex, sequence in enumerate(sequences):
         sound = sequence.sound
 
         for bakeIndex, data in enumerate(sound.singleData):
@@ -49,7 +49,7 @@ class SoundSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             self.bakeData = self.bakeData
 
             soundType, sequenceIndex, bakeIndex = self.bakeData.split("_")
-            sequence = bpy.context.scene.sequence_editor.sequences[int(sequenceIndex)]
+            sequence = self.nodeTree.scene.sequence_editor.sequences[int(sequenceIndex)]
             evaluatorClass = SingleSoundEvaluator if soundType == "SINGLE" else EqualizerSoundEvaluator
             return evaluatorClass([sequence], int(bakeIndex))
         except:

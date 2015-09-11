@@ -6,7 +6,7 @@ from ... tree_info import getNodeByIdentifier
 from ... base_types.node import AnimationNode
 from ... utils.path import getAbsolutePathOfSound
 from ... utils.fcurve import getSingleFCurveWithDataPath
-from ... utils.sequence_editor import getOrCreateSequencer, getEmptyChannel, getSoundsInSequencer
+from ... utils.sequence_editor import getOrCreateSequencer, getEmptyChannel
 
 class SoundBakeNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SoundBakeNode"
@@ -81,7 +81,7 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
 
 
     def loadSound(self, path):
-        editor = getOrCreateSequencer()
+        editor = getOrCreateSequencer(self.nodeTree.scene)
         channel = getEmptyChannel(editor)
         sequence = editor.sequences.new_sound(
             name = os.path.basename(path),
@@ -129,7 +129,7 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
 
     def removeSequencesWithActiveSound(self):
         sound = self.sound
-        editor = getOrCreateSequencer()
+        editor = getOrCreateSequencer(self.nodeTree.scene)
         if not editor: return
         sequences = [sequence for sequence in editor.sequences if getattr(sequence, "sound", -1) == sound]
         for sequence in sequences:

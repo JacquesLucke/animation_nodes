@@ -66,7 +66,7 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
             try: return True, oneTimeCache[self.identifier]
             except: pass
         if self.cacheType == "FRAME_BASED":
-            try: return True, frameBasedCache[self.identifier][str(bpy.context.scene.frame_current)]
+            try: return True, frameBasedCache[self.identifier][str(self.nodeTree.scene.frame_current)]
             except: pass
         if self.cacheType == "INPUT_BASED":
             try: return True, inputBasedCache[self.subprogramIdentifier][self.getArgsHash(args)]
@@ -78,7 +78,7 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
         if self.cacheType == "ONE_TIME": oneTimeCache[self.identifier] = data
         elif self.cacheType == "FRAME_BASED":
             if self.identifier not in frameBasedCache: frameBasedCache[self.identifier] = {}
-            frameBasedCache[self.identifier][str(bpy.context.scene.frame_current)] = data
+            frameBasedCache[self.identifier][str(self.nodeTree.scene.frame_current)] = data
         elif self.cacheType == "INPUT_BASED":
             if self.subprogramIdentifier not in inputBasedCache: inputBasedCache[self.subprogramIdentifier] = {}
             inputBasedCache[self.subprogramIdentifier][self.getArgsHash(args)] = data

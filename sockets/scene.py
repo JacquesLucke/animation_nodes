@@ -25,7 +25,7 @@ class SceneSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def getValue(self):
         if self.useGlobalScene:
-            return bpy.context.scene
+            return self.nodeTree.scene
         return bpy.data.scenes.get(self.sceneName)
 
     def setProperty(self, data):

@@ -37,6 +37,7 @@ class AnimationNodeTree(bpy.types.NodeTree):
 
     autoExecution = PointerProperty(type = AutoExecutionProperties)
     executionTime = FloatProperty(name = "Execution Time")
+    sceneName = StringProperty()
 
     editNodeLabels = BoolProperty(name = "Edit Node Labels", default = False)
 
@@ -82,3 +83,9 @@ class AnimationNodeTree(bpy.types.NodeTree):
     @property
     def mainUnits(self):
         return getMainUnitsByNodeTree(self)
+
+    @property
+    def scene(self):
+        scene = bpy.data.scenes.get(self.sceneName)
+        if scene is None: scene = bpy.data.scenes[0]
+        return scene

@@ -1,7 +1,7 @@
 import bpy
+from . import tree_info
 from . import event_handler
 from bpy.app.handlers import persistent
-from . import tree_info
 
 class EventState:
     def __init__(self):

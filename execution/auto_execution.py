@@ -1,11 +1,11 @@
 import bpy
 from .. import problems
-from .. utils.nodes import getAnimationNodeTrees
 from .. preferences import getPreferences
+from .. utils.nodes import getAnimationNodeTrees
 
 def autoExecuteMainUnits(events):
     if not problems.canExecute(): return False
-    
+
     executed = False
     for nodeTree in getAnimationNodeTrees():
         if nodeTree.canAutoExecute(events):
@@ -16,8 +16,11 @@ def autoExecuteMainUnits(events):
 def afterExecution():
     prefs = getPreferences()
     if prefs.sceneUpdateAfterAutoExecution:
-        bpy.context.scene.update()
-    if prefs.redrawAllAfterAutoExecution:
+        for scene in set(tree.scene for tree in getAnimationNodeTrees()):
+            scene.update()
+
+    from .. events import isRendering
+    if prefs.redrawAllAfterAutoExecution and not isRendering():
         redrawAll()
 
 def redrawAll():
