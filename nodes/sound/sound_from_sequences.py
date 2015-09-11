@@ -39,7 +39,7 @@ class SingleSoundEvaluator:
     type = "SINGLE"
 
     def __init__(self, sequences, index):
-        self.sequenceData = [(sequence, sequence.sound.bakeData[index]) for sequence in sequences if getattr(sequence, "type", "") == "SOUND"]
+        self.sequenceData = [(sequence, sequence.sound.singleData[index]) for sequence in sequences if getattr(sequence, "type", "") == "SOUND"]
 
     def evaluate(self, frame):
         intFrame = int(frame)
@@ -53,11 +53,11 @@ class SingleSoundEvaluator:
 
     def evaluateInt(self, frame):
         evaluate = self.evaluateSequence
-        return sum([evaluate(sequence, bakeData, frame) for sequence, bakeData in self.sequenceData])
+        return sum([evaluate(sequence, data, frame) for sequence, data in self.sequenceData])
 
-    def evaluateSequence(self, sequence, bakeData, frame):
+    def evaluateSequence(self, sequence, data, frame):
         if sequence.frame_final_start <= frame < sequence.frame_final_end - 1:
-            return bakeData.samples[frame - sequence.frame_start].strength
+            return data.samples[frame - sequence.frame_start].strength
         return 0
 
 class EqualizerSoundEvaluator:

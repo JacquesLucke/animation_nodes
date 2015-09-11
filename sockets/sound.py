@@ -16,7 +16,7 @@ def getBakeDataItems(self, context):
     for sequenceIndex, sequence in enumerate(getSoundSequences()):
         sound = sequence.sound
 
-        for bakeIndex, data in enumerate(sound.bakeData):
+        for bakeIndex, data in enumerate(sound.singleData):
             items.append({
                 "id" : data.identifier,
                 "value" : "SINGLE_{}_{}".format(sequenceIndex, bakeIndex),
