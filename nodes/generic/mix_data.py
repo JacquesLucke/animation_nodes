@@ -43,7 +43,10 @@ class MixDataNode(bpy.types.Node, AnimationNode):
         lines = []
         if self.clampFactor: lines.append("f = min(max(factor, 0.0), 1.0)")
         else: lines.append("f = factor")
-        if self.dataType in ("Float", "Vector"): lines.append("result = a * (1 - f) + b * f")
-        if self.dataType == "Matrix": lines.append("result = a.lerp(b, f)")
-        if self.dataType == "Color": lines.append("result = [v1 * (1 - f) + v2 * f for v1, v2 in zip(a, b)]")
+        lines.append(getMixCode(self.dataType, "a", "b", "f", "result"))
         return lines
+
+def getMixCode(dataType, mix1 = "a", mix2 = "b", factor = "f", result = "result"):
+    if dataType in ("Float", "Vector"): return "{} = {} * (1 - {}) + {} * {}".format(result, mix1, factor, mix2, factor)
+    if dataType == "Matrix": return "{} = {}.lerp({}, {})".format(result, mix1, mix2, factor)
+    if dataType == "Color": return "{} = [v1 * (1 - {}) + v2 * {} for v1, v2 in zip({}, {})]".format(result, factor, factor, mix1, mix2)
