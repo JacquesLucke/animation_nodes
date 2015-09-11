@@ -2,8 +2,8 @@ import bpy
 import bmesh
 import itertools
 from bpy.props import *
-from ... base_types.node import AnimationNode
 from ... utils.layout import writeText
+from ... base_types.node import AnimationNode
 
 class SetMeshDataOnObjectNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SetMeshDataOnObjectNode"
@@ -31,7 +31,7 @@ class SetMeshDataOnObjectNode(bpy.types.Node, AnimationNode):
     def execute(self, object, meshData):
         if object is None: return object
         if object.type != "MESH" or object.mode != "OBJECT":
-            self.errorMessage = "Object is in edit mode or is no mesh object"
+            self.errorMessage = "Object is not in object mode or is no mesh object"
             return object
 
         bmesh.new().to_mesh(object.data)

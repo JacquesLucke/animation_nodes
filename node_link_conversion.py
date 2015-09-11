@@ -73,7 +73,7 @@ class ConvertElementToList(LinkCorrection):
 
 class ConvertMeshDataToMesh(LinkCorrection):
     def check(self, origin, target):
-        return origin.dataType == "Mesh Data" and target.dataType == "Mesh"
+        return origin.dataType == "Mesh Data" and target.dataType == "BMesh"
     def insert(self, nodeTree, origin, target, dataOrigin):
         insertLinkedNode(nodeTree, "an_CreateBMeshFromMeshData", origin, target)
 
@@ -98,7 +98,7 @@ class ConvertPolygonListIndicesToEdgeListIndices(LinkCorrection):
 class ConvertSeparatedMathDataToMesh(LinkCorrection):
     separatedMeshDataTypes = ["Vector List", "Edge Indices List", "Polygon Indices List"]
     def check(self, origin, target):
-        return origin.dataType in self.separatedMeshDataTypes and target.dataType == "Mesh"
+        return origin.dataType in self.separatedMeshDataTypes and target.dataType == "BMesh"
     def insert(self, nodeTree, origin, target, dataOrigin):
         toMeshData, toMesh = insertNodes(nodeTree, ["an_CombineMeshDataNode", "an_CreateBMeshFromMeshData"], origin, target)
         nodeTree.links.new(toMeshData.inputs[self.separatedMeshDataTypes.index(origin.dataType)], origin)
