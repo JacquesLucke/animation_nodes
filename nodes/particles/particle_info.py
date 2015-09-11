@@ -9,7 +9,6 @@ class ParticleInfoNode(bpy.types.Node, AnimationNode):
         self.inputs.new("an_ParticleSocket", "Particle", "particle")
         self.outputs.new("an_VectorSocket", "Location", "location")
         self.outputs.new("an_VectorSocket", "Rotation", "rotation")
-        self.outputs.new("an_FloatSocket", "Age", "age")
         self.outputs.new("an_VectorSocket", "Velocity", "velocity").hide = True
         self.outputs.new("an_VectorSocket", "Angular Velocity", "angularVelocity").hide = True
         self.outputs.new("an_FloatSocket", "Size", "size").hide = True
@@ -41,7 +40,6 @@ class ParticleInfoNode(bpy.types.Node, AnimationNode):
         if isLinked["lifetime"]: lines.append("    lifetime = particle.lifetime")
         if isLinked["birthTime"]: lines.append("    birthTime = particle.birth_time")
         if isLinked["dieTime"]: lines.append("    dieTime = particle.die_time")
-        if isLinked["age"]: lines.append("    age = max(0, bpy.context.scene.frame_current - particle.birth_time)")
         if isLinked["previousLocation"]: lines.append("    previousLocation = particle.prev_location")
         if isLinked["previousRotation"]: lines.append("    previousRotation = mathutils.Vector(particle.prev_rotation.to_euler())")
         if isLinked["previousVelocity"]: lines.append("    previousVelocity = particle.prev_velocity")
@@ -60,7 +58,6 @@ class ParticleInfoNode(bpy.types.Node, AnimationNode):
         if isLinked["lifetime"]: lines.append("    lifetime = 0")
         if isLinked["birthTime"]: lines.append("    birthTime = 0")
         if isLinked["dieTime"]: lines.append("    dieTime = 0")
-        if isLinked["age"]: lines.append("    age = 0")
         if isLinked["previousLocation"]: lines.append("    previousLocation = mathutils.Vector((0, 0, 0))")
         if isLinked["previousRotation"]: lines.append("    previousRotation = mathutils.Vector((0, 0, 0))")
         if isLinked["previousVelocity"]: lines.append("    previousVelocity = mathutils.Vector((0, 0, 0))")

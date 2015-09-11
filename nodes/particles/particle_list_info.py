@@ -10,7 +10,6 @@ class ParticleListInfoNode(bpy.types.Node, AnimationNode):
         self.inputs.new("an_ParticleListSocket", "Particles", "particles")
         self.outputs.new("an_VectorListSocket", "Locations", "locations")
         self.outputs.new("an_VectorListSocket", "Velocities", "velocities").hide = True
-        self.outputs.new("an_FloatListSocket", "Ages", "ages").hide = True
         self.outputs.new("an_FloatListSocket", "Sizes", "sizes").hide = True
         self.outputs.new("an_FloatListSocket", "Birth Times", "birthTimes").hide = True
         self.outputs.new("an_FloatListSocket", "Die Times", "dieTimes").hide = True
@@ -20,7 +19,6 @@ class ParticleListInfoNode(bpy.types.Node, AnimationNode):
         lines = []
         if isLinked["locations"]: lines.append("locations = [p.location for p in particles]")
         if isLinked["velocities"]: lines.append("velocities = [p.velocity for p in particles]")
-        if isLinked["ages"]: lines.append("ages = [max(0, scene.frame_current - p.birth_time) for p in particles]")
         if isLinked["sizes"]: lines.append("sizes = [p.size for p in particles]")
         if isLinked["birthTimes"]: lines.append("birthTimes = [p.birth_time for p in particles]")
         if isLinked["dieTimes"]: lines.append("dieTimes = [p.die_time for p in particles]")
