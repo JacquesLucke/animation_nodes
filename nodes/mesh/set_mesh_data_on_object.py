@@ -11,7 +11,7 @@ class SetMeshDataOnObjectNode(bpy.types.Node, AnimationNode):
 
     errorMessage = StringProperty()
     checkIndices = BoolProperty(name = "Check Indices", default = True,
-        description = "Check that the highest edge or polygon index is below the vertex amount")
+        description = "Check that the highest edge or polygon index is below the vertex amount (unchecking can crash Blender when the mesh data is invalid)")
 
     def create(self):
         self.width = 170
