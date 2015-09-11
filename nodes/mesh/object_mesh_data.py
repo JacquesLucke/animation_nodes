@@ -11,6 +11,7 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
         self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
         self.inputs.new("an_BooleanSocket", "Use World Space", "useWorldSpace").value = True
         self.inputs.new("an_BooleanSocket", "Use Modifiers", "useModifiers").value = False
+        self.inputs.new("an_SceneSocket", "Scene", "scene").hide = True
         self.outputs.new("an_VectorListSocket", "Vertices", "vertices")
         self.outputs.new("an_EdgeIndicesListSocket", "Edge Indices", "edgeIndices")
         self.outputs.new("an_PolygonIndicesListSocket", "Polygon Indices", "polygonIndices")
@@ -23,23 +24,23 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
 
         lines = []
         lines.append("if getattr(object, 'type', '') == 'MESH':")
-        lines.append("    mesh = self.getMesh(object, useModifiers)")
+        lines.append("    mesh = self.getMesh(object, useModifiers, scene)")
         if isLinked["vertices"]: lines.append("    vertices = self.getVertices(mesh, object, useWorldSpace)")
         if isLinked["edgeIndices"]: lines.append("    edgeIndices = self.getEdges(mesh)")
         if isLinked["polygonIndices"]: lines.append("    polygonIndices = self.getPolygons(mesh)")
-        lines.append("    self.clearMesh(mesh, useModifiers)")
+        lines.append("    self.clearMesh(mesh, useModifiers, scene)")
         lines.append("else: vertices, edgeIndices, polygonIndices = [], [], []")
         return lines
 
 
-    def getMesh(self, object, useModifiers):
-        if useModifiers:
+    def getMesh(self, object, useModifiers, scene):
+        if useModifiers and scene is not None:
             settings = "RENDER" if isRendering() else "PREVIEW"
-            return object.to_mesh(scene = bpy.context.scene, apply_modifiers = True, settings = settings)
+            return object.to_mesh(scene = scene, apply_modifiers = True, settings = settings)
         return object.data
 
-    def clearMesh(self, mesh, useModifiers):
-        if useModifiers: bpy.data.meshes.remove(mesh)
+    def clearMesh(self, mesh, useModifiers, scene):
+        if useModifiers and scene is not None: bpy.data.meshes.remove(mesh)
 
 
     def getVertices(self, mesh, object, useWorldSpace):
