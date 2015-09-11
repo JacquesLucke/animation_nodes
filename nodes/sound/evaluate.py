@@ -36,6 +36,7 @@ class EvaluateSoundNode(bpy.types.Node, AnimationNode):
         self.width = 175
         self.inputs.new("an_SoundSocket", "Sound", "sound")
         self.inputs.new("an_FloatSocket", "Frame", "frame").hide = True
+        self.inputs.new("an_SceneSocket", "Scene", "scene").hide = True
         self.outputs.new("an_FloatSocket", "Strength", "strength")
         self.outputs.new("an_FloatListSocket", "Strengths", "strengths").hide = True
 
@@ -46,10 +47,10 @@ class EvaluateSoundNode(bpy.types.Node, AnimationNode):
     def drawAdvanced(self, layout):
         layout.prop(bpy.context.scene, "sync_mode")
 
-    def execute(self, sound, frame):
+    def execute(self, sound, frame, scene):
         if sound is None: return 0, []
-        if self.frameType == "OFFSET":
-            frame += bpy.context.scene.frame_current_final
+        if self.frameType == "OFFSET" and scene is not None:
+            frame += scene.frame_current_final
         strength = sound.evaluate(frame) if sound.type == "SINGLE" else 0
         strengths = sound.evaluate(frame) if sound.type == "EQUALIZER" else []
         return strength, strengths
