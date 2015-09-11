@@ -43,6 +43,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.inputs.new("an_IntegerSocket", "Instances", "instancesAmount").minValue = 0
         self.inputs.new("an_ObjectSocket", "Source", "sourceObject").defaultDrawType = "PROPERTY_ONLY"
+        self.inputs.new("an_SceneSocket", "Scene", "scene").hide = True
         self.outputs.new("an_ObjectListSocket", "Objects", "objects")
 
     def draw(self, layout):
@@ -63,10 +64,10 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
             text = "Unlink Instances from Node",
             description = "This will make sure that the objects won't be removed if you remove the Replicate Node.")
 
-    def execute(self, instancesAmount, sourceObject):
+    def execute(self, instancesAmount, sourceObject, scene):
         instancesAmount = max(instancesAmount, 0)
 
-        if self.copyFromSource and sourceObject is None:
+        if self.copyFromSource and sourceObject is None or scene is None:
             self.removeAllObjects()
             return []
 
@@ -77,9 +78,9 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         while instancesAmount < len(self.linkedObjects):
             self.removeLastObject()
 
-        return self.getOutputObjects(instancesAmount, sourceObject)
+        return self.getOutputObjects(instancesAmount, sourceObject, scene)
 
-    def getOutputObjects(self, instancesAmount, sourceObject):
+    def getOutputObjects(self, instancesAmount, sourceObject, scene):
         objects = []
         objectAmount = len(bpy.data.objects)
         counter = 0
@@ -90,7 +91,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
                 if object is None:
                     self.removeObjectFromItemIndex(counter)
             else:
-                object = self.appendNewObject(sourceObject)
+                object = self.appendNewObject(sourceObject, scene)
 
             if object is not None:
                 objects.append(object)
@@ -162,15 +163,15 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
             elif type == "SPEAKER":
                 bpy.data.speakers.remove(data)
 
-    def appendNewObject(self, sourceObject):
-        object = self.newInstance(sourceObject)
-        bpy.context.scene.objects.link(object)
+    def appendNewObject(self, sourceObject, scene):
+        object = self.newInstance(sourceObject, scene)
+        scene.objects.link(object)
         linkedItem = self.linkedObjects.add()
         linkedItem.objectName = object.name
         linkedItem.objectIndex = bpy.data.objects.find(object.name)
         return object
 
-    def newInstance(self, sourceObject):
+    def newInstance(self, sourceObject, scene):
         instanceData = self.getSourceObjectData(sourceObject)
         if self.copyObjectProperties and self.copyFromSource:
             newObject = sourceObject.copy()
@@ -179,7 +180,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
             newObject = bpy.data.objects.new(getPossibleObjectName("instance"), instanceData)
 
         if self.parentInstances:
-            newObject.parent = getMainObjectContainer()
+            newObject.parent = getMainObjectContainer(scene)
         return newObject
 
     def getSourceObjectData(self, sourceObject):
@@ -204,7 +205,9 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
     def unlinkInstance(self, object):
         if bpy.context.mode != "OBJECT" and bpy.context.active_object == object:
             bpy.ops.object.mode_set(mode = "OBJECT")
-        bpy.context.scene.objects.unlink(object)
+        for scene in bpy.data.scenes:
+            if object.name in scene.objects:
+                scene.objects.unlink(object)
 
     def resetObjectDataOnAllInstances(self):
         self.resetInstances = True

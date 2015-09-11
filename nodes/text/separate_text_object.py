@@ -200,7 +200,7 @@ def removeObject(object):
         bpy.data.meshes.remove(data)
 
 def parentObjectsToMainControler(objects):
-    mainControler = getMainObjectContainer()
+    mainControler = getMainObjectContainer(bpy.context.scene)
     for object in objects:
         object.parent = mainControler
 
