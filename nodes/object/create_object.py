@@ -8,9 +8,10 @@ class CreateObjectNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.inputs.new("an_StringSocket", "Name", "name")
+        self.inputs.new("an_SceneSocket", "Scene", "scene").hide = True
         self.outputs.new("an_ObjectSocket", "Object", "object")
 
-    def execute(self, name):
+    def execute(self, name, scene):
         object = bpy.data.objects.new(name, None)
-        bpy.context.scene.objects.link(object)
+        if scene: scene.objects.link(object)
         return object
