@@ -28,14 +28,14 @@ class SoundFromSequencesNode(bpy.types.Node, AnimationNode):
     def execute(self, sequences, bakeIndex):
         try:
             self.errorMessage = ""
-            if self.soundType == "SINGLE": return SequencesEvaluator(sequences, bakeIndex)
-            if self.soundType == "EQUALIZER": return SequencesEqualizerEvaluator(sequences, bakeIndex)
+            if self.soundType == "SINGLE": return SingleSoundEvaluator(sequences, bakeIndex)
+            if self.soundType == "EQUALIZER": return EqualizerSoundEvaluator(sequences, bakeIndex)
         except IndexError:
             self.errorMessage = "At least one sequence does not have this bake index"
             return None
 
 
-class SequencesEvaluator:
+class SingleSoundEvaluator:
     type = "SINGLE"
 
     def __init__(self, sequences, index):
@@ -60,7 +60,7 @@ class SequencesEvaluator:
             return bakeData.samples[frame - sequence.frame_start].strength
         return 0
 
-class SequencesEqualizerEvaluator:
+class EqualizerSoundEvaluator:
     type = "EQUALIZER"
 
     def __init__(self, sequences, index):

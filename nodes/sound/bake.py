@@ -214,6 +214,7 @@ class BakeEqualizerData(bpy.types.Operator):
             equalizerItem.attack = self.attack
             equalizerItem.release = self.release
             equalizerItem.frequencyAmount = len(frequencyRanges)
+            equalizerItem.identifier = getRandomString(10)
             for equalizerSampleData in zip(*self.equalizerData):
                 equalizerSampleItem = equalizerItem.samples.add()
                 for sample in equalizerSampleData:
@@ -335,6 +336,7 @@ class EqualizerData(bpy.types.PropertyGroup):
     release = FloatProperty(name = "Release", precision = 3)
     frequencyAmount = IntProperty(name = "Frequency Amount")
     samples = CollectionProperty(name = "Samples", type = MultipleFrequenciesSample)
+    identifier = StringProperty(name = "Identifier", default = "")
 
 def register():
     bpy.types.Sound.bakeData = CollectionProperty(name = "Bake Data", type = BakeData)

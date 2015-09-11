@@ -51,5 +51,5 @@ class EvaluateSoundNode(bpy.types.Node, AnimationNode):
         if self.frameType == "OFFSET":
             frame += bpy.context.scene.frame_current_final
         strength = sound.evaluate(frame) if sound.type == "SINGLE" else 0
-        strengths = sound.evaluate(frame) if sound.type == "EQUALIZER" else 0
+        strengths = sound.evaluate(frame) if sound.type == "EQUALIZER" else []
         return strength, strengths
