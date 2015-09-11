@@ -11,8 +11,8 @@ class CopyObjectDataNode(bpy.types.Node, AnimationNode):
         self.outputs.new("an_ObjectSocket", "To", "outObject")
 
     def execute(self, fromObject, toObject):
-        if fromObject is not None and toObject is not None:
-            if toObject.data != fromObject.data:
-                if toObject.type == fromObject.type:
-                    toObject.data = fromObject.data
+        if fromObject is None or toObject is None: return toObject
+        if toObject.data == fromObject.data: return toObject
+        if toObject.type == fromObject.type:
+            toObject.data = fromObject.data
         return toObject
