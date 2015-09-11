@@ -9,9 +9,9 @@ splineTypeItems = [
     ("BEZIER", "Bezier", "Each control point has two handles"),
     ("POLY", "Poly", "Linear interpolation between the spline points")]
 
-class CreateSplineNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_CreateSplineNode"
-    bl_label = "Create Spline"
+class SplineFromPointsNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_SplineFromPointsNode"
+    bl_label = "Spline from Points"
 
     splineType = EnumProperty(name = "Spline Type", items = splineTypeItems, update = propertyChanged)
 
