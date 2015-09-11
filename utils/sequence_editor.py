@@ -10,6 +10,11 @@ def getSoundsInSequencer():
     sounds = [sequence.sound for sequence in soundSequences]
     return list(set(sounds))
 
+def getSoundSequencesInChannel(channel):
+    editor = bpy.context.scene.sequence_editor
+    if not editor: return []
+    return [sequence for sequence in editor.sequences if sequence.type == "SOUND" and sequence.channel == channel]    
+
 def getSoundSequences():
     editor = bpy.context.scene.sequence_editor
     if not editor: return []

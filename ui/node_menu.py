@@ -235,7 +235,7 @@ class SplineMenu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         insertNode(layout, "an_SplinesFromObjectNode", "Get from Object")
-        insertNode(layout, "an_CreateSplineNode", "Create from Points")
+        insertNode(layout, "an_SplineFromPointsNode", "Create from Points")
         insertNode(layout, "an_CreateListNode", "List", {"assignedType" : repr("Spline")})
         insertNode(layout, "an_AppendPointToSplineNode", "Append Point")
         insertNode(layout, "an_SmoothBezierSplineNode", "Smooth Bezier")

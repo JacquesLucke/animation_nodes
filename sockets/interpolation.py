@@ -4,12 +4,14 @@ from .. events import propertyChanged
 from .. base_types.socket import AnimationNodeSocket
 from .. algorithms.interpolation import (linear, expoEaseIn, expoEaseOut,
                                     cubicEaseIn, cubicEaseOut, cubicEaseInOut,
-                                    backEaseIn, backEaseOut)
+                                    backEaseIn, backEaseOut,
+                                    quadraticInOut)
 
 topCategoryItems = [("LINEAR", "Linear", ""),
                     ("EXPONENTIAL", "Exponential", ""),
                     ("CUBIC", "Cubic", ""),
-                    ("BACK", "Back", "")]
+                    ("BACK", "Back", ""),
+                    ("QUADRATIC", "Quadratic", "")]
 
 exponentialCategoryItems = [("IN", "In", ""),
                             ("OUT", "Out", "")]
@@ -20,6 +22,8 @@ cubicCategoryItems = [("IN", "In", ""),
 
 backCategoryItems = [("IN", "In", ""),
                     ("OUT", "Out", "")]
+
+quadraticCategoryItems = [("INOUT", "In / Out", "")]
 
 class InterpolationSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_InterpolationSocket"
@@ -45,6 +49,10 @@ class InterpolationSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         name = "Cubic", default = "OUT",
         items = cubicCategoryItems, update = propertyChanged)
 
+    quadraticCategory = EnumProperty(
+        name = "Quadratic", default = "INOUT",
+        items = quadraticCategoryItems, update = propertyChanged)
+
     def drawProperty(self, layout, text):
         col = layout.column(align = True)
         if text != "": col.label(text)
@@ -58,6 +66,8 @@ class InterpolationSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             row.prop(self, "exponentialCategory", text = "")
         if self.topCategory == "CUBIC":
             row.prop(self, "cubicCategory", text = "")
+        if self.topCategory == "QUADRATIC":
+            row.prop(self, "quadraticCategory", text = "")
 
     def getValue(self):
         if self.topCategory == "LINEAR": return (linear, None)
@@ -71,10 +81,12 @@ class InterpolationSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         if self.topCategory == "BACK":
             if self.backCategory == "IN": return (backEaseIn, 1.70158)
             if self.backCategory == "OUT": return (backEaseOut, 1.70158)
+        if self.topCategory == "QUADRATIC":
+            if self.quadraticCategory == "INOUT": return (quadraticInOut, None)
         return (linear, None)
 
     def setProperty(self, data):
-        self.topCategory, self.backCategory, self.exponentialCategory, self.cubicCategory = data
+        self.topCategory, self.backCategory, self.exponentialCategory, self.cubicCategory, self.quadraticCategory = data
 
     def getProperty(self):
-        return self.topCategory, self.backCategory, self.exponentialCategory, self.cubicCategory
+        return self.topCategory, self.backCategory, self.exponentialCategory, self.cubicCategory, self.quadraticCategory

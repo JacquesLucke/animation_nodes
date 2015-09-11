@@ -10,7 +10,7 @@ class SelectDependentNodes(bpy.types.Operator, AnimationNodeOperator):
             node.select = True
         return {"FINISHED"}
 
-class SelectDependentNodes(bpy.types.Operator, AnimationNodeOperator):
+class SelectDependenciesNodes(bpy.types.Operator, AnimationNodeOperator):
     bl_idname = "an.select_dependencies"
     bl_label = "Select Dependencies"
 

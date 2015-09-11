@@ -39,6 +39,7 @@ def getPossibleName(field, name = "element"):
     return name + randomString + str(counter)
 
 def getRandomString(length):
+    random.seed()
     return ''.join(random.choice("abcdefghijklmnopqrstuvwxyz") for _ in range(length))
 
 def toVariableName(name):

@@ -12,6 +12,7 @@ class MapRangeNode(bpy.types.Node, AnimationNode):
         update = executionCodeChanged)
 
     def create(self):
+        self.width = 150
         self.inputs.new("an_FloatSocket", "Value", "value")
         self.inputs.new("an_FloatSocket", "Input Min", "inMin").value = 0
         self.inputs.new("an_FloatSocket", "Input Max", "inMax").value = 1
