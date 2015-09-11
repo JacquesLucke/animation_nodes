@@ -56,7 +56,7 @@ class SingleSoundEvaluator:
         return sum([evaluate(sequence, data, frame) for sequence, data in self.sequenceData])
 
     def evaluateSequence(self, sequence, data, frame):
-        if sequence.frame_final_start <= frame < sequence.frame_final_end - 1:
+        if useSequenceForFrame(sequence, data, frame):
             return data.samples[frame - sequence.frame_start].strength
         return 0
 
@@ -75,6 +75,9 @@ class EqualizerSoundEvaluator:
         return [sum(s) for s in zip(*strengths)]
 
     def evaluateSequence(self, sequence, data, frame):
-        if sequence.frame_final_start <= frame < sequence.frame_final_end - 1:
+        if useSequenceForFrame(sequence, data, frame):
             return [sample.strength for sample in data.samples[frame - sequence.frame_start].samples]
         return [0.0] * data.frequencyAmount
+
+def useSequenceForFrame(sequence, data, frame):
+    return sequence.frame_final_start <= frame < min(sequence.frame_start + len(data.samples), sequence.frame_final_end)
