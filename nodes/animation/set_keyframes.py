@@ -25,6 +25,7 @@ class SetKeyframesNode(bpy.types.Node, AnimationNode):
         self.inputs.new("an_BooleanSocket", "Set Keyframe", "setKeyframe")
         self.inputs.new("an_BooleanSocket", "Remove Unwanted", "removeUnwanted")
         self.inputs.new("an_ObjectSocket", "Object", "object")
+        self.inputs.new("an_SceneSocket", "Scene", "scene").hide = True
 
     def draw(self, layout):
         row = layout.row(align = True)
@@ -39,9 +40,9 @@ class SetKeyframesNode(bpy.types.Node, AnimationNode):
             split.prop(item, "index", text = "")
             self.invokeFunction(row, "removeItemFromList", icon = "X", data = str(i))
 
-    def execute(self, enable, setKeyframe, removeUnwanted, object):
+    def execute(self, enable, setKeyframe, removeUnwanted, object, scene):
         if not enable: return
-        frame = bpy.context.scene.frame_current
+        frame = scene.frame_current if scene else 0
         if setKeyframe:
             for item in self.paths:
                 try:

@@ -13,7 +13,7 @@ class SceneSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     hashable = True
 
     sceneName = StringProperty(name = "Scene", update = propertyChanged)
-    useGlobalScene = BoolProperty(name = "Use Global Scene", default = False, update = propertyChanged)
+    useGlobalScene = BoolProperty(name = "Use Global Scene", default = True, update = propertyChanged)
 
     def drawProperty(self, layout, text):
         if self.useGlobalScene:
