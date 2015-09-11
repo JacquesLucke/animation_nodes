@@ -36,7 +36,7 @@ class SoundFromSequencesNode(bpy.types.Node, AnimationNode):
 
 
 class SequencesEvaluator:
-    type = "Single"
+    type = "SINGLE"
 
     def __init__(self, sequences, index):
         self.sequenceData = [(sequence, sequence.sound.bakeData[index]) for sequence in sequences if getattr(sequence, "type", "") == "SOUND"]
@@ -61,7 +61,7 @@ class SequencesEvaluator:
         return 0
 
 class SequencesEqualizerEvaluator:
-    type = "Equalizer"
+    type = "EQUALIZER"
 
     def __init__(self, sequences, index):
         self.sequenceData = [(sequence, sequence.sound.equalizerData[index]) for sequence in sequences if getattr(sequence, "type", "") == "SOUND"]
