@@ -56,18 +56,11 @@ class InvalidNetworksExist(Problem):
         layout.label("At least one invalid network exists")
 
 class InvalidSyntax(Problem):
-    def __init__(self, code):
-        self.code = code
-
     def allowExecution(self):
         return False
 
     def draw(self, layout):
-        row = layout.row()
-        row.label("Invalid Syntax")
-        props = row.operator("an.print_text", text = "Print")
-        props.text = self.code
-        props.emptyLines = 5
+        layout.label("Invalid Syntax (see console)")
 
 class ExceptionDuringExecution(Problem):
     def allowExecution(self):
