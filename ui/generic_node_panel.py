@@ -12,6 +12,10 @@ def draw(self, context):
     col.prop(node, "width", text = "Width")
     col.prop(node, "bl_width_max", text = "Max Width")
 
+    col = layout.column(align = True)
+    col.prop(node, "location", text = "X", index = 0)
+    col.prop(node, "location", text = "Y", index = 1)
+
     row = layout.row(align = True)
 
     size = max(len(node.inputs), len(node.outputs), 1)

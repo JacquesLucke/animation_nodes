@@ -31,12 +31,16 @@ class Template:
     def insert(self):
         pass
 
-    def newNode(self, type, x = 0, y = 0, move = True):
+    def newNode(self, type, x = 0, y = 0, move = True, label = ""):
         node = newNodeAtCursor(type)
         node.location.x += x
         node.location.y += y
+        node.label = label
         if move: self.nodesToMove.append(node)
         return node
+
+    def newLink(self, fromSocket, toSocket):
+        self.nodeTree.links.new(toSocket, fromSocket)
 
     def nodeByIdentifier(self, identifier):
         try: return getNodeByIdentifier(identifier)
