@@ -188,6 +188,7 @@ class ObjectMenu(bpy.types.Menu):
         layout.separator()
         insertNode(layout, "an_ObjectIDKeyNode", "ID Key")
         insertNode(layout, "an_CopyObjectDataNode", "Copy Data")
+        insertNode(layout, "an_SetKeyframesNode", "Set Keyframes")
         layout.separator()
         insertNode(layout, "an_ObjectInstancerNode", "Instancer")
 
@@ -270,7 +271,12 @@ class AnimationMenu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         insertNode(layout, "an_TimeInfoNode", "Time Info")
-        insertNode(layout, "an_SetKeyframesNode", "Set Keyframes")
+        insertNode(layout, "an_DelayTimeNode", "Delay")
+        insertNode(layout, "an_RepeatTimeNode", "Repeat")
+        insertNode(layout, "an_AnimateDataNode", "Animate Number", {"dataType" : repr("Float")})
+        insertNode(layout, "an_AnimateDataNode", "Animate Vector", {"dataType" : repr("Vector")})
+        insertNode(layout, "an_AnimateDataNode", "Animate Color", {"dataType" : repr("Color")})
+        insertNode(layout, "an_AnimateDataNode", "Animate Matrix", {"dataType" : repr("Matrix")})
         layout.separator()
         insertNode(layout, "an_InterpolationNode", "Interpolation")
         insertNode(layout, "an_EvaluateInterpolationNode", "Evaluate Interpolation")
