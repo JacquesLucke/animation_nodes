@@ -132,7 +132,8 @@ class AnimationNode:
             callback = callback)
 
     def invokePathChooser(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True):
-        self.invokeFunction(layout, "_choosePath", text = text, icon = icon, description = description, emboss = emboss, data = functionName)
+        data = functionName
+        self.invokeFunction(layout, "_choosePath", text = text, icon = icon, description = description, emboss = emboss, data = data)
 
     def _choosePath(self, data):
         bpy.ops.an.choose_path("INVOKE_DEFAULT",

@@ -171,7 +171,7 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
 
 
     def createGeneratorOutputNode(self, dataType):
-        GeneratorOutputTemplate(self, dataType)
+        bpy.ops.an.new_loop_generator_output("INVOKE_DEFAULT", loopIdentifier = self.identifier, dataType = dataType)
         subprogramInterfaceChanged()
 
     def createReassignParameterNode(self, socketIdentifier):
@@ -213,13 +213,6 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     def getReassignParameterNodes(self):
         return [node for node in self.network.reassignParameterNodes if node.linkedParameterSocket]
 
-
-
-class GeneratorOutputTemplate(NodeCreator):
-    def insert(self, loopInputNode, dataType):
-        node = self.newNode("an_LoopGeneratorOutputNode")
-        node.loopInputIdentifier = loopInputNode.identifier
-        node.listDataType = dataType
 
 class ReassignParameterTemplate(NodeCreator):
     def insert(self, loopParameterSocket):
