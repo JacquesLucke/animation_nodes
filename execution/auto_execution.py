@@ -1,6 +1,7 @@
 import bpy
 from .. import problems
 from .. preferences import getPreferences
+from .. utils.blender_ui import iterAreas
 from .. utils.nodes import getAnimationNodeTrees
 
 def autoExecuteMainUnits(events):
@@ -24,6 +25,5 @@ def afterExecution():
         redrawAll()
 
 def redrawAll():
-    if bpy.context.screen is None: return
-    for area in bpy.context.screen.areas:
+    for area in iterAreas():
         area.tag_redraw()

@@ -29,7 +29,7 @@ class ScriptExecutionUnit:
         self.execute = self.raiseNotSetupException
 
     def getCodes(self):
-        return [self.setupScript]
+        return [self.code]
 
     def compileScript(self):
         self.codeObject = compileScript(self.code, name = "script: {}".format(repr(self.network.name)))

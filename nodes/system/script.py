@@ -4,12 +4,13 @@ from ... sockets.info import toIdName
 from ... utils.names import toInterfaceName
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
+from ... utils.blender_ui import getAreaWithType
 from . subprogram_base import SubprogramBaseNode
 from . subprogram_sockets import SubprogramData, subprogramInterfaceChanged
 
 defaultScript = """
 def main():
-    
+
     return
 """
 
@@ -124,6 +125,8 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         textBlock = bpy.data.texts.new(name = self.subprogramName)
         self.textBlockName = textBlock.name
         self.writeToTextBlock()
+        area = getAreaWithType("TEXT_EDITOR")
+        if area: area.spaces.active.text = textBlock
 
     def writeToTextBlock(self):
         if not self.textBlock: return
