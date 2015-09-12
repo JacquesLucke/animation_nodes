@@ -1,6 +1,6 @@
 import re
 import bpy
-import time
+import types
 import random
 from bpy.props import *
 from collections import defaultdict
@@ -271,6 +271,8 @@ class AnimationNode:
 
     def getExecutionCodeString(self):
         code = self.getExecutionCode()
+        if isinstance(code, types.GeneratorType):
+            code = list(code)
         if isinstance(code, (list, tuple)):
             return "\n".join(code)
         return code
