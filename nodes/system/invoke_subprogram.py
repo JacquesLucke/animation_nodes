@@ -4,6 +4,7 @@ from ... sockets.info import toDataType
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 from ... utils.enum_items import enumItemsFromDicts
+from ... utils.nodes import newNodeAtCursor, invokeTranslation
 from ... tree_info import getSubprogramNetworks, getNodeByIdentifier, getNetworkByIdentifier
 
 cacheTypeItems = [
@@ -33,6 +34,9 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
     cacheType = EnumProperty(name = "Cache Type", items = cacheTypeItems, update = cacheTypeChanged)
     isOutputStorable = BoolProperty(default = False)
     isInputHashable = BoolProperty(default = False)
+
+    def create(self):
+        self.width = 170
 
     @property
     def inputVariables(self):
@@ -92,14 +96,19 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
         network = self.subprogramNetwork
 
         layout.separator()
+
         col = layout.column()
-        col.scale_y = 1.6
-        if len(networks) == 0:
-            self.invokeFunction(col, "createNewGroup", text = "Group", icon = "PLUS")
-        else:
+        row = col.row(align = True)
+        row.scale_y = 1.6
+
+        if len(networks) > 0:
             text, icon = (network.name, "GROUP_VERTEX") if network else ("Choose", "TRIA_RIGHT")
-            props = col.operator("an.change_subprogram", text = text, icon = icon)
+            props = row.operator("an.change_subprogram", text = text, icon = icon)
             props.nodeIdentifier = self.identifier
+
+        props = row.operator("an.empty_subprogram_template", icon = "NEW", text = "New Subprogram" if len(networks) == 0 else "")
+        props.targetNodeIdentifier = self.identifier
+
         layout.separator()
 
     def drawAdvanced(self, layout):
@@ -111,7 +120,6 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
             layout.label("This caching method is not available:")
             if not self.isOutputStorable: layout.label("  - The output is not storable")
             if not self.isInputHashable: layout.label("  - The input is not hashable")
-
         self.invokeFunction(layout, "clearCache", text = "Clear Cache")
 
 
@@ -150,9 +158,6 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
         if self.cacheType in ("ONE_TIME", "FRAME_BASED") and self.isOutputStorable: return True
         if self.cacheType == "INPUT_BASED" and self.isInputHashable and self.isOutputStorable: return True
         return False
-
-    def createNewGroup(self):
-        bpy.ops.an.empty_group_template("INVOKE_DEFAULT", targetNodeIdentifier = self.identifier)
 
 
 @enumItemsFromDicts

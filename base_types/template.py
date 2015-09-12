@@ -12,6 +12,17 @@ class Template:
         except: return False
 
     def invoke(self, context, event):
+        if hasattr(self, "drawMenu"):
+            return context.window_manager.invoke_props_dialog(self, width = 400)
+        return self.execute(context)
+
+    def draw(self, context):
+        self.drawMenu(self.layout)
+
+    def check(self, context):
+        return True
+
+    def execute(self, context):
         self.nodesToMove = []
         self.insert()
         self.moveInsertedNodes()
