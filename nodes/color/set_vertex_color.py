@@ -11,19 +11,28 @@ class SetVertexColorNode(bpy.types.Node, AnimationNode):
     enabled = BoolProperty(default = True, update = propertyChanged)
     vertexColorName = StringProperty(default = "Col", update = propertyChanged)
     checkIfColorIsSet = BoolProperty(default = True)
+    errorMessage = StringProperty()
 
     def create(self):
-        self.inputs.new("an_ObjectSocket", "Object", "object")
+        self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
         self.inputs.new("an_ColorSocket", "Color", "color")
         self.outputs.new("an_ObjectSocket", "Object", "outObject")
 
     def draw(self, layout):
         layout.prop(self, "enabled", text = "Enabled")
+        if self.errorMessage != "":
+            layout.label(self.errorMessage, icon = "ERROR")
+
+    def drawAdvanced(self, layout):
         layout.prop(self, "checkIfColorIsSet", text = "Check Color")
+        layout.prop(self, "vertexColorName", text = "Name")
 
     def execute(self, object, color):
         if not self.enabled: return object
         if object is None: return object
+        if object.mode == "EDIT":
+            self.errorMessage = "Object is in edit mode"
+            return object
 
         mesh = object.data
 
@@ -39,4 +48,6 @@ class SetVertexColorNode(bpy.types.Node, AnimationNode):
 
         for meshColor in colorLayer.data:
             meshColor.color = color
+
+        self.errorMessage = ""
         return object
