@@ -6,6 +6,7 @@ from ... events import networkChanged
 from ... utils.layout import splitAlignment
 from ... base_types.node import AnimationNode
 from . subprogram_base import SubprogramBaseNode
+from ... utils.nodes import newNodeAtCursor, invokeTranslation
 from . subprogram_sockets import SubprogramData, subprogramInterfaceChanged
 
 class GroupInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
@@ -92,5 +93,6 @@ class GroupInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         return self.network.groupOutputNode
 
     def createGroupOutputNode(self):
-        settings = [{"name" : "groupInputIdentifier", "value" : repr(self.identifier)}]
-        bpy.ops.node.add_and_link_node("INVOKE_DEFAULT", use_transform = True, settings = settings, type = "an_GroupOutputNode")
+        node = newNodeAtCursor("an_GroupOutputNode")
+        node.groupInputIdentifier = self.identifier
+        invokeTranslation()

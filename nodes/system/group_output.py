@@ -5,6 +5,7 @@ from ... sockets.info import toIdName
 from ... utils.layout import splitAlignment
 from ... base_types.node import AnimationNode
 from . subprogram_sockets import subprogramInterfaceChanged
+from ... utils.nodes import newNodeAtCursor, invokeTranslation
 
 class GroupOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GroupOutputNode"
@@ -74,10 +75,9 @@ class GroupOutputNode(bpy.types.Node, AnimationNode):
         return socket
 
     def createGroupInputNode(self):
-        bpy.ops.node.add_and_link_node(type = "an_GroupInputNode")
-        node = self.nodeTree.nodes[-1]
+        node = newNodeAtCursor("an_GroupInputNode")
         self.groupInputIdentifier = node.identifier
-        bpy.ops.node.translate_attach("INVOKE_DEFAULT")
+        invokeTranslation()
 
     def socketChanged(self):
         subprogramInterfaceChanged()
