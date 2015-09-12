@@ -8,8 +8,9 @@ from ... utils.layout import splitAlignment
 from ... tree_info import getNodeByIdentifier
 from ... base_types.node import AnimationNode
 from . subprogram_base import SubprogramBaseNode
-from ... sockets.info import (toBaseIdName, toListDataType,
-                        toIdName, isBase, toListIdName, toBaseDataType)
+from ... utils.nodes import newNodeAtCursor, invokeTranslation
+from ... sockets.info import (toBaseIdName, toListDataType, toIdName,
+                                    isBase, toListIdName, toBaseDataType)
 from . subprogram_sockets import SubprogramData, subprogramInterfaceChanged
 
 class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
@@ -170,12 +171,18 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
 
 
     def createGeneratorOutputNode(self, dataType):
-        bpy.ops.an.new_loop_generator_output("INVOKE_DEFAULT", loopIdentifier = self.identifier, dataType = dataType)
+        node = newNodeAtCursor("an_LoopGeneratorOutputNode")
+        node.loopInputIdentifier = self.identifier
+        node.listDataType = dataType
+        invokeTranslation()
         subprogramInterfaceChanged()
 
     def createReassignParameterNode(self, socketIdentifier):
         socket = self.outputsByIdentifier[socketIdentifier]
-        bpy.ops.an.new_loop_assign_parameter_node("INVOKE_DEFAULT", socketID = str(socket.toID()))
+        node = newNodeAtCursor("an_ReassignLoopParameterNode")
+        node.loopInputIdentifier = self.identifier
+        node.parameterIdentifier = socketIdentifier
+        invokeTranslation()
         subprogramInterfaceChanged()
 
 
