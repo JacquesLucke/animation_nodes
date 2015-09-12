@@ -9,9 +9,9 @@ class TimeInfoNode(bpy.types.Node, AnimationNode):
     def create(self):
         socket = self.inputs.new("an_SceneSocket", "Scene", "scene").hide = True
         self.outputs.new("an_FloatSocket", "Frame", "frame")
-        self.outputs.new("an_FloatSocket", "Start Frame", "startFrame")
-        self.outputs.new("an_FloatSocket", "End Frame", "endFrame")
-        self.outputs.new("an_FloatSocket", "Frame Rate", "frameRate")
+        self.outputs.new("an_FloatSocket", "Start Frame", "startFrame").hide = True
+        self.outputs.new("an_FloatSocket", "End Frame", "endFrame").hide = True
+        self.outputs.new("an_FloatSocket", "Frame Rate", "frameRate").hide = True
 
     def getExecutionCode(self):
         isLinked = self.getLinkedOutputsDict()
