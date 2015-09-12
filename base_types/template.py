@@ -4,6 +4,7 @@ from .. tree_info import getNodeByIdentifier
 from .. utils.nodes import newNodeAtCursor, invokeTranslation
 
 class Template:
+    bl_options = {"INTERNAL"}
 
     @classmethod
     def poll(cls, context):
