@@ -22,6 +22,7 @@ class AnimateDataNode(bpy.types.Node, AnimationNode):
     dataType = StringProperty(default = "Float", update = dataTypeChanged)
 
     def create(self):
+        self.width = 150
         self.generateSockets()
 
     def generateSockets(self):
