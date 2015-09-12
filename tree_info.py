@@ -3,7 +3,7 @@ from collections import defaultdict
 from . utils.timing import measureTime
 from bpy.app.handlers import persistent
 from . preferences import forbidSubprogramRecursion
-from . utils.nodes import getAnimationNodeTrees, getNode, getSocket
+from . utils.nodes import getAnimationNodeTrees, idToNode, idToSocket
 
 # Global Node Data
 ###########################################
@@ -37,9 +37,9 @@ class NodeData:
 
     def insertNodes(self, nodes):
         for node in nodes:
-            nodeID = nodeToID(node)
-            inputIDs = [socketToID(socket) for socket in node.inputs]
-            outputIDs = [socketToID(socket) for socket in node.outputs]
+            nodeID = node.toID()
+            inputIDs = [socket.toID() for socket in node.inputs]
+            outputIDs = [socket.toID() for socket in node.outputs]
 
             self.nodes.append(nodeID)
             self.nodesByType[node.bl_idname].append(nodeID)
@@ -51,15 +51,15 @@ class NodeData:
                 self.nodeBySocket[socketID] = nodeID
 
             if node.bl_idname == "NodeReroute":
-                inputID = socketToID(node.inputs[0])
-                outputID = socketToID(node.outputs[0])
+                inputID = node.inputs[0].toID()
+                outputID = node.outputs[0].toID()
                 self.reroutePairs[inputID] = outputID
                 self.reroutePairs[outputID] = inputID
 
     def insertLinks(self, links):
         for link in links:
-            originID = socketToID(link.from_socket)
-            targetID = socketToID(link.to_socket)
+            originID = link.from_socket.toID()
+            targetID = link.to_socket.toID()
             linkID = (originID, targetID)
 
             self.linkedSocketsWithReroutes[originID].append(targetID)
@@ -349,29 +349,29 @@ def getNodesByType(idName):
 
 
 def isSocketLinked(socket):
-    socketID = socketToID(socket)
+    socketID = socket.toID()
     return len(_data.linkedSockets[socketID]) > 0
 
 
 def getDirectlyLinkedSockets(socket):
-    socketID = socketToID(socket)
+    socketID = socket.toID()
     linkedIDs = _data.linkedSocketsWithReroutes[socketID]
     return [idToSocket(linkedID) for linkedID in linkedIDs]
 
 def getDirectlyLinkedSocket(socket):
-    socketID = socketToID(socket)
+    socketID = socket.toID()
     linkedSocketIDs = _data.linkedSocketsWithReroutes[socketID]
     if len(linkedSocketIDs) > 0:
         return idToSocket(linkedSocketIDs[0])
 
 
 def getLinkedSockets(socket):
-    socketID = socketToID(socket)
+    socketID = socket.toID()
     linkedIDs = _data.linkedSockets[socketID]
     return [idToSocket(linkedID) for linkedID in linkedIDs]
 
 def getLinkedSocket(socket):
-    socketID = socketToID(socket)
+    socketID = socket.toID()
     linkedIDs = _data.linkedSockets[socketID]
     if len(linkedIDs) > 0:
         return idToSocket(linkedIDs[0])
@@ -386,7 +386,7 @@ def getAllDataLinks():
     return list(dataLinks)
 
 def getNodeConnections(node):
-    nodeID = nodeToID(node)
+    nodeID = node.toID()
     inputIDs, outputIDs = _data.socketsByNode[nodeID]
     connections = []
     for socketID in inputIDs + outputIDs:
@@ -408,7 +408,7 @@ def keepNodeLinks(function):
     return wrapper
 
 def getNetworkWithNode(node):
-    return _networks.networkByNode[nodeToID(node)]
+    return _networks.networkByNode[node.toID()]
 
 def getNetworks():
     return _networks.networks
@@ -423,28 +423,6 @@ def getNetworkByIdentifier(identifier):
     for network in getNetworks():
         if network.identifier == identifier: return network
     return None
-
-
-# Utilities
-###################################
-
-def socketToID(socket):
-    return (nodeToID(socket.node), socket.is_output, socket.identifier)
-
-def nodeToID(node):
-    return (node.id_data.name, node.name)
-
-def idToSocket(socketID):
-    return getSocket(socketID[0][0], socketID[0][1], socketID[1], socketID[2])
-
-def idToNode(nodeID):
-    return getNode(*nodeID)
-
-
-from pprint import PrettyPrinter
-def pprint(data):
-    pp = PrettyPrinter()
-    pp.pprint(data)
 
 
 

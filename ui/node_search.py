@@ -1,9 +1,8 @@
 import bpy
 import itertools
 from bpy.props import *
-from .. node_creator import NodeCreator
 from .. utils.enum_items import enumItemsFromDicts
-from .. utils.nodes import getAnimationNodeClasses
+from .. utils.nodes import getAnimationNodeClasses, newNodeAtCursor, invokeTranslation
 
 itemsByIdentifier = {}
 
@@ -11,7 +10,7 @@ itemsByIdentifier = {}
 def getSearchItems(self, context):
     itemsByIdentifier.clear()
     items = []
-    for item in itertools.chain(iterSingleNodeItems(), iterTemplateItems()):
+    for item in itertools.chain(iterSingleNodeItems()):
         itemsByIdentifier[item.identifier] = item
         items.append({"value" : item.identifier, "name" : item.searchTag})
     return items
@@ -80,38 +79,7 @@ class SingleNodeInsertionItem:
         return self.tag
 
     def insert(self):
-        InsertSingleNode(self.idName, self.settings)
-
-class InsertSingleNode(NodeCreator):
-    def insert(self, idName, settings):
-        node = self.newNode(idName)
-        for key, value in settings.items():
+        node = newNodeAtCursor(self.idName)
+        for key, value in self.settings.items():
             setattr(node, key, eval(value))
-
-
-
-# Templates
-#################################
-
-def iterTemplateItems():
-    for template in getNodeTemplates():
-        yield TemplateInsertionItem(template, template.label)
-
-def getNodeTemplates():
-    return [template for template in NodeCreator.__subclasses__() if hasattr(template, "label")]
-
-class TemplateInsertionItem:
-    def __init__(self, template, tag):
-        self.template = template
-        self.tag = tag
-
-    @property
-    def identifier(self):
-        return "template - " + self.tag
-
-    @property
-    def searchTag(self):
-        return self.tag + " - Template"
-
-    def insert(self):
-        self.template()
+        invokeTranslation()

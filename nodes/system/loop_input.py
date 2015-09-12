@@ -7,7 +7,6 @@ from ... utils.names import getRandomString
 from ... utils.layout import splitAlignment
 from ... tree_info import getNodeByIdentifier
 from ... base_types.node import AnimationNode
-from ... node_creator import NodeCreator
 from . subprogram_base import SubprogramBaseNode
 from ... sockets.info import (toBaseIdName, toListDataType,
                         toIdName, isBase, toListIdName, toBaseDataType)
@@ -175,7 +174,8 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         subprogramInterfaceChanged()
 
     def createReassignParameterNode(self, socketIdentifier):
-        ReassignParameterTemplate(self.outputsByIdentifier[socketIdentifier])
+        socket = self.outputsByIdentifier[socketIdentifier]
+        bpy.ops.an.new_loop_assign_parameter_node("INVOKE_DEFAULT", socketID = str(socket.toID()))
         subprogramInterfaceChanged()
 
 
@@ -212,10 +212,3 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
 
     def getReassignParameterNodes(self):
         return [node for node in self.network.reassignParameterNodes if node.linkedParameterSocket]
-
-
-class ReassignParameterTemplate(NodeCreator):
-    def insert(self, loopParameterSocket):
-        node = self.newNode("an_ReassignLoopParameterNode")
-        node.loopInputIdentifier = loopParameterSocket.node.identifier
-        node.parameterIdentifier = loopParameterSocket.identifier

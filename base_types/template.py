@@ -1,6 +1,7 @@
 import bpy
 from bpy.props import *
 from .. tree_info import getNodeByIdentifier
+from .. utils.nodes import newNodeAtCursor, invokeTranslation
 
 class Template:
 
@@ -19,8 +20,7 @@ class Template:
         pass
 
     def newNode(self, type, x = 0, y = 0, move = True):
-        bpy.ops.node.add_and_link_node(type = type)
-        node = self.nodeTree.nodes[-1]
+        node = newNodeAtCursor(type)
         node.location.x += x
         node.location.y += y
         if move: self.nodesToMove.append(node)
@@ -33,7 +33,7 @@ class Template:
     def moveInsertedNodes(self):
         for node in self.nodeTree.nodes:
             node.select = node in self.nodesToMove
-        bpy.ops.node.translate_attach("INVOKE_DEFAULT")
+        invokeTranslation()
 
     @property
     def nodeTree(self):

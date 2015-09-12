@@ -199,6 +199,9 @@ class AnimationNode:
         nodes.remove(self)
         return list(nodes)
 
+    def toID(self):
+        return (self.id_data.name, self.name)
+
 
     @property
     def nodeTree(self):

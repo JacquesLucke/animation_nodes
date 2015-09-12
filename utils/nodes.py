@@ -1,5 +1,19 @@
 import bpy
 
+def newNodeAtCursor(type):
+    bpy.ops.node.add_and_link_node(type = type)
+    return bpy.context.space_data.node_tree.nodes[-1]
+
+def invokeTranslation():
+    bpy.ops.node.translate_attach("INVOKE_DEFAULT")
+
+def idToSocket(socketID):
+    return getSocket(socketID[0][0], socketID[0][1], socketID[1], socketID[2])
+
+def idToNode(nodeID):
+    return getNode(*nodeID)
+
+
 def getSocket(treeName, nodeName, isOutput, identifier):
     node = getNode(treeName, nodeName)
     sockets = node.outputs if isOutput else node.inputs

@@ -189,6 +189,9 @@ class AnimationNodeSocket:
         self.display.moveOperators = False
         self.display.removeOperator = False
 
+    def toID(self):
+        return ((self.node.id_data.name, self.node.name), self.is_output, self.identifier)
+        
     @property
     def isOutput(self):
         return self.is_output
@@ -268,6 +271,7 @@ class AnimationNodeSocket:
     @property
     def hasProperty(self):
         return hasattr(self, "drawProperty")
+
 
 
 
