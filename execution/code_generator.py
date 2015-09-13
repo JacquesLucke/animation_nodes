@@ -154,7 +154,7 @@ def linkSocketToTargets(socket, variables):
     targets = socket.dataTargets
     needACopy = getTargetsThatNeedACopy(socket, targets)
 
-    for target in socket.dataTargets:
+    for target in targets:
         if target in needACopy:
             lines.append(getCopyLine(socket, variables[target], variables))
         else:
