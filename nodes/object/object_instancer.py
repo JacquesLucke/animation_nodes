@@ -32,6 +32,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
 
     linkedObjects = CollectionProperty(type = an_ObjectNamePropertyGroup)
     resetInstances = BoolProperty(default = False, update = propertyChanged)
+    sourceObjectHash = StringProperty()
 
     copyFromSource = BoolProperty(default = True, name = "Copy from Source", update = copyFromSourceChanged)
     deepCopy = BoolProperty(default = False, update = resetInstancesEvent, name = "Deep Copy", description = "Make the instances independent of the source object (e.g. copy mesh)")
@@ -66,6 +67,11 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
 
     def execute(self, instancesAmount, sourceObject, scene):
         instancesAmount = max(instancesAmount, 0)
+
+        if self.copyFromSource and sourceObject is not None:
+            if self.sourceObjectHash != str(hash(sourceObject)):
+                self.removeAllObjects()
+                self.sourceObjectHash = str(hash(sourceObject))
 
         if self.copyFromSource and sourceObject is None or scene is None:
             self.removeAllObjects()
