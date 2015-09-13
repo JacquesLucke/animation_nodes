@@ -8,10 +8,10 @@ def invokeTranslation():
     bpy.ops.node.translate_attach("INVOKE_DEFAULT")
 
 def idToSocket(socketID):
+    print(socketID)
     node = bpy.data.node_groups[socketID[0][0]].nodes[socketID[0][1]]
     sockets = node.outputs if socketID[1] else node.inputs
-    for socket in sockets:
-        if socket.identifier == socketID[2]: return socket
+    return sockets[socketID[2]]
 
 def idToNode(nodeID):
     return bpy.data.node_groups[nodeID[0]].nodes[nodeID[1]]

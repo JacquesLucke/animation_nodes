@@ -1,11 +1,11 @@
 import bpy
 from bpy.props import *
-from .. import tree_info
 from .. utils.recursion import noRecursion
 from .. events import treeChanged, executionCodeChanged
 from .. utils.names import getRandomString, toVariableName
 from .. operators.dynamic_operators import getInvokeFunctionOperator
 from .. nodes.system.subprogram_sockets import subprogramInterfaceChanged
+from .. tree_info import isSocketLinked, getLinkedSockets, getDirectlyLinkedSockets
 
 class SocketTextProperties(bpy.types.PropertyGroup):
     bl_idname = "an_SocketTextProperties"
@@ -203,17 +203,13 @@ class AnimationNodeSocket:
         return self.node.id_data
 
     @property
-    def index(self):
-        return list(self.sockets).index(self)
-
-    @property
     def sockets(self):
         """Returns all sockets next to this one (all inputs or outputs)"""
         return self.node.outputs if self.isOutput else self.node.inputs
 
     @property
     def isLinked(self):
-        return tree_info.isSocketLinked(self)
+        return isSocketLinked(self)
 
     @property
     def isUnlinked(self):
@@ -251,11 +247,11 @@ class AnimationNodeSocket:
 
     @property
     def linkedSockets(self):
-        return tree_info.getLinkedSockets(self)
+        return getLinkedSockets(self)
 
     @property
     def directlyLinkedSockets(self):
-        return tree_info.getDirectlyLinkedSockets(self)
+        return getDirectlyLinkedSockets(self)
 
 
     @property
@@ -312,12 +308,19 @@ def setSocketVisibility(socket, value):
 from functools import lru_cache
 @lru_cache(maxsize = 2048)
 def toID(socket):
-    return ((socket.node.id_data.name, socket.node.name), socket.is_output, socket.identifier)
+    return ((socket.node.id_data.name, socket.node.name), socket.is_output, socket.index)
 
+def getSocketIndex(socket):
+    if socket.is_output:
+        return list(socket.node.outputs).index(socket)
+    return list(socket.node.inputs).index(socket)
 
 def register():
-    bpy.types.NodeSocket.toID = toID
     bpy.types.NodeSocket.show = BoolProperty(default = True, get = getSocketVisibility, set = setSocketVisibility)
+    bpy.types.NodeSocket.index = IntProperty(get = getSocketIndex)
+    bpy.types.NodeSocket.toID = toID
 
 def unregister():
     del bpy.types.NodeSocket.show
+    del bpy.types.NodeSocket.index
+    del bpy.types.NodeSocket.toID
