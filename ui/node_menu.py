@@ -290,6 +290,7 @@ class ParticlesMenu(bpy.types.Menu):
         layout = self.layout
         insertNode(layout, "an_ParticleSystemsInputNode", "Systems Input")
         insertNode(layout, "an_GetParticlesNode", "Get Particles")
+        insertNode(layout, "an_ParticlesFromObjectNode", "Particles from Object")
         insertNode(layout, "an_FilterParticlesNode", "State Filter")
         insertNode(layout, "an_ParticleListInfoNode", "Particle List Info")
         insertNode(layout, "an_ParticleInfoNode", "Particle Info")
