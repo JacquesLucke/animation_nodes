@@ -1,6 +1,7 @@
 import bpy
 from bpy.props import *
 from ... events import propertyChanged
+from ... utils.names import getRandomString
 from ... base_types.node import AnimationNode
 from ... nodes.container_provider import getMainObjectContainer
 from ... utils.names import (getPossibleObjectName,
@@ -88,23 +89,20 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
 
     def getOutputObjects(self, instancesAmount, sourceObject, scene):
         objects = []
-        objectAmount = len(bpy.data.objects)
-        counter = 0
 
         self.updateFastListAccess()
 
-        while(counter < instancesAmount):
-            if counter < len(self.linkedObjectsList):
-                object = self.getObjectFromItemIndex(counter, objectAmount)
-                if object is None:
-                    self.removeObjectFromItemIndex(counter)
-                    self.updateFastListAccess()
-            else:
-                object = self.appendNewObject(sourceObject, scene)
+        indicesToRemove = []
+        for i, item in enumerate(self.linkedObjectsList):
+            object = self.getObjectFromItem(item)
+            if object is None: indicesToRemove.append(i)
+            else: objects.append(object)
 
-            if object is not None:
-                objects.append(object)
-                counter += 1
+        self.removeObjectFromItemIndices(indicesToRemove)
+
+        missingAmount = instancesAmount - len(objects)
+        newObjects = self.createNewObjects(missingAmount, sourceObject, scene)
+        objects.extend(newObjects)
 
         return objects
 
@@ -113,9 +111,8 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         self.objectList = list(bpy.data.objects)
 
     # at first try to get the object by index, because it's faster and then search by name
-    def getObjectFromItemIndex(self, itemIndex, objectAmount):
-        item = self.linkedObjectsList[itemIndex]
-        if item.objectIndex < objectAmount:
+    def getObjectFromItem(self, item):
+        if item.objectIndex < len(self.objectList):
             object = self.objectList[item.objectIndex]
             if object.name == item.objectName:
                 return object
@@ -140,6 +137,10 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
 
     def removeLastObject(self):
         self.removeObjectFromItemIndex(len(self.linkedObjects)-1)
+
+    def removeObjectFromItemIndices(self, indices):
+        for offset, index in enumerate(indices):
+            self.removeObjectFromItemIndex(index - offset)
 
     def removeObjectFromItemIndex(self, itemIndex):
         item = self.linkedObjects[itemIndex]
@@ -176,25 +177,37 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
             elif type == "SPEAKER":
                 bpy.data.speakers.remove(data)
 
-    def appendNewObject(self, sourceObject, scene):
-        object = self.newInstance(sourceObject, scene)
+    def createNewObjects(self, amount, sourceObject, scene):
+        objects = []
+        nameSuffix = "instance_{}_".format(getRandomString(5))
+        for i in range(amount):
+            name = nameSuffix + str(i)
+            newObject = self.appendNewObject(name, sourceObject, scene)
+            objects.append(newObject)
+        return objects
+
+    def appendNewObject(self, name, sourceObject, scene):
+        object = self.newInstance(name, sourceObject, scene)
         scene.objects.link(object)
         linkedItem = self.linkedObjects.add()
         linkedItem.objectName = object.name
         linkedItem.objectIndex = bpy.data.objects.find(object.name)
         return object
 
-    def newInstance(self, sourceObject, scene):
+    def newInstance(self, name, sourceObject, scene):
         instanceData = self.getSourceObjectData(sourceObject)
         if self.copyObjectProperties and self.copyFromSource:
             newObject = sourceObject.copy()
             newObject.data = instanceData
         else:
-            newObject = bpy.data.objects.new(getPossibleObjectName("instance"), instanceData)
+            newObject = self.createObject(name, instanceData)
 
         if self.parentInstances:
             newObject.parent = getMainObjectContainer(scene)
         return newObject
+
+    def createObject(self, name, instanceData):
+        return bpy.data.objects.new(name, instanceData)
 
     def getSourceObjectData(self, sourceObject):
         if self.copyFromSource:
