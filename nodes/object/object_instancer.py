@@ -91,14 +91,14 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         objectAmount = len(bpy.data.objects)
         counter = 0
 
-        self.linkedObjectsList = list(self.linkedObjects)
-        self.objectList = list(bpy.data.objects)
+        self.updateFastListAccess()
 
         while(counter < instancesAmount):
-            if counter < len(self.linkedObjects):
+            if counter < len(self.linkedObjectsList):
                 object = self.getObjectFromItemIndex(counter, objectAmount)
                 if object is None:
                     self.removeObjectFromItemIndex(counter)
+                    self.updateFastListAccess()
             else:
                 object = self.appendNewObject(sourceObject, scene)
 
@@ -107,6 +107,10 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
                 counter += 1
 
         return objects
+
+    def updateFastListAccess(self):
+        self.linkedObjectsList = list(self.linkedObjects)
+        self.objectList = list(bpy.data.objects)
 
     # at first try to get the object by index, because it's faster and then search by name
     def getObjectFromItemIndex(self, itemIndex, objectAmount):
