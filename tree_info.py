@@ -349,8 +349,7 @@ def getNodesByType(idName):
 
 
 def isSocketLinked(socket):
-    socketID = socket.toID()
-    return len(_data.linkedSockets[socketID]) > 0
+    return len(_data.linkedSockets[socket.toID()]) > 0
 
 
 def getDirectlyLinkedSockets(socket):
@@ -387,8 +386,6 @@ def getOriginNodes(node):
             linkedNodeIDs.add(linkedSocketID[0])
     return [idToNode(nodeID) for nodeID in linkedNodeIDs]
 
-# keep node links
-
 def getAllDataLinks():
     dataLinks = set()
     for socketID, linkedIDs in _data.linkedSockets.items():
@@ -396,6 +393,8 @@ def getAllDataLinks():
             if not socketID[1]: socketID, linkedID = linkedID, socketID
             dataLinks.add((idToSocket(socketID), idToSocket(linkedID)))
     return list(dataLinks)
+
+# keep node links
 
 def getNodeConnections(node):
     nodeID = node.toID()
