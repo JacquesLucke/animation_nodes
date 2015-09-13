@@ -2,7 +2,6 @@ import bpy
 import random
 from bpy.props import *
 from mathutils import Vector, Matrix
-from ... utils.nodes import getNode
 from ... base_types.node import AnimationNode
 from ... id_keys import setIDKeyData, createIDKey
 from ... nodes.container_provider import getMainObjectContainer
