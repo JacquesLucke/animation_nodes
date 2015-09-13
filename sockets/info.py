@@ -15,7 +15,8 @@ listChains = [
     ["an_SplineSocket", "an_SplineListSocket"],
     ["an_MatrixSocket", "an_MatrixListSocket"],
     ["an_MeshDataSocket", "an_MeshDataListSocket"],
-    ["an_SequenceSocket", "an_SequenceListSocket"] ]
+    ["an_SequenceSocket", "an_SequenceListSocket"],
+    ["an_PolygonSocket", "an_PolygonListSocket"] ]
 
 
 
