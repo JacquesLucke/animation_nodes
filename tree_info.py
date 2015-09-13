@@ -60,7 +60,6 @@ class NodeData:
         for link in links:
             originID = link.from_socket.toID()
             targetID = link.to_socket.toID()
-            linkID = (originID, targetID)
 
             self.linkedSocketsWithReroutes[originID].append(targetID)
             self.linkedSocketsWithReroutes[targetID].append(originID)

@@ -13,6 +13,7 @@ def updateEverything():
     Call when the node tree changed in a way that the execution code does
     not work anymore.
     '''
+    tree_info.update()
     problems.reset()
     enableUseFakeUser()
     callNodeEditFunctions()
