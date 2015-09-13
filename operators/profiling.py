@@ -1,6 +1,8 @@
 import bpy
+import io
 import cProfile
 from .. update import updateEverything
+from contextlib import redirect_stdout
 
 class ProfileMainUnitExecution(bpy.types.Operator):
     bl_idname = "an.profile_main_unit_execution"
@@ -23,6 +25,17 @@ class ProfileUpdating(bpy.types.Operator):
     bl_description = ""
 
     def execute(self, context):
-        d = {"update" : updateEverything}
-        cProfile.runctx("update()", d, d, sort = "cumtime")
+        f = io.StringIO()
+        with redirect_stdout(f):
+            d = {"update" : updateEverything}
+            cProfile.runctx("update()", d, d, sort = "cumtime")
+        text = f.getvalue()
+        lines = text.split("\n")
+        outText = "\n".join([line for line in lines if "" in line])
+        getTextBlock("Profile").from_string(outText)
         return {"FINISHED"}
+
+def getTextBlock(name):
+    text = bpy.data.texts.get(name)
+    if text is None: text = bpy.data.texts.new(name)
+    return text
