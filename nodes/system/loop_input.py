@@ -185,6 +185,12 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         invokeTranslation()
         subprogramInterfaceChanged()
 
+    def getTemplateCode(self):
+        for socket in self.getIteratorSockets():
+            yield "self.newIterator({}, name = {})".format(repr(toListDataType(socket.bl_idname)), repr(socket.text))
+        for socket in self.getParameterSockets():
+            yield "self.newParameter({}, name = {})".format(repr(socket.dataType), repr(socket.text))
+
 
     @property
     def newIteratorSocket(self):

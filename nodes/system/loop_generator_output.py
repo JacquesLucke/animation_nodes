@@ -78,6 +78,12 @@ class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
     def duplicate(self, source):
         subprogramInterfaceChanged()
 
+    def getTemplateCode(self):
+        yield "self.loopInputIdentifier = {}".format(repr(self.loopInputIdentifier))
+        yield "self.outputName = {}".format(repr(self.outputName))
+        yield "self.listDataType = '{}'".format(self.listDataType)
+        yield "self.addType = '{}'".format(self.addType)
+
     @property
     def loopInputNode(self):
         try: return getNodeByIdentifier(self.loopInputIdentifier)
