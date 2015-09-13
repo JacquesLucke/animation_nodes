@@ -91,6 +91,9 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         objectAmount = len(bpy.data.objects)
         counter = 0
 
+        self.linkedObjectsList = list(self.linkedObjects)
+        self.objectList = list(bpy.data.objects)
+
         while(counter < instancesAmount):
             if counter < len(self.linkedObjects):
                 object = self.getObjectFromItemIndex(counter, objectAmount)
@@ -107,9 +110,9 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
 
     # at first try to get the object by index, because it's faster and then search by name
     def getObjectFromItemIndex(self, itemIndex, objectAmount):
-        item = self.linkedObjects[itemIndex]
+        item = self.linkedObjectsList[itemIndex]
         if item.objectIndex < objectAmount:
-            object = bpy.data.objects[item.objectIndex]
+            object = self.objectList[item.objectIndex]
             if object.name == item.objectName:
                 return object
 
