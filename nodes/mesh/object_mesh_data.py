@@ -1,5 +1,6 @@
 import bpy
 from bpy.props import *
+from ... utils.math import extractRotation
 from ... data_structures.mesh import Polygon
 from ... base_types.node import AnimationNode
 from ... events import propertyChanged, isRendering
@@ -36,8 +37,8 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
         if isLinked["polygonIndices"]:
             lines.append("    polygonIndices = self.getPolygonIndices(mesh)")
         if isLinked["polygons"]:
-            lines.append("    polygons = self.getPolygons(mesh, vertexLocations)")
-            
+            lines.append("    polygons = self.getPolygons(mesh, vertexLocations, useWorldSpace, object)")
+
         lines.append("    self.clearMesh(mesh, useModifiers, scene)")
         lines.append("else: vertexLocations, edgeIndices, polygonIndices, polygons = [], [], [], []")
         return lines
@@ -67,11 +68,21 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
     def getPolygonIndices(self, mesh):
         return [tuple(face.vertices) for face in mesh.polygons]
 
-    def getPolygons(self, mesh, vertexLocations):
+    def getPolygons(self, mesh, vertexLocations, useWorldSpace, object):
         polygons = []
 
-        for meshPolygon in mesh.polygons:
-            vertices = [vertexLocations[index].copy() for index in meshPolygon.vertices]
-            polygons.append(Polygon(vertices, meshPolygon.normal, meshPolygon.center,
-                                    meshPolygon.area, meshPolygon.material_index))
+        if useWorldSpace:
+            matrix = object.matrix_world
+            rotation = extractRotation(matrix)
+            scale = matrix.to_scale().length / 1.732
+
+            for meshPolygon in mesh.polygons:
+                vertices = [vertexLocations[index].copy() for index in meshPolygon.vertices]
+                polygons.append(Polygon(vertices, rotation * meshPolygon.normal, matrix * meshPolygon.center,
+                                        meshPolygon.area * scale, meshPolygon.material_index))
+        else:
+            for meshPolygon in mesh.polygons:
+                vertices = [vertexLocations[index].copy() for index in meshPolygon.vertices]
+                polygons.append(Polygon(vertices, meshPolygon.normal, meshPolygon.center,
+                                        meshPolygon.area, meshPolygon.material_index))
         return polygons
