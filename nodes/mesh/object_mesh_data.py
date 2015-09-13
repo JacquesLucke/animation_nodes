@@ -83,6 +83,6 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
         else:
             for meshPolygon in mesh.polygons:
                 vertices = [vertexLocations[index].copy() for index in meshPolygon.vertices]
-                polygons.append(Polygon(vertices, meshPolygon.normal, meshPolygon.center,
+                polygons.append(Polygon(vertices, meshPolygon.normal.copy(), meshPolygon.center.copy(),
                                         meshPolygon.area, meshPolygon.material_index))
         return polygons
