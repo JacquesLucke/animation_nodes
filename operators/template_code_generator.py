@@ -15,12 +15,19 @@ class TemplateCodeGenerator(bpy.types.Operator):
 
     def iterCodeLines(self, tree):
         nodeNames = {}
-        for node in sortNodes(tree.nodes):
+        for node in self.sortNodes(tree.nodes):
             yield from iterNodeCreationLines(node, nodeNames)
         for link in tree.links:
             fromText = "{}.outputs[{}]".format(nodeNames[link.from_node], list(link.from_node.outputs).index(link.from_socket))
             toText = "{}.inputs[{}]".format(nodeNames[link.to_node], list(link.to_node.inputs).index(link.to_socket))
             yield "self.newLink({}, {})".format(fromText, toText)
+
+    def sortNodes(self, nodes):
+        animationNodes = [node for node in nodes if hasattr(node, "isAnimationNode")]
+        otherNodes = [node for node in nodes if not hasattr(node, "isAnimationNode")]
+        sortedAnimationNodes = sortNodes(animationNodes)
+        return sortedAnimationNodes + otherNodes
+
 
     def outputCode(self, code):
         textBlock = bpy.data.texts.get("Template Code")

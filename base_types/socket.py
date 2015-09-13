@@ -189,9 +189,7 @@ class AnimationNodeSocket:
         self.display.moveOperators = False
         self.display.removeOperator = False
 
-    def toID(self):
-        return ((self.node.id_data.name, self.node.name), self.is_output, self.identifier)
-        
+
     @property
     def isOutput(self):
         return self.is_output
@@ -310,8 +308,12 @@ def getSocketVisibility(socket):
 def setSocketVisibility(socket, value):
     socket.hide = not value
 
+def toID(self):
+    return ((self.node.id_data.name, self.node.name), self.is_output, self.identifier)
+
 
 def register():
+    bpy.types.NodeSocket.toID = toID
     bpy.types.NodeSocket.show = BoolProperty(default = True, get = getSocketVisibility, set = setSocketVisibility)
 
 def unregister():

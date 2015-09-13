@@ -199,9 +199,6 @@ class AnimationNode:
         nodes.remove(self)
         return list(nodes)
 
-    def toID(self):
-        return (self.id_data.name, self.name)
-
 
     @property
     def nodeTree(self):
@@ -341,7 +338,11 @@ def createIdentifier():
 # Register
 ##################################
 
+def nodeToID(self):
+    return (self.id_data.name, self.name)
+
 def registerHandlers():
+    bpy.types.Node.toID = nodeToID
     bpy.app.handlers.load_post.append(createMissingIdentifiers)
 
 def unregisterHandlers():
