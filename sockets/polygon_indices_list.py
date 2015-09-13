@@ -6,7 +6,7 @@ class PolygonIndicesListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_label = "Polygon Indices List Socket"
     dataType = "Polygon Indices List"
     allowedInputTypes = ["Polygon Indices List"]
-    drawColor = (0.4, 0.2, 1.0, 1)
+    drawColor = (0.6, 0.3, 0.8, 0.5)
 
     def getValueCode(self):
         return "[]"

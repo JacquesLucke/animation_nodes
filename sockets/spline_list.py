@@ -9,7 +9,7 @@ class SplineListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_label = "Spline List Socket"
     dataType = "Spline List"
     allowedInputTypes = ["Spline List"]
-    drawColor = (0.5, 0.28, 1.0, 1.0)
+    drawColor = (0.8, 0.4, 1.0, 0.7)
 
     objectName = StringProperty(default = "",
         description = "Use the splines from this object",

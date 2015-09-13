@@ -9,7 +9,7 @@ class VectorSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_label = "Vector Socket"
     dataType = "Vector"
     allowedInputTypes = ["Vector"]
-    drawColor = (0.05, 0.05, 0.8, 0.7)
+    drawColor = (0.15, 0.15, 0.8, 1.0)
 
     value = FloatVectorProperty(default = [0, 0, 0], update = propertyChanged)
 

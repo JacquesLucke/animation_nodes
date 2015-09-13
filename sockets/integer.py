@@ -13,7 +13,7 @@ class IntegerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_label = "Integer Socket"
     dataType = "Integer"
     allowedInputTypes = ["Integer"]
-    drawColor = (0.2, 0.2, 1.0, 1.0)
+    drawColor = (0.3, 0.4, 1.0, 1.0)
     hashable = True
 
     value = IntProperty(default = 0,

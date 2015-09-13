@@ -6,7 +6,7 @@ class ParticleSystemListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_label = "Particle System List Socket"
     dataType = "Particle System List"
     allowedInputTypes = ["Particle System List"]
-    drawColor = (1.0, 0.55, 0.55, 1)
+    drawColor = (1.0, 0.8, 0.6, 0.5)
     storable = False
 
     def getValueCode(self):

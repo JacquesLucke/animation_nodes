@@ -6,7 +6,7 @@ class EdgeIndicesListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_label = "Edge Indices List Socket"
     dataType = "Edge Indices List"
     allowedInputTypes = ["Edge Indices List"]
-    drawColor = (0, 0.55, 0.23, 1)
+    drawColor = (0.4, 0.6, 0.6, 0.5)
 
     def getValueCode(self):
         return "[]"

@@ -6,7 +6,7 @@ class ObjectListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_label = "Object List Socket"
     dataType = "Object List"
     allowedInputTypes = ["Object List"]
-    drawColor = (0, 0, 0, 0.4)
+    drawColor = (0, 0, 0, 0.5)
     storable = False
 
     def getValueCode(self):
