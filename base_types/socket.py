@@ -308,7 +308,7 @@ def setSocketVisibility(socket, value):
 from functools import lru_cache
 @lru_cache(maxsize = 2048)
 def toID(socket):
-    return ((socket.node.id_data.name, socket.node.name), socket.is_output, socket.index)
+    return ((socket.node.id_data.name, socket.node.name), socket.is_output, socket.identifier)
 
 def getSocketIndex(socket):
     if socket.is_output:
