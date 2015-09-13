@@ -1,10 +1,13 @@
 import bpy
 from bpy.props import *
+from mathutils import Vector
 from .. tree_info import getNodeByIdentifier
+from .. nodes.system import subprogram_sockets
 from .. utils.nodes import newNodeAtCursor, invokeTranslation
 
 class Template:
     bl_options = {"INTERNAL"}
+    nodeOffset = (0, 0)
 
     @classmethod
     def poll(cls, context):
@@ -24,7 +27,9 @@ class Template:
 
     def execute(self, context):
         self.nodesToMove = []
+        self.newNodes = []
         self.insert()
+        self.offsetNewNodesPosition()
         self.moveInsertedNodes()
         return {"FINISHED"}
 
@@ -32,10 +37,11 @@ class Template:
         pass
 
     def newNode(self, type, x = 0, y = 0, move = True, label = ""):
-        node = newNodeAtCursor(type)
+        node = self.nodeTree.nodes.new(type = type)
         node.location.x += x
         node.location.y += y
         node.label = label
+        self.newNodes.append(node)
         if move: self.nodesToMove.append(node)
         return node
 
@@ -45,6 +51,13 @@ class Template:
     def nodeByIdentifier(self, identifier):
         try: return getNodeByIdentifier(identifier)
         except: return None
+
+    def offsetNewNodesPosition(self):
+        tempNode = newNodeAtCursor("an_DebugNode")
+        offset = tempNode.location
+        self.nodeTree.nodes.remove(tempNode)
+        for node in self.newNodes:
+            node.location += offset + Vector(self.nodeOffset)
 
     def moveInsertedNodes(self):
         for node in self.nodeTree.nodes:
@@ -58,3 +71,6 @@ class Template:
     @property
     def activeNode(self):
         return getattr(bpy.context, "active_node", None)
+
+    def updateSubprograms(self):
+        subprogram_sockets.updateIfNecessary()

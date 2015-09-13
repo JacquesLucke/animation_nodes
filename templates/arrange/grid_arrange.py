@@ -5,6 +5,7 @@ from ... base_types.template import Template
 class GridArrangeObjectsTemplate(bpy.types.Operator, Template):
     bl_idname = "an.grid_arrange_objects_template"
     bl_label = "Grid Arrange Objects"
+    nodeOffset = (-500, 200)
 
     def insert(self):
         xDivisionsNode = self.newNode("an_DataInputNode", x = 0, y = 0, label = "X Divisions")
@@ -30,6 +31,7 @@ class GridArrangeObjectsTemplate(bpy.types.Operator, Template):
         transformsOutputNode.useLocation = [True] * 3
 
         invokeSubprogramNode.subprogramIdentifier = loopInputNode.identifier
+        self.updateSubprograms()
 
         self.newLink(xDivisionsNode.outputs[0], gridMeshNode.inputs[0])
         self.newLink(yDivisionsNode.outputs[0], gridMeshNode.inputs[1])
