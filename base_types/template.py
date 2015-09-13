@@ -8,6 +8,7 @@ from .. utils.nodes import newNodeAtCursor, invokeTranslation
 class Template:
     bl_options = {"INTERNAL"}
     nodeOffset = (0, 0)
+    menuWidth = 400
 
     @classmethod
     def poll(cls, context):
@@ -16,7 +17,7 @@ class Template:
 
     def invoke(self, context, event):
         if hasattr(self, "drawMenu"):
-            return context.window_manager.invoke_props_dialog(self, width = 400)
+            return context.window_manager.invoke_props_dialog(self, width = self.menuWidth)
         return self.execute(context)
 
     def draw(self, context):
