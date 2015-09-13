@@ -377,6 +377,18 @@ def getLinkedSocket(socket):
         return idToSocket(linkedIDs[0])
 
 
+# improve performance of higher level functions
+
+def getOriginNodes(node):
+    nodeID = node.toID()
+    linkedNodeIDs = set()
+    for socketID in _data.socketsByNode[nodeID][0]:
+        for linkedSocketID in _data.linkedSockets[socketID]:
+            linkedNodeIDs.add(linkedSocketID[0])
+    return [idToNode(nodeID) for nodeID in linkedNodeIDs]
+
+# keep node links
+
 def getAllDataLinks():
     dataLinks = set()
     for socketID, linkedIDs in _data.linkedSockets.items():

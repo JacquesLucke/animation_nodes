@@ -8,7 +8,7 @@ from bpy.app.handlers import persistent
 from .. ui.node_colors import colorNetworks
 from .. utils.nodes import getAnimationNodeTrees
 from .. operators.dynamic_operators import getInvokeFunctionOperator
-from .. tree_info import getNetworkWithNode, getDirectlyLinkedSockets
+from .. tree_info import getNetworkWithNode, getDirectlyLinkedSockets, getOriginNodes
 
 class AnimationNode:
     isAnimationNode = True
@@ -232,10 +232,7 @@ class AnimationNode:
 
     @property
     def originNodes(self):
-        nodes = set()
-        for socket in self.inputs:
-            nodes.update(socket.linkedNodes)
-        return list(nodes)
+        return getOriginNodes(self)
 
     @property
     def unlinkedInputs(self):
@@ -308,6 +305,8 @@ class AnimationNode:
             code = tagVariableName(code, "self", "#")
             return code.split("\n")
 
+from functools import lru_cache
+@lru_cache(maxsize = 2048)
 def tagVariableName(code, name, tag):
     """
     Find all occurences of 'name' in 'code' and set 'tag' before and after it.
