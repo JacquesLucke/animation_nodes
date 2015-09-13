@@ -53,3 +53,6 @@ class DataInputNode(bpy.types.Node, AnimationNode):
         socket.display.text = True
         socket.text = self.assignedType
         socket.defaultDrawType = "PREFER_PROPERTY"
+
+    def getTemplateCode(self):
+        return "self.assignedType = {}".format(repr(self.assignedType))

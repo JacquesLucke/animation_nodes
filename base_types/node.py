@@ -86,6 +86,8 @@ class AnimationNode:
     def getSearchTags(cls):
         return cls.searchTags
 
+    def getTemplateCode(self):
+        return []
 
     # Don't override these functions
     ######################################
@@ -267,13 +269,11 @@ class AnimationNode:
             if len(identifiers) == 2: links.append(identifiers)
         return links
 
+    def getTemplateCodeString(self):
+        return toString(self.getTemplateCode())
+
     def getExecutionCodeString(self):
-        code = self.getExecutionCode()
-        if isinstance(code, types.GeneratorType):
-            code = list(code)
-        if isinstance(code, (list, tuple)):
-            return "\n".join(code)
-        return code
+        return toString(self.getExecutionCode())
 
     def getTaggedExecutionCodeLines(self):
         """
@@ -297,7 +297,7 @@ class AnimationNode:
             if outputString == "": return [executionString]
             return [outputString + " = "+ executionString]
         else:
-            code = self.getExecutionCodeString()
+            code = toString(self.getExecutionCode())
             for variable in inputVariables.values():
                 code = tagVariableName(code, variable, "%")
             for variable in outputVariables.values():
@@ -331,6 +331,13 @@ def createIdentifier():
     characters = "abcdefghijklmnopqrstuvwxyz" + "0123456789"
     choice = random.SystemRandom().choice
     return "_" + ''.join(choice(characters) for _ in range(identifierLength))
+
+def toString(code):
+    if isinstance(code, types.GeneratorType):
+        code = list(code)
+    if isinstance(code, (list, tuple)):
+        return "\n".join(code)
+    return code
 
 
 

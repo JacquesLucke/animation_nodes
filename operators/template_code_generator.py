@@ -41,3 +41,7 @@ def iterNodeCreationLines(node, nodeNames):
     labelText = ", label = " + repr(node.label) if node.label else ""
     parameterText = "'{}', x = {:.0f}, y = {:.0f}{}".format(node.bl_idname, node.location.x, node.location.y, labelText)
     yield "{} = self.newNode({})".format(name, parameterText)
+
+    if not hasattr(node, "isAnimationNode"): return
+    for line in node.getTemplateCodeString().split("\n"):
+        yield line.replace("self", name)
