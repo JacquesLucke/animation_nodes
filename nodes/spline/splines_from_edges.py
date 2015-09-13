@@ -2,9 +2,9 @@ import bpy
 from ... base_types.node import AnimationNode
 from ... data_structures.splines.poly_spline import PolySpline
 
-class CreateSplinesFromEdgesNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_CreateSplinesFromEdgesNode"
-    bl_label = "Create Splines from Edges"
+class SplinesFromEdgesNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_SplinesFromEdgesNode"
+    bl_label = "Splines from Edges"
 
     def create(self):
         self.inputs.new("an_VectorListSocket", "Vertices", "vertices").dataIsModified = True
