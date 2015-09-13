@@ -79,7 +79,7 @@ class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
         subprogramInterfaceChanged()
 
     def getTemplateCode(self):
-        yield "self.loopInputIdentifier = {}".format(repr(self.loopInputIdentifier))
+        yield "self.loopInputIdentifier = #MISSING----------"
         yield "self.outputName = {}".format(repr(self.outputName))
         yield "self.listDataType = '{}'".format(self.listDataType)
         yield "self.addType = '{}'".format(self.addType)

@@ -146,7 +146,7 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         self.insertIteratorData(data)
         self.insertGeneratorData(data)
         self.insertParameterData(data)
-
+        
         return data
 
     def insertIteratorData(self, data):
