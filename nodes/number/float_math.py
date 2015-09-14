@@ -26,10 +26,11 @@ operationItems = [
     ("MODULO", "Modulo", ""),
     ("ABSOLUTE", "Absolute", ""),
     ("FLOOR", "Floor", ""),
-    ("CEILING", "Ceiling", "")]
+    ("CEILING", "Ceiling", ""),
+    ("SQRT", "Square Root", "")]
 
 singleInputOperations = ("SINE", "COSINE", "TANGENT", "ARCSINE",
-    "ARCCOSINE", "ARCTANGENT", "ABSOLUTE", "FLOOR", "CEILING")
+    "ARCCOSINE", "ARCTANGENT", "ABSOLUTE", "FLOOR", "CEILING", "SQRT")
 
 
 class FloatMathNode(bpy.types.Node, AnimationNode):
@@ -52,12 +53,7 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
         self.outputs.new("an_FloatSocket", "Result", "result")
 
     def draw(self, layout):
-        layout.prop(self, "operation")
-
-    def getNextNodeSuggestions(self):
-        return [("an_FloatMathNode", (0, 0)),
-                ("an_CombineVector", (0, 0)),
-                ("an_FloatClamp", (0, 0))]
+        layout.prop(self, "operation", text = "")
 
     def getExecutionCode(self):
         op = self.operation
@@ -72,7 +68,7 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
         elif op == "ARCSINE": return "result = math.asin(min(max(a, -1), 1))"
         elif op == "ARCCOSINE": return "result = math.acos(min(max(a, -1), 1))"
         elif op == "ARCTANGENT": return "result = math.atan(a)"
-        elif op == "POWER": return "result = math.pow(a, b)"
+        elif op == "POWER": return "result = math.pow(a, b) if a >= 0 or int(b) == b else 0"
         elif op == "LOGARITHM": return ("if b <= 0 or b == 1: result = math.log(a)",
                                         "else: result = math.log(a, b)")
         elif op == "MINIMUM": return "result = min(a, b)"
@@ -85,6 +81,7 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
                                      "else: result = a % b")
         elif op == "FLOOR": return "result = math.floor(a)"
         elif op == "CEILING": return "result = math.ceil(a)"
+        elif op == "SQRT": return "result = math.sqrt(a) if a >= 0 else 0"
 
     def getUsedModules(self):
         return ["math"]
