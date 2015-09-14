@@ -9,7 +9,7 @@ class RandomVectorNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_RandomVectorNode"
     bl_label = "Random Vector"
 
-    nodeSeed = IntProperty(name = "Node Seed", update = propertyChanged, max = 1000)
+    nodeSeed = IntProperty(name = "Node Seed", update = propertyChanged, max = 1000, min = 0)
 
     def create(self):
         self.inputs.new("an_IntegerSocket", "Seed", "seed")
