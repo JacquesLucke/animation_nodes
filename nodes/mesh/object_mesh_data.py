@@ -1,9 +1,9 @@
 import bpy
 from bpy.props import *
 from ... utils.math import extractRotation
-from ... data_structures.mesh import Polygon
 from ... base_types.node import AnimationNode
 from ... events import propertyChanged, isRendering
+from ... data_structures.mesh import Polygon, Vertex
 
 class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectMeshDataNode"
@@ -17,14 +17,12 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
         self.outputs.new("an_VectorListSocket", "Vertex Locations", "vertexLocations")
         self.outputs.new("an_EdgeIndicesListSocket", "Edge Indices", "edgeIndices")
         self.outputs.new("an_PolygonIndicesListSocket", "Polygon Indices", "polygonIndices")
+        self.outputs.new("an_VertexListSocket", "Vertices", "vertices")
         self.outputs.new("an_PolygonListSocket", "Polygons", "polygons")
 
     def getExecutionCode(self):
         isLinked = self.getLinkedOutputsDict()
-        if not (isLinked["vertexLocations"] or
-                isLinked["edgeIndices"] or
-                isLinked["polygonIndices"] or
-                isLinked["polygons"]): return ""
+        if not any(isLinked.values()): return ""
 
         lines = []
         lines.append("if getattr(object, 'type', '') == 'MESH':")
@@ -36,11 +34,13 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
             lines.append("    edgeIndices = self.getEdgeIndices(mesh)")
         if isLinked["polygonIndices"]:
             lines.append("    polygonIndices = self.getPolygonIndices(mesh)")
+        if isLinked["vertices"]:
+            lines.append("    vertices = self.getVertices(mesh, object, useWorldSpace)")
         if isLinked["polygons"]:
-            lines.append("    polygons = self.getPolygons(mesh, vertexLocations, useWorldSpace, object)")
+            lines.append("    polygons = self.getPolygons(mesh, vertexLocations, object, useWorldSpace)")
 
         lines.append("    self.clearMesh(mesh, useModifiers, scene)")
-        lines.append("else: vertexLocations, edgeIndices, polygonIndices, polygons = [], [], [], []")
+        lines.append("else: vertexLocations, edgeIndices, polygonIndices, vertices, polygons = [], [], [], [], []")
         return lines
 
 
@@ -68,7 +68,21 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
     def getPolygonIndices(self, mesh):
         return [tuple(face.vertices) for face in mesh.polygons]
 
-    def getPolygons(self, mesh, vertexLocations, useWorldSpace, object):
+    def getVertices(self, mesh, object, useWorldSpace):
+        vertices = []
+        if useWorldSpace:
+            matrix = object.matrix_world
+            rotation = extractRotation(matrix)
+            for meshVertex in mesh.vertices:
+                vertices.append(Vertex(matrix * meshVertex.co, rotation * meshVertex.normal,
+                                       [group.weight for group in meshVertex.groups]))
+        else:
+            for meshVertex in mesh.vertices:
+                vertices.append(Vertex(meshVertex.co.copy(), meshVertex.normal.copy(),
+                                       [group.weight for group in meshVertex.groups]))
+        return vertices
+
+    def getPolygons(self, mesh, vertexLocations, object, useWorldSpace):
         polygons = []
 
         if useWorldSpace:
