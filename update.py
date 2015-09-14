@@ -16,6 +16,7 @@ def updateEverything():
     tree_info.update()
     problems.reset()
     enableUseFakeUser()
+    fixHiddenLinks()
     callNodeEditFunctions()
     correctForbiddenNodeLinks()
     subprogram_sockets.updateIfNecessary()
@@ -29,6 +30,16 @@ def enableUseFakeUser():
     '''
     for tree in getAnimationNodeTrees():
         tree.use_fake_user = True
+
+def fixHiddenLinks():
+    for tree in getAnimationNodeTrees():
+        linksToReplace = [link for link in tree.links if link.from_socket.hide or link.to_socket.hide]
+        for link in linksToReplace:
+            fromSocket, toSocket = link.from_socket, link.to_socket
+            tree.links.remove(link)
+            fromSocket.hide = toSocket.hide = False
+            tree.links.new(toSocket, fromSocket)
+    tree_info.updateIfNecessary()
 
 def callNodeEditFunctions():
     tree_info.updateIfNecessary()
