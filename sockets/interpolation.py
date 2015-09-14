@@ -2,28 +2,20 @@ import bpy
 from bpy.props import *
 from .. events import propertyChanged
 from .. base_types.socket import AnimationNodeSocket
-from .. algorithms.interpolation import (linear, expoEaseIn, expoEaseOut,
-                                    cubicEaseIn, cubicEaseOut, cubicEaseInOut,
-                                    backEaseIn, backEaseOut,
-                                    quadraticInOut)
+from .. algorithms.interpolation import getInterpolationPreset
 
-topCategoryItems = [("LINEAR", "Linear", ""),
-                    ("EXPONENTIAL", "Exponential", ""),
-                    ("CUBIC", "Cubic", ""),
-                    ("BACK", "Back", ""),
-                    ("QUADRATIC", "Quadratic", "")]
-
-exponentialCategoryItems = [("IN", "In", ""),
-                            ("OUT", "Out", "")]
-
-cubicCategoryItems = [("IN", "In", ""),
-                    ("OUT", "Out", ""),
-                    ("INOUT", "In / Out", "")]
-
-backCategoryItems = [("IN", "In", ""),
-                    ("OUT", "Out", "")]
-
-quadraticCategoryItems = [("INOUT", "In / Out", "")]
+categoryItems = [
+    ("LINEAR", "Linear", "", "IPO_LINEAR", 0),
+    ("SINUSOIDAL", "Sinusoidal", "", "IPO_SINE", 1),
+    ("QUADRATIC", "Quadratic", "", "IPO_QUAD", 2),
+    ("CUBIC", "Cubic", "", "IPO_CUBIC", 3),
+    ("QUARTIC", "Quartic", "", "IPO_QUART", 4),
+    ("QUINTIC", "Quintic", "", "IPO_QUINT", 5),
+    ("EXPONENTIAL", "Exponential", "", "IPO_EXPO", 6),
+    ("CIRCULAR", "Circular", "", "IPO_CIRC", 7),
+    ("BACK", "Back", "", "IPO_BACK", 8),
+    ("BOUNCE", "Bounce", "", "IPO_BOUNCE", 9),
+    ("ELASTIC", "Elastic", "", "IPO_ELASTIC", 10)]
 
 class InterpolationSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_InterpolationSocket"
@@ -33,60 +25,20 @@ class InterpolationSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     drawColor = (0.7, 0.4, 0.3, 1)
     hashable = True
 
-    topCategory = EnumProperty(
-        name = "Category", default = "LINEAR",
-        items = topCategoryItems, update = propertyChanged)
+    category = EnumProperty(name = "Interpolation Category", default = "LINEAR",
+                            items = categoryItems, update = propertyChanged)
 
-    backCategory = EnumProperty(
-        name = "Back", default = "OUT",
-        items = backCategoryItems, update = propertyChanged)
-
-    exponentialCategory = EnumProperty(
-        name = "Exponential", default = "OUT",
-        items = exponentialCategoryItems, update = propertyChanged)
-
-    cubicCategory = EnumProperty(
-        name = "Cubic", default = "OUT",
-        items = cubicCategoryItems, update = propertyChanged)
-
-    quadraticCategory = EnumProperty(
-        name = "Quadratic", default = "INOUT",
-        items = quadraticCategoryItems, update = propertyChanged)
+    easeIn = BoolProperty(name = "Ease In", default = False, update = propertyChanged)
+    easeOut = BoolProperty(name = "Ease Out", default = True, update = propertyChanged)
 
     def drawProperty(self, layout, text):
         col = layout.column(align = True)
         if text != "": col.label(text)
-
         row = col.row(align = True)
-        row.prop(self, "topCategory", text = "")
-
-        if self.topCategory == "BACK":
-            row.prop(self, "backCategory", text = "")
-        if self.topCategory == "EXPONENTIAL":
-            row.prop(self, "exponentialCategory", text = "")
-        if self.topCategory == "CUBIC":
-            row.prop(self, "cubicCategory", text = "")
-        if self.topCategory == "QUADRATIC":
-            row.prop(self, "quadraticCategory", text = "")
+        row.prop(self, "category", text = "")
+        if self.category != "LINEAR":
+            row.prop(self, "easeIn", text = "", icon = "IPO_EASE_IN")
+            row.prop(self, "easeOut", text = "", icon = "IPO_EASE_OUT")
 
     def getValue(self):
-        if self.topCategory == "LINEAR": return (linear, None)
-        if self.topCategory == "EXPONENTIAL":
-            if self.exponentialCategory == "IN": return (expoEaseIn, None)
-            if self.exponentialCategory == "OUT": return (expoEaseOut, None)
-        if self.topCategory == "CUBIC":
-            if self.cubicCategory == "IN": return (cubicEaseIn, None)
-            if self.cubicCategory == "OUT": return (cubicEaseOut, None)
-            if self.cubicCategory == "INOUT": return (cubicEaseInOut, None)
-        if self.topCategory == "BACK":
-            if self.backCategory == "IN": return (backEaseIn, 1.70158)
-            if self.backCategory == "OUT": return (backEaseOut, 1.70158)
-        if self.topCategory == "QUADRATIC":
-            if self.quadraticCategory == "INOUT": return (quadraticInOut, None)
-        return (linear, None)
-
-    def setProperty(self, data):
-        self.topCategory, self.backCategory, self.exponentialCategory, self.cubicCategory, self.quadraticCategory = data
-
-    def getProperty(self):
-        return self.topCategory, self.backCategory, self.exponentialCategory, self.cubicCategory, self.quadraticCategory
+        return getInterpolationPreset(self.category, self.easeIn, self.easeOut)

@@ -5,16 +5,49 @@ Here is a good source for different interpolation functions in Java:
 https://github.com/libgdx/libgdx/blob/master/gdx/src/com/badlogic/gdx/math/Interpolation.java
 '''
 
+def getInterpolationPreset(name = "LINEAR", easeIn = True, easeOut = True):
+    if not (easeIn or easeOut): return (linear, None)
+    if name == "LINEAR": return (linear, None)
+    if name == "SINUSOIDAL":
+        if easeIn and easeOut: return (sinInOut, None)
+        if easeIn: return (sinIn, None)
+        return (sinOut, None)
+    if name in exponentOfName.keys():
+        if easeIn and easeOut: return (powerInOut, exponentOfName[name])
+        if easeIn: return (powerIn, exponentOfName[name])
+        return (powerOut, exponentOfName[name])
+    if name == "EXPONENTIAL":
+        if easeIn and easeOut: return (exponentialInOut, (2.0, 5.0))
+        if easeIn: return (exponentialIn, (2.0, 5.0))
+        return (exponentialOut, (2.0, 5.0))
+    if name == "CIRCULAR":
+        if easeIn and easeOut: return (circularInOut, None)
+        if easeIn: return (circularIn, None)
+        return (circularOut, None)
+    if name == "BACK":
+        if easeIn and easeOut: return (backInOut, 1.7)
+        if easeIn: return (backIn, 1.7)
+        return (backOut, 1.7)
+    if name == "BOUNCE":
+        if easeIn and easeOut: return (bounceInOut, None)
+        if easeIn: return (bounceIn, None)
+        return (bounceOut, None)
+    if name == "ELASTIC":
+        if easeIn and easeOut: return (elasticInOut, (1.44, 5.06, 4.46, -1.0))
+        if easeIn: return (elasticIn, (1.44, 5.06, 4.46, -1.0))
+        return (elasticOut, (1.44, 5.06, 4.46, -1.0))
+
+exponentOfName = {
+    "QUADRATIC" : 2,
+    "CUBIC" : 3,
+    "QUARTIC" : 4,
+    "QUINTIC" : 5 }
+
+
 # Linear interpolation
 
 def linear(x, settings = None):
     return x
-
-
-# Fade interpolation
-
-def fade(x, settings = None):
-    return x * x * x * (x * (x * 6 - 15) + 10)
 
 
 # Power interpolation
@@ -35,19 +68,34 @@ def powerOut(x, exponent = 2):
 
 # Exponential interpolation
 
-def expoEaseOut(x, settings = None):
-    return 1 - pow(2, -10*x)
+def exponentialInOut(x, settings):
+    value, exponent = settings
+    minValue = pow(value, -exponent)
+    scale = 1 / (1 - minValue)
 
-def expoEaseIn(x, settings = None):
-    return pow(2, 10*(x-1))
+    if x <= 0.5:
+        return (pow(value, exponent * (x * 2 - 1)) - minValue) * scale / 2
+    else:
+        return (2 - (pow(value, -exponent * (x * 2 - 1)) - minValue) * scale) / 2
 
-def quadEaseOut(x, settings = None):
-    return -1 * x * (x-2)
+def exponentialIn(x, settings):
+    value, exponent = settings
+    minValue = pow(value, -exponent)
+    scale = 1 / (1 - minValue)
+
+    return (pow(value, exponent * (x - 1)) - minValue) * scale
+
+def exponentialOut(x, settings):
+    value, exponent = settings
+    minValue = pow(value, -exponent)
+    scale = 1 / (1 - minValue)
+
+    return 1 - (pow(value, -exponent * x) - minValue) * scale
 
 
 # Circle interpolation
 
-def circleInOut(x, settings = None):
+def circularInOut(x, settings = None):
     if x <= 0.5:
         x *= 2
         return (1 - sqrt(1 - x * x)) / 2
@@ -55,10 +103,10 @@ def circleInOut(x, settings = None):
         x = (x - 1) * 2
         return (sqrt(1 - x * x) + 1) / 2
 
-def circleIn(x, settings = None):
+def circularIn(x, settings = None):
     return 1 - sqrt(1 - x * x)
 
-def circleOut(x, settings = None):
+def circularOut(x, settings = None):
     x -= 1
     return sqrt(1 - x * x)
 
