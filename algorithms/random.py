@@ -1,6 +1,6 @@
-import random
 import numpy
-import mathutils
+import random
+from mathutils import Vector, Color
 from .. utils.timing import measureTime
 
 randomNumberCache = []
@@ -22,6 +22,10 @@ def getRandomColor(seed = None, hue = None, saturation = None, value = None):
     if saturation is None: saturation = random.random()
     if value is None: value = random.random()
 
-    color = mathutils.Color()
+    color = Color()
     color.hsv = hue, saturation, value
     return color
+
+def getRandomVectors(seed, amount):
+    numpy.random.seed(seed)
+    return [Vector(v) for v in numpy.random.random([amount, 3])]
