@@ -49,4 +49,8 @@ class SetMeshDataOnObjectNode(bpy.types.Node, AnimationNode):
     def areIndicesValid(self, vertices, edges, polygons):
         maxEdgeIndex = max(itertools.chain([-1], *edges))
         maxPolygonIndex = max(itertools.chain([-1], *polygons))
-        return max(maxEdgeIndex, maxPolygonIndex) < len(vertices)
+
+        minEdgeIndex = min(itertools.chain([0], *edges))
+        minPolygonIndex = min(itertools.chain([0], *polygons))
+
+        return max(maxEdgeIndex, maxPolygonIndex) < len(vertices) and min(minEdgeIndex, minPolygonIndex) >= 0
