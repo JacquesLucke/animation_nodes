@@ -14,9 +14,9 @@ class RandomNumberNode(bpy.types.Node, AnimationNode):
         self.inputs["Max"].hide = not self.useMaxValue
         executionCodeChanged()
 
-    additionalSeed = IntProperty(update = propertyChanged)
+    nodeSeed = IntProperty(update = propertyChanged)
 
-    useAdditonalSeed = BoolProperty(name = "Use Additional Seed",
+    useNodeSeed = BoolProperty(name = "Use Node Seed",
         description = "Turning this off gives a speedup",
         default = True, update = executionCodeChanged)
 
@@ -37,14 +37,14 @@ class RandomNumberNode(bpy.types.Node, AnimationNode):
         self.inputs.new("an_FloatSocket", "Min", "minValue").value = 0.0
         self.inputs.new("an_FloatSocket", "Max", "maxValue").value = 1.0
         self.outputs.new("an_FloatSocket", "Number", "number")
-        self.randomizeAdditionalSeed()
+        self.randomizeNodeSeed()
 
     def draw(self, layout):
-        if self.useAdditonalSeed:
-            layout.prop(self, "additionalSeed", text = "Additional Seed")
+        if self.useNodeSeed:
+            layout.prop(self, "nodeSeed", text = "Node Seed")
 
     def drawAdvanced(self, layout):
-        layout.prop(self, "useAdditonalSeed")
+        layout.prop(self, "useNodeSeed")
         layout.prop(self, "checkSeed")
 
         col = layout.column(align = True)
@@ -54,10 +54,10 @@ class RandomNumberNode(bpy.types.Node, AnimationNode):
         subcol.prop(self, "useMinValue")
 
     def getExecutionCode(self):
-        if self.useAdditonalSeed and self.checkSeed: seedCode = "(seed + self.additionalSeed * 1034) % len(random_number_cache)"
-        elif self.useAdditonalSeed and not self.checkSeed: seedCode = "seed + self.additionalSeed * 1034"
-        elif not self.useAdditonalSeed and self.checkSeed: seedCode = "seed % len(random_number_cache)"
-        elif not self.useAdditonalSeed and not self.checkSeed: seedCode = "seed"
+        if self.useNodeSeed and self.checkSeed: seedCode = "(seed + self.nodeSeed * 1034) % len(random_number_cache)"
+        elif self.useNodeSeed and not self.checkSeed: seedCode = "seed + self.nodeSeed * 1034"
+        elif not self.useNodeSeed and self.checkSeed: seedCode = "seed % len(random_number_cache)"
+        elif not self.useNodeSeed and not self.checkSeed: seedCode = "seed"
 
         if self.useMinValue and self.useMaxValue: changeCode = " * (maxValue - minValue) + minValue"
         elif not self.useMinValue and self.useMaxValue: changeCode = " * maxValue"
@@ -66,7 +66,7 @@ class RandomNumberNode(bpy.types.Node, AnimationNode):
         return "number = random_number_cache[{}]{}".format(seedCode, changeCode)
 
     def duplicate(self, sourceNode):
-        self.randomizeAdditionalSeed()
+        self.randomizeNodeSeed()
 
-    def randomizeAdditionalSeed(self):
-        self.additionalSeed = int(random.random() * 100)
+    def randomizeNodeSeed(self):
+        self.nodeSeed = int(random.random() * 100)

@@ -9,7 +9,7 @@ class VectorWiggleNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_VectorWiggleNode"
     bl_label = "Vector Wiggle"
 
-    additionalSeed = IntProperty(update = propertyChanged)
+    nodeSeed = IntProperty(update = propertyChanged)
 
     def create(self):
         self.inputs.new("an_FloatSocket", "Seed", "seed")
@@ -20,11 +20,11 @@ class VectorWiggleNode(bpy.types.Node, AnimationNode):
         self.outputs.new("an_VectorSocket", "Vector", "vector")
 
     def draw(self, layout):
-        layout.prop(self, "additionalSeed", text = "Additional Seed")
+        layout.prop(self, "nodeSeed", text = "Node Seed")
 
     def execute(self, seed, evolution, amplitude, octaves, persistance):
         vector = Vector()
-        evolution = evolution + 2541 * seed + 823 * self.additionalSeed
+        evolution = evolution + 2541 * seed + 823 * self.nodeSeed
         vector[0] = perlinNoise(evolution, persistance, octaves) * amplitude[0]
         evolution += 79
         vector[1] = perlinNoise(evolution, persistance, octaves) * amplitude[1]

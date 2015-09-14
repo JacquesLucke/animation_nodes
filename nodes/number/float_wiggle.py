@@ -8,7 +8,7 @@ class FloatWiggleNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_FloatWiggleNode"
     bl_label = "Number Wiggle"
 
-    additionalSeed = IntProperty(update = propertyChanged)
+    nodeSeed = IntProperty(update = propertyChanged)
 
     def create(self):
         self.inputs.new("an_FloatSocket", "Seed", "seed")
@@ -19,9 +19,9 @@ class FloatWiggleNode(bpy.types.Node, AnimationNode):
         self.outputs.new("an_FloatSocket", "Number", "number")
 
     def draw(self, layout):
-        layout.prop(self, "additionalSeed", text = "Additional Seed")
+        layout.prop(self, "nodeSeed", text = "Node Seed")
 
     def execute(self, seed, evolution, amplitude, octaves, persistance):
-        evolution += 2673 * seed + 823 * self.additionalSeed
+        evolution += 2673 * seed + 823 * self.nodeSeed
         noise = perlinNoise(evolution, persistance, octaves)
         return noise * amplitude
