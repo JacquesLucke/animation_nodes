@@ -16,7 +16,7 @@ def updateEverything():
     tree_info.update()
     problems.reset()
     enableUseFakeUser()
-    fixHiddenLinks()
+    fixHiddenLinks() # is fixed in the next blender release 2.76
     callNodeEditFunctions()
     correctForbiddenNodeLinks()
     subprogram_sockets.updateIfNecessary()

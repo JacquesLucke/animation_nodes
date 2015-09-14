@@ -36,7 +36,7 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.width = 200
         self.inputs.new("an_NodeControlSocket", "New Input")
-        self.recreateOutputSocket()
+        self.outputs.new("an_GenericSocket", "Result", "result")
 
     def recreateOutputSocket(self):
         idName = "an_GenericListSocket" if self.outputIsList else "an_GenericSocket"
