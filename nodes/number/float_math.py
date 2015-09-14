@@ -76,7 +76,6 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
 
     @keepNodeLinks
     def _recreateOutputSocket(self, idName):
-        print("hey")
         self.outputs.clear()
         self.outputs.new(idName, "Result", "result")
 
