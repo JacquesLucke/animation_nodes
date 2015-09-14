@@ -13,6 +13,14 @@ class TimeInfoNode(bpy.types.Node, AnimationNode):
         self.outputs.new("an_FloatSocket", "End Frame", "endFrame").hide = True
         self.outputs.new("an_FloatSocket", "Frame Rate", "frameRate").hide = True
 
+    def edit(self):
+        inputSocket = self.inputs[0]
+        origin = inputSocket.dataOrigin
+        if origin is None: return
+        if origin.dataType != "Scene":
+            inputSocket.removeLinks()
+            inputSocket.hide = True
+
     def getExecutionCode(self):
         isLinked = self.getLinkedOutputsDict()
         if not any(isLinked.values()): return ""
