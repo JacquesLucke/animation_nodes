@@ -8,21 +8,33 @@ operationItems = [
     ("SUBTRACT", "Subtract", ""),
     ("MULTIPLY", "Multiply", "Multiply element by element"),
     ("DIVIDE", "Divide", "Divide element by element"),
-    ("CROSS", "Cross Product", "Calculate the cross/vector product, yielding a vector that is orthogonal to both input vectors") ]
+    ("CROSS", "Cross Product", "Calculate the cross/vector product, yielding a vector that is orthogonal to both input vectors"),
+    ("NORMALIZE", "Normalize", "Scale the vector to a length of 1"),
+    ("SCALE", "Scale", "") ]
+
+operationsWithFloat = ["NORMALIZE", "SCALE"]
 
 class VectorMathNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_VectorMathNode"
     bl_label = "Vector Math"
 
-    operation = EnumProperty(name = "Operation", items = operationItems, default = "ADD", update = executionCodeChanged)
+    def operationChanged(self, context):
+        self.inputs["B"].hide = self.operation in operationsWithFloat
+        self.inputs["Scale"].hide = self.operation not in operationsWithFloat
+        executionCodeChanged()
+
+    operation = EnumProperty(name = "Operation", items = operationItems, default = "ADD", update = operationChanged)
 
     def create(self):
         self.inputs.new("an_VectorSocket", "A", "a")
         self.inputs.new("an_VectorSocket", "B", "b")
+        socket = self.inputs.new("an_FloatSocket", "Scale", "scale")
+        socket.hide = True
+        socket.value = 1.0
         self.outputs.new("an_VectorSocket", "Result", "result")
 
     def draw(self, layout):
-        layout.prop(self, "operation")
+        layout.prop(self, "operation", text = "")
 
     def getExecutionCode(self):
         op = self.operation
@@ -34,6 +46,8 @@ class VectorMathNode(bpy.types.Node, AnimationNode):
                                      "if b[0] != 0: result[0] = a[0] / b[0]",
                                      "if b[1] != 0: result[1] = a[1] / b[1]",
                                      "if b[2] != 0: result[2] = a[2] / b[2]")
+        elif op == "NORMALIZE": return "result = a.normalized() * scale"
+        elif op == "SCALE": return "result = a * scale"
 
     def getUsedModules(self):
         return ["mathutils"]
