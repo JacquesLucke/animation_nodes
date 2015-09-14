@@ -17,9 +17,10 @@ def getInterpolationPreset(name = "LINEAR", easeIn = True, easeOut = True):
         if easeIn: return (powerIn, exponentOfName[name])
         return (powerOut, exponentOfName[name])
     if name == "EXPONENTIAL":
-        if easeIn and easeOut: return (exponentialInOut, (2.0, 5.0))
-        if easeIn: return (exponentialIn, (2.0, 5.0))
-        return (exponentialOut, (2.0, 5.0))
+        settings = prepareExponentialSettings(value = 2, exponent = 5)
+        if easeIn and easeOut: return (exponentialInOut, settings)
+        if easeIn: return (exponentialIn, settings)
+        return (exponentialOut, settings)
     if name == "CIRCULAR":
         if easeIn and easeOut: return (circularInOut, None)
         if easeIn: return (circularIn, None)
@@ -33,9 +34,10 @@ def getInterpolationPreset(name = "LINEAR", easeIn = True, easeOut = True):
         if easeIn: return (bounceIn, None)
         return (bounceOut, None)
     if name == "ELASTIC":
-        if easeIn and easeOut: return (elasticInOut, (1.44, 5.06, 4.46, -1.0))
-        if easeIn: return (elasticIn, (1.44, 5.06, 4.46, -1.0))
-        return (elasticOut, (1.44, 5.06, 4.46, -1.0))
+        settings = prepareElasticSettings(value = 1.6, exponent = 6, bounces = 6)
+        if easeIn and easeOut: return (elasticInOut, settings)
+        if easeIn: return (elasticIn, settings)
+        return (elasticOut, settings)
 
 exponentOfName = {
     "QUADRATIC" : 2,
@@ -68,28 +70,25 @@ def powerOut(x, exponent = 2):
 
 # Exponential interpolation
 
-def exponentialInOut(x, settings):
+def prepareExponentialSettings(value, exponent):
     value, exponent = settings
     minValue = pow(value, -exponent)
     scale = 1 / (1 - minValue)
+    return (value, exponent, minValue, scale)
 
+def exponentialInOut(x, settings):
+    value, exponent, minValue, scale = settings
     if x <= 0.5:
         return (pow(value, exponent * (x * 2 - 1)) - minValue) * scale / 2
     else:
         return (2 - (pow(value, -exponent * (x * 2 - 1)) - minValue) * scale) / 2
 
 def exponentialIn(x, settings):
-    value, exponent = settings
-    minValue = pow(value, -exponent)
-    scale = 1 / (1 - minValue)
-
+    value, exponent, minValue, scale = settings
     return (pow(value, exponent * (x - 1)) - minValue) * scale
 
 def exponentialOut(x, settings):
-    value, exponent = settings
-    minValue = pow(value, -exponent)
-    scale = 1 / (1 - minValue)
-
+    value, exponent, minValue, scale = settings
     return 1 - (pow(value, -exponent * x) - minValue) * scale
 
 
@@ -113,12 +112,15 @@ def circularOut(x, settings = None):
 
 # Elastic interpolation
 
+def prepareElasticSettings(value, exponent, bounces):
+    scale = -1 if bounces % 2 == 0 else 1
+    bounces = bounces + 0.5
+    value = max(value, 0)
+    return (value, exponent, bounces, scale)
+
+
 def elasticInOut(x, settings):
-    '''
-    value > 0
-    '''
     value, exponent, bounces, scale = settings
-    bounces = bounces * pi * (1 if bounces % 2 == 0 else -1)
     if x <= 0.5:
         x *= 2
         return pow(value, exponent * (x - 1)) * sin(x * bounces) * scale / 2
@@ -127,18 +129,10 @@ def elasticInOut(x, settings):
         return 1 - pow(value, exponent * (x - 1)) * sin(x * bounces) * scale / 2
 
 def elasticIn(x, settings):
-    '''
-    scale should be -1 or 1 depending on bounces
-    '''
-    value, exponent, bounces, scale = settings
-    bounces = bounces * pi * (1 if bounces % 2 == 0 else -1)
-
     return pow(value, exponent * (x - 1)) * sin(x * bounces) * scale
 
 def elasticOut(x, settings):
     value, exponent, bounces, scale = settings
-    bounces = bounces * pi * (1 if bounces % 2 == 0 else -1)
-
     x = 1 - x
     return 1 - pow(value, exponent * (x - 1)) * sin(x * bounces) * scale
 
