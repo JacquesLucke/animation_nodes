@@ -1,8 +1,9 @@
 import bpy
 import math
 from bpy.props import *
-from ... base_types.node import AnimationNode
+from ... tree_info import keepNodeLinks
 from ... events import executionCodeChanged
+from ... base_types.node import AnimationNode
 
 
 operationItems = [
@@ -37,15 +38,18 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_FloatMathNode"
     bl_label = "Math"
 
-    def operationChanged(node, context):
-        node.inputs[1].hide = node.operation in singleInputOperations
+    def operationChanged(self, context):
+        self.inputs[1].hide = self.operation in singleInputOperations
         executionCodeChanged()
 
-    operation = EnumProperty(
-        name = "Operation",
-        default = "MULITPLY",
-        items = operationItems,
-        update = operationChanged)
+    def outputIntegerChanged(self, context):
+        self.recreateOutputSocket()
+
+    operation = EnumProperty(name = "Operation", default = "MULITPLY",
+        items = operationItems, update = operationChanged)
+
+    outputInteger = BoolProperty(name = "Output Integer", default = False,
+        update = outputIntegerChanged)
 
     def create(self):
         self.inputs.new("an_FloatSocket", "A", "a")
@@ -55,33 +59,57 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.prop(self, "operation", text = "")
 
+    def edit(self):
+        targets = self.outputs[0].dataTargets
+        if len(targets) >= 1:
+            if all([target.dataType == "Integer" for target in targets]):
+                self.outputInteger = True
+            else:
+                self.outputInteger = False
+        elif self.outputInteger:
+            self.outputInteger = False
+
+    def recreateOutputSocket(self):
+        idName = "an_IntegerSocket" if self.outputInteger else "an_FloatSocket"
+        if self.outputs[0].bl_idname == idName: return
+        self._recreateOutputSocket(idName)
+
+    @keepNodeLinks
+    def _recreateOutputSocket(self, idName):
+        print("hey")
+        self.outputs.clear()
+        self.outputs.new(idName, "Result", "result")
+
     def getExecutionCode(self):
         op = self.operation
-        if op == "ADD": return "result = a + b"
-        elif op == "SUBTRACT": return "result = a - b"
-        elif op == "MULITPLY": return "result = a * b"
-        elif op == "DIVIDE": return ("if b == 0: result = 0",
-                                     "else: result = a / b")
-        elif op == "SINE": return "result = math.sin(a)"
-        elif op == "COSINE": return "result = math.cos(a)"
-        elif op == "TANGENT": return "result = math.tan(a)"
-        elif op == "ARCSINE": return "result = math.asin(min(max(a, -1), 1))"
-        elif op == "ARCCOSINE": return "result = math.acos(min(max(a, -1), 1))"
-        elif op == "ARCTANGENT": return "result = math.atan(a)"
-        elif op == "POWER": return "result = math.pow(a, b) if a >= 0 or int(b) == b else 0"
-        elif op == "LOGARITHM": return ("if b <= 0 or b == 1: result = math.log(a)",
-                                        "else: result = math.log(a, b)")
-        elif op == "MINIMUM": return "result = min(a, b)"
-        elif op == "MAXIMUM": return "result = max(a, b)"
-        elif op == "ROUND": return "result = round(a, int(b))"
-        elif op == "LESSTHAN": return "result = a < b"
-        elif op == "GREATHERTHAN": return "result = a > b"
-        elif op == "ABSOLUTE": return "result = abs(a)"
-        elif op == "MODULO": return ("if b == 0: result = 0",
-                                     "else: result = a % b")
-        elif op == "FLOOR": return "result = math.floor(a)"
-        elif op == "CEILING": return "result = math.ceil(a)"
-        elif op == "SQRT": return "result = math.sqrt(a) if a >= 0 else 0"
+        if op == "ADD": yield "result = a + b"
+        if op == "SUBTRACT": yield "result = a - b"
+        if op == "MULITPLY": yield "result = a * b"
+        if op == "DIVIDE": yield from ("if b == 0: result = 0",
+                                       "else: result = a / b")
+        if op == "SINE": yield "result = math.sin(a)"
+        if op == "COSINE": yield "result = math.cos(a)"
+        if op == "TANGENT": yield "result = math.tan(a)"
+        if op == "ARCSINE": yield "result = math.asin(min(max(a, -1), 1))"
+        if op == "ARCCOSINE": yield "result = math.acos(min(max(a, -1), 1))"
+        if op == "ARCTANGENT": yield "result = math.atan(a)"
+        if op == "POWER": yield "result = math.pow(a, b) if a >= 0 or int(b) == b else 0"
+        if op == "LOGARITHM": yield from ("if b <= 0 or b == 1: result = math.log(a)",
+                                          "else: result = math.log(a, b)")
+        if op == "MINIMUM": yield "result = min(a, b)"
+        if op == "MAXIMUM": yield "result = max(a, b)"
+        if op == "ROUND": yield "result = round(a, int(b))"
+        if op == "LESSTHAN": yield "result = a < b"
+        if op == "GREATHERTHAN": yield "result = a > b"
+        if op == "ABSOLUTE": yield "result = abs(a)"
+        if op == "MODULO": yield from ("if b == 0: result = 0",
+                                       "else: result = a % b")
+        if op == "FLOOR": yield "result = math.floor(a)"
+        if op == "CEILING": yield "result = math.ceil(a)"
+        if op == "SQRT": yield "result = math.sqrt(a) if a >= 0 else 0"
+
+        if self.outputInteger:
+            yield "result = int(result)"
 
     def getUsedModules(self):
         return ["math"]
