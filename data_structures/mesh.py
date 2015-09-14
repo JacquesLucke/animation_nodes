@@ -12,6 +12,18 @@ class MeshData:
         return MeshData(copyVectorList(self.vertices), copy2dList(self.edges), copy2dList(self.polygons))
 
 
+class Vertex:
+    __slots__ = ("location", "normal", "groupWeights")
+
+    def __init__(self, location, normal, groupWeights):
+        self.location = location
+        self.normal = normal
+        self.groupWeights = groupWeights
+
+    def copy(self):
+        return Vertex(self.location.copy(), self.normal.copy(), self.groupWeights[:])       
+
+
 class Polygon:
     __slots__ = ("vertices", "normal", "center", "area", "materialIndex")
 
