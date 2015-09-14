@@ -183,9 +183,11 @@ def removeCurve(curve):
     bpy.data.curves.remove(curveData)
 
 def convertSelectedObjects(type = "MESH"):
-    bpy.context.area.type = "VIEW_3D"
+    area = bpy.context.area
+    oldType = area.type
+    area.type = "VIEW_3D"
     bpy.ops.object.convert(target = type)
-    bpy.context.area.type = "NODE_EDITOR"
+    area.type = oldType
 
 def removeObject(object):
     if object.mode != "OBJECT": bpy.ops.object.mode_set(mode = "OBJECT")
