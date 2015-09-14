@@ -82,17 +82,17 @@ class AnimationNodeSocket:
             TEXT_ONLY: Ignore the property; Just label the text
         '''
         if drawType == "TEXT_PROPERTY_OR_NONE":
-            if self.hasProperty: drawType = "TEXT_PROPERTY"
+            if self.hasProperty(): drawType = "TEXT_PROPERTY"
 
         if drawType == "PREFER_PROPERTY":
-            if self.hasProperty: drawType = "PROPERTY_ONLY"
+            if self.hasProperty(): drawType = "PROPERTY_ONLY"
             else: drawType = "TEXT_ONLY"
 
         if drawType == "TEXT_PROPERTY":
-            if self.hasProperty: self.drawProperty(layout, text)
+            if self.hasProperty(): self.drawProperty(layout, text)
             else: layout.label(text)
         elif drawType == "PROPERTY_ONLY":
-            if self.hasProperty: self.drawProperty(layout, text = "")
+            if self.hasProperty(): self.drawProperty(layout, text = "")
         elif drawType == "TEXT_ONLY":
             layout.label(text)
 
@@ -262,9 +262,9 @@ class AnimationNodeSocket:
     def hasValueCode(self):
         return hasattr(self, "getValueCode")
 
-    @property
-    def hasProperty(self):
-        return hasattr(self, "drawProperty")
+    @classmethod
+    def hasProperty(cls):
+        return hasattr(cls, "drawProperty")
 
 
 

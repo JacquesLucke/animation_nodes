@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... base_types.node import AnimationNode
-from ... sockets.info import toIdName, getDataTypes
+from ... sockets.info import toIdName, getSocketClasses
 
 class DataInputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_DataInputNode"
@@ -10,7 +10,8 @@ class DataInputNode(bpy.types.Node, AnimationNode):
 
     @classmethod
     def getSearchTags(cls):
-        return [(dataType + " Input", {"assignedType" : repr(dataType)}) for dataType in getDataTypes()]
+        return [(socket.dataType + " Input", {"assignedType" : repr(socket.dataType)})
+                 for socket in getSocketClasses() if socket.hasProperty()]
 
     def assignedSocketChanged(self, context):
         self.recreateSockets()
@@ -27,7 +28,7 @@ class DataInputNode(bpy.types.Node, AnimationNode):
             socketGroup = "ALL", text = "Change Type", icon = "TRIA_RIGHT")
 
         col = layout.column()
-        col.active = self.inputs[0].hasProperty
+        col.active = self.inputs[0].hasProperty()
         col.prop(self, "showInViewport")
 
     def getExecutionCode(self):
