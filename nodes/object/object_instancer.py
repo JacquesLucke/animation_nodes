@@ -109,6 +109,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
     def updateFastListAccess(self):
         self.linkedObjectsList = list(self.linkedObjects)
         self.objectList = list(bpy.data.objects)
+        self.objectNameList = None
 
     # at first try to get the object by index, because it's faster and then search by name
     def getObjectFromItem(self, item):
@@ -117,11 +118,14 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
             if object.name == item.objectName:
                 return object
 
-        index = bpy.data.objects.find(item.objectName)
-        if index == -1: return None
-
-        item.objectIndex = index
-        return bpy.data.objects[index]
+        try:
+            if self.objectNameList is None:
+                self.objectNameList = list(bpy.data.objects.keys())
+            index = self.objectNameList.index(item.objectName)
+            item.objectIndex = index
+            return self.objectList[index]
+        except:
+            return None
 
     def removeAllObjects(self):
         objectNames = []
