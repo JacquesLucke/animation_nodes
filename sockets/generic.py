@@ -6,7 +6,7 @@ class GenericSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_label = "Generic Socket"
     dataType = "Generic"
     allowedInputTypes = ["all"]
-    drawColor = (0.6, 0.3, 0.3, 0.7)
+    drawColor = (0.6, 0.3, 0.3, 1.0)
     storable = False
 
     def getValueCode(self):

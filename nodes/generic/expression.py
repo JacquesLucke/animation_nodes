@@ -18,6 +18,9 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
         self.containsSyntaxError = not isCodeValid(self.expression)
         executionCodeChanged()
 
+    def outputTypeChanged(self, context):
+        self.recreateOutputSocket()
+
     expression = StringProperty(name = "Expression", update = settingChanged)
     containsSyntaxError = BoolProperty()
     executionError = StringProperty()
@@ -28,10 +31,18 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
     moduleNames = StringProperty(name = "Modules", update = executionCodeChanged,
         description = "Comma separated module names which can be used inside the expression")
 
+    outputIsList = BoolProperty(name = "Output is List", default = False, update = outputTypeChanged)
+
     def create(self):
         self.width = 200
         self.inputs.new("an_NodeControlSocket", "New Input")
-        self.outputs.new("an_GenericSocket", "Result", "result")
+        self.recreateOutputSocket()
+
+    def recreateOutputSocket(self):
+        idName = "an_GenericListSocket" if self.outputIsList else "an_GenericSocket"
+        if self.outputs[0].bl_idname == idName: return
+        self.outputs.clear()
+        self.outputs.new(idName, "Result", "result")
 
     def draw(self, layout):
         layout.prop(self, "expression", text = "")
@@ -44,6 +55,7 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
 
     def drawAdvanced(self, layout):
         layout.prop(self, "debugMode")
+        layout.prop(self, "outputIsList")
         layout.prop(self, "moduleNames")
 
     def drawControlSocket(self, layout, socket):
