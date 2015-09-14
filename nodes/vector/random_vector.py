@@ -4,27 +4,29 @@ from bpy.props import *
 from mathutils import Vector
 from ... events import propertyChanged
 from ... base_types.node import AnimationNode
-from ... algorithms.random import getUniformRandom
 
 class RandomVectorNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_RandomVectorNode"
     bl_label = "Random Vector"
 
-    additionalSeed = IntProperty(update = propertyChanged)
+    nodeSeed = IntProperty(name = "Node Seed", update = propertyChanged, max = 1000)
 
     def create(self):
         self.inputs.new("an_IntegerSocket", "Seed", "seed")
-        self.inputs.new("an_FloatSocket", "Max Value", "maxValue").value = 5.0
+        self.inputs.new("an_FloatSocket", "Scale", "scale").value = 2.0
         self.outputs.new("an_VectorSocket", "Vector", "randomVector")
 
     def draw(self, layout):
-        layout.prop(self, "additionalSeed", text = "Additional Seed")
+        layout.prop(self, "nodeSeed")
 
-    def execute(self, seed, maxValue):
-        addSeed = 1193 * self.additionalSeed
-        return Vector((getUniformRandom(seed + addSeed, -maxValue, maxValue),
-                getUniformRandom(seed + 7540 + addSeed, -maxValue, maxValue),
-                getUniformRandom(seed + 23450 + addSeed, -maxValue, maxValue)))
+    def getExecutionCode(self):
+        yield "startSeed = (seed + self.nodeSeed * 1000) % (len(random_number_cache) - 3)"
+        yield ("randomVector = scale * mathutils.Vector((random_number_cache[startSeed] - 0.5, "
+                                                         "random_number_cache[startSeed + 1] - 0.5, "
+                                                         "random_number_cache[startSeed + 2] - 0.5))")
+
+    def getUsedModules(self):
+        return ["mathutils"]
 
     def duplicate(self, sourceNode):
-        self.additionalSeed = int(random.random() * 1000)
+        self.nodeSeed = int(random.random() * 100)
