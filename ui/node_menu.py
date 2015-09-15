@@ -23,8 +23,9 @@ def drawMenu(self, context):
     layout.menu("an_mesh_menu", text = "Mesh")
     layout.menu("an_spline_menu", text = "Spline")
     layout.separator()
-    layout.menu("an_material_menu", text = "Material")
     layout.menu("an_animation_menu", text = "Animation")
+    layout.menu("an_interpolation_menu", text = "Interpolation")
+    layout.menu("an_material_menu", text = "Material")
     layout.menu("an_particles_menu", text = "Particles")
     layout.menu("an_sound_menu", text = "Sound")
     layout.separator()
@@ -256,15 +257,6 @@ class SplineMenu(bpy.types.Menu):
         insertNode(layout, "an_LoftSplinesNode", "Loft")
         insertNode(layout, "an_RevolveSplineNode", "Revolve")
 
-class MaterialMenu(bpy.types.Menu):
-    bl_idname = "an_material_menu"
-    bl_label = "Material Menu"
-
-    def draw(self, context):
-        layout = self.layout
-        insertNode(layout, "an_CyclesMaterialOutputNode", "Cycles Material Output")
-        insertNode(layout, "an_ViewportColorNode", "Viewport Color")
-
 class AnimationMenu(bpy.types.Menu):
     bl_idname = "an_animation_menu"
     bl_label = "Animation Menu"
@@ -274,14 +266,31 @@ class AnimationMenu(bpy.types.Menu):
         insertNode(layout, "an_TimeInfoNode", "Time Info")
         insertNode(layout, "an_DelayTimeNode", "Delay")
         insertNode(layout, "an_RepeatTimeNode", "Repeat")
+        layout.separator()
         insertNode(layout, "an_AnimateDataNode", "Animate Number", {"dataType" : repr("Float")})
         insertNode(layout, "an_AnimateDataNode", "Animate Vector", {"dataType" : repr("Vector")})
         insertNode(layout, "an_AnimateDataNode", "Animate Color", {"dataType" : repr("Color")})
         insertNode(layout, "an_AnimateDataNode", "Animate Matrix", {"dataType" : repr("Matrix")})
-        layout.separator()
-        insertNode(layout, "an_InterpolationNode", "Interpolation")
-        insertNode(layout, "an_EvaluateInterpolationNode", "Evaluate Interpolation")
-        insertNode(layout, "an_MixInterpolationNode", "Mix Interpolations")
+
+class InterpolationMenu(bpy.types.Menu):
+    bl_idname = "an_interpolation_menu"
+    bl_label = "Interpolation Menu"
+
+    def draw(self, context):
+        layout = self.layout
+        insertNode(layout, "an_ConstructInterpolationNode", "Construct")
+        insertNode(layout, "an_EvaluateInterpolationNode", "Evaluate")
+        insertNode(layout, "an_DebugInterpolationNode", "Debug")
+        insertNode(layout, "an_MixInterpolationNode", "Mix")
+
+class MaterialMenu(bpy.types.Menu):
+    bl_idname = "an_material_menu"
+    bl_label = "Material Menu"
+
+    def draw(self, context):
+        layout = self.layout
+        insertNode(layout, "an_CyclesMaterialOutputNode", "Cycles Material Output")
+        insertNode(layout, "an_ViewportColorNode", "Viewport Color")
 
 class ParticlesMenu(bpy.types.Menu):
     bl_idname = "an_particles_menu"

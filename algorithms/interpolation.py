@@ -30,9 +30,10 @@ def getInterpolationPreset(name = "LINEAR", easeIn = True, easeOut = True):
         if easeIn: return (backIn, 1.7)
         return (backOut, 1.7)
     if name == "BOUNCE":
-        if easeIn and easeOut: return (bounceInOut, None)
-        if easeIn: return (bounceIn, None)
-        return (bounceOut, None)
+        settings = prepareBounceSettings(4, 1.5)
+        if easeIn and easeOut: return (bounceInOut, settings)
+        if easeIn: return (bounceIn, settings)
+        return (bounceOut, settings)
     if name == "ELASTIC":
         settings = prepareElasticSettings(base = 1.6, exponent = 6, bounces = 6)
         if easeIn and easeOut: return (elasticInOut, settings)
