@@ -18,7 +18,8 @@ listChains = [
     ["an_SequenceSocket", "an_SequenceListSocket"],
     ["an_PolygonSocket", "an_PolygonListSocket"],
     ["an_VertexSocket", "an_VertexListSocket"],
-    ["an_GenericSocket", "an_GenericListSocket"] ]
+    ["an_GenericSocket", "an_GenericListSocket"],
+    ["an_FCurveSocket", "an_FCurveListSocket"] ]
 
 
 
