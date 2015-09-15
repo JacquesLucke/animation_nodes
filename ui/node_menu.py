@@ -27,6 +27,7 @@ def drawMenu(self, context):
     layout.menu("an_interpolation_menu", text = "Interpolation")
     layout.menu("an_material_menu", text = "Material")
     layout.menu("an_particles_menu", text = "Particles")
+    layout.menu("an_fcurve_menu", text = "FCurves")
     layout.menu("an_sound_menu", text = "Sound")
     layout.separator()
     layout.menu("an_debug_menu", text = "Debug")
@@ -305,6 +306,16 @@ class ParticlesMenu(bpy.types.Menu):
         insertNode(layout, "an_FilterParticlesNode", "State Filter")
         insertNode(layout, "an_ParticleListInfoNode", "Particle List Info")
         insertNode(layout, "an_ParticleInfoNode", "Particle Info")
+
+class FCurveMenu(bpy.types.Menu):
+    bl_idname = "an_fcurve_menu"
+    bl_label = "FCurve Menu"
+
+    def draw(self, context):
+        layout = self.layout
+        insertNode(layout, "an_FCurvesFromObjectNode", "From Object")
+        insertNode(layout, "an_EvaluateFCurveNode", "Evaluate")
+        insertNode(layout, "an_FCurveInfoNode", "Info")
 
 class SoundMenu(bpy.types.Menu):
     bl_idname = "an_sound_menu"
