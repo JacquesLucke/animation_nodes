@@ -216,12 +216,8 @@ def sinOut(x, settings = None):
 
 # Specials
 
-def curveInterpolation(x, settings):
-    try:
-        return (settings[0].evaluate(x) - 0.25)*2
-    except:
-        settings[1].initialize()
-        return (settings[0].evaluate(x) - 0.25)*2
+def curveMapping(x, curve):
+    return min(max((curve.evaluate(x) - 0.25) * 2, -0.5), 1.5)
 
 def mixedInterpolation(x, settings):
     a, b, factor = settings

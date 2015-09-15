@@ -279,6 +279,7 @@ class InterpolationMenu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         insertNode(layout, "an_ConstructInterpolationNode", "Construct")
+        insertNode(layout, "an_InterpolationFromCurveMappingNode", "From Curve Mapping")
         insertNode(layout, "an_EvaluateInterpolationNode", "Evaluate")
         insertNode(layout, "an_DebugInterpolationNode", "Debug")
         insertNode(layout, "an_MixInterpolationNode", "Mix")

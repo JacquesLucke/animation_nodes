@@ -32,6 +32,3 @@ def newHelperMaterial():
     material.use_nodes = True
     material.use_fake_user = True
     return material
-
-def getNotUsedMaterialNodeName():
-    return getPossibleNodeName(getHelperMaterial().node_tree)
