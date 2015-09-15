@@ -1,5 +1,5 @@
 import bpy
-from . nodes.animation.debug_interpolation import drawInterpolationPreviews
+from . nodes.interpolation.debug import drawInterpolationPreviews
 
 def drawNodeEditor():
     drawInterpolationPreviews()
