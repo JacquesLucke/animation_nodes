@@ -26,8 +26,10 @@ class DebugInterpolationNode(bpy.types.Node, AnimationNode):
 
 def drawInterpolationPreviews():
     nodes = getNodesByType("an_DebugInterpolationNode")
+    nodesInCurrentTree = getattr(bpy.context.space_data.node_tree, "nodes", [])
     for node in nodes:
-        drawNodePreview(node)
+        if node.name in nodesInCurrentTree:
+            drawNodePreview(node)
 
 def drawNodePreview(node):
     interpolation = interpolationByNode.get(node.identifier, None)
