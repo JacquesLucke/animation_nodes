@@ -80,6 +80,8 @@ def powerOut(x, exponent = 2):
 # Exponential interpolation
 
 def prepareExponentialSettings(base, exponent):
+    exponent = min(max(0, int(exponent)), 70)
+    base = max(0.0001, base) if base != 1 else 1.0001
     minValue = pow(base, -exponent)
     scale = 1 / (1 - minValue)
     return (base, exponent, minValue, scale)
@@ -124,6 +126,7 @@ def prepareElasticSettings(base, exponent, bounces):
     scale = -1 if bounces % 2 == 0 else 1
     bounces = bounces + 0.5
     base = max(base, 0)
+    bounces = bounces * pi * (1 if bounces % 2 == 0 else -1)
     return (base, exponent, bounces, scale)
 
 
@@ -148,17 +151,28 @@ def elasticOut(x, settings):
 
 # Bounce interpolation
 
-widths = [0.68, 0.34, 0.2, 0.12] # should follow this rule: 1 = sum(widths) - widths[0] / 2
-heights = [1.0, 0.26, 0.11, 0.03]
+def prepareBounceSettings(bounces, base):
+    '''
+    sum(widths) - widths[0] / 2 = 1
+    '''
+    bounces = max(1, int(bounces))
+    a = 2 ** (bounces - 1)
+    b = (1 - 2 ** bounces) / (1 - 2) - 2 ** (bounces - 2)
+    c = a / b
+    widths = [c / 2 ** i for i in range(bounces)]
+    heights = [x * base for x in widths]
+    heights[0] = 1
+    return (widths, heights)
 
-def bounceInOut(x, settings = None):
-    if x <= 0.5: return (1 - bounceOut(1 - x * 2)) / 2
-    else: return bounceOut(x * 2 - 1) / 2 + 0.5
+def bounceInOut(x, settings):
+    if x <= 0.5: return (1 - bounceOut(1 - x * 2, settings)) / 2
+    else: return bounceOut(x * 2 - 1, settings) / 2 + 0.5
 
-def bounceIn(x, settings = None):
-    return 1 - bounceOut(1 - x)
+def bounceIn(x, settings):
+    return 1 - bounceOut(1 - x, settings)
 
-def bounceOut(x, settings = None):
+def bounceOut(x, settings):
+    widths, heights = settings
     x += widths[0] / 2
     for width, height in zip(widths, heights):
         if x <= width: break
