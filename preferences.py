@@ -78,8 +78,10 @@ class AddonPreferences(bpy.types.AddonPreferences):
         subcol.prop(self.nodeColors, "subprogramValue", slider = True)
         subcol.prop(self.nodeColors, "subprogramSaturation", slider = True)
 
+addon = None
+
 def getPreferences():
-    return bpy.context.user_preferences.addons.get(addonName).preferences
+    return addon.preferences
 
 def generateCompactCode():
     return getPreferences().generateCompactCode
@@ -89,3 +91,12 @@ def forbidSubprogramRecursion():
 
 def nodeColors():
     return getPreferences().nodeColors
+
+
+def register():
+    global addon
+    addon = bpy.context.user_preferences.addons.get(addonName)
+
+def unregister():
+    global addon
+    addon = None
