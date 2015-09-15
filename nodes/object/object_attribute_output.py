@@ -1,21 +1,50 @@
 import bpy
+from bpy.props import *
+from ... utils.code import isCodeValid
+from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 
 class ObjectAttributeOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectAttributeOutputNode"
     bl_label = "Object Attribute Output"
 
-    def create(self):
-        self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
-        self.inputs.new("an_StringSocket", "Path", "path")
-        self.inputs.new("an_GenericSocket", "Value", "value")
-        self.outputs.new("an_ObjectSocket", "Object", "outObject")
+    attribute = StringProperty(name = "Attribute", default = "",
+        update = executionCodeChanged)
 
-    def execute(self, object, path, value):
-        try:
-            if path.startswith("["):
-                exec("object" + path + "= value")
-            else:
-                exec("object." + path + "= value")
-        except: pass
-        return object
+    errorMessage = StringProperty()
+
+    def create(self):
+        self.width = 160
+        self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
+        self.inputs.new("an_GenericSocket", "Value", "value")
+        self.outputs.new("an_ObjectSocket", "Object", "object")
+
+    def draw(self, layout):
+        layout.prop(self, "attribute", text = "")
+        if self.errorMessage != "":
+            layout.label(self.errorMessage, icon = "ERROR")
+
+    def getExecutionCode(self):
+        code = self.evaluationExpression
+
+        if not isCodeValid(code):
+            self.errorMessage = "Invalid Syntax"
+            return
+        else: self.errorMessage = ""
+
+        yield "try:"
+        yield "    self.errorMessage = ''"
+        yield "    " + code
+        yield "except AttributeError:"
+        yield "    if object: self.errorMessage = 'Attribute not found'"
+        yield "except KeyError:"
+        yield "    if object: self.errorMessage = 'Key not found'"
+        yield "except IndexError:"
+        yield "    if object: self.errorMessage = 'Index not found'"
+        yield "except (ValueError, TypeError):"
+        yield "    if object: self.errorMessage = 'Value has a wrong type'"
+
+    @property
+    def evaluationExpression(self):
+        if self.attribute.startswith("["): return "object" + self.attribute + " = value"
+        else: return "object." + self.attribute + " = value"
