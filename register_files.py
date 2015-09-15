@@ -4,6 +4,7 @@ from . import keymap
 from . import events
 from . import tree_info
 from . import preferences
+from . import draw_handler
 from . ui import node_colors
 from . utils import selection
 from . ui import generic_node_panel
@@ -19,6 +20,7 @@ def registerFiles():
     socket_base.register()
     node_colors.register()
     preferences.register()
+    draw_handler.register()
     events.registerHandlers()
     tree_info.registerHandlers()
     node_base.registerHandlers()
@@ -35,6 +37,7 @@ def unregisterFiles():
     socket_base.unregister()
     node_colors.unregister()
     preferences.unregister()
+    draw_handler.unregister()
     events.unregisterHandlers()
     tree_info.unregisterHandlers()
     node_base.unregisterHandlers()

@@ -46,6 +46,15 @@ exponentOfName = {
     "QUINTIC" : 5 }
 
 
+def sampleInterpolation(interpolation, amount = 40):
+    samples = []
+    for i in range(amount):
+          x = i / (amount - 1)
+          y = interpolation[0](x, interpolation[1])
+          samples.append(y)
+    return samples
+
+
 # Linear interpolation
 
 def linear(x, settings = None):
@@ -71,7 +80,6 @@ def powerOut(x, exponent = 2):
 # Exponential interpolation
 
 def prepareExponentialSettings(value, exponent):
-    value, exponent = settings
     minValue = pow(value, -exponent)
     scale = 1 / (1 - minValue)
     return (value, exponent, minValue, scale)
@@ -129,6 +137,7 @@ def elasticInOut(x, settings):
         return 1 - pow(value, exponent * (x - 1)) * sin(x * bounces) * scale / 2
 
 def elasticIn(x, settings):
+    value, exponent, bounces, scale = settings
     return pow(value, exponent * (x - 1)) * sin(x * bounces) * scale
 
 def elasticOut(x, settings):
