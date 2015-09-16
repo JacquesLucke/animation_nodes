@@ -18,3 +18,5 @@ class SimpleSoundControlerTemplate(bpy.types.Operator, Template):
         self.newLink(evaluateSoundNode.outputs[0], mathNode.inputs[0])
         self.newLink(combineVectorNode.outputs[0], transformsOutputNode.inputs[1])
         self.newLink(mathNode.outputs[0], combineVectorNode.inputs[2])
+
+        bpy.context.scene.sync_mode = "AUDIO_SYNC"
