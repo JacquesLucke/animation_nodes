@@ -66,7 +66,7 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
 
     def draw(self, layout):
         layout.prop(self, "operation", text = "")
-        
+
     def draw_label(self):
         return self.labelOperation + " (" + self.labelOutputType + ")"
 
@@ -81,10 +81,9 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
             self.outputInteger = False
 
     def recreateOutputSocket(self):
-        self.labelOutputType = "integer" if self.outputInteger else "float" #just to be more clear
-        
         idName = "an_IntegerSocket" if self.outputInteger else "an_FloatSocket"
         if self.outputs[0].bl_idname == idName: return
+        self.labelOutputType = "Integer" if self.outputInteger else "Float"
         self._recreateOutputSocket(idName)
 
     @keepNodeLinks
