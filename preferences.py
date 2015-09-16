@@ -81,6 +81,11 @@ class AddonPreferences(bpy.types.AddonPreferences):
 addon = None
 
 def getPreferences():
+    if addon is None:
+        # This should happen very rarely
+        # Problem is that this can access the context while rendering
+        #   which can lead to problems 
+        _updateAddon()
     return addon.preferences
 
 def generateCompactCode():
@@ -93,9 +98,13 @@ def nodeColors():
     return getPreferences().nodeColors
 
 
-def register():
+def _updateAddon():
     global addon
     addon = bpy.context.user_preferences.addons.get(addonName)
+
+def register():
+    global addon
+    _updateAddon()
 
 def unregister():
     global addon
