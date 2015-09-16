@@ -4,13 +4,15 @@ from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 
 operationItems = [
-    ("ADD", "Add", ""),
-    ("SUBTRACT", "Subtract", ""),
-    ("MULTIPLY", "Multiply", "Multiply element by element"),
-    ("DIVIDE", "Divide", "Divide element by element"),
-    ("CROSS", "Cross Product", "Calculate the cross/vector product, yielding a vector that is orthogonal to both input vectors"),
-    ("NORMALIZE", "Normalize", "Scale the vector to a length of 1"),
-    ("SCALE", "Scale", "") ]
+    ("ADD", "Add", "A + B"),
+    ("SUBTRACT", "Subtract", "A - B"),
+    ("MULTIPLY", "Multiply", "A * B       Multiply element by element"),
+    ("DIVIDE", "Divide", "A / B       Divide element by element"),
+    ("CROSS", "Cross Product", "A cross B   Calculate the cross/vector product, yielding a vector that is orthogonal to both input vectors"),
+    ("PROJECT", "Project", "A project B  Projection of A on B, the parallel projection vector"),
+    ("REFLECT", "Reflect", "A reflect B  Reflection of A from mirror B, the reflected vector"),
+    ("NORMALIZE", "Normalize", "A normalize Scale the vector to a length of 1"),
+    ("SCALE", "Scale", "A * scale") ]
 
 operationsWithFloat = ["NORMALIZE", "SCALE"]
 
@@ -19,11 +21,16 @@ class VectorMathNode(bpy.types.Node, AnimationNode):
     bl_label = "Vector Math"
 
     def operationChanged(self, context):
+        for item in operationItems:
+            if item[0] == self.operation:
+                self.labelOperation = item[2][:11]
         self.inputs["B"].hide = self.operation in operationsWithFloat
         self.inputs["Scale"].hide = self.operation not in operationsWithFloat
         executionCodeChanged()
 
     operation = EnumProperty(name = "Operation", items = operationItems, default = "ADD", update = operationChanged)
+
+    labelOperation = StringProperty(name = "Operation Label", default = "A + B", update = operationChanged)
 
     def create(self):
         self.inputs.new("an_VectorSocket", "A", "a")
@@ -35,6 +42,9 @@ class VectorMathNode(bpy.types.Node, AnimationNode):
 
     def draw(self, layout):
         layout.prop(self, "operation", text = "")
+        
+    def draw_label(self):
+        return self.labelOperation
 
     def getExecutionCode(self):
         op = self.operation
@@ -46,6 +56,8 @@ class VectorMathNode(bpy.types.Node, AnimationNode):
                                      "if b[0] != 0: result[0] = a[0] / b[0]",
                                      "if b[1] != 0: result[1] = a[1] / b[1]",
                                      "if b[2] != 0: result[2] = a[2] / b[2]")
+        elif op == "PROJECT": return "result = a.project(b)"
+        elif op == "REFLECT": return "result = a.reflect(b)"
         elif op == "NORMALIZE": return "result = a.normalized() * scale"
         elif op == "SCALE": return "result = a * scale"
 

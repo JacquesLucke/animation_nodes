@@ -7,31 +7,33 @@ from ... base_types.node import AnimationNode
 
 
 operationItems = [
-    ("ADD", "Add", ""),
-    ("SUBTRACT", "Subtract", ""),
-    ("MULITPLY", "Multiply", ""),
-    ("DIVIDE", "Divide", ""),
-    ("SINE", "Sine", ""),
-    ("COSINE", "Cosine", ""),
-    ("TANGENT", "Tangent", ""),
-    ("ARCSINE", "Arcsine", ""),
-    ("ARCCOSINE", "Arccosine", ""),
-    ("ARCTANGENT", "Arctangent", ""),
-    ("POWER", "Power", ""),
-    ("LOGARITHM", "Logarithm", ""),
-    ("MINIMUM", "Minimum", ""),
-    ("MAXIMUM", "Maximum", ""),
-    ("ROUND", "Round", ""),
-    ("LESSTHAN", "Less Than", ""),
-    ("GREATHERTHAN", "Greather Than", ""),
-    ("MODULO", "Modulo", ""),
-    ("ABSOLUTE", "Absolute", ""),
-    ("FLOOR", "Floor", ""),
-    ("CEILING", "Ceiling", ""),
-    ("SQRT", "Square Root", "")]
+    ("ADD", "Add", "A + B"),
+    ("SUBTRACT", "Subtract", "A - B"),
+    ("MULITPLY", "Multiply", "A * B"),
+    ("DIVIDE", "Divide", "A / B"),
+    ("SINE", "Sine", "sin A"),
+    ("COSINE", "Cosine", "cos A"),
+    ("TANGENT", "Tangent", "tan A"),
+    ("ARCSINE", "Arcsine", "asin A"),
+    ("ARCCOSINE", "Arccosine", "acos A"),
+    ("ARCTANGENT", "Arctangent", "atan A"),
+    ("POWER", "Power", "A ** B"),
+    ("LOGARITHM", "Logarithm", "A log B"),
+    ("MINIMUM", "Minimum", "min A B"),
+    ("MAXIMUM", "Maximum", "max A B"),
+    ("ROUND", "Round", "A round B"),
+    ("LESSTHAN", "Less Than", "A < B"),
+    ("GREATHERTHAN", "Greather Than", "A > B"),
+    ("MODULO", "Modulo", "A % B"),
+    ("ABSOLUTE", "Absolute", "abs A"),
+    ("FLOOR", "Floor", "floor A"),
+    ("CEILING", "Ceiling", "ceil A"),
+    ("SQRT", "Square Root", "sqrt A"),
+    ("INVERT", "Inverted", "- A"),
+    ("RECIPROCAL", "Reciprocal", "1 / A")]
 
 singleInputOperations = ("SINE", "COSINE", "TANGENT", "ARCSINE",
-    "ARCCOSINE", "ARCTANGENT", "ABSOLUTE", "FLOOR", "CEILING", "SQRT")
+    "ARCCOSINE", "ARCTANGENT", "ABSOLUTE", "FLOOR", "CEILING", "SQRT", "INVERT", "RECIPROCAL")
 
 
 class FloatMathNode(bpy.types.Node, AnimationNode):
@@ -39,6 +41,9 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
     bl_label = "Math"
 
     def operationChanged(self, context):
+        for item in operationItems:
+            if item[0] == self.operation:
+                self.labelOperation = item[2]
         self.inputs[1].hide = self.operation in singleInputOperations
         executionCodeChanged()
 
@@ -51,6 +56,9 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
     outputInteger = BoolProperty(name = "Output Integer", default = False,
         update = outputIntegerChanged)
 
+    labelOperation = StringProperty(name = "Operation Label", default = "A * B", update = operationChanged)
+    labelOutputType = StringProperty(name = "Output Type Label", default = "float", update = outputIntegerChanged)
+
     def create(self):
         self.inputs.new("an_FloatSocket", "A", "a")
         self.inputs.new("an_FloatSocket", "B", "b").value = 1.0
@@ -58,6 +66,9 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
 
     def draw(self, layout):
         layout.prop(self, "operation", text = "")
+        
+    def draw_label(self):
+        return self.labelOperation + " (" + self.labelOutputType + ")"
 
     def edit(self):
         targets = self.outputs[0].dataTargets
@@ -70,6 +81,8 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
             self.outputInteger = False
 
     def recreateOutputSocket(self):
+        self.labelOutputType = "integer" if self.outputInteger else "float" #just to be more clear
+        
         idName = "an_IntegerSocket" if self.outputInteger else "an_FloatSocket"
         if self.outputs[0].bl_idname == idName: return
         self._recreateOutputSocket(idName)
@@ -106,6 +119,8 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
         if op == "FLOOR": yield "result = math.floor(a)"
         if op == "CEILING": yield "result = math.ceil(a)"
         if op == "SQRT": yield "result = math.sqrt(a) if a >= 0 else 0"
+        if op == "INVERT": yield "result = - a"
+        if op == "RECIPROCAL": yield "result = 1 / a if a != 0 else 0"
 
         if self.outputInteger:
             yield "result = int(result)"
