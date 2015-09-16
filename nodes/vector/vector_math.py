@@ -4,15 +4,15 @@ from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 
 operationItems = [
-    ("ADD", "Add", "A + B"),
-    ("SUBTRACT", "Subtract", "A - B"),
-    ("MULTIPLY", "Multiply", "A * B       Multiply element by element"),
-    ("DIVIDE", "Divide", "A / B       Divide element by element"),
-    ("CROSS", "Cross Product", "A cross B   Calculate the cross/vector product, yielding a vector that is orthogonal to both input vectors"),
-    ("PROJECT", "Project", "A project B  Projection of A on B, the parallel projection vector"),
-    ("REFLECT", "Reflect", "A reflect B  Reflection of A from mirror B, the reflected vector"),
-    ("NORMALIZE", "Normalize", "A normalize Scale the vector to a length of 1"),
-    ("SCALE", "Scale", "A * scale") ]
+    ("ADD", "Add", "A + B", "", 0),
+    ("SUBTRACT", "Subtract", "A - B", "", 1),
+    ("MULTIPLY", "Multiply", "A * B       Multiply element by element", "", 2),
+    ("DIVIDE", "Divide", "A / B       Divide element by element", "", 3),
+    ("CROSS", "Cross Product", "A cross B   Calculate the cross/vector product, yielding a vector that is orthogonal to both input vectors", "", 4),
+    ("PROJECT", "Project", "A project B  Projection of A on B, the parallel projection vector", "", 5),
+    ("REFLECT", "Reflect", "A reflect B  Reflection of A from mirror B, the reflected vector", "", 6),
+    ("NORMALIZE", "Normalize", "A normalize Scale the vector to a length of 1", "", 7),
+    ("SCALE", "Scale", "A * scale", "", 8) ]
 
 operationsWithFloat = ["NORMALIZE", "SCALE"]
 
@@ -30,7 +30,7 @@ class VectorMathNode(bpy.types.Node, AnimationNode):
 
     operation = EnumProperty(name = "Operation", items = operationItems, default = "ADD", update = operationChanged)
 
-    labelOperation = StringProperty(name = "Operation Label", default = "A + B", update = operationChanged)
+    labelOperation = StringProperty(name = "Operation Label", default = "A + B")
 
     def create(self):
         self.inputs.new("an_VectorSocket", "A", "a")
