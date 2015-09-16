@@ -21,16 +21,16 @@ class VectorMathNode(bpy.types.Node, AnimationNode):
     bl_label = "Vector Math"
 
     def operationChanged(self, context):
-        for op in operationItems:
-            if op[0] == self.operation:
-                self.labelOperation = op[2][:11]
+        for item in operationItems:
+            if item[0] == self.operation:
+                self.labelOperation = item[2][:11]
         self.inputs["B"].hide = self.operation in operationsWithFloat
         self.inputs["Scale"].hide = self.operation not in operationsWithFloat
         executionCodeChanged()
 
     operation = EnumProperty(name = "Operation", items = operationItems, default = "ADD", update = operationChanged)
 
-    labelOperation = StringProperty(name = "labelOperation", default = "A + B", update = operationChanged)
+    labelOperation = StringProperty(name = "Operation Label", default = "A + B", update = operationChanged)
 
     def create(self):
         self.inputs.new("an_VectorSocket", "A", "a")
