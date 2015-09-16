@@ -5,7 +5,7 @@ from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 from ... utils.fcurve import getArrayValueAtFrame
 
-frameTypes = [
+frameTypeItems = [
     ("OFFSET", "Offset", ""),
     ("ABSOLUTE", "Absolute", "") ]
 
@@ -23,12 +23,11 @@ class ObjectTransformsInputNode(bpy.types.Node, AnimationNode):
 
     frameType = EnumProperty(
         name = "Frame Type", default = "OFFSET",
-        items = frameTypes, update = executionCodeChanged)
+        items = frameTypeItems, update = executionCodeChanged)
 
     def create(self):
         self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
         self.inputs.new("an_FloatSocket", "Frame", "frame").hide = True
-        self.inputs.new("an_SceneSocket", "Scene", "scene").hide = True
         self.outputs.new("an_VectorSocket", "Location", "location")
         self.outputs.new("an_VectorSocket", "Rotation", "rotation")
         self.outputs.new("an_VectorSocket", "Scale", "scale")
@@ -54,7 +53,7 @@ class ObjectTransformsInputNode(bpy.types.Node, AnimationNode):
             if isLinked["rotation"]: add("    rotation = mathutils.Vector(object.rotation_euler)")
             if isLinked["scale"]: add("    scale = object.scale")
         else:
-            if self.frameType == "OFFSET": add("    evaluationFrame = frame + (scene.frame_current_final if scene else 0)")
+            if self.frameType == "OFFSET": add("    evaluationFrame = frame + self.nodeTree.scene.frame_current_final")
             else: add("    evaluationFrame = frame")
             if isLinked["location"]: add("    location = mathutils.Vector(animation_nodes.utils.fcurve.getArrayValueAtFrame(object, 'location', evaluationFrame))")
             if isLinked["rotation"]: add("    rotation = mathutils.Vector(animation_nodes.utils.fcurve.getArrayValueAtFrame(object, 'rotation_euler', evaluationFrame))")
