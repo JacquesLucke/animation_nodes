@@ -2,6 +2,7 @@ import bpy
 from bpy.props import *
 from .. events import propertyChanged
 from .. base_types.socket import AnimationNodeSocket
+from .. utils.id_reference import tryToFindObjectReference
 
 class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_ObjectSocket"
@@ -25,7 +26,12 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         self.invokeFunction(row, "assignActiveObject", icon = "EYEDROPPER")
 
     def getValue(self):
-        return bpy.data.objects.get(self.objectName)
+        if self.objectName == "": return None
+
+        object = tryToFindObjectReference(self.objectName)
+        name = getattr(object, "name", "")
+        if name != self.objectName: self.objectName = name
+        return object
 
     def setProperty(self, data):
         self.objectName = data

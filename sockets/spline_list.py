@@ -2,6 +2,7 @@ import bpy
 from bpy.props import *
 from .. events import propertyChanged
 from .. base_types.socket import AnimationNodeSocket
+from .. utils.id_reference import tryToFindObjectReference
 from .. data_structures.splines.from_blender import createSplinesFromBlenderObject
 
 class SplineListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
@@ -29,12 +30,20 @@ class SplineListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             row.prop(self, "useWorldSpace", text = "", icon = "WORLD")
 
     def getValue(self):
-        object = bpy.data.objects.get(self.objectName)
+        object = self.getObject()
         splines = createSplinesFromBlenderObject(object)
         if self.useWorldSpace:
             for spline in splines:
                 spline.transform(object.matrix_world)
         return splines
+
+    def getObject(self):
+        if self.objectName == "": return None
+
+        object = tryToFindObjectReference(self.objectName)
+        name = getattr(object, "name", "")
+        if name != self.objectName: self.objectName = name
+        return object
 
     def setProperty(self, data):
         self.objectName, self.useWorldSpace = data
