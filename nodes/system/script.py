@@ -8,12 +8,6 @@ from ... utils.blender_ui import getAreaWithType
 from . subprogram_base import SubprogramBaseNode
 from . subprogram_sockets import SubprogramData, subprogramInterfaceChanged
 
-defaultScript = """
-def main():
-
-    return
-"""
-
 class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     bl_idname = "an_ScriptNode"
     bl_label = "Script"
@@ -22,7 +16,7 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         self.errorMessage = ""
         executionCodeChanged()
 
-    executionCode = StringProperty(default = defaultScript, update = executionCodeChanged)
+    executionCode = StringProperty(default = "", update = executionCodeChanged)
     textBlockName = StringProperty(default = "")
 
     debugMode = BoolProperty(name = "Debug Mode", default = True, update = debugModeChanged)
@@ -92,6 +86,8 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
 
     def setupSocket(self, socket):
         socket.textProps.editable = True
+        socket.textProps.variable = True
+        socket.textProps.unique = True
         socket.display.textInput = True
         socket.display.text = True
         socket.display.removeOperator = True

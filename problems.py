@@ -126,16 +126,6 @@ class NodeDoesNotSupportExecution(Problem):
         node = getNodeByIdentifier(self.nodeIdentifier)
         layout.label("{} does not support excecution".format(repr(node.name)))
 
-class ScriptHasNoMainFunction(Problem):
-    def __init__(self, network):
-        self.network = network
-
-    def allowExecution(self):
-        return False
-
-    def draw(self, layout):
-        layout.label("{} has no main function".format(repr(self.network.name)))        
-
 
 
 
