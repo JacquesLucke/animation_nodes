@@ -10,6 +10,9 @@ class ScriptExecutionUnit:
         self.setupCodeObject = None
         self.executionData = {}
 
+        self.scriptUpdated()
+
+    def scriptUpdated(self):
         self.generateScript()
         self.compileScript()
 

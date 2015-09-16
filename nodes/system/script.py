@@ -1,11 +1,14 @@
 import bpy
+from bpy.app.handlers import persistent
 from bpy.props import *
 from ... sockets.info import toIdName
+from ... tree_info import getNodesByType
 from ... utils.names import toInterfaceName
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 from ... utils.blender_ui import getAreaWithType
 from . subprogram_base import SubprogramBaseNode
+from ... execution.units import getSubprogramUnitByIdentifier
 from . subprogram_sockets import SubprogramData, subprogramInterfaceChanged
 
 class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
@@ -16,11 +19,13 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         self.errorMessage = ""
         executionCodeChanged()
 
-    executionCode = StringProperty(default = "", update = executionCodeChanged)
+    executionCode = StringProperty(default = "")
     textBlockName = StringProperty(default = "")
 
     debugMode = BoolProperty(name = "Debug Mode", default = True, update = debugModeChanged)
     errorMessage = StringProperty()
+
+    interactiveMode = BoolProperty(name = "Interactive Mode", default = True)
 
     def create(self):
         self.width = 200
@@ -50,8 +55,9 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         if text is not None:
             if self.executionCode != text: icon = "ERROR"
 
-        self.invokeFunction(subcol, "readFromTextBlock", text = "Import Changes", icon = icon,
-            description = "Import the changes from the selected text block")
+        if not self.interactiveMode:
+            self.invokeFunction(subcol, "readFromTextBlock", text = "Import Changes", icon = icon,
+                description = "Import the changes from the selected text block")
 
         layout.prop(self, "subprogramName", text = "", icon = "GROUP_VERTEX")
 
@@ -65,6 +71,7 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         col.label("Description:")
         col.prop(self, "subprogramDescription", text = "")
         layout.prop(self, "debugMode")
+        layout.prop(self, "interactiveMode")
 
     def drawControlSocket(self, layout, socket):
         if socket in list(self.inputs):
@@ -104,8 +111,9 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         self.outputs.clear()
         subprogramInterfaceChanged()
 
-    def duplicate(self):
+    def duplicate(self, sourceNode):
         self.randomizeNetworkColor()
+        self.textBlockName = ""
 
     def getSocketData(self):
         data = SubprogramData()
@@ -118,7 +126,7 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         return data
 
     def createNewTextBlock(self):
-        textBlock = bpy.data.texts.new(name = self.subprogramName)
+        textBlock = bpy.data.texts.new(name = self.subprogramName + " Code")
         self.textBlockName = textBlock.name
         self.writeToTextBlock()
         area = getAreaWithType("TEXT_EDITOR")
@@ -132,6 +140,16 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         if not self.textBlock: return
         self.executionCode = self.textInTextBlock
         self.errorMessage = ""
+        executionCodeChanged()
+
+    def interactiveUpdate(self):
+        if not self.textBlock: return
+        text = self.textInTextBlock
+        if self.executionCode == text: return
+        executionUnit = self.executionUnit
+        if executionUnit is None: return
+        self.executionCode = text
+        executionUnit.scriptUpdated()
 
     @property
     def textInTextBlock(self):
@@ -142,3 +160,24 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     @property
     def textBlock(self):
         return bpy.data.texts.get(self.textBlockName)
+
+    @property
+    def executionUnit(self):
+        return getSubprogramUnitByIdentifier(self.identifier)
+
+
+@persistent
+def sceneUpdate(scene):
+    for node in getNodesByType("an_ScriptNode"):
+        if node.interactiveMode:
+            node.interactiveUpdate()
+
+
+# Register
+###############################
+
+def registerHandlers():
+    bpy.app.handlers.scene_update_post.append(sceneUpdate)
+
+def unregisterHandlers():
+    bpy.app.handlers.scene_update_post.remove(sceneUpdate)

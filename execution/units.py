@@ -73,7 +73,7 @@ def getMainUnitsByNodeTree(nodeTree):
     return _mainUnitsByNodeTree[nodeTree.name]
 
 def getSubprogramUnitByIdentifier(identifier):
-    return _subprogramUnitsByIdentifier.get(identifier)
+    return _subprogramUnitsByIdentifier.get(identifier, None)
 
 def getSubprogramUnitsByName(name):
     programs = []

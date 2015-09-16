@@ -7,6 +7,7 @@ from . import preferences
 from . import draw_handler
 from . ui import node_colors
 from . utils import selection
+from . nodes.system import script
 from . ui import generic_node_panel
 from . ui import auto_nodetree_selection
 from . operators import dynamic_operators
@@ -22,6 +23,7 @@ def registerFiles():
     preferences.register()
     draw_handler.register()
     events.registerHandlers()
+    script.registerHandlers()
     tree_info.registerHandlers()
     node_base.registerHandlers()
     selection.registerHandlers()
@@ -39,6 +41,7 @@ def unregisterFiles():
     preferences.unregister()
     draw_handler.unregister()
     events.unregisterHandlers()
+    script.unregisterHandlers()
     tree_info.unregisterHandlers()
     node_base.unregisterHandlers()
     selection.unregisterHandlers()
