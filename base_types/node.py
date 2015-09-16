@@ -53,6 +53,9 @@ class AnimationNode:
     def draw(self, layout):
         pass
 
+    def drawLabel(self):
+        return self.bl_label
+
     def drawAdvanced(self, layout):
         layout.label("Has no advanced settings")
 
@@ -111,6 +114,9 @@ class AnimationNode:
         if self.inInvalidNetwork: layout.label("Invalid Network", icon = "ERROR")
         if self.nodeTree.editNodeLabels: layout.prop(self, "label", text = "")
         self.draw(layout)
+
+    def draw_label(self):
+        return self.drawLabel()
 
     def invokeFunction(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True, data = None):
         idName = getInvokeFunctionOperator(description)

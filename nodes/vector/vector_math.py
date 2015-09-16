@@ -42,8 +42,8 @@ class VectorMathNode(bpy.types.Node, AnimationNode):
 
     def draw(self, layout):
         layout.prop(self, "operation", text = "")
-        
-    def draw_label(self):
+
+    def drawLabel(self):
         return self.labelOperation
 
     def getExecutionCode(self):

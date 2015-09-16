@@ -57,7 +57,7 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
         update = outputIntegerChanged)
 
     labelOperation = StringProperty(name = "Operation Label", default = "A * B", update = operationChanged)
-    labelOutputType = StringProperty(name = "Output Type Label", default = "float", update = outputIntegerChanged)
+    labelOutputType = StringProperty(name = "Output Type Label", default = "Float", update = outputIntegerChanged)
 
     def create(self):
         self.inputs.new("an_FloatSocket", "A", "a")
@@ -67,7 +67,7 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.prop(self, "operation", text = "")
 
-    def draw_label(self):
+    def drawLabel(self):
         return self.labelOperation + " (" + self.labelOutputType + ")"
 
     def edit(self):
