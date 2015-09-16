@@ -41,9 +41,9 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
     bl_label = "Math"
 
     def operationChanged(self, context):
-        for op in operationItems:
-            if op[0] == self.operation:
-                self.labelOperation = op[2]
+        for item in operationItems:
+            if item[0] == self.operation:
+                self.labelOperation = item[2]
         self.inputs[1].hide = self.operation in singleInputOperations
         executionCodeChanged()
 
@@ -56,8 +56,8 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
     outputInteger = BoolProperty(name = "Output Integer", default = False,
         update = outputIntegerChanged)
 
-    labelOperation = StringProperty(name = "labelOperation", default = "A * B", update = operationChanged)
-    labelOutputType = StringProperty(name = "labelOutputType", default = " (float)", update = outputIntegerChanged)
+    labelOperation = StringProperty(name = "Operation Label", default = "A * B", update = operationChanged)
+    labelOutputType = StringProperty(name = "Output Type Label", default = "float", update = outputIntegerChanged)
 
     def create(self):
         self.inputs.new("an_FloatSocket", "A", "a")
@@ -68,7 +68,7 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "operation", text = "")
         
     def draw_label(self):
-        return self.labelOperation + self.labelOutputType
+        return self.labelOperation + " (" + self.labelOutputType + ")"
 
     def edit(self):
         targets = self.outputs[0].dataTargets
@@ -81,7 +81,7 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
             self.outputInteger = False
 
     def recreateOutputSocket(self):
-        self.labelOutputType = " (integer)" if self.outputInteger else " (float)" #just to be more clear
+        self.labelOutputType = "integer" if self.outputInteger else "float" #just to be more clear
         
         idName = "an_IntegerSocket" if self.outputInteger else "an_FloatSocket"
         if self.outputs[0].bl_idname == idName: return
