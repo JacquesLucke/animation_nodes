@@ -24,9 +24,10 @@ class DynamicObjectAttributeOutputNode(bpy.types.Node, AnimationNode):
 
     def execute(self, object, path, arrayIndex, value):
         if object is None: return object
+        setAttributeFunction = getSetFunction(object, path)
+        if setAttributeFunction is None: return object
         try:
-            setAttribute = getSetFunction(object, path)
-            setAttribute(object, arrayIndex, value)
+            setAttributeFunction(object, arrayIndex, value)
             self.errorMessage = ""
         except:
             self.errorMessage = "Error"
@@ -44,26 +45,39 @@ def getSetFunction(object, attribute):
     cache[attribute] = function
     return function
 
-def createSetFunction(object, attribute):
+def createSetFunction(object, dataPath):
+    needsIndex = dataPathBelongsToArray(object, dataPath)
+    if needsIndex is None: return None
+    print(dataPath, needsIndex)
     data = {}
-    try:
-        eval("object.{}[0]".format(attribute))
-        exec(setAttributeWithIndex.replace("attribute", attribute), data, data)
+    if needsIndex:
+        exec(setAttributeWithIndex.replace("#dataPath#", dataPath), data, data)
         return data["setAttributeWithIndex"]
-    except:
-        try:
-            eval("object." + attribute)
-            exec(setAttributeWithoutIndex.replace("attribute", attribute), data, data)
-            return data["setAttributeWithoutIndex"]
-        except: pass
-    return None
+    else:
+        exec(setAttributeWithoutIndex.replace("#dataPath#", dataPath), data, data)
+        return data["setAttributeWithoutIndex"]
 
 setAttributeWithIndex = '''
 def setAttributeWithIndex(object, index, value):
-    object.attribute[index] = value
+    object.#dataPath#[index] = value
 '''
 
 setAttributeWithoutIndex = '''
 def setAttributeWithoutIndex(object, index, value):
-    object.attribute = value
+    object.#dataPath# = value
 '''
+
+def dataPathBelongsToArray(object, dataPath):
+    if "." in dataPath:
+        pathToProperty, propertyName = dataPath.rsplit(".", 1)
+        pathToProperty = "." + pathToProperty
+    else:
+        pathToProperty = ""
+        propertyName = dataPath
+
+    try:
+        amount = eval("object{}.bl_rna.properties[{}].array_length".format(pathToProperty, repr(propertyName)))
+        return amount > 0
+    except:
+        # Means that the property has not been found
+        return None
