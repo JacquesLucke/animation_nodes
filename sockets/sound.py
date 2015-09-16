@@ -14,6 +14,7 @@ def getBakeDataItems(self, context):
     items = []
     sequences = getattr(self.nodeTree.scene.sequence_editor, "sequences", [])
     for sequenceIndex, sequence in enumerate(sequences):
+        if sequence.type != "SOUND": continue
         sound = sequence.sound
 
         for bakeIndex, data in enumerate(sound.singleData):
