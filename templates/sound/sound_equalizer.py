@@ -11,6 +11,7 @@ class SoundEqualizerTemplate(bpy.types.Operator, Template):
 
         instancerNode = self.newNode('an_ObjectInstancerNode', x = 400, y = 0)
         evaluateSoundNode = self.newNode('an_EvaluateSoundNode', x = 400, y = -220)
+        evaluateSoundNode.soundType = "EQUALIZER"
         invokeSubprogramNode = self.newNode('an_InvokeSubprogramNode', x = 713, y = -52)
 
         loopInputNode = self.newNode('an_LoopInputNode', x = 50, y = -450)
@@ -19,7 +20,7 @@ class SoundEqualizerTemplate(bpy.types.Operator, Template):
 
         calcMixFactorNode = self.newNode('an_FloatMathNode', x = 340, y = -600)
         calcMixFactorNode.operation = "DIVIDE"
-        
+
         mixFloatListNode = self.newNode('an_MixDataListNode', x = 560, y = -600)
         interpolationSocket = mixFloatListNode.inputs["Interpolation"]
         interpolationSocket.category = "QUADRATIC"
