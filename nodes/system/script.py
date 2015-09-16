@@ -22,10 +22,12 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     executionCode = StringProperty(default = "")
     textBlockName = StringProperty(default = "")
 
-    debugMode = BoolProperty(name = "Debug Mode", default = True, update = debugModeChanged)
+    debugMode = BoolProperty(name = "Debug Mode", default = True,
+        description = "Give error message inside the node", update = debugModeChanged)
     errorMessage = StringProperty()
 
-    interactiveMode = BoolProperty(name = "Interactive Mode", default = True)
+    interactiveMode = BoolProperty(name = "Interactive Mode", default = True,
+        description = "Recompile the script on each change in the text block")
 
     def create(self):
         self.width = 200
