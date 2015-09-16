@@ -48,7 +48,6 @@ def getSetFunction(object, attribute):
 def createSetFunction(object, dataPath):
     needsIndex = dataPathBelongsToArray(object, dataPath)
     if needsIndex is None: return None
-    print(dataPath, needsIndex)
     data = {}
     if needsIndex:
         exec(setAttributeWithIndex.replace("#dataPath#", dataPath), data, data)
