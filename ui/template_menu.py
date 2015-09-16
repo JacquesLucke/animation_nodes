@@ -11,6 +11,7 @@ class TemplatesMenu(bpy.types.Menu):
         layout.operator("an.random_vertices_offset_template")
         layout.operator("an.network_from_particles_template")
         layout.operator("an.transform_individual_polygons_template")
+        layout.operator("an.simple_sound_controler_template")
 
 class TemplatesMenuInHeader(bpy.types.Header):
     bl_idname = "an_templates_menu_in_header"
