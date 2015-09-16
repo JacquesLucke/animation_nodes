@@ -18,9 +18,6 @@ class TransformPolygonNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.prop(self, "useCenter")
 
-    def drawAdvanced(self, layout):
-        layout.prop(self, "transformVertices")
-
     def getExecutionCode(self):
         matrixName = "matrix"
         if self.useCenter:
