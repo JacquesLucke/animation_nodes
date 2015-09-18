@@ -15,7 +15,6 @@ class DistributeInstancesOnSplineTemplate(bpy.types.Operator, Template):
         getSplineSamplesNode = self.newNode('an_GetSplineSamplesNode', x = 220, y = -39)
         invokeSubprogramNode = self.newNode('an_InvokeSubprogramNode', x = 530, y = 90)
 
-
         loopInputNode = self.newNode('an_LoopInputNode', x = 530, y = -150)
         loopInputNode.newIterator('Object List', name = 'Object')
         loopInputNode.newIterator('Vector List', name = 'Location')
@@ -34,7 +33,7 @@ class DistributeInstancesOnSplineTemplate(bpy.types.Operator, Template):
         self.newLink(instancerNode.outputs[0], invokeSubprogramNode.inputs[0])
         self.newLink(getSplineSamplesNode.outputs[0], invokeSubprogramNode.inputs[1])
         self.newLink(getSplineSamplesNode.outputs[1], invokeSubprogramNode.inputs[2])
-        
+
         self.newLink(loopInputNode.outputs[4], directionToRotationNode.inputs[0])
         self.newLink(loopInputNode.outputs[2], transformsOutputNode.inputs[0])
         self.newLink(loopInputNode.outputs[3], transformsOutputNode.inputs[1])
