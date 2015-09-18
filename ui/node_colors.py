@@ -31,7 +31,7 @@ def getColors():
 
 def draw(self, context):
     node = bpy.context.active_node
-    if not hasattr(context.active_node, "isAnimationNode"): return
+    if not getattr(node, "isAnimationNode", False): return
 
     col = self.layout.column(align = True)
     col.prop(node, "useNetworkColor")

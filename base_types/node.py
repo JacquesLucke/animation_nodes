@@ -11,7 +11,7 @@ from .. operators.dynamic_operators import getInvokeFunctionOperator
 from .. tree_info import getNetworkWithNode, getDirectlyLinkedSockets, getOriginNodes
 
 class AnimationNode:
-    isAnimationNode = True
+    _isAnimationNode = True
 
     def useNetworkColorChanged(self, context):
         colorNetworks()
@@ -353,8 +353,12 @@ def toString(code):
 def nodeToID(self):
     return (self.id_data.name, self.name)
 
+def isAnimationNode(self):
+    return hasattr(self, "_isAnimationNode")
+
 def registerHandlers():
     bpy.types.Node.toID = nodeToID
+    bpy.types.Node.isAnimationNode = BoolProperty(name = "Is Animation Node", get = isAnimationNode)
     bpy.app.handlers.load_post.append(createMissingIdentifiers)
 
 def unregisterHandlers():

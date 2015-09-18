@@ -30,8 +30,7 @@ def getNode(treeName, nodeName):
 def iterAnimationNodes():
     for nodeTree in getAnimationNodeTrees():
         for node in nodeTree.nodes:
-            if getattr(node, "isAnimationNode", False):
-                yield node
+            if node.isAnimationNode: yield node
 
 def getAnimationNodeTrees():
     nodeTrees = []
