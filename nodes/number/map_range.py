@@ -12,7 +12,7 @@ class MapRangeNode(bpy.types.Node, AnimationNode):
         update = executionCodeChanged)
 
     def create(self):
-        self.width = 150
+        self.width = 170
         self.inputs.new("an_FloatSocket", "Value", "value")
         self.inputs.new("an_FloatSocket", "Input Min", "inMin").value = 0
         self.inputs.new("an_FloatSocket", "Input Max", "inMax").value = 1
@@ -24,7 +24,8 @@ class MapRangeNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "clamp")
 
     def getExecutionCode(self):
-        unclampedExpression = "outMin + (value - inMin) / (inMax - inMin) * (outMax - outMin)"
+        unclampedExpression = ("outMin + (value - inMin) / (inMax - inMin) * (outMax - outMin)"
+                               " if inMin != inMax else 0")
         if self.clamp:
             return ("start, end = (outMin, outMax) if outMin < outMax else (outMax, outMin)",
                     "newValue = min(max({}, start), end)".format(unclampedExpression))

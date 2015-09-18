@@ -23,8 +23,8 @@ class TemplateCodeGenerator(bpy.types.Operator):
             yield "self.newLink({}, {})".format(fromText, toText)
 
     def sortNodes(self, nodes):
-        animationNodes = [node for node in nodes if hasattr(node, "isAnimationNode")]
-        otherNodes = [node for node in nodes if not hasattr(node, "isAnimationNode")]
+        animationNodes = [node for node in nodes if node.isAnimationNode]
+        otherNodes = [node for node in nodes if not node.isAnimationNode]
         sortedAnimationNodes = sortNodes(animationNodes)
         return sortedAnimationNodes + otherNodes
 
@@ -42,6 +42,6 @@ def iterNodeCreationLines(node, nodeNames):
     parameterText = "'{}', x = {:.0f}, y = {:.0f}{}".format(node.bl_idname, node.location.x, node.location.y, labelText)
     yield "{} = self.newNode({})".format(name, parameterText)
 
-    if not hasattr(node, "isAnimationNode"): return
+    if not node.isAnimationNode: return
     for line in node.getTemplateCodeString().split("\n"):
         yield line.replace("self", name)

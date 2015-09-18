@@ -1,5 +1,4 @@
 class AnimationNodeOperator:
     @classmethod
     def poll(cls, context):
-        node = context.active_node
-        return hasattr(node, "isAnimationNode")
+        return getattr(context.active_node, "isAnimationNode", False)

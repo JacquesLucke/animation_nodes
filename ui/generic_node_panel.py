@@ -3,7 +3,7 @@ from bpy.props import *
 
 def draw(self, context):
     node = bpy.context.active_node
-    if not hasattr(context.active_node, "isAnimationNode"): return
+    if not getattr(node, "isAnimationNode", False): return
 
     layout = self.layout
     layout.separator()
