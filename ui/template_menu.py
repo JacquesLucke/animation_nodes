@@ -14,6 +14,7 @@ class TemplatesMenu(bpy.types.Menu):
         layout.operator("an.simple_sound_controler_template")
         layout.operator("an.sound_equalizer_template")
         layout.operator("an.distribute_instances_on_spline_template")
+        layout.operator("an.simple_countdown_template")
 
 class TemplatesMenuInHeader(bpy.types.Header):
     bl_idname = "an_templates_menu_in_header"
