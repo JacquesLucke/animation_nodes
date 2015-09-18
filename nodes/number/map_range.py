@@ -25,7 +25,7 @@ class MapRangeNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         unclampedExpression = ("outMin + (value - inMin) / (inMax - inMin) * (outMax - outMin)"
-                               " if inMin != inMax else (outMax + outMin) / 2")
+                               " if inMin != inMax else 0")
         if self.clamp:
             return ("start, end = (outMin, outMax) if outMin < outMax else (outMax, outMin)",
                     "newValue = min(max({}, start), end)".format(unclampedExpression))
