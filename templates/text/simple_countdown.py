@@ -4,7 +4,7 @@ from ... base_types.template import Template
 class SimpleCountdownTemplate(bpy.types.Operator, Template):
     bl_idname = "an.simple_countdown_template"
     bl_label = "Countdown"
-    nodeOffset = (-500, 200)
+    nodeOffset = (-500, 0)
 
     def insert(self):
         timeInfoNode = self.newNode('an_TimeInfoNode', x = 0, y = 0)
