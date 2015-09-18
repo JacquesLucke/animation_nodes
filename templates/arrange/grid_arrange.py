@@ -18,10 +18,9 @@ class GridArrangeObjectsTemplate(bpy.types.Operator, Template):
 
         gridMeshNode = self.newNode("an_GridMeshNode", x = 300, y = -100)
         calcAmountNode = self.newNode("an_FloatMathNode", x = 300, y = 100)
-        toIntegerNode = self.newNode("an_FloatToIntegerNode", x = 500, y = 100)
-        objectInstancerNode = self.newNode("an_ObjectInstancerNode", x = 700, y = 100)
+        objectInstancerNode = self.newNode("an_ObjectInstancerNode", x = 530, y = 100)
 
-        invokeSubprogramNode = self.newNode("an_InvokeSubprogramNode", x = 950, y = -25)
+        invokeSubprogramNode = self.newNode("an_InvokeSubprogramNode", x = 750, y = -25)
 
         loopInputNode = self.newNode("an_LoopInputNode", x = 550, y = -260)
         loopInputNode.newIterator("Object List")
@@ -37,8 +36,7 @@ class GridArrangeObjectsTemplate(bpy.types.Operator, Template):
         self.newLink(yDivisionsNode.outputs[0], gridMeshNode.inputs[1])
         self.newLink(xDivisionsNode.outputs[0], calcAmountNode.inputs[0])
         self.newLink(yDivisionsNode.outputs[0], calcAmountNode.inputs[1])
-        self.newLink(calcAmountNode.outputs[0], toIntegerNode.inputs[0])
-        self.newLink(toIntegerNode.outputs[0], objectInstancerNode.inputs[0])
+        self.newLink(calcAmountNode.outputs[0], objectInstancerNode.inputs[0])
         self.newLink(objectInstancerNode.outputs[0], invokeSubprogramNode.inputs[0])
         self.newLink(gridMeshNode.outputs[0], invokeSubprogramNode.inputs[1])
 
