@@ -106,7 +106,7 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
         op = self.operation
         if op == "ADD": yield "result = a + b"
         if op == "SUBTRACT": yield "result = a - b"
-        if op == "MULITPLY": yield "result = a * b"
+        if op == "MULTIPLY": yield "result = a * b"
         if op == "DIVIDE": yield from ("if b == 0: result = 0",
                                        "else: result = a / b")
         if op == "SINE": yield "result = math.sin(a)"
