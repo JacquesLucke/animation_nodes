@@ -3,6 +3,7 @@ import time
 from bpy.props import *
 from .. events import treeChanged
 from .. nodes.generic.debug_loop import clearDebugLoopTextBlocks
+from .. utils.blender_ui import iterActiveScreens, iterActiveSpacesByType
 from .. execution.units import getMainUnitsByNodeTree, setupExecutionUnits, finishExecutionUnits
 
 class AutoExecutionProperties(bpy.types.PropertyGroup):
@@ -46,15 +47,16 @@ class AnimationNodeTree(bpy.types.NodeTree):
 
     def canAutoExecute(self, events):
         def isAnimationPlaying():
-            try: return bpy.context.screen.is_animation_playing
-            except: return False
+            return any([screen.is_animation_playing for screen in iterActiveScreens()])
+        def isViewportRendering():
+            return any([space.viewport_shade == "RENDERED" for space in iterActiveSpacesByType("VIEW_3D")])
 
         if len(self.mainUnits) == 0: return False
         a = self.autoExecution
         if not a.enabled: return False
         if "Render" not in events and abs(time.clock() - a.lastExecutionTimestamp) < a.minTimeDifference: return False
         if isAnimationPlaying() and "Scene" in events and "Frame" not in events: return False
-        if a.sceneUpdate and "Scene" in events: return True
+        if a.sceneUpdate and "Scene" in events and not isViewportRendering(): return True
         if a.frameChanged and "Frame" in events: return True
         if a.propertyChanged and "Property" in events: return True
         if a.treeChanged and "Tree" in events: return True
