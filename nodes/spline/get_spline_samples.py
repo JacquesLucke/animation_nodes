@@ -7,7 +7,7 @@ class GetSplineSamplesNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
     bl_label = "Get Spline Samples"
 
     def create(self):
-        self.inputs.new("an_SplineSocket", "Spline", "spline")
+        self.inputs.new("an_SplineSocket", "Spline", "spline").defaultDrawType = "PROPERTY_ONLY"
         self.inputs.new("an_IntegerSocket", "Amount", "amount").value = 50
         socket = self.inputs.new("an_FloatSocket", "Start", "start")
         socket.value = 0.0
