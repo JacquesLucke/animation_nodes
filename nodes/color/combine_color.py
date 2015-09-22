@@ -1,4 +1,5 @@
-import bpy, random, colorsys
+import bpy, colorsys
+from bpy.props import *
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 
@@ -18,14 +19,12 @@ class CombineColorNode(bpy.types.Node, AnimationNode):
     bl_label = "Combine Color"
     
     def sourceTypeChanged(self, context):
-        self.labelOperation = self.sourceType
         self.updateHideStatus()
         executionCodeChanged()
     
     sourceType = bpy.props.EnumProperty(name = "Source Type", items = sourceTypeItems, 
                                             default = "RGB", update = sourceTypeChanged)
-    labelOperation = bpy.props.StringProperty(name = "Operation Label", default = "RGB")
-    
+
     def create(self):
         self.inputs.new("an_FloatSocket", "Red", "red")
         self.inputs.new("an_FloatSocket", "Green", "green")
@@ -49,33 +48,22 @@ class CombineColorNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "sourceType", expand = True)
         
     def drawLabel(self):
-        return self.labelOperation + "a --> Col (linear)"
+        return self.sourceType + "a --> Col (linear)"
 
     def getExecutionCode(self):
-        if self.sourceType == "RGB":    yield "C= [red, green, blue]"
-        elif self.sourceType == "HSV":  yield "C= colorsys.hsv_to_rgb(hue, saturation, value)"
-        elif self.sourceType == "HSL":  yield "C= colorsys.hls_to_rgb(hue, lightness, saturation)"
-        elif self.sourceType == "YIQ":  yield "C= colorsys.yiq_to_rgb(y, i, q)"
+        if self.sourceType == "RGB":    yield "C = [red, green, blue]"
+        elif self.sourceType == "HSV":  yield "C = colorsys.hsv_to_rgb(hue, saturation, value)"
+        elif self.sourceType == "HSL":  yield "C = colorsys.hls_to_rgb(hue, lightness, saturation)"
+        elif self.sourceType == "YIQ":  yield "C = colorsys.yiq_to_rgb(y, i, q)"
         yield "color = [C[0], C[1], C[2], alpha]"
     
     def getUsedModules(self):
         return ["colorsys"]
 
     def updateHideStatus(self):
-        self.inputs["Red"].hide = True
-        self.inputs["Green"].hide = True
-        self.inputs["Blue"].hide = True
-        
-        self.inputs["Hue"].hide = True
-        self.inputs["Saturation"].hide = True
-        self.inputs["Value"].hide = True
-        
-        self.inputs["Lightness"].hide = True
-        
-        self.inputs["Y Luma"].hide = True
-        self.inputs["I In phase"].hide = True
-        self.inputs["Q Quadrature"].hide = True
-        
+        for socket in self.inputs: socket.hide = True
+        self.inputs["Alpha"].hide = False
+
         if self.sourceType == "RGB":
             self.inputs["Red"].hide = False
             self.inputs["Green"].hide = False
