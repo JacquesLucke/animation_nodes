@@ -1,4 +1,5 @@
-import bpy, random, colorsys
+import bpy, colorsys
+from bpy.props import *
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 
@@ -18,14 +19,12 @@ class SeparateColorNode(bpy.types.Node, AnimationNode):
     bl_label = "Separate Color"
     
     def targetTypeChanged(self, context):
-        self.labelOperation = self.targetType
         self.updateHideStatus()
         executionCodeChanged()
         
     targetType = bpy.props.EnumProperty(name = "Target Type", items = targetTypeItems,
                                             default = "RGB", update = targetTypeChanged)
-    labelOperation = bpy.props.StringProperty(name = "Operation Label", default = "RGB")
-    
+
     def create(self):
         self.inputs.new("an_ColorSocket", "Color", "color")
         
@@ -50,10 +49,10 @@ class SeparateColorNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "targetType", expand = True)
         
     def drawLabel(self):
-        return "--> " + self.labelOperation + "a (linear)"
+        return "--> " + self.targetType + "a (linear)"
     
     def getExecutionCode(self):
-        yield "r, g, b, h, s, v, l, y, i, q = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0"
+        yield "r = g = b = h = s = v = l = y = i = q = 0"
         if self.targetType == "RGB":    yield "r, g, b = color[0], color[1], color[2]"
         elif self.targetType == "HSV":  yield "h, s, v = colorsys.rgb_to_hsv(color[0], color[1], color[2])"
         elif self.targetType == "HSL":  yield "h, l, s = colorsys.rgb_to_hls(color[0], color[1], color[2])"#attention to the HLS order!
@@ -64,20 +63,9 @@ class SeparateColorNode(bpy.types.Node, AnimationNode):
         return ["colorsys"]
 
     def updateHideStatus(self):
-        self.outputs["Red"].hide = True
-        self.outputs["Green"].hide = True
-        self.outputs["Blue"].hide = True
-        
-        self.outputs["Hue"].hide = True
-        self.outputs["Saturation"].hide = True
-        self.outputs["Value"].hide = True
-        
-        self.outputs["Lightness"].hide = True
-        
-        self.outputs["Y Luma"].hide = True
-        self.outputs["I In phase"].hide = True
-        self.outputs["Q Quadrature"].hide = True
-        
+        for socket in self.outputs: socket.hide = True
+        self.outputs["Alpha"].hide = False
+
         if self.targetType == "RGB":
             self.outputs["Red"].hide = False
             self.outputs["Green"].hide = False
