@@ -1,10 +1,10 @@
 import bpy
-from bpy.props import BoolProperty
+from bpy.props import *
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 
-class an_ObjectVisibilityOutput(bpy.types.Node, AnimationNode):
-    bl_idname = "an_ObjectVisibilityOutput"
+class ObjectVisibilityOutputNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_ObjectVisibilityOutputNode"
     bl_label = "Object Visibility Output"
     
     def checkedPropertiesChanged(self, context):
@@ -22,36 +22,37 @@ class an_ObjectVisibilityOutput(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
-        self.inputs.new("an_BooleanSocket", "Hide", "hide").value = False
-        self.inputs.new("an_BooleanSocket", "Hide Select", "hideSelect").value = False
-        self.inputs.new("an_BooleanSocket", "Hide Render", "hideRender").value = False
-        self.inputs.new("an_BooleanSocket", "Show Name", "showName").value = False
-        self.inputs.new("an_BooleanSocket", "Show Axis", "showAxis").value = False
-        self.inputs.new("an_BooleanSocket", "Show Xray", "showXray").value = False
+        self.inputs.new("an_BooleanSocket", "Hide", "hide")
+        self.inputs.new("an_BooleanSocket", "Hide Select", "hideSelect")
+        self.inputs.new("an_BooleanSocket", "Hide Render", "hideRender")
+        self.inputs.new("an_BooleanSocket", "Show Name", "showName")
+        self.inputs.new("an_BooleanSocket", "Show Axis", "showAxis")
+        self.inputs.new("an_BooleanSocket", "Show Xray", "showXray")
         self.outputs.new("an_ObjectSocket", "Object", "object")
+        for socket in self.inputs: socket.value = False
         self.updateSocketVisibility()
         
     def draw(self, layout):
-        rrow = layout.row()
+        row = layout.row()
         
-        col = rrow.column()
-        row = col.row(align = True)
-        row.alignment = 'LEFT'
+        col = row.column()
+        subrow = col.row(align = True)
+        subrow.alignment = 'LEFT'
         #row.label("Visibility")
-        row.prop(self, "useView", text = "", icon = "RESTRICT_VIEW_OFF")
-        row.prop(self, "useSelect", text = "", icon = "RESTRICT_SELECT_OFF")
-        row.prop(self, "useRender", text = "", icon = "RESTRICT_RENDER_OFF")
+        subrow.prop(self, "useView", text = "", icon = "RESTRICT_VIEW_OFF")
+        subrow.prop(self, "useSelect", text = "", icon = "RESTRICT_SELECT_OFF")
+        subrow.prop(self, "useRender", text = "", icon = "RESTRICT_RENDER_OFF")
         
-        col = rrow.column()
-        row = col.row(align = True)
-        row.alignment = 'RIGHT'
+        col = row.column()
+        subrow = col.row(align = True)
+        subrow.alignment = 'RIGHT'
         #row.label("Show")
-        row.prop(self, "useName", text = "", icon = "SORTALPHA")    # SYNTAX_ON / SYNTAX_OFF
-        row.prop(self, "useAxis", text = "", icon = "MANIPUL")    
-        row.prop(self, "useXray", text = "", icon = "ROTACTIVE")    # MOD_DECIM / META_BALL
+        subrow.prop(self, "useName", text = "", icon = "SORTALPHA")    # SYNTAX_ON / SYNTAX_OFF
+        subrow.prop(self, "useAxis", text = "", icon = "MANIPUL")    
+        subrow.prop(self, "useXray", text = "", icon = "ROTACTIVE")    # MOD_DECIM / META_BALL
     
     def drawAdvanced(self, layout):
-        layout.operator("wm.call_menu", text = "Node Info / Help", icon = "INFO").name = "an.show_obj_vis_help"
+        layout.operator("wm.call_menu", text = "Node Info / Help", icon = "INFO").name = "an.show_object_visibility_output_help"
 
     def updateSocketVisibility(self):
         self.inputs["Hide"].hide = not (self.useView)
@@ -76,17 +77,16 @@ class an_ObjectVisibilityOutput(bpy.types.Node, AnimationNode):
         if not any((self.useView, self.useSelect, self.useRender, self.useName, self.useAxis, self.useXray)): 
             lines = []
             
-        #lines.append("object = object")
         return lines
 
 
 class ShowHelp(bpy.types.Menu):
-    bl_idname = "an.show_obj_vis_help"
+    bl_idname = "an.show_object_visibility_output_help"
     bl_label = "Object Visibility Output node | Blender - Animation Nodes"
     bl_icon = "FORCE_TURBULENCE"
     
-    helpText = bpy.props.StringProperty(default = "help here")
-    noteText = bpy.props.StringProperty(default = "note here")
+    helpText = StringProperty(default = "help here")
+    noteText = StringProperty(default = "note here")
     helpLines = []
     noteLines = []
     
