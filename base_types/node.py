@@ -350,15 +350,19 @@ def toString(code):
 # Register
 ##################################
 
-def nodeToID(self):
-    return (self.id_data.name, self.name)
+def nodeToID(node):
+    return (node.id_data.name, node.name)
 
-def isAnimationNode(self):
-    return hasattr(self, "_isAnimationNode")
+def isAnimationNode(node):
+    return hasattr(node, "_isAnimationNode")
+
+def getNodeTree(node):
+    return node.id_data
 
 def registerHandlers():
     bpy.types.Node.toID = nodeToID
     bpy.types.Node.isAnimationNode = BoolProperty(name = "Is Animation Node", get = isAnimationNode)
+    bpy.types.Node.getNodeTree = getNodeTree
     bpy.app.handlers.load_post.append(createMissingIdentifiers)
 
 def unregisterHandlers():

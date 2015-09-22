@@ -32,7 +32,7 @@ class FrameActiveNetwork(bpy.types.Operator, AnimationNodeOperator):
 
     def execute(self, context):
         nodes = context.active_node.network.getNodes()
-        nodeTree = nodes[0].nodeTree
+        nodeTree = nodes[0].getNodeTree()
         frameNode = nodeTree.nodes.new(type = "NodeFrame")
         for node in nodes:
             while node.parent is not None:
