@@ -25,3 +25,5 @@ class InsertDebugNodeTemplateOperator(bpy.types.Operator, Template):
         if self.usedMenu: socket = activeNode.outputs[self.socketIndex]
         else: socket = activeNode.getVisibleOutputs()[0]
         socket.linkWith(debugNode.inputs[0])
+
+        self.setActiveNode(activeNode)

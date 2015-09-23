@@ -40,9 +40,12 @@ class Template:
     def execute(self, context):
         self.nodesToMove = []
         self.newNodes = []
+        self.finalActiveNode = None
         self.insert()
         self.offsetNewNodesPosition()
         self.moveInsertedNodes()
+        if self.finalActiveNode is not None:
+            self._setActiveNode(self.finalActiveNode)
         return {"FINISHED"}
 
     def insert(self):
@@ -72,8 +75,9 @@ class Template:
             node.location += offset + Vector(self.nodeOffset)
 
     def moveInsertedNodes(self):
-        for node in self.nodeTree.nodes:
-            node.select = node in self.nodesToMove
+        self.deselectAllNodes()
+        for node in self.nodesToMove:
+            node.select = True
         invokeTranslation()
 
     @property
@@ -84,5 +88,17 @@ class Template:
     def activeNode(self):
         return getattr(bpy.context, "active_node", None)
 
+    def deselectAllNodes(self):
+        for node in self.nodeTree.nodes:
+            node.select = False
+
     def updateSubprograms(self):
         subprogram_sockets.updateIfNecessary()
+
+    def setActiveNode(self, node):
+        self.finalActiveNode = node
+
+    def _setActiveNode(self, node):
+        self.deselectAllNodes()
+        self.finalActiveNode.select = True
+        self.nodeTree.nodes.active = self.finalActiveNode

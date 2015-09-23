@@ -33,7 +33,7 @@ class ContextPie(bpy.types.Menu):
 
     def drawLeft(self, context, layout):
         if activeNodeHasInputs():
-            layout.operator("an.insert_data_input_node", text = "Data Input")
+            layout.operator("an.insert_data_input_node_template_operator", text = "Data Input")
         else:
             self.empty(layout)
 
@@ -109,136 +109,9 @@ class ContextPie(bpy.types.Menu):
             item.target = target
 
 
-class InsertDataInputNode(bpy.types.Operator):
-    bl_idname = "an.insert_data_input_node"
-    bl_label = "Insert Data Input Node"
-    bl_description = ""
-    bl_options = {"REGISTER"}
-
-    socketIndex = IntProperty(default = 0)
-    nodeTreeName = StringProperty()
-    nodeName = StringProperty()
-
-    @classmethod
-    def poll(cls, context):
-        return activeNodeHasInputs() and animationNodeTreeActive()
-
-    def invoke(self, context, event):
-        storeCursorLocation(event)
-        node = context.active_node
-        bpy.ops.an.choose_socket_and_execute_operator("INVOKE_DEFAULT",
-            operatorName = "an.insert_data_input_node",
-            nodeTreeName = node.nodeTree.name,
-            nodeName = node.name,
-            chooseOutputSocket = False)
-        return {"FINISHED"}
-
-    def execute(self, context):
-        nodeTree = getActiveAnimationNodeTree()
-        targetNode = getNode(self.nodeTreeName, self.nodeName)
-        targetSocket = targetNode.inputs[self.socketIndex]
-        data = targetSocket.getProperty()
-
-        node = insertNode("an_DataInputNode")
-        node.assignSocketType(toDataType(targetSocket.bl_idname))
-        node.inputs[0].setProperty(data)
-
-        nodeTree.links.new(targetSocket, node.outputs[0])
-        moveNode(node)
-        return{"FINISHED"}
-
-
-class ChooseSocketAndExecuteOperator(bpy.types.Operator):
-    bl_idname = "an.choose_socket_and_execute_operator"
-    bl_label = "Choose Socket and Execute Operator"
-    bl_description = ""
-    bl_options = {"REGISTER"}
-
-    operatorName = StringProperty()
-    nodeTreeName = StringProperty()
-    nodeName = StringProperty()
-    chooseOutputSocket = BoolProperty()
-
-    def invoke(self, context, event):
-        node = getNode(self.nodeTreeName, self.nodeName)
-        sockets = node.outputs if self.chooseOutputSocket else node.inputs
-        amount = len(sockets)
-        if amount == 1:
-            exec("bpy.ops.{}('EXEC_DEFAULT', socketIndex = 0, nodeTreeName = {}, nodeName = {})".format(self.operatorName, repr(self.nodeTreeName), repr(self.nodeName)))
-        elif amount >= 2:
-            context.window_manager.popup_menu(self.drawSocketChooser, title = "Choose Socket")
-        return {"FINISHED"}
-
-    def drawSocketChooser(self, menu, context):
-        node = getNode(self.nodeTreeName, self.nodeName)
-        sockets = node.outputs if self.chooseOutputSocket else node.inputs
-
-        col = menu.layout.column()
-        col.operator_context = "EXEC_DEFAULT"
-        for i, socket in enumerate(sockets):
-            if not socket.hide:
-                props = col.operator(self.operatorName, text = socket.getDisplayedName())
-                props.socketIndex = i
-                props.nodeTreeName = self.nodeTreeName
-                props.nodeName = self.nodeName
-
-
-class LinkedIndices(bpy.types.PropertyGroup):
-    origin = IntProperty(default = 0)
-    target = IntProperty(default = 0)
-
-class InsertLinkedNode(bpy.types.Operator):
-    bl_idname = "an.insert_linked_node"
-    bl_label = "Insert Linked Node"
-    bl_description = ""
-    bl_options = {"REGISTER"}
-
-    nodeType = StringProperty(default = "")
-    links = CollectionProperty(type = LinkedIndices)
-
-    @classmethod
-    def poll(cls, context):
-        return activeNodeHasOutputs() and animationNodeTreeActive()
-
-    def invoke(self, context, event):
-        storeCursorLocation(event)
-
-        nodeTree = getActiveAnimationNodeTree()
-        originNode = getActiveNode()
-        node = insertNode(self.nodeType)
-        for item in self.links:
-            nodeTree.links.new(node.inputs[item.target], originNode.outputs[item.origin])
-
-        moveNode(node)
-        return{"FINISHED"}
-
-
-def insertNode(type):
-    space = bpy.context.space_data
-    nodeTree = space.node_tree
-    node = nodeTree.nodes.new(type)
-    node.location = space.cursor_location
-    return node
-
-def moveNode(node):
-    onlySelect(node)
-    bpy.ops.transform.translate("INVOKE_DEFAULT")
-
-def storeCursorLocation(event):
-    space = bpy.context.space_data
-    nodeTree = space.node_tree
-    space.cursor_location_from_region(event.mouse_region_x, event.mouse_region_y)
-
-def onlySelect(node):
-    bpy.ops.node.select_all(action = "DESELECT")
-    node.select = True
-    node.nodeTree.nodes.active = node
-
-
 def getNodeNameFromIdName(idName):
     try: return getattr(bpy.types, idName).bl_label
     except: return ""
-
 
 def activeNodeHasOutputs():
     if not activeNodeExists(): return False
