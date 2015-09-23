@@ -3,7 +3,7 @@ from bpy.props import *
 from ... tree_info import keepNodeLinks
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
-from ... sockets.info import getBaseDataTypeItems, toIdName, toListIdName, isBase, toBaseDataType
+from ... sockets.info import getBaseDataTypeItems, toIdName, toListIdName, isBase, toBaseDataType, isLimitedList, toGeneralListIdName
 
 class GetListElementNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GetListElementNode"
@@ -43,7 +43,10 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
         fallbackInput = self.inputs["Fallback"].dataOrigin
         elementOutputs = self.outputs["Element"].dataTargets
 
-        if listInput is not None: return toBaseDataType(listInput.bl_idname)
+        if listInput is not None:
+            idName = listInput.bl_idname
+            if isLimitedList(idName): idName = toGeneralListIdName(idName)
+            return toBaseDataType(idName)
         if fallbackInput is not None: return fallbackInput.dataType
         if len(elementOutputs) == 1: return elementOutputs[0].dataType
         return self.outputs["Element"].dataType
