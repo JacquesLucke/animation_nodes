@@ -61,8 +61,7 @@ class CombineColorNode(bpy.types.Node, AnimationNode):
         return ["colorsys"]
 
     def updateHideStatus(self):
-        for socket in self.inputs: socket.hide = True
-        self.inputs["Alpha"].hide = False
+        for socket in self.inputs[:-1]: socket.hide = True
 
         if self.sourceType == "RGB":
             self.inputs["Red"].hide = False
