@@ -5,6 +5,7 @@ lower = "abcdefghijklmnopqrstuvwxyz"
 upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 digits = "0123456789"
 special = "!$%&/()=?*+#'-_.:,;" + '"'
+lineBreak = "\n"
 allChars = lower + upper + digits + special
 
 class CharactersNode(bpy.types.Node, AnimationNode):
@@ -16,7 +17,8 @@ class CharactersNode(bpy.types.Node, AnimationNode):
         self.outputs.new("an_StringSocket", "Upper Case", "upper")
         self.outputs.new("an_StringSocket", "Digits", "digits")
         self.outputs.new("an_StringSocket", "Special", "special")
+        self.outputs.new("an_StringSocket", "Line Break", "lineBreak")
         self.outputs.new("an_StringSocket", "All", "all")
 
     def execute(self):
-        return lower, upper, digits, special, allChars
+        return lower, upper, digits, special, lineBreak, allChars
