@@ -29,7 +29,7 @@ class ObjectVisibilityOutputNode(bpy.types.Node, AnimationNode):
         self.inputs.new("an_BooleanSocket", "Show Axis", "showAxis")
         self.inputs.new("an_BooleanSocket", "Show Xray", "showXray")
         self.outputs.new("an_ObjectSocket", "Object", "object")
-        for socket in self.inputs: socket.value = False
+        for socket in self.inputs[1:]: socket.value = False
         self.updateSocketVisibility()
         
     def draw(self, layout):
@@ -64,19 +64,19 @@ class ObjectVisibilityOutputNode(bpy.types.Node, AnimationNode):
         
     def getExecutionCode(self):
         lines = []
-        lines.append("if object is not None:")
-        
-        if self.useView: lines.append("    object.hide = hide")
-        if self.useSelect: lines.append("    object.hide_select = hideSelect")
-        if self.useRender: lines.append("    object.hide_render = hideRender")
-        
-        if self.useName: lines.append("    object.show_name = showName")
-        if self.useAxis: lines.append("    object.show_axis = showAxis")
-        if self.useXray: lines.append("    object.show_x_ray = showXray")
-        
         if not any((self.useView, self.useSelect, self.useRender, self.useName, self.useAxis, self.useXray)): 
             lines = []
+        else:
+            lines.append("if object is not None:")
             
+            if self.useView: lines.append("    object.hide = hide")
+            if self.useSelect: lines.append("    object.hide_select = hideSelect")
+            if self.useRender: lines.append("    object.hide_render = hideRender")
+            
+            if self.useName: lines.append("    object.show_name = showName")
+            if self.useAxis: lines.append("    object.show_axis = showAxis")
+            if self.useXray: lines.append("    object.show_x_ray = showXray")
+
         return lines
 
 
