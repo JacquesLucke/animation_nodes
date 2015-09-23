@@ -45,7 +45,7 @@ class ContextPie(bpy.types.Menu):
 
     def drawBottom(self, context, layout):
         if activeNodeHasOutputs():
-            layout.operator("an.insert_debug_node", text = "Debug")
+            layout.operator("an.insert_debug_node_template_operator", text = "Debug")
         else:
             self.empty(layout)
 
@@ -107,39 +107,6 @@ class ContextPie(bpy.types.Menu):
             item = props.links.add()
             item.origin = origin
             item.target = target
-
-
-class InsertDebugNode(bpy.types.Operator):
-    bl_idname = "an.insert_debug_node"
-    bl_label = "Insert Debug Node"
-    bl_description = ""
-    bl_options = {"REGISTER"}
-
-    socketIndex = IntProperty(default = 0)
-    nodeTreeName = StringProperty()
-    nodeName = StringProperty()
-
-    @classmethod
-    def poll(cls, context):
-        return activeNodeHasOutputs() and animationNodeTreeActive()
-
-    def invoke(self, context, event):
-        storeCursorLocation(event)
-        node = context.active_node
-        bpy.ops.an.choose_socket_and_execute_operator("INVOKE_DEFAULT",
-            operatorName = "an.insert_debug_node",
-            nodeTreeName = node.nodeTree.name,
-            nodeName = node.name,
-            chooseOutputSocket = True)
-        return {"FINISHED"}
-
-    def execute(self, context):
-        nodeTree = getActiveAnimationNodeTree()
-        originNode = getNode(self.nodeTreeName, self.nodeName)
-        node = insertNode("an_DebugNode")
-        nodeTree.links.new(node.inputs[0], originNode.outputs[self.socketIndex])
-        moveNode(node)
-        return{"FINISHED"}
 
 
 class InsertDataInputNode(bpy.types.Operator):
