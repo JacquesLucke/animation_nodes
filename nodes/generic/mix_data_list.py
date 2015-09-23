@@ -12,6 +12,7 @@ class MixDataListNode(bpy.types.Node, AnimationNode):
 
     onlySearchTags = True
     searchTags = [ ("Mix Matrix List", {"dataType" : repr("Matrix")}),
+                   ("Mix Color List", {"dataType" : repr("Color")}),
                    ("Mix Vector List", {"dataType" : repr("Vector")}),
                    ("Mix Float List", {"dataType" : repr("Float")}) ]
 
