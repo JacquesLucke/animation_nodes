@@ -19,7 +19,7 @@ class GetListElementIndexNode(bpy.types.Node, AnimationNode):
     listIdName = StringProperty()
     
     def create(self):
-        self.assignedType = "Float"  #could use generic to skip all update but users may try funny stuf (I will..)
+        self.assignedType = "Float" 
         self.outputs.new("an_IntegerSocket", "First Index", "firstIndex")
         self.outputs.new("an_IntegerListSocket", "All Indices", "allIndices")
         self.outputs.new("an_IntegerSocket", "Occurrences", "occurrences")
@@ -34,8 +34,8 @@ class GetListElementIndexNode(bpy.types.Node, AnimationNode):
         
         lines = []
         lines.append("allIndices = [i for i, element in enumerate(list) if element == search]")
-        if isLinked["firstIndex"]: lines.append("firstIndex = allIndices[0] if len(allIndices) > 0 else None")  #this may be the most used, so we just avoid another get element
-        if isLinked["occurrences"]: lines.append("occurrences = len(allIndices)")  #this is also an indication that exists
+        if isLinked["firstIndex"]: lines.append("firstIndex = allIndices[0] if len(allIndices) > 0 else -1")
+        if isLinked["occurrences"]: lines.append("occurrences = len(allIndices)")
 
         return lines
     
