@@ -8,7 +8,6 @@ def correctForbiddenNodeLinks():
     dataLinks = getAllDataLinks()
     invalidLinks = filterInvalidLinks(dataLinks)
     for dataOrigin, target in invalidLinks:
-        nodeTree = target.nodeTree
         directOrigin = getDirectlyLinkedSocket(target)
         if not tryToCorrectLink(dataOrigin, directOrigin, target):
             removeLink(directOrigin, target)
@@ -23,13 +22,13 @@ def isConnectionValid(origin, target):
 def tryToCorrectLink(dataOrigin, directOrigin, target):
     for corrector in linkCorrectors:
         if corrector.check(dataOrigin, target):
-            nodeTree = target.nodeTree
+            nodeTree = target.getNodeTree()
             corrector.insert(nodeTree, directOrigin, target, dataOrigin)
             return True
     return False
 
 def removeLink(origin, target):
-    nodeTree = origin.nodeTree
+    nodeTree = origin.getNodeTree()
     for link in nodeTree.links:
         if link.from_socket == origin and link.to_socket == target:
             nodeTree.links.remove(link)
@@ -147,13 +146,17 @@ class ConverFloatToInteger(LinkCorrection):
     def insert(self, nodeTree, origin, target, dataOrigin):
         node = insertLinkedNode(nodeTree, "an_FloatToIntegerNode", origin, target)
 
-class ConvertToBasicTypes(LinkCorrection):
+class ConvertToString(LinkCorrection):
     def check(self, origin, target):
-        return target.dataType in ["String", "Integer", "Float"]
+        return target.dataType == "String"
     def insert(self, nodeTree, origin, target, dataOrigin):
-        node = insertLinkedNode(nodeTree, "an_ConvertNode", origin, target)
-        tree_info.update()
-        node.assignType(target.dataType)
+        node = insertLinkedNode(nodeTree, "an_ConvertToStringNode", origin, target)
+
+class ConvertBooleanToInteger(LinkCorrection):
+    def check(self, origin, target):
+        return origin.dataType == "Boolean" and target.dataType in ("Integer", "Float")
+    def insert(self, nodeTree, origin, target, dataOrigin):
+        node = insertLinkedNode(nodeTree, "an_BooleanToIntegerNode", origin, target)
 
 class ConvertFromGeneric(LinkCorrection):
     def check(self, origin, target):
@@ -208,5 +211,6 @@ linkCorrectors = [
     ConvertVectorToMatrix(),
 	ConvertListToLength(),
     ConverFloatToInteger(),
-    ConvertToBasicTypes(),
+    ConvertToString(),
+    ConvertBooleanToInteger(),
     ConvertFromGeneric() ]

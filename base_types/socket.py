@@ -307,6 +307,9 @@ def setSocketVisibility(socket, value):
 def toID(socket):
     return ((socket.node.id_data.name, socket.node.name), socket.is_output, socket.identifier)
 
+def getNodeTree(socket):
+    return socket.node.id_data
+
 def getSocketIndex(socket):
     if socket.is_output:
         return list(socket.node.outputs).index(socket)
@@ -316,6 +319,7 @@ def register():
     bpy.types.NodeSocket.show = BoolProperty(default = True, get = getSocketVisibility, set = setSocketVisibility)
     bpy.types.NodeSocket.index = IntProperty(get = getSocketIndex)
     bpy.types.NodeSocket.toID = toID
+    bpy.types.NodeSocket.getNodeTree = getNodeTree
 
 def unregister():
     del bpy.types.NodeSocket.show
