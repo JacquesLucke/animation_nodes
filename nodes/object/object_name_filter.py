@@ -1,19 +1,17 @@
 import bpy
+from bpy.props import *
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
+
+filterTypeItems = [("STARTS_WITH", "Starts With", "All Objects with names starting with"),
+                   ("ENDS_WITH", "Ends With", "All Objects with names ending with")]
 
 class ObjectNameFilterNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectNameFilterNode"
     bl_label = "Object Name Filter"
     
-    def checkedPropertiesChanged(self, context):
-        executionCodeChanged()
-    
-    useCaseSensitive = bpy.props.BoolProperty(default = False, description = "Use Case Sensitive", update = checkedPropertiesChanged)
-    
-    filterType = bpy.props.EnumProperty(items = [("STARTS_WITH", "Starts With", "All Objects with names starting with"),
-                                                 ("ENDS_WITH", "Ends With", "All Objects with names ending with")],
-                                        update = checkedPropertiesChanged, default = "STARTS WITH")
+    useCaseSensitive = BoolProperty(default = False, description = "Use Case Sensitive", update = checkedPropertiesChanged)
+    filterType = EnumProperty(items = filterTypeItems, default = "STARTS_WITH", update = executionCodeChanged)
     
     def create(self):
         self.bl_width_default = 160
