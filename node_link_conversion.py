@@ -146,13 +146,17 @@ class ConverFloatToInteger(LinkCorrection):
     def insert(self, nodeTree, origin, target, dataOrigin):
         node = insertLinkedNode(nodeTree, "an_FloatToIntegerNode", origin, target)
 
-class ConvertToBasicTypes(LinkCorrection):
+class ConvertToString(LinkCorrection):
     def check(self, origin, target):
-        return target.dataType in ["String", "Integer", "Float"]
+        return target.dataType == "String"
     def insert(self, nodeTree, origin, target, dataOrigin):
-        node = insertLinkedNode(nodeTree, "an_ConvertNode", origin, target)
-        tree_info.update()
-        node.assignType(target.dataType)
+        node = insertLinkedNode(nodeTree, "an_ConvertToStringNode", origin, target)
+
+class ConvertBooleanToInteger(LinkCorrection):
+    def check(self, origin, target):
+        return origin.dataType == "Boolean" and target.dataType in ("Integer", "Float")
+    def insert(self, nodeTree, origin, target, dataOrigin):
+        node = insertLinkedNode(nodeTree, "an_BooleanToIntegerNode", origin, target)
 
 class ConvertFromGeneric(LinkCorrection):
     def check(self, origin, target):
@@ -207,5 +211,6 @@ linkCorrectors = [
     ConvertVectorToMatrix(),
 	ConvertListToLength(),
     ConverFloatToInteger(),
-    ConvertToBasicTypes(),
+    ConvertToString(),
+    ConvertBooleanToInteger(),
     ConvertFromGeneric() ]
