@@ -6,6 +6,7 @@ listChains = [
     ["an_FloatSocket", "an_FloatListSocket"],
     ["an_IntegerSocket", "an_IntegerListSocket"],
     ["an_VectorSocket", "an_VectorListSocket"],
+    ["an_ColorSocket", "an_ColorListSocket"],
     ["an_ObjectSocket", "an_ObjectListSocket"],
     ["an_StringSocket", "an_StringListSocket"],
     ["an_EdgeIndicesSocket", "an_EdgeIndicesListSocket"],
