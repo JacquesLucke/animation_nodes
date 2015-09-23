@@ -170,6 +170,13 @@ class AnimationNode:
         return linkedOutputs
 
 
+    def getVisibleInputs(self):
+        return [socket for socket in self.inputs if not socket.hide]
+
+    def getVisibleOutputs(self):
+        return [socket for socket in self.outputs if not socket.hide]
+
+
     def disableSocketEditingInNode(self):
         for socket in self.sockets:
             socket.disableSocketEditingInNode()
