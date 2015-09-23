@@ -63,8 +63,7 @@ class SeparateColorNode(bpy.types.Node, AnimationNode):
         return ["colorsys"]
 
     def updateHideStatus(self):
-        for socket in self.outputs: socket.hide = True
-        self.outputs["Alpha"].hide = False
+        for socket in self.outputs[:-1]: socket.hide = True
 
         if self.targetType == "RGB":
             self.outputs["Red"].hide = False
