@@ -23,7 +23,7 @@ class NetworkFromParticlesTemplate(bpy.types.Operator, Template):
 
     connectionType = EnumProperty(items = connectionTypeItems)
 
-    def drawMenu(self, layout):
+    def drawDialog(self, layout):
         layout.prop(self, "connectionType", expand = True)
         layout.separator()
         writeText(layout, performanceInfo)

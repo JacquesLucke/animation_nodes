@@ -10,18 +10,29 @@ class Template:
     nodeOffset = (0, 0)
     menuWidth = 400
 
+    usedMenu = BoolProperty(default = False)
+
     @classmethod
     def poll(cls, context):
         try: return context.space_data.node_tree.bl_idname == "an_AnimationNodeTree"
         except: return False
 
     def invoke(self, context, event):
-        if hasattr(self, "drawMenu"):
+        if hasattr(self, "drawDialog"):
             return context.window_manager.invoke_props_dialog(self, width = self.menuWidth)
+        if hasattr(self, "drawMenu") and getattr(self, "needsMenu", False):
+            self.usedMenu = True
+            context.window_manager.popup_menu(self.drawPopupMenu)
+            return {"FINISHED"}
+        self.usedMenu = False
         return self.execute(context)
 
     def draw(self, context):
-        self.drawMenu(self.layout)
+        self.drawDialog(self.layout)
+
+    def drawPopupMenu(self, menu, context):
+        col = menu.layout.column()
+        self.drawMenu(col)
 
     def check(self, context):
         return True

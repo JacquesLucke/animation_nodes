@@ -16,7 +16,7 @@ class EmptySubprogramTemplate(bpy.types.Operator, Template):
     # optional
     targetNodeIdentifier = StringProperty(default = "")
 
-    def drawMenu(self, layout):
+    def drawDialog(self, layout):
         layout.prop(self, "subprogramType")
 
     def insert(self):
