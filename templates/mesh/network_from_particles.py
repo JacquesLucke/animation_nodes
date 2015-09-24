@@ -66,6 +66,7 @@ class NetworkFromParticlesTemplate(bpy.types.Operator, Template):
             bevelInputNode.assignedType = 'Float'
             bevelInputNode.inputs[0].value = 0.005
             curveOutputNode = self.newNode('an_CurveObjectOutputNode', x = 1330, y = 30)
+            curveOutputNode.inputs["Bevel Depth"].isUsed = True
 
             self.newLink(particlesInfoNode.outputs[0], splinesFromEdgesNode.inputs[0])
             self.newLink(findEdgesNode.outputs[0], splinesFromEdgesNode.inputs[1])
