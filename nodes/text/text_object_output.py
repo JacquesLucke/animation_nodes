@@ -26,10 +26,11 @@ class TextObjectOutputNode(bpy.types.Node, AnimationNode):
 
         self.inputs.new("an_FloatSocket", "X Offset", "xOffset")
         self.inputs.new("an_FloatSocket", "Y Offset", "yOffset")
-        self.inputs.new("an_StringSocket", "Align", "align")
+        self.inputs.new("an_StringSocket", "Align", "align").value = "CENTER"
 
         for socket in self.inputs[1:]:
-            socket.defaultDrawType = "TEXT_ONLY"
+            socket.useIsUsedProperty = True
+            socket.isUsed = False
         for socket in self.inputs[4:]:
             socket.hide = True
 
@@ -41,33 +42,27 @@ class TextObjectOutputNode(bpy.types.Node, AnimationNode):
             writeText(layout, self.errorMessage, width = 25, icon = "ERROR")
 
     def drawAdvanced(self, layout):
-        layout.label("This node uses only linked inputs!", icon = "INFO")
         writeText(layout, "Possible values for 'Align' are 'LEFT', 'CENTER', 'RIGHT', 'JUSTIFY' and 'FLUSH'")
 
     def getExecutionCode(self):
-        isLinked = self.getLinkedInputsDict()
-        lines = []
-        lines.append("if getattr(object, 'type', '') == 'FONT':")
-        lines.append("    textObject = object.data")
+        yield "if getattr(object, 'type', '') == 'FONT':"
+        yield "    textObject = object.data"
 
-        if isLinked["text"]: lines.append("    textObject.body = text")
-        if isLinked["size"]: lines.append("    textObject.size = size")
-        if isLinked["extrude"]: lines.append("    textObject.extrude = extrude")
-        if isLinked["shear"]: lines.append("    textObject.shear = shear")
-        if isLinked["bevelDepth"]: lines.append("    textObject.bevel_depth = bevelDepth")
-        if isLinked["bevelResolution"]: lines.append("    textObject.bevel_resolution = bevelResolution")
+        s = self.inputs
+        if s["Text"].isUsed:                yield "    textObject.body = text"
+        if s["Size"].isUsed:                yield "    textObject.size = size"
+        if s["Extrude"].isUsed:             yield "    textObject.extrude = extrude"
+        if s["Shear"].isUsed:               yield "    textObject.shear = shear"
+        if s["Bevel Depth"].isUsed:         yield "    textObject.bevel_depth = bevelDepth"
+        if s["Bevel Resolution"].isUsed:    yield "    textObject.bevel_resolution = bevelResolution"
 
-        if isLinked["letterSpacing"]: lines.append("    textObject.space_character = letterSpacing")
-        if isLinked["wordSpacing"]: lines.append("    textObject.space_word = wordSpacing")
-        if isLinked["lineSpacing"]: lines.append("    textObject.space_line = lineSpacing")
+        if s["Letter Spacing"].isUsed:      yield "    textObject.space_character = letterSpacing"
+        if s["Word Spacing"].isUsed:        yield "    textObject.space_word = wordSpacing"
+        if s["Line Spacing"].isUsed:        yield "    textObject.space_line = lineSpacing"
 
-        if isLinked["xOffset"]: lines.append("    textObject.offset_x = xOffset")
-        if isLinked["yOffset"]: lines.append("    textObject.offset_y = yOffset")
-        if isLinked["align"]: lines.append("    self.setAlignment(textObject, align)")
-
-        lines.append("    pass")
-
-        return lines
+        if s["X Offset"].isUsed:            yield "    textObject.offset_x = xOffset"
+        if s["Y Offset"].isUsed:            yield "    textObject.offset_y = yOffset"
+        if s["Align"].isUsed:               yield "    self.setAlignment(textObject, align)"
 
     def setAlignment(self, textObject, align):
         if align in ("LEFT", "CENTER", "RIGHT", "JUSTIFY", "FLUSH"):
