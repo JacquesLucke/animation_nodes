@@ -20,20 +20,21 @@ def draw(self, context):
 
     size = max(len(node.inputs), len(node.outputs), 1)
 
-    col = row.column()
-    subrow = col.row(align = True)
-    subrow.label("Inputs")
-    subrow.operator("an.move_input", text = "", icon = "TRIA_UP").moveUp = True
-    subrow.operator("an.move_input", text = "", icon = "TRIA_DOWN").moveUp = False
-    col.template_list("an_SocketUiList", "", node, "inputs", node, "activeInputIndex", rows = size, maxrows = size)
+    if len(node.inputs) > 0:
+        col = row.column()
+        subrow = col.row(align = True)
+        subrow.label("Inputs")
+        subrow.operator("an.move_input", text = "", icon = "TRIA_UP").moveUp = True
+        subrow.operator("an.move_input", text = "", icon = "TRIA_DOWN").moveUp = False
+        col.template_list("an_SocketUiList", "", node, "inputs", node, "activeInputIndex", rows = size, maxrows = size)
 
-    col = row.column()
-    subrow = col.row(align = True)
-    subrow.label("Outputs")
-    subrow.operator("an.move_output", text = "", icon = "TRIA_UP").moveUp = True
-    subrow.operator("an.move_output", text = "", icon = "TRIA_DOWN").moveUp = False
-    col.template_list("an_SocketUiList", "", node, "outputs", node, "activeOutputIndex", rows = size, maxrows = size)
-
+    if len(node.outputs) > 0:
+        col = row.column()
+        subrow = col.row(align = True)
+        subrow.label("Outputs")
+        subrow.operator("an.move_output", text = "", icon = "TRIA_UP").moveUp = True
+        subrow.operator("an.move_output", text = "", icon = "TRIA_DOWN").moveUp = False
+        col.template_list("an_SocketUiList", "", node, "outputs", node, "activeOutputIndex", rows = size, maxrows = size)
 
     col = layout.column(align = True)
     col.label("Toogle Operation Visibility:")
