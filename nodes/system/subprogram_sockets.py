@@ -79,6 +79,7 @@ class SubprogramData:
         if newSocket.isInput: newSocket.setProperty(data.defaultValue)
         newSocket.text = data.text
         newSocket.display.text = True
+        newSocket.dataIsModified = True
         return newSocket
 
     def removeUnusedSockets(self, nodeSockets, socketData):
