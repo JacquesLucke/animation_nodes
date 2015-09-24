@@ -10,6 +10,7 @@ class TextSequenceOutputNode(bpy.types.Node, AnimationNode):
     errorMessage = StringProperty()
 
     def create(self):
+        self.width = 160
         self.inputs.new("an_SequenceSocket", "Sequence", "sequence").defaultDrawType = "PROPERTY_ONLY"
         self.inputs.new("an_StringSocket", "Text", "text")
         self.inputs.new("an_IntegerSocket", "Size", "size").value = 200
@@ -20,7 +21,8 @@ class TextSequenceOutputNode(bpy.types.Node, AnimationNode):
         self.outputs.new("an_SequenceSocket", "Sequence", "sequence")
 
         for socket in self.inputs[1:]:
-            socket.defaultDrawType = "TEXT_ONLY"
+            socket.useIsUsedProperty = True
+            socket.isUsed = False
         for socket in self.inputs[4:]:
             socket.hide = True
 
@@ -29,24 +31,20 @@ class TextSequenceOutputNode(bpy.types.Node, AnimationNode):
             writeText(layout, self.errorMessage, width = 25, icon = "ERROR")
 
     def drawAdvanced(self, layout):
-        layout.label("This node uses only linked inputs!", icon = "INFO")
         writeText(layout, "Possible values for 'Align' are 'LEFT', 'CENTER' and 'RIGHT'")
 
     def getExecutionCode(self):
-        isLinked = self.getLinkedInputsDict()
-        lines = []
-        lines.append("if getattr(sequence, 'type', '') == 'TEXT':")
+        yield "if getattr(sequence, 'type', '') == 'TEXT':"
 
-        if isLinked["text"]: lines.append("    sequence.text = text")
-        if isLinked["size"]: lines.append("    sequence.font_size = size")
-        if isLinked["shadow"]: lines.append("    sequence.use_shadow = shadow")
-        if isLinked["align"]: lines.append("    self.setAlignment(sequence, align)")
-        if isLinked["xLocation"]: lines.append("    sequence.location[0] = xLocation")
-        if isLinked["yLocation"]: lines.append("    sequence.location[1] = yLocation")
+        s = self.inputs
+        if s["Text"].isUsed:        yield "    sequence.text = text"
+        if s["Size"].isUsed:        yield "    sequence.font_size = size"
+        if s["Shadow"].isUsed:      yield "    sequence.use_shadow = shadow"
+        if s["Align"].isUsed:       yield "    self.setAlignment(sequence, align)"
+        if s["X Location"].isUsed:  yield "    sequence.location[0] = xLocation"
+        if s["Y Location"].isUsed:  yield "    sequence.location[1] = yLocation"
 
-        lines.append("    pass")
-
-        return lines
+        yield "    pass"
 
     def setAlignment(self, sequence, align):
         if align in ("LEFT", "CENTER", "RIGHT"):
