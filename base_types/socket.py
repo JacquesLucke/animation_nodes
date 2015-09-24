@@ -43,6 +43,9 @@ class AnimationNodeSocket:
     moveable = BoolProperty(default = False)
     moveGroup = IntProperty(default = 0)
 
+    isUsed = BoolProperty(default = True, update = executionCodeChanged)
+    useIsUsedProperty = BoolProperty(default = False)
+
     display = PointerProperty(type = SocketDisplayProperties)
     textProps = PointerProperty(type = SocketTextProperties)
     loop = PointerProperty(type = SocketLoopProperties)
@@ -57,7 +60,7 @@ class AnimationNodeSocket:
         if self.textProps.editable and self.display.textInput:
             row.prop(self, "text", text = "")
         else:
-            if self.isInput and self.isUnlinked:
+            if self.isInput and self.isUnlinked and self.isUsed:
                 self.drawSocket(row, displayText, self.defaultDrawType)
             else:
                 if self.isOutput: row.alignment = "RIGHT"
@@ -71,6 +74,10 @@ class AnimationNodeSocket:
         if self.removeable and self.display.removeOperator:
             row.separator()
             self.invokeFunction(row, "remove", icon = "X")
+
+        if self.useIsUsedProperty:
+            icon = "LAYER_ACTIVE" if self.isUsed else "LAYER_USED"
+            row.prop(self, "isUsed", text = "", icon = icon, icon_only = True)
 
     def drawSocket(self, layout, text, drawType = "TEXT_PROPERTY"):
         '''
