@@ -73,13 +73,9 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
         if useWorldSpace:
             matrix = object.matrix_world
             rotation = extractRotation(matrix)
-            for meshVertex in mesh.vertices:
-                vertices.append(Vertex(matrix * meshVertex.co, rotation * meshVertex.normal,
-                                       [group.weight for group in meshVertex.groups]))
+            vertices = [Vertex.fromMeshVertexInWorldSpace(meshVertex, matrix, rotation) for meshVertex in mesh.vertices]
         else:
-            for meshVertex in mesh.vertices:
-                vertices.append(Vertex(meshVertex.co.copy(), meshVertex.normal.copy(),
-                                       [group.weight for group in meshVertex.groups]))
+            vertices = [Vertex.fromMeshVertexInLocalSpace(meshVertex) for meshVertex in mesh.vertices]
         return vertices
 
     def getPolygons(self, mesh, vertexLocations, object, useWorldSpace):

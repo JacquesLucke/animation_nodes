@@ -15,13 +15,27 @@ class MeshData:
 class Vertex:
     __slots__ = ("location", "normal", "groupWeights")
 
+    @staticmethod
+    def fromMeshVertexInLocalSpace(meshVertex):
+        return Vertex(
+                 meshVertex.co.copy(),
+                 meshVertex.normal.copy(),
+                 [group.weight for group in meshVertex.groups])
+
+    @staticmethod
+    def fromMeshVertexInWorldSpace(meshVertex, vertexTransformation, normalTransformation):
+        return Vertex(
+                 vertexTransformation * meshVertex.co,
+                 normalTransformation * meshVertex.normal,
+                 [group.weight for group in meshVertex.groups])
+
     def __init__(self, location, normal, groupWeights):
         self.location = location
         self.normal = normal
         self.groupWeights = groupWeights
 
     def copy(self):
-        return Vertex(self.location.copy(), self.normal.copy(), self.groupWeights[:])       
+        return Vertex(self.location.copy(), self.normal.copy(), self.groupWeights[:])
 
 
 class Polygon:
