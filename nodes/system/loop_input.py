@@ -28,6 +28,9 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
 
     def draw(self, layout):
         layout.separator()
+        left, right = splitAlignment(layout)
+        self.invokeSocketTypeChooser(left, "createGeneratorOutputNode", socketGroup = "LIST", text = "", icon = "ZOOMIN", emboss = False)
+        right.label("New Generator")
         layout.prop(self, "subprogramName", text = "", icon = "GROUP_VERTEX")
 
     def drawAdvanced(self, layout):
@@ -146,7 +149,7 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         self.insertIteratorData(data)
         self.insertGeneratorData(data)
         self.insertParameterData(data)
-        
+
         return data
 
     def insertIteratorData(self, data):
