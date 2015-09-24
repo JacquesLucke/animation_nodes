@@ -80,19 +80,11 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
 
     def getPolygons(self, mesh, vertexLocations, object, useWorldSpace):
         polygons = []
-
         if useWorldSpace:
             matrix = object.matrix_world
             rotation = extractRotation(matrix)
             scale = matrix.to_scale().length / 1.732
-
-            for meshPolygon in mesh.polygons:
-                vertices = [vertexLocations[index].copy() for index in meshPolygon.vertices]
-                polygons.append(Polygon(vertices, rotation * meshPolygon.normal, matrix * meshPolygon.center,
-                                        meshPolygon.area * scale, meshPolygon.material_index))
+            polygons = [Polygon.fromMeshPolygonInWorldSpace(meshPolygon, vertexLocations, matrix, rotation, scale) for meshPolygon in mesh.polygons]
         else:
-            for meshPolygon in mesh.polygons:
-                vertices = [vertexLocations[index].copy() for index in meshPolygon.vertices]
-                polygons.append(Polygon(vertices, meshPolygon.normal.copy(), meshPolygon.center.copy(),
-                                        meshPolygon.area, meshPolygon.material_index))
+            polygons = [Polygon.fromMeshPolygonInLocalSpace(meshPolygon, vertexLocations) for meshPolygon in mesh.polygons]
         return polygons

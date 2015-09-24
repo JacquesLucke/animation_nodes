@@ -41,6 +41,26 @@ class Vertex:
 class Polygon:
     __slots__ = ("vertices", "normal", "center", "area", "materialIndex")
 
+    @staticmethod
+    def fromMeshPolygonInLocalSpace(meshPolygon, vertexLocations):
+        vertices = [vertexLocations[index].copy() for index in meshPolygon.vertices]
+        return Polygon(
+                 vertices,
+                 meshPolygon.normal.copy(),
+                 meshPolygon.center.copy(),
+                 meshPolygon.area,
+                 meshPolygon.material_index)
+
+    @staticmethod
+    def fromMeshPolygonInWorldSpace(meshPolygon, vertexLocations, transformation, normalTransformation, scale):
+        vertices = [vertexLocations[index].copy() for index in meshPolygon.vertices]
+        return Polygon(
+                 vertices,
+                 normalTransformation * meshPolygon.normal,
+                 transformation * meshPolygon.center,
+                 meshPolygon.area * scale,
+                 meshPolygon.material_index)
+
     def __init__(self, vertices, normal, center, area, materialIndex):
         self.vertices = vertices
         self.normal = normal
