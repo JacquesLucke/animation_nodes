@@ -16,21 +16,18 @@ operationItems = [
 
 operationsWithFloat = ["NORMALIZE", "SCALE"]
 
+operationLabels = {item[0] : item[2][:11] for item in operationItems}
+
 class VectorMathNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_VectorMathNode"
     bl_label = "Vector Math"
 
     def operationChanged(self, context):
-        for item in operationItems:
-            if item[0] == self.operation:
-                self.labelOperation = item[2][:11]
         self.inputs["B"].hide = self.operation in operationsWithFloat
         self.inputs["Scale"].hide = self.operation not in operationsWithFloat
         executionCodeChanged()
 
     operation = EnumProperty(name = "Operation", items = operationItems, default = "ADD", update = operationChanged)
-
-    labelOperation = StringProperty(name = "Operation Label", default = "A + B")
 
     def create(self):
         self.inputs.new("an_VectorSocket", "A", "a")
@@ -44,7 +41,7 @@ class VectorMathNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "operation", text = "")
 
     def drawLabel(self):
-        return self.labelOperation
+        return operationLabels[self.operation]
 
     def getExecutionCode(self):
         op = self.operation

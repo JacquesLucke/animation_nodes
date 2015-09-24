@@ -33,6 +33,8 @@ operationItems = [
 singleInputOperations = ("SINE", "COSINE", "TANGENT", "ARCSINE",
     "ARCCOSINE", "ARCTANGENT", "ABSOLUTE", "FLOOR", "CEILING", "SQRT", "INVERT", "RECIPROCAL")
 
+operationLabels = {item[0] : item[2] for item in operationItems}
+
 searchItems = {
     "Add Numbers" : "ADD",
     "Subtract Numbers" : "SUBTRACT",
@@ -54,9 +56,6 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
         return tags
 
     def operationChanged(self, context):
-        for item in operationItems:
-            if item[0] == self.operation:
-                self.operationLabel = item[2]
         self.inputs[1].hide = self.operation in singleInputOperations
         executionCodeChanged()
 
@@ -69,8 +68,6 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
     outputInteger = BoolProperty(name = "Output Integer", default = False,
         update = outputIntegerChanged)
 
-    operationLabel = StringProperty(name = "Operation Label", default = "A * B")
-
     def create(self):
         self.inputs.new("an_FloatSocket", "A", "a")
         self.inputs.new("an_FloatSocket", "B", "b").value = 1.0
@@ -80,7 +77,7 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "operation", text = "")
 
     def drawLabel(self):
-        return "{} ({})".format(self.operationLabel, "Integer" if self.outputInteger else "Float")
+        return operationLabels[self.operation]
 
     def edit(self):
         targets = self.outputs[0].dataTargets
