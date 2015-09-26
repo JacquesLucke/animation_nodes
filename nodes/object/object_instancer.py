@@ -3,6 +3,7 @@ from bpy.props import *
 from ... events import propertyChanged
 from ... utils.names import getRandomString
 from ... base_types.node import AnimationNode
+from ... utils.blender_ui import iterActiveSpacesByType
 from ... nodes.container_provider import getMainObjectContainer
 from ... utils.names import (getPossibleObjectName,
                                      getPossibleMeshName,
@@ -30,6 +31,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
 
     def resetInstancesEvent(self, context):
         self.resetInstances = True
+        propertyChanged()
 
     linkedObjects = CollectionProperty(type = an_ObjectNamePropertyGroup)
     resetInstances = BoolProperty(default = False, update = propertyChanged)
@@ -39,6 +41,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
     deepCopy = BoolProperty(default = False, update = resetInstancesEvent, name = "Deep Copy", description = "Make the instances independent of the source object (e.g. copy mesh)")
     objectType = EnumProperty(default = "Mesh", name = "Object Type", items = objectTypeItems, update = resetInstancesEvent)
     copyObjectProperties = BoolProperty(default = False, update = resetInstancesEvent, description = "Enable this to copy modifiers/constrains/... from the source objec.)")
+    removeAnimationData = BoolProperty(name = "Remove Animation Data", default = False, update = resetInstancesEvent, description = "Remove the active action on the instance; This is useful when you want to animate the object yourself")
 
     parentInstances = BoolProperty(default = True, name = "Parent to Main Container", update = resetInstancesEvent)
 
@@ -58,6 +61,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
 
     def drawAdvanced(self, layout):
         layout.prop(self, "parentInstances")
+        layout.prop(self, "removeAnimationData")
 
         self.invokeFunction(layout, "resetObjectDataOnAllInstances",
             text = "Reset Source Data",
@@ -65,6 +69,9 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         self.invokeFunction(layout, "unlinkInstancesFromNode",
             text = "Unlink Instances from Node",
             description = "This will make sure that the objects won't be removed if you remove the Replicate Node.")
+
+        layout.separator()
+        self.invokeFunction(layout, "hideRelationshipLines", text = "Hide Relationship Lines")
 
     def execute(self, instancesAmount, sourceObject, scene):
         instancesAmount = max(instancesAmount, 0)
@@ -208,6 +215,8 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
 
         if self.parentInstances:
             newObject.parent = getMainObjectContainer(scene)
+        if self.removeAnimationData:
+            newObject.animation_data.action = None
         return newObject
 
     def createObject(self, name, instanceData):
@@ -251,3 +260,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
 
     def duplicate(self, sourceNode):
         self.linkedObjects.clear()
+
+    def hideRelationshipLines(self):
+        for space in iterActiveSpacesByType("VIEW_3D"):
+            space.show_relationship_lines = False
