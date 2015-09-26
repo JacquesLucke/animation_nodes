@@ -92,6 +92,10 @@ class GroupOutputNode(bpy.types.Node, AnimationNode):
             if node.bl_idname == "an_GroupInputNode":
                 self.groupInputIdentifier = node.identifier
 
+    def getTemplateCode(self):
+        for socket in self.inputs[:-1]:
+            yield "self.newReturn({}, name = {})".format(repr(socket.dataType), repr(socket.text))
+
     @property
     def newReturnSocket(self):
         return self.inputs[-1]
