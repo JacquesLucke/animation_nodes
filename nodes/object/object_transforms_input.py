@@ -26,11 +26,16 @@ class ObjectTransformsInputNode(bpy.types.Node, AnimationNode):
         items = frameTypeItems, update = executionCodeChanged)
 
     def create(self):
+        self.width = 165
         self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
         self.inputs.new("an_FloatSocket", "Frame", "frame").hide = True
         self.outputs.new("an_VectorSocket", "Location", "location")
         self.outputs.new("an_VectorSocket", "Rotation", "rotation")
         self.outputs.new("an_VectorSocket", "Scale", "scale")
+
+    def draw(self, layout):
+        if not self.useCurrentTransforms:
+            layout.prop(self, "frameType")
 
     def drawAdvanced(self, layout):
         layout.prop(self, "useCurrentTransforms")
@@ -40,31 +45,24 @@ class ObjectTransformsInputNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         isLinked = self.getLinkedOutputsDict()
-        if not (isLinked["location"] or isLinked["rotation"] or isLinked["scale"]): return []
+        if not any(isLinked.values()): return
 
-        frameInput = self.inputs["Frame"]
-
-        lines = []
-        add = lines.append
-
-        add("try:")
+        yield "try:"
         if self.useCurrentTransforms:
-            if isLinked["location"]: add("    location = object.location")
-            if isLinked["rotation"]: add("    rotation = mathutils.Vector(object.rotation_euler)")
-            if isLinked["scale"]: add("    scale = object.scale")
+            if isLinked["location"]: yield "    location = object.location"
+            if isLinked["rotation"]: yield "    rotation = mathutils.Vector(object.rotation_euler)"
+            if isLinked["scale"]:    yield "    scale = object.scale"
         else:
-            if self.frameType == "OFFSET": add("    evaluationFrame = frame + self.nodeTree.scene.frame_current_final")
-            else: add("    evaluationFrame = frame")
-            if isLinked["location"]: add("    location = mathutils.Vector(animation_nodes.utils.fcurve.getArrayValueAtFrame(object, 'location', evaluationFrame))")
-            if isLinked["rotation"]: add("    rotation = mathutils.Vector(animation_nodes.utils.fcurve.getArrayValueAtFrame(object, 'rotation_euler', evaluationFrame))")
-            if isLinked["scale"]: add("    scale = mathutils.Vector(animation_nodes.utils.fcurve.getArrayValueAtFrame(object, 'scale', evaluationFrame))")
+            if self.frameType == "OFFSET": yield "    evaluationFrame = frame + self.nodeTree.scene.frame_current_final"
+            else: yield "    evaluationFrame = frame"
+            if isLinked["location"]: yield "    location = mathutils.Vector(animation_nodes.utils.fcurve.getArrayValueAtFrame(object, 'location', evaluationFrame))"
+            if isLinked["rotation"]: yield "    rotation = mathutils.Vector(animation_nodes.utils.fcurve.getArrayValueAtFrame(object, 'rotation_euler', evaluationFrame))"
+            if isLinked["scale"]:    yield "    scale = mathutils.Vector(animation_nodes.utils.fcurve.getArrayValueAtFrame(object, 'scale', evaluationFrame))"
 
-        add("except:")
-        add("    location = mathutils.Vector((0, 0, 0))")
-        add("    rotation = mathutils.Vector((0, 0, 0))")
-        add("    scale = mathutils.Vector((0, 0, 0))")
-
-        return lines
+        yield "except:"
+        yield "    location = mathutils.Vector((0, 0, 0))"
+        yield "    rotation = mathutils.Vector((0, 0, 0))"
+        yield "    scale = mathutils.Vector((0, 0, 0))"
 
     def getUsedModules(self):
         return ["mathutils"]
