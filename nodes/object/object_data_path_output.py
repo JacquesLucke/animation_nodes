@@ -2,9 +2,9 @@ import bpy
 from bpy.props import *
 from ... base_types.node import AnimationNode
 
-class DynamicObjectAttributeOutputNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_DynamicObjectAttributeOutputNode"
-    bl_label = "Dynamic Object Attribute Output"
+class ObjectDataPathOutputNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_ObjectDataPathOutputNode"
+    bl_label = "Object Data Path Output"
 
     errorMessage = StringProperty()
 
