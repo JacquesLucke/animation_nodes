@@ -151,7 +151,7 @@ class ColorMenu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        insertNode(layout, "an_ColorInputNode", "RGB")
+        insertNode(layout, "an_ChooseColorNode", "Choose Color")
         insertNode(layout, "an_CombineColorNode", "Combine RGBA")
         insertNode(layout, "an_MixDataNode", "Mix", {"dataType" : repr("Color")})
         insertNode(layout, "an_SetVertexColorNode", "Set Vertex Color")
