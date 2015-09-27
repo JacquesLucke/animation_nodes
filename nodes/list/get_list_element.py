@@ -65,5 +65,5 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
         self.outputs.clear()
         self.inputs.new(self.listIdName, "List", "list")
         self.inputs.new("an_IntegerSocket", "Index", "index")
-        self.inputs.new(self.baseIdName, "Fallback", "fallback")
+        self.inputs.new(self.baseIdName, "Fallback", "fallback").hide = True
         self.outputs.new(self.baseIdName, "Element", "element")
