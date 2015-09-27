@@ -8,6 +8,9 @@ class FCurveAnimationOffsetTemplate(bpy.types.Operator, Template):
 
     def insert(self):
 
+        # Nodes
+        ####################################################################
+
         # Main Unit
         sourceObjectNode = self.newNode('an_DataInputNode', x = 0, y = 0, label = 'Source Object')
         sourceObjectNode.assignedType = 'Object'
@@ -60,13 +63,12 @@ class FCurveAnimationOffsetTemplate(bpy.types.Operator, Template):
         subtractOffsetFromFrameNode.operation = "SUBTRACT"
         calculateAccumulatedMatrixNode = self.newNode('an_MatrixMathNode', x = 350, y = -1530)
         reassignAccumulatedMatrixNode = self.newNode('an_ReassignLoopParameterNode', x = 540, y = -1575)
+        copyTransformsNode = self.newNode('an_CopyTransformsNode', x = 550, y = -1340)
+        copyTransformsNode.width = 140
         invokeCopyFCurvesNode = self.newNode('an_InvokeSubprogramNode', x = 760, y = -1200)
-        copyTransformsNode = self.newNode('an_CopyTransformsNode', x = 1000, y = -1330)
-        copyTransformsNode.useCurrentTransforms = False
-        copyTransformsNode.frameType = "ABSOLUTE"
-        updateMatrixNode = self.newNode('an_UpdateObjectMatricesNode', x = 1240, y = -1330)
-        localTransformNode = self.newNode('an_TransformObjectNode', x = 1440, y = -1370)
-        additionalTransformNode = self.newNode('an_TransformObjectNode', x = 1660, y = -1415)
+        updateMatrixNode = self.newNode('an_UpdateObjectMatricesNode', x = 1030, y = -1330)
+        localTransformNode = self.newNode('an_TransformObjectNode', x = 1230, y = -1370)
+        additionalTransformNode = self.newNode('an_TransformObjectNode', x = 1450, y = -1415)
 
         # Copy FCurves Loop
 
@@ -92,44 +94,58 @@ class FCurveAnimationOffsetTemplate(bpy.types.Operator, Template):
 
         self.updateSubprograms()
 
-        self.newLink(fCurvesFromObjectNode.outputs[0], invokeObjectLoopNode.inputs[2])
-        self.newLink(objectLoopInputNode.outputs[5], invokeCopyFCurvesNode.inputs[0])
-        self.newLink(objectLoopInputNode.outputs[2], invokeCopyFCurvesNode.inputs[1])
-        self.newLink(copyFCurvesLoopInput.outputs[2], evaluateFCurveNode.inputs[0])
-        self.newLink(copyFCurvesLoopInput.outputs[2], fCurveInfoNode.inputs[0])
+
+        # Links
+        ####################################################################
+
+        # Main Unit
+
         self.newLink(sourceObjectNode.outputs[0], objectInstancer.inputs[1])
-        self.newLink(animationOffsetGroupInputNode.outputs[0], fCurvesFromObjectNode.inputs[0])
-        self.newLink(animationOffsetGroupInputNode.outputs[1], invokeObjectLoopNode.inputs[0])
+        self.newLink(timeInfoNode.outputs[0], delayTimeNode.inputs[0])
         self.newLink(sourceObjectNode.outputs[0], invokeAnimationOffsetNode.inputs[0])
         self.newLink(objectInstancer.outputs[0], invokeAnimationOffsetNode.inputs[1])
-        self.newLink(animationOffsetGroupInputNode.outputs[3], invokeObjectLoopNode.inputs[4])
-        self.newLink(updateMatrixNode.outputs[0], localTransformNode.inputs[0])
+        self.newLink(delayTimeNode.outputs[0], invokeAnimationOffsetNode.inputs[2])
+        self.newLink(additionalOffsetNode.outputs[0], invokeAnimationOffsetNode.inputs[4])
         self.newLink(transformationOffsetNode.outputs[0], invokeAnimationOffsetNode.inputs[5])
+
+        # Animation Offset Group
+
+        self.newLink(animationOffsetGroupInputNode.outputs[0], fCurvesFromObjectNode.inputs[0])
+        self.newLink(animationOffsetGroupInputNode.outputs[0], invokeObjectLoopNode.inputs[1])
+        self.newLink(animationOffsetGroupInputNode.outputs[1], invokeObjectLoopNode.inputs[0])
+        self.newLink(animationOffsetGroupInputNode.outputs[2], invokeObjectLoopNode.inputs[3])
+        self.newLink(animationOffsetGroupInputNode.outputs[3], invokeObjectLoopNode.inputs[4])
+        self.newLink(animationOffsetGroupInputNode.outputs[4], invokeObjectLoopNode.inputs[5])
         self.newLink(animationOffsetGroupInputNode.outputs[5], invokeObjectLoopNode.inputs[6])
+        self.newLink(fCurvesFromObjectNode.outputs[0], invokeObjectLoopNode.inputs[2])
+        self.newLink(invokeObjectLoopNode.outputs[0], animationOffsetGroupOutputNode.inputs[0])
+
+        # Object Loop
+
+        self.newLink(objectLoopInputNode.outputs[0], multiplyIndexAndOffsetNode.inputs[0])
+        self.newLink(objectLoopInputNode.outputs[2], copyTransformsNode.inputs[1])
+        self.newLink(objectLoopInputNode.outputs[4], copyTransformsNode.inputs[0])
+        self.newLink(objectLoopInputNode.outputs[5], invokeCopyFCurvesNode.inputs[0])
+        self.newLink(objectLoopInputNode.outputs[6], subtractOffsetFromFrameNode.inputs[0])
+        self.newLink(objectLoopInputNode.outputs[7], multiplyIndexAndOffsetNode.inputs[1])
+        self.newLink(objectLoopInputNode.outputs[8], additionalTransformNode.inputs[1])
         self.newLink(objectLoopInputNode.outputs[9], calculateAccumulatedMatrixNode.inputs[0])
         self.newLink(objectLoopInputNode.outputs[10], calculateAccumulatedMatrixNode.inputs[1])
+        self.newLink(multiplyIndexAndOffsetNode.outputs[0], subtractOffsetFromFrameNode.inputs[1])
+        self.newLink(subtractOffsetFromFrameNode.outputs[0], invokeCopyFCurvesNode.inputs[2])
         self.newLink(calculateAccumulatedMatrixNode.outputs[0], localTransformNode.inputs[1])
         self.newLink(calculateAccumulatedMatrixNode.outputs[0], reassignAccumulatedMatrixNode.inputs[0])
+        self.newLink(copyTransformsNode.outputs[0], invokeCopyFCurvesNode.inputs[1])
+        self.newLink(invokeCopyFCurvesNode.outputs[0], updateMatrixNode.inputs[0])
+        self.newLink(updateMatrixNode.outputs[0], localTransformNode.inputs[0])
         self.newLink(localTransformNode.outputs[0], additionalTransformNode.inputs[0])
-        self.newLink(objectLoopInputNode.outputs[8], additionalTransformNode.inputs[1])
-        self.newLink(animationOffsetGroupInputNode.outputs[4], invokeObjectLoopNode.inputs[5])
-        self.newLink(additionalOffsetNode.outputs[0], invokeAnimationOffsetNode.inputs[4])
-        self.newLink(animationOffsetGroupInputNode.outputs[0], invokeObjectLoopNode.inputs[1])
-        self.newLink(objectLoopInputNode.outputs[4], copyTransformsNode.inputs[0])
-        self.newLink(invokeCopyFCurvesNode.outputs[0], copyTransformsNode.inputs[1])
+
+        # Copy FCurves Loop
+
+        self.newLink(copyFCurvesLoopInput.outputs[2], evaluateFCurveNode.inputs[0])
+        self.newLink(copyFCurvesLoopInput.outputs[2], fCurveInfoNode.inputs[0])
+        self.newLink(copyFCurvesLoopInput.outputs[4], objectDataPathOutputNode.inputs[0])
         self.newLink(copyFCurvesLoopInput.outputs[5], evaluateFCurveNode.inputs[1])
-        self.newLink(copyTransformsNode.outputs[0], updateMatrixNode.inputs[0])
-        self.newLink(invokeObjectLoopNode.outputs[0], animationOffsetGroupOutputNode.inputs[0])
-        self.newLink(animationOffsetGroupInputNode.outputs[2], invokeObjectLoopNode.inputs[3])
-        self.newLink(timeInfoNode.outputs[0], delayTimeNode.inputs[0])
-        self.newLink(objectLoopInputNode.outputs[0], multiplyIndexAndOffsetNode.inputs[0])
-        self.newLink(objectLoopInputNode.outputs[7], multiplyIndexAndOffsetNode.inputs[1])
-        self.newLink(subtractOffsetFromFrameNode.outputs[0], invokeCopyFCurvesNode.inputs[2])
-        self.newLink(subtractOffsetFromFrameNode.outputs[0], copyTransformsNode.inputs[2])
-        self.newLink(objectLoopInputNode.outputs[6], subtractOffsetFromFrameNode.inputs[0])
-        self.newLink(multiplyIndexAndOffsetNode.outputs[0], subtractOffsetFromFrameNode.inputs[1])
-        self.newLink(delayTimeNode.outputs[0], invokeAnimationOffsetNode.inputs[2])
         self.newLink(fCurveInfoNode.outputs[0], objectDataPathOutputNode.inputs[1])
         self.newLink(fCurveInfoNode.outputs[1], objectDataPathOutputNode.inputs[2])
         self.newLink(evaluateFCurveNode.outputs[0], objectDataPathOutputNode.inputs[3])
-        self.newLink(copyFCurvesLoopInput.outputs[4], objectDataPathOutputNode.inputs[0])
