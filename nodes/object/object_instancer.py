@@ -217,6 +217,9 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
             newObject.parent = getMainObjectContainer(scene)
         if self.removeAnimationData:
             newObject.animation_data.action = None
+        newObject.select = False
+        newObject.hide = False
+        newObject.hide_render = False
         return newObject
 
     def createObject(self, name, instanceData):
