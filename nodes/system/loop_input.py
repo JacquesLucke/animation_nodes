@@ -165,8 +165,12 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
 
     def insertParameterData(self, data):
         for socket in self.getParameterSockets():
-            if socket.loop.useAsInput: data.newInputFromSocket(socket)
-            if socket.loop.useAsOutput: data.newOutputFromSocket(socket)
+            if socket.loop.useAsInput:
+                socketData = data.newInputFromSocket(socket)
+                socketData.identifier += "_input"
+            if socket.loop.useAsOutput:
+                socketData = data.newOutputFromSocket(socket)
+                socketData.identifier += "_output"
 
     def insertGeneratorData(self, data):
         for node in self.getGeneratorNodes():
