@@ -12,4 +12,4 @@ class ColorListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return "[]"
 
     def getCopyExpression(self):
-        return "[element.copy() for element in value]"
+        return "[element[:] for element in value]"
