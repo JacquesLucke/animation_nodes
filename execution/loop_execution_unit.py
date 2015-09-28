@@ -4,6 +4,7 @@ from .. problems import ExecutionUnitNotSetup
 from . code_generator import (getInitialVariables,
                               getSetupCode,
                               getCopyExpression,
+                              getGlobalizeStatement,
                               getNodeExecutionLines,
                               linkOutputSocketsToTargets,
                               getLoadSocketValueLine)
@@ -60,12 +61,13 @@ class LoopExecutionUnit:
 
     def get_IterationsAmount(self, inputNode, nodes, variables):
         header = self.get_IterationsAmount_Header(inputNode, variables)
+        globalizeStatement = " "*4 + getGlobalizeStatement(nodes, variables)
         generators = indent(self.get_InitializeGenerators(inputNode, variables))
         parameters = indent(self.get_InitializeParameters(inputNode, variables))
         prepareLoop = indent(self.get_IterationsAmount_PrepareLoop(inputNode, variables))
         loopBody = indent(self.get_LoopBody(inputNode, nodes, variables), amount = 2)
         returnStatement = indent([self.get_ReturnStatement(inputNode, variables)])
-        return joinLines([header] + generators + parameters + prepareLoop + loopBody + returnStatement)
+        return joinLines([header] + [globalizeStatement] + generators + parameters + prepareLoop + loopBody + returnStatement)
 
     def get_IterationsAmount_Header(self, inputNode, variables):
         variables[inputNode.iterationsSocket] = "loop_iterations"
@@ -88,12 +90,13 @@ class LoopExecutionUnit:
 
     def get_IteratorLength(self, inputNode, nodes, variables):
         header = self.get_IteratorLength_Header(inputNode, variables)
+        globalizeStatement = " "*4 + getGlobalizeStatement(nodes, variables)
         generators = indent(self.get_InitializeGenerators(inputNode, variables))
         parameters = indent(self.get_InitializeParameters(inputNode, variables))
         prepareLoop = indent(self.get_IteratorLength_PrepareLoop(inputNode, variables))
         loopBody = indent(self.get_LoopBody(inputNode, nodes, variables), amount = 2)
         returnStatement = indent([self.get_ReturnStatement(inputNode, variables)])
-        return joinLines([header] + generators + parameters + prepareLoop + loopBody + returnStatement)
+        return joinLines([header] + [globalizeStatement] + generators + parameters + prepareLoop + loopBody + returnStatement)
 
     def get_IteratorLength_Header(self, inputNode, variables):
         parameterNames = []

@@ -3,6 +3,7 @@ from . compile_scripts import compileScript
 from .. problems import ExecutionUnitNotSetup
 from . code_generator import (getInitialVariables,
                               getSetupCode,
+                              getGlobalizeStatement,
                               getNodeExecutionLines,
                               linkOutputSocketsToTargets)
 
@@ -49,9 +50,10 @@ class GroupExecutionUnit:
 
     def getFunctionGenerationScript(self, nodes, variables):
         headerStatement = self.getFunctionHeader(self.network.groupInputNode, variables)
+        globalizeStatement = " "*4 + getGlobalizeStatement(nodes, variables)
         executionScript = "\n".join(indent(self.getExecutionScriptLines(nodes, variables)))
         returnStatement = "\n" + " "*4 + self.getReturnStatement(self.network.groupOutputNode, variables)
-        return "\n".join([headerStatement, executionScript, returnStatement])
+        return "\n".join([headerStatement, globalizeStatement, executionScript, returnStatement])
 
     def getFunctionHeader(self, inputNode, variables):
         for i, socket in enumerate(inputNode.outputs):
@@ -60,6 +62,7 @@ class GroupExecutionUnit:
         parameterList = ", ".join([variables[socket] for socket in inputNode.sockets[:-1]])
         header = "def main({}):".format(parameterList)
         return header
+
 
     def getExecutionScriptLines(self, nodes, variables):
         lines = []

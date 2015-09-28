@@ -68,10 +68,13 @@ def get_GetNodeReferences(nodes):
 
 def get_GetSocketValues(nodes, variables):
     lines = []
-    for node in nodes:
-        for socket in node.unlinkedInputs:
-            lines.append(getLoadSocketValueLine(socket, variables))
+    for socket in iterUnlinkedSockets(nodes):
+        lines.append(getLoadSocketValueLine(socket, variables))
     return lines
+
+def iterUnlinkedSockets(nodes):
+    for node in nodes:
+        yield from node.unlinkedInputs
 
 
 def getLoadSocketValueLine(socket, variables):
@@ -87,6 +90,10 @@ def getSocketValueExpression(socket):
 
 # Node Execution Code
 ##########################################
+
+def getGlobalizeStatement(nodes, variables):
+    socketNames = [variables[socket] for socket in iterUnlinkedSockets(nodes)]
+    return "global " + ", ".join(socketNames)
 
 def getNodeExecutionLines(node, variables):
     lines = []
