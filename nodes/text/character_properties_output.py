@@ -22,16 +22,17 @@ class CharacterPropertiesOutputNode(bpy.types.Node, AnimationNode):
         self.inputs.new("an_BooleanSocket", "Small Caps", "smallCaps").value = False
         
         for socket in self.inputs[3:]:
-            socket.defaultDrawType = "TEXT_ONLY"
+            socket.useIsUsedProperty = True
+            socket.isUsed = False
         for socket in self.inputs[4:]:
             socket.hide = True
+        
         self.outputs.new("an_ObjectSocket", "Object", "object")
         
     def drawAdvanced(self, layout):
         layout.prop(self, "allowNegativeIndex")
         
     def getExecutionCode(self):
-        isLinked = self.getLinkedInputsDict()
         lines = []
         lines.append("if getattr(object, 'type', '') == 'FONT':")
         lines.append("    textObject = object.data")
@@ -40,11 +41,10 @@ class CharacterPropertiesOutputNode(bpy.types.Node, AnimationNode):
         else: lines.append("    s, e = max(0, start), max(0, end)")
     
         lines.append("    for char in textObject.body_format[s:e]:")
-        if isLinked["materialIndex"]: lines.append(" "*8 + "char.material_index = materialIndex")
-        if isLinked["bold"]: lines.append(" "*8 + "char.use_bold = bold")
-        if isLinked["italic"]: lines.append(" "*8 + "char.use_italic = italic")
-        if isLinked["underline"]: lines.append(" "*8 + "char.use_underline = underline")
-        if isLinked["smallCaps"]: lines.append(" "*8 + "char.use_small_caps = smallCaps")
-        lines.append("    pass")
-
+        if self.inputs["materialIndex"].isUsed: lines.append(" "*8 + "char.material_index = materialIndex")
+        if self.inputs["bold"].isUsed: lines.append(" "*8 + "char.use_bold = bold")
+        if self.inputs["italic"].isUsed: lines.append(" "*8 + "char.use_italic = italic")
+        if self.inputs["underline"].isUsed: lines.append(" "*8 + "char.use_underline = underline")
+        if self.inputs["smallCaps"].isUsed: lines.append(" "*8 + "char.use_small_caps = smallCaps")
+        
         return lines
