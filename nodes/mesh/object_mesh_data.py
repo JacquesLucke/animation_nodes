@@ -83,7 +83,7 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
         if useWorldSpace:
             matrix = object.matrix_world
             rotation = extractRotation(matrix)
-            scale = matrix.to_scale().length / 1.732
+            scale = matrix.median_scale
             polygons = [Polygon.fromMeshPolygonInWorldSpace(meshPolygon, vertexLocations, matrix, rotation, scale) for meshPolygon in mesh.polygons]
         else:
             polygons = [Polygon.fromMeshPolygonInLocalSpace(meshPolygon, vertexLocations) for meshPolygon in mesh.polygons]
