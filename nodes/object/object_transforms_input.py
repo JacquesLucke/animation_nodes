@@ -32,6 +32,7 @@ class ObjectTransformsInputNode(bpy.types.Node, AnimationNode):
         self.outputs.new("an_VectorSocket", "Location", "location")
         self.outputs.new("an_VectorSocket", "Rotation", "rotation")
         self.outputs.new("an_VectorSocket", "Scale", "scale")
+        self.outputs.new("an_QuaternionSocket", "Quaternion", "quaternion").hide = True
 
     def draw(self, layout):
         if not self.useCurrentTransforms:
@@ -52,17 +53,20 @@ class ObjectTransformsInputNode(bpy.types.Node, AnimationNode):
             if isLinked["location"]: yield "    location = object.location"
             if isLinked["rotation"]: yield "    rotation = mathutils.Vector(object.rotation_euler)"
             if isLinked["scale"]:    yield "    scale = object.scale"
+            if isLinked["quaternion"]: yield "    quaternion = object.rotation_quaternion"
         else:
             if self.frameType == "OFFSET": yield "    evaluationFrame = frame + self.nodeTree.scene.frame_current_final"
             else: yield "    evaluationFrame = frame"
             if isLinked["location"]: yield "    location = mathutils.Vector(animation_nodes.utils.fcurve.getArrayValueAtFrame(object, 'location', evaluationFrame))"
             if isLinked["rotation"]: yield "    rotation = mathutils.Vector(animation_nodes.utils.fcurve.getArrayValueAtFrame(object, 'rotation_euler', evaluationFrame))"
             if isLinked["scale"]:    yield "    scale = mathutils.Vector(animation_nodes.utils.fcurve.getArrayValueAtFrame(object, 'scale', evaluationFrame))"
+            if isLinked["quaternion"]:    yield "    quaternion = mathutils.Quaternion(animation_nodes.utils.fcurve.getArrayValueAtFrame(object, 'rotation_quaternion', evaluationFrame, arraySize = 4))"
 
         yield "except:"
         yield "    location = mathutils.Vector((0, 0, 0))"
         yield "    rotation = mathutils.Vector((0, 0, 0))"
         yield "    scale = mathutils.Vector((0, 0, 0))"
+        yield "    quaternion = mathutils.Quaternion((1, 0, 0, 0))"
 
     def getUsedModules(self):
         return ["mathutils"]
