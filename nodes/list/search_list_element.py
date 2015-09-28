@@ -5,9 +5,9 @@ from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 from ... sockets.info import getBaseDataTypeItems, toIdName, toListIdName, isBase, toBaseDataType
 
-class GetListElementIndexNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_GetListElementIndexNode"
-    bl_label = "Get Element Index"    #Search List Element ?
+class SearchListElementNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_SearchListElementNode"
+    bl_label = "Search List Element"
     
     def assignedTypeChanged(self, context):
         self.baseIdName = toIdName(self.assignedType)
