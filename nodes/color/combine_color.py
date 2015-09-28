@@ -3,10 +3,10 @@ from bpy.props import *
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 
-#using linear conversion here, unlike BL colorpicker hsv/hex
-#BL Color() funcion does this also and has only rgb+hsv, so we'l use colorsys
-#only hsv/hex in the colorpicker are gamma corrected for colorspaces
-#we shall not use other functions, till they are in context (BL color space)
+# using linear conversion here, unlike BL colorpicker hsv/hex
+# BL Color() funcion does this also and has only rgb+hsv, so we'l use colorsys
+# only hsv/hex in the colorpicker are gamma corrected for colorspaces
+# we shall not use other functions, till they are in context (BL color space)
 
 sourceTypeItems = [
     ("RGB", "RGB", "Red, Green, Blue"),            
@@ -22,8 +22,8 @@ class CombineColorNode(bpy.types.Node, AnimationNode):
         self.updateHideStatus()
         executionCodeChanged()
     
-    sourceType = bpy.props.EnumProperty(name = "Source Type", items = sourceTypeItems, 
-                                            default = "RGB", update = sourceTypeChanged)
+    sourceType = EnumProperty(name = "Source Type", items = sourceTypeItems, 
+                                    default = "RGB", update = sourceTypeChanged)
 
     def create(self):
         self.inputs.new("an_FloatSocket", "Red", "red")
@@ -40,15 +40,16 @@ class CombineColorNode(bpy.types.Node, AnimationNode):
         self.inputs.new("an_FloatSocket", "Y Luma", "y")
         self.inputs.new("an_FloatSocket", "I In phase", "i")
         self.inputs.new("an_FloatSocket", "Q Quadrature", "q")
-        self.updateHideStatus()
+        
         self.inputs.new("an_FloatSocket", "Alpha", "alpha").value = 1
+        self.updateHideStatus()
         self.outputs.new("an_ColorSocket", "Color", "color")
         
     def draw(self, layout):
         layout.prop(self, "sourceType", expand = True)
         
     def drawLabel(self):
-        return self.sourceType + "a --> Col (linear)"
+        return self.sourceType + "a --> Col (Linear)"
 
     def getExecutionCode(self):
         if self.sourceType == "RGB":    yield "C = [red, green, blue]"
