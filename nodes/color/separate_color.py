@@ -3,10 +3,10 @@ from bpy.props import *
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 
-#using linear conversion here, unlike BL colorpicker hsv/hex
-#BL Color() funcion does this also and has only rgb+hsv, so we'l use colorsys
-#only hsv/hex in the colorpicker are gamma corrected for colorspaces
-#we shall not use other functions, till they are in context (BL color space)
+# using linear conversion here, unlike BL colorpicker hsv/hex
+# BL Color() funcion does this also and has only rgb+hsv, so we'l use colorsys
+# only hsv/hex in the colorpicker are gamma corrected for colorspaces
+# we shall not use other functions, till they are in context (BL color space)
 
 targetTypeItems = [
     ("RGB", "RGB", "Red, Green, Blue"),            
@@ -22,34 +22,35 @@ class SeparateColorNode(bpy.types.Node, AnimationNode):
         self.updateHideStatus()
         executionCodeChanged()
         
-    targetType = bpy.props.EnumProperty(name = "Target Type", items = targetTypeItems,
-                                            default = "RGB", update = targetTypeChanged)
+    targetType = EnumProperty(name = "Target Type", items = targetTypeItems,
+                                    default = "RGB", update = targetTypeChanged)
 
     def create(self):
         self.inputs.new("an_ColorSocket", "Color", "color")
         
-        self.outputs.new("an_FloatSocket", "Red", "red")
-        self.outputs.new("an_FloatSocket", "Green", "green")
-        self.outputs.new("an_FloatSocket", "Blue", "blue")
+        self.outputs.new("an_FloatSocket", "Red", "r")
+        self.outputs.new("an_FloatSocket", "Green", "g")
+        self.outputs.new("an_FloatSocket", "Blue", "b")
         
-        self.outputs.new("an_FloatSocket", "Hue", "hue")
-        self.outputs.new("an_FloatSocket", "Saturation", "saturation")
-        self.outputs.new("an_FloatSocket", "Value", "value")
+        self.outputs.new("an_FloatSocket", "Hue", "h")
+        self.outputs.new("an_FloatSocket", "Saturation", "s")
+        self.outputs.new("an_FloatSocket", "Value", "v")
         
         #same H, S (attention HLS/HSL order! using HSL for sockets, but function does hls)
-        self.outputs.new("an_FloatSocket", "Lightness", "lightness")
+        self.outputs.new("an_FloatSocket", "Lightness", "l")
         
         self.outputs.new("an_FloatSocket", "Y Luma", "y")
         self.outputs.new("an_FloatSocket", "I In phase", "i")
         self.outputs.new("an_FloatSocket", "Q Quadrature", "q")
-        self.updateHideStatus()
+        
         self.outputs.new("an_FloatSocket", "Alpha", "alpha")
+        self.updateHideStatus()
         
     def draw(self, layout):
         layout.prop(self, "targetType", expand = True)
         
     def drawLabel(self):
-        return "--> " + self.targetType + "a (linear)"
+        return "--> " + self.targetType + "a (Linear)"
     
     def getExecutionCode(self):
         yield "r = g = b = h = s = v = l = y = i = q = 0"
