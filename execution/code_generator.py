@@ -93,6 +93,7 @@ def getSocketValueExpression(socket):
 
 def getGlobalizeStatement(nodes, variables):
     socketNames = [variables[socket] for socket in iterUnlinkedSockets(nodes)]
+    if len(socketNames) == 0: return ""
     return "global " + ", ".join(socketNames)
 
 def getNodeExecutionLines(node, variables):
