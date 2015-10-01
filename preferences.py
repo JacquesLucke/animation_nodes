@@ -81,10 +81,10 @@ class AddonPreferences(bpy.types.AddonPreferences):
 addon = None
 
 def getPreferences():
-    if addon is None:
+    if getattr(addon, "module", "") == "":
         # This should happen very rarely
         # Problem is that this can access the context while rendering
-        #   which can lead to problems 
+        #   which can lead to problems
         _updateAddon()
     return addon.preferences
 
@@ -100,7 +100,7 @@ def nodeColors():
 
 def _updateAddon():
     global addon
-    addon = bpy.context.user_preferences.addons.get(addonName)
+    addon = bpy.context.user_preferences.addons[addonName]
 
 def register():
     global addon
