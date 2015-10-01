@@ -15,6 +15,9 @@ def register():
     kmi = km.keymap_items.new("wm.call_menu_pie", type = "W", value = "PRESS")
     kmi.properties.name = "an.context_pie"
 
+    # Move view to subprogram nodes
+    kmi = km.keymap_items.new("an.move_view_to_subprogram", type = "TAB", value = "PRESS")
+
     addon_keymaps.append(km)
 
 def unregister():

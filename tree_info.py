@@ -265,6 +265,10 @@ class NodeNetwork:
         return self.nodeIDs[0][0]
 
     @property
+    def nodeTree(self):
+        return bpy.data.node_groups[self.treeName]
+
+    @property
     def isSubnetwork(self):
         return self.type in ("Group", "Loop", "Script")
 
