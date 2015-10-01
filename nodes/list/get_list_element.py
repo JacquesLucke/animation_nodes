@@ -31,8 +31,11 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
             socketGroup = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
 
     def getExecutionCode(self):
-        if self.allowNegativeIndex: return "element = list[index] if -len(list) <= index < len(list) else fallback"
-        return "element = list[index] if 0 <= index < len(list) else fallback"
+        if self.allowNegativeIndex: yield "element = list[index] if -len(list) <= index < len(list) else fallback"
+        else: yield "element = list[index] if 0 <= index < len(list) else fallback"
+        socket = self.outputs[0]
+        if socket.isCopyable:
+            yield "element = " + socket.getCopyExpression().replace("value", "element")
 
     def edit(self):
         dataType = self.getWantedDataType()
