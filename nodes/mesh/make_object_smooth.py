@@ -8,10 +8,12 @@ class MakeObjectSmoothNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
         self.inputs.new("an_BooleanSocket", "Smooth", "smooth")
-        self.outputs.new("an_ObjectSocket", "Object", "outObject")
+        self.outputs.new("an_ObjectSocket", "Object", "object")
 
     def execute(self, object, smooth):
         if getattr(object, "type", "") == "MESH":
-            for polygon in object.data.polygons:
-                polygon.use_smooth = smooth
+            mesh = object.data
+            smoothList = [smooth] * len(mesh.polygons)
+            mesh.polygons.foreach_set("use_smooth", smoothList)
+            mesh.update()
         return object
