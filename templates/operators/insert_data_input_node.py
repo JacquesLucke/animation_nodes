@@ -30,7 +30,7 @@ class InsertDataInputNodeTemplateOperator(bpy.types.Operator, Template):
         else:
             originNode = self.newNode("an_DataInputNode")
             originNode.assignedType = socket.dataType
+            originNode.inputs[0].setProperty(socket.getProperty())
 
         socket.linkWith(originNode.outputs[0])
-        originNode.inputs[0].setProperty(socket.getProperty())
         self.setActiveNode(originNode)
