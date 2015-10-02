@@ -1,3 +1,4 @@
+from . hash import hashStringToNumber as hashText
 
 # the decorated function should return a list of dicts
 # the dicts have at least an 'id' key
@@ -29,6 +30,3 @@ def enumItemsFromList(function):
             items = [("NONE", "NONE", "")]
         return items
     return wrapper
-
-def hashText(text):
-    return int(hash(text) % 1e9)
