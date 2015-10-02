@@ -219,6 +219,11 @@ def sinOut(x, settings = None):
 def curveMapping(x, curve):
     return min(max((curve.evaluate(x) - 0.25) * 2, -0.5), 1.5)
 
+def fCurveMapping(x, settings):
+    fCurve, xMove, xFactor, yMove, yDivisor = settings
+    x = x * xFactor + xMove
+    return (fCurve.evaluate(x) + yMove) / yDivisor
+
 def mixedInterpolation(x, settings):
     a, b, factor = settings
     return a[0](x, a[1]) * (1 - factor) + b[0](x, b[1]) * factor
