@@ -27,5 +27,5 @@ class EvaluateFCurveNode(bpy.types.Node, AnimationNode):
         if self.frameType == "OFFSET": yield "evaluationFrame = frame + self.nodeTree.scene.frame_current_final"
         else: yield "evaluationFrame = frame"
 
-        yield "if fCurve is None: value = None"
+        yield "if fCurve is None: value = 0.0"
         yield "else: value = fCurve.evaluate(evaluationFrame)"
