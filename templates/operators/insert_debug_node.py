@@ -20,10 +20,14 @@ class InsertDebugNodeTemplateOperator(bpy.types.Operator, Template):
 
     def insert(self):
         activeNode = self.activeNode
-        debugNode = self.newNode("an_DebugNode")
 
         if self.usedMenu: socket = activeNode.outputs[self.socketIndex]
         else: socket = activeNode.getVisibleOutputs()[0]
+
+        if socket.dataType == "Interpolation":
+            debugNode = self.newNode("an_DebugInterpolationNode")
+        else:
+            debugNode = self.newNode("an_DebugNode")
         socket.linkWith(debugNode.inputs[0])
 
         self.setActiveNode(debugNode)
