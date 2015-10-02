@@ -29,7 +29,7 @@ class ScriptExecutionUnit:
         self.execute = self.raiseNotSetupException
 
     def getCodes(self):
-        return [self.code]
+        return [self.setupScript]
 
 
     def generateScript(self):
