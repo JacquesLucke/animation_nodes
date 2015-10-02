@@ -15,8 +15,6 @@ class FCurveKeyframesNode(bpy.types.Node, AnimationNode):
         if not any(isLinked.values()): return
 
         yield "if fCurve is not None:"
-        yield "    keyframesFrames = []"
-        yield "    keyframesValues = []"
-        yield "    for point in fCurve.keyframe_points:"
-        if isLinked["keyframesFrames"]: yield " " * 8 + "keyframesFrames.append(point.co[0])"
-        if isLinked["keyframesValues"]: yield " " * 8 + "keyframesValues.append(point.co[1])"
+        if isLinked["keyframesFrames"]: yield "    keyframesFrames = [point.co[0] for point in fCurve.keyframe_points]"
+        if isLinked["keyframesValues"]: yield "    keyframesValues = [point.co[1] for point in fCurve.keyframe_points]"
+        yield "else: keyframesFrames, keyframesValues = [], []"
