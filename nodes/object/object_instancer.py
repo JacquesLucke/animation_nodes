@@ -170,6 +170,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
             self.removeObjectData(data, type)
 
     def removeObjectData(self, data, type):
+        if data is None: return # the object was an empty
         if data.users == 0:
             if type == "MESH":
                 bpy.data.meshes.remove(data)
