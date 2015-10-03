@@ -160,6 +160,9 @@ class AnimationNode:
             if index < self.activeInputIndex: self.activeInputIndex -= 1
         socket.sockets.remove(socket)
 
+    def remove(self):
+        self.nodeTree.nodes.remove(self)
+
 
     def getLinkedInputsDict(self):
         linkedInputs = {socket.identifier : socket.isLinked for socket in self.inputs}

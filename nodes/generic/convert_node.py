@@ -23,6 +23,9 @@ class ConvertNode(bpy.types.Node, AnimationNode):
         self.invokeSocketTypeChooser(layout, "assignSocketType",
             socketGroup = "ALL", text = "Change Type", icon = "TRIA_RIGHT")
 
+    def drawLabel(self):
+        return "DON'T CONVERT TO GENERIC" if self.outputs[0].dataType == "Generic" else "Convert"
+
     def edit(self):
         socket = self.outputs[0]
         targets = socket.dataTargets
