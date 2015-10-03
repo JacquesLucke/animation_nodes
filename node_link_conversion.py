@@ -184,6 +184,7 @@ def insertNodes(nodeTree, nodeTypes, leftSocket, rightSocket):
         node = nodeTree.nodes.new(nodeType)
         node.select = False
         node.location = center + Vector((180 * (i - (amount - 1) / 2), 0))
+        node.parent = leftSocket.node.parent
         nodes.append(node)
     return nodes
 
@@ -192,7 +193,7 @@ def insertBasicLinking(nodeTree, originSocket, node, targetSocket):
     nodeTree.links.new(targetSocket, node.outputs[0])
 
 def getSocketCenter(socket1, socket2):
-    return (socket1.node.location + socket2.node.location) / 2
+    return (socket1.node.regionLocation + socket2.node.regionLocation) / 2
 
 linkCorrectors = [
     ConvertParticleSystemToParticle(),

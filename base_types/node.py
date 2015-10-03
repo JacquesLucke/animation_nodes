@@ -369,9 +369,17 @@ def isAnimationNode(node):
 def getNodeTree(node):
     return node.id_data
 
+def getRegionLocation(node):
+    location = node.location.copy()
+    while node.parent:
+        node = node.parent
+        location += node.location.copy()
+    return location
+
 def registerHandlers():
     bpy.types.Node.toID = nodeToID
     bpy.types.Node.isAnimationNode = BoolProperty(name = "Is Animation Node", get = isAnimationNode)
+    bpy.types.Node.regionLocation = FloatVectorProperty(name = "Region Location", size = 2, subtype = "XYZ", get = getRegionLocation)
     bpy.types.Node.getNodeTree = getNodeTree
     bpy.app.handlers.load_post.append(createMissingIdentifiers)
 
