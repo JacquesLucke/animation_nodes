@@ -43,15 +43,3 @@ def drawNodePreview(node):
     preview = InterpolationPreview(interpolation, leftBottom, width, node.resolution)
     preview.calculateBoundaries()
     preview.draw()
-
-
-def convertViewToRegion(x, y):
-    factor = getDpiFactor()
-    x *= factor
-    y *= factor
-    return Vector(bpy.context.region.view2d.view_to_region(x, y, clip = False))
-
-def getDpiFactor():
-    systemPreferences = bpy.context.user_preferences.system
-    retinaFactor = getattr(systemPreferences, "pixel_size", 1)
-    return systemPreferences.dpi * retinaFactor / 72
