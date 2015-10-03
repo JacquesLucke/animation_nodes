@@ -193,7 +193,7 @@ def insertBasicLinking(nodeTree, originSocket, node, targetSocket):
     nodeTree.links.new(targetSocket, node.outputs[0])
 
 def getSocketCenter(socket1, socket2):
-    return (socket1.node.regionLocation + socket2.node.regionLocation) / 2
+    return (socket1.node.viewLocation + socket2.node.viewLocation) / 2
 
 linkCorrectors = [
     ConvertParticleSystemToParticle(),

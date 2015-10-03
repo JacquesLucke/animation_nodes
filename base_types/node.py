@@ -7,6 +7,7 @@ from collections import defaultdict
 from bpy.app.handlers import persistent
 from .. ui.node_colors import colorNetworks
 from .. utils.nodes import getAnimationNodeTrees
+from .. utils.blender_ui import convertToRegionLocation
 from .. operators.dynamic_operators import getInvokeFunctionOperator
 from .. tree_info import getNetworkWithNode, getDirectlyLinkedSockets, getOriginNodes
 
@@ -369,18 +370,30 @@ def isAnimationNode(node):
 def getNodeTree(node):
     return node.id_data
 
-def getRegionLocation(node):
+def getViewLocation(node):
     location = node.location.copy()
     while node.parent:
         node = node.parent
         location += node.location.copy()
     return location
 
+def getRegionBottomLeft(node, region):
+    location = node.viewLocation
+    dimensions = node.dimensions
+    return convertToRegionLocation(region, location.x, location.y - dimensions.y)
+
+def getRegionBottomRight(node, region):
+    location = node.viewLocation
+    dimensions = node.dimensions
+    return convertToRegionLocation(region, location.x + dimensions.x, location.y - dimensions.y)
+
 def registerHandlers():
     bpy.types.Node.toID = nodeToID
     bpy.types.Node.isAnimationNode = BoolProperty(name = "Is Animation Node", get = isAnimationNode)
-    bpy.types.Node.regionLocation = FloatVectorProperty(name = "Region Location", size = 2, subtype = "XYZ", get = getRegionLocation)
+    bpy.types.Node.viewLocation = FloatVectorProperty(name = "Region Location", size = 2, subtype = "XYZ", get = getViewLocation)
     bpy.types.Node.getNodeTree = getNodeTree
+    bpy.types.Node.getRegionBottomLeft = getRegionBottomLeft
+    bpy.types.Node.getRegionBottomRight = getRegionBottomRight
     bpy.app.handlers.load_post.append(createMissingIdentifiers)
 
 def unregisterHandlers():

@@ -1,4 +1,5 @@
 import bpy
+from mathutils import Vector
 
 def iterActiveSpacesByType(type):
     for space in iterActiveSpaces():
@@ -28,3 +29,15 @@ def iterActiveScreens():
     for windowManager in bpy.data.window_managers:
         for window in windowManager.windows:
             yield window.screen
+
+
+def convertToRegionLocation(region, x, y):
+    factor = getDpiFactor()
+    x *= factor
+    y *= factor
+    return Vector(region.view2d.view_to_region(x, y, clip = False))
+
+def getDpiFactor():
+    systemPreferences = bpy.context.user_preferences.system
+    retinaFactor = getattr(systemPreferences, "pixel_size", 1)
+    return systemPreferences.dpi * retinaFactor / 72
