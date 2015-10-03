@@ -35,8 +35,9 @@ def drawNodePreview(node):
     interpolation = interpolationByNode.get(node.identifier, None)
     if interpolation is None: return
 
-    leftBottom = convertViewToRegion(node.location.x, node.location.y - node.dimensions.y)
-    rightBottom = convertViewToRegion(node.location.x + node.dimensions.x, node.location.y - node.dimensions.y)
+    region = bpy.context.region
+    leftBottom = node.getRegionBottomLeft(region)
+    rightBottom = node.getRegionBottomRight(region)
     width = rightBottom.x - leftBottom.x
 
     preview = InterpolationPreview(interpolation, leftBottom, width, node.resolution)
