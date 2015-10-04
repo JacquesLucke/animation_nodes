@@ -13,3 +13,6 @@ class FloatListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def getCopyExpression(self):
         return "value[:]"
+
+    def toDebugString(self, value, maxRows):
+        return "\n".join("{:>10.5f}".format(number) for number in value[:maxRows])
