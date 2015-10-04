@@ -54,8 +54,7 @@ class SocketUiList(bpy.types.UIList):
     def draw_item(self, context, layout, node, socket, icon, activeData, activePropname):
         if socket.textProps.editable:
             layout.prop(socket, "text", emboss = False, text = "")
-        elif socket.isLinked or socket.isOutput: layout.label(socket.getDisplayedName())
-        else: layout.label(socket.toString())
+        else: layout.label(socket.getDisplayedName())
 
         if socket.removeable:
             socket.invokeFunction(layout, "remove", icon = "X", emboss = False)

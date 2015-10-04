@@ -339,6 +339,7 @@ class DebugMenu(bpy.types.Menu):
         insertNode(layout, "an_DebugNode", "Debug")
         insertNode(layout, "an_DebugLoopNode", "Debug Loop")
         insertNode(layout, "an_DebugListNode", "Debug List")
+        insertNode(layout, "an_DebugDrawerNode", "Debug Drawer")
 
 class SubprogramsMenu(bpy.types.Menu):
     bl_idname = "an_subprograms_menu"
