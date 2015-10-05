@@ -12,6 +12,7 @@ from .. operators.dynamic_operators import getInvokeFunctionOperator
 from .. tree_info import getNetworkWithNode, getDirectlyLinkedSockets, getOriginNodes
 
 class AnimationNode:
+    bl_width_max = 5000
     _isAnimationNode = True
 
     def useNetworkColorChanged(self, context):

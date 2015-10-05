@@ -8,9 +8,7 @@ def draw(self, context):
     layout = self.layout
     layout.separator()
 
-    col = layout.column(align = True)
-    col.prop(node, "width", text = "Width")
-    col.prop(node, "bl_width_max", text = "Max Width")
+    layout.prop(node, "width", text = "Width")
 
     col = layout.column(align = True)
     col.prop(node, "location", text = "X", index = 0)
