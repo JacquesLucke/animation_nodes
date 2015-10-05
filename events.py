@@ -76,7 +76,7 @@ def renderInitialized(scene):
     event.isRendering = True
 
 @persistent
-def renderCanceled(scene):
+def renderCancelled(scene):
     event.isRendering = False
 
 @persistent
@@ -98,7 +98,7 @@ def registerHandlers():
 
     bpy.app.handlers.render_init.append(renderInitialized)
     bpy.app.handlers.render_pre.append(renderFramePre)
-    bpy.app.handlers.render_cancel.append(renderCanceled)
+    bpy.app.handlers.render_cancel.append(renderCancelled)
     bpy.app.handlers.render_complete.append(renderCompleted)
 
     addonChanged()
@@ -110,5 +110,5 @@ def unregisterHandlers():
 
     bpy.app.handlers.render_init.remove(renderInitialized)
     bpy.app.handlers.render_pre.remove(renderFramePre)
-    bpy.app.handlers.render_cancel.remove(renderCanceled)
+    bpy.app.handlers.render_cancel.remove(renderCancelled)
     bpy.app.handlers.render_complete.remove(renderCompleted)
