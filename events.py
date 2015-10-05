@@ -23,21 +23,33 @@ class EventState:
         if self.addonChanged: events.add("Addon")
         if self.sceneChanged: events.add("Scene")
         if self.frameChanged: events.add("Frame")
-        if self.isRendering: events.add("Render")
         if self.propertyChanged: events.add("Property")
         return events
 
 event = EventState()
 
+
 @persistent
 def sceneUpdated(scene):
     event.sceneChanged = True
+    evaluateRaisedEvents()
+
+@persistent
+def renderFramePre(scene):
+    event.frameChanged = True
+    evaluateRaisedEvents()
+
+def evaluateRaisedEvents():
     event_handler.update(event.getActives())
     event.reset()
+
 
 @persistent
 def frameChanged(scene):
     event.frameChanged = True
+
+def propertyChanged(self = None, context = None):
+    event.propertyChanged = True
 
 @persistent
 def fileLoaded(scene):
@@ -47,9 +59,6 @@ def fileLoaded(scene):
 def addonChanged():
     event.addonChanged = True
     treeChanged()
-
-def propertyChanged(self = None, context = None):
-    event.propertyChanged = True
 
 def executionCodeChanged(self = None, context = None):
     treeChanged()
@@ -61,12 +70,17 @@ def treeChanged(self = None, context = None):
     event.treeChanged = True
     tree_info.treeChanged()
 
+
 @persistent
-def renderIsStarting(scene):
+def renderInitialized(scene):
     event.isRendering = True
 
 @persistent
-def renderIsEnding(scene):
+def renderCanceled(scene):
+    event.isRendering = False
+
+@persistent
+def renderCompleted(scene):
     event.isRendering = False
 
 def isRendering():
@@ -82,11 +96,10 @@ def registerHandlers():
     bpy.app.handlers.frame_change_post.append(frameChanged)
     bpy.app.handlers.load_post.append(fileLoaded)
 
-    bpy.app.handlers.render_pre.append(renderIsStarting)
-    bpy.app.handlers.render_init.append(renderIsStarting)
-    bpy.app.handlers.render_post.append(renderIsEnding)
-    bpy.app.handlers.render_cancel.append(renderIsEnding)
-    bpy.app.handlers.render_complete.append(renderIsEnding)
+    bpy.app.handlers.render_init.append(renderInitialized)
+    bpy.app.handlers.render_pre.append(renderFramePre)
+    bpy.app.handlers.render_cancel.append(renderCanceled)
+    bpy.app.handlers.render_complete.append(renderCompleted)
 
     addonChanged()
 
@@ -95,8 +108,7 @@ def unregisterHandlers():
     bpy.app.handlers.scene_update_post.remove(sceneUpdated)
     bpy.app.handlers.load_post.remove(fileLoaded)
 
-    bpy.app.handlers.render_pre.remove(renderIsStarting)
-    bpy.app.handlers.render_init.remove(renderIsStarting)
-    bpy.app.handlers.render_post.remove(renderIsEnding)
-    bpy.app.handlers.render_cancel.remove(renderIsEnding)
-    bpy.app.handlers.render_complete.remove(renderIsEnding)
+    bpy.app.handlers.render_init.remove(renderInitialized)
+    bpy.app.handlers.render_pre.remove(renderFramePre)
+    bpy.app.handlers.render_cancel.remove(renderCanceled)
+    bpy.app.handlers.render_complete.remove(renderCompleted)

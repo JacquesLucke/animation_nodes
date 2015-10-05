@@ -1,7 +1,7 @@
 import bpy
 import time
 from bpy.props import *
-from .. events import treeChanged
+from .. events import treeChanged, isRendering
 from .. nodes.generic.debug_loop import clearDebugLoopTextBlocks
 from .. utils.blender_ui import iterActiveScreens, iterActiveSpacesByType
 from .. execution.units import getMainUnitsByNodeTree, setupExecutionUnits, finishExecutionUnits
@@ -51,16 +51,26 @@ class AnimationNodeTree(bpy.types.NodeTree):
         def isViewportRendering():
             return any([space.viewport_shade == "RENDERED" for space in iterActiveSpacesByType("VIEW_3D")])
 
-        if len(self.mainUnits) == 0: return False
         a = self.autoExecution
         if not a.enabled: return False
-        if "Render" not in events and abs(time.clock() - a.lastExecutionTimestamp) < a.minTimeDifference: return False
-        if isAnimationPlaying() and "Scene" in events and "Frame" not in events: return False
-        if a.sceneUpdate and "Scene" in events and not isViewportRendering(): return True
-        if a.frameChanged and "Frame" in events: return True
-        if a.propertyChanged and "Property" in events: return True
-        if a.treeChanged and "Tree" in events: return True
-        if events.intersection({"File", "Addon"}) and (a.sceneUpdate or a.frameChanged or a.propertyChanged or a.treeChanged): return True
+        if not self.hasMainExecutionUnits: return False
+
+        if isRendering():
+            if "Scene" in events and a.sceneUpdate: return True
+            if "Frame" in events and (a.frameChanged or a.sceneUpdate): return True
+        else:
+            if self.timeSinceLastAutoExecution < a.minTimeDifference: return False
+
+            if isAnimationPlaying():
+                if (a.sceneUpdate or a.frameChanged) and "Frame" in events: return True
+            elif not isViewportRendering():
+                if "Scene" in events and a.sceneUpdate: return True
+            if "Frame" in events and a.frameChanged: return True
+            if "Property" in events and a.propertyChanged: return True
+            if "Tree" in events and a.treeChanged: return True
+            if events.intersection({"File", "Addon"}) and \
+                (a.sceneUpdate or a.frameChanged or a.propertyChanged or a.treeChanged): return True
+
         return False
 
     def autoExecute(self):
@@ -83,6 +93,10 @@ class AnimationNodeTree(bpy.types.NodeTree):
         self.executionTime = end - start
 
     @property
+    def hasMainExecutionUnits(self):
+        return len(self.mainUnits) > 0
+
+    @property
     def mainUnits(self):
         return getMainUnitsByNodeTree(self)
 
@@ -91,3 +105,7 @@ class AnimationNodeTree(bpy.types.NodeTree):
         scene = bpy.data.scenes.get(self.sceneName)
         if scene is None: scene = bpy.data.scenes[0]
         return scene
+
+    @property
+    def timeSinceLastAutoExecution(self):
+        return abs(time.clock() - self.autoExecution.lastExecutionTimestamp)
