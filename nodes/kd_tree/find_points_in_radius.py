@@ -1,13 +1,15 @@
 import bpy
 from ... base_types.node import AnimationNode
 
-class FindNearestNPointsInKDTreeNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_FindNearestNPointsInKDTreeNode"
-    bl_label = "Find Nearest Points"
+class FindPointsInRadiusInKDTreeNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_FindPointsInRadiusInKDTreeNode"
+    bl_label = "Find Points in Radius"
 
     def create(self):
         self.inputs.new("an_KDTreeSocket", "KDTree", "kdTree")
-        self.inputs.new("an_IntegerSocket", "Amount", "amount").value = 5
+        socket = self.inputs.new("an_FloatSocket", "Radius", "radius")
+        socket.value = 5
+        socket.minValue = 0.0
         self.inputs.new("an_VectorSocket", "Vector", "searchVector").defaultDrawType = "PROPERTY_ONLY"
         self.outputs.new("an_VectorListSocket", "Vectors", "nearestVectors")
         self.outputs.new("an_FloatListSocket", "Distances", "distances")
@@ -15,7 +17,7 @@ class FindNearestNPointsInKDTreeNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         yield "nearestVectors, distances, indices = [], [], []"
-        yield "for vector, index, distance in kdTree.find_n(searchVector, amount):"
+        yield "for vector, index, distance in kdTree.find_range(searchVector, max(radius, 0)):"
         yield "    nearestVectors.append(vector)"
         yield "    indices.append(index)"
         yield "    distances.append(distance)"
