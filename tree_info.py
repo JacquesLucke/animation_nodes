@@ -167,8 +167,6 @@ class NodeNetwork:
     def analyse(self):
         self.findSystemNodes()
 
-
-
         groupNodeAmount = self.groupInAmount + self.groupOutAmount
         loopNodeAmount = self.loopInAmount + self.generatorAmount + self.reassignParameterAmount
 
@@ -181,6 +179,7 @@ class NodeNetwork:
         elif loopNodeAmount == 0:
             if self.groupInAmount == 0 and self.groupOutAmount == 1:
                 self.identifier = self.groupOutputNode.groupInputIdentifier
+                if self.identifier == "": self.identifier = None
             elif self.groupInAmount == 1 and self.groupOutAmount == 0:
                 self.type = "Group"
             elif self.groupInAmount == 1 and self.groupOutAmount == 1:
