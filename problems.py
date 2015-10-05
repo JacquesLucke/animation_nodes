@@ -83,6 +83,18 @@ class CouldNotSetupExecutionUnits(Problem):
     def draw(self, layout):
         layout.label("Could not setup execution units (see console)")
 
+class NodeFailesToCreateExecutionCode(Problem):
+    def __init__(self, nodeIdentifier):
+        self.nodeIdentifier = nodeIdentifier
+
+    def allowUnitCreation(self):
+        return False
+
+    def draw(self, layout):
+        node = getNodeByIdentifier(self.nodeIdentifier)
+        props = layout.operator("an.move_view_to_node", text = "{} Needs Update".format(repr(node.name)))
+        props.nodeIdentifier = self.nodeIdentifier
+
 class SubprogramInvokesItself(Problem):
     def __init__(self, network):
         self.network = network

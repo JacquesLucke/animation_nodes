@@ -1,5 +1,7 @@
 import os
+import traceback
 from collections import defaultdict
+from .. problems import NodeFailesToCreateExecutionCode
 from .. preferences import addonName, generateCompactCode
 
 
@@ -100,9 +102,16 @@ def getNodeExecutionLines(node, variables):
     lines = []
     if not generateCompactCode(): lines.extend(getNodeCommentLines(node))
     lines.extend(getInputCopyLines(node, variables))
-    taggedLines = node.getTaggedExecutionCodeLines()
-    lines.extend([replaceTaggedLine(line, node, variables) for line in taggedLines])
-    return lines
+    try:
+        taggedLines = node.getTaggedExecutionCodeLines()
+        lines.extend([replaceTaggedLine(line, node, variables) for line in taggedLines])
+        return lines
+    except:
+        print("\n"*5)
+        traceback.print_exc()
+        NodeFailesToCreateExecutionCode(node.identifier).report()
+        raise Exception("Node failed to create execution code")
+
 
 def getNodeCommentLines(node):
     return ["\n", "# Node: {} - {}".format(repr(node.nodeTree.name), repr(node.name))]
