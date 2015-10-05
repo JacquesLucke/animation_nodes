@@ -29,6 +29,7 @@ def drawMenu(self, context):
     layout.menu("an_particles_menu", text = "Particles")
     layout.menu("an_fcurve_menu", text = "FCurves")
     layout.menu("an_sound_menu", text = "Sound")
+    layout.menu("an_kdtree_menu", text = "KDTree")
     layout.separator()
     layout.menu("an_debug_menu", text = "Debug")
     layout.menu("an_subprograms_menu", text = "Subprograms")
@@ -329,6 +330,17 @@ class SoundMenu(bpy.types.Menu):
         insertNode(layout, "an_SoundBakeNode", "Bake Sound")
         insertNode(layout, "an_SoundFromSequencesNode", "Sound from Sequences")
         insertNode(layout, "an_EvaluateSoundNode", "Evaluate Sound")
+
+class KDTreeMenu(bpy.types.Menu):
+    bl_idname = "an_kdtree_menu"
+    bl_label = "KDTree Menu"
+
+    def draw(self, context):
+        layout = self.layout
+        insertNode(layout, "an_ConstructKDTreeNode", "Construct")
+        insertNode(layout, "an_FindNearestPointInKDTreeNode", "Find Nearest")
+        insertNode(layout, "an_FindNearestNPointsInKDTreeNode", "Find Amount")
+        insertNode(layout, "an_FindPointsInRadiusInKDTreeNode", "Find in Radius")
 
 class DebugMenu(bpy.types.Menu):
     bl_idname = "an_debug_menu"
