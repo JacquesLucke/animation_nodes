@@ -15,6 +15,7 @@ class TransformIndividualPolygonsTemplate(bpy.types.Operator, Template):
         loopInputNode = self.newNode('an_LoopInputNode', x = 0, y = -300)
         loopInputNode.newIterator('Polygon List', name = 'Polygon')
         composeMatrixNode = self.newNode('an_ComposeMatrixNode', x = 280, y = -430)
+        composeMatrixNode.inputs[1].value.x = 2
 
         transformPolygon = self.newNode('an_TransformPolygonNode', x = 550, y = -295)
 
