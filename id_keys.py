@@ -155,13 +155,8 @@ class TransformsIDType:
 
     @staticmethod
     def drawOperators(layout, object, id):
-        row = layout.row(align = True)
-        props = row.operator("an.set_current_transforms", text = "Use Current Transforms")
+        props = layout.operator("an.set_current_transforms", text = "Use Current Transforms")
         props.id = id
-        props.allSelectedObjects = False
-        props = row.operator("an.set_current_transforms", icon = "WORLD", text = "")
-        props.id = id
-        props.allSelectedObjects = True
 
 
 class SimpleIDType:
@@ -210,13 +205,8 @@ class StringIDType(SimpleIDType):
 
     @staticmethod
     def drawOperators(layout, object, id):
-        row = layout.row(align = True)
-        props = row.operator("an.set_current_texts", text = "Use Current Texts")
+        props = layout.operator("an.set_current_texts", text = "Use Current Texts")
         props.id = id
-        props.allSelectedObjects = False
-        props = row.operator("an.set_current_texts", icon = "WORLD", text = "")
-        props.id = id
-        props.allSelectedObjects = True
 
 
 idTypes = { "Transforms" : TransformsIDType,
@@ -426,16 +416,12 @@ class RemoveKeyFromObject(bpy.types.Operator):
 class SetCurrentTransforms(bpy.types.Operator):
     bl_idname = "an.set_current_transforms"
     bl_label = "Set Current Transforms"
-    bl_description = "Set current transforms (World icon means to do this for all selected objects)"
+    bl_description = ""
 
     id = StringProperty()
-    allSelectedObjects = BoolProperty()
 
     def execute(self, context):
-        if self.allSelectedObjects: objects = context.selected_objects
-        else: objects = [context.active_object]
-
-        for object in objects:
+        for object in context.selected_objects:
             TransformsIDType.write(object, self.id, (object.location, object.rotation_euler, object.scale))
         return {'FINISHED'}
 
@@ -443,16 +429,12 @@ class SetCurrentTransforms(bpy.types.Operator):
 class SetCurrentTexts(bpy.types.Operator):
     bl_idname = "an.set_current_texts"
     bl_label = "Set Current Texts"
-    bl_description = "Set current texts (World icon means to do this for all selected objects)"
+    bl_description = ""
 
     id = StringProperty()
-    allSelectedObjects = BoolProperty()
 
     def execute(self, context):
-        if self.allSelectedObjects: objects = context.selected_objects
-        else: objects = [context.active_object]
-
-        for object in objects:
+        for object in context.selected_objects:
             StringIDType.write(object, self.id, getattr(object.data, "body", ""))
         return {'FINISHED'}
 
