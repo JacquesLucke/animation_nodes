@@ -416,7 +416,7 @@ class RemoveKeyFromObject(bpy.types.Operator):
 class SetCurrentTransforms(bpy.types.Operator):
     bl_idname = "an.set_current_transforms"
     bl_label = "Set Current Transforms"
-    bl_description = ""
+    bl_description = "Set current transforms on this ID Key for all selected objects"
 
     id = StringProperty()
 
@@ -429,7 +429,7 @@ class SetCurrentTransforms(bpy.types.Operator):
 class SetCurrentTexts(bpy.types.Operator):
     bl_idname = "an.set_current_texts"
     bl_label = "Set Current Texts"
-    bl_description = ""
+    bl_description = "Set current text on this ID Key for all selected objects"
 
     id = StringProperty()
 
