@@ -3,6 +3,8 @@ import bmesh
 from mathutils import Vector
 
 class MeshData:
+    __slots__ = ("vertices", "edges", "polygons")
+
     def __init__(self, vertices, edges, polygons):
         self.vertices = vertices
         self.edges = edges
