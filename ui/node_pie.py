@@ -27,7 +27,7 @@ class ContextPie(bpy.types.Menu):
 
     def drawLeft(self, layout):
         amount = len(self.activeNode.getVisibleInputs())
-        if amount == 0: layout.empty(layout, text = "Has no visible inputs")
+        if amount == 0: self.empty(layout, text = "Has no visible inputs")
         else: layout.operator("an.insert_data_input_node_template_operator", text = "Data Input")
 
     def drawRight(self, layout):
