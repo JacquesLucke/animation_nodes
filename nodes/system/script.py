@@ -32,7 +32,7 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     def create(self):
         self.width = 200
         self.randomizeNetworkColor()
-        self.subprogramName = "Script"
+        self.subprogramName = "My Script"
         self.inputs.new("an_NodeControlSocket", "New Input", "newInput")
         self.outputs.new("an_NodeControlSocket", "New Output", "newOutput")
 

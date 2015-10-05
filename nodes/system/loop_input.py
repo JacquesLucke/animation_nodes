@@ -19,7 +19,7 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
 
     def create(self):
         self.randomizeNetworkColor()
-        self.subprogramName = "Loop"
+        self.subprogramName = "My Loop"
         self.outputs.new("an_IntegerSocket", "Index")
         self.outputs.new("an_IntegerSocket", "Iterations")
         self.outputs.new("an_NodeControlSocket", "New Iterator").margin = 0.15

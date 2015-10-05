@@ -15,7 +15,7 @@ class GroupInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
 
     def create(self):
         self.randomizeNetworkColor()
-        self.subprogramName = "Group"
+        self.subprogramName = "My Group"
         socket = self.outputs.new("an_NodeControlSocket", "New Parameter").margin = 0.15
         self.width = 180
 
