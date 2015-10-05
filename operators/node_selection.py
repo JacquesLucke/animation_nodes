@@ -18,3 +18,12 @@ class SelectDependenciesNodes(bpy.types.Operator, AnimationNodeOperator):
         for node in context.active_node.getNodesWhenFollowingLinks(followInputs = True):
             node.select = True
         return {"FINISHED"}
+
+class SelectNetwork(bpy.types.Operator, AnimationNodeOperator):
+    bl_idname = "an.select_network"
+    bl_label = "Select Network"
+
+    def execute(self, context):
+        for node in context.active_node.network.getNodes():
+            node.select = True
+        return {"FINISHED"}
