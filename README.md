@@ -1,1 +1,1 @@
-http://animation-nodes-documentation.readthedocs.org/en/latest/
+http://animation-nodes-manual.readthedocs.org/en/latest/
