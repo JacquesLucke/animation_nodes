@@ -78,15 +78,9 @@ class AddonPreferences(bpy.types.AddonPreferences):
         subcol.prop(self.nodeColors, "subprogramValue", slider = True)
         subcol.prop(self.nodeColors, "subprogramSaturation", slider = True)
 
-addon = None
-
 def getPreferences():
-    if getattr(addon, "module", "") == "":
-        # This should happen very rarely
-        # Problem is that this can access the context while rendering
-        #   which can lead to problems
-        _updateAddon()
-    return addon.preferences
+    # TODO: access user_preferences without the context
+    return bpy.context.user_preferences.addons[addonName].preferences
 
 def generateCompactCode():
     return getPreferences().generateCompactCode
@@ -96,16 +90,3 @@ def forbidSubprogramRecursion():
 
 def nodeColors():
     return getPreferences().nodeColors
-
-
-def _updateAddon():
-    global addon
-    addon = bpy.context.user_preferences.addons[addonName]
-
-def register():
-    global addon
-    _updateAddon()
-
-def unregister():
-    global addon
-    addon = None

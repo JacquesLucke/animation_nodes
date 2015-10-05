@@ -3,7 +3,6 @@ import bpy
 from . import keymap
 from . import events
 from . import tree_info
-from . import preferences
 from . import draw_handler
 from . ui import node_colors
 from . utils import selection
@@ -20,7 +19,6 @@ def registerFiles():
     sound_bake.register()
     socket_base.register()
     node_colors.register()
-    preferences.register()
     draw_handler.register()
     events.registerHandlers()
     script.registerHandlers()
@@ -38,7 +36,6 @@ def unregisterFiles():
     sound_bake.unregister()
     socket_base.unregister()
     node_colors.unregister()
-    preferences.unregister()
     draw_handler.unregister()
     events.unregisterHandlers()
     script.unregisterHandlers()
