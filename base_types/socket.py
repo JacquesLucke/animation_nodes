@@ -5,6 +5,7 @@ from .. events import treeChanged, executionCodeChanged
 from .. utils.names import getRandomString, toVariableName
 from .. operators.dynamic_operators import getInvokeFunctionOperator
 from .. nodes.system.subprogram_sockets import subprogramInterfaceChanged
+from .. templates.operators.insert_linked_node import invokeLinkedNodeInsertion
 from .. tree_info import isSocketLinked, getLinkedSockets, getDirectlyLinkedSockets
 
 class SocketTextProperties(bpy.types.PropertyGroup):
@@ -141,6 +142,9 @@ class AnimationNodeSocket:
         props.invokeWithData = data is not None
         props.data = str(data)
 
+    def invokeNodeInsertion(self, layout, nodeIdName, toIndex, text, settings = {}):
+        invokeLinkedNodeInsertion(layout, nodeIdName, self.index, toIndex, text, settings)
+
     def moveUp(self):
         self.moveTo(self.index - 1)
 
@@ -269,10 +273,13 @@ class AnimationNodeSocket:
     def hasValueCode(self):
         return hasattr(self, "getValueCode")
 
+    @property
+    def hasNodeSuggestions(self):
+        return hasattr(self, "drawSuggestionsMenu")
+
     @classmethod
     def hasProperty(cls):
         return hasattr(cls, "drawProperty")
-
 
 
 
