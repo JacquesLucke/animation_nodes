@@ -41,3 +41,43 @@ def getDpiFactor():
     systemPreferences = bpy.context.user_preferences.system
     retinaFactor = getattr(systemPreferences, "pixel_size", 1)
     return systemPreferences.dpi * retinaFactor / 72
+
+
+class PieMenuHelper:
+    def draw(self, context):
+        pie = self.layout.menu_pie()
+        self.drawLeft(pie)
+        self.drawRight(pie)
+        self.drawBottom(pie)
+        self.drawTop(pie)
+        self.drawTopLeft(pie)
+        self.drawTopRight(pie)
+        self.drawBottomLeft(pie)
+        self.drawBottomRight(pie)
+
+    def drawLeft(self, layout):
+        self.empty(layout)
+
+    def drawRight(self, layout):
+        self.empty(layout)
+
+    def drawBottom(self, layout):
+        self.empty(layout)
+
+    def drawTop(self, layout):
+        self.empty(layout)
+
+    def drawTopLeft(self, layout):
+        self.empty(layout)
+
+    def drawTopRight(self, layout):
+        self.empty(layout)
+
+    def drawBottomLeft(self, layout):
+        self.empty(layout)
+
+    def drawBottomRight(self, layout):
+        self.empty(layout)
+
+    def empty(self, layout, text = ""):
+        layout.row().label(text)

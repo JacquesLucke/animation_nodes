@@ -1,7 +1,5 @@
 import bpy
-from bpy.props import *
-from .. utils.nodes import getNode
-from .. sockets.info import toDataType
+from .. utils.blender_ui import PieMenuHelper
 
 '''
                 ###############
@@ -16,7 +14,7 @@ from .. sockets.info import toDataType
 
 '''
 
-class ContextPie(bpy.types.Menu):
+class ContextPie(bpy.types.Menu, PieMenuHelper):
     bl_idname = "an.context_pie"
     bl_label = "Context Pie"
 
@@ -30,43 +28,10 @@ class ContextPie(bpy.types.Menu):
         if amount == 0: self.empty(layout, text = "Has no visible inputs")
         else: layout.operator("an.insert_data_input_node_template_operator", text = "Data Input")
 
-    def drawRight(self, layout):
-        self.empty(layout)
-
     def drawBottom(self, layout):
         amount = len(self.activeNode.getVisibleOutputs())
         if amount == 0: self.empty(layout, text = "Has no visible outputs")
         else: layout.operator("an.insert_debug_node_template_operator", text = "Debug")
-
-    def drawTop(self, layout):
-        self.empty(layout)
-
-    def drawTopLeft(self, layout):
-        self.empty(layout)
-
-    def drawTopRight(self, layout):
-        self.empty(layout)
-
-    def drawBottomLeft(self, layout):
-        self.empty(layout)
-
-    def drawBottomRight(self, layout):
-        self.empty(layout)
-
-
-    def draw(self, context):
-        pie = self.layout.menu_pie()
-        self.drawLeft(pie)
-        self.drawRight(pie)
-        self.drawBottom(pie)
-        self.drawTop(pie)
-        self.drawTopLeft(pie)
-        self.drawTopRight(pie)
-        self.drawBottomLeft(pie)
-        self.drawBottomRight(pie)
-
-    def empty(self, layout, text = ""):
-        layout.row().label(text)
 
     @property
     def activeNode(self):
