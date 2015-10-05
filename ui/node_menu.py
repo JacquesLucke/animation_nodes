@@ -359,8 +359,19 @@ class SubprogramsMenu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        for network in getSubprogramNetworks():
-            insertNode(layout, "an_InvokeSubprogramNode", network.name, {"subprogramIdentifier" : repr(network.identifier)})
+        insertNode(layout, "an_InvokeSubprogramNode", "Invoke Subprogram")
+        insertNode(layout, "an_GroupInputNode", "Group Input")
+        insertNode(layout, "an_GroupOutputNode", "Group Output")
+        insertNode(layout, "an_LoopInputNode", "Loop")
+        insertNode(layout, "an_ScriptNode", "Script")
+
+        layout.separator()
+        subprograms = getSubprogramNetworks()
+        if len(subprograms) == 0:
+            layout.label("There are no subprograms yet")
+        else:
+            for network in getSubprogramNetworks():
+                insertNode(layout, "an_InvokeSubprogramNode", network.name, {"subprogramIdentifier" : repr(network.identifier)})
 
 
 def insertNode(layout, type, text, settings = {}):
