@@ -11,6 +11,8 @@ class ConvertAngleNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ConvertAngleNode"
     bl_label = "Convert Angle"
 
+    searchTags = [(name, {"conversionType" : repr(type)}) for type, name, _ in conversionTypeItems]
+
     def settingChanged(self, context):
         inSocket = self.inputs["Angle"]
         outSocket = self.outputs["Angle"]
