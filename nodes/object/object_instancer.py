@@ -216,7 +216,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
 
         if self.parentInstances:
             newObject.parent = getMainObjectContainer(scene)
-        if self.removeAnimationData:
+        if self.removeAnimationData and newObject.animation_data is not None:
             newObject.animation_data.action = None
         newObject.select = False
         newObject.hide = False
