@@ -4,15 +4,18 @@ from ... sockets.info import toIdName
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 
+nodeTypes = {
+    "Matrix" : "Mix Matrices",
+    "Vector" : "Mix Vectors",
+    "Float" : "Mix Floats",
+    "Color" : "Mix Colors" }
+
 class MixDataNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MixDataNode"
     bl_label = "Mix"
 
     onlySearchTags = True
-    searchTags = [ ("Mix Matrices", {"dataType" : repr("Matrix")}),
-                   ("Mix Vectors", {"dataType" : repr("Vector")}),
-                   ("Mix Floats", {"dataType" : repr("Float")}),
-                   ("Mix Colors", {"dataType" : repr("Color")}) ]
+    searchTags = [(tag, {"dataType" : repr(type)}) for type, tag in nodeTypes.items()]
 
     def dataTypeChanged(self, context):
         self.generateSockets()
@@ -28,6 +31,9 @@ class MixDataNode(bpy.types.Node, AnimationNode):
 
     def draw(self, layout):
         layout.prop(self, "clampFactor")
+
+    def drawLabel(self):
+        return nodeTypes[self.outputs[0].dataType]
 
     def generateSockets(self):
         self.inputs.clear()
