@@ -206,6 +206,7 @@ class MeshMenu(bpy.types.Menu):
         layout = self.layout
         insertNode(layout, "an_SeparateMeshDataNode", "Separate")
         insertNode(layout, "an_CombineMeshDataNode", "Combine")
+        layout.menu("an_mesh_generators_menu", text = "Generators")
         layout.menu("an_mesh_operators_menu", text = "Operators")
         layout.separator()
         insertNode(layout, "an_CreateBMeshFromMeshData", "Create from Data")
@@ -216,6 +217,14 @@ class MeshMenu(bpy.types.Menu):
         insertNode(layout, "an_SetMeshDataOnObjectNode", "  Mesh Data")
         insertNode(layout, "an_SetBMeshOnObjectNode", "  BMesh")
 
+class MeshGeneratorsMenu(bpy.types.Menu):
+    bl_idname = "an_mesh_generators_menu"
+    bl_label = "Mesh Generators Menu"
+
+    def draw(self, context):
+        layout = self.layout
+        insertNode(layout, "an_LineMeshNode", "Line")
+        insertNode(layout, "an_GridMeshNode", "Grid")
 
 class MeshOperatorsMenu(bpy.types.Menu):
     bl_idname = "an_mesh_operators_menu"
