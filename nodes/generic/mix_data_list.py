@@ -6,15 +6,18 @@ from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 from ... sockets.info import toIdName, toListIdName, toListDataType
 
+nodeTypes = {
+    "Matrix" : "Mix Matrix List",
+    "Vector" : "Mix Vector List",
+    "Float" : "Mix Float List",
+    "Color" : "Mix Color List" }
+
 class MixDataListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MixDataListNode"
     bl_label = "Mix Data List"
 
     onlySearchTags = True
-    searchTags = [ ("Mix Matrix List", {"dataType" : repr("Matrix")}),
-                   ("Mix Color List", {"dataType" : repr("Color")}),
-                   ("Mix Vector List", {"dataType" : repr("Vector")}),
-                   ("Mix Float List", {"dataType" : repr("Float")}) ]
+    searchTags = [(tag, {"dataType" : repr(type)}) for type, tag in nodeTypes.items()]
 
     def dataTypeChanged(self, context):
         self.recreateSockets()
@@ -28,6 +31,9 @@ class MixDataListNode(bpy.types.Node, AnimationNode):
 
     def draw(self, layout):
         layout.prop(self, "repeat")
+
+    def drawLabel(self):
+        return nodeTypes[self.outputs[0].dataType]
 
     def getExecutionCode(self):
         lines = []
