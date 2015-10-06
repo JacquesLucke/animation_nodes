@@ -1,12 +1,13 @@
 import bpy
-import io
 import cProfile
+from io import StringIO
 from .. update import updateEverything
 from contextlib import redirect_stdout
+from .. preferences import getDeveloperSettings
 
-class ProfileMainUnitExecution(bpy.types.Operator):
-    bl_idname = "an.profile_main_unit_execution"
-    bl_label = "Profile Main Unit Execution"
+class PrintProfileExecutionResult(bpy.types.Operator):
+    bl_idname = "an.print_profile_execution_result"
+    bl_label = "Print Profile Execution Result"
     bl_description = ""
 
     @classmethod
@@ -15,27 +16,35 @@ class ProfileMainUnitExecution(bpy.types.Operator):
         except: return False
 
     def execute(self, context):
-        d = {"context" : context}
-        cProfile.runctx("context.space_data.edit_tree.execute()", d, d, sort = "cumtime")
+        result = getExecutionProfilingResult()
+        print(result)
         return {"FINISHED"}
 
-class ProfileUpdating(bpy.types.Operator):
-    bl_idname = "an.profile_updating"
-    bl_label = "Profile Updating"
+class WriteProfileExecutionResult(bpy.types.Operator):
+    bl_idname = "an.write_profile_execution_result"
+    bl_label = "Write Profile Execution Result"
     bl_description = ""
 
+    @classmethod
+    def poll(cls, context):
+        try: return context.space_data.edit_tree.bl_idname == "an_AnimationNodeTree"
+        except: return False
+
     def execute(self, context):
-        f = io.StringIO()
-        with redirect_stdout(f):
-            d = {"update" : updateEverything}
-            cProfile.runctx("update()", d, d, sort = "cumtime")
-        text = f.getvalue()
-        lines = text.split("\n")
-        outText = "\n".join([line for line in lines if "" in line])
-        getTextBlock("Profile").from_string(outText)
+        result = getExecutionProfilingResult()
+
+        textBlockName = "Profiling"
+        textBlock = bpy.data.texts.get(textBlockName)
+        if textBlock is None: textBlock = bpy.data.texts.new(textBlockName)
+
+        textBlock.clear()
+        textBlock.write(result)
         return {"FINISHED"}
 
-def getTextBlock(name):
-    text = bpy.data.texts.get(name)
-    if text is None: text = bpy.data.texts.new(name)
-    return text
+def getExecutionProfilingResult():
+    sortMode = getDeveloperSettings().profilingSortMode
+    f = StringIO()
+    with redirect_stdout(f):
+        d = {"context" : bpy.context}
+        cProfile.runctx("context.space_data.edit_tree.execute()", d, d, sort = sortMode)
+    return f.getvalue()

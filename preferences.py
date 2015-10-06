@@ -34,6 +34,18 @@ class NodeColorProperties(bpy.types.PropertyGroup):
         update = changeNodeColors)
 
 
+profileSortModeItems = [
+    ("calls", "Amount of Calls", "Number of calls", "NONE", 0),
+    ("tottime", "Total Time", " Total time spent in the given function (and excluding time made in calls to sub-functions)", "NONE", 1),
+    ("cumtime", "Cumulative Time", "Cumulative time spent in this and all subfunctions (from invocation till exit)", "NONE", 2) ]
+
+class DeveloperProperties(bpy.types.PropertyGroup):
+    bl_idname = "an_DeveloperProperties"
+
+    profilingSortMode = EnumProperty(name = "Profiling Sort Mode",
+        default = "cumtime", items = profileSortModeItems)
+
+
 class AddonPreferences(bpy.types.AddonPreferences):
     bl_idname = addonName
 
@@ -52,6 +64,7 @@ class AddonPreferences(bpy.types.AddonPreferences):
         description = "A subprogram invoker node must not be in the same network that it calls")
 
     nodeColors = PointerProperty(type = NodeColorProperties)
+    developer = PointerProperty(type = DeveloperProperties)
 
     def draw(self, context):
         layout = self.layout
@@ -87,6 +100,9 @@ def generateCompactCode():
 
 def forbidSubprogramRecursion():
     return getPreferences().forbidSubprogramRecursion
+
+def getDeveloperSettings():
+    return getPreferences().developer
 
 def nodeColors():
     return getPreferences().nodeColors
