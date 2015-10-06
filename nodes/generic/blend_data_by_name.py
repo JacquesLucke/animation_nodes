@@ -27,6 +27,9 @@ class BlendDataByNameNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.dataType = "Object"
 
+    def drawLabel(self):
+        return self.dataType + " by Name"
+
     def getExecutionCode(self):
         space = "bpy.data." + dataTypes[self.dataType][1]
         yield "output = {0}.get(name)".format(space)
