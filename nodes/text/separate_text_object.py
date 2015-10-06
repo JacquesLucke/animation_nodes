@@ -4,15 +4,22 @@ from bpy.props import *
 from mathutils import Vector, Matrix
 from ... base_types.node import AnimationNode
 from ... id_keys import setIDKeyData, createIDKey
+from ... utils.blender_ui import executeInAreaType
 from ... nodes.container_provider import getMainObjectContainer
 
 idPropertyName = "text separation node id"
 indexPropertyName = "text separation node index"
 
 outputTypeItems = [
-    ("TEXT", "Text", ""),
-    ("CURVE", "Curve", ""),
-    ("MESH", "Mesh", "") ]
+    ("TEXT", "Text", "", "FONT_DATA", 0),
+    ("CURVE", "Curve", "", "CURVE_DATA", 1),
+    ("MESH", "Mesh", "", "MESH_DATA", 2) ]
+
+originTypeItems = [
+    ("DEFAULT", "Default", "", "NONE", 0),
+    ("ORIGIN_GEOMETRY", "Origin to Geometry", "", "NONE", 1),
+    ("ORIGIN_CURSOR", "Origin to Cursor", "", "NONE", 2),
+    ("ORIGIN_CENTER_OF_MASS", "Origin to Center of Mass", "", "NONE", 3) ]
 
 class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SeparateTextObjectNode"
@@ -23,11 +30,12 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
     objectCount = IntProperty(default = 0)
     parentLetters = BoolProperty(name = "Parent to Main Container", default = True)
     materialName = StringProperty(name = "Material", default = "")
-    outputType = EnumProperty(name = "Output Type", items = outputTypeItems)
+    outputType = EnumProperty(name = "Output Type", items = outputTypeItems, default = "MESH")
+    originType = EnumProperty(name = "Origin Type", items = originTypeItems, default = "DEFAULT")
 
     def create(self):
         self.outputs.new("an_ObjectListSocket", "Text Objects", "textObjects")
-        self.width = 180
+        self.width = 200
 
     def draw(self, layout):
         row = layout.row(align = True)
@@ -40,6 +48,7 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
             row.prop(source, "hide", text = "")
 
         layout.prop_search(self, "materialName", bpy.data, "materials", text="Material", icon="MATERIAL_DATA")
+        layout.prop(self, "originType", text = "Origin")
         layout.prop(self, "outputType", expand = True)
 
         self.invokeFunction(layout, "updateSeparation",
@@ -83,6 +92,9 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
         onlySelectList(objects)
         if self.outputType in ("MESH", "CURVE"):
             convertSelectedObjects(self.outputType)
+
+        if self.originType != "DEFAULT":
+            setOriginType(self.originType)
 
         if self.parentLetters:
             parentObjectsToMainControler(objects)
@@ -182,12 +194,13 @@ def removeCurve(curve):
     bpy.data.objects.remove(curve)
     bpy.data.curves.remove(curveData)
 
+@executeInAreaType("VIEW_3D")
 def convertSelectedObjects(type = "MESH"):
-    area = bpy.context.area
-    oldType = area.type
-    area.type = "VIEW_3D"
     bpy.ops.object.convert(target = type)
-    area.type = oldType
+
+@executeInAreaType("VIEW_3D")
+def setOriginType(type = "ORIGIN_GEOMETRY"):
+    bpy.ops.object.origin_set(type = type)
 
 def removeObject(object):
     if object.mode != "OBJECT": bpy.ops.object.mode_set(mode = "OBJECT")

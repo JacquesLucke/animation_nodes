@@ -42,6 +42,18 @@ def getDpiFactor():
     retinaFactor = getattr(systemPreferences, "pixel_size", 1)
     return systemPreferences.dpi * retinaFactor / 72
 
+def executeInAreaType(areaType):
+    def changeAreaTypeDecorator(function):
+        def wrapper(*args, **kwargs):
+            area = bpy.context.area
+            oldType = area.type
+            area.type = areaType
+            output = function(*args, **kwargs)
+            area.type = oldType
+            return output
+        return wrapper
+    return changeAreaTypeDecorator
+
 
 class PieMenuHelper:
     def draw(self, context):
