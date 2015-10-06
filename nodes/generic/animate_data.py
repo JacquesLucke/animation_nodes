@@ -25,6 +25,9 @@ class AnimateDataNode(bpy.types.Node, AnimationNode):
         self.width = 150
         self.generateSockets()
 
+    def drawLabel(self):
+        return "Animate " + self.inputs[1].dataType
+
     def generateSockets(self):
         self.inputs.clear()
         self.outputs.clear()
