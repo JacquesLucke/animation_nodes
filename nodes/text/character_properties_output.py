@@ -34,17 +34,19 @@ class CharacterPropertiesOutputNode(bpy.types.Node, AnimationNode):
         
     def getExecutionCode(self):
         lines = []
-        lines.append("if getattr(object, 'type', '') == 'FONT':")
-        lines.append("    textObject = object.data")
+        
+        if any([socket.isUsed for socket in self.inputs[3:]]):
+            lines.append("if getattr(object, 'type', '') == 'FONT':")
+            lines.append("    textObject = object.data")
     
-        if self.allowNegativeIndex: lines.append("    s, e = start, end")
-        else: lines.append("    s, e = max(0, start), max(0, end)")
+            if self.allowNegativeIndex: lines.append("    s, e = start, end")
+            else: lines.append("    s, e = max(0, start), max(0, end)")
     
-        lines.append("    for char in textObject.body_format[s:e]:")
-        if self.inputs["materialIndex"].isUsed: lines.append(" "*8 + "char.material_index = materialIndex")
-        if self.inputs["bold"].isUsed: lines.append(" "*8 + "char.use_bold = bold")
-        if self.inputs["italic"].isUsed: lines.append(" "*8 + "char.use_italic = italic")
-        if self.inputs["underline"].isUsed: lines.append(" "*8 + "char.use_underline = underline")
-        if self.inputs["smallCaps"].isUsed: lines.append(" "*8 + "char.use_small_caps = smallCaps")
+            lines.append("    for char in textObject.body_format[s:e]:")
+        if self.inputs["Material Index"].isUsed: lines.append(" "*8 + "char.material_index = materialIndex")
+        if self.inputs["Bold"].isUsed: lines.append(" "*8 + "char.use_bold = bold")
+        if self.inputs["Italic"].isUsed: lines.append(" "*8 + "char.use_italic = italic")
+        if self.inputs["Underline"].isUsed: lines.append(" "*8 + "char.use_underline = underline")
+        if self.inputs["Small Caps"].isUsed: lines.append(" "*8 + "char.use_small_caps = smallCaps")
         
         return lines
