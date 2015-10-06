@@ -16,6 +16,7 @@ class FloatSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Float", "Integer"]
     drawColor = (0.4, 0.4, 0.7, 1)
     hashable = True
+    storable = True
 
     value = FloatProperty(default = 0.0,
         set = setValue, get = getValue,

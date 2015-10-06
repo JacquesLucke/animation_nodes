@@ -9,6 +9,8 @@ class PolygonSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     dataType = "Polygon"
     allowedInputTypes = ["Polygon"]
     drawColor = (0.4, 0.7, 0.3, 1)
+    storable = True
+    hashable = True
 
     def getValue(self):
         return Polygon(vertices = [Vector((-1, 0, 0)), Vector((1, 0, 0)), Vector((0, 1, 0))],

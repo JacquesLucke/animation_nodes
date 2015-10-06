@@ -9,6 +9,8 @@ class ColorSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     dataType = "Color"
     allowedInputTypes = ["Color"]
     drawColor = (0.8, 0.8, 0.2, 1)
+    storable = True
+    hashable = False
 
     value = FloatVectorProperty(
         default = [0.5, 0.5, 0.5], subtype = "COLOR",

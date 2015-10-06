@@ -24,6 +24,7 @@ class InterpolationSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Interpolation"]
     drawColor = (0.7, 0.4, 0.3, 1)
     hashable = True
+    storable = True
 
     category = EnumProperty(name = "Interpolation Category", default = "LINEAR",
                             items = categoryItems, update = propertyChanged)

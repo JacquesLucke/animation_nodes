@@ -9,6 +9,8 @@ class FCurveSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     dataType = "FCurve"
     allowedInputTypes = ["FCurve"]
     drawColor = (0.2, 0.26, 0.19, 1)
+    storable = True
+    hashable = True
 
     def getValueCode(self):
         return "None"

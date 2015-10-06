@@ -10,6 +10,8 @@ class QuaternionSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     dataType = "Quaternion"
     allowedInputTypes = ["Quaternion"]
     drawColor = (0.8, 0.6, 0.3, 1.0)
+    storable = True
+    hashable = False
 
     value = FloatVectorProperty(default = [1, 0, 0, 0], size = 4, update = propertyChanged)
 

@@ -9,6 +9,7 @@ class BMeshSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["BMesh"]
     drawColor = (0.1, 1.0, 0.1, 1)
     storable = False
+    hashable = True
 
     def getValue(self):
         return bmesh.new()

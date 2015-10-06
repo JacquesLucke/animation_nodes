@@ -8,6 +8,8 @@ class MatrixSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     dataType = "Matrix"
     allowedInputTypes = ["Matrix"]
     drawColor = (1, 0.56, 0.3, 1)
+    storable = True
+    hashable = False
 
     def getValue(self):
         return Matrix.Identity(4)

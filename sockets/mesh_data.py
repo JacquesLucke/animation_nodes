@@ -8,6 +8,8 @@ class MeshDataSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     dataType = "Mesh Data"
     allowedInputTypes = ["Mesh Data"]
     drawColor = (0.3, 0.4, 0.18, 1)
+    storable = True
+    hashable = True
 
     def getValue(self):
         return MeshData([], [], [])
