@@ -286,7 +286,6 @@ class InterpolationMenu(bpy.types.Menu):
         insertNode(layout, "an_InterpolationFromCurveMappingNode", "From Curve Mapping")
         insertNode(layout, "an_InterpolationFromFCurveNode", "From FCurve")
         insertNode(layout, "an_EvaluateInterpolationNode", "Evaluate")
-        insertNode(layout, "an_DebugInterpolationNode", "Debug")
         insertNode(layout, "an_MixInterpolationNode", "Mix")
 
 class MaterialMenu(bpy.types.Menu):
@@ -352,6 +351,7 @@ class DebugMenu(bpy.types.Menu):
         insertNode(layout, "an_DebugLoopNode", "Debug Loop")
         insertNode(layout, "an_DebugListNode", "Debug List")
         insertNode(layout, "an_DebugDrawerNode", "Debug Drawer")
+        insertNode(layout, "an_DebugInterpolationNode", "Debug Interpolation")
 
 class SubprogramsMenu(bpy.types.Menu):
     bl_idname = "an_subprograms_menu"
