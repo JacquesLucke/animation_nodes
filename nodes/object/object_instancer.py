@@ -71,7 +71,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
             description = "This will make sure that the objects won't be removed if you remove the Replicate Node.")
 
         layout.separator()
-        self.invokeFunction(layout, "hideRelationshipLines", text = "Hide Relationship Lines")
+        self.invokeFunction(layout, "hideRelationshipLines", text = "Hide Relationship Lines", icon = "RESTRICT_VIEW_OFF")
 
     def execute(self, instancesAmount, sourceObject, scene):
         instancesAmount = max(instancesAmount, 0)
