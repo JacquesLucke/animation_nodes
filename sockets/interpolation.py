@@ -42,3 +42,9 @@ class InterpolationSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def getValue(self):
         return getInterpolationPreset(self.category, self.easeIn, self.easeOut)
+
+    def getProperty(self):
+        return self.category, self.easeIn, self.easeOut
+
+    def setProperty(self, data):
+        self.category, self.easeIn, self.easeOut = data
