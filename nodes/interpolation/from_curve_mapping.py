@@ -53,6 +53,7 @@ class InterpolationFromCurveMappingNode(bpy.types.Node, AnimationNode):
             if len(curvePoints) == i:
                 curvePoints.new(50, 50) # random start position
             curvePoints[i].location = point.location
+            curvePoints[i].handle_type = point.handle_type
 
 
     def delete(self):
