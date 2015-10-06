@@ -17,6 +17,3 @@ class ScaleMatrixNode(bpy.types.Node, AnimationNode):
 
     def getUsedModules(self):
         return ["mathutils"]
-
-    def duplicate(self, sourceNode):
-        self.inputs[0].value = [1, 1, 1]
