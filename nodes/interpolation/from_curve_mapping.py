@@ -20,7 +20,11 @@ class InterpolationFromCurveMappingNode(bpy.types.Node, AnimationNode):
         self.invokeFunction(layout, "resetEndPoints", text = "Reset End Points")
 
     def execute(self):
-        return (interpolation.curveMapping, self.curve)
+        mapping = self.mapping
+        curve = mapping.curves[3]
+        try: curve.evaluate(0.5)
+        except: mapping.initialize()
+        return (interpolation.curveMapping, curve)
 
     def createCurveNode(self):
         material = getHelperMaterial()
