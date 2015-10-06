@@ -26,7 +26,6 @@ class DeveloperPanel(bpy.types.Panel):
 
         layout.separator()
 
-
         col = layout.column()
         col.label("Profile Execution:")
         row = col.row(align = True)
