@@ -113,10 +113,9 @@ class AdaptiveQuad(bpy.types.Node, AnimationNode):
 class ShowHelp(bpy.types.Menu):
     bl_idname = "an.show_help_adaptive_quad"
     bl_label = "Adaptive Quad node v0.3 | Blender - Animation Nodes"
-    bl_icon = "FORCE_TURBULENCE"
-    
-    helpText = bpy.props.StringProperty(default = "help here")
-    noteText = bpy.props.StringProperty(default = "note here")
+
+    helpText = StringProperty(default = "help here")
+    noteText = StringProperty(default = "note here")
     helpLines = []
     noteLines = []
     
