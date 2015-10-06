@@ -23,6 +23,9 @@ class DataInputNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.recreateSockets()
 
+    def drawLabel(self):
+        return self.inputs[0].dataType + " Input"
+
     def drawAdvanced(self, layout):
         self.invokeSocketTypeChooser(layout, "assignSocketType",
             socketGroup = "ALL", text = "Change Type", icon = "TRIA_RIGHT")
