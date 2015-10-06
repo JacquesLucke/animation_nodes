@@ -87,8 +87,9 @@ class VectorMenu(bpy.types.Menu):
         insertNode(layout, "an_VectorLengthNode", "Length")
         insertNode(layout, "an_VectorDistanceNode", "Distance")
         insertNode(layout, "an_VectorMathNode", "Math")
-        insertNode(layout, "an_DirectionToRotationNode", "Direction to Rotation")
         insertNode(layout, "an_TransformVectorNode", "Transform")
+        insertNode(layout, "an_ConvertQuaternionAndEuler", "Quaternion to Euler")
+        insertNode(layout, "an_DirectionToRotationNode", "Direction to Rotation")
 
 class MatrixMenu(bpy.types.Menu):
     bl_idname = "an_matrix_menu"
