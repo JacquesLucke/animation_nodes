@@ -63,9 +63,12 @@ class NumberMenu(bpy.types.Menu):
         insertNode(layout, "an_RandomNumberNode", "Randomize")
         insertNode(layout, "an_FloatWiggleNode", "Wiggle")
         insertNode(layout, "an_MixDataNode", "Mix", {"dataType" : repr("Float")})
+        insertNode(layout, "an_MapRangeNode", "Map Range")
         layout.separator()
         insertNode(layout, "an_FloatClampNode", "Clamp")
         insertNode(layout, "an_ConvertAngleNode", "Convert Angle")
+        insertNode(layout, "an_FloatToIntegerNode", "Convert Float To Integer")
+        insertNode(layout, "an_RoundNumberNode", "Round")
         insertNode(layout, "an_FloatMathNode", "Math")
 
 class VectorMenu(bpy.types.Menu):
@@ -169,6 +172,7 @@ class ListMenu(bpy.types.Menu):
         insertNode(layout, "an_CreateListNode", "Create")
         insertNode(layout, "an_CombineListsNode", "Combine")
         insertNode(layout, "an_AppendListNode", "Append")
+        insertNode(layout, "an_SearchListElementNode", "Search")
         layout.separator()
         insertNode(layout, "an_GetListElementNode", "Get Element")
         insertNode(layout, "an_GetListLengthNode", "Get Length")
@@ -176,6 +180,7 @@ class ListMenu(bpy.types.Menu):
         insertNode(layout, "an_ShuffleListNode", "Shuffle")
         insertNode(layout, "an_ReverseListNode", "Reverse")
         insertNode(layout, "an_SliceListNode", "Slice")
+        insertNode(layout, "an_ListMathNode", "Math")
 
 class ObjectMenu(bpy.types.Menu):
     bl_idname = "an_object_menu"
@@ -223,6 +228,7 @@ class MeshMenu(bpy.types.Menu):
         layout.menu("an_mesh_operators_menu", text = "Operators")
         layout.separator()
         insertNode(layout, "an_CreateBMeshFromMeshData", "Create from Data")
+        insertNode(layout, "an_MeshDataFromPolygonsNode", "Create from Polygons")
         layout.menu("an_mesh_finalizing_menu", text = "Tools")
         layout.separator()
         layout.label("Set On Object:")
@@ -247,6 +253,10 @@ class MeshOperatorsMenu(bpy.types.Menu):
         layout = self.layout
         insertNode(layout, "an_FindCloseVerticesNode", "Find Close Vertices")
         insertNode(layout, "an_EdgesToPlanesNode", "Edges to Planes")
+        insertNode(layout, "an_CreateEdgeIndicesNode", "Create Edge Indices")
+        insertNode(layout, "an_CreatePolygonIndicesNode", "Create Polygon Indices")
+        insertNode(layout, "an_EdgesOfPolygonsNode", "Edges of Polygons")
+        insertNode(layout, "an_TransformPolygonNode", "Transform Polygon")
 
 class MeshFinalizingMenu(bpy.types.Menu):
     bl_idname = "an_mesh_finalizing_menu"
@@ -355,7 +365,7 @@ class SoundMenu(bpy.types.Menu):
         insertNode(layout, "an_SoundBakeNode", "Bake Sound")
         insertNode(layout, "an_SoundFromSequencesNode", "Sound from Sequences")
         insertNode(layout, "an_GetAllSequencesNode", "Get All Sequences")
-        insertNode(layout, "an_SequencesFromChannelNode", "Sound from Channel")
+        insertNode(layout, "an_SequencesFromChannelNode", "Sequences from Channel")
         insertNode(layout, "an_EvaluateSoundNode", "Evaluate Sound")
 
 class KDTreeMenu(bpy.types.Menu):
@@ -410,7 +420,6 @@ def insertNode(layout, type, text, settings = {}):
         item.name = name
         item.value = value
     return operator
-
 
 def registerMenu():
     bpy.types.NODE_MT_add.append(drawMenu)
