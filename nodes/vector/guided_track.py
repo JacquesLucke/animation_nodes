@@ -47,10 +47,31 @@ class GuidedTrack(bpy.types.Node, AnimationNode):
         lines.append("mat3x3.col[2] = mathutils.Vector((0, 0, 1))")
         
         if self.trackAxis != self.guideAxis and self.trackAxis != ("-" + self.guideAxis):
-            # the escapes here are needed only for the matrix, to not fall to scale 0
-            lines.append("z = direction.normalized() if direction != mathutils.Vector((0, 0, 0)) else mathutils.Vector((0, 0, 1))")          #direction
-            lines.append("y = (z.cross(guide)).normalized() if guide != mathutils.Vector((0, 0, 0)) and guide.normalized() != z else mathutils.Vector((0, 1, 0))")
+            tAx = self.trackAxis
+            gAx = self.guideAxis
+            
+            #direction
+            lines.append("if direction != mathutils.Vector((0, 0, 0)): z = direction.normalized()")
+            if tAx == "X":    lines.append("else: z = mathutils.Vector((1, 0, 0))")
+            elif tAx == "Y":  lines.append("else: z = mathutils.Vector((0, 1, 0))")
+            elif tAx == "Z":  lines.append("else: z = mathutils.Vector((0, 0, 1))") # Z/X default, thus the notation
+            elif tAx == "-X": lines.append("else: z = mathutils.Vector((1, 0, 0))")
+            elif tAx == "-Y": lines.append("else: z = mathutils.Vector((0, 1, 0))")
+            elif tAx == "-Z": lines.append("else: z = mathutils.Vector((0, 0, 1))")
+            
+            #guide
+            lines.append("if guide != mathutils.Vector((0, 0, 0)) and z.cross(guide) != mathutils.Vector((0, 0, 0)): gui = guide.normalized()")
+            if gAx == "X":    lines.append("else: gui = mathutils.Vector((1, 0, 0))")
+            elif gAx == "Y":  lines.append("else: gui = mathutils.Vector((0, 1, 0))")
+            elif gAx == "Z":  lines.append("else: gui = mathutils.Vector((0, 0, 1))")
+            
+            lines.append("y = (z.cross(gui)).normalized()") #if z.cross(guide) != mathutils.Vector((0, 0, 0)) else mathutils.Vector((0, 1, 0))")
             lines.append("x = y.cross(z)")  #guide as perpendicular to dir
+            
+            # the escapes here are needed only for the matrix, to not fall to scale 0
+            #lines.append("z = direction.normalized() if direction != mathutils.Vector((0, 0, 0)) else mathutils.Vector((0, 0, 1))")          #direction
+            #lines.append("y = (z.cross(guide)).normalized() if guide != mathutils.Vector((0, 0, 0)) and guide.normalized() != z else mathutils.Vector((0, 1, 0))")
+            #lines.append("x = y.cross(z)")  #guide as perpendicular to dir
             
             tAx = self.trackAxis
             gAx = self.guideAxis
