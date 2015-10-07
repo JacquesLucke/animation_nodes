@@ -16,7 +16,8 @@ class DirectionToRotationNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.inputs.new("an_VectorSocket", "Direction", "direction")
-        self.outputs.new("an_EulerSocket", "Rotation", "rotation")
+        self.outputs.new("an_EulerSocket", "Euler", "euler")
+        self.outputs.new("an_QuaternionSocket", "Quaternion", "quaternion").hide = True
         self.width += 20
 
     def draw(self, layout):
@@ -28,4 +29,5 @@ class DirectionToRotationNode(bpy.types.Node, AnimationNode):
 
     def execute(self, direction):
         if self.trackAxis == self.upAxis: return Vector((0, 0, 0))
-        return direction.to_track_quat(self.trackAxis, self.upAxis).to_euler()
+        quaternion = direction.to_track_quat(self.trackAxis, self.upAxis)
+        return quaternion.to_euler(), quaternion
