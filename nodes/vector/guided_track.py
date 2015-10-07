@@ -24,8 +24,7 @@ class GuidedTrack(bpy.types.Node, AnimationNode):
     def create(self):
         self.inputs.new("an_VectorSocket", "Direction", "direction")
         self.inputs.new("an_VectorSocket", "Guide", "guide")
-        self.outputs.new("an_VectorSocket", "Rotation Vector", "rotationVector")
-        self.outputs.new("an_MatrixSocket", "Rotation Matrix", "rotationMatrix")
+        self.outputs.new("an_EulerSocket", "Rotation Euler", "euler")
         
         self.width += 20
 
@@ -41,40 +40,26 @@ class GuidedTrack(bpy.types.Node, AnimationNode):
     
     def getExecutionCode(self):
         lines = []
-        lines.append("mat3x3 = mathutils.Matrix().to_3x3()")
-        lines.append("mat3x3.col[0] = mathutils.Vector((1, 0, 0))")
-        lines.append("mat3x3.col[1] = mathutils.Vector((0, 1, 0))")
-        lines.append("mat3x3.col[2] = mathutils.Vector((0, 0, 1))")
         
-        if self.trackAxis != self.guideAxis and self.trackAxis != ("-" + self.guideAxis):
-            tAx = self.trackAxis
-            gAx = self.guideAxis
+        tAx = self.trackAxis
+        gAx = self.guideAxis
+        
+        if tAx != gAx and tAx != ("-" + gAx):
             
-            #direction
-            lines.append("if direction != mathutils.Vector((0, 0, 0)): z = direction.normalized()")
-            if tAx == "X":    lines.append("else: z = mathutils.Vector((1, 0, 0))")
-            elif tAx == "Y":  lines.append("else: z = mathutils.Vector((0, 1, 0))")
-            elif tAx == "Z":  lines.append("else: z = mathutils.Vector((0, 0, 1))") # Z/X default, thus the notation
-            elif tAx == "-X": lines.append("else: z = mathutils.Vector((1, 0, 0))")
-            elif tAx == "-Y": lines.append("else: z = mathutils.Vector((0, 1, 0))")
-            elif tAx == "-Z": lines.append("else: z = mathutils.Vector((0, 0, 1))")
+            # track direction
+            lines.append("if direction != 0: z = direction.normalized()")
+            if tAx == "X" or tAx == "-X":    lines.append("else: z = mathutils.Vector((1, 0, 0))")
+            elif tAx == "Y" or tAx == "-Y":  lines.append("else: z = mathutils.Vector((0, 1, 0))")
+            elif tAx == "Z" or tAx == "-Z":  lines.append("else: z = mathutils.Vector((0, 0, 1))") # Z/X default, thus the notation
             
-            #guide
-            lines.append("if guide != mathutils.Vector((0, 0, 0)) and z.cross(guide) != mathutils.Vector((0, 0, 0)): gui = guide.normalized()")
+            # guide
+            lines.append("if guide != 0 and z.cross(guide) != 0: gui = guide.normalized()")
             if gAx == "X":    lines.append("else: gui = mathutils.Vector((1, 0, 0))")
             elif gAx == "Y":  lines.append("else: gui = mathutils.Vector((0, 1, 0))")
             elif gAx == "Z":  lines.append("else: gui = mathutils.Vector((0, 0, 1))")
             
-            lines.append("y = (z.cross(gui)).normalized()") #if z.cross(guide) != mathutils.Vector((0, 0, 0)) else mathutils.Vector((0, 1, 0))")
-            lines.append("x = y.cross(z)")  #guide as perpendicular to dir
-            
-            # the escapes here are needed only for the matrix, to not fall to scale 0
-            #lines.append("z = direction.normalized() if direction != mathutils.Vector((0, 0, 0)) else mathutils.Vector((0, 0, 1))")          #direction
-            #lines.append("y = (z.cross(guide)).normalized() if guide != mathutils.Vector((0, 0, 0)) and guide.normalized() != z else mathutils.Vector((0, 1, 0))")
-            #lines.append("x = y.cross(z)")  #guide as perpendicular to dir
-            
-            tAx = self.trackAxis
-            gAx = self.guideAxis
+            lines.append("y = z.cross(gui)") 
+            lines.append("x = y.cross(z)")  
             
             if tAx == "X":    lines.append("(mx, my, mz) = ( z,-y, x)") if gAx == "Z" else lines.append("(mx, my, mz) = ( z, x, y)")
             elif tAx == "Y":  lines.append("(mx, my, mz) = ( y, z, x)") if gAx == "Z" else lines.append("(mx, my, mz) = ( x, z,-y)") 
@@ -83,12 +68,11 @@ class GuidedTrack(bpy.types.Node, AnimationNode):
             elif tAx == "-Y": lines.append("(mx, my, mz) = (-y,-z, x)") if gAx == "Z" else lines.append("(mx, my, mz) = ( x,-z, y)") 
             elif tAx == "-Z": lines.append("(mx, my, mz) = ( x,-y,-z)") if gAx == "X" else lines.append("(mx, my, mz) = ( y, x,-z)")
             
-            lines.append("mat3x3.col[0] = mx")
-            lines.append("mat3x3.col[1] = my")
-            lines.append("mat3x3.col[2] = mz")
-
-        lines.append("rotationVector = mathutils.Vector((mat3x3.to_euler()))")
-        lines.append("rotationMatrix = mat3x3.to_4x4()")
+            lines.append("mat3x3 = mathutils.Matrix().to_3x3()")
+            lines.append("mat3x3.col[0], mat3x3.col[1], mat3x3.col[2] = mx, my, mz")
+            lines.append("euler = mat3x3.to_euler()")
+            
+        else: lines.append("euler = mathutils.Euler((0, 0, 0), 'XYZ')")
         
         return lines
     
