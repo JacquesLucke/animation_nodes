@@ -16,7 +16,7 @@ class DirectionToRotationNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.inputs.new("an_VectorSocket", "Direction", "direction")
-        self.outputs.new("an_VectorSocket", "Rotation", "rotation")
+        self.outputs.new("an_EulerSocket", "Rotation", "rotation")
         self.width += 20
 
     def draw(self, layout):
@@ -28,4 +28,4 @@ class DirectionToRotationNode(bpy.types.Node, AnimationNode):
 
     def execute(self, direction):
         if self.trackAxis == self.upAxis: return Vector((0, 0, 0))
-        return Vector((direction.to_track_quat(self.trackAxis, self.upAxis).to_euler()))
+        return direction.to_track_quat(self.trackAxis, self.upAxis).to_euler()

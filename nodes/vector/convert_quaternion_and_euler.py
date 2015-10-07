@@ -35,9 +35,9 @@ class ConvertQuaternionAndEuler(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         if self.conversionType == "QUATERNION_TO_EULER":
-            return "eulerVector = mathutils.Vector(quaternion.to_euler('XYZ'))"
+            return "euler = quaternion.to_euler('XYZ')"
         if self.conversionType == "EULER_TO_QUATERNION":
-            return "quaternion = mathutils.Euler(eulerVector).to_quaternion()"
+            return "quaternion = euler.to_quaternion()"
 
     def getUsedModules(self):
         return ["mathutils"]
@@ -48,8 +48,8 @@ class ConvertQuaternionAndEuler(bpy.types.Node, AnimationNode):
 
         if self.conversionType == "QUATERNION_TO_EULER":
             self.inputs.new("an_QuaternionSocket", "Quaternion", "quaternion")
-            self.outputs.new("an_VectorSocket", "Euler", "eulerVector")
+            self.outputs.new("an_EulerSocket", "Euler", "euler")
         if self.conversionType == "EULER_TO_QUATERNION":
-            self.inputs.new("an_VectorSocket", "Euler", "eulerVector")
+            self.inputs.new("an_EulerSocket", "Euler", "euler")
             self.outputs.new("an_QuaternionSocket", "Quaternion", "quaternion")
         self.inputs[0].defaultDrawType = "PROPERTY_ONLY"
