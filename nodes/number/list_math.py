@@ -10,7 +10,7 @@ operationItems = [
     ("MAX", "Max", "") ]
 
 class ListMathNode(bpy.types.Node, AnimationNode):
-    bl_idname = "ListMathNode"
+    bl_idname = "an_ListMathNode"
     bl_label = "List Math"
 
     operation = EnumProperty(name = "Operation", items = operationItems, update = executionCodeChanged)
