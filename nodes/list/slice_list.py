@@ -5,7 +5,7 @@ from ... base_types.node import AnimationNode
 from ... sockets.info import getBaseDataTypeItems, toListIdName, isBase, toBaseDataType
 
 class SliceListNode(bpy.types.Node, AnimationNode):
-    bl_idname = "SliceListNode"
+    bl_idname = "an_SliceListNode"
     bl_label = "Slice List"
 
     def assignedTypeChanged(self, context):
