@@ -13,16 +13,11 @@ How to use Splines:
 
 class Spline:
     def __getattr__(self, name):
-        if name == "type":
-            return "BASE_SPLINE"
-        if name == "isCyclic":
-            return False
-        if name == "isEvaluable":
-            return False
-        if name == "isChanged":
-            return True
-        if name == "uniformConverter":
-            return None
+        if name == "type": return "BASE_SPLINE"
+        if name == "isCyclic": return False
+        if name == "isEvaluable": return False
+        if name == "isChanged": return True
+        if name == "uniformConverter": return None
 
 
     def copy(self):
