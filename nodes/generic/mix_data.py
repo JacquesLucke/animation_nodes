@@ -8,7 +8,9 @@ nodeTypes = {
     "Matrix" : "Mix Matrices",
     "Vector" : "Mix Vectors",
     "Float" : "Mix Floats",
-    "Color" : "Mix Colors" }
+    "Color" : "Mix Colors",
+    "Euler" : "Mix Eulers",
+    "Quaternion" : "Mix Quaternions" }
 
 class MixDataNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MixDataNode"
@@ -53,6 +55,7 @@ class MixDataNode(bpy.types.Node, AnimationNode):
         return lines
 
 def getMixCode(dataType, mix1 = "a", mix2 = "b", factor = "f", result = "result"):
-    if dataType in ("Float", "Vector"): return "{} = {} * (1 - {}) + {} * {}".format(result, mix1, factor, mix2, factor)
+    if dataType in ("Float", "Vector", "Quaternion"): return "{} = {} * (1 - {}) + {} * {}".format(result, mix1, factor, mix2, factor)
     if dataType == "Matrix": return "{} = {}.lerp({}, {})".format(result, mix1, mix2, factor)
     if dataType == "Color": return "{} = [v1 * (1 - {}) + v2 * {} for v1, v2 in zip({}, {})]".format(result, factor, factor, mix1, mix2)
+    if dataType == "Euler": return "{} = animation_nodes.utils.math.mixEulers({}, {}, {})".format(result, mix1, mix2, factor)

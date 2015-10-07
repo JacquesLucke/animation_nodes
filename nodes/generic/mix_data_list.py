@@ -10,7 +10,9 @@ nodeTypes = {
     "Matrix" : "Mix Matrix List",
     "Vector" : "Mix Vector List",
     "Float" : "Mix Float List",
-    "Color" : "Mix Color List" }
+    "Color" : "Mix Color List",
+    "Euler" : "Mix Euler List",
+    "Quaternion" : "Mix Quaternion List" }
 
 class MixDataListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MixDataListNode"

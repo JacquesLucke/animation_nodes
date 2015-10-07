@@ -16,3 +16,9 @@ def rotationMatrix(rotation):
     matrix *= Matrix.Rotation(rotation[1], 4, 'Y')
     matrix *= Matrix.Rotation(rotation[0], 4, 'X')
     return matrix
+
+def mixEulers(a, b, factor):
+    x = a.x * (1 - factor) + b.x * factor
+    y = a.y * (1 - factor) + b.y * factor
+    z = a.z * (1 - factor) + b.z * factor
+    return Euler((x, y, z), a.order)

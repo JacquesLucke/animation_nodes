@@ -13,7 +13,9 @@ class AnimateDataNode(bpy.types.Node, AnimationNode):
     searchTags = [ ("Animate Matrix", {"dataType" : repr("Matrix")}),
                    ("Animate Vector", {"dataType" : repr("Vector")}),
                    ("Animate Float", {"dataType" : repr("Float")}),
-                   ("Animate Color", {"dataType" : repr("Color")}) ]
+                   ("Animate Color", {"dataType" : repr("Color")}),
+                   ("Animate Euler", {"dataType" : repr("Euler")}),
+                   ("Animate Quaternion", {"dataType" : repr("Quaternion")}) ]
 
     def dataTypeChanged(self, context):
         self.generateSockets()
