@@ -18,7 +18,7 @@ class an_ObjectTransformsOutputNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
         self.inputs.new("an_VectorSocket", "Location", "location")
-        self.inputs.new("an_VectorSocket", "Rotation", "rotation")
+        self.inputs.new("an_EulerSocket", "Rotation", "rotation")
         self.inputs.new("an_VectorSocket", "Scale", "scale").value = (1, 1, 1)
         self.outputs.new("an_ObjectSocket", "Object", "object")
         self.updateSocketVisibility()
