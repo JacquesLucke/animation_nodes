@@ -174,6 +174,7 @@ class ListMenu(bpy.types.Menu):
         layout.separator()
         insertNode(layout, "an_ShuffleListNode", "Shuffle")
         insertNode(layout, "an_ReverseListNode", "Reverse")
+        insertNode(layout, "an_SliceListNode", "Slice")
 
 
 class ObjectMenu(bpy.types.Menu):
