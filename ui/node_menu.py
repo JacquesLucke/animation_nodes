@@ -70,6 +70,7 @@ class NumberMenu(bpy.types.Menu):
         insertNode(layout, "an_FloatToIntegerNode", "Convert Float To Integer")
         insertNode(layout, "an_RoundNumberNode", "Round")
         insertNode(layout, "an_FloatMathNode", "Math")
+        insertNode(layout, "an_ListMathNode", "List Math")
 
 class VectorMenu(bpy.types.Menu):
     bl_idname = "an_vector_menu"
@@ -180,7 +181,6 @@ class ListMenu(bpy.types.Menu):
         insertNode(layout, "an_ShuffleListNode", "Shuffle")
         insertNode(layout, "an_ReverseListNode", "Reverse")
         insertNode(layout, "an_SliceListNode", "Slice")
-        insertNode(layout, "an_ListMathNode", "Math")
 
 class ObjectMenu(bpy.types.Menu):
     bl_idname = "an_object_menu"
