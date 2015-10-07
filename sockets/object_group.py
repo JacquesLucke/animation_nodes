@@ -8,7 +8,7 @@ class ObjectGroupSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_label = "Object Group Socket"
     dataType = "Object Group"
     allowedInputTypes = ["Object Group"]
-    drawColor = (0.3, 0.1, 0.1, 0.8)
+    drawColor = (0.3, 0.1, 0.1, 1.0)
     storable = False
     hashable = True
 
