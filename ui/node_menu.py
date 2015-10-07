@@ -355,7 +355,7 @@ class SoundMenu(bpy.types.Menu):
         insertNode(layout, "an_SoundBakeNode", "Bake Sound")
         insertNode(layout, "an_SoundFromSequencesNode", "Sound from Sequences")
         insertNode(layout, "an_GetAllSequencesNode", "Get All Sequences")
-        insertNode(layout, "an_SequencesFromChannelNode", "from Channel")
+        insertNode(layout, "an_SequencesFromChannelNode", "Sound from Channel")
         insertNode(layout, "an_EvaluateSoundNode", "Evaluate Sound")
 
 class KDTreeMenu(bpy.types.Menu):
