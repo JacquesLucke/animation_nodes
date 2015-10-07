@@ -13,6 +13,7 @@ def drawMenu(self, context):
     layout.separator()
     layout.menu("an_number_menu", text = "Number")
     layout.menu("an_vector_menu", text = "Vector")
+    layout.menu("an_rotation_menu", text = "Rotation")
     layout.menu("an_matrix_menu", text = "Matrix")
     layout.menu("an_text_menu", text = "Text")
     layout.menu("an_boolean_menu", text = "Boolean")
@@ -92,8 +93,20 @@ class VectorMenu(bpy.types.Menu):
         insertNode(layout, "an_VectorMathNode", "Math")
         insertNode(layout, "an_TransformVectorNode", "Transform Vector")
         insertNode(layout, "an_TransformVectorListNode", "Transform Vector List")
-        insertNode(layout, "an_ConvertQuaternionAndEuler", "Quaternion to Euler")
+
+class RotationMenu(bpy.types.Menu):
+    bl_idname = "an_rotation_menu"
+    bl_label = "Rotation Menu"
+
+    def draw(self, context):
+        layout = self.layout
+        insertNode(layout, "an_CombineEulerNode", "Combine Euler")
+        insertNode(layout, "an_EulerFromVectorNode", "Euler from Vector")
+        insertNode(layout, "an_CombineQuaternionNode", "Combine Quaternion")
         insertNode(layout, "an_DirectionToRotationNode", "Direction to Rotation")
+        layout.separator()
+        insertNode(layout, "an_ConvertQuaternionAndEuler", "Euler to Quaternion", {"conversionType" : repr("EULER_TO_QUATERNION")})
+        insertNode(layout, "an_ConvertQuaternionAndEuler", "Quaternion to Euler", {"conversionType" : repr("QUATERNION_TO_EULER")})
 
 class MatrixMenu(bpy.types.Menu):
     bl_idname = "an_matrix_menu"
@@ -202,17 +215,17 @@ class ObjectMenu(bpy.types.Menu):
         insertNode(layout, "an_ObjectAttributeOutputNode", "Attribute Output")
         insertNode(layout, "an_ObjectVisibilityInputNode", "Visibility Input")
         insertNode(layout, "an_ObjectVisibilityOutputNode", "Visibility Output")
-        insertNode(layout, "an_ObjectDataPathOutputNode", "Data Path Output")		
+        insertNode(layout, "an_ObjectDataPathOutputNode", "Data Path Output")
         layout.separator()
         insertNode(layout, "an_MoveObjectNode", "Move")
         insertNode(layout, "an_TransformObjectNode", "Transform")
         insertNode(layout, "an_ObjectIDKeyNode", "ID Key")
         insertNode(layout, "an_CopyObjectDataNode", "Copy Data")
         insertNode(layout, "an_CopyTransformsNode", "Copy Transformations")
-        insertNode(layout, "an_ObjectBoundingBoxNode", "Get Bounding Box")		
+        insertNode(layout, "an_ObjectBoundingBoxNode", "Get Bounding Box")
         insertNode(layout, "an_SetKeyframesNode", "Set Keyframes")
         insertNode(layout, "an_ResetObjectTransformsNode", "Reset Transformations")
-        insertNode(layout, "an_UpdateObjectMatricesNode", "Update Matrices")		
+        insertNode(layout, "an_UpdateObjectMatricesNode", "Update Matrices")
         layout.separator()
         insertNode(layout, "an_ObjectInstancerNode", "Instancer")
 
@@ -289,7 +302,7 @@ class SplineMenu(bpy.types.Menu):
         insertNode(layout, "an_SplineInfoNode", "Info")
         insertNode(layout, "an_EvaluateSplineNode", "Evaluate")
         insertNode(layout, "an_ProjectOnSplineNode", "Project")
-        insertNode(layout, "an_ConnectSplinesNode", "Connect")		
+        insertNode(layout, "an_ConnectSplinesNode", "Connect")
         insertNode(layout, "an_GetSplineLengthNode", "Get Length")
         insertNode(layout, "an_GetSplineSamplesNode", "Get Samples")
         layout.separator()
