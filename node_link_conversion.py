@@ -38,6 +38,24 @@ class LinkCorrection:
     # subclasses need a check and insert function
     pass
 
+class ConvertEulerToQuaternion(LinkCorrection):
+    def check(self, origin, target):
+        return origin.dataType == "Euler" and target.dataType == "Quaternion"
+    def insert(self, nodeTree, origin, target, dataOrigin):
+        node = insertLinkedNode(nodeTree, "an_ConvertQuaternionAndEulerNode", origin, target)
+        node.conversionType = "EULER_TO_QUATERNION"
+        node.inputs[0].linkWith(origin)
+        node.outputs[0].linkWith(target)
+
+class ConvertQuaternionToEuler(LinkCorrection):
+    def check(self, origin, target):
+        return origin.dataType == "Quaternion" and target.dataType == "Euler"
+    def insert(self, nodeTree, origin, target, dataOrigin):
+        node = insertLinkedNode(nodeTree, "an_ConvertQuaternionAndEulerNode", origin, target)
+        node.conversionType = "QUATERNION_TO_EULER"
+        node.inputs[0].linkWith(origin)
+        node.outputs[0].linkWith(target)
+
 class ConvertParticleSystemToParticle(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType == "Particle System" and target.dataType == "Particle"
@@ -196,6 +214,8 @@ def getSocketCenter(socket1, socket2):
     return (socket1.node.viewLocation + socket2.node.viewLocation) / 2
 
 linkCorrectors = [
+    ConvertEulerToQuaternion(),
+    ConvertQuaternionToEuler(),
     ConvertParticleSystemToParticle(),
     ConvertParticleSystemToParticles(),
     ConvertListToElement(),

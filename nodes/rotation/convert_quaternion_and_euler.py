@@ -7,8 +7,8 @@ conversionTypeItems = [
     ("QUATERNION_TO_EULER", "Quaternion to Euler", "", "NONE", 0),
     ("EULER_TO_QUATERNION", "Euler To Quaternion", "", "NONE", 1)]
 
-class ConvertQuaternionAndEuler(bpy.types.Node, AnimationNode):
-    bl_idname = "an_ConvertQuaternionAndEuler"
+class ConvertQuaternionAndEulerNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_ConvertQuaternionAndEulerNode"
     bl_label = "Convert Quaternion and Euler"
 
     onlySearchTags = True
