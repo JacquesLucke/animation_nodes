@@ -12,6 +12,8 @@ class SetMeshDataOnObjectNode(bpy.types.Node, AnimationNode):
     errorMessage = StringProperty()
     checkIndices = BoolProperty(name = "Check Indices", default = True,
         description = "Check that the highest edge or polygon index is below the vertex amount (unchecking can crash Blender when the mesh data is invalid)")
+    validateTargetMesh = BoolProperty(name = "Validate Target Mesh", default = True,
+        description = "Correct the target mesh object so that it can be edited without crashing Blender")
 
     def create(self):
         self.width = 170
@@ -27,6 +29,7 @@ class SetMeshDataOnObjectNode(bpy.types.Node, AnimationNode):
 
     def drawAdvanced(self, layout):
         layout.prop(self, "checkIndices")
+        layout.prop(self, "validateTargetMesh")
 
     def execute(self, object, meshData):
         if object is None: return object
@@ -43,6 +46,8 @@ class SetMeshDataOnObjectNode(bpy.types.Node, AnimationNode):
                 return object
 
         object.data.from_pydata(vertices, edges, polygons)
+        if self.validateTargetMesh: object.data.validate()
+
         self.errorMessage = ""
         return object
 
