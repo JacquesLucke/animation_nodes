@@ -105,8 +105,8 @@ class RotationMenu(bpy.types.Menu):
         insertNode(layout, "an_CombineQuaternionNode", "Combine Quaternion")
         insertNode(layout, "an_DirectionToRotationNode", "Direction to Rotation")
         layout.separator()
-        insertNode(layout, "an_ConvertQuaternionAndEuler", "Euler to Quaternion", {"conversionType" : repr("EULER_TO_QUATERNION")})
-        insertNode(layout, "an_ConvertQuaternionAndEuler", "Quaternion to Euler", {"conversionType" : repr("QUATERNION_TO_EULER")})
+        insertNode(layout, "an_ConvertQuaternionAndEulerNode", "Euler to Quaternion", {"conversionType" : repr("EULER_TO_QUATERNION")})
+        insertNode(layout, "an_ConvertQuaternionAndEulerNode", "Quaternion to Euler", {"conversionType" : repr("QUATERNION_TO_EULER")})
 
 class MatrixMenu(bpy.types.Menu):
     bl_idname = "an_matrix_menu"
