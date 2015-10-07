@@ -5,7 +5,11 @@ from ... base_types.node import AnimationNode
 
 conversionTypeItems = [
     ("QUATERNION_TO_EULER", "Quaternion to Euler", "", "NONE", 0),
-    ("EULER_TO_QUATERNION", "Euler To Quaternion", "", "NONE", 1)]
+    ("EULER_TO_QUATERNION", "Euler To Quaternion", "", "NONE", 1),
+    ("QUATERNION_TO_MATRIX", "Quaternion to Matrix", "", "NONE", 2),
+    ("MATRIX_TO_QUATERNION", "Matrix To Quaternion", "", "NONE", 3),
+    ("EULER_TO_MATRIX", "Euler To Matrix", "", "NONE", 4),
+    ("MATRIX_TO_EULER", "Matrix To Euler", "", "NONE", 5)]
 
 class ConvertQuaternionAndEulerNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ConvertQuaternionAndEulerNode"
@@ -14,7 +18,11 @@ class ConvertQuaternionAndEulerNode(bpy.types.Node, AnimationNode):
     onlySearchTags = True
     searchTags = [
         ("Quaternion to Euler", {"conversionType" : repr("QUATERNION_TO_EULER")}),
-        ("Euler to Quaternion", {"conversionType" : repr("EULER_TO_QUATERNION")}) ]
+        ("Euler to Quaternion", {"conversionType" : repr("EULER_TO_QUATERNION")}),
+        ("Quaternion to Matrix", {"conversionType" : repr("QUATERNION_TO_MATRIX")}),
+        ("Matrix to Quaternion", {"conversionType" : repr("MATRIX_TO_QUATERNION")}),
+        ("Euler To Matrix", {"conversionType" : repr("EULER_TO_MATRIX")}),
+        ("Matrix To Euler", {"conversionType" : repr("MATRIX_TO_EULER")}) ]
 
     def conversionTypeChanged(self, context):
         self.createSockets()
@@ -31,13 +39,24 @@ class ConvertQuaternionAndEulerNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "conversionType", text = "")
 
     def drawLabel(self):
-        return "Euler to Quaternion" if self.conversionType == "EULER_TO_QUATERNION" else "Quaternion to Euler"
+        for item in conversionTypeItems:
+            if self.conversionType == item[0]: return item[1]
 
     def getExecutionCode(self):
         if self.conversionType == "QUATERNION_TO_EULER":
             return "euler = quaternion.to_euler('XYZ')"
         if self.conversionType == "EULER_TO_QUATERNION":
             return "quaternion = euler.to_quaternion()"
+        
+        if self.conversionType == "QUATERNION_TO_MATRIX":
+            return "matrix = quaternion.to_matrix().to_4x4()"
+        if self.conversionType == "MATRIX_TO_QUATERNION":
+            return "quaternion = matrix.to_quaternion()"
+        
+        if self.conversionType == "EULER_TO_MATRIX":
+            return "matrix = euler.to_matrix().to_4x4()"
+        if self.conversionType == "MATRIX_TO_EULER":
+            return "euler = matrix.to_euler('XYZ')"
 
     def getUsedModules(self):
         return ["mathutils"]
@@ -52,4 +71,19 @@ class ConvertQuaternionAndEulerNode(bpy.types.Node, AnimationNode):
         if self.conversionType == "EULER_TO_QUATERNION":
             self.inputs.new("an_EulerSocket", "Euler", "euler")
             self.outputs.new("an_QuaternionSocket", "Quaternion", "quaternion")
+            
+        if self.conversionType == "QUATERNION_TO_MATRIX":
+            self.inputs.new("an_QuaternionSocket", "Quaternion", "quaternion")
+            self.outputs.new("an_MatrixSocket", "Matrix", "matrix")
+        if self.conversionType == "MATRIX_TO_QUATERNION":
+            self.inputs.new("an_MatrixSocket", "Matrix", "matrix")
+            self.outputs.new("an_QuaternionSocket", "Quaternion", "quaternion")
+            
+        if self.conversionType == "EULER_TO_MATRIX":
+            self.inputs.new("an_EulerSocket", "Euler", "euler")
+            self.outputs.new("an_MatrixSocket", "Matrix", "matrix")
+        if self.conversionType == "MATRIX_TO_EULER":
+            self.inputs.new("an_MatrixSocket", "Matrix", "matrix")
+            self.outputs.new("an_EulerSocket", "Euler", "euler")
+            
         self.inputs[0].defaultDrawType = "PROPERTY_ONLY"
