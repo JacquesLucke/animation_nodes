@@ -226,6 +226,7 @@ class ObjectMenu(bpy.types.Menu):
         insertNode(layout, "an_SetKeyframesNode", "Set Keyframes")
         insertNode(layout, "an_ResetObjectTransformsNode", "Reset Transformations")
         insertNode(layout, "an_UpdateObjectMatricesNode", "Update Matrices")
+        insertNode(layout, "an_ObjectLayerVisibilityOutputNode", "Layer Visibility Output")
         layout.separator()
         insertNode(layout, "an_ObjectInstancerNode", "Instancer")
 
