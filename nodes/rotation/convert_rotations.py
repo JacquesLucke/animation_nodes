@@ -5,15 +5,15 @@ from ... base_types.node import AnimationNode
 
 conversionTypeItems = [
     ("QUATERNION_TO_EULER", "Quaternion to Euler", "", "NONE", 0),
-    ("EULER_TO_QUATERNION", "Euler To Quaternion", "", "NONE", 1),
+    ("EULER_TO_QUATERNION", "Euler to Quaternion", "", "NONE", 1),
     ("QUATERNION_TO_MATRIX", "Quaternion to Matrix", "", "NONE", 2),
-    ("MATRIX_TO_QUATERNION", "Matrix To Quaternion", "", "NONE", 3),
-    ("EULER_TO_MATRIX", "Euler To Matrix", "", "NONE", 4),
-    ("MATRIX_TO_EULER", "Matrix To Euler", "", "NONE", 5)]
+    ("MATRIX_TO_QUATERNION", "Matrix to Quaternion", "", "NONE", 3),
+    ("EULER_TO_MATRIX", "Euler to Matrix", "", "NONE", 4),
+    ("MATRIX_TO_EULER", "Matrix to Euler", "", "NONE", 5)]
 
-class ConvertQuaternionAndEulerNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_ConvertQuaternionAndEulerNode"
-    bl_label = "Convert Quaternion and Euler"
+class ConvertRotationsNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_ConvertRotationsNode"
+    bl_label = "Convert Rotations"
 
     onlySearchTags = True
     searchTags = [
@@ -21,8 +21,8 @@ class ConvertQuaternionAndEulerNode(bpy.types.Node, AnimationNode):
         ("Euler to Quaternion", {"conversionType" : repr("EULER_TO_QUATERNION")}),
         ("Quaternion to Matrix", {"conversionType" : repr("QUATERNION_TO_MATRIX")}),
         ("Matrix to Quaternion", {"conversionType" : repr("MATRIX_TO_QUATERNION")}),
-        ("Euler To Matrix", {"conversionType" : repr("EULER_TO_MATRIX")}),
-        ("Matrix To Euler", {"conversionType" : repr("MATRIX_TO_EULER")}) ]
+        ("Euler to Matrix", {"conversionType" : repr("EULER_TO_MATRIX")}),
+        ("Matrix to Euler", {"conversionType" : repr("MATRIX_TO_EULER")}) ]
 
     def conversionTypeChanged(self, context):
         self.createSockets()
