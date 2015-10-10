@@ -38,6 +38,12 @@ class LinkCorrection:
     # subclasses need a check and insert function
     pass
 
+class ConvertNumberToEuler(LinkCorrection):
+    def check(self, origin, target):
+        return origin.dataType in ["Integer", "Float"] and target.dataType == "Euler"
+    def insert(self, nodeTree, origin, target, dataOrigin):
+        insertLinkedNode(nodeTree, "an_CombineEulerNode", origin, target)
+
 class ConvertVectorToEuler(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType == "Vector" and target.dataType == "Euler"
@@ -146,7 +152,7 @@ class ConvertSeparatedMeshDataToBMesh(LinkCorrection):
         nodeTree.links.new(toMesh.inputs[0], toMeshData.outputs[0])
         nodeTree.links.new(toMesh.outputs[0], target)
 
-class ConvertToVector(LinkCorrection):
+class ConvertNumberToVector(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType in ["Integer", "Float"] and target.dataType == "Vector"
     def insert(self, nodeTree, origin, target, dataOrigin):
@@ -232,6 +238,7 @@ def getSocketCenter(socket1, socket2):
     return (socket1.node.viewLocation + socket2.node.viewLocation) / 2
 
 linkCorrectors = [
+    ConvertNumberToEuler(),
     ConvertVectorToEuler(),
     ConvertEulerToVector(),
     ConvertEulerToQuaternion(),
@@ -246,7 +253,7 @@ linkCorrectors = [
     ConvertPolygonListIndicesToEdgeListIndices(),
     ConvertIntegerListToPolygonIndices(),
     ConvertSeparatedMeshDataToBMesh(),
-    ConvertToVector(),
+    ConvertNumberToVector(),
     ConvertVectorToNumber(),
     ConvertTextBlockToString(),
     ConvertVectorToMatrix(),
