@@ -206,7 +206,6 @@ class ObjectMenu(bpy.types.Menu):
         insertNode(layout, "an_CreateObjectNode", "Create")
         insertNode(layout, "an_DataInputNode", "Input", {"assignedType" : repr("Object")})
         insertNode(layout, "an_CreateListNode", "List", {"assignedType" : repr("Object")})
-        insertNode(layout, "an_ObjectNameFilterNode", "List by name")
         insertNode(layout, "an_GetObjectsFromGroupNode", "From Group")
         layout.separator()
         insertNode(layout, "an_ObjectTransformsInputNode", "Transforms Input")
