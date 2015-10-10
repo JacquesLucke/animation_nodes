@@ -39,7 +39,7 @@ class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
             self.outputs.new("an_BooleanSocket", "Exists", "exists")
             if self.keyType == "Transforms":
                 self.outputs.new("an_VectorSocket", "Location", "location")
-                self.outputs.new("an_VectorSocket", "Rotation", "rotation")
+                self.outputs.new("an_EulerSocket", "Rotation", "rotation")
                 self.outputs.new("an_VectorSocket", "Scale", "scale")
             if self.keyType == "Float":
                 self.outputs.new("an_FloatSocket", "Float", "float")

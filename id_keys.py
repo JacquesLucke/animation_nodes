@@ -1,6 +1,6 @@
 import bpy
-from mathutils import Vector
 from bpy.props import *
+from mathutils import Vector, Euler
 from . utils.path import toIDPropertyPath as toPath
 from . utils.enum_items import enumItemsFromDicts
 
@@ -129,7 +129,7 @@ class TransformsIDType:
         rotation = getProp(object, prefix + id + " Rotation", (0, 0, 0))
         scale = getProp(object, prefix + id + " Scale", (1, 1, 1))
 
-        return Vector(location), Vector(rotation), Vector(scale)
+        return Vector(location), Euler(rotation), Vector(scale)
 
     @staticmethod
     def write(object, id, data):
