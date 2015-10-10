@@ -1,5 +1,6 @@
 import bpy
 from bpy.props import *
+from ... tree_info import keepNodeLinks
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 
@@ -16,13 +17,7 @@ class ConvertRotationsNode(bpy.types.Node, AnimationNode):
     bl_label = "Convert Rotations"
 
     onlySearchTags = True
-    searchTags = [
-        ("Quaternion to Euler", {"conversionType" : repr("QUATERNION_TO_EULER")}),
-        ("Euler to Quaternion", {"conversionType" : repr("EULER_TO_QUATERNION")}),
-        ("Quaternion to Matrix", {"conversionType" : repr("QUATERNION_TO_MATRIX")}),
-        ("Matrix to Quaternion", {"conversionType" : repr("MATRIX_TO_QUATERNION")}),
-        ("Euler to Matrix", {"conversionType" : repr("EULER_TO_MATRIX")}),
-        ("Matrix to Euler", {"conversionType" : repr("MATRIX_TO_EULER")}) ]
+    searchTags = [(name, {"conversionType" : repr(type)}) for type, name, _,_,_ in conversionTypeItems]
 
     def conversionTypeChanged(self, context):
         self.createSockets()
@@ -61,6 +56,7 @@ class ConvertRotationsNode(bpy.types.Node, AnimationNode):
     def getUsedModules(self):
         return ["mathutils"]
 
+    @keepNodeLinks
     def createSockets(self):
         self.inputs.clear()
         self.outputs.clear()
