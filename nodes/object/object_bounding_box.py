@@ -7,7 +7,7 @@ class ObjectBoundingBoxNode(bpy.types.Node, AnimationNode):
     bl_label = "Object Bounding Box"
 
     def create(self):
-        self.inputs.new("an_ObjectSocket", "Object", "object")
+        self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
         self.outputs.new("an_VectorListSocket", "Vertices", "vertices")
         self.outputs.new("an_EdgeIndicesListSocket", "Edges", "edges")
         self.outputs.new("an_PolygonIndicesListSocket", "Polygons", "polygons")
