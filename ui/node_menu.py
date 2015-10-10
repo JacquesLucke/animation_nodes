@@ -219,18 +219,26 @@ class ObjectMenu(bpy.types.Menu):
         insertNode(layout, "an_ObjectVisibilityOutputNode", "Visibility Output")
         insertNode(layout, "an_ObjectDataPathOutputNode", "Data Path Output")
         layout.separator()
-        insertNode(layout, "an_MoveObjectNode", "Move")
-        insertNode(layout, "an_TransformObjectNode", "Transform")
         insertNode(layout, "an_ObjectIDKeyNode", "ID Key")
         insertNode(layout, "an_CopyObjectDataNode", "Copy Data")
-        insertNode(layout, "an_CopyTransformsNode", "Copy Transformations")
-        insertNode(layout, "an_ObjectBoundingBoxNode", "Get Bounding Box")
         insertNode(layout, "an_SetKeyframesNode", "Set Keyframes")
-        insertNode(layout, "an_ResetObjectTransformsNode", "Reset Transformations")
-        insertNode(layout, "an_UpdateObjectMatricesNode", "Update Matrices")
         insertNode(layout, "an_ObjectLayerVisibilityOutputNode", "Layer Visibility Output")
+        layout.menu("an_object_utils_menu", text = "Utils")
         layout.separator()
         insertNode(layout, "an_ObjectInstancerNode", "Instancer")
+
+class ObjectUtilsMenu(bpy.types.Menu):
+    bl_idname = "an_object_utils_menu"
+    bl_label = "Object Utils Menu"
+
+    def draw(self, context):
+        layout = self.layout
+        insertNode(layout, "an_MoveObjectNode", "Move")
+        insertNode(layout, "an_TransformObjectNode", "Transform")
+        insertNode(layout, "an_UpdateObjectMatricesNode", "Update Matrices")
+        insertNode(layout, "an_ResetObjectTransformsNode", "Reset Transformations")
+        insertNode(layout, "an_CopyTransformsNode", "Copy Transformations")
+        insertNode(layout, "an_ObjectBoundingBoxNode", "Get Bounding Box")
 
 class MeshMenu(bpy.types.Menu):
     bl_idname = "an_mesh_menu"
