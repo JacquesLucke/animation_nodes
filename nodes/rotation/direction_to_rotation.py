@@ -31,18 +31,19 @@ class DirectionToRotationNode(bpy.types.Node, AnimationNode):
         if self.trackAxis[-1:] == self.guideAxis[-1:]:
             yield "eulerRotation = mathutils.Euler((0, 0, 0), 'XYZ')"
             return
+        
+        yield "zero, worldX, worldY, worldZ = " + getWorldVectors()
 
-        yield "if direction != 0: z = direction.normalized()"
-        if "X" in self.trackAxis: yield "else: z = mathutils.Vector((1, 0, 0))"
-        if "Y" in self.trackAxis: yield "else: z = mathutils.Vector((0, 1, 0))"
-        if "Z" in self.trackAxis: yield "else: z = mathutils.Vector((0, 0, 1))"
+        yield "if direction != zero: z = direction.normalized()"
+        if "X" in self.trackAxis: yield "else: z = worldX"
+        if "Y" in self.trackAxis: yield "else: z = worldY"
+        if "Z" in self.trackAxis: yield "else: z = worldZ"
 
-        yield "if guide != 0 and z.cross(guide) != 0: correctedGuide = guide.normalized()"
-        if "X" == self.guideAxis: yield "else: correctedGuide = mathutils.Vector((1, 0, 0))"
-        if "Y" == self.guideAxis: yield "else: correctedGuide = mathutils.Vector((0, 1, 0))"
-        if "Z" == self.guideAxis: yield "else: correctedGuide = mathutils.Vector((0, 0, 1))"
+        yield "if guide != zero and z.cross(guide) != zero: y = z.cross(guide.normalized())"
+        if "X" == self.guideAxis: yield "else: y = z.cross(worldX) if z.cross(worldX) != zero else worldZ"
+        if "Y" == self.guideAxis: yield "else: y = z.cross(worldY) if z.cross(worldY) != zero else worldZ"
+        if "Z" == self.guideAxis: yield "else: y = z.cross(worldZ) if z.cross(worldZ) != zero else worldY"
 
-        yield "y = z.cross(correctedGuide)"
         yield "x = y.cross(z)"
 
         yield "mx, my, mz = " + getAxesChange(self.trackAxis, self.guideAxis)
@@ -62,3 +63,10 @@ def getAxesChange(track, guide):
     elif track == "-Y": a = "(-y,-z, x)" if guide == "Z" else "( x,-z, y)"
     elif track == "-Z": a = "( x,-y,-z)" if guide == "X" else "( y, x,-z)"
     return a
+
+def getWorldVectors():
+    o = "mathutils.Vector((0, 0, 0))"
+    x = "mathutils.Vector((1, 0, 0))"
+    y = "mathutils.Vector((0, 1, 0))"
+    z = "mathutils.Vector((0, 0, 1))"
+    return o + ", " + x + ", "+ y + ", "+ z
