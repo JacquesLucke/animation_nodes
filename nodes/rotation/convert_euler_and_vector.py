@@ -21,7 +21,7 @@ class ConvertVectorAndEulerNode(bpy.types.Node, AnimationNode):
     useDegree = BoolProperty(name = "Use Degree", default = False,
         update = executionCodeChanged)
 
-    conversionType = EnumProperty(name = "Conversion Type",
+    conversionType = EnumProperty(name = "Conversion Type", default = "VECTOR_TO_EULER",
         update = conversionTypeChanged, items = conversionTypeItems)
 
     def create(self):
