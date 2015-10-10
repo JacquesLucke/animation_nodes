@@ -102,12 +102,13 @@ class RotationMenu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         insertNode(layout, "an_CombineEulerNode", "Combine Euler")
-        insertNode(layout, "an_EulerFromVectorNode", "Euler from Vector")
         insertNode(layout, "an_CombineQuaternionNode", "Combine Quaternion")
         insertNode(layout, "an_DirectionToRotationNode", "Direction to Rotation")
         layout.separator()
         insertNode(layout, "an_ConvertQuaternionAndEulerNode", "Euler to Quaternion", {"conversionType" : repr("EULER_TO_QUATERNION")})
         insertNode(layout, "an_ConvertQuaternionAndEulerNode", "Quaternion to Euler", {"conversionType" : repr("QUATERNION_TO_EULER")})
+        insertNode(layout, "an_ConvertVectorAndEulerNode", "Euler to Vector", {"conversionType" : repr("EULER_TO_VECTOR")})
+        insertNode(layout, "an_ConvertVectorAndEulerNode", "Vector to Euler", {"conversionType" : repr("VECTOR_TO_EULER")})
 
 class MatrixMenu(bpy.types.Menu):
     bl_idname = "an_matrix_menu"
