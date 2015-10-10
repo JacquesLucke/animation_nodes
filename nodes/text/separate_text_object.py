@@ -82,12 +82,6 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
         createIDKey("Initial Text", "String")
 
         objects = splitTextObject(source)
-        for i, object in enumerate(objects):
-            object[idPropertyName] = self.currentID
-            object[indexPropertyName] = i
-            setIDKeyData(object, "Initial Transforms", "Transforms", (object.location, object.rotation_euler, object.scale))
-            setIDKeyData(object, "Initial Text", "String", getattr(object.data, "body", ""))
-        self.objectCount = len(objects)
 
         onlySelectList(objects)
         if self.outputType in ("MESH", "CURVE"):
@@ -98,6 +92,13 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
 
         if self.parentLetters:
             parentObjectsToMainControler(objects)
+
+        for i, object in enumerate(objects):
+            object[idPropertyName] = self.currentID
+            object[indexPropertyName] = i
+            setIDKeyData(object, "Initial Transforms", "Transforms", (object.location, object.rotation_euler, object.scale))
+            setIDKeyData(object, "Initial Text", "String", getattr(object.data, "body", ""))
+        self.objectCount = len(objects)
 
         material = bpy.data.materials.get(self.materialName)
         if material:
