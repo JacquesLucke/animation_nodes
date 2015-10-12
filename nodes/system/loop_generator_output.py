@@ -1,4 +1,5 @@
 import bpy
+import random
 from bpy.props import *
 from ... events import treeChanged
 from ... base_types.node import AnimationNode
@@ -36,7 +37,7 @@ class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.listDataType = "Vector List"
-        self.sortIndex = id(self)
+        self.sortIndex = getRandomSortIndex()
 
     def draw(self, layout):
         node = self.loopInputNode
@@ -76,6 +77,7 @@ class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
         subprogramInterfaceChanged()
 
     def duplicate(self, source):
+        self.sortIndex += getRandomSortIndex()
         subprogramInterfaceChanged()
 
     def getTemplateCode(self):
@@ -96,3 +98,6 @@ class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
     @property
     def addSocket(self):
         return self.inputs[1]
+
+def getRandomInt():
+    return int(random.random() * 10000)
