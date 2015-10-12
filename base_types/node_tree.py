@@ -84,7 +84,10 @@ class AnimationNodeTree(bpy.types.NodeTree):
 
     def _execute(self):
         units = self.mainUnits
-        if len(units) == 0: return
+        if len(units) == 0:
+            self.executionTime = 0
+            return
+            
         clearDebugLoopTextBlocks(self)
         start = time.clock()
         for unit in units:
