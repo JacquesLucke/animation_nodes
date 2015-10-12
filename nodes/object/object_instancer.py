@@ -7,13 +7,17 @@ from ... utils.blender_ui import iterActiveSpacesByType
 from ... nodes.container_provider import getMainObjectContainer
 from ... utils.names import (getPossibleObjectName,
                                      getPossibleMeshName,
-                                     getPossibleCurveName,
                                      getPossibleCameraName,
                                      getPossibleLampName,
                                      getPossibleCurveName)
 
-objectTypes = ["Mesh", "Text", "Camera", "Point Lamp", "Curve"]
-objectTypeItems = [(type, type, "") for type in objectTypes]
+objectTypeItems = [
+    ("Mesh", "Mesh", "", "MESH_DATA", 0),
+    ("Text", "Text", "", "FONT_DATA", 1),
+    ("Camera", "Camera", "", "CAMERA_DATA", 2),
+    ("Point Lamp", "Point Lamp", "", "LAMP_POINT", 3),
+    ("Curve 2D", "Curve 2D", "", "FORCE_CURVE", 4),
+    ("Curve 3D", "Curve 3D", "", "CURVE_DATA", 5) ]
 
 class an_ObjectNamePropertyGroup(bpy.types.PropertyGroup):
     objectName = StringProperty(name = "Object Name", default = "", update = propertyChanged)
@@ -241,8 +245,10 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
                 return bpy.data.cameras.new(getPossibleCameraName("instance camera"))
             elif self.objectType == "Point Lamp":
                 return bpy.data.lamps.new(getPossibleLampName("instance lamp"), type = "POINT")
-            elif self.objectType == "Curve":
-                return bpy.data.curves.new(getPossibleCurveName("instance curve"), type = "CURVE")
+            elif self.objectType.startswith("Curve"):
+                curve = bpy.data.curves.new(getPossibleCurveName("instance curve"), type = "CURVE")
+                curve.dimensions = self.objectType[-2:]
+                return curve
         return None
 
     def unlinkInstance(self, object):
