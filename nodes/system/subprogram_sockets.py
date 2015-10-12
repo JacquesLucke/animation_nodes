@@ -9,6 +9,9 @@ def _updateSubprogramInvokerNodes():
 
 subprogramChanged = False
 
+def forceSubprogramUpdate():
+    _updateSubprogramInvokerNodes()
+
 def updateIfNecessary():
     global subprogramChanged
     if subprogramChanged: _updateSubprogramInvokerNodes()

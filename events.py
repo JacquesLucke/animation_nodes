@@ -1,5 +1,6 @@
 import bpy
 from . import tree_info
+from . import file_tests
 from . import event_handler
 from bpy.app.handlers import persistent
 
@@ -53,6 +54,7 @@ def propertyChanged(self = None, context = None):
 
 @persistent
 def fileLoaded(scene):
+    file_tests.checkCurrentFile()
     event.fileChanged = True
     treeChanged()
 
