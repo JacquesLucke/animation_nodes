@@ -77,7 +77,7 @@ class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
         subprogramInterfaceChanged()
 
     def duplicate(self, source):
-        self.sortIndex += getRandomSortIndex()
+        self.sortIndex = getRandomSortIndex()
         subprogramInterfaceChanged()
 
     def getTemplateCode(self):

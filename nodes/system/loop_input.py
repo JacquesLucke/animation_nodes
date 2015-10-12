@@ -71,7 +71,7 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         col = layout.column()
         col.label("List Generators:")
         box = col.box()
-        for node in self.getGeneratorNodes():
+        for node in self.getSortedGeneratorNodes():
             box.label("{} - {}".format(repr(node.outputName), node.listDataType))
         self.invokeSocketTypeChooser(box, "createGeneratorOutputNode", socketGroup = "LIST", text = "New Generator", icon = "PLUS")
 
@@ -173,7 +173,7 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
                 socketData.identifier += "_output"
 
     def insertGeneratorData(self, data):
-        for node in self.getGeneratorNodes():
+        for node in self.getSortedGeneratorNodes():
             data.newOutput(toIdName(node.listDataType), node.identifier, node.outputName)
 
 
@@ -225,9 +225,11 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     def getParameterSockets(self):
         return self.outputs[self.newIteratorSocket.index + 1:self.newParameterSocket.index]
 
-    def getGeneratorNodes(self):
+    def getSortedGeneratorNodes(self):
         nodes = self.network.generatorOutputNodes
         nodes.sort(key = attrgetter("sortIndex"))
+        for i, node in enumerate(nodes):
+            node.sortIndex = i
         return nodes
 
     def getReassignParameterNodes(self):

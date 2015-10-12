@@ -138,7 +138,7 @@ class LoopExecutionUnit:
 
     def get_InitializeGenerators(self, inputNode, variables):
         lines = []
-        for i, node in enumerate(inputNode.getGeneratorNodes()):
+        for i, node in enumerate(inputNode.getSortedGeneratorNodes()):
             name = "loop_generator_output_" + str(i)
             variables[node] = name
             lines.append("{} = []".format(name))
@@ -166,7 +166,7 @@ class LoopExecutionUnit:
 
     def get_AddToGenerators(self, inputNode, variables):
         lines = []
-        for node in inputNode.getGeneratorNodes():
+        for node in inputNode.getSortedGeneratorNodes():
             operation = "append" if node.addType == "APPEND" else "extend"
             lines.append("if {}:".format(variables[node.enabledSocket]))
             socket = node.addSocket
@@ -189,7 +189,7 @@ class LoopExecutionUnit:
     def get_ReturnStatement(self, inputNode, variables):
         names = []
         names.extend(["loop_iterator_" + str(i) for i, socket in enumerate(inputNode.getIteratorSockets()) if socket.loop.useAsOutput])
-        names.extend([variables[node] for node in inputNode.getGeneratorNodes()])
+        names.extend([variables[node] for node in inputNode.getSortedGeneratorNodes()])
         names.extend([variables[socket] for socket in inputNode.getParameterSockets() if socket.loop.useAsOutput])
         return "return {}".format(", ".join(names))
 
