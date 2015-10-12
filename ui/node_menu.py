@@ -150,6 +150,7 @@ class TextMenu(bpy.types.Menu):
         insertNode(layout, "an_ReplicateStringsNode", "Replicate")
         insertNode(layout, "an_ReplaceTextNode", "Replace")
         insertNode(layout, "an_TrimTextNode", "Trim")
+        insertNode(layout, "an_FillStringNode", "Fill")
         insertNode(layout, "an_StringLengthNode", "Length")
         layout.separator()
         insertNode(layout, "an_SeparateTextObjectNode", "Object Separate")
