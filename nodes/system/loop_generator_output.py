@@ -100,4 +100,5 @@ class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
         return self.inputs[1]
 
 def getRandomInt():
+    random.seed()
     return int(random.random() * 10000)
