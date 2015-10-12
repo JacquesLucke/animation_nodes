@@ -1,9 +1,9 @@
 import bpy
 from ... base_types.node import AnimationNode
 
-class MakeObjectSmoothNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_MakeObjectSmoothNode"
-    bl_label = "Make Object Smooth"
+class ShadeObjectSmooth(bpy.types.Node, AnimationNode):
+    bl_idname = "an_ShadeObjectSmoothNode"
+    bl_label = "Shade Object Smooth"
 
     def create(self):
         self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"

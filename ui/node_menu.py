@@ -293,7 +293,7 @@ class MeshFinalizingMenu(bpy.types.Menu):
         layout = self.layout
         insertNode(layout, "an_BMeshRemoveDoublesNode", "Remove Doubles")
         insertNode(layout, "an_BMeshRecalculateFaceNormalsNode", "Recalculate Normals")
-        insertNode(layout, "an_MakeObjectSmoothNode", "Smooth Object")
+        insertNode(layout, "an_ShadeObjectSmoothNode", "Shade Object Smooth")
 
 class SplineMenu(bpy.types.Menu):
     bl_idname = "an_spline_menu"
