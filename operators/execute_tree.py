@@ -14,5 +14,5 @@ class ExecuteNodeTree(bpy.types.Operator):
             if nodeTree.bl_idname == "an_AnimationNodeTree":
                 nodeTree.execute()
                 return {"FINISHED"}
-        self.report("ERROR", "{} is no animation nodes tree".format(repr(self.name)))
+        self.report({"ERROR"}, "{} is no animation nodes tree".format(repr(self.name)))
         return {"CANCELLED"}
