@@ -37,7 +37,7 @@ class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.listDataType = "Vector List"
-        self.sortIndex = getRandomSortIndex()
+        self.sortIndex = getRandomInt()
 
     def draw(self, layout):
         node = self.loopInputNode
@@ -77,7 +77,7 @@ class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
         subprogramInterfaceChanged()
 
     def duplicate(self, source):
-        self.sortIndex = getRandomSortIndex()
+        self.sortIndex = getRandomInt()
         subprogramInterfaceChanged()
 
     def getTemplateCode(self):
