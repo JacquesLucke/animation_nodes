@@ -11,7 +11,7 @@ class InterpolationPreview:
         self.resolution = resolution
         self.padding = 5
         self.boundary = Rectangle()
-        self.boundary.color = (0.9, 0.9, 0.9, 1)
+        self.boundary.color = (0.9, 0.9, 0.9, 0.6)
         self.boundary.borderThickness = -1
         self.boundary.borderColor = (0.9, 0.76, 0.4, 1.0)
         self.samples = sampleInterpolation(interpolation, amount = resolution)

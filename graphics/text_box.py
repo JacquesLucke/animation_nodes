@@ -15,7 +15,7 @@ class TextBox:
         self.lineHeight = self.fontSize / 5 * lineHeightFactor
 
         self.boundary = Rectangle()
-        self.boundary.color = (0.9, 0.9, 0.9, 1)
+        self.boundary.color = (0.9, 0.9, 0.9, 0.6)
         self.boundary.borderThickness = -1
         self.boundary.borderColor = (0.9, 0.76, 0.4, 1.0)
 
