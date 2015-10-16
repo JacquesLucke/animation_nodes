@@ -228,8 +228,10 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     def getSortedGeneratorNodes(self):
         nodes = self.network.generatorOutputNodes
         nodes.sort(key = attrgetter("sortIndex"))
-        for i, node in enumerate(nodes):
-            node.sortIndex = i
+        try:
+            for i, node in enumerate(nodes):
+                node.sortIndex = i
+        except: pass # The function has been called while drawing the interface
         return nodes
 
     def getReassignParameterNodes(self):
