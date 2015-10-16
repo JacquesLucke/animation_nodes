@@ -51,7 +51,7 @@ class SplineListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         self.objectName, self.useWorldSpace = data
 
     def getProperty(self):
-        return (self.objectName, self.useWorldSpace)
+        return self.objectName, self.useWorldSpace
 
     def getCopyExpression(self):
         return "[element.copy() for element in value]"

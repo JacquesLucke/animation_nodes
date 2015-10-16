@@ -79,7 +79,8 @@ class SubprogramData:
 
     def newSocketFromData(self, nodeSockets, data):
         newSocket = nodeSockets.new(data.idName, data.identifier, data.identifier)
-        if newSocket.isInput: newSocket.setProperty(data.defaultValue)
+        if newSocket.isInput and not data.defaultValue == NoDefaultValue:
+            newSocket.setProperty(data.defaultValue)
         newSocket.text = data.text
         newSocket.display.text = True
         newSocket.dataIsModified = True
@@ -102,3 +103,7 @@ class SocketData:
                           socket.identifier,
                           socket.text,
                           socket.getProperty())
+
+
+class NoDefaultValue:
+    pass

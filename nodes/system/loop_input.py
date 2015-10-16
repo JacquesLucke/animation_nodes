@@ -11,7 +11,7 @@ from . subprogram_base import SubprogramBaseNode
 from ... utils.nodes import newNodeAtCursor, invokeTranslation
 from ... sockets.info import (toBaseIdName, toListDataType, toIdName,
                                     isBase, toListIdName, toBaseDataType)
-from . subprogram_sockets import SubprogramData, subprogramInterfaceChanged
+from . subprogram_sockets import SubprogramData, subprogramInterfaceChanged, NoDefaultValue
 
 class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     bl_idname = "an_LoopInputNode"
@@ -159,7 +159,7 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         else:
             for socket in iteratorSockets:
                 name = socket.text + " List"
-                data.newInput(toListIdName(socket.bl_idname), socket.identifier, name, [])
+                data.newInput(toListIdName(socket.bl_idname), socket.identifier, name, NoDefaultValue)
                 if socket.loop.useAsOutput:
                     data.newOutput(toListIdName(socket.bl_idname), socket.identifier, name)
 
