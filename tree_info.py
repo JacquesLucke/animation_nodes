@@ -168,7 +168,7 @@ class NodeNetwork:
         self.findSystemNodes()
 
         groupNodeAmount = self.groupInAmount + self.groupOutAmount
-        loopNodeAmount = self.loopInAmount + self.generatorAmount + self.reassignParameterAmount
+        loopNodeAmount = self.loopInAmount + self.generatorAmount + self.reassignParameterAmount + self.breakAmount
 
         self.type = "Invalid"
 
@@ -186,7 +186,7 @@ class NodeNetwork:
                 if idToNode(self.groupInputIDs[0]).identifier == idToNode(self.groupOutputIDs[0]).groupInputIdentifier:
                     self.type = "Group"
         elif groupNodeAmount == 0:
-            possibleIdentifiers = list({idToNode(nodeID).loopInputIdentifier for nodeID in self.generatorOutputIDs + self.reassignParameterIDs})
+            possibleIdentifiers = list({idToNode(nodeID).loopInputIdentifier for nodeID in self.generatorOutputIDs + self.reassignParameterIDs + self.breakIDs})
             if self.loopInAmount == 0 and len(possibleIdentifiers) == 1:
                 self.identifier = possibleIdentifiers[0]
             elif self.loopInAmount == 1 and len(possibleIdentifiers) == 0:
@@ -216,6 +216,7 @@ class NodeNetwork:
         self.loopInputIDs = []
         self.generatorOutputIDs = []
         self.reassignParameterIDs = []
+        self.breakIDs = []
         self.scriptIDs = []
         self.invokeSubprogramIDs = []
 
@@ -231,6 +232,8 @@ class NodeNetwork:
                 self.generatorOutputIDs.append(nodeID)
             elif idName == "an_ReassignLoopParameterNode":
                 self.reassignParameterIDs.append(nodeID)
+            elif idName == "an_LoopBreakNode":
+                self.breakIDs.append(nodeID)
             elif idName == "an_ScriptNode":
                 self.scriptIDs.append(nodeID)
             elif idName == "an_InvokeSubprogramNode":
@@ -241,6 +244,7 @@ class NodeNetwork:
         self.loopInAmount = len(self.loopInputIDs)
         self.generatorAmount = len(self.generatorOutputIDs)
         self.reassignParameterAmount = len(self.reassignParameterIDs)
+        self.breakAmount = len(self.breakIDs)
         self.scriptAmount = len(self.scriptIDs)
 
     def getInvokedSubprogramIdentifiers(self):
