@@ -4,14 +4,14 @@ from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 from mathutils import Vector, Matrix
 
-    # Animation Nodes Poly Underware / ver 0.2 (refactor version), no vertex normals involved in this ver
+    # Animation Nodes Poly Underwear / ver 0.2 (refactor version), no vertex normals involved in this ver
     # creates a "wireframe" in centers of poly and middle ofedges, but can be used for normal wireframe too
     # by o.g. 03.09.2015
     # started from dual polyhedron idea on forum 
 
-class PolyUnderwareNode(bpy.types.Node, AnimationNode): 
-    bl_idname = "an_PolyUnderwareNode"
-    bl_label = "Poly Underware"
+class PolyUnderwearNode(bpy.types.Node, AnimationNode): 
+    bl_idname = "an_PolyUnderwearNode"
+    bl_label = "Poly Underwear"
     
     useCentral =  BoolProperty(name = "Use Central Poly", default = True,
         description = "Create central poly, at the stripes intersection. If off, there will be a hole",
@@ -30,7 +30,7 @@ class PolyUnderwareNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "useCentral")
         
     def drawAdvanced(self, layout):
-        layout.operator("wm.call_menu", text = "Info / Help", icon = "INFO").name = "an.show_help_poly_underware"
+        layout.operator("wm.call_menu", text = "Info / Help", icon = "INFO").name = "an.show_help_poly_underwear"
         
     def getExecutionCode(self):
         isLinked = self.getLinkedOutputsDict()
@@ -77,7 +77,7 @@ class PolyUnderwareNode(bpy.types.Node, AnimationNode):
 
 
 class ShowHelp(bpy.types.Menu):
-    bl_idname = "an.show_help_poly_underware"
+    bl_idname = "an.show_help_poly_underwear"
     bl_label = "Poly Underware node | Blender - Animation Nodes"
 
     helpText = StringProperty(default = "help here")
@@ -146,8 +146,7 @@ notes:
             (it should probably be called Mid Wireframe or so)
     
     also to be found on:
-        http://blenderartists.org/forum  Addon-Animation-Nodes , page xx, post 13xx
-        explanations and examples from that point on
+        http://blenderartists.org/forum  Addon-Animation-Nodes 
     
     The logic of the node being implemented per 1 polygon is to allow
     maximum flexibility in a nodal way. 
