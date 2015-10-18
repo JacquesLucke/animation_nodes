@@ -32,22 +32,20 @@ class DirectionToRotationNode(bpy.types.Node, AnimationNode):
             yield "eulerRotation = mathutils.Euler((0, 0, 0), 'XYZ')"
             return
         
-        yield "zero, worldX, worldY, worldZ = " + getWorldVectors()
-
-        yield "if direction != zero: z = direction.normalized()"
-        if "X" in self.trackAxis: yield "else: z = worldX"
-        if "Y" in self.trackAxis: yield "else: z = worldY"
-        if "Z" in self.trackAxis: yield "else: z = worldZ"
-
-        yield "if guide != zero and z.cross(guide) != zero: y = z.cross(guide.normalized())"
-        if "X" == self.guideAxis: yield "else: y = z.cross(worldX) if z.cross(worldX) != zero else worldZ"
-        if "Y" == self.guideAxis: yield "else: y = z.cross(worldY) if z.cross(worldY) != zero else worldZ"
-        if "Z" == self.guideAxis: yield "else: y = z.cross(worldZ) if z.cross(worldZ) != zero else worldY"
-
+        yield "zero = mathutils.Vector((0, 0, 0))"
+        
+        yield "if direction == zero: eulerRotation = mathutils.Euler((0, 0, 0), 'XYZ')"
+        yield "else:"
+        yield "    z = direction.normalized()"
+        yield "    if guide != zero and z.cross(guide) != zero: y = z.cross(guide.normalized())"
+        if "X" == self.guideAxis: yield "    else: y = z.cross(mathutils.Vector((1, 0, 0))) if z.cross(mathutils.Vector((1, 0, 0))) != zero else mathutils.Vector((0, 0, 1))"
+        if "Y" == self.guideAxis: yield "    else: y = z.cross(mathutils.Vector((0, 1, 0))) if z.cross(mathutils.Vector((0, 1, 0))) != zero else mathutils.Vector((0, 0, 1))"
+        if "Z" == self.guideAxis: yield "    else: y = z.cross(mathutils.Vector((0, 0, 1))) if z.cross(mathutils.Vector((0, 0, 1))) != zero else mathutils.Vector((0, 1, 0))"
+        
         yield "x = y.cross(z)"
-
+        
         yield "mx, my, mz = " + getAxesChange(self.trackAxis, self.guideAxis)
-
+        
         yield "mat3x3 = mathutils.Matrix().to_3x3()"
         yield "mat3x3.col[0], mat3x3.col[1], mat3x3.col[2] = mx, my, mz"
         yield "eulerRotation = mat3x3.to_euler()"
@@ -63,10 +61,3 @@ def getAxesChange(track, guide):
     elif track == "-Y": a = "(-y,-z, x)" if guide == "Z" else "( x,-z, y)"
     elif track == "-Z": a = "( x,-y,-z)" if guide == "X" else "( y, x,-z)"
     return a
-
-def getWorldVectors():
-    o = "mathutils.Vector((0, 0, 0))"
-    x = "mathutils.Vector((1, 0, 0))"
-    y = "mathutils.Vector((0, 1, 0))"
-    z = "mathutils.Vector((0, 0, 1))"
-    return o + ", " + x + ", "+ y + ", "+ z
