@@ -1,7 +1,7 @@
 import bpy
 from . import tree_info
 from mathutils import Vector
-from . sockets.info import toBaseIdName
+from . sockets.info import toBaseIdName, isList
 from . tree_info import getAllDataLinks, getDirectlyLinkedSocket
 
 def correctForbiddenNodeLinks():
@@ -200,6 +200,12 @@ class ConvertBooleanToInteger(LinkCorrection):
     def insert(self, nodeTree, origin, target, dataOrigin):
         node = insertLinkedNode(nodeTree, "an_BooleanToIntegerNode", origin, target)
 
+class ConvertFromGenericList(LinkCorrection):
+    def check(self, origin, target):
+        return origin.dataType == "Generic List" and isList(target.dataType)
+    def insert(self, nodeTree, origin, target, dataOrigin):
+        node = insertLinkedNode(nodeTree, "an_ConvertNode", origin, target)
+
 class ConvertFromGeneric(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType == "Generic"
@@ -261,4 +267,5 @@ linkCorrectors = [
     ConverFloatToInteger(),
     ConvertToString(),
     ConvertBooleanToInteger(),
+    ConvertFromGenericList(),
     ConvertFromGeneric() ]
