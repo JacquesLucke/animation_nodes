@@ -20,7 +20,9 @@ class LoopBreakNode(bpy.types.Node, AnimationNode):
 
     def edit(self):
         network = self.network
-        if network.type == "Invalid": return
+        loopInput = network.loopInputNode
+        print(loopInput)
+        if network.type != "Invalid": return
         if network.loopInAmount != 1: return
         loopInput = network.loopInputNode
         if self.loopInputIdentifier == loopInput.identifier: return
