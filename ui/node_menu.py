@@ -250,13 +250,14 @@ class MeshMenu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
+        insertNode(layout, "an_ObjectMeshDataNode", "Object Mesh Data")
         insertNode(layout, "an_SeparateMeshDataNode", "Separate")
         insertNode(layout, "an_CombineMeshDataNode", "Combine")
         layout.menu("an_mesh_generators_menu", text = "Generators")
         layout.menu("an_mesh_operators_menu", text = "Operators")
         layout.separator()
-        insertNode(layout, "an_CreateBMeshFromMeshData", "Create from Data")
-        insertNode(layout, "an_MeshDataFromPolygonsNode", "Create from Polygons")
+        insertNode(layout, "an_MeshDataFromPolygonsNode", "Mesh Data from Polygons")
+        insertNode(layout, "an_CreateBMeshFromMeshData", "BMesh from Mesh Data")
         layout.menu("an_mesh_finalizing_menu", text = "Tools")
         layout.separator()
         layout.label("Set On Object:")
