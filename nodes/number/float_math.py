@@ -80,14 +80,7 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
         return operationLabels[self.operation]
 
     def edit(self):
-        targets = self.outputs[0].dataTargets
-        if len(targets) >= 1:
-            if all([target.dataType == "Integer" for target in targets]):
-                self.outputInteger = True
-            else:
-                self.outputInteger = False
-        elif self.outputInteger:
-            self.outputInteger = False
+        self.outputInteger = self.outputs[0].isOnlyLinkedToDataType("Integer")
 
     def recreateOutputSocket(self):
         idName = "an_IntegerSocket" if self.outputInteger else "an_FloatSocket"
