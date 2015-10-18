@@ -9,6 +9,7 @@ class OverviewPanel(bpy.types.Panel):
     bl_space_type = "NODE_EDITOR"
     bl_region_type = "TOOLS"
     bl_category = "Animation Nodes"
+    bl_options = {"DEFAULT_CLOSED"}
 
     def draw(self, context):
         layout = self.layout
