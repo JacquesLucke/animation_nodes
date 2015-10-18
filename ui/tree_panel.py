@@ -1,4 +1,5 @@
 import bpy
+from .. utils.timing import prettyTime
 
 class TreePanel(bpy.types.Panel):
     bl_idname = "an_tree_panel"
@@ -25,10 +26,7 @@ class TreePanel(bpy.types.Panel):
         layout.separator()
         layout.prop(tree, "editNodeLabels")
 
-        time = tree.executionTime
-        if time > 1.5: timeText = "{:.2f} s".format(tree.executionTime)
-        else: timeText = "{:.5f} ms".format(tree.executionTime * 1000)
-        layout.label(timeText, icon = "TIME")
+        layout.label(prettyTime(tree.executionTime), icon = "TIME")
 
     @classmethod
     def getTree(cls):
