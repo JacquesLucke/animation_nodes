@@ -75,6 +75,8 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
             box.label("{} - {}".format(repr(node.outputName), node.listDataType))
         self.invokeSocketTypeChooser(box, "createGeneratorOutputNode", socketGroup = "LIST", text = "New Generator", icon = "PLUS")
 
+        self.invokeFunction(layout, "createBreakNode", text = "New Break Condition", icon = "PLUS")
+
     def edit(self):
         for target in self.newIteratorSocket.dataTargets:
             if target.dataType == "Node Control": continue
@@ -191,6 +193,12 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         node.parameterIdentifier = socketIdentifier
         invokeTranslation()
         subprogramInterfaceChanged()
+
+    def createBreakNode(self):
+        node = newNodeAtCursor("an_LoopBreakNode")
+        node.loopInputIdentifier = self.identifier
+        invokeTranslation()
+
 
     def getTemplateCode(self):
         for socket in self.getIteratorSockets():
