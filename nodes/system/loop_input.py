@@ -225,6 +225,9 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     def getParameterSockets(self):
         return self.outputs[self.newIteratorSocket.index + 1:self.newParameterSocket.index]
 
+    def getBreakNodes(self):
+        return self.network.breakNodes
+
     def getSortedGeneratorNodes(self):
         nodes = self.network.generatorOutputNodes
         nodes.sort(key = attrgetter("sortIndex"))

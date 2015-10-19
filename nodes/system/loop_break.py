@@ -1,8 +1,8 @@
 import bpy
 from bpy.props import *
-from ... events import treeChanged
 from ... base_types.node import AnimationNode
 from ... tree_info import getNodeByIdentifier
+from ... events import treeChanged, propertyChanged
 
 class LoopBreakNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_LoopBreakNode"
@@ -11,8 +11,7 @@ class LoopBreakNode(bpy.types.Node, AnimationNode):
     loopInputIdentifier = StringProperty(update = treeChanged)
 
     def create(self):
-        self.inputs.new("an_BooleanSocket", "Break", "breakLoop");
-        self.inputs.new("an_BooleanSocket", "Break Before", "breakBefore")
+        self.inputs.new("an_BooleanSocket", "Continue", "continueCondition");
 
     def draw(self, layout):
         node = self.loopInputNode

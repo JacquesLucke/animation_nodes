@@ -304,6 +304,10 @@ class NodeNetwork:
         return [idToNode(nodeID) for nodeID in self.reassignParameterIDs]
 
     @property
+    def breakNodes(self):
+        return [idToNode(nodeID) for nodeID in self.breakIDs]
+
+    @property
     def scriptNode(self):
         try: return idToNode(self.scriptIDs[0])
         except: return None
