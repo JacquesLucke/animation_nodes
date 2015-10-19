@@ -22,6 +22,9 @@ def register():
     kmi = km.keymap_items.new("wm.call_menu_pie", type = "E", value = "PRESS")
     kmi.properties.name = "an.selection_pie"
 
+    # Floating Advanced Panel
+    kmi = km.keymap_items.new("an.floation_advanced_panel", type = "U", value = "PRESS")
+
     addon_keymaps.append(km)
 
 def unregister():
