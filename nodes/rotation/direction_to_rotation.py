@@ -31,9 +31,9 @@ class DirectionToRotationNode(bpy.types.Node, AnimationNode):
         if self.trackAxis[-1:] == self.guideAxis[-1:]:
             yield "eulerRotation = mathutils.Euler((0, 0, 0), 'XYZ')"
             return
-        
+
         yield "zero = mathutils.Vector((0, 0, 0))"
-        
+
         yield "if direction == zero: eulerRotation = mathutils.Euler((0, 0, 0), 'XYZ')"
         yield "else:"
         yield "    z = direction.normalized()"
@@ -41,14 +41,14 @@ class DirectionToRotationNode(bpy.types.Node, AnimationNode):
         if "X" == self.guideAxis: yield "    else: y = z.cross(mathutils.Vector((1, 0, 0))) if z.cross(mathutils.Vector((1, 0, 0))) != zero else mathutils.Vector((0, 0, 1))"
         if "Y" == self.guideAxis: yield "    else: y = z.cross(mathutils.Vector((0, 1, 0))) if z.cross(mathutils.Vector((0, 1, 0))) != zero else mathutils.Vector((0, 0, 1))"
         if "Z" == self.guideAxis: yield "    else: y = z.cross(mathutils.Vector((0, 0, 1))) if z.cross(mathutils.Vector((0, 0, 1))) != zero else mathutils.Vector((0, 1, 0))"
-        
-        yield "x = y.cross(z)"
-        
-        yield "mx, my, mz = " + getAxesChange(self.trackAxis, self.guideAxis)
-        
-        yield "mat3x3 = mathutils.Matrix().to_3x3()"
-        yield "mat3x3.col[0], mat3x3.col[1], mat3x3.col[2] = mx, my, mz"
-        yield "eulerRotation = mat3x3.to_euler()"
+
+        yield "    x = y.cross(z)"
+
+        yield "    mx, my, mz = " + getAxesChange(self.trackAxis, self.guideAxis)
+
+        yield "    mat3x3 = mathutils.Matrix().to_3x3()"
+        yield "    mat3x3.col[0], mat3x3.col[1], mat3x3.col[2] = mx, my, mz"
+        yield "    eulerRotation = mat3x3.to_euler()"
 
     def getUsedModules(self):
         return ["mathutils"]
