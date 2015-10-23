@@ -56,7 +56,7 @@ class ConvertQuaternionAndAxisAngleNodeNode(bpy.types.Node, AnimationNode):
             self.outputs.new("an_VectorSocket", "Axis", "axis")
             self.outputs.new("an_FloatSocket", "Angle", "angle")
         if self.conversionType == "AXIS_ANGLE_TO_QUATERNION":
-            self.inputs.new("an_VectorSocket", "Axis", "axis")
+            self.inputs.new("an_VectorSocket", "Axis", "axis").value = (0, 0, 1)
             self.inputs.new("an_FloatSocket", "Angle", "angle")
             self.outputs.new("an_QuaternionSocket", "Quaternion", "quaternion")
         self.inputs[0].defaultDrawType = "PREFER_PROPERTY"
