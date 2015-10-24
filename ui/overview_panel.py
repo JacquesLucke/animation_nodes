@@ -10,7 +10,12 @@ class OverviewPanel(bpy.types.Panel):
     bl_region_type = "TOOLS"
     bl_category = "Animation Nodes"
     bl_options = {"DEFAULT_CLOSED"}
-
+    
+    @classmethod
+    def poll(cls, context):
+        try: return context.space_data.node_tree.bl_idname == "an_AnimationNodeTree"
+        except: return False
+    
     def draw(self, context):
         layout = self.layout
 
