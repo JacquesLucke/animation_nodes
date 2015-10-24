@@ -7,7 +7,7 @@ from collections import defaultdict
 from bpy.app.handlers import persistent
 from .. ui.node_colors import colorNetworks
 from .. utils.nodes import getAnimationNodeTrees
-from .. utils.blender_ui import convertToRegionLocation
+from .. utils.blender_ui import convertToRegionLocation, getDpiFactor
 from .. operators.dynamic_operators import getInvokeFunctionOperator
 from .. tree_info import getNetworkWithNode, getDirectlyLinkedSockets, getOriginNodes
 
@@ -381,12 +381,14 @@ def getViewLocation(node):
 def getRegionBottomLeft(node, region):
     location = node.viewLocation
     dimensions = node.dimensions
-    return convertToRegionLocation(region, location.x, location.y - dimensions.y)
+    dpiFactor = getDpiFactor()
+    return convertToRegionLocation(region, location.x, location.y - dimensions.y / dpiFactor)
 
 def getRegionBottomRight(node, region):
     location = node.viewLocation
     dimensions = node.dimensions
-    return convertToRegionLocation(region, location.x + dimensions.x, location.y - dimensions.y)
+    dpiFactor = getDpiFactor()
+    return convertToRegionLocation(region, location.x + dimensions.x / dpiFactor, location.y - dimensions.y / dpiFactor)
 
 def registerHandlers():
     bpy.types.Node.toID = nodeToID
