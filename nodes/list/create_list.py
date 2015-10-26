@@ -45,6 +45,8 @@ class CreateListNode(bpy.types.Node, AnimationNode):
 
         layout.prop(self, "hideInputs")
 
+        self.invokeFunction(layout, "removeElementInputs", "Remove Inputs", icon = "X")
+
         self.drawTypeSpecificButtonsExt(layout)
 
     @property
@@ -88,6 +90,10 @@ class CreateListNode(bpy.types.Node, AnimationNode):
         socket.defaultDrawType = "PREFER_PROPERTY"
         socket.moveUp()
         return socket
+
+    def removeElementInputs(self):
+        for socket in self.inputs[:-1]:
+            socket.remove()
 
 
     # type specific stuff
