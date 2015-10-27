@@ -33,9 +33,10 @@ class ContextPie(bpy.types.Menu, PieMenuHelper):
         if amount == 0: self.empty(layout, text = "Has no visible outputs")
         else: layout.operator("an.insert_debug_node_template_operator", text = "Debug")
 
-    def drawRight(self, layout):
-        props = layout.operator("wm.call_menu", text = "Choose Next Node")
-        props.name = "an_node_suggestions_menu"
+    # TODO: Add more node suggestions until this is usable.
+    #def drawRight(self, layout):
+    #    props = layout.operator("wm.call_menu", text = "Choose Next Node")
+    #    props.name = "an_node_suggestions_menu"
 
     @property
     def activeNode(self):
