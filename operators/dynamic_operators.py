@@ -29,7 +29,8 @@ def createOperatorWithDescription(description):
         "bl_idname" : idName,
         "bl_label" : "Invoke Function",
         "bl_description" : description,
-        "execute" : invokeFunction })
+        "invoke" : invoke_InvokeFunction,
+        "execute" : execute_InvokeFunction })
     operator.classType = StringProperty() # 'NODE' or 'SOCKET'
     operator.treeName = StringProperty()
     operator.nodeName = StringProperty()
@@ -37,11 +38,17 @@ def createOperatorWithDescription(description):
     operator.identifier = StringProperty()
     operator.functionName = StringProperty()
     operator.invokeWithData = BoolProperty(default = False)
+    operator.confirm = BoolProperty()
     operator.data = StringProperty()
 
     return operator
 
-def invokeFunction(self, context):
+def invoke_InvokeFunction(self, context, event):
+    if self.confirm:
+        return context.window_manager.invoke_confirm(self, event)
+    return self.execute(context)
+
+def execute_InvokeFunction(self, context):
     if self.classType == "NODE":
         owner = getNode(self.treeName, self.nodeName)
     elif self.classType == "SOCKET":

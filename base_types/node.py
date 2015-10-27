@@ -120,7 +120,7 @@ class AnimationNode:
     def draw_label(self):
         return self.drawLabel()
 
-    def invokeFunction(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True, data = None):
+    def invokeFunction(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True, confirm = False, data = None):
         idName = getInvokeFunctionOperator(description)
         props = layout.operator(idName, text = text, icon = icon, emboss = emboss)
         props.classType = "NODE"
@@ -128,6 +128,7 @@ class AnimationNode:
         props.nodeName = self.name
         props.functionName = functionName
         props.invokeWithData = data is not None
+        props.confirm = confirm
         props.data = str(data)
 
     def invokeSocketTypeChooser(self, layout, functionName, socketGroup = "ALL", text = "", icon = "NONE", description = "", emboss = True):

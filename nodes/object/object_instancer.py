@@ -71,6 +71,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
             text = "Reset Source Data",
             description = "Reset the source data on all instances")
         self.invokeFunction(layout, "unlinkInstancesFromNode",
+            confirm = True,
             text = "Unlink Instances from Node",
             description = "This will make sure that the objects won't be removed if you remove the Replicate Node.")
 
