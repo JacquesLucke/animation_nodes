@@ -100,7 +100,7 @@ class CreateListNode(bpy.types.Node, AnimationNode):
     #############################
 
     def drawTypeSpecificButtonsExt(self, layout):
-        if self.assignedType == "Object":
+        if self.assignedType in ("Object", "Spline"):
             self.invokeFunction(layout, "createInputsFromSelection", text = "From Selection", icon = "PLUS")
 
     def createInputsFromSelection(self):
