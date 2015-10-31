@@ -154,6 +154,12 @@ class IdentifierExistsTwice(Problem):
         writeText(col, message)
         col.operator("an.replace_nodes_with_copies")
 
+class LinkedAnimationNodeTreeExists(Problem):
+    def allowUnitCreation(self):
+        return False
+
+    def draw(self, layout):
+        layout.label("AN doesn't support linked node trees")
 
 
 

@@ -20,9 +20,10 @@ def updateEverything():
     callNodeEditFunctions()
     correctForbiddenNodeLinks()
     subprogram_sockets.updateIfNecessary()
+    checkIfNodeTreeIsLinked()
     checkNetworks()
     checkIdentifiers()
-    
+
     if problems.canCreateExecutionUnits():
         createExecutionUnits()
 
@@ -83,3 +84,9 @@ def checkIdentifiers():
     nodeAmount = len(list(iterAnimationNodes()))
     if nodeAmount > identifierAmount:
         problems.IdentifierExistsTwice().report()
+
+def checkIfNodeTreeIsLinked():
+    for tree in getAnimationNodeTrees():
+        if tree.library is not None:
+            problems.LinkedAnimationNodeTreeExists().report()
+            break
