@@ -345,6 +345,9 @@ def treeChanged():
 def getNodeByIdentifier(identifier):
     return idToNode(_data.nodeByIdentifier[identifier])
 
+def getIdentifierAmount():
+    return len(_data.nodeByIdentifier)
+
 @updateAndRetryOnException
 def getNodesByType(idName):
     return [idToNode(nodeID) for nodeID in _data.nodesByType[idName]]

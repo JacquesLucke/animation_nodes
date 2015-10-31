@@ -21,7 +21,10 @@ def updateEverything():
     correctForbiddenNodeLinks()
     subprogram_sockets.updateIfNecessary()
     checkNetworks()
-    createExecutionUnits()
+    checkIdentifiers()
+    
+    if problems.canCreateExecutionUnits():
+        createExecutionUnits()
 
 
 def enableUseFakeUser():
@@ -74,3 +77,9 @@ def checkNodeOptions(network, nodes):
             problems.NodeMustNotBeInSubprogram(node.identifier).report()
         if "No Auto Execution" in node.options:
             problems.NodeShouldNotBeUsedInAutoExecution(node.identifier).report()
+
+def checkIdentifiers():
+    identifierAmount = tree_info.getIdentifierAmount()
+    nodeAmount = len(list(iterAnimationNodes()))
+    if nodeAmount > identifierAmount:
+        problems.IdentifierExistsTwice().report()

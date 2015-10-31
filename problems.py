@@ -1,3 +1,4 @@
+from . utils.layout import writeText
 from . tree_info import getNodeByIdentifier
 
 currentProblems = []
@@ -137,6 +138,22 @@ class NodeDoesNotSupportExecution(Problem):
     def draw(self, layout):
         node = getNodeByIdentifier(self.nodeIdentifier)
         layout.label("{} does not support excecution".format(repr(node.name)))
+
+class IdentifierExistsTwice(Problem):
+    def allowUnitCreation(self):
+        return False
+
+    def draw(self, layout):
+        message = ("At least one node identifier exists twice. "
+                   "This can happen when you append a node tree "
+                   "that is already in this file. \n"
+                   "Solution: \n"
+                   "  1. Select the NEW node tree \n"
+                   "  2. Click on the button below")
+        col = layout.column()
+        writeText(col, message)
+        col.operator("an.replace_nodes_with_copies")
+
 
 
 
