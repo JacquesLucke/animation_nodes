@@ -122,7 +122,7 @@ class RotationMenu(bpy.types.Menu):
         layout.separator()
         insertNode(layout, "an_MixDataNode", "Mix Quaternion", {"dataType" : repr("Quaternion")})
 
-        
+
 class MatrixMenu(bpy.types.Menu):
     bl_idname = "an_matrix_menu"
     bl_label = "Matrix Menu"
@@ -219,7 +219,7 @@ class ObjectMenu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        
+
         insertNode(layout, "an_DataInputNode", "Object", {"assignedType" : repr("Object")})
         insertNode(layout, "an_CreateListNode", "List", {"assignedType" : repr("Object")})
         insertNode(layout, "an_GetObjectsFromGroupNode", "From Group")
@@ -464,8 +464,8 @@ class SubprogramsMenu(bpy.types.Menu):
         layout.separator()
         insertNode(layout, "an_ExpressionNode", "Expression")
 
-def insertNode(layout, type, text, settings = {}):
-    operator = layout.operator("node.add_node", text = text)
+def insertNode(layout, type, text, settings = {}, icon = "NONE"):
+    operator = layout.operator("node.add_node", text = text, icon = icon)
     operator.type = type
     operator.use_transform = True
     for name, value in settings.items():
