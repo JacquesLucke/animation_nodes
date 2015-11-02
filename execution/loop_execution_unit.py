@@ -159,9 +159,17 @@ class LoopExecutionUnit:
             if node.bl_idname in ("an_LoopInputNode", "an_LoopGeneratorOutputNode", "an_ReassignLoopParameterNode"): continue
             lines.extend(getNodeExecutionLines(node, variables))
             lines.extend(linkOutputSocketsToTargets(node, variables))
+        lines.extend(self.get_LoopBreak(inputNode, variables))
         lines.extend(self.get_AddToGenerators(inputNode, variables))
         lines.extend(self.get_ReassignParameters(inputNode, variables))
         lines.append("pass")
+        return lines
+
+    def get_LoopBreak(self, inputNode, variables):
+        breakNodes = inputNode.getBreakNodes()
+        lines = []
+        for node in breakNodes:
+            lines.append("if not {}: break".format(variables[node.inputs[0]]))
         return lines
 
     def get_AddToGenerators(self, inputNode, variables):
