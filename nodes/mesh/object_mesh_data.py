@@ -1,8 +1,8 @@
 import bpy
 from bpy.props import *
+from ... events import isRendering
 from ... utils.math import extractRotation
 from ... base_types.node import AnimationNode
-from ... events import propertyChanged, isRendering
 from ... data_structures.mesh import Polygon, Vertex
 
 class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
