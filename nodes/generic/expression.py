@@ -28,7 +28,7 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
     debugMode = BoolProperty(name = "Debug Mode", update = executionCodeChanged, default = True,
         description = "Show detailed error messages in the node but is slower.")
 
-    moduleNames = StringProperty(name = "Modules", update = executionCodeChanged,
+    moduleNames = StringProperty(name = "Modules", default = "math", update = executionCodeChanged,
         description = "Comma separated module names which can be used inside the expression")
 
     outputIsList = BoolProperty(name = "Output is List", default = False, update = outputTypeChanged)
