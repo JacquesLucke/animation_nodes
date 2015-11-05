@@ -13,6 +13,8 @@ class an_EdgesToPlanesNode(bpy.types.Node, AnimationNode):
         description = "Calculate a rectangle instead of a parallelogram (takes more time)",
         default = True, update = propertyChanged)
 
+    errorMessage = StringProperty()
+
     def create(self):
         self.inputs.new("an_VectorListSocket", "Vertices", "vertices")
         self.inputs.new("an_EdgeIndicesListSocket", "Edges", "edges")
@@ -26,8 +28,19 @@ class an_EdgesToPlanesNode(bpy.types.Node, AnimationNode):
 
     def draw(self, layout):
         layout.prop(self, "calculateDirection")
+        if self.errorMessage != "":
+            layout.label(self.errorMessage, icon = "ERROR")
 
     def execute(self, vertices, edges, width, upVector):
+        try:
+            self.errorMessage = ""
+            return self.calculatePlanes(vertices, edges, width, upVector)
+        except IndexError:
+            self.errorMessage = "Missing vertices"
+            return [], []
+
+
+    def calculatePlanes(self, vertices, edges, width, upVector):
         newVertices = []
         polygons = []
         appendVertex = newVertices.append
