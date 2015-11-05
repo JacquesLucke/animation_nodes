@@ -9,13 +9,16 @@ items = [("ROUND", "Round", ""),
 
 class FloatToIntegerNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_FloatToIntegerNode"
-    bl_label = "Float To Integer"
+    bl_label = "Float to Integer"
 
     type = EnumProperty(name = "Conversion Type", items = items, default = "FLOOR", update = executionCodeChanged)
 
     def create(self):
         self.inputs.new("an_FloatSocket", "Float", "float")
         self.outputs.new("an_IntegerSocket", "Integer", "integer")
+
+    def drawLabel(self):
+        return "({}) Float to Integer".format(self.type.capitalize())
 
     def drawAdvanced(self, layout):
         layout.prop(self, "type", text = "")
