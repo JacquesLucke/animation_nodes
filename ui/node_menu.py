@@ -11,14 +11,14 @@ def drawMenu(self, context):
 
     layout.operator("an.node_search", text = "Search", icon = "VIEWZOOM")
     layout.separator()
-    layout.menu("an_number_menu", text = "Number")
+    layout.menu("an_number_menu", text = "Number", icon = "LINENUMBERS_ON")
     layout.menu("an_vector_menu", text = "Vector", icon = "MAN_TRANS")
     layout.menu("an_rotation_menu", text = "Rotation", icon = "MAN_ROT")
-    layout.menu("an_matrix_menu", text = "Matrix", icon = "OUTLINER_OB_LATTICE")
+    layout.menu("an_matrix_menu", text = "Matrix", icon = "GRID")
     layout.menu("an_text_menu", text = "Text", icon = "SORTALPHA")
     layout.menu("an_boolean_menu", text = "Boolean")
     layout.menu("an_color_menu", text = "Color", icon = "COLOR")
-    layout.menu("an_list_menu", text = "List", icon = "LINENUMBERS_ON")
+    layout.menu("an_list_menu", text = "List", icon = "WORDWRAP_ON")
     layout.separator()
     layout.menu("an_object_menu", text = "Object", icon = "OBJECT_DATAMODE")
     layout.menu("an_mesh_menu", text = "Mesh", icon = "MESH_DATA")
@@ -30,9 +30,10 @@ def drawMenu(self, context):
     layout.menu("an_particles_menu", text = "Particles", icon = "PARTICLE_DATA")
     layout.menu("an_fcurve_menu", text = "FCurves", icon = "IPO")
     layout.menu("an_sound_menu", text = "Sound", icon = "SPEAKER")
-    layout.menu("an_kdtree_menu", text = "KDTree")
+    layout.menu("an_kdtree_menu", text = "KDTree", icon = "STICKY_UVS_LOC")
     layout.separator()
-    layout.menu("an_debug_menu", text = "Debug", icon = "NODETREE")
+    layout.menu("an_debug_menu", text = "Debug", icon = "INFO")
+
     layout.menu("an_subprograms_menu", text = "Subprograms", icon = "FILE_SCRIPT")
 
 def drawNodeTreeChooser(layout, context):
