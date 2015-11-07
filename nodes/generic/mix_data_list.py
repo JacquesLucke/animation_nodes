@@ -44,7 +44,7 @@ class MixDataListNode(bpy.types.Node, AnimationNode):
         lines.append("    f = (factor{}) * (length - 1)".format(" % 1" if self.repeat else ""))
         lines.append("    before = dataList[max(min(math.floor(f), length - 1), 0)]")
         lines.append("    after = dataList[max(min(math.ceil(f), length - 1), 0)]")
-        lines.append("    influence = interpolation[0](f % 1, interpolation[1])")
+        lines.append("    influence = interpolation(f % 1)")
         lines.append("    " + getMixCode(self.dataType, "before", "after", "influence", "result"))
         lines.append("else: result = self.outputs[0].getValue()")
         return lines
@@ -57,7 +57,7 @@ class MixDataListNode(bpy.types.Node, AnimationNode):
         self.inputs.clear()
         self.outputs.clear()
 
-        self.inputs.new("an_FloatSocket", "Factor", "factor")
+        self.inputs.new("an_FloatSocket", "Factor", "factor").setRange(0, 1)
         self.inputs.new(toListIdName(self.dataType), toListDataType(self.dataType), "dataList")
         self.inputs.new("an_InterpolationSocket", "Interpolation", "interpolation").defaultDrawType = "PROPERTY_ONLY"
         self.outputs.new(toIdName(self.dataType), "Result", "result")

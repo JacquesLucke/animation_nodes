@@ -1,6 +1,6 @@
 import bpy
 from ... base_types.node import AnimationNode
-from ... algorithms.interpolation import linear, fCurveMapping
+from ... algorithms.interpolation import linear, fCurveMapping, assignArguments
 
 class InterpolationFromFCurveNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_InterpolationFromFCurveNode"
@@ -11,11 +11,11 @@ class InterpolationFromFCurveNode(bpy.types.Node, AnimationNode):
         self.outputs.new("an_InterpolationSocket", "Interpolation", "interpolation")
 
     def execute(self, fCurve):
-        if fCurve is None: return (linear, None)
+        if fCurve is None: return linear
         startX, endX = fCurve.range()
-        if startX == endX: return (linear, None)
+        if startX == endX: return linear
         startY = fCurve.evaluate(startX)
         endY = fCurve.evaluate(endX)
-        if startY == endY: return (linear, None)
-
-        return (fCurveMapping, (fCurve, startX, endX - startX, -startY, endY - startY))
+        if startY == endY: return linear
+        
+        return assignArguments(fCurveMapping, (fCurve, startX, endX - startX, -startY, endY - startY))
