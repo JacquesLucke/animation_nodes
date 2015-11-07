@@ -184,6 +184,7 @@ def getSocketCenter(socket1, socket2):
     return (socket1.node.viewLocation + socket2.node.viewLocation) / 2
 
 linkCorrectors = [
+    ConvertSeparatedMeshDataToBMesh(),
     ConvertVectorToEuler(),
     ConvertEulerToVector(),
     ConvertEulerToQuaternion(),

@@ -23,6 +23,7 @@ listChains = [
     ["an_FCurveSocket", "an_FCurveListSocket"],
     ["an_ObjectGroupSocket", "an_ObjectGroupListSocket"],
     ["an_EulerSocket", "an_EulerListSocket"],
+    ["an_QuaternionSocket", "an_QuaternionListSocket"],
     ["an_TextBlockSocket", "an_TextBlockListSocket"],
     ["an_SceneSocket", "an_SceneListSocket"] ]
 
