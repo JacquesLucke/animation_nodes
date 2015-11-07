@@ -117,3 +117,16 @@ def hasIDProperty(object, name):
 
 def toPath(name):
     return '["{}"]'.format(name)
+
+
+
+# Register
+################################
+
+def register():
+    bpy.types.ID.getIDKeyInfo = getIDKeyInfo
+    bpy.types.ID.setIDKeyData = setIDKeyData
+
+def unregister():
+    del bpy.types.ID.getIDKeyInfo
+    del bpy.types.ID.setIDKeyData

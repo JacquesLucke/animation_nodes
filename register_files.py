@@ -2,6 +2,7 @@ import bpy
 
 from . import keymap
 from . import events
+from . import id_keys
 from . import tree_info
 from . import draw_handler
 from . ui import node_colors
@@ -16,6 +17,7 @@ from . base_types import socket as socket_base
 from . ui.node_menu import registerMenu, unregisterMenu
 
 def registerFiles():
+    id_keys.register()
     sound_bake.register()
     socket_base.register()
     node_colors.register()
@@ -33,6 +35,7 @@ def registerFiles():
     keymap.register()
 
 def unregisterFiles():
+    id_keys.unregister()
     sound_bake.unregister()
     socket_base.unregister()
     node_colors.unregister()

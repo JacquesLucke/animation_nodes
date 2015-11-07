@@ -94,7 +94,7 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
         for i, (object, originalCharacter) in enumerate(zip(objects, originalTexts)):
             object[idPropertyName] = self.currentID
             object[indexPropertyName] = i
-            setIDKeyData(object, "Transforms", "Initial Transforms",
+            object.setIDKeyData("Transforms", "Initial Transforms",
                 (object.location, object.rotation_euler, object.scale))
         self.objectCount = len(objects)
 
