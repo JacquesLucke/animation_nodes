@@ -32,11 +32,12 @@ def iterAnimationNodes():
         for node in nodeTree.nodes:
             if node.isAnimationNode: yield node
 
-def getAnimationNodeTrees():
+def getAnimationNodeTrees(skipLinkedTrees = True):
     nodeTrees = []
     for nodeTree in bpy.data.node_groups:
-        if nodeTree.bl_idname == "an_AnimationNodeTree":
-            nodeTrees.append(nodeTree)
+        if nodeTree.bl_idname != "an_AnimationNodeTree": continue
+        if skipLinkedTrees and nodeTree.library is not None: continue
+        nodeTrees.append(nodeTree)
     return nodeTrees
 
 def getAnimationNodeClasses():
