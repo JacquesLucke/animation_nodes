@@ -86,7 +86,7 @@ def checkIdentifiers():
         problems.IdentifierExistsTwice().report()
 
 def checkIfNodeTreeIsLinked():
-    for tree in getAnimationNodeTrees():
+    for tree in getAnimationNodeTrees(skipLinkedTrees = False):
         if tree.library is not None:
             problems.LinkedAnimationNodeTreeExists().report()
             break

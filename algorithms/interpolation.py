@@ -5,40 +5,45 @@ Here is a good source for different interpolation functions in Java:
 https://github.com/libgdx/libgdx/blob/master/gdx/src/com/badlogic/gdx/math/Interpolation.java
 '''
 
+def assignArguments(function, *arguments):
+    def interpolationWrapper(x):
+        return function(x, *arguments)
+    return interpolationWrapper
+
 def getInterpolationPreset(name = "LINEAR", easeIn = True, easeOut = True):
-    if not (easeIn or easeOut): return (linear, None)
-    if name == "LINEAR": return (linear, None)
+    if not (easeIn or easeOut): return linear
+    if name == "LINEAR": return linear
     if name == "SINUSOIDAL":
-        if easeIn and easeOut: return (sinInOut, None)
-        if easeIn: return (sinIn, None)
-        return (sinOut, None)
+        if easeIn and easeOut: return sinInOut
+        if easeIn: return sinIn
+        return sinOut
     if name in exponentOfName.keys():
-        if easeIn and easeOut: return (powerInOut, exponentOfName[name])
-        if easeIn: return (powerIn, exponentOfName[name])
-        return (powerOut, exponentOfName[name])
+        if easeIn and easeOut: return assignArguments(powerInOut, exponentOfName[name])
+        if easeIn: return assignArguments(powerIn, exponentOfName[name])
+        return assignArguments(powerOut, exponentOfName[name])
     if name == "EXPONENTIAL":
         settings = prepareExponentialSettings(base = 2, exponent = 5)
-        if easeIn and easeOut: return (exponentialInOut, settings)
-        if easeIn: return (exponentialIn, settings)
-        return (exponentialOut, settings)
+        if easeIn and easeOut: return assignArguments(exponentialInOut, settings)
+        if easeIn: return assignArguments(exponentialIn, settings)
+        return assignArguments(exponentialOut, settings)
     if name == "CIRCULAR":
-        if easeIn and easeOut: return (circularInOut, None)
-        if easeIn: return (circularIn, None)
-        return (circularOut, None)
+        if easeIn and easeOut: return circularInOut
+        if easeIn: return circularIn
+        return circularOut
     if name == "BACK":
-        if easeIn and easeOut: return (backInOut, 1.7)
-        if easeIn: return (backIn, 1.7)
-        return (backOut, 1.7)
+        if easeIn and easeOut: return assignArguments(backInOut, 1.7)
+        if easeIn: return assignArguments(backIn, 1.7)
+        return assignArguments(backOut, 1.7)
     if name == "BOUNCE":
         settings = prepareBounceSettings(4, 1.5)
-        if easeIn and easeOut: return (bounceInOut, settings)
-        if easeIn: return (bounceIn, settings)
-        return (bounceOut, settings)
+        if easeIn and easeOut: return assignArguments(bounceInOut, settings)
+        if easeIn: return assignArguments(bounceIn, settings)
+        return assignArguments(bounceOut, settings)
     if name == "ELASTIC":
         settings = prepareElasticSettings(base = 1.6, exponent = 6, bounces = 6)
-        if easeIn and easeOut: return (elasticInOut, settings)
-        if easeIn: return (elasticIn, settings)
-        return (elasticOut, settings)
+        if easeIn and easeOut: return assignArguments(elasticInOut, settings)
+        if easeIn: return assignArguments(elasticIn, settings)
+        return assignArguments(elasticOut, settings)
 
 exponentOfName = {
     "QUADRATIC" : 2,
@@ -51,14 +56,14 @@ def sampleInterpolation(interpolation, amount = 40):
     samples = []
     for i in range(amount):
           x = i / (amount - 1)
-          y = interpolation[0](x, interpolation[1])
+          y = interpolation(x)
           samples.append(y)
     return samples
 
 
 # Linear interpolation
 
-def linear(x, settings = None):
+def linear(x):
     return x
 
 
@@ -105,7 +110,7 @@ def exponentialOut(x, settings):
 
 # Circle interpolation
 
-def circularInOut(x, settings = None):
+def circularInOut(x):
     if x <= 0.5:
         x *= 2
         return (1 - sqrt(1 - x * x)) / 2
@@ -113,10 +118,10 @@ def circularInOut(x, settings = None):
         x = (x - 1) * 2
         return (sqrt(1 - x * x) + 1) / 2
 
-def circularIn(x, settings = None):
+def circularIn(x):
     return 1 - sqrt(1 - x * x)
 
-def circularOut(x, settings = None):
+def circularOut(x):
     x -= 1
     return sqrt(1 - x * x)
 
@@ -204,13 +209,13 @@ def backOut(x, scale = 1.7):
 
 # Sine interpolation
 
-def sinInOut(x, settings = None):
+def sinInOut(x):
     return (1 - cos(x * pi)) / 2
 
-def sinIn(x, settings = None):
+def sinIn(x):
     return 1 - cos(x * pi / 2)
 
-def sinOut(x, settings = None):
+def sinOut(x):
     return sin(x * pi / 2)
 
 
@@ -226,4 +231,4 @@ def fCurveMapping(x, settings):
 
 def mixedInterpolation(x, settings):
     a, b, factor = settings
-    return a[0](x, a[1]) * (1 - factor) + b[0](x, b[1]) * factor
+    return a(x) * (1 - factor) + b(x) * factor

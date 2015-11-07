@@ -38,16 +38,14 @@ class MixDataListNode(bpy.types.Node, AnimationNode):
         return nodeTypes[self.outputs[0].dataType]
 
     def getExecutionCode(self):
-        lines = []
-        lines.append("length = len(dataList)")
-        lines.append("if length > 0:")
-        lines.append("    f = (factor{}) * (length - 1)".format(" % 1" if self.repeat else ""))
-        lines.append("    before = dataList[max(min(math.floor(f), length - 1), 0)]")
-        lines.append("    after = dataList[max(min(math.ceil(f), length - 1), 0)]")
-        lines.append("    influence = interpolation[0](f % 1, interpolation[1])")
-        lines.append("    " + getMixCode(self.dataType, "before", "after", "influence", "result"))
-        lines.append("else: result = self.outputs[0].getValue()")
-        return lines
+        yield "length = len(dataList)"
+        yield "if length > 0:"
+        yield "    f = (factor{}) * (length - 1)".format(" % 1" if self.repeat else "")
+        yield "    before = dataList[max(min(math.floor(f), length - 1), 0)]"
+        yield "    after = dataList[max(min(math.ceil(f), length - 1), 0)]"
+        yield "    influence = interpolation(f % 1)"
+        yield "    " + getMixCode(self.dataType, "before", "after", "influence", "result")
+        yield "else: result = self.outputs[0].getValue()"
 
     def getUsedModules(self):
         return ["math"]

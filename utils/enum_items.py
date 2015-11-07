@@ -5,7 +5,7 @@ from . hash import hashStringToNumber as hashText
 def enumItemsFromDicts(function):
     """
     the decorated function should return a list of dicts
-    the dicts have at least an 'id' key
+    the dicts have at least an 'value' key
     """
     def wrapper(self, context):
         items = []

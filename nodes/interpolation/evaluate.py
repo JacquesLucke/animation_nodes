@@ -12,4 +12,4 @@ class EvaluateInterpolationNode(bpy.types.Node, AnimationNode):
         self.outputs.new("an_FloatSocket", "Value", "value")
 
     def getExecutionCode(self):
-        return "value = interpolation[0](max(min(position, 1.0), 0.0), interpolation[1])"
+        return "value = interpolation(max(min(position, 1.0), 0.0))"
