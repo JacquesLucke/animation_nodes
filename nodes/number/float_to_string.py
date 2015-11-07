@@ -17,9 +17,7 @@ class FloatToStringNode(bpy.types.Node, AnimationNode):
         self.outputs.new("an_StringSocket", "Text", "text")
 
     def execute(self, number, minLength, decimals, insertSign):
-        sign = ""
-        if number >= 0 and insertSign: sign = "+"
-        elif number < 0: sign = "-"
+        sign = "+" if insertSign else ""
 
-        formatString = "{" + ":0>{}.{}f".format(max(minLength - len(sign), 0), max(decimals, 0)) + "}"
-        return sign + formatString.format(abs(number))
+        formatString = "{" + ":{}0{}.{}f".format(sign, max(minLength, 0), max(decimals, 0)) + "}"
+        return formatString.format(number)
