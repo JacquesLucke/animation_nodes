@@ -151,6 +151,15 @@ class AnimationNode:
             nodeIdentifier = self.identifier,
             callback = data)
 
+    def invokeIDKeyChooser(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True):
+        data = functionName
+        self.invokeFunction(layout, "_chooseIDKeys", text = text, icon = icon, description = description, emboss = emboss, data = data)
+
+    def _chooseIDKeys(self, data):
+        bpy.ops.an.choose_id_key("INVOKE_DEFAULT",
+            nodeIdentifier = self.identifier,
+            callback = data)
+
     def clearSockets(self):
         self.inputs.clear()
         self.outputs.clear()
