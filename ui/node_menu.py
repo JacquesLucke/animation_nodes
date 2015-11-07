@@ -16,7 +16,7 @@ def drawMenu(self, context):
     layout.menu("an_rotation_menu", text = "Rotation", icon = "MAN_ROT")
     layout.menu("an_matrix_menu", text = "Matrix", icon = "GRID")
     layout.menu("an_text_menu", text = "Text", icon = "SORTALPHA")
-    layout.menu("an_boolean_menu", text = "Boolean")
+    layout.menu("an_boolean_menu", text = "Boolean", icon = "INLINK")
     layout.menu("an_color_menu", text = "Color", icon = "COLOR")
     layout.menu("an_list_menu", text = "List", icon = "WORDWRAP_ON")
     layout.separator()
