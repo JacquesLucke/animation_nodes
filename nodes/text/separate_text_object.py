@@ -3,7 +3,6 @@ import random
 from bpy.props import *
 from mathutils import Vector, Matrix
 from ... base_types.node import AnimationNode
-from ... id_keys import setIDKeyData, createIDKey
 from ... utils.blender_ui import executeInAreaType
 from ... nodes.container_provider import getMainObjectContainer
 
@@ -78,9 +77,6 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
         if source.data is None: return
         source.hide = False
 
-        createIDKey("Initial Transforms", "Transforms")
-        createIDKey("Initial Text", "String")
-
         objects = splitTextObject(source)
         originalTexts = [object.data.body for object in objects]
 
@@ -97,8 +93,6 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
         for i, (object, originalCharacter) in enumerate(zip(objects, originalTexts)):
             object[idPropertyName] = self.currentID
             object[indexPropertyName] = i
-            setIDKeyData(object, "Initial Transforms", "Transforms", (object.location, object.rotation_euler, object.scale))
-            setIDKeyData(object, "Initial Text", "String", originalCharacter)
         self.objectCount = len(objects)
 
         material = bpy.data.materials.get(self.materialName)

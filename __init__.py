@@ -50,32 +50,19 @@ finish = units.finishExecutionUnits
 
 
 
-# properties
-##################################
-
-import bpy
-from bpy.props import *
-from . id_keys import IDKeySettings
-
-class AnimationNodesSettings(bpy.types.PropertyGroup):
-    idKeys = PointerProperty(type = IDKeySettings, name = "ID Keys")
-
-
-
 # register
 ##################################
 
+import bpy
 from . register_files import registerFiles
 from . register_files import unregisterFiles
 
 def register():
     bpy.utils.register_module(__name__)
     registerFiles()
-    bpy.types.Scene.animationNodes = PointerProperty(type = AnimationNodesSettings, name = "Animation Nodes Settings")
     print("Registered Animation Nodes with {} modules.".format(len(modules)))
 
 def unregister():
     bpy.utils.unregister_module(__name__)
     unregisterFiles()
-    del bpy.types.Scene.animationNodes
     print("Unregistered Animation Nodes")
