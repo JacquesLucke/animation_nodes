@@ -13,7 +13,7 @@ class RandomEulerNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.inputs.new("an_IntegerSocket", "Seed", "seed")
-        self.inputs.new("an_FloatSocket", "Scale", "scale").value = pi/6
+        self.inputs.new("an_FloatSocket", "Scale", "scale").value = pi / 6
         self.outputs.new("an_EulerSocket", "Euler", "randomEuler")
 
     def draw(self, layout):
