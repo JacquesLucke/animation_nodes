@@ -13,7 +13,6 @@ import bpy
 from bpy.props import *
 from collections import namedtuple
 from mathutils import Vector, Euler
-from bpy.app.handlers import persistent
 from . utils.handlers import eventHandler
 from . utils.operators import makeOperator
 
