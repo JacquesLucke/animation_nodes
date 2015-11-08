@@ -41,30 +41,11 @@ def getIDKeysInCurrentFile():
     return list(idKeys)
 
 
-class IDKeyDataType:
-    identifier = "None"
 
-    @staticmethod
-    def create(object, name):
-        raise NotImplementedError()
+# ID Key Data Types
+#######################################
 
-    @staticmethod
-    def remove(object, name):
-        raise NotImplementedError()
-
-    @staticmethod
-    def exists(object, name):
-        raise NotImplementedError()
-
-    @staticmethod
-    def set(object, name, data):
-        raise NotImplementedError()
-
-    @staticmethod
-    def get(object, name):
-        raise NotImplementedError()
-
-class TransformDataType(IDKeyDataType):
+class TransformDataType:
     identifier = "Transforms"
     subproperties = ("Location", "Rotation", "Scale")
 
@@ -97,13 +78,13 @@ class TransformDataType(IDKeyDataType):
     def getPropertyKeys(cls, name):
         return list(joinMultiple(cls.identifier, name, cls.subproperties))
 
-
-class StringDataType(IDKeyDataType):
-    identifier = "String"
+class SingleValueDataType:
+    identifier = None
+    default = None
 
     @classmethod
     def create(cls, object, name):
-        cls.set(object, name, "")
+        cls.set(object, name, cls.default)
 
     @classmethod
     def remove(cls, object, name):
@@ -120,16 +101,30 @@ class StringDataType(IDKeyDataType):
 
     @classmethod
     def get(cls, object, name):
-        return getIDProperty(object, cls.getPropertyKey(name), "")
+        return getIDProperty(object, cls.getPropertyKey(name), cls.default)
 
     @classmethod
     def getPropertyKey(cls, name):
         return joinSingle(cls.identifier, name)
 
+class StringDataType(SingleValueDataType):
+    identifier = "String"
+    default = ""
+
+class IntegerDataType(SingleValueDataType):
+    identifier = "Integer"
+    default = 0
+
 
 dataTypeByIdentifier = {
     "Transforms" : TransformDataType,
-    "String" : StringDataType }
+    "String" : StringDataType,
+    "Integer" : IntegerDataType }
+
+
+
+# Misc
+###################################
 
 def joinSingle(dataType, propertyName):
     return "AN * {} * {} * ".format(dataType, propertyName)
