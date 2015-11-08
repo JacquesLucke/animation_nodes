@@ -5,7 +5,8 @@ from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 
 keyDataTypeItems = [
-    ("Transforms", "Transforms", "", "NONE", 0)
+    ("Transforms", "Transforms", "", "NONE", 0),
+    ("String", "String", "", "NONE", 1)
 ]
 
 class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
@@ -48,6 +49,8 @@ class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
             yield "location, rotation, scale = data"
             if isLinked["matrix"]:
                 yield "matrix = animation_nodes.utils.math.composeMatrix(location, rotation, scale)"
+        if dataType == "String":
+            yield "text = data"
 
     @keepNodeLinks
     def recreateOutputs(self):
@@ -55,8 +58,12 @@ class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
         self.outputs.new("an_BooleanSocket", "Exists", "exists")
 
         dataType = self.keyDataType
+
         if dataType == "Transforms":
             self.outputs.new("an_VectorSocket", "Location", "location")
             self.outputs.new("an_EulerSocket", "Rotation", "rotation")
             self.outputs.new("an_VectorSocket", "Scale", "scale")
             self.outputs.new("an_MatrixSocket", "Matrix", "matrix")
+
+        if dataType == "String":
+            self.outputs.new("an_StringSocket", "Text", "text")

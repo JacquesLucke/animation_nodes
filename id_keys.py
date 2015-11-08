@@ -98,8 +98,38 @@ class TransformDataType(IDKeyDataType):
         return list(joinMultiple(cls.identifier, name, cls.subproperties))
 
 
+class StringDataType(IDKeyDataType):
+    identifier = "String"
+
+    @classmethod
+    def create(cls, object, name):
+        cls.set(object, name, "")
+
+    @classmethod
+    def remove(cls, object, name):
+        key = cls.getPropertyKey(name)
+        if key in object: del object[key]
+
+    @classmethod
+    def exists(cls, object, name):
+        return hasIDProperty(object, cls.getPropertyKey(name))
+
+    @classmethod
+    def set(cls, object, name, data):
+        object[cls.getPropertyKey(name)] = data
+
+    @classmethod
+    def get(cls, object, name):
+        return getIDProperty(object, cls.getPropertyKey(name), "")
+
+    @classmethod
+    def getPropertyKey(cls, name):
+        return joinSingle(cls.identifier, name)
+
+
 dataTypeByIdentifier = {
-    "Transforms" : TransformDataType }
+    "Transforms" : TransformDataType,
+    "String" : StringDataType }
 
 def joinSingle(dataType, propertyName):
     return "AN * {} * {} * ".format(dataType, propertyName)
