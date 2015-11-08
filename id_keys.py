@@ -20,6 +20,11 @@ def doesIDKeyExist(object, dataType, propertyName):
     typeClass = dataTypeByIdentifier.get(dataType, None)
     return typeClass.exists(object, propertyName) if typeClass else False
 
+def createIDKey(object, dataType, propertyName):
+    typeClass = dataTypeByIdentifier.get(dataType, None)
+    if typeClass is not None:
+        typeClass.create(object, propertyName)
+
 def getIDKeyData(object, dataType, propertyName):
     typeClass = dataTypeByIdentifier.get(dataType, None)
     return typeClass.get(object, propertyName) if typeClass else None
@@ -28,6 +33,11 @@ def setIDKeyData(object, dataType, propertyName, data):
     typeClass = dataTypeByIdentifier.get(dataType, None)
     if typeClass is not None:
         typeClass.set(object, propertyName, data)
+
+def removeIDKey(object, dataType, propertyName):
+    typeClass = dataTypeByIdentifier.get(dataType, None)
+    if typeClass is not None:
+        typeClass.remove(object, propertyName)
 
 def drawIDKeyProperty(layout, object, dataType, propertyName):
     typeClass = dataTypeByIdentifier.get(dataType, None)
@@ -53,20 +63,19 @@ def getAllIDKeys():
 
 def findIDKeysInCurrentFile():
     collectedKeys = set()
+
     for object in bpy.data.objects:
         for key in object.keys():
             if key.startswith("AN * "): collectedKeys.add(key)
 
-    return filterRealIDKeys(collectedKeys)
-
-def getIDKeysOfObject(object):
-    collectedKeys = set()
-    for key in object.keys():
-        if key.startswith("AN * "): collectedKeys.add(key)
-
-    return filterRealIDKeys(collectedKeys)
+    realKeys = filterRealIDKeys(collectedKeys)
+    realKeys.update(getDefaultIDKeys())
+    return realKeys
 
 IDKey = namedtuple("IDKey", ["type", "name"])
+def getDefaultIDKeys():
+    return [ IDKey("Transforms", "Initial Transforms") ]
+
 def filterRealIDKeys(keys):
     realKeys = set()
     for key in keys:
@@ -161,6 +170,10 @@ class StringDataType(SingleValueDataType, IDKeyDataType):
     identifier = "String"
     default = ""
 
+    @classmethod
+    def drawProperty(cls, layout, object, name):
+        layout.prop(object, toPath(cls.getPropertyKey(name)), text = "")
+
 class IntegerDataType(SingleValueDataType, IDKeyDataType):
     identifier = "Integer"
     default = 0
@@ -214,20 +227,24 @@ class IDKeyProperties(bpy.types.PropertyGroup):
     def _doesIDKeyExist(self, dataType, propertyName):
         return doesIDKeyExist(self.id_data, dataType,propertyName)
 
-    def _getAllIDKeys(self):
-        return getIDKeysOfObject(self.id_data)
-
     def _drawProperty(self, layout, dataType, propertyName):
         drawIDKeyProperty(layout, self.id_data, dataType, propertyName)
 
+    def _createIDKey(self, dataType, propertyName):
+        createIDKey(self.id_data, dataType, propertyName)
+
+    def _removeIDKey(self, dataType, propertyName):
+        removeIDKey(self.id_data, dataType, propertyName)
+
     get = _getIDKeyData
     set = _setIDKeyData
+    create = _createIDKey
+    remove = _removeIDKey
     exists = _doesIDKeyExist
-    getAll = _getAllIDKeys
     drawProperty = _drawProperty
 
 def register():
-    bpy.types.ID.id_keys = PointerProperty(type = IDKeyProperties)
+    bpy.types.ID.id_keys = PointerProperty(name = "ID Keys", type = IDKeyProperties)
 
 def unregister():
     del bpy.types.ID.id_keys
