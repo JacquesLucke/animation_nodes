@@ -2,7 +2,6 @@ import bpy
 
 from . import utils
 from . import keymap
-from . import events
 from . import id_keys
 from . import tree_info
 from . import draw_handler
@@ -23,7 +22,6 @@ def registerFiles():
     socket_base.register()
     node_colors.register()
     draw_handler.register()
-    events.registerHandlers()
     script.registerHandlers()
     utils.operators.register()
     tree_info.registerHandlers()
@@ -43,7 +41,6 @@ def unregisterFiles():
     socket_base.unregister()
     node_colors.unregister()
     draw_handler.unregister()
-    events.unregisterHandlers()
     script.unregisterHandlers()
     utils.operators.unregister()
     tree_info.unregisterHandlers()
