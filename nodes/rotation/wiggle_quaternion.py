@@ -14,7 +14,7 @@ class QuaternionWiggleNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.inputs.new("an_FloatSocket", "Seed", "seed")
         self.inputs.new("an_FloatSocket", "Evolution", "evolution")
-        self.inputs.new("an_QuaternionSocket", "Amplitude", "amplitude").value = [1, 0.5, 0.5, 0.5]
+        self.inputs.new("an_QuaternionSocket", "Amplitude", "amplitude").value = [1, 0.3, 0.3, 0.3]
         self.inputs.new("an_IntegerSocket", "Octaves", "octaves").value = 2
         self.inputs.new("an_FloatSocket", "Persistance", "persistance").value = 0.3
         self.outputs.new("an_QuaternionSocket", "Quaternion", "quaternion")
