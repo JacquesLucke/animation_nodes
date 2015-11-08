@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import *
-from math import pi
+from math import radians
 from mathutils import Euler
 from ... events import propertyChanged
 from ... base_types.node import AnimationNode
@@ -15,7 +15,7 @@ class EulerWiggleNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.inputs.new("an_FloatSocket", "Seed", "seed")
         self.inputs.new("an_FloatSocket", "Evolution", "evolution")
-        self.inputs.new("an_EulerSocket", "Amplitude", "amplitude").value = [pi / 6, pi / 6, pi / 6]
+        self.inputs.new("an_EulerSocket", "Amplitude", "amplitude").value = [radians(30), radians(30), radians(30)]
         self.inputs.new("an_IntegerSocket", "Octaves", "octaves").value = 2
         self.inputs.new("an_FloatSocket", "Persistance", "persistance").value = 0.3
         self.outputs.new("an_EulerSocket", "Euler", "euler")
