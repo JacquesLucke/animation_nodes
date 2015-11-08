@@ -45,7 +45,10 @@ def getIDKeysInCurrentFile():
 # ID Key Data Types
 #######################################
 
-class TransformDataType:
+class IDKeyDataType:
+    pass
+
+class TransformDataType(IDKeyDataType):
     identifier = "Transforms"
     subproperties = ("Location", "Rotation", "Scale")
 
@@ -107,19 +110,21 @@ class SingleValueDataType:
     def getPropertyKey(cls, name):
         return joinSingle(cls.identifier, name)
 
-class StringDataType(SingleValueDataType):
+class StringDataType(SingleValueDataType, IDKeyDataType):
     identifier = "String"
     default = ""
 
-class IntegerDataType(SingleValueDataType):
+class IntegerDataType(SingleValueDataType, IDKeyDataType):
     identifier = "Integer"
     default = 0
 
+class FloatDataType(SingleValueDataType, IDKeyDataType):
+    identifier = "Float"
+    default = 0.0
 
-dataTypeByIdentifier = {
-    "Transforms" : TransformDataType,
-    "String" : StringDataType,
-    "Integer" : IntegerDataType }
+dataTypeByIdentifier = { dataType.identifier : dataType
+     for dataType in IDKeyDataType.__subclasses__()
+     if dataType.identifier is not None }
 
 
 

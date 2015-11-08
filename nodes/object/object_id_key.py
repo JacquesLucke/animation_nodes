@@ -7,7 +7,8 @@ from ... base_types.node import AnimationNode
 keyDataTypeItems = [
     ("Transforms", "Transforms", "", "NONE", 0),
     ("String", "String", "", "NONE", 1),
-    ("Integer", "Integer", "", "NONE", 2)
+    ("Integer", "Integer", "", "NONE", 2),
+    ("Float", "Float", "", "NONE", 3)
 ]
 
 class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
@@ -46,13 +47,16 @@ class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
 
         dataType = self.keyDataType
         isLinked = self.getLinkedOutputsDict()
+
         if dataType == "Transforms":
             yield "location, rotation, scale = data"
             if isLinked["matrix"]:
                 yield "matrix = animation_nodes.utils.math.composeMatrix(location, rotation, scale)"
+
         if dataType == "String":
             yield "text = data"
-        if dataType == "Integer":
+
+        if dataType in ("Integer", "Float"):
             yield "number = data"
 
     @keepNodeLinks
@@ -71,5 +75,5 @@ class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
         if dataType == "String":
             self.outputs.new("an_StringSocket", "Text", "text")
 
-        if dataType == "Integer":
+        if dataType in ("Integer", "Float"):
             self.outputs.new("an_IntegerSocket", "Number", "number")
