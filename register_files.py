@@ -22,10 +22,10 @@ def registerFiles():
     node_colors.register()
     draw_handler.register()
     utils.operators.register()
+    dynamic_operators.register()
     tree_info.registerHandlers()
     generic_node_panel.register()
     utils.handlers.registerHandlers()
-    dynamic_operators.registerHandlers()
     auto_nodetree_selection.registerHandlers()
 
     registerMenu()
@@ -39,10 +39,10 @@ def unregisterFiles():
     node_colors.unregister()
     draw_handler.unregister()
     utils.operators.unregister()
+    dynamic_operators.unregister()
     tree_info.unregisterHandlers()
     generic_node_panel.unregister()
     utils.handlers.unregisterHandlers()
-    dynamic_operators.unregisterHandlers()
     auto_nodetree_selection.unregisterHandlers()
 
     unregisterMenu()

@@ -1,5 +1,4 @@
 import bpy
-from bpy.app.handlers import persistent
 from bpy.props import *
 from ... sockets.info import toIdName
 from ... tree_info import getNodesByType

@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
+from .. utils.handlers import eventHandler
 from .. utils.nodes import getNode, getSocket
-from bpy.app.handlers import persistent
 
 operatorsByDescription = {}
 missingDescriptions = set()
@@ -13,7 +13,7 @@ def getInvokeFunctionOperator(description):
     return fallbackOperator.bl_idname
 
 
-@persistent
+@eventHandler("SCENE_UPDATE_POST")
 def createMissingOperators(scene):
     while len(missingDescriptions) > 0:
         description = missingDescriptions.pop()
@@ -66,12 +66,10 @@ fallbackOperator = createOperatorWithDescription("")
 # Register
 ##################################
 
-def registerHandlers():
+def register():
     try: bpy.utils.register_class(fallbackOperator)
     except: pass
-    bpy.app.handlers.scene_update_post.append(createMissingOperators)
 
-def unregisterHandlers():
+def unregister():
     try: bpy.utils.unregister_class(fallbackOperator)
     except: pass
-    bpy.app.handlers.scene_update_post.remove(createMissingOperators)

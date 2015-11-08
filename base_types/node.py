@@ -4,8 +4,8 @@ import types
 import random
 from bpy.props import *
 from collections import defaultdict
-from bpy.app.handlers import persistent
 from .. ui.node_colors import colorNetworks
+from .. utils.handlers import eventHandler
 from .. utils.nodes import getAnimationNodeTrees
 from .. utils.blender_ui import convertToRegionLocation, getDpiFactor
 from .. operators.dynamic_operators import getInvokeFunctionOperator
@@ -343,7 +343,7 @@ def tagVariableName(code, name, tag):
     code = re.sub(r"([^\.\"\%']|^)\b({})\b".format(name), r"\1{0}\2{0}".format(tag), code)
     return code
 
-@persistent
+@eventHandler("SCENE_UPDATE_POST")
 def createMissingIdentifiers(scene = None):
     def unidentifiedNodes():
         for tree in getAnimationNodeTrees():
@@ -407,7 +407,6 @@ def register():
     bpy.types.Node.getNodeTree = getNodeTree
     bpy.types.Node.getRegionBottomLeft = getRegionBottomLeft
     bpy.types.Node.getRegionBottomRight = getRegionBottomRight
-    bpy.app.handlers.load_post.append(createMissingIdentifiers)
 
 def unregister():
-    bpy.app.handlers.load_post.remove(createMissingIdentifiers)
+    pass
