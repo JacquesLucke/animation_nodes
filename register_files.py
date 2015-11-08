@@ -6,7 +6,6 @@ from . import id_keys
 from . import draw_handler
 from . ui import node_colors
 from . ui import generic_node_panel
-from . ui import auto_nodetree_selection
 from . operators import dynamic_operators
 from . base_types import node as node_base
 from . nodes.sound import bake as sound_bake
@@ -24,7 +23,6 @@ def registerFiles():
     dynamic_operators.register()
     generic_node_panel.register()
     utils.handlers.registerHandlers()
-    auto_nodetree_selection.registerHandlers()
 
     registerMenu()
     keymap.register()
@@ -40,7 +38,6 @@ def unregisterFiles():
     dynamic_operators.unregister()
     generic_node_panel.unregister()
     utils.handlers.unregisterHandlers()
-    auto_nodetree_selection.unregisterHandlers()
 
     unregisterMenu()
     keymap.unregister()
