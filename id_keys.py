@@ -10,35 +10,60 @@ The individual parts are separated with ' * '
 '''
 
 import bpy
+from bpy.props import *
 from collections import namedtuple
 from mathutils import Vector, Euler
+from bpy.app.handlers import persistent
+from . utils.operators import makeOperator
 
-def getIDKeyInfo(object, dataType, propertyName):
+def doesIDKeyExist(object, dataType, propertyName):
     typeClass = dataTypeByIdentifier.get(dataType, None)
-    if typeClass is None: return None, False
-    return typeClass.get(object, propertyName), typeClass.exists(object, propertyName)
+    return typeClass.exists(object, propertyName) if typeClass else False
+
+def getIDKeyData(object, dataType, propertyName):
+    typeClass = dataTypeByIdentifier.get(dataType, None)
+    return typeClass.get(object, propertyName) if typeClass else None
 
 def setIDKeyData(object, dataType, propertyName, data):
     typeClass = dataTypeByIdentifier.get(dataType, None)
     if typeClass is not None:
         typeClass.set(object, propertyName, data)
 
-def getIDKeysInCurrentFile():
+
+idKeysInFile = []
+
+@makeOperator("an.update_id_keys_list", "Update ID Key List")
+def updateIdKeysList():
+    idKeysInFile.clear()
+    idKeysInFile.extend(findIDKeysInCurrentFile())
+
+def getAllIDKeys():
+    return idKeysInFile
+
+def findIDKeysInCurrentFile():
     collectedKeys = set()
     for object in bpy.data.objects:
         for key in object.keys():
             if key.startswith("AN * "): collectedKeys.add(key)
 
-    idKeys = set()
-    IDKey = namedtuple("IDKey", ["type", "name"])
-    dataTypeIdentifiers = dataTypeByIdentifier.keys()
-    for key in collectedKeys:
+    return filterRealIDKeys(collectedKeys)
+
+def getIDKeysOfObject(object):
+    collectedKeys = set()
+    for key in object.keys():
+        if key.startswith("AN * "): collectedKeys.add(key)
+
+    return filterRealIDKeys(collectedKeys)
+
+IDKey = namedtuple("IDKey", ["type", "name"])
+def filterRealIDKeys(keys):
+    realKeys = set()
+    for key in keys:
         parts = key.split(" * ")
         if len(parts) != 4: continue
         if parts[1] not in dataTypeIdentifiers: continue
-        idKeys.add(IDKey(parts[1], parts[2]))
-
-    return list(idKeys)
+        realKeys.add(IDKey(parts[1], parts[2]))
+    return realKeys
 
 
 
@@ -126,6 +151,8 @@ dataTypeByIdentifier = { dataType.identifier : dataType
      for dataType in IDKeyDataType.__subclasses__()
      if dataType.identifier is not None }
 
+dataTypeIdentifiers = dataTypeByIdentifier.keys()
+
 
 
 # Misc
@@ -153,10 +180,34 @@ def toPath(name):
 # Register
 ################################
 
+class IDKeyProperties(bpy.types.PropertyGroup):
+    bl_idname = "an_id_key_properties"
+
+    def _getIDKeyData(self, dataType, propertyName):
+        return getIDKeyData(self.id_data, dataType, propertyName)
+
+    def _setIDKeyData(self, dataType, propertyName, data):
+        return setIDKeyData(self.id_data, dataType, propertyName, data)
+
+    def _doesIDKeyExist(self, dataType, propertyName):
+        return doesIDKeyExist(self.id_data, dataType,propertyName)
+
+    def _getAllIDKeys(self):
+        return getIDKeysOfObject(self.id_data)
+
+    get = _getIDKeyData
+    set = _setIDKeyData
+    exists = _doesIDKeyExist
+    getAll = _getAllIDKeys
+
+@persistent
+def fileLoad(scene):
+    updateIdKeysList()
+
 def register():
-    bpy.types.ID.getIDKeyInfo = getIDKeyInfo
-    bpy.types.ID.setIDKeyData = setIDKeyData
+    bpy.types.ID.id_keys = PointerProperty(type = IDKeyProperties)
+    bpy.app.handlers.load_post.append(fileLoad)
 
 def unregister():
-    del bpy.types.ID.getIDKeyInfo
-    del bpy.types.ID.setIDKeyData
+    del bpy.types.ID.id_keys
+    bpy.app.handlers.load_post.remove(fileLoad)

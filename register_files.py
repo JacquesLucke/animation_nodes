@@ -1,5 +1,6 @@
 import bpy
 
+from . import utils
 from . import keymap
 from . import events
 from . import id_keys
@@ -24,6 +25,7 @@ def registerFiles():
     draw_handler.register()
     events.registerHandlers()
     script.registerHandlers()
+    utils.operators.register()
     tree_info.registerHandlers()
     node_base.registerHandlers()
     selection.registerHandlers()
@@ -42,6 +44,7 @@ def unregisterFiles():
     draw_handler.unregister()
     events.unregisterHandlers()
     script.unregisterHandlers()
+    utils.operators.unregister()
     tree_info.unregisterHandlers()
     node_base.unregisterHandlers()
     selection.unregisterHandlers()

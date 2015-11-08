@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from .. tree_info import getNodeByIdentifier
-from .. id_keys import getIDKeysInCurrentFile
+from .. id_keys import findIDKeysInCurrentFile
 from .. utils.enum_items import enumItemsFromDicts
 
 class IDKeySearch(bpy.types.Operator):
@@ -12,7 +12,7 @@ class IDKeySearch(bpy.types.Operator):
 
     @enumItemsFromDicts
     def getSearchItems(self, context):
-        for dataType, name in getIDKeysInCurrentFile():
+        for dataType, name in findIDKeysInCurrentFile():
             yield { "value" : dataType + " * " + name,
                     "name" : name }
 

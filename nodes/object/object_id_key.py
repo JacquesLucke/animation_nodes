@@ -43,7 +43,8 @@ class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
         self.keyName = name
 
     def getExecutionCode(self):
-        yield "data, exists = animation_nodes.id_keys.getIDKeyInfo(object, {}, {})".format(repr(self.keyDataType), repr(self.keyName))
+        yield "exists = animation_nodes.id_keys.doesIDKeyExist(object, {}, {})".format(repr(self.keyDataType), repr(self.keyName))
+        yield "data = animation_nodes.id_keys.getIDKeyData(object, {}, {})".format(repr(self.keyDataType), repr(self.keyName))
 
         dataType = self.keyDataType
         isLinked = self.getLinkedOutputsDict()
