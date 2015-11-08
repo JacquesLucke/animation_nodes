@@ -3,7 +3,6 @@ import bpy
 from . import utils
 from . import keymap
 from . import id_keys
-from . import tree_info
 from . import draw_handler
 from . ui import node_colors
 from . ui import generic_node_panel
@@ -23,7 +22,6 @@ def registerFiles():
     draw_handler.register()
     utils.operators.register()
     dynamic_operators.register()
-    tree_info.registerHandlers()
     generic_node_panel.register()
     utils.handlers.registerHandlers()
     auto_nodetree_selection.registerHandlers()
@@ -40,7 +38,6 @@ def unregisterFiles():
     draw_handler.unregister()
     utils.operators.unregister()
     dynamic_operators.unregister()
-    tree_info.unregisterHandlers()
     generic_node_panel.unregister()
     utils.handlers.unregisterHandlers()
     auto_nodetree_selection.unregisterHandlers()

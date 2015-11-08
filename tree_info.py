@@ -1,7 +1,7 @@
 import bpy
 from collections import defaultdict
 from . utils.timing import measureTime
-from bpy.app.handlers import persistent
+from . utils.handlers import eventHandler
 from . preferences import forbidSubprogramRecursion
 from . utils.nodes import getAnimationNodeTrees, idToNode, idToSocket
 
@@ -332,6 +332,7 @@ def updateAndRetryOnException(function):
 # Public API
 ##################################
 
+@eventHandler("FILE_LOAD_POST")
 @measureTime
 def update():
     _data.update()
@@ -447,18 +448,3 @@ def getNetworkByIdentifier(identifier):
     for network in getNetworks():
         if network.identifier == identifier: return network
     return None
-
-
-
-# Register
-##################################
-
-@persistent
-def _updateTreeData(scene):
-    update()
-
-def registerHandlers():
-    bpy.app.handlers.load_post.append(_updateTreeData)
-
-def unregisterHandlers():
-    bpy.app.handlers.load_post.remove(_updateTreeData)
