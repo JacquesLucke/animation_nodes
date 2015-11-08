@@ -12,7 +12,7 @@ class RandomQuaternionNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.inputs.new("an_IntegerSocket", "Seed", "seed")
-        self.inputs.new("an_FloatSocket", "Scale", "scale").value = 2.0
+        self.inputs.new("an_FloatSocket", "Scale", "scale").value = 0.3
         self.outputs.new("an_QuaternionSocket", "Quaternion", "randomQuaternion")
 
     def draw(self, layout):
