@@ -3,6 +3,7 @@ from bpy.app.handlers import persistent
 from bpy.props import *
 from ... sockets.info import toIdName
 from ... tree_info import getNodesByType
+from ... utils.handlers import eventHandler
 from ... utils.names import toInterfaceName
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
@@ -168,18 +169,8 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         return getSubprogramUnitByIdentifier(self.identifier)
 
 
-@persistent
+@eventHandler("SCENE_UPDATE_POST")
 def sceneUpdate(scene):
     for node in getNodesByType("an_ScriptNode"):
         if node.interactiveMode:
             node.interactiveUpdate()
-
-
-# Register
-###############################
-
-def registerHandlers():
-    bpy.app.handlers.scene_update_post.append(sceneUpdate)
-
-def unregisterHandlers():
-    bpy.app.handlers.scene_update_post.remove(sceneUpdate)

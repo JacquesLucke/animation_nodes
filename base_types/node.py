@@ -400,7 +400,7 @@ def getRegionBottomRight(node, region):
     dpiFactor = getDpiFactor()
     return convertToRegionLocation(region, location.x + dimensions.x / dpiFactor, location.y - dimensions.y / dpiFactor)
 
-def registerHandlers():
+def register():
     bpy.types.Node.toID = nodeToID
     bpy.types.Node.isAnimationNode = BoolProperty(name = "Is Animation Node", get = isAnimationNode)
     bpy.types.Node.viewLocation = FloatVectorProperty(name = "Region Location", size = 2, subtype = "XYZ", get = getViewLocation)
@@ -409,5 +409,5 @@ def registerHandlers():
     bpy.types.Node.getRegionBottomRight = getRegionBottomRight
     bpy.app.handlers.load_post.append(createMissingIdentifiers)
 
-def unregisterHandlers():
+def unregister():
     bpy.app.handlers.load_post.remove(createMissingIdentifiers)
