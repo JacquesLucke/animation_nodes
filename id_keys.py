@@ -14,6 +14,7 @@ from bpy.props import *
 from collections import namedtuple
 from mathutils import Vector, Euler
 from bpy.app.handlers import persistent
+from . utils.handlers import eventHandler
 from . utils.operators import makeOperator
 
 def doesIDKeyExist(object, dataType, propertyName):
@@ -29,9 +30,20 @@ def setIDKeyData(object, dataType, propertyName, data):
     if typeClass is not None:
         typeClass.set(object, propertyName, data)
 
+def drawIDKeyProperty(layout, object, dataType, propertyName):
+    typeClass = dataTypeByIdentifier.get(dataType, None)
+    if typeClass is None: layout.label("Data Type does not exist", icon = "ERROR")
+    if typeClass.exists(object, propertyName):
+        if hasattr(typeClass, "drawProperty"):
+            typeClass.drawProperty(layout, object, propertyName)
+    else:
+        layout.label("ID Key does not exist yet", icon = "INFO")
+
 
 idKeysInFile = []
 
+@eventHandler("FILE_LOAD_POST")
+@eventHandler("ADDON_LOAD_POST")
 @makeOperator("an.update_id_keys_list", "Update ID Key List")
 def updateIdKeysList():
     idKeysInFile.clear()
@@ -103,8 +115,19 @@ class TransformDataType(IDKeyDataType):
                 Vector(getIDProperty(object, keys[2], (1.0, 1.0, 1.0))) ]
 
     @classmethod
+    def drawProperty(cls, layout, object, name):
+        keys = cls.getPropertyKeys(name)
+        row = layout.row()
+
+        for i, label in enumerate(["Location", "Rotation", "Scale"]):
+            col = row.column(align = True)
+            col.label(label)
+            col.prop(object, toPath(keys[i]), text = "")
+
+    @classmethod
     def getPropertyKeys(cls, name):
         return list(joinMultiple(cls.identifier, name, cls.subproperties))
+
 
 class SingleValueDataType:
     identifier = None
@@ -195,19 +218,17 @@ class IDKeyProperties(bpy.types.PropertyGroup):
     def _getAllIDKeys(self):
         return getIDKeysOfObject(self.id_data)
 
+    def _drawProperty(self, layout, dataType, propertyName):
+        drawIDKeyProperty(layout, self.id_data, dataType, propertyName)
+
     get = _getIDKeyData
     set = _setIDKeyData
     exists = _doesIDKeyExist
     getAll = _getAllIDKeys
-
-@persistent
-def fileLoad(scene):
-    updateIdKeysList()
+    drawProperty = _drawProperty
 
 def register():
     bpy.types.ID.id_keys = PointerProperty(type = IDKeyProperties)
-    bpy.app.handlers.load_post.append(fileLoad)
 
 def unregister():
     del bpy.types.ID.id_keys
-    bpy.app.handlers.load_post.remove(fileLoad)

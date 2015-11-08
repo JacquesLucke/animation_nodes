@@ -30,6 +30,7 @@ def registerFiles():
     node_base.registerHandlers()
     selection.registerHandlers()
     generic_node_panel.register()
+    utils.handlers.registerHandlers()
     dynamic_operators.registerHandlers()
     auto_nodetree_selection.registerHandlers()
 
@@ -49,6 +50,7 @@ def unregisterFiles():
     node_base.unregisterHandlers()
     selection.unregisterHandlers()
     generic_node_panel.unregister()
+    utils.handlers.unregisterHandlers()
     dynamic_operators.unregisterHandlers()
     auto_nodetree_selection.unregisterHandlers()
 

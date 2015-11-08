@@ -15,17 +15,16 @@ class IDKeyPanel(bpy.types.Panel):
         else:
             self.drawForObject(self.layout, object)
 
-        self.layout.label(str(getAllIDKeys()))
-
     def drawForObject(self, layout, object):
         layout.operator("an.update_id_keys_list")
-        for key in object.id_keys.getAll():
+        for key in getAllIDKeys():
             self.drawIdKey(layout, object, key)
 
     def drawIdKey(self, layout, object, key):
         box = layout.box()
-        box.label("{} ({})".format(key.name, key.type))
 
         exists = object.id_keys.exists(*key)
-        if not exists:
-            box.label("Incomplete", icon = "INFO")
+        icon = "FILE_TICK" if exists else "NEW"
+        box.label("{} ({})".format(key.name, key.type), icon = icon)
+
+        object.id_keys.drawProperty(box, *key)
