@@ -35,7 +35,9 @@ bl_info = {
 # load and reload submodules
 ##################################
 
+import importlib
 from . import developer_utils
+importlib.reload(developer_utils)
 modules = developer_utils.setup_addon_modules(__path__, __name__, "bpy" in locals())
 
 
