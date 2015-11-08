@@ -26,6 +26,7 @@ class IDKeyPanel(bpy.types.Panel):
         box = layout.box()
         self.drawIDKeyHeader(box, object, key)
         object.id_keys.drawProperty(box, *key)
+        object.id_keys.drawExtras(box, *key)
 
     def drawIDKeyHeader(self, layout, object, key):
         left, right = splitAlignment(layout)

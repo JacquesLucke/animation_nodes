@@ -41,13 +41,19 @@ def removeIDKey(object, dataType, propertyName):
 
 def drawIDKeyProperty(layout, object, dataType, propertyName):
     typeClass = dataTypeByIdentifier.get(dataType, None)
-    if typeClass is None: layout.label("Data Type does not exist", icon = "ERROR")
+    if typeClass is None:
+        layout.label("Data Type does not exist", icon = "ERROR")
+        return
     if typeClass.exists(object, propertyName):
         if hasattr(typeClass, "drawProperty"):
             typeClass.drawProperty(layout, object, propertyName)
     else:
         layout.label("ID Key does not exist yet", icon = "INFO")
 
+def drawIDKeyExtras(layout, object, dataType, propertyName):
+    typeClass = dataTypeByIdentifier.get(dataType, None)
+    if hasattr(typeClass, "drawExtras"):
+        typeClass.drawExtras(layout, object, propertyName)
 
 idKeysInFile = []
 
@@ -133,8 +139,18 @@ class TransformDataType(IDKeyDataType):
             col.prop(object, toPath(keys[i]), text = "")
 
     @classmethod
+    def drawExtras(cls, layout, object, name):
+        props = layout.operator("an.id_key_from_current_transforms")
+        props.name = name
+
+    @classmethod
     def getPropertyKeys(cls, name):
         return list(joinMultiple(cls.identifier, name, cls.subproperties))
+
+@makeOperator("an.id_key_from_current_transforms", "From Current Transforms", arguments = ["String"])
+def idKeyFromCurrentTransforms(name):
+    for object in bpy.context.selected_objects:
+        object.id_keys.set("Transforms", name, (object.location, object.rotation_euler, object.scale))
 
 
 class SingleValueDataType:
@@ -230,6 +246,9 @@ class IDKeyProperties(bpy.types.PropertyGroup):
     def _drawProperty(self, layout, dataType, propertyName):
         drawIDKeyProperty(layout, self.id_data, dataType, propertyName)
 
+    def _drawExtras(self, layout, dataType, propertyName):
+        drawIDKeyExtras(layout, self.id_data, dataType, propertyName)
+
     def _createIDKey(self, dataType, propertyName):
         createIDKey(self.id_data, dataType, propertyName)
 
@@ -242,6 +261,7 @@ class IDKeyProperties(bpy.types.PropertyGroup):
     remove = _removeIDKey
     exists = _doesIDKeyExist
     drawProperty = _drawProperty
+    drawExtras = _drawExtras
 
 def register():
     bpy.types.ID.id_keys = PointerProperty(name = "ID Keys", type = IDKeyProperties)
