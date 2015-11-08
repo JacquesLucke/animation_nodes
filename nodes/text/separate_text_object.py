@@ -66,7 +66,9 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
         textObjects = [None] * self.objectCount
         for object in bpy.context.scene.objects:
             if self.isObjectPartOfThisNode(object):
-                textObjects[getattr(object, '["'+indexPropertyName+'"]', 0)] = object
+                index = getattr(object, '["{}"]'.format(indexPropertyName), -1)
+                if 0 <= index < self.objectCount:
+                    textObjects[index] = object
         return textObjects
 
     def updateSeparation(self):
@@ -97,6 +99,7 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
             object.id_keys.set("String", "Initial Text", originalCharacter)
             object.id_keys.set("Transforms", "Initial Transforms",
                 (object.location, object.rotation_euler, object.scale))
+        bpy.ops.an.update_id_keys_list()
         self.objectCount = len(objects)
 
         material = bpy.data.materials.get(self.materialName)
