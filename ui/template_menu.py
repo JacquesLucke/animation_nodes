@@ -18,6 +18,7 @@ class TemplatesMenu(bpy.types.Menu):
         layout.operator("an.fcurve_animation_offset_template")
         layout.operator("an.simple_parent_template")
         layout.operator("an.grid_3d_template")
+        layout.operator("an.animate_individual_letters_template")
 
 class TemplatesMenuInHeader(bpy.types.Header):
     bl_idname = "an_templates_menu_in_header"
