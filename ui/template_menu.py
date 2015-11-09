@@ -24,6 +24,8 @@ class TemplatesMenuInHeader(bpy.types.Header):
     bl_space_type = "NODE_EDITOR"
 
     def draw(self, context):
+        if context.space_data.tree_type != "an_AnimationNodeTree": return
+    
         layout = self.layout
         layout.separator()
         layout.menu("an_templates_menu", text = "Templates")
