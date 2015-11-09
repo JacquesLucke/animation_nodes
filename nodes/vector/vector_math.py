@@ -1,5 +1,6 @@
 import bpy
 from bpy.props import *
+from ... tree_info import keepNodeLinks
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 
@@ -23,18 +24,12 @@ class VectorMathNode(bpy.types.Node, AnimationNode):
     bl_label = "Vector Math"
 
     def operationChanged(self, context):
-        self.inputs["B"].hide = self.operation in operationsWithFloat
-        self.inputs["Scale"].hide = self.operation not in operationsWithFloat
-        executionCodeChanged()
+        self.createInputs()
 
     operation = EnumProperty(name = "Operation", items = operationItems, default = "ADD", update = operationChanged)
 
     def create(self):
-        self.inputs.new("an_VectorSocket", "A", "a")
-        self.inputs.new("an_VectorSocket", "B", "b")
-        socket = self.inputs.new("an_FloatSocket", "Scale", "scale")
-        socket.hide = True
-        socket.value = 1.0
+        self.createInputs()
         self.outputs.new("an_VectorSocket", "Result", "result")
 
     def draw(self, layout):
@@ -42,6 +37,16 @@ class VectorMathNode(bpy.types.Node, AnimationNode):
 
     def drawLabel(self):
         return operationLabels[self.operation]
+
+    @keepNodeLinks
+    def createInputs(self):
+        self.inputs.clear()
+        self.inputs.new("an_VectorSocket", "A", "a")
+        if self.operation in operationsWithFloat:
+            self.inputs.new("an_FloatSocket", "Scale", "scale").value = 1.0
+        else:
+            self.inputs.new("an_VectorSocket", "B", "b")
+
 
     def getExecutionCode(self):
         op = self.operation
