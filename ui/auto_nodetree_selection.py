@@ -1,10 +1,10 @@
 import bpy
-from bpy.app.handlers import persistent
+from .. utils.handlers import eventHandler
 from .. utils.nodes import getAnimationNodeTrees
 
 treeNameBySpace = {}
 
-@persistent
+@eventHandler("SCENE_UPDATE_POST")
 def updateAutoNodeTreeSelection(scene):
     nodeTrees = getAnimationNodeTrees()
     if len(nodeTrees) == 0: return
@@ -30,14 +30,3 @@ def getAnimationNodeEditorSpaces():
             if space.tree_type == "an_AnimationNodeTree":
                 spaces.append(space)
     return spaces
-
-
-
-# Register
-##################################
-
-def registerHandlers():
-    bpy.app.handlers.scene_update_post.append(updateAutoNodeTreeSelection)
-
-def unregisterHandlers():
-    bpy.app.handlers.scene_update_post.remove(updateAutoNodeTreeSelection)

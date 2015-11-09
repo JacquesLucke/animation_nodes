@@ -1,5 +1,5 @@
 import bpy
-from bpy.app.handlers import persistent
+from . handlers import eventHandler
 
 enableSelectionSorting = True
 sortedSelectionNames = []
@@ -13,7 +13,7 @@ def getSortedSelectedObjects():
 def getSortedSelectedObjectNames():
     return sortedSelectionNames
 
-@persistent
+@eventHandler("SCENE_UPDATE_POST")
 def updateSelectionSorting(scene):
     global sortedSelectionNames
 
@@ -36,14 +36,3 @@ def getSelectedObjectNames():
     for object in getattr(bpy.context, "selected_objects", []):
         selectedNames.append(object.name)
     return selectedNames
-
-
-
-# Register
-##################################
-
-def registerHandlers():
-    bpy.app.handlers.scene_update_post.append(updateSelectionSorting)
-
-def unregisterHandlers():
-    bpy.app.handlers.scene_update_post.remove(updateSelectionSorting)

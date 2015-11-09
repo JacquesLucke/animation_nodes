@@ -4,8 +4,8 @@ import types
 import random
 from bpy.props import *
 from collections import defaultdict
-from bpy.app.handlers import persistent
 from .. ui.node_colors import colorNetworks
+from .. utils.handlers import eventHandler
 from .. utils.nodes import getAnimationNodeTrees
 from .. utils.blender_ui import convertToRegionLocation, getDpiFactor
 from .. operators.dynamic_operators import getInvokeFunctionOperator
@@ -148,6 +148,15 @@ class AnimationNode:
 
     def _choosePath(self, data):
         bpy.ops.an.choose_path("INVOKE_DEFAULT",
+            nodeIdentifier = self.identifier,
+            callback = data)
+
+    def invokeIDKeyChooser(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True):
+        data = functionName
+        self.invokeFunction(layout, "_chooseIDKeys", text = text, icon = icon, description = description, emboss = emboss, data = data)
+
+    def _chooseIDKeys(self, data):
+        bpy.ops.an.choose_id_key("INVOKE_DEFAULT",
             nodeIdentifier = self.identifier,
             callback = data)
 
@@ -334,7 +343,7 @@ def tagVariableName(code, name, tag):
     code = re.sub(r"([^\.\"\%']|^)\b({})\b".format(name), r"\1{0}\2{0}".format(tag), code)
     return code
 
-@persistent
+@eventHandler("SCENE_UPDATE_POST")
 def createMissingIdentifiers(scene = None):
     def unidentifiedNodes():
         for tree in getAnimationNodeTrees():
@@ -391,14 +400,13 @@ def getRegionBottomRight(node, region):
     dpiFactor = getDpiFactor()
     return convertToRegionLocation(region, location.x + dimensions.x / dpiFactor, location.y - dimensions.y / dpiFactor)
 
-def registerHandlers():
+def register():
     bpy.types.Node.toID = nodeToID
     bpy.types.Node.isAnimationNode = BoolProperty(name = "Is Animation Node", get = isAnimationNode)
     bpy.types.Node.viewLocation = FloatVectorProperty(name = "Region Location", size = 2, subtype = "XYZ", get = getViewLocation)
     bpy.types.Node.getNodeTree = getNodeTree
     bpy.types.Node.getRegionBottomLeft = getRegionBottomLeft
     bpy.types.Node.getRegionBottomRight = getRegionBottomRight
-    bpy.app.handlers.load_post.append(createMissingIdentifiers)
 
-def unregisterHandlers():
-    bpy.app.handlers.load_post.remove(createMissingIdentifiers)
+def unregister():
+    pass
