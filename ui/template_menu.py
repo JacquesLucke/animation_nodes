@@ -7,6 +7,7 @@ class TemplatesMenu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         layout.operator("an.empty_subprogram_template")
+        layout.separator()
         layout.operator("an.grid_arrange_objects_template")
         layout.operator("an.random_vertices_offset_template")
         layout.operator("an.network_from_particles_template")
