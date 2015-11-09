@@ -14,7 +14,7 @@ class ObjectTransformsInputNode(bpy.types.Node, AnimationNode):
     bl_label = "Object Transforms Input"
 
     def useCurrentTransformsChanged(self, context):
-        self.inputs["Frame"].hide = self.useCurrentTransforms
+        self.updateFrameSocket()
         executionCodeChanged()
 
     useCurrentTransforms = BoolProperty(
@@ -28,11 +28,18 @@ class ObjectTransformsInputNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.width = 165
         self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
-        self.inputs.new("an_FloatSocket", "Frame", "frame").hide = True
         self.outputs.new("an_VectorSocket", "Location", "location")
         self.outputs.new("an_EulerSocket", "Rotation", "rotation")
         self.outputs.new("an_VectorSocket", "Scale", "scale")
         self.outputs.new("an_QuaternionSocket", "Quaternion", "quaternion").hide = True
+
+    def updateFrameSocket(self):
+        if self.useCurrentTransforms:
+            if "Frame" in self.inputs:
+                self.inputs["Frame"].remove()
+        else:
+            if "Frame" not in self.inputs:
+                self.inputs.new("an_FloatSocket", "Frame", "frame")
 
     def draw(self, layout):
         if not self.useCurrentTransforms:
