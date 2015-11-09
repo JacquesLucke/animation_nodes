@@ -1,6 +1,5 @@
 import bpy
 from bpy.props import *
-from bl_operators.node import NodeSetting
 from ... base_types.template import Template
 
 class NodeSetting(bpy.types.PropertyGroup):

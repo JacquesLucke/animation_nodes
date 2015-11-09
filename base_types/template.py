@@ -39,10 +39,10 @@ class Template:
 
     def execute(self, context):
         self.nodesToMove = []
-        self.newNodes = []
+        self.nodesToOffset = []
         self.finalActiveNode = None
         self.insert()
-        self.offsetNewNodesPosition()
+        self.offsetNodesToMouse()
         self.moveInsertedNodes()
         if self.finalActiveNode is not None:
             self._setActiveNode(self.finalActiveNode)
@@ -51,12 +51,11 @@ class Template:
     def insert(self):
         pass
 
-    def newNode(self, type, x = 0, y = 0, move = True, label = ""):
+    def newNode(self, type, x = 0, y = 0, move = True, mouseOffset = True, label = ""):
         node = self.nodeTree.nodes.new(type = type)
-        node.location.x += x
-        node.location.y += y
+        node.location = (x, y)
         node.label = label
-        self.newNodes.append(node)
+        if mouseOffset: self.nodesToOffset.append(node)
         if move: self.nodesToMove.append(node)
         return node
 
@@ -67,11 +66,11 @@ class Template:
         try: return getNodeByIdentifier(identifier)
         except: return None
 
-    def offsetNewNodesPosition(self):
+    def offsetNodesToMouse(self):
         tempNode = newNodeAtCursor("an_DebugNode")
         offset = tempNode.location
         self.nodeTree.nodes.remove(tempNode)
-        for node in self.newNodes:
+        for node in self.nodesToOffset:
             node.location += offset + Vector(self.nodeOffset)
 
     def moveInsertedNodes(self):

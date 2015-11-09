@@ -1,4 +1,5 @@
 import bpy
+from .. sockets.info import isList
 from .. utils.blender_ui import PieMenuHelper
 
 '''
@@ -33,10 +34,13 @@ class ContextPie(bpy.types.Menu, PieMenuHelper):
         if amount == 0: self.empty(layout, text = "Has no visible outputs")
         else: layout.operator("an.insert_debug_node_template_operator", text = "Debug")
 
-    # TODO: Add more node suggestions until this is usable.
-    #def drawRight(self, layout):
-    #    props = layout.operator("wm.call_menu", text = "Choose Next Node")
-    #    props.name = "an_node_suggestions_menu"
+    def drawRight(self, layout):
+        col = layout.column(align = True)
+        for socket in self.activeNode.outputs:
+            if isList(socket.bl_idname):
+                props = col.operator("an.insert_loop_for_iteration_template", text = "Loop through {}".format(repr(socket.getDisplayedName())))
+                props.nodeIdentifier = self.activeNode.identifier
+                props.socketIndex = socket.index
 
     @property
     def activeNode(self):
