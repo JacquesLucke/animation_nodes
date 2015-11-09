@@ -1,5 +1,6 @@
 import bpy
 from bpy.props import *
+from ... tree_info import keepNodeLinks
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 from ... algorithms.interpolation import (assignArguments,
@@ -27,12 +28,7 @@ class ConstructInterpolationNode(bpy.types.Node, AnimationNode):
     bl_label = "Construct Interpolation"
 
     def categoryChanged(self, context = None):
-        self.inputs[0].hide = self.category not in ("POWER", "EXPONENTIAL")
-        self.inputs[1].hide = self.category not in ("EXPONENTIAL", "ELASTIC")
-        self.inputs[2].hide = self.category not in ("BACK", "BOUNCE")
-        self.inputs[3].hide = self.category not in ("ELASTIC", )
-        self.inputs[4].hide = self.category not in ("BOUNCE", "ELASTIC")
-        executionCodeChanged()
+        self.createInputs()
 
     category = EnumProperty(name = "Category", default = "LINEAR",
         items = categoryItems, update = categoryChanged)
@@ -42,28 +38,37 @@ class ConstructInterpolationNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.width = 160
-
-        socket = self.inputs.new("an_IntegerSocket", "Exponent", "intExponent")
-        socket.value = 2
-        socket.minValue = 1
-
-        socket = self.inputs.new("an_FloatSocket", "Base", "floatBase")
-        socket.value = 2
-        socket.minValue = 0.001
-
-        socket = self.inputs.new("an_FloatSocket", "Size", "floatSize")
-        socket.value = 1.4
-
-        socket = self.inputs.new("an_FloatSocket", "Exponent", "floatExponent")
-        socket.value = 2
-
-        socket = self.inputs.new("an_IntegerSocket", "Bounces", "intBounces")
-        socket.value = 4
-        socket.minValue = 1
-
-
+        self.createInputs()
         self.outputs.new("an_InterpolationSocket", "Interpolation", "interpolation")
-        self.categoryChanged()
+
+    @keepNodeLinks
+    def createInputs(self):
+        self.inputs.clear()
+        c = self.category
+
+        if c in ("BOUNCE", "ELASTIC"):
+            socket = self.inputs.new("an_IntegerSocket", "Bounces", "intBounces")
+            socket.value = 4
+            socket.minValue = 1
+
+        if c in ("POWER", "EXPONENTIAL"):
+            socket = self.inputs.new("an_IntegerSocket", "Exponent", "intExponent")
+            socket.value = 2
+            socket.minValue = 1
+
+        if c in ("EXPONENTIAL", "ELASTIC"):
+            socket = self.inputs.new("an_FloatSocket", "Base", "floatBase")
+            socket.value = 2
+            socket.minValue = 0.001
+
+        if c == "ELASTIC":
+            socket = self.inputs.new("an_FloatSocket", "Exponent", "floatExponent")
+            socket.value = 2
+
+        if c in ("BACK", "BOUNCE"):
+            socket = self.inputs.new("an_FloatSocket", "Size", "floatSize")
+            socket.value = 1.4
+
 
     def draw(self, layout):
         row = layout.row(align = True)
