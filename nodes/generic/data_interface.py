@@ -38,6 +38,14 @@ class DataInterfaceNode(bpy.types.Node, AnimationNode):
     def getValue(self):
         return dataByIdentifier.get(self.identifier)
 
+    @property
+    def value(self):
+        return self.getValue()
+
+    @value.setter
+    def value(self, value):
+        self.setValue(value)
+
     def recreateSocket(self):
         self.inputs.clear()
         self.outputs.clear()
