@@ -1,10 +1,12 @@
 import bpy
 from bpy.props import *
+from ... sockets.info import isList
+from ... utils import pretty_strings
 from ... tree_info import keepNodeLinks
+from ... utils.timing import measureTime
 from ... tree_info import getNodesByType
 from ... graphics.text_box import TextBox
 from ... base_types.node import AnimationNode
-from ... utils.timing import measureTime
 
 dataByNode = {}
 
@@ -13,7 +15,9 @@ class DebugDrawerNode(bpy.types.Node, AnimationNode):
     bl_label = "Debug Drawer"
 
     fontSize = IntProperty(name = "Font Size", default = 100, min = 10, max = 1000)
-    maxRows = IntProperty(name = "Max Rows", default = 15, min = 0)
+    maxRows = IntProperty(name = "Max Rows", default = 150, min = 0)
+    maxListElements = IntProperty(name = "Max List Elements", default = 15, min = 0)
+    oneElementPerLine = BoolProperty(name = "One Element per Line", default = True)
 
     def create(self):
         self.width = 320
@@ -22,6 +26,8 @@ class DebugDrawerNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.prop(self, "fontSize")
         layout.prop(self, "maxRows")
+        layout.prop(self, "maxListElements")
+        layout.prop(self, "oneElementPerLine")
 
     def edit(self):
         origin = self.inputs[0].dataOrigin
@@ -34,9 +40,42 @@ class DebugDrawerNode(bpy.types.Node, AnimationNode):
         self.inputs.clear()
         self.inputs.new(targetIdName, "Data", "data")
 
-    def execute(self, data):
-        dataByNode[self.identifier] = self.inputs[0].toDebugString(data, self.maxRows)
+    def getExecutionCode(self):
+        dataType = self.inputs[0].dataType
+        yield "conversionFunction = self.getCurrentToStringFunction()"
+        if isList(dataType): yield "self.store_GenericList(data, conversionFunction)"
+        else: yield "self.store_Generic(data)"
 
+    def store_Generic(self, data):
+        self.debugText = str(data)
+
+    def store_GenericList(self, data, elementToStringFunction = str):
+        useSlicedList = len(data) > self.maxListElements
+        elements = data[:self.maxListElements]
+
+        text = "List Length: {}\n\n".format(len(data))
+
+        separator = "\n" if self.oneElementPerLine else ", "
+        text += separator.join(elementToStringFunction(e) for e in elements)
+        if useSlicedList: text += separator + "..."
+
+        self.debugText = text
+
+    @property
+    def debugText(self):
+        return dataByNode[self.identifier]
+
+    @debugText.setter
+    def debugText(self, text):
+        dataByNode[self.identifier] = text
+
+    def getCurrentToStringFunction(self):
+        dataType = self.inputs[0].dataType
+        if dataType == "Vector List": return pretty_strings.formatVector
+        if dataType == "Euler List": return pretty_strings.formatEuler
+        if dataType == "Float List": return pretty_strings.formatFloat
+        if dataType == "Quaternion List": return pretty_strings.formatQuaternion
+        return str
 
 def drawDebugTextBoxes():
     nodes = getNodesByType("an_DebugDrawerNode")
