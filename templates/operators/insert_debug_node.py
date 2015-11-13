@@ -1,5 +1,6 @@
 import bpy
 from bpy.props import *
+from ... sockets.info import isList
 from ... base_types.template import Template
 
 class InsertDebugNodeTemplateOperator(bpy.types.Operator, Template):
@@ -26,6 +27,8 @@ class InsertDebugNodeTemplateOperator(bpy.types.Operator, Template):
 
         if socket.dataType == "Interpolation":
             debugNode = self.newNode("an_DebugInterpolationNode")
+        if isList(socket.dataType):
+            debugNode = self.newNode("an_DebugDrawerNode")
         else:
             debugNode = self.newNode("an_DebugNode")
         socket.linkWith(debugNode.inputs[0])

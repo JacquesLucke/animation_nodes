@@ -50,6 +50,9 @@ class Rectangle:
     def centerY(self):
         return (self.y1 + self.y2) / 2
 
+    def getInsetRectangle(self, amount):
+        return Rectangle(self.left + amount, self.top - amount, self.right - amount, self.bottom + amount)
+
     def contains(self, point):
         return self.left <= point[0] <= self.right and self.bottom <= point[1] <= self.top
 

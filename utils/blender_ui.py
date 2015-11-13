@@ -38,9 +38,12 @@ def convertToRegionLocation(region, x, y):
     return Vector(region.view2d.view_to_region(x, y, clip = False))
 
 def getDpiFactor():
+    return getDpi() / 72
+
+def getDpi():
     systemPreferences = bpy.context.user_preferences.system
     retinaFactor = getattr(systemPreferences, "pixel_size", 1)
-    return systemPreferences.dpi * retinaFactor / 72
+    return systemPreferences.dpi * retinaFactor
 
 def executeInAreaType(areaType):
     def changeAreaTypeDecorator(function):

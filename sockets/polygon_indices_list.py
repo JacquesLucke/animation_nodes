@@ -15,6 +15,3 @@ class PolygonIndicesListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def getCopyExpression(self):
         return "[polygonIndices[:] for polygonIndices in value]"
-
-    def toDebugString(self, value, maxRows):
-        return "\n".join(str(indices) for indices in value[:maxRows])
