@@ -15,6 +15,3 @@ class EdgeIndicesListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def getCopyExpression(self):
         return "[edgeIndices[:] for edgeIndices in value]"
-
-    def toDebugString(self, value, maxRows):
-        return "\n".join(str(indices) for indices in value[:maxRows])

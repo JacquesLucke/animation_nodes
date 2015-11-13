@@ -15,6 +15,3 @@ class QuaternionListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def getCopyExpression(self):
         return "[element.copy() for element in value]"
-
-    def toDebugString(self, value, maxRows):
-        return "\n".join("({:>8.4f}, {:>8.4f}, {:>8.4f}, {:>8.4f})".format(*quat) for quat in value[:maxRows])
