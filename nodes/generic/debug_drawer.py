@@ -15,13 +15,13 @@ class DebugDrawerNode(bpy.types.Node, AnimationNode):
     bl_label = "Debug Drawer"
 
     maxRows = IntProperty(name = "Max Rows", default = 150, min = 0)
-    fontSize = IntProperty(name = "Font Size", default = 100, min = 10, max = 1000)
+    fontSize = IntProperty(name = "Font Size", default = 14, min = 1, max = 1000)
     maxListElements = IntProperty(name = "Max List Elements", default = 15, min = 0)
     oneElementPerLine = BoolProperty(name = "One Element per Line", default = True)
     showIndices = BoolProperty(name = "Show Indices", default = True)
 
     def create(self):
-        self.width = 320
+        self.width = 350
         self.inputs.new("an_GenericSocket", "Data", "data")
 
     def draw(self, layout):
