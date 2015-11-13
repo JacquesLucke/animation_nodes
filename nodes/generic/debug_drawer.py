@@ -65,7 +65,8 @@ class DebugDrawerNode(bpy.types.Node, AnimationNode):
 
         separator = "\n" if self.oneElementPerLine else ", "
         indicesWidth = len(str(len(elements))) + 2
-        if self.showIndices: text += separator.join("{}: ".format(i).rjust(indicesWidth) + elementToStringFunction(e) for i, e in enumerate(elements))
+        if self.showIndices and self.oneElementPerLine:
+            text += separator.join("{}: ".format(i).rjust(indicesWidth) + elementToStringFunction(e) for i, e in enumerate(elements))
         else: text += separator.join(elementToStringFunction(e) for e in elements)
         if useSlicedList: text += separator + "..."
 
