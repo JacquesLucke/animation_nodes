@@ -33,15 +33,18 @@ class TextBox:
     def separateLines(self):
         self.lines = []
         characterWidth = blf.dimensions(font, "abcde")[0] / 5
+        maxCharactersPerLine = int((self.width - 2 * self.padding) / characterWidth)
 
         paragraphs = self.text.split("\n")
-        for paragraph in paragraphs:
-            paragraphLines = textwrap.wrap(paragraph, int((self.width - 2 * self.padding) / characterWidth))
+        for i, paragraph in enumerate(paragraphs):
+            paragraphLines = textwrap.wrap(paragraph, maxCharactersPerLine)
             if len(paragraphLines) == 0: paragraphLines = [""]
             self.lines.extend(paragraphLines)
 
-            if len(self.lines) == self.maxRows: break
-            elif len(self.lines) > self.maxRows: self.lines = self.lines[:self.maxRows]
+            if len(self.lines) > self.maxRows:
+                self.lines = self.lines[:self.maxRows - 1]
+                self.lines.extend(textwrap.wrap("Some rows don't fit", maxCharactersPerLine))
+                break
 
 
     def calculateBoundaries(self):
