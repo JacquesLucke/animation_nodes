@@ -8,4 +8,4 @@ def formatQuaternion(quaternion):
     return "Q({:>7.3f}, {:>7.3f}, {:>7.3f}, {:>7.3f})".format(*quaternion)
 
 def formatFloat(number):
-    return "{:>10.5f}".format(number)
+    return "{:>8.3f}".format(number)
