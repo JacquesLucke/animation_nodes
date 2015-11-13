@@ -109,9 +109,6 @@ class AnimationNodeSocket:
             return self.text
         return self.name
 
-    def toDebugString(self, value, maxRows):
-        return str(value)
-
     def draw_color(self, context, node):
         return self.drawColor
 
