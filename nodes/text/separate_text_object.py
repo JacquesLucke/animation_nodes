@@ -107,6 +107,7 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
             setMaterialOnObjects(objects, material)
 
         source.hide = True
+        source.hide_render = True
 
     def removeExistingObjects(self):
         objects = []
