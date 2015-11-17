@@ -45,6 +45,7 @@ def getRandomString(length):
 def toVariableName(name):
     variable = re.sub("\W+", "", name)
     if keyword.iskeyword(variable): variable += "_"
+    if variable == "": variable = "_"
     return variable
 
 def toInterfaceName(sourceName):
