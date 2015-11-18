@@ -189,10 +189,13 @@ class AnimationNodeSocket:
         else: return self.nodeTree.links.new(self, socket)
 
     def removeLinks(self):
-        if not self.is_linked: return
-        tree = self.nodeTree
-        for link in self.links:
-            tree.links.remove(link)
+        removedLink = False
+        if self.is_linked:
+            tree = self.nodeTree
+            for link in self.links:
+                tree.links.remove(link)
+                removedLink = True
+        return removedLink
 
     def disableSocketEditingInNode(self):
         self.display.textInput = False
