@@ -27,7 +27,7 @@ class InsertDebugNodeTemplateOperator(bpy.types.Operator, Template):
 
         if socket.dataType == "Interpolation":
             debugNode = self.newNode("an_DebugInterpolationNode")
-        if isList(socket.dataType):
+        elif isList(socket.dataType):
             debugNode = self.newNode("an_DebugDrawerNode")
         else:
             debugNode = self.newNode("an_DebugNode")
