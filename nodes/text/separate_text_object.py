@@ -118,6 +118,7 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
             removeObject(object)
 
     def createNewNodeID(self):
+        random.seed()
         self.currentID = round(random.random() * 100000)
 
     def isObjectPartOfThisNode(self, object):
