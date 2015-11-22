@@ -34,10 +34,17 @@ class CreateListNode(bpy.types.Node, AnimationNode):
         self.assignedType = "Float"
 
     def draw(self, layout):
-        self.invokeFunction(layout, "newInputSocket",
+        row = layout.row(align = True)
+        self.invokeFunction(row, "newInputSocket",
             text = "New Input",
             description = "Create a new input socket",
             icon = "PLUS")
+        self.invokeFunction(row, "removeElementInputs",
+            description = "Remove all inputs.",
+            confirm = True,
+            icon = "X")
+
+        self.drawTypeSpecifics(layout)
 
     def drawAdvanced(self, layout):
         self.invokeSocketTypeChooser(layout, "assignListDataType",
@@ -47,7 +54,7 @@ class CreateListNode(bpy.types.Node, AnimationNode):
 
         self.invokeFunction(layout, "removeElementInputs", "Remove Inputs", icon = "X")
 
-        self.drawTypeSpecificButtonsExt(layout)
+        self.drawAdvancedTypeSpecific(layout)
 
     @property
     def inputVariables(self):
@@ -99,12 +106,30 @@ class CreateListNode(bpy.types.Node, AnimationNode):
     # type specific stuff
     #############################
 
-    def drawTypeSpecificButtonsExt(self, layout):
-        if self.assignedType in ("Object", "Spline"):
-            self.invokeFunction(layout, "createInputsFromSelection", text = "From Selection", icon = "PLUS")
+    def drawTypeSpecifics(self, layout):
+        if len(self.inputs) == 1:
+            self.drawAdvancedTypeSpecific(layout)        
 
-    def createInputsFromSelection(self):
+    def drawAdvancedTypeSpecific(self, layout):
+        if self.assignedType in ("Object", "Spline"):
+            self.invokeFunction(layout, "createInputsForSelectedObjects", text = "From Selection", icon = "PLUS")
+        if self.assignedType == "Object Group":
+            self.invokeFunction(layout, "createInputsForSelectedObjectGroups", text = "From Selection", icon = "PLUS")
+
+    def createInputsForSelectedObjects(self):
         names = getSortedSelectedObjectNames()
         for name in names:
             socket = self.newInputSocket()
             socket.objectName = name
+
+    def createInputsForSelectedObjectGroups(self):
+        groups = self.getGroupsOfObjects(bpy.context.selected_objects)
+        for group in groups:
+            socket = self.newInputSocket()
+            socket.groupName = group.name
+
+    def getGroupsOfObjects(self, objects):
+        groups = set()
+        for object in objects:
+            groups.update(group for group in bpy.data.groups if object.name in group.objects)
+        return list(groups)
