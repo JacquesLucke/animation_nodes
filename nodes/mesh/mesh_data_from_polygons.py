@@ -18,8 +18,8 @@ class MeshDataFromPolygonsNode(bpy.types.Node, AnimationNode):
 
         offset = 0
         for polygon in polygons:
-            extendVertices(polygon.vertices)
-            appendIndices([i + offset for i in range(len(polygon.vertices))])
-            offset += len(polygon.vertices)
+            extendVertices(polygon.vertexLocations)
+            appendIndices([i + offset for i in range(len(polygon.vertexLocations))])
+            offset += len(polygon.vertexLocations)
 
         return MeshData(vertices, [], polygonIndices)

@@ -13,7 +13,7 @@ class PolygonSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     hashable = True
 
     def getValue(self):
-        return Polygon(vertices = [Vector((-1, 0, 0)), Vector((1, 0, 0)), Vector((0, 1, 0))],
+        return Polygon(vertexLocations = [Vector((-1, 0, 0)), Vector((1, 0, 0)), Vector((0, 1, 0))],
                        normal = Vector((0, 0, 1)),
                        center = Vector((0, 1/3, 0)),
                        area = 2,

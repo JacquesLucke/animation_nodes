@@ -25,7 +25,7 @@ class TransformPolygonNode(bpy.types.Node, AnimationNode):
             yield "transformMatrix = offsetMatrix * matrix * offsetMatrix.inverted()"
             matrixName = "transformMatrix"
 
-        yield "polygon.vertices = [{} * vertex for vertex in polygon.vertices]".format(matrixName)
+        yield "polygon.vertexLocations = [{} * location for location in polygon.vertexLocations]".format(matrixName)
 
     def getUsedModules(self):
         return ["mathutils"]

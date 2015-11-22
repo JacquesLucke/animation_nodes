@@ -41,37 +41,37 @@ class Vertex:
 
 
 class Polygon:
-    __slots__ = ("vertices", "normal", "center", "area", "materialIndex")
+    __slots__ = ("vertexLocations", "normal", "center", "area", "materialIndex")
 
     @staticmethod
-    def fromMeshPolygonInLocalSpace(meshPolygon, vertexLocations):
-        vertices = [vertexLocations[index].copy() for index in meshPolygon.vertices]
+    def fromMeshPolygonInLocalSpace(meshPolygon, allVertexLocations):
+        vertexLocations = [allVertexLocations[index].copy() for index in meshPolygon.vertices]
         return Polygon(
-                 vertices,
+                 vertexLocations,
                  meshPolygon.normal.copy(),
                  meshPolygon.center.copy(),
                  meshPolygon.area,
                  meshPolygon.material_index)
 
     @staticmethod
-    def fromMeshPolygonInWorldSpace(meshPolygon, vertexLocations, transformation, normalTransformation, scale):
-        vertices = [vertexLocations[index].copy() for index in meshPolygon.vertices]
+    def fromMeshPolygonInWorldSpace(meshPolygon, allVertexLocations, transformation, normalTransformation, scale):
+        vertexLocations = [allVertexLocations[index].copy() for index in meshPolygon.vertices]
         return Polygon(
-                 vertices,
+                 vertexLocations,
                  normalTransformation * meshPolygon.normal,
                  transformation * meshPolygon.center,
                  meshPolygon.area * scale,
                  meshPolygon.material_index)
 
-    def __init__(self, vertices, normal, center, area, materialIndex):
-        self.vertices = vertices
+    def __init__(self, vertexLocations, normal, center, area, materialIndex):
+        self.vertexLocations = vertexLocations
         self.normal = normal
         self.center = center
         self.area = area
         self.materialIndex = materialIndex
 
     def copy(self):
-        return Polygon(copyVectorList(self.vertices), self.normal.copy(),
+        return Polygon(copyVectorList(self.vertexLocations), self.normal.copy(),
                        self.center, self.area, self.materialIndex)
 
 
