@@ -5,6 +5,7 @@ from ... ui.node_colors import colorNetworks
 from ... algorithms.random import getRandomColor
 
 class SubprogramBaseNode:
+    isSubprogramNode = True
 
     subprogramName = StringProperty(name = "Subprogram Name", default = "Subprogram",
         description = "Subprogram name to identify this group elsewhere",
