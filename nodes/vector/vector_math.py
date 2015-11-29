@@ -13,9 +13,11 @@ operationItems = [
     ("PROJECT", "Project", "A project B  Projection of A on B, the parallel projection vector", "", 5),
     ("REFLECT", "Reflect", "A reflect B  Reflection of A from mirror B, the reflected vector", "", 6),
     ("NORMALIZE", "Normalize", "A normalize Scale the vector to a length of 1", "", 7),
-    ("SCALE", "Scale", "A * scale", "", 8) ]
+    ("SCALE", "Scale", "A * scale", "", 8),
+    ("ABSOLUTE", "Absolute", "abs A") ]
 
 operationsWithFloat = ["NORMALIZE", "SCALE"]
+operationsWithVector = ["ADD", "SUBTRACT", "MULTIPLY", "DIVIDE", "CROSS", "PROJECT", "REFLECT"]
 
 operationLabels = {item[0] : item[2][:11] for item in operationItems}
 
@@ -42,10 +44,10 @@ class VectorMathNode(bpy.types.Node, AnimationNode):
     def createInputs(self):
         self.inputs.clear()
         self.inputs.new("an_VectorSocket", "A", "a")
+        if self.operation in operationsWithVector:
+            self.inputs.new("an_VectorSocket", "B", "b")
         if self.operation in operationsWithFloat:
             self.inputs.new("an_FloatSocket", "Scale", "scale").value = 1.0
-        else:
-            self.inputs.new("an_VectorSocket", "B", "b")
 
 
     def getExecutionCode(self):
@@ -62,6 +64,7 @@ class VectorMathNode(bpy.types.Node, AnimationNode):
         elif op == "REFLECT": return "result = a.reflect(b)"
         elif op == "NORMALIZE": return "result = a.normalized() * scale"
         elif op == "SCALE": return "result = a * scale"
+        elif op == "ABSOLUTE": return "result = mathutils.Vector((abs(a.x), abs(a.y), abs(a.z)))"
 
     def getUsedModules(self):
         return ["mathutils"]
