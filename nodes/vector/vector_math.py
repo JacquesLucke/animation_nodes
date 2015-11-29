@@ -14,7 +14,7 @@ operationItems = [
     ("REFLECT", "Reflect", "A reflect B  Reflection of A from mirror B, the reflected vector", "", 6),
     ("NORMALIZE", "Normalize", "A normalize Scale the vector to a length of 1", "", 7),
     ("SCALE", "Scale", "A * scale", "", 8),
-    ("ABSOLUTE", "Absolute", "abs A") ]
+    ("ABSOLUTE", "Absolute", "abs A", "", 9) ]
 
 operationsWithFloat = ["NORMALIZE", "SCALE"]
 operationsWithVector = ["ADD", "SUBTRACT", "MULTIPLY", "DIVIDE", "CROSS", "PROJECT", "REFLECT"]
