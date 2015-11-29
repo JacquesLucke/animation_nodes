@@ -97,7 +97,7 @@ def drawDebugTextBoxes():
     nodes = getNodesByType("an_DebugDrawerNode")
     nodesInCurrentTree = getattr(bpy.context.space_data.node_tree, "nodes", [])
     for node in nodes:
-        if node.name in nodesInCurrentTree:
+        if node.name in nodesInCurrentTree and not node.hide:
             drawDebugTextBox(node)
 
 def drawDebugTextBox(node):
