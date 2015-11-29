@@ -21,9 +21,21 @@ operationsWithVector = ["ADD", "SUBTRACT", "MULTIPLY", "DIVIDE", "CROSS", "PROJE
 
 operationLabels = {item[0] : item[2][:11] for item in operationItems}
 
+searchItems = {
+    "Add Vectors" : "ADD",
+    "Subtract Vectors" : "SUBTRACT",
+    "Multiply Vectors" : "MULTIPLY",
+    "Normalize Vector" : "NORMALIZE",
+    "Scale Vector" : "SCALE" }
+
 class VectorMathNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_VectorMathNode"
     bl_label = "Vector Math"
+
+    @classmethod
+    def getSearchTags(cls):
+        for name, operation in searchItems.items():
+            yield name, {"operation" : repr(operation)}
 
     def operationChanged(self, context):
         self.createInputs()
