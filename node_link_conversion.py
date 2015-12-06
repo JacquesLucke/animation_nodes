@@ -56,7 +56,8 @@ class SimpleConvert(LinkCorrection):
         ("Particle System", "Particle List") : "an_GetParticlesNode",
         ("Integer", "Euler") : "an_CombineEulerNode",
         ("Float", "Euler") : "an_CombineEulerNode",
-        ("Euler", "Float") : "an_SeparateEulerNode"
+        ("Euler", "Float") : "an_SeparateEulerNode",
+        ("Object", "Vector") : "an_ObjectTransformsInputNode"
     }
 
     def check(self, origin, target):
