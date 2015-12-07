@@ -5,21 +5,30 @@ from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 
 operationItems = [
-    ("ADD", "Add", "A + B", "", 0),
-    ("SUBTRACT", "Subtract", "A - B", "", 1),
-    ("MULTIPLY", "Multiply", "A * B       Multiply element by element", "", 2),
-    ("DIVIDE", "Divide", "A / B       Divide element by element", "", 3),
-    ("CROSS", "Cross Product", "A cross B   Calculate the cross/vector product, yielding a vector that is orthogonal to both input vectors", "", 4),
-    ("PROJECT", "Project", "A project B  Projection of A on B, the parallel projection vector", "", 5),
-    ("REFLECT", "Reflect", "A reflect B  Reflection of A from mirror B, the reflected vector", "", 6),
-    ("NORMALIZE", "Normalize", "A normalize Scale the vector to a length of 1", "", 7),
-    ("SCALE", "Scale", "A * scale", "", 8),
-    ("ABSOLUTE", "Absolute", "abs A", "", 9) ]
+    ("ADD", "Add", "", "", 0),
+    ("SUBTRACT", "Subtract", "", "", 1),
+    ("MULTIPLY", "Multiply", "Multiply element by element", "", 2),
+    ("DIVIDE", "Divide", "Divide element by element", "", 3),
+    ("CROSS", "Cross Product", "Calculate the cross/vector product, yielding a vector that is orthogonal to both input vectors", "", 4),
+    ("PROJECT", "Project", "Projection of A on B, the parallel projection vector", "", 5),
+    ("REFLECT", "Reflect", "Reflection of A from mirror B, the reflected vector", "", 6),
+    ("NORMALIZE", "Normalize", "Scale the vector to a specific length", "", 7),
+    ("SCALE", "Scale", "", "", 8),
+    ("ABSOLUTE", "Absolute", "", "", 9),
+    ("SNAP", "Snap", "Snap the vector to a point on a 3d grid", "", 10) ]
 
-operationsWithFloat = ["NORMALIZE", "SCALE"]
-operationsWithVector = ["ADD", "SUBTRACT", "MULTIPLY", "DIVIDE", "CROSS", "PROJECT", "REFLECT"]
-
-operationLabels = {item[0] : item[2][:11] for item in operationItems}
+operationLabels = {
+    "ADD" : "A + B",
+    "SUBTRACT" : "A - B",
+    "MULTIPLY" : "A * B",
+    "DIVIDE" : "A / B",
+    "CROSS" : "A x B",
+    "PROJECT" : "A project B",
+    "REFLECT" : "A reflect B",
+    "NORMALIZE" : "normalize A",
+    "SCALE" : "A * scale",
+    "ABSOLUTE" : "abs A",
+    "SNAP" : "snap A" }
 
 searchItems = {
     "Add Vectors" : "ADD",
@@ -27,6 +36,10 @@ searchItems = {
     "Multiply Vectors" : "MULTIPLY",
     "Normalize Vector" : "NORMALIZE",
     "Scale Vector" : "SCALE" }
+
+operationsWithFloat = ["NORMALIZE", "SCALE"]
+operationsWithSecondVector = ["ADD", "SUBTRACT", "MULTIPLY", "DIVIDE", "CROSS", "PROJECT", "REFLECT"]
+operationsWithStepVector = ["SNAP"]
 
 class VectorMathNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_VectorMathNode"
@@ -56,27 +69,36 @@ class VectorMathNode(bpy.types.Node, AnimationNode):
     def createInputs(self):
         self.inputs.clear()
         self.inputs.new("an_VectorSocket", "A", "a")
-        if self.operation in operationsWithVector:
+        if self.operation in operationsWithSecondVector:
             self.inputs.new("an_VectorSocket", "B", "b")
         if self.operation in operationsWithFloat:
             self.inputs.new("an_FloatSocket", "Scale", "scale").value = 1.0
+        if self.operation in operationsWithStepVector:
+            self.inputs.new("an_VectorSocket", "Step Size", "stepSize").value = (0.1, 0.1, 0.1)
 
 
     def getExecutionCode(self):
         op = self.operation
-        if op == "ADD": return "result = a + b"
-        elif op == "SUBTRACT": return "result = a - b"
-        elif op == "MULTIPLY": return "result = mathutils.Vector((a[0] * b[0], a[1] * b[1], a[2] * b[2]))"
-        elif op == "CROSS": return "result = a.cross(b)"
-        elif op == "DIVIDE": return ("result = mathutils.Vector((0, 0, 0))",
-                                     "if b[0] != 0: result[0] = a[0] / b[0]",
-                                     "if b[1] != 0: result[1] = a[1] / b[1]",
-                                     "if b[2] != 0: result[2] = a[2] / b[2]")
-        elif op == "PROJECT": return "result = a.project(b)"
-        elif op == "REFLECT": return "result = a.reflect(b)"
-        elif op == "NORMALIZE": return "result = a.normalized() * scale"
-        elif op == "SCALE": return "result = a * scale"
-        elif op == "ABSOLUTE": return "result = mathutils.Vector((abs(a.x), abs(a.y), abs(a.z)))"
+        if op == "ADD": yield "result = a + b"
+        elif op == "SUBTRACT": yield "result = a - b"
+        elif op == "MULTIPLY": yield "result = mathutils.Vector((a[0] * b[0], a[1] * b[1], a[2] * b[2]))"
+        elif op == "CROSS": yield "result = a.cross(b)"
+        elif op == "DIVIDE":
+            yield "result = mathutils.Vector((0, 0, 0))"
+            yield "if b.x != 0: result.x = a.x / b.x"
+            yield "if b.y != 0: result.y = a.y / b.y"
+            yield "if b.z != 0: result.z = a.z / b.z"
+        elif op == "PROJECT": yield "result = a.project(b)"
+        elif op == "REFLECT": yield "result = a.reflect(b)"
+        elif op == "NORMALIZE": yield "result = a.normalized() * scale"
+        elif op == "SCALE": yield "result = a * scale"
+        elif op == "ABSOLUTE": yield "result = mathutils.Vector((abs(a.x), abs(a.y), abs(a.z)))"
+        elif op == "SNAP":
+            yield "result = mathutils.Vector((0, 0, 0))"
+            yield "if stepSize.x != 0: result.x = round(a.x / stepSize.x) * stepSize.x"
+            yield "if stepSize.y != 0: result.y = round(a.y / stepSize.y) * stepSize.y"
+            yield "if stepSize.z != 0: result.z = round(a.z / stepSize.z) * stepSize.z"
+
 
     def getUsedModules(self):
         return ["mathutils"]
