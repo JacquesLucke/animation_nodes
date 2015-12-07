@@ -1,4 +1,5 @@
 import bpy
+import itertools
 from bpy.props import *
 from ... sockets.info import isList
 from ... utils import pretty_strings
@@ -16,21 +17,21 @@ class DebugDrawerNode(bpy.types.Node, AnimationNode):
 
     maxRows = IntProperty(name = "Max Rows", default = 150, min = 0)
     fontSize = IntProperty(name = "Font Size", default = 14, min = 1, max = 1000)
-    maxListElements = IntProperty(name = "Max List Elements", default = 15, min = 0)
+    maxListStartElements = IntProperty(name = "Max List Start Elements", default = 15, min = 0)
+    maxListEndElements = IntProperty(name = "Max List End Elements", default = 0, min = 0)
     oneElementPerLine = BoolProperty(name = "One Element per Line", default = True)
-    showIndices = BoolProperty(name = "Show Indices", default = True)
 
     def create(self):
-        self.width = 350
+        self.width = 270
         self.inputs.new("an_GenericSocket", "Data", "data")
 
     def draw(self, layout):
         layout.prop(self, "fontSize")
         if isList(self.dataType):
-            layout.prop(self, "maxListElements")
+            row = layout.row(align = True)
+            row.prop(self, "maxListStartElements", text = "Begin")
+            row.prop(self, "maxListEndElements", text = "End")
             layout.prop(self, "oneElementPerLine")
-            if self.oneElementPerLine:
-                layout.prop(self, "showIndices")
 
     def drawAdvanced(self, layout):
         layout.prop(self, "maxRows")
@@ -57,20 +58,35 @@ class DebugDrawerNode(bpy.types.Node, AnimationNode):
     def store_Generic(self, data):
         self.debugText = str(data)
 
-    def store_GenericList(self, data, elementToStringFunction = str):
-        useSlicedList = len(data) > self.maxListElements
-        elements = data[:self.maxListElements]
+    def store_GenericList(self, data, toString = str):
+        length = len(data)
+        text = "List Length: {}\n\n".format(length)
 
-        text = "List Length: {}\n\n".format(len(data))
-
+        useSlicedList = length > self.maxListStartElements + self.maxListEndElements
         separator = "\n" if self.oneElementPerLine else ", "
-        indicesWidth = len(str(len(elements))) + 2
-        if self.showIndices and self.oneElementPerLine:
-            text += separator.join("{}: ".format(i).rjust(indicesWidth) + elementToStringFunction(e) for i, e in enumerate(elements))
-        else: text += separator.join(elementToStringFunction(e) for e in elements)
-        if useSlicedList: text += separator + "..."
+        indicesWidth = len(str(length)) + 2
+
+        if useSlicedList:
+            startElements = data[:self.maxListStartElements]
+            endElements = data[-self.maxListEndElements:] if self.maxListEndElements > 0 else []
+
+            text += separator.join(self.formatElements(startElements, 0, indicesWidth, toString))
+            text += separator + "..."
+            if len(endElements) > 0: text += "\n"
+            text += separator.join(self.formatElements(endElements, length - len(endElements), indicesWidth, toString))
+        else:
+            elements = data
+            text += separator.join(self.formatElements(elements, 0, indicesWidth, toString))
 
         self.debugText = text
+
+    def formatElements(self, elements, startIndex, indicesWidth, toString):
+        if self.oneElementPerLine:
+            for index, element in zip(itertools.count(startIndex), elements):
+                yield "{}: ".format(index).rjust(indicesWidth) + toString(element)
+        else:
+            for element in elements:
+                yield toString(element)
 
     @property
     def debugText(self):
