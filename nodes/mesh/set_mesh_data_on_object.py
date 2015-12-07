@@ -10,10 +10,13 @@ class SetMeshDataOnObjectNode(bpy.types.Node, AnimationNode):
     bl_label = "Set Mesh Data on Object"
 
     errorMessage = StringProperty()
+
     checkIndices = BoolProperty(name = "Check Indices", default = True,
-        description = "Check that the highest edge or polygon index is below the vertex amount (unchecking can crash Blender when the mesh data is invalid)")
-    validateTargetMesh = BoolProperty(name = "Validate Target Mesh", default = True,
-        description = "Correct the target mesh object so that it can be edited without crashing Blender")
+        description = "Check that the highest edge or polygon index is below the " +
+         "vertex amount (unchecking can crash Blender when the mesh data is invalid)")
+         
+    checkTupleLengths = BoolProperty(name = "Check Tuple Lengths", default = True,
+        description = "Check that edges have two indices and polygons three or more")
 
     def create(self):
         self.width = 170
@@ -29,7 +32,7 @@ class SetMeshDataOnObjectNode(bpy.types.Node, AnimationNode):
 
     def drawAdvanced(self, layout):
         layout.prop(self, "checkIndices")
-        layout.prop(self, "validateTargetMesh")
+        layout.prop(self, "checkTupleLengths")
 
     def execute(self, object, meshData):
         if object is None: return object
@@ -40,22 +43,17 @@ class SetMeshDataOnObjectNode(bpy.types.Node, AnimationNode):
         bmesh.new().to_mesh(object.data)
 
         vertices, edges, polygons = meshData.vertices, meshData.edges, meshData.polygons
-        if self.checkIndices:
-            if not self.areIndicesValid(vertices, edges, polygons):
-                self.errorMessage = "Indices are invalid"
-                return object
+
+        isValidData = meshData.isValid(
+            checkTupleLengths = self.checkTupleLengths,
+            checkIndices = self.checkIndices)
+
+        if not isValidData:
+            self.errorMessage = "The mesh data is invalid"
+            return object
 
         object.data.from_pydata(vertices, edges, polygons)
-        if self.validateTargetMesh: object.data.validate()
+        object.data.validate()
 
         self.errorMessage = ""
         return object
-
-    def areIndicesValid(self, vertices, edges, polygons):
-        maxEdgeIndex = max(itertools.chain([-1], *edges))
-        maxPolygonIndex = max(itertools.chain([-1], *polygons))
-
-        minEdgeIndex = min(itertools.chain([0], *edges))
-        minPolygonIndex = min(itertools.chain([0], *polygons))
-
-        return max(maxEdgeIndex, maxPolygonIndex) < len(vertices) and min(minEdgeIndex, minPolygonIndex) >= 0
