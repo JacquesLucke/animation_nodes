@@ -57,7 +57,8 @@ class SimpleConvert(LinkCorrection):
         ("Integer", "Euler") : "an_CombineEulerNode",
         ("Float", "Euler") : "an_CombineEulerNode",
         ("Euler", "Float") : "an_SeparateEulerNode",
-        ("Object", "Vector") : "an_ObjectTransformsInputNode"
+        ("Object", "Vector") : "an_ObjectTransformsInputNode",
+        ("Object", "Matrix") : "an_ObjectMatrixInputNode"
     }
 
     def check(self, origin, target):

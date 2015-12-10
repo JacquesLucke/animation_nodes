@@ -3,10 +3,10 @@ from bpy.props import *
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 
-outputItems = [	("BASIS", "Basis", ""),
-                ("LOCAL", "Local", ""),
-                ("PARENT INVERSE", "Parent Inverse", ""),
-                ("WORLD", "World", "") ]
+outputItems = [	("BASIS", "Basis", "", "NONE", 0),
+                ("LOCAL", "Local", "", "NONE", 1),
+                ("PARENT INVERSE", "Parent Inverse", "", "NONE", 2),
+                ("WORLD", "World", "", "NONE", 3) ]
 
 class ObjectMatrixOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectMatrixOutputNode"
