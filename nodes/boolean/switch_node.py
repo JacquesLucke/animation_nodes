@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... sockets.info import toIdName
-from ... tree_info import keepNodeLinks
+from ... tree_info import keepNodeState
 from ... base_types.node import AnimationNode
 
 class SwitchNode(bpy.types.Node, AnimationNode):
@@ -36,7 +36,7 @@ class SwitchNode(bpy.types.Node, AnimationNode):
         return ("output = ifTrue if condition else ifFalse",
                 "other = ifFalse if condition else ifTrue")
 
-    @keepNodeLinks
+    @keepNodeState
     def generateSockets(self):
         self.inputs.clear()
         self.outputs.clear()
