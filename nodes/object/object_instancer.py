@@ -1,15 +1,15 @@
 import bpy
 from bpy.props import *
 from ... events import propertyChanged
+from ... tree_info import keepNodeState
 from ... utils.names import getRandomString
 from ... base_types.node import AnimationNode
 from ... utils.blender_ui import iterActiveSpacesByType
 from ... nodes.container_provider import getMainObjectContainer
-from ... utils.names import (getPossibleObjectName,
-                                     getPossibleMeshName,
-                                     getPossibleCameraName,
-                                     getPossibleLampName,
-                                     getPossibleCurveName)
+from ... utils.names import (getPossibleMeshName,
+                             getPossibleCameraName,
+                             getPossibleLampName,
+                             getPossibleCurveName)
 
 objectTypeItems = [
     ("Mesh", "Mesh", "", "MESH_DATA", 0),
@@ -30,7 +30,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
     searchTags = ["Object Replicator (old)"]
 
     def copyFromSourceChanged(self, context):
-        self.inputs["Source"].hide = not self.copyFromSource
+        self.updateInputSockets()
         self.resetInstancesEvent(context)
 
     def resetInstancesEvent(self, context):
@@ -55,6 +55,14 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         self.inputs.new("an_SceneSocket", "Scene", "scene").hide = True
         self.outputs.new("an_ObjectListSocket", "Objects", "objects")
 
+    @keepNodeState
+    def updateInputSockets(self):
+        self.inputs.clear()
+        self.inputs.new("an_IntegerSocket", "Instances", "instancesAmount").minValue = 0
+        if self.copyFromSource:
+            self.inputs.new("an_ObjectSocket", "Source", "sourceObject").defaultDrawType = "PROPERTY_ONLY"
+        self.inputs.new("an_SceneSocket", "Scene", "scene").hide = True
+
     def draw(self, layout):
         layout.prop(self, "copyFromSource")
         if self.copyFromSource:
@@ -78,15 +86,31 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         layout.separator()
         self.invokeFunction(layout, "hideRelationshipLines", text = "Hide Relationship Lines", icon = "RESTRICT_VIEW_OFF")
 
-    def execute(self, instancesAmount, sourceObject, scene):
-        instancesAmount = max(instancesAmount, 0)
 
-        if self.copyFromSource and sourceObject is not None:
+    def getExecutionCode(self):
+        if self.copyFromSource:
+            return "objects = self.getInstances_WithSource(instancesAmount, sourceObject, scene)"
+        else:
+            return "objects = self.getInstances_WithoutSource(instancesAmount, scene)"
+
+    def getInstances_WithSource(self, instancesAmount, sourceObject, scene):
+        if sourceObject is None:
+            self.removeAllObjects()
+            return []
+        else:
             if self.sourceObjectHash != str(hash(sourceObject)):
                 self.removeAllObjects()
                 self.sourceObjectHash = str(hash(sourceObject))
 
-        if self.copyFromSource and sourceObject is None or scene is None:
+        return self.getInstances_Base(instancesAmount, sourceObject, scene)
+
+    def getInstances_WithoutSource(self, instancesAmount, scene):
+        return self.getInstances_Base(instancesAmount, None, scene)
+
+    def getInstances_Base(self, instancesAmount, sourceObject, scene):
+        instancesAmount = max(instancesAmount, 0)
+
+        if scene is None:
             self.removeAllObjects()
             return []
 
@@ -98,6 +122,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
             self.removeLastObject()
 
         return self.getOutputObjects(instancesAmount, sourceObject, scene)
+
 
     def getOutputObjects(self, instancesAmount, sourceObject, scene):
         objects = []
