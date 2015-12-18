@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import *
-from ... tree_info import keepNodeLinks
+from ... tree_info import keepNodeState
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 from ... algorithms.interpolation import (assignArguments,
@@ -41,7 +41,7 @@ class ConstructInterpolationNode(bpy.types.Node, AnimationNode):
         self.createInputs()
         self.outputs.new("an_InterpolationSocket", "Interpolation", "interpolation")
 
-    @keepNodeLinks
+    @keepNodeState
     def createInputs(self):
         self.inputs.clear()
         c = self.category

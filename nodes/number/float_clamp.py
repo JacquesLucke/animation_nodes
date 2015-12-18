@@ -23,6 +23,14 @@ class FloatClampNode(bpy.types.Node, AnimationNode):
         yield "outValue = min(max(value, minValue), maxValue)"
         if self.outputInteger: yield "outValue = int(outValue)"
 
+    def drawLabel(self):
+        label = "clamp(min, max)"
+        if self.minValueSocket.isUnlinked:
+            label = label.replace("min", str(round(self.minValueSocket.value, 4)))
+        if self.maxValueSocket.isUnlinked:
+            label = label.replace("max", str(round(self.maxValueSocket.value, 4)))
+        return label
+
     def edit(self):
         self.outputInteger = self.outputs[0].isOnlyLinkedToDataType("Integer")
 
@@ -35,3 +43,11 @@ class FloatClampNode(bpy.types.Node, AnimationNode):
     def _recreateOutputSocket(self, idName):
         self.outputs.clear()
         self.outputs.new(idName, "Value", "outValue")
+
+    @property
+    def minValueSocket(self):
+        return self.inputs.get("Min")
+
+    @property
+    def maxValueSocket(self):
+        return self.inputs.get("Max")

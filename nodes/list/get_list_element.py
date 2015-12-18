@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import *
-from ... tree_info import keepNodeLinks
+from ... tree_info import keepNodeState
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 from ... sockets.info import getBaseDataTypeItems, toIdName, toListIdName, isBase, toBaseDataType, isLimitedList, toGeneralListIdName
@@ -62,7 +62,7 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
         if baseDataType == self.assignedType: return
         self.assignedType = baseDataType
 
-    @keepNodeLinks
+    @keepNodeState
     def generateSockets(self):
         self.inputs.clear()
         self.outputs.clear()

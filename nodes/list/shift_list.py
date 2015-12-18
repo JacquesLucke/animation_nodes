@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import *
-from ... tree_info import keepNodeLinks
+from ... tree_info import keepNodeState
 from ... sockets.info import toIdName, isList
 from ... base_types.node import AnimationNode
 
@@ -41,7 +41,7 @@ class ShiftListNode(bpy.types.Node, AnimationNode):
         if listDataType == self.assignedType: return
         self.assignedType = listDataType
 
-    @keepNodeLinks
+    @keepNodeState
     def generateSockets(self):
         self.inputs.clear()
         self.outputs.clear()

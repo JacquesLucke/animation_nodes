@@ -1,5 +1,6 @@
 import bpy
 import bmesh
+import itertools
 from mathutils import Vector
 
 class MeshData:
@@ -12,6 +13,34 @@ class MeshData:
 
     def copy(self):
         return MeshData(copyVectorList(self.vertices), copy2dList(self.edges), copy2dList(self.polygons))
+
+    def isValid(self, checkTupleLengths = True, checkIndices = True):
+        try:
+            if checkTupleLengths:
+                if not self.hasValidEdgeTupleLengths(): return False
+                if not self.hasValidPolygonTupleLengths(): return False
+            if checkIndices:
+                if not self.hasValidIndices(): return False
+        except:
+            return False
+        return True
+
+    def hasValidEdgeTupleLengths(self):
+        return all(len(edge) == 2 for edge in self.edges)
+
+    def hasValidPolygonTupleLengths(self):
+        return all(len(polygon) >= 3 for polygon in self.polygons)
+
+    def hasValidIndices(self):
+        maxEdgeIndex = max(itertools.chain([-1], *self.edges))
+        maxPolygonIndex = max(itertools.chain([-1], *self.polygons))
+
+        minEdgeIndex = min(itertools.chain([0], *self.edges))
+        minPolygonIndex = min(itertools.chain([0], *self.polygons))
+
+        return max(maxEdgeIndex, maxPolygonIndex) < len(self.vertices) and min(minEdgeIndex, minPolygonIndex) >= 0
+
+
 
 
 class Vertex:

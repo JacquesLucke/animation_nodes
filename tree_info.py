@@ -408,7 +408,23 @@ def getAllDataLinks():
             dataLinks.add((idToSocket(socketID), idToSocket(linkedID)))
     return list(dataLinks)
 
+
+# keep node state
+
+def keepNodeState(function):
+    def wrapper(node, *args, **kwargs):
+        return keepNodeLinks(keepSocketValues(function))(node, *args, **kwargs)
+    return wrapper
+
 # keep node links
+
+def keepNodeLinks(function):
+    def wrapper(node, *args, **kwargs):
+        connections = getNodeConnections(node)
+        output = function(node, *args, **kwargs)
+        setConnections(connections)
+        return output
+    return wrapper
 
 def getNodeConnections(node):
     nodeID = node.toID()
@@ -424,13 +440,36 @@ def setConnections(connections):
         try: idToSocket(id1).linkWith(idToSocket(id2))
         except: pass
 
-def keepNodeLinks(function):
+# keep socket values
+
+def keepSocketValues(function):
     def wrapper(node, *args, **kwargs):
-        connections = getNodeConnections(node)
+        inputs, outputs = getSocketValues(node)
         output = function(node, *args, **kwargs)
-        setConnections(connections)
+        setSocketValues(node, inputs, outputs)
         return output
     return wrapper
+
+def getSocketValues(node):
+    inputs = [(socket.identifier, socket.dataType, socket.getProperty(), socket.hide) for socket in node.inputs]
+    outputs = [(socket.identifier, socket.dataType, socket.getProperty(), socket.hide) for socket in node.outputs]
+    return inputs, outputs
+
+def setSocketValues(node, inputs, outputs):
+    inputsByIdentifier = node.inputsByIdentifier
+    for identifier, dataType, value, hide in inputs:
+        if getattr(inputsByIdentifier.get(identifier), "dataType", "") == dataType:
+            socket = inputsByIdentifier[identifier]
+            socket.setProperty(value)
+            socket.hide = hide
+
+    outputsByIdentifier = node.outputsByIdentifier
+    for identifier, dataType, value, hide in outputs:
+        if getattr(outputsByIdentifier.get(identifier), "dataType", "") == dataType:
+            socket = outputsByIdentifier[identifier]
+            socket.setProperty(value)
+            socket.hide = hide
+
 
 def getNetworkWithNode(node):
     return _networks.networkByNode[node.toID()]

@@ -5,7 +5,6 @@ from ... tree_info import keepNodeLinks
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 
-
 operationItems = [
     ("ADD", "Add", "A + B", "", 0),
     ("SUBTRACT", "Subtract", "A - B", "", 1),
@@ -18,11 +17,10 @@ operationItems = [
     ("ARCCOSINE", "Arccosine", "acos A", "", 8),
     ("ARCTANGENT", "Arctangent", "atan A", "", 9),
     ("POWER", "Power", "A ** B", "", 10),
-    ("LOGARITHM", "Logarithm", "A log B", "", 11),
-    ("MINIMUM", "Minimum", "min A B", "", 12),
-    ("MAXIMUM", "Maximum", "max A B", "", 13),
-    ("ROUND", "Round", "A round B", "", 14),
-    ("MODULO", "Modulo", "A % B", "", 15),
+    ("LOGARITHM", "Logarithm", "log A, base B", "", 11),
+    ("MINIMUM", "Minimum", "min(A, B)", "", 12),
+    ("MAXIMUM", "Maximum", "max(A, B)", "", 13),
+    ("MODULO", "Modulo", "A mod B", "", 15),
     ("ABSOLUTE", "Absolute", "abs A", "", 16),
     ("FLOOR", "Floor", "floor A", "", 17),
     ("CEILING", "Ceiling", "ceil A", "", 18),
@@ -56,7 +54,7 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
         return tags
 
     def operationChanged(self, context):
-        self.inputs[1].hide = self.operation in singleInputOperations
+        self.recreateInputSockets()
         executionCodeChanged()
 
     def outputIntegerChanged(self, context):
@@ -69,28 +67,22 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
         update = outputIntegerChanged)
 
     def create(self):
-        self.inputs.new("an_FloatSocket", "A", "a")
-        self.inputs.new("an_FloatSocket", "B", "b").value = 1.0
         self.outputs.new("an_FloatSocket", "Result", "result")
+        self.recreateInputSockets()
 
     def draw(self, layout):
         layout.prop(self, "operation", text = "")
 
     def drawLabel(self):
-        return operationLabels[self.operation]
+        label = operationLabels[self.operation]
+        if getattr(self.socketA, "isUnlinked", False):
+            label = label.replace("A", str(round(self.socketA.value, 4)))
+        if getattr(self.socketB, "isUnlinked", False):
+            label = label.replace("B", str(round(self.socketB.value, 4)))
+        return label
 
     def edit(self):
         self.outputInteger = self.outputs[0].isOnlyLinkedToDataType("Integer")
-
-    def recreateOutputSocket(self):
-        idName = "an_IntegerSocket" if self.outputInteger else "an_FloatSocket"
-        if self.outputs[0].bl_idname == idName: return
-        self._recreateOutputSocket(idName)
-
-    @keepNodeLinks
-    def _recreateOutputSocket(self, idName):
-        self.outputs.clear()
-        self.outputs.new(idName, "Result", "result")
 
     def getExecutionCode(self):
         op = self.operation
@@ -111,7 +103,6 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
                                           "else: result = math.log(a, b)")
         if op == "MINIMUM": yield "result = min(a, b)"
         if op == "MAXIMUM": yield "result = max(a, b)"
-        if op == "ROUND": yield "result = round(a, int(b))"
         if op == "LESSTHAN": yield "result = a < b"
         if op == "GREATHERTHAN": yield "result = a > b"
         if op == "ABSOLUTE": yield "result = abs(a)"
@@ -128,3 +119,31 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
 
     def getUsedModules(self):
         return ["math"]
+
+    def recreateOutputSocket(self):
+        idName = "an_IntegerSocket" if self.outputInteger else "an_FloatSocket"
+        if self.outputs[0].bl_idname == idName: return
+        self._recreateOutputSocket(idName)
+
+    @keepNodeLinks
+    def _recreateOutputSocket(self, idName):
+        self.outputs.clear()
+        self.outputs.new(idName, "Result", "result")
+
+    @keepNodeLinks
+    def recreateInputSockets(self):
+        defaultA = getattr(self.socketA, "value", 0)
+        defaultB = getattr(self.socketB, "value", 1)
+
+        self.inputs.clear()
+        self.inputs.new("an_FloatSocket", "A", "a").value = defaultA
+        if self.operation not in singleInputOperations:
+            self.inputs.new("an_FloatSocket", "B", "b").value = defaultB
+
+    @property
+    def socketA(self):
+        return self.inputs.get("A")
+
+    @property
+    def socketB(self):
+        return self.inputs.get("B")
