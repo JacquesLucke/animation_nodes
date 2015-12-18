@@ -451,20 +451,24 @@ def keepSocketValues(function):
     return wrapper
 
 def getSocketValues(node):
-    inputs = [(socket.identifier, socket.dataType, socket.getProperty()) for socket in node.inputs]
-    outputs = [(socket.identifier, socket.dataType, socket.getProperty()) for socket in node.outputs]
+    inputs = [(socket.identifier, socket.dataType, socket.getProperty(), socket.hide) for socket in node.inputs]
+    outputs = [(socket.identifier, socket.dataType, socket.getProperty(), socket.hide) for socket in node.outputs]
     return inputs, outputs
 
 def setSocketValues(node, inputs, outputs):
     inputsByIdentifier = node.inputsByIdentifier
-    for identifier, dataType, value in inputs:
+    for identifier, dataType, value, hide in inputs:
         if getattr(inputsByIdentifier.get(identifier), "dataType", "") == dataType:
-            inputsByIdentifier[identifier].setProperty(value)
+            socket = inputsByIdentifier[identifier]
+            socket.setProperty(value)
+            socket.hide = hide
 
     outputsByIdentifier = node.outputsByIdentifier
-    for identifier, dataType, value in outputs:
+    for identifier, dataType, value, hide in outputs:
         if getattr(outputsByIdentifier.get(identifier), "dataType", "") == dataType:
-            outputsByIdentifier[identifier].setProperty(value)
+            socket = outputsByIdentifier[identifier]
+            socket.setProperty(value)
+            socket.hide = hide
 
 
 def getNetworkWithNode(node):
