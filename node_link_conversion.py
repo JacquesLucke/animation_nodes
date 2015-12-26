@@ -58,7 +58,8 @@ class SimpleConvert(LinkCorrection):
         ("Float", "Euler") : "an_CombineEulerNode",
         ("Euler", "Float") : "an_SeparateEulerNode",
         ("Object", "Vector") : "an_ObjectTransformsInputNode",
-        ("Object", "Matrix") : "an_ObjectMatrixInputNode"
+        ("Object", "Matrix") : "an_ObjectMatrixInputNode",
+        ("Polygon List", "Mesh Data") : "an_MeshDataFromPolygonsNode"
     }
 
     def check(self, origin, target):
