@@ -23,10 +23,13 @@ class TreePanel(bpy.types.Panel):
         props = col.operator("an.execute_tree", icon = "PLAY")
         props.name = tree.name
 
-        layout.separator()
-        layout.prop(tree, "editNodeLabels")
-
         layout.label(prettyTime(tree.executionTime), icon = "TIME")
+
+        layout.separator()
+
+        col = layout.column()
+        col.prop(tree, "dynamicNodeLabels")
+        col.prop(tree, "editNodeLabels")
 
     @classmethod
     def getTree(cls):

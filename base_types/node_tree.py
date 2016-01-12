@@ -41,6 +41,7 @@ class AnimationNodeTree(bpy.types.NodeTree):
     sceneName = StringProperty()
 
     editNodeLabels = BoolProperty(name = "Edit Node Labels", default = False)
+    dynamicNodeLabels = BoolProperty(name = "Dynamic Node Labels", default = True)
 
     def update(self):
         treeChanged()
@@ -87,7 +88,7 @@ class AnimationNodeTree(bpy.types.NodeTree):
         if len(units) == 0:
             self.executionTime = 0
             return
-            
+
         clearDebugLoopTextBlocks(self)
         start = time.clock()
         for unit in units:
