@@ -28,6 +28,8 @@ class TextObjectOutputNode(bpy.types.Node, AnimationNode):
         self.inputs.new("an_FloatSocket", "Y Offset", "yOffset")
         self.inputs.new("an_StringSocket", "Align", "align").value = "CENTER"
 
+        self.inputs.new("an_FontSocket", "Font", "font")
+
         for socket in self.inputs[1:]:
             socket.useIsUsedProperty = True
             socket.isUsed = False
@@ -63,6 +65,8 @@ class TextObjectOutputNode(bpy.types.Node, AnimationNode):
         if s["X Offset"].isUsed:            yield "    textObject.offset_x = xOffset"
         if s["Y Offset"].isUsed:            yield "    textObject.offset_y = yOffset"
         if s["Align"].isUsed:               yield "    self.setAlignment(textObject, align)"
+
+        if s["Font"].isUsed:                yield "    textObject.font = font"
 
     def setAlignment(self, textObject, align):
         if align in ("LEFT", "CENTER", "RIGHT", "JUSTIFY", "FLUSH"):
