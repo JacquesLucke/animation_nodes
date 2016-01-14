@@ -214,6 +214,7 @@ class ListMenu(bpy.types.Menu):
         insertNode(layout, "an_ReverseListNode", "Reverse")
         insertNode(layout, "an_SliceListNode", "Slice")
         insertNode(layout, "an_ShiftListNode", "Shift")
+        insertNode(layout, "an_GetRandomListElementsNode", "Get Random Elements")
 
 class ObjectMenu(bpy.types.Menu):
     bl_idname = "an_object_menu"
