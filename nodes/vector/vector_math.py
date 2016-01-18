@@ -1,7 +1,6 @@
 import bpy
 from bpy.props import *
-from ... tree_info import keepNodeLinks
-from ... events import executionCodeChanged
+from ... tree_info import keepNodeState
 from ... base_types.node import AnimationNode
 
 operationItems = [
@@ -65,7 +64,7 @@ class VectorMathNode(bpy.types.Node, AnimationNode):
     def drawLabel(self):
         return operationLabels[self.operation]
 
-    @keepNodeLinks
+    @keepNodeState
     def createInputs(self):
         self.inputs.clear()
         self.inputs.new("an_VectorSocket", "A", "a")
