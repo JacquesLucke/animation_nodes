@@ -64,6 +64,7 @@ class CreateListNode(bpy.types.Node, AnimationNode):
         return "outList = [" + ", ".join(["element_" + str(i) for i, socket in enumerate(self.inputs) if socket.dataType != "Node Control"]) + "]"
 
     def edit(self):
+        self.updateOutputName()
         emptySocket = self.inputs["..."]
         origin = emptySocket.directOrigin
         if origin is None: return
@@ -98,6 +99,10 @@ class CreateListNode(bpy.types.Node, AnimationNode):
         socket.moveUp()
         return socket
 
+    def updateOutputName(self):
+        name = "List ({})".format(len(self.inputs) - 1)
+        self.outputs[0].name = name
+
     def removeElementInputs(self):
         for socket in self.inputs[:-1]:
             socket.remove()
@@ -108,7 +113,7 @@ class CreateListNode(bpy.types.Node, AnimationNode):
 
     def drawTypeSpecifics(self, layout):
         if len(self.inputs) == 1:
-            self.drawAdvancedTypeSpecific(layout)        
+            self.drawAdvancedTypeSpecific(layout)
 
     def drawAdvancedTypeSpecific(self, layout):
         if self.assignedType in ("Object", "Spline"):
