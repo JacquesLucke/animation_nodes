@@ -39,7 +39,7 @@ operationsWithStepQuaternion = ["SNAP"]
 
 
 class QuaternionMathNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_QuaternionrMathNode"
+    bl_idname = "an_QuaternionMathNode"
     bl_label = "Quaternion Math"
 
     def operationChanged(self, context):
