@@ -4,8 +4,8 @@ from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 
 planeItems = [("XY", "XY", ""), ("XZ", "XZ", ""), ("YZ", "YZ", "")]
-other = {"XY": "z", "XZ": "y", "YZ": "x"}
-coord = {"XY": "(0, 0, 1)", "XZ": "(0, 1, 0)", "YZ": "(1, 0, 0)"}
+thirdAxisName = {"XY": "z", "XZ": "y", "YZ": "x"}
+thirdAxisTuple = {"XY": "(0, 0, 1)", "XZ": "(0, 1, 0)", "YZ": "(1, 0, 0)"}
 
 class ShearMatrixNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ShearMatrixNode"
@@ -23,20 +23,21 @@ class ShearMatrixNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.prop(self, "plane", expand = True)
         layout.prop(self, "useThirdAsScale", 
-                    text = "Use {} as Scale".format(other[self.plane].upper()) )
+                    text = "Use {} as Scale".format(thirdAxisName[self.plane].upper()) )
 
     def getExecutionCode(self):
-
+        plane = self.plane
+        
         if self.useThirdAsScale:
-            yield ("sca = mathutils.Matrix.Scale(shear.{}, 4, {})"
-                .format(other[self.plane], coord[self.plane]) )
-            yield ("mat = mathutils.Matrix.Shear('{}', 4, (shear.{}, shear.{}))"
-                .format(self.plane, self.plane[0].lower(), self.plane[1].lower()) )
-            yield "matrix = sca * mat"
+            yield ("_scale = mathutils.Matrix.Scale(shear.{}, 4, {})"
+                                .format(thirdAxisName[plane], thirdAxisTuple[plane]) )
+            yield ("_matrix = mathutils.Matrix.Shear('{}', 4, (shear.{}, shear.{}))"
+                                .format(plane, plane[0].lower(), plane[1].lower()) )
+            yield "matrix = _scale * _matrix"
         
         else: 
             yield ("matrix = mathutils.Matrix.Shear('{}', 4, (shear.{}, shear.{}))"
-                .format(self.plane, self.plane[0].lower(), self.plane[1].lower()) )
+                                .format(plane, plane[0].lower(), plane[1].lower()) )
 
     def getUsedModules(self):
         return ["mathutils"]
