@@ -78,7 +78,7 @@ class EulerMathNode(bpy.types.Node, AnimationNode):
                         "if b[0] != 0: result[0] = math.radians(math.degrees(a[0]) / math.degrees(b[0]))",
                         "if b[1] != 0: result[1] = math.radians(math.degrees(a[1]) / math.degrees(b[1]))",
                         "if b[2] != 0: result[2] = math.radians(math.degrees(a[2]) / math.degrees(b[2]))")
-            else: 
+            else:
                 return ("result = mathutils.Euler((0, 0, 0), 'XYZ')",
                         "if b[0] != 0: result[0] = a[0] / b[0]",
                         "if b[1] != 0: result[1] = a[1] / b[1]",
