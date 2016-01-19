@@ -24,6 +24,7 @@ operationLabels = {
 operationsWithFloat = ["SCALE"]
 operationsWithSecondEuler = ["ADD", "SUBTRACT", "MULTIPLY", "DIVIDE"]
 operationsWithStepEuler = ["SNAP"]
+operationsWithDegree = ["MULTIPLY", "DIVIDE"]
 
 class EulerMathNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_EulerMathNode"
@@ -33,6 +34,9 @@ class EulerMathNode(bpy.types.Node, AnimationNode):
         self.createInputs()
 
     operation = EnumProperty(name = "Operation", items = operationItems, default = "ADD", update = operationChanged)
+    useDegree = BoolProperty(name = "Use Degrees",
+        description = "Multiply and Divide degrees. If false, operation will use radians (output is always radians)",
+        default = True, update = operationChanged)
 
     def create(self):
         self.createInputs()
@@ -40,6 +44,9 @@ class EulerMathNode(bpy.types.Node, AnimationNode):
 
     def draw(self, layout):
         layout.prop(self, "operation", text = "")
+
+    def drawAdvanced(self, layout):
+        if self.operation in operationsWithDegree: layout.prop(self, "useDegree")
 
     def drawLabel(self):
         return operationLabels[self.operation]
@@ -58,28 +65,32 @@ class EulerMathNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         op = self.operation
-        yield "v1 = mathutils.Vector((a))"
-        if self.operation in operationsWithSecondEuler:
-            yield "v2 = mathutils.Vector((b))"
 
-        if op == "ADD": yield "_result = v1 + v2"
-        elif op == "SUBTRACT": yield "_result = v1 - v2"
-        elif op == "MULTIPLY": yield "_result = mathutils.Vector((v1[0] * v2[0], v1[1] * v2[1], v1[2] * v2[2]))"
+        if op == "ADD": return "result = mathutils.Euler((a[0] + b[0], a[1] + b[1], a[2] + b[2]), 'XYZ')"
+        elif op == "SUBTRACT": return "result = mathutils.Euler((a[0] - b[0], a[1] - b[1], a[2] - b[2]), 'XYZ')"
+        elif op == "MULTIPLY":
+            if self.useDegree:
+                return "result = mathutils.Euler((math.radians(math.degrees(A) * math.degrees(B)) for A, B in zip(a, b)), 'XYZ')"
+            else: return "result = mathutils.Euler((a[0] * b[0], a[1] * b[1], a[2] * b[2]), 'XYZ')"
         elif op == "DIVIDE":
-            yield "_result = mathutils.Vector((0, 0, 0))"
-            yield "if v2.x != 0: _result.x = v1.x / v2.x"
-            yield "if v2.y != 0: _result.y = v1.y / v2.y"
-            yield "if v2.z != 0: _result.z = v1.z / v2.z"
-        elif op == "SCALE": yield "_result = v1 * scale"
-        elif op == "ABSOLUTE": yield "_result = mathutils.Vector((abs(v1.x), abs(v1.y), abs(v1.z)))"
+            if self.useDegree:
+                return ("result = mathutils.Euler((0, 0, 0), 'XYZ')",
+                        "if b[0] != 0: result[0] = math.radians(math.degrees(a[0]) / math.degrees(b[0]))",
+                        "if b[1] != 0: result[1] = math.radians(math.degrees(a[1]) / math.degrees(b[1]))",
+                        "if b[2] != 0: result[2] = math.radians(math.degrees(a[2]) / math.degrees(b[2]))")
+            else: 
+                return ("result = mathutils.Euler((0, 0, 0), 'XYZ')",
+                        "if b[0] != 0: result[0] = a[0] / b[0]",
+                        "if b[1] != 0: result[1] = a[1] / b[1]",
+                        "if b[2] != 0: result[2] = a[2] / b[2]")
+        elif op == "SCALE":  return "result = mathutils.Euler((a[0] * scale, a[1] * scale, a[2] * scale), 'XYZ')"
+        elif op == "ABSOLUTE": return "result = mathutils.Euler((abs(a[0]), abs(a[1]), abs(a[2])), 'XYZ')"
         elif op == "SNAP":
-            yield "_result = mathutils.Vector((0, 0, 0))"
-            yield "if stepSize.x != 0: _result.x = round(v1.x / stepSize.x) * stepSize.x"
-            yield "if stepSize.y != 0: _result.y = round(v1.y / stepSize.y) * stepSize.y"
-            yield "if stepSize.z != 0: _result.z = round(v1.z / stepSize.z) * stepSize.z"
-
-        yield "result = mathutils.Euler(_result)"
+            return ("result = mathutils.Euler((0, 0, 0), 'XYZ')",
+                    "if stepSize.x != 0: result[0] = round(a[0] / stepSize[0]) * stepSize[0]",
+                    "if stepSize.y != 0: result[1] = round(a[1] / stepSize[1]) * stepSize[1]",
+                    "if stepSize.z != 0: result[2] = round(a[2] / stepSize[2]) * stepSize[2]")
 
 
     def getUsedModules(self):
-        return ["mathutils"]
+        return ["math, mathutils"]
