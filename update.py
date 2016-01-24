@@ -16,7 +16,6 @@ def updateEverything():
     tree_info.update()
     problems.reset()
     enableUseFakeUser()
-    fixHiddenLinks() # is fixed in the next blender release 2.76
     callNodeEditFunctions()
     correctForbiddenNodeLinks()
     subprogram_sockets.updateIfNecessary()
@@ -29,21 +28,9 @@ def updateEverything():
 
 
 def enableUseFakeUser():
-    '''
-    Make sure the node trees will not be removed when closing the file.
-    '''
+    # Make sure the node trees will not be removed when closing the file.
     for tree in getAnimationNodeTrees():
         tree.use_fake_user = True
-
-def fixHiddenLinks():
-    for tree in getAnimationNodeTrees():
-        linksToReplace = [link for link in tree.links if link.from_socket.hide or link.to_socket.hide]
-        for link in linksToReplace:
-            fromSocket, toSocket = link.from_socket, link.to_socket
-            tree.links.remove(link)
-            fromSocket.hide = toSocket.hide = False
-            tree.links.new(toSocket, fromSocket)
-    tree_info.updateIfNecessary()
 
 def callNodeEditFunctions():
     tree_info.updateIfNecessary()
