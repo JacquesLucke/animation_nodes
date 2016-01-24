@@ -3,7 +3,7 @@ from . update import updateEverything
 from . utils.recursion import noRecursion
 from . utils.nodes import iterAnimationNodes, getAnimationNodeTrees
 from . execution.units import setupExecutionUnits, finishExecutionUnits
-from . execution.auto_execution import autoExecuteMainUnits, afterExecution
+from . execution.auto_execution import iterAutoExecutionNodeTrees, executeNodeTrees, afterExecution
 
 @noRecursion
 def update(events):
@@ -11,10 +11,12 @@ def update(events):
         updateEverything()
 
     if problems.canAutoExecute():
-        setupExecutionUnits()
-        executed = autoExecuteMainUnits(events)
-        if executed: afterExecution()
-        finishExecutionUnits()
+        nodeTrees = list(iterAutoExecutionNodeTrees(events))
+        if len(nodeTrees) > 0:
+            setupExecutionUnits()
+            executeNodeTrees(nodeTrees)
+            afterExecution()
+            finishExecutionUnits()
 
 
 oldNamesHash = 0
