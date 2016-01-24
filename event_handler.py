@@ -5,7 +5,6 @@ from . utils.recursion import noRecursion
 from . execution.units import setupExecutionUnits, finishExecutionUnits
 from . utils.nodes import iterAnimationNodes, getAnimationNodeTrees, iterAnimationNodesSockets
 from . execution.auto_execution import iterAutoExecutionNodeTrees, executeNodeTrees, afterExecution
-from . utils.timing import measureTime
 
 @noRecursion
 def update(events):
@@ -33,7 +32,6 @@ def didNameChange():
         return True
     return False
 
-@measureTime
 def getNamesHash():
     names = set(itertools.chain(
         (tree.name for tree in getAnimationNodeTrees()),
