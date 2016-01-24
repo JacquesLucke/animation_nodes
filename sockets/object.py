@@ -39,6 +39,9 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getProperty(self):
         return self.objectName
 
+    def updateProperty(self):
+        self.getValue()
+
     def assignActiveObject(self):
         object = bpy.context.active_object
         if object:

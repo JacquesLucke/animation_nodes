@@ -127,6 +127,9 @@ class AnimationNodeSocket:
     def getProperty(self):
         return
 
+    def updateProperty(self):
+        return
+
     def invokeFunction(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True, confirm = False, data = None):
         idName = getInvokeFunctionOperator(description)
         props = layout.operator(idName, text = text, icon = icon, emboss = emboss)

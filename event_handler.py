@@ -1,14 +1,18 @@
+import itertools
 from . import problems
 from . update import updateEverything
 from . utils.recursion import noRecursion
-from . utils.nodes import iterAnimationNodes, getAnimationNodeTrees
 from . execution.units import setupExecutionUnits, finishExecutionUnits
+from . utils.nodes import iterAnimationNodes, getAnimationNodeTrees, iterAnimationNodesSockets
 from . execution.auto_execution import iterAutoExecutionNodeTrees, executeNodeTrees, afterExecution
+from . utils.timing import measureTime
 
 @noRecursion
 def update(events):
     if events.intersection({"File", "Addon", "Tree"}) or didNameChange():
         updateEverything()
+
+    updateSocketProperties()
 
     if problems.canAutoExecute():
         nodeTrees = list(iterAutoExecutionNodeTrees(events))
@@ -29,7 +33,13 @@ def didNameChange():
         return True
     return False
 
+@measureTime
 def getNamesHash():
-    treeNames = "".join((tree.name for tree in getAnimationNodeTrees()))
-    nodeNames = "".join((node.name for node in iterAnimationNodes()))
-    return len(treeNames) + len(nodeNames)
+    names = set(itertools.chain(
+        (tree.name for tree in getAnimationNodeTrees()),
+        (node.name for node in iterAnimationNodes())))
+    return names
+
+def updateSocketProperties():
+    for socket in iterAnimationNodesSockets():
+        socket.updateProperty()
