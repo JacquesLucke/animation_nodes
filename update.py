@@ -1,11 +1,11 @@
 from . import problems
 from . import tree_info
 from . ui import node_colors
-from . utils.nodes import iterAnimationNodes, getAnimationNodeTrees
+from . utils.timing import measureTime
+from . nodes.system import subprogram_sockets
 from . execution.units import createExecutionUnits
 from . node_link_conversion import correctForbiddenNodeLinks
-from . nodes.system import subprogram_sockets
-from . utils.timing import measureTime
+from . utils.nodes import iterAnimationNodes, getAnimationNodeTrees
 
 @measureTime
 def updateEverything():
