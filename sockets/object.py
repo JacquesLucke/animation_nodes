@@ -54,7 +54,3 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         object = bpy.data.objects.new("Target", data)
         bpy.context.scene.objects.link(object)
         self.objectName = object.name
-
-    def drawSuggestionsMenu(self, layout):
-        self.invokeNodeInsertion(layout, "an_ObjectTransformsInputNode", 0, "Transforms Input")
-        self.invokeNodeInsertion(layout, "an_ObjectTransformsOutputNode", 0, "Transforms Output")

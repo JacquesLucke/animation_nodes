@@ -16,6 +16,3 @@ class MeshDataSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def getCopyExpression(self):
         return "value.copy()"
-
-    def drawSuggestionsMenu(self, layout):
-        self.invokeNodeInsertion(layout, "an_SetMeshDataOnObjectNode", 1, "Set On Object")
