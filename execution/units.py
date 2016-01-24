@@ -1,14 +1,14 @@
 import traceback
-from .. problems import ExceptionDuringCodeCreation, CouldNotSetupExecutionUnits
 from .. import problems
 from collections import defaultdict
 from . cache import clearExecutionCache
+from .. utils.nodes import getAnimationNodeTrees
 from . main_execution_unit import MainExecutionUnit
-from . group_execution_unit import GroupExecutionUnit
 from . loop_execution_unit import LoopExecutionUnit
+from . group_execution_unit import GroupExecutionUnit
 from . script_execution_unit import ScriptExecutionUnit
 from .. tree_info import getNetworksByType, getSubprogramNetworks
-from .. utils.nodes import getAnimationNodeTrees
+from .. problems import ExceptionDuringCodeCreation, CouldNotSetupExecutionUnits
 
 _mainUnitsByNodeTree = defaultdict(list)
 _subprogramUnitsByIdentifier = {}
