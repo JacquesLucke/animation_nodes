@@ -7,7 +7,7 @@ from ... sockets.info import toIdName, isList
 from ... base_types.node import AnimationNode
 
 operationItems = [
-    ("UNION", "Union", "Elements that appear at least once one of the inputs", "NONE", 0),
+    ("UNION", "Union", "Elements that are at least in one of both lists", "NONE", 0),
     ("INTERSECTION", "Intersection", "Elements that are in both lists", "NONE", 1),
     ("DIFFERENCE", "Difference", "Elements that are in list 1 but not in list 2", "NONE", 2),
     ("SYMMETRIC_DIFFERENCE", "Symmetric Difference", "Elements that are in list 1 or in list 2 but not in both", "NONE", 3) ]
