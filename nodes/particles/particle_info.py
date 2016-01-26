@@ -22,6 +22,11 @@ class ParticleInfoNode(bpy.types.Node, AnimationNode):
         self.outputs.new("an_VectorSocket", "Previous Rotation", "previousRotation").hide = True
         self.outputs.new("an_VectorSocket", "Previous Velocity", "previousVelocity").hide = True
         self.outputs.new("an_VectorSocket", "Previous Angular Velocity", "previousAngularVelocity").hide = True
+        
+        self.outputs.new("an_FloatListSocket", "HairTime", "hairTime").hide = True
+        self.outputs.new("an_FloatListSocket", "HairWeight", "hairWeight").hide = True
+        self.outputs.new("an_VectorListSocket", "HairPoints", "hairPoints").hide = True
+        self.outputs.new("an_VectorListSocket", "HairPointsLocal", "hairPointsLocal").hide = True
 
     def getExecutionCode(self):
         isLinked = self.getLinkedOutputsDict()
@@ -44,6 +49,17 @@ class ParticleInfoNode(bpy.types.Node, AnimationNode):
         if isLinked["previousRotation"]: lines.append("    previousRotation = mathutils.Vector(particle.prev_rotation.to_euler())")
         if isLinked["previousVelocity"]: lines.append("    previousVelocity = particle.prev_velocity")
         if isLinked["previousAngularVelocity"]: lines.append("    previousAngularVelocity = particle.prev_angular_velocity")
+        
+        hair = ["hairTime", "hairWeight", "hairPoints", "hairPointsLocal"]
+        if any ([isLinked[item] for item in hair]):
+            lines.append("    " + ", ".join(hair) + " = [], [], [] ,[]")
+            lines.append("    if particle.hair_keys:")
+            lines.append(" " * 8 + "for key in particle.hair_keys:")
+            if isLinked["hairTime"]:        lines.append(" " * 12 + "hairTime.append(key.time)")
+            if isLinked["hairWeight"]:      lines.append(" " * 12 + "hairWeight.append(key.weight)")
+            if isLinked["hairPoints"]:      lines.append(" " * 12 + "hairPoints.append(key.co)")
+            if isLinked["hairPointsLocal"]: lines.append(" " * 12 + "hairPointsLocal.append(key.co_local)")
+            
         lines.append("    pass")
 
         lines.append("else:")
@@ -62,6 +78,11 @@ class ParticleInfoNode(bpy.types.Node, AnimationNode):
         if isLinked["previousRotation"]: lines.append("    previousRotation = mathutils.Vector((0, 0, 0))")
         if isLinked["previousVelocity"]: lines.append("    previousVelocity = mathutils.Vector((0, 0, 0))")
         if isLinked["previousAngularVelocity"]: lines.append("    previousAngularVelocity = mathutils.Vector((0, 0, 0))")
+        
+        if isLinked["hairTime"]:        lines.append("    hairTime = []")
+        if isLinked["hairWeight"]:      lines.append("    hairWeight = []")
+        if isLinked["hairPoints"]:      lines.append("    hairPoints = []")
+        if isLinked["hairPointsLocal"]: lines.append("    hairPointsLocal = []")
         lines.append("    pass")
 
         return lines
