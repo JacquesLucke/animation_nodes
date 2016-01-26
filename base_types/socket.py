@@ -283,10 +283,6 @@ class AnimationNodeSocket:
     def hasValueCode(self):
         return hasattr(self, "getValueCode")
 
-    @property
-    def hasNodeSuggestions(self):
-        return hasattr(self, "drawSuggestionsMenu")
-
     @classmethod
     def hasProperty(cls):
         return hasattr(cls, "drawProperty")
