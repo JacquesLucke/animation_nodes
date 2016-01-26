@@ -23,10 +23,10 @@ class ParticleInfoNode(bpy.types.Node, AnimationNode):
         self.outputs.new("an_VectorSocket", "Previous Velocity", "previousVelocity").hide = True
         self.outputs.new("an_VectorSocket", "Previous Angular Velocity", "previousAngularVelocity").hide = True
         
-        self.outputs.new("an_FloatListSocket", "HairTime", "hairTime").hide = True
-        self.outputs.new("an_FloatListSocket", "HairWeight", "hairWeight").hide = True
-        self.outputs.new("an_VectorListSocket", "HairPoints", "hairPoints").hide = True
-        self.outputs.new("an_VectorListSocket", "HairPointsLocal", "hairPointsLocal").hide = True
+        self.outputs.new("an_FloatListSocket", "Hair Time", "hairTime").hide = True
+        self.outputs.new("an_FloatListSocket", "Hair Weight", "hairWeight").hide = True
+        self.outputs.new("an_VectorListSocket", "Hair Points", "hairPoints").hide = True
+        self.outputs.new("an_VectorListSocket", "Hair Points Local", "hairPointsLocal").hide = True
 
     def getExecutionCode(self):
         isLinked = self.getLinkedOutputsDict()
@@ -51,7 +51,7 @@ class ParticleInfoNode(bpy.types.Node, AnimationNode):
         if isLinked["previousAngularVelocity"]: lines.append("    previousAngularVelocity = particle.prev_angular_velocity")
         
         hair = ["hairTime", "hairWeight", "hairPoints", "hairPointsLocal"]
-        if any ([isLinked[item] for item in hair]):
+        if any([isLinked[item] for item in hair]):
             lines.append("    " + ", ".join(hair) + " = [], [], [] ,[]")
             lines.append("    if particle.hair_keys:")
             lines.append(" " * 8 + "for key in particle.hair_keys:")
