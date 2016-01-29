@@ -93,7 +93,7 @@ class VectorMathNode(bpy.types.Node, AnimationNode):
         elif op == "SCALE": yield "result = a * scale"
         elif op == "ABSOLUTE": yield "result = mathutils.Vector((abs(a.x), abs(a.y), abs(a.z)))"
         elif op == "SNAP":
-            yield "result = mathutils.Vector((0, 0, 0))"
+            yield "result = a.copy()"
             yield "if stepSize.x != 0: result.x = round(a.x / stepSize.x) * stepSize.x"
             yield "if stepSize.y != 0: result.y = round(a.y / stepSize.y) * stepSize.y"
             yield "if stepSize.z != 0: result.z = round(a.z / stepSize.z) * stepSize.z"

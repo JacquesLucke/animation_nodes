@@ -71,7 +71,7 @@ class QuaternionMathNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         op = self.operation
-        
+
         if op == "ADD": return "result = a + b"
         elif op == "SUBTRACT": return "result = a - b"
         elif op == "COMBINE": return "result = a * b"
@@ -88,8 +88,8 @@ class QuaternionMathNode(bpy.types.Node, AnimationNode):
         elif op == "ABSOLUTE": return "result = mathutils.Quaternion((abs(A) for A in a))"
         elif op == "INVERT": return "result = a.inverted()"
         elif op == "CONJUGATE": return "result = a.conjugated()"
-        elif op == "SNAP": 
-            return ("result = mathutils.Quaternion((1, 0, 0, 0))",
+        elif op == "SNAP":
+            return ("result = a.copy()",
                     "if stepSize[0] != 0: result[0] = round(a[0] / stepSize[0]) * stepSize[0]",
                     "if stepSize[1] != 0: result[1] = round(a[1] / stepSize[1]) * stepSize[1]",
                     "if stepSize[2] != 0: result[2] = round(a[2] / stepSize[2]) * stepSize[2]",

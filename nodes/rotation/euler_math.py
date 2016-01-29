@@ -86,7 +86,7 @@ class EulerMathNode(bpy.types.Node, AnimationNode):
         elif op == "SCALE":  return "result = mathutils.Euler((a[0] * scale, a[1] * scale, a[2] * scale), 'XYZ')"
         elif op == "ABSOLUTE": return "result = mathutils.Euler((abs(a[0]), abs(a[1]), abs(a[2])), 'XYZ')"
         elif op == "SNAP":
-            return ("result = mathutils.Euler((0, 0, 0), 'XYZ')",
+            return ("result = a.copy()",
                     "if stepSize.x != 0: result[0] = round(a[0] / stepSize[0]) * stepSize[0]",
                     "if stepSize.y != 0: result[1] = round(a[1] / stepSize[1]) * stepSize[1]",
                     "if stepSize.z != 0: result[2] = round(a[2] / stepSize[2]) * stepSize[2]")
