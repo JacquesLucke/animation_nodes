@@ -30,7 +30,7 @@ def drawMenu(self, context):
     layout.menu("an_particles_menu", text = "Particles", icon = "PARTICLE_DATA")
     layout.menu("an_fcurve_menu", text = "FCurves", icon = "IPO")
     layout.menu("an_sound_menu", text = "Sound", icon = "SPEAKER")
-    layout.menu("an_kdtree_menu", text = "KDTree", icon = "STICKY_UVS_LOC")
+    layout.menu("an_kdtree_bvhtree_menu", text = "KD & BVH Tree", icon = "STICKY_UVS_LOC")
     layout.separator()
     layout.menu("an_debug_menu", text = "Debug", icon = "INFO")
 
@@ -422,16 +422,19 @@ class SoundMenu(bpy.types.Menu):
         insertNode(layout, "an_SequencesFromChannelNode", "Sequences from Channel")
         insertNode(layout, "an_EvaluateSoundNode", "Evaluate Sound")
 
-class KDTreeMenu(bpy.types.Menu):
-    bl_idname = "an_kdtree_menu"
+class KDTreeAndBVHTreeMenu(bpy.types.Menu):
+    bl_idname = "an_kdtree_bvhtree_menu"
     bl_label = "KDTree Menu"
 
     def draw(self, context):
         layout = self.layout
-        insertNode(layout, "an_ConstructKDTreeNode", "Construct")
+        insertNode(layout, "an_ConstructKDTreeNode", "Construct KDTree")
         insertNode(layout, "an_FindNearestPointInKDTreeNode", "Find Nearest")
         insertNode(layout, "an_FindNearestNPointsInKDTreeNode", "Find Amount")
         insertNode(layout, "an_FindPointsInRadiusInKDTreeNode", "Find in Radius")
+        layout.separator()
+        insertNode(layout, "an_ConstructBVHTreeNode", "Construct BVHTree")
+        insertNode(layout, "an_RayCastBVHTreeNode", "Ray Cast")
 
 class DebugMenu(bpy.types.Menu):
     bl_idname = "an_debug_menu"

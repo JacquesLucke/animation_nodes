@@ -68,6 +68,12 @@ class SimpleConvert(LinkCorrection):
         nodeIdName = self.rules[(dataOrigin.dataType, target.dataType)]
         node = insertLinkedNode(nodeTree, nodeIdName, origin, target)
 
+class ConvertNormalToEuler(LinkCorrection):
+    def check(self, origin, target):
+        return origin.dataType == "Vector" and origin.name == "Normal" and target.dataType == "Euler"
+    def insert(self, nodeTree, origin, target, dataOrigin):
+        insertLinkedNode(nodeTree, "an_DirectionToRotationNode", origin, target)
+
 class ConvertVectorToEuler(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType == "Vector" and target.dataType == "Euler"
@@ -131,6 +137,16 @@ class ConvertSeparatedMeshDataToBMesh(LinkCorrection):
         nodeTree.links.new(toMesh.inputs[0], toMeshData.outputs[0])
         nodeTree.links.new(toMesh.outputs[0], target)
 
+class ConvertObjectToMeshData(LinkCorrection):
+    def check(self, origin, target):
+        return origin.dataType == "Object" and target.dataType == "Mesh Data"
+    def insert(self, nodeTree, origin, target, dataOrigin):
+        objectMeshData, toMeshData = insertNodes(nodeTree, ["an_ObjectMeshDataNode", "an_CombineMeshDataNode"], origin, target)
+        origin.linkWith(objectMeshData.inputs[0])
+        for i in range(3):
+            objectMeshData.outputs[i].linkWith(toMeshData.inputs[i])
+        toMeshData.outputs[0].linkWith(target)
+
 class ConvertListToLength(LinkCorrection):
     def check(self, origin, target):
         return "List" in origin.dataType and target.dataType == "Integer"
@@ -187,6 +203,8 @@ def getSocketCenter(socket1, socket2):
     return (socket1.node.viewLocation + socket2.node.viewLocation) / 2
 
 linkCorrectors = [
+    ConvertNormalToEuler(),
+    ConvertObjectToMeshData(),
     ConvertSeparatedMeshDataToBMesh(),
     ConvertVectorToEuler(),
     ConvertEulerToVector(),
