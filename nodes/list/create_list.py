@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... base_types.node import AnimationNode
 from ... utils.selection import getSortedSelectedObjectNames
-from ... sockets.info import getBaseDataTypeItems, toIdName, toListIdName, getListDataTypes, toBaseDataType
+from ... sockets.info import getBaseDataTypeItemsCallback, toIdName, toListIdName, getListDataTypes, toBaseDataType
 
 class CreateListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CreateListNode"

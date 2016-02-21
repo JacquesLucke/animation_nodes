@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... tree_info import keepNodeLinks
 from ... base_types.node import AnimationNode
-from ... sockets.info import getBaseDataTypeItems, toIdName, toListIdName, isBase, toBaseDataType
+from ... sockets.info import getBaseDataTypeItemsCallback, toIdName, toListIdName, isBase, toBaseDataType
 
 class AppendListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_AppendListNode"

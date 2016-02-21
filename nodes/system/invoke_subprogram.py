@@ -161,7 +161,6 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
         return False
 
 
-@enumItemsFromDicts
 def getSubprogramItems(self, context):
     itemDict = []
     for network in getSubprogramNetworks():
@@ -169,7 +168,7 @@ def getSubprogramItems(self, context):
             "value" : network.identifier,
             "name" : network.name,
             "description" : network.description})
-    return itemDict
+    return enumItemsFromDicts(itemDict)
 
 class ChangeSubprogram(bpy.types.Operator):
     bl_idname = "an.change_subprogram"

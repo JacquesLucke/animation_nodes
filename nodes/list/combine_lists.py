@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... base_types.node import AnimationNode
-from ... sockets.info import getBaseDataTypeItems, toListIdName, getListDataTypes, toBaseDataType
+from ... sockets.info import getBaseDataTypeItemsCallback, toListIdName, getListDataTypes, toBaseDataType
 
 class CombineListsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CombineListsNode"

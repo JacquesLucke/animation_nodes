@@ -6,14 +6,13 @@ from .. utils.nodes import getAnimationNodeClasses, newNodeAtCursor, invokeTrans
 
 itemsByIdentifier = {}
 
-@enumItemsFromDicts
 def getSearchItems(self, context):
     itemsByIdentifier.clear()
     items = []
     for item in itertools.chain(iterSingleNodeItems()):
         itemsByIdentifier[item.identifier] = item
         items.append({"value" : item.identifier, "name" : item.searchTag})
-    return items
+    return enumItemsFromDicts(items)
 
 class NodeSearch(bpy.types.Operator):
     bl_idname = "an.node_search"

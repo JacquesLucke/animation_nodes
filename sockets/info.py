@@ -144,17 +144,20 @@ def getSocketClassFromIdName(idName):
     return None
 
 
-@enumItemsFromList
-def getListDataTypeItems(self, context):
-    return getListDataTypes()
+def getListDataTypeItemsCallback(self, context):
+    return getListDataTypeItems()
 
-@enumItemsFromList
-def getBaseDataTypeItems(self, context):
-    return getBaseDataTypes()
+def getBaseDataTypeItemsCallback(self, context):
+    return getBaseDataTypeItems()
 
-@enumItemsFromList
-def getDataTypeItems(self, context):
-    return getDataTypes()
+def getListDataTypeItems():
+    return enumItemsFromList(getListDataTypes())
+
+def getBaseDataTypeItems():
+    return enumItemsFromList(getBaseDataTypes())
+
+def getDataTypeItems(skipInternalTypes = False):
+    return enumItemsFromList(getDataTypes(skipInternalTypes))
 
 def getListDataTypes():
     return [toDataType(idName) for idName in getListIdNames()]
@@ -162,8 +165,11 @@ def getListDataTypes():
 def getBaseDataTypes():
     return [toDataType(idName) for idName in getBaseIdNames()]
 
-def getDataTypes():
-    return [socketClass.dataType for socketClass in getSocketClasses()]
+def getDataTypes(skipInternalTypes = False):
+    if skipInternalTypes:
+        return [socketClass.dataType for socketClass in getSocketClasses() if socketClass.dataType != "Node Control"]
+    else:
+        return [socketClass.dataType for socketClass in getSocketClasses()]
 
 
 def getBaseIdNames():
