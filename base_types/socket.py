@@ -205,11 +205,6 @@ class AnimationNodeSocket:
         self.display.moveOperators = False
         self.display.removeOperator = False
 
-    def isOnlyLinkedToDataType(self, dataType):
-        targets = self.dataTargets
-        if len(targets) == 0: return False
-        return all([target.dataType == dataType for target in targets])
-
 
     @property
     def isOutput(self):

@@ -57,14 +57,8 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
         self.recreateInputSockets()
         executionCodeChanged()
 
-    def outputIntegerChanged(self, context):
-        self.recreateOutputSocket()
-
     operation = EnumProperty(name = "Operation", default = "MULTIPLY",
         items = operationItems, update = operationChanged)
-
-    outputInteger = BoolProperty(name = "Output Integer", default = False,
-        update = outputIntegerChanged)
 
     def create(self):
         self.outputs.new("an_FloatSocket", "Result", "result")
@@ -82,7 +76,11 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
         return label
 
     def edit(self):
-        self.outputInteger = self.outputs[0].isOnlyLinkedToDataType("Integer")
+        output = self.outputs[0]
+        if output.dataType == "Float":
+            if output.shouldBeIntegerSocket(): self.setOutputType("an_IntegerSocket")
+        else:
+            if output.shouldBeFloatSocket(): self.setOutputType("an_FloatSocket")
 
     def getExecutionCode(self):
         op = self.operation
@@ -114,19 +112,18 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
         if op == "INVERT": yield "result = - a"
         if op == "RECIPROCAL": yield "result = 1 / a if a != 0 else 0"
 
-        if self.outputInteger:
+        if self.outputs[0].dataType == "Integer":
             yield "result = int(result)"
 
     def getUsedModules(self):
         return ["math"]
 
-    def recreateOutputSocket(self):
-        idName = "an_IntegerSocket" if self.outputInteger else "an_FloatSocket"
+    def setOutputType(self, idName):
         if self.outputs[0].bl_idname == idName: return
-        self._recreateOutputSocket(idName)
+        self._setOutputType(idName)
 
     @keepNodeLinks
-    def _recreateOutputSocket(self, idName):
+    def _setOutputType(self, idName):
         self.outputs.clear()
         self.outputs.new(idName, "Result", "result")
 

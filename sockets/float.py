@@ -40,3 +40,21 @@ class FloatSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def setRange(self, min, max):
         self.minValue = min
         self.maxValue = max
+
+    def shouldBeIntegerSocket(self):
+        targets = self.dataTargets
+        if len(targets) == 0: return False
+
+        ignoredNodesCounter = 0
+        for socket in targets:
+            if socket.dataType == "Generic":
+                if "Debug" not in socket.node.bl_idname:
+                    return False
+                else:
+                    ignoredNodesCounter += 1
+            elif socket.dataType != "Integer":
+                return False
+
+        if ignoredNodesCounter == len(targets):
+            return False
+        return True
