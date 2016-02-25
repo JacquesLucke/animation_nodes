@@ -98,9 +98,11 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
         if op == "ARCCOSINE": yield "result = math.acos(min(max(a, -1), 1))"
         if op == "ARCTANGENT": yield "result = math.atan(a)"
         if op == "POWER": yield "result = math.pow(a, b) if a >= 0 or int(b) == b else 0"
-        if op == "LOGARITHM": yield from ("if a <= 0: result = 0",
-                                          "elif base <= 0 or base == 1: result = math.log(a)",
-                                          "else: result = math.log(a, base)")
+        if op == "LOGARITHM":
+            if "Base" not in self.inputs: yield "base = b" # to keep older files working
+            yield "if a <= 0: result = 0"
+            yield "elif base <= 0 or base == 1: result = math.log(a)"
+            yield "else: result = math.log(a, base)"
         if op == "MINIMUM": yield "result = min(a, b)"
         if op == "MAXIMUM": yield "result = max(a, b)"
         if op == "LESSTHAN": yield "result = a < b"
