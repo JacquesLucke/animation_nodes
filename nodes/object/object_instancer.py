@@ -45,7 +45,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
     deepCopy = BoolProperty(default = False, update = resetInstancesEvent, name = "Deep Copy", description = "Make the instances independent of the source object (e.g. copy mesh)")
     objectType = EnumProperty(default = "Mesh", name = "Object Type", items = objectTypeItems, update = resetInstancesEvent)
     copyObjectProperties = BoolProperty(default = False, update = resetInstancesEvent, description = "Enable this to copy modifiers/constrains/... from the source objec.)")
-    removeAnimationData = BoolProperty(name = "Remove Animation Data", default = False, update = resetInstancesEvent, description = "Remove the active action on the instance; This is useful when you want to animate the object yourself")
+    removeAnimationData = BoolProperty(name = "Remove Animation Data", default = True, update = resetInstancesEvent, description = "Remove the active action on the instance; This is useful when you want to animate the object yourself")
 
     parentInstances = BoolProperty(default = True, name = "Parent to Main Container", update = resetInstancesEvent)
 
