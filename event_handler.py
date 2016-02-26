@@ -8,6 +8,10 @@ from . execution.auto_execution import iterAutoExecutionNodeTrees, executeNodeTr
 
 @noRecursion
 def update(events):
+    if failsToWriteToIDClasses():
+        print("Skip event: cannot write to ID classes")
+        return
+
     if events.intersection({"File", "Addon", "Tree"}) or didNameChange():
         updateEverything()
 
@@ -21,6 +25,13 @@ def update(events):
             afterExecution()
             finishExecutionUnits()
 
+def failsToWriteToIDClasses():
+    try:
+        scene = bpy.data.scenes[0]
+        # just try to set a random property
+        scene.camera = scene.camera
+        return False
+    except: return True
 
 oldNamesHash = 0
 
