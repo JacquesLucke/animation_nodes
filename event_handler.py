@@ -1,3 +1,4 @@
+import bpy
 import itertools
 from . import problems
 from . update import updateEverything
