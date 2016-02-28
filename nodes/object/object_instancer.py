@@ -41,13 +41,25 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
     resetInstances = BoolProperty(default = False, update = propertyChanged)
     sourceObjectHash = StringProperty()
 
-    copyFromSource = BoolProperty(default = True, name = "Copy from Source", update = copyFromSourceChanged)
-    deepCopy = BoolProperty(default = False, update = resetInstancesEvent, name = "Deep Copy", description = "Make the instances independent of the source object (e.g. copy mesh)")
-    objectType = EnumProperty(default = "Mesh", name = "Object Type", items = objectTypeItems, update = resetInstancesEvent)
-    copyObjectProperties = BoolProperty(default = False, update = resetInstancesEvent, description = "Enable this to copy modifiers/constrains/... from the source objec.)")
-    removeAnimationData = BoolProperty(name = "Remove Animation Data", default = True, update = resetInstancesEvent, description = "Remove the active action on the instance; This is useful when you want to animate the object yourself")
+    copyFromSource = BoolProperty(name = "Copy from Source",
+        default = True, update = copyFromSourceChanged)
 
-    parentInstances = BoolProperty(default = True, name = "Parent to Main Container", update = resetInstancesEvent)
+    deepCopy = BoolProperty(name = "Deep Copy", default = False, update = resetInstancesEvent,
+        description = "Make the instances independent of the source object (e.g. copy mesh)")
+
+    objectType = EnumProperty(name = "Object Type", default = "Mesh",
+        items = objectTypeItems, update = resetInstancesEvent)
+
+    copyObjectProperties = BoolProperty(name = "Copy Full Object", default = False,
+        description = "Enable this to copy modifiers/constrains/... from the source object.",
+        update = resetInstancesEvent)
+
+    removeAnimationData = BoolProperty(name = "Remove Animation Data", default = True,
+        description = "Remove the active action on the instance; This is useful when you want to animate the object yourself",
+        update = resetInstancesEvent)
+
+    parentInstances = BoolProperty(name = "Parent to Main Container",
+        default = True, update = resetInstancesEvent)
 
     def create(self):
         self.inputs.new("an_IntegerSocket", "Instances", "instancesAmount").minValue = 0
@@ -196,6 +208,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         if object.users == 0:
             data = object.data
             type = object.type
+            self.removeShapeKeys(object)
             bpy.data.objects.remove(object)
             self.removeObjectData(data, type)
 
@@ -218,6 +231,17 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
                 bpy.data.lamps.remove(data)
             elif type == "SPEAKER":
                 bpy.data.speakers.remove(data)
+
+    def removeShapeKeys(self, object):
+        # don't remove the shape key if it is used somewhere else
+        if object.type not in ("MESH", "CURVE", "LATTICE"): return
+        if object.data.shape_keys is None: return
+        if object.data.shape_keys.user.users > 1: return
+
+        object.active_shape_key_index = 0
+        while object.active_shape_key is not None:
+            object.shape_key_remove(object.active_shape_key)
+
 
     def createNewObjects(self, amount, sourceObject, scene):
         objects = []
