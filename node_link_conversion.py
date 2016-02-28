@@ -59,7 +59,8 @@ class SimpleConvert(LinkCorrection):
         ("Euler", "Float") : "an_SeparateEulerNode",
         ("Object", "Vector") : "an_ObjectTransformsInputNode",
         ("Object", "Matrix") : "an_ObjectMatrixInputNode",
-        ("Polygon List", "Mesh Data") : "an_MeshDataFromPolygonsNode"
+        ("Polygon List", "Mesh Data") : "an_MeshDataFromPolygonsNode",
+        ("Object", "Shape Key List") : "an_ShapeKeysFromObjectNode"
     }
 
     def check(self, origin, target):
@@ -126,6 +127,16 @@ class ConvertElementToList(LinkCorrection):
         node.assignBaseDataType(origin.dataType, inputAmount = 1)
         insertBasicLinking(nodeTree, origin, node, target)
 
+
+class ConvertObjectToShapeKey(LinkCorrection):
+    def check(self, origin, target):
+        return origin.dataType == "Object" and target.dataType == "Shape Key"
+    def insert(self, nodeTree, origin, target, dataOrigin):
+        getShapeKeys, getListElement = insertNodes(nodeTree, ["an_ShapeKeysFromObjectNode", "an_GetListElementNode"], origin, target)
+        getListElement.inputs[1].value = 1
+        nodeTree.links.new(getShapeKeys.inputs[0], origin)
+        nodeTree.links.new(getListElement.inputs[0], getShapeKeys.outputs[0])
+        nodeTree.links.new(getListElement.outputs[0], target)
 
 class ConvertSeparatedMeshDataToBMesh(LinkCorrection):
     separatedMeshDataTypes = ["Vector List", "Edge Indices List", "Polygon Indices List"]
@@ -212,6 +223,7 @@ linkCorrectors = [
     ConvertQuaternionToEuler(),
     ConvertListToElement(),
     ConvertElementToList(),
+    ConvertObjectToShapeKey(),
 	ConvertListToLength(),
     SimpleConvert(),
     ConvertToString(),
