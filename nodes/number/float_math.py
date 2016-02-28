@@ -138,7 +138,7 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
 
         self.inputs.new("an_FloatSocket", "A", "a")
         if self.operation in secondInputOperations:
-            self.inputs.new("an_FloatSocket", "B", "b")
+            self.inputs.new("an_FloatSocket", "B", "b").value = 1
         if self.operation in baseInputOperations:
             self.inputs.new("an_FloatSocket", "Base", "base")
         if self.operation in stepSizeInputOperations:
