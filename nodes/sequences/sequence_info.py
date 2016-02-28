@@ -6,7 +6,7 @@ class SequenceInfoNode(bpy.types.Node, AnimationNode):
     bl_label = "Sequence Info"
 
     def create(self):
-        self.inputs.new("an_SequenceSocket", "Sequence", "sequence")
+        self.inputs.new("an_SequenceSocket", "Sequence", "sequence").defaultDrawType = "PROPERTY_ONLY"
 
         self.outputs.new("an_StringSocket", "Name", "name")
         self.outputs.new("an_StringSocket", "Type", "type")
