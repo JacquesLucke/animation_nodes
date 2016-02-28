@@ -3,7 +3,7 @@ from ... base_types.node import AnimationNode
 
 class GetObjectsFromGroupNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GetObjectsFromGroupNode"
-    bl_label = "Get Objects from Group"
+    bl_label = "Objects from Group"
 
     def create(self):
         self.inputs.new("an_ObjectGroupSocket", "Group", "group").defaultDrawType = "PROPERTY_ONLY"
