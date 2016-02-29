@@ -1,4 +1,5 @@
 import bpy
+from .. utils.blender_ui import isViewportRendering
 
 class AutoExecutionPanel(bpy.types.Panel):
     bl_idname = "an_auto_execution_panel"
@@ -21,14 +22,16 @@ class AutoExecutionPanel(bpy.types.Panel):
         layout = self.layout
         tree = context.space_data.edit_tree
         autoExecution = tree.autoExecution
+        isRendering = isViewportRendering()
+        layout.active = autoExecution.enabled
 
         col = layout.column()
-        col.active = autoExecution.enabled
-        col.prop(autoExecution, "sceneUpdate", text = "Always")
-        col.separator()
+        col.active = not isRendering
+        text = "Always" if not isRendering else "Always (deactivated)"
+        col.prop(autoExecution, "sceneUpdate", text = text)
 
-        col = col.column()
-        col.active = not autoExecution.sceneUpdate
+        col = layout.column()
+        col.active = not autoExecution.sceneUpdate or isRendering
         col.prop(autoExecution, "treeChanged", text = "Tree Changed")
         col.prop(autoExecution, "frameChanged", text = "Frame Changed")
         col.prop(autoExecution, "propertyChanged", text = "Property Changed")

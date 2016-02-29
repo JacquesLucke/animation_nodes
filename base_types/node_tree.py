@@ -3,7 +3,7 @@ import time
 from bpy.props import *
 from .. events import treeChanged, isRendering
 from .. nodes.generic.debug_loop import clearDebugLoopTextBlocks
-from .. utils.blender_ui import iterActiveScreens, iterActiveSpacesByType
+from .. utils.blender_ui import iterActiveScreens, isViewportRendering
 from .. execution.units import getMainUnitsByNodeTree, setupExecutionUnits, finishExecutionUnits
 
 class AutoExecutionProperties(bpy.types.PropertyGroup):
@@ -13,7 +13,7 @@ class AutoExecutionProperties(bpy.types.PropertyGroup):
         description = "Enable auto execution for this node tree")
 
     sceneUpdate = BoolProperty(default = True, name = "Scene Update",
-        description = "Execute many times per second to react on all changes in real time")
+        description = "Execute many times per second to react on all changes in real time (deactivated during preview rendering)")
 
     frameChanged = BoolProperty(default = False, name = "Frame Changed",
         description = "Execute after the frame changed")
@@ -49,8 +49,6 @@ class AnimationNodeTree(bpy.types.NodeTree):
     def canAutoExecute(self, events):
         def isAnimationPlaying():
             return any([screen.is_animation_playing for screen in iterActiveScreens()])
-        def isViewportRendering():
-            return any([space.viewport_shade == "RENDERED" for space in iterActiveSpacesByType("VIEW_3D")])
 
         a = self.autoExecution
         if not a.enabled: return False
