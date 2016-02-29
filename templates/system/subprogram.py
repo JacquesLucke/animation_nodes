@@ -1,6 +1,7 @@
 import bpy
 from bpy.props import *
 from ... base_types.template import Template
+from ... nodes.system.subprogram_sockets import subprogramInterfaceChanged
 
 subprogramTypeItems = [
     ("GROUP", "Group", ""),
@@ -30,6 +31,7 @@ class EmptySubprogramTemplate(bpy.types.Operator, Template):
         targetNode = self.nodeByIdentifier(self.targetNodeIdentifier)
         if targetNode:
             targetNode.subprogramIdentifier = identifier
+        subprogramInterfaceChanged()
 
     def insertGroup(self):
         inputNode = self.newNode("an_GroupInputNode")
