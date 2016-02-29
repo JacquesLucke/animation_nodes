@@ -15,6 +15,9 @@ class EulerWiggleNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.inputs.new("an_FloatSocket", "Seed", "seed")
         self.inputs.new("an_FloatSocket", "Evolution", "evolution")
+        socket = self.inputs.new("an_FloatSocket", "Speed", "speed")
+        socket.value = 1
+        socket.minValue = 0
         self.inputs.new("an_EulerSocket", "Amplitude", "amplitude").value = [radians(30), radians(30), radians(30)]
         self.inputs.new("an_IntegerSocket", "Octaves", "octaves").value = 2
         self.inputs.new("an_FloatSocket", "Persistance", "persistance").value = 0.3
@@ -23,9 +26,9 @@ class EulerWiggleNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.prop(self, "nodeSeed", text = "Node Seed")
 
-    def execute(self, seed, evolution, amplitude, octaves, persistance):
+    def execute(self, seed, evolution, speed, amplitude, octaves, persistance):
         euler = Euler()
-        evolution = evolution + 2541 * seed + 823 * self.nodeSeed
+        evolution = evolution * max(speed, 0) / 20 + 2541 * seed + 823 * self.nodeSeed
         euler[0] = perlinNoise(evolution, persistance, octaves) * amplitude[0]
         evolution += 79
         euler[1] = perlinNoise(evolution, persistance, octaves) * amplitude[1]

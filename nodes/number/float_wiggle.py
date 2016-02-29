@@ -13,6 +13,9 @@ class FloatWiggleNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.inputs.new("an_FloatSocket", "Seed", "seed")
         self.inputs.new("an_FloatSocket", "Evolution", "evolution")
+        socket = self.inputs.new("an_FloatSocket", "Speed", "speed")
+        socket.value = 1
+        socket.minValue = 0
         self.inputs.new("an_FloatSocket", "Amplitude", "amplitude").value = 1.0
         self.inputs.new("an_IntegerSocket", "Octaves", "octaves").value = 2
         self.inputs.new("an_FloatSocket", "Persistance", "persistance").value = 0.3
@@ -21,7 +24,7 @@ class FloatWiggleNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.prop(self, "nodeSeed", text = "Node Seed")
 
-    def execute(self, seed, evolution, amplitude, octaves, persistance):
-        evolution += 2673 * seed + 823 * self.nodeSeed
+    def execute(self, seed, evolution, speed, amplitude, octaves, persistance):
+        evolution = evolution * max(speed, 0) / 20 + 2673 * seed + 823 * self.nodeSeed
         noise = perlinNoise(evolution, persistance, octaves)
         return noise * amplitude
