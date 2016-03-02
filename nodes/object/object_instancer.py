@@ -11,6 +11,8 @@ from ... utils.names import (getPossibleMeshName,
                              getPossibleLampName,
                              getPossibleCurveName)
 
+lastSourceHashes = {}
+
 objectTypeItems = [
     ("Mesh", "Mesh", "", "MESH_DATA", 0),
     ("Text", "Text", "", "FONT_DATA", 1),
@@ -39,7 +41,6 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
 
     linkedObjects = CollectionProperty(type = an_ObjectNamePropertyGroup)
     resetInstances = BoolProperty(default = False, update = propertyChanged)
-    sourceObjectHash = StringProperty()
 
     copyFromSource = BoolProperty(name = "Copy from Source",
         default = True, update = copyFromSourceChanged)
@@ -110,9 +111,11 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
             self.removeAllObjects()
             return []
         else:
-            if self.sourceObjectHash != str(hash(sourceObject)):
-                self.removeAllObjects()
-                self.sourceObjectHash = str(hash(sourceObject))
+            sourceHash = hash(sourceObject)
+            if self.identifier in lastSourceHashes:
+                if lastSourceHashes[self.identifier] != sourceHash:
+                    self.removeAllObjects()
+            lastSourceHashes[self.identifier] = sourceHash
 
         return self.getInstances_Base(instancesAmount, sourceObject, scene)
 
