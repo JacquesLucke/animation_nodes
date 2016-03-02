@@ -12,6 +12,7 @@ from ... utils.names import (getPossibleMeshName,
                              getPossibleCurveName)
 
 lastSourceHashes = {}
+lastSceneHashes = {}
 
 objectTypeItems = [
     ("Mesh", "Mesh", "", "MESH_DATA", 0),
@@ -128,6 +129,12 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         if scene is None:
             self.removeAllObjects()
             return []
+        else:
+            sceneHash = hash(scene)
+            if self.identifier in lastSceneHashes:
+                if lastSceneHashes[self.identifier] != sceneHash:
+                    self.removeAllObjects()
+            lastSceneHashes[self.identifier] = sceneHash
 
         if self.resetInstances:
             self.removeAllObjects()
