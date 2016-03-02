@@ -64,9 +64,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         default = True, update = resetInstancesEvent)
 
     def create(self):
-        self.inputs.new("an_IntegerSocket", "Instances", "instancesAmount").minValue = 0
-        self.inputs.new("an_ObjectSocket", "Source", "sourceObject").defaultDrawType = "PROPERTY_ONLY"
-        self.inputs.new("an_SceneSocket", "Scene", "scene").hide = True
+        self.updateInputSockets()
         self.outputs.new("an_ObjectListSocket", "Objects", "objects")
 
     @keepNodeState
@@ -75,7 +73,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         self.inputs.new("an_IntegerSocket", "Instances", "instancesAmount").minValue = 0
         if self.copyFromSource:
             self.inputs.new("an_ObjectSocket", "Source", "sourceObject").defaultDrawType = "PROPERTY_ONLY"
-        self.inputs.new("an_SceneSocket", "Scene", "scene").hide = True
+        self.inputs.new("an_SceneListSocket", "Scenes", "scenes").hide = True
 
     def draw(self, layout):
         layout.prop(self, "copyFromSource")
@@ -102,12 +100,16 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
 
 
     def getExecutionCode(self):
-        if self.copyFromSource:
-            return "objects = self.getInstances_WithSource(instancesAmount, sourceObject, scene)"
-        else:
-            return "objects = self.getInstances_WithoutSource(instancesAmount, scene)"
+        # support for older nodes which didn't have a scene list input
+        if "Scenes" in self.inputs: yield "_scenes = set(scenes)"
+        else: yield "_scenes = {scene}"
 
-    def getInstances_WithSource(self, instancesAmount, sourceObject, scene):
+        if self.copyFromSource:
+            yield "objects = self.getInstances_WithSource(instancesAmount, sourceObject, _scenes)"
+        else:
+            yield "objects = self.getInstances_WithoutSource(instancesAmount, _scenes)"
+
+    def getInstances_WithSource(self, instancesAmount, sourceObject, scenes):
         if sourceObject is None:
             self.removeAllObjects()
             return []
@@ -118,19 +120,19 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
                     self.removeAllObjects()
             lastSourceHashes[self.identifier] = sourceHash
 
-        return self.getInstances_Base(instancesAmount, sourceObject, scene)
+        return self.getInstances_Base(instancesAmount, sourceObject, scenes)
 
-    def getInstances_WithoutSource(self, instancesAmount, scene):
-        return self.getInstances_Base(instancesAmount, None, scene)
+    def getInstances_WithoutSource(self, instancesAmount, scenes):
+        return self.getInstances_Base(instancesAmount, None, scenes)
 
-    def getInstances_Base(self, instancesAmount, sourceObject, scene):
+    def getInstances_Base(self, instancesAmount, sourceObject, scenes):
         instancesAmount = max(instancesAmount, 0)
 
-        if scene is None:
+        if not any(scenes):
             self.removeAllObjects()
             return []
         else:
-            sceneHash = hash(scene)
+            sceneHash = set(hash(scene) for scene in scenes)
             if self.identifier in lastSceneHashes:
                 if lastSceneHashes[self.identifier] != sceneHash:
                     self.removeAllObjects()
@@ -143,10 +145,10 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         while instancesAmount < len(self.linkedObjects):
             self.removeLastObject()
 
-        return self.getOutputObjects(instancesAmount, sourceObject, scene)
+        return self.getOutputObjects(instancesAmount, sourceObject, scenes)
 
 
-    def getOutputObjects(self, instancesAmount, sourceObject, scene):
+    def getOutputObjects(self, instancesAmount, sourceObject, scenes):
         objects = []
 
         self.updateFastListAccess()
@@ -160,7 +162,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         self.removeObjectFromItemIndices(indicesToRemove)
 
         missingAmount = instancesAmount - len(objects)
-        newObjects = self.createNewObjects(missingAmount, sourceObject, scene)
+        newObjects = self.createNewObjects(missingAmount, sourceObject, scenes)
         objects.extend(newObjects)
 
         return objects
@@ -253,24 +255,25 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
             object.shape_key_remove(object.active_shape_key)
 
 
-    def createNewObjects(self, amount, sourceObject, scene):
+    def createNewObjects(self, amount, sourceObject, scenes):
         objects = []
         nameSuffix = "instance_{}_".format(getRandomString(5))
         for i in range(amount):
             name = nameSuffix + str(i)
-            newObject = self.appendNewObject(name, sourceObject, scene)
+            newObject = self.appendNewObject(name, sourceObject, scenes)
             objects.append(newObject)
         return objects
 
-    def appendNewObject(self, name, sourceObject, scene):
-        object = self.newInstance(name, sourceObject, scene)
-        scene.objects.link(object)
+    def appendNewObject(self, name, sourceObject, scenes):
+        object = self.newInstance(name, sourceObject, scenes)
+        for scene in scenes:
+            if scene is not None: scene.objects.link(object)
         linkedItem = self.linkedObjects.add()
         linkedItem.objectName = object.name
         linkedItem.objectIndex = bpy.data.objects.find(object.name)
         return object
 
-    def newInstance(self, name, sourceObject, scene):
+    def newInstance(self, name, sourceObject, scenes):
         instanceData = self.getSourceObjectData(sourceObject)
         if self.copyObjectProperties and self.copyFromSource:
             newObject = sourceObject.copy()
@@ -279,7 +282,10 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
             newObject = self.createObject(name, instanceData)
 
         if self.parentInstances:
-            newObject.parent = getMainObjectContainer(scene)
+            for scene in scenes:
+                if scene is not None:
+                    newObject.parent = getMainObjectContainer(scene)
+                    break
         if self.removeAnimationData and newObject.animation_data is not None:
             newObject.animation_data.action = None
         newObject.select = False
