@@ -32,7 +32,8 @@ def failsToWriteToIDClasses():
     try:
         scene = bpy.data.scenes[0]
         # just try to set a random property
-        scene.camera = scene.camera
+        scene["AN Prop Test"] = 0
+        del scene["AN Prop Test"]
         return False
     except: return True
 
