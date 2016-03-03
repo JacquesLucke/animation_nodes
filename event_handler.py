@@ -3,8 +3,9 @@ import itertools
 from . import problems
 from . update import updateEverything
 from . utils.recursion import noRecursion
+from . tree_info import iterSocketsThatNeedUpdate
+from . utils.nodes import iterAnimationNodes, getAnimationNodeTrees
 from . execution.units import setupExecutionUnits, finishExecutionUnits
-from . utils.nodes import iterAnimationNodes, getAnimationNodeTrees, iterAnimationNodesSockets
 from . execution.auto_execution import iterAutoExecutionNodeTrees, executeNodeTrees, afterExecution
 
 @noRecursion
@@ -25,6 +26,7 @@ def update(events):
             executeNodeTrees(nodeTrees)
             afterExecution()
             finishExecutionUnits()
+
 
 def failsToWriteToIDClasses():
     try:
@@ -51,5 +53,5 @@ def getNamesHash():
     return names
 
 def updateSocketProperties():
-    for socket in iterAnimationNodesSockets():
+    for socket in iterSocketsThatNeedUpdate():
         socket.updateProperty()

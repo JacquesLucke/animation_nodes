@@ -3,7 +3,7 @@ from collections import defaultdict
 from . utils.timing import measureTime
 from . utils.handlers import eventHandler
 from . preferences import forbidSubprogramRecursion
-from . utils.nodes import getAnimationNodeTrees, idToNode, idToSocket
+from . utils.nodes import getAnimationNodeTrees, iterAnimationNodesSockets, idToNode, idToSocket
 
 # Global Node Data
 ###########################################
@@ -312,9 +312,24 @@ class NodeNetwork:
         try: return idToNode(self.scriptIDs[0])
         except: return None
 
+class SpecialNodesAndSockets:
+    def __init__(self):
+        self.reset()
+
+    def reset(self):
+        self.socketsThatNeedUpdate = set()
+
+    def update(self):
+        self.reset()
+        socketsThatNeedUpdate = self.socketsThatNeedUpdate
+        for socket in iterAnimationNodesSockets():
+            if hasattr(socket, "updateProperty"):
+                socketsThatNeedUpdate.add(socket.toID())
+
 
 _data = NodeData()
 _networks = NodeNetworks()
+_specialNodesAndSockets = SpecialNodesAndSockets()
 _needsUpdate = True
 
 
@@ -337,6 +352,7 @@ def updateAndRetryOnException(function):
 def update():
     _data.update()
     _networks.update()
+    _specialNodesAndSockets.update()
 
     global _needsUpdate
     _needsUpdate = False
@@ -388,6 +404,10 @@ def getLinkedSocket(socket):
     linkedIDs = _data.linkedSockets[socketID]
     if len(linkedIDs) > 0:
         return idToSocket(linkedIDs[0])
+
+def iterSocketsThatNeedUpdate():
+    for socketID in _specialNodesAndSockets.socketsThatNeedUpdate:
+        yield idToSocket(socketID)
 
 
 # improve performance of higher level functions
