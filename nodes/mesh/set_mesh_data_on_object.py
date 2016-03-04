@@ -24,6 +24,8 @@ class SetMeshDataOnObjectNode(bpy.types.Node, AnimationNode):
         socket.defaultDrawType = "PROPERTY_ONLY"
         socket.objectCreationType = "MESH"
         self.inputs.new("an_MeshDataSocket", "Mesh Data", "meshData")
+        matSocket = self.inputs.new("an_IntegerListSocket", "Material Indices", "materialIndices")
+        matSocket.hide = True
         self.outputs.new("an_ObjectSocket", "Object", "object")
 
     def draw(self, layout):
@@ -34,7 +36,7 @@ class SetMeshDataOnObjectNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "checkIndices")
         layout.prop(self, "checkTupleLengths")
 
-    def execute(self, object, meshData):
+    def execute(self, object, meshData, materialIndices):
         if object is None: return object
         if object.type != "MESH" or object.mode != "OBJECT":
             self.errorMessage = "Object is not in object mode or is no mesh object"
@@ -53,6 +55,9 @@ class SetMeshDataOnObjectNode(bpy.types.Node, AnimationNode):
             return object
 
         object.data.from_pydata(vertices, edges, polygons)
+        isLinked = self.getLinkedInputsDict()
+        if isLinked["materialIndices"] and len(materialIndices) > 0:
+            for i in range(len(object.data.polygons)): setattr(object.data.polygons[i], "material_index", materialIndices[i%len(materialIndices)])
         object.data.validate()
 
         self.errorMessage = ""
