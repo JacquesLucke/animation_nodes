@@ -27,9 +27,16 @@ class TreePanel(bpy.types.Panel):
 
         layout.separator()
 
-        col = layout.column()
+        col = layout.column(align = True)
         col.prop(tree, "dynamicNodeLabels")
         col.prop(tree, "editNodeLabels")
+
+        row = layout.row(align = True)
+        subrow = row.row(align = True)
+        subrow.active = not tree.useFirstScene
+        subrow.prop_search(tree, "sceneName", bpy.data, "scenes", icon = "SCENE_DATA", text = "Scene")
+        row.prop(tree, "useFirstScene", icon = "WORLD", text = "")
+
 
     @classmethod
     def getTree(cls):
