@@ -17,7 +17,7 @@ def executeNodeTrees(nodeTrees):
 def afterExecution():
     prefs = getPreferences()
     if prefs.sceneUpdateAfterAutoExecution:
-        for scene in set(tree.scene for tree in getAnimationNodeTrees()):
+        for scene in bpy.data.scenes:
             scene.update()
 
     from .. events import isRendering

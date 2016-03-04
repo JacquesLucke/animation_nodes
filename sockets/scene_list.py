@@ -10,8 +10,8 @@ class SceneListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = False
     hashable = False
 
-    def getValueCode(self):
-        return "[]"
+    def getValue(self):
+        return [self.nodeTree.scene]
 
     def getCopyExpression(self):
         return "value[:]"
