@@ -41,7 +41,8 @@ class AnimationNodeTree(bpy.types.NodeTree):
     autoExecution = PointerProperty(type = AutoExecutionProperties)
     executionTime = FloatProperty(name = "Execution Time")
 
-    sceneName = StringProperty()
+    sceneName = StringProperty(name = "Scene",
+        description = "The global scene used by this node tree (never none)")
 
     editNodeLabels = BoolProperty(name = "Edit Node Labels", default = False)
     dynamicNodeLabels = BoolProperty(name = "Dynamic Node Labels", default = True)
