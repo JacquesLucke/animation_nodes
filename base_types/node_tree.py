@@ -1,7 +1,7 @@
 import bpy
 import time
 from bpy.props import *
-from .. events import treeChanged, isRendering
+from .. events import treeChanged, isRendering, propertyChanged
 from .. nodes.generic.debug_loop import clearDebugLoopTextBlocks
 from .. utils.blender_ui import iterActiveScreens, isViewportRendering
 from .. execution.units import getMainUnitsByNodeTree, setupExecutionUnits, finishExecutionUnits
@@ -38,7 +38,10 @@ class AnimationNodeTree(bpy.types.NodeTree):
 
     autoExecution = PointerProperty(type = AutoExecutionProperties)
     executionTime = FloatProperty(name = "Execution Time")
+
     sceneName = StringProperty()
+    useFirstScene = BoolProperty(name = "Use First Scene", default = True,
+        description = "Auto select the first scene in the current file", update = propertyChanged)
 
     editNodeLabels = BoolProperty(name = "Edit Node Labels", default = False)
     dynamicNodeLabels = BoolProperty(name = "Dynamic Node Labels", default = True)
@@ -104,9 +107,10 @@ class AnimationNodeTree(bpy.types.NodeTree):
 
     @property
     def scene(self):
-        scene = bpy.data.scenes.get(self.sceneName)
-        if scene is None: scene = bpy.data.scenes[0]
-        return scene
+        if self.useFirstScene:
+            return bpy.data.scenes[0]
+        else:
+            return bpy.data.scenes.get(self.sceneName)
 
     @property
     def timeSinceLastAutoExecution(self):
