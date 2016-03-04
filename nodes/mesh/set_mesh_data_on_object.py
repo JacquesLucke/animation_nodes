@@ -71,6 +71,9 @@ class SetMeshDataOnObjectNode(bpy.types.Node, AnimationNode):
 
     def setMaterialIndices(self, object, materialIndices):
         if len(materialIndices) == 0: return
+        if any(index < 0 for index in materialIndices):
+            self.errorMessage = "Material indices have to be greater or equal to zero"
+            return
 
         mesh = object.data
         allMaterialIndices = list(itertools.islice(itertools.cycle(materialIndices), len(mesh.polygons)))
