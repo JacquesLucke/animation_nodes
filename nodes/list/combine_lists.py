@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... base_types.node import AnimationNode
-from ... sockets.info import getBaseDataTypeItemsCallback, toListIdName, getListDataTypes, toBaseDataType
+from ... sockets.info import getBaseDataTypeItemsCallback, toListIdName, getListDataTypes, toBaseDataType, toListDataType
 
 class CombineListsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CombineListsNode"
@@ -33,6 +33,9 @@ class CombineListsNode(bpy.types.Node, AnimationNode):
     def drawAdvanced(self, layout):
         self.invokeSocketTypeChooser(layout, "assignListDataType",
             socketGroup = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
+
+    def drawLabel(self):
+        return "Combine " + toListDataType(self.assignedType)
 
     @property
     def inputVariables(self):
