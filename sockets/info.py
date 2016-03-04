@@ -28,7 +28,8 @@ listChains = [
     ["an_SceneSocket", "an_SceneListSocket"],
     ["an_InterpolationSocket", "an_InterpolationListSocket"],
     ["an_FontSocket", "an_FontListSocket"],
-    ["an_ShapeKeySocket", "an_ShapeKeyListSocket"] ]
+    ["an_ShapeKeySocket", "an_ShapeKeyListSocket"],
+    ["an_BooleanSocket", "an_BooleanListSocket"] ]
 
 limitedListTypes = {
     "an_IntegerListSocket" : ("an_EdgeIndicesSocket", "an_PolygonIndicesSocket") }
