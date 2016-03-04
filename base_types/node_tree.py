@@ -1,6 +1,8 @@
 import bpy
 import time
 from bpy.props import *
+from .. utils.handlers import eventHandler
+from .. utils.nodes import getAnimationNodeTrees
 from .. events import treeChanged, isRendering, propertyChanged
 from .. nodes.generic.debug_loop import clearDebugLoopTextBlocks
 from .. utils.blender_ui import iterActiveScreens, isViewportRendering
@@ -40,8 +42,6 @@ class AnimationNodeTree(bpy.types.NodeTree):
     executionTime = FloatProperty(name = "Execution Time")
 
     sceneName = StringProperty()
-    useFirstScene = BoolProperty(name = "Use First Scene", default = True,
-        description = "Auto select the first scene in the current file", update = propertyChanged)
 
     editNodeLabels = BoolProperty(name = "Edit Node Labels", default = False)
     dynamicNodeLabels = BoolProperty(name = "Dynamic Node Labels", default = True)
@@ -107,11 +107,18 @@ class AnimationNodeTree(bpy.types.NodeTree):
 
     @property
     def scene(self):
-        if self.useFirstScene:
-            return bpy.data.scenes[0]
-        else:
-            return bpy.data.scenes.get(self.sceneName)
+        scene = bpy.data.scenes.get(self.sceneName)
+        if scene is None:
+            scene = bpy.data.scenes[0]
+        return scene
 
     @property
     def timeSinceLastAutoExecution(self):
         return abs(time.clock() - self.autoExecution.lastExecutionTimestamp)
+
+@eventHandler("SCENE_UPDATE_POST")
+def updateSelectedScenes(scene):
+    for tree in getAnimationNodeTrees():
+        scene = tree.scene
+        if scene.name != tree.sceneName:
+            tree.sceneName = scene.name
