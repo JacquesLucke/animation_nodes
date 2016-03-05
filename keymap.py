@@ -23,7 +23,7 @@ def register():
     kmi.properties.name = "an.selection_pie"
 
     # Floating Advanced Panel
-    kmi = km.keymap_items.new("an.floation_advanced_panel", type = "U", value = "PRESS")
+    kmi = km.keymap_items.new("an.floating_advanced_node_settings_panel", type = "U", value = "PRESS")
 
     addon_keymaps.append(km)
 
