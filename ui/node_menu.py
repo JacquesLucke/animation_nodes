@@ -120,16 +120,11 @@ class RotationMenu(bpy.types.Menu):
         insertNode(layout, "an_CombineQuaternionNode", "Combine Quaternion")
         insertNode(layout, "an_QuaternionListCombineNode", "Combine Quaternaion Rotations")
         layout.separator()
-        insertNode(layout, "an_DirectionToRotationNode", "Direction to Rotation")
-        insertNode(layout, "an_RotationToDirectionNode", "Rotation to Direction")
-        insertNode(layout, "an_ConvertVectorAndEulerNode", "Vector to Euler", {"conversionType" : repr("VECTOR_TO_EULER")})
-        insertNode(layout, "an_ConvertVectorAndEulerNode", "Euler to Vector", {"conversionType" : repr("EULER_TO_VECTOR")})
-        insertNode(layout, "an_ConvertRotationsNode", "Euler to Quaternion", {"conversionType" : repr("EULER_TO_QUATERNION")})
-        insertNode(layout, "an_ConvertRotationsNode", "Quaternion to Euler", {"conversionType" : repr("QUATERNION_TO_EULER")})
-        insertNode(layout, "an_ConvertRotationsNode", "Euler to Matrix", {"conversionType" : repr("EULER_TO_MATRIX")})
-        insertNode(layout, "an_ConvertRotationsNode", "Matrix to Euler", {"conversionType" : repr("MATRIX_TO_EULER")})
-        insertNode(layout, "an_ConvertRotationsNode", "Quaternion to Matrix", {"conversionType" : repr("QUATERNION_TO_MATRIX")})
-        insertNode(layout, "an_ConvertRotationsNode", "Matrix to Quaternion", {"conversionType" : repr("MATRIX_TO_QUATERNION")})
+        insertNode(layout, "an_DirectionToRotationNode", "Direction <--> Rotation")
+        insertNode(layout, "an_ConvertVectorAndEulerNode", "Vector <--> Euler", {"conversionType" : repr("VECTOR_TO_EULER")})
+        insertNode(layout, "an_ConvertRotationsNode", "Euler <--> Quaternion", {"conversionType" : repr("EULER_TO_QUATERNION")})
+        insertNode(layout, "an_ConvertRotationsNode", "Euler <--> Matrix", {"conversionType" : repr("EULER_TO_MATRIX")})
+        insertNode(layout, "an_ConvertRotationsNode", "Quaternion <--> Matrix", {"conversionType" : repr("QUATERNION_TO_MATRIX")})
 
 class MatrixMenu(bpy.types.Menu):
     bl_idname = "an_matrix_menu"
