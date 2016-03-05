@@ -189,7 +189,11 @@ class LoopExecutionUnit:
             socket = node.inputs[0]
             if socket.isUnlinked and socket.isCopyable: expression = getCopyExpression(socket, variables)
             else: expression = variables[socket]
-            lines.append("{} = {}".format(variables[node.linkedParameterSocket], expression))
+
+            if node.conditionSocket is None: conditionPrefix = ""
+            else: conditionPrefix = "if {}: ".format(variables[node.conditionSocket])
+
+            lines.append("{}{} = {}".format(conditionPrefix, variables[node.linkedParameterSocket], expression))
         return lines
 
 
