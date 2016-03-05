@@ -97,6 +97,10 @@ class CreateListNode(bpy.types.Node, AnimationNode):
         socket.moveable = True
         socket.defaultDrawType = "PREFER_PROPERTY"
         socket.moveUp()
+
+        if len(self.inputs) > 2:
+            socket.copyDisplaySettingsFrom(self.inputs[0])
+            
         return socket
 
     def updateOutputName(self):
