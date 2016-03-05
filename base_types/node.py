@@ -118,7 +118,10 @@ class AnimationNode:
         self.draw(layout)
 
     def draw_label(self):
-        return self.drawLabel()
+        if self.id_data.dynamicNodeLabels:
+            return self.drawLabel()
+        else:
+            return self.bl_label
 
     def invokeFunction(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True, confirm = False, data = None):
         idName = getInvokeFunctionOperator(description)

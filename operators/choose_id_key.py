@@ -10,11 +10,11 @@ class IDKeySearch(bpy.types.Operator):
     bl_options = {"REGISTER"}
     bl_property = "item"
 
-    @enumItemsFromDicts
     def getSearchItems(self, context):
+        itemDict = []
         for dataType, name in findIDKeysInCurrentFile():
-            yield { "value" : dataType + " * " + name,
-                    "name" : name }
+            itemDict.append({"value" : dataType + " * " + name, "name" : name})
+        return enumItemsFromDicts(itemDict)
 
     item = EnumProperty(items = getSearchItems)
     nodeIdentifier = StringProperty()

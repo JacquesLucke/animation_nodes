@@ -202,11 +202,6 @@ class AnimationNodeSocket:
         self.display.moveOperators = False
         self.display.removeOperator = False
 
-    def isOnlyLinkedToDataType(self, dataType):
-        targets = self.dataTargets
-        if len(targets) == 0: return False
-        return all([target.dataType == dataType for target in targets])
-
 
     @property
     def isOutput(self):
@@ -279,10 +274,6 @@ class AnimationNodeSocket:
     @property
     def hasValueCode(self):
         return hasattr(self, "getValueCode")
-
-    @property
-    def hasNodeSuggestions(self):
-        return hasattr(self, "drawSuggestionsMenu")
 
     @classmethod
     def hasProperty(cls):

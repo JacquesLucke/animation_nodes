@@ -51,12 +51,12 @@ exponentOfName = {
     "QUARTIC" : 4,
     "QUINTIC" : 5 }
 
-
-def sampleInterpolation(interpolation, amount = 40):
+def sampleInterpolation(interpolation, amount = 40, minValue = 0, maxValue = 1):
     samples = []
+    size = maxValue - minValue
     for i in range(amount):
           x = i / (amount - 1)
-          y = interpolation(x)
+          y = interpolation(x) * size + minValue
           samples.append(y)
     return samples
 

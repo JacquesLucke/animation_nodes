@@ -1,9 +1,9 @@
 import bpy
 import math
 from bpy.props import *
-from ... tree_info import keepNodeLinks
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
+from ... tree_info import keepNodeLinks, keepNodeState
 
 operationItems = [
     ("ADD", "Add", "A + B", "", 0),
@@ -26,10 +26,12 @@ operationItems = [
     ("CEILING", "Ceiling", "ceil A", "", 18),
     ("SQRT", "Square Root", "sqrt A", "", 19),
     ("INVERT", "Invert", "- A", "", 20),
-    ("RECIPROCAL", "Reciprocal", "1 / A", "", 21)]
+    ("RECIPROCAL", "Reciprocal", "1 / A", "", 21),
+    ("SNAP", "Snap", "snap A", "", 22)]
 
-singleInputOperations = ("SINE", "COSINE", "TANGENT", "ARCSINE",
-    "ARCCOSINE", "ARCTANGENT", "ABSOLUTE", "FLOOR", "CEILING", "SQRT", "INVERT", "RECIPROCAL")
+secondInputOperations = ("ADD", "SUBTRACT", "MULTIPLY", "DIVIDE", "POWER", "MINIMUM", "MAXIMUM", "MODULO")
+baseInputOperations = ("LOGARITHM", )
+stepSizeInputOperations = ("SNAP", )
 
 operationLabels = {item[0] : item[2] for item in operationItems}
 
@@ -57,14 +59,8 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
         self.recreateInputSockets()
         executionCodeChanged()
 
-    def outputIntegerChanged(self, context):
-        self.recreateOutputSocket()
-
     operation = EnumProperty(name = "Operation", default = "MULTIPLY",
         items = operationItems, update = operationChanged)
-
-    outputInteger = BoolProperty(name = "Output Integer", default = False,
-        update = outputIntegerChanged)
 
     def create(self):
         self.outputs.new("an_FloatSocket", "Result", "result")
@@ -82,7 +78,11 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
         return label
 
     def edit(self):
-        self.outputInteger = self.outputs[0].isOnlyLinkedToDataType("Integer")
+        output = self.outputs[0]
+        if output.dataType == "Float":
+            if output.shouldBeIntegerSocket(): self.setOutputType("an_IntegerSocket")
+        else:
+            if output.shouldBeFloatSocket(): self.setOutputType("an_FloatSocket")
 
     def getExecutionCode(self):
         op = self.operation
@@ -98,9 +98,11 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
         if op == "ARCCOSINE": yield "result = math.acos(min(max(a, -1), 1))"
         if op == "ARCTANGENT": yield "result = math.atan(a)"
         if op == "POWER": yield "result = math.pow(a, b) if a >= 0 or int(b) == b else 0"
-        if op == "LOGARITHM": yield from ("if a <= 0: result = 0",
-                                          "elif b <= 0 or b == 1: result = math.log(a)",
-                                          "else: result = math.log(a, b)")
+        if op == "LOGARITHM":
+            if "Base" not in self.inputs: yield "base = b" # to keep older files working
+            yield "if a <= 0: result = 0"
+            yield "elif base <= 0 or base == 1: result = math.log(a)"
+            yield "else: result = math.log(a, base)"
         if op == "MINIMUM": yield "result = min(a, b)"
         if op == "MAXIMUM": yield "result = max(a, b)"
         if op == "LESSTHAN": yield "result = a < b"
@@ -113,32 +115,34 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
         if op == "SQRT": yield "result = math.sqrt(a) if a >= 0 else 0"
         if op == "INVERT": yield "result = - a"
         if op == "RECIPROCAL": yield "result = 1 / a if a != 0 else 0"
+        if op == "SNAP": yield "result = round(a / stepSize) * stepSize if stepSize != 0 else a"
 
-        if self.outputInteger:
+        if self.outputs[0].dataType == "Integer":
             yield "result = int(result)"
 
     def getUsedModules(self):
         return ["math"]
 
-    def recreateOutputSocket(self):
-        idName = "an_IntegerSocket" if self.outputInteger else "an_FloatSocket"
+    def setOutputType(self, idName):
         if self.outputs[0].bl_idname == idName: return
-        self._recreateOutputSocket(idName)
+        self._setOutputType(idName)
 
     @keepNodeLinks
-    def _recreateOutputSocket(self, idName):
+    def _setOutputType(self, idName):
         self.outputs.clear()
         self.outputs.new(idName, "Result", "result")
 
-    @keepNodeLinks
+    @keepNodeState
     def recreateInputSockets(self):
-        defaultA = getattr(self.socketA, "value", 0)
-        defaultB = getattr(self.socketB, "value", 1)
-
         self.inputs.clear()
-        self.inputs.new("an_FloatSocket", "A", "a").value = defaultA
-        if self.operation not in singleInputOperations:
-            self.inputs.new("an_FloatSocket", "B", "b").value = defaultB
+
+        self.inputs.new("an_FloatSocket", "A", "a")
+        if self.operation in secondInputOperations:
+            self.inputs.new("an_FloatSocket", "B", "b").value = 1
+        if self.operation in baseInputOperations:
+            self.inputs.new("an_FloatSocket", "Base", "base")
+        if self.operation in stepSizeInputOperations:
+            self.inputs.new("an_FloatSocket", "Step Size", "stepSize")
 
     @property
     def socketA(self):

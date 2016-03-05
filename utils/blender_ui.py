@@ -31,6 +31,10 @@ def iterActiveScreens():
             yield window.screen
 
 
+def isViewportRendering():
+    return any([space.viewport_shade == "RENDERED" for space in iterActiveSpacesByType("VIEW_3D")])
+
+
 def convertToRegionLocation(region, x, y):
     factor = getDpiFactor()
     x *= factor

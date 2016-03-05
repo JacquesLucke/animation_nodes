@@ -3,11 +3,10 @@ import itertools
 from bpy.props import *
 from ... sockets.info import isList
 from ... utils import pretty_strings
-from ... tree_info import keepNodeLinks
 from ... utils.timing import measureTime
-from ... tree_info import getNodesByType
 from ... graphics.text_box import TextBox
 from ... base_types.node import AnimationNode
+from ... tree_info import getNodesByType, keepNodeState
 
 dataByNode = {}
 
@@ -24,6 +23,7 @@ class DebugDrawerNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.width = 270
         self.inputs.new("an_GenericSocket", "Data", "data")
+        self.inputs.new("an_BooleanSocket", "Condition", "condition").hide = True
 
     def draw(self, layout):
         layout.prop(self, "fontSize")
@@ -43,17 +43,22 @@ class DebugDrawerNode(bpy.types.Node, AnimationNode):
         if targetIdName != self.inputs[0].bl_idname:
             self.updateInputSocket(targetIdName)
 
-    @keepNodeLinks
+    @keepNodeState
     def updateInputSocket(self, targetIdName):
         self.inputs.clear()
         self.inputs.new(targetIdName, "Data", "data")
+        self.inputs.new("an_BooleanSocket", "Condition", "condition")
 
     def getExecutionCode(self):
+        if "Condition" in self.inputs:
+            yield "if condition:"
+        else: yield "if True:"
+
         if isList(self.dataType):
-            yield "conversionFunction = self.getCurrentToStringFunction()"
-            yield "self.store_GenericList(data, conversionFunction)"
+            yield "    conversionFunction = self.getCurrentToStringFunction()"
+            yield "    self.store_GenericList(data, conversionFunction)"
         else:
-            yield "self.store_Generic(data)"
+            yield "    self.store_Generic(data)"
 
     def store_Generic(self, data):
         self.debugText = str(data)

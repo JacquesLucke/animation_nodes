@@ -7,12 +7,6 @@ class FloatClampNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_FloatClampNode"
     bl_label = "Clamp"
 
-    def outputIntegerChanged(self, context):
-        self.recreateOutputSocket()
-
-    outputInteger = BoolProperty(name = "Output Integer", default = False,
-        update = outputIntegerChanged)
-
     def create(self):
         self.inputs.new("an_FloatSocket", "Value", "value")
         self.inputs.new("an_FloatSocket", "Min", "minValue").value = 0.0
@@ -21,7 +15,8 @@ class FloatClampNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         yield "outValue = min(max(value, minValue), maxValue)"
-        if self.outputInteger: yield "outValue = int(outValue)"
+        if self.outputs[0].dataType == "Integer":
+            yield "outValue = int(outValue)"
 
     def drawLabel(self):
         label = "clamp(min, max)"
@@ -32,15 +27,18 @@ class FloatClampNode(bpy.types.Node, AnimationNode):
         return label
 
     def edit(self):
-        self.outputInteger = self.outputs[0].isOnlyLinkedToDataType("Integer")
+        output = self.outputs[0]
+        if output.dataType == "Float":
+            if output.shouldBeIntegerSocket(): self.setOutputType("an_IntegerSocket")
+        else:
+            if output.shouldBeFloatSocket(): self.setOutputType("an_FloatSocket")
 
-    def recreateOutputSocket(self):
-        idName = "an_IntegerSocket" if self.outputInteger else "an_FloatSocket"
+    def setOutputType(self, idName):
         if self.outputs[0].bl_idname == idName: return
-        self._recreateOutputSocket(idName)
+        self._setOutputType(idName)
 
     @keepNodeLinks
-    def _recreateOutputSocket(self, idName):
+    def _setOutputType(self, idName):
         self.outputs.clear()
         self.outputs.new(idName, "Value", "outValue")
 

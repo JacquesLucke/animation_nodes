@@ -28,6 +28,11 @@ class TextObjectOutputNode(bpy.types.Node, AnimationNode):
         self.inputs.new("an_FloatSocket", "Y Offset", "yOffset")
         self.inputs.new("an_StringSocket", "Align", "align").value = "CENTER"
 
+        self.inputs.new("an_FontSocket", "Font", "font")
+        self.inputs.new("an_FontSocket", "Bold Font", "fontBold")
+        self.inputs.new("an_FontSocket", "Italic Font", "fontItalic")
+        self.inputs.new("an_FontSocket", "Bold Italic Font", "fontBoldItalic")
+
         for socket in self.inputs[1:]:
             socket.useIsUsedProperty = True
             socket.isUsed = False
@@ -63,6 +68,11 @@ class TextObjectOutputNode(bpy.types.Node, AnimationNode):
         if s["X Offset"].isUsed:            yield "    textObject.offset_x = xOffset"
         if s["Y Offset"].isUsed:            yield "    textObject.offset_y = yOffset"
         if s["Align"].isUsed:               yield "    self.setAlignment(textObject, align)"
+
+        if s["Font"].isUsed:                yield "    textObject.font = font"
+        if s["Bold Font"].isUsed:           yield "    textObject.font_bold = fontBold"
+        if s["Italic Font"].isUsed:         yield "    textObject.font_italic = fontItalic"
+        if s["Bold Italic Font"].isUsed:    yield "    textObject.font_bold_italic = fontBoldItalic"
 
     def setAlignment(self, textObject, align):
         if align in ("LEFT", "CENTER", "RIGHT", "JUSTIFY", "FLUSH"):

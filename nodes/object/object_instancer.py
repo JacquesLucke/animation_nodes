@@ -11,6 +11,9 @@ from ... utils.names import (getPossibleMeshName,
                              getPossibleLampName,
                              getPossibleCurveName)
 
+lastSourceHashes = {}
+lastSceneHashes = {}
+
 objectTypeItems = [
     ("Mesh", "Mesh", "", "MESH_DATA", 0),
     ("Text", "Text", "", "FONT_DATA", 1),
@@ -39,20 +42,29 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
 
     linkedObjects = CollectionProperty(type = an_ObjectNamePropertyGroup)
     resetInstances = BoolProperty(default = False, update = propertyChanged)
-    sourceObjectHash = StringProperty()
 
-    copyFromSource = BoolProperty(default = True, name = "Copy from Source", update = copyFromSourceChanged)
-    deepCopy = BoolProperty(default = False, update = resetInstancesEvent, name = "Deep Copy", description = "Make the instances independent of the source object (e.g. copy mesh)")
-    objectType = EnumProperty(default = "Mesh", name = "Object Type", items = objectTypeItems, update = resetInstancesEvent)
-    copyObjectProperties = BoolProperty(default = False, update = resetInstancesEvent, description = "Enable this to copy modifiers/constrains/... from the source objec.)")
-    removeAnimationData = BoolProperty(name = "Remove Animation Data", default = False, update = resetInstancesEvent, description = "Remove the active action on the instance; This is useful when you want to animate the object yourself")
+    copyFromSource = BoolProperty(name = "Copy from Source",
+        default = True, update = copyFromSourceChanged)
 
-    parentInstances = BoolProperty(default = True, name = "Parent to Main Container", update = resetInstancesEvent)
+    deepCopy = BoolProperty(name = "Deep Copy", default = False, update = resetInstancesEvent,
+        description = "Make the instances independent of the source object (e.g. copy mesh)")
+
+    objectType = EnumProperty(name = "Object Type", default = "Mesh",
+        items = objectTypeItems, update = resetInstancesEvent)
+
+    copyObjectProperties = BoolProperty(name = "Copy Full Object", default = False,
+        description = "Enable this to copy modifiers/constrains/... from the source object.",
+        update = resetInstancesEvent)
+
+    removeAnimationData = BoolProperty(name = "Remove Animation Data", default = True,
+        description = "Remove the active action on the instance; This is useful when you want to animate the object yourself",
+        update = resetInstancesEvent)
+
+    parentInstances = BoolProperty(name = "Parent to Main Container",
+        default = True, update = resetInstancesEvent)
 
     def create(self):
-        self.inputs.new("an_IntegerSocket", "Instances", "instancesAmount").minValue = 0
-        self.inputs.new("an_ObjectSocket", "Source", "sourceObject").defaultDrawType = "PROPERTY_ONLY"
-        self.inputs.new("an_SceneSocket", "Scene", "scene").hide = True
+        self.updateInputSockets()
         self.outputs.new("an_ObjectListSocket", "Objects", "objects")
 
     @keepNodeState
@@ -61,7 +73,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         self.inputs.new("an_IntegerSocket", "Instances", "instancesAmount").minValue = 0
         if self.copyFromSource:
             self.inputs.new("an_ObjectSocket", "Source", "sourceObject").defaultDrawType = "PROPERTY_ONLY"
-        self.inputs.new("an_SceneSocket", "Scene", "scene").hide = True
+        self.inputs.new("an_SceneListSocket", "Scenes", "scenes").hide = True
 
     def draw(self, layout):
         layout.prop(self, "copyFromSource")
@@ -88,31 +100,43 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
 
 
     def getExecutionCode(self):
-        if self.copyFromSource:
-            return "objects = self.getInstances_WithSource(instancesAmount, sourceObject, scene)"
-        else:
-            return "objects = self.getInstances_WithoutSource(instancesAmount, scene)"
+        # support for older nodes which didn't have a scene list input
+        if "Scenes" in self.inputs: yield "_scenes = set(scenes)"
+        else: yield "_scenes = {scene}"
 
-    def getInstances_WithSource(self, instancesAmount, sourceObject, scene):
+        if self.copyFromSource:
+            yield "objects = self.getInstances_WithSource(instancesAmount, sourceObject, _scenes)"
+        else:
+            yield "objects = self.getInstances_WithoutSource(instancesAmount, _scenes)"
+
+    def getInstances_WithSource(self, instancesAmount, sourceObject, scenes):
         if sourceObject is None:
             self.removeAllObjects()
             return []
         else:
-            if self.sourceObjectHash != str(hash(sourceObject)):
-                self.removeAllObjects()
-                self.sourceObjectHash = str(hash(sourceObject))
+            sourceHash = hash(sourceObject)
+            if self.identifier in lastSourceHashes:
+                if lastSourceHashes[self.identifier] != sourceHash:
+                    self.removeAllObjects()
+            lastSourceHashes[self.identifier] = sourceHash
 
-        return self.getInstances_Base(instancesAmount, sourceObject, scene)
+        return self.getInstances_Base(instancesAmount, sourceObject, scenes)
 
-    def getInstances_WithoutSource(self, instancesAmount, scene):
-        return self.getInstances_Base(instancesAmount, None, scene)
+    def getInstances_WithoutSource(self, instancesAmount, scenes):
+        return self.getInstances_Base(instancesAmount, None, scenes)
 
-    def getInstances_Base(self, instancesAmount, sourceObject, scene):
+    def getInstances_Base(self, instancesAmount, sourceObject, scenes):
         instancesAmount = max(instancesAmount, 0)
 
-        if scene is None:
+        if not any(scenes):
             self.removeAllObjects()
             return []
+        else:
+            sceneHash = set(hash(scene) for scene in scenes)
+            if self.identifier in lastSceneHashes:
+                if lastSceneHashes[self.identifier] != sceneHash:
+                    self.removeAllObjects()
+            lastSceneHashes[self.identifier] = sceneHash
 
         if self.resetInstances:
             self.removeAllObjects()
@@ -121,10 +145,10 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         while instancesAmount < len(self.linkedObjects):
             self.removeLastObject()
 
-        return self.getOutputObjects(instancesAmount, sourceObject, scene)
+        return self.getOutputObjects(instancesAmount, sourceObject, scenes)
 
 
-    def getOutputObjects(self, instancesAmount, sourceObject, scene):
+    def getOutputObjects(self, instancesAmount, sourceObject, scenes):
         objects = []
 
         self.updateFastListAccess()
@@ -138,7 +162,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         self.removeObjectFromItemIndices(indicesToRemove)
 
         missingAmount = instancesAmount - len(objects)
-        newObjects = self.createNewObjects(missingAmount, sourceObject, scene)
+        newObjects = self.createNewObjects(missingAmount, sourceObject, scenes)
         objects.extend(newObjects)
 
         return objects
@@ -196,6 +220,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         if object.users == 0:
             data = object.data
             type = object.type
+            self.removeShapeKeys(object)
             bpy.data.objects.remove(object)
             self.removeObjectData(data, type)
 
@@ -219,24 +244,36 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
             elif type == "SPEAKER":
                 bpy.data.speakers.remove(data)
 
-    def createNewObjects(self, amount, sourceObject, scene):
+    def removeShapeKeys(self, object):
+        # don't remove the shape key if it is used somewhere else
+        if object.type not in ("MESH", "CURVE", "LATTICE"): return
+        if object.data.shape_keys is None: return
+        if object.data.shape_keys.user.users > 1: return
+
+        object.active_shape_key_index = 0
+        while object.active_shape_key is not None:
+            object.shape_key_remove(object.active_shape_key)
+
+
+    def createNewObjects(self, amount, sourceObject, scenes):
         objects = []
         nameSuffix = "instance_{}_".format(getRandomString(5))
         for i in range(amount):
             name = nameSuffix + str(i)
-            newObject = self.appendNewObject(name, sourceObject, scene)
+            newObject = self.appendNewObject(name, sourceObject, scenes)
             objects.append(newObject)
         return objects
 
-    def appendNewObject(self, name, sourceObject, scene):
-        object = self.newInstance(name, sourceObject, scene)
-        scene.objects.link(object)
+    def appendNewObject(self, name, sourceObject, scenes):
+        object = self.newInstance(name, sourceObject, scenes)
+        for scene in scenes:
+            if scene is not None: scene.objects.link(object)
         linkedItem = self.linkedObjects.add()
         linkedItem.objectName = object.name
         linkedItem.objectIndex = bpy.data.objects.find(object.name)
         return object
 
-    def newInstance(self, name, sourceObject, scene):
+    def newInstance(self, name, sourceObject, scenes):
         instanceData = self.getSourceObjectData(sourceObject)
         if self.copyObjectProperties and self.copyFromSource:
             newObject = sourceObject.copy()
@@ -245,7 +282,10 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
             newObject = self.createObject(name, instanceData)
 
         if self.parentInstances:
-            newObject.parent = getMainObjectContainer(scene)
+            for scene in scenes:
+                if scene is not None:
+                    newObject.parent = getMainObjectContainer(scene)
+                    break
         if self.removeAnimationData and newObject.animation_data is not None:
             newObject.animation_data.action = None
         newObject.select = False

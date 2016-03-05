@@ -11,6 +11,13 @@ class CombineVectorNode(bpy.types.Node, AnimationNode):
         self.inputs.new("an_FloatSocket", "Z", "z")
         self.outputs.new("an_VectorSocket", "Vector", "vector")
 
+    def drawLabel(self):
+        label = "<X, Y, Z>"
+        for axis in "XYZ":
+            if self.inputs[axis].isUnlinked:
+                label = label.replace(axis, str(round(self.inputs[axis].value, 4)))
+        return label
+
     def getExecutionCode(self):
         return "vector = mathutils.Vector((x, y, z))"
 

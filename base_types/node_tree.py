@@ -1,9 +1,11 @@
 import bpy
 import time
 from bpy.props import *
-from .. events import treeChanged, isRendering
+from .. utils.handlers import eventHandler
+from .. utils.nodes import getAnimationNodeTrees
+from .. events import treeChanged, isRendering, propertyChanged
 from .. nodes.generic.debug_loop import clearDebugLoopTextBlocks
-from .. utils.blender_ui import iterActiveScreens, iterActiveSpacesByType
+from .. utils.blender_ui import iterActiveScreens, isViewportRendering
 from .. execution.units import getMainUnitsByNodeTree, setupExecutionUnits, finishExecutionUnits
 
 class AutoExecutionProperties(bpy.types.PropertyGroup):
@@ -13,7 +15,7 @@ class AutoExecutionProperties(bpy.types.PropertyGroup):
         description = "Enable auto execution for this node tree")
 
     sceneUpdate = BoolProperty(default = True, name = "Scene Update",
-        description = "Execute many times per second to react on all changes in real time")
+        description = "Execute many times per second to react on all changes in real time (deactivated during preview rendering)")
 
     frameChanged = BoolProperty(default = False, name = "Frame Changed",
         description = "Execute after the frame changed")
@@ -38,9 +40,12 @@ class AnimationNodeTree(bpy.types.NodeTree):
 
     autoExecution = PointerProperty(type = AutoExecutionProperties)
     executionTime = FloatProperty(name = "Execution Time")
-    sceneName = StringProperty()
+
+    sceneName = StringProperty(name = "Scene",
+        description = "The global scene used by this node tree (never none)")
 
     editNodeLabels = BoolProperty(name = "Edit Node Labels", default = False)
+    dynamicNodeLabels = BoolProperty(name = "Dynamic Node Labels", default = True)
 
     def update(self):
         treeChanged()
@@ -48,8 +53,6 @@ class AnimationNodeTree(bpy.types.NodeTree):
     def canAutoExecute(self, events):
         def isAnimationPlaying():
             return any([screen.is_animation_playing for screen in iterActiveScreens()])
-        def isViewportRendering():
-            return any([space.viewport_shade == "RENDERED" for space in iterActiveSpacesByType("VIEW_3D")])
 
         a = self.autoExecution
         if not a.enabled: return False
@@ -87,7 +90,7 @@ class AnimationNodeTree(bpy.types.NodeTree):
         if len(units) == 0:
             self.executionTime = 0
             return
-            
+
         clearDebugLoopTextBlocks(self)
         start = time.clock()
         for unit in units:
@@ -106,9 +109,17 @@ class AnimationNodeTree(bpy.types.NodeTree):
     @property
     def scene(self):
         scene = bpy.data.scenes.get(self.sceneName)
-        if scene is None: scene = bpy.data.scenes[0]
+        if scene is None:
+            scene = bpy.data.scenes[0]
         return scene
 
     @property
     def timeSinceLastAutoExecution(self):
         return abs(time.clock() - self.autoExecution.lastExecutionTimestamp)
+
+@eventHandler("SCENE_UPDATE_POST")
+def updateSelectedScenes(scene):
+    for tree in getAnimationNodeTrees():
+        scene = tree.scene
+        if scene.name != tree.sceneName:
+            tree.sceneName = scene.name

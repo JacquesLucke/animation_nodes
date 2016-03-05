@@ -4,20 +4,20 @@ from .. preferences import getPreferences
 from .. utils.blender_ui import iterAreas
 from .. utils.nodes import getAnimationNodeTrees
 
-def autoExecuteMainUnits(events):
-    if not problems.canExecute(): return False
-
-    executed = False
+def iterAutoExecutionNodeTrees(events):
+    if not problems.canExecute(): return
     for nodeTree in getAnimationNodeTrees():
         if nodeTree.canAutoExecute(events):
-            nodeTree.autoExecute()
-            executed = True
-    return executed
+            yield nodeTree
+
+def executeNodeTrees(nodeTrees):
+    for nodeTree in nodeTrees:
+        nodeTree.autoExecute()
 
 def afterExecution():
     prefs = getPreferences()
     if prefs.sceneUpdateAfterAutoExecution:
-        for scene in set(tree.scene for tree in getAnimationNodeTrees()):
+        for scene in bpy.data.scenes:
             scene.update()
 
     from .. events import isRendering

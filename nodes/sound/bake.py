@@ -4,9 +4,16 @@ from bpy.props import *
 from ... utils.names import getRandomString
 from ... tree_info import getNodeByIdentifier
 from ... base_types.node import AnimationNode
+from ... utils.blender_ui import getDpiFactor
 from ... utils.path import getAbsolutePathOfSound
 from ... utils.fcurve import getSingleFCurveWithDataPath
 from ... utils.sequence_editor import getOrCreateSequencer, getEmptyChannel
+
+class SoundFrequencyRange(bpy.types.PropertyGroup):
+    bl_idname = "an_SoundFrequencyRange"
+    low = IntProperty(name = "Low", min = 0)
+    high = IntProperty(name = "High", min = 0)
+
 
 class SoundBakeNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SoundBakeNode"
@@ -17,15 +24,19 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
     activeBakeDataIndex = IntProperty()
     activeEqualizerDataIndex = IntProperty()
 
-    low = IntProperty(name = "Low", default = 0)
-    high = IntProperty(name = "High", default = 20000)
+    low = IntProperty(name = "Low", default = 0, min = 0)
+    high = IntProperty(name = "High", default = 20000, min = 0)
     attack = FloatProperty(name = "Attack", default = 0.005, precision = 3)
     release = FloatProperty(name = "Release", default = 0.2, precision = 3)
+
+    showEqualizerFrequencyRanges = BoolProperty(default = False)
+    equalizerFrequencyRanges = CollectionProperty(type = SoundFrequencyRange)
 
     bakeProgress = StringProperty()
 
     def create(self):
         self.width = 300
+        self.setEqualizerFrequencyRanges(frequencyRanges)
 
     def draw(self, layout):
         layout.separator()
@@ -42,10 +53,16 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
         self.invokeFunction(row, "removeSequencesWithActiveSound", icon = "X",
             description = "Remove sound sequences using this sound")
 
-        if self.sound is None: return
+        if self.sound is None:
+            if len(bpy.data.sounds) > 0:
+                layout.label("Select a sound for more settings", icon = "INFO")
+            return
 
         box = col.box()
-        row = box.row()
+        self.drawForSound(box, self.sound)
+
+    def drawForSound(self, layout, sound):
+        row = layout.row()
         col = row.column(align = True)
         col.prop(self, "low")
         col.prop(self, "high")
@@ -53,32 +70,55 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
         col.prop(self, "attack")
         col.prop(self, "release")
 
-        col = box.column(align = True)
+        col = layout.column(align = True)
         subcol = col.column(align = True)
         subcol.scale_y = 1.3
-        subcol.active = getSingleDataItem(self.sound, self.low, self.high, self.attack, self.release) is None
+        subcol.active = getSingleDataItem(sound, self.low, self.high, self.attack, self.release) is None
         self.invokeFunction(subcol, "bakeSound", text = "Bake", icon = "GHOST")
         self.invokeFunction(col, "bakeEqualizerData", text = "Bake Equalizer Data", icon = "RNDCURVE")
+        self.drawEqualizerFrequencyRanges(layout)
 
         if self.bakeProgress != "":
-            box.label(self.bakeProgress, icon = "INFO")
+            layout.label(self.bakeProgress, icon = "INFO")
 
-        items = self.sound.singleData
+        self.drawBakedData_Single(layout, sound)
+        self.drawBakedData_Equalizer(layout, sound)
+
+    def drawEqualizerFrequencyRanges(self, layout):
+        col = layout.column()
+
+        row = col.row(align = True)
+        icon = "TRIA_DOWN" if self.showEqualizerFrequencyRanges else "TRIA_RIGHT"
+        row.prop(self, "showEqualizerFrequencyRanges", icon = icon, text = "", icon_only = True)
+        self.invokeFunction(row, "openFrequencyCalculator", text = "Calculate Equalizer Frequencies ({})".format(len(self.equalizerFrequencyRanges)))
+
+        if self.showEqualizerFrequencyRanges:
+            subcol = col.column(align = True)
+            for i, item in enumerate(self.equalizerFrequencyRanges):
+                row = subcol.row(align = True)
+                row.alignment = "RIGHT"
+                row.label(str(i) + ":")
+                right = row.split(percentage = 0.5, align = True)
+                right.prop(item, "low")
+                right.prop(item, "high")
+
+    def drawBakedData_Single(self, layout, sound):
+        items = sound.singleData
         if len(items) > 0:
-            col = box.column()
+            col = layout.column()
             row = col.row(align = True)
             row.label("Baked Data:")
             self.invokeFunction(row, "moveItemUp", icon = "TRIA_UP")
             self.invokeFunction(row, "moveItemDown", icon = "TRIA_DOWN")
-            col.template_list("an_SingleItemsUiList", "", self.sound, "singleData", self, "activeBakeDataIndex", rows = len(items) + 1)
+            col.template_list("an_SingleItemsUiList", "", sound, "singleData", self, "activeBakeDataIndex", rows = len(items) + 1)
 
-        items = self.sound.equalizerData
+    def drawBakedData_Equalizer(self, layout, sound):
+        items = sound.equalizerData
         if len(items) > 0:
-            col = box.column()
+            col = layout.column()
             row = col.row()
             row.label("Equalizer Data:")
-            col.template_list("an_EqualizerItemsUiList", "", self.sound, "equalizerData", self, "activeEqualizerDataIndex", rows = len(items) + 1)
-
+            col.template_list("an_EqualizerItemsUiList", "", sound, "equalizerData", self, "activeEqualizerDataIndex", rows = len(items) + 1)
 
     def loadSound(self, path):
         editor = getOrCreateSequencer(self.nodeTree.scene)
@@ -89,6 +129,19 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
             channel = channel,
             frame_start = bpy.context.scene.frame_start)
         self.soundName = sequence.sound.name
+
+    def setEqualizerFrequencyRanges(self, ranges):
+        self.equalizerFrequencyRanges.clear()
+        for low, high in ranges:
+            item = self.equalizerFrequencyRanges.add()
+            item.low = low
+            item.high = high
+
+    def openFrequencyCalculator(self):
+        bpy.ops.an.calculate_equalizer_frequency_ranges("INVOKE_DEFAULT",
+            nodeIdentifier = self.identifier,
+            frequencyRangeStart = self.low,
+            frequencyRangeEnd = self.high)
 
     def bakeSound(self):
         sound, low, high, attack, release = self.sound, self.low, self.high, self.attack, self.release
@@ -105,7 +158,8 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
             nodeIdentifier = self.identifier,
             soundName = self.soundName,
             attack = self.attack,
-            release = self.release)
+            release = self.release,
+            frequencyRanges = [{"low" : item.low, "high" : item.high, "name" : ""} for item in self.equalizerFrequencyRanges])
 
     def removeSingleBakedData(self, index):
         self.sound.singleData.remove(int(index))
@@ -181,6 +235,8 @@ class BakeEqualizerData(bpy.types.Operator):
     attack = FloatProperty()
     release = FloatProperty()
 
+    frequencyRanges = CollectionProperty(type = SoundFrequencyRange)
+
     def invoke(self, context, event):
         try: self.node = getNodeByIdentifier(self.nodeIdentifier)
         except: self.node = None
@@ -203,17 +259,17 @@ class BakeEqualizerData(bpy.types.Operator):
         self.counter += 1
         if self.counter % 20 != 0: return {"RUNNING_MODAL"}
 
-        if self.currentIndex < len(frequencyRanges):
-            low, high = frequencyRanges[self.currentIndex]
-            data = bake(self.sound, low, high, self.attack, self.release)
+        if self.currentIndex < len(self.frequencyRanges):
+            item = self.frequencyRanges[self.currentIndex]
+            data = bake(self.sound, item.low, item.high, self.attack, self.release)
             self.equalizerData.append(data)
             self.currentIndex += 1
-            self.setNodeMessage("Frequency range {}-{} baked".format(low, high))
+            self.setNodeMessage("Frequency range {}-{} baked".format(item.low, item.high))
         else:
             equalizerItem = self.sound.equalizerData.add()
             equalizerItem.attack = self.attack
             equalizerItem.release = self.release
-            equalizerItem.frequencyAmount = len(frequencyRanges)
+            equalizerItem.frequencyAmount = len(self.frequencyRanges)
             equalizerItem.identifier = getRandomString(10)
             for equalizerSampleData in zip(*self.equalizerData):
                 equalizerSampleItem = equalizerItem.samples.add()
@@ -295,6 +351,63 @@ def createSingleDataItem(sound, low, high, attack, release):
 def getSamplesFromFCurve(object):
     fcurve = getSingleFCurveWithDataPath(object, "location")
     return [sample.co.y for sample in fcurve.sampled_points]
+
+
+
+# Bake Equalizer Data
+################################
+
+class CalculateEqualizerFrequencyRanges(bpy.types.Operator):
+    bl_idname = "an.calculate_equalizer_frequency_ranges"
+    bl_label = "Calculate Frequency Ranges"
+    bl_options = {"INTERNAL", "REGISTER"}
+
+    nodeIdentifier = StringProperty()
+    amount = IntProperty(name = "Amount", default = 10, min = 1, soft_max = 50)
+    frequencyRangeStart = IntProperty(name = "Frequency Range Start", default = 0, min = 0)
+    frequencyRangeEnd = IntProperty(name = "Frequency Range End", default = 20000, min = 0)
+
+    base = FloatProperty(name = "Base", min = 0.001, default = 0.22)
+    exponent = IntProperty(name = "Exponent", min = 1, max = 20, default = 4)
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_props_dialog(self, width = 200 * getDpiFactor())
+
+    def check(self, context):
+        return True
+
+    def draw(self, context):
+        layout = self.layout
+        layout.prop(self, "amount")
+
+        row = layout.row(align = True)
+        row.prop(self, "frequencyRangeStart", text = "Start")
+        row.prop(self, "frequencyRangeEnd", text = "End")
+
+        row = layout.row(align = True)
+        row.prop(self, "base", text = "Base")
+        row.prop(self, "exponent", text = "Exponent")
+
+        col = layout.column(align = True)
+        for low, high in self.calculate_ranges():
+            row = col.row(align = True)
+            row.label(str(int(low)))
+            row.label(str(int(high)))
+
+    def execute(self, context):
+        node = getNodeByIdentifier(self.nodeIdentifier)
+        node.setEqualizerFrequencyRanges(self.calculate_ranges())
+        return {"FINISHED"}
+
+    def calculate_ranges(self):
+        steps = self.calculate_steps()
+        return list(zip(steps[:-1], steps[1:]))
+
+    def calculate_steps(self):
+        from ... algorithms import interpolation
+        from ... algorithms.interpolation import exponentialOut, prepareExponentialSettings, sampleInterpolation
+        algorithm = interpolation.assignArguments(exponentialOut, prepareExponentialSettings(self.base, self.exponent))
+        return sampleInterpolation(algorithm, self.amount + 1, self.frequencyRangeStart, self.frequencyRangeEnd)
 
 
 

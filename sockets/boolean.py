@@ -2,6 +2,7 @@ import bpy
 from bpy.props import *
 from .. events import propertyChanged
 from .. base_types.socket import AnimationNodeSocket
+from .. utils.nodes import newNodeAtCursor, invokeTranslation
 
 class BooleanSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_BooleanSocket"
@@ -13,9 +14,15 @@ class BooleanSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     hashable = True
 
     value = BoolProperty(default = True, update = propertyChanged)
+    showCreateCompareNodeButton = BoolProperty(default = False)
 
     def drawProperty(self, layout, text):
-        layout.prop(self, "value", text = text)
+        row = layout.row()
+        row.prop(self, "value", text = text)
+        
+        if self.showCreateCompareNodeButton and self.isUnlinked:
+            self.invokeFunction(row, "createCompareNode", icon = "PLUS", emboss = False,
+                description = "Create compare node")
 
     def getValue(self):
         return self.value
@@ -25,3 +32,8 @@ class BooleanSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def getProperty(self):
         return self.value
+
+    def createCompareNode(self):
+        node = newNodeAtCursor("an_CompareNode")
+        self.linkWith(node.outputs[0])
+        invokeTranslation()

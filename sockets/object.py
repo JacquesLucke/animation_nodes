@@ -18,7 +18,10 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def drawProperty(self, layout, text):
         row = layout.row(align = True)
-        row.prop_search(self, "objectName",  bpy.context.scene, "objects", icon="NONE", text = text)
+
+        scene = self.nodeTree.scene
+        if scene is None: scene = bpy.context.scene
+        row.prop_search(self, "objectName",  scene, "objects", icon = "NONE", text = text)
 
         if self.objectCreationType != "":
             self.invokeFunction(row, "createObject", icon = "PLUS")
@@ -39,6 +42,9 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getProperty(self):
         return self.objectName
 
+    def updateProperty(self):
+        self.getValue()
+
     def assignActiveObject(self):
         object = bpy.context.active_object
         if object:
@@ -54,7 +60,3 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         object = bpy.data.objects.new("Target", data)
         bpy.context.scene.objects.link(object)
         self.objectName = object.name
-
-    def drawSuggestionsMenu(self, layout):
-        self.invokeNodeInsertion(layout, "an_ObjectTransformsInputNode", 0, "Transforms Input")
-        self.invokeNodeInsertion(layout, "an_ObjectTransformsOutputNode", 0, "Transforms Output")

@@ -3,7 +3,7 @@ from bpy.props import *
 from ... tree_info import keepNodeState
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
-from ... sockets.info import getBaseDataTypeItems, toIdName, toListIdName, isBase, toBaseDataType, isLimitedList, toGeneralListIdName
+from ... sockets.info import getBaseDataTypeItemsCallback, toIdName, toListIdName, isBase, toBaseDataType, isLimitedList, toGeneralListIdName
 
 class GetListElementNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GetListElementNode"
@@ -18,6 +18,10 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
     baseIdName = StringProperty()
     listIdName = StringProperty()
 
+    clampIndex = BoolProperty(name = "Clamp Index", default = False,
+        description = "Clamp the index between the lowest and highest possible index",
+        update = executionCodeChanged)
+
     allowNegativeIndex = BoolProperty(name = "Allow Negative Index",
         description = "-2 means the second last list element",
         update = executionCodeChanged, default = False)
@@ -26,13 +30,25 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
         self.assignedType = "Float"
 
     def drawAdvanced(self, layout):
+        layout.prop(self, "clampIndex")
         layout.prop(self, "allowNegativeIndex")
         self.invokeSocketTypeChooser(layout, "assignListDataType",
             socketGroup = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
 
     def getExecutionCode(self):
-        if self.allowNegativeIndex: yield "element = list[index] if -len(list) <= index < len(list) else fallback"
-        else: yield "element = list[index] if 0 <= index < len(list) else fallback"
+        if self.allowNegativeIndex:
+            if self.clampIndex:
+                yield "if len(list) != 0: element = list[min(max(index, -len(list)), len(list) - 1)]"
+                yield "else: element = fallback"
+            else:
+                yield "element = list[index] if -len(list) <= index < len(list) else fallback"
+        else:
+            if self.clampIndex:
+                yield "if len(list) != 0: element = list[min(max(index, 0), len(list) - 1)]"
+                yield "else: element = fallback"
+            else:
+                yield "element = list[index] if 0 <= index < len(list) else fallback"
+
         socket = self.outputs[0]
         if socket.isCopyable:
             yield "element = " + socket.getCopyExpression().replace("value", "element")

@@ -40,9 +40,11 @@ class IntegerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         self.minValue = min
         self.maxValue = max
 
-    def drawSuggestionsMenu(self, layout):
-        self.invokeNodeInsertion(layout, "an_FloatMathNode", 0, "Multiply", {"operation" : repr("MULTIPLY")})
-        self.invokeNodeInsertion(layout, "an_FloatMathNode", 0, "Add", {"operation" : repr("ADD")})
-        self.invokeNodeInsertion(layout, "an_FloatClampNode", 0, "Clamp")
-        self.invokeNodeInsertion(layout, "an_VectorFromValueNode", 0, "Vector from Value")
-        self.invokeNodeInsertion(layout, "an_CombineVectorNode", 0, "Combine Vector")
+    def shouldBeFloatSocket(self):
+        targets = self.dataTargets
+        if len(targets) == 0: return True
+
+        for socket in targets:
+            if socket.dataType == "Float": return True
+
+        return False

@@ -14,7 +14,7 @@ class ChooseSocketType(bpy.types.Operator):
 
     def getItems(self, context):
         if self.socketGroup == "ALL":
-            return getDataTypeItems()
+            return getDataTypeItems(skipInternalTypes = True)
         if self.socketGroup == "LIST":
             return getListDataTypeItems()
 

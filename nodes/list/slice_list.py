@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... tree_info import keepNodeLinks
 from ... base_types.node import AnimationNode
-from ... sockets.info import getBaseDataTypeItems, toListIdName, isBase, toBaseDataType
+from ... sockets.info import getBaseDataTypeItemsCallback, toListIdName, isBase, toBaseDataType
 
 class SliceListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SliceListNode"

@@ -13,15 +13,17 @@ class SceneSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     hashable = True
 
     sceneName = StringProperty(name = "Scene", update = propertyChanged)
-    useGlobalScene = BoolProperty(name = "Use Global Scene", default = True, update = propertyChanged)
+    useGlobalScene = BoolProperty(name = "Use Global Scene", default = True,
+        description = "Use the global scene for this node tree", update = propertyChanged)
 
     def drawProperty(self, layout, text):
+        row = layout.row(align = True)
         if self.useGlobalScene:
-            layout.prop(self, "useGlobalScene")
+            if text != "": text += ": "
+            row.label(text + repr(self.nodeTree.scene.name))
         else:
-            row = layout.row(align = True)
             row.prop_search(self, "sceneName",  bpy.data, "scenes", text = text)
-            row.prop(self, "useGlobalScene", icon = "WORLD", text = "")
+        row.prop(self, "useGlobalScene", text = "", icon = "WORLD")
 
     def getValue(self):
         if self.useGlobalScene:

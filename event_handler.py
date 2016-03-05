@@ -1,21 +1,41 @@
+import bpy
+import itertools
 from . import problems
 from . update import updateEverything
 from . utils.recursion import noRecursion
+from . tree_info import iterSocketsThatNeedUpdate
 from . utils.nodes import iterAnimationNodes, getAnimationNodeTrees
 from . execution.units import setupExecutionUnits, finishExecutionUnits
-from . execution.auto_execution import autoExecuteMainUnits, afterExecution
+from . execution.auto_execution import iterAutoExecutionNodeTrees, executeNodeTrees, afterExecution
 
 @noRecursion
 def update(events):
+    if failsToWriteToIDClasses():
+        print("Skip event: cannot write to ID classes")
+        return
+
     if events.intersection({"File", "Addon", "Tree"}) or didNameChange():
         updateEverything()
 
-    if problems.canAutoExecute():
-        setupExecutionUnits()
-        executed = autoExecuteMainUnits(events)
-        if executed: afterExecution()
-        finishExecutionUnits()
+    updateSocketProperties()
 
+    if problems.canAutoExecute():
+        nodeTrees = list(iterAutoExecutionNodeTrees(events))
+        if len(nodeTrees) > 0:
+            setupExecutionUnits()
+            executeNodeTrees(nodeTrees)
+            afterExecution()
+            finishExecutionUnits()
+
+
+def failsToWriteToIDClasses():
+    try:
+        scene = bpy.data.scenes[0]
+        # just try to set a random property
+        scene["AN Prop Test"] = 0
+        del scene["AN Prop Test"]
+        return False
+    except: return True
 
 oldNamesHash = 0
 
@@ -28,6 +48,11 @@ def didNameChange():
     return False
 
 def getNamesHash():
-    treeNames = "".join((tree.name for tree in getAnimationNodeTrees()))
-    nodeNames = "".join((node.name for node in iterAnimationNodes()))
-    return len(treeNames) + len(nodeNames)
+    names = set(itertools.chain(
+        (tree.name for tree in getAnimationNodeTrees()),
+        (node.name for node in iterAnimationNodes())))
+    return names
+
+def updateSocketProperties():
+    for socket in iterSocketsThatNeedUpdate():
+        socket.updateProperty()

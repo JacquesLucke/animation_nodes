@@ -19,14 +19,17 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
         self.outputs.new("an_PolygonIndicesListSocket", "Polygon Indices", "polygonIndices")
         self.outputs.new("an_VertexListSocket", "Vertices", "vertices")
         self.outputs.new("an_PolygonListSocket", "Polygons", "polygons")
+        self.outputs.new("an_StringSocket", "Mesh Name", "meshName").hide = True
 
     def getExecutionCode(self):
         isLinked = self.getLinkedOutputsDict()
         if not any(isLinked.values()): return ""
 
         lines = []
+        lines.append("meshName = ''")
         lines.append("if getattr(object, 'type', '') == 'MESH':")
         lines.append("    mesh = self.getMesh(object, useModifiers, scene)")
+        lines.append("    meshName = mesh.name")
 
         if isLinked["vertexLocations"] or isLinked["polygons"]:
             lines.append("    vertexLocations = self.getVertexLocations(mesh, object, useWorldSpace, {})".format(repr(isLinked["vertexLocations"])))

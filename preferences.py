@@ -66,6 +66,8 @@ class AddonPreferences(bpy.types.AddonPreferences):
     nodeColors = PointerProperty(type = NodeColorProperties)
     developer = PointerProperty(type = DeveloperProperties)
 
+    debug = BoolProperty(name = "Debug", default = False)
+
     def draw(self, context):
         layout = self.layout
 
@@ -91,6 +93,8 @@ class AddonPreferences(bpy.types.AddonPreferences):
         subcol.prop(self.nodeColors, "subprogramValue", slider = True)
         subcol.prop(self.nodeColors, "subprogramSaturation", slider = True)
 
+        layout.prop(self, "debug")
+
 def getPreferences():
     # TODO: access user_preferences without the context
     return bpy.context.user_preferences.addons[addonName].preferences
@@ -106,3 +110,6 @@ def getDeveloperSettings():
 
 def nodeColors():
     return getPreferences().nodeColors
+
+def debuggingIsEnabled():
+    return getPreferences().debug    

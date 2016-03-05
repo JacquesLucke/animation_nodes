@@ -9,7 +9,6 @@ soundTypeItems = [
     ("SINGLE", "Single", "Only one strength per frame per sequence", "NONE", 0),
     ("EQUALIZER", "Equalizer", "Multiple strengths for different frequencies", "NONE", 1)]
 
-@enumItemsFromDicts
 def getBakeDataItems(self, context):
     items = []
     sequences = getattr(self.nodeTree.scene.sequence_editor, "sequences", [])
@@ -30,7 +29,7 @@ def getBakeDataItems(self, context):
                 "value" : "EQUALIZER_{}_{}".format(sequenceIndex, bakeIndex),
                 "name" : "#{} - {} - Equalizer".format(bakeIndex, sequence.name),
                 "description" : "Attack: {:.3f}  Release: {:.3f}".format(data.attack, data.release) })
-    return items
+    return enumItemsFromDicts(items)
 
 class SoundSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_SoundSocket"
@@ -41,7 +40,7 @@ class SoundSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = False
     hashable = False
 
-    bakeData = EnumProperty(name = "Bake Data", items = getBakeDataItems)
+    bakeData = EnumProperty(name = "Bake Data", items = getBakeDataItems, update = propertyChanged)
 
     def drawProperty(self, layout, text):
         layout.prop(self, "bakeData", text = text)

@@ -3,6 +3,7 @@ from bpy.props import *
 from ... sockets.info import toDataType
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
+from ... utils.blender_ui import getDpiFactor
 from ... utils.enum_items import enumItemsFromDicts
 from ... utils.nodes import newNodeAtCursor, invokeTranslation
 from ... tree_info import getSubprogramNetworks, getNodeByIdentifier, getNetworkByIdentifier
@@ -160,7 +161,6 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
         return False
 
 
-@enumItemsFromDicts
 def getSubprogramItems(self, context):
     itemDict = []
     for network in getSubprogramNetworks():
@@ -168,7 +168,7 @@ def getSubprogramItems(self, context):
             "value" : network.identifier,
             "name" : network.name,
             "description" : network.description})
-    return itemDict
+    return enumItemsFromDicts(itemDict)
 
 class ChangeSubprogram(bpy.types.Operator):
     bl_idname = "an.change_subprogram"
@@ -188,7 +188,7 @@ class ChangeSubprogram(bpy.types.Operator):
             node = getNodeByIdentifier(self.nodeIdentifier)
             self.subprogram = node.subprogramIdentifier
         except: pass # when the old subprogram identifier doesn't exist
-        return context.window_manager.invoke_props_dialog(self, width = 400)
+        return context.window_manager.invoke_props_dialog(self, width = 400 * getDpiFactor())
 
     def check(self, context):
         return True
