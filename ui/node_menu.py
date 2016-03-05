@@ -29,7 +29,7 @@ def drawMenu(self, context):
     layout.menu("an_material_menu", text = "Material", icon = "MATERIAL_DATA")
     layout.menu("an_particles_menu", text = "Particles", icon = "PARTICLE_DATA")
     layout.menu("an_fcurve_menu", text = "FCurves", icon = "IPO")
-    layout.menu("an_sound_menu", text = "Sound", icon = "SPEAKER")
+    layout.menu("an_sound_sequence_menu", text = "Sound & Sequence", icon = "SPEAKER")
     layout.menu("an_kdtree_bvhtree_menu", text = "KD & BVH Tree", icon = "STICKY_UVS_LOC")
     layout.separator()
     layout.menu("an_debug_menu", text = "Debug", icon = "INFO")
@@ -62,6 +62,7 @@ class NumberMenu(bpy.types.Menu):
         insertNode(layout, "an_CreateListNode", "Float List", {"assignedType" : repr("Float")})
         insertNode(layout, "an_FloatRangeListNode", "Integer Range", {"dataType" : repr("Integer")})
         insertNode(layout, "an_FloatRangeListNode", "Float Range", {"dataType" : repr("Float")})
+        insertNode(layout, "an_ParseNumberNode", "Parse Number")
         layout.separator()
         insertNode(layout, "an_RandomNumberNode", "Randomize")
         insertNode(layout, "an_FloatWiggleNode", "Wiggle")
@@ -70,7 +71,7 @@ class NumberMenu(bpy.types.Menu):
         layout.separator()
         insertNode(layout, "an_FloatClampNode", "Clamp")
         insertNode(layout, "an_ConvertAngleNode", "Convert Angle")
-        insertNode(layout, "an_FloatToIntegerNode", "Convert Float to Integer")
+        insertNode(layout, "an_FloatToIntegerNode", "Convert Float To Integer")
         insertNode(layout, "an_RoundNumberNode", "Round")
         insertNode(layout, "an_FloatMathNode", "Math")
         insertNode(layout, "an_ListMathNode", "List Math")
@@ -152,6 +153,7 @@ class TextMenu(bpy.types.Menu):
         insertNode(layout, "an_CreateListNode", "List", {"assignedType" : repr("String")})
         insertNode(layout, "an_RandomStringNode", "Randomize")
         insertNode(layout, "an_CharactersNode", "Characters")
+        insertNode(layout, "an_TimecodeGeneratorNode", "Timecode Generator")
         layout.separator()
         insertNode(layout, "an_SplitTextNode", "Split")
         insertNode(layout, "an_JoinStringsNode", "Join")
@@ -213,7 +215,9 @@ class ListMenu(bpy.types.Menu):
         insertNode(layout, "an_ReverseListNode", "Reverse")
         insertNode(layout, "an_SliceListNode", "Slice")
         insertNode(layout, "an_ShiftListNode", "Shift")
+        insertNode(layout, "an_SetListElementNode", "Set Element")
         insertNode(layout, "an_GetRandomListElementsNode", "Get Random Elements")
+        insertNode(layout, "an_ListBooleanOperationsNode", "List Boolean Operations")
 
 class ObjectMenu(bpy.types.Menu):
     bl_idname = "an_object_menu"
@@ -238,6 +242,9 @@ class ObjectMenu(bpy.types.Menu):
         insertNode(layout, "an_ObjectVisibilityOutputNode", "Visibility Output")
         insertNode(layout, "an_ObjectLayerVisibilityOutputNode", "Layer Visibility Output")
         layout.separator()
+        insertNode(layout, "an_ShapeKeysFromObjectNode", "Shape Keys from Object")
+        insertNode(layout, "an_ShapeKeyOutputNode", "Shape Key Output")
+        layout.separator()
         insertNode(layout, "an_ObjectIDKeyNode", "ID Key")
         insertNode(layout, "an_CopyObjectDataNode", "Copy Data")
         insertNode(layout, "an_SetKeyframesNode", "Set Keyframes")
@@ -257,6 +264,7 @@ class ObjectUtilsMenu(bpy.types.Menu):
         insertNode(layout, "an_UpdateObjectMatricesNode", "Update Matrices")
         insertNode(layout, "an_ResetObjectTransformsNode", "Reset Transformations")
         insertNode(layout, "an_CopyTransformsNode", "Copy Transformations")
+        insertNode(layout, "an_GetSelectedObjectsNode", "Get Selected Objects")
 
 class MeshMenu(bpy.types.Menu):
     bl_idname = "an_mesh_menu"
@@ -410,9 +418,9 @@ class FCurveMenu(bpy.types.Menu):
         insertNode(layout, "an_FCurveInfoNode", "Info")
         insertNode(layout, "an_FCurveKeyframesNode", "Keyframes")
 
-class SoundMenu(bpy.types.Menu):
-    bl_idname = "an_sound_menu"
-    bl_label = "Sound Menu"
+class SoundAndSequenceMenu(bpy.types.Menu):
+    bl_idname = "an_sound_sequence_menu"
+    bl_label = "Sound and Sequence Menu"
 
     def draw(self, context):
         layout = self.layout
@@ -421,10 +429,11 @@ class SoundMenu(bpy.types.Menu):
         insertNode(layout, "an_GetAllSequencesNode", "Get All Sequences")
         insertNode(layout, "an_SequencesFromChannelNode", "Sequences from Channel")
         insertNode(layout, "an_EvaluateSoundNode", "Evaluate Sound")
+        insertNode(layout, "an_SequenceInfoNode", "Sequence Info")
 
 class KDTreeAndBVHTreeMenu(bpy.types.Menu):
     bl_idname = "an_kdtree_bvhtree_menu"
-    bl_label = "KDTree Menu"
+    bl_label = "KDTree and BVHTree Menu"
 
     def draw(self, context):
         layout = self.layout
