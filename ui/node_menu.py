@@ -108,6 +108,7 @@ class RotationMenu(bpy.types.Menu):
         insertNode(layout, "an_RandomEulerNode", "Random Euler")
         insertNode(layout, "an_EulerWiggleNode", "Euler Wiggle")
         insertNode(layout, "an_DirectionToRotationNode", "Direction to Rotation")
+        insertNode(layout, "an_RotationToDirectionNode", "Rotation to Direction")
         layout.separator()
         insertNode(layout, "an_SeparateEulerNode", "Separate Euler")
         insertNode(layout, "an_CombineEulerNode", "Combine Euler")
