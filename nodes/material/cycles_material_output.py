@@ -1,5 +1,6 @@
 import bpy
 from bpy.props import *
+from ... tree_info import keepNodeState
 from ... base_types.node import AnimationNode
 
 allowedSocketTypes = {
@@ -31,43 +32,51 @@ class CyclesMaterialOutputNode(bpy.types.Node, AnimationNode):
         return identifiers
 
     def selectedSocketChanged(self, context):
-        self.socketIsChanging = True
-        self.setInputSocket()
-        self.socketIsChanging = False
+        self.createInputSocket()
 
     materialName = StringProperty(update = selectedSocketChanged)
     nodeName = StringProperty(update = selectedSocketChanged)
     socketIdentifier = EnumProperty(items = getPossibleSocketItems, name = "Socket", update = selectedSocketChanged)
-    socketIsChanging = BoolProperty()
 
     def create(self):
-        self.inputs.new("an_GenericSocket", "Data", "data")
+        self.createInputSocket()
 
     def draw(self, layout):
         layout.prop_search(self, 'materialName', bpy.data, 'materials', text='', icon='MATERIAL_DATA')
         material = bpy.data.materials.get(self.materialName)
-        if material is not None:
-            nodeTree = material.node_tree
-            layout.prop_search(self, 'nodeName', nodeTree, 'nodes', text='', icon='NODE')
-            node = material.node_tree.nodes.get(self.nodeName)
-            if node is not None:
-                layout.prop(self, "socketIdentifier", text = "")
+        if material is None: return
 
-    def execute(self, data):
-        socket = self.getSelectedSocket()
-        if socket is not None:
-            try: socket.default_value = data
-            except: pass
+        nodeTree = material.node_tree
+        if nodeTree is None: return
+
+        layout.prop_search(self, 'nodeName', nodeTree, 'nodes', text='', icon='NODE')
+        node = material.node_tree.nodes.get(self.nodeName)
+        if node is None: return
+
+        layout.prop(self, "socketIdentifier", text = "")
+
+    def getExecutionCode(self):
+        inputSocket = self.inputs.get("Data")
+        if inputSocket is None: return
+
+        yield "socket = self.getSelectedSocket()"
+        yield "if socket is not None:"
+        if inputSocket.dataType in ("Float", "Vector"):
+            yield "    if socket.default_value != data:"
+        elif inputSocket.dataType == "Color":
+            yield "    if tuple(socket.default_value) != tuple(data):"
+
+        yield "        socket.default_value = data"
 
     def edit(self):
-        socket = self.inputs.get("Data")
-        if socket is not None and not self.socketIsChanging:
-            if len(socket.links) > 0:
-                fromType = self.inputs[0].links[0].from_socket.bl_idname
-                possibleIdentifiers = self.getInputIdentifiersFromSocketType(fromType)
-                if self.inputs["Data"].bl_idname != fromType and len(possibleIdentifiers) > 0:
-                    self.socketIdentifier = possibleIdentifiers[0]
-                    self.setInputSocket()
+        inputSocket = self.inputs.get("Data")
+        if inputSocket is None: return
+
+        if inputSocket.isLinked:
+            originIdName = socket.dataOrigin.bl_idname
+            possibleIdentifiers = self.getInputIdentifiersFromSocketType(originIdName)
+            if inputSocket.bl_idname != originIdName and len(possibleIdentifiers) > 0:
+                self.socketIdentifier = possibleIdentifiers[0]
 
     def getInputIdentifiersFromSocketType(self, searchType):
         identifiers = []
@@ -79,10 +88,13 @@ class CyclesMaterialOutputNode(bpy.types.Node, AnimationNode):
 
     def getSelectedNode(self):
         material = bpy.data.materials.get(self.materialName)
-        if material is not None:
-            node = material.node_tree.nodes.get(self.nodeName)
-            return node
-        return None
+        if material is None: return None
+
+        nodeTree = material.node_tree
+        if nodeTree is None: return
+
+        node = nodeTree.nodes.get(self.nodeName)
+        return node
 
     def getSelectedSocket(self):
         node = self.getSelectedNode()
@@ -96,12 +108,11 @@ class CyclesMaterialOutputNode(bpy.types.Node, AnimationNode):
             if socket.identifier == identifier: return socket
         return None
 
-    def setInputSocket(self):
-        socket = self.getSelectedSocket()
+    @keepNodeState
+    def createInputSocket(self):
         self.inputs.clear()
-        if socket is None:
-            self.inputs.new("an_GenericSocket", "Data")
-        else:
+        socket = self.getSelectedSocket()
+        if socket is not None:
             data = socket.default_value
-            self.inputs.new(allowedSocketTypes[socket.bl_idname], "Data")
+            self.inputs.new(allowedSocketTypes[socket.bl_idname], "Data", "data")
             self.inputs["Data"].setProperty(data)
