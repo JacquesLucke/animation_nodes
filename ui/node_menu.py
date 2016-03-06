@@ -29,7 +29,8 @@ def drawMenu(self, context):
     layout.menu("an_material_menu", text = "Material", icon = "MATERIAL_DATA")
     layout.menu("an_particles_menu", text = "Particles", icon = "PARTICLE_DATA")
     layout.menu("an_fcurve_menu", text = "FCurves", icon = "IPO")
-    layout.menu("an_sound_sequence_menu", text = "Sound & Sequence", icon = "SPEAKER")
+    layout.menu("an_sound_menu", text = "Sound", icon = "SPEAKER")
+    layout.menu("an_sequence_menu", text = "Sequence", icon = "SEQUENCE")
     layout.menu("an_kdtree_bvhtree_menu", text = "KD & BVH Tree", icon = "STICKY_UVS_LOC")
     layout.separator()
     layout.menu("an_debug_menu", text = "Debug", icon = "INFO")
@@ -429,17 +430,26 @@ class FCurveMenu(bpy.types.Menu):
         insertNode(layout, "an_FCurveInfoNode", "Info")
         insertNode(layout, "an_FCurveKeyframesNode", "Keyframes")
 
-class SoundAndSequenceMenu(bpy.types.Menu):
-    bl_idname = "an_sound_sequence_menu"
-    bl_label = "Sound and Sequence Menu"
+class SoundMenu(bpy.types.Menu):
+    bl_idname = "an_sound_menu"
+    bl_label = "Sound Menu"
 
     def draw(self, context):
         layout = self.layout
         insertNode(layout, "an_SoundBakeNode", "Bake Sound")
-        insertNode(layout, "an_SoundFromSequencesNode", "Sound from Sequences")
-        insertNode(layout, "an_GetAllSequencesNode", "Get All Sequences")
-        insertNode(layout, "an_SequencesFromChannelNode", "Sequences from Channel")
         insertNode(layout, "an_EvaluateSoundNode", "Evaluate Sound")
+        insertNode(layout, "an_SoundFromSequencesNode", "Sound from Sequences")
+
+
+class SequenceMenu(bpy.types.Menu):
+    bl_idname = "an_sequence_menu"
+    bl_label = "Sequence Menu"
+
+    def draw(self, context):
+        layout = self.layout
+        insertNode(layout, "an_SequencesFromChannelNode", "Sequences from Channel")
+        insertNode(layout, "an_GetAllSequencesNode", "Get All Sequences")
+        insertNode(layout, "an_TextSequenceOutputNode", "Text Sequence Output")
         insertNode(layout, "an_SequenceInfoNode", "Sequence Info")
 
 class KDTreeAndBVHTreeMenu(bpy.types.Menu):
