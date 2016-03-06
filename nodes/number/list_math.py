@@ -9,9 +9,9 @@ operationItems = [
     ("MIN", "Min", ""),
     ("MAX", "Max", "") ]
 
-class ListMathNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_ListMathNode"
-    bl_label = "List Math"
+class NumberListMathNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_NumberListMathNode"
+    bl_label = "Number List Math"
 
     operation = EnumProperty(name = "Operation", items = operationItems, update = executionCodeChanged)
 
