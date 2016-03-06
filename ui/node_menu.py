@@ -1,5 +1,6 @@
 import bpy
 from bpy.props import *
+from .. sockets.info import getBaseDataTypes
 from .. tree_info import getSubprogramNetworks
 from .. utils.nodes import getAnimationNodeTrees
 
@@ -214,7 +215,7 @@ class ListMenu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        insertNode(layout, "an_CreateListNode", "Create")
+        layout.menu("an_create_list_menu", text = "Create")
         insertNode(layout, "an_CombineListsNode", "Combine")
         insertNode(layout, "an_AppendListNode", "Append")
         layout.separator()
@@ -229,6 +230,26 @@ class ListMenu(bpy.types.Menu):
         insertNode(layout, "an_SetListElementNode", "Set Element")
         insertNode(layout, "an_GetRandomListElementsNode", "Get Random Elements")
         insertNode(layout, "an_ListBooleanOperationsNode", "List Boolean Operations")
+
+class CreateListMenu(bpy.types.Menu):
+    bl_idname = "an_create_list_menu"
+    bl_label = "Create List Menu"
+
+    def draw(self, context):
+        layout = self.layout
+        for dataType in ("Object", "Integer", "Float", "Vector", "String"):
+            insertNode(layout, "an_CreateListNode", dataType, {"assignedType" : repr(dataType)})
+        layout.separator()
+        layout.menu("an_create_list_menu_extended", text = "More")
+
+class CreateListMenuExtended(bpy.types.Menu):
+    bl_idname = "an_create_list_menu_extended"
+    bl_label = "Create List Menu Extended"
+
+    def draw(self, context):
+        layout = self.layout
+        for dataType in sorted(getBaseDataTypes()):
+            insertNode(layout, "an_CreateListNode", dataType, {"assignedType" : repr(dataType)})
 
 class ObjectMenu(bpy.types.Menu):
     bl_idname = "an_object_menu"
