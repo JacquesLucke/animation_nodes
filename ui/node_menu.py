@@ -269,7 +269,6 @@ class ObjectUtilsMenu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        insertNode(layout, "an_CreateObjectNode", "Create")
         insertNode(layout, "an_MoveObjectNode", "Move")
         insertNode(layout, "an_TransformObjectNode", "Transform")
         insertNode(layout, "an_UpdateObjectMatricesNode", "Update Matrices")
