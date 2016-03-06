@@ -61,6 +61,7 @@ class CyclesMaterialOutputNode(bpy.types.Node, AnimationNode):
 
         yield "socket = self.getSelectedSocket()"
         yield "if socket is not None:"
+
         if inputSocket.dataType in ("Float", "Vector"):
             yield "    if socket.default_value != data:"
         elif inputSocket.dataType == "Color":
