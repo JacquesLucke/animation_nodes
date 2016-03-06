@@ -35,6 +35,11 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
         self.invokeSocketTypeChooser(layout, "assignListDataType",
             socketGroup = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
 
+    def drawLabel(self):
+        if self.hide and self.inputs["Index"].isUnlinked:
+            return "List[{}]".format(self.inputs["Index"].value)
+        return "Get List Element"
+
     def getExecutionCode(self):
         if self.allowNegativeIndex:
             if self.clampIndex:
