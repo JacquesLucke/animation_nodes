@@ -12,6 +12,8 @@ class CombineVectorNode(bpy.types.Node, AnimationNode):
         self.outputs.new("an_VectorSocket", "Vector", "vector")
 
     def drawLabel(self):
+        if not self.hide: return self.bl_label
+        
         label = "<X, Y, Z>"
         for axis in "XYZ":
             if self.inputs[axis].isUnlinked:
