@@ -73,10 +73,10 @@ class NumberMenu(bpy.types.Menu):
         layout.separator()
         insertNode(layout, "an_FloatClampNode", "Clamp")
         insertNode(layout, "an_ConvertAngleNode", "Convert Angle")
-        insertNode(layout, "an_FloatToIntegerNode", "Convert Float To Integer")
+        insertNode(layout, "an_FloatToIntegerNode", "Float To Integer")
         insertNode(layout, "an_RoundNumberNode", "Round")
         insertNode(layout, "an_FloatMathNode", "Math")
-        insertNode(layout, "an_ListMathNode", "List Math")
+        insertNode(layout, "an_NumberListMathNode", "List Math")
 
 class VectorMenu(bpy.types.Menu):
     bl_idname = "an_vector_menu"
@@ -96,6 +96,7 @@ class VectorMenu(bpy.types.Menu):
         insertNode(layout, "an_VectorLengthNode", "Length")
         insertNode(layout, "an_VectorDistanceNode", "Distance")
         insertNode(layout, "an_VectorMathNode", "Math")
+        insertNode(layout, "an_VectorListMathNode", "List Math")
         insertNode(layout, "an_TransformVectorNode", "Transform Vector")
         insertNode(layout, "an_TransformVectorListNode", "Transform Vector List")
 
@@ -300,6 +301,7 @@ class ObjectMenu(bpy.types.Menu):
         insertNode(layout, "an_ObjectIDKeyNode", "ID Key")
         insertNode(layout, "an_CopyObjectDataNode", "Copy Data")
         insertNode(layout, "an_SetKeyframesNode", "Set Keyframes")
+        insertNode(layout, "an_ObjectGroupOperationsNode", "Group Operations")
         layout.menu("an_object_utils_menu", text = "Utils")
         layout.separator()
         insertNode(layout, "an_ObjectInstancerNode", "Instancer")
