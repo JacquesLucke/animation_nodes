@@ -240,7 +240,7 @@ class CreateListMenu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        for dataType in mainListDataTypes:
+        for dataType in mainBaseDataTypes:
             insertNode(layout, "an_CreateListNode", dataType, {"assignedType" : repr(dataType)})
         layout.separator()
         layout.menu("an_create_list_menu_extended", text = "More")
@@ -252,7 +252,7 @@ class CreateListMenuExtended(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         for dataType in sorted(getBaseDataTypes()):
-            if dataType not in mainListDataTypes:
+            if dataType not in mainBaseDataTypes:
                 insertNode(layout, "an_CreateListNode", dataType, {"assignedType" : repr(dataType)})
 
 class CombineListMenu(bpy.types.Menu):
@@ -261,7 +261,7 @@ class CombineListMenu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        for dataType in mainListDataTypes:
+        for dataType in mainBaseDataTypes:
             insertNode(layout, "an_CombineListsNode", dataType, {"assignedType" : repr(dataType)})
         layout.separator()
         layout.menu("an_combine_list_menu_extended", text = "More")
@@ -273,7 +273,7 @@ class CombineListMenuExtended(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         for dataType in sorted(getBaseDataTypes()):
-            if dataType not in mainListDataTypes:
+            if dataType not in mainBaseDataTypes:
                 insertNode(layout, "an_CombineListsNode", dataType, {"assignedType" : repr(dataType)})
 
 class ObjectMenu(bpy.types.Menu):
