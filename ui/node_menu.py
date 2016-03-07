@@ -4,6 +4,8 @@ from .. sockets.info import getBaseDataTypes
 from .. tree_info import getSubprogramNetworks
 from .. utils.nodes import getAnimationNodeTrees
 
+mainBaseDataTypes = ("Object", "Integer", "Float", "Vector", "String")
+
 def drawMenu(self, context):
     if context.space_data.tree_type != "an_AnimationNodeTree": return
 
@@ -237,7 +239,7 @@ class CreateListMenu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        for dataType in ("Object", "Integer", "Float", "Vector", "String"):
+        for dataType in mainListDataTypes:
             insertNode(layout, "an_CreateListNode", dataType, {"assignedType" : repr(dataType)})
         layout.separator()
         layout.menu("an_create_list_menu_extended", text = "More")
@@ -249,7 +251,8 @@ class CreateListMenuExtended(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         for dataType in sorted(getBaseDataTypes()):
-            insertNode(layout, "an_CreateListNode", dataType, {"assignedType" : repr(dataType)})
+            if dataType not in mainListDataTypes:
+                insertNode(layout, "an_CreateListNode", dataType, {"assignedType" : repr(dataType)})
 
 class CombineListMenu(bpy.types.Menu):
     bl_idname = "an_combine_list_menu"
@@ -257,7 +260,7 @@ class CombineListMenu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        for dataType in ("Object", "Integer", "Float", "Vector", "String"):
+        for dataType in mainListDataTypes:
             insertNode(layout, "an_CombineListsNode", dataType, {"assignedType" : repr(dataType)})
         layout.separator()
         layout.menu("an_combine_list_menu_extended", text = "More")
@@ -269,7 +272,8 @@ class CombineListMenuExtended(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         for dataType in sorted(getBaseDataTypes()):
-            insertNode(layout, "an_CombineListsNode", dataType, {"assignedType" : repr(dataType)})
+            if dataType not in mainListDataTypes:
+                insertNode(layout, "an_CombineListsNode", dataType, {"assignedType" : repr(dataType)})
 
 class ObjectMenu(bpy.types.Menu):
     bl_idname = "an_object_menu"
