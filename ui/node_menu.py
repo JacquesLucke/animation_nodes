@@ -4,7 +4,7 @@ from .. sockets.info import getBaseDataTypes
 from .. tree_info import getSubprogramNetworks
 from .. utils.nodes import getAnimationNodeTrees
 
-mainListDataTypes = ("Object", "Integer", "Float", "Vector", "String")
+mainBaseDataTypes = ("Object", "Integer", "Float", "Vector", "String")
 
 def drawMenu(self, context):
     if context.space_data.tree_type != "an_AnimationNodeTree": return
