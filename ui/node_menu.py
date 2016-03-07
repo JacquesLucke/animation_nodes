@@ -97,6 +97,8 @@ class VectorMenu(bpy.types.Menu):
         layout.separator()
         insertNode(layout, "an_VectorLengthNode", "Length")
         insertNode(layout, "an_VectorDistanceNode", "Distance")
+        insertNode(layout, "an_VectorDotProductNode", "Dot Product")
+        insertNode(layout, "an_VectorAngleNode", "Angle")
         insertNode(layout, "an_VectorMathNode", "Math")
         insertNode(layout, "an_VectorListMathNode", "List Math")
         insertNode(layout, "an_TransformVectorNode", "Transform Vector")
