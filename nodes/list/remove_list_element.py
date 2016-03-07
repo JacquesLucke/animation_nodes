@@ -5,6 +5,11 @@ from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 from ... sockets.info import toIdName, toListIdName, toBaseDataType, isBase, isLimitedList, toGeneralListIdName
 
+removeTypeItems = [
+    ("FIRST_OCCURRENCE", "First Occurrence", "", "", 0),
+    ("ALL_OCCURRENCES", "All Occurrences", "", "", 1),
+    ("INDEX", "Index", "", "", 2) ]
+
 class RemoveListElementNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_RemoveListElementNode"
     bl_label = "Remove List Element"
@@ -18,16 +23,31 @@ class RemoveListElementNode(bpy.types.Node, AnimationNode):
     baseIdName = StringProperty()
     listIdName = StringProperty()
 
+    def removeTypeChanged(self, context):
+        self.generateSockets()
+
+    removeType = EnumProperty(name = "Remove Type", default = "FIRST_OCCURRENCE",
+        items = removeTypeItems, update = removeTypeChanged)
+
     def create(self):
         self.assignedType = "Float"
+
+    def draw(self, layout):
+        layout.prop(self, "removeType", text = "")
 
     def drawAdvanced(self, layout):
         self.invokeSocketTypeChooser(layout, "assignListDataType",
             socketGroup = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
 
     def getExecutionCode(self):
-        yield "try: list.remove(element)"
-        yield "except: pass"
+        yield "outList = inList"
+        if self.removeType == "FIRST_OCCURRENCE":
+            yield "try: inList.remove(element)"
+            yield "except: pass"
+        elif self.removeType == "ALL_OCCURRENCES":
+            yield "outList = [e for e in inList if e != element]"
+        elif self.removeType == "INDEX":
+            yield "if 0 <= index < len(inList): del inList[index]"
 
     def edit(self):
         dataType = self.getWantedDataType()
@@ -35,16 +55,19 @@ class RemoveListElementNode(bpy.types.Node, AnimationNode):
 
     def getWantedDataType(self):
         listInput = self.inputs["List"].dataOrigin
-        elementInput = self.inputs["Element"].dataOrigin
-        listOutputs = self.outputs["List"].dataTargets
-
         if listInput is not None:
             idName = listInput.bl_idname
             if isLimitedList(idName): idName = toGeneralListIdName(idName)
             return toBaseDataType(idName)
-        if elementInput is not None: return elementInput.dataType
+
+        if self.removeType in ("FIRST_OCCURRENCE", "ALL_OCCURRENCES"):
+            elementInput = self.inputs["Element"].dataOrigin
+            if elementInput is not None: return elementInput.dataType
+
+        listOutputs = self.outputs["List"].dataTargets
         if len(listOutputs) == 1: return toBaseDataType(listOutputs[0].dataType)
-        return self.inputs["Element"].dataType
+
+        return toBaseDataType(self.inputs["List"].bl_idname)
 
     def assignListDataType(self, listDataType):
         self.assignType(toBaseDataType(listDataType))
@@ -58,6 +81,15 @@ class RemoveListElementNode(bpy.types.Node, AnimationNode):
     def generateSockets(self):
         self.inputs.clear()
         self.outputs.clear()
-        self.inputs.new(self.listIdName, "List", "list").dataIsModified = True
-        self.inputs.new(self.baseIdName, "Element", "element").defaultDrawType = "PREFER_PROPERTY"
-        self.outputs.new(self.listIdName, "List", "list")
+
+        if self.removeType in ("FIRST_OCCURRENCE", "INDEX"):
+            self.inputs.new(self.listIdName, "List", "inList").dataIsModified = True
+        else:
+            self.inputs.new(self.listIdName, "List", "inList")
+
+        if self.removeType in ("FIRST_OCCURRENCE", "ALL_OCCURRENCES"):
+            self.inputs.new(self.baseIdName, "Element", "element").defaultDrawType = "PREFER_PROPERTY"
+        elif self.removeType == "INDEX":
+            self.inputs.new("an_IntegerSocket", "Index", "index")
+
+        self.outputs.new(self.listIdName, "List", "outList")
