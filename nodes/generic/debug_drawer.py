@@ -20,6 +20,8 @@ class DebugDrawerNode(bpy.types.Node, AnimationNode):
     maxListEndElements = IntProperty(name = "Max List End Elements", default = 0, min = 0)
     oneElementPerLine = BoolProperty(name = "One Element per Line", default = True)
 
+    errorMessage = StringProperty()
+
     def create(self):
         self.width = 270
         self.inputs.new("an_GenericSocket", "Data", "data")
@@ -32,6 +34,8 @@ class DebugDrawerNode(bpy.types.Node, AnimationNode):
             row.prop(self, "maxListStartElements", text = "Begin")
             row.prop(self, "maxListEndElements", text = "End")
             layout.prop(self, "oneElementPerLine")
+        if self.errorMessage != "":
+            layout.label(self.errorMessage, icon = "ERROR")
 
     def drawAdvanced(self, layout):
         layout.prop(self, "maxRows")
@@ -54,9 +58,12 @@ class DebugDrawerNode(bpy.types.Node, AnimationNode):
             yield "if condition:"
         else: yield "if True:"
 
+        yield "    self.errorMessage = ''"
         if isList(self.dataType):
             yield "    conversionFunction = self.getCurrentToStringFunction()"
-            yield "    self.store_GenericList(data, conversionFunction)"
+            yield "    if hasattr(data, '__iter__'):"
+            yield "        self.store_GenericList(data, conversionFunction)"
+            yield "    else: self.errorMessage = 'The input should be a list'"
         else:
             yield "    self.store_Generic(data)"
 
@@ -118,7 +125,7 @@ def drawDebugTextBoxes():
     nodes = getNodesByType("an_DebugDrawerNode")
     nodesInCurrentTree = getattr(bpy.context.space_data.node_tree, "nodes", [])
     for node in nodes:
-        if node.name in nodesInCurrentTree and not node.hide:
+        if node.name in nodesInCurrentTree and not node.hide and node.errorMessage == "":
             drawDebugTextBox(node)
 
 def drawDebugTextBox(node):

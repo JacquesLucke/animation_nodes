@@ -1,27 +1,45 @@
 import bpy
 from bpy.props import *
-from ... events import executionCodeChanged
+from ... tree_info import keepNodeState
 from ... base_types.node import AnimationNode
+
+pivotTypeItems = [
+    ("CENTER", "Center", "Use the center of the polygon as pivot"),
+    ("WORLD_ORIGIN", "World Origin", "Use the (0, 0, 0) vector as pivot for all polygons"),
+    ("CUSTOM", "Custom", "Use a custom vector as pivot") ]
 
 class TransformPolygonNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_TransformPolygonNode"
     bl_label = "Transform Polygon"
 
-    useCenter = BoolProperty(name = "Use Center", default = True,
-        description = "Use the polygon center as origin", update = executionCodeChanged)
+    def pivotTypeChanged(self, context):
+        self.generateSockets()
+
+    pivotType = EnumProperty(name = "Pivot Type", default = "CENTER",
+        items = pivotTypeItems, update = pivotTypeChanged)
 
     def create(self):
-        self.inputs.new("an_PolygonSocket", "Polygon", "polygon").dataIsModified = True
-        self.inputs.new("an_MatrixSocket", "Matrix", "matrix")
+        self.generateSockets()
         self.outputs.new("an_PolygonSocket", "Polygon", "polygon")
 
     def draw(self, layout):
-        layout.prop(self, "useCenter")
+        layout.prop(self, "pivotType", text = "Pivot")
+
+    @keepNodeState
+    def generateSockets(self):
+        self.inputs.clear()
+        self.inputs.new("an_PolygonSocket", "Polygon", "polygon").dataIsModified = True
+        self.inputs.new("an_MatrixSocket", "Matrix", "matrix")
+
+        if self.pivotType == "CUSTOM":
+            self.inputs.new("an_VectorSocket", "Pivot", "pivot")
 
     def getExecutionCode(self):
         matrixName = "matrix"
-        if self.useCenter:
-            yield "offsetMatrix = mathutils.Matrix.Translation(polygon.center)"
+
+        if self.pivotType in ("CENTER", "CUSTOM"):
+            pivotName = "polygon.center" if self.pivotType == "CENTER" else "pivot"
+            yield "offsetMatrix = mathutils.Matrix.Translation({})".format(pivotName)
             yield "transformMatrix = offsetMatrix * matrix * offsetMatrix.inverted()"
             matrixName = "transformMatrix"
 
