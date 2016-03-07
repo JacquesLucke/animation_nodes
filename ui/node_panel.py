@@ -1,19 +1,29 @@
 import bpy
 from bpy.props import *
+from .. preferences import debuggingIsEnabled
 
 def draw(self, context):
-    node = bpy.context.active_node
+    node = getattr(bpy.context, "active_node", None)
     if not getattr(node, "isAnimationNode", False): return
-
     layout = self.layout
     layout.separator()
 
+    drawGenericNodeProperties(layout, node)
+    drawSocketLists(layout, node)
+    drawSocketVisibilityOperators(layout, node)
+
+    if debuggingIsEnabled():
+        layout.separator()
+        layout.label("Identifier: " + node.identifier)
+
+def drawGenericNodeProperties(layout, node):
     layout.prop(node, "width", text = "Width")
 
     col = layout.column(align = True)
     col.prop(node, "location", text = "X", index = 0)
     col.prop(node, "location", text = "Y", index = 1)
 
+def drawSocketLists(layout, node):
     row = layout.row(align = True)
 
     size = max(len(node.inputs), len(node.outputs), 1)
@@ -34,6 +44,7 @@ def draw(self, context):
         subrow.operator("an.move_output", text = "", icon = "TRIA_DOWN").moveUp = False
         col.template_list("an_SocketUiList", "", node, "outputs", node, "activeOutputIndex", rows = size, maxrows = size)
 
+def drawSocketVisibilityOperators(layout, node):
     col = layout.column(align = True)
     col.label("Toogle Operation Visibility:")
     row = col.row(align = True)
@@ -41,9 +52,6 @@ def draw(self, context):
     node.invokeFunction(row, "toogleMoveOperatorsVisibility", text = "Move")
     node.invokeFunction(row, "toogleRemoveOperatorVisibility", text = "Remove")
     node.invokeFunction(row, "disableSocketEditingInNode", icon = "FULLSCREEN")
-
-    layout.separator()
-    layout.label("Identifier: " + node.identifier)
 
 
 class SocketUiList(bpy.types.UIList):

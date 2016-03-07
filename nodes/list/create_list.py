@@ -2,7 +2,8 @@ import bpy
 from bpy.props import *
 from ... base_types.node import AnimationNode
 from ... utils.selection import getSortedSelectedObjectNames
-from ... sockets.info import getBaseDataTypeItemsCallback, toIdName, toListIdName, getListDataTypes, toBaseDataType
+from ... sockets.info import (getBaseDataTypeItemsCallback, toIdName, toListIdName,
+                              getListDataTypes, toBaseDataType, toListDataType)
 
 class CreateListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CreateListNode"
@@ -56,6 +57,9 @@ class CreateListNode(bpy.types.Node, AnimationNode):
 
         self.drawAdvancedTypeSpecific(layout)
 
+    def drawLabel(self):
+        return "Create " + toListDataType(self.assignedType)
+
     @property
     def inputVariables(self):
         return { socket.identifier : "element_" + str(i) for i, socket in enumerate(self.inputs) }
@@ -97,6 +101,10 @@ class CreateListNode(bpy.types.Node, AnimationNode):
         socket.moveable = True
         socket.defaultDrawType = "PREFER_PROPERTY"
         socket.moveUp()
+
+        if len(self.inputs) > 2:
+            socket.copyDisplaySettingsFrom(self.inputs[0])
+
         return socket
 
     def updateOutputName(self):

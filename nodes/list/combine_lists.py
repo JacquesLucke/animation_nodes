@@ -79,4 +79,8 @@ class CombineListsNode(bpy.types.Node, AnimationNode):
         socket.textProps.editable = True
         socket.defaultDrawType = "PREFER_PROPERTY"
         socket.moveUp()
+
+        if len(self.inputs) > 2:
+            socket.copyDisplaySettingsFrom(self.inputs[0])
+
         return socket
