@@ -27,7 +27,7 @@ def createOperatorWithDescription(description):
 
     operator = type("InvokeFunction_" + operatorID, (bpy.types.Operator, ), {
         "bl_idname" : idName,
-        "bl_label" : "Invoke Function",
+        "bl_label" : "Are you sure?",
         "bl_description" : description,
         "invoke" : invoke_InvokeFunction,
         "execute" : execute_InvokeFunction })
