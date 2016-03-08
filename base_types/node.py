@@ -232,6 +232,10 @@ class AnimationNode:
         nodes.remove(self)
         return list(nodes)
 
+    def removeLinks(self):
+        for socket in self.sockets:
+            socket.removeLinks()
+
 
     @property
     def nodeTree(self):
