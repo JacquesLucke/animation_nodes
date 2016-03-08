@@ -15,7 +15,7 @@ class StringSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     dataType = "String"
     allowedInputTypes = ["String"]
     drawColor = (1, 1, 1, 1)
-    hashable = True
+    comparable = True
     storable = True
 
     def getEnumItems(self, context):

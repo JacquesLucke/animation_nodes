@@ -8,7 +8,7 @@ class BVHTreeSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     dataType = "BVHTree"
     allowedInputTypes = ["BVHTree"]
     drawColor = (0.18, 0.32, 0.32, 1)
-    hashable = True
+    comparable = True
     storable = True
 
     def getValue(self):

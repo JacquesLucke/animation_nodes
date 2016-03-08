@@ -8,7 +8,7 @@ class EulerListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Euler List"]
     drawColor = (0.1, 0.0, 0.4, 0.5)
     storable = True
-    hashable = False
+    comparable = False
 
     def getValueCode(self):
         return "[]"

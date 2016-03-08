@@ -8,7 +8,7 @@ class FloatListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Float List", "Integer List"]
     drawColor = (0.4, 0.4, 0.7, 0.5)
     storable = True
-    hashable = False
+    comparable = False
 
     def getValueCode(self):
         return "[]"

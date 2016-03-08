@@ -10,7 +10,7 @@ class FontSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Font"]
     drawColor = (0.444, 0.444, 0, 1)
     storable = False
-    hashable = True
+    comparable = True
 
     fontName = StringProperty(update = propertyChanged)
 

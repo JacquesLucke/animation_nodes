@@ -8,7 +8,7 @@ class VertexListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Vertex List"]
     drawColor = (0.55, 0.61, 0.32, 0.5)
     storable = True
-    hashable = False
+    comparable = False
 
     def getValueCode(self):
         return "[]"

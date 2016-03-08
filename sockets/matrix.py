@@ -9,7 +9,7 @@ class MatrixSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Matrix"]
     drawColor = (1, 0.56, 0.3, 1)
     storable = True
-    hashable = False
+    comparable = False
 
     def getValue(self):
         return Matrix.Identity(4)

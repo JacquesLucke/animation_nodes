@@ -10,7 +10,7 @@ class SceneSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Scene"]
     drawColor = (0.2, 0.3, 0.4, 1)
     storable = False
-    hashable = True
+    comparable = True
 
     sceneName = StringProperty(name = "Scene", update = propertyChanged)
     useGlobalScene = BoolProperty(name = "Use Global Scene", default = True,

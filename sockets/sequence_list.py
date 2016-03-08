@@ -8,7 +8,7 @@ class SequenceListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Sequence List"]
     drawColor = (0, 0.644, 0, 0.5)
     storable = False
-    hashable = False
+    comparable = False
 
     def getValueCode(self):
         return "[]"

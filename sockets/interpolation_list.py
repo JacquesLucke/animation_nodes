@@ -8,7 +8,7 @@ class InterpolationListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Interpolation List"]
     drawColor = (0.7, 0.4, 0.3, 0.5)
     storable = False
-    hashable = False
+    comparable = False
 
     def getValueCode(self):
         return "[]"

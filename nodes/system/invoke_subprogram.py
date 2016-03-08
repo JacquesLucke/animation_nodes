@@ -34,7 +34,7 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
 
     cacheType = EnumProperty(name = "Cache Type", items = cacheTypeItems, update = cacheTypeChanged)
     isOutputStorable = BoolProperty(default = False)
-    isInputHashable = BoolProperty(default = False)
+    isInputComparable = BoolProperty(default = False)
 
     def create(self):
         self.width = 170
@@ -120,7 +120,7 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
             col = layout.column(align = True)
             layout.label("This caching method is not available:")
             if not self.isOutputStorable: layout.label("  - The output is not storable")
-            if not self.isInputHashable: layout.label("  - The input is not hashable")
+            if not self.isInputComparable: layout.label("  - The input is not comparable")
         self.invokeFunction(layout, "clearCache", text = "Clear Cache")
 
 
@@ -134,7 +134,7 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
         self.clearCache()
 
     def checkCachingPossibilities(self):
-        self.isInputHashable = all(socket.hashable for socket in self.inputs)
+        self.isInputComparable = all(socket.comparable for socket in self.inputs)
         self.isOutputStorable = all(socket.storable for socket in self.outputs)
 
 
@@ -157,7 +157,7 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
     def canCache(self):
         if self.cacheType == "DISABLED": return True
         if self.cacheType in ("ONE_TIME", "FRAME_BASED") and self.isOutputStorable: return True
-        if self.cacheType == "INPUT_BASED" and self.isInputHashable and self.isOutputStorable: return True
+        if self.cacheType == "INPUT_BASED" and self.isInputComparable and self.isOutputStorable: return True
         return False
 
 

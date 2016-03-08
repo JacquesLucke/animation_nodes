@@ -11,7 +11,7 @@ class ShapeKeySocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Shape Key"]
     drawColor = (1.0, 0.6, 0.5, 1)
     storable = False
-    hashable = True
+    comparable = True
 
     objectName = StringProperty(update = propertyChanged,
         description = "Load the second shape key of this object (the first that is not the reference key)")

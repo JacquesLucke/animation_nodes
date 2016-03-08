@@ -14,7 +14,7 @@ class IntegerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     dataType = "Integer"
     allowedInputTypes = ["Integer"]
     drawColor = (0.3, 0.4, 1.0, 1.0)
-    hashable = True
+    comparable = True
     storable = True
 
     value = IntProperty(default = 0,

@@ -8,7 +8,7 @@ class ParticleListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Particle List"]
     drawColor = (0.5, 0.3, 0.1, 0.5)
     storable = False
-    hashable = False
+    comparable = False
 
     def getValueCode(self):
         return "[]"

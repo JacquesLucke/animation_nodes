@@ -11,7 +11,7 @@ class VectorSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Vector"]
     drawColor = (0.15, 0.15, 0.8, 1.0)
     storable = True
-    hashable = False
+    comparable = False
 
     value = FloatVectorProperty(default = [0, 0, 0], update = propertyChanged, subtype = "XYZ")
 

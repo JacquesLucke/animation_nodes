@@ -8,7 +8,7 @@ class IntegerListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Integer List", "Edge Indices", "Polygon Indices"]
     drawColor = (0.3, 0.4, 1.0, 0.5)
     storable = True
-    hashable = False
+    comparable = False
 
     def getValueCode(self):
         return "[]"

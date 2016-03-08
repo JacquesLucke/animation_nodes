@@ -8,7 +8,7 @@ class PolygonListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Polygon List"]
     drawColor = (0.4, 0.7, 0.3, 0.5)
     storable = True
-    hashable = False
+    comparable = False
 
     def getValueCode(self):
         return "[]"

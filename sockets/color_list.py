@@ -8,7 +8,7 @@ class ColorListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Color List"]
     drawColor = (0.8, 0.8, 0.2, 0.5)
     storable = True
-    hashable = False
+    comparable = False
 
     def getValueCode(self):
         return "[]"

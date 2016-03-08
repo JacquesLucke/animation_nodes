@@ -10,7 +10,7 @@ class TextBlockSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Text Block"]
     drawColor = (0.5, 0.5, 0.5, 1)
     storable = False
-    hashable = True
+    comparable = True
 
     textBlockName = StringProperty(update = propertyChanged)
 

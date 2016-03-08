@@ -11,7 +11,7 @@ class BooleanSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Boolean"]
     drawColor = (0.7, 0.7, 0.4, 1)
     storable = True
-    hashable = True
+    comparable = True
 
     value = BoolProperty(default = True, update = propertyChanged)
     showCreateCompareNodeButton = BoolProperty(default = False)

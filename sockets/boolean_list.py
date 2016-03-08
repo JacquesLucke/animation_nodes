@@ -8,7 +8,7 @@ class BooleanListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Boolean List"]
     drawColor = (0.7, 0.7, 0.4, 0.5)
     storable = True
-    hashable = False
+    comparable = False
 
     def getValueCode(self):
         return "[]"

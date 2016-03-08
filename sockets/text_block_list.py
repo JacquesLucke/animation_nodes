@@ -8,7 +8,7 @@ class TextBlockListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Text Block List"]
     drawColor = (0.5, 0.5, 0.5, 0.5)
     storable = False
-    hashable = False
+    comparable = False
 
     def getValueCode(self):
         return "[]"

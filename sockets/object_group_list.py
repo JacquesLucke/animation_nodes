@@ -8,7 +8,7 @@ class ObjectGroupListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Object Group List"]
     drawColor = (0.3, 0.1, 0.1, 0.5)
     storable = False
-    hashable = False
+    comparable = False
 
     def getValueCode(self):
         return "[]"

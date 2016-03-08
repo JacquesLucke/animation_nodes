@@ -38,7 +38,7 @@ class SoundSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Sound"]
     drawColor = (0.9, 0.7, 0.4, 1)
     storable = False
-    hashable = False
+    comparable = False
 
     bakeData = EnumProperty(name = "Bake Data", items = getBakeDataItems, update = propertyChanged)
 

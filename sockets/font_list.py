@@ -8,7 +8,7 @@ class FontListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Font List"]
     drawColor = (0.444, 0.444, 0, 0.5)
     storable = False
-    hashable = False
+    comparable = False
 
     def getValueCode(self):
         return "[]"
