@@ -10,7 +10,7 @@ class VertexSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Vertex"]
     drawColor = (0.55, 0.61, 0.32, 1)
     storable = True
-    hashable = True
+    hashable = False
 
     def getValue(self):
         return Vertex(location = Vector((0, 0, 0)),
