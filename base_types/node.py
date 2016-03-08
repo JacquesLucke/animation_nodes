@@ -233,8 +233,11 @@ class AnimationNode:
         return list(nodes)
 
     def removeLinks(self):
+        removedLink = False
         for socket in self.sockets:
-            socket.removeLinks()
+            if socket.removeLinks():
+                removedLink = True
+        return removedLink
 
 
     @property
