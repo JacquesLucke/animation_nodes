@@ -103,6 +103,10 @@ class Polygon:
         return Polygon(copyVectorList(self.vertexLocations), self.normal.copy(),
                        self.center, self.area, self.materialIndex)
 
+    def __repr__(self):
+        return "<Polygon - Center: ({:.3f}, {:.3f}, {:.3f}), Verts: {}>".format(
+            self.center.x, self.center.y, self.center.z, len(self.vertexLocations))
+
 
 def copyVectorList(list):
     return [vertex.copy() for vertex in list]
