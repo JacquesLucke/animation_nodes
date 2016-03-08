@@ -76,6 +76,10 @@ def toListDataType(input):
     if isIdName(input): return baseIdNameToListDataType(input)
     else: return baseDataTypeToListDataType(input)
 
+def isComparable(input):
+    if not isIdName(input): input = toIdName(input)
+    return getSocketClassFromIdName(input).comparable
+
 
 # Base Data Type <-> List Data Type
 def listDataTypeToBaseDataType(dataType):
