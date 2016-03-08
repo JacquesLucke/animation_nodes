@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... tree_info import keepNodeState
-from ... ui.info_popups import show_text
+from ... ui.info_popups import showTextPopup
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 from ... sockets.info import (toIdName, toListIdName, toBaseDataType, isBase,
@@ -98,7 +98,7 @@ class RemoveListElementNode(bpy.types.Node, AnimationNode):
 
     def show_type_error(self, dataType):
         text = "This list type only supports element removal using an index: '{}'".format(toListDataType(dataType))
-        show_text(text = text, title = "Error", icon = "ERROR")
+        showTextPopup(text = text, title = "Error", icon = "ERROR")
 
     @keepNodeState
     def generateSockets(self):
