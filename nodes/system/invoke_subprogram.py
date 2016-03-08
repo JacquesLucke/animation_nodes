@@ -31,10 +31,14 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
     def cacheTypeChanged(self, context):
         self.clearCache()
         executionCodeChanged()
+        self.showCacheOptions = True
 
     cacheType = EnumProperty(name = "Cache Type", items = cacheTypeItems, update = cacheTypeChanged)
     isOutputStorable = BoolProperty(default = False)
     isInputComparable = BoolProperty(default = False)
+
+    showCacheOptions = BoolProperty(name = "Show Cache Options", default = False,
+    description = "Draw cache options in the node for easier access")
 
     def create(self):
         self.width = 170
@@ -110,17 +114,24 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
         props = row.operator("an.empty_subprogram_template", icon = "NEW", text = "New Subprogram" if len(networks) == 0 else "")
         props.targetNodeIdentifier = self.identifier
 
+        if self.showCacheOptions:
+            self.drawCacheOptions(layout)
+
         layout.separator()
 
     def drawAdvanced(self, layout):
+        self.drawCacheOptions(layout)
+        layout.prop(self, "showCacheOptions")
+
+    def drawCacheOptions(self, layout):
         col = layout.column()
         col.active = self.isOutputStorable
         col.prop(self, "cacheType")
         if not self.canCache:
             col = layout.column(align = True)
-            layout.label("This caching method is not available:")
-            if not self.isOutputStorable: layout.label("  - The output is not storable")
-            if not self.isInputComparable: layout.label("  - The input is not comparable")
+            col.label("This caching method is not available:")
+            if not self.isOutputStorable: col.label("  - The output is not storable")
+            if not self.isInputComparable: col.label("  - The input is not comparable")
         self.invokeFunction(layout, "clearCache", text = "Clear Cache")
 
 
