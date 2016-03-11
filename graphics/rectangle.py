@@ -8,6 +8,10 @@ class Rectangle:
         self.borderColor = (0.1, 0.1, 0.1, 1.0)
         self.borderThickness = 0
 
+    @classmethod
+    def fromRegionDimensions(cls, region):
+        return cls(0, 0, region.width, region.height)
+
     def resetPosition(self, x1 = 0, y1 = 0, x2 = 0, y2 = 0):
         self.x1 = float(x1)
         self.y1 =  float(y1)

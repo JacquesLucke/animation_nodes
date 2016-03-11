@@ -3,12 +3,15 @@ from bgl import *
 
 dpi = 72
 
-def set_drawing_dpi(new_dpi):
+def set_text_drawing_dpi(new_dpi):
     global dpi
     dpi = new_dpi
 
 def draw_horizontal_line(x, y, length, color, width):
     draw_line(x, y, x + length, y, color, width)
+
+def draw_vertical_line(x, y, length, color, width):
+    draw_line(x, y, x, y + length, color, width)
 
 def draw_line(x1, y1, x2, y2, color, width):
     glLineWidth(width)

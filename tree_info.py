@@ -158,6 +158,7 @@ class NodeNetworks:
 class NodeNetwork:
     def __init__(self, nodeIDs):
         self.nodeIDs = nodeIDs
+        self.nodeTreeName = nodeIDs[0][0]
         self.type = "Invalid"
         self.name = ""
         self.description = ""
@@ -507,3 +508,9 @@ def getNetworkByIdentifier(identifier):
     for network in getNetworks():
         if network.identifier == identifier: return network
     return None
+
+def getNetworksByNodeTree(nodeTree):
+    return [network for network in getNetworks() if network.nodeTreeName == nodeTree.name]
+
+def getSubprogramNetworksByNodeTree(nodeTree):
+    return [network for network in _networks.networks if network.isSubnetwork and network.nodeTreeName == nodeTree.name]
