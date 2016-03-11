@@ -83,8 +83,11 @@ class Spline:
         if amount == 1: return [(start + end) / 2]
 
         if start > end: start, end = end, start
-        factor = (end - start) / (amount - 1)
-        return [i * factor + start for i in range(amount)]
+        stepDivisor = amount - 1
+        if self.isCyclic and start <= 0 and end >= 1:
+            stepDivisor = amount
+        step = (end - start) / stepDivisor
+        return [i * step + start for i in range(amount)]
 
     # call ensureUniformConverter first
     def toUniformParameter(self, parameter):
