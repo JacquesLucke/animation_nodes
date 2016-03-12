@@ -25,6 +25,12 @@ class StatisticsDrawer(bpy.types.Operator):
         self.drawHandler = bpy.types.SpaceNodeEditor.draw_handler_add(self.drawCallback, args, "WINDOW", "POST_PIXEL")
         context.window_manager.modal_handler_add(self)
 
+        dpiFactor = getDpiFactor()
+        self.drawOffset = Vector((20 * dpiFactor, context.region.height - 40 * dpiFactor))
+
+        self.lastMousePosition = Vector((event.mouse_region_x, event.mouse_region_y))
+        self.enableViewDrag = False
+
         self.updateStatistics()
         return {"RUNNING_MODAL"}
 
@@ -39,6 +45,17 @@ class StatisticsDrawer(bpy.types.Operator):
 
         if event.type in {"RIGHTMOUSE", "ESC"}:
             return self.finish()
+
+        mousePosition = Vector((event.mouse_region_x, event.mouse_region_y))
+        if "CTRL" in event.type:
+            if event.value == "PRESS": self.enableViewDrag = True
+            if event.value == "RELEASE": self.enableViewDrag = False
+        if self.enableViewDrag:
+            self.drawOffset += mousePosition - self.lastMousePosition
+        self.lastMousePosition = mousePosition
+
+        if self.enableViewDrag:
+            return {"RUNNING_MODAL"}
 
         return {"PASS_THROUGH"}
 
@@ -59,10 +76,11 @@ class StatisticsDrawer(bpy.types.Operator):
 
         setTextDrawingDpi(getDpi())
 
-        drawText("Press ESC or RMB to exit this view", 10 * dpiFactor, region.height - 20 * dpiFactor,
+        text = "Hold CTRL to drag the statistics - Press ESC or RMB to exit this view"
+        drawText(text, 10 * dpiFactor, region.height - 20 * dpiFactor,
             color = (0, 0, 0, 0.5), size = 11)
 
-        offset = Vector((20 * dpiFactor, region.height - 40 * dpiFactor))
+        offset = self.drawOffset.copy()
         self.drawNodeTreeTable(offset, dpiFactor)
 
         offset.x += 500 * dpiFactor
