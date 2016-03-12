@@ -1,10 +1,13 @@
 import bpy
 from mathutils import Vector
 from collections import defaultdict
-from .. utils.nodes import getAnimationNodeTrees
-from .. graphics.drawing_2d import draw_text, set_text_drawing_dpi, draw_horizontal_line, draw_vertical_line
+from .. graphics.table import Table
 from .. graphics.rectangle import Rectangle
+from .. utils.nodes import getAnimationNodeTrees
 from .. utils.blender_ui import getDpiFactor, getDpi
+from .. graphics.drawing_2d import drawText, setTextDrawingDpi
+
+statisticsViewIsActive = False
 
 class StatisticsDrawer(bpy.types.Operator):
     bl_idname = "an.statistics_drawer"
@@ -12,15 +15,23 @@ class StatisticsDrawer(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return context.area.type == "NODE_EDITOR"
+        return context.area.type == "NODE_EDITOR" and not statisticsViewIsActive
 
     def invoke(self, context, event):
+        global statisticsViewIsActive
+        statisticsViewIsActive = True
+
         args = ()
-        self.draw_handler = bpy.types.SpaceNodeEditor.draw_handler_add(self.draw_callback_px, args, "WINDOW", "POST_PIXEL")
+        self.drawHandler = bpy.types.SpaceNodeEditor.draw_handler_add(self.drawCallback, args, "WINDOW", "POST_PIXEL")
         context.window_manager.modal_handler_add(self)
 
-        self.stats = NodeStatistics(getAnimationNodeTrees())
+        self.updateStatistics()
         return {"RUNNING_MODAL"}
+
+    def updateStatistics(self):
+        self.statistics = NodeStatistics(getAnimationNodeTrees())
+        self.nodeTreeTable = createNodeTreeTable(self.statistics)
+        self.mostUsedNodesTable = createMostUsedNodesTable(self.statistics)
 
     def modal(self, context, event):
         context.area.tag_redraw()
@@ -31,10 +42,13 @@ class StatisticsDrawer(bpy.types.Operator):
         return {"PASS_THROUGH"}
 
     def finish(self):
-        bpy.types.SpaceNodeEditor.draw_handler_remove(self.draw_handler, "WINDOW")
+        bpy.types.SpaceNodeEditor.draw_handler_remove(self.drawHandler, "WINDOW")
+        global statisticsViewIsActive
+        statisticsViewIsActive = False
         return {"FINISHED"}
 
-    def draw_callback_px(self):
+    def drawCallback(self):
+        self.updateStatistics()
         region = bpy.context.region
 
         dpiFactor = getDpiFactor()
@@ -42,19 +56,76 @@ class StatisticsDrawer(bpy.types.Operator):
         bg.color = (1, 1, 1, 0.5)
         bg.draw()
 
-        set_text_drawing_dpi(getDpi())
+        setTextDrawingDpi(getDpi())
 
-        draw_text("Press ESC to exit this view", 10 * dpiFactor, region.height - 20 * dpiFactor,
+        drawText("Press ESC or RMB to exit this view", 10 * dpiFactor, region.height - 20 * dpiFactor,
             color = (0, 0, 0, 0.5), size = 11)
 
-        offset = Vector((150 * dpiFactor, region.height - 100 * dpiFactor))
+        offset = Vector((20 * dpiFactor, region.height - 40 * dpiFactor))
+        self.drawNodeTreeTable(offset, dpiFactor)
 
-        for i in range(4):
-            draw_vertical_line((150 + 100 * i) * dpiFactor, region.height - 100 * dpiFactor, -200 * dpiFactor,
-                width = 1, color = (0, 0, 0, 0.5))
+        offset.x += 500 * dpiFactor
+        self.drawMostUsedNodesTable(offset, dpiFactor)
 
-        for i in range(self.stats.nodeTreeAmount):
-            draw_horizontal_line
+    def drawNodeTreeTable(self, location, dpiFactor):
+        table = self.nodeTreeTable
+
+        table.clearColumns()
+        table.newColumn("Tree", 200 * dpiFactor, "CENTER", font = 0)
+        table.newColumn("Nodes", 80 * dpiFactor, "RIGHT", font = 1)
+        table.newColumn("Links", 80 * dpiFactor, "RIGHT", font = 1)
+        table.newColumn("Subprograms", 110 * dpiFactor, "RIGHT", font = 1)
+
+        table.rowHeight = 22 * dpiFactor
+        table.headerRowHeight = 30 * dpiFactor
+        table.lineThickness = 1 * dpiFactor
+        table.cellPadding = 5 * dpiFactor
+        table.dataFontSize = 11
+        table.headerFontSize = 14
+        table.draw(location)
+
+    def drawMostUsedNodesTable(self, location, dpiFactor):
+        table = self.mostUsedNodesTable
+
+        table.clearColumns()
+        table.newColumn("#", 30 * dpiFactor, "RIGHT", font = 1)
+        table.newColumn("Node", 200 * dpiFactor, "LEFT", font = 0)
+        table.newColumn("Amount", 80 * dpiFactor, "RIGHT", font = 1)
+
+        table.rowHeight = 22 * dpiFactor
+        table.headerRowHeight = 30 * dpiFactor
+        table.lineThickness = 1 * dpiFactor
+        table.cellPadding = 5 * dpiFactor
+        table.dataFontSize = 11
+        table.headerFontSize = 14
+        table.draw(location)
+
+
+
+def createNodeTreeTable(statistics):
+    table = Table()
+
+    for stats in statistics.nodeTreeStats + [statistics.combinedStats]:
+        table.newRow({
+            "Tree" : stats.name,
+            "Nodes" : "{} / {}".format(stats.functionalNodeAmount, stats.totalNodeAmount),
+            "Links" : stats.totalLinkAmount,
+            "Subprograms" : stats.subprogramAmount})
+
+    return table
+
+def createMostUsedNodesTable(statistics):
+    table = Table()
+    stats = statistics.combinedStats
+    items = sorted(stats.amountByLabel.items(), key = lambda x: x[1], reverse = True)[:10]
+
+    for i, (name, amount) in enumerate(items, 1):
+        table.newRow({
+            "#" : str(i),
+            "Node" : name,
+            "Amount" : amount})
+
+    return table
 
 
 class NodeStatistics:
@@ -62,6 +133,7 @@ class NodeStatistics:
         self.nodeTreeAmount = len(nodeTrees)
         self.nodeTreeStats = [TreeStatistics.fromTree(tree) for tree in nodeTrees]
         self.combinedStats = TreeStatistics.fromMerge(self.nodeTreeStats)
+        self.combinedStats.name = "Sum:"
 
 class TreeStatistics:
     def __init__(self):
@@ -70,23 +142,23 @@ class TreeStatistics:
         self.totalLinkAmount = 0
         self.functionalNodeAmount = 0
         self.subprogramAmount = 0
-        self.amountByIdName = defaultdict(int)
+        self.amountByLabel = defaultdict(int)
 
     @classmethod
     def fromTree(cls, nodeTree):
         stats = cls()
 
-        stats.name = nodeTree.name
+        stats.name = repr(nodeTree.name)
         stats.totalNodeAmount = len(nodeTree.nodes)
         stats.totalLinkAmount = len(nodeTree.links)
         stats.subprogramAmount = len(nodeTree.subprogramNetworks)
 
         for node in nodeTree.nodes:
-            stats.amountByIdName[node.bl_idname] += 1
+            stats.amountByLabel[node.bl_label] += 1
 
-        stats.functionalNodeAmount = stats.totalLinkAmount \
-                     - stats.amountByIdName["NodeReroute"] \
-                     - stats.amountByIdName["NodeFrame"]
+        stats.functionalNodeAmount = stats.totalNodeAmount \
+                     - stats.amountByLabel["Reroute"] \
+                     - stats.amountByLabel["Frame"]
 
         return stats
 
@@ -101,7 +173,7 @@ class TreeStatistics:
         stats.subprogramAmount = sum(s.subprogramAmount for s in statistics)
 
         for s in statistics:
-            for idName, amount in s.amountByIdName.items():
-                stats.amountByIdName[idName] += amount
+            for name, amount in s.amountByLabel.items():
+                stats.amountByLabel[name] += amount
 
         return stats
