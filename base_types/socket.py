@@ -44,7 +44,9 @@ class AnimationNodeSocket:
     moveable = BoolProperty(default = False)
     moveGroup = IntProperty(default = 0)
 
-    isUsed = BoolProperty(default = True, update = executionCodeChanged)
+    isUsed = BoolProperty(name = "Is Used", default = True,
+        description = "Enable to tell the node that the socket should be used",
+        update = executionCodeChanged)
     useIsUsedProperty = BoolProperty(default = False)
 
     display = PointerProperty(type = SocketDisplayProperties)

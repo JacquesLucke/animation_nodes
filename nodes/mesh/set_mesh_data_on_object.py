@@ -23,11 +23,14 @@ class SetMeshDataOnObjectNode(bpy.types.Node, AnimationNode):
         socket = self.inputs.new("an_ObjectSocket", "Object", "object")
         socket.defaultDrawType = "PROPERTY_ONLY"
         socket.objectCreationType = "MESH"
+
         self.inputs.new("an_MeshDataSocket", "Mesh Data", "meshData")
-        socket = self.inputs.new("an_IntegerListSocket", "Material Indices", "materialIndices")
-        socket.hide = True
-        socket.isUsed = False
-        socket.useIsUsedProperty = True
+        self.inputs.new("an_IntegerListSocket", "Material Indices", "materialIndices").hide = True
+
+        for socket in self.inputs[1:]:
+            socket.isUsed = False
+            socket.useIsUsedProperty = True
+
         self.outputs.new("an_ObjectSocket", "Object", "object")
 
     def draw(self, layout):
@@ -41,13 +44,11 @@ class SetMeshDataOnObjectNode(bpy.types.Node, AnimationNode):
     def getExecutionCode(self):
         yield "self.errorMessage = ''"
         yield "if self.isValidObject(object):"
-        yield "    self.setMeshData(object, meshData)"
 
-        if "Material Indices" in self.inputs:
-            if self.inputs["Material Indices"].isUsed:
-                yield "    self.setMaterialIndices(object, materialIndices)"
-
-        yield "    object.data.validate()"
+        if self.inputs["Mesh Data"].isUsed:                  yield "    self.setMeshData(object, meshData)"
+        if self.inputs["Material Indices"].isUsed:           yield "    self.setMaterialIndices(object, materialIndices)"
+        if any(socket.isUsed for socket in self.inputs[1:]): yield "    object.data.validate()"
+        else: yield "    pass"
 
     def isValidObject(self, object):
         if object is None: return False
@@ -70,11 +71,13 @@ class SetMeshDataOnObjectNode(bpy.types.Node, AnimationNode):
         object.data.from_pydata(meshData.vertices, meshData.edges, meshData.polygons)
 
     def setMaterialIndices(self, object, materialIndices):
+        mesh = object.data
         if len(materialIndices) == 0: return
+        if len(mesh.polygons) == 0: return
         if any(index < 0 for index in materialIndices):
             self.errorMessage = "Material indices have to be greater or equal to zero"
             return
 
-        mesh = object.data
         allMaterialIndices = list(itertools.islice(itertools.cycle(materialIndices), len(mesh.polygons)))
         mesh.polygons.foreach_set("material_index", allMaterialIndices)
+        mesh.polygons[0].material_index = materialIndices[0]
