@@ -47,6 +47,7 @@ searchItems = {
 class FloatMathNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_FloatMathNode"
     bl_label = "Math"
+    dynamicLabelType = "HIDDEN_ONLY"
 
     @classmethod
     def getSearchTags(cls):

@@ -10,6 +10,7 @@ items = [("ROUND", "Round", ""),
 class FloatToIntegerNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_FloatToIntegerNode"
     bl_label = "Float to Integer"
+    dynamicLabelType = "ALWAYS"
 
     type = EnumProperty(name = "Conversion Type", items = items, default = "FLOOR", update = executionCodeChanged)
 

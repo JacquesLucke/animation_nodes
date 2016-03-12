@@ -29,6 +29,7 @@ operationsWithDegree = ["MULTIPLY", "DIVIDE"]
 class EulerMathNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_EulerMathNode"
     bl_label = "Euler Math"
+    dynamicLabelType = "HIDDEN_ONLY"
 
     def operationChanged(self, context):
         self.createInputs()

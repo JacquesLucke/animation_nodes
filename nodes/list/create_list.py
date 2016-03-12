@@ -8,6 +8,7 @@ from ... sockets.info import (getBaseDataTypeItemsCallback, toIdName, toListIdNa
 class CreateListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CreateListNode"
     bl_label = "Create List"
+    dynamicLabelType = "ALWAYS"
     onlySearchTags = True
 
     @classmethod

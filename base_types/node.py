@@ -32,6 +32,9 @@ class AnimationNode:
     # can contain: 'No Execution', 'No Subprogram', 'No Auto Execution'
     options = set()
 
+    # can be "NONE", "ALWAYS" or "HIDDEN_ONLY"
+    dynamicLabelType = "NONE"
+
     @classmethod
     def poll(cls, nodeTree):
         return nodeTree.bl_idname == "an_AnimationNodeTree"
@@ -98,6 +101,7 @@ class AnimationNode:
     ######################################
 
     def init(self, context):
+        self.width_hidden = 100
         self.identifier = createIdentifier()
         self.create()
 
@@ -118,7 +122,11 @@ class AnimationNode:
         self.draw(layout)
 
     def draw_label(self):
-        if self.id_data.dynamicNodeLabels:
+        if self.dynamicLabelType == "NONE":
+            return self.bl_label
+        elif self.dynamicLabelType == "ALWAYS":
+            return self.drawLabel()
+        elif self.dynamicLabelType == "HIDDEN_ONLY" and self.hide:
             return self.drawLabel()
         else:
             return self.bl_label

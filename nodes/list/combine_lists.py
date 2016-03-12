@@ -6,6 +6,7 @@ from ... sockets.info import getBaseDataTypeItemsCallback, toListIdName, getList
 class CombineListsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CombineListsNode"
     bl_label = "Combine Lists"
+    dynamicLabelType = "ALWAYS"
     onlySearchTags = True
 
     @classmethod

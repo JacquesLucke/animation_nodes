@@ -43,6 +43,7 @@ operationsWithStepVector = ["SNAP"]
 class VectorMathNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_VectorMathNode"
     bl_label = "Vector Math"
+    dynamicLabelType = "HIDDEN_ONLY"
 
     @classmethod
     def getSearchTags(cls):

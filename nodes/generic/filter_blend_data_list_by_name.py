@@ -12,6 +12,7 @@ filterTypeItems = [("STARTS_WITH", "Starts With", "All Objects with names starti
 class FilterBlendDataListByNameNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_FilterBlendDataListByNameNode"
     bl_label = "Filter Blend Data List By Name"
+    dynamicLabelType = "ALWAYS"
 
     onlySearchTags = True
     searchTags = [("Filter {} List by Name".format(name), {"dataType" : repr(name)}) for name in dataTypes]

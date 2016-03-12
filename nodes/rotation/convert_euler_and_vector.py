@@ -10,6 +10,7 @@ conversionTypeItems = [
 class ConvertVectorAndEulerNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ConvertVectorAndEulerNode"
     bl_label = "Convert Vector and Euler"
+    dynamicLabelType = "ALWAYS"
 
     onlySearchTags = True
     searchTags = [(name, {"conversionType" : repr(type)}) for type, name, _,_,_ in conversionTypeItems]

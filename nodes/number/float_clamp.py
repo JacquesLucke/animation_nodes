@@ -6,6 +6,7 @@ from ... base_types.node import AnimationNode
 class FloatClampNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_FloatClampNode"
     bl_label = "Clamp"
+    dynamicLabelType = "HIDDEN_ONLY"
 
     def create(self):
         self.inputs.new("an_FloatSocket", "Value", "value")

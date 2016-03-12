@@ -13,6 +13,7 @@ dataTypes = {
 class BlendDataByNameNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_BlendDataByNameNode"
     bl_label = "Data by Name"
+    dynamicLabelType = "ALWAYS"
 
     onlySearchTags = True
     searchTags = [(name + " by Name", {"dataType" : repr(name)}) for name in dataTypes.keys()]

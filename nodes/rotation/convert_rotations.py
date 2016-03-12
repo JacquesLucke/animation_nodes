@@ -17,6 +17,7 @@ conversionTypeItems = [
 class ConvertRotationsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ConvertRotationsNode"
     bl_label = "Convert Rotations"
+    dynamicLabelType = "ALWAYS"
 
     onlySearchTags = True
     searchTags = [(name, {"conversionType" : repr(type)}) for type, name, _,_,_ in conversionTypeItems]

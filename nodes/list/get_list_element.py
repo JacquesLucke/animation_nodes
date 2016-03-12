@@ -8,6 +8,7 @@ from ... sockets.info import getBaseDataTypeItemsCallback, toIdName, toListIdNam
 class GetListElementNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GetListElementNode"
     bl_label = "Get List Element"
+    dynamicLabelType = "HIDDEN_ONLY"
 
     def assignedTypeChanged(self, context):
         self.baseIdName = toIdName(self.assignedType)
@@ -36,7 +37,7 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
             socketGroup = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
 
     def drawLabel(self):
-        if self.hide and self.inputs["Index"].isUnlinked:
+        if self.inputs["Index"].isUnlinked:
             return "List[{}]".format(self.inputs["Index"].value)
         return "Get List Element"
 

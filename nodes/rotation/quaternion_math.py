@@ -41,6 +41,7 @@ operationsWithStepQuaternion = ["SNAP"]
 class QuaternionMathNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_QuaternionMathNode"
     bl_label = "Quaternion Math"
+    dynamicLabelType = "HIDDEN_ONLY"
 
     def operationChanged(self, context):
         self.createInputs()

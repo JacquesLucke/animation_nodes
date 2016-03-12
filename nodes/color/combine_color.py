@@ -9,45 +9,46 @@ from ... base_types.node import AnimationNode
 # we shall not use other functions, till they are in context (BL color space)
 
 sourceTypeItems = [
-    ("RGB", "RGB", "Red, Green, Blue"),            
-    ("HSV", "HSV", "Hue, Saturation, Value"),      
-    ("HSL", "HSL", "Hue, Saturation, Lightness"),  
-    ("YIQ", "YIQ", "Luma, Chrominance")]           
+    ("RGB", "RGB", "Red, Green, Blue"),
+    ("HSV", "HSV", "Hue, Saturation, Value"),
+    ("HSL", "HSL", "Hue, Saturation, Lightness"),
+    ("YIQ", "YIQ", "Luma, Chrominance")]
 
 class CombineColorNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CombineColorNode"
     bl_label = "Combine Color"
-    
+    dynamicLabelType = "ALWAYS"
+
     def sourceTypeChanged(self, context):
         self.updateHideStatus()
         executionCodeChanged()
-    
-    sourceType = EnumProperty(name = "Source Type", items = sourceTypeItems, 
+
+    sourceType = EnumProperty(name = "Source Type", items = sourceTypeItems,
                                     default = "RGB", update = sourceTypeChanged)
 
     def create(self):
         self.inputs.new("an_FloatSocket", "Red", "red")
         self.inputs.new("an_FloatSocket", "Green", "green")
         self.inputs.new("an_FloatSocket", "Blue", "blue")
-        
+
         self.inputs.new("an_FloatSocket", "Hue", "hue")
         self.inputs.new("an_FloatSocket", "Saturation", "saturation")
         self.inputs.new("an_FloatSocket", "Value", "value")
-        
+
         #same H, S (attention HLS/HSL order! using HSL for sockets, but function does hls!)
         self.inputs.new("an_FloatSocket", "Lightness", "lightness")
-        
+
         self.inputs.new("an_FloatSocket", "Y Luma", "y")
         self.inputs.new("an_FloatSocket", "I In phase", "i")
         self.inputs.new("an_FloatSocket", "Q Quadrature", "q")
-        
+
         self.inputs.new("an_FloatSocket", "Alpha", "alpha").value = 1
         self.updateHideStatus()
         self.outputs.new("an_ColorSocket", "Color", "color")
-        
+
     def draw(self, layout):
         layout.prop(self, "sourceType", expand = True)
-        
+
     def drawLabel(self):
         return self.sourceType + "a --> Col (Linear)"
 
@@ -57,7 +58,7 @@ class CombineColorNode(bpy.types.Node, AnimationNode):
         elif self.sourceType == "HSL":  yield "C = colorsys.hls_to_rgb(hue, lightness, saturation)"
         elif self.sourceType == "YIQ":  yield "C = colorsys.yiq_to_rgb(y, i, q)"
         yield "color = [C[0], C[1], C[2], alpha]"
-    
+
     def getUsedModules(self):
         return ["colorsys"]
 

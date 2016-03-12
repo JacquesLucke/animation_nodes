@@ -15,6 +15,7 @@ nodeTypes = {
 class MixDataNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MixDataNode"
     bl_label = "Mix"
+    dynamicLabelType = "ALWAYS"
 
     onlySearchTags = True
     searchTags = [(tag, {"dataType" : repr(type)}) for type, tag in nodeTypes.items()]

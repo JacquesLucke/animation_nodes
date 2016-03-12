@@ -4,6 +4,7 @@ from ... base_types.node import AnimationNode
 class CombineVectorNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CombineVectorNode"
     bl_label = "Combine Vector"
+    dynamicLabelType = "HIDDEN_ONLY"
 
     def create(self):
         self.inputs.new("an_FloatSocket", "X", "x")
@@ -12,8 +13,6 @@ class CombineVectorNode(bpy.types.Node, AnimationNode):
         self.outputs.new("an_VectorSocket", "Vector", "vector")
 
     def drawLabel(self):
-        if not self.hide: return self.bl_label
-        
         label = "<X, Y, Z>"
         for axis in "XYZ":
             if self.inputs[axis].isUnlinked:

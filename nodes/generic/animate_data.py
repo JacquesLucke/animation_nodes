@@ -8,6 +8,7 @@ from ... base_types.node import AnimationNode
 class AnimateDataNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_AnimateDataNode"
     bl_label = "Animate Data"
+    dynamicLabelType = "ALWAYS"
 
     onlySearchTags = True
     searchTags = [ ("Animate Matrix", {"dataType" : repr("Matrix")}),

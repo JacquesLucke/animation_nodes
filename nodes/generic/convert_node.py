@@ -7,6 +7,7 @@ from ... sockets.info import toIdName
 class ConvertNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ConvertNode"
     bl_label = "Convert"
+    dynamicLabelType = "ALWAYS"
 
     def assignedTypeChanged(self, context):
         self.targetIdName = toIdName(self.assignedType)
