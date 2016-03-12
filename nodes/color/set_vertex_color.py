@@ -1,53 +1,64 @@
 import bpy
 from bpy.props import *
+from mathutils import Color
 from ... base_types.node import AnimationNode
 from ... events import propertyChanged
-
 
 class SetVertexColorNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SetVertexColorNode"
     bl_label = "Set Vertex Color"
 
-    enabled = BoolProperty(default = True, update = propertyChanged)
-    vertexColorName = StringProperty(default = "Col", update = propertyChanged)
+    vertexColorName = StringProperty(name = "Vertex Color Group", default = "Col", update = propertyChanged)
     checkIfColorIsSet = BoolProperty(default = True)
     errorMessage = StringProperty()
 
     def create(self):
         self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
-        self.inputs.new("an_ColorSocket", "Color", "color")
+        self.inputs.new("an_ColorSocket", "Color", "color").defaultDrawType = "PROPERTY_ONLY"
         self.outputs.new("an_ObjectSocket", "Object", "outObject")
 
     def draw(self, layout):
-        layout.prop(self, "enabled", text = "Enabled")
+        layout.prop(self, "vertexColorName", text = "", icon = "GROUP_VCOL")
         if self.errorMessage != "":
             layout.label(self.errorMessage, icon = "ERROR")
 
     def drawAdvanced(self, layout):
         layout.prop(self, "checkIfColorIsSet", text = "Check Color")
-        layout.prop(self, "vertexColorName", text = "Name")
 
     def execute(self, object, color):
-        if not self.enabled: return object
+        self.errorMessage = ""
         if object is None: return object
+        if object.type != "MESH": return object
         if object.mode == "EDIT":
             self.errorMessage = "Object is in edit mode"
             return object
 
         mesh = object.data
 
-        colorLayer = mesh.vertex_colors.get(self.vertexColorName)
-        if colorLayer is None:
-            colorLayer = mesh.vertex_colors.new(self.vertexColorName)
+        # Vertex Colors are internally stored with 8 bytes
+        # I compress the color already here for an easier comparison
+        newColor = tuple(min(max(int(x * 255) / 255, 0), 1) for x in color[:3])
 
-        color = color[:3]
+        colorLayer = getVertexColorLayer(mesh, self.vertexColorName)
+        if len(colorLayer.data) == 0: return object
+
         if self.checkIfColorIsSet:
             oldColor = colorLayer.data[0].color
-            if abs(color[0] * 100 + color[1] * 10 + color[2] - oldColor[0] * 100 - oldColor[1] * 10 - oldColor[2]) < 0.001:
+            if colorsAreEqual(newColor, oldColor):
                 return object
 
-        for meshColor in colorLayer.data:
-            meshColor.color = color
+        colorList = tuple(newColor) * len(colorLayer.data)
+        colorLayer.data.foreach_set("color", colorList)
 
-        self.errorMessage = ""
+        # without this line the 3d view doesn't update
+        colorLayer.data[0].color = newColor
+
         return object
+
+def getVertexColorLayer(mesh, name):
+    try: return mesh.vertex_colors[name]
+    except: return mesh.vertex_colors.new(name)
+
+def colorsAreEqual(a, b):
+    return abs((a[0] * 100 + a[1] * 10 + a[2])
+              -(b[0] * 100 + b[1] * 10 + b[2])) < 0.001
