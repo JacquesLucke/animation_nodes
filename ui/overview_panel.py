@@ -24,14 +24,10 @@ class OverviewPanel(bpy.types.Panel):
         col = layout.box().column(align = True)
         for tree in trees:
             row = col.row(align = True)
-            row.label(tree.name)
+            row.operator("an.switch_tree", text = tree.name, emboss = False).treeName = tree.name
             row.label(prettyTime(tree.executionTime), icon = "TIME")
 
             icon = "LAYER_ACTIVE" if tree.autoExecution.enabled else "LAYER_USED"
             row.prop(tree.autoExecution, "enabled", icon = icon, text = "", icon_only = True)
 
-        nodes = [node for node in tree.nodes for tree in trees]
-        totalNodes = len(nodes)
-        layout.label("Total Nodes: {}".format(totalNodes))
-
-        layout.operator("an.statistics_drawer", text = "Statistics")
+        layout.operator("an.statistics_drawer", text = "Statistics", icon = "LINENUMBERS_ON")
