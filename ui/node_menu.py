@@ -442,8 +442,10 @@ class InterpolationMenu(bpy.types.Menu):
         insertNode(layout, "an_ConstructInterpolationNode", "Construct")
         insertNode(layout, "an_InterpolationFromCurveMappingNode", "From Curve Mapping")
         insertNode(layout, "an_InterpolationFromFCurveNode", "From FCurve")
-        insertNode(layout, "an_EvaluateInterpolationNode", "Evaluate")
         insertNode(layout, "an_MixInterpolationNode", "Mix")
+        layout.separator()
+        insertNode(layout, "an_EvaluateInterpolationNode", "Evaluate")
+        insertNode(layout, "an_MapRangeNode", "Map Range", {"useInterpolation" : repr(True)})
 
 class MaterialMenu(bpy.types.Menu):
     bl_idname = "an_material_menu"
