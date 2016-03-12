@@ -34,7 +34,8 @@ class StatisticsDrawer(bpy.types.Operator):
         self.mostUsedNodesTable = createMostUsedNodesTable(self.statistics)
 
     def modal(self, context, event):
-        context.area.tag_redraw()
+        if context.area is not None:
+            context.area.tag_redraw()
 
         if event.type in {"RIGHTMOUSE", "ESC"}:
             return self.finish()
@@ -89,7 +90,7 @@ class StatisticsDrawer(bpy.types.Operator):
 
         table.clearColumns()
         table.newColumn("#", 30 * dpiFactor, "RIGHT", font = 1)
-        table.newColumn("Node", 200 * dpiFactor, "LEFT", font = 0)
+        table.newColumn("Node", 170 * dpiFactor, "LEFT", font = 0)
         table.newColumn("Amount", 80 * dpiFactor, "RIGHT", font = 1)
 
         table.rowHeight = 22 * dpiFactor
