@@ -27,6 +27,10 @@ def getSocket(treeName, nodeName, isOutput, identifier):
 def getNode(treeName, nodeName):
     return bpy.data.node_groups[treeName].nodes[nodeName]
 
+def getLabelFromIdName(idName):
+    cls = getattr(bpy.types, idName, None)
+    return getattr(cls, "bl_label", "")
+
 def iterAnimationNodesSockets():
     for node in iterAnimationNodes():
         yield from node.inputs
