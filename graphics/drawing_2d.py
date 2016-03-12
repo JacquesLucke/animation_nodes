@@ -3,15 +3,18 @@ from bgl import *
 
 dpi = 72
 
-def set_drawing_dpi(new_dpi):
+def setTextDrawingDpi(new_dpi):
     global dpi
     dpi = new_dpi
 
-def draw_horizontal_line(x, y, length, color, width):
-    draw_line(x, y, x + length, y, color, width)
+def drawHorizontalLine(x, y, length, color, thickness = 1):
+    drawLine(x, y, x + length, y, color, thickness)
 
-def draw_line(x1, y1, x2, y2, color, width):
-    glLineWidth(width)
+def drawVerticalLine(x, y, length, color, thickness = 1):
+    drawLine(x, y, x, y + length, color, thickness)
+
+def drawLine(x1, y1, x2, y2, color, thickness = 1):
+    glLineWidth(thickness)
     glColor4f(*color)
     glEnable(GL_BLEND)
     glBegin(GL_LINES)
@@ -20,24 +23,20 @@ def draw_line(x1, y1, x2, y2, color, width):
     glEnd()
     glLineWidth(1)
 
-def draw_boolean(state, x, y, size = 12, alpha = 1):
-    if state:
-        draw_text("ON", x, y, align = "LEFT", size = size,
-                  color = (0.8, 1, 0.8, alpha))
-    else:
-        draw_text("OFF", x, y, align = "LEFT", size = size,
-                  color = (1, 0.8, 0.8, alpha))
-
-def draw_text(text, x, y, align = "LEFT", size = 12, color = (1, 1, 1, 1)):
-    font = 0
+def drawText(text, x, y, font = 0, align = "LEFT", verticalAlignment = "BASELINE", size = 12, color = (1, 1, 1, 1)):
+    text = str(text)
     blf.size(font, size, int(dpi))
     glColor4f(*color)
 
-    if align == "LEFT":
+    if align == "LEFT" and verticalAlignment == "BASELINE":
         blf.position(font, x, y, 0)
     else:
         width, height = blf.dimensions(font, text)
-        if align == "RIGHT":
-            blf.position(font, x - width, y, 0)
+        newX, newY = x, y
+        if align == "RIGHT": newX -= width
+        elif align == "CENTER": newX -= width / 2
+        if verticalAlignment == "CENTER": newY -= blf.dimensions(font, "x")[1] * 0.75
+
+        blf.position(font, newX, newY, 0)
 
     blf.draw(font, text)

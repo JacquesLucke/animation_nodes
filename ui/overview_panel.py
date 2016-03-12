@@ -10,12 +10,12 @@ class OverviewPanel(bpy.types.Panel):
     bl_region_type = "TOOLS"
     bl_category = "Animation Nodes"
     bl_options = {"DEFAULT_CLOSED"}
-    
+
     @classmethod
     def poll(cls, context):
         try: return context.space_data.node_tree.bl_idname == "an_AnimationNodeTree"
         except: return False
-    
+
     def draw(self, context):
         layout = self.layout
 
@@ -24,12 +24,10 @@ class OverviewPanel(bpy.types.Panel):
         col = layout.box().column(align = True)
         for tree in trees:
             row = col.row(align = True)
-            row.label(tree.name)
+            row.operator("an.switch_tree", text = tree.name, emboss = False).treeName = tree.name
             row.label(prettyTime(tree.executionTime), icon = "TIME")
 
             icon = "LAYER_ACTIVE" if tree.autoExecution.enabled else "LAYER_USED"
             row.prop(tree.autoExecution, "enabled", icon = icon, text = "", icon_only = True)
 
-        nodes = [node for node in tree.nodes for tree in trees]
-        totalNodes = len(nodes)
-        layout.label("Total Nodes: {}".format(totalNodes))
+        layout.operator("an.statistics_drawer", text = "Statistics", icon = "LINENUMBERS_ON")

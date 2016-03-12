@@ -3,7 +3,7 @@ from .. preferences import debuggingIsEnabled
 
 def prettyTime(seconds):
     if seconds > 1.5: return "{:.2f} s".format(seconds)
-    else: return "{:.5f} ms".format(seconds * 1000)
+    else: return "{:.3f} ms".format(seconds * 1000)
 
 def measureTime(function):
     def wrapper(*args, **kwargs):
