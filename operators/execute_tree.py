@@ -1,5 +1,6 @@
 import bpy
 from bpy.props import *
+from .. utils.blender_ui import redrawAll
 
 class ExecuteNodeTree(bpy.types.Operator):
     bl_idname = "an.execute_tree"
@@ -13,6 +14,7 @@ class ExecuteNodeTree(bpy.types.Operator):
         if nodeTree is not None:
             if nodeTree.bl_idname == "an_AnimationNodeTree":
                 nodeTree.execute()
+                redrawAll()
                 return {"FINISHED"}
         self.report({"ERROR"}, "{} is no animation nodes tree".format(repr(self.name)))
         return {"CANCELLED"}

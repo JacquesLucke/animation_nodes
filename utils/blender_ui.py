@@ -31,6 +31,10 @@ def iterActiveScreens():
             yield window.screen
 
 
+def redrawAll():
+    for area in iterAreas():
+        area.tag_redraw()
+
 def isViewportRendering():
     return any([space.viewport_shade == "RENDERED" for space in iterActiveSpacesByType("VIEW_3D")])
 
