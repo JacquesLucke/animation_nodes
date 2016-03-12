@@ -46,7 +46,6 @@ class AnimationNodeTree(bpy.types.NodeTree):
         description = "The global scene used by this node tree (never none)")
 
     editNodeLabels = BoolProperty(name = "Edit Node Labels", default = False)
-    dynamicNodeLabels = BoolProperty(name = "Dynamic Node Labels", default = True)
 
     def update(self):
         treeChanged()

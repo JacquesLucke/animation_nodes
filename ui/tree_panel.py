@@ -26,12 +26,8 @@ class TreePanel(bpy.types.Panel):
         layout.label(prettyTime(tree.executionTime), icon = "TIME")
 
         layout.separator()
-
-        col = layout.column(align = True)
-        col.prop(tree, "dynamicNodeLabels")
-        col.prop(tree, "editNodeLabels")
-
         layout.prop_search(tree, "sceneName", bpy.data, "scenes", icon = "SCENE_DATA", text = "Scene")
+        layout.prop(tree, "editNodeLabels")
 
 
     @classmethod
