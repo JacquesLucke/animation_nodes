@@ -1,7 +1,6 @@
 import bpy, colorsys
 from bpy.props import *
 from ... tree_info import keepNodeState
-from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 
 # using linear conversion here, unlike BL colorpicker hsv/hex
@@ -18,11 +17,10 @@ sourceTypeItems = [
 class CombineColorNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CombineColorNode"
     bl_label = "Combine Color"
-    dynamicLabelType = "ALWAYS"
+    dynamicLabelType = "HIDDEN_ONLY"
 
     def sourceTypeChanged(self, context):
         self.recreateInputs()
-        executionCodeChanged()
 
     sourceType = EnumProperty(name = "Source Type", default = "RGB",
         items = sourceTypeItems, update = sourceTypeChanged)
