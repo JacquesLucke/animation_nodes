@@ -510,6 +510,7 @@ class KDTreeAndBVHTreeMenu(bpy.types.Menu):
         insertNode(layout, "an_FindPointsInRadiusInKDTreeNode", "Find in Radius")
         layout.separator()
         insertNode(layout, "an_ConstructBVHTreeNode", "Construct BVHTree")
+        insertNode(layout, "an_FindNearestSurfacePointNode", "Find Nearest")
         insertNode(layout, "an_RayCastBVHTreeNode", "Ray Cast")
 
 class DebugMenu(bpy.types.Menu):
