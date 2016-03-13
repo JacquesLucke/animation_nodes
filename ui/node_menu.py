@@ -349,10 +349,7 @@ class MeshMenu(bpy.types.Menu):
         insertNode(layout, "an_BMeshFromObjectNode", "BMesh from Object")
         layout.menu("an_mesh_finalizing_menu", text = "Tools")
         layout.separator()
-        layout.label("Set On Object:")
-        insertNode(layout, "an_SetVerticesOnObjectNode", "  Vertex Locations")
-        insertNode(layout, "an_SetMeshDataOnObjectNode", "  Mesh Data")
-        insertNode(layout, "an_SetBMeshOnObjectNode", "  BMesh")
+        insertNode(layout, "an_MeshObjectOutputNode", "Object Output")
 
 class MeshGeneratorsMenu(bpy.types.Menu):
     bl_idname = "an_mesh_generators_menu"
@@ -410,7 +407,7 @@ class SplineMenu(bpy.types.Menu):
         insertNode(layout, "an_GetSplineLengthNode", "Get Length")
         insertNode(layout, "an_GetSplineSamplesNode", "Get Samples")
         layout.separator()
-        insertNode(layout, "an_CurveObjectOutputNode", "Curve Object Output")
+        insertNode(layout, "an_CurveObjectOutputNode", "Object Output")
         layout.separator()
         insertNode(layout, "an_LoftSplinesNode", "Loft")
         insertNode(layout, "an_RevolveSplineNode", "Revolve")

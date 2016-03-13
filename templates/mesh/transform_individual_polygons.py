@@ -10,7 +10,9 @@ class TransformIndividualPolygonsTemplate(bpy.types.Operator, Template):
         meshDataNode = self.newNode('an_ObjectMeshDataNode', x = 0, y = 0)
         loopInvokeNode = self.newNode('an_InvokeSubprogramNode', x = 210, y = 0)
         meshFromPolygonsNode = self.newNode('an_MeshDataFromPolygonsNode', x = 450, y = 0)
-        setOnObjectNode = self.newNode('an_SetMeshDataOnObjectNode', x = 660, y = 0)
+        meshOutput = self.newNode('an_MeshObjectOutputNode', x = 660, y = 0)
+        meshOutput.meshDataType = "MESH_DATA"
+        meshOutput.inputs["Mesh Data"].isUsed = True
 
         loopInputNode = self.newNode('an_LoopInputNode', x = 0, y = -300)
         loopInputNode.newIterator('Polygon List', name = 'Polygon')
@@ -32,5 +34,5 @@ class TransformIndividualPolygonsTemplate(bpy.types.Operator, Template):
         self.newLink(transformPolygon.outputs[0], generatorOutputNode.inputs[1])
         self.newLink(meshDataNode.outputs[4], loopInvokeNode.inputs[0])
         self.newLink(loopInvokeNode.outputs[0], meshFromPolygonsNode.inputs[0])
-        self.newLink(meshFromPolygonsNode.outputs[0], setOnObjectNode.inputs[1])
+        self.newLink(meshFromPolygonsNode.outputs[0], meshOutput.inputs[1])
         self.newLink(composeMatrixNode.outputs[0], transformPolygon.inputs[1])

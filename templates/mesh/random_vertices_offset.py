@@ -10,7 +10,9 @@ class RandomVerticesOffsetTemplate(bpy.types.Operator, Template):
         meshInputNode = self.newNode('an_ObjectMeshDataNode', x = 0, y = 0)
         invokeSubprogramNode = self.newNode('an_InvokeSubprogramNode', x = 210, y = 115)
         combineMeshDataNode = self.newNode('an_CombineMeshDataNode', x = 450, y = 30)
-        setOnObjectNode = self.newNode('an_SetMeshDataOnObjectNode', x = 650, y = 81)
+        meshOutput = self.newNode('an_MeshObjectOutputNode', x = 650, y = 81)
+        meshOutput.meshDataType = "MESH_DATA"
+        meshOutput.inputs["Mesh Data"].isUsed = True
 
         loopInputNode = self.newNode('an_LoopInputNode', x = 70, y = -240)
         loopInputNode.subprogramName = "Move Vertices"
@@ -38,4 +40,4 @@ class RandomVerticesOffsetTemplate(bpy.types.Operator, Template):
         self.newLink(loopInputNode.outputs[4], randomVectorNode.inputs[1])
         self.newLink(loopInputNode.outputs[0], randomVectorNode.inputs[0])
         self.newLink(invokeSubprogramNode.outputs[0], combineMeshDataNode.inputs[0])
-        self.newLink(combineMeshDataNode.outputs[0], setOnObjectNode.inputs[1])
+        self.newLink(combineMeshDataNode.outputs[0], meshOutput.inputs[1])
