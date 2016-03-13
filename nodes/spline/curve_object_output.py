@@ -7,12 +7,16 @@ class CurveObjectOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CurveObjectOutputNode"
     bl_label = "Curve Object Output"
     bl_width_default = 175
+    searchTags = ["Set Splines on Object (old)"]
 
     errorMessage = StringProperty()
 
     def create(self):
-        self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
+        socket = self.inputs.new("an_ObjectSocket", "Object", "object")
+        socket.defaultDrawType = "PROPERTY_ONLY"
+        socket.objectCreationType = "CURVE"
 
+        self.inputs.new("an_SplineListSocket", "Splines", "splines").showObjectInput = False
         self.inputs.new("an_FloatSocket", "Bevel Depth", "bevelDepth")
         self.inputs.new("an_IntegerSocket", "Bevel Resolution", "bevelResolution")
         self.inputs.new("an_FloatSocket", "Extrude", "extrude")
@@ -44,6 +48,7 @@ class CurveObjectOutputNode(bpy.types.Node, AnimationNode):
         yield "    curve = object.data"
 
         s = self.inputs
+        if s["Splines"].isUsed:             yield "    animation_nodes.data_structures.splines.to_blender.setSplinesOnBlenderObject(object, splines)"
         if s["Bevel Depth"].isUsed:         yield "    curve.bevel_depth = bevelDepth"
         if s["Bevel Resolution"].isUsed:    yield "    curve.bevel_resolution = bevelResolution"
         if s["Bevel Start"].isUsed:         yield "    curve.bevel_factor_start = bevelStart"

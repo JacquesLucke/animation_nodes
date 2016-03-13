@@ -61,12 +61,11 @@ class NetworkFromParticlesTemplate(bpy.types.Operator, Template):
 
         if self.connectionType == "SPLINE":
             splinesFromEdgesNode = self.newNode('an_SplinesFromEdgesNode', x = 870, y = 30)
-            setOnObjectNode = self.newNode('an_SetSplinesOnObjectNode', x = 1080, y = 30)
-            curveOutputNode = self.newNode('an_CurveObjectOutputNode', x = 1330, y = 30)
+            curveOutputNode = self.newNode('an_CurveObjectOutputNode', x = 1080, y = 30)
+            curveOutputNode.inputs["Splines"].isUsed = True
             curveOutputNode.inputs["Bevel Depth"].value = 0.005
             curveOutputNode.inputs["Bevel Depth"].isUsed = True
 
             self.newLink(particlesInfoNode.outputs[0], splinesFromEdgesNode.inputs[0])
             self.newLink(findEdgesNode.outputs[0], splinesFromEdgesNode.inputs[1])
-            self.newLink(splinesFromEdgesNode.outputs[0], setOnObjectNode.inputs[1])
-            self.newLink(setOnObjectNode.outputs[0], curveOutputNode.inputs[0])
+            self.newLink(splinesFromEdgesNode.outputs[0], curveOutputNode.inputs[1])
