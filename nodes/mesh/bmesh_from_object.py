@@ -10,13 +10,14 @@ class BMeshFromObjectNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
         self.inputs.new("an_BooleanSocket", "Use World Space", "useWorldSpace").value = True
+        self.inputs.new("an_BooleanSocket", "Use Modifiers", "useModifiers").value = False
         self.inputs.new("an_SceneSocket", "Scene", "scene").hide = True
         self.outputs.new("an_BMeshSocket", "BMesh", "bm")
 
-    def execute(self, object, useWorldSpace, scene):
+    def execute(self, object, useWorldSpace, useModifiers, scene):
         bm = bmesh.new()
         if getattr(object, "type", "") != "MESH" or scene is None: return bm
-        # Seems like the deform and render parameters don't work..
-        bm.from_object(object, scene, deform = True, render = False)
+        # Seems like the deform and render parameters don't work yet..
+        bm.from_object(object, scene, deform = useModifiers, render = isRendering())
         if useWorldSpace: bm.transform(object.matrix_world)
         return bm
