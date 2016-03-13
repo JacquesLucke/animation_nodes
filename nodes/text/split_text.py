@@ -12,6 +12,7 @@ splitTypes = [
 class SplitTextNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SplitTextNode"
     bl_label = "Split Text"
+    bl_width_default = 190
 
     def splitTypeChanges(self, context):
         self.setHideProperty()
@@ -24,7 +25,6 @@ class SplitTextNode(bpy.types.Node, AnimationNode):
     keepDelimiters = BoolProperty(default = False, update = propertyChanged)
 
     def create(self):
-        self.width = 190
         self.inputs.new("an_StringSocket", "Text", "text")
         self.inputs.new("an_StringSocket", "Split By", "splitBy")
         self.outputs.new("an_StringListSocket", "Text List", "textList")

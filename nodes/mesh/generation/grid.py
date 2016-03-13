@@ -9,11 +9,11 @@ from .... events import executionCodeChanged
 class GridMeshNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GridMeshNode"
     bl_label = "Grid Mesh"
+    bl_width_default = 160
 
     centerGrid = BoolProperty(name = "Center", default = True, update = executionCodeChanged)
 
     def create(self):
-        self.width = 160
         divisionsSockets = [
             self.inputs.new("an_IntegerSocket", "X Divisions", "xDivisions"),
             self.inputs.new("an_IntegerSocket", "Y Divisions", "yDivisions") ]

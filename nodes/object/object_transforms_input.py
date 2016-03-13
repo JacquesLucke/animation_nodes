@@ -12,6 +12,7 @@ frameTypeItems = [
 class ObjectTransformsInputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectTransformsInputNode"
     bl_label = "Object Transforms Input"
+    bl_width_default = 165
 
     def useCurrentTransformsChanged(self, context):
         self.updateFrameSocket()
@@ -26,7 +27,6 @@ class ObjectTransformsInputNode(bpy.types.Node, AnimationNode):
         items = frameTypeItems, update = executionCodeChanged)
 
     def create(self):
-        self.width = 165
         self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
         self.outputs.new("an_VectorSocket", "Location", "location")
         self.outputs.new("an_EulerSocket", "Rotation", "rotation")

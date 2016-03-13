@@ -7,6 +7,7 @@ from ... base_types.node import AnimationNode
 class ObjectAttributeInputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectAttributeInputNode"
     bl_label = "Object Attribute Input"
+    bl_width_default = 160
 
     attribute = StringProperty(name = "Attribute", default = "",
         update = executionCodeChanged)
@@ -14,7 +15,6 @@ class ObjectAttributeInputNode(bpy.types.Node, AnimationNode):
     errorMessage = StringProperty()
 
     def create(self):
-        self.width = 160
         self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
         self.outputs.new("an_GenericSocket", "Value", "value")
 

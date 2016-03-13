@@ -10,6 +10,7 @@ from ... utils.nodes import newNodeAtCursor, invokeTranslation
 class GroupOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GroupOutputNode"
     bl_label = "Group Output"
+    bl_width_default = 180
 
     def inputNodeIdentifierChanged(self, context):
         subprogramInterfaceChanged()
@@ -19,7 +20,6 @@ class GroupOutputNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         socket = self.inputs.new("an_NodeControlSocket", "New Return").margin = 0.15
-        self.width = 180
 
     def draw(self, layout):
         if self.inInvalidNetwork:

@@ -26,6 +26,7 @@ categoryItems = [
 class ConstructInterpolationNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ConstructInterpolationNode"
     bl_label = "Construct Interpolation"
+    bl_width_default = 160
 
     def categoryChanged(self, context = None):
         self.createInputs()
@@ -37,7 +38,6 @@ class ConstructInterpolationNode(bpy.types.Node, AnimationNode):
     easeOut = BoolProperty(name = "Ease Out", default = True, update = categoryChanged)
 
     def create(self):
-        self.width = 160
         self.createInputs()
         self.outputs.new("an_InterpolationSocket", "Interpolation", "interpolation")
 

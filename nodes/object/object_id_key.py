@@ -14,6 +14,7 @@ keyDataTypeItems = [
 class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectIDKeyNode"
     bl_label = "Object ID Key"
+    bl_width_default = 160
 
     def keyDataTypeChanged(self, context):
         self.recreateOutputs()
@@ -23,7 +24,6 @@ class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
     keyName = StringProperty(name = "Key Name", update = executionCodeChanged)
 
     def create(self):
-        self.width = 160
         self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
         self.recreateOutputs()
 

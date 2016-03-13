@@ -7,6 +7,7 @@ from ... base_types.node import AnimationNode
 class TextObjectOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_TextObjectOutputNode"
     bl_label = "Text Object Output"
+    bl_width_default = 170
 
     errorMessage = StringProperty()
 
@@ -40,7 +41,6 @@ class TextObjectOutputNode(bpy.types.Node, AnimationNode):
             socket.hide = True
 
         self.outputs.new("an_ObjectSocket", "Object", "object")
-        self.width = 170
 
     def draw(self, layout):
         if self.errorMessage != "":

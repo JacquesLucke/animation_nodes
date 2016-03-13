@@ -18,6 +18,7 @@ class SoundFrequencyRange(bpy.types.PropertyGroup):
 class SoundBakeNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SoundBakeNode"
     bl_label = "Sound Bake"
+    bl_width_default = 300
 
     soundName = StringProperty(name = "Sound")
 
@@ -35,7 +36,6 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
     bakeProgress = StringProperty()
 
     def create(self):
-        self.width = 300
         self.setEqualizerFrequencyRanges(frequencyRanges)
 
     def draw(self, layout):

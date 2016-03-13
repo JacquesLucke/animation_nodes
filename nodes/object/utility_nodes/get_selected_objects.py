@@ -6,9 +6,9 @@ class GetSelectedObjectsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GetSelectedObjectsNode"
     bl_label = "Get Selected Objects"
     searchTags = ["Get Active Object"]
+    bl_width_default = 200
 
     def create(self):
-        self.width = 200
         self.outputs.new("an_ObjectListSocket", "Selected Objects", "selectedObjects")
         self.outputs.new("an_ObjectSocket", "Active Object", "activeObject")
 

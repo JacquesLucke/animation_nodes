@@ -6,11 +6,11 @@ from ... base_types.node import AnimationNode
 class ShapeKeyOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ShapeKeyOutputNode"
     bl_label = "Shape Key Output"
+    bl_width_default = 160
 
     errorMessage = StringProperty()
 
     def create(self):
-        self.width = 160
         self.inputs.new("an_ShapeKeySocket", "Shape Key", "shapeKey").defaultDrawType = "PROPERTY_ONLY"
 
         self.inputs.new("an_FloatSocket", "Value", "value").setRange(0, 1)

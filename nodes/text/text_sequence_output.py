@@ -6,11 +6,11 @@ from ... base_types.node import AnimationNode
 class TextSequenceOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_TextSequenceOutputNode"
     bl_label = "Text Sequence Output"
+    bl_width_default = 160
 
     errorMessage = StringProperty()
 
     def create(self):
-        self.width = 160
         self.inputs.new("an_SequenceSocket", "Sequence", "sequence").defaultDrawType = "PROPERTY_ONLY"
         self.inputs.new("an_StringSocket", "Text", "text")
         self.inputs.new("an_IntegerSocket", "Size", "size").value = 200

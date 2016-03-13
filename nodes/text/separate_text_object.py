@@ -24,6 +24,7 @@ originTypeItems = [
 class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SeparateTextObjectNode"
     bl_label = "Separate Text Object"
+    bl_width_default = 200
 
     sourceObjectName = StringProperty(name = "Source Object")
     currentID = IntProperty(default = 0)
@@ -35,7 +36,6 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.outputs.new("an_ObjectListSocket", "Text Objects", "textObjects")
-        self.width = 200
 
     def draw(self, layout):
         row = layout.row(align = True)

@@ -14,6 +14,7 @@ soundTypeItems = [
 class EvaluateSoundNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_EvaluateSoundNode"
     bl_label = "Evaluate Sound"
+    bl_width_default = 175
 
     def frameTypeChanged(self, context):
         self.inputs["Frame"].hide = False
@@ -33,7 +34,6 @@ class EvaluateSoundNode(bpy.types.Node, AnimationNode):
         items = soundTypeItems, update = soundTypeChanged)
 
     def create(self):
-        self.width = 175
         self.inputs.new("an_SoundSocket", "Sound", "sound")
         self.inputs.new("an_FloatSocket", "Frame", "frame").hide = True
         self.outputs.new("an_FloatSocket", "Strength", "strength")

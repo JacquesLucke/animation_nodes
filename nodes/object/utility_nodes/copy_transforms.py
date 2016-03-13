@@ -10,6 +10,7 @@ frameTypeItems = [
 class CopyTransformsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CopyTransformsNode"
     bl_label = "Copy Transforms"
+    bl_width_default = 170
 
     def useCurrentTransformsChanged(self, context):
         self.inputs["Frame"].hide = self.useCurrentTransforms
@@ -24,7 +25,6 @@ class CopyTransformsNode(bpy.types.Node, AnimationNode):
         items = frameTypeItems, update = executionCodeChanged)
 
     def create(self):
-        self.width = 170
         self.inputs.new("an_ObjectSocket", "From", "fromObject")
         self.inputs.new("an_ObjectSocket", "To", "toObject")
         self.inputs.new("an_FloatSocket", "Frame", "frame").hide = True

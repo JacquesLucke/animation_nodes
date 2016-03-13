@@ -6,11 +6,11 @@ from ... base_types.node import AnimationNode
 class SetBMeshOnObjectNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SetBMeshOnObjectNode"
     bl_label = "Set BMesh on Object"
+    bl_width_default = 170
 
     errorMessage = StringProperty()
 
     def create(self):
-        self.width = 170
         socket = self.inputs.new("an_ObjectSocket", "Object", "object")
         socket.defaultDrawType = "PROPERTY_ONLY"
         socket.objectCreationType = "MESH"

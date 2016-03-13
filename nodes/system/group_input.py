@@ -12,12 +12,12 @@ from . subprogram_sockets import SubprogramData, subprogramInterfaceChanged
 class GroupInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     bl_idname = "an_GroupInputNode"
     bl_label = "Group Input"
+    bl_width_default = 180
 
     def create(self):
         self.randomizeNetworkColor()
         self.subprogramName = "My Group"
         socket = self.outputs.new("an_NodeControlSocket", "New Parameter").margin = 0.15
-        self.width = 180
 
     def draw(self, layout):
         layout.separator()

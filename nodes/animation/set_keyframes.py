@@ -13,6 +13,7 @@ class an_KeyframePath(bpy.types.PropertyGroup):
 class SetKeyframesNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SetKeyframesNode"
     bl_label = "Set Keyframes"
+    bl_width_default = 200
 
     paths = CollectionProperty(type = an_KeyframePath)
 
@@ -20,7 +21,6 @@ class SetKeyframesNode(bpy.types.Node, AnimationNode):
     attributePath = StringProperty(default = "", name = "Attribute Path")
 
     def create(self):
-        self.width = 200
         self.inputs.new("an_BooleanSocket", "Enable", "enable").value = False
         self.inputs.new("an_BooleanSocket", "Set Keyframe", "setKeyframe")
         self.inputs.new("an_BooleanSocket", "Remove Unwanted", "removeUnwanted")

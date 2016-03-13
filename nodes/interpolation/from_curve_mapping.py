@@ -7,11 +7,11 @@ from .. container_provider import getHelperMaterial
 class InterpolationFromCurveMappingNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_InterpolationFromCurveMappingNode"
     bl_label = "Interpolation from Curve Mapping"
+    bl_width_default = 200
 
     curveNodeName = StringProperty(default = "")
 
     def create(self):
-        self.width = 200
         self.outputs.new("an_InterpolationSocket", "Interpolation", "interpolation")
         self.createCurveNode()
 

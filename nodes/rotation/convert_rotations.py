@@ -17,6 +17,7 @@ conversionTypeItems = [
 class ConvertRotationsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ConvertRotationsNode"
     bl_label = "Convert Rotations"
+    bl_width_default = 160
     dynamicLabelType = "ALWAYS"
 
     onlySearchTags = True
@@ -31,7 +32,6 @@ class ConvertRotationsNode(bpy.types.Node, AnimationNode):
     useDegree = BoolProperty(name = "Use Degree", default = False, update = executionCodeChanged)
 
     def create(self):
-        self.width = 160
         self.conversionType = "QUATERNION_TO_EULER"
 
     def draw(self, layout):

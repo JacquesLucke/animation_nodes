@@ -12,6 +12,7 @@ variableNames = list("xyzabcdefghijklmnopqrstuvw")
 class ExpressionNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ExpressionNode"
     bl_label = "Expression"
+    bl_width_default = 200
 
     def settingChanged(self, context = None):
         self.executionError = ""
@@ -34,7 +35,6 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
     outputIsList = BoolProperty(name = "Output is List", default = False, update = outputTypeChanged)
 
     def create(self):
-        self.width = 200
         self.inputs.new("an_NodeControlSocket", "New Input")
         self.outputs.new("an_GenericSocket", "Result", "result")
 

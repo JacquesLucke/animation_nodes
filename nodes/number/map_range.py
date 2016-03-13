@@ -6,6 +6,7 @@ from ... base_types.node import AnimationNode
 class MapRangeNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MapRangeNode"
     bl_label = "Map Range"
+    bl_width_default = 170
 
     def settingChanged(self, context):
         self.recreateInputs()
@@ -19,7 +20,6 @@ class MapRangeNode(bpy.types.Node, AnimationNode):
         update = settingChanged)
 
     def create(self):
-        self.width = 170
         self.recreateInputs()
         self.outputs.new("an_FloatSocket", "Value", "newValue")
 

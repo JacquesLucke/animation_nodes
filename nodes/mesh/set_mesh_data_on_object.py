@@ -8,6 +8,7 @@ from ... base_types.node import AnimationNode
 class SetMeshDataOnObjectNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SetMeshDataOnObjectNode"
     bl_label = "Set Mesh Data on Object"
+    bl_width_default = 170
 
     errorMessage = StringProperty()
 
@@ -19,7 +20,6 @@ class SetMeshDataOnObjectNode(bpy.types.Node, AnimationNode):
         description = "Check that edges have two indices and polygons three or more")
 
     def create(self):
-        self.width = 170
         socket = self.inputs.new("an_ObjectSocket", "Object", "object")
         socket.defaultDrawType = "PROPERTY_ONLY"
         socket.objectCreationType = "MESH"

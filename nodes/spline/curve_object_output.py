@@ -6,11 +6,11 @@ from ... base_types.node import AnimationNode
 class CurveObjectOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CurveObjectOutputNode"
     bl_label = "Curve Object Output"
+    bl_width_default = 175
 
     errorMessage = StringProperty()
 
     def create(self):
-        self.width = 175
         self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
 
         self.inputs.new("an_FloatSocket", "Bevel Depth", "bevelDepth")

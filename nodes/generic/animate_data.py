@@ -8,6 +8,7 @@ from ... base_types.node import AnimationNode
 class AnimateDataNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_AnimateDataNode"
     bl_label = "Animate Data"
+    bl_width_default = 150
     dynamicLabelType = "ALWAYS"
 
     onlySearchTags = True
@@ -25,7 +26,6 @@ class AnimateDataNode(bpy.types.Node, AnimationNode):
     dataType = StringProperty(default = "Float", update = dataTypeChanged)
 
     def create(self):
-        self.width = 150
         self.generateSockets()
 
     def drawLabel(self):
