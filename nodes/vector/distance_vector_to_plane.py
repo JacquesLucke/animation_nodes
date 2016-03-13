@@ -4,6 +4,7 @@ from ... base_types.node import AnimationNode
 class DistanceVectorToPlaneNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_DistanceVectorToPlaneNode"
     bl_label = "Distance Vector to Plane"
+    bl_width_default = 160
 
     def create(self):
         self.inputs.new("an_VectorSocket", "Vector", "vector")
