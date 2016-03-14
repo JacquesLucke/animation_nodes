@@ -1,4 +1,5 @@
 import bpy
+from itertools import chain
 from collections import defaultdict
 from . utils.timing import measureTime
 from . utils.handlers import eventHandler
@@ -14,7 +15,7 @@ class NodeData:
 
     def _reset(self):
         self.nodes = []
-        self.nodesByType = defaultdict(list)
+        self.nodesByType = defaultdict(set)
         self.typeByNode = defaultdict(None)
         self.nodeByIdentifier = defaultdict(None)
 
@@ -28,6 +29,7 @@ class NodeData:
     def update(self):
         self._reset()
         self.insertNodeTrees()
+        self.rerouteNodes = self.nodesByType["NodeReroute"]
         self.findLinksSkippingReroutes()
 
     def insertNodeTrees(self):
@@ -36,60 +38,64 @@ class NodeData:
             self.insertLinks(tree.links)
 
     def insertNodes(self, nodes):
+        appendNode = self.nodes.append
+        nodesByType = self.nodesByType
+        typeByNode = self.typeByNode
+        nodeByIdentifier = self.nodeByIdentifier
+        socketsByNode = self.socketsByNode
+        nodeBySocket = self.nodeBySocket
+        reroutePairs = self.reroutePairs
+
         for node in nodes:
             nodeID = node.toID()
             inputIDs = [socket.toID() for socket in node.inputs]
             outputIDs = [socket.toID() for socket in node.outputs]
 
-            self.nodes.append(nodeID)
-            self.nodesByType[node.bl_idname].append(nodeID)
-            self.typeByNode[nodeID] = node.bl_idname
-            self.nodeByIdentifier[getattr(node, "identifier", None)] = nodeID
+            appendNode(nodeID)
+            typeByNode[nodeID] = node.bl_idname
+            nodesByType[node.bl_idname].add(nodeID)
+            nodeByIdentifier[getattr(node, "identifier", None)] = nodeID
 
-            self.socketsByNode[nodeID] = (inputIDs, outputIDs)
-            for socketID in inputIDs + outputIDs:
-                self.nodeBySocket[socketID] = nodeID
+            socketsByNode[nodeID] = (inputIDs, outputIDs)
+            for socketID in chain(inputIDs, outputIDs):
+                nodeBySocket[socketID] = nodeID
 
             if node.bl_idname == "NodeReroute":
-                inputID = node.inputs[0].toID()
-                outputID = node.outputs[0].toID()
-                self.reroutePairs[inputID] = outputID
-                self.reroutePairs[outputID] = inputID
+                reroutePairs[inputIDs[0]] = outputIDs[0]
+                reroutePairs[outputIDs[0]] = inputIDs[0]
 
     def insertLinks(self, links):
+        linkedSocketsWithReroutes = self.linkedSocketsWithReroutes
+
         for link in links:
             originID = link.from_socket.toID()
             targetID = link.to_socket.toID()
 
-            self.linkedSocketsWithReroutes[originID].append(targetID)
-            self.linkedSocketsWithReroutes[targetID].append(originID)
+            linkedSocketsWithReroutes[originID].append(targetID)
+            linkedSocketsWithReroutes[targetID].append(originID)
 
     def findLinksSkippingReroutes(self):
-        for node in self.nodes:
-            if self.isRerouteNode(node): continue
-            inputs, outputs = self.socketsByNode[node]
-            for socket in inputs + outputs:
-                linkedSockets = self.getLinkedSockets(socket)
-                self.linkedSockets[socket] = linkedSockets
+        rerouteNodes = self.rerouteNodes
+        nonRerouteNodes = filter(lambda n: n not in rerouteNodes, self.nodes)
 
-    def getLinkedSockets(self, socket):
+        socketsByNode = self.socketsByNode
+        linkedSockets = self.linkedSockets
+        iterLinkedSockets = self.iterLinkedSockets
+        chainIterable = chain.from_iterable
+
+        for node in nonRerouteNodes:
+            for socket in chainIterable(socketsByNode[node]):
+                linkedSockets[socket] = tuple(iterLinkedSockets(socket))
+
+    def iterLinkedSockets(self, socket):
         """If the socket is linked to a reroute node the function
         tries to find the next socket that is linked to the reroute"""
-        linkedSockets = []
         for socket in self.linkedSocketsWithReroutes[socket]:
-            if self.isRerouteSocket(socket):
-                rerouteInputSocket = self.reroutePairs[socket]
-                sockets = self.getLinkedSockets(rerouteInputSocket)
-                linkedSockets.extend(sockets)
+            if socket[0] in self.rerouteNodes:
+                yield from self.iterLinkedSockets(self.reroutePairs[socket])
             else:
-                linkedSockets.append(socket)
-        return linkedSockets
+                yield socket
 
-    def isRerouteSocket(self, id):
-        return self.isRerouteNode(id[0])
-
-    def isRerouteNode(self, id):
-        return id in self.nodesByType["NodeReroute"]
 
 
 class NodeNetworks:
