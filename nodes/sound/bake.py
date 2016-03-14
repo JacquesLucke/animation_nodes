@@ -62,6 +62,10 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
         self.drawForSound(box, self.sound)
 
     def drawForSound(self, layout, sound):
+        if sound.users == 0:
+            col = layout.column()
+            col.scale_y = 1.5
+            self.invokeFunction(col, "removeActiveSound", text = "This sound is not used. Remove it?", icon = "CANCEL")
         row = layout.row()
         col = row.column(align = True)
         col.prop(self, "low")
@@ -188,6 +192,10 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
         sequences = [sequence for sequence in editor.sequences if getattr(sequence, "sound", -1) == sound]
         for sequence in sequences:
             editor.sequences.remove(sequence)
+        self.removeActiveSound()
+
+    def removeActiveSound(self):
+        sound = self.sound
         if sound.users == 0:
             bpy.data.sounds.remove(sound)
 

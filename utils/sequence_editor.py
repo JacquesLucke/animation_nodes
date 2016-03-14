@@ -1,6 +1,14 @@
 import bpy
 from . path import toAbsolutePath
 
+def iterSoundSequencesInScene(scene):
+    return (sequence for sequence in iterSequencesInScene(scene) if sequence.type == "SOUND")
+
+def iterSequencesInScene(scene):
+    if scene is None: return []
+    if scene.sequence_editor is None: []
+    yield from scene.sequence_editor.sequences
+
 def getEmptyChannel(editor):
     channels = [False] * 32
     for sequence in editor.sequences:

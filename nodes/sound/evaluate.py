@@ -14,7 +14,7 @@ soundTypeItems = [
 class EvaluateSoundNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_EvaluateSoundNode"
     bl_label = "Evaluate Sound"
-    bl_width_default = 175
+    bl_width_default = 185
 
     def frameTypeChanged(self, context):
         self.inputs["Frame"].hide = False
