@@ -1,6 +1,5 @@
 import bpy
 from .. utils.names import toVariableName
-from .. execution.node_sorting import sortNodes
 
 class TemplateCodeGenerator(bpy.types.Operator):
     bl_idname = "an.generator_template_code"
@@ -15,19 +14,12 @@ class TemplateCodeGenerator(bpy.types.Operator):
 
     def iterCodeLines(self, tree):
         nodeNames = {}
-        for node in self.sortNodes(tree.nodes):
+        for node in tree.nodes:
             yield from iterNodeCreationLines(node, nodeNames)
         for link in tree.links:
             fromText = "{}.outputs[{}]".format(nodeNames[link.from_node], list(link.from_node.outputs).index(link.from_socket))
             toText = "{}.inputs[{}]".format(nodeNames[link.to_node], list(link.to_node.inputs).index(link.to_socket))
             yield "self.newLink({}, {})".format(fromText, toText)
-
-    def sortNodes(self, nodes):
-        animationNodes = [node for node in nodes if node.isAnimationNode]
-        otherNodes = [node for node in nodes if not node.isAnimationNode]
-        sortedAnimationNodes = sortNodes(animationNodes)
-        return sortedAnimationNodes + otherNodes
-
 
     def outputCode(self, code):
         textBlock = bpy.data.texts.get("Template Code")
