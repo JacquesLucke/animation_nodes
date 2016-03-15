@@ -162,7 +162,6 @@ class NodeNetworks:
 class NodeNetwork:
     def __init__(self, nodeIDs):
         self.nodeIDs = nodeIDs
-        self.nodeTreeName = next(iter(nodeIDs))[0]
         self.type = "Invalid"
         self.name = ""
         self.description = ""
@@ -225,24 +224,21 @@ class NodeNetwork:
         self.scriptIDs = []
         self.invokeSubprogramIDs = []
 
+        appendToList = {
+            "an_GroupInputNode" :            self.groupInputIDs.append,
+            "an_GroupOutputNode" :           self.groupOutputIDs.append,
+            "an_LoopInputNode" :             self.loopInputIDs.append,
+            "an_LoopGeneratorOutputNode" :   self.generatorOutputIDs.append,
+            "an_ReassignLoopParameterNode" : self.reassignParameterIDs.append,
+            "an_LoopBreakNode" :             self.breakIDs.append,
+            "an_ScriptNode" :                self.scriptIDs.append,
+            "an_InvokeSubprogramNode" :      self.invokeSubprogramIDs.append }
+
+
+        typeByNode = _data.typeByNode
         for nodeID in self.nodeIDs:
-            idName = _data.typeByNode[nodeID]
-            if idName == "an_GroupInputNode":
-                self.groupInputIDs.append(nodeID)
-            elif idName == "an_GroupOutputNode":
-                self.groupOutputIDs.append(nodeID)
-            elif idName == "an_LoopInputNode":
-                self.loopInputIDs.append(nodeID)
-            elif idName == "an_LoopGeneratorOutputNode":
-                self.generatorOutputIDs.append(nodeID)
-            elif idName == "an_ReassignLoopParameterNode":
-                self.reassignParameterIDs.append(nodeID)
-            elif idName == "an_LoopBreakNode":
-                self.breakIDs.append(nodeID)
-            elif idName == "an_ScriptNode":
-                self.scriptIDs.append(nodeID)
-            elif idName == "an_InvokeSubprogramNode":
-                self.invokeSubprogramIDs.append(nodeID)
+            if typeByNode[nodeID] in appendToList:
+                appendToList[typeByNode[nodeID]](nodeID)
 
         self.groupInAmount = len(self.groupInputIDs)
         self.groupOutAmount = len(self.groupOutputIDs)
@@ -270,7 +266,7 @@ class NodeNetwork:
 
     @property
     def treeName(self):
-        return self.nodeTreeName
+        return next(iter(self.nodeIDs))[0]
 
     @property
     def nodeTree(self):
@@ -519,7 +515,7 @@ def getNetworkByIdentifier(identifier):
     return None
 
 def getNetworksByNodeTree(nodeTree):
-    return [network for network in getNetworks() if network.nodeTreeName == nodeTree.name]
+    return [network for network in getNetworks() if network.treeName == nodeTree.name]
 
 def getSubprogramNetworksByNodeTree(nodeTree):
-    return [network for network in _networks.networks if network.isSubnetwork and network.nodeTreeName == nodeTree.name]
+    return [network for network in _networks.networks if network.isSubnetwork and network.treeName == nodeTree.name]
