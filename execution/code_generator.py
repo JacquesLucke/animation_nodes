@@ -1,5 +1,6 @@
 import os
 import traceback
+from itertools import chain
 from collections import defaultdict
 from .. problems import NodeFailesToCreateExecutionCode
 from .. preferences import addonName, generateCompactCode
@@ -11,7 +12,7 @@ from .. preferences import addonName, generateCompactCode
 def getInitialVariables(nodes):
     variables = {}
     for node in nodes:
-        for socket in node.sockets:
+        for socket in chain(node.inputs, node.outputs):
             variables[socket] = getSocketVariableName(socket)
     return variables
 
@@ -29,8 +30,8 @@ def getSetupCode(nodes, variables):
     lines.append(get_ImportModules(nodes))
     lines.append(get_ImportAnimationNodes())
     lines.append(get_LoadRandomNumberCache())
-    lines.extend(get_GetNodeReferences(nodes))
-    lines.extend(get_GetSocketValues(nodes, variables))
+    lines.extend(tuple(get_GetNodeReferences(nodes)))
+    lines.extend(tuple(get_GetSocketValues(nodes, variables)))
     return "\n".join(lines)
 
 
@@ -61,18 +62,14 @@ def get_LoadRandomNumberCache():
 
 
 def get_GetNodeReferences(nodes):
-    lines = []
-    lines.append("nodes = bpy.data.node_groups[{}].nodes".format(repr(nodes[0].nodeTree.name)))
+    yield "nodes = bpy.data.node_groups[{}].nodes".format(repr(nodes[0].nodeTree.name))
     for node in nodes:
-        lines.append("{} = nodes[{}]".format(node.identifier, repr(node.name)))
-    return lines
+        yield "{} = nodes[{}]".format(node.identifier, repr(node.name))
 
 
 def get_GetSocketValues(nodes, variables):
-    lines = []
     for socket in iterUnlinkedSockets(nodes):
-        lines.append(getLoadSocketValueLine(socket, variables))
-    return lines
+        yield getLoadSocketValueLine(socket, variables)
 
 def iterUnlinkedSockets(nodes):
     for node in nodes:
