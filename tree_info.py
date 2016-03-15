@@ -85,14 +85,18 @@ class NodeData:
 
         for node in nonRerouteNodes:
             for socket in chainIterable(socketsByNode[node]):
-                linkedSockets[socket] = tuple(iterLinkedSockets(socket))
+                linkedSockets[socket] = tuple(iterLinkedSockets(socket, set()))
 
-    def iterLinkedSockets(self, socket):
+    def iterLinkedSockets(self, socket, visitedReroutes):
         """If the socket is linked to a reroute node the function
         tries to find the next socket that is linked to the reroute"""
         for socket in self.linkedSocketsWithReroutes[socket]:
             if socket[0] in self.rerouteNodes:
-                yield from self.iterLinkedSockets(self.reroutePairs[socket])
+                if socket[0] in visitedReroutes:
+                    print("Reroute recursion detected in: {}".format(repr(socket[0][0])))
+                    return
+                visitedReroutes.add(socket[0])
+                yield from self.iterLinkedSockets(self.reroutePairs[socket], visitedReroutes)
             else:
                 yield socket
 
