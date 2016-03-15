@@ -109,62 +109,60 @@ class NodeNetworks:
     def update(self):
         self._reset()
 
-        nodeGroups = self.getNodeGroups()
-
         networksByIdentifier = defaultdict(list)
-        for nodes in nodeGroups:
+        for nodes in self.iterNodeGroups():
             if not self.groupContainsAnimationNodes(nodes): continue
+
             network = NodeNetwork(nodes)
             networksByIdentifier[network.identifier].append(network)
 
         for identifier, networks in networksByIdentifier.items():
-            if identifier is None: self.networks.extend(networks)
-            else: self.networks.append(NodeNetwork.join(networks))
+            if identifier is None:
+                # this are the main networks
+                self.networks.extend(networks)
+            else:
+                # join subprogram networks if they are not connected with links
+                self.networks.append(NodeNetwork.join(networks))
 
         for network in self.networks:
             for nodeID in network.nodeIDs:
                 self.networkByNode[nodeID] = network
 
     def groupContainsAnimationNodes(self, nodes):
-        for node in nodes:
-            if _data.typeByNode[node] not in ("NodeFrame", "NodeReroute"): return True
-        return False
+        typeByNode = _data.typeByNode
+        nonAnimationNodes = ("NodeFrame", "NodeReroute")
+        return any(typeByNode[node] not in nonAnimationNodes for node in nodes)
 
-    def getNodeGroups(self):
-        groups = []
+    def iterNodeGroups(self):
         foundNodes = set()
         for node in _data.nodes:
             if node not in foundNodes:
                 nodeGroup = self.getAllConnectedNodes(node)
                 foundNodes.update(nodeGroup)
-                groups.append(nodeGroup)
-        return groups
+                yield nodeGroup
 
     def getAllConnectedNodes(self, nodeInGroup):
         connectedNodes = set()
         uncheckedNodes = {nodeInGroup}
-        while len(uncheckedNodes) > 0:
+        while uncheckedNodes:
             node = uncheckedNodes.pop()
+
             connectedNodes.add(node)
-            linkedNodes = self.getDirectlyLinkedNodes(node)
-            for linkedNode in linkedNodes:
+            for linkedNode in self.iterDirectlyLinkedNodes(node):
                 if linkedNode not in uncheckedNodes and linkedNode not in connectedNodes:
                     uncheckedNodes.add(linkedNode)
-        return list(connectedNodes)
 
-    def getDirectlyLinkedNodes(self, node):
-        nodes = set()
-        inputs, outputs = _data.socketsByNode[node]
-        for socket in inputs + outputs:
-            for linkedSocket in _data.linkedSocketsWithReroutes[socket]:
-                nodes.add(linkedSocket[0])
-        return nodes
+        return connectedNodes
+
+    def iterDirectlyLinkedNodes(self, node):
+        for socket in chain.from_iterable(_data.socketsByNode[node]):
+            yield from (socket[0] for socket in _data.linkedSocketsWithReroutes[socket])
 
 
 class NodeNetwork:
     def __init__(self, nodeIDs):
         self.nodeIDs = nodeIDs
-        self.nodeTreeName = nodeIDs[0][0]
+        self.nodeTreeName = next(iter(nodeIDs))[0]
         self.type = "Invalid"
         self.name = ""
         self.description = ""
@@ -272,7 +270,7 @@ class NodeNetwork:
 
     @property
     def treeName(self):
-        return self.nodeIDs[0][0]
+        return self.nodeTreeName
 
     @property
     def nodeTree(self):
