@@ -13,7 +13,6 @@ class ForestData:
         self.nodeByIdentifier = defaultdict(None)
 
         self.socketsByNode = defaultdict(lambda: ([], []))
-        self.nodeBySocket = defaultdict(None)
 
         self.linkedSockets = defaultdict(list)
         self.linkedSocketsWithReroutes = defaultdict(list)
@@ -36,7 +35,6 @@ class ForestData:
         typeByNode = self.typeByNode
         nodeByIdentifier = self.nodeByIdentifier
         socketsByNode = self.socketsByNode
-        nodeBySocket = self.nodeBySocket
         reroutePairs = self.reroutePairs
 
         for node in nodes:
@@ -50,8 +48,6 @@ class ForestData:
             nodeByIdentifier[getattr(node, "identifier", None)] = nodeID
 
             socketsByNode[nodeID] = (inputIDs, outputIDs)
-            for socketID in chain(inputIDs, outputIDs):
-                nodeBySocket[socketID] = nodeID
 
             if node.bl_idname == "NodeReroute":
                 reroutePairs[inputIDs[0]] = outputIDs[0]

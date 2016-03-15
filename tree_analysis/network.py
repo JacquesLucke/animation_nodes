@@ -156,3 +156,38 @@ class NodeNetwork:
     def scriptNode(self):
         try: return idToNode(self.scriptIDs[0])
         except: return None
+
+
+    def getSortedAnimationNodes(self):
+        '''
+        Uses a depth-first search algorithm for topological sorting
+        of the directed acyclic graph
+        '''
+
+        unmarkedNodes = self.nodeIDs.copy()
+        temporaryMarkedNodes = set()
+        markedNodes = set()
+        sortedListReversed = list()
+
+        def iterDependentNodes(node):
+            for socket in self.forestData.socketsByNode[node][1]:
+                for otherSocket in self.forestData.linkedSockets[socket]:
+                    yield otherSocket[0]
+
+        def visit(node):
+            if node in temporaryMarkedNodes:
+                print("cycle")
+                raise Exception("Cycle")
+            if node not in markedNodes:
+                temporaryMarkedNodes.add(node)
+                for dependentNode in iterDependentNodes(node):
+                    visit(dependentNode)
+                markedNodes.add(node)
+                temporaryMarkedNodes.remove(node)
+                sortedListReversed.append(node)
+
+        while unmarkedNodes:
+            visit(unmarkedNodes.pop())
+
+        nodes = [idToNode(node) for node in reversed(sortedListReversed)]
+        return [node for node in nodes if node.isAnimationNode]

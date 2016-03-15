@@ -40,9 +40,7 @@ class LoopExecutionUnit:
 
 
     def generateScript(self):
-        nodes = self.network.getAnimationNodes()
-
-        try: nodes = sortNodes(nodes)
+        try: nodes = self.network.getSortedAnimationNodes()
         except: return
 
         variables = getInitialVariables(nodes)
