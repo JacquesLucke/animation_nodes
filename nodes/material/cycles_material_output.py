@@ -79,6 +79,10 @@ class CyclesMaterialOutputNode(bpy.types.Node, AnimationNode):
             if inputSocket.bl_idname != originIdName and len(possibleIdentifiers) > 0:
                 self.socketIdentifier = possibleIdentifiers[0]
 
+        if inputSocket.identifier == "Data":
+            print("Updated Node: '{}'".format(self.name))
+            self.createInputSocket()
+
     def getInputIdentifiersFromSocketType(self, searchType):
         identifiers = []
         sockets = self.getPossibleSockets()
