@@ -1,3 +1,4 @@
+import bpy
 from .. import problems
 from .. utils.nodes import idToNode, idToSocket
 
@@ -167,7 +168,9 @@ class NodeNetwork:
         markedNodeIDs = set()
         temporaryMarkedNodeIDs = set()
         unmarkedNodeIDs = self.nodeIDs.copy()
-        sortedAnimationNodesReversed = list()
+        sortedAnimationNodes = list()
+
+        nodeTree = self.nodeTree
 
         def sort():
             while unmarkedNodeIDs:
@@ -187,15 +190,15 @@ class NodeNetwork:
                 temporaryMarkedNodeIDs.remove(nodeID)
                 markedNodeIDs.add(nodeID)
 
-                node = idToNode(nodeID)
+                node = nodeTree.nodes[nodeID[1]]
                 if node.isAnimationNode:
-                    sortedAnimationNodesReversed.append(node)
+                    sortedAnimationNodes.append(node)
 
         def iterDependentNodes(nodeID):
-            for socketID in self.forestData.socketsByNode[nodeID][1]:
+            for socketID in self.forestData.socketsByNode[nodeID][0]:
                 for otherSocketID in self.forestData.linkedSockets[socketID]:
                     yield otherSocketID[0]
 
         sort()
 
-        return tuple(reversed(sortedAnimationNodesReversed))
+        return sortedAnimationNodes
