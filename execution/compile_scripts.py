@@ -4,6 +4,10 @@ from .. problems import InvalidSyntax
 cache = {}
 
 def compileScript(script, name = "<string>"):
+    # clear the cache once in a while
+    if len(cache) == 500:
+        cache.clear()
+
     try:
         scriptHash = hash(script)
         if scriptHash not in cache:
