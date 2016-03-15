@@ -1,6 +1,5 @@
 import sys, traceback
 from .. import problems
-from . node_sorting import sortNodes
 from . compile_scripts import compileScript
 from .. problems import ExecutionUnitNotSetup, ExceptionDuringExecution
 from . code_generator import (getInitialVariables,

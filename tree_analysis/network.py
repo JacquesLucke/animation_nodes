@@ -160,34 +160,42 @@ class NodeNetwork:
 
     def getSortedAnimationNodes(self):
         '''
-        Uses a depth-first search algorithm for topological sorting
-        of the directed acyclic graph
+        Used Algorithm:
+        https://en.wikipedia.org/wiki/Topological_sorting#Depth-first_search
         '''
 
-        unmarkedNodes = self.nodeIDs.copy()
-        temporaryMarkedNodes = set()
-        markedNodes = set()
-        sortedListReversed = list()
+        markedNodeIDs = set()
+        temporaryMarkedNodeIDs = set()
+        unmarkedNodeIDs = self.nodeIDs.copy()
+        sortedAnimationNodesReversed = list()
 
-        def iterDependentNodes(node):
-            for socket in self.forestData.socketsByNode[node][1]:
-                for otherSocket in self.forestData.linkedSockets[socket]:
-                    yield otherSocket[0]
+        def sort():
+            while unmarkedNodeIDs:
+                visit(unmarkedNodeIDs.pop())
 
-        def visit(node):
-            if node in temporaryMarkedNodes:
-                print("cycle")
-                raise Exception("Cycle")
-            if node not in markedNodes:
-                temporaryMarkedNodes.add(node)
-                for dependentNode in iterDependentNodes(node):
+        def visit(nodeID):
+            if nodeID in temporaryMarkedNodeIDs:
+                problems.NodeLinkRecursion().report()
+                raise Exception()
+
+            if nodeID not in markedNodeIDs:
+                temporaryMarkedNodeIDs.add(nodeID)
+
+                for dependentNode in iterDependentNodes(nodeID):
                     visit(dependentNode)
-                markedNodes.add(node)
-                temporaryMarkedNodes.remove(node)
-                sortedListReversed.append(node)
 
-        while unmarkedNodes:
-            visit(unmarkedNodes.pop())
+                temporaryMarkedNodeIDs.remove(nodeID)
+                markedNodeIDs.add(nodeID)
 
-        nodes = [idToNode(node) for node in reversed(sortedListReversed)]
-        return [node for node in nodes if node.isAnimationNode]
+                node = idToNode(nodeID)
+                if node.isAnimationNode:
+                    sortedAnimationNodesReversed.append(node)
+
+        def iterDependentNodes(nodeID):
+            for socketID in self.forestData.socketsByNode[nodeID][1]:
+                for otherSocketID in self.forestData.linkedSockets[socketID]:
+                    yield otherSocketID[0]
+
+        sort()
+
+        return tuple(reversed(sortedAnimationNodesReversed))

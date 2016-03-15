@@ -1,4 +1,3 @@
-from . node_sorting import sortNodes
 from . compile_scripts import compileScript
 from .. problems import ExecutionUnitNotSetup
 from . code_generator import (getInitialVariables,
