@@ -215,7 +215,4 @@ def getNetworksByNodeTree(nodeTree):
 def getSubprogramNetworksByNodeTree(nodeTree):
     return [network for network in _networks.networks if network.isSubnetwork and network.treeName == nodeTree.name]
 
-
-
-
 __setup()
