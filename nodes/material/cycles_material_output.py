@@ -74,7 +74,7 @@ class CyclesMaterialOutputNode(bpy.types.Node, AnimationNode):
         if inputSocket is None: return
 
         if inputSocket.isLinked:
-            originIdName = socket.dataOrigin.bl_idname
+            originIdName = inputSocket.dataOrigin.bl_idname
             possibleIdentifiers = self.getInputIdentifiersFromSocketType(originIdName)
             if inputSocket.bl_idname != originIdName and len(possibleIdentifiers) > 0:
                 self.socketIdentifier = possibleIdentifiers[0]
