@@ -4,6 +4,7 @@ from ... events import propertyChanged
 from ... tree_info import keepNodeState
 from ... utils.names import getRandomString
 from ... base_types.node import AnimationNode
+from ... utils.enum_items import enumItemsFromDicts
 from ... utils.blender_ui import iterActiveSpacesByType
 from ... nodes.container_provider import getMainObjectContainer
 from ... utils.names import (getPossibleMeshName,
@@ -20,7 +21,13 @@ objectTypeItems = [
     ("Camera", "Camera", "", "CAMERA_DATA", 2),
     ("Point Lamp", "Point Lamp", "", "LAMP_POINT", 3),
     ("Curve 2D", "Curve 2D", "", "FORCE_CURVE", 4),
-    ("Curve 3D", "Curve 3D", "", "CURVE_DATA", 5) ]
+    ("Curve 3D", "Curve 3D", "", "CURVE_DATA", 5),
+    ("Empty", "Empty", "", "EMPTY_DATA", 6) ]
+
+emptyDrawTypes = []
+for item in bpy.types.Object.bl_rna.properties["empty_draw_type"].enum_items:
+    emptyDrawTypes.append({"value" : item.identifier, "name" : item.name})
+emptyDrawTypeItems = enumItemsFromDicts(emptyDrawTypes)
 
 class an_ObjectNamePropertyGroup(bpy.types.PropertyGroup):
     objectName = StringProperty(name = "Object Name", default = "", update = propertyChanged)
@@ -63,6 +70,9 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
     parentInstances = BoolProperty(name = "Parent to Main Container",
         default = True, update = resetInstancesEvent)
 
+    emptyDrawType = EnumProperty(name = "Empty Draw Type", default = "PLAIN_AXES",
+        items = emptyDrawTypeItems, update = resetInstancesEvent)
+
     def create(self):
         self.updateInputSockets()
         self.outputs.new("an_ObjectListSocket", "Objects", "objects")
@@ -82,6 +92,8 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
             layout.prop(self, "deepCopy")
         else:
             layout.prop(self, "objectType", text = "")
+            if self.objectType == "Empty":
+                layout.prop(self, "emptyDrawType", text = "")
 
     def drawAdvanced(self, layout):
         layout.prop(self, "parentInstances")
@@ -291,6 +303,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         newObject.select = False
         newObject.hide = False
         newObject.hide_render = False
+        newObject.empty_draw_type = self.emptyDrawType
         return newObject
 
     def createObject(self, name, instanceData):
