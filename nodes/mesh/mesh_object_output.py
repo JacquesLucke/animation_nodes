@@ -60,9 +60,16 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
             socket.isUsed = False
 
     def draw(self, layout):
-        layout.prop(self, "meshDataType", text = "Type")
+        if not self.meshInputSocket.hide:
+            layout.prop(self, "meshDataType", text = "Type")
         if self.errorMessage != "":
             writeText(layout, self.errorMessage, width = 25, icon = "ERROR")
+
+    @property
+    def meshInputSocket(self):
+        if self.meshDataType == "MESH_DATA": return self.inputs["Mesh Data"]
+        if self.meshDataType == "BMESH": return self.inputs["BMesh"]
+        if self.meshDataType == "VERTICES": return self.inputs["Vertices"]
 
     def drawAdvanced(self, layout):
         layout.prop(self, "checkIndices")
