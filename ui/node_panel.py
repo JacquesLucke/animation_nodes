@@ -1,6 +1,7 @@
 import bpy
 from bpy.props import *
 from .. preferences import debuggingIsEnabled
+from .. base_types.socket import AnimationNodeSocket
 
 def draw(self, context):
     node = getattr(bpy.context, "active_node", None)
@@ -58,6 +59,9 @@ class SocketUiList(bpy.types.UIList):
     bl_idname = "an_SocketUiList"
 
     def draw_item(self, context, layout, node, socket, icon, activeData, activePropname):
+        if not isinstance(socket, AnimationNodeSocket):
+            layout.label("No Animation Node Socket")
+            return
         if socket.textProps.editable:
             layout.prop(socket, "text", emboss = False, text = "")
         else: layout.label(socket.getDisplayedName())
