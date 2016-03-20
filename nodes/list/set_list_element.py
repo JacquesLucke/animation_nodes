@@ -43,6 +43,8 @@ class SetListElementNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         yield "self.errorMessage = ''"
+        if self.assignedType == "Integer": yield "if isinstance(list, tuple): list = [i for i in list]"
+        
         if self.allowNegativeIndex:
             if self.clampIndex:
                 yield "if len(list) != 0: list[min(max(index, -len(list)), len(list) - 1)] = element"
