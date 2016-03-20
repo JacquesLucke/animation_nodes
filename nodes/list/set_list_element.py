@@ -43,23 +43,28 @@ class SetListElementNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         yield "self.errorMessage = ''"
-        if self.assignedType == "Integer": yield "if isinstance(list, tuple): list = [i for i in list]"
+        if self.isTuple: yield "_list = list(_list)"
         
         if self.allowNegativeIndex:
             if self.clampIndex:
-                yield "if len(list) != 0: list[min(max(index, -len(list)), len(list) - 1)] = element"
+                yield "if len(_list) != 0: _list[min(max(index, -len(_list)), len(_list) - 1)] = element"
             else:
-                yield "if -len(list) <= index <= len(list) - 1: list[index] = element"
+                yield "if -len(_list) <= index <= len(_list) - 1: _list[index] = element"
         else:
             if self.clampIndex:
-                yield "if len(list) != 0: list[min(max(index, 0), len(list) - 1)] = element"
+                yield "if len(_list) != 0: _list[min(max(index, 0), len(_list) - 1)] = element"
             else:
-                yield "if 0 <= index <= len(list) - 1: list[index] = element"
+                yield "if 0 <= index <= len(_list) - 1: _list[index] = element"
         yield "else: self.errorMessage = 'Index out of range'"
 
     def edit(self):
         dataType = self.getWantedDataType()
         self.assignType(dataType)
+
+    def isTuple(self):
+        listInput = self.inputs["List"].dataOrigin
+        if listInput is not None and isLimitedList(listInput.bl_idname): return True
+        return False
 
     def getWantedDataType(self):
         listInput = self.inputs["List"].dataOrigin
@@ -86,7 +91,7 @@ class SetListElementNode(bpy.types.Node, AnimationNode):
     def generateSockets(self):
         self.inputs.clear()
         self.outputs.clear()
-        self.inputs.new(self.listIdName, "List", "list").dataIsModified = True
+        self.inputs.new(self.listIdName, "List", "_list").dataIsModified = True
         self.inputs.new(self.baseIdName, "Element", "element")
         self.inputs.new("an_IntegerSocket", "Index", "index")
-        self.outputs.new(self.listIdName, "List", "list")
+        self.outputs.new(self.listIdName, "List", "_list")
