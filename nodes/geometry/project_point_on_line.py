@@ -5,6 +5,7 @@ from ... base_types.node import AnimationNode
 class ProjectPointOnLineNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ProjectPointOnLineNode"
     bl_label = "Project Point on Line"
+    searchTags = ["Distance Point to Line", "Closest Point on Line"]
         
     def create(self):
         self.width = 160
