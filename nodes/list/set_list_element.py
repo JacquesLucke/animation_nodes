@@ -43,7 +43,7 @@ class SetListElementNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         yield "self.errorMessage = ''"
-        if self.isTuple: yield "_list = list(_list)"
+        if self.isTuple(): yield "_list = list(_list)"
         
         if self.allowNegativeIndex:
             if self.clampIndex:
@@ -63,7 +63,8 @@ class SetListElementNode(bpy.types.Node, AnimationNode):
 
     def isTuple(self):
         listInput = self.inputs["List"].dataOrigin
-        if listInput is not None and isLimitedList(listInput.bl_idname): return True
+        if listInput is not None:
+            if isLimitedList(listInput.bl_idname): return True
         return False
 
     def getWantedDataType(self):
