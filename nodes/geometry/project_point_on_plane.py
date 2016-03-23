@@ -8,13 +8,13 @@ class ProjectPointOnPlaneNode(bpy.types.Node, AnimationNode):
     searchTags = ["Distance Point to Plane", "Closest Point on Plane"]
 
     def create(self):
-        self.width = 160
+        self.width = 170
         self.inputs.new("an_VectorSocket", "Point", "point")
         self.inputs.new("an_VectorSocket", "Plane Point", "planePoint").value = (1, 0, 0)
         self.inputs.new("an_VectorSocket", "Plane Normal", "planeNormal").value = (0, 0, 1)
         
         self.outputs.new("an_VectorSocket", "Projection", "projection")
-        self.outputs.new("an_FloatSocket", "Distance to Plane", "distance")
+        self.outputs.new("an_FloatSocket", "Signed Distance to Plane", "distance")
         
     def getExecutionCode(self):
         isLinked = self.getLinkedOutputsDict()
