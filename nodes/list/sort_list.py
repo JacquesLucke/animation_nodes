@@ -25,11 +25,12 @@ class SortingTemplate:
         return []
 
 
+
 # Object List Sorting
 ##################################################
 
 class SortObjectListWithDirectionTemplate(bpy.types.PropertyGroup, SortingTemplate):
-    identifier = "SORT_OBJECT_LIST_WITH_DIRECTION"
+    identifier = "OBJECT_LIST__DIRECTION"
     dataType = "Object List"
     label = "Direction"
 
@@ -47,7 +48,7 @@ class SortObjectListWithDirectionTemplate(bpy.types.PropertyGroup, SortingTempla
             key = lambda x: distance(x.location, (0, 0, 0), direction))
 
 class SortObjectListByNameTemplate(bpy.types.PropertyGroup, SortingTemplate):
-    identifier = "SORT_OBJECT_LIST_BY_NAME"
+    identifier = "OBJECT_LIST__NAME"
     dataType = "Object List"
     label = "Name"
 
@@ -60,7 +61,7 @@ class SortObjectListByNameTemplate(bpy.types.PropertyGroup, SortingTemplate):
             key = lambda x: x.name)
 
 class SortObjectListByPointDistanceTemplate(bpy.types.PropertyGroup, SortingTemplate):
-    identifier = "SORT_OBJECT_LIST_BY_POINT_DISTANCE"
+    identifier = "OBJECT_LIST__POINT_DISTANCE"
     dataType = "Object List"
     label = "Point Distance"
 
@@ -88,7 +89,7 @@ class SortingTemplates(bpy.types.PropertyGroup):
     templatesByDataType = defaultdict(list)
 
     def getTemplates(self, dataType):
-        return self.templatesByDataType[dataType] + self.templatesByDataType["All"]
+        return self.templatesByDataType[dataType]
 
     def getTemplate(self, identifier):
         return self.templateByIdentifier[identifier]
