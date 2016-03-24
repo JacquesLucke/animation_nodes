@@ -37,8 +37,8 @@ def drawMenu(self, context):
     layout.menu("an_kdtree_bvhtree_menu", text = "KD & BVH Tree", icon = "STICKY_UVS_LOC")
     layout.separator()
     layout.menu("an_debug_menu", text = "Debug", icon = "INFO")
-
     layout.menu("an_subprograms_menu", text = "Subprograms", icon = "FILE_SCRIPT")
+    layout.menu("an_layout_menu", text = "Layout", icon = "IMGDISPLAY")
 
 def drawNodeTreeChooser(layout, context):
     activeNodeTree = context.space_data.node_tree
@@ -549,6 +549,19 @@ class SubprogramsMenu(bpy.types.Menu):
         insertNode(layout, "an_ScriptNode", "   Script")
         layout.separator()
         insertNode(layout, "an_ExpressionNode", "Expression")
+
+class LayoutMenu(bpy.types.Menu):
+    bl_idname = "an_layout_menu"
+    bl_label = "Layout Menu"
+
+    def draw(self, context):
+        layout = self.layout
+        props = layout.operator("node.add_node", text = "Frame")
+        props.use_transform = True
+        props.type = "NodeFrame"
+        props = layout.operator("node.add_node", text = "Reroute")
+        props.use_transform = True
+        props.type = "NodeReroute"
 
 def insertNode(layout, type, text, settings = {}, icon = "NONE"):
     operator = layout.operator("node.add_node", text = text, icon = icon)
