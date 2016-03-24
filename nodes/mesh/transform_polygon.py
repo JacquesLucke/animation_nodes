@@ -4,9 +4,9 @@ from ... tree_info import keepNodeState
 from ... base_types.node import AnimationNode
 
 pivotTypeItems = [
-    ("CENTER", "Center", "Use the center of the polygon as pivot"),
-    ("WORLD_ORIGIN", "World Origin", "Use the (0, 0, 0) vector as pivot for all polygons"),
-    ("CUSTOM", "Custom", "Use a custom vector as pivot") ]
+    ("CENTER", "Center", "Use the center of the polygon as pivot", "NONE", 0),
+    ("WORLD_ORIGIN", "World", "Use the (0, 0, 0) vector as pivot for all polygons", "NONE", 1),
+    ("CUSTOM", "Custom", "Use a custom vector as pivot", "NONE", 2) ]
 
 class TransformPolygonNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_TransformPolygonNode"
