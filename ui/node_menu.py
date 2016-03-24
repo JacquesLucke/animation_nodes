@@ -96,8 +96,6 @@ class VectorMenu(bpy.types.Menu):
         insertNode(layout, "an_MixDataNode", "Mix", {"dataType" : repr("Vector")})
         layout.separator()
         insertNode(layout, "an_VectorDistanceNode", "Distance")
-        insertNode(layout, "an_DistanceVectorToLineNode", "Distance to Line")
-        insertNode(layout, "an_DistanceVectorToPlaneNode", "Distance to Plane")
         layout.separator()
         insertNode(layout, "an_VectorAngleNode", "Angle")
         insertNode(layout, "an_VectorLengthNode", "Length")
