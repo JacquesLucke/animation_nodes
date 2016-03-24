@@ -48,6 +48,18 @@ class Problem:
         return bpy.context.region.width / getDpiFactor() / 7
 
 
+contactDeveloperMessage = (
+    "Please contact a developer in the forum or on Github. "
+    "If possible share your .blend file and the content of "
+    "the console/terminal with the developer.")
+
+realBugMessage = "This is most likely a bug in the addon itself. " + contactDeveloperMessage
+
+advancedSettingsFixMessage = (
+   "If you disabled certain problem-handling features in the "
+   "advanced settings of the 'Expression' or 'Script' nodes "
+   "try to enable them again.")
+
 class NodeLinkRecursion(Problem):
     def allowExecution(self):
         return False
@@ -77,14 +89,8 @@ class InvalidSyntax(Problem):
         return False
 
     def draw(self, layout):
-        message = ("The execution code has invalid syntax. "
-                   "This is most likely a bug in the addon itself. "
-                   "Please contact a developer in the forum or on Github. "
-                   "If possible share your .blend file and the content of "
-                   "the console/terminal with the developer.\n\n"
-                   "If you disabled certain problem-handling features in the "
-                   "advanced settings of the 'Expression' or 'Debug' nodes "
-                   "try to enable them again.")
+        message = "The execution code has invalid syntax.\n\n" + \
+            realBugMessage + "\n\n" + advancedSettingsFixMessage
         writeText(layout, message, width = self.drawWidth)
 
 class ExceptionDuringExecution(Problem):
@@ -92,21 +98,27 @@ class ExceptionDuringExecution(Problem):
         return False
 
     def draw(self, layout):
-        layout.label("Exception during execution (see console)")
+        message = "An exception was raised during the execution of a node tree.\n\n" + \
+            realBugMessage + "\n\n" + advancedSettingsFixMessage
+        writeText(layout, message, width = self.drawWidth)
 
 class ExceptionDuringCodeCreation(Problem):
     def allowExecution(self):
         return False
 
     def draw(self, layout):
-        layout.label("Exception during code creation (see console)")
+        message = ("An exception was raised during the creation "
+                   "of the execution code.\n\n") + realBugMessage
+        writeText(layout, message, width = self.drawWidth)
 
 class CouldNotSetupExecutionUnits(Problem):
     def allowExecution(self):
         return False
 
     def draw(self, layout):
-        layout.label("Could not setup execution units (see console)")
+        message = ("The Animation Nodes addon is not able to setup "
+                   "the execution units for your node tree.\n\n") + realBugMessage
+        writeText(layout, message, width = self.drawWidth)
 
 class NodeFailesToCreateExecutionCode(Problem):
     def __init__(self, nodeIdentifier):
@@ -116,19 +128,16 @@ class NodeFailesToCreateExecutionCode(Problem):
         return False
 
     def draw(self, layout):
+        message = ("The node linked below is not able to create its"
+                   "execution code. If this can happen when the node tree "
+                   "has been created in another version of the addon. If that "
+                   "is not the case it is most likely a bug in the addon itself. ") + \
+                   contactDeveloperMessage
+        writeText(layout, message, width = self.drawWidth)
+
         node = getNodeByIdentifier(self.nodeIdentifier)
         props = layout.operator("an.move_view_to_node", text = "{} Needs Update".format(repr(node.name)))
         props.nodeIdentifier = self.nodeIdentifier
-
-class SubprogramInvokesItself(Problem):
-    def __init__(self, network):
-        self.network = network
-
-    def allowUnitCreation(self):
-        return False
-
-    def draw(self, layout):
-        layout.label("{} invokes itself".format(repr(self.network.name)))
 
 class NodeShouldNotBeUsedInAutoExecution(Problem):
     def __init__(self, nodeIdentifier):
@@ -139,7 +148,7 @@ class NodeShouldNotBeUsedInAutoExecution(Problem):
 
     def draw(self, layout):
         node = getNodeByIdentifier(self.nodeIdentifier)
-        layout.label("{} should not be used with auto execution".format(repr(node.name)))
+        layout.label("{} should not be used with auto execution.".format(repr(node.name)))
 
 class NodeMustNotBeInSubprogram(Problem):
     def __init__(self, nodeIdentifier):

@@ -1,4 +1,6 @@
 import bpy
+from .. problems import canExecute
+from .. utils.layout import writeText
 from .. utils.blender_ui import isViewportRendering
 
 class AutoExecutionPanel(bpy.types.Panel):
@@ -20,6 +22,12 @@ class AutoExecutionPanel(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
+
+        if not canExecute():
+            message = ("Your node tree cannot be executed. "
+                       "Look in the 'Problems' panel for more information.")
+            writeText(layout, message, width = 35, icon = "INFO")
+
         tree = context.space_data.edit_tree
         autoExecution = tree.autoExecution
         isRendering = isViewportRendering()

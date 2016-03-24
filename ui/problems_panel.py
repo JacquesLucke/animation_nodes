@@ -28,9 +28,10 @@ class ProblemsPanel(bpy.types.Panel):
             col.operator("wm.console_toggle", text = "Toogle Console", icon = "CONSOLE")
 
         layout.separator()
-        
+
         for problem in problems.getProblems():
             problem.draw(layout)
+            layout.separator()
 
     @classmethod
     def getTree(cls):

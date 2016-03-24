@@ -55,7 +55,6 @@ class NodeNetwork:
             # check if a subprogram invokes itself
             if self.identifier in self.getInvokedSubprogramIdentifiers():
                 self.type = "Invalid"
-                problems.SubprogramInvokesItself(self).report()
 
     def findSystemNodes(self):
         self.groupInputIDs = []
@@ -92,7 +91,7 @@ class NodeNetwork:
         self.scriptAmount = len(self.scriptIDs)
 
     def getInvokedSubprogramIdentifiers(self):
-        return list({idToNode(nodeID).subprogramIdentifier for nodeID in self.invokeSubprogramIDs})
+        return {idToNode(nodeID).subprogramIdentifier for nodeID in self.invokeSubprogramIDs}
 
     @staticmethod
     def join(networks):
