@@ -1,5 +1,7 @@
+import bpy
 from . utils.layout import writeText
 from . tree_info import getNodeByIdentifier
+from . utils.blender_ui import getDpiFactor
 
 currentProblems = []
 
@@ -41,27 +43,49 @@ class Problem:
     def report(self):
         currentProblems.append(self)
 
+    @property
+    def drawWidth(self):
+        return bpy.context.region.width / getDpiFactor() / 7
+
 
 class NodeLinkRecursion(Problem):
     def allowExecution(self):
         return False
 
     def draw(self, layout):
-        layout.label("Node Recursion")
+        message = ("There is a cycle in your node tree. "
+                   "You have to remove the cycle before you will "
+                   "be able to execute the tree again.")
+        writeText(layout, message, width = self.drawWidth)
 
 class InvalidNetworksExist(Problem):
     def allowUnitCreation(self):
         return False
 
     def draw(self, layout):
-        layout.label("At least one invalid network exists")
+        message = ("There is at least one invalid node network. "
+                   "Please make all networks valid again.\n\n"
+                   "Reasons for invalid networks:\n\n"
+                   "  - a 'Invoke Subprogram' is in the same network that it calls\n\n"
+                   "  - a 'Group Output' node has no corresponding 'Group Input' node\n\n"
+                   "  - there are more than one 'Group Input', 'Group Output' or 'Loop Input' "
+                       "nodes in the same network")
+        writeText(layout, message, width = self.drawWidth)
 
 class InvalidSyntax(Problem):
     def allowExecution(self):
         return False
 
     def draw(self, layout):
-        layout.label("Invalid Syntax (see console)")
+        message = ("The execution code has invalid syntax. "
+                   "This is most likely a bug in the addon itself. "
+                   "Please contact a developer in the forum or on Github. "
+                   "If possible share your .blend file and the content of "
+                   "the console/terminal with the developer.\n\n"
+                   "If you disabled certain problem-handling features in the "
+                   "advanced settings of the 'Expression' or 'Debug' nodes "
+                   "try to enable them again.")
+        writeText(layout, message, width = self.drawWidth)
 
 class ExceptionDuringExecution(Problem):
     def allowExecution(self):
