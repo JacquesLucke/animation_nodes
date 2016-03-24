@@ -173,7 +173,7 @@ class LoopExecutionUnit:
         lines = []
         for node in inputNode.getSortedGeneratorNodes():
             operation = "append" if node.addType == "APPEND" else "extend"
-            lines.append("if {}:".format(variables[node.enabledSocket]))
+            lines.append("if {}:".format(variables[node.conditionSocket]))
             socket = node.addSocket
             if socket.isUnlinked and socket.isCopyable: expression = getCopyExpression(socket, variables)
             else: expression = variables[socket]

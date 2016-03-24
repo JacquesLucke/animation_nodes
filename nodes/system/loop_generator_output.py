@@ -64,14 +64,14 @@ class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
     def generateSockets(self):
         self.inputs.clear()
 
-        socket = self.inputs.new("an_BooleanSocket", "Enabled", "enabled")
-        socket.value = True
-        socket.hide = True
-
         if self.addType == "APPEND": dataType = toBaseDataType(self.listDataType)
         elif self.addType == "EXTEND": dataType = self.listDataType
         socket = self.inputs.new(toIdName(dataType), dataType, "input")
         socket.defaultDrawType = "TEXT_ONLY"
+
+        socket = self.inputs.new("an_BooleanSocket", "Condition", "condition")
+        socket.value = True
+        socket.hide = True
 
     def delete(self):
         subprogramInterfaceChanged()
@@ -92,12 +92,15 @@ class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
         except: return None
 
     @property
-    def enabledSocket(self):
-        return self.inputs[0]
+    def conditionSocket(self):
+        try: return self.inputs["Condition"]
+        except: return self.inputs["Enabled"]
 
     @property
     def addSocket(self):
-        return self.inputs[1]
+        for socket in self.inputs:
+            if socket.name not in ("Condition", "Enabled"):
+                return socket
 
 def getRandomInt():
     random.seed()
