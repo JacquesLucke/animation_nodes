@@ -234,6 +234,7 @@ class ListMenu(bpy.types.Menu):
         insertNode(layout, "an_ReverseListNode", "Reverse")
         insertNode(layout, "an_SliceListNode", "Slice")
         insertNode(layout, "an_ShiftListNode", "Shift")
+        insertNode(layout, "an_SortListNode", "Sort")
         insertNode(layout, "an_SetListElementNode", "Set Element")
         insertNode(layout, "an_GetRandomListElementsNode", "Get Random Elements")
         insertNode(layout, "an_ListBooleanOperationsNode", "List Boolean Operations")
