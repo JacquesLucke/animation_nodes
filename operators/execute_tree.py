@@ -1,5 +1,6 @@
 import bpy
 from bpy.props import *
+from .. problems import canExecute
 from .. utils.blender_ui import redrawAll
 
 class ExecuteNodeTree(bpy.types.Operator):
@@ -8,6 +9,10 @@ class ExecuteNodeTree(bpy.types.Operator):
     bl_description = "Execute all main networks in the tree"
 
     name = StringProperty(name = "Node Tree Name")
+
+    @classmethod
+    def poll(cls, context):
+        return canExecute()
 
     def execute(self, context):
         nodeTree = bpy.data.node_groups.get(self.name)

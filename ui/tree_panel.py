@@ -1,4 +1,6 @@
 import bpy
+from .. problems import canExecute
+from .. utils.layout import writeText
 from .. utils.timing import prettyTime
 
 class TreePanel(bpy.types.Panel):
@@ -22,6 +24,11 @@ class TreePanel(bpy.types.Panel):
         col.scale_y = 1.5
         props = col.operator("an.execute_tree", icon = "PLAY")
         props.name = tree.name
+
+        if not canExecute():
+            message = ("Your node tree cannot be executed. "
+                       "Look in the 'Problems' panel for more information.")
+            writeText(layout, message, width = 35, icon = "INFO")
 
         layout.label(prettyTime(tree.executionTime), icon = "TIME")
 
