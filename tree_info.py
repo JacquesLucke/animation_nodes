@@ -105,6 +105,9 @@ def iterSocketsThatNeedUpdate():
     for socketID in _specialNodesAndSockets.socketsThatNeedUpdate:
         yield idToSocket(socketID)
 
+def getUndefinedNodes():
+    return [idToNode(nodeID) for nodeID in _forestData.nodesByType["NodeUndefined"]]
+
 
 # improve performance of higher level functions
 

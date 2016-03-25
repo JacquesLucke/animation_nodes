@@ -7,7 +7,9 @@ class MoveViewToNode(bpy.types.Operator):
     bl_label = "Move View to Node"
     bl_description = ""
 
-    nodeIdentifier = StringProperty()
+    nodeIdentifier = StringProperty(default = "")
+    treeName = StringProperty()
+    nodeName = StringProperty()
 
     @classmethod
     def poll(cls, context):
@@ -15,13 +17,25 @@ class MoveViewToNode(bpy.types.Operator):
         except: return False
 
     def execute(self, context):
-        try: searchNode = getNodeByIdentifier(self.nodeIdentifier)
-        except: return {"CANCELLED"}
+        searchNode = self.getNode()
+        if searchNode is None: return {"CANCELLED"}
 
-        context.space_data.node_tree = searchNode.nodeTree
-        for node in searchNode.nodeTree.nodes: node.select = False
+        tree = searchNode.id_data
+
+        context.space_data.node_tree = tree
+        for node in tree.nodes:
+            node.select = False
+
         searchNode.select = True
-        searchNode.nodeTree.nodes.active = searchNode
+        tree.nodes.active = searchNode
 
         bpy.ops.node.view_selected()
         return {"FINISHED"}
+
+    def getNode(self):
+        if self.nodeIdentifier != "":
+            try: return getNodeByIdentifier(self.nodeIdentifier)
+            except: return None
+        else:
+            try: return bpy.data.node_groups[self.treeName].nodes[self.nodeName]
+            except: return None

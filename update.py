@@ -20,6 +20,7 @@ def updateEverything():
     correctForbiddenNodeLinks()
     subprogram_sockets.updateIfNecessary()
     checkIfNodeTreeIsLinked()
+    checkUndefinedNodes()
     checkNetworks()
     checkIdentifiers()
 
@@ -77,3 +78,8 @@ def checkIfNodeTreeIsLinked():
         if tree.library is not None:
             problems.LinkedAnimationNodeTreeExists().report()
             break
+
+def checkUndefinedNodes():
+    undefinedNodes = tree_info.getUndefinedNodes()
+    if len(undefinedNodes) > 0:
+        problems.UndefinedNodeExists(undefinedNodes).report()        

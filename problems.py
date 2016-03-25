@@ -1,4 +1,5 @@
 import bpy
+from . utils.nodes import idToNode
 from . utils.layout import writeText
 from . tree_info import getNodeByIdentifier
 from . utils.blender_ui import getDpiFactor
@@ -128,10 +129,10 @@ class NodeFailesToCreateExecutionCode(Problem):
         return False
 
     def draw(self, layout):
-        message = ("The node linked below is not able to create its"
+        message = ("The node linked below is not able to create its "
                    "execution code. If this can happen when the node tree "
                    "has been created in another version of the addon. If that "
-                   "is not the case it is most likely a bug in the addon itself. ") + \
+                   "is not the case it is most likely a bug in the addon itself.\n\n") + \
                    contactDeveloperMessage
         writeText(layout, message, width = self.drawWidth)
 
@@ -192,7 +193,24 @@ class LinkedAnimationNodeTreeExists(Problem):
         return False
 
     def draw(self, layout):
-        layout.label("AN doesn't support linked node trees")
+        layout.label("AN doesn't support linked node trees.")
+
+class UndefinedNodeExists(Problem):
+    def __init__(self, nodes):
+        self.nodeIDs = [node.toID() for node in nodes]
+
+    def allowUnitCreation(self):
+        return False
+
+    def draw(self, layout):
+        layout.label("There is at least one undefined node.")
+
+        col = layout.column(align = True)
+        for nodeID in self.nodeIDs:
+            node = idToNode(nodeID)
+            props = col.operator("an.move_view_to_node", text = "{} is Undefined".format(repr(node.name)))
+            props.treeName = nodeID[0]
+            props.nodeName = nodeID[1]
 
 
 
