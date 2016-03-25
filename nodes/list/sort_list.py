@@ -85,9 +85,24 @@ class SortObjectListByNameTemplate(bpy.types.PropertyGroup, SortingTemplate):
     def sort(self, objects, reverse):
         if not all(objects): return "List elements must not be None"
 
-        return sorted(objects,
-            reverse = reverse,
-            key = lambda x: x.name)
+        return sorted(objects, key = lambda x: x.name, reverse = reverse)
+
+
+# Polygon List Sorting
+##################################################
+
+class SortPolygonListWithDirectionTemplate(bpy.types.PropertyGroup, SortingTemplate):
+    identifier = "POLYGON_LIST__DIRECTION"
+    dataType = "Polygon List"
+    label = "Direction"
+
+    def setup(self, node):
+        node.inputs.new("an_VectorSocket", "Direction", "direction").value = (0, 0, 1)
+
+    def sort(self, polygons, reverse, direction):
+        distance = distance_point_to_plane
+        keyFunction = lambda polygon: distance(polygon.center, (0, 0, 0), direction)
+        return sorted(polygons, key = keyFunction, reverse = reverse)
 
 
 
