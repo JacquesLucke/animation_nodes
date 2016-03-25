@@ -20,13 +20,12 @@ def __setup():
     from . tree_analysis.forest_data import ForestData
     from . tree_analysis.networks import NodeNetworks
 
+    global _needsUpdate, _forestData, _networks, _specialNodesAndSockets
+
     _needsUpdate = True
     _forestData = ForestData()
     _networks = NodeNetworks()
     _specialNodesAndSockets = SpecialNodesAndSockets()
-
-    global _needsUpdate, _forestData, _networks, _specialNodesAndSockets
-
 
 
 def updateAndRetryOnException(function):
