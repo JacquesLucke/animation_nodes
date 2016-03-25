@@ -35,7 +35,7 @@ def drawMenu(self, context):
     layout.menu("an_sound_menu", text = "Sound", icon = "SPEAKER")
     layout.menu("an_sequence_menu", text = "Sequence", icon = "SEQUENCE")
     layout.separator()
-    layout.menu("an_geometry_menu", text = "Geometry", icon = "MOD_DISPLACE")#STICKY_UVS_VERT RETOPO MOD_DISPLACE CURVE_NCURVE 
+    layout.menu("an_geometry_menu", text = "Geometry", icon = "MOD_DISPLACE")
     layout.menu("an_kdtree_bvhtree_menu", text = "KD & BVH Tree", icon = "STICKY_UVS_LOC")
     layout.separator()
     layout.menu("an_debug_menu", text = "Debug", icon = "INFO")
@@ -116,13 +116,10 @@ class RotationMenu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        layout.label("-  CONVERSIONS :")
         insertNode(layout, "an_DirectionToRotationNode", "Direction to Rotation")
         insertNode(layout, "an_RotationToDirectionNode", "Rotation to Direction")
         insertNode(layout, "an_ConvertRotationsNode", "Convert Rotation Types", {"conversionType" : repr("MATRIX_TO_EULER")})
-
         layout.separator()
-        layout.label("-  EULER :")
         insertNode(layout, "an_SeparateEulerNode", "Separate Euler")
         insertNode(layout, "an_CombineEulerNode", "Combine Euler")
         insertNode(layout, "an_CreateListNode", "List", {"assignedType" : repr("Euler")})
@@ -131,9 +128,7 @@ class RotationMenu(bpy.types.Menu):
         insertNode(layout, "an_MixDataNode", "Euler Mix", {"dataType" : repr("Euler")})
         insertNode(layout, "an_RandomEulerNode", "Random Euler")
         insertNode(layout, "an_EulerWiggleNode", "Euler Wiggle")
-
         layout.separator()
-        layout.label("-  QUATERNION :")
         insertNode(layout, "an_SeparateQuaternionNode", "Separate Quaternion")
         insertNode(layout, "an_CombineQuaternionNode", "Combine Quaternion")
         insertNode(layout, "an_CreateListNode", "List", {"assignedType" : repr("Quaternion")})
@@ -242,7 +237,7 @@ class ListMenu(bpy.types.Menu):
         insertNode(layout, "an_SliceListNode", "Slice")
         insertNode(layout, "an_ShiftListNode", "Shift")
         insertNode(layout, "an_SortListNode", "Sort")
-        
+
         insertNode(layout, "an_ListBooleanOperationsNode", "List Boolean Operations")
 
 class CreateListMenu(bpy.types.Menu):
@@ -514,15 +509,12 @@ class GeometryMenu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        layout.label("- Plane Conversion :")
         insertNode(layout, "an_ConvertPlaneTypeNode", "Point/Normal to Matrix", {"conversionType" : repr("POINT_NORMAL_TO_MATRIX")})
         insertNode(layout, "an_ConvertPlaneTypeNode", "Matrix to Point/Normal", {"conversionType" : repr("MATRIX_TO_POINT_NORMAL")})
         layout.separator()
-        layout.label("- 3D Operations :")
         insertNode(layout, "an_ProjectPointOnLineNode", "Project Point on Line")
         insertNode(layout, "an_ProjectPointOnPlaneNode", "Project Point on Plane")
-        #layout.label("   2D Operations")
-        
+
 
 class KDTreeAndBVHTreeMenu(bpy.types.Menu):
     bl_idname = "an_kdtree_bvhtree_menu"
