@@ -59,15 +59,23 @@ class SortObjectListByPointDistanceTemplate(bpy.types.PropertyGroup, SortingTemp
     dataType = "Object List"
     label = "Point Distance"
 
+    useInitialTransforms = BoolProperty(name = "Use Initial Transforms", default = False)
+
     def setup(self, node):
         node.inputs.new("an_VectorSocket", "Point", "point")
+
+    def draw(self, layout):
+        layout.prop(self, "useInitialTransforms")
 
     def sort(self, objects, reverse, point):
         if not all(objects): return "List elements must not be None"
 
-        return sorted(objects,
-            reverse = reverse,
-            key = lambda x: (x.location - point).length)
+        if self.useInitialTransforms:
+            keyFunction = lambda object: (object.id_keys.get("Transforms", "Initial Transforms")[0] - point).length_squared
+        else:
+            keyFunction = lambda object: (object.location - point).length_squared
+
+        return sorted(objects, key = keyFunction, reverse = reverse)
 
 class SortObjectListByNameTemplate(bpy.types.PropertyGroup, SortingTemplate):
     identifier = "OBJECT_LIST__NAME"
