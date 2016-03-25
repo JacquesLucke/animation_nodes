@@ -35,16 +35,24 @@ class SortObjectListWithDirectionTemplate(bpy.types.PropertyGroup, SortingTempla
     dataType = "Object List"
     label = "Direction"
 
+    useInitialTransforms = BoolProperty(name = "Use Initial Transforms", default = False)
+
     def setup(self, node):
         node.inputs.new("an_VectorSocket", "Direction", "direction").value = (0, 0, 1)
+
+    def draw(self, layout):
+        layout.prop(self, "useInitialTransforms")
 
     def sort(self, objects, reverse, direction):
         if not all(objects): return "List elements must not be None"
 
         distance = distance_point_to_plane
-        return sorted(objects,
-            reverse = reverse,
-            key = lambda x: distance(x.location, (0, 0, 0), direction))
+        if self.useInitialTransforms:
+            keyFunction = lambda object: distance(object.id_keys.get("Transforms", "Initial Transforms")[0], (0, 0, 0), direction)
+        else:
+            keyFunction = lambda object: distance(object.location, (0, 0, 0), direction)
+
+        return sorted(objects, key = keyFunction, reverse = reverse)
 
 class SortObjectListByPointDistanceTemplate(bpy.types.PropertyGroup, SortingTemplate):
     identifier = "OBJECT_LIST__POINT_DISTANCE"
