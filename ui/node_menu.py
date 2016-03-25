@@ -26,14 +26,16 @@ def drawMenu(self, context):
     layout.menu("an_object_menu", text = "Object", icon = "OBJECT_DATAMODE")
     layout.menu("an_mesh_menu", text = "Mesh", icon = "MESH_DATA")
     layout.menu("an_spline_menu", text = "Spline", icon = "CURVE_DATA")
+    layout.menu("an_particles_menu", text = "Particles", icon = "PARTICLE_DATA")
     layout.separator()
     layout.menu("an_animation_menu", text = "Animation", icon = "RENDER_ANIMATION")
     layout.menu("an_interpolation_menu", text = "Interpolation", icon = "IPO_BEZIER")
-    layout.menu("an_material_menu", text = "Material", icon = "MATERIAL_DATA")
-    layout.menu("an_particles_menu", text = "Particles", icon = "PARTICLE_DATA")
     layout.menu("an_fcurve_menu", text = "FCurves", icon = "IPO")
+    layout.menu("an_material_menu", text = "Material", icon = "MATERIAL_DATA")
     layout.menu("an_sound_menu", text = "Sound", icon = "SPEAKER")
     layout.menu("an_sequence_menu", text = "Sequence", icon = "SEQUENCE")
+    layout.separator()
+    layout.menu("an_geometry_menu", text = "Geometry", icon = "MOD_DISPLACE")#STICKY_UVS_VERT RETOPO MOD_DISPLACE CURVE_NCURVE 
     layout.menu("an_kdtree_bvhtree_menu", text = "KD & BVH Tree", icon = "STICKY_UVS_LOC")
     layout.separator()
     layout.menu("an_debug_menu", text = "Debug", icon = "INFO")
@@ -96,6 +98,8 @@ class VectorMenu(bpy.types.Menu):
         insertNode(layout, "an_MixDataNode", "Mix", {"dataType" : repr("Vector")})
         layout.separator()
         insertNode(layout, "an_VectorDistanceNode", "Distance")
+        insertNode(layout, "an_ProjectPointOnLineNode", "Distance to Line")
+        insertNode(layout, "an_ProjectPointOnPlaneNode", "Distance to Plane")
         layout.separator()
         insertNode(layout, "an_VectorAngleNode", "Angle")
         insertNode(layout, "an_VectorLengthNode", "Length")
@@ -112,35 +116,35 @@ class RotationMenu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
+        layout.label("-  CONVERSIONS :")
+        insertNode(layout, "an_DirectionToRotationNode", "Direction to Rotation")
+        insertNode(layout, "an_RotationToDirectionNode", "Rotation to Direction")
+        insertNode(layout, "an_ConvertRotationsNode", "Convert Rotation Types", {"conversionType" : repr("MATRIX_TO_EULER")})
+
+        layout.separator()
+        layout.label("-  EULER :")
+        insertNode(layout, "an_SeparateEulerNode", "Separate Euler")
+        insertNode(layout, "an_CombineEulerNode", "Combine Euler")
+        insertNode(layout, "an_CreateListNode", "List", {"assignedType" : repr("Euler")})
+        layout.separator()
         insertNode(layout, "an_EulerMathNode", "Euler Math")
         insertNode(layout, "an_MixDataNode", "Euler Mix", {"dataType" : repr("Euler")})
         insertNode(layout, "an_RandomEulerNode", "Random Euler")
         insertNode(layout, "an_EulerWiggleNode", "Euler Wiggle")
+
         layout.separator()
-        insertNode(layout, "an_SeparateEulerNode", "Separate Euler")
-        insertNode(layout, "an_CombineEulerNode", "Combine Euler")
+        layout.label("-  QUATERNION :")
+        insertNode(layout, "an_SeparateQuaternionNode", "Separate Quaternion")
+        insertNode(layout, "an_CombineQuaternionNode", "Combine Quaternion")
+        insertNode(layout, "an_CreateListNode", "List", {"assignedType" : repr("Quaternion")})
         layout.separator()
         insertNode(layout, "an_QuaternionMathNode", "Quaternion Math")
         insertNode(layout, "an_MixDataNode", "Quaternion Mix", {"dataType" : repr("Quaternion")})
         insertNode(layout, "an_RandomQuaternionNode", "Random Quaternion")
         insertNode(layout, "an_QuaternionWiggleNode", "Quaternion Wiggle")
         layout.separator()
-        insertNode(layout, "an_SeparateQuaternionNode", "Separate Quaternion")
-        insertNode(layout, "an_CombineQuaternionNode", "Combine Quaternion")
         insertNode(layout, "an_QuaternionListCombineNode", "Combine Quaternion Rotations")
-        layout.separator()
-        insertNode(layout, "an_RotationToDirectionNode", "Rotation to Direction")
-        insertNode(layout, "an_DirectionToRotationNode", "Direction to Rotation")
-        insertNode(layout, "an_ConvertVectorAndEulerNode", "Vector to Euler", {"conversionType" : repr("VECTOR_TO_EULER")})
-        insertNode(layout, "an_ConvertVectorAndEulerNode", "Euler to Vector", {"conversionType" : repr("EULER_TO_VECTOR")})
-        insertNode(layout, "an_ConvertRotationsNode", "Euler to Quaternion", {"conversionType" : repr("EULER_TO_QUATERNION")})
-        insertNode(layout, "an_ConvertRotationsNode", "Euler to Matrix", {"conversionType" : repr("EULER_TO_MATRIX")})
-        insertNode(layout, "an_ConvertRotationsNode", "Quaternion to Euler", {"conversionType" : repr("QUATERNION_TO_EULER")})
-        insertNode(layout, "an_ConvertRotationsNode", "Quaternion to Matrix", {"conversionType" : repr("QUATERNION_TO_MATRIX")})
-        insertNode(layout, "an_ConvertRotationsNode", "Quaternion to Axis Angle", {"conversionType" : repr("QUATERNION_TO_AXIS_ANGLE")})
-        insertNode(layout, "an_ConvertRotationsNode", "Matrix to Euler", {"conversionType" : repr("MATRIX_TO_EULER")})
-        insertNode(layout, "an_ConvertRotationsNode", "Matrix to Quaternion", {"conversionType" : repr("MATRIX_TO_QUATERNION")})
-        insertNode(layout, "an_ConvertRotationsNode", "Axis Angle to Quaternion", {"conversionType" : repr("AXIS_ANGLE_TO_QUATERNION")})
+
 
 class MatrixMenu(bpy.types.Menu):
     bl_idname = "an_matrix_menu"
@@ -227,7 +231,10 @@ class ListMenu(bpy.types.Menu):
         insertNode(layout, "an_AppendListNode", "Append")
         layout.separator()
         insertNode(layout, "an_GetListElementNode", "Get Element")
-        insertNode(layout, "an_SearchListElementNode", "Search")
+        insertNode(layout, "an_GetRandomListElementsNode", "Get Random Elements")
+        insertNode(layout, "an_SearchListElementNode", "Search Element")
+        insertNode(layout, "an_SetListElementNode", "Set Element")
+        layout.separator()
         insertNode(layout, "an_GetListLengthNode", "Get Length")
         layout.separator()
         insertNode(layout, "an_ShuffleListNode", "Shuffle")
@@ -235,8 +242,7 @@ class ListMenu(bpy.types.Menu):
         insertNode(layout, "an_SliceListNode", "Slice")
         insertNode(layout, "an_ShiftListNode", "Shift")
         insertNode(layout, "an_SortListNode", "Sort")
-        insertNode(layout, "an_SetListElementNode", "Set Element")
-        insertNode(layout, "an_GetRandomListElementsNode", "Get Random Elements")
+        
         insertNode(layout, "an_ListBooleanOperationsNode", "List Boolean Operations")
 
 class CreateListMenu(bpy.types.Menu):
@@ -501,6 +507,23 @@ class SequenceMenu(bpy.types.Menu):
         insertNode(layout, "an_TextSequenceOutputNode", "Text Sequence Output")
         insertNode(layout, "an_SequenceInfoNode", "Sequence Info")
 
+
+class GeometryMenu(bpy.types.Menu):
+    bl_idname = "an_geometry_menu"
+    bl_label = "Geometry Menu"
+
+    def draw(self, context):
+        layout = self.layout
+        layout.label("- Plane Conversion :")
+        insertNode(layout, "an_ConvertPlaneTypeNode", "Point/Normal to Matrix", {"conversionType" : repr("POINT_NORMAL_TO_MATRIX")})
+        insertNode(layout, "an_ConvertPlaneTypeNode", "Matrix to Point/Normal", {"conversionType" : repr("MATRIX_TO_POINT_NORMAL")})
+        layout.separator()
+        layout.label("- 3D Operations :")
+        insertNode(layout, "an_ProjectPointOnLineNode", "Project Point on Line")
+        insertNode(layout, "an_ProjectPointOnPlaneNode", "Project Point on Plane")
+        #layout.label("   2D Operations")
+        
+
 class KDTreeAndBVHTreeMenu(bpy.types.Menu):
     bl_idname = "an_kdtree_bvhtree_menu"
     bl_label = "KDTree and BVHTree Menu"
@@ -516,6 +539,7 @@ class KDTreeAndBVHTreeMenu(bpy.types.Menu):
         insertNode(layout, "an_RayCastBVHTreeNode", "Ray Cast")
         insertNode(layout, "an_FindNearestSurfacePointNode", "Find Nearest")
         insertNode(layout, "an_IsInsideVolumeBVHTreeNode", "Is Inside Volume")
+
 
 class DebugMenu(bpy.types.Menu):
     bl_idname = "an_debug_menu"
