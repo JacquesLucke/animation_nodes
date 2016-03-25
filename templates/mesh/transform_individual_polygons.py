@@ -31,7 +31,7 @@ class TransformIndividualPolygonsTemplate(bpy.types.Operator, Template):
         self.updateSubprograms()
 
         self.newLink(loopInputNode.outputs[2], transformPolygon.inputs[0])
-        self.newLink(transformPolygon.outputs[0], generatorOutputNode.inputs[1])
+        self.newLink(transformPolygon.outputs[0], generatorOutputNode.inputs[0])
         self.newLink(meshDataNode.outputs[4], loopInvokeNode.inputs[0])
         self.newLink(loopInvokeNode.outputs[0], meshFromPolygonsNode.inputs[0])
         self.newLink(meshFromPolygonsNode.outputs[0], meshOutput.inputs[1])

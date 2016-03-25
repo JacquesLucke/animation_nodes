@@ -36,7 +36,7 @@ class RandomVerticesOffsetTemplate(bpy.types.Operator, Template):
         self.newLink(meshInputNode.outputs[2], combineMeshDataNode.inputs[2])
         self.newLink(loopInputNode.outputs[2], vectorMathNode.inputs[0])
         self.newLink(randomVectorNode.outputs[0], vectorMathNode.inputs[1])
-        self.newLink(vectorMathNode.outputs[0], loopOutputNode.inputs[1])
+        self.newLink(vectorMathNode.outputs[0], loopOutputNode.inputs[0])
         self.newLink(loopInputNode.outputs[4], randomVectorNode.inputs[1])
         self.newLink(loopInputNode.outputs[0], randomVectorNode.inputs[0])
         self.newLink(invokeSubprogramNode.outputs[0], combineMeshDataNode.inputs[0])

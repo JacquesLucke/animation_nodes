@@ -40,7 +40,7 @@ class Grid3DTemplate(bpy.types.Operator, Template):
         self.newLink(gridLoopInputNode.outputs[0], multiplyNode.inputs[0])
         self.newLink(combineVectorNode.outputs[0], gridMeshNode.inputs[4])
         self.newLink(multiplyNode.outputs[0], combineVectorNode.inputs[2])
-        self.newLink(gridMeshNode.outputs[0], generatorOutputNode.inputs[1])
+        self.newLink(gridMeshNode.outputs[0], generatorOutputNode.inputs[0])
         self.newLink(getListLengthNode.outputs[0], instancerNode.inputs[0])
         self.newLink(setObjectsLoopInputNode.outputs[2], transformsOutputNode.inputs[0])
         self.newLink(setObjectsLoopInputNode.outputs[3], transformsOutputNode.inputs[1])
