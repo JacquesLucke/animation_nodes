@@ -1,6 +1,7 @@
 import bpy
 import sys
 from .. import problems
+from .. utils.layout import writeText
 
 class ProblemsPanel(bpy.types.Panel):
     bl_idname = "an_problems_panel"
@@ -32,6 +33,21 @@ class ProblemsPanel(bpy.types.Panel):
         for problem in problems.getProblems():
             problem.draw(layout)
             layout.separator()
+
+        layout.separator()
+
+        col = layout.column(align = True)
+        tree = self.getTree()
+        lastExec = tree.lastExecutionInfo
+        col.label("Last successful execution using:")
+        col.label("    Blender:   v{}".format(lastExec.blenderVersionString))
+        col.label("    Animation Nodes:   v{}".format(lastExec.animationNodesVersionString))
+
+        if lastExec.isDefault:
+            writeText(col,
+                ("These versions are only guesses. This file has not been executed "
+                 "in a version that supports storing of version information yet."),
+                autoWidth = True)
 
     @classmethod
     def getTree(cls):

@@ -36,6 +36,7 @@ class AutoExecutionProperties(bpy.types.PropertyGroup):
 
 class LastTreeExecutionInfo(bpy.types.PropertyGroup):
 
+    isDefault = BoolProperty(default = True)
     executionTime = FloatProperty(name = "Execution Time")
     blenderVersion = IntVectorProperty(name = "Blender Version", default = (2, 77, 0))
     animationNodesVersion = IntVectorProperty(name = "Animation Nodes Version", default = (1, 0, 1))
@@ -43,6 +44,19 @@ class LastTreeExecutionInfo(bpy.types.PropertyGroup):
     def updateVersions(self):
         self.blenderVersion = getBlenderVersion()
         self.animationNodesVersion = getAnimationNodesVersion()
+        self.isDefault = False
+
+    @property
+    def blenderVersionString(self):
+        return self.toVersionString(self.blenderVersion)
+
+    @property
+    def animationNodesVersionString(self):
+        return self.toVersionString(self.animationNodesVersion)
+
+    def toVersionString(self, intVector):
+        numbers = tuple(intVector)
+        return "{}.{}.{}".format(*numbers)
 
 class AnimationNodeTree(bpy.types.NodeTree):
     bl_idname = "an_AnimationNodeTree"
