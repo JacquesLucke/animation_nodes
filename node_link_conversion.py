@@ -70,6 +70,12 @@ class SimpleConvert(LinkCorrection):
         nodeIdName = self.rules[(dataOrigin.dataType, target.dataType)]
         node = insertLinkedNode(nodeTree, nodeIdName, origin, target)
 
+class ConvertFloatToScale(LinkCorrection):
+    def check(self, origin, target):
+        return origin.dataType in ("Float", "Integer") and target.dataType == "Vector" and "scale" in target.name.lower()
+    def insert(self, nodeTree, origin, target, dataOrigin):
+        insertLinkedNode(nodeTree, "an_VectorFromValueNode", origin, target)
+
 class ConvertNormalToEuler(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType == "Vector" and origin.name == "Normal" and target.dataType == "Euler"
@@ -233,6 +239,7 @@ linkCorrectors = [
     ConvertEulerToVector(),
     ConvertEulerToQuaternion(),
     ConvertQuaternionToEuler(),
+    ConvertFloatToScale(),
     ConvertListToElement(),
     ConvertElementToList(),
     ConvertObjectToShapeKey(),
