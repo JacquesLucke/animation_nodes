@@ -44,10 +44,6 @@ class Problem:
     def report(self):
         currentProblems.append(self)
 
-    @property
-    def drawWidth(self):
-        return bpy.context.region.width / getDpiFactor() / 7
-
 
 contactDeveloperMessage = (
     "Please contact a developer in the forum or on Github. "
@@ -69,7 +65,7 @@ class NodeLinkRecursion(Problem):
         message = ("There is a cycle in your node tree. "
                    "You have to remove the cycle before you will "
                    "be able to execute the tree again.")
-        writeText(layout, message, width = self.drawWidth)
+        writeText(layout, message, autoWidth = True)
 
 class InvalidNetworksExist(Problem):
     def allowUnitCreation(self):
@@ -83,7 +79,7 @@ class InvalidNetworksExist(Problem):
                    "  - a 'Group Output' node has no corresponding 'Group Input' node\n\n"
                    "  - there are more than one 'Group Input', 'Group Output' or 'Loop Input' "
                        "nodes in the same network")
-        writeText(layout, message, width = self.drawWidth)
+        writeText(layout, message, autoWidth = True)
 
 class InvalidSyntax(Problem):
     def allowExecution(self):
@@ -92,7 +88,7 @@ class InvalidSyntax(Problem):
     def draw(self, layout):
         message = "The execution code has invalid syntax.\n\n" + \
             realBugMessage + "\n\n" + advancedSettingsFixMessage
-        writeText(layout, message, width = self.drawWidth)
+        writeText(layout, message, autoWidth = True)
 
 class ExceptionDuringExecution(Problem):
     def allowExecution(self):
@@ -101,7 +97,7 @@ class ExceptionDuringExecution(Problem):
     def draw(self, layout):
         message = "An exception was raised during the execution of a node tree.\n\n" + \
             realBugMessage + "\n\n" + advancedSettingsFixMessage
-        writeText(layout, message, width = self.drawWidth)
+        writeText(layout, message, autoWidth = True)
 
 class ExceptionDuringCodeCreation(Problem):
     def allowExecution(self):
@@ -110,7 +106,7 @@ class ExceptionDuringCodeCreation(Problem):
     def draw(self, layout):
         message = ("An exception was raised during the creation "
                    "of the execution code.\n\n") + realBugMessage
-        writeText(layout, message, width = self.drawWidth)
+        writeText(layout, message, autoWidth = True)
 
 class CouldNotSetupExecutionUnits(Problem):
     def allowExecution(self):
@@ -119,7 +115,7 @@ class CouldNotSetupExecutionUnits(Problem):
     def draw(self, layout):
         message = ("The Animation Nodes addon is not able to setup "
                    "the execution units for your node tree.\n\n") + realBugMessage
-        writeText(layout, message, width = self.drawWidth)
+        writeText(layout, message, autoWidth = True)
 
 class NodeFailesToCreateExecutionCode(Problem):
     def __init__(self, nodeIdentifier):
@@ -133,11 +129,15 @@ class NodeFailesToCreateExecutionCode(Problem):
                    "execution code. If this can happen when the node tree "
                    "has been created in another version of the addon. If that "
                    "is not the case it is most likely a bug in the addon itself.\n\n") + \
-                   contactDeveloperMessage
-        writeText(layout, message, width = self.drawWidth)
+                   contactDeveloperMessage + "\n\n" + \
+                  ("If the problem is that you use an incompatible AN version, you "
+                   "can also try to simply replace the not-working node with the same node. "
+                   "Sometimes this error occures when the sockets of a node changes "
+                   "between versions.")
+        writeText(layout, message, autoWidth = True)
 
         node = getNodeByIdentifier(self.nodeIdentifier)
-        props = layout.operator("an.move_view_to_node", text = "{} Needs Update".format(repr(node.name)))
+        props = layout.operator("an.move_view_to_node", icon = "VIEWZOOM", text = "{} does not work".format(repr(node.name)))
         props.nodeIdentifier = self.nodeIdentifier
 
 class NodeShouldNotBeUsedInAutoExecution(Problem):
@@ -185,7 +185,7 @@ class IdentifierExistsTwice(Problem):
                    "  1. Select the NEW node tree \n"
                    "  2. Click on the button below")
         col = layout.column()
-        writeText(col, message)
+        writeText(col, message, autoWidth = True)
         col.operator("an.replace_nodes_with_copies")
 
 class LinkedAnimationNodeTreeExists(Problem):
@@ -203,12 +203,19 @@ class UndefinedNodeExists(Problem):
         return False
 
     def draw(self, layout):
-        layout.label("There is at least one undefined node.")
+        message = ("There is at least one undefined node. "
+                   "This happens when you open a .blend file uses "
+                   "nodes which don't exist in your version of AN.\n"
+                   "To fix this you can either install the AN version this "
+                   "file has been created with or you try to replace/remove "
+                   "the undefined nodes.")
+
+        writeText(layout, message, autoWidth = True)
 
         col = layout.column(align = True)
         for nodeID in self.nodeIDs:
             node = idToNode(nodeID)
-            props = col.operator("an.move_view_to_node", text = "{} is Undefined".format(repr(node.name)))
+            props = col.operator("an.move_view_to_node", icon = "VIEWZOOM", text = "{} is undefined".format(repr(node.name)))
             props.treeName = nodeID[0]
             props.nodeName = nodeID[1]
 
