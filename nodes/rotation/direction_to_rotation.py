@@ -40,9 +40,9 @@ class DirectionToRotationNode(bpy.types.Node, AnimationNode):
 
         return generateDirectionToRotationCode("direction", "guide", 
                                                 self.trackAxis, self.guideAxis, 
-                                                matrixOutputName = "{}".format(mat), 
-                                                rotationOutputName = "{}".format(rot),
-                                                quaternionOutputName = "{}".format(quat))
+                                                matrixOutputName = mat, 
+                                                rotationOutputName = rot,
+                                                quaternionOutputName = quat)
 
     def getUsedModules(self):
         return ["mathutils"]
