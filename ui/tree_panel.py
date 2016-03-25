@@ -30,7 +30,7 @@ class TreePanel(bpy.types.Panel):
                        "Look in the 'Problems' panel for more information.")
             writeText(layout, message, width = 35, icon = "INFO")
 
-        layout.label(prettyTime(tree.executionTime), icon = "TIME")
+        layout.label(prettyTime(tree.lastExecutionInfo.executionTime), icon = "TIME")
 
         layout.separator()
         layout.prop_search(tree, "sceneName", bpy.data, "scenes", icon = "SCENE_DATA", text = "Scene")

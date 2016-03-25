@@ -1,5 +1,6 @@
-import bpy
 import os
+import bpy
+import sys
 from bpy.props import *
 
 addonName = os.path.basename(os.path.dirname(__file__))
@@ -106,3 +107,9 @@ def nodeColors():
 
 def debuggingIsEnabled():
     return getPreferences().debug
+
+def getBlenderVersion():
+    return bpy.app.version
+
+def getAnimationNodesVersion():
+    return sys.modules[addonName].bl_info["version"]

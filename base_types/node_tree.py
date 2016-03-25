@@ -6,11 +6,11 @@ from .. utils.nodes import getAnimationNodeTrees
 from .. events import treeChanged, isRendering, propertyChanged
 from .. nodes.generic.debug_loop import clearDebugLoopTextBlocks
 from .. utils.blender_ui import iterActiveScreens, isViewportRendering
+from .. preferences import getBlenderVersion, getAnimationNodesVersion
 from .. tree_info import getNetworksByNodeTree, getSubprogramNetworksByNodeTree
 from .. execution.units import getMainUnitsByNodeTree, setupExecutionUnits, finishExecutionUnits
 
 class AutoExecutionProperties(bpy.types.PropertyGroup):
-    bl_idname = "an_AutoExecutionProperties"
 
     enabled = BoolProperty(default = True, name = "Enabled",
         description = "Enable auto execution for this node tree")
@@ -34,13 +34,23 @@ class AutoExecutionProperties(bpy.types.PropertyGroup):
     lastExecutionTimestamp = FloatProperty(default = 0.0)
 
 
+class LastTreeExecutionInfo(bpy.types.PropertyGroup):
+
+    executionTime = FloatProperty(name = "Execution Time")
+    blenderVersion = IntVectorProperty(name = "Blender Version", default = (2, 77, 0))
+    animationNodesVersion = IntVectorProperty(name = "Animation Nodes Version", default = (1, 0, 1))
+
+    def updateVersions(self):
+        self.blenderVersion = getBlenderVersion()
+        self.animationNodesVersion = getAnimationNodesVersion()
+
 class AnimationNodeTree(bpy.types.NodeTree):
     bl_idname = "an_AnimationNodeTree"
     bl_label = "Animation"
     bl_icon = "ACTION"
 
     autoExecution = PointerProperty(type = AutoExecutionProperties)
-    executionTime = FloatProperty(name = "Execution Time")
+    lastExecutionInfo = PointerProperty(type = LastTreeExecutionInfo)
 
     sceneName = StringProperty(name = "Scene",
         description = "The global scene used by this node tree (never none)")
@@ -88,7 +98,7 @@ class AnimationNodeTree(bpy.types.NodeTree):
     def _execute(self):
         units = self.mainUnits
         if len(units) == 0:
-            self.executionTime = 0
+            self.lastExecutionInfo.executionTime = 0
             return
 
         clearDebugLoopTextBlocks(self)
@@ -96,7 +106,9 @@ class AnimationNodeTree(bpy.types.NodeTree):
         for unit in units:
             unit.execute()
         end = time.clock()
-        self.executionTime = end - start
+
+        self.lastExecutionInfo.executionTime = end - start
+        self.lastExecutionInfo.updateVersions()
 
     @property
     def hasMainExecutionUnits(self):

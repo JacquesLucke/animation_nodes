@@ -25,7 +25,7 @@ class OverviewPanel(bpy.types.Panel):
         for tree in trees:
             row = col.row(align = True)
             row.operator("an.switch_tree", text = tree.name, emboss = False).treeName = tree.name
-            row.label(prettyTime(tree.executionTime), icon = "TIME")
+            row.label(prettyTime(tree.lastExecutionInfo.executionTime), icon = "TIME")
 
             icon = "LAYER_ACTIVE" if tree.autoExecution.enabled else "LAYER_USED"
             row.prop(tree.autoExecution, "enabled", icon = icon, text = "", icon_only = True)
