@@ -15,12 +15,13 @@ class SortingTemplate:
     dataType = "NONE"
     label = "NONE"
 
-    @staticmethod
-    def setup(node):
+    def setup(self, node):
         pass
 
-    @staticmethod
-    def sort(inList, reverseOutput, *args):
+    def draw(self, layout):
+        pass
+
+    def sort(self, inList, reverseOutput, *args):
         '''Returns either the sorted list or an error message'''
         return []
 
@@ -34,12 +35,10 @@ class SortObjectListWithDirectionTemplate(bpy.types.PropertyGroup, SortingTempla
     dataType = "Object List"
     label = "Direction"
 
-    @staticmethod
-    def setup(node):
+    def setup(self, node):
         node.inputs.new("an_VectorSocket", "Direction", "direction").value = (0, 0, 1)
 
-    @staticmethod
-    def sort(objects, reverse, direction):
+    def sort(self, objects, reverse, direction):
         if not all(objects): return "List elements must not be None"
 
         distance = distance_point_to_plane
@@ -47,35 +46,32 @@ class SortObjectListWithDirectionTemplate(bpy.types.PropertyGroup, SortingTempla
             reverse = reverse,
             key = lambda x: distance(x.location, (0, 0, 0), direction))
 
-class SortObjectListByNameTemplate(bpy.types.PropertyGroup, SortingTemplate):
-    identifier = "OBJECT_LIST__NAME"
-    dataType = "Object List"
-    label = "Name"
-
-    @staticmethod
-    def sort(objects, reverse):
-        if not all(objects): return "List elements must not be None"
-
-        return sorted(objects,
-            reverse = reverse,
-            key = lambda x: x.name)
-
 class SortObjectListByPointDistanceTemplate(bpy.types.PropertyGroup, SortingTemplate):
     identifier = "OBJECT_LIST__POINT_DISTANCE"
     dataType = "Object List"
     label = "Point Distance"
 
-    @staticmethod
-    def setup(node):
+    def setup(self, node):
         node.inputs.new("an_VectorSocket", "Point", "point")
 
-    @staticmethod
-    def sort(objects, reverse, point):
+    def sort(self, objects, reverse, point):
         if not all(objects): return "List elements must not be None"
 
         return sorted(objects,
             reverse = reverse,
             key = lambda x: (x.location - point).length)
+
+class SortObjectListByNameTemplate(bpy.types.PropertyGroup, SortingTemplate):
+    identifier = "OBJECT_LIST__NAME"
+    dataType = "Object List"
+    label = "Name"
+
+    def sort(self, objects, reverse):
+        if not all(objects): return "List elements must not be None"
+
+        return sorted(objects,
+            reverse = reverse,
+            key = lambda x: x.name)
 
 
 
@@ -85,19 +81,18 @@ class SortObjectListByPointDistanceTemplate(bpy.types.PropertyGroup, SortingTemp
 class SortingTemplates(bpy.types.PropertyGroup):
     bl_idname = "an_SortingTemplatesGroup"
 
-    templateByIdentifier = dict()
-    templatesByDataType = defaultdict(list)
+    templateIdentifiersByDataType = defaultdict(list)
 
     def getTemplates(self, dataType):
-        return self.templatesByDataType[dataType]
+        identifiers = self.templateIdentifiersByDataType[dataType]
+        return [self.getTemplate(identifier) for identifier in identifiers]
 
     def getTemplate(self, identifier):
-        return self.templateByIdentifier[identifier]
+        return getattr(self, identifier)
 
 for template in SortingTemplate.__subclasses__():
-    SortingTemplates.templateByIdentifier[template.identifier] = template
-    SortingTemplates.templatesByDataType[template.dataType].append(template)
     setattr(SortingTemplates, template.identifier, PointerProperty(type = template))
+    SortingTemplates.templateIdentifiersByDataType[template.dataType].append(template.identifier)
 
 
 
@@ -165,6 +160,8 @@ class SortListNode(bpy.types.Node, AnimationNode):
             col.prop(self, "sortKey", text = "")
         elif self.sortType == "KEY_LIST":
             layout.prop(self, "keyListType", text = "Keys")
+        else:
+            self.activeTemplate.draw(layout)
 
         if self.errorMessage != "":
             layout.label(self.errorMessage, icon = "ERROR")
