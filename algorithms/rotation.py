@@ -8,6 +8,7 @@ required arguments (as strings):
     input socket name: rotation (euler), length (float),
     output socket name: direction (vector)
     axis in ("X", "Y", "Z", "-X", "-Y", "-Z")
+needs mathutils module
 '''
 
 def generateRotationToDirectionCode(rotationName, lengthName, directionOutputName, axis):
