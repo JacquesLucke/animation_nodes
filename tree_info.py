@@ -1,31 +1,17 @@
 from . utils.timing import measureTime
 from . utils.handlers import eventHandler
-from . utils.nodes import iterAnimationNodesSockets, idToNode, idToSocket
+from . utils.nodes import idToNode, idToSocket
 
-class SpecialNodesAndSockets:
-    def __init__(self):
-        self.reset()
-
-    def reset(self):
-        self.socketsThatNeedUpdate = set()
-
-    def update(self):
-        self.reset()
-        socketsThatNeedUpdate = self.socketsThatNeedUpdate
-        for socket in iterAnimationNodesSockets():
-            if hasattr(socket, "updateProperty"):
-                socketsThatNeedUpdate.add(socket.toID())
 
 def __setup():
     from . tree_analysis.forest_data import ForestData
     from . tree_analysis.networks import NodeNetworks
 
-    global _needsUpdate, _forestData, _networks, _specialNodesAndSockets
+    global _needsUpdate, _forestData, _networks
 
     _needsUpdate = True
     _forestData = ForestData()
     _networks = NodeNetworks()
-    _specialNodesAndSockets = SpecialNodesAndSockets()
 
 
 def updateAndRetryOnException(function):
@@ -47,7 +33,6 @@ def updateAndRetryOnException(function):
 def update():
     _forestData.update()
     _networks.update(_forestData)
-    _specialNodesAndSockets.update()
 
     global _needsUpdate
     _needsUpdate = False
@@ -101,7 +86,7 @@ def getLinkedSocket(socket):
         return idToSocket(linkedIDs[0])
 
 def iterSocketsThatNeedUpdate():
-    for socketID in _specialNodesAndSockets.socketsThatNeedUpdate:
+    for socketID in _forestData.socketsThatNeedUpdate:
         yield idToSocket(socketID)
 
 def getUndefinedNodes():
