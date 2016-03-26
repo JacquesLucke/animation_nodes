@@ -1,11 +1,11 @@
-from . utils.timing import measureTime
-from . utils.handlers import eventHandler
-from . utils.nodes import idToNode, idToSocket
+from .. utils.timing import measureTime
+from .. utils.handlers import eventHandler
+from .. utils.nodes import idToNode, idToSocket
 
 
 def __setup():
-    from . tree_analysis.forest_data import ForestData
-    from . tree_analysis.networks import NodeNetworks
+    from . forest_data import ForestData
+    from . networks import NodeNetworks
 
     global _needsUpdate, _forestData, _networks
 
