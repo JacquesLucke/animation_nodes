@@ -1,11 +1,17 @@
 from mathutils import Matrix, Euler
 
 def composeMatrix(location, rotation, scale):
-    matrix = Matrix.Translation(location)
-    matrix *= Euler(rotation).to_matrix().to_4x4()
-    matrix *= Matrix.Scale(scale[0], 4, [1, 0, 0])
-    matrix *= Matrix.Scale(scale[1], 4, [0, 1, 0])
-    matrix *= Matrix.Scale(scale[2], 4, [0, 0, 1])
+    matrix = (rotation.to_matrix() * scaleMatrix_3x3(scale)).to_4x4()
+    matrix[0][3] = location[0]
+    matrix[1][3] = location[1]
+    matrix[2][3] = location[2]
+    return matrix
+
+def scaleMatrix_3x3(scale):
+    matrix = Matrix.Identity(3)
+    matrix[0][0] = scale[0]
+    matrix[1][1] = scale[1]
+    matrix[2][2] = scale[2]
     return matrix
 
 def extractRotation(matrix):
