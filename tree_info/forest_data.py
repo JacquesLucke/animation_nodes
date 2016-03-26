@@ -18,8 +18,8 @@ class ForestData:
         self.linkedSocketsWithReroutes = defaultdict(list)
         self.reroutePairs = defaultdict(list)
 
+        self.dataTypeBySocket = dict()
         self.socketsThatNeedUpdate = set()
-        self.socketsThatNeedCopies = set()
 
     def update(self):
         self._reset()
@@ -31,7 +31,6 @@ class ForestData:
         for tree in getAnimationNodeTrees():
             self.insertNodes(tree.nodes)
             self.insertLinks(tree.links)
-        self.insertSockets()
 
     def insertNodes(self, nodes):
         appendNode = self.nodes.append
@@ -40,6 +39,8 @@ class ForestData:
         nodeByIdentifier = self.nodeByIdentifier
         socketsByNode = self.socketsByNode
         reroutePairs = self.reroutePairs
+        dataTypeBySocket = self.dataTypeBySocket
+        socketsThatNeedUpdate = self.socketsThatNeedUpdate
 
         for node in nodes:
             nodeID = node.toID()
@@ -57,6 +58,14 @@ class ForestData:
                 reroutePairs[inputIDs[0]] = outputIDs[0]
                 reroutePairs[outputIDs[0]] = inputIDs[0]
 
+            chainedSockets = chain(node.inputs, node.outputs)
+            chainedSocketIDs = chain(inputIDs, outputIDs)
+            for socket, socketID in zip(chainedSockets, chainedSocketIDs):
+                dataTypeBySocket[socketID] = socket.dataType
+                if hasattr(socket, "updateProperty"):
+                    socketsThatNeedUpdate.add(socketID)
+
+
     def insertLinks(self, links):
         linkedSocketsWithReroutes = self.linkedSocketsWithReroutes
 
@@ -66,16 +75,6 @@ class ForestData:
 
             linkedSocketsWithReroutes[originID].append(targetID)
             linkedSocketsWithReroutes[targetID].append(originID)
-
-    def insertSockets(self):
-        socketsThatNeedUpdate = self.socketsThatNeedUpdate
-        socketsThatNeedCopies = self.socketsThatNeedCopies
-
-        for socket in iterAnimationNodesSockets():
-            if hasattr(socket, "updateProperty"):
-                socketsThatNeedUpdate.add(socket.toID())
-            if socket.dataIsModified:
-                socketsThatNeedCopies.add(socket.toID())
 
     def findLinksSkippingReroutes(self):
         rerouteNodes = self.rerouteNodes
