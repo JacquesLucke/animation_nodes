@@ -103,13 +103,16 @@ def getOriginNodes(node):
             linkedNodeIDs.add(linkedSocketID[0])
     return [idToNode(nodeID) for nodeID in linkedNodeIDs]
 
-def getAllDataLinks():
-    dataLinks = set()
+def getAllDataLinkIDs():
+    linkDataIDs = set()
+    dataType = _forestData.dataTypeBySocket
     for socketID, linkedIDs in _forestData.linkedSockets.items():
         for linkedID in linkedIDs:
-            if not socketID[1]: socketID, linkedID = linkedID, socketID
-            dataLinks.add((idToSocket(socketID), idToSocket(linkedID)))
-    return list(dataLinks)
+            if socketID[1]: # check which one is origin/target
+                linkDataIDs.add((socketID, linkedID, dataType[socketID], dataType[linkedID]))
+            else:
+                linkDataIDs.add((linkedID, socketID, dataType[linkedID], dataType[socketID]))
+    return linkDataIDs
 
 
 # keep node state
