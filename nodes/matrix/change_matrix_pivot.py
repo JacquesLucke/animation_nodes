@@ -6,7 +6,7 @@ from ... algorithms.rotation import generateDirectionToRotationCode
 from ... base_types.node import AnimationNode
 
 pivotTypeItems = [
-    ("MATRIX", "Pivot Matrix", "Change Pivot by Matrix, like parent", "", 0),
+    ("MATRIX", "Pivot Matrix", "Change Pivot by Matrix like parent", "", 0),
     ("VECTOR", "Pivot Location", "Change Pivot Location", "", 3),
     ("LOC_ROT", "Center and Rotation", "Change Pivot by Center and Custom Rotation", "", 2),
     ("AXES", "Center and Axes Direction", "Change Pivot by Center and Custom Rotation Axes", "", 1) ]
@@ -14,11 +14,6 @@ pivotTypeItems = [
 class ChangeMatrixPivotNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ChangeMatrixPivotNode"
     bl_label = "Change Matrix Pivot"
-    
-    searchTags = [  ("Change Transform Matrix Pivot", {"pivotType" : repr("MATRIX")}),
-                    ("Local Transform Matrix", {"pivotType" : repr("MATRIX")}),
-                    ("Change Matrix Pivot by Axes Direction", {"pivotType" : repr("AXES")}), 
-                    ("Change Matrix Pivot by Center and Rotation", {"pivotType" : repr("LOC_ROT")})]
 
     def pivotTypeChanged(self, context):
         self.generateSockets()
