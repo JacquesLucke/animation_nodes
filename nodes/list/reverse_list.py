@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... tree_info import keepNodeLinks
-from ... sockets.info import toIdName, isList
+from ... sockets.info import toIdName, isList, isLimitedList, toGeneralListIdName, toDataType
 from ... base_types.node import AnimationNode
 
 class ReverseListNode(bpy.types.Node, AnimationNode):
@@ -18,6 +18,10 @@ class ReverseListNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.assignedType = "Object List"
 
+    def drawAdvanced(self, layout):
+        self.invokeSocketTypeChooser(layout, "assignListDataType",
+            socketGroup = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
+
     def getExecutionCode(self):
         return "reversedList = list(reversed(inList))"
 
@@ -29,7 +33,10 @@ class ReverseListNode(bpy.types.Node, AnimationNode):
         listInput = self.inputs[0].dataOrigin
         listOutputs = self.outputs[0].dataTargets
 
-        if listInput is not None: return listInput.dataType
+        if listInput is not None: 
+            idName = listInput.bl_idname
+            if isLimitedList(idName): idName = toGeneralListIdName(idName)
+            return toDataType(idName)
         if len(listOutputs) == 1: return listOutputs[0].dataType
         return self.inputs[0].dataType
 
