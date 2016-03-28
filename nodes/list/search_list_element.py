@@ -3,7 +3,8 @@ from bpy.props import *
 from ... tree_info import keepNodeLinks
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
-from ... sockets.info import getBaseDataTypeItemsCallback, toIdName, toListIdName, isBase, toBaseDataType
+from ... sockets.info import (getBaseDataTypeItemsCallback, toIdName, toListIdName, isBase, 
+                                toBaseDataType, isLimitedList, toGeneralListIdName)
 
 class SearchListElementNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SearchListElementNode"
@@ -47,7 +48,10 @@ class SearchListElementNode(bpy.types.Node, AnimationNode):
         listInput = self.inputs["List"].dataOrigin
         elementInput = self.inputs["Search"].dataOrigin
 
-        if listInput is not None: return toBaseDataType(listInput.bl_idname)
+        if listInput is not None: 
+            idName = listInput.bl_idname
+            if isLimitedList(idName): idName = toGeneralListIdName(idName)
+            return toBaseDataType(idName)
         if elementInput is not None: return elementInput.dataType
         return self.inputs["Search"].dataType
 
