@@ -4,7 +4,8 @@ from bpy.props import *
 from ... events import propertyChanged
 from ... tree_info import keepNodeState
 from ... base_types.node import AnimationNode
-from ... sockets.info import toIdName, isList, toBaseIdName, toListDataType
+from ... sockets.info import (toIdName, isList, toBaseIdName, toListDataType,
+                                isLimitedList, toGeneralListIdName, toDataType)
 
 selectionTypeItems = [
     ("SINGLE", "Single", "Select only one random element from the list"),
@@ -37,6 +38,10 @@ class GetRandomListElementsNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "selectionType", text = "")
         layout.prop(self, "nodeSeed", text = "Node Seed")
 
+    def drawAdvanced(self, layout):
+        self.invokeSocketTypeChooser(layout, "assignListDataType",
+            socketGroup = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
+
     def getExecutionCode(self):
         yield "random.seed(self.nodeSeed * 1245 + seed)"
         if self.selectionType == "SINGLE":
@@ -55,7 +60,10 @@ class GetRandomListElementsNode(bpy.types.Node, AnimationNode):
 
     def getWantedDataType(self):
         listInput = self.inputs[1].dataOrigin
-        if listInput is not None: return listInput.dataType
+        if listInput is not None:             
+            idName = listInput.bl_idname
+            if isLimitedList(idName): idName = toGeneralListIdName(idName)
+            return toDataType(idName)
 
         if self.selectionType == "SINGLE":
             elementOutputs = self.outputs[0].dataTargets
@@ -65,6 +73,9 @@ class GetRandomListElementsNode(bpy.types.Node, AnimationNode):
             if len(listOutputs) == 1: return listOutputs[0].dataType
 
         return self.inputs[0].dataType
+
+    def assignListDataType(self, listDataType):
+        self.assignType(listDataType)
 
     def assignType(self, listDataType):
         if not isList(listDataType): return
