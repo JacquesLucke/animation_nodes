@@ -4,8 +4,8 @@ from ... tree_info import keepNodeState
 from ... ui.info_popups import showTextPopup
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
-from ... sockets.info import (toIdName, toListIdName, toBaseDataType, isBase,
-                              isComparable, toListDataType)
+from ... sockets.info import ( getBaseDataTypeItemsCallback,toIdName, toListIdName, toBaseDataType, isBase,
+                              isComparable, toListDataType, isLimitedList, toGeneralListIdName)
 
 removeTypeItems = [
     ("FIRST_OCCURRENCE", "First Occurrence", "", "", 0),
@@ -50,6 +50,7 @@ class RemoveListElementNode(bpy.types.Node, AnimationNode):
             socketGroup = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
 
     def getExecutionCode(self):
+        if self.isTuple(): yield "inList = list(inList)"
         yield "outList = inList"
         if self.removeType == "FIRST_OCCURRENCE":
             yield "try: inList.remove(element)"
@@ -63,10 +64,18 @@ class RemoveListElementNode(bpy.types.Node, AnimationNode):
         dataType = self.getWantedDataType()
         self.assignType(dataType)
 
+    def isTuple(self):
+        listInput = self.inputs["List"].dataOrigin
+        if listInput is not None:
+            if isLimitedList(listInput.bl_idname): return True
+        return False
+
     def getWantedDataType(self):
         listInput = self.inputs["List"].dataOrigin
         if listInput is not None:
-            return toBaseDataType(listInput.bl_idname)
+            idName = listInput.bl_idname
+            if isLimitedList(idName): idName = toGeneralListIdName(idName)
+            return toBaseDataType(idName)
 
         if self.removeType in ("FIRST_OCCURRENCE", "ALL_OCCURRENCES"):
             elementInput = self.inputs["Element"].dataOrigin
