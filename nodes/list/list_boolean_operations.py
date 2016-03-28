@@ -3,7 +3,7 @@ import itertools
 from bpy.props import *
 from ... tree_info import keepNodeLinks
 from ... events import executionCodeChanged
-from ... sockets.info import toIdName, isList
+from ... sockets.info import toIdName, isList, isLimitedList, toGeneralListIdName, toDataType
 from ... base_types.node import AnimationNode
 
 operationItems = [
@@ -31,6 +31,10 @@ class ListBooleanOperationsNode(bpy.types.Node, AnimationNode):
 
     def draw(self, layout):
         layout.prop(self, "operation", text = "")
+
+    def drawAdvanced(self, layout):
+        self.invokeSocketTypeChooser(layout, "assignListDataType",
+            socketGroup = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
 
     def getExecutionCode(self):
         op = self.operation
@@ -90,10 +94,19 @@ class ListBooleanOperationsNode(bpy.types.Node, AnimationNode):
         listInput2 = self.inputs[1].dataOrigin
         listOutputs = self.outputs[0].dataTargets
 
-        if listInput1 is not None: return listInput1.dataType
-        if listInput2 is not None: return listInput2.dataType
+        if listInput1 is not None: 
+            idName = listInput1.bl_idname
+            if isLimitedList(idName): idName = toGeneralListIdName(idName)
+            return toDataType(idName)
+        if listInput2 is not None: 
+            idName = listInput2.bl_idname
+            if isLimitedList(idName): idName = toGeneralListIdName(idName)
+            return toDataType(idName)
         if len(listOutputs) == 1: return listOutputs[0].dataType
         return self.inputs[0].dataType
+
+    def assignListDataType(self, listDataType):
+        self.assignType(listDataType)
 
     def assignType(self, listDataType):
         if not isList(listDataType): return
