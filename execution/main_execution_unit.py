@@ -53,14 +53,12 @@ class MainExecutionUnit:
 
         variables = getInitialVariables(nodes)
         self.setupScript = "\n".join(iterSetupCodeLines(nodes, variables))
-        self.executeScript = self.getExecutionScript(nodes, variables)
+        self.executeScript = "\n".join(self.iterExecutionScriptLines(nodes, variables))
 
-    def getExecutionScript(self, nodes, variables):
-        lines = []
+    def iterExecutionScriptLines(self, nodes, variables):
         for node in nodes:
-            lines.extend(getNodeExecutionLines(node, variables))
-            lines.extend(linkOutputSocketsToTargets(node, variables))
-        return "\n".join(lines)
+            yield from getNodeExecutionLines(node, variables)
+            yield from linkOutputSocketsToTargets(node, variables)
 
     def compileScripts(self):
         self.setupCodeObject = compileScript(self.setupScript, name = "setup: {}".format(repr(self.network.treeName)))
