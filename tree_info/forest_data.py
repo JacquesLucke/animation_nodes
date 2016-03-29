@@ -1,6 +1,6 @@
 from itertools import chain
 from collections import defaultdict
-from .. utils.nodes import getAnimationNodeTrees
+from .. utils.nodes import getAnimationNodeTrees, iterAnimationNodesSockets
 
 class ForestData:
     def __init__(self):
@@ -17,6 +17,9 @@ class ForestData:
         self.linkedSockets = defaultdict(list)
         self.linkedSocketsWithReroutes = defaultdict(list)
         self.reroutePairs = defaultdict(list)
+
+        self.dataTypeBySocket = dict()
+        self.socketsThatNeedUpdate = set()
 
     def update(self):
         self._reset()
@@ -36,6 +39,8 @@ class ForestData:
         nodeByIdentifier = self.nodeByIdentifier
         socketsByNode = self.socketsByNode
         reroutePairs = self.reroutePairs
+        dataTypeBySocket = self.dataTypeBySocket
+        socketsThatNeedUpdate = self.socketsThatNeedUpdate
 
         for node in nodes:
             nodeID = node.toID()
@@ -52,6 +57,14 @@ class ForestData:
             if node.bl_idname == "NodeReroute":
                 reroutePairs[inputIDs[0]] = outputIDs[0]
                 reroutePairs[outputIDs[0]] = inputIDs[0]
+
+            chainedSockets = chain(node.inputs, node.outputs)
+            chainedSocketIDs = chain(inputIDs, outputIDs)
+            for socket, socketID in zip(chainedSockets, chainedSocketIDs):
+                dataTypeBySocket[socketID] = socket.dataType
+                if hasattr(socket, "updateProperty"):
+                    socketsThatNeedUpdate.add(socketID)
+
 
     def insertLinks(self, links):
         linkedSocketsWithReroutes = self.linkedSocketsWithReroutes

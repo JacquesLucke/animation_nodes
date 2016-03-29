@@ -1,20 +1,31 @@
 import bpy
 from . import tree_info
 from mathutils import Vector
+from . utils.nodes import idToSocket
 from . sockets.info import toBaseIdName, isList
-from . tree_info import getAllDataLinks, getDirectlyLinkedSocket
+from . tree_info import getAllDataLinkIDs, getDirectlyLinkedSocket
 
 def correctForbiddenNodeLinks():
-    dataLinks = getAllDataLinks()
-    invalidLinks = filterInvalidLinks(dataLinks)
-    for dataOrigin, target in invalidLinks:
+    for dataOrigin, target in iterLinksThatNeedToBeCorrectedOrRemoved():
         directOrigin = getDirectlyLinkedSocket(target)
         if not tryToCorrectLink(dataOrigin, directOrigin, target):
             removeLink(directOrigin, target)
     tree_info.updateIfNecessary()
 
-def filterInvalidLinks(dataLinks):
-    return [dataLink for dataLink in dataLinks if not isConnectionValid(*dataLink)]
+approvedLinkTypes = set()
+
+def iterLinksThatNeedToBeCorrectedOrRemoved():
+    for originID, targetID, originType, targetType in getAllDataLinkIDs():
+        if (originType, targetType) in approvedLinkTypes:
+            continue
+
+        origin = idToSocket(originID)
+        target = idToSocket(targetID)
+
+        if isConnectionValid(origin, target):
+            approvedLinkTypes.add((originType, targetType))
+        else:
+            yield (origin, target)
 
 def isConnectionValid(origin, target):
     return origin.dataType in target.allowedInputTypes or target.allowedInputTypes[0] == "all"
