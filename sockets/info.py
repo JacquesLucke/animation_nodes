@@ -31,9 +31,6 @@ listChains = [
     ["an_ShapeKeySocket",           "an_ShapeKeyListSocket"],
     ["an_BooleanSocket",            "an_BooleanListSocket"] ]
 
-limitedListTypes = {
-    "an_IntegerListSocket" : ("an_EdgeIndicesSocket", "an_PolygonIndicesSocket") }
-
 
 def returnNoneOnFailure(function):
     def wrapper(*args, **kwargs):
@@ -133,15 +130,6 @@ def baseIdNameToListIdName(idName):
             if index == len(listChain) - 1: return None
             return listChain[index + 1]
     return None
-
-def isLimitedList(idName):
-    for limitedLists in limitedListTypes.values():
-        if idName in limitedLists: return True
-    return False
-
-def toGeneralListIdName(limitedListIdName):
-    for generalIdName, limitedLists in limitedListTypes.items():
-        if limitedListIdName in limitedLists: return generalIdName
 
 
 def getSocketClassFromIdName(idName):

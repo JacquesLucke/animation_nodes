@@ -3,7 +3,7 @@ from bpy.props import *
 from ... tree_info import keepNodeState
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
-from ... sockets.info import getBaseDataTypeItemsCallback, toIdName, toListIdName, isBase, toBaseDataType, isLimitedList, toGeneralListIdName
+from ... sockets.info import getBaseDataTypeItemsCallback, toIdName, toListIdName, isBase, toBaseDataType
 
 class GetListElementNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GetListElementNode"
@@ -69,9 +69,8 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
         elementOutputs = self.outputs["Element"].dataTargets
 
         if listInput is not None:
-            idName = listInput.bl_idname
-            if isLimitedList(idName): idName = toGeneralListIdName(idName)
-            return toBaseDataType(idName)
+            if listInput.dataType in ("Edge Indices", "Polygon Indices"): return "Integer"
+            return toBaseDataType(listInput.dataType)
         if fallbackInput is not None: return fallbackInput.dataType
         if len(elementOutputs) == 1: return elementOutputs[0].dataType
         return self.outputs["Element"].dataType

@@ -70,6 +70,14 @@ class SimpleConvert(LinkCorrection):
         nodeIdName = self.rules[(dataOrigin.dataType, target.dataType)]
         node = insertLinkedNode(nodeTree, nodeIdName, origin, target)
 
+class ConvertToIntegerList(LinkCorrection):
+    def check(self, origin, target):
+        return origin.dataType in ("Float List", "Edge Indices", "Polygon Indices") and target.dataType == "Integer List"
+    def insert(self, nodeTree, origin, target, dataOrigin):
+        node = insertLinkedNode(nodeTree, "an_ConvertToIntegerListNode", origin, target)
+        node.setOriginType(dataOrigin.dataType)
+        node.inputs[0].linkWith(origin)
+
 class ConvertFloatToScale(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType in ("Float", "Integer") and target.dataType == "Vector" and "scale" in target.name.lower()
@@ -231,6 +239,7 @@ def getSocketCenter(socket1, socket2):
     return (socket1.node.viewLocation + socket2.node.viewLocation) / 2
 
 linkCorrectors = [
+    ConvertToIntegerList(),
     ConvertNormalToEuler(),
     ConvertObjectToMeshData(),
     ConvertSeparatedMeshDataToBMesh(),
