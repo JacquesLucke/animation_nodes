@@ -57,13 +57,13 @@ class ForestData:
             if node.bl_idname == "NodeReroute":
                 reroutePairs[inputIDs[0]] = outputIDs[0]
                 reroutePairs[outputIDs[0]] = inputIDs[0]
-
-            chainedSockets = chain(node.inputs, node.outputs)
-            chainedSocketIDs = chain(inputIDs, outputIDs)
-            for socket, socketID in zip(chainedSockets, chainedSocketIDs):
-                dataTypeBySocket[socketID] = socket.dataType
-                if hasattr(socket, "updateProperty"):
-                    socketsThatNeedUpdate.add(socketID)
+            else:
+                chainedSockets = chain(node.inputs, node.outputs)
+                chainedSocketIDs = chain(inputIDs, outputIDs)
+                for socket, socketID in zip(chainedSockets, chainedSocketIDs):
+                        dataTypeBySocket[socketID] = socket.dataType
+                        if hasattr(socket, "updateProperty"):
+                            socketsThatNeedUpdate.add(socketID)
 
 
     def insertLinks(self, links):
