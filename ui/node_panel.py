@@ -8,7 +8,9 @@ def draw(self, context):
     if not getattr(node, "isAnimationNode", False): return
     layout = self.layout
     layout.separator()
+    drawNodeSettings(layout, node)
 
+def drawNodeSettings(layout, node):
     drawSocketLists(layout, node)
     drawSocketVisibilityOperators(layout, node)
 
