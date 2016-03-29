@@ -9,12 +9,12 @@ def draw(self, context):
     layout = self.layout
     layout.separator()
 
-    drawGenericNodeProperties(layout, node)
     drawSocketLists(layout, node)
     drawSocketVisibilityOperators(layout, node)
 
     if debuggingIsEnabled():
         layout.separator()
+        drawGenericNodeProperties(layout, node)
         layout.label("Identifier: " + node.identifier)
 
 def drawGenericNodeProperties(layout, node):
