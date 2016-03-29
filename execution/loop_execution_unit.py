@@ -156,32 +156,27 @@ class LoopExecutionUnit:
             if node.bl_idname in ("an_LoopInputNode", "an_LoopGeneratorOutputNode", "an_ReassignLoopParameterNode"): continue
             lines.extend(getNodeExecutionLines(node, variables))
             lines.extend(linkOutputSocketsToTargets(node, variables))
-        lines.extend(self.get_LoopBreak(inputNode, variables))
-        lines.extend(self.get_AddToGenerators(inputNode, variables))
-        lines.extend(self.get_ReassignParameters(inputNode, variables))
+        lines.extend(self.iter_LoopBreak(inputNode, variables))
+        lines.extend(self.iter_AddToGenerators(inputNode, variables))
+        lines.extend(self.iter_ReassignParameters(inputNode, variables))
         lines.append("pass")
         return lines
 
-    def get_LoopBreak(self, inputNode, variables):
-        breakNodes = inputNode.getBreakNodes()
-        lines = []
-        for node in breakNodes:
-            lines.append("if not {}: break".format(variables[node.inputs[0]]))
-        return lines
+    def iter_LoopBreak(self, inputNode, variables):
+        for node in inputNode.getBreakNodes():
+            yield "if not {}: break".format(variables[node.inputs[0]])
 
-    def get_AddToGenerators(self, inputNode, variables):
-        lines = []
+    def iter_AddToGenerators(self, inputNode, variables):#
         for node in inputNode.getSortedGeneratorNodes():
             operation = "append" if node.addType == "APPEND" else "extend"
-            lines.append("if {}:".format(variables[node.conditionSocket]))
+            yield "if {}:".format(variables[node.conditionSocket])
+
             socket = node.addSocket
             if socket.isUnlinked and socket.isCopyable: expression = getCopyExpression(socket, variables)
             else: expression = variables[socket]
-            lines.append("    {}.{}({})".format(variables[node], operation, expression))
-        return lines
+            yield "    {}.{}({})".format(variables[node], operation, expression)#
 
-    def get_ReassignParameters(self, inputNode, variables):
-        lines = []
+    def iter_ReassignParameters(self, inputNode, variables):
         for node in inputNode.getReassignParameterNodes():
             socket = node.inputs[0]
             if socket.isUnlinked and socket.isCopyable: expression = getCopyExpression(socket, variables)
@@ -190,8 +185,7 @@ class LoopExecutionUnit:
             if node.conditionSocket is None: conditionPrefix = ""
             else: conditionPrefix = "if {}: ".format(variables[node.conditionSocket])
 
-            lines.append("{}{} = {}".format(conditionPrefix, variables[node.linkedParameterSocket], expression))
-        return lines
+            yield "{}{} = {}".format(conditionPrefix, variables[node.linkedParameterSocket], expression)
 
 
 
