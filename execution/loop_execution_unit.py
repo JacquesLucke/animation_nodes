@@ -62,7 +62,7 @@ class LoopExecutionUnit:
         generators = indent(self.get_InitializeGenerators(inputNode, variables))
         parameters = indent(self.get_InitializeParameters(inputNode, variables))
         prepareLoop = indent(self.get_IterationsAmount_PrepareLoop(inputNode, variables))
-        loopBody = indent(self.get_LoopBody(inputNode, nodes, variables), amount = 2)
+        loopBody = indent(tuple(self.iter_LoopBody(inputNode, nodes, variables)), amount = 2)
         returnStatement = indent([self.get_ReturnStatement(inputNode, variables)])
         return joinLines([header] + [globalizeStatement] + generators + parameters + prepareLoop + loopBody + returnStatement)
 
@@ -91,7 +91,7 @@ class LoopExecutionUnit:
         generators = indent(self.get_InitializeGenerators(inputNode, variables))
         parameters = indent(self.get_InitializeParameters(inputNode, variables))
         prepareLoop = indent(self.get_IteratorLength_PrepareLoop(inputNode, variables))
-        loopBody = indent(self.get_LoopBody(inputNode, nodes, variables), amount = 2)
+        loopBody = indent(tuple(self.iter_LoopBody(inputNode, nodes, variables)), amount = 2)
         returnStatement = indent([self.get_ReturnStatement(inputNode, variables)])
         return joinLines([header] + [globalizeStatement] + generators + parameters + prepareLoop + loopBody + returnStatement)
 
@@ -149,18 +149,19 @@ class LoopExecutionUnit:
         return lines
 
 
-    def get_LoopBody(self, inputNode, nodes, variables):
-        lines = []
-        lines.extend(linkOutputSocketsToTargets(inputNode, variables))
+    def iter_LoopBody(self, inputNode, nodes, variables):
+        yield from linkOutputSocketsToTargets(inputNode, variables)
+
+        ignoreNodes = {"an_LoopInputNode", "an_LoopGeneratorOutputNode", "an_ReassignLoopParameterNode"}
         for node in nodes:
-            if node.bl_idname in ("an_LoopInputNode", "an_LoopGeneratorOutputNode", "an_ReassignLoopParameterNode"): continue
-            lines.extend(getNodeExecutionLines(node, variables))
-            lines.extend(linkOutputSocketsToTargets(node, variables))
-        lines.extend(self.iter_LoopBreak(inputNode, variables))
-        lines.extend(self.iter_AddToGenerators(inputNode, variables))
-        lines.extend(self.iter_ReassignParameters(inputNode, variables))
-        lines.append("pass")
-        return lines
+            if node.bl_idname in ignoreNodes: continue
+            yield from getNodeExecutionLines(node, variables)
+            yield from linkOutputSocketsToTargets(node, variables)
+
+        yield from self.iter_LoopBreak(inputNode, variables)
+        yield from self.iter_AddToGenerators(inputNode, variables)
+        yield from self.iter_ReassignParameters(inputNode, variables)
+        yield "pass"
 
     def iter_LoopBreak(self, inputNode, variables):
         for node in inputNode.getBreakNodes():
