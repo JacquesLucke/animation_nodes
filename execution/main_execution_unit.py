@@ -3,7 +3,7 @@ from .. import problems
 from . compile_scripts import compileScript
 from .. problems import ExecutionUnitNotSetup, ExceptionDuringExecution
 from . code_generator import (getInitialVariables,
-                              getSetupCode,
+                              iterSetupCodeLines,
                               getNodeExecutionLines,
                               linkOutputSocketsToTargets)
 
@@ -52,7 +52,7 @@ class MainExecutionUnit:
         except: return
 
         variables = getInitialVariables(nodes)
-        self.setupScript = getSetupCode(nodes, variables)
+        self.setupScript = "\n".join(iterSetupCodeLines(nodes, variables))
         self.executeScript = self.getExecutionScript(nodes, variables)
 
     def getExecutionScript(self, nodes, variables):

@@ -1,7 +1,7 @@
 from . compile_scripts import compileScript
 from .. problems import ExecutionUnitNotSetup
 from . code_generator import (getInitialVariables,
-                              getSetupCode,
+                              iterSetupCodeLines,
                               getCopyExpression,
                               getGlobalizeStatement,
                               getNodeExecutionLines,
@@ -43,7 +43,7 @@ class LoopExecutionUnit:
         except: return
 
         variables = getInitialVariables(nodes)
-        self.setupScript = getSetupCode(nodes, variables)
+        self.setupScript = "\n".join(iterSetupCodeLines(nodes, variables))
         self.setupScript += "\n"*3
         self.setupScript += self.getFunctionGenerationScript(nodes, variables)
 

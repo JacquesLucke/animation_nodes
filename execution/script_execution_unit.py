@@ -1,7 +1,7 @@
 from .. utils.code import isCodeValid
 from . compile_scripts import compileScript
 from .. problems import ExecutionUnitNotSetup
-from . code_generator import getSocketValueExpression, getSetupCode, getInitialVariables
+from . code_generator import getSocketValueExpression, iterSetupCodeLines, getInitialVariables
 
 class ScriptExecutionUnit:
     def __init__(self, network):
@@ -37,7 +37,7 @@ class ScriptExecutionUnit:
         userCode = node.executionCode
 
         variables = getInitialVariables([node])
-        setupCode = getSetupCode([node], variables)
+        setupCode = "\n".join(iterSetupCodeLines([node], variables))
 
         finalCode = []
         finalCode.append(setupCode)

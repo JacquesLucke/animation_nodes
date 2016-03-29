@@ -25,14 +25,12 @@ def getSocketVariableName(socket):
 # Setup Code
 ##########################################
 
-def getSetupCode(nodes, variables):
-    lines = []
-    lines.append(get_ImportModules(nodes))
-    lines.append(get_ImportAnimationNodes())
-    lines.append(get_LoadRandomNumberCache())
-    lines.extend(tuple(get_GetNodeReferences(nodes)))
-    lines.extend(tuple(get_GetSocketValues(nodes, variables)))
-    return "\n".join(lines)
+def iterSetupCodeLines(nodes, variables):
+    yield get_ImportModules(nodes)
+    yield get_ImportAnimationNodes()
+    yield get_LoadRandomNumberCache()
+    yield from get_GetNodeReferences(nodes)
+    yield from get_GetSocketValues(nodes, variables)
 
 
 def get_ImportModules(nodes):
