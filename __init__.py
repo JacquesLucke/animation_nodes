@@ -23,8 +23,8 @@ bl_info = {
     "name":        "Animation Nodes",
     "description": "Node based visual scripting system designed for motion graphics in Blender.",
     "author":      "Jacques Lucke",
-    "version":     (1, 5, 0),
-    "blender":     (2, 7, 7),
+    "version":     (1, 5, 1),
+    "blender":     (2, 77, 0),
     "location":    "Node Editor",
     "category":    "Node",
     "warning":     ""
@@ -61,6 +61,15 @@ if "numpy" not in globals():
         "Unfortunally the Blender built you are using does not have this library.\n"
         "You can either install numpy manually or use another Blender version\n"
         "that comes with numpy (e.g. the newest official Blender release).")
+    raise Exception(message)
+
+
+from . preferences import getBlenderVersion
+if getBlenderVersion() < (2, 77, 0):
+    message = ("\n\n"
+        "The Animation Nodes addon requires at least Blender 2.77.\n"
+        "Your are using an older version.\n"
+        "Please download the latest official release.")
     raise Exception(message)
 
 
