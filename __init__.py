@@ -1,5 +1,5 @@
 '''
-Copyright (C) 2014 Jacques Lucke
+Copyright (C) 2016 Jacques Lucke
 mail@jlucke.com
 
 Created by Jacques Lucke
