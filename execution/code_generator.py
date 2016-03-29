@@ -3,7 +3,7 @@ import traceback
 from itertools import chain
 from collections import defaultdict
 from .. problems import NodeFailesToCreateExecutionCode
-from .. preferences import addonName, generateCompactCode
+from .. preferences import addonName
 
 
 # Initial Socket Variables
@@ -95,7 +95,7 @@ def getGlobalizeStatement(nodes, variables):
 
 def getNodeExecutionLines(node, variables):
     lines = []
-    if not generateCompactCode(): lines.extend(getNodeCommentLines(node))
+    lines.extend(getNodeCommentLines(node))
     lines.extend(getInputCopyLines(node, variables))
     try:
         taggedLines = node.getTaggedExecutionCodeLines()
@@ -149,10 +149,10 @@ def replace_DollarSign_OutputSocketVariable(line, node, variables):
 ##########################################
 
 def linkOutputSocketsToTargets(node, variables):
-    resolveInnerLinks(node, variables)
     lines = []
+    resolveInnerLinks(node, variables)
     for socket in node.linkedOutputs:
-        lines.extend(linkSocketToTargets(socket, variables))
+        lines.extend(tuple(linkSocketToTargets(socket, variables)))
     return lines
 
 def resolveInnerLinks(node, variables):
@@ -161,18 +161,14 @@ def resolveInnerLinks(node, variables):
         variables[outputs[outputName]] = variables[inputs[inputName]]
 
 def linkSocketToTargets(socket, variables):
-    lines = []
-
     targets = socket.dataTargets
     needACopy = getTargetsThatNeedACopy(socket, targets)
 
     for target in targets:
         if target in needACopy:
-            lines.append(getCopyLine(socket, variables[target], variables))
+            yield getCopyLine(socket, variables[target], variables)
         else:
             variables[target] = variables[socket]
-
-    return lines
 
 def getTargetsThatNeedACopy(socket, targets):
     if not socket.isCopyable: return []

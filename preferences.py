@@ -56,10 +56,6 @@ class AddonPreferences(bpy.types.AddonPreferences):
     sceneUpdateAfterAutoExecution = BoolProperty(
         name = "Scene Update After Auto Execution", default = True)
 
-    generateCompactCode = BoolProperty(
-        name = "Generate Compact Code", default = False,
-        description = "Avoid comments and blank lines (this has no impact on performance)")
-
     nodeColors = PointerProperty(type = NodeColorProperties)
     developer = PointerProperty(type = DeveloperProperties)
 
@@ -77,10 +73,6 @@ class AddonPreferences(bpy.types.AddonPreferences):
         subcol.prop(self, "redrawAllAfterAutoExecution", text = "Redraw All")
         subcol.prop(self, "sceneUpdateAfterAutoExecution", text = "Scene Update")
 
-        subcol = col.column(align = True)
-        subcol.label("Execution Code:")
-        subcol.prop(self, "generateCompactCode")
-
         col = row.column()
 
         subcol = col.column(align = True)
@@ -95,9 +87,6 @@ class AddonPreferences(bpy.types.AddonPreferences):
 def getPreferences():
     # TODO: access user_preferences without the context
     return bpy.context.user_preferences.addons[addonName].preferences
-
-def generateCompactCode():
-    return getPreferences().generateCompactCode
 
 def getDeveloperSettings():
     return getPreferences().developer
