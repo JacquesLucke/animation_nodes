@@ -153,7 +153,6 @@ class ConvertElementToList(LinkCorrection):
         node.assignBaseDataType(origin.dataType, inputAmount = 1)
         insertBasicLinking(nodeTree, origin, node, target)
 
-
 class ConvertVectorListToSplineList(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType == "Vector List" and target.dataType == "Spline List"
