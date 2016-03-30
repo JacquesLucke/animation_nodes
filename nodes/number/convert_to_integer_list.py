@@ -29,7 +29,8 @@ class ConvertToIntegerListNode(bpy.types.Node, AnimationNode):
     def edit(self):
         originSocket = self.inputs[0].dataOrigin
         if originSocket is not None:
-            self.setOriginType(originSocket.dataType)
+            if originSocket.dataType in ("Edge Indices", "Polygon Indices", "Float List"):
+                self.setOriginType(originSocket.dataType)
 
     def setOriginType(self, dataType):
         if dataType != self.originType:
