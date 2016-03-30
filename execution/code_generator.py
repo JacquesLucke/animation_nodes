@@ -29,8 +29,8 @@ def iterSetupCodeLines(nodes, variables):
     yield get_ImportModules(nodes)
     yield get_ImportAnimationNodes()
     yield get_LoadRandomNumberCache()
-    yield from get_GetNodeReferences(nodes)
-    yield from get_GetSocketValues(nodes, variables)
+    yield from iter_GetNodeReferences(nodes)
+    yield from iter_GetSocketValues(nodes, variables)
 
 
 def get_ImportModules(nodes):
@@ -59,13 +59,13 @@ def get_LoadRandomNumberCache():
     return "random_number_cache = animation_nodes.algorithms.random.getRandomNumberCache()"
 
 
-def get_GetNodeReferences(nodes):
+def iter_GetNodeReferences(nodes):
     yield "nodes = bpy.data.node_groups[{}].nodes".format(repr(nodes[0].nodeTree.name))
     for node in nodes:
         yield "{} = nodes[{}]".format(node.identifier, repr(node.name))
 
 
-def get_GetSocketValues(nodes, variables):
+def iter_GetSocketValues(nodes, variables):
     for socket in iterUnlinkedSockets(nodes):
         yield getLoadSocketValueLine(socket, variables)
 
