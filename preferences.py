@@ -35,16 +35,37 @@ class NodeColorProperties(bpy.types.PropertyGroup):
         update = changeNodeColors)
 
 
-profileSortModeItems = [
-    ("calls", "Amount of Calls", "Number of calls", "NONE", 0),
-    ("tottime", "Total Time", " Total time spent in the given function (and excluding time made in calls to sub-functions)", "NONE", 1),
-    ("cumtime", "Cumulative Time", "Cumulative time spent in this and all subfunctions (from invocation till exit)", "NONE", 2) ]
+class ProfilingProperties(bpy.types.PropertyGroup):
+    bl_idname = "an_ProfilingProperties"
+
+    profilingFunctionItems = [
+        ("EXECUTION", "Execution", "", "NONE", 0),
+        ("TREE_ANALYSIS", "Tree Analysis", "", "NONE", 1),
+        ("UPDATE_EVERYTHING", "Update Everything", "", "NONE", 2),
+        ("SCRIPT_GENERATION", "Script Generation", "", "NONE", 3)]
+
+    profilingOutputTypeItems = [
+        ("CONSOLE", "Console", "", "CONSOLE", 0),
+        ("TEXT_BLOCK", "Text Block", "", "TEXT", 1)]
+
+    profileSortModeItems = [
+        ("calls", "Amount of Calls", "Number of calls", "NONE", 0),
+        ("tottime", "Total Time", " Total time spent in the given function (and excluding time made in calls to sub-functions)", "NONE", 1),
+        ("cumtime", "Cumulative Time", "Cumulative time spent in this and all subfunctions (from invocation till exit)", "NONE", 2) ]
+
+    function = EnumProperty(name = "Profiling Function",
+        default = "EXECUTION", items = profilingFunctionItems)
+
+    output = EnumProperty(name = "Profiling Output",
+        default = "CONSOLE", items = profilingOutputTypeItems)
+
+    sort = EnumProperty(name = "Profiling Sort Mode",
+        default = "cumtime", items = profileSortModeItems)
 
 class DeveloperProperties(bpy.types.PropertyGroup):
     bl_idname = "an_DeveloperProperties"
 
-    profilingSortMode = EnumProperty(name = "Profiling Sort Mode",
-        default = "cumtime", items = profileSortModeItems)
+    profiling = PointerProperty(type = ProfilingProperties)
 
 
 class AddonPreferences(bpy.types.AddonPreferences):
@@ -88,8 +109,8 @@ def getPreferences():
     # TODO: access user_preferences without the context
     return bpy.context.user_preferences.addons[addonName].preferences
 
-def getProfilingSortMode():
-    return getDeveloperSettings().profilingSortMode
+def getProfilingSettings():
+    return getDeveloperSettings().profiling
 
 def getDeveloperSettings():
     return getPreferences().developer

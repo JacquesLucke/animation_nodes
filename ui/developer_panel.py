@@ -1,5 +1,5 @@
 import bpy
-from .. preferences import getDeveloperSettings
+from .. preferences import getProfilingSettings
 
 class DeveloperPanel(bpy.types.Panel):
     bl_idname = "an_developer_panel"
@@ -26,9 +26,16 @@ class DeveloperPanel(bpy.types.Panel):
 
         layout.separator()
 
+        profiling = getProfilingSettings()
+
         col = layout.column()
-        col.label("Profile Execution:")
-        row = col.row(align = True)
-        row.operator("an.print_profile_execution_result", text = "Print", icon = "CONSOLE")
-        row.operator("an.write_profile_execution_result", text = "Write", icon = "TEXT")
-        layout.prop(getDeveloperSettings(), "profilingSortMode", text = "Sort")
+        col.prop(profiling, "function", text = "Function")
+        col.prop(profiling, "sort", text = "Sort Mode")
+        col.prop(profiling, "output", text = "Output")
+
+        subcol = col.column()
+        subcol.scale_y = 1.3
+        props = subcol.operator("an.profile", text = "Profile", icon = "PREVIEW_RANGE")
+        props.function = profiling.function
+        props.sort = profiling.sort
+        props.output = profiling.output
