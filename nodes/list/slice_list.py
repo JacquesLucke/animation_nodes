@@ -34,11 +34,12 @@ class SliceListNode(bpy.types.Node, AnimationNode):
             socketGroup = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
 
     def getExecutionCode(self):
+        yield "_step = 1 if step == 0 else step"
         if self.sliceEndType == "END_INDEX":
-            yield "slicedList = list[start:end:step]"
+            yield "slicedList = list[start:end:_step]"
         elif self.sliceEndType == "OUTPUT_LENGTH":
-            yield "endIndex = start + step * length"
-            yield "slicedList = list[start:endIndex:step]"
+            yield "endIndex = max(0, start + _step * length)"
+            yield "slicedList = list[start:endIndex:_step]"
 
     def edit(self):
         baseDataType = self.getWantedDataType()
@@ -73,5 +74,4 @@ class SliceListNode(bpy.types.Node, AnimationNode):
         socket = self.inputs.new("an_IntegerSocket", "Step", "step")
         socket.value = 1
         socket.hide = True
-        socket.minValue = 1
         self.outputs.new(self.listIdName, "List", "slicedList")
