@@ -93,14 +93,14 @@ def getGlobalizeStatement(nodes, variables):
     if len(socketNames) == 0: return ""
     return "global " + ", ".join(socketNames)
 
-def getNodeExecutionLines(node, variables):
-    lines = []
-    lines.extend(getNodeCommentLines(node))
-    lines.extend(getInputCopyLines(node, variables))
+def iterNodeExecutionLines(node, variables):
+    yield ""
+    yield getNodeCommentLine(node)
+    yield from iterInputCopyLines(node, variables)
     try:
         taggedLines = node.getTaggedExecutionCodeLines()
-        lines.extend([replaceTaggedLine(line, node, variables) for line in taggedLines])
-        return lines
+        for line in taggedLines:
+            yield replaceTaggedLine(line, node, variables)
     except:
         print("\n"*5)
         traceback.print_exc()
@@ -108,19 +108,17 @@ def getNodeExecutionLines(node, variables):
         raise Exception("Node failed to create execution code")
 
 
-def getNodeCommentLines(node):
-    return ["\n", "# Node: {} - {}".format(repr(node.nodeTree.name), repr(node.name))]
+def getNodeCommentLine(node):
+    return "# Node: {} - {}".format(repr(node.nodeTree.name), repr(node.name))
 
-def getInputCopyLines(node, variables):
-    lines = []
+def iterInputCopyLines(node, variables):
     for socket in node.inputs:
         if socket.dataIsModified and socket.isCopyable and socket.isUnlinked:
             newName = variables[socket] + "_copy"
             if socket.hasValueCode: line = "{} = {}".format(newName, socket.getValueCode())
             else: line = getCopyLine(socket, newName, variables)
-            lines.append(line)
             variables[socket] = newName
-    return lines
+            yield line
 
 def replaceTaggedLine(line, node, variables):
     line = replace_NumberSign_NodeReference(line, node)

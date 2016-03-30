@@ -3,7 +3,7 @@ from .. problems import ExecutionUnitNotSetup
 from . code_generator import (getInitialVariables,
                               iterSetupCodeLines,
                               getGlobalizeStatement,
-                              getNodeExecutionLines,
+                              iterNodeExecutionLines,
                               linkOutputSocketsToTargets)
 
 class GroupExecutionUnit:
@@ -66,7 +66,7 @@ class GroupExecutionUnit:
         yield from linkOutputSocketsToTargets(self.network.groupInputNode, variables)
         for node in nodes:
             if node.bl_idname in ("an_GroupInputNode", "an_GroupOutputNode"): continue
-            yield from getNodeExecutionLines(node, variables)
+            yield from iterNodeExecutionLines(node, variables)
             yield from linkOutputSocketsToTargets(node, variables)
 
     def getReturnStatement(self, outputNode, variables):

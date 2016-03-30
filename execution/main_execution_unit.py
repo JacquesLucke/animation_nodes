@@ -4,7 +4,7 @@ from . compile_scripts import compileScript
 from .. problems import ExecutionUnitNotSetup, ExceptionDuringExecution
 from . code_generator import (getInitialVariables,
                               iterSetupCodeLines,
-                              getNodeExecutionLines,
+                              iterNodeExecutionLines,
                               linkOutputSocketsToTargets)
 
 class MainExecutionUnit:
@@ -57,7 +57,7 @@ class MainExecutionUnit:
 
     def iterExecutionScriptLines(self, nodes, variables):
         for node in nodes:
-            yield from getNodeExecutionLines(node, variables)
+            yield from iterNodeExecutionLines(node, variables)
             yield from linkOutputSocketsToTargets(node, variables)
 
     def compileScripts(self):

@@ -4,7 +4,7 @@ from . code_generator import (getInitialVariables,
                               iterSetupCodeLines,
                               getCopyExpression,
                               getGlobalizeStatement,
-                              getNodeExecutionLines,
+                              iterNodeExecutionLines,
                               linkOutputSocketsToTargets,
                               getLoadSocketValueLine)
 
@@ -145,7 +145,7 @@ class LoopExecutionUnit:
         ignoreNodes = {"an_LoopInputNode", "an_LoopGeneratorOutputNode", "an_ReassignLoopParameterNode"}
         for node in nodes:
             if node.bl_idname in ignoreNodes: continue
-            yield from getNodeExecutionLines(node, variables)
+            yield from iterNodeExecutionLines(node, variables)
             yield from linkOutputSocketsToTargets(node, variables)
 
         yield from self.iter_LoopBreak(inputNode, variables)
