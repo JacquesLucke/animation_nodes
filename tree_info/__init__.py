@@ -133,6 +133,7 @@ def iterLinkedOutputSockets(node):
 
 def iterUnlinkedInputSockets(node):
     linkedSockets = _forestData.linkedSockets
+    socketIDs = _forestData.socketsByNode[node.toID()][0]
     for socket, socketID in zip(node.inputs, socketIDs):
         if len(linkedSockets[socketID]) == 0:
             yield socket
