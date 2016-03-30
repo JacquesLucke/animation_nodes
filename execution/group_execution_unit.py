@@ -35,22 +35,24 @@ class GroupExecutionUnit:
         return [self.setupScript]
 
 
-
     def generateScript(self):
         try: nodes = self.network.getSortedAnimationNodes()
         except: return
 
         variables = getInitialVariables(nodes)
-        self.setupScript = "\n".join(iterSetupCodeLines(nodes, variables))
-        self.setupScript += "\n"*3
-        self.setupScript += self.getFunctionGenerationScript(nodes, variables)
+        self.setupScript = "\n".join(self.iterSetupScriptLines(nodes, variables))
 
-    def getFunctionGenerationScript(self, nodes, variables):
-        headerStatement = self.getFunctionHeader(self.network.groupInputNode, variables)
-        globalizeStatement = " "*4 + getGlobalizeStatement(nodes, variables)
-        executionScript = "\n".join(indent(self.getExecutionScriptLines(nodes, variables)))
-        returnStatement = "\n" + " "*4 + self.getReturnStatement(self.network.groupOutputNode, variables)
-        return "\n".join([headerStatement, globalizeStatement, executionScript, returnStatement])
+    def iterSetupScriptLines(self, nodes, variables):
+        yield from iterSetupCodeLines(nodes, variables)
+        yield "\n\n"
+        yield from self.iterFunctionGenerationScriptLines(nodes, variables)
+
+    def iterFunctionGenerationScriptLines(self, nodes, variables):
+        yield self.getFunctionHeader(self.network.groupInputNode, variables)
+        yield "    " + getGlobalizeStatement(nodes, variables)
+        yield from iterIndented(self.iterExecutionScriptLines(nodes, variables))
+        yield "\n"
+        yield "    " + self.getReturnStatement(self.network.groupOutputNode, variables)
 
     def getFunctionHeader(self, inputNode, variables):
         for i, socket in enumerate(inputNode.outputs):
@@ -60,15 +62,12 @@ class GroupExecutionUnit:
         header = "def main({}):".format(parameterList)
         return header
 
-
-    def getExecutionScriptLines(self, nodes, variables):
-        lines = []
-        lines.extend(linkOutputSocketsToTargets(self.network.groupInputNode, variables))
+    def iterExecutionScriptLines(self, nodes, variables):
+        yield from linkOutputSocketsToTargets(self.network.groupInputNode, variables)
         for node in nodes:
             if node.bl_idname in ("an_GroupInputNode", "an_GroupOutputNode"): continue
-            lines.extend(getNodeExecutionLines(node, variables))
-            lines.extend(linkOutputSocketsToTargets(node, variables))
-        return lines
+            yield from getNodeExecutionLines(node, variables)
+            yield from linkOutputSocketsToTargets(node, variables)
 
     def getReturnStatement(self, outputNode, variables):
         if outputNode is None: return "return"
@@ -83,5 +82,6 @@ class GroupExecutionUnit:
         raise ExecutionUnitNotSetup()
 
 
-def indent(lines):
-    return [" "*4 + line for line in lines]
+def iterIndented(lines):
+    for line in lines:
+        yield "    " + line
