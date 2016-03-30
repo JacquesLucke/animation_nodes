@@ -28,7 +28,8 @@ class SplineSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def drawProperty(self, layout, text):
         row = layout.row(align = True)
         row.prop_search(self, "objectName",  bpy.context.scene, "objects", icon="NONE", text = text)
-        self.invokeFunction(row, "assignActiveObject", icon = "EYEDROPPER")
+        self.invokeFunction(row, "handleEyedropperButton", icon = "EYEDROPPER", passEvent = True,
+            description = "Assign active object to this socket (hold CTRL to open a rename object dialog)")
         if self.objectName != "":
             row.prop(self, "useWorldSpace", text = "", icon = "WORLD")
 
@@ -61,7 +62,14 @@ class SplineSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getCopyExpression(self):
         return "value.copy()"
 
-    def assignActiveObject(self):
-        object = bpy.context.active_object
-        if getattr(object, "type", "") == "CURVE":
-            self.objectName = object.name
+    def handleEyedropperButton(self, event):
+        if event.ctrl:
+            if self.getObject() is not None:
+                bpy.ops.an.rename_datablock_popup("INVOKE_DEFAULT",
+                    oldName = self.objectName,
+                    path = "bpy.data.objects",
+                    icon = "OUTLINER_OB_CURVE")
+        else:
+            object = bpy.context.active_object
+            if getattr(object, "type", "") == "CURVE":
+                self.objectName = object.name

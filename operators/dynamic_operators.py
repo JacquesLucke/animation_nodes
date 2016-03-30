@@ -40,10 +40,12 @@ def createOperatorWithDescription(description):
     operator.invokeWithData = BoolProperty(default = False)
     operator.confirm = BoolProperty()
     operator.data = StringProperty()
+    operator.passEvent = BoolProperty()
 
     return operator
 
 def invoke_InvokeFunction(self, context, event):
+    self._event = event
     if self.confirm:
         return context.window_manager.invoke_confirm(self, event)
     return self.execute(context)
@@ -54,9 +56,12 @@ def execute_InvokeFunction(self, context):
     elif self.classType == "SOCKET":
         owner = getSocket(self.treeName, self.nodeName, self.isOutput, self.identifier)
 
+    args = []
+    if self.invokeWithData: args.append(self.data)
+    if self.passEvent: args.append(self._event)
     function = getattr(owner, self.functionName)
-    if self.invokeWithData: function(self.data)
-    else: function()
+    function(*args)
+
     bpy.context.area.tag_redraw()
     return {"FINISHED"}
 

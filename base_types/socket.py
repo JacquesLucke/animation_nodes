@@ -129,7 +129,7 @@ class AnimationNodeSocket:
     def getProperty(self):
         return
 
-    def invokeFunction(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True, confirm = False, data = None):
+    def invokeFunction(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True, confirm = False, data = None, passEvent = False):
         idName = getInvokeFunctionOperator(description)
         props = layout.operator(idName, text = text, icon = icon, emboss = emboss)
         props.classType = "SOCKET"
@@ -141,6 +141,7 @@ class AnimationNodeSocket:
         props.invokeWithData = data is not None
         props.confirm = confirm
         props.data = str(data)
+        props.passEvent = passEvent
 
     def invokeNodeInsertion(self, layout, nodeIdName, toIndex, text, settings = {}):
         invokeLinkedNodeInsertion(layout, nodeIdName, self.index, toIndex, text, settings)

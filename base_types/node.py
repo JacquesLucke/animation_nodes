@@ -131,7 +131,7 @@ class AnimationNode:
         else:
             return self.bl_label
 
-    def invokeFunction(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True, confirm = False, data = None):
+    def invokeFunction(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True, confirm = False, data = None, passEvent = False):
         idName = getInvokeFunctionOperator(description)
         props = layout.operator(idName, text = text, icon = icon, emboss = emboss)
         props.classType = "NODE"
@@ -141,6 +141,7 @@ class AnimationNode:
         props.invokeWithData = data is not None
         props.confirm = confirm
         props.data = str(data)
+        props.passEvent = passEvent
 
     def invokeSocketTypeChooser(self, layout, functionName, socketGroup = "ALL", text = "", icon = "NONE", description = "", emboss = True):
         data = functionName + "," + socketGroup
