@@ -64,11 +64,10 @@ class SplineSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def handleEyedropperButton(self, event):
         if event.ctrl:
-            if self.getObject() is not None:
-                bpy.ops.an.rename_datablock_popup("INVOKE_DEFAULT",
-                    oldName = self.objectName,
-                    path = "bpy.data.objects",
-                    icon = "OUTLINER_OB_CURVE")
+            bpy.ops.an.rename_datablock_popup("INVOKE_DEFAULT",
+                oldName = self.objectName,
+                path = "bpy.data.objects",
+                icon = "OUTLINER_OB_CURVE")
         else:
             object = bpy.context.active_object
             if getattr(object, "type", "") == "CURVE":

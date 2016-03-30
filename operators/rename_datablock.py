@@ -21,7 +21,9 @@ class RenameDatablockPopupOperator(bpy.types.Operator):
 
     def draw(self, context):
         dataBlock = self.getDatablock()
-        if dataBlock is not None:
+        if dataBlock is None:
+            self.layout.label("The datablock does not exist.", icon = "INFO")
+        else:
             self.layout.prop(self, "newName", text = "", icon = self.icon)
 
     def execute(self, context):
