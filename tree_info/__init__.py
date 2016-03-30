@@ -114,6 +114,17 @@ def getAllDataLinkIDs():
                 linkDataIDs.add((linkedID, socketID, dataType[linkedID], dataType[socketID]))
     return linkDataIDs
 
+def getLinkedInputsDict(node):
+    linkedSockets = _forestData.linkedSockets
+    socketIDs = _forestData.socketsByNode[node.toID()][0]
+    return {socketID[2] : len(linkedSockets[socketID]) > 0 for socketID in socketIDs}
+
+def getLinkedOutputsDict(node):
+    linkedSockets = _forestData.linkedSockets
+    socketIDs = _forestData.socketsByNode[node.toID()][1]
+    return {socketID[2] : len(linkedSockets[socketID]) > 0 for socketID in socketIDs}
+
+
 
 # keep node state
 
