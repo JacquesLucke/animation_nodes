@@ -88,6 +88,9 @@ def getPreferences():
     # TODO: access user_preferences without the context
     return bpy.context.user_preferences.addons[addonName].preferences
 
+def getProfilingSortMode():
+    return getDeveloperSettings().profilingSortMode
+
 def getDeveloperSettings():
     return getPreferences().developer
 
