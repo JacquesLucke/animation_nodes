@@ -43,28 +43,28 @@ class LoopExecutionUnit:
         except: return
 
         variables = getInitialVariables(nodes)
-        self.setupScript = "\n".join(iterSetupCodeLines(nodes, variables))
-        self.setupScript += "\n"*3
-        self.setupScript += self.getFunctionGenerationScript(nodes, variables)
+        self.setupScript = "\n".join(self.iterSetupScriptLines(nodes, variables))
 
-    def getFunctionGenerationScript(self, nodes, variables):
+    def iterSetupScriptLines(self, nodes, variables):
         inputNode = self.network.loopInputNode
 
+        yield from iterSetupCodeLines(nodes, variables)
+        yield "\n\n"
+
         if inputNode.iterateThroughLists:
-            return "\n".join(self.iter_IteratorLength(inputNode, nodes, variables))
+            yield from self.iter_IteratorLength(inputNode, nodes, variables)
         else:
-            return self.get_IterationsAmount(inputNode, nodes, variables)
+            yield from self.iter_IterationsAmount(inputNode, nodes, variables)
 
 
-    def get_IterationsAmount(self, inputNode, nodes, variables):
-        header = self.get_IterationsAmount_Header(inputNode, variables)
-        globalizeStatement = " "*4 + getGlobalizeStatement(nodes, variables)
-        generators = indent(tuple(self.iter_InitializeGeneratorsLines(inputNode, variables)))
-        parameters = indent(tuple(self.iter_InitializeParametersLines(inputNode, variables)))
-        prepareLoop = indent(self.get_IterationsAmount_PrepareLoop(inputNode, variables))
-        loopBody = indent(tuple(self.iter_LoopBody(inputNode, nodes, variables)), amount = 2)
-        returnStatement = indent([self.get_ReturnStatement(inputNode, variables)])
-        return joinLines([header] + [globalizeStatement] + generators + parameters + prepareLoop + loopBody + returnStatement)
+    def iter_IterationsAmount(self, inputNode, nodes, variables):
+        yield self.get_IterationsAmount_Header(inputNode, variables)
+        yield "    " + getGlobalizeStatement(nodes, variables)
+        yield from iterIndented(self.iter_InitializeGeneratorsLines(inputNode, variables))
+        yield from iterIndented(self.iter_InitializeParametersLines(inputNode, variables))
+        yield from iterIndented(self.iter_IterationsAmount_PrepareLoop(inputNode, variables))
+        yield from iterIndented(self.iter_LoopBody(inputNode, nodes, variables), amount = 2)
+        yield "    " + self.get_ReturnStatement(inputNode, variables)
 
     def get_IterationsAmount_Header(self, inputNode, variables):
         variables[inputNode.iterationsSocket] = "loop_iterations"
@@ -78,11 +78,9 @@ class LoopExecutionUnit:
         header = "def main({}):".format(", ".join(parameterNames))
         return header
 
-    def get_IterationsAmount_PrepareLoop(self, inputNode, variables):
-        lines = []
+    def iter_IterationsAmount_PrepareLoop(self, inputNode, variables):
         variables[inputNode.indexSocket] = "current_loop_index"
-        lines.append("for current_loop_index in range(loop_iterations):")
-        return lines
+        yield "for current_loop_index in range(loop_iterations):"
 
 
     def iter_IteratorLength(self, inputNode, nodes, variables):
