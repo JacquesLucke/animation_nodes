@@ -65,7 +65,7 @@ if "numpy" not in globals():
 
 
 from . preferences import getBlenderVersion
-if getBlenderVersion() < (2, 77, 0):
+if getBlenderVersion() < (2, 76, 0):
     message = ("\n\n"
         "The Animation Nodes addon requires at least Blender 2.77.\n"
         "Your are using an older version.\n"
