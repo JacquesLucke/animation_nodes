@@ -124,6 +124,12 @@ def getLinkedOutputsDict(node):
     socketIDs = _forestData.socketsByNode[node.toID()][1]
     return {socketID[2] : len(linkedSockets[socketID]) > 0 for socketID in socketIDs}
 
+def iterLinkedOutputSockets(node):
+    linkedSockets = _forestData.linkedSockets
+    socketIDs = _forestData.socketsByNode[node.toID()][1]
+    for socket, socketID in zip(node.outputs, socketIDs):
+        if len(linkedSockets[socketID]) > 0:
+            yield socket
 
 
 # keep node state

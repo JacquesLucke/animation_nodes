@@ -10,7 +10,7 @@ from .. utils.nodes import getAnimationNodeTrees
 from .. utils.blender_ui import convertToRegionLocation, getDpiFactor
 from .. operators.dynamic_operators import getInvokeFunctionOperator
 from .. tree_info import (getNetworkWithNode, getDirectlyLinkedSockets, getOriginNodes,
-                          getLinkedInputsDict, getLinkedOutputsDict)
+                          getLinkedInputsDict, getLinkedOutputsDict, iterLinkedOutputSockets)
 
 class AnimationNode:
     bl_width_max = 5000
@@ -266,7 +266,7 @@ class AnimationNode:
 
     @property
     def linkedOutputs(self):
-        return [socket for socket in self.outputs if socket.isLinked]
+        return tuple(iterLinkedOutputSockets(self))
 
     @property
     def activeInputSocket(self):
