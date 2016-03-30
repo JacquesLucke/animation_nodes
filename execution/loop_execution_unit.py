@@ -51,7 +51,7 @@ class LoopExecutionUnit:
         inputNode = self.network.loopInputNode
 
         if inputNode.iterateThroughLists:
-            return self.get_IteratorLength(inputNode, nodes, variables)
+            return "\n".join(self.iter_IteratorLength(inputNode, nodes, variables))
         else:
             return self.get_IterationsAmount(inputNode, nodes, variables)
 
@@ -59,8 +59,8 @@ class LoopExecutionUnit:
     def get_IterationsAmount(self, inputNode, nodes, variables):
         header = self.get_IterationsAmount_Header(inputNode, variables)
         globalizeStatement = " "*4 + getGlobalizeStatement(nodes, variables)
-        generators = indent(self.get_InitializeGenerators(inputNode, variables))
-        parameters = indent(self.get_InitializeParameters(inputNode, variables))
+        generators = indent(tuple(self.iter_InitializeGeneratorsLines(inputNode, variables)))
+        parameters = indent(tuple(self.iter_InitializeParametersLines(inputNode, variables)))
         prepareLoop = indent(self.get_IterationsAmount_PrepareLoop(inputNode, variables))
         loopBody = indent(tuple(self.iter_LoopBody(inputNode, nodes, variables)), amount = 2)
         returnStatement = indent([self.get_ReturnStatement(inputNode, variables)])
@@ -85,15 +85,14 @@ class LoopExecutionUnit:
         return lines
 
 
-    def get_IteratorLength(self, inputNode, nodes, variables):
-        header = self.get_IteratorLength_Header(inputNode, variables)
-        globalizeStatement = " "*4 + getGlobalizeStatement(nodes, variables)
-        generators = indent(self.get_InitializeGenerators(inputNode, variables))
-        parameters = indent(self.get_InitializeParameters(inputNode, variables))
-        prepareLoop = indent(self.get_IteratorLength_PrepareLoop(inputNode, variables))
-        loopBody = indent(tuple(self.iter_LoopBody(inputNode, nodes, variables)), amount = 2)
-        returnStatement = indent([self.get_ReturnStatement(inputNode, variables)])
-        return joinLines([header] + [globalizeStatement] + generators + parameters + prepareLoop + loopBody + returnStatement)
+    def iter_IteratorLength(self, inputNode, nodes, variables):
+        yield self.get_IteratorLength_Header(inputNode, variables)
+        yield "    " + getGlobalizeStatement(nodes, variables)
+        yield from iterIndented(self.iter_InitializeGeneratorsLines(inputNode, variables))
+        yield from iterIndented(self.iter_InitializeParametersLines(inputNode, variables))
+        yield from iterIndented(self.iter_IteratorLength_PrepareLoopLines(inputNode, variables))
+        yield from iterIndented(self.iter_LoopBody(inputNode, nodes, variables), amount = 2)
+        yield "    " + self.get_ReturnStatement(inputNode, variables)
 
     def get_IteratorLength_Header(self, inputNode, variables):
         parameterNames = []
@@ -109,9 +108,7 @@ class LoopExecutionUnit:
         header = "def main({}):".format(", ".join(parameterNames))
         return header
 
-    def get_IteratorLength_PrepareLoop(self, inputNode, variables):
-        lines = []
-
+    def iter_IteratorLength_PrepareLoopLines(self, inputNode, variables):
         iterators = inputNode.getIteratorSockets()
         iteratorNames = ["loop_iterator_" + str(i) for i in range(len(iterators))]
         zipLine = "loop_zipped_list = list(zip({}))".format(", ".join(iteratorNames))
@@ -127,26 +124,21 @@ class LoopExecutionUnit:
         variables[inputNode.indexSocket] = "current_loop_index"
         variables[inputNode.iterationsSocket] = "loop_iterations"
 
-        lines.append(zipLine)
-        lines.append(iterationsLine)
-        lines.append(loopLine)
-        return lines
+        yield zipLine
+        yield iterationsLine
+        yield loopLine
 
 
-    def get_InitializeGenerators(self, inputNode, variables):
-        lines = []
+    def iter_InitializeGeneratorsLines(self, inputNode, variables):
         for i, node in enumerate(inputNode.getSortedGeneratorNodes()):
             name = "loop_generator_output_" + str(i)
             variables[node] = name
-            lines.append("{} = []".format(name))
-        return lines
+            yield "{} = []".format(name)
 
-    def get_InitializeParameters(self, inputNode, variables):
-        lines = []
+    def iter_InitializeParametersLines(self, inputNode, variables):
         for socket in inputNode.getParameterSockets():
             if not socket.loop.useAsInput:
-                lines.append(getLoadSocketValueLine(socket, variables))
-        return lines
+                yield getLoadSocketValueLine(socket, variables)
 
 
     def iter_LoopBody(self, inputNode, nodes, variables):
@@ -211,3 +203,8 @@ def joinLines(lines):
 
 def indent(lines, amount = 1):
     return [" " * (4 * amount) + line for line in lines]
+
+def iterIndented(lines, amount = 1):
+    indentation = "    " * amount
+    for line in lines:
+        yield indentation + line
