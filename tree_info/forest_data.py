@@ -44,8 +44,9 @@ class ForestData:
 
         for node in nodes:
             nodeID = node.toID()
-            inputIDs = [socket.toID() for socket in node.inputs]
-            outputIDs = [socket.toID() for socket in node.outputs]
+
+            inputIDs = [(nodeID, False, socket.identifier) for socket in node.inputs]
+            outputIDs = [(nodeID, True, socket.identifier) for socket in node.outputs]
 
             appendNode(nodeID)
             typeByNode[nodeID] = node.bl_idname
