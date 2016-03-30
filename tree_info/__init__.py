@@ -131,6 +131,12 @@ def iterLinkedOutputSockets(node):
         if len(linkedSockets[socketID]) > 0:
             yield socket
 
+def iterUnlinkedInputSockets(node):
+    linkedSockets = _forestData.linkedSockets
+    for socket, socketID in zip(node.inputs, socketIDs):
+        if len(linkedSockets[socketID]) == 0:
+            yield socket
+
 
 # keep node state
 
