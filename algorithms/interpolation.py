@@ -5,6 +5,7 @@ Here is a good source for different interpolation functions in Java:
 https://github.com/libgdx/libgdx/blob/master/gdx/src/com/badlogic/gdx/math/Interpolation.java
 '''
 
+# using pythons functools.partial function is slower
 def assignArguments(function, *arguments):
     def interpolationWrapper(x):
         return function(x, *arguments)
