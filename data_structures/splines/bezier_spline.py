@@ -105,6 +105,8 @@ class BezierSpline(Spline):
 
 
 class BezierPoint:
+    __slots__ = ("location", "leftHandle", "rightHandle")
+
     def __init__(self, location, leftHandle, rightHandle):
         self.location = location
         self.leftHandle = leftHandle
