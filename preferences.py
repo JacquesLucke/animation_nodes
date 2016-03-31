@@ -65,7 +65,17 @@ class ProfilingProperties(bpy.types.PropertyGroup):
 class DeveloperProperties(bpy.types.PropertyGroup):
     bl_idname = "an_DeveloperProperties"
 
+    def settingChanged(self, context):
+        from . events import executionCodeChanged
+        executionCodeChanged()
+
     profiling = PointerProperty(type = ProfilingProperties)
+
+    monitoredExecution = BoolProperty(name = "Monitored Execution", default = False,
+        description = "Enable to find out which node raises exceptions",
+        update = settingChanged)
+
+    debug = BoolProperty(name = "Debug", default = False)
 
 
 class AddonPreferences(bpy.types.AddonPreferences):
@@ -79,8 +89,6 @@ class AddonPreferences(bpy.types.AddonPreferences):
 
     nodeColors = PointerProperty(type = NodeColorProperties)
     developer = PointerProperty(type = DeveloperProperties)
-
-    debug = BoolProperty(name = "Debug", default = False)
 
     def draw(self, context):
         layout = self.layout
@@ -103,14 +111,11 @@ class AddonPreferences(bpy.types.AddonPreferences):
         subcol.prop(self.nodeColors, "subprogramValue", slider = True)
         subcol.prop(self.nodeColors, "subprogramSaturation", slider = True)
 
-        layout.prop(self, "debug")
+        layout.prop(self.developer, "debug")
 
 def getPreferences():
     # TODO: access user_preferences without the context
     return bpy.context.user_preferences.addons[addonName].preferences
-
-def getProfilingSettings():
-    return getDeveloperSettings().profiling
 
 def getDeveloperSettings():
     return getPreferences().developer
@@ -119,7 +124,10 @@ def nodeColors():
     return getPreferences().nodeColors
 
 def debuggingIsEnabled():
-    return getPreferences().debug
+    return getPreferences().developer.debug
+
+def monitoredExecutionIsEnabled():
+    return getPreferences().developer.monitoredExecution
 
 def getBlenderVersion():
     return bpy.app.version

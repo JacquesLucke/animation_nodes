@@ -219,6 +219,17 @@ class UndefinedNodeExists(Problem):
             props.treeName = nodeID[0]
             props.nodeName = nodeID[1]
 
+class NodeRaisesExceptionDuringExecution(Problem):
+    def __init__(self, nodeIdentifier):
+        self.nodeIdentifier = nodeIdentifier
+
+    def allowExecution(self):
+        return False
+
+    def draw(self, layout):
+        node = getNodeByIdentifier(self.nodeIdentifier)
+        props = layout.operator("an.move_view_to_node", icon = "VIEWZOOM", text = "{} does not work".format(repr(node.name)))
+        props.nodeIdentifier = self.nodeIdentifier
 
 
 

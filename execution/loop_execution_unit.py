@@ -4,9 +4,9 @@ from . code_generator import (getInitialVariables,
                               iterSetupCodeLines,
                               getCopyExpression,
                               getGlobalizeStatement,
-                              iterNodeExecutionLines,
+                              getLoadSocketValueLine,
                               linkOutputSocketsToTargets,
-                              getLoadSocketValueLine)
+                              getFunction_IterNodeExecutionLines)
 
 class LoopExecutionUnit:
     def __init__(self, network):
@@ -142,6 +142,7 @@ class LoopExecutionUnit:
     def iter_LoopBody(self, inputNode, nodes, variables):
         yield from linkOutputSocketsToTargets(inputNode, variables)
 
+        iterNodeExecutionLines = getFunction_IterNodeExecutionLines()
         ignoreNodes = {"an_LoopInputNode", "an_LoopGeneratorOutputNode", "an_ReassignLoopParameterNode"}
         for node in nodes:
             if node.bl_idname in ignoreNodes: continue

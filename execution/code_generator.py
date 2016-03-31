@@ -3,7 +3,7 @@ import traceback
 from itertools import chain
 from collections import defaultdict
 from .. problems import NodeFailesToCreateExecutionCode
-from .. preferences import addonName
+from .. preferences import addonName, monitoredExecutionIsEnabled
 
 
 # Initial Socket Variables
@@ -93,20 +93,36 @@ def getGlobalizeStatement(nodes, variables):
     if len(socketNames) == 0: return ""
     return "global " + ", ".join(socketNames)
 
-def iterNodeExecutionLines(node, variables):
+def getFunction_IterNodeExecutionLines():
+    if monitoredExecutionIsEnabled():
+        return iterNodeExecutionLines_Monitored
+    else:
+        return iterNodeExecutionLines_Basic
+
+def iterNodeExecutionLines_Monitored(node, variables):
+    yield from iterNodePreExecutionLines(node, variables)
+    yield "try:"
+    try:
+        for line in iterRealNodeExecutionLines(node, variables):
+            yield "    " + line
+    except:
+        handleExecutionCodeCreationException(node)
+    yield "    pass"
+    yield "except:"
+    yield "    animation_nodes.problems.NodeRaisesExceptionDuringExecution({}).report()".format(repr(node.identifier))
+    yield "    raise Exception()"
+
+def iterNodeExecutionLines_Basic(node, variables):
+    yield from iterNodePreExecutionLines(node, variables)
+    try:
+        yield from iterRealNodeExecutionLines(node, variables)
+    except:
+        handleExecutionCodeCreationException(node)
+
+def iterNodePreExecutionLines(node, variables):
     yield ""
     yield getNodeCommentLine(node)
     yield from iterInputCopyLines(node, variables)
-    try:
-        taggedLines = node.getTaggedExecutionCodeLines()
-        for line in taggedLines:
-            yield replaceTaggedLine(line, node, variables)
-    except:
-        print("\n"*5)
-        traceback.print_exc()
-        NodeFailesToCreateExecutionCode(node.identifier).report()
-        raise Exception("Node failed to create execution code")
-
 
 def getNodeCommentLine(node):
     return "# Node: {} - {}".format(repr(node.nodeTree.name), repr(node.name))
@@ -119,6 +135,11 @@ def iterInputCopyLines(node, variables):
             else: line = getCopyLine(socket, newName, variables)
             variables[socket] = newName
             yield line
+
+def iterRealNodeExecutionLines(node, variables):
+    taggedLines = node.getTaggedExecutionCodeLines()
+    for line in taggedLines:
+        yield replaceTaggedLine(line, node, variables)
 
 def replaceTaggedLine(line, node, variables):
     line = replace_NumberSign_NodeReference(line, node)
@@ -140,6 +161,12 @@ def replace_DollarSign_OutputSocketVariable(line, node, variables):
     for name, variable in node.outputVariables.items():
         line = line.replace("${}$".format(variable), variables[nodeOutputs[name]])
     return line
+
+def handleExecutionCodeCreationException(node):
+    print("\n"*5)
+    traceback.print_exc()
+    NodeFailesToCreateExecutionCode(node.identifier).report()
+    raise Exception("Node failed to create execution code")
 
 
 

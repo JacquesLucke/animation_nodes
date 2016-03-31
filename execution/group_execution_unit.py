@@ -3,8 +3,8 @@ from .. problems import ExecutionUnitNotSetup
 from . code_generator import (getInitialVariables,
                               iterSetupCodeLines,
                               getGlobalizeStatement,
-                              iterNodeExecutionLines,
-                              linkOutputSocketsToTargets)
+                              linkOutputSocketsToTargets,
+                              getFunction_IterNodeExecutionLines)
 
 class GroupExecutionUnit:
     def __init__(self, network):
@@ -63,6 +63,8 @@ class GroupExecutionUnit:
         return header
 
     def iterExecutionScriptLines(self, nodes, variables):
+        iterNodeExecutionLines = getFunction_IterNodeExecutionLines()
+
         yield from linkOutputSocketsToTargets(self.network.groupInputNode, variables)
         for node in nodes:
             if node.bl_idname in ("an_GroupInputNode", "an_GroupOutputNode"): continue

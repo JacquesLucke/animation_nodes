@@ -1,5 +1,5 @@
 import bpy
-from .. preferences import getProfilingSettings
+from .. preferences import getDeveloperSettings
 
 class DeveloperPanel(bpy.types.Panel):
     bl_idname = "an_developer_panel"
@@ -20,13 +20,17 @@ class DeveloperPanel(bpy.types.Panel):
 
         col = layout.column()
         col.label("Execution Code:")
+
+        developer = getDeveloperSettings()
+        col.prop(developer, "monitoredExecution")
+
         row = col.row(align = True)
         row.operator("an.print_current_execution_code", text = "Print", icon = "CONSOLE")
         row.operator("an.write_current_execution_code", text = "Write", icon = "TEXT")
 
         layout.separator()
 
-        profiling = getProfilingSettings()
+        profiling = developer.profiling
 
         col = layout.column()
         col.prop(profiling, "function", text = "Function")
