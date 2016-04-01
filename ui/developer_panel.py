@@ -17,19 +17,34 @@ class DeveloperPanel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         tree = context.space_data.node_tree
+        developer = getDeveloperSettings()
 
         col = layout.column()
-        col.label("Execution Code:")
+        self.drawExecutionCodeSettings(col, developer)
 
-        developer = getDeveloperSettings()
-        col.prop(developer, "monitoredExecution")
+        layout.separator()
+
+        col = layout.column()
+        self.drawProfilingSettings(col, developer)
+
+    def drawExecutionCodeSettings(self, layout, developer):
+        layout.label("Execution Code:")
+
+        col = layout.column(align = True)
+
+        row = col.row(align = True)
+        row.prop(developer, "measureNodeExecutionTimes", text = "Measure Execution Times")
+        if developer.measureNodeExecutionTimes:
+            row.operator("an.reset_measurements", text = "", icon = "RECOVER_LAST")
+        subcol = col.column()
+        subcol.active = not developer.measureNodeExecutionTimes
+        subcol.prop(developer, "monitorExecution", text = "Monitor Execution")
 
         row = col.row(align = True)
         row.operator("an.print_current_execution_code", text = "Print", icon = "CONSOLE")
         row.operator("an.write_current_execution_code", text = "Write", icon = "TEXT")
 
-        layout.separator()
-
+    def drawProfilingSettings(self, layout, developer):
         profiling = developer.profiling
 
         col = layout.column()

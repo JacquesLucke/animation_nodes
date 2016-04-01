@@ -67,11 +67,17 @@ class DeveloperProperties(bpy.types.PropertyGroup):
 
     def settingChanged(self, context):
         from . events import executionCodeChanged
+        from . execution.measurements import resetMeasurements
         executionCodeChanged()
+        resetMeasurements()
 
     profiling = PointerProperty(type = ProfilingProperties)
 
-    monitoredExecution = BoolProperty(name = "Monitored Execution", default = False,
+    measureNodeExecutionTimes = BoolProperty(name = "Measure Node Execution Times", default = False,
+        description = "Measure the time a node takes to execute each time it is called",
+        update = settingChanged)
+
+    monitorExecution = BoolProperty(name = "Monitor Execution", default = False,
         description = "Enable to find out which node raises exceptions",
         update = settingChanged)
 
@@ -126,8 +132,11 @@ def nodeColors():
 def debuggingIsEnabled():
     return getPreferences().developer.debug
 
-def monitoredExecutionIsEnabled():
-    return getPreferences().developer.monitoredExecution
+def measureNodeExecutionTimesIsEnabled():
+    return getDeveloperSettings().measureNodeExecutionTimes
+
+def monitorExecutionIsEnabled():
+    return getDeveloperSettings().monitorExecution
 
 def getBlenderVersion():
     return bpy.app.version

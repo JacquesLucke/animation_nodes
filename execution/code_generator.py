@@ -3,7 +3,9 @@ import traceback
 from itertools import chain
 from collections import defaultdict
 from .. problems import NodeFailesToCreateExecutionCode
-from .. preferences import addonName, monitoredExecutionIsEnabled
+from .. preferences import (addonName,
+                            monitorExecutionIsEnabled,
+                            measureNodeExecutionTimesIsEnabled)
 
 
 # Initial Socket Variables
@@ -27,8 +29,10 @@ def getSocketVariableName(socket):
 
 def iterSetupCodeLines(nodes, variables):
     yield get_ImportModules(nodes)
+    yield get_ImportTimeMeasurementFunction()
     yield get_ImportAnimationNodes()
     yield get_LoadRandomNumberCache()
+    yield get_LoadMeasurementsDict()
     yield from iter_GetNodeReferences(nodes)
     yield from iter_GetSocketValues(nodes, variables)
 
@@ -39,12 +43,14 @@ def get_ImportModules(nodes):
     modulesString = ", ".join(neededModules)
     return "import " + modulesString
 
+def get_ImportTimeMeasurementFunction():
+    return "from time import perf_counter as getCurrentTime"
+
 def getModulesNeededByNodes(nodes):
     moduleNames = set()
     for node in nodes:
         moduleNames.update(node.getUsedModules())
     return list(moduleNames)
-
 
 def get_ImportAnimationNodes():
     '''
@@ -54,16 +60,16 @@ def get_ImportAnimationNodes():
     '''
     return "animation_nodes = sys.modules.get({})".format(repr(addonName))
 
-
 def get_LoadRandomNumberCache():
     return "random_number_cache = animation_nodes.algorithms.random.getRandomNumberCache()"
 
+def get_LoadMeasurementsDict():
+    return "_node_execution_times = animation_nodes.execution.measurements.getMeasurementsDict()"
 
 def iter_GetNodeReferences(nodes):
     yield "nodes = bpy.data.node_groups[{}].nodes".format(repr(nodes[0].nodeTree.name))
     for node in nodes:
         yield "{} = nodes[{}]".format(node.identifier, repr(node.name))
-
 
 def iter_GetSocketValues(nodes, variables):
     for socket in iterUnlinkedSockets(nodes):
@@ -72,7 +78,6 @@ def iter_GetSocketValues(nodes, variables):
 def iterUnlinkedSockets(nodes):
     for node in nodes:
         yield from node.unlinkedInputs
-
 
 def getLoadSocketValueLine(socket, variables):
     return "{} = {}".format(variables[socket], getSocketValueExpression(socket))
@@ -94,10 +99,14 @@ def getGlobalizeStatement(nodes, variables):
     return "global " + ", ".join(socketNames)
 
 def getFunction_IterNodeExecutionLines():
-    if monitoredExecutionIsEnabled():
-        return iterNodeExecutionLines_Monitored
+    if measureNodeExecutionTimesIsEnabled():
+        return iterNodeExecutionLines_MeasureTimes
     else:
-        return iterNodeExecutionLines_Basic
+        if monitorExecutionIsEnabled():
+            return iterNodeExecutionLines_Monitored
+        else:
+            return iterNodeExecutionLines_Basic
+
 
 def iterNodeExecutionLines_Monitored(node, variables):
     yield from iterNodePreExecutionLines(node, variables)
@@ -111,6 +120,16 @@ def iterNodeExecutionLines_Monitored(node, variables):
     yield "except:"
     yield "    animation_nodes.problems.NodeRaisesExceptionDuringExecution({}).report()".format(repr(node.identifier))
     yield "    raise Exception()"
+
+def iterNodeExecutionLines_MeasureTimes(node, variables):
+    yield from iterNodePreExecutionLines(node, variables)
+    try:
+        yield "_execution_start_time = getCurrentTime()"
+        yield from iterRealNodeExecutionLines(node, variables)
+        yield "_node_execution_times[{}].totalTime += getCurrentTime() - _execution_start_time".format(repr(node.identifier))
+        yield "_node_execution_times[{}].calls += 1".format(repr(node.identifier))
+    except:
+        handleExecutionCodeCreationException(node)
 
 def iterNodeExecutionLines_Basic(node, variables):
     yield from iterNodePreExecutionLines(node, variables)

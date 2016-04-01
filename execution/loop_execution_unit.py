@@ -143,7 +143,7 @@ class LoopExecutionUnit:
         yield from linkOutputSocketsToTargets(inputNode, variables)
 
         iterNodeExecutionLines = getFunction_IterNodeExecutionLines()
-        ignoreNodes = {"an_LoopInputNode", "an_LoopGeneratorOutputNode", "an_ReassignLoopParameterNode"}
+        ignoreNodes = {"an_LoopInputNode", "an_LoopGeneratorOutputNode", "an_ReassignLoopParameterNode", "an_LoopBreakNode"}
         for node in nodes:
             if node.bl_idname in ignoreNodes: continue
             yield from iterNodeExecutionLines(node, variables)

@@ -122,10 +122,12 @@ class DebugDrawerNode(bpy.types.Node, AnimationNode):
 
 
 def drawDebugTextBoxes():
-    nodes = getNodesByType("an_DebugDrawerNode")
-    nodesInCurrentTree = getattr(bpy.context.space_data.node_tree, "nodes", [])
-    for node in nodes:
-        if node.name in nodesInCurrentTree and not node.hide and node.errorMessage == "":
+    tree = bpy.context.space_data.node_tree
+    if tree is None: return
+    if tree.bl_idname != "an_AnimationNodeTree": return
+
+    for node in tree.nodes:
+        if node.bl_idname == "an_DebugDrawerNode" and not node.hide and node.errorMessage == "":
             drawDebugTextBox(node)
 
 def drawDebugTextBox(node):

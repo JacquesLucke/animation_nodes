@@ -38,13 +38,6 @@ def redrawAll():
 def isViewportRendering():
     return any([space.viewport_shade == "RENDERED" for space in iterActiveSpacesByType("VIEW_3D")])
 
-
-def convertToRegionLocation(region, x, y):
-    factor = getDpiFactor()
-    x *= factor
-    y *= factor
-    return Vector(region.view2d.view_to_region(x, y, clip = False))
-
 def getDpiFactor():
     return getDpi() / 72
 
@@ -64,6 +57,29 @@ def executeInAreaType(areaType):
             return output
         return wrapper
     return changeAreaTypeDecorator
+
+
+def iterNodeCornerLocations(nodes, region, horizontal):
+    if horizontal == "LEFT":
+        yield from iterNodeBottomLeftCornerLocations(nodes, region)
+    elif horizontal == "RIGHT":
+        yield from iterNodeBottomRightCornerLocations(nodes, region)
+
+def iterNodeBottomLeftCornerLocations(nodes, region):
+    factor = getDpiFactor()
+    viewToRegion = region.view2d.view_to_region
+    for node in nodes:
+        location = node.viewLocation * factor
+        dimensions = node.dimensions
+        yield Vector(viewToRegion(location.x, location.y - dimensions.y, clip = False))
+
+def iterNodeBottomRightCornerLocations(nodes, region):
+    factor = getDpiFactor()
+    viewToRegion = region.view2d.view_to_region
+    for node in nodes:
+        location = node.viewLocation * factor
+        dimensions = node.dimensions
+        yield Vector(viewToRegion(location.x + dimensions.x, location.y - dimensions.y, clip = False))
 
 
 class PieMenuHelper:
