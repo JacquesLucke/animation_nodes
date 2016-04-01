@@ -79,6 +79,9 @@ class AnimationNodeSocket:
             self.invokeFunction(row, "remove", icon = "X")
 
         if self.useIsUsedProperty:
+            if self.is_linked and not self.isUsed:
+                row.label("", icon = "QUESTION")
+                row.label("", icon = "TRIA_RIGHT")
             icon = "LAYER_ACTIVE" if self.isUsed else "LAYER_USED"
             row.prop(self, "isUsed", text = "", icon = icon)
 
