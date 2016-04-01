@@ -1,8 +1,6 @@
 import bpy
 from bpy.props import *
-from mathutils import Vector
-from ... events import executionCodeChanged
-from ... algorithms.rotation import generateDirectionToRotationCode
+from ... events import propertyChanged
 from ... base_types.node import AnimationNode
 
 trackAxisItems = [(axis, axis, "") for axis in ("X", "Y", "Z", "-X", "-Y", "-Z")]
@@ -12,8 +10,8 @@ class DirectionToRotationNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_DirectionToRotationNode"
     bl_label = "Direction to Rotation"
 
-    trackAxis = EnumProperty(items = trackAxisItems, update = executionCodeChanged, default = "Z")
-    guideAxis = EnumProperty(items = guideAxisItems, update = executionCodeChanged, default = "X")
+    trackAxis = EnumProperty(items = trackAxisItems, update = propertyChanged, default = "Z")
+    guideAxis = EnumProperty(items = guideAxisItems, update = propertyChanged, default = "X")
 
     def create(self):
         self.inputs.new("an_VectorSocket", "Direction", "direction")
@@ -32,17 +30,8 @@ class DirectionToRotationNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         isLinked = self.getLinkedOutputsDict()
-        if not any(isLinked.values()): return ""
-        
-        rot = "eulerRotation" if isLinked["eulerRotation"] else ""
-        quat = "quaternionRotation" if isLinked["quaternionRotation"] else ""
-        mat = "matrixRotation" if isLinked["matrixRotation"] else ""
 
-        return generateDirectionToRotationCode("direction", "guide", 
-                                                self.trackAxis, self.guideAxis, 
-                                                matrixOutputName = mat, 
-                                                rotationOutputName = rot,
-                                                quaternionOutputName = quat)
-
-    def getUsedModules(self):
-        return ["mathutils"]
+        yield "matrixRotation = animation_nodes.algorithms.rotation.generateRotationMatrix(direction, guide, self.trackAxis, self.guideAxis)"
+        if isLinked["matrixRotation"]: yield "matrixRotation.normalize()"
+        if isLinked["eulerRotation"]: yield "eulerRotation = matrixRotation.to_euler()"
+        if isLinked["quaternionRotation"]: yield "quaternionRotation = matrixRotation.to_quaternion()"
