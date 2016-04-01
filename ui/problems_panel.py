@@ -32,7 +32,6 @@ class ProblemsPanel(bpy.types.Panel):
 
         for problem in problems.getProblems():
             problem.draw(layout)
-            layout.separator()
 
         layout.separator()
 
