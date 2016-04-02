@@ -23,13 +23,13 @@ def generateRotationMatrix(direction, guide, trackAxis = "Z", guideAxis = "X"):
         y = z.cross(guide.normalized())
     else:
         if guideAxis == "X":
-            if z.cross(xAxis) != zero: y = xAxis
+            if z.cross(xAxis) != zero: y = z.cross(xAxis)
             else: y = zAxis
         elif guideAxis == "Y":
-            if z.cross(yAxis) != zero: y = yAxis
+            if z.cross(yAxis) != zero: y = z.cross(yAxis)
             else: y = zAxis
         elif guideAxis == "Z":
-            if z.cross(zAxis) != zero: y = zAxis
+            if z.cross(zAxis) != zero: y = z.cross(zAxis)
             else: y = yAxis
 
     x = y.cross(z)
