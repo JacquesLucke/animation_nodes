@@ -19,9 +19,8 @@ def generateRotationMatrix(direction, guide, trackAxis = "Z", guideAxis = "X"):
         return matrix
 
     z = direction.normalized()
-    if guide != zero and z.cross(guide) != zero:
-        y = z.cross(guide.normalized())
-    else:
+    y = z.cross(guide.normalized())
+    if y == zero:
         if guideAxis == "X":
             if z.cross(xAxis) != zero: y = z.cross(xAxis)
             else: y = zAxis
