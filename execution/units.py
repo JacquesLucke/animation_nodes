@@ -16,6 +16,7 @@ _subprogramUnitsByIdentifier = {}
 def createExecutionUnits():
     reset()
     try:
+        nodeByID = createNodeByIdDict()
         createMainUnits()
         createSubprogramUnits()
     except:
@@ -26,6 +27,14 @@ def createExecutionUnits():
 def reset():
     _mainUnitsByNodeTree.clear()
     _subprogramUnitsByIdentifier.clear()
+
+def createNodeByIdDict():
+    nodeByID = dict()
+    for tree in getAnimationNodeTrees():
+        treeName = tree.name
+        for node in tree.nodes:
+            nodeByID[(treeName, node.name)] = node
+    return nodeByID
 
 def createMainUnits():
     for network in getNetworksByType("Main"):

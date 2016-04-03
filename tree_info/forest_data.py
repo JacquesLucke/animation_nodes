@@ -11,6 +11,7 @@ class ForestData:
         self.nodesByType = defaultdict(set)
         self.typeByNode = defaultdict(None)
         self.nodeByIdentifier = defaultdict(None)
+        self.animationNodes = set()
 
         self.socketsByNode = defaultdict(lambda: ([], []))
 
@@ -40,6 +41,7 @@ class ForestData:
         socketsByNode = self.socketsByNode
         reroutePairs = self.reroutePairs
         dataTypeBySocket = self.dataTypeBySocket
+        animationNodes = self.animationNodes
         socketsThatNeedUpdate = self.socketsThatNeedUpdate
 
         for node in nodes:
@@ -51,14 +53,18 @@ class ForestData:
             appendNode(nodeID)
             typeByNode[nodeID] = node.bl_idname
             nodesByType[node.bl_idname].add(nodeID)
-            nodeByIdentifier[getattr(node, "identifier", None)] = nodeID
 
             socketsByNode[nodeID] = (inputIDs, outputIDs)
 
             if node.bl_idname == "NodeReroute":
                 reroutePairs[inputIDs[0]] = outputIDs[0]
                 reroutePairs[outputIDs[0]] = inputIDs[0]
+            elif node.bl_idname == "NodeFrame":
+                pass
             else:
+                animationNodes.add(nodeID)
+                nodeByIdentifier[node.identifier] = nodeID
+
                 chainedSockets = chain(node.inputs, node.outputs)
                 chainedSocketIDs = chain(inputIDs, outputIDs)
                 for socket, socketID in zip(chainedSockets, chainedSocketIDs):

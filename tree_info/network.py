@@ -164,10 +164,15 @@ class NodeNetwork:
         https://en.wikipedia.org/wiki/Topological_sorting#Depth-first_search
         '''
 
+        # localize variables
+        socketsByNode = self.forestData.socketsByNode
+        linkedSockets = self.forestData.linkedSockets
+        animationNodes = self.forestData.animationNodes
+
         markedNodeIDs = set()
         temporaryMarkedNodeIDs = set()
         unmarkedNodeIDs = self.nodeIDs.copy()
-        sortedAnimationNodes = list()
+        sortedAnimationNodesIDs = list()
 
         nodeTree = self.nodeTree
 
@@ -189,15 +194,18 @@ class NodeNetwork:
                 temporaryMarkedNodeIDs.remove(nodeID)
                 markedNodeIDs.add(nodeID)
 
-                node = nodeTree.nodes[nodeID[1]]
-                if node.isAnimationNode:
-                    sortedAnimationNodes.append(node)
+                if nodeID in animationNodes:
+                    sortedAnimationNodesIDs.append(nodeID)
 
         def iterDependentNodes(nodeID):
-            for socketID in self.forestData.socketsByNode[nodeID][0]:
-                for otherSocketID in self.forestData.linkedSockets[socketID]:
+            for socketID in socketsByNode[nodeID][0]:
+                for otherSocketID in linkedSockets[socketID]:
                     yield otherSocketID[0]
+
+        def idsToNodes(nodeIDs):
+            nodes = nodeTree.nodes
+            return [nodes[nodeID[1]] for nodeID in nodeIDs]
 
         sort()
 
-        return sortedAnimationNodes
+        return idsToNodes(sortedAnimationNodesIDs)
