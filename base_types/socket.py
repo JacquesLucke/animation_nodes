@@ -333,9 +333,15 @@ def getSocketIndex(socket):
         return list(socket.node.outputs).index(socket)
     return list(socket.node.inputs).index(socket)
 
+def getSocketIndexWithNode(socket, node):
+    if socket.is_output:
+        return list(node.outputs).index(socket)
+    return list(node.inputs).index(socket)
+
 def register():
     bpy.types.NodeSocket.show = BoolProperty(default = True, get = getSocketVisibility, set = setSocketVisibility)
     bpy.types.NodeSocket.index = IntProperty(get = getSocketIndex)
+    bpy.types.NodeSocket.getIndex = getSocketIndexWithNode
     bpy.types.NodeSocket.toID = toID
     bpy.types.NodeSocket.getNodeTree = getNodeTree
 

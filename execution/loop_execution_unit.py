@@ -136,7 +136,7 @@ class LoopExecutionUnit:
     def iter_InitializeParametersLines(self, inputNode, variables):
         for socket in inputNode.getParameterSockets():
             if not socket.loop.useAsInput:
-                yield getLoadSocketValueLine(socket, variables)
+                yield getLoadSocketValueLine(socket, inputNode, variables)
 
 
     def iter_LoopBody(self, inputNode, nodes, variables):

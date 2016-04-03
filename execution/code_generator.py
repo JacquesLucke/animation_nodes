@@ -15,12 +15,12 @@ def getInitialVariables(nodes):
     variables = {}
     for node in nodes:
         for socket in chain(node.inputs, node.outputs):
-            variables[socket] = getSocketVariableName(socket)
+            variables[socket] = getSocketVariableName(socket, node)
     return variables
 
-def getSocketVariableName(socket):
-    socketID = socket.identifier if socket.identifier.isidentifier() else "_socket_{}_{}".format(socket.isOutput, socket.index)
-    return "_{}{}".format(socketID, socket.node.identifier[:4])
+def getSocketVariableName(socket, node):
+    socketID = socket.identifier if socket.identifier.isidentifier() else "_socket_{}_{}".format(socket.isOutput, socket.getIndex(node))
+    return "_{}{}".format(socketID, node.identifier[:4])
 
 
 
@@ -72,21 +72,18 @@ def iter_GetNodeReferences(nodes):
         yield "{} = nodes[{}]".format(node.identifier, repr(node.name))
 
 def iter_GetSocketValues(nodes, variables):
-    for socket in iterUnlinkedSockets(nodes):
-        yield getLoadSocketValueLine(socket, variables)
-
-def iterUnlinkedSockets(nodes):
     for node in nodes:
-        yield from node.unlinkedInputs
+        for socket in node.unlinkedInputs:
+            yield getLoadSocketValueLine(socket, node, variables)
 
-def getLoadSocketValueLine(socket, variables):
-    return "{} = {}".format(variables[socket], getSocketValueExpression(socket))
+def getLoadSocketValueLine(socket, node, variables):
+    return "{} = {}".format(variables[socket], getSocketValueExpression(socket, node))
 
-def getSocketValueExpression(socket):
+def getSocketValueExpression(socket, node):
     if socket.hasValueCode: return socket.getValueCode()
     else:
         socketsName = "inputs" if socket.isInput else "outputs"
-        return "{}.{}[{}].getValue()".format(socket.node.identifier, socketsName, socket.index)
+        return "{}.{}[{}].getValue()".format(node.identifier, socketsName, socket.getIndex(node))
 
 
 
@@ -97,6 +94,10 @@ def getGlobalizeStatement(nodes, variables):
     socketNames = [variables[socket] for socket in iterUnlinkedSockets(nodes)]
     if len(socketNames) == 0: return ""
     return "global " + ", ".join(socketNames)
+
+def iterUnlinkedSockets(nodes):
+    for node in nodes:
+        yield from node.unlinkedInputs
 
 def getFunction_IterNodeExecutionLines():
     if measureNodeExecutionTimesIsEnabled():
