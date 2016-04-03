@@ -1,6 +1,6 @@
 import bpy
 from .. import problems
-from .. utils.nodes import idToNode, idToSocket
+from .. utils.nodes import idToNode
 
 class NodeNetwork:
     def __init__(self, nodeIDs, forestData):
