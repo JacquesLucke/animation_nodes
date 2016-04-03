@@ -3,7 +3,7 @@ import traceback
 from itertools import chain
 from collections import defaultdict
 from .. problems import NodeFailesToCreateExecutionCode
-from .. tree_info import iterLinkedSocketsWithInfo
+from .. tree_info import iterLinkedSocketsWithInfo, isSocketLinked
 from .. preferences import (addonName,
                             monitorExecutionIsEnabled,
                             measureNodeExecutionTimesIsEnabled)
@@ -75,7 +75,7 @@ def iter_GetNodeReferences(nodes):
 def iter_GetSocketValues(nodes, variables):
     for node in nodes:
         for i, socket in enumerate(node.inputs):
-            if socket.isUnlinked:
+            if not isSocketLinked(socket, node):
                 yield getLoadSocketValueLine(socket, node, variables, i)
 
 def getLoadSocketValueLine(socket, node, variables, index = None):
@@ -152,7 +152,7 @@ def getNodeCommentLine(node):
 
 def iterInputCopyLines(node, variables):
     for socket in node.inputs:
-        if socket.dataIsModified and socket.isCopyable and socket.isUnlinked:
+        if socket.dataIsModified and socket.isCopyable and not isSocketLinked(socket, node):
             newName = variables[socket] + "_copy"
             if socket.hasValueCode: line = "{} = {}".format(newName, socket.getValueCode())
             else: line = getCopyLine(socket, newName, variables)

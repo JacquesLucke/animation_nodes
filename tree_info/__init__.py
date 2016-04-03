@@ -58,9 +58,9 @@ def getNodesByType(idName):
     return [idToNode(nodeID) for nodeID in _forestData.nodesByType[idName]]
 
 
-def isSocketLinked(socket):
-    return len(_forestData.linkedSockets[socket.toID()]) > 0
-
+def isSocketLinked(socket, node):
+    socketID = ((node.id_data.name, node.name), socket.is_output, socket.identifier)
+    return len(_forestData.linkedSockets[socketID]) > 0
 
 def getDirectlyLinkedSockets(socket):
     socketID = socket.toID()

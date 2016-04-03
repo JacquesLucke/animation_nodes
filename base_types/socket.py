@@ -229,11 +229,11 @@ class AnimationNodeSocket:
 
     @property
     def isLinked(self):
-        return isSocketLinked(self)
+        return isSocketLinked(self, self.node)
 
     @property
     def isUnlinked(self):
-        return not self.isLinked
+        return not isSocketLinked(self, self.node)
 
 
     @property
@@ -324,11 +324,11 @@ def setSocketVisibility(socket, value):
     socket.hide = not value
 
 def toID(socket):
-    return ((socket.node.id_data.name, socket.node.name), socket.is_output, socket.identifier)
+    node = socket.node
+    return ((node.id_data.name, node.name), socket.is_output, socket.identifier)
 
 def getNodeTree(socket):
     return socket.node.id_data
-
 
 def getSocketIndex(socket, node = None):
     if node is None: node = socket.node
