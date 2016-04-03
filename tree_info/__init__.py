@@ -73,7 +73,6 @@ def getDirectlyLinkedSocket(socket):
     if len(linkedSocketIDs) > 0:
         return idToSocket(linkedSocketIDs[0])
 
-
 def getLinkedSockets(socket):
     socketID = socket.toID()
     linkedIDs = _forestData.linkedSockets[socketID]
@@ -85,6 +84,17 @@ def iterSocketsThatNeedUpdate():
 
 def getUndefinedNodes():
     return [idToNode(nodeID) for nodeID in _forestData.nodesByType["NodeUndefined"]]
+
+def iterLinkedSocketsWithInfo(socket, node, nodeByID):
+    socketID = ((node.id_data.name, node.name), socket.is_output, socket.identifier)
+    linkedIDs = _forestData.linkedSockets[socketID]
+    for linkedID in linkedIDs:
+        linkedIdentifier = linkedID[2]
+        linkedNode = nodeByID[linkedID[0]]
+        sockets = linkedNode.outputs if linkedID[1] else linkedNode.inputs
+        for socket in sockets:
+            if socket.identifier == linkedIdentifier:
+                yield socket
 
 
 # improve performance of higher level functions

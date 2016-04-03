@@ -179,7 +179,7 @@ class AnimationNode:
         self.outputs.clear()
 
     def removeSocket(self, socket):
-        index = socket.index
+        index = socket.getIndex()
         if socket.isOutput:
             if index < self.activeOutputIndex: self.activeOutputIndex -= 1
         else:

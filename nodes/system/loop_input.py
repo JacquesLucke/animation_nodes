@@ -105,7 +105,7 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     def newIterator(self, listDataType, name = None):
         if name is None: name = toBaseDataType(listDataType)
         socket = self.outputs.new(toBaseIdName(listDataType), name, "iterator_" + getRandomString(5))
-        socket.moveTo(self.newIteratorSocket.index)
+        socket.moveTo(self.newIteratorSocket.getIndex())
         self.setupSocket(socket, name, moveGroup = 1)
         return socket
 
@@ -113,7 +113,7 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         if name is None: name = dataType
         socket = self.outputs.new(toIdName(dataType), name, "parameter_" + getRandomString(5))
         if defaultValue: socket.setProperty(defaultValue)
-        socket.moveTo(self.newParameterSocket.index)
+        socket.moveTo(self.newParameterSocket.getIndex())
         socket.loop.copyAlways = False
         self.setupSocket(socket, name, moveGroup = 2)
         return socket
@@ -228,10 +228,10 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         return len(self.getIteratorSockets()) > 0
 
     def getIteratorSockets(self):
-        return self.outputs[2:self.newIteratorSocket.index]
+        return self.outputs[2:self.newIteratorSocket.getIndex(self)]
 
     def getParameterSockets(self):
-        return self.outputs[self.newIteratorSocket.index + 1:self.newParameterSocket.index]
+        return self.outputs[self.newIteratorSocket.getIndex(self) + 1:self.newParameterSocket.getIndex(self)]
 
     def getBreakNodes(self):
         return self.network.breakNodes

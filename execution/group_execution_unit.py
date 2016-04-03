@@ -40,17 +40,17 @@ class GroupExecutionUnit:
         except: return
 
         variables = getInitialVariables(nodes)
-        self.setupScript = "\n".join(self.iterSetupScriptLines(nodes, variables))
+        self.setupScript = "\n".join(self.iterSetupScriptLines(nodes, variables, nodeByID))
 
-    def iterSetupScriptLines(self, nodes, variables):
+    def iterSetupScriptLines(self, nodes, variables, nodeByID):
         yield from iterSetupCodeLines(nodes, variables)
         yield "\n\n"
-        yield from self.iterFunctionGenerationScriptLines(nodes, variables)
+        yield from self.iterFunctionGenerationScriptLines(nodes, variables, nodeByID)
 
-    def iterFunctionGenerationScriptLines(self, nodes, variables):
+    def iterFunctionGenerationScriptLines(self, nodes, variables, nodeByID):
         yield self.getFunctionHeader(self.network.groupInputNode, variables)
         yield "    " + getGlobalizeStatement(nodes, variables)
-        yield from iterIndented(self.iterExecutionScriptLines(nodes, variables))
+        yield from iterIndented(self.iterExecutionScriptLines(nodes, variables, nodeByID))
         yield "\n"
         yield "    " + self.getReturnStatement(self.network.groupOutputNode, variables)
 
@@ -62,14 +62,14 @@ class GroupExecutionUnit:
         header = "def main({}):".format(parameterList)
         return header
 
-    def iterExecutionScriptLines(self, nodes, variables):
+    def iterExecutionScriptLines(self, nodes, variables, nodeByID):
         iterNodeExecutionLines = getFunction_IterNodeExecutionLines()
 
-        yield from linkOutputSocketsToTargets(self.network.groupInputNode, variables)
+        yield from linkOutputSocketsToTargets(self.network.groupInputNode, variables, nodeByID)
         for node in nodes:
             if node.bl_idname in ("an_GroupInputNode", "an_GroupOutputNode"): continue
             yield from iterNodeExecutionLines(node, variables)
-            yield from linkOutputSocketsToTargets(node, variables)
+            yield from linkOutputSocketsToTargets(node, variables, nodeByID)
 
     def getReturnStatement(self, outputNode, variables):
         if outputNode is None: return "return"

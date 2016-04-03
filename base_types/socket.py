@@ -147,14 +147,15 @@ class AnimationNodeSocket:
         props.passEvent = passEvent
 
     def invokeNodeInsertion(self, layout, nodeIdName, toIndex, text, settings = {}):
-        invokeLinkedNodeInsertion(layout, nodeIdName, self.index, toIndex, text, settings)
+        invokeLinkedNodeInsertion(layout, nodeIdName, self.getIndex(), toIndex, text, settings)
 
     def moveUp(self):
-        self.moveTo(self.index - 1)
+        self.moveTo(self.getIndex() - 1)
 
-    def moveTo(self, index):
-        if self.index != index:
-            self.sockets.move(self.index, index)
+    def moveTo(self, index, node = None):
+        ownIndex = self.getIndex(node)
+        if ownIndex != index:
+            self.sockets.move(ownIndex, index)
             self.node.socketMoved()
 
     def moveUpInGroup(self):
@@ -328,24 +329,19 @@ def toID(socket):
 def getNodeTree(socket):
     return socket.node.id_data
 
-def getSocketIndex(socket):
-    if socket.is_output:
-        return list(socket.node.outputs).index(socket)
-    return list(socket.node.inputs).index(socket)
 
-def getSocketIndexWithNode(socket, node):
+def getSocketIndex(socket, node = None):
+    if node is None: node = socket.node
     if socket.is_output:
         return list(node.outputs).index(socket)
     return list(node.inputs).index(socket)
 
 def register():
-    bpy.types.NodeSocket.show = BoolProperty(default = True, get = getSocketVisibility, set = setSocketVisibility)
-    bpy.types.NodeSocket.index = IntProperty(get = getSocketIndex)
-    bpy.types.NodeSocket.getIndex = getSocketIndexWithNode
     bpy.types.NodeSocket.toID = toID
+    bpy.types.NodeSocket.getIndex = getSocketIndex
     bpy.types.NodeSocket.getNodeTree = getNodeTree
+    bpy.types.NodeSocket.show = BoolProperty(default = True, get = getSocketVisibility, set = setSocketVisibility)
 
 def unregister():
-    del bpy.types.NodeSocket.show
-    del bpy.types.NodeSocket.index
     del bpy.types.NodeSocket.toID
+    del bpy.types.NodeSocket.show

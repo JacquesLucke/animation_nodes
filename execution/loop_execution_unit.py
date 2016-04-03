@@ -43,27 +43,27 @@ class LoopExecutionUnit:
         except: return
 
         variables = getInitialVariables(nodes)
-        self.setupScript = "\n".join(self.iterSetupScriptLines(nodes, variables))
+        self.setupScript = "\n".join(self.iterSetupScriptLines(nodes, variables, nodeByID))
 
-    def iterSetupScriptLines(self, nodes, variables):
+    def iterSetupScriptLines(self, nodes, variables, nodeByID):
         inputNode = self.network.loopInputNode
 
         yield from iterSetupCodeLines(nodes, variables)
         yield "\n\n"
 
         if inputNode.iterateThroughLists:
-            yield from self.iter_IteratorLength(inputNode, nodes, variables)
+            yield from self.iter_IteratorLength(inputNode, nodes, variables, nodeByID)
         else:
-            yield from self.iter_IterationsAmount(inputNode, nodes, variables)
+            yield from self.iter_IterationsAmount(inputNode, nodes, variables, nodeByID)
 
 
-    def iter_IterationsAmount(self, inputNode, nodes, variables):
+    def iter_IterationsAmount(self, inputNode, nodes, variables, nodeByID):
         yield self.get_IterationsAmount_Header(inputNode, variables)
         yield "    " + getGlobalizeStatement(nodes, variables)
         yield from iterIndented(self.iter_InitializeGeneratorsLines(inputNode, variables))
         yield from iterIndented(self.iter_InitializeParametersLines(inputNode, variables))
         yield from iterIndented(self.iter_IterationsAmount_PrepareLoop(inputNode, variables))
-        yield from iterIndented(self.iter_LoopBody(inputNode, nodes, variables), amount = 2)
+        yield from iterIndented(self.iter_LoopBody(inputNode, nodes, variables, nodeByID), amount = 2)
         yield "    " + self.get_ReturnStatement(inputNode, variables)
 
     def get_IterationsAmount_Header(self, inputNode, variables):
@@ -83,13 +83,13 @@ class LoopExecutionUnit:
         yield "for current_loop_index in range(loop_iterations):"
 
 
-    def iter_IteratorLength(self, inputNode, nodes, variables):
+    def iter_IteratorLength(self, inputNode, nodes, variables, nodeByID):
         yield self.get_IteratorLength_Header(inputNode, variables)
         yield "    " + getGlobalizeStatement(nodes, variables)
         yield from iterIndented(self.iter_InitializeGeneratorsLines(inputNode, variables))
         yield from iterIndented(self.iter_InitializeParametersLines(inputNode, variables))
         yield from iterIndented(self.iter_IteratorLength_PrepareLoopLines(inputNode, variables))
-        yield from iterIndented(self.iter_LoopBody(inputNode, nodes, variables), amount = 2)
+        yield from iterIndented(self.iter_LoopBody(inputNode, nodes, variables, nodeByID), amount = 2)
         yield "    " + self.get_ReturnStatement(inputNode, variables)
 
     def get_IteratorLength_Header(self, inputNode, variables):
@@ -139,15 +139,15 @@ class LoopExecutionUnit:
                 yield getLoadSocketValueLine(socket, inputNode, variables)
 
 
-    def iter_LoopBody(self, inputNode, nodes, variables):
-        yield from linkOutputSocketsToTargets(inputNode, variables)
+    def iter_LoopBody(self, inputNode, nodes, variables, nodeByID):
+        yield from linkOutputSocketsToTargets(inputNode, variables, nodeByID)
 
         iterNodeExecutionLines = getFunction_IterNodeExecutionLines()
         ignoreNodes = {"an_LoopInputNode", "an_LoopGeneratorOutputNode", "an_ReassignLoopParameterNode", "an_LoopBreakNode"}
         for node in nodes:
             if node.bl_idname in ignoreNodes: continue
             yield from iterNodeExecutionLines(node, variables)
-            yield from linkOutputSocketsToTargets(node, variables)
+            yield from linkOutputSocketsToTargets(node, variables, nodeByID)
 
         yield from self.iter_LoopBreak(inputNode, variables)
         yield from self.iter_AddToGenerators(inputNode, variables)

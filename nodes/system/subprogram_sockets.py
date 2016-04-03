@@ -59,18 +59,18 @@ class SubprogramData:
 
     def applySockets(self, node, oldSockets, nodeSockets, socketData):
         for i, data in enumerate(socketData):
-            couldUseOldSocket = self.changeExistingSocket(oldSockets, data, i)
+            couldUseOldSocket = self.changeExistingSocket(oldSockets, data, node, i)
             if couldUseOldSocket: continue
             newSocket = self.newSocketFromData(nodeSockets, data)
-            newSocket.moveTo(i)
+            newSocket.moveTo(i, node)
 
         self.removeUnusedSockets(nodeSockets, socketData)
 
-    def changeExistingSocket(self, oldSockets, data, targetIndex):
+    def changeExistingSocket(self, oldSockets, data, node, targetIndex):
         if data.identifier in oldSockets:
             socket = oldSockets[data.identifier]
             if socket.bl_idname == data.idName:
-                socket.moveTo(targetIndex)
+                socket.moveTo(targetIndex, node)
                 socket.text = data.text
                 return True
             else:

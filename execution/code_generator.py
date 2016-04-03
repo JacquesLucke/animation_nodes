@@ -3,6 +3,7 @@ import traceback
 from itertools import chain
 from collections import defaultdict
 from .. problems import NodeFailesToCreateExecutionCode
+from .. tree_info import iterLinkedSocketsWithInfo
 from .. preferences import (addonName,
                             monitorExecutionIsEnabled,
                             measureNodeExecutionTimesIsEnabled)
@@ -14,12 +15,12 @@ from .. preferences import (addonName,
 def getInitialVariables(nodes):
     variables = {}
     for node in nodes:
-        for socket in chain(node.inputs, node.outputs):
-            variables[socket] = getSocketVariableName(socket, node)
+        for i, socket in enumerate(chain(node.inputs, node.outputs)):
+            variables[socket] = getSocketVariableName(socket, node, i)
     return variables
 
-def getSocketVariableName(socket, node):
-    socketID = socket.identifier if socket.identifier.isidentifier() else "_socket_{}_{}".format(socket.isOutput, socket.getIndex(node))
+def getSocketVariableName(socket, node, index):
+    socketID = socket.identifier if socket.identifier.isidentifier() else "_socket_{}_{}".format(socket.isOutput, index)
     return "_{}{}".format(socketID, node.identifier[:4])
 
 
@@ -73,17 +74,19 @@ def iter_GetNodeReferences(nodes):
 
 def iter_GetSocketValues(nodes, variables):
     for node in nodes:
-        for socket in node.unlinkedInputs:
-            yield getLoadSocketValueLine(socket, node, variables)
+        for i, socket in enumerate(node.inputs):
+            if socket.isUnlinked:
+                yield getLoadSocketValueLine(socket, node, variables, i)
 
-def getLoadSocketValueLine(socket, node, variables):
-    return "{} = {}".format(variables[socket], getSocketValueExpression(socket, node))
+def getLoadSocketValueLine(socket, node, variables, index = None):
+    return "{} = {}".format(variables[socket], getSocketValueExpression(socket, node, index))
 
-def getSocketValueExpression(socket, node):
+def getSocketValueExpression(socket, node, index = None):
     if socket.hasValueCode: return socket.getValueCode()
     else:
         socketsName = "inputs" if socket.isInput else "outputs"
-        return "{}.{}[{}].getValue()".format(node.identifier, socketsName, socket.getIndex(node))
+        if index is None: index = socket.getIndex(node)
+        return "{}.{}[{}].getValue()".format(node.identifier, socketsName, index)
 
 
 
@@ -193,20 +196,18 @@ def handleExecutionCodeCreationException(node):
 # Modify Socket Variables
 ##########################################
 
-def linkOutputSocketsToTargets(node, variables):
-    lines = []
+def linkOutputSocketsToTargets(node, variables, nodeByID):
     resolveInnerLinks(node, variables)
     for socket in node.linkedOutputs:
-        lines.extend(tuple(linkSocketToTargets(socket, variables)))
-    return lines
+        yield from linkSocketToTargets(socket, node, variables, nodeByID)
 
 def resolveInnerLinks(node, variables):
     inputs, outputs = node.inputsByIdentifier, node.outputsByIdentifier
     for inputName, outputName in node.innerLinks:
         variables[outputs[outputName]] = variables[inputs[inputName]]
 
-def linkSocketToTargets(socket, variables):
-    targets = socket.dataTargets
+def linkSocketToTargets(socket, node, variables, nodeByID):
+    targets = tuple(iterLinkedSocketsWithInfo(socket, node, nodeByID))
     needACopy = getTargetsThatNeedACopy(socket, targets)
 
     for target in targets:
