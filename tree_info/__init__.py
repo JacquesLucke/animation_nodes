@@ -79,12 +79,6 @@ def getLinkedSockets(socket):
     linkedIDs = _forestData.linkedSockets[socketID]
     return [idToSocket(linkedID) for linkedID in linkedIDs]
 
-def getLinkedSocket(socket):
-    socketID = socket.toID()
-    linkedIDs = _forestData.linkedSockets[socketID]
-    if len(linkedIDs) > 0:
-        return idToSocket(linkedIDs[0])
-
 def iterSocketsThatNeedUpdate():
     for socketID in _forestData.socketsThatNeedUpdate:
         yield idToSocket(socketID)
