@@ -29,10 +29,10 @@ class ForestData:
 
     def insertNodeTrees(self):
         for tree in getAnimationNodeTrees():
-            self.insertNodes(tree.nodes)
-            self.insertLinks(tree.links)
+            self.insertNodes(tree.nodes, tree.name)
+            self.insertLinks(tree.links, tree.name)
 
-    def insertNodes(self, nodes):
+    def insertNodes(self, nodes, treeName):
         appendNode = self.nodes.append
         nodesByType = self.nodesByType
         typeByNode = self.typeByNode
@@ -43,7 +43,7 @@ class ForestData:
         socketsThatNeedUpdate = self.socketsThatNeedUpdate
 
         for node in nodes:
-            nodeID = node.toID()
+            nodeID = (treeName, node.name)
 
             inputIDs = [(nodeID, False, socket.identifier) for socket in node.inputs]
             outputIDs = [(nodeID, True, socket.identifier) for socket in node.outputs]
@@ -67,12 +67,14 @@ class ForestData:
                             socketsThatNeedUpdate.add(socketID)
 
 
-    def insertLinks(self, links):
+    def insertLinks(self, links, treeName):
         linkedSocketsWithReroutes = self.linkedSocketsWithReroutes
 
         for link in links:
-            originID = link.from_socket.toID()
-            targetID = link.to_socket.toID()
+            originSocket = link.from_socket
+            targetSocket = link.to_socket
+            originID = ((treeName, link.from_node.name), originSocket.is_output, originSocket.identifier)
+            targetID = ((treeName, link.to_node.name), targetSocket.is_output, targetSocket.identifier)
 
             linkedSocketsWithReroutes[originID].append(targetID)
             linkedSocketsWithReroutes[targetID].append(originID)
