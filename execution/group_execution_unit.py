@@ -7,13 +7,13 @@ from . code_generator import (getInitialVariables,
                               getFunction_IterNodeExecutionLines)
 
 class GroupExecutionUnit:
-    def __init__(self, network):
+    def __init__(self, network, nodeByID):
         self.network = network
         self.setupScript = ""
         self.setupCodeObject = None
         self.executionData = {}
 
-        self.generateScript()
+        self.generateScript(nodeByID)
         self.compileScript()
         self.execute = self.raiseNotSetupException
 
@@ -35,8 +35,8 @@ class GroupExecutionUnit:
         return [self.setupScript]
 
 
-    def generateScript(self):
-        try: nodes = self.network.getSortedAnimationNodes()
+    def generateScript(self, nodeByID):
+        try: nodes = self.network.getSortedAnimationNodes(nodeByID)
         except: return
 
         variables = getInitialVariables(nodes)

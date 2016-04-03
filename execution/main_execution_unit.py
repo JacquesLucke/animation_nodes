@@ -8,7 +8,7 @@ from . code_generator import (getInitialVariables,
                               getFunction_IterNodeExecutionLines)
 
 class MainExecutionUnit:
-    def __init__(self, network):
+    def __init__(self, network, nodeByID):
         self.network = network
         self.setupScript = ""
         self.executeScript = ""
@@ -16,7 +16,7 @@ class MainExecutionUnit:
         self.executeCodeObject = None
         self.executionData = {}
 
-        self.generateScripts()
+        self.generateScripts(nodeByID)
         self.compileScripts()
         self.execute = self.raiseNotSetupException
 
@@ -47,8 +47,8 @@ class MainExecutionUnit:
 
 
 
-    def generateScripts(self):
-        try: nodes = self.network.getSortedAnimationNodes()
+    def generateScripts(self, nodeByID):
+        try: nodes = self.network.getSortedAnimationNodes(nodeByID)
         except: return
 
         variables = getInitialVariables(nodes)
@@ -57,7 +57,7 @@ class MainExecutionUnit:
 
     def iterExecutionScriptLines(self, nodes, variables):
         iterNodeExecutionLines = getFunction_IterNodeExecutionLines()
-        
+
         for node in nodes:
             yield from iterNodeExecutionLines(node, variables)
             yield from linkOutputSocketsToTargets(node, variables)

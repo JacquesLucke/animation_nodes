@@ -158,7 +158,7 @@ class NodeNetwork:
         except: return None
 
 
-    def getSortedAnimationNodes(self):
+    def getSortedAnimationNodes(self, nodeByID = None):
         '''
         Used Algorithm:
         https://en.wikipedia.org/wiki/Topological_sorting#Depth-first_search
@@ -203,8 +203,11 @@ class NodeNetwork:
                     yield otherSocketID[0]
 
         def idsToNodes(nodeIDs):
-            nodes = nodeTree.nodes
-            return [nodes[nodeID[1]] for nodeID in nodeIDs]
+            if nodeByID is None:
+                nodes = nodeTree.nodes
+                return [nodes[nodeID[1]] for nodeID in nodeIDs]
+            else:
+                return [nodeByID[nodeID] for nodeID in nodeIDs]
 
         sort()
 

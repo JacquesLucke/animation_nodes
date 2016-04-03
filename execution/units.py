@@ -17,8 +17,9 @@ def createExecutionUnits():
     reset()
     try:
         nodeByID = createNodeByIdDict()
-        createMainUnits()
-        createSubprogramUnits()
+        createMainUnits(nodeByID)
+        createSubprogramUnits(nodeByID)
+        nodeByID.clear()
     except:
         print("\n"*5)
         traceback.print_exc()
@@ -36,17 +37,17 @@ def createNodeByIdDict():
             nodeByID[(treeName, node.name)] = node
     return nodeByID
 
-def createMainUnits():
+def createMainUnits(nodeByID):
     for network in getNetworksByType("Main"):
-        unit = MainExecutionUnit(network)
+        unit = MainExecutionUnit(network, nodeByID)
         _mainUnitsByNodeTree[network.treeName].append(unit)
 
-def createSubprogramUnits():
+def createSubprogramUnits(nodeByID):
     for network in getSubprogramNetworks():
         if network.type == "Group":
-            unit = GroupExecutionUnit(network)
+            unit = GroupExecutionUnit(network, nodeByID)
         if network.type == "Loop":
-            unit = LoopExecutionUnit(network)
+            unit = LoopExecutionUnit(network, nodeByID)
         if network.type == "Script":
             unit = ScriptExecutionUnit(network)
         _subprogramUnitsByIdentifier[network.identifier] = unit
