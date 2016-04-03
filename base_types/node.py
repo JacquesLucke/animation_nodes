@@ -312,7 +312,7 @@ class AnimationNode:
             names[variable].append(identifier)
 
         links = []
-        for name, identifiers in names.items():
+        for identifiers in names.values():
             if len(identifiers) == 2: links.append(identifiers)
         return links
 
