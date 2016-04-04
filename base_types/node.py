@@ -314,9 +314,6 @@ class AnimationNode:
     def getTemplateCodeString(self):
         return toString(self.getTemplateCode())
 
-    def getExecutionCodeString(self):
-        return toString(self.getExecutionCode())
-
     def getTaggedExecutionCode(self):
         """
         tags:
@@ -328,26 +325,30 @@ class AnimationNode:
         outputVariables = self.outputVariables
 
         if hasattr(self, "execute"):
-            parameters = ["%{0}%".format(inputVariables[socket.identifier]) for socket in self.inputs]
-            parameterString = ", ".join(parameters)
-
-            executionString = "#self#.execute(" + parameterString + ")"
-
-            outputVariables = ["${}$".format(outputVariables[socket.identifier]) for socket in self.outputs]
-            outputString = ", ".join(outputVariables)
-
-            if outputString == "":
-                return executionString
-            else:
-                return outputString + " = "+ executionString
+            return self.getTaggedExecutionCode_ExecuteFunction(inputVariables, outputVariables)
         else:
-            code = toString(self.getExecutionCode())
-            for variable in inputVariables.values():
-                code = tagVariableName(code, variable, "%")
-            for variable in outputVariables.values():
-                code = tagVariableName(code, variable, "$")
-            code = tagVariableName(code, "self", "#")
-            return code
+            return self.getTaggedExecutionCode_GetExecutionCode(inputVariables, outputVariables)
+
+    def getTaggedExecutionCode_ExecuteFunction(self, inputVariables, outputVariables):
+        parameters = ["%{0}%".format(inputVariables[socket.identifier]) for socket in self.inputs]
+        parameterString = ", ".join(parameters)
+        executionString = "#self#.execute({})".format(parameterString)
+
+        outputVariables = ["${}$".format(outputVariables[socket.identifier]) for socket in self.outputs]
+        outputString = ", ".join(outputVariables)
+
+        if outputString == "": return executionString
+        else: return outputString + " = "+ executionString
+
+    def getTaggedExecutionCode_GetExecutionCode(self, inputVariables, outputVariables):
+        code = toString(self.getExecutionCode())
+        for variable in inputVariables.values():
+            code = tagVariableName(code, variable, "%")
+        for variable in outputVariables.values():
+            code = tagVariableName(code, variable, "$")
+        code = tagVariableName(code, "self", "#")
+        return code
+
 
 from functools import lru_cache
 @lru_cache(maxsize = 2048)
