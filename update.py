@@ -18,10 +18,11 @@ def updateEverything():
     enableUseFakeUser()
     callNodeEditFunctions()
     correctForbiddenNodeLinks()
-    subprogram_sockets.updateIfNecessary()
 
+    # from now on no nodes will be created or removed
     nodeByID = createNodeByIdDict()
 
+    subprogram_sockets.updateIfNecessary()
     checkIfNodeTreeIsLinked()
     checkUndefinedNodes(nodeByID)
     checkNetworks(nodeByID)

@@ -149,7 +149,6 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
         self.isInputComparable = all(socket.comparable for socket in self.inputs)
         self.isOutputStorable = all(socket.storable for socket in self.outputs)
 
-
     def clearCache(self):
         oneTimeCache.pop(self.identifier, None)
         frameBasedCache.pop(self.identifier, None)
