@@ -88,29 +88,26 @@ class RepeatListNode(bpy.types.Node, AnimationNode):
         if self.amountType == "LENGTH_CEIL":
             yield "    amount = math.ceil(abs(length) / lenList)"
 
-
+        if self.repetitionType == "PING_PONG":
+            yield "    reList = reversed(inList)"
+            
+        yield "    for i in range(amount):"
         if self.repetitionType == "LOOP":
-            yield "    outList = inList * amount"
-
-        else:
-            if self.repetitionType == "PING_PONG":
-                yield "    reList = reversed(inList)"
-            
-            yield "    for i in range(amount):"
+            yield "        outList += inList"
         
-            if self.repetitionType == "PING_PONG":
-                yield "        if (i % 2) == 0: outList += inList"
-                yield "        else: outList += reList"
-            
-            if self.repetitionType == "SHIFT":
-                yield "        shift = (amount + i) % lenList"
-                yield "        inList = inList[-shift:] + inList[:-shift]"
-                yield "        outList += inList"
-            
-            if self.repetitionType == "SHUFFLE":
-                yield "        random.seed(i + self.nodeSeed * 1245 + seed)"
-                yield "        random.shuffle(inList)"
-                yield "        outList += inList"
+        elif self.repetitionType == "PING_PONG":
+            yield "        if (i % 2) == 0: outList += inList"
+            yield "        else: outList += reList"
+        
+        elif self.repetitionType == "SHIFT":
+            yield "        shift = (amount + i) % lenList"
+            yield "        inList = inList[-shift:] + inList[:-shift]"
+            yield "        outList += inList"
+        
+        elif self.repetitionType == "SHUFFLE":
+            yield "        random.seed(i + self.nodeSeed * 1245 + seed)"
+            yield "        random.shuffle(inList)"
+            yield "        outList += inList"
 
     def getUsedModules(self):
         return ["random", "math"]
