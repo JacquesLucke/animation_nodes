@@ -303,18 +303,13 @@ class AnimationNode:
     def outputVariables(self):
         return {socket.identifier : socket.identifier for socket in self.outputs}
 
-    @property
-    def innerLinks(self):
-        names = defaultdict(list)
+    def iterInnerLinks(self):
+        names = {}
         for identifier, variable in self.inputVariables.items():
-            names[variable].append(identifier)
+            names[variable] = identifier
         for identifier, variable in self.outputVariables.items():
-            names[variable].append(identifier)
-
-        links = []
-        for identifiers in names.values():
-            if len(identifiers) == 2: links.append(identifiers)
-        return links
+            if variable in names:
+                yield (names[variable], identifier)
 
     def getTemplateCodeString(self):
         return toString(self.getTemplateCode())

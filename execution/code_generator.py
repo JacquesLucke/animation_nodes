@@ -203,7 +203,7 @@ def linkOutputSocketsToTargets(node, variables, nodeByID):
 
 def resolveInnerLinks(node, variables):
     inputs, outputs = node.inputsByIdentifier, node.outputsByIdentifier
-    for inputName, outputName in node.innerLinks:
+    for inputName, outputName in node.iterInnerLinks():
         variables[outputs[outputName]] = variables[inputs[inputName]]
 
 def linkSocketToTargets(socket, node, variables, nodeByID):
