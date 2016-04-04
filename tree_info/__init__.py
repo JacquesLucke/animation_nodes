@@ -85,8 +85,8 @@ def iterSocketsThatNeedUpdate():
     for socketID in _forestData.socketsThatNeedUpdate:
         yield idToSocket(socketID)
 
-def getUndefinedNodes():
-    return [idToNode(nodeID) for nodeID in _forestData.nodesByType["NodeUndefined"]]
+def getUndefinedNodes(nodeByID):
+    return [nodeByID[nodeID] for nodeID in _forestData.nodesByType["NodeUndefined"]]
 
 def iterLinkedSocketsWithInfo(socket, node, nodeByID):
     socketID = ((node.id_data.name, node.name), socket.is_output, socket.identifier)

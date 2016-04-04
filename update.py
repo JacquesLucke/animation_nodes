@@ -5,7 +5,7 @@ from . utils.timing import measureTime
 from . nodes.system import subprogram_sockets
 from . execution.units import createExecutionUnits
 from . node_link_conversion import correctForbiddenNodeLinks
-from . utils.nodes import iterAnimationNodes, getAnimationNodeTrees
+from . utils.nodes import iterAnimationNodes, getAnimationNodeTrees, createNodeByIdDict
 
 @measureTime
 def updateEverything():
@@ -19,13 +19,18 @@ def updateEverything():
     callNodeEditFunctions()
     correctForbiddenNodeLinks()
     subprogram_sockets.updateIfNecessary()
+
+    nodeByID = createNodeByIdDict()
+
     checkIfNodeTreeIsLinked()
-    checkUndefinedNodes()
-    checkNetworks()
+    checkUndefinedNodes(nodeByID)
+    checkNetworks(nodeByID)
     checkIdentifiers()
 
     if problems.canCreateExecutionUnits():
-        createExecutionUnits()
+        createExecutionUnits(nodeByID)
+
+    nodeByID.clear()
 
 
 def enableUseFakeUser():
@@ -39,13 +44,13 @@ def callNodeEditFunctions():
         node.edit()
         tree_info.updateIfNecessary()
 
-def checkNetworks():
+def checkNetworks(nodeByID):
     invalidNetworkExists = False
 
     for network in tree_info.getNetworks():
         if network.type == "Invalid":
             invalidNetworkExists = True
-        nodes = network.getAnimationNodes()
+        nodes = network.getAnimationNodes(nodeByID)
         markInvalidNodes(network, nodes)
         node_colors.colorNetwork(network, nodes)
         checkNodeOptions(network, nodes)
@@ -79,7 +84,7 @@ def checkIfNodeTreeIsLinked():
             problems.LinkedAnimationNodeTreeExists().report()
             break
 
-def checkUndefinedNodes():
-    undefinedNodes = tree_info.getUndefinedNodes()
+def checkUndefinedNodes(nodeByID):
+    undefinedNodes = tree_info.getUndefinedNodes(nodeByID)
     if len(undefinedNodes) > 0:
-        problems.UndefinedNodeExists(undefinedNodes).report()        
+        problems.UndefinedNodeExists(undefinedNodes).report()

@@ -103,11 +103,14 @@ class NodeNetwork:
             nodeIDs.extend(network.nodeIDs)
         return NodeNetwork(nodeIDs, forestData, nodeByID)
 
-    def getNodes(self):
-        return [idToNode(nodeID) for nodeID in self.nodeIDs]
+    def getNodes(self, nodeByID = None):
+        if nodeByID is None:
+            return [idToNode(nodeID) for nodeID in self.nodeIDs]
+        else:
+            return [nodeByID[nodeID] for nodeID in self.nodeIDs]
 
-    def getAnimationNodes(self):
-        return [node for node in self.getNodes() if node.isAnimationNode]
+    def getAnimationNodes(self, nodeByID = None):
+        return [node for node in self.getNodes(nodeByID) if node.isAnimationNode]
 
     @property
     def treeName(self):

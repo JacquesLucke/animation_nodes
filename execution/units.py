@@ -13,13 +13,11 @@ from .. problems import ExceptionDuringCodeCreation, CouldNotSetupExecutionUnits
 _mainUnitsByNodeTree = defaultdict(list)
 _subprogramUnitsByIdentifier = {}
 
-def createExecutionUnits():
+def createExecutionUnits(nodeByID):
     reset()
     try:
-        nodeByID = createNodeByIdDict()
         createMainUnits(nodeByID)
         createSubprogramUnits(nodeByID)
-        nodeByID.clear()
     except:
         print("\n"*5)
         traceback.print_exc()
