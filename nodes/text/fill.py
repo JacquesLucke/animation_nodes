@@ -25,7 +25,6 @@ class FillStringNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         yield "fillText = ' ' if fill == '' else fill"
-        yield "fillText *= max(length, 0)"
-        yield "fillText = fillText[:max(length - len(text), 0)]"
+        yield "fillText *= max(length - len(text), 0)"
         if self.fillMode == "LEFT": yield "outText = fillText + text"
         if self.fillMode == "RIGHT": yield "outText = text + fillText"
