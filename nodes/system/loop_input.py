@@ -233,11 +233,11 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     def getParameterSockets(self):
         return self.outputs[self.newIteratorSocket.getIndex(self) + 1:self.newParameterSocket.getIndex(self)]
 
-    def getBreakNodes(self):
-        return self.network.breakNodes
+    def getBreakNodes(self, nodeByID):
+        return self.network.getBreakNodes(nodeByID)
 
-    def getSortedGeneratorNodes(self):
-        nodes = self.network.generatorOutputNodes
+    def getSortedGeneratorNodes(self, nodeByID = None):
+        nodes = self.network.getGeneratorOutputNodes(nodeByID)
         nodes.sort(key = attrgetter("sortIndex"))
         try:
             for i, node in enumerate(nodes):
@@ -245,5 +245,5 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         except: pass # The function has been called while drawing the interface
         return nodes
 
-    def getReassignParameterNodes(self):
-        return [node for node in self.network.reassignParameterNodes if node.linkedParameterSocket]
+    def getReassignParameterNodes(self, nodeByID = None):
+        return [node for node in self.network.getReassignParameterNodes(nodeByID) if node.linkedParameterSocket]

@@ -30,7 +30,7 @@ class GroupOutputNode(bpy.types.Node, AnimationNode):
 
         layout.separator()
 
-        inputNode = self.network.groupInputNode
+        inputNode = self.network.getGroupInputNode()
         if inputNode: layout.label(inputNode.subprogramName, icon = "GROUP_VERTEX")
         else: self.invokeFunction(layout, "createGroupInputNode", text = "Input Node", icon = "PLUS")
         layout.separator()
@@ -56,7 +56,7 @@ class GroupOutputNode(bpy.types.Node, AnimationNode):
         network = self.network
         if network.type != "Invalid": return
         if network.groupInAmount != 1: return
-        inputNode = network.groupInputNode
+        inputNode = network.getGroupInputNode()
         if self.groupInputIdentifier == inputNode.identifier: return
         self.groupInputIdentifier = inputNode.identifier
 

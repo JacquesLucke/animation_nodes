@@ -48,11 +48,14 @@ class GroupExecutionUnit:
         yield from self.iterFunctionGenerationScriptLines(nodes, variables, nodeByID)
 
     def iterFunctionGenerationScriptLines(self, nodes, variables, nodeByID):
-        yield self.getFunctionHeader(self.network.groupInputNode, variables)
+        inputNode = self.network.getGroupInputNode(nodeByID)
+        outputNode = self.network.getGroupOutputNode(nodeByID)
+
+        yield self.getFunctionHeader(inputNode, variables)
         yield "    " + getGlobalizeStatement(nodes, variables)
-        yield from iterIndented(self.iterExecutionScriptLines(nodes, variables, nodeByID))
+        yield from iterIndented(self.iterExecutionScriptLines(nodes, variables, inputNode, nodeByID))
         yield "\n"
-        yield "    " + self.getReturnStatement(self.network.groupOutputNode, variables)
+        yield "    " + self.getReturnStatement(outputNode, variables)
 
     def getFunctionHeader(self, inputNode, variables):
         for i, socket in enumerate(inputNode.outputs):
@@ -62,10 +65,10 @@ class GroupExecutionUnit:
         header = "def main({}):".format(parameterList)
         return header
 
-    def iterExecutionScriptLines(self, nodes, variables, nodeByID):
+    def iterExecutionScriptLines(self, nodes, variables, inputNode, nodeByID):
         iterNodeExecutionLines = getFunction_IterNodeExecutionLines()
 
-        yield from linkOutputSocketsToTargets(self.network.groupInputNode, variables, nodeByID)
+        yield from linkOutputSocketsToTargets(inputNode, variables, nodeByID)
         for node in nodes:
             if node.bl_idname in ("an_GroupInputNode", "an_GroupOutputNode"): continue
             yield from iterNodeExecutionLines(node, variables)

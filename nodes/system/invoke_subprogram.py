@@ -214,11 +214,11 @@ class ChangeSubprogram(bpy.types.Operator):
             layout.label("Desription: " + network.description)
             layout.separator()
             if network.type == "Group":
-                socketData = network.groupInputNode.getSocketData()
+                socketData = network.getGroupInputNode().getSocketData()
             if network.type == "Loop":
-                socketData = network.loopInputNode.getSocketData()
+                socketData = network.getLoopInputNode().getSocketData()
             if network.type == "Script":
-                socketData = network.scriptNode.getSocketData()
+                socketData = network.getScriptNode().getSocketData()
 
             col = layout.column()
             col.label("Inputs:")

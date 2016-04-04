@@ -46,7 +46,7 @@ class LoopExecutionUnit:
         self.setupScript = "\n".join(self.iterSetupScriptLines(nodes, variables, nodeByID))
 
     def iterSetupScriptLines(self, nodes, variables, nodeByID):
-        inputNode = self.network.loopInputNode
+        inputNode = self.network.getLoopInputNode(nodeByID)
 
         yield from iterSetupCodeLines(nodes, variables)
         yield "\n\n"
@@ -60,7 +60,7 @@ class LoopExecutionUnit:
     def iter_IterationsAmount(self, inputNode, nodes, variables, nodeByID):
         yield self.get_IterationsAmount_Header(inputNode, variables)
         yield "    " + getGlobalizeStatement(nodes, variables)
-        yield from iterIndented(self.iter_InitializeGeneratorsLines(inputNode, variables))
+        yield from iterIndented(self.iter_InitializeGeneratorsLines(inputNode, variables, nodeByID))
         yield from iterIndented(self.iter_InitializeParametersLines(inputNode, variables))
         yield from iterIndented(self.iter_IterationsAmount_PrepareLoop(inputNode, variables))
         yield from iterIndented(self.iter_LoopBody(inputNode, nodes, variables, nodeByID), amount = 2)
@@ -86,7 +86,7 @@ class LoopExecutionUnit:
     def iter_IteratorLength(self, inputNode, nodes, variables, nodeByID):
         yield self.get_IteratorLength_Header(inputNode, variables)
         yield "    " + getGlobalizeStatement(nodes, variables)
-        yield from iterIndented(self.iter_InitializeGeneratorsLines(inputNode, variables))
+        yield from iterIndented(self.iter_InitializeGeneratorsLines(inputNode, variables, nodeByID))
         yield from iterIndented(self.iter_InitializeParametersLines(inputNode, variables))
         yield from iterIndented(self.iter_IteratorLength_PrepareLoopLines(inputNode, variables))
         yield from iterIndented(self.iter_LoopBody(inputNode, nodes, variables, nodeByID), amount = 2)
@@ -127,8 +127,8 @@ class LoopExecutionUnit:
         yield loopLine
 
 
-    def iter_InitializeGeneratorsLines(self, inputNode, variables):
-        for i, node in enumerate(inputNode.getSortedGeneratorNodes()):
+    def iter_InitializeGeneratorsLines(self, inputNode, variables, nodeByID):
+        for i, node in enumerate(inputNode.getSortedGeneratorNodes(nodeByID)):
             name = "loop_generator_output_" + str(i)
             variables[node] = name
             yield "{} = []".format(name)
@@ -149,17 +149,17 @@ class LoopExecutionUnit:
             yield from iterNodeExecutionLines(node, variables)
             yield from linkOutputSocketsToTargets(node, variables, nodeByID)
 
-        yield from self.iter_LoopBreak(inputNode, variables)
-        yield from self.iter_AddToGenerators(inputNode, variables)
-        yield from self.iter_ReassignParameters(inputNode, variables)
+        yield from self.iter_LoopBreak(inputNode, variables, nodeByID)
+        yield from self.iter_AddToGenerators(inputNode, variables, nodeByID)
+        yield from self.iter_ReassignParameters(inputNode, variables, nodeByID)
         yield "pass"
 
-    def iter_LoopBreak(self, inputNode, variables):
-        for node in inputNode.getBreakNodes():
+    def iter_LoopBreak(self, inputNode, variables, nodeByID):
+        for node in inputNode.getBreakNodes(nodeByID):
             yield "if not {}: break".format(variables[node.inputs[0]])
 
-    def iter_AddToGenerators(self, inputNode, variables):#
-        for node in inputNode.getSortedGeneratorNodes():
+    def iter_AddToGenerators(self, inputNode, variables, nodeByID):
+        for node in inputNode.getSortedGeneratorNodes(nodeByID):
             operation = "append" if node.addType == "APPEND" else "extend"
             yield "if {}:".format(variables[node.conditionSocket])
 
@@ -168,8 +168,8 @@ class LoopExecutionUnit:
             else: expression = variables[socket]
             yield "    {}.{}({})".format(variables[node], operation, expression)#
 
-    def iter_ReassignParameters(self, inputNode, variables):
-        for node in inputNode.getReassignParameterNodes():
+    def iter_ReassignParameters(self, inputNode, variables, nodeByID):
+        for node in inputNode.getReassignParameterNodes(nodeByID):
             socket = node.inputs[0]
             if socket.isUnlinked and socket.isCopyable: expression = getCopyExpression(socket, variables)
             else: expression = variables[socket]

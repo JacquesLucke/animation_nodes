@@ -26,7 +26,7 @@ class NodeNetwork:
             self.type = "Script"
         elif loopNodeAmount == 0:
             if self.groupInAmount == 0 and self.groupOutAmount == 1:
-                self.identifier = self.groupOutputNode.groupInputIdentifier
+                self.identifier = self.getGroupOutputNode().groupInputIdentifier
                 if self.identifier == "": self.identifier = None
             elif self.groupInAmount == 1 and self.groupOutAmount == 0:
                 self.type = "Group"
@@ -43,9 +43,9 @@ class NodeNetwork:
                 if idToNode(self.loopInputIDs[0]).identifier == possibleIdentifiers[0]:
                     self.type = "Loop"
 
-        if self.type == "Script": owner = self.scriptNode
-        elif self.type == "Group": owner = self.groupInputNode
-        elif self.type == "Loop": owner = self.loopInputNode
+        if self.type == "Script": owner = self.getScriptNode()
+        elif self.type == "Group": owner = self.getGroupInputNode()
+        elif self.type == "Loop": owner = self.getLoopInputNode()
 
         if self.type in ("Group", "Loop", "Script"):
             self.identifier = owner.identifier
@@ -120,42 +120,38 @@ class NodeNetwork:
     def isSubnetwork(self):
         return self.type in ("Group", "Loop", "Script")
 
-    @property
-    def ownerNode(self):
-        try: return idToNode(self.forestData.nodeByIdentifier[self.identifier])
+    def getOwnerNode(self, nodeByID = None):
+        return self.getNodeByID(self.forestData.nodeByIdentifier[self.identifier], nodeByID)
+
+    def getGroupInputNode(self, nodeByID = None):
+        try: return self.getNodeByID(self.groupInputIDs[0], nodeByID)
         except: return None
 
-    @property
-    def groupInputNode(self):
-        try: return idToNode(self.groupInputIDs[0])
+    def getGroupOutputNode(self, nodeByID = None):
+        try: return self.getNodeByID(self.groupOutputIDs[0], nodeByID)
         except: return None
 
-    @property
-    def groupOutputNode(self):
-        try: return idToNode(self.groupOutputIDs[0])
+    def getLoopInputNode(self, nodeByID = None):
+        try: return self.getNodeByID(self.loopInputIDs[0], nodeByID)
         except: return None
 
-    @property
-    def loopInputNode(self):
-        try: return idToNode(self.loopInputIDs[0])
+    def getGeneratorOutputNodes(self, nodeByID = None):
+        return [self.getNodeByID(nodeID, nodeByID) for nodeID in self.generatorOutputIDs]
+
+    def getReassignParameterNodes(self, nodeByID = None):
+        return [self.getNodeByID(nodeID, nodeByID) for nodeID in self.reassignParameterIDs]
+
+    def getBreakNodes(self, nodeByID = None):
+        return [self.getNodeByID(nodeID, nodeByID) for nodeID in self.breakIDs]
+
+    def getScriptNode(self, nodeByID = None):
+        try: return self.getNodeByID(self.scriptIDs[0], nodeByID)
         except: return None
 
-    @property
-    def generatorOutputNodes(self):
-        return [idToNode(nodeID) for nodeID in self.generatorOutputIDs]
-
-    @property
-    def reassignParameterNodes(self):
-        return [idToNode(nodeID) for nodeID in self.reassignParameterIDs]
-
-    @property
-    def breakNodes(self):
-        return [idToNode(nodeID) for nodeID in self.breakIDs]
-
-    @property
-    def scriptNode(self):
-        try: return idToNode(self.scriptIDs[0])
-        except: return None
+    def getNodeByID(self, nodeID, nodeByID):
+        if nodeByID is None:
+            return idToNode(nodeID)
+        return nodeByID[nodeID]
 
 
     def getSortedAnimationNodes(self, nodeByID = None):
