@@ -20,8 +20,10 @@ def getInitialVariables(nodes):
     return variables
 
 def getSocketVariableName(socket, node, index):
-    socketID = socket.identifier if socket.identifier.isidentifier() else "_socket_{}_{}".format(socket.isOutput, index)
-    return "_{}{}".format(socketID, node.identifier[:4])
+    if socket.identifier.isidentifier():
+        return "_{}{}".format(socket.identifier, node.identifier[:4])
+    else:
+        return "__socket_{}_{}{}".format(socket.is_output, index, node.identifier[:4])
 
 
 
