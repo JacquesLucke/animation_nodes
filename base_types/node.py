@@ -317,7 +317,7 @@ class AnimationNode:
     def getExecutionCodeString(self):
         return toString(self.getExecutionCode())
 
-    def getTaggedExecutionCodeLines(self):
+    def getTaggedExecutionCode(self):
         """
         tags:
             # - self
@@ -336,8 +336,10 @@ class AnimationNode:
             outputVariables = ["${}$".format(outputVariables[socket.identifier]) for socket in self.outputs]
             outputString = ", ".join(outputVariables)
 
-            if outputString == "": return [executionString]
-            return [outputString + " = "+ executionString]
+            if outputString == "":
+                return executionString
+            else:
+                return outputString + " = "+ executionString
         else:
             code = toString(self.getExecutionCode())
             for variable in inputVariables.values():
@@ -345,7 +347,7 @@ class AnimationNode:
             for variable in outputVariables.values():
                 code = tagVariableName(code, variable, "$")
             code = tagVariableName(code, "self", "#")
-            return code.split("\n")
+            return code
 
 from functools import lru_cache
 @lru_cache(maxsize = 2048)

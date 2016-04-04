@@ -162,30 +162,30 @@ def iterInputCopyLines(node, variables):
             yield line
 
 def iterRealNodeExecutionLines(node, variables):
-    taggedLines = node.getTaggedExecutionCodeLines()
-    for line in taggedLines:
-        yield replaceTaggedLine(line, node, variables)
+    taggedCode = node.getTaggedExecutionCode()
+    code = replaceTaggedCode(taggedCode, node, variables)
+    yield from code.splitlines()
 
-def replaceTaggedLine(line, node, variables):
-    line = replace_NumberSign_NodeReference(line, node)
-    line = replace_PercentSign_InputSocketVariable(line, node, variables)
-    line = replace_DollarSign_OutputSocketVariable(line, node, variables)
-    return line
+def replaceTaggedCode(code, node, variables):
+    code = replace_NumberSign_NodeReference(code, node)
+    code = replace_PercentSign_InputSocketVariable(code, node, variables)
+    code = replace_DollarSign_OutputSocketVariable(code, node, variables)
+    return code
 
-def replace_NumberSign_NodeReference(line, node):
-    return line.replace("#self#", node.identifier)
+def replace_NumberSign_NodeReference(code, node):
+    return code.replace("#self#", node.identifier)
 
-def replace_PercentSign_InputSocketVariable(line, node, variables):
+def replace_PercentSign_InputSocketVariable(code, node, variables):
     nodeInputs = node.inputsByIdentifier
     for name, variable in node.inputVariables.items():
-        line = line.replace("%{}%".format(variable), variables[nodeInputs[name]])
-    return line
+        code = code.replace("%{}%".format(variable), variables[nodeInputs[name]])
+    return code
 
-def replace_DollarSign_OutputSocketVariable(line, node, variables):
+def replace_DollarSign_OutputSocketVariable(code, node, variables):
     nodeOutputs = node.outputsByIdentifier
     for name, variable in node.outputVariables.items():
-        line = line.replace("${}$".format(variable), variables[nodeOutputs[name]])
-    return line
+        code = code.replace("${}$".format(variable), variables[nodeOutputs[name]])
+    return code
 
 def handleExecutionCodeCreationException(node):
     print("\n"*5)
