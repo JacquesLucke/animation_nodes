@@ -2,12 +2,12 @@ import traceback
 from .. import problems
 from collections import defaultdict
 from . cache import clearExecutionCache
-from .. utils.nodes import getAnimationNodeTrees
 from . main_execution_unit import MainExecutionUnit
 from . loop_execution_unit import LoopExecutionUnit
 from . group_execution_unit import GroupExecutionUnit
 from . script_execution_unit import ScriptExecutionUnit
 from .. tree_info import getNetworksByType, getSubprogramNetworks
+from .. utils.nodes import getAnimationNodeTrees, createNodeByIdDict
 from .. problems import ExceptionDuringCodeCreation, CouldNotSetupExecutionUnits
 
 _mainUnitsByNodeTree = defaultdict(list)
@@ -28,14 +28,6 @@ def createExecutionUnits():
 def reset():
     _mainUnitsByNodeTree.clear()
     _subprogramUnitsByIdentifier.clear()
-
-def createNodeByIdDict():
-    nodeByID = dict()
-    for tree in getAnimationNodeTrees():
-        treeName = tree.name
-        for node in tree.nodes:
-            nodeByID[(treeName, node.name)] = node
-    return nodeByID
 
 def createMainUnits(nodeByID):
     for network in getNetworksByType("Main"):

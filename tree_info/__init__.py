@@ -1,6 +1,6 @@
 from .. utils.timing import measureTime
 from .. utils.handlers import eventHandler
-from .. utils.nodes import idToNode, idToSocket
+from .. utils.nodes import idToNode, idToSocket, createNodeByIdDict
 
 
 def __setup():
@@ -32,7 +32,10 @@ def updateAndRetryOnException(function):
 @measureTime
 def update():
     _forestData.update()
-    _networks.update(_forestData)
+
+    nodeByID = createNodeByIdDict()
+    _networks.update(_forestData, nodeByID)
+    nodeByID.clear()
 
     global _needsUpdate
     _needsUpdate = False

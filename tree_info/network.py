@@ -3,16 +3,16 @@ from .. import problems
 from .. utils.nodes import idToNode
 
 class NodeNetwork:
-    def __init__(self, nodeIDs, forestData):
+    def __init__(self, nodeIDs, forestData, nodeByID):
         self.nodeIDs = nodeIDs
         self.forestData = forestData
         self.type = "Invalid"
         self.name = ""
         self.description = ""
         self.identifier = None
-        self.analyse()
+        self.analyse(nodeByID)
 
-    def analyse(self):
+    def analyse(self, nodeByID):
         self.findSystemNodes()
 
         groupNodeAmount = self.groupInAmount + self.groupOutAmount
@@ -26,21 +26,22 @@ class NodeNetwork:
             self.type = "Script"
         elif loopNodeAmount == 0:
             if self.groupInAmount == 0 and self.groupOutAmount == 1:
-                self.identifier = self.getGroupOutputNode().groupInputIdentifier
+                self.identifier = self.getGroupOutputNode(nodeByID).groupInputIdentifier
                 if self.identifier == "": self.identifier = None
             elif self.groupInAmount == 1 and self.groupOutAmount == 0:
                 self.type = "Group"
             elif self.groupInAmount == 1 and self.groupOutAmount == 1:
-                if idToNode(self.groupInputIDs[0]).identifier == idToNode(self.groupOutputIDs[0]).groupInputIdentifier:
+                if self.getGroupInputNode(nodeByID).identifier == self.getGroupOutputNode(nodeByID).groupInputIdentifier:
                     self.type = "Group"
         elif groupNodeAmount == 0:
-            possibleIdentifiers = list({idToNode(nodeID).loopInputIdentifier for nodeID in self.generatorOutputIDs + self.reassignParameterIDs + self.breakIDs})
+            additionalLoopNodeIDs = self.generatorOutputIDs + self.reassignParameterIDs + self.breakIDs
+            possibleIdentifiers = list({nodeByID[nodeID].loopInputIdentifier for nodeID in additionalLoopNodeIDs})
             if self.loopInAmount == 0 and len(possibleIdentifiers) == 1:
                 self.identifier = possibleIdentifiers[0]
             elif self.loopInAmount == 1 and len(possibleIdentifiers) == 0:
                 self.type = "Loop"
             elif self.loopInAmount == 1 and len(possibleIdentifiers) == 1:
-                if idToNode(self.loopInputIDs[0]).identifier == possibleIdentifiers[0]:
+                if self.getLoopInputNode(nodeByID).identifier == possibleIdentifiers[0]:
                     self.type = "Loop"
 
         if self.type == "Script": owner = self.getScriptNode()
@@ -53,7 +54,7 @@ class NodeNetwork:
             self.description = owner.subprogramDescription
 
             # check if a subprogram invokes itself
-            if self.identifier in self.getInvokedSubprogramIdentifiers():
+            if self.identifier in self.getInvokedSubprogramIdentifiers(nodeByID):
                 self.type = "Invalid"
 
     def findSystemNodes(self):
@@ -90,17 +91,17 @@ class NodeNetwork:
         self.breakAmount = len(self.breakIDs)
         self.scriptAmount = len(self.scriptIDs)
 
-    def getInvokedSubprogramIdentifiers(self):
-        return {idToNode(nodeID).subprogramIdentifier for nodeID in self.invokeSubprogramIDs}
+    def getInvokedSubprogramIdentifiers(self, nodeByID):
+        return {nodeByID[nodeID].subprogramIdentifier for nodeID in self.invokeSubprogramIDs}
 
     @staticmethod
-    def join(networks):
+    def join(networks, nodeByID):
         forestData = next(iter(networks)).forestData
 
         nodeIDs = []
         for network in networks:
             nodeIDs.extend(network.nodeIDs)
-        return NodeNetwork(nodeIDs, forestData)
+        return NodeNetwork(nodeIDs, forestData, nodeByID)
 
     def getNodes(self):
         return [idToNode(nodeID) for nodeID in self.nodeIDs]

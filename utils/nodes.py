@@ -17,6 +17,13 @@ def idToSocket(socketID):
 def idToNode(nodeID):
     return bpy.data.node_groups[nodeID[0]].nodes[nodeID[1]]
 
+def createNodeByIdDict():
+    nodeByID = dict()
+    for tree in getAnimationNodeTrees():
+        treeName = tree.name
+        for node in tree.nodes:
+            nodeByID[(treeName, node.name)] = node
+    return nodeByID
 
 def getSocket(treeName, nodeName, isOutput, identifier):
     node = bpy.data.node_groups[treeName].nodes[nodeName]
