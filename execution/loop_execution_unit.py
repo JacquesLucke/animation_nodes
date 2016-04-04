@@ -64,7 +64,7 @@ class LoopExecutionUnit:
         yield from iterIndented(self.iter_InitializeParametersLines(inputNode, variables))
         yield from iterIndented(self.iter_IterationsAmount_PrepareLoop(inputNode, variables))
         yield from iterIndented(self.iter_LoopBody(inputNode, nodes, variables, nodeByID), amount = 2)
-        yield "    " + self.get_ReturnStatement(inputNode, variables)
+        yield "    " + self.get_ReturnStatement(inputNode, variables, nodeByID)
 
     def get_IterationsAmount_Header(self, inputNode, variables):
         variables[inputNode.iterationsSocket] = "loop_iterations"
@@ -90,7 +90,7 @@ class LoopExecutionUnit:
         yield from iterIndented(self.iter_InitializeParametersLines(inputNode, variables))
         yield from iterIndented(self.iter_IteratorLength_PrepareLoopLines(inputNode, variables))
         yield from iterIndented(self.iter_LoopBody(inputNode, nodes, variables, nodeByID), amount = 2)
-        yield "    " + self.get_ReturnStatement(inputNode, variables)
+        yield "    " + self.get_ReturnStatement(inputNode, variables, nodeByID)
 
     def get_IteratorLength_Header(self, inputNode, variables):
         parameterNames = []
@@ -181,10 +181,10 @@ class LoopExecutionUnit:
 
 
 
-    def get_ReturnStatement(self, inputNode, variables):
+    def get_ReturnStatement(self, inputNode, variables, nodeByID):
         names = []
         names.extend(["loop_iterator_" + str(i) for i, socket in enumerate(inputNode.getIteratorSockets()) if socket.loop.useAsOutput])
-        names.extend([variables[node] for node in inputNode.getSortedGeneratorNodes()])
+        names.extend([variables[node] for node in inputNode.getSortedGeneratorNodes(nodeByID)])
         names.extend([variables[socket] for socket in inputNode.getParameterSockets() if socket.loop.useAsOutput])
         return "return {}".format(", ".join(names))
 

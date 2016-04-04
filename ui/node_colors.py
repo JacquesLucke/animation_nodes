@@ -8,22 +8,22 @@ def colorNetworks():
     for network in getNetworks():
         colorNetwork(network, network.getAnimationNodes())
 
-def colorNetwork(network, nodes):
-    networkColor = getNetworkColor(network)
+def colorNetwork(network, nodes, nodeByID = None):
+    networkColor = getNetworkColor(network, nodeByID)
     for node in nodes:
         if not node.useNetworkColor: continue
         node.use_custom_color = True
         color = networkColor
         if node.bl_idname == "an_InvokeSubprogramNode":
-            if node.subprogramNetwork: color = getNetworkColor(node.subprogramNetwork)
+            if node.subprogramNetwork: color = getNetworkColor(node.subprogramNetwork, nodeByID)
         node.color = color
 
-def getNetworkColor(network):
+def getNetworkColor(network, nodeByID):
     colors = getColors()
     if network.type == "Invalid": return colors.invalidNetwork
     if network.type == "Main": return colors.mainNetwork
     if network.type in ("Group", "Loop", "Script"):
-        return network.getOwnerNode().networkColor
+        return network.getOwnerNode(nodeByID).networkColor
 
 def getColors():
     return preferences.nodeColors()

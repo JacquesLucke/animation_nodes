@@ -52,7 +52,7 @@ def checkNetworks(nodeByID):
             invalidNetworkExists = True
         nodes = network.getAnimationNodes(nodeByID)
         markInvalidNodes(network, nodes)
-        node_colors.colorNetwork(network, nodes)
+        node_colors.colorNetwork(network, nodes, nodeByID)
         checkNodeOptions(network, nodes)
 
     if invalidNetworkExists:
