@@ -24,9 +24,7 @@ class AutoExecutionPanel(bpy.types.Panel):
         layout = self.layout
 
         if not canExecute():
-            message = ("Your node tree cannot be executed. "
-                       "Look in the 'Problems' panel for more information.")
-            writeText(layout, message, width = 35, icon = "INFO")
+            layout.label("Look in the 'Problems' panel", icon = "INFO")
 
         tree = context.space_data.edit_tree
         autoExecution = tree.autoExecution
