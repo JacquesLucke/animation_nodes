@@ -44,9 +44,9 @@ class NodeNetwork:
                 if self.getLoopInputNode(nodeByID).identifier == possibleIdentifiers[0]:
                     self.type = "Loop"
 
-        if self.type == "Script": owner = self.getScriptNode()
-        elif self.type == "Group": owner = self.getGroupInputNode()
-        elif self.type == "Loop": owner = self.getLoopInputNode()
+        if self.type == "Script": owner = self.getScriptNode(nodeByID)
+        elif self.type == "Group": owner = self.getGroupInputNode(nodeByID)
+        elif self.type == "Loop": owner = self.getLoopInputNode(nodeByID)
 
         if self.type in ("Group", "Loop", "Script"):
             self.identifier = owner.identifier
