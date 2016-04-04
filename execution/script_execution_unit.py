@@ -79,7 +79,7 @@ class ScriptExecutionUnit:
 
     def getDefaultReturnStatement(self, node):
         outputSockets = node.outputs[:-1]
-        outputExpressions = [getSocketValueExpression(socket) for socket in outputSockets]
+        outputExpressions = [getSocketValueExpression(socket, node) for socket in outputSockets]
         return "return " + ", ".join(outputExpressions)
 
     def compileScript(self):

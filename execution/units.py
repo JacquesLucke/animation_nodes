@@ -39,7 +39,7 @@ def createSubprogramUnits(nodeByID):
         if network.type == "Loop":
             unit = LoopExecutionUnit(network, nodeByID)
         if network.type == "Script":
-            unit = ScriptExecutionUnit(network)
+            unit = ScriptExecutionUnit(network, nodeByID)
         _subprogramUnitsByIdentifier[network.identifier] = unit
 
 
