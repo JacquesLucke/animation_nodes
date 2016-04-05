@@ -27,12 +27,17 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
         description = "-2 means the second last list element",
         update = executionCodeChanged, default = False)
 
+    makeCopy = BoolProperty(name = "Make Copy", default = True,
+        description = "Output a copy of the list element to make it independed",
+        update = executionCodeChanged)
+
     def create(self):
         self.assignedType = "Float"
 
     def drawAdvanced(self, layout):
         layout.prop(self, "clampIndex")
         layout.prop(self, "allowNegativeIndex")
+        layout.prop(self, "makeCopy")
         self.invokeSocketTypeChooser(layout, "assignListDataType",
             socketGroup = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
 
@@ -55,9 +60,10 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
             else:
                 yield "element = list[index] if 0 <= index < len(list) else fallback"
 
-        socket = self.outputs[0]
-        if socket.isCopyable:
-            yield "element = " + socket.getCopyExpression().replace("value", "element")
+        if self.makeCopy:
+            socket = self.outputs[0]
+            if socket.isCopyable:
+                yield "element = " + socket.getCopyExpression().replace("value", "element")
 
     def edit(self):
         dataType = self.getWantedDataType()
