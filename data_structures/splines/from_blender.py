@@ -9,11 +9,17 @@ def createSplinesFromBlenderObject(object):
     splines = []
 
     for bSpline in object.data.splines:
-        if bSpline.type == "BEZIER":
-            splines.append(createBezierSpline(bSpline))
-        if bSpline.type == "POLY":
-            splines.append(createPolySpline(bSpline))
+        spline = createSplineFromBlenderSpline(bSpline)
+        if spline is not None:
+            splines.append(spline)
     return splines
+
+def createSplineFromBlenderSpline(bSpline):
+    if bSpline.type == "BEZIER":
+        return createBezierSpline(bSpline)
+    elif bSpline.type == "POLY":
+        return createPolySpline(bSpline)
+    return None
 
 def createBezierSpline(bSpline):
     pointAmount = len(bSpline.bezier_points)
@@ -25,14 +31,10 @@ def createBezierSpline(bSpline):
     bSpline.bezier_points.foreach_get("handle_left", leftHandlesData)
     bSpline.bezier_points.foreach_get("handle_right", rightHandlesData)
 
-    # create Vector objects from flattened position data
-    positionsDataIterator = positionsData.__iter__()
-    leftHandlesDataIterator = leftHandlesData.__iter__()
-    rightHandlesDataIterator = rightHandlesData.__iter__()
-
-    positionsIterator = map(Vector, zip(positionsDataIterator, positionsDataIterator, positionsDataIterator))
-    leftHandlesIterator = map(Vector, zip(leftHandlesDataIterator, leftHandlesDataIterator, leftHandlesDataIterator))
-    rightHandlesIterator = map(Vector, zip(rightHandlesDataIterator, rightHandlesDataIterator, rightHandlesDataIterator))
+    # create (x, y, z) tuples from flattened position data
+    positionsIterator = map(Vector, zip(*([iter(positionsData)] * 3)))
+    leftHandlesIterator = map(Vector, zip(*([iter(leftHandlesData)] * 3)))
+    rightHandlesIterator = map(Vector, zip(*([iter(rightHandlesData)] * 3)))
 
     bezierSpline = BezierSpline()
     bezierSpline.points = list(map(BezierPoint, positionsIterator, leftHandlesIterator, rightHandlesIterator))
