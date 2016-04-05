@@ -1,6 +1,8 @@
 import os
+import re
 import traceback
 from itertools import chain
+from functools import lru_cache
 from collections import defaultdict
 from .. problems import NodeFailesToCreateExecutionCode
 from .. tree_info import iterLinkedSocketsWithInfo, isSocketLinked
@@ -162,30 +164,25 @@ def iterInputCopyLines(node, variables):
             yield line
 
 def iterRealNodeExecutionLines(node, variables):
-    taggedCode = node.getTaggedExecutionCode()
-    code = replaceTaggedCode(taggedCode, node, variables)
-    yield from code.splitlines()
+    localCode = node.getLocalExecutionCode()
+    globalCode = makeGlobalExecutionCode(localCode, node, variables)
+    yield from globalCode.splitlines()
 
-def replaceTaggedCode(code, node, variables):
-    code = replace_NumberSign_NodeReference(code, node)
-    code = replace_PercentSign_InputSocketVariable(code, node, variables)
-    code = replace_DollarSign_OutputSocketVariable(code, node, variables)
-    return code
-
-def replace_NumberSign_NodeReference(code, node):
-    return code.replace("#self#", node.identifier)
-
-def replace_PercentSign_InputSocketVariable(code, node, variables):
+def makeGlobalExecutionCode(localCode, node, variables):
+    code = replaceVariableName(localCode, "self", node.identifier)
     nodeInputs = node.inputsByIdentifier
     for name, variable in node.inputVariables.items():
-        code = code.replace("%{}%".format(variable), variables[nodeInputs[name]])
-    return code
-
-def replace_DollarSign_OutputSocketVariable(code, node, variables):
+        code = replaceVariableName(code, variable, variables[nodeInputs[name]])
     nodeOutputs = node.outputsByIdentifier
     for name, variable in node.outputVariables.items():
-        code = code.replace("${}$".format(variable), variables[nodeOutputs[name]])
+        code = replaceVariableName(code, variable, variables[nodeOutputs[name]])
     return code
+
+@lru_cache(maxsize = 2**15)
+def replaceVariableName(code, oldName, newName):
+    pattern = r"([^\.\"\%']|^)\b{}\b".format(oldName)
+    return re.sub(pattern, r"\1{}".format(newName), code)
+
 
 def handleExecutionCodeCreationException(node):
     print("\n"*5)

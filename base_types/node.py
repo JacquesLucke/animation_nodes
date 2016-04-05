@@ -314,51 +314,27 @@ class AnimationNode:
     def getTemplateCodeString(self):
         return toString(self.getTemplateCode())
 
-    def getTaggedExecutionCode(self):
-        """
-        tags:
-            # - self
-            % - input variables
-            $ - output variables
-        """
+    def getLocalExecutionCode(self):
         inputVariables = self.inputVariables
         outputVariables = self.outputVariables
 
         if hasattr(self, "execute"):
-            return self.getTaggedExecutionCode_ExecuteFunction(inputVariables, outputVariables)
+            return self.getLocalExecutionCode_ExecuteFunction(inputVariables, outputVariables)
         else:
-            return self.getTaggedExecutionCode_GetExecutionCode(inputVariables, outputVariables)
+            return self.getLocalExecutionCode_GetExecutionCode(inputVariables, outputVariables)
 
-    def getTaggedExecutionCode_ExecuteFunction(self, inputVariables, outputVariables):
-        parameters = ["%{0}%".format(inputVariables[socket.identifier]) for socket in self.inputs]
-        parameterString = ", ".join(parameters)
-        executionString = "#self#.execute({})".format(parameterString)
+    def getLocalExecutionCode_ExecuteFunction(self, inputVariables, outputVariables):
+        parameterString = ", ".join(inputVariables[socket.identifier] for socket in self.inputs)
+        executionString = "self.execute({})".format(parameterString)
 
-        outputVariables = ["${}$".format(outputVariables[socket.identifier]) for socket in self.outputs]
-        outputString = ", ".join(outputVariables)
+        outputString = ", ".join(outputVariables[socket.identifier] for socket in self.outputs)
 
         if outputString == "": return executionString
-        else: return outputString + " = "+ executionString
+        else: return "{} = {}".format(outputString, executionString)
 
-    def getTaggedExecutionCode_GetExecutionCode(self, inputVariables, outputVariables):
-        code = toString(self.getExecutionCode())
-        for variable in inputVariables.values():
-            code = tagVariableName(code, variable, "%")
-        for variable in outputVariables.values():
-            code = tagVariableName(code, variable, "$")
-        code = tagVariableName(code, "self", "#")
-        return code
+    def getLocalExecutionCode_GetExecutionCode(self, inputVariables, outputVariables):
+        return toString(self.getExecutionCode())
 
-
-from functools import lru_cache
-@lru_cache(maxsize = 2048)
-def tagVariableName(code, name, tag):
-    """
-    Find all occurences of 'name' in 'code' and set 'tag' before and after it.
-    The occurence must not have a dot before it.
-    """
-    code = re.sub(r"([^\.\"\%']|^)\b({})\b".format(name), r"\1{0}\2{0}".format(tag), code)
-    return code
 
 @eventHandler("SCENE_UPDATE_POST")
 def createMissingIdentifiers(scene = None):
