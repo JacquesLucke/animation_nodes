@@ -9,13 +9,13 @@ from . code_generator import (getInitialVariables,
                               getFunction_IterNodeExecutionLines)
 
 class LoopExecutionUnit:
-    def __init__(self, network):
+    def __init__(self, network, nodeByID):
         self.network = network
         self.setupScript = ""
         self.setupCodeObject = None
         self.executionData = {}
 
-        self.generateScript()
+        self.generateScript(nodeByID)
         self.compileScript()
         self.execute = self.raiseNotSetupException
 
@@ -38,33 +38,33 @@ class LoopExecutionUnit:
 
 
 
-    def generateScript(self):
-        try: nodes = self.network.getSortedAnimationNodes()
+    def generateScript(self, nodeByID):
+        try: nodes = self.network.getSortedAnimationNodes(nodeByID)
         except: return
 
         variables = getInitialVariables(nodes)
-        self.setupScript = "\n".join(self.iterSetupScriptLines(nodes, variables))
+        self.setupScript = "\n".join(self.iterSetupScriptLines(nodes, variables, nodeByID))
 
-    def iterSetupScriptLines(self, nodes, variables):
-        inputNode = self.network.loopInputNode
+    def iterSetupScriptLines(self, nodes, variables, nodeByID):
+        inputNode = self.network.getLoopInputNode(nodeByID)
 
         yield from iterSetupCodeLines(nodes, variables)
         yield "\n\n"
 
         if inputNode.iterateThroughLists:
-            yield from self.iter_IteratorLength(inputNode, nodes, variables)
+            yield from self.iter_IteratorLength(inputNode, nodes, variables, nodeByID)
         else:
-            yield from self.iter_IterationsAmount(inputNode, nodes, variables)
+            yield from self.iter_IterationsAmount(inputNode, nodes, variables, nodeByID)
 
 
-    def iter_IterationsAmount(self, inputNode, nodes, variables):
+    def iter_IterationsAmount(self, inputNode, nodes, variables, nodeByID):
         yield self.get_IterationsAmount_Header(inputNode, variables)
         yield "    " + getGlobalizeStatement(nodes, variables)
-        yield from iterIndented(self.iter_InitializeGeneratorsLines(inputNode, variables))
+        yield from iterIndented(self.iter_InitializeGeneratorsLines(inputNode, variables, nodeByID))
         yield from iterIndented(self.iter_InitializeParametersLines(inputNode, variables))
         yield from iterIndented(self.iter_IterationsAmount_PrepareLoop(inputNode, variables))
-        yield from iterIndented(self.iter_LoopBody(inputNode, nodes, variables), amount = 2)
-        yield "    " + self.get_ReturnStatement(inputNode, variables)
+        yield from iterIndented(self.iter_LoopBody(inputNode, nodes, variables, nodeByID), amount = 2)
+        yield "    " + self.get_ReturnStatement(inputNode, variables, nodeByID)
 
     def get_IterationsAmount_Header(self, inputNode, variables):
         variables[inputNode.iterationsSocket] = "loop_iterations"
@@ -83,14 +83,14 @@ class LoopExecutionUnit:
         yield "for current_loop_index in range(loop_iterations):"
 
 
-    def iter_IteratorLength(self, inputNode, nodes, variables):
+    def iter_IteratorLength(self, inputNode, nodes, variables, nodeByID):
         yield self.get_IteratorLength_Header(inputNode, variables)
         yield "    " + getGlobalizeStatement(nodes, variables)
-        yield from iterIndented(self.iter_InitializeGeneratorsLines(inputNode, variables))
+        yield from iterIndented(self.iter_InitializeGeneratorsLines(inputNode, variables, nodeByID))
         yield from iterIndented(self.iter_InitializeParametersLines(inputNode, variables))
         yield from iterIndented(self.iter_IteratorLength_PrepareLoopLines(inputNode, variables))
-        yield from iterIndented(self.iter_LoopBody(inputNode, nodes, variables), amount = 2)
-        yield "    " + self.get_ReturnStatement(inputNode, variables)
+        yield from iterIndented(self.iter_LoopBody(inputNode, nodes, variables, nodeByID), amount = 2)
+        yield "    " + self.get_ReturnStatement(inputNode, variables, nodeByID)
 
     def get_IteratorLength_Header(self, inputNode, variables):
         parameterNames = []
@@ -127,8 +127,8 @@ class LoopExecutionUnit:
         yield loopLine
 
 
-    def iter_InitializeGeneratorsLines(self, inputNode, variables):
-        for i, node in enumerate(inputNode.getSortedGeneratorNodes()):
+    def iter_InitializeGeneratorsLines(self, inputNode, variables, nodeByID):
+        for i, node in enumerate(inputNode.getSortedGeneratorNodes(nodeByID)):
             name = "loop_generator_output_" + str(i)
             variables[node] = name
             yield "{} = []".format(name)
@@ -136,30 +136,30 @@ class LoopExecutionUnit:
     def iter_InitializeParametersLines(self, inputNode, variables):
         for socket in inputNode.getParameterSockets():
             if not socket.loop.useAsInput:
-                yield getLoadSocketValueLine(socket, variables)
+                yield getLoadSocketValueLine(socket, inputNode, variables)
 
 
-    def iter_LoopBody(self, inputNode, nodes, variables):
-        yield from linkOutputSocketsToTargets(inputNode, variables)
+    def iter_LoopBody(self, inputNode, nodes, variables, nodeByID):
+        yield from linkOutputSocketsToTargets(inputNode, variables, nodeByID)
 
         iterNodeExecutionLines = getFunction_IterNodeExecutionLines()
         ignoreNodes = {"an_LoopInputNode", "an_LoopGeneratorOutputNode", "an_ReassignLoopParameterNode", "an_LoopBreakNode"}
         for node in nodes:
             if node.bl_idname in ignoreNodes: continue
             yield from iterNodeExecutionLines(node, variables)
-            yield from linkOutputSocketsToTargets(node, variables)
+            yield from linkOutputSocketsToTargets(node, variables, nodeByID)
 
-        yield from self.iter_LoopBreak(inputNode, variables)
-        yield from self.iter_AddToGenerators(inputNode, variables)
-        yield from self.iter_ReassignParameters(inputNode, variables)
+        yield from self.iter_LoopBreak(inputNode, variables, nodeByID)
+        yield from self.iter_AddToGenerators(inputNode, variables, nodeByID)
+        yield from self.iter_ReassignParameters(inputNode, variables, nodeByID)
         yield "pass"
 
-    def iter_LoopBreak(self, inputNode, variables):
-        for node in inputNode.getBreakNodes():
+    def iter_LoopBreak(self, inputNode, variables, nodeByID):
+        for node in inputNode.getBreakNodes(nodeByID):
             yield "if not {}: break".format(variables[node.inputs[0]])
 
-    def iter_AddToGenerators(self, inputNode, variables):#
-        for node in inputNode.getSortedGeneratorNodes():
+    def iter_AddToGenerators(self, inputNode, variables, nodeByID):
+        for node in inputNode.getSortedGeneratorNodes(nodeByID):
             operation = "append" if node.addType == "APPEND" else "extend"
             yield "if {}:".format(variables[node.conditionSocket])
 
@@ -168,8 +168,8 @@ class LoopExecutionUnit:
             else: expression = variables[socket]
             yield "    {}.{}({})".format(variables[node], operation, expression)#
 
-    def iter_ReassignParameters(self, inputNode, variables):
-        for node in inputNode.getReassignParameterNodes():
+    def iter_ReassignParameters(self, inputNode, variables, nodeByID):
+        for node in inputNode.getReassignParameterNodes(nodeByID):
             socket = node.inputs[0]
             if socket.isUnlinked and socket.isCopyable: expression = getCopyExpression(socket, variables)
             else: expression = variables[socket]
@@ -181,10 +181,10 @@ class LoopExecutionUnit:
 
 
 
-    def get_ReturnStatement(self, inputNode, variables):
+    def get_ReturnStatement(self, inputNode, variables, nodeByID):
         names = []
         names.extend(["loop_iterator_" + str(i) for i, socket in enumerate(inputNode.getIteratorSockets()) if socket.loop.useAsOutput])
-        names.extend([variables[node] for node in inputNode.getSortedGeneratorNodes()])
+        names.extend([variables[node] for node in inputNode.getSortedGeneratorNodes(nodeByID)])
         names.extend([variables[socket] for socket in inputNode.getParameterSockets() if socket.loop.useAsOutput])
         return "return {}".format(", ".join(names))
 

@@ -63,4 +63,7 @@ def execute_UpdateEverything():
 
 def execute_ScriptGeneration():
     from .. execution import units
-    units.createExecutionUnits()
+    from .. utils.nodes import createNodeByIdDict
+    nodeByID = createNodeByIdDict()
+    units.createExecutionUnits(nodeByID)
+    nodeByID.clear()

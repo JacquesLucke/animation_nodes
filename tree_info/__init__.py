@@ -1,6 +1,6 @@
 from .. utils.timing import measureTime
 from .. utils.handlers import eventHandler
-from .. utils.nodes import idToNode, idToSocket
+from .. utils.nodes import idToNode, idToSocket, createNodeByIdDict
 
 
 def __setup():
@@ -32,7 +32,10 @@ def updateAndRetryOnException(function):
 @measureTime
 def update():
     _forestData.update()
-    _networks.update(_forestData)
+
+    nodeByID = createNodeByIdDict()
+    _networks.update(_forestData, nodeByID)
+    nodeByID.clear()
 
     global _needsUpdate
     _needsUpdate = False
@@ -58,9 +61,9 @@ def getNodesByType(idName):
     return [idToNode(nodeID) for nodeID in _forestData.nodesByType[idName]]
 
 
-def isSocketLinked(socket):
-    return len(_forestData.linkedSockets[socket.toID()]) > 0
-
+def isSocketLinked(socket, node):
+    socketID = ((node.id_data.name, node.name), socket.is_output, socket.identifier)
+    return len(_forestData.linkedSockets[socketID]) > 0
 
 def getDirectlyLinkedSockets(socket):
     socketID = socket.toID()
@@ -73,24 +76,28 @@ def getDirectlyLinkedSocket(socket):
     if len(linkedSocketIDs) > 0:
         return idToSocket(linkedSocketIDs[0])
 
-
 def getLinkedSockets(socket):
     socketID = socket.toID()
     linkedIDs = _forestData.linkedSockets[socketID]
     return [idToSocket(linkedID) for linkedID in linkedIDs]
 
-def getLinkedSocket(socket):
-    socketID = socket.toID()
-    linkedIDs = _forestData.linkedSockets[socketID]
-    if len(linkedIDs) > 0:
-        return idToSocket(linkedIDs[0])
-
 def iterSocketsThatNeedUpdate():
     for socketID in _forestData.socketsThatNeedUpdate:
         yield idToSocket(socketID)
 
-def getUndefinedNodes():
-    return [idToNode(nodeID) for nodeID in _forestData.nodesByType["NodeUndefined"]]
+def getUndefinedNodes(nodeByID):
+    return [nodeByID[nodeID] for nodeID in _forestData.nodesByType["NodeUndefined"]]
+
+def iterLinkedSocketsWithInfo(socket, node, nodeByID):
+    socketID = ((node.id_data.name, node.name), socket.is_output, socket.identifier)
+    linkedIDs = _forestData.linkedSockets[socketID]
+    for linkedID in linkedIDs:
+        linkedIdentifier = linkedID[2]
+        linkedNode = nodeByID[linkedID[0]]
+        sockets = linkedNode.outputs if linkedID[1] else linkedNode.inputs
+        for socket in sockets:
+            if socket.identifier == linkedIdentifier:
+                yield socket
 
 
 # improve performance of higher level functions

@@ -179,7 +179,7 @@ class AnimationNode:
         self.outputs.clear()
 
     def removeSocket(self, socket):
-        index = socket.index
+        index = socket.getIndex()
         if socket.isOutput:
             if index < self.activeOutputIndex: self.activeOutputIndex -= 1
         else:
@@ -303,64 +303,38 @@ class AnimationNode:
     def outputVariables(self):
         return {socket.identifier : socket.identifier for socket in self.outputs}
 
-    @property
-    def innerLinks(self):
-        names = defaultdict(list)
+    def iterInnerLinks(self):
+        names = {}
         for identifier, variable in self.inputVariables.items():
-            names[variable].append(identifier)
+            names[variable] = identifier
         for identifier, variable in self.outputVariables.items():
-            names[variable].append(identifier)
-
-        links = []
-        for name, identifiers in names.items():
-            if len(identifiers) == 2: links.append(identifiers)
-        return links
+            if variable in names:
+                yield (names[variable], identifier)
 
     def getTemplateCodeString(self):
         return toString(self.getTemplateCode())
 
-    def getExecutionCodeString(self):
-        return toString(self.getExecutionCode())
-
-    def getTaggedExecutionCodeLines(self):
-        """
-        tags:
-            # - self
-            % - input variables
-            $ - output variables
-        """
+    def getLocalExecutionCode(self):
         inputVariables = self.inputVariables
         outputVariables = self.outputVariables
 
         if hasattr(self, "execute"):
-            parameters = ["%{0}%".format(inputVariables[socket.identifier]) for socket in self.inputs]
-            parameterString = ", ".join(parameters)
-
-            executionString = "#self#.execute(" + parameterString + ")"
-
-            outputVariables = ["${}$".format(outputVariables[socket.identifier]) for socket in self.outputs]
-            outputString = ", ".join(outputVariables)
-
-            if outputString == "": return [executionString]
-            return [outputString + " = "+ executionString]
+            return self.getLocalExecutionCode_ExecuteFunction(inputVariables, outputVariables)
         else:
-            code = toString(self.getExecutionCode())
-            for variable in inputVariables.values():
-                code = tagVariableName(code, variable, "%")
-            for variable in outputVariables.values():
-                code = tagVariableName(code, variable, "$")
-            code = tagVariableName(code, "self", "#")
-            return code.split("\n")
+            return self.getLocalExecutionCode_GetExecutionCode(inputVariables, outputVariables)
 
-from functools import lru_cache
-@lru_cache(maxsize = 2048)
-def tagVariableName(code, name, tag):
-    """
-    Find all occurences of 'name' in 'code' and set 'tag' before and after it.
-    The occurence must not have a dot before it.
-    """
-    code = re.sub(r"([^\.\"\%']|^)\b({})\b".format(name), r"\1{0}\2{0}".format(tag), code)
-    return code
+    def getLocalExecutionCode_ExecuteFunction(self, inputVariables, outputVariables):
+        parameterString = ", ".join(inputVariables[socket.identifier] for socket in self.inputs)
+        executionString = "self.execute({})".format(parameterString)
+
+        outputString = ", ".join(outputVariables[socket.identifier] for socket in self.outputs)
+
+        if outputString == "": return executionString
+        else: return "{} = {}".format(outputString, executionString)
+
+    def getLocalExecutionCode_GetExecutionCode(self, inputVariables, outputVariables):
+        return toString(self.getExecutionCode())
+
 
 @eventHandler("SCENE_UPDATE_POST")
 def createMissingIdentifiers(scene = None):

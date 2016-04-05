@@ -10,7 +10,7 @@ class NodeNetworks:
         self.networks = []
         self.networkByNode = {}
 
-    def update(self, forestData):
+    def update(self, forestData, nodeByID):
         self._reset()
         self.forestData = forestData
 
@@ -18,7 +18,7 @@ class NodeNetworks:
         for nodes in self.iterNodeGroups():
             if not self.groupContainsAnimationNodes(nodes): continue
 
-            network = NodeNetwork(nodes, self.forestData)
+            network = NodeNetwork(nodes, self.forestData, nodeByID)
             networksByIdentifier[network.identifier].append(network)
 
         for identifier, networks in networksByIdentifier.items():
@@ -27,7 +27,7 @@ class NodeNetworks:
                 self.networks.extend(networks)
             else:
                 # join subprogram networks if they are not connected with links
-                self.networks.append(NodeNetwork.join(networks))
+                self.networks.append(NodeNetwork.join(networks, nodeByID))
 
         for network in self.networks:
             for nodeID in network.nodeIDs:

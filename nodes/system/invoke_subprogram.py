@@ -149,7 +149,6 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
         self.isInputComparable = all(socket.comparable for socket in self.inputs)
         self.isOutputStorable = all(socket.storable for socket in self.outputs)
 
-
     def clearCache(self):
         oneTimeCache.pop(self.identifier, None)
         frameBasedCache.pop(self.identifier, None)
@@ -214,11 +213,11 @@ class ChangeSubprogram(bpy.types.Operator):
             layout.label("Desription: " + network.description)
             layout.separator()
             if network.type == "Group":
-                socketData = network.groupInputNode.getSocketData()
+                socketData = network.getGroupInputNode().getSocketData()
             if network.type == "Loop":
-                socketData = network.loopInputNode.getSocketData()
+                socketData = network.getLoopInputNode().getSocketData()
             if network.type == "Script":
-                socketData = network.scriptNode.getSocketData()
+                socketData = network.getScriptNode().getSocketData()
 
             col = layout.column()
             col.label("Inputs:")
