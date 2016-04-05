@@ -17,16 +17,13 @@ from .. preferences import (addonName,
 def getInitialVariables(nodes):
     variables = {}
     for node in nodes:
-        for i, socket in enumerate(chain(node.inputs, node.outputs)):
-            variables[socket] = getSocketVariableName(socket, node, i)
+        nodeIdentifierPart = node.identifier[:4]
+        for index, socket in enumerate(chain(node.inputs, node.outputs)):
+            if socket.identifier.isidentifier():
+                variables[socket] = "_{}{}".format(socket.identifier, nodeIdentifierPart)
+            else:
+                variables[socket] = "__socket_{}_{}{}".format(socket.is_output, index, nodeIdentifierPart)
     return variables
-
-def getSocketVariableName(socket, node, index):
-    if socket.identifier.isidentifier():
-        return "_{}{}".format(socket.identifier, node.identifier[:4])
-    else:
-        return "__socket_{}_{}{}".format(socket.is_output, index, node.identifier[:4])
-
 
 
 # Setup Code
