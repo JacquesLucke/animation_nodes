@@ -20,9 +20,9 @@ def getInitialVariables(nodes):
         nodeIdentifierPart = node.identifier[:4]
         for index, socket in enumerate(chain(node.inputs, node.outputs)):
             if socket.identifier.isidentifier():
-                variables[socket] = "_{}{}".format(socket.identifier, nodeIdentifierPart)
+                variables[socket] = "_" + socket.identifier + nodeIdentifierPart
             else:
-                variables[socket] = "__socket_{}_{}{}".format(socket.is_output, index, nodeIdentifierPart)
+                variables[socket] = "__socket_" + str(socket.is_output) + "_" + str(index) + nodeIdentifierPart
     return variables
 
 
