@@ -62,8 +62,9 @@ class ForestData:
             elif node.bl_idname == "NodeFrame":
                 pass
             else:
-                animationNodes.add(nodeID)
-                nodeByIdentifier[node.identifier] = nodeID
+                if node.bl_idname != "NodeUndefined":
+                    animationNodes.add(nodeID)
+                    nodeByIdentifier[node.identifier] = nodeID
 
                 chainedSockets = chain(node.inputs, node.outputs)
                 chainedSocketIDs = chain(inputIDs, outputIDs)
