@@ -80,7 +80,8 @@ class RepeatListNode(bpy.types.Node, AnimationNode):
 
 
     def getExecutionCode(self):
-
+        fromSocket = self.inputs["List"]
+        
         yield "outList = []"
         yield "lenList = len(inList)"
         yield "if lenList:"
@@ -97,37 +98,33 @@ class RepeatListNode(bpy.types.Node, AnimationNode):
 
         yield "    for i in range(amount):"
         if self.repetitionType == "LOOP":
-            yield "        outList += {}".format(self.getCopyListString("inList"))
+            yield "        outList += {}".format(self.getCopyString(fromSocket, "inList"))
         
         elif self.repetitionType == "PING_PONG":
-            yield "        if (i % 2) == 0: outList += {}".format(self.getCopyListString("inList"))
-            yield "        else: outList += {}".format(self.getCopyListString("reList"))
+            yield "        if (i % 2) == 0: outList += {}".format(self.getCopyString(fromSocket, "inList"))
+            yield "        else: outList += {}".format(self.getCopyString(fromSocket, "reList"))
         
         elif self.repetitionType == "SHIFT_STEP":
             yield "        shift = (step * i) % lenList"
             yield "        inList = inList[-shift:] + inList[:-shift]"
-            yield "        outList += {}".format(self.getCopyListString("inList"))
+            yield "        outList += {}".format(self.getCopyString(fromSocket, "inList"))
         
         elif self.repetitionType == "SHIFT_SHUFFLE":
             yield "        shift = (amount + i + seed) % lenList"
             yield "        inList = inList[-shift:] + inList[:-shift]"
-            yield "        outList += {}".format(self.getCopyListString("inList"))
+            yield "        outList += {}".format(self.getCopyString(fromSocket, "inList"))
         
         elif self.repetitionType == "SHUFFLE":
             yield "        random.seed(i + seed)"
             yield "        random.shuffle(inList)"
-            yield "        outList += {}".format(self.getCopyListString("inList"))
+            yield "        outList += {}".format(self.getCopyString(fromSocket, "inList"))
 
     def getUsedModules(self):
         return ["random", "math"]
     
-    def getCopyListString(self, listNameStr):
-        listInput = self.inputs["List"]
-        socketCls = getSocketClassFromIdName(listInput.bl_idname)
-        if socketCls is not None: 
-            try: return socketCls.getCopyExpression(listInput).replace("value", listNameStr)
-            except: return listNameStr
-        return listNameStr
+    def getCopyString(self, fromSocket, variableString):
+        if not fromSocket.isCopyable: return variableString
+        return fromSocket.getCopyExpression().replace("value", variableString)
 
     def edit(self):
         listDataType = self.getWantedDataType()
