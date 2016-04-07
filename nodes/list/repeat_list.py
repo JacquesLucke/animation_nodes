@@ -1,15 +1,17 @@
 import bpy
+import random
 from bpy.props import *
 from ... tree_info import keepNodeState
 from ... events import executionCodeChanged, propertyChanged
-from ... sockets.info import toIdName, isList
+from ... sockets.info import toIdName, isList, getSocketClassFromIdName
 from ... base_types.node import AnimationNode
 
 repetitionTypeItems = [
     ("LOOP", "Loop", "Repeat", "NONE", 0),
     ("PING_PONG", "Ping Pong", "Repeat and Reverse", "NONE", 1),
-    ("SHIFT", "Shift Each", "Shift Step Each Time", "NONE", 2),
-    ("SHUFFLE", "Shuffle Each", "Shuffle Each Time", "NONE", 3)]
+    ("SHIFT_STEP", "Step Shift Each", "Shift Step Each Time", "NONE", 2),
+    ("SHIFT_SHUFFLE", "Random Shift Each", "Shift Random Each Time", "NONE", 3),
+    ("SHUFFLE", "Shuffle Each", "Shuffle Each Time", "NONE", 4)]
 
 amountTypeItems = [
     ("AMOUNT", "Amount", "Repeat N Times", "NONE", 0),
@@ -51,9 +53,9 @@ class RepeatListNode(bpy.types.Node, AnimationNode):
         self.inputs.clear()
         self.outputs.clear()
 
-        if self.repetitionType == "SHIFT":
-            self.inputs.new("an_IntegerSocket", "Step", "step")
-        elif self.repetitionType == "SHUFFLE":
+        if "STEP" in self.repetitionType:
+            self.inputs.new("an_IntegerSocket", "Step", "step").value = 1
+        elif "SHUFFLE" in self.repetitionType:
             self.inputs.new("an_IntegerSocket", "Seed", "seed")
 
         self.inputs.new(self.listIdName, "List", "inList").dataIsModified = True
@@ -69,7 +71,7 @@ class RepeatListNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "repetitionType", text = "")
         layout.prop(self, "amountType", text = "")
 
-        if self.repetitionType == "SHUFFLE":
+        if "SHUFFLE" in self.repetitionType:
             layout.prop(self, "nodeSeed", text = "Node Seed")
 
     def drawAdvanced(self, layout):
@@ -88,30 +90,44 @@ class RepeatListNode(bpy.types.Node, AnimationNode):
         if self.amountType == "LENGTH_CEIL":
             yield "    amount = math.ceil(abs(length) / lenList)"
 
+        if "SHUFFLE" in self.repetitionType:
+            yield "    seed = self.nodeSeed * 1245 + seed"
         if self.repetitionType == "PING_PONG":
-            yield "    reList = reversed(inList)"
-            
+            yield "    reList = list(reversed(inList))"
+
         yield "    for i in range(amount):"
         if self.repetitionType == "LOOP":
-            yield "        outList += inList"
+            yield "        outList += {}".format(self.getCopyListString("inList"))
         
         elif self.repetitionType == "PING_PONG":
-            yield "        if (i % 2) == 0: outList += inList"
-            yield "        else: outList += reList"
+            yield "        if (i % 2) == 0: outList += {}".format(self.getCopyListString("inList"))
+            yield "        else: outList += {}".format(self.getCopyListString("reList"))
         
-        elif self.repetitionType == "SHIFT":
-            yield "        shift = (amount + i) % lenList"
+        elif self.repetitionType == "SHIFT_STEP":
+            yield "        shift = (step * i) % lenList"
             yield "        inList = inList[-shift:] + inList[:-shift]"
-            yield "        outList += inList"
+            yield "        outList += {}".format(self.getCopyListString("inList"))
+        
+        elif self.repetitionType == "SHIFT_SHUFFLE":
+            yield "        shift = (amount + i + seed) % lenList"
+            yield "        inList = inList[-shift:] + inList[:-shift]"
+            yield "        outList += {}".format(self.getCopyListString("inList"))
         
         elif self.repetitionType == "SHUFFLE":
-            yield "        random.seed(i + self.nodeSeed * 1245 + seed)"
+            yield "        random.seed(i + seed)"
             yield "        random.shuffle(inList)"
-            yield "        outList += inList"
+            yield "        outList += {}".format(self.getCopyListString("inList"))
 
     def getUsedModules(self):
         return ["random", "math"]
     
+    def getCopyListString(self, listNameStr):
+        listInput = self.inputs["List"]
+        socketCls = getSocketClassFromIdName(listInput.bl_idname)
+        if socketCls is not None: 
+            try: return socketCls.getCopyExpression(listInput).replace("value", listNameStr)
+            except: return listNameStr
+        return listNameStr
 
     def edit(self):
         listDataType = self.getWantedDataType()
@@ -125,7 +141,7 @@ class RepeatListNode(bpy.types.Node, AnimationNode):
         listOutputs = self.outputs["List"].dataTargets
 
         if listInput is not None: return listInput.dataType
-        if len(listOutputs) == 1: return listOutputs["List"].dataType
+        if len(listOutputs) == 1: return listOutputs[0].dataType
         return self.inputs["List"].dataType
 
     def assignType(self, listDataType):
