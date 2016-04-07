@@ -3,7 +3,8 @@ from bpy.props import *
 from ... events import executionCodeChanged
 from ... tree_info import keepNodeState
 from ... base_types.node import AnimationNode
-from ... sockets.info import getBaseDataTypeItemsCallback, toIdName, toListIdName, isBase, toBaseDataType
+from ... sockets.info import (getBaseDataTypeItemsCallback, getSocketClassFromIdName,
+                                toIdName, toListIdName, isBase, toBaseDataType)
 
 fillModeItems = [
     ("LEFT", "Left", "", "TRIA_LEFT", 0),
@@ -37,9 +38,18 @@ class FillListNode(bpy.types.Node, AnimationNode):
 
 
     def getExecutionCode(self):
-        yield "fillList = [fill] * (max(length - len(inList), 0))"
+        yield ("fillList = [fill{} for i in range(max(length - len(inList), 0))]"
+                                .format(self.getCopyElementString()) )
         if self.fillMode == "LEFT": yield "outList = fillList + inList"
         if self.fillMode == "RIGHT": yield "outList = inList + fillList"
+
+    def getCopyElementString(self):
+        element = self.inputs["Fill Element"]
+        socketCls = getSocketClassFromIdName(element.bl_idname)
+        if socketCls is not None: 
+            try: return socketCls.getCopyExpression(element)[5:]
+            except: return ""
+        return ""
 
 
     def edit(self):
