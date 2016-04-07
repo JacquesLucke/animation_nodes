@@ -38,18 +38,14 @@ class FillListNode(bpy.types.Node, AnimationNode):
 
 
     def getExecutionCode(self):
-        yield ("fillList = [fill{} for i in range(max(length - len(inList), 0))]"
-                                .format(self.getCopyElementString()) )
+        yield ("fillList = [{} for i in range(max(length - len(inList), 0))]"
+                .format(self.getCopyString(self.inputs["Fill Element"], "fill")) )
         if self.fillMode == "LEFT": yield "outList = fillList + inList"
         if self.fillMode == "RIGHT": yield "outList = inList + fillList"
 
-    def getCopyElementString(self):
-        element = self.inputs["Fill Element"]
-        socketCls = getSocketClassFromIdName(element.bl_idname)
-        if socketCls is not None: 
-            try: return socketCls.getCopyExpression(element)[5:]
-            except: return ""
-        return ""
+    def getCopyString(self, fromSocket, variableString):
+        if not fromSocket.isCopyable: return variableString
+        return fromSocket.getCopyExpression().replace("value", variableString)
 
 
     def edit(self):
