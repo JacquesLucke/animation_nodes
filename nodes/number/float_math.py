@@ -16,6 +16,7 @@ operationItems = [
     ("ARCSINE", "Arcsine", "asin A", "", 7),
     ("ARCCOSINE", "Arccosine", "acos A", "", 8),
     ("ARCTANGENT", "Arctangent", "atan A", "", 9),
+
     ("POWER", "Power", "A ** B", "", 10),
     ("LOGARITHM", "Logarithm", "log A, base B", "", 11),
     ("MINIMUM", "Minimum", "min(A, B)", "", 12),
@@ -27,9 +28,11 @@ operationItems = [
     ("SQRT", "Square Root", "sqrt A", "", 19),
     ("INVERT", "Invert", "- A", "", 20),
     ("RECIPROCAL", "Reciprocal", "1 / A", "", 21),
-    ("SNAP", "Snap", "snap A", "", 22)]
+    ("SNAP", "Snap", "snap A to Step ", "", 22),
+    ("ARCTANGENT2", "Arctangent B/A", "atan2 (B / A)", "", 23),
+    ("HYPOTENUSE", "Hypotenuse", "hypot A, B", "", 24)]
 
-secondInputOperations = ("ADD", "SUBTRACT", "MULTIPLY", "DIVIDE", "POWER", "MINIMUM", "MAXIMUM", "MODULO")
+secondInputOperations = ("ADD", "SUBTRACT", "MULTIPLY", "DIVIDE", "POWER", "MINIMUM", "MAXIMUM", "MODULO", "ARCTANGENT2", "HYPOTENUSE")
 baseInputOperations = ("LOGARITHM", )
 stepSizeInputOperations = ("SNAP", )
 
@@ -74,8 +77,14 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
         label = operationLabels[self.operation]
         if getattr(self.socketA, "isUnlinked", False):
             label = label.replace("A", str(round(self.socketA.value, 4)))
+            
         if getattr(self.socketB, "isUnlinked", False):
             label = label.replace("B", str(round(self.socketB.value, 4)))
+        if getattr(self.socketBase, "isUnlinked", False):
+            label = label.replace("B", str(round(self.socketBase.value, 4)))
+        if getattr(self.socketStep, "isUnlinked", False):
+            label = label.replace("Step", str(round(self.socketStep.value, 4)))
+            
         return label
 
     def edit(self):
@@ -98,6 +107,8 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
         if op == "ARCSINE": yield "result = math.asin(min(max(a, -1), 1))"
         if op == "ARCCOSINE": yield "result = math.acos(min(max(a, -1), 1))"
         if op == "ARCTANGENT": yield "result = math.atan(a)"
+        if op == "ARCTANGENT2": yield "result = math.atan2(b, a)"
+        if op == "HYPOTENUSE": yield "result = math.hypot(a, b)"
         if op == "POWER": yield "result = math.pow(a, b) if a >= 0 or int(b) == b else 0"
         if op == "LOGARITHM":
             if "Base" not in self.inputs: yield "base = b" # to keep older files working
@@ -152,3 +163,11 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
     @property
     def socketB(self):
         return self.inputs.get("B")
+    
+    @property
+    def socketBase(self):
+        return self.inputs.get("Base")
+
+    @property
+    def socketStep(self):
+        return self.inputs.get("Step Size")
