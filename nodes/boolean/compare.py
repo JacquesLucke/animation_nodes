@@ -8,7 +8,6 @@ from ... tree_info import keepNodeLinks
 compare_types = ["A = B", "A != B", "A < B", "A <= B", "A > B", "A >= B", "A is B"]
 compare_types_items = [(t, t, "") for t in compare_types]
 
-compareLabels = {item[0] : item[0] for item in compare_types_items}
 numericLabelTypes = ["Integer", "Float"]
 
 class CompareNode(bpy.types.Node, AnimationNode):
