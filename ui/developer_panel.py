@@ -17,18 +17,44 @@ class DeveloperPanel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         tree = context.space_data.node_tree
+        developer = getDeveloperSettings()
 
         col = layout.column()
-        col.label("Execution Code:")
-        row = col.row(align = True)
-        row.operator("an.print_current_execution_code", text = "Print", icon = "CONSOLE")
-        row.operator("an.write_current_execution_code", text = "Write", icon = "TEXT")
+        self.drawExecutionCodeSettings(col, developer)
 
         layout.separator()
 
         col = layout.column()
-        col.label("Profile Execution:")
+        self.drawProfilingSettings(col, developer)
+
+    def drawExecutionCodeSettings(self, layout, developer):
+        layout.label("Execution Code:")
+
+        col = layout.column(align = True)
+
         row = col.row(align = True)
-        row.operator("an.print_profile_execution_result", text = "Print", icon = "CONSOLE")
-        row.operator("an.write_profile_execution_result", text = "Write", icon = "TEXT")
-        layout.prop(getDeveloperSettings(), "profilingSortMode", text = "Sort")
+        row.prop(developer, "measureNodeExecutionTimes", text = "Measure Execution Times")
+        if developer.measureNodeExecutionTimes:
+            row.operator("an.reset_measurements", text = "", icon = "RECOVER_LAST")
+        subcol = col.column()
+        subcol.active = not developer.measureNodeExecutionTimes
+        subcol.prop(developer, "monitorExecution", text = "Monitor Execution")
+
+        row = col.row(align = True)
+        row.operator("an.print_current_execution_code", text = "Print", icon = "CONSOLE")
+        row.operator("an.write_current_execution_code", text = "Write", icon = "TEXT")
+
+    def drawProfilingSettings(self, layout, developer):
+        profiling = developer.profiling
+
+        col = layout.column()
+        col.prop(profiling, "function", text = "Function")
+        col.prop(profiling, "sort", text = "Sort Mode")
+        col.prop(profiling, "output", text = "Output")
+
+        subcol = col.column()
+        subcol.scale_y = 1.3
+        props = subcol.operator("an.profile", text = "Profile", icon = "PREVIEW_RANGE")
+        props.function = profiling.function
+        props.sort = profiling.sort
+        props.output = profiling.output

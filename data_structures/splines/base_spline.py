@@ -19,6 +19,9 @@ class Spline:
         if name == "isChanged": return True
         if name == "uniformConverter": return None
 
+    def __repr__(self):
+        return "<AN Spline Object: {}>".format(self.type)
+
 
     def copy(self):
         return copy.deepcopy(self)

@@ -55,7 +55,7 @@ class ContextPie(bpy.types.Menu, PieMenuHelper):
                     text = "Loop through {}".format(repr(socket.getDisplayedName())),
                     icon = "MOD_ARRAY")
                 props.nodeIdentifier = self.activeNode.identifier
-                props.socketIndex = socket.index
+                props.socketIndex = socket.getIndex()
 
     @property
     def activeNode(self):

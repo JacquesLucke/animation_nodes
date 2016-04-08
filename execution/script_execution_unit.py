@@ -1,19 +1,19 @@
 from .. utils.code import isCodeValid
 from . compile_scripts import compileScript
 from .. problems import ExecutionUnitNotSetup
-from . code_generator import getSocketValueExpression, getSetupCode, getInitialVariables
+from . code_generator import getSocketValueExpression, iterSetupCodeLines, getInitialVariables
 
 class ScriptExecutionUnit:
-    def __init__(self, network):
+    def __init__(self, network, nodeByID):
         self.network = network
         self.setupScript = ""
         self.setupCodeObject = None
         self.executionData = {}
 
-        self.scriptUpdated()
+        self.scriptUpdated(nodeByID)
 
-    def scriptUpdated(self):
-        self.generateScript()
+    def scriptUpdated(self, nodeByID = None):
+        self.generateScript(nodeByID)
         self.compileScript()
 
     def setup(self):
@@ -32,12 +32,12 @@ class ScriptExecutionUnit:
         return [self.setupScript]
 
 
-    def generateScript(self):
-        node = self.network.scriptNode
+    def generateScript(self, nodeByID):
+        node = self.network.getScriptNode(nodeByID)
         userCode = node.executionCode
 
         variables = getInitialVariables([node])
-        setupCode = getSetupCode([node], variables)
+        setupCode = "\n".join(iterSetupCodeLines([node], variables))
 
         finalCode = []
         finalCode.append(setupCode)
@@ -79,7 +79,7 @@ class ScriptExecutionUnit:
 
     def getDefaultReturnStatement(self, node):
         outputSockets = node.outputs[:-1]
-        outputExpressions = [getSocketValueExpression(socket) for socket in outputSockets]
+        outputExpressions = [getSocketValueExpression(socket, node) for socket in outputSockets]
         return "return " + ", ".join(outputExpressions)
 
     def compileScript(self):

@@ -94,7 +94,7 @@ class GroupInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
 
     @property
     def outputNode(self):
-        return self.network.groupOutputNode
+        return self.network.getGroupOutputNode()
 
     def createGroupOutputNode(self):
         node = newNodeAtCursor("an_GroupOutputNode")

@@ -8,13 +8,15 @@ def draw(self, context):
     if not getattr(node, "isAnimationNode", False): return
     layout = self.layout
     layout.separator()
+    drawNodeSettings(layout, node)
 
-    drawGenericNodeProperties(layout, node)
+def drawNodeSettings(layout, node):
     drawSocketLists(layout, node)
     drawSocketVisibilityOperators(layout, node)
 
     if debuggingIsEnabled():
         layout.separator()
+        drawGenericNodeProperties(layout, node)
         layout.label("Identifier: " + node.identifier)
 
 def drawGenericNodeProperties(layout, node):

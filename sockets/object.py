@@ -26,7 +26,8 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         if self.objectCreationType != "":
             self.invokeFunction(row, "createObject", icon = "PLUS")
 
-        self.invokeFunction(row, "assignActiveObject", icon = "EYEDROPPER")
+        self.invokeFunction(row, "handleEyedropperButton", icon = "EYEDROPPER", passEvent = True,
+            description = "Assign active object to this socket (hold CTRL to open a rename object dialog)")
 
     def getValue(self):
         if self.objectName == "": return None
@@ -45,10 +46,15 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def updateProperty(self):
         self.getValue()
 
-    def assignActiveObject(self):
-        object = bpy.context.active_object
-        if object:
-            self.objectName = object.name
+    def handleEyedropperButton(self, event):
+        if event.ctrl:
+            bpy.ops.an.rename_datablock_popup("INVOKE_DEFAULT",
+                oldName = self.objectName,
+                path = "bpy.data.objects",
+                icon = "OBJECT_DATA")
+        else:
+            object = bpy.context.active_object
+            if object: self.objectName = object.name
 
     def createObject(self):
         type = self.objectCreationType

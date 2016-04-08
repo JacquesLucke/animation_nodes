@@ -1,8 +1,13 @@
 import bpy
+from bpy.props import *
+from .. tree_info import getNodeByIdentifier
+from .. utils.blender_ui import getDpiFactor
 
 class FloatingAdvancedPanel(bpy.types.Operator):
     bl_idname = "an.floating_advanced_node_settings_panel"
     bl_label = "Advanced Node Settings"
+
+    nodeIdentifier = StringProperty(default = "")
 
     @classmethod
     def poll(cls, context):
@@ -13,11 +18,15 @@ class FloatingAdvancedPanel(bpy.types.Operator):
         return True
 
     def invoke(self, context, event):
-        return context.window_manager.invoke_props_dialog(self, width = 250)
+        self.nodeIdentifier = context.active_node.identifier
+        return context.window_manager.invoke_props_dialog(self, width = 250 * getDpiFactor())
 
     def draw(self, context):
-        try: context.active_node.drawAdvanced(self.layout)
-        except: pass
+        try:
+            node = getNodeByIdentifier(self.nodeIdentifier)
+            node.drawAdvanced(self.layout)
+        except:
+            self.layout.label("An error occured during drawing of the advanced panel", icon = "INFO")
 
     def execute(self, context):
         return {"INTERFACE"}

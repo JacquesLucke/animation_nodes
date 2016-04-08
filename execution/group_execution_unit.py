@@ -1,19 +1,19 @@
 from . compile_scripts import compileScript
 from .. problems import ExecutionUnitNotSetup
 from . code_generator import (getInitialVariables,
-                              getSetupCode,
+                              iterSetupCodeLines,
                               getGlobalizeStatement,
-                              getNodeExecutionLines,
-                              linkOutputSocketsToTargets)
+                              linkOutputSocketsToTargets,
+                              getFunction_IterNodeExecutionLines)
 
 class GroupExecutionUnit:
-    def __init__(self, network):
+    def __init__(self, network, nodeByID):
         self.network = network
         self.setupScript = ""
         self.setupCodeObject = None
         self.executionData = {}
 
-        self.generateScript()
+        self.generateScript(nodeByID)
         self.compileScript()
         self.execute = self.raiseNotSetupException
 
@@ -35,22 +35,27 @@ class GroupExecutionUnit:
         return [self.setupScript]
 
 
-
-    def generateScript(self):
-        try: nodes = self.network.getSortedAnimationNodes()
+    def generateScript(self, nodeByID):
+        try: nodes = self.network.getSortedAnimationNodes(nodeByID)
         except: return
 
         variables = getInitialVariables(nodes)
-        self.setupScript = getSetupCode(nodes, variables)
-        self.setupScript += "\n"*3
-        self.setupScript += self.getFunctionGenerationScript(nodes, variables)
+        self.setupScript = "\n".join(self.iterSetupScriptLines(nodes, variables, nodeByID))
 
-    def getFunctionGenerationScript(self, nodes, variables):
-        headerStatement = self.getFunctionHeader(self.network.groupInputNode, variables)
-        globalizeStatement = " "*4 + getGlobalizeStatement(nodes, variables)
-        executionScript = "\n".join(indent(self.getExecutionScriptLines(nodes, variables)))
-        returnStatement = "\n" + " "*4 + self.getReturnStatement(self.network.groupOutputNode, variables)
-        return "\n".join([headerStatement, globalizeStatement, executionScript, returnStatement])
+    def iterSetupScriptLines(self, nodes, variables, nodeByID):
+        yield from iterSetupCodeLines(nodes, variables)
+        yield "\n\n"
+        yield from self.iterFunctionGenerationScriptLines(nodes, variables, nodeByID)
+
+    def iterFunctionGenerationScriptLines(self, nodes, variables, nodeByID):
+        inputNode = self.network.getGroupInputNode(nodeByID)
+        outputNode = self.network.getGroupOutputNode(nodeByID)
+
+        yield self.getFunctionHeader(inputNode, variables)
+        yield "    " + getGlobalizeStatement(nodes, variables)
+        yield from iterIndented(self.iterExecutionScriptLines(nodes, variables, inputNode, nodeByID))
+        yield "\n"
+        yield "    " + self.getReturnStatement(outputNode, variables)
 
     def getFunctionHeader(self, inputNode, variables):
         for i, socket in enumerate(inputNode.outputs):
@@ -60,15 +65,14 @@ class GroupExecutionUnit:
         header = "def main({}):".format(parameterList)
         return header
 
+    def iterExecutionScriptLines(self, nodes, variables, inputNode, nodeByID):
+        iterNodeExecutionLines = getFunction_IterNodeExecutionLines()
 
-    def getExecutionScriptLines(self, nodes, variables):
-        lines = []
-        lines.extend(linkOutputSocketsToTargets(self.network.groupInputNode, variables))
+        yield from linkOutputSocketsToTargets(inputNode, variables, nodeByID)
         for node in nodes:
             if node.bl_idname in ("an_GroupInputNode", "an_GroupOutputNode"): continue
-            lines.extend(getNodeExecutionLines(node, variables))
-            lines.extend(linkOutputSocketsToTargets(node, variables))
-        return lines
+            yield from iterNodeExecutionLines(node, variables)
+            yield from linkOutputSocketsToTargets(node, variables, nodeByID)
 
     def getReturnStatement(self, outputNode, variables):
         if outputNode is None: return "return"
@@ -83,5 +87,6 @@ class GroupExecutionUnit:
         raise ExecutionUnitNotSetup()
 
 
-def indent(lines):
-    return [" "*4 + line for line in lines]
+def iterIndented(lines):
+    for line in lines:
+        yield "    " + line

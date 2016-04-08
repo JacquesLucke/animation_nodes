@@ -36,11 +36,14 @@ class TextBox:
         characterWidth = blf.dimensions(font, "abcde")[0] / 5
         maxCharactersPerLine = int((self.width - 2 * self.padding) / characterWidth)
 
-        paragraphs = self.text.split("\n")
+        paragraphs = self.text.splitlines()
         for i, paragraph in enumerate(paragraphs):
-            paragraphLines = textwrap.wrap(paragraph, maxCharactersPerLine)
-            if len(paragraphLines) == 0: paragraphLines = [""]
-            self.lines.extend(paragraphLines)
+            if len(paragraph) <= maxCharactersPerLine:
+                self.lines.append(paragraph)
+            else:
+                paragraphLines = textwrap.wrap(paragraph, max(maxCharactersPerLine, 1))
+                if len(paragraphLines) == 0: paragraphLines = [""]
+                self.lines.extend(paragraphLines)
 
             if len(self.lines) > self.maxRows:
                 self.lines = self.lines[:self.maxRows - 1]

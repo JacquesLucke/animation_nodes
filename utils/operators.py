@@ -1,21 +1,24 @@
 import bpy
 import inspect
 from bpy.props import *
+from . blender_ui import redrawAll
 
 createdOperators = []
 
-def makeOperator(idName, label, arguments = []):
+def makeOperator(idName, label, arguments = [], redraw = False):
     def makeOperatorDecorator(function):
-        operator = getOperatorForFunction(function, idName, label, arguments)
+        operator = getOperatorForFunction(function, idName, label, arguments, redraw)
         bpy.utils.register_class(operator)
         createdOperators.append(operator)
         return function
     return makeOperatorDecorator
 
-def getOperatorForFunction(function, idName, label, arguments = []):
+def getOperatorForFunction(function, idName, label, arguments, redraw):
     def execute(self, context):
         parameters = list(iterParameterNamesAndDefaults(function))
         function(*[getattr(self, name) for name, _ in parameters])
+        if redraw:
+            redrawAll()
         return {"FINISHED"}
 
     operator = type(idName, (bpy.types.Operator, ), {

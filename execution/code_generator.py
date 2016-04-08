@@ -1,9 +1,14 @@
 import os
+import re
 import traceback
 from itertools import chain
+from functools import lru_cache
 from collections import defaultdict
 from .. problems import NodeFailesToCreateExecutionCode
-from .. preferences import addonName, generateCompactCode
+from .. tree_info import iterLinkedSocketsWithInfo, isSocketLinked
+from .. preferences import (addonName,
+                            monitorExecutionIsEnabled,
+                            measureNodeExecutionTimesIsEnabled)
 
 
 # Initial Socket Variables
@@ -12,27 +17,26 @@ from .. preferences import addonName, generateCompactCode
 def getInitialVariables(nodes):
     variables = {}
     for node in nodes:
-        for socket in chain(node.inputs, node.outputs):
-            variables[socket] = getSocketVariableName(socket)
+        nodeIdentifierPart = node.identifier[:4]
+        for index, socket in enumerate(chain(node.inputs, node.outputs)):
+            if socket.identifier.isidentifier():
+                variables[socket] = "_" + socket.identifier + nodeIdentifierPart
+            else:
+                variables[socket] = "__socket_" + str(socket.is_output) + "_" + str(index) + nodeIdentifierPart
     return variables
-
-def getSocketVariableName(socket):
-    socketID = socket.identifier if socket.identifier.isidentifier() else "_socket_{}_{}".format(socket.isOutput, socket.index)
-    return "_{}{}".format(socketID, socket.node.identifier[:4])
-
 
 
 # Setup Code
 ##########################################
 
-def getSetupCode(nodes, variables):
-    lines = []
-    lines.append(get_ImportModules(nodes))
-    lines.append(get_ImportAnimationNodes())
-    lines.append(get_LoadRandomNumberCache())
-    lines.extend(tuple(get_GetNodeReferences(nodes)))
-    lines.extend(tuple(get_GetSocketValues(nodes, variables)))
-    return "\n".join(lines)
+def iterSetupCodeLines(nodes, variables):
+    yield get_ImportModules(nodes)
+    yield get_ImportTimeMeasurementFunction()
+    yield get_ImportAnimationNodes()
+    yield get_LoadRandomNumberCache()
+    yield get_LoadMeasurementsDict()
+    yield from iter_GetNodeReferences(nodes)
+    yield from iter_GetSocketValues(nodes, variables)
 
 
 def get_ImportModules(nodes):
@@ -41,12 +45,14 @@ def get_ImportModules(nodes):
     modulesString = ", ".join(neededModules)
     return "import " + modulesString
 
+def get_ImportTimeMeasurementFunction():
+    return "from time import perf_counter as getCurrentTime"
+
 def getModulesNeededByNodes(nodes):
     moduleNames = set()
     for node in nodes:
         moduleNames.update(node.getUsedModules())
     return list(moduleNames)
-
 
 def get_ImportAnimationNodes():
     '''
@@ -56,34 +62,32 @@ def get_ImportAnimationNodes():
     '''
     return "animation_nodes = sys.modules.get({})".format(repr(addonName))
 
-
 def get_LoadRandomNumberCache():
     return "random_number_cache = animation_nodes.algorithms.random.getRandomNumberCache()"
 
+def get_LoadMeasurementsDict():
+    return "_node_execution_times = animation_nodes.execution.measurements.getMeasurementsDict()"
 
-def get_GetNodeReferences(nodes):
+def iter_GetNodeReferences(nodes):
     yield "nodes = bpy.data.node_groups[{}].nodes".format(repr(nodes[0].nodeTree.name))
     for node in nodes:
         yield "{} = nodes[{}]".format(node.identifier, repr(node.name))
 
-
-def get_GetSocketValues(nodes, variables):
-    for socket in iterUnlinkedSockets(nodes):
-        yield getLoadSocketValueLine(socket, variables)
-
-def iterUnlinkedSockets(nodes):
+def iter_GetSocketValues(nodes, variables):
     for node in nodes:
-        yield from node.unlinkedInputs
+        for i, socket in enumerate(node.inputs):
+            if not isSocketLinked(socket, node):
+                yield getLoadSocketValueLine(socket, node, variables, i)
 
+def getLoadSocketValueLine(socket, node, variables, index = None):
+    return "{} = {}".format(variables[socket], getSocketValueExpression(socket, node, index))
 
-def getLoadSocketValueLine(socket, variables):
-    return "{} = {}".format(variables[socket], getSocketValueExpression(socket))
-
-def getSocketValueExpression(socket):
+def getSocketValueExpression(socket, node, index = None):
     if socket.hasValueCode: return socket.getValueCode()
     else:
         socketsName = "inputs" if socket.isInput else "outputs"
-        return "{}.{}[{}].getValue()".format(socket.node.identifier, socketsName, socket.index)
+        if index is None: index = socket.getIndex(node)
+        return "{}.{}[{}].getValue()".format(node.identifier, socketsName, index)
 
 
 
@@ -95,86 +99,118 @@ def getGlobalizeStatement(nodes, variables):
     if len(socketNames) == 0: return ""
     return "global " + ", ".join(socketNames)
 
-def getNodeExecutionLines(node, variables):
-    lines = []
-    if not generateCompactCode(): lines.extend(getNodeCommentLines(node))
-    lines.extend(getInputCopyLines(node, variables))
+def iterUnlinkedSockets(nodes):
+    for node in nodes:
+        yield from node.unlinkedInputs
+
+def getFunction_IterNodeExecutionLines():
+    if measureNodeExecutionTimesIsEnabled():
+        return iterNodeExecutionLines_MeasureTimes
+    else:
+        if monitorExecutionIsEnabled():
+            return iterNodeExecutionLines_Monitored
+        else:
+            return iterNodeExecutionLines_Basic
+
+
+def iterNodeExecutionLines_Monitored(node, variables):
+    yield from iterNodePreExecutionLines(node, variables)
+    yield "try:"
     try:
-        taggedLines = node.getTaggedExecutionCodeLines()
-        lines.extend([replaceTaggedLine(line, node, variables) for line in taggedLines])
-        return lines
+        for line in iterRealNodeExecutionLines(node, variables):
+            yield "    " + line
     except:
-        print("\n"*5)
-        traceback.print_exc()
-        NodeFailesToCreateExecutionCode(node.identifier).report()
-        raise Exception("Node failed to create execution code")
+        handleExecutionCodeCreationException(node)
+    yield "    pass"
+    yield "except:"
+    yield "    animation_nodes.problems.NodeRaisesExceptionDuringExecution({}).report()".format(repr(node.identifier))
+    yield "    raise Exception()"
 
+def iterNodeExecutionLines_MeasureTimes(node, variables):
+    yield from iterNodePreExecutionLines(node, variables)
+    try:
+        yield "_execution_start_time = getCurrentTime()"
+        yield from iterRealNodeExecutionLines(node, variables)
+        yield "_node_execution_times[{}].totalTime += getCurrentTime() - _execution_start_time".format(repr(node.identifier))
+        yield "_node_execution_times[{}].calls += 1".format(repr(node.identifier))
+    except:
+        handleExecutionCodeCreationException(node)
 
-def getNodeCommentLines(node):
-    return ["\n", "# Node: {} - {}".format(repr(node.nodeTree.name), repr(node.name))]
+def iterNodeExecutionLines_Basic(node, variables):
+    yield from iterNodePreExecutionLines(node, variables)
+    try:
+        yield from iterRealNodeExecutionLines(node, variables)
+    except:
+        handleExecutionCodeCreationException(node)
 
-def getInputCopyLines(node, variables):
-    lines = []
+def iterNodePreExecutionLines(node, variables):
+    yield ""
+    yield getNodeCommentLine(node)
+    yield from iterInputCopyLines(node, variables)
+
+def getNodeCommentLine(node):
+    return "# Node: {} - {}".format(repr(node.nodeTree.name), repr(node.name))
+
+def iterInputCopyLines(node, variables):
     for socket in node.inputs:
-        if socket.dataIsModified and socket.isCopyable and socket.isUnlinked:
+        if socket.dataIsModified and socket.isCopyable and not isSocketLinked(socket, node):
             newName = variables[socket] + "_copy"
             if socket.hasValueCode: line = "{} = {}".format(newName, socket.getValueCode())
             else: line = getCopyLine(socket, newName, variables)
-            lines.append(line)
             variables[socket] = newName
-    return lines
+            yield line
 
-def replaceTaggedLine(line, node, variables):
-    line = replace_NumberSign_NodeReference(line, node)
-    line = replace_PercentSign_InputSocketVariable(line, node, variables)
-    line = replace_DollarSign_OutputSocketVariable(line, node, variables)
-    return line
+def iterRealNodeExecutionLines(node, variables):
+    localCode = node.getLocalExecutionCode()
+    globalCode = makeGlobalExecutionCode(localCode, node, variables)
+    yield from globalCode.splitlines()
 
-def replace_NumberSign_NodeReference(line, node):
-    return line.replace("#self#", node.identifier)
-
-def replace_PercentSign_InputSocketVariable(line, node, variables):
+def makeGlobalExecutionCode(localCode, node, variables):
+    code = replaceVariableName(localCode, "self", node.identifier)
     nodeInputs = node.inputsByIdentifier
     for name, variable in node.inputVariables.items():
-        line = line.replace("%{}%".format(variable), variables[nodeInputs[name]])
-    return line
-
-def replace_DollarSign_OutputSocketVariable(line, node, variables):
+        code = replaceVariableName(code, variable, variables[nodeInputs[name]])
     nodeOutputs = node.outputsByIdentifier
     for name, variable in node.outputVariables.items():
-        line = line.replace("${}$".format(variable), variables[nodeOutputs[name]])
-    return line
+        code = replaceVariableName(code, variable, variables[nodeOutputs[name]])
+    return code
+
+@lru_cache(maxsize = 2**15)
+def replaceVariableName(code, oldName, newName):
+    pattern = r"([^\.\"\%']|^)\b{}\b".format(oldName)
+    return re.sub(pattern, r"\1{}".format(newName), code)
+
+
+def handleExecutionCodeCreationException(node):
+    print("\n"*5)
+    traceback.print_exc()
+    NodeFailesToCreateExecutionCode(node.identifier).report()
+    raise Exception("Node failed to create execution code")
 
 
 
 # Modify Socket Variables
 ##########################################
 
-def linkOutputSocketsToTargets(node, variables):
+def linkOutputSocketsToTargets(node, variables, nodeByID):
     resolveInnerLinks(node, variables)
-    lines = []
     for socket in node.linkedOutputs:
-        lines.extend(linkSocketToTargets(socket, variables))
-    return lines
+        yield from linkSocketToTargets(socket, node, variables, nodeByID)
 
 def resolveInnerLinks(node, variables):
     inputs, outputs = node.inputsByIdentifier, node.outputsByIdentifier
-    for inputName, outputName in node.innerLinks:
+    for inputName, outputName in node.iterInnerLinks():
         variables[outputs[outputName]] = variables[inputs[inputName]]
 
-def linkSocketToTargets(socket, variables):
-    lines = []
-
-    targets = socket.dataTargets
+def linkSocketToTargets(socket, node, variables, nodeByID):
+    targets = tuple(iterLinkedSocketsWithInfo(socket, node, nodeByID))
     needACopy = getTargetsThatNeedACopy(socket, targets)
 
     for target in targets:
         if target in needACopy:
-            lines.append(getCopyLine(socket, variables[target], variables))
+            yield getCopyLine(socket, variables[target], variables)
         else:
             variables[target] = variables[socket]
-
-    return lines
 
 def getTargetsThatNeedACopy(socket, targets):
     if not socket.isCopyable: return []
