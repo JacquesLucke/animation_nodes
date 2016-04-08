@@ -19,7 +19,7 @@ class SwitchNode(bpy.types.Node, AnimationNode):
         self.assignedType = "Float"
 
     def drawAdvanced(self, layout):
-        self.invokeSocketTypeChooser(layout, "assignAdvancedDataType",
+        self.invokeSocketTypeChooser(layout, "assignType",
             text = "Change Type", icon = "TRIA_RIGHT")
 
     def edit(self):
@@ -31,9 +31,6 @@ class SwitchNode(bpy.types.Node, AnimationNode):
             dataOrigin = socket.dataOrigin
             if dataOrigin is not None: return dataOrigin.dataType
         return self.inputs[1].dataType
-
-    def assignAdvancedDataType(self, dataType):
-        self.assignType(dataType)
 
     def assignType(self, dataType):
         if dataType == self.assignedType: return

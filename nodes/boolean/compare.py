@@ -41,7 +41,7 @@ class CompareNode(bpy.types.Node, AnimationNode):
         return label
 
     def drawAdvanced(self, layout):
-        self.invokeSocketTypeChooser(layout, "assignAdvancedDataType",
+        self.invokeSocketTypeChooser(layout, "assingType",
             text = "Change Type", icon = "TRIA_RIGHT")
 
 
@@ -67,9 +67,6 @@ class CompareNode(bpy.types.Node, AnimationNode):
         if inputA is not None: return inputA.dataType
         if inputB is not None: return inputB.dataType
         return self.inputs[0].dataType
-
-    def assignAdvancedDataType(self, dataType):
-        self.assingType(dataType)
 
     def assingType(self, dataType):
         if self.assignedType == dataType: return
