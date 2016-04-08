@@ -18,6 +18,10 @@ class SwitchNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.assignedType = "Float"
 
+    def drawAdvanced(self, layout):
+        self.invokeSocketTypeChooser(layout, "assignType",
+            text = "Change Type", icon = "TRIA_RIGHT")
+
     def edit(self):
         dataType = self.getWantedDataType()
         self.assignType(dataType)

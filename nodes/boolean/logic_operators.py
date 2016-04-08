@@ -10,10 +10,13 @@ operationItems = [
     ("NOR", "not (A or B)", "", "NONE", 3),
     ("XOR", "A xor B", "A must be different than B", "NONE", 4) ]
 
+operationLabels = {item[0] : item[1] for item in operationItems}
+
 class LogicOperatorsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_LogicOperatorsNode"
     bl_label = "Logic Operators"
-
+    dynamicLabelType = "HIDDEN_ONLY"
+    
     operation = EnumProperty(name = "Operation", default = "AND",
         items = operationItems, update = executionCodeChanged)
 
@@ -24,6 +27,9 @@ class LogicOperatorsNode(bpy.types.Node, AnimationNode):
 
     def draw(self, layout):
         layout.prop(self, "operation", text = "")
+
+    def drawLabel(self):
+        return operationLabels[self.operation]
 
     def getExecutionCode(self):
         op = self.operation
