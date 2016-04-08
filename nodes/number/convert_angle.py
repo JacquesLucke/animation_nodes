@@ -6,10 +6,12 @@ from ... events import executionCodeChanged
 conversionTypeItems = [
     ("DEGREE_TO_RADIAN", "Degree to Radian", ""),
     ("RADIAN_TO_DEGREE", "Radian to Degree", "")]
+conversionLabels = { t[0] : t[1][:3] + t[1][6:-3] for t in conversionTypeItems } 
 
 class ConvertAngleNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ConvertAngleNode"
     bl_label = "Convert Angle"
+    dynamicLabelType = "HIDDEN_ONLY"
 
     searchTags = [(name, {"conversionType" : repr(type)}) for type, name, _ in conversionTypeItems]
 
@@ -35,6 +37,9 @@ class ConvertAngleNode(bpy.types.Node, AnimationNode):
 
     def draw(self, layout):
         layout.prop(self, "conversionType", text = "")
+
+    def drawLabel(self):
+        return conversionLabels[self.conversionType]
 
     def getExecutionCode(self):
         if self.conversionType == "DEGREE_TO_RADIAN": return "outAngle = inAngle / 180 * math.pi"
