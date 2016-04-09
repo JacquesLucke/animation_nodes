@@ -229,6 +229,7 @@ class ListMenu(bpy.types.Menu):
         insertNode(layout, "an_GetRandomListElementsNode", "Get Random Elements")
         insertNode(layout, "an_SearchListElementNode", "Search Element")
         insertNode(layout, "an_SetListElementNode", "Set Element")
+        insertNode(layout, "an_RemoveListElementNode", "Remove Element")
         layout.separator()
         insertNode(layout, "an_GetListLengthNode", "Get Length")
         layout.separator()
