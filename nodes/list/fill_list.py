@@ -35,10 +35,10 @@ class FillListNode(bpy.types.Node, AnimationNode):
         self.invokeSocketTypeChooser(layout, "assignListDataType",
             socketGroup = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
 
-
     def getExecutionCode(self):
         yield ("fillList = [{} for i in range(max(length - len(inList), 0))]"
                 .format(self.getCopyString(self.inputs["Element"], "fillElement")))
+
         if self.fillMode == "LEFT": yield "outList = fillList + inList"
         if self.fillMode == "RIGHT": yield "outList = inList + fillList"
 
@@ -75,5 +75,5 @@ class FillListNode(bpy.types.Node, AnimationNode):
 
         self.inputs.new("an_IntegerSocket", "Length", "length")
         self.inputs.new(self.listIdName, "List", "inList").dataIsModified = True
-        self.inputs.new(self.baseIdName, "Element", "fillElement").dataIsModified = True
+        self.inputs.new(self.baseIdName, "Element", "fillElement")
         self.outputs.new(self.listIdName, "List", "outList")
