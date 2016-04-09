@@ -5,7 +5,7 @@ from ... ui.info_popups import showTextPopup
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 from ... sockets.info import (toIdName, toListIdName, toBaseDataType, isBase,
-                              isComparable, toListDataType)
+                              isComparable, toListDataType, isList)
 
 removeTypeItems = [
     ("FIRST_OCCURRENCE", "First Occurrence", "", "", 0),
@@ -66,7 +66,8 @@ class RemoveListElementNode(bpy.types.Node, AnimationNode):
     def getWantedDataType(self):
         listInput = self.inputs["List"].dataOrigin
         if listInput is not None:
-            return toBaseDataType(listInput.bl_idname)
+            if isList(listInput.bl_idname):
+                return toBaseDataType(listInput.bl_idname)
 
         if self.removeType in ("FIRST_OCCURRENCE", "ALL_OCCURRENCES"):
             elementInput = self.inputs["Element"].dataOrigin
