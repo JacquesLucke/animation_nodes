@@ -42,18 +42,15 @@ class FillListNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         yield "missingAmount = max(length - len(inList), 0)"
-        if self.makeElementCopies:
+        elementSocket = self.inputs["Element"]
+        if self.makeElementCopies and elementSocket.isCopyable():
             yield ("fillList = [{} for _ in range(missingAmount)]"
-                    .format(self.getCopyString(self.inputs["Element"], "fillElement")))
+                    .format(elementSocket.getCopyExpression().replace("value", "fillElement")))
         else:
             yield "fillList = [fillElement] * missingAmount"
 
         if self.fillMode == "LEFT": yield "outList = fillList + inList"
         if self.fillMode == "RIGHT": yield "outList = inList + fillList"
-
-    def getCopyString(self, fromSocket, variableString):
-        if not fromSocket.isCopyable(): return variableString
-        return fromSocket.getCopyExpression().replace("value", variableString)
 
     def edit(self):
         baseDataType = self.getWantedDataType()
