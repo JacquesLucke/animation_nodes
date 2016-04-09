@@ -1,6 +1,7 @@
 from bpy.props import *
 from ... import preferences
 from ... events import networkChanged
+from ... tree_info import getNodesByType
 from ... ui.node_colors import colorNetworks
 from ... algorithms.random import getRandomColor
 
@@ -28,3 +29,10 @@ class SubprogramBaseNode:
         value = colors.subprogramValue
         saturation = colors.subprogramSaturation
         self.networkColor = getRandomColor(value = value, saturation = saturation)
+
+    def getInvokeNodes(self):
+        nodes = []
+        for node in getNodesByType("an_InvokeSubprogramNode"):
+            if node.subprogramIdentifier == self.identifier:
+                nodes.append(node)
+        return nodes
