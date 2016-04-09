@@ -208,16 +208,16 @@ class AnimationNode:
         for socket in self.sockets:
             socket.disableSocketEditingInNode()
 
-    def toogleTextInputVisibility(self):
-        self.toogleSocketDisplayProperty("textInput")
+    def toggleTextInputVisibility(self):
+        self.toggleSocketDisplayProperty("textInput")
 
-    def toogleMoveOperatorsVisibility(self):
-        self.toogleSocketDisplayProperty("moveOperators")
+    def toggleMoveOperatorsVisibility(self):
+        self.toggleSocketDisplayProperty("moveOperators")
 
-    def toogleRemoveOperatorVisibility(self):
-        self.toogleSocketDisplayProperty("removeOperator")
+    def toggleRemoveOperatorVisibility(self):
+        self.toggleSocketDisplayProperty("removeOperator")
 
-    def toogleSocketDisplayProperty(self, name):
+    def toggleSocketDisplayProperty(self, name):
         if len(self.sockets) == 0: return
         state = not getattr(self.sockets[0].display, name)
         for socket in self.sockets:

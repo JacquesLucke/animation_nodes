@@ -49,11 +49,11 @@ def drawSocketLists(layout, node):
 
 def drawSocketVisibilityOperators(layout, node):
     col = layout.column(align = True)
-    col.label("Toogle Operation Visibility:")
+    col.label("Toggle Operation Visibility:")
     row = col.row(align = True)
-    node.invokeFunction(row, "toogleTextInputVisibility", text = "Name")
-    node.invokeFunction(row, "toogleMoveOperatorsVisibility", text = "Move")
-    node.invokeFunction(row, "toogleRemoveOperatorVisibility", text = "Remove")
+    node.invokeFunction(row, "toggleTextInputVisibility", text = "Name")
+    node.invokeFunction(row, "toggleMoveOperatorsVisibility", text = "Move")
+    node.invokeFunction(row, "toggleRemoveOperatorVisibility", text = "Remove")
     node.invokeFunction(row, "disableSocketEditingInNode", icon = "FULLSCREEN")
 
 
