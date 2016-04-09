@@ -59,7 +59,8 @@ class SplineSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def updateProperty(self):
         self.getObject()
 
-    def getCopyExpression(self):
+    @classmethod
+    def getCopyExpression(cls):
         return "value.copy()"
 
     def handleEyedropperButton(self, event):

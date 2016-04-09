@@ -14,5 +14,6 @@ class MatrixSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getValue(self):
         return Matrix.Identity(4)
 
-    def getCopyExpression(self):
+    @classmethod
+    def getCopyExpression(cls):
         return "value.copy()"

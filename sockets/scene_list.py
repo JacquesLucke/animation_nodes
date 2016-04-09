@@ -28,5 +28,6 @@ class SceneListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getValue(self):
         return [self.nodeTree.scene]
 
-    def getCopyExpression(self):
+    @classmethod
+    def getCopyExpression(cls):
         return "value[:]"

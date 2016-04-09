@@ -164,14 +164,14 @@ class LoopExecutionUnit:
             yield "if {}:".format(variables[node.conditionSocket])
 
             socket = node.addSocket
-            if socket.isUnlinked and socket.isCopyable: expression = getCopyExpression(socket, variables)
+            if socket.isUnlinked and socket.isCopyable(): expression = getCopyExpression(socket, variables)
             else: expression = variables[socket]
             yield "    {}.{}({})".format(variables[node], operation, expression)#
 
     def iter_ReassignParameters(self, inputNode, variables, nodeByID):
         for node in inputNode.getReassignParameterNodes(nodeByID):
             socket = node.inputs[0]
-            if socket.isUnlinked and socket.isCopyable: expression = getCopyExpression(socket, variables)
+            if socket.isUnlinked and socket.isCopyable(): expression = getCopyExpression(socket, variables)
             else: expression = variables[socket]
 
             if node.conditionSocket is None: conditionPrefix = ""

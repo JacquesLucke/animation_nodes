@@ -13,5 +13,6 @@ class BooleanListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getValueCode(self):
         return "[]"
 
-    def getCopyExpression(self):
+    @classmethod
+    def getCopyExpression(cls):
         return "value[:]"

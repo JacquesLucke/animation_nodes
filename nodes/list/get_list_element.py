@@ -62,7 +62,7 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
 
         if self.makeCopy:
             socket = self.outputs[0]
-            if socket.isCopyable:
+            if socket.isCopyable():
                 yield "element = " + socket.getCopyExpression().replace("value", "element")
 
     def edit(self):

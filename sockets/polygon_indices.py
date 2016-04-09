@@ -13,5 +13,6 @@ class PolygonIndicesSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getValueCode(self):
         return "(0, 1, 2)"
 
-    def getCopyExpression(self):
+    @classmethod
+    def getCopyExpression(cls):
         return "value[:]"

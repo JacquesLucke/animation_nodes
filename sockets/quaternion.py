@@ -32,5 +32,6 @@ class QuaternionSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getProperty(self):
         return self.value[:]
 
-    def getCopyExpression(self):
+    @classmethod
+    def getCopyExpression(cls):
         return "value.copy()"

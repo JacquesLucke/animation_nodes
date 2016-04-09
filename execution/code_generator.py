@@ -153,7 +153,7 @@ def getNodeCommentLine(node):
 
 def iterInputCopyLines(node, variables):
     for socket in node.inputs:
-        if socket.dataIsModified and socket.isCopyable and not isSocketLinked(socket, node):
+        if socket.dataIsModified and socket.isCopyable() and not isSocketLinked(socket, node):
             newName = variables[socket] + "_copy"
             if socket.hasValueCode: line = "{} = {}".format(newName, socket.getValueCode())
             else: line = getCopyLine(socket, newName, variables)
@@ -213,7 +213,7 @@ def linkSocketToTargets(socket, node, variables, nodeByID):
             variables[target] = variables[socket]
 
 def getTargetsThatNeedACopy(socket, targets):
-    if not socket.isCopyable: return []
+    if not socket.isCopyable(): return []
     modifiedTargets = [target for target in targets if target.dataIsModified]
     if socket.loop.copyAlways: return modifiedTargets
     if len(targets) == 1: return []
