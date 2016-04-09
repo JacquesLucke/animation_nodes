@@ -28,16 +28,16 @@ class DebugDrawerNode(bpy.types.Node, AnimationNode):
         self.inputs.new("an_BooleanSocket", "Condition", "condition").hide = True
 
     def draw(self, layout):
+        if self.errorMessage != "":
+            layout.label(self.errorMessage, icon = "ERROR")
+
+    def drawAdvanced(self, layout):
         layout.prop(self, "fontSize")
         if isList(self.dataType):
             row = layout.row(align = True)
             row.prop(self, "maxListStartElements", text = "Begin")
             row.prop(self, "maxListEndElements", text = "End")
             layout.prop(self, "oneElementPerLine")
-        if self.errorMessage != "":
-            layout.label(self.errorMessage, icon = "ERROR")
-
-    def drawAdvanced(self, layout):
         layout.prop(self, "maxRows")
 
 
