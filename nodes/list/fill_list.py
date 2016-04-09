@@ -25,6 +25,10 @@ class FillListNode(bpy.types.Node, AnimationNode):
     fillMode = EnumProperty(name = "Fill Mode", default = "RIGHT",
         items = fillModeItems, update = executionCodeChanged)
 
+    makeElementCopies = BoolProperty(name = "Make Element Copies", default = True,
+        description = "Insert copies of the original fill element",
+        update = executionCodeChanged)
+
     def create(self):
         self.assignedType = "Float"
 
@@ -32,12 +36,17 @@ class FillListNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "fillMode", expand = True)
 
     def drawAdvanced(self, layout):
+        layout.prop(self, "makeElementCopies")
         self.invokeSocketTypeChooser(layout, "assignListDataType",
             socketGroup = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
 
     def getExecutionCode(self):
-        yield ("fillList = [{} for i in range(max(length - len(inList), 0))]"
-                .format(self.getCopyString(self.inputs["Element"], "fillElement")))
+        yield "missingAmount = max(length - len(inList), 0)"
+        if self.makeElementCopies:
+            yield ("fillList = [{} for _ in range(missingAmount)]"
+                    .format(self.getCopyString(self.inputs["Element"], "fillElement")))
+        else:
+            yield "fillList = [fillElement] * missingAmount"
 
         if self.fillMode == "LEFT": yield "outList = fillList + inList"
         if self.fillMode == "RIGHT": yield "outList = inList + fillList"
