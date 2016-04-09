@@ -71,8 +71,12 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         col = layout.column()
         col.label("List Generators:")
         box = col.box()
-        for node in self.getSortedGeneratorNodes():
-            box.label("{} - {}".format(repr(node.outputName), node.listDataType))
+        subcol = box.column(align = True)
+        for i, node in enumerate(self.getSortedGeneratorNodes()):
+            row = subcol.row(align = True)
+            row.label("{} - {}".format(repr(node.outputName), node.listDataType))
+            self.invokeFunction(row, "moveGeneratorOutput", data = "{};-1".format(i), icon = "TRIA_UP")
+            self.invokeFunction(row, "moveGeneratorOutput", data = "{};1".format(i), icon = "TRIA_DOWN")
         self.invokeSocketTypeChooser(box, "createGeneratorOutputNode", socketGroup = "LIST", text = "New Generator", icon = "PLUS")
 
         self.invokeFunction(layout, "createBreakNode", text = "New Break Condition", icon = "PLUS")
@@ -198,6 +202,21 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         node = newNodeAtCursor("an_LoopBreakNode")
         node.loopInputIdentifier = self.identifier
         invokeTranslation()
+
+    def moveGeneratorOutput(self, data):
+        index, direction = data.split(";")
+        index = int(index)
+        direction = int(direction)
+
+        sortedGenerators = self.getSortedGeneratorNodes()
+        if index == 0 and direction == -1: return
+        if index == len(sortedGenerators) - 1 and direction == 1: return
+
+        node = sortedGenerators[index]
+        otherNode = sortedGenerators[index + direction]
+
+        node.sortIndex, otherNode.sortIndex = otherNode.sortIndex, node.sortIndex
+        subprogramInterfaceChanged()
 
 
     def getTemplateCode(self):
