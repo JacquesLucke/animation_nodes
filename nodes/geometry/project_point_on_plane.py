@@ -5,16 +5,16 @@ from ... base_types.node import AnimationNode
 class ProjectPointOnPlaneNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ProjectPointOnPlaneNode"
     bl_label = "Project Point on Plane"
+    bl_width_default = 170
     searchTags = ["Distance Point to Plane", "Closest Point on Plane"]
 
     def create(self):
-        self.width = 170
-        self.newInput("an_VectorSocket", "Point", "point")
-        self.newInput("an_VectorSocket", "Plane Point", "planePoint").value = (0, 0, 0)
-        self.newInput("an_VectorSocket", "Plane Normal", "planeNormal").value = (0, 0, 1)
+        self.newInput("Vector", "Point", "point")
+        self.newInput("Vector", "Plane Point", "planePoint", value = (0, 0, 0))
+        self.newInput("Vector", "Plane Normal", "planeNormal", value = (0, 0, 1))
 
-        self.newOutput("an_VectorSocket", "Projection", "projection")
-        self.newOutput("an_FloatSocket", "Signed Distance", "distance")
+        self.newOutput("Vector", "Projection", "projection")
+        self.newOutput("Float", "Signed Distance", "distance")
 
     def getExecutionCode(self):
         isLinked = self.getLinkedOutputsDict()
