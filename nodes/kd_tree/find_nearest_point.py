@@ -1,5 +1,4 @@
 import bpy
-from mathutils import Vector
 from ... base_types.node import AnimationNode
 
 class FindNearestPointInKDTreeNode(bpy.types.Node, AnimationNode):
@@ -7,11 +6,11 @@ class FindNearestPointInKDTreeNode(bpy.types.Node, AnimationNode):
     bl_label = "Find Nearest Point"
 
     def create(self):
-        self.newInput("an_KDTreeSocket", "KDTree", "kdTree")
-        self.newInput("an_VectorSocket", "Vector", "searchVector").defaultDrawType = "PROPERTY_ONLY"
-        self.newOutput("an_VectorSocket", "Vector", "nearestVector")
-        self.newOutput("an_FloatSocket", "Distance", "distance")
-        self.newOutput("an_IntegerSocket", "Index", "index")
+        self.newInput("KDTree", "KDTree", "kdTree")
+        self.newInput("Vector", "Vector", "searchVector").defaultDrawType = "PROPERTY_ONLY"
+        self.newOutput("Vector", "Vector", "nearestVector")
+        self.newOutput("Float", "Distance", "distance")
+        self.newOutput("Integer", "Index", "index")
 
     def getExecutionCode(self):
         yield "nearestVector, index, distance = kdTree.find(searchVector)"

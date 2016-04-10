@@ -6,11 +6,10 @@ class FindPointsInRadiusInKDTreeNode(bpy.types.Node, AnimationNode):
     bl_label = "Find Points in Radius"
 
     def create(self):
-        self.newInput("an_KDTreeSocket", "KDTree", "kdTree")
-        socket = self.newInput("an_FloatSocket", "Radius", "radius")
-        socket.value = 5
-        socket.minValue = 0.0
-        self.newInput("an_VectorSocket", "Vector", "searchVector").defaultDrawType = "PROPERTY_ONLY"
+        self.newInput("KDTree", "KDTree", "kdTree")
+        self.newInput("Float", "Radius", "radius", value = 5, minValue = 0)
+        self.newInput("Vector", "Vector", "searchVector", defaultDrawType = "PROPERTY_ONLY")
+        
         self.newOutput("an_VectorListSocket", "Vectors", "nearestVectors")
         self.newOutput("an_FloatListSocket", "Distances", "distances")
         self.newOutput("an_IntegerListSocket", "Indices", "indices")
