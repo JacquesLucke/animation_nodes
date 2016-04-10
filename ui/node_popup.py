@@ -5,7 +5,7 @@ from .. utils.blender_ui import getDpiFactor
 
 class NodePopup(bpy.types.Operator):
     bl_idname = "an.node_popup"
-    bl_label = "Advanced Node Settings"
+    bl_label = "Node Popup"
 
     nodeIdentifier = StringProperty(default = "")
 
