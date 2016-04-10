@@ -25,10 +25,10 @@ class CopyTransformsNode(bpy.types.Node, AnimationNode):
         items = frameTypeItems, update = executionCodeChanged)
 
     def create(self):
-        self.newInput("an_ObjectSocket", "From", "fromObject")
-        self.newInput("an_ObjectSocket", "To", "toObject")
-        self.newInput("an_FloatSocket", "Frame", "frame").hide = True
-        self.newOutput("an_ObjectSocket", "To", "toObject")
+        self.newInput("Object", "From", "fromObject")
+        self.newInput("Object", "To", "toObject")
+        self.newInput("Float", "Frame", "frame").hide = True
+        self.newOutput("Object", "To", "toObject")
 
     def draw(self, layout):
         if not self.useCurrentTransforms:

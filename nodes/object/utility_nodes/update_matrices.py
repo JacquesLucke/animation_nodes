@@ -6,8 +6,8 @@ class UpdateObjectMatricesNode(bpy.types.Node, AnimationNode):
     bl_label = "Update Object Matrices"
 
     def create(self):
-        self.newInput("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
-        self.newOutput("an_ObjectSocket", "Object", "object")
+        self.newInput("Object", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
+        self.newOutput("Object", "Object", "object")
 
     def getExecutionCode(self):
         yield "if object:"
