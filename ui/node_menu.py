@@ -199,8 +199,9 @@ class BooleanMenu(bpy.types.Menu):
         insertNode(layout, "an_DataInputNode", "Boolean", {"assignedType" : repr("Boolean")})
         insertNode(layout, "an_InvertNode", "Invert")
         insertNode(layout, "an_CompareNode", "Compare")
-        insertNode(layout, "an_LogicOperatorsNode", "Logic")
         insertNode(layout, "an_SwitchNode", "Switch")
+        insertNode(layout, "an_LogicOperatorsNode", "Logic")
+        insertNode(layout, "an_BooleanListLogicNode", "List Logic")
         insertNode(layout, "an_BooleanToIntegerNode", "Boolean to Integer")
 
 class ColorMenu(bpy.types.Menu):
@@ -238,7 +239,9 @@ class ListMenu(bpy.types.Menu):
         insertNode(layout, "an_SliceListNode", "Slice")
         insertNode(layout, "an_ShiftListNode", "Shift")
         insertNode(layout, "an_SortListNode", "Sort")
-
+        layout.separator()
+        insertNode(layout, "an_FillListNode", "Fill")
+        insertNode(layout, "an_RepeatListNode", "Repeat")
         insertNode(layout, "an_ListBooleanOperationsNode", "List Boolean Operations")
 
 class CreateListMenu(bpy.types.Menu):
