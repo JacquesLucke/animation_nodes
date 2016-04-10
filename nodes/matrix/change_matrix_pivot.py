@@ -1,9 +1,8 @@
 import bpy
 from bpy.props import *
 from ... tree_info import keepNodeState
-from ... events import executionCodeChanged
-from ... algorithms.rotation import generateRotationMatrix
 from ... base_types.node import AnimationNode
+from ... algorithms.rotation import generateRotationMatrix
 
 pivotTypeItems = [
     ("MATRIX", "Pivot Matrix", "Change Pivot by Matrix like parent", "", 0),
@@ -18,7 +17,6 @@ class ChangeMatrixPivotNode(bpy.types.Node, AnimationNode):
 
     def pivotTypeChanged(self, context):
         self.generateSockets()
-        executionCodeChanged()
 
     pivotType = EnumProperty(name = "Input Type", default = "MATRIX",
         items = pivotTypeItems, update = pivotTypeChanged)
@@ -26,7 +24,7 @@ class ChangeMatrixPivotNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.width = 150
         self.generateSockets()
-        self.newOutput("an_MatrixSocket", "Transform Matrix", "matrixOut")
+        self.newOutput("Matrix", "Transform Matrix", "matrixOut")
 
     def draw(self, layout):
         layout.prop(self, "pivotType", text = "")
@@ -34,28 +32,28 @@ class ChangeMatrixPivotNode(bpy.types.Node, AnimationNode):
     @keepNodeState
     def generateSockets(self):
         self.inputs.clear()
-        self.newInput("an_MatrixSocket", "Transform Matrix", "matrix")
-        
+        self.newInput("Matrix", "Transform Matrix", "matrix")
+
         type = self.pivotType
-        
+
         if type == "MATRIX":
-            self.newInput("an_MatrixSocket", "Pivot Matrix (Parent)", "pivotMatrix")
+            self.newInput("Matrix", "Pivot Matrix (Parent)", "pivotMatrix")
         if type == "VECTOR":
-            self.newInput("an_VectorSocket", "Pivot Location", "pivot")
+            self.newInput("Vector", "Pivot Location", "pivot")
         if type == "LOC_ROT":
-            self.newInput("an_VectorSocket", "Pivot Center", "pivot")
-            self.newInput("an_EulerSocket", "Rotation", "rotation")
+            self.newInput("Vector", "Pivot Center", "pivot")
+            self.newInput("Euler", "Rotation", "rotation")
 
         if type == "AXES_XXZ":
-            self.newInput("an_VectorSocket", "X Start (Center)", "start")
-            self.newInput("an_VectorSocket", "X End", "end").value = [1, 0, 0]
-            self.newInput("an_VectorSocket", "Z Direction (Normal)", "normal").value = [0, 0, 1]
+            self.newInput("Vector", "X Start (Center)", "start")
+            self.newInput("Vector", "X End", "end").value = [1, 0, 0]
+            self.newInput("Vector", "Z Direction (Normal)", "normal").value = [0, 0, 1]
 
         if type == "AXES_XXZZ":
-            self.newInput("an_VectorSocket", "X Start (Center)", "startX")
-            self.newInput("an_VectorSocket", "X End", "endX").value = [1, 0, 0]
-            self.newInput("an_VectorSocket", "Z Start", "startZ")
-            self.newInput("an_VectorSocket", "Z End", "endZ").value = [0, 0, 1]
+            self.newInput("Vector", "X Start (Center)", "startX")
+            self.newInput("Vector", "X End", "endX").value = [1, 0, 0]
+            self.newInput("Vector", "Z Start", "startZ")
+            self.newInput("Vector", "Z End", "endZ").value = [0, 0, 1]
 
     def getExecutionCode(self):
         type = self.pivotType
@@ -74,6 +72,6 @@ class ChangeMatrixPivotNode(bpy.types.Node, AnimationNode):
             yield "pivotMatrix = mathutils.Matrix.Translation(startX) * matrixRotation"
 
         yield "matrixOut = pivotMatrix * matrix * pivotMatrix.inverted()"
-        
+
     def getUsedModules(self):
         return ["mathutils"]
