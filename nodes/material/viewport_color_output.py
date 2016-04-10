@@ -10,7 +10,7 @@ class ViewportColorNode(bpy.types.Node, AnimationNode):
     materialName = StringProperty(update = propertyChanged)
 
     def create(self):
-        self.newInput("an_ColorSocket", "Color", "color")
+        self.newInput("Color", "Color", "color")
 
     def draw(self, layout):
         layout.prop_search(self, 'materialName', bpy.data, 'materials', text='', icon='MATERIAL_DATA')
