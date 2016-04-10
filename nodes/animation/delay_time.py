@@ -7,7 +7,7 @@ class DelayTimeNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.newInput("Float", "Time", "time")
-        self.newInput("Float", "Delay", "delay").value = 10
+        self.newInput("Float", "Delay", "delay", value = 10)
         self.newOutput("Float", "Time", "outTime")
 
     def getExecutionCode(self):
