@@ -16,9 +16,9 @@ class EvaluateFCurveNode(bpy.types.Node, AnimationNode):
         items = frameTypeItems, update = executionCodeChanged)
 
     def create(self):
-        self.newInput("an_FCurveSocket", "FCurve", "fCurve")
-        self.newInput("an_FloatSocket", "Frame", "frame")
-        self.newOutput("an_FloatSocket", "Value", "value")
+        self.newInput("FCurve", "FCurve", "fCurve")
+        self.newInput("Float", "Frame", "frame")
+        self.newOutput("Float", "Value", "value")
 
     def draw(self, layout):
         layout.prop(self, "frameType", text = "Frame")

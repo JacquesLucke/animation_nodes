@@ -6,9 +6,9 @@ class FCurveInfoNode(bpy.types.Node, AnimationNode):
     bl_label = "FCurve Info"
 
     def create(self):
-        self.newInput("an_FCurveSocket", "FCurve", "fCurve")
-        self.newOutput("an_StringSocket", "Data Path", "dataPath")
-        self.newOutput("an_IntegerSocket", "Array Index", "arrayIndex")
+        self.newInput("FCurve", "FCurve", "fCurve")
+        self.newOutput("String", "Data Path", "dataPath")
+        self.newOutput("Integer", "Array Index", "arrayIndex")
 
     def getExecutionCode(self):
         isLinked = self.getLinkedOutputsDict()
