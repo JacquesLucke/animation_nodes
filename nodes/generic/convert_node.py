@@ -10,14 +10,12 @@ class ConvertNode(bpy.types.Node, AnimationNode):
     dynamicLabelType = "ALWAYS"
 
     def assignedTypeChanged(self, context):
-        self.targetIdName = toIdName(self.assignedType)
         self.recreateOutputSocket()
 
     assignedType = StringProperty(update = assignedTypeChanged)
-    targetIdName = StringProperty()
 
     def create(self):
-        self.newInput("an_GenericSocket", "Old", "old").dataIsModified = True
+        self.newInput("Generic", "Old", "old", dataIsModified = True)
         self.assignedType = "String"
 
     def drawAdvanced(self, layout):
@@ -43,7 +41,7 @@ class ConvertNode(bpy.types.Node, AnimationNode):
     @keepNodeLinks
     def recreateOutputSocket(self):
         self.outputs.clear()
-        self.newOutput(self.targetIdName, "New", "new")
+        self.newOutput(self.assignedType, "New", "new")
 
     def getExecutionCode(self):
         t = self.assignedType

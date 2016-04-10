@@ -51,6 +51,6 @@ class DataInterfaceNode(bpy.types.Node, AnimationNode):
         self.outputs.clear()
 
         if self.dataDirection == "EXPORT":
-            self.newInput("an_GenericSocket", "Value", "value")
+            self.newInput("Generic", "Value", "value")
         if self.dataDirection == "IMPORT":
-            self.newOutput("an_GenericSocket", "Value", "value")
+            self.newOutput("Generic", "Value", "value")

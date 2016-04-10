@@ -24,8 +24,8 @@ class DebugDrawerNode(bpy.types.Node, AnimationNode):
     errorMessage = StringProperty()
 
     def create(self):
-        self.newInput("an_GenericSocket", "Data", "data")
-        self.newInput("an_BooleanSocket", "Condition", "condition").hide = True
+        self.newInput("Generic", "Data", "data")
+        self.newInput("Boolean", "Condition", "condition", hide = True)
 
     def draw(self, layout):
         if self.errorMessage != "":
@@ -43,15 +43,15 @@ class DebugDrawerNode(bpy.types.Node, AnimationNode):
 
     def edit(self):
         origin = self.inputs[0].dataOrigin
-        targetIdName = getattr(origin, "bl_idname", "an_GenericSocket")
-        if targetIdName != self.inputs[0].bl_idname:
-            self.updateInputSocket(targetIdName)
+        targetDataType = getattr(origin, "dataType", "Generic")
+        if targetDataType != self.inputs[0].dataType:
+            self.updateInputSocket(targetDataType)
 
     @keepNodeState
-    def updateInputSocket(self, targetIdName):
+    def updateInputSocket(self, dataType):
         self.inputs.clear()
-        self.newInput(targetIdName, "Data", "data")
-        self.newInput("an_BooleanSocket", "Condition", "condition")
+        self.newInput(dataType, "Data", "data")
+        self.newInput("Boolean", "Condition", "condition")
 
     def getExecutionCode(self):
         if "Condition" in self.inputs:
