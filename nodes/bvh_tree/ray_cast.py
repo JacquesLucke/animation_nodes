@@ -8,20 +8,17 @@ class RayCastBVHTreeNode(bpy.types.Node, AnimationNode):
     bl_width_default = 150
 
     def create(self):
-        self.newInput("an_BVHTreeSocket", "BVHTree", "bvhTree")
-        self.newInput("an_VectorSocket", "Ray Start", "start")
-        self.newInput("an_VectorSocket", "Ray Direction", "direction")
-        socket = self.newInput("an_FloatSocket", "Min Distance", "minDistance")
-        socket.value = 0.001
-        socket.hide = True
-        socket = self.newInput("an_FloatSocket", "Max Distance", "maxDistance")
-        socket.value = 1e6
-        socket.hide = True
-        self.newOutput("an_VectorSocket", "Location", "location")
-        self.newOutput("an_VectorSocket", "Normal", "normal")
-        self.newOutput("an_FloatSocket", "Distance", "distance")
-        self.newOutput("an_IntegerSocket", "Polygon Index", "polygonIndex").hide = True
-        self.newOutput("an_BooleanSocket", "Hit", "hit")
+        self.newInput("BVHTree", "BVHTree", "bvhTree")
+        self.newInput("Vector", "Ray Start", "start")
+        self.newInput("Vector", "Ray Direction", "direction")
+        self.newInput("Float", "Min Distance", "minDistance", value = 0.001, hide = True)
+        self.newInput("Float", "Max Distance", "maxDistance", value = 1e6, hide = True)
+        
+        self.newOutput("Vector", "Location", "location")
+        self.newOutput("Vector", "Normal", "normal")
+        self.newOutput("Float", "Distance", "distance")
+        self.newOutput("Integer", "Polygon Index", "polygonIndex").hide = True
+        self.newOutput("Boolean", "Hit", "hit")
 
     def getExecutionCode(self):
         yield "location, normal, polygonIndex, distance = bvhTree.ray_cast(start + direction.normalized() * minDistance, direction, maxDistance - minDistance)"

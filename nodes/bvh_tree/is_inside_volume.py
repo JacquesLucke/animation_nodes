@@ -14,9 +14,9 @@ class IsInsideVolumeBVHTreeNode(bpy.types.Node, AnimationNode):
     bl_label = "Is Inside Volume"
 
     def create(self):
-        self.newInput("an_BVHTreeSocket", "BVHTree", "bvhTree")
-        self.newInput("an_VectorSocket", "Vector", "vector").defaultDrawType = "PROPERTY_ONLY"
-        self.newOutput("an_BooleanSocket", "Is Inside", "isInside")
+        self.newInput("BVHTree", "BVHTree", "bvhTree")
+        self.newInput("Vector", "Vector", "vector", defaultDrawType = "PROPERTY_ONLY")
+        self.newOutput("Boolean", "Is Inside", "isInside")
 
     def execute(self, bvhTree, vector):
         hits1 = self.countHits(bvhTree, vector, direction1)
