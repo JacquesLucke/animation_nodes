@@ -31,7 +31,8 @@ operationItems = [
     ("ARCTANGENT2", "Arctangent B/A", "atan2 (B / A)", "", 23),
     ("HYPOTENUSE", "Hypotenuse", "hypot A, B", "", 24)]
 
-secondInputOperations = ("ADD", "SUBTRACT", "MULTIPLY", "DIVIDE", "POWER", "MINIMUM", "MAXIMUM", "MODULO", "ARCTANGENT2", "HYPOTENUSE")
+secondInputOperations = ("ADD", "SUBTRACT", "MULTIPLY", "DIVIDE", "POWER",
+                "MINIMUM", "MAXIMUM", "MODULO", "ARCTANGENT2", "HYPOTENUSE")
 baseInputOperations = ("LOGARITHM", )
 stepSizeInputOperations = ("SNAP", )
 
@@ -70,7 +71,9 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
         self.recreateInputSockets()
 
     def draw(self, layout):
-        layout.prop(self, "operation", text = "")
+        row = layout.row(align = True)
+        row.prop(self, "operation", text = "")
+        self.invokePopup(row, "drawOperationChooser", icon = "SCRIPTWIN")
 
     def drawLabel(self):
         label = operationLabels[self.operation]
@@ -170,3 +173,49 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
     @property
     def socketStep(self):
         return self.inputs.get("Step Size")
+
+    def drawOperationChooser(self, layout):
+        row = layout.row()
+
+        col = row.column()
+        subcol = col.column(align = True)
+        self.operationButton(subcol, "ADD", "Add")
+        self.operationButton(subcol, "SUBTRACT", "Subtract")
+        self.operationButton(subcol, "MULTIPLY", "Multiply")
+        self.operationButton(subcol, "DIVIDE", "Divide")
+        self.operationButton(subcol, "MODULO", "Modulo")
+        subcol = col.column(align = True)
+        self.operationButton(subcol, "INVERT", "Invert")
+        self.operationButton(subcol, "RECIPROCAL", "Reciprocal")
+
+        col = row.column()
+        subcol = col.column(align = True)
+        self.operationButton(subcol, "POWER", "Power")
+        self.operationButton(subcol, "LOGARITHM", "Logarithm")
+        self.operationButton(subcol, "SQRT", "Square Root")
+        subcol = col.column(align = True)
+        self.operationButton(subcol, "ABSOLUTE", "Absolute")
+        self.operationButton(subcol, "MINIMUM", "Minimum")
+        self.operationButton(subcol, "MAXIMUM", "Maximum")
+        self.operationButton(subcol, "FLOOR", "Floor")
+        self.operationButton(subcol, "CEILING", "Ceiling")
+        self.operationButton(subcol, "SNAP", "Snap")
+
+        col = layout.column(align = True)
+        row = col.row(align = True)
+        self.operationButton(row, "SINE", "Sine")
+        self.operationButton(row, "ARCSINE", "Arcsine")
+        row = col.row(align = True)
+        self.operationButton(row, "COSINE", "Cosine")
+        self.operationButton(row, "ARCCOSINE", "Arccosine")
+        row = col.row(align = True)
+        self.operationButton(row, "TANGENT", "Tangent")
+        self.operationButton(row, "ARCTANGENT", "Arctangent")
+        self.operationButton(row, "ARCTANGENT2", "Arctangent B/A")
+        self.operationButton(col, "HYPOTENUSE", "Hypotenuse")
+
+    def operationButton(self, layout, operation, text):
+        self.invokeFunction(layout, "setOperation", text = text, data = operation)
+
+    def setOperation(self, operation):
+        self.operation = operation
