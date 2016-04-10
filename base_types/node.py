@@ -4,9 +4,10 @@ import types
 import random
 from bpy.props import *
 from collections import defaultdict
-from .. ui.node_colors import colorNetworks
 from .. utils.handlers import eventHandler
+from .. ui.node_colors import colorNetworks
 from .. utils.nodes import getAnimationNodeTrees
+from .. sockets.info import toIdName as toSocketIdName
 from .. utils.blender_ui import iterNodeCornerLocations
 from .. operators.dynamic_operators import getInvokeFunctionOperator
 from .. tree_info import (getNetworkWithNode, getDirectlyLinkedSockets, getOriginNodes,
@@ -132,6 +133,16 @@ class AnimationNode:
             return self.drawLabel()
         else:
             return self.bl_label
+
+    def newInput(self, type, name, identifier):
+        idName = toSocketIdName(type)
+        socket = self.inputs.new(idName, name, identifier)
+        return socket
+
+    def newOutput(self, type, name, identifier):
+        idName = toSocketIdName(type)
+        socket = self.outputs.new(idName, name, identifier)
+        return socket
 
     def invokeFunction(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True, confirm = False, data = None, passEvent = False):
         idName = getInvokeFunctionOperator(description)
