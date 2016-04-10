@@ -153,6 +153,13 @@ def isIdName(name):
 def isComparable(input):
     return _socketInfo.classByType[input].comparable
 
+@returnNoneOnFailure
+def isCopyable(input):
+    return _socketInfo.classByType[input].isCopyable()
+
+def getCopyExpression(input):
+    return _socketInfo.classByType[input].getCopyExpression()
+
 
 def getListDataTypeItemsCallback(self, context):
     return getListDataTypeItems()
