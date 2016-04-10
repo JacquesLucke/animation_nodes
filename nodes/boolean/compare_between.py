@@ -18,11 +18,11 @@ compare_types_items = [(t, t, "") for t in compare_types]
 
 numericLabelTypes = ["Integer", "Float"]
 
-class IsBetweenNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_IsBetweenNode"
-    bl_label = "Is Between"
+class CompareBetweenNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_CompareBetweenNode"
+    bl_label = "Compare Between"
     dynamicLabelType = "HIDDEN_ONLY"
-    searchTags = ["Compare Between"]
+    searchTags = ["Is Between"]
 
     def assignedTypeChanged(self, context):
         self.inputIdName = toIdName(self.assignedType)
@@ -33,8 +33,6 @@ class IsBetweenNode(bpy.types.Node, AnimationNode):
 
     compareType = EnumProperty(name = "Compare Type", 
         items = compare_types_items, update = executionCodeChanged)
-    negate = BoolProperty(name = "Negate", 
-        default = False, update = executionCodeChanged)
 
     def create(self):
         self.assignedType = "Float"
@@ -42,14 +40,12 @@ class IsBetweenNode(bpy.types.Node, AnimationNode):
 
     def draw(self, layout):
         layout.prop(self, "compareType", text = "")
-        layout.prop(self, "negate")
 
     def drawAdvanced(self, layout):
         self.invokeSocketTypeChooser(layout, "assingType",
             text = "Change Type", icon = "TRIA_RIGHT")
 
     def drawLabel(self):
-        neg = "not " if self.negate else ""
         label = self.compareType
         if self.assignedType in numericLabelTypes:
             label = label.replace("value", "V")
@@ -60,13 +56,11 @@ class IsBetweenNode(bpy.types.Node, AnimationNode):
                 label = label.replace("A", str(round(self.socketA.value, 2)))
             if getattr(self.socketB, "isUnlinked", False):
                 label = label.replace("B", str(round(self.socketB.value, 2)))
-        return neg + label
+        return label
 
     def getExecutionCode(self):
         type = self.compareType.lower()
-        neg = "not " if self.negate else ""
-        
-        return "try: result = " + neg + type +"\nexcept: result = False" 
+        return "try: result = " + type +"\nexcept: result = False" 
 
     def edit(self):
         dataType = self.getWantedDataType()
