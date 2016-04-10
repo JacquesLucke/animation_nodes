@@ -101,12 +101,13 @@ listChains = [
     ["an_ShapeKeySocket",           "an_ShapeKeyListSocket"],
     ["an_BooleanSocket",            "an_BooleanListSocket"] ]
 
-
-def returnNoneOnFailure(function):
-    def wrapper(*args, **kwargs):
-        try: return function(*args, **kwargs)
-        except: return None
-    return wrapper
+def returnOnFailure(returnValue):
+    def failHandlingDecorator(function):
+        def wrapper(*args, **kwargs):
+            try: return function(*args, **kwargs)
+            except: return returnValue
+        return wrapper
+    return failHandlingDecorator
 
 # Check if list or base socket exists
 def isList(input):
@@ -116,30 +117,30 @@ def isBase(input):
     return input in _socketInfo.listIdName
 
 # to Base
-@returnNoneOnFailure
+@returnOnFailure(None)
 def toBaseIdName(input):
     return _socketInfo.baseIdName[input]
 
-@returnNoneOnFailure
+@returnOnFailure(None)
 def toBaseDataType(input):
     return _socketInfo.baseDataType[input]
 
 # to List
-@returnNoneOnFailure
+@returnOnFailure(None)
 def toListIdName(input):
     return _socketInfo.listIdName[input]
 
-@returnNoneOnFailure
+@returnOnFailure(None)
 def toListDataType(input):
     return _socketInfo.listDataType[input]
 
 # Data Type <-> Id Name
-@returnNoneOnFailure
+@returnOnFailure(None)
 def toIdName(input):
     if isIdName(input): return input
     return _socketInfo.typeConversion[input]
 
-@returnNoneOnFailure
+@returnOnFailure(None)
 def toDataType(input):
     if isIdName(input):
         return _socketInfo.typeConversion[input]
@@ -149,11 +150,11 @@ def isIdName(name):
     return name in _socketInfo.idNames
 
 
-@returnNoneOnFailure
+@returnOnFailure(False)
 def isComparable(input):
     return _socketInfo.classByType[input].comparable
 
-@returnNoneOnFailure
+@returnOnFailure(False)
 def isCopyable(input):
     return _socketInfo.classByType[input].isCopyable()
 
