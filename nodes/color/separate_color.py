@@ -26,7 +26,7 @@ class SeparateColorNode(bpy.types.Node, AnimationNode):
                                     default = "RGB", update = targetTypeChanged)
 
     def create(self):
-        self.newInput("an_ColorSocket", "Color", "color")
+        self.newInput("Color", "Color", "color")
         self.recreateOutputs()
 
     @keepNodeState
@@ -34,23 +34,23 @@ class SeparateColorNode(bpy.types.Node, AnimationNode):
         self.outputs.clear()
 
         if self.targetType == "RGB":
-            self.newOutput("an_FloatSocket", "Red", "r")
-            self.newOutput("an_FloatSocket", "Green", "g")
-            self.newOutput("an_FloatSocket", "Blue", "b")
+            self.newOutput("Float", "Red", "r")
+            self.newOutput("Float", "Green", "g")
+            self.newOutput("Float", "Blue", "b")
         elif self.targetType == "HSV":
-            self.newOutput("an_FloatSocket", "Hue", "h")
-            self.newOutput("an_FloatSocket", "Saturation", "s")
-            self.newOutput("an_FloatSocket", "Value", "v")
+            self.newOutput("Float", "Hue", "h")
+            self.newOutput("Float", "Saturation", "s")
+            self.newOutput("Float", "Value", "v")
         elif self.targetType == "HSL":
-            self.newOutput("an_FloatSocket", "Hue", "h")
-            self.newOutput("an_FloatSocket", "Saturation", "s")
-            self.newOutput("an_FloatSocket", "Lightness", "l")
+            self.newOutput("Float", "Hue", "h")
+            self.newOutput("Float", "Saturation", "s")
+            self.newOutput("Float", "Lightness", "l")
         elif self.targetType == "YIQ":
-            self.newOutput("an_FloatSocket", "Y Luma", "y")
-            self.newOutput("an_FloatSocket", "I In phase", "i")
-            self.newOutput("an_FloatSocket", "Q Quadrature", "q")
+            self.newOutput("Float", "Y Luma", "y")
+            self.newOutput("Float", "I In phase", "i")
+            self.newOutput("Float", "Q Quadrature", "q")
 
-        self.newOutput("an_FloatSocket", "Alpha", "alpha")
+        self.newOutput("Float", "Alpha", "alpha")
 
     def draw(self, layout):
         layout.prop(self, "targetType", expand = True)
