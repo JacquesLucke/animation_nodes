@@ -15,9 +15,9 @@ class ObjectAttributeOutputNode(bpy.types.Node, AnimationNode):
     errorMessage = StringProperty()
 
     def create(self):
-        self.newInput("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
-        self.newInput("an_GenericSocket", "Value", "value")
-        self.newOutput("an_ObjectSocket", "Object", "object")
+        self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
+        self.newInput("Generic", "Value", "value")
+        self.newOutput("Object", "Object", "object")
 
     def draw(self, layout):
         layout.prop(self, "attribute", text = "")

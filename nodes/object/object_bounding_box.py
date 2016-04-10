@@ -7,21 +7,21 @@ from ... base_types.node import AnimationNode
 class ObjectBoundingBoxNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectBoundingBoxNode"
     bl_label = "Object Bounding Box"
-    
+
     useWorldSpace = BoolProperty(name = "Use World Space", default = True, update = propertyChanged)
-    
+
     def create(self):
-        self.newInput("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
-        self.newOutput("an_VectorListSocket", "Vertices", "vertices")
-        self.newOutput("an_EdgeIndicesListSocket", "Edges", "edges")
-        self.newOutput("an_PolygonIndicesListSocket", "Polygons", "polygons")
-        
+        self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
+        self.newOutput("Vector List", "Vertices", "vertices")
+        self.newOutput("Edge Indices List", "Edges", "edges")
+        self.newOutput("Polygon Indices List", "Polygons", "polygons")
+
     def drawAdvanced(self, layout):
         layout.prop(self, "useWorldSpace")
-    
+
     def execute(self, object):
         if object is None: return [], [], []
-        
+
         if self.useWorldSpace:
             matrix = object.matrix_world
             vertices = [matrix * Vector(v) for v in object.bound_box]

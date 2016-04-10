@@ -15,9 +15,9 @@ class ObjectMatrixOutputNode(bpy.types.Node, AnimationNode):
     outputType = EnumProperty(items = outputItems, update = executionCodeChanged, default = "WORLD")
 
     def create(self):
-        self.newInput("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
-        self.newInput("an_MatrixSocket", "Matrix", "matrix")
-        self.newOutput("an_ObjectSocket", "Object", "outObject")
+        self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
+        self.newInput("Matrix", "Matrix", "matrix")
+        self.newOutput("Object", "Object", "outObject")
 
     def draw(self, layout):
         layout.prop(self, "outputType", text = "Type")

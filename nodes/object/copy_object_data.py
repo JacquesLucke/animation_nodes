@@ -6,9 +6,9 @@ class CopyObjectDataNode(bpy.types.Node, AnimationNode):
     bl_label = "Copy Object Data"
 
     def create(self):
-        self.newInput("an_ObjectSocket", "From", "fromObject")
-        self.newInput("an_ObjectSocket", "To", "toObject")
-        self.newOutput("an_ObjectSocket", "To", "outObject")
+        self.newInput("Object", "From", "fromObject")
+        self.newInput("Object", "To", "toObject")
+        self.newOutput("Object", "To", "outObject")
 
     def execute(self, fromObject, toObject):
         if fromObject is None or toObject is None: return toObject
