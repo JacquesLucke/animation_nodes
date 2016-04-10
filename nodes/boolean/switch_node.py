@@ -9,11 +9,9 @@ class SwitchNode(bpy.types.Node, AnimationNode):
     bl_label = "Switch"
 
     def assignedTypeChanged(self, context):
-        self.socketIdName = toIdName(self.assignedType)
         self.generateSockets()
 
     assignedType = StringProperty(update = assignedTypeChanged)
-    socketIdName = StringProperty()
 
     def create(self):
         self.assignedType = "Float"
@@ -46,7 +44,7 @@ class SwitchNode(bpy.types.Node, AnimationNode):
         self.outputs.clear()
 
         self.newInput("an_BooleanSocket", "Condition", "condition")
-        self.newInput(self.socketIdName, "If True", "ifTrue")
-        self.newInput(self.socketIdName, "If False", "ifFalse")
-        self.newOutput(self.socketIdName, "Output", "output")
-        self.newOutput(self.socketIdName, "Other", "other").hide = True
+        self.newInput(self.assignedType, "If True", "ifTrue")
+        self.newInput(self.assignedType, "If False", "ifFalse")
+        self.newOutput(self.assignedType, "Output", "output")
+        self.newOutput(self.assignedType, "Other", "other").hide = True

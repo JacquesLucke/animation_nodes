@@ -16,14 +16,14 @@ class LogicOperatorsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_LogicOperatorsNode"
     bl_label = "Logic Operators"
     dynamicLabelType = "HIDDEN_ONLY"
-    
+
     operation = EnumProperty(name = "Operation", default = "AND",
         items = operationItems, update = executionCodeChanged)
 
     def create(self):
-        self.newInput("an_BooleanSocket", "A", "a")
-        self.newInput("an_BooleanSocket", "B", "b")
-        self.newOutput("an_BooleanSocket", "Result", "result")
+        self.newInput("Boolean", "A", "a")
+        self.newInput("Boolean", "B", "b")
+        self.newOutput("Boolean", "Result", "result")
 
     def draw(self, layout):
         layout.prop(self, "operation", text = "")

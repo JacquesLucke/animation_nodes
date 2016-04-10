@@ -20,8 +20,8 @@ class BooleanListLogicNode(bpy.types.Node, AnimationNode):
         items = compareTypeItems, update = executionCodeChanged)
 
     def create(self):
-        self.newInput("an_BooleanListSocket", "Boolean List", "inList")
-        self.newOutput("an_BooleanSocket", "Result", "result")
+        self.newInput("Boolean List", "Boolean List", "inList")
+        self.newOutput("Boolean", "Result", "result")
 
     def draw(self, layout):
         layout.prop(self, "compareType", text = "")

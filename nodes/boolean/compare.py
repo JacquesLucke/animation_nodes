@@ -16,11 +16,9 @@ class CompareNode(bpy.types.Node, AnimationNode):
     dynamicLabelType = "HIDDEN_ONLY"
 
     def assignedTypeChanged(self, context):
-        self.inputIdName = toIdName(self.assignedType)
         self.generateSockets()
 
     assignedType = StringProperty(update = assignedTypeChanged)
-    inputIdName = StringProperty()
     compareType = EnumProperty(name = "Compare Type", items = compare_types_items, update = executionCodeChanged)
 
     def create(self):
@@ -42,7 +40,6 @@ class CompareNode(bpy.types.Node, AnimationNode):
     def drawAdvanced(self, layout):
         self.invokeSocketTypeChooser(layout, "assingType",
             text = "Change Type", icon = "TRIA_RIGHT")
-
 
     def getExecutionCode(self):
         type = self.compareType
@@ -74,8 +71,8 @@ class CompareNode(bpy.types.Node, AnimationNode):
     @keepNodeLinks
     def generateSockets(self):
         self.inputs.clear()
-        self.newInput(self.inputIdName, "A", "a")
-        self.newInput(self.inputIdName, "B", "b")
+        self.newInput(self.assignedType, "A", "a")
+        self.newInput(self.assignedType, "B", "b")
 
     @property
     def socketA(self):
