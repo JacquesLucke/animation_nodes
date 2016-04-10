@@ -6,9 +6,9 @@ class DelayTimeNode(bpy.types.Node, AnimationNode):
     bl_label = "Delay Time"
 
     def create(self):
-        self.inputs.new("an_FloatSocket", "Time", "time")
-        self.inputs.new("an_FloatSocket", "Delay", "delay").value = 10
-        self.outputs.new("an_FloatSocket", "Time", "outTime")
+        self.newInput("Float", "Time", "time")
+        self.newInput("Float", "Delay", "delay").value = 10
+        self.newOutput("Float", "Time", "outTime")
 
     def getExecutionCode(self):
         return "outTime = time - delay"
