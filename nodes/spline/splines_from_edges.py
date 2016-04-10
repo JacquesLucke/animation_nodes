@@ -7,9 +7,9 @@ class SplinesFromEdgesNode(bpy.types.Node, AnimationNode):
     bl_label = "Splines from Edges"
 
     def create(self):
-        self.inputs.new("an_VectorListSocket", "Vertices", "vertices").dataIsModified = True
-        self.inputs.new("an_EdgeIndicesListSocket", "Edge Indices", "edgeIndices")
-        self.outputs.new("an_SplineListSocket", "Splines", "splines")
+        self.newInput("an_VectorListSocket", "Vertices", "vertices").dataIsModified = True
+        self.newInput("an_EdgeIndicesListSocket", "Edge Indices", "edgeIndices")
+        self.newOutput("an_SplineListSocket", "Splines", "splines")
 
     def execute(self, vertices, edgeIndices):
         splines = []

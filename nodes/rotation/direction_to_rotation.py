@@ -14,11 +14,11 @@ class DirectionToRotationNode(bpy.types.Node, AnimationNode):
     guideAxis = EnumProperty(items = guideAxisItems, update = propertyChanged, default = "X")
 
     def create(self):
-        self.inputs.new("an_VectorSocket", "Direction", "direction")
-        self.inputs.new("an_VectorSocket", "Guide", "guide").value = [0.0, 0.0, 1.0]
-        self.outputs.new("an_EulerSocket", "Euler Rotation", "eulerRotation")
-        self.outputs.new("an_QuaternionSocket", "Quaternion Rotation", "quaternionRotation").hide = True
-        self.outputs.new("an_MatrixSocket", "Matrix Rotation", "matrixRotation").hide = True
+        self.newInput("an_VectorSocket", "Direction", "direction")
+        self.newInput("an_VectorSocket", "Guide", "guide").value = [0.0, 0.0, 1.0]
+        self.newOutput("an_EulerSocket", "Euler Rotation", "eulerRotation")
+        self.newOutput("an_QuaternionSocket", "Quaternion Rotation", "quaternionRotation").hide = True
+        self.newOutput("an_MatrixSocket", "Matrix Rotation", "matrixRotation").hide = True
         self.width += 20
 
     def draw(self, layout):

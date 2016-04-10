@@ -21,10 +21,10 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     def create(self):
         self.randomizeNetworkColor()
         self.subprogramName = "My Loop"
-        self.outputs.new("an_IntegerSocket", "Index")
-        self.outputs.new("an_IntegerSocket", "Iterations")
-        self.outputs.new("an_NodeControlSocket", "New Iterator").margin = 0.15
-        self.outputs.new("an_NodeControlSocket", "New Parameter").margin = 0.15
+        self.newOutput("an_IntegerSocket", "Index")
+        self.newOutput("an_IntegerSocket", "Iterations")
+        self.newOutput("an_NodeControlSocket", "New Iterator").margin = 0.15
+        self.newOutput("an_NodeControlSocket", "New Parameter").margin = 0.15
 
     def draw(self, layout):
         layout.separator()
@@ -108,14 +108,14 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
 
     def newIterator(self, listDataType, name = None):
         if name is None: name = toBaseDataType(listDataType)
-        socket = self.outputs.new(toBaseIdName(listDataType), name, "iterator_" + getRandomString(5))
+        socket = self.newOutput(toBaseIdName(listDataType), name, "iterator_" + getRandomString(5))
         socket.moveTo(self.newIteratorSocket.getIndex())
         self.setupSocket(socket, name, moveGroup = 1)
         return socket
 
     def newParameter(self, dataType, name = None, defaultValue = None):
         if name is None: name = dataType
-        socket = self.outputs.new(toIdName(dataType), name, "parameter_" + getRandomString(5))
+        socket = self.newOutput(toIdName(dataType), name, "parameter_" + getRandomString(5))
         if defaultValue: socket.setProperty(defaultValue)
         socket.moveTo(self.newParameterSocket.getIndex())
         socket.loop.copyAlways = False

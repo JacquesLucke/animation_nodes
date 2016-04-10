@@ -39,7 +39,7 @@ class ConstructInterpolationNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.createInputs()
-        self.outputs.new("an_InterpolationSocket", "Interpolation", "interpolation")
+        self.newOutput("an_InterpolationSocket", "Interpolation", "interpolation")
 
     @keepNodeState
     def createInputs(self):
@@ -47,26 +47,26 @@ class ConstructInterpolationNode(bpy.types.Node, AnimationNode):
         c = self.category
 
         if c in ("BOUNCE", "ELASTIC"):
-            socket = self.inputs.new("an_IntegerSocket", "Bounces", "intBounces")
+            socket = self.newInput("an_IntegerSocket", "Bounces", "intBounces")
             socket.value = 4
             socket.minValue = 1
 
         if c in ("POWER", "EXPONENTIAL"):
-            socket = self.inputs.new("an_IntegerSocket", "Exponent", "intExponent")
+            socket = self.newInput("an_IntegerSocket", "Exponent", "intExponent")
             socket.value = 2
             socket.minValue = 1
 
         if c in ("EXPONENTIAL", "ELASTIC"):
-            socket = self.inputs.new("an_FloatSocket", "Base", "floatBase")
+            socket = self.newInput("an_FloatSocket", "Base", "floatBase")
             socket.value = 2
             socket.minValue = 0.001
 
         if c == "ELASTIC":
-            socket = self.inputs.new("an_FloatSocket", "Exponent", "floatExponent")
+            socket = self.newInput("an_FloatSocket", "Exponent", "floatExponent")
             socket.value = 2
 
         if c in ("BACK", "BOUNCE"):
-            socket = self.inputs.new("an_FloatSocket", "Size", "floatSize")
+            socket = self.newInput("an_FloatSocket", "Size", "floatSize")
             socket.value = 1.4
 
 

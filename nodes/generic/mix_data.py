@@ -43,10 +43,10 @@ class MixDataNode(bpy.types.Node, AnimationNode):
         self.outputs.clear()
 
         idName = toIdName(self.dataType)
-        self.inputs.new("an_FloatSocket", "Factor", "factor")
-        self.inputs.new(idName, "A", "a")
-        self.inputs.new(idName, "B", "b")
-        self.outputs.new(idName, "Result", "result")
+        self.newInput("an_FloatSocket", "Factor", "factor")
+        self.newInput(idName, "A", "a")
+        self.newInput(idName, "B", "b")
+        self.newOutput(idName, "Result", "result")
 
     def getExecutionCode(self):
         lines = []

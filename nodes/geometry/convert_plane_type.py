@@ -53,10 +53,10 @@ class ConvertPlaneTypeNode(bpy.types.Node, AnimationNode):
         self.outputs.clear()
 
         if self.conversionType == "POINT_NORMAL_TO_MATRIX":
-            self.inputs.new("an_VectorSocket", "Point in Plane", "planePoint")
-            self.inputs.new("an_VectorSocket", "Plane Normal", "planeNormal").value = [0, 0, 1]
-            self.outputs.new("an_MatrixSocket", "Matrix", "matrix")
+            self.newInput("an_VectorSocket", "Point in Plane", "planePoint")
+            self.newInput("an_VectorSocket", "Plane Normal", "planeNormal").value = [0, 0, 1]
+            self.newOutput("an_MatrixSocket", "Matrix", "matrix")
         if self.conversionType == "MATRIX_TO_POINT_NORMAL":
-            self.inputs.new("an_MatrixSocket", "Matrix", "matrix")
-            self.outputs.new("an_VectorSocket", "Point in Plane", "planePoint")
-            self.outputs.new("an_VectorSocket", "Plane Normal", "planeNormal")
+            self.newInput("an_MatrixSocket", "Matrix", "matrix")
+            self.newOutput("an_VectorSocket", "Point in Plane", "planePoint")
+            self.newOutput("an_VectorSocket", "Plane Normal", "planeNormal")

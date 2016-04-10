@@ -6,8 +6,8 @@ class GetListLengthNode(bpy.types.Node, AnimationNode):
     bl_label = "Get List Length"
 
     def create(self):
-        self.inputs.new("an_GenericSocket", "List", "list")
-        self.outputs.new("an_IntegerSocket", "Length", "length")
+        self.newInput("an_GenericSocket", "List", "list")
+        self.newOutput("an_IntegerSocket", "Length", "length")
 
     def getExecutionCode(self):
         return ("try: length = len(list)",

@@ -6,8 +6,8 @@ class InvertNode(bpy.types.Node, AnimationNode):
     bl_label = "Invert Boolean"
 
     def create(self):
-        self.inputs.new("an_BooleanSocket", "Input", "input")
-        self.outputs.new("an_BooleanSocket", "Output", "output")
+        self.newInput("an_BooleanSocket", "Input", "input")
+        self.newOutput("an_BooleanSocket", "Output", "output")
 
     def getExecutionCode(self):
         return "output = not input"

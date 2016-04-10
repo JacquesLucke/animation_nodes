@@ -27,22 +27,22 @@ class LoftSplinesNode(bpy.types.Node, AnimationNode):
     surfaceDistributionType = EnumProperty(name = "Surface Distribution", default = "RESOLUTION", items = sampleDistributionTypeItems, update = propertyChanged)
 
     def create(self):
-        self.inputs.new("an_SplineListSocket", "Splines", "splines")
-        socket1 = self.inputs.new("an_IntegerSocket", "Spline Samples", "splineSamples")
-        socket2 = self.inputs.new("an_IntegerSocket", "Surface Samples", "surfaceSamples")
+        self.newInput("an_SplineListSocket", "Splines", "splines")
+        socket1 = self.newInput("an_IntegerSocket", "Spline Samples", "splineSamples")
+        socket2 = self.newInput("an_IntegerSocket", "Surface Samples", "surfaceSamples")
         for socket in (socket1, socket2):
             socket.value = 16
             socket.minValue = 2
-        self.inputs.new("an_BooleanSocket", "Cyclic", "cyclic").value = False
-        self.inputs.new("an_FloatSocket", "Smoothness", "smoothness").value = 0.3333
-        socket = self.inputs.new("an_FloatSocket", "Start", "start")
+        self.newInput("an_BooleanSocket", "Cyclic", "cyclic").value = False
+        self.newInput("an_FloatSocket", "Smoothness", "smoothness").value = 0.3333
+        socket = self.newInput("an_FloatSocket", "Start", "start")
         socket.value, socket.hide = 0.0, True
         socket.setRange(0.0, 1.0)
-        socket = self.inputs.new("an_FloatSocket", "End", "end")
+        socket = self.newInput("an_FloatSocket", "End", "end")
         socket.value, socket.hide = 1.0, True
         socket.setRange(0.0, 1.0)
-        self.outputs.new("an_VectorListSocket", "Vertices", "vertices")
-        self.outputs.new("an_PolygonIndicesListSocket", "Polygons", "polygons")
+        self.newOutput("an_VectorListSocket", "Vertices", "vertices")
+        self.newOutput("an_PolygonIndicesListSocket", "Polygons", "polygons")
         self.width += 20
         self.settingChanged(bpy.context)
 

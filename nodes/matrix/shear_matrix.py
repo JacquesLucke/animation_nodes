@@ -17,8 +17,8 @@ class ShearMatrixNode(bpy.types.Node, AnimationNode):
                     update = executionCodeChanged)
 
     def create(self):
-        self.inputs.new("an_VectorSocket", "Shear", "shear").value = [1, 1, 1]
-        self.outputs.new("an_MatrixSocket", "Matrix", "matrix")
+        self.newInput("an_VectorSocket", "Shear", "shear").value = [1, 1, 1]
+        self.newOutput("an_MatrixSocket", "Matrix", "matrix")
 
     def draw(self, layout):
         layout.prop(self, "plane", expand = True)

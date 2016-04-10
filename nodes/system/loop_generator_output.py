@@ -66,10 +66,10 @@ class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
 
         if self.addType == "APPEND": dataType = toBaseDataType(self.listDataType)
         elif self.addType == "EXTEND": dataType = self.listDataType
-        socket = self.inputs.new(toIdName(dataType), dataType, "input")
+        socket = self.newInput(toIdName(dataType), dataType, "input")
         socket.defaultDrawType = "TEXT_ONLY"
 
-        socket = self.inputs.new("an_BooleanSocket", "Condition", "condition")
+        socket = self.newInput("an_BooleanSocket", "Condition", "condition")
         socket.value = True
         socket.hide = True
 

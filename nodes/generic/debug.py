@@ -10,10 +10,10 @@ class DebugNode(bpy.types.Node, AnimationNode):
     printData = BoolProperty(name = "Print to Console", description = "Can be very slow when used often")
 
     def create(self):
-        socket = self.inputs.new("an_GenericSocket", "Data", "data")
+        socket = self.newInput("an_GenericSocket", "Data", "data")
         socket.display.text = True
         socket.text = "None"
-        socket = self.inputs.new("an_BooleanSocket", "Condition", "condition")
+        socket = self.newInput("an_BooleanSocket", "Condition", "condition")
         socket.showCreateCompareNodeButton = True
         socket.hide = True
 

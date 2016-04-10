@@ -6,27 +6,27 @@ class ParticleInfoNode(bpy.types.Node, AnimationNode):
     bl_label = "Particle Info"
 
     def create(self):
-        self.inputs.new("an_ParticleSocket", "Particle", "particle")
-        self.outputs.new("an_VectorSocket", "Location", "location")
-        self.outputs.new("an_EulerSocket", "Rotation", "rotation")
-        self.outputs.new("an_VectorSocket", "Velocity", "velocity").hide = True
-        self.outputs.new("an_EulerSocket", "Angular Velocity", "angularVelocity").hide = True
-        self.outputs.new("an_FloatSocket", "Size", "size").hide = True
-        self.outputs.new("an_StringSocket", "Alive State", "aliveState").hide = True
-        self.outputs.new("an_BooleanSocket", "Is Exist", "isExist").hide = True
-        self.outputs.new("an_BooleanSocket", "Is Visible", "isVisible").hide = True
-        self.outputs.new("an_FloatSocket", "Lifetime", "lifetime").hide = True
-        self.outputs.new("an_FloatSocket", "Birth Time", "birthTime").hide = True
-        self.outputs.new("an_FloatSocket", "Die Time", "dieTime").hide = True
-        self.outputs.new("an_VectorSocket", "Previous Location", "previousLocation").hide = True
-        self.outputs.new("an_EulerSocket", "Previous Rotation", "previousRotation").hide = True
-        self.outputs.new("an_VectorSocket", "Previous Velocity", "previousVelocity").hide = True
-        self.outputs.new("an_EulerSocket", "Previous Angular Velocity", "previousAngularVelocity").hide = True
+        self.newInput("an_ParticleSocket", "Particle", "particle")
+        self.newOutput("an_VectorSocket", "Location", "location")
+        self.newOutput("an_EulerSocket", "Rotation", "rotation")
+        self.newOutput("an_VectorSocket", "Velocity", "velocity").hide = True
+        self.newOutput("an_EulerSocket", "Angular Velocity", "angularVelocity").hide = True
+        self.newOutput("an_FloatSocket", "Size", "size").hide = True
+        self.newOutput("an_StringSocket", "Alive State", "aliveState").hide = True
+        self.newOutput("an_BooleanSocket", "Is Exist", "isExist").hide = True
+        self.newOutput("an_BooleanSocket", "Is Visible", "isVisible").hide = True
+        self.newOutput("an_FloatSocket", "Lifetime", "lifetime").hide = True
+        self.newOutput("an_FloatSocket", "Birth Time", "birthTime").hide = True
+        self.newOutput("an_FloatSocket", "Die Time", "dieTime").hide = True
+        self.newOutput("an_VectorSocket", "Previous Location", "previousLocation").hide = True
+        self.newOutput("an_EulerSocket", "Previous Rotation", "previousRotation").hide = True
+        self.newOutput("an_VectorSocket", "Previous Velocity", "previousVelocity").hide = True
+        self.newOutput("an_EulerSocket", "Previous Angular Velocity", "previousAngularVelocity").hide = True
         
-        self.outputs.new("an_FloatListSocket", "Hair Time", "hairTime").hide = True
-        self.outputs.new("an_FloatListSocket", "Hair Weight", "hairWeight").hide = True
-        self.outputs.new("an_VectorListSocket", "Hair Points", "hairPoints").hide = True
-        self.outputs.new("an_VectorListSocket", "Hair Points Local", "hairPointsLocal").hide = True
+        self.newOutput("an_FloatListSocket", "Hair Time", "hairTime").hide = True
+        self.newOutput("an_FloatListSocket", "Hair Weight", "hairWeight").hide = True
+        self.newOutput("an_VectorListSocket", "Hair Points", "hairPoints").hide = True
+        self.newOutput("an_VectorListSocket", "Hair Points Local", "hairPointsLocal").hide = True
 
     def getExecutionCode(self):
         isLinked = self.getLinkedOutputsDict()

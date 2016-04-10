@@ -75,15 +75,15 @@ class GetRandomListElementsNode(bpy.types.Node, AnimationNode):
     def generateSockets(self):
         self.inputs.clear()
         self.outputs.clear()
-        self.inputs.new("an_IntegerSocket", "Seed", "seed")
-        self.inputs.new(self.listIdName, "List", "inList").dataIsModified = True
+        self.newInput("an_IntegerSocket", "Seed", "seed")
+        self.newInput(self.listIdName, "List", "inList").dataIsModified = True
         if self.selectionType == "SINGLE":
-            self.outputs.new(toBaseIdName(self.listIdName), "Element", "outElement")
+            self.newOutput(toBaseIdName(self.listIdName), "Element", "outElement")
         elif self.selectionType == "MULTIPLE":
-            socket = self.inputs.new("an_IntegerSocket", "Amount", "amount")
+            socket = self.newInput("an_IntegerSocket", "Amount", "amount")
             socket.minValue = 0
             socket.value = 3
-            self.outputs.new(self.listIdName, "List", "outList")
+            self.newOutput(self.listIdName, "List", "outList")
 
     def duplicate(self, sourceNode):
         self.randomizeNodeSeed()

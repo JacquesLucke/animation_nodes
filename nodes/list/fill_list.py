@@ -79,7 +79,7 @@ class FillListNode(bpy.types.Node, AnimationNode):
         self.inputs.clear()
         self.outputs.clear()
 
-        self.inputs.new("an_IntegerSocket", "Length", "length")
-        self.inputs.new(self.listIdName, "List", "inList").dataIsModified = True
-        self.inputs.new(self.baseIdName, "Element", "fillElement")
-        self.outputs.new(self.listIdName, "List", "outList")
+        self.newInput("an_IntegerSocket", "Length", "length")
+        self.newInput(self.listIdName, "List", "inList").dataIsModified = True
+        self.newInput(self.baseIdName, "Element", "fillElement")
+        self.newOutput(self.listIdName, "List", "outList")

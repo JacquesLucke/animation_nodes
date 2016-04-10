@@ -34,8 +34,8 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     def create(self):
         self.randomizeNetworkColor()
         self.subprogramName = "My Script"
-        self.inputs.new("an_NodeControlSocket", "New Input", "newInput")
-        self.outputs.new("an_NodeControlSocket", "New Output", "newOutput")
+        self.newInput("an_NodeControlSocket", "New Input", "newInput")
+        self.newOutput("an_NodeControlSocket", "New Output", "newOutput")
 
     def draw(self, layout):
         layout.separator()
@@ -89,11 +89,11 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
             showTextPopup(text = text, title = "Info", icon = "INFO")
 
     def newInput(self, dataType):
-        socket = self.inputs.new(toIdName(dataType), dataType)
+        socket = self.newInput(toIdName(dataType), dataType)
         self.setupSocket(socket)
 
     def newOutput(self, dataType):
-        socket = self.outputs.new(toIdName(dataType), dataType)
+        socket = self.newOutput(toIdName(dataType), dataType)
         self.setupSocket(socket)
 
     def setupSocket(self, socket):

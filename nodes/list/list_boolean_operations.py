@@ -104,6 +104,6 @@ class ListBooleanOperationsNode(bpy.types.Node, AnimationNode):
     def generateSockets(self):
         self.inputs.clear()
         self.outputs.clear()
-        self.inputs.new(self.listIdName, "List 1", "list1").dataIsModified = True
-        self.inputs.new(self.listIdName, "List 2", "list2").dataIsModified = True
-        self.outputs.new(self.listIdName, "List", "outList")
+        self.newInput(self.listIdName, "List 1", "list1").dataIsModified = True
+        self.newInput(self.listIdName, "List 2", "list2").dataIsModified = True
+        self.newOutput(self.listIdName, "List", "outList")

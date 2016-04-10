@@ -16,14 +16,14 @@ class an_EdgesToPlanesNode(bpy.types.Node, AnimationNode):
     errorMessage = StringProperty()
 
     def create(self):
-        self.inputs.new("an_VectorListSocket", "Vertices", "vertices")
-        self.inputs.new("an_EdgeIndicesListSocket", "Edges", "edges")
-        self.inputs.new("an_FloatSocket", "Width", "width").value = 0.01
-        socket = self.inputs.new("an_VectorSocket", "Up Vector", "upVector")
+        self.newInput("an_VectorListSocket", "Vertices", "vertices")
+        self.newInput("an_EdgeIndicesListSocket", "Edges", "edges")
+        self.newInput("an_FloatSocket", "Width", "width").value = 0.01
+        socket = self.newInput("an_VectorSocket", "Up Vector", "upVector")
         socket.value = (0.001, 0.001, 0.999)
         socket.hide = True
-        self.outputs.new("an_VectorListSocket", "Vertices", "outVertices")
-        self.outputs.new("an_PolygonIndicesListSocket", "Polygons", "polygons")
+        self.newOutput("an_VectorListSocket", "Vertices", "outVertices")
+        self.newOutput("an_PolygonIndicesListSocket", "Polygons", "polygons")
         self.width += 10
 
     def draw(self, layout):

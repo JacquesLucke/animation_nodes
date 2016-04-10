@@ -78,10 +78,10 @@ class SplinesFromObjectNode(bpy.types.Node, AnimationNode):
         self.inputs.clear()
         self.outputs.clear()
 
-        self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
+        self.newInput("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
         if self.importType == "SINGLE":
-            props = self.inputs.new("an_IntegerSocket", "Index", "index")
+            props = self.newInput("an_IntegerSocket", "Index", "index")
             props.minValue = 0
-            self.outputs.new("an_SplineSocket", "Spline", "spline")
+            self.newOutput("an_SplineSocket", "Spline", "spline")
         else:
-            self.outputs.new("an_SplineListSocket", "Splines", "splines")
+            self.newOutput("an_SplineListSocket", "Splines", "splines")

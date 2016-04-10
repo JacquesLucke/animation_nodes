@@ -8,14 +8,14 @@ class ObjectVisibilityOutputNode(bpy.types.Node, AnimationNode):
     bl_label = "Object Visibility Output"
 
     def create(self):
-        self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
-        self.inputs.new("an_BooleanSocket", "Hide", "hide")
-        self.inputs.new("an_BooleanSocket", "Hide Render", "hideRender")
-        self.inputs.new("an_BooleanSocket", "Hide Select", "hideSelect")
-        self.inputs.new("an_BooleanSocket", "Show Name", "showName")
-        self.inputs.new("an_BooleanSocket", "Show Axis", "showAxis")
-        self.inputs.new("an_BooleanSocket", "Show X-Ray", "showXRay")
-        self.outputs.new("an_ObjectSocket", "Object", "object")
+        self.newInput("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
+        self.newInput("an_BooleanSocket", "Hide", "hide")
+        self.newInput("an_BooleanSocket", "Hide Render", "hideRender")
+        self.newInput("an_BooleanSocket", "Hide Select", "hideSelect")
+        self.newInput("an_BooleanSocket", "Show Name", "showName")
+        self.newInput("an_BooleanSocket", "Show Axis", "showAxis")
+        self.newInput("an_BooleanSocket", "Show X-Ray", "showXRay")
+        self.newOutput("an_ObjectSocket", "Object", "object")
 
         for socket in self.inputs[1:]:
             socket.useIsUsedProperty = True

@@ -12,9 +12,9 @@ class RotationToDirectionNode(bpy.types.Node, AnimationNode):
     directionAxis = EnumProperty(items = directionAxisItems, update = propertyChanged, default = "Z")
 
     def create(self):
-        self.inputs.new("an_EulerSocket", "Rotation", "rotation")
-        self.inputs.new("an_FloatSocket", "Length", "length").value = 1
-        self.outputs.new("an_VectorSocket", "Direction", "direction")
+        self.newInput("an_EulerSocket", "Rotation", "rotation")
+        self.newInput("an_FloatSocket", "Length", "length").value = 1
+        self.newOutput("an_VectorSocket", "Direction", "direction")
         self.width += 20
 
     def draw(self, layout):

@@ -20,7 +20,7 @@ class RotationMatrixNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.generateInput()
-        self.outputs.new("an_MatrixSocket", "Matrix", "matrix")
+        self.newOutput("an_MatrixSocket", "Matrix", "matrix")
 
     def draw(self, layout):
         layout.prop(self, "axis", expand = True)
@@ -35,7 +35,7 @@ class RotationMatrixNode(bpy.types.Node, AnimationNode):
     def generateInput(self):
         self.inputs.clear()
         socketType = "an_FloatSocket" if len(self.axis) == 1 else "an_EulerSocket"
-        self.inputs.new(socketType, "Angle", "angle")
+        self.newInput(socketType, "Angle", "angle")
 
     def getUsedModules(self):
         return ["mathutils"]

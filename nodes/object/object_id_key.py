@@ -24,7 +24,7 @@ class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
     keyName = StringProperty(name = "Key Name", update = executionCodeChanged)
 
     def create(self):
-        self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
+        self.newInput("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
         self.recreateOutputs()
 
     def drawAdvanced(self, layout):
@@ -63,18 +63,18 @@ class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
     @keepNodeLinks
     def recreateOutputs(self):
         self.outputs.clear()
-        self.outputs.new("an_BooleanSocket", "Exists", "exists")
+        self.newOutput("an_BooleanSocket", "Exists", "exists")
 
         dataType = self.keyDataType
 
         if dataType == "Transforms":
-            self.outputs.new("an_VectorSocket", "Location", "location")
-            self.outputs.new("an_EulerSocket", "Rotation", "rotation")
-            self.outputs.new("an_VectorSocket", "Scale", "scale")
-            self.outputs.new("an_MatrixSocket", "Matrix", "matrix")
+            self.newOutput("an_VectorSocket", "Location", "location")
+            self.newOutput("an_EulerSocket", "Rotation", "rotation")
+            self.newOutput("an_VectorSocket", "Scale", "scale")
+            self.newOutput("an_MatrixSocket", "Matrix", "matrix")
 
         if dataType == "String":
-            self.outputs.new("an_StringSocket", "Text", "text")
+            self.newOutput("an_StringSocket", "Text", "text")
 
         if dataType in ("Integer", "Float"):
-            self.outputs.new("an_IntegerSocket", "Number", "number")
+            self.newOutput("an_IntegerSocket", "Number", "number")

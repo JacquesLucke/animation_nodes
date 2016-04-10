@@ -12,27 +12,27 @@ class TextObjectOutputNode(bpy.types.Node, AnimationNode):
     errorMessage = StringProperty()
 
     def create(self):
-        self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
+        self.newInput("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
 
-        self.inputs.new("an_StringSocket", "Text", "text")
-        self.inputs.new("an_FloatSocket", "Size", "size").value = 1.0
-        self.inputs.new("an_FloatSocket", "Extrude", "extrude")
-        self.inputs.new("an_FloatSocket", "Shear", "shear")
-        self.inputs.new("an_FloatSocket", "Bevel Depth", "bevelDepth")
-        self.inputs.new("an_IntegerSocket", "Bevel Resolution", "bevelResolution")
+        self.newInput("an_StringSocket", "Text", "text")
+        self.newInput("an_FloatSocket", "Size", "size").value = 1.0
+        self.newInput("an_FloatSocket", "Extrude", "extrude")
+        self.newInput("an_FloatSocket", "Shear", "shear")
+        self.newInput("an_FloatSocket", "Bevel Depth", "bevelDepth")
+        self.newInput("an_IntegerSocket", "Bevel Resolution", "bevelResolution")
 
-        self.inputs.new("an_FloatSocket", "Letter Spacing", "letterSpacing").value = 1.0
-        self.inputs.new("an_FloatSocket", "Word Spacing", "wordSpacing").value = 1.0
-        self.inputs.new("an_FloatSocket", "Line Spacing", "lineSpacing").value = 1.0
+        self.newInput("an_FloatSocket", "Letter Spacing", "letterSpacing").value = 1.0
+        self.newInput("an_FloatSocket", "Word Spacing", "wordSpacing").value = 1.0
+        self.newInput("an_FloatSocket", "Line Spacing", "lineSpacing").value = 1.0
 
-        self.inputs.new("an_FloatSocket", "X Offset", "xOffset")
-        self.inputs.new("an_FloatSocket", "Y Offset", "yOffset")
-        self.inputs.new("an_StringSocket", "Align", "align").value = "CENTER"
+        self.newInput("an_FloatSocket", "X Offset", "xOffset")
+        self.newInput("an_FloatSocket", "Y Offset", "yOffset")
+        self.newInput("an_StringSocket", "Align", "align").value = "CENTER"
 
-        self.inputs.new("an_FontSocket", "Font", "font")
-        self.inputs.new("an_FontSocket", "Bold Font", "fontBold")
-        self.inputs.new("an_FontSocket", "Italic Font", "fontItalic")
-        self.inputs.new("an_FontSocket", "Bold Italic Font", "fontBoldItalic")
+        self.newInput("an_FontSocket", "Font", "font")
+        self.newInput("an_FontSocket", "Bold Font", "fontBold")
+        self.newInput("an_FontSocket", "Italic Font", "fontItalic")
+        self.newInput("an_FontSocket", "Bold Italic Font", "fontBoldItalic")
 
         for socket in self.inputs[1:]:
             socket.useIsUsedProperty = True
@@ -40,7 +40,7 @@ class TextObjectOutputNode(bpy.types.Node, AnimationNode):
         for socket in self.inputs[4:]:
             socket.hide = True
 
-        self.outputs.new("an_ObjectSocket", "Object", "object")
+        self.newOutput("an_ObjectSocket", "Object", "object")
 
     def draw(self, layout):
         if self.errorMessage != "":

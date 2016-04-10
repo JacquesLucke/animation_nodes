@@ -38,7 +38,7 @@ class SortObjectListWithDirectionTemplate(bpy.types.PropertyGroup, SortingTempla
     useInitialTransforms = BoolProperty(name = "Use Initial Transforms", default = False)
 
     def setup(self, node):
-        node.inputs.new("an_VectorSocket", "Direction", "direction").value = (0, 0, 1)
+        node.newInput("an_VectorSocket", "Direction", "direction").value = (0, 0, 1)
 
     def draw(self, layout):
         layout.prop(self, "useInitialTransforms")
@@ -62,7 +62,7 @@ class SortObjectListByPointDistanceTemplate(bpy.types.PropertyGroup, SortingTemp
     useInitialTransforms = BoolProperty(name = "Use Initial Transforms", default = False)
 
     def setup(self, node):
-        node.inputs.new("an_VectorSocket", "Point", "point")
+        node.newInput("an_VectorSocket", "Point", "point")
 
     def draw(self, layout):
         layout.prop(self, "useInitialTransforms")
@@ -97,7 +97,7 @@ class SortPolygonListWithDirectionTemplate(bpy.types.PropertyGroup, SortingTempl
     label = "Direction"
 
     def setup(self, node):
-        node.inputs.new("an_VectorSocket", "Direction", "direction").value = (0, 0, 1)
+        node.newInput("an_VectorSocket", "Direction", "direction").value = (0, 0, 1)
 
     def sort(self, polygons, reverse, direction):
         distance = distance_point_to_plane
@@ -273,16 +273,16 @@ class SortListNode(bpy.types.Node, AnimationNode):
     def generateSockets(self):
         self.inputs.clear()
         self.outputs.clear()
-        self.inputs.new(self.listIdName, "List", "inList").dataIsModified = True
-        self.inputs.new("an_BooleanSocket", "Reverse", "reverseOutput").value = False
+        self.newInput(self.listIdName, "List", "inList").dataIsModified = True
+        self.newInput("an_BooleanSocket", "Reverse", "reverseOutput").value = False
 
         if self.sortType == "KEY_LIST":
             if self.keyListType == "FLOAT":
-                self.inputs.new("an_FloatListSocket", "Key List", "keyList")
+                self.newInput("an_FloatListSocket", "Key List", "keyList")
             elif self.keyListType == "STRING":
-                self.inputs.new("an_StringListSocket", "Key List", "keyList")
+                self.newInput("an_StringListSocket", "Key List", "keyList")
 
-        self.outputs.new(self.listIdName, "Sorted List", "outList")
+        self.newOutput(self.listIdName, "Sorted List", "outList")
 
         self.setupActiveTemplate()
 

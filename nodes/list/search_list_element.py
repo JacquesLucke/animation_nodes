@@ -20,9 +20,9 @@ class SearchListElementNode(bpy.types.Node, AnimationNode):
     
     def create(self):
         self.assignedType = "Float" 
-        self.outputs.new("an_IntegerSocket", "First Index", "firstIndex")
-        self.outputs.new("an_IntegerListSocket", "All Indices", "allIndices")
-        self.outputs.new("an_IntegerSocket", "Occurrences", "occurrences")
+        self.newOutput("an_IntegerSocket", "First Index", "firstIndex")
+        self.newOutput("an_IntegerListSocket", "All Indices", "allIndices")
+        self.newOutput("an_IntegerSocket", "Occurrences", "occurrences")
         
     def drawAdvanced(self, layout):
         self.invokeSocketTypeChooser(layout, "assignListDataType",
@@ -62,5 +62,5 @@ class SearchListElementNode(bpy.types.Node, AnimationNode):
     @keepNodeLinks
     def generateSockets(self):
         self.inputs.clear()
-        self.inputs.new(self.listIdName, "List", "list").dataIsModified  = True
-        self.inputs.new(self.baseIdName, "Search", "search").dataIsModified = True
+        self.newInput(self.listIdName, "List", "list").dataIsModified  = True
+        self.newInput(self.baseIdName, "Search", "search").dataIsModified = True

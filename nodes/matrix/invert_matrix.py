@@ -6,8 +6,8 @@ class InvertMatrixNode(bpy.types.Node, AnimationNode):
     bl_label = "Invert Matrix"
 
     def create(self):
-        self.inputs.new("an_MatrixSocket", "Matrix", "matrix")
-        self.outputs.new("an_MatrixSocket", "Inverted Matrix", "invertedMatrix")
+        self.newInput("an_MatrixSocket", "Matrix", "matrix")
+        self.newOutput("an_MatrixSocket", "Inverted Matrix", "invertedMatrix")
 
     def draw(self, layout):
         layout.separator()

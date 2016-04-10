@@ -36,24 +36,24 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.recreateInputs()
-        self.outputs.new("an_ObjectSocket", "Object", "object")
+        self.newOutput("an_ObjectSocket", "Object", "object")
 
     @keepNodeState
     def recreateInputs(self):
         self.inputs.clear()
 
-        socket = self.inputs.new("an_ObjectSocket", "Object", "object")
+        socket = self.newInput("an_ObjectSocket", "Object", "object")
         socket.defaultDrawType = "PROPERTY_ONLY"
         socket.objectCreationType = "MESH"
 
         if self.meshDataType == "MESH_DATA":
-            self.inputs.new("an_MeshDataSocket", "Mesh Data", "meshData")
+            self.newInput("an_MeshDataSocket", "Mesh Data", "meshData")
         elif self.meshDataType == "BMESH":
-            self.inputs.new("an_BMeshSocket", "BMesh", "bm")
+            self.newInput("an_BMeshSocket", "BMesh", "bm")
         elif self.meshDataType == "VERTICES":
-            self.inputs.new("an_VectorListSocket", "Vertices", "vertices")
+            self.newInput("an_VectorListSocket", "Vertices", "vertices")
 
-        self.inputs.new("an_IntegerListSocket", "Material Indices", "materialIndices")
+        self.newInput("an_IntegerListSocket", "Material Indices", "materialIndices")
 
         for socket in self.inputs[1:]:
             socket.useIsUsedProperty = True

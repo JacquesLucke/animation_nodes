@@ -31,10 +31,10 @@ class FloatRangeListNode(bpy.types.Node, AnimationNode):
 
         baseIdName = toIdName(self.dataType)
         listIdName = toListIdName(self.dataType)
-        self.inputs.new("an_IntegerSocket", "Amount", "amount").value = 5
-        self.inputs.new(baseIdName, "Start", "start")
-        self.inputs.new(baseIdName, "Step", "step").value = 1
-        self.outputs.new(listIdName, "List", "list")
+        self.newInput("an_IntegerSocket", "Amount", "amount").value = 5
+        self.newInput(baseIdName, "Start", "start")
+        self.newInput(baseIdName, "Step", "step").value = 1
+        self.newOutput(listIdName, "List", "list")
 
     def getExecutionCode(self):
         if self.dataType == "Float":

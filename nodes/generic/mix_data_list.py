@@ -56,7 +56,7 @@ class MixDataListNode(bpy.types.Node, AnimationNode):
         self.inputs.clear()
         self.outputs.clear()
 
-        self.inputs.new("an_FloatSocket", "Factor", "factor")
-        self.inputs.new(toListIdName(self.dataType), toListDataType(self.dataType), "dataList")
-        self.inputs.new("an_InterpolationSocket", "Interpolation", "interpolation").defaultDrawType = "PROPERTY_ONLY"
-        self.outputs.new(toIdName(self.dataType), "Result", "result")
+        self.newInput("an_FloatSocket", "Factor", "factor")
+        self.newInput(toListIdName(self.dataType), toListDataType(self.dataType), "dataList")
+        self.newInput("an_InterpolationSocket", "Interpolation", "interpolation").defaultDrawType = "PROPERTY_ONLY"
+        self.newOutput(toIdName(self.dataType), "Result", "result")

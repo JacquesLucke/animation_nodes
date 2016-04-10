@@ -1,3 +1,4 @@
+import bpy
 from ... import tree_info
 
 def _updateSubprogramInvokerNodes():
@@ -61,7 +62,7 @@ class SubprogramData:
         for i, data in enumerate(socketData):
             couldUseOldSocket = self.changeExistingSocket(oldSockets, data, node, i)
             if couldUseOldSocket: continue
-            newSocket = self.newSocketFromData(nodeSockets, data)
+            newSocket = self.newSocketFromData(node, nodeSockets, data)
             newSocket.moveTo(i, node)
 
         self.removeUnusedSockets(nodeSockets, socketData)
@@ -77,8 +78,12 @@ class SubprogramData:
                 socket.remove()
         return False
 
-    def newSocketFromData(self, nodeSockets, data):
-        newSocket = nodeSockets.new(data.idName, data.identifier, data.identifier)
+    def newSocketFromData(self, node, nodeSockets, data):
+        if nodeSockets.bl_rna.identifier == "NodeInputs":
+            newSocket = node.newInput(data.idName, data.identifier, data.identifier)
+        else:
+            newSocket = node.newOutput(data.idName, data.identifier, data.identifier)
+
         if newSocket.isInput and not data.defaultValue == NoDefaultValue:
             newSocket.setProperty(data.defaultValue)
         newSocket.text = data.text

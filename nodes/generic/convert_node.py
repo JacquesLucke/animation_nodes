@@ -17,7 +17,7 @@ class ConvertNode(bpy.types.Node, AnimationNode):
     targetIdName = StringProperty()
 
     def create(self):
-        self.inputs.new("an_GenericSocket", "Old", "old").dataIsModified = True
+        self.newInput("an_GenericSocket", "Old", "old").dataIsModified = True
         self.assignedType = "String"
 
     def drawAdvanced(self, layout):
@@ -43,7 +43,7 @@ class ConvertNode(bpy.types.Node, AnimationNode):
     @keepNodeLinks
     def recreateOutputSocket(self):
         self.outputs.clear()
-        self.outputs.new(self.targetIdName, "New", "new")
+        self.newOutput(self.targetIdName, "New", "new")
 
     def getExecutionCode(self):
         t = self.assignedType

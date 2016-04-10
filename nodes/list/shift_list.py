@@ -45,6 +45,6 @@ class ShiftListNode(bpy.types.Node, AnimationNode):
     def generateSockets(self):
         self.inputs.clear()
         self.outputs.clear()
-        self.inputs.new(self.listIdName, "List", "inList").dataIsModified = True
-        self.inputs.new("an_IntegerSocket", "Amount", "amount")
-        self.outputs.new(self.listIdName, "Shifted List", "shiftedList")
+        self.newInput(self.listIdName, "List", "inList").dataIsModified = True
+        self.newInput("an_IntegerSocket", "Amount", "amount")
+        self.newOutput(self.listIdName, "Shifted List", "shiftedList")

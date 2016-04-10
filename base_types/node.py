@@ -134,14 +134,16 @@ class AnimationNode:
         else:
             return self.bl_label
 
-    def newInput(self, type, name, identifier, **kwargs):
+    def newInput(self, type, name, identifier = None, **kwargs):
         idName = toSocketIdName(type)
+        if identifier is None: identifier = name
         socket = self.inputs.new(idName, name, identifier)
         self._setSocketProperties(socket, kwargs)
         return socket
 
-    def newOutput(self, type, name, identifier, **kwargs):
+    def newOutput(self, type, name, identifier = None, **kwargs):
         idName = toSocketIdName(type)
+        if identifier is None: identifier = name
         socket = self.outputs.new(idName, name, identifier)
         self._setSocketProperties(socket, kwargs)
         return socket

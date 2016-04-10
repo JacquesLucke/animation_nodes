@@ -12,7 +12,7 @@ class InterpolationFromCurveMappingNode(bpy.types.Node, AnimationNode):
     curveNodeName = StringProperty(default = "")
 
     def create(self):
-        self.outputs.new("an_InterpolationSocket", "Interpolation", "interpolation")
+        self.newOutput("an_InterpolationSocket", "Interpolation", "interpolation")
         self.createCurveNode()
 
     def draw(self, layout):

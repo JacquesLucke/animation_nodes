@@ -42,5 +42,5 @@ class ReverseListNode(bpy.types.Node, AnimationNode):
     def generateSockets(self):
         self.inputs.clear()
         self.outputs.clear()
-        self.inputs.new(self.listIdName, "List", "inList").dataIsModified = True
-        self.outputs.new(self.listIdName, "Reversed List", "reversedList")
+        self.newInput(self.listIdName, "List", "inList").dataIsModified = True
+        self.newOutput(self.listIdName, "Reversed List", "reversedList")

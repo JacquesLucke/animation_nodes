@@ -7,11 +7,11 @@ class FindNearestPointInKDTreeNode(bpy.types.Node, AnimationNode):
     bl_label = "Find Nearest Point"
 
     def create(self):
-        self.inputs.new("an_KDTreeSocket", "KDTree", "kdTree")
-        self.inputs.new("an_VectorSocket", "Vector", "searchVector").defaultDrawType = "PROPERTY_ONLY"
-        self.outputs.new("an_VectorSocket", "Vector", "nearestVector")
-        self.outputs.new("an_FloatSocket", "Distance", "distance")
-        self.outputs.new("an_IntegerSocket", "Index", "index")
+        self.newInput("an_KDTreeSocket", "KDTree", "kdTree")
+        self.newInput("an_VectorSocket", "Vector", "searchVector").defaultDrawType = "PROPERTY_ONLY"
+        self.newOutput("an_VectorSocket", "Vector", "nearestVector")
+        self.newOutput("an_FloatSocket", "Distance", "distance")
+        self.newOutput("an_IntegerSocket", "Index", "index")
 
     def getExecutionCode(self):
         yield "nearestVector, index, distance = kdTree.find(searchVector)"

@@ -23,7 +23,7 @@ class ConstructBVHTreeNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.recreateInputs()
-        self.outputs.new("an_BVHTreeSocket", "BVHTree", "bvhTree")
+        self.newOutput("an_BVHTreeSocket", "BVHTree", "bvhTree")
 
     def draw(self, layout):
         layout.prop(self, "sourceType", text = "Source")
@@ -33,12 +33,12 @@ class ConstructBVHTreeNode(bpy.types.Node, AnimationNode):
         self.inputs.clear()
 
         if self.sourceType == "MESH_DATA":
-            self.inputs.new("an_VectorListSocket", "Vector List", "vectorList")
-            self.inputs.new("an_PolygonIndicesListSocket", "Polygon Indices", "polygonsIndices")
+            self.newInput("an_VectorListSocket", "Vector List", "vectorList")
+            self.newInput("an_PolygonIndicesListSocket", "Polygon Indices", "polygonsIndices")
         elif self.sourceType == "BMESH":
-            self.inputs.new("an_BMeshSocket", "BMesh", "bm")
+            self.newInput("an_BMeshSocket", "BMesh", "bm")
 
-        socket = self.inputs.new("an_FloatSocket", "Epsilon", "epsilon")
+        socket = self.newInput("an_FloatSocket", "Epsilon", "epsilon")
         socket.hide = True
         socket.minValue = 0.0
 

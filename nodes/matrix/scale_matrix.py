@@ -6,8 +6,8 @@ class ScaleMatrixNode(bpy.types.Node, AnimationNode):
     bl_label = "Scale Matrix"
 
     def create(self):
-        self.inputs.new("an_VectorSocket", "Scale", "scale").value = [1, 1, 1]
-        self.outputs.new("an_MatrixSocket", "Matrix", "matrix")
+        self.newInput("an_VectorSocket", "Scale", "scale").value = [1, 1, 1]
+        self.newOutput("an_MatrixSocket", "Matrix", "matrix")
 
     def getExecutionCode(self):
         return ("matrix ="

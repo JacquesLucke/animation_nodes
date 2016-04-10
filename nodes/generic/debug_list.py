@@ -11,8 +11,8 @@ class DebugListNode(bpy.types.Node, AnimationNode):
     inputIsIterable = BoolProperty(default = False)
 
     def create(self):
-        self.inputs.new("an_TextBlockSocket", "Text", "text")
-        self.inputs.new("an_GenericSocket", "Data", "data")
+        self.newInput("an_TextBlockSocket", "Text", "text")
+        self.newInput("an_GenericSocket", "Data", "data")
 
     def draw(self, layout):
         if not self.inputIsIterable:

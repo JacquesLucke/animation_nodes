@@ -25,7 +25,7 @@ class CompareNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.assignedType = "Float"
-        self.outputs.new("an_BooleanSocket", "Result", "result")
+        self.newOutput("an_BooleanSocket", "Result", "result")
 
     def draw(self, layout):
         layout.prop(self, "compareType", text = "Type")
@@ -74,8 +74,8 @@ class CompareNode(bpy.types.Node, AnimationNode):
     @keepNodeLinks
     def generateSockets(self):
         self.inputs.clear()
-        self.inputs.new(self.inputIdName, "A", "a")
-        self.inputs.new(self.inputIdName, "B", "b")
+        self.newInput(self.inputIdName, "A", "a")
+        self.newInput(self.inputIdName, "B", "b")
 
     @property
     def socketA(self):

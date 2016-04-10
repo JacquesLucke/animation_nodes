@@ -119,5 +119,5 @@ class CyclesMaterialOutputNode(bpy.types.Node, AnimationNode):
         socket = self.getSelectedSocket()
         if socket is not None:
             data = socket.default_value
-            self.inputs.new(allowedSocketTypes[socket.bl_idname], "Data", "data")
+            self.newInput(allowedSocketTypes[socket.bl_idname], "Data", "data")
             self.inputs["Data"].setProperty(data)

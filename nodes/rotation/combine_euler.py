@@ -11,10 +11,10 @@ class CombineEulerNode(bpy.types.Node, AnimationNode):
         update = executionCodeChanged)
 
     def create(self):
-        self.inputs.new("an_FloatSocket", "X", "x")
-        self.inputs.new("an_FloatSocket", "Y", "y")
-        self.inputs.new("an_FloatSocket", "Z", "z")
-        self.outputs.new("an_EulerSocket", "Euler", "euler")
+        self.newInput("an_FloatSocket", "X", "x")
+        self.newInput("an_FloatSocket", "Y", "y")
+        self.newInput("an_FloatSocket", "Z", "z")
+        self.newOutput("an_EulerSocket", "Euler", "euler")
 
     def draw(self, layout):
         layout.prop(self, "useDegree")

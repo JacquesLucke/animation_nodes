@@ -16,7 +16,7 @@ class DebugInterpolationNode(bpy.types.Node, AnimationNode):
     resolution = IntProperty(name = "Resolution", min = 5, default = 40)
 
     def create(self):
-        self.inputs.new("an_InterpolationSocket", "Interpolation", "interpolation").defaultDrawType = "PROPERTY_ONLY"
+        self.newInput("an_InterpolationSocket", "Interpolation", "interpolation").defaultDrawType = "PROPERTY_ONLY"
 
     def drawAdvanced(self, layout):
         layout.prop(self, "resolution")

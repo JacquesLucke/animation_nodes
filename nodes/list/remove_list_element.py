@@ -107,13 +107,13 @@ class RemoveListElementNode(bpy.types.Node, AnimationNode):
         self.outputs.clear()
 
         if self.removeType in ("FIRST_OCCURRENCE", "INDEX"):
-            self.inputs.new(self.listIdName, "List", "inList").dataIsModified = True
+            self.newInput(self.listIdName, "List", "inList").dataIsModified = True
         else:
-            self.inputs.new(self.listIdName, "List", "inList")
+            self.newInput(self.listIdName, "List", "inList")
 
         if self.removeType in ("FIRST_OCCURRENCE", "ALL_OCCURRENCES"):
-            self.inputs.new(self.baseIdName, "Element", "element").defaultDrawType = "PREFER_PROPERTY"
+            self.newInput(self.baseIdName, "Element", "element").defaultDrawType = "PREFER_PROPERTY"
         elif self.removeType == "INDEX":
-            self.inputs.new("an_IntegerSocket", "Index", "index")
+            self.newInput("an_IntegerSocket", "Index", "index")
 
-        self.outputs.new(self.listIdName, "List", "outList")
+        self.newOutput(self.listIdName, "List", "outList")

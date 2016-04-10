@@ -6,10 +6,10 @@ class VectorAngleNode(bpy.types.Node, AnimationNode):
     bl_label = "Vector Angle"
 
     def create(self):
-        self.inputs.new("an_VectorSocket", "A", "a").value = [1, 0, 0]
-        self.inputs.new("an_VectorSocket", "B", "b").value = [0, 0, 1]
-        self.outputs.new("an_FloatSocket", "Angle", "angle")
-        self.outputs.new("an_QuaternionSocket", "Rotation Difference", "rotationDifference")
+        self.newInput("an_VectorSocket", "A", "a").value = [1, 0, 0]
+        self.newInput("an_VectorSocket", "B", "b").value = [0, 0, 1]
+        self.newOutput("an_FloatSocket", "Angle", "angle")
+        self.newOutput("an_QuaternionSocket", "Rotation Difference", "rotationDifference")
         
     def getExecutionCode(self):
         isLinked = self.getLinkedOutputsDict()

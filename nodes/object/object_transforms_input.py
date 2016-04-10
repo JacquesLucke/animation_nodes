@@ -27,11 +27,11 @@ class ObjectTransformsInputNode(bpy.types.Node, AnimationNode):
         items = frameTypeItems, update = executionCodeChanged)
 
     def create(self):
-        self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
-        self.outputs.new("an_VectorSocket", "Location", "location")
-        self.outputs.new("an_EulerSocket", "Rotation", "rotation")
-        self.outputs.new("an_VectorSocket", "Scale", "scale")
-        self.outputs.new("an_QuaternionSocket", "Quaternion", "quaternion").hide = True
+        self.newInput("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
+        self.newOutput("an_VectorSocket", "Location", "location")
+        self.newOutput("an_EulerSocket", "Rotation", "rotation")
+        self.newOutput("an_VectorSocket", "Scale", "scale")
+        self.newOutput("an_QuaternionSocket", "Quaternion", "quaternion").hide = True
 
     def updateFrameSocket(self):
         if self.useCurrentTransforms:
@@ -39,7 +39,7 @@ class ObjectTransformsInputNode(bpy.types.Node, AnimationNode):
                 self.inputs["Frame"].remove()
         else:
             if "Frame" not in self.inputs:
-                self.inputs.new("an_FloatSocket", "Frame", "frame")
+                self.newInput("an_FloatSocket", "Frame", "frame")
 
     def draw(self, layout):
         if not self.useCurrentTransforms:

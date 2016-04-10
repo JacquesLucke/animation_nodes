@@ -9,13 +9,13 @@ class ProjectPointOnLineNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.width = 160
-        self.inputs.new("an_VectorSocket", "Point", "point")
-        self.inputs.new("an_VectorSocket", "Line Start", "lineStart").value = (0, 0, 0)
-        self.inputs.new("an_VectorSocket", "Line End", "lineEnd").value = (0, 0, 1)
+        self.newInput("an_VectorSocket", "Point", "point")
+        self.newInput("an_VectorSocket", "Line Start", "lineStart").value = (0, 0, 0)
+        self.newInput("an_VectorSocket", "Line End", "lineEnd").value = (0, 0, 1)
 
-        self.outputs.new("an_VectorSocket", "Projection", "projection")
-        self.outputs.new("an_FloatSocket", "Projection Factor", "factor")
-        self.outputs.new("an_FloatSocket", "Distance", "distance")
+        self.newOutput("an_VectorSocket", "Projection", "projection")
+        self.newOutput("an_FloatSocket", "Projection Factor", "factor")
+        self.newOutput("an_FloatSocket", "Distance", "distance")
 
     def getExecutionCode(self):
         isLinked = self.getLinkedOutputsDict()

@@ -45,9 +45,9 @@ class FilterBlendDataListByNameNode(bpy.types.Node, AnimationNode):
         self.inputs.clear()
         self.outputs.clear()
         idName = toListIdName(self.dataType)
-        self.inputs.new(idName, self.dataType + " List", "sourceList")
-        self.inputs.new("an_StringSocket", "Name", "name")
-        self.outputs.new(idName, self.dataType + " List", "targetList")
+        self.newInput(idName, self.dataType + " List", "sourceList")
+        self.newInput("an_StringSocket", "Name", "name")
+        self.newOutput(idName, self.dataType + " List", "targetList")
 
     def getExecutionCode(self):
         operation = "startswith" if self.filterType == "STARTS_WITH" else "endswith"

@@ -7,11 +7,11 @@ class TimecodeGeneratorNode(bpy.types.Node, AnimationNode):
     bl_label = "Timecode Generator"
 
     def create(self):
-        self.inputs.new("an_FloatSocket", "Frame", "frame")
-        socket = self.inputs.new("an_FloatSocket", "Frame Rate", "frameRate")
+        self.newInput("an_FloatSocket", "Frame", "frame")
+        socket = self.newInput("an_FloatSocket", "Frame Rate", "frameRate")
         socket.value = 25
         socket.minValue = 0
-        self.outputs.new("an_StringSocket", "Timecode", "timecode")
+        self.newOutput("an_StringSocket", "Timecode", "timecode")
 
     def execute(self, frame, frameRate):
         if frameRate > 0:

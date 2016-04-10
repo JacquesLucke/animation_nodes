@@ -10,16 +10,16 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
     bl_label = "Object Mesh Data"
 
     def create(self):
-        self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
-        self.inputs.new("an_BooleanSocket", "Use World Space", "useWorldSpace").value = True
-        self.inputs.new("an_BooleanSocket", "Use Modifiers", "useModifiers").value = False
-        self.inputs.new("an_SceneSocket", "Scene", "scene").hide = True
-        self.outputs.new("an_VectorListSocket", "Vertex Locations", "vertexLocations")
-        self.outputs.new("an_EdgeIndicesListSocket", "Edge Indices", "edgeIndices")
-        self.outputs.new("an_PolygonIndicesListSocket", "Polygon Indices", "polygonIndices")
-        self.outputs.new("an_VertexListSocket", "Vertices", "vertices")
-        self.outputs.new("an_PolygonListSocket", "Polygons", "polygons")
-        self.outputs.new("an_StringSocket", "Mesh Name", "meshName").hide = True
+        self.newInput("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
+        self.newInput("an_BooleanSocket", "Use World Space", "useWorldSpace").value = True
+        self.newInput("an_BooleanSocket", "Use Modifiers", "useModifiers").value = False
+        self.newInput("an_SceneSocket", "Scene", "scene").hide = True
+        self.newOutput("an_VectorListSocket", "Vertex Locations", "vertexLocations")
+        self.newOutput("an_EdgeIndicesListSocket", "Edge Indices", "edgeIndices")
+        self.newOutput("an_PolygonIndicesListSocket", "Polygon Indices", "polygonIndices")
+        self.newOutput("an_VertexListSocket", "Vertices", "vertices")
+        self.newOutput("an_PolygonListSocket", "Polygons", "polygons")
+        self.newOutput("an_StringSocket", "Mesh Name", "meshName").hide = True
 
     def getExecutionCode(self):
         isLinked = self.getLinkedOutputsDict()

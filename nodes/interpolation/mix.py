@@ -7,10 +7,10 @@ class MixInterpolationNode(bpy.types.Node, AnimationNode):
     bl_label = "Mix Interpolation"
 
     def create(self):
-        self.inputs.new("an_FloatSocket", "Factor", "factor").setRange(0, 1)
-        self.inputs.new("an_InterpolationSocket", "Interpolation 1", "a").defaultDrawType = "PROPERTY_ONLY"
-        self.inputs.new("an_InterpolationSocket", "Interpolation 2", "b").defaultDrawType = "PROPERTY_ONLY"
-        self.outputs.new("an_InterpolationSocket", "Interpolation", "interpolation")
+        self.newInput("an_FloatSocket", "Factor", "factor").setRange(0, 1)
+        self.newInput("an_InterpolationSocket", "Interpolation 1", "a").defaultDrawType = "PROPERTY_ONLY"
+        self.newInput("an_InterpolationSocket", "Interpolation 2", "b").defaultDrawType = "PROPERTY_ONLY"
+        self.newOutput("an_InterpolationSocket", "Interpolation", "interpolation")
 
     def execute(self, factor, a, b):
         return assignArguments(mixedInterpolation, (a, b, factor))

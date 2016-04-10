@@ -8,11 +8,11 @@ class BMeshFromObjectNode(bpy.types.Node, AnimationNode):
     bl_label = "BMesh from Object"
 
     def create(self):
-        self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
-        self.inputs.new("an_BooleanSocket", "Use World Space", "useWorldSpace").value = True
-        self.inputs.new("an_BooleanSocket", "Use Modifiers", "useModifiers").value = False
-        self.inputs.new("an_SceneSocket", "Scene", "scene").hide = True
-        self.outputs.new("an_BMeshSocket", "BMesh", "bm")
+        self.newInput("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
+        self.newInput("an_BooleanSocket", "Use World Space", "useWorldSpace").value = True
+        self.newInput("an_BooleanSocket", "Use Modifiers", "useModifiers").value = False
+        self.newInput("an_SceneSocket", "Scene", "scene").hide = True
+        self.newOutput("an_BMeshSocket", "BMesh", "bm")
 
     def execute(self, object, useWorldSpace, useModifiers, scene):
         bm = bmesh.new()

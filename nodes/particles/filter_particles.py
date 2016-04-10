@@ -13,8 +13,8 @@ class FilterParticlesNode(bpy.types.Node, AnimationNode):
     outputDead = BoolProperty(name = "Output Dead Particles", default = False, update = executionCodeChanged)
 
     def create(self):
-        self.inputs.new("an_ParticleListSocket", "Particles", "particles")
-        self.outputs.new("an_ParticleListSocket", "Particles", "filteredParticles")
+        self.newInput("an_ParticleListSocket", "Particles", "particles")
+        self.newOutput("an_ParticleListSocket", "Particles", "filteredParticles")
 
     def draw(self, layout):
         col = layout.column()

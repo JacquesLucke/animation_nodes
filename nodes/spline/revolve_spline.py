@@ -15,16 +15,16 @@ class RevolveSplineNode(bpy.types.Node, AnimationNode):
     projectionType = EnumProperty(name = "Projection Type", default = "PROJECT", items = projectionTypeItems, update = propertyChanged)
 
     def create(self):
-        self.inputs.new("an_SplineSocket", "Axis", "axis")
-        self.inputs.new("an_SplineSocket", "Profile", "profile")
-        socket = self.inputs.new("an_IntegerSocket", "Spline Samples", "splineSamples")
+        self.newInput("an_SplineSocket", "Axis", "axis")
+        self.newInput("an_SplineSocket", "Profile", "profile")
+        socket = self.newInput("an_IntegerSocket", "Spline Samples", "splineSamples")
         socket.minValue = 2
         socket.value = 16
-        socket = self.inputs.new("an_IntegerSocket", "Surface Samples", "surfaceSamples")
+        socket = self.newInput("an_IntegerSocket", "Surface Samples", "surfaceSamples")
         socket.minValue = 3
         socket.value = 16
-        self.outputs.new("an_VectorListSocket", "Vertices", "vertices")
-        self.outputs.new("an_PolygonIndicesListSocket", "Polygons", "polygons")
+        self.newOutput("an_VectorListSocket", "Vertices", "vertices")
+        self.newOutput("an_PolygonIndicesListSocket", "Polygons", "polygons")
         self.width += 20
 
     def draw(self, layout):

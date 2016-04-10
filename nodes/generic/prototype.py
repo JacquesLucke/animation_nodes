@@ -19,11 +19,11 @@ class PrototypeNode(bpy.types.Node, AnimationNode):
         self.invokeSocketTypeChooser(row, "newOutput", text = "New Output")
 
     def newInput(self, dataType):
-        socket = self.inputs.new(toIdName(dataType), dataType)
+        socket = self.newInput(toIdName(dataType), dataType)
         self.setupSocket(socket)
 
     def newOutput(self, dataType):
-        socket = self.outputs.new(toIdName(dataType), dataType)
+        socket = self.newOutput(toIdName(dataType), dataType)
         self.setupSocket(socket)
 
     def setupSocket(self, socket):

@@ -6,9 +6,9 @@ class VectorDistanceNode(bpy.types.Node, AnimationNode):
     bl_label = "Vector Distance"
 
     def create(self):
-        self.inputs.new("an_VectorSocket", "A", "a")
-        self.inputs.new("an_VectorSocket", "B", "b")
-        self.outputs.new("an_FloatSocket", "Distance", "distance")
+        self.newInput("an_VectorSocket", "A", "a")
+        self.newInput("an_VectorSocket", "B", "b")
+        self.newOutput("an_FloatSocket", "Distance", "distance")
 
     def getExecutionCode(self):
         return "distance = (a - b).length"

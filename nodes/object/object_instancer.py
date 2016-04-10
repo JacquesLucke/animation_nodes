@@ -75,15 +75,15 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.updateInputSockets()
-        self.outputs.new("an_ObjectListSocket", "Objects", "objects")
+        self.newOutput("an_ObjectListSocket", "Objects", "objects")
 
     @keepNodeState
     def updateInputSockets(self):
         self.inputs.clear()
-        self.inputs.new("an_IntegerSocket", "Instances", "instancesAmount").minValue = 0
+        self.newInput("an_IntegerSocket", "Instances", "instancesAmount").minValue = 0
         if self.copyFromSource:
-            self.inputs.new("an_ObjectSocket", "Source", "sourceObject").defaultDrawType = "PROPERTY_ONLY"
-        self.inputs.new("an_SceneListSocket", "Scenes", "scenes").hide = True
+            self.newInput("an_ObjectSocket", "Source", "sourceObject").defaultDrawType = "PROPERTY_ONLY"
+        self.newInput("an_SceneListSocket", "Scenes", "scenes").hide = True
 
     def draw(self, layout):
         layout.prop(self, "copyFromSource")

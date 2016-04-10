@@ -10,7 +10,7 @@ class DebugLoopNode(bpy.types.Node, AnimationNode):
     textBlockName = StringProperty(name = "Text")
 
     def create(self):
-        self.inputs.new("an_NodeControlSocket", "...", "control")
+        self.newInput("an_NodeControlSocket", "...", "control")
         self.newInput()
 
     def edit(self):
@@ -22,7 +22,7 @@ class DebugLoopNode(bpy.types.Node, AnimationNode):
         controlSocket.removeLinks()
 
     def newInput(self):
-        socket = self.inputs.new("an_GenericSocket", "Data", "data")
+        socket = self.newInput("an_GenericSocket", "Data", "data")
         socket.removeable = True
         socket.moveable = True
         socket["dataWidth"] = 10

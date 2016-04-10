@@ -7,11 +7,11 @@ class BMeshRemoveDoublesNode(bpy.types.Node, AnimationNode):
     bl_label = "BMesh Remove Doubles"
 
     def create(self):
-        self.inputs.new("an_BMeshSocket", "BMesh", "bm").dataIsModified = True
-        socket = self.inputs.new("an_FloatSocket", "Distance", "distance")
+        self.newInput("an_BMeshSocket", "BMesh", "bm").dataIsModified = True
+        socket = self.newInput("an_FloatSocket", "Distance", "distance")
         socket.value = 0.0001
         socket.minValue = 0.0
-        self.outputs.new("an_BMeshSocket", "BMesh", "bm")
+        self.newOutput("an_BMeshSocket", "BMesh", "bm")
 
     def getExecutionCode(self):
         return "bmesh.ops.remove_doubles(bm, verts = bm.verts, dist = distance)"

@@ -13,9 +13,9 @@ class SetVertexColorNode(bpy.types.Node, AnimationNode):
     errorMessage = StringProperty()
 
     def create(self):
-        self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
-        self.inputs.new("an_ColorSocket", "Color", "color").defaultDrawType = "PROPERTY_ONLY"
-        self.outputs.new("an_ObjectSocket", "Object", "outObject")
+        self.newInput("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
+        self.newInput("an_ColorSocket", "Color", "color").defaultDrawType = "PROPERTY_ONLY"
+        self.newOutput("an_ObjectSocket", "Object", "outObject")
 
     def draw(self, layout):
         layout.prop(self, "vertexColorName", text = "", icon = "GROUP_VCOL")

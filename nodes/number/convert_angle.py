@@ -27,8 +27,8 @@ class ConvertAngleNode(bpy.types.Node, AnimationNode):
     conversionType = EnumProperty(name = "Conversion Type", items = conversionTypeItems, update = settingChanged)
 
     def create(self):
-        socket1 = self.inputs.new("an_FloatSocket", "Angle", "inAngle")
-        socket2 = self.outputs.new("an_FloatSocket", "Angle", "outAngle")
+        socket1 = self.newInput("an_FloatSocket", "Angle", "inAngle")
+        socket2 = self.newOutput("an_FloatSocket", "Angle", "outAngle")
         for socket in [socket1, socket2]:
             socket.display.text = True
         self.conversionType = "DEGREE_TO_RADIAN"

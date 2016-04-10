@@ -27,8 +27,8 @@ class SplitTextNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.recreateInputs()
-        self.outputs.new("an_StringListSocket", "Text List", "textList")
-        self.outputs.new("an_IntegerSocket", "Length", "length")
+        self.newOutput("an_StringListSocket", "Text List", "textList")
+        self.newOutput("an_IntegerSocket", "Length", "length")
 
     def draw(self, layout):
         layout.prop(self, "splitType", text = "")
@@ -66,10 +66,10 @@ class SplitTextNode(bpy.types.Node, AnimationNode):
     @keepNodeState
     def recreateInputs(self):
         self.inputs.clear()
-        self.inputs.new("an_StringSocket", "Text", "text")
+        self.newInput("an_StringSocket", "Text", "text")
         if self.splitType == "REGULAR_EXPRESSION":
-            self.inputs.new("an_StringSocket", "Split By", "splitBy")
+            self.newInput("an_StringSocket", "Split By", "splitBy")
         if self.splitType == "N_CHARACTERS":
-            socket = self.inputs.new("an_IntegerSocket", "N", "n")
+            socket = self.newInput("an_IntegerSocket", "N", "n")
             socket.minValue = 1
             socket.value = 5

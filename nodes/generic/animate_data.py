@@ -36,16 +36,16 @@ class AnimateDataNode(bpy.types.Node, AnimationNode):
         self.outputs.clear()
 
         idName = toIdName(self.dataType)
-        self.inputs.new("an_FloatSocket", "Time", "time")
-        self.inputs.new(idName, "Start", "start")
-        self.inputs.new(idName, "End", "end")
-        self.inputs.new("an_InterpolationSocket", "Interpolation", "interpolation").defaultDrawType = "PROPERTY_ONLY"
-        socket = self.inputs.new("an_FloatSocket", "Duration", "duration")
+        self.newInput("an_FloatSocket", "Time", "time")
+        self.newInput(idName, "Start", "start")
+        self.newInput(idName, "End", "end")
+        self.newInput("an_InterpolationSocket", "Interpolation", "interpolation").defaultDrawType = "PROPERTY_ONLY"
+        socket = self.newInput("an_FloatSocket", "Duration", "duration")
         socket.minValue = 0.0001
         socket.value = 20
 
-        self.outputs.new("an_FloatSocket", "Time", "outTime")
-        self.outputs.new(idName, "Result", "result")
+        self.newOutput("an_FloatSocket", "Time", "outTime")
+        self.newOutput(idName, "Result", "result")
 
     def getExecutionCode(self):
         yield "finalDuration = max(duration, 0.0001)"

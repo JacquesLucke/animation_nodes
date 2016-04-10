@@ -46,6 +46,6 @@ class ShuffleListNode(bpy.types.Node, AnimationNode):
     def generateSockets(self):
         self.inputs.clear()
         self.outputs.clear()
-        self.inputs.new(self.listIdName, "List", "list").dataIsModified = True
-        self.inputs.new("an_IntegerSocket", "Seed", "seed")
-        self.outputs.new(self.listIdName, "Shuffled List", "list")
+        self.newInput(self.listIdName, "List", "list").dataIsModified = True
+        self.newInput("an_IntegerSocket", "Seed", "seed")
+        self.newOutput(self.listIdName, "Shuffled List", "list")

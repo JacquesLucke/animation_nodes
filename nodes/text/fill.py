@@ -15,10 +15,10 @@ class FillStringNode(bpy.types.Node, AnimationNode):
         items = fillModeItems, update = executionCodeChanged)
 
     def create(self):
-        self.inputs.new("an_IntegerSocket", "Length", "length")
-        self.inputs.new("an_StringSocket", "Text", "text")
-        self.inputs.new("an_StringSocket", "Fill", "fill")
-        self.outputs.new("an_StringSocket", "Text", "outText")
+        self.newInput("an_IntegerSocket", "Length", "length")
+        self.newInput("an_StringSocket", "Text", "text")
+        self.newInput("an_StringSocket", "Fill", "fill")
+        self.newOutput("an_StringSocket", "Text", "outText")
 
     def draw(self, layout):
         layout.prop(self, "fillMode", text = "")

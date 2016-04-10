@@ -6,8 +6,8 @@ class TranslationMatrixNode(bpy.types.Node, AnimationNode):
     bl_label = "Translation Matrix"
 
     def create(self):
-        self.inputs.new("an_VectorSocket", "Translation", "translation")
-        self.outputs.new("an_MatrixSocket", "Matrix", "matrix")
+        self.newInput("an_VectorSocket", "Translation", "translation")
+        self.newOutput("an_MatrixSocket", "Matrix", "matrix")
 
     def getExecutionCode(self):
         return "matrix = mathutils.Matrix.Translation(translation)"

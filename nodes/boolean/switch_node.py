@@ -45,8 +45,8 @@ class SwitchNode(bpy.types.Node, AnimationNode):
         self.inputs.clear()
         self.outputs.clear()
 
-        self.inputs.new("an_BooleanSocket", "Condition", "condition")
-        self.inputs.new(self.socketIdName, "If True", "ifTrue")
-        self.inputs.new(self.socketIdName, "If False", "ifFalse")
-        self.outputs.new(self.socketIdName, "Output", "output")
-        self.outputs.new(self.socketIdName, "Other", "other").hide = True
+        self.newInput("an_BooleanSocket", "Condition", "condition")
+        self.newInput(self.socketIdName, "If True", "ifTrue")
+        self.newInput(self.socketIdName, "If False", "ifFalse")
+        self.newOutput(self.socketIdName, "Output", "output")
+        self.newOutput(self.socketIdName, "Other", "other").hide = True

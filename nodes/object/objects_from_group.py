@@ -6,8 +6,8 @@ class GetObjectsFromGroupNode(bpy.types.Node, AnimationNode):
     bl_label = "Objects from Group"
 
     def create(self):
-        self.inputs.new("an_ObjectGroupSocket", "Group", "group").defaultDrawType = "PROPERTY_ONLY"
-        self.outputs.new("an_ObjectListSocket", "Objects", "objects")
+        self.newInput("an_ObjectGroupSocket", "Group", "group").defaultDrawType = "PROPERTY_ONLY"
+        self.newOutput("an_ObjectListSocket", "Objects", "objects")
 
     def execute(self, group):
         return list(getattr(group, "objects", []))

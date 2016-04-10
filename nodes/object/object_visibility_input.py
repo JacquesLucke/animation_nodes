@@ -6,13 +6,13 @@ class ObjectVisibilityInputNode(bpy.types.Node, AnimationNode):
     bl_label = "Object Visibility Input"
 
     def create(self):
-        self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
-        self.outputs.new("an_BooleanSocket", "Hide", "hide")
-        self.outputs.new("an_BooleanSocket", "Hide Select", "hideSelect").hide = True
-        self.outputs.new("an_BooleanSocket", "Hide Render", "hideRender")
-        self.outputs.new("an_BooleanSocket", "Show Name", "showName").hide = True
-        self.outputs.new("an_BooleanSocket", "Show Axis", "showAxis").hide = True
-        self.outputs.new("an_BooleanSocket", "Show Xray", "showXray").hide = True
+        self.newInput("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
+        self.newOutput("an_BooleanSocket", "Hide", "hide")
+        self.newOutput("an_BooleanSocket", "Hide Select", "hideSelect").hide = True
+        self.newOutput("an_BooleanSocket", "Hide Render", "hideRender")
+        self.newOutput("an_BooleanSocket", "Show Name", "showName").hide = True
+        self.newOutput("an_BooleanSocket", "Show Axis", "showAxis").hide = True
+        self.newOutput("an_BooleanSocket", "Show Xray", "showXray").hide = True
 
     def getExecutionCode(self):
         isLinked = self.getLinkedOutputsDict()

@@ -6,9 +6,9 @@ class ShapeKeysFromObjectNode(bpy.types.Node, AnimationNode):
     bl_label = "Shape Keys from Object"
 
     def create(self):
-        self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
-        self.outputs.new("an_ShapeKeyListSocket", "Shape Keys", "shapeKeys")
-        self.outputs.new("an_ShapeKeySocket", "Reference Key", "referenceKey")
+        self.newInput("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
+        self.newOutput("an_ShapeKeyListSocket", "Shape Keys", "shapeKeys")
+        self.newOutput("an_ShapeKeySocket", "Reference Key", "referenceKey")
 
     def execute(self, object):
         if object is None: return [], None

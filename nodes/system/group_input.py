@@ -17,7 +17,7 @@ class GroupInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     def create(self):
         self.randomizeNetworkColor()
         self.subprogramName = "My Group"
-        socket = self.outputs.new("an_NodeControlSocket", "New Parameter").margin = 0.15
+        socket = self.newOutput("an_NodeControlSocket", "New Parameter").margin = 0.15
 
     def draw(self, layout):
         layout.separator()
@@ -50,7 +50,7 @@ class GroupInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
 
     def newParameter(self, dataType, name = None, defaultValue = None):
         if name is None: name = dataType
-        socket = self.outputs.new(toIdName(dataType), name, "parameter")
+        socket = self.newOutput(toIdName(dataType), name, "parameter")
         if defaultValue is not None: socket.setProperty(defaultValue)
         socket.text = name
         socket.moveable = True

@@ -26,8 +26,8 @@ class ConvertVectorAndEulerNode(bpy.types.Node, AnimationNode):
         update = conversionTypeChanged, items = conversionTypeItems)
 
     def create(self):
-        self.inputs.new("an_VectorSocket", "Vector", "vector")
-        self.outputs.new("an_EulerSocket", "Euler", "euler")
+        self.newInput("an_VectorSocket", "Vector", "vector")
+        self.newOutput("an_EulerSocket", "Euler", "euler")
 
     def draw(self, layout):
         layout.prop(self, "conversionType", text = "")
@@ -53,9 +53,9 @@ class ConvertVectorAndEulerNode(bpy.types.Node, AnimationNode):
         self.outputs.clear()
 
         if self.conversionType == "VECTOR_TO_EULER":
-            self.inputs.new("an_VectorSocket", "Vector", "vector")
-            self.outputs.new("an_EulerSocket", "Euler", "euler")
+            self.newInput("an_VectorSocket", "Vector", "vector")
+            self.newOutput("an_EulerSocket", "Euler", "euler")
         if self.conversionType == "EULER_TO_VECTOR":
-            self.inputs.new("an_EulerSocket", "Euler", "euler")
-            self.outputs.new("an_VectorSocket", "Vector", "vector")
+            self.newInput("an_EulerSocket", "Euler", "euler")
+            self.newOutput("an_VectorSocket", "Vector", "vector")
         self.inputs[0].defaultDrawType = "PROPERTY_ONLY"

@@ -12,23 +12,23 @@ class CurveObjectOutputNode(bpy.types.Node, AnimationNode):
     errorMessage = StringProperty()
 
     def create(self):
-        socket = self.inputs.new("an_ObjectSocket", "Object", "object")
+        socket = self.newInput("an_ObjectSocket", "Object", "object")
         socket.defaultDrawType = "PROPERTY_ONLY"
         socket.objectCreationType = "CURVE"
 
-        self.inputs.new("an_SplineListSocket", "Splines", "splines").showObjectInput = False
-        self.inputs.new("an_FloatSocket", "Bevel Depth", "bevelDepth")
-        self.inputs.new("an_IntegerSocket", "Bevel Resolution", "bevelResolution")
-        self.inputs.new("an_FloatSocket", "Extrude", "extrude")
-        self.inputs.new("an_FloatSocket", "Bevel Start", "bevelStart")
-        self.inputs.new("an_FloatSocket", "Bevel End", "bevelEnd").value = 1.0
-        self.inputs.new("an_FloatSocket", "Offset", "offset")
-        self.inputs.new("an_IntegerSocket", "Preview Resolution", "previewResolution").value = 12
-        self.inputs.new("an_ObjectSocket", "Taper Object", "taperObject")
-        self.inputs.new("an_ObjectSocket", "Bevel Object", "bevelObject")
-        self.inputs.new("an_StringSocket", "Fill Mode", "fillMode").value = "FRONT"
+        self.newInput("an_SplineListSocket", "Splines", "splines").showObjectInput = False
+        self.newInput("an_FloatSocket", "Bevel Depth", "bevelDepth")
+        self.newInput("an_IntegerSocket", "Bevel Resolution", "bevelResolution")
+        self.newInput("an_FloatSocket", "Extrude", "extrude")
+        self.newInput("an_FloatSocket", "Bevel Start", "bevelStart")
+        self.newInput("an_FloatSocket", "Bevel End", "bevelEnd").value = 1.0
+        self.newInput("an_FloatSocket", "Offset", "offset")
+        self.newInput("an_IntegerSocket", "Preview Resolution", "previewResolution").value = 12
+        self.newInput("an_ObjectSocket", "Taper Object", "taperObject")
+        self.newInput("an_ObjectSocket", "Bevel Object", "bevelObject")
+        self.newInput("an_StringSocket", "Fill Mode", "fillMode").value = "FRONT"
 
-        self.outputs.new("an_ObjectSocket", "Object", "object")
+        self.newOutput("an_ObjectSocket", "Object", "object")
 
         for socket in self.inputs[1:]:
             socket.useIsUsedProperty = True

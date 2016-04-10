@@ -21,9 +21,9 @@ class LogicOperatorsNode(bpy.types.Node, AnimationNode):
         items = operationItems, update = executionCodeChanged)
 
     def create(self):
-        self.inputs.new("an_BooleanSocket", "A", "a")
-        self.inputs.new("an_BooleanSocket", "B", "b")
-        self.outputs.new("an_BooleanSocket", "Result", "result")
+        self.newInput("an_BooleanSocket", "A", "a")
+        self.newInput("an_BooleanSocket", "B", "b")
+        self.newOutput("an_BooleanSocket", "Result", "result")
 
     def draw(self, layout):
         layout.prop(self, "operation", text = "")

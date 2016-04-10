@@ -88,13 +88,13 @@ class CreateListNode(bpy.types.Node, AnimationNode):
         self.inputs.clear()
         self.outputs.clear()
 
-        self.inputs.new("an_NodeControlSocket", "...")
+        self.newInput("an_NodeControlSocket", "...")
         for i in range(inputAmount):
             self.newInputSocket()
-        self.outputs.new(self.listIdName, "List", "outList")
+        self.newOutput(self.listIdName, "List", "outList")
 
     def newInputSocket(self):
-        socket = self.inputs.new(self.baseIdName, "Element")
+        socket = self.newInput(self.baseIdName, "Element")
         socket.dataIsModified = True
         socket.display.text = True
         socket.text = "Element"

@@ -26,7 +26,7 @@ class ChangeMatrixPivotNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.width = 150
         self.generateSockets()
-        self.outputs.new("an_MatrixSocket", "Transform Matrix", "matrixOut")
+        self.newOutput("an_MatrixSocket", "Transform Matrix", "matrixOut")
 
     def draw(self, layout):
         layout.prop(self, "pivotType", text = "")
@@ -34,28 +34,28 @@ class ChangeMatrixPivotNode(bpy.types.Node, AnimationNode):
     @keepNodeState
     def generateSockets(self):
         self.inputs.clear()
-        self.inputs.new("an_MatrixSocket", "Transform Matrix", "matrix")
+        self.newInput("an_MatrixSocket", "Transform Matrix", "matrix")
         
         type = self.pivotType
         
         if type == "MATRIX":
-            self.inputs.new("an_MatrixSocket", "Pivot Matrix (Parent)", "pivotMatrix")
+            self.newInput("an_MatrixSocket", "Pivot Matrix (Parent)", "pivotMatrix")
         if type == "VECTOR":
-            self.inputs.new("an_VectorSocket", "Pivot Location", "pivot")
+            self.newInput("an_VectorSocket", "Pivot Location", "pivot")
         if type == "LOC_ROT":
-            self.inputs.new("an_VectorSocket", "Pivot Center", "pivot")
-            self.inputs.new("an_EulerSocket", "Rotation", "rotation")
+            self.newInput("an_VectorSocket", "Pivot Center", "pivot")
+            self.newInput("an_EulerSocket", "Rotation", "rotation")
 
         if type == "AXES_XXZ":
-            self.inputs.new("an_VectorSocket", "X Start (Center)", "start")
-            self.inputs.new("an_VectorSocket", "X End", "end").value = [1, 0, 0]
-            self.inputs.new("an_VectorSocket", "Z Direction (Normal)", "normal").value = [0, 0, 1]
+            self.newInput("an_VectorSocket", "X Start (Center)", "start")
+            self.newInput("an_VectorSocket", "X End", "end").value = [1, 0, 0]
+            self.newInput("an_VectorSocket", "Z Direction (Normal)", "normal").value = [0, 0, 1]
 
         if type == "AXES_XXZZ":
-            self.inputs.new("an_VectorSocket", "X Start (Center)", "startX")
-            self.inputs.new("an_VectorSocket", "X End", "endX").value = [1, 0, 0]
-            self.inputs.new("an_VectorSocket", "Z Start", "startZ")
-            self.inputs.new("an_VectorSocket", "Z End", "endZ").value = [0, 0, 1]
+            self.newInput("an_VectorSocket", "X Start (Center)", "startX")
+            self.newInput("an_VectorSocket", "X End", "endX").value = [1, 0, 0]
+            self.newInput("an_VectorSocket", "Z Start", "startZ")
+            self.newInput("an_VectorSocket", "Z End", "endZ").value = [0, 0, 1]
 
     def getExecutionCode(self):
         type = self.pivotType

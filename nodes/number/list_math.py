@@ -18,8 +18,8 @@ class NumberListMathNode(bpy.types.Node, AnimationNode):
         items = operationItems, update = executionCodeChanged)
 
     def create(self):
-        self.inputs.new("an_FloatListSocket", "Number List", "numbers")
-        self.outputs.new("an_FloatSocket", "Result", "result")
+        self.newInput("an_FloatListSocket", "Number List", "numbers")
+        self.newOutput("an_FloatSocket", "Result", "result")
 
     def draw(self, layout):
         layout.prop(self, "operation", text = "")

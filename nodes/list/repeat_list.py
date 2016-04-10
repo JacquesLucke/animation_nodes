@@ -52,12 +52,12 @@ class RepeatListNode(bpy.types.Node, AnimationNode):
         self.inputs.clear()
         self.outputs.clear()
 
-        self.inputs.new(self.listIdName, "List", "inList")
+        self.newInput(self.listIdName, "List", "inList")
         if self.amountType == "AMOUNT":
-            self.inputs.new("an_IntegerSocket", "Amount", "amount").value = 5
+            self.newInput("an_IntegerSocket", "Amount", "amount").value = 5
         elif "LENGTH" in self.amountType:
-            self.inputs.new("an_IntegerSocket", "Length", "length").value = 20
-        self.outputs.new(self.listIdName, "List", "outList")
+            self.newInput("an_IntegerSocket", "Length", "length").value = 20
+        self.newOutput(self.listIdName, "List", "outList")
 
     def draw(self, layout):
         col = layout.column()

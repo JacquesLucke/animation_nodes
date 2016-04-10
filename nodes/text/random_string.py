@@ -11,10 +11,10 @@ class RandomStringNode(bpy.types.Node, AnimationNode):
     nodeSeed = IntProperty(name = "Node Seed", update = propertyChanged)
 
     def create(self):
-        self.inputs.new("an_IntegerSocket", "Seed", "seed")
-        self.inputs.new("an_IntegerSocket", "Length", "length").value = 5
-        self.inputs.new("an_StringSocket", "Characters", "characters").value = "abcdefghijklmnopqrstuvwxyz"
-        self.outputs.new("an_StringSocket", "Text", "text")
+        self.newInput("an_IntegerSocket", "Seed", "seed")
+        self.newInput("an_IntegerSocket", "Length", "length").value = 5
+        self.newInput("an_StringSocket", "Characters", "characters").value = "abcdefghijklmnopqrstuvwxyz"
+        self.newOutput("an_StringSocket", "Text", "text")
         self.randomizeNodeSeed()
 
     def draw(self, layout):

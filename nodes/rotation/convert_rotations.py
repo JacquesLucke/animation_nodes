@@ -74,33 +74,33 @@ class ConvertRotationsNode(bpy.types.Node, AnimationNode):
         self.outputs.clear()
 
         if self.conversionType == "QUATERNION_TO_EULER":
-            self.inputs.new("an_QuaternionSocket", "Quaternion", "quaternion")
-            self.outputs.new("an_EulerSocket", "Euler", "euler")
+            self.newInput("an_QuaternionSocket", "Quaternion", "quaternion")
+            self.newOutput("an_EulerSocket", "Euler", "euler")
         if self.conversionType == "EULER_TO_QUATERNION":
-            self.inputs.new("an_EulerSocket", "Euler", "euler")
-            self.outputs.new("an_QuaternionSocket", "Quaternion", "quaternion")
+            self.newInput("an_EulerSocket", "Euler", "euler")
+            self.newOutput("an_QuaternionSocket", "Quaternion", "quaternion")
 
         if self.conversionType == "QUATERNION_TO_MATRIX":
-            self.inputs.new("an_QuaternionSocket", "Quaternion", "quaternion")
-            self.outputs.new("an_MatrixSocket", "Matrix", "matrix")
+            self.newInput("an_QuaternionSocket", "Quaternion", "quaternion")
+            self.newOutput("an_MatrixSocket", "Matrix", "matrix")
         if self.conversionType == "MATRIX_TO_QUATERNION":
-            self.inputs.new("an_MatrixSocket", "Matrix", "matrix")
-            self.outputs.new("an_QuaternionSocket", "Quaternion", "quaternion")
+            self.newInput("an_MatrixSocket", "Matrix", "matrix")
+            self.newOutput("an_QuaternionSocket", "Quaternion", "quaternion")
 
         if self.conversionType == "EULER_TO_MATRIX":
-            self.inputs.new("an_EulerSocket", "Euler", "euler")
-            self.outputs.new("an_MatrixSocket", "Matrix", "matrix")
+            self.newInput("an_EulerSocket", "Euler", "euler")
+            self.newOutput("an_MatrixSocket", "Matrix", "matrix")
         if self.conversionType == "MATRIX_TO_EULER":
-            self.inputs.new("an_MatrixSocket", "Matrix", "matrix")
-            self.outputs.new("an_EulerSocket", "Euler", "euler")
+            self.newInput("an_MatrixSocket", "Matrix", "matrix")
+            self.newOutput("an_EulerSocket", "Euler", "euler")
 
         if self.conversionType == "QUATERNION_TO_AXIS_ANGLE":
-            self.inputs.new("an_QuaternionSocket", "Quaternion", "quaternion")
-            self.outputs.new("an_VectorSocket", "Axis", "axis")
-            self.outputs.new("an_FloatSocket", "Angle", "angle")
+            self.newInput("an_QuaternionSocket", "Quaternion", "quaternion")
+            self.newOutput("an_VectorSocket", "Axis", "axis")
+            self.newOutput("an_FloatSocket", "Angle", "angle")
         if self.conversionType == "AXIS_ANGLE_TO_QUATERNION":
-            self.inputs.new("an_VectorSocket", "Axis", "axis")
-            self.inputs.new("an_FloatSocket", "Angle", "angle")
-            self.outputs.new("an_QuaternionSocket", "Quaternion", "quaternion")
+            self.newInput("an_VectorSocket", "Axis", "axis")
+            self.newInput("an_FloatSocket", "Angle", "angle")
+            self.newOutput("an_QuaternionSocket", "Quaternion", "quaternion")
 
         self.inputs[0].defaultDrawType = "PREFER_PROPERTY"

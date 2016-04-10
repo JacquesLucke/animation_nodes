@@ -15,8 +15,8 @@ class VectorListMathNode(bpy.types.Node, AnimationNode):
         items = operationItems, update = executionCodeChanged)
 
     def create(self):
-        self.inputs.new("an_VectorListSocket", "Vector List", "vectors")
-        self.outputs.new("an_VectorSocket", "Result", "result")
+        self.newInput("an_VectorListSocket", "Vector List", "vectors")
+        self.newOutput("an_VectorSocket", "Result", "result")
 
     def draw(self, layout):
         layout.prop(self, "operation", text = "")

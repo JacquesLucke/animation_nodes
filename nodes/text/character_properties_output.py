@@ -10,16 +10,16 @@ class CharacterPropertiesOutputNode(bpy.types.Node, AnimationNode):
     allowNegativeIndex = BoolProperty(default = True)
     
     def create(self):
-        self.inputs.new("an_ObjectSocket", "Text Object", "object").defaultDrawType = "PROPERTY_ONLY"
+        self.newInput("an_ObjectSocket", "Text Object", "object").defaultDrawType = "PROPERTY_ONLY"
         
-        self.inputs.new("an_IntegerSocket", "Start", "start").value = 0
-        self.inputs.new("an_IntegerSocket", "End", "end").value = -1
+        self.newInput("an_IntegerSocket", "Start", "start").value = 0
+        self.newInput("an_IntegerSocket", "End", "end").value = -1
 
-        self.inputs.new("an_IntegerSocket", "Material Index", "materialIndex").value = 0
-        self.inputs.new("an_BooleanSocket", "Bold", "bold").value = False
-        self.inputs.new("an_BooleanSocket", "Italic", "italic").value = False
-        self.inputs.new("an_BooleanSocket", "Underline", "underline").value = False
-        self.inputs.new("an_BooleanSocket", "Small Caps", "smallCaps").value = False
+        self.newInput("an_IntegerSocket", "Material Index", "materialIndex").value = 0
+        self.newInput("an_BooleanSocket", "Bold", "bold").value = False
+        self.newInput("an_BooleanSocket", "Italic", "italic").value = False
+        self.newInput("an_BooleanSocket", "Underline", "underline").value = False
+        self.newInput("an_BooleanSocket", "Small Caps", "smallCaps").value = False
         
         for socket in self.inputs[3:]:
             socket.useIsUsedProperty = True
@@ -27,7 +27,7 @@ class CharacterPropertiesOutputNode(bpy.types.Node, AnimationNode):
         for socket in self.inputs[4:]:
             socket.hide = True
         
-        self.outputs.new("an_ObjectSocket", "Object", "object")
+        self.newOutput("an_ObjectSocket", "Object", "object")
         
     def drawAdvanced(self, layout):
         layout.prop(self, "allowNegativeIndex")

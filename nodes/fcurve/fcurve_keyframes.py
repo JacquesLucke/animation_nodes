@@ -6,9 +6,9 @@ class FCurveKeyframesNode(bpy.types.Node, AnimationNode):
     bl_label = "FCurve Keyframes"
 
     def create(self):
-        self.inputs.new("an_FCurveSocket", "FCurve", "fCurve")
-        self.outputs.new("an_FloatListSocket", "Keyframes Frames", "keyframesFrames")
-        self.outputs.new("an_FloatListSocket", "Keyframes Values", "keyframesValues")
+        self.newInput("an_FCurveSocket", "FCurve", "fCurve")
+        self.newOutput("an_FloatListSocket", "Keyframes Frames", "keyframesFrames")
+        self.newOutput("an_FloatListSocket", "Keyframes Values", "keyframesValues")
 
     def getExecutionCode(self):
         isLinked = self.getLinkedOutputsDict()

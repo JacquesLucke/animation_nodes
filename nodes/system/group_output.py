@@ -19,7 +19,7 @@ class GroupOutputNode(bpy.types.Node, AnimationNode):
     groupInputIdentifier = StringProperty(update = inputNodeIdentifierChanged)
 
     def create(self):
-        socket = self.inputs.new("an_NodeControlSocket", "New Return").margin = 0.15
+        socket = self.newInput("an_NodeControlSocket", "New Return").margin = 0.15
 
     def draw(self, layout):
         if self.inInvalidNetwork:
@@ -62,7 +62,7 @@ class GroupOutputNode(bpy.types.Node, AnimationNode):
 
     def newReturn(self, dataType, name = None):
         if name is None: name = dataType
-        socket = self.inputs.new(toIdName(dataType), name, "return")
+        socket = self.newInput(toIdName(dataType), name, "return")
         socket.dataIsModified = True
         socket.text = name
         socket.moveable = True

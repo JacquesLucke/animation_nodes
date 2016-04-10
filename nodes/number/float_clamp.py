@@ -9,10 +9,10 @@ class FloatClampNode(bpy.types.Node, AnimationNode):
     dynamicLabelType = "HIDDEN_ONLY"
 
     def create(self):
-        self.inputs.new("an_FloatSocket", "Value", "value")
-        self.inputs.new("an_FloatSocket", "Min", "minValue").value = 0.0
-        self.inputs.new("an_FloatSocket", "Max", "maxValue").value = 1.0
-        self.outputs.new("an_FloatSocket", "Value", "outValue")
+        self.newInput("an_FloatSocket", "Value", "value")
+        self.newInput("an_FloatSocket", "Min", "minValue").value = 0.0
+        self.newInput("an_FloatSocket", "Max", "maxValue").value = 1.0
+        self.newOutput("an_FloatSocket", "Value", "outValue")
 
     def getExecutionCode(self):
         yield "outValue = min(max(value, minValue), maxValue)"
@@ -41,7 +41,7 @@ class FloatClampNode(bpy.types.Node, AnimationNode):
     @keepNodeLinks
     def _setOutputType(self, idName):
         self.outputs.clear()
-        self.outputs.new(idName, "Value", "outValue")
+        self.newOutput(idName, "Value", "outValue")
 
     @property
     def minValueSocket(self):

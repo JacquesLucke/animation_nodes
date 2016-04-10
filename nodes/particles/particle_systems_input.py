@@ -6,9 +6,9 @@ class ParticleSystemsInputNode(bpy.types.Node, AnimationNode):
     bl_label = "Particle Systems Input"
 
     def create(self):
-        self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
-        self.outputs.new("an_ParticleSystemListSocket", "Particle Systems", "particleSystems")
-        self.outputs.new("an_ParticleSystemSocket", "Active", "active")
+        self.newInput("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
+        self.newOutput("an_ParticleSystemListSocket", "Particle Systems", "particleSystems")
+        self.newOutput("an_ParticleSystemSocket", "Active", "active")
         self.width += 10
 
     def execute(self, object):

@@ -15,17 +15,17 @@ class GridMeshNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         divisionsSockets = [
-            self.inputs.new("an_IntegerSocket", "X Divisions", "xDivisions"),
-            self.inputs.new("an_IntegerSocket", "Y Divisions", "yDivisions") ]
+            self.newInput("an_IntegerSocket", "X Divisions", "xDivisions"),
+            self.newInput("an_IntegerSocket", "Y Divisions", "yDivisions") ]
         for socket in divisionsSockets:
             socket.value = 5
             socket.minValue = 2
-        self.inputs.new("an_FloatSocket", "X Distance", "xDistance").value = 1
-        self.inputs.new("an_FloatSocket", "Y Distance", "yDistance").value = 1
-        self.inputs.new("an_VectorSocket", "Offset", "offset").isDataModified = True
-        self.outputs.new("an_VectorListSocket", "Vertices", "vertices")
-        self.outputs.new("an_EdgeIndicesListSocket", "Edge Indices", "edgeIndices")
-        self.outputs.new("an_PolygonIndicesListSocket", "Polygon Indices", "polygonIndices")
+        self.newInput("an_FloatSocket", "X Distance", "xDistance").value = 1
+        self.newInput("an_FloatSocket", "Y Distance", "yDistance").value = 1
+        self.newInput("an_VectorSocket", "Offset", "offset").isDataModified = True
+        self.newOutput("an_VectorListSocket", "Vertices", "vertices")
+        self.newOutput("an_EdgeIndicesListSocket", "Edge Indices", "edgeIndices")
+        self.newOutput("an_PolygonIndicesListSocket", "Polygon Indices", "polygonIndices")
 
     def draw(self, layout):
         layout.prop(self, "centerGrid")

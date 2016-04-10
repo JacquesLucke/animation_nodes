@@ -16,9 +16,9 @@ class SplineFromPointsNode(bpy.types.Node, AnimationNode):
     splineType = EnumProperty(name = "Spline Type", items = splineTypeItems, update = propertyChanged)
 
     def create(self):
-        self.inputs.new("an_VectorListSocket", "Points", "points")
-        self.inputs.new("an_BooleanSocket", "Cyclic", "cyclic").value = False
-        self.outputs.new("an_SplineSocket", "Spline", "spline")
+        self.newInput("an_VectorListSocket", "Points", "points")
+        self.newInput("an_BooleanSocket", "Cyclic", "cyclic").value = False
+        self.newOutput("an_SplineSocket", "Spline", "spline")
 
     def draw(self, layout):
         layout.prop(self, "splineType", text = "")

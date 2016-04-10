@@ -7,18 +7,18 @@ class FindNearestSurfacePointNode(bpy.types.Node, AnimationNode):
     bl_width_default = 165
 
     def create(self):
-        self.inputs.new("an_BVHTreeSocket", "BVHTree", "bvhTree")
-        self.inputs.new("an_VectorSocket", "Vector", "vector").defaultDrawType = "PROPERTY_ONLY"
-        socket = self.inputs.new("an_FloatSocket", "Max Distance", "maxDistance")
+        self.newInput("an_BVHTreeSocket", "BVHTree", "bvhTree")
+        self.newInput("an_VectorSocket", "Vector", "vector").defaultDrawType = "PROPERTY_ONLY"
+        socket = self.newInput("an_FloatSocket", "Max Distance", "maxDistance")
         socket.minValue = 0.0
         socket.value = 1e6
         socket.hide = True
 
-        self.outputs.new("an_VectorSocket", "Location", "location")
-        self.outputs.new("an_VectorSocket", "Normal", "normal")
-        self.outputs.new("an_FloatSocket", "Distance", "distance")
-        self.outputs.new("an_IntegerSocket", "Polygon Index", "polygonIndex").hide = True
-        self.outputs.new("an_BooleanSocket", "Hit", "hit")
+        self.newOutput("an_VectorSocket", "Location", "location")
+        self.newOutput("an_VectorSocket", "Normal", "normal")
+        self.newOutput("an_FloatSocket", "Distance", "distance")
+        self.newOutput("an_IntegerSocket", "Polygon Index", "polygonIndex").hide = True
+        self.newOutput("an_BooleanSocket", "Hit", "hit")
 
     def getExecutionCode(self):
         yield "location, normal, polygonIndex, distance = bvhTree.find_nearest(vector, maxDistance)"

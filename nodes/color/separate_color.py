@@ -26,7 +26,7 @@ class SeparateColorNode(bpy.types.Node, AnimationNode):
                                     default = "RGB", update = targetTypeChanged)
 
     def create(self):
-        self.inputs.new("an_ColorSocket", "Color", "color")
+        self.newInput("an_ColorSocket", "Color", "color")
         self.recreateOutputs()
 
     @keepNodeState
@@ -34,23 +34,23 @@ class SeparateColorNode(bpy.types.Node, AnimationNode):
         self.outputs.clear()
 
         if self.targetType == "RGB":
-            self.outputs.new("an_FloatSocket", "Red", "r")
-            self.outputs.new("an_FloatSocket", "Green", "g")
-            self.outputs.new("an_FloatSocket", "Blue", "b")
+            self.newOutput("an_FloatSocket", "Red", "r")
+            self.newOutput("an_FloatSocket", "Green", "g")
+            self.newOutput("an_FloatSocket", "Blue", "b")
         elif self.targetType == "HSV":
-            self.outputs.new("an_FloatSocket", "Hue", "h")
-            self.outputs.new("an_FloatSocket", "Saturation", "s")
-            self.outputs.new("an_FloatSocket", "Value", "v")
+            self.newOutput("an_FloatSocket", "Hue", "h")
+            self.newOutput("an_FloatSocket", "Saturation", "s")
+            self.newOutput("an_FloatSocket", "Value", "v")
         elif self.targetType == "HSL":
-            self.outputs.new("an_FloatSocket", "Hue", "h")
-            self.outputs.new("an_FloatSocket", "Saturation", "s")
-            self.outputs.new("an_FloatSocket", "Lightness", "l")
+            self.newOutput("an_FloatSocket", "Hue", "h")
+            self.newOutput("an_FloatSocket", "Saturation", "s")
+            self.newOutput("an_FloatSocket", "Lightness", "l")
         elif self.targetType == "YIQ":
-            self.outputs.new("an_FloatSocket", "Y Luma", "y")
-            self.outputs.new("an_FloatSocket", "I In phase", "i")
-            self.outputs.new("an_FloatSocket", "Q Quadrature", "q")
+            self.newOutput("an_FloatSocket", "Y Luma", "y")
+            self.newOutput("an_FloatSocket", "I In phase", "i")
+            self.newOutput("an_FloatSocket", "Q Quadrature", "q")
 
-        self.outputs.new("an_FloatSocket", "Alpha", "alpha")
+        self.newOutput("an_FloatSocket", "Alpha", "alpha")
 
     def draw(self, layout):
         layout.prop(self, "targetType", expand = True)

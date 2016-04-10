@@ -6,10 +6,10 @@ class DecomposeMatrixNode(bpy.types.Node, AnimationNode):
     bl_label = "Decompose Matrix"
 
     def create(self):
-        self.inputs.new("an_MatrixSocket", "Matrix", "matrix")
-        self.outputs.new("an_VectorSocket", "Translation", "translation")
-        self.outputs.new("an_EulerSocket", "Rotation", "rotation")
-        self.outputs.new("an_VectorSocket", "Scale", "scale")
+        self.newInput("an_MatrixSocket", "Matrix", "matrix")
+        self.newOutput("an_VectorSocket", "Translation", "translation")
+        self.newOutput("an_EulerSocket", "Rotation", "rotation")
+        self.newOutput("an_VectorSocket", "Scale", "scale")
 
     def getExecutionCode(self):
         isLinked = self.getLinkedOutputsDict()

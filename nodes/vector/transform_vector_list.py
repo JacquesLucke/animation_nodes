@@ -6,9 +6,9 @@ class TransformVectorListNode(bpy.types.Node, AnimationNode):
     bl_label = "Transform Vector List"
 
     def create(self):
-        self.inputs.new("an_VectorListSocket", "Vector List", "vectors")
-        self.inputs.new("an_MatrixSocket", "Matrix", "matrix")
-        self.outputs.new("an_VectorListSocket", "Vector", "transformedVectors")
+        self.newInput("an_VectorListSocket", "Vector List", "vectors")
+        self.newInput("an_MatrixSocket", "Matrix", "matrix")
+        self.newOutput("an_VectorListSocket", "Vector", "transformedVectors")
 
     def getExecutionCode(self):
         return "transformedVectors = [matrix * vector for vector in vectors]"

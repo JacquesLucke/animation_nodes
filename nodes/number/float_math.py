@@ -67,7 +67,7 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
         items = operationItems, update = operationChanged)
 
     def create(self):
-        self.outputs.new("an_FloatSocket", "Result", "result")
+        self.newOutput("an_FloatSocket", "Result", "result")
         self.recreateInputSockets()
 
     def draw(self, layout):
@@ -144,19 +144,19 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
     @keepNodeLinks
     def _setOutputType(self, idName):
         self.outputs.clear()
-        self.outputs.new(idName, "Result", "result")
+        self.newOutput(idName, "Result", "result")
 
     @keepNodeState
     def recreateInputSockets(self):
         self.inputs.clear()
 
-        self.inputs.new("an_FloatSocket", "A", "a")
+        self.newInput("an_FloatSocket", "A", "a")
         if self.operation in secondInputOperations:
-            self.inputs.new("an_FloatSocket", "B", "b").value = 1
+            self.newInput("an_FloatSocket", "B", "b").value = 1
         if self.operation in baseInputOperations:
-            self.inputs.new("an_FloatSocket", "Base", "base")
+            self.newInput("an_FloatSocket", "Base", "base")
         if self.operation in stepSizeInputOperations:
-            self.inputs.new("an_FloatSocket", "Step Size", "stepSize")
+            self.newInput("an_FloatSocket", "Step Size", "stepSize")
 
     @property
     def socketA(self):

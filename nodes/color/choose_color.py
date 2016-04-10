@@ -12,8 +12,8 @@ class ChooseColorNode(bpy.types.Node, AnimationNode):
         soft_min = 0.0, soft_max = 1.0, update = propertyChanged)
 
     def create(self):
-        self.inputs.new("an_FloatSocket", "Alpha", "alpha").value = 1.0
-        self.outputs.new("an_ColorSocket", "Color", "color")
+        self.newInput("an_FloatSocket", "Alpha", "alpha").value = 1.0
+        self.newOutput("an_ColorSocket", "Color", "color")
 
     def draw(self, layout):
         layout.template_color_picker(self, "colorProperty", value_slider = True)

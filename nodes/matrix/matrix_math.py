@@ -12,9 +12,9 @@ class MatrixMathNode(bpy.types.Node, AnimationNode):
     operation = EnumProperty(name = "Operation", items = operationItems, update = executionCodeChanged)
 
     def create(self):
-        self.inputs.new("an_MatrixSocket", "A", "a")
-        self.inputs.new("an_MatrixSocket", "B", "b")
-        self.outputs.new("an_MatrixSocket", "Result", "result")
+        self.newInput("an_MatrixSocket", "A", "a")
+        self.newInput("an_MatrixSocket", "B", "b")
+        self.newOutput("an_MatrixSocket", "Result", "result")
 
     def draw(self, layout):
         layout.prop(self, "operation", text = "")

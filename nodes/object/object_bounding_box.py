@@ -11,10 +11,10 @@ class ObjectBoundingBoxNode(bpy.types.Node, AnimationNode):
     useWorldSpace = BoolProperty(name = "Use World Space", default = True, update = propertyChanged)
     
     def create(self):
-        self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
-        self.outputs.new("an_VectorListSocket", "Vertices", "vertices")
-        self.outputs.new("an_EdgeIndicesListSocket", "Edges", "edges")
-        self.outputs.new("an_PolygonIndicesListSocket", "Polygons", "polygons")
+        self.newInput("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
+        self.newOutput("an_VectorListSocket", "Vertices", "vertices")
+        self.newOutput("an_EdgeIndicesListSocket", "Edges", "edges")
+        self.newOutput("an_PolygonIndicesListSocket", "Polygons", "polygons")
         
     def drawAdvanced(self, layout):
         layout.prop(self, "useWorldSpace")

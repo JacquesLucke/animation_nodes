@@ -6,32 +6,32 @@ class SequenceInfoNode(bpy.types.Node, AnimationNode):
     bl_label = "Sequence Info"
 
     def create(self):
-        self.inputs.new("an_SequenceSocket", "Sequence", "sequence").defaultDrawType = "PROPERTY_ONLY"
+        self.newInput("an_SequenceSocket", "Sequence", "sequence").defaultDrawType = "PROPERTY_ONLY"
 
-        self.outputs.new("an_StringSocket", "Name", "name")
-        self.outputs.new("an_StringSocket", "Type", "type")
-        self.outputs.new("an_IntegerSocket", "Channel", "channel")
-        self.outputs.new("an_IntegerSocket", "Final Duration", "finalDuration")
-        self.outputs.new("an_IntegerSocket", "Final Start Frame", "finalStartFrame")
-        self.outputs.new("an_IntegerSocket", "Final End Frame", "finalEndFrame")
+        self.newOutput("an_StringSocket", "Name", "name")
+        self.newOutput("an_StringSocket", "Type", "type")
+        self.newOutput("an_IntegerSocket", "Channel", "channel")
+        self.newOutput("an_IntegerSocket", "Final Duration", "finalDuration")
+        self.newOutput("an_IntegerSocket", "Final Start Frame", "finalStartFrame")
+        self.newOutput("an_IntegerSocket", "Final End Frame", "finalEndFrame")
 
-        self.outputs.new("an_FloatSocket", "Opacity", "opacity")
-        self.outputs.new("an_StringSocket", "Blend Type", "blendType")
-        self.outputs.new("an_FloatSocket", "Effect Fader", "effectFader")
+        self.newOutput("an_FloatSocket", "Opacity", "opacity")
+        self.newOutput("an_StringSocket", "Blend Type", "blendType")
+        self.newOutput("an_FloatSocket", "Effect Fader", "effectFader")
 
-        self.outputs.new("an_IntegerSocket", "Start Frame", "startFrame")
-        self.outputs.new("an_IntegerSocket", "Start Offset", "startOffset")
-        self.outputs.new("an_IntegerSocket", "End Offset", "endOffset")
-        self.outputs.new("an_IntegerSocket", "Total Duration", "totalDuration")
-        self.outputs.new("an_IntegerSocket", "Still Frame Start", "stillFrameStart")
-        self.outputs.new("an_IntegerSocket", "Still Frame End", "stillFrameEnd")
+        self.newOutput("an_IntegerSocket", "Start Frame", "startFrame")
+        self.newOutput("an_IntegerSocket", "Start Offset", "startOffset")
+        self.newOutput("an_IntegerSocket", "End Offset", "endOffset")
+        self.newOutput("an_IntegerSocket", "Total Duration", "totalDuration")
+        self.newOutput("an_IntegerSocket", "Still Frame Start", "stillFrameStart")
+        self.newOutput("an_IntegerSocket", "Still Frame End", "stillFrameEnd")
 
-        self.outputs.new("an_BooleanSocket", "Lock", "lock")
-        self.outputs.new("an_BooleanSocket", "Mute", "mute")
-        self.outputs.new("an_BooleanSocket", "Select", "select")
-        self.outputs.new("an_FloatSocket", "Speed Factor", "speedFactor")
-        self.outputs.new("an_BooleanSocket", "Use Default Fade", "useDefaultFade")
-        self.outputs.new("an_BooleanSocket", "Use Linear Modifiers", "useLinearModifiers")
+        self.newOutput("an_BooleanSocket", "Lock", "lock")
+        self.newOutput("an_BooleanSocket", "Mute", "mute")
+        self.newOutput("an_BooleanSocket", "Select", "select")
+        self.newOutput("an_FloatSocket", "Speed Factor", "speedFactor")
+        self.newOutput("an_BooleanSocket", "Use Default Fade", "useDefaultFade")
+        self.newOutput("an_BooleanSocket", "Use Linear Modifiers", "useLinearModifiers")
 
         for socket in self.outputs[6:]:
             socket.hide = True

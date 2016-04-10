@@ -13,15 +13,15 @@ class EulerWiggleNode(bpy.types.Node, AnimationNode):
     nodeSeed = IntProperty(update = propertyChanged)
 
     def create(self):
-        self.inputs.new("an_FloatSocket", "Seed", "seed")
-        self.inputs.new("an_FloatSocket", "Evolution", "evolution")
-        socket = self.inputs.new("an_FloatSocket", "Speed", "speed")
+        self.newInput("an_FloatSocket", "Seed", "seed")
+        self.newInput("an_FloatSocket", "Evolution", "evolution")
+        socket = self.newInput("an_FloatSocket", "Speed", "speed")
         socket.value = 1
         socket.minValue = 0
-        self.inputs.new("an_EulerSocket", "Amplitude", "amplitude").value = [radians(30), radians(30), radians(30)]
-        self.inputs.new("an_IntegerSocket", "Octaves", "octaves").value = 2
-        self.inputs.new("an_FloatSocket", "Persistance", "persistance").value = 0.3
-        self.outputs.new("an_EulerSocket", "Euler", "euler")
+        self.newInput("an_EulerSocket", "Amplitude", "amplitude").value = [radians(30), radians(30), radians(30)]
+        self.newInput("an_IntegerSocket", "Octaves", "octaves").value = 2
+        self.newInput("an_FloatSocket", "Persistance", "persistance").value = 0.3
+        self.newOutput("an_EulerSocket", "Euler", "euler")
 
     def draw(self, layout):
         layout.prop(self, "nodeSeed", text = "Node Seed")

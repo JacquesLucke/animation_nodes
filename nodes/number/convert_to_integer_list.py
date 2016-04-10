@@ -21,7 +21,7 @@ class ConvertToIntegerListNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.recreateInput()
-        self.outputs.new("an_IntegerListSocket", "Integer List", "integerList")
+        self.newOutput("an_IntegerListSocket", "Integer List", "integerList")
 
     def drawAdvanced(self, layout):
         layout.prop(self, "originType")
@@ -45,4 +45,4 @@ class ConvertToIntegerListNode(bpy.types.Node, AnimationNode):
     @keepNodeState
     def recreateInput(self):
         self.inputs.clear()
-        self.inputs.new(toIdName(self.originType), self.originType, "inList")
+        self.newInput(toIdName(self.originType), self.originType, "inList")

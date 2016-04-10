@@ -34,10 +34,10 @@ class EvaluateSoundNode(bpy.types.Node, AnimationNode):
         items = soundTypeItems, update = soundTypeChanged)
 
     def create(self):
-        self.inputs.new("an_SoundSocket", "Sound", "sound")
-        self.inputs.new("an_FloatSocket", "Frame", "frame").hide = True
-        self.outputs.new("an_FloatSocket", "Strength", "strength")
-        self.outputs.new("an_FloatListSocket", "Strengths", "strengths").hide = True
+        self.newInput("an_SoundSocket", "Sound", "sound")
+        self.newInput("an_FloatSocket", "Frame", "frame").hide = True
+        self.newOutput("an_FloatSocket", "Strength", "strength")
+        self.newOutput("an_FloatListSocket", "Strengths", "strengths").hide = True
 
     def draw(self, layout):
         layout.prop(self, "soundType", text = "Type")
