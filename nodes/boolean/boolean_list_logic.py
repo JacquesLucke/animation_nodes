@@ -1,0 +1,44 @@
+import bpy
+from bpy.props import *
+from ... events import executionCodeChanged
+from ... base_types.node import AnimationNode
+
+compareTypeItems = [
+    ("ALL_TRUE", "All True", "Only true if all elements are true", "NONE", 0),
+    ("ALL_FALSE", "All False", "Only true if all elements are false", "NONE", 1),
+    ("NOT_ALL_TRUE", "Not All True", "Only true if at least one element if false", "NONE", 2),
+    ("NOT_ALL_FALSE", "Not All False", "Only true if at least one element is true", "NONE", 3)]
+
+compareLabels = {t[0] : t[1] for t in compareTypeItems}
+
+class BooleanListLogicNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_BooleanListLogicNode"
+    bl_label = "Boolean List Logic"
+    dynamicLabelType = "HIDDEN_ONLY"
+
+    compareType = EnumProperty(name = "Compare Type", default = "ALL_TRUE",
+        items = compareTypeItems, update = executionCodeChanged)
+
+    def create(self):
+        self.inputs.new("an_BooleanListSocket", "Boolean List", "inList")
+        self.outputs.new("an_BooleanSocket", "Result", "result")
+
+    def draw(self, layout):
+        layout.prop(self, "compareType", text = "")
+
+    def drawLabel(self):
+        return compareLabels[self.compareType]
+
+    def getExecutionCode(self):
+        t = self.compareType
+
+        yield "if len(inList) > 0:"
+        if t == "ALL_TRUE":        yield "    result = all(inList)"
+        elif t == "ALL_FALSE":     yield "    result = not any(inList)"
+        elif t == "NOT_ALL_TRUE":  yield "    result = not all(inList)"
+        elif t == "NOT_ALL_FALSE": yield "    result = any(inList)"
+        yield "else:"
+        if t == "ALL_TRUE":        yield "    result = True"
+        elif t == "ALL_FALSE":     yield "    result = True"
+        elif t == "NOT_ALL_TRUE":  yield "    result = False"
+        elif t == "NOT_ALL_FALSE": yield "    result = False"
