@@ -1,7 +1,6 @@
 import re
 import bpy
 from bpy.props import *
-from ... sockets.info import toIdName
 from ... utils.code import isCodeValid
 from ... utils.layout import splitAlignment
 from ... events import executionCodeChanged
@@ -35,14 +34,14 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
     outputIsList = BoolProperty(name = "Output is List", default = False, update = outputTypeChanged)
 
     def create(self):
-        self.newInput("an_NodeControlSocket", "New Input")
-        self.newOutput("an_GenericSocket", "Result", "result")
+        self.newInput("Node Control", "New Input")
+        self.newOutput("Generic", "Result", "result")
 
     def recreateOutputSocket(self):
-        idName = "an_GenericListSocket" if self.outputIsList else "an_GenericSocket"
-        if self.outputs[0].bl_idname == idName: return
+        dataType = "Generic List" if self.outputIsList else "Generic"
+        if self.outputs[0].dataType == dataType: return
         self.outputs.clear()
-        self.newOutput(idName, "Result", "result")
+        self.newOutput(dataType, "Result", "result")
 
     def draw(self, layout):
         layout.prop(self, "expression", text = "")
@@ -101,7 +100,7 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
 
     def newInputSocket(self, dataType):
         name = self.getNewSocketName()
-        socket = self.newInput(toIdName(dataType), name, "input")
+        socket = self.newInput(dataType, name, "input")
         socket.dataIsModified = True
         socket.textProps.editable = True
         socket.textProps.variable = True

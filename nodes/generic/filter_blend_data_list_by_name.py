@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import *
-from ... sockets.info import toListIdName
+from ... sockets.info import toListDataType
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 
@@ -20,7 +20,6 @@ class FilterBlendDataListByNameNode(bpy.types.Node, AnimationNode):
 
     def dataTypeChanged(self, context):
         self.createSockets()
-        executionCodeChanged()
 
     # Should be set only on node creation
     dataType = StringProperty(name = "Data Type", update = dataTypeChanged)
@@ -44,10 +43,10 @@ class FilterBlendDataListByNameNode(bpy.types.Node, AnimationNode):
     def createSockets(self):
         self.inputs.clear()
         self.outputs.clear()
-        idName = toListIdName(self.dataType)
-        self.newInput(idName, self.dataType + " List", "sourceList")
-        self.newInput("an_StringSocket", "Name", "name")
-        self.newOutput(idName, self.dataType + " List", "targetList")
+        listDataType = toListDataType(self.dataType)
+        self.newInput(listDataType, listDataType, "sourceList")
+        self.newInput("String", "Name", "name")
+        self.newOutput(listDataType, listDataType, "targetList")
 
     def getExecutionCode(self):
         operation = "startswith" if self.filterType == "STARTS_WITH" else "endswith"
