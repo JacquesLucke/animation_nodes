@@ -21,10 +21,10 @@ class SetKeyframesNode(bpy.types.Node, AnimationNode):
     attributePath = StringProperty(default = "", name = "Attribute Path")
 
     def create(self):
-        self.newInput("an_BooleanSocket", "Enable", "enable").value = False
-        self.newInput("an_BooleanSocket", "Set Keyframe", "setKeyframe")
-        self.newInput("an_BooleanSocket", "Remove Unwanted", "removeUnwanted")
-        self.newInput("an_ObjectSocket", "Object", "object")
+        self.newInput("Boolean", "Enable", "enable", value = False)
+        self.newInput("Boolean", "Set Keyframe", "setKeyframe")
+        self.newInput("Boolean", "Remove Unwanted", "removeUnwanted")
+        self.newInput("Object", "Object", "object")
 
     def draw(self, layout):
         row = layout.row(align = True)

@@ -7,11 +7,11 @@ class TimeInfoNode(bpy.types.Node, AnimationNode):
     searchTags = ["Frame"]
 
     def create(self):
-        socket = self.newInput("an_SceneSocket", "Scene", "scene").hide = True
-        self.newOutput("an_FloatSocket", "Frame", "frame")
-        self.newOutput("an_FloatSocket", "Start Frame", "startFrame").hide = True
-        self.newOutput("an_FloatSocket", "End Frame", "endFrame").hide = True
-        self.newOutput("an_FloatSocket", "Frame Rate", "frameRate").hide = True
+        self.newInput("Scene", "Scene", "scene", hide = True)
+        self.newOutput("Float", "Frame", "frame")
+        self.newOutput("Float", "Start Frame", "startFrame", hide = True)
+        self.newOutput("Float", "End Frame", "endFrame", hide = True)
+        self.newOutput("Float", "Frame Rate", "frameRate", hide = True)
 
     def edit(self):
         inputSocket = self.inputs[0]
