@@ -6,9 +6,9 @@ class ShadeObjectSmooth(bpy.types.Node, AnimationNode):
     bl_label = "Shade Object Smooth"
 
     def create(self):
-        self.newInput("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
-        self.newInput("an_BooleanSocket", "Smooth", "smooth")
-        self.newOutput("an_ObjectSocket", "Object", "object")
+        self.newInput("Object", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
+        self.newInput("Boolean", "Smooth", "smooth")
+        self.newOutput("Object", "Object", "object")
 
     def execute(self, object, smooth):
         if getattr(object, "type", "") == "MESH":

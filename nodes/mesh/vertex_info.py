@@ -6,10 +6,10 @@ class VertexInfoNode(bpy.types.Node, AnimationNode):
     bl_label = "Vertex Info"
 
     def create(self):
-        self.newInput("an_VertexSocket", "Vertex", "vertex")
-        self.newOutput("an_VectorSocket", "Location", "location")
-        self.newOutput("an_VectorSocket", "Normal", "normal")
-        self.newOutput("an_FloatListSocket", "Group Weights", "groupWeights")
+        self.newInput("Vertex", "Vertex", "vertex")
+        self.newOutput("Vector", "Location", "location")
+        self.newOutput("Vector", "Normal", "normal")
+        self.newOutput("Float List", "Group Weights", "groupWeights")
 
     def getExecutionCode(self):
         isLinked = self.getLinkedOutputsDict()

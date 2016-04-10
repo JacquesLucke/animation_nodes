@@ -6,10 +6,10 @@ class SeparateMeshDataNode(bpy.types.Node, AnimationNode):
     bl_label = "Separate Mesh Data"
 
     def create(self):
-        self.newInput("an_MeshDataSocket", "Mesh Data", "meshData").dataIsModified = True
-        self.newOutput("an_VectorListSocket", "Vertex Locations", "vertexLocations")
-        self.newOutput("an_EdgeIndicesListSocket", "Edges Indices", "edgesIndices")
-        self.newOutput("an_PolygonIndicesListSocket", "Polygons Indices", "polygonsIndices")
+        self.newInput("Mesh Data", "Mesh Data", "meshData").dataIsModified = True
+        self.newOutput("Vector List", "Vertex Locations", "vertexLocations")
+        self.newOutput("Edge Indices List", "Edges Indices", "edgesIndices")
+        self.newOutput("Polygon Indices List", "Polygons Indices", "polygonsIndices")
 
     def execute(self, meshData):
         return meshData.vertices, meshData.edges, meshData.polygons

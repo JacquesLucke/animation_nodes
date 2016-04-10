@@ -7,8 +7,8 @@ class JoinMeshDataList(bpy.types.Node, AnimationNode):
     bl_label = "Join Mesh Data List"
 
     def create(self):
-        self.newInput("an_MeshDataListSocket", "Mesh Data List", "meshDataList").dataIsModified = True
-        self.newOutput("an_MeshDataSocket", "Mesh Data", "meshData")
+        self.newInput("Mesh Data List", "Mesh Data List", "meshDataList", dataIsModified = True)
+        self.newOutput("Mesh Data", "Mesh Data", "meshData")
 
     def execute(self, meshDataList):
         meshData = MeshData([], [], [])

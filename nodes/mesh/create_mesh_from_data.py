@@ -10,8 +10,8 @@ class CreateBMeshFromMeshData(bpy.types.Node, AnimationNode):
     errorMessage = StringProperty(default = "")
 
     def create(self):
-        self.newInput("an_MeshDataSocket", "Mesh Data", "meshData")
-        self.newOutput("an_BMeshSocket", "BMesh", "bm")
+        self.newInput("Mesh Data", "Mesh Data", "meshData")
+        self.newOutput("BMesh", "BMesh", "bm")
 
     def draw(self, layout):
         if self.errorMessage != "":

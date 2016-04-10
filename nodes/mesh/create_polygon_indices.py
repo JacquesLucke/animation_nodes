@@ -9,8 +9,8 @@ class CreatePolygonIndicesNode(bpy.types.Node, AnimationNode):
     errorMessage = StringProperty()
 
     def create(self):
-        self.newInput("an_IntegerListSocket", "Indices", "indices")
-        self.newOutput("an_PolygonIndicesSocket", "Polygon Indices", "polygonIndices")
+        self.newInput("Integer List", "Indices", "indices")
+        self.newOutput("Polygon Indices", "Polygon Indices", "polygonIndices")
 
     def draw(self, layout):
         if self.errorMessage != "":

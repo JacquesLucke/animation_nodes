@@ -6,8 +6,8 @@ class an_EdgesOfPolygonsNode(bpy.types.Node, AnimationNode):
     bl_label = "Edges of Polygons"
 
     def create(self):
-        self.newInput("an_PolygonIndicesListSocket", "Polygons", "polygons")
-        self.newOutput("an_EdgeIndicesListSocket", "Edges", "edges")
+        self.newInput("Polygon Indices List", "Polygons", "polygons")
+        self.newOutput("Edge Indices List", "Edges", "edges")
 
     def execute(self, polygons):
         edges = []

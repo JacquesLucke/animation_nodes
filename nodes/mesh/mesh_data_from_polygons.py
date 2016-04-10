@@ -7,8 +7,8 @@ class MeshDataFromPolygonsNode(bpy.types.Node, AnimationNode):
     bl_label = "Mesh Data from Polygons"
 
     def create(self):
-        self.newInput("an_PolygonListSocket", "Polygons", "polygons").dataIsModified = True
-        self.newOutput("an_MeshDataSocket", "Mesh Data", "meshData")
+        self.newInput("Polygon List", "Polygons", "polygons", dataIsModified = True)
+        self.newOutput("Mesh Data", "Mesh Data", "meshData")
 
     def execute(self, polygons):
         vertices = []

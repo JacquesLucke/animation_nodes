@@ -11,6 +11,10 @@ class MeshData:
         self.edges = edges
         self.polygons = polygons
 
+    def __repr__(self):
+        return "<AN Mesh Data Object: Vertices: {}, Edges: {}, Polygons: {}>".format(
+                len(self.vertices), len(self.edges), len(self.polygons))
+
     def copy(self):
         return MeshData(copyVectorList(self.vertices), copy2dList(self.edges), copy2dList(self.polygons))
 
