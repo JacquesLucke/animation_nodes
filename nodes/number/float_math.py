@@ -1,9 +1,8 @@
 import bpy
 import math
 from bpy.props import *
-from ... events import executionCodeChanged
+from ... tree_info import keepNodeState
 from ... base_types.node import AnimationNode
-from ... tree_info import keepNodeLinks, keepNodeState
 
 operationItems = [
     ("ADD", "Add", "A + B", "", 0),
@@ -61,13 +60,12 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
 
     def operationChanged(self, context):
         self.recreateInputSockets()
-        executionCodeChanged()
 
     operation = EnumProperty(name = "Operation", default = "MULTIPLY",
         items = operationItems, update = operationChanged)
 
     def create(self):
-        self.newOutput("an_FloatSocket", "Result", "result")
+        self.newOutput("Float", "Result", "result")
         self.recreateInputSockets()
 
     def draw(self, layout):
@@ -92,9 +90,9 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
     def edit(self):
         output = self.outputs[0]
         if output.dataType == "Float":
-            if output.shouldBeIntegerSocket(): self.setOutputType("an_IntegerSocket")
+            if output.shouldBeIntegerSocket(): self.setOutputType("Integer")
         else:
-            if output.shouldBeFloatSocket(): self.setOutputType("an_FloatSocket")
+            if output.shouldBeFloatSocket(): self.setOutputType("Float")
 
     def getExecutionCode(self):
         op = self.operation
@@ -137,26 +135,26 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
     def getUsedModules(self):
         return ["math"]
 
-    def setOutputType(self, idName):
-        if self.outputs[0].bl_idname == idName: return
-        self._setOutputType(idName)
+    def setOutputType(self, dataType):
+        if self.outputs[0].dataType != dataType:
+            self._setOutputType(dataType)
 
-    @keepNodeLinks
-    def _setOutputType(self, idName):
+    @keepNodeState
+    def _setOutputType(self, dataType):
         self.outputs.clear()
-        self.newOutput(idName, "Result", "result")
+        self.newOutput(dataType, "Result", "result")
 
     @keepNodeState
     def recreateInputSockets(self):
         self.inputs.clear()
 
-        self.newInput("an_FloatSocket", "A", "a")
+        self.newInput("Float", "A", "a")
         if self.operation in secondInputOperations:
-            self.newInput("an_FloatSocket", "B", "b").value = 1
+            self.newInput("Float", "B", "b").value = 1
         if self.operation in baseInputOperations:
-            self.newInput("an_FloatSocket", "Base", "base")
+            self.newInput("Float", "Base", "base")
         if self.operation in stepSizeInputOperations:
-            self.newInput("an_FloatSocket", "Step Size", "stepSize")
+            self.newInput("Float", "Step Size", "stepSize")
 
     @property
     def socketA(self):

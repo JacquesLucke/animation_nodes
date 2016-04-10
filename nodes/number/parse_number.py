@@ -10,8 +10,8 @@ class ParseNumberNode(bpy.types.Node, AnimationNode):
     parsingSuccessfull = BoolProperty()
 
     def create(self):
-        self.newInput("an_StringSocket", "Text", "text")
-        self.newOutput("an_FloatSocket", "Number", "number")
+        self.newInput("String", "Text", "text")
+        self.newOutput("Float", "Number", "number")
 
     def draw(self, layout):
         if not self.parsingSuccessfull:

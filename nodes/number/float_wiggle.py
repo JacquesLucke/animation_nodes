@@ -11,15 +11,13 @@ class FloatWiggleNode(bpy.types.Node, AnimationNode):
     nodeSeed = IntProperty(update = propertyChanged)
 
     def create(self):
-        self.newInput("an_FloatSocket", "Seed", "seed")
-        self.newInput("an_FloatSocket", "Evolution", "evolution")
-        socket = self.newInput("an_FloatSocket", "Speed", "speed")
-        socket.value = 1
-        socket.minValue = 0
-        self.newInput("an_FloatSocket", "Amplitude", "amplitude").value = 1.0
-        self.newInput("an_IntegerSocket", "Octaves", "octaves").value = 2
-        self.newInput("an_FloatSocket", "Persistance", "persistance").value = 0.3
-        self.newOutput("an_FloatSocket", "Number", "number")
+        self.newInput("Float", "Seed", "seed")
+        self.newInput("Float", "Evolution", "evolution")
+        self.newInput("Float", "Speed", "speed", value = 1, minValue = 0)
+        self.newInput("Float", "Amplitude", "amplitude", value = 1.0)
+        self.newInput("Integer", "Octaves", "octaves", value = 2)
+        self.newInput("Float", "Persistance", "persistance", value = 0.3)
+        self.newOutput("Float", "Number", "number")
 
     def draw(self, layout):
         layout.prop(self, "nodeSeed", text = "Node Seed")

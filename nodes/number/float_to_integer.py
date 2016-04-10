@@ -15,8 +15,8 @@ class FloatToIntegerNode(bpy.types.Node, AnimationNode):
     type = EnumProperty(name = "Conversion Type", items = items, default = "FLOOR", update = executionCodeChanged)
 
     def create(self):
-        self.newInput("an_FloatSocket", "Float", "float")
-        self.newOutput("an_IntegerSocket", "Integer", "integer")
+        self.newInput("Float", "Float", "float")
+        self.newOutput("Integer", "Integer", "integer")
 
     def drawLabel(self):
         return "({}) Float to Integer".format(self.type.capitalize())

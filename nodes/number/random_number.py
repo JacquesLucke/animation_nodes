@@ -11,10 +11,10 @@ class RandomNumberNode(bpy.types.Node, AnimationNode):
     nodeSeed = IntProperty(update = propertyChanged)
 
     def create(self):
-        self.newInput("an_IntegerSocket", "Seed", "seed")
-        self.newInput("an_FloatSocket", "Min", "minValue").value = 0.0
-        self.newInput("an_FloatSocket", "Max", "maxValue").value = 1.0
-        self.newOutput("an_FloatSocket", "Number", "number")
+        self.newInput("Integer", "Seed", "seed")
+        self.newInput("Float", "Min", "minValue").value = 0.0
+        self.newInput("Float", "Max", "maxValue").value = 1.0
+        self.newOutput("Float", "Number", "number")
         self.randomizeNodeSeed()
 
     def draw(self, layout):
