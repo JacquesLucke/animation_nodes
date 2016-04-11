@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... base_types.node import AnimationNode
-from ... sockets.info import getBaseDataTypeItemsCallback, toListIdName, getListDataTypes, toBaseDataType, toListDataType
+from ... sockets.info import getListDataTypes, toBaseDataType, toListDataType
 
 class CombineListsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CombineListsNode"
@@ -15,12 +15,9 @@ class CombineListsNode(bpy.types.Node, AnimationNode):
                 for dataType in getListDataTypes()]
 
     def assignedTypeChanged(self, context):
-        self.listIdName = toListIdName(self.assignedType)
         self.recreateSockets()
 
     assignedType = StringProperty(update = assignedTypeChanged)
-
-    listIdName = StringProperty()
 
     def create(self):
         self.assignedType = "Float"
@@ -65,20 +62,20 @@ class CombineListsNode(bpy.types.Node, AnimationNode):
         self.inputs.clear()
         self.outputs.clear()
 
-        self.newInput("an_NodeControlSocket", "...")
+        self.newInput("Node Control", "...")
         for _ in range(inputAmount):
             self.newInputSocket()
-        self.newOutput(self.listIdName, "List", "outList")
+        self.newOutput(toListDataType(self.assignedType), "List", "outList")
 
     def newInputSocket(self):
-        socket = self.newInput(self.listIdName, "List")
+        socket = self.newInput(toListDataType(self.assignedType), "List")
+        socket.defaultDrawType = "PREFER_PROPERTY"
+        socket.textProps.editable = True
         socket.dataIsModified = True
         socket.display.text = True
-        socket.text = "List"
         socket.removeable = True
         socket.moveable = True
-        socket.textProps.editable = True
-        socket.defaultDrawType = "PREFER_PROPERTY"
+        socket.text = "List"
         socket.moveUp()
 
         if len(self.inputs) > 2:
