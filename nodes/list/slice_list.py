@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... tree_info import keepNodeState
 from ... base_types.node import AnimationNode
-from ... sockets.info import toListIdName, isBase, toBaseDataType
+from ... sockets.info import isBase, toBaseDataType, toListDataType
 
 sliceEndType = [
     ("END_INDEX", "End Index", "", "NONE", 0),
@@ -13,11 +13,9 @@ class SliceListNode(bpy.types.Node, AnimationNode):
     bl_label = "Slice List"
 
     def assignedTypeChanged(self, context):
-        self.listIdName = toListIdName(self.assignedType)
         self.generateSockets()
 
     assignedType = StringProperty(update = assignedTypeChanged)
-    listIdName = StringProperty()
 
     def sliceEndTypeChanged(self, context):
         self.generateSockets()
@@ -65,13 +63,13 @@ class SliceListNode(bpy.types.Node, AnimationNode):
     def generateSockets(self):
         self.inputs.clear()
         self.outputs.clear()
-        self.newInput(self.listIdName, "List", "list").dataIsModified  = True
-        self.newInput("an_IntegerSocket", "Start", "start")
+
+        listDataType = toListDataType(self.assignedType)
+        self.newInput(listDataType, "List", "list", dataIsModified  = True)
+        self.newInput("Integer", "Start", "start")
         if self.sliceEndType == "END_INDEX":
-            self.newInput("an_IntegerSocket", "End", "end")
+            self.newInput("Integer", "End", "end")
         elif self.sliceEndType == "OUTPUT_LENGTH":
-            self.newInput("an_IntegerSocket", "Length", "length")
-        socket = self.newInput("an_IntegerSocket", "Step", "step")
-        socket.value = 1
-        socket.hide = True
-        self.newOutput(self.listIdName, "List", "slicedList")
+            self.newInput("Integer", "Length", "length")
+        self.newInput("Integer", "Step", "step", value = 1, hide = True)
+        self.newOutput(listDataType, "List", "slicedList")
