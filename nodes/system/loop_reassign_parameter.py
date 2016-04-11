@@ -12,12 +12,12 @@ class ReassignLoopParameterNode(bpy.types.Node, AnimationNode):
     def identifierChanged(self, context):
         socket = self.linkedParameterSocket
         if socket:
-            self.parameterIdName = self.linkedParameterSocket.bl_idname
+            self.parameterDataType = self.linkedParameterSocket.dataType
             self.generateSockets()
 
     loopInputIdentifier = StringProperty(update = identifierChanged)
     parameterIdentifier = StringProperty(update = identifierChanged)
-    parameterIdName = StringProperty()
+    parameterDataType = StringProperty()
 
     def create(self):
         pass
@@ -40,9 +40,8 @@ class ReassignLoopParameterNode(bpy.types.Node, AnimationNode):
     @keepNodeState
     def generateSockets(self):
         self.inputs.clear()
-        socket = self.newInput(self.parameterIdName, "New Value", "newValue")
-        socket.defaultDrawType = "TEXT_ONLY"
-        self.newInput("an_BooleanSocket", "Condition", "condition").hide = True
+        self.newInput(self.parameterDataType, "New Value", "newValue", defaultDrawType = "TEXT_ONLY")
+        self.newInput("Boolean", "Condition", "condition", hide = True)
 
     @property
     def linkedParameterSocket(self):

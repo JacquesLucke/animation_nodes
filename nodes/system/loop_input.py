@@ -9,8 +9,7 @@ from ... tree_info import getNodeByIdentifier
 from ... base_types.node import AnimationNode
 from . subprogram_base import SubprogramBaseNode
 from ... utils.nodes import newNodeAtCursor, invokeTranslation
-from ... sockets.info import (toBaseIdName, toListDataType, toIdName,
-                                    isBase, toListIdName, toBaseDataType)
+from ... sockets.info import toListDataType, toIdName, isBase, toListIdName, toBaseDataType
 from . subprogram_sockets import SubprogramData, subprogramInterfaceChanged, NoDefaultValue
 
 class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
@@ -21,10 +20,10 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     def create(self):
         self.randomizeNetworkColor()
         self.subprogramName = "My Loop"
-        self.newOutput("an_IntegerSocket", "Index")
-        self.newOutput("an_IntegerSocket", "Iterations")
-        self.newOutput("an_NodeControlSocket", "New Iterator").margin = 0.15
-        self.newOutput("an_NodeControlSocket", "New Parameter").margin = 0.15
+        self.newOutput("Integer", "Index")
+        self.newOutput("Integer", "Iterations")
+        self.newOutput("Node Control", "New Iterator").margin = 0.15
+        self.newOutput("Node Control", "New Parameter").margin = 0.15
 
     def draw(self, layout):
         layout.separator()
@@ -107,15 +106,18 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
 
 
     def newIterator(self, listDataType, name = None):
-        if name is None: name = toBaseDataType(listDataType)
-        socket = self.newOutput(toBaseIdName(listDataType), name, "iterator_" + getRandomString(5))
+        baseDataType = toBaseDataType(listDataType)
+        if name is None: name = baseDataType
+
+        socket = self.newOutput(baseDataType, name, "iterator_" + getRandomString(5))
         socket.moveTo(self.newIteratorSocket.getIndex())
         self.setupSocket(socket, name, moveGroup = 1)
         return socket
 
     def newParameter(self, dataType, name = None, defaultValue = None):
         if name is None: name = dataType
-        socket = self.newOutput(toIdName(dataType), name, "parameter_" + getRandomString(5))
+
+        socket = self.newOutput(dataType, name, "parameter_" + getRandomString(5))
         if defaultValue: socket.setProperty(defaultValue)
         socket.moveTo(self.newParameterSocket.getIndex())
         socket.loop.copyAlways = False

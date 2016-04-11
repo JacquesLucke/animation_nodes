@@ -2,8 +2,8 @@ import bpy
 import random
 from bpy.props import *
 from ... events import treeChanged
+from ... sockets.info import toBaseDataType
 from ... base_types.node import AnimationNode
-from ... sockets.info import toIdName, toBaseDataType
 from . subprogram_sockets import subprogramInterfaceChanged
 from ... tree_info import keepNodeLinks, getNodeByIdentifier
 
@@ -66,12 +66,9 @@ class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
 
         if self.addType == "APPEND": dataType = toBaseDataType(self.listDataType)
         elif self.addType == "EXTEND": dataType = self.listDataType
-        socket = self.newInput(toIdName(dataType), dataType, "input")
-        socket.defaultDrawType = "TEXT_ONLY"
 
-        socket = self.newInput("an_BooleanSocket", "Condition", "condition")
-        socket.value = True
-        socket.hide = True
+        self.newInput(dataType, dataType, "input", defaultDrawType = "TEXT_ONLY")
+        self.newInput("Boolean", "Condition", "condition", value = True, hide = True)
 
     def delete(self):
         subprogramInterfaceChanged()

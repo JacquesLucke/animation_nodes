@@ -1,7 +1,6 @@
 import re
 import bpy
 from bpy.props import *
-from ... sockets.info import toIdName
 from ... events import networkChanged
 from ... utils.layout import splitAlignment
 from ... base_types.node import AnimationNode
@@ -50,7 +49,7 @@ class GroupInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
 
     def newParameter(self, dataType, name = None, defaultValue = None):
         if name is None: name = dataType
-        socket = self.newOutput(toIdName(dataType), name, "parameter")
+        socket = self.newOutput(dataType, name, "parameter")
         if defaultValue is not None: socket.setProperty(defaultValue)
         socket.text = name
         socket.moveable = True

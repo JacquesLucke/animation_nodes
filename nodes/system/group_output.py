@@ -1,7 +1,6 @@
 import bpy
 from bpy.props import *
 from ... events import treeChanged
-from ... sockets.info import toIdName
 from ... utils.layout import splitAlignment
 from ... base_types.node import AnimationNode
 from . subprogram_sockets import subprogramInterfaceChanged
@@ -62,7 +61,7 @@ class GroupOutputNode(bpy.types.Node, AnimationNode):
 
     def newReturn(self, dataType, name = None):
         if name is None: name = dataType
-        socket = self.newInput(toIdName(dataType), name, "return")
+        socket = self.newInput(dataType, name, "return")
         socket.dataIsModified = True
         socket.text = name
         socket.moveable = True

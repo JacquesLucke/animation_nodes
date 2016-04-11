@@ -11,7 +11,7 @@ class LoopBreakNode(bpy.types.Node, AnimationNode):
     loopInputIdentifier = StringProperty(update = treeChanged)
 
     def create(self):
-        self.newInput("an_BooleanSocket", "Continue", "continueCondition").value = True
+        self.newInput("Boolean", "Continue", "continueCondition", value = True)
 
     def draw(self, layout):
         node = self.loopInputNode
