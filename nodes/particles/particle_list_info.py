@@ -7,12 +7,12 @@ class ParticleListInfoNode(bpy.types.Node, AnimationNode):
     bl_label = "Particle List Info"
 
     def create(self):
-        self.newInput("an_ParticleListSocket", "Particles", "particles")
-        self.newOutput("an_VectorListSocket", "Locations", "locations")
-        self.newOutput("an_VectorListSocket", "Velocities", "velocities").hide = True
-        self.newOutput("an_FloatListSocket", "Sizes", "sizes").hide = True
-        self.newOutput("an_FloatListSocket", "Birth Times", "birthTimes").hide = True
-        self.newOutput("an_FloatListSocket", "Die Times", "dieTimes").hide = True
+        self.newInput("Particle List", "Particles", "particles")
+        self.newOutput("Vector List", "Locations", "locations")
+        self.newOutput("Vector List", "Velocities", "velocities", hide = True)
+        self.newOutput("Float List", "Sizes", "sizes", hide = True)
+        self.newOutput("Float List", "Birth Times", "birthTimes", hide = True)
+        self.newOutput("Float List", "Die Times", "dieTimes", hide = True)
 
     def getExecutionCode(self):
         isLinked = self.getLinkedOutputsDict()
