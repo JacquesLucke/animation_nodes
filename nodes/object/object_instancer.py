@@ -60,7 +60,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         items = objectTypeItems, update = resetInstancesEvent)
 
     copyObjectProperties = BoolProperty(name = "Copy Full Object", default = False,
-        description = "Enable this to copy modifiers/constrains/... from the source object.",
+        description = "Enable this to copy modifiers/constraints/... from the source object.",
         update = resetInstancesEvent)
 
     removeAnimationData = BoolProperty(name = "Remove Animation Data", default = True,
