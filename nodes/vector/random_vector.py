@@ -12,9 +12,9 @@ class RandomVectorNode(bpy.types.Node, AnimationNode):
     nodeSeed = IntProperty(name = "Node Seed", update = propertyChanged, max = 1000, min = 0)
 
     def create(self):
-        self.newInput("an_IntegerSocket", "Seed", "seed")
-        self.newInput("an_FloatSocket", "Scale", "scale").value = 2.0
-        self.newOutput("an_VectorSocket", "Vector", "randomVector")
+        self.newInput("Integer", "Seed", "seed")
+        self.newInput("Float", "Scale", "scale", value = 2.0)
+        self.newOutput("Vector", "Vector", "randomVector")
 
     def draw(self, layout):
         layout.prop(self, "nodeSeed")

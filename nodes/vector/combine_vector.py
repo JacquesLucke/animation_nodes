@@ -7,10 +7,10 @@ class CombineVectorNode(bpy.types.Node, AnimationNode):
     dynamicLabelType = "HIDDEN_ONLY"
 
     def create(self):
-        self.newInput("an_FloatSocket", "X", "x")
-        self.newInput("an_FloatSocket", "Y", "y")
-        self.newInput("an_FloatSocket", "Z", "z")
-        self.newOutput("an_VectorSocket", "Vector", "vector")
+        self.newInput("Float", "X", "x")
+        self.newInput("Float", "Y", "y")
+        self.newInput("Float", "Z", "z")
+        self.newOutput("Vector", "Vector", "vector")
 
     def drawLabel(self):
         label = "<X, Y, Z>"

@@ -6,8 +6,8 @@ class VectorLengthNode(bpy.types.Node, AnimationNode):
     bl_label = "Vector Length"
 
     def create(self):
-        self.newInput("an_VectorSocket", "Vector", "vector")
-        self.newOutput("an_FloatSocket", "Length", "length")
+        self.newInput("Vector", "Vector", "vector")
+        self.newOutput("Float", "Length", "length")
 
     def getExecutionCode(self):
         return "length = vector.length"

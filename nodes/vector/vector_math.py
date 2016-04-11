@@ -57,7 +57,7 @@ class VectorMathNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.createInputs()
-        self.newOutput("an_VectorSocket", "Result", "result")
+        self.newOutput("Vector", "Result", "result")
 
     def draw(self, layout):
         layout.prop(self, "operation", text = "")
@@ -68,13 +68,13 @@ class VectorMathNode(bpy.types.Node, AnimationNode):
     @keepNodeState
     def createInputs(self):
         self.inputs.clear()
-        self.newInput("an_VectorSocket", "A", "a")
+        self.newInput("Vector", "A", "a")
         if self.operation in operationsWithSecondVector:
-            self.newInput("an_VectorSocket", "B", "b")
+            self.newInput("Vector", "B", "b")
         if self.operation in operationsWithFloat:
-            self.newInput("an_FloatSocket", "Scale", "scale").value = 1.0
+            self.newInput("Float", "Scale", "scale").value = 1.0
         if self.operation in operationsWithStepVector:
-            self.newInput("an_VectorSocket", "Step Size", "stepSize").value = (0.1, 0.1, 0.1)
+            self.newInput("Vector", "Step Size", "stepSize").value = (0.1, 0.1, 0.1)
 
 
     def getExecutionCode(self):

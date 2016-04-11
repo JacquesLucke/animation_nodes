@@ -6,8 +6,8 @@ class VectorFromValueNode(bpy.types.Node, AnimationNode):
     bl_label = "Vector from Value"
 
     def create(self):
-        self.newInput("an_FloatSocket", "Value", "value")
-        self.newOutput("an_VectorSocket", "Vector", "vector")
+        self.newInput("Float", "Value", "value")
+        self.newOutput("Vector", "Vector", "vector")
 
     def getExecutionCode(self):
         return "vector = mathutils.Vector((value, value, value))"
