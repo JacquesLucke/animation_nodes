@@ -50,7 +50,7 @@ class QuaternionMathNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.createInputs()
-        self.newOutput("an_QuaternionSocket", "Result", "result")
+        self.newOutput("Quaternion", "Result", "result")
 
     def draw(self, layout):
         layout.prop(self, "operation", text = "")
@@ -61,13 +61,13 @@ class QuaternionMathNode(bpy.types.Node, AnimationNode):
     @keepNodeLinks
     def createInputs(self):
         self.inputs.clear()
-        self.newInput("an_QuaternionSocket", "A", "a")
+        self.newInput("Quaternion", "A", "a")
         if self.operation in operationsWithSecondQuaternion:
-            self.newInput("an_QuaternionSocket", "B", "b")
+            self.newInput("Quaternion", "B", "b")
         if self.operation in operationsWithFloat:
-            self.newInput("an_FloatSocket", "Scale", "scale").value = 1.0
+            self.newInput("Float", "Scale", "scale").value = 1.0
         if self.operation in operationsWithStepQuaternion:
-            self.newInput("an_QuaternionSocket", "Step Size", "stepSize").value = (0.1, 0.1, 0.1)
+            self.newInput("Quaternion", "Step Size", "stepSize").value = (0.1, 0.1, 0.1)
 
 
     def getExecutionCode(self):

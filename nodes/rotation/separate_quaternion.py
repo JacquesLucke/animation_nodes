@@ -6,11 +6,11 @@ class SeparateQuaternionNode(bpy.types.Node, AnimationNode):
     bl_label = "Separate Quaternion"
 
     def create(self):
-        self.newInput("an_QuaternionSocket", "Quaternion", "quaternion")
-        self.newOutput("an_FloatSocket", "W", "w")
-        self.newOutput("an_FloatSocket", "X", "x")
-        self.newOutput("an_FloatSocket", "Y", "y")
-        self.newOutput("an_FloatSocket", "Z", "z")
-        
+        self.newInput("Quaternion", "Quaternion", "quaternion")
+        self.newOutput("Float", "W", "w")
+        self.newOutput("Float", "X", "x")
+        self.newOutput("Float", "Y", "y")
+        self.newOutput("Float", "Z", "z")
+
     def getExecutionCode(self):
         return "w, x, y, z = quaternion"

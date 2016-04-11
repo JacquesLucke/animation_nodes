@@ -9,17 +9,17 @@ guideAxisItems  = [(axis, axis, "") for axis in ("X", "Y", "Z")]
 class DirectionToRotationNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_DirectionToRotationNode"
     bl_label = "Direction to Rotation"
+    bl_width_default = 160
 
     trackAxis = EnumProperty(items = trackAxisItems, update = propertyChanged, default = "Z")
     guideAxis = EnumProperty(items = guideAxisItems, update = propertyChanged, default = "X")
 
     def create(self):
-        self.newInput("an_VectorSocket", "Direction", "direction")
-        self.newInput("an_VectorSocket", "Guide", "guide").value = [0.0, 0.0, 1.0]
-        self.newOutput("an_EulerSocket", "Euler Rotation", "eulerRotation")
-        self.newOutput("an_QuaternionSocket", "Quaternion Rotation", "quaternionRotation").hide = True
-        self.newOutput("an_MatrixSocket", "Matrix Rotation", "matrixRotation").hide = True
-        self.width += 20
+        self.newInput("Vector", "Direction", "direction")
+        self.newInput("Vector", "Guide", "guide", value = [0.0, 0.0, 1.0])
+        self.newOutput("Euler", "Euler Rotation", "eulerRotation")
+        self.newOutput("Quaternion", "Quaternion Rotation", "quaternionRotation", hide = True)
+        self.newOutput("Matrix", "Matrix Rotation", "matrixRotation", hide = True)
 
     def draw(self, layout):
         layout.prop(self, "trackAxis", expand = True)

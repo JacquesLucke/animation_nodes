@@ -9,8 +9,8 @@ class QuaternionListCombineNode(bpy.types.Node, AnimationNode):
     bl_label = "Combine Quaternion Rotations"
 
     def create(self):
-        self.newInput("an_QuaternionListSocket", "Quaternions", "quaternions")
-        self.newOutput("an_QuaternionSocket", "Result", "result")
+        self.newInput("Quaternion List", "Quaternions", "quaternions")
+        self.newOutput("Quaternion", "Result", "result")
 
     def execute(self, quaternions):
         return functools.reduce(operator.mul, reversed(quaternions), Quaternion((1, 0, 0, 0)))
