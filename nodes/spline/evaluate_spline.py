@@ -9,10 +9,10 @@ class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
     bl_label = "Evaluate Spline"
 
     def create(self):
-        self.newInput("an_SplineSocket", "Spline", "spline").defaultDrawType = "PROPERTY_ONLY"
-        self.newInput("an_FloatSocket", "Parameter", "parameter").value = 0.0
-        self.newOutput("an_VectorSocket", "Location", "location")
-        self.newOutput("an_VectorSocket", "Tangent", "tangent")
+        self.newInput("Spline", "Spline", "spline", defaultDrawType = "PROPERTY_ONLY")
+        self.newInput("Float", "Parameter", "parameter", value = 0.0)
+        self.newOutput("Vector", "Location", "location")
+        self.newOutput("Vector", "Tangent", "tangent")
 
     def draw(self, layout):
         layout.prop(self, "parameterType", text = "")

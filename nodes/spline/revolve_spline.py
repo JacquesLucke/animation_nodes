@@ -11,21 +11,18 @@ projectionTypeItems = [
 class RevolveSplineNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_RevolveSplineNode"
     bl_label = "Revolve Spline"
+    bl_width_default = 160
 
-    projectionType = EnumProperty(name = "Projection Type", default = "PROJECT", items = projectionTypeItems, update = propertyChanged)
+    projectionType = EnumProperty(name = "Projection Type", default = "PROJECT",
+        items = projectionTypeItems, update = propertyChanged)
 
     def create(self):
-        self.newInput("an_SplineSocket", "Axis", "axis")
-        self.newInput("an_SplineSocket", "Profile", "profile")
-        socket = self.newInput("an_IntegerSocket", "Spline Samples", "splineSamples")
-        socket.minValue = 2
-        socket.value = 16
-        socket = self.newInput("an_IntegerSocket", "Surface Samples", "surfaceSamples")
-        socket.minValue = 3
-        socket.value = 16
-        self.newOutput("an_VectorListSocket", "Vertices", "vertices")
-        self.newOutput("an_PolygonIndicesListSocket", "Polygons", "polygons")
-        self.width += 20
+        self.newInput("Spline", "Axis", "axis")
+        self.newInput("Spline", "Profile", "profile")
+        self.newInput("Integer", "Spline Samples", "splineSamples", value = 16, minValue = 2)
+        self.newInput("Integer", "Surface Samples", "surfaceSamples", value = 16, minValue = 3)
+        self.newOutput("Vector List", "Vertices", "vertices")
+        self.newOutput("Polygon Indices List", "Polygons", "polygons")
 
     def draw(self, layout):
         layout.prop(self, "projectionType", text = "")

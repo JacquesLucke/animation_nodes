@@ -15,35 +15,37 @@ sampleDistributionTypeItems = [
 class LoftSplinesNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_LoftSplinesNode"
     bl_label = "Loft Splines"
+    bl_width_default = 160
 
     def settingChanged(self, context):
         self.inputs["Smoothness"].hide = self.interpolationType != "BEZIER"
         propertyChanged(self, context)
 
-    interpolationType = EnumProperty(name = "Interpolation Type", default = "BEZIER", items = interpolationTypeItems, update = settingChanged)
+    interpolationType = EnumProperty(name = "Interpolation Type", default = "BEZIER",
+        items = interpolationTypeItems, update = settingChanged)
 
-    resolution = IntProperty(name = "Resolution", default = 100, min = 2, description = "Increase to have a more accurate evaluation", update = propertyChanged)
-    splineDistributionType = EnumProperty(name = "Spline Distribution", default = "RESOLUTION", items = sampleDistributionTypeItems, update = propertyChanged)
-    surfaceDistributionType = EnumProperty(name = "Surface Distribution", default = "RESOLUTION", items = sampleDistributionTypeItems, update = propertyChanged)
+    resolution = IntProperty(name = "Resolution", default = 100, min = 2,
+        description = "Increase to have a more accurate evaluation", update = propertyChanged)
+
+    splineDistributionType = EnumProperty(name = "Spline Distribution", default = "RESOLUTION",
+        items = sampleDistributionTypeItems, update = propertyChanged)
+
+    surfaceDistributionType = EnumProperty(name = "Surface Distribution", default = "RESOLUTION",
+        items = sampleDistributionTypeItems, update = propertyChanged)
 
     def create(self):
-        self.newInput("an_SplineListSocket", "Splines", "splines")
-        socket1 = self.newInput("an_IntegerSocket", "Spline Samples", "splineSamples")
-        socket2 = self.newInput("an_IntegerSocket", "Surface Samples", "surfaceSamples")
+        self.newInput("Spline List", "Splines", "splines")
+        socket1 = self.newInput("Integer", "Spline Samples", "splineSamples")
+        socket2 = self.newInput("Integer", "Surface Samples", "surfaceSamples")
         for socket in (socket1, socket2):
             socket.value = 16
             socket.minValue = 2
-        self.newInput("an_BooleanSocket", "Cyclic", "cyclic").value = False
-        self.newInput("an_FloatSocket", "Smoothness", "smoothness").value = 0.3333
-        socket = self.newInput("an_FloatSocket", "Start", "start")
-        socket.value, socket.hide = 0.0, True
-        socket.setRange(0.0, 1.0)
-        socket = self.newInput("an_FloatSocket", "End", "end")
-        socket.value, socket.hide = 1.0, True
-        socket.setRange(0.0, 1.0)
-        self.newOutput("an_VectorListSocket", "Vertices", "vertices")
-        self.newOutput("an_PolygonIndicesListSocket", "Polygons", "polygons")
-        self.width += 20
+        self.newInput("Boolean", "Cyclic", "cyclic").value = False
+        self.newInput("Float", "Smoothness", "smoothness").value = 0.3333
+        self.newInput("Float", "Start", "start", hide = True, value = 0.0).setRange(0.0, 1.0)
+        self.newInput("Float", "End", "end", hide = True, value = 1.0).setRange(0.0, 1.0)
+        self.newOutput("Vector List", "Vertices", "vertices")
+        self.newOutput("Polygon Indices List", "Polygons", "polygons")
         self.settingChanged(bpy.context)
 
     def draw(self, layout):

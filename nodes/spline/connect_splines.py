@@ -7,8 +7,8 @@ class ConnectSplinesNode(bpy.types.Node, AnimationNode):
     bl_label = "Connect Splines"
 
     def create(self):
-        self.newInput("an_SplineListSocket", "Splines", "splines").defaultDrawType = "PROPERTY_ONLY"
-        self.newOutput("an_SplineSocket", "Spline", "spline")
+        self.newInput("Spline List", "Splines", "splines", defaultDrawType = "PROPERTY_ONLY")
+        self.newOutput("Spline", "Spline", "spline")
 
     def execute(self, splines):
         return connectSplines(splines)

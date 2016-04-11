@@ -7,16 +7,12 @@ class GetSplineSamplesNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
     bl_label = "Get Spline Samples"
 
     def create(self):
-        self.newInput("an_SplineSocket", "Spline", "spline").defaultDrawType = "PROPERTY_ONLY"
-        self.newInput("an_IntegerSocket", "Amount", "amount").value = 50
-        socket = self.newInput("an_FloatSocket", "Start", "start")
-        socket.value = 0.0
-        socket.setRange(0.0, 1.0)
-        socket = self.newInput("an_FloatSocket", "End", "end")
-        socket.value = 1.0
-        socket.setRange(0.0, 1.0)
-        self.newOutput("an_VectorListSocket", "Positions", "positions")
-        self.newOutput("an_VectorListSocket", "Tangents", "tangents")
+        self.newInput("Spline", "Spline", "spline", defaultDrawType = "PROPERTY_ONLY")
+        self.newInput("Integer", "Amount", "amount", value = 50)
+        self.newInput("Float", "Start", "start", value = 0.0).setRange(0.0, 1.0)
+        self.newInput("Float", "End", "end", value = 1.0).setRange(0.0, 1.0)
+        self.newOutput("Vector List", "Positions", "positions")
+        self.newOutput("Vector List", "Tangents", "tangents")
 
     def draw(self, layout):
         layout.prop(self, "parameterType", text = "")
