@@ -6,11 +6,9 @@ class SequencesFromChannelNode(bpy.types.Node, AnimationNode):
     bl_label = "Sequences from Channel"
 
     def create(self):
-        socket = self.newInput("an_IntegerSocket", "Channel", "channel")
-        socket.value = 1
-        socket.setRange(1, 32)
-        self.newInput("an_SceneSocket", "Scene", "scene").hide = True
-        self.newOutput("an_SequenceListSocket", "Sequences", "sequences")
+        self.newInput("Integer", "Channel", "channel", value = 1).setRange(1, 32)
+        self.newInput("Scene", "Scene", "scene", hide = True)
+        self.newOutput("Sequence List", "Sequences", "sequences")
 
     def getExecutionCode(self):
         return ("editor = scene.sequence_editor if scene else None",

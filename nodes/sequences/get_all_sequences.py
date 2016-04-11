@@ -6,8 +6,8 @@ class GetAllSequencesNode(bpy.types.Node, AnimationNode):
     bl_label = "Get All Sequences"
 
     def create(self):
-        self.newInput("an_SceneSocket", "Scene", "scene").hide = True
-        self.newOutput("an_SequenceListSocket", "Sequences", "sequences")
+        self.newInput("Scene", "Scene", "scene", hide = True)
+        self.newOutput("Sequence List", "Sequences", "sequences")
 
     def getExecutionCode(self):
         return ("editor = scene.sequence_editor if scene else None",
