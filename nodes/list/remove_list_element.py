@@ -4,8 +4,7 @@ from ... tree_info import keepNodeState
 from ... ui.info_popups import showTextPopup
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
-from ... sockets.info import (toIdName, toListIdName, toBaseDataType, isBase,
-                              isComparable, toListDataType, isList)
+from ... sockets.info import toBaseDataType, isBase, isComparable, toListDataType, isList
 
 removeTypeItems = [
     ("FIRST_OCCURRENCE", "First Occurrence", "", "", 0),
@@ -20,15 +19,11 @@ class RemoveListElementNode(bpy.types.Node, AnimationNode):
 
     def assignedTypeChanged(self, context):
         if self.isAllowedDataType(self.assignedType):
-            self.baseIdName = toIdName(self.assignedType)
-            self.listIdName = toListIdName(self.assignedType)
             self.generateSockets()
         else:
             self.reset_and_show_error()
 
     assignedType = StringProperty(update = assignedTypeChanged)
-    baseIdName = StringProperty()
-    listIdName = StringProperty()
 
     def removeTypeChanged(self, context):
         if self.isAllowedDataType(self.assignedType):
@@ -106,14 +101,17 @@ class RemoveListElementNode(bpy.types.Node, AnimationNode):
         self.inputs.clear()
         self.outputs.clear()
 
+        baseDataType = self.assignedType
+        listDataType = toListDataType(self.assignedType)
+
         if self.removeType in ("FIRST_OCCURRENCE", "INDEX"):
-            self.newInput(self.listIdName, "List", "inList").dataIsModified = True
+            self.newInput(listDataType, "List", "inList", dataIsModified = True)
         else:
-            self.newInput(self.listIdName, "List", "inList")
+            self.newInput(listDataType, "List", "inList")
 
         if self.removeType in ("FIRST_OCCURRENCE", "ALL_OCCURRENCES"):
-            self.newInput(self.baseIdName, "Element", "element").defaultDrawType = "PREFER_PROPERTY"
+            self.newInput(baseDataType, "Element", "element", defaultDrawType = "PREFER_PROPERTY")
         elif self.removeType == "INDEX":
-            self.newInput("an_IntegerSocket", "Index", "index")
+            self.newInput("Integer", "Index", "index")
 
-        self.newOutput(self.listIdName, "List", "outList")
+        self.newOutput(listDataType, "List", "outList")

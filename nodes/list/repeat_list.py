@@ -4,7 +4,7 @@ from bpy.props import *
 from ... tree_info import keepNodeState
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
-from ... sockets.info import toIdName, isList, toBaseDataType, isCopyable, getCopyExpression
+from ... sockets.info import isList, toBaseDataType, isCopyable, getCopyExpression
 
 repetitionTypeItems = [
     ("LOOP", "Loop", "Repeat", "NONE", 0),
@@ -21,11 +21,9 @@ class RepeatListNode(bpy.types.Node, AnimationNode):
     bl_label = "Repeat  List"
 
     def assignedTypeChanged(self, context):
-        self.listIdName = toIdName(self.assignedType)
         self.generateSockets()
 
     assignedType = StringProperty(update = assignedTypeChanged)
-    listIdName = StringProperty()
 
     def repetitionTypeChanged(self, context):
         self.generateSockets()
@@ -52,12 +50,13 @@ class RepeatListNode(bpy.types.Node, AnimationNode):
         self.inputs.clear()
         self.outputs.clear()
 
-        self.newInput(self.listIdName, "List", "inList")
+        listDataType = self.assignedType
+        self.newInput(listDataType, "List", "inList")
         if self.amountType == "AMOUNT":
-            self.newInput("an_IntegerSocket", "Amount", "amount").value = 5
+            self.newInput("Integer", "Amount", "amount", value = 5)
         elif "LENGTH" in self.amountType:
-            self.newInput("an_IntegerSocket", "Length", "length").value = 20
-        self.newOutput(self.listIdName, "List", "outList")
+            self.newInput("Integer", "Length", "length", value = 20)
+        self.newOutput(listDataType, "List", "outList")
 
     def draw(self, layout):
         col = layout.column()
