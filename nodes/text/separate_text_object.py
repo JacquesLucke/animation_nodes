@@ -35,7 +35,7 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
     originType = EnumProperty(name = "Origin Type", items = originTypeItems, default = "DEFAULT")
 
     def create(self):
-        self.newOutput("an_ObjectListSocket", "Text Objects", "textObjects")
+        self.newOutput("Object List", "Text Objects", "textObjects")
 
     def draw(self, layout):
         row = layout.row(align = True)

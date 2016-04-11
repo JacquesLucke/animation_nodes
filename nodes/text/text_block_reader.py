@@ -6,8 +6,8 @@ class TextBlockReaderNode(bpy.types.Node, AnimationNode):
     bl_label = "Text Block Reader"
 
     def create(self):
-        self.newInput("an_TextBlockSocket", "Text Block", "textBlock").defaultDrawType = "PROPERTY_ONLY"
-        self.newOutput("an_StringSocket", "Text", "text")
+        self.newInput("Text Block", "Text Block", "textBlock").defaultDrawType = "PROPERTY_ONLY"
+        self.newOutput("String", "Text", "text")
 
     def execute(self, textBlock):
         if textBlock is None: return ""

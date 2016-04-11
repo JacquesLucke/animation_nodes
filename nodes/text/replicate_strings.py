@@ -6,11 +6,9 @@ class ReplicateStringsNode(bpy.types.Node, AnimationNode):
     bl_label = "Replicate Text"
 
     def create(self):
-        self.newInput("an_StringSocket", "Text", "text")
-        socket = self.newInput("an_IntegerSocket", "Amount", "amount")
-        socket.minValue = 0
-        socket.value = 2
-        self.newOutput("an_StringSocket", "Text", "outText")
+        self.newInput("String", "Text", "text")
+        self.newInput("Integer", "Amount", "amount", value = 2, minValue = 0)
+        self.newOutput("String", "Text", "outText")
 
     def getExecutionCode(self):
         return "outText = text * amount"

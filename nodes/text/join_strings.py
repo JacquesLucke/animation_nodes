@@ -6,9 +6,9 @@ class JoinStringsNode(bpy.types.Node, AnimationNode):
     bl_label = "Join Texts"
 
     def create(self):
-        self.newInput("an_StringListSocket", "Texts", "texts")
-        self.newInput("an_StringSocket", "Separator", "separator")
-        self.newOutput("an_StringSocket", "Text", "text")
+        self.newInput("String List", "Texts", "texts")
+        self.newInput("String", "Separator", "separator")
+        self.newOutput("String", "Text", "text")
 
     def getExecutionCode(self):
         return "text = separator.join(texts)"

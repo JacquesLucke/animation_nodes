@@ -6,8 +6,8 @@ class ConvertToStringNode(bpy.types.Node, AnimationNode):
     bl_label = "Convert to Text"
 
     def create(self):
-        self.newInput("an_GenericSocket", "Data", "data")
-        self.newOutput("an_StringSocket", "Text", "text")
+        self.newInput("Generic", "Data", "data")
+        self.newOutput("String", "Text", "text")
 
     def getExecutionCode(self):
         return "text = str(data)"

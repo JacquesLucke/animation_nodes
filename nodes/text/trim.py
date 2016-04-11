@@ -20,10 +20,10 @@ class TrimTextNode(bpy.types.Node, AnimationNode):
         description = "Negative indices start from the end")
 
     def create(self):
-        self.newInput("an_StringSocket", "Text", "text")
-        self.newInput("an_IntegerSocket", "Start", "start").value = 0
-        self.newInput("an_IntegerSocket", "End", "end").value = 5
-        self.newOutput("an_StringSocket", "Text", "outText")
+        self.newInput("String", "Text", "text")
+        self.newInput("Integer", "Start", "start", value = 0)
+        self.newInput("Integer", "End", "end", value = 5)
+        self.newOutput("String", "Text", "outText")
 
     def draw(self, layout):
         layout.prop(self, "autoEnd", text = "Auto End")
