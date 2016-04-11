@@ -3,7 +3,7 @@ from bpy.props import *
 from ... tree_info import keepNodeState
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
-from ... sockets.info import getBaseDataTypeItemsCallback, toIdName, toListIdName, isBase, toBaseDataType
+from ... sockets.info import isBase, toBaseDataType, toListDataType
 
 class GetListElementNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GetListElementNode"
@@ -11,13 +11,9 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
     dynamicLabelType = "HIDDEN_ONLY"
 
     def assignedTypeChanged(self, context):
-        self.baseIdName = toIdName(self.assignedType)
-        self.listIdName = toListIdName(self.assignedType)
         self.generateSockets()
 
     assignedType = StringProperty(update = assignedTypeChanged)
-    baseIdName = StringProperty()
-    listIdName = StringProperty()
 
     clampIndex = BoolProperty(name = "Clamp Index", default = False,
         description = "Clamp the index between the lowest and highest possible index",
@@ -93,7 +89,10 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
     def generateSockets(self):
         self.inputs.clear()
         self.outputs.clear()
-        self.newInput(self.listIdName, "List", "list")
-        self.newInput("an_IntegerSocket", "Index", "index")
-        self.newInput(self.baseIdName, "Fallback", "fallback").hide = True
-        self.newOutput(self.baseIdName, "Element", "element")
+
+        baseDataType = self.assignedType
+        listDataType = toListDataType(self.assignedType)
+        self.newInput(listDataType, "List", "list")
+        self.newInput("Integer", "Index", "index")
+        self.newInput(baseDataType, "Fallback", "fallback").hide = True
+        self.newOutput(baseDataType, "Element", "element")

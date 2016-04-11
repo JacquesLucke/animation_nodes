@@ -3,7 +3,7 @@ from bpy.props import *
 from ... tree_info import keepNodeState
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
-from ... sockets.info import toIdName, toListIdName, isBase, toBaseDataType
+from ... sockets.info import isBase, toBaseDataType, toListDataType
 
 fillModeItems = [
     ("LEFT", "Left", "", "TRIA_LEFT", 0),
@@ -14,13 +14,9 @@ class FillListNode(bpy.types.Node, AnimationNode):
     bl_label = "Fill List"
 
     def assignedTypeChanged(self, context):
-        self.baseIdName = toIdName(self.assignedType)
-        self.listIdName = toListIdName(self.assignedType)
         self.generateSockets()
 
     assignedType = StringProperty(update = assignedTypeChanged)
-    baseIdName = StringProperty()
-    listIdName = StringProperty()
 
     fillMode = EnumProperty(name = "Fill Mode", default = "RIGHT",
         items = fillModeItems, update = executionCodeChanged)
@@ -79,7 +75,9 @@ class FillListNode(bpy.types.Node, AnimationNode):
         self.inputs.clear()
         self.outputs.clear()
 
+        baseDataType = self.assignedType
+        listDataType = toListDataType(self.assignedType)
         self.newInput("an_IntegerSocket", "Length", "length")
-        self.newInput(self.listIdName, "List", "inList").dataIsModified = True
-        self.newInput(self.baseIdName, "Element", "fillElement")
-        self.newOutput(self.listIdName, "List", "outList")
+        self.newInput(listDataType, "List", "inList").dataIsModified = True
+        self.newInput(baseDataType, "Element", "fillElement")
+        self.newOutput(listDataType, "List", "outList")
