@@ -51,10 +51,11 @@ class ShapeKeyListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_ShapeKeyListSocket"
     bl_label = "Shape Key List Socket"
     dataType = "Shape Key List"
+    baseDataType = "Shape Key"
     allowedInputTypes = ["Shape Key List"]
     drawColor = (1.0, 0.6, 0.5, 0.5)
     storable = False
     comparable = False
 
     def getValueCode(self):
-        return "[]"            
+        return "[]"

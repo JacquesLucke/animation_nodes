@@ -21,15 +21,17 @@ class SocketInfo:
         self.baseDataTypes = set()
         self.listDataTypes = set()
 
-    def update(self, socketClasses, listChains):
+    def update(self, socketClasses):
         self.reset()
 
-        for socketClass in socketClasses:
-            self.insertSocket(socketClass)
+        # create lookup tables first
+        for socket in socketClasses:
+            self.insertSocket(socket)
 
-        for chain in listChains:
-            for baseIdName, listIdName in zip(chain[:-1], chain[1:]):
-                self.insertBaseListConnection(baseIdName, listIdName)
+        # then insert the socket connections
+        for socket in socketClasses:
+            if hasattr(socket, "baseDataType"):
+                self.insertSocketConnection(socket.baseDataType, socket.dataType)
 
     def insertSocket(self, socketClass):
         idName = socketClass.bl_idname
@@ -44,9 +46,10 @@ class SocketInfo:
         self.typeConversion[idName] = dataType
         self.typeConversion[dataType] = idName
 
-    def insertBaseListConnection(self, baseIdName, listIdName):
-        listDataType = self.typeConversion[listIdName]
-        baseDataType = self.typeConversion[baseIdName]
+    def insertSocketConnection(self, baseDataType, listDataType):
+        print(baseDataType, listDataType)
+        baseIdName = self.typeConversion[baseDataType]
+        listIdName = self.typeConversion[listDataType]
 
         self.baseIdName[listIdName] = baseIdName
         self.baseIdName[listDataType] = baseIdName
@@ -58,48 +61,20 @@ class SocketInfo:
         self.listDataType[baseIdName] = listDataType
         self.listDataType[baseDataType] = listDataType
 
-        self.listDataTypes.add(listDataType)
         self.baseDataTypes.add(baseDataType)
+        self.listDataTypes.add(listDataType)
 
 
 _socketInfo = SocketInfo()
 
 def updateSocketInfo():
     socketClasses = getSocketClasses()
-    _socketInfo.update(socketClasses, listChains)
+    _socketInfo.update(socketClasses)
 
 def getSocketClasses():
     from .. base_types.socket import AnimationNodeSocket
     return AnimationNodeSocket.__subclasses__()
 
-listChains = [
-    ["an_FloatSocket",              "an_FloatListSocket"],
-    ["an_IntegerSocket",            "an_IntegerListSocket"],
-    ["an_VectorSocket",             "an_VectorListSocket"],
-    ["an_ColorSocket",              "an_ColorListSocket"],
-    ["an_ObjectSocket",             "an_ObjectListSocket"],
-    ["an_StringSocket",             "an_StringListSocket"],
-    ["an_EdgeIndicesSocket",        "an_EdgeIndicesListSocket"],
-    ["an_PolygonIndicesSocket",     "an_PolygonIndicesListSocket"],
-    ["an_ParticleSocket",           "an_ParticleListSocket"],
-    ["an_ParticleSystemSocket",     "an_ParticleSystemListSocket"],
-    ["an_SplineSocket",             "an_SplineListSocket"],
-    ["an_MatrixSocket",             "an_MatrixListSocket"],
-    ["an_MeshDataSocket",           "an_MeshDataListSocket"],
-    ["an_SequenceSocket",           "an_SequenceListSocket"],
-    ["an_PolygonSocket",            "an_PolygonListSocket"],
-    ["an_VertexSocket",             "an_VertexListSocket"],
-    ["an_GenericSocket",            "an_GenericListSocket"],
-    ["an_FCurveSocket",             "an_FCurveListSocket"],
-    ["an_ObjectGroupSocket",        "an_ObjectGroupListSocket"],
-    ["an_EulerSocket",              "an_EulerListSocket"],
-    ["an_QuaternionSocket",         "an_QuaternionListSocket"],
-    ["an_TextBlockSocket",          "an_TextBlockListSocket"],
-    ["an_SceneSocket",              "an_SceneListSocket"],
-    ["an_InterpolationSocket",      "an_InterpolationListSocket"],
-    ["an_FontSocket",               "an_FontListSocket"],
-    ["an_ShapeKeySocket",           "an_ShapeKeyListSocket"],
-    ["an_BooleanSocket",            "an_BooleanListSocket"] ]
 
 def returnOnFailure(returnValue):
     def failHandlingDecorator(function):

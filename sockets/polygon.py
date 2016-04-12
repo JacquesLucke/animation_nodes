@@ -28,6 +28,7 @@ class PolygonListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_PolygonListSocket"
     bl_label = "Polygon List Socket"
     dataType = "Polygon List"
+    baseDataType = "Polygon"
     allowedInputTypes = ["Polygon List"]
     drawColor = (0.4, 0.7, 0.3, 0.5)
     storable = True

@@ -38,6 +38,7 @@ class ColorListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_ColorListSocket"
     bl_label = "Color List Socket"
     dataType = "Color List"
+    baseDataType = "Color"
     allowedInputTypes = ["Color List"]
     drawColor = (0.8, 0.8, 0.2, 0.5)
     storable = True

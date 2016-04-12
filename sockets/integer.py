@@ -54,6 +54,7 @@ class IntegerListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_IntegerListSocket"
     bl_label = "Integer List Socket"
     dataType = "Integer List"
+    baseDataType = "Integer"
     allowedInputTypes = ["Integer List"]
     drawColor = (0.3, 0.4, 1.0, 0.5)
     storable = True

@@ -41,6 +41,7 @@ class SceneListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_SceneListSocket"
     bl_label = "Scene List Socket"
     dataType = "Scene List"
+    baseDataType = "Scene"
     allowedInputTypes = ["Scene List"]
     drawColor = (0.2, 0.3, 0.4, 0.5)
     storable = False

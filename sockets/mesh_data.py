@@ -23,6 +23,7 @@ class MeshDataListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_MeshDataListSocket"
     bl_label = "Mesh Data List Socket"
     dataType = "Mesh Data List"
+    baseDataType = "Mesh Data"
     allowedInputTypes = ["Mesh Data List"]
     drawColor = (0.3, 0.4, 0.18, 0.5)
     storable = True

@@ -72,6 +72,7 @@ class ObjectListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_ObjectListSocket"
     bl_label = "Object List Socket"
     dataType = "Object List"
+    baseDataType = "Object"
     allowedInputTypes = ["Object List"]
     drawColor = (0, 0, 0, 0.5)
     storable = False
@@ -82,4 +83,4 @@ class ObjectListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     @classmethod
     def getCopyExpression(cls):
-        return "value[:]"        
+        return "value[:]"

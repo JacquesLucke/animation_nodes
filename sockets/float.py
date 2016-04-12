@@ -64,6 +64,7 @@ class FloatListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_FloatListSocket"
     bl_label = "Float List Socket"
     dataType = "Float List"
+    baseDataType = "Float"
     allowedInputTypes = ["Float List", "Integer List"]
     drawColor = (0.4, 0.4, 0.7, 0.5)
     storable = True
@@ -74,4 +75,4 @@ class FloatListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     @classmethod
     def getCopyExpression(cls):
-        return "value[:]"        
+        return "value[:]"

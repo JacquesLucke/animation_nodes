@@ -55,6 +55,7 @@ class InterpolationListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_InterpolationListSocket"
     bl_label = "Interpolation List Socket"
     dataType = "Interpolation List"
+    baseDataType = "Interpolation"
     allowedInputTypes = ["Interpolation List"]
     drawColor = (0.7, 0.4, 0.3, 0.5)
     storable = False

@@ -18,6 +18,7 @@ class ParticleListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_ParticleListSocket"
     bl_label = "Particle List Socket"
     dataType = "Particle List"
+    baseDataType = "Particle"
     allowedInputTypes = ["Particle List"]
     drawColor = (0.5, 0.3, 0.1, 0.5)
     storable = False

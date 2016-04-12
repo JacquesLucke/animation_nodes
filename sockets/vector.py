@@ -40,6 +40,7 @@ class VectorListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_VectorListSocket"
     bl_label = "Vector List Socket"
     dataType = "Vector List"
+    baseDataType = "Vector"
     allowedInputTypes = ["Vector List"]
     drawColor = (0.15, 0.15, 0.8, 0.5)
     storable = True

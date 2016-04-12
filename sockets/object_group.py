@@ -31,6 +31,7 @@ class ObjectGroupListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_ObjectGroupListSocket"
     bl_label = "Object Group List Socket"
     dataType = "Object Group List"
+    baseDataType = "Object Group"
     allowedInputTypes = ["Object Group List"]
     drawColor = (0.3, 0.1, 0.1, 0.5)
     storable = False
