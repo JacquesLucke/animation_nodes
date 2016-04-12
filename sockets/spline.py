@@ -4,7 +4,8 @@ from .. events import propertyChanged
 from .. base_types.socket import AnimationNodeSocket
 from .. utils.id_reference import tryToFindObjectReference
 from .. data_structures.splines.bezier_spline import BezierSpline
-from .. data_structures.splines.from_blender import createSplinesFromBlenderObject
+from .. data_structures.splines.from_blender import (createSplinesFromBlenderObject,
+                                                     createSplineFromBlenderSpline)
 
 class SplineSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_SplineSocket"
@@ -35,12 +36,19 @@ class SplineSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def getValue(self):
         object = self.getObject()
-        splines = createSplinesFromBlenderObject(object)
-        if self.useWorldSpace:
-            for spline in splines:
-                spline.transform(object.matrix_world)
-        if len(splines) > 0: return splines[0]
-        else: return BezierSpline()
+        if getattr(object, "type", "") != "CURVE":
+            return BezierSpline()
+
+        bSplines = object.data.splines
+        if len(bSplines) > 0:
+            spline = createSplineFromBlenderSpline(bSplines[0])
+            # is None when the spline type is not supported
+            if spline is not None:
+                if self.useWorldSpace:
+                    spline.transform(object.matrix_world)
+                return spline
+
+        return BezierSpline()
 
     def getObject(self):
         if self.objectName == "": return None
@@ -130,4 +138,4 @@ class SplineListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def assignActiveObject(self):
         object = bpy.context.active_object
         if getattr(object, "type", "") == "CURVE":
-            self.objectName = object.name                
+            self.objectName = object.name
