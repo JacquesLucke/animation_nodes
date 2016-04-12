@@ -109,23 +109,25 @@ class LoopExecutionUnit:
     def iter_IteratorLength_PrepareLoopLines(self, inputNode, variables):
         iterators = inputNode.getIteratorSockets()
         iteratorNames = ["loop_iterator_" + str(i) for i in range(len(iterators))]
-        zipLine = "loop_zipped_list = list(zip({}))".format(", ".join(iteratorNames))
-        iterationsLine = "loop_iterations = len(loop_zipped_list)"
+
+        if inputNode.iterationsSocket.isLinked:
+            yield "zipped_iterators = list(zip({}))".format(", ".join(iteratorNames))
+            yield "loop_iterations = len(zipped_iterators)"
+        else:
+            # loop_iterations doesn't have to be calculated
+            #  -> no need to make a list of the zip object
+            yield "zipped_iterators = zip({})".format(", ".join(iteratorNames))
 
         names = []
         for i, socket in enumerate(iterators):
             name = "loop_iterator_element_" + str(i)
             variables[socket] = name
             names.append(name)
-        loopLine = "for current_loop_index, ({}, ) in enumerate(loop_zipped_list):".format(", ".join(names))
+
+        yield "for current_loop_index, ({}, ) in enumerate(zipped_iterators):".format(", ".join(names))
 
         variables[inputNode.indexSocket] = "current_loop_index"
         variables[inputNode.iterationsSocket] = "loop_iterations"
-
-        yield zipLine
-        yield iterationsLine
-        yield loopLine
-
 
     def iter_InitializeGeneratorsLines(self, inputNode, variables, nodeByID):
         for i, node in enumerate(inputNode.getSortedGeneratorNodes(nodeByID)):
