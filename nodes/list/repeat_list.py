@@ -94,8 +94,8 @@ class RepeatListNode(bpy.types.Node, AnimationNode):
                 yield "    elementIterator = itertools.cycle(inList + inList[::-1])"
 
         if makeCopies:
-            yield ("    elementIterator = ({} for element in elementIterator)"
-                   .format(copyExpression.replace("value", "element")))
+            yield ("    elementIterator = ({} for _element in elementIterator)"
+                   .format(copyExpression.replace("value", "_element")))
 
         yield "    outList = list(itertools.islice(elementIterator, outLength))"
 
