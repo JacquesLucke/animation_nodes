@@ -59,3 +59,20 @@ class StringSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             else: item.displayName = enumItem[0]
             if len(enumItem) > 2: item.description = enumItem[2]
             if len(enumItem) > 3: item.icon = enumItem[3]
+
+
+class StringListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+    bl_idname = "an_StringListSocket"
+    bl_label = "String List Socket"
+    dataType = "String List"
+    allowedInputTypes = ["String List"]
+    drawColor = (1, 1, 1, 0.5)
+    storable = True
+    comparable = False
+
+    def getValueCode(self):
+        return "[]"
+
+    @classmethod
+    def getCopyExpression(cls):
+        return "value[:]"            

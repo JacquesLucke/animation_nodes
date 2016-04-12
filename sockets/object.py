@@ -66,3 +66,20 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         object = bpy.data.objects.new("Target", data)
         bpy.context.scene.objects.link(object)
         self.objectName = object.name
+
+
+class ObjectListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+    bl_idname = "an_ObjectListSocket"
+    bl_label = "Object List Socket"
+    dataType = "Object List"
+    allowedInputTypes = ["Object List"]
+    drawColor = (0, 0, 0, 0.5)
+    storable = False
+    comparable = False
+
+    def getValueCode(self):
+        return "[]"
+
+    @classmethod
+    def getCopyExpression(cls):
+        return "value[:]"        

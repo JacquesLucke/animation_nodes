@@ -32,3 +32,20 @@ class FontSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         object = bpy.context.active_object
         if object.type == "FONT":
             self.fontName = object.data.font.name
+
+
+class FontListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+    bl_idname = "an_FontListSocket"
+    bl_label = "Font List Socket"
+    dataType = "Font List"
+    allowedInputTypes = ["Font List"]
+    drawColor = (0.444, 0.444, 0, 0.5)
+    storable = False
+    comparable = False
+
+    def getValueCode(self):
+        return "[]"
+
+    @classmethod
+    def getCopyExpression(cls):
+        return "value[:]"

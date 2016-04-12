@@ -19,7 +19,7 @@ class BooleanSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def drawProperty(self, layout, text):
         row = layout.row()
         row.prop(self, "value", text = text)
-        
+
         if self.showCreateCompareNodeButton and self.isUnlinked:
             self.invokeFunction(row, "createCompareNode", icon = "PLUS", emboss = False,
                 description = "Create compare node")
@@ -37,3 +37,20 @@ class BooleanSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         node = newNodeAtCursor("an_CompareNode")
         self.linkWith(node.outputs[0])
         invokeTranslation()
+
+
+class BooleanListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+    bl_idname = "an_BooleanListSocket"
+    bl_label = "Boolean List Socket"
+    dataType = "Boolean List"
+    allowedInputTypes = ["Boolean List"]
+    drawColor = (0.7, 0.7, 0.4, 0.5)
+    storable = True
+    comparable = False
+
+    def getValueCode(self):
+        return "[]"
+
+    @classmethod
+    def getCopyExpression(cls):
+        return "value[:]"

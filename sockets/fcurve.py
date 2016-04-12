@@ -14,3 +14,20 @@ class FCurveSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def getValueCode(self):
         return "None"
+
+
+class FCurveListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+    bl_idname = "an_FCurveListSocket"
+    bl_label = "FCurve List Socket"
+    dataType = "FCurve List"
+    allowedInputTypes = ["FCurve List"]
+    drawColor = (0.2, 0.26, 0.19, 0.5)
+    storable = True
+    comparable = False
+
+    def getValueCode(self):
+        return "[]"
+
+    @classmethod
+    def getCopyExpression(cls):
+        return "value[:]"
