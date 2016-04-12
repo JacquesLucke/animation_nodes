@@ -5,7 +5,8 @@ from ... base_types.node import AnimationNode
 
 caseTypeItems= [("UPPER", "To Upper Case", ""),
                 ("LOWER", "To Lower Case", ""),
-                ("CAPITALIZE", "Capitalize Phrase", "") ]
+                ("CAPITALIZE", "Capitalize Phrase", ""),
+                ("CAPITALIZE_WORDS", "Capitalize Words", "") ]
 
 caseTypeCode = { item[0] : item[0].lower() for item in caseTypeItems }
 
@@ -28,4 +29,6 @@ class ChangeTextCaseNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "caseType", text = "")
 
     def getExecutionCode(self):
+        if self.caseType == "CAPITALIZE_WORDS":
+            return "outText = ' '.join( [t.capitalize() for t in inText.split()])"
         return "outText = inText.{}()".format(caseTypeCode[self.caseType])
