@@ -47,7 +47,6 @@ class SocketInfo:
         self.typeConversion[dataType] = idName
 
     def insertSocketConnection(self, baseDataType, listDataType):
-        print(baseDataType, listDataType)
         baseIdName = self.typeConversion[baseDataType]
         listIdName = self.typeConversion[listDataType]
 
