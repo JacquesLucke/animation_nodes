@@ -30,4 +30,9 @@ class ChangeTextCaseNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "caseType", text = "")
 
     def getExecutionCode(self):
+        if self.caseType == "CAPWORDS":
+            return "outText = string.capwords(inText)"
         return "outText = inText.{}()".format(caseTypeCode[self.caseType])
+
+    def getUsedModules(self):
+        return ["string"]
