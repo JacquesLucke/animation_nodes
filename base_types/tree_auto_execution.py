@@ -41,8 +41,9 @@ class AutoExecutionTrigger_MonitorProperty(bpy.types.PropertyGroup):
     def getProperty(self):
         self.hasError = False
         object = self.getObject()
-        if object is None:
+        if object is None or self.dataPath is "":
             return None
+
         try: return object.path_resolve(self.dataPath)
         except:
             self.hasError = True
@@ -68,11 +69,17 @@ class AutoExecutionTrigger_MonitorProperty(bpy.types.PropertyGroup):
         row.prop(self, "enabled", icon = icon, text = "")
 
         row.active = self.enabled
+
+        props = row.operator("an.assign_active_object_to_auto_execution_trigger", icon = "EYEDROPPER", text = "")
+        props.index = index
+
         if self.idType == "OBJECT":
             row.prop_search(self, "idObjectName", bpy.context.scene, "objects", text = "")
         elif self.idType == "SCENE":
             row.prop_search(self, "idObjectName", bpy.data, "scenes", text = "")
-        row.prop(self, "dataPath", icon = "RNA", text = "")
+
+        row.prop(self, "dataPath", text = "")
+
         props = row.operator("an.remove_auto_execution_trigger", icon = "X", text = "")
         props.triggerType = "MONITOR_PROPERTY"
         props.index = index
@@ -178,4 +185,25 @@ class RemoveAutoExecutionTrigger(bpy.types.Operator):
 
         if self.triggerType == "MONITOR_PROPERTY":
             customTriggers.monitorPropertyTriggers.remove(self.index)
+        return {"FINISHED"}
+
+
+class AssignActiveObjectToAutoExecutionTrigger(bpy.types.Operator):
+    bl_idname = "an.assign_active_object_to_auto_execution_trigger"
+    bl_label = "Assign Active Object to Auto Execution Trigger"
+    bl_options = {"UNDO"}
+
+    index = IntProperty()
+
+    @classmethod
+    def poll(cls, context):
+        return context.isAnimationNodeTreeActive()
+
+    def execute(self, context):
+        tree = context.space_data.node_tree
+        trigger = tree.autoExecution.customTriggers.monitorPropertyTriggers[self.index]
+        if trigger.idType == "OBJECT":
+            trigger.idObjectName = getattr(context.active_object, "name", "")
+        if trigger.idType == "SCENE":
+            trigger.idObjectName = getattr(context.scene, "name", "")
         return {"FINISHED"}
