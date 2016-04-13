@@ -3,35 +3,13 @@ import time
 from bpy.props import *
 from .. utils.handlers import eventHandler
 from .. utils.nodes import getAnimationNodeTrees
+from . tree_auto_execution import AutoExecutionProperties
 from .. events import treeChanged, isRendering, propertyChanged
 from .. nodes.generic.debug_loop import clearDebugLoopTextBlocks
 from .. utils.blender_ui import iterActiveScreens, isViewportRendering
 from .. preferences import getBlenderVersion, getAnimationNodesVersion
 from .. tree_info import getNetworksByNodeTree, getSubprogramNetworksByNodeTree
 from .. execution.units import getMainUnitsByNodeTree, setupExecutionUnits, finishExecutionUnits
-
-class AutoExecutionProperties(bpy.types.PropertyGroup):
-
-    enabled = BoolProperty(default = True, name = "Enabled",
-        description = "Enable auto execution for this node tree")
-
-    sceneUpdate = BoolProperty(default = True, name = "Scene Update",
-        description = "Execute many times per second to react on all changes in real time (deactivated during preview rendering)")
-
-    frameChanged = BoolProperty(default = False, name = "Frame Changed",
-        description = "Execute after the frame changed")
-
-    propertyChanged = BoolProperty(default = False, name = "Property Changed",
-        description = "Execute when a attribute in a animation node tree changed")
-
-    treeChanged = BoolProperty(default = False, name = "Tree Changed",
-        description = "Execute when the node tree changes (create/remove links and nodes)")
-
-    minTimeDifference = FloatProperty(name = "Min Time Difference",
-        description = "Auto execute not that often; E.g. only every 0.5 seconds",
-        default = 0.0, min = 0.0, soft_max = 1.0)
-
-    lastExecutionTimestamp = FloatProperty(default = 0.0)
 
 
 class LastTreeExecutionInfo(bpy.types.PropertyGroup):
@@ -79,6 +57,10 @@ class AnimationNodeTree(bpy.types.NodeTree):
             return any([screen.is_animation_playing for screen in iterActiveScreens()])
 
         a = self.autoExecution
+
+        # always update the triggers for better visual feedback
+        customTriggerHasBeenActivated = a.customTriggers.update()
+
         if not a.enabled: return False
         if not self.hasMainExecutionUnits: return False
 
@@ -98,7 +80,7 @@ class AnimationNodeTree(bpy.types.NodeTree):
             if events.intersection({"File", "Addon"}) and \
                 (a.sceneUpdate or a.frameChanged or a.propertyChanged or a.treeChanged): return True
 
-        return False
+        return customTriggerHasBeenActivated
 
     def autoExecute(self):
         self._execute()

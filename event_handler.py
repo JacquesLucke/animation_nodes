@@ -17,7 +17,7 @@ def update(events):
     if events.intersection({"File", "Addon", "Tree"}) or didNameChange():
         updateEverything()
 
-    updateSocketProperties()
+    updateProperties()
 
     if problems.canAutoExecute():
         nodeTrees = list(iterAutoExecutionNodeTrees(events))
@@ -53,6 +53,9 @@ def getNamesHash():
         (node.name for node in iterAnimationNodes())))
     return names
 
-def updateSocketProperties():
+def updateProperties():
     for socket in iterSocketsThatNeedUpdate():
         socket.updateProperty()
+
+    for tree in getAnimationNodeTrees():
+        tree.autoExecution.customTriggers.updateProperties()

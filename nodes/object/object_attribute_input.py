@@ -23,6 +23,9 @@ class ObjectAttributeInputNode(bpy.types.Node, AnimationNode):
         if self.errorMessage != "":
             layout.label(self.errorMessage, icon = "ERROR")
 
+    def drawAdvanced(self, layout):
+        self.invokeFunction(layout, "createAutoExecutionTrigger", text = "Create Execution Trigger")
+
     def getExecutionCode(self):
         code = self.evaluationExpression
 
@@ -43,3 +46,9 @@ class ObjectAttributeInputNode(bpy.types.Node, AnimationNode):
     def evaluationExpression(self):
         if self.attribute.startswith("["): return "value = object" + self.attribute
         else: return "value = object." + self.attribute
+
+    def createAutoExecutionTrigger(self):
+        item = self.nodeTree.autoExecution.customTriggers.new("MONITOR_PROPERTY")
+        item.idType = "OBJECT"
+        item.dataPath = self.attribute
+        item.idObjectName = self.inputs["Object"].objectName

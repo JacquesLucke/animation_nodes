@@ -23,12 +23,14 @@ class AutoExecutionPanel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
 
+        tree = context.space_data.edit_tree
+        autoExecution = tree.autoExecution
+
+        isRendering = isViewportRendering()
+
         if not canExecute():
             layout.label("Look in the 'Problems' panel", icon = "INFO")
 
-        tree = context.space_data.edit_tree
-        autoExecution = tree.autoExecution
-        isRendering = isViewportRendering()
         layout.active = autoExecution.enabled
 
         col = layout.column()
@@ -43,6 +45,14 @@ class AutoExecutionPanel(bpy.types.Panel):
         col.prop(autoExecution, "propertyChanged", text = "Property Changed")
 
         layout.prop(autoExecution, "minTimeDifference", slider = True)
+
+        col = layout.column()
+        col.operator("an.add_auto_execution_trigger", text = "New Trigger", icon = "ZOOMIN")
+        customTriggers = autoExecution.customTriggers
+
+        subcol = col.column(align = True)
+        for i, monitorPropertyTrigger in enumerate(customTriggers.monitorPropertyTriggers):
+            monitorPropertyTrigger.draw(subcol, i)
 
     @classmethod
     def getTree(cls):
