@@ -100,11 +100,13 @@ class CreateListNode(bpy.types.Node, AnimationNode):
         if len(self.inputs) > 2:
             socket.copyDisplaySettingsFrom(self.inputs[0])
 
+        self.updateOutputName()
         return socket
 
     def updateOutputName(self):
         name = "List ({})".format(len(self.inputs) - 1)
-        self.outputs[0].name = name
+        if len(self.outputs) > 0:
+            self.outputs[0].name = name
 
     def removeElementInputs(self):
         for socket in self.inputs[:-1]:
