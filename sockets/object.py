@@ -21,7 +21,7 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
         scene = self.nodeTree.scene
         if scene is None: scene = bpy.context.scene
-        row.prop_search(self, "objectName",  scene, "objects", icon = "NONE", text = text)
+        row.prop_search(self, "objectName", scene, "objects", icon = "NONE", text = text)
 
         if self.objectCreationType != "":
             self.invokeFunction(row, "createObject", icon = "PLUS")
