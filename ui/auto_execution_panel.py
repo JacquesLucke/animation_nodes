@@ -44,6 +44,12 @@ class AutoExecutionPanel(bpy.types.Panel):
 
         layout.prop(autoExecution, "minTimeDifference", slider = True)
 
+        col = layout.column()
+        col.operator("an.add_auto_execution_trigger")
+        customTriggers = autoExecution.customTriggers
+        for monitorPropTrigger in customTriggers.monitorPropertyTriggers:
+            monitorPropTrigger.draw(col)
+
     @classmethod
     def getTree(cls):
         return bpy.context.space_data.edit_tree
