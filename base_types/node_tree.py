@@ -59,7 +59,7 @@ class AnimationNodeTree(bpy.types.NodeTree):
         a = self.autoExecution
 
         # always update the triggers for better visual feedback
-        customTriggerEventRaised = a.customTriggers.update()
+        customTriggerHasBeenActivated = a.customTriggers.update()
 
         if not a.enabled: return False
         if not self.hasMainExecutionUnits: return False
@@ -80,7 +80,7 @@ class AnimationNodeTree(bpy.types.NodeTree):
             if events.intersection({"File", "Addon"}) and \
                 (a.sceneUpdate or a.frameChanged or a.propertyChanged or a.treeChanged): return True
 
-        return customTriggerEventRaised
+        return customTriggerHasBeenActivated
 
     def autoExecute(self):
         self._execute()
