@@ -31,9 +31,6 @@ class AutoExecutionPanel(bpy.types.Panel):
         if not canExecute():
             layout.label("Look in the 'Problems' panel", icon = "INFO")
 
-        if not tree.hasMainExecutionUnits:
-            layout.label("There are no nodes to execute in this tree", icon = "INFO")
-
         layout.active = autoExecution.enabled
 
         col = layout.column()
