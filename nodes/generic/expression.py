@@ -12,6 +12,7 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ExpressionNode"
     bl_label = "Expression"
     bl_width_default = 200
+    dynamicLabelType = "HIDDEN_ONLY"
 
     def settingChanged(self, context = None):
         self.executionError = ""
@@ -56,6 +57,9 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "debugMode")
         layout.prop(self, "outputIsList")
         layout.prop(self, "moduleNames")
+
+    def drawLabel(self):
+        return self.expression
 
     def drawControlSocket(self, layout, socket):
         left, right = splitAlignment(layout)
