@@ -23,12 +23,17 @@ class AutoExecutionPanel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
 
+        tree = context.space_data.edit_tree
+        autoExecution = tree.autoExecution
+
+        isRendering = isViewportRendering()
+
         if not canExecute():
             layout.label("Look in the 'Problems' panel", icon = "INFO")
 
-        tree = context.space_data.edit_tree
-        autoExecution = tree.autoExecution
-        isRendering = isViewportRendering()
+        if not tree.hasMainExecutionUnits:
+            layout.label("There are no nodes to execute in this tree", icon = "INFO")
+
         layout.active = autoExecution.enabled
 
         col = layout.column()
