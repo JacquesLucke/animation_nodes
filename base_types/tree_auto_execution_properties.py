@@ -76,9 +76,12 @@ class CustomAutoExecutionTriggers(bpy.types.PropertyGroup):
 
     monitorPropertyTriggers = CollectionProperty(type = AutoExecutionTrigger_MonitorProperty)
 
-    def new(self, type):
+    def new(self, type, **kwargs):
         if type == "MONITOR_PROPERTY":
-            return self.monitorPropertyTriggers.add()
+            item = self.monitorPropertyTriggers.add()
+        for key, value in kwargs.items():
+            setattr(item, key, value)
+        return item
 
     def update(self):
         triggers = [trigger.update() for trigger in self.monitorPropertyTriggers]

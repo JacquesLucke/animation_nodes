@@ -50,6 +50,7 @@ class ObjectTransformsInputNode(bpy.types.Node, AnimationNode):
         col = layout.column()
         col.active = not self.useCurrentTransforms
         col.prop(self, "frameType")
+        self.invokeFunction(layout, "createAutoExecutionTrigger", text = "Create Execution Trigger")
 
     def getExecutionCode(self):
         isLinked = self.getLinkedOutputsDict()
@@ -77,3 +78,18 @@ class ObjectTransformsInputNode(bpy.types.Node, AnimationNode):
 
     def getUsedModules(self):
         return ["mathutils"]
+
+    def createAutoExecutionTrigger(self):
+        isLinked = self.getLinkedOutputsDict()
+        customTriggers = self.nodeTree.autoExecution.customTriggers
+
+        objectName = self.inputs["Object"].objectName
+
+        if isLinked["location"]:
+            customTriggers.new("MONITOR_PROPERTY", idType = "OBJECT", dataPath = "location", idObjectName = objectName)
+        if isLinked["rotation"]:
+            customTriggers.new("MONITOR_PROPERTY", idType = "OBJECT", dataPath = "rotation_euler", idObjectName = objectName)
+        if isLinked["scale"]:
+            customTriggers.new("MONITOR_PROPERTY", idType = "OBJECT", dataPath = "scale", idObjectName = objectName)
+        if isLinked["quaternion"]:
+            customTriggers.new("MONITOR_PROPERTY", idType = "OBJECT", dataPath = "rotation_quaternion", idObjectName = objectName)
