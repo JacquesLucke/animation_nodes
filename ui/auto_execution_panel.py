@@ -47,8 +47,10 @@ class AutoExecutionPanel(bpy.types.Panel):
         col = layout.column()
         col.operator("an.add_auto_execution_trigger")
         customTriggers = autoExecution.customTriggers
-        for monitorPropTrigger in customTriggers.monitorPropertyTriggers:
-            monitorPropTrigger.draw(col)
+
+        subcol = col.column(align = True)
+        for i, monitorPropertyTrigger in enumerate(customTriggers.monitorPropertyTriggers):
+            monitorPropertyTrigger.draw(subcol, i)
 
     @classmethod
     def getTree(cls):
