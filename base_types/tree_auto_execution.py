@@ -22,7 +22,6 @@ class AutoExecutionTrigger_MonitorProperty(bpy.types.PropertyGroup):
     enabled = BoolProperty(default = True)
     hasError = BoolProperty(default = False)
 
-
     def update(self):
         lastState = self.lastState
         newState = self.getPropertyState()
