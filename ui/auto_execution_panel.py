@@ -45,7 +45,6 @@ class AutoExecutionPanel(bpy.types.Panel):
         layout.prop(autoExecution, "minTimeDifference", slider = True)
 
         col = layout.column()
-        col.operator("an.add_auto_execution_trigger")
         customTriggers = autoExecution.customTriggers
 
         subcol = col.column(align = True)
