@@ -18,16 +18,19 @@ class AutoExecutionTrigger_MonitorProperty(bpy.types.PropertyGroup):
     idObjectName = StringProperty(name = "ID Object Name", default = "")
     dataPath = StringProperty(name = "Data Path", default = "")
 
-    lastState = StringProperty()
+    lastState = StringProperty(default = "")
     enabled = BoolProperty(default = True)
+    hasError = BoolProperty(default = False)
+
 
     def update(self):
+        lastState = self.lastState
         newState = self.getPropertyState()
-        if newState == self.lastState:
+        if newState == lastState:
             return False
         else:
             self.lastState = newState
-            return self.enabled
+            return self.enabled and lastState != ""
 
     def getPropertyState(self):
         prop = self.getProperty()
@@ -37,12 +40,14 @@ class AutoExecutionTrigger_MonitorProperty(bpy.types.PropertyGroup):
         return str(prop)
 
     def getProperty(self):
+        self.hasError = False
         object = self.getObject()
         if object is None:
             return None
-
         try: return object.path_resolve(self.dataPath)
-        except: return None
+        except:
+            self.hasError = True
+            return None
 
     def getObject(self):
         if self.idType == "OBJECT":
@@ -56,18 +61,20 @@ class AutoExecutionTrigger_MonitorProperty(bpy.types.PropertyGroup):
             self.idObjectName = getattr(object, "name", "")
 
     def draw(self, layout, index):
-        row = layout.row(align = False)
-        icon = "LAYER_ACTIVE" if self.enabled else "LAYER_USED"
+        row = layout.row(align = True)
+        if self.hasError:
+            row.label("", icon = "ERROR")
 
-        subrow = row.row(align = True)
-        subrow.active = self.enabled
-        subrow.prop(self, "enabled", icon = icon, text = "")
+        icon = "LAYER_ACTIVE" if self.enabled else "LAYER_USED"
+        row.prop(self, "enabled", icon = icon, text = "")
+
+        row.active = self.enabled
         if self.idType == "OBJECT":
-            subrow.prop_search(self, "idObjectName", bpy.context.scene, "objects", text = "")
+            row.prop_search(self, "idObjectName", bpy.context.scene, "objects", text = "")
         elif self.idType == "SCENE":
-            subrow.prop_search(self, "idObjectName", bpy.data, "scenes", text = "")
-        subrow.prop(self, "dataPath", icon = "RNA", text = "")
-        props = subrow.operator("an.remove_auto_execution_trigger", icon = "X", text = "")
+            row.prop_search(self, "idObjectName", bpy.data, "scenes", text = "")
+        row.prop(self, "dataPath", icon = "RNA", text = "")
+        props = row.operator("an.remove_auto_execution_trigger", icon = "X", text = "")
         props.triggerType = "MONITOR_PROPERTY"
         props.index = index
 

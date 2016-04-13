@@ -3,9 +3,9 @@ import time
 from bpy.props import *
 from .. utils.handlers import eventHandler
 from .. utils.nodes import getAnimationNodeTrees
+from . tree_auto_execution import AutoExecutionProperties
 from .. events import treeChanged, isRendering, propertyChanged
 from .. nodes.generic.debug_loop import clearDebugLoopTextBlocks
-from . tree_auto_execution_properties import AutoExecutionProperties
 from .. utils.blender_ui import iterActiveScreens, isViewportRendering
 from .. preferences import getBlenderVersion, getAnimationNodesVersion
 from .. tree_info import getNetworksByNodeTree, getSubprogramNetworksByNodeTree
@@ -57,6 +57,10 @@ class AnimationNodeTree(bpy.types.NodeTree):
             return any([screen.is_animation_playing for screen in iterActiveScreens()])
 
         a = self.autoExecution
+
+        # always update the triggers for better visual feedback
+        customTriggerEventRaised = a.customTriggers.update()
+
         if not a.enabled: return False
         if not self.hasMainExecutionUnits: return False
 
@@ -76,9 +80,7 @@ class AnimationNodeTree(bpy.types.NodeTree):
             if events.intersection({"File", "Addon"}) and \
                 (a.sceneUpdate or a.frameChanged or a.propertyChanged or a.treeChanged): return True
 
-        if a.customTriggers.update(): return True
-
-        return False
+        return customTriggerEventRaised
 
     def autoExecute(self):
         self._execute()
