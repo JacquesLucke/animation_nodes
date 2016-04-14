@@ -1,4 +1,5 @@
 import bpy
+from ... events import executionCodeChanged
 from ... utils.layout import splitAlignment
 from ... base_types.node import AnimationNode
 
@@ -7,7 +8,7 @@ class SetStructElementsNode(bpy.types.Node, AnimationNode):
     bl_label = "Set Struct Elements"
 
     def create(self):
-        self.newInput("Struct", "Struct", "struct")
+        self.newInput("Struct", "Struct", "struct", dataIsModified = True)
         self.newInput("Node Control", "New Input")
         self.newOutput("Struct", "Struct", "struct")
 
@@ -48,7 +49,8 @@ class SetStructElementsNode(bpy.types.Node, AnimationNode):
         return variables
 
     def getExecutionCode(self):
-        yield "inputsIterator = iter(self.inputs[1:-1])"
         for i, socket in enumerate(self.inputs[1:-1]):
-            yield "socket = next(inputsIterator)"
-            yield "struct.data[(socket.dataType, socket.text)] = input_" + str(i)
+            yield "struct.data[({}, {})] = input_{}".format(repr(socket.dataType), repr(socket.text), i)
+
+    def socketChanged(self):
+        executionCodeChanged()
