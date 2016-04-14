@@ -177,7 +177,7 @@ def makeGlobalExecutionCode(localCode, node, variables):
 
 @lru_cache(maxsize = 2**15)
 def replaceVariableName(code, oldName, newName):
-    pattern = r"([^\.\"\%']|^)\b{}\b".format(oldName)
+    pattern = r"([^\.\"']|^)\b{}\b".format(oldName)
     return re.sub(pattern, r"\1{}".format(newName), code)
 
 
