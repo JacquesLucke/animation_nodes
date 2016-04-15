@@ -30,10 +30,12 @@ class MeshData:
         return True
 
     def hasValidEdgeTupleLengths(self):
-        return all(len(edge) == 2 for edge in self.edges)
+        checkTuple = tuple([2] * len(self.edges))
+        edgeTupleLengths = tuple(map(len, self.edges))
+        return checkTuple == edgeTupleLengths
 
     def hasValidPolygonTupleLengths(self):
-        return all(len(polygon) >= 3 for polygon in self.polygons)
+        return all(amount >= 3 for amount in map(len, self.polygons))
 
     def hasValidIndices(self):
         maxEdgeIndex = max(itertools.chain([-1], *self.edges))
