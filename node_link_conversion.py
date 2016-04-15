@@ -204,18 +204,21 @@ class ConvertToString(LinkCorrection):
         return target.dataType == "String"
     def insert(self, nodeTree, origin, target, dataOrigin):
         node = insertLinkedNode(nodeTree, "an_ConvertToStringNode", origin, target)
+        node.hide = True
 
 class ConvertFromGenericList(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType == "Generic List" and isList(target.dataType)
     def insert(self, nodeTree, origin, target, dataOrigin):
         node = insertLinkedNode(nodeTree, "an_ConvertNode", origin, target)
+        node.hide = True
 
 class ConvertFromGeneric(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType == "Generic"
     def insert(self, nodeTree, origin, target, dataOrigin):
         node = insertLinkedNode(nodeTree, "an_ConvertNode", origin, target)
+        node.hide = True
         tree_info.update()
         node.assignType(target.dataType)
 
