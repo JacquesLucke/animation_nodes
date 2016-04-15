@@ -11,8 +11,8 @@ class StructSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = True
     comparable = False
 
-    def getValue(self):
-        return Struct()
+    def getValueCode(self):
+        return "animation_nodes.data_structures.struct.Struct()"
 
     @classmethod
     def getCopyExpression(cls):
