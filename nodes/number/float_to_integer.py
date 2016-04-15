@@ -19,7 +19,7 @@ class FloatToIntegerNode(bpy.types.Node, AnimationNode):
         self.newOutput("Integer", "Integer", "integer")
 
     def drawLabel(self):
-        return "({}) Float to Integer".format(self.type.capitalize())
+        return "to Integer ({})".format(self.type.lower())
 
     def drawAdvanced(self, layout):
         layout.prop(self, "type", text = "")
