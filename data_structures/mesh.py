@@ -35,7 +35,8 @@ class MeshData:
         return checkTuple == edgeTupleLengths
 
     def hasValidPolygonTupleLengths(self):
-        return all(amount >= 3 for amount in map(len, self.polygons))
+        polygonTupleLengths = set(map(len, self.polygons))
+        return all(amount >= 3 for amount in polygonTupleLengths)
 
     def hasValidIndices(self):
         maxEdgeIndex = max(itertools.chain([-1], *self.edges))
