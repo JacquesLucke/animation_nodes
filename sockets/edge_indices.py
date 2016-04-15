@@ -10,7 +10,8 @@ class EdgeIndicesSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     comparable = True
     storable = True
 
-    def getValueCode(self):
+    @classmethod
+    def getDefaultValueCode(self):
         return "(0, 1)"
 
     @classmethod
@@ -28,7 +29,8 @@ class EdgeIndicesListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = True
     comparable = False
 
-    def getValueCode(self):
+    @classmethod
+    def getDefaultValueCode(self):
         return "[]"
 
     @classmethod

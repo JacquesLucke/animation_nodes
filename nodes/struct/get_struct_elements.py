@@ -71,8 +71,8 @@ class GetStructElementsNode(bpy.types.Node, AnimationNode):
             yield "except:"
             yield "    socket = self.outputs[{}]".format(i)
             yield "    self.errorMessage = '{} does not exist'.format(repr(socket.text))"
-            if socket.hasValueCode:
-                yield "    {} = {}".format(name, socket.getValueCode())
+            if hasattr(socket, "getDefaultValueCode"):
+                yield "    {} = {}".format(name, socket.getDefaultValueCode())
             else:
                 yield "    {} = socket.getValue()".format(name)
 

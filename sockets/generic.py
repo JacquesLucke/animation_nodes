@@ -10,7 +10,8 @@ class GenericSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = False
     comparable = False
 
-    def getValueCode(self):
+    @classmethod
+    def getDefaultValueCode(self):
         return "None"
 
 
@@ -24,5 +25,6 @@ class GenericListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = False
     comparable = False
 
-    def getValueCode(self):
+    @classmethod
+    def getDefaultValueCode(self):
         return "[]"

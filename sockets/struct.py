@@ -11,7 +11,8 @@ class StructSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = True
     comparable = False
 
-    def getValueCode(self):
+    @classmethod
+    def getDefaultValueCode(self):
         return "animation_nodes.data_structures.struct.Struct()"
 
     @classmethod
@@ -29,7 +30,8 @@ class StructListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = True
     comparable = False
 
-    def getValueCode(self):
+    @classmethod
+    def getDefaultValueCode(self):
         return "[]"
 
     @classmethod

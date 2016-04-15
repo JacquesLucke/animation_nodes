@@ -10,7 +10,8 @@ class ParticleSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = False
     comparable = True
 
-    def getValueCode(self):
+    @classmethod
+    def getDefaultValueCode(self):
         return "None"
 
 
@@ -24,7 +25,8 @@ class ParticleListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = False
     comparable = False
 
-    def getValueCode(self):
+    @classmethod
+    def getDefaultValueCode(self):
         return "[]"
 
     @classmethod

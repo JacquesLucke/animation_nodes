@@ -274,10 +274,6 @@ class AnimationNodeSocket:
         return getDirectlyLinkedSockets(self)
 
 
-    @property
-    def hasValueCode(self):
-        return hasattr(self, "getValueCode")
-
     @classmethod
     def isCopyable(self):
         return hasattr(self, "getCopyExpression")
