@@ -36,6 +36,10 @@ class SceneSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getProperty(self):
         return self.sceneName, self.useGlobalScene
 
+    @classmethod
+    def getDefaultValue(cls):
+        return None
+
 
 class SceneListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_SceneListSocket"
@@ -62,6 +66,10 @@ class SceneListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def getValue(self):
         return [self.nodeTree.scene]
+
+    @classmethod
+    def getDefaultValue(cls):
+        return []
 
     @classmethod
     def getCopyExpression(cls):

@@ -12,8 +12,8 @@ class StructSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     comparable = False
 
     @classmethod
-    def getDefaultValueCode(self):
-        return "animation_nodes.data_structures.struct.Struct()"
+    def getDefaultValue(cls):
+        return Struct()
 
     @classmethod
     def getCopyExpression(cls):
@@ -29,6 +29,10 @@ class StructListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     drawColor = (0.3, 0.3, 0.3, 0.5)
     storable = True
     comparable = False
+
+    @classmethod
+    def getDefaultValue(cls):
+        return []
 
     @classmethod
     def getDefaultValueCode(self):

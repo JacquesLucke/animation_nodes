@@ -11,6 +11,10 @@ class GenericSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     comparable = False
 
     @classmethod
+    def getDefaultValue(cls):
+        return None
+
+    @classmethod
     def getDefaultValueCode(self):
         return "None"
 
@@ -24,6 +28,10 @@ class GenericListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     drawColor = (0.6, 0.3, 0.3, 0.5)
     storable = False
     comparable = False
+
+    @classmethod
+    def getDefaultValue(cls):
+        return []
 
     @classmethod
     def getDefaultValueCode(self):

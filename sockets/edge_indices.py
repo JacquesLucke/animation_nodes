@@ -11,6 +11,10 @@ class EdgeIndicesSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = True
 
     @classmethod
+    def getDefaultValue(cls):
+        return (0, 1)
+
+    @classmethod
     def getDefaultValueCode(self):
         return "(0, 1)"
 
@@ -28,6 +32,10 @@ class EdgeIndicesListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     drawColor = (0.4, 0.6, 0.6, 0.5)
     storable = True
     comparable = False
+
+    @classmethod
+    def getDefaultValue(cls):
+        return []
 
     @classmethod
     def getDefaultValueCode(self):

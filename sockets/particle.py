@@ -11,6 +11,10 @@ class ParticleSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     comparable = True
 
     @classmethod
+    def getDefaultValue(cls):
+        return None
+
+    @classmethod
     def getDefaultValueCode(self):
         return "None"
 

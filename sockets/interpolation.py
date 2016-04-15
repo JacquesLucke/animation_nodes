@@ -50,6 +50,10 @@ class InterpolationSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def setProperty(self, data):
         self.category, self.easeIn, self.easeOut = data
 
+    @classmethod
+    def getDefaultValue(cls):
+        return getInterpolationPreset("LINEAR")
+
 
 class InterpolationListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_InterpolationListSocket"
@@ -60,6 +64,10 @@ class InterpolationListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     drawColor = (0.7, 0.4, 0.3, 0.5)
     storable = False
     comparable = False
+
+    @classmethod
+    def getDefaultValue(cls):
+        return []
 
     @classmethod
     def getDefaultValueCode(self):

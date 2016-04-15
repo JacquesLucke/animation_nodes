@@ -32,6 +32,10 @@ class EulerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return self.value[:]
 
     @classmethod
+    def getDefaultValue(cls):
+        return Euler((0, 0, 0))
+
+    @classmethod
     def getCopyExpression(cls):
         return "value.copy()"
 
@@ -45,6 +49,10 @@ class EulerListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     drawColor = (0.1, 0.0, 0.4, 0.5)
     storable = True
     comparable = False
+
+    @classmethod
+    def getDefaultValue(cls):
+        return []
 
     @classmethod
     def getDefaultValueCode(self):

@@ -73,3 +73,7 @@ class SoundSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def createSoundBakeNode(self):
         newNodeAtCursor("an_SoundBakeNode")
         invokeTranslation()
+
+    @classmethod
+    def getDefaultValue(cls):
+        return None

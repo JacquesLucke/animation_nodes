@@ -32,6 +32,10 @@ class VectorSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return self.value[:]
 
     @classmethod
+    def getDefaultValue(cls):
+        return Vector((0, 0, 0))
+
+    @classmethod
     def getCopyExpression(cls):
         return "value.copy()"
 
@@ -45,6 +49,10 @@ class VectorListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     drawColor = (0.15, 0.15, 0.8, 0.5)
     storable = True
     comparable = False
+
+    @classmethod
+    def getDefaultValue(cls):
+        return []
 
     @classmethod
     def getDefaultValueCode(self):

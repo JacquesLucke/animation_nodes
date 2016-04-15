@@ -117,9 +117,6 @@ class AnimationNodeSocket:
     def draw_color(self, context, node):
         return self.drawColor
 
-    def getValue(self):
-        return None
-
     def copyDisplaySettingsFrom(self, other):
         self.display.text = other.display.text
         self.display.textInput = other.display.textInput
@@ -281,6 +278,10 @@ class AnimationNodeSocket:
     @classmethod
     def hasProperty(cls):
         return hasattr(cls, "drawProperty")
+
+    @classmethod
+    def getDefaultValue(cls):
+        raise NotImplementedError("All sockets have to define a getDefaultValue function")
 
 
 

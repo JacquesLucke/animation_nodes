@@ -44,6 +44,14 @@ class SequenceSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         if sequence:
             self.sequenceName = sequence.name
 
+    @classmethod
+    def getDefaultValue(cls):
+        return None
+
+    @classmethod
+    def getDefaultValueCode(cls):
+        return "None"
+
 
 class SequenceListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_SequenceListSocket"
@@ -54,6 +62,10 @@ class SequenceListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     drawColor = (0, 0.644, 0, 0.5)
     storable = False
     comparable = False
+
+    @classmethod
+    def getDefaultValue(cls):
+        return []
 
     @classmethod
     def getDefaultValueCode(self):

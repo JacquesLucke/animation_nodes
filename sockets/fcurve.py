@@ -13,6 +13,10 @@ class FCurveSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     comparable = True
 
     @classmethod
+    def getDefaultValue(cls):
+        return None
+
+    @classmethod
     def getDefaultValueCode(self):
         return "None"
 
@@ -26,6 +30,10 @@ class FCurveListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     drawColor = (0.2, 0.26, 0.19, 0.5)
     storable = True
     comparable = False
+
+    @classmethod
+    def getDefaultValue(cls):
+        return []
 
     @classmethod
     def getDefaultValueCode(self):

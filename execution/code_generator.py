@@ -83,11 +83,15 @@ def getLoadSocketValueLine(socket, node, variables, index = None):
     return "{} = {}".format(variables[socket], getSocketValueExpression(socket, node, index))
 
 def getSocketValueExpression(socket, node, index = None):
-    if hasattr(socket, "getDefaultValueCode"): return socket.getDefaultValueCode()
-    else:
-        socketsName = "inputs" if socket.isInput else "outputs"
-        if index is None: index = socket.getIndex(node)
+    socketsName = "inputs" if socket.isInput else "outputs"
+    if index is None: index = socket.getIndex(node)
+
+    if hasattr(socket, "getValue"):
         return "{}.{}[{}].getValue()".format(node.identifier, socketsName, index)
+    elif hasattr(socket, "getDefaultValueCode"):
+        return socket.getDefaultValueCode()
+    else:
+        return "{}.{}[{}].getDefaultValue()".format(node.identifier, socketsName, index) 
 
 
 

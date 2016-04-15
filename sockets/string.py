@@ -27,6 +27,10 @@ class StringSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getProperty(self):
         return self.value
 
+    @classmethod
+    def getDefaultValue(cls):
+        return ""
+
 
 class StringListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_StringListSocket"
@@ -37,6 +41,10 @@ class StringListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     drawColor = (1, 1, 1, 0.5)
     storable = True
     comparable = False
+
+    @classmethod
+    def getDefaultValue(cls):
+        return []
 
     @classmethod
     def getDefaultValueCode(self):

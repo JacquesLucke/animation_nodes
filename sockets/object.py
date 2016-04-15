@@ -67,6 +67,10 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         bpy.context.scene.objects.link(object)
         self.objectName = object.name
 
+    @classmethod
+    def getDefaultValue(cls):
+        return None
+
 
 class ObjectListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_ObjectListSocket"
@@ -77,6 +81,10 @@ class ObjectListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     drawColor = (0, 0, 0, 0.5)
     storable = False
     comparable = False
+
+    @classmethod
+    def getDefaultValue(cls):
+        return []
 
     @classmethod
     def getDefaultValueCode(self):

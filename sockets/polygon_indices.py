@@ -11,6 +11,10 @@ class PolygonIndicesSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = True
 
     @classmethod
+    def getDefaultValue(cls):
+        return (0, 1, 2)
+
+    @classmethod
     def getDefaultValueCode(self):
         return "(0, 1, 2)"
 
@@ -28,6 +32,10 @@ class PolygonIndicesListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     drawColor = (0.6, 0.3, 0.8, 0.5)
     storable = True
     comparable = False
+
+    @classmethod
+    def getDefaultValue(cls):
+        return []
 
     @classmethod
     def getDefaultValueCode(self):

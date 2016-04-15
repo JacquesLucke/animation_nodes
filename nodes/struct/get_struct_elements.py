@@ -74,7 +74,7 @@ class GetStructElementsNode(bpy.types.Node, AnimationNode):
             if hasattr(socket, "getDefaultValueCode"):
                 yield "    {} = {}".format(name, socket.getDefaultValueCode())
             else:
-                yield "    {} = socket.getValue()".format(name)
+                yield "    {} = socket.getDefaultValue()".format(name)
 
     def socketChanged(self):
         executionCodeChanged()
