@@ -193,15 +193,16 @@ class AnimationNode:
             nodeIdentifier = self.identifier,
             callback = data)
 
-    def invokePopup(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True, width = 250):
-        data = functionName + "," + str(width)
+    def invokePopup(self, layout, drawFunctionName, executeFunctionName = "", text = "", icon = "NONE", description = "", emboss = True, width = 250):
+        data = drawFunctionName + "," + executeFunctionName + "," + str(width)
         self.invokeFunction(layout, "_openNodePopup", text = text, icon = icon, description = description, emboss = emboss, data = data)
 
     def _openNodePopup(self, data):
-        functionName, width = data.split(",")
+        drawFunctionName, executeFunctionName, width = data.split(",")
         bpy.ops.an.node_popup("INVOKE_DEFAULT",
             nodeIdentifier = self.identifier,
-            functionName = functionName,
+            drawFunctionName = drawFunctionName,
+            executeFunctionName = executeFunctionName,
             width = int(width))
 
     def clearSockets(self):

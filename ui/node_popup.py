@@ -10,7 +10,8 @@ class NodePopup(bpy.types.Operator):
     nodeIdentifier = StringProperty(default = "")
 
     width = IntProperty(default = 250)
-    functionName = StringProperty(default = "")
+    drawFunctionName = StringProperty(default = "")
+    executeFunctionName = StringProperty(default = "")
 
     def invoke(self, context, event):
         return context.window_manager.invoke_props_dialog(self, width = self.width * getDpiFactor())
@@ -19,11 +20,17 @@ class NodePopup(bpy.types.Operator):
         try: node = getNodeByIdentifier(self.nodeIdentifier)
         except: self.layout.label("Node not found", icon = "INFO")
 
-        drawFunction = getattr(node, self.functionName)
+        drawFunction = getattr(node, self.drawFunctionName)
         drawFunction(self.layout)
 
     def check(self, context):
         return True
 
     def execute(self, context):
-        return {"INTERFACE"}
+        if self.executeFunctionName != "":
+            try: node = getNodeByIdentifier(self.nodeIdentifier)
+            except: return {"CANCELLED"}
+
+            executeFunction = getattr(node, self.executeFunctionName)
+            executeFunction()
+        return {"FINISHED"}
