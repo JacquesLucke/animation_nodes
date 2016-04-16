@@ -1,8 +1,8 @@
 import bpy
 from bpy.props import *
 from ... events import executionCodeChanged
-from ... utils.layout import splitAlignment
 from ... base_types.node import AnimationNode
+from ... utils.layout import splitAlignment, writeText
 
 class GetStructElementsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GetStructElementsNode"
@@ -20,7 +20,7 @@ class GetStructElementsNode(bpy.types.Node, AnimationNode):
 
     def draw(self, layout):
         if self.errorMessage != "":
-            layout.label(self.errorMessage, icon = "ERROR")
+            writeText(layout, self.errorMessage, icon = "ERROR")
 
     def drawAdvanced(self, layout):
         layout.prop(self, "makeCopies")
@@ -70,11 +70,22 @@ class GetStructElementsNode(bpy.types.Node, AnimationNode):
 
             yield "except:"
             yield "    socket = self.outputs[{}]".format(i)
-            yield "    self.errorMessage = '{} does not exist'.format(repr(socket.text))"
+            yield "    self.errorMessage = self.getErrorMessage(struct, socket)"
             if hasattr(socket, "getDefaultValueCode"):
                 yield "    {} = {}".format(name, socket.getDefaultValueCode())
             else:
                 yield "    {} = socket.getDefaultValue()".format(name)
+
+    def getErrorMessage(self, struct, socket):
+        possibleDataTypes = struct.findDataTypesWithName(socket.text)
+        if len(possibleDataTypes) == 0:
+            possibleNames = struct.findNamesWithDataType(socket.dataType)
+            if len(possibleNames) == 0:
+                return "Name {} does not exist".format(repr(socket.text))
+            else:
+                return "Name {} does not exist.\nOther names with type {}: {}".format(repr(socket.text), repr(socket.dataType), possibleNames)
+        else:
+            return "Name {} only exists with these data types: {}".format(repr(socket.text), possibleDataTypes)
 
     def socketChanged(self):
         executionCodeChanged()
