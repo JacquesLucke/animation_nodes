@@ -55,7 +55,7 @@ class MoveViewToSubprogram(bpy.types.Operator):
 
     def jumpToNodes(self, nodes, activeNode = None):
         if len(nodes) == 0: return
-        activeTree = nodes[0].nodeTree
+        activeTree = nodes[0].id_data
         bpy.context.space_data.node_tree = activeTree
         bpy.ops.node.select_all(action = "DESELECT")
         for node in nodes:
