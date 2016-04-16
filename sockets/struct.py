@@ -17,7 +17,7 @@ class StructSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     @classmethod
     def getCopyExpression(cls):
-        return "value.copy()"
+        return "value.copyValues()"
 
 
 class StructListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
@@ -40,4 +40,4 @@ class StructListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     @classmethod
     def getCopyExpression(cls):
-        return "[element.copy() for element in value]"
+        return "[element.copyValues() for element in value]"

@@ -60,7 +60,7 @@ class GetStructElementsNode(bpy.types.Node, AnimationNode):
         yield "self.errorMessage = ''"
         for i, socket in enumerate(self.outputs[:-1]):
             name = "output_" + str(i)
-            structAccess = "struct.data[({}, {})]".format(repr(socket.dataType), repr(socket.text))
+            structAccess = "struct[({}, {})]".format(repr(socket.dataType), repr(socket.text))
 
             yield "try:"
             if socket.isCopyable() and self.makeCopies:

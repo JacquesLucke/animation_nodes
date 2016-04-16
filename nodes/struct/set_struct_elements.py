@@ -50,7 +50,7 @@ class SetStructElementsNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         for i, socket in enumerate(self.inputs[1:-1]):
-            yield "struct.data[({}, {})] = input_{}".format(repr(socket.dataType), repr(socket.text), i)
+            yield "struct[({}, {})] = input_{}".format(repr(socket.dataType), repr(socket.text), i)
 
     def socketChanged(self):
         executionCodeChanged()
