@@ -292,6 +292,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
             newObject.data = instanceData
         else:
             newObject = self.createObject(name, instanceData)
+            newObject.empty_draw_type = self.emptyDrawType
 
         if self.parentInstances:
             for scene in scenes:
@@ -303,7 +304,6 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         newObject.select = False
         newObject.hide = False
         newObject.hide_render = False
-        newObject.empty_draw_type = self.emptyDrawType
         return newObject
 
     def createObject(self, name, instanceData):
