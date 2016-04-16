@@ -5,7 +5,6 @@ from .. utils.handlers import eventHandler
 from .. utils.nodes import getAnimationNodeTrees
 from . tree_auto_execution import AutoExecutionProperties
 from .. events import treeChanged, isRendering, propertyChanged
-from .. nodes.generic.debug_loop import clearDebugLoopTextBlocks
 from .. utils.blender_ui import iterActiveScreens, isViewportRendering
 from .. preferences import getBlenderVersion, getAnimationNodesVersion
 from .. tree_info import getNetworksByNodeTree, getSubprogramNetworksByNodeTree
@@ -97,7 +96,6 @@ class AnimationNodeTree(bpy.types.NodeTree):
             self.lastExecutionInfo.executionTime = 0
             return
 
-        clearDebugLoopTextBlocks(self)
         start = time.clock()
         for unit in units:
             unit.execute()

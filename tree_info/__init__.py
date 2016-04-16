@@ -57,8 +57,11 @@ def getIdentifierAmount():
     return len(_forestData.nodeByIdentifier)
 
 @updateAndRetryOnException
-def getNodesByType(idName):
-    return [idToNode(nodeID) for nodeID in _forestData.nodesByType[idName]]
+def getNodesByType(idName, nodeByID = None):
+    if nodeByID is None:
+        return [idToNode(nodeID) for nodeID in _forestData.nodesByType[idName]]
+    else:
+        return [nodeByID[nodeID] for nodeID in _forestData.nodesByType[idName]]
 
 
 def isSocketLinked(socket, node):

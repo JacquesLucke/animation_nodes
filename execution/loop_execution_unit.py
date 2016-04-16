@@ -1,3 +1,4 @@
+from .. tree_info import getNodesByType
 from . compile_scripts import compileScript
 from .. problems import ExecutionUnitNotSetup
 from . code_generator import (getInitialVariables,
@@ -64,6 +65,7 @@ class LoopExecutionUnit:
         yield from iterIndented(self.iter_InitializeParametersLines(inputNode, variables))
         yield from iterIndented(self.iter_IterationsAmount_PrepareLoop(inputNode, variables))
         yield from iterIndented(self.iter_LoopBody(inputNode, nodes, variables, nodeByID), amount = 2)
+        yield from iterIndented(self.iter_UpdateDebugLoopNodes(nodeByID))
         yield "    " + self.get_ReturnStatement(inputNode, variables, nodeByID)
 
     def get_IterationsAmount_Header(self, inputNode, variables):
@@ -90,6 +92,7 @@ class LoopExecutionUnit:
         yield from iterIndented(self.iter_InitializeParametersLines(inputNode, variables))
         yield from iterIndented(self.iter_IteratorLength_PrepareLoopLines(inputNode, variables))
         yield from iterIndented(self.iter_LoopBody(inputNode, nodes, variables, nodeByID), amount = 2)
+        yield from iterIndented(self.iter_UpdateDebugLoopNodes(nodeByID))
         yield "    " + self.get_ReturnStatement(inputNode, variables, nodeByID)
 
     def get_IteratorLength_Header(self, inputNode, variables):
@@ -128,6 +131,12 @@ class LoopExecutionUnit:
 
         variables[inputNode.indexSocket] = "current_loop_index"
         variables[inputNode.iterationsSocket] = "loop_iterations"
+
+    def iter_UpdateDebugLoopNodes(self, nodeByID):
+        for node in getNodesByType("an_DebugLoopNode", nodeByID):
+            if self.network == node.network:
+                yield "{}.updateTextBlock()".format(node.identifier)
+                yield "{}.clearDebugLines()".format(node.identifier)
 
     def iter_InitializeGeneratorsLines(self, inputNode, variables, nodeByID):
         for i, node in enumerate(inputNode.getSortedGeneratorNodes(nodeByID)):

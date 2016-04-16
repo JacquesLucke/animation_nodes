@@ -1,11 +1,14 @@
 import bpy
 from bpy.props import *
+from collections import defaultdict
 from ... base_types.node import AnimationNode
-from ... tree_info import getNodesByType
+
+debugLinesByIdentifier = defaultdict(list)
 
 class DebugLoopNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_DebugLoopNode"
     bl_label = "Debug Loop"
+    bl_width_default = 160
 
     textBlockName = StringProperty(name = "Text")
 
@@ -30,7 +33,10 @@ class DebugLoopNode(bpy.types.Node, AnimationNode):
         return socket
 
     def draw(self, layout):
-        layout.prop_search(self, "textBlockName",  bpy.data, "texts", text = "")
+        if self.network.type == "Loop":
+            layout.prop_search(self, "textBlockName", bpy.data, "texts", text = "")
+        else:
+            layout.label("Has to be in a loop", icon = "INFO")
 
     def drawAdvanced(self, layout):
         col = layout.column(align = True)
@@ -42,27 +48,34 @@ class DebugLoopNode(bpy.types.Node, AnimationNode):
         return {socket.identifier : "data_" + str(i) for i, socket in enumerate(self.inputs)}
 
     def getExecutionCode(self):
-        names = ["data_" + str(i) for i in range(len(self.inputs[:-1]))]
-        return "self.writeDebugData([{}])".format(", ".join(names))
+        if self.network.type == "Loop":
+            names = ["data_" + str(i) for i in range(len(self.inputs[:-1]))]
+            return "self.newDebugLine({})".format(", ".join(names))
+        else:
+            return ""
 
-    def writeDebugData(self, dataList):
-        textBlock = self.textBlock
-        if textBlock is None: return
-
+    def newDebugLine(self, *dataList):
         texts = []
         for data, socket in zip(dataList, self.inputs):
             if isinstance(data, float): text = str(round(data, 5))
             else: text = str(data)
             texts.append(text.rjust(socket["dataWidth"]))
+        debugLinesByIdentifier[self.identifier].append(" ".join(texts))
 
-        textBlock.write(" ".join(texts))
-        textBlock.write("\n")
+    def updateTextBlock(self):
+        textBlock = self.textBlock
+        if textBlock is None: return
+
+        textBlock.clear()
+        textBlock.write("\n".join(debugLinesByIdentifier[self.identifier]))
+
+    def clearDebugLines(self):
+        try: del debugLinesByIdentifier[self.identifier]
+        except: pass
 
     @property
     def textBlock(self):
         return bpy.data.texts.get(self.textBlockName)
 
-def clearDebugLoopTextBlocks(nodeTree):
-    for node in getNodesByType("an_DebugLoopNode"):
-        textBlock = node.textBlock
-        if textBlock: textBlock.clear()
+    def delete(self):
+        self.clearDebugLines()
