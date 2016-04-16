@@ -16,6 +16,10 @@ class StructSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return Struct()
 
     @classmethod
+    def getDefaultValueCode(cls):
+        return "animation_nodes.data_structures.struct.Struct()"
+
+    @classmethod
     def getCopyExpression(cls):
         return "value.copyValues()"
 
