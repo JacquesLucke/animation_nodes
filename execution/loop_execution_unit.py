@@ -143,6 +143,7 @@ class LoopExecutionUnit:
             name = "loop_generator_output_" + str(i)
             variables[node] = name
             yield "{} = []".format(name)
+            yield "{0}_{1} = {1}.{0}".format(node.addType.lower(), name)
 
     def iter_InitializeParametersLines(self, inputNode, variables):
         for socket in inputNode.getParameterSockets():
@@ -171,13 +172,12 @@ class LoopExecutionUnit:
 
     def iter_AddToGenerators(self, inputNode, variables, nodeByID):
         for node in inputNode.getSortedGeneratorNodes(nodeByID):
-            operation = "append" if node.addType == "APPEND" else "extend"
             yield "if {}:".format(variables[node.conditionSocket])
 
             socket = node.addSocket
             if socket.isUnlinked and socket.isCopyable(): expression = getCopyExpression(socket, variables)
             else: expression = variables[socket]
-            yield "    {}.{}({})".format(variables[node], operation, expression)#
+            yield "    {}_{}({})".format(node.addType.lower(), variables[node], expression)
 
     def iter_ReassignParameters(self, inputNode, variables, nodeByID):
         for node in inputNode.getReassignParameterNodes(nodeByID):
