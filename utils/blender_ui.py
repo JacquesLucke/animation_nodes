@@ -31,6 +31,29 @@ def iterActiveScreens():
             yield window.screen
 
 
+def splitAreaVertical(area, factor):
+    newArea = splitArea(area, "VERTICAL", factor)
+    if factor < 0.5:
+        return newArea, area
+    return area, newArea
+
+def splitAreaHorizontal(area, factor):
+    newArea = splitArea(area, "HORIZONTAL", factor)
+    if factor < 0.5:
+        return newArea, area
+    return area, newArea
+
+def splitArea(area, direction, factor = 0.5):
+    areasWithSameType = set(iterAreasByType(area.type))
+    overwrite = {"area" : area,
+                 "region" : area.regions[0],
+                 "window" : bpy.context.window,
+                 "screen" : bpy.context.screen}
+    bpy.ops.screen.area_split(overwrite, direction = direction, factor = factor)
+    newArea = (set(iterAreasByType(area.type)) - areasWithSameType).pop()
+    return newArea
+
+
 def redrawAll():
     for area in iterAreas():
         area.tag_redraw()

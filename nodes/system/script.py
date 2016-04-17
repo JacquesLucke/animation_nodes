@@ -7,7 +7,6 @@ from ... utils.handlers import eventHandler
 from ... utils.names import toInterfaceName
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
-from ... utils.blender_ui import getAreaWithType
 from . subprogram_base import SubprogramBaseNode
 from ... execution.units import getSubprogramUnitByIdentifier
 from . subprogram_sockets import SubprogramData, subprogramInterfaceChanged
@@ -42,7 +41,10 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
 
         col = layout.column(align = True)
         row = col.row(align = True)
-        self.invokeFunction(row, "createNewTextBlock", icon = "ZOOMIN")
+        if self.textBlock is None:
+            self.invokeFunction(row, "createNewTextBlock", icon = "ZOOMIN")
+        else:
+            self.invokeAreaChooser(row, "viewTextBlockInArea", icon = "ZOOM_SELECTED")
         row.prop_search(self, "textBlockName",  bpy.data, "texts", text = "")
         subrow = row.row(align = True)
         subrow.active = self.textBlock is not None
@@ -131,11 +133,13 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         return data
 
     def createNewTextBlock(self):
-        textBlock = bpy.data.texts.new(name = self.subprogramName + " Code")
+        textBlock = bpy.data.texts.new(name = self.subprogramName)
         self.textBlockName = textBlock.name
         self.writeToTextBlock()
-        area = getAreaWithType("TEXT_EDITOR")
-        if area: area.spaces.active.text = textBlock
+
+    def viewTextBlockInArea(self, area):
+        area.type = "TEXT_EDITOR"
+        area.spaces.active.text = self.textBlock
 
     def writeToTextBlock(self):
         if not self.textBlock: return
