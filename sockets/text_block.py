@@ -14,7 +14,7 @@ class TextBlockSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     textBlockName = StringProperty(update = propertyChanged)
 
-    def drawProperty(self, layout, text):
+    def drawProperty(self, layout, text, node):
         row = layout.row(align = True)
         row.prop_search(self, "textBlockName",  bpy.data, "texts", text = text)
         if self.getValue() is None:

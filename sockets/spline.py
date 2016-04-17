@@ -26,7 +26,7 @@ class SplineSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     showObjectInput = BoolProperty(default = True)
 
-    def drawProperty(self, layout, text):
+    def drawProperty(self, layout, text, node):
         row = layout.row(align = True)
         row.prop_search(self, "objectName",  bpy.context.scene, "objects", icon="NONE", text = text)
         self.invokeFunction(row, "handleEyedropperButton", icon = "EYEDROPPER", passEvent = True,
@@ -108,7 +108,7 @@ class SplineListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     showObjectInput = BoolProperty(default = True)
 
-    def drawProperty(self, layout, text):
+    def drawProperty(self, layout, text, node):
         row = layout.row(align = True)
         row.prop_search(self, "objectName",  bpy.context.scene, "objects", icon="NONE", text = text)
         self.invokeFunction(row, "assignActiveObject", icon = "EYEDROPPER")

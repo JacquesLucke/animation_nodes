@@ -24,7 +24,7 @@ class IntegerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     minValue = IntProperty(default = -2**31)
     maxValue = IntProperty(default = 2**31-1)
 
-    def drawProperty(self, layout, text):
+    def drawProperty(self, layout, text, node):
         layout.prop(self, "value", text = text)
 
     def getValue(self):

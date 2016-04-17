@@ -16,7 +16,7 @@ class SceneSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     useGlobalScene = BoolProperty(name = "Use Global Scene", default = True,
         description = "Use the global scene for this node tree", update = propertyChanged)
 
-    def drawProperty(self, layout, text):
+    def drawProperty(self, layout, text, node):
         row = layout.row(align = True)
         if self.useGlobalScene:
             if text != "": text += ": "
@@ -54,7 +54,7 @@ class SceneListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     useGlobalScene = BoolProperty(name = "Use Global Scene", default = True,
         description = "Use the global scene for this node tree", update = propertyChanged)
 
-    def drawProperty(self, layout, text):
+    def drawProperty(self, layout, text, node):
         row = layout.row(align = True)
         if self.useGlobalScene:
             if text != "": text += ": "

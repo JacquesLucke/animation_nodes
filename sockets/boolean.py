@@ -16,7 +16,7 @@ class BooleanSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     value = BoolProperty(default = True, update = propertyChanged)
     showCreateCompareNodeButton = BoolProperty(default = False)
 
-    def drawProperty(self, layout, text):
+    def drawProperty(self, layout, text, node):
         row = layout.row()
         row.prop(self, "value", text = text)
 

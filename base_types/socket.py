@@ -81,7 +81,7 @@ class AnimationNodeSocket:
             row.prop(self, "text", text = "")
         else:
             if self.isInput and self.isUnlinked and self.isUsed:
-                self.drawSocket(row, displayText, self.defaultDrawType)
+                self.drawSocket(row, displayText, node, self.defaultDrawType)
             else:
                 if self.isOutput: row.alignment = "RIGHT"
                 row.label(displayText)
@@ -102,7 +102,7 @@ class AnimationNodeSocket:
             icon = "LAYER_ACTIVE" if self.isUsed else "LAYER_USED"
             row.prop(self, "isUsed", text = "", icon = icon)
 
-    def drawSocket(self, layout, text, drawType = "TEXT_PROPERTY"):
+    def drawSocket(self, layout, text, node, drawType = "TEXT_PROPERTY"):
         '''
         Draw Types:
             TEXT_PROPERTY_OR_NONE: Draw only if a property exists
@@ -119,10 +119,10 @@ class AnimationNodeSocket:
             else: drawType = "TEXT_ONLY"
 
         if drawType == "TEXT_PROPERTY":
-            if self.hasProperty(): self.drawProperty(layout, text)
+            if self.hasProperty(): self.drawProperty(layout, text, node)
             else: layout.label(text)
         elif drawType == "PROPERTY_ONLY":
-            if self.hasProperty(): self.drawProperty(layout, text = "")
+            if self.hasProperty(): self.drawProperty(layout, text = "", node = node)
         elif drawType == "TEXT_ONLY":
             layout.label(text)
 

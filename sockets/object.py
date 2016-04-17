@@ -16,7 +16,7 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     objectName = StringProperty(update = propertyChanged)
     objectCreationType = StringProperty(default = "")
 
-    def drawProperty(self, layout, text):
+    def drawProperty(self, layout, text, node):
         row = layout.row(align = True)
 
         scene = self.nodeTree.scene

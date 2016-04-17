@@ -14,7 +14,7 @@ class SequenceSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     sequenceName = StringProperty(update = propertyChanged)
 
-    def drawProperty(self, layout, text):
+    def drawProperty(self, layout, text, node):
         row = layout.row(align = True)
 
         editor = self.nodeTree.scene.sequence_editor

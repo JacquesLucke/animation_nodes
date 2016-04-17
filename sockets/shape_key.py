@@ -16,7 +16,7 @@ class ShapeKeySocket(bpy.types.NodeSocket, AnimationNodeSocket):
     objectName = StringProperty(update = propertyChanged,
         description = "Load the second shape key of this object (the first that is not the reference key)")
 
-    def drawProperty(self, layout, text):
+    def drawProperty(self, layout, text, node):
         row = layout.row(align = True)
         row.prop_search(self, "objectName",  bpy.context.scene, "objects", icon = "NONE", text = text)
         self.invokeFunction(row, "assignActiveObject", icon = "EYEDROPPER")

@@ -45,7 +45,7 @@ class SoundSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     bakeData = EnumProperty(name = "Bake Data", items = getBakeDataItems, update = propertyChanged)
 
-    def drawProperty(self, layout, text):
+    def drawProperty(self, layout, text, node):
         row = layout.row(align = True)
         row.prop(self, "bakeData", text = text)
         if self.bakeData == "None":

@@ -32,7 +32,7 @@ class InterpolationSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     easeIn = BoolProperty(name = "Ease In", default = False, update = propertyChanged)
     easeOut = BoolProperty(name = "Ease Out", default = True, update = propertyChanged)
 
-    def drawProperty(self, layout, text):
+    def drawProperty(self, layout, text, node):
         col = layout.column(align = True)
         if text != "": col.label(text)
         row = col.row(align = True)

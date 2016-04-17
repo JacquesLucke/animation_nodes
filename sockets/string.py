@@ -15,7 +15,7 @@ class StringSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     value = StringProperty(default = "", update = propertyChanged, options = {"TEXTEDIT_UPDATE"})
 
-    def drawProperty(self, layout, text):
+    def drawProperty(self, layout, text, node):
         layout.prop(self, "value", text = text)
 
     def getValue(self):

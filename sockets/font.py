@@ -14,7 +14,7 @@ class FontSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     fontName = StringProperty(update = propertyChanged)
 
-    def drawProperty(self, layout, text):
+    def drawProperty(self, layout, text, node):
         row = layout.row(align = True)
         row.prop_search(self, "fontName",  bpy.data, "fonts", icon = "NONE", text = text)
         self.invokeFunction(row, "assignFontOfActiveObject", icon = "EYEDROPPER")
