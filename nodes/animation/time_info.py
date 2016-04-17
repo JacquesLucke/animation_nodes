@@ -23,14 +23,12 @@ class TimeInfoNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         isLinked = self.getLinkedOutputsDict()
-        if not any(isLinked.values()): return ""
+        if not any(isLinked.values()): return
 
-        lines = []
-        lines.append("if scene is not None:")
-        if isLinked["frame"]: lines.append("    frame = scene.frame_current_final")
-        if isLinked["startFrame"]: lines.append("    startFrame = scene.frame_start")
-        if isLinked["endFrame"]: lines.append("    endFrame = scene.frame_end")
-        if isLinked["frameRate"]: lines.append("    frameRate = scene.render.fps")
-        lines.append("else:")
-        lines.append("    frame, startFrame, endFrame, frameRate = 0, 0, 0, 0")
-        return lines
+        yield "if scene is not None:"
+        if isLinked["frame"]:      yield "    frame = scene.frame_current_final"
+        if isLinked["startFrame"]: yield "    startFrame = scene.frame_start"
+        if isLinked["endFrame"]:   yield "    endFrame = scene.frame_end"
+        if isLinked["frameRate"]:  yield "    frameRate = scene.render.fps"
+        yield "else:"
+        yield "    frame, startFrame, endFrame, frameRate = 0, 0, 0, 0"

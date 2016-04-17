@@ -33,8 +33,8 @@ class LogicOperatorsNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         op = self.operation
-        if op == "AND": return "result = a and b"
+        if op == "AND":  return "result = a and b"
         if op == "NAND": return "result = not (a and b)"
-        if op == "OR": return "result = a or b"
-        if op == "NOR": return "result = not (a or b)"
-        if op == "XOR": return "result = a ^ b"
+        if op == "OR":   return "result = a or b"
+        if op == "NOR":  return "result = not (a or b)"
+        if op == "XOR":  return "result = a ^ b"

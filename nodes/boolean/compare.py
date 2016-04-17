@@ -43,11 +43,11 @@ class CompareNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         type = self.compareType
-        if type == "A = B":	return "result = a == b"
+        if type == "A = B":  return "result = a == b"
         if type == "A != B": return "result = a != b"
-        if type == "A < B":	return "try: result = a < b \nexcept: result = False"
+        if type == "A < B":	 return "try: result = a < b \nexcept: result = False"
         if type == "A <= B": return "try: result = a <= b \nexcept: result = False"
-        if type == "A > B":	return "try: result = a > b \nexcept: result = False"
+        if type == "A > B":	 return "try: result = a > b \nexcept: result = False"
         if type == "A >= B": return "try: result = a >= b \nexcept: result = False"
         if type == "A is B": return "result = a is b"
         return "result = False"
