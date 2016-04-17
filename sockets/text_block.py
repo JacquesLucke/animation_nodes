@@ -18,9 +18,9 @@ class TextBlockSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         row = layout.row(align = True)
         row.prop_search(self, "textBlockName",  bpy.data, "texts", text = text)
         if self.getValue() is None:
-            self.invokeFunction(row, "createTextBlock", icon = "ZOOMIN")
+            self.invokeFunction(row, node, "createTextBlock", icon = "ZOOMIN")
         else:
-            self.invokeFunction(row, "openAreaChooser", icon = "ZOOM_SELECTED")
+            self.invokeFunction(row, node, "openAreaChooser", icon = "ZOOM_SELECTED")
 
     def getValue(self):
         return bpy.data.texts.get(self.textBlockName)

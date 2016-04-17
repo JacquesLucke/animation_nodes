@@ -88,12 +88,12 @@ class AnimationNodeSocket:
 
         if self.moveable and self.display.moveOperators:
             row.separator()
-            self.invokeFunction(row, "moveUpInGroup", icon = "TRIA_UP")
-            self.invokeFunction(row, "moveDownInGroup", icon = "TRIA_DOWN")
+            self.invokeFunction(row, node, "moveUpInGroup", icon = "TRIA_UP")
+            self.invokeFunction(row, node, "moveDownInGroup", icon = "TRIA_DOWN")
 
         if self.removeable and self.display.removeOperator:
             row.separator()
-            self.invokeFunction(row, "remove", icon = "X")
+            self.invokeFunction(row, node, "remove", icon = "X")
 
         if self.useIsUsedProperty:
             if self.is_linked and not self.isUsed:
@@ -140,12 +140,12 @@ class AnimationNodeSocket:
         self.display.moveOperators = other.display.moveOperators
         self.display.removeOperator = other.display.removeOperator
 
-    def invokeFunction(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True, confirm = False, data = None, passEvent = False):
+    def invokeFunction(self, layout, node, functionName, text = "", icon = "NONE", description = "", emboss = True, confirm = False, data = None, passEvent = False):
         idName = getInvokeFunctionOperator(description)
         props = layout.operator(idName, text = text, icon = icon, emboss = emboss)
         props.classType = "SOCKET"
         props.treeName = self.nodeTree.name
-        props.nodeName = self.node.name
+        props.nodeName = node.name
         props.isOutput = self.isOutput
         props.identifier = self.identifier
         props.functionName = functionName
@@ -231,7 +231,7 @@ class AnimationNodeSocket:
 
     @property
     def nodeTree(self):
-        return self.node.id_data
+        return self.id_data
 
     @property
     def sockets(self):

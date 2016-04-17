@@ -49,7 +49,7 @@ class SoundSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         row = layout.row(align = True)
         row.prop(self, "bakeData", text = text)
         if self.bakeData == "None":
-            self.invokeFunction(row, "createSoundBakeNode", icon = "PLUS",
+            self.invokeFunction(row, node, "createSoundBakeNode", icon = "PLUS",
                 description = "Create sound bake node")
 
     def getValue(self):

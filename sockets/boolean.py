@@ -21,7 +21,7 @@ class BooleanSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         row.prop(self, "value", text = text)
 
         if self.showCreateCompareNodeButton and self.isUnlinked:
-            self.invokeFunction(row, "createCompareNode", icon = "PLUS", emboss = False,
+            self.invokeFunction(row, node, "createCompareNode", icon = "PLUS", emboss = False,
                 description = "Create compare node")
 
     def getValue(self):

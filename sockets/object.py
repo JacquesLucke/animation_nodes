@@ -24,9 +24,9 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         row.prop_search(self, "objectName", scene, "objects", icon = "NONE", text = text)
 
         if self.objectCreationType != "":
-            self.invokeFunction(row, "createObject", icon = "PLUS")
+            self.invokeFunction(row, node, "createObject", icon = "PLUS")
 
-        self.invokeFunction(row, "handleEyedropperButton", icon = "EYEDROPPER", passEvent = True,
+        self.invokeFunction(row, node, "handleEyedropperButton", icon = "EYEDROPPER", passEvent = True,
             description = "Assign active object to this socket (hold CTRL to open a rename object dialog)")
 
     def getValue(self):
