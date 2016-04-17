@@ -30,14 +30,17 @@ def getInitialVariables(nodes):
 ##########################################
 
 def iterSetupCodeLines(nodes, variables):
-    yield get_ImportModules(nodes)
-    yield get_ImportTimeMeasurementFunction()
-    yield get_ImportAnimationNodes()
+    yield from iter_Imports(nodes)
     yield get_LoadRandomNumberCache()
     yield get_LoadMeasurementsDict()
     yield from iter_GetNodeReferences(nodes)
     yield from iter_GetSocketValues(nodes, variables)
 
+def iter_Imports(nodes):
+    yield get_ImportModules(nodes)
+    yield "from mathutils import Vector, Matrix, Quaternion, Euler"
+    yield "from time import perf_counter as getCurrentTime"
+    yield "animation_nodes = sys.modules.get({})".format(repr(addonName))
 
 def get_ImportModules(nodes):
     neededModules = {"bpy", "sys"}
@@ -45,22 +48,11 @@ def get_ImportModules(nodes):
     modulesString = ", ".join(neededModules)
     return "import " + modulesString
 
-def get_ImportTimeMeasurementFunction():
-    return "from time import perf_counter as getCurrentTime"
-
 def getModulesNeededByNodes(nodes):
     moduleNames = set()
     for node in nodes:
         moduleNames.update(node.getUsedModules())
     return list(moduleNames)
-
-def get_ImportAnimationNodes():
-    '''
-    This needs a special import because the module name can be
-    different because the package folder has another name.
-    Github extends the name with '-master'
-    '''
-    return "animation_nodes = sys.modules.get({})".format(repr(addonName))
 
 def get_LoadRandomNumberCache():
     return "random_number_cache = animation_nodes.algorithms.random.getRandomNumberCache()"
@@ -91,7 +83,7 @@ def getSocketValueExpression(socket, node, index = None):
     elif hasattr(socket, "getDefaultValueCode"):
         return socket.getDefaultValueCode()
     else:
-        return "{}.{}[{}].getDefaultValue()".format(node.identifier, socketsName, index) 
+        return "{}.{}[{}].getDefaultValue()".format(node.identifier, socketsName, index)
 
 
 
