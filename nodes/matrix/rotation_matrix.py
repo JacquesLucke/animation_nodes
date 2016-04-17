@@ -27,7 +27,7 @@ class RotationMatrixNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         if len(self.axis) == 1:
-            return "matrix = mathutils.Matrix.Rotation(angle, 4, '{}')".format(self.axis)
+            return "matrix = Matrix.Rotation(angle, 4, '{}')".format(self.axis)
         else:
             return "matrix = angle.to_matrix(); matrix.resize_4x4()"
 
@@ -36,6 +36,3 @@ class RotationMatrixNode(bpy.types.Node, AnimationNode):
         self.inputs.clear()
         socketType = "Float" if len(self.axis) == 1 else "Euler"
         self.newInput(socketType, "Angle", "angle")
-
-    def getUsedModules(self):
-        return ["mathutils"]

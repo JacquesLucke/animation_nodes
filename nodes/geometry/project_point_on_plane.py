@@ -22,11 +22,11 @@ class ProjectPointOnPlaneNode(bpy.types.Node, AnimationNode):
             return
 
         yield "plane_co = planePoint"
-        yield "plane_no = planeNormal if planeNormal.length_squared != 0 else mathutils.Vector((0, 0, 1))"
+        yield "plane_no = planeNormal if planeNormal.length_squared != 0 else Vector((0, 0, 1))"
 
         if isLinked["projection"]:
             yield "intersection = mathutils.geometry.intersect_line_plane(point, point + plane_no, plane_co, plane_no, False)"
-            yield "projection = mathutils.Vector((0, 0, 0)) if intersection is None else intersection"
+            yield "projection = Vector((0, 0, 0)) if intersection is None else intersection"
         if isLinked["distance"]:
             yield "distance = mathutils.geometry.distance_point_to_plane(point, plane_co, plane_no)"
 

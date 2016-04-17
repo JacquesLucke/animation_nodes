@@ -13,7 +13,4 @@ class CombineQuaternionNode(bpy.types.Node, AnimationNode):
         self.newOutput("Quaternion", "Quaternion", "quaternion")
 
     def getExecutionCode(self):
-        return "quaternion = mathutils.Quaternion((w, x, y, z))"
-
-    def getUsedModules(self):
-        return ["mathutils"]
+        return "quaternion = Quaternion((w, x, y, z))"

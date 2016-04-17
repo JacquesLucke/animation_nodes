@@ -23,9 +23,9 @@ class VectorListMathNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         if self.operation in ("ADD", "AVERAGE"):
-            yield "result = functools.reduce(operator.add, vectors, mathutils.Vector((0, 0, 0)))"
+            yield "result = functools.reduce(operator.add, vectors, Vector((0, 0, 0)))"
         if self.operation == "AVERAGE":
             yield "if len(vectors) > 0: result /= len(vectors)"
 
     def getUsedModules(self):
-        return ["operator", "functools", "mathutils"]
+        return ["operator", "functools"]

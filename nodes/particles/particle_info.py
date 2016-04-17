@@ -37,7 +37,7 @@ class ParticleInfoNode(bpy.types.Node, AnimationNode):
         if isLinked["location"]: lines.append("    location = particle.location")
         if isLinked["rotation"]: lines.append("    rotation = particle.rotation.to_euler()")
         if isLinked["velocity"]: lines.append("    velocity = particle.velocity")
-        if isLinked["angularVelocity"]: lines.append("    angularVelocity = mathutils.Euler(particle.angular_velocity)")
+        if isLinked["angularVelocity"]: lines.append("    angularVelocity = Euler(particle.angular_velocity)")
         if isLinked["size"]: lines.append("    size = particle.size")
         if isLinked["aliveState"]: lines.append("    aliveState = particle.alive_state")
         if isLinked["isExist"]: lines.append("    isExist = particle.is_exist")
@@ -48,7 +48,7 @@ class ParticleInfoNode(bpy.types.Node, AnimationNode):
         if isLinked["previousLocation"]: lines.append("    previousLocation = particle.prev_location")
         if isLinked["previousRotation"]: lines.append("    previousRotation = particle.prev_rotation.to_euler()")
         if isLinked["previousVelocity"]: lines.append("    previousVelocity = particle.prev_velocity")
-        if isLinked["previousAngularVelocity"]: lines.append("    previousAngularVelocity = mathutils.Euler(particle.prev_angular_velocity)")
+        if isLinked["previousAngularVelocity"]: lines.append("    previousAngularVelocity = Euler(particle.prev_angular_velocity)")
 
         hair = ["hairTime", "hairWeight", "hairPoints", "hairPointsLocal"]
         if any([isLinked[item] for item in hair]):
@@ -63,10 +63,10 @@ class ParticleInfoNode(bpy.types.Node, AnimationNode):
         lines.append("    pass")
 
         lines.append("else:")
-        if isLinked["location"]: lines.append("    location = mathutils.Vector((0, 0, 0))")
-        if isLinked["rotation"]: lines.append("    rotation = mathutils.Euler((0, 0, 0))")
-        if isLinked["velocity"]: lines.append("    velocity = mathutils.Vector((0, 0, 0))")
-        if isLinked["angularVelocity"]: lines.append("    angularVelocity = mathutils.Euler((0, 0, 0))")
+        if isLinked["location"]: lines.append("    location = Vector((0, 0, 0))")
+        if isLinked["rotation"]: lines.append("    rotation = Euler((0, 0, 0))")
+        if isLinked["velocity"]: lines.append("    velocity = Vector((0, 0, 0))")
+        if isLinked["angularVelocity"]: lines.append("    angularVelocity = Euler((0, 0, 0))")
         if isLinked["size"]: lines.append("    size = 1")
         if isLinked["aliveState"]: lines.append("    aliveState = 'DEAD'")
         if isLinked["isExist"]: lines.append("    isExist = False")
@@ -74,10 +74,10 @@ class ParticleInfoNode(bpy.types.Node, AnimationNode):
         if isLinked["lifetime"]: lines.append("    lifetime = 0")
         if isLinked["birthTime"]: lines.append("    birthTime = 0")
         if isLinked["dieTime"]: lines.append("    dieTime = 0")
-        if isLinked["previousLocation"]: lines.append("    previousLocation = mathutils.Vector((0, 0, 0))")
-        if isLinked["previousRotation"]: lines.append("    previousRotation = mathutils.Euler((0, 0, 0))")
-        if isLinked["previousVelocity"]: lines.append("    previousVelocity = mathutils.Vector((0, 0, 0))")
-        if isLinked["previousAngularVelocity"]: lines.append("    previousAngularVelocity = mathutils.Euler((0, 0, 0))")
+        if isLinked["previousLocation"]: lines.append("    previousLocation = Vector((0, 0, 0))")
+        if isLinked["previousRotation"]: lines.append("    previousRotation = Euler((0, 0, 0))")
+        if isLinked["previousVelocity"]: lines.append("    previousVelocity = Vector((0, 0, 0))")
+        if isLinked["previousAngularVelocity"]: lines.append("    previousAngularVelocity = Euler((0, 0, 0))")
 
         if isLinked["hairTime"]:        lines.append("    hairTime = []")
         if isLinked["hairWeight"]:      lines.append("    hairWeight = []")
@@ -86,6 +86,3 @@ class ParticleInfoNode(bpy.types.Node, AnimationNode):
         lines.append("    pass")
 
         return lines
-
-    def getUsedModules(self):
-        return ["mathutils"]

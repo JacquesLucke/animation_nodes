@@ -10,7 +10,4 @@ class TranslationMatrixNode(bpy.types.Node, AnimationNode):
         self.newOutput("Matrix", "Matrix", "matrix")
 
     def getExecutionCode(self):
-        return "matrix = mathutils.Matrix.Translation(translation)"
-
-    def getUsedModules(self):
-        return ["mathutils"]
+        return "matrix = Matrix.Translation(translation)"

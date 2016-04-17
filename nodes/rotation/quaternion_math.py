@@ -77,8 +77,8 @@ class QuaternionMathNode(bpy.types.Node, AnimationNode):
         elif op == "SUBTRACT": return "result = a - b"
         elif op == "COMBINE": return "result = a * b"
         elif op == "ROTATION_DIFFERENCE": return "result = a.rotation_difference(b)"
-        elif op == "MULTIPLY": return "result = mathutils.Quaternion((A * B for A, B in zip(a, b)))"
-        elif op == "DIVIDE": return ("result = mathutils.Quaternion((1, 0, 0, 0))",
+        elif op == "MULTIPLY": return "result = Quaternion((A * B for A, B in zip(a, b)))"
+        elif op == "DIVIDE": return ("result = Quaternion((1, 0, 0, 0))",
                                      "if b[0] != 0: result[0] = a[0] / b[0]",
                                      "if b[1] != 0: result[1] = a[1] / b[1]",
                                      "if b[2] != 0: result[2] = a[2] / b[2]",
@@ -86,7 +86,7 @@ class QuaternionMathNode(bpy.types.Node, AnimationNode):
         elif op == "CROSS": return "result = a.cross(b)"
         elif op == "NORMALIZE": return "result = a.normalized() * scale"
         elif op == "SCALE": return "result = a * scale"
-        elif op == "ABSOLUTE": return "result = mathutils.Quaternion((abs(A) for A in a))"
+        elif op == "ABSOLUTE": return "result = Quaternion((abs(A) for A in a))"
         elif op == "INVERT": return "result = a.inverted()"
         elif op == "CONJUGATE": return "result = a.conjugated()"
         elif op == "SNAP":
@@ -95,6 +95,3 @@ class QuaternionMathNode(bpy.types.Node, AnimationNode):
                     "if stepSize[1] != 0: result[1] = round(a[1] / stepSize[1]) * stepSize[1]",
                     "if stepSize[2] != 0: result[2] = round(a[2] / stepSize[2]) * stepSize[2]",
                     "if stepSize[3] != 0: result[3] = round(a[3] / stepSize[3]) * stepSize[3]")
-
-    def getUsedModules(self):
-        return ["mathutils"]

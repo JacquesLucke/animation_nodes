@@ -21,12 +21,9 @@ class FindNearestSurfacePointNode(bpy.types.Node, AnimationNode):
     def getExecutionCode(self):
         yield "location, normal, polygonIndex, distance = bvhTree.find_nearest(vector, maxDistance)"
         yield "if location is None:"
-        yield "    location = mathutils.Vector((0, 0, 0))"
-        yield "    normal = mathutils.Vector((0, 0, 0))"
+        yield "    location = Vector((0, 0, 0))"
+        yield "    normal = Vector((0, 0, 0))"
         yield "    polygonIndex = -1"
         yield "    distance = 0"
         yield "    hit = False"
         yield "else: hit = True"
-
-    def getUsedModules(self):
-        return ["mathutils"]

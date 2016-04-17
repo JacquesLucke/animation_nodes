@@ -61,11 +61,11 @@ class ConvertRotationsNode(bpy.types.Node, AnimationNode):
             if self.useDegree: return "axis, angle = quaternion.axis, math.degrees(quaternion.angle)"
             else: return "axis, angle = quaternion.to_axis_angle()"
         if self.conversionType == "AXIS_ANGLE_TO_QUATERNION":
-            if self.useDegree: return "quaternion = mathutils.Quaternion(axis, math.radians(angle))"
-            else: return "quaternion = mathutils.Quaternion(axis, angle)"
+            if self.useDegree: return "quaternion = Quaternion(axis, math.radians(angle))"
+            else: return "quaternion = Quaternion(axis, angle)"
 
     def getUsedModules(self):
-        return ["mathutils", "math"]
+        return ["math"]
 
     @keepNodeLinks
     def createSockets(self):

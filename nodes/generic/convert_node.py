@@ -51,8 +51,8 @@ class ConvertNode(bpy.types.Node, AnimationNode):
                                      "except: new = 0")
         elif t == "String": return ("try: new = str(old)",
                                     "except: new = ''")
-        elif t == "Vector": return ("try: new = mathutils.Vector(old)",
-                                    "except: new = mathutils.Vector((0, 0, 0))")
+        elif t == "Vector": return ("try: new = Vector(old)",
+                                    "except: new = Vector((0, 0, 0))")
         else:
             return ("new = old")
 

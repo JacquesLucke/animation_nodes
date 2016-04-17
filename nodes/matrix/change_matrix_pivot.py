@@ -59,19 +59,16 @@ class ChangeMatrixPivotNode(bpy.types.Node, AnimationNode):
         type = self.pivotType
 
         if type == "VECTOR":
-            yield "pivotMatrix = mathutils.Matrix.Translation(pivot) "
+            yield "pivotMatrix = Matrix.Translation(pivot) "
         if type == "LOC_ROT":
-            yield "pivotMatrix = mathutils.Matrix.Translation(pivot) * rotation.to_matrix().to_4x4() "
+            yield "pivotMatrix = Matrix.Translation(pivot) * rotation.to_matrix().to_4x4() "
 
         if type == "AXES_XXZ":
             yield "matrixRotation = animation_nodes.algorithms.rotation.generateRotationMatrix(normal, end - start, 'Z', 'X')"
-            yield "pivotMatrix = mathutils.Matrix.Translation(start) * matrixRotation.normalized()"
+            yield "pivotMatrix = Matrix.Translation(start) * matrixRotation.normalized()"
 
         if type == "AXES_XXZZ":
             yield "matrixRotation = (animation_nodes.algorithms.rotation.generateRotationMatrix(endZ - startZ, endX - startX, 'Z', 'X')).normalized()"
-            yield "pivotMatrix = mathutils.Matrix.Translation(startX) * matrixRotation"
+            yield "pivotMatrix = Matrix.Translation(startX) * matrixRotation"
 
         yield "matrixOut = pivotMatrix * matrix * pivotMatrix.inverted()"
-
-    def getUsedModules(self):
-        return ["mathutils"]

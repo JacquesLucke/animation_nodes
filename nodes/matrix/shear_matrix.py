@@ -29,15 +29,12 @@ class ShearMatrixNode(bpy.types.Node, AnimationNode):
         plane = self.plane
 
         if self.useThirdAsScale:
-            yield ("_scale = mathutils.Matrix.Scale(shear.{}, 4, {})"
+            yield ("_scale = Matrix.Scale(shear.{}, 4, {})"
                                 .format(thirdAxisName[plane], thirdAxisTuple[plane]) )
-            yield ("_matrix = mathutils.Matrix.Shear('{}', 4, (shear.{}, shear.{}))"
+            yield ("_matrix = Matrix.Shear('{}', 4, (shear.{}, shear.{}))"
                                 .format(plane, plane[0].lower(), plane[1].lower()) )
             yield "matrix = _scale * _matrix"
 
         else:
-            yield ("matrix = mathutils.Matrix.Shear('{}', 4, (shear.{}, shear.{}))"
+            yield ("matrix = Matrix.Shear('{}', 4, (shear.{}, shear.{}))"
                                 .format(plane, plane[0].lower(), plane[1].lower()) )
-
-    def getUsedModules(self):
-        return ["mathutils"]

@@ -15,7 +15,4 @@ class FindNearestPointInKDTreeNode(bpy.types.Node, AnimationNode):
     def getExecutionCode(self):
         yield "nearestVector, index, distance = kdTree.find(searchVector)"
         yield "if nearestVector is None:"
-        yield "    nearestVector, index, distance = mathutils.Vector((0, 0, 0)), 0.0, -1"
-
-    def getUsedModules(self):
-        return ["mathutils"]
+        yield "    nearestVector, index, distance = Vector((0, 0, 0)), 0.0, -1"

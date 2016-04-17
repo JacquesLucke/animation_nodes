@@ -1,6 +1,5 @@
 import bpy
 from bpy.props import *
-from mathutils import Vector
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 from ... utils.fcurve import getArrayValueAtFrame
@@ -65,19 +64,16 @@ class ObjectTransformsInputNode(bpy.types.Node, AnimationNode):
         else:
             if self.frameType == "OFFSET": yield "    evaluationFrame = frame + self.nodeTree.scene.frame_current_final"
             else: yield "    evaluationFrame = frame"
-            if isLinked["location"]: yield "    location = mathutils.Vector(animation_nodes.utils.fcurve.getArrayValueAtFrame(object, 'location', evaluationFrame))"
-            if isLinked["rotation"]: yield "    rotation = mathutils.Euler(animation_nodes.utils.fcurve.getArrayValueAtFrame(object, 'rotation_euler', evaluationFrame))"
-            if isLinked["scale"]:    yield "    scale = mathutils.Vector(animation_nodes.utils.fcurve.getArrayValueAtFrame(object, 'scale', evaluationFrame))"
-            if isLinked["quaternion"]:    yield "    quaternion = mathutils.Quaternion(animation_nodes.utils.fcurve.getArrayValueAtFrame(object, 'rotation_quaternion', evaluationFrame, arraySize = 4))"
+            if isLinked["location"]: yield "    location = Vector(animation_nodes.utils.fcurve.getArrayValueAtFrame(object, 'location', evaluationFrame))"
+            if isLinked["rotation"]: yield "    rotation = Euler(animation_nodes.utils.fcurve.getArrayValueAtFrame(object, 'rotation_euler', evaluationFrame))"
+            if isLinked["scale"]:    yield "    scale = Vector(animation_nodes.utils.fcurve.getArrayValueAtFrame(object, 'scale', evaluationFrame))"
+            if isLinked["quaternion"]:    yield "    quaternion = Quaternion(animation_nodes.utils.fcurve.getArrayValueAtFrame(object, 'rotation_quaternion', evaluationFrame, arraySize = 4))"
 
         yield "except:"
-        yield "    location = mathutils.Vector((0, 0, 0))"
-        yield "    rotation = mathutils.Euler((0, 0, 0))"
-        yield "    scale = mathutils.Vector((0, 0, 0))"
-        yield "    quaternion = mathutils.Quaternion((1, 0, 0, 0))"
-
-    def getUsedModules(self):
-        return ["mathutils"]
+        yield "    location = Vector((0, 0, 0))"
+        yield "    rotation = Euler((0, 0, 0))"
+        yield "    scale = Vector((0, 0, 0))"
+        yield "    quaternion = Quaternion((1, 0, 0, 0))"
 
     def createAutoExecutionTrigger(self):
         isLinked = self.getLinkedOutputsDict()

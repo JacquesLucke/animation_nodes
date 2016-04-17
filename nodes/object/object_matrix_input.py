@@ -18,15 +18,12 @@ class ObjectMatrixInputNode(bpy.types.Node, AnimationNode):
         if not any(isLinked.values()): return
 
         yield "if object is None:"
-        if isLinked["world"]:         yield "    world = mathutils.Matrix.Identity(4)"
-        if isLinked["basis"]:         yield "    basis = mathutils.Matrix.Identity(4)"
-        if isLinked["local"]:         yield "    local = mathutils.Matrix.Identity(4)"
-        if isLinked["parentInverse"]: yield "    parentInverse = mathutils.Matrix.Identity(4)"
+        if isLinked["world"]:         yield "    world = Matrix.Identity(4)"
+        if isLinked["basis"]:         yield "    basis = Matrix.Identity(4)"
+        if isLinked["local"]:         yield "    local = Matrix.Identity(4)"
+        if isLinked["parentInverse"]: yield "    parentInverse = Matrix.Identity(4)"
         yield "else:"
         if isLinked["world"]:         yield "    world = object.matrix_world"
         if isLinked["basis"]:         yield "    basis = object.matrix_basis"
         if isLinked["local"]:         yield "    local = object.matrix_local"
         if isLinked["parentInverse"]: yield "    parentInverse = object.matrix_parent_inverse"
-
-    def getUsedModules(self):
-        return ["mathutils"]

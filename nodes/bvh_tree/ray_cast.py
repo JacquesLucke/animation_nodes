@@ -13,7 +13,7 @@ class RayCastBVHTreeNode(bpy.types.Node, AnimationNode):
         self.newInput("Vector", "Ray Direction", "direction")
         self.newInput("Float", "Min Distance", "minDistance", value = 0.001, hide = True)
         self.newInput("Float", "Max Distance", "maxDistance", value = 1e6, hide = True)
-        
+
         self.newOutput("Vector", "Location", "location")
         self.newOutput("Vector", "Normal", "normal")
         self.newOutput("Float", "Distance", "distance")
@@ -23,12 +23,9 @@ class RayCastBVHTreeNode(bpy.types.Node, AnimationNode):
     def getExecutionCode(self):
         yield "location, normal, polygonIndex, distance = bvhTree.ray_cast(start + direction.normalized() * minDistance, direction, maxDistance - minDistance)"
         yield "if location is None:"
-        yield "    location = mathutils.Vector((0, 0, 0))"
+        yield "    location = Vector((0, 0, 0))"
         yield "    polygonIndex = -1"
-        yield "    normal = mathutils.Vector((0, 0, 0))"
+        yield "    normal = Vector((0, 0, 0))"
         yield "    distance = 0"
         yield "    hit = False"
         yield "else: hit = True"
-
-    def getUsedModules(self):
-        return ["mathutils"]

@@ -1,4 +1,4 @@
-import bpy, random, mathutils
+import bpy
 from ... base_types.node import AnimationNode
 
 class ParticleSystemsInputNode(bpy.types.Node, AnimationNode):

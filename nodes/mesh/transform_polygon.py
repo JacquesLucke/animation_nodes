@@ -39,11 +39,8 @@ class TransformPolygonNode(bpy.types.Node, AnimationNode):
 
         if self.pivotType in ("CENTER", "CUSTOM"):
             pivotName = "polygon.center" if self.pivotType == "CENTER" else "pivot"
-            yield "offsetMatrix = mathutils.Matrix.Translation({})".format(pivotName)
+            yield "offsetMatrix = Matrix.Translation({})".format(pivotName)
             yield "transformMatrix = offsetMatrix * matrix * offsetMatrix.inverted()"
             matrixName = "transformMatrix"
 
         yield "polygon.vertexLocations = [{} * location for location in polygon.vertexLocations]".format(matrixName)
-
-    def getUsedModules(self):
-        return ["mathutils"]
