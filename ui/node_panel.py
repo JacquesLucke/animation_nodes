@@ -69,7 +69,7 @@ class SocketUiList(bpy.types.UIList):
         else: layout.label(socket.getDisplayedName())
 
         if socket.removeable:
-            socket.invokeFunction(layout, "remove", icon = "X", emboss = False)
+            socket.invokeFunction(layout, node, "remove", icon = "X", emboss = False)
 
         icon = "RESTRICT_VIEW_ON" if socket.hide else "RESTRICT_VIEW_OFF"
         layout.prop(socket, "hide", text = "", icon_only = True, icon = icon, emboss = False)
