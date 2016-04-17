@@ -14,7 +14,7 @@ def update(events):
         print("Skip event: cannot write to ID classes")
         return
 
-    if events.intersection({"File", "Addon", "Tree"}) or didNameChange():
+    if didNameChange() or events.intersection({"File", "Addon", "Tree"}):
         updateEverything()
 
     updateProperties()
