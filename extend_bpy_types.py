@@ -7,7 +7,7 @@ def register():
 
 def unregister():
     del bpy.types.Context.isAnimationNodeTreeActive
-    del bpy.types.Context.executeCallback
+    del bpy.types.Context.an_executeCallback
 
 def isAnimationNodeTreeActive(context):
     if context.area.type == "NODE_EDITOR":
