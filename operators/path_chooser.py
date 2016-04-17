@@ -6,7 +6,6 @@ class ChoosePath(bpy.types.Operator):
     bl_label = "Choose Path"
 
     filepath = StringProperty(subtype = "FILE_PATH")
-    nodeIdentifier = StringProperty()
     callback = StringProperty()
 
     def invoke(self, context, event):

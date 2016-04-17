@@ -167,11 +167,10 @@ class AnimationNode:
         self.invokeFunction(layout, "_chooseSocketDataType", text = text, icon = icon, description = description, emboss = emboss, data = data)
 
     def _chooseSocketDataType(self, data):
-        callback, socketGroup = data.split(",")
+        functionName, socketGroup = data.split(",")
         bpy.ops.an.choose_socket_type("INVOKE_DEFAULT",
-            nodeIdentifier = self.identifier,
             socketGroup = socketGroup,
-            callback = callback)
+            callback = self.newCallback(functionName))
 
     def invokePathChooser(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True):
         data = functionName
