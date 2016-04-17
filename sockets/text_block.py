@@ -15,7 +15,12 @@ class TextBlockSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     textBlockName = StringProperty(update = propertyChanged)
 
     def drawProperty(self, layout, text):
-        layout.prop_search(self, "textBlockName",  bpy.data, "texts", text = text)
+        row = layout.row(align = True)
+        row.prop_search(self, "textBlockName",  bpy.data, "texts", text = text)
+        if self.getValue() is None:
+            self.invokeFunction(row, "createTextBlock", icon = "ZOOMIN")
+        else:
+            self.invokeFunction(row, "openAreaChooser", icon = "ZOOM_SELECTED")
 
     def getValue(self):
         return bpy.data.texts.get(self.textBlockName)
@@ -29,6 +34,18 @@ class TextBlockSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     @classmethod
     def getDefaultValue(cls):
         return None
+
+    def createTextBlock(self):
+        textBlock = bpy.data.texts.new("Text Block")
+        self.textBlockName = textBlock.name
+
+    def openAreaChooser(self):
+        bpy.ops.an.select_area("INVOKE_DEFAULT",
+            callback = self.newCallback("viewTextBlockInArea"))
+
+    def viewTextBlockInArea(self, area):
+        area.type = "TEXT_EDITOR"
+        area.spaces.active.text = self.getValue()
 
 
 class TextBlockListSocket(bpy.types.NodeSocket, AnimationNodeSocket):

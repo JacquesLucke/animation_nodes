@@ -1,6 +1,7 @@
 import bpy
 from bpy.props import *
 from .. utils.recursion import noRecursion
+from .. operators.callbacks import newSocketCallback
 from .. events import treeChanged, executionCodeChanged
 from .. utils.names import getRandomString, toVariableName
 from .. operators.dynamic_operators import getInvokeFunctionOperator
@@ -152,6 +153,9 @@ class AnimationNodeSocket:
         props.confirm = confirm
         props.data = str(data)
         props.passEvent = passEvent
+
+    def newCallback(self, functionName):
+        return newSocketCallback(self, functionName)
 
     def invokeNodeInsertion(self, layout, nodeIdName, toIndex, text, settings = {}):
         invokeLinkedNodeInsertion(layout, nodeIdName, self.getIndex(), toIndex, text, settings)
