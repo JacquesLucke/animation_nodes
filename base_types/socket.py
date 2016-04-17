@@ -56,6 +56,22 @@ class AnimationNodeSocket:
     dataIsModified = BoolProperty(default = False)
     defaultDrawType = StringProperty(default = "TEXT_PROPERTY")
 
+
+    # Overwrite in subclasses
+    ##########################################################
+
+    def setProperty(self, data):
+        pass
+
+    def getProperty(self):
+        return
+
+    @classmethod
+    def getDefaultValue(cls):
+        raise NotImplementedError("All sockets have to define a getDefaultValue function")
+
+    ##########################################################
+
     def draw(self, context, layout, node, text):
         displayText = self.getDisplayedName()
 
@@ -117,20 +133,11 @@ class AnimationNodeSocket:
     def draw_color(self, context, node):
         return self.drawColor
 
-    def getValue(self):
-        return None
-
     def copyDisplaySettingsFrom(self, other):
         self.display.text = other.display.text
         self.display.textInput = other.display.textInput
         self.display.moveOperators = other.display.moveOperators
         self.display.removeOperator = other.display.removeOperator
-
-    def setProperty(self, data):
-        pass
-
-    def getProperty(self):
-        return
 
     def invokeFunction(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True, confirm = False, data = None, passEvent = False):
         idName = getInvokeFunctionOperator(description)
@@ -273,10 +280,6 @@ class AnimationNodeSocket:
     def directlyLinkedSockets(self):
         return getDirectlyLinkedSockets(self)
 
-
-    @property
-    def hasValueCode(self):
-        return hasattr(self, "getValueCode")
 
     @classmethod
     def isCopyable(self):

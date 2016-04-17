@@ -59,6 +59,10 @@ class FloatSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             return False
         return True
 
+    @classmethod
+    def getDefaultValue(cls):
+        return 0
+
 
 class FloatListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_FloatListSocket"
@@ -70,7 +74,12 @@ class FloatListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = True
     comparable = False
 
-    def getValueCode(self):
+    @classmethod
+    def getDefaultValue(cls):
+        return []
+
+    @classmethod
+    def getDefaultValueCode(self):
         return "[]"
 
     @classmethod

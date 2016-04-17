@@ -12,12 +12,13 @@ class PolygonSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = True
     comparable = False
 
-    def getValue(self):
+    @classmethod
+    def getDefaultValue(cls):
         return Polygon(vertexLocations = [Vector((-1, 0, 0)), Vector((1, 0, 0)), Vector((0, 1, 0))],
-                       normal = Vector((0, 0, 1)),
-                       center = Vector((0, 1/3, 0)),
-                       area = 2,
-                       materialIndex = 0)
+            normal = Vector((0, 0, 1)),
+            center = Vector((0, 1/3, 0)),
+            area = 2,
+            materialIndex = 0)
 
     @classmethod
     def getCopyExpression(cls):
@@ -34,7 +35,12 @@ class PolygonListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = True
     comparable = False
 
-    def getValueCode(self):
+    @classmethod
+    def getDefaultValue(cls):
+        return []
+
+    @classmethod
+    def getDefaultValueCode(self):
         return "[]"
 
     @classmethod

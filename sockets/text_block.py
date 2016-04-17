@@ -26,6 +26,10 @@ class TextBlockSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getProperty(self):
         return self.textBlockName
 
+    @classmethod
+    def getDefaultValue(cls):
+        return None
+
 
 class TextBlockListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_TextBlockListSocket"
@@ -37,7 +41,12 @@ class TextBlockListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = False
     comparable = False
 
-    def getValueCode(self):
+    @classmethod
+    def getDefaultValue(cls):
+        return []
+
+    @classmethod
+    def getDefaultValueCode(self):
         return "[]"
 
     @classmethod

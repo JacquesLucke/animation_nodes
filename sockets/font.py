@@ -33,6 +33,10 @@ class FontSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         if object.type == "FONT":
             self.fontName = object.data.font.name
 
+    @classmethod
+    def getDefaultValue(cls):
+        return None
+
 
 class FontListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_FontListSocket"
@@ -44,7 +48,12 @@ class FontListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = False
     comparable = False
 
-    def getValueCode(self):
+    @classmethod
+    def getDefaultValue(cls):
+        return []
+
+    @classmethod
+    def getDefaultValueCode(self):
         return "[]"
 
     @classmethod

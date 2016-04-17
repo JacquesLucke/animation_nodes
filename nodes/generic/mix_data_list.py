@@ -46,7 +46,7 @@ class MixDataListNode(bpy.types.Node, AnimationNode):
         yield "    after = dataList[max(min(math.ceil(f), length - 1), 0)]"
         yield "    influence = interpolation(f % 1)"
         yield "    " + getMixCode(self.dataType, "before", "after", "influence", "result")
-        yield "else: result = self.outputs[0].getValue()"
+        yield "else: result = self.outputs[0].getDefaultValue()"
 
     def getUsedModules(self):
         return ["math"]

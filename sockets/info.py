@@ -21,6 +21,8 @@ class SocketInfo:
         self.baseDataTypes = set()
         self.listDataTypes = set()
 
+        self.copyFunctionByType = dict()
+
     def update(self, socketClasses):
         self.reset()
 
@@ -45,6 +47,14 @@ class SocketInfo:
 
         self.typeConversion[idName] = dataType
         self.typeConversion[dataType] = idName
+
+        if socketClass.isCopyable():
+            copyFunction = eval("lambda value: " + socketClass.getCopyExpression())
+        else:
+            copyFunction = lambda value: value
+
+        self.copyFunctionByType[idName] = copyFunction
+        self.copyFunctionByType[dataType] = copyFunction
 
     def insertSocketConnection(self, baseDataType, listDataType):
         baseIdName = self.typeConversion[baseDataType]
@@ -134,6 +144,9 @@ def isCopyable(input):
 
 def getCopyExpression(input):
     return _socketInfo.classByType[input].getCopyExpression()
+
+def getCopyFunction(input):
+    return _socketInfo.copyFunctionByType[input]
 
 
 def getListDataTypeItemsCallback(self, context):

@@ -83,11 +83,15 @@ def getLoadSocketValueLine(socket, node, variables, index = None):
     return "{} = {}".format(variables[socket], getSocketValueExpression(socket, node, index))
 
 def getSocketValueExpression(socket, node, index = None):
-    if socket.hasValueCode: return socket.getValueCode()
-    else:
-        socketsName = "inputs" if socket.isInput else "outputs"
-        if index is None: index = socket.getIndex(node)
+    socketsName = "inputs" if socket.isInput else "outputs"
+    if index is None: index = socket.getIndex(node)
+
+    if hasattr(socket, "getValue"):
         return "{}.{}[{}].getValue()".format(node.identifier, socketsName, index)
+    elif hasattr(socket, "getDefaultValueCode"):
+        return socket.getDefaultValueCode()
+    else:
+        return "{}.{}[{}].getDefaultValue()".format(node.identifier, socketsName, index) 
 
 
 
@@ -155,7 +159,7 @@ def iterInputCopyLines(node, variables):
     for socket in node.inputs:
         if socket.dataIsModified and socket.isCopyable() and not isSocketLinked(socket, node):
             newName = variables[socket] + "_copy"
-            if socket.hasValueCode: line = "{} = {}".format(newName, socket.getValueCode())
+            if hasattr(socket, "getDefaultValueCode"): line = "{} = {}".format(newName, socket.getDefaultValueCode())
             else: line = getCopyLine(socket, newName, variables)
             variables[socket] = newName
             yield line

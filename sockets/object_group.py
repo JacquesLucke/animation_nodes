@@ -26,6 +26,10 @@ class ObjectGroupSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getProperty(self):
         return self.groupName
 
+    @classmethod
+    def getDefaultValue(cls):
+        return None
+
 
 class ObjectGroupListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_ObjectGroupListSocket"
@@ -37,7 +41,12 @@ class ObjectGroupListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = False
     comparable = False
 
-    def getValueCode(self):
+    @classmethod
+    def getDefaultValue(cls):
+        return []
+
+    @classmethod
+    def getDefaultValueCode(self):
         return "[]"
 
     @classmethod

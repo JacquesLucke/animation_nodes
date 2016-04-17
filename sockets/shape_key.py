@@ -46,6 +46,10 @@ class ShapeKeySocket(bpy.types.NodeSocket, AnimationNodeSocket):
         if object:
             self.objectName = object.name
 
+    @classmethod
+    def getDefaultValue(cls):
+        return None
+
 
 class ShapeKeyListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_ShapeKeyListSocket"
@@ -57,5 +61,10 @@ class ShapeKeyListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = False
     comparable = False
 
-    def getValueCode(self):
+    @classmethod
+    def getDefaultValue(cls):
+        return []
+
+    @classmethod
+    def getDefaultValueCode(self):
         return "[]"

@@ -11,5 +11,6 @@ class BVHTreeSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     comparable = True
     storable = True
 
-    def getValue(self):
+    @classmethod
+    def getDefaultValue(cls):
         return BVHTree.FromPolygons(vertices = [], polygons = [])

@@ -11,7 +11,8 @@ class MeshDataSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = True
     comparable = False
 
-    def getValue(self):
+    @classmethod
+    def getDefaultValue(cls):
         return MeshData([], [], [])
 
     @classmethod
@@ -29,7 +30,8 @@ class MeshDataListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = True
     comparable = False
 
-    def getValueCode(self):
+    @classmethod
+    def getDefaultValueCode(self):
         return "[]"
 
     @classmethod

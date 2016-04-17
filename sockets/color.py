@@ -30,6 +30,10 @@ class ColorSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return self.value
 
     @classmethod
+    def getDefaultValue(cls):
+        return [0, 0, 0, 1]
+
+    @classmethod
     def getCopyExpression(cls):
         return "value[:]"
 
@@ -44,7 +48,12 @@ class ColorListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = True
     comparable = False
 
-    def getValueCode(self):
+    @classmethod
+    def getDefaultValue(cls):
+        return []
+
+    @classmethod
+    def getDefaultValueCode(self):
         return "[]"
 
     @classmethod

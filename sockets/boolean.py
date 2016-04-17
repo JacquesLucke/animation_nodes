@@ -38,6 +38,10 @@ class BooleanSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         self.linkWith(node.outputs[0])
         invokeTranslation()
 
+    @classmethod
+    def getDefaultValue(cls):
+        return False
+
 
 class BooleanListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_BooleanListSocket"
@@ -49,7 +53,12 @@ class BooleanListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = True
     comparable = False
 
-    def getValueCode(self):
+    @classmethod
+    def getDefaultValue(cls):
+        return []
+
+    @classmethod
+    def getDefaultValueCode(self):
         return "[]"
 
     @classmethod

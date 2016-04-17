@@ -11,7 +11,8 @@ class KDTreeSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     comparable = True
     storable = True
 
-    def getValue(self):
+    @classmethod
+    def getDefaultValue(cls):
         kdTree = KDTree(0)
         kdTree.balance()
         return kdTree

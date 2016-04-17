@@ -11,7 +11,8 @@ class MatrixSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = True
     comparable = False
 
-    def getValue(self):
+    @classmethod
+    def getDefaultValue(cls):
         return Matrix.Identity(4)
 
     @classmethod
@@ -29,7 +30,12 @@ class MatrixListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = True
     comparable = False
 
-    def getValueCode(self):
+    @classmethod
+    def getDefaultValue(cls):
+        return []
+
+    @classmethod
+    def getDefaultValueCode(self):
         return "[]"
 
     @classmethod

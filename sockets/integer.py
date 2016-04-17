@@ -49,6 +49,10 @@ class IntegerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
         return False
 
+    @classmethod
+    def getDefaultValue(cls):
+        return 0
+
 
 class IntegerListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_IntegerListSocket"
@@ -60,7 +64,12 @@ class IntegerListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = True
     comparable = False
 
-    def getValueCode(self):
+    @classmethod
+    def getDefaultValue(cls):
+        return []
+
+    @classmethod
+    def getDefaultValueCode(self):
         return "[]"
 
     @classmethod

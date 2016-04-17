@@ -12,7 +12,12 @@ class FCurveSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = True
     comparable = True
 
-    def getValueCode(self):
+    @classmethod
+    def getDefaultValue(cls):
+        return None
+
+    @classmethod
+    def getDefaultValueCode(self):
         return "None"
 
 
@@ -26,7 +31,12 @@ class FCurveListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = True
     comparable = False
 
-    def getValueCode(self):
+    @classmethod
+    def getDefaultValue(cls):
+        return []
+
+    @classmethod
+    def getDefaultValueCode(self):
         return "[]"
 
     @classmethod

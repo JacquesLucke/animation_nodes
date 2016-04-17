@@ -24,3 +24,11 @@ class NodeControlSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         subcol = col.column()
         subcol.label("")
         subcol.scale_y = self.margin
+
+    @classmethod
+    def getDefaultValue(cls):
+        return None
+
+    @classmethod
+    def getDefaultValueCode(cls):
+        return "None"

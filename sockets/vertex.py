@@ -12,7 +12,8 @@ class VertexSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = True
     comparable = False
 
-    def getValue(self):
+    @classmethod
+    def getDefaultValue(cls):
         return Vertex(location = Vector((0, 0, 0)),
                       normal = Vector((0, 0, 1)),
                       groupWeights = [])
@@ -32,7 +33,12 @@ class VertexListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = True
     comparable = False
 
-    def getValueCode(self):
+    @classmethod
+    def getDefaultValue(cls):
+        return []
+
+    @classmethod
+    def getDefaultValueCode(self):
         return "[]"
 
     @classmethod

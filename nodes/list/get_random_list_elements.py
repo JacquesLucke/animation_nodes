@@ -35,7 +35,7 @@ class GetRandomListElementsNode(bpy.types.Node, AnimationNode):
     def getExecutionCode(self):
         yield "random.seed(self.nodeSeed * 1245 + seed)"
         if self.selectionType == "SINGLE":
-            yield "if len(inList) == 0: outElement = self.outputs['Element'].getValue()"
+            yield "if len(inList) == 0: outElement = self.outputs['Element'].getDefaultValue()"
             yield "else: outElement = random.choice(inList)"
         elif self.selectionType == "MULTIPLE":
             yield "if len(inList) == 0: outList = []"

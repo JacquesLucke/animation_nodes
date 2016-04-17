@@ -67,9 +67,6 @@ class SplineSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def updateProperty(self):
         self.getObject()
 
-    @classmethod
-    def getCopyExpression(cls):
-        return "value.copy()"
 
     def handleEyedropperButton(self, event):
         if event.ctrl:
@@ -81,6 +78,14 @@ class SplineSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             object = bpy.context.active_object
             if getattr(object, "type", "") == "CURVE":
                 self.objectName = object.name
+
+    @classmethod
+    def getDefaultValue(cls):
+        return BezierSpline()
+
+    @classmethod
+    def getCopyExpression(cls):
+        return "value.copy()"
 
 
 class SplineListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
@@ -132,11 +137,16 @@ class SplineListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getProperty(self):
         return self.objectName, self.useWorldSpace
 
-    @classmethod
-    def getCopyExpression(cls):
-        return "[element.copy() for element in value]"
 
     def assignActiveObject(self):
         object = bpy.context.active_object
         if getattr(object, "type", "") == "CURVE":
             self.objectName = object.name
+
+    @classmethod
+    def getDefaultValue(cls):
+        return []
+
+    @classmethod
+    def getCopyExpression(cls):
+        return "[element.copy() for element in value]"
