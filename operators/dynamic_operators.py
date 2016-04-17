@@ -52,7 +52,7 @@ def execute_InvokeFunction(self, context):
     args = []
     if self.invokeWithData: args.append(self.data)
     if self.passEvent: args.append(self._event)
-    self.executeCallback(self.callback, *args)
+    self.an_executeCallback(self.callback, *args)
 
     bpy.context.area.tag_redraw()
     return {"FINISHED"}

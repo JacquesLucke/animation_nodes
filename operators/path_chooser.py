@@ -13,5 +13,5 @@ class ChoosePath(bpy.types.Operator):
         return {"RUNNING_MODAL"}
 
     def execute(self, context):
-        self.executeCallback(self.callback, self.filepath)
+        self.an_executeCallback(self.callback, self.filepath)
         return {"FINISHED"}

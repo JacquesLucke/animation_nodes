@@ -3,7 +3,7 @@ from . operators.callbacks import executeCallback
 
 def register():
     bpy.types.Context.isAnimationNodeTreeActive = isAnimationNodeTreeActive
-    bpy.types.Operator.executeCallback = _executeCallback
+    bpy.types.Operator.an_executeCallback = _executeCallback
 
 def unregister():
     del bpy.types.Context.isAnimationNodeTreeActive

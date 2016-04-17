@@ -25,5 +25,5 @@ class IDKeySearch(bpy.types.Operator):
     def execute(self, context):
         if self.item == "NONE": return {"CANCELLED"}
         dataType, name = self.item.split(" * ")
-        self.executeCallback(self.callback, dataType, name)
+        self.an_executeCallback(self.callback, dataType, name)
         return {"FINISHED"}

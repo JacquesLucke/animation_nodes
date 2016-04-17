@@ -28,5 +28,5 @@ class ChooseSocketType(bpy.types.Operator):
         return {"CANCELLED"}
 
     def execute(self, context):
-        self.executeCallback(self.callback, self.selectedDataType)
+        self.an_executeCallback(self.callback, self.selectedDataType)
         return {"FINISHED"}
