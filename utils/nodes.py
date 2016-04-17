@@ -45,8 +45,11 @@ def iterAnimationNodesSockets():
 
 def iterAnimationNodes():
     for nodeTree in getAnimationNodeTrees():
-        for node in nodeTree.nodes:
-            if node.isAnimationNode: yield node
+        yield from (node for node in nodeTree.nodes if node.isAnimationNode)
+
+def iterNodesInAnimationNodeTrees():
+    for nodeTree in getAnimationNodeTrees():
+        yield from nodeTree.nodes
 
 def getAnimationNodeTrees(skipLinkedTrees = True):
     nodeTrees = []

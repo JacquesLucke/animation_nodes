@@ -4,7 +4,7 @@ from . import problems
 from . update import updateEverything
 from . utils.recursion import noRecursion
 from . tree_info import iterSocketsThatNeedUpdate
-from . utils.nodes import iterAnimationNodes, getAnimationNodeTrees
+from . utils.nodes import iterNodesInAnimationNodeTrees, getAnimationNodeTrees
 from . execution.units import setupExecutionUnits, finishExecutionUnits
 from . execution.auto_execution import iterAutoExecutionNodeTrees, executeNodeTrees, afterExecution
 
@@ -50,7 +50,7 @@ def didNameChange():
 def getNamesHash():
     names = set(itertools.chain(
         (tree.name for tree in getAnimationNodeTrees()),
-        (node.name for node in iterAnimationNodes())))
+        (node.name for node in iterNodesInAnimationNodeTrees())))
     return names
 
 def updateProperties():
