@@ -45,8 +45,11 @@ class FillListNode(bpy.types.Node, AnimationNode):
         else:
             yield "fillList = [fillElement] * missingAmount"
 
-        if self.fillMode == "LEFT": yield "outList = fillList + inList"
-        if self.fillMode == "RIGHT": yield "outList = inList + fillList"
+        yield "if len(inList) == 0:"
+        yield "    outList = fillList"
+        yield "else:"
+        if self.fillMode == "LEFT":  yield "    outList = fillList + inList"
+        if self.fillMode == "RIGHT": yield "    outList = inList + fillList"
 
     def edit(self):
         baseDataType = self.getWantedDataType()
