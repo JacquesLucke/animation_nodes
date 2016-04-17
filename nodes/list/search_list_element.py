@@ -26,14 +26,18 @@ class SearchListElementNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         isLinked = self.getLinkedOutputsDict()
-        if not any(isLinked.values()): return ""
+        if not any(isLinked.values()): return
 
-        lines = []
-        lines.append("allIndices = [i for i, element in enumerate(list) if element == search]")
-        if isLinked["firstIndex"]: lines.append("firstIndex = allIndices[0] if len(allIndices) > 0 else -1")
-        if isLinked["occurrences"]: lines.append("occurrences = len(allIndices)")
-
-        return lines
+        if isLinked["allIndices"]:
+            yield "allIndices = [i for i, element in enumerate(list) if element == search]"
+            if isLinked["firstIndex"]:  yield "firstIndex = allIndices[0] if len(allIndices) > 0 else -1"
+            if isLinked["occurrences"]: yield "occurrences = len(allIndices)"
+        else:
+            if isLinked["firstIndex"]:
+                yield "try: firstIndex = list.index(search)"
+                yield "except: firstIndex = -1"
+            if isLinked["occurrences"]:
+                yield "occurrences = list.count(search)"
 
     def edit(self):
         baseDataType = self.getWantedDataType()
