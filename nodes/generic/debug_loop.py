@@ -34,7 +34,12 @@ class DebugLoopNode(bpy.types.Node, AnimationNode):
 
     def draw(self, layout):
         if self.network.type == "Loop":
-            layout.prop_search(self, "textBlockName", bpy.data, "texts", text = "")
+            row = layout.row(align = True)
+            row.prop_search(self, "textBlockName", bpy.data, "texts", text = "")
+            if self.textBlock is None:
+                self.invokeFunction(row, "createNewTextBlock", icon = "ZOOMIN")
+            else:
+                self.invokeAreaChooser(row, "viewTextBlockInArea", icon = "ZOOM_SELECTED")
         else:
             layout.label("Has to be in a loop", icon = "INFO")
 
@@ -72,6 +77,14 @@ class DebugLoopNode(bpy.types.Node, AnimationNode):
     def clearDebugLines(self):
         try: del debugLinesByIdentifier[self.identifier]
         except: pass
+
+    def createNewTextBlock(self):
+        textBlock = bpy.data.texts.new(name = "Debug Loop")
+        self.textBlockName = textBlock.name
+
+    def viewTextBlockInArea(self, area):
+        area.type = "TEXT_EDITOR"
+        area.spaces.active.text = self.textBlock
 
     @property
     def textBlock(self):
