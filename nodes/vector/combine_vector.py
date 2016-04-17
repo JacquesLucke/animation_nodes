@@ -20,7 +20,4 @@ class CombineVectorNode(bpy.types.Node, AnimationNode):
         return label
 
     def getExecutionCode(self):
-        return "vector = mathutils.Vector((x, y, z))"
-
-    def getUsedModules(self):
-        return ["mathutils"]
+        return "vector = Vector((x, y, z))"

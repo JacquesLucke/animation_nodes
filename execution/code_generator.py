@@ -91,7 +91,7 @@ def getSocketValueExpression(socket, node, index = None):
 ##########################################
 
 def getGlobalizeStatement(nodes, variables):
-    socketNames = [variables[socket] for socket in iterUnlinkedSockets(nodes)]
+    socketNames = [variables[socket] for socket in iterUnlinkedSockets(nodes) if socket.dataType != "Node Control"]
     if len(socketNames) == 0: return ""
     return "global " + ", ".join(socketNames)
 
