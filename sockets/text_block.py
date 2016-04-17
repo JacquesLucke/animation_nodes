@@ -41,7 +41,7 @@ class TextBlockSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def openAreaChooser(self):
         bpy.ops.an.select_area("INVOKE_DEFAULT",
-            callback = self.newCallback("viewTextBlockInArea"))
+            callback = self.newCallback(self.node, "viewTextBlockInArea"))
 
     def viewTextBlockInArea(self, area):
         area.type = "TEXT_EDITOR"

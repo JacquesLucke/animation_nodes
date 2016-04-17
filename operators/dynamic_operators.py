@@ -1,7 +1,10 @@
+'''
+This module can create and register operators dynamically based on a description.
+'''
+
 import bpy
 from bpy.props import *
 from .. utils.handlers import eventHandler
-from .. utils.nodes import getNode, getSocket
 
 operatorsByDescription = {}
 missingDescriptions = set()
@@ -31,12 +34,7 @@ def createOperatorWithDescription(description):
         "bl_description" : description,
         "invoke" : invoke_InvokeFunction,
         "execute" : execute_InvokeFunction })
-    operator.classType = StringProperty() # 'NODE' or 'SOCKET'
-    operator.treeName = StringProperty()
-    operator.nodeName = StringProperty()
-    operator.isOutput = BoolProperty()
-    operator.identifier = StringProperty()
-    operator.functionName = StringProperty()
+    operator.callback = StringProperty()
     operator.invokeWithData = BoolProperty(default = False)
     operator.confirm = BoolProperty()
     operator.data = StringProperty()
@@ -51,16 +49,10 @@ def invoke_InvokeFunction(self, context, event):
     return self.execute(context)
 
 def execute_InvokeFunction(self, context):
-    if self.classType == "NODE":
-        owner = getNode(self.treeName, self.nodeName)
-    elif self.classType == "SOCKET":
-        owner = getSocket(self.treeName, self.nodeName, self.isOutput, self.identifier)
-
     args = []
     if self.invokeWithData: args.append(self.data)
     if self.passEvent: args.append(self._event)
-    function = getattr(owner, self.functionName)
-    function(*args)
+    self.executeCallback(self.callback, *args)
 
     bpy.context.area.tag_redraw()
     return {"FINISHED"}

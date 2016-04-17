@@ -143,19 +143,14 @@ class AnimationNodeSocket:
     def invokeFunction(self, layout, node, functionName, text = "", icon = "NONE", description = "", emboss = True, confirm = False, data = None, passEvent = False):
         idName = getInvokeFunctionOperator(description)
         props = layout.operator(idName, text = text, icon = icon, emboss = emboss)
-        props.classType = "SOCKET"
-        props.treeName = self.nodeTree.name
-        props.nodeName = node.name
-        props.isOutput = self.isOutput
-        props.identifier = self.identifier
-        props.functionName = functionName
+        props.callback = self.newCallback(node, functionName)
         props.invokeWithData = data is not None
         props.confirm = confirm
         props.data = str(data)
         props.passEvent = passEvent
 
-    def newCallback(self, functionName):
-        return newSocketCallback(self, functionName)
+    def newCallback(self, node, functionName):
+        return newSocketCallback(self, node, functionName)
 
     def invokeNodeInsertion(self, layout, nodeIdName, toIndex, text, settings = {}):
         invokeLinkedNodeInsertion(layout, nodeIdName, self.getIndex(), toIndex, text, settings)

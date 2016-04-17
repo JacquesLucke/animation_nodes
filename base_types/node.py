@@ -156,10 +156,7 @@ class AnimationNode:
     def invokeFunction(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True, confirm = False, data = None, passEvent = False):
         idName = getInvokeFunctionOperator(description)
         props = layout.operator(idName, text = text, icon = icon, emboss = emboss)
-        props.classType = "NODE"
-        props.treeName = self.nodeTree.name
-        props.nodeName = self.name
-        props.functionName = functionName
+        props.callback = self.newCallback(functionName)
         props.invokeWithData = data is not None
         props.confirm = confirm
         props.data = str(data)
