@@ -1,10 +1,13 @@
 import bpy
+from . operators.callbacks import executeCallback
 
 def register():
     bpy.types.Context.isAnimationNodeTreeActive = isAnimationNodeTreeActive
+    bpy.types.Operator.executeCallback = _executeCallback
 
 def unregister():
     del bpy.types.Context.isAnimationNodeTreeActive
+    del bpy.types.Context.executeCallback
 
 def isAnimationNodeTreeActive(context):
     if context.area.type == "NODE_EDITOR":
@@ -12,3 +15,6 @@ def isAnimationNodeTreeActive(context):
         if tree is not None:
             return tree.bl_idname == "an_AnimationNodeTree"
     return False
+
+def _executeCallback(operator, callback, *args, **kwargs):
+    executeCallback(callback, *args, **kwargs)

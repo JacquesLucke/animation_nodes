@@ -7,6 +7,7 @@ from collections import defaultdict
 from .. utils.handlers import eventHandler
 from .. ui.node_colors import colorNetworks
 from .. utils.nodes import getAnimationNodeTrees
+from .. operators.callbacks import newNodeCallback
 from .. sockets.info import toIdName as toSocketIdName
 from .. utils.blender_ui import iterNodeCornerLocations
 from .. operators.dynamic_operators import getInvokeFunctionOperator
@@ -181,8 +182,7 @@ class AnimationNode:
 
     def _choosePath(self, data):
         bpy.ops.an.choose_path("INVOKE_DEFAULT",
-            nodeIdentifier = self.identifier,
-            callback = data)
+            callback = self.newCallback(data))
 
     def invokeIDKeyChooser(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True):
         data = functionName
@@ -190,8 +190,7 @@ class AnimationNode:
 
     def _chooseIDKeys(self, data):
         bpy.ops.an.choose_id_key("INVOKE_DEFAULT",
-            nodeIdentifier = self.identifier,
-            callback = data)
+            callback = self.newCallback(data))
 
     def invokePopup(self, layout, drawFunctionName, executeFunctionName = "", text = "", icon = "NONE", description = "", emboss = True, width = 250):
         data = drawFunctionName + "," + executeFunctionName + "," + str(width)
@@ -204,6 +203,17 @@ class AnimationNode:
             drawFunctionName = drawFunctionName,
             executeFunctionName = executeFunctionName,
             width = int(width))
+
+    def invokeAreaChooser(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True):
+        data = functionName
+        self.invokeFunction(layout, "_chooseArea", text = text, icon = icon, description = description, emboss = emboss, data = data)
+
+    def _chooseArea(self, data):
+        bpy.ops.an.select_area("INVOKE_DEFAULT",
+            callback = self.newCallback(data))
+
+    def newCallback(self, functionName):
+        return newNodeCallback(self, functionName)
 
     def clearSockets(self):
         self.inputs.clear()
