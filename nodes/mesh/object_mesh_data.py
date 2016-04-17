@@ -24,28 +24,26 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         isLinked = self.getLinkedOutputsDict()
-        if not any(isLinked.values()): return ""
+        if not any(isLinked.values()): return
 
-        lines = []
-        lines.append("meshName = ''")
-        lines.append("if getattr(object, 'type', '') == 'MESH':")
-        lines.append("    mesh = self.getMesh(object, useModifiers, scene)")
-        lines.append("    meshName = mesh.name")
+        yield "meshName = ''"
+        yield "if getattr(object, 'type', '') == 'MESH':"
+        yield "    mesh = self.getMesh(object, useModifiers, scene)"
+        yield "    meshName = mesh.name"
 
         if isLinked["vertexLocations"] or isLinked["polygons"]:
-            lines.append("    vertexLocations = self.getVertexLocations(mesh, object, useWorldSpace, {})".format(repr(isLinked["vertexLocations"])))
+            yield "    vertexLocations = self.getVertexLocations(mesh, object, useWorldSpace, {})".format(repr(isLinked["vertexLocations"]))
         if isLinked["edgeIndices"]:
-            lines.append("    edgeIndices = self.getEdgeIndices(mesh)")
+            yield "    edgeIndices = self.getEdgeIndices(mesh)"
         if isLinked["polygonIndices"]:
-            lines.append("    polygonIndices = self.getPolygonIndices(mesh)")
+            yield "    polygonIndices = self.getPolygonIndices(mesh)"
         if isLinked["vertices"]:
-            lines.append("    vertices = self.getVertices(mesh, object, useWorldSpace)")
+            yield "    vertices = self.getVertices(mesh, object, useWorldSpace)"
         if isLinked["polygons"]:
-            lines.append("    polygons = self.getPolygons(mesh, vertexLocations, object, useWorldSpace)")
+            yield "    polygons = self.getPolygons(mesh, vertexLocations, object, useWorldSpace)"
 
-        lines.append("    self.clearMesh(mesh, useModifiers, scene)")
-        lines.append("else: vertexLocations, edgeIndices, polygonIndices, vertices, polygons = [], [], [], [], []")
-        return lines
+        yield "    self.clearMesh(mesh, useModifiers, scene)"
+        yield "else: vertexLocations, edgeIndices, polygonIndices, vertices, polygons = [], [], [], [], []"
 
 
     def getMesh(self, object, useModifiers, scene):
