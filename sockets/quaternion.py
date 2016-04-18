@@ -40,6 +40,14 @@ class QuaternionSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getCopyExpression(cls):
         return "value.copy()"
 
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, Quaternion):
+            return value, 0
+        else:
+            try: return Quaternion(value), 1
+            except: return cls.getDefaultValue(), 2
+
 
 class QuaternionListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_QuaternionListSocket"
@@ -62,3 +70,11 @@ class QuaternionListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     @classmethod
     def getCopyExpression(cls):
         return "[element.copy() for element in value]"
+
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, list):
+            if all(isinstance(element, Quaternion) for element in value):
+                return value, 0
+        try: return [Quaternion(element) for element in value], 1
+        except: return cls.getDefaultValue(), 2

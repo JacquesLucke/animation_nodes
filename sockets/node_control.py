@@ -32,3 +32,7 @@ class NodeControlSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     @classmethod
     def getDefaultValueCode(cls):
         return "None"
+
+    @classmethod
+    def correctValue(cls, value):
+        return value, 0

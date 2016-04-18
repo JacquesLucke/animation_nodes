@@ -39,6 +39,14 @@ class VectorSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getCopyExpression(cls):
         return "value.copy()"
 
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, Vector):
+            return value, 0
+        else:
+            try: return Vector(value), 1
+            except: return cls.getDefaultValue(), 2
+
 
 class VectorListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_VectorListSocket"
@@ -61,3 +69,11 @@ class VectorListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     @classmethod
     def getCopyExpression(cls):
         return "[element.copy() for element in value]"
+
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, list):
+            if all(isinstance(element, Vector) for element in value):
+                return value, 0
+        try: return [Vector(element) for element in value], 1
+        except: return cls.getDefaultValue(), 2

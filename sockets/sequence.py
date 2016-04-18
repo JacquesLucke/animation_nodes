@@ -1,5 +1,6 @@
 import bpy
 from bpy.props import *
+from bpy.types import Sequence
 from .. events import propertyChanged
 from .. base_types.socket import AnimationNodeSocket
 
@@ -52,6 +53,12 @@ class SequenceSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getDefaultValueCode(cls):
         return "None"
 
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, Sequence) or value is None:
+            return value, 0
+        return cls.getDefaultValue(), 2
+
 
 class SequenceListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_SequenceListSocket"
@@ -74,3 +81,10 @@ class SequenceListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     @classmethod
     def getCopyExpression(cls):
         return "value[:]"
+
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, list):
+            if all(isinstance(element, Sequence) or element is None for element in value):
+                return value, 0
+        return cls.getDefaultValue(), 2

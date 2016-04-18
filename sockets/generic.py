@@ -18,6 +18,10 @@ class GenericSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getDefaultValueCode(self):
         return "None"
 
+    @classmethod
+    def correctValue(cls, value):
+        return value, 0
+
 
 class GenericListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_GenericListSocket"
@@ -36,3 +40,7 @@ class GenericListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     @classmethod
     def getDefaultValueCode(self):
         return "[]"
+
+    @classmethod
+    def correctValue(cls, value):
+        return value, 0

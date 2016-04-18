@@ -54,6 +54,12 @@ class InterpolationSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getDefaultValue(cls):
         return getInterpolationPreset("LINEAR")
 
+    @classmethod
+    def correctValue(cls, value):
+        if isInterpolation(value):
+            return value, 0
+        return cls.getDefaultValue(), 2
+
 
 class InterpolationListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_InterpolationListSocket"
@@ -76,3 +82,16 @@ class InterpolationListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     @classmethod
     def getCopyExpression(cls):
         return "value[:]"
+
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, list):
+            if all(isInterpolation(element) for element in value):
+                return value, 0
+        return cls.getDefaultValue(), 2
+
+
+def isInterpolation(value):
+    try: return isinstance(value(0.5), (float, int))
+    except: pass
+    return False

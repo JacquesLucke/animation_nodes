@@ -22,6 +22,11 @@ class PolygonIndicesSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getCopyExpression(cls):
         return "value[:]"
 
+    @classmethod
+    def correctValue(cls, value):
+        if isPolygon(value): return value, 0
+        else: return cls.getDefaultValue(), 2
+
 
 class PolygonIndicesListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_PolygonIndicesListSocket"
@@ -44,3 +49,16 @@ class PolygonIndicesListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     @classmethod
     def getCopyExpression(cls):
         return "[polygonIndices[:] for polygonIndices in value]"
+
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, list):
+            if all(isPolygon(element) for element in value):
+                return value, 0
+        return cls.getDefaultValue(), 2
+
+
+def isPolygon(value):
+    if isinstance(value, tuple):
+        return len(value) >= 3 and all(isinstance(element, int) for element in value)
+    return False

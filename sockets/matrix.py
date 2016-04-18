@@ -19,6 +19,14 @@ class MatrixSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getCopyExpression(cls):
         return "value.copy()"
 
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, Matrix):
+            return value, 0
+        else:
+            try: return Matrix(value), 1
+            except: return cls.getDefaultValue(), 2
+
 
 class MatrixListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_MatrixListSocket"
@@ -41,3 +49,11 @@ class MatrixListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     @classmethod
     def getCopyExpression(cls):
         return "[element.copy() for element in value]"
+
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, list):
+            if all(isinstance(element, Matrix) for element in value):
+                return value, 0
+        try: return [Matrix(element) for element in value], 1
+        except: return cls.getDefaultValue(), 2

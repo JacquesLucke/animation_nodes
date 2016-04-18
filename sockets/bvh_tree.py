@@ -14,3 +14,9 @@ class BVHTreeSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     @classmethod
     def getDefaultValue(cls):
         return BVHTree.FromPolygons(vertices = [], polygons = [])
+
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, BVHTree):
+            return value, 0
+        return cls.getDefaultValue(), 2

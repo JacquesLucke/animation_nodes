@@ -19,6 +19,12 @@ class MeshDataSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getCopyExpression(cls):
         return "value.copy()"
 
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, MeshData):
+            return value, 0
+        return cls.getDefaultValue(), 2
+
 
 class MeshDataListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_MeshDataListSocket"
@@ -31,9 +37,20 @@ class MeshDataListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     comparable = False
 
     @classmethod
+    def getDefaultValue(cls):
+        return []
+
+    @classmethod
     def getDefaultValueCode(self):
         return "[]"
 
     @classmethod
     def getCopyExpression(cls):
         return "[element.copy() for element in value]"
+
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, list):
+            if all(isinstance(element, MeshData) for element in value):
+                return value, 0
+        return cls.getDefaultValue(), 2

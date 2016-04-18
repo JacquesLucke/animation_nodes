@@ -77,3 +77,9 @@ class SoundSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     @classmethod
     def getDefaultValue(cls):
         return None
+
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, (SingleSoundEvaluator, EqualizerSoundEvaluator)) or value is None:
+            return value, 0
+        return cls.getDefaultValue(), 2

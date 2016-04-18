@@ -1,5 +1,6 @@
 import bpy
 from bpy.props import *
+from bpy.types import VectorFont
 from .. events import propertyChanged
 from .. base_types.socket import AnimationNodeSocket
 
@@ -37,6 +38,12 @@ class FontSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getDefaultValue(cls):
         return None
 
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, VectorFont) or value is None:
+            return value, 0
+        return cls.getDefaultValue(), 2
+
 
 class FontListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_FontListSocket"
@@ -59,3 +66,10 @@ class FontListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     @classmethod
     def getCopyExpression(cls):
         return "value[:]"
+
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, list):
+            if all(isinstance(element, VectorFont) or element is None for element in value):
+                return value, 0
+        return cls.getDefaultValue(), 2
