@@ -124,10 +124,11 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
         if len(dataTargets) == 1:
             dataType = dataTargets[0].dataType
             if dataType not in ("Node Control", "Generic", "Generic List"):
-                self.outputDataType = dataType
+                self.changeOutputType(dataType)
 
     def changeOutputType(self, dataType):
-        self.outputDataType = dataType
+        if self.outputDataType != dataType:
+            self.outputDataType = dataType
 
     def newInputSocket(self, dataType):
         name = self.getNewSocketName()
