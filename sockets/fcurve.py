@@ -18,7 +18,7 @@ class FCurveSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return None
 
     @classmethod
-    def getDefaultValueCode(self):
+    def getDefaultValueCode(cls):
         return "None"
 
     @classmethod
@@ -43,7 +43,7 @@ class FCurveListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return []
 
     @classmethod
-    def getDefaultValueCode(self):
+    def getDefaultValueCode(cls):
         return "[]"
 
     @classmethod

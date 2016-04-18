@@ -15,7 +15,7 @@ class PolygonIndicesSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return (0, 1, 2)
 
     @classmethod
-    def getDefaultValueCode(self):
+    def getDefaultValueCode(cls):
         return "(0, 1, 2)"
 
     @classmethod
@@ -43,7 +43,7 @@ class PolygonIndicesListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return []
 
     @classmethod
-    def getDefaultValueCode(self):
+    def getDefaultValueCode(cls):
         return "[]"
 
     @classmethod

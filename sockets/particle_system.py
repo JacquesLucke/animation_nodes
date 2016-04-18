@@ -16,7 +16,7 @@ class ParticleSystemSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return None
 
     @classmethod
-    def getDefaultValueCode(self):
+    def getDefaultValueCode(cls):
         return "None"
 
     @classmethod
@@ -41,7 +41,7 @@ class ParticleSystemListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return []
 
     @classmethod
-    def getDefaultValueCode(self):
+    def getDefaultValueCode(cls):
         return "[]"
 
     @classmethod

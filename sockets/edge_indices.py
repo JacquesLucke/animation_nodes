@@ -15,7 +15,7 @@ class EdgeIndicesSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return (0, 1)
 
     @classmethod
-    def getDefaultValueCode(self):
+    def getDefaultValueCode(cls):
         return "(0, 1)"
 
     @classmethod
@@ -43,7 +43,7 @@ class EdgeIndicesListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return []
 
     @classmethod
-    def getDefaultValueCode(self):
+    def getDefaultValueCode(cls):
         return "[]"
 
     @classmethod

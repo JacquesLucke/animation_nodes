@@ -75,7 +75,7 @@ class SequenceListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return []
 
     @classmethod
-    def getDefaultValueCode(self):
+    def getDefaultValueCode(cls):
         return "[]"
 
     @classmethod
