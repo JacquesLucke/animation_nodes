@@ -2,7 +2,6 @@ import bpy
 from .. import preferences
 from .. tree_info import getNetworks
 from .. utils.layout import writeText
-from .. algorithms.random import getRandomColor
 
 def colorNetworks():
     for network in getNetworks():
