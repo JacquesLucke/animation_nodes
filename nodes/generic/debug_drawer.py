@@ -33,25 +33,13 @@ class DebugDrawerNode(bpy.types.Node, AnimationNode):
 
     def drawAdvanced(self, layout):
         layout.prop(self, "fontSize")
-        if isList(self.dataType):
-            row = layout.row(align = True)
-            row.prop(self, "maxListStartElements", text = "Begin")
-            row.prop(self, "maxListEndElements", text = "End")
-            layout.prop(self, "oneElementPerLine")
         layout.prop(self, "maxRows")
 
-
-    def edit(self):
-        origin = self.inputs[0].dataOrigin
-        targetDataType = getattr(origin, "dataType", "Generic")
-        if targetDataType != self.inputs[0].dataType:
-            self.updateInputSocket(targetDataType)
-
-    @keepNodeState
-    def updateInputSocket(self, dataType):
-        self.inputs.clear()
-        self.newInput(dataType, "Data", "data")
-        self.newInput("Boolean", "Condition", "condition")
+        col = layout.column(align = True)
+        col.prop(self, "oneElementPerLine")
+        row = col.row(align = True)
+        row.prop(self, "maxListStartElements", text = "Begin")
+        row.prop(self, "maxListEndElements", text = "End")
 
     def getExecutionCode(self):
         if "Condition" in self.inputs:
@@ -59,13 +47,11 @@ class DebugDrawerNode(bpy.types.Node, AnimationNode):
         else: yield "if True:"
 
         yield "    self.errorMessage = ''"
-        if isList(self.dataType):
-            yield "    conversionFunction = self.getCurrentToStringFunction()"
-            yield "    if hasattr(data, '__iter__'):"
-            yield "        self.store_GenericList(data, conversionFunction)"
-            yield "    else: self.errorMessage = 'The input should be a list'"
-        else:
-            yield "    self.store_Generic(data)"
+        yield "    if isinstance(data, list):"
+        yield "        conversionFunction = self.getCurrentToStringFunction()"
+        yield "        self.store_GenericList(data, conversionFunction)"
+        yield "    else:"
+        yield "        self.store_Generic(data)"
 
     def store_Generic(self, data):
         self.debugText = str(data)
