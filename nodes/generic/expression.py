@@ -53,7 +53,7 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
         col = layout.column(align = True)
         if self.containsSyntaxError:
             col.label("Syntax Error", icon = "ERROR")
-        elif self.debugMode:
+        elif self.debugMode and self.expression != "":
             if self.errorMessage != "":
                 row = col.row()
                 row.label(self.errorMessage, icon = "ERROR")
