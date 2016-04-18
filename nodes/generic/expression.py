@@ -28,11 +28,17 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
     lastCorrectionType = IntProperty()
     containsSyntaxError = BoolProperty()
 
-    debugMode = BoolProperty(name = "Debug Mode", update = executionCodeChanged, default = True,
-        description = "Show detailed error messages in the node but is slower.")
+    debugMode = BoolProperty(name = "Debug Mode", default = True,
+        description = "Show detailed error messages in the node but is slower.",
+        update = executionCodeChanged)
 
-    moduleNames = StringProperty(name = "Modules", default = "math", update = executionCodeChanged,
-        description = "Comma separated module names which can be used inside the expression")
+    correctType = BoolProperty(name = "Correct Type", default = True,
+        description = "Check the type of the result and correct it if necessary",
+        update = executionCodeChanged)
+
+    moduleNames = StringProperty(name = "Modules", default = "math",
+        description = "Comma separated module names which can be used inside the expression",
+        update = executionCodeChanged,)
 
     outputDataType = StringProperty(default = "Generic", update = outputDataTypeChanged)
 
@@ -58,15 +64,21 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
                 row = col.row()
                 row.label(self.errorMessage, icon = "ERROR")
                 self.invokeFunction(row, "clearErrorMessage", icon = "X", emboss = False)
-            elif self.lastCorrectionType == 1:
-                col.label("Automatic Type Correction", icon = "INFO")
-            elif self.lastCorrectionType == 2:
-                col.label("Wrong Output Type", icon = "ERROR")
-                col.label("Expected {}".format(repr(self.outputDataType)), icon = "INFO")
+            elif self.correctType:
+                if self.lastCorrectionType == 1:
+                    col.label("Automatic Type Correction", icon = "INFO")
+                elif self.lastCorrectionType == 2:
+                    col.label("Wrong Output Type", icon = "ERROR")
+                    col.label("Expected {}".format(repr(self.outputDataType)), icon = "INFO")
 
     def drawAdvanced(self, layout):
-        layout.prop(self, "debugMode")
         layout.prop(self, "moduleNames")
+
+        col = layout.column(align = True)
+        col.prop(self, "debugMode")
+        subcol = col.column(align = True)
+        subcol.active = self.debugMode
+        subcol.prop(self, "correctType")
 
     def drawLabel(self):
         return self.expression
@@ -93,7 +105,8 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
             yield "except:"
             yield "    result = None"
             yield "    self.errorMessage = str(sys.exc_info()[1])"
-            yield "result, self.lastCorrectionType = self.outputs[0].correctValue(result)"
+            if self.correctType:
+                yield "result, self.lastCorrectionType = self.outputs[0].correctValue(result)"
         else:
             yield "result = " + expression
 
