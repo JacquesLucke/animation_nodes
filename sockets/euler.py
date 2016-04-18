@@ -39,6 +39,14 @@ class EulerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getCopyExpression(cls):
         return "value.copy()"
 
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, Euler):
+            return value, 0
+        else:
+            try: return Euler(value), 1
+            except: return cls.getDefaultValue(), 2
+
 
 class EulerListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_EulerListSocket"
@@ -61,3 +69,11 @@ class EulerListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     @classmethod
     def getCopyExpression(cls):
         return "[element.copy() for element in value]"
+
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, list):
+            if all(isinstance(element, Euler) for element in value):
+                return value, 0
+        try: return [Euler(element) for element in value], 1
+        except: return cls.getDefaultValue(), 2

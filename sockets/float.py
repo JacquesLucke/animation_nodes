@@ -63,6 +63,14 @@ class FloatSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getDefaultValue(cls):
         return 0
 
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, (float, int)):
+            return value, 0
+        else:
+            try: return float(value), 1
+            except: return cls.getDefaultValue(), 2
+
 
 class FloatListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_FloatListSocket"
@@ -85,3 +93,11 @@ class FloatListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     @classmethod
     def getCopyExpression(cls):
         return "value[:]"
+
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, list):
+            if all(isinstance(element, (float, int)) for element in value):
+                return value, 0
+        try: return [float(element) for element in value], 1
+        except: return cls.getDefaultValue(), 2

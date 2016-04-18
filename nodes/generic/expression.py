@@ -2,6 +2,7 @@ import re
 import bpy
 from bpy.props import *
 from ... utils.code import isCodeValid
+from ... tree_info import keepNodeState
 from ... utils.layout import splitAlignment
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
@@ -11,52 +12,73 @@ variableNames = list("xyzabcdefghijklmnopqrstuvw")
 class ExpressionNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ExpressionNode"
     bl_label = "Expression"
-    bl_width_default = 200
+    bl_width_default = 210
     dynamicLabelType = "HIDDEN_ONLY"
 
     def settingChanged(self, context = None):
-        self.executionError = ""
+        self.errorMessage = ""
         self.containsSyntaxError = not isCodeValid(self.expression)
         executionCodeChanged()
 
-    def outputTypeChanged(self, context):
+    def outputDataTypeChanged(self, context):
         self.recreateOutputSocket()
 
     expression = StringProperty(name = "Expression", update = settingChanged)
+    errorMessage = StringProperty()
+    lastCorrectionType = IntProperty()
     containsSyntaxError = BoolProperty()
-    executionError = StringProperty()
 
-    debugMode = BoolProperty(name = "Debug Mode", update = executionCodeChanged, default = True,
-        description = "Show detailed error messages in the node but is slower.")
+    debugMode = BoolProperty(name = "Debug Mode", default = True,
+        description = "Show detailed error messages in the node but is slower.",
+        update = executionCodeChanged)
 
-    moduleNames = StringProperty(name = "Modules", default = "math", update = executionCodeChanged,
-        description = "Comma separated module names which can be used inside the expression")
+    correctType = BoolProperty(name = "Correct Type", default = True,
+        description = "Check the type of the result and correct it if necessary",
+        update = executionCodeChanged)
 
-    outputIsList = BoolProperty(name = "Output is List", default = False, update = outputTypeChanged)
+    moduleNames = StringProperty(name = "Modules", default = "math",
+        description = "Comma separated module names which can be used inside the expression",
+        update = executionCodeChanged,)
+
+    outputDataType = StringProperty(default = "Generic", update = outputDataTypeChanged)
 
     def create(self):
         self.newInput("Node Control", "New Input")
         self.newOutput("Generic", "Result", "result")
 
+    @keepNodeState
     def recreateOutputSocket(self):
-        dataType = "Generic List" if self.outputIsList else "Generic"
-        if self.outputs[0].dataType == dataType: return
         self.outputs.clear()
-        self.newOutput(dataType, "Result", "result")
+        self.newOutput(self.outputDataType, "Result", "result")
 
     def draw(self, layout):
-        layout.prop(self, "expression", text = "")
+        row = layout.row(align = True)
+        row.prop(self, "expression", text = "")
+        self.invokeSocketTypeChooser(row, "changeOutputType", icon = "SCRIPTWIN")
+
+        col = layout.column(align = True)
         if self.containsSyntaxError:
-            layout.label("Syntax Error", icon = "ERROR")
-        if self.executionError != "":
-            row = layout.row()
-            row.label(self.executionError, icon = "ERROR")
-            self.invokeFunction(row, "clearErrorMessage", icon = "X", emboss = False)
+            col.label("Syntax Error", icon = "ERROR")
+        elif self.debugMode and self.expression != "":
+            if self.errorMessage != "":
+                row = col.row()
+                row.label(self.errorMessage, icon = "ERROR")
+                self.invokeFunction(row, "clearErrorMessage", icon = "X", emboss = False)
+            elif self.correctType:
+                if self.lastCorrectionType == 1:
+                    col.label("Automatic Type Correction", icon = "INFO")
+                elif self.lastCorrectionType == 2:
+                    col.label("Wrong Output Type", icon = "ERROR")
+                    col.label("Expected {}".format(repr(self.outputDataType)), icon = "INFO")
 
     def drawAdvanced(self, layout):
-        layout.prop(self, "debugMode")
-        layout.prop(self, "outputIsList")
         layout.prop(self, "moduleNames")
+
+        col = layout.column(align = True)
+        col.prop(self, "debugMode")
+        subcol = col.column(align = True)
+        subcol.active = self.debugMode
+        subcol.prop(self, "correctType")
 
     def drawLabel(self):
         return self.expression
@@ -73,16 +95,20 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
     def getExecutionCode(self):
         expression = self.expression.strip()
 
-        if self.debugMode:
-            if expression == "" or self.containsSyntaxError:
-                return "result = None"
-            return ["try:",
-                    "    result = " + expression,
-                    "    self.executionError = ''",
-                    "except:",
-                    "    result = None",
-                    "    self.executionError = str(sys.exc_info()[1])"]
-        else: return "result = " + expression
+        if expression == "" or self.containsSyntaxError:
+            yield "self.errorMessage = ''"
+            yield "result = self.outputs[0].getDefaultValue()"
+        elif self.debugMode:
+            yield "try:"
+            yield "    result = " + expression
+            yield "    self.errorMessage = ''"
+            yield "except:"
+            yield "    result = None"
+            yield "    self.errorMessage = str(sys.exc_info()[1])"
+            if self.correctType:
+                yield "result, self.lastCorrectionType = self.outputs[0].correctValue(result)"
+        else:
+            yield "result = " + expression
 
     def getUsedModules(self):
         moduleNames = re.split("\W+", self.moduleNames)
@@ -90,9 +116,13 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
         return ["sys"] + modules
 
     def clearErrorMessage(self):
-        self.executionError = ""
+        self.errorMessage = ""
 
     def edit(self):
+        self.edit_Inputs()
+        self.edit_Output()
+
+    def edit_Inputs(self):
         emptySocket = self.inputs["New Input"]
         directOrigin = emptySocket.directOrigin
         if directOrigin is None: return
@@ -101,6 +131,17 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
         socket = self.newInputSocket(dataOrigin.dataType)
         emptySocket.removeLinks()
         socket.linkWith(directOrigin)
+
+    def edit_Output(self):
+        dataTargets = self.outputs[0].dataTargets
+        if len(dataTargets) == 1:
+            dataType = dataTargets[0].dataType
+            if dataType not in ("Node Control", "Generic", "Generic List"):
+                self.changeOutputType(dataType)
+
+    def changeOutputType(self, dataType):
+        if self.outputDataType != dataType:
+            self.outputDataType = dataType
 
     def newInputSocket(self, dataType):
         name = self.getNewSocketName()

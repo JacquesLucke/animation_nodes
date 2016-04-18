@@ -47,6 +47,12 @@ class TextBlockSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         area.type = "TEXT_EDITOR"
         area.spaces.active.text = self.getValue()
 
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, bpy.types.Text) or value is None:
+            return value, 0
+        return cls.getDefaultValue(), 2
+
 
 class TextBlockListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_TextBlockListSocket"
@@ -69,3 +75,10 @@ class TextBlockListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     @classmethod
     def getCopyExpression(cls):
         return "value[:]"
+
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, list):
+            if all(isinstance(element, bpy.types.Text) or element is None for element in value):
+                return value, 0
+        return cls.getDefaultValue(), 2

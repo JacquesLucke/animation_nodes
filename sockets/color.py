@@ -37,6 +37,11 @@ class ColorSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getCopyExpression(cls):
         return "value[:]"
 
+    @classmethod
+    def correctValue(cls, value):
+        if isColor(value): return value, 0
+        else: return cls.getDefaultValue(), 2
+
 
 class ColorListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_ColorListSocket"
@@ -59,3 +64,16 @@ class ColorListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     @classmethod
     def getCopyExpression(cls):
         return "[element[:] for element in value]"
+
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, list):
+            if all(isColor(element) for element in value):
+                return value, 0
+        return cls.getDefaultValue(), 2
+
+
+def isColor(value):
+    if isinstance(value, list):
+        return len(value) == 4 and all(isinstance(element, (int, float)) for element in value)
+    return False

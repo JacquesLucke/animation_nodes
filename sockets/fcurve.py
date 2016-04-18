@@ -1,4 +1,5 @@
 import bpy
+from bpy.types import FCurve
 from mathutils import Vector
 from .. data_structures.mesh import Polygon
 from .. base_types.socket import AnimationNodeSocket
@@ -19,6 +20,12 @@ class FCurveSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     @classmethod
     def getDefaultValueCode(self):
         return "None"
+
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, FCurve) or value is None:
+            return value, 0
+        return cls.getDefaultValue(), 2
 
 
 class FCurveListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
@@ -42,3 +49,10 @@ class FCurveListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     @classmethod
     def getCopyExpression(cls):
         return "value[:]"
+
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, list):
+            if all(isinstance(element, FCurve) or element is None for element in value):
+                return value, 0
+        return cls.getDefaultValue(), 2

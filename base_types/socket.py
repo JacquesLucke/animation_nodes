@@ -69,7 +69,17 @@ class AnimationNodeSocket:
 
     @classmethod
     def getDefaultValue(cls):
-        raise NotImplementedError("All sockets have to define a getDefaultValue function")
+        raise NotImplementedError("All sockets have to define a getDefaultValue method")
+
+    @classmethod
+    def correctValue(cls, value):
+        '''
+        Return Types:
+          If the value has the correct type: (value, 0)
+          If the value has a correctable type: (corrected_value, 1)
+          if the value has a uncorrectable type: (default_value, 2)
+        '''
+        raise NotImplementedError("All sockets have to define a correctValue method")
 
     ##########################################################
 

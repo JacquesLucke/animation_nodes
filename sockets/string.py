@@ -31,6 +31,12 @@ class StringSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getDefaultValue(cls):
         return ""
 
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, str):
+            return value, 0
+        return str(value), 1
+
 
 class StringListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_StringListSocket"
@@ -53,3 +59,12 @@ class StringListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     @classmethod
     def getCopyExpression(cls):
         return "value[:]"
+
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, list):
+            if all(isinstance(element, str) for element in value):
+                return value, 0
+            else:
+                return list(map(str, value)), 1
+        return cls.getDefaultValue(), 2

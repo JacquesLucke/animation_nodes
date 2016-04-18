@@ -4,6 +4,7 @@ from .. events import propertyChanged
 from .. base_types.socket import AnimationNodeSocket
 from .. utils.id_reference import tryToFindObjectReference
 from .. data_structures.splines.bezier_spline import BezierSpline
+from .. data_structures.splines.poly_spline import PolySpline
 from .. data_structures.splines.from_blender import (createSplinesFromBlenderObject,
                                                      createSplineFromBlenderSpline)
 
@@ -87,6 +88,12 @@ class SplineSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getCopyExpression(cls):
         return "value.copy()"
 
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, (BezierSpline, PolySpline)):
+            return value, 0
+        return cls.getDefaultValue(), 2
+
 
 class SplineListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_SplineListSocket"
@@ -150,3 +157,10 @@ class SplineListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     @classmethod
     def getCopyExpression(cls):
         return "[element.copy() for element in value]"
+
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, list):
+            if all(isinstance(element, (BezierSpline, PolySpline)) for element in value):
+                return value, 0
+        return cls.getDefaultValue(), 2

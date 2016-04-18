@@ -42,6 +42,14 @@ class BooleanSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getDefaultValue(cls):
         return False
 
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, bool):
+            return value, 0
+        else:
+            try: return bool(value), 1
+            except: return cls.getDefaultValue(), 2
+
 
 class BooleanListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_BooleanListSocket"
@@ -64,3 +72,10 @@ class BooleanListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     @classmethod
     def getCopyExpression(cls):
         return "value[:]"
+
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, list):
+            if all(isinstance(element, bool) for element in value):
+                return value, 0
+        return cls.getDefaultValue(), 2

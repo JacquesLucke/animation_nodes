@@ -1,4 +1,5 @@
 import bpy
+from bpy.types import ParticleSystem
 from .. base_types.socket import AnimationNodeSocket
 
 class ParticleSystemSocket(bpy.types.NodeSocket, AnimationNodeSocket):
@@ -17,6 +18,12 @@ class ParticleSystemSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     @classmethod
     def getDefaultValueCode(self):
         return "None"
+
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, ParticleSystem) or value is None:
+            return value, 0
+        return cls.getDefaultValue(), 2
 
 
 class ParticleSystemListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
@@ -40,3 +47,10 @@ class ParticleSystemListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     @classmethod
     def getCopyExpression(cls):
         return "value[:]"
+
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, list):
+            if all(isinstance(element, ParticleSystem) or element is None for element in value):
+                return value, 0
+        return cls.getDefaultValue(), 2
