@@ -126,7 +126,7 @@ def getPreferences():
 def getDeveloperSettings():
     return getPreferences().developer
 
-def nodeColors():
+def getColorSettings():
     return getPreferences().nodeColors
 
 def debuggingIsEnabled():

@@ -1,7 +1,7 @@
 from bpy.props import *
-from ... import preferences
 from ... events import networkChanged
 from ... tree_info import getNodesByType
+from ... preferences import getColorSettings
 from ... ui.node_colors import colorNetworks
 from ... algorithms.random import getRandomColor
 
@@ -25,7 +25,7 @@ class SubprogramBaseNode:
         update = networkColorChanged)
 
     def randomizeNetworkColor(self):
-        colors = preferences.nodeColors()
+        colors = getColorSettings()
         value = colors.subprogramValue
         saturation = colors.subprogramSaturation
         self.networkColor = getRandomColor(value = value, saturation = saturation)

@@ -1,34 +1,42 @@
 import bpy
-from .. import preferences
 from .. tree_info import getNetworks
 from .. utils.layout import writeText
+from .. preferences import getColorSettings
+
+
+class NetworkColorsMode():
+    @classmethod
+    def colorNetwork(cls, network, nodesInNetwork, nodeByID = None):
+        networkColor = cls.getNetworkColor(network, nodeByID)
+        for node in nodesInNetwork:
+            if not node.useNetworkColor: continue
+            node.use_custom_color = True
+            color = networkColor
+            if node.bl_idname == "an_InvokeSubprogramNode":
+                if node.subprogramNetwork: color = cls.getNetworkColor(node.subprogramNetwork, nodeByID)
+            node.color = color
+
+    @classmethod
+    def getNetworkColor(cls, network, nodeByID):
+        colors = getColorSettings()
+        if network.type == "Invalid": return colors.invalidNetwork
+        if network.type == "Main": return colors.mainNetwork
+        if network.type in ("Group", "Loop", "Script"):
+            return network.getOwnerNode(nodeByID).networkColor
+
+
+coloringMode = "NETWORK"
 
 def colorNetworks():
     for network in getNetworks():
         colorNetwork(network, network.getAnimationNodes())
 
-def colorNetwork(network, nodes, nodeByID = None):
-    networkColor = getNetworkColor(network, nodeByID)
-    for node in nodes:
-        if not node.useNetworkColor: continue
-        node.use_custom_color = True
-        color = networkColor
-        if node.bl_idname == "an_InvokeSubprogramNode":
-            if node.subprogramNetwork: color = getNetworkColor(node.subprogramNetwork, nodeByID)
-        node.color = color
-
-def getNetworkColor(network, nodeByID):
-    colors = getColors()
-    if network.type == "Invalid": return colors.invalidNetwork
-    if network.type == "Main": return colors.mainNetwork
-    if network.type in ("Group", "Loop", "Script"):
-        return network.getOwnerNode(nodeByID).networkColor
-
-def getColors():
-    return preferences.nodeColors()
+def colorNetwork(network, nodesInNetwork, nodeByID = None):
+    if coloringMode == "NETWORK":
+        NetworkColorsMode.colorNetwork(network, nodesInNetwork)
 
 
-def draw(self, context):
+def drawNodeColorPanel(self, context):
     node = bpy.context.active_node
     if not getattr(node, "isAnimationNode", False): return
 
@@ -45,7 +53,7 @@ def draw(self, context):
 ##################################
 
 def register():
-    bpy.types.NODE_PT_active_node_color.append(draw)
+    bpy.types.NODE_PT_active_node_color.append(drawNodeColorPanel)
 
 def unregister():
-    bpy.types.NODE_PT_active_node_color.remove(draw)
+    bpy.types.NODE_PT_active_node_color.remove(drawNodeColorPanel)
