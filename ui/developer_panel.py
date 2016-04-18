@@ -32,13 +32,14 @@ class DeveloperPanel(bpy.types.Panel):
 
         col = layout.column(align = True)
 
+        subcol = col.column()
+        subcol.active = not developer.measureNodeExecutionTimes
+        subcol.prop(developer, "monitorExecution", text = "Monitor Execution")
+
         row = col.row(align = True)
         row.prop(developer, "measureNodeExecutionTimes", text = "Measure Execution Times")
         if developer.measureNodeExecutionTimes:
             row.operator("an.reset_measurements", text = "", icon = "RECOVER_LAST")
-        subcol = col.column()
-        subcol.active = not developer.measureNodeExecutionTimes
-        subcol.prop(developer, "monitorExecution", text = "Monitor Execution")
 
         row = col.row(align = True)
         row.operator("an.print_current_execution_code", text = "Print", icon = "CONSOLE")
@@ -52,9 +53,7 @@ class DeveloperPanel(bpy.types.Panel):
         col.prop(profiling, "sort", text = "Sort Mode")
         col.prop(profiling, "output", text = "Output")
 
-        subcol = col.column()
-        subcol.scale_y = 1.3
-        props = subcol.operator("an.profile", text = "Profile", icon = "PREVIEW_RANGE")
+        props = col.operator("an.profile", text = "Profile", icon = "PREVIEW_RANGE")
         props.function = profiling.function
         props.sort = profiling.sort
         props.output = profiling.output
