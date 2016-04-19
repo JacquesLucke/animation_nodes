@@ -31,7 +31,7 @@ class SocketLoopProperties(bpy.types.PropertyGroup):
     copyAlways = BoolProperty(default = False, update = socketLoopPropertyChanged)
 
 class SocketExecutionProperties(bpy.types.PropertyGroup):
-    neededCopies = IntProperty()
+    neededCopies = IntProperty(default = 0, min = 0)
 
 class AnimationNodeSocket:
     storable = True

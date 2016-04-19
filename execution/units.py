@@ -7,7 +7,7 @@ from . loop_execution_unit import LoopExecutionUnit
 from . group_execution_unit import GroupExecutionUnit
 from . script_execution_unit import ScriptExecutionUnit
 from .. tree_info import getNetworksByType, getSubprogramNetworks
-from .. utils.nodes import getAnimationNodeTrees, createNodeByIdDict
+from .. utils.nodes import getAnimationNodeTrees, iterAnimationNodes
 from .. problems import ExceptionDuringCodeCreation, CouldNotSetupExecutionUnits
 
 _mainUnitsByNodeTree = defaultdict(list)
@@ -26,6 +26,10 @@ def createExecutionUnits(nodeByID):
 def reset():
     _mainUnitsByNodeTree.clear()
     _subprogramUnitsByIdentifier.clear()
+
+    for node in iterAnimationNodes():
+        for socket in node.outputs:
+            socket.execution.neededCopies = 0
 
 def createMainUnits(nodeByID):
     for network in getNetworksByType("Main"):
