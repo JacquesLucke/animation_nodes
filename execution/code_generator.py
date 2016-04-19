@@ -201,6 +201,7 @@ def resolveInnerLinks(node, variables):
 def linkSocketToTargets(socket, node, variables, nodeByID):
     targets = tuple(iterLinkedSocketsWithInfo(socket, node, nodeByID))
     needACopy = getTargetsThatNeedACopy(socket, targets)
+    socket.execution.neededCopies = len(needACopy)
 
     for target in targets:
         if target in needACopy:

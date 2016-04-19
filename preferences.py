@@ -9,8 +9,8 @@ class NodeColorProperties(bpy.types.PropertyGroup):
     bl_idname = "an_NodeColorProperties"
 
     def changeNodeColors(self, context):
-        from . ui.node_colors import colorNetworks
-        colorNetworks()
+        from . ui.node_colors import colorAllNodes
+        colorAllNodes()
 
     mainNetwork = FloatVectorProperty(name = "Main Network",
         description = "Color for all networks that are not in a subprogram",
