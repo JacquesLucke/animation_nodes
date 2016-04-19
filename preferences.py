@@ -34,6 +34,13 @@ class NodeColorProperties(bpy.types.PropertyGroup):
         default = 0.2, soft_min = 0.0, soft_max = 1.0,
         update = changeNodeColors)
 
+    nodeColorModeItems = [
+        ("NETWORK", "Network", "", "NONE", 0),
+        ("NEEDED_COPIES", "Needed Copies", "", "NONE", 1)]
+
+    nodeColorMode = EnumProperty(name = "Node Color Mode", default = "NETWORK",
+        items = nodeColorModeItems, update = changeNodeColors)
+
 
 class ProfilingProperties(bpy.types.PropertyGroup):
     bl_idname = "an_ProfilingProperties"

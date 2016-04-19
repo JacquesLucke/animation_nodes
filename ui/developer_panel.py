@@ -1,5 +1,5 @@
 import bpy
-from .. preferences import getDeveloperSettings
+from .. preferences import getColorSettings, getDeveloperSettings
 
 class DeveloperPanel(bpy.types.Panel):
     bl_idname = "an_developer_panel"
@@ -26,6 +26,10 @@ class DeveloperPanel(bpy.types.Panel):
 
         col = layout.column()
         self.drawProfilingSettings(col, developer)
+
+        layout.separator()
+
+        layout.prop(getColorSettings(), "nodeColorMode", text = "Color Mode")
 
     def drawExecutionCodeSettings(self, layout, developer):
         layout.label("Execution Code:")

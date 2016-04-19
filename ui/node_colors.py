@@ -38,8 +38,6 @@ class NeededCopiesMode:
             node.color = color
 
 
-coloringMode = "NEEDED_COPIES"
-
 def colorAllNodes():
     for network in getNetworks():
         colorNetwork(network, network.getAnimationNodes())
@@ -49,9 +47,10 @@ def colorNetworks(nodesByNetworkDict, nodeByID = None):
         colorNetwork(network, nodes, nodeByID)
 
 def colorNetwork(network, nodesInNetwork, nodeByID = None):
-    if coloringMode == "NETWORK":
+    mode = getColorSettings().nodeColorMode
+    if mode == "NETWORK":
         NetworkColorsMode.colorNetwork(network, nodesInNetwork)
-    elif coloringMode == "NEEDED_COPIES":
+    elif mode == "NEEDED_COPIES":
         NeededCopiesMode.colorNetwork(network, nodesInNetwork)
 
 
