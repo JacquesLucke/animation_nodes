@@ -81,6 +81,14 @@ class DeveloperProperties(bpy.types.PropertyGroup):
         description = "Enable to find out which node raises exceptions",
         update = settingChanged)
 
+    socketEditModeItems = [
+        ("NORMAL", "Normal", "", "NONE", 0),
+        ("PERFORMANCE", "Performance", "", "NONE", 1)]
+
+    socketEditMode = EnumProperty(name = "Socket Edit Mode", default = "NORMAL",
+        description = "Change to display different sets of socket properties",
+        items = socketEditModeItems)
+
     debug = BoolProperty(name = "Debug", default = False)
 
 

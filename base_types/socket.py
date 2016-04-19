@@ -55,7 +55,7 @@ class AnimationNodeSocket:
     loop = PointerProperty(type = SocketLoopProperties)
     execution = PointerProperty(type = SocketExecutionProperties)
 
-    dataIsModified = BoolProperty(default = False)
+    dataIsModified = BoolProperty(default = False, update = executionCodeChanged)
     defaultDrawType = StringProperty(default = "TEXT_PROPERTY")
 
 

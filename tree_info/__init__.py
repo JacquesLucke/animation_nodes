@@ -196,24 +196,27 @@ def getSocketValues(node):
     return inputs, outputs
 
 def getSocketData(socket):
-    return (socket.identifier, socket.dataType, socket.getProperty(), socket.hide, socket.isUsed)
+    s = socket
+    return (s.identifier, s.dataType, s.getProperty(), s.hide, s.isUsed, s.dataIsModified)
 
 def setSocketValues(node, inputs, outputs):
     inputsByIdentifier = node.inputsByIdentifier
-    for identifier, dataType, value, hide, isUsed in inputs:
+    for identifier, dataType, value, hide, isUsed, dataIsModified in inputs:
         if getattr(inputsByIdentifier.get(identifier), "dataType", "") == dataType:
             socket = inputsByIdentifier[identifier]
             socket.setProperty(value)
             socket.hide = hide
             socket.isUsed = isUsed
+            socket.dataIsModified = dataIsModified
 
     outputsByIdentifier = node.outputsByIdentifier
-    for identifier, dataType, value, hide, isUsed in outputs:
+    for identifier, dataType, value, hide, isUsed, dataIsModified in outputs:
         if getattr(outputsByIdentifier.get(identifier), "dataType", "") == dataType:
             socket = outputsByIdentifier[identifier]
             socket.setProperty(value)
             socket.hide = hide
             socket.isUsed = isUsed
+            socket.dataIsModified = dataIsModified
 
 
 def getNetworkWithNode(node):
