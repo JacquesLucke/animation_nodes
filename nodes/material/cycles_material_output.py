@@ -13,6 +13,7 @@ allowedSocketTypes = {
 class CyclesMaterialOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CyclesMaterialOutputNode"
     bl_label = "Cycles Material Output"
+    bl_width_default = 165
 
     def getPossibleSocketItems(self, context):
         sockets = self.getPossibleSockets()
@@ -53,7 +54,17 @@ class CyclesMaterialOutputNode(bpy.types.Node, AnimationNode):
         node = material.node_tree.nodes.get(self.nodeName)
         if node is None: return
 
-        layout.prop(self, "socketIdentifier", text = "")
+        if self.hasPossibleInputs(node):
+            layout.prop(self, "socketIdentifier", text = "")
+        else:
+            layout.label("No Animatable Inputs", icon = "INFO")
+
+    def hasPossibleInputs(self, node):
+        keys = allowedSocketTypes.keys()
+        for socket in node.inputs:
+            if socket.bl_idname in keys:
+                return True
+        return False
 
     def getExecutionCode(self):
         inputSocket = self.inputs.get("Data")
