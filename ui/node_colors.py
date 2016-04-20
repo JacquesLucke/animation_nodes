@@ -48,7 +48,7 @@ def colorNetworks(nodesByNetworkDict, nodeByID = None):
 
 def colorNetwork(network, nodesInNetwork, nodeByID = None):
     mode = getColorSettings().nodeColorMode
-    if mode == "NETWORK":
+    if mode == "NETWORKS":
         NetworkColorsMode.colorNetwork(network, nodesInNetwork)
     elif mode == "NEEDED_COPIES":
         NeededCopiesMode.colorNetwork(network, nodesInNetwork)
