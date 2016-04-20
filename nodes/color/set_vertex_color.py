@@ -1,8 +1,9 @@
 import bpy
+import numpy
 from bpy.props import *
 from mathutils import Color
-from ... base_types.node import AnimationNode
 from ... events import propertyChanged
+from ... base_types.node import AnimationNode
 
 class SetVertexColorNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SetVertexColorNode"
@@ -47,8 +48,9 @@ class SetVertexColorNode(bpy.types.Node, AnimationNode):
             if colorsAreEqual(newColor, oldColor):
                 return object
 
-        colorList = tuple(newColor) * len(colorLayer.data)
-        colorLayer.data.foreach_set("color", colorList)
+        newColorAsArray = numpy.array(newColor, dtype = "f")
+        colors = numpy.tile(newColorAsArray, len(colorLayer.data))
+        colorLayer.data.foreach_set("color", colors)
 
         # without this line the 3d view doesn't update
         colorLayer.data[0].color = newColor
