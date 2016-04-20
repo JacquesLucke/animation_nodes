@@ -59,12 +59,13 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
         col = layout.column(align = True)
         if self.containsSyntaxError:
             col.label("Syntax Error", icon = "ERROR")
-        elif self.debugMode and self.expression != "":
-            if self.errorMessage != "":
-                row = col.row()
-                row.label(self.errorMessage, icon = "ERROR")
-                self.invokeFunction(row, "clearErrorMessage", icon = "X", emboss = False)
-            elif self.correctType:
+        else:
+            if self.debugMode and self.expression != "":
+                if self.errorMessage != "":
+                    row = col.row()
+                    row.label(self.errorMessage, icon = "ERROR")
+                    self.invokeFunction(row, "clearErrorMessage", icon = "X", emboss = False)
+            if self.correctType:
                 if self.lastCorrectionType == 1:
                     col.label("Automatic Type Correction", icon = "INFO")
                 elif self.lastCorrectionType == 2:
@@ -76,9 +77,7 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
 
         col = layout.column(align = True)
         col.prop(self, "debugMode")
-        subcol = col.column(align = True)
-        subcol.active = self.debugMode
-        subcol.prop(self, "correctType")
+        col.prop(self, "correctType")
 
     def drawLabel(self):
         return self.expression
@@ -105,10 +104,11 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
             yield "except:"
             yield "    result = None"
             yield "    self.errorMessage = str(sys.exc_info()[1])"
-            if self.correctType:
-                yield "result, self.lastCorrectionType = self.outputs[0].correctValue(result)"
         else:
             yield "result = " + expression
+
+        if self.correctType:
+            yield "result, self.lastCorrectionType = self.outputs[0].correctValue(result)"
 
     def getUsedModules(self):
         moduleNames = re.split("\W+", self.moduleNames)
