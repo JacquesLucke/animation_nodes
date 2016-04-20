@@ -2,7 +2,7 @@ from bpy.props import *
 from ... events import networkChanged
 from ... tree_info import getNodesByType
 from ... preferences import getColorSettings
-from ... ui.node_colors import colorNetworks
+from ... ui.node_colors import colorAllNodes
 from ... algorithms.random import getRandomColor
 
 class SubprogramBaseNode:
@@ -17,7 +17,7 @@ class SubprogramBaseNode:
         update = networkChanged)
 
     def networkColorChanged(self, context):
-        colorNetworks()
+        colorAllNodes()
 
     networkColor = FloatVectorProperty(name = "Network Color",
         default = [0.5, 0.5, 0.5], subtype = "COLOR",

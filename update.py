@@ -1,7 +1,7 @@
 from . import problems
 from . import tree_info
-from . ui import node_colors
 from . utils.timing import measureTime
+from . ui.node_colors import colorNetworks
 from . nodes.system import subprogram_sockets
 from . execution.units import createExecutionUnits
 from . node_link_conversion import correctForbiddenNodeLinks
@@ -25,11 +25,13 @@ def updateEverything():
     subprogram_sockets.updateIfNecessary()
     checkIfNodeTreeIsLinked()
     checkUndefinedNodes(nodeByID)
-    checkNetworks(nodeByID)
+    nodesByNetwork = checkNetworks(nodeByID)
     checkIdentifiers()
 
     if problems.canCreateExecutionUnits():
         createExecutionUnits(nodeByID)
+
+    colorNetworks(nodesByNetwork, nodeByID)
 
     nodeByID.clear()
 
@@ -47,17 +49,20 @@ def callNodeEditFunctions():
 
 def checkNetworks(nodeByID):
     invalidNetworkExists = False
+    nodesByNetworkDict = {}
 
     for network in tree_info.getNetworks():
         if network.type == "Invalid":
             invalidNetworkExists = True
         nodes = network.getAnimationNodes(nodeByID)
         markInvalidNodes(network, nodes)
-        node_colors.colorNetwork(network, nodes, nodeByID)
         checkNodeOptions(network, nodes)
+        nodesByNetworkDict[network] = nodes
 
     if invalidNetworkExists:
         problems.InvalidNetworksExist().report()
+
+    return nodesByNetworkDict
 
 def markInvalidNodes(network, nodes):
     isInvalid = network.type == "Invalid"

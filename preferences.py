@@ -9,8 +9,8 @@ class NodeColorProperties(bpy.types.PropertyGroup):
     bl_idname = "an_NodeColorProperties"
 
     def changeNodeColors(self, context):
-        from . ui.node_colors import colorNetworks
-        colorNetworks()
+        from . ui.node_colors import colorAllNodes
+        colorAllNodes()
 
     mainNetwork = FloatVectorProperty(name = "Main Network",
         description = "Color for all networks that are not in a subprogram",
@@ -33,6 +33,13 @@ class NodeColorProperties(bpy.types.PropertyGroup):
         description = "Color intensity of random subnetwork colors",
         default = 0.2, soft_min = 0.0, soft_max = 1.0,
         update = changeNodeColors)
+
+    nodeColorModeItems = [
+        ("NETWORK", "Network", "", "NONE", 0),
+        ("NEEDED_COPIES", "Needed Copies", "", "NONE", 1)]
+
+    nodeColorMode = EnumProperty(name = "Node Color Mode", default = "NETWORK",
+        items = nodeColorModeItems, update = changeNodeColors)
 
 
 class ProfilingProperties(bpy.types.PropertyGroup):
@@ -80,6 +87,14 @@ class DeveloperProperties(bpy.types.PropertyGroup):
     monitorExecution = BoolProperty(name = "Monitor Execution", default = False,
         description = "Enable to find out which node raises exceptions",
         update = settingChanged)
+
+    socketEditModeItems = [
+        ("NORMAL", "Normal", "", "NONE", 0),
+        ("PERFORMANCE", "Performance", "", "NONE", 1)]
+
+    socketEditMode = EnumProperty(name = "Socket Edit Mode", default = "NORMAL",
+        description = "Change to display different sets of socket properties",
+        items = socketEditModeItems)
 
     debug = BoolProperty(name = "Debug", default = False)
 

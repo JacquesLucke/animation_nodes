@@ -5,7 +5,7 @@ import random
 from bpy.props import *
 from collections import defaultdict
 from .. utils.handlers import eventHandler
-from .. ui.node_colors import colorNetworks
+from .. ui.node_colors import colorAllNodes
 from .. utils.nodes import getAnimationNodeTrees
 from .. operators.callbacks import newNodeCallback
 from .. sockets.info import toIdName as toSocketIdName
@@ -20,7 +20,7 @@ class AnimationNode:
     _isAnimationNode = True
 
     def useNetworkColorChanged(self, context):
-        colorNetworks()
+        colorAllNodes()
 
     # unique string for each node; don't change it at all
     identifier = StringProperty(name = "Identifier", default = "")

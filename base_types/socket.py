@@ -10,20 +10,17 @@ from .. templates.operators.insert_linked_node import invokeLinkedNodeInsertion
 from .. tree_info import isSocketLinked, getLinkedSockets, getDirectlyLinkedSockets
 
 class SocketTextProperties(bpy.types.PropertyGroup):
-    bl_idname = "an_SocketTextProperties"
     unique = BoolProperty(default = False)
     editable = BoolProperty(default = False)
     variable = BoolProperty(default = False)
 
 class SocketDisplayProperties(bpy.types.PropertyGroup):
-    bl_idname = "an_SocketDisplayProperties"
     text = BoolProperty(default = False)
     textInput = BoolProperty(default = False)
     moveOperators = BoolProperty(default = False)
     removeOperator = BoolProperty(default = False)
 
 class SocketLoopProperties(bpy.types.PropertyGroup):
-    bl_idname = "an_SocketLoopProperties"
 
     def socketLoopPropertyChanged(self, context):
         subprogramInterfaceChanged()
@@ -32,6 +29,9 @@ class SocketLoopProperties(bpy.types.PropertyGroup):
     useAsInput = BoolProperty(default = False, update = socketLoopPropertyChanged)
     useAsOutput = BoolProperty(default = False, update = socketLoopPropertyChanged)
     copyAlways = BoolProperty(default = False, update = socketLoopPropertyChanged)
+
+class SocketExecutionProperties(bpy.types.PropertyGroup):
+    neededCopies = IntProperty(default = 0, min = 0)
 
 class AnimationNodeSocket:
     storable = True
@@ -53,8 +53,9 @@ class AnimationNodeSocket:
     display = PointerProperty(type = SocketDisplayProperties)
     textProps = PointerProperty(type = SocketTextProperties)
     loop = PointerProperty(type = SocketLoopProperties)
+    execution = PointerProperty(type = SocketExecutionProperties)
 
-    dataIsModified = BoolProperty(default = False)
+    dataIsModified = BoolProperty(default = False, update = executionCodeChanged)
     defaultDrawType = StringProperty(default = "TEXT_PROPERTY")
 
 

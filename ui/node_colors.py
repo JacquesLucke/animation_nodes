@@ -4,7 +4,7 @@ from .. utils.layout import writeText
 from .. preferences import getColorSettings
 
 
-class NetworkColorsMode():
+class NetworkColorsMode:
     @classmethod
     def colorNetwork(cls, network, nodesInNetwork, nodeByID = None):
         networkColor = cls.getNetworkColor(network, nodeByID)
@@ -24,16 +24,34 @@ class NetworkColorsMode():
         if network.type in ("Group", "Loop", "Script"):
             return network.getOwnerNode(nodeByID).networkColor
 
+class NeededCopiesMode:
+    @classmethod
+    def colorNetwork(cls, network, nodesInNetwork, nodeByID = None):
+        for node in nodesInNetwork:
+            node.use_custom_color = True
 
-coloringMode = "NETWORK"
+            neededCopies = sum(socket.execution.neededCopies for socket in node.outputs)
+            if neededCopies == 0:
+                color = (0.7, 0.9, 0.7)
+            else:
+                color = (1.0, 0.3, 0.3)
+            node.color = color
 
-def colorNetworks():
+
+def colorAllNodes():
     for network in getNetworks():
         colorNetwork(network, network.getAnimationNodes())
 
+def colorNetworks(nodesByNetworkDict, nodeByID = None):
+    for network, nodes in nodesByNetworkDict.items():
+        colorNetwork(network, nodes, nodeByID)
+
 def colorNetwork(network, nodesInNetwork, nodeByID = None):
-    if coloringMode == "NETWORK":
+    mode = getColorSettings().nodeColorMode
+    if mode == "NETWORK":
         NetworkColorsMode.colorNetwork(network, nodesInNetwork)
+    elif mode == "NEEDED_COPIES":
+        NeededCopiesMode.colorNetwork(network, nodesInNetwork)
 
 
 def drawNodeColorPanel(self, context):
