@@ -52,32 +52,28 @@ class an_ObjectTransformsOutputNode(bpy.types.Node, AnimationNode):
         useRot = self.useRotation
         useScale = self.useScale
 
-        lines = []
-        lines.append("if object is not None:")
+        if not any((*useLoc, *useRot, *useScale)):
+            return
+
+        yield "if object is not None:"
 
         # Location
-        if useLoc[0] and useLoc[1] and useLoc[2]:
-            lines.append("    object.location = location")
+        if all((*useLoc, )):
+            yield "    object.location = location"
         else:
             for i in range(3):
-                if useLoc[i]: lines.append("    object.location["+str(i)+"] = location["+str(i)+"]")
+                if useLoc[i]: yield "    object.location["+str(i)+"] = location["+str(i)+"]"
 
         # Rotation
-        if useRot[0] and useRot[1] and useRot[2]:
-            lines.append("    object.rotation_euler = rotation")
+        if all((*useRot, )):
+            yield "    object.rotation_euler = rotation"
         else:
             for i in range(3):
-                if useRot[i]: lines.append("    object.rotation_euler["+str(i)+"] = rotation["+str(i)+"]")
+                if useRot[i]: yield "    object.rotation_euler["+str(i)+"] = rotation["+str(i)+"]"
 
         # Scale
-        if useScale[0] and useScale[1] and useScale[2]:
-            lines.append("    object.scale = scale")
+        if all((*useScale, )):
+            yield "    object.scale = scale"
         else:
             for i in range(3):
-                if useScale[i]: lines.append("    object.scale["+str(i)+"] = scale["+str(i)+"]")
-
-        if not any((useLoc[0], useLoc[1], useLoc[2],
-                   useRot[0], useRot[1], useRot[2],
-                   useScale[0], useScale[1], useScale[2])):
-            lines = []
-        return lines
+                if useScale[i]: yield "    object.scale["+str(i)+"] = scale["+str(i)+"]"
