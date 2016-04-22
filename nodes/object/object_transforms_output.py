@@ -77,3 +77,18 @@ class an_ObjectTransformsOutputNode(bpy.types.Node, AnimationNode):
         else:
             for i in range(3):
                 if useScale[i]: yield "    object.scale["+str(i)+"] = scale["+str(i)+"]"
+
+    def getBakeCode(self):
+        yield "if object is not None:"
+
+        for i in range(3):
+            if self.useLocation[i]:
+                yield "    object.keyframe_insert('location', index = {})".format(i)
+
+        for i in range(3):
+            if self.useRotation[i]:
+                yield "    object.keyframe_insert('rotation_euler', index = {})".format(i)
+
+        for i in range(3):
+            if self.useScale[i]:
+                yield "    object.keyframe_insert('scale', index = {})".format(i)

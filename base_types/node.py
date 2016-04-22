@@ -101,6 +101,9 @@ class AnimationNode:
     def getTemplateCode(self):
         return []
 
+    def getBakingSupport(self):
+        return "NONE"
+
     # Don't override these functions
     ######################################
 
@@ -371,6 +374,9 @@ class AnimationNode:
 
     def getLocalExecutionCode_GetExecutionCode(self, inputVariables, outputVariables):
         return toString(self.getExecutionCode())
+
+    def getLocalBakeCode(self):
+        return toString(self.getBakeCode())
 
 
 @eventHandler("SCENE_UPDATE_POST")

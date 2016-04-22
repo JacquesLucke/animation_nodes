@@ -160,6 +160,10 @@ def iterRealNodeExecutionLines(node, variables):
     localCode = node.getLocalExecutionCode()
     globalCode = makeGlobalExecutionCode(localCode, node, variables)
     yield from globalCode.splitlines()
+    if hasattr(node, "getBakeCode"):
+        localCode = node.getLocalBakeCode()
+        globalCode = makeGlobalExecutionCode(localCode, node, variables)
+        yield from globalCode.splitlines()
 
 def makeGlobalExecutionCode(localCode, node, variables):
     code = replaceVariableName(localCode, "self", node.identifier)
