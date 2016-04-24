@@ -136,7 +136,6 @@ class Spline:
         splineTangent = self.evaluateTangent(parameter)
         projectionData = [(splineProjection, splineTangent)]
 
-        # TODO: can cause division by zero here
         if not self.isCyclic:
             startPoint = self.evaluate(0)
             startTangent = self.evaluateTangent(0)

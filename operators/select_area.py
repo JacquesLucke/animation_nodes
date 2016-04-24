@@ -16,7 +16,6 @@ class SelectArea(bpy.types.Operator):
     def invoke(self, context, event):
         self.registerDrawHandlers()
         self.window = context.window
-        self.areaType = "TEXT_EDITOR"
         context.window_manager.modal_handler_add(self)
         return {"RUNNING_MODAL"}
 
