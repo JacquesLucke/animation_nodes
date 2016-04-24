@@ -7,26 +7,26 @@ class RandomVerticesOffsetTemplate(bpy.types.Operator, Template):
     nodeOffset = (-500, 200)
 
     def insert(self):
-        meshInputNode = self.newNode('an_ObjectMeshDataNode', x = 0, y = 0)
-        invokeSubprogramNode = self.newNode('an_InvokeSubprogramNode', x = 210, y = 115)
-        combineMeshDataNode = self.newNode('an_CombineMeshDataNode', x = 450, y = 30)
-        meshOutput = self.newNode('an_MeshObjectOutputNode', x = 650, y = 81)
+        meshInputNode = self.newNode("an_ObjectMeshDataNode", x = 0, y = 0)
+        invokeSubprogramNode = self.newNode("an_InvokeSubprogramNode", x = 210, y = 115)
+        combineMeshDataNode = self.newNode("an_CombineMeshDataNode", x = 450, y = 30)
+        meshOutput = self.newNode("an_MeshObjectOutputNode", x = 650, y = 81)
         meshOutput.meshDataType = "MESH_DATA"
         meshOutput.inputs["Mesh Data"].isUsed = True
 
-        loopInputNode = self.newNode('an_LoopInputNode', x = 70, y = -240)
+        loopInputNode = self.newNode("an_LoopInputNode", x = 70, y = -240)
         loopInputNode.subprogramName = "Move Vertices"
-        loopInputNode.newIterator('Vector List', name = 'Vector')
-        loopInputNode.newParameter('Float', name = 'Strength', defaultValue = 0.3)
+        loopInputNode.newIterator("Vector List", name = "Vector")
+        loopInputNode.newParameter("Float", name = "Strength", defaultValue = 0.3)
 
-        randomVectorNode = self.newNode('an_RandomVectorNode', x = 310, y = -330)
-        vectorMathNode = self.newNode('an_VectorMathNode', x = 515, y = -235)
+        randomVectorNode = self.newNode("an_RandomVectorNode", x = 310, y = -330)
+        vectorMathNode = self.newNode("an_VectorMathNode", x = 515, y = -235)
 
-        loopOutputNode = self.newNode('an_LoopGeneratorOutputNode', x = 720, y = -212)
+        loopOutputNode = self.newNode("an_LoopGeneratorOutputNode", x = 720, y = -212)
         loopOutputNode.loopInputIdentifier = loopInputNode.identifier
-        loopOutputNode.outputName = 'Vector List'
-        loopOutputNode.listDataType = 'Vector List'
-        loopOutputNode.addType = 'APPEND'
+        loopOutputNode.outputName = "Vector List"
+        loopOutputNode.listDataType = "Vector List"
+        loopOutputNode.addType = "APPEND"
 
         invokeSubprogramNode.subprogramIdentifier = loopInputNode.identifier
         self.updateSubprograms()
