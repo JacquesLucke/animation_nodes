@@ -43,14 +43,14 @@ class CyclesMaterialOutputNode(bpy.types.Node, AnimationNode):
         self.createInputSocket()
 
     def draw(self, layout):
-        layout.prop_search(self, 'materialName', bpy.data, 'materials', text='', icon='MATERIAL_DATA')
+        layout.prop_search(self, 'materialName', bpy.data, 'materials', text = '', icon = 'MATERIAL_DATA')
         material = bpy.data.materials.get(self.materialName)
         if material is None: return
 
         nodeTree = material.node_tree
         if nodeTree is None: return
 
-        layout.prop_search(self, 'nodeName', nodeTree, 'nodes', text='', icon='NODE')
+        layout.prop_search(self, 'nodeName', nodeTree, 'nodes', text = '', icon = 'NODE')
         node = material.node_tree.nodes.get(self.nodeName)
         if node is None: return
 

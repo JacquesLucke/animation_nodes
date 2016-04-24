@@ -62,13 +62,13 @@ class ShowHelp(bpy.types.Menu):
         helpLines = self.helpText.split("\n")
         for li in helpLines:
             if li:
-                col.label(text=li)
+                col.label(text = li)
 
         col = row.column(align = True)
         noteLines = self.noteText.split("\n")
         for li in noteLines:
             if li:
-                col.label(text=li)
+                col.label(text = li)
 
         layout.label("o.g. 08.2015", icon = "INFO")
 

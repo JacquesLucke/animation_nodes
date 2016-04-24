@@ -117,7 +117,7 @@ class SplineListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def drawProperty(self, layout, text, node):
         row = layout.row(align = True)
-        row.prop_search(self, "objectName",  bpy.context.scene, "objects", icon="NONE", text = text)
+        row.prop_search(self, "objectName",  bpy.context.scene, "objects", icon = "NONE", text = text)
         self.invokeFunction(row, node, "assignActiveObject", icon = "EYEDROPPER")
         if self.objectName != "":
             row.prop(self, "useWorldSpace", text = "", icon = "WORLD")
