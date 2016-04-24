@@ -1,12 +1,10 @@
-import os
 import re
 import traceback
 from itertools import chain
 from functools import lru_cache
-from collections import defaultdict
 from .. problems import NodeFailesToCreateExecutionCode
-from .. tree_info import iterLinkedSocketsWithInfo, isSocketLinked
 from .. preferences import addonName, getExecutionCodeType
+from .. tree_info import iterLinkedSocketsWithInfo, isSocketLinked
 
 
 
