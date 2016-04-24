@@ -6,9 +6,8 @@ from functools import lru_cache
 from collections import defaultdict
 from .. problems import NodeFailesToCreateExecutionCode
 from .. tree_info import iterLinkedSocketsWithInfo, isSocketLinked
-from .. preferences import (addonName,
-                            monitorExecutionIsEnabled,
-                            measureNodeExecutionTimesIsEnabled)
+from .. preferences import addonName, getExecutionCodeType
+
 
 
 # Initial Socket Variables
@@ -100,14 +99,22 @@ def iterUnlinkedSockets(nodes):
         yield from node.unlinkedInputs
 
 def getFunction_IterNodeExecutionLines():
-    if measureNodeExecutionTimesIsEnabled():
+    mode = getExecutionCodeType()
+    if mode == "DEFAULT":
+        return iterNodeExecutionLines_Basic
+    elif mode == "MONITOR":
+        return iterNodeExecutionLines_Monitored
+    elif mode == "MEASURE":
         return iterNodeExecutionLines_MeasureTimes
-    else:
-        if monitorExecutionIsEnabled():
-            return iterNodeExecutionLines_Monitored
-        else:
-            return iterNodeExecutionLines_Basic
+    elif mode == "BAKE":
+        return iterNodeExecutionLines_Bake
 
+def iterNodeExecutionLines_Basic(node, variables):
+    yield from iterNodePreExecutionLines(node, variables)
+    try:
+        yield from iterRealNodeExecutionLines(node, variables)
+    except:
+        handleExecutionCodeCreationException(node)
 
 def iterNodeExecutionLines_Monitored(node, variables):
     yield from iterNodePreExecutionLines(node, variables)
@@ -132,10 +139,11 @@ def iterNodeExecutionLines_MeasureTimes(node, variables):
     except:
         handleExecutionCodeCreationException(node)
 
-def iterNodeExecutionLines_Basic(node, variables):
+def iterNodeExecutionLines_Bake(node, variables):
     yield from iterNodePreExecutionLines(node, variables)
     try:
         yield from iterRealNodeExecutionLines(node, variables)
+        yield from iterNodeBakeLines(node, variables)
     except:
         handleExecutionCodeCreationException(node)
 
@@ -160,10 +168,11 @@ def iterRealNodeExecutionLines(node, variables):
     localCode = node.getLocalExecutionCode()
     globalCode = makeGlobalExecutionCode(localCode, node, variables)
     yield from globalCode.splitlines()
-    if hasattr(node, "getBakeCode"):
-        localCode = node.getLocalBakeCode()
-        globalCode = makeGlobalExecutionCode(localCode, node, variables)
-        yield from globalCode.splitlines()
+
+def iterNodeBakeLines(node, variables):
+    localCode = node.getLocalBakeCode()
+    globalCode = makeGlobalExecutionCode(localCode, node, variables)
+    yield from globalCode.splitlines()
 
 def makeGlobalExecutionCode(localCode, node, variables):
     code = replaceVariableName(localCode, "self", node.identifier)

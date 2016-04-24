@@ -87,6 +87,9 @@ class AnimationNode:
     def getExecutionCode(self):
         return []
 
+    def getBakeCode(self):
+        return []
+
     def getUsedModules(self):
         return []
 
@@ -100,9 +103,6 @@ class AnimationNode:
 
     def getTemplateCode(self):
         return []
-
-    def getBakingSupport(self):
-        return "NONE"
 
     # Don't override these functions
     ######################################
