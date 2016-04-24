@@ -3,11 +3,11 @@ from bpy.props import *
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 
-caseTypeItems= [("UPPER", "To Upper Case", ""),
-                ("LOWER", "To Lower Case", ""),
-                ("TITLE", "To Title Case", ""),
-                ("CAPITALIZE", "Capitalize Phrase", ""),
-                ("CAPWORDS", "Capitalize Words", "") ]
+caseTypeItems = [("UPPER", "To Upper Case", ""),
+                 ("LOWER", "To Lower Case", ""),
+                 ("TITLE", "To Title Case", ""),
+                 ("CAPITALIZE", "Capitalize Phrase", ""),
+                 ("CAPWORDS", "Capitalize Words", "") ]
 
 caseTypeCode = { item[0] : item[0].lower() for item in caseTypeItems }
 

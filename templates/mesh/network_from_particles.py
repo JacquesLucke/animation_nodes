@@ -29,11 +29,11 @@ class NetworkFromParticlesTemplate(bpy.types.Operator, Template):
         writeText(layout, performanceInfo)
 
     def insert(self):
-        particlesFromObjectNode = self.newNode('an_ParticlesFromObjectNode', x = 0, y = 0)
-        filterParticlesNode = self.newNode('an_FilterParticlesNode', x = 220, y = 0)
-        particlesInfoNode = self.newNode('an_ParticleListInfoNode', x = 450, y = 0)
+        particlesFromObjectNode = self.newNode("an_ParticlesFromObjectNode", x = 0, y = 0)
+        filterParticlesNode = self.newNode("an_FilterParticlesNode", x = 220, y = 0)
+        particlesInfoNode = self.newNode("an_ParticleListInfoNode", x = 450, y = 0)
 
-        findEdgesNode = self.newNode('an_FindCloseVerticesNode', x = 650, y = -90)
+        findEdgesNode = self.newNode("an_FindCloseVerticesNode", x = 650, y = -90)
         findEdgesNode.inputs[4].value = 0.6
 
         self.newLink(particlesFromObjectNode.outputs[0], filterParticlesNode.inputs[0])
@@ -41,8 +41,8 @@ class NetworkFromParticlesTemplate(bpy.types.Operator, Template):
         self.newLink(particlesInfoNode.outputs[0], findEdgesNode.inputs[0])
 
         if self.connectionType == "EDGE":
-            combineMeshNode = self.newNode('an_CombineMeshDataNode', x = 860, y = 30)
-            meshOutput = self.newNode('an_MeshObjectOutputNode', x = 1080, y = 30)
+            combineMeshNode = self.newNode("an_CombineMeshDataNode", x = 860, y = 30)
+            meshOutput = self.newNode("an_MeshObjectOutputNode", x = 1080, y = 30)
             meshOutput.meshDataType = "MESH_DATA"
             meshOutput.inputs["Mesh Data"].isUsed = True
 
@@ -51,9 +51,9 @@ class NetworkFromParticlesTemplate(bpy.types.Operator, Template):
             self.newLink(combineMeshNode.outputs[0], meshOutput.inputs[1])
 
         if self.connectionType == "POLYGON":
-            edgesToPlanesNode = self.newNode('an_EdgesToPlanesNode', x = 870, y = 70)
-            combineMeshNode = self.newNode('an_CombineMeshDataNode', x = 1100, y = 70)
-            meshOutput = self.newNode('an_MeshObjectOutputNode', x = 1315, y = 70)
+            edgesToPlanesNode = self.newNode("an_EdgesToPlanesNode", x = 870, y = 70)
+            combineMeshNode = self.newNode("an_CombineMeshDataNode", x = 1100, y = 70)
+            meshOutput = self.newNode("an_MeshObjectOutputNode", x = 1315, y = 70)
             meshOutput.meshDataType = "MESH_DATA"
             meshOutput.inputs["Mesh Data"].isUsed = True
 
@@ -64,8 +64,8 @@ class NetworkFromParticlesTemplate(bpy.types.Operator, Template):
             self.newLink(edgesToPlanesNode.outputs[1], combineMeshNode.inputs[2])
 
         if self.connectionType == "SPLINE":
-            splinesFromEdgesNode = self.newNode('an_SplinesFromEdgesNode', x = 870, y = 30)
-            curveOutputNode = self.newNode('an_CurveObjectOutputNode', x = 1080, y = 30)
+            splinesFromEdgesNode = self.newNode("an_SplinesFromEdgesNode", x = 870, y = 30)
+            curveOutputNode = self.newNode("an_CurveObjectOutputNode", x = 1080, y = 30)
             curveOutputNode.inputs["Splines"].isUsed = True
             curveOutputNode.inputs["Bevel Depth"].value = 0.005
             curveOutputNode.inputs["Bevel Depth"].isUsed = True
