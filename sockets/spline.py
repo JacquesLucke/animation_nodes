@@ -29,7 +29,7 @@ class SplineSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def drawProperty(self, layout, text, node):
         row = layout.row(align = True)
-        row.prop_search(self, "objectName",  bpy.context.scene, "objects", icon="NONE", text = text)
+        row.prop_search(self, "objectName",  bpy.context.scene, "objects", icon = "NONE", text = text)
         self.invokeFunction(row, node, "handleEyedropperButton", icon = "EYEDROPPER", passEvent = True,
             description = "Assign active object to this socket (hold CTRL to open a rename object dialog)")
         if self.objectName != "":
