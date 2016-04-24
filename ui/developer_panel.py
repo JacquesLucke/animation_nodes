@@ -1,5 +1,5 @@
 import bpy
-from .. preferences import getColorSettings, getDeveloperSettings
+from .. preferences import getPreferences
 
 class DeveloperPanel(bpy.types.Panel):
     bl_idname = "an_developer_panel"
@@ -17,40 +17,42 @@ class DeveloperPanel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         tree = context.space_data.node_tree
-        developer = getDeveloperSettings()
+
+        preferences = getPreferences()
 
         col = layout.column()
-        self.drawExecutionCodeSettings(col, developer)
+        self.drawExecutionCodeSettings(col, preferences)
 
         layout.separator()
 
         col = layout.column()
-        self.drawProfilingSettings(col, developer)
+        self.drawProfilingSettings(col, preferences)
 
         layout.separator()
 
-        layout.prop(getColorSettings(), "nodeColorMode", text = "Color Mode")
+        layout.prop(preferences.nodeColors, "nodeColorMode", text = "Color Mode")
 
-    def drawExecutionCodeSettings(self, layout, developer):
+    def drawExecutionCodeSettings(self, layout, preferences):
+        executionCode = preferences.executionCode
         layout.label("Execution Code:")
 
         col = layout.column(align = True)
 
         subcol = col.column()
-        subcol.active = not developer.measureNodeExecutionTimes
-        subcol.prop(developer, "monitorExecution", text = "Monitor Execution")
+        subcol.active = not executionCode.measureNodeExecutionTimes
+        subcol.prop(executionCode, "monitorExecution", text = "Monitor Execution")
 
         row = col.row(align = True)
-        row.prop(developer, "measureNodeExecutionTimes", text = "Measure Execution Times")
-        if developer.measureNodeExecutionTimes:
+        row.prop(executionCode, "measureNodeExecutionTimes", text = "Measure Execution Times")
+        if executionCode.measureNodeExecutionTimes:
             row.operator("an.reset_measurements", text = "", icon = "RECOVER_LAST")
 
         row = col.row(align = True)
         row.operator("an.print_current_execution_code", text = "Print", icon = "CONSOLE")
         row.operator("an.write_current_execution_code", text = "Write", icon = "TEXT")
 
-    def drawProfilingSettings(self, layout, developer):
-        profiling = developer.profiling
+    def drawProfilingSettings(self, layout, preferences):
+        profiling = preferences.developer.profiling
 
         col = layout.column()
         col.prop(profiling, "function", text = "Function")

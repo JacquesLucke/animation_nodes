@@ -72,21 +72,7 @@ class ProfilingProperties(bpy.types.PropertyGroup):
 class DeveloperProperties(bpy.types.PropertyGroup):
     bl_idname = "an_DeveloperProperties"
 
-    def settingChanged(self, context):
-        from . events import executionCodeChanged
-        from . execution.measurements import resetMeasurements
-        executionCodeChanged()
-        resetMeasurements()
-
     profiling = PointerProperty(type = ProfilingProperties)
-
-    measureNodeExecutionTimes = BoolProperty(name = "Measure Node Execution Times", default = False,
-        description = "Measure the time a node takes to execute each time it is called",
-        update = settingChanged)
-
-    monitorExecution = BoolProperty(name = "Monitor Execution", default = False,
-        description = "Enable to find out which node raises exceptions",
-        update = settingChanged)
 
     socketEditModeItems = [
         ("NORMAL", "Normal", "", "NONE", 0),
@@ -98,6 +84,21 @@ class DeveloperProperties(bpy.types.PropertyGroup):
 
     debug = BoolProperty(name = "Debug", default = False)
 
+class ExecutionCodeProperties(bpy.types.PropertyGroup):
+
+    def settingChanged(self, context):
+        from . events import executionCodeChanged
+        from . execution.measurements import resetMeasurements
+        executionCodeChanged()
+        resetMeasurements()
+
+    measureNodeExecutionTimes = BoolProperty(name = "Measure Node Execution Times", default = False,
+        description = "Measure the time a node takes to execute each time it is called",
+        update = settingChanged)
+
+    monitorExecution = BoolProperty(name = "Monitor Execution", default = False,
+        description = "Enable to find out which node raises exceptions",
+        update = settingChanged)
 
 class AddonPreferences(bpy.types.AddonPreferences):
     bl_idname = addonName
@@ -110,6 +111,7 @@ class AddonPreferences(bpy.types.AddonPreferences):
 
     nodeColors = PointerProperty(type = NodeColorProperties)
     developer = PointerProperty(type = DeveloperProperties)
+    executionCode = PointerProperty(type = ExecutionCodeProperties)
 
     def draw(self, context):
         layout = self.layout
@@ -141,6 +143,9 @@ def getPreferences():
 def getDeveloperSettings():
     return getPreferences().developer
 
+def getExecutionCodeSettings():
+    return getPreferences().executionCode
+
 def getColorSettings():
     return getPreferences().nodeColors
 
@@ -148,10 +153,10 @@ def debuggingIsEnabled():
     return getPreferences().developer.debug
 
 def measureNodeExecutionTimesIsEnabled():
-    return getDeveloperSettings().measureNodeExecutionTimes
+    return getExecutionCodeSettings().measureNodeExecutionTimes
 
 def monitorExecutionIsEnabled():
-    return getDeveloperSettings().monitorExecution
+    return getExecutionCodeSettings().monitorExecution
 
 def getBlenderVersion():
     return bpy.app.version
