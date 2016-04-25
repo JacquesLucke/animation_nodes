@@ -31,3 +31,7 @@ class OverviewPanel(bpy.types.Panel):
             row.prop(tree.autoExecution, "enabled", icon = icon, text = "", icon_only = True)
 
         layout.operator("an.statistics_drawer", text = "Statistics", icon = "LINENUMBERS_ON")
+
+        props = layout.operator("an.bake_to_keyframes", "Bake to Keyframes", icon = "KEY_HLT")
+        props.startFrame = context.scene.frame_start
+        props.endFrame = context.scene.frame_end
