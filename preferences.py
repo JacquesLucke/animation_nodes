@@ -95,7 +95,7 @@ class ExecutionCodeProperties(bpy.types.PropertyGroup):
         ("MEASURE", "Measure Execution Times", "", "NONE", 2),
         ("BAKE", "Enable Baking", "", "NONE", 3)]
 
-    executionCodeType = EnumProperty(name = "Execution Code Type", default = "DEFAULT",
+    type = EnumProperty(name = "Execution Code Type", default = "DEFAULT",
         description = "Different execution codes can be useful in different contexts",
         update = settingChanged, items = executionCodeTypeItems)
 
@@ -146,7 +146,7 @@ def getExecutionCodeSettings():
     return getPreferences().executionCode
 
 def getExecutionCodeType():
-    return getExecutionCodeSettings().executionCodeType
+    return getExecutionCodeSettings().type
 
 def getColorSettings():
     return getPreferences().nodeColors

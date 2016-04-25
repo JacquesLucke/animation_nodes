@@ -39,8 +39,8 @@ class DeveloperPanel(bpy.types.Panel):
         col = layout.column(align = True)
 
         row = col.row(align = True)
-        row.prop(executionCode, "executionCodeType", text = "")
-        if executionCode.executionCodeType == "MEASURE":
+        row.prop(executionCode, "type", text = "")
+        if executionCode.type == "MEASURE":
             row.operator("an.reset_measurements", text = "", icon = "RECOVER_LAST")
 
         row = col.row(align = True)
