@@ -11,7 +11,7 @@ class ObjectDataPathOutputNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
         self.newInput("String", "Path", "path")
-        self.newInput("Integer", "Array Index", "arrayIndex")
+        self.newInput("Integer", "Array Index", "arrayIndex", value = -1)
         self.newInput("Generic", "Value", "value")
         self.newOutput("Object", "Object", "object")
 
@@ -32,6 +32,11 @@ class ObjectDataPathOutputNode(bpy.types.Node, AnimationNode):
         except:
             self.errorMessage = "Error"
         return object
+
+    def getBakeCode(self):
+        yield "if object is not None:"
+        yield "    try: object.keyframe_insert(path, index = arrayIndex)"
+        yield "    except: pass"
 
     def clearCache(self):
         cache.clear()

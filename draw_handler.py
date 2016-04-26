@@ -1,13 +1,13 @@
 import bpy
+from . preferences import getExecutionCodeType
 from . execution.measurements import drawMeasurementResults
 from . nodes.generic.debug_drawer import drawDebugTextBoxes
-from . preferences import measureNodeExecutionTimesIsEnabled
 from . nodes.interpolation.debug import drawInterpolationPreviews
 
 def drawNodeEditor():
     drawDebugTextBoxes()
     drawInterpolationPreviews()
-    if measureNodeExecutionTimesIsEnabled():
+    if getExecutionCodeType() == "MEASURE":
         drawMeasurementResults()
 
 _nodeDrawHandler = None

@@ -87,6 +87,9 @@ class AnimationNode:
     def getExecutionCode(self):
         return []
 
+    def getBakeCode(self):
+        return []
+
     def getUsedModules(self):
         return []
 
@@ -371,6 +374,9 @@ class AnimationNode:
 
     def getLocalExecutionCode_GetExecutionCode(self, inputVariables, outputVariables):
         return toString(self.getExecutionCode())
+
+    def getLocalBakeCode(self):
+        return toString(self.getBakeCode())
 
 
 @eventHandler("SCENE_UPDATE_POST")

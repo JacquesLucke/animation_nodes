@@ -48,3 +48,9 @@ class ObjectAttributeOutputNode(bpy.types.Node, AnimationNode):
     def evaluationExpression(self):
         if self.attribute.startswith("["): return "object" + self.attribute + " = value"
         else: return "object." + self.attribute + " = value"
+
+    def getBakeCode(self):
+        if isCodeValid(self.attribute):
+            yield "if object is not None:"
+            yield "    try: object.keyframe_insert({})".format(repr(self.attribute))
+            yield "    except: pass"

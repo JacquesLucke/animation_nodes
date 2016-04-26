@@ -38,13 +38,9 @@ class DeveloperPanel(bpy.types.Panel):
 
         col = layout.column(align = True)
 
-        subcol = col.column()
-        subcol.active = not executionCode.measureNodeExecutionTimes
-        subcol.prop(executionCode, "monitorExecution", text = "Monitor Execution")
-
         row = col.row(align = True)
-        row.prop(executionCode, "measureNodeExecutionTimes", text = "Measure Execution Times")
-        if executionCode.measureNodeExecutionTimes:
+        row.prop(executionCode, "type", text = "")
+        if executionCode.type == "MEASURE":
             row.operator("an.reset_measurements", text = "", icon = "RECOVER_LAST")
 
         row = col.row(align = True)

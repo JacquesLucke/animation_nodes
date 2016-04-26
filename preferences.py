@@ -6,7 +6,6 @@ from bpy.props import *
 addonName = os.path.basename(os.path.dirname(__file__))
 
 class NodeColorProperties(bpy.types.PropertyGroup):
-    bl_idname = "an_NodeColorProperties"
 
     def changeNodeColors(self, context):
         from . ui.node_colors import colorAllNodes
@@ -43,7 +42,6 @@ class NodeColorProperties(bpy.types.PropertyGroup):
 
 
 class ProfilingProperties(bpy.types.PropertyGroup):
-    bl_idname = "an_ProfilingProperties"
 
     profilingFunctionItems = [
         ("EXECUTION", "Execution", "", "NONE", 0),
@@ -70,7 +68,6 @@ class ProfilingProperties(bpy.types.PropertyGroup):
         default = "cumtime", items = profileSortModeItems)
 
 class DeveloperProperties(bpy.types.PropertyGroup):
-    bl_idname = "an_DeveloperProperties"
 
     profiling = PointerProperty(type = ProfilingProperties)
 
@@ -92,13 +89,15 @@ class ExecutionCodeProperties(bpy.types.PropertyGroup):
         executionCodeChanged()
         resetMeasurements()
 
-    measureNodeExecutionTimes = BoolProperty(name = "Measure Node Execution Times", default = False,
-        description = "Measure the time a node takes to execute each time it is called",
-        update = settingChanged)
+    executionCodeTypeItems = [
+        ("DEFAULT", "Default", "", "NONE", 0),
+        ("MONITOR", "Monitored Execution", "", "NONE", 1),
+        ("MEASURE", "Measure Execution Times", "", "NONE", 2),
+        ("BAKE", "Enable Baking", "", "NONE", 3)]
 
-    monitorExecution = BoolProperty(name = "Monitor Execution", default = False,
-        description = "Enable to find out which node raises exceptions",
-        update = settingChanged)
+    type = EnumProperty(name = "Execution Code Type", default = "DEFAULT",
+        description = "Different execution codes can be useful in different contexts",
+        update = settingChanged, items = executionCodeTypeItems)
 
 class AddonPreferences(bpy.types.AddonPreferences):
     bl_idname = addonName
@@ -146,17 +145,14 @@ def getDeveloperSettings():
 def getExecutionCodeSettings():
     return getPreferences().executionCode
 
+def getExecutionCodeType():
+    return getExecutionCodeSettings().type
+
 def getColorSettings():
     return getPreferences().nodeColors
 
 def debuggingIsEnabled():
     return getPreferences().developer.debug
-
-def measureNodeExecutionTimesIsEnabled():
-    return getExecutionCodeSettings().measureNodeExecutionTimes
-
-def monitorExecutionIsEnabled():
-    return getExecutionCodeSettings().monitorExecution
 
 def getBlenderVersion():
     return bpy.app.version
