@@ -45,8 +45,9 @@ class SelectArea(bpy.types.Operator):
             else:
                 selectedArea = self.createNewArea(area, nearestBorder, factor)
 
+            self.finish()
             self.an_executeCallback(self.callback, selectedArea)
-            return self.finish()
+            return {"FINISHED"}
 
         if event.type in {"RIGHTMOUSE", "ESC"}:
             return self.finish()
