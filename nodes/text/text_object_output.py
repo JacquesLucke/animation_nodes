@@ -80,3 +80,22 @@ class TextObjectOutputNode(bpy.types.Node, AnimationNode):
             self.errorMessage = ""
         else:
             self.errorMessage = "The align type is invalid. Look in the advanced panels to see all possible values."
+
+    def getBakeCode(self):
+        yield "if getattr(object, 'type', '') == 'FONT':"
+        yield "    textObject = object.data"
+
+        s = self.inputs
+        if s["Size"].isUsed:                yield "    textObject.keyframe_insert('size')"
+        if s["Extrude"].isUsed:             yield "    textObject.keyframe_insert('extrude')"
+        if s["Shear"].isUsed:               yield "    textObject.keyframe_insert('shear')"
+        if s["Bevel Depth"].isUsed:         yield "    textObject.keyframe_insert('bevel_depth')"
+        if s["Bevel Resolution"].isUsed:    yield "    textObject.keyframe_insert('bevel_resolution')"
+
+        if s["Letter Spacing"].isUsed:      yield "    textObject.keyframe_insert('space_character')"
+        if s["Word Spacing"].isUsed:        yield "    textObject.keyframe_insert('space_word')"
+        if s["Line Spacing"].isUsed:        yield "    textObject.keyframe_insert('space_line')"
+
+        if s["X Offset"].isUsed:            yield "    textObject.keyframe_insert('offset_x')"
+        if s["Y Offset"].isUsed:            yield "    textObject.keyframe_insert('offset_y')"
+        if s["Align"].isUsed:               yield "    textObject.keyframe_insert('align')"
