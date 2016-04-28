@@ -1,5 +1,7 @@
 import bpy
 from .. preferences import getPreferences
+from .. operators.output_execution_code import setupTextEditorCallback, executionCodeTextBlockName
+
 
 class DeveloperPanel(bpy.types.Panel):
     bl_idname = "an_developer_panel"
@@ -46,6 +48,9 @@ class DeveloperPanel(bpy.types.Panel):
         row = col.row(align = True)
         row.operator("an.print_current_execution_code", text = "Print", icon = "CONSOLE")
         row.operator("an.write_current_execution_code", text = "Write", icon = "TEXT")
+        subrow = row.row(align = True)
+        subrow.active = executionCodeTextBlockName in bpy.data.texts
+        subrow.operator("an.select_area", text = "", icon = "ZOOM_SELECTED").callback = setupTextEditorCallback
 
     def drawProfilingSettings(self, layout, preferences):
         profiling = preferences.developer.profiling
