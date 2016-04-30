@@ -15,8 +15,13 @@ class StringSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     value = StringProperty(default = "", update = propertyChanged, options = {"TEXTEDIT_UPDATE"})
 
+    showFileChooser = BoolProperty(default = False)
+
     def drawProperty(self, layout, text, node):
-        layout.prop(self, "value", text = text)
+        row = layout.row(align = True)
+        row.prop(self, "value", text = text)
+        if self.showFileChooser:
+            self.invokePathChooser(row, node, "setPath", icon = "EYEDROPPER")
 
     def getValue(self):
         return self.value
@@ -26,6 +31,9 @@ class StringSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def getProperty(self):
         return self.value
+
+    def setPath(self, path):
+        self.value = path
 
     @classmethod
     def getDefaultValue(cls):

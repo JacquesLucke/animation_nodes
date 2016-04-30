@@ -160,6 +160,14 @@ class AnimationNodeSocket:
         props.data = str(data)
         props.passEvent = passEvent
 
+    def invokePathChooser(self, layout, node, functionName, text = "", icon = "NONE", description = "", emboss = True):
+        data = functionName
+        self.invokeFunction(layout, node, "_choosePath", text = text, icon = icon, description = description, emboss = emboss, data = data)
+
+    def _choosePath(self, data):
+        bpy.ops.an.choose_path("INVOKE_DEFAULT",
+            callback = self.newCallback(self.node, data))
+
     def newCallback(self, node, functionName):
         return newSocketCallback(self, node, functionName)
 
