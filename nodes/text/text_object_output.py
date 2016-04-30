@@ -54,7 +54,7 @@ class TextObjectOutputNode(bpy.types.Node, AnimationNode):
         yield "    textObject = object.data"
 
         s = self.inputs
-        if s["Text"].isUsed:                yield "    textObject.body = text"
+        if s["Text"].isUsed:                yield "    if str(textObject.body) != text: textObject.body = text"
         if s["Size"].isUsed:                yield "    textObject.size = size"
         if s["Extrude"].isUsed:             yield "    textObject.extrude = extrude"
         if s["Shear"].isUsed:               yield "    textObject.shear = shear"
