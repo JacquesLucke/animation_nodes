@@ -61,3 +61,14 @@ class TextSequenceOutputNode(bpy.types.Node, AnimationNode):
             sequence.align_y = align
         else:
             self.errorMessage = "Y Align must be TOP, CENTER or BOTTOM"
+
+    def getBakeCode(self):
+        yield "if getattr(sequence, 'type', '') == 'TEXT':"
+        s = self.inputs
+        if s["Size"].isUsed:        yield "    sequence.keyframe_insert('font_size')"
+        if s["Shadow"].isUsed:      yield "    sequence.keyframe_insert('use_shadow')"
+        if s["X Align"].isUsed:     yield "    sequence.keyframe_insert('align_x')"
+        if s["Y Align"].isUsed:     yield "    sequence.keyframe_insert('align_y')"
+        if s["X Location"].isUsed:  yield "    sequence.keyframe_insert('location', index = 0)"
+        if s["Y Location"].isUsed:  yield "    sequence.keyframe_insert('location', index = 1)"
+        if s["Wrap Width"].isUsed:  yield "    sequence.keyframe_insert('wrap_width')"
