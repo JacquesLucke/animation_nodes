@@ -96,7 +96,7 @@ class PolySpline(Spline):
         if not self.isEvaluable: return [0.0]
 
         totalLength = self.getLength()
-        if totalLength < 0.0001: return [0.0]
+        if totalLength < 0.0001: return [0.0] * amount
         distancePerStep = totalLength / amount
 
         parameters = [0.0]

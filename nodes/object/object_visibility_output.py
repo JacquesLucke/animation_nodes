@@ -42,6 +42,17 @@ class ObjectVisibilityOutputNode(bpy.types.Node, AnimationNode):
 
         yield "    pass"
 
+    def getBakeCode(self):
+        yield "if object is not None:"
+        s = self.inputs
+        if s["Hide"].isUsed:        yield "    object.keyframe_insert('hide')"
+        if s["Hide Render"].isUsed: yield "    object.keyframe_insert('hide_render')"
+        if s["Hide Select"].isUsed: yield "    object.keyframe_insert('hide_select')"
+
+        if s["Show Name"].isUsed:   yield "    object.keyframe_insert('show_name')"
+        if s["Show Axis"].isUsed:   yield "    object.keyframe_insert('show_axis')"
+        if s["Show X-Ray"].isUsed:  yield "    object.keyframe_insert('show_x_ray')"
+
 class ShowHelp(bpy.types.Menu):
     bl_idname = "an.show_object_visibility_output_help"
     bl_label = "Object Visibility Output node | Blender - Animation Nodes"

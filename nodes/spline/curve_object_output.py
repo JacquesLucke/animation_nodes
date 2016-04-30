@@ -67,3 +67,16 @@ class CurveObjectOutputNode(bpy.types.Node, AnimationNode):
             self.errorMessage = ""
         else:
             self.errorMessage = "The fill mode is invalid. Look in the advanced panels to see all possible values."
+
+    def getBakeCode(self):
+        yield "if getattr(object, 'type', '') == 'CURVE':"
+        yield "    curve = object.data"
+
+        s = self.inputs
+        if s["Bevel Depth"].isUsed:         yield "    curve.keyframe_insert('bevel_depth')"
+        if s["Bevel Resolution"].isUsed:    yield "    curve.keyframe_insert('bevel_resolution')"
+        if s["Bevel Start"].isUsed:         yield "    curve.keyframe_insert('bevel_factor_start')"
+        if s["Bevel End"].isUsed:           yield "    curve.keyframe_insert('bevel_factor_end')"
+        if s["Extrude"].isUsed:             yield "    curve.keyframe_insert('extrude')"
+        if s["Offset"].isUsed:              yield "    curve.keyframe_insert('offset')"
+        if s["Preview Resolution"].isUsed:  yield "    curve.keyframe_insert('resolution_u')"
