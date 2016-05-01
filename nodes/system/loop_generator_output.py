@@ -14,6 +14,7 @@ addTypeItems = [
 class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_LoopGeneratorOutputNode"
     bl_label = "Loop Generator Output"
+    dynamicLabelType = "ALWAYS"
 
     def dataTypeChanged(self, context):
         self.outputName = self.listDataType
@@ -21,7 +22,6 @@ class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
         subprogramInterfaceChanged()
 
     def nameChanged(self, context):
-        self.label = self.outputName
         subprogramInterfaceChanged()
 
     def loopInputIdentifierChanged(self, context):
@@ -48,6 +48,9 @@ class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "addType")
         self.invokeSocketTypeChooser(layout, "setListDataType",
             socketGroup = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
+
+    def drawLabel(self):
+        return self.outputName
 
     def edit(self):
         network = self.network
