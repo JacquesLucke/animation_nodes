@@ -4,12 +4,15 @@ import types
 import random
 from bpy.props import *
 from collections import defaultdict
+from .. utils.timing import prettyTime
 from .. utils.handlers import eventHandler
 from .. ui.node_colors import colorAllNodes
+from .. preferences import getExecutionCodeType
 from .. utils.nodes import getAnimationNodeTrees
 from .. operators.callbacks import newNodeCallback
 from .. sockets.info import toIdName as toSocketIdName
 from .. utils.blender_ui import iterNodeCornerLocations
+from .. execution.measurements import getAverageExecutionTime
 from .. operators.dynamic_operators import getInvokeFunctionOperator
 from .. tree_info import (getNetworkWithNode, getDirectlyLinkedSockets, getOriginNodes,
                           getLinkedInputsDict, getLinkedOutputsDict, iterLinkedOutputSockets,
@@ -129,14 +132,17 @@ class AnimationNode:
         self.draw(layout)
 
     def draw_label(self):
+        if nodeLabelMode == "MEASURE" and self.hide:
+            return prettyTime(getAverageExecutionTime(self))
+
         if self.dynamicLabelType == "NONE":
             return self.bl_label
         elif self.dynamicLabelType == "ALWAYS":
             return self.drawLabel()
         elif self.dynamicLabelType == "HIDDEN_ONLY" and self.hide:
             return self.drawLabel()
-        else:
-            return self.bl_label
+
+        return self.bl_label
 
     def newInput(self, type, name, identifier = None, **kwargs):
         idName = toSocketIdName(type)
@@ -403,6 +409,14 @@ def toString(code):
         return "\n".join(code)
     return code
 
+
+nodeLabelMode = "DEFAULT"
+
+def updateNodeLabelMode():
+    global nodeLabelMode
+    nodeLabelMode = "DEFAULT"
+    if getExecutionCodeType() == "MEASURE":
+        nodeLabelMode = "MEASURE"
 
 
 # Register

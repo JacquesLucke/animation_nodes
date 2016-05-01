@@ -35,6 +35,9 @@ def resetMeasurements():
 def getMeasurementsDict():
     return measurementsByNodeIdentifier
 
+def getAverageExecutionTime(node):
+    return measurementsByNodeIdentifier[node.identifier].averageTime
+
 def drawMeasurementResults():
     tree = bpy.context.space_data.edit_tree
     if tree is None: return

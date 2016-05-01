@@ -85,7 +85,9 @@ class ExecutionCodeProperties(bpy.types.PropertyGroup):
 
     def settingChanged(self, context):
         from . events import executionCodeChanged
+        from . base_types.node import updateNodeLabelMode
         executionCodeChanged()
+        updateNodeLabelMode()
 
     executionCodeTypeItems = [
         ("DEFAULT", "Default", "", "NONE", 0),
