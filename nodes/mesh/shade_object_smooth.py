@@ -13,7 +13,10 @@ class ShadeObjectSmooth(bpy.types.Node, AnimationNode):
     def execute(self, object, smooth):
         if getattr(object, "type", "") == "MESH":
             mesh = object.data
-            smoothList = [smooth] * len(mesh.polygons)
-            mesh.polygons.foreach_set("use_smooth", smoothList)
-            mesh.update()
+            if len(mesh.polygons) > 0:
+                smoothList = [smooth] * len(mesh.polygons)
+                mesh.polygons.foreach_set("use_smooth", smoothList)
+
+                # trigger update
+                mesh.polygons[0].use_smooth = smooth
         return object
