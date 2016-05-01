@@ -2,6 +2,7 @@ import traceback
 from .. import problems
 from collections import defaultdict
 from . cache import clearExecutionCache
+from . measurements import resetMeasurements
 from . main_execution_unit import MainExecutionUnit
 from . loop_execution_unit import LoopExecutionUnit
 from . group_execution_unit import GroupExecutionUnit
@@ -24,6 +25,7 @@ def createExecutionUnits(nodeByID):
         ExceptionDuringCodeCreation().report()
 
 def reset():
+    resetMeasurements()
     _mainUnitsByNodeTree.clear()
     _subprogramUnitsByIdentifier.clear()
 

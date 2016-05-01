@@ -85,9 +85,7 @@ class ExecutionCodeProperties(bpy.types.PropertyGroup):
 
     def settingChanged(self, context):
         from . events import executionCodeChanged
-        from . execution.measurements import resetMeasurements
         executionCodeChanged()
-        resetMeasurements()
 
     executionCodeTypeItems = [
         ("DEFAULT", "Default", "", "NONE", 0),
