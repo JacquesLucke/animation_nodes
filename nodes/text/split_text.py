@@ -5,11 +5,12 @@ from ... tree_info import keepNodeState
 from ... base_types.node import AnimationNode
 
 splitTypeItems = [
-    ("CHARACTERS", "Characters", "", "", 0),
-    ("WORDS", "Words", "", "", 1),
-    ("LINES", "Lines", "", "", 2),
-    ("REGULAR_EXPRESSION", "Regular Expression", "", "", 3),
-    ("N_CHARACTERS", "N Characters", "", "", 4) ]
+    ("CHARACTERS", "Characters", "", "NONE", 0),
+    ("WORDS", "Words", "", "NONE", 1),
+    ("LINES", "Lines", "", "NONE", 2),
+    ("REGULAR_EXPRESSION", "Regular Expression", "", "NONE", 3),
+    ("N_CHARACTERS", "N Characters", "", "NONE", 4),
+    ("SEPARATOR", "Separator", "", "NONE", 5) ]
 
 class SplitTextNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SplitTextNode"
@@ -25,6 +26,8 @@ class SplitTextNode(bpy.types.Node, AnimationNode):
 
     keepDelimiters = BoolProperty(default = False, update = propertyChanged)
 
+    errorMessage = StringProperty()
+
     def create(self):
         self.recreateInputs()
         self.newOutput("String List", "Text List", "textList")
@@ -34,8 +37,11 @@ class SplitTextNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "splitType", text = "")
         if self.splitType == "REGULAR_EXPRESSION":
             layout.prop(self, "keepDelimiters", text = "Keep Delimiters")
+        if self.errorMessage != "":
+            layout.label(self.errorMessage, icon = "ERROR")
 
     def getExecutionCode(self):
+        yield "self.errorMessage = ''"
         if self.splitType == "CHARACTERS":
             yield "textList = list(text)"
         elif self.splitType == "WORDS":
@@ -46,13 +52,19 @@ class SplitTextNode(bpy.types.Node, AnimationNode):
             yield "textList = self.splitWithRegularExpression(text, splitBy)"
         elif self.splitType == "N_CHARACTERS":
             yield "textList = self.splitEveryNCharacters(text, n)"
+        elif self.splitType == "SEPARATOR":
+            yield "textList = [text] if splitBy == '' else text.split(splitBy)"
         yield "length = len(textList)"
 
     def splitWithRegularExpression(self, text, splitBy):
-        if splitBy == "": return[text]
+        if splitBy == "": return [text]
         else:
-            if self.keepDelimiters: return re.split("("+splitBy+")", text)
-            else: return re.split(splitBy, text)
+            try:
+                if self.keepDelimiters: return re.split("("+splitBy+")", text)
+                else: return re.split(splitBy, text)
+            except:
+                self.errorMessage = "Invalid Regular Expression"
+                return [text]
 
     def splitEveryNCharacters(self, text, n):
         if n <= 0: return []
@@ -67,7 +79,7 @@ class SplitTextNode(bpy.types.Node, AnimationNode):
     def recreateInputs(self):
         self.inputs.clear()
         self.newInput("String", "Text", "text")
-        if self.splitType == "REGULAR_EXPRESSION":
+        if self.splitType in ("REGULAR_EXPRESSION", "SEPARATOR"):
             self.newInput("String", "Split By", "splitBy")
         if self.splitType == "N_CHARACTERS":
             self.newInput("Integer", "N", "n", value = 5, minValue = 1)
