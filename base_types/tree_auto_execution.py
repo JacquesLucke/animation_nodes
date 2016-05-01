@@ -144,7 +144,7 @@ class AddAutoExecutionTrigger(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return context.isAnimationNodeTreeActive()
+        return context.getActiveAnimationNodeTree() is not None
 
     def invoke(self, context, event):
         return context.window_manager.invoke_props_dialog(self, width = 250 * getDpiFactor())
@@ -177,7 +177,7 @@ class RemoveAutoExecutionTrigger(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return context.isAnimationNodeTreeActive()
+        return context.getActiveAnimationNodeTree() is not None
 
     def execute(self, context):
         tree = context.space_data.node_tree
@@ -197,7 +197,7 @@ class AssignActiveObjectToAutoExecutionTrigger(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return context.isAnimationNodeTreeActive()
+        return context.getActiveAnimationNodeTree() is not None
 
     def execute(self, context):
         tree = context.space_data.node_tree
