@@ -5,3 +5,4 @@
 *.exp
 *.lib
 *.obj
+.compilation_log
