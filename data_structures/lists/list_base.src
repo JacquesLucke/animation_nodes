@@ -1,0 +1,161 @@
+@cython.freelist(10)
+cdef class LISTNAME:
+    cdef:
+        TYPE* data
+        long length
+        long allocated
+
+    def __cinit__(self, long length = 0, long allocate = -1):
+        if length < 0:
+            raise Exception("Length has to be >= 0")
+        if allocate < length:
+            allocate = length
+        self.data = <TYPE*>malloc(sizeof(TYPE) * allocate)
+        if self.data == NULL:
+            raise MemoryError()
+
+        self.length = length
+        self.allocated = allocate
+
+    def __dealloc__(self):
+        if self.data != NULL:
+            free(self.data)
+
+    cdef void _resize(self, long newSize):
+        self.data = <TYPE*>realloc(self.data, sizeof(TYPE) * newSize)
+        if self.data == NULL:
+            self.length = 0
+            self.allocated = 0
+            raise MemoryError()
+        self.allocated = newSize
+
+    def __len__(self):
+        return self.length
+
+    def fill(self, TYPE value):
+        cdef long i
+        for i in range(self.length):
+            self.data[i] = value
+
+    cpdef append(self, TYPE value):
+        if self.length == self.allocated:
+            self._resize(<long>(self.allocated * 1.5) + 1)
+        self.data[self.length] = value
+        self.length += 1
+
+    cpdef extend(self, list_or_tuple values):
+        cdef long newLength = self.length + len(values)
+        if newLength > self.allocated:
+            self._resize(<long>(newLength * 1.2))
+        cdef long i
+        for i, value in enumerate(values, start = self.length):
+            self.data[i] = value
+        self.length = newLength
+
+    cpdef TYPE[:] getMemoryView(self):
+        if self.length > 0:
+            return <TYPE[:self.length]>self.data
+        else:
+            return (<TYPE[:1]>self.data)[1:]
+
+    cpdef TYPE[:] getSlicedMemoryView(self, sliceObject):
+        cdef long start, stop, step
+        start, stop, step = sliceObject.indices(self.length)
+        return self.getMemoryView()[start:stop:step]
+
+    def __getitem__(self, key):
+        if isinstance(key, int):
+            return self.getMemoryView()[key]
+        else:
+            return self.getSlice(key)
+
+    cpdef LISTNAME getSlice(self, sliceObject):
+        cdef TYPE[:] memView = self.getSlicedMemoryView(sliceObject)
+        newList = LISTNAME(len(memView))
+        cdef int i
+        for i in range(len(memView)):
+            newList.data[i] = memView[i]
+        return newList
+
+    def __setitem__(self, key, value):
+        if isinstance(key, int):
+            self.getMemoryView()[key] = value
+        else:
+            start, stop, step = key.indices(self.length)
+            self.getMemoryView()[start:stop:step] = value
+
+    def copy(self):
+        newList = LISTNAME(self.length)
+        newList.overwrite(self)
+        return newList
+
+    def __add__(LISTNAME a, LISTNAME b):
+        return LISTNAME.join((a, b))
+
+    def __iadd__(self, LISTNAME other):
+        if self.length + other.length > self.allocated:
+            self._resize(self.length + other.length)
+        self.overwrite(other, index = self.length)
+        return self
+
+    def __iter__(self):
+        return LISTNAMEIterator(self)
+
+    def __contains__(self, TYPE value):
+        cdef long i
+        for i in range(self.length):
+            if self.data[i] == value:
+                return True
+        return False
+
+    cpdef overwrite(self, LISTNAME other, long index = 0):
+        if index + other.length > self.allocated:
+            self._resize(index + other.length)
+        memcpy(self.data + index, other.data, other.length * sizeof(TYPE))
+        self.length = max(self.length, index + other.length)
+
+    @classmethod
+    def join(cls, *sourceLists):
+        cdef long newLength = 0
+        cdef long offset = 0
+        cdef LISTNAME source
+
+        for source in sourceLists:
+            newLength += len(source)
+        newList = LISTNAME(newLength)
+        for source in sourceLists:
+            newList.overwrite(source, offset)
+            offset += source.length
+
+        return newList
+
+    @classmethod
+    def fromValues(cls, list_or_tuple values):
+        newList = LISTNAME(len(values))
+        cdef long i
+        for i, value in enumerate(values):
+            newList.data[i] = value
+        return newList
+
+    def __repr__(self):
+        return "<LISTNAME {}>".format(list(self.getMemoryView()))
+
+    def status(self):
+        return "Length: {}, Allocated: {}, Size: {} bytes".format(
+            self.length, self.allocated, self.allocated * sizeof(TYPE))
+
+cdef class LISTNAMEIterator:
+    cdef:
+        LISTNAME source
+        long current
+
+    def __cinit__(self, LISTNAME source):
+        self.source = source
+        self.current = 0
+
+    def __next__(self):
+        if self.current >= self.source.length:
+            raise StopIteration()
+        cdef TYPE currentValue = self.source.data[self.current]
+        self.current += 1
+        return currentValue

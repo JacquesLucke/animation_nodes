@@ -1,0 +1,27 @@
+##OUTPUT list_base.pyx
+from libc.stdlib cimport malloc, free, realloc
+from libc.string cimport memcpy
+from libc.math cimport sin
+cimport cython
+
+ctypedef fused list_or_tuple:
+    list
+    tuple
+
+##INSERT list_base.src {'LISTNAME': 'FloatList', 'TYPE' : 'float'}
+
+
+'''
+Lists have to support the following operations:
+    myList.append(baseType)
+    myList.extend(baseTypeList)
+    myList.fill(baseType)
+    list.join(*lists)
+    list.fromValues(baseTypeList)
+    len(myList)                     # __len__
+    myList + otherList              # __add__
+    myList += otherList             # __iadd__
+    myList[x]  | myList[x:y:z]      # __getitem__
+    myList = x | myList[x:y:z] = x  # __setitem__
+    x in myList                     # __contains__
+'''
