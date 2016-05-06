@@ -39,11 +39,13 @@ class FillListNode(bpy.types.Node, AnimationNode):
     def getExecutionCode(self):
         yield "missingAmount = max(length - len(inList), 0)"
         elementSocket = self.inputs["Element"]
+        listFromValuesCode = self.outputs[0].getFromValuesCode()
         if self.makeElementCopies and elementSocket.isCopyable():
             yield ("fillList = [{} for _ in range(missingAmount)]"
                     .format(elementSocket.getCopyExpression().replace("value", "fillElement")))
+            yield "fillList = " + listFromValuesCode.replace("value", "fillList")
         else:
-            yield "fillList = [fillElement] * missingAmount"
+            yield "fillList = {} * missingAmount".format(listFromValuesCode.replace("value", "[fillElement]"))
 
         yield "if len(inList) == 0:"
         yield "    outList = fillList"

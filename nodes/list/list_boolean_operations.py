@@ -40,7 +40,7 @@ class ListBooleanOperationsNode(bpy.types.Node, AnimationNode):
         if op == "SYMMETRIC_DIFFERENCE": return "outList = self.execute_SymmetricDifference(list1, list2)"
 
     def execute_Union(self, list1, list2):
-        outList = []
+        outList = self.getEmptyStartList()
         append = outList.append
         for element in itertools.chain(list1, list2):
             if element not in outList:
@@ -48,7 +48,7 @@ class ListBooleanOperationsNode(bpy.types.Node, AnimationNode):
         return outList
 
     def execute_Intersection(self, list1, list2):
-        outList = []
+        outList = self.getEmptyStartList()
         append = outList.append
         for element in list1:
             if element not in outList:
@@ -57,7 +57,7 @@ class ListBooleanOperationsNode(bpy.types.Node, AnimationNode):
         return outList
 
     def execute_Difference(self, list1, list2):
-        outList = []
+        outList = self.getEmptyStartList()
         append = outList.append
         for element in list1:
             if element not in outList:
@@ -68,7 +68,7 @@ class ListBooleanOperationsNode(bpy.types.Node, AnimationNode):
     def execute_SymmetricDifference(self, list1, list2):
         # I could combine this out of the methods above but it would
         # propably be slower. Maybe someone can test this later.
-        outList = []
+        outList = self.getEmptyStartList()
         append = outList.append
         for element in list1:
             if element not in outList:
@@ -79,6 +79,9 @@ class ListBooleanOperationsNode(bpy.types.Node, AnimationNode):
                 if element not in list1:
                     append(element)
         return outList
+
+    def getEmptyStartList(self):
+        return self.outputs[0].getDefaultValue()
 
     def edit(self):
         listDataType = self.getWantedDataType()

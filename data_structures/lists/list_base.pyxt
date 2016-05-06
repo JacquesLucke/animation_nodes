@@ -8,9 +8,18 @@ ctypedef fused list_or_tuple:
     list
     tuple
 
+##INSERT list_iterator.src {'LISTNAME': 'FloatList', 'TYPE' : 'float'}
 ##INSERT list_base.src {'LISTNAME': 'FloatList', 'TYPE' : 'float'}
 
+##INSERT list_iterator.src {'LISTNAME': 'DoubleList', 'TYPE' : 'double'}
 ##INSERT list_base.src {'LISTNAME': 'DoubleList', 'TYPE' : 'double'}
+    @classmethod
+    def fromRange(cls, long amount, double start, double step):
+        cdef DoubleList newList = DoubleList(max(0, amount))
+        cdef long i
+        for i in range(max(0, amount)):
+            newList.data[i] = start + i * step
+        return newList
 
 
 cpdef DoubleList floatListToDoubleList(FloatList floatList):
@@ -31,6 +40,7 @@ Lists have to support the following operations:
     len(myList)                     # __len__
     myList + otherList              # __add__
     myList += otherList             # __iadd__
+    myList * x                      # __mul__
     myList[x]  | myList[x:y:z]      # __getitem__
     myList = x | myList[x:y:z] = x  # __setitem__
     x in myList                     # __contains__

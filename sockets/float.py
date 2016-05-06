@@ -104,6 +104,10 @@ class FloatListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
         return "DoubleList.join(value)"
 
     @classmethod
+    def getReverseCode(cls):
+        return "value.reversed()"
+
+    @classmethod
     def correctValue(cls, value):
         if isinstance(value, list):
             if all(isinstance(element, (float, int)) for element in value):

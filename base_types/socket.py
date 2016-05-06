@@ -352,6 +352,10 @@ class ListSocket:
     def getJoinListsCode(cls):
         return "list(itertools.chain(value))"
 
+    @classmethod
+    def getReverseCode(cls):
+        return "list(reversed(value))"
+
 
 
 # Register

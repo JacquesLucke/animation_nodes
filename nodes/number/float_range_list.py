@@ -1,5 +1,6 @@
 import bpy
 from bpy.props import *
+from ... data_structures import DoubleList
 from ... sockets.info import toListDataType
 from ... base_types.node import AnimationNode
 
@@ -34,6 +35,6 @@ class FloatRangeListNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         if self.dataType == "Float":
-            return "list = [start + i * step for i in range(amount)]"
+            return "list = DoubleList.fromRange(amount, start, step)"
         if self.dataType == "Integer":
             return "list = [int(start + i * step) for i in range(amount)]"

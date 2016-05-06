@@ -75,7 +75,7 @@ class RepeatListNode(bpy.types.Node, AnimationNode):
             copyExpression = getCopyExpression(elementDataType)
 
         yield "inLength = len(inList)"
-        yield "outList = []"
+        yield "outList = self.outputs[0].getDefaultValue()"
         yield "if inLength > 0:"
 
         if self.amountType == "AMOUNT":
@@ -91,13 +91,14 @@ class RepeatListNode(bpy.types.Node, AnimationNode):
         if self.repetitionType == "LOOP":
                 yield "    elementIterator = itertools.cycle(inList)"
         elif self.repetitionType == "PING_PONG":
-                yield "    elementIterator = itertools.cycle(inList + inList[::-1])"
+                yield "    reversedList = " + self.outputs[0].getReverseCode().replace("value", "inList")
+                yield "    elementIterator = itertools.cycle(inList + reversedList)"
 
         if makeCopies:
             yield ("    elementIterator = ({} for _element in elementIterator)"
                    .format(copyExpression.replace("value", "_element")))
 
-        yield "    outList = list(itertools.islice(elementIterator, outLength))"
+        yield "    outList.extend(tuple(itertools.islice(elementIterator, outLength)))"
 
     def getUsedModules(self):
         return ["itertools", "math"]

@@ -89,8 +89,39 @@ cdef class LISTNAME:
         newList.overwrite(self)
         return newList
 
+    cpdef long index(self, TYPE value):
+        cdef long i
+        for i in range(self.length):
+            if self.data[i] == value:
+                return i
+        return -1
+
+    cpdef long count(self, TYPE value):
+        cdef long i
+        cdef long amount = 0
+        for i in range(self.length):
+            if self.data[i] == value:
+                amount += 1
+        return amount
+
+    cpdef LISTNAME reversed(self):
+        cdef:
+            LISTNAME newList = LISTNAME(self.length)
+            long i, offset
+        offset = self.length - 1
+        for i in range(self.length):
+            newList.data[i] = self.data[offset - i]
+        return newList
+
     def __add__(LISTNAME a, LISTNAME b):
-        return LISTNAME.join((a, b))
+        return LISTNAME.join(a, b)
+
+    def __mul__(LISTNAME self, long amount):
+        cdef LISTNAME newList = LISTNAME(self.length * amount)
+        cdef long i
+        for i in range(amount):
+            newList.overwrite(self, self.length * i)
+        return newList
 
     def __iadd__(self, LISTNAME other):
         if self.length + other.length > self.allocated:
@@ -143,19 +174,3 @@ cdef class LISTNAME:
     def status(self):
         return "Length: {}, Allocated: {}, Size: {} bytes".format(
             self.length, self.allocated, self.allocated * sizeof(TYPE))
-
-cdef class LISTNAMEIterator:
-    cdef:
-        LISTNAME source
-        long current
-
-    def __cinit__(self, LISTNAME source):
-        self.source = source
-        self.current = 0
-
-    def __next__(self):
-        if self.current >= self.source.length:
-            raise StopIteration()
-        cdef TYPE currentValue = self.source.data[self.current]
-        self.current += 1
-        return currentValue
