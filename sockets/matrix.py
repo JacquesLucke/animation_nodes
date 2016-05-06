@@ -1,6 +1,6 @@
 import bpy
 from mathutils import Matrix
-from .. base_types.socket import AnimationNodeSocket
+from .. base_types.socket import AnimationNodeSocket, ListSocket
 
 class MatrixSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_MatrixSocket"
@@ -28,7 +28,7 @@ class MatrixSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             except: return cls.getDefaultValue(), 2
 
 
-class MatrixListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+class MatrixListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
     bl_idname = "an_MatrixListSocket"
     bl_label = "Matrix List Socket"
     dataType = "Matrix List"
@@ -37,14 +37,6 @@ class MatrixListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     drawColor = (1, 0.56, 0.3, 0.5)
     storable = True
     comparable = False
-
-    @classmethod
-    def getDefaultValue(cls):
-        return []
-
-    @classmethod
-    def getDefaultValueCode(cls):
-        return "[]"
 
     @classmethod
     def getCopyExpression(cls):

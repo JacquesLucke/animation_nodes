@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from bpy.types import Sequence
 from .. events import propertyChanged
-from .. base_types.socket import AnimationNodeSocket
+from .. base_types.socket import AnimationNodeSocket, ListSocket
 
 class SequenceSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_SequenceSocket"
@@ -60,7 +60,7 @@ class SequenceSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return cls.getDefaultValue(), 2
 
 
-class SequenceListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+class SequenceListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
     bl_idname = "an_SequenceListSocket"
     bl_label = "Sequence List Socket"
     dataType = "Sequence List"
@@ -69,14 +69,6 @@ class SequenceListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     drawColor = (0, 0.644, 0, 0.5)
     storable = False
     comparable = False
-
-    @classmethod
-    def getDefaultValue(cls):
-        return []
-
-    @classmethod
-    def getDefaultValueCode(cls):
-        return "[]"
 
     @classmethod
     def getCopyExpression(cls):

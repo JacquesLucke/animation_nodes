@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from mathutils import Vector
 from .. events import propertyChanged
-from .. base_types.socket import AnimationNodeSocket
+from .. base_types.socket import AnimationNodeSocket, ListSocket
 
 class VectorSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_VectorSocket"
@@ -48,7 +48,7 @@ class VectorSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             except: return cls.getDefaultValue(), 2
 
 
-class VectorListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+class VectorListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
     bl_idname = "an_VectorListSocket"
     bl_label = "Vector List Socket"
     dataType = "Vector List"
@@ -57,14 +57,6 @@ class VectorListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     drawColor = (0.15, 0.15, 0.8, 0.5)
     storable = True
     comparable = False
-
-    @classmethod
-    def getDefaultValue(cls):
-        return []
-
-    @classmethod
-    def getDefaultValueCode(cls):
-        return "[]"
 
     @classmethod
     def getCopyExpression(cls):

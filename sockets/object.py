@@ -2,8 +2,8 @@ import bpy
 from bpy.props import *
 from bpy.types import Object
 from .. events import propertyChanged
-from .. base_types.socket import AnimationNodeSocket
 from .. utils.id_reference import tryToFindObjectReference
+from .. base_types.socket import AnimationNodeSocket, ListSocket
 
 class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_ObjectSocket"
@@ -79,7 +79,7 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return cls.getDefaultValue(), 2
 
 
-class ObjectListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+class ObjectListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
     bl_idname = "an_ObjectListSocket"
     bl_label = "Object List Socket"
     dataType = "Object List"
@@ -88,14 +88,6 @@ class ObjectListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     drawColor = (0, 0, 0, 0.5)
     storable = False
     comparable = False
-
-    @classmethod
-    def getDefaultValue(cls):
-        return []
-
-    @classmethod
-    def getDefaultValueCode(cls):
-        return "[]"
 
     @classmethod
     def getCopyExpression(cls):

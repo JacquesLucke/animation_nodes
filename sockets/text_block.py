@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from .. events import propertyChanged
-from .. base_types.socket import AnimationNodeSocket
+from .. base_types.socket import AnimationNodeSocket, ListSocket
 
 class TextBlockSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_TextBlockSocket"
@@ -54,7 +54,7 @@ class TextBlockSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return cls.getDefaultValue(), 2
 
 
-class TextBlockListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+class TextBlockListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
     bl_idname = "an_TextBlockListSocket"
     bl_label = "Text Block List Socket"
     dataType = "Text Block List"
@@ -63,14 +63,6 @@ class TextBlockListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     drawColor = (0.5, 0.5, 0.5, 0.5)
     storable = False
     comparable = False
-
-    @classmethod
-    def getDefaultValue(cls):
-        return []
-
-    @classmethod
-    def getDefaultValueCode(cls):
-        return "[]"
 
     @classmethod
     def getCopyExpression(cls):

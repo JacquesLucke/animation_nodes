@@ -1,5 +1,5 @@
 import bpy
-from .. base_types.socket import AnimationNodeSocket
+from .. base_types.socket import AnimationNodeSocket, ListSocket
 
 class PolygonIndicesSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_PolygonIndicesSocket"
@@ -28,7 +28,7 @@ class PolygonIndicesSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         else: return cls.getDefaultValue(), 2
 
 
-class PolygonIndicesListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+class PolygonIndicesListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
     bl_idname = "an_PolygonIndicesListSocket"
     bl_label = "Polygon Indices List Socket"
     dataType = "Polygon Indices List"
@@ -37,14 +37,6 @@ class PolygonIndicesListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     drawColor = (0.6, 0.3, 0.8, 0.5)
     storable = True
     comparable = False
-
-    @classmethod
-    def getDefaultValue(cls):
-        return []
-
-    @classmethod
-    def getDefaultValueCode(cls):
-        return "[]"
 
     @classmethod
     def getCopyExpression(cls):

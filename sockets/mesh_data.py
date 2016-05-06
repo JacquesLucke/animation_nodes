@@ -1,6 +1,6 @@
 import bpy
 from .. data_structures.mesh import MeshData
-from .. base_types.socket import AnimationNodeSocket
+from .. base_types.socket import AnimationNodeSocket, ListSocket
 
 class MeshDataSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_MeshDataSocket"
@@ -26,7 +26,7 @@ class MeshDataSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return cls.getDefaultValue(), 2
 
 
-class MeshDataListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+class MeshDataListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
     bl_idname = "an_MeshDataListSocket"
     bl_label = "Mesh Data List Socket"
     dataType = "Mesh Data List"
@@ -35,14 +35,6 @@ class MeshDataListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     drawColor = (0.3, 0.4, 0.18, 0.5)
     storable = True
     comparable = False
-
-    @classmethod
-    def getDefaultValue(cls):
-        return []
-
-    @classmethod
-    def getDefaultValueCode(cls):
-        return "[]"
 
     @classmethod
     def getCopyExpression(cls):

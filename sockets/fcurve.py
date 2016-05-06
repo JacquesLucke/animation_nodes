@@ -1,8 +1,6 @@
 import bpy
 from bpy.types import FCurve
-from mathutils import Vector
-from .. data_structures.mesh import Polygon
-from .. base_types.socket import AnimationNodeSocket
+from .. base_types.socket import AnimationNodeSocket, ListSocket
 
 class FCurveSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_FCurveSocket"
@@ -28,7 +26,7 @@ class FCurveSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return cls.getDefaultValue(), 2
 
 
-class FCurveListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+class FCurveListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
     bl_idname = "an_FCurveListSocket"
     bl_label = "FCurve List Socket"
     dataType = "FCurve List"
@@ -37,14 +35,6 @@ class FCurveListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     drawColor = (0.2, 0.26, 0.19, 0.5)
     storable = True
     comparable = False
-
-    @classmethod
-    def getDefaultValue(cls):
-        return []
-
-    @classmethod
-    def getDefaultValueCode(cls):
-        return "[]"
 
     @classmethod
     def getCopyExpression(cls):

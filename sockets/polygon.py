@@ -1,7 +1,7 @@
 import bpy
 from mathutils import Vector
 from .. data_structures.mesh import Polygon
-from .. base_types.socket import AnimationNodeSocket
+from .. base_types.socket import AnimationNodeSocket, ListSocket
 
 class PolygonSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_PolygonSocket"
@@ -31,7 +31,7 @@ class PolygonSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return cls.getDefaultValue(), 2
 
 
-class PolygonListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+class PolygonListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
     bl_idname = "an_PolygonListSocket"
     bl_label = "Polygon List Socket"
     dataType = "Polygon List"
@@ -40,14 +40,6 @@ class PolygonListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     drawColor = (0.4, 0.7, 0.3, 0.5)
     storable = True
     comparable = False
-
-    @classmethod
-    def getDefaultValue(cls):
-        return []
-
-    @classmethod
-    def getDefaultValueCode(cls):
-        return "[]"
 
     @classmethod
     def getCopyExpression(cls):

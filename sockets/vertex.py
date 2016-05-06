@@ -1,7 +1,7 @@
 import bpy
 from mathutils import Vector
 from .. data_structures.mesh import Vertex
-from .. base_types.socket import AnimationNodeSocket
+from .. base_types.socket import AnimationNodeSocket, ListSocket
 
 class VertexSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_VertexSocket"
@@ -29,7 +29,7 @@ class VertexSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return cls.getDefaultValue(), 2
 
 
-class VertexListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+class VertexListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
     bl_idname = "an_VertexListSocket"
     bl_label = "Vertex List Socket"
     dataType = "Vertex List"
@@ -38,14 +38,6 @@ class VertexListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     drawColor = (0.55, 0.61, 0.32, 0.5)
     storable = True
     comparable = False
-
-    @classmethod
-    def getDefaultValue(cls):
-        return []
-
-    @classmethod
-    def getDefaultValueCode(cls):
-        return "[]"
 
     @classmethod
     def getCopyExpression(cls):

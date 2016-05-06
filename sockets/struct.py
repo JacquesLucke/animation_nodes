@@ -1,6 +1,6 @@
 import bpy
 from .. data_structures.struct import Struct
-from .. base_types.socket import AnimationNodeSocket
+from .. base_types.socket import AnimationNodeSocket, ListSocket
 
 class StructSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_StructSocket"
@@ -17,7 +17,7 @@ class StructSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     @classmethod
     def getDefaultValueCode(cls):
-        return "animation_nodes.data_structures.struct.Struct()"
+        return "animation_nodes.data_structures.Struct()"
 
     @classmethod
     def getCopyExpression(cls):
@@ -30,7 +30,7 @@ class StructSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return cls.getDefaultValue(), 2
 
 
-class StructListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+class StructListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
     bl_idname = "an_StructListSocket"
     bl_label = "Struct List Socket"
     dataType = "Struct List"
@@ -39,14 +39,6 @@ class StructListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     drawColor = (0.3, 0.3, 0.3, 0.5)
     storable = True
     comparable = False
-
-    @classmethod
-    def getDefaultValue(cls):
-        return []
-
-    @classmethod
-    def getDefaultValueCode(cls):
-        return "[]"
 
     @classmethod
     def getCopyExpression(cls):

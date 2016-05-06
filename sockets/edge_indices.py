@@ -1,5 +1,5 @@
 import bpy
-from .. base_types.socket import AnimationNodeSocket
+from .. base_types.socket import AnimationNodeSocket, ListSocket
 
 class EdgeIndicesSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_EdgeIndicesSocket"
@@ -28,7 +28,7 @@ class EdgeIndicesSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         else: return cls.getDefaultValue(), 2
 
 
-class EdgeIndicesListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+class EdgeIndicesListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
     bl_idname = "an_EdgeIndicesListSocket"
     bl_label = "Edge Indices List Socket"
     dataType = "Edge Indices List"
@@ -37,14 +37,6 @@ class EdgeIndicesListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     drawColor = (0.4, 0.6, 0.6, 0.5)
     storable = True
     comparable = False
-
-    @classmethod
-    def getDefaultValue(cls):
-        return []
-
-    @classmethod
-    def getDefaultValueCode(cls):
-        return "[]"
 
     @classmethod
     def getCopyExpression(cls):

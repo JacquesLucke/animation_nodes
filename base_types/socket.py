@@ -335,6 +335,21 @@ def isTextUsed(node, name):
 
 
 
+class ListSocket:
+    @classmethod
+    def getDefaultValue(cls):
+        return []
+
+    @classmethod
+    def getDefaultValueCode(cls):
+        return "[]"
+
+    @classmethod
+    def fromBaseValues(cls):
+        return "value"
+
+
+
 # Register
 ##################################
 

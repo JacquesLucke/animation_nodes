@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from .. events import propertyChanged
-from .. base_types.socket import AnimationNodeSocket
+from .. base_types.socket import AnimationNodeSocket, ListSocket
 
 class ColorSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_ColorSocket"
@@ -43,7 +43,7 @@ class ColorSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         else: return cls.getDefaultValue(), 2
 
 
-class ColorListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+class ColorListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
     bl_idname = "an_ColorListSocket"
     bl_label = "Color List Socket"
     dataType = "Color List"
@@ -52,14 +52,6 @@ class ColorListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     drawColor = (0.8, 0.8, 0.2, 0.5)
     storable = True
     comparable = False
-
-    @classmethod
-    def getDefaultValue(cls):
-        return []
-
-    @classmethod
-    def getDefaultValueCode(cls):
-        return "[]"
 
     @classmethod
     def getCopyExpression(cls):

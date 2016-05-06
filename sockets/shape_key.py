@@ -2,8 +2,8 @@ import bpy
 from bpy.props import *
 from bpy.types import ShapeKey
 from .. events import propertyChanged
-from .. base_types.socket import AnimationNodeSocket
 from .. utils.id_reference import tryToFindObjectReference
+from .. base_types.socket import AnimationNodeSocket, ListSocket
 
 class ShapeKeySocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_ShapeKeySocket"
@@ -58,7 +58,7 @@ class ShapeKeySocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return cls.getDefaultValue(), 2
 
 
-class ShapeKeyListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+class ShapeKeyListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
     bl_idname = "an_ShapeKeyListSocket"
     bl_label = "Shape Key List Socket"
     dataType = "Shape Key List"
@@ -67,14 +67,6 @@ class ShapeKeyListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     drawColor = (1.0, 0.6, 0.5, 0.5)
     storable = False
     comparable = False
-
-    @classmethod
-    def getDefaultValue(cls):
-        return []
-
-    @classmethod
-    def getDefaultValueCode(cls):
-        return "[]"
 
     @classmethod
     def correctValue(cls, value):

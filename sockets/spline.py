@@ -1,9 +1,9 @@
 import bpy
 from bpy.props import *
 from .. events import propertyChanged
-from .. base_types.socket import AnimationNodeSocket
 from .. utils.id_reference import tryToFindObjectReference
 from .. data_structures.splines.bezier_spline import BezierSpline
+from .. base_types.socket import AnimationNodeSocket, ListSocket
 from .. data_structures.splines.poly_spline import PolySpline
 from .. data_structures.splines.from_blender import (createSplinesFromBlenderObject,
                                                      createSplineFromBlenderSpline)
@@ -95,7 +95,7 @@ class SplineSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return cls.getDefaultValue(), 2
 
 
-class SplineListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+class SplineListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
     bl_idname = "an_SplineListSocket"
     bl_label = "Spline List Socket"
     dataType = "Spline List"
@@ -149,10 +149,6 @@ class SplineListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         object = bpy.context.active_object
         if getattr(object, "type", "") == "CURVE":
             self.objectName = object.name
-
-    @classmethod
-    def getDefaultValue(cls):
-        return []
 
     @classmethod
     def getCopyExpression(cls):

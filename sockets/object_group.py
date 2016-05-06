@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from bpy.types import Group
 from .. events import propertyChanged
-from .. base_types.socket import AnimationNodeSocket
+from .. base_types.socket import AnimationNodeSocket, ListSocket
 
 class ObjectGroupSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_ObjectGroupSocket"
@@ -38,7 +38,7 @@ class ObjectGroupSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return cls.getDefaultValue(), 2
 
 
-class ObjectGroupListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+class ObjectGroupListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
     bl_idname = "an_ObjectGroupListSocket"
     bl_label = "Object Group List Socket"
     dataType = "Object Group List"
@@ -47,14 +47,6 @@ class ObjectGroupListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     drawColor = (0.3, 0.1, 0.1, 0.5)
     storable = False
     comparable = False
-
-    @classmethod
-    def getDefaultValue(cls):
-        return []
-
-    @classmethod
-    def getDefaultValueCode(cls):
-        return "[]"
 
     @classmethod
     def getCopyExpression(cls):

@@ -1,6 +1,6 @@
 import bpy
 from bpy.types import Particle
-from .. base_types.socket import AnimationNodeSocket
+from .. base_types.socket import AnimationNodeSocket, ListSocket
 
 class ParticleSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_ParticleSocket"
@@ -26,7 +26,7 @@ class ParticleSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return cls.getDefaultValue(), 2
 
 
-class ParticleListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+class ParticleListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
     bl_idname = "an_ParticleListSocket"
     bl_label = "Particle List Socket"
     dataType = "Particle List"
@@ -35,14 +35,6 @@ class ParticleListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     drawColor = (0.5, 0.3, 0.1, 0.5)
     storable = False
     comparable = False
-
-    @classmethod
-    def getDefaultValue(cls):
-        return []
-
-    @classmethod
-    def getDefaultValueCode(cls):
-        return "[]"
 
     @classmethod
     def getCopyExpression(cls):

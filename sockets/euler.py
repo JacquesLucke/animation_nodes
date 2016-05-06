@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from mathutils import Euler
 from .. events import propertyChanged
-from .. base_types.socket import AnimationNodeSocket
+from .. base_types.socket import AnimationNodeSocket, ListSocket
 
 class EulerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_EulerSocket"
@@ -48,7 +48,7 @@ class EulerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             except: return cls.getDefaultValue(), 2
 
 
-class EulerListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+class EulerListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
     bl_idname = "an_EulerListSocket"
     bl_label = "Euler List Socket"
     dataType = "Euler List"
@@ -57,14 +57,6 @@ class EulerListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     drawColor = (0.1, 0.0, 0.4, 0.5)
     storable = True
     comparable = False
-
-    @classmethod
-    def getDefaultValue(cls):
-        return []
-
-    @classmethod
-    def getDefaultValueCode(cls):
-        return "[]"
 
     @classmethod
     def getCopyExpression(cls):

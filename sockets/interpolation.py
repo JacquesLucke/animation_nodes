@@ -1,8 +1,8 @@
 import bpy
 from bpy.props import *
 from .. events import propertyChanged
-from .. base_types.socket import AnimationNodeSocket
 from .. algorithms.interpolation import getInterpolationPreset
+from .. base_types.socket import AnimationNodeSocket, ListSocket
 
 categoryItems = [
     ("LINEAR", "Linear", "", "IPO_LINEAR", 0),
@@ -61,7 +61,7 @@ class InterpolationSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return cls.getDefaultValue(), 2
 
 
-class InterpolationListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+class InterpolationListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
     bl_idname = "an_InterpolationListSocket"
     bl_label = "Interpolation List Socket"
     dataType = "Interpolation List"
@@ -70,14 +70,6 @@ class InterpolationListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     drawColor = (0.7, 0.4, 0.3, 0.5)
     storable = False
     comparable = False
-
-    @classmethod
-    def getDefaultValue(cls):
-        return []
-
-    @classmethod
-    def getDefaultValueCode(cls):
-        return "[]"
 
     @classmethod
     def getCopyExpression(cls):

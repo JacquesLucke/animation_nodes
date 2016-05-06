@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from .. events import propertyChanged
-from .. base_types.socket import AnimationNodeSocket
+from .. base_types.socket import AnimationNodeSocket, ListSocket
 
 def getValue(self):
     return min(max(self.minValue, self.get("value", 0)), self.maxValue)
@@ -62,7 +62,7 @@ class IntegerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             except: return cls.getDefaultValue(), 2
 
 
-class IntegerListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+class IntegerListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
     bl_idname = "an_IntegerListSocket"
     bl_label = "Integer List Socket"
     dataType = "Integer List"
@@ -71,14 +71,6 @@ class IntegerListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     drawColor = (0.3, 0.4, 1.0, 0.5)
     storable = True
     comparable = False
-
-    @classmethod
-    def getDefaultValue(cls):
-        return []
-
-    @classmethod
-    def getDefaultValueCode(cls):
-        return "[]"
 
     @classmethod
     def getCopyExpression(cls):

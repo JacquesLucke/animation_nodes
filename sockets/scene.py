@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from bpy.types import Scene
 from .. events import propertyChanged
-from .. base_types.socket import AnimationNodeSocket
+from .. base_types.socket import AnimationNodeSocket, ListSocket
 
 class SceneSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_SceneSocket"
@@ -48,7 +48,7 @@ class SceneSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return cls.getDefaultValue(), 2
 
 
-class SceneListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+class SceneListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
     bl_idname = "an_SceneListSocket"
     bl_label = "Scene List Socket"
     dataType = "Scene List"
@@ -73,10 +73,6 @@ class SceneListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def getValue(self):
         return [self.nodeTree.scene]
-
-    @classmethod
-    def getDefaultValue(cls):
-        return []
 
     @classmethod
     def getCopyExpression(cls):
