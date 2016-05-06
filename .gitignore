@@ -6,3 +6,5 @@
 *.lib
 *.obj
 .compilation_log
+*.html
+data_structures/lists/list_base.pyx
