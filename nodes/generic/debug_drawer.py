@@ -47,7 +47,7 @@ class DebugDrawerNode(bpy.types.Node, AnimationNode):
         else: yield "if True:"
 
         yield "    self.errorMessage = ''"
-        yield "    if isinstance(data, list):"
+        yield "    if hasattr(data, '__iter__'):"
         yield "        conversionFunction = self.getCurrentToStringFunction()"
         yield "        self.store_GenericList(data, conversionFunction)"
         yield "    else:"

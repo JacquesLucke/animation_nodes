@@ -1,5 +1,7 @@
 import bpy
 from ... base_types.node import AnimationNode
+from ... data_structures.lists import toDoubleList
+from ... data_structures import FloatList, DoubleList
 
 class FCurveKeyframesNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_FCurveKeyframesNode"
@@ -10,11 +12,10 @@ class FCurveKeyframesNode(bpy.types.Node, AnimationNode):
         self.newOutput("Float List", "Keyframes Frames", "keyframesFrames")
         self.newOutput("Float List", "Keyframes Values", "keyframesValues")
 
-    def getExecutionCode(self):
-        isLinked = self.getLinkedOutputsDict()
-        if not any(isLinked.values()): return
+    def execute(self, fCurve):
+        if fCurve is None:
+            return DoubleList(), DoubleList()
 
-        yield "if fCurve is not None:"
-        if isLinked["keyframesFrames"]: yield "    keyframesFrames = [point.co[0] for point in fCurve.keyframe_points]"
-        if isLinked["keyframesValues"]: yield "    keyframesValues = [point.co[1] for point in fCurve.keyframe_points]"
-        yield "else: keyframesFrames, keyframesValues = [], []"
+        allValues = FloatList(len(fCurve.keyframe_points) * 2)
+        fCurve.keyframe_points.foreach_get("co", allValues.getMemoryView())
+        return toDoubleList(allValues[0::2]), toDoubleList(allValues[1::2])

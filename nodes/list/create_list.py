@@ -60,7 +60,10 @@ class CreateListNode(bpy.types.Node, AnimationNode):
         return { socket.identifier : "element_" + str(i) for i, socket in enumerate(self.inputs) }
 
     def getExecutionCode(self):
-        return "outList = [" + ", ".join(["element_" + str(i) for i, socket in enumerate(self.inputs) if socket.dataType != "Node Control"]) + "]"
+        variableNames = ["element_" + str(i) for i, socket in enumerate(self.inputs) if socket.dataType != "Node Control"]
+        createPyListExpression = "[" + ", ".join(variableNames) + "]"
+        createListExpression = self.outputs[0].getFromValuesCode().replace("value", createPyListExpression)
+        return "outList = " + createListExpression
 
     def edit(self):
         self.updateOutputName()

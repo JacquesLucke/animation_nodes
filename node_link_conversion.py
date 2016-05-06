@@ -72,7 +72,8 @@ class SimpleConvert(LinkCorrection):
         ("Object", "Matrix") : "an_ObjectMatrixInputNode",
         ("Polygon List", "Mesh Data") : "an_MeshDataFromPolygonsNode",
         ("Object", "Shape Key List") : "an_ShapeKeysFromObjectNode",
-        ("String", "Float") : "an_ParseNumberNode"
+        ("String", "Float") : "an_ParseNumberNode",
+        ("Integer List", "Float List") : "an_IntegerListToFloatListNode"
     }
 
     def check(self, origin, target):

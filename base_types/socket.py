@@ -345,8 +345,12 @@ class ListSocket:
         return "[]"
 
     @classmethod
-    def fromBaseValues(cls):
+    def getFromValuesCode(cls):
         return "value"
+
+    @classmethod
+    def getJoinListsCode(cls):
+        return "list(itertools.chain(value))"
 
 
 

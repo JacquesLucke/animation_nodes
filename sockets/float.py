@@ -2,7 +2,8 @@ import bpy
 import sys
 from bpy.props import *
 from .. events import propertyChanged
-from .. base_types.socket import AnimationNodeSocket
+from .. data_structures.lists import DoubleList
+from .. base_types.socket import AnimationNodeSocket, ListSocket
 
 def getValue(self):
     return min(max(self.minValue, self.get("value", 0)), self.maxValue)
@@ -72,27 +73,35 @@ class FloatSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             except: return cls.getDefaultValue(), 2
 
 
-class FloatListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+class FloatListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
     bl_idname = "an_FloatListSocket"
     bl_label = "Float List Socket"
     dataType = "Float List"
     baseDataType = "Float"
-    allowedInputTypes = ["Float List", "Integer List"]
+    allowedInputTypes = ["Float List"]
     drawColor = (0.4, 0.4, 0.7, 0.5)
     storable = True
     comparable = False
 
     @classmethod
     def getDefaultValue(cls):
-        return []
+        return DoubleList()
 
     @classmethod
     def getDefaultValueCode(cls):
-        return "[]"
+        return "DoubleList()"
 
     @classmethod
     def getCopyExpression(cls):
-        return "value[:]"
+        return "value.copy()"
+
+    @classmethod
+    def getFromValuesCode(cls):
+        return "DoubleList.fromValues(value)"
+
+    @classmethod
+    def getJoinListsCode(cls):
+        return "DoubleList.join(value)"
 
     @classmethod
     def correctValue(cls, value):

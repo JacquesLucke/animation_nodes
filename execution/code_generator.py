@@ -35,9 +35,11 @@ def iterSetupCodeLines(nodes, variables):
 
 def iter_Imports(nodes):
     yield get_ImportModules(nodes)
+    yield "import itertools"
     yield "from mathutils import Vector, Matrix, Quaternion, Euler"
     yield "from time import perf_counter as getCurrentTime"
     yield "animation_nodes = sys.modules.get({})".format(repr(addonName))
+    yield "from animation_nodes.data_structures import DoubleList, FloatList, Struct"
 
 def get_ImportModules(nodes):
     neededModules = {"bpy", "sys"}

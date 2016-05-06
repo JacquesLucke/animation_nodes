@@ -10,6 +10,16 @@ ctypedef fused list_or_tuple:
 
 ##INSERT list_base.src {'LISTNAME': 'FloatList', 'TYPE' : 'float'}
 
+##INSERT list_base.src {'LISTNAME': 'DoubleList', 'TYPE' : 'double'}
+
+
+cpdef DoubleList floatListToDoubleList(FloatList floatList):
+    cdef DoubleList newList = DoubleList(floatList.length)
+    cdef long i
+    for i in range(len(floatList)):
+        newList.data[i] = floatList.data[i]
+    return newList
+
 
 '''
 Lists have to support the following operations:
