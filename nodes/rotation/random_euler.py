@@ -20,10 +20,7 @@ class RandomEulerNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "nodeSeed")
 
     def getExecutionCode(self):
-        yield "startSeed = (seed + self.nodeSeed * 1000) % (len(random_number_cache) - 3)"
-        yield ("randomEuler = mathutils.Euler(( (random_number_cache[startSeed] - 0.5) * scale, "
-                                                "(random_number_cache[startSeed + 1] - 0.5) * scale, "
-                                                "(random_number_cache[startSeed + 2] - 0.5) * scale))")
+        yield "randomEuler = algorithms.random.uniformRandomEulerWithTwoSeeds(seed, self.nodeSeed, scale)"
 
     def getUsedModules(self):
         return ["mathutils"]

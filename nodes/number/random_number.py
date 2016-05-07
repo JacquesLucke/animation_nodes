@@ -21,8 +21,7 @@ class RandomNumberNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "nodeSeed", text = "Node Seed")
 
     def getExecutionCode(self):
-        yield "number = random_number_cache[(seed + self.nodeSeed * 123259) % len(random_number_cache)]"
-        yield "number = number * (maxValue - minValue) + minValue"
+        yield "number = algorithms.random.uniformRandomNumberWithTwoSeeds(seed, self.nodeSeed, minValue, maxValue)"
 
     def duplicate(self, sourceNode):
         self.randomizeNodeSeed()

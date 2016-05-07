@@ -28,7 +28,6 @@ def getInitialVariables(nodes):
 
 def iterSetupCodeLines(nodes, variables):
     yield from iter_Imports(nodes)
-    yield get_LoadRandomNumberCache()
     yield get_LoadMeasurementsDict()
     yield from iter_GetNodeReferences(nodes)
     yield from iter_GetSocketValues(nodes, variables)
@@ -36,10 +35,11 @@ def iterSetupCodeLines(nodes, variables):
 def iter_Imports(nodes):
     yield get_ImportModules(nodes)
     yield "import itertools"
-    yield "from mathutils import Vector, Matrix, Quaternion, Euler"
     yield "from time import perf_counter as getCurrentTime"
+    yield "from mathutils import Vector, Matrix, Quaternion, Euler"
     yield "animation_nodes = sys.modules.get({})".format(repr(addonName))
     yield "from animation_nodes.data_structures import DoubleList, FloatList, Struct"
+    yield "from animation_nodes import algorithms"
 
 def get_ImportModules(nodes):
     neededModules = {"bpy", "sys"}
@@ -52,9 +52,6 @@ def getModulesNeededByNodes(nodes):
     for node in nodes:
         moduleNames.update(node.getUsedModules())
     return list(moduleNames)
-
-def get_LoadRandomNumberCache():
-    return "random_number_cache = animation_nodes.algorithms.random.getRandomNumberCache()"
 
 def get_LoadMeasurementsDict():
     return "_node_execution_times = animation_nodes.execution.measurements.getMeasurementsDict()"

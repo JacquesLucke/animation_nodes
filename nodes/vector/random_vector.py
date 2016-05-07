@@ -19,10 +19,7 @@ class RandomVectorNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "nodeSeed")
 
     def getExecutionCode(self):
-        yield "startSeed = (seed + self.nodeSeed * 1000) % (len(random_number_cache) - 3)"
-        yield ("randomVector = scale * Vector((random_number_cache[startSeed]     - 0.5, "
-                                              "random_number_cache[startSeed + 1] - 0.5, "
-                                              "random_number_cache[startSeed + 2] - 0.5))")
+        yield "randomVector = algorithms.random.uniformRandomVectorWithTwoSeeds(seed, self.nodeSeed, scale)"
 
     def duplicate(self, sourceNode):
         self.nodeSeed = int(random.random() * 100)

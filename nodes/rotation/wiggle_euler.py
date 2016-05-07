@@ -1,4 +1,5 @@
 import bpy
+import random
 from bpy.props import *
 from math import radians
 from mathutils import Euler
@@ -20,16 +21,16 @@ class EulerWiggleNode(bpy.types.Node, AnimationNode):
         self.newInput("Integer", "Octaves", "octaves", value = 2)
         self.newInput("Float", "Persistance", "persistance", value = 0.3)
         self.newOutput("Euler", "Euler", "euler")
+        self.randomizeNodeSeed()
 
     def draw(self, layout):
         layout.prop(self, "nodeSeed", text = "Node Seed")
 
-    def execute(self, seed, evolution, speed, amplitude, octaves, persistance):
-        euler = Euler()
-        evolution = evolution * max(speed, 0) / 20 + 2541 * seed + 823 * self.nodeSeed
-        euler[0] = perlinNoise(evolution, persistance, octaves) * amplitude[0]
-        evolution += 79
-        euler[1] = perlinNoise(evolution, persistance, octaves) * amplitude[1]
-        evolution += 263
-        euler[2] = perlinNoise(evolution, persistance, octaves) * amplitude[2]
-        return euler
+    def getExecutionCode(self):
+        yield "euler = Euler(algorithms.perlin_noise.perlinNoiseVectorForNodes(seed, self.nodeSeed, evolution, speed, amplitude, octaves, persistance))"
+
+    def duplicate(self, sourceNode):
+        self.randomizeNodeSeed()
+
+    def randomizeNodeSeed(self):
+        self.nodeSeed = int(random.random() * 100)

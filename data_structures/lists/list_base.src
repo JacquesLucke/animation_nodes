@@ -32,7 +32,7 @@ cdef class LISTNAME:
     def __len__(self):
         return self.length
 
-    def fill(self, TYPE value):
+    cpdef fill(self, TYPE value):
         cdef long i
         for i in range(self.length):
             self.data[i] = value
@@ -84,7 +84,7 @@ cdef class LISTNAME:
             start, stop, step = key.indices(self.length)
             self.getMemoryView()[start:stop:step] = value
 
-    def copy(self):
+    cpdef copy(self):
         newList = LISTNAME(self.length)
         newList.overwrite(self)
         return newList
