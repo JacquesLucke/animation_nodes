@@ -25,6 +25,9 @@ Command Line Arguments:
 
 Generate .html files to debug cython code:
     cython -a filename.pyx
+
+Cleanup Repository:
+    git clean -fdx
 '''
 
 import os
@@ -83,7 +86,8 @@ def preprocessor():
 
         outputPath = changeFileName(path, outputName)
 
-        lastCreationTime = os.stat(outputPath).st_mtime
+        try: lastCreationTime = os.stat(outputPath).st_mtime
+        except: lastCreationTime = 0
         lastModificationTime = os.stat(path).st_mtime
 
         if lastModificationTime > lastCreationTime:

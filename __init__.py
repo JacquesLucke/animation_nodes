@@ -73,6 +73,17 @@ if getBlenderVersion() < (2, 76, 0):
     raise Exception(message)
 
 
+try: from . data_structures import FloatList
+except: pass
+
+if "FloatList" not in globals():
+    message = ("\n\n"
+        "You are using an uncompiled version of the Animation Nodes addon.\n"
+        "Please download an official release or compile it yourself.\n"
+        "More information is in this file: compile_cython.py")
+    raise Exception(message)
+
+
 if __name__ != "animation_nodes":
     import os
     message = ("\n\n"
