@@ -12,7 +12,6 @@ from libc.stdlib cimport malloc, free, realloc
 ##INSERT __list_implementation.src {'LISTNAME': 'DoubleList', 'TYPE' : 'double'}
 ##INSERT __list_iterator.src {'LISTNAME': 'DoubleList', 'TYPE' : 'double'}
 
-
 ##INSERT __list_implementation.src {'LISTNAME': 'LongLongList', 'TYPE' : 'long long'}
 ##INSERT __list_iterator.src {'LISTNAME': 'LongLongList', 'TYPE' : 'long long'}
 
