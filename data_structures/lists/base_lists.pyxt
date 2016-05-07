@@ -1,4 +1,5 @@
-##OUTPUT list_base.pyx
+##OUTPUT base_lists.pyx
+
 from libc.stdlib cimport malloc, free, realloc
 from libc.string cimport memcpy
 from libc.math cimport sin
@@ -9,10 +10,10 @@ ctypedef fused list_or_tuple:
     tuple
 
 ##INSERT list_iterator.src {'LISTNAME': 'FloatList', 'TYPE' : 'float'}
-##INSERT list_base.src {'LISTNAME': 'FloatList', 'TYPE' : 'float'}
+##INSERT base_list.src {'LISTNAME': 'FloatList', 'TYPE' : 'float'}
 
 ##INSERT list_iterator.src {'LISTNAME': 'DoubleList', 'TYPE' : 'double'}
-##INSERT list_base.src {'LISTNAME': 'DoubleList', 'TYPE' : 'double'}
+##INSERT base_list.src {'LISTNAME': 'DoubleList', 'TYPE' : 'double'}
     @classmethod
     def fromRange(cls, long amount, double start, double step):
         cdef DoubleList newList = DoubleList(max(0, amount))
@@ -20,6 +21,10 @@ ctypedef fused list_or_tuple:
         for i in range(max(0, amount)):
             newList.data[i] = start + i * step
         return newList
+
+
+##INSERT list_iterator.src {'LISTNAME': 'IntegerList', 'TYPE' : 'long long'}
+##INSERT base_list.src {'LISTNAME': 'IntegerList', 'TYPE' : 'long long'}
 
 
 cpdef DoubleList floatListToDoubleList(FloatList floatList):

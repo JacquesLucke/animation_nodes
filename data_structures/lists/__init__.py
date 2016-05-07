@@ -1,2 +1,2 @@
-from . list_base import FloatList, DoubleList
-from . list_base import floatListToDoubleList as toDoubleList
+from . base_lists import FloatList, DoubleList, IntegerList
+from . base_lists import floatListToDoubleList as toDoubleList
