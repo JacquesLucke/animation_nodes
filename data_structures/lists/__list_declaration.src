@@ -1,0 +1,18 @@
+cdef class LISTNAME:
+    cdef:
+        TYPE* data
+        long length
+        long allocated
+
+    cdef void _resize(self, long newSize)
+    cpdef fill(self, TYPE value)
+    cpdef append(self, TYPE value)
+    cpdef extend(self, list_or_tuple values)
+    cpdef TYPE[:] getMemoryView(self)
+    cpdef TYPE[:] getSlicedMemoryView(self, sliceObject)
+    cpdef LISTNAME getSlice(self, sliceObject)
+    cpdef copy(self)
+    cpdef long index(self, TYPE value)
+    cpdef long count(self, TYPE value)
+    cpdef LISTNAME reversed(self)
+    cpdef overwrite(self, LISTNAME other, long index = ?)

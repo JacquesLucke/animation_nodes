@@ -1,9 +1,5 @@
 @cython.freelist(10)
 cdef class LISTNAME:
-    cdef:
-        TYPE* data
-        long length
-        long allocated
 
     def __cinit__(self, long length = 0, long allocate = -1):
         if length < 0:

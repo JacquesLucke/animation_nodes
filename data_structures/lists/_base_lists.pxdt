@@ -1,0 +1,11 @@
+##OUTPUT base_lists.pxd
+
+ctypedef fused list_or_tuple:
+    list
+    tuple
+
+##INSERT __list_declaration.src {'LISTNAME': 'FloatList', 'TYPE' : 'float'}
+
+##INSERT __list_declaration.src {'LISTNAME': 'DoubleList', 'TYPE' : 'double'}
+
+##INSERT __list_declaration.src {'LISTNAME': 'LongLongList', 'TYPE' : 'long long'}

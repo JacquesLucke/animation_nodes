@@ -8,6 +8,7 @@ import re
 import sys
 import shutil
 from io import StringIO
+from itertools import chain
 from contextlib import redirect_stdout
 from os.path import abspath, dirname, basename, join
 
@@ -35,7 +36,7 @@ def canCompileCython():
 ###################################################################
 
 def preprocessor():
-    for path in iterPathsWithSuffix(".pyxt"):
+    for path in chain(iterPathsWithSuffix(".pyxt"), iterPathsWithSuffix(".pxdt")):
         content = readFile(path)
         lines = content.splitlines()
 
@@ -94,22 +95,28 @@ def compileCythonFiles():
     try:
         with redirect_stdout(resultBuffer):
             setup(name = 'AN Cython', ext_modules = extensions)
-        print("Compilation Successful")
-        print("More information is in the '.compilation_log' file")
+        print("Compilation Successful.")
+        print("More information is in the '.log' file.")
     except:
         print(resultBuffer.getvalue())
 
-    writeFile(".compilation_log", resultBuffer.getvalue())
+    writeFile(".log", resultBuffer.getvalue())
 
-    cleanupRepository()
+    cleanupRepository(removeBuildDirectory = True, removeCFiles = True)
 
 def getPathsToCythonFiles():
     return list(iterPathsWithSuffix(".pyx"))
 
-def cleanupRepository():
-    buildDirectory = join(currentDirectory, "build")
-    if os.path.exists(buildDirectory):
-        shutil.rmtree(buildDirectory)
+def cleanupRepository(removeBuildDirectory, removeCFiles):
+    if removeBuildDirectory:
+        buildDirectory = join(currentDirectory, "build")
+        if os.path.exists(buildDirectory):
+            shutil.rmtree(buildDirectory)
+        print("Removed not needed build directory.")
+    if removeCFiles:
+        for path in iterPathsWithSuffix(".c"):
+            os.remove(path)
+        print("Remove generated .c files.")
 
 
 

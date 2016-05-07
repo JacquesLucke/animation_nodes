@@ -5,26 +5,16 @@ from libc.string cimport memcpy
 from libc.math cimport sin
 cimport cython
 
-ctypedef fused list_or_tuple:
-    list
-    tuple
 
-##INSERT list_iterator.src {'LISTNAME': 'FloatList', 'TYPE' : 'float'}
-##INSERT base_list.src {'LISTNAME': 'FloatList', 'TYPE' : 'float'}
+##INSERT __list_implementation.src {'LISTNAME': 'FloatList', 'TYPE' : 'float'}
+##INSERT __list_iterator.src {'LISTNAME': 'FloatList', 'TYPE' : 'float'}
 
-##INSERT list_iterator.src {'LISTNAME': 'DoubleList', 'TYPE' : 'double'}
-##INSERT base_list.src {'LISTNAME': 'DoubleList', 'TYPE' : 'double'}
-    @classmethod
-    def fromRange(cls, long amount, double start, double step):
-        cdef DoubleList newList = DoubleList(max(0, amount))
-        cdef long i
-        for i in range(max(0, amount)):
-            newList.data[i] = start + i * step
-        return newList
+##INSERT __list_implementation.src {'LISTNAME': 'DoubleList', 'TYPE' : 'double'}
+##INSERT __list_iterator.src {'LISTNAME': 'DoubleList', 'TYPE' : 'double'}
 
 
-##INSERT list_iterator.src {'LISTNAME': 'IntegerList', 'TYPE' : 'long long'}
-##INSERT base_list.src {'LISTNAME': 'IntegerList', 'TYPE' : 'long long'}
+##INSERT __list_implementation.src {'LISTNAME': 'LongLongList', 'TYPE' : 'long long'}
+##INSERT __list_iterator.src {'LISTNAME': 'LongLongList', 'TYPE' : 'long long'}
 
 
 cpdef DoubleList floatListToDoubleList(FloatList floatList):

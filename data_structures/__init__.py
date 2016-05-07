@@ -1,2 +1,2 @@
-from . lists import FloatList, DoubleList, IntegerList
-from . struct import Struct
+from . lists import FloatList, DoubleList, LongLongList
+from . struct import ANStruct

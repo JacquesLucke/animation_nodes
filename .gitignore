@@ -5,6 +5,7 @@
 *.exp
 *.lib
 *.obj
-.compilation_log
 *.html
-data_structures/lists/list_base.pyx
+.log
+data_structures/lists/base_lists.pxd
+data_structures/lists/base_lists.pyx

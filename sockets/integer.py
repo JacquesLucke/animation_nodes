@@ -1,6 +1,7 @@
 import bpy
 from bpy.props import *
 from .. events import propertyChanged
+from .. data_structures.lists import LongLongList
 from .. base_types.socket import AnimationNodeSocket, ListSocket
 
 def getValue(self):
@@ -73,8 +74,28 @@ class IntegerListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
     comparable = False
 
     @classmethod
+    def getDefaultValue(cls):
+        return LongLongList()
+
+    @classmethod
+    def getDefaultValueCode(cls):
+        return "LongLongList()"
+
+    @classmethod
     def getCopyExpression(cls):
-        return "value[:]"
+        return "value.copy()"
+
+    @classmethod
+    def getFromValuesCode(cls):
+        return "LongLongList.fromValues(value)"
+
+    @classmethod
+    def getJoinListsCode(cls):
+        return "LongLongList.join(value)"
+
+    @classmethod
+    def getReverseCode(cls):
+        return "value.reversed()"
 
     @classmethod
     def correctValue(cls, value):

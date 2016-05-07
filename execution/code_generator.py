@@ -38,7 +38,7 @@ def iter_Imports(nodes):
     yield "from time import perf_counter as getCurrentTime"
     yield "from mathutils import Vector, Matrix, Quaternion, Euler"
     yield "animation_nodes = sys.modules.get({})".format(repr(addonName))
-    yield "from animation_nodes.data_structures import DoubleList, FloatList, IntegerList, Struct"
+    yield "from animation_nodes.data_structures import DoubleList, FloatList, LongLongList, ANStruct"
     yield "from animation_nodes import algorithms"
 
 def get_ImportModules(nodes):

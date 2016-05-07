@@ -1,5 +1,5 @@
 import bpy
-from .. data_structures.struct import Struct
+from .. data_structures.struct import ANStruct
 from .. base_types.socket import AnimationNodeSocket, ListSocket
 
 class StructSocket(bpy.types.NodeSocket, AnimationNodeSocket):
@@ -13,11 +13,11 @@ class StructSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     @classmethod
     def getDefaultValue(cls):
-        return Struct()
+        return ANStruct()
 
     @classmethod
     def getDefaultValueCode(cls):
-        return "Struct()"
+        return "ANStruct()"
 
     @classmethod
     def getCopyExpression(cls):
@@ -25,7 +25,7 @@ class StructSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     @classmethod
     def correctValue(cls, value):
-        if isinstance(value, Struct) or value is None:
+        if isinstance(value, ANStruct) or value is None:
             return value, 0
         return cls.getDefaultValue(), 2
 
@@ -47,6 +47,6 @@ class StructListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
     @classmethod
     def correctValue(cls, value):
         if isinstance(value, list):
-            if all(isinstance(element, Struct) or element is None for element in value):
+            if all(isinstance(element, ANStruct) or element is None for element in value):
                 return value, 0
         return cls.getDefaultValue(), 2

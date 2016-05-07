@@ -35,6 +35,6 @@ class FloatRangeListNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         if self.dataType == "Float":
-            return "list = DoubleList.fromRange(amount, start, step)"
+            return "list = algorithms.list_creation.fromRange(amount, start, step)"
         if self.dataType == "Integer":
             return "list = [int(start + i * step) for i in range(amount)]"
