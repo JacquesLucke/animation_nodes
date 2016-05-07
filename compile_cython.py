@@ -1,7 +1,31 @@
-# Install VS 2015 first with the c++ common tools
-# Some commands for easy reference:
-#   cython -a yourmod.pyx
-#   python setup.py build_ext --inplace
+'''
+Compiling the cython code needs some setup (only tested on windows yet):
+
+    1. Install Anaconda: https://www.continuum.io/downloads (Python 3.5)
+       If you have another python version already installed make sure that
+       the command line uses the right version. You can check this by executing
+       this command: 'python -V'
+       The result should be something like: 'Python 3.5.1 :: Anaconda 2.5.0 (64-bit)'
+
+    2. Install cython with this command: 'conda install cython'
+
+    3. Navigate to the 'animation_nodes' folder in the command line and
+       execute 'python compile_cython.py'. If you are lucky this works immediatly..
+       It didn't work for me directly. Oftentimes there is an error message like this:
+       'unable to find vcvarsall.bat'.
+       To fix this you need install Visual Studio 2015 Community, especially
+       the 'Common Tools for Visual C++ 2015' as you can see here:
+       http://stackoverflow.com/a/35243904/4755171
+       This can take a while, but in the end you should be able to run this file..
+       Please report any issue you have.
+
+Command Line Arguments:
+    python compile_cython.py            # full cleanup afterwards
+    python compile_cython.py -c         # don't remove generated .c file
+
+Generate .html files to debug cython code:
+    cython -a filename.pyx
+'''
 
 import os
 import re
@@ -17,6 +41,8 @@ currentDirectory = dirname(abspath(__file__))
 # should be 'animation_nodes' or 'animation_nodes-master' most of the time
 currentDirectoryName = basename(currentDirectory)
 
+initialArgs = sys.argv[:]
+
 
 def main():
     if canCompileCython():
@@ -24,6 +50,8 @@ def main():
         compileCythonFiles()
 
 def canCompileCython():
+    # Will be false when cython is not installed
+    # -> won't try to compile when executed from within Blender
     try:
         import Cython
         return True
@@ -52,9 +80,17 @@ def preprocessor():
 
         if outputName is None:
             raise Exception("Output name not specified in " + path)
+
         outputPath = changeFileName(path, outputName)
-        writeFile(outputPath, "\n".join(output))
-        print("Created " + outputPath)
+
+        lastCreationTime = os.stat(outputPath).st_mtime
+        lastModificationTime = os.stat(path).st_mtime
+
+        if lastModificationTime > lastCreationTime:
+            writeFile(outputPath, "\n".join(output))
+            print("Created " + outputPath)
+        else:
+            print("File is up to date: " + outputPath)
 
 def preprocess_OUTPUT(line, path):
     match = re.fullmatch(r"##OUTPUT\s*(.*)\s*", line)
@@ -102,7 +138,9 @@ def compileCythonFiles():
 
     writeFile(".log", resultBuffer.getvalue())
 
-    cleanupRepository(removeBuildDirectory = True, removeCFiles = True)
+    cleanupRepository(
+        removeBuildDirectory = True,
+        removeCFiles = "-c" not in initialArgs)
 
 def getPathsToCythonFiles():
     return list(iterPathsWithSuffix(".pyx"))
