@@ -91,9 +91,9 @@ class ExecutionCodeProperties(bpy.types.PropertyGroup):
 
     executionCodeTypeItems = [
         ("DEFAULT", "Default", "", "NONE", 0),
-        ("MONITOR", "Monitored Execution", "", "NONE", 1),
+        ("MONITOR", "Monitor Execution", "", "NONE", 1),
         ("MEASURE", "Measure Execution Times", "", "NONE", 2),
-        ("BAKE", "Enable Baking", "", "NONE", 3)]
+        ("BAKE", "Bake", "", "NONE", 3)]
 
     type = EnumProperty(name = "Execution Code Type", default = "DEFAULT",
         description = "Different execution codes can be useful in different contexts",
