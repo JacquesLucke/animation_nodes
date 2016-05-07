@@ -2,7 +2,7 @@ import bpy
 import sys
 from bpy.props import *
 from .. events import propertyChanged
-from .. data_structures.lists import DoubleList
+from .. data_structures import DoubleList
 from .. base_types.socket import AnimationNodeSocket, ListSocket
 
 def getValue(self):

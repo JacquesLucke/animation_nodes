@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from .. events import propertyChanged
-from .. data_structures.lists import LongLongList
+from .. data_structures import LongLongList
 from .. base_types.socket import AnimationNodeSocket, ListSocket
 
 def getValue(self):
