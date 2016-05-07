@@ -1,9 +1,9 @@
 ##OUTPUT base_lists.pyx
 
-from libc.stdlib cimport malloc, free, realloc
-from libc.string cimport memcpy
-from libc.math cimport sin
 cimport cython
+from libc.math cimport sin
+from libc.string cimport memcpy
+from libc.stdlib cimport malloc, free, realloc
 
 
 ##INSERT __list_implementation.src {'LISTNAME': 'FloatList', 'TYPE' : 'float'}
@@ -15,14 +15,6 @@ cimport cython
 
 ##INSERT __list_implementation.src {'LISTNAME': 'LongLongList', 'TYPE' : 'long long'}
 ##INSERT __list_iterator.src {'LISTNAME': 'LongLongList', 'TYPE' : 'long long'}
-
-
-cpdef DoubleList floatListToDoubleList(FloatList floatList):
-    cdef DoubleList newList = DoubleList(floatList.length)
-    cdef long i
-    for i in range(len(floatList)):
-        newList.data[i] = floatList.data[i]
-    return newList
 
 
 '''

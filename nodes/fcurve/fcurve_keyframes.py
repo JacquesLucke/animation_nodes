@@ -1,7 +1,7 @@
 import bpy
 from ... base_types.node import AnimationNode
-from ... data_structures.lists import toDoubleList
 from ... data_structures import FloatList, DoubleList
+from ... algorithms.list_creation import floatListToDoubleList as toDoubleList
 
 class FCurveKeyframesNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_FCurveKeyframesNode"
