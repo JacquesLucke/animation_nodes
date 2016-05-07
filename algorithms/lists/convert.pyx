@@ -1,4 +1,4 @@
-from ... data_structures.lists.base_lists cimport DoubleList, FloatList, LongLongList
+from ... data_structures.lists.base_lists cimport DoubleList, FloatList, LongLongList, IntegerList, ShortList, CharList
 
 cpdef DoubleList FloatList_to_DoubleList(FloatList sourceList):
     cdef DoubleList newList = DoubleList(sourceList.length)
@@ -19,4 +19,11 @@ cpdef LongLongList DoubleList_to_LongLongList(DoubleList sourceList):
     cdef long i
     for i in range(len(sourceList)):
         newList.data[i] = <long long>sourceList.data[i]
+    return newList
+
+cpdef ShortList LongLongList_to_ShortList(LongLongList sourceList):
+    cdef ShortList newList = ShortList(sourceList.length)
+    cdef long i
+    for i in range(len(sourceList)):
+        newList.data[i] = sourceList.data[i]
     return newList

@@ -99,8 +99,7 @@ class IntegerListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
 
     @classmethod
     def correctValue(cls, value):
-        if isinstance(value, list):
-            if all(isinstance(element, int) for element in value):
-                return value, 0
-        try: return [int(element) for element in value], 1
+        if isinstance(value, LongLongList):
+            return value, 0
+        try: return LongLongList.fromValues(value), 1
         except: return cls.getDefaultValue(), 2
