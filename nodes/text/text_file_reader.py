@@ -5,28 +5,19 @@ from bpy.props import *
 from ... events import propertyChanged
 from ... base_types.node import AnimationNode
 
-# path : last modification, content
+# path, encoding : last modification, content
 cache = {}
-pathsByIdentifier = collections.defaultdict(set)
 
 class TextFileReaderNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_TextFileReaderNode"
     bl_label = "Text File Reader"
     bl_width_default = 170
 
-    def encodingChanged(self, context):
-        for path in pathsByIdentifier[self.identifier]:
-            del cache[path]
-        propertyChanged()
-
-    encoding = StringProperty(name = "Encoding", default = "ascii",
-        description = "Encoding used when reading the file (ascii, utf8, ...)",
-        update = encodingChanged)
-
     errorMessage = StringProperty()
 
     def create(self):
         self.newInput("String", "Path", "path", showFileChooser = True)
+        self.newInput("String", "Encoding", "encoding", value = "ascii")
         self.newOutput("String", "Text", "text")
 
     def draw(self, layout):
@@ -35,38 +26,42 @@ class TextFileReaderNode(bpy.types.Node, AnimationNode):
             if name != "":
                 layout.label(name, icon = "FILE_TEXT")
 
-        layout.prop(self, "encoding")
-
         if self.errorMessage != "":
             layout.label(self.errorMessage, icon = "ERROR")
 
-    def execute(self, path):
+    def drawAdvanced(self, layout):
+        self.invokeFunction(layout, "clearCache", text = "Clear Cache")
+
+    def clearCache(self):
+        cache.clear()
+
+    def execute(self, path, encoding):
         self.errorMessage = ""
 
         if not os.path.exists(path):
             self.errorMessage = "Path does not exist"
             return ""
 
-        pathsByIdentifier[self.identifier].add(path)
+        key = (path, encoding)
 
         lastModification = os.stat(path).st_mtime
 
         loadFile = False
-        if path not in cache:
+        if key not in cache:
             loadFile = True
         else:
-            oldLastModification = cache[path][0]
+            oldLastModification = cache[key][0]
             if lastModification > oldLastModification:
                 loadFile = True
 
         if loadFile:
             try:
-                with open(path, "r", encoding = self.encoding) as f:
+                with open(path, "r", encoding = encoding) as f:
                     data = f.read()
-                cache[path] = (lastModification, data)
+                cache[key] = (lastModification, data)
             except LookupError:
                 self.errorMessage = "Invalid Encoding"
             except:
                 self.errorMessage = "Encoding Error"
 
-        return cache.get(path, (0, ""))[1]
+        return cache.get(key, (0, ""))[1]
