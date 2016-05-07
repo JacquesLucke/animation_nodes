@@ -39,7 +39,7 @@ class ConvertToIntegerListNode(bpy.types.Node, AnimationNode):
         if "Indices" in self.originType:
             yield "integerList = LongLongList.fromValues(inList)"
         elif self.originType == "Float List":
-            yield "integerList = algorithms.list_conversion.DoubleList_to_LongLongList(inList)"
+            yield "integerList = algorithms.lists.convert.DoubleList_to_LongLongList(inList)"
 
     @keepNodeState
     def recreateInput(self):

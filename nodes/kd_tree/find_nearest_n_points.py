@@ -14,10 +14,11 @@ class FindNearestNPointsInKDTreeNode(bpy.types.Node, AnimationNode):
         self.newOutput("Integer List", "Indices", "indices")
 
     def getExecutionCode(self):
+        yield "_amount = max(amount, 0)"
         yield "nearestVectors = []"
-        yield "distances = DoubleList(allocate = amount)"
-        yield "indices = []"
-        yield "for vector, index, distance in kdTree.find_n(searchVector, max(amount, 0)):"
+        yield "distances = DoubleList(allocate = _amount)"
+        yield "indices = LongLongList(allocate = _amount)"
+        yield "for vector, index, distance in kdTree.find_n(searchVector, max(_amount, 0)):"
         yield "    nearestVectors.append(vector)"
         yield "    indices.append(index)"
         yield "    distances.append(distance)"

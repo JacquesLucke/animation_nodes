@@ -1,4 +1,4 @@
-from .. data_structures.lists.base_lists cimport DoubleList, FloatList, LongLongList
+from ... data_structures.lists.base_lists cimport DoubleList, FloatList, LongLongList
 
 def createDoubleListRange(long amount, double start, double step):
     cdef DoubleList newList = DoubleList(max(0, amount))

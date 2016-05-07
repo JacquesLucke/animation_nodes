@@ -1,4 +1,4 @@
-from .. data_structures.lists.base_lists cimport DoubleList, FloatList, LongLongList
+from ... data_structures.lists.base_lists cimport DoubleList, FloatList, LongLongList
 
 cpdef DoubleList FloatList_to_DoubleList(FloatList sourceList):
     cdef DoubleList newList = DoubleList(sourceList.length)
