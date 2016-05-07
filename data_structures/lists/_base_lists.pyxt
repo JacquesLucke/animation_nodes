@@ -1,7 +1,6 @@
 ##OUTPUT base_lists.pyx
 
 cimport cython
-from libc.math cimport sin
 from libc.string cimport memcpy
 from libc.stdlib cimport malloc, free, realloc
 
