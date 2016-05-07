@@ -73,6 +73,16 @@ if getBlenderVersion() < (2, 76, 0):
     raise Exception(message)
 
 
+if __name__ != "animation_nodes":
+    import os
+    message = ("\n\n"
+        "The folder which contains the Animation Nodes addon has a wrong name.\n"
+        "The name has to be 'animation_nodes'.\n"
+        "Please rename the folder.\n"
+        "It's located here: " + os.path.dirname(__file__))
+    raise Exception(message)
+
+
 
 # load and reload submodules
 ##################################
