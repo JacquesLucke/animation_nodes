@@ -28,7 +28,7 @@ class DebugLoopNode(bpy.types.Node, AnimationNode):
         socket = self.newInput("an_GenericSocket", "Data", "data")
         socket.removeable = True
         socket.moveable = True
-        socket["dataWidth"] = 10
+        socket["dataWidth"] = 0
         socket.moveUp()
         return socket
 
