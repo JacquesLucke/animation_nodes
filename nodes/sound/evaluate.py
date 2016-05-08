@@ -2,6 +2,7 @@ import bpy
 from bpy.props import *
 from ... events import propertyChanged
 from ... base_types.node import AnimationNode
+from ... data_structures import DoubleList
 
 frameTypes = [
     ("OFFSET", "Offset", ""),
@@ -47,7 +48,7 @@ class EvaluateSoundNode(bpy.types.Node, AnimationNode):
         layout.prop(bpy.context.scene, "sync_mode")
 
     def execute(self, sound, frame):
-        if sound is None: return 0, []
+        if sound is None: return 0, DoubleList()
         if self.frameType == "OFFSET":
             frame += self.nodeTree.scene.frame_current_final
         strength = sound.evaluate(frame) if sound.type == "SINGLE" else 0

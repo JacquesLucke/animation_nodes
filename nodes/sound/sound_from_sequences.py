@@ -1,6 +1,7 @@
 import bpy
 from bpy.props import *
 from ... utils.layout import writeText
+from ... data_structures import DoubleList
 from ... base_types.node import AnimationNode
 
 soundTypeItems = [
@@ -69,12 +70,12 @@ class EqualizerSoundEvaluator:
     def evaluate(self, frame):
         intFrame = int(frame)
         if intFrame == frame:
-            return self.evaluateInt(intFrame)
+            return DoubleList.fromValues(self.evaluateInt(intFrame))
         else:
             before = self.evaluateInt(intFrame)
             after = self.evaluateInt(intFrame + 1)
             influence = frame - intFrame
-            return [a * (1 - influence) + b * influence for a, b in zip(before, after)]
+            return DoubleList.fromValues([a * (1 - influence) + b * influence for a, b in zip(before, after)])
 
     def evaluateInt(self, frame):
         evaluate = self.evaluateSequence
