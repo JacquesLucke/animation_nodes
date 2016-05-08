@@ -2,7 +2,7 @@
 
 from ... data_structures.lists.base_lists cimport (
   DoubleList, FloatList, LongLongList, IntegerList, UShortList, CharList,
-  numeric_list, floating_point_list)
+  numeric_list)
 
 
 ##INSERT __conversion_base.src {"TARGETLIST" : "UShortList", "TYPE" : "unsigned short"}
