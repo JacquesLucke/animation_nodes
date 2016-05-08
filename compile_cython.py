@@ -72,6 +72,12 @@ def preprocessor():
         lines = content.splitlines()
 
         output = []
+        output.append("'''")
+        output.append("Don't modify this file! It is auto-generated.")
+        output.append("All changes will gone after compilation.")
+        output.append("The source is here:")
+        output.append("  " + path)
+        output.append("'''")
         outputName = None
         for line in lines:
             if line.startswith("##OUTPUT"):

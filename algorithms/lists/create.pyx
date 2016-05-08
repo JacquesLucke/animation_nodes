@@ -15,21 +15,6 @@ def createLongLongListRange(long amount, double start, double step):
         newList.data[i] = <long long>(start + i * step)
     return newList
 
-def repeatUnsignedShortList(UShortList source, long finalLength):
-    if len(source) == 0:
-        raise ValueError("Length of the source list has to be >0")
-    finalLength = max(0, finalLength)
-    cdef UShortList newList = UShortList(finalLength)
-    cdef long i = 0
-    cdef long k = 0
-    while(i < finalLength):
-        newList.data[i] = source.data[k]
-        i += 1
-        k += 1
-        if k == source.length:
-            k = 0
-    return newList
-
 def getMinValue(LongLongList source):
     if source.length == 0:
         raise Exception("List is empty")
