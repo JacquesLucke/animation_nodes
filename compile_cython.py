@@ -68,6 +68,8 @@ def canCompileCython():
 
 def preprocessor():
     for path in chain(iterPathsWithSuffix(".pyxt"), iterPathsWithSuffix(".pxdt")):
+        lastModificationTime = os.stat(path).st_mtime
+
         content = readFile(path)
         lines = content.splitlines()
 
@@ -83,7 +85,9 @@ def preprocessor():
             if line.startswith("##OUTPUT"):
                 outputName = preprocess_OUTPUT(line, path)
             elif line.startswith("##INSERT"):
-                output.append(preprocess_INSERT(line, path))
+                lastSourceModification, insertedCode = preprocess_INSERT(line, path)
+                lastModificationTime = max(lastModificationTime, lastSourceModification)
+                output.append(insertedCode)
             else:
                 output.append(line)
 
@@ -94,7 +98,6 @@ def preprocessor():
 
         try: lastCreationTime = os.stat(outputPath).st_mtime
         except: lastCreationTime = 0
-        lastModificationTime = os.stat(path).st_mtime
 
         if lastModificationTime > lastCreationTime:
             writeFile(outputPath, "\n".join(output))
@@ -117,7 +120,7 @@ def preprocess_INSERT(line, path):
     replaceDict = eval(match.group(2))
     for key, value in replaceDict.items():
         insertContent = insertContent.replace(key, value)
-    return insertContent
+    return os.stat(insertPath).st_mtime, insertContent
 
 
 
