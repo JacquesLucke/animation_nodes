@@ -5,12 +5,13 @@ from libc.string cimport memcpy
 from libc.stdlib cimport malloc, free, realloc
 
 
-##INSERT __list_implementation.src {'LISTNAME': 'FloatList', 'TYPE' : 'float'}
-##INSERT __list_implementation.src {'LISTNAME': 'DoubleList', 'TYPE' : 'double'}
+##INSERT __list_implementation.src {'LISTNAME': 'FloatList',    'TYPE' : 'float'}
+##INSERT __list_implementation.src {'LISTNAME': 'DoubleList',   'TYPE' : 'double'}
 ##INSERT __list_implementation.src {'LISTNAME': 'LongLongList', 'TYPE' : 'long long'}
-##INSERT __list_implementation.src {'LISTNAME': 'IntegerList', 'TYPE' : 'int'}
-##INSERT __list_implementation.src {'LISTNAME': 'UShortList', 'TYPE' : 'unsigned short'}
-##INSERT __list_implementation.src {'LISTNAME': 'CharList', 'TYPE' : 'char'}
+##INSERT __list_implementation.src {'LISTNAME': 'IntegerList',  'TYPE' : 'int'}
+##INSERT __list_implementation.src {'LISTNAME': 'UShortList',   'TYPE' : 'unsigned short'}
+##INSERT __list_implementation.src {'LISTNAME': 'CharList',     'TYPE' : 'char'}
+
 
 '''
 Lists have to support the following operations:

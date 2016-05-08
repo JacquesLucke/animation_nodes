@@ -129,6 +129,16 @@ cdef class LISTNAME:
                 amount += 1
         return amount
 
+    cpdef overwrite(self, LISTNAME other, long index = 0):
+        if index + other.length > self.allocated:
+            self._resize(index + other.length)
+        memcpy(self.data + index, other.data, other.length * sizeof(TYPE))
+        self.length = max(self.length, index + other.length)
+
+
+    # Create new lists based on an existing list
+    ###############################################
+
     cpdef LISTNAME reversed(self):
         cdef:
             LISTNAME newList = LISTNAME(self.length)
@@ -138,11 +148,63 @@ cdef class LISTNAME:
             newList.data[i] = self.data[offset - i]
         return newList
 
-    cpdef overwrite(self, LISTNAME other, long index = 0):
-        if index + other.length > self.allocated:
-            self._resize(index + other.length)
-        memcpy(self.data + index, other.data, other.length * sizeof(TYPE))
-        self.length = max(self.length, index + other.length)
+    def repeated(self, *, long length = -1, long amount = -1):
+        if length < 0 and amount < 0:
+            raise ValueError("Specify the 'length' or 'amount' parameter as keyword")
+        elif length > 0 and amount > 0:
+            raise ValueError("Can only evaluate one parameter of 'length' and 'amount'")
+
+        if amount >= 0:
+            length = self.length * amount
+
+        if self.length == 0 and length > 0:
+            raise ValueError("Cannot repeat a list with zero elements to something longer")
+
+        cdef LISTNAME newList = LISTNAME(length)
+        cdef long i = 0, k = 0
+        while(i < length):
+            newList.data[i] = self.data[k]
+            i += 1
+            k += 1
+            if k == self.length:
+                k = 0
+        return newList
+
+
+    # Utility Functions
+    ###############################################
+
+    def getMinValue(self):
+        if self.length == 0:
+            raise ValueError("Cannot find a min value in a list with zero elements")
+
+        cdef TYPE minValue = self.data[0]
+        for i in range(self.length):
+            if self.data[i] < minValue:
+                minValue = self.data[i]
+        return minValue
+
+    def getMaxValue(self):
+        if self.length == 0:
+            raise ValueError("Cannot find a min value in a list with zero elements")
+
+        cdef TYPE maxValue = self.data[0]
+        for i in range(self.length):
+            if self.data[i] < maxValue:
+                maxValue = self.data[i]
+        return maxValue
+
+    def containsValueLowerThan(self, TYPE value):
+        for i in range(self.length):
+            if self.data[i] < value:
+                return True
+        return False
+
+    def containsValueGreaterThan(self, TYPE value):
+        for i in range(self.length):
+            if self.data[i] > value:
+                return True
+        return False
 
 
     # Memory Views
