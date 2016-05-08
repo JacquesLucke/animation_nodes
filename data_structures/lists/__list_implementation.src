@@ -1,7 +1,15 @@
 @cython.freelist(10)
 cdef class LISTNAME:
 
+    # Initialization and Memory Management
+    ###############################################
+
     def __cinit__(self, long length = 0, long allocate = -1):
+        '''
+        Initialize a new object with the given length.
+        You can also directly allocate more memory from the beginning
+        to allow faster appending/extending without memory reallocation.
+        '''
         if length < 0:
             raise Exception("Length has to be >= 0")
         if allocate < length:
@@ -25,13 +33,66 @@ cdef class LISTNAME:
             raise MemoryError()
         self.allocated = newSize
 
+
+    # Magic Methods for Python
+    ###############################################
+
     def __len__(self):
         return self.length
 
-    cpdef fill(self, TYPE value):
+    def __getitem__(self, key):
+        if isinstance(key, int):
+            return self.getMemoryView()[key]
+        else:
+            return self.getSlice(key)
+
+    def __setitem__(self, key, value):
+        if isinstance(key, int):
+            self.getMemoryView()[key] = value
+        else:
+            start, stop, step = key.indices(self.length)
+            self.getMemoryView()[start:stop:step] = value
+
+    def __add__(LISTNAME a, LISTNAME b):
+        return LISTNAME.join(a, b)
+
+    def __mul__(LISTNAME self, long amount):
+        amount = max(amount, 0)
+        cdef LISTNAME newList = LISTNAME(self.length * amount)
+        cdef long i
+        if self.length == 0:
+            pass
+        elif self.length == 1:
+            newList.fill(self.data[0])
+        else:
+            for i in range(amount):
+                newList.overwrite(self, self.length * i)
+        return newList
+
+    def __iadd__(self, LISTNAME other):
+        if self.length + other.length > self.allocated:
+            self._resize(self.length + other.length)
+        self.overwrite(other, index = self.length)
+        return self
+
+    def __iter__(self):
+        return LISTNAMEIterator(self)
+
+    def __contains__(self, TYPE value):
         cdef long i
         for i in range(self.length):
-            self.data[i] = value
+            if self.data[i] == value:
+                return True
+        return False
+
+
+    # Base Operations for Lists
+    ###############################################
+
+    cpdef copy(self):
+        newList = LISTNAME(self.length)
+        newList.overwrite(self)
+        return newList
 
     cpdef append(self, TYPE value):
         if self.length == self.allocated:
@@ -48,42 +109,10 @@ cdef class LISTNAME:
             self.data[i] = value
         self.length = newLength
 
-    cpdef TYPE[:] getMemoryView(self):
-        if self.length > 0:
-            return <TYPE[:self.length]>self.data
-        else:
-            return (<TYPE[:1]>self.data)[1:]
-
-    cpdef TYPE[:] getSlicedMemoryView(self, sliceObject):
-        cdef long start, stop, step
-        start, stop, step = sliceObject.indices(self.length)
-        return self.getMemoryView()[start:stop:step]
-
-    def __getitem__(self, key):
-        if isinstance(key, int):
-            return self.getMemoryView()[key]
-        else:
-            return self.getSlice(key)
-
-    cpdef LISTNAME getSlice(self, sliceObject):
-        cdef TYPE[:] memView = self.getSlicedMemoryView(sliceObject)
-        newList = LISTNAME(len(memView))
-        cdef int i
-        for i in range(len(memView)):
-            newList.data[i] = memView[i]
-        return newList
-
-    def __setitem__(self, key, value):
-        if isinstance(key, int):
-            self.getMemoryView()[key] = value
-        else:
-            start, stop, step = key.indices(self.length)
-            self.getMemoryView()[start:stop:step] = value
-
-    cpdef copy(self):
-        newList = LISTNAME(self.length)
-        newList.overwrite(self)
-        return newList
+    cpdef fill(self, TYPE value):
+        cdef long i
+        for i in range(self.length):
+            self.data[i] = value
 
     cpdef long index(self, TYPE value):
         cdef long i
@@ -109,37 +138,38 @@ cdef class LISTNAME:
             newList.data[i] = self.data[offset - i]
         return newList
 
-    def __add__(LISTNAME a, LISTNAME b):
-        return LISTNAME.join(a, b)
-
-    def __mul__(LISTNAME self, long amount):
-        cdef LISTNAME newList = LISTNAME(self.length * amount)
-        cdef long i
-        for i in range(amount):
-            newList.overwrite(self, self.length * i)
-        return newList
-
-    def __iadd__(self, LISTNAME other):
-        if self.length + other.length > self.allocated:
-            self._resize(self.length + other.length)
-        self.overwrite(other, index = self.length)
-        return self
-
-    def __iter__(self):
-        return LISTNAMEIterator(self)
-
-    def __contains__(self, TYPE value):
-        cdef long i
-        for i in range(self.length):
-            if self.data[i] == value:
-                return True
-        return False
-
     cpdef overwrite(self, LISTNAME other, long index = 0):
         if index + other.length > self.allocated:
             self._resize(index + other.length)
         memcpy(self.data + index, other.data, other.length * sizeof(TYPE))
         self.length = max(self.length, index + other.length)
+
+
+    # Memory Views
+    ###############################################
+
+    cpdef TYPE[:] getMemoryView(self):
+        if self.length > 0:
+            return <TYPE[:self.length]>self.data
+        else:
+            return (<TYPE[:1]>self.data)[1:]
+
+    cpdef TYPE[:] getSlicedMemoryView(self, sliceObject):
+        cdef long start, stop, step
+        start, stop, step = sliceObject.indices(self.length)
+        return self.getMemoryView()[start:stop:step]
+
+    cpdef LISTNAME getSlice(self, sliceObject):
+        cdef TYPE[:] memView = self.getSlicedMemoryView(sliceObject)
+        newList = LISTNAME(len(memView))
+        cdef int i
+        for i in range(len(memView)):
+            newList.data[i] = memView[i]
+        return newList
+
+
+    # Classmethods for List Creation
+    ###############################################
 
     @classmethod
     def join(cls, *sourceLists):
@@ -164,6 +194,10 @@ cdef class LISTNAME:
             newList.data[i] = value
         return newList
 
+
+    # String Representations
+    ###############################################
+
     def __repr__(self):
         return "<LISTNAME {}>".format(list(self.getMemoryView()))
 
@@ -171,7 +205,15 @@ cdef class LISTNAME:
         return "Length: {}, Allocated: {}, Size: {} bytes".format(
             self.length, self.allocated, self.allocated * sizeof(TYPE))
 
+
 cdef class LISTNAMEIterator:
+    '''
+    Implements the 'Iterator Protocol' that is used to allow iteration
+    over a custom list object (eg with a for loop).
+    An instance of this class is only created in the __iter__ method
+    of the corresponding list type.
+    https://docs.python.org/3.5/library/stdtypes.html#iterator-types
+    '''
     cdef:
         LISTNAME source
         long current
