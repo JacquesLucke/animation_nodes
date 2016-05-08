@@ -109,8 +109,7 @@ class FloatListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
 
     @classmethod
     def correctValue(cls, value):
-        if isinstance(value, list):
-            if all(isinstance(element, (float, int)) for element in value):
-                return value, 0
-        try: return [float(element) for element in value], 1
+        if isinstance(value, DoubleList):
+            return value, 0
+        try: return DoubleList.fromValues(value), 1
         except: return cls.getDefaultValue(), 2
