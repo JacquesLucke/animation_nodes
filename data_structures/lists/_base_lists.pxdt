@@ -4,6 +4,18 @@ ctypedef fused list_or_tuple:
     list
     tuple
 
+ctypedef fused floating_point_list:
+    DoubleList
+    FloatList
+
+ctypedef fused numeric_list:
+    FloatList
+    DoubleList
+    LongLongList
+    IntegerList
+    UShortList
+    CharList
+
 ##INSERT __list_declaration.src {'LISTNAME': 'FloatList', 'TYPE' : 'float'}
 
 ##INSERT __list_declaration.src {'LISTNAME': 'DoubleList', 'TYPE' : 'double'}
@@ -12,6 +24,6 @@ ctypedef fused list_or_tuple:
 
 ##INSERT __list_declaration.src {'LISTNAME': 'IntegerList', 'TYPE' : 'int'}
 
-##INSERT __list_declaration.src {'LISTNAME': 'ShortList', 'TYPE' : 'short'}
+##INSERT __list_declaration.src {'LISTNAME': 'UShortList', 'TYPE' : 'unsigned short'}
 
 ##INSERT __list_declaration.src {'LISTNAME': 'CharList', 'TYPE' : 'char'}

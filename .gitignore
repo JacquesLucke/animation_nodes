@@ -9,3 +9,4 @@
 .log
 data_structures/lists/base_lists.pxd
 data_structures/lists/base_lists.pyx
+algorithms/lists/convert.pyx

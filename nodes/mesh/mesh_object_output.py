@@ -5,8 +5,8 @@ from bpy.props import *
 from ... utils.layout import writeText
 from ... tree_info import keepNodeState
 from ... base_types.node import AnimationNode
-from ... algorithms.lists.create import repeatLongLongList, getMinValue
-from ... algorithms.lists.convert import LongLongList_to_ShortList as toShortList
+from ... algorithms.lists.create import repeatUnsignedShortList, getMinValue
+from ... algorithms.lists.convert import toUShortList
 
 meshDataTypeItems = [
     ("MESH_DATA", "Mesh Data", "Mesh Data object that contains only vertex locations, edge indices and polygon indices", "", 0),
@@ -132,11 +132,9 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
             self.errorMessage = "Material indices have to be greater or equal to zero"
             return
 
-        if len(materialIndices) == len(mesh.polygons):
-            allMaterialIndices = toShortList(materialIndices)
-        else:
-            allMaterialIndices = toShortList(repeatLongLongList(materialIndices, len(mesh.polygons)))
-        memview = allMaterialIndices.getMemoryView()
-        print(memview, dir(memview), memview.shape)
-        mesh.polygons.foreach_set("material_index", allMaterialIndices)
+        allMaterialIndices = toUShortList(materialIndices)
+        if len(materialIndices) != len(mesh.polygons):
+            allMaterialIndices = repeatUnsignedShortList(allMaterialIndices, len(mesh.polygons))
+            
+        mesh.polygons.foreach_set("material_index", allMaterialIndices.getMemoryView())
         mesh.polygons[0].material_index = materialIndices[0]

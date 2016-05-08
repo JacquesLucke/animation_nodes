@@ -1,5 +1,5 @@
 from libc.limits cimport LONG_MAX
-from ... data_structures.lists.base_lists cimport DoubleList, FloatList, LongLongList
+from ... data_structures.lists.base_lists cimport DoubleList, FloatList, LongLongList, UShortList
 
 def createDoubleListRange(long amount, double start, double step):
     cdef DoubleList newList = DoubleList(max(0, amount))
@@ -15,14 +15,19 @@ def createLongLongListRange(long amount, double start, double step):
         newList.data[i] = <long long>(start + i * step)
     return newList
 
-def repeatLongLongList(LongLongList source, long finalLength):
+def repeatUnsignedShortList(UShortList source, long finalLength):
     if len(source) == 0:
         raise ValueError("Length of the source list has to be >0")
     finalLength = max(0, finalLength)
-    cdef LongLongList newList = LongLongList(finalLength)
-    cdef long i
-    for i in range(finalLength):
-        newList.data[i] = source.data[i % source.length]
+    cdef UShortList newList = UShortList(finalLength)
+    cdef long i = 0
+    cdef long k = 0
+    while(i < finalLength):
+        newList.data[i] = source.data[k]
+        i += 1
+        k += 1
+        if k == source.length:
+            k = 0
     return newList
 
 def getMinValue(LongLongList source):

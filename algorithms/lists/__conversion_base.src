@@ -1,0 +1,9 @@
+cpdef TARGETLIST toTARGETLIST(numeric_list sourceList):
+    cdef TARGETLIST newList = TARGETLIST(sourceList.length)
+    cdef long i
+    for i in range(len(sourceList)):
+        if numeric_list in floating_point_list:
+            newList.data[i] = <TYPE>sourceList.data[i]
+        else:
+            newList.data[i] = sourceList.data[i]
+    return newList
