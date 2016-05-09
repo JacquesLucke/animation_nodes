@@ -87,6 +87,9 @@ class Problem:
         currentProblems.append(self)
 
 
+# Before Code Creation
+################################################################
+
 class NodeLinkRecursion(Problem):
     def allowExecution(self):
         return False
@@ -110,106 +113,6 @@ class InvalidNetworksExist(Problem):
                    "  - there are more than one 'Group Input', 'Group Output' or 'Loop Input' "
                        "nodes in the same network")
         writeText(layout, message, autoWidth = True)
-
-class InvalidSyntax(Problem):
-    reportable = True
-
-    def allowExecution(self):
-        return False
-
-    def draw(self, layout):
-        message = "The execution code has invalid syntax."
-        writeText(layout, message, autoWidth = True)
-
-class ExceptionDuringExecution(Problem):
-    reportable = True
-    possiblyDisabledSafetyFeature = True
-
-    def allowExecution(self):
-        return False
-
-    def draw(self, layout):
-        message = "An exception was raised during the execution of a node tree."
-        writeText(layout, message, autoWidth = True)
-
-class ExceptionDuringCodeCreation(Problem):
-    reportable = True
-
-    def allowExecution(self):
-        return False
-
-    def draw(self, layout):
-        message = "An exception was raised during the creation of the execution code."
-        writeText(layout, message, autoWidth = True)
-
-class CouldNotSetupExecutionUnits(Problem):
-    reportable = True
-
-    def allowExecution(self):
-        return False
-
-    def draw(self, layout):
-        message = ("The Animation Nodes addon is not able to setup "
-                   "the execution units for the node tree.")
-        writeText(layout, message, autoWidth = True)
-
-class NodeFailesToCreateExecutionCode(Problem):
-    reportable = True
-    possiblyDisabledSafetyFeature = True
-
-    def __init__(self, nodeIdentifier):
-        self.nodeIdentifier = nodeIdentifier
-
-    def allowUnitCreation(self):
-        return False
-
-    def draw(self, layout):
-        message = ("The node linked below is not able to create its "
-                   "execution code. If this can happen when the node tree "
-                   "has been created in another version of the addon. If that "
-                   "is not the case it is most likely a bug in the addon itself.\n\n"
-                   "If the problem is that you use an incompatible AN version, you "
-                   "can also try to simply replace the not-working node with the same node. "
-                   "Sometimes this error occures when the sockets of a node changes "
-                   "between versions.")
-        writeText(layout, message, autoWidth = True)
-
-        node = getNodeByIdentifier(self.nodeIdentifier)
-        props = layout.operator("an.move_view_to_node", icon = "VIEWZOOM", text = "{} does not work".format(repr(node.name)))
-        props.nodeIdentifier = self.nodeIdentifier
-
-class NodeShouldNotBeUsedInAutoExecution(Problem):
-    def __init__(self, nodeIdentifier):
-        self.nodeIdentifier = nodeIdentifier
-
-    def allowAutoExecution(self):
-        return False
-
-    def draw(self, layout):
-        node = getNodeByIdentifier(self.nodeIdentifier)
-        layout.label("{} should not be used with auto execution.".format(repr(node.name)))
-
-class NodeMustNotBeInSubprogram(Problem):
-    def __init__(self, nodeIdentifier):
-        self.nodeIdentifier = nodeIdentifier
-
-    def allowUnitCreation(self):
-        return False
-
-    def draw(self, layout):
-        node = getNodeByIdentifier(self.nodeIdentifier)
-        layout.label("{} must not be in a subprogram".format(repr(node.name)))
-
-class NodeDoesNotSupportExecution(Problem):
-    def __init__(self, nodeIdentifier):
-        self.nodeIdentifier = nodeIdentifier
-
-    def allowUnitCreation(self):
-        return False
-
-    def draw(self, layout):
-        node = getNodeByIdentifier(self.nodeIdentifier)
-        layout.label("{} does not support excecution".format(repr(node.name)))
 
 class IdentifierExistsTwice(Problem):
     def allowUnitCreation(self):
@@ -256,6 +159,114 @@ class UndefinedNodeExists(Problem):
             props = col.operator("an.move_view_to_node", icon = "VIEWZOOM", text = "{} is undefined".format(repr(node.name)))
             props.treeName = nodeID[0]
             props.nodeName = nodeID[1]
+
+class NodeMustNotBeInSubprogram(Problem):
+    def __init__(self, nodeIdentifier):
+        self.nodeIdentifier = nodeIdentifier
+
+    def allowUnitCreation(self):
+        return False
+
+    def draw(self, layout):
+        node = getNodeByIdentifier(self.nodeIdentifier)
+        layout.label("{} must not be in a subprogram".format(repr(node.name)))
+
+class NodeShouldNotBeUsedInAutoExecution(Problem):
+    def __init__(self, nodeIdentifier):
+        self.nodeIdentifier = nodeIdentifier
+
+    def allowAutoExecution(self):
+        return False
+
+    def draw(self, layout):
+        node = getNodeByIdentifier(self.nodeIdentifier)
+        layout.label("{} should not be used with auto execution.".format(repr(node.name)))
+
+class NodeDoesNotSupportExecution(Problem):
+    def __init__(self, nodeIdentifier):
+        self.nodeIdentifier = nodeIdentifier
+
+    def allowUnitCreation(self):
+        return False
+
+    def draw(self, layout):
+        node = getNodeByIdentifier(self.nodeIdentifier)
+        layout.label("{} does not support excecution".format(repr(node.name)))
+
+
+# During Code Creation
+################################################################
+
+class ExceptionDuringCodeCreation(Problem):
+    reportable = True
+
+    def allowExecution(self):
+        return False
+
+    def draw(self, layout):
+        message = "An exception was raised during the creation of the execution code."
+        writeText(layout, message, autoWidth = True)
+
+class NodeFailesToCreateExecutionCode(Problem):
+    reportable = True
+    possiblyDisabledSafetyFeature = True
+
+    def __init__(self, nodeIdentifier):
+        self.nodeIdentifier = nodeIdentifier
+
+    def allowUnitCreation(self):
+        return False
+
+    def draw(self, layout):
+        message = ("The node linked below is not able to create its "
+                   "execution code. If this can happen when the node tree "
+                   "has been created in another version of the addon. If that "
+                   "is not the case it is most likely a bug in the addon itself.\n\n"
+                   "If the problem is that you use an incompatible AN version, you "
+                   "can also try to simply replace the not-working node with the same node. "
+                   "Sometimes this error occures when the sockets of a node changes "
+                   "between versions.")
+        writeText(layout, message, autoWidth = True)
+
+        node = getNodeByIdentifier(self.nodeIdentifier)
+        props = layout.operator("an.move_view_to_node", icon = "VIEWZOOM", text = "{} does not work".format(repr(node.name)))
+        props.nodeIdentifier = self.nodeIdentifier
+
+class InvalidSyntax(Problem):
+    reportable = True
+
+    def allowExecution(self):
+        return False
+
+    def draw(self, layout):
+        message = "The execution code has invalid syntax."
+        writeText(layout, message, autoWidth = True)
+
+
+# During Executing
+################################################################
+
+class CouldNotSetupExecutionUnits(Problem):
+    reportable = True
+
+    def allowExecution(self):
+        return False
+
+    def draw(self, layout):
+        message = ("The Animation Nodes addon is not able to setup "
+                   "the execution units for the node tree.")
+        writeText(layout, message, autoWidth = True)
+
+class ExceptionDuringExecution(Problem):
+    reportable = True
+    possiblyDisabledSafetyFeature = True
+
+    def allowExecution(self):
+        return False
+
+    def draw(self, layout):
+        message = "An exception was raised during the execution of a node tree."
+        writeText(layout, message, autoWidth = True)
 
 class NodeRaisesExceptionDuringExecution(Problem):
     reportable = True
