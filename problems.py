@@ -24,11 +24,53 @@ def canAutoExecute():
         if not problem.allowAutoExecution(): return False
     return True
 
-def getProblems():
-    return currentProblems
+def problemsExist():
+    return len(currentProblems) > 0
+
+def drawCurrentProblemInfo(layout):
+    for problem in currentProblems:
+        problem.draw(layout)
+
+    if isPossiblyDisabledSafetyFeature():
+        layout.separator()
+        drawSafetyFeaturesMessage(layout)
+
+    if isReportable():
+        layout.separator()
+        drawReportBugMessage(layout)
+
+def isPossiblyDisabledSafetyFeature():
+    return any(problem.possiblyDisabledSafetyFeature for problem in currentProblems)
+
+def drawSafetyFeaturesMessage(layout):
+    message = (
+        "This problem can happen when you disabled certain problem-handling "
+        "features in the advanced node settings of some nodes (e.g. 'Expression')."
+        " If this is the case try to enable them again.")
+
+    writeText(layout, message, autoWidth = True)
+
+def isReportable():
+    return any(problem.reportable for problem in currentProblems)
+
+def drawReportBugMessage(layout):
+    message = (
+        "It is possible that this is a bug in the Animation Nodes addon itself. "
+        "If you think that this is the case make a bug report, please. "
+        "Don't forget to give as much information as possible. "
+        "Beside that it would be helpful if you could share the "
+        ".blend file and the content of the console/terminal.")
+
+    writeText(layout, message, autoWidth = True)
+
+    url = r"https://github.com/JacquesLucke/animation_nodes/issues/new"
+    layout.operator("wm.url_open", text = "New Bug Report", icon = "RIGHTARROW_THIN").url = url
 
 
 class Problem:
+    reportable = False
+    possiblyDisabledSafetyFeature = False
+
     def allowUnitCreation(self):
         return True
 
@@ -44,18 +86,6 @@ class Problem:
     def report(self):
         currentProblems.append(self)
 
-
-contactDeveloperMessage = (
-    "Please contact a developer in the forum or on Github. "
-    "If possible share your .blend file and the content of "
-    "the console/terminal with the developer.")
-
-realBugMessage = "This is most likely a bug in the addon itself. " + contactDeveloperMessage
-
-advancedSettingsFixMessage = (
-   "If you disabled certain problem-handling features in the "
-   "advanced settings of the 'Expression' or 'Script' nodes "
-   "try to enable them again.")
 
 class NodeLinkRecursion(Problem):
     def allowExecution(self):
@@ -82,42 +112,51 @@ class InvalidNetworksExist(Problem):
         writeText(layout, message, autoWidth = True)
 
 class InvalidSyntax(Problem):
+    reportable = True
+
     def allowExecution(self):
         return False
 
     def draw(self, layout):
-        message = "The execution code has invalid syntax.\n\n" + \
-            realBugMessage + "\n\n" + advancedSettingsFixMessage
+        message = "The execution code has invalid syntax."
         writeText(layout, message, autoWidth = True)
 
 class ExceptionDuringExecution(Problem):
+    reportable = True
+    possiblyDisabledSafetyFeature = True
+
     def allowExecution(self):
         return False
 
     def draw(self, layout):
-        message = "An exception was raised during the execution of a node tree.\n\n" + \
-            realBugMessage + "\n\n" + advancedSettingsFixMessage
+        message = "An exception was raised during the execution of a node tree."
         writeText(layout, message, autoWidth = True)
 
 class ExceptionDuringCodeCreation(Problem):
+    reportable = True
+
     def allowExecution(self):
         return False
 
     def draw(self, layout):
-        message = ("An exception was raised during the creation "
-                   "of the execution code.\n\n") + realBugMessage
+        message = "An exception was raised during the creation of the execution code."
         writeText(layout, message, autoWidth = True)
 
 class CouldNotSetupExecutionUnits(Problem):
+    reportable = True
+
     def allowExecution(self):
         return False
 
     def draw(self, layout):
         message = ("The Animation Nodes addon is not able to setup "
-                   "the execution units for your node tree.\n\n") + realBugMessage
+                   "the execution units for the node tree.")
         writeText(layout, message, autoWidth = True)
 
 class NodeFailesToCreateExecutionCode(Problem):
+    reportable = True
+    possiblyDisabledSafetyFeature = True
+
     def __init__(self, nodeIdentifier):
         self.nodeIdentifier = nodeIdentifier
 
@@ -128,9 +167,8 @@ class NodeFailesToCreateExecutionCode(Problem):
         message = ("The node linked below is not able to create its "
                    "execution code. If this can happen when the node tree "
                    "has been created in another version of the addon. If that "
-                   "is not the case it is most likely a bug in the addon itself.\n\n") + \
-                   contactDeveloperMessage + "\n\n" + \
-                  ("If the problem is that you use an incompatible AN version, you "
+                   "is not the case it is most likely a bug in the addon itself.\n\n"
+                   "If the problem is that you use an incompatible AN version, you "
                    "can also try to simply replace the not-working node with the same node. "
                    "Sometimes this error occures when the sockets of a node changes "
                    "between versions.")
@@ -220,6 +258,9 @@ class UndefinedNodeExists(Problem):
             props.nodeName = nodeID[1]
 
 class NodeRaisesExceptionDuringExecution(Problem):
+    reportable = True
+    possiblyDisabledSafetyFeature = True
+
     def __init__(self, nodeIdentifier):
         self.nodeIdentifier = nodeIdentifier
 

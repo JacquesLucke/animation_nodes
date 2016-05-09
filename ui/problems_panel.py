@@ -14,7 +14,7 @@ class ProblemsPanel(bpy.types.Panel):
     def poll(cls, context):
         tree = cls.getTree()
         if tree is None: return False
-        return tree.bl_idname == "an_AnimationNodeTree" and len(problems.getProblems()) > 0
+        return tree.bl_idname == "an_AnimationNodeTree" and problems.problemsExist()
 
     def draw_header(self, context):
         self.layout.label("", icon = "ERROR")
@@ -29,10 +29,7 @@ class ProblemsPanel(bpy.types.Panel):
             col.operator("wm.console_toggle", text = "Toogle Console", icon = "CONSOLE")
 
         layout.separator()
-
-        for problem in problems.getProblems():
-            problem.draw(layout)
-
+        problems.drawCurrentProblemInfo(layout)
         layout.separator()
 
         col = layout.column(align = True)
