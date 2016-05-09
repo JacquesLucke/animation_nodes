@@ -1,6 +1,5 @@
 import bpy
 from . import tree_info
-from . import file_tests
 from . import event_handler
 from . utils.handlers import eventHandler
 
@@ -54,7 +53,8 @@ def propertyChanged(self = None, context = None):
 
 @eventHandler("FILE_LOAD_POST")
 def fileLoaded():
-    file_tests.checkCurrentFile()
+    from . nodes.system.subprogram_sockets import forceSubprogramUpdate
+    forceSubprogramUpdate()
     event.fileChanged = True
     treeChanged()
 
