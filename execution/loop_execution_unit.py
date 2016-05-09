@@ -1,9 +1,11 @@
+from .. sockets.info import toIdName
 from .. tree_info import getNodesByType
 from . compile_scripts import compileScript
 from .. problems import ExecutionUnitNotSetup
 from . code_generator import (getInitialVariables,
                               iterSetupCodeLines,
                               getCopyExpression,
+                              getNodeCommentLine,
                               getGlobalizeStatement,
                               getLoadSocketValueLine,
                               linkOutputSocketsToTargets,
@@ -142,7 +144,7 @@ class LoopExecutionUnit:
         for i, node in enumerate(inputNode.getSortedGeneratorNodes(nodeByID)):
             name = "loop_generator_output_" + str(i)
             variables[node] = name
-            yield "{} = []".format(name)
+            yield "{} = bpy.types.{}.getDefaultValue()".format(name, toIdName(node.listDataType))
             yield "{0}_{1} = {1}.{0}".format(node.addType.lower(), name)
 
     def iter_InitializeParametersLines(self, inputNode, variables):
@@ -172,6 +174,8 @@ class LoopExecutionUnit:
 
     def iter_AddToGenerators(self, inputNode, variables, nodeByID):
         for node in inputNode.getSortedGeneratorNodes(nodeByID):
+            yield ""
+            yield getNodeCommentLine(node)
             yield "if {}:".format(variables[node.conditionSocket])
 
             socket = node.addSocket
