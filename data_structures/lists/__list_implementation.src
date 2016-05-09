@@ -190,9 +190,24 @@ cdef class LISTNAME:
 
         cdef TYPE maxValue = self.data[0]
         for i in range(self.length):
-            if self.data[i] < maxValue:
+            if self.data[i] > maxValue:
                 maxValue = self.data[i]
         return maxValue
+
+    def getSumOfElements(self):
+        cdef TYPE sum = 0
+        for i in range(self.length):
+            sum += self.data[i]
+        return sum
+
+    def getProductOfElements(self):
+        cdef TYPE sum = 1
+        for i in range(self.length):
+            sum *= self.data[i]
+        return sum
+
+    def getAverageOfElements(self):
+        return <double>self.getSumOfElements() / <double>self.length
 
     def containsValueLowerThan(self, TYPE value):
         for i in range(self.length):

@@ -25,11 +25,11 @@ class NumberListMathNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "operation", text = "")
 
     def getExecutionCode(self):
-        if self.operation in ("ADD", "AVERAGE"): yield "result = functools.reduce(operator.add, numbers, 0)"
-        if self.operation == "MULTIPLY": yield "result = functools.reduce(operator.mul, numbers, 1)"
-        if self.operation == "MIN": yield "result = min(numbers) if len(numbers) > 0 else 0"
-        if self.operation == "MAX": yield "result = max(numbers) if len(numbers) > 0 else 0"
-        if self.operation == "AVERAGE": yield "if len(numbers) > 0: result /= len(numbers)"
+        if self.operation == "ADD": yield "result = numbers.getSumOfElements()"
+        if self.operation == "MULTIPLY": yield "result = numbers.getProductOfElements()"
+        if self.operation == "MIN": yield "result = numbers.getMinValue() if len(numbers) > 0 else 0"
+        if self.operation == "MAX": yield "result = numbers.getMaxValue() if len(numbers) > 0 else 0"
+        if self.operation == "AVERAGE": yield "if len(numbers) > 0: result = numbers.getAverageOfElements()"
 
     def getUsedModules(self):
         return ["operator", "functools"]
