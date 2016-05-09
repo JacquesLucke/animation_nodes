@@ -30,7 +30,7 @@ class StructSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return cls.getDefaultValue(), 2
 
 
-class StructListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
+class StructListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSocket):
     bl_idname = "an_StructListSocket"
     bl_label = "Struct List Socket"
     dataType = "Struct List"

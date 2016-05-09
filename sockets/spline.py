@@ -95,7 +95,7 @@ class SplineSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return cls.getDefaultValue(), 2
 
 
-class SplineListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
+class SplineListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSocket):
     bl_idname = "an_SplineListSocket"
     bl_label = "Spline List Socket"
     dataType = "Spline List"

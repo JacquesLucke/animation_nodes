@@ -48,7 +48,7 @@ class VectorSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             except: return cls.getDefaultValue(), 2
 
 
-class VectorListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
+class VectorListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSocket):
     bl_idname = "an_VectorListSocket"
     bl_label = "Vector List Socket"
     dataType = "Vector List"

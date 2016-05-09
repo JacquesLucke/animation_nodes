@@ -28,7 +28,7 @@ class PolygonIndicesSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         else: return cls.getDefaultValue(), 2
 
 
-class PolygonIndicesListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
+class PolygonIndicesListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSocket):
     bl_idname = "an_PolygonIndicesListSocket"
     bl_label = "Polygon Indices List Socket"
     dataType = "Polygon Indices List"

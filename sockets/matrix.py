@@ -28,7 +28,7 @@ class MatrixSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             except: return cls.getDefaultValue(), 2
 
 
-class MatrixListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
+class MatrixListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSocket):
     bl_idname = "an_MatrixListSocket"
     bl_label = "Matrix List Socket"
     dataType = "Matrix List"

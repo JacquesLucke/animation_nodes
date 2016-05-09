@@ -79,7 +79,7 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return cls.getDefaultValue(), 2
 
 
-class ObjectListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
+class ObjectListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSocket):
     bl_idname = "an_ObjectListSocket"
     bl_label = "Object List Socket"
     dataType = "Object List"

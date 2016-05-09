@@ -46,7 +46,7 @@ class StringSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return str(value), 1
 
 
-class StringListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
+class StringListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSocket):
     bl_idname = "an_StringListSocket"
     bl_label = "String List Socket"
     dataType = "String List"

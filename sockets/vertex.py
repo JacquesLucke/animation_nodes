@@ -29,7 +29,7 @@ class VertexSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return cls.getDefaultValue(), 2
 
 
-class VertexListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
+class VertexListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSocket):
     bl_idname = "an_VertexListSocket"
     bl_label = "Vertex List Socket"
     dataType = "Vertex List"

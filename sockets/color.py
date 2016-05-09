@@ -43,7 +43,7 @@ class ColorSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         else: return cls.getDefaultValue(), 2
 
 
-class ColorListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
+class ColorListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSocket):
     bl_idname = "an_ColorListSocket"
     bl_label = "Color List Socket"
     dataType = "Color List"

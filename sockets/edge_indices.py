@@ -28,7 +28,7 @@ class EdgeIndicesSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         else: return cls.getDefaultValue(), 2
 
 
-class EdgeIndicesListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
+class EdgeIndicesListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSocket):
     bl_idname = "an_EdgeIndicesListSocket"
     bl_label = "Edge Indices List Socket"
     dataType = "Edge Indices List"

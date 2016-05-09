@@ -45,7 +45,7 @@ class FontSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return cls.getDefaultValue(), 2
 
 
-class FontListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
+class FontListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSocket):
     bl_idname = "an_FontListSocket"
     bl_label = "Font List Socket"
     dataType = "Font List"

@@ -26,7 +26,7 @@ class FCurveSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return cls.getDefaultValue(), 2
 
 
-class FCurveListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
+class FCurveListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSocket):
     bl_idname = "an_FCurveListSocket"
     bl_label = "FCurve List Socket"
     dataType = "FCurve List"

@@ -60,7 +60,7 @@ class SequenceSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return cls.getDefaultValue(), 2
 
 
-class SequenceListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
+class SequenceListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSocket):
     bl_idname = "an_SequenceListSocket"
     bl_label = "Sequence List Socket"
     dataType = "Sequence List"

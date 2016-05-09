@@ -31,7 +31,7 @@ class PolygonSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return cls.getDefaultValue(), 2
 
 
-class PolygonListSocket(bpy.types.NodeSocket, AnimationNodeSocket, ListSocket):
+class PolygonListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSocket):
     bl_idname = "an_PolygonListSocket"
     bl_label = "Polygon List Socket"
     dataType = "Polygon List"
