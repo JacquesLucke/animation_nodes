@@ -265,7 +265,10 @@ class ExceptionDuringExecution(Problem):
         return False
 
     def draw(self, layout):
-        message = "An exception was raised during the execution of a node tree."
+        message = ("An exception was raised during the execution of a node tree. "
+                   "Maybe you can get more details when you choose 'Monitor Execution' "
+                   "as Execution Code Type in the Developer panel. Don't forget to "
+                   "disable it afterwards for optimal performance.")
         writeText(layout, message, autoWidth = True)
 
 class NodeRaisesExceptionDuringExecution(Problem):
