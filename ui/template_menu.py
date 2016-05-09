@@ -11,7 +11,6 @@ class TemplatesMenu(bpy.types.Menu):
         layout.operator("an.grid_arrange_objects_template")
         layout.operator("an.random_vertices_offset_template")
         layout.operator("an.network_from_particles_template")
-        layout.operator("an.transform_individual_polygons_template")
         layout.operator("an.simple_sound_controler_template")
         layout.operator("an.sound_equalizer_template")
         layout.operator("an.distribute_instances_on_spline_template")
@@ -27,7 +26,7 @@ class TemplatesMenuInHeader(bpy.types.Header):
 
     def draw(self, context):
         if context.space_data.tree_type != "an_AnimationNodeTree": return
-    
+
         layout = self.layout
         layout.separator()
         layout.menu("an_templates_menu", text = "Templates")
