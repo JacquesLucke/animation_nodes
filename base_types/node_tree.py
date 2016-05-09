@@ -96,13 +96,18 @@ class AnimationNodeTree(bpy.types.NodeTree):
             self.lastExecutionInfo.executionTime = 0
             return
 
+        allExecutionsSuccessfull = True
+
         start = time.clock()
         for unit in units:
-            unit.execute()
+            success = unit.execute()
+            if not success:
+                allExecutionsSuccessfull = False
         end = time.clock()
 
-        self.lastExecutionInfo.executionTime = end - start
-        self.lastExecutionInfo.updateVersions()
+        if allExecutionsSuccessfull:
+            self.lastExecutionInfo.executionTime = end - start
+            self.lastExecutionInfo.updateVersions()
 
     @property
     def hasMainExecutionUnits(self):

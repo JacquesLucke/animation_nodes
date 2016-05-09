@@ -36,10 +36,12 @@ class MainExecutionUnit:
     def executeUnit(self):
         try:
             exec(self.executeCodeObject, self.executionData, self.executionData)
+            return True
         except:
             print("\n"*5)
             traceback.print_exc()
             ExceptionDuringExecution().report()
+            return False
 
 
     def getCodes(self):
