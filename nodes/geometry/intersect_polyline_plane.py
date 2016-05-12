@@ -22,17 +22,17 @@ class IntersectPolylinePlaneNode(bpy.types.Node, AnimationNode):
         default = True, update = executionCodeChanged)
         
     def create(self):
-        self.newInput("Vector", "Positions", "positions")
+        self.newInput("Vector List", "Positions", "positions")
         self.newInput("Edge Indices List", "Edge Indices", "edges")
         self.inputs[1].useIsUsedProperty = True
         self.inputs[1].isUsed = False
         self.newInput("Vector", "Plane Point", "planePoint")
-        self.newInput("Vector", "Plane Normal", "planeNormal").value = (0, 0, 1)
+        self.newInput("Vector", "Plane Normal", "planeNormal", value = (0, 0, 1))
 
         self.newOutput("Vector List", "Intersections List", "intersections")
-        self.newOutput("Integer List", "Intersected Edge Index", "cutEdges").hide = True
-        self.newOutput("Integer List", "Intersected Edge Plane Side", "cutEdgesDir").hide = True
-        self.newOutput("Boolean", "Is Valid", "isValid").hide = True
+        self.newOutput("Integer List", "Intersected Edge Index", "cutEdges", hide = True)
+        self.newOutput("Integer List", "Intersected Edge Plane Side", "cutEdgesDir", hide = True)
+        self.newOutput("Boolean", "Is Valid", "isValid", hide = True)
         
     def draw(self, layout):
         if self.edgesType == 'POINTS': layout.prop(self, "cyclic")
