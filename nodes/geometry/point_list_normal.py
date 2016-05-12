@@ -12,7 +12,6 @@ class PointListNormalNode(bpy.types.Node, AnimationNode):
     errorMessage = StringProperty()
         
     def create(self):
-        self.width = 160
         self.newInput("Vector List", "Point List", "points")
         self.newOutput("Vector", "Normal", "normal")
         self.newOutput("Boolean", "Is Valid", "isValid")
@@ -22,8 +21,12 @@ class PointListNormalNode(bpy.types.Node, AnimationNode):
             writeText(layout, self.errorMessage, icon = "ERROR", width = 20)
         
     def getExecutionCode(self):
-        yield "if len(points) > 2: normal, self.errorMessage = mathutils.geometry.normal(points), ''"
-        yield "else: normal, self.errorMessage = mathutils.Vector((0, 0, 0)), 'Expected min 3 different vectors'"
+        yield "if len(points) > 2:"
+        yield "    normal = mathutils.geometry.normal(points)"
+        yield "    self.errorMessage =  '' "
+        yield "else:"
+        yield "    normal = mathutils.Vector((0, 0, 0))"
+        yield "    self.errorMessage =  'Expected min 3 different vectors' "
 
         yield "isValid = normal[:] != (0, 0, 0)"
         
