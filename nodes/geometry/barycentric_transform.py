@@ -34,13 +34,13 @@ class BarycentricTransformNode(bpy.types.Node, AnimationNode):
         
         if self.operationType == "POINT":
             self.newInput("Vector", "Location", "point")
-            self.newInput("Vector List", "Source Triangle Points", "t1")
-            self.newInput("Vector List", "Target Triangle Points", "t2")
+            self.newInput("Vector List", "Source Triangle Points", "sourceTrianglePoints")
+            self.newInput("Vector List", "Target Triangle Points", "targetTrianglePoints")
             self.newOutput("Vector", "Morphed Location", "location")
         if self.operationType == "LIST":
             self.newInput("Vector List", "Location List", "pointList")
-            self.newInput("Vector List", "Source Triangle Points", "t1")
-            self.newInput("Vector List", "Target Triangle Points", "t2")
+            self.newInput("Vector List", "Source Triangle Points", "sourceTrianglePoints")
+            self.newInput("Vector List", "Target Triangle Points", "targetTrianglePoints")
             self.newOutput("Vector List", "Morphed Locations", "locationList")
 
     def draw(self, layout):
@@ -56,13 +56,13 @@ class BarycentricTransformNode(bpy.types.Node, AnimationNode):
   
     def getExecutionCode(self):
 
-        yield "self.errorMessage = self.barycentricValidTriInputs(t1, t2)"
+        yield "self.errorMessage = self.barycentricValidTriInputs(sourceTrianglePoints, targetTrianglePoints)"
         yield "if self.errorMessage == '': "
         if self.operationType == "POINT":
-            yield "    location = self.barycentricTransform(point, t1, t2)"
+            yield "    location = self.barycentricTransform(point, sourceTrianglePoints, targetTrianglePoints)"
             yield "else: location = point"
         elif self.operationType == "LIST":
-            yield "    locationList = [self.barycentricTransform(p, t1, t2) for p in pointList]"
+            yield "    locationList = [self.barycentricTransform(p, sourceTrianglePoints, targetTrianglePoints) for p in pointList]"
             yield "else: locationList = []"
 
 
