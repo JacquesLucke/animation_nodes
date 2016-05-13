@@ -8,7 +8,7 @@ class IntersectLineSphereNode(bpy.types.Node, AnimationNode):
     bl_label = "Intersect Line Sphere"
     bl_width_default = 160
     
-    clip = BoolProperty(default = False, update = propertyChanged,
+    clip = BoolProperty(name = "Clip Inside Line", default = False, update = propertyChanged,
         description = "Only consider intersections inside the line, otherwise line is infinite")
         
     def create(self):
