@@ -72,7 +72,9 @@ class SimpleConvert(LinkCorrection):
         ("Object", "Matrix") : "an_ObjectMatrixInputNode",
         ("Polygon List", "Mesh Data") : "an_MeshDataFromPolygonsNode",
         ("Object", "Shape Key List") : "an_ShapeKeysFromObjectNode",
-        ("String", "Float") : "an_ParseNumberNode"
+        ("String", "Float") : "an_ParseNumberNode",
+        ("Vector", "Euler") : "an_DirectionToRotationNode",
+        ("Euler", "Vector") : "an_RotationToDirectionNode"
     }
 
     def check(self, origin, target):
@@ -100,24 +102,6 @@ class ConvertNormalToEuler(LinkCorrection):
         return origin.dataType == "Vector" and origin.name == "Normal" and target.dataType == "Euler"
     def insert(self, nodeTree, origin, target, dataOrigin):
         insertLinkedNode(nodeTree, "an_DirectionToRotationNode", origin, target)
-
-class ConvertVectorToEuler(LinkCorrection):
-    def check(self, origin, target):
-        return origin.dataType == "Vector" and target.dataType == "Euler"
-    def insert(self, nodeTree, origin, target, dataOrigin):
-        node = insertLinkedNode(nodeTree, "an_ConvertVectorAndEulerNode", origin, target)
-        node.conversionType = "VECTOR_TO_EULER"
-        node.inputs[0].linkWith(origin)
-        node.outputs[0].linkWith(target)
-
-class ConvertEulerToVector(LinkCorrection):
-    def check(self, origin, target):
-        return origin.dataType == "Euler" and target.dataType == "Vector"
-    def insert(self, nodeTree, origin, target, dataOrigin):
-        node = insertLinkedNode(nodeTree, "an_ConvertVectorAndEulerNode", origin, target)
-        node.conversionType = "EULER_TO_VECTOR"
-        node.inputs[0].linkWith(origin)
-        node.outputs[0].linkWith(target)
 
 class ConvertEulerToQuaternion(LinkCorrection):
     def check(self, origin, target):
@@ -257,8 +241,6 @@ linkCorrectors = [
     ConvertObjectToMeshData(),
     ConvertSeparatedMeshDataToBMesh(),
     ConvertVectorListToSplineList(),
-    ConvertVectorToEuler(),
-    ConvertEulerToVector(),
     ConvertEulerToQuaternion(),
     ConvertQuaternionToEuler(),
     ConvertFloatToScale(),
