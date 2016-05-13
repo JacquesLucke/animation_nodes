@@ -92,7 +92,7 @@ class Polygon:
         return Polygon(
                  vertexLocations,
                  bmeshFace.normal,
-                 bmeshFace.calc_center_median(),
+                 bmeshFace.calc_center_median_weighted() if centerWeighted else bmeshFace.calc_center_median(),
                  bmeshFace.calc_area(),
                  bmeshFace.material_index)
  

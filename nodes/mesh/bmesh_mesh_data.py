@@ -1,11 +1,16 @@
 import bpy
 from bpy.props import *
+from ... events import propertyChanged
 from ... base_types.node import AnimationNode
 from ... data_structures.mesh import Polygon, Vertex
 
 class BMeshMeshDataNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_BMeshMeshDataNode"
     bl_label = "BMesh Mesh Data"
+
+    centerWeighted = BoolProperty(name = "Weigthed Center", default = False,
+        description = "Center weigthed by edges length instead of normal median",
+        update = propertyChanged)
 
     def create(self):
         self.newInput("BMesh", "BMesh", "bm")
@@ -16,14 +21,12 @@ class BMeshMeshDataNode(bpy.types.Node, AnimationNode):
         self.newOutput("Vertex List", "Vertices", "vertices")
         self.newOutput("Polygon List", "Polygons", "polygons")
 
+    def drawAdvanced(self, layout):
+        layout.prop(self, "centerWeighted")
+
     def getExecutionCode(self):
         isLinked = self.getLinkedOutputsDict()
         if not any(isLinked.values()): return
-
-#        yield "meshName = ''"
-#        yield "if getattr(object, 'type', '') == 'MESH':"
-#        yield "    mesh = self.getMesh(object, useModifiers, scene)"
-#        yield "    meshName = mesh.name"
 
         yield "if bm:"
         if isLinked["vertexLocations"]:
@@ -35,20 +38,10 @@ class BMeshMeshDataNode(bpy.types.Node, AnimationNode):
         if isLinked["vertices"]:
             yield "    vertices = self.getVertices(bm)"
         if isLinked["polygons"]:
-            yield "    polygons = self.getPolygons(bm)"
+            yield "    polygons = self.getPolygons(bm, self.centerWeighted)"
 
-#        yield "    self.clearMesh(mesh, useModifiers, scene)"
         yield "else: vertexLocations, edgeIndices, polygonIndices, vertices, polygons = [], [], [], [], []"
 
-
-#    def getMesh(self, object, useModifiers, scene):
-#        if useModifiers and scene is not None:
-#            settings = "RENDER" if isRendering() else "PREVIEW"
-#            return object.to_mesh(scene = scene, apply_modifiers = True, settings = settings)
-#        return object.data
-
-#    def clearMesh(self, mesh, useModifiers, scene):
-#        if useModifiers and scene is not None: bpy.data.meshes.remove(mesh)
 
     def getVertexLocations(self, BMesh):
         return [v.co for v in BMesh.verts]
@@ -62,5 +55,5 @@ class BMeshMeshDataNode(bpy.types.Node, AnimationNode):
     def getVertices(self, BMesh):
         return [Vertex.fromBMeshVert(vert) for vert in BMesh.verts]
 
-    def getPolygons(self, BMesh):
-        return [Polygon.fromBMeshFace(face) for face in BMesh.faces]
+    def getPolygons(self, BMesh, centerWeighted):
+        return [Polygon.fromBMeshFace(face, centerWeighted) for face in BMesh.faces]
