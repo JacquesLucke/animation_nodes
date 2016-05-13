@@ -312,7 +312,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
 
     def getSourceObjectData(self, sourceObject):
         if self.copyFromSource:
-            if self.deepCopy:
+            if self.deepCopy and sourceObject.data is not None:
                 return sourceObject.data.copy()
             else:
                 return sourceObject.data
