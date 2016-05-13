@@ -1,7 +1,6 @@
 import bpy
 from bpy.props import *
 from bpy.types import NlaStrip
-from .. events import propertyChanged
 from .. base_types.socket import AnimationNodeSocket
 
 class NLAStripSocket(bpy.types.NodeSocket, AnimationNodeSocket):
@@ -12,7 +11,7 @@ class NLAStripSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     drawColor = (0.26, 0.20, 0.06, 1)
     storable = False
     comparable = True
-    
+
     @classmethod
     def getDefaultValue(cls):
         return None
