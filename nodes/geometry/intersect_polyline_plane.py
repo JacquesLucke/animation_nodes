@@ -18,7 +18,8 @@ class IntersectPolylinePlaneNode(bpy.types.Node, AnimationNode):
     edgesType = EnumProperty(name = "Plane Type", default = "POINTS",
         items = edgesTypeItems, update = edgesTypeChanged)
     message = StringProperty(name = "Message", default = "Expecting Points")
-    cyclic = BoolProperty(name = "Cyclic points", description = "Consider last point to first point also", 
+    cyclic = BoolProperty(name = "Cyclic Points", 
+        description = "Consider last point to first point also, for closed polygon or cyclic spline", 
         default = True, update = executionCodeChanged)
         
     def create(self):
