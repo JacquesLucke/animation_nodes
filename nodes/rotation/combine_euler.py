@@ -25,3 +25,6 @@ class CombineEulerNode(bpy.types.Node, AnimationNode):
             return "euler = Euler((x * {0}, y * {0}, z * {0}), 'XYZ')".format(toRadian)
         else:
             return "euler = Euler((x, y, z), 'XYZ')"
+
+    def getUsedModules(self):
+        return ["math"]
