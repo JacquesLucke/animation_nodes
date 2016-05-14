@@ -191,4 +191,14 @@ def readFile(path):
 def changeFileName(path, newName):
     return join(dirname(path), newName)
 
+listData = [
+    ("CharList", "char"),          ("UCharList", "unsigned char"),
+    ("LongList", "long"),          ("ULongList", "unsigned long"),
+    ("IntegerList", "int"),        ("UIntegerList", "unsigned int"),
+    ("FloatList", "float"),        ("UFloatList", "unsigned float"),
+    ("ShortList", "short"),        ("UShortList", "unsigned short"),
+    ("DoubleList", "double"),      ("UDoubleList", "unsigned double"),
+    ("LongLongList", "long long"), ("ULongLongList", "unsigned long long"),
+]
+
 main()
