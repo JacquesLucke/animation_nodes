@@ -54,6 +54,13 @@ class Vertex:
     __slots__ = ("location", "normal", "groupWeights")
 
     @staticmethod
+    def fromBMeshVert(bmeshVert):
+        return Vertex(
+                 bmeshVert.co,
+                 bmeshVert.normal,
+                 [])
+
+    @staticmethod
     def fromMeshVertexInLocalSpace(meshVertex):
         return Vertex(
                  meshVertex.co.copy(),
@@ -79,6 +86,16 @@ class Vertex:
 class Polygon:
     __slots__ = ("vertexLocations", "normal", "center", "area", "materialIndex")
 
+    @staticmethod
+    def fromBMeshFace(bmeshFace, centerWeighted = False):
+        vertexLocations = [v.co for v in bmeshFace.verts]
+        return Polygon(
+                 vertexLocations,
+                 bmeshFace.normal,
+                 bmeshFace.calc_center_median_weighted() if centerWeighted else bmeshFace.calc_center_median(),
+                 bmeshFace.calc_area(),
+                 bmeshFace.material_index)
+ 
     @staticmethod
     def fromMeshPolygonInLocalSpace(meshPolygon, allVertexLocations):
         vertexLocations = [allVertexLocations[index].copy() for index in meshPolygon.vertices]
