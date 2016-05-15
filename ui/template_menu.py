@@ -1,5 +1,4 @@
 import bpy
-from . node_menu import SubprogramsMenu
 
 class TemplatesMenu(bpy.types.Menu):
     bl_idname = "an_templates_menu"
