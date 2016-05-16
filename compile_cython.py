@@ -50,6 +50,7 @@ initialArgs = sys.argv[:]
 def main():
     if canCompileCython():
         preprocessor()
+        #return
         compileCythonFiles()
 
 def canCompileCython():
@@ -67,6 +68,20 @@ def canCompileCython():
 ###################################################################
 
 def preprocessor():
+    for path in iterPathsWithSuffix(".pre"):
+        code = readFile(path)
+        codeBlock = compile(code, path, "exec")
+        context = {
+            "__file__" : abspath(path),
+            "baseLists" : baseListsData,
+            "readFile" : readFile,
+            "writeFile" : writeFile,
+            "multiReplace" : multiReplace,
+            "dependenciesChanged" : dependenciesChanged,
+            "changeFileName" : changeFileName}
+        exec(codeBlock, context, context)
+
+    return
     for path in chain(iterPathsWithSuffix(".pyxt"), iterPathsWithSuffix(".pxdt")):
         lastModificationTime = os.stat(path).st_mtime
 
@@ -191,14 +206,24 @@ def readFile(path):
 def changeFileName(path, newName):
     return join(dirname(path), newName)
 
-listData = [
+def multiReplace(text, **replacements):
+    for key, value in replacements.items():
+        text = text.replace(key, value)
+    return text
+
+def dependenciesChanged(target, dependencies):
+    try: targetTime = os.stat(target).st_mtime
+    except FileNotFoundError: targetTime = 0
+    latestDependencyModification = max(os.stat(path).st_mtime for path in dependencies)
+    return targetTime < latestDependencyModification
+
+baseListsData = [
+    ("FloatList", "float"),
+    ("DoubleList", "double"),
     ("CharList", "char"),          ("UCharList", "unsigned char"),
     ("LongList", "long"),          ("ULongList", "unsigned long"),
     ("IntegerList", "int"),        ("UIntegerList", "unsigned int"),
-    ("FloatList", "float"),        ("UFloatList", "unsigned float"),
     ("ShortList", "short"),        ("UShortList", "unsigned short"),
-    ("DoubleList", "double"),      ("UDoubleList", "unsigned double"),
-    ("LongLongList", "long long"), ("ULongLongList", "unsigned long long"),
-]
+    ("LongLongList", "long long"), ("ULongLongList", "unsigned long long") ]
 
 main()
