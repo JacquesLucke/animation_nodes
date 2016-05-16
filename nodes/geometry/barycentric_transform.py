@@ -68,6 +68,7 @@ class BarycentricTransformNode(bpy.types.Node, AnimationNode):
             return 'Expected 3 vectors for Target Triangle'
         if any((sourceTri[0]==sourceTri[1],
                 sourceTri[1]==sourceTri[2],
+                sourceTri[2]==sourceTri[0])):
             return 'Expected 3 Different vectors for Source'
         return ''
 
