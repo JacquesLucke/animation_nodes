@@ -11,27 +11,27 @@ class IntersectSphereSphereNode(bpy.types.Node, AnimationNode):
         self.newInput("Float", "Sphere 1 Radius", "radius1", value = 1)
         self.newInput("Vector", "Sphere 2 Center", "center2", value = (0, 0, 1))
         self.newInput("Float", "Sphere 2 Radius", "radius2", value = 1)
-        
+
         self.newOutput("Vector", "Circle Center", "center")
         self.newOutput("Vector", "Circle Normal", "normal")
         self.newOutput("Float", "Circle Radius", "radius")
         self.newOutput("Boolean", "Is Valid", "isValid", hide = True)
-        
+
     def getExecutionCode(self):
         isLinked = self.getLinkedOutputsDict()
         if not any(isLinked.values()): return ""
-    
+
         center  = isLinked["center"]
         normal  = isLinked["normal"]
         radius  = isLinked["radius"]
         isValid = isLinked["isValid"]
-        
+
         yield "if center1 == center2: "
-        if center : yield "    center = mathutils.Vector((0,0,0))"
-        if normal : yield "    normal = mathutils.Vector((0,0,0))"
+        if center : yield "    center = Vector((0,0,0))"
+        if normal : yield "    normal = Vector((0,0,0))"
         if radius : yield "    radius = 0"
         if isValid: yield "    isValid = False"
-    
+
         yield "else:"
         yield "    dif = (center2 - center1)"
         yield "    dist = dif.length"
@@ -43,10 +43,10 @@ class IntersectSphereSphereNode(bpy.types.Node, AnimationNode):
         if radius : yield "        radius = intx[1] * 2"
         if isValid: yield "        isValid = True"
         yield "    else:"
-        if center : yield "        center = mathutils.Vector((0,0,0))"
-        if normal : yield "        normal = mathutils.Vector((0,0,0))"
+        if center : yield "        center = Vector((0,0,0))"
+        if normal : yield "        normal = Vector((0,0,0))"
         if radius : yield "        radius = 0"
         if isValid: yield "        isValid = False"
-        
+
     def getUsedModules(self):
         return ["mathutils"]
