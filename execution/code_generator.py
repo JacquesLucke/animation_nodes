@@ -120,12 +120,15 @@ def iterNodeExecutionLines_Monitored(node, variables):
     try:
         for line in iterRealNodeExecutionLines(node, variables):
             yield "    " + line
+        for socket in node.linkedOutputs:
+            yield "    if not ({0} in globals() or {0} in locals()): raise Exception({1})".format(
+                repr(variables[socket]), repr("Socket output has not been calculated: " + repr(socket.getDisplayedName())))
     except:
         handleExecutionCodeCreationException(node)
     yield "    pass"
-    yield "except:"
+    yield "except Exception as e:"
     yield "    animation_nodes.problems.NodeRaisesExceptionDuringExecution({}).report()".format(repr(node.identifier))
-    yield "    raise Exception()"
+    yield "    raise Exception(str(e))"
 
 def iterNodeExecutionLines_MeasureTimes(node, variables):
     yield from iterNodePreExecutionLines(node, variables)
