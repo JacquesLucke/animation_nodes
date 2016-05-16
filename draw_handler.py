@@ -1,5 +1,6 @@
 import bpy
 from . preferences import getExecutionCodeType
+from . ui.problems_panel import drawWarningOverlay
 from . ui.node_editor_hud import drawNodeEditorHud
 from . execution.measurements import drawMeasurementResults
 from . nodes.generic.debug_drawer import drawDebugTextBoxes
@@ -11,6 +12,7 @@ def drawNodeEditor():
     if getExecutionCodeType() == "MEASURE":
         drawMeasurementResults()
     drawNodeEditorHud()
+    drawWarningOverlay()
 
 _nodeDrawHandler = None
 def register():
