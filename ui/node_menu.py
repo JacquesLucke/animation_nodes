@@ -578,10 +578,9 @@ class SubprogramsMenu(bpy.types.Menu):
             for network in getSubprogramNetworks():
                 insertNode(layout, "an_InvokeSubprogramNode", "-  " + network.name, {"subprogramIdentifier" : repr(network.identifier)})
         layout.separator()
-        layout.label("New:")
-        insertNode(layout, "an_GroupInputNode", "   Group")
-        insertNode(layout, "an_LoopInputNode", "   Loop")
-        insertNode(layout, "an_ScriptNode", "   Script")
+        insertNode(layout, "an_GroupInputNode", "Group")
+        insertNode(layout, "an_LoopInputNode", "Loop")
+        insertNode(layout, "an_ScriptNode", "Script")
         layout.separator()
         insertNode(layout, "an_ExpressionNode", "Expression")
 
