@@ -50,7 +50,7 @@ class BarycentricTransformNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         yield "self.errorMessage = self.barycentricValidTriInputs(sourceTrianglePoints, targetTrianglePoints)"
-        yield "if self.errorMessage == '': "
+        yield "if self.errorMessage == '':"
         if self.operationType == "POINT":
             yield "    location = self.barycentricTransform(point, sourceTrianglePoints, targetTrianglePoints)"
             yield "else: location = point"
