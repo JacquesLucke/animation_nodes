@@ -202,15 +202,14 @@ def handleExecutionCodeCreationException(node):
 # Modify Socket Variables
 ##########################################
 
-def linkOutputSocketsToTargets(node, variables, nodeByID):
-    resolveInnerLinks(node, variables)
-    for socket in node.linkedOutputs:
-        yield from linkSocketToTargets(socket, node, variables, nodeByID)
-
 def resolveInnerLinks(node, variables):
     inputs, outputs = node.inputsByIdentifier, node.outputsByIdentifier
     for inputName, outputName in node.iterInnerLinks():
         variables[outputs[outputName]] = variables[inputs[inputName]]
+
+def linkOutputSocketsToTargets(node, variables, nodeByID):
+    for socket in node.linkedOutputs:
+        yield from linkSocketToTargets(socket, node, variables, nodeByID)
 
 def linkSocketToTargets(socket, node, variables, nodeByID):
     targets = tuple(iterLinkedSocketsWithInfo(socket, node, nodeByID))
