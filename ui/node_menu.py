@@ -523,6 +523,7 @@ class GeometryMenu(bpy.types.Menu):
         layout = self.layout
         insertNode(layout, "an_ConvertPlaneTypeNode", "Point/Normal to Matrix", {"conversionType" : repr("POINT_NORMAL_TO_MATRIX")})
         insertNode(layout, "an_ConvertPlaneTypeNode", "Matrix to Point/Normal", {"conversionType" : repr("MATRIX_TO_POINT_NORMAL")})
+        insertNode(layout, "an_PointListNormalNode", "Point List Normal")
         layout.separator()
         insertNode(layout, "an_ProjectPointOnLineNode", "Project Point on Line")
         insertNode(layout, "an_ProjectPointOnPlaneNode", "Project Point on Plane")
@@ -531,8 +532,13 @@ class GeometryMenu(bpy.types.Menu):
         insertNode(layout, "an_IntersectLinePlaneNode", "Intersect Line Plane")
         insertNode(layout, "an_IntersectLineSphereNode", "Intersect Line Sphere")
         insertNode(layout, "an_IntersectPlanePlaneNode", "Intersect Plane Plane")
+        insertNode(layout, "an_IntersectSpherePlaneNode", "Intersect Plane Sphere")
+        insertNode(layout, "an_IntersectSphereSphereNode", "Intersect Sphere Sphere")
         layout.separator()
         insertNode(layout, "an_IntersectPolylinePlaneNode", "Intersect Polyline Plane")
+        layout.separator()
+        insertNode(layout, "an_BarycentricTransformNode", "Barycentric Transform")
+        insertNode(layout, "an_BarycentricTransformNode", "Barycentric Transform List", {"operationType" : repr("LIST")})
 
 
 class KDTreeAndBVHTreeMenu(bpy.types.Menu):
