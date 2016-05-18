@@ -538,8 +538,6 @@ class GeometryMenu(bpy.types.Menu):
         insertNode(layout, "an_IntersectPolylinePlaneNode", "Intersect Polyline Plane")
         layout.separator()
         insertNode(layout, "an_BarycentricTransformNode", "Barycentric Transform")
-        insertNode(layout, "an_BarycentricTransformNode", "Barycentric Transform List", {"operationType" : repr("LIST")})
-
 
 class KDTreeAndBVHTreeMenu(bpy.types.Menu):
     bl_idname = "an_kdtree_bvhtree_menu"
