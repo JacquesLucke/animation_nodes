@@ -184,6 +184,7 @@ class TextMenu(bpy.types.Menu):
         layout.separator()
         insertNode(layout, "an_TextBlockReaderNode", "Block Reader")
         insertNode(layout, "an_TextBlockWriterNode", "Block Writer")
+        insertNode(layout, "an_TextFileReaderNode", "File Reader")
         layout.separator()
         insertNode(layout, "an_TextSequenceOutputNode", "Sequence Output")
         insertNode(layout, "an_CharacterPropertiesOutputNode", "Character Property")
