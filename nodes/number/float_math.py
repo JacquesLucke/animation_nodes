@@ -29,7 +29,7 @@ operationItems = [
     ("SNAP", "Snap", "snap A to Step ", "", 22),
     ("ARCTANGENT2", "Arctangent B/A", "atan2 (B / A)", "", 23),
     ("HYPOTENUSE", "Hypotenuse", "hypot A, B", "", 24),
-    ("COPY_SIGN", "A sign of B", "A sign of B", "", 25)]
+    ("COPY_SIGN", "Copy Sign", "A sign of B", "", 25)]
 
 secondInputOperations = ("ADD", "SUBTRACT", "MULTIPLY", "DIVIDE", "POWER",
     "MINIMUM", "MAXIMUM", "MODULO", "ARCTANGENT2", "HYPOTENUSE", "COPY_SIGN")
@@ -185,9 +185,9 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
         self.operationButton(subcol, "DIVIDE", "Divide")
         self.operationButton(subcol, "MODULO", "Modulo")
         subcol = col.column(align = True)
-        self.operationButton(subcol, "COPY_SIGN", "A sign of B")
         self.operationButton(subcol, "INVERT", "Invert")
         self.operationButton(subcol, "RECIPROCAL", "Reciprocal")
+        self.operationButton(subcol, "COPY_SIGN", "Copy Sign")
 
         col = row.column()
         subcol = col.column(align = True)
