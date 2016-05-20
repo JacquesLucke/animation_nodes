@@ -28,10 +28,11 @@ operationItems = [
     ("RECIPROCAL", "Reciprocal", "1 / A", "", 21),
     ("SNAP", "Snap", "snap A to Step ", "", 22),
     ("ARCTANGENT2", "Arctangent B/A", "atan2 (B / A)", "", 23),
-    ("HYPOTENUSE", "Hypotenuse", "hypot A, B", "", 24)]
+    ("HYPOTENUSE", "Hypotenuse", "hypot A, B", "", 24),
+    ("COPY_SIGN", "A sign of B", "A sign of B", "", 25)]
 
 secondInputOperations = ("ADD", "SUBTRACT", "MULTIPLY", "DIVIDE", "POWER",
-                "MINIMUM", "MAXIMUM", "MODULO", "ARCTANGENT2", "HYPOTENUSE")
+    "MINIMUM", "MAXIMUM", "MODULO", "ARCTANGENT2", "HYPOTENUSE", "COPY_SIGN")
 baseInputOperations = ("LOGARITHM", )
 stepSizeInputOperations = ("SNAP", )
 
@@ -125,6 +126,7 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
         if op == "FLOOR": yield "result = math.floor(a)"
         if op == "CEILING": yield "result = math.ceil(a)"
         if op == "SQRT": yield "result = math.sqrt(a) if a >= 0 else 0"
+        if op == "COPY_SIGN": yield "result = math.copysign(a, b)"
         if op == "INVERT": yield "result = - a"
         if op == "RECIPROCAL": yield "result = 1 / a if a != 0 else 0"
         if op == "SNAP": yield "result = round(a / stepSize) * stepSize if stepSize != 0 else a"
@@ -183,6 +185,7 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
         self.operationButton(subcol, "DIVIDE", "Divide")
         self.operationButton(subcol, "MODULO", "Modulo")
         subcol = col.column(align = True)
+        self.operationButton(subcol, "COPY_SIGN", "A sign of B")
         self.operationButton(subcol, "INVERT", "Invert")
         self.operationButton(subcol, "RECIPROCAL", "Reciprocal")
 
