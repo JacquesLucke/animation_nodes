@@ -40,7 +40,7 @@ class IntersectSphereSphereNode(bpy.types.Node, AnimationNode):
         yield "    if intx is not None:"
         if center : yield "        center = center1.lerp(center2, intx[0]/dist)"
         if normal : yield "        normal = dif.normalized()"
-        if radius : yield "        radius = intx[1] * 2"
+        if radius : yield "        radius = intx[1]"
         if isValid: yield "        isValid = True"
         yield "    else:"
         if center : yield "        center = Vector((0,0,0))"
