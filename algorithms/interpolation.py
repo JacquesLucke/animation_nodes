@@ -222,9 +222,6 @@ def sinOut(x):
 
 # Specials
 
-def curveMapping(x, curve):
-    return min(max((curve.evaluate(x) - 0.25) * 2, -0.5), 1.5)
-
 def fCurveMapping(x, settings):
     fCurve, xMove, xFactor, yMove, yDivisor = settings
     x = x * xFactor + xMove
