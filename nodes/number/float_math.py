@@ -29,10 +29,11 @@ operationItems = [
     ("SNAP", "Snap", "snap A to Step ", "", 22),
     ("ARCTANGENT2", "Arctangent B/A", "atan2 (B / A)", "", 23),
     ("HYPOTENUSE", "Hypotenuse", "hypot A, B", "", 24),
-    ("COPY_SIGN", "Copy Sign", "A sign of B", "", 25)]
+    ("COPY_SIGN", "Copy Sign", "A sign of B", "", 25),
+    ("FLOOR_DIV", "Floor Division", "floor(A / B)", "", 26)]
 
 secondInputOperations = ("ADD", "SUBTRACT", "MULTIPLY", "DIVIDE", "POWER",
-    "MINIMUM", "MAXIMUM", "MODULO", "ARCTANGENT2", "HYPOTENUSE", "COPY_SIGN")
+    "MINIMUM", "MAXIMUM", "MODULO", "ARCTANGENT2", "HYPOTENUSE", "COPY_SIGN", "FLOOR_DIV")
 baseInputOperations = ("LOGARITHM", )
 stepSizeInputOperations = ("SNAP", )
 
@@ -130,6 +131,8 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
         if op == "INVERT": yield "result = - a"
         if op == "RECIPROCAL": yield "result = 1 / a if a != 0 else 0"
         if op == "SNAP": yield "result = round(a / stepSize) * stepSize if stepSize != 0 else a"
+        if op == "FLOOR_DIV": yield from ("if b == 0: result = 0",
+                                          "else: result = a // b")
 
         if self.outputs[0].dataType == "Integer":
             yield "result = int(result)"
@@ -184,6 +187,7 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
         self.operationButton(subcol, "MULTIPLY", "Multiply")
         self.operationButton(subcol, "DIVIDE", "Divide")
         self.operationButton(subcol, "MODULO", "Modulo")
+        self.operationButton(subcol, "FLOOR_DIV", "Floor Division")
         subcol = col.column(align = True)
         self.operationButton(subcol, "INVERT", "Invert")
         self.operationButton(subcol, "RECIPROCAL", "Reciprocal")
