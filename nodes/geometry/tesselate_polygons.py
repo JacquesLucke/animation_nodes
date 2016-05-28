@@ -15,8 +15,7 @@ polyTypeItems = [
     ("INDICES_LIST", "Poly Indices List", "", "", 2),
     ("MESH", "Mesh Data", "", "", 3),
     ("POLY", "Polygon", "", "", 4),
-    ("POLY_LIST", "Polygon List", "", "", 5),
-    ("BMESH", "Bmesh", "", "", 6)]
+    ("POLY_LIST", "Polygon List", "", "", 5)]
 
 typesWithLoopFix = ["INDICES_LIST", "MESH"]
 
@@ -48,10 +47,6 @@ class PolygonsTessellateNode(bpy.types.Node, AnimationNode):
                 
     polyType = EnumProperty(name = "Polygon  Definition", default = "INDICES_LIST",
                 items = polyTypeItems, update = polyTypeChanged)
-    bmeshQuad = IntProperty(name = "Quad Method", update = propertyChanged, max = 3, min = 0)
-    bmeshNgon = IntProperty(name = "Ngon Method", update = propertyChanged, max = 1, min = 0)
-
-    errorMessage = StringProperty()
 
     def getActiveEnumOp(self):
         if self.polyType in typesWithLoopFix: 
@@ -96,34 +91,23 @@ class PolygonsTessellateNode(bpy.types.Node, AnimationNode):
             self.newInput("Polygon List", "Polygon List", "polygonList")
             self.newOutput("Polygon List", "Triangulated Polygons", "triPolyList")
             self.newOutput("Integer List", "Matching Ngon Indices", "ngonIndices")
-        
-        elif type == "BMESH":
-            self.newInput("BMesh", "BMesh", "bm")
-            self.newOutput("BMesh", "BMesh", "bmOut")
-
 
     def draw(self, layout):
         layout.prop(self, "polyType", text = "")
         
-        if self.polyType == "BMESH":
-            layout.prop(self, "bmeshQuad")
-            layout.prop(self, "bmeshNgon")
-        elif self.polyType in typesWithLoopFix:
+        if self.polyType in typesWithLoopFix:
             layout.prop(self, "operationFix", expand = True)
         else: 
             layout.prop(self, "operation", expand = True)
         
-        if self.errorMessage != "":
-            writeText(layout, self.errorMessage, icon = "ERROR", width = 20)
-        
     def getExecutionCode(self):
         isLinked = self.getLinkedOutputsDict()
-        if not any(isLinked.values()): return ""
+        if not any(isLinked.values()): return 
     
         type = self.polyType
         op = self.getActiveEnumOp()
-        self.errorMessage = ""
-        
+
+
         if type == "VECTORS":
             yield "triIndices = []"
 
@@ -133,6 +117,7 @@ class PolygonsTessellateNode(bpy.types.Node, AnimationNode):
                 yield "    triIndices = list(self.tesselateVecs(vertexLocations))"
             elif op == "NGON":
                 yield "    triIndices = list(self.tesselatePolyNgon(vertexLocations, range(lenV), False))"
+
 
         elif type == "INDICES":
             yield "triIndices = []"
@@ -167,7 +152,7 @@ class PolygonsTessellateNode(bpy.types.Node, AnimationNode):
         elif type == "MESH":
             yield "triMeshData = meshData"
             yield "triIndices, ngonIndices = [], []"
-        
+
             yield "vertexLocations, polygonIndices = meshData.vertices, meshData.polygons"
             yield "lenV = len(vertexLocations)"
             yield "if lenV > 2 and polygonIndices:"
@@ -190,7 +175,7 @@ class PolygonsTessellateNode(bpy.types.Node, AnimationNode):
             yield "if polygon is not None:"
             yield "    vertexLocations = polygon.vertexLocations"
             yield "    lenV = len(vertexLocations)"
-        
+
             yield "    if lenV < 4: triPolyList = [polygon]"
             yield "    else:"
             if op == "TRI": 
@@ -221,13 +206,6 @@ class PolygonsTessellateNode(bpy.types.Node, AnimationNode):
                 yield "    " * 4 + "triPolyList.append(newPoly)"
             if isLinked["ngonIndices"]: yield "    " * 4 + "ngonIndices.append(p)"
 
-        elif type == "BMESH":
-            yield "bmOut = self.bmeshTriangulate(bm, self.bmeshQuad, self.bmeshNgon)"
-        
-
-    def getUsedModules(self):
-        return ["mathutils"]
-
 
     def isValidPolyIndex(self, lenV, poly):
         return 0 <= min(poly) and max(poly) < lenV
@@ -240,11 +218,3 @@ class PolygonsTessellateNode(bpy.types.Node, AnimationNode):
 
     def tesselatePolyNgon(self, vecs, poly, fix):
         return (tuple(poly[i] for i in t) for t in ngon_tessellate(vecs, poly, fix_loops=fix))
-
-    def bmeshTriangulate(self, bm, quad, ngon):
-        bmOut = bm
-        faces = bmOut.faces[:]
-        triangulate(bmOut, faces=faces, quad_method = quad, ngon_method = ngon)
-        return bmOut
-
-
