@@ -25,7 +25,7 @@ class BMeshTessellateNode(bpy.types.Node, AnimationNode):
         isLinked = self.getLinkedOutputsDict()
         if not any(isLinked.values()): return
         
-        yield "faces = bm.faces[:]"
+        yield "faces = bm.faces"
         
         # do not invert isLinked order, this needs original faces
         if isLinked["ngonIndices"]: 
