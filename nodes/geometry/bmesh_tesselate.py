@@ -17,7 +17,7 @@ class BMeshTessellateNode(bpy.types.Node, AnimationNode):
         self.newOutput("BMesh", "BMesh", "bm")
         self.newOutput("Integer List", "Source Ngon Indices", "ngonIndices", hide = True)
 
-    def draw(self, layout):
+    def drawAdvanced(self, layout):
         layout.prop(self, "quad")
         layout.prop(self, "ngon")
 
@@ -29,7 +29,7 @@ class BMeshTessellateNode(bpy.types.Node, AnimationNode):
         
         # do not invert isLinked order, this needs original faces
         if isLinked["ngonIndices"]: 
-            yield "ngonIndices = list( range(len(faces)) )"
+            yield "ngonIndices = list(range(len(faces)))"
             yield "for face in faces:"
             yield "    indf = face.index"
             yield "    lenf = len(face.verts) - 3"
