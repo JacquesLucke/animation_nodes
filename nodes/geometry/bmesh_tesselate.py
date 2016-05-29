@@ -13,9 +13,9 @@ class BMeshTessellateNode(bpy.types.Node, AnimationNode):
     ngon = IntProperty(name = "Ngon Method", update = propertyChanged, max = 1, min = 0)
 
     def create(self):
-        self.newInput("BMesh", "BMesh", "bm")
+        self.newInput("BMesh", "BMesh", "bm", dataIsModified = True)
         self.newOutput("BMesh", "BMesh", "bm")
-        self.newOutput("Integer List", "Matching Ngon Indices", "ngonIndices", hide = True)
+        self.newOutput("Integer List", "Source Ngon Indices", "ngonIndices", hide = True)
 
     def draw(self, layout):
         layout.prop(self, "quad")
