@@ -128,7 +128,7 @@ def iterNodeExecutionLines_Monitored(node, variables):
     yield "    pass"
     yield "except Exception as e:"
     yield "    animation_nodes.problems.NodeRaisesExceptionDuringExecution({}).report()".format(repr(node.identifier))
-    yield "    raise Exception(str(e))"
+    yield "    raise"
 
 def iterNodeExecutionLines_MeasureTimes(node, variables):
     yield from iterNodePreExecutionLines(node, variables)
