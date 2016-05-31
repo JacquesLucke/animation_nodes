@@ -1,10 +1,8 @@
 import bpy
 from bpy.props import *
-from ... utils.layout import writeText
 from ... tree_info import keepNodeState
-from ... events import executionCodeChanged, propertyChanged
+from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
-from bmesh.ops import triangulate
 from mathutils.geometry import tessellate_polygon
 from bpy_extras.mesh_utils import ngon_tessellate
 
@@ -26,24 +24,19 @@ operationItemsFix = operationItems + [
     ("NGON_FIX", "Ngon Fix Loops", "Slower 4x-5x. Use extras ngon. Solve some loop stuf", "", 2)]
     
 
-class PolygonsTessellateNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_PolygonsTessellateNode"
+class PolygonsTriangulateNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_PolygonsTriangulateNode"
     bl_label = "Triangulate Polygons"
     bl_width_default = 180
-    
-    searchLabels = ["Tesselate Point List", "Tesselate Polygons"]
 
     def polyTypeChanged(self, context):
         self.recreateSockets()
         executionCodeChanged()
-        
-    def operationChanged(self, context):
-        executionCodeChanged()
 
     operation = EnumProperty(name = "Operation", default = "TRI",
-                items = operationItems, update = operationChanged)
+                items = operationItems, update = executionCodeChanged)
     operationFix = EnumProperty(name = "Operation Fix", default = "TRI",
-                items = operationItemsFix, update = operationChanged)
+                items = operationItemsFix, update = executionCodeChanged)
                 
     polyType = EnumProperty(name = "Polygon  Definition", default = "INDICES_LIST",
                 items = polyTypeItems, update = polyTypeChanged)
