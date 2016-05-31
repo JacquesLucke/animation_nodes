@@ -3,11 +3,10 @@ from bpy.props import *
 from ... events import propertyChanged
 from ... base_types.node import AnimationNode
 
-class BMeshTessellateNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_BMeshTessellateNode"
+class BMeshTriangulateNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_BMeshTriangulateNode"
     bl_label = "Triangulate BMesh"
     bl_width_default = 160
-    searchLabels = ["Tesselate BMesh"]
 
     quad = IntProperty(name = "Quad Method", update = propertyChanged, max = 3, min = 0)
     ngon = IntProperty(name = "Ngon Method", update = propertyChanged, max = 1, min = 0)
