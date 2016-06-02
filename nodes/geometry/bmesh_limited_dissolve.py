@@ -1,6 +1,7 @@
 import bpy
 from bpy.props import *
-from ... events import propertyChanged
+from math import radians
+from bmesh.ops import dissolve_limit
 from ... base_types.node import AnimationNode
 
 class BMeshLimitedDissolveNode(bpy.types.Node, AnimationNode):
@@ -14,14 +15,8 @@ class BMeshLimitedDissolveNode(bpy.types.Node, AnimationNode):
         self.newInput("Boolean", "Dissolve Boundries", "dissolveBoundries", value = False)
         self.newOutput("BMesh", "BMesh", "bm")
 
-    def getExecutionCode(self):
-        isLinked = self.getLinkedOutputsDict()
-        if not any(isLinked.values()): return
-
-        if isLinked["bm"]: 
-            yield "bmesh.ops.dissolve_limit(bm, verts = bm.verts, edges = bm.edges,"
-            yield "    angle_limit = math.radians(angleLimit),"
-            yield "    use_dissolve_boundaries = dissolveBoundries)"
-        
-    def getUsedModules(self):
-        return ["math", "bmesh"]
+    def execute(self, bm, angleLimit, dissolveBoundries):
+        dissolve_limit(bm, verts = bm.verts, edges = bm.edges,
+                            angle_limit = radians(angleLimit),
+                            use_dissolve_boundaries = dissolveBoundries)
+        return bm
