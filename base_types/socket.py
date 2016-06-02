@@ -1,6 +1,7 @@
 import bpy
 from bpy.props import *
 from .. utils.recursion import noRecursion
+from .. operators.callbacks import newSocketCallback
 from .. events import treeChanged, executionCodeChanged
 from .. utils.names import getRandomString, toVariableName
 from .. operators.dynamic_operators import getInvokeFunctionOperator
@@ -9,20 +10,17 @@ from .. templates.operators.insert_linked_node import invokeLinkedNodeInsertion
 from .. tree_info import isSocketLinked, getLinkedSockets, getDirectlyLinkedSockets
 
 class SocketTextProperties(bpy.types.PropertyGroup):
-    bl_idname = "an_SocketTextProperties"
     unique = BoolProperty(default = False)
     editable = BoolProperty(default = False)
     variable = BoolProperty(default = False)
 
 class SocketDisplayProperties(bpy.types.PropertyGroup):
-    bl_idname = "an_SocketDisplayProperties"
     text = BoolProperty(default = False)
     textInput = BoolProperty(default = False)
     moveOperators = BoolProperty(default = False)
     removeOperator = BoolProperty(default = False)
 
 class SocketLoopProperties(bpy.types.PropertyGroup):
-    bl_idname = "an_SocketLoopProperties"
 
     def socketLoopPropertyChanged(self, context):
         subprogramInterfaceChanged()
@@ -31,6 +29,9 @@ class SocketLoopProperties(bpy.types.PropertyGroup):
     useAsInput = BoolProperty(default = False, update = socketLoopPropertyChanged)
     useAsOutput = BoolProperty(default = False, update = socketLoopPropertyChanged)
     copyAlways = BoolProperty(default = False, update = socketLoopPropertyChanged)
+
+class SocketExecutionProperties(bpy.types.PropertyGroup):
+    neededCopies = IntProperty(default = 0, min = 0)
 
 class AnimationNodeSocket:
     storable = True
@@ -52,9 +53,36 @@ class AnimationNodeSocket:
     display = PointerProperty(type = SocketDisplayProperties)
     textProps = PointerProperty(type = SocketTextProperties)
     loop = PointerProperty(type = SocketLoopProperties)
+    execution = PointerProperty(type = SocketExecutionProperties)
 
-    dataIsModified = BoolProperty(default = False)
+    dataIsModified = BoolProperty(default = False, update = executionCodeChanged)
     defaultDrawType = StringProperty(default = "TEXT_PROPERTY")
+
+
+    # Overwrite in subclasses
+    ##########################################################
+
+    def setProperty(self, data):
+        pass
+
+    def getProperty(self):
+        return
+
+    @classmethod
+    def getDefaultValue(cls):
+        raise NotImplementedError("All sockets have to define a getDefaultValue method")
+
+    @classmethod
+    def correctValue(cls, value):
+        '''
+        Return Types:
+          If the value has the correct type: (value, 0)
+          If the value has a correctable type: (corrected_value, 1)
+          if the value has a uncorrectable type: (default_value, 2)
+        '''
+        raise NotImplementedError("All sockets have to define a correctValue method")
+
+    ##########################################################
 
     def draw(self, context, layout, node, text):
         displayText = self.getDisplayedName()
@@ -64,25 +92,28 @@ class AnimationNodeSocket:
             row.prop(self, "text", text = "")
         else:
             if self.isInput and self.isUnlinked and self.isUsed:
-                self.drawSocket(row, displayText, self.defaultDrawType)
+                self.drawSocket(row, displayText, node, self.defaultDrawType)
             else:
                 if self.isOutput: row.alignment = "RIGHT"
                 row.label(displayText)
 
         if self.moveable and self.display.moveOperators:
             row.separator()
-            self.invokeFunction(row, "moveUpInGroup", icon = "TRIA_UP")
-            self.invokeFunction(row, "moveDownInGroup", icon = "TRIA_DOWN")
+            self.invokeFunction(row, node, "moveUpInGroup", icon = "TRIA_UP")
+            self.invokeFunction(row, node, "moveDownInGroup", icon = "TRIA_DOWN")
 
         if self.removeable and self.display.removeOperator:
             row.separator()
-            self.invokeFunction(row, "remove", icon = "X")
+            self.invokeFunction(row, node, "remove", icon = "X")
 
         if self.useIsUsedProperty:
+            if self.is_linked and not self.isUsed:
+                row.label("", icon = "QUESTION")
+                row.label("", icon = "TRIA_RIGHT")
             icon = "LAYER_ACTIVE" if self.isUsed else "LAYER_USED"
             row.prop(self, "isUsed", text = "", icon = icon)
 
-    def drawSocket(self, layout, text, drawType = "TEXT_PROPERTY"):
+    def drawSocket(self, layout, text, node, drawType = "TEXT_PROPERTY"):
         '''
         Draw Types:
             TEXT_PROPERTY_OR_NONE: Draw only if a property exists
@@ -99,10 +130,10 @@ class AnimationNodeSocket:
             else: drawType = "TEXT_ONLY"
 
         if drawType == "TEXT_PROPERTY":
-            if self.hasProperty(): self.drawProperty(layout, text)
+            if self.hasProperty(): self.drawProperty(layout, text, node)
             else: layout.label(text)
         elif drawType == "PROPERTY_ONLY":
-            if self.hasProperty(): self.drawProperty(layout, text = "")
+            if self.hasProperty(): self.drawProperty(layout, text = "", node = node)
         elif drawType == "TEXT_ONLY":
             layout.label(text)
 
@@ -114,43 +145,42 @@ class AnimationNodeSocket:
     def draw_color(self, context, node):
         return self.drawColor
 
-    def getValue(self):
-        return None
-
     def copyDisplaySettingsFrom(self, other):
         self.display.text = other.display.text
         self.display.textInput = other.display.textInput
         self.display.moveOperators = other.display.moveOperators
         self.display.removeOperator = other.display.removeOperator
 
-    def setProperty(self, data):
-        pass
-
-    def getProperty(self):
-        return
-
-    def invokeFunction(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True, confirm = False, data = None):
+    def invokeFunction(self, layout, node, functionName, text = "", icon = "NONE", description = "", emboss = True, confirm = False, data = None, passEvent = False):
         idName = getInvokeFunctionOperator(description)
         props = layout.operator(idName, text = text, icon = icon, emboss = emboss)
-        props.classType = "SOCKET"
-        props.treeName = self.nodeTree.name
-        props.nodeName = self.node.name
-        props.isOutput = self.isOutput
-        props.identifier = self.identifier
-        props.functionName = functionName
+        props.callback = self.newCallback(node, functionName)
         props.invokeWithData = data is not None
         props.confirm = confirm
         props.data = str(data)
+        props.passEvent = passEvent
+
+    def invokePathChooser(self, layout, node, functionName, text = "", icon = "NONE", description = "", emboss = True):
+        data = functionName
+        self.invokeFunction(layout, node, "_choosePath", text = text, icon = icon, description = description, emboss = emboss, data = data)
+
+    def _choosePath(self, data):
+        bpy.ops.an.choose_path("INVOKE_DEFAULT",
+            callback = self.newCallback(self.node, data))
+
+    def newCallback(self, node, functionName):
+        return newSocketCallback(self, node, functionName)
 
     def invokeNodeInsertion(self, layout, nodeIdName, toIndex, text, settings = {}):
-        invokeLinkedNodeInsertion(layout, nodeIdName, self.index, toIndex, text, settings)
+        invokeLinkedNodeInsertion(layout, nodeIdName, self.getIndex(), toIndex, text, settings)
 
     def moveUp(self):
-        self.moveTo(self.index - 1)
+        self.moveTo(self.getIndex() - 1)
 
-    def moveTo(self, index):
-        if self.index != index:
-            self.sockets.move(self.index, index)
+    def moveTo(self, index, node = None):
+        ownIndex = self.getIndex(node)
+        if ownIndex != index:
+            self.sockets.move(ownIndex, index)
             self.node.socketMoved()
 
     def moveUpInGroup(self):
@@ -215,7 +245,7 @@ class AnimationNodeSocket:
 
     @property
     def nodeTree(self):
-        return self.node.id_data
+        return self.id_data
 
     @property
     def sockets(self):
@@ -224,11 +254,11 @@ class AnimationNodeSocket:
 
     @property
     def isLinked(self):
-        return isSocketLinked(self)
+        return isSocketLinked(self, self.node)
 
     @property
     def isUnlinked(self):
-        return not self.isLinked
+        return not isSocketLinked(self, self.node)
 
 
     @property
@@ -269,13 +299,9 @@ class AnimationNodeSocket:
         return getDirectlyLinkedSockets(self)
 
 
-    @property
+    @classmethod
     def isCopyable(self):
         return hasattr(self, "getCopyExpression")
-
-    @property
-    def hasValueCode(self):
-        return hasattr(self, "getValueCode")
 
     @classmethod
     def hasProperty(cls):
@@ -319,23 +345,24 @@ def setSocketVisibility(socket, value):
     socket.hide = not value
 
 def toID(socket):
-    return ((socket.node.id_data.name, socket.node.name), socket.is_output, socket.identifier)
+    node = socket.node
+    return ((node.id_data.name, node.name), socket.is_output, socket.identifier)
 
 def getNodeTree(socket):
     return socket.node.id_data
 
-def getSocketIndex(socket):
+def getSocketIndex(socket, node = None):
+    if node is None: node = socket.node
     if socket.is_output:
-        return list(socket.node.outputs).index(socket)
-    return list(socket.node.inputs).index(socket)
+        return list(node.outputs).index(socket)
+    return list(node.inputs).index(socket)
 
 def register():
-    bpy.types.NodeSocket.show = BoolProperty(default = True, get = getSocketVisibility, set = setSocketVisibility)
-    bpy.types.NodeSocket.index = IntProperty(get = getSocketIndex)
     bpy.types.NodeSocket.toID = toID
+    bpy.types.NodeSocket.getIndex = getSocketIndex
     bpy.types.NodeSocket.getNodeTree = getNodeTree
+    bpy.types.NodeSocket.show = BoolProperty(default = True, get = getSocketVisibility, set = setSocketVisibility)
 
 def unregister():
-    del bpy.types.NodeSocket.show
-    del bpy.types.NodeSocket.index
     del bpy.types.NodeSocket.toID
+    del bpy.types.NodeSocket.show

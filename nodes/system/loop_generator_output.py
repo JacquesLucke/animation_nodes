@@ -2,8 +2,8 @@ import bpy
 import random
 from bpy.props import *
 from ... events import treeChanged
+from ... sockets.info import toBaseDataType
 from ... base_types.node import AnimationNode
-from ... sockets.info import toIdName, toBaseDataType
 from . subprogram_sockets import subprogramInterfaceChanged
 from ... tree_info import keepNodeLinks, getNodeByIdentifier
 
@@ -14,6 +14,7 @@ addTypeItems = [
 class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_LoopGeneratorOutputNode"
     bl_label = "Loop Generator Output"
+    dynamicLabelType = "ALWAYS"
 
     def dataTypeChanged(self, context):
         self.outputName = self.listDataType
@@ -21,7 +22,6 @@ class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
         subprogramInterfaceChanged()
 
     def nameChanged(self, context):
-        self.label = self.outputName
         subprogramInterfaceChanged()
 
     def loopInputIdentifierChanged(self, context):
@@ -49,11 +49,14 @@ class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
         self.invokeSocketTypeChooser(layout, "setListDataType",
             socketGroup = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
 
+    def drawLabel(self):
+        return self.outputName
+
     def edit(self):
         network = self.network
         if network.type != "Invalid": return
         if network.loopInAmount != 1: return
-        loopInput = network.loopInputNode
+        loopInput = network.getLoopInputNode()
         if self.loopInputIdentifier == loopInput.identifier: return
         self.loopInputIdentifier = loopInput.identifier
 
@@ -66,12 +69,9 @@ class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
 
         if self.addType == "APPEND": dataType = toBaseDataType(self.listDataType)
         elif self.addType == "EXTEND": dataType = self.listDataType
-        socket = self.inputs.new(toIdName(dataType), dataType, "input")
-        socket.defaultDrawType = "TEXT_ONLY"
 
-        socket = self.inputs.new("an_BooleanSocket", "Condition", "condition")
-        socket.value = True
-        socket.hide = True
+        self.newInput(dataType, dataType, "input", defaultDrawType = "TEXT_ONLY")
+        self.newInput("Boolean", "Condition", "condition", value = True, hide = True)
 
     def delete(self):
         subprogramInterfaceChanged()

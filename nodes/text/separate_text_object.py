@@ -35,7 +35,7 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
     originType = EnumProperty(name = "Origin Type", items = originTypeItems, default = "DEFAULT")
 
     def create(self):
-        self.outputs.new("an_ObjectListSocket", "Text Objects", "textObjects")
+        self.newOutput("Object List", "Text Objects", "textObjects")
 
     def draw(self, layout):
         row = layout.row(align = True)
@@ -47,7 +47,7 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
         if source is not None:
             row.prop(source, "hide", text = "")
 
-        layout.prop_search(self, "materialName", bpy.data, "materials", text="Material", icon="MATERIAL_DATA")
+        layout.prop_search(self, "materialName", bpy.data, "materials", text = "Material", icon = "MATERIAL_DATA")
         layout.prop(self, "originType", text = "Origin")
         layout.prop(self, "outputType", expand = True)
 

@@ -12,27 +12,27 @@ class TextObjectOutputNode(bpy.types.Node, AnimationNode):
     errorMessage = StringProperty()
 
     def create(self):
-        self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
+        self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
 
-        self.inputs.new("an_StringSocket", "Text", "text")
-        self.inputs.new("an_FloatSocket", "Size", "size").value = 1.0
-        self.inputs.new("an_FloatSocket", "Extrude", "extrude")
-        self.inputs.new("an_FloatSocket", "Shear", "shear")
-        self.inputs.new("an_FloatSocket", "Bevel Depth", "bevelDepth")
-        self.inputs.new("an_IntegerSocket", "Bevel Resolution", "bevelResolution")
+        self.newInput("String", "Text", "text")
+        self.newInput("Float", "Size", "size", value = 1.0)
+        self.newInput("Float", "Extrude", "extrude")
+        self.newInput("Float", "Shear", "shear")
+        self.newInput("Float", "Bevel Depth", "bevelDepth")
+        self.newInput("Integer", "Bevel Resolution", "bevelResolution")
 
-        self.inputs.new("an_FloatSocket", "Letter Spacing", "letterSpacing").value = 1.0
-        self.inputs.new("an_FloatSocket", "Word Spacing", "wordSpacing").value = 1.0
-        self.inputs.new("an_FloatSocket", "Line Spacing", "lineSpacing").value = 1.0
+        self.newInput("Float", "Letter Spacing", "letterSpacing", value = 1.0)
+        self.newInput("Float", "Word Spacing", "wordSpacing", value = 1.0)
+        self.newInput("Float", "Line Spacing", "lineSpacing", value = 1.0)
 
-        self.inputs.new("an_FloatSocket", "X Offset", "xOffset")
-        self.inputs.new("an_FloatSocket", "Y Offset", "yOffset")
-        self.inputs.new("an_StringSocket", "Align", "align").value = "CENTER"
+        self.newInput("Float", "X Offset", "xOffset")
+        self.newInput("Float", "Y Offset", "yOffset")
+        self.newInput("String", "Align", "align", value = "CENTER")
 
-        self.inputs.new("an_FontSocket", "Font", "font")
-        self.inputs.new("an_FontSocket", "Bold Font", "fontBold")
-        self.inputs.new("an_FontSocket", "Italic Font", "fontItalic")
-        self.inputs.new("an_FontSocket", "Bold Italic Font", "fontBoldItalic")
+        self.newInput("Font", "Font", "font")
+        self.newInput("Font", "Bold Font", "fontBold")
+        self.newInput("Font", "Italic Font", "fontItalic")
+        self.newInput("Font", "Bold Italic Font", "fontBoldItalic")
 
         for socket in self.inputs[1:]:
             socket.useIsUsedProperty = True
@@ -40,7 +40,7 @@ class TextObjectOutputNode(bpy.types.Node, AnimationNode):
         for socket in self.inputs[4:]:
             socket.hide = True
 
-        self.outputs.new("an_ObjectSocket", "Object", "object")
+        self.newOutput("Object", "Object", "object")
 
     def draw(self, layout):
         if self.errorMessage != "":
@@ -54,7 +54,7 @@ class TextObjectOutputNode(bpy.types.Node, AnimationNode):
         yield "    textObject = object.data"
 
         s = self.inputs
-        if s["Text"].isUsed:                yield "    textObject.body = text"
+        if s["Text"].isUsed:                yield "    if str(textObject.body) != text: textObject.body = text"
         if s["Size"].isUsed:                yield "    textObject.size = size"
         if s["Extrude"].isUsed:             yield "    textObject.extrude = extrude"
         if s["Shear"].isUsed:               yield "    textObject.shear = shear"
@@ -80,3 +80,22 @@ class TextObjectOutputNode(bpy.types.Node, AnimationNode):
             self.errorMessage = ""
         else:
             self.errorMessage = "The align type is invalid. Look in the advanced panels to see all possible values."
+
+    def getBakeCode(self):
+        yield "if getattr(object, 'type', '') == 'FONT':"
+        yield "    textObject = object.data"
+
+        s = self.inputs
+        if s["Size"].isUsed:                yield "    textObject.keyframe_insert('size')"
+        if s["Extrude"].isUsed:             yield "    textObject.keyframe_insert('extrude')"
+        if s["Shear"].isUsed:               yield "    textObject.keyframe_insert('shear')"
+        if s["Bevel Depth"].isUsed:         yield "    textObject.keyframe_insert('bevel_depth')"
+        if s["Bevel Resolution"].isUsed:    yield "    textObject.keyframe_insert('bevel_resolution')"
+
+        if s["Letter Spacing"].isUsed:      yield "    textObject.keyframe_insert('space_character')"
+        if s["Word Spacing"].isUsed:        yield "    textObject.keyframe_insert('space_word')"
+        if s["Line Spacing"].isUsed:        yield "    textObject.keyframe_insert('space_line')"
+
+        if s["X Offset"].isUsed:            yield "    textObject.keyframe_insert('offset_x')"
+        if s["Y Offset"].isUsed:            yield "    textObject.keyframe_insert('offset_y')"
+        if s["Align"].isUsed:               yield "    textObject.keyframe_insert('align')"

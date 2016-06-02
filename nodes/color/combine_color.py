@@ -27,30 +27,30 @@ class CombineColorNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.recreateInputs()
-        self.outputs.new("an_ColorSocket", "Color", "color")
+        self.newOutput("Color", "Color", "color")
 
     @keepNodeState
     def recreateInputs(self):
         self.inputs.clear()
 
         if self.sourceType == "RGB":
-            self.inputs.new("an_FloatSocket", "Red", "red")
-            self.inputs.new("an_FloatSocket", "Green", "green")
-            self.inputs.new("an_FloatSocket", "Blue", "blue")
+            self.newInput("Float", "Red", "red")
+            self.newInput("Float", "Green", "green")
+            self.newInput("Float", "Blue", "blue")
         elif self.sourceType == "HSV":
-            self.inputs.new("an_FloatSocket", "Hue", "hue")
-            self.inputs.new("an_FloatSocket", "Saturation", "saturation")
-            self.inputs.new("an_FloatSocket", "Value", "value")
+            self.newInput("Float", "Hue", "hue")
+            self.newInput("Float", "Saturation", "saturation")
+            self.newInput("Float", "Value", "value")
         elif self.sourceType == "HSL":
-            self.inputs.new("an_FloatSocket", "Hue", "hue")
-            self.inputs.new("an_FloatSocket", "Saturation", "saturation")
-            self.inputs.new("an_FloatSocket", "Lightness", "lightness")
+            self.newInput("Float", "Hue", "hue")
+            self.newInput("Float", "Saturation", "saturation")
+            self.newInput("Float", "Lightness", "lightness")
         elif self.sourceType == "YIQ":
-            self.inputs.new("an_FloatSocket", "Y Luma", "y")
-            self.inputs.new("an_FloatSocket", "I In phase", "i")
-            self.inputs.new("an_FloatSocket", "Q Quadrature", "q")
+            self.newInput("Float", "Y Luma", "y")
+            self.newInput("Float", "I In phase", "i")
+            self.newInput("Float", "Q Quadrature", "q")
 
-        self.inputs.new("an_FloatSocket", "Alpha", "alpha").value = 1
+        self.newInput("Float", "Alpha", "alpha", value = 1)
 
     def draw(self, layout):
         layout.prop(self, "sourceType", expand = True)

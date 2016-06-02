@@ -1,14 +1,13 @@
 import bpy
 from bpy.props import *
-from ... events import executionCodeChanged
+from ... tree_info import keepNodeState
 from ... base_types.node import AnimationNode
-from ... utils.hash import hashStringToNumber
 
 dataTypes = {
-    "Object" : ("an_ObjectSocket", "objects"),
-    "Scene" : ("an_SceneSocket", "scenes"),
-    "Object Group" : ("an_ObjectGroupSocket", "groups"),
-    "Text Block" : ("an_TextBlockSocket", "texts") }
+    "Object" : "objects",
+    "Scene" : "scenes",
+    "Object Group" : "groups",
+    "Text Block" : "texts" }
 
 class BlendDataByNameNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_BlendDataByNameNode"
@@ -20,7 +19,6 @@ class BlendDataByNameNode(bpy.types.Node, AnimationNode):
 
     def dataTypeChanged(self, context):
         self.createSockets()
-        executionCodeChanged()
 
     # Should be set only on node creation
     dataType = StringProperty(name = "Data Type", update = dataTypeChanged)
@@ -32,12 +30,11 @@ class BlendDataByNameNode(bpy.types.Node, AnimationNode):
         return self.dataType + " by Name"
 
     def getExecutionCode(self):
-        space = "bpy.data." + dataTypes[self.dataType][1]
-        yield "output = {0}.get(name)".format(space)
+        return "output = bpy.data.{}.get(name)".format(dataTypes[self.dataType])
 
+    @keepNodeState
     def createSockets(self):
         self.inputs.clear()
         self.outputs.clear()
-        self.inputs.new("an_StringSocket", "Name", "name").defaultDrawType = "PROPERTY_ONLY"
-        idName = dataTypes[self.dataType][0]
-        self.outputs.new(idName, self.dataType, "output")
+        self.newInput("String", "Name", "name").defaultDrawType = "PROPERTY_ONLY"
+        self.newOutput(self.dataType, self.dataType, "output")

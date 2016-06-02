@@ -71,17 +71,20 @@ class Rectangle:
         glEnd()
 
         if self.borderThickness != 0:
-            self.drawBorder()
+            if abs(self.borderThickness) == 1:
+                self.drawBorderWithLines()
+            else:
+                self.drawBorderwithRectangles()
 
-    def drawBorder(self):
+    def drawBorderwithRectangles(self):
         thickness = self.borderThickness
         thickness = min(abs(self.x1 - self.x2) / 2, abs(self.y1 - self.y2) / 2, thickness)
         left, right = sorted([self.x1, self.x2])
         bottom, top = sorted([self.y1, self.y2])
 
         if thickness > 0:
-            topBorder = Rectangle(left, top, right, top - thickness)
-            bottomBorder = Rectangle(left, bottom + thickness, right, bottom)
+            topBorder = Rectangle(left + thickness, top, right - thickness, top - thickness)
+            bottomBorder = Rectangle(left + thickness, bottom + thickness, right - thickness, bottom)
         else:
             topBorder = Rectangle(left + thickness, top, right - thickness, top - thickness)
             bottomBorder = Rectangle(left + thickness, bottom + thickness, right - thickness, bottom)
@@ -91,6 +94,18 @@ class Rectangle:
         for border in (topBorder, bottomBorder, leftBorder, rightBorder):
             border.color = self.borderColor
             border.draw()
+
+    def drawBorderWithLines(self):
+        glColor4f(*self.borderColor)
+        glLineWidth(self.borderThickness)
+        glBegin(GL_LINE_STRIP)
+        glVertex2f(self.left, self.bottom)
+        glVertex2f(self.right, self.bottom)
+        glVertex2f(self.right, self.top)
+        glVertex2f(self.left, self.top)
+        glVertex2f(self.left, self.bottom)
+        glEnd()
+        glLineWidth(1)
 
     def __repr__(self):
         return "({}, {}) - ({}, {})".format(self.x1, self.y1, self.x2, self.y2)

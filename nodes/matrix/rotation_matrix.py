@@ -20,22 +20,19 @@ class RotationMatrixNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.generateInput()
-        self.outputs.new("an_MatrixSocket", "Matrix", "matrix")
+        self.newOutput("Matrix", "Matrix", "matrix")
 
     def draw(self, layout):
         layout.prop(self, "axis", expand = True)
 
     def getExecutionCode(self):
         if len(self.axis) == 1:
-            return "matrix = mathutils.Matrix.Rotation(angle, 4, '{}')".format(self.axis)
+            return "matrix = Matrix.Rotation(angle, 4, '{}')".format(self.axis)
         else:
             return "matrix = angle.to_matrix(); matrix.resize_4x4()"
 
     @keepNodeState
     def generateInput(self):
         self.inputs.clear()
-        socketType = "an_FloatSocket" if len(self.axis) == 1 else "an_EulerSocket"
-        self.inputs.new(socketType, "Angle", "angle")
-
-    def getUsedModules(self):
-        return ["mathutils"]
+        socketType = "Float" if len(self.axis) == 1 else "Euler"
+        self.newInput(socketType, "Angle", "angle")

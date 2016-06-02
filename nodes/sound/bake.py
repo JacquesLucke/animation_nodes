@@ -246,6 +246,10 @@ class BakeEqualizerData(bpy.types.Operator):
     frequencyRanges = CollectionProperty(type = SoundFrequencyRange)
 
     def invoke(self, context, event):
+        if len(self.frequencyRanges) == 0:
+            self.report({"INFO"}, "There has to be at least one frequency range")
+            return {"FINISHED"}
+
         try: self.node = getNodeByIdentifier(self.nodeIdentifier)
         except: self.node = None
         self.sound = bpy.data.sounds[self.soundName]

@@ -1,6 +1,7 @@
 import bpy
 from bpy.props import *
 from ... events import propertyChanged
+from ... tree_info import keepNodeState
 from ... base_types.node import AnimationNode
 
 pointTypeItems = [
@@ -16,14 +17,15 @@ class AppendPointToSplineNode(bpy.types.Node, AnimationNode):
         self.inputs["Right Handle"].hide = self.pointType != "BEZIER_POINT"
         propertyChanged(self, context)
 
-    pointType = EnumProperty(name = "Point Type", default = "POINT", items = pointTypeItems, update = settingChanged)
+    pointType = EnumProperty(name = "Point Type", default = "POINT",
+        items = pointTypeItems, update = settingChanged)
 
     def create(self):
-        self.inputs.new("an_SplineSocket", "Spline", "spline").dataIsModified = True
-        self.inputs.new("an_VectorSocket", "Point", "point")
-        self.inputs.new("an_VectorSocket", "Left Handle", "leftHandle")
-        self.inputs.new("an_VectorSocket", "Right Handle", "rightHandle")
-        self.outputs.new("an_SplineSocket", "Spline", "outSpline")
+        self.newInput("Spline", "Spline", "spline", dataIsModified = True)
+        self.newInput("Vector", "Point", "point")
+        self.newInput("Vector", "Left Handle", "leftHandle")
+        self.newInput("Vector", "Right Handle", "rightHandle")
+        self.newOutput("Spline", "Spline", "outSpline")
         self.settingChanged(bpy.context)
 
     def draw(self, layout):

@@ -21,7 +21,6 @@ class ChooseSocketType(bpy.types.Operator):
     selectedDataType = EnumProperty(items = getItems)
     socketGroup = EnumProperty(items = socketGroupItems)
 
-    nodeIdentifier = StringProperty()
     callback = StringProperty()
 
     def invoke(self, context, event):
@@ -29,7 +28,5 @@ class ChooseSocketType(bpy.types.Operator):
         return {"CANCELLED"}
 
     def execute(self, context):
-        node = getNodeByIdentifier(self.nodeIdentifier)
-        function = getattr(node, self.callback)
-        function(self.selectedDataType)
+        self.an_executeCallback(self.callback, self.selectedDataType)
         return {"FINISHED"}

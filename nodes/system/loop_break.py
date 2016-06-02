@@ -11,7 +11,7 @@ class LoopBreakNode(bpy.types.Node, AnimationNode):
     loopInputIdentifier = StringProperty(update = treeChanged)
 
     def create(self):
-        self.inputs.new("an_BooleanSocket", "Continue", "continueCondition").value = True
+        self.newInput("Boolean", "Continue", "continueCondition", value = True)
 
     def draw(self, layout):
         node = self.loopInputNode
@@ -21,7 +21,7 @@ class LoopBreakNode(bpy.types.Node, AnimationNode):
         network = self.network
         if network.type != "Invalid": return
         if network.loopInAmount != 1: return
-        loopInput = network.loopInputNode
+        loopInput = network.getLoopInputNode()
         if self.loopInputIdentifier == loopInput.identifier: return
         self.loopInputIdentifier = loopInput.identifier
 

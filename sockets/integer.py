@@ -24,7 +24,7 @@ class IntegerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     minValue = IntProperty(default = -2**31)
     maxValue = IntProperty(default = 2**31-1)
 
-    def drawProperty(self, layout, text):
+    def drawProperty(self, layout, text, node):
         layout.prop(self, "value", text = text)
 
     def getValue(self):
@@ -48,3 +48,46 @@ class IntegerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             if socket.dataType == "Float": return True
 
         return False
+
+    @classmethod
+    def getDefaultValue(cls):
+        return 0
+
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, int):
+            return value, 0
+        else:
+            try: return int(value), 1
+            except: return cls.getDefaultValue(), 2
+
+
+class IntegerListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+    bl_idname = "an_IntegerListSocket"
+    bl_label = "Integer List Socket"
+    dataType = "Integer List"
+    baseDataType = "Integer"
+    allowedInputTypes = ["Integer List"]
+    drawColor = (0.3, 0.4, 1.0, 0.5)
+    storable = True
+    comparable = False
+
+    @classmethod
+    def getDefaultValue(cls):
+        return []
+
+    @classmethod
+    def getDefaultValueCode(cls):
+        return "[]"
+
+    @classmethod
+    def getCopyExpression(cls):
+        return "value[:]"
+
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, list):
+            if all(isinstance(element, int) for element in value):
+                return value, 0
+        try: return [int(element) for element in value], 1
+        except: return cls.getDefaultValue(), 2

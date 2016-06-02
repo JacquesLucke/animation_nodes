@@ -24,34 +24,22 @@ class DebugDrawerNode(bpy.types.Node, AnimationNode):
     errorMessage = StringProperty()
 
     def create(self):
-        self.inputs.new("an_GenericSocket", "Data", "data")
-        self.inputs.new("an_BooleanSocket", "Condition", "condition").hide = True
+        self.newInput("Generic", "Data", "data")
+        self.newInput("Boolean", "Condition", "condition", hide = True)
 
     def draw(self, layout):
-        layout.prop(self, "fontSize")
-        if isList(self.dataType):
-            row = layout.row(align = True)
-            row.prop(self, "maxListStartElements", text = "Begin")
-            row.prop(self, "maxListEndElements", text = "End")
-            layout.prop(self, "oneElementPerLine")
         if self.errorMessage != "":
             layout.label(self.errorMessage, icon = "ERROR")
 
     def drawAdvanced(self, layout):
+        layout.prop(self, "fontSize")
         layout.prop(self, "maxRows")
 
-
-    def edit(self):
-        origin = self.inputs[0].dataOrigin
-        targetIdName = getattr(origin, "bl_idname", "an_GenericSocket")
-        if targetIdName != self.inputs[0].bl_idname:
-            self.updateInputSocket(targetIdName)
-
-    @keepNodeState
-    def updateInputSocket(self, targetIdName):
-        self.inputs.clear()
-        self.inputs.new(targetIdName, "Data", "data")
-        self.inputs.new("an_BooleanSocket", "Condition", "condition")
+        col = layout.column(align = True)
+        col.prop(self, "oneElementPerLine")
+        row = col.row(align = True)
+        row.prop(self, "maxListStartElements", text = "Begin")
+        row.prop(self, "maxListEndElements", text = "End")
 
     def getExecutionCode(self):
         if "Condition" in self.inputs:
@@ -59,13 +47,11 @@ class DebugDrawerNode(bpy.types.Node, AnimationNode):
         else: yield "if True:"
 
         yield "    self.errorMessage = ''"
-        if isList(self.dataType):
-            yield "    conversionFunction = self.getCurrentToStringFunction()"
-            yield "    if hasattr(data, '__iter__'):"
-            yield "        self.store_GenericList(data, conversionFunction)"
-            yield "    else: self.errorMessage = 'The input should be a list'"
-        else:
-            yield "    self.store_Generic(data)"
+        yield "    if isinstance(data, list):"
+        yield "        conversionFunction = self.getCurrentToStringFunction()"
+        yield "        self.store_GenericList(data, conversionFunction)"
+        yield "    else:"
+        yield "        self.store_Generic(data)"
 
     def store_Generic(self, data):
         self.debugText = str(data)
@@ -122,10 +108,12 @@ class DebugDrawerNode(bpy.types.Node, AnimationNode):
 
 
 def drawDebugTextBoxes():
-    nodes = getNodesByType("an_DebugDrawerNode")
-    nodesInCurrentTree = getattr(bpy.context.space_data.node_tree, "nodes", [])
-    for node in nodes:
-        if node.name in nodesInCurrentTree and not node.hide and node.errorMessage == "":
+    tree = bpy.context.space_data.node_tree
+    if tree is None: return
+    if tree.bl_idname != "an_AnimationNodeTree": return
+
+    for node in tree.nodes:
+        if node.bl_idname == "an_DebugDrawerNode" and not node.hide and node.errorMessage == "":
             drawDebugTextBox(node)
 
 def drawDebugTextBox(node):

@@ -15,9 +15,9 @@ class ObjectAttributeOutputNode(bpy.types.Node, AnimationNode):
     errorMessage = StringProperty()
 
     def create(self):
-        self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
-        self.inputs.new("an_GenericSocket", "Value", "value")
-        self.outputs.new("an_ObjectSocket", "Object", "object")
+        self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
+        self.newInput("Generic", "Value", "value")
+        self.newOutput("Object", "Object", "object")
 
     def draw(self, layout):
         layout.prop(self, "attribute", text = "")
@@ -48,3 +48,9 @@ class ObjectAttributeOutputNode(bpy.types.Node, AnimationNode):
     def evaluationExpression(self):
         if self.attribute.startswith("["): return "object" + self.attribute + " = value"
         else: return "object." + self.attribute + " = value"
+
+    def getBakeCode(self):
+        if isCodeValid(self.attribute):
+            yield "if object is not None:"
+            yield "    try: object.keyframe_insert({})".format(repr(self.attribute))
+            yield "    except: pass"

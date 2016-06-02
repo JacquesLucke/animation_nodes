@@ -6,10 +6,13 @@ class SeparateVectorNode(bpy.types.Node, AnimationNode):
     bl_label = "Separate Vector"
 
     def create(self):
-        self.inputs.new("an_VectorSocket", "Vector", "vector")
-        self.outputs.new("an_FloatSocket", "X", "x")
-        self.outputs.new("an_FloatSocket", "Y", "y")
-        self.outputs.new("an_FloatSocket", "Z", "z")
+        self.newInput("Vector", "Vector", "vector")
+        self.newOutput("Float", "X", "x")
+        self.newOutput("Float", "Y", "y")
+        self.newOutput("Float", "Z", "z")
 
     def getExecutionCode(self):
-        return "x, y, z = vector.xyz"
+        isLinked = self.getLinkedOutputsDict()
+        if isLinked["x"]: yield "x = vector[0]"
+        if isLinked["y"]: yield "y = vector[1]"
+        if isLinked["z"]: yield "z = vector[2]"

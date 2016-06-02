@@ -41,7 +41,7 @@ class EulerMathNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.createInputs()
-        self.outputs.new("an_EulerSocket", "Result", "result")
+        self.newOutput("Euler", "Result", "result")
 
     def draw(self, layout):
         layout.prop(self, "operation", text = "")
@@ -55,13 +55,13 @@ class EulerMathNode(bpy.types.Node, AnimationNode):
     @keepNodeState
     def createInputs(self):
         self.inputs.clear()
-        self.inputs.new("an_EulerSocket", "A", "a")
+        self.newInput("Euler", "A", "a")
         if self.operation in operationsWithSecondEuler:
-            self.inputs.new("an_EulerSocket", "B", "b")
+            self.newInput("Euler", "B", "b")
         if self.operation in operationsWithFloat:
-            self.inputs.new("an_FloatSocket", "Scale", "scale").value = 1.0
+            self.newInput("Float", "Scale", "scale").value = 1.0
         if self.operation in operationsWithStepEuler:
-            self.inputs.new("an_EulerSocket", "Step Size", "stepSize").value = (0.1, 0.1, 0.1)
+            self.newInput("Euler", "Step Size", "stepSize").value = (0.1, 0.1, 0.1)
 
 
     def getExecutionCode(self):

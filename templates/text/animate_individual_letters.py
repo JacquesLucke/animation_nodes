@@ -7,21 +7,21 @@ class AnimateIndividualLettersTemplate(bpy.types.Operator, Template):
     nodeOffset = (-0, 0)
 
     def insert(self):
-        separateTextNode = self.newNode('an_SeparateTextObjectNode', x = 0, y = 0)
-        invokeNode = self.newNode('an_InvokeSubprogramNode', x = 250, y = 0)
+        separateTextNode = self.newNode("an_SeparateTextObjectNode", x = 0, y = 0)
+        invokeNode = self.newNode("an_InvokeSubprogramNode", x = 250, y = 0)
 
-        loopInputNode = self.newNode('an_LoopInputNode', x = 0, y = -250)
-        loopInputNode.newIterator('Object List', name = 'Object')
+        loopInputNode = self.newNode("an_LoopInputNode", x = 0, y = -250)
+        loopInputNode.newIterator("Object List", name = "Object")
         loopInputNode.subprogramName = "Animate Objects"
-        idKeyNode = self.newNode('an_ObjectIDKeyNode', x = 400, y = -420)
+        idKeyNode = self.newNode("an_ObjectIDKeyNode", x = 400, y = -420)
         idKeyNode.keyDataType = "Transforms"
         idKeyNode.keyName = "Initial Transforms"
-        composeMatrixNode = self.newNode('an_ComposeMatrixNode', x = 230, y = -340)
-        timeInfoNode = self.newNode('an_TimeInfoNode', x = 350, y = -220)
-        animateNode = self.newNode('an_AnimateDataNode', x = 640, y = -300)
+        composeMatrixNode = self.newNode("an_ComposeMatrixNode", x = 230, y = -340)
+        timeInfoNode = self.newNode("an_TimeInfoNode", x = 350, y = -220)
+        animateNode = self.newNode("an_AnimateDataNode", x = 640, y = -300)
         animateNode.dataType = "Matrix"
         animateNode.inputs["Interpolation"].category = "BACK"
-        objectMatrixOutput = self.newNode('an_ObjectMatrixOutputNode', x = 870, y = -190)
+        objectMatrixOutput = self.newNode("an_ObjectMatrixOutputNode", x = 870, y = -190)
 
         invokeNode.subprogramIdentifier = loopInputNode.identifier
         self.updateSubprograms()

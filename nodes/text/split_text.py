@@ -1,13 +1,16 @@
 import bpy, re
 from bpy.props import *
 from ... events import propertyChanged
+from ... tree_info import keepNodeState
 from ... base_types.node import AnimationNode
 
-splitTypes = [
-    ("Characters", "Characters", ""),
-    ("Words", "Words", ""),
-    ("Lines", "Lines", ""),
-    ("Regexp", "Regexp", "") ]
+splitTypeItems = [
+    ("CHARACTERS", "Characters", "", "NONE", 0),
+    ("WORDS", "Words", "", "NONE", 1),
+    ("LINES", "Lines", "", "NONE", 2),
+    ("REGULAR_EXPRESSION", "Regular Expression", "", "NONE", 3),
+    ("N_CHARACTERS", "N Characters", "", "NONE", 4),
+    ("SEPARATOR", "Separator", "", "NONE", 5) ]
 
 class SplitTextNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SplitTextNode"
@@ -15,40 +18,68 @@ class SplitTextNode(bpy.types.Node, AnimationNode):
     bl_width_default = 190
 
     def splitTypeChanges(self, context):
-        self.setHideProperty()
-        propertyChanged()
+        self.recreateInputs()
 
     splitType = EnumProperty(
-        name = "Split Type", default = "Regexp",
-        items = splitTypes, update = splitTypeChanges)
+        name = "Split Type", default = "REGULAR_EXPRESSION",
+        items = splitTypeItems, update = splitTypeChanges)
 
     keepDelimiters = BoolProperty(default = False, update = propertyChanged)
 
+    errorMessage = StringProperty()
+
     def create(self):
-        self.inputs.new("an_StringSocket", "Text", "text")
-        self.inputs.new("an_StringSocket", "Split By", "splitBy")
-        self.outputs.new("an_StringListSocket", "Text List", "textList")
-        self.outputs.new("an_IntegerSocket", "Length", "length")
+        self.recreateInputs()
+        self.newOutput("String List", "Text List", "textList")
+        self.newOutput("Integer", "Length", "length")
 
     def draw(self, layout):
-        layout.prop(self, "splitType", text = "Type")
-        if self.splitType == "Regexp":
+        layout.prop(self, "splitType", text = "")
+        if self.splitType == "REGULAR_EXPRESSION":
             layout.prop(self, "keepDelimiters", text = "Keep Delimiters")
+        if self.errorMessage != "":
+            layout.label(self.errorMessage, icon = "ERROR")
 
-    def setHideProperty(self):
-        self.inputs["Split By"].hide = not self.splitType == "Regexp"
+    def getExecutionCode(self):
+        yield "self.errorMessage = ''"
+        if self.splitType == "CHARACTERS":
+            yield "textList = list(text)"
+        elif self.splitType == "WORDS":
+            yield "textList = text.split()"
+        elif self.splitType == "LINES":
+            yield "textList = text.splitlines()"
+        elif self.splitType == "REGULAR_EXPRESSION":
+            yield "textList = self.splitWithRegularExpression(text, splitBy)"
+        elif self.splitType == "N_CHARACTERS":
+            yield "textList = self.splitEveryNCharacters(text, n)"
+        elif self.splitType == "SEPARATOR":
+            yield "textList = [text] if splitBy == '' else text.split(splitBy)"
+        yield "length = len(textList)"
 
-    def execute(self, text, splitBy):
-        textList = []
+    def splitWithRegularExpression(self, text, splitBy):
+        if splitBy == "": return [text]
+        else:
+            try:
+                if self.keepDelimiters: return re.split("("+splitBy+")", text)
+                else: return re.split(splitBy, text)
+            except:
+                self.errorMessage = "Invalid Regular Expression"
+                return [text]
 
-        if self.splitType == "Characters": textList = list(text)
-        elif self.splitType == "Words": textList = text.split()
-        elif self.splitType == "Lines": textList = text.split("\n")
+    def splitEveryNCharacters(self, text, n):
+        if n <= 0: return []
 
-        elif self.splitType == "Regexp":
-            if splitBy == "": textList = [text]
-            else:
-                if self.keepDelimiters: textList = re.split("("+splitBy+")", text)
-                else: textList = re.split(splitBy, text)
+        textList = list(map(''.join, zip(*([iter(text)] * n))))
+        missingChars = len(text) % n
+        if missingChars > 0:
+            textList.append(text[-missingChars:])
+        return textList
 
-        return textList, len(textList)
+    @keepNodeState
+    def recreateInputs(self):
+        self.inputs.clear()
+        self.newInput("String", "Text", "text")
+        if self.splitType in ("REGULAR_EXPRESSION", "SEPARATOR"):
+            self.newInput("String", "Split By", "splitBy")
+        if self.splitType == "N_CHARACTERS":
+            self.newInput("Integer", "N", "n", value = 5, minValue = 1)

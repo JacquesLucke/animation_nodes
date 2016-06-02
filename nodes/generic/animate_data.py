@@ -1,7 +1,6 @@
 import bpy
 from bpy.props import *
 from . mix_data import getMixCode
-from ... sockets.info import toIdName
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 
@@ -35,17 +34,14 @@ class AnimateDataNode(bpy.types.Node, AnimationNode):
         self.inputs.clear()
         self.outputs.clear()
 
-        idName = toIdName(self.dataType)
-        self.inputs.new("an_FloatSocket", "Time", "time")
-        self.inputs.new(idName, "Start", "start")
-        self.inputs.new(idName, "End", "end")
-        self.inputs.new("an_InterpolationSocket", "Interpolation", "interpolation").defaultDrawType = "PROPERTY_ONLY"
-        socket = self.inputs.new("an_FloatSocket", "Duration", "duration")
-        socket.minValue = 0.0001
-        socket.value = 20
+        self.newInput("Float", "Time", "time")
+        self.newInput(self.dataType, "Start", "start")
+        self.newInput(self.dataType, "End", "end")
+        self.newInput("Interpolation", "Interpolation", "interpolation", defaultDrawType = "PROPERTY_ONLY")
+        self.newInput("Float", "Duration", "duration", value = 20, minValue = 0.001)
 
-        self.outputs.new("an_FloatSocket", "Time", "outTime")
-        self.outputs.new(idName, "Result", "result")
+        self.newOutput("Float", "Time", "outTime")
+        self.newOutput(self.dataType, "Result", "result")
 
     def getExecutionCode(self):
         yield "finalDuration = max(duration, 0.0001)"

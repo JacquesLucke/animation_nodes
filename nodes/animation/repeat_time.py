@@ -15,11 +15,9 @@ class RepeatTimeNode(bpy.types.Node, AnimationNode):
         items = repetitionTypeItems, update = executionCodeChanged)
 
     def create(self):
-        self.inputs.new("an_FloatSocket", "Time", "time")
-        socket = self.inputs.new("an_FloatSocket", "Rate", "rate")
-        socket.min = 0.0001
-        socket.value = 50
-        self.outputs.new("an_FloatSocket", "Time", "outTime")
+        self.newInput("Float", "Time", "time")
+        self.newInput("Float", "Rate", "rate", value = 50, minValue = 0.0001)
+        self.newOutput("Float", "Time", "outTime")
 
     def draw(self, layout):
         layout.prop(self, "repetitionType", text = "Type")

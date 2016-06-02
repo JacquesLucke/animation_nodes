@@ -9,10 +9,10 @@ class FloatClampNode(bpy.types.Node, AnimationNode):
     dynamicLabelType = "HIDDEN_ONLY"
 
     def create(self):
-        self.inputs.new("an_FloatSocket", "Value", "value")
-        self.inputs.new("an_FloatSocket", "Min", "minValue").value = 0.0
-        self.inputs.new("an_FloatSocket", "Max", "maxValue").value = 1.0
-        self.outputs.new("an_FloatSocket", "Value", "outValue")
+        self.newInput("Float", "Value", "value")
+        self.newInput("Float", "Min", "minValue", value = 0.0)
+        self.newInput("Float", "Max", "maxValue", value = 1.0)
+        self.newOutput("Float", "Value", "outValue")
 
     def getExecutionCode(self):
         yield "outValue = min(max(value, minValue), maxValue)"
@@ -30,9 +30,9 @@ class FloatClampNode(bpy.types.Node, AnimationNode):
     def edit(self):
         output = self.outputs[0]
         if output.dataType == "Float":
-            if output.shouldBeIntegerSocket(): self.setOutputType("an_IntegerSocket")
+            if output.shouldBeIntegerSocket(): self.setOutputType("Integer")
         else:
-            if output.shouldBeFloatSocket(): self.setOutputType("an_FloatSocket")
+            if output.shouldBeFloatSocket(): self.setOutputType("Float")
 
     def setOutputType(self, idName):
         if self.outputs[0].bl_idname == idName: return
@@ -41,7 +41,7 @@ class FloatClampNode(bpy.types.Node, AnimationNode):
     @keepNodeLinks
     def _setOutputType(self, idName):
         self.outputs.clear()
-        self.outputs.new(idName, "Value", "outValue")
+        self.newOutput(idName, "Value", "outValue")
 
     @property
     def minValueSocket(self):

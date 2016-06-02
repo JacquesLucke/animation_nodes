@@ -15,7 +15,7 @@ class EulerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     value = FloatVectorProperty(default = [0, 0, 0], update = propertyChanged, subtype = "EULER")
 
-    def drawProperty(self, layout, text):
+    def drawProperty(self, layout, text, node):
         col = layout.column(align = True)
         if text != "": col.label(text)
         col.prop(self, "value", index = 0, text = "X")
@@ -31,5 +31,49 @@ class EulerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getProperty(self):
         return self.value[:]
 
-    def getCopyExpression(self):
+    @classmethod
+    def getDefaultValue(cls):
+        return Euler((0, 0, 0))
+
+    @classmethod
+    def getCopyExpression(cls):
         return "value.copy()"
+
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, Euler):
+            return value, 0
+        else:
+            try: return Euler(value), 1
+            except: return cls.getDefaultValue(), 2
+
+
+class EulerListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+    bl_idname = "an_EulerListSocket"
+    bl_label = "Euler List Socket"
+    dataType = "Euler List"
+    baseDataType = "Euler"
+    allowedInputTypes = ["Euler List"]
+    drawColor = (0.1, 0.0, 0.4, 0.5)
+    storable = True
+    comparable = False
+
+    @classmethod
+    def getDefaultValue(cls):
+        return []
+
+    @classmethod
+    def getDefaultValueCode(cls):
+        return "[]"
+
+    @classmethod
+    def getCopyExpression(cls):
+        return "[element.copy() for element in value]"
+
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, list):
+            if all(isinstance(element, Euler) for element in value):
+                return value, 0
+        try: return [Euler(element) for element in value], 1
+        except: return cls.getDefaultValue(), 2

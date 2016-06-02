@@ -7,29 +7,23 @@ class ObjectMatrixInputNode(bpy.types.Node, AnimationNode):
     bl_label = "Object Matrix Input"
 
     def create(self):
-        self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
-        self.outputs.new("an_MatrixSocket", "World", "world")
-        self.outputs.new("an_MatrixSocket", "Basis", "basis").hide = True
-        self.outputs.new("an_MatrixSocket", "Local", "local").hide = True
-        self.outputs.new("an_MatrixSocket", "Parent Inverse", "parentInverse").hide = True
+        self.newInput("Object", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
+        self.newOutput("Matrix", "World", "world")
+        self.newOutput("Matrix", "Basis", "basis", hide = True)
+        self.newOutput("Matrix", "Local", "local", hide = True)
+        self.newOutput("Matrix", "Parent Inverse", "parentInverse", hide = True)
 
     def getExecutionCode(self):
-
         isLinked = self.getLinkedOutputsDict()
-        if not any(isLinked.values()): return ""
-        lines = []
-        lines.append("if object is None:")
-        if isLinked["world"]: lines.append("    world = mathutils.Matrix.Identity(4)")
-        if isLinked["basis"]: lines.append("    basis = mathutils.Matrix.Identity(4)")
-        if isLinked["local"]: lines.append("    local = mathutils.Matrix.Identity(4)")
-        if isLinked["parentInverse"]: lines.append("    parentInverse = mathutils.Matrix.Identity(4)")
-        lines.append("else:")
-        if isLinked["world"]: lines.append("    world = object.matrix_world")
-        if isLinked["basis"]: lines.append("    basis = object.matrix_basis")
-        if isLinked["local"]: lines.append("    local = object.matrix_local")
-        if isLinked["parentInverse"]: lines.append("    parentInverse = object.matrix_parent_inverse")
+        if not any(isLinked.values()): return
 
-        return lines
-
-    def getUsedModules(self):
-        return ["mathutils"]
+        yield "if object is None:"
+        if isLinked["world"]:         yield "    world = Matrix.Identity(4)"
+        if isLinked["basis"]:         yield "    basis = Matrix.Identity(4)"
+        if isLinked["local"]:         yield "    local = Matrix.Identity(4)"
+        if isLinked["parentInverse"]: yield "    parentInverse = Matrix.Identity(4)"
+        yield "else:"
+        if isLinked["world"]:         yield "    world = object.matrix_world"
+        if isLinked["basis"]:         yield "    basis = object.matrix_basis"
+        if isLinked["local"]:         yield "    local = object.matrix_local"
+        if isLinked["parentInverse"]: yield "    parentInverse = object.matrix_parent_inverse"

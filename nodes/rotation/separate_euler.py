@@ -11,11 +11,11 @@ class SeparateEulerNode(bpy.types.Node, AnimationNode):
         update = executionCodeChanged)
 
     def create(self):
-        self.inputs.new("an_EulerSocket", "Euler", "euler")
-        self.outputs.new("an_FloatSocket", "X", "x")
-        self.outputs.new("an_FloatSocket", "Y", "y")
-        self.outputs.new("an_FloatSocket", "Z", "z")
-        
+        self.newInput("Euler", "Euler", "euler")
+        self.newOutput("Float", "X", "x")
+        self.newOutput("Float", "Y", "y")
+        self.newOutput("Float", "Z", "z")
+
     def draw(self, layout):
         layout.prop(self, "useDegree")
 

@@ -1,11 +1,11 @@
 import bpy
 from bpy.props import *
 from collections import defaultdict
+from ... sockets.info import isList
 from ... utils.code import isCodeValid
 from ... tree_info import keepNodeState
 from ... utils.names import toVariableName
 from ... events import executionCodeChanged
-from ... sockets.info import toIdName, isList
 from ... base_types.node import AnimationNode
 from ... utils.enum_items import enumItemsFromDicts
 from mathutils.geometry import distance_point_to_plane
@@ -38,7 +38,7 @@ class SortObjectListWithDirectionTemplate(bpy.types.PropertyGroup, SortingTempla
     useInitialTransforms = BoolProperty(name = "Use Initial Transforms", default = False)
 
     def setup(self, node):
-        node.inputs.new("an_VectorSocket", "Direction", "direction").value = (0, 0, 1)
+        node.newInput("Vector", "Direction", "direction", value = (0, 0, 1))
 
     def draw(self, layout):
         layout.prop(self, "useInitialTransforms")
@@ -62,7 +62,7 @@ class SortObjectListByPointDistanceTemplate(bpy.types.PropertyGroup, SortingTemp
     useInitialTransforms = BoolProperty(name = "Use Initial Transforms", default = False)
 
     def setup(self, node):
-        node.inputs.new("an_VectorSocket", "Point", "point")
+        node.newInput("Vector", "Point", "point")
 
     def draw(self, layout):
         layout.prop(self, "useInitialTransforms")
@@ -97,7 +97,7 @@ class SortPolygonListWithDirectionTemplate(bpy.types.PropertyGroup, SortingTempl
     label = "Direction"
 
     def setup(self, node):
-        node.inputs.new("an_VectorSocket", "Direction", "direction").value = (0, 0, 1)
+        node.newInput("Vector", "Direction", "direction", value = (0, 0, 1))
 
     def sort(self, polygons, reverse, direction):
         distance = distance_point_to_plane
@@ -142,11 +142,9 @@ class SortListNode(bpy.types.Node, AnimationNode):
     templates = PointerProperty(type = SortingTemplates)
 
     def assignedTypeChanged(self, context):
-        self.listIdName = toIdName(self.assignedType)
         self.generateSockets()
 
     assignedType = StringProperty(update = assignedTypeChanged)
-    listIdName = StringProperty()
 
     def getSortTypeItems(self, context):
         items = []
@@ -273,16 +271,18 @@ class SortListNode(bpy.types.Node, AnimationNode):
     def generateSockets(self):
         self.inputs.clear()
         self.outputs.clear()
-        self.inputs.new(self.listIdName, "List", "inList").dataIsModified = True
-        self.inputs.new("an_BooleanSocket", "Reverse", "reverseOutput").value = False
+
+        listDataType = self.assignedType
+        self.newInput(listDataType, "List", "inList", dataIsModified = True)
+        self.newInput("Boolean", "Reverse", "reverseOutput", value = False)
 
         if self.sortType == "KEY_LIST":
             if self.keyListType == "FLOAT":
-                self.inputs.new("an_FloatListSocket", "Key List", "keyList")
+                self.newInput("Float List", "Key List", "keyList")
             elif self.keyListType == "STRING":
-                self.inputs.new("an_StringListSocket", "Key List", "keyList")
+                self.newInput("String List", "Key List", "keyList")
 
-        self.outputs.new(self.listIdName, "Sorted List", "outList")
+        self.newOutput(listDataType, "Sorted List", "outList")
 
         self.setupActiveTemplate()
 

@@ -25,7 +25,6 @@ class ConvertRotationsNode(bpy.types.Node, AnimationNode):
 
     def conversionTypeChanged(self, context):
         self.createSockets()
-        executionCodeChanged()
 
     conversionType = EnumProperty(name = "Conversion Type", default = "QUATERNION_TO_EULER",
         items = conversionTypeItems, update = conversionTypeChanged)
@@ -62,11 +61,11 @@ class ConvertRotationsNode(bpy.types.Node, AnimationNode):
             if self.useDegree: return "axis, angle = quaternion.axis, math.degrees(quaternion.angle)"
             else: return "axis, angle = quaternion.to_axis_angle()"
         if self.conversionType == "AXIS_ANGLE_TO_QUATERNION":
-            if self.useDegree: return "quaternion = mathutils.Quaternion(axis, math.radians(angle))"
-            else: return "quaternion = mathutils.Quaternion(axis, angle)"
+            if self.useDegree: return "quaternion = Quaternion(axis, math.radians(angle))"
+            else: return "quaternion = Quaternion(axis, angle)"
 
     def getUsedModules(self):
-        return ["mathutils", "math"]
+        return ["math"]
 
     @keepNodeLinks
     def createSockets(self):
@@ -74,33 +73,33 @@ class ConvertRotationsNode(bpy.types.Node, AnimationNode):
         self.outputs.clear()
 
         if self.conversionType == "QUATERNION_TO_EULER":
-            self.inputs.new("an_QuaternionSocket", "Quaternion", "quaternion")
-            self.outputs.new("an_EulerSocket", "Euler", "euler")
+            self.newInput("Quaternion", "Quaternion", "quaternion")
+            self.newOutput("Euler", "Euler", "euler")
         if self.conversionType == "EULER_TO_QUATERNION":
-            self.inputs.new("an_EulerSocket", "Euler", "euler")
-            self.outputs.new("an_QuaternionSocket", "Quaternion", "quaternion")
+            self.newInput("Euler", "Euler", "euler")
+            self.newOutput("Quaternion", "Quaternion", "quaternion")
 
         if self.conversionType == "QUATERNION_TO_MATRIX":
-            self.inputs.new("an_QuaternionSocket", "Quaternion", "quaternion")
-            self.outputs.new("an_MatrixSocket", "Matrix", "matrix")
+            self.newInput("Quaternion", "Quaternion", "quaternion")
+            self.newOutput("Matrix", "Matrix", "matrix")
         if self.conversionType == "MATRIX_TO_QUATERNION":
-            self.inputs.new("an_MatrixSocket", "Matrix", "matrix")
-            self.outputs.new("an_QuaternionSocket", "Quaternion", "quaternion")
+            self.newInput("Matrix", "Matrix", "matrix")
+            self.newOutput("Quaternion", "Quaternion", "quaternion")
 
         if self.conversionType == "EULER_TO_MATRIX":
-            self.inputs.new("an_EulerSocket", "Euler", "euler")
-            self.outputs.new("an_MatrixSocket", "Matrix", "matrix")
+            self.newInput("Euler", "Euler", "euler")
+            self.newOutput("Matrix", "Matrix", "matrix")
         if self.conversionType == "MATRIX_TO_EULER":
-            self.inputs.new("an_MatrixSocket", "Matrix", "matrix")
-            self.outputs.new("an_EulerSocket", "Euler", "euler")
+            self.newInput("Matrix", "Matrix", "matrix")
+            self.newOutput("Euler", "Euler", "euler")
 
         if self.conversionType == "QUATERNION_TO_AXIS_ANGLE":
-            self.inputs.new("an_QuaternionSocket", "Quaternion", "quaternion")
-            self.outputs.new("an_VectorSocket", "Axis", "axis")
-            self.outputs.new("an_FloatSocket", "Angle", "angle")
+            self.newInput("Quaternion", "Quaternion", "quaternion")
+            self.newOutput("Vector", "Axis", "axis")
+            self.newOutput("Float", "Angle", "angle")
         if self.conversionType == "AXIS_ANGLE_TO_QUATERNION":
-            self.inputs.new("an_VectorSocket", "Axis", "axis")
-            self.inputs.new("an_FloatSocket", "Angle", "angle")
-            self.outputs.new("an_QuaternionSocket", "Quaternion", "quaternion")
+            self.newInput("Vector", "Axis", "axis")
+            self.newInput("Float", "Angle", "angle")
+            self.newOutput("Quaternion", "Quaternion", "quaternion")
 
         self.inputs[0].defaultDrawType = "PREFER_PROPERTY"

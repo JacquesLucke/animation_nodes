@@ -38,14 +38,11 @@ class ConvertPlaneTypeNode(bpy.types.Node, AnimationNode):
             return
 
         if self.conversionType == "POINT_NORMAL_TO_MATRIX":
-            yield "if planeNormal.length_squared == 0: planeNormal = mathutils.Vector((0, 0, 1))"
-            yield "matrix = mathutils.Matrix.Translation(planePoint) * planeNormal.to_track_quat('Z', 'Y').to_matrix().to_4x4()"
+            yield "if planeNormal.length_squared == 0: planeNormal = Vector((0, 0, 1))"
+            yield "matrix = Matrix.Translation(planePoint) * planeNormal.to_track_quat('Z', 'Y').to_matrix().to_4x4()"
         if self.conversionType == "MATRIX_TO_POINT_NORMAL":
             if isLinked["planePoint"]: yield "planePoint = matrix.to_translation()"
-            if isLinked["planeNormal"]: yield "planeNormal = matrix.to_3x3() * mathutils.Vector((0, 0, 1))"
-
-    def getUsedModules(self):
-        return ["mathutils"]
+            if isLinked["planeNormal"]: yield "planeNormal = matrix.to_3x3() * Vector((0, 0, 1))"
 
     @keepNodeState
     def createSockets(self):
@@ -53,10 +50,10 @@ class ConvertPlaneTypeNode(bpy.types.Node, AnimationNode):
         self.outputs.clear()
 
         if self.conversionType == "POINT_NORMAL_TO_MATRIX":
-            self.inputs.new("an_VectorSocket", "Point in Plane", "planePoint")
-            self.inputs.new("an_VectorSocket", "Plane Normal", "planeNormal").value = [0, 0, 1]
-            self.outputs.new("an_MatrixSocket", "Matrix", "matrix")
+            self.newInput("Vector", "Point in Plane", "planePoint")
+            self.newInput("Vector", "Plane Normal", "planeNormal", value = [0, 0, 1])
+            self.newOutput("Matrix", "Matrix", "matrix")
         if self.conversionType == "MATRIX_TO_POINT_NORMAL":
-            self.inputs.new("an_MatrixSocket", "Matrix", "matrix")
-            self.outputs.new("an_VectorSocket", "Point in Plane", "planePoint")
-            self.outputs.new("an_VectorSocket", "Plane Normal", "planeNormal")
+            self.newInput("Matrix", "Matrix", "matrix")
+            self.newOutput("Vector", "Point in Plane", "planePoint")
+            self.newOutput("Vector", "Plane Normal", "planeNormal")

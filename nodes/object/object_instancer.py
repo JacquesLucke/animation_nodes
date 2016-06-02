@@ -75,15 +75,15 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.updateInputSockets()
-        self.outputs.new("an_ObjectListSocket", "Objects", "objects")
+        self.newOutput("an_ObjectListSocket", "Objects", "objects")
 
     @keepNodeState
     def updateInputSockets(self):
         self.inputs.clear()
-        self.inputs.new("an_IntegerSocket", "Instances", "instancesAmount").minValue = 0
+        self.newInput("Integer", "Instances", "instancesAmount", minValue = 0)
         if self.copyFromSource:
-            self.inputs.new("an_ObjectSocket", "Source", "sourceObject").defaultDrawType = "PROPERTY_ONLY"
-        self.inputs.new("an_SceneListSocket", "Scenes", "scenes").hide = True
+            self.newInput("Object", "Source", "sourceObject", defaultDrawType = "PROPERTY_ONLY")
+        self.newInput("Scene List", "Scenes", "scenes", hide = True)
 
     def draw(self, layout):
         layout.prop(self, "copyFromSource")
@@ -303,7 +303,8 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         newObject.select = False
         newObject.hide = False
         newObject.hide_render = False
-        newObject.empty_draw_type = self.emptyDrawType
+        if not self.copyFromSource and self.objectType == "Empty":
+            newObject.empty_draw_type = self.emptyDrawType
         return newObject
 
     def createObject(self, name, instanceData):
@@ -311,7 +312,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
 
     def getSourceObjectData(self, sourceObject):
         if self.copyFromSource:
-            if self.deepCopy:
+            if self.deepCopy and sourceObject.data is not None:
                 return sourceObject.data.copy()
             else:
                 return sourceObject.data

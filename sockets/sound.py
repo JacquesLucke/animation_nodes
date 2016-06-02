@@ -45,11 +45,11 @@ class SoundSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     bakeData = EnumProperty(name = "Bake Data", items = getBakeDataItems, update = propertyChanged)
 
-    def drawProperty(self, layout, text):
+    def drawProperty(self, layout, text, node):
         row = layout.row(align = True)
         row.prop(self, "bakeData", text = text)
         if self.bakeData == "None":
-            self.invokeFunction(row, "createSoundBakeNode", icon = "PLUS",
+            self.invokeFunction(row, node, "createSoundBakeNode", icon = "PLUS",
                 description = "Create sound bake node")
 
     def getValue(self):
@@ -73,3 +73,13 @@ class SoundSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def createSoundBakeNode(self):
         newNodeAtCursor("an_SoundBakeNode")
         invokeTranslation()
+
+    @classmethod
+    def getDefaultValue(cls):
+        return None
+
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, (SingleSoundEvaluator, EqualizerSoundEvaluator)) or value is None:
+            return value, 0
+        return cls.getDefaultValue(), 2

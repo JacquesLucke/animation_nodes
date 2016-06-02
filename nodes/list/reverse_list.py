@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
+from ... sockets.info import isList
 from ... tree_info import keepNodeLinks
-from ... sockets.info import toIdName, isList
 from ... base_types.node import AnimationNode
 
 class ReverseListNode(bpy.types.Node, AnimationNode):
@@ -9,11 +9,9 @@ class ReverseListNode(bpy.types.Node, AnimationNode):
     bl_label = "Reverse List"
 
     def assignedTypeChanged(self, context):
-        self.listIdName = toIdName(self.assignedType)
         self.generateSockets()
 
     assignedType = StringProperty(update = assignedTypeChanged)
-    listIdName = StringProperty()
 
     def create(self):
         self.assignedType = "Object List"
@@ -42,5 +40,6 @@ class ReverseListNode(bpy.types.Node, AnimationNode):
     def generateSockets(self):
         self.inputs.clear()
         self.outputs.clear()
-        self.inputs.new(self.listIdName, "List", "inList").dataIsModified = True
-        self.outputs.new(self.listIdName, "Reversed List", "reversedList")
+        listDataType = self.assignedType
+        self.newInput(listDataType, "List", "inList", dataIsModified = True)
+        self.newOutput(listDataType, "Reversed List", "reversedList")

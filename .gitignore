@@ -1,2 +1,7 @@
 *.pyc
+*.pyd
 *.py~
+*.c
+*.exp
+*.lib
+*.obj

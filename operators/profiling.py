@@ -1,50 +1,69 @@
 import bpy
 import cProfile
+from bpy.props import *
 from io import StringIO
-from .. update import updateEverything
 from contextlib import redirect_stdout
-from .. preferences import getDeveloperSettings
 
-class PrintProfileExecutionResult(bpy.types.Operator):
-    bl_idname = "an.print_profile_execution_result"
-    bl_label = "Print Profile Execution Result"
-    bl_description = ""
+class ProfileAnimationNodes(bpy.types.Operator):
+    bl_idname = "an.profile"
+    bl_label = "Profile"
 
-    @classmethod
-    def poll(cls, context):
-        try: return context.space_data.edit_tree.bl_idname == "an_AnimationNodeTree"
-        except: return False
+    function = StringProperty()
+    output = StringProperty()
+    sort = StringProperty()
 
     def execute(self, context):
-        result = getExecutionProfilingResult()
-        print(result)
+        result = self.getProfilingResult()
+
+        if self.output == "CONSOLE":
+            print(result)
+        elif self.output == "TEXT_BLOCK":
+            textBlock = self.getOutputTextBlock()
+            textBlock.clear()
+            textBlock.write(result)
+
         return {"FINISHED"}
 
-class WriteProfileExecutionResult(bpy.types.Operator):
-    bl_idname = "an.write_profile_execution_result"
-    bl_label = "Write Profile Execution Result"
-    bl_description = ""
+    def getProfilingResult(self):
+        resultBuffer = StringIO()
+        with redirect_stdout(resultBuffer):
+            d = {"function" : self.executeFunction}
+            cProfile.runctx("function()", d, d, sort = self.sort)
+            self.executeFunction()
+        return resultBuffer.getvalue()
 
-    @classmethod
-    def poll(cls, context):
-        try: return context.space_data.edit_tree.bl_idname == "an_AnimationNodeTree"
-        except: return False
+    def executeFunction(self):
+        if self.function == "EXECUTION":
+            execute_TreeExecutiong()
+        elif self.function == "TREE_ANALYSIS":
+            execute_TreeAnalysis()
+        elif self.function == "UPDATE_EVERYTHING":
+            execute_UpdateEverything()
+        elif self.function == "SCRIPT_GENERATION":
+            execute_ScriptGeneration()
 
-    def execute(self, context):
-        result = getExecutionProfilingResult()
-
+    def getOutputTextBlock(self):
         textBlockName = "Profiling"
-        textBlock = bpy.data.texts.get(textBlockName)
-        if textBlock is None: textBlock = bpy.data.texts.new(textBlockName)
+        if textBlockName in bpy.data.texts:
+            return bpy.data.texts[textBlockName]
+        else:
+            return bpy.data.texts.new(textBlockName)
 
-        textBlock.clear()
-        textBlock.write(result)
-        return {"FINISHED"}
 
-def getExecutionProfilingResult():
-    sortMode = getDeveloperSettings().profilingSortMode
-    f = StringIO()
-    with redirect_stdout(f):
-        d = {"context" : bpy.context}
-        cProfile.runctx("context.space_data.edit_tree.execute()", d, d, sort = sortMode)
-    return f.getvalue()
+def execute_TreeExecutiong():
+    bpy.context.space_data.edit_tree.execute()
+
+def execute_TreeAnalysis():
+    from .. import tree_info
+    tree_info.update()
+
+def execute_UpdateEverything():
+    from .. import update
+    update.updateEverything()
+
+def execute_ScriptGeneration():
+    from .. execution import units
+    from .. utils.nodes import createNodeByIdDict
+    nodeByID = createNodeByIdDict()
+    units.createExecutionUnits(nodeByID)
+    nodeByID.clear()

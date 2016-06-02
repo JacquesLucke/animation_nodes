@@ -2,9 +2,9 @@ import bpy
 from bpy.props import *
 from . mix_data import getMixCode
 from ... tree_info import keepNodeLinks
+from ... sockets.info import toListDataType
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
-from ... sockets.info import toIdName, toListIdName, toListDataType
 
 nodeTypes = {
     "Matrix" : "Mix Matrix List",
@@ -36,7 +36,7 @@ class MixDataListNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "repeat")
 
     def drawLabel(self):
-        return nodeTypes[self.outputs[0].dataType]
+        return nodeTypes[self.dataType]
 
     def getExecutionCode(self):
         yield "length = len(dataList)"
@@ -46,7 +46,7 @@ class MixDataListNode(bpy.types.Node, AnimationNode):
         yield "    after = dataList[max(min(math.ceil(f), length - 1), 0)]"
         yield "    influence = interpolation(f % 1)"
         yield "    " + getMixCode(self.dataType, "before", "after", "influence", "result")
-        yield "else: result = self.outputs[0].getValue()"
+        yield "else: result = self.outputs[0].getDefaultValue()"
 
     def getUsedModules(self):
         return ["math"]
@@ -56,7 +56,8 @@ class MixDataListNode(bpy.types.Node, AnimationNode):
         self.inputs.clear()
         self.outputs.clear()
 
-        self.inputs.new("an_FloatSocket", "Factor", "factor")
-        self.inputs.new(toListIdName(self.dataType), toListDataType(self.dataType), "dataList")
-        self.inputs.new("an_InterpolationSocket", "Interpolation", "interpolation").defaultDrawType = "PROPERTY_ONLY"
-        self.outputs.new(toIdName(self.dataType), "Result", "result")
+        listDataType = toListDataType(self.dataType)
+        self.newInput("Float", "Factor", "factor")
+        self.newInput(listDataType, listDataType, "dataList")
+        self.newInput("Interpolation", "Interpolation", "interpolation").defaultDrawType = "PROPERTY_ONLY"
+        self.newOutput(self.dataType, "Result", "result")

@@ -7,25 +7,25 @@ class TransformIndividualPolygonsTemplate(bpy.types.Operator, Template):
     nodeOffset = (-300, 400)
 
     def insert(self):
-        meshDataNode = self.newNode('an_ObjectMeshDataNode', x = 0, y = 0)
-        loopInvokeNode = self.newNode('an_InvokeSubprogramNode', x = 210, y = 0)
-        meshFromPolygonsNode = self.newNode('an_MeshDataFromPolygonsNode', x = 450, y = 0)
-        meshOutput = self.newNode('an_MeshObjectOutputNode', x = 660, y = 0)
+        meshDataNode = self.newNode("an_ObjectMeshDataNode", x = 0, y = 0)
+        loopInvokeNode = self.newNode("an_InvokeSubprogramNode", x = 210, y = 0)
+        meshFromPolygonsNode = self.newNode("an_MeshDataFromPolygonsNode", x = 450, y = 0)
+        meshOutput = self.newNode("an_MeshObjectOutputNode", x = 660, y = 0)
         meshOutput.meshDataType = "MESH_DATA"
         meshOutput.inputs["Mesh Data"].isUsed = True
 
-        loopInputNode = self.newNode('an_LoopInputNode', x = 0, y = -300)
-        loopInputNode.newIterator('Polygon List', name = 'Polygon')
-        composeMatrixNode = self.newNode('an_ComposeMatrixNode', x = 280, y = -430)
+        loopInputNode = self.newNode("an_LoopInputNode", x = 0, y = -300)
+        loopInputNode.newIterator("Polygon List", name = "Polygon")
+        composeMatrixNode = self.newNode("an_ComposeMatrixNode", x = 280, y = -430)
         composeMatrixNode.inputs[1].value.x = 2
 
-        transformPolygon = self.newNode('an_TransformPolygonNode', x = 550, y = -295)
+        transformPolygon = self.newNode("an_TransformPolygonNode", x = 550, y = -295)
 
-        generatorOutputNode = self.newNode('an_LoopGeneratorOutputNode', x = 760, y = -295, label = 'Transformed Polygons')
+        generatorOutputNode = self.newNode("an_LoopGeneratorOutputNode", x = 760, y = -295, label = "Transformed Polygons")
         generatorOutputNode.loopInputIdentifier = loopInputNode.identifier
-        generatorOutputNode.outputName = 'Transformed Polygons'
-        generatorOutputNode.listDataType = 'Polygon List'
-        generatorOutputNode.addType = 'APPEND'
+        generatorOutputNode.outputName = "Transformed Polygons"
+        generatorOutputNode.listDataType = "Polygon List"
+        generatorOutputNode.addType = "APPEND"
 
         loopInvokeNode.subprogramIdentifier = loopInputNode.identifier
         self.updateSubprograms()

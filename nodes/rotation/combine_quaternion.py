@@ -6,14 +6,11 @@ class CombineQuaternionNode(bpy.types.Node, AnimationNode):
     bl_label = "Combine Quaternion"
 
     def create(self):
-        self.inputs.new("an_FloatSocket", "W", "w").value = 1
-        self.inputs.new("an_FloatSocket", "X", "x")
-        self.inputs.new("an_FloatSocket", "Y", "y")
-        self.inputs.new("an_FloatSocket", "Z", "z")
-        self.outputs.new("an_QuaternionSocket", "Quaternion", "quaternion")
+        self.newInput("Float", "W", "w").value = 1
+        self.newInput("Float", "X", "x")
+        self.newInput("Float", "Y", "y")
+        self.newInput("Float", "Z", "z")
+        self.newOutput("Quaternion", "Quaternion", "quaternion")
 
     def getExecutionCode(self):
-        return "quaternion = mathutils.Quaternion((w, x, y, z))"
-
-    def getUsedModules(self):
-        return ["mathutils"]
+        return "quaternion = Quaternion((w, x, y, z))"

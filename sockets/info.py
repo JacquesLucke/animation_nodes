@@ -1,153 +1,152 @@
 import bpy
-from functools import lru_cache
+from collections import defaultdict
 from .. utils.enum_items import enumItemsFromList
 
-listChains = [
-    ["an_FloatSocket",              "an_FloatListSocket"],
-    ["an_IntegerSocket",            "an_IntegerListSocket"],
-    ["an_VectorSocket",             "an_VectorListSocket"],
-    ["an_ColorSocket",              "an_ColorListSocket"],
-    ["an_ObjectSocket",             "an_ObjectListSocket"],
-    ["an_StringSocket",             "an_StringListSocket"],
-    ["an_EdgeIndicesSocket",        "an_EdgeIndicesListSocket"],
-    ["an_PolygonIndicesSocket",     "an_PolygonIndicesListSocket"],
-    ["an_ParticleSocket",           "an_ParticleListSocket"],
-    ["an_ParticleSystemSocket",     "an_ParticleSystemListSocket"],
-    ["an_SplineSocket",             "an_SplineListSocket"],
-    ["an_MatrixSocket",             "an_MatrixListSocket"],
-    ["an_MeshDataSocket",           "an_MeshDataListSocket"],
-    ["an_SequenceSocket",           "an_SequenceListSocket"],
-    ["an_PolygonSocket",            "an_PolygonListSocket"],
-    ["an_VertexSocket",             "an_VertexListSocket"],
-    ["an_GenericSocket",            "an_GenericListSocket"],
-    ["an_FCurveSocket",             "an_FCurveListSocket"],
-    ["an_ObjectGroupSocket",        "an_ObjectGroupListSocket"],
-    ["an_EulerSocket",              "an_EulerListSocket"],
-    ["an_QuaternionSocket",         "an_QuaternionListSocket"],
-    ["an_TextBlockSocket",          "an_TextBlockListSocket"],
-    ["an_SceneSocket",              "an_SceneListSocket"],
-    ["an_InterpolationSocket",      "an_InterpolationListSocket"],
-    ["an_FontSocket",               "an_FontListSocket"],
-    ["an_ShapeKeySocket",           "an_ShapeKeyListSocket"],
-    ["an_BooleanSocket",            "an_BooleanListSocket"] ]
+class SocketInfo:
+    def __init__(self):
+        self.reset()
 
-limitedListTypes = {
-    "an_IntegerListSocket" : ("an_EdgeIndicesSocket", "an_PolygonIndicesSocket") }
+    def reset(self):
+        self.idNames = set()
+        self.dataTypes = set()
+
+        self.classByType = dict()
+        self.typeConversion = dict()
+
+        self.baseIdName = dict()
+        self.listIdName = dict()
+        self.baseDataType = dict()
+        self.listDataType = dict()
+
+        self.baseDataTypes = set()
+        self.listDataTypes = set()
+
+        self.copyFunctionByType = dict()
+
+    def update(self, socketClasses):
+        self.reset()
+
+        # create lookup tables first
+        for socket in socketClasses:
+            self.insertSocket(socket)
+
+        # then insert the socket connections
+        for socket in socketClasses:
+            if hasattr(socket, "baseDataType"):
+                self.insertSocketConnection(socket.baseDataType, socket.dataType)
+
+    def insertSocket(self, socketClass):
+        idName = socketClass.bl_idname
+        dataType = socketClass.dataType
+
+        self.idNames.add(idName)
+        self.dataTypes.add(dataType)
+
+        self.classByType[idName] = socketClass
+        self.classByType[dataType] = socketClass
+
+        self.typeConversion[idName] = dataType
+        self.typeConversion[dataType] = idName
+
+        if socketClass.isCopyable():
+            copyFunction = eval("lambda value: " + socketClass.getCopyExpression())
+        else:
+            copyFunction = lambda value: value
+
+        self.copyFunctionByType[idName] = copyFunction
+        self.copyFunctionByType[dataType] = copyFunction
+
+    def insertSocketConnection(self, baseDataType, listDataType):
+        baseIdName = self.typeConversion[baseDataType]
+        listIdName = self.typeConversion[listDataType]
+
+        self.baseIdName[listIdName] = baseIdName
+        self.baseIdName[listDataType] = baseIdName
+        self.listIdName[baseIdName] = listIdName
+        self.listIdName[baseDataType] = listIdName
+
+        self.baseDataType[listIdName] = baseDataType
+        self.baseDataType[listDataType] = baseDataType
+        self.listDataType[baseIdName] = listDataType
+        self.listDataType[baseDataType] = listDataType
+
+        self.baseDataTypes.add(baseDataType)
+        self.listDataTypes.add(listDataType)
 
 
-def returnNoneOnFailure(function):
-    def wrapper(*args, **kwargs):
-        try: return function(*args, **kwargs)
-        except: return None
-    return wrapper
+_socketInfo = SocketInfo()
 
+def updateSocketInfo():
+    socketClasses = getSocketClasses()
+    _socketInfo.update(socketClasses)
+
+def getSocketClasses():
+    from .. base_types.socket import AnimationNodeSocket
+    return AnimationNodeSocket.__subclasses__()
+
+
+def returnOnFailure(returnValue):
+    def failHandlingDecorator(function):
+        def wrapper(*args, **kwargs):
+            try: return function(*args, **kwargs)
+            except: return returnValue
+        return wrapper
+    return failHandlingDecorator
 
 # Check if list or base socket exists
-@returnNoneOnFailure
 def isList(input):
-    if not isIdName(input): input = toIdName(input)
-    return listIdNameToBaseIdName(input) is not None
+    return input in _socketInfo.baseIdName
 
-@returnNoneOnFailure
 def isBase(input):
-    if not isIdName(input): input = toIdName(input)
-    return baseDataTypeToListIdName(input) is not None
-
+    return input in _socketInfo.listIdName
 
 # to Base
-@returnNoneOnFailure
+@returnOnFailure(None)
 def toBaseIdName(input):
-    if isIdName(input): return listIdNameToBaseIdName(input)
-    else: return listDataTypeToBaseIdName(input)
+    return _socketInfo.baseIdName[input]
 
-@returnNoneOnFailure
+@returnOnFailure(None)
 def toBaseDataType(input):
-    if isIdName(input): return listIdNameToBaseDataType(input)
-    else: return listDataTypeToBaseDataType(input)
+    return _socketInfo.baseDataType[input]
 
 # to List
-@returnNoneOnFailure
+@returnOnFailure(None)
 def toListIdName(input):
-    if isIdName(input): return baseIdNameToListIdName(input)
-    else: return baseDataTypeToListIdName(input)
+    return _socketInfo.listIdName[input]
 
-@returnNoneOnFailure
+@returnOnFailure(None)
 def toListDataType(input):
-    if isIdName(input): return baseIdNameToListDataType(input)
-    else: return baseDataTypeToListDataType(input)
+    return _socketInfo.listDataType[input]
 
+# Data Type <-> Id Name
+@returnOnFailure(None)
+def toIdName(input):
+    if isIdName(input): return input
+    return _socketInfo.typeConversion[input]
+
+@returnOnFailure(None)
+def toDataType(input):
+    if isIdName(input):
+        return _socketInfo.typeConversion[input]
+    return input
+
+def isIdName(name):
+    return name in _socketInfo.idNames
+
+
+@returnOnFailure(False)
 def isComparable(input):
-    if not isIdName(input): input = toIdName(input)
-    return getSocketClassFromIdName(input).comparable
+    return _socketInfo.classByType[input].comparable
 
+@returnOnFailure(False)
+def isCopyable(input):
+    return _socketInfo.classByType[input].isCopyable()
 
-# Base Data Type <-> List Data Type
-def listDataTypeToBaseDataType(dataType):
-    listIdName = toIdName(dataType)
-    baseIdName = listIdNameToBaseIdName(listIdName)
-    baseDataType = toDataType(baseIdName)
-    return baseDataType
+def getCopyExpression(input):
+    return _socketInfo.classByType[input].getCopyExpression()
 
-def baseDataTypeToListDataType(dataType):
-    baseIdName = toIdName(dataType)
-    listIdName = baseIdNameToListIdName(baseIdName)
-    listDataType = toDataType(listIdName)
-    return listDataType
-
-# Base Id Name <-> List Data Type
-def listDataTypeToBaseIdName(dataType):
-    listIdName = toIdName(dataType)
-    baseIdName = listIdNameToBaseIdName(listIdName)
-    return baseIdName
-
-def baseIdNameToListDataType(idName):
-    listIdName = baseDataTypeToListIdName(idName)
-    listDataType = toDataType(listIdName)
-    return listDataType
-
-# Base Data Type <-> List Id Name
-def listIdNameToBaseDataType(idName):
-    baseIdName = listIdNameToBaseIdName(idName)
-    baseDataType = toDataType(baseIdName)
-    return baseDataType
-
-def baseDataTypeToListIdName(dataType):
-    baseIdName = toIdName(dataType)
-    listIdName = baseIdNameToListIdName(baseIdName)
-    return listIdName
-
-# Base Id Name <-> List Id Name
-@lru_cache(maxsize = None)
-def listIdNameToBaseIdName(idName):
-    for listChain in listChains:
-        if idName in listChain:
-            index = listChain.index(idName)
-            if index == 0: return None
-            else: return listChain[index - 1]
-
-@lru_cache(maxsize = None)
-def baseIdNameToListIdName(idName):
-    for listChain in listChains:
-        if idName in listChain:
-            index = listChain.index(idName)
-            if index == len(listChain) - 1: return None
-            return listChain[index + 1]
-    return None
-
-def isLimitedList(idName):
-    for limitedLists in limitedListTypes.values():
-        if idName in limitedLists: return True
-    return False
-
-def toGeneralListIdName(limitedListIdName):
-    for generalIdName, limitedLists in limitedListTypes.items():
-        if limitedListIdName in limitedLists: return generalIdName
-
-
-def getSocketClassFromIdName(idName):
-    for cls in getSocketClasses():
-        if cls.bl_idname == idName: return cls
-    return None
+def getCopyFunction(input):
+    return _socketInfo.copyFunctionByType[input]
 
 
 def getListDataTypeItemsCallback(self, context):
@@ -166,50 +165,14 @@ def getDataTypeItems(skipInternalTypes = False):
     return enumItemsFromList(getDataTypes(skipInternalTypes))
 
 def getListDataTypes():
-    return [toDataType(idName) for idName in getListIdNames()]
+    return list(_socketInfo.listDataTypes)
 
 def getBaseDataTypes():
-    return [toDataType(idName) for idName in getBaseIdNames()]
+    return list(_socketInfo.baseDataTypes)
 
 def getDataTypes(skipInternalTypes = False):
+    internalTypes = {"Node Control"}
     if skipInternalTypes:
-        return [socketClass.dataType for socketClass in getSocketClasses() if socketClass.dataType != "Node Control"]
+        return [dataType for dataType in _socketInfo.dataTypes if dataType not in internalTypes]
     else:
-        return [socketClass.dataType for socketClass in getSocketClasses()]
-
-
-def getBaseIdNames():
-    idNames = []
-    for listChain in listChains:
-        idNames.extend(listChain[:-1])
-    return idNames
-
-def getListIdNames():
-    types = []
-    for listChain in listChains:
-        for i, type in enumerate(listChain):
-            if i > 0:
-                types.append(type)
-    return types
-
-
-# Data Type <-> Id Name
-@lru_cache(maxsize = None)
-def toIdName(input):
-    if isIdName(input): return input
-    for subClass in getSocketClasses():
-        if getattr(subClass, "dataType") == input: return subClass.bl_idname
-    return None
-
-@lru_cache(maxsize = None)
-def toDataType(input):
-    if not isIdName(input): return input
-    cls = getattr(bpy.types, input)
-    return cls.dataType
-
-def getSocketClasses():
-    from .. base_types.socket import AnimationNodeSocket
-    return AnimationNodeSocket.__subclasses__()
-
-def isIdName(name):
-    return name.startswith("an_")
+        return list(_socketInfo.dataTypes)

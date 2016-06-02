@@ -3,42 +3,42 @@ from bpy.props import *
 from ... tree_info import keepNodeLinks
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
-from ... sockets.info import getBaseDataTypeItemsCallback, toIdName, toListIdName, isBase, toBaseDataType
+from ... sockets.info import isBase, toBaseDataType, toListDataType
 
 class SearchListElementNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SearchListElementNode"
     bl_label = "Search List Element"
-    
+
     def assignedTypeChanged(self, context):
-        self.baseIdName = toIdName(self.assignedType)
-        self.listIdName = toListIdName(self.assignedType)
         self.generateSockets()
 
     assignedType = StringProperty(update = assignedTypeChanged)
-    baseIdName = StringProperty()
-    listIdName = StringProperty()
-    
+
     def create(self):
-        self.assignedType = "Float" 
-        self.outputs.new("an_IntegerSocket", "First Index", "firstIndex")
-        self.outputs.new("an_IntegerListSocket", "All Indices", "allIndices")
-        self.outputs.new("an_IntegerSocket", "Occurrences", "occurrences")
-        
+        self.assignedType = "Float"
+        self.newOutput("an_IntegerSocket", "First Index", "firstIndex")
+        self.newOutput("an_IntegerListSocket", "All Indices", "allIndices")
+        self.newOutput("an_IntegerSocket", "Occurrences", "occurrences")
+
     def drawAdvanced(self, layout):
         self.invokeSocketTypeChooser(layout, "assignListDataType",
             socketGroup = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
-        
+
     def getExecutionCode(self):
         isLinked = self.getLinkedOutputsDict()
-        if not any(isLinked.values()): return ""
-        
-        lines = []
-        lines.append("allIndices = [i for i, element in enumerate(list) if element == search]")
-        if isLinked["firstIndex"]: lines.append("firstIndex = allIndices[0] if len(allIndices) > 0 else -1")
-        if isLinked["occurrences"]: lines.append("occurrences = len(allIndices)")
+        if not any(isLinked.values()): return
 
-        return lines
-    
+        if isLinked["allIndices"]:
+            yield "allIndices = [i for i, element in enumerate(list) if element == search]"
+            if isLinked["firstIndex"]:  yield "firstIndex = allIndices[0] if len(allIndices) > 0 else -1"
+            if isLinked["occurrences"]: yield "occurrences = len(allIndices)"
+        else:
+            if isLinked["firstIndex"]:
+                yield "try: firstIndex = list.index(search)"
+                yield "except: firstIndex = -1"
+            if isLinked["occurrences"]:
+                yield "occurrences = list.count(search)"
+
     def edit(self):
         baseDataType = self.getWantedDataType()
         self.assignType(baseDataType)
@@ -62,5 +62,7 @@ class SearchListElementNode(bpy.types.Node, AnimationNode):
     @keepNodeLinks
     def generateSockets(self):
         self.inputs.clear()
-        self.inputs.new(self.listIdName, "List", "list").dataIsModified  = True
-        self.inputs.new(self.baseIdName, "Search", "search").dataIsModified = True
+        baseDataType = self.assignedType
+        listDataType = toListDataType(self.assignedType)
+        self.newInput(listDataType, "List", "list", dataIsModified  = True)
+        self.newInput(baseDataType, "Search", "search", dataIsModified = True)

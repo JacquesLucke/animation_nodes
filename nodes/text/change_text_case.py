@@ -3,9 +3,11 @@ from bpy.props import *
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 
-caseTypeItems= [("UPPER", "To Upper Case", ""),
-                ("LOWER", "To Lower Case", ""),
-                ("CAPITALIZE", "Capitalize Phrase", "") ]
+caseTypeItems = [("UPPER", "To Upper Case", ""),
+                 ("LOWER", "To Lower Case", ""),
+                 ("TITLE", "To Title Case", ""),
+                 ("CAPITALIZE", "Capitalize Phrase", ""),
+                 ("CAPWORDS", "Capitalize Words", "") ]
 
 caseTypeCode = { item[0] : item[0].lower() for item in caseTypeItems }
 
@@ -21,11 +23,16 @@ class ChangeTextCaseNode(bpy.types.Node, AnimationNode):
         items = caseTypeItems, update = caseTypeChanges)
 
     def create(self):
-        self.inputs.new("an_StringSocket", "Text", "inText")
-        self.outputs.new("an_StringSocket", "Text", "outText")
+        self.newInput("String", "Text", "inText")
+        self.newOutput("String", "Text", "outText")
 
     def draw(self, layout):
         layout.prop(self, "caseType", text = "")
 
     def getExecutionCode(self):
+        if self.caseType == "CAPWORDS":
+            return "outText = string.capwords(inText)"
         return "outText = inText.{}()".format(caseTypeCode[self.caseType])
+
+    def getUsedModules(self):
+        return ["string"]

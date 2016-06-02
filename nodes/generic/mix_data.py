@@ -1,6 +1,5 @@
 import bpy
 from bpy.props import *
-from ... sockets.info import toIdName
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
 
@@ -22,7 +21,6 @@ class MixDataNode(bpy.types.Node, AnimationNode):
 
     def dataTypeChanged(self, context):
         self.generateSockets()
-        executionCodeChanged()
 
     dataType = StringProperty(default = "Float", update = dataTypeChanged)
     clampFactor = BoolProperty(name = "Clamp Factor",
@@ -42,18 +40,17 @@ class MixDataNode(bpy.types.Node, AnimationNode):
         self.inputs.clear()
         self.outputs.clear()
 
-        idName = toIdName(self.dataType)
-        self.inputs.new("an_FloatSocket", "Factor", "factor")
-        self.inputs.new(idName, "A", "a")
-        self.inputs.new(idName, "B", "b")
-        self.outputs.new(idName, "Result", "result")
+        self.newInput("Float", "Factor", "factor")
+        self.newInput(self.dataType, "A", "a")
+        self.newInput(self.dataType, "B", "b")
+        self.newOutput(self.dataType, "Result", "result")
 
     def getExecutionCode(self):
-        lines = []
-        if self.clampFactor: lines.append("f = min(max(factor, 0.0), 1.0)")
-        else: lines.append("f = factor")
-        lines.append(getMixCode(self.dataType, "a", "b", "f", "result"))
-        return lines
+        if self.clampFactor:
+            yield "f = min(max(factor, 0.0), 1.0)"
+        else:
+            yield "f = factor"
+        yield getMixCode(self.dataType, "a", "b", "f", "result")
 
 def getMixCode(dataType, mix1 = "a", mix2 = "b", factor = "f", result = "result"):
     if dataType in ("Float", "Vector", "Quaternion"): return "{} = {} * (1 - {}) + {} * {}".format(result, mix1, factor, mix2, factor)

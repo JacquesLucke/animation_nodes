@@ -6,8 +6,8 @@ class ConstructKDTreeNode(bpy.types.Node, AnimationNode):
     bl_label = "Construct KDTree"
 
     def create(self):
-        self.inputs.new("an_VectorListSocket", "Vector List", "vectorList")
-        self.outputs.new("an_KDTreeSocket", "KDTree", "kdTree")
+        self.newInput("Vector List", "Vector List", "vectorList")
+        self.newOutput("KDTree", "KDTree", "kdTree")
 
     def getExecutionCode(self):
         yield "kdTree = mathutils.kdtree.KDTree(len(vectorList))"

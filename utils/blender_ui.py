@@ -31,19 +31,35 @@ def iterActiveScreens():
             yield window.screen
 
 
+def splitAreaVertical(area, factor):
+    newArea = splitArea(area, "VERTICAL", factor)
+    if factor < 0.5:
+        return newArea, area
+    return area, newArea
+
+def splitAreaHorizontal(area, factor):
+    newArea = splitArea(area, "HORIZONTAL", factor)
+    if factor < 0.5:
+        return newArea, area
+    return area, newArea
+
+def splitArea(area, direction, factor = 0.5):
+    areasWithSameType = set(iterAreasByType(area.type))
+    overwrite = {"area" : area,
+                 "region" : area.regions[0],
+                 "window" : bpy.context.window,
+                 "screen" : bpy.context.screen}
+    bpy.ops.screen.area_split(overwrite, direction = direction, factor = factor)
+    newArea = (set(iterAreasByType(area.type)) - areasWithSameType).pop()
+    return newArea
+
+
 def redrawAll():
     for area in iterAreas():
         area.tag_redraw()
 
 def isViewportRendering():
     return any([space.viewport_shade == "RENDERED" for space in iterActiveSpacesByType("VIEW_3D")])
-
-
-def convertToRegionLocation(region, x, y):
-    factor = getDpiFactor()
-    x *= factor
-    y *= factor
-    return Vector(region.view2d.view_to_region(x, y, clip = False))
 
 def getDpiFactor():
     return getDpi() / 72
@@ -64,6 +80,29 @@ def executeInAreaType(areaType):
             return output
         return wrapper
     return changeAreaTypeDecorator
+
+
+def iterNodeCornerLocations(nodes, region, horizontal):
+    if horizontal == "LEFT":
+        yield from iterNodeBottomLeftCornerLocations(nodes, region)
+    elif horizontal == "RIGHT":
+        yield from iterNodeBottomRightCornerLocations(nodes, region)
+
+def iterNodeBottomLeftCornerLocations(nodes, region):
+    factor = getDpiFactor()
+    viewToRegion = region.view2d.view_to_region
+    for node in nodes:
+        location = node.viewLocation * factor
+        dimensions = node.dimensions
+        yield Vector(viewToRegion(location.x, location.y - dimensions.y, clip = False))
+
+def iterNodeBottomRightCornerLocations(nodes, region):
+    factor = getDpiFactor()
+    viewToRegion = region.view2d.view_to_region
+    for node in nodes:
+        location = node.viewLocation * factor
+        dimensions = node.dimensions
+        yield Vector(viewToRegion(location.x + dimensions.x, location.y - dimensions.y, clip = False))
 
 
 class PieMenuHelper:

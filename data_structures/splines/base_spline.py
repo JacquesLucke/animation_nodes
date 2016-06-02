@@ -19,6 +19,9 @@ class Spline:
         if name == "isChanged": return True
         if name == "uniformConverter": return None
 
+    def __repr__(self):
+        return "<AN Spline Object: {}>".format(self.type)
+
 
     def copy(self):
         return copy.deepcopy(self)
@@ -133,7 +136,6 @@ class Spline:
         splineTangent = self.evaluateTangent(parameter)
         projectionData = [(splineProjection, splineTangent)]
 
-        # TODO: can cause division by zero here
         if not self.isCyclic:
             startPoint = self.evaluate(0)
             startTangent = self.evaluateTangent(0)

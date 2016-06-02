@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
+from ... sockets.info import isList
 from ... tree_info import keepNodeState
-from ... sockets.info import toIdName, isList
 from ... base_types.node import AnimationNode
 
 class ShiftListNode(bpy.types.Node, AnimationNode):
@@ -9,11 +9,9 @@ class ShiftListNode(bpy.types.Node, AnimationNode):
     bl_label = "Shift List"
 
     def assignedTypeChanged(self, context):
-        self.listIdName = toIdName(self.assignedType)
         self.generateSockets()
 
     assignedType = StringProperty(update = assignedTypeChanged)
-    listIdName = StringProperty()
 
     def create(self):
         self.assignedType = "Object List"
@@ -45,6 +43,8 @@ class ShiftListNode(bpy.types.Node, AnimationNode):
     def generateSockets(self):
         self.inputs.clear()
         self.outputs.clear()
-        self.inputs.new(self.listIdName, "List", "inList").dataIsModified = True
-        self.inputs.new("an_IntegerSocket", "Amount", "amount")
-        self.outputs.new(self.listIdName, "Shifted List", "shiftedList")
+
+        listDataType = self.assignedType
+        self.newInput(listDataType, "List", "inList", dataIsModified = True)
+        self.newInput("Integer", "Amount", "amount")
+        self.newOutput(listDataType, "Shifted List", "shiftedList")

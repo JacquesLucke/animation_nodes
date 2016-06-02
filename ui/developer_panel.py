@@ -1,5 +1,7 @@
 import bpy
-from .. preferences import getDeveloperSettings
+from .. preferences import getPreferences
+from .. operators.output_execution_code import setupTextEditorCallback, executionCodeTextBlockName
+
 
 class DeveloperPanel(bpy.types.Panel):
     bl_idname = "an_developer_panel"
@@ -18,17 +20,47 @@ class DeveloperPanel(bpy.types.Panel):
         layout = self.layout
         tree = context.space_data.node_tree
 
+        preferences = getPreferences()
+
         col = layout.column()
-        col.label("Execution Code:")
-        row = col.row(align = True)
-        row.operator("an.print_current_execution_code", text = "Print", icon = "CONSOLE")
-        row.operator("an.write_current_execution_code", text = "Write", icon = "TEXT")
+        self.drawExecutionCodeSettings(col, preferences)
 
         layout.separator()
 
         col = layout.column()
-        col.label("Profile Execution:")
+        self.drawProfilingSettings(col, preferences)
+
+        layout.separator()
+
+        layout.prop(preferences.nodeColors, "nodeColorMode", text = "Color Mode")
+
+    def drawExecutionCodeSettings(self, layout, preferences):
+        executionCode = preferences.executionCode
+        layout.label("Execution Code:")
+
+        col = layout.column(align = True)
+
         row = col.row(align = True)
-        row.operator("an.print_profile_execution_result", text = "Print", icon = "CONSOLE")
-        row.operator("an.write_profile_execution_result", text = "Write", icon = "TEXT")
-        layout.prop(getDeveloperSettings(), "profilingSortMode", text = "Sort")
+        row.prop(executionCode, "type", text = "")
+        if executionCode.type == "MEASURE":
+            row.operator("an.reset_measurements", text = "", icon = "RECOVER_LAST")
+
+        row = col.row(align = True)
+        row.operator("an.print_current_execution_code", text = "Print", icon = "CONSOLE")
+        row.operator("an.write_current_execution_code", text = "Write", icon = "TEXT")
+        subrow = row.row(align = True)
+        subrow.active = executionCodeTextBlockName in bpy.data.texts
+        subrow.operator("an.select_area", text = "", icon = "ZOOM_SELECTED").callback = setupTextEditorCallback
+
+    def drawProfilingSettings(self, layout, preferences):
+        profiling = preferences.developer.profiling
+
+        col = layout.column()
+        col.prop(profiling, "function", text = "Function")
+        col.prop(profiling, "sort", text = "Sort Mode")
+        col.prop(profiling, "output", text = "Output")
+
+        props = col.operator("an.profile", text = "Profile", icon = "PREVIEW_RANGE")
+        props.function = profiling.function
+        props.sort = profiling.sort
+        props.output = profiling.output

@@ -11,6 +11,7 @@ class ForestData:
         self.nodesByType = defaultdict(set)
         self.typeByNode = defaultdict(None)
         self.nodeByIdentifier = defaultdict(None)
+        self.animationNodes = set()
 
         self.socketsByNode = defaultdict(lambda: ([], []))
 
@@ -29,10 +30,10 @@ class ForestData:
 
     def insertNodeTrees(self):
         for tree in getAnimationNodeTrees():
-            self.insertNodes(tree.nodes)
-            self.insertLinks(tree.links)
+            self.insertNodes(tree.nodes, tree.name)
+            self.insertLinks(tree.links, tree.name)
 
-    def insertNodes(self, nodes):
+    def insertNodes(self, nodes, treeName):
         appendNode = self.nodes.append
         nodesByType = self.nodesByType
         typeByNode = self.typeByNode
@@ -40,24 +41,31 @@ class ForestData:
         socketsByNode = self.socketsByNode
         reroutePairs = self.reroutePairs
         dataTypeBySocket = self.dataTypeBySocket
+        animationNodes = self.animationNodes
         socketsThatNeedUpdate = self.socketsThatNeedUpdate
 
         for node in nodes:
-            nodeID = node.toID()
-            inputIDs = [socket.toID() for socket in node.inputs]
-            outputIDs = [socket.toID() for socket in node.outputs]
+            nodeID = (treeName, node.name)
+
+            inputIDs = [(nodeID, False, socket.identifier) for socket in node.inputs]
+            outputIDs = [(nodeID, True, socket.identifier) for socket in node.outputs]
 
             appendNode(nodeID)
             typeByNode[nodeID] = node.bl_idname
             nodesByType[node.bl_idname].add(nodeID)
-            nodeByIdentifier[getattr(node, "identifier", None)] = nodeID
 
             socketsByNode[nodeID] = (inputIDs, outputIDs)
 
             if node.bl_idname == "NodeReroute":
                 reroutePairs[inputIDs[0]] = outputIDs[0]
                 reroutePairs[outputIDs[0]] = inputIDs[0]
+            elif node.bl_idname == "NodeFrame":
+                pass
             else:
+                if node.bl_idname != "NodeUndefined":
+                    animationNodes.add(nodeID)
+                    nodeByIdentifier[node.identifier] = nodeID
+
                 chainedSockets = chain(node.inputs, node.outputs)
                 chainedSocketIDs = chain(inputIDs, outputIDs)
                 for socket, socketID in zip(chainedSockets, chainedSocketIDs):
@@ -66,12 +74,14 @@ class ForestData:
                             socketsThatNeedUpdate.add(socketID)
 
 
-    def insertLinks(self, links):
+    def insertLinks(self, links, treeName):
         linkedSocketsWithReroutes = self.linkedSocketsWithReroutes
 
         for link in links:
-            originID = link.from_socket.toID()
-            targetID = link.to_socket.toID()
+            originSocket = link.from_socket
+            targetSocket = link.to_socket
+            originID = ((treeName, link.from_node.name), originSocket.is_output, originSocket.identifier)
+            targetID = ((treeName, link.to_node.name), targetSocket.is_output, targetSocket.identifier)
 
             linkedSocketsWithReroutes[originID].append(targetID)
             linkedSocketsWithReroutes[targetID].append(originID)

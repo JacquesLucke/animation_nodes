@@ -1,7 +1,6 @@
 import bpy
 from bpy.props import *
-from ... sockets.info import toIdName, toListIdName
-from ... events import executionCodeChanged
+from ... sockets.info import toListDataType
 from ... base_types.node import AnimationNode
 
 class FloatRangeListNode(bpy.types.Node, AnimationNode):
@@ -15,7 +14,6 @@ class FloatRangeListNode(bpy.types.Node, AnimationNode):
 
     def dataTypeChanged(self, context):
         self.generateSockets()
-        executionCodeChanged()
 
     dataType = StringProperty(default = "Float", update = dataTypeChanged)
 
@@ -29,12 +27,10 @@ class FloatRangeListNode(bpy.types.Node, AnimationNode):
         self.inputs.clear()
         self.outputs.clear()
 
-        baseIdName = toIdName(self.dataType)
-        listIdName = toListIdName(self.dataType)
-        self.inputs.new("an_IntegerSocket", "Amount", "amount").value = 5
-        self.inputs.new(baseIdName, "Start", "start")
-        self.inputs.new(baseIdName, "Step", "step").value = 1
-        self.outputs.new(listIdName, "List", "list")
+        self.newInput("Integer", "Amount", "amount", value = 5)
+        self.newInput(self.dataType, "Start", "start")
+        self.newInput(self.dataType, "Step", "step", value = 1)
+        self.newOutput(toListDataType(self.dataType), "List", "list")
 
     def getExecutionCode(self):
         if self.dataType == "Float":

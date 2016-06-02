@@ -11,16 +11,16 @@ class TextSequenceOutputNode(bpy.types.Node, AnimationNode):
     errorMessage = StringProperty()
 
     def create(self):
-        self.inputs.new("an_SequenceSocket", "Sequence", "sequence").defaultDrawType = "PROPERTY_ONLY"
-        self.inputs.new("an_StringSocket", "Text", "text")
-        self.inputs.new("an_IntegerSocket", "Size", "size").value = 200
-        self.inputs.new("an_BooleanSocket", "Shadow", "shadow").value = False
-        self.inputs.new("an_StringSocket", "X Align", "xAlign").value = "CENTER"
-        self.inputs.new("an_StringSocket", "Y Align", "yAlign").value = "BOTTOM"
-        self.inputs.new("an_FloatSocket", "X Location", "xLocation").value = 0.5
-        self.inputs.new("an_FloatSocket", "Y Location", "yLocation").value = 0.0
-        self.inputs.new("an_FloatSocket", "Wrap Width", "wrapWidth").value = 0.0
-        self.outputs.new("an_SequenceSocket", "Sequence", "sequence")
+        self.newInput("Sequence", "Sequence", "sequence", defaultDrawType = "PROPERTY_ONLY")
+        self.newInput("String", "Text", "text")
+        self.newInput("Integer", "Size", "size", value = 200)
+        self.newInput("Boolean", "Shadow", "shadow", value = False)
+        self.newInput("String", "X Align", "xAlign", value = "CENTER")
+        self.newInput("String", "Y Align", "yAlign", value = "BOTTOM")
+        self.newInput("Float", "X Location", "xLocation", value = 0.5)
+        self.newInput("Float", "Y Location", "yLocation", value = 0.0)
+        self.newInput("Float", "Wrap Width", "wrapWidth", value = 0.0)
+        self.newOutput("Sequence", "Sequence", "sequence")
 
         for socket in self.inputs[1:]:
             socket.useIsUsedProperty = True
@@ -44,8 +44,8 @@ class TextSequenceOutputNode(bpy.types.Node, AnimationNode):
         if s["Text"].isUsed:        yield "    sequence.text = text"
         if s["Size"].isUsed:        yield "    sequence.font_size = size"
         if s["Shadow"].isUsed:      yield "    sequence.use_shadow = shadow"
-        if s["X Align"].isUsed:       yield "    self.setXAlignment(sequence, xAlign)"
-        if s["Y Align"].isUsed:       yield "    self.setYAlignment(sequence, yAlign)"
+        if s["X Align"].isUsed:     yield "    self.setXAlignment(sequence, xAlign)"
+        if s["Y Align"].isUsed:     yield "    self.setYAlignment(sequence, yAlign)"
         if s["X Location"].isUsed:  yield "    sequence.location[0] = xLocation"
         if s["Y Location"].isUsed:  yield "    sequence.location[1] = yLocation"
         if s["Wrap Width"].isUsed:  yield "    sequence.wrap_width = wrapWidth"
@@ -61,3 +61,14 @@ class TextSequenceOutputNode(bpy.types.Node, AnimationNode):
             sequence.align_y = align
         else:
             self.errorMessage = "Y Align must be TOP, CENTER or BOTTOM"
+
+    def getBakeCode(self):
+        yield "if getattr(sequence, 'type', '') == 'TEXT':"
+        s = self.inputs
+        if s["Size"].isUsed:        yield "    sequence.keyframe_insert('font_size')"
+        if s["Shadow"].isUsed:      yield "    sequence.keyframe_insert('use_shadow')"
+        if s["X Align"].isUsed:     yield "    sequence.keyframe_insert('align_x')"
+        if s["Y Align"].isUsed:     yield "    sequence.keyframe_insert('align_y')"
+        if s["X Location"].isUsed:  yield "    sequence.keyframe_insert('location', index = 0)"
+        if s["Y Location"].isUsed:  yield "    sequence.keyframe_insert('location', index = 1)"
+        if s["Wrap Width"].isUsed:  yield "    sequence.keyframe_insert('wrap_width')"

@@ -1,5 +1,6 @@
 import bpy
 from bpy.props import *
+from bpy.types import ShapeKey
 from .. events import propertyChanged
 from .. base_types.socket import AnimationNodeSocket
 from .. utils.id_reference import tryToFindObjectReference
@@ -16,10 +17,10 @@ class ShapeKeySocket(bpy.types.NodeSocket, AnimationNodeSocket):
     objectName = StringProperty(update = propertyChanged,
         description = "Load the second shape key of this object (the first that is not the reference key)")
 
-    def drawProperty(self, layout, text):
+    def drawProperty(self, layout, text, node):
         row = layout.row(align = True)
         row.prop_search(self, "objectName",  bpy.context.scene, "objects", icon = "NONE", text = text)
-        self.invokeFunction(row, "assignActiveObject", icon = "EYEDROPPER")
+        self.invokeFunction(row, node, "assignActiveObject", icon = "EYEDROPPER")
 
     def getValue(self):
         object = self.getObject()
@@ -45,3 +46,39 @@ class ShapeKeySocket(bpy.types.NodeSocket, AnimationNodeSocket):
         object = bpy.context.active_object
         if object:
             self.objectName = object.name
+
+    @classmethod
+    def getDefaultValue(cls):
+        return None
+
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, ShapeKey) or value is None:
+            return value, 0
+        return cls.getDefaultValue(), 2
+
+
+class ShapeKeyListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+    bl_idname = "an_ShapeKeyListSocket"
+    bl_label = "Shape Key List Socket"
+    dataType = "Shape Key List"
+    baseDataType = "Shape Key"
+    allowedInputTypes = ["Shape Key List"]
+    drawColor = (1.0, 0.6, 0.5, 0.5)
+    storable = False
+    comparable = False
+
+    @classmethod
+    def getDefaultValue(cls):
+        return []
+
+    @classmethod
+    def getDefaultValueCode(cls):
+        return "[]"
+
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, list):
+            if all(isinstance(element, ShapeKey) or element is None for element in value):
+                return value, 0
+        return cls.getDefaultValue(), 2

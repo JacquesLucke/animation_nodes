@@ -1,8 +1,9 @@
 import bpy
+import numpy
 from bpy.props import *
 from mathutils import Color
-from ... base_types.node import AnimationNode
 from ... events import propertyChanged
+from ... base_types.node import AnimationNode
 
 class SetVertexColorNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SetVertexColorNode"
@@ -13,9 +14,9 @@ class SetVertexColorNode(bpy.types.Node, AnimationNode):
     errorMessage = StringProperty()
 
     def create(self):
-        self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
-        self.inputs.new("an_ColorSocket", "Color", "color").defaultDrawType = "PROPERTY_ONLY"
-        self.outputs.new("an_ObjectSocket", "Object", "outObject")
+        self.newInput("Object", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
+        self.newInput("Color", "Color", "color").defaultDrawType = "PROPERTY_ONLY"
+        self.newOutput("Object", "Object", "outObject")
 
     def draw(self, layout):
         layout.prop(self, "vertexColorName", text = "", icon = "GROUP_VCOL")
@@ -47,8 +48,9 @@ class SetVertexColorNode(bpy.types.Node, AnimationNode):
             if colorsAreEqual(newColor, oldColor):
                 return object
 
-        colorList = tuple(newColor) * len(colorLayer.data)
-        colorLayer.data.foreach_set("color", colorList)
+        newColorAsArray = numpy.array(newColor, dtype = "f")
+        colors = numpy.tile(newColorAsArray, len(colorLayer.data))
+        colorLayer.data.foreach_set("color", colors)
 
         # without this line the 3d view doesn't update
         colorLayer.data[0].color = newColor

@@ -12,78 +12,78 @@ class FCurveAnimationOffsetTemplate(bpy.types.Operator, Template):
         ####################################################################
 
         # Main Unit
-        sourceObjectNode = self.newNode('an_DataInputNode', x = 0, y = 0, label = 'Source Object')
-        sourceObjectNode.assignedType = 'Object'
+        sourceObjectNode = self.newNode("an_DataInputNode", x = 0, y = 0, label = "Source Object")
+        sourceObjectNode.assignedType = "Object"
 
-        timeInfoNode = self.newNode('an_TimeInfoNode', x = 0, y = -200)
-        additionalOffsetNode = self.newNode('an_TranslationMatrixNode', x = 0, y = -325)
+        timeInfoNode = self.newNode("an_TimeInfoNode", x = 0, y = -200)
+        additionalOffsetNode = self.newNode("an_TranslationMatrixNode", x = 0, y = -325)
         additionalOffsetNode.inputs[0].value = [4, 3, 0]
-        individualOffsetNode = self.newNode('an_ComposeMatrixNode', x = 220, y = -325)
+        individualOffsetNode = self.newNode("an_ComposeMatrixNode", x = 220, y = -325)
         individualOffsetNode.inputs[0].value = [3, 0, 0]
-        delayTimeNode = self.newNode('an_DelayTimeNode', x = 220, y = -200)
-        objectInstancer = self.newNode('an_ObjectInstancerNode', x = 220, y = 150)
+        delayTimeNode = self.newNode("an_DelayTimeNode", x = 220, y = -200)
+        objectInstancer = self.newNode("an_ObjectInstancerNode", x = 220, y = 150)
         objectInstancer.copyObjectProperties = True
         objectInstancer.removeAnimationData = True
         objectInstancer.inputs[0].value = 5
-        invokeAnimationOffsetNode = self.newNode('an_InvokeSubprogramNode', x = 500, y = -80)
+        invokeAnimationOffsetNode = self.newNode("an_InvokeSubprogramNode", x = 500, y = -80)
 
         # Animation Offset Group
 
-        animationOffsetGroupInputNode = self.newNode('an_GroupInputNode', x = 0, y = -845)
+        animationOffsetGroupInputNode = self.newNode("an_GroupInputNode", x = 0, y = -845)
         animationOffsetGroupInputNode.subprogramName = "FCurve Animation Offset"
-        animationOffsetGroupInputNode.newParameter('Object', name = 'Source')
-        animationOffsetGroupInputNode.newParameter('Object List', name = 'Targets')
-        animationOffsetGroupInputNode.newParameter('Float', name = 'Frame')
-        animationOffsetGroupInputNode.newParameter('Float', name = 'Time Offset').value = 10
-        animationOffsetGroupInputNode.newParameter('Matrix', name = 'Additional Offset')
-        animationOffsetGroupInputNode.newParameter('Matrix', name = 'Individual Offset')
+        animationOffsetGroupInputNode.newParameter("Object", name = "Source")
+        animationOffsetGroupInputNode.newParameter("Object List", name = "Targets")
+        animationOffsetGroupInputNode.newParameter("Float", name = "Frame")
+        animationOffsetGroupInputNode.newParameter("Float", name = "Time Offset").value = 10
+        animationOffsetGroupInputNode.newParameter("Matrix", name = "Additional Offset")
+        animationOffsetGroupInputNode.newParameter("Matrix", name = "Individual Offset")
 
-        fCurvesFromObjectNode = self.newNode('an_FCurvesFromObjectNode', x = 250, y = -775)
-        invokeObjectLoopNode = self.newNode('an_InvokeSubprogramNode', x = 470, y = -745)
+        fCurvesFromObjectNode = self.newNode("an_FCurvesFromObjectNode", x = 250, y = -775)
+        invokeObjectLoopNode = self.newNode("an_InvokeSubprogramNode", x = 470, y = -745)
 
-        animationOffsetGroupOutputNode = self.newNode('an_GroupOutputNode', x = 700, y = -745)
-        animationOffsetGroupOutputNode.newReturn('Object List', name = 'Targets')
+        animationOffsetGroupOutputNode = self.newNode("an_GroupOutputNode", x = 700, y = -745)
+        animationOffsetGroupOutputNode.newReturn("Object List", name = "Targets")
 
         # Object Loop
 
-        objectLoopInputNode = self.newNode('an_LoopInputNode', x = 0, y = -1300)
+        objectLoopInputNode = self.newNode("an_LoopInputNode", x = 0, y = -1300)
         objectLoopInputNode.subprogramName = "Object Loop"
-        objectLoopInputNode.newIterator('Object List', name = 'Target').loop.useAsOutput = True
-        objectLoopInputNode.newParameter('Object', name = 'Source')
-        objectLoopInputNode.newParameter('FCurve List', name = 'FCurve List')
-        objectLoopInputNode.newParameter('Float', name = 'Frame')
-        objectLoopInputNode.newParameter('Float', name = 'Time Offset')
-        objectLoopInputNode.newParameter('Matrix', name = 'Additional Offset')
-        objectLoopInputNode.newParameter('Matrix', name = 'Individual Offset')
-        accumulatedTransformationSocket = objectLoopInputNode.newParameter('Matrix', name = 'Accumulated Transformation')
+        objectLoopInputNode.newIterator("Object List", name = "Target").loop.useAsOutput = True
+        objectLoopInputNode.newParameter("Object", name = "Source")
+        objectLoopInputNode.newParameter("FCurve List", name = "FCurve List")
+        objectLoopInputNode.newParameter("Float", name = "Frame")
+        objectLoopInputNode.newParameter("Float", name = "Time Offset")
+        objectLoopInputNode.newParameter("Matrix", name = "Additional Offset")
+        objectLoopInputNode.newParameter("Matrix", name = "Individual Offset")
+        accumulatedTransformationSocket = objectLoopInputNode.newParameter("Matrix", name = "Accumulated Transformation")
         accumulatedTransformationSocket.loop.useAsInput = False
 
-        multiplyIndexAndOffsetNode = self.newNode('an_FloatMathNode', x = 350, y = -1200)
-        subtractOffsetFromFrameNode = self.newNode('an_FloatMathNode', x = 550, y = -1200)
+        multiplyIndexAndOffsetNode = self.newNode("an_FloatMathNode", x = 350, y = -1200)
+        subtractOffsetFromFrameNode = self.newNode("an_FloatMathNode", x = 550, y = -1200)
         subtractOffsetFromFrameNode.operation = "SUBTRACT"
-        calculateAccumulatedMatrixNode = self.newNode('an_MatrixMathNode', x = 350, y = -1580)
-        reassignAccumulatedMatrixNode = self.newNode('an_ReassignLoopParameterNode', x = 540, y = -1580)
-        copyTransformsNode = self.newNode('an_CopyTransformsNode', x = 550, y = -1340)
+        calculateAccumulatedMatrixNode = self.newNode("an_MatrixMathNode", x = 350, y = -1580)
+        reassignAccumulatedMatrixNode = self.newNode("an_ReassignLoopParameterNode", x = 540, y = -1580)
+        copyTransformsNode = self.newNode("an_CopyTransformsNode", x = 550, y = -1340)
         copyTransformsNode.width = 140
-        invokeCopyFCurvesNode = self.newNode('an_InvokeSubprogramNode', x = 760, y = -1200)
-        updateMatrixNode = self.newNode('an_UpdateObjectMatricesNode', x = 1030, y = -1330)
-        localTransformNode = self.newNode('an_TransformObjectNode', x = 1230, y = -1370)
+        invokeCopyFCurvesNode = self.newNode("an_InvokeSubprogramNode", x = 760, y = -1200)
+        updateMatrixNode = self.newNode("an_UpdateObjectMatricesNode", x = 1030, y = -1330)
+        localTransformNode = self.newNode("an_TransformObjectNode", x = 1230, y = -1370)
         localTransformNode.useCenter = True
-        additionalTransformNode = self.newNode('an_TransformObjectNode', x = 1450, y = -1415)
+        additionalTransformNode = self.newNode("an_TransformObjectNode", x = 1450, y = -1415)
         additionalTransformNode.useCenter = False
 
         # Copy FCurves Loop
 
-        copyFCurvesLoopInput = self.newNode('an_LoopInputNode', x = 0, y = -1850)
+        copyFCurvesLoopInput = self.newNode("an_LoopInputNode", x = 0, y = -1850)
         copyFCurvesLoopInput.subprogramName = "Copy FCurves"
-        copyFCurvesLoopInput.newIterator('FCurve List', name = 'FCurve')
-        copyFCurvesLoopInput.newParameter('Object', name = 'Object').loop.useAsOutput = True
-        copyFCurvesLoopInput.newParameter('Float', name = 'Frame Offset')
+        copyFCurvesLoopInput.newIterator("FCurve List", name = "FCurve")
+        copyFCurvesLoopInput.newParameter("Object", name = "Object").loop.useAsOutput = True
+        copyFCurvesLoopInput.newParameter("Float", name = "Frame Offset")
 
-        fCurveInfoNode = self.newNode('an_FCurveInfoNode', x = 300, y = -1850)
-        evaluateFCurveNode = self.newNode('an_EvaluateFCurveNode', x = 300, y = -2000)
+        fCurveInfoNode = self.newNode("an_FCurveInfoNode", x = 300, y = -1850)
+        evaluateFCurveNode = self.newNode("an_EvaluateFCurveNode", x = 300, y = -2000)
         evaluateFCurveNode.frameType = "ABSOLUTE"
-        objectDataPathOutputNode = self.newNode('an_ObjectDataPathOutputNode', x = 550, y = -1910)
+        objectDataPathOutputNode = self.newNode("an_ObjectDataPathOutputNode", x = 550, y = -1910)
 
         self.updateSubprograms()
 

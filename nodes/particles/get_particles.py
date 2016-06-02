@@ -6,8 +6,8 @@ class GetParticlesNode(bpy.types.Node, AnimationNode):
     bl_label = "Get Particles"
 
     def create(self):
-        self.inputs.new("an_ParticleSystemSocket", "Particle System", "particleSystem")
-        self.outputs.new("an_ParticleListSocket", "Particles", "particles")
+        self.newInput("Particle System", "Particle System", "particleSystem")
+        self.newOutput("Particle List", "Particles", "particles")
 
     def execute(self, particleSystem):
         if not particleSystem: return []

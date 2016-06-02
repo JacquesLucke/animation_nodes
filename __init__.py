@@ -1,5 +1,5 @@
 '''
-Copyright (C) 2014 Jacques Lucke
+Copyright (C) 2016 Jacques Lucke
 mail@jlucke.com
 
 Created by Jacques Lucke
@@ -64,6 +64,15 @@ if "numpy" not in globals():
     raise Exception(message)
 
 
+from . preferences import getBlenderVersion
+if getBlenderVersion() < (2, 76, 0):
+    message = ("\n\n"
+        "The Animation Nodes addon requires at least Blender 2.77.\n"
+        "Your are using an older version.\n"
+        "Please download the latest official release.")
+    raise Exception(message)
+
+
 
 # load and reload submodules
 ##################################
@@ -75,13 +84,11 @@ modules = developer_utils.setup_addon_modules(__path__, __name__, "bpy" in local
 
 
 
-# Public API
+# Initialization
 ##################################
 
-from . execution import units
-subprogramsByName = units.getSubprogramUnitsByName
-setup = units.setupExecutionUnits
-finish = units.finishExecutionUnits
+from . sockets.info import updateSocketInfo
+updateSocketInfo()
 
 
 

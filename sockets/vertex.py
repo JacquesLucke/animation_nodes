@@ -12,10 +12,48 @@ class VertexSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = True
     comparable = False
 
-    def getValue(self):
+    @classmethod
+    def getDefaultValue(cls):
         return Vertex(location = Vector((0, 0, 0)),
                       normal = Vector((0, 0, 1)),
                       groupWeights = [])
 
-    def getCopyExpression(self):
+    @classmethod
+    def getCopyExpression(cls):
         return "value.copy()"
+
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, Vertex):
+            return value, 0
+        return cls.getDefaultValue(), 2
+
+
+class VertexListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+    bl_idname = "an_VertexListSocket"
+    bl_label = "Vertex List Socket"
+    dataType = "Vertex List"
+    baseDataType = "Vertex"
+    allowedInputTypes = ["Vertex List"]
+    drawColor = (0.55, 0.61, 0.32, 0.5)
+    storable = True
+    comparable = False
+
+    @classmethod
+    def getDefaultValue(cls):
+        return []
+
+    @classmethod
+    def getDefaultValueCode(cls):
+        return "[]"
+
+    @classmethod
+    def getCopyExpression(cls):
+        return "[element.copy() for element in value]"
+
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, list):
+            if all(isinstance(element, Vertex) for element in value):
+                return value, 0
+        return cls.getDefaultValue(), 2

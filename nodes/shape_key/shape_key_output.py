@@ -11,15 +11,15 @@ class ShapeKeyOutputNode(bpy.types.Node, AnimationNode):
     errorMessage = StringProperty()
 
     def create(self):
-        self.inputs.new("an_ShapeKeySocket", "Shape Key", "shapeKey").defaultDrawType = "PROPERTY_ONLY"
+        self.newInput("Shape Key", "Shape Key", "shapeKey").defaultDrawType = "PROPERTY_ONLY"
 
-        self.inputs.new("an_FloatSocket", "Value", "value").setRange(0, 1)
-        self.inputs.new("an_FloatSocket", "Slider Min", "sliderMin")
-        self.inputs.new("an_FloatSocket", "Slider Max", "sliderMax")
-        self.inputs.new("an_StringSocket", "Name", "name")
-        self.inputs.new("an_BooleanSocket", "Mute", "mute")
+        self.newInput("Float", "Value", "value").setRange(0, 1)
+        self.newInput("Float", "Slider Min", "sliderMin")
+        self.newInput("Float", "Slider Max", "sliderMax")
+        self.newInput("String", "Name", "name")
+        self.newInput("Boolean", "Mute", "mute")
 
-        self.outputs.new("an_ShapeKeySocket", "Shape Key", "shapeKey")
+        self.newOutput("Shape Key", "Shape Key", "shapeKey")
 
         for socket in self.inputs[1:]:
             socket.useIsUsedProperty = True

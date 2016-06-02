@@ -6,8 +6,8 @@ class BooleanToIntegerNode(bpy.types.Node, AnimationNode):
     bl_label = "Boolean to Integer"
 
     def create(self):
-        self.inputs.new("an_BooleanSocket", "Boolean", "boolean")
-        self.outputs.new("an_IntegerSocket", "Number", "number")
+        self.newInput("Boolean", "Boolean", "boolean")
+        self.newOutput("Integer", "Number", "number")
 
     def getExecutionCode(self):
         return "number = int(boolean)"

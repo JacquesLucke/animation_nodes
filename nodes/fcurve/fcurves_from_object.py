@@ -6,8 +6,8 @@ class FCurvesFromObjectNode(bpy.types.Node, AnimationNode):
     bl_label = "FCurves from Object"
 
     def create(self):
-        self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
-        self.outputs.new("an_FCurveListSocket", "FCurves", "fCurves")
+        self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
+        self.newOutput("FCurve List", "FCurves", "fCurves")
 
     def execute(self, object):
         try: return list(object.animation_data.action.fcurves)

@@ -7,12 +7,12 @@ class FindCloseVerticesNode(bpy.types.Node, AnimationNode):
     bl_label = "Find Close Vertices"
 
     def create(self):
-        self.inputs.new("an_VectorListSocket", "Vertices", "vertices")
-        self.inputs.new("an_IntegerSocket", "Clusters", "clusters").value = 1000
-        self.inputs.new("an_IntegerSocket", "Connections", "connections").value = 3
-        self.inputs.new("an_FloatSocket", "Min Distance", "minDistance").value = 0.02
-        self.inputs.new("an_FloatSocket", "Max Distance", "maxDistance").value = 0.3
-        self.outputs.new("an_EdgeIndicesListSocket", "Edges", "edges")
+        self.newInput("Vector List", "Vertices", "vertices")
+        self.newInput("Integer", "Clusters", "clusters", value = 1000)
+        self.newInput("Integer", "Connections", "connections", value = 3)
+        self.newInput("Float", "Min Distance", "minDistance", value = 0.02)
+        self.newInput("Float", "Max Distance", "maxDistance", value = 0.3)
+        self.newOutput("Edge Indices List", "Edges", "edges")
 
     def execute(self, vertices, clusters, connections, minDistance, maxDistance):
         minDistance = max(0, minDistance)

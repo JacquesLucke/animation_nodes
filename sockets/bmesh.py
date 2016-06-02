@@ -11,8 +11,16 @@ class BMeshSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = False
     comparable = True
 
-    def getValue(self):
+    @classmethod
+    def getDefaultValue(cls):
         return bmesh.new()
 
-    def getCopyExpression(self):
+    @classmethod
+    def getCopyExpression(cls):
         return "value.copy()"
+
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, bmesh.types.BMesh):
+            return value, 0
+        return cls.getDefaultValue(), 2

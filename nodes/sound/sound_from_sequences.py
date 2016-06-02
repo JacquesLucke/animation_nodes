@@ -16,9 +16,9 @@ class SoundFromSequencesNode(bpy.types.Node, AnimationNode):
     errorMessage = StringProperty()
 
     def create(self):
-        self.inputs.new("an_SequenceListSocket", "Sequences", "sequences")
-        self.inputs.new("an_IntegerSocket", "Bake Index", "bakeIndex")
-        self.outputs.new("an_SoundSocket", "Sound", "sound")
+        self.newInput("Sequence List", "Sequences", "sequences")
+        self.newInput("Integer", "Bake Index", "bakeIndex")
+        self.newOutput("Sound", "Sound", "sound")
 
     def draw(self, layout):
         layout.prop(self, "soundType")

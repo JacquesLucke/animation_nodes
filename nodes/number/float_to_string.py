@@ -6,15 +6,11 @@ class FloatToStringNode(bpy.types.Node, AnimationNode):
     bl_label = "Float to Text"
 
     def create(self):
-        self.inputs.new("an_FloatSocket", "Number", "number")
-        socket = self.inputs.new("an_IntegerSocket", "Min Length", "minLength")
-        socket.value = 10
-        socket.minValue = 0
-        socket = self.inputs.new("an_IntegerSocket", "Decimals", "decimals")
-        socket.value = 3
-        socket.minValue = 0
-        self.inputs.new("an_BooleanSocket", "Insert Sign", "insertSign").value = False
-        self.outputs.new("an_StringSocket", "Text", "text")
+        self.newInput("Float", "Number", "number")
+        self.newInput("Integer", "Min Length", "minLength", value = 10, minValue = 0)
+        self.newInput("Integer", "Decimals", "decimals", value = 3, minValue = 0)
+        self.newInput("Boolean", "Insert Sign", "insertSign").value = False
+        self.newOutput("String", "Text", "text")
 
     def execute(self, number, minLength, decimals, insertSign):
         sign = "+" if insertSign else ""

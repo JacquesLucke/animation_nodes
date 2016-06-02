@@ -17,7 +17,7 @@ class InsertDataInputNodeTemplateOperator(bpy.types.Operator, Template):
         layout.operator_context = "EXEC_DEFAULT"
         for socket in self.activeNode.getVisibleInputs():
             props = layout.operator(self.bl_idname, text = socket.getDisplayedName())
-            props.socketIndex = socket.index
+            props.socketIndex = socket.getIndex()
 
     def insert(self):
         activeNode = self.activeNode

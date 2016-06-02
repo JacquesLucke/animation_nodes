@@ -5,20 +5,21 @@ from ... base_types.node import AnimationNode
 class DebugNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_DebugNode"
     bl_label = "Debug"
+    dynamicLabelType = "HIDDEN_ONLY"
 
-    text = StringProperty()
     printData = BoolProperty(name = "Print to Console", description = "Can be very slow when used often")
 
     def create(self):
-        socket = self.inputs.new("an_GenericSocket", "Data", "data")
+        socket = self.newInput("Generic", "Data", "data", text = "None")
         socket.display.text = True
-        socket.text = "None"
-        socket = self.inputs.new("an_BooleanSocket", "Condition", "condition")
+        socket = self.newInput("Boolean", "Condition", "condition", hide = True)
         socket.showCreateCompareNodeButton = True
-        socket.hide = True
 
     def drawAdvanced(self, layout):
         layout.prop(self, "printData")
+
+    def drawLabel(self):
+        return self.inputs[0].text
 
     def getExecutionCode(self):
         if "Condition" in self.inputs: # support for older nodes

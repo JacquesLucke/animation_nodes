@@ -20,8 +20,8 @@ class ObjectLayerVisibilityOutputNode(bpy.types.Node, AnimationNode):
         items = layerChoosingTypeItems, update = layerChoosingTypeChanged)
 
     def create(self):
-        self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
-        self.outputs.new("an_ObjectSocket", "Object", "object")
+        self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
+        self.newOutput("Object", "Object", "object")
         self.recreateLayerInputSockets()
 
     def draw(self, layout):
@@ -49,12 +49,12 @@ class ObjectLayerVisibilityOutputNode(bpy.types.Node, AnimationNode):
         self.clearLayerInputNodes()
         if self.layerChoosingType == "MULTIPLE":
             for i in range(20):
-                self.inputs.new("an_BooleanSocket", "Layer " + str(i + 1), "layer" + str(i + 1)).value = False
+                self.newInput("Boolean", "Layer " + str(i + 1), "layer" + str(i + 1), value = False)
             for socket in self.inputs[4:]:
                 socket.hide = True
             self.inputs[1].value = True
         if self.layerChoosingType == "SINGLE":
-            self.inputs.new("an_IntegerSocket", "Layer Index", "layerIndex")
+            self.newInput("Integer", "Layer Index", "layerIndex")
 
     def clearLayerInputNodes(self):
         for socket in self.inputs[1:]:

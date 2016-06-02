@@ -2,20 +2,16 @@ import bpy
 from bpy.props import *
 from ... tree_info import keepNodeLinks
 from ... base_types.node import AnimationNode
-from ... sockets.info import getBaseDataTypeItemsCallback, toIdName, toListIdName, isBase, toBaseDataType
+from ... sockets.info import isBase, toBaseDataType, toListDataType
 
 class AppendListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_AppendListNode"
     bl_label = "Append to List"
 
     def assignedTypeChanged(self, context):
-        self.baseIdName = toIdName(self.assignedType)
-        self.listIdName = toListIdName(self.assignedType)
         self.generateSockets()
 
     assignedType = StringProperty(update = assignedTypeChanged)
-    baseIdName = StringProperty()
-    listIdName = StringProperty()
 
     def create(self):
         self.assignedType = "Float"
@@ -53,6 +49,9 @@ class AppendListNode(bpy.types.Node, AnimationNode):
     def generateSockets(self):
         self.inputs.clear()
         self.outputs.clear()
-        self.inputs.new(self.listIdName, "List", "list").dataIsModified  = True
-        self.inputs.new(self.baseIdName, "Element", "element").dataIsModified = True
-        self.outputs.new(self.listIdName, "List", "list")
+
+        baseDataType = self.assignedType
+        listDataType = toListDataType(self.assignedType)
+        self.newInput(listDataType, "List", "list", dataIsModified  = True)
+        self.newInput(baseDataType, "Element", "element", dataIsModified = True)
+        self.newOutput(listDataType, "List", "list")

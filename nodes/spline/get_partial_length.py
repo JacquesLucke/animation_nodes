@@ -7,13 +7,10 @@ class GetSplineLengthNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
     bl_label = "Get Spline Length"
 
     def create(self):
-        self.inputs.new("an_SplineSocket", "Spline", "spline").defaultDrawType = "PROPERTY_ONLY"
-        socket = self.inputs.new("an_FloatSocket", "Start", "start")
-        socket.minValue = 0
-        socket = self.inputs.new("an_FloatSocket", "End", "end")
-        socket.minValue = 0
-        socket.value = 1.0
-        self.outputs.new("an_FloatSocket", "Length", "length")
+        self.newInput("Spline", "Spline", "spline", defaultDrawType = "PROPERTY_ONLY")
+        self.newInput("Float", "Start", "start", minValue = 0)
+        self.newInput("Float", "End", "end", value = 1.0, minValue = 0)
+        self.newOutput("Float", "Length", "length")
 
     def draw(self, layout):
         layout.prop(self, "parameterType", text = "")

@@ -16,12 +16,12 @@ class BooleanSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     value = BoolProperty(default = True, update = propertyChanged)
     showCreateCompareNodeButton = BoolProperty(default = False)
 
-    def drawProperty(self, layout, text):
+    def drawProperty(self, layout, text, node):
         row = layout.row()
         row.prop(self, "value", text = text)
-        
+
         if self.showCreateCompareNodeButton and self.isUnlinked:
-            self.invokeFunction(row, "createCompareNode", icon = "PLUS", emboss = False,
+            self.invokeFunction(row, node, "createCompareNode", icon = "PLUS", emboss = False,
                 description = "Create compare node")
 
     def getValue(self):
@@ -37,3 +37,45 @@ class BooleanSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         node = newNodeAtCursor("an_CompareNode")
         self.linkWith(node.outputs[0])
         invokeTranslation()
+
+    @classmethod
+    def getDefaultValue(cls):
+        return False
+
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, bool):
+            return value, 0
+        else:
+            try: return bool(value), 1
+            except: return cls.getDefaultValue(), 2
+
+
+class BooleanListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+    bl_idname = "an_BooleanListSocket"
+    bl_label = "Boolean List Socket"
+    dataType = "Boolean List"
+    baseDataType = "Boolean"
+    allowedInputTypes = ["Boolean List"]
+    drawColor = (0.7, 0.7, 0.4, 0.5)
+    storable = True
+    comparable = False
+
+    @classmethod
+    def getDefaultValue(cls):
+        return []
+
+    @classmethod
+    def getDefaultValueCode(cls):
+        return "[]"
+
+    @classmethod
+    def getCopyExpression(cls):
+        return "value[:]"
+
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, list):
+            if all(isinstance(element, bool) for element in value):
+                return value, 0
+        return cls.getDefaultValue(), 2

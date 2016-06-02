@@ -1,20 +1,23 @@
 import bpy
 from bpy.props import *
-from .. preferences import debuggingIsEnabled
+from .. utils.layout import writeText
 from .. base_types.socket import AnimationNodeSocket
+from .. preferences import getDeveloperSettings, debuggingIsEnabled
 
 def draw(self, context):
     node = getattr(bpy.context, "active_node", None)
     if not getattr(node, "isAnimationNode", False): return
     layout = self.layout
     layout.separator()
+    drawNodeSettings(layout, node)
 
-    drawGenericNodeProperties(layout, node)
+def drawNodeSettings(layout, node):
     drawSocketLists(layout, node)
     drawSocketVisibilityOperators(layout, node)
 
     if debuggingIsEnabled():
         layout.separator()
+        drawGenericNodeProperties(layout, node)
         layout.label("Identifier: " + node.identifier)
 
 def drawGenericNodeProperties(layout, node):
@@ -25,6 +28,15 @@ def drawGenericNodeProperties(layout, node):
     col.prop(node, "location", text = "Y", index = 1)
 
 def drawSocketLists(layout, node):
+    layout.prop(getDeveloperSettings(), "socketEditMode", expand = True)
+    mode = getDeveloperSettings().socketEditMode
+
+    if mode == "NORMAL":
+        drawSocketLists_NormalMode(layout, node)
+    elif mode == "PERFORMANCE":
+        drawSocketLists_PerformanceMode(layout, node)
+
+def drawSocketLists_NormalMode(layout, node):
     row = layout.row(align = True)
 
     size = max(len(node.inputs), len(node.outputs), 1)
@@ -35,7 +47,7 @@ def drawSocketLists(layout, node):
         subrow.label("Inputs")
         subrow.operator("an.move_input", text = "", icon = "TRIA_UP").moveUp = True
         subrow.operator("an.move_input", text = "", icon = "TRIA_DOWN").moveUp = False
-        col.template_list("an_SocketUiList", "", node, "inputs", node, "activeInputIndex", rows = size, maxrows = size)
+        col.template_list("an_SocketUiList_Normal", "", node, "inputs", node, "activeInputIndex", rows = size, maxrows = size)
 
     if len(node.outputs) > 0:
         col = row.column()
@@ -43,20 +55,31 @@ def drawSocketLists(layout, node):
         subrow.label("Outputs")
         subrow.operator("an.move_output", text = "", icon = "TRIA_UP").moveUp = True
         subrow.operator("an.move_output", text = "", icon = "TRIA_DOWN").moveUp = False
-        col.template_list("an_SocketUiList", "", node, "outputs", node, "activeOutputIndex", rows = size, maxrows = size)
+        col.template_list("an_SocketUiList_Normal", "", node, "outputs", node, "activeOutputIndex", rows = size, maxrows = size)
+
+def drawSocketLists_PerformanceMode(layout, node):
+    box = layout.box()
+    writeText(box, "Select the input sockets whose data will be modified", icon = "INFO", autoWidth = True)
+    col = box.column(align = True)
+    for socket in node.inputs:
+        name = repr(socket.getDisplayedName())
+        if socket.isCopyable():
+            col.prop(socket, "dataIsModified", text = name)
+        else:
+            col.label("{} ({}) is not copyable".format(name, socket.dataType))
 
 def drawSocketVisibilityOperators(layout, node):
     col = layout.column(align = True)
-    col.label("Toogle Operation Visibility:")
+    col.label("Toggle Operation Visibility:")
     row = col.row(align = True)
-    node.invokeFunction(row, "toogleTextInputVisibility", text = "Name")
-    node.invokeFunction(row, "toogleMoveOperatorsVisibility", text = "Move")
-    node.invokeFunction(row, "toogleRemoveOperatorVisibility", text = "Remove")
+    node.invokeFunction(row, "toggleTextInputVisibility", text = "Name")
+    node.invokeFunction(row, "toggleMoveOperatorsVisibility", text = "Move")
+    node.invokeFunction(row, "toggleRemoveOperatorVisibility", text = "Remove")
     node.invokeFunction(row, "disableSocketEditingInNode", icon = "FULLSCREEN")
 
 
-class SocketUiList(bpy.types.UIList):
-    bl_idname = "an_SocketUiList"
+class SocketUiList_Normal(bpy.types.UIList):
+    bl_idname = "an_SocketUiList_Normal"
 
     def draw_item(self, context, layout, node, socket, icon, activeData, activePropname):
         if not isinstance(socket, AnimationNodeSocket):
@@ -67,7 +90,7 @@ class SocketUiList(bpy.types.UIList):
         else: layout.label(socket.getDisplayedName())
 
         if socket.removeable:
-            socket.invokeFunction(layout, "remove", icon = "X", emboss = False)
+            socket.invokeFunction(layout, node, "remove", icon = "X", emboss = False)
 
         icon = "RESTRICT_VIEW_ON" if socket.hide else "RESTRICT_VIEW_OFF"
         layout.prop(socket, "hide", text = "", icon_only = True, icon = icon, emboss = False)

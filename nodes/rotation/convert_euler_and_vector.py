@@ -17,7 +17,6 @@ class ConvertVectorAndEulerNode(bpy.types.Node, AnimationNode):
 
     def conversionTypeChanged(self, context):
         self.createSockets()
-        executionCodeChanged()
 
     useDegree = BoolProperty(name = "Use Degree", default = False,
         update = executionCodeChanged)
@@ -26,8 +25,7 @@ class ConvertVectorAndEulerNode(bpy.types.Node, AnimationNode):
         update = conversionTypeChanged, items = conversionTypeItems)
 
     def create(self):
-        self.inputs.new("an_VectorSocket", "Vector", "vector")
-        self.outputs.new("an_EulerSocket", "Euler", "euler")
+        self.createSockets()
 
     def draw(self, layout):
         layout.prop(self, "conversionType", text = "")
@@ -39,23 +37,23 @@ class ConvertVectorAndEulerNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         if self.conversionType == "VECTOR_TO_EULER":
-            if self.useDegree: return "euler = mathutils.Euler(vector / 180 * math.pi, 'XYZ')"
-            else: return "euler = mathutils.Euler(vector, 'XYZ')"
+            if self.useDegree: return "euler = Euler(vector / 180 * math.pi, 'XYZ')"
+            else: return "euler = Euler(vector, 'XYZ')"
         elif self.conversionType == "EULER_TO_VECTOR":
-            if self.useDegree: return "vector = mathutils.Vector(euler) * 180 / math.pi"
-            else: return "vector = mathutils.Vector(euler)"
+            if self.useDegree: return "vector = Vector(euler) * 180 / math.pi"
+            else: return "vector = Vector(euler)"
 
     def getUsedModules(self):
-        return ["mathutils", "math"]
+        return ["math"]
 
     def createSockets(self):
         self.inputs.clear()
         self.outputs.clear()
 
         if self.conversionType == "VECTOR_TO_EULER":
-            self.inputs.new("an_VectorSocket", "Vector", "vector")
-            self.outputs.new("an_EulerSocket", "Euler", "euler")
+            self.newInput("Vector", "Vector", "vector")
+            self.newOutput("Euler", "Euler", "euler")
         if self.conversionType == "EULER_TO_VECTOR":
-            self.inputs.new("an_EulerSocket", "Euler", "euler")
-            self.outputs.new("an_VectorSocket", "Vector", "vector")
+            self.newInput("Euler", "Euler", "euler")
+            self.newOutput("Vector", "Vector", "vector")
         self.inputs[0].defaultDrawType = "PROPERTY_ONLY"

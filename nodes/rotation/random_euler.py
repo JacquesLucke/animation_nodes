@@ -12,9 +12,9 @@ class RandomEulerNode(bpy.types.Node, AnimationNode):
     nodeSeed = IntProperty(name = "Node Seed", update = propertyChanged, max = 1000, min = 0)
 
     def create(self):
-        self.inputs.new("an_IntegerSocket", "Seed", "seed")
-        self.inputs.new("an_FloatSocket", "Scale", "scale").value = radians(30)
-        self.outputs.new("an_EulerSocket", "Euler", "randomEuler")
+        self.newInput("Integer", "Seed", "seed")
+        self.newInput("Float", "Scale", "scale", value = radians(30))
+        self.newOutput("Euler", "Euler", "randomEuler")
 
     def draw(self, layout):
         layout.prop(self, "nodeSeed")

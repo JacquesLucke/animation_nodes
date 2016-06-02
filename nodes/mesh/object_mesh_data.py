@@ -10,41 +10,40 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
     bl_label = "Object Mesh Data"
 
     def create(self):
-        self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
-        self.inputs.new("an_BooleanSocket", "Use World Space", "useWorldSpace").value = True
-        self.inputs.new("an_BooleanSocket", "Use Modifiers", "useModifiers").value = False
-        self.inputs.new("an_SceneSocket", "Scene", "scene").hide = True
-        self.outputs.new("an_VectorListSocket", "Vertex Locations", "vertexLocations")
-        self.outputs.new("an_EdgeIndicesListSocket", "Edge Indices", "edgeIndices")
-        self.outputs.new("an_PolygonIndicesListSocket", "Polygon Indices", "polygonIndices")
-        self.outputs.new("an_VertexListSocket", "Vertices", "vertices")
-        self.outputs.new("an_PolygonListSocket", "Polygons", "polygons")
-        self.outputs.new("an_StringSocket", "Mesh Name", "meshName").hide = True
+        self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
+        self.newInput("Boolean", "Use World Space", "useWorldSpace", value = True)
+        self.newInput("Boolean", "Use Modifiers", "useModifiers", value = False)
+        self.newInput("Scene", "Scene", "scene", hide = True)
+
+        self.newOutput("Vector List", "Vertex Locations", "vertexLocations")
+        self.newOutput("Edge Indices List", "Edge Indices", "edgeIndices")
+        self.newOutput("Polygon Indices List", "Polygon Indices", "polygonIndices")
+        self.newOutput("Vertex List", "Vertices", "vertices")
+        self.newOutput("Polygon List", "Polygons", "polygons")
+        self.newOutput("String", "Mesh Name", "meshName", hide = True)
 
     def getExecutionCode(self):
         isLinked = self.getLinkedOutputsDict()
-        if not any(isLinked.values()): return ""
+        if not any(isLinked.values()): return
 
-        lines = []
-        lines.append("meshName = ''")
-        lines.append("if getattr(object, 'type', '') == 'MESH':")
-        lines.append("    mesh = self.getMesh(object, useModifiers, scene)")
-        lines.append("    meshName = mesh.name")
+        yield "meshName = ''"
+        yield "if getattr(object, 'type', '') == 'MESH':"
+        yield "    mesh = self.getMesh(object, useModifiers, scene)"
+        yield "    meshName = mesh.name"
 
         if isLinked["vertexLocations"] or isLinked["polygons"]:
-            lines.append("    vertexLocations = self.getVertexLocations(mesh, object, useWorldSpace, {})".format(repr(isLinked["vertexLocations"])))
+            yield "    vertexLocations = self.getVertexLocations(mesh, object, useWorldSpace, {})".format(repr(isLinked["vertexLocations"]))
         if isLinked["edgeIndices"]:
-            lines.append("    edgeIndices = self.getEdgeIndices(mesh)")
+            yield "    edgeIndices = self.getEdgeIndices(mesh)"
         if isLinked["polygonIndices"]:
-            lines.append("    polygonIndices = self.getPolygonIndices(mesh)")
+            yield "    polygonIndices = self.getPolygonIndices(mesh)"
         if isLinked["vertices"]:
-            lines.append("    vertices = self.getVertices(mesh, object, useWorldSpace)")
+            yield "    vertices = self.getVertices(mesh, object, useWorldSpace)"
         if isLinked["polygons"]:
-            lines.append("    polygons = self.getPolygons(mesh, vertexLocations, object, useWorldSpace)")
+            yield "    polygons = self.getPolygons(mesh, vertexLocations, object, useWorldSpace)"
 
-        lines.append("    self.clearMesh(mesh, useModifiers, scene)")
-        lines.append("else: vertexLocations, edgeIndices, polygonIndices, vertices, polygons = [], [], [], [], []")
-        return lines
+        yield "    self.clearMesh(mesh, useModifiers, scene)"
+        yield "else: vertexLocations, edgeIndices, polygonIndices, vertices, polygons = [], [], [], [], []"
 
 
     def getMesh(self, object, useModifiers, scene):

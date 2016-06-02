@@ -12,12 +12,12 @@ class PolygonInfoNode(bpy.types.Node, AnimationNode):
         update = executionCodeChanged)
 
     def create(self):
-        self.inputs.new("an_PolygonSocket", "Polygon", "polygon")
-        self.outputs.new("an_VectorListSocket", "Vertex Locations", "vertexLocations")
-        self.outputs.new("an_VectorSocket", "Center", "center")
-        self.outputs.new("an_VectorSocket", "Normal", "normal")
-        self.outputs.new("an_FloatSocket", "Area", "area")
-        self.outputs.new("an_IntegerSocket", "Material Index", "materialIndex")
+        self.newInput("Polygon", "Polygon", "polygon")
+        self.newOutput("Vector List", "Vertex Locations", "vertexLocations")
+        self.newOutput("Vector", "Center", "center")
+        self.newOutput("Vector", "Normal", "normal")
+        self.newOutput("Float", "Area", "area")
+        self.newOutput("Integer", "Material Index", "materialIndex")
 
     def getExecutionCode(self):
         isLinked = self.getLinkedOutputsDict()

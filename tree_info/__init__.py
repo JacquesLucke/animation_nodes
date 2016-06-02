@@ -1,6 +1,6 @@
 from .. utils.timing import measureTime
 from .. utils.handlers import eventHandler
-from .. utils.nodes import idToNode, idToSocket
+from .. utils.nodes import idToNode, idToSocket, createNodeByIdDict
 
 
 def __setup():
@@ -32,7 +32,10 @@ def updateAndRetryOnException(function):
 @measureTime
 def update():
     _forestData.update()
-    _networks.update(_forestData)
+
+    nodeByID = createNodeByIdDict()
+    _networks.update(_forestData, nodeByID)
+    nodeByID.clear()
 
     global _needsUpdate
     _needsUpdate = False
@@ -54,13 +57,16 @@ def getIdentifierAmount():
     return len(_forestData.nodeByIdentifier)
 
 @updateAndRetryOnException
-def getNodesByType(idName):
-    return [idToNode(nodeID) for nodeID in _forestData.nodesByType[idName]]
+def getNodesByType(idName, nodeByID = None):
+    if nodeByID is None:
+        return [idToNode(nodeID) for nodeID in _forestData.nodesByType[idName]]
+    else:
+        return [nodeByID[nodeID] for nodeID in _forestData.nodesByType[idName]]
 
 
-def isSocketLinked(socket):
-    return len(_forestData.linkedSockets[socket.toID()]) > 0
-
+def isSocketLinked(socket, node):
+    socketID = ((node.id_data.name, node.name), socket.is_output, socket.identifier)
+    return len(_forestData.linkedSockets[socketID]) > 0
 
 def getDirectlyLinkedSockets(socket):
     socketID = socket.toID()
@@ -73,24 +79,28 @@ def getDirectlyLinkedSocket(socket):
     if len(linkedSocketIDs) > 0:
         return idToSocket(linkedSocketIDs[0])
 
-
 def getLinkedSockets(socket):
     socketID = socket.toID()
     linkedIDs = _forestData.linkedSockets[socketID]
     return [idToSocket(linkedID) for linkedID in linkedIDs]
 
-def getLinkedSocket(socket):
-    socketID = socket.toID()
-    linkedIDs = _forestData.linkedSockets[socketID]
-    if len(linkedIDs) > 0:
-        return idToSocket(linkedIDs[0])
-
 def iterSocketsThatNeedUpdate():
     for socketID in _forestData.socketsThatNeedUpdate:
         yield idToSocket(socketID)
 
-def getUndefinedNodes():
-    return [idToNode(nodeID) for nodeID in _forestData.nodesByType["NodeUndefined"]]
+def getUndefinedNodes(nodeByID):
+    return [nodeByID[nodeID] for nodeID in _forestData.nodesByType["NodeUndefined"]]
+
+def iterLinkedSocketsWithInfo(socket, node, nodeByID):
+    socketID = ((node.id_data.name, node.name), socket.is_output, socket.identifier)
+    linkedIDs = _forestData.linkedSockets[socketID]
+    for linkedID in linkedIDs:
+        linkedIdentifier = linkedID[2]
+        linkedNode = nodeByID[linkedID[0]]
+        sockets = linkedNode.outputs if linkedID[1] else linkedNode.inputs
+        for socket in sockets:
+            if socket.identifier == linkedIdentifier:
+                yield socket
 
 
 # improve performance of higher level functions
@@ -113,6 +123,30 @@ def getAllDataLinkIDs():
             else:
                 linkDataIDs.add((linkedID, socketID, dataType[linkedID], dataType[socketID]))
     return linkDataIDs
+
+def getLinkedInputsDict(node):
+    linkedSockets = _forestData.linkedSockets
+    socketIDs = _forestData.socketsByNode[node.toID()][0]
+    return {socketID[2] : len(linkedSockets[socketID]) > 0 for socketID in socketIDs}
+
+def getLinkedOutputsDict(node):
+    linkedSockets = _forestData.linkedSockets
+    socketIDs = _forestData.socketsByNode[node.toID()][1]
+    return {socketID[2] : len(linkedSockets[socketID]) > 0 for socketID in socketIDs}
+
+def iterLinkedOutputSockets(node):
+    linkedSockets = _forestData.linkedSockets
+    socketIDs = _forestData.socketsByNode[node.toID()][1]
+    for socket, socketID in zip(node.outputs, socketIDs):
+        if len(linkedSockets[socketID]) > 0:
+            yield socket
+
+def iterUnlinkedInputSockets(node):
+    linkedSockets = _forestData.linkedSockets
+    socketIDs = _forestData.socketsByNode[node.toID()][0]
+    for socket, socketID in zip(node.inputs, socketIDs):
+        if len(linkedSockets[socketID]) == 0:
+            yield socket
 
 
 # keep node state
@@ -162,24 +196,27 @@ def getSocketValues(node):
     return inputs, outputs
 
 def getSocketData(socket):
-    return (socket.identifier, socket.dataType, socket.getProperty(), socket.hide, socket.isUsed)
+    s = socket
+    return (s.identifier, s.dataType, s.getProperty(), s.hide, s.isUsed, s.dataIsModified)
 
 def setSocketValues(node, inputs, outputs):
     inputsByIdentifier = node.inputsByIdentifier
-    for identifier, dataType, value, hide, isUsed in inputs:
+    for identifier, dataType, value, hide, isUsed, dataIsModified in inputs:
         if getattr(inputsByIdentifier.get(identifier), "dataType", "") == dataType:
             socket = inputsByIdentifier[identifier]
             socket.setProperty(value)
             socket.hide = hide
             socket.isUsed = isUsed
+            socket.dataIsModified = dataIsModified
 
     outputsByIdentifier = node.outputsByIdentifier
-    for identifier, dataType, value, hide, isUsed in outputs:
+    for identifier, dataType, value, hide, isUsed, dataIsModified in outputs:
         if getattr(outputsByIdentifier.get(identifier), "dataType", "") == dataType:
             socket = outputsByIdentifier[identifier]
             socket.setProperty(value)
             socket.hide = hide
             socket.isUsed = isUsed
+            socket.dataIsModified = dataIsModified
 
 
 def getNetworkWithNode(node):

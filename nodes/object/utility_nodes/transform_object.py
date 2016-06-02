@@ -12,9 +12,9 @@ class TransformObjectNode(bpy.types.Node, AnimationNode):
         description = "Use the object location as origin", update = propertyChanged)
 
     def create(self):
-        self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
-        self.inputs.new("an_MatrixSocket", "Matrix", "matrix")
-        self.outputs.new("an_ObjectSocket", "Object", "object")
+        self.newInput("Object", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
+        self.newInput("Matrix", "Matrix", "matrix")
+        self.newOutput("Object", "Object", "object")
 
     def draw(self, layout):
         layout.prop(self, "useCenter")

@@ -26,6 +26,13 @@ def rotationMatrix(rotation):
     matrix *= Matrix.Rotation(rotation[0], 4, 'X')
     return matrix
 
+def scaleMatrix(scale):
+    scaleMatrix = Matrix.Identity(4)
+    scaleMatrix[0][0] = scale[0]
+    scaleMatrix[1][1] = scale[1]
+    scaleMatrix[2][2] = scale[2]
+    return scaleMatrix
+
 def mixEulers(a, b, factor):
     x = a.x * (1 - factor) + b.x * factor
     y = a.y * (1 - factor) + b.y * factor

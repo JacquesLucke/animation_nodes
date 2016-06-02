@@ -21,19 +21,19 @@ class MapRangeNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.recreateInputs()
-        self.outputs.new("an_FloatSocket", "Value", "newValue")
+        self.newOutput("Float", "Value", "newValue")
 
     @keepNodeState
     def recreateInputs(self):
         self.inputs.clear()
-        self.inputs.new("an_FloatSocket", "Value", "value")
-        self.inputs.new("an_FloatSocket", "Input Min", "inMin").value = 0
-        self.inputs.new("an_FloatSocket", "Input Max", "inMax").value = 1
-        self.inputs.new("an_FloatSocket", "Output Min", "outMin").value = 0
-        self.inputs.new("an_FloatSocket", "Output Max", "outMax").value = 1
+        self.newInput("Float", "Value", "value")
+        self.newInput("Float", "Input Min", "inMin", value = 0)
+        self.newInput("Float", "Input Max", "inMax", value = 1)
+        self.newInput("Float", "Output Min", "outMin", value = 0)
+        self.newInput("Float", "Output Max", "outMax", value = 1)
 
         if self.useInterpolation and self.clampInput:
-            self.inputs.new("an_InterpolationSocket", "Interpolation", "interpolation").defaultDrawType = "PROPERTY_ONLY"
+            self.newInput("Interpolation", "Interpolation", "interpolation", defaultDrawType = "PROPERTY_ONLY")
 
     def draw(self, layout):
         col = layout.column(align = True)

@@ -1,9 +1,9 @@
 import bpy
 import itertools
 from bpy.props import *
+from ... sockets.info import isList
 from ... tree_info import keepNodeLinks
 from ... events import executionCodeChanged
-from ... sockets.info import toIdName, isList
 from ... base_types.node import AnimationNode
 
 operationItems = [
@@ -17,14 +17,12 @@ class ListBooleanOperationsNode(bpy.types.Node, AnimationNode):
     bl_label = "List Boolean Operations"
 
     def assignedTypeChanged(self, context):
-        self.listIdName = toIdName(self.assignedType)
         self.generateSockets()
 
     operation = EnumProperty(name = "Operation", default = "UNION",
         items = operationItems, update = executionCodeChanged)
 
     assignedType = StringProperty(update = assignedTypeChanged)
-    listIdName = StringProperty()
 
     def create(self):
         self.assignedType = "Object List"
@@ -35,6 +33,7 @@ class ListBooleanOperationsNode(bpy.types.Node, AnimationNode):
     def getExecutionCode(self):
         op = self.operation
         # I don't use sets here to keep the order the elements come in
+        # But we could speedup this node by using sets to see if an element is already inserted
         if op == "UNION": return "outList = self.execute_Union(list1, list2)"
         if op == "INTERSECTION": return "outList = self.execute_Intersection(list1, list2)"
         if op == "DIFFERENCE": return "outList = self.execute_Difference(list1, list2)"
@@ -104,6 +103,6 @@ class ListBooleanOperationsNode(bpy.types.Node, AnimationNode):
     def generateSockets(self):
         self.inputs.clear()
         self.outputs.clear()
-        self.inputs.new(self.listIdName, "List 1", "list1").dataIsModified = True
-        self.inputs.new(self.listIdName, "List 2", "list2").dataIsModified = True
-        self.outputs.new(self.listIdName, "List", "outList")
+        self.newInput(self.assignedType, "List 1", "list1", dataIsModified = True)
+        self.newInput(self.assignedType, "List 2", "list2", dataIsModified = True)
+        self.newOutput(self.assignedType, "List", "outList")

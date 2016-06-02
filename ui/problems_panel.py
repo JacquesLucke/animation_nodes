@@ -2,6 +2,8 @@ import bpy
 import sys
 from .. import problems
 from .. utils.layout import writeText
+from .. graphics.rectangle import Rectangle
+from .. utils.blender_ui import getDpiFactor
 
 class ProblemsPanel(bpy.types.Panel):
     bl_idname = "an_problems_panel"
@@ -14,7 +16,7 @@ class ProblemsPanel(bpy.types.Panel):
     def poll(cls, context):
         tree = cls.getTree()
         if tree is None: return False
-        return tree.bl_idname == "an_AnimationNodeTree" and len(problems.getProblems()) > 0
+        return tree.bl_idname == "an_AnimationNodeTree" and problems.problemsExist()
 
     def draw_header(self, context):
         self.layout.label("", icon = "ERROR")
@@ -29,11 +31,7 @@ class ProblemsPanel(bpy.types.Panel):
             col.operator("wm.console_toggle", text = "Toogle Console", icon = "CONSOLE")
 
         layout.separator()
-
-        for problem in problems.getProblems():
-            problem.draw(layout)
-            layout.separator()
-
+        problems.drawCurrentProblemInfo(layout)
         layout.separator()
 
         col = layout.column(align = True)
@@ -52,3 +50,12 @@ class ProblemsPanel(bpy.types.Panel):
     @classmethod
     def getTree(cls):
         return bpy.context.space_data.edit_tree
+
+
+def drawWarningOverlay():
+    if problems.problemsExist():
+        rectangle = Rectangle.fromRegionDimensions(bpy.context.region)
+        rectangle.color = (0, 0, 0, 0)
+        rectangle.borderColor = (0.9, 0.1, 0.1, 0.6)
+        rectangle.borderThickness = 4 * getDpiFactor()
+        rectangle.draw()

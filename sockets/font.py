@@ -1,5 +1,6 @@
 import bpy
 from bpy.props import *
+from bpy.types import VectorFont
 from .. events import propertyChanged
 from .. base_types.socket import AnimationNodeSocket
 
@@ -14,10 +15,10 @@ class FontSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     fontName = StringProperty(update = propertyChanged)
 
-    def drawProperty(self, layout, text):
+    def drawProperty(self, layout, text, node):
         row = layout.row(align = True)
         row.prop_search(self, "fontName",  bpy.data, "fonts", icon = "NONE", text = text)
-        self.invokeFunction(row, "assignFontOfActiveObject", icon = "EYEDROPPER")
+        self.invokeFunction(row, node, "assignFontOfActiveObject", icon = "EYEDROPPER")
 
     def getValue(self):
         return bpy.data.fonts.get(self.fontName)
@@ -32,3 +33,43 @@ class FontSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         object = bpy.context.active_object
         if object.type == "FONT":
             self.fontName = object.data.font.name
+
+    @classmethod
+    def getDefaultValue(cls):
+        return None
+
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, VectorFont) or value is None:
+            return value, 0
+        return cls.getDefaultValue(), 2
+
+
+class FontListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+    bl_idname = "an_FontListSocket"
+    bl_label = "Font List Socket"
+    dataType = "Font List"
+    baseDataType = "Font"
+    allowedInputTypes = ["Font List"]
+    drawColor = (0.444, 0.444, 0, 0.5)
+    storable = False
+    comparable = False
+
+    @classmethod
+    def getDefaultValue(cls):
+        return []
+
+    @classmethod
+    def getDefaultValueCode(cls):
+        return "[]"
+
+    @classmethod
+    def getCopyExpression(cls):
+        return "value[:]"
+
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, list):
+            if all(isinstance(element, VectorFont) or element is None for element in value):
+                return value, 0
+        return cls.getDefaultValue(), 2

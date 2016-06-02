@@ -3,11 +3,6 @@ from bpy.props import *
 from .. events import propertyChanged
 from .. base_types.socket import AnimationNodeSocket
 
-class EnumItem(bpy.types.PropertyGroup):
-    displayName = StringProperty()
-    identifier = StringProperty()
-    description = StringProperty(default = "")
-    icon = StringProperty(default = "NONE")
 
 class StringSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_StringSocket"
@@ -18,27 +13,15 @@ class StringSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     comparable = True
     storable = True
 
-    def getEnumItems(self, context):
-        items = []
-        for i, item in enumerate(self.enumItems):
-            items.append((item.identifier, item.displayName, item.description, item.icon, i))
-        if len(items) == 0: items.append(("NONE", "NONE", ""))
-        return items
-
-    def enumChanged(self, context):
-        if self.useEnum:
-            self.value = self.stringEnum
-
     value = StringProperty(default = "", update = propertyChanged, options = {"TEXTEDIT_UPDATE"})
 
-    stringEnum = EnumProperty(name = "Possible Items",
-        items = getEnumItems, update = enumChanged)
-    useEnum = BoolProperty(default = False)
-    enumItems = CollectionProperty(type = EnumItem)
+    showFileChooser = BoolProperty(default = False)
 
-    def drawProperty(self, layout, text):
-        if self.useEnum: layout.prop(self, "stringEnum", text = text)
-        else: layout.prop(self, "value", text = text)
+    def drawProperty(self, layout, text, node):
+        row = layout.row(align = True)
+        row.prop(self, "value", text = text)
+        if self.showFileChooser:
+            self.invokePathChooser(row, node, "setPath", icon = "EYEDROPPER")
 
     def getValue(self):
         return self.value
@@ -49,13 +32,47 @@ class StringSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getProperty(self):
         return self.value
 
-    def setEnumItems(self, enumItems):
-        self.useEnum = len(enumItems) > 0
-        self.enumItems.clear()
-        for enumItem in enumItems:
-            item = self.enumItems.add()
-            item.identifier = enumItem[0]
-            if len(enumItem) > 1: item.displayName = enumItem[1]
-            else: item.displayName = enumItem[0]
-            if len(enumItem) > 2: item.description = enumItem[2]
-            if len(enumItem) > 3: item.icon = enumItem[3]
+    def setPath(self, path):
+        self.value = path
+
+    @classmethod
+    def getDefaultValue(cls):
+        return ""
+
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, str):
+            return value, 0
+        return str(value), 1
+
+
+class StringListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+    bl_idname = "an_StringListSocket"
+    bl_label = "String List Socket"
+    dataType = "String List"
+    baseDataType = "String"
+    allowedInputTypes = ["String List"]
+    drawColor = (1, 1, 1, 0.5)
+    storable = True
+    comparable = False
+
+    @classmethod
+    def getDefaultValue(cls):
+        return []
+
+    @classmethod
+    def getDefaultValueCode(cls):
+        return "[]"
+
+    @classmethod
+    def getCopyExpression(cls):
+        return "value[:]"
+
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, list):
+            if all(isinstance(element, str) for element in value):
+                return value, 0
+            else:
+                return list(map(str, value)), 1
+        return cls.getDefaultValue(), 2

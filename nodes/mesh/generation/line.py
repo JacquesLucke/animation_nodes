@@ -6,13 +6,11 @@ class LineMeshNode(bpy.types.Node, AnimationNode):
     bl_label = "Line Mesh"
 
     def create(self):
-        self.inputs.new("an_VectorSocket", "Start", "start")
-        self.inputs.new("an_VectorSocket", "End", "end").value = (0, 0, 10)
-        socket = self.inputs.new("an_IntegerSocket", "Steps", "steps")
-        socket.value = 2
-        socket.minValue = 2
-        self.outputs.new("an_VectorListSocket", "Vertices", "vertices")
-        self.outputs.new("an_EdgeIndicesListSocket", "Edge Indices", "edgeIndices")
+        self.newInput("Vector", "Start", "start")
+        self.newInput("Vector", "End", "end", value = [0, 0, 10])
+        self.newInput("Integer", "Steps", "steps", value = 2, minValue = 2)
+        self.newOutput("Vector List", "Vertices", "vertices")
+        self.newOutput("Edge Indices List", "Edge Indices", "edgeIndices")
 
     def execute(self, start, end, steps):
         steps = max(steps, 2)

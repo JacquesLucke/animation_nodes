@@ -6,10 +6,10 @@ class ObjectGroupOperationsNode(bpy.types.Node, AnimationNode):
     bl_label = "Object Group Operations"
 
     def create(self):
-        self.inputs.new("an_ObjectGroupSocket", "Group", "group").defaultDrawType = "PROPERTY_ONLY"
-        self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
-        self.inputs.new("an_BooleanSocket", "Linked", "linked")
-        self.outputs.new("an_ObjectGroupSocket", "Group", "group")
+        self.newInput("Object Group", "Group", "group", defaultDrawType = "PROPERTY_ONLY")
+        self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
+        self.newInput("Boolean", "Linked", "linked")
+        self.newOutput("Object Group", "Group", "group")
 
     def execute(self, group, object, linked):
         if group is None: return group

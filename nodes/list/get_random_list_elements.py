@@ -4,7 +4,7 @@ from bpy.props import *
 from ... events import propertyChanged
 from ... tree_info import keepNodeState
 from ... base_types.node import AnimationNode
-from ... sockets.info import toIdName, isList, toBaseIdName, toListDataType
+from ... sockets.info import isList, toBaseIdName, toListDataType
 
 selectionTypeItems = [
     ("SINGLE", "Single", "Select only one random element from the list"),
@@ -14,18 +14,13 @@ class GetRandomListElementsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GetRandomListElementsNode"
     bl_label = "Get Random List Elements"
 
-    def assignedTypeChanged(self, context):
-        self.listIdName = toIdName(self.assignedType)
+    def updateSockets(self, context):
         self.generateSockets()
 
-    def selectionTypeChanged(self, context):
-        self.generateSockets()
-
-    assignedType = StringProperty(update = assignedTypeChanged)
-    listIdName = StringProperty()
+    assignedType = StringProperty(update = updateSockets)
 
     selectionType = EnumProperty(name = "Select Type", default = "MULTIPLE",
-        items = selectionTypeItems, update = selectionTypeChanged)
+        items = selectionTypeItems, update = updateSockets)
 
     nodeSeed = IntProperty(update = propertyChanged)
 
@@ -40,7 +35,7 @@ class GetRandomListElementsNode(bpy.types.Node, AnimationNode):
     def getExecutionCode(self):
         yield "random.seed(self.nodeSeed * 1245 + seed)"
         if self.selectionType == "SINGLE":
-            yield "if len(inList) == 0: outElement = self.outputs['Element'].getValue()"
+            yield "if len(inList) == 0: outElement = self.outputs['Element'].getDefaultValue()"
             yield "else: outElement = random.choice(inList)"
         elif self.selectionType == "MULTIPLE":
             yield "if len(inList) == 0: outList = []"
@@ -75,15 +70,14 @@ class GetRandomListElementsNode(bpy.types.Node, AnimationNode):
     def generateSockets(self):
         self.inputs.clear()
         self.outputs.clear()
-        self.inputs.new("an_IntegerSocket", "Seed", "seed")
-        self.inputs.new(self.listIdName, "List", "inList").dataIsModified = True
+        listDataType = self.assignedType
+        self.newInput("Integer", "Seed", "seed")
+        self.newInput(listDataType, "List", "inList", dataIsModified = True)
         if self.selectionType == "SINGLE":
-            self.outputs.new(toBaseIdName(self.listIdName), "Element", "outElement")
+            self.newOutput(toBaseIdName(listDataType), "Element", "outElement")
         elif self.selectionType == "MULTIPLE":
-            socket = self.inputs.new("an_IntegerSocket", "Amount", "amount")
-            socket.minValue = 0
-            socket.value = 3
-            self.outputs.new(self.listIdName, "List", "outList")
+            self.newInput("Integer", "Amount", "amount", value = 3, minValue = 0)
+            self.newOutput(listDataType, "List", "outList")
 
     def duplicate(self, sourceNode):
         self.randomizeNodeSeed()

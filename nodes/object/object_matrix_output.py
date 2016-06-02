@@ -15,20 +15,23 @@ class ObjectMatrixOutputNode(bpy.types.Node, AnimationNode):
     outputType = EnumProperty(items = outputItems, update = executionCodeChanged, default = "WORLD")
 
     def create(self):
-        self.inputs.new("an_ObjectSocket", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
-        self.inputs.new("an_MatrixSocket", "Matrix", "matrix")
-        self.outputs.new("an_ObjectSocket", "Object", "outObject")
+        self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
+        self.newInput("Matrix", "Matrix", "matrix")
+        self.newOutput("Object", "Object", "object")
 
     def draw(self, layout):
         layout.prop(self, "outputType", text = "Type")
 
     def getExecutionCode(self):
         t = self.outputType
-        lines = []
-        lines.append("if object is not None:")
-        if t == "BASIS": lines.append("    object.matrix_basis = matrix")
-        if t == "LOCAL": lines.append("    object.matrix_local = matrix")
-        if t == "PARENT INVERSE": lines.append("    object.matrix_parent_inverse = matrix")
-        if t == "WORLD": lines.append("    object.matrix_world = matrix")
-        lines.append("outObject = object")
-        return lines
+        yield "if object is not None:"
+        if t == "BASIS":          yield "    object.matrix_basis = matrix"
+        if t == "LOCAL":          yield "    object.matrix_local = matrix"
+        if t == "PARENT INVERSE": yield "    object.matrix_parent_inverse = matrix"
+        if t == "WORLD":          yield "    object.matrix_world = matrix"
+
+    def getBakeCode(self):
+        yield "if object is not None:"
+        yield "    object.keyframe_insert('location')"
+        yield "    object.keyframe_insert('rotation_euler')"
+        yield "    object.keyframe_insert('scale')"

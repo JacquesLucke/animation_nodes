@@ -26,9 +26,7 @@ class TreePanel(bpy.types.Panel):
         props.name = tree.name
 
         if not canExecute():
-            message = ("Your node tree cannot be executed. "
-                       "Look in the 'Problems' panel for more information.")
-            writeText(layout, message, width = 35, icon = "INFO")
+            layout.label("Look in the 'Problems' panel", icon = "INFO")
 
         layout.label(prettyTime(tree.lastExecutionInfo.executionTime), icon = "TIME")
 

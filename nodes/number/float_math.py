@@ -1,9 +1,8 @@
 import bpy
 import math
 from bpy.props import *
-from ... events import executionCodeChanged
+from ... tree_info import keepNodeState
 from ... base_types.node import AnimationNode
-from ... tree_info import keepNodeLinks, keepNodeState
 
 operationItems = [
     ("ADD", "Add", "A + B", "", 0),
@@ -27,9 +26,14 @@ operationItems = [
     ("SQRT", "Square Root", "sqrt A", "", 19),
     ("INVERT", "Invert", "- A", "", 20),
     ("RECIPROCAL", "Reciprocal", "1 / A", "", 21),
-    ("SNAP", "Snap", "snap A", "", 22)]
+    ("SNAP", "Snap", "snap A to Step ", "", 22),
+    ("ARCTANGENT2", "Arctangent B/A", "atan2 (B / A)", "", 23),
+    ("HYPOTENUSE", "Hypotenuse", "hypot A, B", "", 24),
+    ("COPY_SIGN", "Copy Sign", "A sign of B", "", 25),
+    ("FLOOR_DIV", "Floor Division", "floor(A / B)", "", 26)]
 
-secondInputOperations = ("ADD", "SUBTRACT", "MULTIPLY", "DIVIDE", "POWER", "MINIMUM", "MAXIMUM", "MODULO")
+secondInputOperations = ("ADD", "SUBTRACT", "MULTIPLY", "DIVIDE", "POWER",
+    "MINIMUM", "MAXIMUM", "MODULO", "ARCTANGENT2", "HYPOTENUSE", "COPY_SIGN", "FLOOR_DIV")
 baseInputOperations = ("LOGARITHM", )
 stepSizeInputOperations = ("SNAP", )
 
@@ -58,32 +62,39 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
 
     def operationChanged(self, context):
         self.recreateInputSockets()
-        executionCodeChanged()
 
     operation = EnumProperty(name = "Operation", default = "MULTIPLY",
         items = operationItems, update = operationChanged)
 
     def create(self):
-        self.outputs.new("an_FloatSocket", "Result", "result")
+        self.newOutput("Float", "Result", "result")
         self.recreateInputSockets()
 
     def draw(self, layout):
-        layout.prop(self, "operation", text = "")
+        row = layout.row(align = True)
+        row.prop(self, "operation", text = "")
+        self.invokePopup(row, "drawOperationChooser", icon = "SCRIPTWIN")
 
     def drawLabel(self):
         label = operationLabels[self.operation]
         if getattr(self.socketA, "isUnlinked", False):
             label = label.replace("A", str(round(self.socketA.value, 4)))
+
         if getattr(self.socketB, "isUnlinked", False):
             label = label.replace("B", str(round(self.socketB.value, 4)))
+        if getattr(self.socketBase, "isUnlinked", False):
+            label = label.replace("B", str(round(self.socketBase.value, 4)))
+        if getattr(self.socketStep, "isUnlinked", False):
+            label = label.replace("Step", str(round(self.socketStep.value, 4)))
+
         return label
 
     def edit(self):
         output = self.outputs[0]
         if output.dataType == "Float":
-            if output.shouldBeIntegerSocket(): self.setOutputType("an_IntegerSocket")
+            if output.shouldBeIntegerSocket(): self.setOutputType("Integer")
         else:
-            if output.shouldBeFloatSocket(): self.setOutputType("an_FloatSocket")
+            if output.shouldBeFloatSocket(): self.setOutputType("Float")
 
     def getExecutionCode(self):
         op = self.operation
@@ -98,6 +109,8 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
         if op == "ARCSINE": yield "result = math.asin(min(max(a, -1), 1))"
         if op == "ARCCOSINE": yield "result = math.acos(min(max(a, -1), 1))"
         if op == "ARCTANGENT": yield "result = math.atan(a)"
+        if op == "ARCTANGENT2": yield "result = math.atan2(b, a)"
+        if op == "HYPOTENUSE": yield "result = math.hypot(a, b)"
         if op == "POWER": yield "result = math.pow(a, b) if a >= 0 or int(b) == b else 0"
         if op == "LOGARITHM":
             if "Base" not in self.inputs: yield "base = b" # to keep older files working
@@ -114,9 +127,12 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
         if op == "FLOOR": yield "result = math.floor(a)"
         if op == "CEILING": yield "result = math.ceil(a)"
         if op == "SQRT": yield "result = math.sqrt(a) if a >= 0 else 0"
+        if op == "COPY_SIGN": yield "result = math.copysign(a, b)"
         if op == "INVERT": yield "result = - a"
         if op == "RECIPROCAL": yield "result = 1 / a if a != 0 else 0"
         if op == "SNAP": yield "result = round(a / stepSize) * stepSize if stepSize != 0 else a"
+        if op == "FLOOR_DIV": yield from ("if b == 0: result = 0",
+                                          "else: result = a // b")
 
         if self.outputs[0].dataType == "Integer":
             yield "result = int(result)"
@@ -124,26 +140,26 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
     def getUsedModules(self):
         return ["math"]
 
-    def setOutputType(self, idName):
-        if self.outputs[0].bl_idname == idName: return
-        self._setOutputType(idName)
+    def setOutputType(self, dataType):
+        if self.outputs[0].dataType != dataType:
+            self._setOutputType(dataType)
 
-    @keepNodeLinks
-    def _setOutputType(self, idName):
+    @keepNodeState
+    def _setOutputType(self, dataType):
         self.outputs.clear()
-        self.outputs.new(idName, "Result", "result")
+        self.newOutput(dataType, "Result", "result")
 
     @keepNodeState
     def recreateInputSockets(self):
         self.inputs.clear()
 
-        self.inputs.new("an_FloatSocket", "A", "a")
+        self.newInput("Float", "A", "a")
         if self.operation in secondInputOperations:
-            self.inputs.new("an_FloatSocket", "B", "b").value = 1
+            self.newInput("Float", "B", "b").value = 1
         if self.operation in baseInputOperations:
-            self.inputs.new("an_FloatSocket", "Base", "base")
+            self.newInput("Float", "Base", "base")
         if self.operation in stepSizeInputOperations:
-            self.inputs.new("an_FloatSocket", "Step Size", "stepSize")
+            self.newInput("Float", "Step Size", "stepSize")
 
     @property
     def socketA(self):
@@ -152,3 +168,59 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
     @property
     def socketB(self):
         return self.inputs.get("B")
+
+    @property
+    def socketBase(self):
+        return self.inputs.get("Base")
+
+    @property
+    def socketStep(self):
+        return self.inputs.get("Step Size")
+
+    def drawOperationChooser(self, layout):
+        row = layout.row()
+
+        col = row.column()
+        subcol = col.column(align = True)
+        self.operationButton(subcol, "ADD", "Add")
+        self.operationButton(subcol, "SUBTRACT", "Subtract")
+        self.operationButton(subcol, "MULTIPLY", "Multiply")
+        self.operationButton(subcol, "DIVIDE", "Divide")
+        self.operationButton(subcol, "MODULO", "Modulo")
+        self.operationButton(subcol, "FLOOR_DIV", "Floor Division")
+        subcol = col.column(align = True)
+        self.operationButton(subcol, "INVERT", "Invert")
+        self.operationButton(subcol, "RECIPROCAL", "Reciprocal")
+        self.operationButton(subcol, "COPY_SIGN", "Copy Sign")
+
+        col = row.column()
+        subcol = col.column(align = True)
+        self.operationButton(subcol, "POWER", "Power")
+        self.operationButton(subcol, "LOGARITHM", "Logarithm")
+        self.operationButton(subcol, "SQRT", "Square Root")
+        subcol = col.column(align = True)
+        self.operationButton(subcol, "ABSOLUTE", "Absolute")
+        self.operationButton(subcol, "MINIMUM", "Minimum")
+        self.operationButton(subcol, "MAXIMUM", "Maximum")
+        self.operationButton(subcol, "FLOOR", "Floor")
+        self.operationButton(subcol, "CEILING", "Ceiling")
+        self.operationButton(subcol, "SNAP", "Snap")
+
+        col = layout.column(align = True)
+        row = col.row(align = True)
+        self.operationButton(row, "SINE", "Sine")
+        self.operationButton(row, "ARCSINE", "Arcsine")
+        row = col.row(align = True)
+        self.operationButton(row, "COSINE", "Cosine")
+        self.operationButton(row, "ARCCOSINE", "Arccosine")
+        row = col.row(align = True)
+        self.operationButton(row, "TANGENT", "Tangent")
+        self.operationButton(row, "ARCTANGENT", "Arctangent")
+        self.operationButton(row, "ARCTANGENT2", "Arctangent B/A")
+        self.operationButton(col, "HYPOTENUSE", "Hypotenuse")
+
+    def operationButton(self, layout, operation, text):
+        self.invokeFunction(layout, "setOperation", text = text, data = operation)
+
+    def setOperation(self, operation):
+        self.operation = operation

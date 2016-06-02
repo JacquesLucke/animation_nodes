@@ -25,7 +25,7 @@ class FloatSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     minValue = FloatProperty(default = -1e10)
     maxValue = FloatProperty(default = sys.float_info.max)
 
-    def drawProperty(self, layout, text):
+    def drawProperty(self, layout, text, node):
         layout.prop(self, "value", text = text)
 
     def getValue(self):
@@ -58,3 +58,46 @@ class FloatSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         if ignoredNodesCounter == len(targets):
             return False
         return True
+
+    @classmethod
+    def getDefaultValue(cls):
+        return 0
+
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, (float, int)):
+            return value, 0
+        else:
+            try: return float(value), 1
+            except: return cls.getDefaultValue(), 2
+
+
+class FloatListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+    bl_idname = "an_FloatListSocket"
+    bl_label = "Float List Socket"
+    dataType = "Float List"
+    baseDataType = "Float"
+    allowedInputTypes = ["Float List", "Integer List"]
+    drawColor = (0.4, 0.4, 0.7, 0.5)
+    storable = True
+    comparable = False
+
+    @classmethod
+    def getDefaultValue(cls):
+        return []
+
+    @classmethod
+    def getDefaultValueCode(cls):
+        return "[]"
+
+    @classmethod
+    def getCopyExpression(cls):
+        return "value[:]"
+
+    @classmethod
+    def correctValue(cls, value):
+        if isinstance(value, list):
+            if all(isinstance(element, (float, int)) for element in value):
+                return value, 0
+        try: return [float(element) for element in value], 1
+        except: return cls.getDefaultValue(), 2

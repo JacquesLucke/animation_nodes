@@ -7,28 +7,28 @@ class Grid3DTemplate(bpy.types.Operator, Template):
     nodeOffset = (-500, 200)
 
     def insert(self):
-        invokeGridLoopNode = self.newNode('an_InvokeSubprogramNode', x = 0, y = 0)
-        getListLengthNode = self.newNode('an_GetListLengthNode', x = 250, y = -50)
-        instancerNode = self.newNode('an_ObjectInstancerNode', x = 463, y = 47)
-        invokeSetObjectsNode = self.newNode('an_InvokeSubprogramNode', x = 670, y = 75)
+        invokeGridLoopNode = self.newNode("an_InvokeSubprogramNode", x = 0, y = 0)
+        getListLengthNode = self.newNode("an_GetListLengthNode", x = 250, y = -50)
+        instancerNode = self.newNode("an_ObjectInstancerNode", x = 463, y = 47)
+        invokeSetObjectsNode = self.newNode("an_InvokeSubprogramNode", x = 670, y = 75)
 
-        gridLoopInputNode = self.newNode('an_LoopInputNode', x = 0, y = -250)
+        gridLoopInputNode = self.newNode("an_LoopInputNode", x = 0, y = -250)
         gridLoopInputNode.subprogramName = "3D Grid Points"
-        multiplyNode = self.newNode('an_FloatMathNode', x = 250, y = -250)
-        combineVectorNode = self.newNode('an_CombineVectorNode', x = 450, y = -250)
-        gridMeshNode = self.newNode('an_GridMeshNode', x = 660, y = -250)
+        multiplyNode = self.newNode("an_FloatMathNode", x = 250, y = -250)
+        combineVectorNode = self.newNode("an_CombineVectorNode", x = 450, y = -250)
+        gridMeshNode = self.newNode("an_GridMeshNode", x = 660, y = -250)
 
-        generatorOutputNode = self.newNode('an_LoopGeneratorOutputNode', x = 880, y = -250, label = 'Vector List')
+        generatorOutputNode = self.newNode("an_LoopGeneratorOutputNode", x = 880, y = -250, label = "Vector List")
         generatorOutputNode.loopInputIdentifier = gridLoopInputNode.identifier
-        generatorOutputNode.outputName = 'Vector List'
-        generatorOutputNode.listDataType = 'Vector List'
-        generatorOutputNode.addType = 'EXTEND'
+        generatorOutputNode.outputName = "Vector List"
+        generatorOutputNode.listDataType = "Vector List"
+        generatorOutputNode.addType = "EXTEND"
 
-        setObjectsLoopInputNode = self.newNode('an_LoopInputNode', x = 0, y = -530)
+        setObjectsLoopInputNode = self.newNode("an_LoopInputNode", x = 0, y = -530)
         setObjectsLoopInputNode.subprogramName = "Set Object Positions"
-        setObjectsLoopInputNode.newIterator('Object List', name = 'Object')
-        setObjectsLoopInputNode.newIterator('Vector List', name = 'Vector')
-        transformsOutputNode = self.newNode('an_ObjectTransformsOutputNode', x = 250, y = -530)
+        setObjectsLoopInputNode.newIterator("Object List", name = "Object")
+        setObjectsLoopInputNode.newIterator("Vector List", name = "Vector")
+        transformsOutputNode = self.newNode("an_ObjectTransformsOutputNode", x = 250, y = -530)
         transformsOutputNode.useLocation = [True, True, True]
 
         invokeGridLoopNode.subprogramIdentifier = gridLoopInputNode.identifier

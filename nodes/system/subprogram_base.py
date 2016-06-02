@@ -1,7 +1,8 @@
 from bpy.props import *
-from ... import preferences
 from ... events import networkChanged
-from ... ui.node_colors import colorNetworks
+from ... tree_info import getNodesByType
+from ... preferences import getColorSettings
+from ... ui.node_colors import colorAllNodes
 from ... algorithms.random import getRandomColor
 
 class SubprogramBaseNode:
@@ -16,7 +17,7 @@ class SubprogramBaseNode:
         update = networkChanged)
 
     def networkColorChanged(self, context):
-        colorNetworks()
+        colorAllNodes()
 
     networkColor = FloatVectorProperty(name = "Network Color",
         default = [0.5, 0.5, 0.5], subtype = "COLOR",
@@ -24,7 +25,14 @@ class SubprogramBaseNode:
         update = networkColorChanged)
 
     def randomizeNetworkColor(self):
-        colors = preferences.nodeColors()
+        colors = getColorSettings()
         value = colors.subprogramValue
         saturation = colors.subprogramSaturation
         self.networkColor = getRandomColor(value = value, saturation = saturation)
+
+    def getInvokeNodes(self):
+        nodes = []
+        for node in getNodesByType("an_InvokeSubprogramNode"):
+            if node.subprogramIdentifier == self.identifier:
+                nodes.append(node)
+        return nodes

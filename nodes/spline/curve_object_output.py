@@ -12,23 +12,23 @@ class CurveObjectOutputNode(bpy.types.Node, AnimationNode):
     errorMessage = StringProperty()
 
     def create(self):
-        socket = self.inputs.new("an_ObjectSocket", "Object", "object")
+        socket = self.newInput("Object", "Object", "object")
         socket.defaultDrawType = "PROPERTY_ONLY"
         socket.objectCreationType = "CURVE"
 
-        self.inputs.new("an_SplineListSocket", "Splines", "splines").showObjectInput = False
-        self.inputs.new("an_FloatSocket", "Bevel Depth", "bevelDepth")
-        self.inputs.new("an_IntegerSocket", "Bevel Resolution", "bevelResolution")
-        self.inputs.new("an_FloatSocket", "Extrude", "extrude")
-        self.inputs.new("an_FloatSocket", "Bevel Start", "bevelStart")
-        self.inputs.new("an_FloatSocket", "Bevel End", "bevelEnd").value = 1.0
-        self.inputs.new("an_FloatSocket", "Offset", "offset")
-        self.inputs.new("an_IntegerSocket", "Preview Resolution", "previewResolution").value = 12
-        self.inputs.new("an_ObjectSocket", "Taper Object", "taperObject")
-        self.inputs.new("an_ObjectSocket", "Bevel Object", "bevelObject")
-        self.inputs.new("an_StringSocket", "Fill Mode", "fillMode").value = "FRONT"
+        self.newInput("Spline List", "Splines", "splines", showObjectInput = False)
+        self.newInput("Float", "Bevel Depth", "bevelDepth")
+        self.newInput("Integer", "Bevel Resolution", "bevelResolution")
+        self.newInput("Float", "Extrude", "extrude")
+        self.newInput("Float", "Bevel Start", "bevelStart")
+        self.newInput("Float", "Bevel End", "bevelEnd", value = 1.0)
+        self.newInput("Float", "Offset", "offset")
+        self.newInput("Integer", "Preview Resolution", "previewResolution", value = 12)
+        self.newInput("Object", "Taper Object", "taperObject")
+        self.newInput("Object", "Bevel Object", "bevelObject")
+        self.newInput("String", "Fill Mode", "fillMode", value = "FRONT")
 
-        self.outputs.new("an_ObjectSocket", "Object", "object")
+        self.newOutput("Object", "Object", "object")
 
         for socket in self.inputs[1:]:
             socket.useIsUsedProperty = True
@@ -67,3 +67,16 @@ class CurveObjectOutputNode(bpy.types.Node, AnimationNode):
             self.errorMessage = ""
         else:
             self.errorMessage = "The fill mode is invalid. Look in the advanced panels to see all possible values."
+
+    def getBakeCode(self):
+        yield "if getattr(object, 'type', '') == 'CURVE':"
+        yield "    curve = object.data"
+
+        s = self.inputs
+        if s["Bevel Depth"].isUsed:         yield "    curve.keyframe_insert('bevel_depth')"
+        if s["Bevel Resolution"].isUsed:    yield "    curve.keyframe_insert('bevel_resolution')"
+        if s["Bevel Start"].isUsed:         yield "    curve.keyframe_insert('bevel_factor_start')"
+        if s["Bevel End"].isUsed:           yield "    curve.keyframe_insert('bevel_factor_end')"
+        if s["Extrude"].isUsed:             yield "    curve.keyframe_insert('extrude')"
+        if s["Offset"].isUsed:              yield "    curve.keyframe_insert('offset')"
+        if s["Preview Resolution"].isUsed:  yield "    curve.keyframe_insert('resolution_u')"
