@@ -69,12 +69,12 @@ class PolygonsTriangulateNode(bpy.types.Node, AnimationNode):
             self.newInput("Vector List", "Vertex Locations", "vertexLocations")
             self.newInput("Polygon Indices List", "Polygon Indices", "polygonIndices")
             self.newOutput("Polygon Indices List", "Triangulated Polygon Indices", "triIndices")
-            self.newOutput("Integer List", "Matching Ngon Indices", "ngonIndices")
+            self.newOutput("Integer List", "Source Ngon Indices", "ngonIndices")
         
         elif type == "MESH":
             self.newInput("Mesh Data", "Mesh Data", "meshData")
             self.newOutput("Mesh Data", "Mesh Data", "triMeshData")
-            self.newOutput("Integer List", "Matching Ngon Indices", "ngonIndices")
+            self.newOutput("Integer List", "Source Ngon Indices", "ngonIndices")
         
         elif type == "POLY":
             self.newInput("Polygon", "Polygon", "polygon")
@@ -83,7 +83,7 @@ class PolygonsTriangulateNode(bpy.types.Node, AnimationNode):
         elif type == "POLY_LIST":
             self.newInput("Polygon List", "Polygon List", "polygonList")
             self.newOutput("Polygon List", "Triangulated Polygons", "triPolyList")
-            self.newOutput("Integer List", "Matching Ngon Indices", "ngonIndices")
+            self.newOutput("Integer List", "Source Ngon Indices", "ngonIndices")
 
     def draw(self, layout):
         layout.prop(self, "polyType", text = "")
