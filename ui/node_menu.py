@@ -397,6 +397,7 @@ class MeshFinalizingMenu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         insertNode(layout, "an_BMeshRemoveDoublesNode", "Remove Doubles")
+        insertNode(layout, "an_BMeshLimitedDissolve", "Limited Dissolve")
         insertNode(layout, "an_BMeshRecalculateFaceNormalsNode", "Recalculate Normals")
         insertNode(layout, "an_ShadeObjectSmoothNode", "Shade Object Smooth")
 
