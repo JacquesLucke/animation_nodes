@@ -107,27 +107,30 @@ def getFunction_IterNodeExecutionLines():
         return iterNodeExecutionLines_Bake
 
 def iterNodeExecutionLines_Basic(node, variables):
-    yield from iterNodePreExecutionLines(node, variables)
+    yield from setupNodeForExecution(node, variables)
     try:
         yield from iterRealNodeExecutionLines(node, variables)
     except:
         handleExecutionCodeCreationException(node)
 
 def iterNodeExecutionLines_Monitored(node, variables):
-    yield from iterNodePreExecutionLines(node, variables)
+    yield from setupNodeForExecution(node, variables)
     yield "try:"
     try:
         for line in iterRealNodeExecutionLines(node, variables):
             yield "    " + line
+        for socket in node.linkedOutputs:
+            yield "    if not ({0} in globals() or {0} in locals()): raise Exception({1})".format(
+                repr(variables[socket]), repr("Socket output has not been calculated: " + repr(socket.getDisplayedName())))
     except:
         handleExecutionCodeCreationException(node)
     yield "    pass"
-    yield "except:"
+    yield "except Exception as e:"
     yield "    animation_nodes.problems.NodeRaisesExceptionDuringExecution({}).report()".format(repr(node.identifier))
-    yield "    raise Exception()"
+    yield "    raise"
 
 def iterNodeExecutionLines_MeasureTimes(node, variables):
-    yield from iterNodePreExecutionLines(node, variables)
+    yield from setupNodeForExecution(node, variables)
     try:
         yield "_execution_start_time = getCurrentTime()"
         yield from iterRealNodeExecutionLines(node, variables)
@@ -137,12 +140,16 @@ def iterNodeExecutionLines_MeasureTimes(node, variables):
         handleExecutionCodeCreationException(node)
 
 def iterNodeExecutionLines_Bake(node, variables):
-    yield from iterNodePreExecutionLines(node, variables)
+    yield from setupNodeForExecution(node, variables)
     try:
         yield from iterRealNodeExecutionLines(node, variables)
         yield from iterNodeBakeLines(node, variables)
     except:
         handleExecutionCodeCreationException(node)
+
+def setupNodeForExecution(node, variables):
+    yield from iterNodePreExecutionLines(node, variables)
+    resolveInnerLinks(node, variables)
 
 def iterNodePreExecutionLines(node, variables):
     yield ""
@@ -198,15 +205,14 @@ def handleExecutionCodeCreationException(node):
 # Modify Socket Variables
 ##########################################
 
-def linkOutputSocketsToTargets(node, variables, nodeByID):
-    resolveInnerLinks(node, variables)
-    for socket in node.linkedOutputs:
-        yield from linkSocketToTargets(socket, node, variables, nodeByID)
-
 def resolveInnerLinks(node, variables):
     inputs, outputs = node.inputsByIdentifier, node.outputsByIdentifier
     for inputName, outputName in node.iterInnerLinks():
         variables[outputs[outputName]] = variables[inputs[inputName]]
+
+def linkOutputSocketsToTargets(node, variables, nodeByID):
+    for socket in node.linkedOutputs:
+        yield from linkSocketToTargets(socket, node, variables, nodeByID)
 
 def linkSocketToTargets(socket, node, variables, nodeByID):
     targets = tuple(iterLinkedSocketsWithInfo(socket, node, nodeByID))

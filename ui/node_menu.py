@@ -155,11 +155,12 @@ class MatrixMenu(bpy.types.Menu):
         insertNode(layout, "an_RotationMatrixNode", "Rotation")
         insertNode(layout, "an_ScaleMatrixNode", "Scale")
         insertNode(layout, "an_ShearMatrixNode", "Shear")
-        insertNode(layout, "an_MatrixCombineNode", "Combine")
         layout.separator()
-        insertNode(layout, "an_MixDataNode", "Mix", {"dataType" : repr("Matrix")})
         insertNode(layout, "an_InvertMatrixNode", "Invert")
+        insertNode(layout, "an_MixDataNode", "Mix", {"dataType" : repr("Matrix")})
+        insertNode(layout, "an_ChangeMatrixPivotNode", "Change Pivot")
         insertNode(layout, "an_MatrixMathNode", "Math")
+        insertNode(layout, "an_MatrixCombineNode", "Combine")
 
 class TextMenu(bpy.types.Menu):
     bl_idname = "an_text_menu"
@@ -184,6 +185,7 @@ class TextMenu(bpy.types.Menu):
         layout.separator()
         insertNode(layout, "an_TextBlockReaderNode", "Block Reader")
         insertNode(layout, "an_TextBlockWriterNode", "Block Writer")
+        insertNode(layout, "an_TextFileReaderNode", "File Reader")
         layout.separator()
         insertNode(layout, "an_TextSequenceOutputNode", "Sequence Output")
         insertNode(layout, "an_CharacterPropertiesOutputNode", "Character Property")
@@ -243,6 +245,11 @@ class ListMenu(bpy.types.Menu):
         insertNode(layout, "an_FillListNode", "Fill")
         insertNode(layout, "an_RepeatListNode", "Repeat")
         insertNode(layout, "an_ListBooleanOperationsNode", "List Boolean Operations")
+        layout.separator()
+        insertNode(layout, "an_SetStructElementsNode", "Set Struct Elements")
+        insertNode(layout, "an_GetStructElementsNode", "Get Struct Elements")
+        insertNode(layout, "an_GetStructListElementsNode", "Get Struct List Elements")
+
 
 class CreateListMenu(bpy.types.Menu):
     bl_idname = "an_create_list_menu"
@@ -350,7 +357,6 @@ class MeshMenu(bpy.types.Menu):
         insertNode(layout, "an_CreateListNode", "Mesh Data List", {"assignedType" : repr("Mesh Data")})
         insertNode(layout, "an_JoinMeshDataList", "Join Mesh Data List")
         insertNode(layout, "an_CreateBMeshFromMeshData", "BMesh from Mesh Data")
-        insertNode(layout, "an_BMeshFromObjectNode", "BMesh from Object")
         layout.menu("an_mesh_finalizing_menu", text = "Tools")
         layout.separator()
         insertNode(layout, "an_MeshObjectOutputNode", "Object Output")
@@ -384,6 +390,7 @@ class MeshFinalizingMenu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         insertNode(layout, "an_BMeshRemoveDoublesNode", "Remove Doubles")
+        insertNode(layout, "an_BMeshLimitedDissolve", "Limited Dissolve")
         insertNode(layout, "an_BMeshRecalculateFaceNormalsNode", "Recalculate Normals")
         insertNode(layout, "an_ShadeObjectSmoothNode", "Shade Object Smooth")
 
@@ -511,10 +518,23 @@ class GeometryMenu(bpy.types.Menu):
         layout = self.layout
         insertNode(layout, "an_ConvertPlaneTypeNode", "Point/Normal to Matrix", {"conversionType" : repr("POINT_NORMAL_TO_MATRIX")})
         insertNode(layout, "an_ConvertPlaneTypeNode", "Matrix to Point/Normal", {"conversionType" : repr("MATRIX_TO_POINT_NORMAL")})
+        insertNode(layout, "an_PointListNormalNode", "Point List Normal")
         layout.separator()
         insertNode(layout, "an_ProjectPointOnLineNode", "Project Point on Line")
         insertNode(layout, "an_ProjectPointOnPlaneNode", "Project Point on Plane")
-
+        layout.separator()
+        insertNode(layout, "an_IntersectLineLineNode", "Intersect Line Line")
+        insertNode(layout, "an_IntersectLinePlaneNode", "Intersect Line Plane")
+        insertNode(layout, "an_IntersectLineSphereNode", "Intersect Line Sphere")
+        insertNode(layout, "an_IntersectPlanePlaneNode", "Intersect Plane Plane")
+        insertNode(layout, "an_IntersectSpherePlaneNode", "Intersect Plane Sphere")
+        insertNode(layout, "an_IntersectSphereSphereNode", "Intersect Sphere Sphere")
+        layout.separator()
+        insertNode(layout, "an_IntersectPolylinePlaneNode", "Intersect Polyline Plane")
+        layout.separator()
+        insertNode(layout, "an_BarycentricTransformNode", "Barycentric Transform")
+        insertNode(layout, "an_PolygonsTriangulateNode", "Triangulate")
+        insertNode(layout, "an_BMeshTriangulateNode", "BMesh Triangulate")
 
 class KDTreeAndBVHTreeMenu(bpy.types.Menu):
     bl_idname = "an_kdtree_bvhtree_menu"
@@ -559,10 +579,9 @@ class SubprogramsMenu(bpy.types.Menu):
             for network in getSubprogramNetworks():
                 insertNode(layout, "an_InvokeSubprogramNode", "-  " + network.name, {"subprogramIdentifier" : repr(network.identifier)})
         layout.separator()
-        layout.label("New:")
-        insertNode(layout, "an_GroupInputNode", "   Group")
-        insertNode(layout, "an_LoopInputNode", "   Loop")
-        insertNode(layout, "an_ScriptNode", "   Script")
+        insertNode(layout, "an_GroupInputNode", "Group")
+        insertNode(layout, "an_LoopInputNode", "Loop")
+        insertNode(layout, "an_ScriptNode", "Script")
         layout.separator()
         insertNode(layout, "an_ExpressionNode", "Expression")
 

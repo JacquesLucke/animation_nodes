@@ -1,5 +1,5 @@
 #Animation Nodes
 
-The Animation Nodes (AN) addon is a powerful extension for [Blender](http://blender.org).
+The Animation Nodes addon (AN) implements a new node system for [Blender](http://blender.org).
 
 You can find some documentation here: http://animation-nodes-manual.readthedocs.org/en/latest/

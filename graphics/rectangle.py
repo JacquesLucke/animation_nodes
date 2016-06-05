@@ -83,8 +83,8 @@ class Rectangle:
         bottom, top = sorted([self.y1, self.y2])
 
         if thickness > 0:
-            topBorder = Rectangle(left, top, right, top - thickness)
-            bottomBorder = Rectangle(left, bottom + thickness, right, bottom)
+            topBorder = Rectangle(left + thickness, top, right - thickness, top - thickness)
+            bottomBorder = Rectangle(left + thickness, bottom + thickness, right - thickness, bottom)
         else:
             topBorder = Rectangle(left + thickness, top, right - thickness, top - thickness)
             bottomBorder = Rectangle(left + thickness, bottom + thickness, right - thickness, bottom)

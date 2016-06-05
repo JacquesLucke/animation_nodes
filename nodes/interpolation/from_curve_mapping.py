@@ -1,6 +1,5 @@
 import bpy
 from bpy.props import *
-from ... algorithms import interpolation
 from ... base_types.node import AnimationNode
 from .. container_provider import getHelperMaterial
 
@@ -24,12 +23,16 @@ class InterpolationFromCurveMappingNode(bpy.types.Node, AnimationNode):
         curve = mapping.curves[3]
         try: curve.evaluate(0.5)
         except: mapping.initialize()
-        return interpolation.assignArguments(interpolation.curveMapping, curve)
+        return curve.evaluate
 
     def createCurveNode(self):
         material = getHelperMaterial()
         node = material.node_tree.nodes.new("ShaderNodeRGBCurve")
         self.curveNodeName = node.name
+        mapping = self.mapping
+        mapping.use_clip = True
+        mapping.clip_min_y = -0.5
+        mapping.clip_max_y = 1.5
         self.resetEndPoints()
         return node
 
@@ -43,8 +46,9 @@ class InterpolationFromCurveMappingNode(bpy.types.Node, AnimationNode):
 
     def resetEndPoints(self):
         points = self.curve.points
-        points[0].location = (0, 0.25)
-        points[-1].location = (1, 0.75)
+        points[0].location = (0, 0)
+        points[-1].location = (1, 1)
+        self.mapping.update()
 
     def duplicate(self, sourceNode):
         self.createCurveNode()
