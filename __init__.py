@@ -23,7 +23,7 @@ bl_info = {
     "name":        "Animation Nodes",
     "description": "Node based visual scripting system designed for motion graphics in Blender.",
     "author":      "Jacques Lucke",
-    "version":     (1, 5, 2),
+    "version":     (1, 6, 0),
     "blender":     (2, 77, 0),
     "location":    "Node Editor",
     "category":    "Node",
@@ -34,6 +34,20 @@ bl_info = {
 
 # Test Environment
 ##################################
+
+from os import listdir
+from os.path import dirname
+addonsDirectory = dirname(dirname(__file__))
+counter = 0
+for name in listdir(addonsDirectory):
+    if "animation" in name.lower() and "nodes" in name.lower():
+        counter += 1
+
+if counter > 1:
+    message = ("\n\n"
+        "There are multiple versions of the Animation Nodes addon installed\n"
+        "Please uninstall/remove all older versions of the addon\n")
+    raise Exception(message)
 
 try: from . import developer_utils
 except: pass
@@ -70,27 +84,6 @@ if getBlenderVersion() < (2, 76, 0):
         "The Animation Nodes addon requires at least Blender 2.77.\n"
         "Your are using an older version.\n"
         "Please download the latest official release.")
-    raise Exception(message)
-
-
-try: from . data_structures import FloatList
-except: pass
-
-if "FloatList" not in globals():
-    message = ("\n\n"
-        "You are using an uncompiled version of the Animation Nodes addon.\n"
-        "Please download an official release or compile it yourself.\n"
-        "More information is in this file: compile_cython.py")
-    raise Exception(message)
-
-
-if __name__ != "animation_nodes":
-    import os
-    message = ("\n\n"
-        "The folder which contains the Animation Nodes addon has a wrong name.\n"
-        "The name has to be 'animation_nodes'.\n"
-        "Please rename the folder.\n"
-        "It's located here: " + os.path.dirname(__file__))
     raise Exception(message)
 
 

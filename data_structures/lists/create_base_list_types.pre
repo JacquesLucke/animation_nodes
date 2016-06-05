@@ -1,0 +1,12 @@
+declarationSourceFile = changeFileName(__file__, "__list_declaration.src")
+implementationSourceFile = changeFileName(__file__, "__list_implementation.src")
+
+implementation = readFile(implementationSourceFile)
+contentParts = []
+
+for listName, listType in baseLists:
+    text = multiReplace(implementation, LISTNAME = listName, TYPE = listType)
+    contentParts.append(text)
+
+output = changeFileName(__file__, "base_lists.pyx")
+writeFile(output, "\n\n".join(contentParts))

@@ -10,7 +10,7 @@ Compiling the cython code needs some setup (only tested on windows yet):
     2. Install cython with this command: 'conda install cython'
 
     3. Navigate to the 'animation_nodes' folder in the command line and
-       execute 'python compile_cython.py'. If you are lucky this works immediatly..
+       execute 'python compile.py'. If you are lucky this works immediatly..
        It didn't work for me directly. Oftentimes there is an error message like this:
        'unable to find vcvarsall.bat'.
        To fix this you need install Visual Studio 2015 Community, especially
@@ -20,8 +20,8 @@ Compiling the cython code needs some setup (only tested on windows yet):
        Please report any issue you have.
 
 Command Line Arguments:
-    python compile_cython.py            # full cleanup afterwards
-    python compile_cython.py -c         # don't remove generated .c file
+    python compile.py            # full cleanup afterwards
+    python compile.py -c         # don't remove generated .c file
 
 Generate .html files to debug cython code:
     cython -a filename.pyx
