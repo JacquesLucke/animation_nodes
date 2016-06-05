@@ -108,14 +108,14 @@ def getFunction_IterNodeExecutionLines():
         return iterNodeExecutionLines_Bake
 
 def iterNodeExecutionLines_Basic(node, variables):
-    yield from iterNodePreExecutionLines(node, variables)
+    yield from setupNodeForExecution(node, variables)
     try:
         yield from iterRealNodeExecutionLines(node, variables)
     except:
         handleExecutionCodeCreationException(node)
 
 def iterNodeExecutionLines_Monitored(node, variables):
-    yield from iterNodePreExecutionLines(node, variables)
+    yield from setupNodeForExecution(node, variables)
     yield "try:"
     try:
         for line in iterRealNodeExecutionLines(node, variables):
@@ -131,7 +131,7 @@ def iterNodeExecutionLines_Monitored(node, variables):
     yield "    raise"
 
 def iterNodeExecutionLines_MeasureTimes(node, variables):
-    yield from iterNodePreExecutionLines(node, variables)
+    yield from setupNodeForExecution(node, variables)
     try:
         yield "_execution_start_time = getCurrentTime()"
         yield from iterRealNodeExecutionLines(node, variables)
@@ -141,12 +141,16 @@ def iterNodeExecutionLines_MeasureTimes(node, variables):
         handleExecutionCodeCreationException(node)
 
 def iterNodeExecutionLines_Bake(node, variables):
-    yield from iterNodePreExecutionLines(node, variables)
+    yield from setupNodeForExecution(node, variables)
     try:
         yield from iterRealNodeExecutionLines(node, variables)
         yield from iterNodeBakeLines(node, variables)
     except:
         handleExecutionCodeCreationException(node)
+
+def setupNodeForExecution(node, variables):
+    yield from iterNodePreExecutionLines(node, variables)
+    resolveInnerLinks(node, variables)
 
 def iterNodePreExecutionLines(node, variables):
     yield ""

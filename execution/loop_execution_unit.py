@@ -4,7 +4,6 @@ from .. problems import ExecutionUnitNotSetup
 from . code_generator import (getInitialVariables,
                               iterSetupCodeLines,
                               getCopyExpression,
-                              resolveInnerLinks,
                               getGlobalizeStatement,
                               getLoadSocketValueLine,
                               linkOutputSocketsToTargets,
@@ -159,7 +158,6 @@ class LoopExecutionUnit:
         ignoreNodes = {"an_LoopInputNode", "an_LoopGeneratorOutputNode", "an_ReassignLoopParameterNode", "an_LoopBreakNode"}
         for node in nodes:
             if node.bl_idname in ignoreNodes: continue
-            resolveInnerLinks(node, variables)
             yield from iterNodeExecutionLines(node, variables)
             yield from linkOutputSocketsToTargets(node, variables, nodeByID)
 

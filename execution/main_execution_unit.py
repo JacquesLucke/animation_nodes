@@ -4,7 +4,6 @@ from . compile_scripts import compileScript
 from .. problems import ExecutionUnitNotSetup, ExceptionDuringExecution
 from . code_generator import (getInitialVariables,
                               iterSetupCodeLines,
-                              resolveInnerLinks,
                               linkOutputSocketsToTargets,
                               getFunction_IterNodeExecutionLines)
 
@@ -62,7 +61,6 @@ class MainExecutionUnit:
         iterNodeExecutionLines = getFunction_IterNodeExecutionLines()
 
         for node in nodes:
-            resolveInnerLinks(node, variables)
             yield from iterNodeExecutionLines(node, variables)
             yield from linkOutputSocketsToTargets(node, variables, nodeByID)
 

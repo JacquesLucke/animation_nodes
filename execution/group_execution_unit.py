@@ -2,7 +2,6 @@ from . compile_scripts import compileScript
 from .. problems import ExecutionUnitNotSetup
 from . code_generator import (getInitialVariables,
                               iterSetupCodeLines,
-                              resolveInnerLinks,
                               getGlobalizeStatement,
                               linkOutputSocketsToTargets,
                               getFunction_IterNodeExecutionLines)
@@ -72,7 +71,6 @@ class GroupExecutionUnit:
         yield from linkOutputSocketsToTargets(inputNode, variables, nodeByID)
         for node in nodes:
             if node.bl_idname in ("an_GroupInputNode", "an_GroupOutputNode"): continue
-            resolveInnerLinks(node, variables)
             yield from iterNodeExecutionLines(node, variables)
             yield from linkOutputSocketsToTargets(node, variables, nodeByID)
 
