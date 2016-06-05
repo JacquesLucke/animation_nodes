@@ -1,0 +1,7 @@
+
+def createLISTNAMERange(unsigned long amount, double start, double step):
+    cdef LISTNAME newList = LISTNAME(amount)
+    cdef unsigned long i
+    for i in range(amount):
+        newList.data[i] = <TYPE>(start + i * step)
+    return newList

@@ -1,6 +1,8 @@
+from ... data_structures.lists.base_lists cimport numeric_list
+
 cpdef TARGETLIST toTARGETLIST(numeric_list sourceList):
     cdef TARGETLIST newList = TARGETLIST(sourceList.length)
-    cdef long i
+    cdef unsigned long i
     for i in range(len(sourceList)):
             newList.data[i] = <TYPE>sourceList.data[i]
     return newList

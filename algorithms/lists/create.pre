@@ -1,0 +1,18 @@
+from textwrap import dedent
+
+sourcePath = changeFileName(__file__, "create.src")
+targetPath = changeFileName(__file__, "create.pyx")
+
+if dependenciesChanged(targetPath, dependencies = [sourcePath]):
+    templateCode = readFile(sourcePath)
+
+    parts = []
+
+    listNames = ", ".join([listName for listName, _ in baseLists])
+    parts.append("from ... data_structures.lists.base_lists cimport " + listNames)
+
+    for listName, listType in baseLists:
+        code = multiReplace(templateCode, LISTNAME = listName, TYPE = listType)
+        parts.append(code)
+
+    writeFile(targetPath, "\n\n".join(parts))

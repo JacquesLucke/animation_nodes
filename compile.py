@@ -198,6 +198,7 @@ def iterPathsWithSuffix(suffix):
 def writeFile(path, content):
     with open(path, "wt") as f:
         f.write(content)
+    print("Changed File:", path)
 
 def readFile(path):
     with open(path, "rt") as f:

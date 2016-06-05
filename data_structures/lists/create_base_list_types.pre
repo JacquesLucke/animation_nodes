@@ -1,12 +1,43 @@
-declarationSourceFile = changeFileName(__file__, "__list_declaration.src")
-implementationSourceFile = changeFileName(__file__, "__list_implementation.src")
+from textwrap import dedent
 
-implementation = readFile(implementationSourceFile)
-contentParts = []
+declarationTargetPath = changeFileName(__file__, "base_lists.pxd")
+declarationSourcePath = changeFileName(__file__, "__list_declaration.src")
 
-for listName, listType in baseLists:
-    text = multiReplace(implementation, LISTNAME = listName, TYPE = listType)
-    contentParts.append(text)
+implementationTargetPath = changeFileName(__file__, "base_lists.pyx")
+implementationSourcePath = changeFileName(__file__, "__list_implementation.src")
 
-output = changeFileName(__file__, "base_lists.pyx")
-writeFile(output, "\n\n".join(contentParts))
+
+# Create Declaration File
+#####################################################
+
+if dependenciesChanged(declarationTargetPath, dependencies = [declarationSourcePath]):
+    declaration = readFile(declarationSourcePath)
+
+    parts = []
+    parts.append("ctypedef fused list_or_tuple: list, tuple")
+
+    fusedType = "ctypedef fused numeric_list:\n"
+    for listName, _ in baseLists:
+        fusedType += "    " + listName + "\n"
+    parts.append(fusedType)
+
+    for listName, listType in baseLists:
+        code = multiReplace(declaration, LISTNAME = listName, TYPE = listType)
+        parts.append(code)
+
+    writeFile(declarationTargetPath, "\n\n".join(parts))
+
+
+# Create Implementation File
+#####################################################
+
+if dependenciesChanged(implementationTargetPath, dependencies = [implementationSourcePath]):
+    implementation = readFile(implementationSourcePath)
+
+    parts = []
+
+    for listName, listType in baseLists:
+        code = multiReplace(implementation, LISTNAME = listName, TYPE = listType)
+        parts.append(code)
+
+    writeFile(implementationTargetPath, "\n\n".join(parts))
