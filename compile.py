@@ -87,62 +87,6 @@ def preprocessor():
             "changeFileName" : changeFileName}
         exec(codeBlock, context, context)
 
-    return
-    for path in chain(iterPathsWithSuffix(".pyxt"), iterPathsWithSuffix(".pxdt")):
-        lastModificationTime = os.stat(path).st_mtime
-
-        content = readFile(path)
-        lines = content.splitlines()
-
-        output = []
-        output.append("'''")
-        output.append("Don't modify this file! It is auto-generated.")
-        output.append("All changes will gone after compilation.")
-        output.append("The source is here:")
-        output.append("  " + path)
-        output.append("'''")
-        outputName = None
-        for line in lines:
-            if line.startswith("##OUTPUT"):
-                outputName = preprocess_OUTPUT(line, path)
-            elif line.startswith("##INSERT"):
-                lastSourceModification, insertedCode = preprocess_INSERT(line, path)
-                lastModificationTime = max(lastModificationTime, lastSourceModification)
-                output.append(insertedCode)
-            else:
-                output.append(line)
-
-        if outputName is None:
-            raise Exception("Output name not specified in " + path)
-
-        outputPath = changeFileName(path, outputName)
-
-        try: lastCreationTime = os.stat(outputPath).st_mtime
-        except: lastCreationTime = 0
-
-        if lastModificationTime > lastCreationTime:
-            writeFile(outputPath, "\n".join(output))
-            print("Created " + outputPath)
-        else:
-            print("File is up to date: " + outputPath)
-
-def preprocess_OUTPUT(line, path):
-    match = re.fullmatch(r"##OUTPUT\s*(.*)\s*", line)
-    if match is None:
-        raise Exception("Wrong ##OUTPUT in " + path)
-    return match.group(1)
-
-def preprocess_INSERT(line, path):
-    match = re.fullmatch(r"##INSERT\s*(\w*\.\w*)\s*(\{.*\})", line)
-    if match is None:
-        raise Exception("Wrong ##INSERT in " + path)
-    insertPath = changeFileName(path, match.group(1))
-    insertContent = readFile(insertPath)
-    replaceDict = eval(match.group(2))
-    for key, value in replaceDict.items():
-        insertContent = insertContent.replace(key, value)
-    return os.stat(insertPath).st_mtime, insertContent
-
 
 
 # Translate .pyx to .c files and compile extension modules
