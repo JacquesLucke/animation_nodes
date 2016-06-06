@@ -284,7 +284,7 @@ cdef class LISTNAME:
         if len(memView) < 20:
             return "<LISTNAME {}>".format(list(memView))
         else:
-            return "<LISTNAME [{}, ...]>".format(", ".join(*memView[:20]))
+            return "<LISTNAME [{}, ...]>".format(", ".join(str(e) for e in memView[:20]))
 
     def status(self):
         return "Length: {}, Allocated: {}, Size: {} bytes".format(
