@@ -14,7 +14,7 @@ if dependenciesChanged(declarationTargetPath, dependencies = [declarationSourceP
     declaration = readFile(declarationSourcePath)
 
     parts = []
-    parts.append("ctypedef fused list_or_tuple: list, tuple")
+    parts.append("ctypedef fused list_or_tuple:\n    list\n    tuple")
 
     fusedType = "ctypedef fused numeric_list:\n"
     for listName, _ in baseLists:
