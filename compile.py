@@ -30,9 +30,16 @@ Cleanup Repository:
     git clean -fdx
 '''
 
+import sys
+
+v = sys.version_info
+if v.major < 3 or v.minor < 5:
+    print("Only works with Python 3.5.x")
+    print("You are using: {}".format(sys.version))
+    sys.exit()
+
 import os
 import re
-import sys
 import shutil
 from io import StringIO
 from itertools import chain
@@ -50,7 +57,6 @@ initialArgs = sys.argv[:]
 def main():
     if canCompileCython():
         preprocessor()
-        #return
         compileCythonFiles()
 
 def canCompileCython():
