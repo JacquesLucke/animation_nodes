@@ -6,6 +6,7 @@
 *.lib
 *.obj
 *.html
+*.so
 .log
 data_structures/lists/base_lists.pxd
 data_structures/lists/base_lists.pyx
