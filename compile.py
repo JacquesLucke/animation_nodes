@@ -60,12 +60,14 @@ def main():
         compileCythonFiles()
 
 def canCompileCython():
-    # Will be false when cython is not installed
-    # -> won't try to compile when executed from within Blender
+    if "bpy" in sys.modules:
+        return False
     try:
         import Cython
         return True
     except:
+        print("Cython is not installed for this Python version.")
+        print(sys.version)
         return False
 
 
