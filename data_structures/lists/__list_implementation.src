@@ -280,7 +280,11 @@ cdef class LISTNAME:
     ###############################################
 
     def __repr__(self):
-        return "<LISTNAME {}>".format(list(self.getMemoryView()))
+        memView = self.getMemoryView()
+        if len(memView) < 20:
+            return "<LISTNAME {}>".format(list(memView))
+        else:
+            return "<LISTNAME [{}, ...]>".format(", ".join(*memView[:20]))
 
     def status(self):
         return "Length: {}, Allocated: {}, Size: {} bytes".format(
