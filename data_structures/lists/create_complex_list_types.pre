@@ -6,11 +6,14 @@ conversionSourcePath = changeFileName(__file__, "__complex_list_converters.src")
 # Create Implementation File
 #####################################################
 
+if dependenciesChanged(implementationTargetPath, dependencies = [implementationSourcePath, conversionSourcePath]):
     implementation = readFile(implementationSourcePath)
 
     parts = []
     parts.append(readFile(conversionSourcePath))
     code = multiReplace(implementation,
+            BASELISTTYPE = "FloatList",
+            LISTNAME = "VectorList",
             AMOUNT = "3",
             APPEND = "appendVector",
             GETITEM = "getVector")
