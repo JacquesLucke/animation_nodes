@@ -225,6 +225,11 @@ cdef class LISTNAME:
                 return True
         return False
 
+    def getSubTuple(self, long start, long length):
+        if 0 <= start < start + length <= self.length:
+            return tuple(self.data[i] for i in range(start, start + length))
+        raise IndexError("Index out of range")
+
 
     # Memory Views
     ###############################################
@@ -235,17 +240,14 @@ cdef class LISTNAME:
         else:
             return (<TYPE[:1]>self.data)[1:]
 
-    cpdef TYPE[:] getSlicedMemoryView(self, sliceObject):
-        cdef long start, stop, step
-        start, stop, step = sliceObject.indices(self.length)
-        return self.getMemoryView()[start:stop:step]
-
     cpdef LISTNAME getSlice(self, sliceObject):
-        cdef TYPE[:] memView = self.getSlicedMemoryView(sliceObject)
-        newList = LISTNAME(len(memView))
-        cdef int i
-        for i in range(len(memView)):
-            newList.data[i] = memView[i]
+        cdef:
+            long start, stop, step
+            LISTNAME newList
+        newList = LISTNAME()
+        start, stop, step = sliceObject.indices(self.length)
+        for i in range(start, stop, step):
+            newList.append(self.data[i])
         return newList
 
 

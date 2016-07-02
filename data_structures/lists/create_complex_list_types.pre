@@ -1,0 +1,19 @@
+implementationTargetPath = changeFileName(__file__, "complex_lists.pyx")
+implementationSourcePath = changeFileName(__file__, "__complex_list_implementation.src")
+
+conversionSourcePath = changeFileName(__file__, "__complex_list_converters.src")
+
+# Create Implementation File
+#####################################################
+
+    implementation = readFile(implementationSourcePath)
+
+    parts = []
+    parts.append(readFile(conversionSourcePath))
+    code = multiReplace(implementation,
+            AMOUNT = "3",
+            APPEND = "appendVector",
+            GETITEM = "getVector")
+    parts.append(code)
+
+    writeFile(implementationTargetPath, "\n\n".join(parts))

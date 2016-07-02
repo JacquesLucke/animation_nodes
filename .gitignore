@@ -12,3 +12,4 @@ data_structures/lists/base_lists.pxd
 data_structures/lists/base_lists.pyx
 algorithms/lists/convert.pyx
 algorithms/lists/create.pyx
+data_structures/lists/complex_lists.pyx
