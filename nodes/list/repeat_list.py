@@ -18,7 +18,7 @@ amountTypeItems = [
 
 class RepeatListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_RepeatListNode"
-    bl_label = "Repeat  List"
+    bl_label = "Repeat List"
 
     def assignedTypeChanged(self, context):
         self.generateSockets()
