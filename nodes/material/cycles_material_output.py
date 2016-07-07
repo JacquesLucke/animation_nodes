@@ -80,6 +80,11 @@ class CyclesMaterialOutputNode(bpy.types.Node, AnimationNode):
 
         yield "        socket.default_value = data"
 
+    def getBakeCode(self):
+        yield "socket = self.getSelectedSocket()"
+        yield "if socket is not None:"
+        yield "    socket.keyframe_insert('default_value')"
+
     def edit(self):
         inputSocket = self.inputs.get("Data")
         if inputSocket is None: return
