@@ -1,5 +1,6 @@
 import bpy
 from bpy.props import *
+from .. utils.operators import makeOperator
 from .. sockets.info import getBaseDataTypes
 from .. tree_info import getSubprogramNetworks
 from .. utils.nodes import getAnimationNodeTrees
@@ -11,6 +12,8 @@ def drawMenu(self, context):
 
     layout = self.layout
     layout.operator_context = "INVOKE_DEFAULT"
+
+    drawNodeTreeChooser(layout, context)
 
     layout.operator("an.node_search", text = "Search", icon = "VIEWZOOM")
     layout.separator()
@@ -43,18 +46,15 @@ def drawMenu(self, context):
     layout.menu("an_layout_menu", text = "Layout", icon = "IMGDISPLAY")
 
 def drawNodeTreeChooser(layout, context):
-    activeNodeTree = context.space_data.node_tree
-    nodeTrees = getAnimationNodeTrees()
-
-    if not activeNodeTree:
+    if len(getAnimationNodeTrees()) == 0:
         col = layout.column()
         col.scale_y = 1.6
-        if len(nodeTrees) == 0:
-            col.operator("an.create_node_tree", text = "New Node Tree", icon = "PLUS")
-        else:
-            for nodeTree in nodeTrees:
-                props = col.operator("an.select_node_tree", text = "Select '{}'".format(nodeTree.name), icon = "EYEDROPPER")
-                props.nodeTreeName = nodeTree.name
+        col.operator("an.create_node_tree", text = "New Node Tree", icon = "PLUS")
+
+@makeOperator("an.create_node_tree", "Create Node Tree")
+def createNodeTree():
+    tree = bpy.data.node_groups.new("AN Tree", "an_AnimationNodeTree")
+    bpy.context.space_data.node_tree = tree;
 
 class NumberMenu(bpy.types.Menu):
     bl_idname = "an_number_menu"
