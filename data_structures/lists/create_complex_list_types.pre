@@ -1,7 +1,31 @@
+declarationTargetPath = changeFileName(__file__, "complex_lists.pxd")
+declarationSourcePath = changeFileName(__file__, "__complex_list_declaration.src")
+
 implementationTargetPath = changeFileName(__file__, "complex_lists.pyx")
 implementationSourcePath = changeFileName(__file__, "__complex_list_implementation.src")
 
 conversionSourcePath = changeFileName(__file__, "__complex_list_converters.src")
+
+types = [dict(BASELISTTYPE = "FloatList",
+             LISTNAME = "VectorList",
+             AMOUNT = "3",
+             APPEND = "appendVector",
+             GETITEM = "getVector")]
+
+# Create Declaration File
+#####################################################
+
+if dependenciesChanged(declarationTargetPath, dependencies = [declarationSourcePath]):
+    declaration = readFile(declarationSourcePath)
+
+    parts = []
+    parts.append("from . base_lists cimport FloatList")
+
+    for typeData in types:
+        code = multiReplace(declaration, **typeData)
+        parts.append(code)
+
+    writeFile(declarationTargetPath, "\n\n".join(parts))
 
 # Create Implementation File
 #####################################################
@@ -11,12 +35,9 @@ if dependenciesChanged(implementationTargetPath, dependencies = [implementationS
 
     parts = []
     parts.append(readFile(conversionSourcePath))
-    code = multiReplace(implementation,
-            BASELISTTYPE = "FloatList",
-            LISTNAME = "VectorList",
-            AMOUNT = "3",
-            APPEND = "appendVector",
-            GETITEM = "getVector")
-    parts.append(code)
+
+    for typeData in types:
+        code = multiReplace(implementation, **typeData)
+        parts.append(code)
 
     writeFile(implementationTargetPath, "\n\n".join(parts))

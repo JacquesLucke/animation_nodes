@@ -1,10 +1,10 @@
 from textwrap import dedent
 
 declarationTargetPath = changeFileName(__file__, "base_lists.pxd")
-declarationSourcePath = changeFileName(__file__, "__list_declaration.src")
+declarationSourcePath = changeFileName(__file__, "__base_list_declaration.src")
 
 implementationTargetPath = changeFileName(__file__, "base_lists.pyx")
-implementationSourcePath = changeFileName(__file__, "__list_implementation.src")
+implementationSourcePath = changeFileName(__file__, "__base_list_implementation.src")
 
 
 # Create Declaration File
