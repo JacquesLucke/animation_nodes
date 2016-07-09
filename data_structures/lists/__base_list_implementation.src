@@ -239,6 +239,7 @@ cdef class LISTNAME:
         if self.length > 0:
             return <TYPE[:self.length]>self.data
         else:
+            # hack to make zero-length memview possible
             return (<TYPE[:1]>self.data)[1:]
 
     cpdef LISTNAME getSlice(self, sliceObject):
