@@ -1,6 +1,7 @@
 cimport cython
 from libc.string cimport memcpy
 from libc.stdlib cimport malloc, free, realloc
+from ... utils.lists cimport predictRangeLength
 
 @cython.freelist(10)
 cdef class LISTNAME:
@@ -243,11 +244,29 @@ cdef class LISTNAME:
     cpdef LISTNAME getSlice(self, sliceObject):
         cdef:
             long start, stop, step
+            long outLength
+            long newIndex, oldIndex
             LISTNAME newList
-        newList = LISTNAME()
+
         start, stop, step = sliceObject.indices(self.length)
-        for i in range(start, stop, step):
-            newList.append(self.data[i])
+        outLength = predictRangeLength(start, stop, step)
+        newList = LISTNAME(length = outLength)
+
+        newIndex = 0
+        oldIndex = start
+        if step == 1:
+            memcpy(newList.data, self.data + start, outLength * sizeof(TYPE))
+        elif step > 0:
+            while oldIndex < stop:
+                newList.data[newIndex] = self.data[oldIndex]
+                oldIndex += step
+                newIndex += 1
+        else:
+            while oldIndex > stop:
+                newList.data[newIndex] = self.data[oldIndex]
+                oldIndex += step
+                newIndex += 1
+
         return newList
 
 
