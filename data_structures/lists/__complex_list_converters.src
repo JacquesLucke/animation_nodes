@@ -3,7 +3,7 @@ from . base_lists cimport FloatList
 
 def appendVector(FloatList myList, vector):
     if len(vector) != 3: raise Exception("Invalid Vector Length. Expected 3.")
-    myList.extend(tuple(vector))
+    myList.extend(vector)
 
 def getVector(myList, long index):
     return Vector(myList.getSubTuple(index * 3, 3))

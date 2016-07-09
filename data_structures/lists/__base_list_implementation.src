@@ -100,14 +100,14 @@ cdef class LISTNAME:
 
     cpdef append(self, TYPE value):
         if self.length == self.allocated:
-            self._resize(<long>(self.allocated * 1.5) + 1)
+            self._resize(<long>(self.allocated * 2) + 1)
         self.data[self.length] = value
         self.length += 1
 
-    cpdef extend(self, list_or_tuple values):
+    cpdef extend(self, values):
         cdef long newLength = self.length + len(values)
         if newLength > self.allocated:
-            self._resize(<long>(newLength * 1.2))
+            self._resize(<long>(newLength * 1.5))
         cdef long i
         for i, value in enumerate(values, start = self.length):
             self.data[i] = value
