@@ -17,11 +17,11 @@ if dependenciesChanged(declarationTargetPath, dependencies = [declarationSourceP
     parts.append("ctypedef fused list_or_tuple:\n    list\n    tuple")
 
     fusedType = "ctypedef fused numeric_list:\n"
-    for listName, _ in baseLists:
+    for listName, _ in baseListsParameters:
         fusedType += "    " + listName + "\n"
     parts.append(fusedType)
 
-    for listName, listType in baseLists:
+    for listName, listType in baseListsParameters:
         code = multiReplace(declaration, LISTNAME = listName, TYPE = listType)
         parts.append(code)
 
@@ -36,7 +36,7 @@ if dependenciesChanged(implementationTargetPath, dependencies = [implementationS
 
     parts = []
 
-    for listName, listType in baseLists:
+    for listName, listType in baseListsParameters:
         code = multiReplace(implementation, LISTNAME = listName, TYPE = listType)
         parts.append(code)
 

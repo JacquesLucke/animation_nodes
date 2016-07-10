@@ -6,9 +6,6 @@ implementationSourcePath = changeFileName(__file__, "__complex_list_implementati
 
 conversionSourcePath = changeFileName(__file__, "__complex_list_converters.src")
 
-types = [dict(BASELISTTYPE = "FloatList",
-             LISTNAME = "VectorList",
-             AMOUNT = "3")]
 
 # Create Declaration File
 #####################################################
@@ -19,7 +16,7 @@ if dependenciesChanged(declarationTargetPath, dependencies = [declarationSourceP
     parts = []
     parts.append("from . base_lists cimport FloatList")
 
-    for typeData in types:
+    for typeData in complexListsParameters:
         code = multiReplace(declaration, **typeData)
         parts.append(code)
 
@@ -34,7 +31,7 @@ if dependenciesChanged(implementationTargetPath, dependencies = [implementationS
     parts = []
     parts.append(readFile(conversionSourcePath))
 
-    for typeData in types:
+    for typeData in complexListsParameters:
         code = multiReplace(implementation, **typeData)
         parts.append(code)
 

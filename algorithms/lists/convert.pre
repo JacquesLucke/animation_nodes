@@ -8,10 +8,10 @@ if dependenciesChanged(targetPath, dependencies = [sourcePath]):
 
     parts = []
 
-    listNames = ", ".join([listName for listName, _ in baseLists])
+    listNames = ", ".join([listName for listName, _ in baseListsParameters])
     parts.append("from ... data_structures.lists.base_lists cimport " + listNames)
 
-    for listName, listType in baseLists:
+    for listName, listType in baseListsParameters:
         code = multiReplace(templateCode, TARGETLIST = listName, TYPE = listType)
         parts.append(code)
 
