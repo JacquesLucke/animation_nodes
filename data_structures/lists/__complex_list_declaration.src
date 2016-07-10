@@ -4,3 +4,4 @@ cdef class LISTNAME:
 
     cpdef append(self, value)
     cpdef copy(self)
+    cpdef LISTNAME getSlice(self, sliceObject)

@@ -1,4 +1,6 @@
 cimport cython
+from libc.string cimport memcpy
+from ... utils.lists cimport predictRangeLength
 
 @cython.freelist(10)
 cdef class LISTNAME:
@@ -16,7 +18,7 @@ cdef class LISTNAME:
         if isinstance(key, int):
             return getElementFromLISTNAME(self, key)
         else:
-            raise NotImplemented()
+            return self.getSlice(key)
 
     cpdef append(self, value):
         appendToLISTNAME(self, value)
@@ -25,3 +27,40 @@ cdef class LISTNAME:
         newList = LISTNAME()
         newList.data = self.data.copy()
         return newList
+
+    cpdef LISTNAME getSlice(self, sliceObject):
+        cdef:
+            long start, stop, step
+            long realStart, realStop, realStep
+            long outLength
+            long newIndex, oldIndex
+            LISTNAME newList
+
+        start, stop, step = sliceObject.indices(len(self))
+        outLength = predictRangeLength(start, stop, step)
+        newList = LISTNAME(length = outLength)
+
+        realStart = start * AMOUNT
+        realStop = stop * AMOUNT
+        realStep = step * AMOUNT
+
+        newIndex = 0
+        oldIndex = realStart
+
+        if step == 1:
+            memcpy(newList.data.data, self.data.data + realStart, outLength * AMOUNT * sizeof(BASETYPE))
+        elif step > 0:
+            while oldIndex < realStop:
+                memcpy(newList.data.data + newIndex, self.data.data + oldIndex, AMOUNT * sizeof(BASETYPE))
+                oldIndex += realStep
+                newIndex += AMOUNT
+        elif step < 0:
+            while oldIndex > realStop:
+                memcpy(newList.data.data + newIndex, self.data.data + oldIndex, AMOUNT * sizeof(BASETYPE))
+                oldIndex += realStep
+                newIndex += AMOUNT
+
+        return newList
+
+    def __repr__(self):
+        return "<LISTNAME - {}>".format([self[i] for i in range(len(self))])

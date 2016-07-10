@@ -262,7 +262,7 @@ cdef class LISTNAME:
                 newList.data[newIndex] = self.data[oldIndex]
                 oldIndex += step
                 newIndex += 1
-        else:
+        elif step < 0:
             while oldIndex > stop:
                 newList.data[newIndex] = self.data[oldIndex]
                 oldIndex += step

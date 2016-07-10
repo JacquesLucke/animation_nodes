@@ -184,6 +184,7 @@ baseListsParameters = [
 complexListsParameters = [
     dict(BASELISTTYPE = "FloatList",
          LISTNAME = "VectorList",
+         BASETYPE = "float",
          AMOUNT = "3")
 ]
 
