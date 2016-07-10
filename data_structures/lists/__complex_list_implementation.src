@@ -36,7 +36,8 @@ cdef class LISTNAME:
             long newIndex, oldIndex
             LISTNAME newList
 
-        start, stop, step = sliceObject.indices(len(self))
+        try: start, stop, step = sliceObject.indices(len(self))
+        except: raise Exception("Expected slice object. Not:", type(sliceObject))
         outLength = predictRangeLength(start, stop, step)
         newList = LISTNAME(length = outLength)
 
