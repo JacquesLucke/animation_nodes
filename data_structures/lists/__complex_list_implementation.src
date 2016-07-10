@@ -14,12 +14,12 @@ cdef class LISTNAME:
 
     def __getitem__(self, key):
         if isinstance(key, int):
-            return GETITEM(self.data, key)
+            return getElementFromLISTNAME(self, key)
         else:
             raise NotImplemented()
 
     cpdef append(self, value):
-        APPEND(self.data, value)
+        appendToLISTNAME(self, value)
 
     cpdef copy(self):
         newList = LISTNAME()

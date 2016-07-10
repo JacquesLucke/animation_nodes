@@ -8,9 +8,7 @@ conversionSourcePath = changeFileName(__file__, "__complex_list_converters.src")
 
 types = [dict(BASELISTTYPE = "FloatList",
              LISTNAME = "VectorList",
-             AMOUNT = "3",
-             APPEND = "appendVector",
-             GETITEM = "getVector")]
+             AMOUNT = "3")]
 
 # Create Declaration File
 #####################################################
