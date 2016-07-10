@@ -121,7 +121,7 @@ def compileCythonFiles():
 
     cleanupRepository(
         removeBuildDirectory = True,
-        removeCFiles = "-c" not in initialArgs)
+        removeCFiles = "-c" in initialArgs)
 
 def getPathsToCythonFiles():
     return list(iterPathsWithSuffix(".pyx"))
