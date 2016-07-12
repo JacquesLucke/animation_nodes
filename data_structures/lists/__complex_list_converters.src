@@ -1,9 +1,9 @@
 from mathutils import Vector
 from . base_lists cimport FloatList
 
-def appendToVectorList(VectorList myList, vector):
+def appendToVector3DList(Vector3DList myList, vector):
     if len(vector) != 3: raise Exception("Invalid Vector Length. Expected 3.")
     myList.data.extend(vector)
 
-def getElementFromVectorList(VectorList myList, long index):
+def getElementFromVector3DList(Vector3DList myList, long index):
     return Vector(myList.data.getSubTuple(index * 3, 3))
