@@ -49,7 +49,7 @@ cdef class LISTNAME:
         if isinstance(key, int):
             return self.getValueAtIndex(key)
         else:
-            return self.getSlice(key)
+            return self.getValuesInSlice(key)
 
     def __setitem__(self, key, value):
         if isinstance(key, int):
@@ -323,7 +323,7 @@ cdef class LISTNAME:
             # hack to make zero-length memview possible
             return (<TYPE[:1]>self.data)[1:]
 
-    cdef LISTNAME getSlice(self, sliceObject):
+    cdef LISTNAME getValuesInSlice(self, sliceObject):
         cdef:
             long start, stop, step
             long outLength

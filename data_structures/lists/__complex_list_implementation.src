@@ -18,7 +18,7 @@ cdef class LISTNAME:
         if isinstance(key, int):
             return getElementFromLISTNAME(self, key)
         else:
-            return self.getSlice(key)
+            return self.getValuesInSlice(key)
 
     cpdef append(self, value):
         appendToLISTNAME(self, value)
@@ -28,7 +28,7 @@ cdef class LISTNAME:
         newList.data = self.data.copy()
         return newList
 
-    cpdef LISTNAME getSlice(self, sliceObject):
+    cpdef LISTNAME getValuesInSlice(self, sliceObject):
         cdef:
             long start, stop, step
             long realStart, realStop, realStep
