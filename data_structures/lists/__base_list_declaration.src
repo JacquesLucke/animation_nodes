@@ -19,10 +19,11 @@ cdef class LISTNAME:
 
     cdef removeValueAtIndex(self, long index)
     cdef removeValuesInSlice(self, sliceObject)
-    
+
     cdef tryCorrectIndex(self, long index)
 
     cpdef long index(self, TYPE value)
     cpdef long count(self, TYPE value)
+    cpdef remove(self, TYPE value)
     cpdef LISTNAME reversed(self)
     cpdef overwrite(self, LISTNAME other, long index = ?)

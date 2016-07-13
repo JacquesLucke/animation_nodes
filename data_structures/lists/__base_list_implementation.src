@@ -139,6 +139,13 @@ cdef class LISTNAME:
                 amount += 1
         return amount
 
+    cpdef remove(self, TYPE value):
+        cdef long index = self.index(value)
+        if index == -1:
+            raise ValueError("value not in list")
+        else:
+            self.removeValueAtIndex(index)
+
     cpdef overwrite(self, LISTNAME other, long index = 0):
         if index + other.length > self.allocated:
             self._resize(index + other.length)
