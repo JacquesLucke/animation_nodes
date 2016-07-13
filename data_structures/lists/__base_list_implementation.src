@@ -31,7 +31,7 @@ cdef class LISTNAME:
             free(self.data)
 
     cdef void _resize(self, long newSize):
-        self.data = <TYPE*>realloc(self.data, sizeof(TYPE) * newSize)
+        self.data = <TYPE*>realloc(self.data, sizeof(TYPE) * max(1, newSize))
         if self.data == NULL:
             self.length = 0
             self.allocated = 0
@@ -104,6 +104,10 @@ cdef class LISTNAME:
         newList.overwrite(self)
         return newList
 
+    cpdef clear(self):
+        self.length = 0
+        self._resize(0)
+
     cpdef append(self, TYPE value):
         if self.length == self.allocated:
             self._resize(<long>(self.allocated * 2) + 1)
@@ -145,6 +149,9 @@ cdef class LISTNAME:
             raise ValueError("value not in list")
         else:
             self.removeValueAtIndex(index)
+
+    cpdef insert(self, long index, TYPE value):
+        raise NotImplemented()
 
     cpdef overwrite(self, LISTNAME other, long index = 0):
         if index + other.length > self.allocated:

@@ -7,6 +7,7 @@ cdef class LISTNAME:
     cdef void _resize(self, long newSize)
 
     cpdef copy(self)
+    cpdef clear(self)
     cpdef fill(self, TYPE value)
 
     cpdef append(self, TYPE value)
@@ -14,6 +15,7 @@ cdef class LISTNAME:
     cpdef remove(self, TYPE value)
     cpdef long index(self, TYPE value)
     cpdef long count(self, TYPE value)
+    cpdef insert(self, long index, TYPE value)
 
     cpdef TYPE[:] getMemoryView(self)
 
