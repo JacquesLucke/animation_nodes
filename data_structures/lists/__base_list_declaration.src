@@ -9,8 +9,19 @@ cdef class LISTNAME:
     cpdef append(self, TYPE value)
     cpdef extend(self, values)
     cpdef TYPE[:] getMemoryView(self)
-    cpdef LISTNAME getSlice(self, sliceObject)
     cpdef copy(self)
+
+    cdef LISTNAME getSlice(self, sliceObject)
+    cdef setValuesInSlice(self, sliceObject, values)
+
+    cdef getValueAtIndex(self, long index)
+    cdef setValueAtIndex(self, long index, TYPE value)
+
+    cdef removeValueAtIndex(self, long index)
+    cdef removeValuesInSlice(self, sliceObject)
+    
+    cdef tryCorrectIndex(self, long index)
+
     cpdef long index(self, TYPE value)
     cpdef long count(self, TYPE value)
     cpdef LISTNAME reversed(self)

@@ -1,7 +1,7 @@
 cimport cython
-from libc.string cimport memcpy
+from libc.string cimport memcpy, memmove
 from libc.stdlib cimport malloc, free, realloc
-from ... utils.lists cimport predictRangeLength
+from ... utils.slicing cimport predictSliceLength, makeStepPositive
 
 @cython.freelist(10)
 cdef class LISTNAME:
@@ -16,7 +16,7 @@ cdef class LISTNAME:
         to allow faster appending/extending without memory reallocation.
         '''
         if length < 0:
-            raise Exception("Length has to be >= 0")
+            raise ValueError("Length has to be >= 0")
         if allocate < length:
             allocate = length
         self.data = <TYPE*>malloc(sizeof(TYPE) * allocate)
@@ -47,16 +47,21 @@ cdef class LISTNAME:
 
     def __getitem__(self, key):
         if isinstance(key, int):
-            return self.getMemoryView()[key]
+            return self.getValueAtIndex(key)
         else:
             return self.getSlice(key)
 
     def __setitem__(self, key, value):
         if isinstance(key, int):
-            self.getMemoryView()[key] = value
+            self.setValueAtIndex(key, value)
         else:
-            start, stop, step = key.indices(self.length)
-            self.getMemoryView()[start:stop:step] = value
+            self.setValuesInSlice(key, value)
+
+    def __delitem__(self, key):
+        if isinstance(key, int):
+            self.removeValueAtIndex(key)
+        else:
+            self.removeValuesInSlice(key)
 
     def __add__(LISTNAME a, LISTNAME b):
         return LISTNAME.join(a, b)
@@ -139,6 +144,75 @@ cdef class LISTNAME:
             self._resize(index + other.length)
         memcpy(self.data + index, other.data, other.length * sizeof(TYPE))
         self.length = max(self.length, index + other.length)
+
+    cdef getValueAtIndex(self, long index):
+        index = self.tryCorrectIndex(index)
+        return self.data[index]
+
+    cdef setValueAtIndex(self, long index, TYPE value):
+        index = self.tryCorrectIndex(index)
+        self.data[index] = value
+
+    cdef removeValueAtIndex(self, long index):
+        index = self.tryCorrectIndex(index)
+        memmove(self.data + index, self.data + index + 1, (self.length - index) * sizeof(TYPE))
+        self.length -= 1
+
+    cdef removeValuesInSlice(self, sliceObject):
+        cdef:
+            long start, stop, step
+            long removeAmount
+            long i, stepMinusOne
+            TYPE* sliceStart
+
+        start, stop, step = sliceObject.indices(self.length)
+        if step < 0:
+            start, stop, step = makeStepPositive(start, stop, step)
+        removeAmount = predictSliceLength(start, stop, step)
+        if removeAmount == 0: return
+
+        sliceStart = self.data + start
+        stepMinusOne = step - 1
+
+        if step == 1:
+            memmove(sliceStart,
+                    self.data + stop,
+                    sizeof(TYPE) * (self.length - start - removeAmount))
+        elif step > 1:
+            # Move values between the steps
+            for i in range(removeAmount - 1):
+                memmove(sliceStart + i * stepMinusOne,
+                        sliceStart + i * step + 1,
+                        sizeof(TYPE) * stepMinusOne)
+
+            # Move values behind the last step
+            memmove(sliceStart + (removeAmount - 1) * stepMinusOne,
+                    sliceStart + (removeAmount - 1) * step + 1,
+                    sizeof(TYPE) * (self.length - (start + (removeAmount - 1) * step + 1)))
+
+        self.length -= removeAmount
+
+    cdef tryCorrectIndex(self, long index):
+        if index < 0:
+            index += self.length
+        if index < 0 or index >= self.length:
+            raise IndexError("list assignment index out of range")
+        return index
+
+    cdef setValuesInSlice(self, sliceObject, values):
+        cdef:
+            long start, stop, step
+            long sliceLength
+
+        start, stop, step = sliceObject.indices(self.length)
+        sliceLength = predictSliceLength(start, stop, step)
+        if sliceLength != len(values):
+            raise ValueError("attempt to assign sequence of size {} to extended slice of size {}"
+                             .format(len(values), sliceLength))
+
+        for i, value in zip(range(start, stop, step), values):
+            self.data[i] = value
+
 
 
     # Create new lists based on an existing list
@@ -242,7 +316,7 @@ cdef class LISTNAME:
             # hack to make zero-length memview possible
             return (<TYPE[:1]>self.data)[1:]
 
-    cpdef LISTNAME getSlice(self, sliceObject):
+    cdef LISTNAME getSlice(self, sliceObject):
         cdef:
             long start, stop, step
             long outLength
@@ -250,14 +324,14 @@ cdef class LISTNAME:
             LISTNAME newList
 
         start, stop, step = sliceObject.indices(self.length)
-        outLength = predictRangeLength(start, stop, step)
+        outLength = predictSliceLength(start, stop, step)
         newList = LISTNAME(length = outLength)
 
         newIndex = 0
         oldIndex = start
         if step == 1:
             memcpy(newList.data, self.data + start, outLength * sizeof(TYPE))
-        elif step > 0:
+        elif step > 1:
             while oldIndex < stop:
                 newList.data[newIndex] = self.data[oldIndex]
                 oldIndex += step

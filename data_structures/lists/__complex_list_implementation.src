@@ -1,6 +1,6 @@
 cimport cython
 from libc.string cimport memcpy
-from ... utils.lists cimport predictRangeLength
+from ... utils.slicing cimport predictSliceLength
 
 @cython.freelist(10)
 cdef class LISTNAME:
@@ -38,7 +38,7 @@ cdef class LISTNAME:
 
         try: start, stop, step = sliceObject.indices(len(self))
         except: raise Exception("Expected slice object. Not:", type(sliceObject))
-        outLength = predictRangeLength(start, stop, step)
+        outLength = predictSliceLength(start, stop, step)
         newList = LISTNAME(length = outLength)
 
         realStart = start * AMOUNT
@@ -50,7 +50,7 @@ cdef class LISTNAME:
 
         if step == 1:
             memcpy(newList.data.data, self.data.data + realStart, outLength * AMOUNT * sizeof(BASETYPE))
-        elif step > 0:
+        elif step > 1:
             while oldIndex < realStop:
                 memcpy(newList.data.data + newIndex, self.data.data + oldIndex, AMOUNT * sizeof(BASETYPE))
                 oldIndex += realStep
