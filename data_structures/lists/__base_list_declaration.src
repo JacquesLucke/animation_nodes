@@ -4,7 +4,8 @@ cdef class LISTNAME:
         long length
         long capacity
 
-    cdef void _resize(self, long newSize)
+    cdef void grow(self, long minCapacity)
+    cdef void shrinkToLength(self)
 
     cpdef copy(self)
     cpdef clear(self)
