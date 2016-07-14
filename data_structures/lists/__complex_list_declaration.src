@@ -5,3 +5,6 @@ cdef class LISTNAME:
     cpdef append(self, value)
     cpdef copy(self)
     cpdef LISTNAME getValuesInSlice(self, sliceObject)
+    cdef getValueAtIndex(self, long index)
+
+    cdef tryCorrectIndex(self, long index)

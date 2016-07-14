@@ -16,9 +16,20 @@ cdef class LISTNAME:
 
     def __getitem__(self, key):
         if isinstance(key, int):
-            return getElementFromLISTNAME(self, key)
+            return self.getValueAtIndex(key)
         else:
             return self.getValuesInSlice(key)
+
+    cdef getValueAtIndex(self, long index):
+        index = self.tryCorrectIndex(index)
+        return getElementFromLISTNAME(self, index)
+
+    cdef tryCorrectIndex(self, long index):
+        if index < 0:
+            index += self.base.length / AMOUNT
+        if index < 0 or index >= self.base.length / AMOUNT:
+            raise IndexError("list assignment index out of range")
+        return index
 
     cpdef append(self, value):
         appendToLISTNAME(self, value)
