@@ -101,3 +101,43 @@ class TestAppend(TestCase):
         for i in range(10):
             a.append(i)
         self.assertEqual(a, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+
+class TestExtend(TestCase):
+    def testEmptyList(self):
+        a = IntegerList()
+        a.extend((1, 2, 3))
+        self.assertEqual(a, [1, 2, 3])
+
+    def testListInput(self):
+        a = IntegerList.fromValues((1, 2, 3))
+        a.extend([4, 5, 6])
+        self.assertEqual(a, [1, 2, 3, 4, 5, 6])
+
+    def testTupleInput(self):
+        a = IntegerList.fromValues((1, 2, 3))
+        a.extend((4, 5, 6))
+        self.assertEqual(a, [1, 2, 3, 4, 5, 6])
+
+    def testIteratorInput(self):
+        a = IntegerList()
+        a.extend(range(5))
+        self.assertEqual(a, [0, 1, 2, 3, 4])
+
+    def testGeneratorInput(self):
+        a = IntegerList()
+        gen = (i**2 for i in range(5))
+        a.extend(gen)
+        self.assertEqual(a, [0, 1, 4, 9, 16])
+
+    def testOtherListInput(self):
+        a = IntegerList.fromValues((0, 1, 2))
+        b = IntegerList.fromValues((3, 4, 5))
+        a.extend(b)
+        self.assertEqual(a, [0, 1, 2, 3, 4, 5])
+
+    def testInvalidInput(self):
+        a = IntegerList()
+        with self.assertRaises(TypeError):
+            a.extend("abc")
+        with self.assertRaises(TypeError):
+            a.extend(0)

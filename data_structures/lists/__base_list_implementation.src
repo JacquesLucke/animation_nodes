@@ -1,4 +1,5 @@
 cimport cython
+from types import GeneratorType
 from libc.stdlib cimport malloc, free, realloc
 from libc.string cimport memcpy, memmove, memcmp
 from ... utils.slicing cimport predictSliceLength, makeStepPositive
@@ -138,12 +139,21 @@ cdef class LISTNAME:
         self.length += 1
 
     cpdef extend(self, values):
-        cdef long newLength = self.length + len(values)
-        self.grow(newLength)
-        cdef long i
-        for i, value in enumerate(values, start = self.length):
-            self.data[i] = value
-        self.length = newLength
+        cdef long newLength, i
+        if type(values) == LISTNAME:
+            self.overwrite(values, self.length)
+        elif hasattr(values, "__len__"):
+            newLength = self.length + len(values)
+            self.grow(newLength)
+            for i, value in enumerate(values, start = self.length):
+                self.data[i] = value
+            self.length = newLength
+        elif isinstance(values, GeneratorType):
+            for value in values:
+                self.append(value)
+        else:
+            raise TypeError("invalid input")
+
 
     cpdef fill(self, TYPE value):
         cdef long i
