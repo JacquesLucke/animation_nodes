@@ -55,5 +55,7 @@ class TestRichComparison(TestCase):
         a = IntegerList.fromValues((0, 1, 2, 3))
         b = IntegerList.fromValues((0, 1, 2, 3))
         c = IntegerList.fromValues((0, 1, 2, 3, 4))
+        d = IntegerList.fromValues((0, 1, 2, 4))
         self.assertTrue(a == b)
         self.assertFalse(a == c)
+        self.assertFalse(a == d)
