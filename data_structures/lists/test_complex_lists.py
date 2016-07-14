@@ -60,3 +60,19 @@ class TestGetSingleItem(TestCase):
         v = Vector3DList()
         v.append((0, 0, 0))
         self.assertIsInstance(v[0], Vector)
+
+class TestJoin(TestCase):
+    def testNormal(self):
+        v1 = Vector3DList()
+        v1.append((0, 0, 0))
+        v1.append((1, 1, 1))
+        v2 = Vector3DList()
+        v2.append((2, 2, 2))
+        v2.append((3, 3, 3))
+        v3 = Vector3DList()
+        v3.append((4, 4, 4))
+        v3.append((5, 5, 5))
+
+        result = Vector3DList.join(v1, v2, v3)
+        self.assertEquals(len(result), 6)
+        self.assertEquals(result[4], Vector((4, 4, 4)))

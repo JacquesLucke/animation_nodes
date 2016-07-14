@@ -31,7 +31,7 @@ cdef class LISTNAME:
 
 
     cpdef LISTNAME reversed(self)
-    cpdef overwrite(self, LISTNAME other, long index = ?)
+    cdef overwrite(self, LISTNAME other, long index = ?)
 
     # Helpers
     cdef equals_SameType(self, LISTNAME other)

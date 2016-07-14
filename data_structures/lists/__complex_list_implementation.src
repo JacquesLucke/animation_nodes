@@ -74,5 +74,12 @@ cdef class LISTNAME:
 
         return newList
 
+    @classmethod
+    def join(cls, *sourceLists):
+        cdef LISTNAME newList = LISTNAME()
+        sources = [(<LISTNAME>source).base for source in sourceLists]
+        newList.base = BASELISTTYPE.join(*sources)
+        return newList
+
     def __repr__(self):
         return "<LISTNAME - {}>".format([self[i] for i in range(len(self))])
