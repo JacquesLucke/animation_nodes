@@ -154,7 +154,6 @@ cdef class LISTNAME:
         else:
             raise TypeError("invalid input")
 
-
     cpdef fill(self, TYPE value):
         cdef long i
         for i in range(self.length):
