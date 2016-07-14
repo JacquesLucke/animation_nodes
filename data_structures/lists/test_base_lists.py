@@ -59,3 +59,45 @@ class TestRichComparison(TestCase):
         self.assertTrue(a == b)
         self.assertFalse(a == c)
         self.assertFalse(a == d)
+
+class TestClear(TestCase):
+    def testLengthAfterClear(self):
+        a = IntegerList.fromValues((0, 1, 2, 3))
+        self.assertEqual(len(a), 4)
+        a.clear()
+        self.assertEqual(len(a), 0)
+
+class TestCopy(TestCase):
+    def testDifferentMemoryAdresses(self):
+        a = IntegerList()
+        b = a.copy()
+        self.assertNotEqual(id(a), id(b))
+
+    def testIndependency(self):
+        a = IntegerList()
+        b = a.copy()
+        a.append(5)
+        self.assertEqual(len(a), 1)
+        self.assertEqual(len(b), 0)
+
+class TestAppend(TestCase):
+    def testEmptyList(self):
+        a = IntegerList()
+        a.append(5)
+        self.assertEqual(a, [5])
+
+    def testLength(self):
+        a = IntegerList.fromValues((1, 2, 3, 4))
+        a.append(5)
+        self.assertEqual(len(a), 5)
+
+    def testNormal(self):
+        a = IntegerList.fromValues((1, 2, 3))
+        a.append(4)
+        self.assertEqual(a, [1, 2, 3, 4])
+
+    def testMany(self):
+        a = IntegerList()
+        for i in range(10):
+            a.append(i)
+        self.assertEqual(a, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
