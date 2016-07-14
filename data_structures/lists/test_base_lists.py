@@ -158,3 +158,38 @@ class TestRepeated(TestCase):
         a = IntegerList.fromValues((0, 1, 2, 3, 4))
         b = a.repeated(length = 12)
         self.assertEquals(b, (0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1))
+
+class TestDeleteElement(TestCase):
+    def testLengthUpdate(self):
+        a = IntegerList.fromValues((0, 1, 2))
+        del a[1]
+        self.assertEquals(len(a), 2)
+
+    def testStart(self):
+        a = IntegerList.fromValues((0, 1, 2, 3))
+        del a[0]
+        self.assertEquals(a, [1, 2, 3])
+
+    def testEnd(self):
+        a = IntegerList.fromValues((0, 1, 2, 3))
+        del a[3]
+        self.assertEquals(a, [0, 1, 2])
+
+    def testMiddle(self):
+        a = IntegerList.fromValues((0, 1, 2, 3))
+        del a[1]
+        self.assertEquals(a, [0, 2, 3])
+
+    def testNegativeIndex(self):
+        a = IntegerList.fromValues((0, 1, 2, 3))
+        del a[-1]
+        self.assertEquals(a, [0, 1, 2])
+        del a[-2]
+        self.assertEquals(a, [0, 2])
+
+    def testIndexError(self):
+        a = IntegerList.fromValues((0, 1, 2, 3))
+        with self.assertRaises(IndexError):
+            del a[10]
+        with self.assertRaises(IndexError):
+            del a[-10]
