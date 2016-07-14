@@ -111,3 +111,14 @@ class TestInplaceAdd(TestCase):
         v1 += v2
         self.assertEquals(len(v1), 4)
         self.assertEquals(v1[2], Vector((2, 2, 2)))
+
+class TestReversed(TestCase):
+    def testNormal(self):
+        v = Vector3DList()
+        for i in range(4):
+            v.append((i, i, i))
+        r = v.reversed()
+        self.assertEquals(r[0], Vector((3, 3, 3)))
+        self.assertEquals(r[1], Vector((2, 2, 2)))
+        self.assertEquals(r[2], Vector((1, 1, 1)))
+        self.assertEquals(r[3], Vector((0, 0, 0)))

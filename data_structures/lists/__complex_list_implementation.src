@@ -98,5 +98,16 @@ cdef class LISTNAME:
                          amount = amount)
         return newList
 
+    def reversed(self):
+        cdef:
+            LISTNAME newList = LISTNAME(len(self))
+            long i, offset
+        offset = (len(self) - 1) * AMOUNT
+        for i in range(len(self)):
+            memcpy(newList.base.data + i * AMOUNT,
+                   self.base.data + offset - i * AMOUNT,
+                   sizeof(BASETYPE) * AMOUNT)
+        return newList
+
     def __repr__(self):
         return "<LISTNAME - {}>".format([self[i] for i in range(len(self))])
