@@ -434,7 +434,7 @@ cdef class LISTNAME:
             return "<LISTNAME [{}, ...]>".format(", ".join(str(e) for e in memView[:20]))
 
     def status(self):
-        return "Length: {}, Allocated: {}, Size: {} bytes".format(
+        return "Length: {}, Capacity: {}, Size: {} bytes".format(
             self.length, self.capacity, self.capacity * sizeof(TYPE))
 
 

@@ -39,7 +39,7 @@ cdef class LISTNAME:
         newList.base = self.base.copy()
         return newList
 
-    cpdef LISTNAME getValuesInSlice(self, sliceObject):
+    cdef LISTNAME getValuesInSlice(self, sliceObject):
         cdef:
             long start, stop, step
             long realStart, realStop, realStep
