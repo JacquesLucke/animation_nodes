@@ -141,3 +141,20 @@ class TestExtend(TestCase):
             a.extend("abc")
         with self.assertRaises(TypeError):
             a.extend(0)
+
+class TestMultiply(TestCase):
+    def test(self):
+        a = IntegerList.fromValues((0, 1, 2))
+        b = a * 3
+        self.assertEquals(b, (0, 1, 2, 0, 1, 2, 0, 1, 2))
+
+class TestRepeated(TestCase):
+    def testAmount(self):
+        a = IntegerList.fromValues((0, 1, 2))
+        b = a.repeated(amount = 3)
+        self.assertEquals(b, (0, 1, 2, 0, 1, 2, 0, 1, 2))
+
+    def testLength(self):
+        a = IntegerList.fromValues((0, 1, 2, 3, 4))
+        b = a.repeated(length = 12)
+        self.assertEquals(b, (0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1))

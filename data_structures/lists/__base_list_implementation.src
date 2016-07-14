@@ -1,5 +1,6 @@
 cimport cython
 from types import GeneratorType
+from libc.math cimport floor
 from libc.stdlib cimport malloc, free, realloc
 from libc.string cimport memcpy, memmove, memcmp
 from ... utils.slicing cimport predictSliceLength, makeStepPositive
@@ -77,17 +78,7 @@ cdef class LISTNAME:
         return LISTNAME.join(a, b)
 
     def __mul__(LISTNAME self, long amount):
-        amount = max(amount, 0)
-        cdef LISTNAME newList = LISTNAME(self.length * amount)
-        cdef long i
-        if self.length == 0:
-            pass
-        elif self.length == 1:
-            newList.fill(self.data[0])
-        else:
-            for i in range(amount):
-                newList.overwrite(self, self.length * i)
-        return newList
+        return self.repeated(amount = amount)
 
     def __iadd__(self, LISTNAME other):
         self.grow(self.length + other.length)
@@ -290,14 +281,13 @@ cdef class LISTNAME:
         if self.length == 0 and length > 0:
             raise ValueError("Cannot repeat a list with zero elements to something longer")
 
-        cdef LISTNAME newList = LISTNAME(length)
-        cdef long i = 0, k = 0
-        while(i < length):
-            newList.data[i] = self.data[k]
-            i += 1
-            k += 1
-            if k == self.length:
-                k = 0
+        cdef:
+            LISTNAME newList = LISTNAME(length)
+            long offset = 0
+        while offset < length:
+            memcpy(newList.data + offset, self.data, sizeof(TYPE) * self.length)
+            offset += self.length
+        memcpy(newList.data + offset, self.data, sizeof(TYPE) * (length % self.length))
         return newList
 
 

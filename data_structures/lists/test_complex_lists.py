@@ -76,3 +76,38 @@ class TestJoin(TestCase):
         result = Vector3DList.join(v1, v2, v3)
         self.assertEquals(len(result), 6)
         self.assertEquals(result[4], Vector((4, 4, 4)))
+
+class TestAdd(TestCase):
+    def testNormal(self):
+        v1 = Vector3DList()
+        v1.append((0, 0, 0))
+        v1.append((1, 1, 1))
+        v2 = Vector3DList()
+        v2.append((2, 2, 2))
+        v2.append((3, 3, 3))
+
+        result = v1 + v2
+        self.assertEquals(len(result), 4)
+        self.assertEquals(result[2], Vector((2, 2, 2)))
+
+class TestMultiply(TestCase):
+    def testNormal(self):
+        v = Vector3DList()
+        v.append((0, 0, 0))
+        v.append((1, 1, 1))
+        r = v * 3
+        self.assertEquals(len(r), 6)
+        self.assertEquals(r[4], Vector((0, 0, 0)))
+
+class TestInplaceAdd(TestCase):
+    def testNormal(self):
+        v1 = Vector3DList()
+        v1.append((0, 0, 0))
+        v1.append((1, 1, 1))
+        v2 = Vector3DList()
+        v2.append((2, 2, 2))
+        v2.append((3, 3, 3))
+
+        v1 += v2
+        self.assertEquals(len(v1), 4)
+        self.assertEquals(v1[2], Vector((2, 2, 2)))

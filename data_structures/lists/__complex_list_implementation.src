@@ -20,6 +20,16 @@ cdef class LISTNAME:
         else:
             return self.getValuesInSlice(key)
 
+    def __add__(LISTNAME a, LISTNAME b):
+        return LISTNAME.join(a, b)
+
+    def __mul__(LISTNAME self, long amount):
+        return self.repeated(amount = amount)
+
+    def __iadd__(self, LISTNAME other):
+        self.base += other.base
+        return self
+
     cdef getValueAtIndex(self, long index):
         index = self.tryCorrectIndex(index)
         return getElementFromLISTNAME(self, index)
@@ -79,6 +89,13 @@ cdef class LISTNAME:
         cdef LISTNAME newList = LISTNAME()
         sources = [(<LISTNAME>source).base for source in sourceLists]
         newList.base = BASELISTTYPE.join(*sources)
+        return newList
+
+    def repeated(self, *, long length = -1, long amount = -1):
+        cdef LISTNAME newList = LISTNAME()
+        newList.base = self.base.repeated(
+                         length = length * AMOUNT,
+                         amount = amount)
         return newList
 
     def __repr__(self):
