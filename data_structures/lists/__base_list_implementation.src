@@ -283,11 +283,18 @@ cdef class LISTNAME:
 
         cdef:
             LISTNAME newList = LISTNAME(length)
-            long offset = 0
-        while offset < length:
-            memcpy(newList.data + offset, self.data, sizeof(TYPE) * self.length)
-            offset += self.length
-        memcpy(newList.data + offset, self.data, sizeof(TYPE) * (length % self.length))
+            long copyAmount = length // self.length
+            long i
+            
+        # Full copy as often as possible
+        for i in range(copyAmount):
+            memcpy(newList.data + i * self.length,
+                   self.data,
+                   sizeof(TYPE) * self.length)
+        # Partial copy at the end
+        memcpy(newList.data + self.length * copyAmount,
+               self.data,
+               sizeof(TYPE) * (length % self.length))
         return newList
 
 
