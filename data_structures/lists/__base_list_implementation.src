@@ -49,8 +49,6 @@ cdef class LISTNAME:
         self.capacity = newCapacity
 
 
-
-
     # Magic Methods for Python
     ###############################################
 
@@ -266,7 +264,6 @@ cdef class LISTNAME:
 
         for i, value in zip(range(start, stop, step), values):
             self.data[i] = value
-
 
 
     # Create new lists based on an existing list

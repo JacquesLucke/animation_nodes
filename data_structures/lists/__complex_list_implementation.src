@@ -6,13 +6,13 @@ from ... utils.slicing cimport predictSliceLength
 cdef class LISTNAME:
 
     def __cinit__(self, long length = 0, long allocate = -1):
-        self.data = BASELISTTYPE(length * AMOUNT, allocate * AMOUNT)
+        self.base = BASELISTTYPE(length * AMOUNT, allocate * AMOUNT)
 
     def __dealloc__(self):
         pass
 
     def __len__(self):
-        return len(self.data) / AMOUNT
+        return len(self.base) / AMOUNT
 
     def __getitem__(self, key):
         if isinstance(key, int):
@@ -25,7 +25,7 @@ cdef class LISTNAME:
 
     cpdef copy(self):
         newList = LISTNAME()
-        newList.data = self.data.copy()
+        newList.base = self.base.copy()
         return newList
 
     cpdef LISTNAME getValuesInSlice(self, sliceObject):
@@ -49,15 +49,15 @@ cdef class LISTNAME:
         oldIndex = realStart
 
         if step == 1:
-            memcpy(newList.data.data, self.data.data + realStart, outLength * AMOUNT * sizeof(BASETYPE))
+            memcpy(newList.base.data, self.base.data + realStart, outLength * AMOUNT * sizeof(BASETYPE))
         elif step > 1:
             while oldIndex < realStop:
-                memcpy(newList.data.data + newIndex, self.data.data + oldIndex, AMOUNT * sizeof(BASETYPE))
+                memcpy(newList.base.data + newIndex, self.base.data + oldIndex, AMOUNT * sizeof(BASETYPE))
                 oldIndex += realStep
                 newIndex += AMOUNT
         elif step < 0:
             while oldIndex > realStop:
-                memcpy(newList.data.data + newIndex, self.data.data + oldIndex, AMOUNT * sizeof(BASETYPE))
+                memcpy(newList.base.data + newIndex, self.base.data + oldIndex, AMOUNT * sizeof(BASETYPE))
                 oldIndex += realStep
                 newIndex += AMOUNT
 

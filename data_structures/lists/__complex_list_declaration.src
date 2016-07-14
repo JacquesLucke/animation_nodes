@@ -1,6 +1,6 @@
 cdef class LISTNAME:
     cdef:
-        BASELISTTYPE data
+        BASELISTTYPE base
 
     cpdef append(self, value)
     cpdef copy(self)
