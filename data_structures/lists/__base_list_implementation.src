@@ -95,6 +95,12 @@ cdef class LISTNAME:
                 return True
         return False
 
+    def __richcmp__(x, y, int operation):
+        if operation == 2:
+            if len(x) != len(y): return False
+            return all(a == b for a, b in zip(x, y))
+        raise NotImplemented()
+
 
     # Base Operations for Lists
     ###############################################
@@ -151,7 +157,18 @@ cdef class LISTNAME:
             self.removeValueAtIndex(index)
 
     cpdef insert(self, long index, TYPE value):
-        raise NotImplemented()
+        if index >= self.length:
+            self.append(value)
+        else:
+            if self.length == self.allocated:
+                self._resize(<long>(self.allocated * 2) + 1)
+            if index < 0: index += self.length
+            if index < 0: index = 0
+            memmove(self.data + index + 1,
+                    self.data + index,
+                    sizeof(TYPE) * (self.length - index))
+            self.data[index] = value
+            self.length += 1
 
     cpdef overwrite(self, LISTNAME other, long index = 0):
         if index + other.length > self.allocated:
