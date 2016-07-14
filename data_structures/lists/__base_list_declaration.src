@@ -2,7 +2,7 @@ cdef class LISTNAME:
     cdef:
         TYPE* data
         long length
-        long allocated
+        long capacity
 
     cdef void _resize(self, long newSize)
 

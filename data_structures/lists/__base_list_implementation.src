@@ -24,7 +24,7 @@ cdef class LISTNAME:
             raise MemoryError()
 
         self.length = length
-        self.allocated = allocate
+        self.capacity = allocate
 
     def __dealloc__(self):
         if self.data != NULL:
@@ -34,9 +34,9 @@ cdef class LISTNAME:
         self.data = <TYPE*>realloc(self.data, sizeof(TYPE) * max(1, newSize))
         if self.data == NULL:
             self.length = 0
-            self.allocated = 0
+            self.capacity = 0
             raise MemoryError()
-        self.allocated = newSize
+        self.capacity = newSize
 
 
     # Magic Methods for Python
@@ -80,7 +80,7 @@ cdef class LISTNAME:
         return newList
 
     def __iadd__(self, LISTNAME other):
-        if self.length + other.length > self.allocated:
+        if self.length + other.length > self.capacity:
             self._resize(self.length + other.length)
         self.overwrite(other, index = self.length)
         return self
@@ -123,14 +123,14 @@ cdef class LISTNAME:
         self._resize(0)
 
     cpdef append(self, TYPE value):
-        if self.length == self.allocated:
-            self._resize(<long>(self.allocated * 2) + 1)
+        if self.length == self.capacity:
+            self._resize(<long>(self.capacity * 2) + 1)
         self.data[self.length] = value
         self.length += 1
 
     cpdef extend(self, values):
         cdef long newLength = self.length + len(values)
-        if newLength > self.allocated:
+        if newLength > self.capacity:
             self._resize(<long>(newLength * 1.5))
         cdef long i
         for i, value in enumerate(values, start = self.length):
@@ -168,8 +168,8 @@ cdef class LISTNAME:
         if index >= self.length:
             self.append(value)
         else:
-            if self.length == self.allocated:
-                self._resize(<long>(self.allocated * 2) + 1)
+            if self.length == self.capacity:
+                self._resize(<long>(self.capacity * 2) + 1)
             if index < 0: index += self.length
             if index < 0: index = 0
             memmove(self.data + index + 1,
@@ -179,7 +179,7 @@ cdef class LISTNAME:
             self.length += 1
 
     cpdef overwrite(self, LISTNAME other, long index = 0):
-        if index + other.length > self.allocated:
+        if index + other.length > self.capacity:
             self._resize(index + other.length)
         memcpy(self.data + index, other.data, other.length * sizeof(TYPE))
         self.length = max(self.length, index + other.length)
@@ -423,7 +423,7 @@ cdef class LISTNAME:
 
     def status(self):
         return "Length: {}, Allocated: {}, Size: {} bytes".format(
-            self.length, self.allocated, self.allocated * sizeof(TYPE))
+            self.length, self.capacity, self.capacity * sizeof(TYPE))
 
 
 cdef class LISTNAMEIterator:
