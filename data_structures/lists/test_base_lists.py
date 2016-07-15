@@ -66,6 +66,7 @@ class TestClear(TestCase):
         self.assertEqual(len(a), 4)
         a.clear()
         self.assertEqual(len(a), 0)
+        self.assertEqual(a, [])
 
 class TestCopy(TestCase):
     def testDifferentMemoryAdresses(self):
@@ -146,46 +147,46 @@ class TestMultiply(TestCase):
     def test(self):
         a = IntegerList.fromValues((0, 1, 2))
         b = a * 3
-        self.assertEquals(b, (0, 1, 2, 0, 1, 2, 0, 1, 2))
+        self.assertEqual(b, (0, 1, 2, 0, 1, 2, 0, 1, 2))
 
 class TestRepeated(TestCase):
     def testAmount(self):
         a = IntegerList.fromValues((0, 1, 2))
         b = a.repeated(amount = 3)
-        self.assertEquals(b, (0, 1, 2, 0, 1, 2, 0, 1, 2))
+        self.assertEqual(b, (0, 1, 2, 0, 1, 2, 0, 1, 2))
 
     def testLength(self):
         a = IntegerList.fromValues((0, 1, 2, 3, 4))
         b = a.repeated(length = 12)
-        self.assertEquals(b, (0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1))
+        self.assertEqual(b, (0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1))
 
 class TestDeleteElement(TestCase):
     def testLengthUpdate(self):
         a = IntegerList.fromValues((0, 1, 2))
         del a[1]
-        self.assertEquals(len(a), 2)
+        self.assertEqual(len(a), 2)
 
     def testStart(self):
         a = IntegerList.fromValues((0, 1, 2, 3))
         del a[0]
-        self.assertEquals(a, [1, 2, 3])
+        self.assertEqual(a, [1, 2, 3])
 
     def testEnd(self):
         a = IntegerList.fromValues((0, 1, 2, 3))
         del a[3]
-        self.assertEquals(a, [0, 1, 2])
+        self.assertEqual(a, [0, 1, 2])
 
     def testMiddle(self):
         a = IntegerList.fromValues((0, 1, 2, 3))
         del a[1]
-        self.assertEquals(a, [0, 2, 3])
+        self.assertEqual(a, [0, 2, 3])
 
     def testNegativeIndex(self):
         a = IntegerList.fromValues((0, 1, 2, 3))
         del a[-1]
-        self.assertEquals(a, [0, 1, 2])
+        self.assertEqual(a, [0, 1, 2])
         del a[-2]
-        self.assertEquals(a, [0, 2])
+        self.assertEqual(a, [0, 2])
 
     def testIndexError(self):
         a = IntegerList.fromValues((0, 1, 2, 3))
@@ -200,50 +201,50 @@ class TestDeleteSlice(TestCase):
 
     def testStart(self):
         del self.list[:4]
-        self.assertEquals(self.list, [4, 5, 6, 7])
+        self.assertEqual(self.list, [4, 5, 6, 7])
 
     def testEnd(self):
         del self.list[4:]
-        self.assertEquals(self.list, [0, 1, 2, 3])
+        self.assertEqual(self.list, [0, 1, 2, 3])
 
     def testMiddle(self):
         del self.list[2:6]
-        self.assertEquals(self.list, [0, 1, 6, 7])
+        self.assertEqual(self.list, [0, 1, 6, 7])
 
     def testStep(self):
         del self.list[::2]
-        self.assertEquals(self.list, [1, 3, 5, 7])
+        self.assertEqual(self.list, [1, 3, 5, 7])
 
     def testNegativeStep(self):
         del self.list[::-2]
-        self.assertEquals(self.list, [0, 2, 4, 6])
+        self.assertEqual(self.list, [0, 2, 4, 6])
 
     def testCombined(self):
         del self.list[1:-2:3]
-        self.assertEquals(self.list, [0, 2, 3, 5, 6, 7])
+        self.assertEqual(self.list, [0, 2, 3, 5, 6, 7])
 
 class TestGetSlice(TestCase):
     def setUp(self):
         self.list = IntegerList.fromValues((0, 1, 2, 3, 4, 5))
 
     def testStart(self):
-        self.assertEquals(self.list[:3], [0, 1, 2])
+        self.assertEqual(self.list[:3], [0, 1, 2])
 
     def testEnd(self):
-        self.assertEquals(self.list[2:], [2, 3, 4, 5])
+        self.assertEqual(self.list[2:], [2, 3, 4, 5])
 
     def testMiddle(self):
-        self.assertEquals(self.list[2:4], [2, 3])
+        self.assertEqual(self.list[2:4], [2, 3])
 
     def testStep(self):
-        self.assertEquals(self.list[::2], [0, 2, 4])
+        self.assertEqual(self.list[::2], [0, 2, 4])
 
     def testReverse(self):
-        self.assertEquals(self.list[::-1], [5, 4, 3, 2, 1, 0])
+        self.assertEqual(self.list[::-1], [5, 4, 3, 2, 1, 0])
 
     def testNegativeIndex(self):
-        self.assertEquals(self.list[-4:-2], [2, 3])
-        self.assertEquals(self.list[-1:-5:-1], [5, 4, 3, 2])
+        self.assertEqual(self.list[-4:-2], [2, 3])
+        self.assertEqual(self.list[-1:-5:-1], [5, 4, 3, 2])
 
 class TestRemove(TestCase):
     def setUp(self):
@@ -259,13 +260,13 @@ class TestRemove(TestCase):
 
     def testStart(self):
         self.list.remove(0)
-        self.assertEquals(self.list, [1, 2, 3, 2, 3])
+        self.assertEqual(self.list, [1, 2, 3, 2, 3])
 
     def testLengthUpdate(self):
-        self.assertEquals(len(self.list), 6)
+        self.assertEqual(len(self.list), 6)
         self.list.remove(1)
-        self.assertEquals(len(self.list), 5)
+        self.assertEqual(len(self.list), 5)
 
     def testOnlyRemoveFirst(self):
         self.list.remove(2)
-        self.assertEquals(self.list, [0, 1, 3, 2, 3])
+        self.assertEqual(self.list, [0, 1, 3, 2, 3])
