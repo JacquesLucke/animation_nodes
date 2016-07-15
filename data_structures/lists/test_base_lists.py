@@ -288,3 +288,22 @@ class TestCount(TestCase):
 
     def testNotExist(self):
         self.assertEqual(self.list.count(10), 0)
+
+class TestIndex(TestCase):
+    def setUp(self):
+        self.list = IntegerList.fromValues((0, 1, 0, 0, 1, 2, 1, 3, 3, 4))
+
+    def testWrongType(self):
+        with self.assertRaises(TypeError):
+            self.list.index("abc")
+
+    def testNormal(self):
+        self.assertEqual(self.list.index(0), 0)
+        self.assertEqual(self.list.index(1), 1)
+        self.assertEqual(self.list.index(2), 5)
+        self.assertEqual(self.list.index(3), 7)
+        self.assertEqual(self.list.index(4), 9)
+
+    def testNotExist(self):
+        with self.assertRaises(ValueError):
+            self.list.index(10)

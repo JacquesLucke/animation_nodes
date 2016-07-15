@@ -148,7 +148,12 @@ cdef class LISTNAME:
         for i in range(self.length):
             self.data[i] = value
 
-    cpdef long index(self, TYPE value):
+    cpdef index(self, TYPE value):
+        cdef long index = self.searchIndex(value)
+        if index >= 0: return index
+        raise ValueError("value not in list")
+
+    cdef long searchIndex(self, TYPE value):
         cdef long i
         for i in range(self.length):
             if self.data[i] == value:
@@ -164,7 +169,7 @@ cdef class LISTNAME:
         return amount
 
     cpdef remove(self, TYPE value):
-        cdef long index = self.index(value)
+        cdef long index = self.searchIndex(value)
         if index == -1:
             raise ValueError("value not in list")
         else:
@@ -285,7 +290,7 @@ cdef class LISTNAME:
             LISTNAME newList = LISTNAME(length)
             long copyAmount = length // self.length
             long i
-            
+
         # Full copy as often as possible
         for i in range(copyAmount):
             memcpy(newList.data + i * self.length,

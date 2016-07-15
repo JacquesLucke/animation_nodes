@@ -14,7 +14,8 @@ cdef class LISTNAME:
     cpdef append(self, TYPE value)
     cpdef extend(self, values)
     cpdef remove(self, TYPE value)
-    cpdef long index(self, TYPE value)
+    cpdef index(self, TYPE value)
+    cdef long searchIndex(self, TYPE value)
     cpdef long count(self, TYPE value)
     cpdef insert(self, long index, TYPE value)
 
