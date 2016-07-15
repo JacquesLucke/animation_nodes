@@ -127,10 +127,6 @@ from . register_files import unregisterFiles
 def register():
     bpy.utils.register_module(__name__)
     registerFiles()
-
-    from . tests import runTests
-    runTests()
-
     print("Registered Animation Nodes with {} modules.".format(len(modules)))
 
 def unregister():

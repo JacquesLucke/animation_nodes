@@ -79,7 +79,11 @@ class DeveloperProperties(bpy.types.PropertyGroup):
         description = "Change to display different sets of socket properties",
         items = socketEditModeItems)
 
-    debug = BoolProperty(name = "Debug", default = False)
+    debug = BoolProperty(name = "Debug", default = False,
+        description = "Enable some print statements")
+
+    runTests = BoolProperty(name = "Run Tests", default = False,
+        description = "Run the test suite when Blender starts")
 
 class ExecutionCodeProperties(bpy.types.PropertyGroup):
 
@@ -133,7 +137,9 @@ class AddonPreferences(bpy.types.AddonPreferences):
         subcol.prop(self.nodeColors, "subprogramValue", slider = True)
         subcol.prop(self.nodeColors, "subprogramSaturation", slider = True)
 
-        layout.prop(self.developer, "debug")
+        col = layout.column(align = True)
+        col.prop(self.developer, "debug")
+        col.prop(self.developer, "runTests")
 
 def getPreferences():
     # TODO: access user_preferences without the context
@@ -153,6 +159,9 @@ def getColorSettings():
 
 def debuggingIsEnabled():
     return getPreferences().developer.debug
+
+def testsAreEnabled():
+    return getPreferences().developer.runTests
 
 def getBlenderVersion():
     return bpy.app.version
