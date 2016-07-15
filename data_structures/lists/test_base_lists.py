@@ -307,3 +307,24 @@ class TestIndex(TestCase):
     def testNotExist(self):
         with self.assertRaises(ValueError):
             self.list.index(10)
+
+class TestFill(TestCase):
+    def testUninitialized(self):
+        a = IntegerList(5)
+        a.fill(2)
+        self.assertEqual(a, [2, 2, 2, 2, 2])
+
+    def testInitialized(self):
+        a = IntegerList.fromValues((4, 23, 6, 2, 3))
+        a.fill(-1)
+        self.assertEqual(a, [-1, -1, -1, -1, -1])
+
+    def testWrongType(self):
+        a = IntegerList(4)
+        with self.assertRaises(TypeError):
+            a.fill("abc")
+
+    def testEmptyList(self):
+        a = IntegerList()
+        a.fill(4)
+        self.assertEqual(a, [])
