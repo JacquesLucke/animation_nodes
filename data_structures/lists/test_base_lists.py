@@ -193,3 +193,26 @@ class TestDeleteElement(TestCase):
             del a[10]
         with self.assertRaises(IndexError):
             del a[-10]
+
+class TestGetSlice(TestCase):
+    def setUp(self):
+        self.list = IntegerList.fromValues((0, 1, 2, 3, 4, 5))
+
+    def testStart(self):
+        self.assertEquals(self.list[:3], [0, 1, 2])
+
+    def testEnd(self):
+        self.assertEquals(self.list[2:], [2, 3, 4, 5])
+
+    def testMiddle(self):
+        self.assertEquals(self.list[2:4], [2, 3])
+
+    def testStep(self):
+        self.assertEquals(self.list[::2], [0, 2, 4])
+
+    def testReverse(self):
+        self.assertEquals(self.list[::-1], [5, 4, 3, 2, 1, 0])
+
+    def testNegativeIndex(self):
+        self.assertEquals(self.list[-4:-2], [2, 3])
+        self.assertEquals(self.list[-1:-5:-1], [5, 4, 3, 2])
