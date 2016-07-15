@@ -359,3 +359,51 @@ class TestContains(TestCase):
     def testNotIn(self):
         self.assertFalse(1 not in self.list)
         self.assertTrue(10 not in self.list)
+
+class TestSetElement(TestCase):
+    def setUp(self):
+        self.list = IntegerList.fromValues((0, 1, 2, 3, 4))
+
+    def testStart(self):
+        self.list[0] = 10
+        self.assertEqual(self.list, [10, 1, 2, 3, 4])
+
+    def testEnd(self):
+        self.list[4] = 10
+        self.assertEqual(self.list, [0, 1, 2, 3, 10])
+
+    def testMiddle(self):
+        self.list[2] = 10
+        self.assertEqual(self.list, [0, 1, 10, 3, 4])
+
+    def testNegativeIndex(self):
+        self.list[-2] = 10
+        self.assertEqual(self.list, [0, 1, 2, 10, 4])
+
+class TestSetSlice(TestCase):
+    def setUp(self):
+        self.list = IntegerList.fromValues((0, 1, 2, 3, 4))
+
+    def testStart(self):
+        self.list[:3] = [6, 7, 8]
+        self.assertEqual(self.list, [6, 7, 8, 3, 4])
+
+    def testEnd(self):
+        self.list[2:] = [7, 8, 9]
+        self.assertEqual(self.list, [0, 1, 7, 8, 9])
+
+    def testMiddle(self):
+        self.list[1:4] = [6, 7, 8]
+        self.assertEqual(self.list, [0, 6, 7, 8, 4])
+
+    def testStep(self):
+        self.list[1::2] = [6, 7]
+        self.assertEqual(self.list, [0, 6, 2, 7, 4])
+
+    def testInputTypes(self):
+        self.list[2:5] = (6, 7, 8)
+        self.assertEqual(self.list, [0, 1, 6, 7, 8])
+        self.list[2:5] = [0, 1, 2]
+        self.assertEqual(self.list, [0, 1, 0, 1, 2])
+        self.list[2:5] = IntegerList.fromValues((6, 7, 8))
+        self.assertEqual(self.list, [0, 1, 6, 7, 8])
