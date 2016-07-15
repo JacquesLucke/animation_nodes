@@ -328,3 +328,34 @@ class TestFill(TestCase):
         a = IntegerList()
         a.fill(4)
         self.assertEqual(a, [])
+
+class TestReversed(TestCase):
+    def testEmptyList(self):
+        a = IntegerList()
+        result = a.reversed()
+        self.assertEqual(result, [])
+
+    def testNormal(self):
+        a = IntegerList.fromValues((0, 1, 2, 3, 4))
+        result = a.reversed()
+        self.assertEqual(result, [4, 3, 2, 1, 0])
+
+class TestContains(TestCase):
+    def setUp(self):
+        self.list = IntegerList.fromValues((0, 1, 1, 3, 4, 0, 5))
+
+    def testContains(self):
+        self.assertTrue(0 in self.list)
+        self.assertTrue(1 in self.list)
+        self.assertTrue(3 in self.list)
+        self.assertTrue(4 in self.list)
+        self.assertTrue(5 in self.list)
+
+    def testContainsNot(self):
+        self.assertFalse(2 in self.list)
+        self.assertFalse(-1 in self.list)
+        self.assertFalse(10 in self.list)
+
+    def testNotIn(self):
+        self.assertFalse(1 not in self.list)
+        self.assertTrue(10 not in self.list)
