@@ -270,3 +270,21 @@ class TestRemove(TestCase):
     def testOnlyRemoveFirst(self):
         self.list.remove(2)
         self.assertEqual(self.list, [0, 1, 3, 2, 3])
+
+class TestCount(TestCase):
+    def setUp(self):
+        self.list = IntegerList.fromValues((0, 1, 2, 3, 1, 3, 2, 4, 3))
+
+    def testWrongType(self):
+        with self.assertRaises(TypeError):
+            self.list.count("abc")
+
+    def testNormal(self):
+        self.assertEqual(self.list.count(0), 1)
+        self.assertEqual(self.list.count(1), 2)
+        self.assertEqual(self.list.count(2), 2)
+        self.assertEqual(self.list.count(3), 3)
+        self.assertEqual(self.list.count(4), 1)
+
+    def testNotExist(self):
+        self.assertEqual(self.list.count(10), 0)
