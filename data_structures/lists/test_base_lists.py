@@ -194,6 +194,34 @@ class TestDeleteElement(TestCase):
         with self.assertRaises(IndexError):
             del a[-10]
 
+class TestDeleteSlice(TestCase):
+    def setUp(self):
+        self.list = IntegerList.fromValues((0, 1, 2, 3, 4, 5, 6, 7))
+
+    def testStart(self):
+        del self.list[:4]
+        self.assertEquals(self.list, [4, 5, 6, 7])
+
+    def testEnd(self):
+        del self.list[4:]
+        self.assertEquals(self.list, [0, 1, 2, 3])
+
+    def testMiddle(self):
+        del self.list[2:6]
+        self.assertEquals(self.list, [0, 1, 6, 7])
+
+    def testStep(self):
+        del self.list[::2]
+        self.assertEquals(self.list, [1, 3, 5, 7])
+
+    def testNegativeStep(self):
+        del self.list[::-2]
+        self.assertEquals(self.list, [0, 2, 4, 6])
+
+    def testCombined(self):
+        del self.list[1:-2:3]
+        self.assertEquals(self.list, [0, 2, 3, 5, 6, 7])
+
 class TestGetSlice(TestCase):
     def setUp(self):
         self.list = IntegerList.fromValues((0, 1, 2, 3, 4, 5))
@@ -216,3 +244,28 @@ class TestGetSlice(TestCase):
     def testNegativeIndex(self):
         self.assertEquals(self.list[-4:-2], [2, 3])
         self.assertEquals(self.list[-1:-5:-1], [5, 4, 3, 2])
+
+class TestRemove(TestCase):
+    def setUp(self):
+        self.list = IntegerList.fromValues((0, 1, 2, 3, 2, 3))
+
+    def testNotExists(self):
+        with self.assertRaises(ValueError):
+            self.list.remove(10)
+
+    def testWrongType(self):
+        with self.assertRaises(TypeError):
+            self.list.remove("abc")
+
+    def testStart(self):
+        self.list.remove(0)
+        self.assertEquals(self.list, [1, 2, 3, 2, 3])
+
+    def testLengthUpdate(self):
+        self.assertEquals(len(self.list), 6)
+        self.list.remove(1)
+        self.assertEquals(len(self.list), 5)
+
+    def testOnlyRemoveFirst(self):
+        self.list.remove(2)
+        self.assertEquals(self.list, [0, 1, 3, 2, 3])
