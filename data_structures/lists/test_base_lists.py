@@ -1,5 +1,5 @@
 from unittest import TestCase
-from . base_lists import IntegerList
+from . base_lists import IntegerList, FloatList
 
 class TestInsertion(TestCase):
     def testAtStart(self):
@@ -407,3 +407,5 @@ class TestSetSlice(TestCase):
         self.assertEqual(self.list, [0, 1, 0, 1, 2])
         self.list[2:5] = IntegerList.fromValues((6, 7, 8))
         self.assertEqual(self.list, [0, 1, 6, 7, 8])
+        self.list[2:5] = FloatList.fromValues((0, 1, 2))
+        self.assertEqual(self.list, [0, 1, 0, 1, 2])
