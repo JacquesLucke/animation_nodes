@@ -1,5 +1,5 @@
 cimport cython
-from libc.string cimport memcpy
+from libc.string cimport memcpy, memcmp
 from ... utils.slicing cimport predictSliceLength
 
 @cython.freelist(10)
@@ -44,7 +44,17 @@ cdef class LISTNAME:
         return self
 
     def __contains__(self, value):
-        raise NotImplemented()
+        if len(value) != AMOUNT: raise TypeError("input has wrong type")
+        cdef BASELISTTYPE search = BASELISTTYPE.fromValues(value)
+        cdef long i = 0
+        cdef int compareResult
+        for i in range(len(self)):
+            compareResult = memcmp(search.data,
+                                   self.base.data + i * AMOUNT,
+                                   sizeof(BASETYPE) * AMOUNT)
+            if compareResult == 0: return True
+        return False
+
 
     def __richcmp__(x, y, int operation):
         raise NotImplemented()

@@ -210,3 +210,24 @@ class TestGetValuesInSlice(TestCase):
         v = self.list[::2]
         self.assertEqual(len(v), 5)
         self.assertEqual(v[2], Vector((4, 4, 4)))
+
+class TestContains(TestCase):
+    def setUp(self):
+        self.list = Vector3DList.fromValues(
+            [(0, 0, 0), (1, 1, 1), (2, 2, 2), (3, 3, 3)])
+
+    def testInside(self):
+        self.assertTrue((2, 2, 2) in self.list)
+        self.assertTrue([1, 1, 1] in self.list)
+        self.assertTrue(Vector((3, 3, 3)) in self.list)
+
+    def testNotInside(self):
+        self.assertFalse((4, 4, 4) in self.list)
+        self.assertFalse([-1, -1, -1] in self.list)
+        self.assertFalse(Vector((4, 5, 6)) in self.list)
+
+    def testWrongInputType(self):
+        with self.assertRaises(TypeError):
+            a = "abc" in self.list
+        with self.assertRaises(TypeError):
+            a = (0, 0, 0, 0) in self.list

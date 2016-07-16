@@ -1,3 +1,4 @@
+from mathutils import Vector
 from unittest import TestCase
 from . base_lists import IntegerList, FloatList
 
@@ -142,6 +143,11 @@ class TestExtend(TestCase):
             a.extend("abc")
         with self.assertRaises(TypeError):
             a.extend(0)
+
+    def testExtendVector(self):
+        a = IntegerList()
+        a.extend(Vector((0, 1, 2)))
+        self.assertEqual(a, [0, 1, 2])
 
 class TestMultiply(TestCase):
     def test(self):
@@ -432,3 +438,7 @@ class TestFromValues(TestCase):
     def testWrongType(self):
         with self.assertRaises(TypeError):
             a = IntegerList.fromValues("abc")
+
+    def testVector(self):
+        a = IntegerList.fromValues(Vector((0, 1, 2)))
+        self.assertEqual(a, [0, 1, 2])

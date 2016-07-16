@@ -434,8 +434,13 @@ cdef class LISTNAME:
     def fromValues(cls, values):
         if isinstance(values, (list, tuple)):
             return cls.fromListOrTuple(values)
-        else:
-            return toLISTNAME(values)
+
+        try: return toLISTNAME(values)
+        except TypeError: pass
+
+        cdef LISTNAME newList = LISTNAME()
+        newList.extend(values)
+        return newList
 
     @classmethod
     def fromListOrTuple(cls, list_or_tuple values):
