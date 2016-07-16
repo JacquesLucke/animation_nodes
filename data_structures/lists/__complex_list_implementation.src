@@ -151,5 +151,11 @@ cdef class LISTNAME:
                    sizeof(BASETYPE) * AMOUNT)
         return newList
 
+    @classmethod
+    def fromValues(cls, values):
+        newList = LISTNAME()
+        newList.extend(values)
+        return newList
+
     def __repr__(self):
         return "<LISTNAME - {}>".format([self[i] for i in range(len(self))])

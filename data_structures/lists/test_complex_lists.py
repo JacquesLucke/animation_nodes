@@ -160,3 +160,53 @@ class TestExtend(TestCase):
     def testWrongInputType(self):
         with self.assertRaises(TypeError):
             self.list.extend("abc")
+
+class TestFromValues(TestCase):
+    def testEmptyInput(self):
+        v = Vector3DList.fromValues([])
+        self.assertEqual(len(v), 0)
+
+    def testWrongInputType(self):
+        with self.assertRaises(TypeError):
+            v = Vector3DList.fromValues("abc")
+        with self.assertRaises(TypeError):
+            v = Vector3DList.fromValues([(0, 0, 0), (1, 1, 1, 1)])
+
+    def testListInput(self):
+        v = Vector3DList.fromValues([(0, 0, 0), (1, 1, 1), (2, 2, 2)])
+        self.assertEqual(len(v), 3)
+        self.assertEqual(v[1], Vector((1, 1, 1)))
+
+    def testOtherComplexListInput(self):
+        tmp = Vector3DList.fromValues([(0, 0, 0), (1, 1, 1), (2, 2, 2)])
+        v = Vector3DList.fromValues(tmp)
+        self.assertEqual(len(v), 3)
+        self.assertEqual(v[1], Vector((1, 1, 1)))
+
+class TestGetValuesInSlice(TestCase):
+    def setUp(self):
+        self.list = Vector3DList()
+        for i in range(10):
+            self.list.append((i, i, i))
+
+    def testStart(self):
+        v = self.list[:3]
+        self.assertEqual(len(v), 3)
+        self.assertEqual(v[0].x, 0)
+        self.assertEqual(v[1].y, 1)
+        self.assertEqual(v[2].z, 2)
+
+    def testMiddle(self):
+        v = self.list[3:6]
+        self.assertEqual(len(v), 3)
+
+    def testReverse(self):
+        v = self.list[::-1]
+        self.assertEqual(len(v), 10)
+        self.assertEqual(v[0], Vector((9, 9, 9)))
+        self.assertEqual(v[9], Vector((0, 0, 0)))
+
+    def testStep(self):
+        v = self.list[::2]
+        self.assertEqual(len(v), 5)
+        self.assertEqual(v[2], Vector((4, 4, 4)))
