@@ -7,10 +7,11 @@ cdef class LISTNAME:
     cpdef append(self, value)
     cpdef extend(self, values)
     cpdef index(self, value)
-    cpdef long count(self, value)
+    cdef searchIndex(self, value)
+    cpdef count(self, value)
     cpdef remove(self, value)
     cpdef insert(self, long index, value)
-    
+
     cdef LISTNAME getValuesInSlice(self, sliceObject)
     cdef getValueAtIndex(self, long index)
 

@@ -46,7 +46,7 @@ cdef class LISTNAME:
     def __contains__(self, value):
         if len(value) != AMOUNT: raise TypeError("input has wrong type")
         cdef BASELISTTYPE search = BASELISTTYPE.fromValues(value)
-        cdef long i = 0
+        cdef long i
         cdef int compareResult
         for i in range(len(self)):
             compareResult = memcmp(search.data,
@@ -90,10 +90,36 @@ cdef class LISTNAME:
             self.append(value)
 
     cpdef index(self, value):
-        raise NotImplemented()
+        cdef long index = self.searchIndex(value)
+        if index >= 0: return index
+        elif index == -1: raise ValueError("value not in list")
+        else: raise TypeError("value has wrong type")
 
-    cpdef long count(self, value):
-        raise NotImplemented()
+    cdef searchIndex(self, value):
+        ''' >= 0:  value exists
+            == -1: value not in list
+            == -2: value has wrong type'''
+        if len(value) != AMOUNT: return -2
+        cdef BASELISTTYPE search = BASELISTTYPE.fromValues(value)
+        cdef long i
+        for i in range(len(self)):
+            if 0 == memcmp(search.data,
+                           self.base.data + i * AMOUNT,
+                           sizeof(BASETYPE) * AMOUNT):
+                return i
+        return -1
+
+    cpdef count(self, value):
+        if len(value) != AMOUNT:
+            raise TypeError("value has wrong type")
+        cdef BASELISTTYPE search = BASELISTTYPE.fromValues(value)
+        cdef long i, counter = 0
+        for i in range(len(self)):
+            if 0 == memcmp(search.data,
+                           self.base.data + i * AMOUNT,
+                           sizeof(BASETYPE) * AMOUNT):
+                counter += 1
+        return counter
 
     cpdef remove(self, value):
         raise NotImplemented()

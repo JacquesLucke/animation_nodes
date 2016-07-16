@@ -231,3 +231,65 @@ class TestContains(TestCase):
             a = "abc" in self.list
         with self.assertRaises(TypeError):
             a = (0, 0, 0, 0) in self.list
+
+class TestIndex(TestCase):
+    def setUp(self):
+        self.list = Vector3DList.fromValues(
+            [(0, 0, 0), (1, 1, 1), (2, 2, 2), (3, 3, 3)])
+
+    def testInside(self):
+        self.assertEqual(self.list.index((0, 0, 0)), 0)
+        self.assertEqual(self.list.index((1, 1, 1)), 1)
+        self.assertEqual(self.list.index((2, 2, 2)), 2)
+        self.assertEqual(self.list.index((3, 3, 3)), 3)
+
+    def testNotInside(self):
+        with self.assertRaises(ValueError):
+            self.list.index((0, 1, 2))
+
+    def testWrongType(self):
+        with self.assertRaises(TypeError):
+            self.list.index("abc")
+
+    def testTooLongInput(self):
+        with self.assertRaises(TypeError):
+            self.list.index((0, 0, 0, 0))
+
+    def testTooShortInput(self):
+        with self.assertRaises(TypeError):
+            self.list.index((0, 0))
+
+    def testList(self):
+        self.assertEqual(self.list.index([2, 2, 2]), 2)
+
+    def testTuple(self):
+        self.assertEqual(self.list.index((2, 2, 2)), 2)
+
+    def testVector(self):
+        self.assertEqual(self.list.index(Vector((2, 2, 2))), 2)
+
+class TestCount(TestCase):
+    def setUp(self):
+        self.list = Vector3DList.fromValues(
+            [(0, 0, 0), (1, 1, 1), (0, 0, 0), (3, 3, 3),
+             (0, 0, 0), (1, 2, 3), (3, 2, 1), (1, 2, 3)])
+
+    def testWrongType(self):
+        with self.assertRaises(TypeError):
+            self.list.count("abc")
+
+    def testWrongLength(self):
+        with self.assertRaises(TypeError):
+            self.list.count((0, 0))
+        with self.assertRaises(TypeError):
+            self.list.count((0, 0, 0, 0))
+
+    def testNormal(self):
+        self.assertEqual(self.list.count((0, 0, 0)), 3)
+        self.assertEqual(self.list.count((1, 1, 1)), 1)
+        self.assertEqual(self.list.count((3, 3, 3)), 1)
+        self.assertEqual(self.list.count((1, 2, 3)), 2)
+        self.assertEqual(self.list.count((3, 2, 1)), 1)
+
+    def testNotInside(self):
+        self.assertEqual(self.list.count((2, 6, 4)), 0)
