@@ -409,3 +409,26 @@ class TestSetSlice(TestCase):
         self.assertEqual(self.list, [0, 1, 6, 7, 8])
         self.list[2:5] = FloatList.fromValues((0, 1, 2))
         self.assertEqual(self.list, [0, 1, 0, 1, 2])
+
+class TestFromValues(TestCase):
+    def testList(self):
+        a = IntegerList.fromValues([0, 1, 2, 3])
+        self.assertEqual(a, [0, 1, 2, 3])
+
+    def testTuple(self):
+        a = IntegerList.fromValues((0, 1, 2, 3))
+        self.assertEqual(a, [0, 1, 2, 3])
+
+    def testSameType(self):
+        tmp = IntegerList.fromValues([0, 1, 2, 3])
+        a = IntegerList.fromValues(tmp)
+        self.assertEqual(a, [0, 1, 2, 3])
+
+    def testOtherType(self):
+        tmp = FloatList.fromValues([0, 1, 2, 3])
+        a = IntegerList.fromValues(tmp)
+        self.assertEqual(a, [0, 1, 2, 3])
+
+    def testWrongType(self):
+        with self.assertRaises(TypeError):
+            a = IntegerList.fromValues("abc")

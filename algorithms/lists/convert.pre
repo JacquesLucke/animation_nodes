@@ -2,17 +2,37 @@ from textwrap import dedent
 
 sourcePath = changeFileName(__file__, "convert.src")
 targetPath = changeFileName(__file__, "convert.pyx")
+declarationPath = changeFileName(__file__, "convert.pxd")
+
+listNames = ", ".join([listName for listName, _ in baseListsParameters])
+importStatements = [
+    "from ... data_structures.lists.base_lists cimport numeric_list",
+    "from ... data_structures.lists.base_lists cimport " + listNames
+]
 
 if dependenciesChanged(targetPath, dependencies = [sourcePath]):
+
+    # Generate implementation file
+    ######################################################
+
     templateCode = readFile(sourcePath)
 
     parts = []
-
-    listNames = ", ".join([listName for listName, _ in baseListsParameters])
-    parts.append("from ... data_structures.lists.base_lists cimport " + listNames)
+    parts.extend(importStatements)
 
     for listName, listType in baseListsParameters:
         code = multiReplace(templateCode, TARGETLIST = listName, TYPE = listType)
         parts.append(code)
 
     writeFile(targetPath, "\n\n".join(parts))
+
+
+    # Generate declaration file
+    ######################################################
+
+    parts = []
+    parts.extend(importStatements)
+    for listName, listType in baseListsParameters:
+        line = "cpdef {0} to{0}(numeric_list sourceList)".format(listName)
+        parts.append(line)
+    writeFile(declarationPath, "\n".join(parts))

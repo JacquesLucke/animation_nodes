@@ -3,6 +3,7 @@ from types import GeneratorType
 from libc.math cimport floor
 from libc.stdlib cimport malloc, free, realloc
 from libc.string cimport memcpy, memmove, memcmp
+from ... algorithms.lists.convert import toLISTNAME
 from ... utils.slicing cimport predictSliceLength, makeStepPositive
 
 @cython.freelist(10)
@@ -417,7 +418,14 @@ cdef class LISTNAME:
         return newList
 
     @classmethod
-    def fromValues(cls, list_or_tuple values):
+    def fromValues(cls, values):
+        if isinstance(values, (list, tuple)):
+            return cls.fromListOrTuple(values)
+        else:
+            return toLISTNAME(values)
+
+    @classmethod
+    def fromListOrTuple(cls, list_or_tuple values):
         newList = LISTNAME(len(values))
         cdef long i
         for i, value in enumerate(values):

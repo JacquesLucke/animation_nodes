@@ -14,3 +14,4 @@ algorithms/lists/convert.pyx
 algorithms/lists/create.pyx
 data_structures/lists/complex_lists.pyx
 data_structures/lists/complex_lists.pxd
+algorithms/lists/convert.pxd
