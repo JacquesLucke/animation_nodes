@@ -13,6 +13,7 @@ cdef class LISTNAME:
     cpdef insert(self, long index, value)
 
     cdef setValueAtIndex(self, long index, value)
+    cdef removeValueAtIndex(self, long index)
 
     cdef LISTNAME getValuesInSlice(self, sliceObject)
     cdef getValueAtIndex(self, long index)

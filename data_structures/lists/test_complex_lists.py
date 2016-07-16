@@ -329,3 +329,26 @@ class TestSetSingleElement(TestCase):
             self.list[5] = (1, 1, 1)
         with self.assertRaises(IndexError):
             self.list[-5] = (1, 1, 1)
+
+class TestDeleteSingleElement(TestCase):
+    def setUp(self):
+        self.list = Vector3DList.fromValues(
+            [(0, 1, 2), (3, 4, 5), (6, 7, 8)])
+
+    def testLength(self):
+        del self.list[0]
+        self.assertEqual(len(self.list), 2)
+
+    def testPositiveIndex(self):
+        del self.list[1]
+        self.assertEqual(self.list[1], Vector((6, 7, 8)))
+
+    def testNegativeIndex(self):
+        del self.list[-3]
+        self.assertEqual(self.list[0], Vector((3, 4, 5)))
+
+    def testInvalidIndex(self):
+        with self.assertRaises(IndexError):
+            del self.list[6]
+        with self.assertRaises(IndexError):
+            del self.list[-6]

@@ -202,7 +202,9 @@ cdef class LISTNAME:
 
     cdef removeValueAtIndex(self, long index):
         index = self.tryCorrectIndex(index)
-        memmove(self.data + index, self.data + index + 1, (self.length - index) * sizeof(TYPE))
+        memmove(self.data + index,
+                self.data + index + 1,
+                (self.length - index) * sizeof(TYPE))
         self.length -= 1
 
 
