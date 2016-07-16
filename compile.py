@@ -72,7 +72,7 @@ def canCompileCython():
 
 
 
-# Preprocess and convert .pyxt to .pyx files
+# Preprocess - execute .pre files
 ###################################################################
 
 def preprocessor():
