@@ -16,22 +16,26 @@ class TestInitialisation(TestCase):
         self.assertEqual(len(v), 10)
 
 class TestAppend(TestCase):
+    def setUp(self):
+        self.list = Vector3DList()
+
     def testFirst(self):
-        v = Vector3DList()
-        v.append((1, 2, 3))
-        self.assertEqual(len(v), 1)
+        self.list.append((1, 2, 3))
+        self.assertEqual(len(self.list), 1)
 
     def testWrongInputLength(self):
-        v = Vector3DList()
-        with self.assertRaises(ValueError):
-            v.append((2, 4))
-        with self.assertRaises(ValueError):
-            v.append((2, 4, 7, 9))
+        with self.assertRaises(TypeError):
+            self.list.append((2, 4))
+        with self.assertRaises(TypeError):
+            self.list.append((2, 4, 7, 9))
 
     def testWrongInputType(self):
-        v = Vector3DList()
         with self.assertRaises(TypeError):
-            v.append("abc")
+            self.list.append("abc")
+
+    def testVector(self):
+        self.list.append(Vector((1, 2, 3)))
+        self.assertEqual(self.list[0], Vector((1, 2, 3)))
 
 class TestGetSingleItem(TestCase):
     def testEmptyList(self):
@@ -122,3 +126,37 @@ class TestReversed(TestCase):
         self.assertEqual(r[1], Vector((2, 2, 2)))
         self.assertEqual(r[2], Vector((1, 1, 1)))
         self.assertEqual(r[3], Vector((0, 0, 0)))
+
+class TestExtend(TestCase):
+    def setUp(self):
+        self.list = Vector3DList()
+
+    def testEmptyInput(self):
+        self.list.extend([])
+        self.assertEqual(len(self.list), 0)
+
+    def testListInput(self):
+        self.list.extend([(0, 0, 0), (1, 1, 1), (2, 2, 2)])
+        self.assertEqual(len(self.list), 3)
+        self.assertEqual(self.list[1], Vector((1, 1, 1)))
+
+    def testTupleInput(self):
+        self.list.extend(([0, 0, 0], [1, 1, 1], [2, 2, 2]))
+        self.assertEqual(len(self.list), 3)
+        self.assertEqual(self.list[1], Vector((1, 1, 1)))
+
+    def testVectorListInput(self):
+        self.list.extend([Vector((0, 0, 0)), Vector((1, 1, 1)), Vector((2, 2, 2))])
+        self.assertEqual(len(self.list), 3)
+        self.assertEqual(self.list[1], Vector((1, 1, 1)))
+
+    def testOtherBaseListInput(self):
+        tmp = Vector3DList()
+        tmp.extend([(0, 0, 0), (1, 1, 1), (2, 2, 2)])
+        self.list.extend(tmp)
+        self.assertEqual(len(self.list), 3)
+        self.assertEqual(self.list[1], Vector((1, 1, 1)))
+
+    def testWrongInputType(self):
+        with self.assertRaises(TypeError):
+            self.list.extend("abc")
