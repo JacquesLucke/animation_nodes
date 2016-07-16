@@ -31,7 +31,7 @@ cdef class LISTNAME:
         if isinstance(key, int):
             self.setValueAtIndex(key, value)
         else:
-            raise NotImplemented()
+            self.setValuesInSlice(key, value)
 
     def __delitem__(self, key):
         if isinstance(key, int):
@@ -186,6 +186,20 @@ cdef class LISTNAME:
                 newIndex += AMOUNT
 
         return newList
+
+    cdef setValuesInSlice(self, sliceObject, values):
+        cdef:
+            long start, stop, step
+            long sliceLength
+
+        start, stop, step = sliceObject.indices(len(self))
+        sliceLength = predictSliceLength(start, stop, step)
+        if sliceLength != len(values):
+            raise ValueError("attempt to assign sequence of size {} to extended slice of size {}"
+                             .format(len(values), sliceLength))
+
+        for i, value in zip(range(start, stop, step), values):
+            setElementInLISTNAME(self, i, value)
 
     @classmethod
     def join(cls, *sourceLists):

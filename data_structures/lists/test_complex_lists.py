@@ -352,3 +352,36 @@ class TestDeleteSingleElement(TestCase):
             del self.list[6]
         with self.assertRaises(IndexError):
             del self.list[-6]
+
+class TestSetElementsInSlice(TestCase):
+    def setUp(self):
+        self.list = Vector3DList.fromValues(
+            [(0, 0, 0), (1, 1, 1), (2, 2, 2), (3, 3, 3)])
+
+    def testWrongLength(self):
+        with self.assertRaises(ValueError):
+            self.list[:3] = [(1, 2, 3), (5, 6, 7)]
+
+    def testWrongType(self):
+        with self.assertRaises(Exception):
+            self.lists[:3] = "abc"
+
+    def testInvalidElement(self):
+        with self.assertRaises(TypeError):
+            self.list[:3] = [(1, 2, 3), (4, 5, 6, 7), (0, 0, 0)]
+
+    def testStart(self):
+        self.list[:2] = (1, 2, 3), (4, 5, 6)
+        self.assertEqual(self.list[0], Vector((1, 2, 3)))
+        self.assertEqual(self.list[1], Vector((4, 5, 6)))
+        self.assertEqual(self.list[2], Vector((2, 2, 2)))
+
+    def testEnd(self):
+        self.list[2:] = (5, 6, 7), (1, 2, 3)
+        self.assertEqual(self.list[2], Vector((5, 6, 7)))
+        self.assertEqual(self.list[3], Vector((1, 2, 3)))
+
+    def testNegativeStep(self):
+        self.list[::-2] = (1, 2, 3), (4, 5, 6)
+        self.assertEqual(self.list[1], Vector((4, 5, 6)))
+        self.assertEqual(self.list[3], Vector((1, 2, 3)))
