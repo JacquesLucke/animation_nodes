@@ -10,6 +10,6 @@ def getElementFromVector3DList(Vector3DList myList, long index):
 
 def setElementInVector3DList(Vector3DList myList, long index, vector):
     if len(vector) != 3: raise TypeError("Invalid Vector Length. Expected 3.")
-    myList.base[index * 3 + 0] = vector[0]
-    myList.base[index * 3 + 1] = vector[1]
-    myList.base[index * 3 + 2] = vector[2]
+    myList.base.data[index * 3 + 0] = vector[0]
+    myList.base.data[index * 3 + 1] = vector[1]
+    myList.base.data[index * 3 + 2] = vector[2]
