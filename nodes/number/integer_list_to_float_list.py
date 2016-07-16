@@ -10,4 +10,4 @@ class IntegerListToFloatListNode(bpy.types.Node, AnimationNode):
         self.newOutput("Float List", "Float List", "floatList")
 
     def getExecutionCode(self):
-        return "floatList = algorithms.lists.convert.toDoubleList(integerList)"
+        return "floatList = FloatList.fromValues(integerList)"
