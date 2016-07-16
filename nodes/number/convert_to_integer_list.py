@@ -36,10 +36,7 @@ class ConvertToIntegerListNode(bpy.types.Node, AnimationNode):
             self.originType = dataType
 
     def getExecutionCode(self):
-        if "Indices" in self.originType:
-            yield "integerList = LongLongList.fromValues(inList)"
-        elif self.originType == "Float List":
-            yield "integerList = algorithms.lists.convert.toLongLongList(inList)"
+        yield "integerList = LongLongList.fromValues(inList)"
 
     @keepNodeState
     def recreateInput(self):
