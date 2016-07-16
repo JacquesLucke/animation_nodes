@@ -50,7 +50,7 @@ cdef class LISTNAME:
         self.capacity = newCapacity
 
 
-    # Magic Methods for Python
+    # Special Methods for Python
     ###############################################
 
     def __len__(self):

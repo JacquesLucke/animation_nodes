@@ -5,11 +5,18 @@ from ... utils.slicing cimport predictSliceLength
 @cython.freelist(10)
 cdef class LISTNAME:
 
+    # Initialization and Memory Management
+    ###############################################
+
     def __cinit__(self, long length = 0, long allocate = -1):
         self.base = BASELISTTYPE(length * AMOUNT, allocate * AMOUNT)
 
     def __dealloc__(self):
         pass
+
+
+    # Special Methods for Python
+    ###############################################
 
     def __len__(self):
         return len(self.base) / AMOUNT
@@ -20,6 +27,12 @@ cdef class LISTNAME:
         else:
             return self.getValuesInSlice(key)
 
+    def __setitem__(self, key, values):
+        raise NotImplemented()
+
+    def __delitem__(self, key):
+        raise NotImplemented()
+
     def __add__(LISTNAME a, LISTNAME b):
         return LISTNAME.join(a, b)
 
@@ -29,6 +42,12 @@ cdef class LISTNAME:
     def __iadd__(self, LISTNAME other):
         self.base += other.base
         return self
+
+    def __contains__(self, value):
+        raise NotImplemented()
+
+    def __richcmp__(x, y, int operation):
+        raise NotImplemented()
 
     cdef getValueAtIndex(self, long index):
         index = self.tryCorrectIndex(index)
@@ -41,13 +60,36 @@ cdef class LISTNAME:
             raise IndexError("list assignment index out of range")
         return index
 
-    cpdef append(self, value):
-        appendToLISTNAME(self, value)
+
+    # Base operations for lists - mimic python list
+    ###############################################
 
     cpdef copy(self):
         newList = LISTNAME()
         newList.base = self.base.copy()
         return newList
+
+    cpdef clear(self):
+        self.base.clear()
+
+    cpdef append(self, value):
+        appendToLISTNAME(self, value)
+
+    cpdef extend(self, values):
+        for value in values:
+            self.append(value)
+
+    cpdef index(self, value):
+        raise NotImplemented()
+
+    cpdef long count(self, value):
+        raise NotImplemented()
+
+    cpdef remove(self, value):
+        raise NotImplemented()
+
+    cpdef insert(self, long index, value):
+        raise NotImplemented()
 
     cdef LISTNAME getValuesInSlice(self, sliceObject):
         cdef:
