@@ -20,8 +20,8 @@ Compiling the cython code needs some setup (only tested on windows yet):
        Please report any issue you have.
 
 Command Line Arguments:
-    python compile.py            # full cleanup afterwards
-    python compile.py -c         # don't remove generated .c file
+    python compile.py
+    python compile.py -c         # remove generated .c file
 
 Generate .html files to debug cython code:
     cython -a filename.pyx
