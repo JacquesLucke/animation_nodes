@@ -27,8 +27,11 @@ cdef class LISTNAME:
         else:
             return self.getValuesInSlice(key)
 
-    def __setitem__(self, key, values):
-        raise NotImplemented()
+    def __setitem__(self, key, value):
+        if isinstance(key, int):
+            self.setValueAtIndex(key, value)
+        else:
+            raise NotImplemented()
 
     def __delitem__(self, key):
         raise NotImplemented()
@@ -58,17 +61,6 @@ cdef class LISTNAME:
 
     def __richcmp__(x, y, int operation):
         raise NotImplemented()
-
-    cdef getValueAtIndex(self, long index):
-        index = self.tryCorrectIndex(index)
-        return getElementFromLISTNAME(self, index)
-
-    cdef tryCorrectIndex(self, long index):
-        if index < 0:
-            index += self.base.length / AMOUNT
-        if index < 0 or index >= self.base.length / AMOUNT:
-            raise IndexError("list assignment index out of range")
-        return index
 
 
     # Base operations for lists - mimic python list
@@ -126,6 +118,29 @@ cdef class LISTNAME:
 
     cpdef insert(self, long index, value):
         raise NotImplemented()
+
+
+    # Get/Set/Remove single element
+    ################################################
+
+    cdef getValueAtIndex(self, long index):
+        index = self.tryCorrectIndex(index)
+        return getElementFromLISTNAME(self, index)
+
+    cdef setValueAtIndex(self, long index, value):
+        index = self.tryCorrectIndex(index)
+        setElementInLISTNAME(self, index, value)
+
+    cdef tryCorrectIndex(self, long index):
+        if index < 0:
+            index += self.base.length / AMOUNT
+        if index < 0 or index >= self.base.length / AMOUNT:
+            raise IndexError("list assignment index out of range")
+        return index
+
+
+    # Get/Set/Remove elements in slice
+    ################################################
 
     cdef LISTNAME getValuesInSlice(self, sliceObject):
         cdef:

@@ -293,3 +293,39 @@ class TestCount(TestCase):
 
     def testNotInside(self):
         self.assertEqual(self.list.count((2, 6, 4)), 0)
+
+class TestSetSingleElement(TestCase):
+    def setUp(self):
+        self.list = Vector3DList.fromValues([(0, 0, 0), (1, 1, 1), (2, 2, 2)])
+
+    def testWrongType(self):
+        with self.assertRaises(TypeError):
+            self.list[1] = "abc"
+
+    def testWrongLength(self):
+        with self.assertRaises(TypeError):
+            self.list[1] = (1, 1, 1, 1)
+        with self.assertRaises(TypeError):
+            self.list[1] = (1, 1)
+
+    def testTuple(self):
+        self.list[1] = (4, 5, 6)
+        self.assertEqual(self.list[1], Vector((4, 5, 6)))
+
+    def testList(self):
+        self.list[1] = [6, 7, 8]
+        self.assertEqual(self.list[1], Vector((6, 7, 8)))
+
+    def testVector(self):
+        self.list[1] = Vector((3, 4, 5))
+        self.assertEqual(self.list[1], Vector((3, 4, 5)))
+
+    def testNegativeIndex(self):
+        self.list[-1] = (7, 7, 7)
+        self.assertEqual(self.list[2], Vector((7, 7, 7)))
+
+    def testInvalidIndex(self):
+        with self.assertRaises(IndexError):
+            self.list[5] = (1, 1, 1)
+        with self.assertRaises(IndexError):
+            self.list[-5] = (1, 1, 1)
