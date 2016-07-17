@@ -86,16 +86,10 @@ cdef class LISTNAME:
             self.append(value)
 
     cpdef index(self, value):
-        cdef long index = self.searchIndex(value)
-        if index >= 0: return index
-        elif index == -1: raise ValueError("value not in list")
-        else: raise TypeError("value has wrong type")
+        return self.searchIndex(value)
 
     cdef searchIndex(self, value):
-        ''' >= 0:  value exists
-            == -1: value not in list
-            == -2: value has wrong type'''
-        if len(value) != AMOUNT: return -2
+        if len(value) != AMOUNT: raise TypeError("value has wrong type")
         cdef BASELISTTYPE search = elementToBaseListOfLISTNAME(value)
         cdef long i
         for i in range(len(self)):
@@ -103,7 +97,7 @@ cdef class LISTNAME:
                            self.base.data + i * AMOUNT,
                            sizeof(BASETYPE) * AMOUNT):
                 return i
-        return -1
+        raise ValueError("value not in list")
 
     cpdef count(self, value):
         if len(value) != AMOUNT:
@@ -118,7 +112,11 @@ cdef class LISTNAME:
         return counter
 
     cpdef remove(self, value):
-        raise NotImplemented()
+        cdef long index = self.searchIndex(value)
+        memmove(self.base.data + AMOUNT * index,
+                self.base.data + AMOUNT * (index + 1),
+                (self.base.length - index * AMOUNT) * sizeof(BASETYPE))
+        self.base.length -= AMOUNT
 
     cpdef insert(self, long index, value):
         raise NotImplemented()

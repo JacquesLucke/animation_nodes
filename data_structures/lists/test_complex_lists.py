@@ -385,3 +385,41 @@ class TestSetElementsInSlice(TestCase):
         self.list[::-2] = (1, 2, 3), (4, 5, 6)
         self.assertEqual(self.list[1], Vector((4, 5, 6)))
         self.assertEqual(self.list[3], Vector((1, 2, 3)))
+
+class TestRemove(TestCase):
+    def setUp(self):
+        self.list = Vector3DList.fromValues(
+            [(0, 0, 0), (1, 1, 1), (2, 2, 2), (3, 3, 3)])
+
+    def testNotExistant(self):
+        with self.assertRaises(ValueError):
+            self.list.remove((1, 2, 3))
+
+    def testWrongType(self):
+        with self.assertRaises(TypeError):
+            self.list.remove("abc")
+
+    def testWrongLength(self):
+        with self.assertRaises(TypeError):
+            self.list.remove((1, 2, 3, 4))
+
+    def testLengthUpdate(self):
+        self.list.remove((1, 1, 1))
+        self.assertEqual(len(self.list), 3)
+
+    def testTuple(self):
+        self.list.remove((2, 2, 2))
+        self.assertEqual(self.list[2], Vector((3, 3, 3)))
+
+    def testList(self):
+        self.list.remove([1, 1, 1])
+        self.assertEqual(self.list[2], Vector((3, 3, 3)))
+
+    def testVector(self):
+        self.list.remove(Vector((0, 0, 0)))
+        self.assertEqual(self.list[2], Vector((3, 3, 3)))
+
+    def testRemoveLast(self):
+        self.list.remove((3, 3, 3))
+        with self.assertRaises(IndexError):
+            a = self.list[3]
