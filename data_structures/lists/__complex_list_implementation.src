@@ -78,7 +78,8 @@ cdef class LISTNAME:
         self.base.clear()
 
     cpdef append(self, value):
-        appendToLISTNAME(self, value)
+        cdef BASELISTTYPE valueFlattened = elementToBaseListOfLISTNAME(value)
+        self.base.extend(valueFlattened)
 
     cpdef extend(self, values):
         for value in values:
@@ -95,7 +96,7 @@ cdef class LISTNAME:
             == -1: value not in list
             == -2: value has wrong type'''
         if len(value) != AMOUNT: return -2
-        cdef BASELISTTYPE search = BASELISTTYPE.fromValues(value)
+        cdef BASELISTTYPE search = elementToBaseListOfLISTNAME(value)
         cdef long i
         for i in range(len(self)):
             if 0 == memcmp(search.data,
@@ -107,7 +108,7 @@ cdef class LISTNAME:
     cpdef count(self, value):
         if len(value) != AMOUNT:
             raise TypeError("value has wrong type")
-        cdef BASELISTTYPE search = BASELISTTYPE.fromValues(value)
+        cdef BASELISTTYPE search = elementToBaseListOfLISTNAME(value)
         cdef long i, counter = 0
         for i in range(len(self)):
             if 0 == memcmp(search.data,
@@ -132,7 +133,8 @@ cdef class LISTNAME:
 
     cdef setValueAtIndex(self, long index, value):
         index = self.tryCorrectIndex(index)
-        setElementInLISTNAME(self, index, value)
+        cdef BASELISTTYPE valueFlattened = elementToBaseListOfLISTNAME(value)
+        self.base.overwrite(valueFlattened, index * AMOUNT)
 
     cdef removeValueAtIndex(self, long index):
         index = self.tryCorrectIndex(index)
@@ -198,8 +200,8 @@ cdef class LISTNAME:
             raise ValueError("attempt to assign sequence of size {} to extended slice of size {}"
                              .format(len(values), sliceLength))
 
-        for i, value in zip(range(start, stop, step), values):
-            setElementInLISTNAME(self, i, value)
+        for index, value in zip(range(start, stop, step), values):
+            self.setValueAtIndex(index, value)
 
     @classmethod
     def join(cls, *sourceLists):
