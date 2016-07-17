@@ -189,6 +189,10 @@ class TestGetValuesInSlice(TestCase):
         for i in range(10):
             self.list.append((i, i, i))
 
+    def testWrongType(self):
+        with self.assertRaises(TypeError):
+            self.list["abc"]
+
     def testStart(self):
         v = self.list[:3]
         self.assertEqual(len(v), 3)

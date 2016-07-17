@@ -218,7 +218,8 @@ cdef class LISTNAME:
             long newIndex, oldIndex
             LISTNAME newList
 
-        start, stop, step = sliceObject.indices(self.length)
+        try: start, stop, step = sliceObject.indices(len(self))
+        except: raise TypeError("Expected slice object. Not: {}".format(type(sliceObject)))
         outLength = predictSliceLength(start, stop, step)
         newList = LISTNAME(length = outLength)
 
@@ -244,7 +245,8 @@ cdef class LISTNAME:
             long start, stop, step
             long sliceLength
 
-        start, stop, step = sliceObject.indices(self.length)
+        try: start, stop, step = sliceObject.indices(len(self))
+        except: raise TypeError("Expected slice object. Not: {}".format(type(sliceObject)))
         sliceLength = predictSliceLength(start, stop, step)
         if sliceLength != len(values):
             raise ValueError("attempt to assign sequence of size {} to extended slice of size {}"
@@ -262,7 +264,8 @@ cdef class LISTNAME:
             long i, stepMinusOne
             TYPE* sliceStart
 
-        start, stop, step = sliceObject.indices(self.length)
+        try: start, stop, step = sliceObject.indices(len(self))
+        except: raise TypeError("Expected slice object. Not: {}".format(type(sliceObject)))
         if step < 0:
             start, stop, step = makeStepPositive(start, stop, step)
         removeAmount = predictSliceLength(start, stop, step)

@@ -233,6 +233,10 @@ class TestGetSlice(TestCase):
     def setUp(self):
         self.list = IntegerList.fromValues((0, 1, 2, 3, 4, 5))
 
+    def testWrongType(self):
+        with self.assertRaises(TypeError):
+            self.list["abc"]
+
     def testStart(self):
         self.assertEqual(self.list[:3], [0, 1, 2])
 
