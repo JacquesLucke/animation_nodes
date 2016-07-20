@@ -134,7 +134,7 @@ class ConvertElementToList(LinkCorrection):
         return origin.bl_idname == toBaseIdName(target.bl_idname)
     def insert(self, nodeTree, origin, target, dataOrigin):
         node = insertNode(nodeTree, "an_CreateListNode", origin, target)
-        node.assignBaseDataType(origin.dataType, inputAmount = 1)
+        node.assignBaseDataType(dataOrigin.dataType, inputAmount = 1)
         insertBasicLinking(nodeTree, origin, node, target)
 
 class ConvertVectorListToSplineList(LinkCorrection):
