@@ -20,10 +20,10 @@ Created by Jacques Lucke
 
 
 bl_info = {
-    "name":        "Animation Nodes",
+    "name":        "Animation Nodes Fork",
     "description": "Node based visual scripting system designed for motion graphics in Blender.",
-    "author":      "Jacques Lucke",
-    "version":     (1, 6, 0),
+    "author":      "Jacques Lucke_Jared Webber",
+    "version":     (1, 6, 1),
     "blender":     (2, 77, 0),
     "location":    "Node Editor",
     "category":    "Node",
