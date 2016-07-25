@@ -119,7 +119,10 @@ cdef class LISTNAME:
         self.base.length -= AMOUNT
 
     cpdef insert(self, long index, value):
-        raise NotImplemented()
+        if index >= len(self):
+            self.append(value)
+        else:
+            raise NotImplemented()
 
 
     # Get/Set/Remove single element

@@ -427,3 +427,35 @@ class TestRemove(TestCase):
         self.list.remove((3, 3, 3))
         with self.assertRaises(IndexError):
             a = self.list[3]
+
+class TestInsert(TestCase):
+    def setUp(self):
+        self.list = Vector3DList.fromValues(
+            [(0, 0, 0), (1, 1, 1), (2, 2, 2), (3, 3, 3)])
+        self.v = Vector((1, 2, 3))
+
+    def testAtStart(self):
+        self.list.insert(0, self.v)
+        self.assertEqual(self.list[0], self.v)
+
+    def testAtEnd(self):
+        self.list.insert(4, self.v)
+        self.assertEqual(self.list[4], self.v)
+
+    def testAfterEnd(self):
+        self.list.insert(50, self.v)
+        self.assertEqual(self.list[4], self.v)
+
+    def testInMiddle(self):
+        self.list.insert(2, self.v)
+        self.assertEqual(self.list[2], self.v)
+        self.assertEqual(len(self), 5)
+        self.assertEqual(self.list[4], Vector((3, 3, 3)))
+
+    def testNegativeIndex(self):
+        self.list.insert(-1, self.v)
+        self.assertEqual(self.list[-1], self.v)
+        self.list.insert(-3, self.v)
+        self.assertEqual(self.list[-3], self.v)
+        self.list.insert(-100, self.v)
+        self.assertEqual(self.list[0], self.v)

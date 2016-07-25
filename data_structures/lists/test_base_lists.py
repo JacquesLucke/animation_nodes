@@ -417,6 +417,26 @@ class TestSetSlice(TestCase):
         self.list[2:5] = FloatList.fromValues((0, 1, 2))
         self.assertEqual(self.list, [0, 1, 0, 1, 2])
 
+    def testWrongLengthExtendedSlice(self):
+        with self.assertRaises(ValueError):
+            self.list[::2] = [1, 2, 3, 4, 5]
+
+    def testShorterReplacement(self):
+        self.list[:3] = [10]
+        self.assertEqual(self.list, [10, 3, 4])
+
+    def testLongerReplacement(self):
+        self.list[2:4] = [6, 7, 8, 9, 10]
+        self.assertEqual(self.list, [0, 1, 6, 7, 8, 9, 10, 4])
+
+    def testInsertion(self):
+        self.list[2:2] = [6, 7, 8, 9]
+        self.assertEqual(self.list, [0, 1, 6, 7, 8, 9, 2, 3, 4])
+
+    def testDelete(self):
+        self.list[1:] = []
+        self.assertEqual(self.list, [0])
+
 class TestFromValues(TestCase):
     def testList(self):
         a = IntegerList.fromValues([0, 1, 2, 3])
@@ -443,3 +463,7 @@ class TestFromValues(TestCase):
     def testVector(self):
         a = IntegerList.fromValues(Vector((0, 1, 2)))
         self.assertEqual(a, [0, 1, 2])
+
+    def testGeneratorInput(self):
+        a = IntegerList.fromValues(range(7))
+        self.assertEqual(a, [0, 1, 2, 3, 4, 5, 6])
