@@ -128,7 +128,8 @@ cdef class LISTNAME:
             self.data[i] = value
 
     cpdef append(self, TYPE value):
-        self.grow(self.length + 1)
+        if self.length >= self.capacity:
+            self.grow(self.length + 1)
         self.data[self.length] = value
         self.length += 1
 
@@ -136,6 +137,8 @@ cdef class LISTNAME:
         cdef long newLength, i
         if type(values) == LISTNAME:
             self.overwrite(values, self.length)
+        elif isinstance(values, list):
+            self.extendList(values)
         elif hasattr(values, "__len__"):
             newLength = self.length + len(values)
             self.grow(newLength)
@@ -147,6 +150,14 @@ cdef class LISTNAME:
                 self.append(value)
         else:
             raise TypeError("invalid input")
+
+    cdef extendList(self, list values):
+        cdef long newLength, i
+        newLength = self.length + len(values)
+        self.grow(newLength)
+        for i in range(len(values)):
+            self.data[self.length + i] = values[i]
+        self.length = newLength
 
     cpdef index(self, TYPE value):
         cdef long index = self.searchIndex(value)

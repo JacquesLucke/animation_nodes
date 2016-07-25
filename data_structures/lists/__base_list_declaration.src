@@ -13,6 +13,7 @@ cdef class LISTNAME:
 
     cpdef append(self, TYPE value)
     cpdef extend(self, values)
+    cdef extendList(self, list values)
     cpdef remove(self, TYPE value)
     cpdef index(self, TYPE value)
     cdef long searchIndex(self, TYPE value)
