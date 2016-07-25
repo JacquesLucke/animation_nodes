@@ -1,9 +1,9 @@
 import bpy
 from ... base_types.node import AnimationNode
 
-class ParticleOutput(bpy.types.Node, AnimationNode):
-    bl_idname = "an_ParticleInfoOutput"
-    bl_label = "ParticleInfoOutput"
+class ParticleInfoNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_ParticleOutputNode"
+    bl_label = "Particle Output"
 
     def create(self):
         self.newOutput("Particle", "Particle", "particle")
@@ -29,7 +29,7 @@ class ParticleOutput(bpy.types.Node, AnimationNode):
         self.newInput("Vector List", "Hair Points Local", "hairPointsLocal", hide = True)
 
     def getExecutionCode(self):
-        isLinked = self.getLinkedOutputsDict()
+        isLinked = self.getLinkedInputsDict()
 
         lines = []
 
