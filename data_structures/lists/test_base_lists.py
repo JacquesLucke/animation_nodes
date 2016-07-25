@@ -3,39 +3,36 @@ from unittest import TestCase
 from . base_lists import IntegerList, FloatList
 
 class TestInsertion(TestCase):
+    def setUp(self):
+        self.list = IntegerList.fromValues((0, 1, 2, 3))
+
     def testAtStart(self):
-        a = IntegerList.fromValues((0, 1, 2, 3))
-        a.insert(0, 10)
-        self.assertEqual(a, (10, 0, 1, 2, 3))
+        self.list.insert(0, 10)
+        self.assertEqual(self.list, (10, 0, 1, 2, 3))
 
     def testAtEnd(self):
-        a = IntegerList.fromValues((0, 1, 2, 3))
-        a.insert(4, 10)
-        self.assertEqual(a, (0, 1, 2, 3, 10))
+        self.list.insert(4, 10)
+        self.assertEqual(self.list, (0, 1, 2, 3, 10))
 
     def testAfterEnd(self):
-        a = IntegerList.fromValues((0, 1, 2, 3))
-        a.insert(50, 10)
-        self.assertEqual(a, (0, 1, 2, 3, 10))
+        self.list.insert(50, 10)
+        self.assertEqual(self.list, (0, 1, 2, 3, 10))
 
     def testInMiddle(self):
-        a = IntegerList.fromValues((0, 1, 2, 3))
-        a.insert(2, 10)
-        self.assertEqual(a, (0, 1, 10, 2, 3))
+        self.list.insert(2, 10)
+        self.assertEqual(self.list, (0, 1, 10, 2, 3))
 
     def testLengthUpdate(self):
-        a = IntegerList.fromValues((0, 1, 2, 3))
-        a.insert(2, 1)
-        self.assertEqual(len(a), 5)
+        self.list.insert(2, 1)
+        self.assertEqual(len(self.list), 5)
 
     def testNegativeIndex(self):
-        a = IntegerList.fromValues((0, 1, 2, 3))
-        a.insert(-1, 10)
-        self.assertEqual(a, (0, 1, 2, 10, 3))
-        a.insert(-3, 20)
-        self.assertEqual(a, (0, 1, 20, 2, 10, 3))
-        a.insert(-100, 30)
-        self.assertEqual(a, (30, 0, 1, 20, 2, 10, 3))
+        self.list.insert(-1, 10)
+        self.assertEqual(self.list, (0, 1, 2, 10, 3))
+        self.list.insert(-3, 20)
+        self.assertEqual(self.list, (0, 1, 20, 2, 10, 3))
+        self.list.insert(-100, 30)
+        self.assertEqual(self.list, (30, 0, 1, 20, 2, 10, 3))
 
 class TestRichComparison(TestCase):
     def testEqual_Left(self):
