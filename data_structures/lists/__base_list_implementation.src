@@ -252,12 +252,32 @@ cdef class LISTNAME:
         return newList
 
     cdef setValuesInSlice(self, slice sliceObject, values):
-        cdef:
-            long start, stop, step
-            long sliceLength
-
+        cdef long start, stop, step
         start, stop, step = sliceObject.indices(len(self))
-        sliceLength = predictSliceLength(start, stop, step)
+
+        if step == 1:
+            self.setValuesInSimpleSlice(start, stop, values)
+        else:
+            self.setValuesInExtendedSlice(start, stop, step, values)
+
+    cdef setValuesInSimpleSlice(self, long start, long stop, values):
+        cdef:
+            long replacementLength = len(values)
+            long sliceLength = predictSliceLength(start, stop, 1)
+
+        if replacementLength > sliceLength:
+            self.grow(self.length + (replacementLength - sliceLength))
+        if replacementLength != sliceLength:
+            memmove(self.data + start + replacementLength,
+                    self.data + stop,
+                    sizeof(TYPE) * (self.length - stop))
+            self.length += replacementLength - sliceLength
+
+        for i in range(replacementLength):
+            self.data[start + i] = values[i]
+
+    cdef setValuesInExtendedSlice(self, long start, long stop, long step, values):
+        cdef long sliceLength = predictSliceLength(start, stop, step)
         if sliceLength != len(values):
             raise ValueError("attempt to assign sequence of size {} to extended slice of size {}"
                              .format(len(values), sliceLength))

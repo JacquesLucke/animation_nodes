@@ -26,6 +26,9 @@ cdef class LISTNAME:
     cdef setValuesInSlice(self, slice sliceObject, values)
     cdef removeValuesInSlice(self, slice sliceObject)
 
+    cdef setValuesInSimpleSlice(self, long start, long stop, values)
+    cdef setValuesInExtendedSlice(self, long start, long stop, long step, values)
+
     cdef getValueAtIndex(self, long index)
     cdef setValueAtIndex(self, long index, TYPE value)
     cdef removeValueAtIndex(self, long index)
