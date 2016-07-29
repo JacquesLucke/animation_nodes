@@ -35,8 +35,8 @@ class CreateListNode(bpy.types.Node, AnimationNode):
             text = "New Input",
             description = "Create a new input socket",
             icon = "PLUS")
-        self.invokeFunction(row, "removeElementInputs",
-            description = "Remove all inputs.",
+        self.invokeFunction(row, "removeUnlinkedInputs",
+            description = "Remove unlinked inputs",
             confirm = True,
             icon = "X")
 
@@ -48,7 +48,7 @@ class CreateListNode(bpy.types.Node, AnimationNode):
 
         layout.prop(self, "hideInputs")
 
-        self.invokeFunction(layout, "removeElementInputs", "Remove Inputs", icon = "X")
+        self.invokeFunction(layout, "removeUnlinkedInputs", "Remove Unlinked Inputs", icon = "X")
 
         self.drawAdvancedTypeSpecific(layout)
 
@@ -111,9 +111,10 @@ class CreateListNode(bpy.types.Node, AnimationNode):
         if len(self.outputs) > 0:
             self.outputs[0].name = name
 
-    def removeElementInputs(self):
+    def removeUnlinkedInputs(self):
         for socket in self.inputs[:-1]:
-            socket.remove()
+            if not socket.is_linked:
+                socket.remove()
 
 
     # type specific stuff
