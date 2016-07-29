@@ -22,14 +22,14 @@ cdef class LISTNAME:
 
     cpdef TYPE[:] getMemoryView(self)
 
-    cdef LISTNAME getValuesInSlice(self, sliceObject)
-    cdef setValuesInSlice(self, sliceObject, values)
+    cdef LISTNAME getValuesInSlice(self, slice sliceObject)
+    cdef setValuesInSlice(self, slice sliceObject, values)
+    cdef removeValuesInSlice(self, slice sliceObject)
 
     cdef getValueAtIndex(self, long index)
     cdef setValueAtIndex(self, long index, TYPE value)
-
     cdef removeValueAtIndex(self, long index)
-    cdef removeValuesInSlice(self, sliceObject)
+
 
 
     cpdef LISTNAME reversed(self)
