@@ -449,13 +449,13 @@ class TestInsert(TestCase):
     def testInMiddle(self):
         self.list.insert(2, self.v)
         self.assertEqual(self.list[2], self.v)
-        self.assertEqual(len(self), 5)
+        self.assertEqual(len(self.list), 5)
         self.assertEqual(self.list[4], Vector((3, 3, 3)))
 
     def testNegativeIndex(self):
         self.list.insert(-1, self.v)
-        self.assertEqual(self.list[-1], self.v)
+        self.assertEqual(self.list[-2], self.v)
         self.list.insert(-3, self.v)
-        self.assertEqual(self.list[-3], self.v)
+        self.assertEqual(self.list[-4], self.v)
         self.list.insert(-100, self.v)
         self.assertEqual(self.list[0], self.v)
