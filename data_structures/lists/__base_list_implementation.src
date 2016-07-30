@@ -199,6 +199,7 @@ cdef class LISTNAME:
                     sizeof(TYPE) * (self.length - index))
             self.data[index] = value
             self.length += 1
+            
 
 
     # Get/Set/Remove single element
@@ -370,7 +371,7 @@ cdef class LISTNAME:
         if index < 0:
             index += self.length
         if index < 0 or index >= self.length:
-            raise IndexError("list assignment index out of range")
+            raise IndexError("list index out of range")
         return index
 
     cdef overwrite(self, LISTNAME other, long index = 0):

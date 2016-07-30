@@ -19,7 +19,10 @@ cdef class LISTNAME:
     ###############################################
 
     def __len__(self):
-        return len(self.base) / AMOUNT
+        return self.getLength()
+
+    cdef inline getLength(self):
+        return self.base.length / AMOUNT
 
     def __getitem__(self, key):
         if isinstance(key, int):
@@ -54,7 +57,7 @@ cdef class LISTNAME:
         cdef BASELISTTYPE search = BASELISTTYPE.fromValues(value)
         cdef long i
         cdef int compareResult
-        for i in range(len(self)):
+        for i in range(self.getLength()):
             compareResult = memcmp(search.data,
                                    self.base.data + i * AMOUNT,
                                    sizeof(BASETYPE) * AMOUNT)
@@ -92,7 +95,7 @@ cdef class LISTNAME:
         if len(value) != AMOUNT: raise TypeError("value has wrong type")
         cdef BASELISTTYPE search = elementToBaseListOfLISTNAME(value)
         cdef long i
-        for i in range(len(self)):
+        for i in range(self.getLength()):
             if 0 == memcmp(search.data,
                            self.base.data + i * AMOUNT,
                            sizeof(BASETYPE) * AMOUNT):
@@ -104,7 +107,7 @@ cdef class LISTNAME:
             raise TypeError("value has wrong type")
         cdef BASELISTTYPE search = elementToBaseListOfLISTNAME(value)
         cdef long i, counter = 0
-        for i in range(len(self)):
+        for i in range(self.getLength()):
             if 0 == memcmp(search.data,
                            self.base.data + i * AMOUNT,
                            sizeof(BASETYPE) * AMOUNT):
@@ -119,10 +122,14 @@ cdef class LISTNAME:
         self.base.length -= AMOUNT
 
     cpdef insert(self, long index, value):
-        if index >= len(self):
-            self.append(value)
-        else:
-            raise NotImplemented()
+        if index >= self.getLength(): index = self.getLength()
+        if index < 0: index += self.getLength()
+        if index < 0: index = 0
+
+        cdef BASELISTTYPE valueFlattened
+        valueFlattened = elementToBaseListOfLISTNAME(value)
+        self.base.setValuesInSimpleSlice(index * AMOUNT, index * AMOUNT, valueFlattened)
+
 
 
     # Get/Set/Remove single element
@@ -146,8 +153,8 @@ cdef class LISTNAME:
 
     cdef tryCorrectIndex(self, long index):
         if index < 0:
-            index += self.base.length / AMOUNT
-        if index < 0 or index >= self.base.length / AMOUNT:
+            index += self.getLength()
+        if index < 0 or index >= self.getLength():
             raise IndexError("list assignment index out of range")
         return index
 
@@ -163,7 +170,7 @@ cdef class LISTNAME:
             long newIndex, oldIndex
             LISTNAME newList
 
-        try: start, stop, step = sliceObject.indices(len(self))
+        try: start, stop, step = sliceObject.indices(self.getLength())
         except: raise TypeError("Expected slice object. Not: {}".format(type(sliceObject)))
         outLength = predictSliceLength(start, stop, step)
         newList = LISTNAME(length = outLength)
@@ -195,7 +202,7 @@ cdef class LISTNAME:
             long start, stop, step
             long sliceLength
 
-        try: start, stop, step = sliceObject.indices(len(self))
+        try: start, stop, step = sliceObject.indices(self.getLength())
         except: raise TypeError("Expected slice object. Not: {}".format(type(sliceObject)))
         sliceLength = predictSliceLength(start, stop, step)
         if sliceLength != len(values):
@@ -221,10 +228,10 @@ cdef class LISTNAME:
 
     def reversed(self):
         cdef:
-            LISTNAME newList = LISTNAME(len(self))
+            LISTNAME newList = LISTNAME(self.getLength())
             long i, offset
-        offset = (len(self) - 1) * AMOUNT
-        for i in range(len(self)):
+        offset = (self.getLength() - 1) * AMOUNT
+        for i in range(self.getLength()):
             memcpy(newList.base.data + i * AMOUNT,
                    self.base.data + offset - i * AMOUNT,
                    sizeof(BASETYPE) * AMOUNT)
@@ -237,4 +244,4 @@ cdef class LISTNAME:
         return newList
 
     def __repr__(self):
-        return "<LISTNAME - {}>".format([self[i] for i in range(len(self))])
+        return "<LISTNAME - {}>".format([self[i] for i in range(self.getLength())])

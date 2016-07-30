@@ -2,6 +2,8 @@ cdef class LISTNAME:
     cdef:
         BASELISTTYPE base
 
+    cdef inline getLength(self)
+
     cpdef copy(self)
     cpdef clear(self)
     cpdef append(self, value)
