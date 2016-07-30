@@ -11,7 +11,7 @@ cdef class LISTNAME:
     # Initialization and Memory Management
     ###############################################
 
-    def __cinit__(self, long length = 0, long allocate = -1):
+    def __cinit__(self, long length = 0, long capacity = -1):
         '''
         Initialize a new object with the given length.
         You can also directly allocate more memory from the beginning
@@ -19,14 +19,14 @@ cdef class LISTNAME:
         '''
         if length < 0:
             raise ValueError("Length has to be >= 0")
-        if allocate < length:
-            allocate = length
-        self.data = <TYPE*>malloc(sizeof(TYPE) * allocate)
+        if capacity < length:
+            capacity = length
+        self.data = <TYPE*>malloc(sizeof(TYPE) * capacity)
         if self.data == NULL:
             raise MemoryError()
 
         self.length = length
-        self.capacity = allocate
+        self.capacity = capacity
 
     def __dealloc__(self):
         if self.data != NULL:
@@ -140,6 +140,8 @@ cdef class LISTNAME:
             self.overwrite(values, self.length)
         elif isinstance(values, list):
             self.extendList(values)
+        elif isinstance(values, tuple):
+            self.extendTuple(values)
         elif hasattr(values, "__len__"):
             newLength = self.length + len(values)
             self.grow(newLength)
@@ -153,6 +155,14 @@ cdef class LISTNAME:
             raise TypeError("invalid input")
 
     cdef extendList(self, list values):
+        cdef long newLength, i
+        newLength = self.length + len(values)
+        self.grow(newLength)
+        for i in range(len(values)):
+            self.data[self.length + i] = values[i]
+        self.length = newLength
+
+    cdef extendTuple(self, tuple values):
         cdef long newLength, i
         newLength = self.length + len(values)
         self.grow(newLength)
@@ -199,7 +209,7 @@ cdef class LISTNAME:
                     sizeof(TYPE) * (self.length - index))
             self.data[index] = value
             self.length += 1
-            
+
 
 
     # Get/Set/Remove single element
@@ -274,8 +284,11 @@ cdef class LISTNAME:
                     sizeof(TYPE) * (self.length - stop))
             self.length += replacementLength - sliceLength
 
-        for i in range(replacementLength):
-            self.data[start + i] = values[i]
+        if isinstance(values, LISTNAME):
+            self.overwrite(values, start)
+        else:
+            for i in range(replacementLength):
+                self.data[start + i] = values[i]
 
     cdef setValuesInExtendedSlice(self, long start, long stop, long step, values):
         cdef long sliceLength = predictSliceLength(start, stop, step)
