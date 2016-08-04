@@ -10,7 +10,7 @@ def getElementFromVector3DList(Vector3DList myList, long index):
 
 def elementToBaseListOfVector3DList(vector):
     if len(vector) != 3: raise TypeError("Invalid Vector Length. Expected 3.")
-    cdef FloatList element = FloatList(length = 3)
+    cdef FloatList element = FloatList.__new__(FloatList, length = 3)
     element.data[0] = vector[0]
     element.data[1] = vector[1]
     element.data[2] = vector[2]
