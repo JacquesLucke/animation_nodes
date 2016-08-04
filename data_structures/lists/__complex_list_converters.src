@@ -2,10 +2,16 @@ from mathutils import Vector
 from . base_lists cimport FloatList
 
 def getElementFromVector3DList(Vector3DList myList, long index):
-    return Vector(myList.base.getSubTuple(index * 3, 3))
+    '''Index has to be valid at this point!'''
+    cdef long baseIndex = index * 3
+    return Vector((myList.base.data[baseIndex + 0],
+                   myList.base.data[baseIndex + 1],
+                   myList.base.data[baseIndex + 2]))
 
 def elementToBaseListOfVector3DList(vector):
-    cdef FloatList element = FloatList.fromValues(vector)
-    if element.length != 3:
-        raise TypeError("Invalid Vector Length. Expected 3.")
+    if len(vector) != 3: raise TypeError("Invalid Vector Length. Expected 3.")
+    cdef FloatList element = FloatList(length = 3)
+    element.data[0] = vector[0]
+    element.data[1] = vector[1]
+    element.data[2] = vector[2]
     return element

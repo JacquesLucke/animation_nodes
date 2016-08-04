@@ -443,11 +443,6 @@ cdef class LISTNAME:
                 return True
         return False
 
-    def getSubTuple(self, long start, long length):
-        if 0 <= start < start + length <= self.length:
-            return tuple(self.data[i] for i in range(start, start + length))
-        raise IndexError("Index out of range")
-
 
     # Memory Views
     ###############################################
