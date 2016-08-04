@@ -37,6 +37,10 @@ class TestAppend(TestCase):
         self.list.append(Vector((1, 2, 3)))
         self.assertEqual(self.list[0], Vector((1, 2, 3)))
 
+    def testPartiallyWrongType(self):
+        with self.assertRaises(TypeError):
+            self.list.append((1, "a", 2))
+
 class TestGetSingleItem(TestCase):
     def testEmptyList(self):
         v = Vector3DList()
