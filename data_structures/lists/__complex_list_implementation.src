@@ -21,7 +21,7 @@ cdef class LISTNAME:
     def __len__(self):
         return self.getLength()
 
-    cdef inline getLength(self):
+    cdef inline long getLength(self):
         return self.base.length / AMOUNT
 
     def __getitem__(self, key):
@@ -142,8 +142,9 @@ cdef class LISTNAME:
     ################################################
 
     cdef getValueAtIndex(self, long index):
-        index = self.tryCorrectIndex(index)
-        return getElementFromLISTNAME(self, index)
+        index = self.tryCorrectIndex_Fast(index)
+        if index >= 0: return getElementFromLISTNAME(self, index)
+        else: raise IndexError("list assignment index out of range")
 
     cdef setValueAtIndex(self, long index, value):
         index = self.tryCorrectIndex(index)
@@ -158,11 +159,16 @@ cdef class LISTNAME:
         self.base.length -= AMOUNT
 
     cdef tryCorrectIndex(self, long index):
-        if index < 0:
-            index += self.getLength()
-        if index < 0 or index >= self.getLength():
-            raise IndexError("list assignment index out of range")
-        return index
+        index = self.tryCorrectIndex_Fast(index)
+        if index >= 0: return index
+        raise IndexError("list assignment index out of range")
+
+    cdef long tryCorrectIndex_Fast(self, long index):
+        cdef long length = self.getLength()
+        if 0 <= index < length: return index
+        index += length
+        if 0 <= index < length: return index
+        return -1
 
 
     # Get/Set/Remove elements in slice

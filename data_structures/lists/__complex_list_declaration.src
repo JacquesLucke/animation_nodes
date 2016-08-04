@@ -2,7 +2,7 @@ cdef class LISTNAME:
     cdef:
         BASELISTTYPE base
 
-    cdef inline getLength(self)
+    cdef inline long getLength(self)
 
     cpdef copy(self)
     cpdef clear(self)
@@ -22,3 +22,4 @@ cdef class LISTNAME:
     cdef getValueAtIndex(self, long index)
 
     cdef tryCorrectIndex(self, long index)
+    cdef long tryCorrectIndex_Fast(self, long index)
