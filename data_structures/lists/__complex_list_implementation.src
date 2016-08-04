@@ -72,6 +72,9 @@ cdef class LISTNAME:
 
 
     def __richcmp__(x, y, int operation):
+        if operation == 2: # '=='
+            if type(x) == type(y):
+                return (<LISTNAME>x).base == (<LISTNAME>y).base
         raise NotImplemented()
 
 

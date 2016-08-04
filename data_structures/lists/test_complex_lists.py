@@ -2,6 +2,15 @@ from mathutils import Vector
 from unittest import TestCase
 from . complex_lists import Vector3DList
 
+def valuesToVectorList(*values):
+    return Vector3DList.fromValues([v, v, v] for v in values)
+
+class TestValuesToVectorList(TestCase):
+    def testNormal(self):
+        a = valuesToVectorList(1, 2, 3)
+        self.assertEqual(a, Vector3DList.fromValues(
+                        [(1, 1, 1), (2, 2, 2), (3, 3, 3)]))
+
 class TestInitialisation(TestCase):
     def testEmpty(self):
         v = Vector3DList()
@@ -361,6 +370,34 @@ class TestDeleteSingleElement(TestCase):
         with self.assertRaises(IndexError):
             del self.list[-6]
 
+class TestDeleteSlice(TestCase):
+    def setUp(self):
+        self.list = valuesToVectorList(0, 1, 2, 3, 4, 5, 6, 7)
+
+    def testStart(self):
+        del self.list[:4]
+        self.assertEqual(self.list, valuesToVectorList(4, 5, 6, 7))
+
+    def testEnd(self):
+        del self.list[4:]
+        self.assertEqual(self.list, valuesToVectorList(0, 1, 2, 3))
+
+    def testMiddle(self):
+        del self.list[2:6]
+        self.assertEqual(self.list, valuesToVectorList(0, 1, 6, 7))
+
+    def testStep(self):
+        del self.list[::2]
+        self.assertEqual(self.list, valuesToVectorList(1, 3, 5, 7))
+
+    def testNegativeStep(self):
+        del self.list[::-2]
+        self.assertEqual(self.list, valuesToVectorList(0, 2, 4, 6))
+
+    def testCombined(self):
+        del self.list[1:-2:3]
+        self.assertEqual(self.list, valuesToVectorList(0, 2, 3, 5, 6, 7))
+
 class TestSetElementsInSlice(TestCase):
     def setUp(self):
         self.list = Vector3DList.fromValues(
@@ -463,3 +500,13 @@ class TestInsert(TestCase):
         self.assertEqual(self.list[-4], self.v)
         self.list.insert(-100, self.v)
         self.assertEqual(self.list[0], self.v)
+
+class TestRichComparison(TestCase):
+    def testEqual_Both(self):
+        a = valuesToVectorList(0, 1, 2, 3)
+        b = valuesToVectorList(0, 1, 2, 3)
+        c = valuesToVectorList(0, 1, 2, 3, 4)
+        d = valuesToVectorList(0, 1, 2, 4)
+        self.assertTrue(a == b)
+        self.assertFalse(a == c)
+        self.assertFalse(a == d)
