@@ -61,19 +61,24 @@ cdef class LISTNAME:
             return self.getValueAtIndex(key)
         elif isinstance(key, slice):
             return self.getValuesInSlice(key)
-        raise TypeError("Expected int or slice object")
+        else:
+            raise TypeError("Expected int or slice object")
 
     def __setitem__(self, key, value):
         if isinstance(key, int):
             self.setValueAtIndex(key, value)
         elif isinstance(key, slice):
             self.setValuesInSlice(key, value)
+        else:
+            raise TypeError("Expected int or slice object")
 
     def __delitem__(self, key):
         if isinstance(key, int):
             self.removeValueAtIndex(key)
         elif isinstance(key, slice):
             self.removeValuesInSlice(key)
+        else:
+            raise TypeError("Expected int or slice object")
 
     def __add__(LISTNAME a, LISTNAME b):
         return LISTNAME.join(a, b)

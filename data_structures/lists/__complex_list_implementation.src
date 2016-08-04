@@ -27,20 +27,26 @@ cdef class LISTNAME:
     def __getitem__(self, key):
         if isinstance(key, int):
             return self.getValueAtIndex(key)
-        else:
+        elif isinstance(key, slice):
             return self.getValuesInSlice(key)
+        else:
+            raise TypeError("Expected int or slice object")
 
     def __setitem__(self, key, value):
         if isinstance(key, int):
             self.setValueAtIndex(key, value)
-        else:
+        elif isinstance(key, slice):
             self.setValuesInSlice(key, value)
+        else:
+            raise TypeError("Expected int or slice object")
 
     def __delitem__(self, key):
         if isinstance(key, int):
             self.removeValueAtIndex(key)
-        else:
+        elif isinstance(key, slice):
             raise NotImplemented()
+        else:
+            raise TypeError("Expected int or slice object")
 
     def __add__(LISTNAME a, LISTNAME b):
         return LISTNAME.join(a, b)
@@ -170,8 +176,7 @@ cdef class LISTNAME:
             long newIndex, oldIndex
             LISTNAME newList
 
-        try: start, stop, step = sliceObject.indices(self.getLength())
-        except: raise TypeError("Expected slice object. Not: {}".format(type(sliceObject)))
+        start, stop, step = sliceObject.indices(self.getLength())
         outLength = predictSliceLength(start, stop, step)
         newList = LISTNAME(length = outLength)
 
@@ -202,8 +207,7 @@ cdef class LISTNAME:
             long start, stop, step
             long sliceLength
 
-        try: start, stop, step = sliceObject.indices(self.getLength())
-        except: raise TypeError("Expected slice object. Not: {}".format(type(sliceObject)))
+        start, stop, step = sliceObject.indices(self.getLength())
         sliceLength = predictSliceLength(start, stop, step)
         if sliceLength != len(values):
             raise ValueError("attempt to assign sequence of size {} to extended slice of size {}"
