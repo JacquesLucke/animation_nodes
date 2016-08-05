@@ -44,7 +44,7 @@ cdef class LISTNAME:
         if isinstance(key, int):
             self.removeValueAtIndex(key)
         elif isinstance(key, slice):
-            raise NotImplemented()
+            raise NotImplementedError()
         else:
             raise TypeError("Expected int or slice object")
 
@@ -91,7 +91,7 @@ cdef class LISTNAME:
 
     cpdef append(self, value):
         cdef BASELISTTYPE valueFlattened = elementToBaseListOfLISTNAME(value)
-        self.base.extend(valueFlattened)
+        self.base.overwrite(valueFlattened, self.base.length)
 
     cpdef extend(self, values):
         for value in values:

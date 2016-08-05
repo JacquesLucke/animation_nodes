@@ -393,7 +393,8 @@ cdef class LISTNAME:
         return index
 
     cdef overwrite(self, LISTNAME other, long index = 0):
-        self.grow(index + other.length)
+        if self.capacity <= index + other.length:
+            self.grow(index + other.length)
         memcpy(self.data + index, other.data, other.length * sizeof(TYPE))
         self.length = max(self.length, index + other.length)
 
