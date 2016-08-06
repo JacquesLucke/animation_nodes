@@ -1,12 +1,22 @@
 import math
 from mathutils import Vector
+from ... data_structures.lists.complex_lists cimport Vector3DList
 
-def gridVertices(xDivisions, yDivisions, xDistance = 1, yDistance = 1, offset = Vector((0, 0, 0))):
-    vertices = []
-    append = vertices.append
+def gridVertices(int xDivisions, int yDivisions, float xDistance = 1, float yDistance = 1, offset = Vector((0, 0, 0))):
+    assert xDivisions >= 0
+    assert yDivisions >= 0
+    cdef:
+        float xOffset, yOffset, zOffset
+        int x, y
+    vertices = Vector3DList(length = xDivisions * yDivisions)
+    xOffset, yOffset, zOffset = offset
+    cdef int tmp
     for x in range(xDivisions):
+        tmp = x * yDivisions
         for y in range(yDivisions):
-            append(Vector((x * xDistance, y * yDistance, 0)) + offset)
+            vertices.base.data[(tmp + y) * 3 + 0] = x * xDistance + xOffset
+            vertices.base.data[(tmp + y) * 3 + 1] = y * yDistance + yOffset
+            vertices.base.data[(tmp + y) * 3 + 2] = zOffset
     return vertices
 
 def tubeVertices(centerPoints, ringPoints, tangents, resolution):

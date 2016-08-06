@@ -98,12 +98,12 @@ class AnimationNodeTree(bpy.types.NodeTree):
 
         allExecutionsSuccessfull = True
 
-        start = time.clock()
+        start = time.perf_counter()
         for unit in units:
             success = unit.execute()
             if not success:
                 allExecutionsSuccessfull = False
-        end = time.clock()
+        end = time.perf_counter()
 
         if allExecutionsSuccessfull:
             self.lastExecutionInfo.executionTime = end - start
