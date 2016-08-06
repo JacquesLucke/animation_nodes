@@ -9,8 +9,8 @@ cdef class LISTNAME:
     # Initialization and Memory Management
     ###############################################
 
-    def __cinit__(self, long length = 0, long allocate = -1):
-        self.base = BASELISTTYPE(length * AMOUNT, allocate * AMOUNT)
+    def __cinit__(self, long length = 0, long capacity = -1):
+        self.base = BASELISTTYPE(length * AMOUNT, capacity * AMOUNT)
 
     def __dealloc__(self):
         pass
