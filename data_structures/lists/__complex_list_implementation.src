@@ -59,6 +59,9 @@ cdef class LISTNAME:
         self.base += other.base
         return self
 
+    def __iter__(self):
+        return LISTNAMEIterator(self)
+
     def __contains__(self, value):
         if len(value) != AMOUNT: raise TypeError("input has wrong type")
         cdef BASELISTTYPE search = BASELISTTYPE.fromValues(value)
@@ -282,3 +285,27 @@ cdef class LISTNAME:
 
     def __repr__(self):
         return "<LISTNAME - {}>".format([self[i] for i in range(self.getLength())])
+
+
+cdef class LISTNAMEIterator:
+    '''
+    Implements the 'Iterator Protocol' that is used to allow iteration
+    over a custom list object (eg with a for loop).
+    An instance of this class is only created in the __iter__ method
+    of the corresponding list type.
+    https://docs.python.org/3.5/library/stdtypes.html#iterator-types
+    '''
+    cdef:
+        LISTNAME source
+        long current
+
+    def __cinit__(self, LISTNAME source):
+        self.source = source
+        self.current = 0
+
+    def __next__(self):
+        if self.current >= self.source.getLength():
+            raise StopIteration()
+        value = getElementFromLISTNAME(self.source, self.current)
+        self.current += 1
+        return value
