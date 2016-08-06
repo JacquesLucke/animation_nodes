@@ -1,4 +1,5 @@
 import bpy
+from .. data_structures import EdgeIndicesList
 from .. base_types.socket import AnimationNodeSocket, ListSocket
 
 class EdgeIndicesSocket(bpy.types.NodeSocket, AnimationNodeSocket):
@@ -39,18 +40,32 @@ class EdgeIndicesListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSocke
     comparable = False
 
     @classmethod
+    def getDefaultValue(cls):
+        return EdgeIndicesList()
+
+    @classmethod
+    def getDefaultValueCode(cls):
+        return "EdgeIndicesList()"
+
+    @classmethod
     def getCopyExpression(cls):
-        return "[edgeIndices[:] for edgeIndices in value]"
+        return "value.copy()"
+
+    @classmethod
+    def getFromValuesCode(cls):
+        return "EdgeIndicesList.fromValues(value)"
+
+    @classmethod
+    def getJoinListsCode(cls):
+        return "EdgeIndicesList.join(value)"
+
+    @classmethod
+    def getReverseCode(cls):
+        return "value.reversed()"
 
     @classmethod
     def correctValue(cls, value):
-        if isinstance(value, list):
-            if all(isEdge(element) for element in value):
-                return value, 0
-        return cls.getDefaultValue(), 2
-
-
-def isEdge(value):
-    if isinstance(value, tuple):
-        return len(value) == 2 and all(isinstance(element, int) for element in value)
-    return False
+        if isinstance(value, EdgeIndicesList):
+            return value, 0
+        try: return EdgeIndicesList.fromValues(value), 1
+        except: return cls.getDefaultValue(), 2
