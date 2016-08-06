@@ -1,5 +1,6 @@
 import bpy
 from bpy.props import *
+from ... data_structures import Vector3DList
 from ... base_types.node import AnimationNode
 
 class BMeshMeshDataNode(bpy.types.Node, AnimationNode):
@@ -27,12 +28,11 @@ class BMeshMeshDataNode(bpy.types.Node, AnimationNode):
 
         yield "else: vertexLocations, edgeIndices, polygonIndices = [], [], []"
 
+    def getVertexLocations(self, bMesh):
+        return Vector3DList.fromValues(v.co for v in bMesh.verts)
 
-    def getVertexLocations(self, BMesh):
-        return [v.co for v in BMesh.verts]
+    def getEdgeIndices(self, bMesh):
+        return [tuple(v.index for v in edge.verts) for edge in bMesh.edges]
 
-    def getEdgeIndices(self, BMesh):
-        return [tuple(v.index for v in edge.verts) for edge in BMesh.edges]
-
-    def getPolygonIndices(self, BMesh):
-        return [tuple(v.index for v in face.verts) for face in BMesh.faces]
+    def getPolygonIndices(self, bMesh):
+        return [tuple(v.index for v in face.verts) for face in bMesh.faces]
