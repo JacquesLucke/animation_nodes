@@ -99,8 +99,11 @@ cdef class LISTNAME:
             raise TypeError("Cannot append the value to LISTNAME")
 
     cpdef extend(self, values):
-        for value in values:
-            self.append(value)
+        if isinstance(values, LISTNAME):
+            self.base.extend((<LISTNAME>values).base)
+        else:
+            for value in values:
+                self.append(value)
 
     cpdef index(self, value):
         return self.searchIndex(value)
