@@ -14,7 +14,8 @@ if dependenciesChanged(declarationTargetPath, dependencies = [declarationSourceP
     declaration = readFile(declarationSourcePath)
 
     parts = []
-    parts.append("from . base_lists cimport FloatList")
+    baseListTypes = [typeData["BASELISTTYPE"] for typeData in complexListsParameters]
+    parts.append("from . base_lists cimport " + ", ".join(baseListTypes))
 
     for typeData in complexListsParameters:
         code = multiReplace(declaration, **typeData)

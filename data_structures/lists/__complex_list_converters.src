@@ -1,12 +1,9 @@
 from mathutils import Vector, Matrix
-from . base_lists cimport FloatList
+from . base_lists cimport FloatList, UIntegerList
 
-cdef getElementFromVector3DList(Vector3DList myList, long index):
-    '''Index has to be valid at this point!'''
-    cdef long baseIndex = index * 3
-    return Vector((myList.base.data[baseIndex + 0],
-                   myList.base.data[baseIndex + 1],
-                   myList.base.data[baseIndex + 2]))
+
+# Vector3DList
+############################################
 
 cdef int elementToArrayOfVector3DList(vector, float* array) except -1:
     '''The array has to be initialized with a length of 3.
@@ -17,17 +14,19 @@ cdef int elementToArrayOfVector3DList(vector, float* array) except -1:
     array[2] = vector[2]
     return 0
 
-cdef getElementFromMatrix4x4List(Matrix4x4List myList, long index):
+cdef getElementFromVector3DList(Vector3DList myList, long index):
     '''Index has to be valid at this point!'''
-    cdef long i = index * 16
-    cdef float* data = myList.base.data
-    return Matrix(((data[i + 0],  data[i + 1],  data[i + 2],  data[i + 3]),
-                   (data[i + 4],  data[i + 5],  data[i + 6],  data[i + 7]),
-                   (data[i + 8],  data[i + 9],  data[i + 10], data[i + 11]),
-                   (data[i + 12], data[i + 13], data[i + 14], data[i + 15])))
+    cdef long baseIndex = index * 3
+    return Vector((myList.base.data[baseIndex + 0],
+                   myList.base.data[baseIndex + 1],
+                   myList.base.data[baseIndex + 2]))
+
+
+# Matrix4x4List
+############################################
 
 cdef int elementToArrayOfMatrix4x4List(matrix, float* array) except -1:
-    '''The array has to be initialized with a length of 3.
+    '''The array has to be initialized with a length of 16.
     Returns 0 on success.'''
     if len(matrix.col) != 4 or len(matrix.row) != 4: return -2
 
@@ -52,3 +51,29 @@ cdef int elementToArrayOfMatrix4x4List(matrix, float* array) except -1:
     array[15] = matrix[3][3]
 
     return 0
+
+cdef getElementFromMatrix4x4List(Matrix4x4List myList, long index):
+    '''Index has to be valid at this point!'''
+    cdef long i = index * 16
+    cdef float* data = myList.base.data
+    return Matrix(((data[i + 0],  data[i + 1],  data[i + 2],  data[i + 3]),
+                   (data[i + 4],  data[i + 5],  data[i + 6],  data[i + 7]),
+                   (data[i + 8],  data[i + 9],  data[i + 10], data[i + 11]),
+                   (data[i + 12], data[i + 13], data[i + 14], data[i + 15])))
+
+
+# EdgeIndicesList
+############################################
+
+cdef int elementToArrayOfEdgeIndicesList(edge, unsigned int* array) except -1:
+    '''The array has to be initialized with a length of 2.
+    Returns 0 on success.'''
+    if len(edge) != 2: return -2
+    array[0] = edge[0]
+    array[1] = edge[1]
+    return 0
+
+cdef getElementFromEdgeIndicesList(EdgeIndicesList myList, long index):
+    '''Index has to be valid at this point!'''
+    cdef long i = index * 2
+    return (myList.base.data[i + 0], myList.base.data[i + 1])
