@@ -1,8 +1,9 @@
 import bpy
 from bpy.props import *
 from mathutils import Vector
-from ... base_types.node import AnimationNode
 from ... events import propertyChanged
+from ... data_structures import Vector3DList
+from ... base_types.node import AnimationNode
 
 class an_EdgesToPlanesNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_EdgesToPlanesNode"
@@ -40,7 +41,7 @@ class an_EdgesToPlanesNode(bpy.types.Node, AnimationNode):
 
 
     def calculatePlanes(self, vertices, edges, width, upVector):
-        newVertices = []
+        newVertices = Vector3DList()
         polygons = []
         appendVertex = newVertices.append
         appendPolygon = polygons.append
