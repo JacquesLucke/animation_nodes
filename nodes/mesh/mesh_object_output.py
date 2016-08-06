@@ -139,8 +139,7 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
             self.errorMessage = "The vertex amounts are not equal"
             return object
 
-        flatVertices = list(itertools.chain.from_iterable(vertices))
-        mesh.vertices.foreach_set("co", flatVertices)
+        mesh.vertices.foreach_set("co", vertices.getMemoryView())
         mesh.update()
 
     def setMaterialIndices(self, mesh, materialIndices):
