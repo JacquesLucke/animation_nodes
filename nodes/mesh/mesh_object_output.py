@@ -103,9 +103,7 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
         # clear existing mesh
         bmesh.new().to_mesh(mesh)
 
-        isValidData = meshData.isValid(
-            checkTupleLengths = self.checkTupleLengths,
-            checkIndices = self.checkIndices)
+        isValidData = meshData.isValid()
 
         if isValidData:
             self.setValidMeshData(mesh, meshData.vertices, meshData.edges, meshData.polygons)
