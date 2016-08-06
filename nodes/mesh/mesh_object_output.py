@@ -108,9 +108,28 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
             checkIndices = self.checkIndices)
 
         if isValidData:
-            mesh.from_pydata(meshData.vertices, meshData.edges, meshData.polygons)
+            self.setValidMeshData(mesh, meshData.vertices, meshData.edges, meshData.polygons)
         else:
             self.errorMessage = "The mesh data is invalid"
+
+    def setValidMeshData(self, mesh, vertices, edges, polygons):
+        from itertools import chain, islice, accumulate
+
+        mesh.vertices.add(len(vertices))
+        mesh.edges.add(len(edges))
+        mesh.loops.add(sum(map(len, polygons)))
+        mesh.polygons.add(len(polygons))
+
+        mesh.vertices.foreach_set("co", vertices.getMemoryView())
+        mesh.edges.foreach_set("vertices", tuple(chain.from_iterable(edges)))
+
+        lengths = tuple(map(len, polygons))
+        vertex_indices = tuple(chain.from_iterable(polygons))
+        loop_starts = tuple(islice(chain([0], accumulate(lengths)), len(polygons)))
+
+        mesh.polygons.foreach_set("loop_total", lengths)
+        mesh.polygons.foreach_set("loop_start", loop_starts)
+        mesh.polygons.foreach_set("vertices", vertex_indices)
 
     def setBMesh(self, mesh, bm):
         bm.to_mesh(mesh)
