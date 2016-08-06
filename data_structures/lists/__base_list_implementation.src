@@ -3,7 +3,7 @@ from types import GeneratorType
 from libc.stdlib cimport malloc, free, realloc
 from libc.string cimport memcpy, memmove, memcmp
 from ... algorithms.lists.convert import toLISTNAME
-from ... utils.slicing cimport predictSliceLength, makeStepPositive
+from ... utils.slicing cimport predictSliceLength, makeStepPositive, removeValuesInSlice
 
 @cython.freelist(10)
 cdef class LISTNAME:
@@ -307,37 +307,13 @@ cdef class LISTNAME:
             self.data[i] = value
 
     cdef removeValuesInSlice(self, slice sliceObject):
-        cdef:
-            long start, stop, step
-            long removeAmount
-            long i, stepMinusOne
-            TYPE* sliceStart
-
+        cdef long start, stop, step
         start, stop, step = sliceObject.indices(len(self))
-        if step < 0:
-            start, stop, step = makeStepPositive(start, stop, step)
-        removeAmount = predictSliceLength(start, stop, step)
-        if removeAmount == 0: return
-
-        sliceStart = self.data + start
-        stepMinusOne = step - 1
-
-        if step == 1:
-            memmove(sliceStart,
-                    self.data + stop,
-                    sizeof(TYPE) * (self.length - start - removeAmount))
-        elif step > 1:
-            # Move values between the steps
-            for i in range(removeAmount - 1):
-                memmove(sliceStart + i * stepMinusOne,
-                        sliceStart + i * step + 1,
-                        sizeof(TYPE) * stepMinusOne)
-
-            # Move values behind the last step
-            memmove(sliceStart + (removeAmount - 1) * stepMinusOne,
-                    sliceStart + (removeAmount - 1) * step + 1,
-                    sizeof(TYPE) * (self.length - (start + (removeAmount - 1) * step + 1)))
-
+        cdef long removeAmount = removeValuesInSlice(
+                    arrayStart = <char*>self.data,
+                    arrayLength = self.length * sizeof(TYPE),
+                    elementSize = sizeof(TYPE),
+                    start = start, stop = stop, step = step)
         self.length -= removeAmount
 
 

@@ -1,7 +1,7 @@
 cimport cython
 from libc.stdlib cimport malloc, free
 from libc.string cimport memcpy, memmove, memcmp
-from ... utils.slicing cimport predictSliceLength
+from ... utils.slicing cimport predictSliceLength, makeStepPositive, removeValuesInSlice
 
 @cython.freelist(10)
 cdef class LISTNAME:
@@ -45,7 +45,7 @@ cdef class LISTNAME:
         if isinstance(key, int):
             self.removeValueAtIndex(key)
         elif isinstance(key, slice):
-            raise NotImplementedError()
+            self.removeValuesInSlice(key)
         else:
             raise TypeError("Expected int or slice object")
 
@@ -238,6 +238,16 @@ cdef class LISTNAME:
 
         for index, value in zip(range(start, stop, step), values):
             self.setValueAtIndex(index, value)
+
+    cdef removeValuesInSlice(self, sliceObject):
+        cdef long start, stop, step
+        start, stop, step = sliceObject.indices(len(self))
+        cdef long removeAmount = removeValuesInSlice(
+                    arrayStart = <char*>self.base.data,
+                    arrayLength = self.base.length * sizeof(BASETYPE),
+                    elementSize = sizeof(BASETYPE) * AMOUNT,
+                    start = start, stop = stop, step = step)
+        self.base.length -= removeAmount * AMOUNT
 
     @classmethod
     def join(cls, *sourceLists):

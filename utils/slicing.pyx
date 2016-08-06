@@ -1,3 +1,4 @@
+from libc.string cimport memmove
 from libc.math cimport ceil, floor
 
 cpdef long predictSliceLength(long start, long stop, long step):
@@ -22,3 +23,28 @@ cpdef makeStepPositive(long start, long stop, long step):
         newEnd = start + 1
         newStep = -step
     return newStart, newEnd, newStep
+
+cdef removeValuesInSlice(char* arrayStart, long arrayLength, long elementSize,
+                         long start, long stop, long step):
+    cdef long removeAmount, i
+
+    if step < 0: start, stop, step = makeStepPositive(start, stop, step)
+    removeAmount = predictSliceLength(start, stop, step)
+
+    if step == 1:
+        memmove(arrayStart + start * elementSize,
+                arrayStart + stop * elementSize,
+                arrayLength - stop * elementSize)
+    elif step > 1:
+        # Move values between the steps
+        for i in range(removeAmount - 1):
+            memmove(arrayStart + (start + i * (step - 1)) * elementSize,
+                    arrayStart + (start + i * step + 1) * elementSize,
+                    (step - 1) * elementSize)
+
+        # Move values behind the last step
+        memmove(arrayStart + (start + (step - 1) * (removeAmount - 1)) * elementSize,
+                arrayStart + (start + (removeAmount - 1) * step + 1) * elementSize,
+                arrayLength - (start + (removeAmount - 1) * step + 1) * elementSize)
+
+    return removeAmount
