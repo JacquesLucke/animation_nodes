@@ -7,9 +7,9 @@ from . lists.complex_lists cimport Vector3DList, EdgeIndicesList
 
 cdef class MeshData:
     cdef:
-        Vector3DList vertices
-        EdgeIndicesList edges
-        list polygons
+        public Vector3DList vertices
+        public EdgeIndicesList edges
+        public list polygons
 
     def __cinit__(self, Vector3DList vertices, EdgeIndicesList edges, list polygons):
         self.vertices = vertices
@@ -38,9 +38,9 @@ cdef class MeshData:
         return all(amount >= 3 for amount in polygonTupleLengths)
 
     def hasValidPolygonIndices(self):
-        maxPolygonIndex = max(itertools.chain([-1], *self.polygons))
         minPolygonIndex = min(itertools.chain([0], *self.polygons))
-        return 0 <= minPolygonIndex <= maxPolygonIndex <= len(self.vertices)
+        maxPolygonIndex = max(itertools.chain([-1], *self.polygons))
+        return 0 <= minPolygonIndex and maxPolygonIndex <= len(self.vertices)
 
 
 def copyVectorList(list):
