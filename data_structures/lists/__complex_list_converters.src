@@ -1,4 +1,4 @@
-from mathutils import Vector
+from mathutils import Vector, Matrix
 from . base_lists cimport FloatList
 
 cdef getElementFromVector3DList(Vector3DList myList, long index):
@@ -15,4 +15,40 @@ cdef int elementToArrayOfVector3DList(vector, float* array) except -1:
     array[0] = vector[0]
     array[1] = vector[1]
     array[2] = vector[2]
+    return 0
+
+cdef getElementFromMatrix4x4List(Matrix4x4List myList, long index):
+    '''Index has to be valid at this point!'''
+    cdef long i = index * 16
+    cdef float* data = myList.base.data
+    return Matrix(((data[i + 0],  data[i + 1],  data[i + 2],  data[i + 3]),
+                   (data[i + 4],  data[i + 5],  data[i + 6],  data[i + 7]),
+                   (data[i + 8],  data[i + 9],  data[i + 10], data[i + 11]),
+                   (data[i + 12], data[i + 13], data[i + 14], data[i + 15])))
+
+cdef int elementToArrayOfMatrix4x4List(matrix, float* array) except -1:
+    '''The array has to be initialized with a length of 3.
+    Returns 0 on success.'''
+    if len(matrix.col) != 4 or len(matrix.row) != 4: return -2
+
+    array[0] = matrix[0][0]
+    array[1] = matrix[0][1]
+    array[2] = matrix[0][2]
+    array[3] = matrix[0][3]
+
+    array[4] = matrix[1][0]
+    array[5] = matrix[1][1]
+    array[6] = matrix[1][2]
+    array[7] = matrix[1][3]
+
+    array[8] = matrix[2][0]
+    array[9] = matrix[2][1]
+    array[10] = matrix[2][2]
+    array[11] = matrix[2][3]
+
+    array[12] = matrix[3][0]
+    array[13] = matrix[3][1]
+    array[14] = matrix[3][2]
+    array[15] = matrix[3][3]
+
     return 0

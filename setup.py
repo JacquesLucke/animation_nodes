@@ -185,7 +185,11 @@ complexListsParameters = [
     dict(BASELISTTYPE = "FloatList",
          LISTNAME = "Vector3DList",
          BASETYPE = "float",
-         AMOUNT = "3")
+         AMOUNT = "3"),
+    dict(BASELISTTYPE = "FloatList",
+         LISTNAME = "Matrix4x4List",
+         BASETYPE = "float",
+         AMOUNT = "16")
 ]
 
 main()
