@@ -121,7 +121,7 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
         mesh.polygons.add(len(polygons))
 
         mesh.vertices.foreach_set("co", vertices.getMemoryView())
-        mesh.edges.foreach_set("vertices", tuple(chain.from_iterable(edges)))
+        mesh.edges.foreach_set("vertices", edges.getMemoryView())
 
         lengths = tuple(map(len, polygons))
         vertex_indices = tuple(chain.from_iterable(polygons))

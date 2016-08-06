@@ -1,3 +1,5 @@
+from ... data_structures import EdgeIndicesList
+
 class GridMeshIndices:
     @classmethod
     def quadPolygons(cls, xDivisions, yDivisions, joinHorizontal = False, joinVertical = False):
@@ -40,7 +42,7 @@ class GridMeshIndices:
 
     @staticmethod
     def innerQuadEdges(xDivisions, yDivisions):
-        edges = []
+        edges = EdgeIndicesList()
         for i in range((xDivisions - 1) * yDivisions):
             edges.append((i, i + yDivisions))
         for i in range(yDivisions - 1):
