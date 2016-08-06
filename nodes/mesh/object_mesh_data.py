@@ -2,6 +2,7 @@ import bpy
 from bpy.props import *
 from ... events import isRendering
 from ... utils.math import extractRotation
+from ... data_structures import Vector3DList
 from ... base_types.node import AnimationNode
 
 class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
@@ -50,11 +51,16 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
 
 
     def getVertexLocations(self, mesh, object, useWorldSpace):
+
         if useWorldSpace:
+            # TODO
             matrix = object.matrix_world
-            return [matrix * v.co for v in mesh.vertices]
+            return Vector3DList.fromValues([matrix * v.co for v in mesh.vertices])
         else:
-            return [v.co.copy() for v in mesh.vertices]
+            #return Vector3DList.fromValues([v.co.copy() for v in mesh.vertices])
+            vertexLocations = Vector3DList(length = len(mesh.vertices))
+            mesh.vertices.foreach_get("co", vertexLocations.getMemoryView())
+            return vertexLocations
 
     def getEdgeIndices(self, mesh):
         return [tuple(edge.vertices) for edge in mesh.edges]

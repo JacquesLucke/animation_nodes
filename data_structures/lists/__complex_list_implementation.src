@@ -283,6 +283,9 @@ cdef class LISTNAME:
         newList.extend(values)
         return newList
 
+    cpdef BASETYPE[:] getMemoryView(self):
+        return self.base.getMemoryView()
+
     def __repr__(self):
         return "<LISTNAME {}>".format([self[i] for i in range(self.getLength())])
 
