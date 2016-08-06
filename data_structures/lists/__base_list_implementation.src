@@ -398,6 +398,12 @@ cdef class LISTNAME:
         memcpy(self.data + index, other.data, other.length * sizeof(TYPE))
         self.length = max(self.length, index + other.length)
 
+    cdef overwriteArray(self, TYPE* array, long arrayLength, long index):
+        if self.capacity <= index + arrayLength:
+            self.grow(index + arrayLength)
+        memcpy(self.data + index, array, arrayLength * sizeof(TYPE))
+        self.length = max(self.length, index + arrayLength)
+
 
     # High level utilities
     ###############################################

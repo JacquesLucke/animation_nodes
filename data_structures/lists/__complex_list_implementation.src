@@ -1,4 +1,5 @@
 cimport cython
+from libc.stdlib cimport malloc, free
 from libc.string cimport memcpy, memmove, memcmp
 from ... utils.slicing cimport predictSliceLength
 
@@ -90,8 +91,12 @@ cdef class LISTNAME:
         self.base.clear()
 
     cpdef append(self, value):
-        cdef BASELISTTYPE valueFlattened = elementToBaseListOfLISTNAME(value)
-        self.base.overwrite(valueFlattened, self.base.length)
+        if self.base.capacity < self.base.length + AMOUNT:
+            self.base.grow(self.base.length + AMOUNT)
+        if 0 == elementToArrayOfLISTNAME(value, self.base.data + self.base.length):
+            self.base.length += AMOUNT
+        else:
+            raise TypeError("Cannot append the value to LISTNAME")
 
     cpdef extend(self, values):
         for value in values:
@@ -101,23 +106,24 @@ cdef class LISTNAME:
         return self.searchIndex(value)
 
     cdef searchIndex(self, value):
-        if len(value) != AMOUNT: raise TypeError("value has wrong type")
-        cdef BASELISTTYPE search = elementToBaseListOfLISTNAME(value)
+        cdef BASETYPE search[AMOUNT]
+        if 0 != elementToArrayOfLISTNAME(value, search):
+            raise TypeError("Value has to be an element of LISTNAME")
         cdef long i
         for i in range(self.getLength()):
-            if 0 == memcmp(search.data,
+            if 0 == memcmp(search,
                            self.base.data + i * AMOUNT,
                            sizeof(BASETYPE) * AMOUNT):
                 return i
         raise ValueError("value not in list")
 
     cpdef count(self, value):
-        if len(value) != AMOUNT:
-            raise TypeError("value has wrong type")
-        cdef BASELISTTYPE search = elementToBaseListOfLISTNAME(value)
+        cdef BASETYPE search[AMOUNT]
+        if 0 != elementToArrayOfLISTNAME(value, search):
+            raise TypeError("Value has to be an element of LISTNAME")
         cdef long i, counter = 0
         for i in range(self.getLength()):
-            if 0 == memcmp(search.data,
+            if 0 == memcmp(search,
                            self.base.data + i * AMOUNT,
                            sizeof(BASETYPE) * AMOUNT):
                 counter += 1
@@ -135,9 +141,11 @@ cdef class LISTNAME:
         if index < 0: index += self.getLength()
         if index < 0: index = 0
 
-        cdef BASELISTTYPE valueFlattened
-        valueFlattened = elementToBaseListOfLISTNAME(value)
-        self.base.setValuesInSimpleSlice(index * AMOUNT, index * AMOUNT, valueFlattened)
+        cdef BASELISTTYPE valueFlattened = BASELISTTYPE(length = AMOUNT)
+        if 0 == elementToArrayOfLISTNAME(value, valueFlattened.data):
+            self.base.setValuesInSimpleSlice(index * AMOUNT, index * AMOUNT, valueFlattened)
+        else:
+            raise TypeError("Value has to be an element of LISTNAME")
 
 
 
@@ -151,8 +159,11 @@ cdef class LISTNAME:
 
     cdef setValueAtIndex(self, long index, value):
         index = self.tryCorrectIndex(index)
-        cdef BASELISTTYPE valueFlattened = elementToBaseListOfLISTNAME(value)
-        self.base.overwrite(valueFlattened, index * AMOUNT)
+        cdef BASETYPE valueArray[AMOUNT]
+        if 0 == elementToArrayOfLISTNAME(value, valueArray):
+            self.base.overwriteArray(valueArray, AMOUNT, index * AMOUNT)
+        else:
+            raise TypeError("Value has to be an element of LISTNAME")
 
     cdef removeValueAtIndex(self, long index):
         index = self.tryCorrectIndex(index)

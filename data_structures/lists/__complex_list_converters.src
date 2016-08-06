@@ -8,10 +8,11 @@ cdef getElementFromVector3DList(Vector3DList myList, long index):
                    myList.base.data[baseIndex + 1],
                    myList.base.data[baseIndex + 2]))
 
-cdef elementToBaseListOfVector3DList(vector):
-    if len(vector) != 3: raise TypeError("Invalid Vector Length. Expected 3.")
-    cdef FloatList element = FloatList.__new__(FloatList, length = 3)
-    element.data[0] = vector[0]
-    element.data[1] = vector[1]
-    element.data[2] = vector[2]
-    return element
+cdef int elementToArrayOfVector3DList(vector, float* array) except -1:
+    '''The array has to be initialized with a length of 3.
+    Returns 0 on success.'''
+    if len(vector) != 3: return -2
+    array[0] = vector[0]
+    array[1] = vector[1]
+    array[2] = vector[2]
+    return 0
