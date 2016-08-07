@@ -2,8 +2,8 @@ import bpy
 from bpy.props import *
 from ... events import isRendering
 from ... utils.math import extractRotation
-from ... data_structures import Vector3DList
 from ... base_types.node import AnimationNode
+from ... data_structures import Vector3DList, EdgeIndicesList
 
 class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectMeshDataNode"
@@ -57,13 +57,14 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
             matrix = object.matrix_world
             return Vector3DList.fromValues([matrix * v.co for v in mesh.vertices])
         else:
-            #return Vector3DList.fromValues([v.co.copy() for v in mesh.vertices])
             vertexLocations = Vector3DList(length = len(mesh.vertices))
             mesh.vertices.foreach_get("co", vertexLocations.getMemoryView())
             return vertexLocations
 
     def getEdgeIndices(self, mesh):
-        return [tuple(edge.vertices) for edge in mesh.edges]
+        edges = EdgeIndicesList(length = len(mesh.edges))
+        mesh.edges.foreach_get("vertices", edges.getMemoryView())
+        return edges
 
     def getPolygonIndices(self, mesh):
         return [tuple(face.vertices) for face in mesh.polygons]

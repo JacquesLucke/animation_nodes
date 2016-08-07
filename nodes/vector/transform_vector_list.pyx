@@ -1,6 +1,9 @@
 import bpy
 from ... base_types.node import AnimationNode
-from ... utils.cmath cimport *
+
+from ... math.conversion cimport toMatrix4
+from ... math.ctypes cimport Matrix4, Vector3
+from ... math.base_operations cimport transformVec3
 from ... data_structures.lists.complex_lists cimport Vector3DList
 
 class TransformVectorListNode(bpy.types.Node, AnimationNode):
@@ -13,11 +16,11 @@ class TransformVectorListNode(bpy.types.Node, AnimationNode):
         self.newOutput("Vector List", "Vectors List", "vectors")
 
     def execute(self, Vector3DList vectors, matrix):
-        cdef Matrix4_t m
-        applyMatrix(&m, matrix)
+        cdef Matrix4 mat
+        toMatrix4(&mat, matrix)
 
         cdef long i
-        cdef Vector3_t* v = <Vector3_t*>vectors.base.data
+        cdef Vector3* v = <Vector3*>vectors.base.data
         for i in range(len(vectors)):
-            transformVec3(v+i, v+i, &m)
+            transformVec3(v+i, v+i, &mat)
         return vectors
