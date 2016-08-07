@@ -1,7 +1,6 @@
 import bpy
 from bpy.props import *
 from ... events import isRendering
-from ... utils.math import extractRotation
 from ... base_types.node import AnimationNode
 from ... math.list_operations import transformVector3DList
 from ... data_structures import Vector3DList, EdgeIndicesList
