@@ -11,4 +11,7 @@ cdef class PolygonIndicesList:
     cpdef append(self, value)
     cpdef extend(self, values)
 
+    cdef getElementAtIndex(self, long index)
+
     cdef isValueValid(self, value)
+    cdef tryCorrectIndex(self, long index)

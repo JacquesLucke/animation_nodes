@@ -14,6 +14,11 @@ cdef class PolygonIndicesList:
     cdef long getLength(self):
         return self.loopStarts.length
 
+    def __getitem__(self, key):
+        if isinstance(key, int):
+            return self.getElementAtIndex(key)
+        raise TypeError("expected int")
+
     # Base operations for lists - mimic python list
     ###############################################
 
@@ -31,6 +36,23 @@ cdef class PolygonIndicesList:
     cpdef extend(self, values):
         for value in values:
             self.append(value)
+
+
+    # Utilities for setting and getting
+    ###############################################
+
+    cdef getElementAtIndex(self, long index):
+        index = self.tryCorrectIndex(index)
+        cdef long start = self.loopStarts.data[index]
+        cdef long length = self.loopLengths.data[index]
+        return tuple(self.indices.data[i] for i in range(start, start + length))
+
+    cdef tryCorrectIndex(self, long index):
+        if index < 0:
+            index += self.getLength()
+        if index < 0 or index >= self.getLength():
+            raise IndexError("list index out of range")
+        return index
 
 
     # Classmethods for List Creation
