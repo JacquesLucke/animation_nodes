@@ -66,3 +66,30 @@ class TestCopyWithNewOrder(TestCase):
         order = ULongList.fromValues([1, 0, 4, 2])
         with self.assertRaises(IndexError):
             newList = self.list.copyWithNewOrder(order)
+
+class TestGetValuesInSlice(TestCase):
+    def setUp(self):
+        self.list = PolygonIndicesList.fromValues([
+            (1, 2, 3), (4, 5, 6, 7), (8, 9, 0), (3, 4, 5),
+            (5, 4, 2), (2, 7, 6), (3, 4, 6, 2, 8), (5, 3, 2)])
+
+    def testStart(self):
+        newList = self.list[:3]
+        self.assertEquals(len(newList), 3)
+        self.assertEquals(newList[0], (1, 2, 3))
+        self.assertEquals(newList[1], (4, 5, 6, 7))
+        self.assertEquals(newList[2], (8, 9, 0))
+
+    def testEnd(self):
+        newList = self.list[-3:]
+        self.assertEquals(len(newList), 3)
+        self.assertEquals(newList[0], (2, 7, 6))
+        self.assertEquals(newList[1], (3, 4, 6, 2, 8))
+        self.assertEquals(newList[2], (5, 3, 2))
+
+    def testComplex(self):
+        newList = self.list[2:-1:2]
+        self.assertEquals(len(newList), 3)
+        self.assertEquals(newList[0], (8, 9, 0))
+        self.assertEquals(newList[1], (5, 4, 2))
+        self.assertEquals(newList[2], (3, 4, 6, 2, 8))

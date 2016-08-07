@@ -13,6 +13,7 @@ cdef class PolygonIndicesList:
     cpdef copy(self)
 
     cdef getElementAtIndex(self, long index)
+    cdef getValuesInSlice(self, slice sliceObject)
 
     cdef isValueValid(self, value)
     cdef tryCorrectIndex(self, long index)

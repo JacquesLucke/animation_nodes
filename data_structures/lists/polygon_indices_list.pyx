@@ -17,7 +17,9 @@ cdef class PolygonIndicesList:
     def __getitem__(self, key):
         if isinstance(key, int):
             return self.getElementAtIndex(key)
-        raise TypeError("expected int")
+        elif isinstance(key, slice):
+            return self.getValuesInSlice(key)
+        raise TypeError("expected int or slice")
 
     def __iter__(self):
         return PolygonIndicesListIterator(self)
@@ -65,6 +67,10 @@ cdef class PolygonIndicesList:
             raise IndexError("list index out of range")
         return index
 
+    cdef getValuesInSlice(self, slice sliceObject):
+        cdef ULongList order = ULongList.fromValues(range(*sliceObject.indices(self.getLength())))
+        return self.copyWithNewOrder(order, checkIndices = False)
+
     def copyWithNewOrder(self, ULongList newOrder, checkIndices = True):
         cdef PolygonIndicesList newList = PolygonIndicesList()
 
@@ -91,7 +97,7 @@ cdef class PolygonIndicesList:
         cdef ULongList newOrder = ULongList(length = length)
         for i in range(length):
             newOrder.data[i] = length - i - 1
-        return self.copyWithNewOrder(newOrder)
+        return self.copyWithNewOrder(newOrder, checkIndices = False)
 
 
     # Classmethods for List Creation
