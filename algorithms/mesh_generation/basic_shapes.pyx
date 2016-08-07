@@ -19,6 +19,27 @@ def gridVertices(int xDivisions, int yDivisions, float xDistance = 1, float yDis
             vertices.base.data[(tmp + y) * 3 + 2] = zOffset
     return vertices
 
+def lineVertices(start, end, long steps):
+    assert steps >= 2
+    cdef:
+        float _start[3]
+        float _end[3]
+        float stepsInverse = 1 / <float>(steps - 1)
+        float startWeight, endWeight
+        long i
+
+    _start = start
+    _end = end
+
+    vertices = Vector3DList(length = steps)
+    for i in range(steps):
+        startWeight = i * (1 - stepsInverse)
+        endWeight = i * stepsInverse
+        vertices.base.data[i * 3 + 0] = _start[0] * startWeight + _end[0] * endWeight
+        vertices.base.data[i * 3 + 1] = _start[1] * startWeight + _end[1] * endWeight
+        vertices.base.data[i * 3 + 2] = _start[2] * startWeight + _end[2] * endWeight
+    return vertices
+
 def tubeVertices(centerPoints, ringPoints, tangents, resolution):
     vertices = []
     for center, pointOnCircle, tangent in zip(centerPoints, ringPoints, tangents):

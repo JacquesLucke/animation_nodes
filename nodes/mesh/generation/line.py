@@ -1,5 +1,6 @@
 import bpy
 from .... base_types.node import AnimationNode
+from .... algorithms.mesh_generation.basic_shapes import lineVertices
 
 class LineMeshNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_LineMeshNode"
@@ -14,7 +15,6 @@ class LineMeshNode(bpy.types.Node, AnimationNode):
 
     def execute(self, start, end, steps):
         steps = max(steps, 2)
-        divisor = steps - 1
-        vertices = [start * (1 - i / divisor) + end * i / divisor for i in range(steps)]
+        vertices = lineVertices(start, end, steps)
         edges = [(i, i + 1) for i in range(steps - 1)]
         return vertices, edges
