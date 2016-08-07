@@ -1,7 +1,7 @@
 cimport cython
 from libc.stdlib cimport malloc, free
 from libc.string cimport memcpy, memmove, memcmp
-from ... utils.slicing cimport predictSliceLength, makeStepPositive, removeValuesInSlice
+from . utils cimport predictSliceLength, makeStepPositive, removeValuesInSlice
 
 @cython.freelist(10)
 cdef class LISTNAME:

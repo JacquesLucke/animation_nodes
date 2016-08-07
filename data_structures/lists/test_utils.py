@@ -1,5 +1,5 @@
 from unittest import TestCase
-from . slicing import predictSliceLength, makeStepPositive
+from . utils import predictSliceLength, makeStepPositive
 
 class TestPredictSliceLength(TestCase):
     def testSimple(self):
