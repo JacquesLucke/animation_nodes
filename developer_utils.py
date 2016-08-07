@@ -33,6 +33,7 @@ def setup_addon_modules(path, package_name, reload):
     def reload_modules(modules):
         modules.sort(key = lambda module: getattr(module, "__reload_order_index__", 0))
         for module in modules:
+            # does not reload extension modules
             importlib.reload(module)
 
     names = get_submodule_names()
