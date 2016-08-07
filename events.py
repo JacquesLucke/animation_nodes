@@ -2,6 +2,7 @@ import bpy
 from . import tree_info
 from . import event_handler
 from . utils.handlers import eventHandler
+from . execution.measurements import resetMeasurements
 
 class EventState:
     def __init__(self):
@@ -50,6 +51,7 @@ def frameChanged(scene):
 
 def propertyChanged(self = None, context = None):
     event.propertyChanged = True
+    resetMeasurements()
 
 @eventHandler("FILE_LOAD_POST")
 def fileLoaded():

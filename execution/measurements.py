@@ -7,22 +7,25 @@ from .. utils.operators import makeOperator
 from .. utils.blender_ui import iterNodeCornerLocations
 
 class NodeMeasurements:
-    __slots__ = ("totalTime", "calls")
+    __slots__ = ("minTime", "totalTime", "calls")
 
     def __init__(self):
         self.totalTime = 0
         self.calls = 0
+        self.minTime = 1e10
 
-    @property
-    def averageTime(self):
-        return self.totalTime / max(self.calls, 1)
+    def registerTime(self, time):
+        self.calls += 1
+        self.totalTime += time
+        if time < self.minTime:
+            self.minTime = time
 
     def __repr__(self):
         return textwrap.dedent("""\
-            Average: {}
+            Min: {}
             Total: {}
             Calls: {:,d}\
-            """.format(prettyTime(self.averageTime),
+            """.format(prettyTime(self.minTime),
                        prettyTime(self.totalTime),
                        self.calls))
 
