@@ -1,5 +1,5 @@
+from . import grid
 from . basic_shapes import tubeVertices
-from . indices_utils import GridMeshIndices
 from ... data_structures.splines import BezierSpline, PolySpline
 
 # Loft
@@ -52,7 +52,7 @@ def loftSplines(splines,
     def calculatePolygonIndices():
         allSplinesCyclic = all(spline.isCyclic for spline in splines)
         isRealCyclic = cyclic and startSurfaceParameter <= 0.0 and endSurfaceParameter >= 1.0
-        return GridMeshIndices.quadPolygons(
+        return grid.quadPolygons(
                    nSplineSamples, nSurfaceSamples,
                    joinHorizontal = allSplinesCyclic,
                    joinVertical = isRealCyclic)
@@ -78,6 +78,6 @@ def revolveProfileAroundAxis(axis, profile, nSplineSamples, nSurfaceSamples, typ
             tangents.append(tangent)
 
     vertices = tubeVertices(axisSamples, profileSamples, tangents, nSurfaceSamples)
-    polygons = GridMeshIndices.quadPolygons(nSplineSamples, nSurfaceSamples, joinVertical = True)
+    polygons = grid.quadPolygons(nSplineSamples, nSurfaceSamples, joinVertical = True)
 
     return vertices, polygons

@@ -3,8 +3,7 @@ from bpy.props import *
 from mathutils import Vector
 from .... events import executionCodeChanged
 from .... base_types.node import AnimationNode
-from .... algorithms.mesh_generation.basic_shapes import gridVertices
-from .... algorithms.mesh_generation.indices_utils import GridMeshIndices
+from .... algorithms.mesh_generation import grid
 
 class GridMeshNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GridMeshNode"
@@ -34,8 +33,8 @@ class GridMeshNode(bpy.types.Node, AnimationNode):
         offset.x -= (xDivisions - 1) * xDistance / 2 if self.centerGrid else 0
         offset.y -= (yDivisions - 1) * yDistance / 2 if self.centerGrid else 0
 
-        vertices = gridVertices(xDivisions, yDivisions, xDistance, yDistance, offset) if self.outputs[0].isLinked else []
-        edgeIndices = GridMeshIndices.innerQuadEdges(xDivisions, yDivisions) if self.outputs[1].isLinked else []
-        polygonIndices = GridMeshIndices.innerQuadPolygons(xDivisions, yDivisions) if self.outputs[2].isLinked else []
+        vertices = grid.vertices(xDivisions, yDivisions, xDistance, yDistance, offset) if self.outputs[0].isLinked else []
+        edgeIndices = grid.innerQuadEdges(xDivisions, yDivisions) if self.outputs[1].isLinked else []
+        polygonIndices = grid.innerQuadPolygons(xDivisions, yDivisions) if self.outputs[2].isLinked else []
 
         return vertices, edgeIndices, polygonIndices
