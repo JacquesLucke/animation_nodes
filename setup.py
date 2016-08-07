@@ -39,7 +39,6 @@ if v.major < 3 or v.minor < 5:
     sys.exit()
 
 import os
-import re
 import shutil
 from io import StringIO
 from itertools import chain
