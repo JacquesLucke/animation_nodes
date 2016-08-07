@@ -1,4 +1,5 @@
 import bpy
+from .. data_structures import PolygonIndicesList
 from .. base_types.socket import AnimationNodeSocket, ListSocket
 
 class PolygonIndicesSocket(bpy.types.NodeSocket, AnimationNodeSocket):
@@ -39,18 +40,32 @@ class PolygonIndicesListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSo
     comparable = False
 
     @classmethod
+    def getDefaultValue(cls):
+        return PolygonIndicesList()
+
+    @classmethod
+    def getDefaultValueCode(cls):
+        return "PolygonIndicesList()"
+
+    @classmethod
     def getCopyExpression(cls):
-        return "[polygonIndices[:] for polygonIndices in value]"
+        return "value.copy()"
+
+    @classmethod
+    def getFromValuesCode(cls):
+        return "PolygonIndicesList.fromValues(value)"
+
+    @classmethod
+    def getJoinListsCode(cls):
+        return "PolygonIndicesList.join(value)"
+
+    @classmethod
+    def getReverseCode(cls):
+        return "value.reversed()"
 
     @classmethod
     def correctValue(cls, value):
-        if isinstance(value, list):
-            if all(isPolygon(element) for element in value):
-                return value, 0
-        return cls.getDefaultValue(), 2
-
-
-def isPolygon(value):
-    if isinstance(value, tuple):
-        return len(value) >= 3 and all(isinstance(element, int) for element in value)
-    return False
+        if isinstance(value, PolygonIndicesList):
+            return value, 0
+        try: return PolygonIndicesList.fromValues(value), 1
+        except: return cls.getDefaultValue(), 2

@@ -1,8 +1,9 @@
 def importDataStructures():
     from . struct import ANStruct
     from . meshes.mesh_data import MeshData
-    from . lists.base_lists import FloatList, DoubleList, LongLongList, IntegerList, UShortList, CharList
+    from . lists.polygon_indices_list import PolygonIndicesList
     from . lists.complex_lists import Vector3DList, Matrix4x4List, EdgeIndicesList
+    from . lists.base_lists import FloatList, DoubleList, LongLongList, IntegerList, UShortList, CharList
     return locals()
 
 dataStructures = importDataStructures()
