@@ -11,7 +11,7 @@ class JoinMeshDataList(bpy.types.Node, AnimationNode):
         self.newOutput("Mesh Data", "Mesh Data", "meshData")
 
     def execute(self, meshDataList):
-        meshData = MeshData([], [], [])
+        meshData = MeshData()
         offset = 0
         for mesh in meshDataList:
             meshData.vertices.extend(mesh.vertices)
