@@ -67,6 +67,7 @@ def addonChanged():
 
 def executionCodeChanged(self = None, context = None):
     treeChanged()
+    propertyChanged()
 
 def networkChanged(self = None, context = None):
     treeChanged()

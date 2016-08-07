@@ -1,6 +1,6 @@
 import bpy
+from ... data_structures import MeshData
 from ... base_types.node import AnimationNode
-from ... data_structures.mesh import MeshData
 
 class CombineMeshDataNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CombineMeshDataNode"

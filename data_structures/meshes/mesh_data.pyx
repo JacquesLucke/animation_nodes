@@ -1,17 +1,20 @@
-import bpy
-import bmesh
 import itertools
-from mathutils import Vector
-
-from . lists.complex_lists cimport Vector3DList, EdgeIndicesList
+from .. lists.complex_lists cimport Vector3DList, EdgeIndicesList
 
 cdef class MeshData:
     cdef:
-        public Vector3DList vertices
-        public EdgeIndicesList edges
-        public list polygons
+        readonly Vector3DList vertices
+        readonly EdgeIndicesList edges
+        readonly list polygons
 
-    def __cinit__(self, Vector3DList vertices, EdgeIndicesList edges, list polygons):
+    def __cinit__(self, Vector3DList vertices = None,
+                        EdgeIndicesList edges = None,
+                        list polygons = None):
+
+        if vertices is None: vertices = Vector3DList()
+        if edges is None: edges = EdgeIndicesList()
+        if polygons is None: polygons = list()
+
         self.vertices = vertices
         self.edges = edges
         self.polygons = polygons
@@ -24,14 +27,15 @@ cdef class MeshData:
         return MeshData(self.vertices.copy(), self.edges.copy(), copy2dList(self.polygons))
 
     def isValid(self):
+        if len(self.edges) > 0:
+            if self.edges.base.getMaxValue() >= len(self.vertices):
+                return False
         try:
-            if self.edges.base.getMaxValue() >= len(self.vertices): return False
             if not self.hasValidPolygonTupleLengths(): return False
             if not self.hasValidPolygonIndices(): return False
         except:
             return False
         return True
-
 
     def hasValidPolygonTupleLengths(self):
         polygonTupleLengths = set(map(len, self.polygons))
@@ -40,7 +44,7 @@ cdef class MeshData:
     def hasValidPolygonIndices(self):
         minPolygonIndex = min(itertools.chain([0], *self.polygons))
         maxPolygonIndex = max(itertools.chain([-1], *self.polygons))
-        return 0 <= minPolygonIndex and maxPolygonIndex <= len(self.vertices)
+        return 0 <= minPolygonIndex and maxPolygonIndex < len(self.vertices)
 
 
 def copyVectorList(list):

@@ -1,10 +1,10 @@
 import bpy
 from bpy.props import *
 from mathutils import Vector
-from .... base_types.node import AnimationNode
-from .... algorithms.mesh_generation.indices_utils import GridMeshIndices
-from .... algorithms.mesh_generation.basic_shapes import gridVertices
 from .... events import executionCodeChanged
+from .... base_types.node import AnimationNode
+from .... algorithms.mesh_generation.basic_shapes import gridVertices
+from .... algorithms.mesh_generation.indices_utils import GridMeshIndices
 
 class GridMeshNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GridMeshNode"

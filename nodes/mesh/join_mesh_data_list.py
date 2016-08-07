@@ -1,5 +1,5 @@
 import bpy
-from ... data_structures.mesh import MeshData
+from ... data_structures import MeshData
 from ... base_types.node import AnimationNode
 
 class JoinMeshDataList(bpy.types.Node, AnimationNode):

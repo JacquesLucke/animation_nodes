@@ -1,5 +1,5 @@
 import bpy
-from .. data_structures.mesh import MeshData
+from .. data_structures import MeshData
 from .. base_types.socket import AnimationNodeSocket, ListSocket
 
 class MeshDataSocket(bpy.types.NodeSocket, AnimationNodeSocket):
@@ -13,7 +13,7 @@ class MeshDataSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     @classmethod
     def getDefaultValue(cls):
-        return MeshData([], [], [])
+        return MeshData()
 
     @classmethod
     def getCopyExpression(cls):

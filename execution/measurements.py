@@ -38,8 +38,8 @@ def resetMeasurements():
 def getMeasurementsDict():
     return measurementsByNodeIdentifier
 
-def getAverageExecutionTime(node):
-    return measurementsByNodeIdentifier[node.identifier].averageTime
+def getMinExecutionTime(node):
+    return measurementsByNodeIdentifier[node.identifier].minTime
 
 def drawMeasurementResults():
     tree = bpy.context.space_data.edit_tree
