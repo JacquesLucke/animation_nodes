@@ -1,4 +1,4 @@
-from . complex_lists cimport UIntegerList, IntegerList
+from . base_lists cimport UIntegerList, IntegerList
 
 cdef class PolygonIndicesList:
     cdef:
@@ -10,5 +10,5 @@ cdef class PolygonIndicesList:
 
     cpdef append(self, value)
     cpdef extend(self, values)
-    
+
     cdef isValueValid(self, value)
