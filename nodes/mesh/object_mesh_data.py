@@ -66,8 +66,9 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
         return edges
 
     def getPolygonIndices(self, mesh):
-        amount = len(mesh.polygons) * 4 # TODO
-        polygons = PolygonIndicesList(indicesAmount = amount, loopAmount = len(mesh.polygons))
+        polygons = PolygonIndicesList(
+                        indicesAmount = len(mesh.loops),
+                        loopAmount = len(mesh.polygons))
         mesh.polygons.foreach_get("vertices", polygons.indices.getMemoryView())
         mesh.polygons.foreach_get("loop_total", polygons.loopLengths.getMemoryView())
         mesh.polygons.foreach_get("loop_start", polygons.loopStarts.getMemoryView())
