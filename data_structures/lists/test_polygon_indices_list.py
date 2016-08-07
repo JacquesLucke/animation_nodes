@@ -33,9 +33,9 @@ class TestReversed(TestCase):
 
 class TestJoin(TestCase):
     def testNormal(self):
-        l1 = PolygonIndicesList([(1, 2, 3), (4, 5, 6, 7)])
-        l2 = PolygonIndicesList([(2, 4, 7, 8), (1, 2, 3, 4)])
-        l3 = PolygonIndicesList([(6, 5, 4), (2, 3, 4, 5, 6)])
+        l1 = PolygonIndicesList.fromValues([(1, 2, 3), (4, 5, 6, 7)])
+        l2 = PolygonIndicesList.fromValues([(2, 4, 7, 8), (1, 2, 3, 4)])
+        l3 = PolygonIndicesList.fromValues([(6, 5, 4), (2, 3, 4, 5, 6)])
         newList = PolygonIndicesList.join(l1, l2, l3)
         self.assertEquals(len(newList), 6)
         self.assertEquals(newList[0], (1, 2, 3))

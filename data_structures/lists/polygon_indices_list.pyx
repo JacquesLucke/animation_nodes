@@ -93,6 +93,13 @@ cdef class PolygonIndicesList:
         newList.extend(values)
         return newList
 
+    @classmethod
+    def join(cls, *lists):
+        cdef PolygonIndicesList newList = PolygonIndicesList()
+        for elements in lists:
+            newList.extend(elements)
+        return newList
+
 
 cdef class PolygonIndicesListIterator:
     cdef:
