@@ -65,8 +65,18 @@ cdef class PolygonIndicesList:
             raise IndexError("list index out of range")
         return index
 
-    def copyWithNewOrder(self, ULongList newOrder):
+    def copyWithNewOrder(self, ULongList newOrder, checkIndices = True):
         cdef PolygonIndicesList newList = PolygonIndicesList()
+
+        if checkIndices:
+            if newOrder.length == 0:
+                return newList
+            if self.getLength() == 0:
+                raise IndexError("Not all indices in the new order exist")
+            else:
+                if newOrder.getMaxValue() >= self.getLength():
+                    raise IndexError("Not all indices in the new order exist")
+
         cdef long i
         for i in newOrder:
             newList.append(self.getElementAtIndex(i))

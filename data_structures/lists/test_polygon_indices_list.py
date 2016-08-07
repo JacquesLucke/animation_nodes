@@ -55,3 +55,14 @@ class TestCopyWithNewOrder(TestCase):
         self.assertEquals(newList[1], (8, 9, 0))
         self.assertEquals(newList[2], (1, 2, 3))
         self.assertEquals(newList[3], (4, 5, 6, 7))
+
+    def testEmptyList(self):
+        myList = PolygonIndicesList()
+        order = ULongList.fromValues([1])
+        with self.assertRaises(IndexError):
+            newList = myList.copyWithNewOrder(order)
+
+    def testTooHighIndex(self):
+        order = ULongList.fromValues([1, 0, 4, 2])
+        with self.assertRaises(IndexError):
+            newList = self.list.copyWithNewOrder(order)
