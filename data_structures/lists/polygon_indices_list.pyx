@@ -1,8 +1,8 @@
 cdef class PolygonIndicesList:
     def __cinit__(self, long indicesAmount = 0, long loopAmount = 0):
         self.indices = UIntegerList(length = indicesAmount)
-        self.loopStarts = IntegerList(length = loopAmount)
-        self.loopLengths = IntegerList(length = loopAmount)
+        self.loopStarts = UIntegerList(length = loopAmount)
+        self.loopLengths = UIntegerList(length = loopAmount)
 
 
     # Special Methods for Python

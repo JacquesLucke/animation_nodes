@@ -1,10 +1,10 @@
-from . base_lists cimport UIntegerList, IntegerList
+from . base_lists cimport UIntegerList
 
 cdef class PolygonIndicesList:
     cdef:
         readonly UIntegerList indices
-        readonly IntegerList loopStarts
-        readonly IntegerList loopLengths
+        readonly UIntegerList loopStarts
+        readonly UIntegerList loopLengths
 
     cdef long getLength(self)
 
