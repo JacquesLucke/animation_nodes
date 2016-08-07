@@ -17,9 +17,12 @@ class CreatePolygonIndicesNode(bpy.types.Node, AnimationNode):
             layout.label(self.errorMessage, icon = "ERROR")
 
     def execute(self, indices):
-        if len(indices) >= 3:
-            self.errorMessage = ""
-            return tuple(indices)
-        else:
+        if len(indices) < 3:
             self.errorMessage = "3 or more indices needed"
             return (0, 1, 2)
+        elif any(index < 0 for index in indices):
+            self.errorMessage = "indices have to be >= 0"
+            return (0, 1, 2)
+        else:
+            self.errorMessage = ""
+            return tuple(indices)

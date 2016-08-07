@@ -14,6 +14,18 @@ class TestAppend(TestCase):
         self.assertEquals(self.list[1], (4, 5, 6, 7))
         self.assertEquals(self.list[2], (7, 5, 3))
 
+    def testTooShort(self):
+        with self.assertRaises(TypeError):
+            self.list.append((3, 5))
+
+    def testWrongType(self):
+        with self.assertRaises(TypeError):
+            self.list.append((4, "abc", 3))
+
+    def testNegativeNumbers(self):
+        with self.assertRaises(TypeError):
+            self.list.append((4, -3, 6))
+
 class TestCopy(TestCase):
     def testNormal(self):
         self.list = PolygonIndicesList.fromValues([(1, 2, 3), (4, 5, 6, 7)])
