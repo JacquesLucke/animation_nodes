@@ -1,6 +1,6 @@
 cdef class LISTNAME:
     cdef:
-        BASELISTTYPE base
+        readonly BASELISTTYPE base
 
     cdef inline long getLength(self)
 
