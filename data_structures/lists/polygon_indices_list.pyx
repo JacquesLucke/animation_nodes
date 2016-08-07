@@ -37,6 +37,13 @@ cdef class PolygonIndicesList:
         for value in values:
             self.append(value)
 
+    cpdef copy(self):
+        cdef PolygonIndicesList newList = PolygonIndicesList()
+        newList.indices.overwrite(self.indices)
+        newList.loopStarts.overwrite(self.loopStarts)
+        newList.loopLengths.overwrite(self.loopLengths)
+        return newList
+
 
     # Utilities for setting and getting
     ###############################################

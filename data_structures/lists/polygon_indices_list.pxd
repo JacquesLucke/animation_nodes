@@ -10,6 +10,7 @@ cdef class PolygonIndicesList:
 
     cpdef append(self, value)
     cpdef extend(self, values)
+    cpdef copy(self)
 
     cdef getElementAtIndex(self, long index)
 
