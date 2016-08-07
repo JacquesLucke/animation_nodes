@@ -1,4 +1,4 @@
-from . base_lists cimport UIntegerList
+from . base_lists cimport UIntegerList, ULongList
 
 cdef class PolygonIndicesList:
     cdef:

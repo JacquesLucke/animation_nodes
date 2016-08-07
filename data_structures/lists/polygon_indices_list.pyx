@@ -19,6 +19,10 @@ cdef class PolygonIndicesList:
             return self.getElementAtIndex(key)
         raise TypeError("expected int")
 
+    def __iter__(self):
+        return PolygonIndicesListIterator(self)
+
+
     # Base operations for lists - mimic python list
     ###############################################
 
@@ -61,6 +65,24 @@ cdef class PolygonIndicesList:
             raise IndexError("list index out of range")
         return index
 
+    def copyWithNewOrder(self, ULongList newOrder):
+        cdef PolygonIndicesList newList = PolygonIndicesList()
+        cdef long i
+        for i in newOrder:
+            newList.append(self.getElementAtIndex(i))
+        return newList
+
+
+    # Create new lists based on an existing list
+    ###############################################
+
+    def reversed(self):
+        cdef long length = self.getLength()
+        cdef ULongList newOrder = ULongList(length = length)
+        for i in range(length):
+            newOrder.data[i] = length - i - 1
+        return self.copyWithNewOrder(newOrder)
+
 
     # Classmethods for List Creation
     ###############################################
@@ -70,3 +92,22 @@ cdef class PolygonIndicesList:
         cdef PolygonIndicesList newList = PolygonIndicesList()
         newList.extend(values)
         return newList
+
+
+cdef class PolygonIndicesListIterator:
+    cdef:
+        PolygonIndicesList source
+        long current
+
+    def __cinit__(self, PolygonIndicesList source):
+        self.source = source
+        self.current = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.current >= self.source.getLength():
+            raise StopIteration()
+        self.current += 1
+        return self.source[self.current - 1]

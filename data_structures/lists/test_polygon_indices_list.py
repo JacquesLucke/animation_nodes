@@ -1,4 +1,5 @@
 from unittest import TestCase
+from . base_lists import ULongList
 from . polygon_indices_list import PolygonIndicesList
 
 class TestAppend(TestCase):
@@ -40,3 +41,17 @@ class TestJoin(TestCase):
         self.assertEquals(newList[0], (1, 2, 3))
         self.assertEquals(newList[3], (1, 2, 3, 4))
         self.assertEquals(newList[5], (2, 3, 4, 5, 6))
+
+class TestCopyWithNewOrder(TestCase):
+    def setUp(self):
+        self.list = PolygonIndicesList.fromValues([
+            (1, 2, 3), (4, 5, 6, 7), (8, 9, 0)])
+
+    def testNormal(self):
+        order = ULongList.fromValues([1, 2, 0, 1])
+        newList = self.list.copyWithNewOrder(order)
+        self.assertEquals(len(newList), 4)
+        self.assertEquals(newList[0], (4, 5, 6, 7))
+        self.assertEquals(newList[1], (8, 9, 0))
+        self.assertEquals(newList[2], (1, 2, 3))
+        self.assertEquals(newList[3], (4, 5, 6, 7))
