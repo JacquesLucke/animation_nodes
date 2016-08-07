@@ -3,7 +3,6 @@ from bpy.props import *
 from ... events import isRendering
 from ... base_types.node import AnimationNode
 from ... math.list_operations import transformVector3DList
-from ... data_structures import Vector3DList, EdgeIndicesList
 
 class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectMeshDataNode"
@@ -37,7 +36,10 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
             yield "    polygonIndices = self.getPolygonIndices(mesh)"
 
         yield "    self.clearMesh(mesh, useModifiers, scene)"
-        yield "else: vertexLocations, edgeIndices, polygonIndices = [], [], []"
+        yield "else:"
+        yield "    vertexLocations = Vector3DList()"
+        yield "    edgeIndices = EdgeIndicesList()"
+        yield "    polygonIndices = PolygonIndicesList()"
 
 
     def getMesh(self, object, useModifiers, scene):
@@ -63,4 +65,9 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
         return edges
 
     def getPolygonIndices(self, mesh):
-        return [tuple(face.vertices) for face in mesh.polygons]
+        amount = len(mesh.polygons) * 4 # TODO
+        polygons = PolygonIndicesList(indicesAmount = amount, loopAmount = len(mesh.polygons))
+        mesh.polygons.foreach_get("vertices", polygons.indices.getMemoryView())
+        mesh.polygons.foreach_get("loop_total", polygons.loopLengths.getMemoryView())
+        mesh.polygons.foreach_get("loop_start", polygons.loopStarts.getMemoryView())
+        return polygons
