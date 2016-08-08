@@ -21,24 +21,29 @@ cdef class PolySpline(Spline):
     def getPoints(self):
         return self.points
 
-    def copy(self):
+    cpdef PolySpline copy(self):
         cdef PolySpline newSpline = PolySpline()
         newSpline.cyclic = self.cyclic
         newSpline.points = self.pointy.copy()
         return newSpline
 
-    def transform(self, matrix):
+    cpdef transform(self, matrix):
         transformVector3DList(self.points, matrix)
 
-    def getLength(self, resolution = 0):
+    cpdef double getLength(self, resolution = 0):
         return distanceSumOfVector3DList(self.points)
 
-    def update(self):
+    cpdef void update(self):
         pass
 
-    def evaluate(self, float t):
-        assert self.points.length > 0
-        assert 0 <= t <= 1
+    cpdef bint isEvaluable(self):
+        return self.points.getLength() >= 2
+
+    cpdef evaluate(self, float t):
+        if t < 0 or t > 1:
+            raise ValueError("parameter has to be between 0 and 1")
+        if not self.isEvaluable():
+            raise Exception("spline is not evaluable")
         cdef Vector3 result
         self.evaluate_LowLevel(t, &result)
         return Vector((result.x, result.y, result.z))

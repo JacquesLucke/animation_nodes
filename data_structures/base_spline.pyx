@@ -1,17 +1,20 @@
 cdef class Spline:
     pass
 
-    def copy(self):
+    cpdef Spline copy(self):
         raise NotImplementedError()
 
-    def transform(self, matrix):
+    cpdef transform(self, matrix):
         raise NotImplementedError()
 
-    def getLength(self, resolution):
+    cpdef double getLength(self, resolution = 0):
         raise NotImplementedError()
 
-    def evaluate(self, t):
+    cpdef bint isEvaluable(self):
         raise NotImplementedError()
 
-    def update(self):
+    cpdef evaluate(self, float t):
+        raise NotImplementedError()
+
+    cpdef void update(self):
         raise NotImplementedError()
