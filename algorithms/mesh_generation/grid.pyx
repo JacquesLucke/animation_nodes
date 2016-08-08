@@ -4,8 +4,8 @@ from ... data_structures.lists.complex_lists cimport Vector3DList, EdgeIndicesLi
 ############################################
 
 def vertices(int xDivisions, int yDivisions, float xDistance = 1, float yDistance = 1, offset = (0, 0, 0)):
-    assert xDivisions >= 0
-    assert yDivisions >= 0
+    assert xDivisions >= 2
+    assert yDivisions >= 2
     cdef:
         float xOffset, yOffset, zOffset
         int x, y
@@ -24,14 +24,25 @@ def vertices(int xDivisions, int yDivisions, float xDistance = 1, float yDistanc
 # Edges
 ############################################
 
-def innerQuadEdges(xDivisions, yDivisions):
-    edges = EdgeIndicesList()
-    for i in range((xDivisions - 1) * yDivisions):
-        edges.append((i, i + yDivisions))
-    for i in range(yDivisions - 1):
-        for j in range(xDivisions):
-            firstIndex = i + j * yDivisions
-            edges.append((firstIndex, firstIndex + 1))
+def innerQuadEdges(long xDivisions, long yDivisions):
+    assert xDivisions >= 2
+    assert yDivisions >= 2
+
+    cdef EdgeIndicesList edges = EdgeIndicesList(
+            length = 2 * xDivisions * yDivisions - xDivisions - yDivisions)
+
+    cdef long offset = 0
+    cdef long i, j
+    for i in range(xDivisions):
+        for j in range(yDivisions - 1):
+            edges.base.data[offset + 0] = i * yDivisions + j
+            edges.base.data[offset + 1] = i * yDivisions + j + 1
+            offset += 2
+    for i in range(yDivisions):
+        for j in range(xDivisions - 1):
+            edges.base.data[offset + 0] = j * yDivisions + i
+            edges.base.data[offset + 1] = j * yDivisions + i + yDivisions
+            offset += 2
     return edges
 
 
