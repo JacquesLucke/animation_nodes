@@ -1,3 +1,5 @@
+from . poly_spline import PolySpline
+
 def createSplinesFromBlenderObject(object):
     if object is None: return []
     if object.type != "CURVE": return []
@@ -21,4 +23,8 @@ def createBezierSpline(bSpline):
     raise NotImplementedError()
 
 def createPolySpline(bSpline):
-    raise NotImplementedError()
+    spline = PolySpline()
+    spline.cyclic = bSpline.use_cyclic_u
+    for point in bSpline.points:
+        spline.appendPoint(point.co[:-1])
+    return spline

@@ -23,8 +23,9 @@ class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
         col.prop(self, "resolution")
 
     def execute(self, spline, parameter):
+        parameter = min(max(parameter, 0), 1)
         spline.update()
-        if spline.isEvaluable:
+        if spline.isEvaluable():
             if self.parameterType == "UNIFORM":
                 spline.ensureUniformConverter(self.resolution)
                 parameter = spline.toUniformParameter(parameter)

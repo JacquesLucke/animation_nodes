@@ -24,7 +24,7 @@ cdef class PolySpline(Spline):
     cpdef PolySpline copy(self):
         cdef PolySpline newSpline = PolySpline()
         newSpline.cyclic = self.cyclic
-        newSpline.points = self.pointy.copy()
+        newSpline.points = self.points.copy()
         return newSpline
 
     cpdef transform(self, matrix):
