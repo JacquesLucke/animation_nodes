@@ -120,6 +120,9 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
         mesh.polygons.foreach_set("loop_start", polygons.loopStarts.getMemoryView())
         mesh.polygons.foreach_set("vertices", polygons.indices.getMemoryView())
 
+        if len(polygons) > 0 and len(edges) == 0:
+            mesh.update(calc_edges = True)
+
     def setBMesh(self, mesh, bm):
         bm.to_mesh(mesh)
 
