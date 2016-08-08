@@ -135,6 +135,9 @@ cdef class PolygonIndicesList:
             newList.extend(elements)
         return newList
 
+    def __repr__(self):
+        return str(tuple(self[i] for i in range(self.getLength())))
+
 
 cdef class PolygonIndicesListIterator:
     cdef:

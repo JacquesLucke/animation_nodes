@@ -1,3 +1,4 @@
+from ... data_structures.lists.polygon_indices_list cimport PolygonIndicesList
 from ... data_structures.lists.complex_lists cimport Vector3DList, EdgeIndicesList
 
 # Vertices
@@ -51,7 +52,7 @@ def innerQuadEdges(long xDivisions, long yDivisions):
 
 
 def quadPolygons(cls, xDivisions, yDivisions, joinHorizontal = False, joinVertical = False):
-    polygons = []
+    polygons = PolygonIndicesList()
     polygons.extend(cls.innerQuadPolygons(xDivisions, yDivisions))
     if joinHorizontal:
         polygons.extend(cls.joinHorizontalEdgesQuadPolygons(xDivisions, yDivisions))
@@ -61,11 +62,22 @@ def quadPolygons(cls, xDivisions, yDivisions, joinHorizontal = False, joinVertic
         polygons.append(cls.joinCornersWithQuad(xDivisions, yDivisions))
     return polygons
 
-def innerQuadPolygons(xDivisions, yDivisions):
-    polygons = []
-    for i in range(0, (xDivisions - 1) * yDivisions, yDivisions):
-        for j in range(i, i + yDivisions - 1):
-            polygons.append((j, j + 1, j + yDivisions + 1, j + yDivisions))
+def innerQuadPolygons(long xDivisions, long yDivisions):
+    cdef long polyAmount = (xDivisions - 1) * (yDivisions - 1)
+    polygons = PolygonIndicesList(
+                    indicesAmount = 4 * polyAmount,
+                    loopAmount = polyAmount)
+
+    cdef long i, j, offset = 0
+    for i in range(yDivisions - 1):
+        for j in range(xDivisions - 1):
+            polygons.loopStarts.data[offset / 4] = offset
+            polygons.loopLengths.data[offset / 4] = 4
+            polygons.indices.data[offset + 0] = (j + 0) * yDivisions + i
+            polygons.indices.data[offset + 1] = (j + 0) * yDivisions + i + 1
+            polygons.indices.data[offset + 2] = (j + 1) * yDivisions + i + 1
+            polygons.indices.data[offset + 3] = (j + 1) * yDivisions + i
+            offset += 4
     return polygons
 
 def joinHorizontalEdgesQuadPolygons(xDivisions, yDivisions):
