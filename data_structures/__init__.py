@@ -4,6 +4,8 @@ def importDataStructures():
     from . lists.polygon_indices_list import PolygonIndicesList
     from . lists.complex_lists import Vector3DList, Matrix4x4List, EdgeIndicesList
     from . lists.base_lists import FloatList, DoubleList, LongLongList, IntegerList, UShortList, CharList
+    from . splines.poly_spline import PolySpline
+    from . splines.bezier_spline import BezierSpline
     return locals()
 
 dataStructures = importDataStructures()

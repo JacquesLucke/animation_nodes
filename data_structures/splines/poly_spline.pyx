@@ -1,7 +1,7 @@
 from libc.math cimport floor
-from .. math.ctypes cimport Vector3
-from .. math.base_operations cimport mixVec3, distanceVec3, subVec3
-from .. math.list_operations cimport (
+from ... math.ctypes cimport Vector3
+from ... math.base_operations cimport mixVec3, distanceVec3, subVec3
+from ... math.list_operations cimport (
                                 transformVector3DList,
                                 distanceSumOfVector3DList)
 
