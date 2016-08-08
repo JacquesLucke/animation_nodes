@@ -8,4 +8,5 @@ cdef class Spline:
     cpdef double getLength(self, resolution = ?)
     cpdef bint isEvaluable(self)
     cpdef evaluate(self, float t)
+    cpdef evaluateTangent(self, float t)
     cpdef void update(self)

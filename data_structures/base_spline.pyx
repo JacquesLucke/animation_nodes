@@ -16,5 +16,8 @@ cdef class Spline:
     cpdef evaluate(self, float t):
         raise NotImplementedError()
 
+    cpdef evaluateTangent(self, float t):
+        raise NotImplementedError()
+
     cpdef void update(self):
         raise NotImplementedError()
