@@ -11,3 +11,13 @@ cdef void transformVector3DList_lowlevel(Vector3* vectors, long arrayLength, Mat
     cdef long i
     for i in range(arrayLength):
         transformVec3(vectors + i, vectors + i, matrix)
+
+cpdef double distanceSumOfVector3DList(Vector3DList vectors):
+    cdef:
+        Vector3* _vectors = <Vector3*>vectors.base.data
+        double distance = 0
+        long i
+
+    for i in range(vectors.getLength() - 1):
+        distance += distanceVec3(_vectors + i, _vectors + i + 1)
+    return distance
