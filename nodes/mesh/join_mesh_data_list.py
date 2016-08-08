@@ -11,11 +11,4 @@ class JoinMeshDataList(bpy.types.Node, AnimationNode):
         self.newOutput("Mesh Data", "Mesh Data", "meshData")
 
     def execute(self, meshDataList):
-        meshData = MeshData()
-        offset = 0
-        for mesh in meshDataList:
-            meshData.vertices.extend(mesh.vertices)
-            meshData.edges.extend([(index1 + offset, index2 + offset) for index1, index2 in mesh.edges])
-            meshData.polygons.extend([tuple(index + offset for index in poly) for poly in mesh.polygons])
-            offset += len(mesh.vertices)
-        return meshData
+        return MeshData.join(*meshDataList)

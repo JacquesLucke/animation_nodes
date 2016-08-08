@@ -42,8 +42,22 @@ cdef class PolygonIndicesList:
         return len(value) >= 3 and all(v >= 0 and isinstance(v, int) for v in value)
 
     cpdef extend(self, values):
-        for value in values:
-            self.append(value)
+        if isinstance(values, PolygonIndicesList):
+            self.extend_SameType(values)
+        else:
+            for value in values:
+                self.append(value)
+
+    cdef extend_SameType(self, PolygonIndicesList otherList):
+        cdef long oldLength = self.getLength()
+        cdef long oldIndicesLength = self.indices.length
+        self.indices.extend(otherList.indices)
+        self.loopStarts.extend(otherList.loopStarts)
+        self.loopLengths.extend(otherList.loopLengths)
+
+        cdef long i
+        for i in range(otherList.getLength()):
+            self.loopStarts.data[oldLength + i] += oldIndicesLength
 
     cpdef copy(self):
         cdef PolygonIndicesList newList = PolygonIndicesList()

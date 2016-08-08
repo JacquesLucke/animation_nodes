@@ -35,3 +35,27 @@ cdef class MeshData:
     def __repr__(self):
         return "<AN Mesh Data Object: Vertices: {}, Edges: {}, Polygons: {}>".format(
                 len(self.vertices), len(self.edges), len(self.polygons))
+
+    @classmethod
+    def join(cls, *meshes):
+        cdef MeshData newMeshData = MeshData()
+        for meshData in meshes:
+            newMeshData.append(meshData)
+        return newMeshData
+
+    def append(self, MeshData meshData):
+        cdef long vertexOffset = self.vertices.getLength()
+        cdef long edgeOffset = self.edges.getLength()
+        cdef long polygonIndicesOffset = self.polygons.indices.length
+        cdef long i
+
+        self.vertices.extend(meshData.vertices)
+
+        self.edges.extend(meshData.edges)
+        for i in range(meshData.edges.getLength()):
+            self.edges.base.data[2 * (edgeOffset + i) + 0] += vertexOffset
+            self.edges.base.data[2 * (edgeOffset + i) + 1] += vertexOffset
+
+        self.polygons.extend(meshData.polygons)
+        for i in range(meshData.polygons.indices.length):
+            self.polygons.indices.data[polygonIndicesOffset + i] += vertexOffset
