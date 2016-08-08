@@ -1,3 +1,5 @@
+from libc.string cimport memcpy
+
 cdef class PolygonIndicesList:
     def __cinit__(self, long indicesAmount = 0, long loopAmount = 0):
         self.indices = UIntegerList(length = indicesAmount)
@@ -71,12 +73,10 @@ cdef class PolygonIndicesList:
         cdef ULongList order = ULongList.fromValues(range(*sliceObject.indices(self.getLength())))
         return self.copyWithNewOrder(order, checkIndices = False)
 
-    def copyWithNewOrder(self, ULongList newOrder, checkIndices = True):
-        cdef PolygonIndicesList newList = PolygonIndicesList()
-
+    cpdef copyWithNewOrder(self, ULongList newOrder, checkIndices = True):
         if checkIndices:
             if newOrder.length == 0:
-                return newList
+                return PolygonIndicesList()
             if self.getLength() == 0:
                 raise IndexError("Not all indices in the new order exist")
             else:
@@ -84,8 +84,23 @@ cdef class PolygonIndicesList:
                     raise IndexError("Not all indices in the new order exist")
 
         cdef long i
-        for i in newOrder:
-            newList.append(self.getElementAtIndex(i))
+        cdef long indicesAmount = 0
+        for i in range(newOrder.length):
+            indicesAmount += self.loopLengths.data[newOrder.data[i]]
+
+        cdef PolygonIndicesList newList = PolygonIndicesList(
+                indicesAmount = indicesAmount,
+                loopAmount = newOrder.length)
+
+        for i in range(newOrder.length):
+            index = newOrder.data[i]
+
+            length = self.loopLengths.data[index]
+            start = self.loopStarts.data[index]
+
+            newList.loopLengths.data[i] = length
+                   self.indices.data + start,
+                   sizeof(unsigned int) * length)
         return newList
 
 
@@ -93,7 +108,7 @@ cdef class PolygonIndicesList:
     ###############################################
 
     def reversed(self):
-        cdef long length = self.getLength()
+        cdef long i, length = self.getLength()
         cdef ULongList newOrder = ULongList(length = length)
         for i in range(length):
             newOrder.data[i] = length - i - 1

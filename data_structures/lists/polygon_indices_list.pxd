@@ -15,5 +15,7 @@ cdef class PolygonIndicesList:
     cdef getElementAtIndex(self, long index)
     cdef getValuesInSlice(self, slice sliceObject)
 
+    cpdef copyWithNewOrder(self, ULongList newOrder, checkIndices = ?)
+
     cdef isValueValid(self, value)
     cdef tryCorrectIndex(self, long index)
