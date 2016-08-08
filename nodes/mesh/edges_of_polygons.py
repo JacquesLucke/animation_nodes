@@ -1,5 +1,6 @@
 import bpy
 from ... base_types.node import AnimationNode
+from ... data_structures import EdgeIndicesList
 
 class an_EdgesOfPolygonsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_EdgesOfPolygonsNode"
@@ -16,4 +17,4 @@ class an_EdgesOfPolygonsNode(bpy.types.Node, AnimationNode):
                 startIndex = polygon[i - 1]
                 edge = (startIndex, index) if index > startIndex else (index, startIndex)
                 edges.append(edge)
-        return list(set(edges))
+        return EdgeIndicesList.fromValues(set(edges))
