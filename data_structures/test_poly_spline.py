@@ -62,6 +62,14 @@ class TestEvaluate(TestCase):
         with self.assertRaises(Exception):
             spline.evaluate(0)
 
+    def testCyclic(self):
+        self.spline.cyclic = True
+        testEqual(self, self.spline.evaluate(0.0), (0, 0, 0))
+        testEqual(self, self.spline.evaluate(1/3), (2, 4, 6))
+        testEqual(self, self.spline.evaluate(0.5), (2, 7, 7))
+        testEqual(self, self.spline.evaluate(2/3), (2, 10, 8))
+        testEqual(self, self.spline.evaluate(1.0), (0, 0, 0))
+
 def testEqual(testCase, vector1, vector2):
     testCase.assertAlmostEqual(vector1[0], vector2[0])
     testCase.assertAlmostEqual(vector1[1], vector2[1])

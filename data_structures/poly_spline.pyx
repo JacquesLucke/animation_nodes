@@ -68,7 +68,11 @@ cdef class PolySpline(Spline):
                 index[1] = index[0]
                 factor[0] = 1
         else:
-            # TODO
-            index[0] = 0
-            index[1] = 0
-            factor[0]= 0
+            if t < 1:
+                index[0] = <long>floor(t * pointAmount)
+                index[1] = index[0] + 1 if index[0] < (pointAmount - 1) else 0
+                factor[0] = t * pointAmount - index[0]
+            else:
+                index[0] = 0
+                index[1] = 0
+                factor[0] = 0
