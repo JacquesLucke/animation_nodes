@@ -283,6 +283,14 @@ cdef class LISTNAME:
         newList.extend(values)
         return newList
 
+    @classmethod
+    def fromBaseList(cls, BASELISTTYPE source):
+        if source.length % AMOUNT != 0:
+            raise ValueError("Length of the list has to be a multiple of AMOUNT")
+        cdef LISTNAME newList = LISTNAME()
+        newList.base = source
+        return newList
+
     cpdef BASETYPE[:] getMemoryView(self):
         return self.base.getMemoryView()
 

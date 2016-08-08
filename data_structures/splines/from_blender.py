@@ -1,4 +1,5 @@
 from . poly_spline import PolySpline
+from .. import FloatList, Vector3DList
 
 def createSplinesFromBlenderObject(object):
     if object is None: return []
@@ -23,8 +24,10 @@ def createBezierSpline(bSpline):
     raise NotImplementedError()
 
 def createPolySpline(bSpline):
-    spline = PolySpline()
+    pointArray = FloatList(length = 4 * len(bSpline.points))
+    del pointArray[3::4]
+    splinePoints = Vector3DList.fromBaseList(pointArray)
+
+    spline = PolySpline(splinePoints)
     spline.cyclic = bSpline.use_cyclic_u
-    for point in bSpline.points:
-        spline.appendPoint(point.co[:-1])
     return spline
