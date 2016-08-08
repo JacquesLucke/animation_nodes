@@ -92,6 +92,7 @@ cdef class PolygonIndicesList:
                 indicesAmount = indicesAmount,
                 loopAmount = newOrder.length)
 
+        cdef long index, length, start, accumulatedLength = 0
         for i in range(newOrder.length):
             index = newOrder.data[i]
 
@@ -99,8 +100,11 @@ cdef class PolygonIndicesList:
             start = self.loopStarts.data[index]
 
             newList.loopLengths.data[i] = length
+            newList.loopStarts.data[i] = accumulatedLength
+            memcpy(newList.indices.data + accumulatedLength,
                    self.indices.data + start,
                    sizeof(unsigned int) * length)
+            accumulatedLength += length
         return newList
 
 
