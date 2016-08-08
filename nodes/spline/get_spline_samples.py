@@ -27,7 +27,7 @@ class GetSplineSamplesNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
         if not (isLinked["positions"] or isLinked["tangents"]): return []
 
         yield "spline.update()"
-        yield "if spline.isEvaluable:"
+        yield "if spline.isEvaluable():"
 
         if self.parameterType == "UNIFORM":
             if isLinked["positions"]: yield "    positions = spline.getUniformSamples(amount, start, end, self.resolution)"

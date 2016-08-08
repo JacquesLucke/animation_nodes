@@ -1,3 +1,5 @@
+from ... math.ctypes cimport Vector3
+
 cdef class Spline:
     cdef:
         public bint cyclic
@@ -10,3 +12,8 @@ cdef class Spline:
     cpdef evaluate(self, float t)
     cpdef evaluateTangent(self, float t)
     cpdef void update(self)
+
+    cdef void evaluate_LowLevel(self, float t, Vector3* result)
+    cdef void evaluateTangent_LowLevel(self, float t, Vector3* result)
+
+    cpdef getSamples(self, long amount, float start = ?, float end = ?)
