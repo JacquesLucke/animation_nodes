@@ -3,8 +3,8 @@ from . base_lists cimport UIntegerList, ULongList
 cdef class PolygonIndicesList:
     cdef:
         readonly UIntegerList indices
-        readonly UIntegerList loopStarts
-        readonly UIntegerList loopLengths
+        readonly UIntegerList polyStarts
+        readonly UIntegerList polyLengths
 
     cdef long getLength(self)
 

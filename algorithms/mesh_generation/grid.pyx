@@ -71,8 +71,8 @@ def innerQuadPolygons(long xDivisions, long yDivisions):
     cdef long i, j, offset = 0
     for i in range(yDivisions - 1):
         for j in range(xDivisions - 1):
-            polygons.loopStarts.data[offset / 4] = offset
-            polygons.loopLengths.data[offset / 4] = 4
+            polygons.polyStarts.data[offset / 4] = offset
+            polygons.polyLengths.data[offset / 4] = 4
             polygons.indices.data[offset + 0] = (j + 0) * yDivisions + i
             polygons.indices.data[offset + 1] = (j + 0) * yDivisions + i + 1
             polygons.indices.data[offset + 2] = (j + 1) * yDivisions + i + 1

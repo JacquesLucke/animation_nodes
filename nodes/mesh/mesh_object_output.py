@@ -116,8 +116,8 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
 
         mesh.vertices.foreach_set("co", vertices.getMemoryView())
         mesh.edges.foreach_set("vertices", edges.getMemoryView())
-        mesh.polygons.foreach_set("loop_total", polygons.loopLengths.getMemoryView())
-        mesh.polygons.foreach_set("loop_start", polygons.loopStarts.getMemoryView())
+        mesh.polygons.foreach_set("loop_total", polygons.polyLengths.getMemoryView())
+        mesh.polygons.foreach_set("loop_start", polygons.polyStarts.getMemoryView())
         mesh.polygons.foreach_set("vertices", polygons.indices.getMemoryView())
 
         if len(polygons) > 0 and len(edges) == 0:

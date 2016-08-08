@@ -3,8 +3,8 @@ from libc.string cimport memcpy
 cdef class PolygonIndicesList:
     def __cinit__(self, long indicesAmount = 0, long loopAmount = 0):
         self.indices = UIntegerList(length = indicesAmount)
-        self.loopStarts = UIntegerList(length = loopAmount)
-        self.loopLengths = UIntegerList(length = loopAmount)
+        self.polyStarts = UIntegerList(length = loopAmount)
+        self.polyLengths = UIntegerList(length = loopAmount)
 
 
     # Special Methods for Python
@@ -14,7 +14,7 @@ cdef class PolygonIndicesList:
         return self.getLength()
 
     cdef long getLength(self):
-        return self.loopStarts.length
+        return self.polyStarts.length
 
     def __getitem__(self, key):
         if isinstance(key, int):
@@ -34,8 +34,8 @@ cdef class PolygonIndicesList:
         if not self.isValueValid(value):
             raise TypeError("cannot append value to this list")
 
-        self.loopStarts.append(self.indices.length)
-        self.loopLengths.append(len(value))
+        self.polyStarts.append(self.indices.length)
+        self.polyLengths.append(len(value))
         self.indices.extend(value)
 
     cdef isValueValid(self, value):
@@ -52,18 +52,18 @@ cdef class PolygonIndicesList:
         cdef long oldLength = self.getLength()
         cdef long oldIndicesLength = self.indices.length
         self.indices.extend(otherList.indices)
-        self.loopStarts.extend(otherList.loopStarts)
-        self.loopLengths.extend(otherList.loopLengths)
+        self.polyStarts.extend(otherList.polyStarts)
+        self.polyLengths.extend(otherList.polyLengths)
 
         cdef long i
         for i in range(otherList.getLength()):
-            self.loopStarts.data[oldLength + i] += oldIndicesLength
+            self.polyStarts.data[oldLength + i] += oldIndicesLength
 
     cpdef copy(self):
         cdef PolygonIndicesList newList = PolygonIndicesList()
         newList.indices.overwrite(self.indices)
-        newList.loopStarts.overwrite(self.loopStarts)
-        newList.loopLengths.overwrite(self.loopLengths)
+        newList.polyStarts.overwrite(self.polyStarts)
+        newList.polyLengths.overwrite(self.polyLengths)
         return newList
 
 
@@ -72,8 +72,8 @@ cdef class PolygonIndicesList:
 
     cdef getElementAtIndex(self, long index):
         index = self.tryCorrectIndex(index)
-        cdef long start = self.loopStarts.data[index]
-        cdef long length = self.loopLengths.data[index]
+        cdef long start = self.polyStarts.data[index]
+        cdef long length = self.polyLengths.data[index]
         return tuple(self.indices.data[i] for i in range(start, start + length))
 
     cdef tryCorrectIndex(self, long index):
@@ -100,7 +100,7 @@ cdef class PolygonIndicesList:
         cdef long i
         cdef long indicesAmount = 0
         for i in range(newOrder.length):
-            indicesAmount += self.loopLengths.data[newOrder.data[i]]
+            indicesAmount += self.polyLengths.data[newOrder.data[i]]
 
         cdef PolygonIndicesList newList = PolygonIndicesList(
                 indicesAmount = indicesAmount,
@@ -110,11 +110,11 @@ cdef class PolygonIndicesList:
         for i in range(newOrder.length):
             index = newOrder.data[i]
 
-            length = self.loopLengths.data[index]
-            start = self.loopStarts.data[index]
+            length = self.polyLengths.data[index]
+            start = self.polyStarts.data[index]
 
-            newList.loopLengths.data[i] = length
-            newList.loopStarts.data[i] = accumulatedLength
+            newList.polyLengths.data[i] = length
+            newList.polyStarts.data[i] = accumulatedLength
             memcpy(newList.indices.data + accumulatedLength,
                    self.indices.data + start,
                    sizeof(unsigned int) * length)
