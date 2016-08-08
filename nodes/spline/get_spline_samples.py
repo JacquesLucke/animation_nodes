@@ -36,4 +36,6 @@ class GetSplineSamplesNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
             if isLinked["positions"]: yield "    positions = spline.getSamples(amount, start, end)"
             if isLinked["tangents"]:  yield "    tangents = spline.getTangentSamples(amount, start, end)"
 
-        yield "else: positions, tangents = [], []"
+        yield "else:"
+        yield "    positions = Vector3DList()"
+        yield "    tangents = Vector3DList()"
