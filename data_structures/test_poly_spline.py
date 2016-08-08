@@ -29,6 +29,44 @@ class TestAppendPoint(TestCase):
         with self.assertRaises(TypeError):
             self.spline.appendPoint((0, 1, 2, 3))
 
+class TestGetLength(TestCase):
+    def testEmptySpline(self):
+        spline = PolySpline()
+        self.assertEqual(spline.getLength(), 0)
+
+    def testSplineWithOnePoint(self):
+        spline = PolySpline()
+        spline.appendPoint((1, 2, 3))
+        self.assertEqual(spline.getLength(), 0)
+
+    def testSimple(self):
+        spline = PolySpline()
+        spline.appendPoint((0, 0, 0))
+        spline.appendPoint((3, 4, 0))
+        self.assertAlmostEqual(spline.getLength(), 5)
+
+    def testMultiplePoints(self):
+        spline = PolySpline()
+        spline.appendPoint((0, 0, 0))
+        spline.appendPoint((2, 4, 6))
+        spline.appendPoint((2, 10, 8))
+        self.assertAlmostEqual(spline.getLength(), 13.80787009)
+
+    def testSimpleCyclic(self):
+        spline = PolySpline()
+        spline.cyclic = True
+        spline.appendPoint((0, 0, 0))
+        spline.appendPoint((3, 4, 0))
+        self.assertAlmostEqual(spline.getLength(), 10)
+
+    def testMultiplePointsCyclic(self):
+        spline = PolySpline()
+        spline.cyclic = True
+        spline.appendPoint((0, 0, 0))
+        spline.appendPoint((2, 4, 6))
+        spline.appendPoint((2, 10, 8))
+        self.assertAlmostEqual(spline.getLength(), 26.76935149)
+
 class TestEvaluate(TestCase):
     def setUp(self):
         self.spline = PolySpline()

@@ -1,6 +1,6 @@
 from libc.math cimport floor
 from .. math.ctypes cimport Vector3
-from .. math.base_operations cimport mixVec3
+from .. math.base_operations cimport mixVec3, distanceVec3
 from .. math.list_operations cimport (
                                 transformVector3DList,
                                 distanceSumOfVector3DList)
@@ -31,7 +31,12 @@ cdef class PolySpline(Spline):
         transformVector3DList(self.points, matrix)
 
     cpdef double getLength(self, resolution = 0):
-        return distanceSumOfVector3DList(self.points)
+        cdef double length = distanceSumOfVector3DList(self.points)
+        cdef Vector3* _points
+        if self.cyclic and self.points.getLength() >= 2:
+            _points = <Vector3*>self.points.base.data
+            length += distanceVec3(_points + 0, _points + self.points.getLength() - 1)
+        return length
 
     cpdef void update(self):
         pass
