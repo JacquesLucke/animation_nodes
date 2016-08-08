@@ -83,6 +83,12 @@ class SimpleConvert(LinkCorrection):
         nodeIdName = self.rules[(dataOrigin.dataType, target.dataType)]
         node = insertLinkedNode(nodeTree, nodeIdName, origin, target)
 
+class ConvertMeshDataListToMeshData(LinkCorrection):
+    def check(self, origin, target):
+        return origin.dataType == "Mesh Data List" and target.dataType == "Mesh Data"
+    def insert(self, nodeTree, origin, target, dataOrigin):
+        insertLinkedNode(nodeTree, "an_JoinMeshDataListNode", origin, target)
+
 class ConvertToIntegerList(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType in ("Float List", "Edge Indices", "Polygon Indices") and target.dataType == "Integer List"
@@ -236,6 +242,7 @@ def getSocketCenter(socket1, socket2):
     return (socket1.node.viewLocation + socket2.node.viewLocation) / 2
 
 linkCorrectors = [
+    ConvertMeshDataListToMeshData(),
     ConvertToIntegerList(),
     ConvertNormalToEuler(),
     ConvertObjectToMeshData(),
