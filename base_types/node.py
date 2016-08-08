@@ -36,7 +36,7 @@ class AnimationNode:
 
     searchTags = []
     onlySearchTags = False
-    # can contain: 'No Execution', 'No Subprogram', 'No Auto Execution'
+    # can contain: 'No Execution', 'No Subprogram', 'No Auto Execution', 'No Timing'
     options = set()
 
     # can be "NONE", "ALWAYS" or "HIDDEN_ONLY"

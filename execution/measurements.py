@@ -53,7 +53,8 @@ def drawMeasurementResults():
 
     for node, leftBottom, rightBottom in zip(nodes, leftCorners, rightCorners):
         if node.isAnimationNode and not node.hide:
-            drawMeasurementResultForNode(node, leftBottom, rightBottom)
+            if "No Timing" not in node.options:
+                drawMeasurementResultForNode(node, leftBottom, rightBottom)
 
 def drawMeasurementResultForNode(node, leftBottom, rightBottom):
     result = measurementsByNodeIdentifier[node.identifier]
