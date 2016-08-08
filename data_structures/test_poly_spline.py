@@ -108,6 +108,49 @@ class TestEvaluate(TestCase):
         testEqual(self, self.spline.evaluate(2/3), (2, 10, 8))
         testEqual(self, self.spline.evaluate(1.0), (0, 0, 0))
 
+class TestEvaluateTangent(TestCase):
+    def setUp(self):
+        self.spline = PolySpline()
+        self.spline.appendPoint((0, 0, 0))
+        self.spline.appendPoint((2, 4, 6))
+        self.spline.appendPoint((2, 10, 8))
+
+    def testZero(self):
+        testEqual(self, self.spline.evaluateTangent(0), (2, 4, 6))
+
+    def testOne(self):
+        testEqual(self, self.spline.evaluateTangent(1), (0, 6, 2))
+
+    def testMiddle(self):
+        testEqual(self, self.spline.evaluateTangent(0.25), (2, 4, 6))
+        testEqual(self, self.spline.evaluateTangent(0.50), (0, 6, 2))
+        testEqual(self, self.spline.evaluateTangent(0.75), (0, 6, 2))
+
+    def testWrongType(self):
+        with self.assertRaises(TypeError):
+            self.spline.evaluateTangent("abc")
+
+    def testInvalidValue(self):
+        with self.assertRaises(ValueError):
+            self.spline.evaluateTangent(-1)
+        with self.assertRaises(ValueError):
+            self.spline.evaluateTangent(1.5)
+
+    def testEmptySpline(self):
+        spline = PolySpline()
+        with self.assertRaises(Exception):
+            spline.evaluateTangent(0)
+
+    def testCyclic(self):
+        self.spline.cyclic = True
+        testEqual(self, self.spline.evaluateTangent(0.0), (2, 4, 6))
+        testEqual(self, self.spline.evaluateTangent(0.1), (2, 4, 6))
+        testEqual(self, self.spline.evaluateTangent(1/3), (0, 6, 2))
+        testEqual(self, self.spline.evaluateTangent(0.5), (0, 6, 2))
+        testEqual(self, self.spline.evaluateTangent(2/3), (-2, -10, -8))
+        testEqual(self, self.spline.evaluateTangent(0.8), (-2, -10, -8))
+        testEqual(self, self.spline.evaluateTangent(1.0), (-2, -10, -8))
+
 def testEqual(testCase, vector1, vector2):
     testCase.assertAlmostEqual(vector1[0], vector2[0])
     testCase.assertAlmostEqual(vector1[1], vector2[1])
