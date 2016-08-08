@@ -4,7 +4,7 @@ from ... base_types.node import AnimationNode
 class PrototypeNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_PrototypeNode"
     bl_label = "Prototype Node"
-    options = {"No Execution"}
+    options = {"NO_EXECUTION"}
 
     def draw(self, layout):
         if len(self.sockets) == 0:

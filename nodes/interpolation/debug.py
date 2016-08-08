@@ -12,7 +12,7 @@ class DebugInterpolationNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_DebugInterpolationNode"
     bl_label = "Debug Interpolation"
     bl_width_default = 160
-    options = {"No Timing"}
+    options = {"NO_TIMING"}
 
     resolution = IntProperty(name = "Resolution", min = 5, default = 40)
 

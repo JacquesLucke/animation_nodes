@@ -71,11 +71,11 @@ def markInvalidNodes(network, nodes):
 
 def checkNodeOptions(network, nodes):
     for node in nodes:
-        if "No Execution" in node.options:
+        if "NO_EXECUTION" in node.options:
             problems.NodeDoesNotSupportExecution(node.identifier).report()
-        if "No Subprogram" in node.options and network.type in ("Group", "Loop"):
+        if "NOT_IN_SUBPROGRAM" in node.options and network.type in ("Group", "Loop"):
             problems.NodeMustNotBeInSubprogram(node.identifier).report()
-        if "No Auto Execution" in node.options:
+        if "NO_AUTO_EXECUTION" in node.options:
             problems.NodeShouldNotBeUsedInAutoExecution(node.identifier).report()
 
 def checkIdentifiers():
