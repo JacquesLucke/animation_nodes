@@ -13,7 +13,7 @@ class SplineFromPointsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SplineFromPointsNode"
     bl_label = "Spline from Points"
 
-    splineType = EnumProperty(name = "Spline Type", default = "BEZIER",
+    splineType = EnumProperty(name = "Spline Type", default = "POLY",
         items = splineTypeItems, update = propertyChanged)
 
     def create(self):
@@ -26,7 +26,7 @@ class SplineFromPointsNode(bpy.types.Node, AnimationNode):
 
     def execute(self, points, cyclic):
         if self.splineType == "BEZIER": spline = BezierSpline()
-        if self.splineType == "POLY": spline = PolySpline()
-        spline.appendPoints(points)
-        spline.isCyclic = cyclic
+        if self.splineType == "POLY":
+            spline = PolySpline(points)
+            spline.cyclic = cyclic
         return spline
