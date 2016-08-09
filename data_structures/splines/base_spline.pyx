@@ -43,12 +43,14 @@ cdef class Spline:
         if amount == 1:
             return Vector3DList.fromValues([self.evaluate((start + end) / 2)])
 
+        cdef Vector3DList samples = Vector3DList(length = amount)
+        self.getSamples_LowLevel(amount, start, end, <Vector3*>samples.base.data)
+        return samples
+
+    cdef void getSamples_LowLevel(self, long amount, float start, float end, Vector3* output):
         cdef:
-            Vector3DList samples = Vector3DList(length = amount)
-            Vector3* _samples = <Vector3*>samples.base.data
             long stepDivisor, i
             float step, t
-
         if self.cyclic and start == 0 and end == 1:
             stepDivisor = amount
         else:
@@ -59,5 +61,4 @@ cdef class Spline:
             # needed due to limited float accuracy
             if t > 1: t = 1
             if t < 0: t = 0
-            self.evaluate_LowLevel(t, _samples + i)
-        return samples
+            self.evaluate_LowLevel(t, output + i)
