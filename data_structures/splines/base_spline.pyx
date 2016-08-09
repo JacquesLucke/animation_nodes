@@ -22,7 +22,7 @@ cdef class Spline:
         raise NotImplementedError()
 
     cpdef void update(self):
-        raise NotImplementedError()
+        pass
 
     cdef void evaluate_LowLevel(self, float t, Vector3* result):
         raise NotImplementedError()

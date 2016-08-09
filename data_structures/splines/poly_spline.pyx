@@ -38,9 +38,6 @@ cdef class PolySpline(Spline):
             length += distanceVec3(_points + 0, _points + self.points.getLength() - 1)
         return length
 
-    cpdef void update(self):
-        pass
-
     cpdef bint isEvaluable(self):
         return self.points.getLength() >= 2
 
