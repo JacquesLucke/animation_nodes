@@ -1,3 +1,4 @@
+from mathutils import Vector
 from .. lists.complex_lists cimport Vector3DList
 
 cdef class Spline:
@@ -16,10 +17,22 @@ cdef class Spline:
         raise NotImplementedError()
 
     cpdef evaluate(self, float t):
-        raise NotImplementedError()
+        if t < 0 or t > 1:
+            raise ValueError("parameter has to be between 0 and 1")
+        if not self.isEvaluable():
+            raise Exception("spline is not evaluable")
+        cdef Vector3 result
+        self.evaluate_LowLevel(t, &result)
+        return Vector((result.x, result.y, result.z))
 
     cpdef evaluateTangent(self, float t):
-        raise NotImplementedError()
+        if t < 0 or t > 1:
+            raise ValueError("parameter has to be between 0 and 1")
+        if not self.isEvaluable():
+            raise Exception("spline is not evaluable")
+        cdef Vector3 result
+        self.evaluateTangent_LowLevel(t, &result)
+        return Vector((result.x, result.y, result.z))
 
     cpdef void update(self):
         pass

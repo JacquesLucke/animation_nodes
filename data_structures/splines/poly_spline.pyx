@@ -41,15 +41,6 @@ cdef class PolySpline(Spline):
     cpdef bint isEvaluable(self):
         return self.points.getLength() >= 2
 
-    cpdef evaluate(self, float t):
-        if t < 0 or t > 1:
-            raise ValueError("parameter has to be between 0 and 1")
-        if not self.isEvaluable():
-            raise Exception("spline is not evaluable")
-        cdef Vector3 result
-        self.evaluate_LowLevel(t, &result)
-        return Vector((result.x, result.y, result.z))
-
     cdef void evaluate_LowLevel(self, float t, Vector3* result):
         cdef:
             Vector3* _points = <Vector3*>self.points.base.data
@@ -57,15 +48,6 @@ cdef class PolySpline(Spline):
             float factor
         self.calcPointIndicesAndMixFactor(t, indices, &factor)
         mixVec3(result, _points + indices[0], _points + indices[1], factor)
-
-    cpdef evaluateTangent(self, float t):
-        if t < 0 or t > 1:
-            raise ValueError("parameter has to be between 0 and 1")
-        if not self.isEvaluable():
-            raise Exception("spline is not evaluable")
-        cdef Vector3 result
-        self.evaluateTangent_LowLevel(t, &result)
-        return Vector((result.x, result.y, result.z))
 
     cdef void evaluateTangent_LowLevel(self, float t, Vector3* result):
         cdef:
