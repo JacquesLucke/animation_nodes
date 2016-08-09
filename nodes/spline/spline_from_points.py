@@ -25,8 +25,9 @@ class SplineFromPointsNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "splineType", text = "")
 
     def execute(self, points, cyclic):
-        if self.splineType == "BEZIER": spline = BezierSpline()
+        if self.splineType == "BEZIER":
+            spline = BezierSpline(points, points.copy(), points.copy())
         if self.splineType == "POLY":
             spline = PolySpline(points)
-            spline.cyclic = cyclic
+        spline.cyclic = cyclic
         return spline

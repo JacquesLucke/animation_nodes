@@ -6,3 +6,5 @@ cdef class BezierSpline(Spline):
         Vector3DList points
         Vector3DList leftHandles
         Vector3DList rightHandles
+
+    cdef void calcPointIndicesAndMixFactor(self, float t, long* index, float* factor)
