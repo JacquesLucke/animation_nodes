@@ -2,7 +2,6 @@ cimport cython
 from types import GeneratorType
 from libc.stdlib cimport malloc, free, realloc
 from libc.string cimport memcpy, memmove, memcmp
-from ... algorithms.lists.convert import toLISTNAME
 from . utils cimport predictSliceLength, makeStepPositive, removeValuesInSlice
 
 @cython.freelist(10)
@@ -466,6 +465,7 @@ cdef class LISTNAME:
         if isinstance(values, (list, tuple)):
             return cls.fromListOrTuple(values)
 
+        from ... algorithms.lists.convert import toLISTNAME
         try: return toLISTNAME(values)
         except TypeError: pass
 

@@ -87,10 +87,10 @@ if getBlenderVersion() < (2, 76, 0):
     raise Exception(message)
 
 
-try: from . data_structures import FloatList
+try: from . import test_compile
 except: pass
 
-if "FloatList" not in globals():
+if "test_compile" not in globals():
     message = ("\n\n"
         "You are using an uncompiled version of Animation Nodes.\n"
         "Please download an official release or compile the addon yourself.\n"
