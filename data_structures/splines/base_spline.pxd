@@ -15,6 +15,7 @@ cdef class Spline:
     cpdef double getLength(self, resolution = ?)
 
     cpdef getSamples(self, long amount, float start = ?, float end = ?)
+    cpdef getTangentSamples(self, long amount, float start = ?, float end = ?)
 
     cpdef evaluate(self, float t)
     cpdef evaluateTangent(self, float t)

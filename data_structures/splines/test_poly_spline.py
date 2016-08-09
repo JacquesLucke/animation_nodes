@@ -220,6 +220,23 @@ class TestGetSamples(TestCase):
         with self.assertRaises(Exception):
             spline.getSamples(5)
 
+class TestGetTangentSamples(TestCase):
+    def setUp(self):
+        self.spline = PolySpline()
+        self.spline.appendPoint((0, 0, 0))
+        self.spline.appendPoint((4, 0, 0))
+        self.spline.appendPoint((4, 2, 0))
+        self.spline.appendPoint((10, 2, 10))
+
+    def testNormal(self):
+        samples = self.spline.getTangentSamples(5)
+        self.assertEqual(len(samples), 5)
+        testEqual(self, samples[0], (4, 0, 0))
+        testEqual(self, samples[1], (4, 0, 0))
+        testEqual(self, samples[2], (0, 2, 0))
+        testEqual(self, samples[3], (6, 0, 10))
+        testEqual(self, samples[4], (6, 0, 10))
+
 
 def testEqual(testCase, vector1, vector2):
     testCase.assertAlmostEqual(vector1[0], vector2[0], places = 5)
