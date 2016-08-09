@@ -32,6 +32,10 @@ cdef class Spline:
 
 
     cpdef getSamples(self, long amount, float start = 0, float end = 1):
+        return self.sampleEvaluationFunction(self.evaluate_LowLevel, amount, start, end)
+
+    cdef sampleEvaluationFunction(self, EvaluationFunction evaluate,
+                                        long amount, float start, float end):
         if not self.isEvaluable():
             raise Exception("spline is not evaluable")
         if start < 0 or end < 0 or start > 1 or end > 1:
@@ -40,25 +44,31 @@ cdef class Spline:
             raise ValueError("amount has to be greator or equal to 0")
         if amount == 0:
             return Vector3DList()
-        if amount == 1:
-            return Vector3DList.fromValues([self.evaluate((start + end) / 2)])
 
         cdef Vector3DList samples = Vector3DList(length = amount)
-        self.getSamples_LowLevel(amount, start, end, <Vector3*>samples.base.data)
+        self.sampleEvaluationFunction_LowLevel(evaluate, amount, start, end, <Vector3*>samples.base.data)
         return samples
 
-    cdef void getSamples_LowLevel(self, long amount, float start, float end, Vector3* output):
-        cdef:
-            long stepDivisor, i
-            float step, t
+    cdef void sampleEvaluationFunction_LowLevel(self, EvaluationFunction evaluate,
+                                                long amount, float start, float end,
+                                                Vector3* output):
+        '''amount >= 1; 0 <= start, end <= 1'''
+        if amount == 1:
+            evaluate(self, (start + end) / 2, output)
+            return
+
+        cdef float step
+        
         if self.cyclic and start == 0 and end == 1:
-            stepDivisor = amount
+            step = (end - start) / amount
         else:
-            stepDivisor = amount - 1
-        step = (end - start) / stepDivisor
+            step = (end - start) / (amount - 1)
+
+        cdef long i
+        cdef float t
         for i in range(amount):
             t = start + i * step
             # needed due to limited float accuracy
             if t > 1: t = 1
             if t < 0: t = 0
-            self.evaluate_LowLevel(t, output + i)
+            evaluate(self, t, output + i)
