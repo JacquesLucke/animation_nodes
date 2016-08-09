@@ -64,9 +64,25 @@ cdef class BezierSpline(Spline):
         result.z = w[0].z*mt3 + w[1].z*coeff1 + w[2].z*coeff2 + w[3].z*t3
 
     cdef void evaluateTangent_LowLevel(self, float t, Vector3* result):
-        result.x = 0
-        result.y = 0
-        result.z = 0
+        cdef:
+            float t1
+            Vector3* w[4]
+            long indices[2]
+        self.calcPointIndicesAndMixFactor(t, indices, &t1)
+        w[0] = (<Vector3*>self.points.base.data) + indices[0]
+        w[1] = (<Vector3*>self.rightHandles.base.data) + indices[0]
+        w[2] = (<Vector3*>self.leftHandles.base.data) + indices[1]
+        w[3] = (<Vector3*>self.points.base.data) + indices[1]
+
+        cdef:
+            float t2 = t1 * t1
+            float coeff0 = -3 +  6 * t1 - 3 * t2
+            float coeff1 =  3 - 12 * t1 + 9 * t2
+            float coeff2 =       6 * t1 - 9 * t2
+            float coeff3 =                3 * t2
+        result.x = w[0].x*coeff0 + w[1].x*coeff1 + w[2].x*coeff2 + w[3].x*coeff3
+        result.y = w[0].y*coeff0 + w[1].y*coeff1 + w[2].y*coeff2 + w[3].y*coeff3
+        result.z = w[0].z*coeff0 + w[1].z*coeff1 + w[2].z*coeff2 + w[3].z*coeff3
 
     cdef void calcPointIndicesAndMixFactor(self, float t, long* index, float* factor):
         cdef long pointAmount = self.points.getLength()
