@@ -35,7 +35,9 @@ cdef class Spline:
         if not self.isEvaluable():
             raise Exception("spline is not evaluable")
         if start < 0 or end < 0 or start > 1 or end > 1:
-            raise Exception("start and end have to be between 0 and 1")
+            raise ValueError("start and end have to be between 0 and 1")
+        if amount < 0:
+            raise ValueError("amount has to be greator or equal to 0")
         if amount == 0:
             return Vector3DList()
         if amount == 1:
