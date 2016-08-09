@@ -53,7 +53,7 @@ cdef class Spline:
     cdef void sampleEvaluationFunction_LowLevel(self, EvaluationFunction evaluate,
                                                 long amount, float start, float end,
                                                 Vector3* output):
-        '''amount >= 1; 0 <= start, end <= 1'''
+        '''amount >= 0; 0 <= start, end <= 1'''
         if amount == 1: evaluate(self, (start + end) / 2, output)
         if amount <= 1: return
 
