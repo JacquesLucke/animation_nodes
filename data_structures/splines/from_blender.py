@@ -1,4 +1,5 @@
 from . poly_spline import PolySpline
+from . bezier_spline import BezierSpline
 from .. import FloatList, Vector3DList
 
 def createSplinesFromBlenderObject(object):
@@ -21,7 +22,18 @@ def createSplineFromBlenderSpline(bSpline):
     return None
 
 def createBezierSpline(bSpline):
-    raise NotImplementedError()
+    amount = len(bSpline.bezier_points)
+    points = Vector3DList(length = amount)
+    leftHandles = Vector3DList(length = amount)
+    rightHandles = Vector3DList(length = amount)
+
+    bSpline.bezier_points.foreach_get("co", points.getMemoryView())
+    bSpline.bezier_points.foreach_get("handle_left", leftHandles.getMemoryView())
+    bSpline.bezier_points.foreach_get("handle_right", rightHandles.getMemoryView())
+
+    spline = BezierSpline(points, leftHandles, rightHandles)
+    spline.cyclic = bSpline.use_cyclic_u
+    return spline
 
 def createPolySpline(bSpline):
     pointArray = FloatList(length = 4 * len(bSpline.points))

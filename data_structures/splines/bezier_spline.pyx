@@ -2,6 +2,10 @@ from libc.math cimport floor
 from ... math.ctypes cimport Vector3
 from ... math.base_operations cimport mixVec3
 from ... math.list_operations cimport transformVector3DList
+from mathutils import Vector
+
+# Great free online book about bezier curves:
+# http://pomax.github.io/bezierinfo/
 
 cdef class BezierSpline(Spline):
 
@@ -38,18 +42,26 @@ cdef class BezierSpline(Spline):
 
     cdef void evaluate_LowLevel(self, float t, Vector3* result):
         cdef:
+            float t1
+            Vector3* w[4]
             long indices[2]
-            float factor
-            Vector3* start
-            Vector3* startControl
-            Vector3* endControl
-            Vector3* end
-        self.calcPointIndicesAndMixFactor(t, indices, &factor)
-        start = (<Vector3*>self.points.base.data) + indices[0]
-        end = (<Vector3*>self.points.base.data) + indices[1]
-        startControl = (<Vector3*>self.rightHandles.base.data) + indices[0]
-        endControl = (<Vector3*>self.leftHandles.base.data) + indices[1]
-        mixVec3(result, start, end, factor)
+        self.calcPointIndicesAndMixFactor(t, indices, &t1)
+        w[0] = (<Vector3*>self.points.base.data) + indices[0]
+        w[1] = (<Vector3*>self.rightHandles.base.data) + indices[0]
+        w[2] = (<Vector3*>self.leftHandles.base.data) + indices[1]
+        w[3] = (<Vector3*>self.points.base.data) + indices[1]
+
+        cdef:
+            float t2 = t1 * t1
+            float t3 = t2 * t1
+            float mt1 = 1 - t1
+            float mt2 = mt1 * mt1
+            float mt3 = mt2 * mt1
+            float coeff1 = 3 * mt2 * t1
+            float coeff2 = 3 * mt1 * t2
+        result.x = w[0].x*mt3 + w[1].x*coeff1 + w[2].x*coeff2 + w[3].x*t3
+        result.y = w[0].y*mt3 + w[1].y*coeff1 + w[2].y*coeff2 + w[3].y*t3
+        result.z = w[0].z*mt3 + w[1].z*coeff1 + w[2].z*coeff2 + w[3].z*t3
 
     cdef void evaluateTangent_LowLevel(self, float t, Vector3* result):
         result.x = 0
