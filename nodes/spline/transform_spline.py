@@ -14,5 +14,4 @@ class TransformSplineNode(bpy.types.Node, AnimationNode):
 
     def execute(self, spline, matrix):
         spline.transform(matrix)
-        spline.isChanged = True
         return spline
