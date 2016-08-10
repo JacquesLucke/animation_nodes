@@ -91,17 +91,34 @@ cdef class BezierSpline(Spline):
             Vector3* _points = <Vector3*>self.points.base.data
             Vector3* _leftHandles = <Vector3*>self.leftHandles.base.data
             Vector3* _rightHandles = <Vector3*>self.rightHandles.base.data
-            long indexLeft, indexCurrent, indexRight
+            long indexLeft, i, indexRight
             long pointAmount = self.points.getLength()
 
-        for indexCurrent in range(pointAmount):
-            indexLeft = max(indexCurrent - 1, 0)
-            indexRight = min(indexCurrent + 1, pointAmount - 1)
+        if pointAmount < 2: return
 
+        for i in range(1, pointAmount - 1):
             calculateSmoothControlPoints(
-                _points + indexCurrent, _points + indexLeft, _points + indexRight, strength,
-                _leftHandles + indexCurrent, _rightHandles + indexCurrent
-            )
+                _points + i, _points + i - 1, _points + i + 1, strength,
+                _leftHandles + i, _rightHandles + i)
+
+        # End points need extra consideration
+        cdef long lastIndex = pointAmount - 1
+        if self.cyclic:
+            # Start Point
+            calculateSmoothControlPoints(
+                _points, _points + lastIndex, _points + 1, strength,
+                _leftHandles, _rightHandles)
+            # End Point
+            calculateSmoothControlPoints(
+                _points + lastIndex, _points + lastIndex - 1, _points, strength,
+                _leftHandles + lastIndex, _rightHandles + lastIndex)
+        else:
+            # Start Point
+            _leftHandles[0] = _points[0]
+            _rightHandles[0] = _points[0]
+            # End Point
+            _leftHandles[lastIndex] = _points[lastIndex]
+            _rightHandles[lastIndex] = _points[lastIndex]
 
 cdef calculateSmoothControlPoints(
                 Vector3* point, Vector3* left, Vector3* right, float strength,
@@ -118,6 +135,7 @@ cdef calculateSmoothControlPoints(
     lenRight = lengthVec3(&vecRight)
 
     if lenLeft > 0 and lenRight > 0:
+        # TODO: Inline manually (check if it matters)
         scaleVec3(&vecRight, factor = lenLeft / lenRight)
         subVec3(&direction, &vecRight, &vecLeft)
         normalizeVec3(&direction)
