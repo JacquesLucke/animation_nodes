@@ -13,7 +13,7 @@ class SplineFromPointsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SplineFromPointsNode"
     bl_label = "Spline from Points"
 
-    splineType = EnumProperty(name = "Spline Type", default = "POLY",
+    splineType = EnumProperty(name = "Spline Type", default = "BEZIER",
         items = splineTypeItems, update = propertyChanged)
 
     def create(self):
