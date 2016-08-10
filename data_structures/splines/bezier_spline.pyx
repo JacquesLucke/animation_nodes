@@ -23,6 +23,11 @@ cdef class BezierSpline(Spline):
         self.rightHandles = rightHandles
         self.type = "BEZIER"
 
+    cpdef appendPoint(self, point, leftHandle, rightHandle):
+        self.points.append(point)
+        self.leftHandles.append(leftHandle)
+        self.rightHandles.append(rightHandle)
+
     cpdef BezierSpline copy(self):
         cdef BezierSpline newSpline = BezierSpline(
                 self.points.copy(),
