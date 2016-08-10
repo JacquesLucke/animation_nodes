@@ -19,9 +19,6 @@ cdef class PolySpline(Spline):
     def appendPoint(self, point):
         self.points.append(point)
 
-    def getPoints(self):
-        return self.points
-
     cpdef PolySpline copy(self):
         cdef PolySpline newSpline = PolySpline()
         newSpline.cyclic = self.cyclic

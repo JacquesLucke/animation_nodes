@@ -7,7 +7,7 @@ class TestInitialisation(TestCase):
         spline = PolySpline()
         self.assertFalse(spline.cyclic)
         self.assertEqual(spline.type, "POLY")
-        self.assertEqual(len(spline.getPoints()), 0)
+        self.assertEqual(len(spline.points), 0)
 
 class TestAppendPoint(TestCase):
     def setUp(self):
@@ -16,7 +16,7 @@ class TestAppendPoint(TestCase):
     def testNormal(self):
         self.spline.appendPoint((0, 0, 0))
         self.spline.appendPoint((1, 1, 1))
-        points = self.spline.getPoints()
+        points = self.spline.points
         self.assertEqual(len(points), 2)
         self.assertEqual(points[0], Vector((0, 0, 0)))
         self.assertEqual(points[1], Vector((1, 1, 1)))

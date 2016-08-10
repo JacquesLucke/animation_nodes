@@ -11,5 +11,6 @@ class SplineInfoNode(bpy.types.Node, AnimationNode):
         self.newOutput("Boolean", "Cyclic", "cyclic")
 
     def execute(self, spline):
+        raise NotImplementedError()
         spline.update()
         return spline.getPoints(), spline.isCyclic

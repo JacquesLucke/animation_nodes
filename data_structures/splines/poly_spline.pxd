@@ -4,4 +4,4 @@ from .. lists.complex_lists cimport Vector3DList
 
 cdef class PolySpline(Spline):
     cdef:
-        Vector3DList points
+        readonly Vector3DList points

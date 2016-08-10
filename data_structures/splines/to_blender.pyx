@@ -19,16 +19,18 @@ def setSplinesOnBlenderObject(object, splines):
 
 def appendBezierSpline(bSplines, spline):
     bSpline = bSplines.new("BEZIER")
-    bSpline.use_cyclic_u = spline.isCyclic
+    bSpline.use_cyclic_u = spline.cyclic
 
     # one point is already there
     bSpline.bezier_points.add(len(spline.points) - 1)
 
-    raise NotImplementedError()
+    bSpline.bezier_points.foreach_set("co", spline.points.getMemoryView())
+    bSpline.bezier_points.foreach_set("handle_left", spline.leftHandles.getMemoryView())
+    bSpline.bezier_points.foreach_set("handle_right", spline.rightHandles.getMemoryView())
 
 def appendPolySpline(bSplines, spline):
     # Blender stores 4 values for each point of a poly spline
-    cdef Vector3DList points = spline.getPoints()
+    cdef Vector3DList points = spline.points
     cdef FloatList pointCoordinates = points.base
     cdef FloatList bPoints = FloatList(length = points.getLength() * 4)
 
