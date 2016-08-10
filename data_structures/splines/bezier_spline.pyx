@@ -8,9 +8,9 @@ from mathutils import Vector
 
 cdef class BezierSpline(Spline):
 
-    def __cinit__(self, Vector3DList points,
-                        Vector3DList leftHandles,
-                        Vector3DList rightHandles):
+    def __cinit__(self, Vector3DList points = None,
+                        Vector3DList leftHandles = None,
+                        Vector3DList rightHandles = None):
         if points is None: points = Vector3DList()
         if leftHandles is None: leftHandles = Vector3DList()
         if rightHandles is None: rightHandles = Vector3DList()

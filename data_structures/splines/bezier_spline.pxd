@@ -8,5 +8,7 @@ cdef class BezierSpline(Spline):
         Vector3DList leftHandles
         Vector3DList rightHandles
 
+    cpdef appendPoint(self, point, leftHandle, rightHandle)
+
     cdef void getSegmentData(self, float parameter, float* t, Vector3** w)
     cdef void calcPointIndicesAndMixFactor(self, float t, long* index, float* factor)
