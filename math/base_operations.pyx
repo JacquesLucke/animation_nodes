@@ -1,5 +1,13 @@
 from libc.math cimport sqrt
 
+cdef void scaleVec3(Vector3* v, float factor):
+    v.x *= factor
+    v.y *= factor
+    v.z *= factor
+
+cdef float lengthVec3(Vector3* v):
+    return sqrt(v.x ** 2 + v.y ** 2 + v.z ** 2)
+
 cdef void addVec3(Vector3* target, Vector3* a, Vector3* b):
     target.x = a.x + b.x
     target.y = a.y + b.y
@@ -25,7 +33,7 @@ cdef void normalizeVec3(Vector3* v):
     v.y /= length
     v.z /= length
 
-cdef double distanceVec3(Vector3* a, Vector3* b):
+cdef float distanceVec3(Vector3* a, Vector3* b):
     return sqrt((a.x - b.x) ** 2
               + (a.y - b.y) ** 2
               + (a.z - b.z) ** 2)

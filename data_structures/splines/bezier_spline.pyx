@@ -1,6 +1,7 @@
-from ... math.base_operations cimport mixVec3
-from ... math.list_operations cimport transformVector3DList
+cimport cython
 from . utils cimport calcSegmentIndicesAndFactor
+from ... math.list_operations cimport transformVector3DList
+from ... math.base_operations cimport addVec3, mixVec3, subVec3, normalizeVec3, lengthVec3, scaleVec3
 from mathutils import Vector
 
 # Great free online book about bezier curves:
@@ -83,3 +84,39 @@ cdef class BezierSpline(Spline):
         w[1] = (<Vector3*>self.rightHandles.base.data) + indices[0]
         w[2] = (<Vector3*>self.leftHandles.base.data) + indices[1]
         w[3] = (<Vector3*>self.points.base.data) + indices[1]
+
+    @cython.cdivision(True)
+    cpdef calculateSmoothHandles(self, float strength = 1/3):
+        # http://stackoverflow.com/questions/13037606/how-does-inkscape-calculate-the-coordinates-for-control-points-for-smooth-edges/13425159#13425159
+        cdef:
+            Vector3* _points = <Vector3*>self.points.base.data
+            Vector3* _leftHandles = <Vector3*>self.leftHandles.base.data
+            Vector3* _rightHandles = <Vector3*>self.rightHandles.base.data
+            long indexBefore, indexCurrent, indexAfter
+            long pointAmount = self.points.getLength()
+            Vector3 vecLeft, vecRight
+            double lenLeft, lenRight
+            Vector3 direction, directionLeft, directionRight
+
+        for indexCurrent in range(pointAmount):
+            indexBefore = max(indexCurrent - 1, 0)
+            indexAfter = min(indexCurrent + 1, pointAmount - 1)
+
+            subVec3(&vecLeft, _points + indexBefore, _points + indexCurrent)
+            subVec3(&vecRight, _points + indexAfter, _points + indexCurrent)
+            lenLeft = lengthVec3(&vecLeft)
+            lenRight = lengthVec3(&vecRight)
+
+            if lenLeft > 0 and lenRight > 0:
+                scaleVec3(&vecRight, factor = lenLeft / lenRight)
+                subVec3(&direction, &vecRight, &vecLeft)
+                normalizeVec3(&direction)
+
+                directionLeft = direction
+                directionRight = direction
+
+                scaleVec3(&directionLeft, -lenLeft * strength)
+                scaleVec3(&directionRight, lenRight * strength)
+
+                addVec3(_leftHandles + indexCurrent, _points + indexCurrent, &directionLeft)
+                addVec3(_rightHandles + indexCurrent, _points + indexCurrent, &directionRight)

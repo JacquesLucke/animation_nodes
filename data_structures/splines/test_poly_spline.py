@@ -50,7 +50,7 @@ class TestGetLength(TestCase):
         spline.appendPoint((0, 0, 0))
         spline.appendPoint((2, 4, 6))
         spline.appendPoint((2, 10, 8))
-        self.assertAlmostEqual(spline.getLength(), 13.80787009)
+        self.assertAlmostEqual(spline.getLength(), 13.80787009, places = 5)
 
     def testSimpleCyclic(self):
         spline = PolySpline()

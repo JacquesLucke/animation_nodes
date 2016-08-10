@@ -1,9 +1,11 @@
 from . ctypes cimport Vector3, Matrix4
 
+cdef void scaleVec3(Vector3* v, float factor)
+cdef float lengthVec3(Vector3* v)
 cdef void addVec3(Vector3* target, Vector3* a, Vector3* b)
 cdef void subVec3(Vector3* target, Vector3* a, Vector3* b)
 cdef void mixVec3(Vector3* target, Vector3* a, Vector3* b, float factor)
 
 cdef void normalizeVec3(Vector3* v)
-cdef double distanceVec3(Vector3* a, Vector3* b)
+cdef float distanceVec3(Vector3* a, Vector3* b)
 cdef void transformVec3(Vector3* target, Vector3* v, Matrix4* m)
