@@ -1,5 +1,4 @@
 from libc.math cimport floor
-from ... math.ctypes cimport Vector3
 from ... math.base_operations cimport mixVec3
 from ... math.list_operations cimport transformVector3DList
 from mathutils import Vector
@@ -40,17 +39,11 @@ cdef class BezierSpline(Spline):
     cpdef bint isEvaluable(self):
         return self.points.getLength() >= 2
 
-    cdef void evaluate_LowLevel(self, float t, Vector3* result):
+    cdef void evaluate_LowLevel(self, float parameter, Vector3* result):
         cdef:
             float t1
             Vector3* w[4]
-            long indices[2]
-        self.calcPointIndicesAndMixFactor(t, indices, &t1)
-        w[0] = (<Vector3*>self.points.base.data) + indices[0]
-        w[1] = (<Vector3*>self.rightHandles.base.data) + indices[0]
-        w[2] = (<Vector3*>self.leftHandles.base.data) + indices[1]
-        w[3] = (<Vector3*>self.points.base.data) + indices[1]
-
+        self.getSegmentData(parameter, &t1, w)
         cdef:
             float t2 = t1 * t1
             float t3 = t2 * t1
@@ -63,17 +56,11 @@ cdef class BezierSpline(Spline):
         result.y = w[0].y*mt3 + w[1].y*coeff1 + w[2].y*coeff2 + w[3].y*t3
         result.z = w[0].z*mt3 + w[1].z*coeff1 + w[2].z*coeff2 + w[3].z*t3
 
-    cdef void evaluateTangent_LowLevel(self, float t, Vector3* result):
+    cdef void evaluateTangent_LowLevel(self, float parameter, Vector3* result):
         cdef:
             float t1
             Vector3* w[4]
-            long indices[2]
-        self.calcPointIndicesAndMixFactor(t, indices, &t1)
-        w[0] = (<Vector3*>self.points.base.data) + indices[0]
-        w[1] = (<Vector3*>self.rightHandles.base.data) + indices[0]
-        w[2] = (<Vector3*>self.leftHandles.base.data) + indices[1]
-        w[3] = (<Vector3*>self.points.base.data) + indices[1]
-
+        self.getSegmentData(parameter, &t1, w)
         cdef:
             float t2 = t1 * t1
             float coeff0 = -3 +  6 * t1 - 3 * t2
@@ -83,6 +70,14 @@ cdef class BezierSpline(Spline):
         result.x = w[0].x*coeff0 + w[1].x*coeff1 + w[2].x*coeff2 + w[3].x*coeff3
         result.y = w[0].y*coeff0 + w[1].y*coeff1 + w[2].y*coeff2 + w[3].y*coeff3
         result.z = w[0].z*coeff0 + w[1].z*coeff1 + w[2].z*coeff2 + w[3].z*coeff3
+
+    cdef void getSegmentData(self, float parameter, float* t, Vector3** w):
+        cdef long indices[2]
+        self.calcPointIndicesAndMixFactor(parameter, indices, t)
+        w[0] = (<Vector3*>self.points.base.data) + indices[0]
+        w[1] = (<Vector3*>self.rightHandles.base.data) + indices[0]
+        w[2] = (<Vector3*>self.leftHandles.base.data) + indices[1]
+        w[3] = (<Vector3*>self.points.base.data) + indices[1]
 
     cdef void calcPointIndicesAndMixFactor(self, float t, long* index, float* factor):
         cdef long pointAmount = self.points.getLength()
