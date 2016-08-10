@@ -19,6 +19,17 @@ cdef void mixVec3(Vector3* target, Vector3* a, Vector3* b, float factor):
     target.y = newY
     target.z = newZ
 
+cdef void normalizeVec3(Vector3* v):
+    cdef float length = sqrt(v.x ** 2 + v.y ** 2 + v.z ** 2)
+    v.x /= length
+    v.y /= length
+    v.z /= length
+
+cdef double distanceVec3(Vector3* a, Vector3* b):
+    return sqrt((a.x - b.x) ** 2
+              + (a.y - b.y) ** 2
+              + (a.z - b.z) ** 2)
+
 cdef void transformVec3(Vector3* target, Vector3* v, Matrix4* m):
     cdef float newX, newY, newZ
     newX = v.x * m.a11 + v.y * m.a12 + v.z * m.a13 + m.a14
@@ -27,8 +38,3 @@ cdef void transformVec3(Vector3* target, Vector3* v, Matrix4* m):
     target.x = newX
     target.y = newY
     target.z = newZ
-
-cdef double distanceVec3(Vector3* a, Vector3* b):
-    return sqrt((a.x - b.x) ** 2
-              + (a.y - b.y) ** 2
-              + (a.z - b.z) ** 2)
