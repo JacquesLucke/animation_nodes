@@ -1,4 +1,5 @@
 from libc.math cimport floor
+from . utils cimport calcSegmentIndicesAndFactor
 from ... math.ctypes cimport Vector3
 from ... math.base_operations cimport mixVec3, distanceVec3, subVec3
 from ... math.list_operations cimport (
@@ -41,39 +42,18 @@ cdef class PolySpline(Spline):
     cpdef bint isEvaluable(self):
         return self.points.getLength() >= 2
 
-    cdef void evaluate_LowLevel(self, float t, Vector3* result):
+    cdef void evaluate_LowLevel(self, float parameter, Vector3* result):
         cdef:
             Vector3* _points = <Vector3*>self.points.base.data
             long indices[2]
-            float factor
-        self.calcPointIndicesAndMixFactor(t, indices, &factor)
-        mixVec3(result, _points + indices[0], _points + indices[1], factor)
+            float t
+        calcSegmentIndicesAndFactor(self.points.getLength(), self.cyclic, parameter, indices, &t)
+        mixVec3(result, _points + indices[0], _points + indices[1], t)
 
-    cdef void evaluateTangent_LowLevel(self, float t, Vector3* result):
+    cdef void evaluateTangent_LowLevel(self, float parameter, Vector3* result):
         cdef:
             Vector3* _points = <Vector3*>self.points.base.data
             long indices[2]
-            float factor # not really needed here
-        self.calcPointIndicesAndMixFactor(t, indices, &factor)
+            float t # not really needed here
+        calcSegmentIndicesAndFactor(self.points.getLength(), self.cyclic, parameter, indices, &t)
         subVec3(result, _points + indices[1], _points + indices[0])
-
-    cdef void calcPointIndicesAndMixFactor(self, float t, long* index, float* factor):
-        cdef long pointAmount = self.points.getLength()
-        if not self.cyclic:
-            if t < 1:
-                index[0] = <long>floor(t * (pointAmount - 1))
-                index[1] = index[0] + 1
-                factor[0] = t * (pointAmount - 1) - index[0]
-            else:
-                index[0] = pointAmount - 2
-                index[1] = pointAmount - 1
-                factor[0] = 1
-        else:
-            if t < 1:
-                index[0] = <long>floor(t * pointAmount)
-                index[1] = index[0] + 1 if index[0] < (pointAmount - 1) else 0
-                factor[0] = t * pointAmount - index[0]
-            else:
-                index[0] = pointAmount - 1
-                index[1] = 0
-                factor[0] = 1

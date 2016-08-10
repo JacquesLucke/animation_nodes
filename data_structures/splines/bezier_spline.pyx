@@ -1,6 +1,6 @@
-from libc.math cimport floor
 from ... math.base_operations cimport mixVec3
 from ... math.list_operations cimport transformVector3DList
+from . utils cimport calcSegmentIndicesAndFactor
 from mathutils import Vector
 
 # Great free online book about bezier curves:
@@ -78,29 +78,8 @@ cdef class BezierSpline(Spline):
 
     cdef void getSegmentData(self, float parameter, float* t, Vector3** w):
         cdef long indices[2]
-        self.calcPointIndicesAndMixFactor(parameter, indices, t)
+        calcSegmentIndicesAndFactor(self.points.getLength(), self.cyclic, parameter, indices, t)
         w[0] = (<Vector3*>self.points.base.data) + indices[0]
         w[1] = (<Vector3*>self.rightHandles.base.data) + indices[0]
         w[2] = (<Vector3*>self.leftHandles.base.data) + indices[1]
         w[3] = (<Vector3*>self.points.base.data) + indices[1]
-
-    cdef void calcPointIndicesAndMixFactor(self, float t, long* index, float* factor):
-        cdef long pointAmount = self.points.getLength()
-        if not self.cyclic:
-            if t < 1:
-                index[0] = <long>floor(t * (pointAmount - 1))
-                index[1] = index[0] + 1
-                factor[0] = t * (pointAmount - 1) - index[0]
-            else:
-                index[0] = pointAmount - 2
-                index[1] = pointAmount - 1
-                factor[0] = 1
-        else:
-            if t < 1:
-                index[0] = <long>floor(t * pointAmount)
-                index[1] = index[0] + 1 if index[0] < (pointAmount - 1) else 0
-                factor[0] = t * pointAmount - index[0]
-            else:
-                index[0] = pointAmount - 1
-                index[1] = 0
-                factor[0] = 1
