@@ -85,7 +85,6 @@ cdef class BezierSpline(Spline):
         w[2] = (<Vector3*>self.leftHandles.base.data) + indices[1]
         w[3] = (<Vector3*>self.points.base.data) + indices[1]
 
-    @cython.cdivision(True)
     cpdef calculateSmoothHandles(self, float strength = 1/3):
         cdef:
             Vector3* _points = <Vector3*>self.points.base.data
@@ -120,13 +119,14 @@ cdef class BezierSpline(Spline):
             _leftHandles[lastIndex] = _points[lastIndex]
             _rightHandles[lastIndex] = _points[lastIndex]
 
+@cython.cdivision(True)
 cdef calculateSmoothControlPoints(
                 Vector3* point, Vector3* left, Vector3* right, float strength,
                 Vector3* leftHandle, Vector3* rightHandle):   # <- output
     # http://stackoverflow.com/questions/13037606/how-does-inkscape-calculate-the-coordinates-for-control-points-for-smooth-edges/13425159#13425159
     cdef:
         Vector3 vecLeft, vecRight
-        double lenLeft, lenRight
+        float lenLeft, lenRight, factor
         Vector3 direction, directionLeft, directionRight
 
     subVec3(&vecLeft, left, point)
@@ -135,16 +135,18 @@ cdef calculateSmoothControlPoints(
     lenRight = lengthVec3(&vecRight)
 
     if lenLeft > 0 and lenRight > 0:
-        # TODO: Inline manually (check if it matters)
-        scaleVec3(&vecRight, factor = lenLeft / lenRight)
-        subVec3(&direction, &vecRight, &vecLeft)
+        factor = lenLeft / lenRight
+        direction.x = factor * vecRight.x - vecLeft.x
+        direction.y = factor * vecRight.y - vecLeft.y
+        direction.z = factor * vecRight.z - vecLeft.z
         normalizeVec3(&direction)
 
-        directionLeft = direction
-        directionRight = direction
+        factor = lenLeft * strength
+        leftHandle.x = point.x - direction.x * factor
+        leftHandle.y = point.y - direction.y * factor
+        leftHandle.z = point.z - direction.z * factor
 
-        scaleVec3(&directionLeft, -lenLeft * strength)
-        scaleVec3(&directionRight, lenRight * strength)
-
-        addVec3(leftHandle, point, &directionLeft)
-        addVec3(rightHandle, point, &directionRight)
+        factor = lenRight * strength
+        rightHandle.x = point.x + direction.x * factor
+        rightHandle.y = point.y + direction.y * factor
+        rightHandle.z = point.z + direction.z * factor
