@@ -1,6 +1,8 @@
 from . import grid
 from . basic_shapes import tubeVertices
-from ... data_structures.splines import BezierSpline, PolySpline
+from ... data_structures.splines.poly_spline cimport PolySpline
+from ... data_structures.splines.bezier_spline cimport BezierSpline
+from ... data_structures.lists.complex_lists cimport Vector3DList
 
 # Loft
 ###################################
@@ -15,9 +17,9 @@ def loftSplines(splines,
     assert nSurfaceSamples >= 2
 
     def calculateVertices():
-        vertices = []
+        vertices = Vector3DList()
         for samples in zip(*sampleInputSplines()):
-            spline = createSurfaceSpline(samples)
+            spline = createSurfaceSpline(Vector3DList.fromValues(samples))
             vertices.extend(sampleSurfaceSpline(spline))
         return vertices
 
@@ -31,13 +33,10 @@ def loftSplines(splines,
 
     def createSurfaceSpline(samples):
         if type == "BEZIER":
-            spline = BezierSpline.fromLocations(samples)
-            spline.isCyclic = cyclic
+            spline = BezierSpline(samples, samples.copy(), samples.copy(), cyclic)
             spline.calculateSmoothHandles(smoothness)
         elif type == "LINEAR":
-            spline = PolySpline.fromLocations(samples)
-            spline.isCyclic = cyclic
-        spline.update()
+            spline = PolySpline(samples, cyclic)
         return spline
 
     def sampleSurfaceSpline(spline):
@@ -50,7 +49,7 @@ def loftSplines(splines,
                 start = startSurfaceParameter, end = endSurfaceParameter)
 
     def calculatePolygonIndices():
-        allSplinesCyclic = all(spline.isCyclic for spline in splines)
+        allSplinesCyclic = all(spline.cyclic for spline in splines)
         isRealCyclic = cyclic and startSurfaceParameter <= 0.0 and endSurfaceParameter >= 1.0
         return grid.quadPolygons(
                    nSplineSamples, nSurfaceSamples,

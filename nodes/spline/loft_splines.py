@@ -68,9 +68,6 @@ class LoftSplinesNode(bpy.types.Node, AnimationNode):
             if isRealCyclic and surfaceSamples < 3: return False
             return True
 
-        for spline in splines:
-            spline.update()
-
         if canExecute():
             vertices, polygons = loftSplines(splines,
                                              splineSamples,

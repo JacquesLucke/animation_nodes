@@ -122,6 +122,8 @@ cdef class BezierSpline(Spline):
             _leftHandles[lastIndex] = _points[lastIndex]
             _rightHandles[lastIndex] = _points[lastIndex]
 
+        self.markChanged()
+
 @cython.cdivision(True)
 cdef calculateSmoothControlPoints(
                 Vector3* point, Vector3* left, Vector3* right, float strength,
