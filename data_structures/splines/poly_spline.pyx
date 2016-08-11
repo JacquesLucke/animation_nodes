@@ -1,3 +1,4 @@
+cimport cython
 from libc.math cimport floor
 from . utils cimport calcSegmentIndicesAndFactor
 from ... math.ctypes cimport Vector3
@@ -54,3 +55,49 @@ cdef class PolySpline(Spline):
             float t # not really needed here
         calcSegmentIndicesAndFactor(self.points.getLength(), self.cyclic, parameter, indices, &t)
         subVec3(result, _points + indices[1], _points + indices[0])
+
+    @cython.cdivision(True)
+    cpdef FloatList getEqualDistanceParameters(self, long amount):
+        cdef:
+            long i
+            FloatList parameters = FloatList(length = max(0, amount))
+            Vector3* _points = <Vector3*>self.points.base.data
+            long pointAmount = self.points.getLength()
+
+        if amount <= 1 or pointAmount <= 1:
+            parameters.fill(0)
+            return parameters
+
+        cdef FloatList distances = FloatList(length = pointAmount - 1)
+        for i in range(pointAmount - 1):
+            distances.data[i] = distanceVec3(_points + i, _points + i + 1)
+
+        cdef float totalLength = distances.getSumOfElements()
+        if totalLength < 0.001: # <- necessary to remove the risk of running
+            parameters.fill(0)  #    into endless loops or division by 0
+            return parameters
+
+        cdef:
+            # Safe Division: amount > 1
+            float stepSize = totalLength / (amount - 1)
+            float factor = 1 / <float>(pointAmount - 1)
+            float missingDistance = stepSize
+            float residualDistance
+            long currentIndex = 1
+
+        for i in range(distances.length):
+            residualDistance = distances.data[i]
+            while residualDistance > missingDistance and currentIndex < amount:
+                residualDistance -= missingDistance
+                # Safe Division: distances.data[i] > 0
+                parameters.data[currentIndex] = (i + 1 - residualDistance / distances.data[i]) * factor
+                missingDistance = stepSize
+                currentIndex += 1
+            missingDistance -= residualDistance
+
+        parameters.data[0] = 0
+        # It can happen that more than one element is 1 due to float inaccuracy
+        for i in range(currentIndex, amount):
+            parameters.data[i] = 1
+        parameters.data[amount - 1]
+        return parameters
