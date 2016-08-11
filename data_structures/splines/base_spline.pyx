@@ -1,5 +1,5 @@
 from mathutils import Vector
-from .. lists.complex_lists cimport Vector3DList
+from . utils cimport calcSegmentIndicesAndFactor
 
 cdef class Spline:
     pass
@@ -15,6 +15,31 @@ cdef class Spline:
 
     cpdef bint isEvaluable(self):
         raise NotImplementedError()
+
+    cpdef void markChanged(self):
+        self.uniformParameters = None
+
+    cpdef ensureUniformConverter(self, long resolution):
+        resolution = max(2, resolution)
+        if self.uniformParameters is None:
+            self.updateUniformParameters(resolution)
+        elif self.uniformParameters.length < resolution:
+            self.updateUniformParameters(resolution)
+
+    cdef updateUniformParameters(self, long resolution):
+        from . poly_spline import PolySpline
+        cdef Vector3DList samples = self.getSamples(resolution)
+        polySpline = PolySpline(samples)
+        self.uniformParameters = polySpline.getUniformParameters(resolution)
+
+    cpdef toUniformParameter(self, float t):
+        if self.uniformParameters is None:
+            raise Exception("cannot evaluate uniform parameters, call spline.ensureUniformConverter() first")
+        cdef float factor
+        cdef long indices[2]
+        calcSegmentIndicesAndFactor(self.uniformParameters.length, False, t, indices, &factor)
+        return self.uniformParameters.data[indices[0]] * (1 - factor) + \
+               self.uniformParameters.data[indices[1]] * factor
 
     cpdef evaluate(self, float t):
         if t < 0 or t > 1:
@@ -33,9 +58,6 @@ cdef class Spline:
         cdef Vector3 result
         self.evaluateTangent_LowLevel(t, &result)
         return Vector((result.x, result.y, result.z))
-
-    cpdef void update(self):
-        pass
 
     cdef void evaluate_LowLevel(self, float t, Vector3* result):
         raise NotImplementedError()
