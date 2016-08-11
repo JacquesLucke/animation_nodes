@@ -277,13 +277,7 @@ class TestGetUniformParameters(TestCase):
         self.assertAlmostEqual(parameters[5], 1.0)
 
     def testMultiplePointsDifferentDistances(self):
-        spline = PolySpline()
-        spline.appendPoint((-1, 0, 0))
-        spline.appendPoint((1, 0, 0))
-        spline.appendPoint((1, 2, 0))
-        spline.appendPoint((1, 2, 5))
-        spline.appendPoint((-2, 2, 5))
-        spline.appendPoint((-2, 2, 2))
+        spline = self.getTestSpline()
         parameters = spline.getUniformParameters(6)
         self.assertAlmostEqual(parameters[0], 0.0)
         self.assertAlmostEqual(parameters[1], 0.3)
@@ -291,6 +285,26 @@ class TestGetUniformParameters(TestCase):
         self.assertAlmostEqual(parameters[3], 0.6)
         self.assertAlmostEqual(parameters[4], 0.8)
         self.assertAlmostEqual(parameters[5], 1.0)
+
+    def testCyclic(self):
+        spline = self.getTestSpline()
+        spline.cyclic = True
+        parameters = spline.getUniformParameters(5)
+        self.assertAlmostEqual(parameters[0], 0.0)
+        self.assertAlmostEqual(parameters[1], 0.35)
+        self.assertAlmostEqual(parameters[2], 0.5)
+        self.assertAlmostEqual(parameters[3], 0.75)
+        self.assertAlmostEqual(parameters[4], 1.0)
+
+    def getTestSpline(self):
+        spline = PolySpline()
+        spline.appendPoint((-1, 0, 0))
+        spline.appendPoint((1, 0, 0))
+        spline.appendPoint((1, 2, 0))
+        spline.appendPoint((1, 2, 5))
+        spline.appendPoint((-2, 2, 5))
+        spline.appendPoint((-2, 2, 2))
+        return spline
 
 def testEqual(testCase, vector1, vector2):
     testCase.assertAlmostEqual(vector1[0], vector2[0], places = 5)

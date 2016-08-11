@@ -68,9 +68,11 @@ cdef class PolySpline(Spline):
             parameters.fill(0)
             return parameters
 
-        cdef FloatList distances = FloatList(length = pointAmount - 1)
+        cdef FloatList distances = FloatList(length = pointAmount - 1 + int(self.cyclic))
         for i in range(pointAmount - 1):
             distances.data[i] = distanceVec3(_points + i, _points + i + 1)
+        if self.cyclic:
+            distances.data[pointAmount - 1] = distanceVec3(_points + pointAmount - 1, _points)
 
         cdef float totalLength = distances.getSumOfElements()
         if totalLength < 0.001: # <- necessary to remove the risk of running
@@ -80,7 +82,7 @@ cdef class PolySpline(Spline):
         cdef:
             # Safe Division: amount > 1
             float stepSize = totalLength / (amount - 1)
-            float factor = 1 / <float>(pointAmount - 1)
+            float factor = 1 / <float>distances.length
             float missingDistance = stepSize
             float residualDistance
             long currentIndex = 1
