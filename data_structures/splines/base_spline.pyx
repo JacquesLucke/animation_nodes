@@ -73,6 +73,9 @@ cdef class Spline:
     cdef void evaluateUniform_LowLevel(self, float parameter, Vector3* result):
         self.evaluate_LowLevel(self.toUniformParameter_LowLevel(parameter), result)
 
+    cdef void evaluateUniformTangent_LowLevel(self, float parameter, Vector3* result):
+        self.evaluateTangent_LowLevel(self.toUniformParameter_LowLevel(parameter), result)
+
 
     cpdef getSamples(self, long amount, float start = 0, float end = 1):
         return self.sampleEvaluationFunction(self.evaluate_LowLevel, amount, start, end)
@@ -84,6 +87,11 @@ cdef class Spline:
         if self.uniformParameters is None:
             raise Exception("cannot evaluate uniform parameters, call spline.ensureUniformConverter() first")
         return self.sampleEvaluationFunction(self.evaluateUniform_LowLevel, amount, start, end)
+
+    cpdef getUniformTangentSamples(self, long amount, float start = 0, float end = 1):
+        if self.uniformParameters is None:
+            raise Exception("cannot evaluate uniform parameters, call spline.ensureUniformConverter() first")
+        return self.sampleEvaluationFunction(self.evaluateUniformTangent_LowLevel, amount, start, end)
 
     cdef sampleEvaluationFunction(self, EvaluationFunction evaluate,
                                         long amount, float start, float end):

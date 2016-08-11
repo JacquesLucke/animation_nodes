@@ -27,6 +27,7 @@ class GetSplineSamplesNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
         if not (isLinked["positions"] or isLinked["tangents"]): return []
 
         yield "if spline.isEvaluable():"
+        yield "    amount = max(amount, 0.0)"
 
         if self.parameterType == "UNIFORM":
             yield "    spline.ensureUniformConverter(self.resolution)"
