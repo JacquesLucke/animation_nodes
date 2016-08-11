@@ -28,8 +28,8 @@ cdef class Spline:
 
     cdef updateUniformParameters(self, long resolution):
         from . poly_spline import PolySpline
-        cdef Vector3DList samples = self.getSamples(resolution)
-        polySpline = PolySpline(samples)
+        if self.type == "POLY": polySpline = self
+        else: polySpline = PolySpline(self.getSamples(resolution))
         self.uniformParameters = polySpline.getUniformParameters(resolution)
 
     cpdef toUniformParameter(self, float t):
