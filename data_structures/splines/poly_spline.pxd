@@ -7,4 +7,4 @@ cdef class PolySpline(Spline):
     cdef:
         readonly Vector3DList points
 
-    cpdef FloatList getEqualDistanceParameters(self, long amount)
+    cpdef FloatList getUniformParameters(self, long amount)

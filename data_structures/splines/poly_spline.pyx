@@ -57,7 +57,7 @@ cdef class PolySpline(Spline):
         subVec3(result, _points + indices[1], _points + indices[0])
 
     @cython.cdivision(True)
-    cpdef FloatList getEqualDistanceParameters(self, long amount):
+    cpdef FloatList getUniformParameters(self, long amount):
         cdef:
             long i
             FloatList parameters = FloatList(length = max(0, amount))

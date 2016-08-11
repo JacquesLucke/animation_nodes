@@ -237,6 +237,60 @@ class TestGetTangentSamples(TestCase):
         testEqual(self, samples[3], (6, 0, 10))
         testEqual(self, samples[4], (6, 0, 10))
 
+class TestGetUniformParameters(TestCase):
+    def testEmptySpline(self):
+        spline = PolySpline()
+        parameters = spline.getUniformParameters(10)
+        self.assertEqual(len(parameters), 10)
+
+    def testSplineWithLengthZero(self):
+        spline = PolySpline()
+        for i in range(10):
+            spline.appendPoint((3, 4, 5))
+        parameters = spline.getUniformParameters(10)
+        self.assertEqual(len(parameters), 10)
+
+    def testSimple(self):
+        spline = PolySpline()
+        spline.appendPoint((0, 0, 0))
+        spline.appendPoint((3, 0, 0))
+        parameters = spline.getUniformParameters(4)
+        self.assertEqual(len(parameters), 4)
+        self.assertAlmostEqual(parameters[0], 0.0)
+        self.assertAlmostEqual(parameters[1], 1/3)
+        self.assertAlmostEqual(parameters[2], 2/3)
+        self.assertAlmostEqual(parameters[3], 1.0)
+
+    def testMultiplePointsSameDistance(self):
+        spline = PolySpline()
+        spline.appendPoint((0, 0, 0))
+        spline.appendPoint((3, 0, 0))
+        spline.appendPoint((6, 0, 0))
+        spline.appendPoint((6, -3, 0))
+        spline.appendPoint((6, -3, 3))
+        parameters = spline.getUniformParameters(6)
+        self.assertAlmostEqual(parameters[0], 0.0)
+        self.assertAlmostEqual(parameters[1], 0.2)
+        self.assertAlmostEqual(parameters[2], 0.4)
+        self.assertAlmostEqual(parameters[3], 0.6)
+        self.assertAlmostEqual(parameters[4], 0.8)
+        self.assertAlmostEqual(parameters[5], 1.0)
+
+    def testMultiplePointsDifferentDistances(self):
+        spline = PolySpline()
+        spline.appendPoint((-1, 0, 0))
+        spline.appendPoint((1, 0, 0))
+        spline.appendPoint((1, 2, 0))
+        spline.appendPoint((1, 2, 5))
+        spline.appendPoint((-2, 2, 5))
+        spline.appendPoint((-2, 2, 2))
+        parameters = spline.getUniformParameters(6)
+        self.assertAlmostEqual(parameters[0], 0.0)
+        self.assertAlmostEqual(parameters[1], 0.3)
+        self.assertAlmostEqual(parameters[2], 0.48)
+        self.assertAlmostEqual(parameters[3], 0.6)
+        self.assertAlmostEqual(parameters[4], 0.8)
+        self.assertAlmostEqual(parameters[5], 1.0)
 
 def testEqual(testCase, vector1, vector2):
     testCase.assertAlmostEqual(vector1[0], vector2[0], places = 5)
