@@ -35,6 +35,11 @@ cdef class Spline:
     cpdef toUniformParameter(self, float t):
         if self.uniformParameters is None:
             raise Exception("cannot evaluate uniform parameters, call spline.ensureUniformConverter() first")
+        if t < 0 or t > 1:
+            raise ValueError("parameter has to be between 0 and 1")
+        return self.toUniformParameter_LowLevel(t)
+
+    cdef float toUniformParameter_LowLevel(self, float t):
         cdef float factor
         cdef long indices[2]
         calcSegmentIndicesAndFactor(self.uniformParameters.length, False, t, indices, &factor)
