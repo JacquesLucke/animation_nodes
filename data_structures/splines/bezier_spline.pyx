@@ -11,7 +11,8 @@ cdef class BezierSpline(Spline):
 
     def __cinit__(self, Vector3DList points = None,
                         Vector3DList leftHandles = None,
-                        Vector3DList rightHandles = None):
+                        Vector3DList rightHandles = None,
+                        bint cyclic = False):
         if points is None: points = Vector3DList()
         if leftHandles is None: leftHandles = Vector3DList()
         if rightHandles is None: rightHandles = Vector3DList()
@@ -22,25 +23,27 @@ cdef class BezierSpline(Spline):
         self.points = points
         self.leftHandles = leftHandles
         self.rightHandles = rightHandles
+        self.cyclic = cyclic
         self.type = "BEZIER"
+        self.markChanged()
 
     cpdef appendPoint(self, point, leftHandle, rightHandle):
         self.points.append(point)
         self.leftHandles.append(leftHandle)
         self.rightHandles.append(rightHandle)
+        self.markChanged()
 
     cpdef BezierSpline copy(self):
-        cdef BezierSpline newSpline = BezierSpline(
-                self.points.copy(),
-                self.leftHandles.copy(),
-                self.rightHandles.copy())
-        newSpline.cyclic = self.cyclic
-        return newSpline
+        return BezierSpline(self.points.copy(),
+                            self.leftHandles.copy(),
+                            self.rightHandles.copy(),
+                            self.cyclic)
 
     cpdef transform(self, matrix):
         transformVector3DList(self.points, matrix)
         transformVector3DList(self.leftHandles, matrix)
         transformVector3DList(self.rightHandles, matrix)
+        self.markChanged()
 
     cpdef bint isEvaluable(self):
         return self.points.getLength() >= 2

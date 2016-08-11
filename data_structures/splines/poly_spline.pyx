@@ -11,23 +11,23 @@ from mathutils import Vector
 
 cdef class PolySpline(Spline):
 
-    def __cinit__(self, Vector3DList points = None):
+    def __cinit__(self, Vector3DList points = None, bint cyclic = False):
         if points is None: points = Vector3DList()
-        self.cyclic = False
+        self.cyclic = cyclic
         self.type = "POLY"
         self.points = points
+        self.markChanged()
 
     def appendPoint(self, point):
         self.points.append(point)
+        self.markChanged()
 
     cpdef PolySpline copy(self):
-        cdef PolySpline newSpline = PolySpline()
-        newSpline.cyclic = self.cyclic
-        newSpline.points = self.points.copy()
-        return newSpline
+        return PolySpline(self.points.copy(), self.cyclic)
 
     cpdef transform(self, matrix):
         transformVector3DList(self.points, matrix)
+        self.markChanged()
 
     cpdef double getLength(self, resolution = 0):
         cdef double length = distanceSumOfVector3DList(self.points)

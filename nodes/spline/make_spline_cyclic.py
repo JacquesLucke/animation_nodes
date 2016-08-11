@@ -13,6 +13,6 @@ class MakeSplineCyclicNode(bpy.types.Node, AnimationNode):
         self.newOutput("Spline", "Spline", "outSpline")
 
     def execute(self, spline, cyclic):
-        spline.isCyclic = cyclic
-        spline.isChanged = True
+        spline.cyclic = cyclic
+        spline.markChanged()
         return spline
