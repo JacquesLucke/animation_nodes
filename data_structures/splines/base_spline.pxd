@@ -17,19 +17,21 @@ cdef class Spline:
 
     cpdef ensureUniformConverter(self, long resolution)
     cdef updateUniformParameters(self, long resolution)
-    cpdef toUniformParameter(self, float t)
-    cdef float toUniformParameter_LowLevel(self, float t)
+    cpdef toUniformParameter(self, float parameter)
+    cdef float toUniformParameter_LowLevel(self, float parameter)
 
     cpdef double getLength(self, resolution = ?)
 
     cpdef getSamples(self, long amount, float start = ?, float end = ?)
     cpdef getTangentSamples(self, long amount, float start = ?, float end = ?)
+    cpdef getUniformSamples(self, long amount, float start = ?, float end = ?)
 
-    cpdef evaluate(self, float t)
-    cpdef evaluateTangent(self, float t)
+    cpdef evaluate(self, float parameter)
+    cpdef evaluateTangent(self, float parameter)
 
-    cdef void evaluate_LowLevel(self, float t, Vector3* result)
-    cdef void evaluateTangent_LowLevel(self, float t, Vector3* result)
+    cdef void evaluate_LowLevel(self, float parameter, Vector3* result)
+    cdef void evaluateTangent_LowLevel(self, float parameter, Vector3* result)
+    cdef void evaluateUniform_LowLevel(self, float parameter, Vector3* result)
 
     cdef sampleEvaluationFunction(self, EvaluationFunction evaluate,
                                         long amount, float start, float end)
