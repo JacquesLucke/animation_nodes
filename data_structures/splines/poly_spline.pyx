@@ -44,11 +44,16 @@ cdef class PolySpline(Spline):
             long endIndices[2]
             float startT, endT
 
-        calcSegmentIndicesAndFactor(self.points.getLength(), False, start, startIndices, &startT)
-        calcSegmentIndicesAndFactor(self.points.getLength(), False, end, endIndices, &endT)
+        calcSegmentIndicesAndFactor(self.points.getLength(), self.cyclic, start, startIndices, &startT)
+        calcSegmentIndicesAndFactor(self.points.getLength(), self.cyclic, end, endIndices, &endT)
+
+        cdef long newPointAmount
+        if endIndices[1] > 0:
+            newPointAmount = endIndices[1] - startIndices[0] + 1
+        elif endIndices[1] == 0: # <- cyclic extension required
+            newPointAmount = self.points.getLength() - startIndices[0] + 1
 
         cdef:
-            long newPointAmount = endIndices[1] - startIndices[0] + 1
             Vector3DList newPoints = Vector3DList(length = newPointAmount)
             Vector3* _newPoints = <Vector3*>newPoints.base.data
             Vector3* _oldPoints = <Vector3*>self.points.base.data

@@ -326,6 +326,17 @@ class TestGetTrimmedCopy(TestCase):
         testEqual(self, newSpline.points[3], (1, -3, 0))
         testEqual(self, newSpline.points[4], (3, -3, 0))
 
+    def testCyclic(self):
+        spline = self.getTestSpline()
+        spline.cyclic = True
+        newSpline = spline.getTrimmedCopy(start = 0.4, end = 0.95)
+        self.assertEqual(len(newSpline.points), 5)
+        testEqual(self, newSpline.points[0], (1, -1.2, 1))
+        testEqual(self, newSpline.points[1], (1, -3, 1))
+        testEqual(self, newSpline.points[2], (1, -3, 0))
+        testEqual(self, newSpline.points[3], (5, -3, 0))
+        testEqual(self, newSpline.points[4], (0.8, -0.9, 0))
+
     def getTestSpline(self):
         spline = PolySpline()
         spline.appendPoint((-1, 0, 0))

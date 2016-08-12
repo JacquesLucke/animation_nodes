@@ -27,8 +27,6 @@ cdef class Spline:
             raise Exception("spline is not evaluable")
         if start < 0 or end < 0 or start > 1 or end > 1:
             raise ValueError("start and end have to be between 0 and 1")
-        if self.cyclic:
-            raise Exception("trimming not supported for cyclic splines (yet)")
         cdef float _start, _end
         if start <= end:
             _start = start
