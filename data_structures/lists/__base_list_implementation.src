@@ -395,7 +395,7 @@ cdef class LISTNAME:
 
     def getMaxValue(self):
         if self.length == 0:
-            raise ValueError("Cannot find a min value in a list with zero elements")
+            raise ValueError("Cannot find a max value in a list with zero elements")
 
         cdef TYPE maxValue = self.data[0]
         for i in range(self.length):
