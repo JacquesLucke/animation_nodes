@@ -3,20 +3,23 @@ from ... data_structures cimport Vector3DList, EdgeIndicesList, PolygonIndicesLi
 # Vertices
 ############################################
 
-def vertices(int xDivisions, int yDivisions, float xDistance = 1, float yDistance = 1, offset = (0, 0, 0)):
+def vertices(float length, float width, int xDivisions, int yDivisions, offset = (0, 0, 0)):
     assert xDivisions >= 2
     assert yDivisions >= 2
     cdef:
+        float xStep = length / <float>(xDivisions - 1)
+        float yStep = width / <float>(yDivisions - 1)
         float xOffset, yOffset, zOffset
         int x, y
+
     vertices = Vector3DList(length = xDivisions * yDivisions)
     xOffset, yOffset, zOffset = offset
     cdef int tmp
     for x in range(xDivisions):
         tmp = x * yDivisions
         for y in range(yDivisions):
-            vertices.base.data[(tmp + y) * 3 + 0] = x * xDistance + xOffset
-            vertices.base.data[(tmp + y) * 3 + 1] = y * yDistance + yOffset
+            vertices.base.data[(tmp + y) * 3 + 0] = x * xStep + xOffset
+            vertices.base.data[(tmp + y) * 3 + 1] = y * yStep + yOffset
             vertices.base.data[(tmp + y) * 3 + 2] = zOffset
     return vertices
 

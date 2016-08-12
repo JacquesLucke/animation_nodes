@@ -13,10 +13,10 @@ class GridMeshNode(bpy.types.Node, AnimationNode):
     centerGrid = BoolProperty(name = "Center", default = True, update = executionCodeChanged)
 
     def create(self):
+        self.newInput("Float", "Length", "length", value = 2)
+        self.newInput("Float", "Width", "width", value = 2)
         self.newInput("Integer", "X Divisions", "xDivisions", value = 5, minValue = 2)
         self.newInput("Integer", "Y Divisions", "yDivisions", value = 5, minValue = 2)
-        self.newInput("Float", "X Distance", "xDistance", value = 1)
-        self.newInput("Float", "Y Distance", "yDistance", value = 1)
         self.newInput("Vector", "Offset", "offset", isDataModified = True)
 
         self.newOutput("Vector List", "Vertices", "vertices")
@@ -26,15 +26,26 @@ class GridMeshNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.prop(self, "centerGrid")
 
-    def execute(self, xDivisions, yDivisions, xDistance, yDistance, offset):
-        xDivisions = max(xDivisions, 2)
-        yDivisions = max(yDivisions, 2)
-        offset = offset.copy()
-        offset.x -= (xDivisions - 1) * xDistance / 2 if self.centerGrid else 0
-        offset.y -= (yDivisions - 1) * yDistance / 2 if self.centerGrid else 0
+    def getExecutionCode(self):
+        isLinked = self.getLinkedOutputsDict()
+        yield "_xDivisions =  max(xDivisions, 2)"
+        yield "_yDivisions =  max(yDivisions, 2)"
+        if isLinked["vertices"]:
+            yield "vertices = self.calcVertices(length, width, _xDivisions, _yDivisions, offset)"
+        if isLinked["edgeIndices"]:
+            yield "edgeIndices = self.calcEdgeIndices(_xDivisions, _yDivisions)"
+        if isLinked["polygonIndices"]:
+            yield "polygonIndices = self.calcPolygonIndices(_xDivisions, _yDivisions)"
 
-        vertices = grid.vertices(xDivisions, yDivisions, xDistance, yDistance, offset) if self.outputs[0].isLinked else []
-        edgeIndices = grid.innerQuadEdges(xDivisions, yDivisions) if self.outputs[1].isLinked else []
-        polygonIndices = grid.innerQuadPolygons(xDivisions, yDivisions) if self.outputs[2].isLinked else []
+    def calcVertices(self, length, width, xDivisions, yDivisions, offset):
+        if self.centerGrid:
+            offset = offset.copy()
+            offset.x -= length / 2 if self.centerGrid else 0
+            offset.y -= width / 2 if self.centerGrid else 0
+        return grid.vertices(length, width, xDivisions, yDivisions, offset)
 
-        return vertices, edgeIndices, polygonIndices
+    def calcEdgeIndices(self, xDivisions, yDivisions):
+        return grid.innerQuadEdges(xDivisions, yDivisions)
+
+    def calcPolygonIndices(self, xDivisions, yDivisions):
+        return grid.innerQuadPolygons(xDivisions, yDivisions)
