@@ -133,7 +133,11 @@ cdef class BezierSpline(Spline):
         calcSegmentIndicesAndFactor(self.points.getLength(), self.cyclic, start, startIndices, &startT)
         calcSegmentIndicesAndFactor(self.points.getLength(), self.cyclic, end, endIndices, &endT)
 
-        cdef long newPointAmount = endIndices[1] - startIndices[0] + 1
+        cdef long newPointAmount
+        if endIndices[1] > 0:
+            newPointAmount = endIndices[1] - startIndices[0] + 1
+        elif endIndices[1] == 0: # <- cyclic extension required
+            newPointAmount = self.points.getLength() - startIndices[0] + 1
         cdef:
             Vector3DList newPoints = Vector3DList(length = newPointAmount)
             Vector3DList newLeftHandles = Vector3DList(length = newPointAmount)

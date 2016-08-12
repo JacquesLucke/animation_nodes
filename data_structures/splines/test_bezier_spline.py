@@ -86,6 +86,16 @@ class TestGetTrimmedCopy(TestCase):
         testEqual(self, newSpline.rightHandles[0], (1.356, -1.764, -0.728))
         testEqual(self, newSpline.leftHandles[1], (0.372, -1.968, 0.064))
 
+    def testGetSingleSegmentOfCyclicSpline(self):
+        spline = self.getMultiSegmentSpline()
+        spline.cyclic = True
+        newSpline = spline.getTrimmedCopy(0.8, 0.95)
+        self.assertEqual(len(newSpline.points), 2)
+        testEqual(self, newSpline.points[0], (0.232, -3.12, 0.896))
+        testEqual(self, newSpline.points[1], (-0.992, -0.6, 0.104))
+        testEqual(self, newSpline.rightHandles[0], (0.148, -2.82, 0.704))
+        testEqual(self, newSpline.leftHandles[1], (-0.728, -1.44, 0.296))
+
     def getSingleSegmentSpline(self):
         spline = BezierSpline()
         spline.appendPoint((-1, 0, 0), (-1.5, -0.5, 0), (-0.5, 0.5, 0))
