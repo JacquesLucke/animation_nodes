@@ -1,5 +1,6 @@
 cimport cython
 from libc.math cimport floor
+from libc.string cimport memcpy
 from . utils cimport calcSegmentIndicesAndFactor
 from ... math.ctypes cimport Vector3
 from ... math.base_operations cimport mixVec3, distanceVec3, subVec3
@@ -36,6 +37,26 @@ cdef class PolySpline(Spline):
             _points = <Vector3*>self.points.base.data
             length += distanceVec3(_points + 0, _points + self.points.getLength() - 1)
         return length
+
+    cdef PolySpline getTrimmedCopy_LowLovel(self, float start, float end):
+        cdef:
+            long startIndices[2]
+            long endIndices[2]
+            float startT, endT
+
+        calcSegmentIndicesAndFactor(self.points.getLength(), False, start, startIndices, &startT)
+        calcSegmentIndicesAndFactor(self.points.getLength(), False, end, endIndices, &endT)
+
+        cdef:
+            long newPointAmount = endIndices[1] - startIndices[0] + 1
+            Vector3DList newPoints = Vector3DList(length = newPointAmount)
+            Vector3* _newPoints = <Vector3*>newPoints.base.data
+            Vector3* _oldPoints = <Vector3*>self.points.base.data
+
+        mixVec3(_newPoints, _oldPoints + startIndices[0], _oldPoints + startIndices[1], startT)
+        mixVec3(_newPoints + newPointAmount - 1, _oldPoints + endIndices[0], _oldPoints + endIndices[1], endT)
+        memcpy(_newPoints + 1, _oldPoints + startIndices[1], 3 * sizeof(float) * (newPointAmount - 2))
+        return PolySpline(newPoints)
 
     cpdef bint isEvaluable(self):
         return self.points.getLength() >= 2

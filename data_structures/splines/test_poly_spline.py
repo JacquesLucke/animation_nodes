@@ -306,6 +306,36 @@ class TestGetUniformParameters(TestCase):
         spline.appendPoint((-2, 2, 2))
         return spline
 
+class TestGetTrimmedCopy(TestCase):
+    def testSingleSegment(self):
+        spline = PolySpline()
+        spline.appendPoint((-1, 0, 0))
+        spline.appendPoint((1, 0, 0))
+        newSpline = spline.getTrimmedCopy(start = 0.25, end = 0.8)
+        self.assertEqual(len(newSpline.points), 2)
+        testEqual(self, newSpline.points[0], (-0.5, 0, 0))
+        testEqual(self, newSpline.points[1], (0.6, 0, 0))
+
+    def testMultipleSegments(self):
+        spline = self.getTestSpline()
+        newSpline = spline.getTrimmedCopy(start = 0.25, end = 0.9)
+        self.assertEqual(len(newSpline.points), 5)
+        testEqual(self, newSpline.points[0], (1, 0, 0.25))
+        testEqual(self, newSpline.points[1], (1, 0, 1))
+        testEqual(self, newSpline.points[2], (1, -3, 1))
+        testEqual(self, newSpline.points[3], (1, -3, 0))
+        testEqual(self, newSpline.points[4], (3, -3, 0))
+
+    def getTestSpline(self):
+        spline = PolySpline()
+        spline.appendPoint((-1, 0, 0))
+        spline.appendPoint((1, 0, 0))
+        spline.appendPoint((1, 0, 1))
+        spline.appendPoint((1, -3, 1))
+        spline.appendPoint((1, -3, 0))
+        spline.appendPoint((5, -3, 0))
+        return spline
+
 def testEqual(testCase, vector1, vector2):
     testCase.assertAlmostEqual(vector1[0], vector2[0], places = 5)
     testCase.assertAlmostEqual(vector1[1], vector2[1], places = 5)

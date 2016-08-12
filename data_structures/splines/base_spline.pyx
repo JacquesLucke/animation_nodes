@@ -22,6 +22,26 @@ cdef class Spline:
     cpdef void markChanged(self):
         self.uniformParameters = None
 
+    cpdef getTrimmedCopy(self, float start = 0.0, float end = 1.0):
+        if not self.isEvaluable():
+            raise Exception("spline is not evaluable")
+        if start < 0 or end < 0 or start > 1 or end > 1:
+            raise ValueError("start and end have to be between 0 and 1")
+        if self.cyclic:
+            raise Exception("trimming not supported for cyclic splines (yet)")
+        cdef float _start, _end
+        if start <= end:
+            _start = start
+            _end = end
+        else:
+            _start = end
+            _end = start
+        cdef Spline trimmedSpline = self.getTrimmedCopy_LowLovel(_start, _end)
+        return trimmedSpline
+
+    cdef Spline getTrimmedCopy_LowLovel(self, float start, float end):
+        raise NotImplementedError()
+
 
     # Uniform Conversion
     #############################################
