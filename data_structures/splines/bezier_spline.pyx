@@ -139,6 +139,7 @@ cdef class BezierSpline(Spline):
             newPointAmount = endIndices[1] - startIndices[0] + 1
         elif endIndices[1] == 0: # <- cyclic extension required
             newPointAmount = self.points.getLength() - startIndices[0] + 1
+            
         cdef:
             Vector3DList newPoints = Vector3DList(length = newPointAmount)
             Vector3DList newLeftHandles = Vector3DList(length = newPointAmount)
@@ -151,7 +152,7 @@ cdef class BezierSpline(Spline):
             Vector3* _oldRightHandles = <Vector3*>self.rightHandles.base.data
             Vector3 tmp[4]
 
-        if startIndices[0] == endIndices[0]: # <- trim one segment from both sides
+        if startIndices[0] == endIndices[0]: # <- result will contain only one segment
             if endT < 0.0001: # <- both parameters are (nearly) zero, avoid division by zero
                 _newPoints[0] = _oldPoints[startIndices[0]]
                 _newPoints[1] = _oldPoints[startIndices[0]]
@@ -159,18 +160,19 @@ cdef class BezierSpline(Spline):
                 _newLeftHandles[1] = _oldPoints[startIndices[0]]
                 _newRightHandles[0] = _oldPoints[startIndices[0]]
                 _newRightHandles[1] = _oldPoints[startIndices[0]]
-            else:
+            else: # <- trim segment from both ends
                 calcRightTrimmedSegment(endT,
                                    _oldPoints + startIndices[0], _oldRightHandles + startIndices[0],
                                    _oldLeftHandles + startIndices[1], _oldPoints + startIndices[1],
                                    tmp + 0, tmp + 1, tmp + 2, tmp + 3)
-                calcRightTrimmedSegment(1 - startT / endT,
-                                   tmp + 3, tmp + 2, tmp + 1, tmp + 0,
-                                   _newPoints + 1, _newLeftHandles + 1,
-                                   _newRightHandles + 0, _newPoints + 0)
+                calcLeftTrimmedSegment(startT / endT,
+                                   tmp + 0, tmp + 1, tmp + 2, tmp + 3,
+                                   _newPoints + 0, _newRightHandles + 0,
+                                   _newLeftHandles + 1, _newPoints + 1)
                 _newLeftHandles[0] = _newPoints[0]
                 _newRightHandles[1] = _newPoints[1]
-        else:
+        else: # <- resulting spline will contain multiple segments
+            # Copy segments which stay the same
             memcpy(_newPoints + 1,
                    _oldPoints + startIndices[1],
                    3 * sizeof(float) * (newPointAmount - 2))
@@ -180,18 +182,23 @@ cdef class BezierSpline(Spline):
             memcpy(_newRightHandles + 1,
                    _oldRightHandles + startIndices[1],
                    3 * sizeof(float) * (newPointAmount - 2))
+
+            # Trim first segment
             calcLeftTrimmedSegment(startT,
                 _oldPoints + startIndices[0], _oldRightHandles + startIndices[0],
                 _oldLeftHandles + startIndices[1], _oldPoints + startIndices[1],
                 _newPoints, _newRightHandles,
                 _newLeftHandles + 1, _newPoints + 1)
             _newLeftHandles[0] = _newPoints[0]
+
+            # Trim last segment
             calcRightTrimmedSegment(endT,
                 _oldPoints + endIndices[0], _oldRightHandles + endIndices[0],
                 _oldLeftHandles + endIndices[1], _oldPoints + endIndices[1],
                 _newPoints + newPointAmount - 2, _newRightHandles + newPointAmount - 2,
                 _newLeftHandles + newPointAmount - 1, _newPoints + newPointAmount - 1)
             _newRightHandles[newPointAmount - 1] = _newPoints[newPointAmount - 1]
+
         return BezierSpline(newPoints, newLeftHandles, newRightHandles)
 
 @cython.cdivision(True)
