@@ -38,7 +38,7 @@ cdef class PolySpline(Spline):
             length += distanceVec3(_points + 0, _points + self.points.getLength() - 1)
         return length
 
-    cdef PolySpline getTrimmedCopy_LowLovel(self, float start, float end):
+    cdef PolySpline getTrimmedCopy_LowLevel(self, float start, float end):
         cdef:
             long startIndices[2]
             long endIndices[2]

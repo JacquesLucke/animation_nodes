@@ -34,10 +34,10 @@ cdef class Spline:
         else:
             _start = end
             _end = start
-        cdef Spline trimmedSpline = self.getTrimmedCopy_LowLovel(_start, _end)
+        cdef Spline trimmedSpline = self.getTrimmedCopy_LowLevel(_start, _end)
         return trimmedSpline
 
-    cdef Spline getTrimmedCopy_LowLovel(self, float start, float end):
+    cdef Spline getTrimmedCopy_LowLevel(self, float start, float end):
         raise NotImplementedError()
 
 

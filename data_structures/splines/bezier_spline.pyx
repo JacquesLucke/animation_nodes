@@ -124,6 +124,49 @@ cdef class BezierSpline(Spline):
 
         self.markChanged()
 
+    cpdef BezierSpline getTrimmedCopy_LowLevel(self, float start, float end):
+        cdef:
+            long startIndices[2]
+            long endIndices[2]
+            float startT, endT
+
+        calcSegmentIndicesAndFactor(self.points.getLength(), self.cyclic, start, startIndices, &startT)
+        calcSegmentIndicesAndFactor(self.points.getLength(), self.cyclic, end, endIndices, &endT)
+
+        cdef long newPointAmount = endIndices[1] - startIndices[0] + 1
+        cdef:
+            Vector3DList newPoints = Vector3DList(length = newPointAmount)
+            Vector3DList newLeftHandles = Vector3DList(length = newPointAmount)
+            Vector3DList newRightHandles = Vector3DList(length = newPointAmount)
+            Vector3* _newPoints = <Vector3*>newPoints.base.data
+            Vector3* _newLeftHandles = <Vector3*>newLeftHandles.base.data
+            Vector3* _newRightHandles = <Vector3*>newRightHandles.base.data
+            Vector3* _oldPoints = <Vector3*>self.points.base.data
+            Vector3* _oldLeftHandles = <Vector3*>self.leftHandles.base.data
+            Vector3* _oldRightHandles = <Vector3*>self.rightHandles.base.data
+            Vector3 tmp[4]
+
+        if startIndices[0] == endIndices[0]:
+            if endT < 0.0001:
+                _newPoints[0] = _oldPoints[startIndices[0]]
+                _newPoints[1] = _oldPoints[startIndices[0]]
+                _newLeftHandles[0] = _oldPoints[startIndices[0]]
+                _newLeftHandles[1] = _oldPoints[startIndices[0]]
+                _newRightHandles[0] = _oldPoints[startIndices[0]]
+                _newRightHandles[1] = _oldPoints[startIndices[0]]
+            else:
+                calcTrimmedSegment(endT,
+                                   _oldPoints + startIndices[0], _oldRightHandles + startIndices[0],
+                                   _oldLeftHandles + startIndices[1], _oldPoints + startIndices[1],
+                                   tmp + 0, tmp + 1, tmp + 2, tmp + 3)
+                calcTrimmedSegment(1 - startT / endT,
+                                   tmp + 3, tmp + 2, tmp + 1, tmp + 0,
+                                   _newPoints + 1, _newLeftHandles + 1,
+                                   _newRightHandles + 0, _newPoints + 0)
+                _newLeftHandles[0] = _newPoints[0]
+                _newRightHandles[1] = _newPoints[1]
+        return BezierSpline(newPoints, newLeftHandles, newRightHandles)
+
 @cython.cdivision(True)
 cdef calculateSmoothControlPoints(
                 Vector3* point, Vector3* left, Vector3* right, float strength,
@@ -155,3 +198,23 @@ cdef calculateSmoothControlPoints(
         rightHandle.x = point.x + direction.x * factor
         rightHandle.y = point.y + direction.y * factor
         rightHandle.z = point.z + direction.z * factor
+
+cdef calcTrimmedSegment(float t,
+                    Vector3* P1, Vector3* P2, Vector3* P3, Vector3* P4,
+                    Vector3* outP1, Vector3* outP2, Vector3* outP3, Vector3* outP4):
+    cdef float t2 = t * t
+    cdef float t3 = t2 * t
+
+    outP1[0] = P1[0]
+
+    outP2.x = t * P2.x - (t-1) * P1.x
+    outP2.y = t * P2.y - (t-1) * P1.y
+    outP2.z = t * P2.z - (t-1) * P1.z
+
+    outP3.x = t2 * P3.x - 2 * t * (t-1) * P2.x + (t-1) ** 2 * P1.x
+    outP3.y = t2 * P3.y - 2 * t * (t-1) * P2.y + (t-1) ** 2 * P1.y
+    outP3.z = t2 * P3.z - 2 * t * (t-1) * P2.z + (t-1) ** 2 * P1.z
+
+    outP4.x = t3 * P4.x - 3 * t2 * (t-1) * P3.x + 3 * t * (t-1) ** 2 * P2.x - (t-1) ** 3 * P1.x
+    outP4.y = t3 * P4.y - 3 * t2 * (t-1) * P3.y + 3 * t * (t-1) ** 2 * P2.y - (t-1) ** 3 * P1.y
+    outP4.z = t3 * P4.z - 3 * t2 * (t-1) * P3.z + 3 * t * (t-1) ** 2 * P2.z - (t-1) ** 3 * P1.z

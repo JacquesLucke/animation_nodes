@@ -19,7 +19,7 @@ cdef class Spline:
     cpdef transform(self, matrix)
     cpdef double getLength(self, resolution = ?)
     cpdef getTrimmedCopy(self, float start = ?, float end = ?)
-    cdef Spline getTrimmedCopy_LowLovel(self, float start, float end)
+    cdef Spline getTrimmedCopy_LowLevel(self, float start, float end)
 
 
     # Uniform Conversion
