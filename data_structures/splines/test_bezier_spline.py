@@ -77,10 +77,27 @@ class TestGetTrimmedCopy(TestCase):
         for point in newSpline.points + newSpline.leftHandles + newSpline.rightHandles:
             testEqual(self, point, (-1, 0, 0))
 
+    def testGetSingleSegmentFromMultipleSegments(self):
+        spline = self.getMultiSegmentSpline()
+        newSpline = spline.getTrimmedCopy(0.7, 0.9)
+        self.assertEqual(len(newSpline.points), 2)
+        testEqual(self, newSpline.points[0], (1.188, -1.272, -0.944))
+        testEqual(self, newSpline.points[1], (-0.036, -2.316, 0.568))
+        testEqual(self, newSpline.rightHandles[0], (1.356, -1.764, -0.728))
+        testEqual(self, newSpline.leftHandles[1], (0.372, -1.968, 0.064))
+
     def getSingleSegmentSpline(self):
         spline = BezierSpline()
         spline.appendPoint((-1, 0, 0), (-1.5, -0.5, 0), (-0.5, 0.5, 0))
         spline.appendPoint((2, 1, 0), (1, 2, 1), (2, 0, 0))
+        return spline
+
+    def getMultiSegmentSpline(self):
+        spline = BezierSpline()
+        spline.appendPoint((-1, 0, 0), (-1.5, -0.5, 0), (-0.5, 0.5, 0))
+        spline.appendPoint((2, 1, 0), (1, 2, 1), (2, 0, 0))
+        spline.appendPoint((1, -1, -1), (0, 0, 0), (2, -2, -1))
+        spline.appendPoint((0, -3, 1), (-1, -2, 1), (1, -4, 1))
         return spline
 
 def testEqual(testCase, vector1, vector2):

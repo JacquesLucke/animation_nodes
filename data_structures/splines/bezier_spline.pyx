@@ -146,8 +146,8 @@ cdef class BezierSpline(Spline):
             Vector3* _oldRightHandles = <Vector3*>self.rightHandles.base.data
             Vector3 tmp[4]
 
-        if startIndices[0] == endIndices[0]:
-            if endT < 0.0001:
+        if startIndices[0] == endIndices[0]: # <- trim one segment from both sides
+            if endT < 0.0001: # <- both parameters are (nearly) zero, avoid division by zero
                 _newPoints[0] = _oldPoints[startIndices[0]]
                 _newPoints[1] = _oldPoints[startIndices[0]]
                 _newLeftHandles[0] = _oldPoints[startIndices[0]]
@@ -165,6 +165,8 @@ cdef class BezierSpline(Spline):
                                    _newRightHandles + 0, _newPoints + 0)
                 _newLeftHandles[0] = _newPoints[0]
                 _newRightHandles[1] = _newPoints[1]
+        else:
+            pass
         return BezierSpline(newPoints, newLeftHandles, newRightHandles)
 
 @cython.cdivision(True)
