@@ -1,23 +1,25 @@
 from libc.string cimport memcpy
+from . base_spline cimport Spline
+from . poly_spline cimport PolySpline
+from . bezier_spline cimport BezierSpline
 from .. lists.base_lists cimport FloatList
 from .. lists.complex_lists cimport Vector3DList
 
-from itertools import chain
-
-def setSplinesOnBlenderObject(object, splines):
+def setSplinesOnBlenderObject(object, list splines):
     if object is None: return
     if object.type != "CURVE": return
 
     bSplines = object.data.splines
     bSplines.clear()
+    cdef Spline spline
     for spline in splines:
-        if spline.type == "BEZIER":
+        if isinstance(spline, BezierSpline):
             appendBezierSpline(bSplines, spline)
-        if spline.type == "POLY":
+        elif isinstance(spline, PolySpline):
             appendPolySpline(bSplines, spline)
 
 
-def appendBezierSpline(bSplines, spline):
+cdef appendBezierSpline(object bSplines, BezierSpline spline):
     bSpline = bSplines.new("BEZIER")
     bSpline.use_cyclic_u = spline.cyclic
 
@@ -28,16 +30,15 @@ def appendBezierSpline(bSplines, spline):
     bSpline.bezier_points.foreach_set("handle_left", spline.leftHandles.getMemoryView())
     bSpline.bezier_points.foreach_set("handle_right", spline.rightHandles.getMemoryView())
 
-def appendPolySpline(bSplines, spline):
+cdef appendPolySpline(object bSplines, PolySpline spline):
     # Blender stores 4 values for each point of a poly spline
-    cdef Vector3DList points = spline.points
-    cdef FloatList pointCoordinates = points.base
-    cdef FloatList bPoints = FloatList(length = points.getLength() * 4)
+    cdef FloatList pointCoordinates = spline.points.base
+    cdef FloatList bPoints = FloatList(length = spline.points.getLength() * 4)
 
     # Insert a one after every vector to match Blenders data format
     # [1, 2, 3, 4, 5, 6] -> [1, 2, 3, (1), 4, 5, 6, (1)]
     cdef long i
-    for i in range(points.getLength()):
+    for i in range(spline.points.getLength()):
         memcpy(bPoints.data + i * 4,
                pointCoordinates.data + i * 3,
                sizeof(float) * 3)
@@ -47,5 +48,6 @@ def appendPolySpline(bSplines, spline):
     bSpline.use_cyclic_u = spline.cyclic
 
     # one point is already there
-    bSpline.points.add(pointCoordinates.length / 3 - 1)
-    bSpline.points.foreach_set("co", bPoints.getMemoryView())
+    points = bSpline.points
+    points.add(pointCoordinates.length / 3 - 1)
+    points.foreach_set("co", bPoints.getMemoryView())
