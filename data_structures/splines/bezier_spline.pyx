@@ -139,7 +139,7 @@ cdef class BezierSpline(Spline):
             newPointAmount = endIndices[1] - startIndices[0] + 1
         elif endIndices[1] == 0: # <- cyclic extension required
             newPointAmount = self.points.getLength() - startIndices[0] + 1
-            
+
         cdef:
             Vector3DList newPoints = Vector3DList(length = newPointAmount)
             Vector3DList newLeftHandles = Vector3DList(length = newPointAmount)
@@ -247,7 +247,7 @@ cdef calcRightTrimmedSegment(float t,
     P2: right handle of left point
     P3: left handle of right point
     P4: right point
-    outXX: new location of that point
+    outPX: new location of that point
     '''
     cdef float t2 = t * t
     cdef float t3 = t2 * t
