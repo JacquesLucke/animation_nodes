@@ -1,3 +1,4 @@
+cimport cython
 from mathutils import Vector
 from . utils cimport calcSegmentIndicesAndFactor
 
@@ -88,6 +89,7 @@ cdef class Spline:
         self.sampleEvaluationFunction_LowLevel(evaluate, amount, start, end, <Vector3*>samples.base.data)
         return samples
 
+    @cython.cdivision(True)
     cdef void sampleEvaluationFunction_LowLevel(self, EvaluationFunction evaluate,
                                            long amount, float start, float end,
                                            Vector3* output):
