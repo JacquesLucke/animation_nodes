@@ -465,7 +465,7 @@ cdef class LISTNAME:
         if isinstance(values, (list, tuple)):
             return cls.fromListOrTuple(values)
 
-        from ... algorithms.lists.convert import toLISTNAME
+        from . convert import toLISTNAME
         try: return toLISTNAME(values)
         except TypeError: pass
 
