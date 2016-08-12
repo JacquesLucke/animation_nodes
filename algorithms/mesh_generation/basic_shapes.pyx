@@ -1,6 +1,6 @@
 import math
 from mathutils import Vector
-from ... data_structures.lists.complex_lists cimport Vector3DList
+from ... data_structures cimport Vector3DList
 
 def tubeVertices(centerPoints, ringPoints, tangents, resolution):
     vertices = []

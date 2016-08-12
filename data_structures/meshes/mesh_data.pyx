@@ -1,12 +1,4 @@
-import itertools
-from .. lists.polygon_indices_list cimport PolygonIndicesList
-from .. lists.complex_lists cimport Vector3DList, EdgeIndicesList
-
 cdef class MeshData:
-    cdef:
-        readonly Vector3DList vertices
-        readonly EdgeIndicesList edges
-        readonly PolygonIndicesList polygons
 
     def __cinit__(self, Vector3DList vertices = None,
                         EdgeIndicesList edges = None,

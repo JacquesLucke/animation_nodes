@@ -1,4 +1,4 @@
-from ... data_structures.lists.complex_lists cimport Vector3DList, EdgeIndicesList
+from ... data_structures cimport Vector3DList, EdgeIndicesList
 
 # Vertices
 ###########################################

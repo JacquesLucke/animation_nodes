@@ -1,5 +1,4 @@
-from ... data_structures.lists.polygon_indices_list cimport PolygonIndicesList
-from ... data_structures.lists.complex_lists cimport Vector3DList, EdgeIndicesList
+from ... data_structures cimport Vector3DList, EdgeIndicesList, PolygonIndicesList
 
 # Vertices
 ############################################
