@@ -13,7 +13,7 @@ class SplineEvaluationBase:
 
     parameterType = EnumProperty(
         name = "Parameter Type",
-        default = "RESOLUTION",
+        default = "UNIFORM",
         items = parameterTypeItems,
         update = parameterTypeChanged)
 
