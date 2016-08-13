@@ -27,7 +27,7 @@ cdef class PolySpline(Spline):
         transformVector3DList(self.points, matrix)
         self.markChanged()
 
-    cpdef double getLength(self, resolution = 0):
+    cpdef double getLength(self, int resolution = 0):
         cdef double length = distanceSumOfVector3DList(self.points)
         cdef Vector3* _points
         if self.cyclic and self.points.getLength() >= 2:

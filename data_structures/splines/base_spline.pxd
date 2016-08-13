@@ -17,7 +17,8 @@ cdef class Spline:
     cpdef void markChanged(self)
     cpdef bint isEvaluable(self)
     cpdef transform(self, matrix)
-    cpdef double getLength(self, resolution = ?)
+    cpdef double getLength(self, int resolution = ?)
+    cpdef double getPartialLength(self, float start, float end, int resolution = ?)
     cpdef getTrimmedCopy(self, float start = ?, float end = ?)
     cdef Spline getTrimmedCopy_LowLevel(self, float start, float end)
 

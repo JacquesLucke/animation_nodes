@@ -1,5 +1,6 @@
 cimport cython
 from mathutils import Vector
+from ... math cimport distanceSumOfVector3DList
 from ... utils.lists cimport findListSegment_LowLevel
 
 cdef class Spline:
@@ -13,8 +14,15 @@ cdef class Spline:
     cpdef transform(self, matrix):
         raise NotImplementedError()
 
-    cpdef double getLength(self, resolution = 0):
-        raise NotImplementedError()
+    cpdef double getLength(self, int resolution = 0):
+        return self.getPartialLength(0.0, 1.0, resolution)
+
+    cpdef double getPartialLength(self, float start, float end, int resolution = 100):
+        if not self.isEvaluable(): return 0.0
+        start = min(max(start, 0), 1)
+        end = min(max(end, 0), 1)
+        print(start, end)
+        return distanceSumOfVector3DList(self.getSamples(resolution, start, end))
 
     cpdef bint isEvaluable(self):
         raise NotImplementedError()
