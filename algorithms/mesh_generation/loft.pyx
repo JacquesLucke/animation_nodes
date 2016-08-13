@@ -75,7 +75,8 @@ cdef class LinearLoft:
             self.writeSubdivisionLines(target = _vertices + samples,
                     sourceA = _vertices,
                     sourceB = _vertices + (subdivisions + 1) * samples)
-        else:
+        else: # <- multiple segments in the result
+            # TODO: speedup when startT or endT is 0 or 1
             tmp1 = Vector3DList(length = samples); _tmp1 = <Vector3*>tmp1.base.data
             tmp2 = Vector3DList(length = samples); _tmp2 = <Vector3*>tmp2.base.data
             self.writeSplineLine(self.splines[startIndices[0]], _tmp1)
