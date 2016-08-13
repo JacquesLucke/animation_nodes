@@ -1,7 +1,7 @@
 from . poly_spline import PolySpline
 from . bezier_spline import BezierSpline
 
-def connectSplines(list splines):
+def connectSplines(splines):
     if len(splines) == 0: return BezierSpline()
     if len(splines) == 1: return splines[0].copy()
 
@@ -28,5 +28,5 @@ def joinInBezierSpline(splines):
             newSpline.rightHandles.extend(spline.rightHandles)
     return newSpline
 
-def allPolySplines(list splines):
+def allPolySplines(splines):
     return all(isinstance(spline, PolySpline) for spline in splines)
