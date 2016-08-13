@@ -87,6 +87,9 @@ class AnimationNode:
         """
         pass
 
+    def getExecuteFunctionName(self):
+        return "execute"
+
     def getExecutionCode(self):
         return []
 
@@ -364,14 +367,14 @@ class AnimationNode:
         inputVariables = self.inputVariables
         outputVariables = self.outputVariables
 
-        if hasattr(self, "execute"):
+        if hasattr(self, self.getExecuteFunctionName()):
             return self.getLocalExecutionCode_ExecuteFunction(inputVariables, outputVariables)
         else:
             return self.getLocalExecutionCode_GetExecutionCode(inputVariables, outputVariables)
 
     def getLocalExecutionCode_ExecuteFunction(self, inputVariables, outputVariables):
         parameterString = ", ".join(inputVariables[socket.identifier] for socket in self.inputs)
-        executionString = "self.execute({})".format(parameterString)
+        executionString = "self.{}({})".format(self.getExecuteFunctionName(), parameterString)
 
         outputString = ", ".join(outputVariables[socket.identifier] for socket in self.outputs)
 

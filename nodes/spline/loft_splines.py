@@ -1,28 +1,29 @@
 import bpy
 from bpy.props import *
 from ... events import propertyChanged
+from ... tree_info import keepNodeState
 from ... base_types.node import AnimationNode
-from ... algorithms.mesh_generation.from_splines import loftSplines
+from ... algorithms.mesh_generation.loft import LinearLoft
+from ... data_structures import Vector3DList, EdgeIndicesList, PolygonIndicesList
 
 interpolationTypeItems = [
-    ("LINEAR", "Linear", ""),
-    ("BEZIER", "Bezier", "")]
+    ("LINEAR", "Linear", "", "NONE", 0),
+    ("SMOOTH", "Bezier", "", "NONE", 1)]
 
 sampleDistributionTypeItems = [
-    ("RESOLUTION", "Resolution", ""),
-    ("UNIFORM", "Uniform", "")]
+    ("RESOLUTION", "Resolution", "", "NONE", 0),
+    ("UNIFORM", "Uniform", "", "NONE", 1)]
 
 class LoftSplinesNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_LoftSplinesNode"
     bl_label = "Loft Splines"
     bl_width_default = 160
 
-    def settingChanged(self, context):
-        self.inputs["Smoothness"].hide = self.interpolationType != "BEZIER"
-        propertyChanged(self, context)
+    def interpolationTypeChanged(self, context):
+        self.recreateSockets()
 
-    interpolationType = EnumProperty(name = "Interpolation Type", default = "BEZIER",
-        items = interpolationTypeItems, update = settingChanged)
+    interpolationType = EnumProperty(name = "Interpolation Type", default = "LINEAR",
+        items = interpolationTypeItems, update = interpolationTypeChanged)
 
     resolution = IntProperty(name = "Resolution", default = 100, min = 2,
         description = "Increase to have a more accurate evaluation", update = propertyChanged)
@@ -34,19 +35,27 @@ class LoftSplinesNode(bpy.types.Node, AnimationNode):
         items = sampleDistributionTypeItems, update = propertyChanged)
 
     def create(self):
+        self.recreateSockets()
+
+    @keepNodeState
+    def recreateSockets(self):
+        self.clearSockets()
+
         self.newInput("Spline List", "Splines", "splines")
-        socket1 = self.newInput("Integer", "Spline Samples", "splineSamples")
-        socket2 = self.newInput("Integer", "Surface Samples", "surfaceSamples")
-        for socket in (socket1, socket2):
-            socket.value = 16
-            socket.minValue = 2
-        self.newInput("Boolean", "Cyclic", "cyclic").value = False
-        self.newInput("Float", "Smoothness", "smoothness").value = 0.3333
+        self.newInput("Integer", "Spline Samples", "splineSamples", value = 16, minValue = 2)
+        if self.interpolationType == "LINEAR":
+            self.newInput("Integer", "Subdivisions", "subdivisions", value = 0, minValue = 0)
+        elif self.interpolationType == "SMOOTH":
+            self.newInput("Integer", "Surface Samples", "surfaceSamples", value = 16, minValue = 2)
+        self.newInput("Boolean", "Cyclic", "cyclic", value = False)
+        if self.interpolationType == "SMOOTH":
+            self.newInput("Float", "Smoothness", "smoothness", value = 1/3)
         self.newInput("Float", "Start", "start", hide = True, value = 0.0).setRange(0.0, 1.0)
         self.newInput("Float", "End", "end", hide = True, value = 1.0).setRange(0.0, 1.0)
+
         self.newOutput("Vector List", "Vertices", "vertices")
-        self.newOutput("Polygon Indices List", "Polygons", "polygons")
-        self.settingChanged(bpy.context)
+        self.newOutput("Edge Indices List", "Edge Indices", "edgeIndices")
+        self.newOutput("Polygon Indices List", "Polygon Indices", "polygonIndices")
 
     def draw(self, layout):
         layout.prop(self, "interpolationType", text = "")
@@ -56,6 +65,36 @@ class LoftSplinesNode(bpy.types.Node, AnimationNode):
         col.prop(self, "splineDistributionType")
         col.prop(self, "surfaceDistributionType")
         col.prop(self, "resolution")
+
+    def getExecuteFunctionName(self):
+        if self.interpolationType == "LINEAR":
+            return "execute_Linear"
+        elif self.interpolationType == "SMOOTH":
+            return "execute_Smooth"
+
+    def execute_Linear(self, splines, splineSamples, subdivisions, cyclic, start, end):
+        if not all(spline.isEvaluable() for spline in splines):
+            return Vector3DList(), EdgeIndicesList(), PolygonIndicesList()
+
+        loft = LinearLoft()
+        loft.splines = splines
+        loft.splineSamples = splineSamples
+        loft.subdivisions = subdivisions
+        loft.cyclic = cyclic
+        loft.start = start
+        loft.end = end
+
+        if loft.validate():
+            vertices = loft.calcVertices()
+            edgeIndices = loft.calcEdgeIndices()
+            polygonIndices = loft.calcPolygonIndices()
+        else:
+            vertices = Vector3DList()
+            edgeIndices = EdgeIndicesList()
+            polygonIndices = PolygonIndicesList()
+
+        return vertices, edgeIndices, polygonIndices
+
 
     def execute(self, splines, splineSamples, surfaceSamples, cyclic, smoothness, start, end):
         def canExecute():
