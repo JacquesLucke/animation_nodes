@@ -142,7 +142,6 @@ class AddonPreferences(bpy.types.AddonPreferences):
         col.prop(self.developer, "runTests")
 
 def getPreferences():
-    # TODO: access user_preferences without the context
     return bpy.context.user_preferences.addons[addonName].preferences
 
 def getDeveloperSettings():
