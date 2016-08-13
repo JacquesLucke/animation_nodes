@@ -1,7 +1,9 @@
+from ... math cimport Vector3
+from ... data_structures cimport PolySpline, Vector3DList, EdgeIndicesList
+
 import bpy
 from ... base_types.node import AnimationNode
-from ... data_structures cimport PolySpline, Vector3DList, EdgeIndicesList
-from ... math.ctypes cimport Vector3
+
 
 class SplinesFromEdgesNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SplinesFromEdgesNode"
@@ -14,7 +16,7 @@ class SplinesFromEdgesNode(bpy.types.Node, AnimationNode):
 
     def execute(self, Vector3DList vertices, EdgeIndicesList edgeIndices):
         if vertices.getLength() == 0 or edgeIndices.getLength() == 0: return []
-        
+
         cdef long highestIndex = edgeIndices.base.getMaxValue()
         if highestIndex >= vertices.getLength(): return []
 

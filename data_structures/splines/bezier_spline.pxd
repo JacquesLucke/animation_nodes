@@ -1,5 +1,5 @@
+from ... math cimport Vector3
 from . base_spline cimport Spline
-from ... math.ctypes cimport Vector3
 from .. lists.complex_lists cimport Vector3DList
 
 cdef class BezierSpline(Spline):

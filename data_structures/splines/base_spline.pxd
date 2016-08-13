@@ -1,4 +1,4 @@
-from ... math.ctypes cimport Vector3
+from ... math cimport Vector3
 from .. lists.base_lists cimport FloatList
 from .. lists.complex_lists cimport Vector3DList
 

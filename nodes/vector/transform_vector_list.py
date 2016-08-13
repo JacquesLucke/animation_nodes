@@ -1,6 +1,6 @@
 import bpy
+from ... math import transformVector3DList
 from ... base_types.node import AnimationNode
-from ... math.list_operations import transformVector3DList
 
 class TransformVectorListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_TransformVectorListNode"

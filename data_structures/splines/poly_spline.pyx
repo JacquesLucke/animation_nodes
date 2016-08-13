@@ -2,11 +2,8 @@ cimport cython
 from libc.math cimport floor
 from libc.string cimport memcpy
 from ... utils.lists cimport findListSegment_LowLevel
-from ... math.ctypes cimport Vector3
-from ... math.base_operations cimport mixVec3, distanceVec3, subVec3
-from ... math.list_operations cimport (
-                                transformVector3DList,
-                                distanceSumOfVector3DList)
+from ... math cimport (Vector3, mixVec3, distanceVec3, subVec3,
+                       transformVector3DList, distanceSumOfVector3DList)
 
 from mathutils import Vector
 

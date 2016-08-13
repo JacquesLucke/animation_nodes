@@ -1,5 +1,4 @@
-from ... math.ctypes cimport Vector3
-from ... math.list_operations cimport mixVec3Arrays
+from ... math cimport Vector3, mixVec3Arrays
 from ... data_structures cimport Vector3DList, Spline
 from ... utils.lists cimport findListSegment_LowLevel, findListSegment
 from ... data_structures.splines.base_spline cimport EvaluationFunction
