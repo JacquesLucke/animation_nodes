@@ -25,7 +25,7 @@ cpdef double distanceSumOfVector3DList(Vector3DList vectors):
         distance += distanceVec3(_vectors + i, _vectors + i + 1)
     return distance
 
-cdef void mixVector3DLists_LowLevel(Vector3* target, Vector3* a, Vector3* b, long arrayLength, float factor):
+cdef void mixVec3Arrays(Vector3* target, Vector3* a, Vector3* b, long arrayLength, float factor):
     cdef long i
     for i in range(arrayLength):
         mixVec3(target + i, a + i, b + i, factor)

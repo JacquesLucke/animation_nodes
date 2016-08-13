@@ -1,7 +1,7 @@
 cimport cython
 from libc.math cimport floor
 from libc.string cimport memcpy
-from . utils cimport calcSegmentIndicesAndFactor
+from ... utils.lists cimport calcSegmentIndicesAndFactor
 from ... math.ctypes cimport Vector3
 from ... math.base_operations cimport mixVec3, distanceVec3, subVec3
 from ... math.list_operations cimport (

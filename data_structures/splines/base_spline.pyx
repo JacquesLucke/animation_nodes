@@ -1,6 +1,6 @@
 cimport cython
 from mathutils import Vector
-from . utils cimport calcSegmentIndicesAndFactor
+from ... utils.lists cimport calcSegmentIndicesAndFactor
 
 cdef class Spline:
 

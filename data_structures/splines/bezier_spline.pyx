@@ -1,6 +1,6 @@
 cimport cython
 from libc.string cimport memcpy
-from . utils cimport calcSegmentIndicesAndFactor
+from ... utils.lists cimport calcSegmentIndicesAndFactor
 from ... math.list_operations cimport transformVector3DList
 from ... math.base_operations cimport addVec3, mixVec3, subVec3, normalizeVec3, lengthVec3, scaleVec3
 from mathutils import Vector

@@ -1,5 +1,5 @@
 from ... math.ctypes cimport Vector3
-from ... math.list_operations cimport mixVector3DLists_LowLevel
+from ... math.list_operations cimport mixVec3Arrays
 from ... data_structures cimport Vector3DList, Spline
 from ... data_structures.splines.base_spline cimport EvaluationFunction
 
@@ -31,35 +31,42 @@ cdef class LinearLoft:
     def calcVertices(self):
         cdef:
             int splineAmount = len(self.splines)
-            Vector3DList vertices = Vector3DList(length = (splineAmount + (splineAmount - 1) * self.subdivisions) * self.splineSamples)
+            Vector3DList vertices = Vector3DList(length = self.getVertexAmount())
             Vector3* _vertices = <Vector3*>vertices.base.data
             Spline spline
             int i, j
-            EvaluationFunction evaluateFunction
 
-        spline = self.splines[0]
+
+        for i in range(splineAmount):
+            self.writeSplineLine(self.splines[i], _vertices + i * (self.subdivisions + 1) * self.splineSamples)
+
+        for i in range(splineAmount - 1):
+            for j in range(self.subdivisions):
+                self.writeMixedLine(_vertices + ((i + 1) + i * self.subdivisions + j) * self.splineSamples,
+                    _vertices + i *       (self.subdivisions + 1) * self.splineSamples,
+                    _vertices + (i + 1) * (self.subdivisions + 1) * self.splineSamples,
+                    (j + 1) / <float>(self.subdivisions + 1))
+
+        return vertices
+
+    cdef getVertexAmount(self):
+        cdef int splineAmount = len(self.splines)
+        cdef int splineLinesAmount = splineAmount
+        cdef int mixedLinesAmount = (splineAmount - 1) * self.subdivisions
+        return (splineLinesAmount + mixedLinesAmount) * self.splineSamples
+
+    cdef writeSplineLine(self, Spline spline, Vector3* target):
+        cdef EvaluationFunction evaluateFunction
         if self.distributionType == "RESOLUTION":
             evaluateFunction = spline.evaluate_LowLevel
         elif self.distributionType == "UNIFORM":
             evaluateFunction = spline.evaluateUniform_LowLevel
-            for spline in self.splines:
-                spline.ensureUniformConverter(self.uniformResolution)
+            spline.ensureUniformConverter(self.uniformResolution)
+        spline.sampleEvaluationFunction_LowLevel(evaluateFunction, self.splineSamples,
+                                                 0.0, 1.0, target)
 
-        for i in range(splineAmount):
-            spline = self.splines[i]
-            spline.sampleEvaluationFunction_LowLevel(
-                evaluateFunction, self.splineSamples,
-                self.start, self.end, _vertices + i * (self.subdivisions + 1) * self.splineSamples)
-                
-        for i in range(splineAmount - 1):
-            for j in range(self.subdivisions):
-                mixVector3DLists_LowLevel(_vertices + (i + 1) * self.splineSamples + i * self.subdivisions * self.splineSamples + j * self.splineSamples,
-                    _vertices + i * (self.subdivisions + 1) * self.splineSamples,
-                    _vertices + (i + 1) * (self.subdivisions + 1) * self.splineSamples,
-                    self.splineSamples,
-                    (j + 1) / <float>(self.subdivisions + 1))
-
-        return vertices
+    cdef writeMixedLine(self, Vector3* target, Vector3* a, Vector3* b, float factor):
+        mixVec3Arrays(target, a, b, self.splineSamples, factor)
 
     def calcEdgeIndices(self):
         pass
