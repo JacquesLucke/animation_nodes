@@ -83,40 +83,16 @@ class LoftSplinesNode(bpy.types.Node, AnimationNode):
         loft.distributionType = self.splineDistributionType
         loft.uniformResolution = self.resolution
 
-        if loft.validate():
-            vertices = loft.calcVertices()
-            edgeIndices = loft.calcEdgeIndices()
-            polygonIndices = loft.calcPolygonIndices()
-        else:
-            vertices = Vector3DList()
-            edgeIndices = EdgeIndicesList()
-            polygonIndices = PolygonIndicesList()
+        valid = loft.validate()
+
+        vertices, edgeIndices, polygonIndices = None, None, None
+        if valid:
+            if self.outputs["Vertices"].isLinked: vertices = loft.calcVertices()
+            if self.outputs["Edge Indices"].isLinked: edgeIndices = loft.calcEdgeIndices()
+            if self.outputs["Polygon Indices"].isLinked: polygonIndices = loft.calcPolygonIndices()
+
+        if vertices is None: vertices = Vector3DList()
+        if edgeIndices is None: edgeIndices = EdgeIndicesList()
+        if polygonIndices is None: polygonIndices = PolygonIndicesList()
 
         return vertices, edgeIndices, polygonIndices
-
-
-    def execute(self, splines, splineSamples, surfaceSamples, cyclic, smoothness, start, end):
-        def canExecute():
-            for spline in splines:
-                if not spline.isEvaluable: return False
-            if len(splines) < 2: return False
-            if splineSamples < 2: return False
-            if surfaceSamples < 2: return False
-            isRealCyclic = cyclic and start == 0.0 and end == 1.0
-            if isRealCyclic and surfaceSamples < 3: return False
-            return True
-
-        if canExecute():
-            vertices, polygons = loftSplines(splines,
-                                             splineSamples,
-                                             surfaceSamples,
-                                             type = self.interpolationType,
-                                             cyclic = cyclic,
-                                             smoothness = smoothness,
-                                             uniformConverterResolution = self.resolution,
-                                             splineDistributionType = self.splineDistributionType,
-                                             surfaceDistributionType = self.surfaceDistributionType,
-                                             startSurfaceParameter = start,
-                                             endSurfaceParameter = end)
-            return vertices, polygons
-        else: return [], []

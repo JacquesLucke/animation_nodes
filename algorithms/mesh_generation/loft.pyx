@@ -40,6 +40,7 @@ cdef class LinearLoft:
             long endIndices[2]
             float startT, endT
 
+        # find which segments to split
         findListSegment_LowLevel(splineAmount, self.cyclic, self.start, startIndices, &startT)
         findListSegment_LowLevel(splineAmount, self.cyclic, self.end, endIndices, &endT)
 
@@ -50,19 +51,14 @@ cdef class LinearLoft:
             Vector3* _tmp2
             long totalLineAmount, i, lineIndex
 
-        if endIndices[1] > 0:
-            totalLineAmount = endIndices[1] - startIndices[0] + 1
-            totalLineAmount += (totalLineAmount - 1) * subdivisions
-        elif endIndices[1] == 0: # <- cyclic
-            totalLineAmount = splineAmount - startIndices[0] + 1
-            totalLineAmount += (totalLineAmount - 1) * subdivisions
-            #if endT == 1.0:
-            #    totalLineAmount -= 1
+        controlLines = splineAmount - startIndices[0] + 1
+        subdivisionLines = (controlLines - 1) * subdivisions
+        totalLineAmount = controlLines + subdivisionLines
 
         vertices = Vector3DList(length = totalLineAmount * samples)
         _vertices = <Vector3*>vertices.base.data
 
-        if startIndices[0] == endIndices[0]:
+        if startIndices[0] == endIndices[0]: # <- only one segment in the result
             tmp1 = Vector3DList(length = samples); _tmp1 = <Vector3*>tmp1.base.data
             tmp2 = Vector3DList(length = samples); _tmp2 = <Vector3*>tmp2.base.data
             self.writeSplineLine(self.splines[startIndices[0]], _tmp1)
@@ -109,6 +105,7 @@ cdef class LinearLoft:
                     sourceA = _vertices + (totalLineAmount - 2 - subdivisions) * samples,
                     sourceB = _vertices + (totalLineAmount - 1) * samples)
 
+        # remove last line when the first line can be reused
         if self.cyclic and self.start == 0 and self.end == 1:
             vertices.base.length -= 3 * samples
 
@@ -135,20 +132,19 @@ cdef class LinearLoft:
                 sourceB = sourceB,
                 factor = (i + 1) / <float>(self.subdivisions + 1))
 
-
     def calcEdgeIndices(self):
-        pass
+        raise NotImplementedError()
 
     def calcPolygonIndices(self):
         startIndices, _ = findListSegment(len(self.splines), self.cyclic, self.start)
         endIndices, _ = findListSegment(len(self.splines), self.cyclic, self.end)
 
-        joinHorizontal = False
         controlLines = endIndices[0] - startIndices[0] + 2
         totalLines = controlLines + (controlLines - 1) * self.subdivisions
-        if self.cyclic and self.start == 0 and self.end == 1:
+
+        joinHorizontal = self.cyclic and self.start == 0 and self.end == 1
+        if joinHorizontal:
             totalLines -= 1
-            joinHorizontal = True
 
         return grid.quadPolygons(
             xDivisions = totalLines,
