@@ -1,7 +1,7 @@
 cimport cython
 from libc.math cimport floor
 from libc.string cimport memcpy
-from ... utils.lists cimport calcSegmentIndicesAndFactor
+from ... utils.lists cimport findListSegment_LowLevel
 from ... math.ctypes cimport Vector3
 from ... math.base_operations cimport mixVec3, distanceVec3, subVec3
 from ... math.list_operations cimport (
@@ -44,8 +44,8 @@ cdef class PolySpline(Spline):
             long endIndices[2]
             float startT, endT
 
-        calcSegmentIndicesAndFactor(self.points.getLength(), self.cyclic, start, startIndices, &startT)
-        calcSegmentIndicesAndFactor(self.points.getLength(), self.cyclic, end, endIndices, &endT)
+        findListSegment_LowLevel(self.points.getLength(), self.cyclic, start, startIndices, &startT)
+        findListSegment_LowLevel(self.points.getLength(), self.cyclic, end, endIndices, &endT)
 
         cdef long newPointAmount
         if endIndices[1] > 0:
@@ -71,7 +71,7 @@ cdef class PolySpline(Spline):
             Vector3* _points = <Vector3*>self.points.base.data
             long indices[2]
             float t
-        calcSegmentIndicesAndFactor(self.points.getLength(), self.cyclic, parameter, indices, &t)
+        findListSegment_LowLevel(self.points.getLength(), self.cyclic, parameter, indices, &t)
         mixVec3(result, _points + indices[0], _points + indices[1], t)
 
     cdef void evaluateTangent_LowLevel(self, float parameter, Vector3* result):
@@ -79,7 +79,7 @@ cdef class PolySpline(Spline):
             Vector3* _points = <Vector3*>self.points.base.data
             long indices[2]
             float t # not really needed here
-        calcSegmentIndicesAndFactor(self.points.getLength(), self.cyclic, parameter, indices, &t)
+        findListSegment_LowLevel(self.points.getLength(), self.cyclic, parameter, indices, &t)
         subVec3(result, _points + indices[1], _points + indices[0])
 
     @cython.cdivision(True)

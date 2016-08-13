@@ -1,6 +1,12 @@
 from libc.math cimport floor
 
-cdef void calcSegmentIndicesAndFactor(long amount, bint cyclic, float parameter, long* index, float* factor):
+cpdef findListSegment(long amount, bint cyclic, float parameter):
+    cdef long[2] indices
+    cdef float factor
+    findListSegment_LowLevel(amount, cyclic, parameter, indices, &factor)
+    return [indices[0], indices[1]], factor
+
+cdef void findListSegment_LowLevel(long amount, bint cyclic, float parameter, long* index, float* factor):
     if not cyclic:
         if parameter < 1:
             index[0] = <long>floor(parameter * (amount - 1))

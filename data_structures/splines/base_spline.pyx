@@ -1,6 +1,6 @@
 cimport cython
 from mathutils import Vector
-from ... utils.lists cimport calcSegmentIndicesAndFactor
+from ... utils.lists cimport findListSegment_LowLevel
 
 cdef class Spline:
 
@@ -71,7 +71,7 @@ cdef class Spline:
     cdef float toUniformParameter_LowLevel(self, float t):
         cdef float factor
         cdef long indices[2]
-        calcSegmentIndicesAndFactor(self.uniformParameters.length, False, t, indices, &factor)
+        findListSegment_LowLevel(self.uniformParameters.length, False, t, indices, &factor)
         return self.uniformParameters.data[indices[0]] * (1 - factor) + \
                self.uniformParameters.data[indices[1]] * factor
 

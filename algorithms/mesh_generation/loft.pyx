@@ -1,8 +1,10 @@
 from ... math.ctypes cimport Vector3
 from ... math.list_operations cimport mixVec3Arrays
 from ... data_structures cimport Vector3DList, Spline
+from ... utils.lists cimport findListSegment_LowLevel, findListSegment
 from ... data_structures.splines.base_spline cimport EvaluationFunction
-from ... utils.lists cimport calcSegmentIndicesAndFactor
+
+from . import grid
 
 cdef class LinearLoft:
     cdef:
@@ -38,8 +40,8 @@ cdef class LinearLoft:
             long endIndices[2]
             float startT, endT
 
-        calcSegmentIndicesAndFactor(splineAmount, self.cyclic, self.start, startIndices, &startT)
-        calcSegmentIndicesAndFactor(splineAmount, self.cyclic, self.end, endIndices, &endT)
+        findListSegment_LowLevel(splineAmount, self.cyclic, self.start, startIndices, &startT)
+        findListSegment_LowLevel(splineAmount, self.cyclic, self.end, endIndices, &endT)
 
         cdef:
             Vector3DList vertices, tmp1, tmp2
@@ -138,4 +140,15 @@ cdef class LinearLoft:
         pass
 
     def calcPolygonIndices(self):
-        pass
+        startIndices, _ = findListSegment(len(self.splines), self.cyclic, self.start)
+        endIndices, _ = findListSegment(len(self.splines), self.cyclic, self.end)
+
+        controlLines = endIndices[0] - startIndices[0] + 2
+        totalLines = controlLines + (controlLines - 1) * self.subdivisions
+        if self.cyclic and self.start == 0 and self.end == 1:
+            totalLines -= 1
+
+        return grid.quadPolygons(
+            xDivisions = totalLines,
+            yDivisions = self.splineSamples
+        )

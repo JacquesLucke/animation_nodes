@@ -1,6 +1,6 @@
 cimport cython
 from libc.string cimport memcpy
-from ... utils.lists cimport calcSegmentIndicesAndFactor
+from ... utils.lists cimport findListSegment_LowLevel
 from ... math.list_operations cimport transformVector3DList
 from ... math.base_operations cimport addVec3, mixVec3, subVec3, normalizeVec3, lengthVec3, scaleVec3
 from mathutils import Vector
@@ -83,7 +83,7 @@ cdef class BezierSpline(Spline):
 
     cdef void getSegmentData(self, float parameter, float* t, Vector3** w):
         cdef long indices[2]
-        calcSegmentIndicesAndFactor(self.points.getLength(), self.cyclic, parameter, indices, t)
+        findListSegment_LowLevel(self.points.getLength(), self.cyclic, parameter, indices, t)
         w[0] = (<Vector3*>self.points.base.data) + indices[0]
         w[1] = (<Vector3*>self.rightHandles.base.data) + indices[0]
         w[2] = (<Vector3*>self.leftHandles.base.data) + indices[1]
@@ -131,8 +131,8 @@ cdef class BezierSpline(Spline):
             long endIndices[2]
             float startT, endT
 
-        calcSegmentIndicesAndFactor(self.points.getLength(), self.cyclic, start, startIndices, &startT)
-        calcSegmentIndicesAndFactor(self.points.getLength(), self.cyclic, end, endIndices, &endT)
+        findListSegment_LowLevel(self.points.getLength(), self.cyclic, start, startIndices, &startT)
+        findListSegment_LowLevel(self.points.getLength(), self.cyclic, end, endIndices, &endT)
 
         cdef long newPointAmount
         if endIndices[1] > 0:
