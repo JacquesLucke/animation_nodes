@@ -25,7 +25,7 @@ class LoftSplinesNode(bpy.types.Node, AnimationNode):
     interpolationType = EnumProperty(name = "Interpolation Type", default = "LINEAR",
         items = interpolationTypeItems, update = interpolationTypeChanged)
 
-    resolution = IntProperty(name = "Resolution", default = 100, min = 2,
+    resolution = IntProperty(name = "Resolution", default = 200, min = 2,
         description = "Increase to have a more accurate evaluation", update = propertyChanged)
 
     splineDistributionType = EnumProperty(name = "Spline Distribution", default = "RESOLUTION",
@@ -73,9 +73,6 @@ class LoftSplinesNode(bpy.types.Node, AnimationNode):
             return "execute_Smooth"
 
     def execute_Linear(self, splines, splineSamples, subdivisions, cyclic, start, end):
-        if not all(spline.isEvaluable() for spline in splines):
-            return Vector3DList(), EdgeIndicesList(), PolygonIndicesList()
-
         loft = LinearLoft()
         loft.splines = splines
         loft.splineSamples = splineSamples
@@ -83,6 +80,8 @@ class LoftSplinesNode(bpy.types.Node, AnimationNode):
         loft.cyclic = cyclic
         loft.start = start
         loft.end = end
+        loft.distributionType = self.splineDistributionType
+        loft.uniformResolution = self.resolution
 
         if loft.validate():
             vertices = loft.calcVertices()
