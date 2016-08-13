@@ -143,12 +143,18 @@ cdef class LinearLoft:
         startIndices, _ = findListSegment(len(self.splines), self.cyclic, self.start)
         endIndices, _ = findListSegment(len(self.splines), self.cyclic, self.end)
 
+        joinHorizontal = False
         controlLines = endIndices[0] - startIndices[0] + 2
         totalLines = controlLines + (controlLines - 1) * self.subdivisions
         if self.cyclic and self.start == 0 and self.end == 1:
             totalLines -= 1
+            joinHorizontal = True
 
         return grid.quadPolygons(
             xDivisions = totalLines,
-            yDivisions = self.splineSamples
-        )
+            yDivisions = self.splineSamples,
+            joinHorizontal = joinHorizontal,
+            joinVertical = self.allSplinesCyclic())
+
+    def allSplinesCyclic(self):
+        return all(spline.cyclic for spline in self.splines)

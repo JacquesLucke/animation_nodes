@@ -75,24 +75,24 @@ def innerQuadPolygons(long xDivisions, long yDivisions):
         for j in range(xDivisions - 1):
             polygons.polyStarts.data[offset / 4] = offset
             polygons.polyLengths.data[offset / 4] = 4
-            polygons.indices.data[offset + 0] = (j + 0) * yDivisions + i
-            polygons.indices.data[offset + 1] = (j + 0) * yDivisions + i + 1
-            polygons.indices.data[offset + 2] = (j + 1) * yDivisions + i + 1
-            polygons.indices.data[offset + 3] = (j + 1) * yDivisions + i
+            polygons.indices.data[offset + 0] = (j + 1) * yDivisions + i
+            polygons.indices.data[offset + 1] = (j + 1) * yDivisions + i + 1
+            polygons.indices.data[offset + 2] = (j + 0) * yDivisions + i + 1
+            polygons.indices.data[offset + 3] = (j + 0) * yDivisions + i
             offset += 4
     return polygons
 
 def joinHorizontalEdgesQuadPolygons(xDivisions, yDivisions):
-    polygons = PolygonIndicesList
+    polygons = PolygonIndicesList()
     offset = yDivisions * (xDivisions - 1)
     for i in range(yDivisions - 1):
-        polygons.append((i, i + offset, i + offset + 1, i + 1))
+        polygons.append((i + 1, i + offset + 1, i + offset, i))
     return polygons
 
 def joinVerticalEdgesQuadPolygons(xDivisions, yDivisions):
-    polygons = PolygonIndicesList
+    polygons = PolygonIndicesList()
     for i in range(0, (xDivisions - 1) * yDivisions, yDivisions):
-        polygons.append((i, i + yDivisions, i + 2 * yDivisions - 1, i + yDivisions - 1))
+        polygons.append((i + yDivisions - 1, i + 2 * yDivisions - 1, i + yDivisions, i))
     return polygons
 
 def joinCornersWithQuad(xDivisions, yDivisions):
