@@ -1,10 +1,10 @@
 from libc.string cimport memcpy
 
 cdef class PolygonIndicesList:
-    def __cinit__(self, long indicesAmount = 0, long loopAmount = 0):
+    def __cinit__(self, long indicesAmount = 0, long polygonAmount = 0):
         self.indices = UIntegerList(length = indicesAmount)
-        self.polyStarts = UIntegerList(length = loopAmount)
-        self.polyLengths = UIntegerList(length = loopAmount)
+        self.polyStarts = UIntegerList(length = polygonAmount)
+        self.polyLengths = UIntegerList(length = polygonAmount)
 
 
     # Special Methods for Python
@@ -104,7 +104,7 @@ cdef class PolygonIndicesList:
 
         cdef PolygonIndicesList newList = PolygonIndicesList(
                 indicesAmount = indicesAmount,
-                loopAmount = newOrder.length)
+                polygonAmount = newOrder.length)
 
         cdef long index, length, start, accumulatedLength = 0
         for i in range(newOrder.length):

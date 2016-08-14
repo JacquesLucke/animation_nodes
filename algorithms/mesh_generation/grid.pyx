@@ -92,7 +92,7 @@ def innerQuadPolygons(long xDivisions, long yDivisions):
     cdef long polyAmount = (xDivisions - 1) * (yDivisions - 1)
     polygons = PolygonIndicesList(
                     indicesAmount = 4 * polyAmount,
-                    loopAmount = polyAmount)
+                    polygonAmount = polyAmount)
 
     cdef long i, j, offset = 0
     for i in range(yDivisions - 1):
