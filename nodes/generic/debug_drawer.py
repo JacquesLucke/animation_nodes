@@ -47,6 +47,8 @@ class DebugDrawerNode(bpy.types.Node, AnimationNode):
         socket = self.inputs["Data"]
         if socket.isLinked:
             self.dataType = socket.dataOrigin.dataType
+        else:
+            dataType = "Generic"
 
     def getExecutionCode(self):
         if "Condition" in self.inputs:
