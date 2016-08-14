@@ -21,6 +21,7 @@ class DebugDrawerNode(bpy.types.Node, AnimationNode):
     maxListStartElements = IntProperty(name = "Max List Start Elements", default = 15, min = 0)
     maxListEndElements = IntProperty(name = "Max List End Elements", default = 0, min = 0)
     oneElementPerLine = BoolProperty(name = "One Element per Line", default = True)
+    dataType = StringProperty()
 
     errorMessage = StringProperty()
 
@@ -41,6 +42,11 @@ class DebugDrawerNode(bpy.types.Node, AnimationNode):
         row = col.row(align = True)
         row.prop(self, "maxListStartElements", text = "Begin")
         row.prop(self, "maxListEndElements", text = "End")
+
+    def edit(self):
+        socket = self.inputs["Data"]
+        if socket.isLinked:
+            self.dataType = socket.dataOrigin.dataType
 
     def getExecutionCode(self):
         if "Condition" in self.inputs:
@@ -94,10 +100,6 @@ class DebugDrawerNode(bpy.types.Node, AnimationNode):
     @debugText.setter
     def debugText(self, text):
         dataByNode[self.identifier] = text
-
-    @property
-    def dataType(self):
-        return self.inputs[0].dataType
 
     def getCurrentToStringFunction(self):
         dataType = self.dataType
