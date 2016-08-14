@@ -21,31 +21,36 @@ class FloatMapRampInOutNode(bpy.types.Node, AnimationNode):
     
     def create(self):
         self.newInput("Float", "Value", "input", value = 0)
-        self.newInput("Boolean", "Clamp input", "clamp", value = True)
+        self.newInput("Boolean", "Clamp", "clamp", value = True)
         self.newInput("Float", "Input Min", "imin", value = 0)
         self.newInput("Float", "Input Max", "imax", value = 1)
         self.newInput("Float", "Output Min", "omin", value = 0)
         self.newInput("Float", "Output Max", "omax", value = 1)
-        self.newInput("Float", "Size", "size", value = 10.0)
+        self.newInput("Float", "Size", "size", value = 0.1)
         self.newInput("Float", "Offset", "offset", value = 0.0)
         self.newOutput("Float", "Value", "output")
     
     def getExecutionCode(self):
-        yield "output = self.rampInOut(input, imin, imax, omin, omax, clamp, size, offset)"
-           
+        yield "self.errorMessage = self.rampInOutValidInput(imin, imax, size)"
+        yield "if self.errorMessage == '':"
+        yield "    output = self.rampInOut(input, imin, imax, omin, omax, clamp, size, offset)"
+        yield "else:"
+        yield "    output = input"
+    
+    def rampInOutValidInput(self, imin, imax, size):
+        if imin == imax:
+            return 'Expected Input Min different from Input Max'
+        if size == 0.0:
+            return 'Expected Size greater than 0'
+        return ''
+        
     def rampInOut(self, input, imin, imax, omin, omax, clamp, size, offset):
-        no, ns = offset / 100, size / 100
         delta_i = imax-imin
         delta_o = omax-omin
-        icur = input
-        if clamp:
-            if input > imax:
-                icur = imax
-            if input < imin:
-                icur = imin
-        normalized_i = icur / delta_i
-        if no > 0.5:
-            no = 0.5        
-        limit = 0.5 - no
-        ramp = (limit - abs(normalized_i - 0.5)) / ns 
+        offset = min(offset, 0.5)
+        interval_input = abs((input / delta_i) - 0.5)
+        interval_ramp = 0.5 - offset
+        ramp = (interval_ramp - interval_input) / size
+        if interval_input < interval_ramp or clamp:
+            ramp = max(0.0, min(ramp, 1.0))
         return omin + ramp * delta_o
