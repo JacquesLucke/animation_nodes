@@ -101,7 +101,6 @@ cdef class Spline:
         self.checkUniformConverter()
         return self.sampleEvaluationFunction(self.evaluateUniformTangent_LowLevel, amount, start, end)
 
-
     cdef sampleEvaluationFunction(self, EvaluationFunction evaluate,
                                    long amount, float start, float end):
         if not self.isEvaluable():
@@ -114,6 +113,12 @@ cdef class Spline:
         cdef Vector3DList samples = Vector3DList(length = amount)
         self.sampleEvaluationFunction_LowLevel(evaluate, amount, start, end, <Vector3*>samples.base.data)
         return samples
+
+    cdef getSamples_LowLevel(self, long amount, float start, float end, Vector3* output):
+        self.sampleEvaluationFunction_LowLevel(self.evaluate_LowLevel, amount, start, end, output)
+
+    cdef getUniformSamples_LowLevel(self, long amount, float start, float end, Vector3* output):
+        self.sampleEvaluationFunction_LowLevel(self.evaluateUniform_LowLevel, amount, start, end, output)
 
     @cython.cdivision(True)
     cdef void sampleEvaluationFunction_LowLevel(self, EvaluationFunction evaluate,

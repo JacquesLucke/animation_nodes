@@ -41,6 +41,9 @@ cdef class Spline:
     cpdef getUniformSamples(self, long amount, float start = ?, float end = ?)
     cpdef getUniformTangentSamples(self, long amount, float start = ?, float end = ?)
 
+    cdef getSamples_LowLevel(self, long amount, float start, float end, Vector3* output)
+    cdef getUniformSamples_LowLevel(self, long amount, float start, float end, Vector3* output)
+
     cdef sampleEvaluationFunction(self, EvaluationFunction evaluate,
                                         long amount, float start, float end)
 

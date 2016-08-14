@@ -150,10 +150,7 @@ cdef class LinearLoft:
             xDivisions = totalLines,
             yDivisions = self.splineSamples,
             joinHorizontal = joinHorizontal,
-            joinVertical = self.allSplinesCyclic())
-
-    def allSplinesCyclic(self):
-        return all(spline.cyclic for spline in self.splines)
+            joinVertical = allSplinesCyclic(self.splines))
 
 
 cdef class SmoothLoft:
@@ -188,8 +185,7 @@ cdef class SmoothLoft:
             Vector3DList vertices = Vector3DList(length = self.splineSamples * self.surfaceSamples)
             Vector3* _vertices = <Vector3*>vertices.base.data
             Vector3DList surfaceSplinePoints = Vector3DList(length = splineAmount)
-            Vector3* _surfaceSplinePoints = <Vector3*>surfaceSplinePoints.base.data
-            int i, k
+            int i
             float parameter
             Spline spline
             BezierSpline surfaceSpline
@@ -208,21 +204,30 @@ cdef class SmoothLoft:
 
         for i in range(self.splineSamples):
             parameter = i / <float>(self.splineSamples - 1)
-            for k in range(splineAmount):
-                spline = self.splines[k]
-                splineEvaluationFunction(spline, parameter, _surfaceSplinePoints + k)
-
+            self.createSurfaceSpline(parameter, <Vector3*>surfaceSplinePoints.base.data)
             surfaceSpline.calculateSmoothHandles(self.smoothness)
-            if self.surfaceDistributionType == "UNIFORM":
-                surfaceSpline.ensureUniformConverter(self.uniformResolution)
-
-            surfaceSpline.sampleEvaluationFunction_LowLevel(
-                surfaceEvaluationFunction,
-                self.surfaceSamples, self.start, self.end,
-                _vertices + i * self.surfaceSamples)
-
+            self.sampleSurfaceSpline(surfaceSpline, _vertices + i * self.surfaceSamples)
 
         return vertices
+
+    cdef createSurfaceSpline(self, float parameter, Vector3* _surfaceSplinePoints):
+        cdef int k
+        cdef Spline spline
+        if self.splineDistributionType == "RESOLUTION":
+            for k in range(len(self.splines)):
+                spline = self.splines[k]
+                spline.evaluate_LowLevel(parameter, _surfaceSplinePoints + k)
+        elif self.splineDistributionType == "UNIFORM":
+            for k in range(len(self.splines)):
+                spline = self.splines[k]
+                spline.evaluateUniform_LowLevel(parameter, _surfaceSplinePoints + k)
+
+    cdef sampleSurfaceSpline(self, BezierSpline spline, Vector3* output):
+        if self.surfaceDistributionType == "UNIFORM":
+            spline.ensureUniformConverter(self.uniformResolution)
+            spline.getUniformSamples_LowLevel(self.surfaceSamples, self.start, self.end, output)
+        else:
+            spline.getSamples_LowLevel(self.surfaceSamples, self.start, self.end, output)
 
     cdef EvaluationFunction getSplineEvaluationFunction(self):
         cdef Spline spline = self.splines[0]
@@ -242,4 +247,11 @@ cdef class SmoothLoft:
         pass
 
     def calcPolygonIndices(self):
-        pass
+        return grid.quadPolygons(
+            xDivisions = self.splineSamples,
+            yDivisions = self.surfaceSamples,
+            joinHorizontal = allSplinesCyclic(self.splines),
+            joinVertical = self.cyclic and self.start == 0 and self.end == 1)
+
+def allSplinesCyclic(splines):
+    return all(spline.cyclic for spline in splines)
