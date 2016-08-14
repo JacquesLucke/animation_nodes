@@ -8,7 +8,7 @@ class PointInCameraFrustrum(bpy.types.Node, AnimationNode):
     bl_label = "Point in Camera Frustrum"
     
     def create(self):
-        self.newInput("Scene", "scene", "scene", hide = True)
+        self.newInput("Scene", "Scene", "scene", hide = True)
         self.newInput("Object", "Camera", "camera")
         self.newInput("Vector", "3d Point", "point", value=(0, 0, 0))
         self.newInput("Float", "Threshold % (positive = interior)", "threshold", value = 0.0)
