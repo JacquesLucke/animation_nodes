@@ -339,6 +339,7 @@ class ObjectUtilsMenu(bpy.types.Menu):
         insertNode(layout, "an_ResetObjectTransformsNode", "Reset Transformations")
         insertNode(layout, "an_CopyTransformsNode", "Copy Transformations")
         insertNode(layout, "an_GetSelectedObjectsNode", "Get Selected Objects")
+        insertNode(layout, "an_GetActiveCameraNode", "Get Active Camera")
 
 class MeshMenu(bpy.types.Menu):
     bl_idname = "an_mesh_menu"
