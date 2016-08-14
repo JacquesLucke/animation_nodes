@@ -189,8 +189,6 @@ cdef class SmoothLoft:
             float parameter
             Spline spline
             BezierSpline surfaceSpline
-            EvaluationFunction splineEvaluationFunction = self.getSplineEvaluationFunction()
-            EvaluationFunction surfaceEvaluationFunction = self.getSurfaceEvaluationFunction()
 
         surfaceSpline = BezierSpline(
             points = surfaceSplinePoints,
@@ -228,20 +226,6 @@ cdef class SmoothLoft:
             spline.getUniformSamples_LowLevel(self.surfaceSamples, self.start, self.end, output)
         else:
             spline.getSamples_LowLevel(self.surfaceSamples, self.start, self.end, output)
-
-    cdef EvaluationFunction getSplineEvaluationFunction(self):
-        cdef Spline spline = self.splines[0]
-        if self.splineDistributionType == "RESOLUTION":
-            return spline.evaluate_LowLevel
-        elif self.splineDistributionType == "UNIFORM":
-            return spline.evaluateUniform_LowLevel
-
-    cdef EvaluationFunction getSurfaceEvaluationFunction(self):
-        cdef Spline spline = self.splines[0]
-        if self.surfaceDistributionType == "RESOLUTION":
-            return spline.evaluate_LowLevel
-        elif self.surfaceDistributionType == "UNIFORM":
-            return spline.evaluateUniform_LowLevel
 
     def calcEdgeIndices(self):
         pass
