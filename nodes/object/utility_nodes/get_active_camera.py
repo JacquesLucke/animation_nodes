@@ -6,7 +6,7 @@ class GetActiveCameraNode(bpy.types.Node, AnimationNode):
     bl_label = "Get Active Camera"
     
     def create(self):
-       self.newInput("Scene", "scene", "scene", value = bpy.context.scene)
+       self.newInput("Scene", "scene", "scene", hide = True)
        self.newOutput("Object", "Active Camera", "activeCamera")
 
     def execute(self, scene):
