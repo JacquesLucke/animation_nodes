@@ -232,6 +232,9 @@ cdef calculateSmoothControlPoints(
         rightHandle.x = point.x + direction.x * factor
         rightHandle.y = point.y + direction.y * factor
         rightHandle.z = point.z + direction.z * factor
+    else:
+        leftHandle[0] = point[0]
+        rightHandle[0] = point[0]
 
 cdef calcLeftTrimmedSegment(float t,
                     Vector3* P1, Vector3* P2, Vector3* P3, Vector3* P4,
