@@ -3,8 +3,8 @@ from bpy.props import *
 from ... base_types.node import AnimationNode
 import bpy_extras
 
-class PointInCameraFrustrum(bpy.types.Node, AnimationNode):
-    bl_idname = "an_PointInCameraFrustrum"
+class PointInCameraFrustrumNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_PointInCameraFrustrumNode"
     bl_label = "Point in Camera Frustrum"
     
     def create(self):
