@@ -25,7 +25,7 @@ class LoftSplinesNode(bpy.types.Node, AnimationNode):
     interpolationType = EnumProperty(name = "Interpolation Type", default = "LINEAR",
         items = interpolationTypeItems, update = interpolationTypeChanged)
 
-    resolution = IntProperty(name = "Resolution", default = 200, min = 2,
+    resolution = IntProperty(name = "Resolution", default = 100, min = 2,
         description = "Increase to have a more accurate evaluation", update = propertyChanged)
 
     splineDistributionType = EnumProperty(name = "Spline Distribution", default = "RESOLUTION",

@@ -1,5 +1,5 @@
 from ... math cimport Vector3, mixVec3Arrays
-from ... data_structures cimport Vector3DList, Spline
+from ... data_structures cimport Vector3DList, Spline, BezierSpline
 from ... utils.lists cimport findListSegment_LowLevel, findListSegment
 from ... data_structures.splines.base_spline cimport EvaluationFunction
 
@@ -183,7 +183,59 @@ cdef class SmoothLoft:
         return True
 
     def calcVertices(self):
-        pass
+        cdef:
+            int splineAmount = len(self.splines)
+            Vector3DList vertices = Vector3DList(length = self.splineSamples * self.surfaceSamples)
+            Vector3* _vertices = <Vector3*>vertices.base.data
+            Vector3DList surfaceSplinePoints = Vector3DList(length = splineAmount)
+            Vector3* _surfaceSplinePoints = <Vector3*>surfaceSplinePoints.base.data
+            int i, k
+            float parameter
+            Spline spline
+            BezierSpline surfaceSpline
+            EvaluationFunction splineEvaluationFunction = self.getSplineEvaluationFunction()
+            EvaluationFunction surfaceEvaluationFunction = self.getSurfaceEvaluationFunction()
+
+        surfaceSpline = BezierSpline(
+            points = surfaceSplinePoints,
+            leftHandles = Vector3DList(length = splineAmount),
+            rightHandles = Vector3DList(length = splineAmount))
+
+        if self.splineDistributionType == "UNIFORM":
+            for spline in self.splines:
+                spline.ensureUniformConverter(self.uniformResolution)
+
+        for i in range(self.splineSamples):
+            parameter = i / <float>(self.splineSamples - 1)
+            for k in range(splineAmount):
+                spline = self.splines[k]
+                splineEvaluationFunction(spline, parameter, _surfaceSplinePoints + k)
+
+            surfaceSpline.calculateSmoothHandles(self.smoothness)
+            if self.surfaceDistributionType == "UNIFORM":
+                surfaceSpline.ensureUniformConverter(self.uniformResolution)
+
+            surfaceSpline.sampleEvaluationFunction_LowLevel(
+                surfaceEvaluationFunction,
+                self.surfaceSamples, self.start, self.end,
+                _vertices + i * self.surfaceSamples)
+
+
+        return vertices
+
+    cdef EvaluationFunction getSplineEvaluationFunction(self):
+        cdef Spline spline = self.splines[0]
+        if self.splineDistributionType == "RESOLUTION":
+            return spline.evaluate_LowLevel
+        elif self.splineDistributionType == "UNIFORM":
+            return spline.evaluateUniform_LowLevel
+
+    cdef EvaluationFunction getSurfaceEvaluationFunction(self):
+        cdef Spline spline = self.splines[0]
+        if self.surfaceDistributionType == "RESOLUTION":
+            return spline.evaluate_LowLevel
+        elif self.surfaceDistributionType == "UNIFORM":
+            return spline.evaluateUniform_LowLevel
 
     def calcEdgeIndices(self):
         pass
