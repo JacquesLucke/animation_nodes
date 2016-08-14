@@ -154,3 +154,39 @@ cdef class LinearLoft:
 
     def allSplinesCyclic(self):
         return all(spline.cyclic for spline in self.splines)
+
+
+cdef class SmoothLoft:
+    cdef:
+        public list splines
+        public int splineSamples, surfaceSamples
+        public float start, end, smoothness
+        public bint cyclic
+        public str splineDistributionType, surfaceDistributionType
+        public int uniformResolution
+
+    def validate(self):
+        if self.start > self.end:
+            self.start, self.end = self.end, self.start
+        self.start = min(max(self.start, 0), 1)
+        self.end = min(max(self.end, 0), 1)
+        self.splineSamples = max(self.splineSamples, 2)
+        self.surfaceSamples = max(self.surfaceSamples, 2)
+        self.uniformResolution = max(self.uniformResolution, 2)
+
+        if self.splineDistributionType not in ("RESOLUTION", "UNIFORM"): return False
+        if self.surfaceDistributionType not in ("RESOLUTION", "UNIFORM"): return False
+        if len(self.splines) < 2: return False
+        for spline in self.splines:
+            if not isinstance(spline, Spline): return False
+            if not spline.isEvaluable(): return False
+        return True
+
+    def calcVertices(self):
+        pass
+
+    def calcEdgeIndices(self):
+        pass
+
+    def calcPolygonIndices(self):
+        pass
