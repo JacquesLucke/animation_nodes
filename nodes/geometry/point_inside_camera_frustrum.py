@@ -29,12 +29,11 @@ class PointInCameraFrustrumNode(bpy.types.Node, AnimationNode):
             return 0, 0, 0, False
         co = bpy_extras.object_utils.world_to_camera_view(scene, camera, point)
         clipStart, clipEnd = camera.data.clip_start, camera.data.clip_end
-        th = threshold / 100
-        if th > 0.5:
-            th = 0.5
-        limit = 0.5 - th
-        u, y, z = co.xyz
-        visible = ( 0.0 + th < u < 1.0 - th and 
-                    0.0 + th < v < 1.0 - th and 
+        if threshold > 0.5:
+            threshold = 0.5
+        limit = 0.5 - threshold
+        u, v, z = co.xyz
+        visible = ( 0.0 + threshold < u < 1.0 - threshold and 
+                    0.0 + threshold < v < 1.0 - threshold and 
                     clipStart < z <  clipEnd)
         return u, v, z, visible
