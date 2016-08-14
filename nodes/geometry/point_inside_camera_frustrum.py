@@ -17,14 +17,11 @@ class PointInCameraFrustrumNode(bpy.types.Node, AnimationNode):
         self.newOutput("Float", "Image v", "v")
         self.newOutput("Float", "Z depth", "z")
         self.newOutput("Boolean", "Visible", "visible")
-        
-    def getExecutionCode(self):
-        yield "u, v, z, visible = self.isInFrustrum(scene, camera, point, threshold)"
-            
+                
     def getUsedModules(self):
         return ["bpy_extras"]
     
-    def isInFrustrum(self, scene, camera, point, threshold):
+    def execute(self, scene, camera, point, threshold):
         if getattr(camera, "type", "") != 'CAMERA':
             return 0, 0, 0, False
         co = bpy_extras.object_utils.world_to_camera_view(scene, camera, point)
