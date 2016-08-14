@@ -199,7 +199,8 @@ cdef class SmoothLoft:
         surfaceSpline = BezierSpline(
             points = surfaceSplinePoints,
             leftHandles = Vector3DList(length = splineAmount),
-            rightHandles = Vector3DList(length = splineAmount))
+            rightHandles = Vector3DList(length = splineAmount),
+            cyclic = self.cyclic)
 
         if self.splineDistributionType == "UNIFORM":
             for spline in self.splines:
