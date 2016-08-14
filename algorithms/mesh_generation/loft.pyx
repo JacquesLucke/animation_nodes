@@ -50,7 +50,7 @@ cdef class LinearLoft:
             Vector3* _tmp2
             long totalLineAmount, i, lineIndex
 
-        controlLines = splineAmount - startIndices[0] + 1
+        controlLines = endIndices[0] - startIndices[0] + 2
         subdivisionLines = (controlLines - 1) * subdivisions
         totalLineAmount = controlLines + subdivisionLines
 
