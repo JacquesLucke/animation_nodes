@@ -27,6 +27,15 @@ def vertices(float length, float width, int xDivisions, int yDivisions, offset =
 # Edges
 ############################################
 
+def quadEdges(xDivisions, yDivisions, joinHorizontal = False, joinVertical = False):
+    edges = EdgeIndicesList()
+    edges.extend(innerQuadEdges(xDivisions, yDivisions))
+    if joinHorizontal:
+        edges.extend(joinHorizontalEdgesQuadEdges(xDivisions, yDivisions))
+    if joinVertical:
+        edges.extend(joinVerticalEdgesQuadEdges(xDivisions, yDivisions))
+    return edges
+
 def innerQuadEdges(long xDivisions, long yDivisions):
     assert xDivisions >= 2
     assert yDivisions >= 2
@@ -46,6 +55,21 @@ def innerQuadEdges(long xDivisions, long yDivisions):
             edges.base.data[offset + 0] = j * yDivisions + i
             edges.base.data[offset + 1] = j * yDivisions + i + yDivisions
             offset += 2
+    return edges
+
+def joinHorizontalEdgesQuadEdges(long xDivisions, long yDivisions):
+    cdef EdgeIndicesList edges = EdgeIndicesList()
+    cdef long i, offset = (xDivisions - 1) * yDivisions
+    for i in range(yDivisions):
+        print(i, i + offset)
+        edges.append((i, i + offset))
+    return edges
+
+def joinVerticalEdgesQuadEdges(long xDivisions, long yDivisions):
+    cdef EdgeIndicesList edges = EdgeIndicesList()
+    cdef long i
+    for i in range(xDivisions):
+        edges.append((i * yDivisions, (i + 1) * yDivisions - 1))
     return edges
 
 

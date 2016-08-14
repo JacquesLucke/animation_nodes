@@ -29,9 +29,14 @@ cdef void mixVec3(Vector3* target, Vector3* a, Vector3* b, float factor):
 
 cdef void normalizeVec3(Vector3* v):
     cdef float length = sqrt(v.x ** 2 + v.y ** 2 + v.z ** 2)
-    v.x /= length
-    v.y /= length
-    v.z /= length
+    if length != 0:
+        v.x /= length
+        v.y /= length
+        v.z /= length
+    else:
+        v.x = 0
+        v.y = 0
+        v.z = 0
 
 cdef float distanceVec3(Vector3* a, Vector3* b):
     return sqrt((a.x - b.x) ** 2

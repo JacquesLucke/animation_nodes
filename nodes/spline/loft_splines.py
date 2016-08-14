@@ -103,7 +103,7 @@ class LoftSplinesNode(bpy.types.Node, AnimationNode):
         vertices, edgeIndices, polygonIndices = None, None, None
         if valid:
             if self.outputs["Vertices"].isLinked: vertices = loft.calcVertices()
-            # TODO: if self.outputs["Edge Indices"].isLinked: edgeIndices = loft.calcEdgeIndices()
+            if self.outputs["Edge Indices"].isLinked: edgeIndices = loft.calcEdgeIndices()
             if self.outputs["Polygon Indices"].isLinked: polygonIndices = loft.calcPolygonIndices()
 
         if vertices is None: vertices = Vector3DList()
