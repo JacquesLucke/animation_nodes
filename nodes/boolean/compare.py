@@ -5,7 +5,7 @@ from ... events import executionCodeChanged
 from ... sockets.info import toIdName
 from ... tree_info import keepNodeLinks
 
-compare_types = ["A = B", "A != B", "A < B", "A <= B", "A > B", "A >= B", "A is B"]
+compare_types = ["A = B", "A != B", "A < B", "A <= B", "A > B", "A >= B", "A is B","A is None"]
 compare_types_items = [(t, t, "") for t in compare_types]
 
 numericLabelTypes = ["Integer", "Float"]
@@ -17,9 +17,13 @@ class CompareNode(bpy.types.Node, AnimationNode):
 
     def assignedTypeChanged(self, context):
         self.generateSockets()
-
+    
+    def compareTypeChanged(self, context):
+        self.generateSockets()
+        self.executionCodeChanged(self, context)
+    
     assignedType = StringProperty(update = assignedTypeChanged)
-    compareType = EnumProperty(name = "Compare Type", items = compare_types_items, update = executionCodeChanged)
+    compareType = EnumProperty(name = "Compare Type", items = compare_types_items, update = compareTypeChanged)
 
     def create(self):
         self.assignedType = "Float"
@@ -50,6 +54,7 @@ class CompareNode(bpy.types.Node, AnimationNode):
         if type == "A > B":	 return "try: result = a > b \nexcept: result = False"
         if type == "A >= B": return "try: result = a >= b \nexcept: result = False"
         if type == "A is B": return "result = a is b"
+        if type == "A is None": return "result = a is None"
         return "result = False"
 
     def edit(self):
@@ -58,8 +63,10 @@ class CompareNode(bpy.types.Node, AnimationNode):
 
     def getWantedDataType(self):
         inputA = self.inputs[0].dataOrigin
-        inputB = self.inputs[1].dataOrigin
-
+        if len(self.inputs) > 1:
+            inputB = self.inputs[1].dataOrigin
+        else:
+            inputB = None
         if inputA is not None: return inputA.dataType
         if inputB is not None: return inputB.dataType
         return self.inputs[0].dataType
@@ -72,7 +79,8 @@ class CompareNode(bpy.types.Node, AnimationNode):
     def generateSockets(self):
         self.inputs.clear()
         self.newInput(self.assignedType, "A", "a")
-        self.newInput(self.assignedType, "B", "b")
+        if self.compareType != "A is None":
+            self.newInput(self.assignedType, "B", "b")
 
     @property
     def socketA(self):
