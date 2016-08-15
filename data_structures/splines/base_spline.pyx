@@ -1,7 +1,7 @@
 cimport cython
 from mathutils import Vector
-from ... math cimport distanceSumOfVector3DList
 from ... utils.lists cimport findListSegment_LowLevel
+from ... math cimport distanceSumOfVector3DList, toVector3, toPyVector
 
 cdef class Spline:
 
@@ -23,6 +23,16 @@ cdef class Spline:
         end = min(max(end, 0), 1)
         print(start, end)
         return distanceSumOfVector3DList(self.getSamples(resolution, start, end))
+
+    cpdef project(self, point):
+        if not self.isEvaluable():
+            raise Exception("spline is not evaluable")
+        cdef Vector3 _point
+        toVector3(&_point, point)
+        return self.project_LowLevel(&_point)
+
+    cdef project_LowLevel(self, Vector3* point):
+        raise NotImplementedError()
 
     cpdef bint isEvaluable(self):
         raise NotImplementedError()

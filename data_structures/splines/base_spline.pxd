@@ -19,6 +19,10 @@ cdef class Spline:
     cpdef transform(self, matrix)
     cpdef double getLength(self, int resolution = ?)
     cpdef double getPartialLength(self, float start, float end, int resolution = ?)
+
+    cpdef project(self, point)
+    cdef project_LowLevel(self, Vector3* point)
+
     cpdef getTrimmedCopy(self, float start = ?, float end = ?)
     cdef Spline getTrimmedCopy_LowLevel(self, float start, float end)
 

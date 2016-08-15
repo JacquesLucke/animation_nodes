@@ -2,7 +2,8 @@ cimport cython
 from libc.math cimport floor
 from libc.string cimport memcpy
 from ... utils.lists cimport findListSegment_LowLevel
-from ... math cimport (Vector3, mixVec3, distanceVec3, subVec3,
+from ... math cimport (Vector3, mixVec3, distanceVec3, subVec3, lengthVec3,
+                       scaleVec3, dotVec3, distanceSquaredVec3,
                        transformVector3DList, distanceSumOfVector3DList)
 
 from mathutils import Vector
@@ -34,6 +35,39 @@ cdef class PolySpline(Spline):
             _points = <Vector3*>self.points.base.data
             length += distanceVec3(_points + 0, _points + self.points.getLength() - 1)
         return length
+
+    cdef project_LowLevel(self, Vector3* point):
+        cdef:
+            float closestParameter = 0
+            float smallestDistance = 1e9
+            float lineParameter, lineDistance
+            int segmentAmount = self.getSegmentAmount()
+            int i, pointAmount = self.points.getLength()
+            Vector3 lineDirection, projectionOnLine
+            Vector3* _points = <Vector3*>self.points.base.data
+            int endIndex
+
+        for i in range(segmentAmount):
+            endIndex = (i + 1) % pointAmount
+
+            # find closest t value on current segment
+            subVec3(&lineDirection, _points + endIndex, _points + i)
+            lineParameter = findNearestParameterOnLine(_points + i, &lineDirection, point)
+            lineParameter = min(max(lineParameter, 0.0), 1.0)
+
+            # calculate closest point on the current segment
+            mixVec3(&projectionOnLine, _points + i, _points + endIndex, lineParameter)
+
+            # check if it is closer than all previously calculated points
+            lineDistance = distanceSquaredVec3(point, &projectionOnLine)
+            if lineDistance < smallestDistance:
+                smallestDistance = lineDistance
+                closestParameter = (lineParameter + i) / <float>segmentAmount
+
+        return closestParameter
+
+    cdef inline int getSegmentAmount(self):
+        return self.points.getLength() - 1 + self.cyclic
 
     cdef PolySpline getTrimmedCopy_LowLevel(self, float start, float end):
         cdef:
@@ -126,3 +160,14 @@ cdef class PolySpline(Spline):
             parameters.data[i] = 1
         parameters.data[amount - 1]
         return parameters
+
+cdef float findNearestParameterOnLine(Vector3* lineStart, Vector3* lineDirection, Vector3* point):
+    cdef float directionLength = lengthVec3(lineDirection)
+    if directionLength == 0: return 0.0
+
+    cdef Vector3 normalizedLineDirection = lineDirection[0]
+    scaleVec3(&normalizedLineDirection, 1 / directionLength)
+
+    cdef Vector3 pointDifference
+    subVec3(&pointDifference, point, lineStart)
+    return dotVec3(&normalizedLineDirection, &pointDifference) / directionLength

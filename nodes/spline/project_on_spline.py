@@ -28,8 +28,7 @@ class ProjectOnSplineNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "extended", text = "Extended")
 
     def execute(self, spline, location):
-        spline.update()
-        if spline.isEvaluable:
+        if spline.isEvaluable():
             if self.extended:
                 position, tangent = spline.projectExtended(location)
                 parameter = 0.0

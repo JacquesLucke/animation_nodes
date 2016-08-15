@@ -21,7 +21,8 @@ Compiling the cython code needs some setup (only tested on windows yet):
 
 Command Line Arguments:
     python setup.py
-    python setup.py -c         # remove generated .c files
+     -c              # remove generated .c files
+     -all            # recompile all
 
 Generate .html files to debug cython code:
     cython -a filename.pyx
@@ -56,6 +57,7 @@ initialArgs = sys.argv[:]
 def main():
     if canCompileCython():
         preprocessor()
+        if "-all" in initialArgs: removeCFiles()
         compileCythonFiles()
 
 def canCompileCython():
@@ -118,23 +120,24 @@ def compileCythonFiles():
 
     writeFile(".log", resultBuffer.getvalue())
 
-    cleanupRepository(
-        removeBuildDirectory = True,
-        removeCFiles = "-c" in initialArgs)
+    if "-c" in initialArgs:
+        removeCFiles()
+    if True: # <- may become important later, not sure
+        removeBuildDirectory()
 
 def getPathsToCythonFiles():
     return list(iterPathsWithSuffix(".pyx"))
 
-def cleanupRepository(removeBuildDirectory, removeCFiles):
-    if removeBuildDirectory:
-        buildDirectory = join(currentDirectory, "build")
-        if os.path.exists(buildDirectory):
-            shutil.rmtree(buildDirectory)
-        print("Removed not needed build directory.")
-    if removeCFiles:
-        for path in iterPathsWithSuffix(".c"):
-            os.remove(path)
-        print("Remove generated .c files.")
+def removeBuildDirectory():
+    buildDirectory = join(currentDirectory, "build")
+    if os.path.exists(buildDirectory):
+        shutil.rmtree(buildDirectory)
+    print("Removed not needed build directory.")
+
+def removeCFiles():
+    for path in iterPathsWithSuffix(".c"):
+        os.remove(path)
+    print("Remove generated .c files.")
 
 
 

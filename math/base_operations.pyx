@@ -43,6 +43,9 @@ cdef float distanceVec3(Vector3* a, Vector3* b):
               + (a.y - b.y) ** 2
               + (a.z - b.z) ** 2)
 
+cdef float distanceSquaredVec3(Vector3* a, Vector3* b):
+    return (a.x - b.x) ** 2 + (a.y - b.y) ** 2 + (a.z - b.z) ** 2
+
 cdef void transformVec3(Vector3* target, Vector3* v, Matrix4* m):
     cdef float newX, newY, newZ
     newX = v.x * m.a11 + v.y * m.a12 + v.z * m.a13 + m.a14
@@ -51,3 +54,6 @@ cdef void transformVec3(Vector3* target, Vector3* v, Matrix4* m):
     target.x = newX
     target.y = newY
     target.z = newZ
+
+cdef float dotVec3(Vector3* a, Vector3* b):
+    return a.x * b.x + a.y * b.y + a.z * b.z

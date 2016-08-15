@@ -8,3 +8,4 @@ cdef class PolySpline(Spline):
         readonly Vector3DList points
 
     cpdef FloatList getUniformParameters(self, long amount)
+    cdef inline int getSegmentAmount(self)
