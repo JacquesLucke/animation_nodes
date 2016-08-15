@@ -385,6 +385,26 @@ class TestProject(TestCase):
         spline.appendPoint((1, 0, 4))
         return spline
 
+class TestProjectExtended(TestCase):
+    def testStart(self):
+        spline = self.getTestSpline()
+        point, tangent = spline.projectExtended((-5, 1, 2))
+        testEqual(self, point, (-5, 0, 0))
+        testEqual(self, tangent, (2, 0, 0))
+
+    def testEnd(self):
+        spline = self.getTestSpline()
+        point, tangent = spline.projectExtended((3, 5, 20))
+        testEqual(self, point, (1, 0, 20))
+        testEqual(self, tangent, (0, 0, 4))
+
+    def getTestSpline(self):
+        spline = PolySpline()
+        spline.appendPoint((-1, 0, 0))
+        spline.appendPoint((1, 0, 0))
+        spline.appendPoint((1, 0, 4))
+        return spline
+
 
 def testEqual(testCase, vector1, vector2):
     testCase.assertAlmostEqual(vector1[0], vector2[0], places = 5)
