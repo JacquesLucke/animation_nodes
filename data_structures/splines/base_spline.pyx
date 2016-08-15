@@ -2,7 +2,7 @@ cimport cython
 from mathutils import Vector
 from ... utils.lists cimport findListSegment_LowLevel
 from ... math cimport (distanceSumOfVector3DList, toVector3, toPyVector,
-                       findNearestLineParameter)
+                       findNearestLineParameter, distanceSquaredVec3)
 
 cdef class Spline:
 
@@ -37,23 +37,49 @@ cdef class Spline:
             raise Exception("spline is not evaluable")
 
         cdef:
-            float parameter
             Vector3 _point
-            Vector3 onSplinePoint
+            float parameter, smallestDistance, distance
+            Vector3 nearestProjection, projection
+            Vector3 nearestTangent, tangent
             Vector3 startPoint, startTangent
             Vector3 endPoint, endTangent
         toVector3(&_point, point)
 
         parameter = self.project_LowLevel(&_point)
-        self.evaluate_LowLevel(parameter, &onSplinePoint)
+        self.evaluate_LowLevel(parameter, &nearestProjection)
+        self.evaluateTangent_LowLevel(parameter, &nearestTangent)
 
-        if self.cyclic:
-            return toPyVector(&onSplinePoint)
+        if not self.cyclic:
+            smallestDistance = distanceSquaredVec3(&_point, &nearestProjection)
 
-        self.evaluate_LowLevel(0, &startPoint)
-        self.evaluate_LowLevel(1, &endPoint)
-        self.evaluateTangent_LowLevel(0, &startTangent)
-        self.evaluateTangent_LowLevel(1, &endTangent)
+            self.evaluate_LowLevel(0, &startPoint)
+            self.evaluate_LowLevel(1, &endPoint)
+            self.evaluateTangent_LowLevel(0, &startTangent)
+            self.evaluateTangent_LowLevel(1, &endTangent)
+
+            parameter = findNearestLineParameter(&startPoint, &startTangent, &_point)
+            if parameter < 0:
+                projection.x = startPoint.x + parameter * startTangent.x
+                projection.y = startPoint.y + parameter * startTangent.y
+                projection.z = startPoint.z + parameter * startTangent.z
+                distance = distanceSquaredVec3(&_point, &projection)
+                if distance < smallestDistance:
+                    smallestDistance = distance
+                    nearestProjection = projection
+                    nearestTangent = startTangent
+
+            parameter = findNearestLineParameter(&endPoint, &endTangent, &_point)
+            if parameter > 0:
+                projection.x = endPoint.x + parameter * endTangent.x
+                projection.y = endPoint.y + parameter * endTangent.y
+                projection.z = endPoint.z + parameter * endTangent.z
+                distance = distanceSquaredVec3(&_point, &projection)
+                if distance < smallestDistance:
+                    smallestDistance = distance
+                    nearestProjection = projection
+                    nearestTangent = endTangent
+
+        return toPyVector(&nearestProjection), toPyVector(&nearestTangent)
 
     cdef project_LowLevel(self, Vector3* point):
         raise NotImplementedError()
