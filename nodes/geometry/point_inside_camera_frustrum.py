@@ -1,7 +1,7 @@
 import bpy
+import bpy_extras
 from bpy.props import *
 from ... base_types.node import AnimationNode
-import bpy_extras
 
 class PointInCameraFrustrumNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_PointInCameraFrustrumNode"
@@ -10,16 +10,13 @@ class PointInCameraFrustrumNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.newInput("Scene", "Scene", "scene", hide = True)
         self.newInput("Object", "Camera", "camera")
-        self.newInput("Vector", "Point", "point", value=(0, 0, 0))
+        self.newInput("Vector", "Point", "point", value = (0, 0, 0))
         self.newInput("Float", "Threshold", "threshold", value = 0.0)
         
         self.newOutput("Float", "Image u", "u")
         self.newOutput("Float", "Image v", "v")
         self.newOutput("Float", "Z depth", "z")
         self.newOutput("Boolean", "Visible", "visible")
-                
-    def getUsedModules(self):
-        return ["bpy_extras"]
     
     def execute(self, scene, camera, point, threshold):
         if getattr(camera, "type", "") != 'CAMERA':
