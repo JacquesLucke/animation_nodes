@@ -347,6 +347,45 @@ class TestGetTrimmedCopy(TestCase):
         spline.appendPoint((5, -3, 0))
         return spline
 
+class TestProject(TestCase):
+    def testEmptySpline(self):
+        spline = PolySpline()
+        with self.assertRaises(Exception):
+            spline.project((1, 2, 3))
+
+    def testOnSpline(self):
+        spline = self.getTestSpline()
+        self.assertAlmostEqual(spline.project((-1, 0, 0)), 0)
+        self.assertAlmostEqual(spline.project((0, 0, 0)), 0.25)
+        self.assertAlmostEqual(spline.project((1, 0, 0)), 0.5)
+        self.assertAlmostEqual(spline.project((1, 0, 2)), 0.75)
+        self.assertAlmostEqual(spline.project((1, 0, 4)), 1)
+
+    def testNearSpline(self):
+        spline = self.getTestSpline()
+        self.assertAlmostEqual(spline.project((0, 0, 0.3)), 0.25)
+        self.assertAlmostEqual(spline.project((1, 0.4, 2)), 0.75)
+
+    def testEnd(self):
+        spline = self.getTestSpline()
+        self.assertAlmostEqual(spline.project((-3, 0.1, 0.2)), 0)
+        self.assertAlmostEqual(spline.project((-3, 0.1, 10)), 1)
+
+    def testCyclic(self):
+        spline = self.getTestSpline()
+        spline.cyclic = True
+        self.assertAlmostEqual(spline.project((1, 0, 0)), 1/3)
+        self.assertAlmostEqual(spline.project((0, 0, 10)), 2/3)
+        self.assertAlmostEqual(spline.project((0, 2, 2)), 5/6)
+
+    def getTestSpline(self):
+        spline = PolySpline()
+        spline.appendPoint((-1, 0, 0))
+        spline.appendPoint((1, 0, 0))
+        spline.appendPoint((1, 0, 4))
+        return spline
+
+
 def testEqual(testCase, vector1, vector2):
     testCase.assertAlmostEqual(vector1[0], vector2[0], places = 5)
     testCase.assertAlmostEqual(vector1[1], vector2[1], places = 5)
