@@ -146,6 +146,7 @@ class AnimationNode:
 
     def newInput(self, type, name, identifier = None, **kwargs):
         idName = toSocketIdName(type)
+        if idName is None: raise ValueError("Socket type does not exist")
         if identifier is None: identifier = name
         socket = self.inputs.new(idName, name, identifier)
         self._setSocketProperties(socket, kwargs)
@@ -153,6 +154,7 @@ class AnimationNode:
 
     def newOutput(self, type, name, identifier = None, **kwargs):
         idName = toSocketIdName(type)
+        if idName is None: raise ValueError("Socket type does not exist")
         if identifier is None: identifier = name
         socket = self.outputs.new(idName, name, identifier)
         self._setSocketProperties(socket, kwargs)
