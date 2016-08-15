@@ -2,6 +2,7 @@ import bpy
 import sys
 from .. import problems
 from .. utils.layout import writeText
+from .. draw_handler import drawHandler
 from .. graphics.rectangle import Rectangle
 from .. utils.blender_ui import getDpiFactor
 
@@ -52,6 +53,7 @@ class ProblemsPanel(bpy.types.Panel):
         return bpy.context.space_data.edit_tree
 
 
+@drawHandler("SpaceNodeEditor", "WINDOW")
 def drawWarningOverlay():
     if problems.problemsExist():
         rectangle = Rectangle.fromRegionDimensions(bpy.context.region)

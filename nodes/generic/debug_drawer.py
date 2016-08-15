@@ -3,6 +3,7 @@ import itertools
 from bpy.props import *
 from ... sockets.info import isList
 from ... utils import pretty_strings
+from ... draw_handler import drawHandler
 from ... utils.timing import measureTime
 from ... graphics.text_box import TextBox
 from ... base_types.node import AnimationNode
@@ -112,6 +113,7 @@ class DebugDrawerNode(bpy.types.Node, AnimationNode):
         return str
 
 
+@drawHandler("SpaceNodeEditor", "WINDOW")
 def drawDebugTextBoxes():
     tree = bpy.context.space_data.node_tree
     if tree is None: return

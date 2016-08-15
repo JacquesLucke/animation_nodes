@@ -19,7 +19,6 @@ def registerFiles():
     sound_bake.register()
     socket_base.register()
     node_colors.register()
-    draw_handler.register()
     utils.operators.register()
     extend_bpy_types.register()
     dynamic_operators.register()

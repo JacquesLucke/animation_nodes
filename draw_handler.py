@@ -1,23 +1,25 @@
 import bpy
-from . preferences import getExecutionCodeType
-from . ui.problems_panel import drawWarningOverlay
-from . ui.node_editor_hud import drawNodeEditorHud
-from . execution.measurements import drawMeasurementResults
-from . nodes.generic.debug_drawer import drawDebugTextBoxes
-from . nodes.interpolation.debug import drawInterpolationPreviews
+import functools
+from collections import defaultdict
 
-def drawNodeEditor():
-    drawDebugTextBoxes()
-    drawInterpolationPreviews()
-    if getExecutionCodeType() == "MEASURE":
-        drawMeasurementResults()
-    drawNodeEditorHud()
-    drawWarningOverlay()
+handlersPerEditor = defaultdict(list)
 
-_nodeDrawHandler = None
-def register():
-    global _nodeDrawHandler
-    _nodeDrawHandler = bpy.types.SpaceNodeEditor.draw_handler_add(drawNodeEditor, (), "WINDOW", "POST_PIXEL")
+def drawHandler(editorName, regionName):
+    def drawHandlerDecorator(function):
+        registerDrawHandler(function, editorName, regionName)
+
+        @functools.wraps(function)
+        def wrapper():
+            function()
+        return wrapper
+
+    return drawHandlerDecorator
+
+def registerDrawHandler(function, editorName, regionName):
+    editor = getattr(bpy.types, editorName)
+    handler = editor.draw_handler_add(function, (), regionName, "POST_PIXEL")
+    handlersPerEditor[editor].append((handler, regionName))
 
 def unregister():
-    bpy.types.SpaceNodeEditor.draw_handler_remove(_nodeDrawHandler, "WINDOW")
+    for editor, (handler, regionName) in handlersPerEditor:
+        editor.draw_handler_remove(handler, regionName)

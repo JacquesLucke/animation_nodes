@@ -1,6 +1,7 @@
 import bpy
 from bpy.props import *
 from mathutils import Vector
+from ... draw_handler import drawHandler
 from ... tree_info import getNodesByType
 from ... base_types.node import AnimationNode
 from ... algorithms.interpolation import sampleInterpolation
@@ -25,6 +26,7 @@ class DebugInterpolationNode(bpy.types.Node, AnimationNode):
     def execute(self, interpolation):
         interpolationByNode[self.identifier] = interpolation
 
+@drawHandler("SpaceNodeEditor", "WINDOW")
 def drawInterpolationPreviews():
     nodes = getNodesByType("an_DebugInterpolationNode")
     nodesInCurrentTree = getattr(bpy.context.space_data.node_tree, "nodes", [])

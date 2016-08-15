@@ -2,8 +2,10 @@ import bpy
 import textwrap
 from collections import defaultdict
 from .. utils.timing import prettyTime
+from .. draw_handler import drawHandler
 from .. graphics.text_box import TextBox
 from .. utils.operators import makeOperator
+from .. preferences import getExecutionCodeType
 from .. utils.blender_ui import iterNodeCornerLocations
 
 class NodeMeasurements:
@@ -41,10 +43,12 @@ def getMeasurementsDict():
 def getMinExecutionTime(node):
     return measurementsByNodeIdentifier[node.identifier].minTime
 
+@drawHandler("SpaceNodeEditor", "WINDOW")
 def drawMeasurementResults():
     tree = bpy.context.space_data.edit_tree
     if tree is None: return
     if tree.bl_idname != "an_AnimationNodeTree": return
+    if getExecutionCodeType() != "MEASURE": return
 
     nodes = tree.nodes
     region = bpy.context.region
