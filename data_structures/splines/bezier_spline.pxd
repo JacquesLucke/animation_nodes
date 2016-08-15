@@ -9,7 +9,6 @@ cdef class BezierSpline(Spline):
         readonly Vector3DList rightHandles
 
     cpdef appendPoint(self, point, leftHandle, rightHandle)
-
     cdef void getSegmentData(self, float parameter, float* t, Vector3** w)
-
     cpdef calculateSmoothHandles(self, float strength = ?)
+    cdef inline int getSegmentAmount(self)

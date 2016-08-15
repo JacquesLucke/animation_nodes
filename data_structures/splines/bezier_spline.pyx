@@ -1,8 +1,9 @@
 cimport cython
 from libc.string cimport memcpy
+from numpy.polynomial import Polynomial
 from ... utils.lists cimport findListSegment_LowLevel
 from ... math cimport (subVec3, normalizeVec3, lengthVec3,
-                       transformVector3DList)
+                       transformVector3DList, toPyVector)
 
 from mathutils import Vector
 
@@ -46,6 +47,51 @@ cdef class BezierSpline(Spline):
         transformVector3DList(self.leftHandles, matrix)
         transformVector3DList(self.rightHandles, matrix)
         self.markChanged()
+
+    cdef project_LowLevel(self, Vector3* _point):
+        # TODO: Speedup using python
+        # http://jazzros.blogspot.be/2011/03/projecting-point-on-bezier-curve.html
+        cdef:
+            int segmentAmount = self.getSegmentAmount()
+            int i, leftIndex, rightIndex
+            set possibleParameters = set()
+            list coeffs = [0] * 6
+
+        point = toPyVector(_point)
+
+        for i in range(segmentAmount):
+            leftIndex = i
+            rightIndex = (i + 1) % segmentAmount
+
+            p0 = self.points[leftIndex] - point
+            p1 = self.rightHandles[leftIndex] - point
+            p2 = self.leftHandles[rightIndex] - point
+            p3 = self.points[rightIndex] - point
+
+            a = p3 - 3 * p2 + 3 * p1 - p0
+            b = 3 * p2 - 6 * p1 + 3 * p0
+            c = 3 * (p1 - p0)
+
+            coeffs[0] = c.dot(p0)
+            coeffs[1] = c.dot(c) + b.dot(p0) * 2.0
+            coeffs[2] = b.dot(c) * 3.0 + a.dot(p0) * 3.0
+            coeffs[3] = a.dot(c) * 4.0 + b.dot(b) * 2.0
+            coeffs[4] = a.dot(b) * 5.0
+            coeffs[5] = a.dot(a) * 3.0
+
+            poly = Polynomial(coeffs, [0.0, 1.0], [0.0, 1.0])
+            roots = poly.roots()
+            realRoots = [float(min(max(root.real, 0), 1)) for root in roots]
+            segmentParameters = [(i + t) / segmentAmount for t in realRoots]
+            possibleParameters.update(segmentParameters)
+
+        sampledData = [(p, (point - self.evaluate(p)).length_squared) for p in possibleParameters]
+        if len(sampledData) > 0:
+            return min(sampledData, key = lambda item: item[1])[0]
+        return 0
+
+    cdef inline int getSegmentAmount(self):
+        return self.points.getLength() - 1 + self.cyclic
 
     cpdef bint isEvaluable(self):
         return self.points.getLength() >= 2
