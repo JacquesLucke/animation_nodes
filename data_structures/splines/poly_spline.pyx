@@ -3,7 +3,7 @@ from libc.math cimport floor
 from libc.string cimport memcpy
 from ... utils.lists cimport findListSegment_LowLevel
 from ... math cimport (Vector3, mixVec3, distanceVec3, subVec3, lengthVec3,
-                       scaleVec3, dotVec3, distanceSquaredVec3,
+                       distanceSquaredVec3, findNearestLineParameter,
                        transformVector3DList, distanceSumOfVector3DList)
 
 from mathutils import Vector
@@ -36,6 +36,7 @@ cdef class PolySpline(Spline):
             length += distanceVec3(_points + 0, _points + self.points.getLength() - 1)
         return length
 
+    @cython.cdivision(True)
     cdef project_LowLevel(self, Vector3* point):
         cdef:
             float closestParameter = 0
@@ -52,7 +53,7 @@ cdef class PolySpline(Spline):
 
             # find closest t value on current segment
             subVec3(&lineDirection, _points + endIndex, _points + i)
-            lineParameter = findNearestParameterOnLine(_points + i, &lineDirection, point)
+            lineParameter = findNearestLineParameter(_points + i, &lineDirection, point)
             lineParameter = min(max(lineParameter, 0.0), 1.0)
 
             # calculate closest point on the current segment
@@ -160,14 +161,3 @@ cdef class PolySpline(Spline):
             parameters.data[i] = 1
         parameters.data[amount - 1]
         return parameters
-
-cdef float findNearestParameterOnLine(Vector3* lineStart, Vector3* lineDirection, Vector3* point):
-    cdef float directionLength = lengthVec3(lineDirection)
-    if directionLength == 0: return 0.0
-
-    cdef Vector3 normalizedLineDirection = lineDirection[0]
-    scaleVec3(&normalizedLineDirection, 1 / directionLength)
-
-    cdef Vector3 pointDifference
-    subVec3(&pointDifference, point, lineStart)
-    return dotVec3(&normalizedLineDirection, &pointDifference) / directionLength

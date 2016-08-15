@@ -1,7 +1,8 @@
 cimport cython
 from libc.string cimport memcpy
 from ... utils.lists cimport findListSegment_LowLevel
-from ... math cimport subVec3, normalizeVec3, lengthVec3, transformVector3DList
+from ... math cimport (subVec3, normalizeVec3, lengthVec3,
+                       transformVector3DList)
 
 from mathutils import Vector
 
