@@ -57,3 +57,8 @@ cdef void transformVec3(Vector3* target, Vector3* v, Matrix4* m):
 
 cdef float dotVec3(Vector3* a, Vector3* b):
     return a.x * b.x + a.y * b.y + a.z * b.z
+
+cdef void crossVec3(Vector3* result, Vector3* a, Vector3* b):
+    result.x = a.y * b.z - a.z * b.y
+    result.y = a.z * b.x - a.x * b.z
+    result.z = a.x * b.y - a.y * b.x
