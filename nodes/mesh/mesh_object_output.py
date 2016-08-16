@@ -1,7 +1,7 @@
 import bpy
 import bmesh
-import itertools
 from bpy.props import *
+from ... events import propertyChanged
 from ... utils.layout import writeText
 from ... tree_info import keepNodeState
 from ... data_structures import UShortList
@@ -26,12 +26,19 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
     meshDataType = EnumProperty(name = "Mesh Data Type", default = "MESH_DATA",
         items = meshDataTypeItems, update = meshDataTypeChanged)
 
-    checkIndices = BoolProperty(name = "Check Indices", default = True,
-        description = "Check that the highest edge or polygon index is below the " +
-         "vertex amount (unchecking can crash Blender when the mesh data is invalid)")
+    updateMesh = BoolProperty(name = "Update Mesh", default = True,
+        description = "Update create mesh to recalculate other mesh related data",
+        update = propertyChanged)
 
-    checkTupleLengths = BoolProperty(name = "Check Tuple Lengths", default = True,
-        description = "Check that edges have two indices and polygons three or more")
+    recalcEdges = BoolProperty(name = "Recalculate Edges", default = True,
+        description = "Make sure that all connected vertices of polygons also exist as edge",
+        update = propertyChanged)
+
+    recalcTessFaces = BoolProperty(name = "Recalculate Tessellation Faces", default = False,
+        description = "", update = propertyChanged)
+
+    validateMesh = BoolProperty(name = "Validate Mesh", default = False,
+        description = "", update = propertyChanged)
 
     errorMessage = StringProperty()
 
@@ -73,8 +80,14 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
         if self.meshDataType == "VERTICES": return self.inputs["Vertices"]
 
     def drawAdvanced(self, layout):
-        layout.prop(self, "checkIndices")
-        layout.prop(self, "checkTupleLengths")
+        col = layout.column()
+        col.prop(self, "updateMesh")
+        subcol = col.column(align = True)
+        subcol.active = self.updateMesh
+        subcol.prop(self, "recalcEdges")
+        subcol.prop(self, "recalcTessFaces")
+
+        layout.prop(self, "validateMesh")
 
     def getExecutionCode(self):
         yield "self.errorMessage = ''"
@@ -120,8 +133,11 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
         mesh.polygons.foreach_set("loop_start", polygons.polyStarts.getMemoryView())
         mesh.polygons.foreach_set("vertices", polygons.indices.getMemoryView())
 
-        if len(polygons) > 0 and len(edges) == 0:
-            mesh.update(calc_edges = True)
+        if self.updateMesh:
+            mesh.update(calc_edges = self.recalcEdges,
+                        calc_tessface = self.recalcTessFaces)
+        if self.validateMesh:
+            mesh.validate()
 
     def setBMesh(self, mesh, bm):
         bm.to_mesh(mesh)
