@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from mathutils import Vector
-from ... events import propertyChanged
+from ... tree_info import keepNodeState
 from ... base_types.node import AnimationNode
 
 class ProjectOnSplineNode(bpy.types.Node, AnimationNode):
@@ -9,8 +9,7 @@ class ProjectOnSplineNode(bpy.types.Node, AnimationNode):
     bl_label = "Project on Spline"
 
     def settingChanged(self, context):
-        self.outputs["Parameter"].hide = self.extended
-        propertyChanged()
+        self.recreateOutputs()
 
     extended = BoolProperty(
         name = "Extended Spline",
@@ -20,22 +19,28 @@ class ProjectOnSplineNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.newInput("Spline", "Spline", "spline", defaultDrawType = "PROPERTY_ONLY")
         self.newInput("Vector", "Location", "location")
+        self.recreateOutputs()
+
+    @keepNodeState
+    def recreateOutputs(self):
+        self.outputs.clear()
         self.newOutput("Vector", "Position", "position")
         self.newOutput("Vector", "Tangent", "tangent")
-        self.newOutput("Float", "Parameter", "parameter")
+        if not self.extended:
+            self.newOutput("Float", "Parameter", "parameter")
 
     def draw(self, layout):
         layout.prop(self, "extended", text = "Extended")
 
-    def execute(self, spline, location):
-        if spline.isEvaluable():
-            if self.extended:
-                position, tangent = spline.projectExtended(location)
-                parameter = 0.0
-            else:
-                parameter = spline.project(location)
-                position = spline.evaluate(parameter)
-                tangent = spline.evaluateTangent(parameter)
-            return position, tangent, parameter
+    def getExecutionCode(self):
+        yield "if spline.isEvaluable():"
+        if self.extended:
+            yield "    position, tangent = spline.projectExtended(location)"
         else:
-            return Vector((0, 0, 0)), Vector((0, 0, 0)), 0.0
+            yield "    parameter = spline.project(location)"
+            yield "    position = spline.evaluate(parameter)"
+            yield "    tangent = spline.evaluateTangent(parameter)"
+        yield "else:"
+        yield "    position = Vector((0, 0, 0))"
+        yield "    tangent = Vector((0, 0, 0))"
+        yield "    parameter = 0.0"
