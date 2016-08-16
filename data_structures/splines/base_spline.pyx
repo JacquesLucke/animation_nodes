@@ -161,7 +161,7 @@ cdef class Spline:
         self.checkUniformConverter()
         return self.sampleEvaluationFunction(self.evaluateUniformTangent_LowLevel, amount, start, end)
 
-    cdef sampleEvaluationFunction(self, EvaluationFunction evaluate,
+    cdef sampleEvaluationFunction(self, SplineEvaluationFunction evaluate,
                                    long amount, float start, float end):
         if not self.isEvaluable():
             raise Exception("spline is not evaluable")
@@ -181,7 +181,7 @@ cdef class Spline:
         self.sampleEvaluationFunction_LowLevel(self.evaluateUniform_LowLevel, amount, start, end, output)
 
     @cython.cdivision(True)
-    cdef void sampleEvaluationFunction_LowLevel(self, EvaluationFunction evaluate,
+    cdef void sampleEvaluationFunction_LowLevel(self, SplineEvaluationFunction evaluate,
                                            long amount, float start, float end,
                                            Vector3* output):
         '''amount >= 0; 0 <= start, end <= 1'''
@@ -222,7 +222,7 @@ cdef class Spline:
         self.checkUniformConverter()
         return self.evaluateEvaluationFunction(self.evaluateUniformTangent_LowLevel, parameter)
 
-    cdef evaluateEvaluationFunction(self, EvaluationFunction evaluate, float parameter):
+    cdef evaluateEvaluationFunction(self, SplineEvaluationFunction evaluate, float parameter):
         if parameter < 0 or parameter > 1:
             raise ValueError("parameter has to be between 0 and 1")
         if not self.isEvaluable():

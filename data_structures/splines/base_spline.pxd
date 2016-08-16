@@ -2,7 +2,7 @@ from ... math cimport Vector3
 from .. lists.base_lists cimport FloatList
 from .. lists.complex_lists cimport Vector3DList
 
-ctypedef void (*EvaluationFunction)(Spline, float, Vector3*)
+ctypedef void (*SplineEvaluationFunction)(Spline, float, Vector3*)
 
 cdef class Spline:
     cdef:
@@ -49,10 +49,10 @@ cdef class Spline:
     cdef getSamples_LowLevel(self, long amount, float start, float end, Vector3* output)
     cdef getUniformSamples_LowLevel(self, long amount, float start, float end, Vector3* output)
 
-    cdef sampleEvaluationFunction(self, EvaluationFunction evaluate,
+    cdef sampleEvaluationFunction(self, SplineEvaluationFunction evaluate,
                                         long amount, float start, float end)
 
-    cdef void sampleEvaluationFunction_LowLevel(self, EvaluationFunction evaluate,
+    cdef void sampleEvaluationFunction_LowLevel(self, SplineEvaluationFunction evaluate,
                                                 long amount, float start, float end,
                                                 Vector3* output)
 
@@ -65,7 +65,7 @@ cdef class Spline:
     cpdef evaluateUniform(self, float parameter)
     cpdef evaluateUniformTangent(self, float parameter)
 
-    cdef evaluateEvaluationFunction(self, EvaluationFunction evaluate, float parameter)
+    cdef evaluateEvaluationFunction(self, SplineEvaluationFunction evaluate, float parameter)
 
     cdef void evaluate_LowLevel(self, float parameter, Vector3* result)
     cdef void evaluateTangent_LowLevel(self, float parameter, Vector3* result)

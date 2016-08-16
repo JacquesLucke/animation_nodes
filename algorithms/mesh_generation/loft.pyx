@@ -1,7 +1,7 @@
 from ... math cimport Vector3, mixVec3Arrays
 from ... data_structures cimport Vector3DList, Spline, BezierSpline
 from ... utils.lists cimport findListSegment_LowLevel, findListSegment
-from ... data_structures.splines.base_spline cimport EvaluationFunction
+from ... data_structures.splines.base_spline cimport SplineEvaluationFunction
 
 from . import grid
 
@@ -112,7 +112,7 @@ cdef class LinearLoft:
         return vertices
 
     cdef writeSplineLine(self, Spline spline, Vector3* target):
-        cdef EvaluationFunction evaluateFunction
+        cdef SplineEvaluationFunction evaluateFunction
         if self.distributionType == "RESOLUTION":
             evaluateFunction = spline.evaluate_LowLevel
         elif self.distributionType == "UNIFORM":
