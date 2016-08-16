@@ -21,5 +21,6 @@ def registerDrawHandler(function, editorName, regionName):
     handlersPerEditor[editor].append((handler, regionName))
 
 def unregister():
-    for editor, (handler, regionName) in handlersPerEditor:
-        editor.draw_handler_remove(handler, regionName)
+    for editor, handlers in handlersPerEditor.items():
+        for handler, regionName in handlers:
+            editor.draw_handler_remove(handler, regionName)
