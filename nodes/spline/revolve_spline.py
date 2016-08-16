@@ -40,7 +40,9 @@ class RevolveSplineNode(bpy.types.Node, AnimationNode):
         vertices, edgeIndices, polygonIndices = None, None, None
 
         if canExecute():
-            vertices = revolve.vertices(axis, profile, splineSamples, surfaceSamples, self.projectionType)
+            if self.outputs[0].isLinked: vertices = revolve.vertices(axis, profile, splineSamples, surfaceSamples, self.projectionType)
+            if self.outputs[1].isLinked: edgeIndices = revolve.edges(splineSamples, surfaceSamples)
+            if self.outputs[2].isLinked: polygonIndices = revolve.polygons(splineSamples, surfaceSamples)
 
         if vertices is None: vertices = Vector3DList()
         if edgeIndices is None: edgeIndices = EdgeIndicesList()

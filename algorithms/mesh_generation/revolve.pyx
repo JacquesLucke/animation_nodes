@@ -4,12 +4,13 @@ from libc.math cimport M_PI as PI
 from ... data_structures cimport Spline, Vector3DList
 from ... math cimport Vector3, subVec3, lengthVec3, crossVec3, normalizeVec3
 
+# Vertices
+####################################################
+
 def vertices(Spline axis not None, Spline profile not None,
              int nSplineSamples, int nSurfaceSamples, str type):
 
-    assert axis is not None
     assert axis.isEvaluable()
-    assert profile is not None
     assert profile.isEvaluable()
     assert nSplineSamples >= 2
     assert nSurfaceSamples >= 3
@@ -38,18 +39,14 @@ def tubeVertices(Vector3DList centerPoints not None,
     cdef:
         int i, ringAmount = ringPoints.getLength()
         Vector3DList vertices = Vector3DList(length = ringAmount * resolution)
-        Vector3* _vertices = <Vector3*>vertices.base.data
-        Vector3* _centerPoints = <Vector3*>centerPoints.base.data
-        Vector3* _ringPoints = <Vector3*>ringPoints.base.data
-        Vector3* _tangents = <Vector3*>tangents.base.data
 
     for i in range(ringAmount):
         alignedCircleVertices_LowLevel(
-            center = _centerPoints + i,
-            pointOnCircle = _ringPoints + i,
-            tangent = _tangents + i,
-            resolution = resolution,
-            output = _vertices + i * resolution)
+            center =        <Vector3*>centerPoints.base.data + i,
+            pointOnCircle = <Vector3*>ringPoints.base.data + i,
+            tangent =       <Vector3*>tangents.base.data + i,
+            resolution =    resolution,
+            output =        <Vector3*>vertices.base.data + i * resolution)
 
     return vertices
 
@@ -75,3 +72,17 @@ cdef alignedCircleVertices_LowLevel(Vector3* center, Vector3* pointOnCircle,
         output[i].y = center.y + radius * (cos(angle) * dirX.y + sin(angle) * dirY.y)
         output[i].z = center.z + radius * (cos(angle) * dirX.z + sin(angle) * dirY.z)
         angle += angleStep
+
+
+# Edges
+####################################################
+
+def edges(int nSplineSamples, int nSurfaceSamples):
+    return grid.quadEdges(nSplineSamples, nSurfaceSamples, joinVertical = True)
+
+
+# Polygons
+####################################################
+
+def polygons(int nSplineSamples, int nSurfaceSamples):
+    return grid.quadPolygons(nSplineSamples, nSurfaceSamples, joinVertical = True)
