@@ -47,13 +47,13 @@ class CompareNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         type = self.compareType
-        if type == "A = B":  return "result = a == b"
-        if type == "A != B": return "result = a != b"
-        if type == "A < B":	 return "try: result = a < b \nexcept: result = False"
-        if type == "A <= B": return "try: result = a <= b \nexcept: result = False"
-        if type == "A > B":	 return "try: result = a > b \nexcept: result = False"
-        if type == "A >= B": return "try: result = a >= b \nexcept: result = False"
-        if type == "A is B": return "result = a is b"
+        if type == "A = B":     return "result = a == b"
+        if type == "A != B":    return "result = a != b"
+        if type == "A < B":	    return "try: result = a < b \nexcept: result = False"
+        if type == "A <= B":    return "try: result = a <= b \nexcept: result = False"
+        if type == "A > B":	    return "try: result = a > b \nexcept: result = False"
+        if type == "A >= B":    return "try: result = a >= b \nexcept: result = False"
+        if type == "A is B":    return "result = a is b"
         if type == "A is None": return "result = a is None"
         return "result = False"
 
@@ -62,13 +62,9 @@ class CompareNode(bpy.types.Node, AnimationNode):
         self.assignType(dataType)
 
     def getWantedDataType(self):
-        inputA = self.inputs[0].dataOrigin
-        if len(self.inputs) > 1:
-            inputB = self.inputs[1].dataOrigin
-        else:
-            inputB = None
-        if inputA is not None: return inputA.dataType
-        if inputB is not None: return inputB.dataType
+        for input in self.inputs:
+            if input.dataOrigin is not None:
+                return input.dataType
         return self.inputs[0].dataType
 
     def assignType(self, dataType):
