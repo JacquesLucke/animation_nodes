@@ -4,7 +4,6 @@ from mathutils import Vector
 from ... draw_handler import drawHandler
 from ... tree_info import getNodesByType
 from ... base_types.node import AnimationNode
-from ... algorithms.interpolation import sampleInterpolation
 from ... graphics.interpolation_preview import InterpolationPreview
 
 interpolationByNode = {}

@@ -1,6 +1,6 @@
 from bgl import *
 from . rectangle import Rectangle
-from .. algorithms.interpolation import sampleInterpolation
+from .. algorithms.interpolations import sampleInterpolation
 
 class InterpolationPreview:
     def __init__(self, interpolation, position, width, resolution):
