@@ -1,7 +1,7 @@
-ctypedef float (*InterpolationFunction)(InterpolationBase, float)
+ctypedef double (*InterpolationFunction)(InterpolationBase, double)
 
 cdef class InterpolationBase:
     cdef:
         InterpolationFunction function
 
-    cdef float evaluate(self, float x)
+    cdef double evaluate(self, double x)
