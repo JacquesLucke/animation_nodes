@@ -1,6 +1,6 @@
 import bpy
 from ... base_types.node import AnimationNode
-from ... algorithms.interpolation import mixedInterpolation, assignArguments
+from ... algorithms.interpolations.implementations import Mixed
 
 class MixInterpolationNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MixInterpolationNode"
@@ -13,4 +13,4 @@ class MixInterpolationNode(bpy.types.Node, AnimationNode):
         self.newOutput("Interpolation", "Interpolation", "interpolation")
 
     def execute(self, factor, a, b):
-        return assignArguments(mixedInterpolation, (a, b, factor))
+        return Mixed(factor, a, b)
