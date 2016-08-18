@@ -5,3 +5,6 @@ cdef class InterpolationBase:
 
     cdef double evaluate(self, double x):
         raise NotImplementedError()
+
+    def __repr__(self):
+        return "<{} Interpolation>".format(self.__class__.__name__)

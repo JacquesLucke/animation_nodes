@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from .. events import propertyChanged
-from .. algorithms.interpolation import getInterpolationPreset
+from .. algorithms.interpolations.presets import getInterpolationPreset
 from .. base_types.socket import AnimationNodeSocket, ListSocket
 
 categoryItems = [
