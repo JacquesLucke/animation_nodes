@@ -259,3 +259,24 @@ cdef class PyInterpolation(InterpolationBase):
 
     cdef double evaluate(self, double x):
         return self.function(x)
+
+
+from bpy.types import FCurve
+
+cdef class FCurveMapping(InterpolationBase):
+    cdef:
+        object fCurve
+        double xMove, xFactor, yMove, yFactor
+
+    def __cinit__(self, object fCurve, double xMove, double xFactor, double yMove, double yFactor):
+        if not isinstance(fCurve, FCurve):
+            raise TypeError("Expected FCurve")
+        self.fCurve = fCurve
+        self.xMove = xMove
+        self.xFactor = xFactor
+        self.yMove = yMove
+        self.yFactor = yFactor
+
+    cdef double evaluate(self, double x):
+        x = x * self.xFactor + self.xMove
+        return (self.fCurve.evaluate(x) + self.yMove) * self.yFactor
