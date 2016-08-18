@@ -5,7 +5,8 @@ from . implementations import (Linear,
                                CircularIn, CircularOut, CircularInOut,
                                ElasticIn, ElasticOut, ElasticInOut,
                                BounceIn, BounceOut, BounceInOut,
-                               BackIn, BackOut, BackInOut)
+                               BackIn, BackOut, BackInOut,
+                               SinIn, SinOut, SinInOut)
 
 class TestLinear(TestCase):
     def testNormal(self):
@@ -172,4 +173,29 @@ class TestBack(TestCase):
         self.assertAlmostEqual(f(0.25), -0.125)
         self.assertAlmostEqual(f(0.50), 0.5)
         self.assertAlmostEqual(f(0.75), 1.125)
+        self.assertAlmostEqual(f(1.00), 1)
+
+class TestSin(TestCase):
+    def testSinIn(self):
+        f = SinIn()
+        self.assertAlmostEqual(f(0.00), 0)
+        self.assertAlmostEqual(f(0.25), 0.0761205)
+        self.assertAlmostEqual(f(0.50), 0.2928932)
+        self.assertAlmostEqual(f(0.75), 0.6173166)
+        self.assertAlmostEqual(f(1.00), 1)
+
+    def testSinOut(self):
+        f = SinOut()
+        self.assertAlmostEqual(f(0.00), 0)
+        self.assertAlmostEqual(f(0.25), 0.3826834)
+        self.assertAlmostEqual(f(0.50), 0.7071068)
+        self.assertAlmostEqual(f(0.75), 0.9238795)
+        self.assertAlmostEqual(f(1.00), 1)
+
+    def testSinInOut(self):
+        f = SinInOut()
+        self.assertAlmostEqual(f(0.00), 0)
+        self.assertAlmostEqual(f(0.25), 0.1464466)
+        self.assertAlmostEqual(f(0.50), 0.5)
+        self.assertAlmostEqual(f(0.75), 0.8535534)
         self.assertAlmostEqual(f(1.00), 1)

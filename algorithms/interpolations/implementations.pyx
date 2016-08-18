@@ -1,5 +1,5 @@
 from libc.math cimport M_PI as PI
-from libc.math cimport pow, sqrt, sin
+from libc.math cimport pow, sqrt, sin, cos
 from ... data_structures cimport InterpolationBase, DoubleList
 
 # Linear
@@ -214,3 +214,19 @@ cdef class BackInOut(BackInterpolationBase):
         else:
             x = (x - 1) * 2
             return x * x * ((self.scale + 1) * x + self.scale) / 2 + 1
+
+
+# Sine
+#####################################################
+
+cdef class SinIn(InterpolationBase):
+    cdef double evaluate(self, double x):
+        return 1.0 - cos(x * PI / 2.0)
+
+cdef class SinOut(InterpolationBase):
+    cdef double evaluate(self, double x):
+        return sin(x * PI / 2.0)
+
+cdef class SinInOut(InterpolationBase):
+    cdef double evaluate(self, double x):
+        return (1.0 - cos(x * PI)) / 2.0
