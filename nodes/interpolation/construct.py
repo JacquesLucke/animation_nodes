@@ -3,15 +3,15 @@ from bpy.props import *
 from ... tree_info import keepNodeState
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
-from ... algorithms.interpolation import (assignArguments,
-                                          linear,
-                                          sinInOut, sinIn, sinOut,
-                                          backInOut, backIn, backOut,
-                                          powerInOut, powerIn, powerOut,
-                                          circularInOut, circularIn, circularOut,
-                                          prepareBounceSettings, bounceInOut, bounceIn, bounceOut,
-                                          prepareElasticSettings, elasticInOut, elasticIn, elasticOut,
-                                          prepareExponentialSettings, exponentialInOut, exponentialIn, exponentialOut)
+from ... algorithms.interpolations.implementations import (
+              Linear,
+              SinInOut, SinIn, SinOut,
+              BackInOut, BackIn, BackOut,
+              PowerInOut, PowerIn, PowerOut,
+              CircularInOut, CircularIn, CircularOut,
+              BounceInOut, BounceIn, BounceOut,
+              ElasticInOut, ElasticIn, ElasticOut,
+              ExponentialInOut, ExponentialIn, ExponentialOut)
 
 categoryItems = [
     ("LINEAR", "Linear", "", "IPO_LINEAR", 0),
@@ -47,7 +47,7 @@ class ConstructInterpolationNode(bpy.types.Node, AnimationNode):
         c = self.category
 
         if c in ("BOUNCE", "ELASTIC"):
-            self.newInput("Integer", "Bounces", "intBounces", value = 4, minValue = 1)
+            self.newInput("Integer", "Bounces", "intBounces", value = 4, minValue = 0)
         if c in ("POWER", "EXPONENTIAL"):
             self.newInput("Integer", "Exponent", "intExponent", value = 2, minValue = 1)
         if c in ("EXPONENTIAL", "ELASTIC"):
@@ -77,43 +77,40 @@ class ConstructInterpolationNode(bpy.types.Node, AnimationNode):
         if c == "ELASTIC": return "interpolation = self.getElastic(floatBase, floatExponent, intBounces)"
 
     def getLinear(self):
-        return linear
+        return Linear()
 
     def getSinusoidal(self):
-        if self.easeIn and self.easeOut: return sinInOut
-        if self.easeIn: return sinIn
-        return sinOut
+        if self.easeIn and self.easeOut: return SinInOut()
+        if self.easeIn: return SinIn()
+        return SinOut()
 
     def getPower(self, exponent):
         exponent = max(0, int(exponent))
-        if self.easeIn and self.easeOut: return assignArguments(powerInOut, exponent)
-        if self.easeIn: return assignArguments(powerIn, exponent)
-        return assignArguments(powerOut, exponent)
+        if self.easeIn and self.easeOut: return PowerInOut(exponent)
+        if self.easeIn: return PowerIn(exponent)
+        return PowerOut(exponent)
 
     def getExponential(self, base, exponent):
-        settings = prepareExponentialSettings(base, exponent)
-        if self.easeIn and self.easeOut: return assignArguments(exponentialInOut, settings)
-        if self.easeIn: return assignArguments(exponentialIn, settings)
-        return assignArguments(exponentialOut, settings)
+        if self.easeIn and self.easeOut: return ExponentialInOut(base, exponent)
+        if self.easeIn: return ExponentialIn(base, exponent)
+        return ExponentialOut(base, exponent)
 
     def getCircular(self):
-        if self.easeIn and self.easeOut: return circularInOut
-        if self.easeIn: return circularIn
-        return circularOut
+        if self.easeIn and self.easeOut: return CircularInOut()
+        if self.easeIn: return CircularIn()
+        return CircularOut()
 
     def getBack(self, back):
-        if self.easeIn and self.easeOut: return assignArguments(backInOut, back)
-        if self.easeIn: return assignArguments(backIn, back)
-        return assignArguments(backOut, back)
+        if self.easeIn and self.easeOut: return BackInOut(back)
+        if self.easeIn: return BackIn(back)
+        return BackOut(back)
 
     def getBounce(self, bounces, base):
-        settings = prepareBounceSettings(bounces, base)
-        if self.easeIn and self.easeOut: return assignArguments(bounceInOut, settings)
-        if self.easeIn: return assignArguments(bounceIn, settings)
-        return assignArguments(bounceOut, settings)
+        if self.easeIn and self.easeOut: return BounceInOut(bounces, base)
+        if self.easeIn: return BounceIn(bounces, base)
+        return BounceOut(bounces, base)
 
     def getElastic(self, base, exponent, bounces):
-        settings = prepareElasticSettings(base, exponent, bounces)
-        if self.easeIn and self.easeOut: return assignArguments(elasticInOut, settings)
-        if self.easeIn: return assignArguments(elasticIn, settings)
-        return assignArguments(elasticOut, settings)
+        if self.easeIn and self.easeOut: return ElasticInOut(bounces, base, exponent)
+        if self.easeIn: return ElasticIn(bounces, base, exponent)
+        return ElasticOut(bounces, base, exponent)
