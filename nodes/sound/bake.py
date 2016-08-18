@@ -416,9 +416,9 @@ class CalculateEqualizerFrequencyRanges(bpy.types.Operator):
         return list(zip(steps[:-1], steps[1:]))
 
     def calculate_steps(self):
-        from ... algorithms import interpolation
-        from ... algorithms.interpolation import exponentialOut, prepareExponentialSettings, sampleInterpolation
-        algorithm = interpolation.assignArguments(exponentialOut, prepareExponentialSettings(self.base, self.exponent))
+        from ... algorithms.interpolations import ExponentialOut
+        from ... algorithms.interpolation import sampleInterpolation
+        algorithm = ExponentialOut(self.base, self.exponent)
         return sampleInterpolation(algorithm, self.amount + 1, self.frequencyRangeStart, self.frequencyRangeEnd)
 
 
