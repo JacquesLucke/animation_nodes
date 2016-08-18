@@ -60,7 +60,7 @@ class InterpolationSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         if isinstance(value, InterpolationBase):
             return value, 0
         try: return PyInterpolation(value), 1
-        except: cls.getDefaultValue(), 2
+        except: return cls.getDefaultValue(), 2
 
 
 class InterpolationListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSocket):
@@ -82,4 +82,5 @@ class InterpolationListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSoc
         if isinstance(value, list):
             if all(isinstance(element, InterpolationBase) for element in value):
                 return value, 0
-        return cls.getDefaultValue(), 2
+        try: return [PyInterpolation(element) for element in value], 1
+        except: return cls.getDefaultValue(), 2
