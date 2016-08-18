@@ -230,3 +230,20 @@ cdef class SinOut(InterpolationBase):
 cdef class SinInOut(InterpolationBase):
     cdef double evaluate(self, double x):
         return (1.0 - cos(x * PI)) / 2.0
+
+
+# Specials
+#####################################################
+
+cdef class Mixed(InterpolationBase):
+    cdef:
+        double factor
+        InterpolationBase a, b
+
+    def __cinit__(self, double factor, InterpolationBase a not None, InterpolationBase b not None):
+        self.factor = factor
+        self.a = a
+        self.b = b
+
+    cdef double evaluate(self, double x):
+        return self.a.evaluate(x) * (1 - self.factor) + self.b.evaluate(x) * self.factor
