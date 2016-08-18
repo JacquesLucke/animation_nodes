@@ -2,6 +2,11 @@ from libc.math cimport M_PI as PI
 from libc.math cimport pow, sqrt, sin, cos
 from ... data_structures cimport InterpolationBase, DoubleList
 
+'''
+Here is a good source for different interpolation functions in Java:
+https://github.com/libgdx/libgdx/blob/master/gdx/src/com/badlogic/gdx/math/Interpolation.java
+'''
+
 # Linear
 #####################################################
 
