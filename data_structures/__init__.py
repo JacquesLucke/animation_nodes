@@ -6,6 +6,7 @@ def importDataStructures():
     from . lists.base_lists import FloatList, DoubleList, LongLongList, IntegerList, UShortList, CharList
     from . splines.poly_spline import PolySpline
     from . splines.bezier_spline import BezierSpline
+    from . interpolation_base import InterpolationBase
     return locals()
 
 dataStructures = importDataStructures()
