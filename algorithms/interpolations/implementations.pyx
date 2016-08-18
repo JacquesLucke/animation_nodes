@@ -186,3 +186,31 @@ cdef class BounceInOut(BounceInterpolationBase):
             return (1 - self.bounceOut(1 - x * 2)) / 2
         else:
             return self.bounceOut(x * 2 - 1) / 2 + 0.5
+
+
+# Back
+#####################################################
+
+cdef class BackInterpolationBase(InterpolationBase):
+    cdef double scale
+
+    def __cinit__(self, double scale):
+        self.scale = scale
+
+cdef class BackIn(BackInterpolationBase):
+    cdef double evaluate(self, double x):
+        return x * x * ((self.scale + 1) * x - self.scale)
+
+cdef class BackOut(BackInterpolationBase):
+    cdef double evaluate(self, double x):
+        x -= 1
+        return x * x * ((self.scale + 1) * x + self.scale) + 1
+
+cdef class BackInOut(BackInterpolationBase):
+    cdef double evaluate(self, double x):
+        if x <= 0.5:
+            x *= 2
+            return x * x * ((self.scale + 1) * x - self.scale) / 2
+        else:
+            x = (x - 1) * 2
+            return x * x * ((self.scale + 1) * x + self.scale) / 2 + 1

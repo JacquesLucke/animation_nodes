@@ -4,7 +4,8 @@ from . implementations import (Linear,
                                ExponentialIn, ExponentialOut, ExponentialInOut,
                                CircularIn, CircularOut, CircularInOut,
                                ElasticIn, ElasticOut, ElasticInOut,
-                               BounceIn, BounceOut, BounceInOut)
+                               BounceIn, BounceOut, BounceInOut,
+                               BackIn, BackOut, BackInOut)
 
 class TestLinear(TestCase):
     def testNormal(self):
@@ -146,4 +147,29 @@ class TestBounce(TestCase):
         self.assertAlmostEqual(f(0.25), 0.15)
         self.assertAlmostEqual(f(0.50), 0.5)
         self.assertAlmostEqual(f(0.75), 0.85)
+        self.assertAlmostEqual(f(1.00), 1)
+
+class TestBack(TestCase):
+    def testBackIn(self):
+        f = BackIn(scale = 2)
+        self.assertAlmostEqual(f(0.00), 0)
+        self.assertAlmostEqual(f(0.25), -0.0781250)
+        self.assertAlmostEqual(f(0.50), -0.125)
+        self.assertAlmostEqual(f(0.75), 0.1406250)
+        self.assertAlmostEqual(f(1.00), 1)
+
+    def testBackOut(self):
+        f = BackOut(scale = 3)
+        self.assertAlmostEqual(f(0.00), 0)
+        self.assertAlmostEqual(f(0.25), 1)
+        self.assertAlmostEqual(f(0.50), 1.25)
+        self.assertAlmostEqual(f(0.75), 1.125)
+        self.assertAlmostEqual(f(1.00), 1)
+
+    def testBackInOut(self):
+        f = BackInOut(scale = 3)
+        self.assertAlmostEqual(f(0.00), 0)
+        self.assertAlmostEqual(f(0.25), -0.125)
+        self.assertAlmostEqual(f(0.50), 0.5)
+        self.assertAlmostEqual(f(0.75), 1.125)
         self.assertAlmostEqual(f(1.00), 1)
