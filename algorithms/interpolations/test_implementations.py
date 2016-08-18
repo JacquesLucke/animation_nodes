@@ -1,7 +1,9 @@
 from unittest import TestCase
 from . implementations import (Linear,
                                PowerIn, PowerOut, PowerInOut,
-                               ExponentialIn, ExponentialOut, ExponentialInOut)
+                               ExponentialIn, ExponentialOut, ExponentialInOut,
+                               CircularIn, CircularOut, CircularInOut,
+                               ElasticIn, ElasticOut, ElasticInOut)
 
 class TestLinear(TestCase):
     def testNormal(self):
@@ -68,4 +70,54 @@ class TestExponential(TestCase):
         self.assertAlmostEqual(f(0.25), 0.0806952)
         self.assertAlmostEqual(f(0.50), 0.5)
         self.assertAlmostEqual(f(0.75), 0.9193048)
+        self.assertAlmostEqual(f(1.00), 1)
+
+class TestCircular(TestCase):
+    def testCircularIn(self):
+        f = CircularIn()
+        self.assertAlmostEqual(f(0.00), 0)
+        self.assertAlmostEqual(f(0.25), 0.0317542)
+        self.assertAlmostEqual(f(0.50), 0.1339746)
+        self.assertAlmostEqual(f(0.75), 0.3385622)
+        self.assertAlmostEqual(f(1.00), 1)
+
+    def testCircularOut(self):
+        f = CircularOut()
+        self.assertAlmostEqual(f(0.00), 0)
+        self.assertAlmostEqual(f(0.25), 0.6614378)
+        self.assertAlmostEqual(f(0.50), 0.8660254)
+        self.assertAlmostEqual(f(0.75), 0.9682458)
+        self.assertAlmostEqual(f(1.00), 1)
+
+    def testCircularInOut(self):
+        f = CircularInOut()
+        self.assertAlmostEqual(f(0.00), 0)
+        self.assertAlmostEqual(f(0.25), 0.0669873)
+        self.assertAlmostEqual(f(0.50), 0.5)
+        self.assertAlmostEqual(f(0.75), 0.9330127)
+        self.assertAlmostEqual(f(1.00), 1)
+
+class TestElastic(TestCase):
+    def testElasticIn(self):
+        f = ElasticIn(bounces = 4, base = 3, exponent = 2)
+        self.assertAlmostEqual(f(0.00), 0)
+        self.assertAlmostEqual(f(0.25), -0.0736475)
+        self.assertAlmostEqual(f(0.50), 0.2357023)
+        self.assertAlmostEqual(f(0.75), -0.5334021)
+        self.assertAlmostEqual(f(1.00), 1)
+
+    def testElasticOut(self):
+        f = ElasticOut(bounces = 3, base = 2, exponent = 3)
+        self.assertAlmostEqual(f(0.00), 0)
+        self.assertAlmostEqual(f(0.25), 1.5493421)
+        self.assertAlmostEqual(f(0.50), 0.75)
+        self.assertAlmostEqual(f(0.75), 1.0804493)
+        self.assertAlmostEqual(f(1.00), 1)
+
+    def testElasticInOut(self):
+        f = ElasticInOut(bounces = 3, base = 2, exponent = 3)
+        self.assertAlmostEqual(f(0.00), 0)
+        self.assertAlmostEqual(f(0.25), 0.125)
+        self.assertAlmostEqual(f(0.50), 0.5)
+        self.assertAlmostEqual(f(0.75), 0.875)
         self.assertAlmostEqual(f(1.00), 1)

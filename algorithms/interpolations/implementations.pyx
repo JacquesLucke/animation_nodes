@@ -1,4 +1,5 @@
-from libc.math cimport pow
+from libc.math cimport M_PI as PI
+from libc.math cimport pow, sqrt, sin
 from ... data_structures cimport InterpolationBase
 
 # Linear
@@ -77,3 +78,58 @@ cdef class ExponentialInOut(ExponentialInterpolationBase):
             return (pow(self.base, self.exponent * (x * 2 - 1)) - self.minValue) * self.scale / 2
         else:
             return (2 - (pow(self.base, -self.exponent * (x * 2 - 1)) - self.minValue) * self.scale) / 2
+
+
+# Circular
+#####################################################
+
+cdef class CircularIn(InterpolationBase):
+    cdef double evaluate(self, double x):
+        return 1 - sqrt(1 - x * x)
+
+cdef class CircularOut(InterpolationBase):
+    cdef double evaluate(self, double x):
+        x -= 1
+        return sqrt(1 - x * x)
+
+cdef class CircularInOut(InterpolationBase):
+    cdef double evaluate(self, double x):
+        if x <= 0.5:
+            x *= 2
+            return (1 - sqrt(1 - x * x)) / 2
+        else:
+            x = (x - 1) * 2
+            return (sqrt(1 - x * x) + 1) / 2
+
+# Elastic
+#####################################################
+
+cdef class ElasticInterpolationBase(InterpolationBase):
+    cdef:
+        int factor
+        double bounceFactor, base, exponent
+
+    def __cinit__(self, int bounces, double base, double exponent):
+        bounces = max(0, bounces)
+        self.factor = -1 if bounces % 2 == 0 else 1
+        self.base = max(0, base)
+        self.bounceFactor = -(bounces + 0.5) * PI
+        self.exponent = exponent
+
+cdef class ElasticIn(ElasticInterpolationBase):
+    cdef double evaluate(self, double x):
+        return pow(self.base, self.exponent * (x - 1)) * sin(x * self.bounceFactor) * self.factor
+
+cdef class ElasticOut(ElasticInterpolationBase):
+    cdef double evaluate(self, double x):
+        x = 1 - x
+        return 1 - pow(self.base, self.exponent * (x - 1)) * sin(x * self.bounceFactor) * self.factor
+
+cdef class ElasticInOut(ElasticInterpolationBase):
+    cdef double evaluate(self, double x):
+        if x <= 0.5:
+            x *= 2
+            return pow(self.base, self.exponent * (x - 1)) * sin(x * self.bounceFactor) * self.factor / 2
+        else:
+            x = (1 - x) * 2
+            return 1 - pow(self.base, self.exponent * (x - 1)) * sin(x * self.bounceFactor) * self.factor / 2
