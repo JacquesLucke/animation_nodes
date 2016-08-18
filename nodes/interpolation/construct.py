@@ -3,7 +3,7 @@ from bpy.props import *
 from ... tree_info import keepNodeState
 from ... events import executionCodeChanged
 from ... base_types.node import AnimationNode
-from ... algorithms.interpolations.implementations import (
+from ... algorithms.interpolations import (
               Linear,
               SinInOut, SinIn, SinOut,
               BackInOut, BackIn, BackOut,
