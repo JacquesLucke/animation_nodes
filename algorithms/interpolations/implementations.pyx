@@ -247,3 +247,15 @@ cdef class Mixed(InterpolationBase):
 
     cdef double evaluate(self, double x):
         return self.a.evaluate(x) * (1 - self.factor) + self.b.evaluate(x) * self.factor
+
+
+cdef class PyInterpolation(InterpolationBase):
+    cdef object function
+
+    def __cinit__(self, object function not None):
+        if not hasattr(function, "__call__"):
+            raise TypeError("object is not callable")
+        self.function = function
+
+    cdef double evaluate(self, double x):
+        return self.function(x)

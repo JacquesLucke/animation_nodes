@@ -2,6 +2,7 @@ import bpy
 from bpy.props import *
 from ... base_types.node import AnimationNode
 from .. container_provider import getHelperMaterial
+from ... algorithms.interpolations import PyInterpolation
 
 class InterpolationFromCurveMappingNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_InterpolationFromCurveMappingNode"
@@ -23,7 +24,7 @@ class InterpolationFromCurveMappingNode(bpy.types.Node, AnimationNode):
         curve = mapping.curves[3]
         try: curve.evaluate(0.5)
         except: mapping.initialize()
-        return curve.evaluate
+        return PyInterpolation(curve.evaluate)
 
     def createCurveNode(self):
         material = getHelperMaterial()
