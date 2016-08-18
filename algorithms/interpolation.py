@@ -164,7 +164,7 @@ def prepareBounceSettings(bounces, base):
     '''
     bounces = max(1, int(bounces))
     a = 2 ** (bounces - 1)
-    b = (1 - 2 ** bounces) / (1 - 2) - 2 ** (bounces - 2)
+    b = 2 ** bounces - 2 ** (bounces - 2) - 1
     c = a / b
     widths = [c / 2 ** i for i in range(bounces)]
     heights = [x * base for x in widths]
