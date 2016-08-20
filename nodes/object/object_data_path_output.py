@@ -36,7 +36,10 @@ class ObjectDataPathOutputNode(bpy.types.Node, AnimationNode):
     def getPropertyPath(self, object, path):
         if "." in path:
             propPath, propName = path.rsplit(".", 1)
-            dataPath = object.path_resolve(propPath)
+            try:
+                dataPath = object.path_resolve(propPath)
+            except:
+                dataPath = object
         else:
             dataPath = object
             propName = path
