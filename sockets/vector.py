@@ -42,11 +42,13 @@ class VectorSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     @classmethod
     def correctValue(cls, value):
-        if isinstance(value, Vector):
+        if isinstance(value, Vector) and len(value) == 3:
             return value, 0
-        else:
-            try: return Vector(value), 1
-            except: return cls.getDefaultValue(), 2
+        try:
+            if len(value) == 3: return Vector(value), 1
+        except:
+            pass
+        return cls.getDefaultValue(), 2
 
 
 class VectorListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSocket):
