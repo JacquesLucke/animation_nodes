@@ -7,7 +7,7 @@ class GenericSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     dataType = "Generic"
     allowedInputTypes = ["all"]
     drawColor = (0.6, 0.3, 0.3, 1.0)
-    storable = False
+    storable = True
     comparable = False
 
     @classmethod
@@ -30,7 +30,7 @@ class GenericListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSocket):
     baseDataType = "Generic"
     allowedInputTypes = ["Generic List"]
     drawColor = (0.6, 0.3, 0.3, 0.5)
-    storable = False
+    storable = True
     comparable = False
 
     @classmethod
