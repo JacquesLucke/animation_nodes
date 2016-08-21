@@ -45,7 +45,7 @@ class AnimateDataNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         yield "finalDuration = max(duration, 0.0001)"
-        yield "influence = max(min(time / duration, 1.0), 0.0)"
+        yield "influence = max(min(time / finalDuration, 1.0), 0.0)"
         yield "influence = interpolation(influence)"
         yield getMixCode(self.dataType, "start", "end", "influence", "result")
-        yield "outTime = time - duration"
+        yield "outTime = time - finalDuration"
