@@ -210,7 +210,7 @@ class ConvertFromGeneric(LinkCorrection):
         node = insertLinkedNode(nodeTree, "an_ConvertNode", origin, target)
         node.hide = True
         tree_info.update()
-        node.assignType(target.dataType)
+        node.assignOutputType(target.dataType)
 
 
 def insertLinkedNode(nodeTree, nodeType, origin, target):

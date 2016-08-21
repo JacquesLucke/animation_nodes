@@ -19,6 +19,7 @@ from .. tree_info import (getNetworkWithNode, getDirectlyLinkedSockets, getOrigi
                           iterUnlinkedInputSockets)
 
 class AnimationNode:
+    bl_width_min = 10
     bl_width_max = 5000
     _isAnimationNode = True
 
