@@ -495,3 +495,27 @@ class TestAdd(TestCase):
     def testWrongType(self):
         with self.assertRaises(NotImplementedError):
             result = self.list + [1, 2, "abc"]
+
+class TestIAdd(TestCase):
+    def setUp(self):
+        self.list = IntegerList.fromValues([0, 1, 2, 3])
+
+    def testWrongType(self):
+        with self.assertRaises(NotImplementedError):
+            self.list += [1, 2, "34"]
+
+    def testSameType(self):
+        self.list += IntegerList.fromValues([4, 5, 6])
+        self.assertEqual(self.list, [0, 1, 2, 3, 4, 5, 6])
+
+    def testList(self):
+        self.list += [4, 5, 6]
+        self.assertEqual(self.list, [0, 1, 2, 3, 4, 5, 6])
+
+    def testTuple(self):
+        self.list += (4, 5, 6)
+        self.assertEqual(self.list, [0, 1, 2, 3, 4, 5, 6])
+
+    def testSimiliarType(self):
+        self.list += FloatList.fromValues([4, 5, 6])
+        self.assertEqual(self.list, [0, 1, 2, 3, 4, 5, 6])

@@ -92,9 +92,11 @@ cdef class LISTNAME:
     def __mul__(LISTNAME self, long amount):
         return self.repeated(amount = amount)
 
-    def __iadd__(self, LISTNAME other):
-        self.grow(self.length + other.length)
-        self.overwrite(other, index = self.length)
+    def __iadd__(LISTNAME self, other):
+        try:
+            self.extend(other)
+        except:
+            raise NotImplementedError()
         return self
 
     def __iter__(self):
@@ -147,7 +149,7 @@ cdef class LISTNAME:
 
     cpdef extend(self, values):
         cdef long newLength, i
-        if type(values) == LISTNAME:
+        if isinstance(values, LISTNAME):
             self.overwrite(values, self.length)
         elif isinstance(values, list):
             self.extendList(values)
