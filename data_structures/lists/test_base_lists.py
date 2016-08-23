@@ -467,3 +467,31 @@ class TestFromValues(TestCase):
     def testGeneratorInput(self):
         a = IntegerList.fromValues(range(7))
         self.assertEqual(a, [0, 1, 2, 3, 4, 5, 6])
+
+class TestAdd(TestCase):
+    def setUp(self):
+        self.list = IntegerList.fromValues([0, 1, 2, 3])
+
+    def testSameType(self):
+        result = self.list + IntegerList.fromValues([4, 5, 6, 7])
+        self.assertEqual(result, [0, 1, 2, 3, 4, 5, 6, 7])
+
+    def testListLeft(self):
+        result = [6, 7, 8] + self.list
+        self.assertEqual(result, [6, 7, 8, 0, 1, 2, 3])
+
+    def testListRight(self):
+        result = self.list + [6, 7, 8]
+        self.assertEqual(result, [0, 1, 2, 3, 6, 7, 8])
+
+    def testTestMultiple(self):
+        result = [6, 7] + [5, 6] + self.list + [0, 9, 8] + [1, 2]
+        self.assertEqual(result, [6, 7, 5, 6, 0, 1, 2, 3, 0, 9, 8, 1, 2])
+
+    def testTuple(self):
+        result = self.list + (8, 9)
+        self.assertEqual(result, [0, 1, 2, 3, 8, 9])
+
+    def testWrongType(self):
+        with self.assertRaises(NotImplementedError):
+            result = self.list + [1, 2, "abc"]

@@ -79,8 +79,15 @@ cdef class LISTNAME:
         else:
             raise TypeError("Expected int or slice object")
 
-    def __add__(LISTNAME a, LISTNAME b):
-        return LISTNAME.join(a, b)
+    def __add__(a, b):
+        cdef LISTNAME newList
+        try:
+            newList = LISTNAME(capacity = len(a) + len(b))
+            newList.extend(a)
+            newList.extend(b)
+        except:
+            raise NotImplementedError()
+        return newList
 
     def __mul__(LISTNAME self, long amount):
         return self.repeated(amount = amount)
