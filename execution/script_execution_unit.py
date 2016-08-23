@@ -47,7 +47,7 @@ class ScriptExecutionUnit:
             finalCode.extend(indent(self.getFunctionBodyLines(node, userCode)))
 
             # used to show the correct line numbers to the user
-            lineNumber = findFirstLineIndexWithContent(finalCode, userCodeStartComment)
+            lineNumber = findFirstLineIndexWithContent(finalCode, userCodeStartComment) + 1
             finalCode.append("USER_CODE_START_LINE = {}".format(lineNumber))
         else:
             error = getSyntaxError(userCode)
@@ -78,10 +78,10 @@ class ScriptExecutionUnit:
         yield "try:"
         yield "    {}.errorMessage = ''".format(node.identifier)
         yield from indent(lines)
-        yield "except:"
-        yield "    _, __exception, __tb = sys.exc_info()"
+        yield "except Exception as e:"
+        yield "    __exceptionType, __exception, __tb = sys.exc_info()"
         yield "    __lineNumber = __tb.tb_lineno - USER_CODE_START_LINE"
-        yield "    {}.errorMessage = 'Line: ' + str(__lineNumber) + ' - ' + str(__exception)".format(node.identifier)
+        yield "    {}.errorMessage = 'Line: {{}} - {{}} ({{}})'.format(__lineNumber, __exception, type(e).__name__)".format(node.identifier)
         yield "    " + self.getDefaultReturnStatement(node)
 
     def getFunctionHeader(self, node):
