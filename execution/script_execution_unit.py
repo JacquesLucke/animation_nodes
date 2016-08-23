@@ -3,6 +3,8 @@ from . compile_scripts import compileScript
 from .. problems import ExecutionUnitNotSetup
 from . code_generator import getSocketValueExpression, iterSetupCodeLines, getInitialVariables
 
+userCodeStartComment = "# User Code"
+
 class ScriptExecutionUnit:
     def __init__(self, network, nodeByID):
         self.network = network
@@ -42,29 +44,11 @@ class ScriptExecutionUnit:
         finalCode.append(self.getFunctionHeader(node))
 
         if isCodeValid(userCode):
-            codeLines = []
-            codeLines.append("\n")
-            userCodeStartComment = "# User Code"
-            codeLines.append(userCodeStartComment)
-            codeLines.extend(userCode.split("\n"))
-            codeLines.append("\n")
-            if node.initializeMissingOutputs:
-                codeLines.extend(self.iterInitializeMissingOutputsLines(node))
-            if node.correctOutputTypes:
-                codeLines.extend(self.iterTypeCorrectionLines(node))
-            codeLines.append(self.getReturnStatement(node))
+            finalCode.extend(indent(self.getFunctionBodyLines(node, userCode)))
 
-            if node.debugMode: finalCode.extend(indent(self.iterDebugModeFunctionBody(codeLines, node)))
-            else: finalCode.extend(indent(codeLines))
-
-            userCodeStartLine = 0
-            for i, line in enumerate(finalCode, start = 1):
-                if userCodeStartComment in line:
-                    userCodeStartLine = i + 1
-                    break
-
-            finalCode.append("USER_CODE_START_LINE = {}".format(userCodeStartLine))
-
+            # used to show the correct line numbers to the user
+            lineNumber = findFirstLineIndexWithContent(finalCode, userCodeStartComment)
+            finalCode.append("USER_CODE_START_LINE = {}".format(lineNumber))
         else:
             error = getSyntaxError(userCode)
             finalCode.append("    {}.errorMessage = 'Line: {} - Invalid Syntax'".
@@ -73,10 +57,27 @@ class ScriptExecutionUnit:
 
         self.setupScript = "\n".join(finalCode)
 
-    def iterDebugModeFunctionBody(self, codeLines, node):
+    def getFunctionBodyLines(self, node, userCode):
+        lines = []
+        lines.append("\n")
+        lines.append(userCodeStartComment)
+        lines.extend(userCode.split("\n"))
+        lines.append("\n")
+        if node.initializeMissingOutputs:
+            lines.extend(self.iterInitializeMissingOutputsLines(node))
+        if node.correctOutputTypes:
+            lines.extend(self.iterTypeCorrectionLines(node))
+        lines.append(self.getReturnStatement(node))
+
+        if node.debugMode:
+            return list(self.iterDebugModeFunctionBody(lines, node))
+        else:
+            return lines
+
+    def iterDebugModeFunctionBody(self, lines, node):
         yield "try:"
         yield "    {}.errorMessage = ''".format(node.identifier)
-        yield from indent(codeLines)
+        yield from indent(lines)
         yield "except:"
         yield "    _, __exception, __tb = sys.exc_info()"
         yield "    __lineNumber = __tb.tb_lineno - USER_CODE_START_LINE"
@@ -126,3 +127,8 @@ class ScriptExecutionUnit:
 
 def indent(lines, amount = 1):
     return (" " * (4 * amount) + line for line in lines) # returns a generator
+
+def findFirstLineIndexWithContent(lines, content):
+    for i, line in enumerate(lines, start = 1):
+        if content in line: return i
+    return 0
