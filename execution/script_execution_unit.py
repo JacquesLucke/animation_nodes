@@ -1,4 +1,4 @@
-from .. utils.code import isCodeValid
+from .. utils.code import isCodeValid, getSyntaxError
 from . compile_scripts import compileScript
 from .. problems import ExecutionUnitNotSetup
 from . code_generator import getSocketValueExpression, iterSetupCodeLines, getInitialVariables
@@ -59,7 +59,6 @@ class ScriptExecutionUnit:
 
             userCodeStartLine = 0
             for i, line in enumerate(finalCode, start = 1):
-                print(i, line)
                 if userCodeStartComment in line:
                     userCodeStartLine = i + 1
                     break
@@ -67,7 +66,9 @@ class ScriptExecutionUnit:
             finalCode.append("USER_CODE_START_LINE = {}".format(userCodeStartLine))
 
         else:
-            finalCode.append("    {}.errorMessage = 'Syntax Error'".format(node.identifier))
+            error = getSyntaxError(userCode)
+            finalCode.append("    {}.errorMessage = 'Line: {} - Invalid Syntax'".
+                                  format(node.identifier, error.lineno))
             finalCode.append("    " + self.getDefaultReturnStatement(node))
 
         self.setupScript = "\n".join(finalCode)
