@@ -35,17 +35,19 @@ class ScriptExecutionUnit:
     def generateScript(self, nodeByID):
         node = self.network.getScriptNode(nodeByID)
         userCode = node.executionCode
-
         variables = getInitialVariables([node])
-        setupCode = "\n".join(iterSetupCodeLines([node], variables))
 
         finalCode = []
-        finalCode.append(setupCode)
+        finalCode.extend(iterSetupCodeLines([node], variables))
         finalCode.append(self.getFunctionHeader(node))
 
         if isCodeValid(userCode):
             codeLines = []
+            codeLines.append("\n")
+            userCodeStartComment = "# User Code"
+            codeLines.append(userCodeStartComment)
             codeLines.extend(userCode.split("\n"))
+            codeLines.append("\n")
             if node.initializeMissingOutputs:
                 codeLines.extend(self.iterInitializeMissingOutputsLines(node))
             if node.correctOutputTypes:
@@ -54,6 +56,16 @@ class ScriptExecutionUnit:
 
             if node.debugMode: finalCode.extend(indent(self.iterDebugModeFunctionBody(codeLines, node)))
             else: finalCode.extend(indent(codeLines))
+
+            userCodeStartLine = 0
+            for i, line in enumerate(finalCode, start = 1):
+                print(i, line)
+                if userCodeStartComment in line:
+                    userCodeStartLine = i + 1
+                    break
+
+            finalCode.append("USER_CODE_START_LINE = {}".format(userCodeStartLine))
+
         else:
             finalCode.append("    {}.errorMessage = 'Syntax Error'".format(node.identifier))
             finalCode.append("    " + self.getDefaultReturnStatement(node))
@@ -65,7 +77,9 @@ class ScriptExecutionUnit:
         yield "    {}.errorMessage = ''".format(node.identifier)
         yield from indent(codeLines)
         yield "except:"
-        yield "    {}.errorMessage = str(sys.exc_info()[1])".format(node.identifier)
+        yield "    _, __exception, __tb = sys.exc_info()"
+        yield "    __lineNumber = __tb.tb_lineno - USER_CODE_START_LINE"
+        yield "    {}.errorMessage = 'Line: ' + str(__lineNumber) + ' - ' + str(__exception)".format(node.identifier)
         yield "    " + self.getDefaultReturnStatement(node)
 
     def getFunctionHeader(self, node):
@@ -75,14 +89,19 @@ class ScriptExecutionUnit:
         return header
 
     def iterInitializeMissingOutputsLines(self, node):
+        yield ""
+        yield "# initialize missing outputs"
         yield "localVariables = locals()"
         for i, socket in enumerate(node.outputs[:-1]):
             variableName = socket.text
-            yield "if {} not in localVariables:".format(repr(variableName))
-            yield "    {} = {}.outputs[{}].getDefaultValue()".format(
-                       variableName, node.identifier, i)
+            yield "__socket = {}.outputs[{}]".format(node.identifier, i)
+            yield "__socket['variableInitialized'] = {} in localVariables".format(repr(variableName))
+            yield "if not __socket['variableInitialized']:"
+            yield "    {} = __socket.getDefaultValue()".format(variableName)
 
     def iterTypeCorrectionLines(self, node):
+        yield ""
+        yield "# correct output types"
         for i, socket in enumerate(node.outputs[:-1]):
             variableName = socket.text
             yield "__socket = {}.outputs[{}]".format(node.identifier, i)

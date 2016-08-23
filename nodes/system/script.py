@@ -74,19 +74,37 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
 
         layout.prop(self, "subprogramName", text = "", icon = "GROUP_VERTEX")
 
-        if self.errorMessage != "":
-            layout.label(self.errorMessage, icon = "ERROR")
+        self.drawErrorMessages(layout, onlyErrors = False)
 
         layout.separator()
+
+    def drawErrorMessages(self, layout, onlyErrors = False):
+        if self.errorMessage != "":
+            layout.label(self.errorMessage, icon = "ERROR")
+            return
+
+        col = layout.column(align = True)
+        for socket in self.outputs[:-1]:
+            variableName = socket.text
+            if self.initializeMissingOutputs:
+                if not getattr(socket, '["variableInitialized"]', True):
+                    col.label("'{}' - Not Initialized, used default".format(variableName), icon = "ERROR")
+            if self.correctOutputTypes:
+                correctionType = getattr(socket, '["correctionType"]', 0)
+                if correctionType == 1 and not onlyErrors:
+                    col.label("'{}' - Type Corrected".format(variableName), icon = "INFO")
+                elif correctionType == 2:
+                    col.label("'{}' - Wrong Type, expected '{}'".format(variableName, socket.dataType), icon = "ERROR")
 
     def drawAdvanced(self, layout):
         col = layout.column()
         col.label("Description:")
         col.prop(self, "subprogramDescription", text = "")
-        layout.prop(self, "debugMode")
         layout.prop(self, "interactiveMode")
-        layout.prop(self, "initializeMissingOutputs")
-        layout.prop(self, "correctOutputTypes")
+        col = layout.column(align = True)
+        col.prop(self, "debugMode")
+        col.prop(self, "initializeMissingOutputs")
+        col.prop(self, "correctOutputTypes")
 
     def drawControlSocket(self, layout, socket):
         if socket in list(self.inputs):
