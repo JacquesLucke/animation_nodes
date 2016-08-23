@@ -16,7 +16,7 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     bl_label = "Script"
     bl_width_default = 200
 
-    def debugModeChanged(self, context):
+    def scriptExecutionCodeChanged(self, context):
         self.errorMessage = ""
         executionCodeChanged()
 
@@ -24,11 +24,19 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     textBlockName = StringProperty(default = "")
 
     debugMode = BoolProperty(name = "Debug Mode", default = True,
-        description = "Give error message inside the node", update = debugModeChanged)
+        description = "Give error message inside the node", update = scriptExecutionCodeChanged)
     errorMessage = StringProperty()
 
     interactiveMode = BoolProperty(name = "Interactive Mode", default = True,
         description = "Recompile the script on each change in the text block")
+
+    initializeMissingOutputs = BoolProperty(name = "Initialize Missing Outputs",
+        default = True, description = "Use default values for uninitialized outputs",
+        update = scriptExecutionCodeChanged)
+
+    correctOutputTypes = BoolProperty(name = "Correct Output Types", default = True,
+        description = "Try to correct the type of variables, return default otherwise",
+        update = scriptExecutionCodeChanged)
 
     def create(self):
         self.randomizeNetworkColor()
@@ -77,6 +85,8 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         col.prop(self, "subprogramDescription", text = "")
         layout.prop(self, "debugMode")
         layout.prop(self, "interactiveMode")
+        layout.prop(self, "initializeMissingOutputs")
+        layout.prop(self, "correctOutputTypes")
 
     def drawControlSocket(self, layout, socket):
         if socket in list(self.inputs):

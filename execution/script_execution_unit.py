@@ -46,9 +46,13 @@ class ScriptExecutionUnit:
         if isCodeValid(userCode):
             codeLines = []
             codeLines.extend(userCode.split("\n"))
+            if node.initializeMissingOutputs:
+                codeLines.extend(self.iterInitializeMissingOutputsLines(node))
+            if node.correctOutputTypes:
+                codeLines.extend(self.iterTypeCorrectionLines(node))
             codeLines.append(self.getReturnStatement(node))
 
-            if node.debugMode: finalCode.extend(indent(self.getDebugModeFunctionBody(codeLines, node)))
+            if node.debugMode: finalCode.extend(indent(self.iterDebugModeFunctionBody(codeLines, node)))
             else: finalCode.extend(indent(codeLines))
         else:
             finalCode.append("    {}.errorMessage = 'Syntax Error'".format(node.identifier))
@@ -56,21 +60,33 @@ class ScriptExecutionUnit:
 
         self.setupScript = "\n".join(finalCode)
 
-    def getDebugModeFunctionBody(self, codeLines, node):
-        lines = []
-        lines.append("try:")
-        lines.append("    {}.errorMessage = ''".format(node.identifier))
-        lines.extend(indent(codeLines))
-        lines.append("except:")
-        lines.append("    {}.errorMessage = str(sys.exc_info()[1])".format(node.identifier))
-        lines.append("    " + self.getDefaultReturnStatement(node))
-        return lines
+    def iterDebugModeFunctionBody(self, codeLines, node):
+        yield "try:"
+        yield "    {}.errorMessage = ''".format(node.identifier)
+        yield from indent(codeLines)
+        yield "except:"
+        yield "    {}.errorMessage = str(sys.exc_info()[1])".format(node.identifier)
+        yield "    " + self.getDefaultReturnStatement(node)
 
     def getFunctionHeader(self, node):
         inputNames = [socket.text for socket in node.inputs[:-1]]
         parameterList = ", ".join(inputNames)
         header = "def main({}):".format(parameterList)
         return header
+
+    def iterInitializeMissingOutputsLines(self, node):
+        yield "localVariables = locals()"
+        for i, socket in enumerate(node.outputs[:-1]):
+            variableName = socket.text
+            yield "if {} not in localVariables:".format(repr(variableName))
+            yield "    {} = {}.outputs[{}].getDefaultValue()".format(
+                       variableName, node.identifier, i)
+
+    def iterTypeCorrectionLines(self, node):
+        for i, socket in enumerate(node.outputs[:-1]):
+            variableName = socket.text
+            yield "__socket = {}.outputs[{}]".format(node.identifier, i)
+            yield "{0}, __socket['correctionType'] = __socket.correctValue({0})".format(variableName)
 
     def getReturnStatement(self, node):
         outputNames = [socket.text for socket in node.outputs[:-1]]
@@ -89,4 +105,4 @@ class ScriptExecutionUnit:
         raise ExecutionUnitNotSetup()
 
 def indent(lines, amount = 1):
-    return [" " * (4 * amount) + line for line in lines]
+    return (" " * (4 * amount) + line for line in lines) # returns a generator
