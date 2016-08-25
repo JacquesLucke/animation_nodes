@@ -7,7 +7,7 @@ def importDataStructures():
     from . splines.poly_spline import PolySpline
     from . splines.bezier_spline import BezierSpline
     from . interpolation_base import InterpolationBase
-    from . falloff_base import FalloffBase
+    from . falloffs.falloff_base import FalloffBase
     return locals()
 
 dataStructures = importDataStructures()
