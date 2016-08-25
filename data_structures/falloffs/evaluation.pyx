@@ -1,14 +1,14 @@
 cpdef createFalloffEvaluator(falloff, str sourceType):
-    cdef FalloffEvaluator evaluator
-    cdef FalloffBase _falloffBase
+    cdef BaseFalloff _falloffBase
+    evaluator = None
 
-    if isinstance(falloff, FalloffBase):
+    if isinstance(falloff, BaseFalloff):
         _falloffBase = falloff
         dataType = _falloffBase.dataType
         if dataType == "All" or sourceType == dataType:
-            evaluator = SimpleFalloffBaseEvaluator(_falloffBase)
+            evaluator = BaseFalloffEvaluator_NoConversion(_falloffBase)
         else:
-            evaluator = ComplexFalloffBaseEvaluator(_falloffBase, sourceType)
+            evaluator = BaseFalloffEvaluator_Conversion(_falloffBase, sourceType)
 
     if getattr(evaluator, "isValid", False):
         return evaluator
@@ -21,8 +21,8 @@ cdef class FalloffEvaluator:
         raise NotImplementedError()
 
 
-cdef class SimpleFalloffBaseEvaluator(FalloffEvaluator):
-    def __cinit__(self, FalloffBase falloff):
+cdef class BaseFalloffEvaluator_NoConversion(FalloffEvaluator):
+    def __cinit__(self, BaseFalloff falloff):
         self.falloff = falloff
         self.isValid = True
 
@@ -30,8 +30,8 @@ cdef class SimpleFalloffBaseEvaluator(FalloffEvaluator):
         return self.falloff.evaluate(value, index)
 
 
-cdef class ComplexFalloffBaseEvaluator(FalloffEvaluator):
-    def __cinit__(self, FalloffBase falloff, str sourceType):
+cdef class BaseFalloffEvaluator_Conversion(FalloffEvaluator):
+    def __cinit__(self, BaseFalloff falloff, str sourceType):
         self.evaluator = getEvaluatorWithConversion(sourceType, falloff.dataType)
         self.isValid = self.evaluator != NULL
         self.falloff = falloff
@@ -48,7 +48,7 @@ cdef FalloffBaseEvaluatorWithConversion getEvaluatorWithConversion(str sourceTyp
         return convert_TransformationMatrix_Location
     return NULL
 
-cdef double convert_TransformationMatrix_Location(FalloffBase falloff, void* value, long index):
+cdef double convert_TransformationMatrix_Location(BaseFalloff falloff, void* value, long index):
     cdef Matrix4* matrix = <Matrix4*>value
     cdef Vector3 vector
     vector.x = matrix.a14

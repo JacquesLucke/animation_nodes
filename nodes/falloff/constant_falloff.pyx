@@ -1,5 +1,5 @@
 import bpy
-from ... data_structures cimport FalloffBase
+from ... data_structures cimport BaseFalloff
 from ... base_types.node import AnimationNode
 
 class ConstantFalloffNode(bpy.types.Node, AnimationNode):
@@ -14,7 +14,7 @@ class ConstantFalloffNode(bpy.types.Node, AnimationNode):
         return ConstantFalloff(strength)
 
 
-cdef class ConstantFalloff(FalloffBase):
+cdef class ConstantFalloff(BaseFalloff):
     cdef double value
 
     def __cinit__(self, double value):

@@ -1,5 +1,5 @@
 import bpy
-from ... data_structures cimport FalloffBase
+from ... data_structures cimport BaseFalloff
 from ... base_types.node import AnimationNode
 from ... math cimport Vector3, toVector3, distanceVec3
 
@@ -15,7 +15,7 @@ class DistanceFalloffNode(bpy.types.Node, AnimationNode):
         return DistanceFalloff(origin)
 
 
-cdef class DistanceFalloff(FalloffBase):
+cdef class DistanceFalloff(BaseFalloff):
     cdef Vector3 origin
 
     def __cinit__(self, vector):

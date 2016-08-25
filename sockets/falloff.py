@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from .. events import propertyChanged
-from .. data_structures import FalloffBase
+from .. data_structures import BaseFalloff, CompoundFalloff
 from .. base_types.socket import AnimationNodeSocket
 from .. nodes.falloff.constant_falloff import ConstantFalloff
 
@@ -34,6 +34,6 @@ class FalloffSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     @classmethod
     def correctValue(cls, value):
-        if isinstance(value, FalloffBase):
+        if isinstance(value, BaseFalloff) or isinstance(value, CompoundFalloff):
             return value, 0
         return cls.getDefaultValue(), 2

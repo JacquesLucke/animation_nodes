@@ -1,5 +1,5 @@
 import bpy
-from ... data_structures cimport FalloffBase
+from ... data_structures cimport BaseFalloff
 from ... base_types.node import AnimationNode
 from ... algorithms.random cimport uniformRandomNumber
 
@@ -17,7 +17,7 @@ class RandomFalloffNode(bpy.types.Node, AnimationNode):
         return RandomFalloff(seed % 0x7fffffff, minValue, maxValue)
 
 
-cdef class RandomFalloff(FalloffBase):
+cdef class RandomFalloff(BaseFalloff):
     cdef:
         int seed
         double minValue, maxValue
