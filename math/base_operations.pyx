@@ -41,7 +41,7 @@ cdef void normalizeVec3(Vector3* v):
 cdef float distanceVec3(Vector3* a, Vector3* b):
     return sqrt(distanceSquaredVec3(a, b))
 
-cdef inline float distanceSquaredVec3(Vector3* a, Vector3* b):
+cdef float distanceSquaredVec3(Vector3* a, Vector3* b):
     cdef:
         float diff1 = (a.x - b.x)
         float diff2 = (a.y - b.y)
