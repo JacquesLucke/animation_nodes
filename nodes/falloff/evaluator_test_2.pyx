@@ -1,6 +1,6 @@
 import bpy
 from ... base_types.node import AnimationNode
-from ... data_structures cimport getFalloffEvaluator, FalloffEvaluator, Matrix4x4List
+from ... data_structures cimport createFalloffEvaluator, FalloffEvaluator, Matrix4x4List
 from ... math cimport Matrix4
 
 class TestEvaluator2Node(bpy.types.Node, AnimationNode):
@@ -14,7 +14,7 @@ class TestEvaluator2Node(bpy.types.Node, AnimationNode):
 
     def execute(self, Matrix4x4List matrices, falloff):
         cdef:
-            FalloffEvaluator evaluator = getFalloffEvaluator(falloff, "Transformation Matrix")
+            FalloffEvaluator evaluator = createFalloffEvaluator(falloff, "Transformation Matrix")
             Matrix4* _matrices = <Matrix4*>matrices.base.data
             long i
             double influence

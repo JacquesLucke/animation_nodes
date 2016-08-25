@@ -1,6 +1,6 @@
 import bpy
 from ... base_types.node import AnimationNode
-from ... data_structures cimport getFalloffEvaluator, FalloffEvaluator, Vector3DList
+from ... data_structures cimport createFalloffEvaluator, FalloffEvaluator, Vector3DList
 from ... math cimport Vector3
 
 class TestEvaluatorNode(bpy.types.Node, AnimationNode):
@@ -14,7 +14,7 @@ class TestEvaluatorNode(bpy.types.Node, AnimationNode):
 
     def execute(self, Vector3DList vectors, falloff):
         cdef:
-            FalloffEvaluator evaluator = getFalloffEvaluator(falloff, "Location")
+            FalloffEvaluator evaluator = createFalloffEvaluator(falloff, "Location")
             Vector3* _vectors = <Vector3*>vectors.base.data
             long i
             double influence
