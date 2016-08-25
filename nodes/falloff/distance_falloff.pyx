@@ -20,9 +20,7 @@ cdef class DistanceFalloff(FalloffBase):
 
     def __cinit__(self, vector):
         toVector3(&self.origin, vector)
-
-    cpdef getHandledDataType(self):
-        return "Location"
-
+        self.dataType = "Location"
+        
     cdef double evaluate(self, void* object, long index):
         return distanceVec3(&self.origin, <Vector3*>object)

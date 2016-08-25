@@ -1,12 +1,14 @@
 cpdef createFalloffEvaluator(falloff, str sourceType):
     cdef FalloffEvaluator evaluator
+    cdef FalloffBase _falloffBase
 
     if isinstance(falloff, FalloffBase):
-        dataType = falloff.getHandledDataType()
+        _falloffBase = falloff
+        dataType = _falloffBase.dataType
         if dataType == "All" or sourceType == dataType:
-            evaluator = SimpleFalloffBaseEvaluator(falloff)
+            evaluator = SimpleFalloffBaseEvaluator(_falloffBase)
         else:
-            evaluator = ComplexFalloffBaseEvaluator(falloff, sourceType)
+            evaluator = ComplexFalloffBaseEvaluator(_falloffBase, sourceType)
 
     if getattr(evaluator, "isValid", False):
         return evaluator
@@ -30,8 +32,7 @@ cdef class SimpleFalloffBaseEvaluator(FalloffEvaluator):
 
 cdef class ComplexFalloffBaseEvaluator(FalloffEvaluator):
     def __cinit__(self, FalloffBase falloff, str sourceType):
-        cdef str dataType = falloff.getHandledDataType()
-        self.evaluator = getEvaluatorWithConversion(sourceType, dataType)
+        self.evaluator = getEvaluatorWithConversion(sourceType, falloff.dataType)
         self.isValid = self.evaluator != NULL
         self.falloff = falloff
 
