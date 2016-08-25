@@ -10,8 +10,7 @@ cdef class FalloffBaseEvaluator(FalloffEvaluator):
             self.falloff = falloff
 
     cdef double evaluate(self, void* value, long index):
-        return 0.7
-        #return self.falloff.evaluate(value, index)
+        return self.falloff.evaluate(value, index)
 
 
 cpdef getFalloffEvaluator(falloff, str sourceType):

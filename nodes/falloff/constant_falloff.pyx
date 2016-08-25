@@ -23,5 +23,5 @@ cdef class ConstantFalloff(FalloffBase):
     cpdef getHandledDataType(self):
         return "All"
 
-    cdef double execute(self, void* object, long index):
+    cdef double evaluate(self, void* object, long index):
         return self.value

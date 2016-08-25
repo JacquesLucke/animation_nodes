@@ -9,5 +9,5 @@ from . data_structures.splines.poly_spline cimport PolySpline
 from . data_structures.splines.bezier_spline cimport BezierSpline
 
 from . data_structures.falloffs.falloff_base cimport FalloffBase
-from . data_structures.falloffs.evaluation cimport getFalloffEvaluator
+from . data_structures.falloffs.evaluation cimport getFalloffEvaluator, FalloffEvaluator
 from . data_structures.interpolation_base cimport InterpolationFunction, InterpolationBase
