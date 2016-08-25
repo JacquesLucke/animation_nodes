@@ -1,4 +1,4 @@
-from . falloff_base cimport BaseFalloff
+from . falloff_base cimport Falloff, BaseFalloff, CompoundFalloff
 from ... math cimport Matrix4, Vector3
 
 cpdef createFalloffEvaluator(falloff, str sourceType)

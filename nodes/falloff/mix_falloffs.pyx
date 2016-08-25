@@ -8,7 +8,7 @@ class MixFalloffsNode(bpy.types.Node, AnimationNode):
     bl_label = "Mix Falloffs"
 
     def create(self):
-        self.newInput("Float", "Factor", "factor")
+        self.newInput("Float", "Factor", "factor", value = 1).setRange(0, 1)
         self.newInput("Falloff", "A", "a")
         self.newInput("Falloff", "B", "b")
         self.newOutput("Falloff", "Falloff", "falloff")

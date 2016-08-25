@@ -7,3 +7,4 @@ cdef class BaseFalloff(Falloff):
 
 cdef class CompoundFalloff(Falloff):
     cdef list getDependencies(self)
+    cdef double evaluate(self, double* dependencyResults)
