@@ -1,6 +1,6 @@
 cdef class FalloffBase:
 
-    def getHandledDataType(self):
+    cpdef getHandledDataType(self):
         raise NotImplementedError()
 
     cdef double execute(FalloffBase self, void* object, long index):

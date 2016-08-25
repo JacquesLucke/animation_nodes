@@ -1,3 +1,5 @@
 cdef class FalloffBase:
 
-    cdef double execute(FalloffBase self, void* object, long index)
+    cpdef getHandledDataType(self)
+
+    cdef double execute(self, void* object, long index)

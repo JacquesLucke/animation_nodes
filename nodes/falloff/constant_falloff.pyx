@@ -20,8 +20,8 @@ cdef class ConstantFalloff(FalloffBase):
     def __cinit__(self, double value):
         self.value = value
 
-    def getHandledDataType(self):
+    cpdef getHandledDataType(self):
         return "All"
 
-    cdef double execute(ConstantFalloff self, void* object, long index):
+    cdef double execute(self, void* object, long index):
         return self.value
