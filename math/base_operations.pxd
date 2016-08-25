@@ -10,5 +10,5 @@ cdef float dotVec3(Vector3* a, Vector3* b)
 
 cdef void normalizeVec3(Vector3* v)
 cdef float distanceVec3(Vector3* a, Vector3* b)
-cdef float distanceSquaredVec3(Vector3* a, Vector3* b)
+cdef inline float distanceSquaredVec3(Vector3* a, Vector3* b)
 cdef void transformVec3(Vector3* target, Vector3* v, Matrix4* m)

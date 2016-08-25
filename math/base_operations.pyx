@@ -39,12 +39,14 @@ cdef void normalizeVec3(Vector3* v):
         v.z = 0
 
 cdef float distanceVec3(Vector3* a, Vector3* b):
-    return sqrt((a.x - b.x) ** 2
-              + (a.y - b.y) ** 2
-              + (a.z - b.z) ** 2)
+    return sqrt(distanceSquaredVec3(a, b))
 
-cdef float distanceSquaredVec3(Vector3* a, Vector3* b):
-    return (a.x - b.x) ** 2 + (a.y - b.y) ** 2 + (a.z - b.z) ** 2
+cdef inline float distanceSquaredVec3(Vector3* a, Vector3* b):
+    cdef:
+        float diff1 = (a.x - b.x)
+        float diff2 = (a.y - b.y)
+        float diff3 = (a.z - b.z)
+    return diff1 * diff1 + diff2 * diff2 + diff3 * diff3
 
 cdef void transformVec3(Vector3* target, Vector3* v, Matrix4* m):
     cdef float newX, newY, newZ
