@@ -1,6 +1,19 @@
-from cpython.mem cimport PyMem_Malloc, PyMem_Free
 from cpython.ref cimport PyObject
-from libc.stdio cimport printf
+from cpython.mem cimport PyMem_Malloc, PyMem_Free
+
+from ... math cimport Matrix4, Vector3
+from . falloff_base cimport Falloff, BaseFalloff, CompoundFalloff
+
+ctypedef double (*BaseEvaluatorWithConversion)(BaseFalloff, void*, long index)
+ctypedef double (*FalloffEvaluatorFunction)(void* settings, void* value, long index)
+
+
+# Interface for other files
+#########################################################
+
+cdef class FalloffEvaluator:
+    cdef double evaluate(self, void* value, long index):
+        raise NotImplementedError()
 
 cpdef createFalloffEvaluator(falloff, str sourceType):
     cdef:
@@ -16,6 +29,10 @@ cpdef createFalloffEvaluator(falloff, str sourceType):
         return evaluator
     else:
         return None
+
+
+# Create Falloff Evaluators
+#########################################################
 
 cdef createEvaluatorFunction(falloff, str sourceType, FalloffEvaluatorFunction* outFunction, void** outSettings):
     outFunction[0] = NULL
@@ -67,6 +84,10 @@ cdef createEvaluator_Compound(CompoundFalloff falloff, str sourceType, FalloffEv
     outFunction[0] = evaluateCompoundFalloff
     outSettings[0] = settings
 
+
+# Free Falloff Evaluators
+#########################################################
+
 cdef freeEvaluatorFunction(FalloffEvaluatorFunction function, void* settings):
     if function == evaluateBaseFalloff_NoConversion:
         PyMem_Free(settings)
@@ -86,6 +107,9 @@ cdef freeCompoundSettings(CompoundSettings* settings):
     PyMem_Free(settings)
 
 
+# Evaluator Settings
+#########################################################
+
 cdef struct BaseSettings_NoConversion:
     PyObject* falloff
 
@@ -99,6 +123,10 @@ cdef struct CompoundSettings:
     void** dependencySettings
     double* dependencyResults
     int dependencyAmount
+
+
+# Execute Falloff Evaluators
+#########################################################
 
 cdef double evaluateBaseFalloff_NoConversion(void* settings, void* value, long index):
     cdef BaseSettings_NoConversion* _settings = <BaseSettings_NoConversion*>settings
@@ -116,11 +144,13 @@ cdef double evaluateCompoundFalloff(void* settings, void* value, long index):
     return (<CompoundFalloff>_settings.falloff).evaluate(_settings.dependencyResults)
 
 
-cdef class FalloffEvaluator:
-    cdef double evaluate(self, void* value, long index):
-        raise NotImplementedError()
+# Evaluator Function Wrapper
+#########################################################
 
 cdef class FalloffEvaluatorFunctionEvaluator(FalloffEvaluator):
+    cdef FalloffEvaluatorFunction function
+    cdef void* settings
+
     def __dealloc__(self):
         freeEvaluatorFunction(self.function, self.settings)
 
