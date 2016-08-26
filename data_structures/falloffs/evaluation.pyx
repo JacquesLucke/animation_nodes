@@ -42,20 +42,24 @@ cdef createEvaluatorFunction(falloff, str sourceType, FalloffEvaluatorFunction* 
     if isinstance(falloff, BaseFalloff):
         dataType = (<BaseFalloff>falloff).dataType
         if dataType == "All" or sourceType == dataType:
-            createEvaluator_NoConversion(falloff, outFunction, outSettings)
+            createBaseEvaluator_NoConversion(falloff, outFunction, outSettings)
         else:
-            createEvaluator_Conversion(falloff, sourceType, outFunction, outSettings)
+            createBaseEvaluator_Conversion(falloff, sourceType, outFunction, outSettings)
     elif isinstance(falloff, CompoundFalloff):
-        createEvaluator_Compound(falloff, sourceType, outFunction, outSettings)
+        dependencyAmount = len((<CompoundFalloff>falloff).getDependencies())
+        if dependencyAmount == 1:
+            createCompoundEvaluator_One(falloff, sourceType, outFunction, outSettings)
+        else:
+            createCompoundEvaluator_Generic(falloff, sourceType, outFunction, outSettings)
 
-cdef createEvaluator_NoConversion(BaseFalloff falloff, FalloffEvaluatorFunction* outFunction, void** outSettings):
+cdef createBaseEvaluator_NoConversion(BaseFalloff falloff, FalloffEvaluatorFunction* outFunction, void** outSettings):
     cdef BaseSettings_NoConversion* settings
     settings = <BaseSettings_NoConversion*>PyMem_Malloc(sizeof(BaseSettings_NoConversion))
     settings.falloff = <PyObject*>falloff
     outFunction[0] = evaluateBaseFalloff_NoConversion
     outSettings[0] = settings
 
-cdef createEvaluator_Conversion(BaseFalloff falloff, str sourceType, FalloffEvaluatorFunction* outFunction, void** outSettings):
+cdef createBaseEvaluator_Conversion(BaseFalloff falloff, str sourceType, FalloffEvaluatorFunction* outFunction, void** outSettings):
     cdef BaseEvaluatorWithConversion evaluator
     evaluator = getEvaluatorWithConversion(sourceType, falloff.dataType)
     if evaluator == NULL: return
@@ -66,9 +70,9 @@ cdef createEvaluator_Conversion(BaseFalloff falloff, str sourceType, FalloffEval
     outFunction[0] = evaluateBaseFalloff_Conversion
     outSettings[0] = settings
 
-cdef createEvaluator_Compound(CompoundFalloff falloff, str sourceType, FalloffEvaluatorFunction* outFunction, void** outSettings):
+cdef createCompoundEvaluator_Generic(CompoundFalloff falloff, str sourceType, FalloffEvaluatorFunction* outFunction, void** outSettings):
     cdef:
-        CompoundSettings* settings = <CompoundSettings*>PyMem_Malloc(sizeof(CompoundSettings))
+        CompoundSettings_Generic* settings = <CompoundSettings_Generic*>PyMem_Malloc(sizeof(CompoundSettings_Generic))
         list dependencies = falloff.getDependencies()
         int amount = len(dependencies)
         int i
@@ -82,7 +86,14 @@ cdef createEvaluator_Compound(CompoundFalloff falloff, str sourceType, FalloffEv
     for i in range(amount):
         createEvaluatorFunction(dependencies[i], sourceType, settings.dependencyFunctions + i, settings.dependencySettings + i)
 
-    outFunction[0] = evaluateCompoundFalloff
+    outFunction[0] = evaluateCompoundFalloff_Generic
+    outSettings[0] = settings
+
+cdef createCompoundEvaluator_One(CompoundFalloff falloff, str sourceType, FalloffEvaluatorFunction* outFunction, void** outSettings):
+    cdef CompoundSettings_One* settings = <CompoundSettings_One*>PyMem_Malloc(sizeof(CompoundSettings_One))
+    settings.falloff = <PyObject*>falloff
+    createEvaluatorFunction(falloff.getDependencies()[0], sourceType, &settings.dependencyFunction, &settings.dependencySettings)
+    outFunction[0] = evaluateCompoundFalloff_One
     outSettings[0] = settings
 
 
@@ -94,10 +105,12 @@ cdef freeEvaluatorFunction(FalloffEvaluatorFunction function, void* settings):
         PyMem_Free(settings)
     elif function == evaluateBaseFalloff_Conversion:
         PyMem_Free(settings)
-    elif function == evaluateCompoundFalloff:
-        freeCompoundSettings(<CompoundSettings*>settings)
+    elif function == evaluateCompoundFalloff_Generic:
+        freeCompoundSettings(<CompoundSettings_Generic*>settings)
+    elif function == evaluateCompoundFalloff_One:
+        PyMem_Free(settings)
 
-cdef freeCompoundSettings(CompoundSettings* settings):
+cdef freeCompoundSettings(CompoundSettings_Generic* settings):
     cdef int i
     for i in range(settings.dependencyAmount):
         freeEvaluatorFunction(settings.dependencyFunctions[i], settings.dependencySettings[i])
@@ -118,12 +131,17 @@ cdef struct BaseSettings_Conversion:
     PyObject* falloff
     BaseEvaluatorWithConversion evaluator
 
-cdef struct CompoundSettings:
+cdef struct CompoundSettings_Generic:
     PyObject* falloff
     FalloffEvaluatorFunction* dependencyFunctions
     void** dependencySettings
     double* dependencyResults
     int dependencyAmount
+
+cdef struct CompoundSettings_One:
+    PyObject* falloff
+    FalloffEvaluatorFunction dependencyFunction
+    void* dependencySettings
 
 
 # Execute Falloff Evaluators
@@ -137,12 +155,17 @@ cdef double evaluateBaseFalloff_Conversion(void* settings, void* value, long ind
     cdef BaseSettings_Conversion* _settings = <BaseSettings_Conversion*>settings
     return _settings.evaluator(<BaseFalloff>_settings.falloff, value, index)
 
-cdef double evaluateCompoundFalloff(void* settings, void* value, long index):
-    cdef CompoundSettings* _settings = <CompoundSettings*>settings
+cdef double evaluateCompoundFalloff_Generic(void* settings, void* value, long index):
+    cdef CompoundSettings_Generic* _settings = <CompoundSettings_Generic*>settings
     cdef int i
     for i in range(_settings.dependencyAmount):
         _settings.dependencyResults[i] = _settings.dependencyFunctions[i](_settings.dependencySettings[i], value, index)
     return (<CompoundFalloff>_settings.falloff).evaluate(_settings.dependencyResults)
+
+cdef double evaluateCompoundFalloff_One(void* settings, void* value, long index):
+    cdef CompoundSettings_One* _settings = <CompoundSettings_One*>settings
+    cdef double dependencyResult = _settings.dependencyFunction(_settings.dependencySettings, value, index)
+    return (<CompoundFalloff>_settings.falloff).evaluate(&dependencyResult)
 
 
 # Evaluator Function Wrapper
