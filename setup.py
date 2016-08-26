@@ -60,6 +60,7 @@ def main():
         compileCythonFiles()
 
 def canCompileCython():
+    correctSysPath()
     if "bpy" in sys.modules:
         return False
     if currentDirectoryName != "animation_nodes":
@@ -72,6 +73,12 @@ def canCompileCython():
         print("Cython is not installed for this Python version.")
         print(sys.version)
         return False
+
+def correctSysPath():
+    pathsToRemove = [path for path in sys.path if currentDirectory in path]
+    for path in pathsToRemove:
+        sys.path.remove(path)
+        print("Removed from sys.path:", path)
 
 
 
