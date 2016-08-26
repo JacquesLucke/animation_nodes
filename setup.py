@@ -123,10 +123,9 @@ def copyCompiledFilesToCorrectFolders():
     directory = join(currentDirectory, "animation_nodes")
     for root, dirs, files in os.walk(directory):
         for fileName in files:
-            if not fileName.endswith(".c"):
-                sourcePath = join(root, fileName)
-                targetPath = join(currentDirectory, relpath(sourcePath, directory))
-                shutil.copyfile(sourcePath, targetPath)
+            sourcePath = join(root, fileName)
+            targetPath = join(currentDirectory, relpath(sourcePath, directory))
+            shutil.copyfile(sourcePath, targetPath)
 
 def removeBuildDirectory():
     buildDirectory = join(currentDirectory, "build")
