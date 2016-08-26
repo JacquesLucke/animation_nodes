@@ -9,38 +9,31 @@ class PointDistanceFalloffNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_PointDistanceFalloffNode"
     bl_label = "Point Distance Falloff"
 
-    clamp = BoolProperty(name = "Clamp", update = propertyChanged, default = True)
-
     def create(self):
         self.newInput("Vector", "Origin", "origin")
         self.newInput("Float", "Min Distance", "minDistance")
-        self.newInput("Float", "Max Distance", "maxDistance")
+        self.newInput("Float", "Max Distance", "maxDistance", value = 5)
         self.newOutput("Falloff", "Falloff", "falloff")
 
-    def draw(self, layout):
-        layout.prop(self, "clamp")
-
     def execute(self, origin, minDistance, maxDistance):
-        return PointDistanceFalloff(origin, minDistance, maxDistance, self.clamp)
+        return PointDistanceFalloff(origin, minDistance, maxDistance)
 
 
 cdef class PointDistanceFalloff(BaseFalloff):
     cdef:
         Vector3 origin
-        double minDistance, maxDistance
-        double factor
-        bint clamp
+        double factor, minDistance, maxDistance
 
-    def __cinit__(self, vector, double minDistance, double maxDistance, bint clamp):
-        toVector3(&self.origin, vector)
+    def __cinit__(self, vector, double minDistance, double maxDistance):
         if minDistance == maxDistance: minDistance -= 0.00001
         self.factor = 1 / (maxDistance - minDistance)
         self.minDistance = minDistance
         self.maxDistance = maxDistance
-        self.clamp = clamp
+        toVector3(&self.origin, vector)
         self.dataType = "Location"
 
     cdef double evaluate(self, void* value, long index):
-        cdef double result = (distanceVec3(&self.origin, <Vector3*>value) - self.minDistance) * self.factor
-        if self.clamp: return min(max(result, 0), 1)
-        return result
+        cdef double distance = distanceVec3(&self.origin, <Vector3*>value)
+        if distance <= self.minDistance: return 1
+        if distance <= self.maxDistance: return 1 - (distance - self.minDistance) * self.factor
+        return 0
