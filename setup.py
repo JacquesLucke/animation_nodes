@@ -101,14 +101,13 @@ def preprocessor():
 def compileCythonFiles():
     import Cython
     from distutils.core import setup
-    from distutils.dir_util import copy_tree
     from Cython.Build import cythonize
 
     sys.argv = [sys.argv[0], "build_ext", "--inplace"]
 
     extensions = cythonize(getPathsToCythonFiles())
     setup(name = 'AN Cython', ext_modules = extensions)
-    copy_tree(join(currentDirectory, "animation_nodes"), currentDirectory)
+    copyCompiledFilesToCorrectFolders()
     print("Compilation Successful.")
 
     if "-c" in initialArgs:
@@ -118,6 +117,15 @@ def compileCythonFiles():
 
 def getPathsToCythonFiles():
     return list(iterPathsWithSuffix(".pyx"))
+
+def copyCompiledFilesToCorrectFolders():
+    from os.path import relpath
+    directory = join(currentDirectory, "animation_nodes")
+    for root, dirs, files in os.walk(directory):
+        for fileName in files:
+            sourcePath = join(root, fileName)
+            targetPath = join(currentDirectory, relpath(sourcePath, directory))
+            shutil.copyfile(sourcePath, targetPath)
 
 def removeBuildDirectory():
     buildDirectory = join(currentDirectory, "build")
