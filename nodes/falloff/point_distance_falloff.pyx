@@ -1,6 +1,4 @@
 import bpy
-from bpy.props import *
-from ... events import propertyChanged
 from ... data_structures cimport BaseFalloff
 from ... base_types.node import AnimationNode
 from ... math cimport Vector3, toVector3, distanceVec3
