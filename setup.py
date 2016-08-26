@@ -41,14 +41,13 @@ if v.major < 3 or v.minor < 5:
 
 import os
 import shutil
-from io import StringIO
 from itertools import chain
 from contextlib import redirect_stdout
 from os.path import abspath, dirname, basename, join
 
 currentDirectory = dirname(abspath(__file__))
 
-# should be 'animation_nodes' or 'animation_nodes-master' most of the time
+# should be 'animation_nodes', otherwise fail later
 currentDirectoryName = basename(currentDirectory)
 
 initialArgs = sys.argv[:]
@@ -62,6 +61,9 @@ def main():
 
 def canCompileCython():
     if "bpy" in sys.modules:
+        return False
+    if currentDirectoryName != "animation_nodes":
+        print("Folder name has to be 'animation_nodes'")
         return False
     try:
         import Cython
@@ -99,26 +101,15 @@ def preprocessor():
 def compileCythonFiles():
     import Cython
     from distutils.core import setup
+    from distutils.dir_util import copy_tree
     from Cython.Build import cythonize
 
     sys.argv = [sys.argv[0], "build_ext", "--inplace"]
 
     extensions = cythonize(getPathsToCythonFiles())
-    for extension in extensions:
-        # cut off 'animation_nodes.' from name
-        extension.name = extension.name[len(currentDirectoryName)+1:]
-
-
-    resultBuffer = StringIO()
-    try:
-        with redirect_stdout(resultBuffer):
-            setup(name = 'AN Cython', ext_modules = extensions)
-        print("Compilation Successful.")
-        print("More information is in the '.log' file.")
-    except:
-        print(resultBuffer.getvalue())
-
-    writeFile(".log", resultBuffer.getvalue())
+    setup(name = 'AN Cython', ext_modules = extensions)
+    copy_tree(join(currentDirectory, "animation_nodes"), currentDirectory)
+    print("Compilation Successful.")
 
     if "-c" in initialArgs:
         removeCFiles()

@@ -8,6 +8,7 @@
 *.html
 *.so
 .log
+animation_nodes/
 data_structures/lists/base_lists.pxd
 data_structures/lists/base_lists.pyx
 algorithms/lists/convert.pyx
