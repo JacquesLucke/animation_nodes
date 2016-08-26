@@ -22,6 +22,6 @@ class TestEvaluatorNode(bpy.types.Node, AnimationNode):
         if evaluator is not None:
             for i in range(vectors.getLength()):
                 influence = evaluator.evaluate(_vectors + i, i)
-                _vectors[i].z += influence
+                _vectors[i].z += influence * 5
 
         return vectors
