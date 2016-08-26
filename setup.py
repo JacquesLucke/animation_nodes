@@ -60,12 +60,12 @@ def main():
         compileCythonFiles()
 
 def canCompileCython():
-    correctSysPath()
     if "bpy" in sys.modules:
         return False
     if currentDirectoryName != "animation_nodes":
         print("Folder name has to be 'animation_nodes'")
         return False
+    correctSysPath()
     try:
         import Cython
         return True
