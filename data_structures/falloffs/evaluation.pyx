@@ -24,6 +24,7 @@ cpdef createFalloffEvaluator(falloff, str sourceType):
     createEvaluatorFunction(falloff, sourceType, &function, &settings)
     if function != NULL:
         evaluator = FalloffEvaluatorFunctionEvaluator()
+        evaluator.falloff = falloff
         evaluator.function = function
         evaluator.settings = settings
         return evaluator
@@ -148,11 +149,17 @@ cdef double evaluateCompoundFalloff(void* settings, void* value, long index):
 #########################################################
 
 cdef class FalloffEvaluatorFunctionEvaluator(FalloffEvaluator):
-    cdef FalloffEvaluatorFunction function
+    cdef Falloff falloff # only used to make sure that a reference exists
     cdef void* settings
+    cdef FalloffEvaluatorFunction function
 
     def __dealloc__(self):
         freeEvaluatorFunction(self.function, self.settings)
+
+    cdef set(self, Falloff falloff, void* settings, FalloffEvaluatorFunction function):
+        self.falloff = falloff
+        self.settings = settings
+        self.function = function
 
     cdef double evaluate(self, void* value, long index):
         return self.function(self.settings, value, index)
