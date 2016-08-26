@@ -12,7 +12,7 @@ class FalloffSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     allowedInputTypes = ["Falloff"]
     drawColor = (0.32, 1, 0.18, 1)
     comparable = False
-    storable = True
+    storable = False
 
     value = FloatProperty(soft_min = 0, soft_max = 1, update = propertyChanged)
 
