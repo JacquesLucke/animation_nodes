@@ -1,5 +1,5 @@
 from . conversion cimport toMatrix4
-from . base_operations cimport transformVec3, distanceVec3, mixVec3
+from . cimport transformVec3, distanceVec3, mixVec3
 
 cpdef void transformVector3DList(Vector3DList vectors, matrix):
     cdef:

@@ -1,5 +1,5 @@
 cimport cython
-from . base_operations cimport *
+from . cimport subVec3, scaleVec3, lengthVec3, dotVec3, Vector3
 
 @cython.cdivision(True)
 cdef float findNearestLineParameter(Vector3* lineStart, Vector3* lineDirection, Vector3* point):
