@@ -1,4 +1,4 @@
-from . ctypes cimport Matrix4, Vector3
+from . cimport Matrix4, Vector3
 from .. data_structures.lists.complex_lists cimport Vector3DList
 
 cpdef void transformVector3DList(Vector3DList vectors, matrix)

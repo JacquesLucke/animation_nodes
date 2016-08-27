@@ -1,4 +1,4 @@
-from . ctypes cimport Vector3, Matrix4
+from . cimport Vector3, Matrix4
 
 cdef float lengthVec3(Vector3* v)
 cdef void scaleVec3(Vector3* v, float factor)

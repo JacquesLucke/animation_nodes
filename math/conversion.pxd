@@ -1,4 +1,4 @@
-from . ctypes cimport Matrix4, Vector3
+from . cimport Matrix4, Vector3
 
 cdef toMatrix4(Matrix4* m, value)
 cdef toVector3(Vector3* v, value)
