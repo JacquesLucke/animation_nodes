@@ -13,8 +13,8 @@ class GridMeshNode(bpy.types.Node, AnimationNode):
     centerGrid = BoolProperty(name = "Center", default = True, update = executionCodeChanged)
 
     def create(self):
-        self.newInput("Float", "Length", "length", value = 2)
-        self.newInput("Float", "Width", "width", value = 2)
+        self.newInput("Float", "Length", "length", value = 10)
+        self.newInput("Float", "Width", "width", value = 10)
         self.newInput("Integer", "X Divisions", "xDivisions", value = 5, minValue = 2)
         self.newInput("Integer", "Y Divisions", "yDivisions", value = 5, minValue = 2)
         self.newInput("Vector", "Offset", "offset", isDataModified = True)

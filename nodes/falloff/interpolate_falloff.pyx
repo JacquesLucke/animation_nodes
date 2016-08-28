@@ -31,4 +31,4 @@ cdef class InterpolateFalloff(CompoundFalloff):
         return [True]
 
     cdef double evaluate(self, double* dependencyResults):
-        return self.interpolation.evaluate(min(max(dependencyResults[0], 0), 1))
+        return self.interpolation.evaluate(dependencyResults[0])
