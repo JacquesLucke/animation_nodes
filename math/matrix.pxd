@@ -6,8 +6,8 @@ cdef struct Matrix4:
     float a31, a32, a33, a34
     float a41, a42, a43, a44
 
-cdef void transformVec3_InPlace(Vector3* vector, Matrix4* matrix)
-cdef void transformVec3(Vector3* target, Vector3* vector, Matrix4* matrix)
+cdef void transformVec3AsPoint_InPlace(Vector3* vector, Matrix4* matrix)
+cdef void transformVec3AsPoint(Vector3* target, Vector3* vector, Matrix4* matrix)
 
 cdef void setIdentityMatrix4(Matrix4* m)
 cdef void setTranslationMatrix4(Matrix4* m, Vector3* v)

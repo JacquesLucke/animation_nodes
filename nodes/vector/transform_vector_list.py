@@ -1,5 +1,5 @@
 import bpy
-from ... math import transformVector3DList
+from ... math import transformVector3DListAsPoints
 from ... base_types.node import AnimationNode
 
 class TransformVectorListNode(bpy.types.Node, AnimationNode):
@@ -12,5 +12,5 @@ class TransformVectorListNode(bpy.types.Node, AnimationNode):
         self.newOutput("Vector List", "Vectors List", "vectors")
 
     def execute(self, vectors, matrix):
-        transformVector3DList(vectors, matrix)
+        transformVector3DListAsPoints(vectors, matrix)
         return vectors

@@ -1,20 +1,20 @@
 from . conversion cimport toMatrix4
-from . cimport transformVec3_InPlace, distanceVec3, mixVec3, multMatrix4, setIdentityMatrix4
+from . cimport transformVec3AsPoint_InPlace, distanceVec3, mixVec3, multMatrix4, setIdentityMatrix4
 
 
-cpdef void transformVector3DList(Vector3DList vectors, matrix):
+cpdef void transformVector3DListAsPoints(Vector3DList vectors, matrix):
     cdef:
         Matrix4 _matrix
         Vector3* _vectors
 
     toMatrix4(&_matrix, matrix)
     _vectors = <Vector3*>vectors.base.data
-    transformVector3DList_LowLevel(_vectors, vectors.getLength(), &_matrix)
+    transformVector3DListAsPoints_LowLevel(_vectors, vectors.getLength(), &_matrix)
 
-cdef void transformVector3DList_LowLevel(Vector3* vectors, long arrayLength, Matrix4* matrix):
+cdef void transformVector3DListAsPoints_LowLevel(Vector3* vectors, long arrayLength, Matrix4* matrix):
     cdef long i
     for i in range(arrayLength):
-        transformVec3_InPlace(vectors + i, matrix)
+        transformVec3AsPoint_InPlace(vectors + i, matrix)
 
 cpdef double distanceSumOfVector3DList(Vector3DList vectors):
     cdef:
