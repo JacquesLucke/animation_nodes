@@ -5,7 +5,7 @@ from ... math cimport Matrix4, Vector3
 from . falloff_base cimport BaseFalloff, CompoundFalloff
 
 ctypedef double (*BaseEvaluatorWithConversion)(BaseFalloff, void*, long index)
-ctypedef double (*FalloffEvaluatorFunction)(void* settings, void* value, long index)
+ctypedef double (*EvaluatorFunction)(void* settings, void* value, long index)
 
 
 # Interface for other files
@@ -17,15 +17,15 @@ cdef class FalloffEvaluator:
 
 cpdef createFalloffEvaluator(Falloff falloff, str sourceType, bint clamped = False):
     cdef:
-        FalloffEvaluatorFunctionEvaluator evaluator
-        FalloffEvaluatorFunction function
+        EvaluatorFunctionEvaluator evaluator
+        EvaluatorFunction function
         void* settings
 
     assert falloff is not None
 
     createEvaluatorFunction(falloff, sourceType, clamped, &function, &settings)
     if function != NULL:
-        evaluator = FalloffEvaluatorFunctionEvaluator()
+        evaluator = EvaluatorFunctionEvaluator()
         evaluator.falloff = falloff
         evaluator.function = function
         evaluator.settings = settings
@@ -37,7 +37,7 @@ cpdef createFalloffEvaluator(Falloff falloff, str sourceType, bint clamped = Fal
 # Create Falloff Evaluators
 #########################################################
 
-cdef createEvaluatorFunction(Falloff falloff, str sourceType, bint clamped, FalloffEvaluatorFunction* outFunction, void** outSettings):
+cdef createEvaluatorFunction(Falloff falloff, str sourceType, bint clamped, EvaluatorFunction* outFunction, void** outSettings):
     outFunction[0] = NULL
     outSettings[0] = NULL
 
@@ -57,14 +57,14 @@ cdef createEvaluatorFunction(Falloff falloff, str sourceType, bint clamped, Fall
     if not falloff.clamped and clamped:
         pass
 
-cdef createBaseEvaluator_NoConversion(BaseFalloff falloff, FalloffEvaluatorFunction* outFunction, void** outSettings):
+cdef createBaseEvaluator_NoConversion(BaseFalloff falloff, EvaluatorFunction* outFunction, void** outSettings):
     cdef BaseSettings_NoConversion* settings
     settings = <BaseSettings_NoConversion*>PyMem_Malloc(sizeof(BaseSettings_NoConversion))
     settings.falloff = <PyObject*>falloff
     outFunction[0] = evaluateBaseFalloff_NoConversion
     outSettings[0] = settings
 
-cdef createBaseEvaluator_Conversion(BaseFalloff falloff, str sourceType, FalloffEvaluatorFunction* outFunction, void** outSettings):
+cdef createBaseEvaluator_Conversion(BaseFalloff falloff, str sourceType, EvaluatorFunction* outFunction, void** outSettings):
     cdef BaseEvaluatorWithConversion evaluator
     evaluator = getEvaluatorWithConversion(sourceType, falloff.dataType)
     if evaluator == NULL: return
@@ -75,7 +75,7 @@ cdef createBaseEvaluator_Conversion(BaseFalloff falloff, str sourceType, Falloff
     outFunction[0] = evaluateBaseFalloff_Conversion
     outSettings[0] = settings
 
-cdef createCompoundEvaluator_Generic(CompoundFalloff falloff, str sourceType, FalloffEvaluatorFunction* outFunction, void** outSettings):
+cdef createCompoundEvaluator_Generic(CompoundFalloff falloff, str sourceType, EvaluatorFunction* outFunction, void** outSettings):
     cdef:
         CompoundSettings_Generic* settings = <CompoundSettings_Generic*>PyMem_Malloc(sizeof(CompoundSettings_Generic))
         list dependencies = falloff.getDependencies()
@@ -87,7 +87,7 @@ cdef createCompoundEvaluator_Generic(CompoundFalloff falloff, str sourceType, Fa
     settings.dependencyAmount = amount
     settings.dependencyResults = <double*>PyMem_Malloc(sizeof(double) * amount)
     settings.dependencySettings = <void**>PyMem_Malloc(sizeof(char*) * amount)
-    settings.dependencyFunctions = <FalloffEvaluatorFunction*>PyMem_Malloc(sizeof(FalloffEvaluatorFunction) * amount)
+    settings.dependencyFunctions = <EvaluatorFunction*>PyMem_Malloc(sizeof(EvaluatorFunction) * amount)
 
     for i in range(amount):
         createEvaluatorFunction(dependencies[i], sourceType, clampingRequirements[i],
@@ -96,7 +96,7 @@ cdef createCompoundEvaluator_Generic(CompoundFalloff falloff, str sourceType, Fa
     outFunction[0] = evaluateCompoundFalloff_Generic
     outSettings[0] = settings
 
-cdef createCompoundEvaluator_One(CompoundFalloff falloff, str sourceType, FalloffEvaluatorFunction* outFunction, void** outSettings):
+cdef createCompoundEvaluator_One(CompoundFalloff falloff, str sourceType, EvaluatorFunction* outFunction, void** outSettings):
     cdef CompoundSettings_One* settings = <CompoundSettings_One*>PyMem_Malloc(sizeof(CompoundSettings_One))
     settings.falloff = <PyObject*>falloff
     createEvaluatorFunction(falloff.getDependencies()[0], sourceType, falloff.getClampingRequirements()[0],
@@ -108,7 +108,7 @@ cdef createCompoundEvaluator_One(CompoundFalloff falloff, str sourceType, Fallof
 # Free Falloff Evaluators
 #########################################################
 
-cdef freeEvaluatorFunction(FalloffEvaluatorFunction function, void* settings):
+cdef freeEvaluatorFunction(EvaluatorFunction function, void* settings):
     if function == evaluateBaseFalloff_NoConversion:
         PyMem_Free(settings)
     elif function == evaluateBaseFalloff_Conversion:
@@ -141,14 +141,14 @@ cdef struct BaseSettings_Conversion:
 
 cdef struct CompoundSettings_Generic:
     PyObject* falloff
-    FalloffEvaluatorFunction* dependencyFunctions
+    EvaluatorFunction* dependencyFunctions
     void** dependencySettings
     double* dependencyResults
     int dependencyAmount
 
 cdef struct CompoundSettings_One:
     PyObject* falloff
-    FalloffEvaluatorFunction dependencyFunction
+    EvaluatorFunction dependencyFunction
     void* dependencySettings
 
 
@@ -179,15 +179,15 @@ cdef double evaluateCompoundFalloff_One(void* settings, void* value, long index)
 # Evaluator Function Wrapper
 #########################################################
 
-cdef class FalloffEvaluatorFunctionEvaluator(FalloffEvaluator):
+cdef class EvaluatorFunctionEvaluator(FalloffEvaluator):
     cdef Falloff falloff # only used to make sure that a reference exists
     cdef void* settings
-    cdef FalloffEvaluatorFunction function
+    cdef EvaluatorFunction function
 
     def __dealloc__(self):
         freeEvaluatorFunction(self.function, self.settings)
 
-    cdef set(self, Falloff falloff, void* settings, FalloffEvaluatorFunction function):
+    cdef set(self, Falloff falloff, void* settings, EvaluatorFunction function):
         self.falloff = falloff
         self.settings = settings
         self.function = function
