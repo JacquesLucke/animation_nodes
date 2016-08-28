@@ -9,6 +9,9 @@ cdef struct Matrix4:
 cdef void transformVec3AsPoint_InPlace(Vector3* vector, Matrix4* matrix)
 cdef void transformVec3AsPoint(Vector3* target, Vector3* vector, Matrix4* matrix)
 
+cdef void transformVec3AsDirection_InPlace(Vector3* v, Matrix4* m)
+cdef void transformVec3AsDirection(Vector3* target, Vector3* v, Matrix4* m)
+
 cdef void setIdentityMatrix4(Matrix4* m)
 cdef void setTranslationMatrix4(Matrix4* m, Vector3* v)
 

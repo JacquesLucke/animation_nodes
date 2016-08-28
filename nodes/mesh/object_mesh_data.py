@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... events import isRendering
 from ... base_types.node import AnimationNode
-from ... math.list_operations import transformVector3DListAsPoints
+from ... math.list_operations import transformVector3DList
 from ... data_structures import Vector3DList, EdgeIndicesList, PolygonIndicesList
 
 class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
@@ -37,7 +37,7 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
         if isLinked["polygonIndices"]:
             yield "    polygonIndices = self.getPolygonIndices(mesh)"
         if isLinked["vertexNormals"]:
-            yield "    vertexNormals = self.getVertexNormals(mesh)"
+            yield "    vertexNormals = self.getVertexNormals(mesh, object, useWorldSpace)"
 
         yield "    self.clearMesh(mesh, useModifiers, scene)"
         yield "else:"
@@ -60,7 +60,7 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
         vertexLocations = Vector3DList(length = len(mesh.vertices))
         mesh.vertices.foreach_get("co", vertexLocations.getMemoryView())
         if useWorldSpace:
-            transformVector3DListAsPoints(vertexLocations, object.matrix_world)
+            transformVector3DList(vertexLocations, object.matrix_world)
         return vertexLocations
 
     def getEdgeIndices(self, mesh):
@@ -77,7 +77,9 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
         mesh.polygons.foreach_get("loop_start", polygons.polyStarts.getMemoryView())
         return polygons
 
-    def getVertexNormals(self, mesh):
+    def getVertexNormals(self, mesh, object, useWorldSpace):
         normals = Vector3DList(length = len(mesh.vertices))
         mesh.vertices.foreach_get("normal", normals.getMemoryView())
+        if useWorldSpace:
+            transformVector3DList(normals, object.matrix_world, ignoreTranslation = True)
         return normals

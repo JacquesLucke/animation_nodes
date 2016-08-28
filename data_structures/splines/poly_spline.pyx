@@ -4,7 +4,7 @@ from libc.string cimport memcpy
 from ... utils.lists cimport findListSegment_LowLevel
 from ... math cimport (Vector3, mixVec3, distanceVec3, subVec3, lengthVec3,
                        distanceSquaredVec3, findNearestLineParameter,
-                       transformVector3DListAsPoints, distanceSumOfVector3DList)
+                       transformVector3DList, distanceSumOfVector3DList)
 
 from mathutils import Vector
 
@@ -25,7 +25,7 @@ cdef class PolySpline(Spline):
         return PolySpline(self.points.copy(), self.cyclic)
 
     cpdef transform(self, matrix):
-        transformVector3DListAsPoints(self.points, matrix)
+        transformVector3DList(self.points, matrix)
         self.markChanged()
 
     cpdef double getLength(self, int resolution = 0):
