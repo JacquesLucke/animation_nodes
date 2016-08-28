@@ -10,11 +10,11 @@ cdef class BaseFalloff(Falloff):
 
 
 cdef class CompoundFalloff(Falloff):
-    def __cinit__(self):
-        self.requiresClampedInput = False
-
     cdef list getDependencies(self):
         raise NotImplementedError()
+
+    cdef list getClampingRequirements(self):
+        return [False] * self.getDependencies()
 
     cdef double evaluate(self, double* dependencyResults):
         raise NotImplementedError()

@@ -23,10 +23,12 @@ cdef class InterpolateFalloff(CompoundFalloff):
     def __cinit__(self, Falloff falloff, InterpolationBase interpolation):
         self.falloff = falloff
         self.interpolation = interpolation
-        self.requiresClampedInput = True
 
     cdef list getDependencies(self):
         return [self.falloff]
+
+    cdef list getClampingRequirements(self):
+        return [True]
 
     cdef double evaluate(self, double* dependencyResults):
         return self.interpolation.evaluate(min(max(dependencyResults[0], 0), 1))
