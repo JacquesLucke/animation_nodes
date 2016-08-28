@@ -14,7 +14,7 @@ cdef class CompoundFalloff(Falloff):
         raise NotImplementedError()
 
     cdef list getClampingRequirements(self):
-        return [False] * self.getDependencies()
+        return [False] * len(self.getDependencies())
 
     cdef double evaluate(self, double* dependencyResults):
         raise NotImplementedError()
