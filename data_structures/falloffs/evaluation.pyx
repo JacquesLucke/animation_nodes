@@ -87,6 +87,7 @@ cdef createCompoundEvaluator_Generic(CompoundFalloff falloff, str sourceType, Ev
         list clampingRequirements = falloff.getClampingRequirements()
         int amount = len(dependencies)
         int i
+        bint isValid = True
 
     settings.falloff = <PyObject*>falloff
     settings.dependencyAmount = amount
@@ -97,9 +98,16 @@ cdef createCompoundEvaluator_Generic(CompoundFalloff falloff, str sourceType, Ev
     for i in range(amount):
         createEvaluatorFunction(dependencies[i], sourceType, clampingRequirements[i],
             settings.dependencyFunctions + i, settings.dependencySettings + i)
+        if settings.dependencyFunctions[i] == NULL:
+            isValid = False
+            break
 
-    outFunction[0] = evaluateCompoundFalloff_Generic
-    outSettings[0] = settings
+    if isValid:
+        outFunction[0] = evaluateCompoundFalloff_Generic
+        outSettings[0] = settings
+    else:
+        freeCompoundSettings_Generic(settings)
+        outFunction[0] = outSettings[0] = NULL
 
 cdef createCompoundEvaluator_One(CompoundFalloff falloff, str sourceType, EvaluatorFunction* outFunction, void** outSettings):
     cdef CompoundSettings_One* settings = <CompoundSettings_One*>PyMem_Malloc(sizeof(CompoundSettings_One))
@@ -126,13 +134,13 @@ cdef freeEvaluatorFunction(EvaluatorFunction function, void* settings):
     elif function == evaluateBaseFalloff_Conversion:
         PyMem_Free(settings)
     elif function == evaluateCompoundFalloff_Generic:
-        freeCompoundSettings(<CompoundSettings_Generic*>settings)
+        freeCompoundSettings_Generic(<CompoundSettings_Generic*>settings)
     elif function == evaluateCompoundFalloff_One:
         PyMem_Free(settings)
     elif function == evaluateClamping:
         freeClampingSettings(<ClampingSettings*>settings)
 
-cdef freeCompoundSettings(CompoundSettings_Generic* settings):
+cdef freeCompoundSettings_Generic(CompoundSettings_Generic* settings):
     cdef int i
     for i in range(settings.dependencyAmount):
         freeEvaluatorFunction(settings.dependencyFunctions[i], settings.dependencySettings[i])
