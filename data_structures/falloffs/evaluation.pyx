@@ -38,24 +38,29 @@ cpdef createFalloffEvaluator(Falloff falloff, str sourceType, bint clamped = Fal
 #########################################################
 
 cdef createEvaluatorFunction(Falloff falloff, str sourceType, bint clamped, EvaluatorFunction* outFunction, void** outSettings):
-    outFunction[0] = NULL
-    outSettings[0] = NULL
+    cdef:
+        EvaluatorFunction function = NULL
+        void* settings = NULL
 
     if isinstance(falloff, BaseFalloff):
         dataType = (<BaseFalloff>falloff).dataType
         if dataType == "All" or sourceType == dataType:
-            createBaseEvaluator_NoConversion(falloff, outFunction, outSettings)
+            createBaseEvaluator_NoConversion(falloff, &function, &settings)
         else:
-            createBaseEvaluator_Conversion(falloff, sourceType, outFunction, outSettings)
+            createBaseEvaluator_Conversion(falloff, sourceType, &function, &settings)
     elif isinstance(falloff, CompoundFalloff):
         dependencyAmount = len((<CompoundFalloff>falloff).getDependencies())
         if dependencyAmount == 1:
-            createCompoundEvaluator_One(falloff, sourceType, outFunction, outSettings)
+            createCompoundEvaluator_One(falloff, sourceType, &function, &settings)
         else:
-            createCompoundEvaluator_Generic(falloff, sourceType, outFunction, outSettings)
+            createCompoundEvaluator_Generic(falloff, sourceType, &function, &settings)
 
-    if not falloff.clamped and clamped:
-        pass
+    if not falloff.clamped and clamped and function != NULL and settings != NULL:
+        createClampingEvaluator(function, settings, outFunction, outSettings)
+    else:
+        outFunction[0] = function
+        outSettings[0] = settings
+
 
 cdef createBaseEvaluator_NoConversion(BaseFalloff falloff, EvaluatorFunction* outFunction, void** outSettings):
     cdef BaseSettings_NoConversion* settings
@@ -104,6 +109,13 @@ cdef createCompoundEvaluator_One(CompoundFalloff falloff, str sourceType, Evalua
     outFunction[0] = evaluateCompoundFalloff_One
     outSettings[0] = settings
 
+cdef createClampingEvaluator(EvaluatorFunction realFunction, void* realSettings, EvaluatorFunction* outFunction, void** outSettings):
+    cdef ClampingSettings* settings = <ClampingSettings*>PyMem_Malloc(sizeof(ClampingSettings))
+    settings.realFunction = realFunction
+    settings.realSettings = realSettings
+    outFunction[0] = evaluateClamping
+    outSettings[0] = settings
+
 
 # Free Falloff Evaluators
 #########################################################
@@ -117,6 +129,8 @@ cdef freeEvaluatorFunction(EvaluatorFunction function, void* settings):
         freeCompoundSettings(<CompoundSettings_Generic*>settings)
     elif function == evaluateCompoundFalloff_One:
         PyMem_Free(settings)
+    elif function == evaluateClamping:
+        freeClampingSettings(<ClampingSettings*>settings)
 
 cdef freeCompoundSettings(CompoundSettings_Generic* settings):
     cdef int i
@@ -126,6 +140,10 @@ cdef freeCompoundSettings(CompoundSettings_Generic* settings):
     PyMem_Free(settings.dependencyResults)
     PyMem_Free(settings.dependencyFunctions)
     PyMem_Free(settings.dependencySettings)
+    PyMem_Free(settings)
+
+cdef freeClampingSettings(ClampingSettings* settings):
+    freeEvaluatorFunction(settings.realFunction, settings.realSettings)
     PyMem_Free(settings)
 
 
@@ -151,6 +169,10 @@ cdef struct CompoundSettings_One:
     EvaluatorFunction dependencyFunction
     void* dependencySettings
 
+cdef struct ClampingSettings:
+    EvaluatorFunction realFunction
+    void* realSettings
+
 
 # Execute Falloff Evaluators
 #########################################################
@@ -174,6 +196,13 @@ cdef double evaluateCompoundFalloff_One(void* settings, void* value, long index)
     cdef CompoundSettings_One* _settings = <CompoundSettings_One*>settings
     cdef double dependencyResult = _settings.dependencyFunction(_settings.dependencySettings, value, index)
     return (<CompoundFalloff>_settings.falloff).evaluate(&dependencyResult)
+
+cdef double evaluateClamping(void* settings, void* value, long index):
+    cdef ClampingSettings* _settings = <ClampingSettings*>settings
+    cdef double result = _settings.realFunction(_settings.realSettings, value, index)
+    if result > 1: return 1
+    if result < 0: return 0
+    return result
 
 
 # Evaluator Function Wrapper
