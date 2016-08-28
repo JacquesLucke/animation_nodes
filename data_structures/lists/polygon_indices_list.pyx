@@ -23,6 +23,15 @@ cdef class PolygonIndicesList:
             return self.getValuesInSlice(key)
         raise TypeError("expected int or slice")
 
+    def __add__(a, b):
+        cdef PolygonIndicesList newList = PolygonIndicesList()
+        try:
+            newList.extend(a)
+            newList.extend(b)
+        except:
+            raise NotImplementedError()
+        return newList
+
     def __iter__(self):
         return PolygonIndicesListIterator(self)
 
