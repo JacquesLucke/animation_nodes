@@ -114,8 +114,13 @@ cdef createCompoundEvaluator_One(CompoundFalloff falloff, str sourceType, Evalua
     settings.falloff = <PyObject*>falloff
     createEvaluatorFunction(falloff.getDependencies()[0], sourceType, falloff.getClampingRequirements()[0],
         &settings.dependencyFunction, &settings.dependencySettings)
-    outFunction[0] = evaluateCompoundFalloff_One
-    outSettings[0] = settings
+
+    if settings.dependencyFunction == NULL:
+        PyMem_Free(settings)
+        outFunction[0] = outSettings[0] = NULL
+    else:
+        outFunction[0] = evaluateCompoundFalloff_One
+        outSettings[0] = settings
 
 cdef createClampingEvaluator(EvaluatorFunction realFunction, void* realSettings, EvaluatorFunction* outFunction, void** outSettings):
     cdef ClampingSettings* settings = <ClampingSettings*>PyMem_Malloc(sizeof(ClampingSettings))
