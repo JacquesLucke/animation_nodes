@@ -23,6 +23,7 @@ cdef class InterpolateFalloff(CompoundFalloff):
     def __cinit__(self, Falloff falloff, InterpolationBase interpolation):
         self.falloff = falloff
         self.interpolation = interpolation
+        self.clamped = interpolation.clamped
 
     cdef list getDependencies(self):
         return [self.falloff]
