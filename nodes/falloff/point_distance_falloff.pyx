@@ -29,6 +29,7 @@ cdef class PointDistanceFalloff(BaseFalloff):
         self.maxDistance = maxDistance
         toVector3(&self.origin, vector)
         self.dataType = "Location"
+        self.clamped = True
 
     cdef double evaluate(self, void* value, long index):
         cdef double distance = distanceVec3(&self.origin, <Vector3*>value)

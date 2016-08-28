@@ -1,5 +1,6 @@
 cdef class Falloff:
-    pass
+    def __cinit__(self):
+        self.clamped = False
 
 
 cdef class BaseFalloff(Falloff):
@@ -9,6 +10,8 @@ cdef class BaseFalloff(Falloff):
 
 
 cdef class CompoundFalloff(Falloff):
+    def __cinit__(self):
+        self.requiresClampedInput = False
 
     cdef list getDependencies(self):
         raise NotImplementedError()

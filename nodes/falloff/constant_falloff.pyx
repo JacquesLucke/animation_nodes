@@ -19,6 +19,7 @@ cdef class ConstantFalloff(BaseFalloff):
 
     def __cinit__(self, double value):
         self.value = value
+        self.clamped = 0 <= value <= 1 
         self.dataType = "All"
 
     cdef double evaluate(self, void* object, long index):

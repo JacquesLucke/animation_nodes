@@ -27,6 +27,7 @@ cdef class RandomFalloff(BaseFalloff):
         self.minValue = minValue
         self.maxValue = maxValue
         self.dataType = "All"
+        self.clamped = 0 <= min(minValue, maxValue) <= max(minValue, maxValue) <= 1
 
     cdef double evaluate(self, void* object, long index):
         return uniformRandomNumber((self.seed + index) % 0x7fffffff, self.minValue, self.maxValue)
