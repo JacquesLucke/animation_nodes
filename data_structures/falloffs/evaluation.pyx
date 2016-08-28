@@ -2,7 +2,7 @@ from cpython.ref cimport PyObject
 from cpython.mem cimport PyMem_Malloc, PyMem_Free
 
 from ... math cimport Matrix4, Vector3
-from . falloff_base cimport Falloff, BaseFalloff, CompoundFalloff
+from . falloff_base cimport BaseFalloff, CompoundFalloff
 
 ctypedef double (*BaseEvaluatorWithConversion)(BaseFalloff, void*, long index)
 ctypedef double (*FalloffEvaluatorFunction)(void* settings, void* value, long index)
@@ -15,13 +15,15 @@ cdef class FalloffEvaluator:
     cdef double evaluate(self, void* value, long index):
         raise NotImplementedError()
 
-cpdef createFalloffEvaluator(falloff, str sourceType):
+cpdef createFalloffEvaluator(Falloff falloff, str sourceType, bint clamped = False):
     cdef:
         FalloffEvaluatorFunctionEvaluator evaluator
         FalloffEvaluatorFunction function
         void* settings
 
-    createEvaluatorFunction(falloff, sourceType, &function, &settings)
+    assert falloff is not None
+
+    createEvaluatorFunction(falloff, sourceType, clamped, &function, &settings)
     if function != NULL:
         evaluator = FalloffEvaluatorFunctionEvaluator()
         evaluator.falloff = falloff
@@ -35,7 +37,7 @@ cpdef createFalloffEvaluator(falloff, str sourceType):
 # Create Falloff Evaluators
 #########################################################
 
-cdef createEvaluatorFunction(falloff, str sourceType, FalloffEvaluatorFunction* outFunction, void** outSettings):
+cdef createEvaluatorFunction(Falloff falloff, str sourceType, bint clamped, FalloffEvaluatorFunction* outFunction, void** outSettings):
     outFunction[0] = NULL
     outSettings[0] = NULL
 
@@ -51,6 +53,9 @@ cdef createEvaluatorFunction(falloff, str sourceType, FalloffEvaluatorFunction* 
             createCompoundEvaluator_One(falloff, sourceType, outFunction, outSettings)
         else:
             createCompoundEvaluator_Generic(falloff, sourceType, outFunction, outSettings)
+
+    if not falloff.clamped and clamped:
+        pass
 
 cdef createBaseEvaluator_NoConversion(BaseFalloff falloff, FalloffEvaluatorFunction* outFunction, void** outSettings):
     cdef BaseSettings_NoConversion* settings
@@ -74,6 +79,7 @@ cdef createCompoundEvaluator_Generic(CompoundFalloff falloff, str sourceType, Fa
     cdef:
         CompoundSettings_Generic* settings = <CompoundSettings_Generic*>PyMem_Malloc(sizeof(CompoundSettings_Generic))
         list dependencies = falloff.getDependencies()
+        list clampingRequirements = falloff.getClampingRequirements()
         int amount = len(dependencies)
         int i
 
@@ -84,7 +90,8 @@ cdef createCompoundEvaluator_Generic(CompoundFalloff falloff, str sourceType, Fa
     settings.dependencyFunctions = <FalloffEvaluatorFunction*>PyMem_Malloc(sizeof(FalloffEvaluatorFunction) * amount)
 
     for i in range(amount):
-        createEvaluatorFunction(dependencies[i], sourceType, settings.dependencyFunctions + i, settings.dependencySettings + i)
+        createEvaluatorFunction(dependencies[i], sourceType, clampingRequirements[i],
+            settings.dependencyFunctions + i, settings.dependencySettings + i)
 
     outFunction[0] = evaluateCompoundFalloff_Generic
     outSettings[0] = settings
@@ -92,7 +99,8 @@ cdef createCompoundEvaluator_Generic(CompoundFalloff falloff, str sourceType, Fa
 cdef createCompoundEvaluator_One(CompoundFalloff falloff, str sourceType, FalloffEvaluatorFunction* outFunction, void** outSettings):
     cdef CompoundSettings_One* settings = <CompoundSettings_One*>PyMem_Malloc(sizeof(CompoundSettings_One))
     settings.falloff = <PyObject*>falloff
-    createEvaluatorFunction(falloff.getDependencies()[0], sourceType, &settings.dependencyFunction, &settings.dependencySettings)
+    createEvaluatorFunction(falloff.getDependencies()[0], sourceType, falloff.getClampingRequirements()[0],
+        &settings.dependencyFunction, &settings.dependencySettings)
     outFunction[0] = evaluateCompoundFalloff_One
     outSettings[0] = settings
 
