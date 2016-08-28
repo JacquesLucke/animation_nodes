@@ -98,7 +98,7 @@ class RepeatListNode(bpy.types.Node, AnimationNode):
             yield ("    elementIterator = ({} for _element in elementIterator)"
                    .format(copyExpression.replace("value", "_element")))
 
-        yield "    outList.extend(tuple(itertools.islice(elementIterator, outLength)))"
+        yield "    outList.extend(itertools.islice(elementIterator, outLength))"
 
     def getUsedModules(self):
         return ["itertools", "math"]
