@@ -1,5 +1,6 @@
 from . conversion cimport toMatrix4
-from . cimport transformVec3, distanceVec3, mixVec3
+from . cimport transformVec3_InPlace, distanceVec3, mixVec3
+
 
 cpdef void transformVector3DList(Vector3DList vectors, matrix):
     cdef:
@@ -13,7 +14,7 @@ cpdef void transformVector3DList(Vector3DList vectors, matrix):
 cdef void transformVector3DList_LowLevel(Vector3* vectors, long arrayLength, Matrix4* matrix):
     cdef long i
     for i in range(arrayLength):
-        transformVec3(vectors + i, vectors + i, matrix)
+        transformVec3_InPlace(vectors + i, matrix)
 
 cpdef double distanceSumOfVector3DList(Vector3DList vectors):
     cdef:
