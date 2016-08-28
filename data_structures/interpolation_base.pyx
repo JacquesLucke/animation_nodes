@@ -1,4 +1,7 @@
 cdef class InterpolationBase:
+    def __cinit__(self):
+        self.clamped = False
+        
     def __call__(self, double x):
         x = min(max(x, 0), 1)
         return self.evaluate(x)
