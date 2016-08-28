@@ -1,4 +1,4 @@
-from mathutils import Vector
+from mathutils import Vector, Matrix
 
 cdef toMatrix4(Matrix4* m, value):
     m.a11 = value[0][0]
@@ -20,6 +20,12 @@ cdef toMatrix4(Matrix4* m, value):
     m.a42 = value[3][1]
     m.a43 = value[3][2]
     m.a44 = value[3][3]
+
+cdef toPyMatrix(Matrix4* m):
+    return Matrix(((m.a11, m.a12, m.a13, m.a14),
+                   (m.a21, m.a22, m.a23, m.a24),
+                   (m.a31, m.a32, m.a33, m.a34),
+                   (m.a41, m.a42, m.a43, m.a44)))
 
 cdef toVector3(Vector3* v, value):
     v.x = value[0]

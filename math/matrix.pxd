@@ -9,5 +9,7 @@ cdef struct Matrix4:
 cdef void transformVec3_InPlace(Vector3* vector, Matrix4* matrix)
 cdef void transformVec3(Vector3* target, Vector3* vector, Matrix4* matrix)
 
-cdef void calcTranslationMatrix(Matrix4* m, Vector3* v)
+cdef void setIdentityMatrix4(Matrix4* m)
+cdef void setTranslationMatrix4(Matrix4* m, Vector3* v)
+
 cdef void multMatrix4(Matrix4* target, Matrix4* x, Matrix4* y)

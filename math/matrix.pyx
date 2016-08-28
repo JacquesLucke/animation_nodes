@@ -12,7 +12,14 @@ cdef void transformVec3(Vector3* target, Vector3* v, Matrix4* m):
     target.y = v.x * m.a21 + v.y * m.a22 + v.z * m.a23 + m.a24
     target.z = v.x * m.a31 + v.y * m.a32 + v.z * m.a33 + m.a34
 
-cdef void calcTranslationMatrix(Matrix4* m, Vector3* v):
+cdef void setIdentityMatrix4(Matrix4* m):
+    m.a12 = m.a13 = m.a14 = 0
+    m.a21 = m.a23 = m.a24 = 0
+    m.a31 = m.a32 = m.a34 = 0
+    m.a41 = m.a42 = m.a43 = 0
+    m.a11 = m.a22 = m.a33 = m.a44 = 1
+
+cdef void setTranslationMatrix4(Matrix4* m, Vector3* v):
     m.a11 = m.a22 = m.a33 = m.a44 = 1
     m.a12 = m.a13 = 0
     m.a21 = m.a23 = 0

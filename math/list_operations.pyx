@@ -1,5 +1,5 @@
 from . conversion cimport toMatrix4
-from . cimport transformVec3_InPlace, distanceVec3, mixVec3
+from . cimport transformVec3_InPlace, distanceVec3, mixVec3, multMatrix4, setIdentityMatrix4
 
 
 cpdef void transformVector3DList(Vector3DList vectors, matrix):
@@ -30,3 +30,18 @@ cdef void mixVec3Arrays(Vector3* target, Vector3* a, Vector3* b, long arrayLengt
     cdef long i
     for i in range(arrayLength):
         mixVec3(target + i, a + i, b + i, factor)
+
+cdef void reduceMatrix4x4List(Matrix4* matrices, unsigned long amount, Matrix4* target):
+    cdef:
+        long i
+        Matrix4 tmp
+
+    if amount == 0:
+        setIdentityMatrix4(target)
+    elif amount == 1:
+        target[0] = matrices[0]
+    else:
+        tmp = matrices[0]
+        for i in range(1, amount):
+            multMatrix4(target, &tmp, matrices + i)
+            tmp = target[0]
