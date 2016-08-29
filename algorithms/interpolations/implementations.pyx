@@ -265,7 +265,7 @@ cdef class Mixed(InterpolationBase):
         self.factor = factor
         self.a = a
         self.b = b
-        self.clamped = a.clamped and b.clampd and 0 <= factor <= 1
+        self.clamped = a.clamped and b.clamped and 0 <= factor <= 1
 
     cdef double evaluate(self, double x):
         return self.a.evaluate(x) * (1 - self.factor) + self.b.evaluate(x) * self.factor
