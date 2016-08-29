@@ -1,4 +1,4 @@
-from .. utils.code import isCodeValid, getSyntaxError
+from .. utils.code import isCodeValid, getSyntaxError, containsStarImport
 from . compile_scripts import compileScript
 from .. problems import ExecutionUnitNotSetup
 from . code_generator import getSocketValueExpression, iterSetupCodeLines, getInitialVariables
@@ -37,13 +37,17 @@ class ScriptExecutionUnit:
     def generateScript(self, nodeByID):
         node = self.network.getScriptNode(nodeByID)
         userCode = node.executionCode
+
         variables = getInitialVariables([node])
 
         finalCode = []
         finalCode.extend(iterSetupCodeLines([node], variables))
         finalCode.append(self.getFunctionHeader(node))
 
-        if isCodeValid(userCode):
+        if containsStarImport(userCode):
+            finalCode.append("    {}.errorMessage = 'Star import is not allowed'".
+                                  format(node.identifier))
+        elif isCodeValid(userCode):
             finalCode.extend(indent(self.getFunctionBodyLines(node, userCode)))
 
             # used to show the correct line numbers to the user

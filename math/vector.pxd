@@ -1,4 +1,5 @@
-from . ctypes cimport Vector3, Matrix4
+cdef struct Vector3:
+    float x, y, z
 
 cdef float lengthVec3(Vector3* v)
 cdef void scaleVec3(Vector3* v, float factor)
@@ -11,4 +12,3 @@ cdef float dotVec3(Vector3* a, Vector3* b)
 cdef void normalizeVec3(Vector3* v)
 cdef float distanceVec3(Vector3* a, Vector3* b)
 cdef float distanceSquaredVec3(Vector3* a, Vector3* b)
-cdef void transformVec3(Vector3* target, Vector3* v, Matrix4* m)

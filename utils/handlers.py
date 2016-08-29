@@ -1,9 +1,22 @@
 import bpy
+from functools import wraps
 from bpy.app.handlers import persistent
 
 # Make sure that this module reloads before all the others
 # otherwise the reload of this module will overwrite the handler lists
 __reload_order_index__ = -100
+
+
+def validCallback(function):
+    @wraps(function)
+    def wrapper(self, context):
+        function(self, context)
+    return wrapper
+
+
+
+# Event Handler System
+###########################################################
 
 fileLoadPostHandlers = []
 addonLoadPostHandlers = []

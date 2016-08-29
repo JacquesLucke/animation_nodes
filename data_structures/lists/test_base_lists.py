@@ -128,6 +128,13 @@ class TestExtend(TestCase):
         a.extend(gen)
         self.assertEqual(a, [0, 1, 4, 9, 16])
 
+    def testISliceInput(self):
+        a = IntegerList()
+        b = [1, 2, 3, 4, 5]
+        from itertools import islice
+        a.extend(islice(b, 2, 7))
+        self.assertEqual(a, [3, 4, 5])
+
     def testOtherListInput(self):
         a = IntegerList.fromValues((0, 1, 2))
         b = IntegerList.fromValues((3, 4, 5))

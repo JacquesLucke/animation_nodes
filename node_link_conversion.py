@@ -74,7 +74,8 @@ class SimpleConvert(LinkCorrection):
         ("String", "Float") : "an_ParseNumberNode",
         ("Integer List", "Float List") : "an_IntegerListToFloatListNode",
         ("Vector", "Euler") : "an_DirectionToRotationNode",
-        ("Euler", "Vector") : "an_RotationToDirectionNode"
+        ("Euler", "Vector") : "an_RotationToDirectionNode",
+        ("Float", "Falloff") : "an_ConstantFalloffNode"
     }
 
     def check(self, origin, target):

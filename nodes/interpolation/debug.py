@@ -14,7 +14,7 @@ class DebugInterpolationNode(bpy.types.Node, AnimationNode):
     bl_width_default = 160
     options = {"NO_TIMING"}
 
-    resolution = IntProperty(name = "Resolution", min = 5, default = 40)
+    resolution = IntProperty(name = "Resolution", min = 5, default = 100)
 
     def create(self):
         self.newInput("Interpolation", "Interpolation", "interpolation", defaultDrawType = "PROPERTY_ONLY")

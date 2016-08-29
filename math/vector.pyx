@@ -1,3 +1,4 @@
+import cython
 from libc.math cimport sqrt
 
 cdef void scaleVec3(Vector3* v, float factor):
@@ -27,6 +28,7 @@ cdef void mixVec3(Vector3* target, Vector3* a, Vector3* b, float factor):
     target.y = newY
     target.z = newZ
 
+@cython.cdivision(True)
 cdef void normalizeVec3(Vector3* v):
     cdef float length = sqrt(v.x ** 2 + v.y ** 2 + v.z ** 2)
     if length != 0:
@@ -39,21 +41,14 @@ cdef void normalizeVec3(Vector3* v):
         v.z = 0
 
 cdef float distanceVec3(Vector3* a, Vector3* b):
-    return sqrt((a.x - b.x) ** 2
-              + (a.y - b.y) ** 2
-              + (a.z - b.z) ** 2)
+    return sqrt(distanceSquaredVec3(a, b))
 
 cdef float distanceSquaredVec3(Vector3* a, Vector3* b):
-    return (a.x - b.x) ** 2 + (a.y - b.y) ** 2 + (a.z - b.z) ** 2
-
-cdef void transformVec3(Vector3* target, Vector3* v, Matrix4* m):
-    cdef float newX, newY, newZ
-    newX = v.x * m.a11 + v.y * m.a12 + v.z * m.a13 + m.a14
-    newY = v.x * m.a21 + v.y * m.a22 + v.z * m.a23 + m.a24
-    newZ = v.x * m.a31 + v.y * m.a32 + v.z * m.a33 + m.a34
-    target.x = newX
-    target.y = newY
-    target.z = newZ
+    cdef:
+        float diff1 = (a.x - b.x)
+        float diff2 = (a.y - b.y)
+        float diff3 = (a.z - b.z)
+    return diff1 * diff1 + diff2 * diff2 + diff3 * diff3
 
 cdef float dotVec3(Vector3* a, Vector3* b):
     return a.x * b.x + a.y * b.y + a.z * b.z

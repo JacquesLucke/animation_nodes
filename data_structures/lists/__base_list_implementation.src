@@ -148,7 +148,7 @@ cdef class LISTNAME:
         self.length += 1
 
     cpdef extend(self, values):
-        cdef long newLength, i
+        cdef long oldLength, newLength, i
         if isinstance(values, LISTNAME):
             self.overwrite(values, self.length)
         elif isinstance(values, list):
@@ -161,11 +161,14 @@ cdef class LISTNAME:
             for i, value in enumerate(values, start = self.length):
                 self.data[i] = value
             self.length = newLength
-        elif isinstance(values, GeneratorType):
-            for value in values:
-                self.append(value)
         else:
-            raise TypeError("invalid input")
+            try:
+                oldLength = self.length
+                for value in values:
+                    self.append(value)
+            except:
+                self.length = oldLength
+                raise TypeError("invalid input")
 
     cdef extendList(self, list values):
         cdef long newLength, i

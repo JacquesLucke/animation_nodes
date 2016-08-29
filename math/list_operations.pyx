@@ -1,19 +1,26 @@
 from . conversion cimport toMatrix4
-from . base_operations cimport transformVec3, distanceVec3, mixVec3
+from . cimport (transformVec3AsPoint_InPlace, transformVec3AsDirection_InPlace,
+                distanceVec3, mixVec3, multMatrix4, setIdentityMatrix4)
 
-cpdef void transformVector3DList(Vector3DList vectors, matrix):
+
+cpdef void transformVector3DList(Vector3DList vectors, matrix, bint ignoreTranslation = False):
     cdef:
         Matrix4 _matrix
         Vector3* _vectors
 
     toMatrix4(&_matrix, matrix)
     _vectors = <Vector3*>vectors.base.data
-    transformVector3DList_LowLevel(_vectors, vectors.getLength(), &_matrix)
+    transformVector3DListAsPoints(_vectors, vectors.getLength(), &_matrix, ignoreTranslation)
 
-cdef void transformVector3DList_LowLevel(Vector3* vectors, long arrayLength, Matrix4* matrix):
+cdef void transformVector3DListAsPoints(Vector3* vectors, long arrayLength, Matrix4* matrix, bint ignoreTranslation):
     cdef long i
-    for i in range(arrayLength):
-        transformVec3(vectors + i, vectors + i, matrix)
+    if ignoreTranslation:
+        for i in range(arrayLength):
+            transformVec3AsDirection_InPlace(vectors + i, matrix)
+    else:
+        for i in range(arrayLength):
+            transformVec3AsPoint_InPlace(vectors + i, matrix)
+
 
 cpdef double distanceSumOfVector3DList(Vector3DList vectors):
     cdef:
@@ -29,3 +36,18 @@ cdef void mixVec3Arrays(Vector3* target, Vector3* a, Vector3* b, long arrayLengt
     cdef long i
     for i in range(arrayLength):
         mixVec3(target + i, a + i, b + i, factor)
+
+cdef void reduceMatrix4x4List(Matrix4* matrices, unsigned long amount, Matrix4* target):
+    cdef:
+        long i
+        Matrix4 tmp
+
+    if amount == 0:
+        setIdentityMatrix4(target)
+    elif amount == 1:
+        target[0] = matrices[0]
+    else:
+        tmp = matrices[0]
+        for i in range(1, amount):
+            multMatrix4(target, &tmp, matrices + i)
+            tmp = target[0]

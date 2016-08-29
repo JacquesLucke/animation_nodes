@@ -106,7 +106,6 @@ def preprocessor():
 ###################################################################
 
 def compileCythonFiles():
-    import Cython
     from distutils.core import setup
     from Cython.Build import cythonize
 

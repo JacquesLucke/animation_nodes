@@ -1,3 +1,4 @@
+import re
 import ast
 import sys
 
@@ -10,3 +11,7 @@ def getSyntaxError(code):
         return None
     except SyntaxError as e:
         return e
+
+def containsStarImport(code):
+    match = re.search("import\s*\*", code)
+    return match is not None

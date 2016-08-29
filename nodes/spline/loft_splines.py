@@ -65,7 +65,7 @@ class LoftSplinesNode(bpy.types.Node, AnimationNode):
         col.prop(self, "surfaceDistributionType")
         col.prop(self, "resolution")
 
-    def getExecuteFunctionName(self):
+    def getExecutionFunctionName(self):
         if self.interpolationType == "LINEAR":
             return "execute_Linear"
         elif self.interpolationType == "SMOOTH":

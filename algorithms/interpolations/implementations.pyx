@@ -11,6 +11,9 @@ https://github.com/libgdx/libgdx/blob/master/gdx/src/com/badlogic/gdx/math/Inter
 #####################################################
 
 cdef class Linear(InterpolationBase):
+    def __cinit__(self):
+        self.clamped = True
+
     cdef double evaluate(self, double x):
         return x
 
@@ -23,6 +26,7 @@ cdef class PowerIn(InterpolationBase):
 
     def __cinit__(self, int exponent):
         self.exponent = max(exponent, 1)
+        self.clamped = True
 
     cdef double evaluate(self, double x):
         return pow(x, self.exponent)
@@ -34,6 +38,7 @@ cdef class PowerOut(InterpolationBase):
     def __cinit__(self, int exponent):
         self.exponent = max(exponent, 1)
         self.factor = -1 if self.exponent % 2 == 0 else 1
+        self.clamped = True
 
     cdef double evaluate(self, double x):
         return pow(x - 1, self.exponent) * self.factor + 1
@@ -45,6 +50,7 @@ cdef class PowerInOut(InterpolationBase):
     def __cinit__(self, int exponent):
         self.exponent = max(exponent, 1)
         self.factor = -0.5 if self.exponent % 2 == 0 else 0.5
+        self.clamped = True
 
     cdef double evaluate(self, double x):
         if x <= 0.5:
@@ -68,6 +74,7 @@ cdef class ExponentialInterpolationBase(InterpolationBase):
         self.base = max(0.0001, base) if base != 1 else 1.0001
         self.minValue = pow(self.base, -self.exponent)
         self.scale = 1 / (1 - self.minValue)
+        self.clamped = True
 
 cdef class ExponentialIn(ExponentialInterpolationBase):
     cdef double evaluate(self, double x):
@@ -88,16 +95,20 @@ cdef class ExponentialInOut(ExponentialInterpolationBase):
 # Circular
 #####################################################
 
-cdef class CircularIn(InterpolationBase):
+cdef class CircularInterpolationBase(InterpolationBase):
+    def __cinit__(self):
+        self.clamped = True
+
+cdef class CircularIn(CircularInterpolationBase):
     cdef double evaluate(self, double x):
         return 1 - sqrt(1 - x * x)
 
-cdef class CircularOut(InterpolationBase):
+cdef class CircularOut(CircularInterpolationBase):
     cdef double evaluate(self, double x):
         x -= 1
         return sqrt(1 - x * x)
 
-cdef class CircularInOut(InterpolationBase):
+cdef class CircularInOut(CircularInterpolationBase):
     cdef double evaluate(self, double x):
         if x <= 0.5:
             x *= 2
@@ -162,6 +173,7 @@ cdef class BounceInterpolationBase(InterpolationBase):
             self.widths.data[i] = c / 2.0 ** i
             self.heights.data[i] = self.widths.data[i] * base
         self.heights.data[0] = 1
+        self.clamped = True
 
     cdef double bounceOut(self, double x):
         x += self.widths[0] / 2
@@ -224,15 +236,19 @@ cdef class BackInOut(BackInterpolationBase):
 # Sine
 #####################################################
 
-cdef class SinIn(InterpolationBase):
+cdef class SinInterpolationBase(InterpolationBase):
+    def __cinit__(self):
+        self.clamped = True
+
+cdef class SinIn(SinInterpolationBase):
     cdef double evaluate(self, double x):
         return 1.0 - cos(x * PI / 2.0)
 
-cdef class SinOut(InterpolationBase):
+cdef class SinOut(SinInterpolationBase):
     cdef double evaluate(self, double x):
         return sin(x * PI / 2.0)
 
-cdef class SinInOut(InterpolationBase):
+cdef class SinInOut(SinInterpolationBase):
     cdef double evaluate(self, double x):
         return (1.0 - cos(x * PI)) / 2.0
 
@@ -249,6 +265,7 @@ cdef class Mixed(InterpolationBase):
         self.factor = factor
         self.a = a
         self.b = b
+        self.clamped = a.clamped and b.clampd and 0 <= factor <= 1
 
     cdef double evaluate(self, double x):
         return self.a.evaluate(x) * (1 - self.factor) + self.b.evaluate(x) * self.factor
