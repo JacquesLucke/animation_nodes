@@ -35,11 +35,12 @@ class OffsetVectorsNode(bpy.types.Node, AnimationNode):
         self.newInput("Falloff", "Falloff", "falloff")
 
     def draw(self, layout):
-        col = layout.column(align = True)
-        col.prop(self, "clampFalloff")
-        col.prop(self, "useOffsetList")
+        layout.prop(self, "clampFalloff")
         if self.errorMessage != "":
             layout.label(self.errorMessage, icon = "ERROR")
+
+    def drawAdvanced(self, layout):
+        layout.prop(self, "useOffsetList")
 
     def getExecutionFunctionName(self):
         if self.useOffsetList:
