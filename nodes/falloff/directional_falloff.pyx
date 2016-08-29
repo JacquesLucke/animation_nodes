@@ -25,7 +25,7 @@ class DirectionalFalloffNode(bpy.types.Node, AnimationNode):
         row.prop(self, "falloffRight", icon = "TRIA_RIGHT", text = "Right")
 
     def execute(self, position, direction, size):
-        size = max(0, size)
+        size = max(0.0001, size)
         if self.falloffLeft and self.falloffRight:
             return BiDirectionalFalloff(position, direction, size)
         elif self.falloffLeft:
