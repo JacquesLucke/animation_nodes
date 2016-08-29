@@ -15,8 +15,8 @@ class DirectionalFalloffNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.newInput("Vector", "Position", "position")
-        self.newInput("Vector", "Direction", "direction")
-        self.newInput("Float", "Size", "size", value = 4, minValue = 0)
+        self.newInput("Vector", "Direction", "direction", value = (1, 0, 0))
+        self.newInput("Float", "Size", "size", value = 2, minValue = 0)
         self.newOutput("Falloff", "Falloff", "falloff")
 
     def draw(self, layout):
