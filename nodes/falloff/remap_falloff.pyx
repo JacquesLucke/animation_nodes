@@ -23,12 +23,12 @@ cdef class RemapFalloff(CompoundFalloff):
         double outputMin, outputMax
         double factor
 
-    def __cinit__(self, Falloff falloff, double outputMin, double outputMax):
+    def __cinit__(self, Falloff falloff, double outMin, double outMax):
         self.falloff = falloff
-        self.outputMin = outputMin
-        self.outputMax = outputMax
-        self.factor = outputMax - outputMin
-        self.clamped = False
+        self.outputMin = outMin
+        self.outputMax = outMax
+        self.factor = outMax - outMin
+        self.clamped = falloff.clamped and 0 <= min(outMin, outMax) <= max(outMin, outMax) <= 1
 
     cdef list getDependencies(self):
         return [self.falloff]
