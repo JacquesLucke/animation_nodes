@@ -30,14 +30,21 @@ cdef void setIdentityMatrix4(Matrix4* m):
     m.a11 = m.a22 = m.a33 = m.a44 = 1
 
 cdef void setTranslationMatrix4(Matrix4* m, Vector3* v):
+    m.a14, m.a24, m.a34 = v.x, v.y, v.z
     m.a11 = m.a22 = m.a33 = m.a44 = 1
     m.a12 = m.a13 = 0
     m.a21 = m.a23 = 0
     m.a31 = m.a32 = 0
     m.a41 = m.a42 = m.a43 = 0
-    m.a14 = v.x
-    m.a24 = v.y
-    m.a34 = v.z
+
+cdef void setTranslationScaleMatrix4(Matrix4* m, Vector3* t, Vector3* s):
+    m.a11, m.a22, m.a33 = s.x, s.y, s.z
+    m.a14, m.a24, m.a34 = t.x, t.y, t.z
+    m.a44 = 1
+    m.a12 = m.a13 = 0
+    m.a21 = m.a23 = 0
+    m.a31 = m.a32 = 0
+    m.a41 = m.a42 = m.a43 = 0
 
 cdef void multMatrix4(Matrix4* target, Matrix4* x, Matrix4* y):
     target.a11 = x.a11 * y.a11  +  x.a12 * y.a21  +  x.a13 * y.a31  +  x.a14 * y.a41

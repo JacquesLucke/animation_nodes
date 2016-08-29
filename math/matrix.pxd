@@ -14,5 +14,6 @@ cdef void transformVec3AsDirection(Vector3* target, Vector3* v, Matrix4* m)
 
 cdef void setIdentityMatrix4(Matrix4* m)
 cdef void setTranslationMatrix4(Matrix4* m, Vector3* v)
+cdef void setTranslationScaleMatrix4(Matrix4* m, Vector3* t, Vector3* s)
 
 cdef void multMatrix4(Matrix4* target, Matrix4* x, Matrix4* y)

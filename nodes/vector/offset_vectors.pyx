@@ -28,11 +28,11 @@ class OffsetVectorsNode(bpy.types.Node, AnimationNode):
     def recreateInputs(self):
         self.inputs.clear()
         self.newInput("Vector List", "Vector List", "vectors", dataIsModified = True)
+        self.newInput("Falloff", "Falloff", "falloff")
         if self.useOffsetList:
             self.newInput("Vector List", "Offset List", "offsets")
         else:
             self.newInput("Vector", "Offset", "offset", value = (0, 0, 1))
-        self.newInput("Falloff", "Falloff", "falloff")
 
     def draw(self, layout):
         layout.prop(self, "clampFalloff")
@@ -48,7 +48,7 @@ class OffsetVectorsNode(bpy.types.Node, AnimationNode):
         else:
             return "execute_SameOffset"
 
-    def execute_OffsetList(self, Vector3DList vectors, Vector3DList offsets, falloff):
+    def execute_OffsetList(self, Vector3DList vectors, falloff, Vector3DList offsets):
         cdef:
             FalloffEvaluator evaluator = self.getFalloffEvaluator(falloff)
             Vector3* _vectors = <Vector3*>vectors.base.data
@@ -72,7 +72,7 @@ class OffsetVectorsNode(bpy.types.Node, AnimationNode):
 
         return vectors
 
-    def execute_SameOffset(self, Vector3DList vectors, offset, falloff):
+    def execute_SameOffset(self, Vector3DList vectors, falloff, offset):
         cdef:
             FalloffEvaluator evaluator = self.getFalloffEvaluator(falloff)
             Vector3* _vectors = <Vector3*>vectors.base.data
