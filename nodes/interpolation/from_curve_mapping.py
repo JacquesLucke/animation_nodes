@@ -21,7 +21,6 @@ class InterpolationFromCurveMappingNode(bpy.types.Node, AnimationNode):
     bl_label = "Interpolation from Curve Mapping"
     bl_width_default = 200
 
-    curveNodeName = StringProperty(default = "")
     curveMapCache = PointerProperty(type = CurveMapCache)
 
     def create(self):
@@ -48,7 +47,7 @@ class InterpolationFromCurveMappingNode(bpy.types.Node, AnimationNode):
     def createCurveNode(self):
         material = getHelperMaterial()
         node = material.node_tree.nodes.new("ShaderNodeRGBCurve")
-        self.curveNodeName = node.name
+        node.name = self.identifier
         mapping = self.mapping
         mapping.use_clip = True
         mapping.clip_min_y = -0.5
@@ -59,10 +58,9 @@ class InterpolationFromCurveMappingNode(bpy.types.Node, AnimationNode):
     def removeCurveNode(self):
         material = getHelperMaterial()
         tree = material.node_tree
-        curveNode = tree.nodes.get(self.curveNodeName)
+        curveNode = tree.nodes.get(self.identifier)
         if curveNode is not None:
             tree.nodes.remove(curveNode)
-        self.curveNodeName = ""
 
     def resetEndPoints(self):
         points = self.curve.points
@@ -112,7 +110,7 @@ class InterpolationFromCurveMappingNode(bpy.types.Node, AnimationNode):
     @property
     def curveNode(self):
         material = getHelperMaterial()
-        node = material.node_tree.nodes.get(self.curveNodeName)
+        node = material.node_tree.nodes.get(self.identifier)
         if node is None: node = self.createCurveNode()
         return node
 
