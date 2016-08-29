@@ -5,6 +5,7 @@ from bpy.app.handlers import persistent
 # otherwise the reload of this module will overwrite the handler lists
 __reload_order_index__ = -100
 
+fileSavePreHandlers = []
 fileLoadPostHandlers = []
 addonLoadPostHandlers = []
 sceneUpdatePostHandlers = []
@@ -17,6 +18,7 @@ renderCompleteHandlers = []
 
 def eventHandler(event):
     def eventHandlerDecorator(function):
+        if event == "FILE_SAVE_PRE": fileSavePreHandlers.append(function)
         if event == "FILE_LOAD_POST": fileLoadPostHandlers.append(function)
         if event == "ADDON_LOAD_POST": addonLoadPostHandlers.append(function)
         if event == "SCENE_UPDATE_POST": sceneUpdatePostHandlers.append(function)
@@ -40,6 +42,11 @@ def sceneUpdatePost(scene):
         addonChanged = False
         for handler in addonLoadPostHandlers:
             handler()
+
+@persistent
+def savePre(scene):
+    for handler in fileSavePreHandlers:
+        handler()
 
 @persistent
 def loadPost(scene):
@@ -75,6 +82,7 @@ def registerHandlers():
     bpy.app.handlers.frame_change_post.append(frameChangedPost)
     bpy.app.handlers.scene_update_post.append(sceneUpdatePost)
     bpy.app.handlers.load_post.append(loadPost)
+    bpy.app.handlers.save_pre.append(savePre)
 
     bpy.app.handlers.render_complete.append(renderCompleted)
     bpy.app.handlers.render_init.append(renderInitialized)
@@ -88,6 +96,7 @@ def unregisterHandlers():
     bpy.app.handlers.frame_change_post.remove(frameChangedPost)
     bpy.app.handlers.scene_update_post.remove(sceneUpdatePost)
     bpy.app.handlers.load_post.remove(loadPost)
+    bpy.app.handlers.save_pre.remove(savePre)
 
     bpy.app.handlers.render_complete.remove(renderCompleted)
     bpy.app.handlers.render_init.remove(renderInitialized)
