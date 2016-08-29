@@ -1,3 +1,4 @@
+import cython
 from libc.math cimport sqrt
 
 cdef void scaleVec3(Vector3* v, float factor):
@@ -27,6 +28,7 @@ cdef void mixVec3(Vector3* target, Vector3* a, Vector3* b, float factor):
     target.y = newY
     target.z = newZ
 
+@cython.cdivision(True)
 cdef void normalizeVec3(Vector3* v):
     cdef float length = sqrt(v.x ** 2 + v.y ** 2 + v.z ** 2)
     if length != 0:

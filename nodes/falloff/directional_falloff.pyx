@@ -1,8 +1,9 @@
 import bpy
 from ... data_structures cimport BaseFalloff
 from ... base_types.node import AnimationNode
-from ... math cimport Vector3, toVector3, distancePointToPlane
 from . constant_falloff import ConstantFalloff
+from ... math cimport Vector3, toVector3, normalizeVec3
+from ... math cimport signedDistancePointToPlane_Normalized as signedDistance
 
 class DirectionalFalloffNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_DirectionalFalloffNode"
@@ -31,12 +32,14 @@ cdef class DirectionalFalloff(BaseFalloff):
         assert size > 0
         toVector3(&self.position, position)
         toVector3(&self.direction, direction)
+        normalizeVec3(&self.direction)
         self.size = size
         self.clamped = True
         self.dataType = "Location"
 
     cdef double evaluate(self, void* value, long index):
-        cdef double distance = distancePointToPlane(&self.position, &self.direction, <Vector3*>value)
+        cdef double distance = signedDistance(&self.position, &self.direction, <Vector3*>value)
         cdef double result = 1 - distance / self.size
         if result < 0: return 0
+        if result > 1: return 1
         return result
