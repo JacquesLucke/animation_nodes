@@ -31,8 +31,16 @@ lists.append(dict(LISTNAME = "Vector3DList",
                   TYPE = "Vector3",
                   MEMVIEW = "float",
                   EQUALS = r"\1.x == \2.x and \1.y == \2.y and \1.z == \2.z",
-                  TRY_CONVERSION_CODE = "valueToVector3(value, target)",
+                  TRY_CONVERSION_CODE = "toVector3(target, value)",
                   TO_PYOBJECT_CODE = "return toPyVector(value)"))
+
+lists.append(dict(LISTNAME = "Matrix4x4List",
+                  TYPE = "Matrix4",
+                  MEMVIEW = "float",
+                  EQUALS = " and ".join(r"\1.a{0}{1} == \2.a{0}{1}".format(i+1, j+1)
+                                        for i in range(4) for j in range(4)),
+                  TRY_CONVERSION_CODE = "toMatrix4(target, value)",
+                  TO_PYOBJECT_CODE = "return toPyMatrix(value)"))
 
 
 # Create Declaration File
