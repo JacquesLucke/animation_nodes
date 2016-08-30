@@ -134,10 +134,8 @@ cdef class LISTNAME:
         if self.length != other.length:
             return False
         cdef Py_ssize_t i
-        cdef bint isEqual
         for i in range(self.length):
-            isEqual = EQUALS(self.data[i], other.data[i])
-            if not isEqual: return False
+            if not EQUALS(self.data[i], other.data[i]): return False
         return True
 
 

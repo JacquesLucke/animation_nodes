@@ -64,7 +64,7 @@ if dependenciesChanged(implementationTargetPath, dependencies = [implementationS
 
     parts = []
     for listData in lists:
-        listCode = re.sub("EQUALS\((.*), (.*)\)", listData["EQUALS"], implementation)
+        listCode = re.sub("EQUALS\((.*), (.*)\)", "({})".format(listData["EQUALS"]), implementation)
         parts.append(multiReplace(listCode,
            LISTNAME = listData["LISTNAME"],
            TYPE = listData["TYPE"],
