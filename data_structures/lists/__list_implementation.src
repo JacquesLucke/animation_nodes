@@ -377,11 +377,8 @@ cdef class LISTNAME:
     # Low level utilities
     ###############################################
 
-    TRY_CONVERSION_CODE
-
-    #cdef tryConversion(self, value, TYPE* target):
-    #    if TRY_CONVERT_TO_C(value, &_value) != 0:
-    #        raise TypeError("Value cannot be element of LISTNAME")
+    cdef tryConversion(self, value, TYPE* target):
+        TRY_CONVERSION_CODE
 
     cdef tryCorrectIndex(self, Py_ssize_t index):
         if index < 0:

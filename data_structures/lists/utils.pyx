@@ -2,15 +2,15 @@ from libc.stdlib cimport malloc
 from libc.math cimport ceil, floor
 from libc.string cimport memmove, memcpy
 
-cpdef long predictSliceLength(long start, long stop, long step):
+cpdef Py_ssize_t predictSliceLength(Py_ssize_t start, Py_ssize_t stop, Py_ssize_t step):
     assert step != 0
-    cdef long diff = abs(start - stop)
-    if start < stop and step > 0: return <long>max(1, ceil(diff / <double>step))
-    elif start > stop and step < 0: return <long>max(1, -floor(diff / <double>step))
+    cdef Py_ssize_t diff = abs(start - stop)
+    if start < stop and step > 0: return <Py_ssize_t>max(1, ceil(diff / <double>step))
+    elif start > stop and step < 0: return <Py_ssize_t>max(1, -floor(diff / <double>step))
     else: return 0
 
-cpdef makeStepPositive(long start, long stop, long step):
-    cdef long newStart, newEnd, newStep
+cpdef makeStepPositive(Py_ssize_t start, Py_ssize_t stop, Py_ssize_t step):
+    cdef Py_ssize_t newStart, newEnd, newStep
     if step >= 0:
          newStart, newEnd, newStep = start, stop, step
     elif step < 0:
@@ -25,9 +25,9 @@ cpdef makeStepPositive(long start, long stop, long step):
         newStep = -step
     return newStart, newEnd, newStep
 
-cdef removeValuesInSlice(char* arrayStart, long arrayLength, long elementSize,
-                         long start, long stop, long step):
-    cdef long removeAmount, i
+cdef removeValuesInSlice(char* arrayStart, Py_ssize_t arrayLength, Py_ssize_t elementSize,
+                         Py_ssize_t start, Py_ssize_t stop, Py_ssize_t step):
+    cdef Py_ssize_t removeAmount, i
 
     if step < 0: start, stop, step = makeStepPositive(start, stop, step)
     removeAmount = predictSliceLength(start, stop, step)

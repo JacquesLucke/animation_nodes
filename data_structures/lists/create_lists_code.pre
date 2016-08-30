@@ -4,25 +4,40 @@ declarationSourcePath = changeFileName(__file__, "__list_declaration.src")
 implementationTargetPath = changeFileName(__file__, "lists_test.pyx")
 implementationSourcePath = changeFileName(__file__, "__list_implementation.src")
 
+numericLists = [
+    ("FloatList", "float"),
+    ("DoubleList", "double"),
+    ("CharList", "char"),          ("UCharList", "unsigned char"),
+    ("LongList", "long"),          ("ULongList", "unsigned long"),
+    ("IntegerList", "int"),        ("UIntegerList", "unsigned int"),
+    ("ShortList", "short"),        ("UShortList", "unsigned short"),
+    ("LongLongList", "long long"), ("ULongLongList", "unsigned long long")
+]
 
-tryConversionCode = '''
-    cdef tryConversion(self, value, int* target):
-        target[0] = value
-'''
+lists = []
+
+for listName, dataType in numericLists:
+    lists.append(dict(LISTNAME = listName,
+                      TYPE = dataType,
+                      MEMVIEW = dataType,
+                      EQUALS = "value1 == value2",
+                      TRY_CONVERSION_CODE = "target[0] = value"))
 
 
 # Create Declaration File
 #####################################################
 
-if dependenciesChanged(declarationTargetPath, dependencies = [declarationSourcePath]):
+if dependenciesChanged(declarationTargetPath, dependencies = [declarationSourcePath, __file__]):
     declaration = readFile(declarationSourcePath)
 
     parts = []
     parts.append("ctypedef fused list_or_tuple:\n    list\n    tuple")
-    parts.append(multiReplace(declaration,
-                        LISTNAME = "IntegerList",
-                        TYPE = "int",
-                        MEMVIEW = "int"))
+
+    for listData in lists:
+        parts.append(multiReplace(declaration,
+            LISTNAME = listData["LISTNAME"],
+            TYPE = listData["TYPE"],
+            MEMVIEW = listData["MEMVIEW"]))
 
     writeFile(declarationTargetPath, "\n\n".join(parts))
 
@@ -30,14 +45,15 @@ if dependenciesChanged(declarationTargetPath, dependencies = [declarationSourceP
 # Create Implementation File
 #####################################################
 
-if dependenciesChanged(implementationTargetPath, dependencies = [implementationSourcePath]):
+if dependenciesChanged(implementationTargetPath, dependencies = [implementationSourcePath, __file__]):
     implementation = readFile(implementationSourcePath)
 
     parts = []
-    parts.append(multiReplace(implementation,
-                       LISTNAME = "IntegerList",
-                       TYPE = "int",
-                       MEMVIEW = "int",
-                       TRY_CONVERSION_CODE = tryConversionCode))
+    for listData in lists:
+        parts.append(multiReplace(implementation,
+           LISTNAME = listData["LISTNAME"],
+           TYPE = listData["TYPE"],
+           MEMVIEW = listData["MEMVIEW"],
+           TRY_CONVERSION_CODE = listData["TRY_CONVERSION_CODE"]))
 
     writeFile(implementationTargetPath, "\n\n".join(parts))
