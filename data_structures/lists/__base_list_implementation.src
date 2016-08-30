@@ -2,7 +2,7 @@ cimport cython
 from types import GeneratorType
 from libc.stdlib cimport malloc, free, realloc
 from libc.string cimport memcpy, memmove, memcmp
-from . utils cimport predictSliceLength, makeStepPositive, removeValuesInSlice
+from . utils cimport predictSliceLength, makeStepPositive, removeValuesInSlice, getValuesInSlice
 
 @cython.freelist(10)
 cdef class LISTNAME:
@@ -46,6 +46,12 @@ cdef class LISTNAME:
     cdef void shrinkToLength(self):
         cdef long newCapacity = max(1, self.length)
         self.data = <TYPE*>realloc(self.data, sizeof(TYPE) * newCapacity)
+        self.capacity = newCapacity
+
+    cdef replaceArray(self, TYPE* newData, size_t newLength, size_t newCapacity):
+        free(self.data)
+        self.data = newData
+        self.length = newLength
         self.capacity = newCapacity
 
 
@@ -252,30 +258,15 @@ cdef class LISTNAME:
 
     cdef LISTNAME getValuesInSlice(self, slice sliceObject):
         cdef:
-            long start, stop, step
-            long outLength
-            long newIndex, oldIndex
+            void* newArray
+            size_t newLength
             LISTNAME newList
 
-        start, stop, step = sliceObject.indices(len(self))
-        outLength = predictSliceLength(start, stop, step)
-        newList = LISTNAME(length = outLength)
+        getValuesInSlice(self.data, self.length, sizeof(TYPE),
+                         &newArray, &newLength, sliceObject)
 
-        newIndex = 0
-        oldIndex = start
-        if step == 1:
-            memcpy(newList.data, self.data + start, outLength * sizeof(TYPE))
-        elif step > 1:
-            while oldIndex < stop:
-                newList.data[newIndex] = self.data[oldIndex]
-                oldIndex += step
-                newIndex += 1
-        elif step < 0:
-            while oldIndex > stop:
-                newList.data[newIndex] = self.data[oldIndex]
-                oldIndex += step
-                newIndex += 1
-
+        newList = LISTNAME()
+        newList.replaceArray(<TYPE*>newArray, newLength, newLength)
         return newList
 
     cdef setValuesInSlice(self, slice sliceObject, values):

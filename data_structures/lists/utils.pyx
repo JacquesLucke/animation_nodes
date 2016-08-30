@@ -1,5 +1,6 @@
-from libc.string cimport memmove
+from libc.stdlib cimport malloc
 from libc.math cimport ceil, floor
+from libc.string cimport memmove, memcpy
 
 cpdef long predictSliceLength(long start, long stop, long step):
     assert step != 0
@@ -48,3 +49,42 @@ cdef removeValuesInSlice(char* arrayStart, long arrayLength, long elementSize,
                 arrayLength - (start + (removeAmount - 1) * step + 1) * elementSize)
 
     return removeAmount
+
+
+cdef getValuesInSlice(void* source, size_t elementAmount, int elementSize,
+                      void** target, size_t* targetLength,
+                      sliceObject):
+    cdef:
+        Py_ssize_t start, stop, step
+        Py_ssize_t realStart, realStop, realStep
+        Py_ssize_t outLength
+        Py_ssize_t newIndex, oldIndex
+        char* _source = <char*>source
+        char* result
+
+    start, stop, step = sliceObject.indices(elementAmount)
+    outLength = predictSliceLength(start, stop, step)
+    result = <char*>malloc(outLength * elementSize)
+
+    realStart = start * elementSize
+    realStop = stop * elementSize
+    realStep = step * elementSize
+
+    newIndex = 0
+    oldIndex = realStart
+
+    if step == 1:
+        memcpy(result, _source + realStart, outLength * elementSize)
+    elif step > 1:
+        while oldIndex < realStop:
+            memcpy(result + newIndex, _source + oldIndex, elementSize)
+            oldIndex += realStep
+            newIndex += elementSize
+    elif step < 0:
+        while oldIndex > realStop:
+            memcpy(result + newIndex, _source + oldIndex, elementSize)
+            oldIndex += realStep
+            newIndex += elementSize
+
+    target[0] = result
+    targetLength[0] = outLength
