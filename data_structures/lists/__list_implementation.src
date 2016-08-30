@@ -111,7 +111,7 @@ cdef class LISTNAME:
     def __contains__(self, TYPE value):
         cdef Py_ssize_t i
         for i in range(self.length):
-            if self.data[i] == value:
+            if EQUALS(self.data[i], value):
                 return True
         return False
 
@@ -129,7 +129,7 @@ cdef class LISTNAME:
             return False
         cdef Py_ssize_t i
         for i in range(self.length):
-            if not self.data[i] == other.data[i]: return False
+            if not EQUALS(self.data[i], other.data[i]): return False
         return True
 
 
@@ -207,7 +207,7 @@ cdef class LISTNAME:
     cdef Py_ssize_t searchIndex(self, TYPE value):
         cdef Py_ssize_t i
         for i in range(self.length):
-            if self.data[i] == value:
+            if EQUALS(self.data[i], value):
                 return i
         return -1
 
@@ -217,7 +217,7 @@ cdef class LISTNAME:
         cdef Py_ssize_t i
         cdef Py_ssize_t amount = 0
         for i in range(self.length):
-            if self.data[i] == _value:
+            if EQUALS(self.data[i], _value):
                 amount += 1
         return amount
 
@@ -407,12 +407,12 @@ cdef class LISTNAME:
         if "MEMVIEW" == "None":
             raise NotImplementedError("Cannot create memoryview for this type")
 
-        cdef TYPE[:] memview
+        cdef MEMVIEW[:] memview
         if self.length > 0:
-            memview = <MEMVIEW[:self.length]>self.data
+            memview = <MEMVIEW[:self.length]><MEMVIEW*>self.data
         else:
             # hack to make zero-length memview possible
-            memview = (<MEMVIEW[:1]>self.data)[1:]
+            memview = (<MEMVIEW[:1]><MEMVIEW*>self.data)[1:]
         return memview
 
 

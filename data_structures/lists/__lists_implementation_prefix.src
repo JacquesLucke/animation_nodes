@@ -1,0 +1,10 @@
+from ... math cimport Vector3, toVector3, toPyVector
+
+
+# Vector3DList
+############################################
+
+cdef inline valueToVector3(value, Vector3* target):
+    if len(value) != 3:
+        raise TypeError("element is not a 3D vector")
+    toVector3(target, value)

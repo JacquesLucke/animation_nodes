@@ -1,6 +1,6 @@
 from mathutils import Vector
 from unittest import TestCase
-from . complex_lists import Vector3DList
+from . lists_test import Vector3DList
 
 def valuesToVectorList(*values):
     return Vector3DList.fromValues([v, v, v] for v in values)

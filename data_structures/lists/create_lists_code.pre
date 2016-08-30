@@ -1,8 +1,11 @@
+import re
+
 declarationTargetPath = changeFileName(__file__, "lists_test.pxd")
 declarationSourcePath = changeFileName(__file__, "__list_declaration.src")
 
 implementationTargetPath = changeFileName(__file__, "lists_test.pyx")
 implementationSourcePath = changeFileName(__file__, "__list_implementation.src")
+implementationPrefixPath = changeFileName(__file__, "__lists_implementation_prefix.src")
 
 numericLists = [
     ("FloatList", "float"),
@@ -20,17 +23,25 @@ for listName, dataType in numericLists:
     lists.append(dict(LISTNAME = listName,
                       TYPE = dataType,
                       MEMVIEW = dataType,
-                      EQUALS = "value1 == value2",
+                      EQUALS = r"\1 == \2",
                       TRY_CONVERSION_CODE = "target[0] = value"))
+
+lists.append(dict(LISTNAME = "Vector3DList",
+                  TYPE = "Vector3",
+                  MEMVIEW = "float",
+                  EQUALS = r"\1.x == \2.x and \1.y == \2.y and \1.z == \2.z",
+                  TRY_CONVERSION_CODE = "valueToVector3(value, target)"))
 
 
 # Create Declaration File
 #####################################################
 
-if dependenciesChanged(declarationTargetPath, dependencies = [declarationSourcePath, __file__]):
+if dependenciesChanged(declarationTargetPath, dependencies = [declarationSourcePath, implementationPrefixPath, __file__]):
+    prefix = readFile(implementationPrefixPath)
     declaration = readFile(declarationSourcePath)
 
     parts = []
+    parts.append(prefix)
     parts.append("ctypedef fused list_or_tuple:\n    list\n    tuple")
 
     for listData in lists:
@@ -50,7 +61,8 @@ if dependenciesChanged(implementationTargetPath, dependencies = [implementationS
 
     parts = []
     for listData in lists:
-        parts.append(multiReplace(implementation,
+        listCode = re.sub("EQUALS\((.*), (.*)\)", listData["EQUALS"], implementation)
+        parts.append(multiReplace(listCode,
            LISTNAME = listData["LISTNAME"],
            TYPE = listData["TYPE"],
            MEMVIEW = listData["MEMVIEW"],
