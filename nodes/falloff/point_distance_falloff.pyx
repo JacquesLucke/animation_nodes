@@ -1,7 +1,7 @@
 import bpy
 from ... data_structures cimport BaseFalloff
 from ... base_types.node import AnimationNode
-from ... math cimport Vector3, toVector3, distanceVec3
+from ... math cimport Vector3, setVector3, distanceVec3
 
 class PointDistanceFalloffNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_PointDistanceFalloffNode"
@@ -28,7 +28,7 @@ cdef class PointDistanceFalloff(BaseFalloff):
         self.factor = 1 / (maxDistance - minDistance)
         self.minDistance = minDistance
         self.maxDistance = maxDistance
-        toVector3(&self.origin, vector)
+        setVector3(&self.origin, vector)
         self.dataType = "Location"
         self.clamped = True
 

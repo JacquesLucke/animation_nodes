@@ -1,4 +1,4 @@
-from . conversion cimport toMatrix4
+from . conversion cimport setMatrix4
 from . cimport (transformVec3AsPoint_InPlace, transformVec3AsDirection_InPlace,
                 distanceVec3, mixVec3, multMatrix4, setIdentityMatrix4)
 
@@ -8,7 +8,7 @@ cpdef void transformVector3DList(Vector3DList vectors, matrix, bint ignoreTransl
         Matrix4 _matrix
         Vector3* _vectors
 
-    toMatrix4(&_matrix, matrix)
+    setMatrix4(&_matrix, matrix)
     _vectors = <Vector3*>vectors.base.data
     transformVector3DListAsPoints(_vectors, vectors.getLength(), &_matrix, ignoreTranslation)
 

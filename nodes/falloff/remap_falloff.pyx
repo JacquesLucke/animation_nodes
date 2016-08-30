@@ -1,7 +1,7 @@
 import bpy
 from ... base_types.node import AnimationNode
 from ... data_structures cimport Falloff, CompoundFalloff
-from ... math cimport Vector3, toVector3, distanceVec3
+from ... math cimport Vector3, setVector3, distanceVec3
 
 class RemapFalloffNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_RemapFalloffNode"

@@ -1,6 +1,6 @@
 from mathutils import Vector, Matrix
 from . base_lists cimport FloatList, UIntegerList
-from ... math cimport toVector3, toPyVector, toMatrix4, toPyMatrix, Vector3, Matrix4
+from ... math cimport setVector3, toPyVector, setMatrix4, toPyMatrix, Vector3, Matrix4
 
 
 # Vector3DList
@@ -10,7 +10,7 @@ cdef int elementToArrayOfVector3DList(vector, float* array) except -1:
     '''The array has to be initialized with a length of 3.
     Returns 0 on success.'''
     if len(vector) != 3: return -2
-    toVector3(<Vector3*>array, vector)
+    setVector3(<Vector3*>array, vector)
     return 0
 
 cdef getElementFromVector3DList(Vector3DList myList, long index):
@@ -25,7 +25,7 @@ cdef int elementToArrayOfMatrix4x4List(matrix, float* array) except -1:
     '''The array has to be initialized with a length of 16.
     Returns 0 on success.'''
     if len(matrix.col) != 4 or len(matrix.row) != 4: return -2
-    toMatrix4(<Matrix4*>array, matrix)
+    setMatrix4(<Matrix4*>array, matrix)
     return 0
 
 cdef getElementFromMatrix4x4List(Matrix4x4List myList, long index):

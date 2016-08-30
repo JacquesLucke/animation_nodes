@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... tree_info import keepNodeState
-from ... math cimport Vector3, toVector3
+from ... math cimport Vector3, setVector3
 from ... utils.handlers import validCallback
 from ... base_types.node import AnimationNode
 from ... data_structures cimport FalloffEvaluator, Vector3DList
@@ -85,7 +85,7 @@ class OffsetVectorsNode(bpy.types.Node, AnimationNode):
             self.errorMessage = "Falloff cannot be evaluated for vectors"
             return vectors
 
-        toVector3(&_offset, offset)
+        setVector3(&_offset, offset)
 
         for i in range(vectors.getLength()):
             influence = evaluator.evaluate(_vectors + i, i)

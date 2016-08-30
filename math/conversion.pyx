@@ -1,6 +1,6 @@
 from mathutils import Vector, Matrix
 
-cdef toMatrix4(Matrix4* m, value):
+cdef setMatrix4(Matrix4* m, value):
     if not (len(value.rows) == len(value.rows[0]) == 4):
         raise TypeError("element is not a 4x4 matrix")
     m.a11 = value[0][0]
@@ -29,7 +29,7 @@ cdef toPyMatrix(Matrix4* m):
                    (m.a31, m.a32, m.a33, m.a34),
                    (m.a41, m.a42, m.a43, m.a44)))
 
-cdef toVector3(Vector3* v, value):
+cdef setVector3(Vector3* v, value):
     if len(value) != 3:
         raise TypeError("element is not a 3D vector")
     v.x = value[0]

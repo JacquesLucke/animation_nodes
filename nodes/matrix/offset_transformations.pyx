@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... base_types.node import AnimationNode
 from ... data_structures cimport FalloffEvaluator
-from ... math cimport Matrix4, Vector3, Matrix4x4List, toVector3, setTranslationScaleMatrix4, multMatrix4
+from ... math cimport Matrix4, Vector3, Matrix4x4List, setVector3, setTranslationScaleMatrix4, multMatrix4
 
 class OffsetTransformationsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_OffsetTransformationsNode"
@@ -35,8 +35,8 @@ class OffsetTransformationsNode(bpy.types.Node, AnimationNode):
             self.errorMessage = "Falloff cannot be evaluated for matrices"
             return transformations
 
-        toVector3(&_translation, translation)
-        toVector3(&_scale, scale)
+        setVector3(&_translation, translation)
+        setVector3(&_scale, scale)
         for i in range(len(transformations)):
             influence = evaluator.evaluate(_transformations + i, i)
 
