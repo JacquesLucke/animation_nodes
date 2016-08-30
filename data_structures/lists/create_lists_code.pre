@@ -5,7 +5,6 @@ declarationSourcePath = changeFileName(__file__, "__list_declaration.src")
 
 implementationTargetPath = changeFileName(__file__, "lists_test.pyx")
 implementationSourcePath = changeFileName(__file__, "__list_implementation.src")
-implementationPrefixPath = changeFileName(__file__, "__lists_implementation_prefix.src")
 
 numericLists = [
     ("FloatList", "float"),
@@ -25,14 +24,16 @@ for listName, dataType in numericLists:
                       MEMVIEW = dataType,
                       EQUALS = r"\1 == \2",
                       TRY_CONVERSION_CODE = "target[0] = value",
-                      TO_PYOBJECT_CODE = "return value[0]"))
+                      TO_PYOBJECT_CODE = "return value[0]",
+                      IMPORTS = []))
 
 lists.append(dict(LISTNAME = "Vector3DList",
                   TYPE = "Vector3",
                   MEMVIEW = "float",
                   EQUALS = r"\1.x == \2.x and \1.y == \2.y and \1.z == \2.z",
                   TRY_CONVERSION_CODE = "setVector3(target, value)",
-                  TO_PYOBJECT_CODE = "return toPyVector(value)"))
+                  TO_PYOBJECT_CODE = "return toPyVector(value)",
+                  IMPORTS = ["from ... math cimport Vector3, setVector3, toPyVector"]))
 
 lists.append(dict(LISTNAME = "Matrix4x4List",
                   TYPE = "Matrix4",
@@ -40,18 +41,17 @@ lists.append(dict(LISTNAME = "Matrix4x4List",
                   EQUALS = " and ".join(r"\1.a{0}{1} == \2.a{0}{1}".format(i+1, j+1)
                                         for i in range(4) for j in range(4)),
                   TRY_CONVERSION_CODE = "setMatrix4(target, value)",
-                  TO_PYOBJECT_CODE = "return toPyMatrix(value)"))
+                  TO_PYOBJECT_CODE = "return toPyMatrix(value)",
+                  IMPORTS = ["from ... math cimport Matrix4, setMatrix4, toPyMatrix"]))
 
 
 # Create Declaration File
 #####################################################
 
-if dependenciesChanged(declarationTargetPath, dependencies = [declarationSourcePath, implementationPrefixPath, __file__]):
-    prefix = readFile(implementationPrefixPath)
+if dependenciesChanged(declarationTargetPath, dependencies = [declarationSourcePath, __file__]):
     declaration = readFile(declarationSourcePath)
 
     parts = []
-    parts.append(prefix)
     parts.append("ctypedef fused list_or_tuple:\n    list\n    tuple")
 
     for listData in lists:
@@ -70,6 +70,10 @@ if dependenciesChanged(implementationTargetPath, dependencies = [implementationS
     implementation = readFile(implementationSourcePath)
 
     parts = []
+
+    for listData in lists:
+        parts.extend(listData["IMPORTS"])
+
     for listData in lists:
         listCode = re.sub("EQUALS\((.*), (.*)\)", "({})".format(listData["EQUALS"]), implementation)
         parts.append(multiReplace(listCode,

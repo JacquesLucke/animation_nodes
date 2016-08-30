@@ -1,2 +1,0 @@
-from ... math cimport Vector3, setVector3, toPyVector
-from ... math cimport Matrix4, setMatrix4, toPyMatrix
