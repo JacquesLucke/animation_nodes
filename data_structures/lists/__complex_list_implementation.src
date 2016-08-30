@@ -197,7 +197,7 @@ cdef class LISTNAME:
     cdef LISTNAME getValuesInSlice(self, sliceObject):
         cdef:
             void* newArray
-            size_t newLength
+            Py_ssize_t newLength
             LISTNAME newList
 
         getValuesInSlice(self.base.data, self.getLength(), sizeof(BASETYPE) * AMOUNT,

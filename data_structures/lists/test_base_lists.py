@@ -1,6 +1,7 @@
 from mathutils import Vector
 from unittest import TestCase
-from . base_lists import IntegerList, FloatList
+from . base_lists import FloatList
+from . lists_test import IntegerList
 
 class TestInsertion(TestCase):
     def setUp(self):

@@ -1,0 +1,47 @@
+cdef class LISTNAME:
+    cdef:
+        TYPE* data
+        Py_ssize_t length
+        Py_ssize_t capacity
+
+    cdef grow(self, Py_ssize_t minCapacity)
+    cdef void shrinkToLength(self)
+    cdef replaceArray(self, TYPE* newData, Py_ssize_t newLength, Py_ssize_t newCapacity)
+
+    cpdef copy(self)
+    cpdef clear(self)
+    cpdef fill(self, value)
+
+    cpdef append(self, value)
+    cpdef extend(self, values)
+    cdef extendList(self, list values)
+    cdef extendTuple(self, tuple values)
+    cpdef remove(self, value)
+    cpdef index(self, value)
+    cdef Py_ssize_t searchIndex(self, TYPE value)
+    cpdef count(self, value)
+    cpdef insert(self, Py_ssize_t index, value)
+
+    cpdef getMemoryView(self)
+
+    cdef LISTNAME getValuesInSlice(self, slice sliceObject)
+    cdef setValuesInSlice(self, slice sliceObject, values)
+    cdef removeValuesInSlice(self, slice sliceObject)
+
+    cdef setValuesInSimpleSlice(self, Py_ssize_t start, Py_ssize_t stop, values)
+    cdef setValuesInExtendedSlice(self, Py_ssize_t start, Py_ssize_t stop, Py_ssize_t step, values)
+
+    cdef getValueAtIndex(self, Py_ssize_t index)
+    cdef setValueAtIndex(self, Py_ssize_t index, TYPE value)
+    cdef removeValueAtIndex(self, Py_ssize_t index)
+
+
+
+    cpdef LISTNAME reversed(self)
+    cdef overwrite(self, LISTNAME other, Py_ssize_t index = ?)
+    cdef overwriteArray(self, TYPE* array, Py_ssize_t arrayLength, Py_ssize_t index)
+
+    # Helpers
+    cdef tryConversion(self, value, TYPE* target)
+    cdef equals_SameType(self, LISTNAME other)
+    cdef tryCorrectIndex(self, Py_ssize_t index)

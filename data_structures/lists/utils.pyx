@@ -51,8 +51,8 @@ cdef removeValuesInSlice(char* arrayStart, long arrayLength, long elementSize,
     return removeAmount
 
 
-cdef getValuesInSlice(void* source, size_t elementAmount, int elementSize,
-                      void** target, size_t* targetLength,
+cdef getValuesInSlice(void* source, Py_ssize_t elementAmount, int elementSize,
+                      void** target, Py_ssize_t* targetLength,
                       sliceObject):
     cdef:
         Py_ssize_t start, stop, step

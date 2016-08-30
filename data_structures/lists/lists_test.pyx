@@ -5,12 +5,12 @@ from libc.string cimport memcpy, memmove, memcmp
 from . utils cimport predictSliceLength, makeStepPositive, removeValuesInSlice, getValuesInSlice
 
 @cython.freelist(10)
-cdef class LISTNAME:
+cdef class IntegerList:
 
     # Initialization and Memory Management
     ###############################################
 
-    def __cinit__(self, long length = 0, long capacity = -1):
+    def __cinit__(self, Py_ssize_t length = 0, Py_ssize_t capacity = -1):
         '''
         Initialize a new object with the given length.
         You can also directly allocate more memory from the beginning
@@ -20,7 +20,7 @@ cdef class LISTNAME:
             raise ValueError("Length has to be >= 0")
         if capacity < length:
             capacity = length
-        self.data = <TYPE*>malloc(sizeof(TYPE) * capacity)
+        self.data = <int*>malloc(sizeof(int) * capacity)
         if self.data == NULL:
             raise MemoryError()
 
@@ -31,12 +31,12 @@ cdef class LISTNAME:
         if self.data != NULL:
             free(self.data)
 
-    cdef grow(self, long minCapacity):
+    cdef grow(self, Py_ssize_t minCapacity):
         if minCapacity < self.capacity:
             return
 
-        cdef long newCapacity = minCapacity * 2 + 1
-        self.data = <TYPE*>realloc(self.data, sizeof(TYPE) * newCapacity)
+        cdef Py_ssize_t newCapacity = minCapacity * 2 + 1
+        self.data = <int*>realloc(self.data, sizeof(int) * newCapacity)
         if self.data == NULL:
             self.length = 0
             self.capacity = 0
@@ -44,11 +44,11 @@ cdef class LISTNAME:
         self.capacity = newCapacity
 
     cdef void shrinkToLength(self):
-        cdef long newCapacity = max(1, self.length)
-        self.data = <TYPE*>realloc(self.data, sizeof(TYPE) * newCapacity)
+        cdef Py_ssize_t newCapacity = max(1, self.length)
+        self.data = <int*>realloc(self.data, sizeof(int) * newCapacity)
         self.capacity = newCapacity
 
-    cdef replaceArray(self, TYPE* newData, Py_ssize_t newLength, Py_ssize_t newCapacity):
+    cdef replaceArray(self, int* newData, Py_ssize_t newLength, Py_ssize_t newCapacity):
         free(self.data)
         self.data = newData
         self.length = newLength
@@ -86,19 +86,19 @@ cdef class LISTNAME:
             raise TypeError("Expected int or slice object")
 
     def __add__(a, b):
-        cdef LISTNAME newList
+        cdef IntegerList newList
         try:
-            newList = LISTNAME(capacity = len(a) + len(b))
+            newList = IntegerList(capacity = len(a) + len(b))
             newList.extend(a)
             newList.extend(b)
         except:
             raise NotImplementedError()
         return newList
 
-    def __mul__(LISTNAME self, long amount):
+    def __mul__(IntegerList self, Py_ssize_t amount):
         return self.repeated(amount = amount)
 
-    def __iadd__(LISTNAME self, other):
+    def __iadd__(IntegerList self, other):
         try:
             self.extend(other)
         except:
@@ -106,10 +106,10 @@ cdef class LISTNAME:
         return self
 
     def __iter__(self):
-        return LISTNAMEIterator(self)
+        return IntegerListIterator(self)
 
-    def __contains__(self, TYPE value):
-        cdef long i
+    def __contains__(self, int value):
+        cdef Py_ssize_t i
         for i in range(self.length):
             if self.data[i] == value:
                 return True
@@ -118,23 +118,26 @@ cdef class LISTNAME:
     def __richcmp__(x, y, int operation):
         if operation == 2: # '=='
             if type(x) == type(y):
-                return (<LISTNAME>x).equals_SameType(y)
+                return (<IntegerList>x).equals_SameType(y)
             if len(x) == len(y):
                 return all(a == b for a, b in zip(x, y))
             return False
         raise NotImplemented()
 
-    cdef equals_SameType(self, LISTNAME other):
+    cdef equals_SameType(self, IntegerList other):
         if self.length != other.length:
             return False
-        return memcmp(self.data, other.data, self.length * sizeof(TYPE)) == 0
+        cdef Py_ssize_t i
+        for i in range(self.length):
+            if not self.data[i] == other.data[i]: return False
+        return True
 
 
     # Base operations for lists - mimic python list
     ###############################################
 
     cpdef copy(self):
-        newList = LISTNAME(self.length)
+        newList = IntegerList(self.length)
         newList.overwrite(self)
         return newList
 
@@ -142,20 +145,22 @@ cdef class LISTNAME:
         self.length = 0
         self.shrinkToLength()
 
-    cpdef fill(self, TYPE value):
-        cdef long i
+    cpdef fill(self, value):
+        cdef Py_ssize_t i
+        cdef int _value
+        self.tryConversion(value, &_value)
         for i in range(self.length):
-            self.data[i] = value
+            self.data[i] = _value
 
-    cpdef append(self, TYPE value):
+    cpdef append(self, value):
         if self.length >= self.capacity:
             self.grow(self.length + 1)
-        self.data[self.length] = value
+        self.tryConversion(value, self.data + self.length)
         self.length += 1
 
     cpdef extend(self, values):
-        cdef long oldLength, newLength, i
-        if isinstance(values, LISTNAME):
+        cdef Py_ssize_t oldLength, newLength, i
+        if isinstance(values, IntegerList):
             self.overwrite(values, self.length)
         elif isinstance(values, list):
             self.extendList(values)
@@ -165,7 +170,7 @@ cdef class LISTNAME:
             newLength = self.length + len(values)
             self.grow(newLength)
             for i, value in enumerate(values, start = self.length):
-                self.data[i] = value
+                self.tryConversion(value, self.data + i)
             self.length = newLength
         else:
             try:
@@ -177,59 +182,65 @@ cdef class LISTNAME:
                 raise TypeError("invalid input")
 
     cdef extendList(self, list values):
-        cdef long newLength, i
+        cdef Py_ssize_t newLength, i
         newLength = self.length + len(values)
         self.grow(newLength)
         for i in range(len(values)):
-            self.data[self.length + i] = values[i]
+            self.tryConversion(values[i], self.data + self.length + i)
         self.length = newLength
 
     cdef extendTuple(self, tuple values):
-        cdef long newLength, i
+        cdef Py_ssize_t newLength, i
         newLength = self.length + len(values)
         self.grow(newLength)
         for i in range(len(values)):
-            self.data[self.length + i] = values[i]
+            self.tryConversion(values[i], self.data + self.length + i)
         self.length = newLength
 
-    cpdef index(self, TYPE value):
-        cdef long index = self.searchIndex(value)
+    cpdef index(self, value):
+        cdef int _value
+        self.tryConversion(value, &_value)
+        cdef Py_ssize_t index = self.searchIndex(_value)
         if index >= 0: return index
         raise ValueError("value not in list")
 
-    cdef long searchIndex(self, TYPE value):
-        cdef long i
+    cdef Py_ssize_t searchIndex(self, int value):
+        cdef Py_ssize_t i
         for i in range(self.length):
             if self.data[i] == value:
                 return i
         return -1
 
-    cpdef long count(self, TYPE value):
-        cdef long i
-        cdef long amount = 0
+    cpdef count(self, value):
+        cdef int _value
+        self.tryConversion(value, &_value)
+        cdef Py_ssize_t i
+        cdef Py_ssize_t amount = 0
         for i in range(self.length):
-            if self.data[i] == value:
+            if self.data[i] == _value:
                 amount += 1
         return amount
 
-    cpdef remove(self, TYPE value):
-        cdef long index = self.searchIndex(value)
+    cpdef remove(self, value):
+        cdef Py_ssize_t index = self.searchIndex(value)
         if index == -1:
             raise ValueError("value not in list")
         else:
             self.removeValueAtIndex(index)
 
-    cpdef insert(self, long index, TYPE value):
+    cpdef insert(self, Py_ssize_t index, value):
+        cdef int _value
         if index >= self.length:
             self.append(value)
         else:
+            self.tryConversion(value, &_value)
             self.grow(self.length + 1)
             if index < 0: index += self.length
             if index < 0: index = 0
             memmove(self.data + index + 1,
                     self.data + index,
-                    sizeof(TYPE) * (self.length - index))
-            self.data[index] = value
+                    sizeof(int) * (self.length - index))
+            self.data[index] = _value
             self.length += 1
 
 
@@ -237,40 +248,40 @@ cdef class LISTNAME:
     # Get/Set/Remove single element
     ################################################
 
-    cdef getValueAtIndex(self, long index):
+    cdef getValueAtIndex(self, Py_ssize_t index):
         index = self.tryCorrectIndex(index)
         return self.data[index]
 
-    cdef setValueAtIndex(self, long index, TYPE value):
+    cdef setValueAtIndex(self, Py_ssize_t index, int value):
         index = self.tryCorrectIndex(index)
         self.data[index] = value
 
-    cdef removeValueAtIndex(self, long index):
+    cdef removeValueAtIndex(self, Py_ssize_t index):
         index = self.tryCorrectIndex(index)
         memmove(self.data + index,
                 self.data + index + 1,
-                (self.length - index) * sizeof(TYPE))
+                (self.length - index) * sizeof(int))
         self.length -= 1
 
 
     # Get/Set/Remove elements in slice
     ################################################
 
-    cdef LISTNAME getValuesInSlice(self, slice sliceObject):
+    cdef IntegerList getValuesInSlice(self, slice sliceObject):
         cdef:
             void* newArray
             Py_ssize_t newLength
-            LISTNAME newList
+            IntegerList newList
 
-        getValuesInSlice(self.data, self.length, sizeof(TYPE),
+        getValuesInSlice(self.data, self.length, sizeof(int),
                          &newArray, &newLength, sliceObject)
 
-        newList = LISTNAME()
-        newList.replaceArray(<TYPE*>newArray, newLength, newLength)
+        newList = IntegerList()
+        newList.replaceArray(<int*>newArray, newLength, newLength)
         return newList
 
     cdef setValuesInSlice(self, slice sliceObject, values):
-        cdef long start, stop, step
+        cdef Py_ssize_t start, stop, step
         start, stop, step = sliceObject.indices(len(self))
 
         if step == 1:
@@ -278,60 +289,63 @@ cdef class LISTNAME:
         else:
             self.setValuesInExtendedSlice(start, stop, step, values)
 
-    cdef setValuesInSimpleSlice(self, long start, long stop, values):
+    cdef setValuesInSimpleSlice(self, Py_ssize_t start, Py_ssize_t stop, values):
         cdef:
-            long replacementLength = len(values)
-            long sliceLength = predictSliceLength(start, stop, 1)
+            Py_ssize_t replacementLength = len(values)
+            Py_ssize_t sliceLength = predictSliceLength(start, stop, 1)
 
         if replacementLength > sliceLength:
             self.grow(self.length + (replacementLength - sliceLength))
         if replacementLength != sliceLength:
             memmove(self.data + start + replacementLength,
                     self.data + stop,
-                    sizeof(TYPE) * (self.length - stop))
+                    sizeof(int) * (self.length - stop))
             self.length += replacementLength - sliceLength
 
-        if isinstance(values, LISTNAME):
+        cdef Py_ssize_t i
+        cdef int _value
+        if isinstance(values, IntegerList):
             self.overwrite(values, start)
         else:
             for i in range(replacementLength):
-                self.data[start + i] = values[i]
+                self.tryConversion(values[i], self.data + start + i)
 
-    cdef setValuesInExtendedSlice(self, long start, long stop, long step, values):
-        cdef long sliceLength = predictSliceLength(start, stop, step)
+    cdef setValuesInExtendedSlice(self, Py_ssize_t start, Py_ssize_t stop, Py_ssize_t step, values):
+        cdef Py_ssize_t sliceLength = predictSliceLength(start, stop, step)
         if sliceLength != len(values):
             raise ValueError("attempt to assign sequence of size {} to extended slice of size {}"
                              .format(len(values), sliceLength))
 
         # TODO: Speedup for specific list types + use while loop
         # range does not efficiently work with a variable step
+        cdef Py_ssize_t i
         for i, value in zip(range(start, stop, step), values):
-            self.data[i] = value
+            self.tryConversion(value, self.data + i)
 
     cdef removeValuesInSlice(self, slice sliceObject):
-        cdef long start, stop, step
+        cdef Py_ssize_t start, stop, step
         start, stop, step = sliceObject.indices(len(self))
-        cdef long removeAmount = removeValuesInSlice(
-                    arrayStart = <char*>self.data,
-                    arrayLength = self.length * sizeof(TYPE),
-                    elementSize = sizeof(TYPE),
-                    start = start, stop = stop, step = step)
+        cdef Py_ssize_t removeAmount = removeValuesInSlice(
+                      arrayStart = <char*>self.data,
+                      arrayLength = self.length * sizeof(int),
+                      elementSize = sizeof(int),
+                      start = start, stop = stop, step = step)
         self.length -= removeAmount
 
 
     # Create new lists based on an existing list
     ###############################################
 
-    cpdef LISTNAME reversed(self):
+    cpdef IntegerList reversed(self):
         cdef:
-            LISTNAME newList = LISTNAME(self.length)
-            long i, offset
+            IntegerList newList = IntegerList(self.length)
+            Py_ssize_t i, offset
         offset = self.length - 1
         for i in range(self.length):
             newList.data[i] = self.data[offset - i]
         return newList
 
-    def repeated(self, *, long length = -1, long amount = -1):
+    def repeated(self, *, Py_ssize_t length = -1, Py_ssize_t amount = -1):
         if length < 0 and amount < 0:
             raise ValueError("Specify the 'length' or 'amount' parameter as keyword")
         elif length > 0 and amount > 0:
@@ -344,105 +358,68 @@ cdef class LISTNAME:
             raise ValueError("Cannot repeat a list with zero elements to something longer")
 
         cdef:
-            LISTNAME newList = LISTNAME(length)
-            long copyAmount = length // self.length
-            long i
+            IntegerList newList = IntegerList(length)
+            Py_ssize_t copyAmount = length // self.length
+            Py_ssize_t i
 
         # Full copy as often as possible
         for i in range(copyAmount):
             memcpy(newList.data + i * self.length,
                    self.data,
-                   sizeof(TYPE) * self.length)
+                   sizeof(int) * self.length)
         # Partial copy at the end
         memcpy(newList.data + self.length * copyAmount,
                self.data,
-               sizeof(TYPE) * (length % self.length))
+               sizeof(int) * (length % self.length))
         return newList
 
 
     # Low level utilities
     ###############################################
 
-    cdef tryCorrectIndex(self, long index):
+    
+    cdef tryConversion(self, value, int* target):
+        target[0] = value
+
+
+    #cdef tryConversion(self, value, int* target):
+    #    if TRY_CONVERT_TO_C(value, &_value) != 0:
+    #        raise TypeError("Value cannot be element of IntegerList")
+
+    cdef tryCorrectIndex(self, Py_ssize_t index):
         if index < 0:
             index += self.length
         if index < 0 or index >= self.length:
             raise IndexError("list index out of range")
         return index
 
-    cdef overwrite(self, LISTNAME other, long index = 0):
+    cdef overwrite(self, IntegerList other, Py_ssize_t index = 0):
         if self.capacity <= index + other.length:
             self.grow(index + other.length)
-        memcpy(self.data + index, other.data, other.length * sizeof(TYPE))
+        memcpy(self.data + index, other.data, other.length * sizeof(int))
         self.length = max(self.length, index + other.length)
 
-    cdef overwriteArray(self, TYPE* array, long arrayLength, long index):
+    cdef overwriteArray(self, int* array, Py_ssize_t arrayLength, Py_ssize_t index):
         if self.capacity <= index + arrayLength:
             self.grow(index + arrayLength)
-        memcpy(self.data + index, array, arrayLength * sizeof(TYPE))
+        memcpy(self.data + index, array, arrayLength * sizeof(int))
         self.length = max(self.length, index + arrayLength)
-
-
-    # High level utilities
-    ###############################################
-
-    def getMinValue(self):
-        if self.length == 0:
-            raise ValueError("Cannot find a min value in a list with zero elements")
-
-        cdef TYPE minValue = self.data[0]
-        for i in range(self.length):
-            if self.data[i] < minValue:
-                minValue = self.data[i]
-        return minValue
-
-    def getMaxValue(self):
-        if self.length == 0:
-            raise ValueError("Cannot find a max value in a list with zero elements")
-
-        cdef TYPE maxValue = self.data[0]
-        for i in range(self.length):
-            if self.data[i] > maxValue:
-                maxValue = self.data[i]
-        return maxValue
-
-    def getSumOfElements(self):
-        cdef TYPE sum = 0
-        for i in range(self.length):
-            sum += self.data[i]
-        return sum
-
-    def getProductOfElements(self):
-        cdef TYPE sum = 1
-        for i in range(self.length):
-            sum *= self.data[i]
-        return sum
-
-    def getAverageOfElements(self):
-        return <double>self.getSumOfElements() / <double>self.length
-
-    def containsValueLowerThan(self, TYPE value):
-        for i in range(self.length):
-            if self.data[i] < value:
-                return True
-        return False
-
-    def containsValueGreaterThan(self, TYPE value):
-        for i in range(self.length):
-            if self.data[i] > value:
-                return True
-        return False
 
 
     # Memory Views
     ###############################################
 
-    cpdef TYPE[:] getMemoryView(self):
+    cpdef getMemoryView(self):
+        if "int" == "None":
+            raise NotImplementedError("Cannot create memoryview for this type")
+
+        cdef int[:] memview
         if self.length > 0:
-            return <TYPE[:self.length]>self.data
+            memview = <int[:self.length]>self.data
         else:
             # hack to make zero-length memview possible
-            return (<TYPE[:1]>self.data)[1:]
+            memview = (<int[:1]>self.data)[1:]
+        return memview
 
 
     # Classmethods for List Creation
@@ -450,13 +427,13 @@ cdef class LISTNAME:
 
     @classmethod
     def join(cls, *sourceLists):
-        cdef long newLength = 0
-        cdef long offset = 0
-        cdef LISTNAME source
+        cdef Py_ssize_t newLength = 0
+        cdef Py_ssize_t offset = 0
+        cdef IntegerList source
 
         for source in sourceLists:
             newLength += len(source)
-        newList = LISTNAME(newLength)
+        newList = IntegerList(newLength)
         for source in sourceLists:
             newList.overwrite(source, offset)
             offset += source.length
@@ -468,20 +445,21 @@ cdef class LISTNAME:
         if isinstance(values, (list, tuple)):
             return cls.fromListOrTuple(values)
 
-        from . convert import toLISTNAME
-        try: return toLISTNAME(values)
+        try:
+            from . convert import toIntegerList
+            return toIntegerList(values)
         except TypeError: pass
 
-        cdef LISTNAME newList = LISTNAME()
+        cdef IntegerList newList = IntegerList()
         newList.extend(values)
         return newList
 
     @classmethod
     def fromListOrTuple(cls, list_or_tuple values):
-        newList = LISTNAME(len(values))
-        cdef long i
+        cdef IntegerList newList = IntegerList(len(values))
+        cdef Py_ssize_t i
         for i, value in enumerate(values):
-            newList.data[i] = value
+            newList.tryConversion(value, newList.data + i)
         return newList
 
 
@@ -489,18 +467,17 @@ cdef class LISTNAME:
     ###############################################
 
     def __repr__(self):
-        memView = self.getMemoryView()
-        if len(memView) < 20:
-            return "<LISTNAME {}>".format(list(memView))
+        if self.length < 20:
+            return "<IntegerList [{}]>".format(", ".join(str(self[i]) for i in range(self.length)))
         else:
-            return "<LISTNAME [{}, ...]>".format(", ".join(str(e) for e in memView[:20]))
+            return "<IntegerList [{}, ...]>".format(", ".join(str(self[i]) for i in range(20)))
 
     def status(self):
         return "Length: {}, Capacity: {}, Size: {} bytes".format(
-            self.length, self.capacity, self.capacity * sizeof(TYPE))
+            self.length, self.capacity, self.capacity * sizeof(int))
 
 
-cdef class LISTNAMEIterator:
+cdef class IntegerListIterator:
     '''
     Implements the 'Iterator Protocol' that is used to allow iteration
     over a custom list object (eg with a for loop).
@@ -509,10 +486,10 @@ cdef class LISTNAMEIterator:
     https://docs.python.org/3.5/library/stdtypes.html#iterator-types
     '''
     cdef:
-        LISTNAME source
-        long current
+        IntegerList source
+        Py_ssize_t current
 
-    def __cinit__(self, LISTNAME source):
+    def __cinit__(self, IntegerList source):
         self.source = source
         self.current = 0
 
@@ -522,6 +499,6 @@ cdef class LISTNAMEIterator:
     def __next__(self):
         if self.current >= self.source.length:
             raise StopIteration()
-        cdef TYPE currentValue = self.source.data[self.current]
+        cdef int currentValue = self.source.data[self.current]
         self.current += 1
         return currentValue

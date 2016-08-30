@@ -1,0 +1,43 @@
+declarationTargetPath = changeFileName(__file__, "lists_test.pxd")
+declarationSourcePath = changeFileName(__file__, "__list_declaration.src")
+
+implementationTargetPath = changeFileName(__file__, "lists_test.pyx")
+implementationSourcePath = changeFileName(__file__, "__list_implementation.src")
+
+
+tryConversionCode = '''
+    cdef tryConversion(self, value, int* target):
+        target[0] = value
+'''
+
+
+# Create Declaration File
+#####################################################
+
+if dependenciesChanged(declarationTargetPath, dependencies = [declarationSourcePath]):
+    declaration = readFile(declarationSourcePath)
+
+    parts = []
+    parts.append("ctypedef fused list_or_tuple:\n    list\n    tuple")
+    parts.append(multiReplace(declaration,
+                        LISTNAME = "IntegerList",
+                        TYPE = "int",
+                        MEMVIEW = "int"))
+
+    writeFile(declarationTargetPath, "\n\n".join(parts))
+
+
+# Create Implementation File
+#####################################################
+
+if dependenciesChanged(implementationTargetPath, dependencies = [implementationSourcePath]):
+    implementation = readFile(implementationSourcePath)
+
+    parts = []
+    parts.append(multiReplace(implementation,
+                       LISTNAME = "IntegerList",
+                       TYPE = "int",
+                       MEMVIEW = "int",
+                       TRY_CONVERSION_CODE = tryConversionCode))
+
+    writeFile(implementationTargetPath, "\n\n".join(parts))

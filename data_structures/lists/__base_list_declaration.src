@@ -6,7 +6,7 @@ cdef class LISTNAME:
 
     cdef grow(self, long minCapacity)
     cdef void shrinkToLength(self)
-    cdef replaceArray(self, TYPE* newData, size_t newLength, size_t newCapacity)
+    cdef replaceArray(self, TYPE* newData, Py_ssize_t newLength, Py_ssize_t newCapacity)
 
     cpdef copy(self)
     cpdef clear(self)
