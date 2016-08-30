@@ -62,16 +62,20 @@ cdef class LISTNAME:
         return self.length
 
     def __getitem__(self, key):
+        cdef TYPE element
         if isinstance(key, int):
-            return self.getValueAtIndex(key)
+            element = self.getValueAtIndex(key)
+            return self.toPyObject(&element)
         elif isinstance(key, slice):
             return self.getValuesInSlice(key)
         else:
             raise TypeError("Expected int or slice object")
 
     def __setitem__(self, key, value):
+        cdef TYPE _value
         if isinstance(key, int):
-            self.setValueAtIndex(key, value)
+            self.tryConversion(value, &_value)
+            self.setValueAtIndex(key, _value)
         elif isinstance(key, slice):
             self.setValuesInSlice(key, value)
         else:
@@ -108,10 +112,12 @@ cdef class LISTNAME:
     def __iter__(self):
         return LISTNAMEIterator(self)
 
-    def __contains__(self, TYPE value):
+    def __contains__(self, value):
+        cdef TYPE _value
+        self.tryConversion(value, &_value)
         cdef Py_ssize_t i
         for i in range(self.length):
-            if EQUALS(self.data[i], value):
+            if EQUALS(self.data[i], _value):
                 return True
         return False
 
@@ -128,8 +134,10 @@ cdef class LISTNAME:
         if self.length != other.length:
             return False
         cdef Py_ssize_t i
+        cdef bint isEqual
         for i in range(self.length):
-            if not EQUALS(self.data[i], other.data[i]): return False
+            isEqual = EQUALS(self.data[i], other.data[i])
+            if not isEqual: return False
         return True
 
 
@@ -222,7 +230,9 @@ cdef class LISTNAME:
         return amount
 
     cpdef remove(self, value):
-        cdef Py_ssize_t index = self.searchIndex(value)
+        cdef TYPE _value
+        self.tryConversion(value, &_value)
+        cdef Py_ssize_t index = self.searchIndex(_value)
         if index == -1:
             raise ValueError("value not in list")
         else:
@@ -380,6 +390,9 @@ cdef class LISTNAME:
     cdef tryConversion(self, value, TYPE* target):
         TRY_CONVERSION_CODE
 
+    cdef toPyObject(self, TYPE* value):
+        TO_PYOBJECT_CODE
+
     cdef tryCorrectIndex(self, Py_ssize_t index):
         if index < 0:
             index += self.length
@@ -442,7 +455,7 @@ cdef class LISTNAME:
         try:
             from . convert import toLISTNAME
             return toLISTNAME(values)
-        except TypeError: pass
+        except (ImportError, TypeError): pass
 
         cdef LISTNAME newList = LISTNAME()
         newList.extend(values)

@@ -41,5 +41,6 @@ cdef class LISTNAME:
 
     # Helpers
     cdef tryConversion(self, value, TYPE* target)
+    cdef toPyObject(self, TYPE* value)
     cdef equals_SameType(self, LISTNAME other)
     cdef tryCorrectIndex(self, Py_ssize_t index)

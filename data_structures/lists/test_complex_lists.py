@@ -404,8 +404,11 @@ class TestSetElementsInSlice(TestCase):
             [(0, 0, 0), (1, 1, 1), (2, 2, 2), (3, 3, 3)])
 
     def testWrongLength(self):
-        with self.assertRaises(ValueError):
-            self.list[:3] = [(1, 2, 3), (5, 6, 7)]
+        self.list[:3] = [(1, 2, 3), (5, 6, 7)]
+        self.assertEqual(len(self.list), 3)
+        self.assertEqual(self.list[0], Vector((1, 2, 3)))
+        self.assertEqual(self.list[1], Vector((5, 6, 7)))
+        self.assertEqual(self.list[2], Vector((3, 3, 3)))
 
     def testWrongType(self):
         with self.assertRaises(Exception):

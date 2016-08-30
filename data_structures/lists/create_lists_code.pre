@@ -16,6 +16,7 @@ numericLists = [
     ("ShortList", "short"),        ("UShortList", "unsigned short"),
     ("LongLongList", "long long"), ("ULongLongList", "unsigned long long")
 ]
+numericLists = [("IntegerList", "int"), ("FloatList", "float")]
 
 lists = []
 
@@ -24,13 +25,15 @@ for listName, dataType in numericLists:
                       TYPE = dataType,
                       MEMVIEW = dataType,
                       EQUALS = r"\1 == \2",
-                      TRY_CONVERSION_CODE = "target[0] = value"))
+                      TRY_CONVERSION_CODE = "target[0] = value",
+                      TO_PYOBJECT_CODE = "return value[0]"))
 
 lists.append(dict(LISTNAME = "Vector3DList",
                   TYPE = "Vector3",
                   MEMVIEW = "float",
                   EQUALS = r"\1.x == \2.x and \1.y == \2.y and \1.z == \2.z",
-                  TRY_CONVERSION_CODE = "valueToVector3(value, target)"))
+                  TRY_CONVERSION_CODE = "valueToVector3(value, target)",
+                  TO_PYOBJECT_CODE = "return toPyVector(value)"))
 
 
 # Create Declaration File
@@ -66,6 +69,7 @@ if dependenciesChanged(implementationTargetPath, dependencies = [implementationS
            LISTNAME = listData["LISTNAME"],
            TYPE = listData["TYPE"],
            MEMVIEW = listData["MEMVIEW"],
-           TRY_CONVERSION_CODE = listData["TRY_CONVERSION_CODE"]))
+           TRY_CONVERSION_CODE = listData["TRY_CONVERSION_CODE"],
+           TO_PYOBJECT_CODE = listData["TO_PYOBJECT_CODE"]))
 
     writeFile(implementationTargetPath, "\n\n".join(parts))
