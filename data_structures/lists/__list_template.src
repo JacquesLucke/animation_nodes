@@ -109,7 +109,7 @@ cdef class LISTNAME:
         return LISTNAMEIterator(self)
 
     def __contains__(self, TYPE value):
-        cdef long i
+        cdef size_t i
         for i in range(self.length):
             if self.data[i] == value:
                 return True
@@ -127,7 +127,10 @@ cdef class LISTNAME:
     cdef equals_SameType(self, LISTNAME other):
         if self.length != other.length:
             return False
-        return memcmp(self.data, other.data, self.length * sizeof(TYPE)) == 0
+        cdef size_t i
+        for i in range(self.length):
+            if not EQUAL(self.data[i], other.data[i]): return False
+        return True
 
 
     # Base operations for lists - mimic python list
@@ -208,31 +211,33 @@ cdef class LISTNAME:
     cdef long searchIndex(self, TYPE value):
         cdef long i
         for i in range(self.length):
-            if self.data[i] == value:
+            if EQUAL(self.data[i], value):
                 return i
         return -1
 
-    cpdef long count(self, TYPE value):
+    cpdef long count(self, value):
         cdef TYPE _value
         self.tryConversion(value, &_value)
-        cdef long i
+        cdef size_t i
         cdef long amount = 0
         for i in range(self.length):
-            if self.data[i] == _value:
+            if EQUAL(self.data[i], _value):
                 amount += 1
         return amount
 
     cpdef remove(self, TYPE value):
-        cdef long index = self.searchIndex(value)
+        cdef size_t index = self.searchIndex(value)
         if index == -1:
             raise ValueError("value not in list")
         else:
             self.removeValueAtIndex(index)
 
-    cpdef insert(self, long index, TYPE value):
+    cpdef insert(self, size_t index, value):
+        cdef TYPE _value
         if index >= self.length:
             self.append(value)
         else:
+            self.tryConversion(value, &_value)
             self.grow(self.length + 1)
             if index < 0: index += self.length
             if index < 0: index = 0
@@ -247,15 +252,15 @@ cdef class LISTNAME:
     # Get/Set/Remove single element
     ################################################
 
-    cdef getValueAtIndex(self, long index):
+    cdef getValueAtIndex(self, size_t index):
         index = self.tryCorrectIndex(index)
         return self.data[index]
 
-    cdef setValueAtIndex(self, long index, TYPE value):
+    cdef setValueAtIndex(self, size_t index, TYPE value):
         index = self.tryCorrectIndex(index)
         self.data[index] = value
 
-    cdef removeValueAtIndex(self, long index):
+    cdef removeValueAtIndex(self, size_t index):
         index = self.tryCorrectIndex(index)
         memmove(self.data + index,
                 self.data + index + 1,
@@ -301,11 +306,12 @@ cdef class LISTNAME:
                     sizeof(TYPE) * (self.length - stop))
             self.length += replacementLength - sliceLength
 
+        cdef TYPE _value
         if isinstance(values, LISTNAME):
             self.overwrite(values, start)
         else:
             for i in range(replacementLength):
-                self.data[start + i] = values[i]
+                self.tryConversion(values[i], self.data + start + i)
 
     cdef setValuesInExtendedSlice(self, long start, long stop, long step, values):
         cdef long sliceLength = predictSliceLength(start, stop, step)
@@ -316,7 +322,7 @@ cdef class LISTNAME:
         # TODO: Speedup for specific list types + use while loop
         # range does not efficiently work with a variable step
         for i, value in zip(range(start, stop, step), values):
-            self.data[i] = value
+            self.tryConversion(value, self.data + i)
 
     cdef removeValuesInSlice(self, slice sliceObject):
         cdef long start, stop, step
@@ -393,66 +399,17 @@ cdef class LISTNAME:
         self.length = max(self.length, index + arrayLength)
 
 
-    # High level utilities
-    ###############################################
-
-    def getMinValue(self):
-        if self.length == 0:
-            raise ValueError("Cannot find a min value in a list with zero elements")
-
-        cdef TYPE minValue = self.data[0]
-        for i in range(self.length):
-            if self.data[i] < minValue:
-                minValue = self.data[i]
-        return minValue
-
-    def getMaxValue(self):
-        if self.length == 0:
-            raise ValueError("Cannot find a max value in a list with zero elements")
-
-        cdef TYPE maxValue = self.data[0]
-        for i in range(self.length):
-            if self.data[i] > maxValue:
-                maxValue = self.data[i]
-        return maxValue
-
-    def getSumOfElements(self):
-        cdef TYPE sum = 0
-        for i in range(self.length):
-            sum += self.data[i]
-        return sum
-
-    def getProductOfElements(self):
-        cdef TYPE sum = 1
-        for i in range(self.length):
-            sum *= self.data[i]
-        return sum
-
-    def getAverageOfElements(self):
-        return <double>self.getSumOfElements() / <double>self.length
-
-    def containsValueLowerThan(self, TYPE value):
-        for i in range(self.length):
-            if self.data[i] < value:
-                return True
-        return False
-
-    def containsValueGreaterThan(self, TYPE value):
-        for i in range(self.length):
-            if self.data[i] > value:
-                return True
-        return False
-
-
     # Memory Views
     ###############################################
 
-    cpdef TYPE[:] getMemoryView(self):
+    cpdef MEMVIEW_TYPE[:] getMemoryView(self):
+        if MEMVIEW_TYPE is None:
+            raise NotImplementedError("Cannot create memoryview for this type")
         if self.length > 0:
-            return <TYPE[:self.length]>self.data
+            return <MEMVIEW_TYPE[:self.length]>self.data
         else:
             # hack to make zero-length memview possible
-            return (<TYPE[:1]>self.data)[1:]
+            return (<MEMVIEW_TYPE[:1]>self.data)[1:]
 
 
     # Classmethods for List Creation
@@ -478,8 +435,9 @@ cdef class LISTNAME:
         if isinstance(values, (list, tuple)):
             return cls.fromListOrTuple(values)
 
-        from . convert import toLISTNAME
-        try: return toLISTNAME(values)
+        try:
+            from . convert import toLISTNAME
+            return toLISTNAME(values)
         except TypeError: pass
 
         cdef LISTNAME newList = LISTNAME()
@@ -491,7 +449,7 @@ cdef class LISTNAME:
         newList = LISTNAME(len(values))
         cdef long i
         for i, value in enumerate(values):
-            newList.data[i] = value
+            self.tryConversion(value, newList.data + i)
         return newList
 
 
@@ -499,11 +457,10 @@ cdef class LISTNAME:
     ###############################################
 
     def __repr__(self):
-        memView = self.getMemoryView()
-        if len(memView) < 20:
-            return "<LISTNAME {}>".format(list(memView))
+        if self.length < 20:
+            return "<LISTNAME [{}]>".format(", ".join(self[i] for i in range(min(self.length))))
         else:
-            return "<LISTNAME [{}, ...]>".format(", ".join(str(e) for e in memView[:20]))
+            return "<LISTNAME [{}, ...]>".format(", ".join(self[i] for i in range(20)))
 
     def status(self):
         return "Length: {}, Capacity: {}, Size: {} bytes".format(
