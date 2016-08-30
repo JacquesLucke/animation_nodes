@@ -16,7 +16,6 @@ numericLists = [
     ("ShortList", "short"),        ("UShortList", "unsigned short"),
     ("LongLongList", "long long"), ("ULongLongList", "unsigned long long")
 ]
-numericLists = [("IntegerList", "int"), ("FloatList", "float")]
 
 lists = []
 
