@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... base_types.node import AnimationNode
-from ... data_structures cimport FalloffEvaluator, createFalloffEvaluator
+from ... data_structures cimport FalloffEvaluator
 from ... math cimport Matrix4, Vector3, Matrix4x4List, toVector3, setTranslationScaleMatrix4, multMatrix4
 
 class OffsetTransformationsNode(bpy.types.Node, AnimationNode):
@@ -23,7 +23,7 @@ class OffsetTransformationsNode(bpy.types.Node, AnimationNode):
 
     def execute(self, Matrix4x4List transformations, falloff, translation, scale):
         cdef:
-            FalloffEvaluator evaluator = createFalloffEvaluator(falloff, "Transformation Matrix")
+            FalloffEvaluator evaluator = FalloffEvaluator.create(falloff, "Transformation Matrix")
             Matrix4* _transformations = <Matrix4*>transformations.base.data
             Vector3 _translation, localTranslation
             Vector3 _scale, localScale

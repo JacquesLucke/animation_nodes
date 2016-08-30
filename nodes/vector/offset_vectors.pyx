@@ -4,7 +4,7 @@ from ... tree_info import keepNodeState
 from ... math cimport Vector3, toVector3
 from ... utils.handlers import validCallback
 from ... base_types.node import AnimationNode
-from ... data_structures cimport createFalloffEvaluator, FalloffEvaluator, Vector3DList
+from ... data_structures cimport FalloffEvaluator, Vector3DList
 
 class OffsetVectorsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_OffsetVectorsNode"
@@ -96,4 +96,4 @@ class OffsetVectorsNode(bpy.types.Node, AnimationNode):
         return vectors
 
     def getFalloffEvaluator(self, falloff):
-        return createFalloffEvaluator(falloff, "Location", self.clampFalloff)
+        return FalloffEvaluator.create(falloff, "Location", self.clampFalloff)

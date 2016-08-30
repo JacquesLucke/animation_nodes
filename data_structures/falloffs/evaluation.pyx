@@ -1,6 +1,7 @@
 from cpython.ref cimport PyObject
 from cpython.mem cimport PyMem_Malloc, PyMem_Free
 
+from . falloff_base cimport Falloff
 from ... math cimport Matrix4, Vector3
 from . falloff_base cimport BaseFalloff, CompoundFalloff
 
@@ -12,10 +13,15 @@ ctypedef double (*EvaluatorFunction)(void* settings, void* value, long index)
 #########################################################
 
 cdef class FalloffEvaluator:
+
+    @staticmethod
+    def create(Falloff falloff, str sourceType, bint clamped = False):
+        return createFalloffEvaluator(falloff, sourceType, clamped)
+
     cdef double evaluate(self, void* value, long index):
         raise NotImplementedError()
 
-cpdef createFalloffEvaluator(Falloff falloff, str sourceType, bint clamped = False):
+cdef createFalloffEvaluator(Falloff falloff, str sourceType, bint clamped = False):
     cdef:
         EvaluatorFunctionEvaluator evaluator
         EvaluatorFunction function
