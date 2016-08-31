@@ -482,6 +482,12 @@ TO_PYOBJECT_CODE
             self.length, self.capacity, self.capacity * sizeof(TYPE))
 
 
+    # Type Specific Methods
+    ###############################################
+
+MORE_METHODS
+
+
 cdef class LISTNAMEIterator:
     '''
     Implements the 'Iterator Protocol' that is used to allow iteration
