@@ -1,9 +1,5 @@
 from libc.math cimport sin, cos
 
-ctypedef fused Matrix3_or_Matrix4:
-    Matrix3
-    Matrix4
-
 cdef void transformVec3AsPoint_InPlace(Vector3* v, Matrix4* m):
     cdef float newX, newY, newZ
     newX = v.x * m.a11 + v.y * m.a12 + v.z * m.a13 + m.a14
@@ -28,14 +24,17 @@ cdef void transformVec3AsDirection(Vector3* target, Vector3* v, Matrix4* m):
     target.y = v.x * m.a21 + v.y * m.a22 + v.z * m.a23
     target.z = v.x * m.a31 + v.y * m.a32 + v.z * m.a33
 
-cdef void setIdentityMatrix4(Matrix4* m):
-    m.a12 = m.a13 = m.a14 = 0
-    m.a21 = m.a23 = m.a24 = 0
-    m.a31 = m.a32 = m.a34 = 0
-    m.a41 = m.a42 = m.a43 = 0
-    m.a11 = m.a22 = m.a33 = m.a44 = 1
+cdef void setIdentityMatrix(Matrix3_or_Matrix4* m):
+    m.a12 = m.a13 = 0
+    m.a21 = m.a23 = 0
+    m.a31 = m.a32 = 0
+    m.a11 = m.a22 = m.a33 = 1
+    if Matrix3_or_Matrix4 is Matrix4:
+        m.a14 = m.a24 = m.a34 = 0
+        m.a41 = m.a42 = m.a43 = 0
+        m.a44 = 1
 
-cdef void setTranslationMatrix4(Matrix4* m, Vector3* v):
+cdef void setTranslationMatrix(Matrix4* m, Vector3* v):
     m.a14, m.a24, m.a34 = v.x, v.y, v.z
     m.a11 = m.a22 = m.a33 = m.a44 = 1
     m.a12 = m.a13 = 0
@@ -43,7 +42,7 @@ cdef void setTranslationMatrix4(Matrix4* m, Vector3* v):
     m.a31 = m.a32 = 0
     m.a41 = m.a42 = m.a43 = 0
 
-cdef void setTranslationScaleMatrix4(Matrix4* m, Vector3* t, Vector3* s):
+cdef void setTranslationScaleMatrix(Matrix4* m, Vector3* t, Vector3* s):
     m.a11, m.a22, m.a33 = s.x, s.y, s.z
     m.a14, m.a24, m.a34 = t.x, t.y, t.z
     m.a44 = 1
@@ -52,34 +51,41 @@ cdef void setTranslationScaleMatrix4(Matrix4* m, Vector3* t, Vector3* s):
     m.a31 = m.a32 = 0
     m.a41 = m.a42 = m.a43 = 0
 
-cdef void setRotationMatrix4(Matrix4* m, Euler3* e):
-    cdef Matrix3 rotation
-    setRotationMatrix3(&rotation, e)
-    convertMatrix3ToMatrix4(&rotation, m)
+cdef void setRotationMatrix(Matrix3_or_Matrix4* m, Euler3* e):
+    cdef Matrix3 xMat, yMat, zMat, rotation
+    setRotationXMatrix3(&xMat, e.x)
+    setRotationYMatrix3(&yMat, e.y)
+    setRotationZMatrix3(&zMat, e.z)
 
-cdef void setTranslationRotationScaleMatrix4(Matrix4* m, Vector3* t, Euler3* e, Vector3* s):
-    m.a41 = m.a42 = m.a43 = 0
-    m.a44 = 1
+    if Matrix3_or_Matrix4 is Matrix3:
+        joinRotationMatricesInOrder(e.order, &xMat, &yMat, &zMat, m)
+    else:
+        joinRotationMatricesInOrder(e.order, &xMat, &yMat, &zMat, &rotation)
+        convertMatrix3ToMatrix4(m, &rotation)
+
+cdef void setTranslationRotationScaleMatrix(Matrix4* m, Vector3* t, Euler3* e, Vector3* s):
+    cdef Matrix3 rotation, scale, rotationScale
+    setScaleMatrix(&scale, s)
+    setRotationMatrix(&rotation, e)
+    multMatrix3(&rotationScale, &rotation, &scale)
+    convertMatrix3ToMatrix4(m, &rotationScale)
     m.a14, m.a24, m.a34 = t.x, t.y, t.z
 
-cdef void setScaleMatrix3(Matrix3_or_Matrix4* m, Vector3* s):
+cdef void setScaleMatrix(Matrix3_or_Matrix4* m, Vector3* s):
     m.a11, m.a22, m.a33 = s.x, s.y, s.z
     m.a12 = m.a13 = 0
     m.a21 = m.a23 = 0
     m.a31 = m.a32 = 0
+    if Matrix3_or_Matrix4 is Matrix4:
+        m.a14 = m.a24 = m.a34 = 0
+        m.a41 = m.a42 = m.a43 = 0
+        m.a44 = 1
 
-cdef void convertMatrix3ToMatrix4(Matrix3* s, Matrix4* t):
+cdef void convertMatrix3ToMatrix4(Matrix4* t, Matrix3* s):
     t.a11, t.a12, t.a13, t.a14 = s.a11, s.a12, s.a13, 0
     t.a21, t.a22, t.a23, t.a24 = s.a21, s.a22, s.a23, 0
     t.a31, t.a32, t.a33, t.a34 = s.a31, s.a32, s.a33, 0
     t.a41, t.a42, t.a43, t.a44 = 0, 0, 0, 1
-
-cdef void setRotationMatrix3(Matrix3* m, Euler3* e):
-    cdef Matrix3 xMat, yMat, zMat
-    setRotationXMatrix3(&xMat, e.x)
-    setRotationYMatrix3(&yMat, e.y)
-    setRotationZMatrix3(&zMat, e.z)
-    joinRotationMatricesInOrder(e.order, &xMat, &yMat, &zMat, m)
 
 cdef void joinRotationMatricesInOrder(char order, Matrix3* x, Matrix3* y, Matrix3* z, Matrix3* target):
     if order == 0:   mult3xMatrix3_Reversed(target, x, y, z)

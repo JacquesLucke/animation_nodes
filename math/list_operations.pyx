@@ -1,6 +1,6 @@
 from . conversion cimport toMatrix4
 from . cimport (transformVec3AsPoint_InPlace, transformVec3AsDirection_InPlace,
-                distanceVec3, mixVec3, multMatrix4, setIdentityMatrix4)
+                distanceVec3, mixVec3, multMatrix4, setIdentityMatrix)
 
 
 cpdef void transformVector3DList(Vector3DList vectors, matrix, bint ignoreTranslation = False):
@@ -37,7 +37,7 @@ cdef void reduceMatrix4x4List(Matrix4* matrices, unsigned long amount, Matrix4* 
         Matrix4 tmp
 
     if amount == 0:
-        setIdentityMatrix4(target)
+        setIdentityMatrix(target)
     elif amount == 1:
         target[0] = matrices[0]
     else:

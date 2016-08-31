@@ -3,7 +3,7 @@ from bpy.props import *
 from ... base_types.node import AnimationNode
 from ... data_structures cimport FalloffEvaluator
 from ... math cimport (Matrix4, Vector3, Euler3, Matrix4x4List, toVector3, toEuler3,
-                       setTranslationScaleMatrix4, multMatrix4, setRotationMatrix4, toPyMatrix4)
+                       multMatrix4, toPyMatrix4, setTranslationRotationScaleMatrix)
 
 class OffsetTransformationsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_OffsetTransformationsNode"
@@ -57,8 +57,7 @@ class OffsetTransformationsNode(bpy.types.Node, AnimationNode):
             localScale.y = _scale.y * influence + (1 - influence)
             localScale.z = _scale.z * influence + (1 - influence)
 
-            #setTranslationScaleMatrix4(&matrix, &localTranslation, &localScale)
-            setRotationMatrix4(&matrix, &localRotation)
+            setTranslationRotationScaleMatrix(&matrix, &localTranslation, &localRotation, &localScale)
             multMatrix4(&result, _transformations + i, &matrix)
             _transformations[i] = result
 
