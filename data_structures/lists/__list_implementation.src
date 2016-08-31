@@ -512,4 +512,4 @@ cdef class LISTNAMEIterator:
             raise StopIteration()
         cdef TYPE currentValue = self.source.data[self.current]
         self.current += 1
-        return currentValue
+        return self.source.toPyObject(&currentValue)
