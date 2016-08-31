@@ -68,6 +68,11 @@ if dependenciesChanged(declarationTargetPath, dependencies = [declarationSourceP
     parts = []
     parts.append("ctypedef fused list_or_tuple:\n    list\n    tuple")
 
+    fusedTypeCode = "ctypedef fused NumericList:\n"
+    for listName, _ in numericLists:
+        fusedTypeCode += "    " + listName + "\n"
+    parts.append(fusedTypeCode)
+
     for listData in lists:
         parts.extend(listData["DECLARATIONS"])
         parts.append(multiReplace(declaration,
