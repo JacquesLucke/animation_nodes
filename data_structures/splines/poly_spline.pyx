@@ -30,10 +30,9 @@ cdef class PolySpline(Spline):
 
     cpdef double getLength(self, int resolution = 0):
         cdef double length = distanceSumOfVector3DList(self.points)
-        cdef Vector3* _points
-        if self.cyclic and self.points.getLength() >= 2:
-            _points = <Vector3*>self.points.base.data
-            length += distanceVec3(_points + 0, _points + self.points.getLength() - 1)
+        if self.cyclic and self.points.length >= 2:
+            length += distanceVec3(self.points.data + 0,
+                                   self.points.data + self.points.length - 1)
         return length
 
     @cython.cdivision(True)
@@ -43,9 +42,9 @@ cdef class PolySpline(Spline):
             float smallestDistance = 1e9
             float lineParameter, lineDistance
             int segmentAmount = self.getSegmentAmount()
-            int i, pointAmount = self.points.getLength()
+            int i, pointAmount = self.points.length
             Vector3 lineDirection, projectionOnLine
-            Vector3* _points = <Vector3*>self.points.base.data
+            Vector3* _points = self.points.data
             int endIndex
 
         for i in range(segmentAmount):
@@ -68,7 +67,7 @@ cdef class PolySpline(Spline):
         return closestParameter
 
     cdef inline int getSegmentAmount(self):
-        return self.points.getLength() - 1 + self.cyclic
+        return self.points.length - 1 + self.cyclic
 
     cdef PolySpline getTrimmedCopy_LowLevel(self, float start, float end):
         cdef:
@@ -76,19 +75,19 @@ cdef class PolySpline(Spline):
             long endIndices[2]
             float startT, endT
 
-        findListSegment_LowLevel(self.points.getLength(), self.cyclic, start, startIndices, &startT)
-        findListSegment_LowLevel(self.points.getLength(), self.cyclic, end, endIndices, &endT)
+        findListSegment_LowLevel(self.points.length, self.cyclic, start, startIndices, &startT)
+        findListSegment_LowLevel(self.points.length, self.cyclic, end, endIndices, &endT)
 
         cdef long newPointAmount
         if endIndices[1] > 0:
             newPointAmount = endIndices[1] - startIndices[0] + 1
         elif endIndices[1] == 0: # <- cyclic extension required
-            newPointAmount = self.points.getLength() - startIndices[0] + 1
+            newPointAmount = self.points.length - startIndices[0] + 1
 
         cdef:
             Vector3DList newPoints = Vector3DList(length = newPointAmount)
-            Vector3* _newPoints = <Vector3*>newPoints.base.data
-            Vector3* _oldPoints = <Vector3*>self.points.base.data
+            Vector3* _newPoints = newPoints.data
+            Vector3* _oldPoints = self.points.data
 
         mixVec3(_newPoints, _oldPoints + startIndices[0], _oldPoints + startIndices[1], startT)
         mixVec3(_newPoints + newPointAmount - 1, _oldPoints + endIndices[0], _oldPoints + endIndices[1], endT)
@@ -96,22 +95,22 @@ cdef class PolySpline(Spline):
         return PolySpline(newPoints)
 
     cpdef bint isEvaluable(self):
-        return self.points.getLength() >= 2
+        return self.points.length >= 2
 
     cdef void evaluate_LowLevel(self, float parameter, Vector3* result):
         cdef:
-            Vector3* _points = <Vector3*>self.points.base.data
+            Vector3* _points = self.points.data
             long indices[2]
             float t
-        findListSegment_LowLevel(self.points.getLength(), self.cyclic, parameter, indices, &t)
+        findListSegment_LowLevel(self.points.length, self.cyclic, parameter, indices, &t)
         mixVec3(result, _points + indices[0], _points + indices[1], t)
 
     cdef void evaluateTangent_LowLevel(self, float parameter, Vector3* result):
         cdef:
-            Vector3* _points = <Vector3*>self.points.base.data
+            Vector3* _points = self.points.data
             long indices[2]
             float t # not really needed here
-        findListSegment_LowLevel(self.points.getLength(), self.cyclic, parameter, indices, &t)
+        findListSegment_LowLevel(self.points.length, self.cyclic, parameter, indices, &t)
         subVec3(result, _points + indices[1], _points + indices[0])
 
     @cython.cdivision(True)
@@ -119,8 +118,8 @@ cdef class PolySpline(Spline):
         cdef:
             long i
             FloatList parameters = FloatList(length = max(0, amount))
-            Vector3* _points = <Vector3*>self.points.base.data
-            long pointAmount = self.points.getLength()
+            Vector3* _points = self.points.data
+            long pointAmount = self.points.length
 
         if amount <= 1 or pointAmount <= 1:
             parameters.fill(0)
