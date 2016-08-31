@@ -24,7 +24,7 @@ class OffsetTransformationsNode(bpy.types.Node, AnimationNode):
     def execute(self, Matrix4x4List transformations, falloff, translation, scale):
         cdef:
             FalloffEvaluator evaluator = FalloffEvaluator.create(falloff, "Transformation Matrix")
-            Matrix4* _transformations = <Matrix4*>transformations.base.data
+            Matrix4* _transformations = transformations.data
             Vector3 _translation, localTranslation
             Vector3 _scale, localScale
             Matrix4 matrix, result

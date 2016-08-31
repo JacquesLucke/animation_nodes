@@ -15,23 +15,21 @@ class SplinesFromEdgesNode(bpy.types.Node, AnimationNode):
         self.newOutput("Spline List", "Splines", "splines")
 
     def execute(self, Vector3DList vertices, EdgeIndicesList edgeIndices):
-        if vertices.getLength() == 0 or edgeIndices.getLength() == 0: return []
+        if vertices.length == 0 or edgeIndices.length == 0: return []
 
-        cdef long highestIndex = edgeIndices.base.getMaxValue()
-        if highestIndex >= vertices.getLength(): return []
+        cdef long highestIndex = edgeIndices.getMaxIndex()
+        if highestIndex >= vertices.length: return []
 
         cdef:
             long i
             list splines = []
             Vector3DList edgeVertices
-            Vector3* _vertices = <Vector3*>vertices.base.data
             Vector3* _edgeVertices
 
-        for i in range(edgeIndices.getLength()):
+        for i in range(edgeIndices.length):
             edgeVertices = Vector3DList.__new__(Vector3DList, length = 2)
-            _edgeVertices = <Vector3*>edgeVertices.base.data
-            _edgeVertices[0] = _vertices[edgeIndices.base.data[2 * i + 0]]
-            _edgeVertices[1] = _vertices[edgeIndices.base.data[2 * i + 1]]
+            edgeVertices.data[0] = vertices.data[edgeIndices.data[i].v1]
+            edgeVertices.data[1] = vertices.data[edgeIndices.data[i].v2]
             splines.append(PolySpline.__new__(PolySpline, edgeVertices))
 
         return splines

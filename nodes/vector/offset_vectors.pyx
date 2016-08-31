@@ -51,8 +51,8 @@ class OffsetVectorsNode(bpy.types.Node, AnimationNode):
     def execute_OffsetList(self, Vector3DList vectors, falloff, Vector3DList offsets):
         cdef:
             FalloffEvaluator evaluator = self.getFalloffEvaluator(falloff)
-            Vector3* _vectors = <Vector3*>vectors.base.data
-            Vector3* _offsets = <Vector3*>offsets.base.data
+            Vector3* _vectors = vectors.data
+            Vector3* _offsets = offsets.data
             double influence
             long i
 
@@ -75,7 +75,7 @@ class OffsetVectorsNode(bpy.types.Node, AnimationNode):
     def execute_SameOffset(self, Vector3DList vectors, falloff, offset):
         cdef:
             FalloffEvaluator evaluator = self.getFalloffEvaluator(falloff)
-            Vector3* _vectors = <Vector3*>vectors.base.data
+            Vector3* _vectors = vectors.data
             Vector3 _offset
             double influence
             long i
@@ -87,7 +87,7 @@ class OffsetVectorsNode(bpy.types.Node, AnimationNode):
 
         setVector3(&_offset, offset)
 
-        for i in range(vectors.getLength()):
+        for i in range(vectors.length):
             influence = evaluator.evaluate(_vectors + i, i)
             _vectors[i].x += _offset.x * influence
             _vectors[i].y += _offset.y * influence

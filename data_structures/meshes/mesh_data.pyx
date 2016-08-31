@@ -44,7 +44,7 @@ cdef class MeshData:
         self.vertices.extend(meshData.vertices)
 
         self.edges.extend(meshData.edges)
-        for i in range(meshData.edges.getLength()):
+        for i in range(meshData.edges.length):
             self.edges.data[edgeOffset + i].v1 += vertexOffset
             self.edges.data[edgeOffset + i].v2 += vertexOffset
 

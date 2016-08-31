@@ -195,7 +195,7 @@ cdef class SmoothLoft:
                 spline.ensureUniformConverter(self.uniformResolution)
 
         for i in range(self.splineSamples):
-            self.createSurfaceSpline(i, <Vector3*>surfaceSplinePoints.base.data)
+            self.createSurfaceSpline(i, surfaceSplinePoints.data)
             surfaceSpline.calculateSmoothHandles(self.smoothness)
             self.sampleSurfaceSpline(surfaceSpline, vertices.data + i * self.surfaceSamples)
 

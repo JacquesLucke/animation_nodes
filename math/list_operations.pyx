@@ -5,7 +5,7 @@ from . cimport (transformVec3AsPoint_InPlace, transformVec3AsDirection_InPlace,
 
 cpdef void transformVector3DList(Vector3DList vectors, matrix, bint ignoreTranslation = False):
     cdef Matrix4 _matrix = toMatrix4(matrix)
-    transformVector3DListAsPoints(vectors.base.data, vectors.length, &_matrix, ignoreTranslation)
+    transformVector3DListAsPoints(vectors.data, vectors.length, &_matrix, ignoreTranslation)
 
 cdef void transformVector3DListAsPoints(Vector3* vectors, long arrayLength, Matrix4* matrix, bint ignoreTranslation):
     cdef long i
@@ -22,7 +22,7 @@ cpdef double distanceSumOfVector3DList(Vector3DList vectors):
         double distance = 0
         long i
 
-    for i in range(vectors.getLength() - 1):
+    for i in range(vectors.length - 1):
         distance += distanceVec3(vectors.data + i, vectors.data + i + 1)
     return distance
 
