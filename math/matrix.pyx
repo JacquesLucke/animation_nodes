@@ -63,12 +63,19 @@ cdef void setRotationMatrix(Matrix3_or_Matrix4* m, Euler3* e):
         joinRotationMatricesInOrder(e.order, &xMat, &yMat, &zMat, &rotation)
         convertMatrix3ToMatrix4(m, &rotation)
 
-cdef void setTranslationRotationScaleMatrix(Matrix4* m, Vector3* t, Euler3* e, Vector3* s):
+cdef void setRotationScaleMatrix(Matrix3_or_Matrix4* m, Euler3* e, Vector3* s):
     cdef Matrix3 rotation, scale, rotationScale
     setScaleMatrix(&scale, s)
     setRotationMatrix(&rotation, e)
-    multMatrix3(&rotationScale, &rotation, &scale)
-    convertMatrix3ToMatrix4(m, &rotationScale)
+
+    if Matrix3_or_Matrix4 is Matrix3:
+        multMatrix3(m, &rotation, &scale)
+    else:
+        multMatrix3(&rotationScale, &rotation, &scale)
+        convertMatrix3ToMatrix4(m, &rotationScale)
+
+cdef void setTranslationRotationScaleMatrix(Matrix4* m, Vector3* t, Euler3* e, Vector3* s):
+    setRotationScaleMatrix(m, e, s)
     m.a14, m.a24, m.a34 = t.x, t.y, t.z
 
 cdef void setScaleMatrix(Matrix3_or_Matrix4* m, Vector3* s):
@@ -86,6 +93,11 @@ cdef void convertMatrix3ToMatrix4(Matrix4* t, Matrix3* s):
     t.a21, t.a22, t.a23, t.a24 = s.a21, s.a22, s.a23, 0
     t.a31, t.a32, t.a33, t.a34 = s.a31, s.a32, s.a33, 0
     t.a41, t.a42, t.a43, t.a44 = 0, 0, 0, 1
+
+cdef void convertMatrix4ToMatrix3(Matrix3* t, Matrix4* s):
+    t.a11, t.a12, t.a13 = s.a11, s.a12, s.a13
+    t.a21, t.a22, t.a23 = s.a21, s.a22, s.a23
+    t.a31, t.a32, t.a33 = s.a31, s.a32, s.a33
 
 cdef void joinRotationMatricesInOrder(char order, Matrix3* x, Matrix3* y, Matrix3* z, Matrix3* target):
     if order == 0:   mult3xMatrix3_Reversed(target, x, y, z)
