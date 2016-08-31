@@ -40,7 +40,8 @@ from os.path import dirname
 addonsDirectory = dirname(dirname(__file__))
 counter = 0
 for name in listdir(addonsDirectory):
-    if "animation" in name.lower() and "nodes" in name.lower():
+    name = name.lower()
+    if "animation" in name and "nodes" in name and not "test" in name:
         counter += 1
 
 if counter > 1:
