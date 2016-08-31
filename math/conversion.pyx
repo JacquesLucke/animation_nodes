@@ -66,18 +66,22 @@ cdef Euler3 toEuler3(value) except *:
     return e
 
 cdef setEuler3(Euler3* e, value):
-    if not isinstance(value, Euler):
-        raise TypeError("value is no mathutils.Euler object")
+    if len(value) != 3:
+        raise TypeError("value is no euler value")
     e.x = value.x
     e.y = value.y
     e.z = value.z
-    cdef str order = value.order
-    if   order == "XYZ": e.order = 0
-    elif order == "XZY": e.order = 1
-    elif order == "YXZ": e.order = 2
-    elif order == "YZX": e.order = 3
-    elif order == "ZXY": e.order = 4
-    elif order == "ZYX": e.order = 5
+    cdef str order
+    if isinstance(value, Euler):
+        order = value.order
+        if   order == "XYZ": e.order = 0
+        elif order == "XZY": e.order = 1
+        elif order == "YXZ": e.order = 2
+        elif order == "YZX": e.order = 3
+        elif order == "ZXY": e.order = 4
+        elif order == "ZYX": e.order = 5
+    else:
+        e.order = 0
 
 cdef toPyEuler3(Euler3* e):
     if e.order == 0: return Euler((e.x, e.y, e.z), "XYZ")

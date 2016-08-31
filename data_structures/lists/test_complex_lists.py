@@ -1,6 +1,6 @@
-from mathutils import Vector
+from mathutils import Vector, Euler
 from unittest import TestCase
-from . base_lists import Vector3DList, EdgeIndicesList
+from . base_lists import Vector3DList, EdgeIndicesList, EulerList
 
 def valuesToVectorList(*values):
     return Vector3DList.fromValues([v, v, v] for v in values)
@@ -551,3 +551,16 @@ class TestEdgeIndicesList(TestCase):
             myList.append((4, 5, 7))
         with self.assertRaises(TypeError):
             myList.append("ab")
+
+class TestEulerList(TestCase):
+    def testAppend(self):
+        myList = EulerList()
+        myList.append(Euler((-1, -2, 0)))
+        myList.append(Euler((1, 2, 3)))
+        myList.append(Euler((4, 5, 6), "ZXY"))
+        myList.append(Euler((7, 8, 9), "YZX"))
+        self.assertEqual(len(myList), 4)
+        self.assertEqual(myList[0], Euler((-1, -2, 0), "XYZ"))
+        self.assertEqual(myList[1], Euler((1, 2, 3), "XYZ"))
+        self.assertEqual(myList[2], Euler((4, 5, 6), "ZXY"))
+        self.assertEqual(myList[3], Euler((7, 8, 9), "YZX"))

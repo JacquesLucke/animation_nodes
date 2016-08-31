@@ -43,6 +43,16 @@ lists.append(dict(LISTNAME = "Vector3DList",
                   DECLARATIONS = ["from ... math.vector cimport Vector3",
                                   "from ... math.conversion cimport setVector3, toPyVector3"]))
 
+lists.append(dict(LISTNAME = "EulerList",
+                  TYPE = "Euler3",
+                  MEMVIEW = "NotExistentType",
+                  EQUALS = r"\1.x == \2.x and \1.y == \2.y and \1.z == \2.z and \1.order == \2.order",
+                  TRY_CONVERSION_CODE = "setEuler3(target, value)",
+                  TO_PYOBJECT_CODE = "return toPyEuler3(value)",
+                  MORE_METHODS = "",
+                  DECLARATIONS = ["from ... math.euler cimport Euler3",
+                                  "from ... math.conversion cimport setEuler3, toPyEuler3"]))
+
 lists.append(dict(LISTNAME = "Matrix4x4List",
                   TYPE = "Matrix4",
                   MEMVIEW = "float",
@@ -101,7 +111,7 @@ if dependenciesChanged(implementationTargetPath, dependencies = [implementationS
     implementation = readFile(implementationSourcePath)
 
     parts = []
-    parts.append("cdef struct NotExistantType:\n    char tmp")
+    parts.append("cdef struct NotExistentType:\n    char tmp")
 
     for listData in lists:
         listCode = implementation.replace("MORE_METHODS", indent(listData["MORE_METHODS"], "    "))
