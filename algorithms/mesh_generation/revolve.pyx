@@ -34,19 +34,19 @@ def tubeVertices(Vector3DList centerPoints not None,
                  Vector3DList ringPoints not None,
                  Vector3DList tangents not None, int resolution):
     assert resolution >= 0
-    assert centerPoints.getLength() == ringPoints.getLength() == tangents.getLength()
+    assert len(centerPoints) == len(ringPoints) == len(tangents)
 
     cdef:
-        int i, ringAmount = ringPoints.getLength()
+        int i, ringAmount = len(ringPoints)
         Vector3DList vertices = Vector3DList(length = ringAmount * resolution)
 
     for i in range(ringAmount):
         alignedCircleVertices_LowLevel(
-            center =        <Vector3*>centerPoints.base.data + i,
-            pointOnCircle = <Vector3*>ringPoints.base.data + i,
-            tangent =       <Vector3*>tangents.base.data + i,
+            center =        centerPoints.data + i,
+            pointOnCircle = ringPoints.data + i,
+            tangent =       tangents.data + i,
             resolution =    resolution,
-            output =        <Vector3*>vertices.base.data + i * resolution)
+            output =        vertices.data + i * resolution)
 
     return vertices
 

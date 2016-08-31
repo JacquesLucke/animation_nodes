@@ -45,9 +45,6 @@ cdef class LinearLoft:
 
         cdef:
             Vector3DList vertices, tmp1, tmp2
-            Vector3* _vertices
-            Vector3* _tmp1
-            Vector3* _tmp2
             long totalLineAmount, i, lineIndex
 
         controlLines = endIndices[0] - startIndices[0] + 2
@@ -55,59 +52,58 @@ cdef class LinearLoft:
         totalLineAmount = controlLines + subdivisionLines
 
         vertices = Vector3DList(length = totalLineAmount * samples)
-        _vertices = <Vector3*>vertices.base.data
 
         if startIndices[0] == endIndices[0]: # <- only one segment in the result
-            tmp1 = Vector3DList(length = samples); _tmp1 = <Vector3*>tmp1.base.data
-            tmp2 = Vector3DList(length = samples); _tmp2 = <Vector3*>tmp2.base.data
-            self.writeSplineLine(self.splines[startIndices[0]], _tmp1)
-            self.writeSplineLine(self.splines[startIndices[1]], _tmp2)
+            tmp1 = Vector3DList(length = samples);
+            tmp2 = Vector3DList(length = samples);
+            self.writeSplineLine(self.splines[startIndices[0]], tmp1.data)
+            self.writeSplineLine(self.splines[startIndices[1]], tmp2.data)
 
-            self.writeMixedLine(target = _vertices,
-                    sourceA = _tmp1,
-                    sourceB = _tmp2,
+            self.writeMixedLine(target = vertices.data,
+                    sourceA = tmp1.data,
+                    sourceB = tmp2.data,
                     factor = startT)
-            self.writeMixedLine(target = _vertices + (subdivisions + 1) * samples,
-                    sourceA = _tmp1,
-                    sourceB = _tmp2,
+            self.writeMixedLine(target = vertices.data + (subdivisions + 1) * samples,
+                    sourceA = tmp1.data,
+                    sourceB = tmp2.data,
                     factor = endT)
-            self.writeSubdivisionLines(target = _vertices + samples,
-                    sourceA = _vertices,
-                    sourceB = _vertices + (subdivisions + 1) * samples)
+            self.writeSubdivisionLines(target = vertices.data + samples,
+                    sourceA = vertices.data,
+                    sourceB = vertices.data + (subdivisions + 1) * samples)
         else: # <- multiple segments in the result
             # TODO: speedup when startT or endT is 0 or 1
-            tmp1 = Vector3DList(length = samples); _tmp1 = <Vector3*>tmp1.base.data
-            tmp2 = Vector3DList(length = samples); _tmp2 = <Vector3*>tmp2.base.data
-            self.writeSplineLine(self.splines[startIndices[0]], _tmp1)
-            self.writeSplineLine(self.splines[startIndices[1]], _tmp2)
-            self.writeMixedLine(target = _vertices,
-                    sourceA = _tmp1,
-                    sourceB = _tmp2,
+            tmp1 = Vector3DList(length = samples)
+            tmp2 = Vector3DList(length = samples)
+            self.writeSplineLine(self.splines[startIndices[0]], tmp1.data)
+            self.writeSplineLine(self.splines[startIndices[1]], tmp2.data)
+            self.writeMixedLine(target = vertices.data,
+                    sourceA = tmp1.data,
+                    sourceB = tmp2.data,
                     factor = startT)
-            self.writeSplineLine(self.splines[endIndices[0]], _tmp1)
-            self.writeSplineLine(self.splines[endIndices[1]], _tmp2)
-            self.writeMixedLine(target = _vertices + (totalLineAmount - 1) * samples,
-                    sourceA = _tmp1,
-                    sourceB = _tmp2,
+            self.writeSplineLine(self.splines[endIndices[0]], tmp1.data)
+            self.writeSplineLine(self.splines[endIndices[1]], tmp2.data)
+            self.writeMixedLine(target = vertices.data + (totalLineAmount - 1) * samples,
+                    sourceA = tmp1.data,
+                    sourceB = tmp2.data,
                     factor = endT)
 
             for i in range(endIndices[0] - startIndices[0]):
                 spline = self.splines[i + startIndices[1]]
                 lineIndex = (i + 1) * (subdivisions + 1)
-                self.writeSplineLine(spline, _vertices + lineIndex * samples)
+                self.writeSplineLine(spline, vertices.data + lineIndex * samples)
                 self.writeSubdivisionLines(
-                        target = _vertices + (lineIndex - subdivisions) * samples,
-                        sourceA = _vertices + (lineIndex - subdivisions - 1) * samples,
-                        sourceB = _vertices + lineIndex * samples)
+                        target = vertices.data + (lineIndex - subdivisions) * samples,
+                        sourceA = vertices.data + (lineIndex - subdivisions - 1) * samples,
+                        sourceB = vertices.data + lineIndex * samples)
 
             self.writeSubdivisionLines(
-                    target = _vertices + (totalLineAmount - 1 - subdivisions) * samples,
-                    sourceA = _vertices + (totalLineAmount - 2 - subdivisions) * samples,
-                    sourceB = _vertices + (totalLineAmount - 1) * samples)
+                    target = vertices.data + (totalLineAmount - 1 - subdivisions) * samples,
+                    sourceA = vertices.data + (totalLineAmount - 2 - subdivisions) * samples,
+                    sourceB = vertices.data + (totalLineAmount - 1) * samples)
 
         # remove last line when the first line can be reused
         if self.cyclic and self.start == 0 and self.end == 1:
-            vertices.base.length -= 3 * samples
+            vertices.length -= 1
 
         return vertices
 
@@ -184,7 +180,6 @@ cdef class SmoothLoft:
             int i
             int splineAmount = len(self.splines)
             Vector3DList vertices = Vector3DList(length = self.splineSamples * self.surfaceSamples)
-            Vector3* _vertices = <Vector3*>vertices.base.data
             Vector3DList surfaceSplinePoints = Vector3DList(length = splineAmount)
             BezierSpline surfaceSpline
 
@@ -202,7 +197,7 @@ cdef class SmoothLoft:
         for i in range(self.splineSamples):
             self.createSurfaceSpline(i, <Vector3*>surfaceSplinePoints.base.data)
             surfaceSpline.calculateSmoothHandles(self.smoothness)
-            self.sampleSurfaceSpline(surfaceSpline, _vertices + i * self.surfaceSamples)
+            self.sampleSurfaceSpline(surfaceSpline, vertices.data + i * self.surfaceSamples)
 
         return vertices
 
