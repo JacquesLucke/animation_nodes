@@ -91,8 +91,6 @@ def preprocessor():
         codeBlock = compile(code, path, "exec")
         context = {
             "__file__" : abspath(path),
-            "baseListsParameters" : baseListsParameters,
-            "complexListsParameters" : complexListsParameters,
             "readFile" : readFile,
             "writeFile" : writeFile,
             "multiReplace" : multiReplace,
@@ -177,30 +175,5 @@ def dependenciesChanged(target, dependencies):
     except FileNotFoundError: targetTime = 0
     latestDependencyModification = max(os.stat(path).st_mtime for path in dependencies)
     return targetTime < latestDependencyModification
-
-baseListsParameters = [
-    ("FloatList", "float"),
-    ("DoubleList", "double"),
-    ("CharList", "char"),          ("UCharList", "unsigned char"),
-    ("LongList", "long"),          ("ULongList", "unsigned long"),
-    ("IntegerList", "int"),        ("UIntegerList", "unsigned int"),
-    ("ShortList", "short"),        ("UShortList", "unsigned short"),
-    ("LongLongList", "long long"), ("ULongLongList", "unsigned long long")
-]
-
-complexListsParameters = [
-    dict(BASELISTTYPE = "FloatList",
-         LISTNAME = "Vector3DList",
-         BASETYPE = "float",
-         AMOUNT = "3"),
-    dict(BASELISTTYPE = "FloatList",
-         LISTNAME = "Matrix4x4List",
-         BASETYPE = "float",
-         AMOUNT = "16"),
-    dict(BASELISTTYPE = "UIntegerList",
-         LISTNAME = "EdgeIndicesList",
-         BASETYPE = "unsigned int",
-         AMOUNT = "2")
-]
 
 main()
