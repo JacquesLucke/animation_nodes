@@ -122,8 +122,8 @@ cdef void setRotationYMatrix3(Matrix3* m, float angle):
     m.a22 = 1
     m.a12 = m.a21 = m.a23 = m.a32 = 0
     m.a11 = m.a33 = cosValue
-    m.a13 = -sinValue
-    m.a31 = sinValue
+    m.a13 = sinValue
+    m.a31 = -sinValue
 
 cdef void setRotationZMatrix3(Matrix3* m, float angle):
     cdef float sinValue = sin(angle)

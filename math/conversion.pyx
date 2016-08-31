@@ -56,6 +56,11 @@ cdef toPyMatrix4(Matrix4* m):
                    (m.a31, m.a32, m.a33, m.a34),
                    (m.a41, m.a42, m.a43, m.a44)))
 
+cdef toPyMatrix3(Matrix3* m):
+    return Matrix(((m.a11, m.a12, m.a13),
+                   (m.a21, m.a22, m.a23),
+                   (m.a31, m.a32, m.a33)))
+
 
 # Eulers
 ##########################################################
