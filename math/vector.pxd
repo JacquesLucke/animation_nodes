@@ -1,3 +1,4 @@
+# it is important that the compiler does not add padding here
 cdef struct Vector3:
     float x, y, z
 

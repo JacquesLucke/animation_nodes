@@ -1,6 +1,6 @@
 from mathutils import Vector
 from unittest import TestCase
-from . lists_test import Vector3DList
+from . base_lists2 import Vector3DList, EdgeIndicesList
 
 def valuesToVectorList(*values):
     return Vector3DList.fromValues([v, v, v] for v in values)
@@ -513,3 +513,41 @@ class TestRichComparison(TestCase):
         self.assertTrue(a == b)
         self.assertFalse(a == c)
         self.assertFalse(a == d)
+
+
+class TestEdgeIndicesList(TestCase):
+    def testInitialisation(self):
+        myList = EdgeIndicesList(length = 3)
+        self.assertEqual(len(myList), 3)
+
+    def testAppend(self):
+        myList = EdgeIndicesList()
+        myList.append((3, 4))
+        myList.append((7, 5))
+        self.assertEqual(len(myList), 2)
+        self.assertEqual(myList[0], (3, 4))
+        self.assertEqual(myList[1], (7, 5))
+
+    def testExtend(self):
+        myList = EdgeIndicesList()
+        myList.extend([(1, 2), (2, 3), (4, 5), (6, 7)])
+        self.assertEqual(len(myList), 4)
+        self.assertEqual(myList[0], (1, 2))
+        self.assertEqual(myList[1], (2, 3))
+        self.assertEqual(myList[2], (4, 5))
+        self.assertEqual(myList[3], (6, 7))
+
+    def testFromValues(self):
+        myList = EdgeIndicesList.fromValues([(1, 2), (5, 6)])
+        self.assertEqual(len(myList), 2)
+        self.assertEqual(myList[0], (1, 2))
+        self.assertEqual(myList[1], (5, 6))
+
+    def testWrongTypes(self):
+        myList = EdgeIndicesList()
+        with self.assertRaises(TypeError):
+            myList.append([2])
+        with self.assertRaises(TypeError):
+            myList.append((4, 5, 7))
+        with self.assertRaises(TypeError):
+            myList.append("ab")

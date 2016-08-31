@@ -386,10 +386,10 @@ cdef class LISTNAME:
     ###############################################
 
     cdef tryConversion(self, value, TYPE* target):
-        TRY_CONVERSION_CODE
+TRY_CONVERSION_CODE
 
     cdef toPyObject(self, TYPE* value):
-        TO_PYOBJECT_CODE
+TO_PYOBJECT_CODE
 
     cdef tryCorrectIndex(self, Py_ssize_t index):
         if index < 0:
