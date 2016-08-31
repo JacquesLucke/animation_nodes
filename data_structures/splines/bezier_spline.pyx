@@ -20,7 +20,7 @@ cdef class BezierSpline(Spline):
         if leftHandles is None: leftHandles = Vector3DList()
         if rightHandles is None: rightHandles = Vector3DList()
 
-        if not (points.getLength() == leftHandles.getLength() == points.getLength()):
+        if not (points.length == leftHandles.length == points.length):
             raise ValueError("list lengths have to be equal")
 
         self.points = points
@@ -93,10 +93,10 @@ cdef class BezierSpline(Spline):
         return 0
 
     cdef inline int getSegmentAmount(self):
-        return self.points.getLength() - 1 + self.cyclic
+        return self.points.length - 1 + self.cyclic
 
     cpdef bint isEvaluable(self):
-        return self.points.getLength() >= 2
+        return self.points.length >= 2
 
     cdef void evaluate_LowLevel(self, float parameter, Vector3* result):
         cdef:
@@ -132,19 +132,19 @@ cdef class BezierSpline(Spline):
 
     cdef void getSegmentData(self, float parameter, float* t, Vector3** w):
         cdef long indices[2]
-        findListSegment_LowLevel(self.points.getLength(), self.cyclic, parameter, indices, t)
-        w[0] = (<Vector3*>self.points.base.data) + indices[0]
-        w[1] = (<Vector3*>self.rightHandles.base.data) + indices[0]
-        w[2] = (<Vector3*>self.leftHandles.base.data) + indices[1]
-        w[3] = (<Vector3*>self.points.base.data) + indices[1]
+        findListSegment_LowLevel(self.points.length, self.cyclic, parameter, indices, t)
+        w[0] = (self.points.data) + indices[0]
+        w[1] = (self.rightHandles.data) + indices[0]
+        w[2] = (self.leftHandles.data) + indices[1]
+        w[3] = (self.points.data) + indices[1]
 
     cpdef calculateSmoothHandles(self, float strength = 1/3):
         cdef:
-            Vector3* _points = <Vector3*>self.points.base.data
-            Vector3* _leftHandles = <Vector3*>self.leftHandles.base.data
-            Vector3* _rightHandles = <Vector3*>self.rightHandles.base.data
+            Vector3* _points = self.points.data
+            Vector3* _leftHandles = self.leftHandles.data
+            Vector3* _rightHandles = self.rightHandles.data
             long indexLeft, i, indexRight
-            long pointAmount = self.points.getLength()
+            long pointAmount = self.points.length
 
         if pointAmount < 2: return
 
@@ -180,25 +180,25 @@ cdef class BezierSpline(Spline):
             long endIndices[2]
             float startT, endT
 
-        findListSegment_LowLevel(self.points.getLength(), self.cyclic, start, startIndices, &startT)
-        findListSegment_LowLevel(self.points.getLength(), self.cyclic, end, endIndices, &endT)
+        findListSegment_LowLevel(self.points.length, self.cyclic, start, startIndices, &startT)
+        findListSegment_LowLevel(self.points.length, self.cyclic, end, endIndices, &endT)
 
         cdef long newPointAmount
         if endIndices[1] > 0:
             newPointAmount = endIndices[1] - startIndices[0] + 1
         elif endIndices[1] == 0: # <- cyclic extension required
-            newPointAmount = self.points.getLength() - startIndices[0] + 1
+            newPointAmount = self.points.length - startIndices[0] + 1
 
         cdef:
             Vector3DList newPoints = Vector3DList(length = newPointAmount)
             Vector3DList newLeftHandles = Vector3DList(length = newPointAmount)
             Vector3DList newRightHandles = Vector3DList(length = newPointAmount)
-            Vector3* _newPoints = <Vector3*>newPoints.base.data
-            Vector3* _newLeftHandles = <Vector3*>newLeftHandles.base.data
-            Vector3* _newRightHandles = <Vector3*>newRightHandles.base.data
-            Vector3* _oldPoints = <Vector3*>self.points.base.data
-            Vector3* _oldLeftHandles = <Vector3*>self.leftHandles.base.data
-            Vector3* _oldRightHandles = <Vector3*>self.rightHandles.base.data
+            Vector3* _newPoints = newPoints.data
+            Vector3* _newLeftHandles = newLeftHandles.data
+            Vector3* _newRightHandles = newRightHandles.data
+            Vector3* _oldPoints = self.points.data
+            Vector3* _oldLeftHandles = self.leftHandles.data
+            Vector3* _oldRightHandles = self.rightHandles.data
             Vector3 tmp[4]
 
         if startIndices[0] == endIndices[0]: # <- result will contain only one segment

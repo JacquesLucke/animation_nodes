@@ -1,4 +1,4 @@
-from ... math cimport Vector3
+from ... math.vector cimport Vector3
 from .. lists.base_lists cimport FloatList, Vector3DList
 
 ctypedef void (*SplineEvaluationFunction)(Spline, float, Vector3*)

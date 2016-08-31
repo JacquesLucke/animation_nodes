@@ -1,8 +1,7 @@
 cimport cython
-from mathutils import Vector
 from ... utils.lists cimport findListSegment_LowLevel
-from ... math cimport (distanceSumOfVector3DList, setVector3, toPyVector3,
-                       findNearestLineParameter, distanceSquaredVec3)
+from ... math cimport (distanceSumOfVector3DList, toPyVector3,
+                       findNearestLineParameter, distanceSquaredVec3, toVector3)
 
 cdef class Spline:
 
@@ -22,14 +21,12 @@ cdef class Spline:
         if not self.isEvaluable(): return 0.0
         start = min(max(start, 0), 1)
         end = min(max(end, 0), 1)
-        print(start, end)
         return distanceSumOfVector3DList(self.getSamples(resolution, start, end))
 
     cpdef project(self, point):
         if not self.isEvaluable():
             raise Exception("spline is not evaluable")
-        cdef Vector3 _point
-        setVector3(&_point, point)
+        cdef Vector3 _point = toVector3(point)
         return self.project_LowLevel(&_point)
 
     cpdef projectExtended(self, point):
@@ -37,13 +34,12 @@ cdef class Spline:
             raise Exception("spline is not evaluable")
 
         cdef:
-            Vector3 _point
+            Vector3 _point = toVector3(point)
             float parameter, smallestDistance, distance
             Vector3 nearestProjection, projection
             Vector3 nearestTangent, tangent
             Vector3 startPoint, startTangent
             Vector3 endPoint, endTangent
-        setVector3(&_point, point)
 
         parameter = self.project_LowLevel(&_point)
         self.evaluate_LowLevel(parameter, &nearestProjection)
@@ -229,7 +225,7 @@ cdef class Spline:
             raise Exception("spline is not evaluable")
         cdef Vector3 result
         evaluate(self, parameter, &result)
-        return Vector((result.x, result.y, result.z))
+        return toPyVector3(&result)
 
     cdef void evaluate_LowLevel(self, float parameter, Vector3* result):
         raise NotImplementedError()
