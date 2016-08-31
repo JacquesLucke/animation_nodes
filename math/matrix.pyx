@@ -1,3 +1,9 @@
+from libc.math cimport sin, cos
+
+ctypedef fused Matrix3_or_Matrix4:
+    Matrix3
+    Matrix4
+
 cdef void transformVec3AsPoint_InPlace(Vector3* v, Matrix4* m):
     cdef float newX, newY, newZ
     newX = v.x * m.a11 + v.y * m.a12 + v.z * m.a13 + m.a14
@@ -46,6 +52,70 @@ cdef void setTranslationScaleMatrix4(Matrix4* m, Vector3* t, Vector3* s):
     m.a31 = m.a32 = 0
     m.a41 = m.a42 = m.a43 = 0
 
+cdef void setRotationMatrix4(Matrix4* m, Euler3* e):
+    cdef Matrix3 rotation
+    setRotationMatrix3(&rotation, e)
+    convertMatrix3ToMatrix4(&rotation, m)
+
+cdef void setTranslationRotationScaleMatrix4(Matrix4* m, Vector3* t, Euler3* e, Vector3* s):
+    m.a41 = m.a42 = m.a43 = 0
+    m.a44 = 1
+    m.a14, m.a24, m.a34 = t.x, t.y, t.z
+
+cdef void setScaleMatrix3(Matrix3_or_Matrix4* m, Vector3* s):
+    m.a11, m.a22, m.a33 = s.x, s.y, s.z
+    m.a12 = m.a13 = 0
+    m.a21 = m.a23 = 0
+    m.a31 = m.a32 = 0
+
+cdef void convertMatrix3ToMatrix4(Matrix3* s, Matrix4* t):
+    t.a11, t.a12, t.a13, t.a14 = s.a11, s.a12, s.a13, 0
+    t.a21, t.a22, t.a23, t.a24 = s.a21, s.a22, s.a23, 0
+    t.a31, t.a32, t.a33, t.a34 = s.a31, s.a32, s.a33, 0
+    t.a41, t.a42, t.a43, t.a44 = 0, 0, 0, 1
+
+cdef void setRotationMatrix3(Matrix3* m, Euler3* e):
+    cdef Matrix3 xMat, yMat, zMat
+    setRotationXMatrix3(&xMat, e.x)
+    setRotationYMatrix3(&yMat, e.y)
+    setRotationZMatrix3(&zMat, e.z)
+    joinRotationMatricesInOrder(e.order, &xMat, &yMat, &zMat, m)
+
+cdef void joinRotationMatricesInOrder(char order, Matrix3* x, Matrix3* y, Matrix3* z, Matrix3* target):
+    if order == 0:   mult3xMatrix3_Reversed(target, x, y, z)
+    elif order == 1: mult3xMatrix3_Reversed(target, x, z, y)
+    elif order == 2: mult3xMatrix3_Reversed(target, y, x, z)
+    elif order == 3: mult3xMatrix3_Reversed(target, y, z, x)
+    elif order == 4: mult3xMatrix3_Reversed(target, z, x, y)
+    elif order == 5: mult3xMatrix3_Reversed(target, z, y, x)
+
+cdef void setRotationXMatrix3(Matrix3* m, float angle):
+    cdef float sinValue = sin(angle)
+    cdef float cosValue = cos(angle)
+    m.a11 = 1
+    m.a12 = m.a13 = m.a21 = m.a31 = 0
+    m.a22 = m.a33 = cosValue
+    m.a23 = -sinValue
+    m.a32 = sinValue
+
+cdef void setRotationYMatrix3(Matrix3* m, float angle):
+    cdef float sinValue = sin(angle)
+    cdef float cosValue = cos(angle)
+    m.a22 = 1
+    m.a12 = m.a21 = m.a23 = m.a32 = 0
+    m.a11 = m.a33 = cosValue
+    m.a13 = -sinValue
+    m.a31 = sinValue
+
+cdef void setRotationZMatrix3(Matrix3* m, float angle):
+    cdef float sinValue = sin(angle)
+    cdef float cosValue = cos(angle)
+    m.a33 = 1
+    m.a13 = m.a23 = m.a31 = m.a32 = 0
+    m.a11 = m.a22 = cosValue
+    m.a12 = -sinValue
+    m.a21 = sinValue
+
 cdef void multMatrix4(Matrix4* target, Matrix4* x, Matrix4* y):
     target.a11 = x.a11 * y.a11  +  x.a12 * y.a21  +  x.a13 * y.a31  +  x.a14 * y.a41
     target.a12 = x.a11 * y.a12  +  x.a12 * y.a22  +  x.a13 * y.a32  +  x.a14 * y.a42
@@ -66,3 +136,21 @@ cdef void multMatrix4(Matrix4* target, Matrix4* x, Matrix4* y):
     target.a42 = x.a41 * y.a12  +  x.a42 * y.a22  +  x.a43 * y.a32  +  x.a44 * y.a42
     target.a43 = x.a41 * y.a13  +  x.a42 * y.a23  +  x.a43 * y.a33  +  x.a44 * y.a43
     target.a44 = x.a41 * y.a14  +  x.a42 * y.a24  +  x.a43 * y.a34  +  x.a44 * y.a44
+
+cdef void multMatrix3(Matrix3* target, Matrix3* x, Matrix3* y):
+    target.a11 = x.a11 * y.a11  +  x.a12 * y.a21  +  x.a13 * y.a31
+    target.a12 = x.a11 * y.a12  +  x.a12 * y.a22  +  x.a13 * y.a32
+    target.a13 = x.a11 * y.a13  +  x.a12 * y.a23  +  x.a13 * y.a33
+
+    target.a21 = x.a21 * y.a11  +  x.a22 * y.a21  +  x.a23 * y.a31
+    target.a22 = x.a21 * y.a12  +  x.a22 * y.a22  +  x.a23 * y.a32
+    target.a23 = x.a21 * y.a13  +  x.a22 * y.a23  +  x.a23 * y.a33
+
+    target.a31 = x.a31 * y.a11  +  x.a32 * y.a21  +  x.a33 * y.a31
+    target.a32 = x.a31 * y.a12  +  x.a32 * y.a22  +  x.a33 * y.a32
+    target.a33 = x.a31 * y.a13  +  x.a32 * y.a23  +  x.a33 * y.a33
+
+cdef void mult3xMatrix3_Reversed(Matrix3* target, Matrix3* m1, Matrix3* m2, Matrix3* m3):
+    cdef Matrix3 tmp
+    multMatrix3(&tmp, m3, m2)
+    multMatrix3(target, &tmp, m1)
