@@ -7,6 +7,7 @@ declarationSourcePath = changeFileName(__file__, "__list_declaration.src")
 implementationTargetPath = changeFileName(__file__, "base_lists.pyx")
 implementationSourcePath = changeFileName(__file__, "__list_implementation.src")
 numericListFunctionsPath = changeFileName(__file__, "__numeric_list_functions.src")
+indicesListFunctionsPath = changeFileName(__file__, "__indices_list_functions.src")
 
 numericLists = [
     ("FloatList", "float"),
@@ -60,7 +61,7 @@ lists.append(dict(LISTNAME = "EdgeIndicesList",
                        if len(value) == 2: target.v1, target.v2 = value[0], value[1]
                        else: raise TypeError("length has to be 2")'''),
                   TO_PYOBJECT_CODE = "return (value.v1, value.v2)",
-                  MORE_METHODS = "",
+                  MORE_METHODS = readFile(indicesListFunctionsPath),
                   DECLARATIONS = ["cdef struct EdgeIndices:\n    unsigned int v1, v2"]))
 
 
@@ -96,6 +97,7 @@ if dependenciesChanged(implementationTargetPath, dependencies = [implementationS
     implementation = readFile(implementationSourcePath)
 
     parts = []
+    parts.append("cdef struct NotExistantType:\n    char tmp")
 
     for listData in lists:
         listCode = implementation.replace("MORE_METHODS", indent(listData["MORE_METHODS"], "    "))

@@ -415,7 +415,7 @@ TO_PYOBJECT_CODE
     ###############################################
 
     cpdef getMemoryView(self):
-        if "MEMVIEW" == "None":
+        if "MEMVIEW" == "NotExistantType":
             raise NotImplementedError("Cannot create memoryview for this type")
 
         cdef MEMVIEW[:] memview
