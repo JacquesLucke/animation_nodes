@@ -1,5 +1,27 @@
 from mathutils import Vector, Matrix
 
+# Vectors
+##########################################################
+
+cdef Vector3 toVector3(value) except *:
+    cdef Vector3 v
+    setVector3(&v, value)
+    return v
+
+cdef setVector3(Vector3* v, value):
+    if len(value) != 3:
+        raise TypeError("element is not a 3D vector")
+    v.x = value[0]
+    v.y = value[1]
+    v.z = value[2]
+
+cdef toPyVector3(Vector3* v):
+    return Vector((v.x, v.y, v.z))
+
+
+# Matrices
+##########################################################
+
 cdef Matrix4 toMatrix4(value) except *:
     cdef Matrix4 m
     setMatrix4(&m, value)
@@ -33,19 +55,3 @@ cdef toPyMatrix4(Matrix4* m):
                    (m.a21, m.a22, m.a23, m.a24),
                    (m.a31, m.a32, m.a33, m.a34),
                    (m.a41, m.a42, m.a43, m.a44)))
-
-
-cdef Vector3 toVector3(value) except *:
-    cdef Vector3 v
-    setVector3(&v, value)
-    return v
-
-cdef setVector3(Vector3* v, value):
-    if len(value) != 3:
-        raise TypeError("element is not a 3D vector")
-    v.x = value[0]
-    v.y = value[1]
-    v.z = value[2]
-
-cdef toPyVector3(Vector3* v):
-    return Vector((v.x, v.y, v.z))
