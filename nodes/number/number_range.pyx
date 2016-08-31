@@ -1,11 +1,11 @@
 import bpy
 from bpy.props import *
-from ... data_structures import DoubleList
 from ... sockets.info import toListDataType
 from ... base_types.node import AnimationNode
+from ... data_structures import DoubleList, LongLongList
 
-class FloatRangeListNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_FloatRangeListNode"
+class NumberRangeNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_NumberRangeNode"
     bl_label = "Number Range"
     dynamicLabelType = "ALWAYS"
 
@@ -33,8 +33,22 @@ class FloatRangeListNode(bpy.types.Node, AnimationNode):
         self.newInput(self.dataType, "Step", "step", value = 1)
         self.newOutput(toListDataType(self.dataType), "List", "list")
 
-    def getExecutionCode(self):
-        if self.dataType == "Float":
-            return "list = algorithms.lists.create.createDoubleListRange(max(0, amount), start, step)"
+    def getExecutionFunctionName(self):
         if self.dataType == "Integer":
-            return "list = algorithms.lists.create.createLongLongListRange(max(0, amount), start, step)"
+            return "execute_IntegerRange"
+        elif self.dataType == "Float":
+            return "execute_FloatRange"
+
+    def execute_IntegerRange(self, long amount, long start, long step):
+        cdef LongLongList newList = LongLongList(length = max(amount, 0))
+        cdef long i
+        for i in range(amount):
+            newList.data[i] = start + i * step
+        return newList
+
+    def execute_FloatRange(self, long amount, double start, double step):
+        cdef DoubleList newList = DoubleList(length = max(amount, 0))
+        cdef long i
+        for i in range(amount):
+            newList.data[i] = start + i * step
+        return newList
