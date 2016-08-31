@@ -1,6 +1,7 @@
 import bpy
 from bpy.props import *
 from ... sockets.info import toListDataType
+from ... utils.handlers import validCallback
 from ... base_types.node import AnimationNode
 from ... data_structures cimport DoubleList, LongLongList
 
@@ -13,6 +14,7 @@ class NumberRangeNode(bpy.types.Node, AnimationNode):
     searchTags = [ ("Float Range", {"dataType" : repr("Float")}),
                    ("Integer Range", {"dataType" : repr("Integer")}) ]
 
+    @validCallback
     def dataTypeChanged(self, context):
         self.generateSockets()
 
