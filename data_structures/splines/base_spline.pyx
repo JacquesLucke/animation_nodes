@@ -1,7 +1,9 @@
 cimport cython
 from ... utils.lists cimport findListSegment_LowLevel
-from ... math cimport (distanceSumOfVector3DList, toPyVector3,
-                       findNearestLineParameter, distanceSquaredVec3, toVector3)
+from ... math.vector cimport distanceSquaredVec3
+from ... math.conversion cimport toPyVector3, toVector3
+from ... math.geometry cimport findNearestLineParameter
+from ... math.list_operations cimport distanceSumOfVector3DList
 
 cdef class Spline:
 

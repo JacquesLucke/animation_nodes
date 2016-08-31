@@ -93,7 +93,10 @@ if dependenciesChanged(declarationTargetPath, dependencies = [declarationSourceP
 # Create Implementation File
 #####################################################
 
-if dependenciesChanged(implementationTargetPath, dependencies = [implementationSourcePath, __file__]):
+if dependenciesChanged(implementationTargetPath, dependencies = [implementationSourcePath,
+                                                                 numericListFunctionsPath,
+                                                                 indicesListFunctionsPath,
+                                                                 __file__]):
     implementation = readFile(implementationSourcePath)
 
     parts = []
