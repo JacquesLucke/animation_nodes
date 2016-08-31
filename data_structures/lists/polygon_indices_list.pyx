@@ -142,6 +142,16 @@ cdef class PolygonIndicesList:
         return self.copyWithNewOrder(newOrder, checkIndices = False)
 
 
+    # Helper functions
+    ###############################################
+
+    def getMinIndex(self):
+        return self.indices.getMinValue()
+
+    def getMaxIndex(self):
+        return self.indices.getMaxValue()
+
+
     # Classmethods for List Creation
     ###############################################
 

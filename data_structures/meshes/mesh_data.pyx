@@ -17,10 +17,10 @@ cdef class MeshData:
 
     def isValid(self):
         if len(self.edges) > 0:
-            if self.edges.base.getMaxValue() >= len(self.vertices):
+            if self.edges.getMaxIndex() >= len(self.vertices):
                 return False
         if len(self.polygons) > 0:
-            if self.polygons.indices.getMaxValue() >= len(self.vertices):
+            if self.polygons.getMaxIndex() >= len(self.vertices):
                 return False
         return True
 
@@ -36,8 +36,8 @@ cdef class MeshData:
         return newMeshData
 
     def append(self, MeshData meshData):
-        cdef long vertexOffset = self.vertices.getLength()
-        cdef long edgeOffset = self.edges.getLength()
+        cdef long vertexOffset = self.vertices.length
+        cdef long edgeOffset = self.edges.length
         cdef long polygonIndicesOffset = self.polygons.indices.length
         cdef long i
 
@@ -45,8 +45,8 @@ cdef class MeshData:
 
         self.edges.extend(meshData.edges)
         for i in range(meshData.edges.getLength()):
-            self.edges.base.data[2 * (edgeOffset + i) + 0] += vertexOffset
-            self.edges.base.data[2 * (edgeOffset + i) + 1] += vertexOffset
+            self.edges.data[edgeOffset + i].v1 += vertexOffset
+            self.edges.data[edgeOffset + i].v2 += vertexOffset
 
         self.polygons.extend(meshData.polygons)
         for i in range(meshData.polygons.indices.length):
