@@ -129,9 +129,12 @@ cdef class LinearLoft:
                 factor = (i + 1) / <float>(self.subdivisions + 1))
 
     def calcEdgeIndices(self):
-        raise NotImplementedError()
+        return grid.quadEdges(**self.getGridParameters())
 
     def calcPolygonIndices(self):
+        return grid.quadPolygons(**self.getGridParameters())
+
+    def getGridParameters(self):
         startIndices, _ = findListSegment(len(self.splines), self.cyclic, self.start)
         endIndices, _ = findListSegment(len(self.splines), self.cyclic, self.end)
 
@@ -142,11 +145,10 @@ cdef class LinearLoft:
         if joinHorizontal:
             totalLines -= 1
 
-        return grid.quadPolygons(
-            xDivisions = totalLines,
-            yDivisions = self.splineSamples,
-            joinHorizontal = joinHorizontal,
-            joinVertical = allSplinesCyclic(self.splines))
+        return dict(xDivisions = totalLines,
+                    yDivisions = self.splineSamples,
+                    joinHorizontal = joinHorizontal,
+                    joinVertical = allSplinesCyclic(self.splines))
 
 
 cdef class SmoothLoft:
