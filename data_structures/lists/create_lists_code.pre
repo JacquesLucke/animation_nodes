@@ -8,6 +8,7 @@ implementationTargetPath = changeFileName(__file__, "base_lists.pyx")
 implementationSourcePath = changeFileName(__file__, "__list_implementation.src")
 numericListFunctionsPath = changeFileName(__file__, "__numeric_list_functions.src")
 indicesListFunctionsPath = changeFileName(__file__, "__indices_list_functions.src")
+vectorListFunctionsPath = changeFileName(__file__, "__vector_list_functions.src")
 
 numericLists = [
     ("FloatList", "float"),
@@ -38,7 +39,7 @@ lists.append(dict(LISTNAME = "Vector3DList",
                   EQUALS = r"\1.x == \2.x and \1.y == \2.y and \1.z == \2.z",
                   TRY_CONVERSION_CODE = "setVector3(target, value)",
                   TO_PYOBJECT_CODE = "return toPyVector3(value)",
-                  MORE_METHODS = "",
+                  MORE_METHODS = readFile(vectorListFunctionsPath),
                   DECLARATIONS = ["from ... math.vector cimport Vector3",
                                   "from ... math.conversion cimport setVector3, toPyVector3"]))
 

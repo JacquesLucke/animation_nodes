@@ -39,7 +39,7 @@ def createPolySpline(bSpline):
     pointArray = FloatList(length = 4 * len(bSpline.points))
     bSpline.points.foreach_get("co", pointArray.getMemoryView())
     del pointArray[3::4]
-    splinePoints = Vector3DList.fromBaseList(pointArray)
+    splinePoints = Vector3DList.fromFloatList(pointArray)
 
     spline = PolySpline(splinePoints)
     spline.cyclic = bSpline.use_cyclic_u

@@ -1,0 +1,7 @@
+@classmethod
+def fromFloatList(self, FloatList source):
+    if source.length % 3 != 0:
+        raise ValueError("length of float list has to be divisable by 3")
+    cdef Vector3DList newList = Vector3DList(length = source.length / 3)
+    memcpy(newList.data, source.data, source.length * sizeof(float))
+    return newList
