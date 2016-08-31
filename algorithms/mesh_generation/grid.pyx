@@ -14,13 +14,13 @@ def vertices(float length, float width, int xDivisions, int yDivisions, offset =
 
     vertices = Vector3DList(length = xDivisions * yDivisions)
     xOffset, yOffset, zOffset = offset
-    cdef int tmp
+    cdef int rowOffset
     for x in range(xDivisions):
-        tmp = x * yDivisions
+        rowOffset = x * yDivisions
         for y in range(yDivisions):
-            vertices.base.data[(tmp + y) * 3 + 0] = x * xStep + xOffset
-            vertices.base.data[(tmp + y) * 3 + 1] = y * yStep + yOffset
-            vertices.base.data[(tmp + y) * 3 + 2] = zOffset
+            vertices.data[rowOffset + y].x = x * xStep + xOffset
+            vertices.data[rowOffset + y].y = y * yStep + yOffset
+            vertices.data[rowOffset + y].z = zOffset
     return vertices
 
 
@@ -43,25 +43,24 @@ def innerQuadEdges(long xDivisions, long yDivisions):
     cdef EdgeIndicesList edges = EdgeIndicesList(
             length = 2 * xDivisions * yDivisions - xDivisions - yDivisions)
 
-    cdef long offset = 0
+    cdef long index = 0
     cdef long i, j
     for i in range(xDivisions):
         for j in range(yDivisions - 1):
-            edges.base.data[offset + 0] = i * yDivisions + j
-            edges.base.data[offset + 1] = i * yDivisions + j + 1
-            offset += 2
+            edges.data[index].v1 = i * yDivisions + j
+            edges.data[index].v2 = i * yDivisions + j + 1
+            index += 1
     for i in range(yDivisions):
         for j in range(xDivisions - 1):
-            edges.base.data[offset + 0] = j * yDivisions + i
-            edges.base.data[offset + 1] = j * yDivisions + i + yDivisions
-            offset += 2
+            edges.data[index].v1 = j * yDivisions + i
+            edges.data[index].v2 = j * yDivisions + i + yDivisions
+            index += 1
     return edges
 
 def joinHorizontalEdgesQuadEdges(long xDivisions, long yDivisions):
     cdef EdgeIndicesList edges = EdgeIndicesList()
     cdef long i, offset = (xDivisions - 1) * yDivisions
     for i in range(yDivisions):
-        print(i, i + offset)
         edges.append((i, i + offset))
     return edges
 

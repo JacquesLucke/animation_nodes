@@ -3,7 +3,7 @@ from libc.string cimport memcpy
 from numpy.polynomial import Polynomial
 from ... utils.lists cimport findListSegment_LowLevel
 from ... math cimport (subVec3, normalizeVec3, lengthVec3,
-                       transformVector3DList, toPyVector)
+                       transformVector3DList, toPyVector3)
 
 from mathutils import Vector
 
@@ -59,7 +59,7 @@ cdef class BezierSpline(Spline):
             set possibleParameters = set()
             list coeffs = [0] * 6
 
-        point = toPyVector(_point)
+        point = toPyVector3(_point)
 
         for i in range(segmentAmount):
             leftIndex = i

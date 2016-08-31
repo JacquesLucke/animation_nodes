@@ -33,9 +33,9 @@ lists.append(dict(LISTNAME = "Vector3DList",
                   MEMVIEW = "float",
                   EQUALS = r"\1.x == \2.x and \1.y == \2.y and \1.z == \2.z",
                   TRY_CONVERSION_CODE = "setVector3(target, value)",
-                  TO_PYOBJECT_CODE = "return toPyVector(value)",
+                  TO_PYOBJECT_CODE = "return toPyVector3(value)",
                   DECLARATIONS = ["from ... math.vector cimport Vector3",
-                                  "from ... math.conversion cimport setVector3, toPyVector"]))
+                                  "from ... math.conversion cimport setVector3, toPyVector3"]))
 
 lists.append(dict(LISTNAME = "Matrix4x4List",
                   TYPE = "Matrix4",
@@ -43,9 +43,9 @@ lists.append(dict(LISTNAME = "Matrix4x4List",
                   EQUALS = " and ".join(r"\1.a{0}{1} == \2.a{0}{1}".format(i+1, j+1)
                                         for i in range(4) for j in range(4)),
                   TRY_CONVERSION_CODE = "setMatrix4(target, value)",
-                  TO_PYOBJECT_CODE = "return toPyMatrix(value)",
+                  TO_PYOBJECT_CODE = "return toPyMatrix4(value)",
                   DECLARATIONS = ["from ... math.matrix cimport Matrix4",
-                                  "from ... math.conversion cimport setMatrix4, toPyMatrix"]))
+                                  "from ... math.conversion cimport setMatrix4, toPyMatrix4"]))
 
 lists.append(dict(LISTNAME = "EdgeIndicesList",
                   TYPE = "EdgeIndices",

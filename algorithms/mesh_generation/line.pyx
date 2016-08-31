@@ -1,3 +1,4 @@
+from ... math cimport Vector3, toVector3
 from ... data_structures cimport Vector3DList, EdgeIndicesList
 
 # Vertices
@@ -6,22 +7,19 @@ from ... data_structures cimport Vector3DList, EdgeIndicesList
 def vertices(start, end, long steps):
     assert steps >= 2
     cdef:
-        float _start[3]
-        float _end[3]
+        Vector3 _start = toVector3(start)
+        Vector3 _end = toVector3(end)
         float stepsInverse = 1 / <float>(steps - 1)
         float startWeight, endWeight
         long i
-
-    _start = start
-    _end = end
 
     vertices = Vector3DList(length = steps)
     for i in range(steps):
         startWeight = 1 - i * stepsInverse
         endWeight = i * stepsInverse
-        vertices.base.data[i * 3 + 0] = _start[0] * startWeight + _end[0] * endWeight
-        vertices.base.data[i * 3 + 1] = _start[1] * startWeight + _end[1] * endWeight
-        vertices.base.data[i * 3 + 2] = _start[2] * startWeight + _end[2] * endWeight
+        vertices.data[i].x = _start.x * startWeight + _end.x * endWeight
+        vertices.data[i].y = _start.y * startWeight + _end.y * endWeight
+        vertices.data[i].z = _start.z * startWeight + _end.z * endWeight
     return vertices
 
 
@@ -32,6 +30,6 @@ def edges(long steps):
     edges = EdgeIndicesList(length = steps - 1)
     cdef long i
     for i in range(steps - 1):
-        edges.base.data[i * 2 + 0] = i
-        edges.base.data[i * 2 + 1] = i + 1
+        edges.data[i].v1 = i
+        edges.data[i].v2 = i + 1
     return edges

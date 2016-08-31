@@ -23,11 +23,17 @@ cdef setMatrix4(Matrix4* m, value):
     m.a43 = value[3][2]
     m.a44 = value[3][3]
 
-cdef toPyMatrix(Matrix4* m):
+cdef toPyMatrix4(Matrix4* m):
     return Matrix(((m.a11, m.a12, m.a13, m.a14),
                    (m.a21, m.a22, m.a23, m.a24),
                    (m.a31, m.a32, m.a33, m.a34),
                    (m.a41, m.a42, m.a43, m.a44)))
+
+
+cdef Vector3 toVector3(value) except *:
+    cdef Vector3 v
+    setVector3(&v, value)
+    return v
 
 cdef setVector3(Vector3* v, value):
     if len(value) != 3:
@@ -36,5 +42,5 @@ cdef setVector3(Vector3* v, value):
     v.y = value[1]
     v.z = value[2]
 
-cdef toPyVector(Vector3* v):
+cdef toPyVector3(Vector3* v):
     return Vector((v.x, v.y, v.z))

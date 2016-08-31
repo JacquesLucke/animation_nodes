@@ -1,7 +1,7 @@
 cimport cython
 from mathutils import Vector
 from ... utils.lists cimport findListSegment_LowLevel
-from ... math cimport (distanceSumOfVector3DList, setVector3, toPyVector,
+from ... math cimport (distanceSumOfVector3DList, setVector3, toPyVector3,
                        findNearestLineParameter, distanceSquaredVec3)
 
 cdef class Spline:
@@ -79,7 +79,7 @@ cdef class Spline:
                     nearestProjection = projection
                     nearestTangent = endTangent
 
-        return toPyVector(&nearestProjection), toPyVector(&nearestTangent)
+        return toPyVector3(&nearestProjection), toPyVector3(&nearestTangent)
 
     cdef project_LowLevel(self, Vector3* point):
         raise NotImplementedError()
