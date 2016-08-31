@@ -128,7 +128,7 @@ cdef class LISTNAME:
             if len(x) == len(y):
                 return all(a == b for a, b in zip(x, y))
             return False
-        raise NotImplemented()
+        raise NotImplementedError()
 
     cdef equals_SameType(self, LISTNAME other):
         if self.length != other.length:
