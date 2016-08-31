@@ -2,8 +2,7 @@ from libc.string cimport memcpy
 from . base_spline cimport Spline
 from . poly_spline cimport PolySpline
 from . bezier_spline cimport BezierSpline
-from .. lists.base_lists cimport FloatList
-from .. lists.complex_lists cimport Vector3DList
+from .. lists.base_lists cimport FloatList, Vector3DList
 
 def setSplinesOnBlenderObject(object, list splines):
     if object is None: return
