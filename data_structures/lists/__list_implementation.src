@@ -420,7 +420,7 @@ TO_PYOBJECT_CODE
 
         cdef MEMVIEW[:] memview
         if self.length > 0:
-            memview = <MEMVIEW[:self.length]><MEMVIEW*>self.data
+            memview = <MEMVIEW[:self.length * sizeof(TYPE) / sizeof(MEMVIEW)]><MEMVIEW*>self.data
         else:
             # hack to make zero-length memview possible
             memview = (<MEMVIEW[:1]><MEMVIEW*>self.data)[1:]
