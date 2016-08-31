@@ -43,4 +43,4 @@ def containsValueGreaterThan(self, TYPE value):
     for i in range(self.length):
         if self.data[i] > value:
             return True
-return False
+    return False
