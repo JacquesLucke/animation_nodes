@@ -28,7 +28,7 @@ cdef Matrix4 toMatrix4(value) except *:
     return m
 
 cdef setMatrix4(Matrix4* m, value):
-    if not (len(value.rows) == len(value.rows[0]) == 4):
+    if not (len(value.row) == len(value.col) == 4):
         raise TypeError("element is not a 4x4 matrix")
     m.a11 = value[0][0]
     m.a12 = value[0][1]
