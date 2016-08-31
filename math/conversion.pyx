@@ -1,4 +1,4 @@
-from mathutils import Vector, Matrix
+from mathutils import Vector, Matrix, Euler
 
 # Vectors
 ##########################################################
@@ -55,3 +55,34 @@ cdef toPyMatrix4(Matrix4* m):
                    (m.a21, m.a22, m.a23, m.a24),
                    (m.a31, m.a32, m.a33, m.a34),
                    (m.a41, m.a42, m.a43, m.a44)))
+
+
+# Eulers
+##########################################################
+
+cdef Euler3 toEuler3(value) except *:
+    cdef Euler3 e
+    setEuler3(&e, value)
+    return e
+
+cdef setEuler3(Euler3* e, value):
+    if not isinstance(value, Euler):
+        raise TypeError("value is no mathutils.Euler object")
+    e.x = value.x
+    e.y = value.y
+    e.z = value.z
+    cdef str order = value.order
+    if   order == "XYZ": e.order = 0
+    elif order == "XZY": e.order = 1
+    elif order == "YXZ": e.order = 2
+    elif order == "YZX": e.order = 3
+    elif order == "ZXY": e.order = 4
+    elif order == "ZYX": e.order = 5
+
+cdef toPyEuler3(Euler3* e):
+    if e.order == 0: return Euler((e.x, e.y, e.z), "XYZ")
+    if e.order == 1: return Euler((e.x, e.y, e.z), "XZY")
+    if e.order == 2: return Euler((e.x, e.y, e.z), "YXZ")
+    if e.order == 3: return Euler((e.x, e.y, e.z), "YZX")
+    if e.order == 4: return Euler((e.x, e.y, e.z), "ZXY")
+    if e.order == 5: return Euler((e.x, e.y, e.z), "ZYX")
