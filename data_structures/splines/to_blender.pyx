@@ -31,7 +31,6 @@ cdef appendBezierSpline(object bSplines, BezierSpline spline):
 
 cdef appendPolySpline(object bSplines, PolySpline spline):
     # Blender stores 4 values for each point of a poly spline
-    cdef FloatList pointCoordinates = spline.points.base
     cdef FloatList bPoints = FloatList(length = spline.points.length * 4)
 
     # Insert a one after every vector to match Blenders data format
@@ -39,7 +38,7 @@ cdef appendPolySpline(object bSplines, PolySpline spline):
     cdef long i
     for i in range(spline.points.length):
         memcpy(bPoints.data + i * 4,
-               pointCoordinates.data + i * 3,
+               spline.points.data + i,
                sizeof(float) * 3)
         bPoints.data[i * 4 + 3] = 1
 
@@ -48,5 +47,5 @@ cdef appendPolySpline(object bSplines, PolySpline spline):
 
     # one point is already there
     points = bSpline.points
-    points.add(pointCoordinates.length / 3 - 1)
+    points.add(spline.points.length - 1)
     points.foreach_set("co", bPoints.getMemoryView())
