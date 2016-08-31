@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... sockets.info import toListDataType
 from ... base_types.node import AnimationNode
-from ... data_structures import DoubleList, LongLongList
+from ... data_structures cimport DoubleList, LongLongList
 
 class NumberRangeNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_NumberRangeNode"

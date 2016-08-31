@@ -1,4 +1,4 @@
-from . cimport Vector3
+from . vector cimport Vector3
 
 cdef struct Matrix4:
     float a11, a12, a13, a14
