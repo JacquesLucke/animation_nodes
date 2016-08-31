@@ -1,10 +1,10 @@
 import re
 from textwrap import indent, dedent
 
-declarationTargetPath = changeFileName(__file__, "base_lists2.pxd")
+declarationTargetPath = changeFileName(__file__, "base_lists.pxd")
 declarationSourcePath = changeFileName(__file__, "__list_declaration.src")
 
-implementationTargetPath = changeFileName(__file__, "base_lists2.pyx")
+implementationTargetPath = changeFileName(__file__, "base_lists.pyx")
 implementationSourcePath = changeFileName(__file__, "__list_implementation.src")
 
 numericLists = [
