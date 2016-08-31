@@ -1,5 +1,7 @@
-from . cimport Matrix4, Vector3
+from . vector cimport Vector3
+from . matrix cimport Matrix4
 
+cdef Matrix4 toMatrix4(value) except *
 cdef setMatrix4(Matrix4* m, value)
 cdef toPyMatrix4(Matrix4* m)
 

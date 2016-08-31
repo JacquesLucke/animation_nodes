@@ -1,16 +1,11 @@
-from . conversion cimport setMatrix4
+from . conversion cimport toMatrix4
 from . cimport (transformVec3AsPoint_InPlace, transformVec3AsDirection_InPlace,
                 distanceVec3, mixVec3, multMatrix4, setIdentityMatrix4)
 
 
 cpdef void transformVector3DList(Vector3DList vectors, matrix, bint ignoreTranslation = False):
-    cdef:
-        Matrix4 _matrix
-        Vector3* _vectors
-
-    setMatrix4(&_matrix, matrix)
-    _vectors = <Vector3*>vectors.base.data
-    transformVector3DListAsPoints(_vectors, vectors.getLength(), &_matrix, ignoreTranslation)
+    cdef Matrix4 _matrix = toMatrix4(matrix)
+    transformVector3DListAsPoints(vectors.base.data, vectors.length, &_matrix, ignoreTranslation)
 
 cdef void transformVector3DListAsPoints(Vector3* vectors, long arrayLength, Matrix4* matrix, bint ignoreTranslation):
     cdef long i
@@ -24,12 +19,11 @@ cdef void transformVector3DListAsPoints(Vector3* vectors, long arrayLength, Matr
 
 cpdef double distanceSumOfVector3DList(Vector3DList vectors):
     cdef:
-        Vector3* _vectors = <Vector3*>vectors.base.data
         double distance = 0
         long i
 
     for i in range(vectors.getLength() - 1):
-        distance += distanceVec3(_vectors + i, _vectors + i + 1)
+        distance += distanceVec3(vectors.data + i, vectors.data + i + 1)
     return distance
 
 cdef void mixVec3Arrays(Vector3* target, Vector3* a, Vector3* b, long arrayLength, float factor):

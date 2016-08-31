@@ -1,5 +1,10 @@
 from mathutils import Vector, Matrix
 
+cdef Matrix4 toMatrix4(value) except *:
+    cdef Matrix4 m
+    setMatrix4(&m, value)
+    return m
+
 cdef setMatrix4(Matrix4* m, value):
     if not (len(value.rows) == len(value.rows[0]) == 4):
         raise TypeError("element is not a 4x4 matrix")
