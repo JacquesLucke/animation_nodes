@@ -21,7 +21,7 @@ class OffsetTransformationsNode(bpy.types.Node, AnimationNode):
 
     errorMessage = StringProperty()
 
-    offsetMode = EnumProperty(name = "Offset Mode", default = "APPLY_AFTER",
+    offsetMode = EnumProperty(name = "Offset Mode", default = "ADVANCED",
         items = offsetModeTypes)
 
     def create(self):
