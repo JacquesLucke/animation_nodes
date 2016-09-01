@@ -409,11 +409,11 @@ def createIdentifier():
     return "_" + ''.join(choice(characters) for _ in range(identifierLength))
 
 def toString(code):
-    if isinstance(code, types.GeneratorType):
-        code = list(code)
-    if isinstance(code, (list, tuple)):
+    if isinstance(code, str):
+        return code
+    if hasattr(code, "__iter__"):
         return "\n".join(code)
-    return code
+    return ""
 
 
 nodeLabelMode = "DEFAULT"
