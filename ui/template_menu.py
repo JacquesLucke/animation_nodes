@@ -10,7 +10,7 @@ class TemplatesMenu(bpy.types.Menu):
         layout.operator("an.grid_arrange_objects_template")
         layout.operator("an.random_vertices_offset_template")
         layout.operator("an.network_from_particles_template")
-        layout.operator("an.simple_sound_controler_template")
+        layout.operator("an.simple_sound_controller_template")
         layout.operator("an.sound_equalizer_template")
         layout.operator("an.distribute_instances_on_spline_template")
         layout.operator("an.simple_countdown_template")

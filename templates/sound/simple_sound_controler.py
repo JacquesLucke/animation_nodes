@@ -1,9 +1,9 @@
 import bpy
 from ... base_types.template import Template
 
-class SimpleSoundControlerTemplate(bpy.types.Operator, Template):
-    bl_idname = "an.simple_sound_controler_template"
-    bl_label = "Simple Sound Controler"
+class SimpleSoundControllerTemplate(bpy.types.Operator, Template):
+    bl_idname = "an.simple_sound_controller_template"
+    bl_label = "Simple Sound Controller"
     nodeOffset = (-500, 150)
 
     def insert(self):

@@ -91,7 +91,7 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
             setOriginType(self.originType)
 
         if self.parentLetters:
-            parentObjectsToMainControler(objects)
+            parentObjectsToMainController(objects)
 
         for i, (object, originalCharacter) in enumerate(zip(objects, originalTexts)):
             object[idPropertyName] = self.currentID
@@ -218,10 +218,10 @@ def removeObject(object):
     elif objectType == "MESH":
         bpy.data.meshes.remove(data)
 
-def parentObjectsToMainControler(objects):
-    mainControler = getMainObjectContainer(bpy.context.scene)
+def parentObjectsToMainController(objects):
+    mainController = getMainObjectContainer(bpy.context.scene)
     for object in objects:
-        object.parent = mainControler
+        object.parent = mainController
 
 def setMaterialOnObjects(objects, material):
     for object in objects:
