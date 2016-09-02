@@ -6,7 +6,6 @@ from .. events import treeChanged, executionCodeChanged
 from .. utils.names import getRandomString, toVariableName
 from .. operators.dynamic_operators import getInvokeFunctionOperator
 from .. nodes.system.subprogram_sockets import subprogramInterfaceChanged
-from .. templates.operators.insert_linked_node import invokeLinkedNodeInsertion
 from .. tree_info import isSocketLinked, getLinkedSockets, getDirectlyLinkedSockets
 
 class SocketTextProperties(bpy.types.PropertyGroup):
@@ -84,6 +83,8 @@ class AnimationNodeSocket:
         '''
         raise NotImplementedError("All sockets have to define a correctValue method")
 
+
+    # Drawing
     ##########################################################
 
     def draw(self, context, layout, node, text):
@@ -153,6 +154,14 @@ class AnimationNodeSocket:
         self.display.moveOperators = other.display.moveOperators
         self.display.removeOperator = other.display.removeOperator
 
+    def disableSocketEditingInNode(self):
+        self.display.textInput = False
+        self.display.moveOperators = False
+        self.display.removeOperator = False
+
+    # Draw Utilities
+    ##########################################################
+
     def invokeFunction(self, layout, node, functionName, text = "", icon = "NONE", description = "", emboss = True, confirm = False, data = None, passEvent = False):
         idName = getInvokeFunctionOperator(description)
         props = layout.operator(idName, text = text, icon = icon, emboss = emboss)
@@ -173,8 +182,9 @@ class AnimationNodeSocket:
     def newCallback(self, node, functionName):
         return newSocketCallback(self, node, functionName)
 
-    def invokeNodeInsertion(self, layout, nodeIdName, toIndex, text, settings = {}):
-        invokeLinkedNodeInsertion(layout, nodeIdName, self.getIndex(), toIndex, text, settings)
+
+    # Move Utilities
+    ##########################################################
 
     def moveUp(self):
         self.moveTo(self.getIndex() - 1)
@@ -213,14 +223,18 @@ class AnimationNodeSocket:
             else: self.sockets.move(targetIndex - 1, currentIndex)
             self.node.socketMoved()
 
-    def remove(self):
-        node = self.node
-        node.removeSocket(self)
-        node.socketRemoved()
+
+    # Link/Remove Utilities
+    ##########################################################
 
     def linkWith(self, socket):
         if self.isOutput: return self.nodeTree.links.new(socket, self)
         else: return self.nodeTree.links.new(self, socket)
+
+    def remove(self):
+        node = self.node
+        node.removeSocket(self)
+        node.socketRemoved()
 
     def removeLinks(self):
         removedLink = False
@@ -231,11 +245,9 @@ class AnimationNodeSocket:
                 removedLink = True
         return removedLink
 
-    def disableSocketEditingInNode(self):
-        self.display.textInput = False
-        self.display.moveOperators = False
-        self.display.removeOperator = False
 
+    # Properties
+    ##########################################################
 
     @property
     def isOutput(self):
