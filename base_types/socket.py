@@ -245,6 +245,9 @@ class AnimationNodeSocket:
                 removedLink = True
         return removedLink
 
+    def isLinkedToType(self, dataType):
+        return any(socket.dataType == dataType for socket in self.linkedSockets)
+
 
     # Properties
     ##########################################################
