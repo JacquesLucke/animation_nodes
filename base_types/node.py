@@ -148,6 +148,24 @@ class AnimationNode:
 
         return self.bl_label
 
+
+    # Remove Utilities
+    ####################################################
+
+    def removeLinks(self):
+        removedLink = False
+        for socket in self.sockets:
+            if socket.removeLinks():
+                removedLink = True
+        return removedLink
+
+    def remove(self):
+        self.nodeTree.nodes.remove(self)
+
+
+    # Create/Update/Remove Sockets
+    ####################################################
+
     def newInput(self, type, name, identifier = None, **kwargs):
         idName = toSocketIdName(type)
         if idName is None: raise ValueError("Socket type does not exist")
@@ -167,6 +185,22 @@ class AnimationNode:
     def _setSocketProperties(self, socket, properties):
         for key, value in properties.items():
             setattr(socket, key, value)
+
+    def clearSockets(self):
+        self.inputs.clear()
+        self.outputs.clear()
+
+    def removeSocket(self, socket):
+        index = socket.getIndex()
+        if socket.isOutput:
+            if index < self.activeOutputIndex: self.activeOutputIndex -= 1
+        else:
+            if index < self.activeInputIndex: self.activeInputIndex -= 1
+        socket.sockets.remove(socket)
+
+
+    # Draw Utilities
+    ####################################################
 
     def invokeFunction(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True, confirm = False, data = None, passEvent = False):
         idName = getInvokeFunctionOperator(description)
@@ -226,35 +260,9 @@ class AnimationNode:
     def newCallback(self, functionName):
         return newNodeCallback(self, functionName)
 
-    def clearSockets(self):
-        self.inputs.clear()
-        self.outputs.clear()
 
-    def removeSocket(self, socket):
-        index = socket.getIndex()
-        if socket.isOutput:
-            if index < self.activeOutputIndex: self.activeOutputIndex -= 1
-        else:
-            if index < self.activeInputIndex: self.activeInputIndex -= 1
-        socket.sockets.remove(socket)
-
-    def remove(self):
-        self.nodeTree.nodes.remove(self)
-
-
-    def getLinkedInputsDict(self):
-        return getLinkedInputsDict(self)
-
-    def getLinkedOutputsDict(self):
-        return getLinkedOutputsDict(self)
-
-
-    def getVisibleInputs(self):
-        return [socket for socket in self.inputs if not socket.hide]
-
-    def getVisibleOutputs(self):
-        return [socket for socket in self.outputs if not socket.hide]
-
+    # Socket Editing Utilities
+    ####################################################
 
     def disableSocketEditingInNode(self):
         for socket in self.sockets:
@@ -276,6 +284,29 @@ class AnimationNode:
             setattr(socket.display, name, state)
 
 
+    # More Utilities
+    ####################################################
+
+    def getLinkedInputsDict(self):
+        return getLinkedInputsDict(self)
+
+    def getLinkedOutputsDict(self):
+        return getLinkedOutputsDict(self)
+
+    def getVisibleInputs(self):
+        return [socket for socket in self.inputs if not socket.hide]
+
+    def getVisibleOutputs(self):
+        return [socket for socket in self.outputs if not socket.hide]
+
+    def iterInnerLinks(self):
+        names = {}
+        for identifier, variable in self.inputVariables.items():
+            names[variable] = identifier
+        for identifier, variable in self.outputVariables.items():
+            if variable in names:
+                yield (names[variable], identifier)
+
     def getNodesWhenFollowingLinks(self, followInputs = False, followOutputs = False):
         nodes = set()
         nodesToCheck = {self}
@@ -292,14 +323,6 @@ class AnimationNode:
                     if node not in nodes: nodesToCheck.add(node)
         nodes.remove(self)
         return list(nodes)
-
-    def removeLinks(self):
-        removedLink = False
-        for socket in self.sockets:
-            if socket.removeLinks():
-                removedLink = True
-        return removedLink
-
 
     @property
     def nodeTree(self):
@@ -355,13 +378,9 @@ class AnimationNode:
     def outputVariables(self):
         return {socket.identifier : socket.identifier for socket in self.outputs}
 
-    def iterInnerLinks(self):
-        names = {}
-        for identifier, variable in self.inputVariables.items():
-            names[variable] = identifier
-        for identifier, variable in self.outputVariables.items():
-            if variable in names:
-                yield (names[variable], identifier)
+
+    # Code Generation
+    ####################################################
 
     def getTemplateCodeString(self):
         return toString(self.getTemplateCode())
