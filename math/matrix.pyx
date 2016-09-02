@@ -155,7 +155,7 @@ cdef void multMatrix4(Matrix4* target, Matrix4* x, Matrix4* y):
     target.a43 = x.a41 * y.a13  +  x.a42 * y.a23  +  x.a43 * y.a33  +  x.a44 * y.a43
     target.a44 = x.a41 * y.a14  +  x.a42 * y.a24  +  x.a43 * y.a34  +  x.a44 * y.a44
 
-cdef void multMatrix3(Matrix3* target, Matrix3* x, Matrix3* y):
+cdef void multMatrix3(Matrix3_or_Matrix4* target, Matrix3_or_Matrix4* x, Matrix3_or_Matrix4* y):
     target.a11 = x.a11 * y.a11  +  x.a12 * y.a21  +  x.a13 * y.a31
     target.a12 = x.a11 * y.a12  +  x.a12 * y.a22  +  x.a13 * y.a32
     target.a13 = x.a11 * y.a13  +  x.a12 * y.a23  +  x.a13 * y.a33
@@ -167,6 +167,13 @@ cdef void multMatrix3(Matrix3* target, Matrix3* x, Matrix3* y):
     target.a31 = x.a31 * y.a11  +  x.a32 * y.a21  +  x.a33 * y.a31
     target.a32 = x.a31 * y.a12  +  x.a32 * y.a22  +  x.a33 * y.a32
     target.a33 = x.a31 * y.a13  +  x.a32 * y.a23  +  x.a33 * y.a33
+
+cdef void multMatrix3Parts(Matrix4* target, Matrix4* x, Matrix4* y, bint keepFirst = True):
+    multMatrix3(target, x, y)
+    cdef Matrix4* k = x if keepFirst else y
+    target.a14, target.a24, target.a34 = k.a14, k.a24, k.a34
+    target.a41, target.a42, target.a43 = k.a41, k.a42, k.a43
+    target.a44 = k.a44
 
 cdef void mult3xMatrix3_Reversed(Matrix3* target, Matrix3* m1, Matrix3* m2, Matrix3* m3):
     cdef Matrix3 tmp

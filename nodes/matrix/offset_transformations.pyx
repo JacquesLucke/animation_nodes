@@ -6,7 +6,8 @@ from ... data_structures cimport FalloffEvaluator
 from ... math cimport (Matrix4, Vector3, Euler3, Matrix4x4List, toVector3, toEuler3,
                        multMatrix4, toPyMatrix4, setTranslationRotationScaleMatrix,
                        convertMatrix4ToMatrix3, multMatrix3, setRotationScaleMatrix,
-                       convertMatrix3ToMatrix4, Matrix3)
+                       convertMatrix3ToMatrix4, Matrix3, setScaleMatrix, setRotationMatrix,
+                       setTranslationMatrix, transformVec3AsDirection, multMatrix3Parts)
 
 ctypedef void (*OffsetMatrixFunction)(Matrix4* target, Matrix4* source,
                         Vector3* translation, Euler3* rotation, Vector3* scale)
@@ -25,7 +26,7 @@ class OffsetTransformationsNode(bpy.types.Node, AnimationNode):
         items = localGlobalItems, update = propertyChanged)
     rotationMode = EnumProperty(name = "Rotation Mode", default = "GLOBAL",
         items = localGlobalItems, update = propertyChanged)
-    scaleMode = EnumProperty(name = "Scale Mode", default = "GLOBAL",
+    scaleMode = EnumProperty(name = "Scale Mode", default = "LOCAL",
         items = localGlobalItems, update = propertyChanged)
 
     axisRotation = BoolProperty(name = "Axis Rotation", default = False,
@@ -35,7 +36,7 @@ class OffsetTransformationsNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.newInput("Matrix List", "Transformations", "transformations", dataIsModified = True)
-        self.newInput("Falloff", "Falloff", "falloff")
+        self.newInput("Falloff", "Falloff", "falloff", value = 1)
         self.newInput("Vector", "Translation", "translation")
         self.newInput("Euler", "Rotation", "rotation")
         self.newInput("Vector", "Scale", "scale", value = (1, 1, 1))
@@ -62,7 +63,7 @@ class OffsetTransformationsNode(bpy.types.Node, AnimationNode):
     def execute(self, Matrix4x4List transformations, falloff, translation, rotation, scale):
         cdef:
             FalloffEvaluator evaluator = FalloffEvaluator.create(falloff, "Transformation Matrix")
-            OffsetMatrixFunction offsetFunction = getOffsetFunction(self)
+            #OffsetMatrixFunction offsetFunction = getOffsetFunction(self)
             Vector3 _translation = toVector3(translation)
             Euler3 _rotation = toEuler3(rotation)
             Vector3 _scale = toVector3(scale)
@@ -71,6 +72,13 @@ class OffsetTransformationsNode(bpy.types.Node, AnimationNode):
             Matrix4 result
             double influence
             long i
+
+        cdef:
+            bint axisRotation = self.axisRotation
+            bint axisScale = self.axisScale
+            bint useLocalTranslation = self.translationMode == "LOCAL"
+            bint useLocalRotation = self.rotationMode == "LOCAL"
+            bint useLocalScale = self.scaleMode == "LOCAL"
 
         if evaluator is None:
             self.errorMessage = "Falloff cannot be evaluated for matrices"
@@ -93,43 +101,64 @@ class OffsetTransformationsNode(bpy.types.Node, AnimationNode):
             localScale.y = _scale.y * influence + (1 - influence)
             localScale.z = _scale.z * influence + (1 - influence)
 
-            offsetFunction(&result, transformations.data + i,
-                &localTranslation, &localRotation, &localScale)
+            applyTransformation(&result, transformations.data + i,
+                &localTranslation, &localRotation, &localScale,
+                useLocalTranslation, useLocalRotation, useLocalScale,
+                axisRotation, axisScale)
 
             transformations.data[i] = result
 
         return transformations
 
-cdef OffsetMatrixFunction getOffsetFunction(node):
-    raise NotImplementedError()
-    if name == "APPLY_BEFORE":
-        return applyBefore
-    if name == "APPLY_AFTER":
-        return applyAfter
-    if name == "ADVANCED":
-        return applyAdvanced
+cdef void applyTransformation(Matrix4* target, Matrix4* source,
+                     Vector3* translation, Euler3* rotation, Vector3* scale,
+                     bint localTranslation, bint localRotation, bint localScale,
+                     bint axisRotation, bint axisScale):
 
-cdef void applyBefore(Matrix4* target, Matrix4* source,
-                      Vector3* translation, Euler3* rotation, Vector3* scale):
-    cdef Matrix4 matrix
-    setTranslationRotationScaleMatrix(&matrix, translation, rotation, scale)
-    multMatrix4(target, source, &matrix)
+    cdef Matrix4 afterScale, afterRotation
+    applyScale(&afterScale, source, scale, localScale, axisScale)
+    applyRotation(&afterRotation, &afterScale, rotation, localRotation, axisRotation)
+    applyTranslation(target, &afterRotation, source, translation, localTranslation)
 
-cdef void applyAfter(Matrix4* target, Matrix4* source,
-                     Vector3* translation, Euler3* rotation, Vector3* scale):
-    cdef Matrix4 matrix
-    setTranslationRotationScaleMatrix(&matrix, translation, rotation, scale)
-    multMatrix4(target, &matrix, source)
+cdef void applyScale(Matrix4* target, Matrix4* source,
+                     Vector3* scale, bint localScale, bint axisScale):
+    cdef Matrix4 scaleMatrix
+    setScaleMatrix(&scaleMatrix, scale)
+    if localScale:
+        if axisScale:
+            multMatrix4(target, source, &scaleMatrix)
+        else:
+            multMatrix3Parts(target, source, &scaleMatrix, keepFirst = True)
+    else:
+        if axisScale:
+            multMatrix4(target, &scaleMatrix, source)
+        else:
+            multMatrix3Parts(target, &scaleMatrix, source, keepFirst = False)
 
-cdef void applyAdvanced(Matrix4* target, Matrix4* source,
-                     Vector3* translation, Euler3* rotation, Vector3* scale):
-    cdef Matrix3 _source
-    convertMatrix4ToMatrix3(&_source, source)
-    cdef Matrix3 rotationScale
-    setRotationScaleMatrix(&rotationScale, rotation, scale)
-    cdef Matrix3 newRotationScale
-    multMatrix3(&newRotationScale, &rotationScale, &_source)
-    convertMatrix3ToMatrix4(target, &newRotationScale)
-    target.a14 = source.a14 + translation.x
-    target.a24 = source.a24 + translation.y
-    target.a34 = source.a34 + translation.z
+cdef void applyRotation(Matrix4* target, Matrix4* source,
+                        Euler3* rotation, bint localRotation, bint axisRotation):
+    cdef Matrix4 rotationMatrix
+    setRotationMatrix(&rotationMatrix, rotation)
+    if localRotation:
+        if axisRotation:
+            multMatrix4(target, source, &rotationMatrix)
+        else:
+            multMatrix3Parts(target, source, &rotationMatrix, keepFirst = True)
+    else:
+        if axisRotation:
+            multMatrix4(target, &rotationMatrix, source)
+        else:
+            multMatrix3Parts(target, &rotationMatrix, source, keepFirst = False)
+
+cdef void applyTranslation(Matrix4* target, Matrix4* source, Matrix4* original,
+                           Vector3* translation, bint localTranslation):
+    cdef Matrix4 translationMatrix
+    cdef Vector3 offsetTranslation
+    if localTranslation:
+        transformVec3AsDirection(&offsetTranslation, translation, original)
+    else:
+        offsetTranslation = translation[0]
+    target[0] = source[0]
+    target.a14 += offsetTranslation.x
+    target.a24 += offsetTranslation.y
+    target.a34 += offsetTranslation.z

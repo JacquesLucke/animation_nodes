@@ -34,5 +34,6 @@ cdef void setTranslationRotationScaleMatrix(Matrix4* m, Vector3* t, Euler3* e, V
 cdef void convertMatrix3ToMatrix4(Matrix4* t, Matrix3* s)
 cdef void convertMatrix4ToMatrix3(Matrix3* t, Matrix4* s)
 
-cdef void multMatrix3(Matrix3* target, Matrix3* x, Matrix3* y)
+cdef void multMatrix3(Matrix3_or_Matrix4* target, Matrix3_or_Matrix4* x, Matrix3_or_Matrix4* y)
 cdef void multMatrix4(Matrix4* target, Matrix4* x, Matrix4* y)
+cdef void multMatrix3Parts(Matrix4* target, Matrix4* x, Matrix4* y, bint keepFirst = ?)
