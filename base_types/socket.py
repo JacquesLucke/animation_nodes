@@ -33,6 +33,8 @@ class SocketLoopProperties(bpy.types.PropertyGroup):
 class SocketExecutionProperties(bpy.types.PropertyGroup):
     neededCopies = IntProperty(default = 0, min = 0)
 
+colorOverwritePerSocket = dict()
+
 class AnimationNodeSocket:
     storable = True
     comparable = False
@@ -143,7 +145,7 @@ class AnimationNodeSocket:
         return self.name
 
     def draw_color(self, context, node):
-        return self.drawColor
+        return colorOverwritePerSocket.get(hash(self), self.drawColor)
 
     def copyDisplaySettingsFrom(self, other):
         self.display.text = other.display.text
