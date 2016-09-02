@@ -1,5 +1,6 @@
 import bpy
 from bpy.props import *
+from ... events import propertyChanged
 from ... base_types.node import AnimationNode
 from ... data_structures cimport FalloffEvaluator
 from ... math cimport (Matrix4, Vector3, Euler3, Matrix4x4List, toVector3, toEuler3,
@@ -10,10 +11,9 @@ from ... math cimport (Matrix4, Vector3, Euler3, Matrix4x4List, toVector3, toEul
 ctypedef void (*OffsetMatrixFunction)(Matrix4* target, Matrix4* source,
                         Vector3* translation, Euler3* rotation, Vector3* scale)
 
-offsetModeTypes = [
-    ("APPLY_BEFORE", "Apply Before", "", "NONE", 0),
-    ("APPLY_AFTER", "Apply After", "", "NONE", 1),
-    ("ADVANCED", "Advanced", "", "NONE", 2)]
+localGlobalItems = [
+    ("LOCAL", "Local", "", "NONE", 0),
+    ("GLOBAL", "Global", "", "NONE", 1)]
 
 class OffsetTransformationsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_OffsetTransformationsNode"
@@ -21,8 +21,17 @@ class OffsetTransformationsNode(bpy.types.Node, AnimationNode):
 
     errorMessage = StringProperty()
 
-    offsetMode = EnumProperty(name = "Offset Mode", default = "ADVANCED",
-        items = offsetModeTypes)
+    translationMode = EnumProperty(name = "Translation Mode", default = "GLOBAL",
+        items = localGlobalItems, update = propertyChanged)
+    rotationMode = EnumProperty(name = "Rotation Mode", default = "GLOBAL",
+        items = localGlobalItems, update = propertyChanged)
+    scaleMode = EnumProperty(name = "Scale Mode", default = "GLOBAL",
+        items = localGlobalItems, update = propertyChanged)
+
+    axisRotation = BoolProperty(name = "Axis Rotation", default = False,
+        update = propertyChanged, description = "Use world center as rotation pivot")
+    axisScale = BoolProperty(name = "Axis Scale", default = False,
+        update = propertyChanged, description = "Use world center as scale pivot")
 
     def create(self):
         self.newInput("Matrix List", "Transformations", "transformations", dataIsModified = True)
@@ -33,14 +42,27 @@ class OffsetTransformationsNode(bpy.types.Node, AnimationNode):
         self.newOutput("Matrix List", "Transformations", "transformations")
 
     def draw(self, layout):
-        layout.prop(self, "offsetMode")
         if self.errorMessage != "":
             layout.label(self.errorMessage, icon = "ERROR")
+
+    def drawAdvanced(self, layout):
+        col = layout.column(align = False)
+        row = col.row(align = True)
+        row.label("Translation")
+        row.prop(self, "translationMode", expand = True)
+        row = col.row(align = True)
+        row.label("Rotation")
+        row.prop(self, "rotationMode", expand = True)
+        row.prop(self, "axisRotation", icon = "MANIPUL", text = "")
+        row = col.row(align = True)
+        row.label("Scale")
+        row.prop(self, "scaleMode", expand = True)
+        row.prop(self, "axisScale", icon = "MANIPUL", text = "")
 
     def execute(self, Matrix4x4List transformations, falloff, translation, rotation, scale):
         cdef:
             FalloffEvaluator evaluator = FalloffEvaluator.create(falloff, "Transformation Matrix")
-            OffsetMatrixFunction offsetFunction = getOffsetFunction(self.offsetMode)
+            OffsetMatrixFunction offsetFunction = getOffsetFunction(self)
             Vector3 _translation = toVector3(translation)
             Euler3 _rotation = toEuler3(rotation)
             Vector3 _scale = toVector3(scale)
@@ -78,7 +100,8 @@ class OffsetTransformationsNode(bpy.types.Node, AnimationNode):
 
         return transformations
 
-cdef OffsetMatrixFunction getOffsetFunction(str name):
+cdef OffsetMatrixFunction getOffsetFunction(node):
+    raise NotImplementedError()
     if name == "APPLY_BEFORE":
         return applyBefore
     if name == "APPLY_AFTER":
