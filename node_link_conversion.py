@@ -75,7 +75,8 @@ class SimpleConvert(LinkCorrection):
         ("Integer List", "Float List") : "an_IntegerListToFloatListNode",
         ("Vector", "Euler") : "an_DirectionToRotationNode",
         ("Euler", "Vector") : "an_RotationToDirectionNode",
-        ("Float", "Falloff") : "an_ConstantFalloffNode"
+        ("Float", "Falloff") : "an_ConstantFalloffNode",
+        ("Vector List", "Matrix List") : "an_TranslationMatrixNode"
     }
 
     def check(self, origin, target):
@@ -83,6 +84,8 @@ class SimpleConvert(LinkCorrection):
     def insert(self, nodeTree, origin, target, dataOrigin):
         nodeIdName = self.rules[(dataOrigin.dataType, target.dataType)]
         node = insertLinkedNode(nodeTree, nodeIdName, origin, target)
+        tree_info.updateIfNecessary()
+        node.edit()
 
 class ConvertMeshDataListToMeshData(LinkCorrection):
     def check(self, origin, target):
