@@ -1,4 +1,4 @@
-from .. math cimport Vector3, Euler3, Matrix4
+from .. math cimport Vector3, Euler3, Matrix4, Matrix3
 
 ctypedef void (*TransformMatrixFunction)(
             void* settings, Matrix4* target, Matrix4* source,

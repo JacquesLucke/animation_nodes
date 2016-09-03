@@ -53,9 +53,9 @@ cdef void setTranslationScaleMatrix(Matrix4* m, Vector3* t, Vector3* s):
 
 cdef void setRotationMatrix(Matrix3_or_Matrix4* m, Euler3* e):
     cdef Matrix3 xMat, yMat, zMat, rotation
-    setRotationXMatrix3(&xMat, e.x)
-    setRotationYMatrix3(&yMat, e.y)
-    setRotationZMatrix3(&zMat, e.z)
+    setRotationXMatrix(&xMat, e.x)
+    setRotationYMatrix(&yMat, e.y)
+    setRotationZMatrix(&zMat, e.z)
 
     if Matrix3_or_Matrix4 is Matrix3:
         joinRotationMatricesInOrder(e.order, &xMat, &yMat, &zMat, m)
@@ -100,14 +100,14 @@ cdef void convertMatrix4ToMatrix3(Matrix3* t, Matrix4* s):
     t.a31, t.a32, t.a33 = s.a31, s.a32, s.a33
 
 cdef void joinRotationMatricesInOrder(char order, Matrix3* x, Matrix3* y, Matrix3* z, Matrix3* target):
-    if order == 0:   mult3xMatrix3_Reversed(target, x, y, z)
-    elif order == 1: mult3xMatrix3_Reversed(target, x, z, y)
-    elif order == 2: mult3xMatrix3_Reversed(target, y, x, z)
-    elif order == 3: mult3xMatrix3_Reversed(target, y, z, x)
-    elif order == 4: mult3xMatrix3_Reversed(target, z, x, y)
-    elif order == 5: mult3xMatrix3_Reversed(target, z, y, x)
+    if order == 0:   mult3xMatrix_Reversed(target, x, y, z)
+    elif order == 1: mult3xMatrix_Reversed(target, x, z, y)
+    elif order == 2: mult3xMatrix_Reversed(target, y, x, z)
+    elif order == 3: mult3xMatrix_Reversed(target, y, z, x)
+    elif order == 4: mult3xMatrix_Reversed(target, z, x, y)
+    elif order == 5: mult3xMatrix_Reversed(target, z, y, x)
 
-cdef void setRotationXMatrix3(Matrix3* m, float angle):
+cdef void setRotationXMatrix(Matrix3_or_Matrix4* m, float angle):
     cdef float sinValue = sin(angle)
     cdef float cosValue = cos(angle)
     m.a11 = 1
@@ -115,8 +115,12 @@ cdef void setRotationXMatrix3(Matrix3* m, float angle):
     m.a22 = m.a33 = cosValue
     m.a23 = -sinValue
     m.a32 = sinValue
+    if Matrix3_or_Matrix4 is Matrix4:
+        m.a14 = m.a24 = m.a34 = 0
+        m.a41 = m.a42 = m.a43 = 0
+        m.a44 = 1
 
-cdef void setRotationYMatrix3(Matrix3* m, float angle):
+cdef void setRotationYMatrix(Matrix3_or_Matrix4* m, float angle):
     cdef float sinValue = sin(angle)
     cdef float cosValue = cos(angle)
     m.a22 = 1
@@ -124,8 +128,12 @@ cdef void setRotationYMatrix3(Matrix3* m, float angle):
     m.a11 = m.a33 = cosValue
     m.a13 = sinValue
     m.a31 = -sinValue
+    if Matrix3_or_Matrix4 is Matrix4:
+        m.a14 = m.a24 = m.a34 = 0
+        m.a41 = m.a42 = m.a43 = 0
+        m.a44 = 1
 
-cdef void setRotationZMatrix3(Matrix3* m, float angle):
+cdef void setRotationZMatrix(Matrix3_or_Matrix4* m, float angle):
     cdef float sinValue = sin(angle)
     cdef float cosValue = cos(angle)
     m.a33 = 1
@@ -133,6 +141,10 @@ cdef void setRotationZMatrix3(Matrix3* m, float angle):
     m.a11 = m.a22 = cosValue
     m.a12 = -sinValue
     m.a21 = sinValue
+    if Matrix3_or_Matrix4 is Matrix4:
+        m.a14 = m.a24 = m.a34 = 0
+        m.a41 = m.a42 = m.a43 = 0
+        m.a44 = 1
 
 cdef void multMatrix4(Matrix4* target, Matrix4* x, Matrix4* y):
     target.a11 = x.a11 * y.a11  +  x.a12 * y.a21  +  x.a13 * y.a31  +  x.a14 * y.a41
@@ -175,7 +187,14 @@ cdef void multMatrix3Parts(Matrix4* target, Matrix4* x, Matrix4* y, bint keepFir
     target.a41, target.a42, target.a43 = k.a41, k.a42, k.a43
     target.a44 = k.a44
 
-cdef void mult3xMatrix3_Reversed(Matrix3* target, Matrix3* m1, Matrix3* m2, Matrix3* m3):
-    cdef Matrix3 tmp
-    multMatrix3(&tmp, m3, m2)
-    multMatrix3(target, &tmp, m1)
+cdef void mult3xMatrix_Reversed(Matrix3_or_Matrix4* target,
+            Matrix3_or_Matrix4* m1,
+            Matrix3_or_Matrix4* m2,
+            Matrix3_or_Matrix4* m3):
+    cdef Matrix3_or_Matrix4 tmp
+    if Matrix3_or_Matrix4 is Matrix3:
+        multMatrix3(&tmp, m3, m2)
+        multMatrix3(target, &tmp, m1)
+    if Matrix3_or_Matrix4 is Matrix4:
+        multMatrix4(&tmp, m3, m2)
+        multMatrix4(target, &tmp, m1)
