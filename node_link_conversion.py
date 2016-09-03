@@ -6,15 +6,22 @@ from . sockets.info import toBaseIdName, isList
 from . tree_info import getAllDataLinkIDs, getDirectlyLinkedSocket
 
 def correctForbiddenNodeLinks():
-    for dataOrigin, target in iterLinksThatNeedToBeCorrectedOrRemoved():
-        directOrigin = getDirectlyLinkedSocket(target)
-        if not tryToCorrectLink(dataOrigin, directOrigin, target):
-            removeLink(directOrigin, target)
-    tree_info.updateIfNecessary()
+    allLinksCorrect = False
+    while not allLinksCorrect:
+        allLinksCorrect = correctNextForbiddenLink()
+        tree_info.updateIfNecessary()
+
+def correctNextForbiddenLink():
+    dataOrigin, target = getNextInvalidLink()
+    if dataOrigin is None: return True
+    directOrigin = getDirectlyLinkedSocket(target)
+    if not tryToCorrectLink(dataOrigin, directOrigin, target):
+        removeLink(directOrigin, target)
+    return False
 
 approvedLinkTypes = set()
 
-def iterLinksThatNeedToBeCorrectedOrRemoved():
+def getNextInvalidLink():
     for originID, targetID, originType, targetType in getAllDataLinkIDs():
         if (originType, targetType) in approvedLinkTypes:
             continue
@@ -25,7 +32,8 @@ def iterLinksThatNeedToBeCorrectedOrRemoved():
         if isConnectionValid(origin, target):
             approvedLinkTypes.add((originType, targetType))
         else:
-            yield (origin, target)
+            return origin, target
+    return None, None
 
 def isConnectionValid(origin, target):
     return origin.dataType in target.allowedInputTypes or target.allowedInputTypes[0] == "all"
