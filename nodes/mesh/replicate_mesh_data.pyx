@@ -37,6 +37,7 @@ class ReplicateMeshDataNode(bpy.types.Node, AnimationNode):
         newPolygons = PolygonIndicesList(indicesAmount = amount * polygonIndicesAmount,
                                          polygonAmount = amount * polygonAmount)
 
+        # Vertices
         for i in range(amount):
             offset = i * vertexAmount
             for j in range(vertexAmount):
@@ -44,22 +45,24 @@ class ReplicateMeshDataNode(bpy.types.Node, AnimationNode):
                                      oldVertices.data + j,
                                      matrices.data + i)
 
+        # Edges
         for i in range(amount):
             offset = i * edgeAmount
             for j in range(edgeAmount):
                 newEdges.data[offset + j].v1 = oldEdges.data[j].v1 + vertexAmount * i
                 newEdges.data[offset + j].v2 = oldEdges.data[j].v2 + vertexAmount * i
 
+        # Polygon Indices
         for i in range(amount):
             offset = i * polygonIndicesAmount
             for j in range(polygonIndicesAmount):
                 newPolygons.indices.data[offset + j] = oldPolygons.indices.data[j] + vertexAmount * i
-
+        # Polygon Starts
         for i in range(amount):
             offset = i * polygonAmount
             for j in range(polygonAmount):
                 newPolygons.polyStarts.data[offset + j] = oldPolygons.polyStarts.data[j] + polygonIndicesAmount * i
-
+        # Polygon Lengths
         for i in range(amount):
             memcpy(newPolygons.polyLengths.data + i * polygonAmount,
                    oldPolygons.polyLengths.data,
