@@ -4,14 +4,14 @@ from ... math cimport toPyMatrix4
 from ... sockets.info import isList
 from ... events import executionCodeChanged
 from ... data_structures cimport Matrix4x4List
-from ... base_types import AnimationNode, DynamicSocketHelper
+from ... base_types import AnimationNode, DynamicSocketSet
 
 outputItems = [	("BASIS", "Basis", "", "NONE", 0),
                 ("LOCAL", "Local", "", "NONE", 1),
                 ("PARENT INVERSE", "Parent Inverse", "", "NONE", 2),
                 ("WORLD", "World", "", "NONE", 3) ]
 
-class DynamicSockets(DynamicSocketHelper):
+class DynamicSockets(DynamicSocketSet):
     def defaults(self):
         self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
         self.newInput("Matrix", "Matrix", "matrix")
