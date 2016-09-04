@@ -103,6 +103,18 @@ class ExecutionCodeProperties(bpy.types.PropertyGroup):
         description = "Different execution codes can be useful in different contexts",
         update = settingChanged, items = executionCodeTypeItems)
 
+    def get_MeasureExecution(self):
+        return self.type == "MEASURE"
+
+    def set_MeasureExecution(self, value):
+        if value: self.type = "MEASURE"
+        elif self.type == "MEASURE":
+            self.type = "DEFAULT"
+
+    measureExecution = BoolProperty(name = "Measure Execution",
+        get = get_MeasureExecution, set = set_MeasureExecution,
+        description = "Measure execution times of the individual nodes")
+
 class AddonPreferences(bpy.types.AddonPreferences):
     bl_idname = addonName
 

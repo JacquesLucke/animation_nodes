@@ -2,6 +2,7 @@ import bpy
 from .. problems import canExecute
 from .. utils.layout import writeText
 from .. utils.timing import prettyTime
+from .. preferences import getExecutionCodeSettings
 
 class TreePanel(bpy.types.Panel):
     bl_idname = "an_tree_panel"
@@ -28,7 +29,9 @@ class TreePanel(bpy.types.Panel):
         if not canExecute():
             layout.label("Look in the 'Problems' panel", icon = "INFO")
 
-        layout.label(prettyTime(tree.lastExecutionInfo.executionTime), icon = "TIME")
+        row = layout.row(align = True)
+        row.label(prettyTime(tree.lastExecutionInfo.executionTime), icon = "TIME")
+        row.prop(getExecutionCodeSettings(), "measureExecution", text = "Details", emboss = False)
 
         layout.separator()
         layout.prop_search(tree, "sceneName", bpy.data, "scenes", icon = "SCENE_DATA", text = "Scene")
