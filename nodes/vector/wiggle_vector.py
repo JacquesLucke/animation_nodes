@@ -3,7 +3,7 @@ import random
 from bpy.props import *
 from mathutils import Vector
 from ... events import propertyChanged
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from ... algorithms.perlin_noise import perlinNoise
 
 class VectorWiggleNode(bpy.types.Node, AnimationNode):

@@ -3,7 +3,7 @@ import random
 from bpy.props import *
 from ... events import treeChanged
 from ... sockets.info import toBaseDataType
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from . subprogram_sockets import subprogramInterfaceChanged
 from ... tree_info import keepNodeLinks, getNodeByIdentifier
 

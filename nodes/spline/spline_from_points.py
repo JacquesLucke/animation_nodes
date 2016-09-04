@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... events import propertyChanged
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from ... data_structures.splines.poly_spline import PolySpline
 from ... data_structures.splines.bezier_spline import BezierSpline
 

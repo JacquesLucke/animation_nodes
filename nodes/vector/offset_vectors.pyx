@@ -3,7 +3,7 @@ from bpy.props import *
 from ... tree_info import keepNodeState
 from ... math cimport Vector3, setVector3
 from ... utils.handlers import validCallback
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from ... data_structures cimport FalloffEvaluator, Vector3DList
 
 class OffsetVectorsNode(bpy.types.Node, AnimationNode):

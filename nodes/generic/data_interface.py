@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from collections import defaultdict
 from ... sockets.info import toIdName
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 
 dataByIdentifier = defaultdict(None)
 

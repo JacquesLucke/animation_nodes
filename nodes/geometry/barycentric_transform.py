@@ -3,7 +3,7 @@ import mathutils
 from bpy.props import *
 from ... utils.layout import writeText
 from ... tree_info import keepNodeState
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 
 operationTypeItems = [  ("POINT", "Transform Vector", ""),
                         ("LIST", "Transform Vector List", "") ]

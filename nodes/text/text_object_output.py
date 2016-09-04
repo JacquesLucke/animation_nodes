@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... utils.layout import writeText
 from ... events import executionCodeChanged
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 
 class TextObjectOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_TextObjectOutputNode"

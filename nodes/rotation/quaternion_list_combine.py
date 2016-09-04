@@ -2,7 +2,7 @@ import bpy
 import operator
 import functools
 from mathutils import Quaternion
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 
 class QuaternionListCombineNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_QuaternionListCombineNode"

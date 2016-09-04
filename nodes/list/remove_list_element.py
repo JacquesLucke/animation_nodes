@@ -3,7 +3,7 @@ from bpy.props import *
 from ... tree_info import keepNodeState
 from ... ui.info_popups import showTextPopup
 from ... events import executionCodeChanged
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from ... sockets.info import toBaseDataType, isBase, isComparable, toListDataType, isList
 
 removeTypeItems = [

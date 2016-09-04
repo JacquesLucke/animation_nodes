@@ -3,7 +3,7 @@ from bpy.props import *
 from ... events import propertyChanged
 from ... tree_info import getNodesByType
 from ... utils.handlers import eventHandler
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from .. container_provider import getHelperMaterial
 from ... algorithms.interpolations import PyInterpolation, CachedInterpolation
 

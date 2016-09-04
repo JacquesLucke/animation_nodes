@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... sockets.info import toIdName
 from ... tree_info import keepNodeState
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 
 class SwitchNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SwitchNode"

@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... tree_info import keepNodeLinks
 from ... events import executionCodeChanged
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from ... sockets.info import isBase, toBaseDataType, toListDataType
 
 class SearchListElementNode(bpy.types.Node, AnimationNode):

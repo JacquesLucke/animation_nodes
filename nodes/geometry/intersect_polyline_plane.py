@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from mathutils import Vector, geometry
 from ... events import executionCodeChanged
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 
 edgesTypeItems = [  ("POINTS", "Points in order", ""),
                     ("EDGES", "Points by edges", "") ]

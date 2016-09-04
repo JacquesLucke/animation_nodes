@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from bpy.types import NlaStrip
-from .. base_types.socket import AnimationNodeSocket
+from .. base_types import AnimationNodeSocket
 
 class NLAStripSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_NLAStripSocket"

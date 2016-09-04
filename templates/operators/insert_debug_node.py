@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... sockets.info import isList
-from ... base_types.template import Template
+from ... base_types import Template
 
 class InsertDebugNodeTemplateOperator(bpy.types.Operator, Template):
     bl_idname = "an.insert_debug_node_template_operator"

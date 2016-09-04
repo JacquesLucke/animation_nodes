@@ -60,5 +60,5 @@ def getAnimationNodeTrees(skipLinkedTrees = True):
     return nodeTrees
 
 def getAnimationNodeClasses():
-    from .. base_types.node import AnimationNode
+    from .. base_types import AnimationNode
     return AnimationNode.__subclasses__()

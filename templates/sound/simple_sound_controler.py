@@ -1,5 +1,5 @@
 import bpy
-from ... base_types.template import Template
+from ... base_types import Template
 
 class SimpleSoundControllerTemplate(bpy.types.Operator, Template):
     bl_idname = "an.simple_sound_controller_template"

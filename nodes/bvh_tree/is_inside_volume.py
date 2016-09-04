@@ -1,7 +1,7 @@
 import bpy
 from random import random
 from mathutils import Vector
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 
 # in some cases multiple tests have to done
 # to reduce the probability for errors

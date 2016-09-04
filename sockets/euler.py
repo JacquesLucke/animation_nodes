@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from mathutils import Euler
 from .. events import propertyChanged
-from .. base_types.socket import AnimationNodeSocket, ListSocket
+from .. base_types import AnimationNodeSocket, ListSocket
 
 class EulerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_EulerSocket"

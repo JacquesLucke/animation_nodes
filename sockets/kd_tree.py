@@ -1,6 +1,6 @@
 import bpy
 from mathutils.kdtree import KDTree
-from .. base_types.socket import AnimationNodeSocket
+from .. base_types import AnimationNodeSocket
 
 class KDTreeSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_KDTreeSocket"

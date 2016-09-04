@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from .. events import propertyChanged
 from .. utils.enum_items import enumItemsFromDicts
-from .. base_types.socket import AnimationNodeSocket
+from .. base_types import AnimationNodeSocket
 from .. utils.nodes import newNodeAtCursor, invokeTranslation
 from .. nodes.sound.sound_from_sequences import SingleSoundEvaluator, EqualizerSoundEvaluator
 

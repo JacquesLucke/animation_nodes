@@ -6,7 +6,7 @@ from ... utils import pretty_strings
 from ... draw_handler import drawHandler
 from ... utils.timing import measureTime
 from ... graphics.text_box import TextBox
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from ... tree_info import getNodesByType, keepNodeState
 
 dataByNode = {}

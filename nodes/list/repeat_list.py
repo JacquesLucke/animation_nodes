@@ -3,7 +3,7 @@ import random
 from bpy.props import *
 from ... tree_info import keepNodeState
 from ... events import executionCodeChanged
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from ... sockets.info import isList, toBaseDataType, isCopyable, getCopyExpression
 
 repetitionTypeItems = [

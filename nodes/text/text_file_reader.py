@@ -3,7 +3,7 @@ import bpy
 import collections
 from bpy.props import *
 from ... events import propertyChanged
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 
 # path, encoding : last modification, content
 cache = {}

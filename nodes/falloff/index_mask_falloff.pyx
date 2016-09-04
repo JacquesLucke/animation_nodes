@@ -3,7 +3,7 @@ cimport cython
 from bpy.props import *
 from libc.limits cimport LONG_MAX
 from ... data_structures cimport BaseFalloff
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 
 maskTypeItems = [
     ("EVERY_NTH", "Every Nth", "", "NONE", 0)

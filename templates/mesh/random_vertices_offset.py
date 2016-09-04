@@ -1,5 +1,5 @@
 import bpy
-from ... base_types.template import Template
+from ... base_types import Template
 
 class RandomVerticesOffsetTemplate(bpy.types.Operator, Template):
     bl_idname = "an.random_vertices_offset_template"

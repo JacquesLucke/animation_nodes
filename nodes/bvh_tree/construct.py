@@ -4,7 +4,7 @@ from bpy.props import *
 from ... events import isRendering
 from mathutils.bvhtree import BVHTree
 from ... tree_info import keepNodeState
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 
 sourceTypeItems = [
     ("MESH_DATA", "Mesh Data", "", "", 0),

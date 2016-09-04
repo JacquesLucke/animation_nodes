@@ -1,6 +1,6 @@
 import bpy
 from .. data_structures import MeshData
-from .. base_types.socket import AnimationNodeSocket, ListSocket
+from .. base_types import AnimationNodeSocket, ListSocket
 
 class MeshDataSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_MeshDataSocket"

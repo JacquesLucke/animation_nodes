@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from mathutils import Vector
 from ... sockets.info import isList
-from ... base_types.template import Template
+from ... base_types import Template
 from ... tree_info import getNodeByIdentifier
 
 class InsertLoopForIteration(bpy.types.Operator, Template):

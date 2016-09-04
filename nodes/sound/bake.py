@@ -3,7 +3,7 @@ import os
 from bpy.props import *
 from ... utils.names import getRandomString
 from ... tree_info import getNodeByIdentifier
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from ... utils.blender_ui import getDpiFactor
 from ... utils.path import getAbsolutePathOfSound
 from ... utils.fcurve import getSingleFCurveWithDataPath

@@ -1,5 +1,5 @@
 import bpy
-from ... base_types.template import Template
+from ... base_types import Template
 
 class AnimateIndividualLettersTemplate(bpy.types.Operator, Template):
     bl_idname = "an.animate_individual_letters_template"

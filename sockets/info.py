@@ -81,7 +81,7 @@ def updateSocketInfo():
     _socketInfo.update(socketClasses)
 
 def getSocketClasses():
-    from .. base_types.socket import AnimationNodeSocket
+    from .. base_types import AnimationNodeSocket
     return AnimationNodeSocket.__subclasses__()
 
 

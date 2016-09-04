@@ -1,5 +1,5 @@
 import bpy
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from ... data_structures import FloatList, DoubleList
 
 class FCurveKeyframesNode(bpy.types.Node, AnimationNode):

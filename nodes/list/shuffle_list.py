@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... sockets.info import isList
 from ... tree_info import keepNodeLinks
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 
 class ShuffleListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ShuffleListNode"

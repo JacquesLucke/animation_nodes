@@ -1,7 +1,7 @@
 import bpy
 import bmesh
 from ... events import isRendering
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 
 class BMeshFromObjectNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_BMeshFromObjectNode"

@@ -1,5 +1,5 @@
 import bpy
-from ... base_types.template import Template
+from ... base_types import Template
 
 class DistributeInstancesOnSplineTemplate(bpy.types.Operator, Template):
     bl_idname = "an.distribute_instances_on_spline_template"

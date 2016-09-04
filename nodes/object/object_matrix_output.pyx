@@ -4,7 +4,7 @@ from ... math cimport toPyMatrix4
 from ... sockets.info import isList
 from ... events import executionCodeChanged
 from ... data_structures cimport Matrix4x4List
-from ... base_types.node import AnimationNode, DynamicSocketHelper
+from ... base_types import AnimationNode, DynamicSocketHelper
 
 outputItems = [	("BASIS", "Basis", "", "NONE", 0),
                 ("LOCAL", "Local", "", "NONE", 1),

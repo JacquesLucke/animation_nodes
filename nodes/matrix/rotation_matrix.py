@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... tree_info import keepNodeState
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 
 axisItems = [
     ("X", "X", "", "", 0),

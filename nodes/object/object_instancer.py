@@ -3,7 +3,7 @@ from bpy.props import *
 from ... events import propertyChanged
 from ... tree_info import keepNodeState
 from ... utils.names import getRandomString
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from ... utils.enum_items import enumItemsFromDicts
 from ... utils.blender_ui import iterActiveSpacesByType
 from ... nodes.container_provider import getMainObjectContainer

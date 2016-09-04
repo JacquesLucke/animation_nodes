@@ -1,5 +1,5 @@
 import bpy
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from ... data_structures import EdgeIndicesList
 
 class an_EdgesOfPolygonsNode(bpy.types.Node, AnimationNode):

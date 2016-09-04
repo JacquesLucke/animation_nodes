@@ -4,7 +4,7 @@ from bpy.props import *
 from ... sockets.info import isList
 from ... tree_info import keepNodeLinks
 from ... events import executionCodeChanged
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 
 operationItems = [
     ("UNION", "Union", "Elements that are at least in one of both lists", "NONE", 0),

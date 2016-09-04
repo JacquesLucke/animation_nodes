@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import *
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from ... tree_info import getNodeByIdentifier, keepNodeState
 
 class ReassignLoopParameterNode(bpy.types.Node, AnimationNode):

@@ -3,7 +3,7 @@ import bpy
 from bpy.props import *
 from ... events import networkChanged
 from ... utils.layout import splitAlignment
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from . subprogram_base import SubprogramBaseNode
 from ... utils.nodes import newNodeAtCursor, invokeTranslation
 from . subprogram_sockets import SubprogramData, subprogramInterfaceChanged

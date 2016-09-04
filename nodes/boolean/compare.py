@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import *
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from ... events import executionCodeChanged
 from ... sockets.info import toIdName
 from ... tree_info import keepNodeLinks

@@ -6,7 +6,7 @@ from ... events import networkChanged
 from ... utils.names import getRandomString
 from ... utils.layout import splitAlignment
 from ... tree_info import getNodeByIdentifier
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from . subprogram_base import SubprogramBaseNode
 from ... utils.nodes import newNodeAtCursor, invokeTranslation
 from ... sockets.info import toListDataType, toIdName, isBase, toListIdName, toBaseDataType

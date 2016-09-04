@@ -1,7 +1,7 @@
 import bpy
 import bmesh
 from bpy.props import *
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 
 class CreateBMeshFromMeshData(bpy.types.Node, AnimationNode):
     bl_idname = "an_CreateBMeshFromMeshData"

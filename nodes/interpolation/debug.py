@@ -3,7 +3,7 @@ from bpy.props import *
 from mathutils import Vector
 from ... draw_handler import drawHandler
 from ... tree_info import getNodesByType
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from ... graphics.interpolation_preview import InterpolationPreview
 
 interpolationByNode = {}

@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... sockets.info import toListDataType
 from ... events import executionCodeChanged
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 
 dataTypes = ["Object", "Scene", "Object Group", "Text Block"]
 

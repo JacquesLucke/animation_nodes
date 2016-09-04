@@ -3,7 +3,7 @@ import random
 from bpy.props import *
 from ... events import propertyChanged
 from ... tree_info import keepNodeState
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from ... sockets.info import isList, toBaseIdName, toListDataType
 
 selectionTypeItems = [

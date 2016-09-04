@@ -1,5 +1,5 @@
 import bpy
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from ... algorithms.interpolations import Linear, FCurveMapping
 
 class InterpolationFromFCurveNode(bpy.types.Node, AnimationNode):

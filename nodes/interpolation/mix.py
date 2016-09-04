@@ -1,5 +1,5 @@
 import bpy
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from ... algorithms.interpolations import Mixed
 
 class MixInterpolationNode(bpy.types.Node, AnimationNode):

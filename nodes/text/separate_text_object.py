@@ -3,7 +3,7 @@ import random
 from bpy.props import *
 from mathutils import Vector, Matrix
 from ... id_keys import setIDKeyData
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from ... utils.blender_ui import executeInAreaType
 from ... nodes.container_provider import getMainObjectContainer
 

@@ -1,5 +1,5 @@
 import bpy
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from . spline_evaluation_base import SplineEvaluationBase
 
 class GetSplineSamplesNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):

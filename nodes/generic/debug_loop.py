@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from collections import defaultdict
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 
 debugLinesByIdentifier = defaultdict(list)
 

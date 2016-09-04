@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import *
-from .. base_types.socket import AnimationNodeSocket
+from .. base_types import AnimationNodeSocket
 
 class NodeControlSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_NodeControlSocket"

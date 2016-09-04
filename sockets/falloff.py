@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from .. events import propertyChanged
 from .. data_structures import BaseFalloff, CompoundFalloff
-from .. base_types.socket import AnimationNodeSocket
+from .. base_types import AnimationNodeSocket
 from .. nodes.falloff.constant_falloff import ConstantFalloff
 
 class FalloffSocket(bpy.types.NodeSocket, AnimationNodeSocket):

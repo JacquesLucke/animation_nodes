@@ -5,7 +5,7 @@ from ... utils.code import isCodeValid
 from ... tree_info import keepNodeState
 from ... utils.layout import splitAlignment
 from ... events import executionCodeChanged
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 
 variableNames = list("xyzabcdefghijklmnopqrstuvw")
 

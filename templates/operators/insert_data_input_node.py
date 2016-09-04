@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import *
-from ... base_types.template import Template
+from ... base_types import Template
 from ... sockets.info import isList, toBaseDataType
 
 class InsertDataInputNodeTemplateOperator(bpy.types.Operator, Template):

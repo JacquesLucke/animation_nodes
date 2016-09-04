@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import *
-from ... base_types.template import Template
+from ... base_types import Template
 from ... utils.layout import writeText
 
 connectionTypeItems = [

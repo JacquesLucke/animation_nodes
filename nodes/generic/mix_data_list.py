@@ -4,7 +4,7 @@ from . mix_data import getMixCode
 from ... tree_info import keepNodeLinks
 from ... sockets.info import toListDataType
 from ... events import executionCodeChanged
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 
 nodeTypes = {
     "Matrix" : "Mix Matrix List",

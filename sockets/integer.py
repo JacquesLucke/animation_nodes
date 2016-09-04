@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from .. events import propertyChanged
 from .. data_structures import LongLongList
-from .. base_types.socket import AnimationNodeSocket, ListSocket
+from .. base_types import AnimationNodeSocket, ListSocket
 
 def getValue(self):
     return min(max(self.minValue, self.get("value", 0)), self.maxValue)

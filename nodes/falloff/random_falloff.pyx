@@ -1,6 +1,6 @@
 import bpy
 from ... data_structures cimport BaseFalloff
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from ... algorithms.random cimport uniformRandomNumber
 
 class RandomFalloffNode(bpy.types.Node, AnimationNode):

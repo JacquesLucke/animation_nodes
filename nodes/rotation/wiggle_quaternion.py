@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from mathutils import Quaternion
 from ... events import propertyChanged
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from ... algorithms.perlin_noise import perlinNoise
 
 class QuaternionWiggleNode(bpy.types.Node, AnimationNode):

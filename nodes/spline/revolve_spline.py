@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... events import propertyChanged
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from ... algorithms.mesh_generation import revolve
 from ... data_structures import Vector3DList, EdgeIndicesList, PolygonIndicesList
 

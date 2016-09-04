@@ -1,6 +1,6 @@
 import bpy
 from libc.string cimport memcpy
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from ... math cimport transformVec3AsPoint
 from ... data_structures cimport (MeshData,
             Vector3DList, Matrix4x4List, EdgeIndicesList, PolygonIndicesList)

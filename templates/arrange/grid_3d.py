@@ -1,5 +1,5 @@
 import bpy
-from ... base_types.template import Template
+from ... base_types import Template
 
 class Grid3DTemplate(bpy.types.Operator, Template):
     bl_idname = "an.grid_3d_template"

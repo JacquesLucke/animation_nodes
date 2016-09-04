@@ -3,7 +3,7 @@ import numpy
 from bpy.props import *
 from mathutils import Color
 from ... events import propertyChanged
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 
 class SetVertexColorNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SetVertexColorNode"

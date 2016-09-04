@@ -1,5 +1,5 @@
 import bpy
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from ... data_structures cimport Matrix4x4List
 from ... math cimport reduceMatrix4x4List, toPyMatrix4, Matrix4
 

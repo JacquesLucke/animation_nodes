@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import *
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from ... data_structures import Vector3DList, EdgeIndicesList, PolygonIndicesList
 
 class BMeshMeshDataNode(bpy.types.Node, AnimationNode):

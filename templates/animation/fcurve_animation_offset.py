@@ -1,5 +1,5 @@
 import bpy
-from ... base_types.template import Template
+from ... base_types import Template
 
 class FCurveAnimationOffsetTemplate(bpy.types.Operator, Template):
     bl_idname = "an.fcurve_animation_offset_template"

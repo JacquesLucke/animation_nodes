@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from mathutils import Vector
 from .... events import executionCodeChanged
-from .... base_types.node import AnimationNode
+from .... base_types import AnimationNode
 from .... algorithms.mesh_generation import grid
 
 class GridMeshNode(bpy.types.Node, AnimationNode):

@@ -3,7 +3,7 @@ from bpy.props import *
 from operator import itemgetter
 from ... utils.layout import writeText
 from ... tree_info import keepNodeState
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from ... sockets.info import isBase, toListDataType
 from ... events import executionCodeChanged, propertyChanged
 

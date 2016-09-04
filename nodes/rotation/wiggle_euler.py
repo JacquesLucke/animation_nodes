@@ -4,7 +4,7 @@ from bpy.props import *
 from math import radians
 from mathutils import Euler
 from ... events import propertyChanged
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from ... algorithms.perlin_noise import perlinNoise
 
 class EulerWiggleNode(bpy.types.Node, AnimationNode):

@@ -1,6 +1,6 @@
 import bpy
 from mathutils.bvhtree import BVHTree
-from .. base_types.socket import AnimationNodeSocket
+from .. base_types import AnimationNodeSocket
 
 class BVHTreeSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_BVHTreeSocket"

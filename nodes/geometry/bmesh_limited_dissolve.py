@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from math import radians
 from bmesh.ops import dissolve_limit
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 
 class BMeshLimitedDissolveNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_BMeshLimitedDissolve"

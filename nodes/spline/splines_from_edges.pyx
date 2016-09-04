@@ -2,7 +2,7 @@ from ... math cimport Vector3
 from ... data_structures cimport PolySpline, Vector3DList, EdgeIndicesList
 
 import bpy
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 
 
 class SplinesFromEdgesNode(bpy.types.Node, AnimationNode):

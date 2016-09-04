@@ -1,5 +1,5 @@
 import bpy
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 
 
 class ObjectMatrixInputNode(bpy.types.Node, AnimationNode):

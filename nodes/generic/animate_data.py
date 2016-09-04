@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from . mix_data import getMixCode
 from ... events import executionCodeChanged
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 
 class AnimateDataNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_AnimateDataNode"

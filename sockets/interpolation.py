@@ -3,7 +3,7 @@ from bpy.props import *
 from .. events import propertyChanged
 from .. data_structures import InterpolationBase
 from .. algorithms.interpolations import getInterpolationPreset, PyInterpolation, Linear
-from .. base_types.socket import AnimationNodeSocket, ListSocket
+from .. base_types import AnimationNodeSocket, ListSocket
 
 categoryItems = [
     ("LINEAR", "Linear", "", "IPO_LINEAR", 0),

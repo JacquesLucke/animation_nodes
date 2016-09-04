@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... tree_info import keepNodeState
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 
 conversionTypeItems = [
     ("POINT_NORMAL_TO_MATRIX", "Point/Normal to Matrix", "", "NONE", 0),

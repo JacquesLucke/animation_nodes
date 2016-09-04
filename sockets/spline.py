@@ -3,7 +3,7 @@ from bpy.props import *
 from .. events import propertyChanged
 from .. data_structures import BezierSpline, PolySpline
 from .. utils.id_reference import tryToFindObjectReference
-from .. base_types.socket import AnimationNodeSocket, ListSocket
+from .. base_types import AnimationNodeSocket, ListSocket
 from .. data_structures.splines.from_blender import (createSplinesFromBlenderObject,
                                                      createSplineFromBlenderSpline)
 

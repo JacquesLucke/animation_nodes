@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import *
-from ... base_types.template import Template
+from ... base_types import Template
 
 class GridArrangeObjectsTemplate(bpy.types.Operator, Template):
     bl_idname = "an.grid_arrange_objects_template"

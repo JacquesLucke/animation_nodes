@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... events import executionCodeChanged
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 
 class SeparateEulerNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SeparateEulerNode"

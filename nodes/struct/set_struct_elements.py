@@ -1,7 +1,7 @@
 import bpy
 from ... events import executionCodeChanged
 from ... utils.layout import splitAlignment
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 
 class SetStructElementsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SetStructElementsNode"

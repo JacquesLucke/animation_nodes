@@ -6,7 +6,7 @@ from ... ui.info_popups import showTextPopup
 from ... utils.handlers import eventHandler
 from ... utils.names import toInterfaceName
 from ... events import executionCodeChanged
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from . subprogram_base import SubprogramBaseNode
 from ... execution.units import getSubprogramUnitByIdentifier
 from . subprogram_sockets import SubprogramData, subprogramInterfaceChanged

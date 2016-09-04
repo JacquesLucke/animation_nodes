@@ -1,7 +1,7 @@
 import bpy, colorsys
 from bpy.props import *
 from ... tree_info import keepNodeState
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 
 # using linear conversion here, unlike BL colorpicker hsv/hex
 # BL Color() funcion does this also and has only rgb+hsv, so we'l use colorsys

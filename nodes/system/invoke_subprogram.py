@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... sockets.info import toDataType
 from ... events import executionCodeChanged
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from ... utils.blender_ui import getDpiFactor
 from ... utils.enum_items import enumItemsFromDicts
 from ... utils.nodes import newNodeAtCursor, invokeTranslation

@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from .. utils.layout import writeText
-from .. base_types.socket import AnimationNodeSocket
+from .. base_types import AnimationNodeSocket
 from .. preferences import getDeveloperSettings, debuggingIsEnabled
 
 def draw(self, context):

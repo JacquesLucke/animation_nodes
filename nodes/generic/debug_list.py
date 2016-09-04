@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import *
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 
 class DebugListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_DebugListNode"

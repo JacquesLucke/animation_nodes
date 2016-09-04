@@ -2,7 +2,7 @@ import bpy
 from ... sockets.info import isList
 from ... math cimport setTranslationMatrix
 from ... data_structures cimport Matrix4x4List, Vector3DList
-from ... base_types.node import AnimationNode, DynamicSocketHelper
+from ... base_types import AnimationNode, DynamicSocketHelper
 
 class DynamicSockets(DynamicSocketHelper):
     def defaults(self):

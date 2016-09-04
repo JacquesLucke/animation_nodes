@@ -2,7 +2,7 @@ import bpy, re
 from bpy.props import *
 from ... events import propertyChanged
 from ... tree_info import keepNodeState
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 
 splitTypeItems = [
     ("CHARACTERS", "Characters", "", "NONE", 0),

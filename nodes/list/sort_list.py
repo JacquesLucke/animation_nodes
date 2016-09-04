@@ -6,7 +6,7 @@ from ... utils.code import isCodeValid
 from ... tree_info import keepNodeState
 from ... utils.names import toVariableName
 from ... events import executionCodeChanged
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from ... utils.enum_items import enumItemsFromDicts
 from mathutils.geometry import distance_point_to_plane
 

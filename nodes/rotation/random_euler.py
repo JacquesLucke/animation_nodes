@@ -3,7 +3,7 @@ import random
 from math import radians
 from bpy.props import *
 from ... events import propertyChanged
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 
 class RandomEulerNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_RandomEulerNode"

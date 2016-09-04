@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... data_structures cimport BaseFalloff
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from . constant_falloff import ConstantFalloff
 from ... math cimport Vector3, setVector3, normalizeVec3
 from ... math cimport signedDistancePointToPlane_Normalized as signedDistance

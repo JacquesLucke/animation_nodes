@@ -3,7 +3,7 @@ from bpy.props import *
 from mathutils import Vector
 from ... events import propertyChanged
 from ... data_structures import Vector3DList
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 
 class an_EdgesToPlanesNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_EdgesToPlanesNode"

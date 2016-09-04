@@ -1,5 +1,5 @@
 import bpy
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from ... data_structures cimport Falloff, CompoundFalloff
 from ... math cimport Vector3, setVector3, distanceVec3
 

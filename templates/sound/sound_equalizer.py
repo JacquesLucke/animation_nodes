@@ -1,5 +1,5 @@
 import bpy
-from ... base_types.template import Template
+from ... base_types import Template
 
 class SoundEqualizerTemplate(bpy.types.Operator, Template):
     bl_idname = "an.sound_equalizer_template"
