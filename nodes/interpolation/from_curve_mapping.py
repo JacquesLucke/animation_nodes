@@ -1,10 +1,11 @@
 import bpy
 from bpy.props import *
+from ... events import propertyChanged
 from ... tree_info import getNodesByType
 from ... utils.handlers import eventHandler
 from ... base_types.node import AnimationNode
 from .. container_provider import getHelperMaterial
-from ... algorithms.interpolations import PyInterpolation
+from ... algorithms.interpolations import PyInterpolation, CachedInterpolation
 
 
 class CurveMapPointCache(bpy.types.PropertyGroup):
@@ -23,6 +24,9 @@ class InterpolationFromCurveMappingNode(bpy.types.Node, AnimationNode):
     bl_width_default = 200
 
     curveMapCache = PointerProperty(type = CurveMapCache)
+    cacheInterpolation = BoolProperty(name = "Cache Interpolation", default = False,
+        description = "Allows much faster evaluation of the interpolation",
+        update = propertyChanged)
 
     def create(self):
         self.newOutput("Interpolation", "Interpolation", "interpolation")
@@ -31,6 +35,7 @@ class InterpolationFromCurveMappingNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.template_curve_mapping(self.curveNode, "mapping", type = "NONE")
         self.invokeFunction(layout, "resetEndPoints", text = "Reset End Points")
+        layout.prop(self, "cacheInterpolation")
 
     def execute(self):
         # load cached curve map if available
@@ -43,7 +48,12 @@ class InterpolationFromCurveMappingNode(bpy.types.Node, AnimationNode):
         curve = mapping.curves[3]
         try: curve.evaluate(0.5)
         except: mapping.initialize()
-        return PyInterpolation(curve.evaluate)
+
+        interpolation = PyInterpolation(curve.evaluate)
+        if self.cacheInterpolation:
+            return CachedInterpolation(interpolation)
+        else:
+            return interpolation
 
     def createCurveNode(self):
         material = getHelperMaterial()

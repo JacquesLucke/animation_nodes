@@ -1,5 +1,7 @@
+cimport cython
 from libc.math cimport M_PI as PI
 from libc.math cimport pow, sqrt, sin, cos
+from ... utils.lists cimport findListSegment_LowLevel
 from ... data_structures cimport InterpolationBase, DoubleList
 
 '''
@@ -281,6 +283,31 @@ cdef class PyInterpolation(InterpolationBase):
 
     cdef double evaluate(self, double x):
         return self.function(x)
+
+
+cdef class CachedInterpolation(InterpolationBase):
+    cdef:
+        InterpolationBase original
+        readonly DoubleList cache
+        int resolution
+
+    def __cinit__(self, InterpolationBase original not None, int resolution = 100):
+        self.original = original
+        self.resolution = max(2, resolution)
+        self.updateCache()
+
+    @cython.cdivision(True)
+    cdef updateCache(self):
+        self.cache = DoubleList(length = self.resolution)
+        cdef unsigned int i
+        for i in range(self.resolution):
+            self.cache.data[i] = self.original.evaluate(i / <double>(self.resolution - 1))
+
+    cdef double evaluate(self, double x):
+        cdef long index[2]
+        cdef float factor
+        findListSegment_LowLevel(self.resolution, False, x, index, &factor)
+        return self.cache.data[index[0]] * (1 - factor) + self.cache.data[index[1]] * factor
 
 
 from bpy.types import FCurve
