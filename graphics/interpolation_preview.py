@@ -44,7 +44,6 @@ class InterpolationPreview:
         glColor4f(0.2, 0.2, 0.2, 0.8)
         glLineWidth(2)
         glEnable(GL_BLEND)
-        glShadeModel(GL_SMOOTH)
         glEnable(GL_LINE_SMOOTH)
 
         glBegin(GL_LINE_STRIP)
@@ -58,7 +57,7 @@ class InterpolationPreview:
         glEnd()
 
         glDisable(GL_LINE_SMOOTH)
-        glShadeModel(GL_FLAT)
+        glDisable(GL_BLEND)
         glLineWidth(1)
 
     def drawRangeLines(self):
@@ -72,3 +71,5 @@ class InterpolationPreview:
         glVertex2f(self.boundary.left, self.interpolationBottom)
         glVertex2f(self.boundary.right, self.interpolationBottom)
         glEnd()
+
+        glDisable(GL_BLEND)
