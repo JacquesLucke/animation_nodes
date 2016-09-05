@@ -44,6 +44,7 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
         yield "    vertexLocations = Vector3DList()"
         yield "    edgeIndices = EdgeIndicesList()"
         yield "    polygonIndices = PolygonIndicesList()"
+        yield "    vertexNormals = Vector3DList()"
 
 
     def getMesh(self, object, useModifiers, scene):
