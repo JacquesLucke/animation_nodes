@@ -3,10 +3,10 @@ The ID Key system allows to store custom data inside of ID objects (Objects, ...
 Therefor it builds upon the normal ID properties Blender provides.
 
 The key (properties name always has a specific form):
-AN * Data Type * Property Name * Subproperty Name
+AN*Data Type*Property Name*Subproperty Name
 
 The total length of this string is limited to 63 characters.
-The individual parts are separated with ' * '
+The individual parts are separated by '*'
 '''
 
 import bpy
@@ -21,6 +21,8 @@ def doesIDKeyExist(object, dataType, propertyName):
     return typeClass.exists(object, propertyName) if typeClass else False
 
 def createIDKey(object, dataType, propertyName):
+    if "*" in propertyName:
+        raise ValueError("'*' must not be in the property name")
     typeClass = dataTypeByIdentifier.get(dataType, None)
     if typeClass is not None:
         typeClass.create(object, propertyName)
@@ -72,7 +74,7 @@ def findIDKeysInCurrentFile():
 
     for object in bpy.data.objects:
         for key in object.keys():
-            if key.startswith("AN * "): collectedKeys.add(key)
+            if key.startswith("AN*"): collectedKeys.add(key)
 
     realKeys = filterRealIDKeys(collectedKeys)
     realKeys.update(getDefaultIDKeys())
@@ -85,7 +87,7 @@ def getDefaultIDKeys():
 def filterRealIDKeys(keys):
     realKeys = set()
     for key in keys:
-        parts = key.split(" * ")
+        parts = key.split("*")
         if len(parts) != 4: continue
         if parts[1] not in dataTypeIdentifiers: continue
         realKeys.add(IDKey(parts[1], parts[2]))
@@ -210,12 +212,11 @@ dataTypeIdentifiers = dataTypeByIdentifier.keys()
 ###################################
 
 def joinSingle(dataType, propertyName):
-    return "AN * {} * {} * ".format(dataType, propertyName)
+    return "AN*%s*%s" % (dataType, propertyName)
 
 def joinMultiple(dataType, propertyName, subproperties):
-    prefix = joinSingle(dataType, propertyName)
     for subproperty in subproperties:
-        yield prefix + subproperty
+        yield "AN*%s*%s*%s" % (dataType, propertyName, subproperty)
 
 def getIDProperty(object, name, default):
     return getattr(object, toPath(name), default)
