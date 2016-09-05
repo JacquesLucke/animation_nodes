@@ -105,13 +105,17 @@ def iterLinkedSocketsWithInfo(socket, node, nodeByID):
 
 # improve performance of higher level functions
 
-def getOriginNodes(node):
+def getOriginNodes(node, nodeByID = None):
     nodeID = node.toID()
     linkedNodeIDs = set()
     for socketID in _forestData.socketsByNode[nodeID][0]:
         for linkedSocketID in _forestData.linkedSockets[socketID]:
             linkedNodeIDs.add(linkedSocketID[0])
-    return [idToNode(nodeID) for nodeID in linkedNodeIDs]
+
+    if nodeByID is None:
+        return [idToNode(nodeID) for nodeID in linkedNodeIDs]
+    else:
+        return [nodeByID[nodeID] for nodeID in linkedNodeIDs]
 
 def getAllDataLinkIDs():
     linkDataIDs = set()

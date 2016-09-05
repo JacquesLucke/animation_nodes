@@ -1,6 +1,7 @@
 from . import problems
 from . import tree_info
 from . utils.timing import measureTime
+from . tree_info import getOriginNodes
 from . ui.node_colors import colorNetworks
 from . nodes.system import subprogram_sockets
 from . execution.units import createExecutionUnits
@@ -43,9 +44,26 @@ def enableUseFakeUser():
 
 def callNodeEditFunctions():
     tree_info.updateIfNecessary()
-    for node in iterAnimationNodes():
+    nodeByID = createNodeByIdDict()
+    editedNodes = set()
+    currentNodes = set()
+
+    def editNode(node):
+        if node in editedNodes: return
+        currentNodes.add(node)
+
+        for dependencyNode in getOriginNodes(node, nodeByID):
+            if dependencyNode not in currentNodes:
+                editNode(dependencyNode)
+
         node.edit()
+        editedNodes.add(node)
+        currentNodes.remove(node)
         tree_info.updateIfNecessary()
+
+    for node in iterAnimationNodes():
+        editNode(node)
+
 
 def checkNetworks(nodeByID):
     invalidNetworkExists = False
