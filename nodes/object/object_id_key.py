@@ -16,12 +16,12 @@ class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
     bl_label = "Object ID Key"
     bl_width_default = 160
 
-    def keyDataTypeChanged(self, context):
+    def keyChanged(self, context):
         self.recreateOutputs()
 
     keyDataType = EnumProperty(name = "Key Data Type",
-        items = keyDataTypeItems, update = keyDataTypeChanged)
-    keyName = StringProperty(name = "Key Name", update = executionCodeChanged)
+        items = keyDataTypeItems, update = keyChanged)
+    keyName = StringProperty(name = "Key Name", update = keyChanged)
 
     def create(self):
         self.newInput("Object", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
@@ -43,6 +43,9 @@ class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
         self.keyName = name
 
     def getExecutionCode(self):
+        if self.keyName == "":
+            return
+            
         yield "exists = animation_nodes.id_keys.doesIDKeyExist(object, {}, {})".format(repr(self.keyDataType), repr(self.keyName))
         yield "data = animation_nodes.id_keys.getIDKeyData(object, {}, {})".format(repr(self.keyDataType), repr(self.keyName))
 
@@ -63,9 +66,11 @@ class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
     @keepNodeLinks
     def recreateOutputs(self):
         self.outputs.clear()
-        self.newOutput("Boolean", "Exists", "exists")
+        if self.keyName == "":
+            return
 
         dataType = self.keyDataType
+        self.newOutput("Boolean", "Exists", "exists")
 
         if dataType == "Transforms":
             self.newOutput("Vector", "Location", "location")

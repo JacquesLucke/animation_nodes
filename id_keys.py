@@ -23,6 +23,8 @@ def doesIDKeyExist(object, dataType, propertyName):
 def createIDKey(object, dataType, propertyName):
     if "*" in propertyName:
         raise ValueError("'*' must not be in the property name")
+    if propertyName == "":
+        raise ValueError("property name must not be empty")
     typeClass = dataTypeByIdentifier.get(dataType, None)
     if typeClass is not None:
         typeClass.create(object, propertyName)
