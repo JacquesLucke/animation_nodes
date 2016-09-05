@@ -1,40 +1,47 @@
 import bpy
 from bpy.props import *
-from ... events import executionCodeChanged
+from ... tree_info import keepNodeState
 from ... base_types import AnimationNode
 
-planeItems = [("XY", "XY", ""), ("XZ", "XZ", ""), ("YZ", "YZ", "")]
-thirdAxisName = {"XY": "z", "XZ": "y", "YZ": "x"}
-thirdAxisTuple = {"XY": "(0, 0, 1)", "XZ": "(0, 1, 0)", "YZ": "(1, 0, 0)"}
+planeItems = [
+    ("XY", "XY", "", "NONE", 0),
+    ("XZ", "XZ", "", "NONE", 1),
+    ("YZ", "YZ", "", "NONE", 2)]
 
 class ShearMatrixNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ShearMatrixNode"
     bl_label = "Shear Matrix"
 
-    plane = EnumProperty(items = planeItems, update = executionCodeChanged)
-    useThirdAsScale = BoolProperty(name = "Use Third as Scale", default = True,
-                    description = "Use Third Coordinate as Scale, if not, only use the 2 shear coordinates",
-                    update = executionCodeChanged)
+    def planeChanged(self, context):
+        self.recreateInputs()
+
+    plane = EnumProperty(items = planeItems, update = planeChanged)
 
     def create(self):
-        self.newInput("Vector", "Shear", "shear", value = [1, 1, 1])
+        self.recreateInputs()
         self.newOutput("Matrix", "Matrix", "matrix")
+
+    @keepNodeState
+    def recreateInputs(self):
+        self.inputs.clear()
+        if self.plane == "XY":
+            self.newInput("Float", "Angle X", "angleA")
+            self.newInput("Float", "Angle Y", "angleB")
+        elif self.plane == "XZ":
+            self.newInput("Float", "Angle X", "angleA")
+            self.newInput("Float", "Angle Z", "angleB")
+        elif self.plane == "YZ":
+            self.newInput("Float", "Angle Y", "angleA")
+            self.newInput("Float", "Angle Z", "angleB")
 
     def draw(self, layout):
         layout.prop(self, "plane", expand = True)
-        layout.prop(self, "useThirdAsScale",
-                    text = "Use {} as Scale".format(thirdAxisName[self.plane].upper()) )
 
     def getExecutionCode(self):
-        plane = self.plane
+        yield "limit = math.pi / 2 - 0.00001"
+        yield "_angleA = math.tan(min(max(angleA, -limit), limit))"
+        yield "_angleB = math.tan(min(max(angleB, -limit), limit))"
+        yield "matrix = Matrix.Shear('{}', 4, (_angleA, _angleB))".format(self.plane)
 
-        if self.useThirdAsScale:
-            yield ("_scale = Matrix.Scale(shear.{}, 4, {})"
-                                .format(thirdAxisName[plane], thirdAxisTuple[plane]) )
-            yield ("_matrix = Matrix.Shear('{}', 4, (shear.{}, shear.{}))"
-                                .format(plane, plane[0].lower(), plane[1].lower()) )
-            yield "matrix = _scale * _matrix"
-
-        else:
-            yield ("matrix = Matrix.Shear('{}', 4, (shear.{}, shear.{}))"
-                                .format(plane, plane[0].lower(), plane[1].lower()) )
+    def getUsedModules(self):
+        return ["math"]
