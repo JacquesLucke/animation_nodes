@@ -31,7 +31,7 @@ class DynamicSockets(DynamicSocketSet):
             self.setType(inputs[1], "Matrix List")
             self.setType(outputs[0], "Object List")
 
-dynamicSockets = DynamicSockets()
+socketSet = DynamicSockets()
 
 
 class ObjectMatrixOutputNode(bpy.types.Node, AnimationNode):
@@ -41,14 +41,14 @@ class ObjectMatrixOutputNode(bpy.types.Node, AnimationNode):
     outputType = EnumProperty(items = outputItems, update = executionCodeChanged, default = "WORLD")
 
     def create(self):
-        dynamicSockets.createDefaults(self)
+        socketSet.createDefaults(self)
 
     def draw(self, layout):
         row = layout.row(align = True)
         row.prop(self, "outputType", text = "Type")
 
     def edit(self):
-        dynamicSockets.applyRules(self)
+        socketSet.applyRules(self)
 
     def getExecutionFunctionName(self):
         if isList(self.inputs[1].dataType):

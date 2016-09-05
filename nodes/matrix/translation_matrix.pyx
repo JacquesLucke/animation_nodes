@@ -18,17 +18,17 @@ class DynamicSockets(DynamicSocketSet):
             self.setType(inputs[0], "Vector List")
             self.setType(outputs[0], "Matrix List")
 
-dynamicSockets = DynamicSockets()
+socketSet = DynamicSockets()
 
 class TranslationMatrixNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_TranslationMatrixNode"
     bl_label = "Translation Matrix"
 
     def create(self):
-        dynamicSockets.createDefaults(self)
+        socketSet.createDefaults(self)
 
     def edit(self):
-        dynamicSockets.applyRules(self)
+        socketSet.applyRules(self)
 
     def getExecutionCode(self):
         if isList(self.inputs[0].dataType):
