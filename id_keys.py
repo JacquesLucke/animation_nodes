@@ -37,11 +37,15 @@ def setIDKeyData(object, dataType, propertyName, data):
     typeClass = dataTypeByIdentifier.get(dataType, None)
     if typeClass is not None:
         typeClass.set(object, propertyName, data)
+    else:
+        raise TypeError("data type {} does not exist".format(dataType))
 
 def removeIDKey(object, dataType, propertyName):
     typeClass = dataTypeByIdentifier.get(dataType, None)
     if typeClass is not None:
         typeClass.remove(object, propertyName)
+    else:
+        raise TypeError("data type {} does not exist".format(dataType))
 
 def drawIDKeyProperty(layout, object, dataType, propertyName):
     typeClass = dataTypeByIdentifier.get(dataType, None)
@@ -84,13 +88,13 @@ def findIDKeysInCurrentFile():
 
 IDKey = namedtuple("IDKey", ["type", "name"])
 def getDefaultIDKeys():
-    return [ IDKey("Transforms", "Initial Transforms") ]
+    return [IDKey("Transforms", "Initial Transforms")]
 
 def filterRealIDKeys(keys):
     realKeys = set()
     for key in keys:
         parts = key.split("*")
-        if len(parts) != 4: continue
+        if len(parts) not in (3, 4): continue
         if parts[1] not in dataTypeIdentifiers: continue
         realKeys.add(IDKey(parts[1], parts[2]))
     return realKeys
