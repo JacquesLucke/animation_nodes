@@ -10,7 +10,7 @@ class TimecodeGeneratorNode(bpy.types.Node, AnimationNode):
         self.newInput("Float", "Frame", "frame")
         socket = self.newInput("Float", "Frame Rate", "frameRate", minValue = 0)
         socket.value = bpy.context.scene.render.fps
-        self.newOutput("String", "Timecode", "timecode")
+        self.newOutput("Text", "Timecode", "timecode")
 
     def execute(self, frame, frameRate):
         if frameRate > 0:

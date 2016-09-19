@@ -13,7 +13,7 @@ class ParticleInfoNode(bpy.types.Node, AnimationNode):
         self.newOutput("Vector", "Velocity", "velocity", hide = True)
         self.newOutput("Euler", "Angular Velocity", "angularVelocity", hide = True)
         self.newOutput("Float", "Size", "size", hide = True)
-        self.newOutput("String", "Alive State", "aliveState", hide = True)
+        self.newOutput("Text", "Alive State", "aliveState", hide = True)
         self.newOutput("Boolean", "Is Exist", "isExist", hide = True)
         self.newOutput("Boolean", "Is Visible", "isVisible", hide = True)
         self.newOutput("Float", "Lifetime", "lifetime", hide = True)

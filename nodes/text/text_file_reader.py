@@ -16,9 +16,9 @@ class TextFileReaderNode(bpy.types.Node, AnimationNode):
     errorMessage = StringProperty()
 
     def create(self):
-        self.newInput("String", "Path", "path", showFileChooser = True)
-        self.newInput("String", "Encoding", "encoding", value = "ascii")
-        self.newOutput("String", "Text", "text")
+        self.newInput("Text", "Path", "path", showFileChooser = True)
+        self.newInput("Text", "Encoding", "encoding", value = "ascii")
+        self.newOutput("Text", "Text", "text")
 
     def draw(self, layout):
         if self.inputs[0].isUnlinked:

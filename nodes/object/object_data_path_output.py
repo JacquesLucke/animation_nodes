@@ -10,7 +10,7 @@ class ObjectDataPathOutputNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
-        self.newInput("String", "Path", "path")
+        self.newInput("Text", "Path", "path")
         self.newInput("Integer", "Array Index", "arrayIndex", value = -1)
         self.newInput("Generic", "Value", "value")
         self.newOutput("Object", "Object", "object")

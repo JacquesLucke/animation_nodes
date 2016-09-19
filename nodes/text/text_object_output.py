@@ -14,7 +14,7 @@ class TextObjectOutputNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
 
-        self.newInput("String", "Text", "text")
+        self.newInput("Text", "Text", "text")
         self.newInput("Float", "Size", "size", value = 1.0)
         self.newInput("Float", "Extrude", "extrude")
         self.newInput("Float", "Shear", "shear")
@@ -27,7 +27,7 @@ class TextObjectOutputNode(bpy.types.Node, AnimationNode):
 
         self.newInput("Float", "X Offset", "xOffset")
         self.newInput("Float", "Y Offset", "yOffset")
-        self.newInput("String", "Align", "align", value = "CENTER")
+        self.newInput("Text", "Align", "align", value = "CENTER")
 
         self.newInput("Font", "Font", "font")
         self.newInput("Font", "Bold Font", "fontBold")

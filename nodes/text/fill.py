@@ -7,8 +7,8 @@ fillModeItems = [
     ("LEFT", "Left", "", "TRIA_LEFT", 0),
     ("RIGHT", "Right", "", "TRIA_RIGHT", 1) ]
 
-class FillStringNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_FillStringNode"
+class FillTextNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_FillTextNode"
     bl_label = "Fill Text"
 
     fillMode = EnumProperty(name = "Fill Mode", default = "LEFT",
@@ -16,9 +16,9 @@ class FillStringNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.newInput("Integer", "Length", "length")
-        self.newInput("String", "Text", "text")
-        self.newInput("String", "Fill", "fill")
-        self.newOutput("String", "Text", "outText")
+        self.newInput("Text", "Text", "text")
+        self.newInput("Text", "Fill", "fill")
+        self.newOutput("Text", "Text", "outText")
 
     def draw(self, layout):
         layout.prop(self, "fillMode", text = "")

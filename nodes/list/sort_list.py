@@ -114,7 +114,7 @@ for template in SortingTemplate.__subclasses__():
 
 keyListTypeItems = [
     ("FLOAT", "Float", "", "NONE", 0),
-    ("STRING", "String", "", "NONE", 1) ]
+    ("TEXT", "Text", "", "NONE", 1) ]
 
 class SortListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SortListNode"
@@ -261,8 +261,8 @@ class SortListNode(bpy.types.Node, AnimationNode):
         if self.sortType == "KEY_LIST":
             if self.keyListType == "FLOAT":
                 self.newInput("Float List", "Key List", "keyList")
-            elif self.keyListType == "STRING":
-                self.newInput("String List", "Key List", "keyList")
+            elif self.keyListType == "TEXT":
+                self.newInput("Text List", "Key List", "keyList")
 
         self.newOutput(listDataType, "Sorted List", "outList")
 

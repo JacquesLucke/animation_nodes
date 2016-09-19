@@ -7,7 +7,7 @@ class FCurveInfoNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.newInput("FCurve", "FCurve", "fCurve")
-        self.newOutput("String", "Data Path", "dataPath")
+        self.newOutput("Text", "Data Path", "dataPath")
         self.newOutput("Integer", "Array Index", "arrayIndex")
 
     def getExecutionCode(self):

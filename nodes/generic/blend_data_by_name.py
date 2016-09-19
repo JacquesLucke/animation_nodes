@@ -36,5 +36,5 @@ class BlendDataByNameNode(bpy.types.Node, AnimationNode):
     def createSockets(self):
         self.inputs.clear()
         self.outputs.clear()
-        self.newInput("String", "Name", "name").defaultDrawType = "PROPERTY_ONLY"
+        self.newInput("Text", "Name", "name").defaultDrawType = "PROPERTY_ONLY"
         self.newOutput(self.dataType, self.dataType, "output")

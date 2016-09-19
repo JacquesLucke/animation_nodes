@@ -4,8 +4,8 @@ from bpy.props import *
 from ... events import propertyChanged
 from ... base_types import AnimationNode
 
-class RandomStringNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_RandomStringNode"
+class RandomTextNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_RandomTextNode"
     bl_label = "Random Text"
 
     nodeSeed = IntProperty(name = "Node Seed", update = propertyChanged)
@@ -13,8 +13,8 @@ class RandomStringNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.newInput("Integer", "Seed", "seed")
         self.newInput("Integer", "Length", "length", value = 5)
-        self.newInput("String", "Characters", "characters", value = "abcdefghijklmnopqrstuvwxyz")
-        self.newOutput("String", "Text", "text")
+        self.newInput("Text", "Characters", "characters", value = "abcdefghijklmnopqrstuvwxyz")
+        self.newOutput("Text", "Text", "text")
         self.randomizeNodeSeed()
 
     def draw(self, layout):

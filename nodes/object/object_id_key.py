@@ -6,7 +6,7 @@ from ... base_types import AnimationNode
 
 keyDataTypeItems = [
     ("Transforms", "Transforms", "", "NONE", 0),
-    ("String", "String", "", "NONE", 1),
+    ("Text", "Text", "", "NONE", 1),
     ("Integer", "Integer", "", "NONE", 2),
     ("Float", "Float", "", "NONE", 3)
 ]
@@ -45,7 +45,7 @@ class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
     def getExecutionCode(self):
         if self.keyName == "":
             return
-            
+
         yield "exists = animation_nodes.id_keys.doesIDKeyExist(object, {}, {})".format(repr(self.keyDataType), repr(self.keyName))
         yield "data = animation_nodes.id_keys.getIDKeyData(object, {}, {})".format(repr(self.keyDataType), repr(self.keyName))
 
@@ -57,7 +57,7 @@ class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
             if isLinked["matrix"]:
                 yield "matrix = animation_nodes.utils.math.composeMatrix(location, rotation, scale)"
 
-        if dataType == "String":
+        if dataType == "Text":
             yield "text = data"
 
         if dataType in ("Integer", "Float"):
@@ -78,8 +78,8 @@ class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
             self.newOutput("Vector", "Scale", "scale")
             self.newOutput("Matrix", "Matrix", "matrix")
 
-        if dataType == "String":
-            self.newOutput("String", "Text", "text")
+        if dataType == "Text":
+            self.newOutput("Text", "Text", "text")
 
         if dataType in ("Integer", "Float"):
             self.newOutput("Integer", "Number", "number")

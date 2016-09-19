@@ -186,8 +186,8 @@ class SingleValueDataType:
     def getPropertyKey(cls, name):
         return joinSingle(cls.identifier, name)
 
-class StringDataType(SingleValueDataType, IDKeyDataType):
-    identifier = "String"
+class TextDataType(SingleValueDataType, IDKeyDataType):
+    identifier = "Text"
     default = ""
 
     @classmethod

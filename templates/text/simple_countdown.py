@@ -14,11 +14,11 @@ class SimpleCountdownTemplate(bpy.types.Operator, Template):
         mapRangeNode.inputs[3].value = 10
         mapRangeNode.inputs[4].value = 0
         roundNumberNode = self.newNode("an_RoundNumberNode", x = 420, y = 50)
-        convertToStringNode = self.newNode("an_ConvertToStringNode", x = 630, y = 50)
+        convertToTextNode = self.newNode("an_ConvertToTextNode", x = 630, y = 50)
         textOutputNode = self.newNode("an_TextObjectOutputNode", x = 840, y = 100)
         textOutputNode.inputs["Text"].isUsed = True
 
         self.newLink(timeInfoNode.outputs[0], mapRangeNode.inputs[0])
         self.newLink(mapRangeNode.outputs[0], roundNumberNode.inputs[0])
-        self.newLink(roundNumberNode.outputs[0], convertToStringNode.inputs[0])
-        self.newLink(convertToStringNode.outputs[0], textOutputNode.inputs[1])
+        self.newLink(roundNumberNode.outputs[0], convertToTextNode.inputs[0])
+        self.newLink(convertToTextNode.outputs[0], textOutputNode.inputs[1])

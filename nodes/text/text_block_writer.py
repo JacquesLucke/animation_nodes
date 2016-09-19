@@ -7,7 +7,7 @@ class TextBlockWriterNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.newInput("Text Block", "Text Block", "textBlock", defaultDrawType = "PROPERTY_ONLY")
-        self.newInput("String", "Text", "text")
+        self.newInput("Text", "Text", "text")
         self.newInput("Boolean", "Enabled", "enabled", hide = True)
         self.newOutput("Text Block", "Text Block", "textBlock")
 

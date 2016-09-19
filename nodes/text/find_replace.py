@@ -6,10 +6,10 @@ class ReplaceTextNode(bpy.types.Node, AnimationNode):
     bl_label = "Replace Text"
 
     def create(self):
-        self.newInput("String", "Text", "text")
-        self.newInput("String", "Old", "old")
-        self.newInput("String", "New", "new")
-        self.newOutput("String", "Text", "newText")
+        self.newInput("Text", "Text", "text")
+        self.newInput("Text", "Old", "old")
+        self.newInput("Text", "New", "new")
+        self.newOutput("Text", "Text", "newText")
 
     def getExecutionCode(self):
         return "newText = text.replace(old, new)"

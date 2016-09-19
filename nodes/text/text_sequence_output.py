@@ -12,11 +12,11 @@ class TextSequenceOutputNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.newInput("Sequence", "Sequence", "sequence", defaultDrawType = "PROPERTY_ONLY")
-        self.newInput("String", "Text", "text")
+        self.newInput("Text", "Text", "text")
         self.newInput("Integer", "Size", "size", value = 200)
         self.newInput("Boolean", "Shadow", "shadow", value = False)
-        self.newInput("String", "X Align", "xAlign", value = "CENTER")
-        self.newInput("String", "Y Align", "yAlign", value = "BOTTOM")
+        self.newInput("Text", "X Align", "xAlign", value = "CENTER")
+        self.newInput("Text", "Y Align", "yAlign", value = "BOTTOM")
         self.newInput("Float", "X Location", "xLocation", value = 0.5)
         self.newInput("Float", "Y Location", "yLocation", value = 0.0)
         self.newInput("Float", "Wrap Width", "wrapWidth", value = 0.0)

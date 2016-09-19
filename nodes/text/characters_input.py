@@ -13,12 +13,12 @@ class CharactersNode(bpy.types.Node, AnimationNode):
     bl_label = "Characters"
 
     def create(self):
-        self.newOutput("String", "Lower Case", "lower")
-        self.newOutput("String", "Upper Case", "upper")
-        self.newOutput("String", "Digits", "digits")
-        self.newOutput("String", "Special", "special")
-        self.newOutput("String", "Line Break", "lineBreak")
-        self.newOutput("String", "All", "all")
+        self.newOutput("Text", "Lower Case", "lower")
+        self.newOutput("Text", "Upper Case", "upper")
+        self.newOutput("Text", "Digits", "digits")
+        self.newOutput("Text", "Special", "special")
+        self.newOutput("Text", "Line Break", "lineBreak")
+        self.newOutput("Text", "All", "all")
 
     def execute(self):
         return lower, upper, digits, special, lineBreak, allChars

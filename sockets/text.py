@@ -4,11 +4,11 @@ from .. events import propertyChanged
 from .. base_types import AnimationNodeSocket, ListSocket
 
 
-class StringSocket(bpy.types.NodeSocket, AnimationNodeSocket):
-    bl_idname = "an_StringSocket"
-    bl_label = "String Socket"
-    dataType = "String"
-    allowedInputTypes = ["String"]
+class TextSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+    bl_idname = "an_TextSocket"
+    bl_label = "Text Socket"
+    dataType = "Text"
+    allowedInputTypes = ["Text"]
     drawColor = (1, 1, 1, 1)
     comparable = True
     storable = True
@@ -46,12 +46,12 @@ class StringSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return str(value), 1
 
 
-class StringListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSocket):
-    bl_idname = "an_StringListSocket"
-    bl_label = "String List Socket"
-    dataType = "String List"
-    baseDataType = "String"
-    allowedInputTypes = ["String List"]
+class TextListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSocket):
+    bl_idname = "an_TextListSocket"
+    bl_label = "Text List Socket"
+    dataType = "Text List"
+    baseDataType = "Text"
+    allowedInputTypes = ["Text List"]
     drawColor = (1, 1, 1, 0.5)
     storable = True
     comparable = False

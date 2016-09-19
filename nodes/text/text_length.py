@@ -1,12 +1,12 @@
 import bpy
 from ... base_types import AnimationNode
 
-class StringLengthNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_StringLengthNode"
+class TextLengthNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_TextLengthNode"
     bl_label = "Text Length"
 
     def create(self):
-        self.newInput("String", "Text", "text")
+        self.newInput("Text", "Text", "text")
         self.newOutput("Integer", "Length", "length")
 
     def getExecutionCode(self):

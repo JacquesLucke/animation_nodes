@@ -63,7 +63,7 @@ class SimpleConvert(LinkCorrection):
         ("Boolean", "Float") : "an_BooleanToIntegerNode",
         ("Float", "Integer") : "an_FloatToIntegerNode",
         ("Vector", "Matrix") : "an_TranslationMatrixNode",
-        ("Text Block", "String") : "an_TextBlockReaderNode",
+        ("Text Block", "Text") : "an_TextBlockReaderNode",
         ("Vector", "Float") : "an_SeparateVectorNode",
         ("Float", "Vector") : "an_CombineVectorNode",
         ("Integer", "Vector") : "an_CombineVectorNode",
@@ -79,7 +79,7 @@ class SimpleConvert(LinkCorrection):
         ("Object", "Vector") : "an_ObjectTransformsInputNode",
         ("Object", "Matrix") : "an_ObjectMatrixInputNode",
         ("Object", "Shape Key List") : "an_ShapeKeysFromObjectNode",
-        ("String", "Float") : "an_ParseNumberNode",
+        ("Text", "Float") : "an_ParseNumberNode",
         ("Integer List", "Float List") : "an_IntegerListToFloatListNode",
         ("Vector", "Euler") : "an_DirectionToRotationNode",
         ("Euler", "Vector") : "an_RotationToDirectionNode",
@@ -201,11 +201,11 @@ class ConvertListToLength(LinkCorrection):
     def insert(self, nodeTree, origin, target, dataOrigin):
         insertLinkedNode(nodeTree, "an_GetListLengthNode", origin, target)
 
-class ConvertToString(LinkCorrection):
+class ConvertToText(LinkCorrection):
     def check(self, origin, target):
-        return target.dataType == "String"
+        return target.dataType == "Text"
     def insert(self, nodeTree, origin, target, dataOrigin):
-        node = insertLinkedNode(nodeTree, "an_ConvertToStringNode", origin, target)
+        node = insertLinkedNode(nodeTree, "an_ConvertToTextNode", origin, target)
         node.hide = True
 
 class ConvertFromGenericList(LinkCorrection):
@@ -268,6 +268,6 @@ linkCorrectors = [
     ConvertObjectToShapeKey(),
 	ConvertListToLength(),
     SimpleConvert(),
-    ConvertToString(),
+    ConvertToText(),
     ConvertFromGenericList(),
     ConvertFromGeneric() ]

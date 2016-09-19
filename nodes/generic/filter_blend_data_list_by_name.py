@@ -46,7 +46,7 @@ class FilterBlendDataListByNameNode(bpy.types.Node, AnimationNode):
         self.outputs.clear()
         listDataType = toListDataType(self.dataType)
         self.newInput(listDataType, listDataType, "sourceList")
-        self.newInput("String", "Name", "name")
+        self.newInput("Text", "Name", "name")
         self.newOutput(listDataType, listDataType, "targetList")
 
     def getExecutionCode(self):

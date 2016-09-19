@@ -23,8 +23,8 @@ class ChangeTextCaseNode(bpy.types.Node, AnimationNode):
         items = caseTypeItems, update = caseTypeChanges)
 
     def create(self):
-        self.newInput("String", "Text", "inText")
-        self.newOutput("String", "Text", "outText")
+        self.newInput("Text", "Text", "inText")
+        self.newOutput("Text", "Text", "outText")
 
     def draw(self, layout):
         layout.prop(self, "caseType", text = "")

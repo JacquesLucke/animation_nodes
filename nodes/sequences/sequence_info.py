@@ -8,15 +8,15 @@ class SequenceInfoNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.newInput("Sequence", "Sequence", "sequence", defaultDrawType = "PROPERTY_ONLY")
 
-        self.newOutput("String", "Name", "name")
-        self.newOutput("String", "Type", "type")
+        self.newOutput("Text", "Name", "name")
+        self.newOutput("Text", "Type", "type")
         self.newOutput("Integer", "Channel", "channel")
         self.newOutput("Integer", "Final Duration", "finalDuration")
         self.newOutput("Integer", "Final Start Frame", "finalStartFrame")
         self.newOutput("Integer", "Final End Frame", "finalEndFrame")
 
         self.newOutput("Float", "Opacity", "opacity")
-        self.newOutput("String", "Blend Type", "blendType")
+        self.newOutput("Text", "Blend Type", "blendType")
         self.newOutput("Float", "Effect Fader", "effectFader")
 
         self.newOutput("Integer", "Start Frame", "startFrame")

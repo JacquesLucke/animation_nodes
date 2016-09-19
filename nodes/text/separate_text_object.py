@@ -96,7 +96,7 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
         for i, (object, originalCharacter) in enumerate(zip(objects, originalTexts)):
             object[idPropertyName] = self.currentID
             object[indexPropertyName] = i
-            object.id_keys.set("String", "Initial Text", originalCharacter)
+            object.id_keys.set("Text", "Initial Text", originalCharacter)
             object.id_keys.set("Transforms", "Initial Transforms",
                 (object.location, object.rotation_euler, object.scale))
         bpy.ops.an.update_id_keys_list()

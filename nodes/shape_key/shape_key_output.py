@@ -16,7 +16,7 @@ class ShapeKeyOutputNode(bpy.types.Node, AnimationNode):
         self.newInput("Float", "Value", "value").setRange(0, 1)
         self.newInput("Float", "Slider Min", "sliderMin")
         self.newInput("Float", "Slider Max", "sliderMax")
-        self.newInput("String", "Name", "name")
+        self.newInput("Text", "Name", "name")
         self.newInput("Boolean", "Mute", "mute")
 
         self.newOutput("Shape Key", "Shape Key", "shapeKey")

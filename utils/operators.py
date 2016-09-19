@@ -29,7 +29,8 @@ def getOperatorForFunction(function, idName, label, arguments, redraw):
     parameters = list(iterParameterNamesAndDefaults(function))
     for argument, (name, default) in zip(arguments, parameters):
         if argument == "Int": propertyType = IntProperty
-        if argument == "String": propertyType = StringProperty
+        elif argument == "String": propertyType = StringProperty
+        else: raise ValueError("cannot create property of this type")            
 
         if default is None: setattr(operator, name, propertyType())
         else: setattr(operator, name, propertyType(default = default))

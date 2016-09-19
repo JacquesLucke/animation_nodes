@@ -30,7 +30,7 @@ class SplitTextNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.recreateInputs()
-        self.newOutput("String List", "Text List", "textList")
+        self.newOutput("Text List", "Text List", "textList")
         self.newOutput("Integer", "Length", "length")
 
     def draw(self, layout):
@@ -78,8 +78,8 @@ class SplitTextNode(bpy.types.Node, AnimationNode):
     @keepNodeState
     def recreateInputs(self):
         self.inputs.clear()
-        self.newInput("String", "Text", "text")
+        self.newInput("Text", "Text", "text")
         if self.splitType in ("REGULAR_EXPRESSION", "SEPARATOR"):
-            self.newInput("String", "Split By", "splitBy")
+            self.newInput("Text", "Split By", "splitBy")
         if self.splitType == "N_CHARACTERS":
             self.newInput("Integer", "N", "n", value = 5, minValue = 1)

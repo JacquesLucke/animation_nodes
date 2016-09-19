@@ -19,7 +19,7 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
         self.newOutput("Edge Indices List", "Edge Indices", "edgeIndices")
         self.newOutput("Polygon Indices List", "Polygon Indices", "polygonIndices")
         self.newOutput("Vector List", "Vertex Normals", "vertexNormals")
-        self.newOutput("String", "Mesh Name", "meshName", hide = True)
+        self.newOutput("Text", "Mesh Name", "meshName", hide = True)
 
     def getExecutionCode(self):
         isLinked = self.getLinkedOutputsDict()

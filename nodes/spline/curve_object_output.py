@@ -26,7 +26,7 @@ class CurveObjectOutputNode(bpy.types.Node, AnimationNode):
         self.newInput("Integer", "Preview Resolution", "previewResolution", value = 12)
         self.newInput("Object", "Taper Object", "taperObject")
         self.newInput("Object", "Bevel Object", "bevelObject")
-        self.newInput("String", "Fill Mode", "fillMode", value = "FRONT")
+        self.newInput("Text", "Fill Mode", "fillMode", value = "FRONT")
 
         self.newOutput("Object", "Object", "object")
 

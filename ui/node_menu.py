@@ -5,7 +5,7 @@ from .. sockets.info import getBaseDataTypes
 from .. tree_info import getSubprogramNetworks
 from .. utils.nodes import getAnimationNodeTrees
 
-mainBaseDataTypes = ("Object", "Integer", "Float", "Vector", "String")
+mainBaseDataTypes = ("Object", "Integer", "Float", "Vector", "Text")
 
 def drawMenu(self, context):
     if context.space_data.tree_type != "an_AnimationNodeTree": return
@@ -168,20 +168,20 @@ class TextMenu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        insertNode(layout, "an_DataInputNode", "Input", {"assignedType" : repr("String")})
-        insertNode(layout, "an_CreateListNode", "List", {"assignedType" : repr("String")})
-        insertNode(layout, "an_RandomStringNode", "Randomize")
+        insertNode(layout, "an_DataInputNode", "Input", {"assignedType" : repr("Text")})
+        insertNode(layout, "an_CreateListNode", "List", {"assignedType" : repr("Text")})
+        insertNode(layout, "an_RandomTextNode", "Randomize")
         insertNode(layout, "an_CharactersNode", "Characters")
         insertNode(layout, "an_TimecodeGeneratorNode", "Timecode Generator")
         layout.separator()
         insertNode(layout, "an_SplitTextNode", "Split")
-        insertNode(layout, "an_JoinStringsNode", "Join")
+        insertNode(layout, "an_JoinTextsNode", "Join")
         insertNode(layout, "an_TrimTextNode", "Trim")
         layout.separator()
-        insertNode(layout, "an_ReplicateStringsNode", "Replicate")
-        insertNode(layout, "an_FillStringNode", "Fill")
+        insertNode(layout, "an_ReplicateTextsNode", "Replicate")
+        insertNode(layout, "an_FillTextNode", "Fill")
         insertNode(layout, "an_ReplaceTextNode", "Replace")
-        insertNode(layout, "an_StringLengthNode", "Length")
+        insertNode(layout, "an_TextLengthNode", "Length")
         layout.separator()
         insertNode(layout, "an_TextBlockReaderNode", "Block Reader")
         insertNode(layout, "an_TextBlockWriterNode", "Block Writer")
