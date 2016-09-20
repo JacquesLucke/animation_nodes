@@ -60,5 +60,13 @@ def getAnimationNodeTrees(skipLinkedTrees = True):
     return nodeTrees
 
 def getAnimationNodeClasses():
+    '''This function is intentionally not fully recursive.
+    We know that there are only a very few classes that have subclasses again'''
     from .. base_types import AnimationNode
-    return AnimationNode.__subclasses__()
+    nodeClasses = []
+    for cls in AnimationNode.__subclasses__():
+        if hasattr(cls, "bl_idname"):
+            nodeClasses.append(cls)
+        else:
+            nodeClasses.extend(cls.__subclasses__())
+    return nodeClasses

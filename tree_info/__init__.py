@@ -1,7 +1,7 @@
+import functools
 from .. utils.timing import measureTime
 from .. utils.handlers import eventHandler
 from .. utils.nodes import idToNode, idToSocket, createNodeByIdDict
-
 
 def __setup():
     from . forest_data import ForestData
@@ -156,6 +156,7 @@ def iterUnlinkedInputSockets(node):
 # keep node state
 
 def keepNodeState(function):
+    @functools.wraps(function)
     def wrapper(node, *args, **kwargs):
         return keepNodeLinks(keepSocketValues(function))(node, *args, **kwargs)
     return wrapper
@@ -163,6 +164,7 @@ def keepNodeState(function):
 # keep node links
 
 def keepNodeLinks(function):
+    @functools.wraps(function)
     def wrapper(node, *args, **kwargs):
         connections = getNodeConnections(node)
         output = function(node, *args, **kwargs)
@@ -187,6 +189,7 @@ def setConnections(connections):
 # keep socket values
 
 def keepSocketValues(function):
+    @functools.wraps(function)
     def wrapper(node, *args, **kwargs):
         inputs, outputs = getSocketValues(node)
         output = function(node, *args, **kwargs)

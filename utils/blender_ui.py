@@ -1,4 +1,5 @@
 import bpy
+import functools
 from mathutils import Vector
 
 def iterActiveSpacesByType(type):
@@ -71,6 +72,7 @@ def getDpi():
 
 def executeInAreaType(areaType):
     def changeAreaTypeDecorator(function):
+        @functools.wraps(function)
         def wrapper(*args, **kwargs):
             area = bpy.context.area
             oldType = area.type
