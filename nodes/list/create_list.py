@@ -8,6 +8,7 @@ class CreateListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CreateListNode"
     bl_label = "Create List"
     dynamicLabelType = "ALWAYS"
+    options = {"SINGLE_CREATION"}
     onlySearchTags = True
 
     @classmethod

@@ -14,6 +14,7 @@ from . subprogram_sockets import SubprogramData, subprogramInterfaceChanged
 class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     bl_idname = "an_ScriptNode"
     bl_label = "Script"
+    options = {"SINGLE_CREATION"}
     bl_width_default = 200
 
     def scriptExecutionCodeChanged(self, context):

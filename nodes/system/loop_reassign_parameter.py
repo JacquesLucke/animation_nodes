@@ -6,6 +6,7 @@ from ... tree_info import getNodeByIdentifier, keepNodeState
 class ReassignLoopParameterNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ReassignLoopParameterNode"
     bl_label = "Reassign Loop Parameter"
+    options = {"SINGLE_CREATION"}
     bl_width_default = 180
     onlySearchTags = True
 

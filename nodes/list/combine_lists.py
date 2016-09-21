@@ -7,6 +7,7 @@ class CombineListsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CombineListsNode"
     bl_label = "Combine Lists"
     dynamicLabelType = "ALWAYS"
+    options = {"SINGLE_CREATION"}
     onlySearchTags = True
 
     @classmethod

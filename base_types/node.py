@@ -8,15 +8,15 @@ from .. utils.timing import prettyTime
 from .. utils.handlers import eventHandler
 from .. ui.node_colors import colorAllNodes
 from .. preferences import getExecutionCodeType
-from .. utils.nodes import getAnimationNodeTrees
 from .. operators.callbacks import newNodeCallback
 from .. sockets.info import toIdName as toSocketIdName
 from .. utils.blender_ui import iterNodeCornerLocations
 from .. execution.measurements import getMinExecutionTime
 from .. operators.dynamic_operators import getInvokeFunctionOperator
+from .. utils.nodes import getAnimationNodeTrees, iterAnimationNodes
 from .. tree_info import (getNetworkWithNode, getDirectlyLinkedSockets, getOriginNodes,
                           getLinkedInputsDict, getLinkedOutputsDict, iterLinkedOutputSockets,
-                          iterUnlinkedInputSockets)
+                          iterUnlinkedInputSockets, keepNodeState)
 
 class AnimationNode:
     bl_width_min = 10
@@ -37,7 +37,9 @@ class AnimationNode:
 
     searchTags = []
     onlySearchTags = False
-    # can contain: 'NO_EXECUTION', 'NOT_IN_SUBPROGRAM', 'NO_AUTO_EXECUTION', 'NO_TIMING'
+    # can contain: 'NO_EXECUTION', 'NOT_IN_SUBPROGRAM',
+    #              'NO_AUTO_EXECUTION', 'NO_TIMING',
+    #              'SINGLE_CREATION'
     options = set()
 
     # can be "NONE", "ALWAYS" or "HIDDEN_ONLY"
@@ -147,6 +149,18 @@ class AnimationNode:
             return self.drawLabel()
 
         return self.bl_label
+
+    def updateSockets(self, context = None):
+        if "SINGLE_CREATION" in self.options:
+            return
+
+        @keepNodeState
+        def createWrapper(self):
+            print(self)
+            self.clearSockets()
+            self.create()
+
+        createWrapper(self)
 
 
     # Remove Utilities
@@ -457,6 +471,15 @@ def updateNodeLabelMode():
     if getExecutionCodeType() == "MEASURE":
         nodeLabelMode = "MEASURE"
 
+
+
+# Recreate sockets when loaded
+###############################################################
+
+@eventHandler("FILE_LOAD_POST")
+def updateSockets():
+    for node in iterAnimationNodes():
+        node.updateSockets()
 
 
 # Register

@@ -13,6 +13,7 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ExpressionNode"
     bl_label = "Expression"
     bl_width_default = 210
+    options = {"SINGLE_CREATION"}
     dynamicLabelType = "HIDDEN_ONLY"
 
     def settingChanged(self, context = None):

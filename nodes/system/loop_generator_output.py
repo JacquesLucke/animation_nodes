@@ -15,6 +15,7 @@ class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_LoopGeneratorOutputNode"
     bl_label = "Loop Generator Output"
     dynamicLabelType = "ALWAYS"
+    options = {"SINGLE_CREATION"}
 
     def dataTypeChanged(self, context):
         self.outputName = self.listDataType

@@ -15,6 +15,7 @@ from . subprogram_sockets import SubprogramData, subprogramInterfaceChanged, NoD
 class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     bl_idname = "an_LoopInputNode"
     bl_label = "Loop Input"
+    options = {"SINGLE_CREATION"}
     bl_width_default = 180
 
     def create(self):
