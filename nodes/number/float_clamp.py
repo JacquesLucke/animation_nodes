@@ -1,14 +1,14 @@
 import bpy
 from bpy.props import *
 from ... tree_info import keepNodeLinks
-from ... base_types import StaticAnimationNode
+from ... base_types import AnimationNode
 
-class FloatClampNode(bpy.types.Node, StaticAnimationNode):
+class FloatClampNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_FloatClampNode"
     bl_label = "Clamp"
     dynamicLabelType = "HIDDEN_ONLY"
 
-    def createSockets(self):
+    def create(self):
         self.newInput("Float", "Value", "value")
         self.newInput("Float", "Min", "minValue", value = 0.0)
         self.newInput("Float", "Max", "maxValue", value = 1.0)
