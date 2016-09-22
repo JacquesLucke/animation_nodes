@@ -6,9 +6,9 @@ from ... utils.code import isCodeValid
 from ... tree_info import keepNodeState
 from ... utils.names import toVariableName
 from ... events import executionCodeChanged
-from ... base_types import AnimationNode
 from ... utils.enum_items import enumItemsFromDicts
 from mathutils.geometry import distance_point_to_plane
+from ... base_types import AnimationNode, UpdateAssignedListDataType
 
 class SortingTemplate:
     identifier = "NONE"
@@ -123,10 +123,7 @@ class SortListNode(bpy.types.Node, AnimationNode):
 
     templates = PointerProperty(type = SortingTemplates)
 
-    def assignedTypeChanged(self, context):
-        self.generateSockets()
-
-    assignedType = StringProperty(update = assignedTypeChanged)
+    assignedType = StringProperty(update = AnimationNode.updateSockets, default = "Object List")
 
     def getSortTypeItems(self, context):
         items = []
@@ -136,16 +133,13 @@ class SortListNode(bpy.types.Node, AnimationNode):
             items.append({"value" : template.identifier, "name" : template.label})
         return enumItemsFromDicts(items)
 
-    def sortTypeChanged(self, context):
-        self.generateSockets()
-
-    sortType = EnumProperty(name = "Sort Type", update = sortTypeChanged,
+    sortType = EnumProperty(name = "Sort Type", update = AnimationNode.updateSockets,
         items = getSortTypeItems)
 
     sortKey = StringProperty(update = executionCodeChanged, default = "e")
 
     keyListType = EnumProperty(name = "Key List Type", default = "FLOAT",
-        items = keyListTypeItems, update = sortTypeChanged)
+        items = keyListTypeItems, update = AnimationNode.updateSockets)
 
     def elementNameChanged(self, context):
         variableName = toVariableName(self.elementName)
@@ -158,9 +152,28 @@ class SortListNode(bpy.types.Node, AnimationNode):
 
     errorMessage = StringProperty()
 
-    def create(self):
-        self.assignedType = "Object List"
+    def setup(self):
         self.sortType = "CUSTOM"
+
+    def create(self):
+        listDataType = self.assignedType
+        self.newInput(listDataType, "List", "inList", dataIsModified = True)
+        self.newInput("Boolean", "Reverse", "reverseOutput", value = False)
+
+        if self.sortType == "KEY_LIST":
+            if self.keyListType == "FLOAT":
+                self.newInput("Float List", "Key List", "keyList")
+            elif self.keyListType == "TEXT":
+                self.newInput("Text List", "Key List", "keyList")
+
+        self.newOutput(listDataType, "Sorted List", "outList")
+
+        self.setupActiveTemplate()
+
+        self.newSocketEffect(UpdateAssignedListDataType("assignedType", "LIST",
+            [(self.inputs[0], "LIST"),
+             (self.outputs[0], "LIST")]
+        ))
 
     def draw(self, layout):
         layout.prop(self, "sortType", text = "Type")
@@ -229,18 +242,6 @@ class SortListNode(bpy.types.Node, AnimationNode):
         yield "    outList = []"
         yield "    self.errorMessage = output"
 
-    def edit(self):
-        listDataType = self.getWantedDataType()
-        self.assignType(listDataType)
-
-    def getWantedDataType(self):
-        listInput = self.inputs[0].dataOrigin
-        listOutputs = self.outputs[0].dataTargets
-
-        if listInput is not None: return listInput.dataType
-        if len(listOutputs) == 1: return listOutputs[0].dataType
-        return self.inputs[0].dataType
-
     def assignType(self, listDataType):
         if not isList(listDataType): return
         if listDataType == self.assignedType: return
@@ -248,25 +249,6 @@ class SortListNode(bpy.types.Node, AnimationNode):
 
         if self.sortType not in ("CUSTOM", "KEY_LIST"):
             self.sortType = "CUSTOM"
-
-    @keepNodeState
-    def generateSockets(self):
-        self.inputs.clear()
-        self.outputs.clear()
-
-        listDataType = self.assignedType
-        self.newInput(listDataType, "List", "inList", dataIsModified = True)
-        self.newInput("Boolean", "Reverse", "reverseOutput", value = False)
-
-        if self.sortType == "KEY_LIST":
-            if self.keyListType == "FLOAT":
-                self.newInput("Float List", "Key List", "keyList")
-            elif self.keyListType == "TEXT":
-                self.newInput("Text List", "Key List", "keyList")
-
-        self.newOutput(listDataType, "Sorted List", "outList")
-
-        self.setupActiveTemplate()
 
     def setupActiveTemplate(self):
         template = self.activeTemplate
