@@ -32,15 +32,17 @@ class CyclesMaterialOutputNode(bpy.types.Node, AnimationNode):
                     identifiers.append(socket)
         return identifiers
 
-    def selectedSocketChanged(self, context):
-        self.createInputSocket()
-
-    materialName = StringProperty(update = selectedSocketChanged)
-    nodeName = StringProperty(update = selectedSocketChanged)
-    socketIdentifier = EnumProperty(items = getPossibleSocketItems, name = "Socket", update = selectedSocketChanged)
+    materialName = StringProperty(update = AnimationNode.updateSockets)
+    nodeName = StringProperty(update = AnimationNode.updateSockets)
+    socketIdentifier = EnumProperty(name = "Socket", items = getPossibleSocketItems,
+        update = AnimationNode.updateSockets)
 
     def create(self):
-        self.createInputSocket()
+        socket = self.getSelectedSocket()
+        if socket is not None:
+            data = socket.default_value
+            self.newInput(allowedSocketTypes[socket.bl_idname], "Data", "data")
+            self.inputs["Data"].setProperty(data)
 
     def draw(self, layout):
         layout.prop_search(self, "materialName", bpy.data, "materials", text = "", icon = "MATERIAL_DATA")
@@ -95,10 +97,6 @@ class CyclesMaterialOutputNode(bpy.types.Node, AnimationNode):
             if inputSocket.bl_idname != originIdName and len(possibleIdentifiers) > 0:
                 self.socketIdentifier = possibleIdentifiers[0]
 
-        if inputSocket.identifier == "Data":
-            print("Updated Node: '{}'".format(self.name))
-            self.createInputSocket()
-
     def getInputIdentifiersFromSocketType(self, searchType):
         identifiers = []
         sockets = self.getPossibleSockets()
@@ -128,12 +126,3 @@ class CyclesMaterialOutputNode(bpy.types.Node, AnimationNode):
         for socket in node.inputs:
             if socket.identifier == identifier: return socket
         return None
-
-    @keepNodeState
-    def createInputSocket(self):
-        self.inputs.clear()
-        socket = self.getSelectedSocket()
-        if socket is not None:
-            data = socket.default_value
-            self.newInput(allowedSocketTypes[socket.bl_idname], "Data", "data")
-            self.inputs["Data"].setProperty(data)
