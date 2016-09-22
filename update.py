@@ -17,7 +17,7 @@ def updateEverything():
     tree_info.update()
     problems.reset()
     enableUseFakeUser()
-    callNodeEditFunctions()
+    updateIndividualNodes()
     correctForbiddenNodeLinks()
 
     # from now on no nodes will be created or removed
@@ -42,7 +42,7 @@ def enableUseFakeUser():
     for tree in getAnimationNodeTrees():
         tree.use_fake_user = True
 
-def callNodeEditFunctions():
+def updateIndividualNodes():
     tree_info.updateIfNecessary()
     nodeByID = createNodeByIdDict()
     editedNodes = set()
@@ -56,6 +56,7 @@ def callNodeEditFunctions():
             if dependencyNode not in currentNodes:
                 editNode(dependencyNode)
 
+        node.applySocketEffects()
         node.edit()
         editedNodes.add(node)
         currentNodes.remove(node)

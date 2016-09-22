@@ -4,6 +4,7 @@ import types
 import random
 from bpy.props import *
 from collections import defaultdict
+from .. import tree_info
 from .. utils.timing import prettyTime
 from .. utils.handlers import eventHandler
 from .. ui.node_colors import colorAllNodes
@@ -17,6 +18,8 @@ from .. utils.nodes import getAnimationNodeTrees, iterAnimationNodes
 from .. tree_info import (getNetworkWithNode, getDirectlyLinkedSockets, getOriginNodes,
                           getLinkedInputsDict, getLinkedOutputsDict, iterLinkedOutputSockets,
                           iterUnlinkedInputSockets, keepNodeState)
+
+socketEffectsByIdentifier = defaultdict(list)
 
 class AnimationNode:
     bl_width_min = 10
@@ -127,6 +130,7 @@ class AnimationNode:
 
     def copy(self, sourceNode):
         self.identifier = createIdentifier()
+        self.copySocketEffects(sourceNode)
         self.duplicate(sourceNode)
 
     def free(self):
@@ -156,11 +160,26 @@ class AnimationNode:
 
         @keepNodeState
         def createWrapper(self):
-            print(self)
             self.clearSockets()
+            self.clearSocketEffects()
             self.create()
 
         createWrapper(self)
+
+
+    def applySocketEffects(self):
+        for effect in socketEffectsByIdentifier[self.identifier]:
+            effect.apply(self)
+
+    def clearSocketEffects(self):
+        if self.identifier in socketEffectsByIdentifier:
+            del socketEffectsByIdentifier[self.identifier]
+
+    def copySocketEffects(self, sourceNode):
+        socketEffectsByIdentifier[self.identifier] = socketEffectsByIdentifier[sourceNode.identifier]
+
+    def newSocketEffect(self, effect):
+        socketEffectsByIdentifier[self.identifier].append(effect)
 
 
     # Remove Utilities
@@ -203,11 +222,12 @@ class AnimationNode:
     def replaceSocket(self, socket, dataType, name, identifier = None, **kwargs):
         index = socket.getIndex(self)
         linkedSockets = socket.linkedSockets
-        if socket.isInput:
+        isInput = socket.isInput
+        socket.remove()
+        if isInput:
             newSocket = self.newInput(dataType, name, identifier, **kwargs)
         else:
             newSocket = self.newOutput(dataType, name, identifier, **kwargs)
-        socket.remove()
         newSocket.moveTo(index)
         for linkedSocket in linkedSockets:
             newSocket.linkWith(linkedSocket)
@@ -480,6 +500,9 @@ def updateNodeLabelMode():
 def updateSockets():
     for node in iterAnimationNodes():
         node.updateSockets()
+
+    for node in iterAnimationNodes():
+        node.applySocketEffects()
 
 
 # Register
