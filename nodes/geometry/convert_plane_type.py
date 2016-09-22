@@ -10,20 +10,23 @@ conversionTypeItems = [
 class ConvertPlaneTypeNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ConvertPlaneTypeNode"
     bl_label = "Convert Plane Type"
-    bl_width_default = 160
+    bl_width_default = 170
     dynamicLabelType = "HIDDEN_ONLY"
 
     searchTags = [(name, {"conversionType" : repr(type)}) for type, name, _,_,_ in conversionTypeItems]
 
-    def conversionTypeChanged(self, context):
-        self.createSockets()
-
     conversionType = EnumProperty(name = "Conversion Type", default = "MATRIX_TO_POINT_NORMAL",
-        items = conversionTypeItems, update = conversionTypeChanged)
+        items = conversionTypeItems, update = AnimationNode.updateSockets)
 
     def create(self):
-        self.width = 170
-        self.conversionType = "MATRIX_TO_POINT_NORMAL"
+        if self.conversionType == "POINT_NORMAL_TO_MATRIX":
+            self.newInput("Vector", "Point in Plane", "planePoint")
+            self.newInput("Vector", "Plane Normal", "planeNormal", value = [0, 0, 1])
+            self.newOutput("Matrix", "Matrix", "matrix")
+        if self.conversionType == "MATRIX_TO_POINT_NORMAL":
+            self.newInput("Matrix", "Matrix", "matrix")
+            self.newOutput("Vector", "Point in Plane", "planePoint")
+            self.newOutput("Vector", "Plane Normal", "planeNormal")
 
     def draw(self, layout):
         layout.prop(self, "conversionType", text = "")
@@ -43,17 +46,3 @@ class ConvertPlaneTypeNode(bpy.types.Node, AnimationNode):
         if self.conversionType == "MATRIX_TO_POINT_NORMAL":
             if isLinked["planePoint"]: yield "planePoint = matrix.to_translation()"
             if isLinked["planeNormal"]: yield "planeNormal = matrix.to_3x3() * Vector((0, 0, 1))"
-
-    @keepNodeState
-    def createSockets(self):
-        self.inputs.clear()
-        self.outputs.clear()
-
-        if self.conversionType == "POINT_NORMAL_TO_MATRIX":
-            self.newInput("Vector", "Point in Plane", "planePoint")
-            self.newInput("Vector", "Plane Normal", "planeNormal", value = [0, 0, 1])
-            self.newOutput("Matrix", "Matrix", "matrix")
-        if self.conversionType == "MATRIX_TO_POINT_NORMAL":
-            self.newInput("Matrix", "Matrix", "matrix")
-            self.newOutput("Vector", "Point in Plane", "planePoint")
-            self.newOutput("Vector", "Plane Normal", "planeNormal")

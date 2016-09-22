@@ -2,7 +2,6 @@ import bpy
 import mathutils
 from bpy.props import *
 from ... utils.layout import writeText
-from ... tree_info import keepNodeState
 from ... base_types import AnimationNode
 
 operationTypeItems = [  ("POINT", "Transform Vector", ""),
@@ -13,21 +12,12 @@ class BarycentricTransformNode(bpy.types.Node, AnimationNode):
     bl_label = "Barycentric Transform"
     bl_width_default = 160
 
-    def operationTypeChanged(self, context):
-        self.generateSockets()
-
     operationType = EnumProperty(name = "Operation Type", default = "POINT",
-        items = operationTypeItems, update = operationTypeChanged)
+        items = operationTypeItems, update = AnimationNode.updateSockets)
+
     errorMessage = StringProperty()
 
     def create(self):
-        self.operationType = "POINT"
-
-    @keepNodeState
-    def generateSockets(self):
-        self.inputs.clear()
-        self.outputs.clear()
-
         if self.operationType == "POINT":
             self.newInput("Vector", "Location", "point")
             self.newOutput("Vector", "Morphed Location", "location")
@@ -66,9 +56,9 @@ class BarycentricTransformNode(bpy.types.Node, AnimationNode):
             return 'Expected 3 vectors for Source Triangle'
         if len(targetTri) < 3:
             return 'Expected 3 vectors for Target Triangle'
-        if any((sourceTri[0]==sourceTri[1],
-                sourceTri[1]==sourceTri[2],
-                sourceTri[2]==sourceTri[0])):
+        if any((sourceTri[0] == sourceTri[1],
+                sourceTri[1] == sourceTri[2],
+                sourceTri[2] == sourceTri[0])):
             return 'Expected 3 Different vectors for Source'
         return ''
 

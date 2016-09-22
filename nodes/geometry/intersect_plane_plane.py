@@ -7,7 +7,6 @@ class IntersectPlanePlaneNode(bpy.types.Node, AnimationNode):
     bl_width_default = 160
 
     def create(self):
-        self.width = 160
         self.newInput("Vector", "Plane 1 Point", "point1")
         self.newInput("Vector", "Plane 1 Normal", "normal1", value = (1, 0, 0))
         self.newInput("Vector", "Plane 2 Point", "point2")
