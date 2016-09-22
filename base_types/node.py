@@ -139,6 +139,7 @@ class AnimationNode:
         self.duplicate(sourceNode)
 
     def free(self):
+        self.clearSocketEffects()
         self.delete()
 
     def draw_buttons(self, context, layout):
@@ -159,6 +160,10 @@ class AnimationNode:
 
         return self.bl_label
 
+
+    # Socket Effects
+    ####################################################
+
     def updateSockets(self, context = None):
         if not hasattr(self, "create"):
             return
@@ -170,7 +175,6 @@ class AnimationNode:
             self.create()
 
         createWrapper(self)
-
 
     def applySocketEffects(self):
         for effect in socketEffectsByIdentifier[self.identifier]:
