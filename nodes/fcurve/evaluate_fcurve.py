@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
-from ... events import executionCodeChanged
 from ... base_types import AnimationNode
+from ... events import executionCodeChanged
 
 frameTypeItems = [
     ("OFFSET", "Offset", ""),
