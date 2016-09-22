@@ -78,3 +78,20 @@ class UpdateAssignedListDataType(SocketEffect):
         if len(dataTargets) == 1:
             if isList(dataTargets[0].dataType):
                 return toBaseDataType(dataTargets[0].dataType)
+
+
+class UpdateAssignedDataType(SocketEffect):
+    def __init__(self, propertyName, sockets):
+        self.propertyName = propertyName
+        self.socketIDs = [self.toSocketID(socket) for socket in sockets if socket is not None]
+
+    def apply(self, node):
+        currentType = getattr(node, self.propertyName)
+        for socketID in self.socketIDs:
+            socket = self.getSocket(node, socketID)
+            linkedSockets = socket.linkedSockets
+            if len(linkedSockets) == 1:
+                linkedDataType = linkedSockets[0].dataType
+                if linkedDataType != currentType:
+                    setattr(node, self.propertyName, linkedDataType)
+                break

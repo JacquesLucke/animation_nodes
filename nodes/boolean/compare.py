@@ -1,9 +1,6 @@
 import bpy
 from bpy.props import *
-from ... base_types import AnimationNode
-from ... events import executionCodeChanged
-from ... sockets.info import toIdName
-from ... tree_info import keepNodeLinks
+from ... base_types import AnimationNode, UpdateAssignedDataType
 
 compare_types = ["A = B", "A != B", "A < B", "A <= B", "A > B", "A >= B", "A is B","A is None"]
 compare_types_items = [(t, t, "") for t in compare_types]
@@ -15,19 +12,21 @@ class CompareNode(bpy.types.Node, AnimationNode):
     bl_label = "Compare"
     dynamicLabelType = "HIDDEN_ONLY"
 
-    def assignedTypeChanged(self, context):
-        self.generateSockets()
-    
-    def compareTypeChanged(self, context):
-        self.generateSockets()
-        self.executionCodeChanged(self, context)
-    
-    assignedType = StringProperty(update = assignedTypeChanged)
-    compareType = EnumProperty(name = "Compare Type", items = compare_types_items, update = compareTypeChanged)
+    assignedType = StringProperty(update = AnimationNode.updateSockets, default = "Integer")
+
+    compareType = EnumProperty(name = "Compare Type",
+        items = compare_types_items, update = AnimationNode.updateSockets)
 
     def create(self):
-        self.assignedType = "Float"
+        self.newInput(self.assignedType, "A", "a")
+        if self.compareType != "A is None":
+            self.newInput(self.assignedType, "B", "b")
         self.newOutput("an_BooleanSocket", "Result", "result")
+
+        self.newSocketEffect(UpdateAssignedDataType("assignedType",
+            [self.inputs[0],
+             self.inputs[1] if len(self.inputs) == 2 else None]
+        ))
 
     def draw(self, layout):
         layout.prop(self, "compareType", text = "Type")
@@ -57,26 +56,9 @@ class CompareNode(bpy.types.Node, AnimationNode):
         if type == "A is None": return "result = a is None"
         return "result = False"
 
-    def edit(self):
-        dataType = self.getWantedDataType()
-        self.assignType(dataType)
-
-    def getWantedDataType(self):
-        for input in self.inputs:
-            if input.dataOrigin is not None:
-                return input.dataType
-        return self.inputs[0].dataType
-
     def assignType(self, dataType):
         if self.assignedType == dataType: return
         self.assignedType = dataType
-
-    @keepNodeLinks
-    def generateSockets(self):
-        self.inputs.clear()
-        self.newInput(self.assignedType, "A", "a")
-        if self.compareType != "A is None":
-            self.newInput(self.assignedType, "B", "b")
 
     @property
     def socketA(self):
