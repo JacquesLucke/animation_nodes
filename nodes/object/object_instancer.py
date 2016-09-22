@@ -1,9 +1,8 @@
 import bpy
 from bpy.props import *
 from ... events import propertyChanged
-from ... tree_info import keepNodeState
-from ... utils.names import getRandomString
 from ... base_types import AnimationNode
+from ... utils.names import getRandomString
 from ... utils.enum_items import enumItemsFromDicts
 from ... utils.blender_ui import iterActiveSpacesByType
 from ... nodes.container_provider import getMainObjectContainer
@@ -40,7 +39,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
     searchTags = ["Object Replicator (old)"]
 
     def copyFromSourceChanged(self, context):
-        self.updateInputSockets()
+        self.updateSockets()
         self.resetInstancesEvent(context)
 
     def resetInstancesEvent(self, context):
@@ -74,16 +73,12 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         items = emptyDrawTypeItems, update = resetInstancesEvent)
 
     def create(self):
-        self.updateInputSockets()
-        self.newOutput("an_ObjectListSocket", "Objects", "objects")
-
-    @keepNodeState
-    def updateInputSockets(self):
-        self.inputs.clear()
         self.newInput("Integer", "Instances", "instancesAmount", minValue = 0)
         if self.copyFromSource:
             self.newInput("Object", "Source", "sourceObject", defaultDrawType = "PROPERTY_ONLY")
         self.newInput("Scene List", "Scenes", "scenes", hide = True)
+
+        self.newOutput("an_ObjectListSocket", "Objects", "objects")
 
     def draw(self, layout):
         layout.prop(self, "copyFromSource")

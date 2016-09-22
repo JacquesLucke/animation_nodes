@@ -11,18 +11,25 @@ class ObjectLayerVisibilityOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectLayerVisibilityOutputNode"
     bl_label = "Object Layer Visibility Output"
 
-    def layerChoosingTypeChanged(self, context):
-        self.recreateLayerInputSockets()
-
     errorMessage = StringProperty()
 
     layerChoosingType = EnumProperty(name = "Layer Choosing Type", default = "MULTIPLE",
-        items = layerChoosingTypeItems, update = layerChoosingTypeChanged)
+        items = layerChoosingTypeItems, update = AnimationNode.updateSockets)
 
     def create(self):
         self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
         self.newOutput("Object", "Object", "object")
-        self.recreateLayerInputSockets()
+        self.createLayerInputSockets()
+
+    def createLayerInputSockets(self):
+        if self.layerChoosingType == "SINGLE":
+            self.newInput("Integer", "Layer Index", "layerIndex")
+        elif self.layerChoosingType == "MULTIPLE":
+            for i in range(1, 21):
+                self.newInput("Boolean", "Layer " + str(i), "layer" + str(i), value = False)
+            for socket in self.inputs[4:]:
+                socket.hide = True
+            self.inputs[1].value = True
 
     def draw(self, layout):
         layout.prop(self, "layerChoosingType", text = "Type")
@@ -32,7 +39,7 @@ class ObjectLayerVisibilityOutputNode(bpy.types.Node, AnimationNode):
     def getExecutionCode(self):
         yield "if object:"
         if self.layerChoosingType == "MULTIPLE":
-            yield "    visibilities = [{}]".format(", ".join("layer" + str(i + 1) for i in range(20)))
+            yield "    visibilities = [{}]".format(", ".join("layer" + str(i) for i in range(1, 21)))
             yield "    object.layers = visibilities"
             yield "    self.errorMessage = '' if any(visibilities) else 'The target has to be visible on at least one layer'"
 
@@ -44,18 +51,3 @@ class ObjectLayerVisibilityOutputNode(bpy.types.Node, AnimationNode):
             yield "        object.layers = layers"
             yield "    else:"
             yield "        self.errorMessage = 'The layer index has to be between 0 and 19'"
-
-    def recreateLayerInputSockets(self):
-        self.clearLayerInputNodes()
-        if self.layerChoosingType == "MULTIPLE":
-            for i in range(20):
-                self.newInput("Boolean", "Layer " + str(i + 1), "layer" + str(i + 1), value = False)
-            for socket in self.inputs[4:]:
-                socket.hide = True
-            self.inputs[1].value = True
-        if self.layerChoosingType == "SINGLE":
-            self.newInput("Integer", "Layer Index", "layerIndex")
-
-    def clearLayerInputNodes(self):
-        for socket in self.inputs[1:]:
-            socket.remove()
