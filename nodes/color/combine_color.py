@@ -19,20 +19,10 @@ class CombineColorNode(bpy.types.Node, AnimationNode):
     bl_label = "Combine Color"
     dynamicLabelType = "HIDDEN_ONLY"
 
-    def sourceTypeChanged(self, context):
-        self.recreateInputs()
-
     sourceType = EnumProperty(name = "Source Type", default = "RGB",
-        items = sourceTypeItems, update = sourceTypeChanged)
+        items = sourceTypeItems, update = AnimationNode.updateSockets)
 
     def create(self):
-        self.recreateInputs()
-        self.newOutput("Color", "Color", "color")
-
-    @keepNodeState
-    def recreateInputs(self):
-        self.inputs.clear()
-
         if self.sourceType == "RGB":
             self.newInput("Float", "Red", "red")
             self.newInput("Float", "Green", "green")
@@ -51,6 +41,7 @@ class CombineColorNode(bpy.types.Node, AnimationNode):
             self.newInput("Float", "Q Quadrature", "q")
 
         self.newInput("Float", "Alpha", "alpha", value = 1)
+        self.newOutput("Color", "Color", "color")
 
     def draw(self, layout):
         layout.prop(self, "sourceType", expand = True)

@@ -23,15 +23,10 @@ class SeparateColorNode(bpy.types.Node, AnimationNode):
         self.recreateOutputs()
 
     targetType = EnumProperty(name = "Target Type", items = targetTypeItems,
-                                    default = "RGB", update = targetTypeChanged)
+        default = "RGB", update = AnimationNode.updateSockets)
 
     def create(self):
         self.newInput("Color", "Color", "color")
-        self.recreateOutputs()
-
-    @keepNodeState
-    def recreateOutputs(self):
-        self.outputs.clear()
 
         if self.targetType == "RGB":
             self.newOutput("Float", "Red", "r")
@@ -49,7 +44,6 @@ class SeparateColorNode(bpy.types.Node, AnimationNode):
             self.newOutput("Float", "Y Luma", "y")
             self.newOutput("Float", "I In phase", "i")
             self.newOutput("Float", "Q Quadrature", "q")
-
         self.newOutput("Float", "Alpha", "alpha")
 
     def draw(self, layout):
