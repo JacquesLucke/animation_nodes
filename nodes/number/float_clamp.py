@@ -1,7 +1,5 @@
 import bpy
-from bpy.props import *
-from ... tree_info import keepNodeLinks
-from ... base_types import AnimationNode
+from ... base_types import AnimationNode, AutoSelectFloatOrInteger
 
 class FloatClampNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_FloatClampNode"
@@ -13,6 +11,8 @@ class FloatClampNode(bpy.types.Node, AnimationNode):
         self.newInput("Float", "Min", "minValue", value = 0.0)
         self.newInput("Float", "Max", "maxValue", value = 1.0)
         self.newOutput("Float", "Value", "outValue")
+
+        self.newSocketEffect(AutoSelectFloatOrInteger(self.outputs[0]))
 
     def getExecutionCode(self):
         yield "outValue = min(max(value, minValue), maxValue)"
@@ -26,22 +26,6 @@ class FloatClampNode(bpy.types.Node, AnimationNode):
         if self.maxValueSocket.isUnlinked:
             label = label.replace("max", str(round(self.maxValueSocket.value, 4)))
         return label
-
-    def edit(self):
-        output = self.outputs[0]
-        if output.dataType == "Float":
-            if output.shouldBeIntegerSocket(): self.setOutputType("Integer")
-        else:
-            if output.shouldBeFloatSocket(): self.setOutputType("Float")
-
-    def setOutputType(self, idName):
-        if self.outputs[0].bl_idname == idName: return
-        self._setOutputType(idName)
-
-    @keepNodeLinks
-    def _setOutputType(self, idName):
-        self.outputs.clear()
-        self.newOutput(idName, "Value", "outValue")
 
     @property
     def minValueSocket(self):
