@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... tree_info import keepNodeState
 from ... events import executionCodeChanged
-from ... base_types import AnimationNode
+from ... base_types import AnimationNode, UpdateAssignedListDataType
 from ... sockets.info import isBase, toBaseDataType, toListDataType
 
 class GetListElementNode(bpy.types.Node, AnimationNode):
@@ -10,10 +10,7 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
     bl_label = "Get List Element"
     dynamicLabelType = "HIDDEN_ONLY"
 
-    def assignedTypeChanged(self, context):
-        self.generateSockets()
-
-    assignedType = StringProperty(update = assignedTypeChanged)
+    assignedType = StringProperty(update = AnimationNode.updateSockets, default = "Float")
 
     clampIndex = BoolProperty(name = "Clamp Index", default = False,
         description = "Clamp the index between the lowest and highest possible index",
@@ -28,7 +25,19 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
         update = executionCodeChanged)
 
     def create(self):
-        self.assignedType = "Float"
+        baseDataType = self.assignedType
+        listDataType = toListDataType(self.assignedType)
+
+        self.newInput(listDataType, "List", "list")
+        self.newInput("Integer", "Index", "index")
+        self.newInput(baseDataType, "Fallback", "fallback", hide = True)
+        self.newOutput(baseDataType, "Element", "element")
+
+        self.newSocketEffect(UpdateAssignedListDataType("assignedType", [
+            (self.inputs[0], "LIST"),
+            (self.inputs[2], "BASE"),
+            (self.outputs[0], "BASE")
+        ]))
 
     def drawAdvanced(self, layout):
         layout.prop(self, "clampIndex")
@@ -61,22 +70,6 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
             if socket.isCopyable():
                 yield "element = " + socket.getCopyExpression().replace("value", "element")
 
-    def edit(self):
-        dataType = self.getWantedDataType()
-        self.assignType(dataType)
-
-    def getWantedDataType(self):
-        listInput = self.inputs["List"].dataOrigin
-        fallbackInput = self.inputs["Fallback"].dataOrigin
-        elementOutputs = self.outputs["Element"].dataTargets
-
-        if listInput is not None:
-            if listInput.dataType in ("Edge Indices", "Polygon Indices"): return "Integer"
-            return toBaseDataType(listInput.dataType)
-        if fallbackInput is not None: return fallbackInput.dataType
-        if len(elementOutputs) == 1: return elementOutputs[0].dataType
-        return self.outputs["Element"].dataType
-
     def assignListDataType(self, listDataType):
         self.assignType(toBaseDataType(listDataType))
 
@@ -84,15 +77,3 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
         if not isBase(baseDataType): return
         if baseDataType == self.assignedType: return
         self.assignedType = baseDataType
-
-    @keepNodeState
-    def generateSockets(self):
-        self.inputs.clear()
-        self.outputs.clear()
-
-        baseDataType = self.assignedType
-        listDataType = toListDataType(self.assignedType)
-        self.newInput(listDataType, "List", "list")
-        self.newInput("Integer", "Index", "index")
-        self.newInput(baseDataType, "Fallback", "fallback").hide = True
-        self.newOutput(baseDataType, "Element", "element")
