@@ -28,9 +28,11 @@ class InterpolationFromCurveMappingNode(bpy.types.Node, AnimationNode):
         description = "Allows much faster evaluation of the interpolation",
         update = propertyChanged)
 
+    def setup(self):
+        self.createCurveNode()
+
     def create(self):
         self.newOutput("Interpolation", "Interpolation", "interpolation")
-        self.createCurveNode()
 
     def draw(self, layout):
         layout.template_curve_mapping(self.curveNode, "mapping", type = "NONE")

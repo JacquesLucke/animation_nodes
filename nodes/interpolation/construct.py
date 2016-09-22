@@ -1,8 +1,7 @@
 import bpy
 from bpy.props import *
-from ... tree_info import keepNodeState
-from ... events import executionCodeChanged
 from ... base_types import AnimationNode
+from ... events import executionCodeChanged
 from ... algorithms.interpolations import (
               Linear,
               SinInOut, SinIn, SinOut,
@@ -28,22 +27,13 @@ class ConstructInterpolationNode(bpy.types.Node, AnimationNode):
     bl_label = "Construct Interpolation"
     bl_width_default = 160
 
-    def categoryChanged(self, context = None):
-        self.createInputs()
-
     category = EnumProperty(name = "Category", default = "LINEAR",
-        items = categoryItems, update = categoryChanged)
+        items = categoryItems, update = AnimationNode.updateSockets)
 
-    easeIn = BoolProperty(name = "Ease In", default = False, update = categoryChanged)
-    easeOut = BoolProperty(name = "Ease Out", default = True, update = categoryChanged)
+    easeIn = BoolProperty(name = "Ease In", default = False, update = executionCodeChanged)
+    easeOut = BoolProperty(name = "Ease Out", default = True, update = executionCodeChanged)
 
     def create(self):
-        self.createInputs()
-        self.newOutput("Interpolation", "Interpolation", "interpolation")
-
-    @keepNodeState
-    def createInputs(self):
-        self.inputs.clear()
         c = self.category
 
         if c in ("BOUNCE", "ELASTIC"):
@@ -57,6 +47,8 @@ class ConstructInterpolationNode(bpy.types.Node, AnimationNode):
         if c in ("BACK", "BOUNCE"):
             self.newInput("Float", "Size", "floatSize", value = 1.4)
 
+        self.newOutput("Interpolation", "Interpolation", "interpolation")
+
     def draw(self, layout):
         row = layout.row(align = True)
         row.prop(self, "category", text = "")
@@ -67,14 +59,14 @@ class ConstructInterpolationNode(bpy.types.Node, AnimationNode):
     def getExecutionCode(self):
         c = self.category
         if not (self.easeIn or self.easeOut): return "interpolation = self.getLinear()"
-        if c == "LINEAR": return "interpolation = self.getLinear()"
-        if c == "SINUSOIDAL": return "interpolation = self.getSinusoidal()"
-        if c == "POWER": return "interpolation = self.getPower(intExponent)"
+        if c == "LINEAR":      return "interpolation = self.getLinear()"
+        if c == "SINUSOIDAL":  return "interpolation = self.getSinusoidal()"
+        if c == "POWER":       return "interpolation = self.getPower(intExponent)"
         if c == "EXPONENTIAL": return "interpolation = self.getExponential(floatBase, intExponent)"
-        if c == "CIRCULAR": return "interpolation = self.getCircular()"
-        if c == "BACK": return "interpolation = self.getBack(floatSize)"
-        if c == "BOUNCE": return "interpolation = self.getBounce(intBounces, floatSize)"
-        if c == "ELASTIC": return "interpolation = self.getElastic(floatBase, floatExponent, intBounces)"
+        if c == "CIRCULAR":    return "interpolation = self.getCircular()"
+        if c == "BACK":        return "interpolation = self.getBack(floatSize)"
+        if c == "BOUNCE":      return "interpolation = self.getBounce(intBounces, floatSize)"
+        if c == "ELASTIC":     return "interpolation = self.getElastic(floatBase, floatExponent, intBounces)"
 
     def getLinear(self):
         return Linear()
