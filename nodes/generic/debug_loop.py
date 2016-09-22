@@ -12,7 +12,7 @@ class DebugLoopNode(bpy.types.Node, AnimationNode):
 
     textBlockName = StringProperty(name = "Text")
 
-    def create(self):
+    def setup(self):
         self.newInput("Node Control", "...", "control")
         self.newInputSocket()
 

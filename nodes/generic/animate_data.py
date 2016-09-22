@@ -1,8 +1,8 @@
 import bpy
 from bpy.props import *
 from . mix_data import getMixCode
-from ... events import executionCodeChanged
 from ... base_types import AnimationNode
+from ... events import executionCodeChanged
 
 class AnimateDataNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_AnimateDataNode"
@@ -18,22 +18,9 @@ class AnimateDataNode(bpy.types.Node, AnimationNode):
                    ("Animate Euler", {"dataType" : repr("Euler")}),
                    ("Animate Quaternion", {"dataType" : repr("Quaternion")}) ]
 
-    def dataTypeChanged(self, context):
-        self.generateSockets()
-        executionCodeChanged()
-
-    dataType = StringProperty(default = "Float", update = dataTypeChanged)
+    dataType = StringProperty(default = "Float", update = AnimationNode.updateSockets)
 
     def create(self):
-        self.generateSockets()
-
-    def drawLabel(self):
-        return "Animate " + self.inputs[1].dataType
-
-    def generateSockets(self):
-        self.inputs.clear()
-        self.outputs.clear()
-
         self.newInput("Float", "Time", "time")
         self.newInput(self.dataType, "Start", "start")
         self.newInput(self.dataType, "End", "end")
@@ -42,6 +29,9 @@ class AnimateDataNode(bpy.types.Node, AnimationNode):
 
         self.newOutput("Float", "Time", "outTime")
         self.newOutput(self.dataType, "Result", "result")
+
+    def drawLabel(self):
+        return "Animate " + self.inputs[1].dataType
 
     def getExecutionCode(self):
         yield "finalDuration = max(duration, 0.0001)"

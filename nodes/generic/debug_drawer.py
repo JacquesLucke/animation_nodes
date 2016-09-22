@@ -1,13 +1,10 @@
 import bpy
 import itertools
 from bpy.props import *
-from ... sockets.info import isList
 from ... utils import pretty_strings
 from ... draw_handler import drawHandler
-from ... utils.timing import measureTime
 from ... graphics.text_box import TextBox
-from ... base_types import AnimationNode
-from ... tree_info import getNodesByType, keepNodeState
+from ... base_types import AnimationNode, UpdateAssignedDataType
 
 dataByNode = {}
 
@@ -22,13 +19,15 @@ class DebugDrawerNode(bpy.types.Node, AnimationNode):
     maxListStartElements = IntProperty(name = "Max List Start Elements", default = 15, min = 0)
     maxListEndElements = IntProperty(name = "Max List End Elements", default = 0, min = 0)
     oneElementPerLine = BoolProperty(name = "One Element per Line", default = True)
-    dataType = StringProperty()
+    dataType = StringProperty(default = "Generic", update = AnimationNode.updateSockets)
 
     errorMessage = StringProperty()
 
     def create(self):
-        self.newInput("Generic", "Data", "data")
+        self.newInput(self.dataType, "Data", "data")
         self.newInput("Boolean", "Condition", "condition", hide = True)
+        self.newSocketEffect(UpdateAssignedDataType(
+            "dataType", [self.inputs[0]], default = "Generic"))
 
     def draw(self, layout):
         if self.errorMessage != "":
@@ -43,13 +42,6 @@ class DebugDrawerNode(bpy.types.Node, AnimationNode):
         row = col.row(align = True)
         row.prop(self, "maxListStartElements", text = "Begin")
         row.prop(self, "maxListEndElements", text = "End")
-
-    def edit(self):
-        socket = self.inputs["Data"]
-        if socket.isLinked:
-            self.dataType = socket.dataOrigin.dataType
-        else:
-            dataType = "Generic"
 
     def getExecutionCode(self):
         if "Condition" in self.inputs:

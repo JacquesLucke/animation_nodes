@@ -22,10 +22,7 @@ class DebugNode(bpy.types.Node, AnimationNode):
         return self.inputs[0].text
 
     def getExecutionCode(self):
-        if "Condition" in self.inputs: # support for older nodes
-            return "if condition: self.storeDebugData(data)"
-        else:
-            return "self.storeDebugData(data)"
+        return "if condition: self.storeDebugData(data)"
 
     def storeDebugData(self, data):
         if isinstance(data, float): text = str(round(data, 5))

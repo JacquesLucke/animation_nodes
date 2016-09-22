@@ -19,31 +19,23 @@ class MixDataNode(bpy.types.Node, AnimationNode):
     onlySearchTags = True
     searchTags = [(tag, {"dataType" : repr(type)}) for type, tag in nodeTypes.items()]
 
-    def dataTypeChanged(self, context):
-        self.generateSockets()
-
-    dataType = StringProperty(default = "Float", update = dataTypeChanged)
+    dataType = StringProperty(default = "Float", update = AnimationNode.updateSockets)
+    
     clampFactor = BoolProperty(name = "Clamp Factor",
         description = "Clamp factor between 0 and 1",
         default = False, update = executionCodeChanged)
 
     def create(self):
-        self.generateSockets()
+        self.newInput("Float", "Factor", "factor")
+        self.newInput(self.dataType, "A", "a")
+        self.newInput(self.dataType, "B", "b")
+        self.newOutput(self.dataType, "Result", "result")
 
     def draw(self, layout):
         layout.prop(self, "clampFactor")
 
     def drawLabel(self):
         return nodeTypes[self.outputs[0].dataType]
-
-    def generateSockets(self):
-        self.inputs.clear()
-        self.outputs.clear()
-
-        self.newInput("Float", "Factor", "factor")
-        self.newInput(self.dataType, "A", "a")
-        self.newInput(self.dataType, "B", "b")
-        self.newOutput(self.dataType, "Result", "result")
 
     def getExecutionCode(self):
         if self.clampFactor:

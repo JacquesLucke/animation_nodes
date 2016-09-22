@@ -14,14 +14,14 @@ class DataInterfaceNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_DataInterfaceNode"
     bl_label = "Data Interface"
 
-    def dataDirectionChanged(self, context):
-        self.recreateSocket()
-
     dataDirection = EnumProperty(name = "Data Direction", default = "IMPORT",
-        items = dataDirectionItems, update = dataDirectionChanged)
+        items = dataDirectionItems, update = AnimationNode.updateSockets)
 
     def create(self):
-        self.recreateSocket()
+        if self.dataDirection == "EXPORT":
+            self.newInput("Generic", "Value", "value")
+        if self.dataDirection == "IMPORT":
+            self.newOutput("Generic", "Value", "value")
 
     def draw(self, layout):
         layout.prop(self, "dataDirection", text = "")
@@ -45,12 +45,3 @@ class DataInterfaceNode(bpy.types.Node, AnimationNode):
     @value.setter
     def value(self, value):
         self.setValue(value)
-
-    def recreateSocket(self):
-        self.inputs.clear()
-        self.outputs.clear()
-
-        if self.dataDirection == "EXPORT":
-            self.newInput("Generic", "Value", "value")
-        if self.dataDirection == "IMPORT":
-            self.newOutput("Generic", "Value", "value")

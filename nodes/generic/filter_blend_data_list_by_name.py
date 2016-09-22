@@ -1,8 +1,8 @@
 import bpy
 from bpy.props import *
+from ... base_types import AnimationNode
 from ... sockets.info import toListDataType
 from ... events import executionCodeChanged
-from ... base_types import AnimationNode
 
 dataTypes = ["Object", "Scene", "Object Group", "Text Block"]
 
@@ -18,12 +18,9 @@ class FilterBlendDataListByNameNode(bpy.types.Node, AnimationNode):
     onlySearchTags = True
     searchTags = [("Filter {} List by Name".format(name), {"dataType" : repr(name)}) for name in dataTypes]
 
-    def dataTypeChanged(self, context):
-        self.createSockets()
-
     # Should be set only on node creation
     dataType = StringProperty(name = "Data Type", default = "Object",
-        update = dataTypeChanged)
+        update = AnimationNode.updateSockets)
 
     filterType = EnumProperty(name = "Filter Type", default = "STARTS_WITH",
         items = filterTypeItems, update = executionCodeChanged)
@@ -32,7 +29,10 @@ class FilterBlendDataListByNameNode(bpy.types.Node, AnimationNode):
         update = executionCodeChanged)
 
     def create(self):
-        self.createSockets()
+        listDataType = toListDataType(self.dataType)
+        self.newInput(listDataType, listDataType, "sourceList")
+        self.newInput("Text", "Name", "name")
+        self.newOutput(listDataType, listDataType, "targetList")
 
     def draw(self, layout):
         layout.prop(self, "filterType", expand = True)
@@ -40,14 +40,6 @@ class FilterBlendDataListByNameNode(bpy.types.Node, AnimationNode):
 
     def drawLabel(self):
         return "Filter {} List".format(self.dataType)
-
-    def createSockets(self):
-        self.inputs.clear()
-        self.outputs.clear()
-        listDataType = toListDataType(self.dataType)
-        self.newInput(listDataType, listDataType, "sourceList")
-        self.newInput("Text", "Name", "name")
-        self.newOutput(listDataType, listDataType, "targetList")
 
     def getExecutionCode(self):
         operation = "startswith" if self.filterType == "STARTS_WITH" else "endswith"

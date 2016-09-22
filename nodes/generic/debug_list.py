@@ -1,28 +1,24 @@
 import bpy
 from bpy.props import *
-from ... base_types import AnimationNode
+from ... base_types import AnimationNode, UpdateAssignedDataType
 
 class DebugListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_DebugListNode"
     bl_label = "Debug List"
 
     textBlockName = StringProperty(name = "Text")
-    dataType = StringProperty()
+    dataType = StringProperty(default = "Generic", update = AnimationNode.updateSockets)
     inputIsIterable = BoolProperty(default = False)
 
     def create(self):
         self.newInput("Text Block", "Text", "text")
-        self.newInput("Generic", "Data", "data")
+        self.newInput(self.dataType, "Data", "data")
+        self.newSocketEffect(UpdateAssignedDataType(
+            "dataType", [self.inputs[1]], default = "Generic"))
 
     def draw(self, layout):
         if not self.inputIsIterable:
             layout.label("No List Type", icon = "ERROR")
-
-    def edit(self):
-        inputSocket = self.inputs[1]
-        dataOrigin = inputSocket.dataOrigin
-        if dataOrigin is None: self.dataType = ""
-        else: self.dataType = dataOrigin.dataType
 
     def execute(self, text, data):
         self.inputIsIterable = True

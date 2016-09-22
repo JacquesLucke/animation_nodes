@@ -22,15 +22,17 @@ class MixDataListNode(bpy.types.Node, AnimationNode):
     onlySearchTags = True
     searchTags = [(tag, {"dataType" : repr(type)}) for type, tag in nodeTypes.items()]
 
-    def dataTypeChanged(self, context):
-        self.recreateSockets()
-
-    dataType = StringProperty(update = dataTypeChanged)
+    dataType = StringProperty(update = AnimationNode.updateSockets, default = "Float")
+    
     repeat = BoolProperty(name = "Repeat", default = False,
         description = "Repeat the factor for values above and below 0-1", update = executionCodeChanged)
 
     def create(self):
-        self.dataType = "Float"
+        listDataType = toListDataType(self.dataType)
+        self.newInput("Float", "Factor", "factor")
+        self.newInput(listDataType, listDataType, "dataList")
+        self.newInput("Interpolation", "Interpolation", "interpolation").defaultDrawType = "PROPERTY_ONLY"
+        self.newOutput(self.dataType, "Result", "result")
 
     def draw(self, layout):
         layout.prop(self, "repeat")
@@ -50,14 +52,3 @@ class MixDataListNode(bpy.types.Node, AnimationNode):
 
     def getUsedModules(self):
         return ["math"]
-
-    @keepNodeLinks
-    def recreateSockets(self):
-        self.inputs.clear()
-        self.outputs.clear()
-
-        listDataType = toListDataType(self.dataType)
-        self.newInput("Float", "Factor", "factor")
-        self.newInput(listDataType, listDataType, "dataList")
-        self.newInput("Interpolation", "Interpolation", "interpolation").defaultDrawType = "PROPERTY_ONLY"
-        self.newOutput(self.dataType, "Result", "result")

@@ -1,6 +1,5 @@
 import bpy
 from bpy.props import *
-from ... tree_info import keepNodeState
 from ... base_types import AnimationNode
 
 dataTypes = {
@@ -17,24 +16,16 @@ class BlendDataByNameNode(bpy.types.Node, AnimationNode):
     onlySearchTags = True
     searchTags = [(name + " by Name", {"dataType" : repr(name)}) for name in dataTypes.keys()]
 
-    def dataTypeChanged(self, context):
-        self.createSockets()
-
     # Should be set only on node creation
-    dataType = StringProperty(name = "Data Type", update = dataTypeChanged)
+    dataType = StringProperty(name = "Data Type", default = "Object",
+        update = AnimationNode.updateSockets)
 
     def create(self):
-        self.dataType = "Object"
+        self.newInput("Text", "Name", "name", defaultDrawType = "PROPERTY_ONLY")
+        self.newOutput(self.dataType, self.dataType, "output")
 
     def drawLabel(self):
         return self.dataType + " by Name"
 
     def getExecutionCode(self):
         return "output = bpy.data.{}.get(name)".format(dataTypes[self.dataType])
-
-    @keepNodeState
-    def createSockets(self):
-        self.inputs.clear()
-        self.outputs.clear()
-        self.newInput("Text", "Name", "name").defaultDrawType = "PROPERTY_ONLY"
-        self.newOutput(self.dataType, self.dataType, "output")

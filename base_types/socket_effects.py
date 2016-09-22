@@ -81,8 +81,10 @@ class UpdateAssignedListDataType(SocketEffect):
 
 
 class UpdateAssignedDataType(SocketEffect):
-    def __init__(self, propertyName, sockets):
+    def __init__(self, propertyName, sockets, ignore = set(), default = None):
         self.propertyName = propertyName
+        self.ignoredDataTypes = set(ignore)
+        self.default = default
         self.socketIDs = [self.toSocketID(socket) for socket in sockets if socket is not None]
 
     def apply(self, node):
@@ -90,8 +92,14 @@ class UpdateAssignedDataType(SocketEffect):
         for socketID in self.socketIDs:
             socket = self.getSocket(node, socketID)
             linkedSockets = socket.linkedSockets
+            
             if len(linkedSockets) == 1:
                 linkedDataType = linkedSockets[0].dataType
+                if linkedDataType in self.ignoredDataTypes:
+                    continue
                 if linkedDataType != currentType:
                     setattr(node, self.propertyName, linkedDataType)
                 break
+            elif len(linkedSockets) == 0 and self.default is not None:
+                if self.default != currentType:
+                    setattr(node, self.propertyName, self.default)
