@@ -2,7 +2,7 @@ import bpy
 import math
 from bpy.props import *
 from ... tree_info import keepNodeState
-from ... base_types import AnimationNode
+from ... base_types import AnimationNode, AutoSelectFloatOrInteger
 
 operationItems = [
     ("ADD", "Add", "A + B", "", 0),
@@ -60,15 +60,20 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
             tags.append((name, {"operation" : repr(operation)}))
         return tags
 
-    def operationChanged(self, context):
-        self.recreateInputSockets()
-
     operation = EnumProperty(name = "Operation", default = "MULTIPLY",
-        items = operationItems, update = operationChanged)
+        items = operationItems, update = AnimationNode.updateSockets)
 
     def create(self):
-        self.newOutput("Float", "Result", "result")
-        self.recreateInputSockets()
+        self.newInput("Float", "A", "a")
+        if self.operation in secondInputOperations:
+            self.newInput("Float", "B", "b", value = 1)
+        if self.operation in baseInputOperations:
+            self.newInput("Float", "Base", "base")
+        if self.operation in stepSizeInputOperations:
+            self.newInput("Float", "Step Size", "stepSize")
+
+        output = self.newOutput("Float", "Result", "result")
+        self.newSocketEffect(AutoSelectFloatOrInteger(output))
 
     def draw(self, layout):
         row = layout.row(align = True)
@@ -88,13 +93,6 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
             label = label.replace("Step", str(round(self.socketStep.value, 4)))
 
         return label
-
-    def edit(self):
-        output = self.outputs[0]
-        if output.dataType == "Float":
-            if output.shouldBeIntegerSocket(): self.setOutputType("Integer")
-        else:
-            if output.shouldBeFloatSocket(): self.setOutputType("Float")
 
     def getExecutionCode(self):
         op = self.operation
@@ -148,18 +146,6 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
     def _setOutputType(self, dataType):
         self.outputs.clear()
         self.newOutput(dataType, "Result", "result")
-
-    @keepNodeState
-    def recreateInputSockets(self):
-        self.inputs.clear()
-
-        self.newInput("Float", "A", "a")
-        if self.operation in secondInputOperations:
-            self.newInput("Float", "B", "b").value = 1
-        if self.operation in baseInputOperations:
-            self.newInput("Float", "Base", "base")
-        if self.operation in stepSizeInputOperations:
-            self.newInput("Float", "Step Size", "stepSize")
 
     @property
     def socketA(self):
