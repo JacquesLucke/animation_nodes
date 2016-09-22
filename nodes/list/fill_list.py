@@ -40,7 +40,9 @@ class FillListNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "fillMode", expand = True)
 
     def drawAdvanced(self, layout):
-        layout.prop(self, "makeElementCopies")
+        col = layout.column()
+        col.active = self.inputs["Element"].isCopyable()
+        col.prop(self, "makeElementCopies")
         self.invokeSocketTypeChooser(layout, "assignListDataType",
             socketGroup = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
 
