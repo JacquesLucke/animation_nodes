@@ -35,7 +35,7 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
 
     bakeProgress = StringProperty()
 
-    def create(self):
+    def setup(self):
         self.setEqualizerFrequencyRanges(frequencyRanges)
 
     def draw(self, layout):
