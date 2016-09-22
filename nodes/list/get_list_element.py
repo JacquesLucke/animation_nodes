@@ -1,9 +1,8 @@
 import bpy
 from bpy.props import *
-from ... tree_info import keepNodeState
 from ... events import executionCodeChanged
-from ... base_types import AnimationNode, UpdateAssignedListDataType
 from ... sockets.info import isBase, toBaseDataType, toListDataType
+from ... base_types import AnimationNode, UpdateAssignedListDataType
 
 class GetListElementNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GetListElementNode"

@@ -23,10 +23,11 @@ class AutoSelectFloatOrInteger(SocketEffect):
                 node.replaceSocket(socket, "Float", socket.name, socket.identifier)
 
 
-from .. sockets.info import isBase, isList, toBaseDataType
+from .. sockets.info import isBase, isList, toBaseDataType, toListDataType
 class UpdateAssignedListDataType(SocketEffect):
-    def __init__(self, propertyName, sockets):
+    def __init__(self, propertyName, sockets, propertyType = "BASE"):
         self.propertyName = propertyName
+        self.propertyType = propertyType
         self.socketIDs = []
         self.checkFunctions = []
         for socket, mode in sockets:
@@ -47,6 +48,8 @@ class UpdateAssignedListDataType(SocketEffect):
         for socketID, getLinkedBaseType in zip(self.socketIDs, self.checkFunctions):
             linkedType = getLinkedBaseType(self.getSocket(node, socketID))
             if linkedType is not None:
+                if self.propertyType == "LIST":
+                    linkedType = toListDataType(linkedType)
                 if linkedType != currentType:
                     setattr(node, self.propertyName, linkedType)
                 break
