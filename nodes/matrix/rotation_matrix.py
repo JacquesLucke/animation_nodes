@@ -13,13 +13,12 @@ class RotationMatrixNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_RotationMatrixNode"
     bl_label = "Rotation Matrix"
 
-    def axisChanged(self, context):
-        self.generateInput()
-
-    axis = EnumProperty(default = "X", items = axisItems, update = axisChanged)
+    axis = EnumProperty(default = "X", items = axisItems,
+        update = AnimationNode.updateSockets)
 
     def create(self):
-        self.generateInput()
+        socketType = "Euler" if self.axis == "ALL" else "Float"
+        self.newInput(socketType, "Angle", "angle")
         self.newOutput("Matrix", "Matrix", "matrix")
 
     def draw(self, layout):
@@ -30,9 +29,3 @@ class RotationMatrixNode(bpy.types.Node, AnimationNode):
             return "matrix = Matrix.Rotation(angle, 4, '{}')".format(self.axis)
         else:
             return "matrix = angle.to_matrix(); matrix.resize_4x4()"
-
-    @keepNodeState
-    def generateInput(self):
-        self.inputs.clear()
-        socketType = "Float" if len(self.axis) == 1 else "Euler"
-        self.newInput(socketType, "Angle", "angle")

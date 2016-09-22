@@ -1,6 +1,5 @@
 import bpy
 from bpy.props import *
-from ... tree_info import keepNodeState
 from ... base_types import AnimationNode
 from ... algorithms.rotation import generateRotationMatrix
 
@@ -14,60 +13,47 @@ pivotTypeItems = [
 class ChangeMatrixPivotNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ChangeMatrixPivotNode"
     bl_label = "Change Matrix Pivot"
-
-    def pivotTypeChanged(self, context):
-        self.generateSockets()
+    bl_width_default = 150
 
     pivotType = EnumProperty(name = "Input Type", default = "MATRIX",
-        items = pivotTypeItems, update = pivotTypeChanged)
+        items = pivotTypeItems, update = AnimationNode.updateSockets)
 
     def create(self):
-        self.width = 150
-        self.generateSockets()
-        self.newOutput("Matrix", "Transform Matrix", "matrixOut")
-
-    def draw(self, layout):
-        layout.prop(self, "pivotType", text = "")
-
-    @keepNodeState
-    def generateSockets(self):
-        self.inputs.clear()
         self.newInput("Matrix", "Transform Matrix", "matrix")
 
-        type = self.pivotType
-
-        if type == "MATRIX":
+        pivot = self.pivotType
+        if pivot == "MATRIX":
             self.newInput("Matrix", "Pivot Matrix (Parent)", "pivotMatrix")
-        if type == "VECTOR":
+        if pivot == "VECTOR":
             self.newInput("Vector", "Pivot Location", "pivot")
-        if type == "LOC_ROT":
+        if pivot == "LOC_ROT":
             self.newInput("Vector", "Pivot Center", "pivot")
             self.newInput("Euler", "Rotation", "rotation")
-
-        if type == "AXES_XXZ":
+        if pivot == "AXES_XXZ":
             self.newInput("Vector", "X Start (Center)", "start")
             self.newInput("Vector", "X End", "end").value = [1, 0, 0]
             self.newInput("Vector", "Z Direction (Normal)", "normal").value = [0, 0, 1]
-
-        if type == "AXES_XXZZ":
+        if pivot == "AXES_XXZZ":
             self.newInput("Vector", "X Start (Center)", "startX")
             self.newInput("Vector", "X End", "endX").value = [1, 0, 0]
             self.newInput("Vector", "Z Start", "startZ")
             self.newInput("Vector", "Z End", "endZ").value = [0, 0, 1]
 
+        self.newOutput("Matrix", "Transform Matrix", "matrixOut")
+
+    def draw(self, layout):
+        layout.prop(self, "pivotType", text = "")
+
     def getExecutionCode(self):
-        type = self.pivotType
-
-        if type == "VECTOR":
+        pivot = self.pivotType
+        if pivot == "VECTOR":
             yield "pivotMatrix = Matrix.Translation(pivot) "
-        if type == "LOC_ROT":
+        if pivot == "LOC_ROT":
             yield "pivotMatrix = Matrix.Translation(pivot) * rotation.to_matrix().to_4x4() "
-
-        if type == "AXES_XXZ":
+        if pivot == "AXES_XXZ":
             yield "matrixRotation = animation_nodes.algorithms.rotation.generateRotationMatrix(normal, end - start, 'Z', 'X')"
             yield "pivotMatrix = Matrix.Translation(start) * matrixRotation.normalized()"
-
-        if type == "AXES_XXZZ":
+        if pivot == "AXES_XXZZ":
             yield "matrixRotation = (animation_nodes.algorithms.rotation.generateRotationMatrix(endZ - startZ, endX - startX, 'Z', 'X')).normalized()"
             yield "pivotMatrix = Matrix.Translation(startX) * matrixRotation"
 

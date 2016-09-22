@@ -12,18 +12,9 @@ class ShearMatrixNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ShearMatrixNode"
     bl_label = "Shear Matrix"
 
-    def planeChanged(self, context):
-        self.recreateInputs()
-
-    plane = EnumProperty(items = planeItems, update = planeChanged)
+    plane = EnumProperty(items = planeItems, update = AnimationNode.updateSockets)
 
     def create(self):
-        self.recreateInputs()
-        self.newOutput("Matrix", "Matrix", "matrix")
-
-    @keepNodeState
-    def recreateInputs(self):
-        self.inputs.clear()
         if self.plane == "XY":
             self.newInput("Float", "Angle X", "angleA")
             self.newInput("Float", "Angle Y", "angleB")
@@ -33,6 +24,8 @@ class ShearMatrixNode(bpy.types.Node, AnimationNode):
         elif self.plane == "YZ":
             self.newInput("Float", "Angle Y", "angleA")
             self.newInput("Float", "Angle Z", "angleB")
+
+        self.newOutput("Matrix", "Matrix", "matrix")
 
     def draw(self, layout):
         layout.prop(self, "plane", expand = True)
