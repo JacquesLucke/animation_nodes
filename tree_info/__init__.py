@@ -209,19 +209,21 @@ def getSocketData(socket):
 def setSocketValues(node, inputs, outputs):
     inputsByIdentifier = node.inputsByIdentifier
     for identifier, dataType, value, hide, isUsed, dataIsModified in inputs:
-        if getattr(inputsByIdentifier.get(identifier), "dataType", "") == dataType:
-            socket = inputsByIdentifier[identifier]
+        socket = inputsByIdentifier.get(identifier)
+        if socket is None: continue
+        socket.hide = hide
+        if socket.dataType == dataType:
             socket.setProperty(value)
-            socket.hide = hide
             socket.isUsed = isUsed
             socket.dataIsModified = dataIsModified
 
     outputsByIdentifier = node.outputsByIdentifier
     for identifier, dataType, value, hide, isUsed, dataIsModified in outputs:
-        if getattr(outputsByIdentifier.get(identifier), "dataType", "") == dataType:
-            socket = outputsByIdentifier[identifier]
+        socket = inputsByIdentifier.get(identifier)
+        if socket is None: continue
+        socket.hide = hide
+        if socket.dataType == dataType:
             socket.setProperty(value)
-            socket.hide = hide
             socket.isUsed = isUsed
             socket.dataIsModified = dataIsModified
 
