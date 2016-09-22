@@ -1,29 +1,20 @@
 import bpy
 from bpy.props import *
-from mathutils import Vector
-from ... tree_info import keepNodeState
 from ... base_types import AnimationNode
 
 class ProjectOnSplineNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ProjectOnSplineNode"
     bl_label = "Project on Spline"
 
-    def settingChanged(self, context):
-        self.recreateOutputs()
-
     extended = BoolProperty(
         name = "Extended Spline",
         description = "Project point on extended spline. If this is turned on the parameter is not computable.",
-        update = settingChanged)
+        update = AnimationNode.updateSockets)
 
     def create(self):
         self.newInput("Spline", "Spline", "spline", defaultDrawType = "PROPERTY_ONLY")
         self.newInput("Vector", "Location", "location")
-        self.recreateOutputs()
 
-    @keepNodeState
-    def recreateOutputs(self):
-        self.outputs.clear()
         self.newOutput("Vector", "Position", "position")
         self.newOutput("Vector", "Tangent", "tangent")
         if not self.extended:

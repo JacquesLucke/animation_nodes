@@ -1,7 +1,6 @@
 import bpy
 from bpy.props import *
-from ... tree_info import keepNodeState
-from ... events import executionCodeChanged
+from ... events import propertyChanged
 from ... base_types import AnimationNode
 from ... data_structures.splines.bezier_spline import BezierSpline
 from ... data_structures.splines.from_blender import createSplinesFromBlenderObject, createSplineFromBlenderSpline
@@ -14,21 +13,23 @@ class SplinesFromObjectNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SplinesFromObjectNode"
     bl_label = "Splines from Object"
 
-    def importTypeChanged(self, context):
-        self.recreateSockets()
-
     useWorldSpace = BoolProperty(
         name = "Use World Space",
         description = "Use the position in global space",
-        default = True, update = executionCodeChanged)
+        default = True, update = propertyChanged)
 
     importType = EnumProperty(name = "Import Type", default = "ALL",
-        items = importTypeItems, update = importTypeChanged)
+        items = importTypeItems, update = AnimationNode.updateSockets)
 
     errorMessage = StringProperty()
 
     def create(self):
-        self.recreateSockets()
+        self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
+        if self.importType == "SINGLE":
+            self.newInput("Integer", "Index", "index", minValue = 0)
+            self.newOutput("Spline", "Spline", "spline")
+        else:
+            self.newOutput("Spline List", "Splines", "splines")
 
     def draw(self, layout):
         layout.prop(self, "useWorldSpace")
@@ -72,15 +73,3 @@ class SplinesFromObjectNode(bpy.types.Node, AnimationNode):
             for spline in splines:
                 spline.transform(object.matrix_world)
         return splines
-
-    @keepNodeState
-    def recreateSockets(self):
-        self.inputs.clear()
-        self.outputs.clear()
-
-        self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
-        if self.importType == "SINGLE":
-            self.newInput("Integer", "Index", "index", minValue = 0)
-            self.newOutput("Spline", "Spline", "spline")
-        else:
-            self.newOutput("Spline List", "Splines", "splines")

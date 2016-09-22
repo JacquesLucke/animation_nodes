@@ -19,11 +19,8 @@ class LoftSplinesNode(bpy.types.Node, AnimationNode):
     bl_label = "Loft Splines"
     bl_width_default = 160
 
-    def interpolationTypeChanged(self, context):
-        self.recreateInputs()
-
     interpolationType = EnumProperty(name = "Interpolation Type", default = "LINEAR",
-        items = interpolationTypeItems, update = interpolationTypeChanged)
+        items = interpolationTypeItems, update = AnimationNode.updateSockets)
 
     resolution = IntProperty(name = "Resolution", default = 100, min = 2,
         description = "Increase to have a more accurate evaluation", update = propertyChanged)
@@ -35,15 +32,6 @@ class LoftSplinesNode(bpy.types.Node, AnimationNode):
         items = sampleDistributionTypeItems, update = propertyChanged)
 
     def create(self):
-        self.recreateInputs()
-        self.newOutput("Vector List", "Vertices", "vertices")
-        self.newOutput("Edge Indices List", "Edge Indices", "edgeIndices")
-        self.newOutput("Polygon Indices List", "Polygon Indices", "polygonIndices")
-
-    @keepNodeState
-    def recreateInputs(self):
-        self.inputs.clear()
-
         self.newInput("Spline List", "Splines", "splines")
         self.newInput("Integer", "Spline Samples", "splineSamples", value = 16, minValue = 2)
         if self.interpolationType == "LINEAR":
@@ -55,6 +43,10 @@ class LoftSplinesNode(bpy.types.Node, AnimationNode):
             self.newInput("Float", "Smoothness", "smoothness", value = 1/3)
         self.newInput("Float", "Start", "start", hide = True, value = 0.0).setRange(0.0, 1.0)
         self.newInput("Float", "End", "end", hide = True, value = 1.0).setRange(0.0, 1.0)
+
+        self.newOutput("Vector List", "Vertices", "vertices")
+        self.newOutput("Edge Indices List", "Edge Indices", "edgeIndices")
+        self.newOutput("Polygon Indices List", "Polygon Indices", "polygonIndices")
 
     def draw(self, layout):
         layout.prop(self, "interpolationType", text = "")

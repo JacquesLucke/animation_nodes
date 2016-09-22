@@ -37,7 +37,7 @@ class SplineSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getValue(self):
         object = self.getObject()
         if getattr(object, "type", "") != "CURVE":
-            return PolySpline()
+            return BezierSpline()
 
         bSplines = object.data.splines
         if len(bSplines) > 0:
@@ -48,7 +48,7 @@ class SplineSocket(bpy.types.NodeSocket, AnimationNodeSocket):
                     spline.transform(object.matrix_world)
                 return spline
 
-        return PolySpline()
+        return BezierSpline()
 
     def getObject(self):
         if self.objectName == "": return None
