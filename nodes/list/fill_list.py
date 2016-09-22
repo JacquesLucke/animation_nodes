@@ -1,9 +1,8 @@
 import bpy
 from bpy.props import *
-from ... tree_info import keepNodeState
 from ... events import executionCodeChanged
-from ... base_types import AnimationNode
 from ... sockets.info import isBase, toBaseDataType, toListDataType
+from ... base_types import AnimationNode, UpdateAssignedListDataType
 
 fillModeItems = [
     ("LEFT", "Left", "", "TRIA_LEFT", 0),
@@ -13,10 +12,7 @@ class FillListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_FillListNode"
     bl_label = "Fill List"
 
-    def assignedTypeChanged(self, context):
-        self.generateSockets()
-
-    assignedType = StringProperty(update = assignedTypeChanged)
+    assignedType = StringProperty(update = AnimationNode.updateSockets, default = "Float")
 
     fillMode = EnumProperty(name = "Fill Mode", default = "RIGHT",
         items = fillModeItems, update = executionCodeChanged)
@@ -26,7 +22,19 @@ class FillListNode(bpy.types.Node, AnimationNode):
         update = executionCodeChanged)
 
     def create(self):
-        self.assignedType = "Float"
+        baseDataType = self.assignedType
+        listDataType = toListDataType(self.assignedType)
+
+        self.newInput("an_IntegerSocket", "Length", "length")
+        self.newInput(listDataType, "List", "inList", dataIsModified = True)
+        self.newInput(baseDataType, "Element", "fillElement")
+        self.newOutput(listDataType, "List", "outList")
+
+        self.newSocketEffect(UpdateAssignedListDataType("assignedType", [
+            (self.inputs[1], "LIST"),
+            (self.inputs[2], "BASE"),
+            (self.outputs[0], "LIST")
+        ]))
 
     def draw(self, layout):
         layout.prop(self, "fillMode", expand = True)
@@ -53,20 +61,6 @@ class FillListNode(bpy.types.Node, AnimationNode):
         if self.fillMode == "LEFT":  yield "    outList = fillList + inList"
         if self.fillMode == "RIGHT": yield "    outList = inList + fillList"
 
-    def edit(self):
-        baseDataType = self.getWantedDataType()
-        self.assignType(baseDataType)
-
-    def getWantedDataType(self):
-        listInput = self.inputs["List"].dataOrigin
-        elementInput = self.inputs["Element"].dataOrigin
-        listOutputs = self.outputs["List"].dataTargets
-
-        if listInput is not None: return toBaseDataType(listInput.bl_idname)
-        if elementInput is not None: return elementInput.dataType
-        if len(listOutputs) == 1: return toBaseDataType(listOutputs[0].bl_idname)
-        return self.inputs["Element"].dataType
-
     def assignListDataType(self, listDataType):
         self.assignType(toBaseDataType(listDataType))
 
@@ -74,15 +68,3 @@ class FillListNode(bpy.types.Node, AnimationNode):
         if not isBase(baseDataType): return
         if baseDataType == self.assignedType: return
         self.assignedType = baseDataType
-
-    @keepNodeState
-    def generateSockets(self):
-        self.inputs.clear()
-        self.outputs.clear()
-
-        baseDataType = self.assignedType
-        listDataType = toListDataType(self.assignedType)
-        self.newInput("an_IntegerSocket", "Length", "length")
-        self.newInput(listDataType, "List", "inList").dataIsModified = True
-        self.newInput(baseDataType, "Element", "fillElement")
-        self.newOutput(listDataType, "List", "outList")
