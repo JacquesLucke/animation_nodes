@@ -1,6 +1,5 @@
 import bpy
 from bpy.props import *
-from ... tree_info import keepNodeState
 from ... base_types import AnimationNode
 
 operationItems = [
@@ -50,24 +49,10 @@ class VectorMathNode(bpy.types.Node, AnimationNode):
         for name, operation in searchItems.items():
             yield name, {"operation" : repr(operation)}
 
-    def operationChanged(self, context):
-        self.createInputs()
-
-    operation = EnumProperty(name = "Operation", items = operationItems, default = "ADD", update = operationChanged)
+    operation = EnumProperty(name = "Operation", default = "ADD",
+        items = operationItems, update = AnimationNode.updateSockets)
 
     def create(self):
-        self.createInputs()
-        self.newOutput("Vector", "Result", "result")
-
-    def draw(self, layout):
-        layout.prop(self, "operation", text = "")
-
-    def drawLabel(self):
-        return operationLabels[self.operation]
-
-    @keepNodeState
-    def createInputs(self):
-        self.inputs.clear()
         self.newInput("Vector", "A", "a")
         if self.operation in operationsWithSecondVector:
             self.newInput("Vector", "B", "b")
@@ -76,6 +61,13 @@ class VectorMathNode(bpy.types.Node, AnimationNode):
         if self.operation in operationsWithStepVector:
             self.newInput("Vector", "Step Size", "stepSize").value = (0.1, 0.1, 0.1)
 
+        self.newOutput("Vector", "Result", "result")
+
+    def draw(self, layout):
+        layout.prop(self, "operation", text = "")
+
+    def drawLabel(self):
+        return operationLabels[self.operation]
 
     def getExecutionCode(self):
         op = self.operation
@@ -98,7 +90,6 @@ class VectorMathNode(bpy.types.Node, AnimationNode):
             yield "if stepSize.x != 0: result.x = round(a.x / stepSize.x) * stepSize.x"
             yield "if stepSize.y != 0: result.y = round(a.y / stepSize.y) * stepSize.y"
             yield "if stepSize.z != 0: result.z = round(a.z / stepSize.z) * stepSize.z"
-
 
     def getUsedModules(self):
         return ["mathutils"]

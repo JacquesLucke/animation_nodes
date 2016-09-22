@@ -1,16 +1,17 @@
 import bpy
 import random
 from bpy.props import *
-from mathutils import Vector
 from ... events import propertyChanged
 from ... base_types import AnimationNode
-from ... algorithms.perlin_noise import perlinNoise
 
 class VectorWiggleNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_VectorWiggleNode"
     bl_label = "Vector Wiggle"
 
     nodeSeed = IntProperty(update = propertyChanged)
+
+    def setup(self):
+        self.randomizeNodeSeed()
 
     def create(self):
         self.newInput("Float", "Seed", "seed")
@@ -20,7 +21,6 @@ class VectorWiggleNode(bpy.types.Node, AnimationNode):
         self.newInput("Integer", "Octaves", "octaves", value = 2)
         self.newInput("Float", "Persistance", "persistance", value = 0.3)
         self.newOutput("Vector", "Vector", "vector")
-        self.randomizeNodeSeed()
 
     def draw(self, layout):
         layout.prop(self, "nodeSeed", text = "Node Seed")
