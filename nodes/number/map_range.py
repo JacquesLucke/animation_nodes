@@ -8,24 +8,15 @@ class MapRangeNode(bpy.types.Node, AnimationNode):
     bl_label = "Map Range"
     bl_width_default = 170
 
-    def settingChanged(self, context):
-        self.recreateInputs()
-
     clampInput = BoolProperty(name = "Clamp Input", default = True,
         description = "The input will be between Input Min and Input Max",
-        update = settingChanged)
+        update = AnimationNode.updateSockets)
 
     useInterpolation = BoolProperty(name = "Use Interpolation", default = False,
         description = "Don't use the normal linear interpolation between Min and Max (only available when clamp is turned on)",
-        update = settingChanged)
+        update = AnimationNode.updateSockets)
 
     def create(self):
-        self.recreateInputs()
-        self.newOutput("Float", "Value", "newValue")
-
-    @keepNodeState
-    def recreateInputs(self):
-        self.inputs.clear()
         self.newInput("Float", "Value", "value")
         self.newInput("Float", "Input Min", "inMin", value = 0)
         self.newInput("Float", "Input Max", "inMax", value = 1)
@@ -34,6 +25,8 @@ class MapRangeNode(bpy.types.Node, AnimationNode):
 
         if self.useInterpolation and self.clampInput:
             self.newInput("Interpolation", "Interpolation", "interpolation", defaultDrawType = "PROPERTY_ONLY")
+
+        self.newOutput("Float", "Value", "newValue")
 
     def draw(self, layout):
         col = layout.column(align = True)

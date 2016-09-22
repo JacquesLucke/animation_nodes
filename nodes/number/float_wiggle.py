@@ -11,6 +11,9 @@ class FloatWiggleNode(bpy.types.Node, AnimationNode):
 
     nodeSeed = IntProperty(update = propertyChanged)
 
+    def setup(self):
+        self.randomizeNodeSeed()
+
     def create(self):
         self.newInput("Float", "Seed", "seed")
         self.newInput("Float", "Evolution", "evolution")
@@ -19,7 +22,6 @@ class FloatWiggleNode(bpy.types.Node, AnimationNode):
         self.newInput("Integer", "Octaves", "octaves", value = 2)
         self.newInput("Float", "Persistance", "persistance", value = 0.3)
         self.newOutput("Float", "Number", "number")
-        self.randomizeNodeSeed()
 
     def draw(self, layout):
         layout.prop(self, "nodeSeed", text = "Node Seed")

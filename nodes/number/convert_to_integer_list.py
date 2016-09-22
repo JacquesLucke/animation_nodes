@@ -12,14 +12,14 @@ class ConvertToIntegerListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ConvertToIntegerListNode"
     bl_label = "Convert to Integer List"
 
-    def originTypeChanged(self, context):
-        self.recreateInput()
-
     originType = EnumProperty(name = "Origin Type", default = "Float List",
-        items = originTypeItems, update = originTypeChanged)
+        items = originTypeItems, update = AnimationNode.updateSockets)
+
+    def setup(self):
+        self.width_hidden = 45
 
     def create(self):
-        self.recreateInput()
+        self.newInput(self.originType, self.originType, "inList")
         self.newOutput("Integer List", "Integer List", "integerList")
 
     def drawAdvanced(self, layout):
@@ -37,8 +37,3 @@ class ConvertToIntegerListNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         yield "integerList = LongLongList.fromValues(inList)"
-
-    @keepNodeState
-    def recreateInput(self):
-        self.inputs.clear()
-        self.newInput(self.originType, self.originType, "inList")

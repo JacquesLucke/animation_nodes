@@ -4,34 +4,25 @@ from ... base_types import AnimationNode
 from ... events import executionCodeChanged
 
 conversionTypeItems = [
-    ("DEGREE_TO_RADIAN", "Degree to Radian", ""),
-    ("RADIAN_TO_DEGREE", "Radian to Degree", "")]
+    ("DEGREE_TO_RADIAN", "Degree to Radian", "", "NONE", 0),
+    ("RADIAN_TO_DEGREE", "Radian to Degree", "", "NONE", 1)]
 
 class ConvertAngleNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ConvertAngleNode"
     bl_label = "Convert Angle"
 
-    searchTags = [(name, {"conversionType" : repr(type)}) for type, name, _ in conversionTypeItems]
+    searchTags = [(name, {"conversionType" : repr(type)}) for type, name, *_ in conversionTypeItems]
 
-    def settingChanged(self, context):
-        inSocket = self.inputs["Angle"]
-        outSocket = self.outputs["Angle"]
-        if self.conversionType == "DEGREE_TO_RADIAN":
-            inSocket.text = "Degree"
-            outSocket.text = "Radian"
-        else:
-            inSocket.text = "Radian"
-            outSocket.text = "Degree"
-        executionCodeChanged()
-
-    conversionType = EnumProperty(name = "Conversion Type", items = conversionTypeItems, update = settingChanged)
+    conversionType = EnumProperty(name = "Conversion Type", default = "DEGREE_TO_RADIAN",
+        items = conversionTypeItems, update = AnimationNode.updateSockets)
 
     def create(self):
-        socket1 = self.newInput("Float", "Angle", "inAngle")
-        socket2 = self.newOutput("Float", "Angle", "outAngle")
-        for socket in [socket1, socket2]:
-            socket.display.text = True
-        self.conversionType = "DEGREE_TO_RADIAN"
+        if self.conversionType == "DEGREE_TO_RADIAN":
+            self.newInput("Float", "Degree", "inAngle")
+            self.newOutput("Float", "Radian", "outAngle")
+        elif self.conversionType == "RADIAN_TO_DEGREE":
+            self.newInput("Float", "Radian", "inAngle")
+            self.newOutput("Float", "Degree", "outAngle")
 
     def draw(self, layout):
         layout.prop(self, "conversionType", text = "")
