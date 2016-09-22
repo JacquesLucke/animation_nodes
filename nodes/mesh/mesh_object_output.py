@@ -20,11 +20,8 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
                   ("Set BMesh on Object (old)", {"meshDataType" : repr("BMESH")}),
                   ("Set Vertices on Object (old)", {"meshDataType" : repr("VERTICES")}) ]
 
-    def meshDataTypeChanged(self, context):
-        self.recreateInputs()
-
     meshDataType = EnumProperty(name = "Mesh Data Type", default = "MESH_DATA",
-        items = meshDataTypeItems, update = meshDataTypeChanged)
+        items = meshDataTypeItems, update = AnimationNode.updateSockets)
 
     updateMesh = BoolProperty(name = "Update Mesh", default = True,
         description = "Update create mesh to recalculate other mesh related data",
@@ -43,13 +40,6 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
     errorMessage = StringProperty()
 
     def create(self):
-        self.recreateInputs()
-        self.newOutput("Object", "Object", "object")
-
-    @keepNodeState
-    def recreateInputs(self):
-        self.inputs.clear()
-
         socket = self.newInput("Object", "Object", "object")
         socket.defaultDrawType = "PROPERTY_ONLY"
         socket.objectCreationType = "MESH"
@@ -66,6 +56,8 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
         for socket in self.inputs[1:]:
             socket.useIsUsedProperty = True
             socket.isUsed = False
+
+        self.newOutput("Object", "Object", "object")
 
     def draw(self, layout):
         if not self.meshInputSocket.hide:
