@@ -1,6 +1,5 @@
 import bpy
 from bpy.props import *
-from ... tree_info import keepNodeLinks
 from ... events import executionCodeChanged
 from ... sockets.info import isBase, toBaseDataType, toListDataType
 from ... base_types import AnimationNode, UpdateAssignedListDataType

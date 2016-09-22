@@ -1,18 +1,14 @@
 import bpy
 from bpy.props import *
-from ... tree_info import keepNodeState
 from ... events import executionCodeChanged
-from ... base_types import AnimationNode
 from ... sockets.info import toBaseDataType, toListDataType, isBase
+from ... base_types import AnimationNode, UpdateAssignedListDataType
 
 class SetListElementNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SetListElementNode"
     bl_label = "Set List Element"
 
-    def assignedTypeChanged(self, context):
-        self.generateSockets()
-
-    assignedType = StringProperty(update = assignedTypeChanged)
+    assignedType = StringProperty(update = AnimationNode.updateSockets, default = "Float")
 
     clampIndex = BoolProperty(name = "Clamp Index", default = False,
         description = "Clamp the index between the lowest and highest possible index",
@@ -25,7 +21,19 @@ class SetListElementNode(bpy.types.Node, AnimationNode):
     errorMessage = StringProperty()
 
     def create(self):
-        self.assignedType = "Float"
+        baseDataType = self.assignedType
+        listDataType = toListDataType(self.assignedType)
+
+        self.newInput(listDataType, "List", "list", dataIsModified = True)
+        self.newInput(baseDataType, "Element", "element")
+        self.newInput("an_IntegerSocket", "Index", "index")
+        self.newOutput(listDataType, "List", "list")
+
+        self.newSocketEffect(UpdateAssignedListDataType("assignedType", "BASE",
+            [(self.inputs[0], "LIST"),
+             (self.inputs[1], "BASE"),
+             (self.outputs[0], "LIST")]
+        ))
 
     def draw(self, layout):
         if self.errorMessage != "":
@@ -51,22 +59,6 @@ class SetListElementNode(bpy.types.Node, AnimationNode):
                 yield "if 0 <= index <= len(list) - 1: list[index] = element"
         yield "else: self.errorMessage = 'Index out of range'"
 
-    def edit(self):
-        dataType = self.getWantedDataType()
-        self.assignType(dataType)
-
-    def getWantedDataType(self):
-        listInput = self.inputs["List"].dataOrigin
-        elementInput = self.inputs["Element"].dataOrigin
-        listOutputs = self.outputs["List"].dataTargets
-
-        if listInput is not None:
-            if listInput.dataType in ("Edge Indices", "Polygon Indices"): return "Integer"
-            return toBaseDataType(listInput.dataType)
-        if elementInput is not None: return elementInput.dataType
-        if len(listOutputs) == 1: return toBaseDataType(listOutputs[0].dataType)
-        return self.inputs["Element"].dataType
-
     def assignListDataType(self, listDataType):
         self.assignType(toBaseDataType(listDataType))
 
@@ -74,15 +66,3 @@ class SetListElementNode(bpy.types.Node, AnimationNode):
         if not isBase(baseDataType): return
         if baseDataType == self.assignedType: return
         self.assignedType = baseDataType
-
-    @keepNodeState
-    def generateSockets(self):
-        self.inputs.clear()
-        self.outputs.clear()
-
-        baseDataType = self.assignedType
-        listDataType = toListDataType(self.assignedType)
-        self.newInput(listDataType, "List", "list", dataIsModified = True)
-        self.newInput(baseDataType, "Element", "element")
-        self.newInput("an_IntegerSocket", "Index", "index")
-        self.newOutput(listDataType, "List", "list")
