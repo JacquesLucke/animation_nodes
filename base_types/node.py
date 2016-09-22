@@ -42,7 +42,6 @@ class AnimationNode:
     onlySearchTags = False
     # can contain: 'NO_EXECUTION', 'NOT_IN_SUBPROGRAM',
     #              'NO_AUTO_EXECUTION', 'NO_TIMING',
-    #              'SINGLE_CREATION'
     options = set()
 
     # can be "NONE", "ALWAYS" or "HIDDEN_ONLY"
@@ -56,8 +55,12 @@ class AnimationNode:
     # functions subclasses can override
     ######################################
 
-    def create(self):
+    def setup(self):
         pass
+
+    # may be defined be nodes
+    #def create(self):
+    #    pass
 
     def edit(self):
         pass
@@ -122,7 +125,9 @@ class AnimationNode:
     def init(self, context):
         self.width_hidden = 100
         self.identifier = createIdentifier()
-        self.create()
+        if hasattr(self, "create"):
+            self.create()
+        self.setup()
 
     def update(self):
         '''Don't use this function at all!!'''
@@ -155,7 +160,7 @@ class AnimationNode:
         return self.bl_label
 
     def updateSockets(self, context = None):
-        if "SINGLE_CREATION" in self.options:
+        if not hasattr(self, "create"):
             return
 
         @keepNodeState

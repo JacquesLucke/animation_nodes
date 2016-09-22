@@ -9,7 +9,6 @@ from ... utils.nodes import newNodeAtCursor, invokeTranslation
 class GroupOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GroupOutputNode"
     bl_label = "Group Output"
-    options = {"SINGLE_CREATION"}
     bl_width_default = 180
 
     def inputNodeIdentifierChanged(self, context):
@@ -18,7 +17,7 @@ class GroupOutputNode(bpy.types.Node, AnimationNode):
 
     groupInputIdentifier = StringProperty(update = inputNodeIdentifierChanged)
 
-    def create(self):
+    def setup(self):
         socket = self.newInput("an_NodeControlSocket", "New Return").margin = 0.15
 
     def draw(self, layout):

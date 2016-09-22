@@ -8,7 +8,6 @@ class CreateListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CreateListNode"
     bl_label = "Create List"
     dynamicLabelType = "ALWAYS"
-    options = {"SINGLE_CREATION"}
     onlySearchTags = True
 
     @classmethod
@@ -27,7 +26,7 @@ class CreateListNode(bpy.types.Node, AnimationNode):
 
     hideInputs = BoolProperty(name = "Hide Inputs", default = False, update = hideStatusChanged)
 
-    def create(self):
+    def setup(self):
         self.assignedType = "Float"
 
     def draw(self, layout):

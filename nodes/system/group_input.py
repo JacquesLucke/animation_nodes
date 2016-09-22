@@ -11,10 +11,9 @@ from . subprogram_sockets import SubprogramData, subprogramInterfaceChanged
 class GroupInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     bl_idname = "an_GroupInputNode"
     bl_label = "Group Input"
-    options = {"SINGLE_CREATION"}
     bl_width_default = 180
 
-    def create(self):
+    def setup(self):
         self.randomizeNetworkColor()
         self.subprogramName = "My Group"
         socket = self.newOutput("an_NodeControlSocket", "New Parameter").margin = 0.15

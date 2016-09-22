@@ -2,7 +2,7 @@ import bpy
 import random
 from bpy.props import *
 from ... events import propertyChanged
-from ... sockets.info import isList, toBaseDataType, toListDataType
+from ... sockets.info import isList, toBaseDataType
 from ... base_types import AnimationNode, UpdateAssignedListDataType
 
 selectionTypeItems = [
@@ -19,6 +19,9 @@ class GetRandomListElementsNode(bpy.types.Node, AnimationNode):
         items = selectionTypeItems, update = AnimationNode.updateSockets)
 
     nodeSeed = IntProperty(update = propertyChanged)
+
+    def setup(self):
+        self.randomizeNodeSeed()
 
     def create(self):
         listDataType = self.assignedType

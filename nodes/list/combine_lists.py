@@ -7,7 +7,6 @@ class CombineListsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CombineListsNode"
     bl_label = "Combine Lists"
     dynamicLabelType = "ALWAYS"
-    options = {"SINGLE_CREATION"}
     onlySearchTags = True
 
     @classmethod
@@ -20,7 +19,7 @@ class CombineListsNode(bpy.types.Node, AnimationNode):
 
     assignedType = StringProperty(update = assignedTypeChanged)
 
-    def create(self):
+    def setup(self):
         self.assignedType = "Float"
 
     def draw(self, layout):

@@ -14,7 +14,6 @@ from . subprogram_sockets import SubprogramData, subprogramInterfaceChanged
 class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     bl_idname = "an_ScriptNode"
     bl_label = "Script"
-    options = {"SINGLE_CREATION"}
     bl_width_default = 200
 
     def scriptExecutionCodeChanged(self, context):
@@ -39,7 +38,7 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         description = "Try to correct the type of variables, return default otherwise",
         update = scriptExecutionCodeChanged)
 
-    def create(self):
+    def setup(self):
         self.randomizeNetworkColor()
         self.subprogramName = "My Script"
         self.newInput("an_NodeControlSocket", "New Input", "newInput")

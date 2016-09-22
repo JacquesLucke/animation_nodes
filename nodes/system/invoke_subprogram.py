@@ -21,7 +21,6 @@ inputBasedCache = {}
 class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_InvokeSubprogramNode"
     bl_label = "Invoke Subprogram"
-    options = {"SINGLE_CREATION"}
     bl_width_default = 170
 
     def subprogramIdentifierChanged(self, context):
@@ -41,9 +40,6 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
 
     showCacheOptions = BoolProperty(name = "Show Cache Options", default = False,
     description = "Draw cache options in the node for easier access")
-
-    def create(self):
-        pass
 
     @property
     def inputVariables(self):
