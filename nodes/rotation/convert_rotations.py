@@ -23,15 +23,43 @@ class ConvertRotationsNode(bpy.types.Node, AnimationNode):
     onlySearchTags = True
     searchTags = [(name, {"conversionType" : repr(type)}) for type, name, _,_,_ in conversionTypeItems]
 
-    def conversionTypeChanged(self, context):
-        self.createSockets()
-
     conversionType = EnumProperty(name = "Conversion Type", default = "QUATERNION_TO_EULER",
-        items = conversionTypeItems, update = conversionTypeChanged)
+        items = conversionTypeItems, update = AnimationNode.updateSockets)
+
     useDegree = BoolProperty(name = "Use Degree", default = False, update = executionCodeChanged)
 
     def create(self):
-        self.conversionType = "QUATERNION_TO_EULER"
+        if self.conversionType == "QUATERNION_TO_EULER":
+            self.newInput("Quaternion", "Quaternion", "quaternion")
+            self.newOutput("Euler", "Euler", "euler")
+        if self.conversionType == "EULER_TO_QUATERNION":
+            self.newInput("Euler", "Euler", "euler")
+            self.newOutput("Quaternion", "Quaternion", "quaternion")
+
+        if self.conversionType == "QUATERNION_TO_MATRIX":
+            self.newInput("Quaternion", "Quaternion", "quaternion")
+            self.newOutput("Matrix", "Matrix", "matrix")
+        if self.conversionType == "MATRIX_TO_QUATERNION":
+            self.newInput("Matrix", "Matrix", "matrix")
+            self.newOutput("Quaternion", "Quaternion", "quaternion")
+
+        if self.conversionType == "EULER_TO_MATRIX":
+            self.newInput("Euler", "Euler", "euler")
+            self.newOutput("Matrix", "Matrix", "matrix")
+        if self.conversionType == "MATRIX_TO_EULER":
+            self.newInput("Matrix", "Matrix", "matrix")
+            self.newOutput("Euler", "Euler", "euler")
+
+        if self.conversionType == "QUATERNION_TO_AXIS_ANGLE":
+            self.newInput("Quaternion", "Quaternion", "quaternion")
+            self.newOutput("Vector", "Axis", "axis")
+            self.newOutput("Float", "Angle", "angle")
+        if self.conversionType == "AXIS_ANGLE_TO_QUATERNION":
+            self.newInput("Vector", "Axis", "axis")
+            self.newInput("Float", "Angle", "angle")
+            self.newOutput("Quaternion", "Quaternion", "quaternion")
+
+        self.inputs[0].defaultDrawType = "PREFER_PROPERTY"
 
     def draw(self, layout):
         layout.prop(self, "conversionType", text = "")
@@ -66,40 +94,3 @@ class ConvertRotationsNode(bpy.types.Node, AnimationNode):
 
     def getUsedModules(self):
         return ["math"]
-
-    @keepNodeLinks
-    def createSockets(self):
-        self.inputs.clear()
-        self.outputs.clear()
-
-        if self.conversionType == "QUATERNION_TO_EULER":
-            self.newInput("Quaternion", "Quaternion", "quaternion")
-            self.newOutput("Euler", "Euler", "euler")
-        if self.conversionType == "EULER_TO_QUATERNION":
-            self.newInput("Euler", "Euler", "euler")
-            self.newOutput("Quaternion", "Quaternion", "quaternion")
-
-        if self.conversionType == "QUATERNION_TO_MATRIX":
-            self.newInput("Quaternion", "Quaternion", "quaternion")
-            self.newOutput("Matrix", "Matrix", "matrix")
-        if self.conversionType == "MATRIX_TO_QUATERNION":
-            self.newInput("Matrix", "Matrix", "matrix")
-            self.newOutput("Quaternion", "Quaternion", "quaternion")
-
-        if self.conversionType == "EULER_TO_MATRIX":
-            self.newInput("Euler", "Euler", "euler")
-            self.newOutput("Matrix", "Matrix", "matrix")
-        if self.conversionType == "MATRIX_TO_EULER":
-            self.newInput("Matrix", "Matrix", "matrix")
-            self.newOutput("Euler", "Euler", "euler")
-
-        if self.conversionType == "QUATERNION_TO_AXIS_ANGLE":
-            self.newInput("Quaternion", "Quaternion", "quaternion")
-            self.newOutput("Vector", "Axis", "axis")
-            self.newOutput("Float", "Angle", "angle")
-        if self.conversionType == "AXIS_ANGLE_TO_QUATERNION":
-            self.newInput("Vector", "Axis", "axis")
-            self.newInput("Float", "Angle", "angle")
-            self.newOutput("Quaternion", "Quaternion", "quaternion")
-
-        self.inputs[0].defaultDrawType = "PREFER_PROPERTY"

@@ -1,11 +1,11 @@
 import bpy
 from bpy.props import *
-from ... events import executionCodeChanged
 from ... base_types import AnimationNode
+from ... events import executionCodeChanged
 
 conversionTypeItems = [
     ("VECTOR_TO_EULER", "Vector to Euler", "", "NONE", 0),
-    ("EULER_TO_VECTOR", "Euler to Vector", "", "NONE", 1) ]
+    ("EULER_TO_VECTOR", "Euler to Vector", "", "NONE", 1)]
 
 class ConvertVectorAndEulerNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ConvertVectorAndEulerNode"
@@ -15,17 +15,20 @@ class ConvertVectorAndEulerNode(bpy.types.Node, AnimationNode):
     onlySearchTags = True
     searchTags = [(name, {"conversionType" : repr(type)}) for type, name, _,_,_ in conversionTypeItems]
 
-    def conversionTypeChanged(self, context):
-        self.createSockets()
-
     useDegree = BoolProperty(name = "Use Degree", default = False,
         update = executionCodeChanged)
 
     conversionType = EnumProperty(name = "Conversion Type", default = "VECTOR_TO_EULER",
-        update = conversionTypeChanged, items = conversionTypeItems)
+        update = AnimationNode.updateSockets, items = conversionTypeItems)
 
     def create(self):
-        self.createSockets()
+        if self.conversionType == "VECTOR_TO_EULER":
+            self.newInput("Vector", "Vector", "vector")
+            self.newOutput("Euler", "Euler", "euler")
+        if self.conversionType == "EULER_TO_VECTOR":
+            self.newInput("Euler", "Euler", "euler")
+            self.newOutput("Vector", "Vector", "vector")
+        self.inputs[0].defaultDrawType = "PROPERTY_ONLY"
 
     def draw(self, layout):
         layout.prop(self, "conversionType", text = "")
@@ -45,15 +48,3 @@ class ConvertVectorAndEulerNode(bpy.types.Node, AnimationNode):
 
     def getUsedModules(self):
         return ["math"]
-
-    def createSockets(self):
-        self.inputs.clear()
-        self.outputs.clear()
-
-        if self.conversionType == "VECTOR_TO_EULER":
-            self.newInput("Vector", "Vector", "vector")
-            self.newOutput("Euler", "Euler", "euler")
-        if self.conversionType == "EULER_TO_VECTOR":
-            self.newInput("Euler", "Euler", "euler")
-            self.newOutput("Vector", "Vector", "vector")
-        self.inputs[0].defaultDrawType = "PROPERTY_ONLY"

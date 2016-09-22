@@ -31,16 +31,22 @@ class EulerMathNode(bpy.types.Node, AnimationNode):
     bl_label = "Euler Math"
     dynamicLabelType = "HIDDEN_ONLY"
 
-    def operationChanged(self, context):
-        self.createInputs()
-
-    operation = EnumProperty(name = "Operation", items = operationItems, default = "ADD", update = operationChanged)
+    operation = EnumProperty(name = "Operation", default = "ADD",
+        items = operationItems, update = AnimationNode.updateSockets)
+    
     useDegree = BoolProperty(name = "Use Degrees",
         description = "Multiply and Divide degrees. If false, operation will use radians (output is always radians)",
-        default = True, update = operationChanged)
+        default = True, update = AnimationNode.updateSockets)
 
     def create(self):
-        self.createInputs()
+        self.newInput("Euler", "A", "a")
+        if self.operation in operationsWithSecondEuler:
+            self.newInput("Euler", "B", "b")
+        if self.operation in operationsWithFloat:
+            self.newInput("Float", "Scale", "scale").value = 1.0
+        if self.operation in operationsWithStepEuler:
+            self.newInput("Euler", "Step Size", "stepSize").value = (0.1, 0.1, 0.1)
+
         self.newOutput("Euler", "Result", "result")
 
     def draw(self, layout):
@@ -51,18 +57,6 @@ class EulerMathNode(bpy.types.Node, AnimationNode):
 
     def drawLabel(self):
         return operationLabels[self.operation]
-
-    @keepNodeState
-    def createInputs(self):
-        self.inputs.clear()
-        self.newInput("Euler", "A", "a")
-        if self.operation in operationsWithSecondEuler:
-            self.newInput("Euler", "B", "b")
-        if self.operation in operationsWithFloat:
-            self.newInput("Float", "Scale", "scale").value = 1.0
-        if self.operation in operationsWithStepEuler:
-            self.newInput("Euler", "Step Size", "stepSize").value = (0.1, 0.1, 0.1)
-
 
     def getExecutionCode(self):
         op = self.operation

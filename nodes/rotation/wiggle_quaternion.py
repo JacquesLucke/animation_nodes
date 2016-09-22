@@ -1,4 +1,5 @@
 import bpy
+import random
 from bpy.props import *
 from mathutils import Quaternion
 from ... events import propertyChanged
@@ -11,6 +12,9 @@ class QuaternionWiggleNode(bpy.types.Node, AnimationNode):
 
     nodeSeed = IntProperty(update = propertyChanged)
 
+    def setup(self):
+        self.randomizeNodeSeed()
+
     def create(self):
         self.newInput("Float", "Seed", "seed")
         self.newInput("Float", "Evolution", "evolution")
@@ -19,7 +23,6 @@ class QuaternionWiggleNode(bpy.types.Node, AnimationNode):
         self.newInput("Integer", "Octaves", "octaves", value = 2)
         self.newInput("Float", "Persistance", "persistance", value = 0.3)
         self.newOutput("Quaternion", "Quaternion", "quaternion")
-        self.randomizeNodeSeed()
 
     def draw(self, layout):
         layout.prop(self, "nodeSeed", text = "Node Seed")

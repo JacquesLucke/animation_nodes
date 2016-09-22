@@ -37,30 +37,15 @@ operationsWithFloat = ["NORMALIZE", "SCALE"]
 operationsWithSecondQuaternion = ["ADD","SUBTRACT", "COMBINE", "ROTATION_DIFFERENCE", "MULTIPLY", "DIVIDE", "CROSS"]
 operationsWithStepQuaternion = ["SNAP"]
 
-
 class QuaternionMathNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_QuaternionMathNode"
     bl_label = "Quaternion Math"
     dynamicLabelType = "HIDDEN_ONLY"
 
-    def operationChanged(self, context):
-        self.createInputs()
-
-    operation = EnumProperty(name = "Operation", items = operationItems, default = "ADD", update = operationChanged)
+    operation = EnumProperty(name = "Operation", default = "ADD",
+        items = operationItems, update = AnimationNode.updateSockets)
 
     def create(self):
-        self.createInputs()
-        self.newOutput("Quaternion", "Result", "result")
-
-    def draw(self, layout):
-        layout.prop(self, "operation", text = "")
-
-    def drawLabel(self):
-        return operationLabels[self.operation]
-
-    @keepNodeLinks
-    def createInputs(self):
-        self.inputs.clear()
         self.newInput("Quaternion", "A", "a")
         if self.operation in operationsWithSecondQuaternion:
             self.newInput("Quaternion", "B", "b")
@@ -69,6 +54,13 @@ class QuaternionMathNode(bpy.types.Node, AnimationNode):
         if self.operation in operationsWithStepQuaternion:
             self.newInput("Quaternion", "Step Size", "stepSize").value = (0.1, 0.1, 0.1)
 
+        self.newOutput("Quaternion", "Result", "result")
+
+    def draw(self, layout):
+        layout.prop(self, "operation", text = "")
+
+    def drawLabel(self):
+        return operationLabels[self.operation]
 
     def getExecutionCode(self):
         op = self.operation
