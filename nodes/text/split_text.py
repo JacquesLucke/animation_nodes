@@ -17,19 +17,21 @@ class SplitTextNode(bpy.types.Node, AnimationNode):
     bl_label = "Split Text"
     bl_width_default = 190
 
-    def splitTypeChanges(self, context):
-        self.recreateInputs()
-
     splitType = EnumProperty(
         name = "Split Type", default = "REGULAR_EXPRESSION",
-        items = splitTypeItems, update = splitTypeChanges)
+        items = splitTypeItems, update = AnimationNode.updateSockets)
 
     keepDelimiters = BoolProperty(default = False, update = propertyChanged)
 
     errorMessage = StringProperty()
 
     def create(self):
-        self.recreateInputs()
+        self.newInput("Text", "Text", "text")
+        if self.splitType in ("REGULAR_EXPRESSION", "SEPARATOR"):
+            self.newInput("Text", "Split By", "splitBy")
+        if self.splitType == "N_CHARACTERS":
+            self.newInput("Integer", "N", "n", value = 5, minValue = 1)
+
         self.newOutput("Text List", "Text List", "textList")
         self.newOutput("Integer", "Length", "length")
 
@@ -74,12 +76,3 @@ class SplitTextNode(bpy.types.Node, AnimationNode):
         if missingChars > 0:
             textList.append(text[-missingChars:])
         return textList
-
-    @keepNodeState
-    def recreateInputs(self):
-        self.inputs.clear()
-        self.newInput("Text", "Text", "text")
-        if self.splitType in ("REGULAR_EXPRESSION", "SEPARATOR"):
-            self.newInput("Text", "Split By", "splitBy")
-        if self.splitType == "N_CHARACTERS":
-            self.newInput("Integer", "N", "n", value = 5, minValue = 1)

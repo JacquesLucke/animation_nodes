@@ -10,12 +10,14 @@ class RandomTextNode(bpy.types.Node, AnimationNode):
 
     nodeSeed = IntProperty(name = "Node Seed", update = propertyChanged)
 
+    def setup(self):
+        self.randomizeNodeSeed()
+
     def create(self):
         self.newInput("Integer", "Seed", "seed")
         self.newInput("Integer", "Length", "length", value = 5)
         self.newInput("Text", "Characters", "characters", value = "abcdefghijklmnopqrstuvwxyz")
         self.newOutput("Text", "Text", "text")
-        self.randomizeNodeSeed()
 
     def draw(self, layout):
         layout.prop(self, "nodeSeed")
