@@ -25,7 +25,7 @@ class AutoSelectFloatOrInteger(SocketEffect):
 
 from .. sockets.info import isBase, isList, toBaseDataType, toListDataType
 class UpdateAssignedListDataType(SocketEffect):
-    def __init__(self, propertyName, sockets, propertyType = "BASE"):
+    def __init__(self, propertyName, propertyType, sockets):
         self.propertyName = propertyName
         self.propertyType = propertyType
         self.socketIDs = []

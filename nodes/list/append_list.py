@@ -17,11 +17,11 @@ class AppendListNode(bpy.types.Node, AnimationNode):
         self.newInput(baseDataType, "Element", "element", dataIsModified = True)
         self.newOutput(listDataType, "List", "list")
 
-        self.newSocketEffect(UpdateAssignedListDataType("assignedType", [
-            (self.inputs[0], "LIST"),
-            (self.inputs[1], "BASE"),
-            (self.outputs[0], "LIST")
-        ]))
+        self.newSocketEffect(UpdateAssignedListDataType("assignedType", "BASE",
+            [(self.inputs[0], "LIST"),
+             (self.inputs[1], "BASE"),
+             (self.outputs[0], "LIST")]
+        ))
 
     def drawAdvanced(self, layout):
         self.invokeSocketTypeChooser(layout, "assignListDataType",

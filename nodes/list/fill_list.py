@@ -30,11 +30,11 @@ class FillListNode(bpy.types.Node, AnimationNode):
         self.newInput(baseDataType, "Element", "fillElement")
         self.newOutput(listDataType, "List", "outList")
 
-        self.newSocketEffect(UpdateAssignedListDataType("assignedType", [
-            (self.inputs[1], "LIST"),
-            (self.inputs[2], "BASE"),
-            (self.outputs[0], "LIST")
-        ]))
+        self.newSocketEffect(UpdateAssignedListDataType("assignedType", "BASE",
+            [(self.inputs[1], "LIST"),
+             (self.inputs[2], "BASE"),
+             (self.outputs[0], "LIST")]
+        ))
 
     def draw(self, layout):
         layout.prop(self, "fillMode", expand = True)

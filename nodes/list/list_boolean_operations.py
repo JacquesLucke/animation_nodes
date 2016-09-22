@@ -2,9 +2,8 @@ import bpy
 import itertools
 from bpy.props import *
 from ... sockets.info import isList
-from ... tree_info import keepNodeLinks
 from ... events import executionCodeChanged
-from ... base_types import AnimationNode
+from ... base_types import AnimationNode, UpdateAssignedListDataType
 
 operationItems = [
     ("UNION", "Union", "Elements that are at least in one of both lists", "NONE", 0),
@@ -16,16 +15,21 @@ class ListBooleanOperationsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ListBooleanOperationsNode"
     bl_label = "List Boolean Operations"
 
-    def assignedTypeChanged(self, context):
-        self.generateSockets()
-
     operation = EnumProperty(name = "Operation", default = "UNION",
         items = operationItems, update = executionCodeChanged)
 
-    assignedType = StringProperty(update = assignedTypeChanged)
+    assignedType = StringProperty(update = AnimationNode.updateSockets, default = "Object List")
 
     def create(self):
-        self.assignedType = "Object List"
+        self.newInput(self.assignedType, "List 1", "list1", dataIsModified = True)
+        self.newInput(self.assignedType, "List 2", "list2", dataIsModified = True)
+        self.newOutput(self.assignedType, "List", "outList")
+
+        self.newSocketEffect(UpdateAssignedListDataType("assignedType", "LIST",
+            [(self.inputs[0], "LIST"),
+             (self.inputs[1], "LIST"),
+             (self.outputs[0], "LIST")]
+        ))
 
     def draw(self, layout):
         layout.prop(self, "operation", text = "")
@@ -83,29 +87,7 @@ class ListBooleanOperationsNode(bpy.types.Node, AnimationNode):
     def getEmptyStartList(self):
         return self.outputs[0].getDefaultValue()
 
-    def edit(self):
-        listDataType = self.getWantedDataType()
-        self.assignType(listDataType)
-
-    def getWantedDataType(self):
-        listInput1 = self.inputs[0].dataOrigin
-        listInput2 = self.inputs[1].dataOrigin
-        listOutputs = self.outputs[0].dataTargets
-
-        if listInput1 is not None: return listInput1.dataType
-        if listInput2 is not None: return listInput2.dataType
-        if len(listOutputs) == 1: return listOutputs[0].dataType
-        return self.inputs[0].dataType
-
     def assignType(self, listDataType):
         if not isList(listDataType): return
         if listDataType == self.assignedType: return
         self.assignedType = listDataType
-
-    @keepNodeLinks
-    def generateSockets(self):
-        self.inputs.clear()
-        self.outputs.clear()
-        self.newInput(self.assignedType, "List 1", "list1", dataIsModified = True)
-        self.newInput(self.assignedType, "List 2", "list2", dataIsModified = True)
-        self.newOutput(self.assignedType, "List", "outList")

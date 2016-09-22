@@ -35,10 +35,10 @@ class GetRandomListElementsNode(bpy.types.Node, AnimationNode):
             self.newInput("Integer", "Amount", "amount", value = 3, minValue = 0)
             self.newOutput(listDataType, "List", "outList")
 
-        self.newSocketEffect(UpdateAssignedListDataType("assignedType", [
-            (self.inputs[1], "LIST"),
-            (self.outputs[0], "BASE" if self.selectionType == "SINGLE" else "LIST")
-        ], propertyType = "LIST"))
+        self.newSocketEffect(UpdateAssignedListDataType("assignedType", "LIST",
+            [(self.inputs[1], "LIST"),
+             (self.outputs[0], "BASE" if self.selectionType == "SINGLE" else "LIST")]
+        ))
 
     def draw(self, layout):
         layout.prop(self, "selectionType", text = "")

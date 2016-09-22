@@ -32,11 +32,11 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
         self.newInput(baseDataType, "Fallback", "fallback", hide = True)
         self.newOutput(baseDataType, "Element", "element")
 
-        self.newSocketEffect(UpdateAssignedListDataType("assignedType", [
-            (self.inputs[0], "LIST"),
-            (self.inputs[2], "BASE"),
-            (self.outputs[0], "BASE")
-        ]))
+        self.newSocketEffect(UpdateAssignedListDataType("assignedType", "BASE",
+            [(self.inputs[0], "LIST"),
+             (self.inputs[2], "BASE"),
+             (self.outputs[0], "BASE")]
+        ))
 
     def drawAdvanced(self, layout):
         layout.prop(self, "clampIndex")
