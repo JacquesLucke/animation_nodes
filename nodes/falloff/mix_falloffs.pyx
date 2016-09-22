@@ -1,9 +1,6 @@
 import bpy
 from bpy.props import *
-from ... tree_info import keepNodeState
-from ... utils.handlers import validCallback
 from ... base_types import AnimationNode
-from ... algorithms.random cimport uniformRandomNumber
 from ... data_structures cimport CompoundFalloff, Falloff
 
 mixTypeItems = [
@@ -18,24 +15,15 @@ class MixFalloffsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MixFalloffsNode"
     bl_label = "Mix Falloffs"
 
-    @validCallback
-    def mixTypeChanged(self, context):
-        self.recreateInputs()
-
     mixType = EnumProperty(name = "Mix Type", items = mixTypeItems,
-        default = "MAX", update = mixTypeChanged)
+        default = "MAX", update = AnimationNode.updateSockets)
 
     def create(self):
-        self.recreateInputs()
-        self.newOutput("Falloff", "Falloff", "falloff")
-
-    @keepNodeState
-    def recreateInputs(self):
-        self.inputs.clear()
         self.newInput("Falloff", "A", "a")
         self.newInput("Falloff", "B", "b")
         if self.mixType in useFactorTypes:
             self.newInput("Float", "Factor", "factor", value = 1).setRange(0, 1)
+        self.newOutput("Falloff", "Falloff", "falloff")
 
     def draw(self, layout):
         layout.prop(self, "mixType", text = "")
