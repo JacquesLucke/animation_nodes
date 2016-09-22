@@ -31,6 +31,7 @@ class UpdateAssignedListDataType(SocketEffect):
         self.socketIDs = []
         self.checkFunctions = []
         for socket, mode in sockets:
+            if mode == "IGNORE": continue
             self.socketIDs.append(self.toSocketID(socket))
             if socket.isInput:
                 if mode == "BASE":
