@@ -1,9 +1,6 @@
 import bpy
-import itertools
 from bpy.props import *
-from ... events import isRendering
 from mathutils.bvhtree import BVHTree
-from ... tree_info import keepNodeState
 from ... base_types import AnimationNode
 
 sourceTypeItems = [
@@ -15,30 +12,20 @@ class ConstructBVHTreeNode(bpy.types.Node, AnimationNode):
     bl_label = "Construct BVHTree"
     bl_width_default = 160
 
-    def sourceTypeChanged(self, context):
-        self.recreateInputs()
-
     sourceType = EnumProperty(name = "Source Type", default = "MESH_DATA",
-        items = sourceTypeItems, update = sourceTypeChanged)
+        items = sourceTypeItems, update = AnimationNode.updateSockets)
 
     def create(self):
-        self.recreateInputs()
-        self.newOutput("BVHTree", "BVHTree", "bvhTree")
-
-    def draw(self, layout):
-        layout.prop(self, "sourceType", text = "Source")
-
-    @keepNodeState
-    def recreateInputs(self):
-        self.inputs.clear()
-
         if self.sourceType == "MESH_DATA":
             self.newInput("Vector List", "Vector List", "vectorList")
             self.newInput("Polygon Indices List", "Polygon Indices", "polygonsIndices")
         elif self.sourceType == "BMESH":
             self.newInput("BMesh", "BMesh", "bm")
-
         self.newInput("Float", "Epsilon", "epsilon", hide = True, minValue = 0)
+        self.newOutput("BVHTree", "BVHTree", "bvhTree")
+
+    def draw(self, layout):
+        layout.prop(self, "sourceType", text = "Source")
 
     def getExecutionCode(self):
         if self.sourceType == "MESH_DATA":
@@ -50,11 +37,9 @@ class ConstructBVHTreeNode(bpy.types.Node, AnimationNode):
         return ["mathutils"]
 
     def fromMeshData(self, vectorList, polygonsIndices, epsilon):
-        maxPolygonIndex = max(itertools.chain([-1], *polygonsIndices))
-        minPolygonIndex = min(itertools.chain([0], *polygonsIndices))
-
-        if 0 <= minPolygonIndex and maxPolygonIndex < len(vectorList):
-            return BVHTree.FromPolygons(vectorList, polygonsIndices, epsilon = epsilon)
+        if len(polygonsIndices) > 0:
+            if 0 <= polygonsIndices.getMinIndex() <= polygonsIndices.getMaxIndex() < len(vectorList):
+                return BVHTree.FromPolygons(vectorList, polygonsIndices, epsilon = epsilon)
         return BVHTree.FromPolygons([], [], epsilon = epsilon)
 
     def fromBMesh(self, bm, epsilon):
