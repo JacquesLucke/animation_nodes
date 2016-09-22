@@ -14,7 +14,7 @@ class GetStructElementsNode(bpy.types.Node, AnimationNode):
 
     errorMessage = StringProperty()
 
-    def create(self):
+    def setup(self):
         self.newInput("Struct", "Struct", "struct")
         self.newOutput("Node Control", "New Output")
 

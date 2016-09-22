@@ -7,7 +7,7 @@ class SetStructElementsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SetStructElementsNode"
     bl_label = "Set Struct Elements"
 
-    def create(self):
+    def setup(self):
         self.newInput("Struct", "Struct", "struct", dataIsModified = True)
         self.newInput("Node Control", "New Input")
         self.newOutput("Struct", "Struct", "struct")

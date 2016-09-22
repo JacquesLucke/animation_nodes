@@ -1,8 +1,6 @@
 import bpy
 from bpy.props import *
-from operator import itemgetter
 from ... utils.layout import writeText
-from ... tree_info import keepNodeState
 from ... base_types import AnimationNode
 from ... sockets.info import isBase, toListDataType
 from ... events import executionCodeChanged, propertyChanged
@@ -16,18 +14,19 @@ class GetStructListElementsNode(bpy.types.Node, AnimationNode):
         description = "Copy the data before outputting it",
         update = executionCodeChanged)
 
-    def elementDataTypeChanged(self, context):
-        self.recreateOutput()
-
     elementKey = StringProperty(name = "Key", update = propertyChanged)
+
     elementDataType = StringProperty(name = "Data Type", default = "Integer",
-        update = elementDataTypeChanged)
+        update = AnimationNode.updateSockets)
 
     errorMessage = StringProperty()
 
     def create(self):
         self.newInput("Struct List", "Struct List", "structList")
-        self.elementDataType = "Integer"
+        if isBase(self.elementDataType):
+            self.newOutput(toListDataType(self.elementDataType), "Data")
+        else:
+            self.newOutput("Generic List", "Data")
 
     def draw(self, layout):
         col = layout.column()
@@ -40,14 +39,6 @@ class GetStructListElementsNode(bpy.types.Node, AnimationNode):
 
     def assignType(self, dataType):
         self.elementDataType = dataType
-
-    @keepNodeState
-    def recreateOutput(self):
-        self.outputs.clear()
-        if isBase(self.elementDataType):
-            self.newOutput(toListDataType(self.elementDataType), "Data")
-        else:
-            self.newOutput("Generic List", "Data")
 
     def execute(self, structList):
         key = (self.elementDataType, self.elementKey)
