@@ -1,7 +1,6 @@
 import bpy
 from bpy.props import *
 from ... sockets.info import isList
-from ... tree_info import keepNodeLinks
 from ... base_types import AnimationNode, UpdateAssignedListDataType
 
 class ReverseListNode(bpy.types.Node, AnimationNode):
