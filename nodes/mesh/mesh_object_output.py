@@ -3,9 +3,8 @@ import bmesh
 from bpy.props import *
 from ... events import propertyChanged
 from ... utils.layout import writeText
-from ... tree_info import keepNodeState
-from ... data_structures import UShortList
 from ... base_types import AnimationNode
+from ... data_structures import UShortList
 
 meshDataTypeItems = [
     ("MESH_DATA", "Mesh Data", "Mesh Data object that contains only vertex locations, edge indices and polygon indices", "", 0),
