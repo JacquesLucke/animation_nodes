@@ -25,6 +25,9 @@ def updateFile():
         tree_info.updateIfNecessary()
 
 
+# Undefined Sockets
+##############################################
+
 def removeUndefinedSockets():
     for node in iterAnimationNodes():
         for socket in node.inputs:
@@ -41,6 +44,9 @@ def removeSocket(sockets, socket):
     print("    Name: {}".format(repr(socket.name)))
     sockets.remove(socket)
 
+
+# Socket Data
+##############################################
 
 def getSocketProperties():
     socketsByNode = {}
@@ -68,6 +74,9 @@ def setSocketInfo(socket, data):
     if socket.dataType == data[0]:
         socket.setProperty(data[1])
 
+
+# Links
+##############################################
 
 def getLinks():
     linksByTree = {}
