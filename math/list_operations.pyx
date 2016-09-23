@@ -31,7 +31,7 @@ cdef void mixVec3Arrays(Vector3* target, Vector3* a, Vector3* b, long arrayLengt
     for i in range(arrayLength):
         mixVec3(target + i, a + i, b + i, factor)
 
-cdef void reduceMatrix4x4List(Matrix4* matrices, unsigned long amount, Matrix4* target):
+cdef void reduceMatrix4x4List(Matrix4* matrices, unsigned long amount, Matrix4* target, bint reversed = False):
     cdef:
         long i
         Matrix4 tmp
@@ -41,7 +41,13 @@ cdef void reduceMatrix4x4List(Matrix4* matrices, unsigned long amount, Matrix4* 
     elif amount == 1:
         target[0] = matrices[0]
     else:
-        tmp = matrices[0]
-        for i in range(1, amount):
-            multMatrix4(target, &tmp, matrices + i)
-            tmp = target[0]
+        if reversed:
+            tmp = matrices[amount - 1]
+            for i in range(amount - 2, -1, -1):
+                multMatrix4(target, &tmp, matrices + i)
+                tmp = target[0]
+        else:
+            tmp = matrices[0]
+            for i in range(1, amount):
+                multMatrix4(target, &tmp, matrices + i)
+                tmp = target[0]

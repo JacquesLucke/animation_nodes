@@ -13,5 +13,5 @@ class MatrixCombineNode(bpy.types.Node, AnimationNode):
 
     def execute(self, Matrix4x4List matrices):
         cdef Matrix4 result
-        reduceMatrix4x4List(matrices.data, matrices.length, &result)
+        reduceMatrix4x4List(matrices.data, matrices.length, &result, reversed = True)
         return toPyMatrix4(&result)
