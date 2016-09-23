@@ -78,6 +78,9 @@ class ForestData:
         linkedSocketsWithReroutes = self.linkedSocketsWithReroutes
 
         for link in links:
+            if (link.from_node.bl_idname == "NodeUndefined" or
+                link.to_node.bl_idname == "NodeUndefined"):
+                continue
             originSocket = link.from_socket
             targetSocket = link.to_socket
             originID = ((treeName, link.from_node.name), originSocket.is_output, originSocket.identifier)
