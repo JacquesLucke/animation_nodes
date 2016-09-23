@@ -6,7 +6,8 @@ from .. events import treeChanged, executionCodeChanged
 from .. utils.names import getRandomString, toVariableName
 from .. operators.dynamic_operators import getInvokeFunctionOperator
 from .. nodes.system.subprogram_sockets import subprogramInterfaceChanged
-from .. tree_info import isSocketLinked, getLinkedSockets, getDirectlyLinkedSockets
+from .. tree_info import (isSocketLinked, getLinkedSockets, getDirectlyLinkedSockets,
+                          getLinkedDataTypes)
 
 class SocketTextProperties(bpy.types.PropertyGroup):
     unique = BoolProperty(default = False)
@@ -306,6 +307,10 @@ class AnimationNodeSocket:
     def directlyLinkedNodes(self):
         nodes = [socket.node for socket in self.directlyLinkedSockets]
         return list(set(nodes))
+
+    @property
+    def linkedDataTypes(self):
+        return getLinkedDataTypes(self)
 
 
     @property

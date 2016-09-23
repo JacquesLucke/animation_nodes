@@ -150,6 +150,12 @@ def iterUnlinkedInputSockets(node):
         if len(linkedSockets[socketID]) == 0:
             yield socket
 
+def getLinkedDataTypes(socket):
+    dataTypes = set()
+    for linkedSocketID in _forestData.linkedSockets[socket.toID()]:
+        dataTypes.add(_forestData.dataTypeBySocket[linkedSocketID])
+    return dataTypes
+
 
 # keep node state
 
