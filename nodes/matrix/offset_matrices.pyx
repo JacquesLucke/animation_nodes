@@ -5,22 +5,15 @@ from ... base_types import AnimationNode
 from ... data_structures cimport FalloffEvaluator
 from ... algorithms.transform_matrix cimport (
     allocateMatrixTransformer, freeMatrixTransformer, TransformMatrixFunction)
-from ... math cimport (Matrix4, Vector3, Euler3, Matrix4x4List, toVector3, toEuler3,
-                       multMatrix4, toPyMatrix4, setTranslationRotationScaleMatrix,
-                       convertMatrix4ToMatrix3, multMatrix3, setRotationScaleMatrix,
-                       convertMatrix3ToMatrix4, Matrix3, setScaleMatrix, setRotationMatrix,
-                       setTranslationMatrix, transformVec3AsDirection, multMatrix3Parts)
-
-ctypedef void (*OffsetMatrixFunction)(Matrix4* target, Matrix4* source,
-                        Vector3* translation, Euler3* rotation, Vector3* scale)
+from ... math cimport (Matrix4, Vector3, Euler3, Matrix4x4List, toVector3, toEuler3)
 
 localGlobalItems = [
     ("LOCAL", "Local", "", "NONE", 0),
     ("GLOBAL", "Global", "", "NONE", 1)]
 
-class OffsetTransformationsNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_OffsetTransformationsNode"
-    bl_label = "Offset Transformations"
+class OffsetMatricesNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_OffsetMatricesNode"
+    bl_label = "Offset Matrices"
 
     errorMessage = StringProperty()
 
@@ -37,12 +30,12 @@ class OffsetTransformationsNode(bpy.types.Node, AnimationNode):
         update = propertyChanged, description = "Use world center as scale pivot")
 
     def create(self):
-        self.newInput("Matrix List", "Transformations", "transformations")
+        self.newInput("Matrix List", "Matrices", "matrices")
         self.newInput("Falloff", "Falloff", "falloff", value = 1)
         self.newInput("Vector", "Translation", "translation")
         self.newInput("Euler", "Rotation", "rotation")
         self.newInput("Vector", "Scale", "scale", value = (1, 1, 1))
-        self.newOutput("Matrix List", "Transformations", "transformations")
+        self.newOutput("Matrix List", "Matrices", "matrices")
 
     def draw(self, layout):
         if self.errorMessage != "":
