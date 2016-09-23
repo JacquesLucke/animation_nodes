@@ -37,6 +37,7 @@ colorOverwritePerSocket = dict()
 class AnimationNodeSocket:
     storable = True
     comparable = False
+    _isAnimationNodeSocket = True
 
     def textChanged(self, context):
         updateText(self)
@@ -397,12 +398,21 @@ def getSocketIndex(socket, node = None):
         return list(node.outputs).index(socket)
     return list(node.inputs).index(socket)
 
+def isAnimationNodeSocket(socket):
+    return getattr(socket, "_isAnimationNodeSocket", False)
+
 def register():
     bpy.types.NodeSocket.toID = toID
     bpy.types.NodeSocket.getIndex = getSocketIndex
     bpy.types.NodeSocket.getNodeTree = getNodeTree
-    bpy.types.NodeSocket.show = BoolProperty(default = True, get = getSocketVisibility, set = setSocketVisibility)
+
+    bpy.types.NodeSocket.show = BoolProperty(default = True,
+        get = getSocketVisibility, set = setSocketVisibility)
+
+    bpy.types.NodeSocket.isAnimationNodeSocket = BoolProperty(default = False,
+        get = isAnimationNodeSocket)
 
 def unregister():
     del bpy.types.NodeSocket.toID
     del bpy.types.NodeSocket.show
+    del bpy.types.NodeSocket.isAnimationNodeSocket
