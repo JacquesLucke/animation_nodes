@@ -16,10 +16,8 @@ class ParticleListInfoNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         isLinked = self.getLinkedOutputsDict()
-        lines = []
-        if isLinked["locations"]: lines.append("locations = [p.location for p in particles]")
-        if isLinked["velocities"]: lines.append("velocities = [p.velocity for p in particles]")
-        if isLinked["sizes"]: lines.append("sizes = [p.size for p in particles]")
-        if isLinked["birthTimes"]: lines.append("birthTimes = [p.birth_time for p in particles]")
-        if isLinked["dieTimes"]: lines.append("dieTimes = [p.die_time for p in particles]")
-        return lines
+        if isLinked["locations"]:  yield "locations = Vector3DList.fromValues(p.location for p in particles)"
+        if isLinked["velocities"]: yield "velocities = Vector3DList.fromValues(p.velocity for p in particles)"
+        if isLinked["sizes"]:      yield "sizes = DoubleList.fromValues(p.size for p in particles)"
+        if isLinked["birthTimes"]: yield "birthTimes = DoubleList.fromValues(p.birth_time for p in particles)"
+        if isLinked["dieTimes"]:   yield "dieTimes = DoubleList.fromValues(p.die_time for p in particles)"

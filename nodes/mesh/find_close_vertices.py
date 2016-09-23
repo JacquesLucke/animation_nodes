@@ -1,6 +1,7 @@
 import bpy
 from mathutils.kdtree import KDTree
 from ... base_types import AnimationNode
+from ... data_structures import EdgeIndicesList
 
 class FindCloseVerticesNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_FindCloseVerticesNode"
@@ -36,4 +37,4 @@ class FindCloseVerticesNode(bpy.types.Node, AnimationNode):
                     edges.append(edge)
                     added += 1
 
-        return list(set(edges))
+        return EdgeIndicesList.fromValues(tuple(set(edges)))
