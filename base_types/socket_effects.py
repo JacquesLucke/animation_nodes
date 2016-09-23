@@ -91,15 +91,12 @@ class UpdateAssignedDataType(SocketEffect):
         currentType = getattr(node, self.propertyName)
         for socketID in self.socketIDs:
             socket = self.getSocket(node, socketID)
-            linkedSockets = socket.linkedSockets
-            
-            if len(linkedSockets) == 1:
-                linkedDataType = linkedSockets[0].dataType
-                if linkedDataType in self.ignoredDataTypes:
-                    continue
-                if linkedDataType != currentType:
-                    setattr(node, self.propertyName, linkedDataType)
+            linkedDataTypes = tuple(socket.linkedDataTypes - self.ignoredDataTypes)
+
+            if len(linkedDataTypes) == 1:
+                if linkedDataTypes[0] != currentType:
+                    setattr(node, self.propertyName, linkedDataTypes[0])
                 break
-            elif len(linkedSockets) == 0 and self.default is not None:
+            elif len(linkedDataTypes) == 0 and self.default is not None:
                 if self.default != currentType:
                     setattr(node, self.propertyName, self.default)
