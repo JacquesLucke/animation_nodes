@@ -33,7 +33,10 @@ class AppendPointToSplineNode(bpy.types.Node, AnimationNode):
             return "execute_BezierPoint"
 
     def execute_Point(self, spline, point):
-        spline.appendPoint(point)
+        if spline.type == "BEZIER":
+            spline.appendPoint(point, point, point)
+        else:
+            spline.appendPoint(point)
         spline.markChanged()
         return spline
 
