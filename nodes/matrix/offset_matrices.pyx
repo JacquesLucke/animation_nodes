@@ -30,12 +30,12 @@ class OffsetMatricesNode(bpy.types.Node, AnimationNode):
         update = propertyChanged, description = "Use world center as scale pivot")
 
     def create(self):
-        self.newInput("Matrix List", "Matrices", "matrices")
+        self.newInput("Matrix List", "Matrices", "inMatrices")
         self.newInput("Falloff", "Falloff", "falloff", value = 1)
         self.newInput("Vector", "Translation", "translation")
         self.newInput("Euler", "Rotation", "rotation")
         self.newInput("Vector", "Scale", "scale", value = (1, 1, 1))
-        self.newOutput("Matrix List", "Matrices", "matrices")
+        self.newOutput("Matrix List", "Matrices", "outMatrices")
 
     def draw(self, layout):
         if self.errorMessage != "":
@@ -55,21 +55,21 @@ class OffsetMatricesNode(bpy.types.Node, AnimationNode):
         row.prop(self, "scaleMode", expand = True)
         row.prop(self, "originAsScalePivot", icon = "MANIPUL", text = "")
 
-    def execute(self, Matrix4x4List transformations, falloff, translation, rotation, scale):
+    def execute(self, Matrix4x4List inMatrices, falloff, translation, rotation, scale):
         cdef:
+            Matrix4x4List outMatrices = Matrix4x4List(length = inMatrices.length)
             FalloffEvaluator evaluator = FalloffEvaluator.create(falloff, "Transformation Matrix")
             Vector3 _translation = toVector3(translation)
             Euler3 _rotation = toEuler3(rotation)
             Vector3 _scale = toVector3(scale)
             Vector3 localTranslation, localScale
             Euler3 localRotation
-            Matrix4 result
             double influence
             long i
 
         if evaluator is None:
             self.errorMessage = "Falloff cannot be evaluated for matrices"
-            return transformations
+            return inMatrices
 
         cdef:
             TransformMatrixFunction transformFunction
@@ -82,8 +82,8 @@ class OffsetMatricesNode(bpy.types.Node, AnimationNode):
 
         localRotation.order = _rotation.order
 
-        for i in range(len(transformations)):
-            influence = evaluator.evaluate(transformations.data + i, i)
+        for i in range(len(inMatrices)):
+            influence = evaluator.evaluate(inMatrices.data + i, i)
 
             localTranslation.x = _translation.x * influence
             localTranslation.y = _translation.y * influence
@@ -97,10 +97,8 @@ class OffsetMatricesNode(bpy.types.Node, AnimationNode):
             localScale.y = _scale.y * influence + (1 - influence)
             localScale.z = _scale.z * influence + (1 - influence)
 
-            transformFunction(transformSettings, &result, transformations.data + i,
+            transformFunction(transformSettings, outMatrices.data + i, inMatrices.data + i,
                 &localTranslation, &localRotation, &localScale)
 
-            transformations.data[i] = result
-
         freeMatrixTransformer(transformFunction, transformSettings)
-        return transformations
+        return outMatrices
