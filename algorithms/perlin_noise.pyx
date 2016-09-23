@@ -29,8 +29,8 @@ cpdef double perlinNoise(double x, double persistance, int octaves):
 
 cdef double interpolatedNoise(double x):
     cdef:
-        int intX = int(x)
-        double fracX = x - intX
+        int intX = int(x) # overflow handled below
+        double fracX = (x - intX) % 1
         double v0 = randomNumber(intX - 2)
         double v1 = randomNumber(intX - 1)
         double v2 = randomNumber(intX)
