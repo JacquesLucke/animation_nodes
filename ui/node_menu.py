@@ -33,6 +33,7 @@ def drawMenu(self, context):
     layout.separator()
     layout.menu("an_animation_menu", text = "Animation", icon = "RENDER_ANIMATION")
     layout.menu("an_interpolation_menu", text = "Interpolation", icon = "IPO_BEZIER")
+    layout.menu("an_falloff_menu", text = "Falloff", icon = "SMOOTHCURVE")
     layout.menu("an_fcurve_menu", text = "FCurves", icon = "IPO")
     layout.menu("an_material_menu", text = "Material", icon = "MATERIAL_DATA")
     layout.menu("an_sound_menu", text = "Sound", icon = "SPEAKER")
@@ -454,6 +455,22 @@ class InterpolationMenu(bpy.types.Menu):
         layout.separator()
         insertNode(layout, "an_EvaluateInterpolationNode", "Evaluate")
         insertNode(layout, "an_MapRangeNode", "Map Range", {"useInterpolation" : repr(True)})
+
+class FalloffMenu(bpy.types.Menu):
+    bl_idname = "an_falloff_menu"
+    bl_label = "Falloff Menu"
+
+    def draw(self, context):
+        layout = self.layout
+        insertNode(layout, "an_ConstantFalloffNode", "Constant")
+        insertNode(layout, "an_RandomFalloffNode", "Random")
+        layout.separator()
+        insertNode(layout, "an_DirectionalFalloffNode", "Directional")
+        insertNode(layout, "an_PointDistanceFalloffNode", "Point Distance")
+        layout.separator()
+        insertNode(layout, "an_InterpolateFalloffNode", "Interpolate")
+        insertNode(layout, "an_RemapFalloffNode", "Remap")
+        insertNode(layout, "an_MixFalloffsNode", "Mix")
 
 class MaterialMenu(bpy.types.Menu):
     bl_idname = "an_material_menu"
