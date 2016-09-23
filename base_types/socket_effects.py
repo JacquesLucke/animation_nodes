@@ -68,16 +68,16 @@ class UpdateAssignedListDataType(SocketEffect):
                 return toBaseDataType(dataOrigin.dataType)
 
     def getLinkedBaseType_BaseOutput(self, socket):
-        dataTargets = socket.dataTargets
-        if len(dataTargets) == 1:
-            if isBase(dataTargets[0].dataType):
-                return dataTargets[0].dataType
+        linkedDataTypes = tuple(socket.linkedDataTypes)
+        if len(linkedDataTypes) == 1:
+            if isBase(linkedDataTypes[0]):
+                return linkedDataTypes[0]
 
     def getLinkedBaseType_ListOutput(self, socket):
-        dataTargets = socket.dataTargets
-        if len(dataTargets) == 1:
-            if isList(dataTargets[0].dataType):
-                return toBaseDataType(dataTargets[0].dataType)
+        linkedDataTypes = tuple(socket.linkedDataTypes)
+        if len(linkedDataTypes) == 1:
+            if isList(linkedDataTypes[0]):
+                return toBaseDataType(linkedDataTypes[0])
 
 
 class UpdateAssignedDataType(SocketEffect):
