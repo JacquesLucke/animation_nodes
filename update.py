@@ -45,20 +45,19 @@ def enableUseFakeUser():
 def updateIndividualNodes():
     tree_info.updateIfNecessary()
     nodeByID = createNodeByIdDict()
-    editedNodes = set()
+    updatedNodes = set()
     currentNodes = set()
 
     def editNode(node):
-        if node in editedNodes: return
+        if node in updatedNodes: return
         currentNodes.add(node)
 
         for dependencyNode in getOriginNodes(node, nodeByID):
             if dependencyNode not in currentNodes:
                 editNode(dependencyNode)
 
-        node.applySocketEffects()
-        node.edit()
-        editedNodes.add(node)
+        node.updateNode()
+        updatedNodes.add(node)
         currentNodes.remove(node)
         tree_info.updateIfNecessary()
 

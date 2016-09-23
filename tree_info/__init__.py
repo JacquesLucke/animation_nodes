@@ -1,6 +1,5 @@
 import functools
 from .. utils.timing import measureTime
-from .. utils.handlers import eventHandler
 from .. utils.nodes import idToNode, idToSocket, createNodeByIdDict
 
 def __setup():
@@ -28,7 +27,6 @@ def updateAndRetryOnException(function):
 # Public API
 ##################################
 
-@eventHandler("FILE_LOAD_POST")
 @measureTime
 def update():
     _forestData.update()

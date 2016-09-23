@@ -55,7 +55,10 @@ def propertyChanged(self = None, context = None):
 
 @eventHandler("FILE_LOAD_POST")
 def fileLoaded():
+    from . base_types.update_file import updateFile
     from . nodes.system.subprogram_sockets import forceSubprogramUpdate
+    updateFile()
+    tree_info.updateIfNecessary()
     forceSubprogramUpdate()
     event.fileChanged = True
     treeChanged()

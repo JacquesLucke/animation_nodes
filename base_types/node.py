@@ -164,17 +164,26 @@ class AnimationNode:
     # Socket Effects
     ####################################################
 
+    def updateNode(self):
+        self.applySocketEffects()
+        self.edit()
+
     def updateSockets(self, context = None):
         if not hasattr(self, "create"):
             return
 
         @keepNodeState
         def createWrapper(self):
-            self.clearSockets()
-            self.clearSocketEffects()
-            self.create()
+            self._updateSockets()
 
         createWrapper(self)
+
+    def _updateSockets(self):
+        if not hasattr(self, "create"):
+            return
+        self.clearSockets()
+        self.clearSocketEffects()
+        self.create()
 
     def applySocketEffects(self):
         for effect in socketEffectsByIdentifier[self.identifier]:
@@ -210,7 +219,8 @@ class AnimationNode:
 
     def newInput(self, type, name, identifier = None, **kwargs):
         idName = toSocketIdName(type)
-        if idName is None: raise ValueError("Socket type does not exist")
+        if idName is None:
+            raise ValueError("Socket type does not exist: {}".format(repr(type)))
         if identifier is None: identifier = name
         socket = self.inputs.new(idName, name, identifier)
         self._setSocketProperties(socket, kwargs)
@@ -218,7 +228,8 @@ class AnimationNode:
 
     def newOutput(self, type, name, identifier = None, **kwargs):
         idName = toSocketIdName(type)
-        if idName is None: raise ValueError("Socket type does not exist")
+        if idName is None:
+            raise ValueError("Socket type does not exist: {}".format(repr(type)))
         if identifier is None: identifier = name
         socket = self.outputs.new(idName, name, identifier)
         self._setSocketProperties(socket, kwargs)
@@ -500,18 +511,6 @@ def updateNodeLabelMode():
     if getExecutionCodeType() == "MEASURE":
         nodeLabelMode = "MEASURE"
 
-
-
-# Recreate sockets when loaded
-###############################################################
-
-@eventHandler("FILE_LOAD_POST")
-def updateSockets():
-    for node in iterAnimationNodes():
-        node.updateSockets()
-
-    for node in iterAnimationNodes():
-        node.applySocketEffects()
 
 
 # Register
