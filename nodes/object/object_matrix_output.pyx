@@ -4,34 +4,12 @@ from ... math cimport toPyMatrix4
 from ... sockets.info import isList
 from ... events import executionCodeChanged
 from ... data_structures cimport Matrix4x4List
-from ... base_types import AnimationNode, DynamicSocketSet
+from ... base_types import AnimationNode, VectorizedSockets
 
 outputItems = [	("BASIS", "Basis", "", "NONE", 0),
                 ("LOCAL", "Local", "", "NONE", 1),
                 ("PARENT INVERSE", "Parent Inverse", "", "NONE", 2),
                 ("WORLD", "World", "", "NONE", 3) ]
-
-class DynamicSockets(DynamicSocketSet):
-    def defaults(self):
-        self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
-        self.newInput("Matrix", "Matrix", "matrix")
-        self.newOutput("Object", "Object", "object")
-
-    def states(self, inputs, outputs):
-        self.setState(inputs[0], "Object List", "Objects", "objects")
-        self.setState(inputs[1], "Matrix List", "Matrices", "matrices")
-        self.setState(outputs[0], "Object List", "Objects", "objects")
-
-    def rules(self, inputs, outputs):
-        if inputs[0].isLinkedToType("Object List") or outputs[0].isLinkedToType("Object List"):
-            self.setType(inputs[0], "Object List")
-            self.setType(outputs[0], "Object List")
-        if inputs[1].isLinkedToType("Matrix List"):
-            self.setType(inputs[0], "Object List")
-            self.setType(inputs[1], "Matrix List")
-            self.setType(outputs[0], "Object List")
-
-socketSet = DynamicSockets()
 
 
 class ObjectMatrixOutputNode(bpy.types.Node, AnimationNode):
@@ -41,14 +19,27 @@ class ObjectMatrixOutputNode(bpy.types.Node, AnimationNode):
     outputType = EnumProperty(items = outputItems, update = executionCodeChanged, default = "WORLD")
 
     def create(self):
-        socketSet.createDefaults(self)
+        sockets = VectorizedSockets()
+
+        sockets.newInput(self, "Object",
+            "Object", "object", {"defaultDrawType" : "PROPERTY_ONLY"},
+            "Objects", "objects", {})
+
+        sockets.newInput(self, "Matrix",
+            "Matrixaaaaaaa", "matrix", {},
+            "Matrices", "matrices", {})
+
+        sockets.newOutput(self, "Object",
+            "Object", "object", {},
+            "Objects", "objects", {})
+
+        sockets.newConnection(self.inputs[0], self.outputs[0], bothDirections = True)
+
+        self.newSocketEffect(sockets)
 
     def draw(self, layout):
         row = layout.row(align = True)
         row.prop(self, "outputType", text = "Type")
-
-    def edit(self):
-        socketSet.applyRules(self)
 
     def getExecutionFunctionName(self):
         if isList(self.inputs[1].dataType):

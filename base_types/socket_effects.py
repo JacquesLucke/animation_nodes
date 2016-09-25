@@ -100,3 +100,55 @@ class UpdateAssignedDataType(SocketEffect):
             elif len(linkedDataTypes) == 0 and self.default is not None:
                 if self.default != currentType:
                     setattr(node, self.propertyName, self.default)
+
+
+class VectorizedSockets(SocketEffect):
+    def __init__(self):
+        self.sockets = []
+
+    def newInput(self, node, dataType,
+                 baseName, baseIdentifier, baseArgs,
+                 listName, listIdentifier, listArgs):
+        socket = VectorizedSocket(True, dataType,
+                     baseName, baseIdentifier, baseArgs,
+                     listName, listIdentifier, listArgs)
+        return socket.createBase(node)
+
+    def newOutput(self, node, dataType,
+                  baseName, baseIdentifier, baseArgs,
+                  listName, listIdentifier, listArgs):
+        socket = VectorizedSocket(False, dataType,
+                     baseName, baseIdentifier, baseArgs,
+                     listName, listIdentifier, listArgs)
+        return socket.createBase(node)
+
+    def newConnection(self, socketA, socketB, bothDirections = False):
+        pass
+
+class VectorizedSocket:
+    def __init__(self, isInput, baseDataType,
+                 baseName, baseIdentifier, baseArgs,
+                 listName, listIdentifier, listArgs):
+        self.baseDataType = baseDataType
+        self.listDataType = toListDataType(baseDataType)
+        self.isInput = isInput
+
+        self.baseName = baseName
+        self.baseArgs = baseArgs
+        self.baseIdentifier = baseIdentifier
+
+        self.listName = listName
+        self.listArgs = listArgs
+        self.listIdentifier = listIdentifier
+
+    def createBase(self, node):
+        if self.isInput:
+            return node.newInput(self.baseDataType, self.baseName, self.baseIdentifier, **self.baseArgs)
+        else:
+            return node.newOutput(self.baseDataType, self.baseName, self.baseIdentifier, **self.baseArgs)
+
+    def createList(self, node):
+        if self.isInput:
+            return node.newInput(self.listDataType, self.listName, self.listIdentifier, **self.listArgs)
+        else:
+            return node.newOutput(self.listDataType, self.listName, self.listIdentifier, **self.listArgs)
