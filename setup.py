@@ -41,6 +41,7 @@ if v.major < 3 or v.minor < 5:
 
 import os
 import shutil
+import traceback
 from itertools import chain
 from contextlib import redirect_stdout
 from os.path import abspath, dirname, basename, join
@@ -125,11 +126,16 @@ def getPathsToCythonFiles():
 def copyCompiledFilesToCorrectFolders():
     from os.path import relpath
     directory = join(currentDirectory, "animation_nodes")
-    for root, dirs, files in os.walk(directory):
-        for fileName in files:
-            sourcePath = join(root, fileName)
-            targetPath = join(currentDirectory, relpath(sourcePath, directory))
-            shutil.copyfile(sourcePath, targetPath)
+    try:
+        for root, dirs, files in os.walk(directory):
+            for fileName in files:
+                sourcePath = join(root, fileName)
+                targetPath = join(currentDirectory, relpath(sourcePath, directory))
+                shutil.copyfile(sourcePath, targetPath)
+    except:
+        traceback.print_exc()
+        print("\n\nError might be caused by a running Blender instance.")
+        sys.exit(0)
 
 def removeBuildDirectory():
     buildDirectory = join(currentDirectory, "build")
