@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from .. sockets.info import isBase, isList, toBaseDataType, toListDataType
 
 class SocketEffect:
@@ -110,7 +111,9 @@ class AutoSelectDataType(SocketEffect):
 
 class AutoSelectVectorization(SocketEffect):
     def __init__(self):
-        self.properties = {}
+        self.properties = []
+        self.dependencies = OrderedDict()
+        self.sockets = OrderedDict()
 
     def add(self, propertyName, sockets, dependency = None):
         if dependency is None:
@@ -119,13 +122,16 @@ class AutoSelectVectorization(SocketEffect):
             dependencies = set([dependency])
         else:
             dependencies = set(dependency)
-        self.properties[propertyName] = (self.toSocketIDs(sockets), dependencies)
+
+        self.properties.append(propertyName)
+        self.sockets[propertyName] = self.toSocketIDs(sockets)
+        self.dependencies[propertyName] = dependencies
 
     def apply(self, node):
-        propertyStates = {propertyName : "BASE" for propertyName in self.properties.keys()}
+        propertyStates = {propertyName : "BASE" for propertyName in self.properties}
         fixedProperties = set()
 
-        for propertyName, (socketIDs, _) in self.properties.items():
+        for propertyName, socketIDs in self.sockets.items():
             for socketID in socketIDs:
                 socket = self.getSocket(node, socketID)
                 linkedDataTypes = tuple(socket.linkedDataTypes - {"Generic"})
@@ -138,7 +144,7 @@ class AutoSelectVectorization(SocketEffect):
                         fixedProperties.add(propertyName)
                     break
 
-        for propertyName, (_, dependencies) in self.properties.items():
+        for propertyName, dependencies in self.dependencies.items():
             targetState = propertyStates[propertyName]
             if targetState == "LIST":
                 baseDependencies = {dependency for dependency in dependencies if propertyStates[dependency] == "BASE"}
@@ -149,7 +155,7 @@ class AutoSelectVectorization(SocketEffect):
                         for dependency in baseDependencies:
                             propertyStates[dependency] = "LIST"
 
-        for propertyName in self.properties.keys():
+        for propertyName in self.properties:
             state = propertyStates[propertyName] == "LIST"
             if state != getattr(node, propertyName):
                 setattr(node, propertyName, state)
