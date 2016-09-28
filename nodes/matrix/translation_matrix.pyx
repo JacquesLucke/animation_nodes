@@ -20,7 +20,7 @@ class TranslationMatrixNode(bpy.types.Node, AnimationNode):
             ("Matrix List", "Matrices", "matrices"))
 
         vectorization = AutoSelectVectorization()
-        vectorization.add("useList", [self.inputs[0], self.outputs[0]])
+        vectorization.add(self, "useList", [self.inputs[0], self.outputs[0]])
         self.newSocketEffect(vectorization)
 
     def getExecutionCode(self):

@@ -111,11 +111,13 @@ class AutoSelectDataType(SocketEffect):
 
 class AutoSelectVectorization(SocketEffect):
     def __init__(self):
-        self.properties = []
+        self.properties = list()
         self.dependencies = OrderedDict()
         self.sockets = OrderedDict()
+        self.baseDataTypes = dict()
+        self.listDataTypes = dict()
 
-    def add(self, propertyName, sockets, dependency = None):
+    def add(self, node, propertyName, sockets, dependency = None):
         if dependency is None:
             dependencies = set()
         elif isinstance(dependency, str):
@@ -123,9 +125,21 @@ class AutoSelectVectorization(SocketEffect):
         else:
             dependencies = set(dependency)
 
+        socketIDs = self.toSocketIDs(sockets)
         self.properties.append(propertyName)
-        self.sockets[propertyName] = self.toSocketIDs(sockets)
+        self.sockets[propertyName] = socketIDs
         self.dependencies[propertyName] = dependencies
+
+        if getattr(node, propertyName):
+            self.listDataTypes[propertyName] = {socketID : socket.dataType
+                                                for socket, socketID in zip(sockets, socketIDs)}
+            self.baseDataTypes[propertyName] = {socketID : toBaseDataType(socket.dataType)
+                                                for socket, socketID in zip(sockets, socketIDs)}
+        else:
+            self.listDataTypes[propertyName] = {socketID : toListDataType(socket.dataType)
+                                                for socket, socketID in zip(sockets, socketIDs)}
+            self.baseDataTypes[propertyName] = {socketID : socket.dataType
+                                                for socket, socketID in zip(sockets, socketIDs)}
 
     def apply(self, node):
         propertyStates = {propertyName : "BASE" for propertyName in self.properties}
@@ -136,10 +150,10 @@ class AutoSelectVectorization(SocketEffect):
                 socket = self.getSocket(node, socketID)
                 linkedDataTypes = tuple(socket.linkedDataTypes - {"Generic"})
                 if len(linkedDataTypes) == 1:
-                    if isList(linkedDataTypes[0]):
+                    if linkedDataTypes[0] == self.listDataTypes[propertyName][socketID]:
                         propertyStates[propertyName] = "LIST"
                         fixedProperties.add(propertyName)
-                    elif isBase(linkedDataTypes[0]):
+                    elif linkedDataTypes[0] == self.baseDataTypes[propertyName][socketID]:
                         propertyStates[propertyName] = "BASE"
                         fixedProperties.add(propertyName)
                     break
