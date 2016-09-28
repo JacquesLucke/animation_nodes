@@ -22,17 +22,17 @@ class ObjectMatrixOutputNode(bpy.types.Node, AnimationNode):
     useMatrixList = BoolProperty(default = False, update = AnimationNode.updateSockets)
 
     def create(self):
-        if self.useObjectList:
-            self.newInput("Object List", "Objects", "objects")
-            self.newOutput("Object List", "Objects", "objects")
-        else:
-            self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
-            self.newOutput("Object", "Object", "object")
+        self.newInputGroup(int(self.useObjectList), [
+            ("Object", "Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
+            ("Object List", "Objects", "objects")])
 
-        if self.useMatrixList:
-            self.newInput("Matrix List", "Matrices", "matrices")
-        else:
-            self.newInput("Matrix", "Matrix", "matrix")
+        self.newInputGroup(int(self.useMatrixList), [
+            ("Matrix", "Matrix", "matrix"),
+            ("Matrix List", "Matrices", "matrices")])
+
+        self.newOutputGroup(int(self.useObjectList), [
+            ("Object", "Object", "object"),
+            ("Object List", "Objects", "objects")])
 
         vectorization = AutoSelectVectorization()
         vectorization.add("useObjectList", [self.inputs[0], self.outputs[0]])

@@ -1,5 +1,6 @@
 import bpy
 from bpy.props import *
+from collections import defaultdict
 from .. utils.recursion import noRecursion
 from .. operators.callbacks import newSocketCallback
 from .. events import treeChanged, executionCodeChanged
@@ -34,6 +35,7 @@ class SocketExecutionProperties(bpy.types.PropertyGroup):
     neededCopies = IntProperty(default = 0, min = 0)
 
 colorOverwritePerSocket = dict()
+alternativeIdentifiersPerSocket = defaultdict(list)
 
 class AnimationNodeSocket:
     storable = True
@@ -183,6 +185,18 @@ class AnimationNodeSocket:
 
     def newCallback(self, node, functionName):
         return newSocketCallback(self, node, functionName)
+
+
+    # Alternative Identifier
+    ##########################################################
+
+    @property
+    def alternativeIdentifiers(self):
+        return alternativeIdentifiersPerSocket[hash(self)]
+
+    @alternativeIdentifiers.setter
+    def alternativeIdentifiers(self, value):
+        alternativeIdentifiersPerSocket[hash(self)] = value
 
 
     # Move Utilities

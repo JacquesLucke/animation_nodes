@@ -137,6 +137,8 @@ class AnimationNode:
         self.identifier = createIdentifier()
         self.copySocketEffects(sourceNode)
         self.duplicate(sourceNode)
+        for socket, sourceSocket in zip(self.sockets, sourceNode.sockets):
+            socket.alternativeIdentifiers = sourceSocket.alternativeIdentifiers
 
     def free(self):
         self.clearSocketEffects()
@@ -238,6 +240,25 @@ class AnimationNode:
     def _setSocketProperties(self, socket, properties):
         for key, value in properties.items():
             setattr(socket, key, value)
+
+    def newInputGroup(self, selector, socketsData):
+        self._newSocketGroup(selector, socketsData, self.newInput)
+
+    def newOutputGroup(self, selector, socketsData):
+        self._newSocketGroup(selector, socketsData, self.newOutput)
+
+    def _newSocketGroup(self, selector, socketsData, newSocketFunction):
+        if 0 <= selector < len(socketsData):
+            data = socketsData[selector]
+            if len(data) == 3:
+                socket = newSocketFunction(data[0], data[1], data[2])
+            elif len(data) == 4:
+                socket = newSocketFunction(data[0], data[1], data[2], **data[3])
+            else:
+                raise ValueError("invalid socket data")
+            socket.alternativeIdentifiers = [data[2] for data in socketsData]
+        else:
+            raise ValueError("invalid selector")
 
     def replaceSocket(self, socket, dataType, name, identifier = None, **kwargs):
         index = socket.getIndex(self)

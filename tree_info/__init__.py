@@ -1,4 +1,5 @@
 import functools
+from itertools import chain
 from .. utils.timing import measureTime
 from .. utils.nodes import idToNode, idToSocket, createNodeByIdDict
 
@@ -177,12 +178,15 @@ def keepNodeLinks(function):
     return wrapper
 
 def getNodeConnections(node):
-    nodeID = node.toID()
-    inputIDs, outputIDs = _forestData.socketsByNode[nodeID]
+    inputIDs, outputIDs = _forestData.socketsByNode[node.toID()]
+
     connections = []
-    for socketID in inputIDs + outputIDs:
+    for socketID, socket in zip(chain(inputIDs, outputIDs), node.sockets):
         for linkedID in _forestData.linkedSocketsWithReroutes[socketID]:
             connections.append((socketID, linkedID))
+
+            for identifier in socket.alternativeIdentifiers:
+                connections.append(((socketID[0], socketID[1], identifier), linkedID))
     return connections
 
 def setConnections(connections):
