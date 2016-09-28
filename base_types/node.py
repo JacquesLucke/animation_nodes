@@ -241,10 +241,10 @@ class AnimationNode:
         for key, value in properties.items():
             setattr(socket, key, value)
 
-    def newInputGroup(self, selector, socketsData):
+    def newInputGroup(self, selector, *socketsData):
         self._newSocketGroup(selector, socketsData, self.newInput)
 
-    def newOutputGroup(self, selector, socketsData):
+    def newOutputGroup(self, selector, *socketsData):
         self._newSocketGroup(selector, socketsData, self.newOutput)
 
     def _newSocketGroup(self, selector, socketsData, newSocketFunction):
