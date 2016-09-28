@@ -142,34 +142,38 @@ class AutoSelectVectorization(SocketEffect):
                                                 for socket, socketID in zip(sockets, socketIDs)}
 
     def apply(self, node):
-        propertyStates = {propertyName : "BASE" for propertyName in self.properties}
+        # Set default state to BASE
+        states = {propertyName : "BASE" for propertyName in self.properties}
         fixedProperties = set()
 
+        # Evaluate linked sockets
         for propertyName, socketIDs in self.sockets.items():
             for socketID in socketIDs:
                 socket = self.getSocket(node, socketID)
                 linkedDataTypes = tuple(socket.linkedDataTypes - {"Generic"})
                 if len(linkedDataTypes) == 1:
                     if linkedDataTypes[0] == self.listDataTypes[propertyName][socketID]:
-                        propertyStates[propertyName] = "LIST"
+                        states[propertyName] = "LIST"
                         fixedProperties.add(propertyName)
                     elif linkedDataTypes[0] == self.baseDataTypes[propertyName][socketID]:
-                        propertyStates[propertyName] = "BASE"
+                        states[propertyName] = "BASE"
                         fixedProperties.add(propertyName)
                     break
 
+        # Evaluate dependencies
         for propertyName, dependencies in self.dependencies.items():
-            targetState = propertyStates[propertyName]
+            targetState = states[propertyName]
             if targetState == "LIST":
-                baseDependencies = {dependency for dependency in dependencies if propertyStates[dependency] == "BASE"}
-                if len(baseDependencies) > 0:
-                    if any(dependency in fixedProperties for dependency in baseDependencies):
-                        propertyStates[propertyName] = "BASE"
+                baseDeps = set(filter(lambda x: states[x] == "BASE", dependencies))
+                if len(baseDeps) > 0:
+                    if any(dependency in fixedProperties for dependency in baseDeps):
+                        states[propertyName] = "BASE"
                     else:
-                        for dependency in baseDependencies:
-                            propertyStates[dependency] = "LIST"
+                        for dependency in baseDeps:
+                            states[dependency] = "LIST"
 
+        # Update properties of node
         for propertyName in self.properties:
-            state = propertyStates[propertyName] == "LIST"
+            state = states[propertyName] == "LIST"
             if state != getattr(node, propertyName):
                 setattr(node, propertyName, state)
