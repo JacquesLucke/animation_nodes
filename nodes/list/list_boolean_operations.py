@@ -3,7 +3,7 @@ import itertools
 from bpy.props import *
 from ... sockets.info import isList
 from ... events import executionCodeChanged
-from ... base_types import AnimationNode, UpdateAssignedListDataType
+from ... base_types import AnimationNode, AutoSelectListDataType
 
 operationItems = [
     ("UNION", "Union", "Elements that are at least in one of both lists", "NONE", 0),
@@ -25,7 +25,7 @@ class ListBooleanOperationsNode(bpy.types.Node, AnimationNode):
         self.newInput(self.assignedType, "List 2", "list2", dataIsModified = True)
         self.newOutput(self.assignedType, "List", "outList")
 
-        self.newSocketEffect(UpdateAssignedListDataType("assignedType", "LIST",
+        self.newSocketEffect(AutoSelectListDataType("assignedType", "LIST",
             [(self.inputs[0], "LIST"),
              (self.inputs[1], "LIST"),
              (self.outputs[0], "LIST")]

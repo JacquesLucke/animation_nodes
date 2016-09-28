@@ -3,7 +3,7 @@ import random
 from bpy.props import *
 from ... events import propertyChanged
 from ... sockets.info import isList, toBaseDataType
-from ... base_types import AnimationNode, UpdateAssignedListDataType
+from ... base_types import AnimationNode, AutoSelectListDataType
 
 selectionTypeItems = [
     ("SINGLE", "Single", "Select only one random element from the list", "NONE", 0),
@@ -35,7 +35,7 @@ class GetRandomListElementsNode(bpy.types.Node, AnimationNode):
             self.newInput("Integer", "Amount", "amount", value = 3, minValue = 0)
             self.newOutput(listDataType, "List", "outList")
 
-        self.newSocketEffect(UpdateAssignedListDataType("assignedType", "LIST",
+        self.newSocketEffect(AutoSelectListDataType("assignedType", "LIST",
             [(self.inputs[1], "LIST"),
              (self.outputs[0], "BASE" if self.selectionType == "SINGLE" else "LIST")]
         ))

@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import *
-from ... base_types import AnimationNode, UpdateAssignedDataType
+from ... base_types import AnimationNode, AutoSelectDataType
 
 class SwitchNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SwitchNode"
@@ -15,7 +15,7 @@ class SwitchNode(bpy.types.Node, AnimationNode):
         self.newOutput(self.assignedType, "Output", "output")
         self.newOutput(self.assignedType, "Other", "other", hide = True)
 
-        self.newSocketEffect(UpdateAssignedDataType("assignedType",
+        self.newSocketEffect(AutoSelectDataType("assignedType",
             [self.inputs[1], self.inputs[2],
              self.outputs[0], self.outputs[1]]
         ))

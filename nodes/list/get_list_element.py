@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... events import executionCodeChanged
 from ... sockets.info import isBase, toBaseDataType, toListDataType
-from ... base_types import AnimationNode, UpdateAssignedListDataType
+from ... base_types import AnimationNode, AutoSelectListDataType
 
 class GetListElementNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GetListElementNode"
@@ -32,7 +32,7 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
         self.newInput(baseDataType, "Fallback", "fallback", hide = True)
         self.newOutput(baseDataType, "Element", "element")
 
-        self.newSocketEffect(UpdateAssignedListDataType("assignedType", "BASE",
+        self.newSocketEffect(AutoSelectListDataType("assignedType", "BASE",
             [(self.inputs[0], "LIST"),
              (self.inputs[2], "BASE"),
              (self.outputs[0], "BASE")]

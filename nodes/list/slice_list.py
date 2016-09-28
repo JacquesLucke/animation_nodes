@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... sockets.info import isBase, toBaseDataType, toListDataType
-from ... base_types import AnimationNode, UpdateAssignedListDataType
+from ... base_types import AnimationNode, AutoSelectListDataType
 
 sliceEndType = [
     ("END_INDEX", "Index", "", "NONE", 0),
@@ -39,7 +39,7 @@ class SliceListNode(bpy.types.Node, AnimationNode):
             self.newInput("Integer", "Step", "step", value = 1)
         self.newOutput(listDataType, "List", "slicedList")
 
-        self.newSocketEffect(UpdateAssignedListDataType("assignedType", "BASE",
+        self.newSocketEffect(AutoSelectListDataType("assignedType", "BASE",
             [(self.inputs[0], "LIST"),
              (self.outputs[0], "LIST")]
         ))

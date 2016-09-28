@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import *
-from ... base_types import AnimationNode, UpdateAssignedDataType
+from ... base_types import AnimationNode, AutoSelectDataType
 
 class DebugListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_DebugListNode"
@@ -13,7 +13,7 @@ class DebugListNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.newInput("Text Block", "Text", "text")
         self.newInput(self.dataType, "Data", "data")
-        self.newSocketEffect(UpdateAssignedDataType(
+        self.newSocketEffect(AutoSelectDataType(
             "dataType", [self.inputs[1]], default = "Generic"))
 
     def draw(self, layout):

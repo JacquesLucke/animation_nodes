@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import *
-from ... base_types import AnimationNode, UpdateAssignedDataType
+from ... base_types import AnimationNode, AutoSelectDataType
 
 compare_types = ["A = B", "A != B", "A < B", "A <= B", "A > B", "A >= B", "A is B","A is None"]
 compare_types_items = [(t, t, "") for t in compare_types]
@@ -23,7 +23,7 @@ class CompareNode(bpy.types.Node, AnimationNode):
             self.newInput(self.assignedType, "B", "b")
         self.newOutput("an_BooleanSocket", "Result", "result")
 
-        self.newSocketEffect(UpdateAssignedDataType("assignedType",
+        self.newSocketEffect(AutoSelectDataType("assignedType",
             [self.inputs[0],
              self.inputs[1] if len(self.inputs) == 2 else None]
         ))

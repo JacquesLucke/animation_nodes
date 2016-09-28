@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... events import executionCodeChanged
-from ... base_types import AnimationNode, UpdateAssignedListDataType
+from ... base_types import AnimationNode, AutoSelectListDataType
 from ... sockets.info import isList, toBaseDataType, isCopyable, getCopyExpression
 
 repetitionTypeItems = [
@@ -40,7 +40,7 @@ class RepeatListNode(bpy.types.Node, AnimationNode):
             self.newInput("Integer", "Length", "length", value = 20)
         self.newOutput(listDataType, "List", "outList")
 
-        self.newSocketEffect(UpdateAssignedListDataType("assignedType", "LIST",
+        self.newSocketEffect(AutoSelectListDataType("assignedType", "LIST",
             [(self.inputs[0], "LIST"),
              (self.outputs[0], "LIST")]
         ))

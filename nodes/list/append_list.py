@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... sockets.info import isBase, toBaseDataType, toListDataType
-from ... base_types import AnimationNode, UpdateAssignedListDataType
+from ... base_types import AnimationNode, AutoSelectListDataType
 
 class AppendListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_AppendListNode"
@@ -17,7 +17,7 @@ class AppendListNode(bpy.types.Node, AnimationNode):
         self.newInput(baseDataType, "Element", "element", dataIsModified = True)
         self.newOutput(listDataType, "List", "list")
 
-        self.newSocketEffect(UpdateAssignedListDataType("assignedType", "BASE",
+        self.newSocketEffect(AutoSelectListDataType("assignedType", "BASE",
             [(self.inputs[0], "LIST"),
              (self.inputs[1], "BASE"),
              (self.outputs[0], "LIST")]

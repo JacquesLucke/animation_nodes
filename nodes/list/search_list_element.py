@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... events import executionCodeChanged
 from ... sockets.info import isBase, toBaseDataType, toListDataType
-from ... base_types import AnimationNode, UpdateAssignedListDataType
+from ... base_types import AnimationNode, AutoSelectListDataType
 
 class SearchListElementNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SearchListElementNode"
@@ -21,7 +21,7 @@ class SearchListElementNode(bpy.types.Node, AnimationNode):
         self.newOutput("an_IntegerListSocket", "All Indices", "allIndices")
         self.newOutput("an_IntegerSocket", "Occurrences", "occurrences")
 
-        self.newSocketEffect(UpdateAssignedListDataType("assignedType", "BASE",
+        self.newSocketEffect(AutoSelectListDataType("assignedType", "BASE",
             [(self.inputs[0], "LIST"),
              (self.inputs[1], "BASE")]
         ))

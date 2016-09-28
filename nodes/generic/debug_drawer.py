@@ -4,7 +4,7 @@ from bpy.props import *
 from ... utils import pretty_strings
 from ... draw_handler import drawHandler
 from ... graphics.text_box import TextBox
-from ... base_types import AnimationNode, UpdateAssignedDataType
+from ... base_types import AnimationNode, AutoSelectDataType
 
 dataByNode = {}
 
@@ -26,7 +26,7 @@ class DebugDrawerNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.newInput(self.dataType, "Data", "data")
         self.newInput("Boolean", "Condition", "condition", hide = True)
-        self.newSocketEffect(UpdateAssignedDataType(
+        self.newSocketEffect(AutoSelectDataType(
             "dataType", [self.inputs[0]], default = "Generic"))
 
     def draw(self, layout):

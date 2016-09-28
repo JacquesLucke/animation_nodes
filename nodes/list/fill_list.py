@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... events import executionCodeChanged
 from ... sockets.info import isBase, toBaseDataType, toListDataType
-from ... base_types import AnimationNode, UpdateAssignedListDataType
+from ... base_types import AnimationNode, AutoSelectListDataType
 
 fillModeItems = [
     ("LEFT", "Left", "", "TRIA_LEFT", 0),
@@ -30,7 +30,7 @@ class FillListNode(bpy.types.Node, AnimationNode):
         self.newInput(baseDataType, "Element", "fillElement")
         self.newOutput(listDataType, "List", "outList")
 
-        self.newSocketEffect(UpdateAssignedListDataType("assignedType", "BASE",
+        self.newSocketEffect(AutoSelectListDataType("assignedType", "BASE",
             [(self.inputs[1], "LIST"),
              (self.inputs[2], "BASE"),
              (self.outputs[0], "LIST")]

@@ -8,7 +8,7 @@ from ... utils.names import toVariableName
 from ... events import executionCodeChanged
 from ... utils.enum_items import enumItemsFromDicts
 from mathutils.geometry import distance_point_to_plane
-from ... base_types import AnimationNode, UpdateAssignedListDataType
+from ... base_types import AnimationNode, AutoSelectListDataType
 
 class SortingTemplate:
     identifier = "NONE"
@@ -170,7 +170,7 @@ class SortListNode(bpy.types.Node, AnimationNode):
 
         self.setupActiveTemplate()
 
-        self.newSocketEffect(UpdateAssignedListDataType("assignedType", "LIST",
+        self.newSocketEffect(AutoSelectListDataType("assignedType", "LIST",
             [(self.inputs[0], "LIST"),
              (self.outputs[0], "LIST")]
         ))

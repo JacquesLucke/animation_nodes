@@ -3,7 +3,7 @@ from bpy.props import *
 from ... tree_info import keepNodeState
 from ... ui.info_popups import showTextPopup
 from ... events import executionCodeChanged
-from ... base_types import AnimationNode, UpdateAssignedListDataType
+from ... base_types import AnimationNode, AutoSelectListDataType
 from ... sockets.info import toBaseDataType, isBase, isComparable, toListDataType, isList
 
 removeTypeItems = [
@@ -42,7 +42,7 @@ class RemoveListElementNode(bpy.types.Node, AnimationNode):
 
         self.newOutput(listDataType, "List", "outList")
 
-        self.newSocketEffect(UpdateAssignedListDataType("assignedType", "BASE",
+        self.newSocketEffect(AutoSelectListDataType("assignedType", "BASE",
             [(self.inputs[0], "LIST"),
              (self.inputs[1], "BASE") if self.inputs[1].name == "Element" else (None, "IGNORE"),
              (self.outputs[0], "LIST")]

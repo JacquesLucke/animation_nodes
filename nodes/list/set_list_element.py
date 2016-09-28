@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... events import executionCodeChanged
 from ... sockets.info import toBaseDataType, toListDataType, isBase
-from ... base_types import AnimationNode, UpdateAssignedListDataType
+from ... base_types import AnimationNode, AutoSelectListDataType
 
 class SetListElementNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SetListElementNode"
@@ -29,7 +29,7 @@ class SetListElementNode(bpy.types.Node, AnimationNode):
         self.newInput("an_IntegerSocket", "Index", "index")
         self.newOutput(listDataType, "List", "list")
 
-        self.newSocketEffect(UpdateAssignedListDataType("assignedType", "BASE",
+        self.newSocketEffect(AutoSelectListDataType("assignedType", "BASE",
             [(self.inputs[0], "LIST"),
              (self.inputs[1], "BASE"),
              (self.outputs[0], "LIST")]

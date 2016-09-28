@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... tree_info import keepNodeLinks
-from ... base_types import AnimationNode, UpdateAssignedDataType
+from ... base_types import AnimationNode, AutoSelectDataType
 from ... sockets.info import toIdName
 
 class ConvertNode(bpy.types.Node, AnimationNode):
@@ -18,7 +18,7 @@ class ConvertNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.newInput("Generic", "Old", "old", dataIsModified = True)
         self.newOutput(self.dataType, "New", "new")
-        self.newSocketEffect(UpdateAssignedDataType(
+        self.newSocketEffect(AutoSelectDataType(
             "dataType", [self.outputs[0]], ignore = {"Generic"}))
 
     def drawAdvanced(self, layout):
