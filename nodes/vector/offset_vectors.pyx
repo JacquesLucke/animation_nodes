@@ -1,46 +1,34 @@
 import bpy
 from bpy.props import *
-from ... tree_info import keepNodeState
 from ... math cimport Vector3, setVector3
-from ... utils.handlers import validCallback
-from ... base_types import AnimationNode
 from ... data_structures cimport FalloffEvaluator, Vector3DList
+from ... base_types import AnimationNode, AutoSelectVectorization
 
 class OffsetVectorsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_OffsetVectorsNode"
     bl_label = "Offset Vectors"
 
-    @validCallback
-    def useOffsetListChanged(self, context):
-        self.recreateInputs()
-
-    useOffsetList = BoolProperty(name = "Use Offset List", default = False,
-        update = useOffsetListChanged)
+    useOffsetList = BoolProperty(default = False, update = AnimationNode.updateSockets)
 
     errorMessage = StringProperty()
     clampFalloff = BoolProperty(name = "Clamp Falloff", default = False)
 
     def create(self):
-        self.recreateInputs()
-        self.newOutput("Vector List", "Vector List", "vectors")
-
-    @keepNodeState
-    def recreateInputs(self):
-        self.inputs.clear()
         self.newInput("Vector List", "Vector List", "vectors", dataIsModified = True)
         self.newInput("Falloff", "Falloff", "falloff")
-        if self.useOffsetList:
-            self.newInput("Vector List", "Offset List", "offsets")
-        else:
-            self.newInput("Vector", "Offset", "offset", value = (0, 0, 1))
+        self.newInputGroup(self.useOffsetList,
+            ("Vector", "Offset", "offset", dict(value = (0, 0, 1))),
+            ("Vector List", "Offset List", "offsets"))
+
+        self.newOutput("Vector List", "Vector List", "vectors")
+
+        vectorization = AutoSelectVectorization()
+        vectorization.add(self, "useOffsetList", [self.inputs[2]])
+        self.newSocketEffect(vectorization)
 
     def draw(self, layout):
-        layout.prop(self, "clampFalloff")
         if self.errorMessage != "":
             layout.label(self.errorMessage, icon = "ERROR")
-
-    def drawAdvanced(self, layout):
-        layout.prop(self, "useOffsetList")
 
     def getExecutionFunctionName(self):
         if self.useOffsetList:

@@ -14,7 +14,7 @@ class FalloffSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     comparable = False
     storable = False
 
-    value = FloatProperty(soft_min = 0, soft_max = 1, update = propertyChanged)
+    value = FloatProperty(default = 1, soft_min = 0, soft_max = 1, update = propertyChanged)
 
     def drawProperty(self, layout, text, node):
         layout.prop(self, "value", text = text, slider = True)
