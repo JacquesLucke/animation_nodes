@@ -10,17 +10,18 @@ class SocketEffect:
 
 
 class AutoSelectFloatOrInteger(SocketEffect):
-    def __init__(self, socket):
+    def __init__(self, propertyName, socket):
         self.socketID = self.toSocketID(socket)
+        self.propertyName = propertyName
 
     def apply(self, node):
         socket = self.getSocket(node, self.socketID)
         if socket.dataType == "Float":
             if socket.shouldBeIntegerSocket():
-                node.replaceSocket(socket, "Integer", socket.name, socket.identifier)
+                setattr(node, self.propertyName, "Integer")
         elif socket.dataType == "Integer":
             if socket.shouldBeFloatSocket():
-                node.replaceSocket(socket, "Float", socket.name, socket.identifier)
+                setattr(node, self.propertyName, "Float")
 
 
 from .. sockets.info import isBase, isList, toBaseDataType, toListDataType

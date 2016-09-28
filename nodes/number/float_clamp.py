@@ -1,4 +1,5 @@
 import bpy
+from bpy.props import *
 from ... base_types import AnimationNode, AutoSelectFloatOrInteger
 
 class FloatClampNode(bpy.types.Node, AnimationNode):
@@ -6,17 +7,19 @@ class FloatClampNode(bpy.types.Node, AnimationNode):
     bl_label = "Clamp"
     dynamicLabelType = "HIDDEN_ONLY"
 
+    outputDataType = StringProperty(default = "Float", update = AnimationNode.updateSockets)
+
     def create(self):
         self.newInput("Float", "Value", "value")
         self.newInput("Float", "Min", "minValue", value = 0.0)
         self.newInput("Float", "Max", "maxValue", value = 1.0)
-        self.newOutput("Float", "Value", "outValue")
+        self.newOutput(self.outputDataType, "Value", "outValue")
 
-        self.newSocketEffect(AutoSelectFloatOrInteger(self.outputs[0]))
+        self.newSocketEffect(AutoSelectFloatOrInteger("outputDataType", self.outputs[0]))
 
     def getExecutionCode(self):
         yield "outValue = min(max(value, minValue), maxValue)"
-        if self.outputs[0].dataType == "Integer":
+        if self.outputDataType == "Integer":
             yield "outValue = int(outValue)"
 
     def drawLabel(self):

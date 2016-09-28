@@ -63,6 +63,8 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
     operation = EnumProperty(name = "Operation", default = "MULTIPLY",
         items = operationItems, update = AnimationNode.updateSockets)
 
+    outputDataType = StringProperty(default = "Float", update = AnimationNode.updateSockets)
+
     def create(self):
         self.newInput("Float", "A", "a")
         if self.operation in secondInputOperations:
@@ -72,8 +74,8 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
         if self.operation in stepSizeInputOperations:
             self.newInput("Float", "Step Size", "stepSize")
 
-        output = self.newOutput("Float", "Result", "result")
-        self.newSocketEffect(AutoSelectFloatOrInteger(output))
+        self.newOutput(self.outputDataType, "Result", "result")
+        self.newSocketEffect(AutoSelectFloatOrInteger("outputDataType", self.outputs[0]))
 
     def draw(self, layout):
         row = layout.row(align = True)
@@ -132,7 +134,7 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
         if op == "FLOOR_DIV": yield from ("if b == 0: result = 0",
                                           "else: result = a // b")
 
-        if self.outputs[0].dataType == "Integer":
+        if self.outputDataType == "Integer":
             yield "result = int(result)"
 
     def getUsedModules(self):

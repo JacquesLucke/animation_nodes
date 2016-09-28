@@ -8,10 +8,12 @@ class ParseNumberNode(bpy.types.Node, AnimationNode):
 
     parsingSuccessfull = BoolProperty()
 
+    outputDataType = StringProperty(default = "Float", update = AnimationNode.updateSockets)
+
     def create(self):
         self.newInput("Text", "Text", "text")
-        self.newOutput("Float", "Number", "number")
-        self.newSocketEffect(AutoSelectFloatOrInteger(self.outputs[0]))
+        self.newOutput(self.outputDataType, "Number", "number")
+        self.newSocketEffect(AutoSelectFloatOrInteger("outputDataType", self.outputs[0]))
 
     def draw(self, layout):
         if not self.parsingSuccessfull:
@@ -24,5 +26,5 @@ class ParseNumberNode(bpy.types.Node, AnimationNode):
         yield "except:"
         yield "    number = 0"
         yield "    self.parsingSuccessfull = False"
-        if self.outputs[0].dataType == "Integer":
+        if self.outputDataType == "Integer":
             yield "number = int(number)"
