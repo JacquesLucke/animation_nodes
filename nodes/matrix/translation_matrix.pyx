@@ -11,11 +11,11 @@ class TranslationMatrixNode(bpy.types.Node, AnimationNode):
     useList = BoolProperty(default = False, update = AnimationNode.updateSockets)
 
     def create(self):
-        self.newInputGroup(int(self.useList),
+        self.newInputGroup(self.useList,
             ("Vector", "Translation", "translation"),
             ("Vector List", "Translations", "translations"))
 
-        self.newOutputGroup(int(self.useList),
+        self.newOutputGroup(self.useList,
             ("Matrix", "Matrix", "matrix"),
             ("Matrix List", "Matrices", "matrices"))
 

@@ -242,14 +242,14 @@ class AnimationNode:
             setattr(socket, key, value)
 
     def newInputGroup(self, selector, *socketsData):
-        self._newSocketGroup(selector, socketsData, self.newInput)
+        self._newSocketGroup(int(selector), socketsData, self.newInput)
 
     def newOutputGroup(self, selector, *socketsData):
-        self._newSocketGroup(selector, socketsData, self.newOutput)
+        self._newSocketGroup(int(selector), socketsData, self.newOutput)
 
-    def _newSocketGroup(self, selector, socketsData, newSocketFunction):
-        if 0 <= selector < len(socketsData):
-            data = socketsData[selector]
+    def _newSocketGroup(self, index, socketsData, newSocketFunction):
+        if 0 <= index < len(socketsData):
+            data = socketsData[index]
             if len(data) == 3:
                 socket = newSocketFunction(data[0], data[1], data[2])
             elif len(data) == 4:
