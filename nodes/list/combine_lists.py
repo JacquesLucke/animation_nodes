@@ -56,8 +56,7 @@ class CombineListsNode(bpy.types.Node, AnimationNode):
         self.assignedType = toBaseDataType(listDataType)
 
     def recreateSockets(self, inputAmount = 2):
-        self.inputs.clear()
-        self.outputs.clear()
+        self.clearSockets()
 
         self.newInput("Node Control", "...")
         for _ in range(inputAmount):

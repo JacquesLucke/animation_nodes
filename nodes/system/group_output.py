@@ -82,7 +82,7 @@ class GroupOutputNode(bpy.types.Node, AnimationNode):
         subprogramInterfaceChanged()
 
     def delete(self):
-        self.inputs.clear()
+        self.clearSockets()
         subprogramInterfaceChanged()
 
     def useGroupInputInNetwork(self):

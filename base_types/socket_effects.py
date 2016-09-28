@@ -118,6 +118,8 @@ class AutoSelectVectorization(SocketEffect):
         self.listDataTypes = dict()
 
     def add(self, node, propertyName, sockets, dependency = None):
+        self.setSocketTransparency(sockets)
+
         if dependency is None:
             dependencies = set()
         elif isinstance(dependency, str):
@@ -140,6 +142,10 @@ class AutoSelectVectorization(SocketEffect):
                                                 for socket, socketID in zip(sockets, socketIDs)}
             self.baseDataTypes[propertyName] = {socketID : socket.dataType
                                                 for socket, socketID in zip(sockets, socketIDs)}
+
+    def setSocketTransparency(self, sockets):
+        for socket in sockets:
+            socket.setTemporarySocketTransparency(0.70)
 
     def apply(self, node):
         # Set default state to BASE

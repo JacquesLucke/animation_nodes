@@ -187,8 +187,14 @@ class AnimationNodeSocket:
         return newSocketCallback(self, node, functionName)
 
 
-    # Alternative Identifier
+    # Misc
     ##########################################################
+
+    def free(self):
+        try: del alternativeIdentifiersPerSocket[hash(self)]
+        except: pass
+        try: del colorOverwritePerSocket[hash(self)]
+        except: pass
 
     @property
     def alternativeIdentifiers(self):
@@ -197,6 +203,9 @@ class AnimationNodeSocket:
     @alternativeIdentifiers.setter
     def alternativeIdentifiers(self, value):
         alternativeIdentifiersPerSocket[hash(self)] = value
+
+    def setTemporarySocketTransparency(self, transparency):
+        colorOverwritePerSocket[hash(self)] = list(self.drawColor[:3]) + [transparency]
 
 
     # Move Utilities
@@ -248,6 +257,7 @@ class AnimationNodeSocket:
         else: return self.nodeTree.links.new(self, socket)
 
     def remove(self):
+        self.free()
         node = self.node
         node.removeSocket(self)
         node.socketRemoved()

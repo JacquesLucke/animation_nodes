@@ -275,6 +275,8 @@ class AnimationNode:
         return newSocket
 
     def clearSockets(self):
+        for socket in self.sockets:
+            socket.free()
         self.inputs.clear()
         self.outputs.clear()
 

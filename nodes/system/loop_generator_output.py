@@ -65,7 +65,7 @@ class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
 
     @keepNodeLinks
     def generateSockets(self):
-        self.inputs.clear()
+        self.clearSockets()
 
         if self.addType == "APPEND": dataType = toBaseDataType(self.listDataType)
         elif self.addType == "EXTEND": dataType = self.listDataType

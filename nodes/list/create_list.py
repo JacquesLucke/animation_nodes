@@ -82,8 +82,7 @@ class CreateListNode(bpy.types.Node, AnimationNode):
         self.recreateSockets(inputAmount)
 
     def recreateSockets(self, inputAmount = 2):
-        self.inputs.clear()
-        self.outputs.clear()
+        self.clearSockets()
 
         self.newInput("Node Control", "...")
         for i in range(inputAmount):

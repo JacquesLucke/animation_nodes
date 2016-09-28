@@ -142,8 +142,7 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         subprogramInterfaceChanged()
 
     def delete(self):
-        self.inputs.clear()
-        self.outputs.clear()
+        self.clearSockets()
         subprogramInterfaceChanged()
 
     def duplicate(self, sourceNode):

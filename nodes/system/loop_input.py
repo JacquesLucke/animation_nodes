@@ -140,7 +140,7 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         subprogramInterfaceChanged()
 
     def delete(self):
-        self.outputs.clear()
+        self.clearSockets()
         subprogramInterfaceChanged()
 
     def duplicate(self, sourceNode):

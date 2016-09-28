@@ -36,7 +36,7 @@ class ReassignLoopParameterNode(bpy.types.Node, AnimationNode):
 
     @keepNodeState
     def generateSockets(self):
-        self.inputs.clear()
+        self.clearSockets()
         self.newInput(self.parameterDataType, "New Value", "newValue", defaultDrawType = "TEXT_ONLY")
         self.newInput("Boolean", "Condition", "condition", hide = True)
 
