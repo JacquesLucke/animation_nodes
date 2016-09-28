@@ -10,6 +10,13 @@ class GenericSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = True
     comparable = False
 
+    def getCurrentDataType(self):
+        linkedDataTypes = tuple(self.linkedDataTypes)
+        if len(linkedDataTypes) == 0:
+            return "Generic"
+        else:
+            return linkedDataTypes[0]
+
     @classmethod
     def getDefaultValue(cls):
         return None

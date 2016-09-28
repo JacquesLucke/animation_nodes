@@ -7,14 +7,11 @@ class DebugListNode(bpy.types.Node, AnimationNode):
     bl_label = "Debug List"
 
     textBlockName = StringProperty(name = "Text")
-    dataType = StringProperty(default = "Generic", update = AnimationNode.updateSockets)
     inputIsIterable = BoolProperty(default = False)
 
     def create(self):
         self.newInput("Text Block", "Text", "text")
-        self.newInput(self.dataType, "Data", "data")
-        self.newSocketEffect(AutoSelectDataType(
-            "dataType", [self.inputs[1]], default = "Generic"))
+        self.newInput("Generic", "Data", "data")
 
     def draw(self, layout):
         if not self.inputIsIterable:
@@ -25,8 +22,8 @@ class DebugListNode(bpy.types.Node, AnimationNode):
         if text is None: return
 
         text.clear()
-        if self.dataType in ("Float List", "Color"):
-            text.write("\n".join([str(round(e, 4)) for e in data]))
+        if self.self.inputs[0].getCurrentDataType() in ("Float List", "Color"):
+            text.write("\n".join([str(round(e, 5)) for e in data]))
         else:
             try: text.write("\n".join([str(e) for e in data]))
             except: self.inputIsIterable = False

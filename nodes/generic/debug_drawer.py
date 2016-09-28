@@ -19,15 +19,12 @@ class DebugDrawerNode(bpy.types.Node, AnimationNode):
     maxListStartElements = IntProperty(name = "Max List Start Elements", default = 15, min = 0)
     maxListEndElements = IntProperty(name = "Max List End Elements", default = 0, min = 0)
     oneElementPerLine = BoolProperty(name = "One Element per Line", default = True)
-    dataType = StringProperty(default = "Generic", update = AnimationNode.updateSockets)
 
     errorMessage = StringProperty()
 
     def create(self):
-        self.newInput(self.dataType, "Data", "data")
+        self.newInput("Generic", "Data", "data")
         self.newInput("Boolean", "Condition", "condition", hide = True)
-        self.newSocketEffect(AutoSelectDataType(
-            "dataType", [self.inputs[0]], default = "Generic"))
 
     def draw(self, layout):
         if self.errorMessage != "":
@@ -97,7 +94,7 @@ class DebugDrawerNode(bpy.types.Node, AnimationNode):
         dataByNode[self.identifier] = text
 
     def getCurrentToStringFunction(self):
-        dataType = self.dataType
+        dataType = self.inputs[0].getCurrentDataType()
         if dataType == "Vector List": return pretty_strings.formatVector
         if dataType == "Euler List": return pretty_strings.formatEuler
         if dataType == "Float List": return pretty_strings.formatFloat
