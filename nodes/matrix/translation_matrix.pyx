@@ -1,37 +1,30 @@
 import bpy
-from ... sockets.info import isList
+from bpy.props import *
 from ... math cimport setTranslationMatrix
 from ... data_structures cimport Matrix4x4List, Vector3DList
-from ... base_types import AnimationNode, DynamicSocketSet
-
-class DynamicSockets(DynamicSocketSet):
-    def defaults(self):
-        self.newInput("Vector", "Translation", "translation")
-        self.newOutput("Matrix", "Matrix", "matrix")
-
-    def states(self, inputs, outputs):
-        self.setState(inputs[0], "Vector List", "Translations", "translations")
-        self.setState(outputs[0], "Matrix List", "Matrices", "matrices")
-
-    def rules(self, inputs, outputs):
-        if inputs[0].isLinkedToType("Vector List") or outputs[0].isLinkedToType("Matrix List"):
-            self.setType(inputs[0], "Vector List")
-            self.setType(outputs[0], "Matrix List")
-
-socketSet = DynamicSockets()
+from ... base_types import AnimationNode, AutoSelectVectorization
 
 class TranslationMatrixNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_TranslationMatrixNode"
     bl_label = "Translation Matrix"
 
-    def create(self):
-        socketSet.createDefaults(self)
+    useList = BoolProperty(default = False, update = AnimationNode.updateSockets)
 
-    def edit(self):
-        socketSet.applyRules(self)
+    def create(self):
+        self.newInputGroup(int(self.useList), [
+            ("Vector", "Translation", "translation"),
+            ("Vector List", "Translations", "translations")])
+
+        self.newOutputGroup(int(self.useList), [
+            ("Matrix", "Matrix", "matrix"),
+            ("Matrix List", "Matrices", "matrices")])
+
+        vectorization = AutoSelectVectorization()
+        vectorization.add("useList", [self.inputs[0], self.outputs[0]])
+        self.newSocketEffect(vectorization)
 
     def getExecutionCode(self):
-        if isList(self.inputs[0].dataType):
+        if self.useList:
             return "matrices = self.calcMatrices(translations)"
         else:
             return "matrix = Matrix.Translation(translation)"
