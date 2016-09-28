@@ -1,7 +1,6 @@
 import bpy
 from bpy.props import *
 from ... events import propertyChanged
-from ... tree_info import keepNodeState
 from ... base_types import AnimationNode
 
 pointTypeItems = [

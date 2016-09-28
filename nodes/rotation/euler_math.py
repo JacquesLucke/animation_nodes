@@ -1,6 +1,5 @@
 import bpy
 from bpy.props import *
-from ... tree_info import keepNodeState
 from ... base_types import AnimationNode
 
 operationItems = [
@@ -33,7 +32,7 @@ class EulerMathNode(bpy.types.Node, AnimationNode):
 
     operation = EnumProperty(name = "Operation", default = "ADD",
         items = operationItems, update = AnimationNode.updateSockets)
-    
+
     useDegree = BoolProperty(name = "Use Degrees",
         description = "Multiply and Divide degrees. If false, operation will use radians (output is always radians)",
         default = True, update = AnimationNode.updateSockets)

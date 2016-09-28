@@ -1,7 +1,6 @@
 import bpy
 import math
 from bpy.props import *
-from ... tree_info import keepNodeState
 from ... base_types import AnimationNode, AutoSelectFloatOrInteger
 
 operationItems = [
@@ -139,15 +138,6 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
 
     def getUsedModules(self):
         return ["math"]
-
-    def setOutputType(self, dataType):
-        if self.outputs[0].dataType != dataType:
-            self._setOutputType(dataType)
-
-    @keepNodeState
-    def _setOutputType(self, dataType):
-        self.outputs.clear()
-        self.newOutput(dataType, "Result", "result")
 
     @property
     def socketA(self):

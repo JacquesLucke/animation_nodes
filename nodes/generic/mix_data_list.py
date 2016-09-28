@@ -1,7 +1,6 @@
 import bpy
 from bpy.props import *
 from . mix_data import getMixCode
-from ... tree_info import keepNodeLinks
 from ... sockets.info import toListDataType
 from ... events import executionCodeChanged
 from ... base_types import AnimationNode
@@ -23,7 +22,7 @@ class MixDataListNode(bpy.types.Node, AnimationNode):
     searchTags = [(tag, {"dataType" : repr(type)}) for type, tag in nodeTypes.items()]
 
     dataType = StringProperty(update = AnimationNode.updateSockets, default = "Float")
-    
+
     repeat = BoolProperty(name = "Repeat", default = False,
         description = "Repeat the factor for values above and below 0-1", update = executionCodeChanged)
 

@@ -3,7 +3,6 @@ from bpy.props import *
 from collections import defaultdict
 from ... sockets.info import isList
 from ... utils.code import isCodeValid
-from ... tree_info import keepNodeState
 from ... utils.names import toVariableName
 from ... events import executionCodeChanged
 from ... utils.enum_items import enumItemsFromDicts

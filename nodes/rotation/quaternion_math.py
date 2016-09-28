@@ -1,6 +1,5 @@
 import bpy
 from bpy.props import *
-from ... tree_info import keepNodeLinks
 from ... base_types import AnimationNode
 
 operationItems = [

@@ -1,7 +1,6 @@
 import bpy
 from bpy.props import *
 from ... events import propertyChanged
-from ... tree_info import keepNodeState
 from ... base_types import AnimationNode
 from ... algorithms.mesh_generation.loft import LinearLoft, SmoothLoft
 from ... data_structures import Vector3DList, EdgeIndicesList, PolygonIndicesList

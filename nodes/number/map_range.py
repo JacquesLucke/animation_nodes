@@ -1,6 +1,5 @@
 import bpy
 from bpy.props import *
-from ... tree_info import keepNodeState
 from ... base_types import AnimationNode
 
 class MapRangeNode(bpy.types.Node, AnimationNode):
