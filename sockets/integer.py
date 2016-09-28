@@ -41,15 +41,6 @@ class IntegerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         self.minValue = min
         self.maxValue = max
 
-    def shouldBeFloatSocket(self):
-        targets = self.dataTargets
-        if len(targets) == 0: return True
-
-        for socket in targets:
-            if socket.dataType == "Float": return True
-
-        return False
-
     @classmethod
     def getDefaultValue(cls):
         return 0
