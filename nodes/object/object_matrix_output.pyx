@@ -4,7 +4,7 @@ from ... math cimport toPyMatrix4
 from ... sockets.info import isList
 from ... events import executionCodeChanged
 from ... data_structures cimport Matrix4x4List
-from ... base_types import AnimationNode, VectorizedSockets
+from ... base_types import AnimationNode, AutoSelectVectorization
 
 outputItems = [	("BASIS", "Basis", "", "NONE", 0),
                 ("LOCAL", "Local", "", "NONE", 1),
@@ -18,24 +18,26 @@ class ObjectMatrixOutputNode(bpy.types.Node, AnimationNode):
 
     outputType = EnumProperty(items = outputItems, update = executionCodeChanged, default = "WORLD")
 
+    useObjectList = BoolProperty(default = False, update = AnimationNode.updateSockets)
+    useMatrixList = BoolProperty(default = False, update = AnimationNode.updateSockets)
+
     def create(self):
-        sockets = VectorizedSockets()
+        if self.useObjectList:
+            self.newInput("Object List", "Objects", "objects")
+            self.newOutput("Object List", "Objects", "objects")
+        else:
+            self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
+            self.newOutput("Object", "Object", "object")
 
-        sockets.newInput(self, "Object",
-            "Object", "object", {"defaultDrawType" : "PROPERTY_ONLY"},
-            "Objects", "objects", {})
+        if self.useMatrixList:
+            self.newInput("Matrix List", "Matrices", "matrices")
+        else:
+            self.newInput("Matrix", "Matrix", "matrix")
 
-        sockets.newInput(self, "Matrix",
-            "Matrixaaaaaaa", "matrix", {},
-            "Matrices", "matrices", {})
-
-        sockets.newOutput(self, "Object",
-            "Object", "object", {},
-            "Objects", "objects", {})
-
-        sockets.newConnection(self.inputs[0], self.outputs[0], bothDirections = True)
-
-        self.newSocketEffect(sockets)
+        vectorization = AutoSelectVectorization()
+        vectorization.add("useObjectList", [self.inputs[0], self.outputs[0]])
+        vectorization.add("useMatrixList", [self.inputs[1]], dependency = "useObjectList")
+        self.newSocketEffect(vectorization)
 
     def draw(self, layout):
         row = layout.row(align = True)

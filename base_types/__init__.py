@@ -6,4 +6,4 @@ from . dynamic_socket_set import DynamicSocketSet
 from . socket_effects import (AutoSelectFloatOrInteger,
                               AutoSelectListDataType,
                               AutoSelectDataType,
-                              VectorizedSockets)
+                              AutoSelectVectorization)

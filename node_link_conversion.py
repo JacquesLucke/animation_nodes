@@ -93,7 +93,7 @@ class SimpleConvert(LinkCorrection):
         nodeIdName = self.rules[(dataOrigin.dataType, target.dataType)]
         node = insertLinkedNode(nodeTree, nodeIdName, origin, target)
         tree_info.updateIfNecessary()
-        node.edit()
+        node.updateNode()
 
 class ConvertMeshDataListToMeshData(LinkCorrection):
     def check(self, origin, target):

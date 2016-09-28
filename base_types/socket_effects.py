@@ -1,6 +1,11 @@
+from .. sockets.info import isBase, isList, toBaseDataType, toListDataType
+
 class SocketEffect:
     def apply(self, node):
         pass
+
+    def toSocketIDs(self, sockets):
+        return [self.toSocketID(socket) for socket in sockets if socket is not None]
 
     def toSocketID(self, socket):
         return socket.isOutput, socket.getIndex()
@@ -16,6 +21,7 @@ class AutoSelectFloatOrInteger(SocketEffect):
 
     def apply(self, node):
         socket = self.getSocket(node, self.socketID)
+        linkedDataTypes = socket.linkedDataTypes - {"Generic"}
         if socket.dataType == "Float":
             if linkedDataTypes == {"Integer"}:
                 setattr(node, self.propertyName, "Integer")
@@ -24,7 +30,6 @@ class AutoSelectFloatOrInteger(SocketEffect):
                 setattr(node, self.propertyName, "Float")
 
 
-from .. sockets.info import isBase, isList, toBaseDataType, toListDataType
 class AutoSelectListDataType(SocketEffect):
     def __init__(self, propertyName, propertyType, sockets):
         self.propertyName = propertyName
@@ -86,7 +91,7 @@ class AutoSelectDataType(SocketEffect):
         self.propertyName = propertyName
         self.ignoredDataTypes = set(ignore)
         self.default = default
-        self.socketIDs = [self.toSocketID(socket) for socket in sockets if socket is not None]
+        self.socketIDs = self.toSocketIDs(sockets)
 
     def apply(self, node):
         currentType = getattr(node, self.propertyName)
@@ -103,53 +108,48 @@ class AutoSelectDataType(SocketEffect):
                     setattr(node, self.propertyName, self.default)
 
 
-class VectorizedSockets(SocketEffect):
+class AutoSelectVectorization(SocketEffect):
     def __init__(self):
-        self.sockets = []
+        self.properties = {}
 
-    def newInput(self, node, dataType,
-                 baseName, baseIdentifier, baseArgs,
-                 listName, listIdentifier, listArgs):
-        socket = VectorizedSocket(True, dataType,
-                     baseName, baseIdentifier, baseArgs,
-                     listName, listIdentifier, listArgs)
-        return socket.createBase(node)
-
-    def newOutput(self, node, dataType,
-                  baseName, baseIdentifier, baseArgs,
-                  listName, listIdentifier, listArgs):
-        socket = VectorizedSocket(False, dataType,
-                     baseName, baseIdentifier, baseArgs,
-                     listName, listIdentifier, listArgs)
-        return socket.createBase(node)
-
-    def newConnection(self, socketA, socketB, bothDirections = False):
-        pass
-
-class VectorizedSocket:
-    def __init__(self, isInput, baseDataType,
-                 baseName, baseIdentifier, baseArgs,
-                 listName, listIdentifier, listArgs):
-        self.baseDataType = baseDataType
-        self.listDataType = toListDataType(baseDataType)
-        self.isInput = isInput
-
-        self.baseName = baseName
-        self.baseArgs = baseArgs
-        self.baseIdentifier = baseIdentifier
-
-        self.listName = listName
-        self.listArgs = listArgs
-        self.listIdentifier = listIdentifier
-
-    def createBase(self, node):
-        if self.isInput:
-            return node.newInput(self.baseDataType, self.baseName, self.baseIdentifier, **self.baseArgs)
+    def add(self, propertyName, sockets, dependency = None):
+        if dependency is None:
+            dependencies = set()
+        elif isinstance(dependency, str):
+            dependencies = set([dependency])
         else:
-            return node.newOutput(self.baseDataType, self.baseName, self.baseIdentifier, **self.baseArgs)
+            dependencies = set(dependency)
+        self.properties[propertyName] = (self.toSocketIDs(sockets), dependencies)
 
-    def createList(self, node):
-        if self.isInput:
-            return node.newInput(self.listDataType, self.listName, self.listIdentifier, **self.listArgs)
-        else:
-            return node.newOutput(self.listDataType, self.listName, self.listIdentifier, **self.listArgs)
+    def apply(self, node):
+        propertyStates = {propertyName : "BASE" for propertyName in self.properties.keys()}
+        fixedProperties = set()
+
+        for propertyName, (socketIDs, _) in self.properties.items():
+            for socketID in socketIDs:
+                socket = self.getSocket(node, socketID)
+                linkedDataTypes = tuple(socket.linkedDataTypes - {"Generic"})
+                if len(linkedDataTypes) == 1:
+                    if isList(linkedDataTypes[0]):
+                        propertyStates[propertyName] = "LIST"
+                        fixedProperties.add(propertyName)
+                    elif isBase(linkedDataTypes[0]):
+                        propertyStates[propertyName] = "BASE"
+                        fixedProperties.add(propertyName)
+                    break
+
+        for propertyName, (_, dependencies) in self.properties.items():
+            targetState = propertyStates[propertyName]
+            if targetState == "LIST":
+                baseDependencies = {dependency for dependency in dependencies if propertyStates[dependency] == "BASE"}
+                if len(baseDependencies) > 0:
+                    if any(dependency in fixedProperties for dependency in baseDependencies):
+                        propertyStates[propertyName] = "BASE"
+                    else:
+                        for dependency in baseDependencies:
+                            propertyStates[dependency] = "LIST"
+
+        for propertyName in self.properties.keys():
+            state = propertyStates[propertyName] == "LIST"
+            if state != getattr(node, propertyName):
+                setattr(node, propertyName, state)
