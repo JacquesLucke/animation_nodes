@@ -40,7 +40,7 @@ def resetMeasurements():
 def getMeasurementsDict():
     return measurementsByNodeIdentifier
 
-def getMeasuredMinExecutionTime(node):
+def getMinExecutionTimeString(node):
     measure = measurementsByNodeIdentifier[node.identifier]
     if measure.calls > 0:
         return prettyTime(measure.minTime)

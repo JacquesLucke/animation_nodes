@@ -12,7 +12,7 @@ from .. preferences import getExecutionCodeType
 from .. operators.callbacks import newNodeCallback
 from .. sockets.info import toIdName as toSocketIdName
 from .. utils.blender_ui import iterNodeCornerLocations
-from .. execution.measurements import getMeasuredMinExecutionTime
+from .. execution.measurements import getMinExecutionTimeString
 from .. operators.dynamic_operators import getInvokeFunctionOperator
 from .. utils.nodes import getAnimationNodeTrees, iterAnimationNodes
 from .. tree_info import (getNetworkWithNode, getDirectlyLinkedSockets, getOriginNodes,
@@ -152,7 +152,7 @@ class AnimationNode:
 
     def draw_label(self):
         if nodeLabelMode == "MEASURE" and self.hide:
-            return getMeasuredMinExecutionTime(self)
+            return getMinExecutionTimeString(self)
 
         if self.dynamicLabelType == "NONE":
             return self.bl_label
