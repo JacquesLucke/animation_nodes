@@ -65,7 +65,7 @@ class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
 
     @keepNodeLinks
     def recreateOutputs(self):
-        self.outputs.clear()
+        self.clearOutputs()
         if self.keyName == "":
             return
 

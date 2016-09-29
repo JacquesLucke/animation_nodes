@@ -143,6 +143,7 @@ class AnimationNode:
     def free(self):
         self.clearSocketEffects()
         self.delete()
+        self.clearSockets()
 
     def draw_buttons(self, context, layout):
         if self.inInvalidNetwork: layout.label("Invalid Network", icon = "ERROR")
@@ -275,13 +276,21 @@ class AnimationNode:
         return newSocket
 
     def clearSockets(self):
-        for socket in self.sockets:
+        self.clearInputs()
+        self.clearOutputs()
+
+    def clearInputs(self):
+        for socket in self.inputs:
             socket.free()
         self.inputs.clear()
+
+    def clearOutputs(self):
+        for socket in self.outputs:
+            socket.free()
         self.outputs.clear()
 
     def removeSocket(self, socket):
-        index = socket.getIndex()
+        index = socket.getIndex(self)
         if socket.isOutput:
             if index < self.activeOutputIndex: self.activeOutputIndex -= 1
         else:

@@ -48,7 +48,7 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
 
     @keepNodeState
     def recreateOutputSocket(self):
-        self.outputs.clear()
+        self.clearOutputs()
         self.newOutput(self.outputDataType, "Result", "result")
 
     def draw(self, layout):

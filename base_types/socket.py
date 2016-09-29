@@ -1,9 +1,9 @@
 import bpy
 from bpy.props import *
 from collections import defaultdict
+from .. events import executionCodeChanged
 from .. utils.recursion import noRecursion
 from .. operators.callbacks import newSocketCallback
-from .. events import treeChanged, executionCodeChanged
 from .. utils.names import getRandomString, toVariableName
 from .. operators.dynamic_operators import getInvokeFunctionOperator
 from .. nodes.system.subprogram_sockets import subprogramInterfaceChanged
@@ -150,7 +150,7 @@ class AnimationNodeSocket:
         return self.name
 
     def draw_color(self, context, node):
-        return colorOverwritePerSocket.get(hash(self), self.drawColor)
+        return colorOverwritePerSocket.get(self.getTemporaryIdentifier(), self.drawColor)
 
     def copyDisplaySettingsFrom(self, other):
         self.display.text = other.display.text
@@ -191,21 +191,24 @@ class AnimationNodeSocket:
     ##########################################################
 
     def free(self):
-        try: del alternativeIdentifiersPerSocket[hash(self)]
+        try: del alternativeIdentifiersPerSocket[self.getTemporaryIdentifier()]
         except: pass
-        try: del colorOverwritePerSocket[hash(self)]
+        try: del colorOverwritePerSocket[self.getTemporaryIdentifier()]
         except: pass
 
     @property
     def alternativeIdentifiers(self):
-        return alternativeIdentifiersPerSocket[hash(self)]
+        return alternativeIdentifiersPerSocket[self.getTemporaryIdentifier()]
 
     @alternativeIdentifiers.setter
     def alternativeIdentifiers(self, value):
-        alternativeIdentifiersPerSocket[hash(self)] = value
+        alternativeIdentifiersPerSocket[self.getTemporaryIdentifier()] = value
 
     def setTemporarySocketTransparency(self, transparency):
-        colorOverwritePerSocket[hash(self)] = list(self.drawColor[:3]) + [transparency]
+        colorOverwritePerSocket[self.getTemporaryIdentifier()] = list(self.drawColor[:3]) + [transparency]
+
+    def getTemporaryIdentifier(self):
+        return str(hash(self)) + self.identifier
 
 
     # Move Utilities
