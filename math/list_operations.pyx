@@ -1,6 +1,7 @@
 from . conversion cimport toMatrix4
 from . cimport (transformVec3AsPoint_InPlace, transformVec3AsDirection_InPlace,
-                distanceVec3, mixVec3, multMatrix4, setIdentityMatrix)
+                distanceVec3, mixVec3, multMatrix4, setIdentityMatrix,
+                setComposedMatrix)
 
 
 cpdef void transformVector3DList(Vector3DList vectors, matrix, bint ignoreTranslation = False):
@@ -15,6 +16,18 @@ cdef void transformVector3DListAsPoints(Vector3* vectors, long arrayLength, Matr
     else:
         for i in range(arrayLength):
             transformVec3AsPoint_InPlace(vectors + i, matrix)
+
+
+cpdef Matrix4x4List composeMatrixList(Vector3DList locations, EulerList rotations, Vector3DList scales):
+    if not (len(locations) == len(rotations) == len(scales)):
+        raise ValueError("lists have different lengths")
+    cdef:
+        Matrix4x4List newList = Matrix4x4List(length = len(locations))
+        size_t i
+
+    for i in range(len(locations)):
+        setComposedMatrix(newList.data + i, locations.data + i, rotations.data + i, scales.data + i)
+    return newList
 
 
 cpdef double distanceSumOfVector3DList(Vector3DList vectors):

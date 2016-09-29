@@ -1,7 +1,6 @@
 import bpy
 from bpy.props import *
-from ... tree_info import keepNodeLinks
-from ... events import executionCodeChanged
+from ... math import composeMatrixList
 from ... base_types import AnimationNode, AutoSelectVectorization
 
 keyDataTypeItems = [
@@ -80,7 +79,7 @@ class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
     def getExecutionCode(self):
         if self.keyName == "":
             return
-        
+
         keyName = repr(self.keyName)
         yield "_key = animation_nodes.id_keys.IDKeyTypes[{}]".format(repr(self.keyDataType))
         if self.useList:
@@ -121,6 +120,8 @@ class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
                 yield "rotations = _key.getRotations(objects, %s)" % keyName
             if isLinked["scales"] or useMatrices:
                 yield "scales = _key.getScales(objects, %s)" % keyName
+            if useMatrices:
+                yield "matrices = animation_nodes.math.composeMatrixList(locations, rotations, scales)"
 
     def getList_Exists(self, objects):
         from animation_nodes.id_keys import doesIDKeyExist

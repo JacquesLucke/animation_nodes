@@ -1,6 +1,6 @@
 from . vector cimport Vector3
 from . matrix cimport Matrix4
-from .. data_structures.lists.base_lists cimport Vector3DList, Matrix4x4List
+from .. data_structures.lists.base_lists cimport Vector3DList, EulerList, Matrix4x4List
 
 cpdef void transformVector3DList(Vector3DList vectors, matrix, bint ignoreTranslation = ?)
 cpdef double distanceSumOfVector3DList(Vector3DList vectors)

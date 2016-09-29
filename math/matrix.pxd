@@ -40,6 +40,8 @@ cdef void mult3xMatrix_Reversed(Matrix3_or_Matrix4* target,
             Matrix3_or_Matrix4* m2,
             Matrix3_or_Matrix4* m3)
 
+cdef void setComposedMatrix(Matrix4* m, Vector3* t, Euler3* e, Vector3* s)
+
 cdef void convertMatrix3ToMatrix4(Matrix4* t, Matrix3* s)
 cdef void convertMatrix4ToMatrix3(Matrix3* t, Matrix4* s)
 

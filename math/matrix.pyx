@@ -146,6 +146,11 @@ cdef void setRotationZMatrix(Matrix3_or_Matrix4* m, float angle):
         m.a41 = m.a42 = m.a43 = 0
         m.a44 = 1
 
+cdef void setComposedMatrix(Matrix4* m, Vector3* t, Euler3* e, Vector3* s):
+    setRotationScaleMatrix(m, e, s)
+    m.a14, m.a24, m.a34 = t.x, t.y, t.z
+
+
 cdef void multMatrix4(Matrix4* target, Matrix4* x, Matrix4* y):
     target.a11 = x.a11 * y.a11  +  x.a12 * y.a21  +  x.a13 * y.a31  +  x.a14 * y.a41
     target.a12 = x.a11 * y.a12  +  x.a12 * y.a22  +  x.a13 * y.a32  +  x.a14 * y.a42
