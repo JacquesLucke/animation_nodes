@@ -1,0 +1,11 @@
+def allTrue(self):
+    cdef size_t i
+    for i in range(self.length):
+        if self.data[i] == 0: return False
+    return True
+
+def allFalse(self):
+    cdef size_t i
+    for i in range(self.length):
+        if self.data[i] != 0: return False
+    return True

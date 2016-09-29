@@ -9,6 +9,7 @@ implementationSourcePath = changeFileName(__file__, "__list_implementation.src")
 numericListFunctionsPath = changeFileName(__file__, "__numeric_list_functions.src")
 indicesListFunctionsPath = changeFileName(__file__, "__indices_list_functions.src")
 vectorListFunctionsPath = changeFileName(__file__, "__vector_list_functions.src")
+booleanListFunctionsPath = changeFileName(__file__, "__boolean_list_functions.src")
 
 numericLists = [
     ("FloatList", "float"),
@@ -32,6 +33,15 @@ for listName, dataType in numericLists:
                       TO_PYOBJECT_CODE = "return value[0]",
                       MORE_METHODS = moreMethodsCode,
                       DECLARATIONS = []))
+
+lists.append(dict(LISTNAME = "BooleanList",
+                  TYPE = "char",
+                  MEMVIEW = "char",
+                  EQUALS = r"(\1 == 0) == (\2 == 0)",
+                  TRY_CONVERSION_CODE = "target[0] = value",
+                  TO_PYOBJECT_CODE = "return bool(value[0])",
+                  MORE_METHODS = readFile(booleanListFunctionsPath),
+                  DECLARATIONS = []))
 
 lists.append(dict(LISTNAME = "Vector3DList",
                   TYPE = "Vector3",

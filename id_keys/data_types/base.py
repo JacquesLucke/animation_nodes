@@ -1,3 +1,5 @@
+from ... data_structures import BooleanList
+
 class IDKeyDataType:
 
     @classmethod
@@ -14,7 +16,7 @@ class IDKeyDataType:
 
     @classmethod
     def existsList(cls, objects, name):
-        return [cls.exists(object, name) for object in objects]
+        return BooleanList.fromValues(cls.exists(object, name) for object in objects)
 
 
     @classmethod

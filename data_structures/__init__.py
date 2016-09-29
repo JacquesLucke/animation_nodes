@@ -3,7 +3,7 @@ def importDataStructures():
     from . meshes.mesh_data import MeshData
     from . lists.polygon_indices_list import PolygonIndicesList
     from . lists.base_lists import (
-        Vector3DList, Matrix4x4List, EdgeIndicesList, EulerList,
+        Vector3DList, Matrix4x4List, EdgeIndicesList, EulerList, BooleanList,
         FloatList, DoubleList, LongLongList, IntegerList, UShortList, CharList)
     from . splines.poly_spline import PolySpline
     from . splines.bezier_spline import BezierSpline
