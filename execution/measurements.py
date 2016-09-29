@@ -40,8 +40,12 @@ def resetMeasurements():
 def getMeasurementsDict():
     return measurementsByNodeIdentifier
 
-def getMinExecutionTime(node):
-    return measurementsByNodeIdentifier[node.identifier].minTime
+def getMeasuredMinExecutionTime(node):
+    measure = measurementsByNodeIdentifier[node.identifier]
+    if measure.calls > 0:
+        return prettyTime(measure.minTime)
+    else:
+        return "Not Measured"
 
 @drawHandler("SpaceNodeEditor", "WINDOW")
 def drawMeasurementResults():
