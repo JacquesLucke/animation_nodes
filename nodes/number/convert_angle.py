@@ -1,7 +1,6 @@
 import bpy
 from bpy.props import *
 from ... base_types import AnimationNode
-from ... events import executionCodeChanged
 
 conversionTypeItems = [
     ("DEGREE_TO_RADIAN", "Degree to Radian", "", "NONE", 0),
