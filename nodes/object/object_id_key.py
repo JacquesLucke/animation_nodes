@@ -15,9 +15,15 @@ class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
     bl_label = "Object ID Key"
     bl_width_default = 160
 
-    keyDataType = EnumProperty(name = "Key Data Type",
+    searchTags = [("Object Initial Transforms",
+                   {"keyDataType" : repr("Transforms"),
+                    "keyName" : repr("Initial Transforms")})]
+
+    keyDataType = EnumProperty(name = "Key Data Type", default = "Transforms",
         items = keyDataTypeItems, update = AnimationNode.updateSockets)
-    keyName = StringProperty(name = "Key Name", update = AnimationNode.updateSockets)
+
+    keyName = StringProperty(name = "Key Name", default = "",
+        update = AnimationNode.updateSockets)
 
     useList = BoolProperty(default = False, update = AnimationNode.updateSockets)
 
