@@ -95,7 +95,7 @@ if "test_compile" not in globals():
     message = ("\n\n"
         "You are using an uncompiled version of Animation Nodes.\n"
         "Please download an official release or compile the addon yourself.\n"
-        "More information about compilation can be found in the compile.py file.")
+        "More information about compilation can be found in the setup.py file.")
     raise Exception(message)
 
 
