@@ -206,13 +206,15 @@ def keepSocketValues(function):
     return wrapper
 
 def getSocketValues(node):
-    inputs = [getSocketData(socket) for socket in node.inputs]
-    outputs = [getSocketData(socket) for socket in node.outputs]
+    inputs = [data for socket in node.inputs for data in getSocketData(socket)]
+    outputs = [data for socket in node.outputs for data in getSocketData(socket)]
     return inputs, outputs
 
 def getSocketData(socket):
     s = socket
-    return (s.identifier, s.dataType, s.getProperty(), s.hide, s.isUsed, s.dataIsModified)
+    yield (s.identifier, s.dataType, s.getProperty(), s.hide, s.isUsed, s.dataIsModified)
+    for identifier in socket.alternativeIdentifiers:
+        yield (identifier, s.dataType, s.getProperty(), s.hide, s.isUsed, s.dataIsModified)
 
 def setSocketValues(node, inputs, outputs):
     inputsByIdentifier = node.inputsByIdentifier

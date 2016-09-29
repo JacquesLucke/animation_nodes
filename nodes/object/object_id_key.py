@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... tree_info import keepNodeLinks
 from ... events import executionCodeChanged
-from ... base_types import AnimationNode
+from ... base_types import AnimationNode, AutoSelectVectorization
 
 keyDataTypeItems = [
     ("Transforms", "Transforms", "", "NONE", 0),
@@ -16,16 +16,51 @@ class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
     bl_label = "Object ID Key"
     bl_width_default = 160
 
-    def keyChanged(self, context):
-        self.recreateOutputs()
-
     keyDataType = EnumProperty(name = "Key Data Type",
-        items = keyDataTypeItems, update = keyChanged)
-    keyName = StringProperty(name = "Key Name", update = keyChanged)
+        items = keyDataTypeItems, update = AnimationNode.updateSockets)
+    keyName = StringProperty(name = "Key Name", update = AnimationNode.updateSockets)
+
+    useList = BoolProperty(default = False, update = AnimationNode.updateSockets)
 
     def create(self):
-        self.newInput("Object", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
-        self.recreateOutputs()
+        self.newInputGroup(self.useList,
+            ("Object", "Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
+            ("Object List", "Objects", "objects"))
+
+        if self.keyName != "":
+            if self.keyDataType == "Transforms":
+                self.newOutputGroup(self.useList,
+                    ("Vector", "Location", "location"),
+                    ("Vector List", "Locations", "locations"))
+                self.newOutputGroup(self.useList,
+                    ("Euler", "Rotation", "rotation"),
+                    ("Euler List", "Rotations", "rotations"))
+                self.newOutputGroup(self.useList,
+                    ("Vector", "Scale", "scale"),
+                    ("Vector List", "Scales", "scales"))
+                self.newOutputGroup(self.useList,
+                    ("Matrix", "Matrix", "matrix"),
+                    ("Matrix List", "Matrices", "matrices"))
+            elif self.keyDataType == "Text":
+                self.newOutputGroup(self.useList,
+                    ("Text", "Text", "text"),
+                    ("Text List", "Texts", "texts"))
+            elif self.keyDataType == "Integer":
+                self.newOutputGroup(self.useList,
+                    ("Integer", "Number", "number"),
+                    ("Integer List", "Numbers", "numbers"))
+            elif self.keyDataType == "Float":
+                self.newOutputGroup(self.useList,
+                    ("Float", "Number", "number"),
+                    ("Float List", "Numbers", "numbers"))
+
+            self.newOutputGroup(self.useList,
+                ("Boolean", "Exists", "exists", dict(hide = True)),
+                ("Boolean List", "Exists", "exists", dict(hide = True)))
+
+        vectorization = AutoSelectVectorization()
+        vectorization.add(self, "useList", list(self.inputs) + list(self.outputs))
+        self.newSocketEffect(vectorization)
 
     def drawAdvanced(self, layout):
         col = layout.column()
@@ -43,6 +78,7 @@ class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
         self.keyName = name
 
     def getExecutionCode(self):
+        return
         if self.keyName == "":
             return
 
@@ -62,24 +98,3 @@ class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
 
         if dataType in ("Integer", "Float"):
             yield "number = data"
-
-    @keepNodeLinks
-    def recreateOutputs(self):
-        self.clearOutputs()
-        if self.keyName == "":
-            return
-
-        dataType = self.keyDataType
-        self.newOutput("Boolean", "Exists", "exists")
-
-        if dataType == "Transforms":
-            self.newOutput("Vector", "Location", "location")
-            self.newOutput("Euler", "Rotation", "rotation")
-            self.newOutput("Vector", "Scale", "scale")
-            self.newOutput("Matrix", "Matrix", "matrix")
-
-        if dataType == "Text":
-            self.newOutput("Text", "Text", "text")
-
-        if dataType in ("Integer", "Float"):
-            self.newOutput("Integer", "Number", "number")
