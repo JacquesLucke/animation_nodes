@@ -39,7 +39,7 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
     isInputComparable = BoolProperty(default = False)
 
     showCacheOptions = BoolProperty(name = "Show Cache Options", default = False,
-    description = "Draw cache options in the node for easier access")
+        description = "Draw cache options in the node for easier access")
 
     @property
     def inputVariables(self):
@@ -112,14 +112,16 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
         props = row.operator("an.empty_subprogram_template", icon = "NEW", text = "New Subprogram" if len(networks) == 0 else "")
         props.targetNodeIdentifier = self.identifier
 
-        if self.showCacheOptions:
+        if self.showCacheOptions or self.cacheType != "DISABLED":
             self.drawCacheOptions(layout)
 
         layout.separator()
 
     def drawAdvanced(self, layout):
         self.drawCacheOptions(layout)
-        layout.prop(self, "showCacheOptions")
+        col = layout.column()
+        col.active = self.cacheType == "DISABLED"
+        col.prop(self, "showCacheOptions")
 
     def drawCacheOptions(self, layout):
         col = layout.column()
