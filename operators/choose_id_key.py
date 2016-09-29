@@ -11,7 +11,7 @@ class IDKeySearch(bpy.types.Operator):
 
     def getSearchItems(self, context):
         itemDict = []
-        for dataType, name in findIDKeysInCurrentFile():
+        for dataType, name in getAllIDKeys():
             itemDict.append({"value" : dataType + " * " + name, "name" : name})
         return enumItemsFromDicts(itemDict)
 

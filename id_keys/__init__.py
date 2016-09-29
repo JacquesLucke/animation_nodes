@@ -12,3 +12,4 @@ Data_Type, Subproperty_Name and Property_Name must not be empty nor contain '*'.
 '''
 
 from . existing_keys import getAllIDKeys
+from . data_types import dataTypeByIdentifier as IDKeyTypes

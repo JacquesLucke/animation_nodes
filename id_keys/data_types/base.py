@@ -12,6 +12,10 @@ class IDKeyDataType:
     def exists(cls, object, name):
         raise NotImplementedError()
 
+    @classmethod
+    def existsList(cls, objects, name):
+        return [cls.exists(object, name) for object in objects]
+
 
     @classmethod
     def set(cls, object, name, data):
