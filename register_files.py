@@ -14,23 +14,23 @@ from . base_types import socket as socket_base
 from . ui.node_menu import registerMenu, unregisterMenu
 
 def registerFiles():
-    id_keys.register()
     node_base.register()
+    node_panel.register()
     sound_bake.register()
     socket_base.register()
     node_colors.register()
     utils.operators.register()
     extend_bpy_types.register()
     dynamic_operators.register()
-    node_panel.register()
     utils.handlers.registerHandlers()
+    id_keys.object_extension.register()
 
     registerMenu()
     keymap.register()
 
 def unregisterFiles():
-    id_keys.unregister()
     node_base.unregister()
+    node_panel.unregister()
     sound_bake.unregister()
     socket_base.unregister()
     node_colors.unregister()
@@ -38,8 +38,8 @@ def unregisterFiles():
     utils.operators.unregister()
     extend_bpy_types.unregister()
     dynamic_operators.unregister()
-    node_panel.unregister()
     utils.handlers.unregisterHandlers()
+    id_keys.object_extension.unregister()
 
     unregisterMenu()
     keymap.unregister()

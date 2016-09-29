@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import *
-from .. id_keys import findIDKeysInCurrentFile
+from .. id_keys import getAllIDKeys
 from .. utils.enum_items import enumItemsFromDicts
 
 class IDKeySearch(bpy.types.Operator):
@@ -19,6 +19,7 @@ class IDKeySearch(bpy.types.Operator):
     callback = StringProperty()
 
     def invoke(self, context, event):
+        bpy.ops.an.update_id_keys_list()
         context.window_manager.invoke_search_popup(self)
         return {"CANCELLED"}
 

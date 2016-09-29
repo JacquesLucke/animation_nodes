@@ -24,15 +24,16 @@ class IDKeyPanel(bpy.types.Panel):
 
     def drawIdKey(self, layout, object, key):
         box = layout.box()
-        self.drawIDKeyHeader(box, object, key)
-        object.id_keys.drawProperty(box, *key)
+        exists = object.id_keys.exists(*key)
+        self.drawIDKeyHeader(box, object, key, exists)
+        if exists: object.id_keys.drawProperty(box, *key)
         object.id_keys.drawExtras(box, *key)
 
-    def drawIDKeyHeader(self, layout, object, key):
+    def drawIDKeyHeader(self, layout, object, key, exists):
         left, right = splitAlignment(layout)
         left.label(key.name)
 
-        if object.id_keys.exists(*key):
+        if exists:
             props = right.operator("an.remove_id_key_on_selected_objects", text = "Remove", icon = "X", emboss = False)
         else:
             props = right.operator("an.create_id_key_on_selected_objects", text = "Create", icon = "NEW", emboss = False)

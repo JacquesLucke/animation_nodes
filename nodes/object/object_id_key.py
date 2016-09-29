@@ -78,15 +78,23 @@ class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
         self.keyName = name
 
     def getExecutionCode(self):
-        return
         if self.keyName == "":
             return
 
-        yield "exists = animation_nodes.id_keys.doesIDKeyExist(object, {}, {})".format(repr(self.keyDataType), repr(self.keyName))
-        yield "data = animation_nodes.id_keys.getIDKeyData(object, {}, {})".format(repr(self.keyDataType), repr(self.keyName))
+        if self.useList:
+            yield from self.getExecutionCode_List()
+        else:
+            yield from self.getExecutionCode_Base()
 
+    def getExecutionCode_Base(self):
         dataType = self.keyDataType
         isLinked = self.getLinkedOutputsDict()
+
+        if isLinked["exists"]:
+            yield ("exists = animation_nodes.id_keys.doesIDKeyExist(object, {}, {})"
+                   .format(repr(self.keyDataType), repr(self.keyName)))
+
+        yield "data = animation_nodes.id_keys.getIDKeyData(object, {}, {})".format(repr(self.keyDataType), repr(self.keyName))
 
         if dataType == "Transforms":
             yield "location, rotation, scale = data"
@@ -98,3 +106,13 @@ class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
 
         if dataType in ("Integer", "Float"):
             yield "number = data"
+
+    def getExecutionCode_List(self):
+        dataType = self.keyDataType
+        isLinked = self.getLinkedOutputsDict()
+
+        if isLinked["exists"]: yield "exists = self.getList_Exists(objects)"
+
+    def getList_Exists(self, objects):
+        from animation_nodes.id_keys import doesIDKeyExist
+        return [doesIDKeyExist(object, self.keyDataType, self.keyName) for object in objects]
