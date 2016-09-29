@@ -122,6 +122,12 @@ class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
                 yield "scales = _key.getScales(objects, %s)" % keyName
             if useMatrices:
                 yield "matrices = animation_nodes.math.composeMatrixList(locations, rotations, scales)"
+        elif dataType == "Text":
+            if isLinked["texts"]:
+                yield "texts = _key.getList(objects, %s)" % keyName
+        elif dataType in ("Integer", "Float"):
+            if isLinked["numbers"]:
+                yield "numbers = _key.getList(objects, %s)" % keyName
 
     def getList_Exists(self, objects):
         from animation_nodes.id_keys import doesIDKeyExist
