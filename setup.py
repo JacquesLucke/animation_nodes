@@ -21,7 +21,6 @@ Compiling the cython code needs some setup (only tested on windows yet):
 
 Command Line Arguments:
     python setup.py
-     -c              # remove generated .c files
      -all            # recompile all
 
 Generate .html files to debug cython code:
@@ -115,8 +114,6 @@ def compileCythonFiles():
     copyCompiledFilesToCorrectFolders()
     print("Compilation Successful.")
 
-    if "-c" in initialArgs:
-        removeCFiles()
     if True: # <- may become important later, not sure
         removeBuildDirectory()
 

@@ -9,6 +9,7 @@
 *.so
 .log
 animation_nodes/
+build/
 data_structures/lists/base_lists.pxd
 data_structures/lists/base_lists.pyx
 algorithms/lists/convert.pyx
