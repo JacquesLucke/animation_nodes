@@ -8,12 +8,9 @@
 *.html
 *.so
 .log
-animation_nodes/
 build/
-data_structures/lists/base_lists.pxd
-data_structures/lists/base_lists.pyx
-algorithms/lists/convert.pyx
-algorithms/lists/create.pyx
-algorithms/lists/convert.pxd
-data_structures/lists/convert.pxd
-data_structures/lists/convert.pyx
+animation_nodes.zip
+animation_nodes/data_structures/lists/base_lists.pxd
+animation_nodes/data_structures/lists/base_lists.pyx
+animation_nodes/data_structures/lists/convert.pxd
+animation_nodes/data_structures/lists/convert.pyx

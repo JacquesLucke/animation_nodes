@@ -1,24 +1,4 @@
 '''
-Compiling the cython code needs some setup (only tested on windows yet):
-
-    1. Install Anaconda: https://www.continuum.io/downloads (Python 3.5)
-       If you have another python version already installed make sure that
-       the command line uses the right version. You can check this by executing
-       this command: 'python -V'
-       The result should be something like: 'Python 3.5.1 :: Anaconda 2.5.0 (64-bit)'
-
-    2. Install cython with this command: 'conda install cython'
-
-    3. Navigate to the 'animation_nodes' folder in the command line and
-       execute 'python setup.py'. If you are lucky this works immediatly..
-       It didn't work for me directly. Oftentimes there is an error message like this:
-       'unable to find vcvarsall.bat'.
-       To fix this you need install Visual Studio 2015 Community, especially
-       the 'Common Tools for Visual C++ 2015' as you can see here:
-       http://stackoverflow.com/a/35243904/4755171
-       This can take a while, but in the end you should be able to run this file..
-       Please report any issue you have.
-
 Command Line Arguments:
     python setup.py
      -all            # recompile all
@@ -31,6 +11,10 @@ Cleanup Repository:
     git clean -fdx       # make sure you don't have uncommited files!
 '''
 
+# The compiled build will be copied to this addon folder.
+# Please change it to use this feature.
+addonsDirectory = "C:\\Users\\Jacques Lucke\\AppData\\Roaming\\Blender Foundation\\Blender\\2.78\\scripts\\addons"
+
 import sys
 
 v = sys.version_info
@@ -41,17 +25,10 @@ if v.major < 3 or v.minor < 5:
 
 import os
 import shutil
-import traceback
-from itertools import chain
-from contextlib import redirect_stdout
-from os.path import abspath, dirname, basename, join, relpath
+from os.path import abspath, dirname, join, relpath
 
 currentDirectory = dirname(abspath(__file__))
-
-# should be 'animation_nodes', otherwise fail later
-currentDirectoryName = basename(currentDirectory)
-
-exportTarget = join(dirname(currentDirectory), "animation_nodes (exported)")
+sourceDirectory = join(currentDirectory, "animation_nodes")
 
 initialArgs = sys.argv[:]
 
@@ -64,12 +41,15 @@ def main():
         compileCythonFiles()
         if "-export" in initialArgs:
             export()
+        if os.path.isdir(addonsDirectory):
+            copyToBlender()
+        else:
+            print("The path to Blenders addon directory does not exist")
 
 def canCompileCython():
     if "bpy" in sys.modules:
         return False
-    if currentDirectoryName != "animation_nodes":
-        print("Folder name has to be 'animation_nodes'")
+    if not os.path.isdir(sourceDirectory):
         return False
     correctSysPath()
     try:
@@ -116,34 +96,11 @@ def compileCythonFiles():
     sys.argv = [sys.argv[0], "build_ext", "--inplace"]
 
     extensions = cythonize(getPathsToCythonFiles())
-    setup(name = 'AN Cython', ext_modules = extensions)
-    copyCompiledFilesToCorrectFolders()
+    setup(name = 'Animation Nodes', ext_modules = extensions)
     print("Compilation Successful.")
-
-    if True: # <- may become important later, not sure
-        removeBuildDirectory()
 
 def getPathsToCythonFiles():
     return list(iterPathsWithSuffix(".pyx"))
-
-def copyCompiledFilesToCorrectFolders():
-    directory = join(currentDirectory, "animation_nodes")
-    try:
-        for root, dirs, files in os.walk(directory):
-            for fileName in files:
-                sourcePath = join(root, fileName)
-                targetPath = join(currentDirectory, relpath(sourcePath, directory))
-                shutil.copyfile(sourcePath, targetPath)
-    except:
-        traceback.print_exc()
-        print("\n\nError might be caused by a running Blender instance.")
-        sys.exit(0)
-
-def removeBuildDirectory():
-    buildDirectory = join(currentDirectory, "build")
-    if os.path.exists(buildDirectory):
-        shutil.rmtree(buildDirectory)
-    print("Removed not needed build directory.")
 
 def removeCFiles():
     for path in iterPathsWithSuffix(".c"):
@@ -152,59 +109,144 @@ def removeCFiles():
 
 
 
-# Export
+# Copy to Blenders addons directory
+###################################################################
+
+def copyToBlender():
+    print("\n\nCopy changes to addon folder")
+    targetPath = join(addonsDirectory, "animation_nodes")
+    copyAddonFiles(sourceDirectory, targetPath, verbose = True)
+    print("\nCopied all changes")
+
+
+
+# Export Build
 ###################################################################
 
 def export():
-    print("Start Export")
-    targetPath = currentDirectory + ".zip"
-    removeTemporaryAddonCopy()
-    copyAddon()
-    zipAddonDirectory(exportTarget, targetPath)
-    removeTemporaryAddonCopy()
+    print("\nStart Export")
+
+    targetPath = join(currentDirectory, "animation_nodes.zip")
+    zipAddonDirectory(sourceDirectory, targetPath)
+
     print("Finished Export")
     print("Zipped file can be found here:")
     print("  " + targetPath)
 
-def copyAddon():
-    shutil.copytree(currentDirectory, exportTarget, ignore = ignoredFiles)
 
-def ignoredFiles(directory, content):
-    ignoredNames = set(name for name in content if name.endswith(".c"))
-    ignoredNames.update({".git", "__pycache__", "animation_nodes"})
-    return list(ignoredNames)
 
-def removeTemporaryAddonCopy():
-    try: shutil.rmtree(exportTarget, onerror = tryGetPermission)
+# Copy Addon Utilities
+###################################################################
+
+def copyAddonFiles(source, target, verbose = False):
+    if not os.path.isdir(target):
+        os.mkdir(target)
+
+    existingFilesInSource = set(iterRelativeAddonFiles(source))
+    existingFilesInTarget = set(iterRelativeAddonFiles(target))
+
+    counter = 0
+
+    filesToRemove = existingFilesInTarget - existingFilesInSource
+    for relativePath in filesToRemove:
+        path = join(target, relativePath)
+        removeFile(path)
+        if verbose: print("Removed File: ", path)
+        counter += 1
+
+    filesToCreate = existingFilesInSource - existingFilesInTarget
+    for relativePath in filesToCreate:
+        sourcePath = join(source, relativePath)
+        targetPath = join(target, relativePath)
+        copyFile(sourcePath, targetPath)
+        if verbose: print("Created File: ", targetPath)
+        counter += 1
+
+    filesToUpdate = existingFilesInSource.intersection(existingFilesInTarget)
+    for relativePath in filesToUpdate:
+        sourcePath = join(source, relativePath)
+        targetPath = join(target, relativePath)
+        sourceModificationTime = os.stat(sourcePath).st_mtime
+        targetModificationTime = os.stat(targetPath).st_mtime
+        if sourceModificationTime > targetModificationTime:
+            overwriteFile(sourcePath, targetPath)
+            if verbose: print("Updated File: ", targetPath)
+            counter += 1
+
+    print("Changed {} files.".format(counter))
+
+def removeFile(path):
+    try:
+        os.remove(path)
+    except:
+        if tryGetFileAccessPermission(path):
+            os.remove(path)
+
+def copyFile(source, target):
+    directory = dirname(target)
+    if not os.path.isdir(directory):
+        os.makedirs(directory)
+    shutil.copyfile(source, target)
+
+def overwriteFile(source, target):
+    removeFile(target)
+    copyFile(source, target)
+
+
+def iterRelativeAddonFiles(directory):
+    if not os.path.isdir(directory):
+        return
+
+    for root, folders, files in os.walk(directory, topdown = True):
+        for folder in folders:
+            if ignoreAddonDirectory(folder):
+                folders.remove(folder)
+
+        for fileName in files:
+            if not ignoreAddonFile(fileName):
+                yield relpath(join(root, fileName), directory)
+
+
+def ignoreAddonFile(name):
+    return name.endswith(".c")
+
+def ignoreAddonDirectory(name):
+    return name in {".git", "__pycache__"}
+
+def tryRemoveDirectory(path):
+    try: shutil.rmtree(path, onerror = handlePermissionError)
     except FileNotFoundError: pass
 
-def tryGetPermission(function, path, excinfo):
-    import stat
-    if not os.access(path, os.W_OK):
-        # Is the error an access error ?
-        os.chmod(path, stat.S_IWUSR)
+def handlePermissionError(function, path, excinfo):
+    if tryGetFileAccessPermission(path):
         function(path)
     else:
         raise
 
+def tryGetFileAccessPermission(path):
+    import stat
+    if not os.access(path, os.W_OK):
+        os.chmod(path, stat.S_IWUSR)
+        return True
+    return False
+
 def zipAddonDirectory(sourcePath, targetPath):
     try: os.remove(targetPath)
     except FileNotFoundError: pass
-    
+
     import zipfile
-    content = os.walk(sourcePath)
     with zipfile.ZipFile(targetPath, "w", zipfile.ZIP_DEFLATED) as zipFile:
-        for root, folders, files in content:
-            for data in folders + files:
-                absolutePath = os.path.join(root, data)
-                relativePath = join("animation_nodes", relpath(absolutePath, sourcePath))
-                zipFile.write(absolutePath, relativePath)
+        for relativePath in iterRelativeAddonFiles(sourcePath):
+            absolutePath = join(sourcePath, relativePath)
+            zipFile.write(absolutePath, relativePath)
+
+
 
 # Utils
 ###################################################################
 
 def iterPathsWithSuffix(suffix):
-    for root, dirs, files in os.walk("."):
+    for root, dirs, files in os.walk(sourceDirectory):
         for fileName in files:
             if fileName.endswith(suffix):
                 yield join(root, fileName)
