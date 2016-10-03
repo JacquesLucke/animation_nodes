@@ -22,12 +22,13 @@ Compiling the cython code needs some setup (only tested on windows yet):
 Command Line Arguments:
     python setup.py
      -all            # recompile all
+     -export         # make redistributable version
 
 Generate .html files to debug cython code:
     cython -a filename.pyx
 
 Cleanup Repository:
-    git clean -fdx
+    git clean -fdx       # make sure you don't have uncommited files!
 '''
 
 import sys
@@ -43,12 +44,14 @@ import shutil
 import traceback
 from itertools import chain
 from contextlib import redirect_stdout
-from os.path import abspath, dirname, basename, join
+from os.path import abspath, dirname, basename, join, relpath
 
 currentDirectory = dirname(abspath(__file__))
 
 # should be 'animation_nodes', otherwise fail later
 currentDirectoryName = basename(currentDirectory)
+
+exportTarget = join(dirname(currentDirectory), "animation_nodes (exported)")
 
 initialArgs = sys.argv[:]
 
@@ -56,8 +59,11 @@ initialArgs = sys.argv[:]
 def main():
     if canCompileCython():
         preprocessor()
-        if "-all" in initialArgs: removeCFiles()
+        if "-all" in initialArgs:
+            removeCFiles()
         compileCythonFiles()
+        if "-export" in initialArgs:
+            export()
 
 def canCompileCython():
     if "bpy" in sys.modules:
@@ -121,7 +127,6 @@ def getPathsToCythonFiles():
     return list(iterPathsWithSuffix(".pyx"))
 
 def copyCompiledFilesToCorrectFolders():
-    from os.path import relpath
     directory = join(currentDirectory, "animation_nodes")
     try:
         for root, dirs, files in os.walk(directory):
@@ -146,6 +151,54 @@ def removeCFiles():
     print("Remove generated .c files.")
 
 
+
+# Export
+###################################################################
+
+def export():
+    print("Start Export")
+    targetPath = currentDirectory + ".zip"
+    removeTemporaryAddonCopy()
+    copyAddon()
+    zipAddonDirectory(exportTarget, targetPath)
+    removeTemporaryAddonCopy()
+    print("Finished Export")
+    print("Zipped file can be found here:")
+    print("  " + targetPath)
+
+def copyAddon():
+    shutil.copytree(currentDirectory, exportTarget, ignore = ignoredFiles)
+
+def ignoredFiles(directory, content):
+    ignoredNames = set(name for name in content if name.endswith(".c"))
+    ignoredNames.update({".git", "__pycache__", "animation_nodes"})
+    return list(ignoredNames)
+
+def removeTemporaryAddonCopy():
+    try: shutil.rmtree(exportTarget, onerror = tryGetPermission)
+    except FileNotFoundError: pass
+
+def tryGetPermission(function, path, excinfo):
+    import stat
+    if not os.access(path, os.W_OK):
+        # Is the error an access error ?
+        os.chmod(path, stat.S_IWUSR)
+        function(path)
+    else:
+        raise
+
+def zipAddonDirectory(sourcePath, targetPath):
+    try: os.remove(targetPath)
+    except FileNotFoundError: pass
+    
+    import zipfile
+    content = os.walk(sourcePath)
+    with zipfile.ZipFile(targetPath, "w", zipfile.ZIP_DEFLATED) as zipFile:
+        for root, folders, files in content:
+            for data in folders + files:
+                absolutePath = os.path.join(root, data)
+                relativePath = join("animation_nodes", relpath(absolutePath, sourcePath))
+                zipFile.write(absolutePath, relativePath)
 
 # Utils
 ###################################################################
