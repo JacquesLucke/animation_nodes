@@ -25,6 +25,7 @@ if v.major < 3 or v.minor < 5:
 
 import os
 import shutil
+import traceback
 from os.path import abspath, dirname, join, relpath
 
 currentDirectory = dirname(abspath(__file__))
@@ -115,7 +116,12 @@ def removeCFiles():
 def copyToBlender():
     print("\n\nCopy changes to addon folder")
     targetPath = join(addonsDirectory, "animation_nodes")
-    copyAddonFiles(sourceDirectory, targetPath, verbose = True)
+    try:
+        copyAddonFiles(sourceDirectory, targetPath, verbose = True)
+    except PermissionError:
+        traceback.print_exc()
+        print("\n\nMaybe this error happens because Blender is running.")
+        sys.exit()
     print("\nCopied all changes")
 
 
