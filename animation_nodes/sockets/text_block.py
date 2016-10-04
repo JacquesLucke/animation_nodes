@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from .. events import propertyChanged
-from .. base_types import AnimationNodeSocket, ListSocket
+from .. base_types import AnimationNodeSocket, PythonListSocket
 
 class TextBlockSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_TextBlockSocket"
@@ -54,7 +54,7 @@ class TextBlockSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return cls.getDefaultValue(), 2
 
 
-class TextBlockListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSocket):
+class TextBlockListSocket(bpy.types.NodeSocket, PythonListSocket, AnimationNodeSocket):
     bl_idname = "an_TextBlockListSocket"
     bl_label = "Text Block List Socket"
     dataType = "Text Block List"

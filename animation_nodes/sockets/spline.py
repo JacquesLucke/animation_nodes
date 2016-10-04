@@ -3,7 +3,7 @@ from bpy.props import *
 from .. events import propertyChanged
 from .. data_structures import BezierSpline, PolySpline
 from .. utils.id_reference import tryToFindObjectReference
-from .. base_types import AnimationNodeSocket, ListSocket
+from .. base_types import AnimationNodeSocket, PythonListSocket
 from .. data_structures.splines.from_blender import (createSplinesFromBlenderObject,
                                                      createSplineFromBlenderSpline)
 
@@ -94,7 +94,7 @@ class SplineSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return cls.getDefaultValue(), 2
 
 
-class SplineListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSocket):
+class SplineListSocket(bpy.types.NodeSocket, PythonListSocket, AnimationNodeSocket):
     bl_idname = "an_SplineListSocket"
     bl_label = "Spline List Socket"
     dataType = "Spline List"

@@ -1,7 +1,7 @@
 import bpy
 from mathutils import Matrix
 from .. data_structures import Matrix4x4List
-from .. base_types import AnimationNodeSocket, ListSocket
+from .. base_types import AnimationNodeSocket, CythonListSocket
 
 class MatrixSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_MatrixSocket"
@@ -29,7 +29,7 @@ class MatrixSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             except: return cls.getDefaultValue(), 2
 
 
-class MatrixListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSocket):
+class MatrixListSocket(bpy.types.NodeSocket, CythonListSocket, AnimationNodeSocket):
     bl_idname = "an_MatrixListSocket"
     bl_label = "Matrix List Socket"
     dataType = "Matrix List"
@@ -38,34 +38,4 @@ class MatrixListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSocket):
     drawColor = (1, 0.56, 0.3, 0.5)
     storable = True
     comparable = False
-
-    @classmethod
-    def getDefaultValue(cls):
-        return Matrix4x4List()
-
-    @classmethod
-    def getDefaultValueCode(cls):
-        return "Matrix4x4List()"
-
-    @classmethod
-    def getCopyExpression(cls):
-        return "value.copy()"
-
-    @classmethod
-    def getFromValuesCode(cls):
-        return "Matrix4x4List.fromValues(value)"
-
-    @classmethod
-    def getJoinListsCode(cls):
-        return "Matrix4x4List.join(value)"
-
-    @classmethod
-    def getReverseCode(cls):
-        return "value.reversed()"
-
-    @classmethod
-    def correctValue(cls, value):
-        if isinstance(value, Matrix4x4List):
-            return value, 0
-        try: return Matrix4x4List.fromValues(value), 1
-        except: return cls.getDefaultValue(), 2
+    listClass = Matrix4x4List

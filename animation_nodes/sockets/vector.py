@@ -3,7 +3,7 @@ from bpy.props import *
 from mathutils import Vector
 from .. events import propertyChanged
 from .. data_structures import Vector3DList
-from .. base_types import AnimationNodeSocket, ListSocket
+from .. base_types import AnimationNodeSocket, CythonListSocket
 
 class VectorSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_VectorSocket"
@@ -51,7 +51,7 @@ class VectorSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return cls.getDefaultValue(), 2
 
 
-class VectorListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSocket):
+class VectorListSocket(bpy.types.NodeSocket, CythonListSocket, AnimationNodeSocket):
     bl_idname = "an_VectorListSocket"
     bl_label = "Vector List Socket"
     dataType = "Vector List"
@@ -60,34 +60,4 @@ class VectorListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSocket):
     drawColor = (0.15, 0.15, 0.8, 0.5)
     storable = True
     comparable = False
-
-    @classmethod
-    def getDefaultValue(cls):
-        return Vector3DList()
-
-    @classmethod
-    def getDefaultValueCode(cls):
-        return "Vector3DList()"
-
-    @classmethod
-    def getCopyExpression(cls):
-        return "value.copy()"
-
-    @classmethod
-    def getFromValuesCode(cls):
-        return "Vector3DList.fromValues(value)"
-
-    @classmethod
-    def getJoinListsCode(cls):
-        return "Vector3DList.join(value)"
-
-    @classmethod
-    def getReverseCode(cls):
-        return "value.reversed()"
-
-    @classmethod
-    def correctValue(cls, value):
-        if isinstance(value, Vector3DList):
-            return value, 0
-        try: return Vector3DList.fromValues(value), 1
-        except: return cls.getDefaultValue(), 2
+    listClass = Vector3DList

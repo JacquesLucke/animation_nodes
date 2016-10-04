@@ -5,13 +5,17 @@ from .. random cimport uniformRandomInteger
 from cpython.mem cimport PyMem_Malloc, PyMem_Free
 from ... data_structures cimport CList, PolygonIndicesList, ULongList
 
-def shuffle(myList not None, seed):
-    if isinstance(myList, list):
-        return shuffle_PythonList(myList, seed)
-    elif isinstance(myList, CList):
-        return shuffle_CythonList(myList, seed)
-    elif isinstance(myList, PolygonIndicesList):
-        return shuffle_PolygonIndicesList(myList, seed)
+from ... sockets.info import getSocketClass
+
+def getShuffleFunction(str dataType):
+    socketClass = getSocketClass(dataType)
+    defaultValue = socketClass.getDefaultValue()
+    if isinstance(defaultValue, list):
+        return shuffle_PythonList
+    elif isinstance(defaultValue, CList):
+        return shuffle_CythonList
+    elif isinstance(defaultValue, PolygonIndicesList):
+        return shuffle_PolygonIndicesList
     else:
         raise NotImplementedError()
 

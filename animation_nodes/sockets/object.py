@@ -3,7 +3,7 @@ from bpy.props import *
 from bpy.types import Object
 from .. events import propertyChanged
 from .. utils.id_reference import tryToFindObjectReference
-from .. base_types import AnimationNodeSocket, ListSocket
+from .. base_types import AnimationNodeSocket, PythonListSocket
 
 class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_ObjectSocket"
@@ -79,7 +79,7 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return cls.getDefaultValue(), 2
 
 
-class ObjectListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSocket):
+class ObjectListSocket(bpy.types.NodeSocket, PythonListSocket, AnimationNodeSocket):
     bl_idname = "an_ObjectListSocket"
     bl_label = "Object List Socket"
     dataType = "Object List"

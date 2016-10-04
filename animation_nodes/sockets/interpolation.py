@@ -3,7 +3,7 @@ from bpy.props import *
 from .. events import propertyChanged
 from .. data_structures import InterpolationBase
 from .. algorithms.interpolations import getInterpolationPreset, PyInterpolation, Linear
-from .. base_types import AnimationNodeSocket, ListSocket
+from .. base_types import AnimationNodeSocket, PythonListSocket
 
 categoryItems = [
     ("LINEAR", "Linear", "", "IPO_LINEAR", 0),
@@ -65,7 +65,7 @@ class InterpolationSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         except: return cls.getDefaultValue(), 2
 
 
-class InterpolationListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSocket):
+class InterpolationListSocket(bpy.types.NodeSocket, PythonListSocket, AnimationNodeSocket):
     bl_idname = "an_InterpolationListSocket"
     bl_label = "Interpolation List Socket"
     dataType = "Interpolation List"

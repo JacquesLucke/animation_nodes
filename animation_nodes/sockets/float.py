@@ -3,7 +3,7 @@ import sys
 from bpy.props import *
 from .. events import propertyChanged
 from .. data_structures import DoubleList
-from .. base_types import AnimationNodeSocket, ListSocket
+from .. base_types import AnimationNodeSocket, CythonListSocket
 
 def getValue(self):
     return min(max(self.minValue, self.get("value", 0)), self.maxValue)
@@ -55,7 +55,7 @@ class FloatSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             except: return cls.getDefaultValue(), 2
 
 
-class FloatListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSocket):
+class FloatListSocket(bpy.types.NodeSocket, CythonListSocket, AnimationNodeSocket):
     bl_idname = "an_FloatListSocket"
     bl_label = "Float List Socket"
     dataType = "Float List"
@@ -64,34 +64,4 @@ class FloatListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSocket):
     drawColor = (0.4, 0.4, 0.7, 0.5)
     storable = True
     comparable = False
-
-    @classmethod
-    def getDefaultValue(cls):
-        return DoubleList()
-
-    @classmethod
-    def getDefaultValueCode(cls):
-        return "DoubleList()"
-
-    @classmethod
-    def getCopyExpression(cls):
-        return "value.copy()"
-
-    @classmethod
-    def getFromValuesCode(cls):
-        return "DoubleList.fromValues(value)"
-
-    @classmethod
-    def getJoinListsCode(cls):
-        return "DoubleList.join(value)"
-
-    @classmethod
-    def getReverseCode(cls):
-        return "value.reversed()"
-
-    @classmethod
-    def correctValue(cls, value):
-        if isinstance(value, DoubleList):
-            return value, 0
-        try: return DoubleList.fromValues(value), 1
-        except: return cls.getDefaultValue(), 2
+    listClass = DoubleList

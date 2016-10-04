@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from bpy.types import Group
 from .. events import propertyChanged
-from .. base_types import AnimationNodeSocket, ListSocket
+from .. base_types import AnimationNodeSocket, PythonListSocket
 
 class ObjectGroupSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_ObjectGroupSocket"
@@ -38,7 +38,7 @@ class ObjectGroupSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return cls.getDefaultValue(), 2
 
 
-class ObjectGroupListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSocket):
+class ObjectGroupListSocket(bpy.types.NodeSocket, PythonListSocket, AnimationNodeSocket):
     bl_idname = "an_ObjectGroupListSocket"
     bl_label = "Object Group List Socket"
     dataType = "Object Group List"

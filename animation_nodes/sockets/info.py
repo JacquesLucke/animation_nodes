@@ -95,10 +95,10 @@ def returnOnFailure(returnValue):
 
 # Check if list or base socket exists
 def isList(input):
-    return input in _socketInfo.baseIdName
+    return input in _socketInfo.listDataTypes
 
 def isBase(input):
-    return input in _socketInfo.listIdName
+    return input in _socketInfo.baseDataTypes
 
 # to Base
 @returnOnFailure(None)
@@ -147,6 +147,9 @@ def getCopyExpression(input):
 
 def getCopyFunction(input):
     return _socketInfo.copyFunctionByType[input]
+
+def getSocketClass(input):
+    return _socketInfo.classByType[input]
 
 
 def getListDataTypeItemsCallback(self, context):

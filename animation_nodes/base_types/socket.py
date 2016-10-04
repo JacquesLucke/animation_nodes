@@ -385,29 +385,6 @@ def isTextUsed(node, name):
 
 
 
-class ListSocket:
-    @classmethod
-    def getDefaultValue(cls):
-        return []
-
-    @classmethod
-    def getDefaultValueCode(cls):
-        return "[]"
-
-    @classmethod
-    def getFromValuesCode(cls):
-        return "value"
-
-    @classmethod
-    def getJoinListsCode(cls):
-        return "list(itertools.chain(value))"
-
-    @classmethod
-    def getReverseCode(cls):
-        return "list(reversed(value))"
-
-
-
 # Register
 ##################################
 

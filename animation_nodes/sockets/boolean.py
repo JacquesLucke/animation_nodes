@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from .. events import propertyChanged
 from .. data_structures import BooleanList
-from .. base_types import AnimationNodeSocket, ListSocket
+from .. base_types import AnimationNodeSocket, CythonListSocket
 from .. utils.nodes import newNodeAtCursor, invokeTranslation
 
 class BooleanSocket(bpy.types.NodeSocket, AnimationNodeSocket):
@@ -52,7 +52,7 @@ class BooleanSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             except: return cls.getDefaultValue(), 2
 
 
-class BooleanListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSocket):
+class BooleanListSocket(bpy.types.NodeSocket, CythonListSocket, AnimationNodeSocket):
     bl_idname = "an_BooleanListSocket"
     bl_label = "Boolean List Socket"
     dataType = "Boolean List"
@@ -61,34 +61,4 @@ class BooleanListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSocket):
     drawColor = (0.7, 0.7, 0.4, 0.5)
     storable = True
     comparable = False
-
-    @classmethod
-    def getDefaultValue(cls):
-        return BooleanList()
-
-    @classmethod
-    def getDefaultValueCode(cls):
-        return "BooleanList()"
-
-    @classmethod
-    def getCopyExpression(cls):
-        return "value.copy()"
-
-    @classmethod
-    def getFromValuesCode(cls):
-        return "BooleanList.fromValues(value)"
-
-    @classmethod
-    def getJoinListsCode(cls):
-        return "BooleanList.join(value)"
-
-    @classmethod
-    def getReverseCode(cls):
-        return "value.reversed()"
-
-    @classmethod
-    def correctValue(cls, value):
-        if isinstance(value, BooleanList):
-            return value, 0
-        try: return BooleanList.fromValues(value), 1
-        except: return cls.getDefaultValue(), 2
+    listClass = BooleanList

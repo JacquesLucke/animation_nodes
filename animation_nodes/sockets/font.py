@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from bpy.types import VectorFont
 from .. events import propertyChanged
-from .. base_types import AnimationNodeSocket, ListSocket
+from .. base_types import AnimationNodeSocket, PythonListSocket
 
 class FontSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_FontSocket"
@@ -45,7 +45,7 @@ class FontSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return cls.getDefaultValue(), 2
 
 
-class FontListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSocket):
+class FontListSocket(bpy.types.NodeSocket, PythonListSocket, AnimationNodeSocket):
     bl_idname = "an_FontListSocket"
     bl_label = "Font List Socket"
     dataType = "Font List"

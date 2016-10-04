@@ -1,6 +1,6 @@
 import bpy
 from .. data_structures.struct import ANStruct
-from .. base_types import AnimationNodeSocket, ListSocket
+from .. base_types import AnimationNodeSocket, PythonListSocket
 
 class StructSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_StructSocket"
@@ -30,7 +30,7 @@ class StructSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return cls.getDefaultValue(), 2
 
 
-class StructListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSocket):
+class StructListSocket(bpy.types.NodeSocket, PythonListSocket, AnimationNodeSocket):
     bl_idname = "an_StructListSocket"
     bl_label = "Struct List Socket"
     dataType = "Struct List"

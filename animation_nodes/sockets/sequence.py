@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from bpy.types import Sequence
 from .. events import propertyChanged
-from .. base_types import AnimationNodeSocket, ListSocket
+from .. base_types import AnimationNodeSocket, PythonListSocket
 
 class SequenceSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_SequenceSocket"
@@ -60,7 +60,7 @@ class SequenceSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return cls.getDefaultValue(), 2
 
 
-class SequenceListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSocket):
+class SequenceListSocket(bpy.types.NodeSocket, PythonListSocket, AnimationNodeSocket):
     bl_idname = "an_SequenceListSocket"
     bl_label = "Sequence List Socket"
     dataType = "Sequence List"

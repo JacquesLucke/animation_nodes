@@ -1,1 +1,1 @@
-from . shuffle import shuffle
+from . shuffle import getShuffleFunction

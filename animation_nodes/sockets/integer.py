@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from .. events import propertyChanged
 from .. data_structures import LongLongList
-from .. base_types import AnimationNodeSocket, ListSocket
+from .. base_types import AnimationNodeSocket, CythonListSocket
 
 def getValue(self):
     return min(max(self.minValue, self.get("value", 0)), self.maxValue)
@@ -54,7 +54,7 @@ class IntegerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             except: return cls.getDefaultValue(), 2
 
 
-class IntegerListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSocket):
+class IntegerListSocket(bpy.types.NodeSocket, CythonListSocket, AnimationNodeSocket):
     bl_idname = "an_IntegerListSocket"
     bl_label = "Integer List Socket"
     dataType = "Integer List"
@@ -63,34 +63,4 @@ class IntegerListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSocket):
     drawColor = (0.3, 0.4, 1.0, 0.5)
     storable = True
     comparable = False
-
-    @classmethod
-    def getDefaultValue(cls):
-        return LongLongList()
-
-    @classmethod
-    def getDefaultValueCode(cls):
-        return "LongLongList()"
-
-    @classmethod
-    def getCopyExpression(cls):
-        return "value.copy()"
-
-    @classmethod
-    def getFromValuesCode(cls):
-        return "LongLongList.fromValues(value)"
-
-    @classmethod
-    def getJoinListsCode(cls):
-        return "LongLongList.join(value)"
-
-    @classmethod
-    def getReverseCode(cls):
-        return "value.reversed()"
-
-    @classmethod
-    def correctValue(cls, value):
-        if isinstance(value, LongLongList):
-            return value, 0
-        try: return LongLongList.fromValues(value), 1
-        except: return cls.getDefaultValue(), 2
+    listClass = LongLongList
