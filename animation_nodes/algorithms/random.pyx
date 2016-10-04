@@ -42,6 +42,9 @@ def uniformRandomQuaternionWithTwoSeeds(seed1, seed2, double scale):
 def uniformRandomNumberWithTwoSeeds(seed1, seed2, double min, double max):
     return uniformRandomNumber((seed1 * 674523 + seed2 * 3465284) % 0x7fffffff, min, max)
 
+cdef int uniformRandomInteger(int x, int min, int max):
+    return <int>uniformRandomNumber(x, min, <double>max + 0.9999999)
+
 cdef double uniformRandomNumber(int x, double min, double max):
     '''Generate a random number between min and max using a seed'''
     x = (x<<13) ^ x

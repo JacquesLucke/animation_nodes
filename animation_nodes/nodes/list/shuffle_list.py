@@ -1,29 +1,41 @@
 import bpy
+import random
 from bpy.props import *
-from ... sockets.info import isList
+from ... events import propertyChanged
 from ... base_types import AnimationNode, AutoSelectListDataType
 
 class ShuffleListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ShuffleListNode"
     bl_label = "Shuffle List"
 
+    nodeSeed = IntProperty(name = "Node Seed", update = propertyChanged)
+
     assignedType = StringProperty(update = AnimationNode.updateSockets, default = "Float List")
+
+    def setup(self):
+        self.randomizeNodeSeed()
 
     def create(self):
         listDataType = self.assignedType
-        
-        self.newInput(listDataType, "List", "list", dataIsModified = True)
+
+        self.newInput(listDataType, "List", "sourceList", dataIsModified = True)
         self.newInput("an_IntegerSocket", "Seed", "seed")
-        self.newOutput(listDataType, "Shuffled List", "list")
+        self.newOutput(listDataType, "Shuffled List", "newList")
 
         self.newSocketEffect(AutoSelectListDataType("assignedType", "LIST",
             [(self.inputs[0], "LIST"),
              (self.outputs[0], "LIST")]
         ))
 
-    def getExecutionCode(self):
-        return ("random.seed(seed)",
-                "random.shuffle(list)")
+    def draw(self, layout):
+        layout.prop(self, "nodeSeed")
 
-    def getUsedModules(self):
-        return ["random"]
+    def getExecutionCode(self):
+        yield "_seed = self.nodeSeed * 3242354 + seed"
+        yield "newList = animation_nodes.algorithms.lists.shuffle(sourceList, _seed)"
+
+    def duplicate(self, sourceNode):
+        self.randomizeNodeSeed()
+
+    def randomizeNodeSeed(self):
+        self.nodeSeed = int(random.random() * 100)

@@ -97,14 +97,13 @@ cdef class PolygonIndicesList:
         return self.copyWithNewOrder(order, checkIndices = False)
 
     cpdef copyWithNewOrder(self, ULongList newOrder, checkIndices = True):
+        if newOrder.length == 0:
+            return PolygonIndicesList()
+        if self.getLength() == 0:
+            raise IndexError("Not all indices in the new order exist")
         if checkIndices:
-            if newOrder.length == 0:
-                return PolygonIndicesList()
-            if self.getLength() == 0:
+            if newOrder.getMaxValue() >= self.getLength():
                 raise IndexError("Not all indices in the new order exist")
-            else:
-                if newOrder.getMaxValue() >= self.getLength():
-                    raise IndexError("Not all indices in the new order exist")
 
         cdef long i
         cdef long indicesAmount = 0
