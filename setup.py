@@ -244,7 +244,7 @@ def zipAddonDirectory(sourcePath, targetPath):
     with zipfile.ZipFile(targetPath, "w", zipfile.ZIP_DEFLATED) as zipFile:
         for relativePath in iterRelativeAddonFiles(sourcePath):
             absolutePath = join(sourcePath, relativePath)
-            zipFile.write(absolutePath, relativePath)
+            zipFile.write(absolutePath, join("animation_nodes", relativePath))
 
 
 
