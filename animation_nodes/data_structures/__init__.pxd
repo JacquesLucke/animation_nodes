@@ -1,3 +1,4 @@
+from . data_structures.lists.clist import CList
 from . data_structures.lists.base_lists cimport *
 from . data_structures.lists.polygon_indices_list cimport PolygonIndicesList
 

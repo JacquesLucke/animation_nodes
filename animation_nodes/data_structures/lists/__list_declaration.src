@@ -1,4 +1,6 @@
-cdef class LISTNAME:
+from . clist cimport CList
+
+cdef class LISTNAME(CList):
     cdef:
         TYPE* data
         Py_ssize_t length
