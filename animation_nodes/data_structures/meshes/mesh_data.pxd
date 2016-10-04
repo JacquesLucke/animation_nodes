@@ -1,4 +1,5 @@
-from .. cimport Vector3DList, EdgeIndicesList, PolygonIndicesList
+from .. lists.base_lists cimport Vector3DList, EdgeIndicesList
+from .. lists.polygon_indices_list cimport PolygonIndicesList
 
 cdef class MeshData:
     cdef:

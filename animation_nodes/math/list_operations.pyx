@@ -1,7 +1,7 @@
 from . conversion cimport toMatrix4
-from . cimport (transformVec3AsPoint_InPlace, transformVec3AsDirection_InPlace,
-                distanceVec3, mixVec3, multMatrix4, setIdentityMatrix,
-                setComposedMatrix)
+from . vector cimport distanceVec3, mixVec3
+from . matrix cimport (transformVec3AsPoint_InPlace, transformVec3AsDirection_InPlace,
+                       multMatrix4, setIdentityMatrix, setComposedMatrix)
 
 
 cpdef void transformVector3DList(Vector3DList vectors, matrix, bint ignoreTranslation = False):
