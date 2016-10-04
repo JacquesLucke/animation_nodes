@@ -22,6 +22,9 @@ if v.major < 3 or v.minor < 5:
     print("Only works with Python 3.5.x")
     print("You are using: {}".format(sys.version))
     sys.exit()
+else:
+    print(sys.version)
+    print()
 
 import os
 import shutil
