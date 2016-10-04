@@ -7,9 +7,8 @@
 *.obj
 *.html
 *.so
-.log
+*.zip
 build/
-animation_nodes.zip
 animation_nodes/data_structures/lists/base_lists.pxd
 animation_nodes/data_structures/lists/base_lists.pyx
 animation_nodes/data_structures/lists/convert.pxd
