@@ -116,8 +116,11 @@ cdef class LISTNAME(CList):
             raise NotImplementedError()
         return newList
 
-    def __mul__(LISTNAME self, Py_ssize_t amount):
-        return self.repeated(amount = max(0, amount))
+    def __mul__(a, b):
+        if isinstance(a, LISTNAME):
+            return a.repeated(amount = max(0, b))
+        else:
+            return b.repeated(amount = max(0, a))
 
     def __iadd__(LISTNAME self, other):
         try:

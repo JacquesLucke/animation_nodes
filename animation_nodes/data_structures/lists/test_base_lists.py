@@ -154,9 +154,14 @@ class TestExtend(TestCase):
         self.assertEqual(a, [0, 1, 2])
 
 class TestMultiply(TestCase):
-    def test(self):
+    def testLeft(self):
         a = IntegerList.fromValues((0, 1, 2))
         b = a * 3
+        self.assertEqual(b, (0, 1, 2, 0, 1, 2, 0, 1, 2))
+
+    def testRight(self):
+        a = IntegerList.fromValues((0, 1, 2))
+        b = 3 * a
         self.assertEqual(b, (0, 1, 2, 0, 1, 2, 0, 1, 2))
 
     def testNegativeFactor(self):
