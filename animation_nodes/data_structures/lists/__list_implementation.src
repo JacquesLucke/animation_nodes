@@ -117,7 +117,7 @@ cdef class LISTNAME(CList):
         return newList
 
     def __mul__(LISTNAME self, Py_ssize_t amount):
-        return self.repeated(amount = amount)
+        return self.repeated(amount = max(0, amount))
 
     def __iadd__(LISTNAME self, other):
         try:
@@ -372,7 +372,7 @@ cdef class LISTNAME(CList):
 
     def repeated(self, *, Py_ssize_t length = -1, Py_ssize_t amount = -1):
         if length < 0 and amount < 0:
-            raise ValueError("Specify the 'length' or 'amount' parameter as keyword")
+            raise ValueError("'length' or 'amount' has to be non-negative")
         elif length > 0 and amount > 0:
             raise ValueError("Can only evaluate one parameter of 'length' and 'amount'")
 

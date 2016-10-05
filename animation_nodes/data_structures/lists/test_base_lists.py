@@ -159,6 +159,11 @@ class TestMultiply(TestCase):
         b = a * 3
         self.assertEqual(b, (0, 1, 2, 0, 1, 2, 0, 1, 2))
 
+    def testNegativeFactor(self):
+        a = IntegerList.fromValues((0, 1, 2, 3))
+        b = a * (-2)
+        self.assertEqual(b, [])
+
 class TestRepeated(TestCase):
     def testAmount(self):
         a = IntegerList.fromValues((0, 1, 2))
