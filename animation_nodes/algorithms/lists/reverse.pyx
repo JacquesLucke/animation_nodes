@@ -12,6 +12,9 @@ def getReverseFunction(str dataType):
     else:
         raise NotImplementedError()
 
+def reverseList(str dataType, myList):
+    return getReverseFunction(dataType)(myList)
+
 def reverse_PythonList(list myList):
     return list(reversed(myList))
 

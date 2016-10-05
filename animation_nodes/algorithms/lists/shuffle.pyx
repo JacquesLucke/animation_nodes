@@ -19,6 +19,9 @@ def getShuffleFunction(str dataType):
     else:
         raise NotImplementedError()
 
+def shuffleList(str dataType, myList, seed):
+    return getShuffleFunction(dataType)(myList, seed)
+
 def shuffle_PythonList(list myList, seed):
     random.seed(seed)
     random.shuffle(myList)

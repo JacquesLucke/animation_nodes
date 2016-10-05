@@ -32,8 +32,7 @@ class ShuffleListNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         yield "_seed = self.nodeSeed * 3242354 + seed"
-        yield "shuffle = animation_nodes.algorithms.lists.getShuffleFunction('{}')".format(self.assignedType)
-        yield "newList = shuffle(sourceList, _seed)"
+        yield "newList = AN.algorithms.lists.shuffleList('%s', sourceList, _seed)" % self.assignedType
 
     def duplicate(self, sourceNode):
         self.randomizeNodeSeed()

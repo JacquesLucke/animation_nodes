@@ -1,2 +1,2 @@
-from . shuffle import getShuffleFunction
-from . reverse import getReverseFunction
+from . shuffle import shuffleList, getShuffleFunction
+from . reverse import reverseList, getReverseFunction
