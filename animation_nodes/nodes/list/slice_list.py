@@ -32,7 +32,7 @@ class SliceListNode(bpy.types.Node, AnimationNode):
             self.newInput("Integer", "Start", "start")
         if self.useEnd:
             if self.sliceEndType == "END_INDEX":
-                self.newInput("Integer", "End", "end")
+                self.newInput("Integer", "End", "end", value = 10)
             elif self.sliceEndType == "OUTPUT_LENGTH":
                 self.newInput("Integer", "Length", "length")
         if self.useStep:
