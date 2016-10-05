@@ -15,6 +15,10 @@ class an_ObjectTransformsOutputNode(bpy.types.Node, AnimationNode):
     useRotation = BoolVectorProperty(update = checkedPropertiesChanged)
     useScale = BoolVectorProperty(update = checkedPropertiesChanged)
 
+    deltaTransforms = BoolProperty(name = "Delta Transforms", default = False,
+        description = "Apply changes on delta transforms",
+        update = executionCodeChanged)
+
     def create(self):
         self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
         self.newInput("Vector", "Location", "location")
@@ -42,6 +46,12 @@ class an_ObjectTransformsOutputNode(bpy.types.Node, AnimationNode):
         row.prop(self, "useScale", index = 1, text = "Y")
         row.prop(self, "useScale", index = 2, text = "Z")
 
+        if self.deltaTransforms:
+            col.label("Delta Transforms", icon = "INFO")
+
+    def drawAdvanced(self, layout):
+        layout.prop(self, "deltaTransforms")
+
     def updateSocketVisibility(self):
         self.inputs["Location"].hide = not (self.useLocation[0] or self.useLocation[1] or self.useLocation[2])
         self.inputs["Rotation"].hide = not (self.useRotation[0] or self.useRotation[1] or self.useRotation[2])
@@ -59,36 +69,48 @@ class an_ObjectTransformsOutputNode(bpy.types.Node, AnimationNode):
 
         # Location
         if all((*useLoc, )):
-            yield "    object.location = location"
+            yield "    object.{} = location".format(self.locationPath)
         else:
             for i in range(3):
-                if useLoc[i]: yield "    object.location["+str(i)+"] = location["+str(i)+"]"
+                if useLoc[i]: yield "    object.{0}[{1}] = location[{1}]".format(self.locationPath, i)
 
         # Rotation
         if all((*useRot, )):
-            yield "    object.rotation_euler = rotation"
+            yield "    object.{} = rotation".format(self.rotationPath)
         else:
             for i in range(3):
-                if useRot[i]: yield "    object.rotation_euler["+str(i)+"] = rotation["+str(i)+"]"
+                if useRot[i]: yield "    object.{0}[{1}] = rotation[{1}]".format(self.rotationPath, i)
 
         # Scale
         if all((*useScale, )):
-            yield "    object.scale = scale"
+            yield "    object.{} = scale".format(self.scalePath)
         else:
             for i in range(3):
-                if useScale[i]: yield "    object.scale["+str(i)+"] = scale["+str(i)+"]"
+                if useScale[i]: yield "    object.{0}[{1}] = scale[{1}]".format(self.scalePath, i)
 
     def getBakeCode(self):
         yield "if object is not None:"
 
         for i in range(3):
             if self.useLocation[i]:
-                yield "    object.keyframe_insert('location', index = {})".format(i)
+                yield "    object.keyframe_insert('{}', index = {})".format(self.locationPath, i)
 
         for i in range(3):
             if self.useRotation[i]:
-                yield "    object.keyframe_insert('rotation_euler', index = {})".format(i)
+                yield "    object.keyframe_insert('{}', index = {})".format(self.rotationPath, i)
 
         for i in range(3):
             if self.useScale[i]:
-                yield "    object.keyframe_insert('scale', index = {})".format(i)
+                yield "    object.keyframe_insert('{}', index = {})".format(self.scalePath, i)
+
+    @property
+    def locationPath(self):
+        return "delta_location" if self.deltaTransforms else "location"
+
+    @property
+    def rotationPath(self):
+        return "delta_rotation_euler" if self.deltaTransforms else "rotation_euler"
+
+    @property
+    def scalePath(self):
+        return "delta_Scale" if self.deltaTransforms else "scale"
