@@ -20,8 +20,8 @@ class ReverseListNode(bpy.types.Node, AnimationNode):
         ))
 
     def getExecutionCode(self):
-        reverseCode = self.inputs[0].getReverseCode().replace("value", "inList")
-        return "reversedList = " + reverseCode
+        yield "reverse = animation_nodes.algorithms.lists.getReverseFunction('{}')".format(self.assignedType)
+        yield "reversedList = reverse(inList)"
 
     def assignType(self, listDataType):
         if not isList(listDataType): return
