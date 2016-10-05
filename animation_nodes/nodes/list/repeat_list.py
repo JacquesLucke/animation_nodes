@@ -78,7 +78,8 @@ class RepeatListNode(bpy.types.Node, AnimationNode):
         if self.repetitionType == "LOOP":
                 yield "    elementIterator = itertools.cycle(inList)"
         elif self.repetitionType == "PING_PONG":
-                yield "    reversedList = " + self.outputs[0].getReverseCode().replace("value", "inList")
+                yield "    reverse = animation_nodes.algorithms.lists.getReverseFunction('{}')".format(self.assignedType)
+                yield "    reversedList = reverse(inList)"
                 yield "    elementIterator = itertools.cycle(inList + reversedList)"
 
         if makeCopies:

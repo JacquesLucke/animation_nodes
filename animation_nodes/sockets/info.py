@@ -95,10 +95,10 @@ def returnOnFailure(returnValue):
 
 # Check if list or base socket exists
 def isList(input):
-    return input in _socketInfo.listDataTypes
+    return input in _socketInfo.baseDataType.keys()
 
 def isBase(input):
-    return input in _socketInfo.baseDataTypes
+    return input in _socketInfo.listDataType.keys()
 
 # to Base
 @returnOnFailure(None)

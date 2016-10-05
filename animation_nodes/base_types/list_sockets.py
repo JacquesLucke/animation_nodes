@@ -11,10 +11,6 @@ class ListSocket:
     def getJoinListsCode(cls):
         raise NotImplementedError()
 
-    @classmethod
-    def getReverseCode(cls):
-        raise NotImplementedError()
-
 class PythonListSocket(ListSocket):
     @classmethod
     def getDefaultValue(cls):
@@ -31,10 +27,6 @@ class PythonListSocket(ListSocket):
     @classmethod
     def getJoinListsCode(cls):
         return "list(itertools.chain(value))"
-
-    @classmethod
-    def getReverseCode(cls):
-        return "list(reversed(value))"
 
 class CythonListSocket(ListSocket):
     listClass = None
@@ -58,10 +50,6 @@ class CythonListSocket(ListSocket):
     @classmethod
     def getJoinListsCode(cls):
         return cls.listClass.__name__ + ".join(value)"
-
-    @classmethod
-    def getReverseCode(cls):
-        return "value.reversed()"
 
     @classmethod
     def correctValue(cls, value):

@@ -60,10 +60,6 @@ class PolygonIndicesListSocket(bpy.types.NodeSocket, ListSocket, AnimationNodeSo
         return "PolygonIndicesList.join(value)"
 
     @classmethod
-    def getReverseCode(cls):
-        return "value.reversed()"
-
-    @classmethod
     def correctValue(cls, value):
         if isinstance(value, PolygonIndicesList):
             return value, 0
