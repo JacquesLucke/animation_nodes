@@ -1,8 +1,8 @@
 import bpy
 from bpy.props import *
 from ... events import executionCodeChanged
-from ... sockets.info import isBase, toBaseDataType, toListDataType
 from ... base_types import AnimationNode, AutoSelectListDataType
+from ... sockets.info import isBase, toBaseDataType, toListDataType
 
 fillModeItems = [
     ("LEFT", "Left", "", "TRIA_LEFT", 0),
@@ -25,14 +25,14 @@ class FillListNode(bpy.types.Node, AnimationNode):
         baseDataType = self.assignedType
         listDataType = toListDataType(self.assignedType)
 
-        self.newInput("an_IntegerSocket", "Length", "length")
         self.newInput(listDataType, "List", "inList", dataIsModified = True)
         self.newInput(baseDataType, "Element", "fillElement")
+        self.newInput("an_IntegerSocket", "Length", "length")
         self.newOutput(listDataType, "List", "outList")
 
         self.newSocketEffect(AutoSelectListDataType("assignedType", "BASE",
-            [(self.inputs[1], "LIST"),
-             (self.inputs[2], "BASE"),
+            [(self.inputs[0], "LIST"),
+             (self.inputs[1], "BASE"),
              (self.outputs[0], "LIST")]
         ))
 
@@ -47,21 +47,8 @@ class FillListNode(bpy.types.Node, AnimationNode):
             socketGroup = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
 
     def getExecutionCode(self):
-        yield "missingAmount = max(length - len(inList), 0)"
-        elementSocket = self.inputs["Element"]
-        listFromValuesCode = self.outputs[0].getFromValuesCode()
-        if self.makeElementCopies and elementSocket.isCopyable():
-            yield ("fillList = [{} for _ in range(missingAmount)]"
-                    .format(elementSocket.getCopyExpression().replace("value", "fillElement")))
-            yield "fillList = " + listFromValuesCode.replace("value", "fillList")
-        else:
-            yield "fillList = {} * missingAmount".format(listFromValuesCode.replace("value", "[fillElement]"))
-
-        yield "if len(inList) == 0:"
-        yield "    outList = fillList"
-        yield "else:"
-        if self.fillMode == "LEFT":  yield "    outList = fillList + inList"
-        if self.fillMode == "RIGHT": yield "    outList = inList + fillList"
+        yield ("outList = AN.algorithms.lists.fillList('{}', inList, '{}', length, fillElement)"
+                          .format(toListDataType(self.assignedType), self.fillMode))
 
     def assignListDataType(self, listDataType):
         self.assignType(toBaseDataType(listDataType))

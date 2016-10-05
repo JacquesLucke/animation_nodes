@@ -13,7 +13,7 @@ def getShuffleFunction(str dataType):
     if isinstance(defaultValue, list):
         return shuffle_PythonList
     elif isinstance(defaultValue, CList):
-        return shuffle_CythonList
+        return shuffle_CList
     elif isinstance(defaultValue, PolygonIndicesList):
         return shuffle_PolygonIndicesList
     else:
@@ -27,7 +27,7 @@ def shuffle_PythonList(list myList, seed):
     random.shuffle(myList)
     return myList
 
-def shuffle_CythonList(CList myList, seed):
+def shuffle_CList(CList myList, seed):
     cdef:
         int _seed = (seed * 345722341) % INT_MAX
         char* data = <char*>myList.getPointer()
@@ -57,6 +57,6 @@ def shuffle_PolygonIndicesList(PolygonIndicesList myList, seed):
     for i in range(len(myList)):
         newOrder.data[i] = i
 
-    shuffle_CythonList(newOrder, seed)
+    shuffle_CList(newOrder, seed)
 
     return myList.copyWithNewOrder(newOrder, checkIndices = False)
