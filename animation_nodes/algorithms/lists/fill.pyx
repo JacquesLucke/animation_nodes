@@ -16,7 +16,7 @@ def getFillFunction(str dataType, bint makeElementCopies = True):
     elif isinstance(defaultValue, CList):
         return fill_CList
     elif isinstance(defaultValue, PolygonIndicesList):
-        raise NotImplementedError()
+        return fill_PolygonIndicesList
     else:
         raise NotImplementedError()
 
@@ -37,6 +37,11 @@ def fill_PythonList_NoCopy(list myList, str direction, int length, element):
 def fill_CList(CList myList, str direction, int length, element):
     cdef int extendAmount = max(0, length - len(myList))
     cdef CList extension = type(myList).fromValues([element]).repeated(length = extendAmount)
+    return joinListAndExtension(myList, extension, direction)
+
+def fill_PolygonIndicesList(PolygonIndicesList myList, str direction, int length, element):
+    cdef int extendAmount = max(0, length - len(myList))
+    cdef PolygonIndicesList extension = PolygonIndicesList.fromValues([element]).repeated(length = extendAmount)
     return joinListAndExtension(myList, extension, direction)
 
 cdef joinListAndExtension(myList, extension, direction):

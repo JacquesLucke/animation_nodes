@@ -137,3 +137,28 @@ class TestAdd(TestCase):
         self.assertEqual(result[2], (8, 9, 0))
         self.assertEqual(result[3], (5, 6, 7))
         self.assertEqual(result[4], (1, 2, 3))
+
+class TestMultiply(TestCase):
+    def setUp(self):
+        self.list = PolygonIndicesList.fromValues([
+            (1, 2, 3), (4, 5, 6, 7), (8, 9, 0)])
+
+    def testListLeft(self):
+        result = self.list * 3
+        self.assertEqual(len(result), 9)
+        self.assertEqual(result[0], (1, 2, 3))
+        self.assertEqual(result[1], (4, 5, 6, 7))
+        self.assertEqual(result[5], (8, 9, 0))
+        self.assertEqual(result[6], (1, 2, 3))
+
+    def testListRight(self):
+        result = 3 * self.list
+        self.assertEqual(len(result), 9)
+        self.assertEqual(result[0], (1, 2, 3))
+        self.assertEqual(result[1], (4, 5, 6, 7))
+        self.assertEqual(result[5], (8, 9, 0))
+        self.assertEqual(result[6], (1, 2, 3))
+
+    def testNegativeFactor(self):
+        result = -5 * self.list
+        self.assertEqual(len(result), 0)

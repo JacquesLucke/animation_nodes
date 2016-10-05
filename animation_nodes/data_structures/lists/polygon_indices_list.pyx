@@ -32,6 +32,12 @@ cdef class PolygonIndicesList:
             raise NotImplementedError()
         return newList
 
+    def __mul__(a, b):
+        if isinstance(a, PolygonIndicesList):
+            return a.repeated(amount = max(0, b))
+        else:
+            return b.repeated(amount = max(0, a))
+
     def __iter__(self):
         return PolygonIndicesListIterator(self)
 
@@ -135,9 +141,17 @@ cdef class PolygonIndicesList:
 
     def reversed(self):
         cdef long i, length = self.getLength()
-        cdef ULongList newOrder = ULongList(length = length)
+        cdef ULongList newOrder = ULongList(length = self.getLength())
         for i in range(length):
             newOrder.data[i] = length - i - 1
+        return self.copyWithNewOrder(newOrder, checkIndices = False)
+
+    def repeated(self, *, length = -1, amount = -1):
+        cdef long i
+        cdef ULongList preNewOrder = ULongList(length = self.getLength())
+        for i in range(self.getLength()):
+            preNewOrder.data[i] = i
+        cdef ULongList newOrder = preNewOrder.repeated(length = length, amount = amount)
         return self.copyWithNewOrder(newOrder, checkIndices = False)
 
 
