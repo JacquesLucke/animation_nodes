@@ -162,3 +162,62 @@ class TestMultiply(TestCase):
     def testNegativeFactor(self):
         result = -5 * self.list
         self.assertEqual(len(result), 0)
+
+class TestIndex(TestCase):
+    def setUp(self):
+        self.list = PolygonIndicesList.fromValues([
+            (1, 2, 3), (4, 5, 6, 7), (8, 9, 0)])
+
+    def testExists(self):
+        result0 = self.list.index((1, 2, 3))
+        self.assertEqual(result0, 0)
+        result1 = self.list.index((4, 5, 6, 7))
+        self.assertEqual(result1, 1)
+        result2 = self.list.index((8, 9, 0))
+        self.assertEqual(result2, 2)
+
+    def testDoesNotExist(self):
+        result0 = self.list.index((3, 4))
+        self.assertEqual(result0, -1)
+        result1 = self.list.index((2, 3, 4))
+        self.assertEqual(result1, -1)
+        result2 = self.list.index((4, 5, 6, 7, 8))
+        self.assertEqual(result2, -1)
+
+    def testWrongType(self):
+        with self.assertRaises(TypeError):
+            self.list.index("abc")
+
+    def testNegativeNumbers(self):
+        with self.assertRaises(Exception):
+            self.list.index((3, -1, 4))
+
+class TestCount(TestCase):
+    def setUp(self):
+        self.list = PolygonIndicesList.fromValues([
+            (1, 2, 3), (3, 4, 6, 2, 8), (5, 4, 2), (1, 2, 3),
+            (5, 4, 2), (5, 4, 2), (3, 4, 6, 2, 8), (5, 3, 2)])
+
+    def testExists(self):
+        result0 = self.list.count((1, 2, 3))
+        self.assertEqual(result0, 2)
+        result1 = self.list.count((3, 4, 6, 2, 8))
+        self.assertEqual(result1, 2)
+        result2 = self.list.count((5, 4, 2))
+        self.assertEqual(result2, 3)
+        result3 = self.list.count((5, 3, 2))
+        self.assertEqual(result3, 1)
+
+    def testDoesNotExist(self):
+        result0 = self.list.count((0, 1, 2))
+        self.assertEqual(result0, 0)
+        result1 = self.list.count((5, 4, 2, 1, 2, 3))
+        self.assertEqual(result1, 0)
+
+    def testWrongType(self):
+        with self.assertRaises(TypeError):
+            self.list.count("abc")
+
+    def testNegativeNumbers(self):
+        with self.assertRaises(Exception):
+            self.list.count((3, -2, 5))

@@ -11,6 +11,8 @@ cdef class PolygonIndicesList:
     cpdef append(self, value)
     cpdef extend(self, values)
     cpdef copy(self)
+    cpdef index(self, value)
+    cpdef count(self, value)
 
     cdef getElementAtIndex(self, long index)
     cdef getValuesInSlice(self, slice sliceObject)

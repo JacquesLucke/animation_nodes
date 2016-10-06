@@ -1,4 +1,4 @@
-from libc.string cimport memcpy
+from libc.string cimport memcpy, memcmp
 
 cdef class PolygonIndicesList:
     def __cinit__(self, long indicesAmount = 0, long polygonAmount = 0):
@@ -80,6 +80,37 @@ cdef class PolygonIndicesList:
         newList.polyStarts.overwrite(self.polyStarts)
         newList.polyLengths.overwrite(self.polyLengths)
         return newList
+
+    cpdef index(self, value):
+        cdef:
+            UIntegerList _value = UIntegerList.fromValues(value)
+            unsigned int inputLength = _value.length
+            unsigned int *indices = self.indices.data
+            unsigned int *polyStarts = self.polyStarts.data
+            unsigned int *polyLengths = self.polyLengths.data
+            Py_ssize_t i
+        for i in range(self.getLength()):
+            if inputLength == polyLengths[i]:
+                if 0 == memcmp(_value.data, indices + polyStarts[i],
+                               polyLengths[i] * sizeof(unsigned int)):
+                    return i
+        return -1
+
+    cpdef count(self, value):
+        cdef:
+            UIntegerList _value = UIntegerList.fromValues(value)
+            unsigned int inputLength = _value.length
+            unsigned int *indices = self.indices.data
+            unsigned int *polyStarts = self.polyStarts.data
+            unsigned int *polyLengths = self.polyLengths.data
+            int counter = 0
+            Py_ssize_t i
+        for i in range(self.getLength()):
+            if inputLength == polyLengths[i]:
+                if 0 == memcmp(_value.data, indices + polyStarts[i],
+                               polyLengths[i] * sizeof(unsigned int)):
+                    counter += 1
+        return counter
 
 
     # Utilities for setting and getting
