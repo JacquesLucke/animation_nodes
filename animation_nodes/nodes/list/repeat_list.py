@@ -35,9 +35,9 @@ class RepeatListNode(bpy.types.Node, AnimationNode):
 
         self.newInput(listDataType, "List", "inList")
         if self.amountType == "AMOUNT":
-            self.newInput("Integer", "Amount", "amount", value = 5)
+            self.newInput("Integer", "Amount", "amount", value = 5, minValue = 0)
         elif "LENGTH" in self.amountType:
-            self.newInput("Integer", "Length", "length", value = 20)
+            self.newInput("Integer", "Length", "length", value = 20, minValue = 0)
         self.newOutput(listDataType, "List", "outList")
 
         self.newSocketEffect(AutoSelectListDataType("assignedType", "LIST",
@@ -56,14 +56,10 @@ class RepeatListNode(bpy.types.Node, AnimationNode):
             socketGroup = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
 
     def getExecutionCode(self):
-        elementDataType = toBaseDataType(self.assignedType)
-        makeCopies = isCopyable(elementDataType) and self.makeElementCopies
-        if makeCopies:
-            copyExpression = getCopyExpression(elementDataType)
-
         yield "inLength = len(inList)"
-        yield "outList = self.outputs[0].getDefaultValue()"
-        yield "if inLength > 0:"
+        yield "if inLength == 0:"
+        yield "    outList = self.outputs[0].getDefaultValue()"
+        yield "else:"
 
         if self.amountType == "AMOUNT":
             yield "    outLength = inLength * amount"
@@ -76,20 +72,15 @@ class RepeatListNode(bpy.types.Node, AnimationNode):
         yield "    outLength = max(0, outLength)"
 
         if self.repetitionType == "LOOP":
-                yield "    elementIterator = itertools.cycle(inList)"
+            yield "    _sourceList = inList"
         elif self.repetitionType == "PING_PONG":
-                yield "    reverse = animation_nodes.algorithms.lists.getReverseFunction('{}')".format(self.assignedType)
-                yield "    reversedList = reverse(inList)"
-                yield "    elementIterator = itertools.cycle(inList + reversedList)"
+            yield "    _reversedList = AN.algorithms.lists.reverse('%s', inList)" % self.assignedType
+            yield "    _sourceList = inList + _reversedList"
 
-        if makeCopies:
-            yield ("    elementIterator = ({} for _element in elementIterator)"
-                   .format(copyExpression.replace("value", "_element")))
-
-        yield "    outList.extend(itertools.islice(elementIterator, outLength))"
+        yield "    outList = AN.algorithms.lists.repeat('%s', _sourceList, outLength)" % self.assignedType
 
     def getUsedModules(self):
-        return ["itertools", "math"]
+        return ["math"]
 
     def assignListDataType(self, listDataType):
         self.assignType(listDataType)

@@ -47,7 +47,7 @@ class FillListNode(bpy.types.Node, AnimationNode):
             socketGroup = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
 
     def getExecutionCode(self):
-        yield ("outList = AN.algorithms.lists.fillList('{}', inList, '{}', length, fillElement, {})"
+        yield ("outList = AN.algorithms.lists.fill('{}', inList, '{}', length, fillElement, {})"
                .format(toListDataType(self.assignedType), self.fillMode, self.makeElementCopies))
 
     def assignListDataType(self, listDataType):

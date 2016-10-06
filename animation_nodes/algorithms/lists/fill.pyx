@@ -20,7 +20,7 @@ def getFillFunction(str dataType, bint makeElementCopies = True):
     else:
         raise NotImplementedError()
 
-def fillList(str dataType, myList, str direction, length, element, bint makeElementCopies = True):
+def fill(str dataType, myList, str direction, length, element, bint makeElementCopies = True):
     length = min(max(length, 0), INT_MAX)
     return getFillFunction(dataType, makeElementCopies)(myList, direction, length, element)
 

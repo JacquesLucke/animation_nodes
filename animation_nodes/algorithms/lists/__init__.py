@@ -1,3 +1,4 @@
-from . shuffle import shuffleList, getShuffleFunction
-from . reverse import reverseList, getReverseFunction
-from . fill import fillList, getFillFunction
+from . shuffle import shuffle, getShuffleFunction
+from . reverse import reverse, getReverseFunction
+from . repeat import repeat, getRepeatFunction
+from . fill import fill, getFillFunction
