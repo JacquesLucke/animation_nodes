@@ -385,20 +385,31 @@ cdef class LISTNAME(CList):
         if self.length == 0 and length > 0:
             raise ValueError("Cannot repeat a list with zero elements to something longer")
 
+        if length <= self.length:
+            return self[:length]
+
         cdef:
             LISTNAME newList = LISTNAME(length)
-            Py_ssize_t copyAmount = length // self.length
-            Py_ssize_t i
+            Py_ssize_t done = 0
+            Py_ssize_t todo = length
 
-        # Full copy as often as possible
-        for i in range(copyAmount):
-            memcpy(newList.data + i * self.length,
-                   self.data,
-                   sizeof(TYPE) * self.length)
-        # Partial copy at the end
-        memcpy(newList.data + self.length * copyAmount,
-               self.data,
-               sizeof(TYPE) * (length % self.length))
+        # Copy First Segment
+        memcpy(newList.data, self.data, self.length * sizeof(TYPE))
+        done = self.length
+        todo -= self.length
+
+        # Replicate already copied segments
+        #  -> double the amount of elements that are copied at each step
+        while todo > 0:
+            if done < todo:
+                memcpy(newList.data + done, newList.data, done * sizeof(TYPE))
+                todo -= done
+                done *= 2
+            else:
+                memcpy(newList.data + done, newList.data, todo * sizeof(TYPE))
+                todo = 0
+                done = length
+
         return newList
 
 
