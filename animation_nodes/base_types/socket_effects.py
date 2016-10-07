@@ -88,9 +88,11 @@ class AutoSelectListDataType(SocketEffect):
 
 
 class AutoSelectDataType(SocketEffect):
-    def __init__(self, propertyName, sockets, ignore = set(), default = None):
+    def __init__(self, propertyName, sockets, *, use = None, ignore = set(), default = None):
         self.propertyName = propertyName
         self.ignoredDataTypes = set(ignore)
+        if use is None: self.usedDataTypes = None
+        else: self.usedDataTypes = set(use)
         self.default = default
         self.socketIDs = self.toSocketIDs(sockets)
 
@@ -98,7 +100,12 @@ class AutoSelectDataType(SocketEffect):
         currentType = getattr(node, self.propertyName)
         for socketID in self.socketIDs:
             socket = self.getSocket(node, socketID)
-            linkedDataTypes = tuple(socket.linkedDataTypes - self.ignoredDataTypes)
+
+            linkedTypes = socket.linkedDataTypes - self.ignoredDataTypes
+            if self.usedDataTypes is None:
+                linkedDataTypes = tuple(linkedTypes)
+            else:
+                linkedDataTypes = tuple(linkedTypes.intersection(self.usedDataTypes))
 
             if len(linkedDataTypes) == 1:
                 if linkedDataTypes[0] != currentType:
