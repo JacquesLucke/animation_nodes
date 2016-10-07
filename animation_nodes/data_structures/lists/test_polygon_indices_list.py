@@ -271,3 +271,31 @@ class TestSetElement(TestCase):
     def testWrongType(self):
         with self.assertRaises(TypeError):
             self.list[1] = "abc"
+
+class TestRemove(TestCase):
+    def setUp(self):
+        self.list = PolygonIndicesList.fromValues([
+            (1, 2, 3), (3, 4, 6, 2, 8), (5, 4, 2), (1, 2, 3)])
+
+    def testExists(self):
+        self.list.remove((3, 4, 6, 2, 8))
+        self.assertEqual(len(self.list), 3)
+        self.list.remove((1, 2, 3))
+        self.assertEqual(len(self.list), 2)
+        self.list.remove((1, 2, 3))
+        self.assertEqual(len(self.list), 1)
+        self.assertEqual(self.list[0], (5, 4, 2))
+
+    def testDoesNotExist(self):
+        with self.assertRaises(ValueError):
+            self.list.remove((1, 2, 3, 4))
+        with self.assertRaises(ValueError):
+            self.list.remove((3, 3, 4, 5))
+
+    def testWrongType(self):
+        with self.assertRaises(ValueError):
+            self.list.remove("abc")
+
+    def testNegativeNumbers(self):
+        with self.assertRaises(ValueError):
+            self.list.remove((4, -2, 3))

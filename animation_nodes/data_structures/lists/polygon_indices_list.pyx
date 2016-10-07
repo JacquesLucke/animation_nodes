@@ -120,6 +120,14 @@ cdef class PolygonIndicesList:
                     counter += 1
         return counter
 
+    cpdef remove(self, value):
+        cdef long index
+        try: index = self.index(value)
+        except (TypeError, OverflowError): index = -1
+        if index == -1:
+            raise ValueError("value is not in list")
+        self.removeElementAtIndex(index)
+
 
     # Utilities for setting and getting
     ###############################################
@@ -140,31 +148,44 @@ cdef class PolygonIndicesList:
 
     cdef setElementAtIndex_SameLength(self, long index, value):
         cdef long i
-        cdef long startIndex = self.polyStarts.data[index]
+        cdef long polyStart = self.polyStarts.data[index]
         for i in range(self.polyLengths.data[index]):
-            self.indices.data[startIndex + i] = value[i]
+            self.indices.data[polyStart + i] = value[i]
 
     cdef setElementAtIndex_DifferentLength(self, long index, value):
         cdef:
-            int startIndex = self.polyStarts.data[index]
+            int polyStart = self.polyStarts.data[index]
             int oldLength = self.polyLengths.data[index]
             int newLength = len(value)
             int lengthDifference = newLength - oldLength
 
         self.indices.grow(self.indices.length + lengthDifference)
 
-        memmove(self.indices.data + startIndex + newLength,
-                self.indices.data + startIndex + oldLength,
-                (self.indices.length - startIndex - oldLength) * sizeof(unsigned int))
+        memmove(self.indices.data + polyStart + newLength,
+                self.indices.data + polyStart + oldLength,
+                (self.indices.length - polyStart - oldLength) * sizeof(unsigned int))
 
         self.indices.length += lengthDifference
 
         cdef long i
-        for i in range(index + 1, self.polyStarts.length):
+        for i in range(index + 1, self.getLength()):
             self.polyStarts.data[i] += lengthDifference
         self.polyLengths.data[index] = newLength
         self.setElementAtIndex_SameLength(index, value)
 
+    cdef removeElementAtIndex(self, long index):
+        index = self.tryCorrectIndex(index)
+        cdef:
+            int polyStart = self.polyStarts.data[index]
+            int polyLength = self.polyLengths.data[index]
+
+        del self.indices[polyStart:polyStart + polyLength]
+        del self.polyStarts[index]
+        del self.polyLengths[index]
+
+        cdef int i
+        for i in range(index, self.getLength()):
+            self.polyStarts.data[i] -= polyLength
 
     cdef tryCorrectIndex(self, long index):
         if index < 0:

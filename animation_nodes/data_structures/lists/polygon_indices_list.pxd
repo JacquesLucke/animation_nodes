@@ -13,6 +13,7 @@ cdef class PolygonIndicesList:
     cpdef copy(self)
     cpdef index(self, value)
     cpdef count(self, value)
+    cpdef remove(self, value)
 
     cdef getElementAtIndex(self, long index)
     cdef getValuesInSlice(self, slice sliceObject)
@@ -20,6 +21,8 @@ cdef class PolygonIndicesList:
     cdef setElementAtIndex(self, long index, value)
     cdef setElementAtIndex_SameLength(self, long index, value)
     cdef setElementAtIndex_DifferentLength(self, long index, value)
+
+    cdef removeElementAtIndex(self, long index)
 
     cpdef copyWithNewOrder(self, ULongList newOrder, checkIndices = ?)
     cdef extend_SameType(self, PolygonIndicesList otherList)

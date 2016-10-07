@@ -58,7 +58,7 @@ class RemoveListElementNode(bpy.types.Node, AnimationNode):
         yield "outList = inList"
         if self.removeType == "FIRST_OCCURRENCE":
             yield "try: inList.remove(element)"
-            yield "except: pass"
+            yield "except ValueError: pass"
         elif self.removeType == "ALL_OCCURRENCES":
             yield "outList = [e for e in inList if e != element]"
         elif self.removeType == "INDEX":
