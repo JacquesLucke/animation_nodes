@@ -1,4 +1,5 @@
 import random
+cimport cython
 from libc.math cimport log, pow
 from libc.string cimport memcpy
 from libc.limits cimport INT_MAX
@@ -76,11 +77,11 @@ cdef getUniqueIndices(int listLength, int amount, int seed, bint shuffled = True
 
     cdef IntegerList indices = IntegerList(length = amount)
 
-    if pow(2, (log(amount) / log(2) - 2) * 2) < listLength:
+    if 2 * (log(amount) / log(2) - 2) < log(listLength) / log(2):
         selectUniqueIndices_Naive(listLength, amount, seed, indices.data)
     else:
         selectUniqueIndices_ReservoirSampling(listLength, amount, seed, indices.data)
-        
+
     if shuffled:
         shuffle_CList(indices, seed * 432 + amount * 6345 + listLength * 5243)
 
@@ -88,6 +89,7 @@ cdef getUniqueIndices(int listLength, int amount, int seed, bint shuffled = True
 
 cdef void selectUniqueIndices_Naive(int listLength, int amount, int seed, int* indicesOut):
     '''
+    O(amount^2)
     Randomly selects indices and reselects if it has been taken already.
     Efficient when the amount is very low compared to the list length.
     '''
@@ -113,7 +115,12 @@ cdef void selectUniqueIndices_Naive(int listLength, int amount, int seed, int* i
                 indicesOut[i] = index
                 break
 
+@cython.cdivision(True)
 cdef void selectUniqueIndices_ReservoirSampling(int listLength, int amount, int seed, int* indicesOut):
+    '''
+    O(listLength)
+    https://en.wikipedia.org/wiki/Reservoir_sampling
+    '''
     cdef:
         int i = 0
         int k = 0
