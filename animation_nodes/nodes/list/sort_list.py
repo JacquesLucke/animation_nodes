@@ -1,173 +1,57 @@
 import bpy
 from bpy.props import *
 from collections import defaultdict
-from ... sockets.info import isList
-from ... utils.code import isCodeValid
-from ... utils.names import toVariableName
-from ... events import executionCodeChanged
-from ... utils.enum_items import enumItemsFromDicts
-from mathutils.geometry import distance_point_to_plane
 from ... base_types import AnimationNode, AutoSelectListDataType
 
 class SortingTemplate:
-    identifier = "NONE"
-    dataType = "NONE"
-    label = "NONE"
+    properties = {}
 
-    def setup(self, node):
+    @classmethod
+    def create(self, node, data):
         pass
 
-    def draw(self, layout):
+    @classmethod
+    def draw(self, layout, data):
         pass
 
-    def sort(self, inList, reverseOutput, *args):
-        '''Returns either the sorted list or an error message'''
-        return []
+    @classmethod
+    def drawAdvanced(self, layout, data):
+        pass
 
-
-
-# Object List Sorting
-##################################################
-
-class SortObjectListWithDirectionTemplate(bpy.types.PropertyGroup, SortingTemplate):
-    identifier = "OBJECT_LIST__DIRECTION"
-    dataType = "Object List"
-    label = "Direction"
-
-    useInitialTransforms = BoolProperty(name = "Use Initial Transforms", default = False)
-
-    def setup(self, node):
-        node.newInput("Vector", "Direction", "direction", value = (0, 0, 1))
-
-    def draw(self, layout):
-        layout.prop(self, "useInitialTransforms")
-
-    def sort(self, objects, reverse, direction):
-        if not all(objects): return "List elements must not be None"
-
-        distance = distance_point_to_plane
-        if self.useInitialTransforms:
-            keyFunction = lambda object: distance(object.id_keys.get("Transforms", "Initial Transforms")[0], (0, 0, 0), direction)
-        else:
-            keyFunction = lambda object: distance(object.location, (0, 0, 0), direction)
-
-        return sorted(objects, key = keyFunction, reverse = reverse)
-
-class SortObjectListByPointDistanceTemplate(bpy.types.PropertyGroup, SortingTemplate):
-    identifier = "OBJECT_LIST__POINT_DISTANCE"
-    dataType = "Object List"
-    label = "Point Distance"
-
-    useInitialTransforms = BoolProperty(name = "Use Initial Transforms", default = False)
-
-    def setup(self, node):
-        node.newInput("Vector", "Point", "point")
-
-    def draw(self, layout):
-        layout.prop(self, "useInitialTransforms")
-
-    def sort(self, objects, reverse, point):
-        if not all(objects): return "List elements must not be None"
-
-        if self.useInitialTransforms:
-            keyFunction = lambda object: (object.id_keys.get("Transforms", "Initial Transforms")[0] - point).length_squared
-        else:
-            keyFunction = lambda object: (object.location - point).length_squared
-
-        return sorted(objects, key = keyFunction, reverse = reverse)
-
-class SortObjectListByNameTemplate(bpy.types.PropertyGroup, SortingTemplate):
-    identifier = "OBJECT_LIST__NAME"
-    dataType = "Object List"
-    label = "Name"
-
-    def sort(self, objects, reverse):
-        if not all(objects): return "List elements must not be None"
-
-        return sorted(objects, key = lambda x: x.name, reverse = reverse)
-
-
-# Collect templates in a property group
-##################################################
-
-class SortingTemplates(bpy.types.PropertyGroup):
-    bl_idname = "an_SortingTemplatesGroup"
-
-    templateIdentifiersByDataType = defaultdict(list)
-
-    def getTemplates(self, dataType):
-        identifiers = self.templateIdentifiersByDataType[dataType]
-        return [self.getTemplate(identifier) for identifier in identifiers]
-
-    def getTemplate(self, identifier):
-        return getattr(self, identifier)
-
-for template in SortingTemplate.__subclasses__():
-    setattr(SortingTemplates, template.identifier, PointerProperty(type = template))
-    SortingTemplates.templateIdentifiersByDataType[template.dataType].append(template.identifier)
-
-
-
-# Actual Node
-###################################################
-
-keyListTypeItems = [
-    ("FLOAT", "Float", "", "NONE", 0),
-    ("TEXT", "Text", "", "NONE", 1) ]
+class SortingTemplateProperties(bpy.types.PropertyGroup):
+    bl_idname = "an_SortingTemplateProperties"
 
 class SortListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SortListNode"
     bl_label = "Sort List"
     bl_width_default = 190
 
-    templates = PointerProperty(type = SortingTemplates)
-
-    assignedType = StringProperty(update = AnimationNode.updateSockets, default = "Object List")
-
-    def getSortTypeItems(self, context):
-        items = []
-        items.append({"value" : "CUSTOM", "name" : "Custom"})
-        items.append({"value" : "KEY_LIST", "name" : "Key List"})
-        for template in self.templates.getTemplates(self.assignedType):
-            items.append({"value" : template.identifier, "name" : template.label})
-        return enumItemsFromDicts(items)
-
-    sortType = EnumProperty(name = "Sort Type", update = AnimationNode.updateSockets,
-        items = getSortTypeItems)
-
-    sortKey = StringProperty(update = executionCodeChanged, default = "e")
-
-    keyListType = EnumProperty(name = "Key List Type", default = "FLOAT",
-        items = keyListTypeItems, update = AnimationNode.updateSockets)
-
-    def elementNameChanged(self, context):
-        variableName = toVariableName(self.elementName)
-        if variableName != self.elementName:
-            self.elementName = variableName
-        executionCodeChanged()
-
-    elementName = StringProperty(name = "Element Name", default = "e",
-        update = elementNameChanged)
-
     errorMessage = StringProperty()
 
+    assignedType = StringProperty(default = "Object List",
+        update = AnimationNode.updateSockets)
+
+    templateData = PointerProperty(type = SortingTemplateProperties)
+
+    def getSortingTemplateItems(self, context):
+        items = []
+        for template in getTemplatesForDataType(self.assignedType):
+            item = (template.identifier, template.name, "")
+            items.append(item)
+        return items
+
+    activeTemplateIdentifier = EnumProperty(name = "Template",
+        update = AnimationNode.updateSockets, items = getSortingTemplateItems)
+
     def setup(self):
-        self.sortType = "CUSTOM"
+        self.activeTemplateIdentifier = "CUSTOM"
 
     def create(self):
-        listDataType = self.assignedType
-        self.newInput(listDataType, "List", "inList", dataIsModified = True)
+        self.newInput(self.assignedType, "List", "inList", dataIsModified = True)
         self.newInput("Boolean", "Reverse", "reverseOutput", value = False)
+        self.newOutput(self.assignedType, "Sorted List", "outList")
 
-        if self.sortType == "KEY_LIST":
-            if self.keyListType == "FLOAT":
-                self.newInput("Float List", "Key List", "keyList")
-            elif self.keyListType == "TEXT":
-                self.newInput("Text List", "Key List", "keyList")
-
-        self.newOutput(listDataType, "Sorted List", "outList")
-
-        self.setupActiveTemplate()
+        self.activeTemplate.create(self, self.activeTemplateData)
 
         self.newSocketEffect(AutoSelectListDataType("assignedType", "LIST",
             [(self.inputs[0], "LIST"),
@@ -175,86 +59,65 @@ class SortListNode(bpy.types.Node, AnimationNode):
         ))
 
     def draw(self, layout):
-        layout.prop(self, "sortType", text = "Type")
-
-        if self.sortType == "CUSTOM":
-            col = layout.column(align = True)
-            col.label("Key (use {} for the element)".format(repr(self.elementName)))
-            col.prop(self, "sortKey", text = "")
-        elif self.sortType == "KEY_LIST":
-            layout.prop(self, "keyListType", text = "Keys")
-        else:
-            self.activeTemplate.draw(layout)
-
+        layout.prop(self, "activeTemplateIdentifier", text = "")
+        self.activeTemplate.draw(layout, self.activeTemplateData)
         if self.errorMessage != "":
             layout.label(self.errorMessage, icon = "ERROR")
 
     def drawAdvanced(self, layout):
-        layout.prop(self, "elementName")
+        self.activeTemplate.drawAdvanced(layout, self.activeTemplateData)
 
-    def getExecutionCode(self):
-        if self.sortType == "CUSTOM":
-            yield from self.iterCustomSortingLines()
-        elif self.sortType == "KEY_LIST":
-            yield from self.iterKeyListSortingLines()
-        else:
-            yield from self.iterTemplateSortingLines()
-
-    def iterCustomSortingLines(self):
-        sortExpression = "sorted(inList, key = lambda {}: {}, reverse = reverseOutput)".format(self.elementName, self.sortKey)
-        if isCodeValid(sortExpression):
-            self.errorMessage = ""
-            yield "try:"
-            yield "    outList = " + sortExpression
-            yield "    self.errorMessage = ''"
-            yield "except:"
-            yield "    outList = []"
-            yield "    self.errorMessage = str(sys.exc_info()[1])"
-        else:
-            self.errorMessage = "Invalid Expression"
-            yield "outList = inList"
-
-    def iterKeyListSortingLines(self):
-        zipExpression = "zip(inList, keyList)"
-        sortExpression = "sorted({}, key = lambda item: item[1], reverse = reverseOutput)".format(zipExpression)
-        unzipExpression = "[item[0] for item in {}]".format(sortExpression)
-
-        yield "if len(inList) == len(keyList):"
-        yield "    try:"
-        yield "        outList = {}".format(unzipExpression)
-        yield "        self.errorMessage = ''"
-        yield "    except:"
-        yield "        outList = []"
-        yield "        self.errorMessage = str(sys.exc_info()[1])"
-        yield "else:"
-        yield "    outList = []"
-        yield "    self.errorMessage = 'The list lengths are not equal'"
-
-    def iterTemplateSortingLines(self):
-        yield "self.errorMessage = ''"
-        templateParameters = ", ".join(socket.identifier for socket in self.inputs)
-        yield "output = self.activeTemplate.sort({})".format(templateParameters)
-        yield "if isinstance(output, list):"
-        yield "    outList = output"
-        yield "    self.errorMessage = ''"
-        yield "else:"
-        yield "    outList = []"
-        yield "    self.errorMessage = output"
-
-    def assignType(self, listDataType):
-        if not isList(listDataType): return
-        if listDataType == self.assignedType: return
-        self.assignedType = listDataType
-
-        if self.sortType not in ("CUSTOM", "KEY_LIST"):
-            self.sortType = "CUSTOM"
-
-    def setupActiveTemplate(self):
-        template = self.activeTemplate
-        if template is not None:
-            template.setup(self)
+    def execute(self, *args):
+        self.errorMessage = ""
+        try:
+            sortedList = self.activeTemplate.execute(self.activeTemplateData, *args)
+            return self.outputs[0].correctValue(sortedList)[0]
+        except Exception as e:
+            self.errorMessage = str(e)
+            return self.outputs[0].getDefaultValue()
 
     @property
     def activeTemplate(self):
-        if self.sortType in ("CUSTOM", "KEY_LIST"): return None
-        return self.templates.getTemplate(self.sortType)
+        return getTemplateByIdentifer(self.activeTemplateIdentifier)
+
+    @property
+    def activeTemplateData(self):
+        return getattr(self.templateData, self.activeTemplateIdentifier, None)
+
+
+
+templates = []
+templatesByDataType = defaultdict(list)
+templateByIdentifier = {}
+
+def updateSortingTemplates():
+    global templates
+
+    templates = list(SortingTemplate.__subclasses__())
+    for template in templates:
+        identifier = template.identifier
+        if not hasattr(SortingTemplateProperties, identifier):
+            registerSortingTemplate(template)
+
+def registerSortingTemplate(template):
+    templates.append(template)
+    templatesByDataType[template.dataType].append(template)
+    templateByIdentifier[template.identifier] = template
+
+    propertyGroup = type("an_SortingTemplateProperties_" + template.identifier,
+                         (bpy.types.PropertyGroup,),
+                         {"bl_label" : template.name})
+
+    bpy.utils.register_class(propertyGroup)
+    for name, prop in template.properties.items():
+        setattr(propertyGroup, name, prop)
+
+    setattr(SortingTemplateProperties,
+            template.identifier,
+            PointerProperty(type = propertyGroup))
+
+def getTemplatesForDataType(dataType):
+    return templatesByDataType["All"] + templatesByDataType[dataType]
+
+def getTemplateByIdentifer(identifier):
+    return templateByIdentifier.get(identifier, None)
