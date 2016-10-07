@@ -46,6 +46,10 @@ cdef class PolygonIndicesList:
         else:
             return b.repeated(amount = max(0, a))
 
+    def __contains__(self, value):
+        try: return self.index(value) >= 0
+        except: return False
+
     def __iter__(self):
         return PolygonIndicesListIterator(self)
 
