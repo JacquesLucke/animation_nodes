@@ -221,3 +221,53 @@ class TestCount(TestCase):
     def testNegativeNumbers(self):
         with self.assertRaises(Exception):
             self.list.count((3, -2, 5))
+
+class TestSetElement(TestCase):
+    def setUp(self):
+        self.list = PolygonIndicesList.fromValues([
+            (1, 2, 3), (3, 4, 6, 2, 8), (5, 4, 2), (1, 2, 3)])
+
+    def testSameLength(self):
+        self.list[0] = (5, 6, 7)
+        self.list[1] = (5, 6, 7, 8, 9)
+
+        self.assertEqual(len(self.list), 4)
+        self.assertEqual(self.list[0], (5, 6, 7))
+        self.assertEqual(self.list[1], (5, 6, 7, 8, 9))
+        self.assertEqual(self.list[2], (5, 4, 2))
+        self.assertEqual(self.list[3], (1, 2, 3))
+
+    def testDifferentLength(self):
+        self.list[0] = (5, 6, 7, 8, 9)
+        self.list[1] = (5, 6, 7)
+
+        self.assertEqual(len(self.list), 4)
+        self.assertEqual(self.list[0], (5, 6, 7, 8, 9))
+        self.assertEqual(self.list[1], (5, 6, 7))
+        self.assertEqual(self.list[2], (5, 4, 2))
+        self.assertEqual(self.list[3], (1, 2, 3))
+
+    def testNegativeIndex(self):
+        self.list[-2] = (1, 2, 3, 4, 5)
+        self.assertEqual(self.list[0], (1, 2, 3))
+        self.assertEqual(self.list[1], (3, 4, 6, 2, 8))
+        self.assertEqual(self.list[2], (1, 2, 3, 4, 5))
+        self.assertEqual(self.list[3], (1, 2, 3))
+
+    def testNegativeNumbers(self):
+        with self.assertRaises(TypeError):
+            self.list[1] = (4, -6, 2)
+
+    def testTooShort(self):
+        with self.assertRaises(TypeError):
+            self.list[1] = (3, 2)
+
+    def testWrongIndex(self):
+        with self.assertRaises(IndexError):
+            self.list[7] = (1, 2, 3)
+        with self.assertRaises(IndexError):
+            self.list[-7] = (1, 2, 3)
+
+    def testWrongType(self):
+        with self.assertRaises(TypeError):
+            self.list[1] = "abc"

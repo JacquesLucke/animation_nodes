@@ -1,4 +1,4 @@
-from libc.string cimport memcpy, memcmp
+from libc.string cimport memcpy, memcmp, memmove
 
 cdef class PolygonIndicesList:
     def __cinit__(self, long indicesAmount = 0, long polygonAmount = 0):
@@ -22,6 +22,14 @@ cdef class PolygonIndicesList:
         elif isinstance(key, slice):
             return self.getValuesInSlice(key)
         raise TypeError("expected int or slice")
+
+    def __setitem__(self, key, value):
+        if not self.isValueValid(value):
+            raise TypeError("not valid polygon indices")
+        if isinstance(key, int):
+            self.setElementAtIndex(key, value)
+        else:
+            raise TypeError("expected int")
 
     def __add__(a, b):
         cdef PolygonIndicesList newList = PolygonIndicesList()
@@ -121,6 +129,42 @@ cdef class PolygonIndicesList:
         cdef long start = self.polyStarts.data[index]
         cdef long length = self.polyLengths.data[index]
         return tuple(self.indices.data[i] for i in range(start, start + length))
+
+    cdef setElementAtIndex(self, long index, value):
+        # value has to be valid at this point
+        index = self.tryCorrectIndex(index)
+        if len(value) == self.polyLengths.data[index]:
+            self.setElementAtIndex_SameLength(index, value)
+        else:
+            self.setElementAtIndex_DifferentLength(index, value)
+
+    cdef setElementAtIndex_SameLength(self, long index, value):
+        cdef long i
+        cdef long startIndex = self.polyStarts.data[index]
+        for i in range(self.polyLengths.data[index]):
+            self.indices.data[startIndex + i] = value[i]
+
+    cdef setElementAtIndex_DifferentLength(self, long index, value):
+        cdef:
+            int startIndex = self.polyStarts.data[index]
+            int oldLength = self.polyLengths.data[index]
+            int newLength = len(value)
+            int lengthDifference = newLength - oldLength
+
+        self.indices.grow(self.indices.length + lengthDifference)
+
+        memmove(self.indices.data + startIndex + newLength,
+                self.indices.data + startIndex + oldLength,
+                (self.indices.length - startIndex - oldLength) * sizeof(unsigned int))
+
+        self.indices.length += lengthDifference
+
+        cdef long i
+        for i in range(index + 1, self.polyStarts.length):
+            self.polyStarts.data[i] += lengthDifference
+        self.polyLengths.data[index] = newLength
+        self.setElementAtIndex_SameLength(index, value)
+
 
     cdef tryCorrectIndex(self, long index):
         if index < 0:
