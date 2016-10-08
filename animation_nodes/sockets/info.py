@@ -163,12 +163,6 @@ def getSocketClass(input):
     return _socketInfo.classByType[input]
 
 
-def getListDataTypeItemsCallback(self, context):
-    return getListDataTypeItems()
-
-def getBaseDataTypeItemsCallback(self, context):
-    return getBaseDataTypeItems()
-
 def getListDataTypeItems():
     return enumItemsFromList(getListDataTypes())
 
