@@ -1,8 +1,8 @@
 import bpy
 from bpy.props import *
 from .. events import propertyChanged
-from .. algorithms.hashing import strToEnumItemID
 from .. base_types import AnimationNodeSocket
+from .. algorithms.hashing import strToEnumItemID
 from .. utils.nodes import newNodeAtCursor, invokeTranslation
 from .. nodes.sound.sound_from_sequences import (SingleSoundEvaluator,
                                                  EqualizerSoundEvaluator)

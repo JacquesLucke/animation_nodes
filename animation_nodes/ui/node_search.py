@@ -1,24 +1,23 @@
 import bpy
 import itertools
 from bpy.props import *
-from .. utils.enum_items import enumItemsFromDicts
 from .. utils.nodes import getAnimationNodeClasses, newNodeAtCursor, invokeTranslation
 
 itemsByIdentifier = {}
-
-def getSearchItems(self, context):
-    itemsByIdentifier.clear()
-    items = []
-    for item in itertools.chain(iterSingleNodeItems()):
-        itemsByIdentifier[item.identifier] = item
-        items.append({"value" : item.identifier, "name" : item.searchTag})
-    return enumItemsFromDicts(items)
 
 class NodeSearch(bpy.types.Operator):
     bl_idname = "an.node_search"
     bl_label = "Node Search"
     bl_options = {"REGISTER"}
     bl_property = "item"
+
+    def getSearchItems(self, context):
+        itemsByIdentifier.clear()
+        items = []
+        for item in itertools.chain(iterSingleNodeItems()):
+            itemsByIdentifier[item.identifier] = item
+            items.append((item.identifier, item.searchTag, ""))
+        return items
 
     item = EnumProperty(items = getSearchItems)
 
