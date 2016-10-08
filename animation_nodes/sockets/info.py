@@ -12,6 +12,7 @@ class SocketInfo:
 
         self.classByType = dict()
         self.typeConversion = dict()
+        self.allowedInputDataTypes = dict()
 
         self.baseIdName = dict()
         self.listIdName = dict()
@@ -34,6 +35,15 @@ class SocketInfo:
         for socket in socketClasses:
             if hasattr(socket, "baseDataType"):
                 self.insertSocketConnection(socket.baseDataType, socket.dataType)
+
+        # insert allowed input data types
+        for socket in socketClasses:
+            if "All" in socket.allowedInputTypes:
+                inputTypes = self.dataTypes
+            else:
+                inputTypes = socket.allowedInputTypes
+            self.allowedInputDataTypes[socket.dataType] = inputTypes
+            self.allowedInputDataTypes[socket.bl_idname] = inputTypes
 
     def insertSocket(self, socketClass):
         idName = socketClass.bl_idname
@@ -147,6 +157,9 @@ def getCopyExpression(input):
 
 def getCopyFunction(input):
     return _socketInfo.copyFunctionByType[input]
+
+def getAllowedInputDataTypes(input):
+    return _socketInfo.allowedInputDataTypes[input]
 
 def getSocketClass(input):
     return _socketInfo.classByType[input]

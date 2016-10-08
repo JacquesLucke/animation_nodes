@@ -1,5 +1,6 @@
 from collections import OrderedDict
-from .. sockets.info import isBase, isList, toBaseDataType, toListDataType
+from .. sockets.info import (isBase, isList, toBaseDataType, toListDataType,
+                             getAllowedInputDataTypes)
 
 class SocketEffect:
     def apply(self, node):
@@ -124,15 +125,19 @@ class AutoSelectVectorization(SocketEffect):
         self.dependencies[propertyName] = dependencies
 
         if getattr(node, propertyName):
-            self.listDataTypes[propertyName] = {socketID : socket.dataType
-                                                for socket, socketID in zip(sockets, socketIDs)}
-            self.baseDataTypes[propertyName] = {socketID : toBaseDataType(socket.dataType)
-                                                for socket, socketID in zip(sockets, socketIDs)}
+            self.listDataTypes[propertyName] =
+                {socketID : getAllowedInputDataTypes(socket.dataType)
+                 for socket, socketID in zip(sockets, socketIDs)}
+            self.baseDataTypes[propertyName] =
+                {socketID : getAllowedInputDataTypes(toBaseDataType(socket.dataType))
+                 for socket, socketID in zip(sockets, socketIDs)}
         else:
-            self.listDataTypes[propertyName] = {socketID : toListDataType(socket.dataType)
-                                                for socket, socketID in zip(sockets, socketIDs)}
-            self.baseDataTypes[propertyName] = {socketID : socket.dataType
-                                                for socket, socketID in zip(sockets, socketIDs)}
+            self.listDataTypes[propertyName] =
+                {socketID : getAllowedInputDataTypes(toListDataType(socket.dataType))
+                 for socket, socketID in zip(sockets, socketIDs)}
+            self.baseDataTypes[propertyName] =
+                {socketID : getAllowedInputDataTypes(socket.dataType)
+                 for socket, socketID in zip(sockets, socketIDs)}
 
     def setSocketTransparency(self, sockets):
         for socket in sockets:
@@ -149,10 +154,10 @@ class AutoSelectVectorization(SocketEffect):
                 socket = self.getSocket(node, socketID)
                 linkedDataTypes = tuple(socket.linkedDataTypes - {"Generic"})
                 if len(linkedDataTypes) == 1:
-                    if linkedDataTypes[0] == self.listDataTypes[propertyName][socketID]:
+                    if linkedDataTypes[0] in self.listDataTypes[propertyName][socketID]:
                         states[propertyName] = "LIST"
                         fixedProperties.add(propertyName)
-                    elif linkedDataTypes[0] == self.baseDataTypes[propertyName][socketID]:
+                    elif linkedDataTypes[0] in self.baseDataTypes[propertyName][socketID]:
                         states[propertyName] = "BASE"
                         fixedProperties.add(propertyName)
                     break

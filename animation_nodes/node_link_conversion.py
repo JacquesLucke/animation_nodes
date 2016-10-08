@@ -2,8 +2,8 @@ import bpy
 from . import tree_info
 from mathutils import Vector
 from . utils.nodes import idToSocket
-from . sockets.info import toBaseIdName, isList
 from . tree_info import getAllDataLinkIDs, getDirectlyLinkedSocket
+from . sockets.info import toBaseIdName, isList, getAllowedInputDataTypes
 
 def correctForbiddenNodeLinks():
     allLinksCorrect = False
@@ -36,7 +36,7 @@ def getNextInvalidLink():
     return None, None
 
 def isConnectionValid(origin, target):
-    return origin.dataType in target.allowedInputTypes or target.allowedInputTypes[0] == "All"
+    return origin.dataType in getAllowedInputDataTypes(target.dataType)
 
 def tryToCorrectLink(dataOrigin, directOrigin, target):
     for corrector in linkCorrectors:

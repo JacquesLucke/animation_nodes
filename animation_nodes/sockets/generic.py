@@ -35,7 +35,7 @@ class GenericListSocket(bpy.types.NodeSocket, PythonListSocket, AnimationNodeSoc
     bl_label = "GenericListSocket"
     dataType = "Generic List"
     baseDataType = "Generic"
-    allowedInputTypes = ["Generic List"]
+    allowedInputTypes = ["All"]
     drawColor = (0.6, 0.3, 0.3, 0.5)
     storable = True
     comparable = False

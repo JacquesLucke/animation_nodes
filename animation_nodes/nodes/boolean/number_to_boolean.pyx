@@ -1,39 +1,34 @@
 import bpy
 from bpy.props import *
-from ... sockets.info import isList
-from ... base_types import AnimationNode, AutoSelectDataType
-from ... data_structures cimport DoubleList, LongLongList, BooleanList
-
-ctypedef fused NumberList:
-    DoubleList
-    LongLongList
+from ... data_structures cimport DoubleList, BooleanList
+from ... base_types import AnimationNode, AutoSelectVectorization
 
 class NumberToBooleanNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_NumberToBooleanNode"
     bl_label = "Number to Boolean"
 
-    sourceType = StringProperty(default = "Integer", update = AnimationNode.updateSockets)
+    useList = BoolProperty(update = AnimationNode.updateSockets)
 
     def create(self):
-        if isList(self.sourceType):
-            self.newInput(self.sourceType, "Numbers", "numbers", alternativeIdentifier = "number")
-        else:
-            self.newInput(self.sourceType, "Number", "number", alternativeIdentifier = "numbers")
+        self.newInputGroup(self.useList,
+            ("Float", "Number", "number"),
+            ("Float List", "Numbers", "numbers"))
 
-        self.newOutputGroup(isList(self.sourceType),
+        self.newOutputGroup(self.useList,
             ("Boolean", "Boolean", "boolean"),
             ("Boolean List", "Booleans", "booleans"))
 
-        self.newSocketEffect(AutoSelectDataType("sourceType", [self.inputs[0]],
-            use = ["Integer", "Float", "Integer List", "Float List"]))
+        vectorization = AutoSelectVectorization()
+        vectorization.add(self, "useList", [self.inputs[0], self.outputs[0]])
+        self.newSocketEffect(vectorization)
 
     def getExecutionCode(self):
-        if isList(self.sourceType):
+        if self.useList:
             return "booleans = self.convertToBooleanList(numbers)"
         else:
             return "boolean = bool(number)"
 
-    def convertToBooleanList(self, NumberList inList):
+    def convertToBooleanList(self, DoubleList inList):
         cdef BooleanList outList = BooleanList(length = inList.length)
         cdef long i
         for i in range(len(inList)):
