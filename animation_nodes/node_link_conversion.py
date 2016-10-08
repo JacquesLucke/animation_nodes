@@ -36,7 +36,7 @@ def getNextInvalidLink():
     return None, None
 
 def isConnectionValid(origin, target):
-    return origin.dataType in target.allowedInputTypes or target.allowedInputTypes[0] == "all"
+    return origin.dataType in target.allowedInputTypes or target.allowedInputTypes[0] == "All"
 
 def tryToCorrectLink(dataOrigin, directOrigin, target):
     for corrector in linkCorrectors:
@@ -61,7 +61,6 @@ class SimpleConvert(LinkCorrection):
     rules = {
         ("Boolean", "Integer") : "an_BooleanToIntegerNode",
         ("Boolean", "Float") : "an_BooleanToIntegerNode",
-        ("Float", "Integer") : "an_FloatToIntegerNode",
         ("Vector", "Matrix") : "an_TranslationMatrixNode",
         ("Text Block", "Text") : "an_TextBlockReaderNode",
         ("Vector", "Float") : "an_SeparateVectorNode",

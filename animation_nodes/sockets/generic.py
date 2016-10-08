@@ -5,7 +5,7 @@ class GenericSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_GenericSocket"
     bl_label = "Generic Socket"
     dataType = "Generic"
-    allowedInputTypes = ["all"]
+    allowedInputTypes = ["All"]
     drawColor = (0.6, 0.3, 0.3, 1.0)
     storable = True
     comparable = False

@@ -157,6 +157,14 @@ def getLinkedDataTypes(socket):
         dataTypes.add(_forestData.dataTypeBySocket[linkedSocketID])
     return dataTypes
 
+def iterLinkedInputSocketsWithOriginDataType(node):
+    linkedSocketsDict = _forestData.linkedSockets
+    inputIDs = _forestData.socketsByNode[node.toID()][0]
+    for socket, socketID in zip(node.inputs, inputIDs):
+        linkedSockets = linkedSocketsDict[socketID]
+        if len(linkedSockets) > 0:
+            yield socket, _forestData.dataTypeBySocket[linkedSockets[0]]
+
 
 # keep node state
 

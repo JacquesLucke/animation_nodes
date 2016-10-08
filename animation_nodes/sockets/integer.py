@@ -13,7 +13,7 @@ class IntegerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_IntegerSocket"
     bl_label = "Integer Socket"
     dataType = "Integer"
-    allowedInputTypes = ["Integer"]
+    allowedInputTypes = ["Integer", "Float"]
     drawColor = (0.3, 0.4, 1.0, 1.0)
     comparable = True
     storable = True
@@ -46,6 +46,11 @@ class IntegerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return 0
 
     @classmethod
+    def getConversionCode(cls, dataType):
+        if dataType == "Float":
+            return "int(value)"
+
+    @classmethod
     def correctValue(cls, value):
         if isinstance(value, int):
             return value, 0
@@ -59,8 +64,13 @@ class IntegerListSocket(bpy.types.NodeSocket, CythonListSocket, AnimationNodeSoc
     bl_label = "Integer List Socket"
     dataType = "Integer List"
     baseDataType = "Integer"
-    allowedInputTypes = ["Integer List"]
+    allowedInputTypes = ["Integer List", "Float List"]
     drawColor = (0.3, 0.4, 1.0, 0.5)
     storable = True
     comparable = False
     listClass = LongLongList
+
+    @classmethod
+    def getConversionCode(cls, dataType):
+        if dataType == "Float List":
+            return "LongLongList.fromValues(value)"

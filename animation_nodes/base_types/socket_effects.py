@@ -15,22 +15,6 @@ class SocketEffect:
         return (node.outputs if socketID[0] else node.inputs)[socketID[1]]
 
 
-class AutoSelectFloatOrInteger(SocketEffect):
-    def __init__(self, propertyName, socket):
-        self.socketID = self.toSocketID(socket)
-        self.propertyName = propertyName
-
-    def apply(self, node):
-        socket = self.getSocket(node, self.socketID)
-        linkedDataTypes = socket.linkedDataTypes - {"Generic"}
-        if socket.dataType == "Float":
-            if linkedDataTypes == {"Integer"}:
-                setattr(node, self.propertyName, "Integer")
-        elif socket.dataType == "Integer":
-            if linkedDataTypes == {"Float"}:
-                setattr(node, self.propertyName, "Float")
-
-
 class AutoSelectListDataType(SocketEffect):
     def __init__(self, propertyName, propertyType, sockets):
         self.propertyName = propertyName

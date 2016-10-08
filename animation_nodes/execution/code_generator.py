@@ -4,7 +4,8 @@ from itertools import chain
 from functools import lru_cache
 from .. problems import NodeFailesToCreateExecutionCode
 from .. preferences import addonName, getExecutionCodeType
-from .. tree_info import iterLinkedSocketsWithInfo, isSocketLinked
+from .. tree_info import (iterLinkedSocketsWithInfo, isSocketLinked,
+                          iterLinkedInputSocketsWithOriginDataType)
 
 
 
@@ -153,10 +154,21 @@ def setupNodeForExecution(node, variables):
 def iterNodePreExecutionLines(node, variables):
     yield ""
     yield getNodeCommentLine(node)
+    yield from iterInputConversionLines(node, variables)
     yield from iterInputCopyLines(node, variables)
 
 def getNodeCommentLine(node):
     return "# Node: {} - {}".format(repr(node.nodeTree.name), repr(node.name))
+
+def iterInputConversionLines(node, variables):
+    for socket, dataType in iterLinkedInputSocketsWithOriginDataType(node):
+        if socket.dataType != dataType and socket.dataType != "All":
+            conversionExpression = socket.getConversionCode(dataType)
+            if conversionExpression is not None:
+                conversion = conversionExpression.replace("value", variables[socket])
+                newVariableName = variables[socket] + "_converted"
+                yield "{} = {}".format(newVariableName, conversion)
+                variables[socket] = newVariableName
 
 def iterInputCopyLines(node, variables):
     for socket in node.inputs:

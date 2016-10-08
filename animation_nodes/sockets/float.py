@@ -65,3 +65,8 @@ class FloatListSocket(bpy.types.NodeSocket, CythonListSocket, AnimationNodeSocke
     storable = True
     comparable = False
     listClass = DoubleList
+
+    @classmethod
+    def getConversionCode(cls, dataType):
+        if dataType == "Integer List":
+            return "DoubleList.fromValues(value)"

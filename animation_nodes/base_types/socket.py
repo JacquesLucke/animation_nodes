@@ -87,6 +87,10 @@ class AnimationNodeSocket:
         '''
         raise NotImplementedError("All sockets have to define a correctValue method")
 
+    @classmethod
+    def getConversionCode(cls, dataType):
+        return None
+
 
     # Drawing
     ##########################################################
