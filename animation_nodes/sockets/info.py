@@ -144,11 +144,9 @@ def isIdName(name):
     return name in _socketInfo.idNames
 
 
-@returnOnFailure(False)
 def isComparable(input):
     return _socketInfo.classByType[input].comparable
 
-@returnOnFailure(False)
 def isCopyable(input):
     return _socketInfo.classByType[input].isCopyable()
 

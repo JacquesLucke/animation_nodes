@@ -1,8 +1,8 @@
 import bpy
 from bpy.props import *
+from ... sockets.info import isList
 from ... events import executionCodeChanged
 from ... base_types import AnimationNode, AutoSelectListDataType
-from ... sockets.info import isList, toBaseDataType, isCopyable, getCopyExpression
 
 repetitionTypeItems = [
     ("LOOP", "Loop", "Repeat", "NONE", 0),
