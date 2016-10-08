@@ -3,7 +3,6 @@ from bpy.props import *
 from ... events import propertyChanged
 from ... base_types import AnimationNode
 from ... utils.names import getRandomString
-from ... utils.enum_items import enumItemsFromDicts
 from ... utils.blender_ui import iterActiveSpacesByType
 from ... nodes.container_provider import getMainObjectContainer
 from ... utils.names import (getPossibleMeshName,
@@ -23,10 +22,9 @@ objectTypeItems = [
     ("Curve 3D", "Curve 3D", "", "CURVE_DATA", 5),
     ("Empty", "Empty", "", "EMPTY_DATA", 6) ]
 
-emptyDrawTypes = []
+emptyDrawTypeItems = []
 for item in bpy.types.Object.bl_rna.properties["empty_draw_type"].enum_items:
-    emptyDrawTypes.append({"value" : item.identifier, "name" : item.name})
-emptyDrawTypeItems = enumItemsFromDicts(emptyDrawTypes)
+    emptyDrawTypeItems.append((item.identifier, item.name, ""))
 
 class an_ObjectNamePropertyGroup(bpy.types.PropertyGroup):
     objectName = StringProperty(name = "Object Name", default = "", update = propertyChanged)
