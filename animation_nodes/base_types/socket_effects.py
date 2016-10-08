@@ -125,19 +125,19 @@ class AutoSelectVectorization(SocketEffect):
         self.dependencies[propertyName] = dependencies
 
         if getattr(node, propertyName):
-            self.listDataTypes[propertyName] =
+            self.listDataTypes[propertyName] = (
                 {socketID : getAllowedInputDataTypes(socket.dataType)
-                 for socket, socketID in zip(sockets, socketIDs)}
-            self.baseDataTypes[propertyName] =
+                 for socket, socketID in zip(sockets, socketIDs)})
+            self.baseDataTypes[propertyName] = (
                 {socketID : getAllowedInputDataTypes(toBaseDataType(socket.dataType))
-                 for socket, socketID in zip(sockets, socketIDs)}
+                 for socket, socketID in zip(sockets, socketIDs)})
         else:
-            self.listDataTypes[propertyName] =
+            self.listDataTypes[propertyName] = (
                 {socketID : getAllowedInputDataTypes(toListDataType(socket.dataType))
-                 for socket, socketID in zip(sockets, socketIDs)}
-            self.baseDataTypes[propertyName] =
+                 for socket, socketID in zip(sockets, socketIDs)})
+            self.baseDataTypes[propertyName] = (
                 {socketID : getAllowedInputDataTypes(socket.dataType)
-                 for socket, socketID in zip(sockets, socketIDs)}
+                 for socket, socketID in zip(sockets, socketIDs)})
 
     def setSocketTransparency(self, sockets):
         for socket in sockets:
