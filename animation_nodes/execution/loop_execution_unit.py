@@ -5,7 +5,7 @@ from .. problems import ExecutionUnitNotSetup
 from . code_generator import (getInitialVariables,
                               iterSetupCodeLines,
                               getCopyExpression,
-                              getNodeCommentLine,
+                              iterNodeCommentLines,
                               getGlobalizeStatement,
                               getLoadSocketValueLine,
                               linkOutputSocketsToTargets,
@@ -174,8 +174,7 @@ class LoopExecutionUnit:
 
     def iter_AddToGenerators(self, inputNode, variables, nodeByID):
         for node in inputNode.getSortedGeneratorNodes(nodeByID):
-            yield ""
-            yield getNodeCommentLine(node)
+            yield from iterNodeCommentLines(node)
             yield "if {}:".format(variables[node.conditionSocket])
 
             socket = node.addSocket

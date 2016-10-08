@@ -108,6 +108,7 @@ def getFunction_IterNodeExecutionLines():
         return iterNodeExecutionLines_Bake
 
 def iterNodeExecutionLines_Basic(node, variables):
+    yield from iterNodeCommentLines(node)
     yield from setupNodeForExecution(node, variables)
     try:
         yield from iterRealNodeExecutionLines(node, variables)
@@ -115,6 +116,7 @@ def iterNodeExecutionLines_Basic(node, variables):
         handleExecutionCodeCreationException(node)
 
 def iterNodeExecutionLines_Monitored(node, variables):
+    yield from iterNodeCommentLines(node)
     yield from setupNodeForExecution(node, variables)
     yield "try:"
     try:
@@ -131,15 +133,17 @@ def iterNodeExecutionLines_Monitored(node, variables):
     yield "    raise"
 
 def iterNodeExecutionLines_MeasureTimes(node, variables):
-    yield from setupNodeForExecution(node, variables)
+    yield from iterNodeCommentLines(node)
     try:
         yield "_execution_start_time = getCurrentTime()"
+        yield from setupNodeForExecution(node, variables)
         yield from iterRealNodeExecutionLines(node, variables)
         yield "_node_execution_times[{}].registerTime(getCurrentTime() - _execution_start_time)".format(repr(node.identifier))
     except:
         handleExecutionCodeCreationException(node)
 
 def iterNodeExecutionLines_Bake(node, variables):
+    yield from iterNodeCommentLines(node)
     yield from setupNodeForExecution(node, variables)
     try:
         yield from iterRealNodeExecutionLines(node, variables)
@@ -147,18 +151,17 @@ def iterNodeExecutionLines_Bake(node, variables):
     except:
         handleExecutionCodeCreationException(node)
 
+def iterNodeCommentLines(node):
+    yield ""
+    yield "# Node: {} - {}".format(repr(node.nodeTree.name), repr(node.name))
+
 def setupNodeForExecution(node, variables):
     yield from iterNodePreExecutionLines(node, variables)
     resolveInnerLinks(node, variables)
 
 def iterNodePreExecutionLines(node, variables):
-    yield ""
-    yield getNodeCommentLine(node)
     yield from iterInputConversionLines(node, variables)
     yield from iterInputCopyLines(node, variables)
-
-def getNodeCommentLine(node):
-    return "# Node: {} - {}".format(repr(node.nodeTree.name), repr(node.name))
 
 def iterInputConversionLines(node, variables):
     for socket, dataType in iterLinkedInputSocketsWithOriginDataType(node):

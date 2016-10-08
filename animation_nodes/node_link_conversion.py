@@ -78,7 +78,6 @@ class SimpleConvert(LinkCorrection):
         ("Object", "Matrix") : "an_ObjectMatrixInputNode",
         ("Object", "Shape Key List") : "an_ShapeKeysFromObjectNode",
         ("Text", "Float") : "an_ParseNumberNode",
-        ("Integer List", "Float List") : "an_ConvertToFloatListNode",
         ("Vector", "Euler") : "an_DirectionToRotationNode",
         ("Euler", "Vector") : "an_RotationToDirectionNode",
         ("Float", "Falloff") : "an_ConstantFalloffNode",
