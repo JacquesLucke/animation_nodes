@@ -1,12 +1,12 @@
 import bpy
 from bpy.props import *
 from ... sockets.info import toDataType
-from ... events import executionCodeChanged
 from ... base_types import AnimationNode
+from ... events import executionCodeChanged
 from ... utils.blender_ui import getDpiFactor
-from ... utils.enum_items import enumItemsFromDicts
-from ... utils.nodes import newNodeAtCursor, invokeTranslation
-from ... tree_info import getSubprogramNetworks, getNodeByIdentifier, getNetworkByIdentifier
+from ... tree_info import (getSubprogramNetworks,
+                           getNodeByIdentifier,
+                           getNetworkByIdentifier)
 
 cacheTypeItems = [
     ("DISABLED", "Disabled", ""),
@@ -171,19 +171,16 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
         return False
 
 
-def getSubprogramItems(self, context):
-    itemDict = []
-    for network in getSubprogramNetworks():
-        itemDict.append({
-            "value" : network.identifier,
-            "name" : network.name,
-            "description" : network.description})
-    return enumItemsFromDicts(itemDict)
-
 class ChangeSubprogram(bpy.types.Operator):
     bl_idname = "an.change_subprogram"
     bl_label = "Change Subprogram"
     bl_description = "Change Subprogram"
+
+    def getSubprogramItems(self, context):
+        items = []
+        for network in getSubprogramNetworks():
+            items.append((network.identifier, network.name, network.description))
+        return items
 
     nodeIdentifier = StringProperty()
     subprogram = EnumProperty(name = "Subprogram", items = getSubprogramItems)
