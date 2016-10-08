@@ -1,7 +1,6 @@
 import bpy
 from bpy.props import *
 from .. id_keys import getAllIDKeys
-from .. utils.enum_items import enumItemsFromDicts
 
 class IDKeySearch(bpy.types.Operator):
     bl_idname = "an.choose_id_key"
@@ -10,10 +9,10 @@ class IDKeySearch(bpy.types.Operator):
     bl_property = "item"
 
     def getSearchItems(self, context):
-        itemDict = []
+        items = []
         for dataType, name in getAllIDKeys():
-            itemDict.append({"value" : dataType + " * " + name, "name" : name})
-        return enumItemsFromDicts(itemDict)
+            items.append(("{} * {}".format(dataType, name), name, ""))
+        return items
 
     item = EnumProperty(items = getSearchItems)
     callback = StringProperty()
