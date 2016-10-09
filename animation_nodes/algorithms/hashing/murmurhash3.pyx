@@ -9,12 +9,12 @@ cpdef uint32_t strToInt(str text, uint32_t seed = 0):
 
 cdef uint32_t murmur3_32(char* key, uint32_t len, uint32_t seed):
     cdef:
-        uint32_t c1 = 0xcc9e2d51;
-        uint32_t c2 = 0x1b873593;
-        uint32_t r1 = 15;
-        uint32_t r2 = 13;
-        uint32_t m = 5;
-        uint32_t n = 0xe6546b64;
+        uint32_t c1 = 0xcc9e2d51
+        uint32_t c2 = 0x1b873593
+        uint32_t r1 = 15
+        uint32_t r2 = 13
+        uint32_t m = 5
+        uint32_t n = 0xe6546b64
 
         uint32_t hash = seed
         int nBlocks = len / 4
