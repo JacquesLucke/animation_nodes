@@ -251,10 +251,10 @@ class AnimationNode:
             setattr(socket, key, value)
 
     def newInputGroup(self, selector, *socketsData):
-        self._newSocketGroup(int(selector), socketsData, self.newInput)
+        return self._newSocketGroup(int(selector), socketsData, self.newInput)
 
     def newOutputGroup(self, selector, *socketsData):
-        self._newSocketGroup(int(selector), socketsData, self.newOutput)
+        return self._newSocketGroup(int(selector), socketsData, self.newOutput)
 
     def _newSocketGroup(self, index, socketsData, newSocketFunction):
         if 0 <= index < len(socketsData):
@@ -266,6 +266,7 @@ class AnimationNode:
             else:
                 raise ValueError("invalid socket data")
             socket.alternativeIdentifiers = [data[2] for data in socketsData]
+            return socket
         else:
             raise ValueError("invalid selector")
 
