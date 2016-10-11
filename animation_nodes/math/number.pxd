@@ -1,6 +1,6 @@
 from libc.math cimport M_PI as PI
 from libc.math cimport (sin, cos, tan, asin, acos, atan, atan2, hypot,
-                        pow, floor, ceil)
+                        pow, floor, ceil, sqrt)
 
 cdef double PI_HALF, PI_QUARTER
 
@@ -18,3 +18,9 @@ cdef double power_Save(double base, double exponent)
 cdef double min(double x, double y)
 cdef double max(double x, double y)
 cdef double abs(double x)
+
+cdef double sqrt_Save(double x)
+cdef double invert(double x)
+cdef double reciprocal_Save(double x)
+
+cdef double snap_Save(double x, double step)

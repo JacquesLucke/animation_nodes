@@ -7,7 +7,8 @@ from ... math cimport max as maxNumber
 from ... math cimport abs as absNumber
 from ... math cimport (add, subtract, multiply, divide_Save, modulo_Save,
                        sin, cos, tan, asin_Save, acos_Save, atan, atan2, hypot,
-                       power_Save, floor, ceil)
+                       power_Save, floor, ceil, sqrt_Save, invert, reciprocal_Save,
+                       snap_Save)
 
 ctypedef double (*SingleInputFunction)(double a)
 ctypedef double (*DoubleInputFunction)(double a, double b)
@@ -75,7 +76,7 @@ cdef new(str name, str label, str type, str expression, void* function):
     op.setup(name, label, type, expression, function)
     return op
 
-cdef list operations = [None] * 19
+cdef list operations = [None] * 23
 
 # Changing the order can break existing files
 operations[0] = new("Add", "A + B", "A_B",
@@ -116,6 +117,14 @@ operations[17] = new("Floor", "floor A", "A",
     "result = math.floor(a)", <void*>floor)
 operations[18] = new("Ceiling", "ceil A", "A",
     "result = math.ceil(a)", <void*>ceil)
+operations[19] = new("Square Root", "sqrt A", "A",
+    "result = math.sqrt(a) if a >= 0 else 0", <void*>sqrt_Save)
+operations[20] = new("Invert", "- A", "A",
+    "result = -a", <void*>invert)
+operations[21] = new("Reciprocal", "1 / A", "A",
+    "result = 1 / a if a != 0 else 0", <void*>reciprocal_Save)
+operations[22] = new("Snap", "snap A to Step", "A_Step",
+    "result = round(a / step) * step if step != 0 else a", <void*>snap_Save)
 
 
 operationItems = [(op.name, op.name, op.label, i) for i, op in enumerate(operations)]
@@ -136,6 +145,7 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
     useListB = BoolProperty(default = False, update = AnimationNode.updateSockets)
     useListBase = BoolProperty(default = False, update = AnimationNode.updateSockets)
     useListExponent = BoolProperty(default = False, update = AnimationNode.updateSockets)
+    useListStep = BoolProperty(default = False, update = AnimationNode.updateSockets)
 
     def create(self):
         vectorization = AutoSelectVectorization()
@@ -173,6 +183,8 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
                 yield "result = self._operation.execute_A_B(a, b)"
             elif currentType == "Base_Exponent":
                 yield "result = self._operation.execute_A_B(base, exponent)"
+            elif currentType == "A_Step":
+                yield "result = self._operation.execute_A_B(a, step)"
         else:
             yield self._operation.expression
 

@@ -48,3 +48,18 @@ cdef double max(double x, double y):
 cdef double abs(double x):
     if x < 0: return -x
     else: return x
+
+cdef double sqrt_Save(double x):
+    if x >= 0: return sqrt(x)
+    else: return 0
+
+cdef double invert(double x):
+    return -x
+
+cdef double reciprocal_Save(double x):
+    if x != 0: return 1 / x
+    else: return 0
+
+cdef double snap_Save(double x, double step):
+    if step != 0: return ceil(x / step - 0.5) * step
+    else: return x
