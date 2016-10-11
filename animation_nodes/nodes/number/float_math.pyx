@@ -76,9 +76,9 @@ cdef new(str name, str label, str type, str expression, void* function):
     op.setup(name, label, type, expression, function)
     return op
 
-cdef list operations = [None] * 26
+cdef dict operations = {}
 
-# Changing the order can break existing files
+# Changing the order/indices can break existing files
 operations[0] = new("Add", "A + B", "A_B",
     "result = a + b", <void*>add)
 operations[1] = new("Subtract", "A - B", "A_B",
@@ -99,15 +99,15 @@ operations[8] = new("Arccosine", "acos A", "A",
     "result = math.acos(min(max(a, -1), 1))", <void*>acos_Save)
 operations[9] = new("Arctangent", "atan A", "A",
     "result = math.atan(a)", <void*>atan)
-operations[10] = new("Arctangent B/A", "atan2 (B / A)", "A_B",
-    "result = math.atan2(b, a)", <void*>atan2)
-operations[11] = new("Hypotenuse", "hypot A, B", "A_B",
-    "result = math.hypot(a, b)", <void*>hypot)
-operations[12] = new("Power", "A^B", "Base_Exponent",
-    "result = math.pow(base, exponent) if base >= 0 or exponent % 1 == 0 else 0", <void*>power_Save)
-operations[13] = new("Minimum", "min(A, B)", "A_B",
+operations[10] = new("Power", "A^B", "Base_Exponent",
+    "result = math.pow(base, exponent) if base >= 0 or exponent % 1 == 0 else 0",
+    <void*>power_Save)
+operations[11] = new("Logarithm", "log A with Base", "A_Base",
+    "result = 0 if a <= 0 else math.log(a) if base <= 0 or base == 1 else math.log(a, base)",
+    <void*>logarithm_Save)
+operations[12] = new("Minimum", "min(A, B)", "A_B",
     "result = min(a, b)", <void*>minNumber)
-operations[14] = new("Maximum", "max(A, B)", "A_B",
+operations[13] = new("Maximum", "max(A, B)", "A_B",
     "result = max(a, b)", <void*>maxNumber)
 operations[15] = new("Modulo", "A mod B", "A_B",
     "result = a % b if b != 0 else 0", <void*>modulo_Save)
@@ -125,17 +125,17 @@ operations[21] = new("Reciprocal", "1 / A", "A",
     "result = 1 / a if a != 0 else 0", <void*>reciprocal_Save)
 operations[22] = new("Snap", "snap A to Step", "A_Step",
     "result = round(a / step) * step if step != 0 else a", <void*>snap_Save)
-operations[23] = new("Copy Sign", "A gets sign of B", "A_B",
+operations[23] = new("Arctangent B/A", "atan2 (B / A)", "A_B",
+    "result = math.atan2(b, a)", <void*>atan2)
+operations[24] = new("Hypotenuse", "hypot A, B", "A_B",
+    "result = math.hypot(a, b)", <void*>hypot)
+operations[25] = new("Copy Sign", "A gets sign of B", "A_B",
     "result = math.copysign(a, b)", <void*>copySign)
-operations[24] = new("Floor Division", "floor(A / B)", "A_B",
+operations[26] = new("Floor Division", "floor(A / B)", "A_B",
     "result = a // b if b != 0 else 0", <void*>floorDivision_Save)
-operations[25] = new("Logarithm", "log A with Base", "A_Base",
-    "result = 0 if a <= 0 else math.log(a) if base <= 0 or base == 1 else math.log(a, base)",
-    <void*>logarithm_Save)
 
-
-operationItems = [(op.name, op.name, op.label, i) for i, op in enumerate(operations)]
-operationByName = {op.name : op for op in operations}
+operationItems = [(op.name, op.name, op.label, i) for i, op in operations.items()]
+operationByName = {op.name : op for op in operations.values()}
 
 class FloatMathNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_FloatMathNode"
