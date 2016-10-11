@@ -1,6 +1,6 @@
 from libc.math cimport M_PI as PI
 from libc.math cimport (sin, cos, tan, asin, acos, atan, atan2, hypot,
-                        pow, floor, ceil, sqrt)
+                        pow, floor, ceil, sqrt, log)
 
 cdef double PI_HALF, PI_QUARTER
 
@@ -26,3 +26,5 @@ cdef double reciprocal_Save(double x)
 
 cdef double snap_Save(double x, double step)
 cdef double copySign(double x, double y)
+
+cdef double logarithm_Save(double a, double base)

@@ -71,3 +71,8 @@ cdef double snap_Save(double x, double step):
 cdef double copySign(double x, double y):
     if y >= 0: return x if x > 0 else -x
     else: return x if x < 0 else -x
+
+cdef double logarithm_Save(double a, double base):
+    if a <= 0: return 0
+    elif base <= 0 or base == 1: return log(a)
+    else: return log(a) / log(base)
