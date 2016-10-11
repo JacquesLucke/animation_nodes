@@ -155,7 +155,8 @@ class AutoSelectVectorization(SocketEffect):
 
     def setSocketTransparency(self, sockets):
         for socket in sockets:
-            socket.setTemporarySocketTransparency(0.80)
+            if isBase(socket.dataType):
+                socket.setTemporarySocketTransparency(0.80)
 
     def apply(self, node):
         # Set default state to BASE
