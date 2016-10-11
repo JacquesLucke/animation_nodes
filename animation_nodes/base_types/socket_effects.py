@@ -1,4 +1,5 @@
-from collections import OrderedDict
+import bpy
+from collections import OrderedDict, defaultdict
 from .. sockets.info import (isBase, isList, toBaseDataType, toListDataType,
                              getAllowedInputDataTypes)
 
@@ -6,11 +7,11 @@ class SocketEffect:
     def apply(self, node):
         pass
 
-    def toSocketIDs(self, sockets):
-        return [self.toSocketID(socket) for socket in sockets if socket is not None]
+    def toSocketIDs(self, sockets, node = None):
+        return [self.toSocketID(socket, node) for socket in sockets if socket is not None]
 
-    def toSocketID(self, socket):
-        return socket.isOutput, socket.getIndex()
+    def toSocketID(self, socket, node = None):
+        return socket.isOutput, socket.getIndex(node)
 
     def getSocket(self, node, socketID):
         return (node.outputs if socketID[0] else node.inputs)[socketID[1]]
@@ -104,40 +105,52 @@ class AutoSelectDataType(SocketEffect):
 class AutoSelectVectorization(SocketEffect):
     def __init__(self):
         self.properties = list()
-        self.dependencies = OrderedDict()
-        self.sockets = OrderedDict()
-        self.baseDataTypes = dict()
-        self.listDataTypes = dict()
+        self.inputDependencies = OrderedDict()
+        self.inputSocketIndicesByProperty = OrderedDict()
+        self.inputListDataTypes = dict()
+        self.inputBaseDataTypes = dict()
+        self.outputDependencies = OrderedDict()
 
-    def add(self, node, propertyName, sockets, dependency = None):
+    def input(self, node, propertyName, sockets, dependencies = []):
+        if isinstance(sockets, bpy.types.NodeSocket):
+            sockets = [sockets]
+        if any(socket.is_output for socket in sockets):
+            raise ValueError("only input sockets allowed")
+
         self.setSocketTransparency(sockets)
 
-        if dependency is None:
-            dependencies = set()
-        elif isinstance(dependency, str):
-            dependencies = set([dependency])
-        else:
-            dependencies = set(dependency)
-
-        socketIDs = self.toSocketIDs(sockets)
         self.properties.append(propertyName)
-        self.sockets[propertyName] = socketIDs
-        self.dependencies[propertyName] = dependencies
+        socketIndices = [socket.getIndex(node) for socket in sockets]
+        self.inputSocketIndicesByProperty[propertyName] = socketIndices
+        self.inputDependencies[propertyName] = dependencies
 
         if getattr(node, propertyName):
-            self.listDataTypes[propertyName] = (
-                {socketID : getAllowedInputDataTypes(socket.dataType)
-                 for socket, socketID in zip(sockets, socketIDs)})
-            self.baseDataTypes[propertyName] = (
-                {socketID : getAllowedInputDataTypes(toBaseDataType(socket.dataType))
-                 for socket, socketID in zip(sockets, socketIDs)})
+            self.inputListDataTypes[propertyName] = (
+                {index : getAllowedInputDataTypes(socket.dataType)
+                 for socket, index in zip(sockets, socketIndices)})
+            self.inputBaseDataTypes[propertyName] = (
+                {index : getAllowedInputDataTypes(toBaseDataType(socket.dataType))
+                 for socket, index in zip(sockets, socketIndices)})
         else:
-            self.listDataTypes[propertyName] = (
-                {socketID : getAllowedInputDataTypes(toListDataType(socket.dataType))
-                 for socket, socketID in zip(sockets, socketIDs)})
-            self.baseDataTypes[propertyName] = (
-                {socketID : getAllowedInputDataTypes(socket.dataType)
-                 for socket, socketID in zip(sockets, socketIDs)})
+            self.inputListDataTypes[propertyName] = (
+                {index : getAllowedInputDataTypes(toListDataType(socket.dataType))
+                 for socket, index in zip(sockets, socketIndices)})
+            self.inputBaseDataTypes[propertyName] = (
+                {index : getAllowedInputDataTypes(socket.dataType)
+                 for socket, index in zip(sockets, socketIndices)})
+
+    def output(self, node, sockets, dependencies):
+        if isinstance(sockets, bpy.types.NodeSocket):
+            sockets = [sockets]
+        if any(not socket.is_output for socket in sockets):
+            raise ValueError("only output sockets allowed")
+        if not isinstance(dependencies, (set, list, tuple)):
+            raise ValueError("dependencies has to be a collection")
+
+        self.setSocketTransparency(sockets)
+
+        for socket in sockets:
+            self.outputDependencies[socket.getIndex(node)] = dependencies
 
     def setSocketTransparency(self, sockets):
         for socket in sockets:
@@ -148,31 +161,51 @@ class AutoSelectVectorization(SocketEffect):
         states = {propertyName : "BASE" for propertyName in self.properties}
         fixedProperties = set()
 
-        # Evaluate linked sockets
-        for propertyName, socketIDs in self.sockets.items():
-            for socketID in socketIDs:
-                socket = self.getSocket(node, socketID)
+        # Evaluate linked input sockets
+        for propertyName, inputIndices in self.inputSocketIndicesByProperty.items():
+            for index in inputIndices:
+                socket = node.inputs[index]
                 linkedDataTypes = tuple(socket.linkedDataTypes - {"Generic"})
                 if len(linkedDataTypes) == 1:
-                    if linkedDataTypes[0] in self.listDataTypes[propertyName][socketID]:
+                    linkedType = linkedDataTypes[0]
+                    if linkedType in self.inputListDataTypes[propertyName][index]:
                         states[propertyName] = "LIST"
                         fixedProperties.add(propertyName)
-                    elif linkedDataTypes[0] in self.baseDataTypes[propertyName][socketID]:
+                    elif linkedType in self.inputBaseDataTypes[propertyName][index]:
                         states[propertyName] = "BASE"
                         fixedProperties.add(propertyName)
-                    break
 
-        # Evaluate dependencies
-        for propertyName, dependencies in self.dependencies.items():
-            targetState = states[propertyName]
-            if targetState == "LIST":
-                baseDeps = set(filter(lambda x: states[x] == "BASE", dependencies))
-                if len(baseDeps) > 0:
-                    if any(dependency in fixedProperties for dependency in baseDeps):
-                        states[propertyName] = "BASE"
-                    else:
-                        for dependency in baseDeps:
+        # Evaluate input dependencies
+        for propertyName, dependencyNames in self.inputDependencies.items():
+            if states[propertyName] == "LIST":
+                if any(states[name] == "BASE" and name in fixedProperties for name in dependencyNames):
+                    states[propertyName] = "BASE"
+                else:
+                    for name in dependencyNames:
+                        states[name] = "LIST"
+                        fixedProperties.add(name)
+                fixedProperties.add(propertyName)
+
+        # Evaluate output dependencies
+        for socketIndex, dependencies in self.outputDependencies.items():
+            socket = node.outputs[socketIndex]
+            linkedTypes = tuple(socket.linkedDataTypes - {"Generic"})
+            if len(linkedTypes) != 1:
+                continue
+            linkedType = linkedTypes[0]
+            if isList(linkedType): # TODO: needs to be generalised
+                for dependency in dependencies:
+                    if isinstance(dependency, str):
+                        if dependency not in fixedProperties:
                             states[dependency] = "LIST"
+                            fixedProperties.add(dependency)
+                    elif isinstance(dependency, (set, list, tuple)):
+                        if all(states[name] == "BASE" for name in dependency):
+                            for name in dependency:
+                                if name not in fixedProperties:
+                                    states[name] = "LIST"
+                                    fixedProperties.add(name)
+                                    break
 
         # Update properties of node
         for propertyName in self.properties:

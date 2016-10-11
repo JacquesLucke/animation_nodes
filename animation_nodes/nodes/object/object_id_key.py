@@ -64,7 +64,8 @@ class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
                 ("Boolean List", "Exists", "exists", dict(hide = True)))
 
         vectorization = AutoSelectVectorization()
-        vectorization.add(self, "useList", list(self.inputs) + list(self.outputs))
+        vectorization.input(self, "useList", list(self.inputs))
+        vectorization.output(self, list(self.outputs), dependencies = ["useList"])
         self.newSocketEffect(vectorization)
 
     def drawAdvanced(self, layout):

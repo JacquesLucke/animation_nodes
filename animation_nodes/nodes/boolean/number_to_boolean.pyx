@@ -19,7 +19,8 @@ class NumberToBooleanNode(bpy.types.Node, AnimationNode):
             ("Boolean List", "Booleans", "booleans"))
 
         vectorization = AutoSelectVectorization()
-        vectorization.add(self, "useList", [self.inputs[0], self.outputs[0]])
+        vectorization.input(self, "useList", self.inputs[0])
+        vectorization.output(self, self.outputs[0], dependencies = ["useList"])
         self.newSocketEffect(vectorization)
 
     def getExecutionCode(self):
