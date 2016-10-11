@@ -8,7 +8,7 @@ from ... math cimport abs as absNumber
 from ... math cimport (add, subtract, multiply, divide_Save, modulo_Save,
                        sin, cos, tan, asin_Save, acos_Save, atan, atan2, hypot,
                        power_Save, floor, ceil, sqrt_Save, invert, reciprocal_Save,
-                       snap_Save)
+                       snap_Save, copySign, floorDivision_Save)
 
 ctypedef double (*SingleInputFunction)(double a)
 ctypedef double (*DoubleInputFunction)(double a, double b)
@@ -76,7 +76,7 @@ cdef new(str name, str label, str type, str expression, void* function):
     op.setup(name, label, type, expression, function)
     return op
 
-cdef list operations = [None] * 23
+cdef list operations = [None] * 25
 
 # Changing the order can break existing files
 operations[0] = new("Add", "A + B", "A_B",
@@ -125,6 +125,10 @@ operations[21] = new("Reciprocal", "1 / A", "A",
     "result = 1 / a if a != 0 else 0", <void*>reciprocal_Save)
 operations[22] = new("Snap", "snap A to Step", "A_Step",
     "result = round(a / step) * step if step != 0 else a", <void*>snap_Save)
+operations[23] = new("Copy Sign", "A gets sign of B", "A_B",
+    "result = math.copysign(a, b)", <void*>copySign)
+operations[24] = new("Floor Division", "floor(A / B)", "A_B",
+    "result = a // b if b != 0 else 0", <void*>floorDivision_Save)
 
 
 operationItems = [(op.name, op.name, op.label, i) for i, op in enumerate(operations)]

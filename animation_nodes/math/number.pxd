@@ -9,6 +9,7 @@ cdef double subtract(double x, double y)
 cdef double multiply(double x, double y)
 cdef double divide_Save(double x, double y)
 cdef double modulo_Save(double x, double y)
+cdef double floorDivision_Save(double x, double y)
 
 cdef double asin_Save(double x)
 cdef double acos_Save(double x)
@@ -24,3 +25,4 @@ cdef double invert(double x)
 cdef double reciprocal_Save(double x)
 
 cdef double snap_Save(double x, double step)
+cdef double copySign(double x, double y)

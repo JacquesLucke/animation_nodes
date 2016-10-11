@@ -16,6 +16,10 @@ cdef double multiply(double x, double y):
 cdef double divide_Save(double x, double y):
     return x / y if y != 0 else 0
 
+cdef double floorDivision_Save(double x, double y):
+    if y != 0: return x // y
+    else: return 0
+
 cdef double modulo_Save(double x, double y):
     # cannot use cdivision(True) because it changes the modulo behavior
     # http://stackoverflow.com/a/3883019/4755171
@@ -63,3 +67,7 @@ cdef double reciprocal_Save(double x):
 cdef double snap_Save(double x, double step):
     if step != 0: return ceil(x / step - 0.5) * step
     else: return x
+
+cdef double copySign(double x, double y):
+    if y >= 0: return x if x > 0 else -x
+    else: return x if x < 0 else -x
