@@ -21,7 +21,7 @@ class TransformVectorNode(bpy.types.Node, AnimationNode):
 
         vectorization = AutoSelectVectorization()
         vectorization.input(self, "useVectorList", self.inputs[0])
-        vectorization.output(self, self.outputs[0], dependencies = ["useVectorList"])
+        vectorization.output(self, "useVectorList", self.outputs[0])
         self.newSocketEffect(vectorization)
 
     def getExecutionCode(self):

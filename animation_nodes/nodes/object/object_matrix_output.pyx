@@ -37,7 +37,7 @@ class ObjectMatrixOutputNode(bpy.types.Node, AnimationNode):
         vectorization = AutoSelectVectorization()
         vectorization.input(self, "useObjectList", self.inputs[0])
         vectorization.input(self, "useMatrixList", self.inputs[1], dependencies = ["useObjectList"])
-        vectorization.output(self, self.outputs[0], dependencies = ["useObjectList"])
+        vectorization.output(self, "useObjectList", self.outputs[0])
         self.newSocketEffect(vectorization)
 
     def draw(self, layout):

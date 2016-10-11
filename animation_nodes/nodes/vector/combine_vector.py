@@ -36,7 +36,7 @@ class CombineVectorNode(bpy.types.Node, AnimationNode):
         vectorization.input(self, "useListX", self.inputs[0])
         vectorization.input(self, "useListY", self.inputs[1])
         vectorization.input(self, "useListZ", self.inputs[2])
-        vectorization.output(self, self.outputs[0], dependencies = [("useListX", "useListY", "useListZ")])
+        vectorization.output(self, [("useListX", "useListY", "useListZ")], self.outputs[0])
         self.newSocketEffect(vectorization)
 
     def draw(self, layout):

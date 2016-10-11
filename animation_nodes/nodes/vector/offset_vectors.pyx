@@ -23,7 +23,7 @@ class OffsetVectorsNode(bpy.types.Node, AnimationNode):
         self.newOutput("Vector List", "Vector List", "vectors")
 
         vectorization = AutoSelectVectorization()
-        vectorization.input(self, "useOffsetList", [self.inputs[2]])
+        vectorization.input(self, "useOffsetList", self.inputs[2])
         self.newSocketEffect(vectorization)
 
     def draw(self, layout):

@@ -139,13 +139,14 @@ class AutoSelectVectorization(SocketEffect):
                 {index : getAllowedInputDataTypes(socket.dataType)
                  for socket, index in zip(sockets, socketIndices)})
 
-    def output(self, node, sockets, dependencies):
+    def output(self, node, dependencies, sockets):
         if isinstance(sockets, bpy.types.NodeSocket):
             sockets = [sockets]
         if any(not socket.is_output for socket in sockets):
             raise ValueError("only output sockets allowed")
-        if not isinstance(dependencies, (set, list, tuple)):
-            raise ValueError("dependencies has to be a collection")
+
+        if isinstance(dependencies, str):
+            dependencies = [dependencies]
 
         self.setSocketTransparency(sockets)
 
