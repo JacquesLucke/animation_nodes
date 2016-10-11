@@ -1,4 +1,5 @@
 from . random cimport randomNumber
+from libc.limits cimport INT_MAX
 
 # http://freespace.virgin.net/hugo.elias/models/m_perlin.htm
 
@@ -28,9 +29,10 @@ cpdef double perlinNoise(double x, double persistance, int octaves):
     return total
 
 cdef double interpolatedNoise(double x):
+    x = x % INT_MAX
     cdef:
-        int intX = int(x) # overflow handled below
-        double fracX = (x - intX) % 1
+        int intX = int(x)
+        double fracX = x - intX
         double v0 = randomNumber(intX - 2)
         double v1 = randomNumber(intX - 1)
         double v2 = randomNumber(intX)
