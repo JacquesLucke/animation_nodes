@@ -2,9 +2,12 @@ import bpy
 from bpy.props import *
 from ... data_structures cimport DoubleList
 from ... base_types import AnimationNode, AutoSelectVectorization
-from ... math cimport (add, subtract, multiply, divide_Save,
+from ... math cimport min as minNumber
+from ... math cimport max as maxNumber
+from ... math cimport abs as absNumber
+from ... math cimport (add, subtract, multiply, divide_Save, modulo_Save,
                        sin, cos, tan, asin_Save, acos_Save, atan, atan2, hypot,
-                       power_Save)
+                       power_Save, floor, ceil)
 
 ctypedef double (*SingleInputFunction)(double a)
 ctypedef double (*DoubleInputFunction)(double a, double b)
@@ -72,7 +75,7 @@ cdef new(str name, str label, str type, str expression, void* function):
     op.setup(name, label, type, expression, function)
     return op
 
-cdef list operations = [None] * 13
+cdef list operations = [None] * 19
 
 # Changing the order can break existing files
 operations[0] = new("Add", "A + B", "A_B",
@@ -101,6 +104,18 @@ operations[11] = new("Hypotenuse", "hypot A, B", "A_B",
     "result = math.hypot(a, b)", <void*>hypot)
 operations[12] = new("Power", "A^B", "Base_Exponent",
     "result = math.pow(base, exponent) if base >= 0 or exponent % 1 == 0 else 0", <void*>power_Save)
+operations[13] = new("Minimum", "min(A, B)", "A_B",
+    "result = min(a, b)", <void*>minNumber)
+operations[14] = new("Maximum", "max(A, B)", "A_B",
+    "result = max(a, b)", <void*>maxNumber)
+operations[15] = new("Modulo", "A mod B", "A_B",
+    "result = a % b if b != 0 else 0", <void*>modulo_Save)
+operations[16] = new("Absolute", "abs A)", "A",
+    "result = abs(a)", <void*>absNumber)
+operations[17] = new("Floor", "floor A", "A",
+    "result = math.floor(a)", <void*>floor)
+operations[18] = new("Ceiling", "ceil A", "A",
+    "result = math.ceil(a)", <void*>ceil)
 
 
 operationItems = [(op.name, op.name, op.label, i) for i, op in enumerate(operations)]
