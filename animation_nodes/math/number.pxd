@@ -28,3 +28,5 @@ cdef double snap_Save(double x, double step)
 cdef double copySign(double x, double y)
 
 cdef double logarithm_Save(double a, double base)
+
+cdef double clamp(double x, double minValue, double maxValue)

@@ -76,3 +76,8 @@ cdef double logarithm_Save(double a, double base):
     if a <= 0: return 0
     elif base <= 0 or base == 1: return log(a)
     else: return log(a) / log(base)
+
+cdef double clamp(double x, double minValue, double maxValue):
+    if x < minValue: return minValue
+    if x > maxValue: return maxValue
+    return x
