@@ -1,7 +1,8 @@
 import bpy
 from bpy.props import *
-from ... data_structures cimport Vector3DList, DoubleList
+from ... data_structures import Vector3DList, DoubleList
 from ... base_types import AnimationNode, AutoSelectVectorization
+from . list_operation_utils import combineDoubleListsToVectorList
 
 class CombineVectorNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CombineVectorNode"
@@ -57,18 +58,9 @@ class CombineVectorNode(bpy.types.Node, AnimationNode):
 
     def createVectorList(self, x, y, z):
         self.errorMessage = ""
-        cdef DoubleList _x, _y, _z
         _x, _y, _z = self.prepareInputLists(x, y, z)
         if _x is None: return Vector3DList()
-
-        cdef:
-            Vector3DList output = Vector3DList(length = len(_x))
-            long i
-        for i in range(len(output)):
-            output.data[i].x = _x.data[i]
-            output.data[i].y = _y.data[i]
-            output.data[i].z = _z.data[i]
-        return output
+        return combineDoubleListsToVectorList(_x, _y, _z)
 
     def prepareInputLists(self, x, y, z):
         maxLength = max(len(l) for l in (x, y, z) if isinstance(l, DoubleList))
