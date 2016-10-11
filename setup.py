@@ -217,7 +217,7 @@ def iterRelativeAddonFiles(directory):
 
 
 def ignoreAddonFile(name):
-    return name.endswith(".c")
+    return name.endswith(".c") or name.endswith(".html")
 
 def ignoreAddonDirectory(name):
     return name in {".git", "__pycache__"}
