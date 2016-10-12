@@ -3,24 +3,31 @@ from ... data_structures cimport Vector3DList, EdgeIndicesList, PolygonIndicesLi
 # Vertices
 ############################################
 
-def vertices(float length, float width, int xDivisions, int yDivisions, offset = (0, 0, 0)):
+def vertices_Step(float xDistance, float yDistance, int xDivisions, int yDivisions):
+    return vertices_Size(xDistance * (xDivisions - 1), yDistance * (yDivisions - 1),
+                         xDivisions, yDivisions)
+
+def vertices_Size(float length, float width, int xDivisions, int yDivisions):
     assert xDivisions >= 2
     assert yDivisions >= 2
     cdef:
         float xStep = length / <float>(xDivisions - 1)
         float yStep = width / <float>(yDivisions - 1)
-        float xOffset, yOffset, zOffset
         int x, y
 
     vertices = Vector3DList(length = xDivisions * yDivisions)
-    xOffset, yOffset, zOffset = offset
+
+    cdef:
+        double xOffset = -length / 2.0
+        double yOffset = -width / 2.0
+
     cdef int rowOffset
     for x in range(xDivisions):
         rowOffset = x * yDivisions
         for y in range(yDivisions):
             vertices.data[rowOffset + y].x = x * xStep + xOffset
             vertices.data[rowOffset + y].y = y * yStep + yOffset
-            vertices.data[rowOffset + y].z = zOffset
+            vertices.data[rowOffset + y].z = 0
     return vertices
 
 
