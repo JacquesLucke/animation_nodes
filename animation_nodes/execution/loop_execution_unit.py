@@ -177,7 +177,7 @@ class LoopExecutionUnit:
             yield from iterNodeCommentLines(node)
             yield "if {}:".format(variables[node.conditionSocket])
 
-            socket = node.addSocket
+            socket = node.dataInputSocket
             if socket.isUnlinked and socket.isCopyable(): expression = getCopyExpression(socket, variables)
             else: expression = variables[socket]
             yield "    {}_{}({})".format("extend" if node.useList else "append", variables[node], expression)

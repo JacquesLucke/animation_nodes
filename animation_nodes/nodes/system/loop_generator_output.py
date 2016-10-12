@@ -78,14 +78,11 @@ class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
 
     @property
     def conditionSocket(self):
-        try: return self.inputs["Condition"]
-        except: return self.inputs["Enabled"]
+        return self.inputs[1]
 
     @property
-    def addSocket(self):
-        for socket in self.inputs:
-            if socket.name not in ("Condition", "Enabled"):
-                return socket
+    def dataInputSocket(self):
+        return self.inputs[0]
 
 def getRandomInt():
     random.seed()
