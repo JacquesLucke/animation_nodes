@@ -463,6 +463,7 @@ class FalloffMenu(bpy.types.Menu):
         layout = self.layout
         insertNode(layout, "an_ConstantFalloffNode", "Constant")
         insertNode(layout, "an_RandomFalloffNode", "Random")
+        insertNode(layout, "an_CustomFalloffNode", "Custom")
         layout.separator()
         insertNode(layout, "an_DirectionalFalloffNode", "Directional")
         insertNode(layout, "an_PointDistanceFalloffNode", "Point Distance")
