@@ -1,7 +1,8 @@
 import bpy
+from bpy.props import *
 from libc.string cimport memcpy
-from ... base_types import AnimationNode
-from ... math cimport transformVec3AsPoint
+from ... math cimport transformVec3AsPoint, Vector3
+from ... base_types import AnimationNode, AutoSelectDataType
 from ... data_structures cimport (MeshData,
             Vector3DList, Matrix4x4List, EdgeIndicesList, PolygonIndicesList)
 
@@ -9,15 +10,21 @@ class ReplicateMeshDataNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ReplicateMeshDataNode"
     bl_label = "Replicate Mesh Data"
 
+    transformationType = StringProperty(default = "Matrix List",
+        update = AnimationNode.updateSockets)
+
     def create(self):
         self.newInput("Mesh Data", "Mesh Data", "sourceMeshData")
-        self.newInput("Matrix List", "Matrices", "matrices")
+        self.newInput(self.transformationType, "Transformations", "transformations")
         self.newOutput("Mesh Data", "Mesh Data", "outMeshData")
 
-    def execute(self, MeshData source, Matrix4x4List matrices):
+        self.newSocketEffect(AutoSelectDataType("transformationType", [self.inputs[1]],
+            use = ["Matrix List", "Vector List"], default = "Matrix List"))
+
+    def execute(self, MeshData source, transformations):
         cdef:
             Py_ssize_t i, j, offset
-            Py_ssize_t amount = len(matrices)
+            Py_ssize_t amount = len(transformations)
             Py_ssize_t vertexAmount, edgeAmount, polygonAmount, polygonIndicesAmount
             Vector3DList oldVertices, newVertices
             EdgeIndicesList oldEdges, newEdges
@@ -32,18 +39,10 @@ class ReplicateMeshDataNode(bpy.types.Node, AnimationNode):
         polygonAmount = len(oldPolygons)
         polygonIndicesAmount = len(oldPolygons.indices)
 
-        newVertices = Vector3DList(length = amount * vertexAmount)
+        newVertices = self.getTransformedVertices(oldVertices, transformations)
         newEdges = EdgeIndicesList(length = amount * edgeAmount)
         newPolygons = PolygonIndicesList(indicesAmount = amount * polygonIndicesAmount,
                                          polygonAmount = amount * polygonAmount)
-
-        # Vertices
-        for i in range(amount):
-            offset = i * vertexAmount
-            for j in range(vertexAmount):
-                transformVec3AsPoint(newVertices.data + offset + j,
-                                     oldVertices.data + j,
-                                     matrices.data + i)
 
         # Edges
         for i in range(amount):
@@ -69,3 +68,39 @@ class ReplicateMeshDataNode(bpy.types.Node, AnimationNode):
                    sizeof(unsigned int) * polygonAmount)
 
         return MeshData(newVertices, newEdges, newPolygons)
+
+    def getTransformedVertices(self, Vector3DList oldVertices, transformations):
+        if isinstance(transformations, Vector3DList):
+            return self.getTransformedVertices_VectorList(oldVertices, transformations)
+        elif isinstance(transformations, Matrix4x4List):
+            return self.getTransformedVertices_MatrixList(oldVertices, transformations)
+
+    def getTransformedVertices_VectorList(self, Vector3DList oldVertices, Vector3DList transformations):
+        cdef:
+            Py_ssize_t i, j, offset
+            Vector3DList newVertices = Vector3DList(oldVertices.length * transformations.length)
+            Vector3* _oldVertices = oldVertices.data
+            Vector3* _newVertices = newVertices.data
+            Vector3* _transformations = transformations.data
+
+        for i in range(transformations.length):
+            offset = i * oldVertices.length
+            for j in range(oldVertices.length):
+                _newVertices[offset + j].x = _oldVertices[j].x + _transformations[i].x
+                _newVertices[offset + j].y = _oldVertices[j].y + _transformations[i].y
+                _newVertices[offset + j].z = _oldVertices[j].z + _transformations[i].z
+
+        return newVertices
+
+    def getTransformedVertices_MatrixList(self, Vector3DList oldVertices, Matrix4x4List transformations):
+        cdef:
+            Py_ssize_t i, j, offset
+            Vector3DList newVertices = Vector3DList(oldVertices.length * transformations.length)
+
+        for i in range(transformations.length):
+            offset = i * oldVertices.length
+            for j in range(oldVertices.length):
+                transformVec3AsPoint(newVertices.data + offset + j,
+                                     oldVertices.data + j,
+                                     transformations.data + i)
+        return newVertices
