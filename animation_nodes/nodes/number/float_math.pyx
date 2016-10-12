@@ -86,7 +86,7 @@ operations[1] = new("Subtract", "A - B", "A_B",
 operations[2] = new("Multiply", "A * B", "A_B",
     "result = a * b", <void*>multiply)
 operations[3] = new("Divide", "A / B", "A_B",
-    "result = a / b", <void*>divide_Save)
+    "result = a / b if b != 0 else 0", <void*>divide_Save)
 operations[4] = new("Sin", "sin A", "A",
     "result = math.sin(a)", <void*>sin)
 operations[5] = new("Cos", "cos A", "A",
@@ -137,10 +137,19 @@ operations[26] = new("Floor Division", "floor(A / B)", "A_B",
 operationItems = [(op.name, op.name, op.label, i) for i, op in operations.items()]
 operationByName = {op.name : op for op in operations.values()}
 
+searchItems = {
+    "Add Numbers" : "Add",
+    "Subtract Numbers" : "Subtract",
+    "Multiply Numbers" : "Multiply",
+    "Divide Numbers" : "Divide",
+    "Invert Number" : "Invert",
+    "Reciprocal Number" : "Reciprocal"}
+
 class FloatMathNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_FloatMathNode"
-    bl_label = "Math"
+    bl_label = "Float Math"
     dynamicLabelType = "HIDDEN_ONLY"
+    searchTags = [(name, {"operation" : repr(op)}) for name, op in searchItems.items()]
 
     operation = EnumProperty(name = "Operation",
         description = "Operation to perform on the inputs",
