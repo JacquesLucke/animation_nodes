@@ -3,7 +3,8 @@ from bpy.props import *
 from ... events import isRendering
 from ... base_types import AnimationNode
 from ... math.list_operations import transformVector3DList
-from ... data_structures import Vector3DList, EdgeIndicesList, PolygonIndicesList
+from ... data_structures import (Vector3DList, EdgeIndicesList, PolygonIndicesList,
+                                 FloatList, DoubleList)
 
 class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectMeshDataNode"
@@ -18,7 +19,10 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
         self.newOutput("Vector List", "Vertex Locations", "vertexLocations")
         self.newOutput("Edge Indices List", "Edge Indices", "edgeIndices")
         self.newOutput("Polygon Indices List", "Polygon Indices", "polygonIndices")
-        self.newOutput("Vector List", "Vertex Normals", "vertexNormals")
+        self.newOutput("Vector List", "Vertex Normals", "vertexNormals", hide = True)
+        self.newOutput("Vector List", "Polygon Normals", "polygonNormals", hide = True)
+        self.newOutput("Vector List", "Polygon Centers", "polygonCenters", hide = True)
+        self.newOutput("Float List", "Local Polygon Areas", "localPolygonAreas", hide = True)
         self.newOutput("Text", "Mesh Name", "meshName", hide = True)
 
     def getExecutionCode(self):
@@ -38,6 +42,12 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
             yield "    polygonIndices = self.getPolygonIndices(mesh)"
         if isLinked["vertexNormals"]:
             yield "    vertexNormals = self.getVertexNormals(mesh, object, useWorldSpace)"
+        if isLinked["polygonNormals"]:
+            yield "    polygonNormals = self.getPolygonNormals(mesh, object, useWorldSpace)"
+        if isLinked["polygonCenters"]:
+            yield "    polygonCenters = self.getPolygonCenters(mesh, object, useWorldSpace)"
+        if isLinked["localPolygonAreas"]:
+            yield "    localPolygonAreas = self.getLocalPolygonAreas(mesh)"
 
         yield "    self.clearMesh(mesh, useModifiers, scene)"
         yield "else:"
@@ -45,6 +55,9 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
         yield "    edgeIndices = EdgeIndicesList()"
         yield "    polygonIndices = PolygonIndicesList()"
         yield "    vertexNormals = Vector3DList()"
+        yield "    polygonNormals = Vector3DList()"
+        yield "    polygonCenters = Vector3DList()"
+        yield "    localPolygonAreas = DoubleList()"
 
 
     def getMesh(self, object, useModifiers, scene):
@@ -84,3 +97,22 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
         if useWorldSpace:
             transformVector3DList(normals, object.matrix_world, ignoreTranslation = True)
         return normals
+
+    def getPolygonNormals(self, mesh, object, useWorldSpace):
+        normals = Vector3DList(length = len(mesh.polygons))
+        mesh.polygons.foreach_get("normal", normals.getMemoryView())
+        if useWorldSpace:
+            transformVector3DList(normals, object.matrix_world, ignoreTranslation = True)
+        return normals
+
+    def getPolygonCenters(self, mesh, object, useWorldSpace):
+        centers = Vector3DList(length = len(mesh.polygons))
+        mesh.polygons.foreach_get("center", centers.getMemoryView())
+        if useWorldSpace:
+            transformVector3DList(centers, object.matrix_world)
+        return centers
+
+    def getLocalPolygonAreas(self, mesh):
+        areas = FloatList(length = len(mesh.polygons))
+        mesh.polygons.foreach_get("area", areas.getMemoryView())
+        return DoubleList.fromValues(areas)
