@@ -11,10 +11,6 @@ Cleanup Repository:
     git clean -fdx       # make sure you don't have uncommited files!
 '''
 
-# The compiled build will be copied to this addon folder.
-# Please change it to use this feature.
-addonsDirectory = "C:\\Users\\Jacques Lucke\\AppData\\Roaming\\Blender Foundation\\Blender\\2.78\\scripts\\addons"
-
 import sys
 
 v = sys.version_info
@@ -33,29 +29,32 @@ from os.path import abspath, dirname, join, relpath
 
 currentDirectory = dirname(abspath(__file__))
 sourceDirectory = join(currentDirectory, "animation_nodes")
+configPath = join(currentDirectory, "config.py")
+
+config = {}
 
 initialArgs = sys.argv[:]
 
-
 def main():
-    if canCompileCython():
+    if canCompile():
         preprocessor()
         if "-all" in initialArgs:
             removeCFiles()
         compileCythonFiles()
         if "-export" in initialArgs:
             export()
-        if os.path.isdir(addonsDirectory):
+        if os.path.isdir(config["addonsDirectory"]):
             copyToBlender()
         else:
             print("The path to Blenders addon directory does not exist")
 
-def canCompileCython():
+def canCompile():
     if "bpy" in sys.modules:
         return False
     if not os.path.isdir(sourceDirectory):
         return False
     correctSysPath()
+    loadConfig()
     try:
         import Cython
         return True
@@ -69,6 +68,15 @@ def correctSysPath():
     for path in pathsToRemove:
         sys.path.remove(path)
         print("Removed from sys.path:", path)
+
+def loadConfig():
+    if os.path.isfile(configPath):
+        configCode = readFile(configPath)
+        exec(configCode, config, config)
+    else:
+        print("Cannot find the config.py file.")
+        print("Please duplicate the config.default.py file and change it to your needs.")
+        sys.exit()
 
 
 
@@ -118,7 +126,7 @@ def removeCFiles():
 
 def copyToBlender():
     print("\n\nCopy changes to addon folder")
-    targetPath = join(addonsDirectory, "animation_nodes")
+    targetPath = join(config["addonsDirectory"], "animation_nodes")
     try:
         copyAddonFiles(sourceDirectory, targetPath, verbose = True)
     except PermissionError:

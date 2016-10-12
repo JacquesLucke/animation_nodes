@@ -13,3 +13,4 @@ animation_nodes/data_structures/lists/base_lists.pxd
 animation_nodes/data_structures/lists/base_lists.pyx
 animation_nodes/data_structures/lists/convert.pxd
 animation_nodes/data_structures/lists/convert.pyx
+config.py
