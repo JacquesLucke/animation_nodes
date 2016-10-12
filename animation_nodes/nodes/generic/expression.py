@@ -42,6 +42,9 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
 
     outputDataType = StringProperty(default = "Generic", update = outputDataTypeChanged)
 
+    fixedOutputDataType = BoolProperty(name = "Fixed Data Type", default = False,
+        description = "When activated the output type does not automatically changes its type")
+
     def setup(self):
         self.newInput("Node Control", "New Input")
         self.newOutput("Generic", "Result", "result")
@@ -54,7 +57,7 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         row = layout.row(align = True)
         row.prop(self, "expression", text = "")
-        self.invokeSocketTypeChooser(row, "changeOutputType", icon = "SCRIPTWIN")
+        self.invokeSocketTypeChooser(row, "changeOutputTypeManually", icon = "SCRIPTWIN")
 
         col = layout.column(align = True)
         if self.containsSyntaxError:
@@ -78,6 +81,8 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
         col = layout.column(align = True)
         col.prop(self, "debugMode")
         col.prop(self, "correctType")
+
+        layout.prop(self, "fixedOutputDataType")
 
     def drawLabel(self):
         return self.expression
@@ -133,11 +138,16 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
         socket.linkWith(directOrigin)
 
     def edit_Output(self):
+        if self.fixedOutputDataType: return
         dataTargets = self.outputs[0].dataTargets
         if len(dataTargets) == 1:
             dataType = dataTargets[0].dataType
             if dataType not in ("Node Control", "Generic", "Generic List"):
                 self.changeOutputType(dataType)
+
+    def changeOutputTypeManually(self, dataType):
+        self.fixedOutputDataType = True
+        self.changeOutputType(dataType)
 
     def changeOutputType(self, dataType):
         if self.outputDataType != dataType:
