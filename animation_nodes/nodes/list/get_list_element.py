@@ -17,7 +17,7 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
 
     allowNegativeIndex = BoolProperty(name = "Allow Negative Index",
         description = "-2 means the second last list element",
-        update = executionCodeChanged, default = False)
+        update = executionCodeChanged, default = True)
 
     makeCopy = BoolProperty(name = "Make Copy", default = True,
         description = "Output a copy of the list element to make it independed",
