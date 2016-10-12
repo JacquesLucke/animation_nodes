@@ -22,7 +22,7 @@ class Grid3DTemplate(bpy.types.Operator, Template):
         generatorOutputNode.loopInputIdentifier = gridLoopInputNode.identifier
         generatorOutputNode.outputName = "Vector List"
         generatorOutputNode.listDataType = "Vector List"
-        generatorOutputNode.addType = "EXTEND"
+        generatorOutputNode.useList = True
 
         setObjectsLoopInputNode = self.newNode("an_LoopInputNode", x = 0, y = -530)
         setObjectsLoopInputNode.subprogramName = "Set Object Positions"

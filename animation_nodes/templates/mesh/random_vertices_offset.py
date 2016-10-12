@@ -26,7 +26,7 @@ class RandomVerticesOffsetTemplate(bpy.types.Operator, Template):
         loopOutputNode.loopInputIdentifier = loopInputNode.identifier
         loopOutputNode.outputName = "Vector List"
         loopOutputNode.listDataType = "Vector List"
-        loopOutputNode.addType = "APPEND"
+        loopOutputNode.useList = False
 
         invokeSubprogramNode.subprogramIdentifier = loopInputNode.identifier
         self.updateSubprograms()

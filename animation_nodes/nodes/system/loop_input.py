@@ -189,6 +189,7 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         node = newNodeAtCursor("an_LoopGeneratorOutputNode")
         node.loopInputIdentifier = self.identifier
         node.listDataType = dataType
+        node.outputName = dataType
         invokeTranslation()
         subprogramInterfaceChanged()
 

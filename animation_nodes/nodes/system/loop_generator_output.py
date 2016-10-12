@@ -1,51 +1,52 @@
 import bpy
 import random
 from bpy.props import *
-from ... events import treeChanged
 from ... sockets.info import toBaseDataType
-from ... base_types import AnimationNode
+from ... tree_info import getNodeByIdentifier
 from . subprogram_sockets import subprogramInterfaceChanged
-from ... tree_info import keepNodeLinks, getNodeByIdentifier
-
-addTypeItems = [
-    ("APPEND", "Append", "Add one element to the output list", "NONE", 0),
-    ("EXTEND", "Extend", "Add a custom amount of elements to the output list", "NONE", 1) ]
+from ... base_types import AnimationNode, AutoSelectVectorization
 
 class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_LoopGeneratorOutputNode"
     bl_label = "Loop Generator Output"
     dynamicLabelType = "ALWAYS"
 
-    def dataTypeChanged(self, context):
-        self.outputName = self.listDataType
-        self.generateSockets()
+    def settingChanged(self, context):
+        self.updateSockets()
         subprogramInterfaceChanged()
 
-    def nameChanged(self, context):
-        subprogramInterfaceChanged()
-
-    def loopInputIdentifierChanged(self, context):
-        subprogramInterfaceChanged()
-        treeChanged()
-
-    listDataType = StringProperty(update = dataTypeChanged)
-    addType = EnumProperty(name = "Add Type", items = addTypeItems, update = dataTypeChanged)
-
-    outputName = StringProperty(name = "Generator Name", update = nameChanged)
-    loopInputIdentifier = StringProperty(update = loopInputIdentifierChanged)
+    outputName = StringProperty(name = "Generator Name", update = settingChanged)
+    loopInputIdentifier = StringProperty(update = settingChanged)
     sortIndex = IntProperty(default = 0)
 
+    listDataType = StringProperty(default = "Vector List", update = settingChanged)
+    useList = BoolProperty(default = False, update = settingChanged)
+
     def setup(self):
-        self.listDataType = "Vector List"
         self.sortIndex = getRandomInt()
+        self.outputName = self.listDataType
+
+    def create(self):
+        listDataType = self.listDataType
+        baseDataType = toBaseDataType(listDataType)
+
+        self.newInputGroup(self.useList,
+            (baseDataType, baseDataType, "input", dict(defaultDrawType = "TEXT_ONLY")),
+            (listDataType, listDataType, "input", dict(defaultDrawType = "TEXT_ONLY")))
+
+        self.newInput("Boolean", "Condition", "condition", value = True, hide = True)
+
+        vectorization = AutoSelectVectorization()
+        vectorization.input(self, "useList", self.inputs[0])
+        self.newSocketEffect(vectorization)
 
     def draw(self, layout):
         node = self.loopInputNode
-        if node: layout.label(node.subprogramName, icon = "GROUP_VERTEX")
+        if node is not None:
+            layout.label(node.subprogramName, icon = "GROUP_VERTEX")
 
     def drawAdvanced(self, layout):
         layout.prop(self, "outputName", text = "Name")
-        layout.prop(self, "addType")
         self.invokeSocketTypeChooser(layout, "setListDataType",
             socketGroup = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
 
@@ -63,28 +64,12 @@ class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
     def setListDataType(self, dataType):
         self.listDataType = dataType
 
-    @keepNodeLinks
-    def generateSockets(self):
-        self.clearSockets()
-
-        if self.addType == "APPEND": dataType = toBaseDataType(self.listDataType)
-        elif self.addType == "EXTEND": dataType = self.listDataType
-
-        self.newInput(dataType, dataType, "input", defaultDrawType = "TEXT_ONLY")
-        self.newInput("Boolean", "Condition", "condition", value = True, hide = True)
-
     def delete(self):
         subprogramInterfaceChanged()
 
     def duplicate(self, source):
         self.sortIndex = getRandomInt()
         subprogramInterfaceChanged()
-
-    def getTemplateCode(self):
-        yield "self.loopInputIdentifier = #MISSING----------"
-        yield "self.outputName = {}".format(repr(self.outputName))
-        yield "self.listDataType = '{}'".format(self.listDataType)
-        yield "self.addType = '{}'".format(self.addType)
 
     @property
     def loopInputNode(self):
