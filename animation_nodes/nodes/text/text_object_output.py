@@ -76,7 +76,10 @@ class TextObjectOutputNode(bpy.types.Node, AnimationNode):
 
     def setAlignment(self, textObject, align):
         if align in ("LEFT", "CENTER", "RIGHT", "JUSTIFY", "FLUSH"):
-            textObject.align = align
+            if bpy.data.version < (2, 78, 0):
+                textObject.align = align
+            else:
+                textObject.align_x = align
             self.errorMessage = ""
         else:
             self.errorMessage = "The align type is invalid. Look in the advanced panels to see all possible values."
