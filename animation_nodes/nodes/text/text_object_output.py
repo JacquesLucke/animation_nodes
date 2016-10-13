@@ -27,7 +27,8 @@ class TextObjectOutputNode(bpy.types.Node, AnimationNode):
 
         self.newInput("Float", "X Offset", "xOffset")
         self.newInput("Float", "Y Offset", "yOffset")
-        self.newInput("Text", "Align", "align", value = "CENTER")
+        self.newInput("Text", "Horizontal Align", "horizontalAlign", value = "CENTER")
+        self.newInput("Text", "Vertical Align", "verticalAlign", value = "CENTER")
 
         self.newInput("Font", "Font", "font")
         self.newInput("Font", "Bold Font", "fontBold")
@@ -47,9 +48,11 @@ class TextObjectOutputNode(bpy.types.Node, AnimationNode):
             writeText(layout, self.errorMessage, width = 25, icon = "ERROR")
 
     def drawAdvanced(self, layout):
-        writeText(layout, "Possible values for 'Align' are 'LEFT', 'CENTER', 'RIGHT', 'JUSTIFY' and 'FLUSH'")
+        writeText(layout, "'Horizontal Align' in [LEFT, CENTER, RIGHT, JUSTIFY, FLUSH]", autoWidth = True)
+        writeText(layout, "'Vertical Align' in ['TOP_BASELINE', 'TOP', 'CENTER', 'BOTTOM']", autoWidth = True)
 
     def getExecutionCode(self):
+        yield "self.errorMessage = ''"
         yield "if getattr(object, 'type', '') == 'FONT':"
         yield "    textObject = object.data"
 
@@ -67,22 +70,25 @@ class TextObjectOutputNode(bpy.types.Node, AnimationNode):
 
         if s["X Offset"].isUsed:            yield "    textObject.offset_x = xOffset"
         if s["Y Offset"].isUsed:            yield "    textObject.offset_y = yOffset"
-        if s["Align"].isUsed:               yield "    self.setAlignment(textObject, align)"
+        if s["Horizontal Align"].isUsed:    yield "    self.setAlignmentX(textObject, horizontalAlign)"
+        if s["Vertical Align"].isUsed:      yield "    self.setAlignmentY(textObject, verticalAlign)"
 
         if s["Font"].isUsed:                yield "    textObject.font = font"
         if s["Bold Font"].isUsed:           yield "    textObject.font_bold = fontBold"
         if s["Italic Font"].isUsed:         yield "    textObject.font_italic = fontItalic"
         if s["Bold Italic Font"].isUsed:    yield "    textObject.font_bold_italic = fontBoldItalic"
 
-    def setAlignment(self, textObject, align):
+    def setAlignmentX(self, textObject, align):
         if align in ("LEFT", "CENTER", "RIGHT", "JUSTIFY", "FLUSH"):
-            if bpy.data.version < (2, 78, 0):
-                textObject.align = align
-            else:
-                textObject.align_x = align
-            self.errorMessage = ""
+            textObject.align_x = align
         else:
-            self.errorMessage = "The align type is invalid. Look in the advanced panels to see all possible values."
+            self.errorMessage = "Invalid align type. More info in the advanced panel"
+
+    def setAlignmentY(self, textObject, align):
+        if align in ("TOP_BASELINE", "TOP", "CENTER", "BOTTOM"):
+            textObject.align_y = align
+        else:
+            self.errorMessage = "Invalid align type. More info in the advanced panel"
 
     def getBakeCode(self):
         yield "if getattr(object, 'type', '') == 'FONT':"
