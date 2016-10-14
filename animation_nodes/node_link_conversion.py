@@ -196,7 +196,9 @@ class ConvertListToLength(LinkCorrection):
     def check(self, origin, target):
         return "List" in origin.dataType and target.dataType == "Integer"
     def insert(self, nodeTree, origin, target, dataOrigin):
-        insertLinkedNode(nodeTree, "an_GetListLengthNode", origin, target)
+        node = insertLinkedNode(nodeTree, "an_GetListLengthNode", origin, target)
+        node.hide = True
+        node.width_hidden = 60
 
 class ConvertToText(LinkCorrection):
     def check(self, origin, target):
