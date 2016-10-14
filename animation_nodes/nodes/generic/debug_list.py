@@ -22,7 +22,7 @@ class DebugListNode(bpy.types.Node, AnimationNode):
         if text is None: return
 
         text.clear()
-        if self.self.inputs[0].getCurrentDataType() in ("Float List", "Color"):
+        if self.inputs[1].getCurrentDataType() in ("Float List", "Color"):
             text.write("\n".join([str(round(e, 5)) for e in data]))
         else:
             try: text.write("\n".join([str(e) for e in data]))
