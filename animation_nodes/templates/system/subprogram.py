@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... base_types import Template
-from ... nodes.system.subprogram_sockets import subprogramInterfaceChanged
+from ... nodes.subprogram.subprogram_sockets import subprogramInterfaceChanged
 
 subprogramTypeItems = [
     ("GROUP", "Group", ""),

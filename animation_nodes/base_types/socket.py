@@ -6,7 +6,7 @@ from .. utils.recursion import noRecursion
 from .. operators.callbacks import newSocketCallback
 from .. utils.names import getRandomString, toVariableName
 from .. operators.dynamic_operators import getInvokeFunctionOperator
-from .. nodes.system.subprogram_sockets import subprogramInterfaceChanged
+from .. nodes.subprogram.subprogram_sockets import subprogramInterfaceChanged
 from .. tree_info import (isSocketLinked, getLinkedSockets, getDirectlyLinkedSockets,
                           getLinkedDataTypes)
 

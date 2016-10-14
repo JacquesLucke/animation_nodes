@@ -1,7 +1,7 @@
 import bpy
 from .. sockets.info import isList
 from .. utils.blender_ui import PieMenuHelper
-from .. nodes.system.subprogram_base import SubprogramBaseNode
+from .. nodes.subprogram.subprogram_base import SubprogramBaseNode
 
 '''
                 ###############

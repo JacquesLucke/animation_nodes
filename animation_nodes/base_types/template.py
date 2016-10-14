@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from mathutils import Vector
 from .. tree_info import getNodeByIdentifier
-from .. nodes.system import subprogram_sockets
+from .. nodes.subprogram import subprogram_sockets
 from .. utils.nodes import newNodeAtCursor, invokeTranslation
 
 class Template:

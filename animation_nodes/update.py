@@ -3,7 +3,7 @@ from . import tree_info
 from . utils.timing import measureTime
 from . tree_info import getOriginNodes
 from . ui.node_colors import colorNetworks
-from . nodes.system import subprogram_sockets
+from . nodes.subprogram import subprogram_sockets
 from . execution.units import createExecutionUnits
 from . node_link_conversion import correctForbiddenNodeLinks
 from . utils.nodes import iterAnimationNodes, getAnimationNodeTrees, createNodeByIdDict
