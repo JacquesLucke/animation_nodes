@@ -1,5 +1,6 @@
 import bpy
 from bpy.props import *
+from collections import OrderedDict
 from ... data_structures cimport DoubleList
 from ... base_types import AnimationNode, AutoSelectVectorization
 from ... math cimport min as minNumber
@@ -76,13 +77,13 @@ cdef new(str name, str label, str type, str expression, void* function):
     op.setup(name, label, type, expression, function)
     return op
 
-cdef dict operations = {}
+operations = OrderedDict()
 
 # Changing the order/indices can break existing files
 operations[0] = new("Add", "A + B", "A_B",
     "result = a + b", <void*>add)
 operations[1] = new("Subtract", "A - B", "A_B",
-    "result = a + b", <void*>subtract)
+    "result = a - b", <void*>subtract)
 operations[2] = new("Multiply", "A * B", "A_B",
     "result = a * b", <void*>multiply)
 operations[3] = new("Divide", "A / B", "A_B",
