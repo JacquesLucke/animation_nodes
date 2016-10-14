@@ -205,7 +205,9 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
                 yield "    result = self._operation.execute_A_B(a, step)"
             elif currentType == "A_Base":
                 yield "    result = self._operation.execute_A_B(a, base)"
-            yield "except Exception as e: self.errorMessage = str(e)"
+            yield "except Exception as e:"
+            yield "    self.errorMessage = str(e)"
+            yield "    result = self.outputs[0].getDefaultValue()"
         else:
             yield self._operation.expression
 

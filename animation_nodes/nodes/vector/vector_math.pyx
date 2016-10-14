@@ -173,6 +173,8 @@ class VectorMathNode(bpy.types.Node, AnimationNode):
     useListFactor = BoolProperty(default = False, update = AnimationNode.updateSockets)
     useListStep = BoolProperty(default = False, update = AnimationNode.updateSockets)
 
+    errorMessage = StringProperty()
+
     def create(self):
         vectorization = AutoSelectVectorization()
         usedProperties = []
@@ -196,6 +198,8 @@ class VectorMathNode(bpy.types.Node, AnimationNode):
 
     def draw(self, layout):
         layout.prop(self, "operation", text = "")
+        if self.errorMessage != "":
+            layout.label(self.errorMessage, icon = "ERROR")
 
     def drawLabel(self):
         return self._operation.label
@@ -203,16 +207,21 @@ class VectorMathNode(bpy.types.Node, AnimationNode):
     def getExecutionCode(self):
         if self.generatesList:
             currentType = self._operation.type
+            yield "try:"
+            yield "    self.errorMessage = ''"
             if currentType == "vA":
-                yield "result = self._operation.execute_vA(a)"
+                yield "    result = self._operation.execute_vA(a)"
             if currentType == "vA_vB":
-                yield "result = self._operation.execute_vA_vB(a, b)"
+                yield "    result = self._operation.execute_vA_vB(a, b)"
             elif currentType == "vA_fLength":
-                yield "result = self._operation.execute_vA_fB(a, length)"
+                yield "    result = self._operation.execute_vA_fB(a, length)"
             elif currentType == "vA_fFactor":
-                yield "result = self._operation.execute_vA_fB(a, factor)"
+                yield "    result = self._operation.execute_vA_fB(a, factor)"
             elif currentType == "vA_vStep":
-                yield "result = self._operation.execute_vA_vB(a, step)"
+                yield "    result = self._operation.execute_vA_vB(a, step)"
+            yield "except Exception as e:"
+            yield "    self.errorMessage = str(e)"
+            yield "    result = self.outputs[0].getDefaultValue()"
         else:
             yield self._operation.expression
 
