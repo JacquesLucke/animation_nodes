@@ -159,10 +159,18 @@ dataTypeById = {
     "v": ("Vector", "Vector List", (0, 0, 0)),
     "f": ("Float", "Float List", 1) }
 
+searchItems = {
+    "Add Vectors" : "Add",
+    "Scale Vector" : "Scale",
+    "Subtract Vectors" : "Subtract",
+    "Multiply Vectors" : "Multiply",
+    "Normalize Vector" : "Normalize"}
+
 class VectorMathNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_VectorMathNode"
     bl_label = "Vector Math"
     dynamicLabelType = "HIDDEN_ONLY"
+    searchTags = [(name, {"operation" : repr(op)}) for name, op in searchItems.items()]
 
     operation = EnumProperty(name = "Operation", default = "Add",
         items = operationItems, update = AnimationNode.updateSockets)
