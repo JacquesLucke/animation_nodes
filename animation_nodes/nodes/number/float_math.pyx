@@ -193,16 +193,19 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
     def getExecutionCode(self):
         if self.generatesList:
             currentType = self._operation.type
+            yield "try:"
+            yield "    self.errorMessage = ''"
             if currentType == "A":
-                yield "result = self._operation.execute_A(a)"
+                yield "    result = self._operation.execute_A(a)"
             elif currentType == "A_B":
-                yield "result = self._operation.execute_A_B(a, b)"
+                yield "    result = self._operation.execute_A_B(a, b)"
             elif currentType == "Base_Exponent":
-                yield "result = self._operation.execute_A_B(base, exponent)"
+                yield "    result = self._operation.execute_A_B(base, exponent)"
             elif currentType == "A_Step":
-                yield "result = self._operation.execute_A_B(a, step)"
+                yield "    result = self._operation.execute_A_B(a, step)"
             elif currentType == "A_Base":
-                yield "result = self._operation.execute_A_B(a, base)"
+                yield "    result = self._operation.execute_A_B(a, base)"
+            yield "except Exception as e: self.errorMessage = str(e)"
         else:
             yield self._operation.expression
 

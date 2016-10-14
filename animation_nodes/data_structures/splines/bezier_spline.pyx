@@ -2,7 +2,7 @@ cimport cython
 from libc.string cimport memcpy
 from numpy.polynomial import Polynomial
 from ... utils.lists cimport findListSegment_LowLevel
-from ... math cimport (subVec3, normalizeVec3, lengthVec3,
+from ... math cimport (subVec3, normalizeVec3_Inplace, lengthVec3,
                        transformVector3DList, toPyVector3)
 
 from mathutils import Vector
@@ -270,7 +270,7 @@ cdef calculateSmoothControlPoints(
         direction.x = factor * vecRight.x - vecLeft.x
         direction.y = factor * vecRight.y - vecLeft.y
         direction.z = factor * vecRight.z - vecLeft.z
-        normalizeVec3(&direction)
+        normalizeVec3_Inplace(&direction)
 
         factor = lenLeft * strength
         leftHandle.x = point.x - direction.x * factor

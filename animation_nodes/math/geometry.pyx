@@ -1,6 +1,6 @@
 cimport cython
-from . vector cimport (subVec3, scaleVec3, lengthVec3, dotVec3,
-                       distanceVec3, normalizeVec3)
+from . vector cimport (subVec3, scaleVec3_Inplace, lengthVec3, dotVec3,
+                       distanceVec3, normalizeVec3_Inplace)
 
 @cython.cdivision(True)
 cdef float findNearestLineParameter(Vector3* lineStart, Vector3* lineDirection, Vector3* point):
@@ -8,7 +8,7 @@ cdef float findNearestLineParameter(Vector3* lineStart, Vector3* lineDirection, 
     if directionLength == 0: return 0.0
 
     cdef Vector3 normalizedLineDirection = lineDirection[0]
-    scaleVec3(&normalizedLineDirection, 1 / directionLength)
+    scaleVec3_Inplace(&normalizedLineDirection, 1 / directionLength)
 
     cdef Vector3 pointDifference
     subVec3(&pointDifference, point, lineStart)
@@ -16,7 +16,7 @@ cdef float findNearestLineParameter(Vector3* lineStart, Vector3* lineDirection, 
 
 cdef double distancePointToPlane(Vector3* planePoint, Vector3* planeNormal, Vector3* point):
     cdef Vector3 normPlaneNormal = planeNormal[0]
-    normalizeVec3(&normPlaneNormal)
+    normalizeVec3_Inplace(&normPlaneNormal)
     return abs(signedDistancePointToPlane_Normalized(planePoint, &normPlaneNormal, point))
 
 cdef double signedDistancePointToPlane_Normalized(Vector3* planePoint, Vector3* normalizedPlaneNormal, Vector3* point):
