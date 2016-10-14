@@ -152,7 +152,7 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
     dynamicLabelType = "HIDDEN_ONLY"
     searchTags = [(name, {"operation" : repr(op)}) for name, op in searchItems.items()]
 
-    operation = EnumProperty(name = "Operation",
+    operation = EnumProperty(name = "Operation", default = "Multiply",
         description = "Operation to perform on the inputs",
         items = operationItems, update = AnimationNode.updateSockets)
 
