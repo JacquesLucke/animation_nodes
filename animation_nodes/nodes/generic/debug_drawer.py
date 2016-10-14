@@ -41,10 +41,7 @@ class DebugDrawerNode(bpy.types.Node, AnimationNode):
         row.prop(self, "maxListEndElements", text = "End")
 
     def getExecutionCode(self):
-        if "Condition" in self.inputs:
-            yield "if condition:"
-        else: yield "if True:"
-
+        yield "if condition:"
         yield "    self.errorMessage = ''"
         yield "    if hasattr(data, '__iter__'):"
         yield "        conversionFunction = self.getCurrentToStringFunction()"
