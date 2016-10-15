@@ -37,8 +37,6 @@ def extractPolygonTransforms(Vector3DList vertices, PolygonIndicesList polygons)
         long i, j
         long start, length
 
-    # TODO check indices
-
     for i in range(transforms.length):
         calcPolygonCenter(&center, vertices, polygons, i)
         setTranslationMatrix(transforms.data + i, &center)
