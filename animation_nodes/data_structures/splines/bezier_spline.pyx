@@ -2,8 +2,7 @@ cimport cython
 from libc.string cimport memcpy
 from numpy.polynomial import Polynomial
 from ... utils.lists cimport findListSegment_LowLevel
-from ... math cimport (subVec3, normalizeVec3_Inplace, lengthVec3,
-                       transformVector3DList, toPyVector3)
+from ... math cimport (subVec3, normalizeVec3_Inplace, lengthVec3, toPyVector3)
 
 from mathutils import Vector
 
@@ -43,9 +42,9 @@ cdef class BezierSpline(Spline):
                             self.cyclic)
 
     cpdef transform(self, matrix):
-        transformVector3DList(self.points, matrix)
-        transformVector3DList(self.leftHandles, matrix)
-        transformVector3DList(self.rightHandles, matrix)
+        self.points.transform(matrix)
+        self.leftHandles.transform(matrix)
+        self.rightHandles.transform(matrix)
         self.markChanged()
 
     cdef project_LowLevel(self, Vector3* _point):

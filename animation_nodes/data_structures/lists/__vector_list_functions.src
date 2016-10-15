@@ -5,3 +5,7 @@ def fromFloatList(self, FloatList source):
     cdef Vector3DList newList = Vector3DList(length = source.length / 3)
     memcpy(newList.data, source.data, source.length * sizeof(float))
     return newList
+
+def transform(self, matrix, bint ignoreTranslation = False):
+    from ... math import transformVector3DList
+    transformVector3DList(self, matrix, ignoreTranslation)
