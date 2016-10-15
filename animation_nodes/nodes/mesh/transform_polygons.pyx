@@ -1,8 +1,8 @@
 import bpy
 from bpy.props import *
 from ... base_types.node import AnimationNode
+from ... math cimport transformVec3AsPoint_InPlace, Matrix4, Vector3
 from ... data_structures cimport Vector3DList, PolygonIndicesList, Matrix4x4List
-from ... math cimport transformVec3AsPoint_InPlace, Matrix4
 
 class TransformPolygonsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_TransformPolygonsNode"
@@ -36,15 +36,18 @@ class TransformPolygonsNode(bpy.types.Node, AnimationNode):
 
 def transformPolygons(Vector3DList vertices, PolygonIndicesList polygons, Matrix4x4List matrices):
     cdef:
+        Matrix4* _matrices = matrices.data
         Matrix4* matrix
         long i, j
         long start, length
-        long index
+        Vector3* _vertices = vertices.data
+        unsigned int* _polyStarts = polygons.polyStarts.data
+        unsigned int* _polyLengths = polygons.polyLengths.data
+        unsigned int* _indices = polygons.indices.data
 
     for i in range(matrices.length):
-        matrix = matrices.data + i
-        start = polygons.polyStarts.data[i]
-        length = polygons.polyLengths.data[i]
+        matrix = _matrices + i
+        start = _polyStarts[i]
+        length = _polyLengths[i]
         for j in range(length):
-            index = polygons.indices.data[start + j]
-            transformVec3AsPoint_InPlace(vertices.data + polygons.indices.data[index], matrix)
+            transformVec3AsPoint_InPlace(_vertices + _indices[start + j], matrix)
