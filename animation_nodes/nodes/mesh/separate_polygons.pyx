@@ -1,12 +1,15 @@
 import bpy
+from bpy.props import *
 from ... math cimport Vector3
+from libc.string cimport memcpy
 from ... base_types.node import AnimationNode
 from ... data_structures cimport Vector3DList, PolygonIndicesList
-from libc.string cimport memcpy
 
 class SeparatePolygonsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SeparatePolygonsNode"
     bl_label = "Separate Polygons"
+
+    errorMessage = StringProperty()
 
     def create(self):
         self.newInput("Vector List", "Vertices", "inVertices")
@@ -15,8 +18,17 @@ class SeparatePolygonsNode(bpy.types.Node, AnimationNode):
         self.newOutput("Vector List", "Vertices", "outVertices")
         self.newOutput("Polygon Indices List", "Polygon Indices", "outPolygonIndices")
 
-    def execute(self, Vector3DList oldVertices, PolygonIndicesList oldPolygons):
-        return separatePolygons(oldVertices, oldPolygons)
+    def draw(self, layout):
+        if self.errorMessage != "":
+            layout.label(self.errorMessage, icon = "ERROR")
+
+    def execute(self, Vector3DList vertices, PolygonIndicesList polygons):
+        self.errorMessage = ""
+        if len(polygons) == 0 or polygons.getMaxIndex() < len(vertices):
+            return separatePolygons(vertices, polygons)
+        else:
+            self.errorMessage = "Invalid polygon indices"
+            return Vector3DList(), PolygonIndicesList()
 
 def separatePolygons(Vector3DList oldVertices, PolygonIndicesList oldPolygons):
     cdef Vector3DList newVertices
