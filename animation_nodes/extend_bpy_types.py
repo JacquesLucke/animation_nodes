@@ -8,11 +8,13 @@ def register():
     bpy.types.Context.getActiveAnimationNodeTree = getActiveAnimationNodeTree
     bpy.types.Operator.an_executeCallback = _executeCallback
     bpy.types.Mesh.an = PointerProperty(type = MeshProperties)
+    bpy.types.Object.an = PointerProperty(type = ObjectProperties)
 
 def unregister():
     del bpy.types.Context.getActiveAnimationNodeTree
     del bpy.types.Operator.an_executeCallback
     del bpy.types.Mesh.an
+    del bpy.types.Object.an
 
 def getActiveAnimationNodeTree(context):
     if context.area.type == "NODE_EDITOR":
@@ -68,3 +70,17 @@ class MeshProperties(bpy.types.PropertyGroup):
     @property
     def mesh(self):
         return self.id_data
+
+class ObjectProperties(bpy.types.PropertyGroup):
+    bl_idname = "an_ObjectProperties"
+
+    def createModifiedMesh(self, scene):
+        object = self.id_data
+        if object.type != "MESH":
+            return None
+        else:
+            from . events import isRendering
+            settings = "RENDER" if isRendering() else "PREVIEW"
+            return object.to_mesh(scene = scene,
+                                  apply_modifiers = True,
+                                  settings = settings)

@@ -59,8 +59,7 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
 
     def getMesh(self, object, useModifiers, scene):
         if useModifiers and scene is not None:
-            settings = "RENDER" if isRendering() else "PREVIEW"
-            return object.to_mesh(scene = scene, apply_modifiers = True, settings = settings)
+            return object.an.createModifiedMesh(scene)
         return object.data
 
     def clearMesh(self, mesh, useModifiers, scene):
