@@ -26,6 +26,6 @@ class TransformVectorNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         if self.useVectorList:
-            return "animation_nodes.math.transformVector3DList(vectors, matrix)"
+            return "vectors.transform(matrix)"
         else:
             return "transformedVector = matrix * vector"

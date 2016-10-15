@@ -2,7 +2,6 @@ import bpy
 from bpy.props import *
 from ... events import isRendering
 from ... base_types import AnimationNode
-from ... math.list_operations import transformVector3DList
 from ... data_structures import (Vector3DList, EdgeIndicesList, PolygonIndicesList,
                                  FloatList, DoubleList)
 
@@ -71,48 +70,57 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
 
 
     def getVertexLocations(self, mesh, object, useWorldSpace):
-        vertexLocations = Vector3DList(length = len(mesh.vertices))
-        mesh.vertices.foreach_get("co", vertexLocations.getMemoryView())
-        if useWorldSpace:
-            transformVector3DList(vertexLocations, object.matrix_world)
-        return vertexLocations
+        return getVertices(mesh, object, useWorldSpace)
 
     def getEdgeIndices(self, mesh):
-        edges = EdgeIndicesList(length = len(mesh.edges))
-        mesh.edges.foreach_get("vertices", edges.getMemoryView())
-        return edges
+        return getEdges(mesh)
 
     def getPolygonIndices(self, mesh):
-        polygons = PolygonIndicesList(
-                        indicesAmount = len(mesh.loops),
-                        polygonAmount = len(mesh.polygons))
-        mesh.polygons.foreach_get("vertices", polygons.indices.getMemoryView())
-        mesh.polygons.foreach_get("loop_total", polygons.polyLengths.getMemoryView())
-        mesh.polygons.foreach_get("loop_start", polygons.polyStarts.getMemoryView())
-        return polygons
+        return getPolygons(mesh)
 
     def getVertexNormals(self, mesh, object, useWorldSpace):
         normals = Vector3DList(length = len(mesh.vertices))
         mesh.vertices.foreach_get("normal", normals.getMemoryView())
         if useWorldSpace:
-            transformVector3DList(normals, object.matrix_world, ignoreTranslation = True)
+            normals.transform(object.matrix_world, ignoreTranslation = True)
         return normals
 
     def getPolygonNormals(self, mesh, object, useWorldSpace):
         normals = Vector3DList(length = len(mesh.polygons))
         mesh.polygons.foreach_get("normal", normals.getMemoryView())
         if useWorldSpace:
-            transformVector3DList(normals, object.matrix_world, ignoreTranslation = True)
+            normals.transform(object.matrix_world, ignoreTranslation = True)
         return normals
 
     def getPolygonCenters(self, mesh, object, useWorldSpace):
         centers = Vector3DList(length = len(mesh.polygons))
         mesh.polygons.foreach_get("center", centers.getMemoryView())
         if useWorldSpace:
-            transformVector3DList(centers, object.matrix_world)
+            centers.transform(object.matrix_world)
         return centers
 
     def getLocalPolygonAreas(self, mesh):
         areas = FloatList(length = len(mesh.polygons))
         mesh.polygons.foreach_get("area", areas.getMemoryView())
         return DoubleList.fromValues(areas)
+
+def getVertices(mesh, object = None, useWorldSpace = False):
+    vertexLocations = Vector3DList(length = len(mesh.vertices))
+    mesh.vertices.foreach_get("co", vertexLocations.getMemoryView())
+    if useWorldSpace and object is not None:
+        vertexLocations.transform(object.matrix_world)
+    return vertexLocations
+
+def getEdges(mesh):
+    edges = EdgeIndicesList(length = len(mesh.edges))
+    mesh.edges.foreach_get("vertices", edges.getMemoryView())
+    return edges
+
+def getPolygons(mesh):
+    polygons = PolygonIndicesList(
+                    indicesAmount = len(mesh.loops),
+                    polygonAmount = len(mesh.polygons))
+    mesh.polygons.foreach_get("vertices", polygons.indices.getMemoryView())
+    mesh.polygons.foreach_get("loop_total", polygons.polyLengths.getMemoryView())
+    mesh.polygons.foreach_get("loop_start", polygons.polyStarts.getMemoryView())
+    return polygons
