@@ -16,6 +16,7 @@ class TransformPolygonsNode(bpy.types.Node, AnimationNode):
         self.newInput("Matrix List", "Matrices", "matrices")
 
         self.newOutput("Vector List", "Vertices", "vertices")
+        self.newOutput("Polygon Indices List", "Polygon Indices", "polygonIndices")
 
     def draw(self, layout):
         if self.errorMessage != "":
@@ -25,13 +26,13 @@ class TransformPolygonsNode(bpy.types.Node, AnimationNode):
         self.errorMessage = ""
         if len(polygons) != 0 and polygons.getMaxIndex() >= len(vertices):
             self.errorMessage = "Invalid polygon indices"
-            return vertices
+            return vertices, polygons
         if len(polygons) != len(matrices):
             self.errorMessage = "Different amount of polygons and matrices"
-            return vertices
+            return vertices, polygons
 
         transformPolygons(vertices, polygons, matrices)
-        return vertices
+        return vertices, polygons
 
 def transformPolygons(Vector3DList vertices, PolygonIndicesList polygons, Matrix4x4List matrices):
     cdef:
