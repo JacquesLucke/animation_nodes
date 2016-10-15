@@ -230,9 +230,9 @@ def setSocketValues(node, inputs, outputs):
         socket = inputsByIdentifier.get(identifier)
         if socket is None: continue
         socket.hide = hide
+        socket.isUsed = isUsed
         if socket.dataType == dataType:
             socket.setProperty(value)
-            socket.isUsed = isUsed
             socket.dataIsModified = dataIsModified
 
     outputsByIdentifier = node.outputsByIdentifier
