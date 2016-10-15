@@ -16,7 +16,6 @@ class TemplatesMenu(bpy.types.Menu):
         layout.operator("an.simple_countdown_template")
         layout.operator("an.fcurve_animation_offset_template")
         layout.operator("an.simple_parent_template")
-        layout.operator("an.grid_3d_template")
         layout.operator("an.animate_individual_letters_template")
 
 class TemplatesMenuInHeader(bpy.types.Header):
