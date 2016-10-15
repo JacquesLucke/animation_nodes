@@ -2,8 +2,6 @@ import bpy
 from bpy.props import *
 from ... events import isRendering
 from ... base_types import AnimationNode
-from ... data_structures import (Vector3DList, EdgeIndicesList, PolygonIndicesList,
-                                 FloatList, DoubleList)
 
 class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectMeshDataNode"
