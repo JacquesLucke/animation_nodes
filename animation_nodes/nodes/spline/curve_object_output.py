@@ -1,7 +1,8 @@
 import bpy
 from bpy.props import *
 from ... utils.layout import writeText
-from ... base_types import AnimationNode
+from ... base_types import AnimationNode, AutoSelectVectorization
+from ... data_structures.splines.to_blender import setSplinesOnBlenderObject
 
 class CurveObjectOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CurveObjectOutputNode"
@@ -11,12 +12,17 @@ class CurveObjectOutputNode(bpy.types.Node, AnimationNode):
 
     errorMessage = StringProperty()
 
+    useSplineList = BoolProperty(default = False, update = AnimationNode.updateSockets)
+
     def create(self):
         socket = self.newInput("Object", "Object", "object")
         socket.defaultDrawType = "PROPERTY_ONLY"
         socket.objectCreationType = "CURVE"
 
-        self.newInput("Spline List", "Splines", "splines", showObjectInput = False)
+        splineProps = {"showObjectInput" : False, "defaultDrawType" : "TEXT_ONLY"}
+        self.newInputGroup(self.useSplineList,
+            ("Spline", "Spline", "spline", splineProps),
+            ("Spline List", "Splines", "splines", splineProps))
         self.newInput("Float", "Bevel Depth", "bevelDepth")
         self.newInput("Integer", "Bevel Resolution", "bevelResolution")
         self.newInput("Float", "Extrude", "extrude")
@@ -36,6 +42,10 @@ class CurveObjectOutputNode(bpy.types.Node, AnimationNode):
         for socket in self.inputs[4:]:
             socket.hide = True
 
+        vectorization = AutoSelectVectorization()
+        vectorization.input(self, "useSplineList", self.inputs[1])
+        self.newSocketEffect(vectorization)
+
     def draw(self, layout):
         if self.errorMessage != "":
             writeText(layout, self.errorMessage, width = 25, icon = "ERROR")
@@ -48,7 +58,10 @@ class CurveObjectOutputNode(bpy.types.Node, AnimationNode):
         yield "    curve = object.data"
 
         s = self.inputs
-        if s["Splines"].isUsed:             yield "    animation_nodes.data_structures.splines.to_blender.setSplinesOnBlenderObject(object, splines)"
+        if self.useSplineList:
+            if s["Splines"].isUsed:         yield "    self.setSplines(object, splines)"
+        else:
+            if s["Spline"].isUsed:          yield "    self.setSplines(object, [spline])"
         if s["Bevel Depth"].isUsed:         yield "    curve.bevel_depth = bevelDepth"
         if s["Bevel Resolution"].isUsed:    yield "    curve.bevel_resolution = bevelResolution"
         if s["Bevel Start"].isUsed:         yield "    curve.bevel_factor_start = bevelStart"
@@ -59,6 +72,9 @@ class CurveObjectOutputNode(bpy.types.Node, AnimationNode):
         if s["Taper Object"].isUsed:        yield "    curve.taper_object = taperObject"
         if s["Bevel Object"].isUsed:        yield "    curve.bevel_object = bevelObject"
         if s["Fill Mode"].isUsed:           yield "    self.setFillMode(curve, fillMode)"
+
+    def setSplines(self, object, splines):
+        setSplinesOnBlenderObject(object, splines)
 
     def setFillMode(self, curve, fillMode):
         isCorrectFillMode = fillMode in ("FULL", "BACK", "FRONT", "HALF") if curve.dimensions == "3D" else fillMode in ("NONE", "BACK", "FRONT", "BOTH")
