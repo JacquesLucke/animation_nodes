@@ -43,6 +43,8 @@ def main():
         compileCythonFiles()
         if "-export" in initialArgs:
             export()
+        if "-nocopy" in initialArgs:
+            return
         if os.path.isdir(config["addonsDirectory"]):
             copyToBlender()
         else:
