@@ -1,11 +1,15 @@
 '''
+Requires an existing config.py file.
+Duplicate and rename the config.default.py to get it.
+
 Command Line Arguments:
     python setup.py
      -all            # recompile all
      -export         # make redistributable version
+     -nocopy         # don't copy the build into Blenders addon directory
 
 Generate .html files to debug cython code:
-    cython -a filename.pyx
+    cython -a path/to/file.pyx
 
 Cleanup Repository:
     git clean -fdx       # make sure you don't have uncommited files!
@@ -43,10 +47,11 @@ def main():
         compileCythonFiles()
         if "-export" in initialArgs:
             export()
-        if os.path.isdir(config["addonsDirectory"]):
-            copyToBlender()
-        else:
-            print("The path to Blenders addon directory does not exist")
+        if not "-nocopy" in initialArgs:
+            if os.path.isdir(config["addonsDirectory"]):
+                copyToBlender()
+            else:
+                print("The path to Blenders addon directory does not exist")
 
 def canCompile():
     if "bpy" in sys.modules:
