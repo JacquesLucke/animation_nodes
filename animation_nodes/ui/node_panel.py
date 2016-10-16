@@ -28,15 +28,6 @@ def drawGenericNodeProperties(layout, node):
     col.prop(node, "location", text = "Y", index = 1)
 
 def drawSocketLists(layout, node):
-    layout.prop(getDeveloperSettings(), "socketEditMode", expand = True)
-    mode = getDeveloperSettings().socketEditMode
-
-    if mode == "NORMAL":
-        drawSocketLists_NormalMode(layout, node)
-    elif mode == "PERFORMANCE":
-        drawSocketLists_PerformanceMode(layout, node)
-
-def drawSocketLists_NormalMode(layout, node):
     row = layout.row(align = True)
 
     size = max(len(node.inputs), len(node.outputs), 1)
@@ -56,17 +47,6 @@ def drawSocketLists_NormalMode(layout, node):
         subrow.operator("an.move_output", text = "", icon = "TRIA_UP").moveUp = True
         subrow.operator("an.move_output", text = "", icon = "TRIA_DOWN").moveUp = False
         col.template_list("an_SocketUiList_Normal", "", node, "outputs", node, "activeOutputIndex", rows = size, maxrows = size)
-
-def drawSocketLists_PerformanceMode(layout, node):
-    box = layout.box()
-    writeText(box, "Select the input sockets whose data will be modified", icon = "INFO", autoWidth = True)
-    col = box.column(align = True)
-    for socket in node.inputs:
-        name = repr(socket.getDisplayedName())
-        if socket.isCopyable():
-            col.prop(socket, "dataIsModified", text = name)
-        else:
-            col.label("{} ({}) is not copyable".format(name, socket.dataType))
 
 def drawSocketVisibilityOperators(layout, node):
     col = layout.column(align = True)

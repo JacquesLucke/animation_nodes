@@ -71,14 +71,6 @@ class DeveloperProperties(bpy.types.PropertyGroup):
 
     profiling = PointerProperty(type = ProfilingProperties)
 
-    socketEditModeItems = [
-        ("NORMAL", "Normal", "", "NONE", 0),
-        ("PERFORMANCE", "Performance", "", "NONE", 1)]
-
-    socketEditMode = EnumProperty(name = "Socket Edit Mode", default = "NORMAL",
-        description = "Change to display different sets of socket properties",
-        items = socketEditModeItems)
-
     debug = BoolProperty(name = "Debug", default = False,
         description = "Enable some print statements")
 
