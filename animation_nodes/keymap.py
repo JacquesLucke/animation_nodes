@@ -25,6 +25,9 @@ def register():
     # Floating Advanced Panel
     kmi = km.keymap_items.new("an.floating_advanced_node_settings_panel", type = "U", value = "PRESS")
 
+    # Float Node Panel
+    kmi = km.keymap_items.new("an.floating_node_panel", type = "U", ctrl = True, value = "PRESS")
+
     addon_keymaps.append(km)
 
 def unregister():
