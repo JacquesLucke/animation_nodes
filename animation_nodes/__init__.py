@@ -94,9 +94,14 @@ except: traceback.print_exc()
 
 if "test_compile" not in globals():
     message = ("\n\n"
-        "You are using an uncompiled version of Animation Nodes.\n"
-        "Please download an official release or compile the addon yourself.\n"
-        "More information about compilation can be found in the setup.py file.")
+        "This build does not work at the moment.\n"
+        "  1. Make sure that you are using compiled version of AN.\n"
+        "     (Not a direct download of the repository from Github)\n"
+        "  2. If you are on windows you can try to install a library called\n"
+        "     'Visual C++ 2015 Redistributable'. Should be easy to find using\n"
+        "     your search engine of choice.\n"
+        "  3. Make a bug report on Github (prefered) and give as much information\n"
+        "     as you can. Specifically the full error message, your OS, version, ...")
     raise Exception(message)
 
 
