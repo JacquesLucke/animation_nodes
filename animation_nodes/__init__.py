@@ -35,6 +35,7 @@ bl_info = {
 # Test Environment
 ##################################
 
+import traceback
 from os import listdir
 from os.path import dirname
 addonsDirectory = dirname(dirname(__file__))
@@ -89,7 +90,7 @@ if getBlenderVersion() < (2, 76, 0):
 
 
 try: from . import test_compile
-except: pass
+except: traceback.print_exc()
 
 if "test_compile" not in globals():
     message = ("\n\n"
