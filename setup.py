@@ -34,12 +34,14 @@ from os.path import abspath, dirname, join, relpath
 currentDirectory = dirname(abspath(__file__))
 sourceDirectory = join(currentDirectory, "animation_nodes")
 configPath = join(currentDirectory, "config.py")
+defaultConfigPath = join(currentDirectory, "config.default.py")
 
 config = {}
 
 initialArgs = sys.argv[:]
 
 def main():
+    setupAndReadConfigFile()
     if canCompile():
         preprocessor()
         if "-all" in initialArgs:
@@ -52,6 +54,24 @@ def main():
                 copyToBlender()
             else:
                 print("The path to Blenders addon directory does not exist")
+                print("Please correct the config.py file.")
+
+def setupAndReadConfigFile():
+    if not os.path.isfile(configPath) and os.path.isfile(defaultConfigPath):
+        shutil.copyfile(defaultConfigPath, configPath)
+        print("Copied the config.default.py file to config.py")
+        print("Please change it manually if needed.")
+        print("Note: git ignores it, so depending on the settings of your editor")
+        print("      it might not be shown inside it.\n\n")
+
+    if os.path.isfile(configPath):
+        configCode = readFile(configPath)
+        exec(configCode, config, config)
+    else:
+        print("Cannot find any of these files: config.py, config.default.py ")
+        print("Make sure that at least the config.default.py exists.")
+        print("Maybe you have to clone the repository again.")
+        sys.exit()
 
 def canCompile():
     if "bpy" in sys.modules:
@@ -59,7 +79,6 @@ def canCompile():
     if not os.path.isdir(sourceDirectory):
         return False
     correctSysPath()
-    loadConfig()
     try:
         import Cython
         return True
@@ -73,15 +92,6 @@ def correctSysPath():
     for path in pathsToRemove:
         sys.path.remove(path)
         print("Removed from sys.path:", path)
-
-def loadConfig():
-    if os.path.isfile(configPath):
-        configCode = readFile(configPath)
-        exec(configCode, config, config)
-    else:
-        print("Cannot find the config.py file.")
-        print("Please duplicate the config.default.py file and change it to your needs.")
-        sys.exit()
 
 
 
