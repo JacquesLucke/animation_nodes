@@ -31,7 +31,7 @@ class DirectionToRotationNode(bpy.types.Node, AnimationNode):
     def getExecutionCode(self):
         isLinked = self.getLinkedOutputsDict()
 
-        yield "matrixRotation = animation_nodes.algorithms.rotation.generateRotationMatrix(direction, guide, self.trackAxis, self.guideAxis)"
+        yield "matrixRotation = animation_nodes.algorithms.rotation_test.directionToRotation(direction, guide, self.trackAxis, self.guideAxis)"
         if isLinked["matrixRotation"]: yield "matrixRotation.normalize()"
         if isLinked["eulerRotation"]: yield "eulerRotation = matrixRotation.to_euler()"
         if isLinked["quaternionRotation"]: yield "quaternionRotation = matrixRotation.to_quaternion()"

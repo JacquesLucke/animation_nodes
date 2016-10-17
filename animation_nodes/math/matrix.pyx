@@ -12,14 +12,14 @@ cdef void transformVec3AsPoint(Vector3* target, Vector3* v, Matrix4* m):
     target.y = v.x * m.a21 + v.y * m.a22 + v.z * m.a23 + m.a24
     target.z = v.x * m.a31 + v.y * m.a32 + v.z * m.a33 + m.a34
 
-cdef void transformVec3AsDirection_InPlace(Vector3* v, Matrix4* m):
+cdef void transformVec3AsDirection_InPlace(Vector3* v, Matrix3_or_Matrix4* m):
     cdef float newX, newY, newZ
     newX = v.x * m.a11 + v.y * m.a12 + v.z * m.a13
     newY = v.x * m.a21 + v.y * m.a22 + v.z * m.a23
     newZ = v.x * m.a31 + v.y * m.a32 + v.z * m.a33
     v.x, v.y, v.z = newX, newY, newZ
 
-cdef void transformVec3AsDirection(Vector3* target, Vector3* v, Matrix4* m):
+cdef void transformVec3AsDirection(Vector3* target, Vector3* v, Matrix3_or_Matrix4* m):
     target.x = v.x * m.a11 + v.y * m.a12 + v.z * m.a13
     target.y = v.x * m.a21 + v.y * m.a22 + v.z * m.a23
     target.z = v.x * m.a31 + v.y * m.a32 + v.z * m.a33

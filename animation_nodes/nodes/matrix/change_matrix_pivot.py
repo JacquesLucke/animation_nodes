@@ -1,7 +1,6 @@
 import bpy
 from bpy.props import *
 from ... base_types import AnimationNode
-from ... algorithms.rotation import generateRotationMatrix
 
 pivotTypeItems = [
     ("MATRIX", "Pivot Matrix", "Change Pivot by Matrix like parent", "", 0),
@@ -51,10 +50,10 @@ class ChangeMatrixPivotNode(bpy.types.Node, AnimationNode):
         if pivot == "LOC_ROT":
             yield "pivotMatrix = Matrix.Translation(pivot) * rotation.to_matrix().to_4x4() "
         if pivot == "AXES_XXZ":
-            yield "matrixRotation = animation_nodes.algorithms.rotation.generateRotationMatrix(normal, end - start, 'Z', 'X')"
+            yield "matrixRotation = animation_nodes.algorithms.rotation.directionToRotation(normal, end - start, 'Z', 'X')"
             yield "pivotMatrix = Matrix.Translation(start) * matrixRotation.normalized()"
         if pivot == "AXES_XXZZ":
-            yield "matrixRotation = (animation_nodes.algorithms.rotation.generateRotationMatrix(endZ - startZ, endX - startX, 'Z', 'X')).normalized()"
+            yield "matrixRotation = (animation_nodes.algorithms.rotation.directionToRotation(endZ - startZ, endX - startX, 'Z', 'X')).normalized()"
             yield "pivotMatrix = Matrix.Translation(startX) * matrixRotation"
 
         yield "matrixOut = pivotMatrix * matrix * pivotMatrix.inverted()"
