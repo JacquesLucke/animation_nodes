@@ -5,3 +5,5 @@
 *.exp
 *.lib
 *.obj
+*.zip
+*.html
