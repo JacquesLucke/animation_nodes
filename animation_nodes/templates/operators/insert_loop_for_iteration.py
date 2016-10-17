@@ -21,8 +21,8 @@ class InsertLoopForIteration(bpy.types.Operator, Template):
 
         loopInputNode = self.newNode("an_LoopInputNode")
         loopInputNode.newIterator(socket.dataType)
-        invokeNode = self.newNode("an_InvokeSubprogramNode", x = 200, move = False, mouseOffset = False)
-        invokeNode.location = sourceNode.location + Vector((250, 0))
+        invokeNode = self.newNode("an_InvokeSubprogramNode", move = False, mouseOffset = False)
+        invokeNode.location = sourceNode.viewLocation + Vector((250, 0))
 
         invokeNode.subprogramIdentifier = loopInputNode.identifier
         self.updateSubprograms()
