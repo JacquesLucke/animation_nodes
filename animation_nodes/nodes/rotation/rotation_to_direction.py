@@ -35,7 +35,7 @@ class RotationToDirectionNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         if self.useRotationList:
-            yield "directions = AN.algorithms.rotations.rotationsToDirections(rotations, self.directionAxis)"
+            yield "directions = AN.algorithms.rotations.eulersToDirections(rotations, self.directionAxis)"
             yield "AN.math.scaleVector3DList(directions, length)"
         else:
             yield "direction = AN.algorithms.rotations.eulerToDirection(rotation, self.directionAxis)"

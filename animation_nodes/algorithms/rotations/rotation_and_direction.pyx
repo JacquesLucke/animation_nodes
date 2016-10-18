@@ -114,7 +114,7 @@ cdef void changeAxis(char track, char guide, Vector3* x, Vector3* y, Vector3* z)
 # List Operations
 ################################################
 
-def rotationsToDirections(EulerList rotations, str axis):
+def eulersToDirections(EulerList rotations, str axis):
     cdef char _axis = axixNumbers[axis]
     cdef Vector3DList directions = Vector3DList(length = rotations.length)
     cdef long i
