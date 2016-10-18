@@ -47,7 +47,7 @@ cdef void mixVec3(Vector3* target, Vector3* a, Vector3* b, float factor):
     target.z = newZ
 
 @cython.cdivision(True)
-cdef void normalizeVec3_Inplace(Vector3* v):
+cdef void normalizeVec3_InPlace(Vector3* v):
     cdef float length = sqrt(v.x * v.x + v.y * v.y + v.z * v.z)
     if length != 0:
         v.x /= length

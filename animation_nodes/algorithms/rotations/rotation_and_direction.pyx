@@ -1,7 +1,8 @@
 from ... data_structures cimport EulerList, Matrix4x4List, Vector3DList
 from ... math cimport (Euler3, Vector3, toVector3, toPyVector3, Matrix3, toEuler3,
                        transformVec3AsDirection_InPlace, setRotationMatrix,
-                       setIdentityMatrix, Matrix4, toPyMatrix4, crossVec3, normalizeVec3)
+                       setIdentityMatrix, Matrix4, toPyMatrix4, crossVec3, normalizeVec3,
+                       normalizeVec3_InPlace)
 
 
 axixNumbers = { "X" : 0,  "Y" : 1,  "Z" : 2,
@@ -67,6 +68,10 @@ cdef directionToRotation_LowLevel(Matrix4* target,
     crossVec3(&x, &y, &z)
 
     changeAxis(trackAxis, guideAxis, &x, &y, &z)
+
+    normalizeVec3_InPlace(&x)
+    normalizeVec3_InPlace(&y)
+    # z is already normalized
 
     target.a11, target.a12, target.a13 = x.x, y.x, z.x
     target.a21, target.a22, target.a23 = x.y, y.y, z.y

@@ -18,7 +18,7 @@ cdef void crossVec3(Vector3* result, Vector3* a, Vector3* b)
 cdef void projectVec3(Vector3* result, Vector3* a, Vector3* b)
 cdef void reflectVec3(Vector3* result, Vector3* v, Vector3* axis)
 
-cdef void normalizeVec3_Inplace(Vector3* v)
+cdef void normalizeVec3_InPlace(Vector3* v)
 cdef void normalizeVec3(Vector3* target, Vector3* v)
 cdef void normalizeLengthVec3(Vector3* target, Vector3* v, float length)
 

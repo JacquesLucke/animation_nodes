@@ -2,7 +2,7 @@ from . import grid
 from libc.math cimport sin, cos
 from libc.math cimport M_PI as PI
 from ... data_structures cimport Spline, Vector3DList
-from ... math cimport Vector3, subVec3, lengthVec3, crossVec3, normalizeVec3_Inplace
+from ... math cimport Vector3, subVec3, lengthVec3, crossVec3, normalizeVec3_InPlace
 
 # Vertices
 ####################################################
@@ -62,8 +62,8 @@ cdef alignedCircleVertices_LowLevel(Vector3* center, Vector3* pointOnCircle,
     crossVec3(&dirY, tangent, &dirX)
 
     radius = lengthVec3(&dirX)
-    normalizeVec3_Inplace(&dirX)
-    normalizeVec3_Inplace(&dirY)
+    normalizeVec3_InPlace(&dirX)
+    normalizeVec3_InPlace(&dirY)
 
     angle = 0
     angleStep = 2 * PI / <float>resolution
