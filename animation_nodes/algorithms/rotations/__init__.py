@@ -1,2 +1,2 @@
-from . rotation_and_direction import (rotationToDirection, rotationsToDirections,
-                                      directionToRotation)
+from . rotation_and_direction import (eulerToDirection, rotationsToDirections,
+                                      directionToMatrix)

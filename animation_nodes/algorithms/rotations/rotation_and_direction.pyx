@@ -16,30 +16,30 @@ axisVectors[3] = toVector3((-1, 0, 0))
 axisVectors[4] = toVector3((0, -1, 0))
 axisVectors[5] = toVector3((0, 0, -1))
 
-def rotationToDirection(rotation, str axis):
+def eulerToDirection(rotation, str axis):
     cdef char _axis = axixNumbers[axis]
     cdef Euler3 _rotation = toEuler3(rotation)
     cdef Vector3 direction
-    rotationToDirection_LowLevel(&direction, &_rotation, _axis)
+    eulerToDirection_LowLevel(&direction, &_rotation, _axis)
     return toPyVector3(&direction)
 
-cdef rotationToDirection_LowLevel(Vector3* target, Euler3* rotation, char axis):
+cdef eulerToDirection_LowLevel(Vector3* target, Euler3* rotation, char axis):
     cdef Matrix3 matrix
     setRotationMatrix(&matrix, rotation)
     target[0] = axisVectors[axis]
     transformVec3AsDirection_InPlace(target, &matrix)
 
-def directionToRotation(direction, guide, trackAxis = "Z", guideAxis = "X"):
+def directionToMatrix(direction, guide, trackAxis = "Z", guideAxis = "X"):
     cdef:
         Matrix4 result
         Vector3 _direction = toVector3(direction)
         Vector3 _guide = toVector3(guide)
         char _trackAxis = axixNumbers[trackAxis]
         char _guideAxis = axixNumbers[guideAxis]
-    directionToRotation_LowLevel(&result, &_direction, &_guide, _trackAxis, _guideAxis)
+    directionToMatrix_LowLevel(&result, &_direction, &_guide, _trackAxis, _guideAxis)
     return toPyMatrix4(&result)
 
-cdef directionToRotation_LowLevel(Matrix4* target,
+cdef directionToMatrix_LowLevel(Matrix4* target,
                                   Vector3* direction, Vector3* guide,
                                   char trackAxis, char guideAxis):
     '''
@@ -119,5 +119,5 @@ def rotationsToDirections(EulerList rotations, str axis):
     cdef Vector3DList directions = Vector3DList(length = rotations.length)
     cdef long i
     for i in range(directions.length):
-        rotationToDirection_LowLevel(directions.data + i, rotations.data + i, _axis)
+        eulerToDirection_LowLevel(directions.data + i, rotations.data + i, _axis)
     return directions

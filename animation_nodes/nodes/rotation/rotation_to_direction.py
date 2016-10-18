@@ -38,5 +38,5 @@ class RotationToDirectionNode(bpy.types.Node, AnimationNode):
             yield "directions = AN.algorithms.rotations.rotationsToDirections(rotations, self.directionAxis)"
             yield "AN.math.scaleVector3DList(directions, length)"
         else:
-            yield "direction = AN.algorithms.rotations.rotationToDirection(rotation, self.directionAxis)"
+            yield "direction = AN.algorithms.rotations.eulerToDirection(rotation, self.directionAxis)"
             yield "direction *= length"
