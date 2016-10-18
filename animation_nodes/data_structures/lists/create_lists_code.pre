@@ -75,6 +75,16 @@ lists.append(dict(LISTNAME = "Matrix4x4List",
                   DECLARATIONS = ["from ... math.matrix cimport Matrix4",
                                   "from ... math.conversion cimport setMatrix4, toPyMatrix4"]))
 
+lists.append(dict(LISTNAME = "QuaternionList",
+                  TYPE = "Quaternion",
+                  MEMVIEW = "float",
+                  EQUALS = r"\1.w == \2.w and \1.x == \2.x and \1.y == \2.y and \1.z == \2.z",
+                  TRY_CONVERSION_CODE = "setQuaternion(target, value)",
+                  TO_PYOBJECT_CODE = "return toPyQuaternion(value)",
+                  MORE_METHODS = "",
+                  DECLARATIONS = ["from ... math.quaternion cimport Quaternion",
+                                  "from ... math.conversion cimport setQuaternion, toPyQuaternion"]))
+
 lists.append(dict(LISTNAME = "EdgeIndicesList",
                   TYPE = "EdgeIndices",
                   MEMVIEW = "unsigned int",

@@ -2,7 +2,8 @@ import bpy
 from bpy.props import *
 from mathutils import Quaternion
 from .. events import propertyChanged
-from .. base_types import AnimationNodeSocket, PythonListSocket
+from .. data_structures import QuaternionList
+from .. base_types import AnimationNodeSocket, CythonListSocket
 
 class QuaternionSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_QuaternionSocket"
@@ -49,7 +50,7 @@ class QuaternionSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             except: return cls.getDefaultValue(), 2
 
 
-class QuaternionListSocket(bpy.types.NodeSocket, PythonListSocket, AnimationNodeSocket):
+class QuaternionListSocket(bpy.types.NodeSocket, CythonListSocket, AnimationNodeSocket):
     bl_idname = "an_QuaternionListSocket"
     bl_label = "Quaternion List Socket"
     dataType = "Quaternion List"
@@ -58,15 +59,4 @@ class QuaternionListSocket(bpy.types.NodeSocket, PythonListSocket, AnimationNode
     drawColor = (0.8, 0.6, 0.3, 0.5)
     storable = True
     comparable = False
-
-    @classmethod
-    def getCopyExpression(cls):
-        return "[element.copy() for element in value]"
-
-    @classmethod
-    def correctValue(cls, value):
-        if isinstance(value, list):
-            if all(isinstance(element, Quaternion) for element in value):
-                return value, 0
-        try: return [Quaternion(element) for element in value], 1
-        except: return cls.getDefaultValue(), 2
+    listClass = QuaternionList

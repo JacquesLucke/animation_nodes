@@ -1,4 +1,5 @@
 from mathutils import Vector, Matrix, Euler
+from mathutils import Quaternion as PyQuaternion
 
 # Vectors
 ##########################################################
@@ -86,3 +87,21 @@ cdef toPyEuler3(Euler3* e):
     if e.order == 3: return Euler((e.x, e.y, e.z), "YZX")
     if e.order == 4: return Euler((e.x, e.y, e.z), "ZXY")
     if e.order == 5: return Euler((e.x, e.y, e.z), "ZYX")
+
+
+# Quaternions
+##########################################################
+
+cdef Quaternion toQuaternion(value) except *:
+    cdef Quaternion q
+    setQuaternion(&q, value)
+    return q
+
+cdef setQuaternion(Quaternion* q, value):
+    q.w = value.w
+    q.x = value.x
+    q.y = value.y
+    q.z = value.z
+
+cdef toPyQuaternion(Quaternion* q):
+    return PyQuaternion((q.w, q.x, q.y, q.z))
