@@ -1,5 +1,5 @@
 from . vector cimport Vector3
-from . matrix cimport Matrix3, Matrix4
+from . matrix cimport Matrix3, Matrix4, Matrix3_or_Matrix4
 from . euler cimport Euler3
 
 cdef Matrix4 toMatrix4(value) except *

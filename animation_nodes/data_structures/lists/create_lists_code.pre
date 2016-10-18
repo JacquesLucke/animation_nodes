@@ -10,6 +10,7 @@ numericListFunctionsPath = changeFileName(__file__, "__numeric_list_functions.sr
 indicesListFunctionsPath = changeFileName(__file__, "__indices_list_functions.src")
 vectorListFunctionsPath = changeFileName(__file__, "__vector_list_functions.src")
 booleanListFunctionsPath = changeFileName(__file__, "__boolean_list_functions.src")
+eulerListFunctionsPath = changeFileName(__file__, "__euler_list_functions.src")
 
 numericLists = [
     ("FloatList", "float"),
@@ -59,7 +60,7 @@ lists.append(dict(LISTNAME = "EulerList",
                   EQUALS = r"\1.x == \2.x and \1.y == \2.y and \1.z == \2.z and \1.order == \2.order",
                   TRY_CONVERSION_CODE = "setEuler3(target, value)",
                   TO_PYOBJECT_CODE = "return toPyEuler3(value)",
-                  MORE_METHODS = "",
+                  MORE_METHODS = readFile(eulerListFunctionsPath),
                   DECLARATIONS = ["from ... math.euler cimport Euler3",
                                   "from ... math.conversion cimport setEuler3, toPyEuler3"]))
 

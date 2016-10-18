@@ -1,0 +1,4 @@
+@classmethod
+def fromMatrices(cls, Matrix4x4List matrices):
+    from ... math import matrix4x4ListToEulerList
+    return matrix4x4ListToEulerList(matrices)
