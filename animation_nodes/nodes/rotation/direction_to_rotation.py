@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... events import propertyChanged
-from ... base_types import AnimationNode
+from ... base_types import AnimationNode, AutoSelectVectorization
 
 trackAxisItems = [(axis, axis, "") for axis in ("X", "Y", "Z", "-X", "-Y", "-Z")]
 guideAxisItems  = [(axis, axis, "") for axis in ("X", "Y", "Z")]
@@ -14,12 +14,36 @@ class DirectionToRotationNode(bpy.types.Node, AnimationNode):
     trackAxis = EnumProperty(items = trackAxisItems, update = propertyChanged, default = "Z")
     guideAxis = EnumProperty(items = guideAxisItems, update = propertyChanged, default = "X")
 
+    useDirectionList = BoolProperty(update = AnimationNode.updateSockets)
+    useGuideList = BoolProperty(update = AnimationNode.updateSockets)
+
     def create(self):
-        self.newInput("Vector", "Direction", "direction")
-        self.newInput("Vector", "Guide", "guide", value = [0.0, 0.0, 1.0])
-        self.newOutput("Euler", "Euler Rotation", "eulerRotation")
-        self.newOutput("Quaternion", "Quaternion Rotation", "quaternionRotation", hide = True)
-        self.newOutput("Matrix", "Matrix Rotation", "matrixRotation", hide = True)
+        self.newInputGroup(self.useDirectionList,
+            ("Vector", "Direction", "direction"),
+            ("Vector List", "Directions", "directions"))
+        self.newInputGroup(self.useGuideList,
+            ("Vector", "Guide", "guide", {"value" : (0, 0, 1)}),
+            ("Vector List", "Guides", "guides"))
+
+        generateList = self.useDirectionList or self.useGuideList
+
+        self.newOutputGroup(generateList,
+            ("Euler", "Euler Rotation", "eulerRotation"),
+            ("Euler List", "Euler Rotations", "eulerRotations"))
+
+        self.newOutputGroup(generateList,
+            ("Quaternion", "Quaternion Rotation", "quaternionRotation", {"hide" : True}),
+            ("Quaternion List", "Quaternion Rotations", "quaternionRotations", {"hide" : True}))
+
+        self.newOutputGroup(generateList,
+            ("Matrix", "Matrix Rotation", "matrixRotation", {"hide" : True}),
+            ("Matrix List", "Matrix Rotations", "matrixRotations", {"hide" : True}))
+
+        vectorization = AutoSelectVectorization()
+        vectorization.input(self, "useDirectionList", self.inputs[0])
+        vectorization.input(self, "useGuideList", self.inputs[1])
+        vectorization.output(self, [("useDirectionList", "useGuideList")], list(self.outputs))
+        self.newSocketEffect(vectorization)
 
     def draw(self, layout):
         layout.prop(self, "trackAxis", expand = True)
@@ -30,8 +54,12 @@ class DirectionToRotationNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         isLinked = self.getLinkedOutputsDict()
+        generateList = self.useDirectionList or self.useGuideList
 
-        yield "matrixRotation = animation_nodes.algorithms.rotations.directionToRotation(direction, guide, self.trackAxis, self.guideAxis)"
-        if isLinked["matrixRotation"]: yield "matrixRotation.normalize()"
-        if isLinked["eulerRotation"]: yield "eulerRotation = matrixRotation.to_euler()"
-        if isLinked["quaternionRotation"]: yield "quaternionRotation = matrixRotation.to_quaternion()"
+        if generateList:
+            yield "matrixRotations = eulerRotations = quaternionRotations = 0"
+        else:
+            yield "matrixRotation = AN.algorithms.rotations.directionToMatrix(direction, guide, self.trackAxis, self.guideAxis)"
+            if isLinked["matrixRotation"]: yield "#matrixRotation.normalize()"
+            if isLinked["eulerRotation"]: yield "eulerRotation = matrixRotation.to_euler()"
+            if isLinked["quaternionRotation"]: yield "quaternionRotation = matrixRotation.to_quaternion()"
