@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from .. events import propertyChanged
 from .. data_structures import LongLongList
-from .. base_types import AnimationNodeSocket, CythonListSocket
+from .. base_types import AnimationNodeSocket, CListSocket
 
 def getValue(self):
     return min(max(self.minValue, self.get("value", 0)), self.maxValue)
@@ -59,7 +59,7 @@ class IntegerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             except: return cls.getDefaultValue(), 2
 
 
-class IntegerListSocket(bpy.types.NodeSocket, CythonListSocket, AnimationNodeSocket):
+class IntegerListSocket(bpy.types.NodeSocket, CListSocket, AnimationNodeSocket):
     bl_idname = "an_IntegerListSocket"
     bl_label = "Integer List Socket"
     dataType = "Integer List"

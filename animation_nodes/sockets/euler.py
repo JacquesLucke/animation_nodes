@@ -3,7 +3,7 @@ from bpy.props import *
 from mathutils import Euler
 from .. events import propertyChanged
 from .. data_structures import EulerList
-from .. base_types import AnimationNodeSocket, CythonListSocket
+from .. base_types import AnimationNodeSocket, CListSocket
 
 class EulerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_EulerSocket"
@@ -49,7 +49,7 @@ class EulerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             except: return cls.getDefaultValue(), 2
 
 
-class EulerListSocket(bpy.types.NodeSocket, CythonListSocket, AnimationNodeSocket):
+class EulerListSocket(bpy.types.NodeSocket, CListSocket, AnimationNodeSocket):
     bl_idname = "an_EulerListSocket"
     bl_label = "Euler List Socket"
     dataType = "Euler List"

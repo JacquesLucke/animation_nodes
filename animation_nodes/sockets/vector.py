@@ -3,7 +3,7 @@ from bpy.props import *
 from mathutils import Vector
 from .. events import propertyChanged
 from .. data_structures import Vector3DList
-from .. base_types import AnimationNodeSocket, CythonListSocket
+from .. base_types import AnimationNodeSocket, CListSocket
 
 class VectorSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_VectorSocket"
@@ -51,7 +51,7 @@ class VectorSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return cls.getDefaultValue(), 2
 
 
-class VectorListSocket(bpy.types.NodeSocket, CythonListSocket, AnimationNodeSocket):
+class VectorListSocket(bpy.types.NodeSocket, CListSocket, AnimationNodeSocket):
     bl_idname = "an_VectorListSocket"
     bl_label = "Vector List Socket"
     dataType = "Vector List"

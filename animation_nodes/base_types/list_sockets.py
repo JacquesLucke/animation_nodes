@@ -28,7 +28,7 @@ class PythonListSocket(ListSocket):
     def getJoinListsCode(cls):
         return "list(itertools.chain(value))"
 
-class CythonListSocket(ListSocket):
+class CListSocket(ListSocket):
     listClass = None
 
     @classmethod

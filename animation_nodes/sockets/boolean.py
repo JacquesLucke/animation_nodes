@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from .. events import propertyChanged
 from .. data_structures import BooleanList
-from .. base_types import AnimationNodeSocket, CythonListSocket
+from .. base_types import AnimationNodeSocket, CListSocket
 from .. utils.nodes import newNodeAtCursor, invokeTranslation
 
 class BooleanSocket(bpy.types.NodeSocket, AnimationNodeSocket):
@@ -52,7 +52,7 @@ class BooleanSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             except: return cls.getDefaultValue(), 2
 
 
-class BooleanListSocket(bpy.types.NodeSocket, CythonListSocket, AnimationNodeSocket):
+class BooleanListSocket(bpy.types.NodeSocket, CListSocket, AnimationNodeSocket):
     bl_idname = "an_BooleanListSocket"
     bl_label = "Boolean List Socket"
     dataType = "Boolean List"

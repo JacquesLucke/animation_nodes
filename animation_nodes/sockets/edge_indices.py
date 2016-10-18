@@ -1,6 +1,6 @@
 import bpy
 from .. data_structures import EdgeIndicesList
-from .. base_types import AnimationNodeSocket, CythonListSocket
+from .. base_types import AnimationNodeSocket, CListSocket
 
 class EdgeIndicesSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_EdgeIndicesSocket"
@@ -29,7 +29,7 @@ class EdgeIndicesSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         else: return cls.getDefaultValue(), 2
 
 
-class EdgeIndicesListSocket(bpy.types.NodeSocket, CythonListSocket, AnimationNodeSocket):
+class EdgeIndicesListSocket(bpy.types.NodeSocket, CListSocket, AnimationNodeSocket):
     bl_idname = "an_EdgeIndicesListSocket"
     bl_label = "Edge Indices List Socket"
     dataType = "Edge Indices List"

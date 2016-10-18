@@ -3,7 +3,7 @@ from bpy.props import *
 from mathutils import Quaternion
 from .. events import propertyChanged
 from .. data_structures import QuaternionList
-from .. base_types import AnimationNodeSocket, CythonListSocket
+from .. base_types import AnimationNodeSocket, CListSocket
 
 class QuaternionSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_QuaternionSocket"
@@ -50,7 +50,7 @@ class QuaternionSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             except: return cls.getDefaultValue(), 2
 
 
-class QuaternionListSocket(bpy.types.NodeSocket, CythonListSocket, AnimationNodeSocket):
+class QuaternionListSocket(bpy.types.NodeSocket, CListSocket, AnimationNodeSocket):
     bl_idname = "an_QuaternionListSocket"
     bl_label = "Quaternion List Socket"
     dataType = "Quaternion List"
