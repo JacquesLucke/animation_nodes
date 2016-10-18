@@ -40,8 +40,8 @@ def directionToMatrix(direction, guide, trackAxis = "Z", guideAxis = "X"):
     return toPyMatrix4(&result)
 
 cdef directionToMatrix_LowLevel(Matrix4* target,
-                                  Vector3* direction, Vector3* guide,
-                                  char trackAxis, char guideAxis):
+                                Vector3* direction, Vector3* guide,
+                                char trackAxis, char guideAxis):
     '''
     trackAxis in [0, 5] -> X, Y, Z, -X, -Y, -Z
     guideAxis in [0, 2] -> X, Y, Z
@@ -121,3 +121,15 @@ def eulersToDirections(EulerList rotations, str axis):
     for i in range(directions.length):
         eulerToDirection_LowLevel(directions.data + i, rotations.data + i, _axis)
     return directions
+
+def directionsToMatrices(Vector3DList directions, guide, trackAxis = "Z", guideAxis = "X"):
+    cdef:
+        Matrix4x4List matrices = Matrix4x4List(length = directions.length)
+        char _trackAxis = axixNumbers[trackAxis]
+        char _guideAxis = axixNumbers[guideAxis]
+        Vector3 _guide = toVector3(guide)
+        long i
+    for i in range(matrices.length):
+        directionToMatrix_LowLevel(matrices.data + i, directions.data + i,
+                                   &_guide, _trackAxis, _guideAxis)
+    return matrices
