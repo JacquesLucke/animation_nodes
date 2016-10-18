@@ -21,5 +21,5 @@ class RotationToDirectionNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "directionAxis", expand = True)
 
     def getExecutionCode(self):
-        yield "direction = animation_nodes.algorithms.rotation.rotationToDirection(rotation, self.directionAxis)"
+        yield "direction = animation_nodes.algorithms.rotations.rotationToDirection(rotation, self.directionAxis)"
         yield "direction *= length"

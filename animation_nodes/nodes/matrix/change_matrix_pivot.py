@@ -50,10 +50,10 @@ class ChangeMatrixPivotNode(bpy.types.Node, AnimationNode):
         if pivot == "LOC_ROT":
             yield "pivotMatrix = Matrix.Translation(pivot) * rotation.to_matrix().to_4x4() "
         if pivot == "AXES_XXZ":
-            yield "matrixRotation = animation_nodes.algorithms.rotation.directionToRotation(normal, end - start, 'Z', 'X')"
+            yield "matrixRotation = animation_nodes.algorithms.rotations.directionToRotation(normal, end - start, 'Z', 'X')"
             yield "pivotMatrix = Matrix.Translation(start) * matrixRotation.normalized()"
         if pivot == "AXES_XXZZ":
-            yield "matrixRotation = (animation_nodes.algorithms.rotation.directionToRotation(endZ - startZ, endX - startX, 'Z', 'X')).normalized()"
+            yield "matrixRotation = (animation_nodes.algorithms.rotations.directionToRotation(endZ - startZ, endX - startX, 'Z', 'X')).normalized()"
             yield "pivotMatrix = Matrix.Translation(startX) * matrixRotation"
 
         yield "matrixOut = pivotMatrix * matrix * pivotMatrix.inverted()"

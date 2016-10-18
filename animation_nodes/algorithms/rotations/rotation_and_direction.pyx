@@ -1,6 +1,6 @@
-from .. math cimport (Euler3, Vector3, toVector3, toPyVector3, Matrix3, toEuler3,
-                      transformVec3AsDirection_InPlace, setRotationMatrix,
-                      setIdentityMatrix, Matrix4, toPyMatrix4, crossVec3, normalizeVec3)
+from ... math cimport (Euler3, Vector3, toVector3, toPyVector3, Matrix3, toEuler3,
+                       transformVec3AsDirection_InPlace, setRotationMatrix,
+                       setIdentityMatrix, Matrix4, toPyMatrix4, crossVec3, normalizeVec3)
 
 
 axixNumbers = { "X" : 0,  "Y" : 1,  "Z" : 2,
