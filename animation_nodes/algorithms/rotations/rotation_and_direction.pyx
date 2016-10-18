@@ -1,3 +1,4 @@
+from ... data_structures cimport EulerList, Matrix4x4List, Vector3DList
 from ... math cimport (Euler3, Vector3, toVector3, toPyVector3, Matrix3, toEuler3,
                        transformVec3AsDirection_InPlace, setRotationMatrix,
                        setIdentityMatrix, Matrix4, toPyMatrix4, crossVec3, normalizeVec3)
@@ -103,3 +104,15 @@ cdef void changeAxis(char track, char guide, Vector3* x, Vector3* y, Vector3* z)
     elif selector == 15: x[0], y[0], z[0] = x[0], inv(y), inv(z) # -ZX
     elif selector == 16: x[0], y[0], z[0] = y[0], x[0], inv(z)   # -ZY
     elif selector == 17: pass                                    # -ZZ
+
+
+# List Operations
+################################################
+
+def rotationsToDirections(EulerList rotations, str axis):
+    cdef char _axis = axixNumbers[axis]
+    cdef Vector3DList directions = Vector3DList(length = rotations.length)
+    cdef long i
+    for i in range(directions.length):
+        rotationToDirection_LowLevel(directions.data + i, rotations.data + i, _axis)
+    return directions

@@ -64,3 +64,11 @@ cdef void reduceMatrix4x4List(Matrix4* matrices, unsigned long amount, Matrix4* 
             for i in range(1, amount):
                 multMatrix4(target, &tmp, matrices + i)
                 tmp = target[0]
+
+def scaleVector3DList(Vector3DList vectors, float factor):
+    cdef Vector3* data = vectors.data
+    cdef long i
+    for i in range(vectors.length):
+        data[i].x *= factor
+        data[i].y *= factor
+        data[i].z *= factor
