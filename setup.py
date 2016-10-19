@@ -40,6 +40,13 @@ config = {}
 
 initialArgs = sys.argv[:]
 
+expectedArgs = {"--all", "--export", "--nocopy"}
+unknownArgs = set(initialArgs[1:]) - expectedArgs
+if len(unknownArgs) > 0:
+    print("Unknown arguments:", unknownArgs)
+    print("Allowed arguments:", expectedArgs)
+    sys.exit()
+
 def main():
     setupAndReadConfigFile()
     if canCompile():
