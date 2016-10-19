@@ -36,7 +36,6 @@ class ShapeKeyOutputNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         yield "if shapeKey is not None:"
-
         s = self.inputs
         if s["Value"].isUsed:      yield "    shapeKey.value = value"
         if s["Slider Min"].isUsed: yield "    shapeKey.slider_min = sliderMin"
@@ -44,3 +43,11 @@ class ShapeKeyOutputNode(bpy.types.Node, AnimationNode):
         if s["Name"].isUsed:       yield "    shapeKey.name = name"
         if s["Mute"].isUsed:       yield "    shapeKey.mute = mute"
         yield "    pass"
+
+    def getBakeCode(self):
+        yield "if shapeKey is not None:"
+        s = self.inputs
+        if s["Value"].isUsed:      yield "    shapeKey.keyframe_insert('value')"
+        if s["Slider Min"].isUsed: yield "    shapeKey.keyframe_insert('slider_min')"
+        if s["Slider Max"].isUsed: yield "    shapeKey.keyframe_insert('slider_max')"
+        if s["Mute"].isUsed:       yield "    shapeKey.keyframe_insert('mute')"
