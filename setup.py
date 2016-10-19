@@ -4,9 +4,9 @@ Duplicate and rename the config.default.py to get it.
 
 Command Line Arguments:
     python setup.py
-     -all            # recompile all
-     -export         # make redistributable version
-     -nocopy         # don't copy the build into Blenders addon directory
+     --all            # recompile all
+     --export         # make redistributable version
+     --nocopy         # don't copy the build into Blenders addon directory
 
 Generate .html files to debug cython code:
     cython -a path/to/file.pyx
@@ -44,12 +44,12 @@ def main():
     setupAndReadConfigFile()
     if canCompile():
         preprocessor()
-        if "-all" in initialArgs:
+        if "--all" in initialArgs:
             removeCFiles()
         compileCythonFiles()
-        if "-export" in initialArgs:
+        if "--export" in initialArgs:
             export()
-        if not "-nocopy" in initialArgs:
+        if not "--nocopy" in initialArgs:
             if os.path.isdir(config["addonsDirectory"]):
                 copyToBlender()
             else:
