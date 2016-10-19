@@ -45,12 +45,13 @@ class GetRandomListElementsNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "nodeSeed", text = "Node Seed")
 
     def getExecutionCode(self):
-        yield "_seed = self.nodeSeed * 154245 + seed * 13412 + amount * 45234"
+        yield "_seed = self.nodeSeed * 154245 + seed * 13412"
         if self.selectionType == "SINGLE":
             yield "random.seed(_seed)"
             yield "if len(inList) == 0: outElement = self.outputs['Element'].getDefaultValue()"
             yield "else: outElement = random.choice(inList)"
         elif self.selectionType == "MULTIPLE":
+            yield "_seed += amount * 45234"
             yield "_amount = min(max(amount, 0), len(inList))"
             yield "outList = AN.algorithms.lists.sample('%s', inList, _amount, _seed)" % self.assignedType
 
