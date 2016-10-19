@@ -115,7 +115,7 @@ def moveSocket(isOutput, moveUp):
     return {"FINISHED"}
 
 def getActiveSocket(isOutput):
-    node = bpy.context.active_node
+    node = getattr(bpy.context, "active_node", None)
     if node is None: return
     if isOutput: return node.activeOutputSocket
     else: return node.activeInputSocket
