@@ -64,6 +64,7 @@ class DirectionToRotationNode(bpy.types.Node, AnimationNode):
             elif self.useGuideList:
                 yield "matrixRotations = eulerRotations = quaternionRotations = 0"
             if isLinked["eulerRotations"]: yield "eulerRotations = EulerList.fromMatrices(matrixRotations)"
+            if isLinked["quaternionRotations"]: yield "quaternionRotations = AN.math.matrix4x4ListToQuaternionList(matrixRotations)"
         else:
             yield "matrixRotation = AN.algorithms.rotations.directionToMatrix(direction, guide, self.trackAxis, self.guideAxis)"
             if isLinked["eulerRotation"]: yield "eulerRotation = matrixRotation.to_euler()"

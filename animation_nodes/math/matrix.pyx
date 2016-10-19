@@ -1,4 +1,4 @@
-from libc.math cimport sin, cos
+from libc.math cimport sin, cos, sqrt
 
 cdef void transformVec3AsPoint_InPlace(Vector3* v, Matrix4* m):
     cdef float newX, newY, newZ
@@ -203,3 +203,22 @@ cdef void mult3xMatrix_Reversed(Matrix3_or_Matrix4* target,
     if Matrix3_or_Matrix4 is Matrix4:
         multMatrix4(&tmp, m3, m2)
         multMatrix4(target, &tmp, m1)
+
+cdef void normalizeMatrix_3x3_Part(Matrix3_or_Matrix4* t, Matrix3_or_Matrix4* m):
+    cdef float len1, len2, len3
+    len1 = sqrt(m.a11 * m.a11 + m.a21 * m.a21 + m.a31 * m.a31)
+    len2 = sqrt(m.a12 * m.a12 + m.a22 * m.a22 + m.a32 * m.a32)
+    len3 = sqrt(m.a13 * m.a13 + m.a23 * m.a23 + m.a33 * m.a33)
+
+    if len1 > 0: t.a11, t.a21, t.a31 = m.a11 / len1, m.a21 / len1, m.a31 / len1
+    else: t.a11 = t.a21 = t.a31 = 0
+
+    if len2 > 0: t.a12, t.a22, t.a32 = m.a12 / len2, m.a22 / len2, m.a32 / len2
+    else: t.a12 = t.a22 = t.a32 = 0
+
+    if len3 > 0: t.a13, t.a23, t.a33 = m.a13 / len3, m.a23 / len3, m.a33 / len3
+    else: t.a13 = t.a23 = t.a33 = 0
+
+    if Matrix3_or_Matrix4 is Matrix4:
+        t.a14, t.a24, t.a34 = m.a14, m.a24, m.a34
+        t.a41, t.a42, t.a43, t.a44 = m.a41, m.a42, m.a43, m.a44
