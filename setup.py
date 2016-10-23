@@ -31,8 +31,9 @@ import shutil
 import traceback
 from os.path import abspath, dirname, join, relpath
 
+addonName = "animation_nodes"
 currentDirectory = dirname(abspath(__file__))
-sourceDirectory = join(currentDirectory, "animation_nodes")
+sourceDirectory = join(currentDirectory, addonName)
 configPath = join(currentDirectory, "config.py")
 defaultConfigPath = join(currentDirectory, "config.default.py")
 
@@ -141,7 +142,7 @@ def removeCFiles():
 
 def copyToBlender():
     print("\n\nCopy changes to addon folder")
-    targetPath = join(config["addonsDirectory"], "animation_nodes")
+    targetPath = join(config["addonsDirectory"], addonName)
     try:
         copyAddonFiles(sourceDirectory, targetPath, verbose = True)
     except PermissionError:
@@ -158,7 +159,7 @@ def copyToBlender():
 def export():
     print("\nStart Export")
 
-    targetPath = join(currentDirectory, "animation_nodes.zip")
+    targetPath = join(currentDirectory, addonName + ".zip")
     zipAddonDirectory(sourceDirectory, targetPath)
 
     print("Finished Export")
@@ -270,7 +271,7 @@ def zipAddonDirectory(sourcePath, targetPath):
     with zipfile.ZipFile(targetPath, "w", zipfile.ZIP_DEFLATED) as zipFile:
         for relativePath in iterRelativeAddonFiles(sourcePath):
             absolutePath = join(sourcePath, relativePath)
-            zipFile.write(absolutePath, join("animation_nodes", relativePath))
+            zipFile.write(absolutePath, join(addonName, relativePath))
 
 
 
