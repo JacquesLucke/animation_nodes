@@ -11,6 +11,7 @@ indicesListFunctionsPath = changeFileName(__file__, "__indices_list_functions.sr
 vectorListFunctionsPath = changeFileName(__file__, "__vector_list_functions.src")
 booleanListFunctionsPath = changeFileName(__file__, "__boolean_list_functions.src")
 eulerListFunctionsPath = changeFileName(__file__, "__euler_list_functions.src")
+matrixListFunctionsPath = changeFileName(__file__, "__matrix_list_functions.src")
 
 numericLists = [
     ("FloatList", "float"),
@@ -71,7 +72,7 @@ lists.append(dict(LISTNAME = "Matrix4x4List",
                                         for i in range(4) for j in range(4)),
                   TRY_CONVERSION_CODE = "setMatrix4(target, value)",
                   TO_PYOBJECT_CODE = "return toPyMatrix4(value)",
-                  MORE_METHODS = "",
+                  MORE_METHODS = readFile(matrixListFunctionsPath),
                   DECLARATIONS = ["from ... math.matrix cimport Matrix4",
                                   "from ... math.conversion cimport setMatrix4, toPyMatrix4"]))
 

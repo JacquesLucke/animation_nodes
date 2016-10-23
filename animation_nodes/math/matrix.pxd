@@ -48,3 +48,5 @@ cdef void convertMatrix4ToMatrix3(Matrix3* t, Matrix4* s)
 cdef void multMatrix3(Matrix3_or_Matrix4* target, Matrix3_or_Matrix4* x, Matrix3_or_Matrix4* y)
 cdef void multMatrix4(Matrix4* target, Matrix4* x, Matrix4* y)
 cdef void multMatrix3Parts(Matrix4* target, Matrix4* x, Matrix4* y, bint keepFirst = ?)
+
+cdef void normalizeMatrix_3x3_Part(Matrix3_or_Matrix4* t, Matrix3_or_Matrix4* m)
