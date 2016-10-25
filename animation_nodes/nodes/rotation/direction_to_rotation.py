@@ -36,8 +36,8 @@ class DirectionToRotationNode(bpy.types.Node, AnimationNode):
             ("Quaternion List", "Quaternion Rotations", "quaternionRotations", {"hide" : True}))
 
         self.newOutputGroup(generateList,
-            ("Matrix", "Matrix Rotation", "matrixRotation", {"hide" : True}),
-            ("Matrix List", "Matrix Rotations", "matrixRotations", {"hide" : True}))
+            ("Matrix", "Matrix Rotation", "matrixRotation"),
+            ("Matrix List", "Matrix Rotations", "matrixRotations"))
 
         vectorization = AutoSelectVectorization()
         vectorization.input(self, "useDirectionList", self.inputs[0])
@@ -57,12 +57,9 @@ class DirectionToRotationNode(bpy.types.Node, AnimationNode):
         generateList = self.useDirectionList or self.useGuideList
 
         if generateList:
-            if self.useDirectionList and self.useGuideList:
-                yield "matrixRotations = eulerRotations = quaternionRotations = 0"
-            elif self.useDirectionList:
-                yield "matrixRotations = AN.algorithms.rotations.directionsToMatrices(directions, guide, self.trackAxis, self.guideAxis)"
-            elif self.useGuideList:
-                yield "matrixRotations = eulerRotations = quaternionRotations = 0"
+            yield "_directions = " + self.inputs[0].identifier
+            yield "_guides = " + self.inputs[1].identifier
+            yield "matrixRotations = AN.algorithms.rotations.directionsToMatrices(_directions, _guides, self.trackAxis, self.guideAxis)"
             if isLinked["eulerRotations"]: yield "eulerRotations = matrixRotations.toEulers(isNormalized = True)"
             if isLinked["quaternionRotations"]: yield "quaternionRotations = matrixRotations.toQuaternions(isNormalized = True)"
         else:
