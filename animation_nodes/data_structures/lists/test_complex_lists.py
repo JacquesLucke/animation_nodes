@@ -564,3 +564,8 @@ class TestEulerList(TestCase):
         self.assertEqual(myList[1], Euler((1, 2, 3), "XYZ"))
         self.assertEqual(myList[2], Euler((4, 5, 6), "ZXY"))
         self.assertEqual(myList[3], Euler((7, 8, 9), "YZX"))
+
+    def testAppendTuple(self):
+        myList = EulerList()
+        myList.append((1, 2, 3))
+        self.assertEqual(myList[0], Euler((1, 2, 3), "XYZ"))

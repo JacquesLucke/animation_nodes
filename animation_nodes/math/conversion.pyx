@@ -65,9 +65,9 @@ cdef Euler3 toEuler3(value) except *:
 cdef setEuler3(Euler3* e, value):
     if len(value) != 3:
         raise TypeError("value is no euler value")
-    e.x = value.x
-    e.y = value.y
-    e.z = value.z
+    e.x = value[0]
+    e.y = value[1]
+    e.z = value[2]
     cdef str order
     if isinstance(value, Euler):
         order = value.order
