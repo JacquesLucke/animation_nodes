@@ -23,8 +23,8 @@ bl_info = {
     "name":        "Animation Nodes",
     "description": "Node based visual scripting system designed for motion graphics in Blender.",
     "author":      "Jacques Lucke",
-    "version":     (1, 7, 2),
-    "blender":     (2, 77, 0),
+    "version":     (1, 7, 3),
+    "blender":     (2, 78, 0),
     "location":    "Node Editor",
     "category":    "Node",
     "warning":     "This is no official release, it's still work in progress"
