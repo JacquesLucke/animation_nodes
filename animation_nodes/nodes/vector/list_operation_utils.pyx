@@ -24,3 +24,12 @@ def getAxisListOfVectorList(Vector3DList myList, str axis):
         for i in range(output.length):
             output.data[i] = myList.data[i].z
     return output
+
+def vectorsFromValues(DoubleList values):
+    cdef Vector3DList output = Vector3DList(length = values.length)
+    cdef long i
+    for i in range(values.length):
+        output.data[i].x = values.data[i]
+        output.data[i].y = values.data[i]
+        output.data[i].z = values.data[i]
+    return output
