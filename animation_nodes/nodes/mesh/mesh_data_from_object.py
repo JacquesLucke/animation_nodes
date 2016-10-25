@@ -13,7 +13,7 @@ class MeshDataFromObjectNode(bpy.types.Node, AnimationNode):
         update = propertyChanged)
     loadPolygons = BoolProperty(name = "Load Polygons", default = False,
         update = propertyChanged)
-    useModifiers = BoolProperty(name = "Use Modifier", default = False,
+    useModifiers = BoolProperty(name = "Use Modifiers", default = False,
         update = propertyChanged)
     useWorldSpace = BoolProperty(name = "Use World Space", default = False,
         update = propertyChanged)
