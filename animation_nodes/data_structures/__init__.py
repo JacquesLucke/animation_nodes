@@ -10,9 +10,11 @@ def importDataStructures():
         QuaternionList)
 
     from . splines.poly_spline import PolySpline
+    from . list_mocks.clist_mock import CListMock
     from . splines.bezier_spline import BezierSpline
     from . interpolation_base import InterpolationBase
     from . falloffs.falloff_base import Falloff, BaseFalloff, CompoundFalloff
+
     return locals()
 
 dataStructures = importDataStructures()

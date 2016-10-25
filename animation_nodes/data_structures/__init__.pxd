@@ -2,6 +2,7 @@ from . data_structures.lists.clist import CList
 from . data_structures.lists.base_lists cimport *
 from . data_structures.lists.polygon_indices_list cimport PolygonIndicesList
 
+from . data_structures.list_mocks.clist_mock cimport CListMock
 from . data_structures.meshes.mesh_data cimport MeshData
 
 from . data_structures.splines.base_spline cimport Spline
