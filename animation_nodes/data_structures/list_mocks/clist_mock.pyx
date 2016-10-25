@@ -25,7 +25,7 @@ cdef class CListMock:
             return self.realList[index]
         return self.defaultElementList[0]
 
-    cdef void* getElement(self, long index):
+    cdef void* get(self, long index):
         if 0 <= index < self.realListLength:
             return self.arrayStart + index * self.elementSize
         return self.default

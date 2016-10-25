@@ -12,4 +12,4 @@ cdef class CListMock(ListMock):
         long realListLength
         long elementSize
 
-    cdef void* getElement(self, long index)
+    cdef void* get(self, long index)

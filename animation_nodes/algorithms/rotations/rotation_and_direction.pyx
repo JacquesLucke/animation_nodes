@@ -122,19 +122,19 @@ def eulersToDirections(EulerList rotations, str axis):
         eulerToDirection_LowLevel(directions.data + i, rotations.data + i, _axis)
     return directions
 
-def directionsToMatrices(_directions, _guides, trackAxis = "Z", guideAxis = "X"):
+def directionsToMatrices(directions, guides, trackAxis = "Z", guideAxis = "X"):
     cdef:
-        CListMock directions = CListMock(Vector3DList, _directions, (0, 0, 0))
-        CListMock guides = CListMock(Vector3DList, _guides, (0, 0, 1))
+        CListMock _directions = CListMock(Vector3DList, directions, (0, 0, 0))
+        CListMock _guides = CListMock(Vector3DList, guides, (0, 0, 1))
 
-        Matrix4x4List matrices = Matrix4x4List(length = CListMock.getMaxLength(directions, guides))
+        Matrix4x4List matrices = Matrix4x4List(length = CListMock.getMaxLength(_directions, _guides))
         char _trackAxis = axixNumbers[trackAxis]
         char _guideAxis = axixNumbers[guideAxis]
         long i
 
     for i in range(matrices.length):
         directionToMatrix_LowLevel(matrices.data + i,
-                                   <Vector3*>directions.getElement(i),
-                                   <Vector3*>guides.getElement(i),
+                                   <Vector3*>_directions.get(i),
+                                   <Vector3*>_guides.get(i),
                                    _trackAxis, _guideAxis)
     return matrices
