@@ -470,6 +470,7 @@ class FalloffMenu(bpy.types.Menu):
         layout.separator()
         insertNode(layout, "an_InterpolateFalloffNode", "Interpolate")
         insertNode(layout, "an_RemapFalloffNode", "Remap")
+        insertNode(layout, "an_InvertFalloffNode", "Invert")
         insertNode(layout, "an_MixFalloffsNode", "Mix")
 
 class MaterialMenu(bpy.types.Menu):
