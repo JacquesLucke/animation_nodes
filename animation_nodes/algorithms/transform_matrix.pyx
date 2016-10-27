@@ -4,20 +4,53 @@ from .. math cimport (setScaleMatrix, setRotationMatrix, setTranslationMatrix,
               setRotationXMatrix, setRotationYMatrix, setRotationZMatrix,
               mult3xMatrix_Reversed, convertMatrix3ToMatrix4, setIdentityMatrix)
 
-cdef void allocateMatrixTransformer(
+cdef struct MatrixTransformerSettings:
+    # Location
+    bint useTranslation
+    bint localTranslationAxis
+    # Rotation
+    bint useRotationX, useRotationY, useRotationZ
+    bint onlyRotationOrderXYZ
+    bint localRotationAxis, localRotationPivot
+    # Scale
+    bint useScale
+    bint localScaleAxis, localScalePivot
+
+cdef void allocateMatrixTransformerFromSingleValues(
             TransformMatrixFunction* outFunction, void** outSettings,
-            Vector3* translation, bint localAxis,
+            Vector3* translation, bint localTranslationAxis,
             Euler3* rotation, bint localRotationAxis, bint localRotationPivot,
             Vector3* scale, bint localScaleAxis, bint localScalePivot):
+    cdef MatrixTransformerSettings s
+
+    s.useTranslation = not (translation.x == translation.y == translation.z == 0)
+    s.localTranslationAxis = localTranslationAxis
+
+    s.useRotationX = rotation.x != 0
+    s.useRotationY = rotation.y != 0
+    s.useRotationZ = rotation.z != 0
+    s.onlyRotationOrderXYZ = rotation.order == 0
+    s.localRotationAxis = localRotationAxis
+    s.localRotationPivot = localRotationPivot
+
+    s.useScale = not (scale.x == scale.y == scale.z == 1)
+    s.localScaleAxis = localScaleAxis
+    s.localScalePivot = localScalePivot
+
+    allocateMatrixTransformer(outFunction, outSettings, &s)
+
+cdef void allocateMatrixTransformer(
+            TransformMatrixFunction* outFunction, void** outSettings,
+            MatrixTransformerSettings* s):
 
     cdef GenericSettings* settings = <GenericSettings*>PyMem_Malloc(sizeof(GenericSettings))
 
-    settings.translate = selectTranslationFunction(translation, localAxis)
-    settings.rotate = selectRotationFunction(rotation, localRotationAxis, localRotationPivot)
-    settings.scale = selectScaleFunction(scale, localScaleAxis, localScalePivot)
-    settings.setRotation = selectSetRotationFunction(rotation)
+    settings.translate = selectTranslationFunction(s)
+    settings.rotate = selectRotationFunction(s)
+    settings.scale = selectScaleFunction(s)
+    settings.setRotation = selectSetRotationFunction(s)
 
-    outFunction[0] = selectTransformFunction(translation, rotation, scale)
+    outFunction[0] = selectTransformFunction(s)
     outSettings[0] = settings
 
 cdef freeMatrixTransformer(TransformMatrixFunction function, void* settings):
@@ -40,25 +73,25 @@ cdef struct GenericSettings:
 #############################################################
 
 cdef TransformMatrixFunction selectTransformFunction(
-            Vector3* t, Euler3* r, Vector3* s):
+            MatrixTransformerSettings* s):
     cdef:
-        bint useTranslation = not (t.x == t.y == t.z == 0)
-        bint useRotation = not (r.x == r.y == r.z == 0)
-        bint useScale = not (s.x == s.y == s.z == 1)
+        bint _useTranslation = s.useTranslation
+        bint _useRotation = s.useRotationX or s.useRotationY or s.useRotationZ
+        bint _useScale = s.useScale
 
-    if useTranslation:
-        if useRotation:
-            if useScale: return transformMatrix_TranslateRotateScale
+    if _useTranslation:
+        if _useRotation:
+            if _useScale: return transformMatrix_TranslateRotateScale
             else: return transformMatrix_TranslateRotate
         else:
-            if useScale: return transformMatrix_TranslateScale
+            if _useScale: return transformMatrix_TranslateScale
             else: return transformMatrix_Translate
     else:
-        if useRotation:
-            if useScale: return transformMatrix_RotateScale
+        if _useRotation:
+            if _useScale: return transformMatrix_RotateScale
             else: return transformMatrix_Rotate
         else:
-            if useScale: return transformMatrix_Scale
+            if _useScale: return transformMatrix_Scale
             else: return transformMatrix_None
 
 cdef void transformMatrix_TranslateRotateScale(
@@ -125,12 +158,12 @@ cdef void transformMatrix_None(
 # Scale Functions
 #############################################################
 
-cdef ScaleFunction selectScaleFunction(Vector3* scale, bint localAxis, bint localPivot):
-    if localAxis:
-        if localPivot: return scale_LocalAxis_LocalPivot
+cdef ScaleFunction selectScaleFunction(MatrixTransformerSettings* s):
+    if s.localScaleAxis:
+        if s.localScalePivot: return scale_LocalAxis_LocalPivot
         else: return scale_LocalAxis_GlobalPivot
     else:
-        if localPivot: return scale_GlobalAxis_LocalPivot
+        if s.localScalePivot: return scale_GlobalAxis_LocalPivot
         else: return scale_GlobalAxis_GlobalPivot
 
 cdef void scale_LocalAxis_LocalPivot(Matrix4* target, Matrix4* source, Vector3* scale):
@@ -157,12 +190,12 @@ cdef void scale_GlobalAxis_GlobalPivot(Matrix4* target, Matrix4* source, Vector3
 # Rotation Functions
 #############################################################
 
-cdef RotationFunction selectRotationFunction(Euler3* rotation, bint localAxis, bint localPivot):
-    if localAxis:
-        if localPivot: return rotate_LocalAxis_LocalPivot
+cdef RotationFunction selectRotationFunction(MatrixTransformerSettings* s):
+    if s.localRotationAxis:
+        if s.localRotationPivot: return rotate_LocalAxis_LocalPivot
         else: return rotate_LocalAxis_GlobalPivot
     else:
-        if localPivot: return rotate_GlobalAxis_LocalPivot
+        if s.localRotationPivot: return rotate_GlobalAxis_LocalPivot
         else: return rotate_GlobalAxis_GlobalPivot
 
 cdef void rotate_LocalAxis_LocalPivot(Matrix4* target, Matrix4* source, Euler3* rotation, SetRotationFunction setRotation):
@@ -189,8 +222,8 @@ cdef void rotate_GlobalAxis_GlobalPivot(Matrix4* target, Matrix4* source, Euler3
 # Translation Functions
 #############################################################
 
-cdef TranslationFunction selectTranslationFunction(Vector3* translation, bint localAxis):
-    if localAxis: return translate_LocalAxis
+cdef TranslationFunction selectTranslationFunction(MatrixTransformerSettings* s):
+    if s.localTranslationAxis: return translate_LocalAxis
     else: return translate_GlobalAxis
 
 cdef void translate_LocalAxis(Matrix4* target, Matrix4* source, Matrix4* original, Vector3* translation):
@@ -211,13 +244,13 @@ cdef void translate_GlobalAxis(Matrix4* target, Matrix4* source, Matrix4* origin
 # Set Rotation Functions
 #############################################################
 
-cdef SetRotationFunction selectSetRotationFunction(Euler3* rotation):
+cdef SetRotationFunction selectSetRotationFunction(MatrixTransformerSettings* s):
     cdef:
-        bint useX = rotation.x != 0
-        bint useY = rotation.y != 0
-        bint useZ = rotation.z != 0
+        bint useX = s.useRotationX
+        bint useY = s.useRotationY
+        bint useZ = s.useRotationZ
 
-    if rotation.order != 0: # 0 = 'XYZ'
+    if not s.onlyRotationOrderXYZ:
         return setRotationMatrix[Matrix4]
 
     if useX:

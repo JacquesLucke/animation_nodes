@@ -4,7 +4,7 @@ from ... events import propertyChanged
 from ... base_types import AnimationNode
 from ... data_structures cimport FalloffEvaluator
 from ... algorithms.transform_matrix cimport (
-    allocateMatrixTransformer, freeMatrixTransformer, TransformMatrixFunction)
+    allocateMatrixTransformerFromSingleValues, freeMatrixTransformer, TransformMatrixFunction)
 from ... math cimport (Matrix4, Vector3, Euler3, Matrix4x4List, toVector3, toEuler3)
 
 localGlobalItems = [
@@ -75,7 +75,7 @@ class OffsetMatricesNode(bpy.types.Node, AnimationNode):
             TransformMatrixFunction transformFunction
             void* transformSettings
 
-        allocateMatrixTransformer(&transformFunction, &transformSettings,
+        allocateMatrixTransformerFromSingleValues(&transformFunction, &transformSettings,
             &_translation, self.translationMode == "LOCAL",
             &_rotation, self.rotationMode == "LOCAL", not self.originAsRotationPivot,
             &_scale, self.scaleMode == "LOCAL", not self.originAsScalePivot)
