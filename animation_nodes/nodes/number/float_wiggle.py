@@ -3,7 +3,6 @@ import random
 from bpy.props import *
 from ... events import propertyChanged
 from ... base_types import AnimationNode
-from ... algorithms.perlin_noise import perlinNoise
 
 class FloatWiggleNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_FloatWiggleNode"

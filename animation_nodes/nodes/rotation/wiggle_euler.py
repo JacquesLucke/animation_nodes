@@ -5,7 +5,6 @@ from math import radians
 from mathutils import Euler
 from ... events import propertyChanged
 from ... base_types import AnimationNode
-from ... algorithms.perlin_noise import perlinNoise
 
 class EulerWiggleNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_EulerWiggleNode"

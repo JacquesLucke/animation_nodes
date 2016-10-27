@@ -5,16 +5,16 @@ from libc.limits cimport INT_MAX
 
 def perlinNoiseVectorForNodes(seed, nodeSeed, double evolution, double speed, amplitude, octaves, double persistance):
     cdef double finalX = evolution * max(speed, 0) / 20 + seed * 9234612 + nodeSeed * 3424533
-    cdef int finalOctaves = octaves % 0x7fffffff
-    return (perlinNoise(finalX, persistance, finalOctaves) * amplitude[0],
-            perlinNoise(finalX + 1356453, persistance, finalOctaves) * amplitude[1],
-            perlinNoise(finalX + 9786652, persistance, finalOctaves) * amplitude[2])
+    cdef int finalOctaves = max(octaves, 0) % 0x7fffffff
+    return (perlinNoise1D(finalX, persistance, finalOctaves) * amplitude[0],
+            perlinNoise1D(finalX + 1356453, persistance, finalOctaves) * amplitude[1],
+            perlinNoise1D(finalX + 9786652, persistance, finalOctaves) * amplitude[2])
 
 def perlinNoiseForNodes(seed, nodeSeed, double evolution, double speed, double amplitude, octaves, double persistance):
     cdef double finalX = evolution * max(speed, 0) / 20 + seed * 545621 + nodeSeed * 3424536
-    return perlinNoise(finalX, persistance, octaves % 0x7fffffff) * amplitude
+    return perlinNoise1D(finalX, persistance, octaves % 0x7fffffff) * amplitude
 
-cpdef double perlinNoise(double x, double persistance, int octaves):
+cpdef double perlinNoise1D(double x, double persistance, int octaves):
     cdef:
         double total = 0
         double frequency
