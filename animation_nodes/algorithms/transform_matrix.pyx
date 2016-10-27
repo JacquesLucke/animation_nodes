@@ -39,6 +39,29 @@ cdef void allocateMatrixTransformerFromSingleValues(
 
     allocateMatrixTransformer(outFunction, outSettings, &s)
 
+cdef void allocateMatrixTransformerFromCListMocks(
+            TransformMatrixFunction* outFunction, void** outSettings,
+            CListMock translations, bint localTranslationAxis,
+            CListMock rotations, bint localRotationAxis, bint localRotationPivot,
+            CListMock scales, bint localScaleAxis, bint localScalePivot):
+    cdef MatrixTransformerSettings s
+
+    s.useTranslation = True
+    s.localTranslationAxis = localTranslationAxis
+
+    s.useRotationX = True
+    s.useRotationY = True
+    s.useRotationZ = True
+    s.onlyRotationOrderXYZ = False
+    s.localRotationAxis = localRotationAxis
+    s.localRotationPivot = localRotationPivot
+
+    s.useScale = True
+    s.localScaleAxis = localScaleAxis
+    s.localScalePivot = localScalePivot
+
+    allocateMatrixTransformer(outFunction, outSettings, &s)
+
 cdef void allocateMatrixTransformer(
             TransformMatrixFunction* outFunction, void** outSettings,
             MatrixTransformerSettings* s):

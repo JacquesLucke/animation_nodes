@@ -2,10 +2,11 @@ import bpy
 from bpy.props import *
 from ... events import propertyChanged
 from ... base_types import AnimationNode
-from ... data_structures cimport FalloffEvaluator
+from ... data_structures cimport (Vector3DList, EulerList, Matrix4x4List,
+                                  FalloffEvaluator, CListMock)
 from ... algorithms.transform_matrix cimport (
-    allocateMatrixTransformerFromSingleValues, freeMatrixTransformer, TransformMatrixFunction)
-from ... math cimport (Matrix4, Vector3, Euler3, Matrix4x4List, toVector3, toEuler3)
+    allocateMatrixTransformerFromCListMocks, freeMatrixTransformer, TransformMatrixFunction)
+from ... math cimport Matrix4, Vector3, Euler3, toVector3, toEuler3
 
 localGlobalItems = [
     ("LOCAL", "Local", "", "NONE", 0),
@@ -55,49 +56,62 @@ class OffsetMatricesNode(bpy.types.Node, AnimationNode):
         row.prop(self, "scaleMode", expand = True)
         row.prop(self, "originAsScalePivot", icon = "MANIPUL", text = "")
 
-    def execute(self, Matrix4x4List inMatrices, falloff, translation, rotation, scale):
+    def execute(self, Matrix4x4List inMatrices, falloff, translations, rotations, scales):
         cdef:
+            CListMock _translations = CListMock(Vector3DList, translations, (0, 0, 0))
+            CListMock _rotations = CListMock(EulerList, rotations, (0, 0, 0))
+            CListMock _scales = CListMock(Vector3DList, scales, (1, 1, 1))
+
             Matrix4x4List outMatrices = Matrix4x4List(length = inMatrices.length)
             FalloffEvaluator evaluator = FalloffEvaluator.create(falloff, "Transformation Matrix")
-            Vector3 _translation = toVector3(translation)
-            Euler3 _rotation = toEuler3(rotation)
-            Vector3 _scale = toVector3(scale)
-            Vector3 localTranslation, localScale
-            Euler3 localRotation
-            double influence
-            long i
 
         if evaluator is None:
             self.errorMessage = "Falloff cannot be evaluated for matrices"
-            return inMatrices
+            return inMatrices.copy()
 
         cdef:
             TransformMatrixFunction transformFunction
             void* transformSettings
 
-        allocateMatrixTransformerFromSingleValues(&transformFunction, &transformSettings,
-            &_translation, self.translationMode == "LOCAL",
-            &_rotation, self.rotationMode == "LOCAL", not self.originAsRotationPivot,
-            &_scale, self.scaleMode == "LOCAL", not self.originAsScalePivot)
+        allocateMatrixTransformerFromCListMocks(&transformFunction, &transformSettings,
+            _translations, self.translationMode == "LOCAL",
+            _rotations, self.rotationMode == "LOCAL", not self.originAsRotationPivot,
+            _scales, self.scaleMode == "LOCAL", not self.originAsScalePivot)
 
-        localRotation.order = _rotation.order
+        cdef:
+            long i
+            double influence
 
-        for i in range(len(inMatrices)):
+            Vector3* translation
+            Euler3* rotation
+            Vector3* scale
+
+            Vector3 localTranslation
+            Euler3 localRotation
+            Vector3 localScale
+
+        for i in range(outMatrices.length):
             influence = evaluator.evaluate(inMatrices.data + i, i)
 
-            localTranslation.x = _translation.x * influence
-            localTranslation.y = _translation.y * influence
-            localTranslation.z = _translation.z * influence
+            translation = <Vector3*>_translations.get(i)
+            localTranslation.x = translation.x * influence
+            localTranslation.y = translation.y * influence
+            localTranslation.z = translation.z * influence
 
-            localRotation.x = _rotation.x * influence
-            localRotation.y = _rotation.y * influence
-            localRotation.z = _rotation.z * influence
+            rotation = <Euler3*>_rotations.get(i)
+            localRotation.order = rotation.order
+            localRotation.x = rotation.x * influence
+            localRotation.y = rotation.y * influence
+            localRotation.z = rotation.z * influence
 
-            localScale.x = _scale.x * influence + (1 - influence)
-            localScale.y = _scale.y * influence + (1 - influence)
-            localScale.z = _scale.z * influence + (1 - influence)
+            scale = <Vector3*>_scales.get(i)
+            localScale.x = scale.x * influence + (1 - influence)
+            localScale.y = scale.y * influence + (1 - influence)
+            localScale.z = scale.z * influence + (1 - influence)
 
-            transformFunction(transformSettings, outMatrices.data + i, inMatrices.data + i,
+            transformFunction(transformSettings,
+                outMatrices.data + i,
+                inMatrices.data + i,
                 &localTranslation, &localRotation, &localScale)
 
         freeMatrixTransformer(transformFunction, transformSettings)
