@@ -40,7 +40,7 @@ class RandomVectorNode(bpy.types.Node, AnimationNode):
         if self.createList:
             yield "randomVectors = self.calcRandomVectors(seed, count, scale)"
         else:
-            yield "randomVector = algorithms.random.uniformRandomVectorWithTwoSeeds(seed, self.nodeSeed, scale)"
+            yield "randomVector = Vector(algorithms.random.randomNumberTuple(seed + 34223 * self.nodeSeed, 3, scale))"
 
     def calcRandomVectors(self, seed, count, double scale):
         cdef:

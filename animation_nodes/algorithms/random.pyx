@@ -18,26 +18,11 @@ def getRandomColor(seed = None, hue = None, saturation = None, value = None):
     color.hsv = hue, saturation, value
     return color
 
-def uniformRandomVectorWithTwoSeeds(seed1, seed2, double scale):
-    cdef int seed = (seed1 * 1234365 + seed2 * 8672234) % 0x7fffffff
-    return Vector((
-            uniformRandomNumber(seed + 0, -scale, scale),
-            uniformRandomNumber(seed + 1, -scale, scale),
-            uniformRandomNumber(seed + 2, -scale, scale)))
-
-def uniformRandomEulerWithTwoSeeds(seed1, seed2, double scale):
-    cdef int seed = (seed1 * 646735 + seed2 * 2346547) % 0x7fffffff
-    return Euler((
-            uniformRandomNumber(seed + 0, -scale, scale),
-            uniformRandomNumber(seed + 1, -scale, scale),
-            uniformRandomNumber(seed + 2, -scale, scale)))
-
-def uniformRandomQuaternionWithTwoSeeds(seed1, seed2, double scale):
-    cdef int seed = (seed1 * 9783452 + seed2 * 1235786) % 0x7fffffff
-    return Quaternion((1,
-            uniformRandomNumber(seed + 0, -scale, scale),
-            uniformRandomNumber(seed + 1, -scale, scale),
-            uniformRandomNumber(seed + 2, -scale, scale)))
+def randomNumberTuple(seed, int size, double scale):
+    cdef int _seed = seed % 0x7fffffff
+    cdef int i
+    _seed *= 23412
+    return tuple(randomNumber(_seed + i) * scale for i in range(size))
 
 def uniformRandomNumberWithTwoSeeds(seed1, seed2, double min, double max):
     return uniformRandomNumber((seed1 * 674523 + seed2 * 3465284) % 0x7fffffff, min, max)

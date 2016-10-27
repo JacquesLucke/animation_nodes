@@ -12,17 +12,17 @@ class RandomQuaternionNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.newInput("Integer", "Seed", "seed")
-        self.newInput("Float", "Scale", "scale").value = 0.3
         self.newOutput("Quaternion", "Quaternion", "randomQuaternion")
 
     def draw(self, layout):
         layout.prop(self, "nodeSeed")
 
     def getExecutionCode(self):
-        yield "randomQuaternion = algorithms.random.uniformRandomQuaternionWithTwoSeeds(seed, self.nodeSeed, scale)"
+        yield "randomQuaternion = Quaternion(algorithms.random.randomNumberTuple(seed + 24523 * self.nodeSeed, 4, math.pi))"
+        yield "randomQuaternion.normalize()"
 
     def getUsedModules(self):
-        return ["mathutils"]
+        return ["math"]
 
     def duplicate(self, sourceNode):
         self.nodeSeed = int(random.random() * 100)

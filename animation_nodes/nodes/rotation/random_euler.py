@@ -20,10 +20,7 @@ class RandomEulerNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "nodeSeed")
 
     def getExecutionCode(self):
-        yield "randomEuler = algorithms.random.uniformRandomEulerWithTwoSeeds(seed, self.nodeSeed, scale)"
-
-    def getUsedModules(self):
-        return ["mathutils"]
+        yield "randomEuler = Euler(algorithms.random.randomNumberTuple(seed + 45234 * self.nodeSeed, 3, scale))"
 
     def duplicate(self, sourceNode):
         self.nodeSeed = int(random.random() * 100)
