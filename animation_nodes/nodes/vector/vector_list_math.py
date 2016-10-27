@@ -22,10 +22,7 @@ class VectorListMathNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "operation", text = "")
 
     def getExecutionCode(self):
-        if self.operation in ("ADD", "AVERAGE"):
-            yield "result = functools.reduce(operator.add, vectors, Vector((0, 0, 0)))"
-        if self.operation == "AVERAGE":
-            yield "if len(vectors) > 0: result /= len(vectors)"
-
-    def getUsedModules(self):
-        return ["operator", "functools"]
+        if self.operation == "ADD":
+            yield "result = vectors.getSumOfElements()"
+        elif self.operation == "AVERAGE":
+            yield "result = vectors.getAverageOfElements()"
