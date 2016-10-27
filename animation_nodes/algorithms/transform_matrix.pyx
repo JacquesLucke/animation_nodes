@@ -46,6 +46,7 @@ cdef void allocateMatrixTransformerFromCListMocks(
             CListMock scales, bint localScaleAxis, bint localScalePivot):
     cdef MatrixTransformerSettings s
 
+    # TODO: Select optimized booleans
     s.useTranslation = True
     s.localTranslationAxis = localTranslationAxis
 
