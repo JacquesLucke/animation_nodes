@@ -9,8 +9,8 @@ class RemapFalloffNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.newInput("Falloff", "Falloff", "inFalloff")
-        self.newInput("Float", "New Min", "outputMin", value = 0).setRange(0, 1)
-        self.newInput("Float", "New Max", "outputMax", value = 1).setRange(0, 1)
+        self.newInput("Float", "New Min", "outputMin", value = 0)
+        self.newInput("Float", "New Max", "outputMax", value = 1)
         self.newOutput("Falloff", "Falloff", "outFalloff")
 
     def execute(self, falloff, outputMin, outputMax):
