@@ -9,12 +9,12 @@ class PointDistanceFalloffNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.newInput("Vector", "Origin", "origin")
-        self.newInput("Float", "Min Distance", "minDistance")
-        self.newInput("Float", "Max Distance", "maxDistance", value = 4)
+        self.newInput("Float", "Size", "size")
+        self.newInput("Float", "Falloff Width", "falloffWidth", value = 4)
         self.newOutput("Falloff", "Falloff", "falloff")
 
-    def execute(self, origin, minDistance, maxDistance):
-        return PointDistanceFalloff(origin, minDistance, maxDistance)
+    def execute(self, origin, size, falloffWidth):
+        return PointDistanceFalloff(origin, size, falloffWidth)
 
 
 cdef class PointDistanceFalloff(BaseFalloff):
@@ -23,12 +23,18 @@ cdef class PointDistanceFalloff(BaseFalloff):
         double factor
         double minDistance, maxDistance
 
-    def __cinit__(self, vector, double minDistance, double maxDistance):
-        if minDistance == maxDistance: minDistance -= 0.00001
-        self.factor = 1 / (maxDistance - minDistance)
-        self.minDistance = minDistance
-        self.maxDistance = maxDistance
+    def __cinit__(self, vector, double size, double falloffWidth):
+        if falloffWidth < 0:
+            size += falloffWidth
+            falloffWidth = -falloffWidth
+        self.minDistance = size
+        self.maxDistance = size + falloffWidth
+
+        if self.minDistance == self.maxDistance:
+            self.minDistance -= 0.00001
+        self.factor = 1 / (self.maxDistance - self.minDistance)
         setVector3(&self.origin, vector)
+
         self.dataType = "Location"
         self.clamped = True
 
