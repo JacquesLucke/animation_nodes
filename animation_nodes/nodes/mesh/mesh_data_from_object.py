@@ -9,9 +9,9 @@ class MeshDataFromObjectNode(bpy.types.Node, AnimationNode):
     bl_label = "Mesh Data from Object"
     bl_width_default = 160
 
-    loadEdges = BoolProperty(name = "Load Edges", default = False,
+    loadEdges = BoolProperty(name = "Load Edges", default = True,
         update = propertyChanged)
-    loadPolygons = BoolProperty(name = "Load Polygons", default = False,
+    loadPolygons = BoolProperty(name = "Load Polygons", default = True,
         update = propertyChanged)
     useModifiers = BoolProperty(name = "Use Modifiers", default = False,
         update = propertyChanged)
