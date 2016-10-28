@@ -41,7 +41,8 @@ cdef class DirectionalFalloff(BaseFalloff):
     cdef Vector3 position, direction
 
     def __cinit__(self, position, direction, double size):
-        assert size > 0
+        assert size >= 0
+        if size == 0: size = 0.00001
         setVector3(&self.position, position)
         setVector3(&self.direction, direction)
         normalizeVec3_InPlace(&self.direction)
