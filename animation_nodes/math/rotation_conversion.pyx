@@ -34,6 +34,7 @@ cdef normalizedMatrixToEuler(Euler3* e, Matrix3_or_Matrix4* m):
         e[0] = e2
 
 cdef normalizedMatrixToEuler2(Euler3* e1, Euler3* e2, Matrix3_or_Matrix4* m):
+    '''Create 2 eulers and pick the better one later'''
     cdef float cy = hypot(m.a11, m.a21)
     e1.order = e2.order = 0
     if cy > 0.000001:
