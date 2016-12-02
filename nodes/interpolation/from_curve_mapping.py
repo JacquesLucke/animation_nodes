@@ -1,14 +1,27 @@
 import bpy
 from bpy.props import *
+from ... tree_info import getNodesByType
+from ... utils.handlers import eventHandler
 from ... base_types.node import AnimationNode
 from .. container_provider import getHelperMaterial
+
+
+class CurveMapPointCache(bpy.types.PropertyGroup):
+    handle_type = StringProperty()
+    location = FloatVectorProperty(size = 2)
+
+class CurveMapCache(bpy.types.PropertyGroup):
+    extend = StringProperty()
+    points = CollectionProperty(type = CurveMapPointCache)
+    dirty = BoolProperty(default = True)
+
 
 class InterpolationFromCurveMappingNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_InterpolationFromCurveMappingNode"
     bl_label = "Interpolation from Curve Mapping"
     bl_width_default = 200
 
-    curveNodeName = StringProperty(default = "")
+    curveMapCache = PointerProperty(type = CurveMapCache)
 
     def create(self):
         self.newOutput("Interpolation", "Interpolation", "interpolation")
@@ -19,6 +32,12 @@ class InterpolationFromCurveMappingNode(bpy.types.Node, AnimationNode):
         self.invokeFunction(layout, "resetEndPoints", text = "Reset End Points")
 
     def execute(self):
+        # load cached curve map if available
+        # this happens when the node tree is appended to another file
+        if not self.curveMapCache.dirty:
+            self.loadCachedCurveMap()
+            self.curveMapCache.dirty = True
+
         mapping = self.mapping
         curve = mapping.curves[3]
         try: curve.evaluate(0.5)
@@ -28,7 +47,9 @@ class InterpolationFromCurveMappingNode(bpy.types.Node, AnimationNode):
     def createCurveNode(self):
         material = getHelperMaterial()
         node = material.node_tree.nodes.new("ShaderNodeRGBCurve")
-        self.curveNodeName = node.name
+        node.name = self.identifier
+        try: del self["curveNodeName"]
+        except: pass
         mapping = self.mapping
         mapping.use_clip = True
         mapping.clip_min_y = -0.5
@@ -39,10 +60,9 @@ class InterpolationFromCurveMappingNode(bpy.types.Node, AnimationNode):
     def removeCurveNode(self):
         material = getHelperMaterial()
         tree = material.node_tree
-        curveNode = tree.nodes.get(self.curveNodeName)
+        curveNode = tree.nodes.get(self.identifier)
         if curveNode is not None:
             tree.nodes.remove(curveNode)
-        self.curveNodeName = ""
 
     def resetEndPoints(self):
         points = self.curve.points
@@ -52,16 +72,34 @@ class InterpolationFromCurveMappingNode(bpy.types.Node, AnimationNode):
 
     def duplicate(self, sourceNode):
         self.createCurveNode()
-        curvePoints = self.curve.points
-        for i, point in enumerate(sourceNode.curve.points):
+        self.copyOtherCurve(sourceNode.curve)
+
+    def delete(self):
+        self.removeCurveNode()
+
+    def cacheCurveMap(self):
+        curve = self.curve
+        self.curveMapCache.extend = curve.extend
+        self.curveMapCache.points.clear()
+        for point in curve.points:
+            item = self.curveMapCache.points.add()
+            item.handle_type = point.handle_type
+            item.location = point.location
+        self.curveMapCache.dirty = False
+
+    def loadCachedCurveMap(self):
+        self.copyOtherCurve(self.curveMapCache)
+
+    def copyOtherCurve(self, otherCurve):
+        curve = self.curve
+        curve.extend = otherCurve.extend
+        curvePoints = curve.points
+        for i, point in enumerate(otherCurve.points):
             if len(curvePoints) == i:
                 curvePoints.new(50, 50) # random start position
             curvePoints[i].location = point.location
             curvePoints[i].handle_type = point.handle_type
-
-
-    def delete(self):
-        self.removeCurveNode()
+        self.mapping.update()
 
     @property
     def curve(self):
@@ -74,6 +112,11 @@ class InterpolationFromCurveMappingNode(bpy.types.Node, AnimationNode):
     @property
     def curveNode(self):
         material = getHelperMaterial()
-        node = material.node_tree.nodes.get(self.curveNodeName)
+        node = material.node_tree.nodes.get(getattr(self, '["curveNodeName"]', self.identifier))
         if node is None: node = self.createCurveNode()
         return node
+
+@eventHandler("FILE_SAVE_PRE")
+def storeCurveMappingsInNodes():
+    for node in getNodesByType("an_InterpolationFromCurveMappingNode"):
+        node.cacheCurveMap()

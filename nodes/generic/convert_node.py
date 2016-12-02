@@ -7,56 +7,37 @@ from ... sockets.info import toIdName
 class ConvertNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ConvertNode"
     bl_label = "Convert"
-    dynamicLabelType = "ALWAYS"
+    bl_width = 100
 
     def assignedTypeChanged(self, context):
         self.recreateOutputSocket()
 
-    assignedType = StringProperty(update = assignedTypeChanged)
+    lastCorrectionType = IntProperty()
 
     def create(self):
         self.newInput("Generic", "Old", "old", dataIsModified = True)
-        self.assignedType = "String"
+        self.recreateOutputSocket("Generic")
+        self.width_hidden = 45
 
     def drawAdvanced(self, layout):
-        self.invokeSocketTypeChooser(layout, "assignSocketType",
+        self.invokeSocketTypeChooser(layout, "assignOutputType",
             socketGroup = "ALL", text = "Change Type", icon = "TRIA_RIGHT")
-
-    def drawLabel(self):
-        return "DON'T CONVERT TO GENERIC" if self.outputs[0].dataType == "Generic" else "Convert"
 
     def edit(self):
         socket = self.outputs[0]
         targets = socket.dataTargets
         if len(targets) == 1:
-            self.assignType(targets[0].dataType)
+            target = targets[0]
+            if target.dataType != "Generic":
+                self.assignOutputType(target.dataType)
 
-    def assignSocketType(self, dataType):
-        self.assignType(dataType)
-
-    def assignType(self, dataType = "Float"):
-        if self.assignedType == dataType: return
-        self.assignedType = dataType
+    def assignOutputType(self, dataType):
+        self.recreateOutputSocket(dataType)
 
     @keepNodeLinks
-    def recreateOutputSocket(self):
+    def recreateOutputSocket(self, dataType):
         self.outputs.clear()
-        self.newOutput(self.assignedType, "New", "new")
+        self.newOutput(dataType, "New", "new")
 
     def getExecutionCode(self):
-        t = self.assignedType
-        if t == "Float": return ("try: new = float(old)",
-                                 "except: new = 0")
-        elif t == "Integer": return ("try: new = int(old)",
-                                     "except: new = 0")
-        elif t == "String": return ("try: new = str(old)",
-                                    "except: new = ''")
-        elif t == "Vector": return ("try: new = Vector(old)",
-                                    "except: new = Vector((0, 0, 0))")
-        else:
-            return ("new = old")
-
-    def getUsedModules(self):
-        t = self.assignedType
-        if t == "Vector": return ["mathutils"]
-        return []
+        yield "new, self.lastCorrectionType = self.outputs[0].correctValue(old)"

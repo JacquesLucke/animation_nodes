@@ -13,7 +13,7 @@ def perlinNoise(x, persistance, octaves):
         frequency = 2**i
         localAmplitude = persistance**i
         total += interpolatedNoise(x * frequency) * localAmplitude
-    return total
+    return float(total)
 
 def interpolatedNoise(x):
     intX = int(x)

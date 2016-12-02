@@ -32,12 +32,27 @@ class ObjectDataPathOutputNode(bpy.types.Node, AnimationNode):
         except:
             self.errorMessage = "Error"
         return object
-
+    
+    def getPropertyPath(self, object, path):
+        if "." in path:
+            propPath, propName = path.rsplit(".", 1)
+            try:
+                dataPath = object.path_resolve(propPath)
+            except:
+                dataPath = object
+        else:
+            dataPath = object
+            propName = path
+        return dataPath, propName
+    
     def getBakeCode(self):
         yield "if object is not None:"
         yield "    try: object.keyframe_insert(path, index = arrayIndex)"
-        yield "    except: pass"
-
+        yield "    except:"
+        yield "        dataPath, propName = self.getPropertyPath(object, path)"
+        yield "        try: dataPath.keyframe_insert(propName, index = arrayIndex)"
+        yield "        except: pass"
+    
     def clearCache(self):
         cache.clear()
 

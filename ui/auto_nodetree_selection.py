@@ -16,7 +16,11 @@ def updateAutoNodeTreeSelection(scene):
             if len(nodeTrees) == 1:
                 space.node_tree = nodeTrees[0]
             else:
-                space.node_tree = bpy.data.node_groups.get(treeNameBySpace.get(spaceHash, None))
+                lastUsedTree = bpy.data.node_groups.get(treeNameBySpace.get(spaceHash, ""))
+                if lastUsedTree is not None:
+                    space.node_tree = lastUsedTree
+                else:
+                    space.node_tree = nodeTrees[0]
 
         treeName = getattr(space.node_tree, "name", None)
         if treeName is not None:
