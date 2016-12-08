@@ -133,33 +133,33 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
         self.createNewNodeID()
 
 def splitTextObject(source):
-    text = cleanText(source.data.body)
+    text = source.data.body
 
     splineCounter = 0
     sourceSplinePositions = getSplinePositions(source)
     objects = []
 
     for i, character in enumerate(text):
-        name = source.name + " part " + str(i).zfill(3)
-        characterObject = newCharacterObject(name, source.data, character)
-
-        characterSplinePositions = getSplinePositions(characterObject)
-        test = characterSplinePositions[0]
-        setCharacterPosition(characterObject, source, sourceSplinePositions[splineCounter], characterSplinePositions[0])
-        splineCounter += len(characterSplinePositions)
-
-        objects.append(characterObject)
-
+        if character not in [" ", "\n", "\t", "\r"]:
+            name = source.name + " part " + str(i).zfill(3)
+            characterObject = newCharacterObject(name, source.data, character, i)
+            
+            characterSplinePositions = getSplinePositions(characterObject)
+            test = characterSplinePositions[0]
+            setCharacterPosition(characterObject, source, sourceSplinePositions[splineCounter], characterSplinePositions[0])
+            splineCounter += len(characterSplinePositions)
+            
+            objects.append(characterObject)
+            
     return objects
 
-def cleanText(text):
-    for part in [" ", "\n", "\t", "\r"]:
-        text = text.replace(part, "")
-    return text
-
-def newCharacterObject(name, sourceData, character):
+def newCharacterObject(name, sourceData, character, i):
     newTextData = sourceData.copy()
     newTextData.body = character
+    newTextData.body_format[0].use_bold = sourceData.body_format[i].use_bold
+    newTextData.body_format[0].use_italic = sourceData.body_format[i].use_italic
+    newTextData.body_format[0].use_underline = sourceData.body_format[i].use_underline
+    newTextData.body_format[0].use_small_caps = sourceData.body_format[i].use_small_caps
     characterObject = bpy.data.objects.new(name, newTextData)
     bpy.context.scene.objects.link(characterObject)
     return characterObject
