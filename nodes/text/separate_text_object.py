@@ -133,7 +133,6 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
         self.createNewNodeID()
 
 def splitTextObject(source):
-    #text = cleanText(source.data.body)
     text = source.data.body
 
     splineCounter = 0
@@ -153,11 +152,6 @@ def splitTextObject(source):
             objects.append(characterObject)
             
     return objects
-
-def cleanText(text):
-    for part in [" ", "\n", "\t", "\r"]:
-        text = text.replace(part, "")
-    return text
 
 def newCharacterObject(name, sourceData, character, i):
     newTextData = sourceData.copy()
