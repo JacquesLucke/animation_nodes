@@ -141,7 +141,7 @@ def splitTextObject(source):
 
     for i, character in enumerate(text):
         name = source.name + " part " + str(i).zfill(3)
-        characterObject = newCharacterObject(name, source.data, character)
+        characterObject = newCharacterObject(name, source.data, character, i)
 
         characterSplinePositions = getSplinePositions(characterObject)
         test = characterSplinePositions[0]
@@ -157,9 +157,13 @@ def cleanText(text):
         text = text.replace(part, "")
     return text
 
-def newCharacterObject(name, sourceData, character):
+def newCharacterObject(name, sourceData, character, i):
     newTextData = sourceData.copy()
     newTextData.body = character
+    newTextData.body_format[0].use_bold = sourceData.body_format[i].use_bold
+    newTextData.body_format[0].use_italic = sourceData.body_format[i].use_italic
+    newTextData.body_format[0].use_underline = sourceData.body_format[i].use_underline
+    newTextData.body_format[0].use_small_caps = sourceData.body_format[i].use_small_caps
     characterObject = bpy.data.objects.new(name, newTextData)
     bpy.context.scene.objects.link(characterObject)
     return characterObject
