@@ -133,23 +133,25 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
         self.createNewNodeID()
 
 def splitTextObject(source):
-    text = cleanText(source.data.body)
+    #text = cleanText(source.data.body)
+    text = source.data.body
 
     splineCounter = 0
     sourceSplinePositions = getSplinePositions(source)
     objects = []
 
     for i, character in enumerate(text):
-        name = source.name + " part " + str(i).zfill(3)
-        characterObject = newCharacterObject(name, source.data, character, i)
-
-        characterSplinePositions = getSplinePositions(characterObject)
-        test = characterSplinePositions[0]
-        setCharacterPosition(characterObject, source, sourceSplinePositions[splineCounter], characterSplinePositions[0])
-        splineCounter += len(characterSplinePositions)
-
-        objects.append(characterObject)
-
+        if character not in [" ", "\n", "\t", "\r"]:
+            name = source.name + " part " + str(i).zfill(3)
+            characterObject = newCharacterObject(name, source.data, character, i)
+            
+            characterSplinePositions = getSplinePositions(characterObject)
+            test = characterSplinePositions[0]
+            setCharacterPosition(characterObject, source, sourceSplinePositions[splineCounter], characterSplinePositions[0])
+            splineCounter += len(characterSplinePositions)
+            
+            objects.append(characterObject)
+            
     return objects
 
 def cleanText(text):
