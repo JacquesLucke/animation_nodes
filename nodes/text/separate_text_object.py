@@ -157,7 +157,7 @@ def cleanText(text):
         text = text.replace(part, "")
     return text
 
-def newCharacterObject(name, sourceData, character):
+def newCharacterObject(name, sourceData, character, i):
     newTextData = sourceData.copy()
     newTextData.body = character
     newTextData.body_format[0].use_bold = sourceData.body_format[i].use_bold
