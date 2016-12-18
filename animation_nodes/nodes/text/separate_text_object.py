@@ -131,50 +131,56 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
     def duplicate(self, sourceNode):
         self.createNewNodeID()
 
-def splitTextObject(source):
-    text = cleanText(source.data.body)
-
-    splineCounter = 0
-    sourceSplinePositions = getSplinePositions(source)
+def splitTextObject(sourceObject):
     objects = []
+    # each character can consist of multiple splines
+    # but the splines for one character are in a specific order
+    sourceSplinePositions = getSplinePositions(sourceObject)
+    splineCounter = 0
 
-    for i, character in enumerate(text):
-        name = source.name + " part " + str(i).zfill(3)
-        characterObject = newCharacterObject(name, source.data, character)
+    for index, character in enumerate(sourceObject.data.body):
+        if character.isspace():
+            continue
 
-        characterSplinePositions = getSplinePositions(characterObject)
-        test = characterSplinePositions[0]
-        setCharacterPosition(characterObject, source, sourceSplinePositions[splineCounter], characterSplinePositions[0])
-        splineCounter += len(characterSplinePositions)
+        newName = sourceObject.name + " part " + str(index).zfill(3)
+        charObject = newCharacterObject(newName, sourceObject.data, index)
 
-        objects.append(characterObject)
+        charSplinePositions = getSplinePositions(charObject)
+        setCharacterPosition(charObject, sourceObject, sourceSplinePositions[splineCounter], charSplinePositions[0])
+        splineCounter += len(charSplinePositions)
+
+        objects.append(charObject)
 
     return objects
 
-def cleanText(text):
-    for part in [" ", "\n", "\t", "\r"]:
-        text = text.replace(part, "")
-    return text
-
-def newCharacterObject(name, sourceData, character):
+def newCharacterObject(name, sourceData, index):
     newTextData = sourceData.copy()
-    newTextData.body = character
+    newTextData.body = sourceData.body[index]
+    copyTextCharacterFormat(sourceData.body_format[index], newTextData.body_format[0])
+
     characterObject = bpy.data.objects.new(name, newTextData)
     bpy.context.scene.objects.link(characterObject)
     return characterObject
 
-def setCharacterPosition(characterObject, source, sourceSplinePosition, offsetPosition):
+def copyTextCharacterFormat(source, target):
+    target.use_bold = source.use_bold
+    target.use_italic = source.use_italic
+    target.use_underline = source.use_underline
+    target.use_small_caps = source.use_small_caps
+    target.material_index = source.material_index
+
+def setCharacterPosition(charObject, source, sourceSplinePosition, offsetPosition):
     characterOffset = sourceSplinePosition - offsetPosition
-    characterObject.matrix_world = source.matrix_world * Matrix.Translation(characterOffset)
+    charObject.matrix_world = source.matrix_world * Matrix.Translation(characterOffset)
 
 def getSplinePositions(textObject):
-    onlySelect(textObject)
+    makeObjectActive(textObject)
     curve = newCurveFromActiveObject()
     positions = [Vector(spline.bezier_points[0].co) for spline in curve.data.splines]
-    removeCurve(curve)
+    removeObject(curve)
     return positions
 
-def onlySelect(object):
+def makeObjectActive(object):
     bpy.ops.object.select_all(action = "DESELECT")
     bpy.context.scene.objects.active = object
     object.select = True
@@ -192,12 +198,6 @@ def newCurveFromActiveObject():
     bpy.ops.object.convert(target = "CURVE", keep_original = True)
     return bpy.context.scene.objects.active
 
-def removeCurve(curve):
-    curveData = curve.data
-    bpy.context.scene.objects.unlink(curve)
-    bpy.data.objects.remove(curve)
-    bpy.data.curves.remove(curveData)
-
 @executeInAreaType("VIEW_3D")
 def convertSelectedObjects(type = "MESH"):
     bpy.ops.object.convert(target = type)
@@ -212,7 +212,7 @@ def removeObject(object):
     objectType = object.type
     data = object.data
     bpy.data.objects.remove(object)
-    if objectType == "FONT":
+    if objectType in ("CURVE", "FONT"):
         bpy.data.curves.remove(data)
     elif objectType == "MESH":
         bpy.data.meshes.remove(data)
