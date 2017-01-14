@@ -62,7 +62,7 @@ cdef class BezierSpline(Spline):
 
         for i in range(segmentAmount):
             leftIndex = i
-            rightIndex = (i + 1) % segmentAmount
+            rightIndex = (i + 1) % (segmentAmount + 1)
 
             p0 = self.points[leftIndex] - point
             p1 = self.rightHandles[leftIndex] - point

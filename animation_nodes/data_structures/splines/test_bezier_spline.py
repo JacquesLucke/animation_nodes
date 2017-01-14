@@ -155,6 +155,14 @@ class TestGetTrimmedCopy(TestCase):
         spline.appendPoint((0, -3, 1), (-1, -2, 1), (1, -4, 1))
         return spline
 
+class TestProjectOnSpline(TestCase):
+    def testStraight(self):
+        spline = BezierSpline()
+        spline.appendPoint((-1, 0, 0), (-2, 0, 0), (-0.2, 0, 0))
+        spline.appendPoint((1, 0, 0), (0.2, 0, 0), (2, 0, 0))
+        parameter = spline.project((0, 0, 1))
+        self.assertAlmostEqual(parameter, 0.5)
+
 def testEqual(testCase, vector1, vector2):
     testCase.assertAlmostEqual(vector1[0], vector2[0], places = 5)
     testCase.assertAlmostEqual(vector1[1], vector2[1], places = 5)
