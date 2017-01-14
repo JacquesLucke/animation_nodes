@@ -17,6 +17,7 @@ class ProjectOnSplineNode(bpy.types.Node, AnimationNode):
 
         self.newOutput("Vector", "Position", "position")
         self.newOutput("Vector", "Tangent", "tangent")
+        self.newOutput("Float", "Distance", "distance")
         if not self.extended:
             self.newOutput("Float", "Parameter", "parameter")
 
@@ -31,7 +32,9 @@ class ProjectOnSplineNode(bpy.types.Node, AnimationNode):
             yield "    parameter = spline.project(location)"
             yield "    position = spline.evaluate(parameter)"
             yield "    tangent = spline.evaluateTangent(parameter)"
+        yield "    distance = (position - location).length"
         yield "else:"
         yield "    position = Vector((0, 0, 0))"
         yield "    tangent = Vector((0, 0, 0))"
         yield "    parameter = 0.0"
+        yield "    distance = 0.0"
