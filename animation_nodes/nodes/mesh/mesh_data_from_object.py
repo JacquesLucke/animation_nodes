@@ -36,12 +36,13 @@ class MeshDataFromObjectNode(bpy.types.Node, AnimationNode):
         return self.meshDataFromObject(object, scene)
 
     def meshDataFromObject(self, object, scene):
-        if getattr(object, "type", "") != "MESH":
+        if object is None:
             return MeshData()
 
-        temporaryMesh = self.useModifiers and scene is not None
-        if temporaryMesh: mesh = object.an.createModifiedMesh(scene)
-        else: mesh = object.data
+        mesh = object.an.getMesh(scene, self.useModifiers)
+
+        if mesh is None:
+            return MeshData()
 
         vertices = mesh.an.getVertices()
         if self.useWorldSpace:
@@ -52,7 +53,7 @@ class MeshDataFromObjectNode(bpy.types.Node, AnimationNode):
         if self.loadPolygons: polygons = mesh.an.getPolygonIndices()
         else: polygons = None
 
-        if temporaryMesh:
+        if mesh.users == 0:
             bpy.data.meshes.remove(mesh)
 
         return MeshData(vertices, edges, polygons)

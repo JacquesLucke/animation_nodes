@@ -74,13 +74,15 @@ class MeshProperties(bpy.types.PropertyGroup):
 class ObjectProperties(bpy.types.PropertyGroup):
     bl_idname = "an_ObjectProperties"
 
-    def createModifiedMesh(self, scene):
+    def getMesh(self, scene, applyModifiers = False):
+        if scene is None: return None
         object = self.id_data
-        if object.type != "MESH":
-            return None
+
+        from . events import isRendering
+        settings = "RENDER" if isRendering() else "PREVIEW"
+
+        if not applyModifiers and object.type == "MESH":
+            return object.data
         else:
-            from . events import isRendering
-            settings = "RENDER" if isRendering() else "PREVIEW"
-            return object.to_mesh(scene = scene,
-                                  apply_modifiers = True,
-                                  settings = settings)
+            try: return object.to_mesh(scene, applyModifiers, settings)
+            except: return None

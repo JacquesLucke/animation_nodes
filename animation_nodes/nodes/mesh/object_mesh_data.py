@@ -27,8 +27,8 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
         if not any(isLinked.values()): return
 
         yield "meshName = ''"
-        yield "if getattr(object, 'type', '') == 'MESH':"
-        yield "    mesh = self.getMesh(object, useModifiers, scene)"
+        yield "mesh = object.an.getMesh(scene, useModifiers) if object else None"
+        yield "if mesh is not None:"
         yield "    meshName = mesh.name"
 
         if isLinked["vertexLocations"]:
@@ -46,7 +46,7 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
         if isLinked["localPolygonAreas"]:
             yield "    localPolygonAreas = mesh.an.getPolygonAreas()"
 
-        yield "    self.clearMesh(mesh, useModifiers, scene)"
+        yield "    if mesh.users == 0: bpy.data.meshes.remove(mesh)"
         yield "else:"
         yield "    vertexLocations = Vector3DList()"
         yield "    edgeIndices = EdgeIndicesList()"
@@ -55,16 +55,6 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
         yield "    polygonNormals = Vector3DList()"
         yield "    polygonCenters = Vector3DList()"
         yield "    localPolygonAreas = DoubleList()"
-
-
-    def getMesh(self, object, useModifiers, scene):
-        if useModifiers and scene is not None:
-            return object.an.createModifiedMesh(scene)
-        return object.data
-
-    def clearMesh(self, mesh, useModifiers, scene):
-        if useModifiers and scene is not None: bpy.data.meshes.remove(mesh)
-
 
     def getVertexLocations(self, mesh, object, useWorldSpace):
         vertices = mesh.an.getVertices()
