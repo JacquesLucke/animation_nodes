@@ -12,3 +12,10 @@ dataTypeByIdentifier = {
 }
 
 dataTypeIdentifiers = set(dataTypeByIdentifier.keys())
+
+keyDataTypeItems = [
+    ("Transforms", "Transforms", "", "NONE", 0),
+    ("Text", "Text", "", "NONE", 1),
+    ("Integer", "Integer", "", "NONE", 2),
+    ("Float", "Float", "", "NONE", 3)
+]

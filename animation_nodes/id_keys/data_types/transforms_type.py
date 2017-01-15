@@ -91,7 +91,7 @@ class TransformDataType(CompoundIDKeyDataType):
 
     @classmethod
     def drawExtras(cls, layout, object, name):
-        props = layout.operator("an.id_key_from_current_transforms")
+        props = layout.operator("an.id_key_from_current_transforms", icon = "ROTACTIVE")
         props.name = name
 
     @classmethod

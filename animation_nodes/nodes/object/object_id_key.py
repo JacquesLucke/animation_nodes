@@ -1,14 +1,8 @@
 import bpy
 from bpy.props import *
 from ... math import composeMatrixList
+from ... id_keys import keyDataTypeItems
 from ... base_types import AnimationNode, AutoSelectVectorization
-
-keyDataTypeItems = [
-    ("Transforms", "Transforms", "", "NONE", 0),
-    ("Text", "Text", "", "NONE", 1),
-    ("Integer", "Integer", "", "NONE", 2),
-    ("Float", "Float", "", "NONE", 3)
-]
 
 class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectIDKeyNode"

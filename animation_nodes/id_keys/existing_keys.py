@@ -18,9 +18,12 @@ def getAllIDKeys():
     return idKeysInFile
 
 def findIDKeysInCurrentFile():
+    from . new_id_key import getCreatedIDKeys
+
     foundKeys = set()
     foundKeys.update(getIDKeysOfNodes())
     foundKeys.update(getIDKeysOnObjects())
+    foundKeys.update(getCreatedIDKeys())
 
     # default keys should stay in order
     allKeys = list()

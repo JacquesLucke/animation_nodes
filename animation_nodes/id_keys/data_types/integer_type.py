@@ -15,7 +15,7 @@ class IntegerDataType(SingleIDKeyDataType):
 
     @classmethod
     def drawExtras(cls, layout, object, name):
-        props = layout.operator("an.id_keys_from_selection_order")
+        props = layout.operator("an.id_keys_from_selection_order", icon = "BORDER_RECT")
         props.name = name
 
 @makeOperator("an.id_keys_from_selection_order", "From Selection Order", arguments = ["String"])
