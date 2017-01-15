@@ -21,12 +21,16 @@ def updateSelectionSorting(scene):
 
     if enableSelectionSorting:
         newSortedSelection = []
+
+        selectedNamesSet = set(selectedNames)
         for name in sortedSelectionNames:
-            if name in selectedNames:
+            if name in selectedNamesSet:
                 newSortedSelection.append(name)
+
         for name in selectedNames:
             if name not in newSortedSelection:
                 newSortedSelection.append(name)
+                
         sortedSelectionNames = newSortedSelection
     else:
         sortedSelectionNames = selectedNames
