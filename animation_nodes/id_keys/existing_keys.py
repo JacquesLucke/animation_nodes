@@ -23,13 +23,17 @@ def findIDKeysInCurrentFile():
         for key in object.keys():
             if key.startswith("AN*"): collectedKeys.add(key)
 
-    realKeys = filterRealIDKeys(collectedKeys)
-    realKeys.update(getDefaultIDKeys())
+    # default keys should stay in order
+    realKeys = getDefaultIDKeys()
+    for key in filterRealIDKeys(collectedKeys):
+        if key not in realKeys:
+            realKeys.append(key)
     return realKeys
 
 IDKey = namedtuple("IDKey", ["type", "name"])
 def getDefaultIDKeys():
-    return [IDKey("Transforms", "Initial Transforms")]
+    return [IDKey("Transforms", "Initial Transforms"),
+            IDKey("Integer", "Selection Index")]
 
 def filterRealIDKeys(keys):
     realKeys = set()
