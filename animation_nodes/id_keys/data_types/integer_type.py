@@ -19,6 +19,6 @@ class IntegerDataType(SingleIDKeyDataType):
         props.name = name
 
 @makeOperator("an.id_keys_from_selection_order", "From Selection Order", arguments = ["String"])
-def idKeyFromCurrentTransforms(name):
+def idKeyFromSelectionOrder(name):
     for i, object in enumerate(getSortedSelectedObjects()):
         object.id_keys.set("Integer", name, i)
