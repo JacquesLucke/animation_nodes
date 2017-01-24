@@ -1,6 +1,6 @@
 from .. lists.clist cimport CList
 
-cdef class CListMock:
+cdef class CListMock(ListMock):
     def __cinit__(self, dataType, listOrElement, defaultElement):
         if not issubclass(dataType, CList):
             raise TypeError("first argument has to be a subclass of CList")
