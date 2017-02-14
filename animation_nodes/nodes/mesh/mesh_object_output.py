@@ -118,11 +118,11 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
         mesh.loops.add(len(polygons.indices))
         mesh.polygons.add(len(polygons))
 
-        mesh.vertices.foreach_set("co", vertices.getMemoryView())
-        mesh.edges.foreach_set("vertices", edges.getMemoryView())
-        mesh.polygons.foreach_set("loop_total", polygons.polyLengths.getMemoryView())
-        mesh.polygons.foreach_set("loop_start", polygons.polyStarts.getMemoryView())
-        mesh.polygons.foreach_set("vertices", polygons.indices.getMemoryView())
+        mesh.vertices.foreach_set("co", vertices.asMemoryView())
+        mesh.edges.foreach_set("vertices", edges.asMemoryView())
+        mesh.polygons.foreach_set("loop_total", polygons.polyLengths.asMemoryView())
+        mesh.polygons.foreach_set("loop_start", polygons.polyStarts.asMemoryView())
+        mesh.polygons.foreach_set("vertices", polygons.indices.asMemoryView())
 
         if self.updateMesh:
             mesh.update(calc_edges = self.recalcEdges,
@@ -138,7 +138,7 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
             self.errorMessage = "The vertex amounts are not equal"
             return object
 
-        mesh.vertices.foreach_set("co", vertices.getMemoryView())
+        mesh.vertices.foreach_set("co", vertices.asMemoryView())
         mesh.update()
 
     def setMaterialIndices(self, mesh, materialIndices):
@@ -152,5 +152,5 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
         if len(materialIndices) != len(mesh.polygons):
             allMaterialIndices = allMaterialIndices.repeated(length = len(mesh.polygons))
 
-        mesh.polygons.foreach_set("material_index", allMaterialIndices.getMemoryView())
+        mesh.polygons.foreach_set("material_index", allMaterialIndices.asMemoryView())
         mesh.polygons[0].material_index = materialIndices[0]

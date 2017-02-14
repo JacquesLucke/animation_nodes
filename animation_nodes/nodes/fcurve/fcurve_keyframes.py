@@ -16,5 +16,5 @@ class FCurveKeyframesNode(bpy.types.Node, AnimationNode):
             return DoubleList(), DoubleList()
 
         allValues = FloatList(len(fCurve.keyframe_points) * 2)
-        fCurve.keyframe_points.foreach_get("co", allValues.getMemoryView())
+        fCurve.keyframe_points.foreach_get("co", allValues.asMemoryView())
         return DoubleList.fromValues(allValues[0::2]), DoubleList.fromValues(allValues[1::2])

@@ -24,7 +24,7 @@ cdef class LISTNAME(CList):
     cpdef count(self, value)
     cpdef insert(self, Py_ssize_t index, value)
 
-    cpdef getMemoryView(self)
+    cpdef asMemoryView(self)
 
     cdef LISTNAME getValuesInSlice(self, slice sliceObject)
     cdef setValuesInSlice(self, slice sliceObject, values)

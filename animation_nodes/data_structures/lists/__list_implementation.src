@@ -444,7 +444,7 @@ TO_PYOBJECT_CODE
     # Memory Views
     ###############################################
 
-    cpdef getMemoryView(self):
+    cpdef asMemoryView(self):
         if "MEMVIEW" == "NotExistentType":
             raise NotImplementedError("Cannot create memoryview for this type")
 
@@ -458,7 +458,7 @@ TO_PYOBJECT_CODE
 
     def asNumpyArray(self):
         import numpy
-        return numpy.asarray(self.getMemoryView())
+        return numpy.asarray(self.asMemoryView())
 
 
     # Classmethods for List Creation
