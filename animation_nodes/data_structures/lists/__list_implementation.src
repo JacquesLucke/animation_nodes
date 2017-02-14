@@ -1,5 +1,4 @@
 cimport cython
-from types import GeneratorType
 from libc.stdlib cimport malloc, free, realloc
 from libc.string cimport memcpy, memmove, memcmp
 from . utils cimport predictSliceLength, makeStepPositive, removeValuesInSlice, getValuesInSlice
@@ -456,6 +455,10 @@ TO_PYOBJECT_CODE
             # hack to make zero-length memview possible
             memview = (<MEMVIEW[:1]><MEMVIEW*>self.data)[1:]
         return memview
+
+    def asNumpyArray(self):
+        import numpy
+        return numpy.asarray(self.getMemoryView())
 
 
     # Classmethods for List Creation
