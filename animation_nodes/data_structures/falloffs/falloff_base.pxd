@@ -1,3 +1,4 @@
+from . evaluation cimport FalloffEvaluator
 
 cdef class Falloff:
     cdef bint clamped
