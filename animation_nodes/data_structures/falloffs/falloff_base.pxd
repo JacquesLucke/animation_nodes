@@ -1,5 +1,8 @@
+
 cdef class Falloff:
     cdef bint clamped
+
+    cpdef FalloffEvaluator getEvaluator(self, str sourceType, bint clamped = ?)
 
 cdef class BaseFalloff(Falloff):
     cdef str dataType

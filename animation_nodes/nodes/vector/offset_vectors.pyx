@@ -84,4 +84,4 @@ class OffsetVectorsNode(bpy.types.Node, AnimationNode):
         return vectors
 
     def getFalloffEvaluator(self, falloff):
-        return FalloffEvaluator.create(falloff, "Location", self.clampFalloff)
+        return falloff.getEvaluator("Location", self.clampFalloff)

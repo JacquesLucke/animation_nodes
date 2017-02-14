@@ -83,7 +83,7 @@ class OffsetMatricesNode(bpy.types.Node, AnimationNode):
             CListMock _scales = CListMock(Vector3DList, scales, (1, 1, 1))
 
             Matrix4x4List outMatrices = Matrix4x4List(length = inMatrices.length)
-            FalloffEvaluator evaluator = FalloffEvaluator.create(falloff, "Transformation Matrix")
+            FalloffEvaluator evaluator = falloff.getEvaluator("Transformation Matrix")
 
         if evaluator is None:
             self.errorMessage = "Falloff cannot be evaluated for matrices"
