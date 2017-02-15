@@ -2,8 +2,8 @@ from cpython.ref cimport PyObject
 from cpython.mem cimport PyMem_Malloc, PyMem_Free
 
 from . falloff_base cimport Falloff
-from ... math cimport Matrix4, Vector3
 from . falloff_base cimport BaseFalloff, CompoundFalloff
+from ... math cimport Matrix4, Vector3, toVector3, toMatrix4
 
 ctypedef double (*BaseEvaluatorWithConversion)(BaseFalloff, void*, long index)
 ctypedef double (*EvaluatorFunction)(void* settings, void* value, long index)
@@ -13,13 +13,21 @@ ctypedef double (*EvaluatorFunction)(void* settings, void* value, long index)
 #########################################################
 
 cdef class FalloffEvaluator:
-
     @staticmethod
-    def create(Falloff falloff, str sourceType, bint clamped = False):
-        return createFalloffEvaluator(falloff, sourceType, clamped)
+    def create(Falloff falloff, str sourceType, bint clamped, bint onlyC):
+        cdef FalloffEvaluator evaluator = createFalloffEvaluator(falloff, sourceType, clamped)
+        if evaluator is None:
+            raise Exception("Cannot create FalloffEvaluator for this source type")
+        if not onlyC and evaluator.pyEvaluator is None:
+            raise Exception("Cannot evaluate this source type from Python. "
+                            "Consider to set the 'onlyC' parameter to True.")
+        return evaluator
 
     cdef double evaluate(self, void* value, long index):
         raise NotImplementedError()
+
+    def __call__(self, object value, long index):
+        return self.pyEvaluator(self, value, index)
 
 cdef createFalloffEvaluator(Falloff falloff, str sourceType, bint clamped = False):
     cdef:
@@ -35,6 +43,7 @@ cdef createFalloffEvaluator(Falloff falloff, str sourceType, bint clamped = Fals
         evaluator.falloff = falloff
         evaluator.function = function
         evaluator.settings = settings
+        evaluator.pyEvaluator = getPyEvaluator(sourceType)
         return evaluator
     else:
         return None
@@ -259,3 +268,20 @@ cdef double convert_TransformationMatrix_Location(BaseFalloff falloff, void* val
     vector.y = matrix.a24
     vector.z = matrix.a34
     return falloff.evaluate(&vector, index)
+
+
+# Evaluate falloff with Python objects
+###########################################################
+
+cdef getPyEvaluator(str sourceType):
+    if sourceType == "Location": return evaluate_PyVector
+    if sourceType == "Transformation Matrix": return evaluate_PyMatrix
+    return None
+
+def evaluate_PyVector(FalloffEvaluator evaluator, object pyVector, long index):
+    cdef Vector3 vector = toVector3(pyVector)
+    return evaluator.evaluate(&vector, index)
+
+def evaluate_PyMatrix(FalloffEvaluator evaluator, object pyMatrix, long index):
+    cdef Matrix4 matrix = toMatrix4(pyMatrix)
+    return evaluator.evaluate(&matrix, index)

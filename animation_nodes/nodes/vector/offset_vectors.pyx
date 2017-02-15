@@ -38,7 +38,7 @@ class OffsetVectorsNode(bpy.types.Node, AnimationNode):
 
     def execute_OffsetList(self, Vector3DList vectors, falloff, Vector3DList offsets):
         cdef:
-            FalloffEvaluator evaluator = self.getFalloffEvaluator(falloff)
+            FalloffEvaluator evaluator
             Vector3* _vectors = vectors.data
             Vector3* _offsets = offsets.data
             double influence
@@ -48,7 +48,8 @@ class OffsetVectorsNode(bpy.types.Node, AnimationNode):
         if len(vectors) != len(offsets):
             self.errorMessage = "Vector lists have different lengths"
             return vectors
-        if evaluator is None:
+        try: evaluator = self.getFalloffEvaluator(falloff)
+        except:
             self.errorMessage = "Falloff cannot be evaluated for vectors"
             return vectors
 
@@ -62,14 +63,15 @@ class OffsetVectorsNode(bpy.types.Node, AnimationNode):
 
     def execute_SameOffset(self, Vector3DList vectors, falloff, offset):
         cdef:
-            FalloffEvaluator evaluator = self.getFalloffEvaluator(falloff)
+            FalloffEvaluator evaluator
             Vector3* _vectors = vectors.data
             Vector3 _offset
             double influence
             long i
 
         self.errorMessage = ""
-        if evaluator is None:
+        try: evaluator = self.getFalloffEvaluator(falloff)
+        except:
             self.errorMessage = "Falloff cannot be evaluated for vectors"
             return vectors
 

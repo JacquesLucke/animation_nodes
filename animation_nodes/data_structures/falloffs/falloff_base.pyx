@@ -2,8 +2,8 @@ cdef class Falloff:
     def __cinit__(self):
         self.clamped = False
 
-    cpdef FalloffEvaluator getEvaluator(self, str sourceType, bint clamped = False):
-        return FalloffEvaluator.create(self, sourceType, clamped)
+    cpdef FalloffEvaluator getEvaluator(self, str sourceType, bint clamped = False, bint onlyC = False):
+        return FalloffEvaluator.create(self, sourceType, clamped, onlyC)
 
 
 cdef class BaseFalloff(Falloff):

@@ -3,7 +3,7 @@ from . evaluation cimport FalloffEvaluator
 cdef class Falloff:
     cdef bint clamped
 
-    cpdef FalloffEvaluator getEvaluator(self, str sourceType, bint clamped = ?)
+    cpdef FalloffEvaluator getEvaluator(self, str sourceType, bint clamped = ?, bint onlyC = ?)
 
 cdef class BaseFalloff(Falloff):
     cdef str dataType
