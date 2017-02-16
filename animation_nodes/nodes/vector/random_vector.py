@@ -1,11 +1,9 @@
 import bpy
 import random
 from bpy.props import *
-from libc.limits cimport INT_MAX
 from ... events import propertyChanged
 from ... base_types import AnimationNode
-from ... data_structures cimport Vector3DList
-from ... algorithms.random cimport uniformRandomNumber
+from ... algorithms.lists.random import generateRandomVectors
 
 class RandomVectorNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_RandomVectorNode"
@@ -42,18 +40,8 @@ class RandomVectorNode(bpy.types.Node, AnimationNode):
         else:
             yield "randomVector = Vector(algorithms.random.randomNumberTuple(seed + 34223 * self.nodeSeed, 3, scale))"
 
-    def calcRandomVectors(self, seed, count, double scale):
-        cdef:
-            int length = min(max(count, 0), INT_MAX)
-            int startSeed = (seed * 763645 + self.nodeSeed * 2345423) % INT_MAX
-            Vector3DList newList = Vector3DList(length = length)
-            float* _data = <float*>newList.data
-            int i
-
-        for i in range(length * 3):
-            _data[i] = uniformRandomNumber(startSeed + i, -scale, scale)
-
-        return newList
+    def calcRandomVectors(self, seed, count, scale):
+        return generateRandomVectors(seed + self.nodeSeed * 234144, count, scale)
 
     def duplicate(self, sourceNode):
         self.randomizeNodeSeed()

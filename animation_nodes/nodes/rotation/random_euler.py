@@ -2,12 +2,9 @@ import bpy
 import random
 from bpy.props import *
 from math import radians
-from libc.limits cimport INT_MAX
-from ... math cimport Euler3
 from ... events import propertyChanged
 from ... base_types import AnimationNode
-from ... data_structures cimport EulerList
-from ... algorithms.random cimport uniformRandomNumber
+from ... algorithms.lists.random import generateRandomEulers
 
 class RandomEulerNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_RandomEulerNode"
@@ -44,22 +41,8 @@ class RandomEulerNode(bpy.types.Node, AnimationNode):
         else:
             yield "randomEuler = Euler(algorithms.random.randomNumberTuple(seed + 45234 * self.nodeSeed, 3, scale))"
 
-    def calcRandomEulers(self, seed, count, double scale):
-        cdef:
-            int length = min(max(count, 0), INT_MAX)
-            int startSeed = (seed * 763645 + self.nodeSeed * 2345423) % INT_MAX
-            EulerList newList = EulerList(length = length)
-            Euler3* _data = <Euler3*>newList.data
-            int i, seedOffset
-
-        for i in range(length):
-            seedOffset = i * 3
-            _data[i].x = uniformRandomNumber(startSeed + seedOffset + 0, -scale, scale)
-            _data[i].y = uniformRandomNumber(startSeed + seedOffset + 1, -scale, scale)
-            _data[i].z = uniformRandomNumber(startSeed + seedOffset + 2, -scale, scale)
-            _data[i].order = 0
-
-        return newList
+    def calcRandomEulers(self, seed, count, scale):
+        return generateRandomEulers(self.nodeSeed * 1234545 + seed, count, scale)
 
     def duplicate(self, sourceNode):
         self.nodeSeed = int(random.random() * 100)
