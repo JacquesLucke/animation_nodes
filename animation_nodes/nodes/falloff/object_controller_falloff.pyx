@@ -4,6 +4,7 @@ from ... events import propertyChanged
 from ... base_types import AnimationNode
 from ... algorithms.rotations import eulerToDirection
 from ... data_structures cimport BaseFalloff, DoubleList
+from . remap_falloff import RemapFalloff
 from . constant_falloff import ConstantFalloff
 from . interpolate_falloff import InterpolateFalloff
 from . directional_falloff import UniDirectionalFalloff
@@ -29,8 +30,10 @@ class ObjectControllerFalloffNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
         if self.falloffType == "SPHERE":
+            self.newInput("Float", "Offset", "offset", value = 0)
             self.newInput("Float", "Falloff Width", "falloffWidth", value = 1.0)
         self.newInput("Interpolation", "Interpolation", "interpolation", defaultDrawType = "PROPERTY_ONLY")
+        self.newInput("Boolean", "Invert", "invert", value = False)
         self.newOutput("Falloff", "Falloff", "falloff")
 
     def draw(self, layout):
@@ -45,17 +48,18 @@ class ObjectControllerFalloffNode(bpy.types.Node, AnimationNode):
         elif self.falloffType == "DIRECTIONAL":
             return "execute_Directional"
 
-    def execute_Sphere(self, object, falloffWidth, interpolation):
+    def execute_Sphere(self, object, offset, falloffWidth, interpolation, invert):
         if object is None:
             return ConstantFalloff(1)
 
         matrix = object.matrix_world
         center = matrix.to_translation()
-        size = abs(matrix.to_scale().x)
-        falloff = PointDistanceFalloff(center, size, falloffWidth)
-        return InterpolateFalloff(falloff, interpolation)
+        size = abs(matrix.to_scale().x) + offset
 
-    def execute_Directional(self, object, interpolation):
+        falloff = PointDistanceFalloff(center, size-1, falloffWidth)
+        return self.applyInterpolationAndInvert(falloff, interpolation, invert)
+
+    def execute_Directional(self, object, interpolation, invert):
         if object is None:
             return ConstantFalloff(1)
 
@@ -63,6 +67,11 @@ class ObjectControllerFalloffNode(bpy.types.Node, AnimationNode):
         location = matrix.to_translation()
         size = max(matrix.to_scale().x, 0.0001)
         direction = eulerToDirection(matrix.to_euler(), self.axisDirection)
-        
+
         falloff = UniDirectionalFalloff(location, direction, size)
-        return InterpolateFalloff(falloff, interpolation)
+        return self.applyInterpolationAndInvert(falloff, interpolation, invert)
+
+    def applyInterpolationAndInvert(self, falloff, interpolation, invert):
+        falloff = InterpolateFalloff(falloff, interpolation)
+        if invert: falloff = RemapFalloff(falloff, 1, 0)
+        return falloff
