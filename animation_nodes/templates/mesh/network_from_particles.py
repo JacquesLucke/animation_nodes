@@ -33,7 +33,7 @@ class NetworkFromParticlesTemplate(bpy.types.Operator, Template):
         filterParticlesNode = self.newNode("an_FilterParticlesNode", x = 220, y = 0)
         particlesInfoNode = self.newNode("an_ParticleListInfoNode", x = 450, y = 0)
 
-        findEdgesNode = self.newNode("an_FindCloseVerticesNode", x = 650, y = -90)
+        findEdgesNode = self.newNode("an_FindClosePointsNode", x = 650, y = -90)
         findEdgesNode.inputs[4].value = 0.6
 
         self.newLink(particlesFromObjectNode.outputs[0], filterParticlesNode.inputs[0])
