@@ -3,19 +3,6 @@ from .. sockets.info import isList
 from .. utils.blender_ui import PieMenuHelper
 from .. nodes.subprogram.subprogram_base import SubprogramBaseNode
 
-'''
-                ###############
-
-    #########                      #########
-
- Data Input                               #########
-
-    #########                      #########
-
-                  Debug Node
-
-'''
-
 class ContextPie(bpy.types.Menu, PieMenuHelper):
     bl_idname = "an.context_pie"
     bl_label = "Context Pie"
@@ -50,7 +37,7 @@ class ContextPie(bpy.types.Menu, PieMenuHelper):
     def insertLoopTemplate(self, layout):
         col = layout.column(align = True)
         for socket in self.activeNode.outputs:
-            if isList(socket.bl_idname):
+            if not socket.hide and isList(socket.bl_idname):
                 props = col.operator("an.insert_loop_for_iteration_template",
                     text = "Loop through {}".format(repr(socket.getDisplayedName())),
                     icon = "MOD_ARRAY")
