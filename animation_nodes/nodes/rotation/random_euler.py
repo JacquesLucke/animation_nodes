@@ -20,11 +20,11 @@ class RandomEulerNode(bpy.types.Node, AnimationNode):
         if self.createList:
             self.newInput("Integer", "Seed", "seed")
             self.newInput("Integer", "Count", "count", value = 5, minValue = 0)
-            self.newInput("Float", "Scale", "scale", value = radians(30))
+            self.newInput("Float", "Scale", "scale", value = 0.5)
             self.newOutput("Euler List", "Eulers", "randomEulers")
         else:
             self.newInput("Integer", "Seed", "seed")
-            self.newInput("Float", "Scale", "scale", value = radians(30))
+            self.newInput("Float", "Scale", "scale", value = 0.5)
             self.newOutput("Euler", "Euler", "randomEuler")
 
     def draw(self, layout):

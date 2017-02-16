@@ -38,7 +38,7 @@ class ObjectControllerFalloffNode(bpy.types.Node, AnimationNode):
 
     def draw(self, layout):
         col = layout.column()
-        col.prop(self, "falloffType", text = "Type")
+        col.prop(self, "falloffType", text = "Type", text = "")
         if self.falloffType == "DIRECTIONAL":
             col.row().prop(self, "axisDirection", expand = True)
 
