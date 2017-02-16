@@ -37,6 +37,8 @@ cdef class LISTNAME(CList):
     cdef setValueAtIndex(self, Py_ssize_t index, TYPE value)
     cdef removeValueAtIndex(self, Py_ssize_t index)
 
+    cdef getValuesInIndexList(self, indices)
+
     cpdef LISTNAME reversed(self)
     cdef overwrite(self, LISTNAME other, Py_ssize_t index = ?)
     cdef overwriteArray(self, TYPE* array, Py_ssize_t arrayLength, Py_ssize_t index)

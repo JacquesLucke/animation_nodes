@@ -270,6 +270,34 @@ class TestGetSlice(TestCase):
         self.assertEqual(self.list[-4:-2], [2, 3])
         self.assertEqual(self.list[-1:-5:-1], [5, 4, 3, 2])
 
+class TestGetIndexList(TestCase):
+    def setUp(self):
+        self.list = IntegerList.fromValues([3, 6, 7, 10, 4])
+
+    def testEmpty(self):
+        self.assertEqual(self.list[tuple()], [])
+
+    def testNormal(self):
+        self.assertEqual(self.list[(0, 1, 3)], [3, 6, 10])
+
+    def testNegativeIndex(self):
+        self.assertEqual(self.list[(1, -2, -3)], [6, 10, 7])
+
+    def testList(self):
+        self.assertEqual(self.list[[3, 2, 1]], [10, 7, 6])
+
+    def testIndexError(self):
+        with self.assertRaises(IndexError):
+            a = self.list[(3, 10, 2)]
+        with self.assertRaises(IndexError):
+            a = self.list[(1, -10, -2)]
+
+    def testInvalidType(self):
+        with self.assertRaises(TypeError):
+            a = self.list["abc"]
+        with self.assertRaises(TypeError):
+            a = self.list[("fsd", 3, 4)]
+
 class TestRemove(TestCase):
     def setUp(self):
         self.list = IntegerList.fromValues((0, 1, 2, 3, 2, 3))

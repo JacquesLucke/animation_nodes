@@ -84,8 +84,10 @@ cdef class LISTNAME(CList):
             return self.toPyObject(&element)
         elif isinstance(key, slice):
             return self.getValuesInSlice(key)
+        elif hasattr(key, "__iter__"):
+            return self.getValuesInIndexList(key)
         else:
-            raise TypeError("Expected int or slice object")
+            raise TypeError("Expected int, slice or index list object")
 
     def __setitem__(self, key, value):
         cdef TYPE _value
@@ -359,6 +361,19 @@ cdef class LISTNAME(CList):
                       start = start, stop = stop, step = step)
         self.length -= removeAmount
 
+
+    # Get/Set/Remove elements in index list
+    ################################################
+
+    cdef getValuesInIndexList(self, indices):
+        # TODO: optimize for some data types
+        cdef LISTNAME newList = LISTNAME()
+        cdef long index
+        cdef TYPE element
+        for index in indices:
+            element = self.getValueAtIndex(index)
+            newList.append(self.toPyObject(&element))
+        return newList
 
     # Create new lists based on an existing list
     ###############################################
