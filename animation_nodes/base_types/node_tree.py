@@ -64,8 +64,8 @@ class AnimationNodeTree(bpy.types.NodeTree):
         if not self.hasMainExecutionUnits: return False
 
         if isRendering():
-            if "Scene" in events and a.sceneUpdate: return True
-            if "Frame" in events and (a.frameChanged or a.sceneUpdate): return True
+            if events.intersection({"Scene", "Frame"}) and (a.sceneUpdate or a.frameChanged):
+                return True
         else:
             if self.timeSinceLastAutoExecution < a.minTimeDifference: return False
 
