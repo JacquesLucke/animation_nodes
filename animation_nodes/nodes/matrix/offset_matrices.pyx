@@ -7,16 +7,26 @@ from ... data_structures cimport (Vector3DList, EulerList, Matrix4x4List,
 from ... algorithms.transform_matrix cimport (
     allocateMatrixTransformerFromCListMocks, freeMatrixTransformer, TransformMatrixFunction)
 from ... math cimport Matrix4, Vector3, Euler3, toVector3, toEuler3
+from .. falloff.invert_falloff import InvertFalloff
 
 localGlobalItems = [
     ("LOCAL", "Local", "", "NONE", 0),
     ("GLOBAL", "Global", "", "NONE", 1)]
+
+specifiedStateItems = [
+    ("START", "Start", "", "Given matrices set the start state", 0),
+    ("END", "End", "", "Given matrices set the end state", 1)
+]
 
 class OffsetMatricesNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_OffsetMatricesNode"
     bl_label = "Offset Matrices"
 
     errorMessage = StringProperty()
+
+    specifiedState = EnumProperty(name = "Specified State", default = "START",
+        description = "Specify if the given matrices are the start or end state",
+        items = specifiedStateItems, update = propertyChanged)
 
     translationMode = EnumProperty(name = "Translation Mode", default = "GLOBAL",
         items = localGlobalItems, update = propertyChanged)
@@ -59,6 +69,7 @@ class OffsetMatricesNode(bpy.types.Node, AnimationNode):
         self.newSocketEffect(vectorization)
 
     def draw(self, layout):
+        layout.prop(self, "specifiedState", expand = True)
         if self.errorMessage != "":
             layout.label(self.errorMessage, icon = "ERROR")
 
@@ -85,6 +96,7 @@ class OffsetMatricesNode(bpy.types.Node, AnimationNode):
             Matrix4x4List outMatrices = Matrix4x4List(length = inMatrices.length)
             FalloffEvaluator evaluator
 
+        if self.specifiedState == "END": falloff = InvertFalloff(falloff)
         try: evaluator = falloff.getEvaluator("Transformation Matrix")
         except:
             self.errorMessage = "Falloff cannot be evaluated for matrices"

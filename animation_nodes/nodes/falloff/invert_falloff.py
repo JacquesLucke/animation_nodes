@@ -11,4 +11,8 @@ class InvertFalloffNode(bpy.types.Node, AnimationNode):
         self.newOutput("Falloff", "Falloff", "outFalloff")
 
     def execute(self, falloff):
+        return InvertFalloff(falloff)
+
+class InvertFalloff:
+    def __new__(cls, falloff):
         return RemapFalloff(falloff, 1, 0)
