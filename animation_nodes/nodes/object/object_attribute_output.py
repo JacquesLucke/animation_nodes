@@ -2,25 +2,44 @@ import bpy
 from bpy.props import *
 from ... utils.code import isCodeValid
 from ... events import executionCodeChanged
-from ... base_types import AnimationNode
+from ... base_types import AnimationNode, AutoSelectVectorization
 
 class ObjectAttributeOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectAttributeOutputNode"
     bl_label = "Object Attribute Output"
-    bl_width_default = 160
+    bl_width_default = 175
 
     attribute = StringProperty(name = "Attribute", default = "",
         update = executionCodeChanged)
 
+    useObjectList = BoolProperty(default = False, update = AnimationNode.updateSockets)
+    useValueList = BoolProperty(default = False, update = AnimationNode.updateSockets)
+
     errorMessage = StringProperty()
 
     def create(self):
-        self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
-        self.newInput("Generic", "Value", "value")
-        self.newOutput("Object", "Object", "object")
+        self.newInputGroup(self.useObjectList,
+            ("Object", "Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
+            ("Object List", "Objects", "objects"))
+
+        self.newInputGroup(self.useValueList and self.useObjectList,
+            ("Generic", "Value", "value"),
+            ("Generic List", "Values", "values"))
+
+        self.newOutputGroup(self.useObjectList,
+            ("Object", "Object", "object"),
+            ("Object List", "Objects", "objects"))
+
+        vectorization = AutoSelectVectorization()
+        vectorization.input(self, "useObjectList", self.inputs[0])
+        vectorization.output(self, "useObjectList", self.outputs[0])
+        self.newSocketEffect(vectorization)
 
     def draw(self, layout):
-        layout.prop(self, "attribute", text = "")
+        col = layout.column()
+        col.prop(self, "attribute", text = "")
+        if self.useObjectList:
+            col.prop(self, "useValueList", text = "Multiple Values")
         if self.errorMessage != "":
             layout.label(self.errorMessage, icon = "ERROR")
 
@@ -34,7 +53,17 @@ class ObjectAttributeOutputNode(bpy.types.Node, AnimationNode):
 
         yield "try:"
         yield "    self.errorMessage = ''"
-        yield "    " + code
+        if self.useObjectList:
+            if self.useValueList:
+                yield "    if len(objects) != len(values):"
+                yield "        self.errorMessage = 'Lists have different length'"
+                yield "        raise Exception()"
+                yield "    for object, value in zip(objects, values):"
+            else:
+                yield "    for object in objects:"
+            yield "        " + code
+        else:
+            yield "    " + code
         yield "except AttributeError:"
         yield "    if object: self.errorMessage = 'Attribute not found'"
         yield "except KeyError:"
@@ -43,6 +72,9 @@ class ObjectAttributeOutputNode(bpy.types.Node, AnimationNode):
         yield "    if object: self.errorMessage = 'Index not found'"
         yield "except (ValueError, TypeError):"
         yield "    if object: self.errorMessage = 'Value has a wrong type'"
+        yield "except:"
+        yield "    if object and self.errorMessage == '':"
+        yield "        self.errorMessage = 'Unknown error'"
 
     @property
     def evaluationExpression(self):
@@ -50,7 +82,11 @@ class ObjectAttributeOutputNode(bpy.types.Node, AnimationNode):
         else: return "object." + self.attribute + " = value"
 
     def getBakeCode(self):
-        if isCodeValid(self.attribute):
+        if not isCodeValid(self.attribute): return
+        if self.useObjectList:
+            yield "for object in objects:"
+            yield "    if object is None: continue"
+        else:
             yield "if object is not None:"
-            yield "    try: object.keyframe_insert({})".format(repr(self.attribute))
-            yield "    except: pass"
+        yield "    try: object.keyframe_insert({})".format(repr(self.attribute))
+        yield "    except: pass"
