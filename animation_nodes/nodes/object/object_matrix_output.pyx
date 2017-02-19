@@ -90,7 +90,7 @@ class ObjectMatrixOutputNode(bpy.types.Node, AnimationNode):
         return objects
 
     def getBakeCode(self):
-        if isList(self.inputs[0].dataType):
+        if self.useObjectList:
             yield "for object in objects:"
             yield "    if object is not None:"
             yield "        object.keyframe_insert('location')"
