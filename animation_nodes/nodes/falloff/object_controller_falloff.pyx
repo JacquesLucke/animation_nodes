@@ -4,7 +4,7 @@ from ... events import propertyChanged
 from ... base_types import AnimationNode
 from ... algorithms.rotations import eulerToDirection
 from ... data_structures cimport BaseFalloff, DoubleList
-from . remap_falloff import RemapFalloff
+from . invert_falloff import InvertFalloff
 from . constant_falloff import ConstantFalloff
 from . interpolate_falloff import InterpolateFalloff
 from . directional_falloff import UniDirectionalFalloff
@@ -73,5 +73,5 @@ class ObjectControllerFalloffNode(bpy.types.Node, AnimationNode):
 
     def applyInterpolationAndInvert(self, falloff, interpolation, invert):
         falloff = InterpolateFalloff(falloff, interpolation)
-        if invert: falloff = RemapFalloff(falloff, 1, 0)
+        if invert: falloff = InvertFalloff(falloff)
         return falloff
