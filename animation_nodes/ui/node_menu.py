@@ -461,8 +461,13 @@ class FalloffMenu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        insertNode(layout, "an_ConstantFalloffNode", "Constant")
+        insertNode(layout, "an_DelayFalloffNode", "Delay")
+        insertNode(layout, "an_WiggleFalloffNode", "Wiggle")
         insertNode(layout, "an_RandomFalloffNode", "Random")
+        insertNode(layout, "an_IndexMaskFalloffNode", "Index Mask")
+        insertNode(layout, "an_ObjectControllerFalloffNode", "Object Controller")
+        layout.separator()
+        insertNode(layout, "an_ConstantFalloffNode", "Constant")
         insertNode(layout, "an_CustomFalloffNode", "Custom")
         layout.separator()
         insertNode(layout, "an_DirectionalFalloffNode", "Directional")
