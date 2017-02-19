@@ -92,12 +92,9 @@ class ObjectMatrixOutputNode(bpy.types.Node, AnimationNode):
     def getBakeCode(self):
         if self.useObjectList:
             yield "for object in objects:"
-            yield "    if object is not None:"
-            yield "        object.keyframe_insert('location')"
-            yield "        object.keyframe_insert('rotation_euler')"
-            yield "        object.keyframe_insert('scale')"
+            yield "    if object is None: continue"
         else:
             yield "if object is not None:"
-            yield "    object.keyframe_insert('location')"
-            yield "    object.keyframe_insert('rotation_euler')"
-            yield "    object.keyframe_insert('scale')"
+        yield "    object.keyframe_insert('location')"
+        yield "    object.keyframe_insert('rotation_euler')"
+        yield "    object.keyframe_insert('scale')"
