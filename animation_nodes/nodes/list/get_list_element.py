@@ -9,7 +9,7 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
     bl_label = "Get List Element"
     dynamicLabelType = "HIDDEN_ONLY"
 
-    assignedType = StringProperty(update = AnimationNode.updateSockets, default = "Float")
+    assignedType = StringProperty(update = AnimationNode.refresh, default = "Float")
 
     clampIndex = BoolProperty(name = "Clamp Index", default = False,
         description = "Clamp the index between the lowest and highest possible index",

@@ -12,7 +12,7 @@ class ConvertToIntegerListNode(bpy.types.Node, AnimationNode):
     bl_label = "Convert to Integer List"
 
     originType = EnumProperty(name = "Origin Type", default = "Float List",
-        items = originTypeItems, update = AnimationNode.updateSockets)
+        items = originTypeItems, update = AnimationNode.refresh)
 
     def setup(self):
         self.width_hidden = 45

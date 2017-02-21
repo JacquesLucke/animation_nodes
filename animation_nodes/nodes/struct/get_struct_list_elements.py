@@ -17,7 +17,7 @@ class GetStructListElementsNode(bpy.types.Node, AnimationNode):
     elementKey = StringProperty(name = "Key", update = propertyChanged)
 
     elementDataType = StringProperty(name = "Data Type", default = "Integer",
-        update = AnimationNode.updateSockets)
+        update = AnimationNode.refresh)
 
     errorMessage = StringProperty()
 

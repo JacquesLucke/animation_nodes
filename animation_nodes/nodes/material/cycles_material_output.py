@@ -31,10 +31,10 @@ class CyclesMaterialOutputNode(bpy.types.Node, AnimationNode):
                     identifiers.append(socket)
         return identifiers
 
-    materialName = StringProperty(update = AnimationNode.updateSockets)
-    nodeName = StringProperty(update = AnimationNode.updateSockets)
+    materialName = StringProperty(update = AnimationNode.refresh)
+    nodeName = StringProperty(update = AnimationNode.refresh)
     socketIdentifier = EnumProperty(name = "Socket", items = getPossibleSocketItems,
-        update = AnimationNode.updateSockets)
+        update = AnimationNode.refresh)
 
     def create(self):
         socket = self.getSelectedSocket()

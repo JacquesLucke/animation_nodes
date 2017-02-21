@@ -40,9 +40,9 @@ class OffsetMatricesNode(bpy.types.Node, AnimationNode):
     originAsScalePivot = BoolProperty(name = "Origin Scale", default = False,
         update = propertyChanged, description = "Use world center as scale pivot")
 
-    useTranslationList = BoolProperty(update = AnimationNode.updateSockets)
-    useRotationList = BoolProperty(update = AnimationNode.updateSockets)
-    useScaleList = BoolProperty(update = AnimationNode.updateSockets)
+    useTranslationList = BoolProperty(update = AnimationNode.refresh)
+    useRotationList = BoolProperty(update = AnimationNode.refresh)
+    useScaleList = BoolProperty(update = AnimationNode.refresh)
 
     def create(self):
         self.newInput("Matrix List", "Matrices", "inMatrices")

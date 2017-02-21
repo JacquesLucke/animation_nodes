@@ -20,7 +20,7 @@ class FilterBlendDataListByNameNode(bpy.types.Node, AnimationNode):
 
     # Should be set only on node creation
     dataType = StringProperty(name = "Data Type", default = "Object",
-        update = AnimationNode.updateSockets)
+        update = AnimationNode.refresh)
 
     filterType = EnumProperty(name = "Filter Type", default = "STARTS_WITH",
         items = filterTypeItems, update = executionCodeChanged)

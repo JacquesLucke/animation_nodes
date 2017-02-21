@@ -20,7 +20,7 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
                   ("Set Vertices on Object (old)", {"meshDataType" : repr("VERTICES")}) ]
 
     meshDataType = EnumProperty(name = "Mesh Data Type", default = "MESH_DATA",
-        items = meshDataTypeItems, update = AnimationNode.updateSockets)
+        items = meshDataTypeItems, update = AnimationNode.refresh)
 
     updateMesh = BoolProperty(name = "Update Mesh", default = True,
         description = "Update create mesh to recalculate other mesh related data",

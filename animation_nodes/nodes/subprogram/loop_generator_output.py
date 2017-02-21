@@ -12,7 +12,7 @@ class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
     dynamicLabelType = "ALWAYS"
 
     def settingChanged(self, context):
-        self.updateSockets()
+        self.refresh()
         subprogramInterfaceChanged()
 
     outputName = StringProperty(name = "Generator Name", update = settingChanged)

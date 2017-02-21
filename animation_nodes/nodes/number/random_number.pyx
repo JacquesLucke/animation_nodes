@@ -16,7 +16,7 @@ class RandomNumberNode(bpy.types.Node, AnimationNode):
 
     createList = BoolProperty(name = "Create List", default = False,
         description = "Create a list of random numbers",
-        update = AnimationNode.updateSockets)
+        update = AnimationNode.refresh)
 
     def setup(self):
         self.randomizeNodeSeed()

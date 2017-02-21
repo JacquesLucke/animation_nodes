@@ -7,7 +7,7 @@ class SeparateVectorNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SeparateVectorNode"
     bl_label = "Separate Vector"
 
-    useList = BoolProperty(default = False, update = AnimationNode.updateSockets)
+    useList = BoolProperty(default = False, update = AnimationNode.refresh)
 
     def create(self):
         self.newInputGroup(self.useList,

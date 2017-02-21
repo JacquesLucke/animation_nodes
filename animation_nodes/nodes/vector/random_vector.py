@@ -13,7 +13,7 @@ class RandomVectorNode(bpy.types.Node, AnimationNode):
 
     createList = BoolProperty(name = "Create List", default = False,
         description = "Create a list of random vectors",
-        update = AnimationNode.updateSockets)
+        update = AnimationNode.refresh)
 
     def setup(self):
         self.randomizeNodeSeed()

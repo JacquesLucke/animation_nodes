@@ -7,7 +7,7 @@ class NumberToBooleanNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_NumberToBooleanNode"
     bl_label = "Number to Boolean"
 
-    useList = BoolProperty(update = AnimationNode.updateSockets)
+    useList = BoolProperty(update = AnimationNode.refresh)
 
     def create(self):
         self.newInputGroup(self.useList,

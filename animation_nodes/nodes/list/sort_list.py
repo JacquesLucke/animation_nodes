@@ -29,7 +29,7 @@ class SortListNode(bpy.types.Node, AnimationNode):
     errorMessage = StringProperty()
 
     assignedType = StringProperty(default = "Object List",
-        update = AnimationNode.updateSockets)
+        update = AnimationNode.refresh)
 
     templateData = PointerProperty(type = SortingTemplateProperties)
 
@@ -41,7 +41,7 @@ class SortListNode(bpy.types.Node, AnimationNode):
         return items
 
     activeTemplateIdentifier = EnumProperty(name = "Template",
-        update = AnimationNode.updateSockets, items = getSortingTemplateItems)
+        update = AnimationNode.refresh, items = getSortingTemplateItems)
 
     def setup(self):
         self.activeTemplateIdentifier = "CUSTOM"

@@ -13,7 +13,7 @@ class BarycentricTransformNode(bpy.types.Node, AnimationNode):
     bl_width_default = 160
 
     operationType = EnumProperty(name = "Operation Type", default = "POINT",
-        items = operationTypeItems, update = AnimationNode.updateSockets)
+        items = operationTypeItems, update = AnimationNode.refresh)
 
     errorMessage = StringProperty()
 

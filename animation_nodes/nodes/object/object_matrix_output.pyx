@@ -18,8 +18,8 @@ class ObjectMatrixOutputNode(bpy.types.Node, AnimationNode):
 
     outputType = EnumProperty(items = outputItems, update = executionCodeChanged, default = "WORLD")
 
-    useObjectList = BoolProperty(default = False, update = AnimationNode.updateSockets)
-    useMatrixList = BoolProperty(default = False, update = AnimationNode.updateSockets)
+    useObjectList = BoolProperty(default = False, update = AnimationNode.refresh)
+    useMatrixList = BoolProperty(default = False, update = AnimationNode.refresh)
 
     def create(self):
         self.newInputGroup(self.useObjectList,

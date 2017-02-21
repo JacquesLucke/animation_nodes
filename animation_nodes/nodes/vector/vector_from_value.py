@@ -6,7 +6,7 @@ class VectorFromValueNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_VectorFromValueNode"
     bl_label = "Vector from Value"
 
-    useList = BoolProperty(update = AnimationNode.updateSockets)
+    useList = BoolProperty(update = AnimationNode.refresh)
 
     def create(self):
         self.newInputGroup(self.useList,

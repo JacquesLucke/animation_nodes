@@ -19,7 +19,7 @@ class ConvertVectorAndEulerNode(bpy.types.Node, AnimationNode):
         update = executionCodeChanged)
 
     conversionType = EnumProperty(name = "Conversion Type", default = "VECTOR_TO_EULER",
-        update = AnimationNode.updateSockets, items = conversionTypeItems)
+        update = AnimationNode.refresh, items = conversionTypeItems)
 
     def create(self):
         if self.conversionType == "VECTOR_TO_EULER":

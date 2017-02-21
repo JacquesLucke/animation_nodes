@@ -18,7 +18,7 @@ class BlendDataByNameNode(bpy.types.Node, AnimationNode):
 
     # Should be set only on node creation
     dataType = StringProperty(name = "Data Type", default = "Object",
-        update = AnimationNode.updateSockets)
+        update = AnimationNode.refresh)
 
     def create(self):
         self.newInput("Text", "Name", "name", defaultDrawType = "PROPERTY_ONLY")

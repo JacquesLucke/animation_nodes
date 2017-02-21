@@ -8,7 +8,7 @@ class SetListElementNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SetListElementNode"
     bl_label = "Set List Element"
 
-    assignedType = StringProperty(update = AnimationNode.updateSockets, default = "Float")
+    assignedType = StringProperty(update = AnimationNode.refresh, default = "Float")
 
     clampIndex = BoolProperty(name = "Clamp Index", default = False,
         description = "Clamp the index between the lowest and highest possible index",

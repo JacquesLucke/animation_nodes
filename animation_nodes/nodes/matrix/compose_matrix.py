@@ -6,9 +6,9 @@ class ComposeMatrixNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ComposeMatrixNode"
     bl_label = "Compose Matrix"
 
-    useTranslationList = BoolProperty(update = AnimationNode.updateSockets)
-    useRotationList = BoolProperty(update = AnimationNode.updateSockets)
-    useScaleList = BoolProperty(update = AnimationNode.updateSockets)
+    useTranslationList = BoolProperty(update = AnimationNode.refresh)
+    useRotationList = BoolProperty(update = AnimationNode.refresh)
+    useScaleList = BoolProperty(update = AnimationNode.refresh)
 
     def create(self):
         self.newInputGroup(self.useTranslationList,

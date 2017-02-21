@@ -11,7 +11,7 @@ class ReplicateMeshDataNode(bpy.types.Node, AnimationNode):
     bl_label = "Replicate Mesh Data"
 
     transformationType = StringProperty(default = "Matrix List",
-        update = AnimationNode.updateSockets)
+        update = AnimationNode.refresh)
 
     def create(self):
         self.newInput("Mesh Data", "Mesh Data", "sourceMeshData")

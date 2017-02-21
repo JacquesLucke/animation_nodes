@@ -13,7 +13,7 @@ class EvaluateFalloffNode(bpy.types.Node, AnimationNode):
     bl_label = "Evaluate Falloff"
 
     falloffType = EnumProperty(name = "Falloff Type",
-        items = falloffTypeItems, update = AnimationNode.updateSockets)
+        items = falloffTypeItems, update = AnimationNode.refresh)
 
     def create(self):
         self.newInput("Falloff", "Falloff", "falloff")

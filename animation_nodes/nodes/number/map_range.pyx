@@ -11,13 +11,13 @@ class MapRangeNode(bpy.types.Node, AnimationNode):
 
     clampInput = BoolProperty(name = "Clamp Input", default = True,
         description = "The input will be between Input Min and Input Max",
-        update = AnimationNode.updateSockets)
+        update = AnimationNode.refresh)
 
     useInterpolation = BoolProperty(name = "Use Interpolation", default = False,
         description = "Don't use the normal linear interpolation between Min and Max (only available when clamp is turned on)",
-        update = AnimationNode.updateSockets)
+        update = AnimationNode.refresh)
 
-    useValueList = BoolProperty(default = False, update = AnimationNode.updateSockets)
+    useValueList = BoolProperty(default = False, update = AnimationNode.refresh)
 
     def create(self):
         self.newInputGroup(self.useValueList,

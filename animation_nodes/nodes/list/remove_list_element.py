@@ -16,7 +16,7 @@ class RemoveListElementNode(bpy.types.Node, AnimationNode):
 
     def typeChanged(self, context):
         if self.isAllowedDataType(self.assignedType):
-            self.updateSockets()
+            self.refresh()
         else:
             self.reset_and_show_error()
 

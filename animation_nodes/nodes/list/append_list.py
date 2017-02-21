@@ -7,7 +7,7 @@ class AppendListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_AppendListNode"
     bl_label = "Append to List"
 
-    assignedType = StringProperty(update = AnimationNode.updateSockets, default = "Float")
+    assignedType = StringProperty(update = AnimationNode.refresh, default = "Float")
 
     def create(self):
         baseDataType = self.assignedType

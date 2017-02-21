@@ -14,8 +14,8 @@ class DirectionToRotationNode(bpy.types.Node, AnimationNode):
     trackAxis = EnumProperty(items = trackAxisItems, update = propertyChanged, default = "Z")
     guideAxis = EnumProperty(items = guideAxisItems, update = propertyChanged, default = "X")
 
-    useDirectionList = BoolProperty(update = AnimationNode.updateSockets)
-    useGuideList = BoolProperty(update = AnimationNode.updateSockets)
+    useDirectionList = BoolProperty(update = AnimationNode.refresh)
+    useGuideList = BoolProperty(update = AnimationNode.refresh)
 
     def create(self):
         self.newInputGroup(self.useDirectionList,

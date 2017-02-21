@@ -9,9 +9,9 @@ class CombineVectorNode(bpy.types.Node, AnimationNode):
     bl_label = "Combine Vector"
     dynamicLabelType = "HIDDEN_ONLY"
 
-    useListX = BoolProperty(update = AnimationNode.updateSockets)
-    useListY = BoolProperty(update = AnimationNode.updateSockets)
-    useListZ = BoolProperty(update = AnimationNode.updateSockets)
+    useListX = BoolProperty(update = AnimationNode.refresh)
+    useListY = BoolProperty(update = AnimationNode.refresh)
+    useListZ = BoolProperty(update = AnimationNode.refresh)
 
     errorMessage = StringProperty()
 

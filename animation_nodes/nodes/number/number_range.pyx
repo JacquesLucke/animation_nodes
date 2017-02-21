@@ -13,7 +13,7 @@ class NumberRangeNode(bpy.types.Node, AnimationNode):
     searchTags = [ ("Float Range", {"dataType" : repr("Float")}),
                    ("Integer Range", {"dataType" : repr("Integer")}) ]
 
-    dataType = StringProperty(default = "Float", update = AnimationNode.updateSockets)
+    dataType = StringProperty(default = "Float", update = AnimationNode.refresh)
 
     def create(self):
         self.newInput("Integer", "Amount", "amount", value = 5)

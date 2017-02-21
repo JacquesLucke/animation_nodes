@@ -42,7 +42,7 @@ class QuaternionMathNode(bpy.types.Node, AnimationNode):
     dynamicLabelType = "HIDDEN_ONLY"
 
     operation = EnumProperty(name = "Operation", default = "ADD",
-        items = operationItems, update = AnimationNode.updateSockets)
+        items = operationItems, update = AnimationNode.refresh)
 
     def create(self):
         self.newInput("Quaternion", "A", "a")

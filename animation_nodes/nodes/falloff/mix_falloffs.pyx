@@ -16,7 +16,7 @@ class MixFalloffsNode(bpy.types.Node, AnimationNode):
     bl_label = "Mix Falloffs"
 
     mixType = EnumProperty(name = "Mix Type", items = mixTypeItems,
-        default = "MAX", update = AnimationNode.updateSockets)
+        default = "MAX", update = AnimationNode.refresh)
 
     def create(self):
         self.newInput("Falloff", "A", "a")

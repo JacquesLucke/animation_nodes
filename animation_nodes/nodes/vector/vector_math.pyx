@@ -173,13 +173,13 @@ class VectorMathNode(bpy.types.Node, AnimationNode):
     searchTags = [(name, {"operation" : repr(op)}) for name, op in searchItems.items()]
 
     operation = EnumProperty(name = "Operation", default = "Add",
-        items = operationItems, update = AnimationNode.updateSockets)
+        items = operationItems, update = AnimationNode.refresh)
 
-    useListA = BoolProperty(default = False, update = AnimationNode.updateSockets)
-    useListB = BoolProperty(default = False, update = AnimationNode.updateSockets)
-    useListLength = BoolProperty(default = False, update = AnimationNode.updateSockets)
-    useListFactor = BoolProperty(default = False, update = AnimationNode.updateSockets)
-    useListStep = BoolProperty(default = False, update = AnimationNode.updateSockets)
+    useListA = BoolProperty(default = False, update = AnimationNode.refresh)
+    useListB = BoolProperty(default = False, update = AnimationNode.refresh)
+    useListLength = BoolProperty(default = False, update = AnimationNode.refresh)
+    useListFactor = BoolProperty(default = False, update = AnimationNode.refresh)
+    useListStep = BoolProperty(default = False, update = AnimationNode.refresh)
 
     errorMessage = StringProperty()
 

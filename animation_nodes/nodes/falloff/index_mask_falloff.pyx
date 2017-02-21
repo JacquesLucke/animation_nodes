@@ -17,7 +17,7 @@ class IndexMaskFalloffNode(bpy.types.Node, AnimationNode):
     bl_width_default = 150
 
     maskType = EnumProperty(name = "Mask Type",
-        items = maskTypeItems, update = AnimationNode.updateSockets)
+        items = maskTypeItems, update = AnimationNode.refresh)
 
     def create(self):
         if self.maskType == "EVERY_NTH":

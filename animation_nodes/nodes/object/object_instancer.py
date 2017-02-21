@@ -37,7 +37,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
     searchTags = ["Object Replicator (old)"]
 
     def copyFromSourceChanged(self, context):
-        self.updateSockets()
+        self.refresh()
         self.resetInstancesEvent(context)
 
     def resetInstancesEvent(self, context):

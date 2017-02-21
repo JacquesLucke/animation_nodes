@@ -13,10 +13,10 @@ class GetRandomListElementsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GetRandomListElementsNode"
     bl_label = "Get Random List Elements"
 
-    assignedType = StringProperty(update = AnimationNode.updateSockets, default = "Float List")
+    assignedType = StringProperty(update = AnimationNode.refresh, default = "Float List")
 
     selectionType = EnumProperty(name = "Select Type", default = "MULTIPLE",
-        items = selectionTypeItems, update = AnimationNode.updateSockets)
+        items = selectionTypeItems, update = AnimationNode.refresh)
 
     nodeSeed = IntProperty(update = propertyChanged)
 

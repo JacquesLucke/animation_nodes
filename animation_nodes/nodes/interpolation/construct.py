@@ -28,7 +28,7 @@ class ConstructInterpolationNode(bpy.types.Node, AnimationNode):
     bl_width_default = 160
 
     category = EnumProperty(name = "Category", default = "LINEAR",
-        items = categoryItems, update = AnimationNode.updateSockets)
+        items = categoryItems, update = AnimationNode.refresh)
 
     easeIn = BoolProperty(name = "Ease In", default = False, update = executionCodeChanged)
     easeOut = BoolProperty(name = "Ease Out", default = True, update = executionCodeChanged)

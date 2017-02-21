@@ -18,13 +18,13 @@ class RepeatListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_RepeatListNode"
     bl_label = "Repeat List"
 
-    assignedType = StringProperty(update = AnimationNode.updateSockets, default = "Float List")
+    assignedType = StringProperty(update = AnimationNode.refresh, default = "Float List")
 
     repetitionType = EnumProperty(name = "Repeat Type", default = "LOOP",
         items = repetitionTypeItems, update = executionCodeChanged)
 
     amountType = EnumProperty(name = "Amount Type", default = "AMOUNT",
-        items = amountTypeItems, update = AnimationNode.updateSockets)
+        items = amountTypeItems, update = AnimationNode.refresh)
 
     makeElementCopies = BoolProperty(name = "Make Element Copies", default = True,
         description = "Insert copies of the original elements",

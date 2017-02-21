@@ -19,7 +19,7 @@ class SplinesFromObjectNode(bpy.types.Node, AnimationNode):
         default = True, update = propertyChanged)
 
     importType = EnumProperty(name = "Import Type", default = "ALL",
-        items = importTypeItems, update = AnimationNode.updateSockets)
+        items = importTypeItems, update = AnimationNode.refresh)
 
     errorMessage = StringProperty()
 

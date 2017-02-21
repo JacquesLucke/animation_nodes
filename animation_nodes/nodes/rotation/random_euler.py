@@ -14,7 +14,7 @@ class RandomEulerNode(bpy.types.Node, AnimationNode):
 
     createList = BoolProperty(name = "Create List", default = False,
         description = "Create a list of random eulers",
-        update = AnimationNode.updateSockets)
+        update = AnimationNode.refresh)
 
     def create(self):
         if self.createList:

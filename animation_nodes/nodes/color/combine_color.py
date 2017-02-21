@@ -19,7 +19,7 @@ class CombineColorNode(bpy.types.Node, AnimationNode):
     dynamicLabelType = "HIDDEN_ONLY"
 
     sourceType = EnumProperty(name = "Source Type", default = "RGB",
-        items = sourceTypeItems, update = AnimationNode.updateSockets)
+        items = sourceTypeItems, update = AnimationNode.refresh)
 
     def create(self):
         if self.sourceType == "RGB":

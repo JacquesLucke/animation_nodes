@@ -10,7 +10,7 @@ class RotationToDirectionNode(bpy.types.Node, AnimationNode):
     bl_label = "Rotation to Direction"
     bl_width_default = 160
 
-    useRotationList = BoolProperty(update = AnimationNode.updateSockets)
+    useRotationList = BoolProperty(update = AnimationNode.refresh)
 
     directionAxis = EnumProperty(items = directionAxisItems, update = propertyChanged, default = "Z")
 

@@ -13,7 +13,7 @@ class ConstructBVHTreeNode(bpy.types.Node, AnimationNode):
     bl_width_default = 160
 
     sourceType = EnumProperty(name = "Source Type", default = "MESH_DATA",
-        items = sourceTypeItems, update = AnimationNode.updateSockets)
+        items = sourceTypeItems, update = AnimationNode.refresh)
 
     def create(self):
         if self.sourceType == "MESH_DATA":

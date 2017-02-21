@@ -12,7 +12,7 @@ class FillListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_FillListNode"
     bl_label = "Fill List"
 
-    assignedType = StringProperty(update = AnimationNode.updateSockets, default = "Float")
+    assignedType = StringProperty(update = AnimationNode.refresh, default = "Float")
 
     fillMode = EnumProperty(name = "Fill Mode", default = "RIGHT",
         items = fillModeItems, update = executionCodeChanged)

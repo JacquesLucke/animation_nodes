@@ -171,17 +171,17 @@ class AnimationNode:
         self.applySocketEffects()
         self.edit()
 
-    def updateSockets(self, context = None):
+    def refresh(self, context = None):
         if not hasattr(self, "create"):
             return
 
         @keepNodeState
         def createWrapper(self):
-            self._updateSockets()
+            self._refresh()
 
         createWrapper(self)
 
-    def _updateSockets(self):
+    def _refresh(self):
         if not hasattr(self, "create"):
             return
         self.clearSockets()

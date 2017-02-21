@@ -8,7 +8,7 @@ class OffsetVectorsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_OffsetVectorsNode"
     bl_label = "Offset Vectors"
 
-    useOffsetList = BoolProperty(default = False, update = AnimationNode.updateSockets)
+    useOffsetList = BoolProperty(default = False, update = AnimationNode.refresh)
 
     errorMessage = StringProperty()
     clampFalloff = BoolProperty(name = "Clamp Falloff", default = False)

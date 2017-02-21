@@ -18,7 +18,7 @@ class ListBooleanOperationsNode(bpy.types.Node, AnimationNode):
     operation = EnumProperty(name = "Operation", default = "UNION",
         items = operationItems, update = executionCodeChanged)
 
-    assignedType = StringProperty(update = AnimationNode.updateSockets, default = "Object List")
+    assignedType = StringProperty(update = AnimationNode.refresh, default = "Object List")
 
     def create(self):
         self.newInput(self.assignedType, "List 1", "list1", dataIsModified = True)

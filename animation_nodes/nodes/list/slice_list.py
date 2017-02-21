@@ -12,17 +12,17 @@ class SliceListNode(bpy.types.Node, AnimationNode):
     bl_label = "Slice List"
     bl_width_default = 170
 
-    assignedType = StringProperty(update = AnimationNode.updateSockets, default = "Float")
+    assignedType = StringProperty(update = AnimationNode.refresh, default = "Float")
 
     useStart = BoolProperty(name = "Start", default = True,
-        update = AnimationNode.updateSockets)
+        update = AnimationNode.refresh)
     useEnd = BoolProperty(name = "End", default = True,
-        update = AnimationNode.updateSockets)
+        update = AnimationNode.refresh)
     useStep = BoolProperty(name = "Step", default = False,
-        update = AnimationNode.updateSockets)
+        update = AnimationNode.refresh)
 
     sliceEndType = EnumProperty(name = "Slice Type", default = "END_INDEX",
-        items = sliceEndType, update = AnimationNode.updateSockets)
+        items = sliceEndType, update = AnimationNode.refresh)
 
     def create(self):
         listDataType = toListDataType(self.assignedType)

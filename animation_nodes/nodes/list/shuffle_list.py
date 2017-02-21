@@ -10,7 +10,7 @@ class ShuffleListNode(bpy.types.Node, AnimationNode):
 
     nodeSeed = IntProperty(name = "Node Seed", update = propertyChanged)
 
-    assignedType = StringProperty(update = AnimationNode.updateSockets, default = "Float List")
+    assignedType = StringProperty(update = AnimationNode.refresh, default = "Float List")
 
     def setup(self):
         self.randomizeNodeSeed()

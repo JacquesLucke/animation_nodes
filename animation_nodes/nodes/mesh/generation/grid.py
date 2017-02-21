@@ -13,7 +13,7 @@ class GridMeshNode(bpy.types.Node, AnimationNode):
     bl_width_default = 160
 
     mode = EnumProperty(name = "Mode", default = "STEP",
-        update = AnimationNode.updateSockets, items = modeItems)
+        update = AnimationNode.refresh, items = modeItems)
 
     def create(self):
         if self.mode == "STEP":

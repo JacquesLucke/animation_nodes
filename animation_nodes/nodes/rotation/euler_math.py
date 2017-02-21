@@ -31,11 +31,11 @@ class EulerMathNode(bpy.types.Node, AnimationNode):
     dynamicLabelType = "HIDDEN_ONLY"
 
     operation = EnumProperty(name = "Operation", default = "ADD",
-        items = operationItems, update = AnimationNode.updateSockets)
+        items = operationItems, update = AnimationNode.refresh)
 
     useDegree = BoolProperty(name = "Use Degrees",
         description = "Multiply and Divide degrees. If false, operation will use radians (output is always radians)",
-        default = True, update = AnimationNode.updateSockets)
+        default = True, update = AnimationNode.refresh)
 
     def create(self):
         self.newInput("Euler", "A", "a")

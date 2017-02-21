@@ -14,12 +14,12 @@ class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
                     "keyName" : repr("Initial Transforms")})]
 
     keyDataType = EnumProperty(name = "Key Data Type", default = "Transforms",
-        items = keyDataTypeItems, update = AnimationNode.updateSockets)
+        items = keyDataTypeItems, update = AnimationNode.refresh)
 
     keyName = StringProperty(name = "Key Name", default = "",
-        update = AnimationNode.updateSockets)
+        update = AnimationNode.refresh)
 
-    useList = BoolProperty(default = False, update = AnimationNode.updateSockets)
+    useList = BoolProperty(default = False, update = AnimationNode.refresh)
 
     def create(self):
         self.newInputGroup(self.useList,

@@ -12,8 +12,8 @@ class ObjectAttributeOutputNode(bpy.types.Node, AnimationNode):
     attribute = StringProperty(name = "Attribute", default = "",
         update = executionCodeChanged)
 
-    useObjectList = BoolProperty(default = False, update = AnimationNode.updateSockets)
-    useValueList = BoolProperty(default = False, update = AnimationNode.updateSockets)
+    useObjectList = BoolProperty(default = False, update = AnimationNode.refresh)
+    useValueList = BoolProperty(default = False, update = AnimationNode.refresh)
 
     errorMessage = StringProperty()
 

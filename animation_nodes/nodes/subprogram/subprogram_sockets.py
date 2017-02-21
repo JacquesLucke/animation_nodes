@@ -4,7 +4,7 @@ from ... import tree_info
 def _updateSubprogramInvokerNodes():
     tree_info.updateIfNecessary()
     for node in tree_info.getNodesByType("an_InvokeSubprogramNode"):
-        node.updateSockets()
+        node.refresh()
     tree_info.updateIfNecessary()
 
 

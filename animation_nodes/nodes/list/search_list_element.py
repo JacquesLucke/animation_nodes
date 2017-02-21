@@ -8,7 +8,7 @@ class SearchListElementNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SearchListElementNode"
     bl_label = "Search List Element"
 
-    assignedType = StringProperty(update = AnimationNode.updateSockets, default = "Float")
+    assignedType = StringProperty(update = AnimationNode.refresh, default = "Float")
 
     def create(self):
         baseDataType = self.assignedType

@@ -13,7 +13,7 @@ class RotationMatrixNode(bpy.types.Node, AnimationNode):
     bl_label = "Rotation Matrix"
 
     axis = EnumProperty(default = "X", items = axisItems,
-        update = AnimationNode.updateSockets)
+        update = AnimationNode.refresh)
 
     def create(self):
         socketType = "Euler" if self.axis == "ALL" else "Float"

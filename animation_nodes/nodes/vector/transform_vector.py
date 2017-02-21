@@ -6,7 +6,7 @@ class TransformVectorNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_TransformVectorNode"
     bl_label = "Transform Vector"
 
-    useVectorList = BoolProperty(default = False, update = AnimationNode.updateSockets)
+    useVectorList = BoolProperty(default = False, update = AnimationNode.refresh)
 
     def create(self):
         self.newInputGroup(self.useVectorList,

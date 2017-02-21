@@ -11,7 +11,7 @@ class ShearMatrixNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ShearMatrixNode"
     bl_label = "Shear Matrix"
 
-    plane = EnumProperty(items = planeItems, update = AnimationNode.updateSockets)
+    plane = EnumProperty(items = planeItems, update = AnimationNode.refresh)
 
     def create(self):
         if self.plane == "XY":

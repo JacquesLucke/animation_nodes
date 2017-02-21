@@ -23,7 +23,7 @@ class ConvertRotationsNode(bpy.types.Node, AnimationNode):
     searchTags = [(name, {"conversionType" : repr(type)}) for type, name, _,_,_ in conversionTypeItems]
 
     conversionType = EnumProperty(name = "Conversion Type", default = "QUATERNION_TO_EULER",
-        items = conversionTypeItems, update = AnimationNode.updateSockets)
+        items = conversionTypeItems, update = AnimationNode.refresh)
 
     useDegree = BoolProperty(name = "Use Degree", default = False, update = executionCodeChanged)
 

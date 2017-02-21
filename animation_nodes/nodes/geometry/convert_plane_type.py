@@ -15,7 +15,7 @@ class ConvertPlaneTypeNode(bpy.types.Node, AnimationNode):
     searchTags = [(name, {"conversionType" : repr(type)}) for type, name, _,_,_ in conversionTypeItems]
 
     conversionType = EnumProperty(name = "Conversion Type", default = "MATRIX_TO_POINT_NORMAL",
-        items = conversionTypeItems, update = AnimationNode.updateSockets)
+        items = conversionTypeItems, update = AnimationNode.refresh)
 
     def create(self):
         if self.conversionType == "POINT_NORMAL_TO_MATRIX":

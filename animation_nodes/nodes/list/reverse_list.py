@@ -7,7 +7,7 @@ class ReverseListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ReverseListNode"
     bl_label = "Reverse List"
 
-    assignedType = StringProperty(update = AnimationNode.updateSockets, default = "Float List")
+    assignedType = StringProperty(update = AnimationNode.refresh, default = "Float List")
 
     def create(self):
         listDataType = self.assignedType

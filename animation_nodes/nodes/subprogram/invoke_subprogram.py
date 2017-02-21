@@ -24,7 +24,7 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
     bl_width_default = 170
 
     def subprogramIdentifierChanged(self, context):
-        self.updateSockets()
+        self.refresh()
         executionCodeChanged()
 
     subprogramIdentifier = StringProperty(name = "Subprogram Identifier", default = "", update = subprogramIdentifierChanged)
@@ -135,7 +135,7 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
         self.invokeFunction(layout, "clearCache", text = "Clear Cache")
 
 
-    def updateSockets(self):
+    def refresh(self):
         subprogram = self.subprogramNode
         if subprogram is None: self.clearSockets()
         else:

@@ -15,7 +15,7 @@ class ChangeMatrixPivotNode(bpy.types.Node, AnimationNode):
     bl_width_default = 150
 
     pivotType = EnumProperty(name = "Input Type", default = "MATRIX",
-        items = pivotTypeItems, update = AnimationNode.updateSockets)
+        items = pivotTypeItems, update = AnimationNode.refresh)
 
     def create(self):
         self.newInput("Matrix", "Transform Matrix", "matrix")

@@ -10,7 +10,7 @@ class MaskListNode(bpy.types.Node, AnimationNode):
 
     errorMessage = StringProperty()
 
-    assignedType = StringProperty(default = "Integer List", update = AnimationNode.updateSockets)
+    assignedType = StringProperty(default = "Integer List", update = AnimationNode.refresh)
 
     def create(self):
         self.newInput(self.assignedType, "List", "inList")

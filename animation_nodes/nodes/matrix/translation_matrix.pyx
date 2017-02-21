@@ -8,7 +8,7 @@ class TranslationMatrixNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_TranslationMatrixNode"
     bl_label = "Translation Matrix"
 
-    useList = BoolProperty(default = False, update = AnimationNode.updateSockets)
+    useList = BoolProperty(default = False, update = AnimationNode.refresh)
 
     def create(self):
         self.newInputGroup(self.useList,

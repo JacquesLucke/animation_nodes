@@ -13,7 +13,7 @@ def updateFile():
 
     tree_info.updateIfNecessary()
     for node in iterAnimationNodes():
-        try: node._updateSockets()
+        try: node._refresh()
         except: traceback.print_exc()
 
     setSocketProperties(socketProperties)

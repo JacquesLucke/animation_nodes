@@ -154,15 +154,15 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
 
     operation = EnumProperty(name = "Operation", default = "Multiply",
         description = "Operation to perform on the inputs",
-        items = operationItems, update = AnimationNode.updateSockets)
+        items = operationItems, update = AnimationNode.refresh)
 
     errorMessage = StringProperty()
 
-    useListA = BoolProperty(default = False, update = AnimationNode.updateSockets)
-    useListB = BoolProperty(default = False, update = AnimationNode.updateSockets)
-    useListBase = BoolProperty(default = False, update = AnimationNode.updateSockets)
-    useListExponent = BoolProperty(default = False, update = AnimationNode.updateSockets)
-    useListStep = BoolProperty(default = False, update = AnimationNode.updateSockets)
+    useListA = BoolProperty(default = False, update = AnimationNode.refresh)
+    useListB = BoolProperty(default = False, update = AnimationNode.refresh)
+    useListBase = BoolProperty(default = False, update = AnimationNode.refresh)
+    useListExponent = BoolProperty(default = False, update = AnimationNode.refresh)
+    useListStep = BoolProperty(default = False, update = AnimationNode.refresh)
 
     def create(self):
         vectorization = AutoSelectVectorization()

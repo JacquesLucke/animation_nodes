@@ -8,7 +8,7 @@ class ConvertNode(bpy.types.Node, AnimationNode):
     bl_label = "Convert"
     bl_width = 100
 
-    dataType = StringProperty(default = "Generic", update = AnimationNode.updateSockets)
+    dataType = StringProperty(default = "Generic", update = AnimationNode.refresh)
     lastCorrectionType = IntProperty()
 
     def setup(self):

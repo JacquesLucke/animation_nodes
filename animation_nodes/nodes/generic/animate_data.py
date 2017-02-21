@@ -18,7 +18,7 @@ class AnimateDataNode(bpy.types.Node, AnimationNode):
                    ("Animate Euler", {"dataType" : repr("Euler")}),
                    ("Animate Quaternion", {"dataType" : repr("Quaternion")}) ]
 
-    dataType = StringProperty(default = "Float", update = AnimationNode.updateSockets)
+    dataType = StringProperty(default = "Float", update = AnimationNode.refresh)
 
     def create(self):
         self.newInput("Float", "Time", "time")

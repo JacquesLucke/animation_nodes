@@ -12,10 +12,10 @@ class CompareNode(bpy.types.Node, AnimationNode):
     bl_label = "Compare"
     dynamicLabelType = "HIDDEN_ONLY"
 
-    assignedType = StringProperty(update = AnimationNode.updateSockets, default = "Integer")
+    assignedType = StringProperty(update = AnimationNode.refresh, default = "Integer")
 
     compareType = EnumProperty(name = "Compare Type",
-        items = compare_types_items, update = AnimationNode.updateSockets)
+        items = compare_types_items, update = AnimationNode.refresh)
 
     def create(self):
         self.newInput(self.assignedType, "A", "a")

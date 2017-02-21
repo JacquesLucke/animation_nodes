@@ -12,7 +12,7 @@ class CurveObjectOutputNode(bpy.types.Node, AnimationNode):
 
     errorMessage = StringProperty()
 
-    useSplineList = BoolProperty(default = False, update = AnimationNode.updateSockets)
+    useSplineList = BoolProperty(default = False, update = AnimationNode.refresh)
 
     def create(self):
         socket = self.newInput("Object", "Object", "object")

@@ -15,7 +15,7 @@ class DataInterfaceNode(bpy.types.Node, AnimationNode):
     bl_label = "Data Interface"
 
     dataDirection = EnumProperty(name = "Data Direction", default = "IMPORT",
-        items = dataDirectionItems, update = AnimationNode.updateSockets)
+        items = dataDirectionItems, update = AnimationNode.refresh)
 
     def create(self):
         if self.dataDirection == "EXPORT":

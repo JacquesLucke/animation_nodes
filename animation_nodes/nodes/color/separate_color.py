@@ -22,7 +22,7 @@ class SeparateColorNode(bpy.types.Node, AnimationNode):
         self.recreateOutputs()
 
     targetType = EnumProperty(name = "Target Type", items = targetTypeItems,
-        default = "RGB", update = AnimationNode.updateSockets)
+        default = "RGB", update = AnimationNode.refresh)
 
     def create(self):
         self.newInput("Color", "Color", "color")

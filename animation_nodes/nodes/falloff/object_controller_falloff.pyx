@@ -22,7 +22,7 @@ class ObjectControllerFalloffNode(bpy.types.Node, AnimationNode):
     bl_label = "Object Controller Falloff"
 
     falloffType = EnumProperty(name = "Falloff Type", items = falloffTypeItems,
-        update = AnimationNode.updateSockets)
+        update = AnimationNode.refresh)
 
     axisDirection = EnumProperty(name = "Axis Direction", default = "Z",
         items = axisDirectionItems, update = propertyChanged)
