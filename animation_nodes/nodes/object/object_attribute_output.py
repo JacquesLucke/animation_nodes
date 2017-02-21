@@ -40,7 +40,7 @@ class ObjectAttributeOutputNode(bpy.types.Node, AnimationNode):
         col.prop(self, "attribute", text = "")
         if self.useObjectList:
             col.prop(self, "useValueList", text = "Multiple Values")
-        if self.errorMessage != "":
+        if self.errorMessage != "" and self.attribute != "":
             layout.label(self.errorMessage, icon = "ERROR")
 
     def getExecutionCode(self):
