@@ -42,6 +42,9 @@ cdef void setTranslationMatrix(Matrix4* m, Vector3* v):
     m.a31 = m.a32 = 0
     m.a41 = m.a42 = m.a43 = 0
 
+cdef void setMatrixTranslation(Matrix4* m, Vector3* v):
+    m.a14, m.a24, m.a34 = v.x, v.y, v.z
+
 cdef void setTranslationScaleMatrix(Matrix4* m, Vector3* t, Vector3* s):
     m.a11, m.a22, m.a33 = s.x, s.y, s.z
     m.a14, m.a24, m.a34 = t.x, t.y, t.z

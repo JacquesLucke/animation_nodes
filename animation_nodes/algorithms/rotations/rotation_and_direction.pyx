@@ -1,7 +1,7 @@
 from ... data_structures cimport EulerList, Matrix4x4List, Vector3DList, CListMock
-from ... math cimport (Euler3, Vector3, toVector3, toPyVector3, Matrix3, toEuler3,
+from ... math cimport (toVector3, toPyVector3, Matrix3, toEuler3,
                        transformVec3AsDirection_InPlace, setRotationMatrix,
-                       setIdentityMatrix, Matrix4, toPyMatrix4, crossVec3, normalizeVec3,
+                       setIdentityMatrix, toPyMatrix4, crossVec3, normalizeVec3,
                        normalizeVec3_InPlace)
 
 

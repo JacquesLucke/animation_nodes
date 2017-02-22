@@ -26,6 +26,7 @@ cdef void setIdentityMatrix(Matrix3_or_Matrix4* m)
 cdef void setTranslationMatrix(Matrix4* m, Vector3* v)
 cdef void setRotationMatrix(Matrix3_or_Matrix4* m, Euler3* e)
 cdef void setScaleMatrix(Matrix3_or_Matrix4* m, Vector3* s)
+cdef void setMatrixTranslation(Matrix4* m, Vector3* v)
 
 cdef void setTranslationScaleMatrix(Matrix4* m, Vector3* t, Vector3* s)
 cdef void setRotationScaleMatrix(Matrix3_or_Matrix4* m, Euler3* e, Vector3* s)
