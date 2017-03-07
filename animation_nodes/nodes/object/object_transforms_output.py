@@ -6,6 +6,7 @@ from ... base_types import AnimationNode
 class an_ObjectTransformsOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectTransformsOutputNode"
     bl_label = "Object Transforms Output"
+    bl_width_default = 165
 
     def checkedPropertiesChanged(self, context):
         self.updateSocketVisibility()
