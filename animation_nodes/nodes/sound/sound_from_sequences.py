@@ -5,8 +5,9 @@ from ... data_structures import DoubleList
 from ... base_types import AnimationNode
 
 soundTypeItems = [
-    ("AVERAGE", "Average", "", "NONE", 0),
-    ("SPECTRUM", "Spectrum", "", "NONE", 1)]
+    ("AVERAGE", "Average", "", "FORCE_TURBULENCE", 0),
+    ("SPECTRUM", "Spectrum", "", "RNDCURVE", 1)
+]
 
 class SoundFromSequencesNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SoundFromSequencesNode"
@@ -22,7 +23,7 @@ class SoundFromSequencesNode(bpy.types.Node, AnimationNode):
         self.newOutput("Sound", "Sound", "sound")
 
     def draw(self, layout):
-        layout.prop(self, "soundType")
+        layout.prop(self, "soundType", text = "")
         if self.errorMessage != "":
             writeText(layout, self.errorMessage, width = 25, icon = "ERROR")
 

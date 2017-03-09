@@ -7,35 +7,41 @@ from .. utils.nodes import newNodeAtCursor, invokeTranslation
 from .. nodes.sound.sound_from_sequences import (AverageSoundEvaluator,
                                                  SpectrumSoundEvaluator)
 
-soundTypeItems = [
-    ("AVERAGE", "Average", "Only one strength per frame per sequence", "NONE", 0),
-    ("SPECTRUM", "Spectrum", "Multiple strengths for different frequencies", "NONE", 1)]
+typeFilterItems = [
+    ("ALL", "All", "", "NONE", 0),
+    ("AVERAGE", "Average", "", "NONE", 1),
+    ("SPECTRUM", "Spectrum", "", "NONE", 2)]
 
 def getBakeDataItems(self, context):
     items = []
     sequences = getattr(self.nodeTree.scene.sequence_editor, "sequences", [])
-    for sequenceIndex, sequence in enumerate(sequences):
+    for index, sequence in enumerate(sequences):
         if sequence.type != "SOUND": continue
-        sound = sequence.sound
 
-        for bakeIndex, data in enumerate(sound.averageData):
-            items.append((
-                "AVERAGE_{}_{}".format(sequenceIndex, bakeIndex),
-                "#{} - {} - Average".format(bakeIndex, sequence.name),
-                "Low: {}  High: {}  Attack: {:.3f}  Release: {:.3f}".format(
-                    data.low, data.high, data.attack, data.release),
-                strToEnumItemID(data.identifier)))
+        if self.typeFilter in {"ALL", "AVERAGE"}:
+            items.extend(iterAverageItems(index, sequence))
 
-        for bakeIndex, data in enumerate(sound.spectrumData):
-            items.append((
-                "SPECTRUM_{}_{}".format(sequenceIndex, bakeIndex),
-                "#{} - {} - Spectrum".format(bakeIndex, sequence.name),
-                "Attack: {:.3f}  Release: {:.3f}".format(data.attack, data.release),
-                strToEnumItemID(data.identifier)))
+        if self.typeFilter in {"ALL", "SPECTRUM"}:
+            items.extend(iterSpectrumItems(index, sequence))
 
     if len(items) == 0:
         return [("None", "None", "")]
     return items
+
+def iterAverageItems(sequenceIndex, sequence):
+    for bakeIndex, data in enumerate(sequence.sound.averageData):
+        yield ("AVERAGE_{}_{}".format(sequenceIndex, bakeIndex),
+               "#{} - {} - Average".format(bakeIndex, sequence.name),
+               "Low: {}  High: {}  Attack: {:.3f}  Release: {:.3f}".format(
+                   data.low, data.high, data.attack, data.release),
+               strToEnumItemID(data.identifier))
+
+def iterSpectrumItems(sequenceIndex, sequence):
+    for bakeIndex, data in enumerate(sequence.sound.spectrumData):
+        yield ("SPECTRUM_{}_{}".format(sequenceIndex, bakeIndex),
+               "#{} - {} - Spectrum".format(bakeIndex, sequence.name),
+               "Attack: {:.3f}  Release: {:.3f}".format(data.attack, data.release),
+               strToEnumItemID(data.identifier))
 
 class SoundSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_SoundSocket"
@@ -48,6 +54,8 @@ class SoundSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     bakeData = EnumProperty(name = "Bake Data", items = getBakeDataItems,
         update = propertyChanged)
+
+    typeFilter = EnumProperty(items = typeFilterItems, default = "ALL")
 
     def drawProperty(self, layout, text, node):
         row = layout.row(align = True)
@@ -70,9 +78,6 @@ class SoundSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def getProperty(self):
         return self.bakeData, self.type
-
-    def updateProperty(self):
-        self.bakeData = self.bakeData
 
     def createSoundBakeNode(self):
         newNodeAtCursor("an_SoundBakeNode")
