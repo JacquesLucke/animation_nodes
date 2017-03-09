@@ -4,11 +4,11 @@ from .. events import propertyChanged
 from .. base_types import AnimationNodeSocket
 from .. algorithms.hashing import strToEnumItemID
 from .. utils.nodes import newNodeAtCursor, invokeTranslation
-from .. nodes.sound.sound_from_sequences import (SingleSoundEvaluator,
+from .. nodes.sound.sound_from_sequences import (AverageSoundEvaluator,
                                                  SpectrumSoundEvaluator)
 
 soundTypeItems = [
-    ("SINGLE", "Single", "Only one strength per frame per sequence", "NONE", 0),
+    ("AVERAGE", "Average", "Only one strength per frame per sequence", "NONE", 0),
     ("SPECTRUM", "Spectrum", "Multiple strengths for different frequencies", "NONE", 1)]
 
 def getBakeDataItems(self, context):
@@ -18,10 +18,10 @@ def getBakeDataItems(self, context):
         if sequence.type != "SOUND": continue
         sound = sequence.sound
 
-        for bakeIndex, data in enumerate(sound.singleData):
+        for bakeIndex, data in enumerate(sound.averageData):
             items.append((
-                "SINGLE_{}_{}".format(sequenceIndex, bakeIndex),
-                "#{} - {} - Single".format(bakeIndex, sequence.name),
+                "AVERAGE_{}_{}".format(sequenceIndex, bakeIndex),
+                "#{} - {} - Average".format(bakeIndex, sequence.name),
                 "Low: {}  High: {}  Attack: {:.3f}  Release: {:.3f}".format(
                     data.low, data.high, data.attack, data.release),
                 strToEnumItemID(data.identifier)))
@@ -60,7 +60,7 @@ class SoundSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         try:
             soundType, sequenceIndex, bakeIndex = self.bakeData.split("_")
             sequence = self.nodeTree.scene.sequence_editor.sequences[int(sequenceIndex)]
-            evaluatorClass = SingleSoundEvaluator if soundType == "SINGLE" else SpectrumSoundEvaluator
+            evaluatorClass = AverageSoundEvaluator if soundType == "AVERAGE" else SpectrumSoundEvaluator
             return evaluatorClass([sequence], int(bakeIndex))
         except:
             return None
@@ -84,6 +84,6 @@ class SoundSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     @classmethod
     def correctValue(cls, value):
-        if isinstance(value, (SingleSoundEvaluator, SpectrumSoundEvaluator)) or value is None:
+        if isinstance(value, (AverageSoundEvaluator, SpectrumSoundEvaluator)) or value is None:
             return value, 0
         return cls.getDefaultValue(), 2

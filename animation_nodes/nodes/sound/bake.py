@@ -74,18 +74,16 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
         col.prop(self, "attack")
         col.prop(self, "release")
 
-        col = layout.column(align = True)
-        subcol = col.column(align = True)
-        subcol.scale_y = 1.3
-        subcol.active = getSingleDataItem(sound, self.low, self.high, self.attack, self.release) is None
-        self.invokeFunction(subcol, "bakeSound", text = "Bake", icon = "GHOST")
-        self.invokeFunction(col, "bakeSpectrumData", text = "Bake Spectrum Data", icon = "RNDCURVE")
+        row = layout.row(align = True)
+        row.scale_y = 1.3
+        self.invokeFunction(row, "bakeAverageSound", text = "Bake Average", icon = "FORCE_TURBULENCE")
+        self.invokeFunction(row, "bakeSpectrumData", text = "Bake Spectrum", icon = "RNDCURVE")
         self.drawSpectrumFrequencyRanges(layout)
 
         if self.bakeProgress != "":
             layout.label(self.bakeProgress, icon = "INFO")
 
-        self.drawBakedData_Single(layout, sound)
+        self.drawBakedData_Average(layout, sound)
         self.drawBakedData_Spectrum(layout, sound)
 
     def drawSpectrumFrequencyRanges(self, layout):
@@ -106,15 +104,15 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
                 right.prop(item, "low")
                 right.prop(item, "high")
 
-    def drawBakedData_Single(self, layout, sound):
-        items = sound.singleData
+    def drawBakedData_Average(self, layout, sound):
+        items = sound.averageData
         if len(items) > 0:
             col = layout.column()
             row = col.row(align = True)
             row.label("Baked Data:")
             self.invokeFunction(row, "moveItemUp", icon = "TRIA_UP")
             self.invokeFunction(row, "moveItemDown", icon = "TRIA_DOWN")
-            col.template_list("an_SingleItemsUiList", "", sound, "singleData", self, "activeBakeDataIndex", rows = len(items) + 1)
+            col.template_list("an_AverageItemsUiList", "", sound, "averageData", self, "activeBakeDataIndex", rows = len(items) + 1)
 
     def drawBakedData_Spectrum(self, layout, sound):
         items = sound.spectrumData
@@ -147,12 +145,12 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
             frequencyRangeStart = self.low,
             frequencyRangeEnd = self.high)
 
-    def bakeSound(self):
+    def bakeAverageSound(self):
         sound, low, high, attack, release = self.sound, self.low, self.high, self.attack, self.release
-        if getSingleDataItem(sound, low, high, attack, release): return
+        if getAverageDataItem(sound, low, high, attack, release): return
 
         soundData = bake(sound, low, high, attack, release)
-        bakeDataItem = createSingleDataItem(sound, low, high, attack, release)
+        bakeDataItem = createAverageDataItem(sound, low, high, attack, release)
         addSavedSample = bakeDataItem.samples.add
         for data in soundData:
             addSavedSample().strength = data
@@ -165,8 +163,8 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
             release = self.release,
             frequencyRanges = [{"low" : item.low, "high" : item.high, "name" : ""} for item in self.spectrumFrequencyRanges])
 
-    def removeSingleBakedData(self, index):
-        self.sound.singleData.remove(int(index))
+    def removeAverageBakedData(self, index):
+        self.sound.averageData.remove(int(index))
 
     def removeSpectrumBakedData(self, index):
         self.sound.spectrumData.remove(int(index))
@@ -182,8 +180,8 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
         self.moveItem(fromIndex, toIndex)
 
     def moveItem(self, fromIndex, toIndex):
-        self.sound.singleData.move(fromIndex, toIndex)
-        self.activeBakeDataIndex = min(max(toIndex, 0), len(self.sound.singleData) - 1)
+        self.sound.averageData.move(fromIndex, toIndex)
+        self.activeBakeDataIndex = min(max(toIndex, 0), len(self.sound.averageData) - 1)
 
     def removeSequencesWithActiveSound(self):
         sound = self.sound
@@ -205,16 +203,16 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
         return bpy.data.sounds.get(self.soundName)
 
 
-class SingleItemsUiList(bpy.types.UIList):
-    bl_idname = "an_SingleItemsUiList"
+class AverageItemsUiList(bpy.types.UIList):
+    bl_idname = "an_AverageItemsUiList"
 
     def draw_item(self, context, layout, sound, item, icon, node, activePropname):
-        layout.label("#" + str(list(sound.singleData).index(item)))
+        layout.label("#" + str(list(sound.averageData).index(item)))
         layout.label(str(round(item.low)))
         layout.label(str(round(item.high)))
         layout.label(str(round(item.attack, 3)))
         layout.label(str(round(item.release, 3)))
-        node.invokeFunction(layout, "removeSingleBakedData", icon = "X", emboss = False, data = list(sound.singleData).index(item))
+        node.invokeFunction(layout, "removeAverageBakedData", icon = "X", emboss = False, data = list(sound.averageData).index(item))
 
 class SpectrumItemsUiList(bpy.types.UIList):
     bl_idname = "an_SpectrumItemsUiList"
@@ -351,8 +349,8 @@ def getRealFilePath(sound):
     file.close()
     return True, path
 
-def createSingleDataItem(sound, low, high, attack, release):
-    item = sound.singleData.add()
+def createAverageDataItem(sound, low, high, attack, release):
+    item = sound.averageData.add()
     item.low = low
     item.high = high
     item.attack = attack
@@ -425,8 +423,8 @@ class CalculateSpectrumFrequencyRanges(bpy.types.Operator):
 # Utils
 ################################
 
-def getSingleDataItem(sound, low, high, attack, release):
-    for item in sound.singleData:
+def getAverageDataItem(sound, low, high, attack, release):
+    for item in sound.averageData:
         if all([item.low == low,
                 item.high == high,
                 item.attack == attack,
@@ -445,8 +443,8 @@ class MultipleFrequenciesSample(bpy.types.PropertyGroup):
     bl_idname = "an_MultipleFrequenciesSample"
     samples = CollectionProperty(name = "Samples", type = SingleFrequencySample)
 
-class SingleData(bpy.types.PropertyGroup):
-    bl_idname = "an_SoundSingleData"
+class AverageData(bpy.types.PropertyGroup):
+    bl_idname = "an_SoundAverageData"
     low = IntProperty(name = "Low")
     high = IntProperty(name = "High")
     attack = FloatProperty(name = "Attack", precision = 3)
@@ -463,9 +461,9 @@ class SpectrumData(bpy.types.PropertyGroup):
     identifier = StringProperty(name = "Identifier", default = "")
 
 def register():
-    bpy.types.Sound.singleData = CollectionProperty(name = "Bake Data", type = SingleData)
+    bpy.types.Sound.averageData = CollectionProperty(name = "Bake Data", type = AverageData)
     bpy.types.Sound.spectrumData = CollectionProperty(name = "Spectrum Data", type = SpectrumData)
 
 def unregister():
-    del bpy.types.Sound.singleData
+    del bpy.types.Sound.averageData
     del bpy.types.Sound.spectrumData

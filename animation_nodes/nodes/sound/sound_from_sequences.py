@@ -5,8 +5,8 @@ from ... data_structures import DoubleList
 from ... base_types import AnimationNode
 
 soundTypeItems = [
-    ("SINGLE", "Single", ""),
-    ("SPECTRUM", "Spectrum", "")]
+    ("AVERAGE", "Average", "", "NONE", 0),
+    ("SPECTRUM", "Spectrum", "", "NONE", 1)]
 
 class SoundFromSequencesNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SoundFromSequencesNode"
@@ -29,18 +29,18 @@ class SoundFromSequencesNode(bpy.types.Node, AnimationNode):
     def execute(self, sequences, bakeIndex):
         try:
             self.errorMessage = ""
-            if self.soundType == "SINGLE": return SingleSoundEvaluator(sequences, bakeIndex)
+            if self.soundType == "AVERAGE": return AverageSoundEvaluator(sequences, bakeIndex)
             if self.soundType == "SPECTRUM": return SpectrumSoundEvaluator(sequences, bakeIndex)
         except IndexError:
             self.errorMessage = "At least one sequence does not have this bake index"
             return None
 
 
-class SingleSoundEvaluator:
-    type = "SINGLE"
+class AverageSoundEvaluator:
+    type = "AVERAGE"
 
     def __init__(self, sequences, index):
-        self.sequenceData = [(sequence, sequence.sound.singleData[index]) for sequence in sequences if getattr(sequence, "type", "") == "SOUND"]
+        self.sequenceData = [(sequence, sequence.sound.averageData[index]) for sequence in sequences if getattr(sequence, "type", "") == "SOUND"]
 
     def evaluate(self, frame):
         intFrame = int(frame)
