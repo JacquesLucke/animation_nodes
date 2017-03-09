@@ -10,7 +10,7 @@ frameTypes = [
 
 soundTypeItems = [
     ("SINGLE", "Single", ""),
-    ("EQUALIZER", "Equalizer", "")]
+    ("SPECTRUM", "Spectrum", "")]
 
 class EvaluateSoundNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_EvaluateSoundNode"
@@ -23,7 +23,7 @@ class EvaluateSoundNode(bpy.types.Node, AnimationNode):
 
     def soundTypeChanged(self, context):
         self.outputs["Strength"].hide = self.soundType != "SINGLE"
-        self.outputs["Strengths"].hide = self.soundType != "EQUALIZER"
+        self.outputs["Strengths"].hide = self.soundType != "SPECTRUM"
 
     frameType = EnumProperty(
         name = "Frame Type", default = "OFFSET",
@@ -52,5 +52,5 @@ class EvaluateSoundNode(bpy.types.Node, AnimationNode):
         if self.frameType == "OFFSET":
             frame += self.nodeTree.scene.frame_current_final
         strength = sound.evaluate(frame) if sound.type == "SINGLE" else 0
-        strengths = sound.evaluate(frame) if sound.type == "EQUALIZER" else []
+        strengths = sound.evaluate(frame) if sound.type == "SPECTRUM" else []
         return strength, strengths

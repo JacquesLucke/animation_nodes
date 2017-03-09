@@ -23,20 +23,20 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
     soundName = StringProperty(name = "Sound")
 
     activeBakeDataIndex = IntProperty()
-    activeEqualizerDataIndex = IntProperty()
+    activeSpectrumDataIndex = IntProperty()
 
     low = IntProperty(name = "Low", default = 0, min = 0, max = 20000)
     high = IntProperty(name = "High", default = 20000, min = 0, max = 20000)
     attack = FloatProperty(name = "Attack", default = 0.005, precision = 3)
     release = FloatProperty(name = "Release", default = 0.2, precision = 3)
 
-    showEqualizerFrequencyRanges = BoolProperty(default = False)
-    equalizerFrequencyRanges = CollectionProperty(type = SoundFrequencyRange)
+    showSpectrumFrequencyRanges = BoolProperty(default = False)
+    spectrumFrequencyRanges = CollectionProperty(type = SoundFrequencyRange)
 
     bakeProgress = StringProperty()
 
     def setup(self):
-        self.setEqualizerFrequencyRanges(frequencyRanges)
+        self.setSpectrumFrequencyRanges(frequencyRanges)
 
     def draw(self, layout):
         layout.separator()
@@ -79,26 +79,26 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
         subcol.scale_y = 1.3
         subcol.active = getSingleDataItem(sound, self.low, self.high, self.attack, self.release) is None
         self.invokeFunction(subcol, "bakeSound", text = "Bake", icon = "GHOST")
-        self.invokeFunction(col, "bakeEqualizerData", text = "Bake Equalizer Data", icon = "RNDCURVE")
-        self.drawEqualizerFrequencyRanges(layout)
+        self.invokeFunction(col, "bakeSpectrumData", text = "Bake Spectrum Data", icon = "RNDCURVE")
+        self.drawSpectrumFrequencyRanges(layout)
 
         if self.bakeProgress != "":
             layout.label(self.bakeProgress, icon = "INFO")
 
         self.drawBakedData_Single(layout, sound)
-        self.drawBakedData_Equalizer(layout, sound)
+        self.drawBakedData_Spectrum(layout, sound)
 
-    def drawEqualizerFrequencyRanges(self, layout):
+    def drawSpectrumFrequencyRanges(self, layout):
         col = layout.column()
 
         row = col.row(align = True)
-        icon = "TRIA_DOWN" if self.showEqualizerFrequencyRanges else "TRIA_RIGHT"
-        row.prop(self, "showEqualizerFrequencyRanges", icon = icon, text = "", icon_only = True)
-        self.invokeFunction(row, "openFrequencyCalculator", text = "Calculate Equalizer Frequencies ({})".format(len(self.equalizerFrequencyRanges)))
+        icon = "TRIA_DOWN" if self.showSpectrumFrequencyRanges else "TRIA_RIGHT"
+        row.prop(self, "showSpectrumFrequencyRanges", icon = icon, text = "", icon_only = True)
+        self.invokeFunction(row, "openFrequencyCalculator", text = "Calculate Spectrum Frequencies ({})".format(len(self.spectrumFrequencyRanges)))
 
-        if self.showEqualizerFrequencyRanges:
+        if self.showSpectrumFrequencyRanges:
             subcol = col.column(align = True)
-            for i, item in enumerate(self.equalizerFrequencyRanges):
+            for i, item in enumerate(self.spectrumFrequencyRanges):
                 row = subcol.row(align = True)
                 row.alignment = "RIGHT"
                 row.label(str(i) + ":")
@@ -116,13 +116,13 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
             self.invokeFunction(row, "moveItemDown", icon = "TRIA_DOWN")
             col.template_list("an_SingleItemsUiList", "", sound, "singleData", self, "activeBakeDataIndex", rows = len(items) + 1)
 
-    def drawBakedData_Equalizer(self, layout, sound):
-        items = sound.equalizerData
+    def drawBakedData_Spectrum(self, layout, sound):
+        items = sound.spectrumData
         if len(items) > 0:
             col = layout.column()
             row = col.row()
-            row.label("Equalizer Data:")
-            col.template_list("an_EqualizerItemsUiList", "", sound, "equalizerData", self, "activeEqualizerDataIndex", rows = len(items) + 1)
+            row.label("Spectrum Data:")
+            col.template_list("an_SpectrumItemsUiList", "", sound, "spectrumData", self, "activeSpectrumDataIndex", rows = len(items) + 1)
 
     def loadSound(self, path):
         editor = getOrCreateSequencer(self.nodeTree.scene)
@@ -134,15 +134,15 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
             frame_start = bpy.context.scene.frame_start)
         self.soundName = sequence.sound.name
 
-    def setEqualizerFrequencyRanges(self, ranges):
-        self.equalizerFrequencyRanges.clear()
+    def setSpectrumFrequencyRanges(self, ranges):
+        self.spectrumFrequencyRanges.clear()
         for low, high in ranges:
-            item = self.equalizerFrequencyRanges.add()
+            item = self.spectrumFrequencyRanges.add()
             item.low = low
             item.high = high
 
     def openFrequencyCalculator(self):
-        bpy.ops.an.calculate_equalizer_frequency_ranges("INVOKE_DEFAULT",
+        bpy.ops.an.calculate_spectrum_frequency_ranges("INVOKE_DEFAULT",
             nodeIdentifier = self.identifier,
             frequencyRangeStart = self.low,
             frequencyRangeEnd = self.high)
@@ -157,19 +157,19 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
         for data in soundData:
             addSavedSample().strength = data
 
-    def bakeEqualizerData(self):
-        bpy.ops.an.bake_sound_equalizer_data("INVOKE_DEFAULT",
+    def bakeSpectrumData(self):
+        bpy.ops.an.bake_sound_spectrum_data("INVOKE_DEFAULT",
             nodeIdentifier = self.identifier,
             soundName = self.soundName,
             attack = self.attack,
             release = self.release,
-            frequencyRanges = [{"low" : item.low, "high" : item.high, "name" : ""} for item in self.equalizerFrequencyRanges])
+            frequencyRanges = [{"low" : item.low, "high" : item.high, "name" : ""} for item in self.spectrumFrequencyRanges])
 
     def removeSingleBakedData(self, index):
         self.sound.singleData.remove(int(index))
 
-    def removeEqualizerBakedData(self, index):
-        self.sound.equalizerData.remove(int(index))
+    def removeSpectrumBakedData(self, index):
+        self.sound.spectrumData.remove(int(index))
 
     def moveItemUp(self):
         fromIndex = self.activeBakeDataIndex
@@ -216,26 +216,26 @@ class SingleItemsUiList(bpy.types.UIList):
         layout.label(str(round(item.release, 3)))
         node.invokeFunction(layout, "removeSingleBakedData", icon = "X", emboss = False, data = list(sound.singleData).index(item))
 
-class EqualizerItemsUiList(bpy.types.UIList):
-    bl_idname = "an_EqualizerItemsUiList"
+class SpectrumItemsUiList(bpy.types.UIList):
+    bl_idname = "an_SpectrumItemsUiList"
 
     def draw_item(self, context, layout, sound, item, icon, node, activePropname):
-        layout.label("#" + str(list(sound.equalizerData).index(item)))
+        layout.label("#" + str(list(sound.spectrumData).index(item)))
         layout.label(str(round(item.attack, 3)))
         layout.label(str(round(item.release, 3)))
-        node.invokeFunction(layout, "removeEqualizerBakedData", icon = "X", emboss = False, data = list(sound.equalizerData).index(item))
+        node.invokeFunction(layout, "removeSpectrumBakedData", icon = "X", emboss = False, data = list(sound.spectrumData).index(item))
 
 
 
-# Bake Equalizer Data
+# Bake Spectrum Data
 ################################
 
 frequencySteps = [0, 20, 40, 80, 250, 600, 2000, 4000, 6000, 8000, 20000]
 frequencyRanges = list(zip(frequencySteps[:-1], frequencySteps[1:]))
 
-class BakeEqualizerData(bpy.types.Operator):
-    bl_idname = "an.bake_sound_equalizer_data"
-    bl_label = "Bake Equalizer Data"
+class BakeSpectrumData(bpy.types.Operator):
+    bl_idname = "an.bake_sound_spectrum_data"
+    bl_label = "Bake Spectrum Data"
 
     nodeIdentifier = StringProperty()
 
@@ -254,7 +254,7 @@ class BakeEqualizerData(bpy.types.Operator):
         except: self.node = None
         self.sound = bpy.data.sounds[self.soundName]
         self.currentIndex = 0
-        self.equalizerData = []
+        self.spectrumData = []
         self.counter = 0
         context.window_manager.modal_handler_add(self)
         self.timer = context.window_manager.event_timer_add(0.001, context.window)
@@ -274,19 +274,19 @@ class BakeEqualizerData(bpy.types.Operator):
         if self.currentIndex < len(self.frequencyRanges):
             item = self.frequencyRanges[self.currentIndex]
             data = bake(self.sound, item.low, item.high, self.attack, self.release)
-            self.equalizerData.append(data)
+            self.spectrumData.append(data)
             self.currentIndex += 1
             self.setNodeMessage("Frequency range {}-{} baked".format(item.low, item.high))
         else:
-            equalizerItem = self.sound.equalizerData.add()
-            equalizerItem.attack = self.attack
-            equalizerItem.release = self.release
-            equalizerItem.frequencyAmount = len(self.frequencyRanges)
-            equalizerItem.identifier = getRandomString(10)
-            for equalizerSampleData in zip(*self.equalizerData):
-                equalizerSampleItem = equalizerItem.samples.add()
-                for sample in equalizerSampleData:
-                    equalizerSampleItem.samples.add().strength = sample
+            spectrumItem = self.sound.spectrumData.add()
+            spectrumItem.attack = self.attack
+            spectrumItem.release = self.release
+            spectrumItem.frequencyAmount = len(self.frequencyRanges)
+            spectrumItem.identifier = getRandomString(10)
+            for spectrumSampleData in zip(*self.spectrumData):
+                spectrumSampleItem = spectrumItem.samples.add()
+                for sample in spectrumSampleData:
+                    spectrumSampleItem.samples.add().strength = sample
             return self.finish()
 
         context.area.tag_redraw()
@@ -366,11 +366,11 @@ def getSamplesFromFCurve(object):
 
 
 
-# Bake Equalizer Data
+# Bake Spectrum Data
 ################################
 
-class CalculateEqualizerFrequencyRanges(bpy.types.Operator):
-    bl_idname = "an.calculate_equalizer_frequency_ranges"
+class CalculateSpectrumFrequencyRanges(bpy.types.Operator):
+    bl_idname = "an.calculate_spectrum_frequency_ranges"
     bl_label = "Calculate Frequency Ranges"
     bl_options = {"INTERNAL", "REGISTER"}
 
@@ -408,7 +408,7 @@ class CalculateEqualizerFrequencyRanges(bpy.types.Operator):
 
     def execute(self, context):
         node = getNodeByIdentifier(self.nodeIdentifier)
-        node.setEqualizerFrequencyRanges(self.calculate_ranges())
+        node.setSpectrumFrequencyRanges(self.calculate_ranges())
         return {"FINISHED"}
 
     def calculate_ranges(self):
@@ -454,8 +454,8 @@ class SingleData(bpy.types.PropertyGroup):
     samples = CollectionProperty(name = "Samples", type = SingleFrequencySample)
     identifier = StringProperty(name = "Identifier", default = "")
 
-class EqualizerData(bpy.types.PropertyGroup):
-    bl_idname = "an_SoundEqualizerData"
+class SpectrumData(bpy.types.PropertyGroup):
+    bl_idname = "an_SoundSpectrumData"
     attack = FloatProperty(name = "Attack", precision = 3)
     release = FloatProperty(name = "Release", precision = 3)
     frequencyAmount = IntProperty(name = "Frequency Amount")
@@ -464,8 +464,8 @@ class EqualizerData(bpy.types.PropertyGroup):
 
 def register():
     bpy.types.Sound.singleData = CollectionProperty(name = "Bake Data", type = SingleData)
-    bpy.types.Sound.equalizerData = CollectionProperty(name = "Equalizer Data", type = EqualizerData)
+    bpy.types.Sound.spectrumData = CollectionProperty(name = "Spectrum Data", type = SpectrumData)
 
 def unregister():
     del bpy.types.Sound.singleData
-    del bpy.types.Sound.equalizerData
+    del bpy.types.Sound.spectrumData

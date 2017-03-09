@@ -6,7 +6,7 @@ from ... base_types import AnimationNode
 
 soundTypeItems = [
     ("SINGLE", "Single", ""),
-    ("EQUALIZER", "Equalizer", "")]
+    ("SPECTRUM", "Spectrum", "")]
 
 class SoundFromSequencesNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SoundFromSequencesNode"
@@ -30,7 +30,7 @@ class SoundFromSequencesNode(bpy.types.Node, AnimationNode):
         try:
             self.errorMessage = ""
             if self.soundType == "SINGLE": return SingleSoundEvaluator(sequences, bakeIndex)
-            if self.soundType == "EQUALIZER": return EqualizerSoundEvaluator(sequences, bakeIndex)
+            if self.soundType == "SPECTRUM": return SpectrumSoundEvaluator(sequences, bakeIndex)
         except IndexError:
             self.errorMessage = "At least one sequence does not have this bake index"
             return None
@@ -61,11 +61,11 @@ class SingleSoundEvaluator:
             return data.samples[frame - sequence.frame_start].strength
         return 0
 
-class EqualizerSoundEvaluator:
-    type = "EQUALIZER"
+class SpectrumSoundEvaluator:
+    type = "SPECTRUM"
 
     def __init__(self, sequences, index):
-        self.sequenceData = [(sequence, sequence.sound.equalizerData[index]) for sequence in sequences if getattr(sequence, "type", "") == "SOUND"]
+        self.sequenceData = [(sequence, sequence.sound.spectrumData[index]) for sequence in sequences if getattr(sequence, "type", "") == "SOUND"]
 
     def evaluate(self, frame):
         intFrame = int(frame)
