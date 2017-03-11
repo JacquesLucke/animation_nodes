@@ -96,6 +96,7 @@ class OffsetMatricesNode(bpy.types.Node, AnimationNode):
             Matrix4x4List outMatrices = Matrix4x4List(length = inMatrices.length)
             FalloffEvaluator evaluator
 
+        self.errorMessage = ""
         if self.specifiedState == "END": falloff = InvertFalloff(falloff)
         try: evaluator = falloff.getEvaluator("Transformation Matrix")
         except:
