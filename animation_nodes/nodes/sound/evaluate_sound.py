@@ -43,10 +43,8 @@ class EvaluateSoundNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self):
         yield "self.errorMessage = ''"
-        if self.useCurrentFrame:
-            yield "_frame = self.nodeTree.scene.frame_current_final"
-        else:
-            yield "_frame = frame"
+        if self.useCurrentFrame: yield "_frame = self.nodeTree.scene.frame_current_final"
+        else:                    yield "_frame = frame"
 
         if self.mode == "AVERAGE":
             yield "volume = self.execute_Average(sound, _frame)"
