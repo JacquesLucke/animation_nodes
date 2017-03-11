@@ -12,8 +12,15 @@ cdef class AverageSound(Sound):
         return createAverageSound(sequences, index)
 
     cpdef float evaluate(self, float frame):
+        cdef int intFrame = <int>frame
+        cdef float before = self.evaluateInt(intFrame)
+        cdef float after = self.evaluateInt(intFrame + 1)
+        cdef float influence = frame - intFrame
+        return before * (1 - influence) + after * influence
+
+    cdef float evaluateInt(self, int frame):
         if self.startFrame <= frame <= self.endFrame:
-            return self.samples.data[<int>frame - self.startFrame]
+            return self.samples.data[frame - self.startFrame]
         return 0
 
 def createAverageSound(list sequences, int index):

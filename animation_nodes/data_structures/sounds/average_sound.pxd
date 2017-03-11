@@ -8,3 +8,4 @@ cdef class AverageSound(Sound):
         int endFrame
 
     cpdef float evaluate(self, float frame)
+    cdef float evaluateInt(self, int frame)
