@@ -33,7 +33,7 @@ class SoundFromSequencesNode(bpy.types.Node, AnimationNode):
             self.errorMessage = ""
             if self.soundType == "AVERAGE": return AverageSound.fromSequences(sequences, bakeIndex)
             if self.soundType == "SPECTRUM": return SpectrumSoundEvaluator(sequences, bakeIndex)
-        except IndexError:
+        except:
             self.errorMessage = "At least one sequence does not have this bake index"
             return None
 
