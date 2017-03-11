@@ -1,2 +1,2 @@
 cdef class Sound:
-    cdef str type
+    cdef readonly str type

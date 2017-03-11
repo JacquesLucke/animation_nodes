@@ -14,6 +14,9 @@ def importDataStructures():
     from . splines.bezier_spline import BezierSpline
     from . interpolation_base import InterpolationBase
     from . falloffs.falloff_base import Falloff, BaseFalloff, CompoundFalloff
+    
+    from . sounds.sound import Sound
+    from . sounds.average_sound import AverageSound
 
     return locals()
 

@@ -1,8 +1,8 @@
 import bpy
 from bpy.props import *
 from ... utils.layout import writeText
-from ... data_structures import DoubleList
 from ... base_types import AnimationNode
+from ... data_structures import DoubleList, AverageSound
 
 soundTypeItems = [
     ("AVERAGE", "Average", "", "FORCE_TURBULENCE", 0),
@@ -28,39 +28,14 @@ class SoundFromSequencesNode(bpy.types.Node, AnimationNode):
             writeText(layout, self.errorMessage, width = 25, icon = "ERROR")
 
     def execute(self, sequences, bakeIndex):
+        if len(sequences) == 0: return None
         try:
             self.errorMessage = ""
-            if self.soundType == "AVERAGE": return AverageSoundEvaluator(sequences, bakeIndex)
+            if self.soundType == "AVERAGE": return AverageSound.fromSequences(sequences, bakeIndex)
             if self.soundType == "SPECTRUM": return SpectrumSoundEvaluator(sequences, bakeIndex)
         except IndexError:
             self.errorMessage = "At least one sequence does not have this bake index"
             return None
-
-
-class AverageSoundEvaluator:
-    type = "AVERAGE"
-
-    def __init__(self, sequences, index):
-        self.sequenceData = [(sequence, sequence.sound.averageData[index]) for sequence in sequences if getattr(sequence, "type", "") == "SOUND"]
-
-    def evaluate(self, frame):
-        intFrame = int(frame)
-        if intFrame == frame:
-            return self.evaluateInt(intFrame)
-        else:
-            before = self.evaluateInt(intFrame)
-            after = self.evaluateInt(intFrame + 1)
-            influence = frame - intFrame
-            return before * (1 - influence) + after * influence
-
-    def evaluateInt(self, frame):
-        evaluate = self.evaluateSequence
-        return sum([evaluate(sequence, data, frame) for sequence, data in self.sequenceData])
-
-    def evaluateSequence(self, sequence, data, frame):
-        if useSequenceForFrame(sequence, data, frame):
-            return data.samples[frame - sequence.frame_start].strength
-        return 0
 
 class SpectrumSoundEvaluator:
     type = "SPECTRUM"

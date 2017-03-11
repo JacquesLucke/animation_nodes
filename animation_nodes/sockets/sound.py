@@ -4,8 +4,8 @@ from .. events import propertyChanged
 from .. base_types import AnimationNodeSocket
 from .. algorithms.hashing import strToEnumItemID
 from .. utils.nodes import newNodeAtCursor, invokeTranslation
-from .. nodes.sound.sound_from_sequences import (AverageSoundEvaluator,
-                                                 SpectrumSoundEvaluator)
+from .. data_structures import AverageSound
+from .. nodes.sound.sound_from_sequences import SpectrumSoundEvaluator
 
 typeFilterItems = [
     ("ALL", "All", "", "NONE", 0),
@@ -68,8 +68,8 @@ class SoundSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         try:
             soundType, sequenceIndex, bakeIndex = self.bakeData.split("_")
             sequence = self.nodeTree.scene.sequence_editor.sequences[int(sequenceIndex)]
-            evaluatorClass = AverageSoundEvaluator if soundType == "AVERAGE" else SpectrumSoundEvaluator
-            return evaluatorClass([sequence], int(bakeIndex))
+            if soundType == "AVERAGE": return AverageSound.fromSequences([sequence], int(bakeIndex))
+            if soundType == "SPECTRUM": return SpectrumSoundEvaluator([sequence], int(bakeIndex))
         except:
             return None
 

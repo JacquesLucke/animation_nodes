@@ -12,3 +12,6 @@ from . data_structures.splines.bezier_spline cimport BezierSpline
 from . data_structures.falloffs.evaluation cimport FalloffEvaluator
 from . data_structures.falloffs.falloff_base cimport Falloff, BaseFalloff, CompoundFalloff
 from . data_structures.interpolation_base cimport InterpolationFunction, InterpolationBase
+
+from . data_structures.sounds.sound cimport Sound
+from . data_structures.sounds.average_sound cimport AverageSound
