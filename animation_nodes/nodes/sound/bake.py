@@ -1,6 +1,7 @@
 import bpy
 import os
 from bpy.props import *
+from ... data_structures import FloatList
 from ... utils.names import getRandomString
 from ... tree_info import getNodeByIdentifier
 from ... base_types import AnimationNode
@@ -452,6 +453,11 @@ class AverageData(bpy.types.PropertyGroup):
     samples = CollectionProperty(name = "Samples", type = SingleFrequencySample)
     identifier = StringProperty(name = "Identifier", default = "")
 
+    def getSamples(self):
+        samples = FloatList(length = len(self.samples))
+        self.samples.foreach_get("strength", samples.asMemoryView())
+        return samples
+
 class SpectrumData(bpy.types.PropertyGroup):
     bl_idname = "an_SoundSpectrumData"
     attack = FloatProperty(name = "Attack", precision = 3)
@@ -461,7 +467,7 @@ class SpectrumData(bpy.types.PropertyGroup):
     identifier = StringProperty(name = "Identifier", default = "")
 
 def register():
-    bpy.types.Sound.averageData = CollectionProperty(name = "Bake Data", type = AverageData)
+    bpy.types.Sound.averageData = CollectionProperty(name = "Average Data", type = AverageData)
     bpy.types.Sound.spectrumData = CollectionProperty(name = "Spectrum Data", type = SpectrumData)
 
 def unregister():
