@@ -27,7 +27,7 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
     activeSpectrumDataIndex = IntProperty()
 
     low = IntProperty(name = "Low", default = 0, min = 0, max = 20000)
-    high = IntProperty(name = "High", default = 20000, min = 0, max = 20000)
+    high = IntProperty(name = "High", default = 10000, min = 0, max = 20000)
     attack = FloatProperty(name = "Attack", default = 0.005, precision = 3)
     release = FloatProperty(name = "Release", default = 0.2, precision = 3)
 
