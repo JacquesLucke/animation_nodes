@@ -10,7 +10,7 @@ soundTypeItems = [
 ]
 
 averageFalloffTypeItems = [
-    ("INDEX_DELAY", "Index Delay", "", "NONE", 0)
+    ("INDEX_OFFSET", "Index Offset", "", "NONE", 0)
 ]
 
 class SoundFalloffNode(bpy.types.Node, AnimationNode):
@@ -20,7 +20,7 @@ class SoundFalloffNode(bpy.types.Node, AnimationNode):
     soundType = EnumProperty(name = "Sound Type", default = "AVERAGE",
         items = soundTypeItems, update = AnimationNode.refresh)
 
-    averageFalloffType = EnumProperty(name = "Average Falloff Type", default = "INDEX_DELAY",
+    averageFalloffType = EnumProperty(name = "Average Falloff Type", default = "INDEX_OFFSET",
         items = averageFalloffTypeItems, update = AnimationNode.refresh)
 
     useCurrentFrame = BoolProperty(name = "Use Current Frame", default = True,
@@ -32,8 +32,8 @@ class SoundFalloffNode(bpy.types.Node, AnimationNode):
             self.newInput("Float", "Frame", "frame")
 
         if self.soundType == "AVERAGE":
-            if self.averageFalloffType == "INDEX_DELAY":
-                self.newInput("Float", "Delay", "delay", value = 1)
+            if self.averageFalloffType == "INDEX_OFFSET":
+                self.newInput("Integer", "Offset", "offset", value = 1, minValue = 0)
 
         self.newOutput("Falloff", "Falloff", "falloff")
 
@@ -43,27 +43,27 @@ class SoundFalloffNode(bpy.types.Node, AnimationNode):
         else:                    yield "    _frame = frame"
 
         if self.soundType == "AVERAGE":
-            if self.averageFalloffType == "INDEX_DELAY":
-                yield "    falloff = self.execute_Average_IndexDelay(sound, _frame, delay)"
+            if self.averageFalloffType == "INDEX_OFFSET":
+                yield "    falloff = self.execute_Average_IndexOffset(sound, _frame, offset)"
 
         yield "else: falloff = self.getConstantFalloff(0)"
 
     def getConstantFalloff(self, value = 0):
         return ConstantFalloff(value)
 
-    def execute_Average_IndexDelay(self, sound, frame, delay):
-        return Average_IndexDelay_SoundFalloff(sound, frame, delay)
+    def execute_Average_IndexOffset(self, sound, frame, offset):
+        return Average_IndexOffset_SoundFalloff(sound, frame, offset)
 
-cdef class Average_IndexDelay_SoundFalloff(BaseFalloff):
+cdef class Average_IndexOffset_SoundFalloff(BaseFalloff):
     cdef:
         AverageSound sound
-        float frame, delay
+        float frame, offsetInverse
 
-    def __cinit__(self, AverageSound sound, float frame, float delay):
+    def __cinit__(self, AverageSound sound, float frame, offset):
         self.sound = sound
         self.frame = frame
-        self.delay = delay
+        self.offsetInverse = 1 / offset if offset != 0 else 0
         self.dataType = "All"
 
     cdef double evaluate(self, void *object, long index):
-        return self.sound.evaluate(self.frame - index * self.delay)
+        return self.sound.evaluate(self.frame - index * self.offsetInverse)
