@@ -51,8 +51,8 @@ cdef class MaskEveryNthFalloff(BaseFalloff):
     cdef double valueA, valueB
 
     def __cinit__(self, step, offset, double valueA, double valueB):
-        self.step = max(1, step % LONG_MAX)
-        self.offset = max(1, offset % LONG_MAX)
+        self.step = max(1, min(step, LONG_MAX))
+        self.offset = max(1, min(offset, LONG_MAX))
         self.valueA = valueA
         self.valueB = valueB
         self.dataType = "All"

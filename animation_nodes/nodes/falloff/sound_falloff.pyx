@@ -64,6 +64,7 @@ cdef class Average_IndexOffset_SoundFalloff(BaseFalloff):
         self.frame = frame
         self.offsetInverse = 1 / offset if offset != 0 else 0
         self.dataType = "All"
+        self.clamped = False
 
     cdef double evaluate(self, void *object, long index):
         return self.sound.evaluate(self.frame - index * self.offsetInverse)
