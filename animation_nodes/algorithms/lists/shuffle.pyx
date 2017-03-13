@@ -1,9 +1,9 @@
-import random
 from libc.string cimport memcpy
 from libc.limits cimport INT_MAX
 from .. random cimport uniformRandomInteger
 from cpython.mem cimport PyMem_Malloc, PyMem_Free
 from ... data_structures cimport CList, PolygonIndicesList, ULongList
+random = __import__("random") # to avoid cython name clashes
 
 from ... sockets.info import getSocketClass
 
