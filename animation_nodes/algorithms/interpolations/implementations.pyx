@@ -310,14 +310,13 @@ cdef class CachedInterpolation(Interpolation):
         return self.cache.data[index[0]] * (1 - factor) + self.cache.data[index[1]] * factor
 
 
-from bpy.types import FCurve
-
 cdef class FCurveMapping(Interpolation):
     cdef:
         object fCurve
         double xMove, xFactor, yMove, yFactor
 
     def __cinit__(self, object fCurve, double xMove, double xFactor, double yMove, double yFactor):
+        from bpy.types import FCurve
         if not isinstance(fCurve, FCurve):
             raise TypeError("Expected FCurve")
         self.fCurve = fCurve
@@ -329,3 +328,15 @@ cdef class FCurveMapping(Interpolation):
     cdef double evaluate(self, double x):
         x = x * self.xFactor + self.xMove
         return (self.fCurve.evaluate(x) + self.yMove) * self.yFactor
+
+
+cdef class MirrorInterpolation(Interpolation):
+    cdef Interpolation interpolation
+
+    def __cinit__(self, Interpolation interpolation not None):
+        self.interpolation = interpolation
+
+    cdef double evaluate(self, double x):
+        if x <= 0.5:
+            return self.interpolation.evaluate(2 * x)
+        return self.interpolation.evaluate(2 - 2 * x)
