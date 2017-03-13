@@ -1,6 +1,6 @@
-from ... data_structures cimport DoubleList, InterpolationBase
+from ... data_structures cimport DoubleList, Interpolation
 
-def sampleInterpolation(InterpolationBase f not None,
+def sampleInterpolation(Interpolation f not None,
                         unsigned int amount,
                         double minValue = 0,
                         double maxValue = 1):

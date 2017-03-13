@@ -12,9 +12,9 @@ def importDataStructures():
     from . splines.poly_spline import PolySpline
     from . list_mocks.clist_mock import CListMock
     from . splines.bezier_spline import BezierSpline
-    from . interpolation_base import InterpolationBase
+    from . interpolation import Interpolation
     from . falloffs.falloff_base import Falloff, BaseFalloff, CompoundFalloff
-    
+
     from . sounds.sound import Sound
     from . sounds.average_sound import AverageSound
 

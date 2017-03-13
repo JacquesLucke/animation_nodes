@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... math cimport clamp
-from ... data_structures cimport DoubleList, InterpolationBase
+from ... data_structures cimport DoubleList, Interpolation
 from ... base_types import AnimationNode, AutoSelectVectorization
 
 class MapRangeNode(bpy.types.Node, AnimationNode):
@@ -92,7 +92,7 @@ class MapRangeNode(bpy.types.Node, AnimationNode):
 
     def execute_Multiple_Interpolated(self, DoubleList values,
                                 double inMin, double inMax, double outMin, double outMax,
-                                InterpolationBase interpolation):
+                                Interpolation interpolation):
         if inMin == inMax:
             return DoubleList.fromValues([0]) * values.length
 

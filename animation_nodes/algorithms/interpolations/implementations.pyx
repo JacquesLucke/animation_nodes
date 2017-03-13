@@ -2,7 +2,7 @@ cimport cython
 from libc.math cimport M_PI as PI
 from libc.math cimport pow, sqrt, sin, cos
 from ... utils.lists cimport findListSegment_LowLevel
-from ... data_structures cimport InterpolationBase, DoubleList
+from ... data_structures cimport Interpolation, DoubleList
 
 '''
 Here is a good source for different interpolation functions in Java:
@@ -12,7 +12,7 @@ https://github.com/libgdx/libgdx/blob/master/gdx/src/com/badlogic/gdx/math/Inter
 # Linear
 #####################################################
 
-cdef class Linear(InterpolationBase):
+cdef class Linear(Interpolation):
     def __cinit__(self):
         self.clamped = True
 
@@ -23,7 +23,7 @@ cdef class Linear(InterpolationBase):
 # Power
 #####################################################
 
-cdef class PowerIn(InterpolationBase):
+cdef class PowerIn(Interpolation):
     cdef int exponent
 
     def __cinit__(self, int exponent):
@@ -33,7 +33,7 @@ cdef class PowerIn(InterpolationBase):
     cdef double evaluate(self, double x):
         return pow(x, self.exponent)
 
-cdef class PowerOut(InterpolationBase):
+cdef class PowerOut(Interpolation):
     cdef int exponent
     cdef int factor
 
@@ -45,7 +45,7 @@ cdef class PowerOut(InterpolationBase):
     cdef double evaluate(self, double x):
         return pow(x - 1, self.exponent) * self.factor + 1
 
-cdef class PowerInOut(InterpolationBase):
+cdef class PowerInOut(Interpolation):
     cdef int exponent
     cdef double factor
 
@@ -64,7 +64,7 @@ cdef class PowerInOut(InterpolationBase):
 # Exponential
 #####################################################
 
-cdef class ExponentialInterpolationBase(InterpolationBase):
+cdef class ExponentialInterpolationBase(Interpolation):
     cdef:
         int exponent
         double base
@@ -97,7 +97,7 @@ cdef class ExponentialInOut(ExponentialInterpolationBase):
 # Circular
 #####################################################
 
-cdef class CircularInterpolationBase(InterpolationBase):
+cdef class CircularInterpolationBase(Interpolation):
     def __cinit__(self):
         self.clamped = True
 
@@ -122,7 +122,7 @@ cdef class CircularInOut(CircularInterpolationBase):
 # Elastic
 #####################################################
 
-cdef class ElasticInterpolationBase(InterpolationBase):
+cdef class ElasticInterpolationBase(Interpolation):
     cdef:
         int factor
         double bounceFactor, base, exponent
@@ -156,7 +156,7 @@ cdef class ElasticInOut(ElasticInterpolationBase):
 # Bounce
 #####################################################
 
-cdef class BounceInterpolationBase(InterpolationBase):
+cdef class BounceInterpolationBase(Interpolation):
     cdef:
         DoubleList widths, heights
 
@@ -210,7 +210,7 @@ cdef class BounceInOut(BounceInterpolationBase):
 # Back
 #####################################################
 
-cdef class BackInterpolationBase(InterpolationBase):
+cdef class BackInterpolationBase(Interpolation):
     cdef double scale
 
     def __cinit__(self, double scale):
@@ -238,7 +238,7 @@ cdef class BackInOut(BackInterpolationBase):
 # Sine
 #####################################################
 
-cdef class SinInterpolationBase(InterpolationBase):
+cdef class SinInterpolationBase(Interpolation):
     def __cinit__(self):
         self.clamped = True
 
@@ -258,12 +258,12 @@ cdef class SinInOut(SinInterpolationBase):
 # Specials
 #####################################################
 
-cdef class Mixed(InterpolationBase):
+cdef class Mixed(Interpolation):
     cdef:
         double factor
-        InterpolationBase a, b
+        Interpolation a, b
 
-    def __cinit__(self, double factor, InterpolationBase a not None, InterpolationBase b not None):
+    def __cinit__(self, double factor, Interpolation a not None, Interpolation b not None):
         self.factor = factor
         self.a = a
         self.b = b
@@ -273,7 +273,7 @@ cdef class Mixed(InterpolationBase):
         return self.a.evaluate(x) * (1 - self.factor) + self.b.evaluate(x) * self.factor
 
 
-cdef class PyInterpolation(InterpolationBase):
+cdef class PyInterpolation(Interpolation):
     cdef object function
 
     def __cinit__(self, object function not None):
@@ -285,13 +285,13 @@ cdef class PyInterpolation(InterpolationBase):
         return self.function(x)
 
 
-cdef class CachedInterpolation(InterpolationBase):
+cdef class CachedInterpolation(Interpolation):
     cdef:
-        InterpolationBase original
+        Interpolation original
         readonly DoubleList cache
         int resolution
 
-    def __cinit__(self, InterpolationBase original not None, int resolution = 100):
+    def __cinit__(self, Interpolation original not None, int resolution = 100):
         self.original = original
         self.resolution = max(2, resolution)
         self.updateCache()
@@ -312,7 +312,7 @@ cdef class CachedInterpolation(InterpolationBase):
 
 from bpy.types import FCurve
 
-cdef class FCurveMapping(InterpolationBase):
+cdef class FCurveMapping(Interpolation):
     cdef:
         object fCurve
         double xMove, xFactor, yMove, yFactor

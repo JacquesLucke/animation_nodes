@@ -1,6 +1,6 @@
 import bpy
 from ... base_types import AnimationNode
-from ... data_structures cimport CompoundFalloff, Falloff, InterpolationBase
+from ... data_structures cimport CompoundFalloff, Falloff, Interpolation
 
 class InterpolateFalloffNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_InterpolateFalloffNode"
@@ -18,9 +18,9 @@ class InterpolateFalloffNode(bpy.types.Node, AnimationNode):
 cdef class InterpolateFalloff(CompoundFalloff):
     cdef:
         Falloff falloff
-        InterpolationBase interpolation
+        Interpolation interpolation
 
-    def __cinit__(self, Falloff falloff, InterpolationBase interpolation):
+    def __cinit__(self, Falloff falloff, Interpolation interpolation):
         self.falloff = falloff
         self.interpolation = interpolation
         self.clamped = interpolation.clamped

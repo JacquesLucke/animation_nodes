@@ -1,4 +1,4 @@
-cdef class InterpolationBase:
+cdef class Interpolation:
     def __cinit__(self):
         self.clamped = False
 

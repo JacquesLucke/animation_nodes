@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from .. events import propertyChanged
-from .. data_structures import InterpolationBase
+from .. data_structures import Interpolation
 from .. algorithms.interpolations import getInterpolationPreset, PyInterpolation, Linear
 from .. base_types import AnimationNodeSocket, PythonListSocket
 
@@ -59,7 +59,7 @@ class InterpolationSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     @classmethod
     def correctValue(cls, value):
-        if isinstance(value, InterpolationBase):
+        if isinstance(value, Interpolation):
             return value, 0
         try: return PyInterpolation(value), 1
         except: return cls.getDefaultValue(), 2
@@ -82,7 +82,7 @@ class InterpolationListSocket(bpy.types.NodeSocket, PythonListSocket, AnimationN
     @classmethod
     def correctValue(cls, value):
         if isinstance(value, list):
-            if all(isinstance(element, InterpolationBase) for element in value):
+            if all(isinstance(element, Interpolation) for element in value):
                 return value, 0
         try: return [PyInterpolation(element) for element in value], 1
         except: return cls.getDefaultValue(), 2
