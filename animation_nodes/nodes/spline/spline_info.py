@@ -17,11 +17,11 @@ class SplineInfoNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.newInput("Spline", "Spline", "spline", defaultDrawType = "PROPERTY_ONLY", dataIsModified = True)
-        self.newOutput("Boolean", "Cyclic", "cyclic")
         self.newOutput("Vector List", "Points", "points")
         if self.splineType == "BEZIER":
             self.newOutput("Vector List", "Left Handles", "leftHandles")
             self.newOutput("Vector List", "Right Handles", "rightHandles")
+        self.newOutput("Boolean", "Cyclic", "cyclic")
 
     def draw(self, layout):
         layout.prop(self, "splineType", text = "")
@@ -34,8 +34,8 @@ class SplineInfoNode(bpy.types.Node, AnimationNode):
 
     def execute_Bezier(self, spline):
         if spline.type == "BEZIER":
-            return spline.cyclic, spline.points, spline.leftHandles, spline.rightHandles
-        return spline.cyclic, spline.points, Vector3DList(), Vector3DList()
+            return spline.points, spline.leftHandles, spline.rightHandles, spline.cyclic
+        return spline.points, Vector3DList(), Vector3DList(), spline.cyclic
 
     def execute_Poly(self, spline):
-        return spline.cyclic, spline.points
+        return spline.points, spline.cyclic
