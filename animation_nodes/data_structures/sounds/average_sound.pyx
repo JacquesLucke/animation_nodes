@@ -24,20 +24,16 @@ cdef class AverageSound(Sound):
         return 0
 
 def createAverageSound(list sequences, int index):
-    if not canMakeAverageSound(sequences, index):
-        raise Exception("cannot make AverageSound")
-
+    checkAverageSoundInput(sequences, index)
     return createValidAverageSound(sequences, index)
 
-cdef canMakeAverageSound(list sequences, int index):
+cdef checkAverageSoundInput(list sequences, int index):
     if len(sequences) == 0: return False
     for sequence in sequences:
-        if sequence is None:
-            return False
         if not isinstance(getattr(sequence, "sound", None), bpy.types.Sound):
-            return False
+            raise TypeError("at least one sequence has no sound")
         if index >= len(sequence.sound.averageData):
-            return False
+            raise IndexError("at least one sequence does not have the given bake index")
     return True
 
 cdef createValidAverageSound(list sequences, int index):

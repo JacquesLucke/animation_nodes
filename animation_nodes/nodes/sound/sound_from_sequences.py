@@ -28,12 +28,13 @@ class SoundFromSequencesNode(bpy.types.Node, AnimationNode):
             writeText(layout, self.errorMessage, width = 25, icon = "ERROR")
 
     def execute(self, sequences, bakeIndex):
+        self.errorMessage = ""
         if len(sequences) == 0: return None
+        sequences = list(filter(lambda x: getattr(x, "type", None) == "SOUND", sequences))
         try:
-            self.errorMessage = ""
             if self.soundType == "AVERAGE": return AverageSound.fromSequences(sequences, bakeIndex)
             if self.soundType == "SPECTRUM": return SpectrumSoundEvaluator(sequences, bakeIndex)
-        except:
+        except IndexError:
             self.errorMessage = "At least one sequence does not have this bake index"
             return None
 
