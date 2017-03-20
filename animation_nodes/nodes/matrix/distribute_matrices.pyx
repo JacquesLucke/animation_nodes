@@ -126,7 +126,8 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
             CListMock _normals = CListMock(Vector3DList, normals, (0, 0, 0))
             int amount = CListMock.getMaxLength(_vertices, _normals)
             Matrix4x4List matrices = Matrix4x4List(length = amount)
-            Vector3 *normal, *position
+            Vector3 *normal
+            Vector3 *position
             Vector3 guide = toVector3((0, 0, 1))
 
         for i in range(amount):
