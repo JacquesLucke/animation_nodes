@@ -53,14 +53,14 @@ cdef class BaseInterpolateDoubleListFalloff(BaseFalloff):
 cdef class Loop_InterpolateDoubleListFalloff(BaseInterpolateDoubleListFalloff):
     cdef double evaluate(self, void *object, long _index):
         cdef double index = (<double>_index + self.offset) % self.length
-        cdef double x = index / self.length * self.myList.length
+        cdef double x = index / (self.length - 1) * (self.myList.length - 1)
         return evaluatePosition(x, self.myList, self.interpolation)
 
 cdef class Extend_InterpolateDoubleListFalloff(BaseInterpolateDoubleListFalloff):
     cdef double evaluate(self, void *object, long _index):
         cdef double index = <double>_index + self.offset
         index = min(max(index, 0), self.length - 1)
-        cdef double x = index / self.length * self.myList.length
+        cdef double x = index / (self.length - 1) * (self.myList.length - 1)
         return evaluatePosition(x, self.myList, self.interpolation)
 
 
