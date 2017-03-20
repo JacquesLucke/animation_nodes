@@ -1,14 +1,15 @@
 import bpy
+from . utils cimport findStartAndEndFrame
 
 cdef class AverageSound(Sound):
-    def __cinit__(self, FloatList samples, int startFrame):
+    def __cinit__(self, FloatList samples not None, int startFrame):
         self.type = "AVERAGE"
         self.samples = samples
         self.startFrame = startFrame
         self.endFrame = startFrame + len(samples) - 1
 
     @classmethod
-    def fromSequences(cls, list sequences, int index):
+    def fromSequences(cls, list sequences not None, int index):
         return createAverageSound(sequences, index)
 
     cpdef float evaluate(self, float frame):
@@ -23,18 +24,18 @@ cdef class AverageSound(Sound):
             return self.samples.data[frame - self.startFrame]
         return 0
 
-def createAverageSound(list sequences, int index):
+def createAverageSound(list sequences not None, int index):
     checkAverageSoundInput(sequences, index)
     return createValidAverageSound(sequences, index)
 
 cdef checkAverageSoundInput(list sequences, int index):
-    if len(sequences) == 0: return False
+    if len(sequences) == 0:
+        raise ValueError("at least one sequence required")
     for sequence in sequences:
         if not isinstance(getattr(sequence, "sound", None), bpy.types.Sound):
             raise TypeError("at least one sequence has no sound")
-        if index >= len(sequence.sound.averageData):
+        if index >= len(sequence.sound.bakedData.average):
             raise IndexError("at least one sequence does not have the given bake index")
-    return True
 
 cdef createValidAverageSound(list sequences, int index):
     cdef int startFrame, endFrame
@@ -62,12 +63,7 @@ cdef FloatList addSequenceSamplesInRange(list sequences, int index, int rangeSta
 
 cdef dict cachedAverageSounds = dict()
 cdef getAverageSoundSamples(sound, index):
-    cdef str identifier = sound.averageData[index].identifier
+    cdef str identifier = sound.bakedData.average[index].identifier
     if identifier not in cachedAverageSounds:
-        cachedAverageSounds[identifier] = sound.averageData[index].getSamples()
+        cachedAverageSounds[identifier] = sound.bakedData.average[index].getSamples()
     return cachedAverageSounds[identifier]
-
-cdef findStartAndEndFrame(sequences):
-    startFrame = min(sequence.frame_final_start for sequence in sequences)
-    endFrame = max(sequence.frame_final_end for sequence in sequences)
-    return startFrame, endFrame

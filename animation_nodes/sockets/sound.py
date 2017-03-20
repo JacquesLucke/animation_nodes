@@ -29,7 +29,7 @@ def getBakeDataItems(self, context):
     return items
 
 def iterAverageItems(sequenceIndex, sequence):
-    for bakeIndex, data in enumerate(sequence.sound.averageData):
+    for bakeIndex, data in enumerate(sequence.sound.bakedData.average):
         yield ("AVERAGE_{}_{}".format(sequenceIndex, bakeIndex),
                "#{} - {} - Average".format(bakeIndex, sequence.name),
                "Low: {}  High: {}  Attack: {:.3f}  Release: {:.3f}".format(
@@ -37,7 +37,7 @@ def iterAverageItems(sequenceIndex, sequence):
                strToEnumItemID(data.identifier))
 
 def iterSpectrumItems(sequenceIndex, sequence):
-    for bakeIndex, data in enumerate(sequence.sound.spectrumData):
+    for bakeIndex, data in enumerate(sequence.sound.bakedData.spectrum):
         yield ("SPECTRUM_{}_{}".format(sequenceIndex, bakeIndex),
                "#{} - {} - Spectrum".format(bakeIndex, sequence.name),
                "Attack: {:.3f}  Release: {:.3f}".format(data.attack, data.release),
