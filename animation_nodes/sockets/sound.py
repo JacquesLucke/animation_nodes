@@ -3,9 +3,8 @@ from bpy.props import *
 from .. events import propertyChanged
 from .. base_types import AnimationNodeSocket
 from .. algorithms.hashing import strToEnumItemID
+from .. data_structures import AverageSound, SpectrumSound
 from .. utils.nodes import newNodeAtCursor, invokeTranslation
-from .. data_structures import AverageSound
-from .. nodes.sound.sound_from_sequences import SpectrumSoundEvaluator
 
 typeFilterItems = [
     ("ALL", "All", "", "NONE", 0),
@@ -69,7 +68,7 @@ class SoundSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             soundType, sequenceIndex, bakeIndex = self.bakeData.split("_")
             sequence = self.nodeTree.scene.sequence_editor.sequences[int(sequenceIndex)]
             if soundType == "AVERAGE": return AverageSound.fromSequences([sequence], int(bakeIndex))
-            if soundType == "SPECTRUM": return SpectrumSoundEvaluator([sequence], int(bakeIndex))
+            if soundType == "SPECTRUM": return SpectrumSound.fromSequences([sequence], int(bakeIndex))
         except:
             return None
 
@@ -89,6 +88,6 @@ class SoundSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     @classmethod
     def correctValue(cls, value):
-        if isinstance(value, (AverageSoundEvaluator, SpectrumSoundEvaluator)) or value is None:
+        if isinstance(value, (AverageSound, SpectrumSound)) or value is None:
             return value, 0
         return cls.getDefaultValue(), 2

@@ -17,6 +17,7 @@ def importDataStructures():
 
     from . sounds.sound import Sound
     from . sounds.average_sound import AverageSound
+    from . sounds.spectrum_sound import SpectrumSound
 
     return locals()
 
