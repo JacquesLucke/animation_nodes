@@ -64,13 +64,17 @@ class SoundSocket(bpy.types.NodeSocket, AnimationNodeSocket):
                 description = "Create sound bake node")
 
     def getValue(self):
-        try:
-            soundType, sequenceIndex, bakeIndex = self.bakeData.split("_")
-            sequence = self.nodeTree.scene.sequence_editor.sequences[int(sequenceIndex)]
-            if soundType == "AVERAGE": return AverageSound.fromSequences([sequence], int(bakeIndex))
-            if soundType == "SPECTRUM": return SpectrumSound.fromSequences([sequence], int(bakeIndex))
-        except:
+        if self.bakeData == "None":
             return None
+
+        soundType, sequenceIndex, bakeIndex = self.bakeData.split("_")
+        try: sequence = self.nodeTree.scene.sequence_editor.sequences[int(sequenceIndex)]
+        except IndexError:
+            return None
+
+        if soundType == "AVERAGE": return AverageSound.fromSequences([sequence], int(bakeIndex))
+        if soundType == "SPECTRUM": return SpectrumSound.fromSequences([sequence], int(bakeIndex))
+        return None
 
     def setProperty(self, data):
         try: self.bakeData = data
