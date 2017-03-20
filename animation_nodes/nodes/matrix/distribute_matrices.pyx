@@ -11,9 +11,10 @@ from ... math cimport (Matrix4, Vector3, setTranslationMatrix,
 cdef double PI = _pi # cimporting pi does not work for some reason...
 
 modeItems = [
-    ("GRID", "Grid", "", "", 0),
-    ("CIRCLE", "Circle", "", "", 1),
-    ("VERTICES", "Vertices", "", "", 2)
+    ("LINEAR", "Linear", "", "", 0),
+    ("GRID", "Grid", "", "", 1),
+    ("CIRCLE", "Circle", "", "", 2),
+    ("VERTICES", "Vertices", "", "", 3)
 ]
 
 distanceModeItems = [
@@ -32,7 +33,13 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
         items = distanceModeItems, update = AnimationNode.refresh)
 
     def create(self):
-        if self.mode == "GRID":
+        if self.mode == "LINEAR":
+            self.newInput("Integer", "Amount", "amount", value = 5)
+            if self.distanceMode == "STEP":
+                self.newInput("Float", "Distance", "distance", value = 1)
+            elif self.distanceMode == "SIZE":
+                self.newInput("Float", "Size", "size", value = 4)
+        elif self.mode == "GRID":
             self.newInput("Integer", "X Divisions", "xDivisions", value = 3, minValue = 0)
             self.newInput("Integer", "Y Divisions", "yDivisions", value = 3, minValue = 0)
             self.newInput("Integer", "Z Divisions", "zDivisions", value = 1, minValue = 0)
@@ -57,16 +64,21 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         col = layout.column()
         layout.prop(self, "mode", text = "")
-        if self.mode == "GRID":
+        if self.mode in ("LINEAR", "GRID"):
             layout.prop(self, "distanceMode", text = "")
 
     def getExecutionFunctionName(self):
-        if self.mode == "GRID":
+        if self.mode == "LINEAR":
+            return "execute_Linear"
+        elif self.mode == "GRID":
             return "execute_Grid"
         elif self.mode == "CIRCLE":
             return "execute_Circle"
         elif self.mode == "VERTICES":
             return "execute_Vertices"
+
+    def execute_Linear(self, amount, size):
+        return self.execute_Grid(amount, 1, 1, size, 0, 0)
 
     def execute_Grid(self, xDivisions, yDivisions, zDivisions, size1, size2, size3):
         cdef:
