@@ -8,7 +8,7 @@ class LineMeshNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.newInput("Vector", "Start", "start")
-        self.newInput("Vector", "End", "end", value = [0, 0, 10])
+        self.newInput("Vector", "End", "end", value = [5, 0, 0])
         self.newInput("Integer", "Steps", "steps", value = 2, minValue = 2)
 
         self.newOutput("Vector List", "Vertices", "vertices")
