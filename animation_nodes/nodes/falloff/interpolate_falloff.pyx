@@ -31,5 +31,5 @@ cdef class InterpolateFalloff(CompoundFalloff):
     cdef list getClampingRequirements(self):
         return [True]
 
-    cdef double evaluate(self, double* dependencyResults):
+    cdef double evaluate(self, double *dependencyResults):
         return self.interpolation.evaluate(dependencyResults[0])
