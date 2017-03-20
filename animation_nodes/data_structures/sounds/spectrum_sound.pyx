@@ -1,5 +1,5 @@
 import bpy
-from . utils cimport findStartAndEndFrame
+from . utils cimport findStartAndEndFrame, getNearestFloatListValue
 
 cdef class SpectrumSound(Sound):
 
@@ -60,6 +60,8 @@ cdef mixSequenceSamplesInRange(list sequences, int index, int rangeStart, int ra
     mixedSamples.fill(0)
 
     cdef int frame, finalStartFrame, finalEndFrame, sequenceStart, i
+    cdef int offsetTarget, offsetSource
+    cdef float frequencyFactor, value
     for sequence in sequences:
         sound = sequence.sound
         samples = getSpectrumSoundSamples(sound, index)
@@ -71,12 +73,19 @@ cdef mixSequenceSamplesInRange(list sequences, int index, int rangeStart, int ra
 
         if sequenceFrequencyAmount == frequencyAmount:
             for frame in range(finalStartFrame, finalEndFrame):
+                offsetSource = (frame - sequenceStart) * frequencyAmount
+                offsetTarget = (frame - rangeStart) * frequencyAmount
                 for i in range(frequencyAmount):
-                    mixedSamples.data[(frame - rangeStart) * frequencyAmount + i] += samples.data[(frame - sequenceStart) * frequencyAmount + i]
+                    mixedSamples.data[offsetTarget + i] += samples.data[offsetSource + i]
         else:
+            frequencyFactor = 1.0 / (frequencyAmount - 1)
             for frame in range(finalStartFrame, finalEndFrame):
-                pass
-
+                offsetSource = (frame - sequenceStart) * sequenceFrequencyAmount
+                offsetTarget = (frame - rangeStart) * frequencyAmount
+                for i in range(frequencyAmount):
+                    value = getNearestFloatListValue(samples.data + offsetSource,
+                                sequenceFrequencyAmount, <float>i * frequencyFactor)
+                    mixedSamples.data[offsetTarget + i] += value
     return mixedSamples
 
 cdef dict cachedSpectrumSounds = dict()
