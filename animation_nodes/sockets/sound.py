@@ -73,10 +73,11 @@ class SoundSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             return None
 
     def setProperty(self, data):
-        self.bakeData, self.type = data
+        try: self.bakeData = data
+        except: pass
 
     def getProperty(self):
-        return self.bakeData, self.type
+        return self.bakeData
 
     def createSoundBakeNode(self):
         newNodeAtCursor("an_SoundBakeNode")

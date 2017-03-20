@@ -63,4 +63,4 @@ class EvaluateSoundNode(bpy.types.Node, AnimationNode):
         if sound.type != "SPECTRUM":
             self.errorMessage = "Wrong sound type"
             return DoubleList()
-        return sound.evaluate(frame)
+        return DoubleList.fromValues(sound.evaluate(frame))
