@@ -1,6 +1,6 @@
 cimport cython
 from libc.stdlib cimport malloc, free, realloc
-from libc.string cimport memcpy, memmove, memcmp
+from libc.string cimport memcpy, memmove, memcmp, memset
 from . utils cimport predictSliceLength, makeStepPositive, removeValuesInSlice, getValuesInSlice
 
 cdef class LISTNAME(CList):
@@ -175,9 +175,12 @@ cdef class LISTNAME(CList):
     cpdef fill(self, value):
         cdef Py_ssize_t i
         cdef TYPE _value
-        self.tryConversion(value, &_value)
-        for i in range(self.length):
-            self.data[i] = _value
+        if value == 0:
+            memset(self.data, 0, self.length * sizeof(TYPE))
+        else:
+            self.tryConversion(value, &_value)
+            for i in range(self.length):
+                self.data[i] = _value
 
     cpdef append(self, value):
         if self.length >= self.capacity:
