@@ -1,41 +1,44 @@
 import bpy
 from bpy.props import *
-from ... events import propertyChanged
 from ... base_types import AnimationNode
+from ... events import executionCodeChanged
 
 class TrimTextNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_TrimTextNode"
     bl_label = "Trim Text"
 
-    def settingChanged(self, context):
-        self.inputs["End"].hide = self.autoEnd
-        propertyChanged()
+    trimStart = BoolProperty(name = "Trim Start", default = False,
+        update = AnimationNode.refresh)
 
-    autoEnd = BoolProperty(
-        default = False, update = settingChanged,
-        description = "Use the length of the text as trim-end")
+    trimEnd = BoolProperty(name = "Trim End", default = True,
+        update = AnimationNode.refresh)
 
-    allowNegativeIndex = BoolProperty(
-        default = False, update = settingChanged,
-        description = "Negative indices start from the end")
+    allowNegativeIndex = BoolProperty(name = "Allow Negative Index", default = False,
+        update = executionCodeChanged)
 
     def create(self):
         self.newInput("Text", "Text", "text")
-        self.newInput("Integer", "Start", "start", value = 0)
-        self.newInput("Integer", "End", "end", value = 5)
+        if self.trimStart:
+            self.newInput("Integer", "Start", "start", value = 0)
+        if self.trimEnd:
+            self.newInput("Integer", "End", "end", value = 5)
         self.newOutput("Text", "Text", "outText")
 
     def draw(self, layout):
-        layout.prop(self, "autoEnd", text = "Auto End")
+        row = layout.row(align = True)
+        row.prop(self, "trimStart", text = "Start", icon = "TRIA_RIGHT")
+        row.prop(self, "trimEnd", text = "End", icon = "TRIA_LEFT")
+
+    def drawAdvanced(self, layout):
         layout.prop(self, "allowNegativeIndex", text = "Negative Indices")
 
-    def execute(self, text, start, end):
-        textLength = len(text)
+    def getExecutionCode(self):
+        if not self.trimStart:
+            yield "start = 0"
+        if not self.trimEnd:
+            yield "end = len(text)"
 
-        if self.autoEnd: end = textLength
-
-        minIndex = -textLength if self.allowNegativeIndex else 0
-        start = min(max(minIndex, start), textLength)
-        end = min(max(minIndex, end), textLength)
-
-        return text[start:end]
+        if self.allowNegativeIndex:
+            yield "outText = text[start:end]"
+        else:
+            yield "outText = text[max(start, 0):max(end, 0)]"
