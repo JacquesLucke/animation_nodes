@@ -162,6 +162,7 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
         socket.textProps.unique = True
         socket.display.text = True
         socket.display.textInput = True
+        socket.display.removeOperator = True
         socket.text = name
         socket.moveable = True
         socket.removeable = True
