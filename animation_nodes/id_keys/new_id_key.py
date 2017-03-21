@@ -1,11 +1,12 @@
 import bpy
 from bpy.props import *
 from . data_types import keyDataTypeItems
-from . existing_keys import updateIdKeysList, IDKey
 from .. utils.blender_ui import getDpiFactor, redrawAll
+from . existing_keys import updateIdKeysList, IDKey, findsIDKeys
 
 createdIDKeys = set()
 
+@findsIDKeys
 def getCreatedIDKeys():
     return createdIDKeys
 

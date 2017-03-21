@@ -1,7 +1,8 @@
 import bpy
 from bpy.props import *
 from ... math import composeMatrixList
-from ... id_keys import keyDataTypeItems
+from ... tree_info import getNodesByType
+from ... id_keys import keyDataTypeItems, IDKey, findsIDKeys
 from ... base_types import AnimationNode, AutoSelectVectorization
 
 class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
@@ -133,3 +134,11 @@ class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
     def getList_Exists(self, objects):
         from animation_nodes.id_keys import doesIDKeyExist
         return [doesIDKeyExist(object, self.keyDataType, self.keyName) for object in objects]
+
+@findsIDKeys
+def getIDKeysOfNodes():
+    idKeys = set()
+    for node in getNodesByType("an_ObjectIDKeyNode"):
+        if node.keyName != "":
+            idKeys.add(IDKey(node.keyDataType, node.keyName))
+    return idKeys

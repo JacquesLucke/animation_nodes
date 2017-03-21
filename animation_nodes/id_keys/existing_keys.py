@@ -21,9 +21,8 @@ def findIDKeysInCurrentFile():
     from . new_id_key import getCreatedIDKeys
 
     foundKeys = set()
-    foundKeys.update(getIDKeysOfNodes())
-    foundKeys.update(getIDKeysOnObjects())
-    foundKeys.update(getCreatedIDKeys())
+    for loadKeys in loadExistingIDKeysFunctions:
+        foundKeys.update(loadKeys())
 
     # default keys should stay in order
     allKeys = list()
@@ -34,16 +33,17 @@ def findIDKeysInCurrentFile():
     return allKeys
 
 IDKey = namedtuple("IDKey", ["type", "name"])
+
 def getDefaultIDKeys():
     return [IDKey("Transforms", "Initial Transforms")]
 
-def getIDKeysOfNodes():
-    idKeys = set()
-    for node in getNodesByType("an_ObjectIDKeyNode"):
-        if node.keyName != "":
-            idKeys.add(IDKey(node.keyDataType, node.keyName))
-    return idKeys
 
+loadExistingIDKeysFunctions = []
+def findsIDKeys(function):
+    loadExistingIDKeysFunctions.append(function)
+    return function
+
+@findsIDKeys
 def getIDKeysOnObjects():
     possibleKeys = set()
     for object in bpy.data.objects:
