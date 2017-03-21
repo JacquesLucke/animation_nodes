@@ -23,10 +23,15 @@ class CombineListsNode(bpy.types.Node, AnimationNode):
         self.assignedType = "Float"
 
     def draw(self, layout):
-        self.invokeFunction(layout, "newInputSocket",
+        row = layout.row(align = True)
+        self.invokeFunction(row, "newInputSocket",
             text = "New Input",
             description = "Create a new input socket",
             icon = "PLUS")
+        self.invokeFunction(row, "removeUnlinkedInputs",
+            description = "Remove unlinked inputs",
+            confirm = True,
+            icon = "X")
 
     def drawAdvanced(self, layout):
         self.invokeSocketTypeChooser(layout, "assignListDataType",
@@ -78,3 +83,8 @@ class CombineListsNode(bpy.types.Node, AnimationNode):
             socket.copyDisplaySettingsFrom(self.inputs[0])
 
         return socket
+
+    def removeUnlinkedInputs(self):
+        for socket in self.inputs[:-1]:
+            if not socket.is_linked:
+                socket.remove()
