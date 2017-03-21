@@ -22,6 +22,7 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_InvokeSubprogramNode"
     bl_label = "Invoke Subprogram"
     bl_width_default = 170
+    dynamicLabelType = "HIDDEN_ONLY"
 
     def subprogramIdentifierChanged(self, context):
         self.refresh()
@@ -40,6 +41,12 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
 
     showCacheOptions = BoolProperty(name = "Show Cache Options", default = False,
         description = "Draw cache options in the node for easier access")
+
+    def drawLabel(self):
+        network = self.subprogramNetwork
+        if network is not None:
+            return "<" + network.name + ">"
+        return "Invoke Subprogram"
 
     @property
     def inputVariables(self):
