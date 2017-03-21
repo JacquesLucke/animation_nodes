@@ -5,15 +5,21 @@ from . blender_ui import redrawAll
 
 createdOperators = []
 
-def makeOperator(idName, label, arguments = [], redraw = False):
+def makeOperator(idName, label, arguments = [], redraw = False, confirm = False):
     def makeOperatorDecorator(function):
-        operator = getOperatorForFunction(function, idName, label, arguments, redraw)
+        operator = getOperatorForFunction(function, idName, label, arguments, redraw, confirm)
         bpy.utils.register_class(operator)
         createdOperators.append(operator)
         return function
     return makeOperatorDecorator
 
-def getOperatorForFunction(function, idName, label, arguments, redraw):
+def getOperatorForFunction(function, idName, label, arguments, redraw, confirm):
+    def invoke(self, context, event):
+        if confirm:
+            return context.window_manager.invoke_confirm(self, event)
+        else:
+            return self.execute(context)
+
     def execute(self, context):
         parameters = list(iterParameterNamesAndDefaults(function))
         function(*[getattr(self, name) for name, _ in parameters])
@@ -24,13 +30,14 @@ def getOperatorForFunction(function, idName, label, arguments, redraw):
     operator = type(idName, (bpy.types.Operator, ), {
         "bl_idname" : idName,
         "bl_label" : label,
+        "invoke" : invoke,
         "execute" : execute })
 
     parameters = list(iterParameterNamesAndDefaults(function))
     for argument, (name, default) in zip(arguments, parameters):
         if argument == "Int": propertyType = IntProperty
         elif argument == "String": propertyType = StringProperty
-        else: raise ValueError("cannot create property of this type")            
+        else: raise ValueError("cannot create property of this type")
 
         if default is None: setattr(operator, name, propertyType())
         else: setattr(operator, name, propertyType(default = default))

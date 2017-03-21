@@ -1,64 +1,69 @@
-import bpy
 from collections import namedtuple
-from .. tree_info import getNodesByType
 from .. utils.handlers import eventHandler
 from .. utils.operators import makeOperator
-from . data_types import dataTypeIdentifiers
 
 idKeysInFile = []
+unremovableIDKeys = set()
 
 @eventHandler("FILE_LOAD_POST")
 @eventHandler("ADDON_LOAD_POST")
-@makeOperator("an.update_id_keys_list", "Update ID Key List")
+@makeOperator("an.update_id_keys_list", "Update ID Key List", redraw = True)
 def updateIdKeysList():
     idKeysInFile.clear()
-    idKeysInFile.extend(findIDKeysInCurrentFile())
+    unremovableIDKeys.clear()
+
+    keys, unremovable = findIDKeysInCurrentFile()
+
+    idKeysInFile.extend(keys)
+    unremovableIDKeys.update(unremovable)
 
 def getAllIDKeys():
     return idKeysInFile
 
-def findIDKeysInCurrentFile():
-    from . new_id_key import getCreatedIDKeys
+def getUnremovableIDKeys():
+    return unremovableIDKeys
 
+def findIDKeysInCurrentFile():
     foundKeys = set()
-    for loadKeys in loadExistingIDKeysFunctions:
-        foundKeys.update(loadKeys())
+    unremovableKeys = set()
+
+    for findKeys, removable in findIDKeysFunctions:
+        keys = findKeys()
+        foundKeys.update(keys)
+        if not removable:
+            unremovableKeys.update(keys)
 
     # default keys should stay in order
     allKeys = list()
-    allKeys.extend(getDefaultIDKeys())
+    allKeys.extend(defaultIDKeys)
+    unremovableKeys.update(defaultIDKeys)
     for key in foundKeys:
         if key not in allKeys:
             allKeys.append(key)
-    return allKeys
+    return allKeys, unremovableKeys
 
 IDKey = namedtuple("IDKey", ["type", "name"])
 
-def getDefaultIDKeys():
-    return [IDKey("Transforms", "Initial Transforms")]
+defaultIDKeys = [
+    IDKey("Transforms", "Initial Transforms")
+]
 
+findIDKeysFunctions = []
+def findsIDKeys(removable = True):
+    def findsIDKeysDecorator(function):
+        findIDKeysFunctions.append((function, removable))
+        return function
+    return findsIDKeysDecorator
 
-loadExistingIDKeysFunctions = []
-def findsIDKeys(function):
-    loadExistingIDKeysFunctions.append(function)
+removeIDKeyFunctions = []
+def removesIDKey(function):
+    removeIDKeyFunctions.append(function)
     return function
 
-@findsIDKeys
-def getIDKeysOnObjects():
-    possibleKeys = set()
-    for object in bpy.data.objects:
-        for key in object.keys():
-            if key.startswith("AN*"): possibleKeys.add(key)
-    return filterRealIDKeys(possibleKeys)
-
-def filterRealIDKeys(possibleKeys):
-    realIDKeys = set()
-    for key in possibleKeys:
-        parts = key.split("*")
-        if len(parts) == 3:
-            if parts[1] in dataTypeIdentifiers:
-                realIDKeys.add(IDKey(parts[1], parts[2]))
-        elif len(parts) == 4:
-            if parts[1] in dataTypeIdentifiers:
-                realIDKeys.add(IDKey(parts[1], parts[3]))
-    return realIDKeys
+@makeOperator("an.remove_id_key", "Remove ID Key", arguments = ["String", "String"],
+              redraw = True, confirm = True)
+def removeIDKey(dataType, propertyName):
+    idKey = IDKey(dataType, propertyName)
+    for removeFunction in removeIDKeyFunctions:
+        removeFunction(idKey)
+    updateIdKeysList()

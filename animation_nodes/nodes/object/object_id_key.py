@@ -2,23 +2,27 @@ import bpy
 from bpy.props import *
 from ... math import composeMatrixList
 from ... tree_info import getNodesByType
-from ... id_keys import keyDataTypeItems, IDKey, findsIDKeys
 from ... base_types import AnimationNode, AutoSelectVectorization
+from ... id_keys import keyDataTypeItems, IDKey, findsIDKeys, updateIdKeysList
 
 class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectIDKeyNode"
     bl_label = "Object ID Key"
     bl_width_default = 160
 
+    def keyChanged(self, context):
+        updateIdKeysList()
+        self.refresh()
+
     searchTags = [("Object Initial Transforms",
                    {"keyDataType" : repr("Transforms"),
                     "keyName" : repr("Initial Transforms")})]
 
     keyDataType = EnumProperty(name = "Key Data Type", default = "Transforms",
-        items = keyDataTypeItems, update = AnimationNode.refresh)
+        items = keyDataTypeItems, update = keyChanged)
 
     keyName = StringProperty(name = "Key Name", default = "",
-        update = AnimationNode.refresh)
+        update = keyChanged)
 
     useList = BoolProperty(default = False, update = AnimationNode.refresh)
 
@@ -135,7 +139,11 @@ class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
         from animation_nodes.id_keys import doesIDKeyExist
         return [doesIDKeyExist(object, self.keyDataType, self.keyName) for object in objects]
 
-@findsIDKeys
+    def delete(self):
+        self.keyName = ""
+        bpy.ops.an.update_id_keys_list()
+
+@findsIDKeys(removable = False)
 def getIDKeysOfNodes():
     idKeys = set()
     for node in getNodesByType("an_ObjectIDKeyNode"):

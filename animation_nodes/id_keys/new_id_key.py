@@ -2,13 +2,18 @@ import bpy
 from bpy.props import *
 from . data_types import keyDataTypeItems
 from .. utils.blender_ui import getDpiFactor, redrawAll
-from . existing_keys import updateIdKeysList, IDKey, findsIDKeys
+from . existing_keys import updateIdKeysList, IDKey, findsIDKeys, removesIDKey
 
 createdIDKeys = set()
 
-@findsIDKeys
+@findsIDKeys(removable = True)
 def getCreatedIDKeys():
     return createdIDKeys
+
+@removesIDKey
+def removeIDKey(idKey):
+    if idKey in createdIDKeys:
+        createdIDKeys.remove(idKey)
 
 class NewIDKey(bpy.types.Operator):
     bl_idname = "an.new_id_key"

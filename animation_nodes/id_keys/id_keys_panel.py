@@ -1,5 +1,5 @@
 import bpy
-from . existing_keys import getAllIDKeys, IDKey
+from . existing_keys import getAllIDKeys, IDKey, getUnremovableIDKeys
 from .. utils.layout import splitAlignment
 from .. utils.operators import makeOperator
 
@@ -27,6 +27,7 @@ class IDKeyPanel(bpy.types.Panel):
 
     def drawIDKeyList(self, layout):
         col = layout.box().column(align = True)
+        unremovableIDKeys = getUnremovableIDKeys()
         for idKey in getAllIDKeys():
             row = col.row(align = True)
             icon = "RESTRICT_VIEW_ON" if idKey in hiddenIDKeys else "RESTRICT_VIEW_OFF"
@@ -35,6 +36,11 @@ class IDKeyPanel(bpy.types.Panel):
             props.dataType = idKey.type
             props.propertyName = idKey.name
             row.label(idKey.name)
+            
+            if idKey not in unremovableIDKeys:
+                props = row.operator("an.remove_id_key", text = "", icon = "X", emboss = False)
+                props.dataType = idKey.type
+                props.propertyName = idKey.name
 
     def drawForObject(self, layout, object):
         for idKey in getAllIDKeys():
