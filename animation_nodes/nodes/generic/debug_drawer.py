@@ -43,7 +43,7 @@ class DebugDrawerNode(bpy.types.Node, AnimationNode):
     def getExecutionCode(self):
         yield "if condition:"
         yield "    self.errorMessage = ''"
-        yield "    if hasattr(data, '__iter__'):"
+        yield "    if hasattr(data, '__iter__') and not isinstance(data, str):"
         yield "        conversionFunction = self.getCurrentToStringFunction()"
         yield "        self.store_GenericList(data, conversionFunction)"
         yield "    else:"
