@@ -110,7 +110,7 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
         if len(items) > 0:
             col = layout.column()
             row = col.row(align = True)
-            row.label("Baked Data:")
+            row.label("Average Data:")
             self.invokeFunction(row, "moveItemUp", icon = "TRIA_UP")
             self.invokeFunction(row, "moveItemDown", icon = "TRIA_DOWN")
             col.template_list("an_AverageItemsUiList", "", sound.bakedData, "average",

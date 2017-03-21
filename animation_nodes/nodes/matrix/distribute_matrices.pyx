@@ -26,10 +26,10 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_DistributeMatricesNode"
     bl_label = "Distribute Matrices"
 
-    mode = EnumProperty(name = "Mode", default = "GRID",
+    mode = EnumProperty(name = "Mode", default = "LINEAR",
         items = modeItems, update = AnimationNode.refresh)
 
-    distanceMode = EnumProperty(name = "Distance Mode", default = "STEP",
+    distanceMode = EnumProperty(name = "Distance Mode", default = "SIZE",
         items = distanceModeItems, update = AnimationNode.refresh)
 
     def create(self):
