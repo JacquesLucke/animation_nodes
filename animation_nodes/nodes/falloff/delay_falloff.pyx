@@ -11,11 +11,11 @@ class DelayFalloffNode(bpy.types.Node, AnimationNode):
         self.newInput("Float", "Time", "time")
         self.newInput("Float", "Delay", "delay", value = 5)
         self.newInput("Float", "Duration", "duration", value = 20)
-        self.newInput("Float List", "Offsets", "offsets")
         self.newInput("Interpolation", "Interpolation", "interpolation", defaultDrawType = "PROPERTY_ONLY")
+        self.newInput("Float List", "Offsets", "offsets")
         self.newOutput("Falloff", "Falloff", "falloff")
 
-    def execute(self, frame, delay, duration, offsets, interpolation):
+    def execute(self, frame, delay, duration, interpolation, offsets):
         falloff = DelayFalloff(frame, delay, duration, offsets)
         return InterpolateFalloff(falloff, interpolation)
 
