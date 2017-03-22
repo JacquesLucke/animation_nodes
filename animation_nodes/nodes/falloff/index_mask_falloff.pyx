@@ -1,7 +1,7 @@
 import bpy
 cimport cython
 from bpy.props import *
-from libc.limits cimport LONG_MAX
+from libc.limits cimport LONG_MIN, LONG_MAX
 from ... data_structures cimport BaseFalloff
 from ... algorithms.random cimport randomNumber_Positive
 from ... base_types import AnimationNode
@@ -51,8 +51,8 @@ cdef class MaskEveryNthFalloff(BaseFalloff):
     cdef double valueA, valueB
 
     def __cinit__(self, step, offset, double valueA, double valueB):
-        self.step = max(1, min(step, LONG_MAX))
-        self.offset = max(1, min(offset, LONG_MAX))
+        self.step = max(min(step, LONG_MAX), 1)
+        self.offset = max(min(offset, LONG_MAX), LONG_MIN)
         self.valueA = valueA
         self.valueB = valueB
         self.dataType = "All"
