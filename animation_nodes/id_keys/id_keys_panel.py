@@ -36,7 +36,7 @@ class IDKeyPanel(bpy.types.Panel):
             props.dataType = idKey.type
             props.propertyName = idKey.name
             row.label(idKey.name)
-            
+
             if idKey not in unremovableIDKeys:
                 props = row.operator("an.remove_id_key", text = "", icon = "X", emboss = False)
                 props.dataType = idKey.type
@@ -59,23 +59,28 @@ class IDKeyPanel(bpy.types.Panel):
         left.label(idKey.name)
 
         if exists:
-            props = right.operator("an.remove_id_key_on_selected_objects", text = "Remove", icon = "X", emboss = False)
+            props = right.operator("an.remove_id_key_on_selected_objects",
+                                   text = "Remove", icon = "X", emboss = False)
         else:
-            props = right.operator("an.create_id_key_on_selected_objects", text = "Create", icon = "NEW", emboss = False)
+            props = right.operator("an.create_id_key_on_selected_objects",
+                                   text = "Create", icon = "NEW", emboss = False)
         props.dataType = idKey.type
         props.propertyName = idKey.name
 
-@makeOperator("an.create_id_key_on_selected_objects", "Create ID Keys", arguments = ["String", "String"])
+@makeOperator("an.create_id_key_on_selected_objects",
+              "Create ID Keys", arguments = ["String", "String"])
 def createIDKeyOnSelectedObjects(dataType, propertyName):
     for object in bpy.context.selected_objects:
         object.id_keys.create(dataType, propertyName)
 
-@makeOperator("an.remove_id_key_on_selected_objects", "Remove ID Keys", arguments = ["String", "String"])
+@makeOperator("an.remove_id_key_on_selected_objects",
+              "Remove ID Keys", arguments = ["String", "String"])
 def createIDKeyOnSelectedObjects(dataType, propertyName):
     for object in bpy.context.selected_objects:
         object.id_keys.remove(dataType, propertyName)
 
-@makeOperator("an.toggle_id_key_visibility", "Toogle ID Key Visibility", arguments = ["String", "String"])
+@makeOperator("an.toggle_id_key_visibility",
+              "Toogle ID Key Visibility", arguments = ["String", "String"])
 def toggleIDKeyVisibility(dataType, propertyName):
     idKey = IDKey(dataType, propertyName)
     if idKey in hiddenIDKeys:
