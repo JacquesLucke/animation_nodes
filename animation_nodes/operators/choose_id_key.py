@@ -1,6 +1,7 @@
 import bpy
 from bpy.props import *
 from .. id_keys import getAllIDKeys
+from .. utils.unicode import toValidString, fromValidString
 
 class IDKeySearch(bpy.types.Operator):
     bl_idname = "an.choose_id_key"
@@ -11,7 +12,8 @@ class IDKeySearch(bpy.types.Operator):
     def getSearchItems(self, context):
         items = []
         for dataType, name in getAllIDKeys():
-            items.append(("{} * {}".format(dataType, name), name, ""))
+            identifier = toValidString("{} * {}".format(dataType, name))
+            items.append((identifier, name, ""))
         return items
 
     item = EnumProperty(items = getSearchItems)
@@ -23,7 +25,8 @@ class IDKeySearch(bpy.types.Operator):
         return {"CANCELLED"}
 
     def execute(self, context):
-        if self.item == "NONE": return {"CANCELLED"}
-        dataType, name = self.item.split(" * ")
+        item = fromValidString(self.item)
+        if item == "NONE": return {"CANCELLED"}
+        dataType, name = item.split(" * ")
         self.an_executeCallback(self.callback, dataType, name)
         return {"FINISHED"}
