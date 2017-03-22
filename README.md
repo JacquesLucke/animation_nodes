@@ -1,5 +1,5 @@
 #Animation Nodes
 
-The Animation Nodes addon (AN) implements a new node system for [Blender](http://blender.org).
+Animation Nodes is a node based visual scripting system designed for motion graphics in [Blender](http://blender.org).
 
-You can find some documentation here: http://animation-nodes-manual.readthedocs.org/en/latest/
+[Here](http://animation-nodes-manual.readthedocs.org/en/latest/) is the official documentation. Checkout the external links especially. 
