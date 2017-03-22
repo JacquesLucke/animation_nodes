@@ -59,25 +59,45 @@ class IDKeyPanel(bpy.types.Panel):
         left.label(idKey.name)
 
         if exists:
+            props = right.operator("an.copy_id_key_to_selected_objects",
+                                   text = "", icon = "GHOST", emboss = False)
+            props.dataType = idKey.type
+            props.propertyName = idKey.name
+
             props = right.operator("an.remove_id_key_on_selected_objects",
-                                   text = "Remove", icon = "X", emboss = False)
+                                   text = "", icon = "X", emboss = False)
+            props.dataType = idKey.type
+            props.propertyName = idKey.name
         else:
             props = right.operator("an.create_id_key_on_selected_objects",
-                                   text = "Create", icon = "NEW", emboss = False)
-        props.dataType = idKey.type
-        props.propertyName = idKey.name
+                                   text = "", icon = "PLUS", emboss = False)
+            props.dataType = idKey.type
+            props.propertyName = idKey.name
 
 @makeOperator("an.create_id_key_on_selected_objects",
-              "Create ID Keys", arguments = ["String", "String"])
+              "Create ID Key", arguments = ["String", "String"],
+              description = "Create this ID Key on selected objects.")
 def createIDKeyOnSelectedObjects(dataType, propertyName):
     for object in bpy.context.selected_objects:
         object.id_keys.create(dataType, propertyName)
 
 @makeOperator("an.remove_id_key_on_selected_objects",
-              "Remove ID Keys", arguments = ["String", "String"])
+              "Remove ID Key", arguments = ["String", "String"], confirm = True,
+              description = "Remove this ID Key on selected objects.")
 def createIDKeyOnSelectedObjects(dataType, propertyName):
     for object in bpy.context.selected_objects:
         object.id_keys.remove(dataType, propertyName)
+
+@makeOperator("an.copy_id_key_to_selected_objects",
+              "Copy ID Key", arguments = ["String", "String"], confirm = True,
+              description = "Copy this ID Key from active to all selected objects.")
+def copyIDKeyToSelectedObjects(dataType, propertyName):
+    activeObject = bpy.context.active_object
+    if activeObject is None: return
+
+    value = activeObject.id_keys.get(dataType, propertyName)
+    for object in bpy.context.selected_objects:
+        object.id_keys.set(dataType, propertyName, value)
 
 @makeOperator("an.toggle_id_key_visibility",
               "Toogle ID Key Visibility", arguments = ["String", "String"])

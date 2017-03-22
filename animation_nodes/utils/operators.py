@@ -5,15 +5,15 @@ from . blender_ui import redrawAll
 
 createdOperators = []
 
-def makeOperator(idName, label, arguments = [], redraw = False, confirm = False):
+def makeOperator(idName, label, arguments = [], redraw = False, confirm = False, description = ""):
     def makeOperatorDecorator(function):
-        operator = getOperatorForFunction(function, idName, label, arguments, redraw, confirm)
+        operator = getOperatorForFunction(function, idName, label, arguments, redraw, confirm, description)
         bpy.utils.register_class(operator)
         createdOperators.append(operator)
         return function
     return makeOperatorDecorator
 
-def getOperatorForFunction(function, idName, label, arguments, redraw, confirm):
+def getOperatorForFunction(function, idName, label, arguments, redraw, confirm, description):
     def invoke(self, context, event):
         if confirm:
             return context.window_manager.invoke_confirm(self, event)
@@ -30,6 +30,7 @@ def getOperatorForFunction(function, idName, label, arguments, redraw, confirm):
     operator = type(idName, (bpy.types.Operator, ), {
         "bl_idname" : idName,
         "bl_label" : label,
+        "bl_description" : description,
         "invoke" : invoke,
         "execute" : execute })
 
