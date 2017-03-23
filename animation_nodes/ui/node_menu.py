@@ -108,7 +108,8 @@ class VectorMenu(bpy.types.Menu):
         layout.separator()
         insertNode(layout, "an_VectorMathNode", "Math")
         insertNode(layout, "an_VectorListMathNode", "List Math")
-        insertNode(layout, "an_TransformVectorNode", "Transform Vector")
+        insertNode(layout, "an_TransformVectorNode", "Transform")
+        insertNode(layout, "an_OffsetVectorsNode", "Offset")
 
 class RotationMenu(bpy.types.Menu):
     bl_idname = "an_rotation_menu"
@@ -162,6 +163,7 @@ class MatrixMenu(bpy.types.Menu):
         insertNode(layout, "an_ChangeMatrixPivotNode", "Change Pivot")
         insertNode(layout, "an_MatrixMathNode", "Math")
         insertNode(layout, "an_MatrixCombineNode", "Combine")
+        insertNode(layout, "an_OffsetMatricesNode", "Offset")
 
 class TextMenu(bpy.types.Menu):
     bl_idname = "an_text_menu"
