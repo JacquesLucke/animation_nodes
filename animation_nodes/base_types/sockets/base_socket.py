@@ -1,14 +1,14 @@
 import bpy
 from bpy.props import *
 from collections import defaultdict
-from .. events import executionCodeChanged
-from .. utils.recursion import noRecursion
-from .. operators.callbacks import newSocketCallback
-from .. utils.names import getRandomString, toVariableName
-from .. operators.dynamic_operators import getInvokeFunctionOperator
-from .. nodes.subprogram.subprogram_sockets import subprogramInterfaceChanged
-from .. tree_info import (isSocketLinked, getLinkedSockets, getDirectlyLinkedSockets,
-                          getLinkedDataTypes)
+from ... events import executionCodeChanged
+from ... utils.recursion import noRecursion
+from ... operators.callbacks import newSocketCallback
+from ... utils.names import getRandomString, toVariableName
+from ... operators.dynamic_operators import getInvokeFunctionOperator
+from ... nodes.subprogram.subprogram_sockets import subprogramInterfaceChanged
+from ... tree_info import (isSocketLinked, getLinkedSockets, getDirectlyLinkedSockets,
+                           getLinkedDataTypes)
 
 class SocketTextProperties(bpy.types.PropertyGroup):
     unique = BoolProperty(default = False)

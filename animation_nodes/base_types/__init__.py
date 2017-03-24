@@ -1,8 +1,13 @@
 from . template import Template
-from . node import AnimationNode
 from . node_tree import AnimationNodeTree
-from . socket import AnimationNodeSocket
-from . list_sockets import ListSocket, PythonListSocket, CListSocket
+
+from . nodes import (AnimationNode,
+                     AutoVectorizedNode)
+
+from . sockets import (AnimationNodeSocket,
+                       ListSocket,
+                       PythonListSocket,
+                       CListSocket)
 
 from . effects.socket_effects import (AutoSelectListDataType,
                                       AutoSelectDataType,

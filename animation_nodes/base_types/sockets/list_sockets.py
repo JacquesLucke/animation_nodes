@@ -1,4 +1,4 @@
-from . socket import AnimationNodeSocket
+from . base_socket import AnimationNodeSocket
 
 class ListSocket(AnimationNodeSocket):
     @classmethod
