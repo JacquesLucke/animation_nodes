@@ -61,11 +61,11 @@ def getAnimationNodeTrees(skipLinkedTrees = True):
 
 def iterAnimationNodeClasses():
     from .. base_types import AnimationNode
-    yield from _getRealNodeSubclasses(AnimationNode)
+    yield from iterSubclassesWithAttribute(AnimationNode, "bl_idname")
 
-def _getRealNodeSubclasses(cls):
+def iterSubclassesWithAttribute(cls, attribute):
     for subcls in cls.__subclasses__():
-        if hasattr(subcls, "bl_idname"):
+        if hasattr(subcls, attribute):
             yield subcls
         else:
-            yield from _getRealNodeSubclasses(subcls)
+            yield from iterSubclassesWithAttribute(subcls)

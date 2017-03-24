@@ -1,6 +1,7 @@
 import bpy
 from collections import defaultdict
 from .. utils.enum_items import enumItemsFromList
+from .. utils.nodes import iterSubclassesWithAttribute
 
 class SocketInfo:
     def __init__(self):
@@ -92,7 +93,7 @@ def updateSocketInfo():
 
 def getSocketClasses():
     from .. base_types import AnimationNodeSocket
-    return AnimationNodeSocket.__subclasses__()
+    return list(iterSubclassesWithAttribute(AnimationNodeSocket, "bl_idname"))
 
 
 def returnOnFailure(returnValue):
