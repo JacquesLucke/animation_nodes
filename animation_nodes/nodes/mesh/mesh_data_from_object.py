@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... events import propertyChanged
 from ... data_structures import MeshData
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 
 class MeshDataFromObjectNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MeshDataFromObjectNode"

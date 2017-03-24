@@ -7,17 +7,17 @@ from . import draw_handler
 from . ui import node_panel
 from . ui import node_colors
 from . import extend_bpy_types
+from . base_types.nodes import base_node
 from . operators import dynamic_operators
-from . base_types import node as node_base
 from . nodes.sound import bake as sound_bake
-from . base_types import socket as socket_base
+from . base_types.sockets import base_socket
 from . ui.node_menu import registerMenu, unregisterMenu
 
 def registerFiles():
-    node_base.register()
+    base_node.register()
     node_panel.register()
     sound_bake.register()
-    socket_base.register()
+    base_socket.register()
     node_colors.register()
     utils.operators.register()
     extend_bpy_types.register()
@@ -29,10 +29,10 @@ def registerFiles():
     keymap.register()
 
 def unregisterFiles():
-    node_base.unregister()
+    base_node.unregister()
     node_panel.unregister()
     sound_bake.unregister()
-    socket_base.unregister()
+    base_socket.unregister()
     node_colors.unregister()
     draw_handler.unregister()
     utils.operators.unregister()

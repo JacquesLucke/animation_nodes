@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... data_structures import DoubleList
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 
 modeItems = [
     ("AVERAGE", "Average", "", "FORCE_TURBULENCE", 0),

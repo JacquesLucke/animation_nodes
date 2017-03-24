@@ -2,7 +2,7 @@ import bpy
 cimport cython
 from bpy.props import *
 from ... utils.clamp cimport clampLong
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from ... data_structures cimport BaseFalloff, Interpolation
 
 modeItems = [

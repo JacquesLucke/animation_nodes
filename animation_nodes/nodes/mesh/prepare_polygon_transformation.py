@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import *
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from . separate_polygons import separatePolygons
 from . transform_polygons import transformPolygons
 from . extract_polygon_transforms import extractPolygonTransforms

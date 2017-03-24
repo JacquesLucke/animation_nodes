@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from libc.limits cimport LONG_MAX
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from . constant_falloff import ConstantFalloff
 from . interpolate_list_falloff import createIndexBasedFalloff, createFalloffBasedFalloff
 from ... data_structures cimport (AverageSound, BaseFalloff, CompoundFalloff,

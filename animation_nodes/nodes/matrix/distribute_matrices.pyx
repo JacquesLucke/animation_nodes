@@ -3,7 +3,7 @@ from bpy.props import *
 from math import pi as _pi
 from libc.limits cimport INT_MAX
 from libc.math cimport sin, cos
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from ... data_structures cimport Matrix4x4List, Vector3DList, CListMock
 from ... algorithms.rotations.rotation_and_direction cimport directionToMatrix_LowLevel
 from ... math cimport (Matrix4, Vector3, setTranslationMatrix,

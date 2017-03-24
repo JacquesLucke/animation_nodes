@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import *
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from ... data_structures cimport Vector3DList, PolygonIndicesList, Matrix4x4List
 from ... math cimport Vector3, setTranslationMatrix, scaleVec3, scaleVec3, toPyVector3
 

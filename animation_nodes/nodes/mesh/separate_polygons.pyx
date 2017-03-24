@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... math cimport Vector3
 from libc.string cimport memcpy
-from ... base_types.node import AnimationNode
+from ... base_types import AnimationNode
 from ... data_structures cimport Vector3DList, PolygonIndicesList
 
 class SeparatePolygonsNode(bpy.types.Node, AnimationNode):
