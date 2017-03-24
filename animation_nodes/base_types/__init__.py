@@ -9,6 +9,6 @@ from . sockets import (AnimationNodeSocket,
                        PythonListSocket,
                        CListSocket)
 
-from . effects.socket_effects import (AutoSelectListDataType,
-                                      AutoSelectDataType,
-                                      AutoSelectVectorization)
+from . effects import (AutoSelectListDataType,
+                       AutoSelectDataType,
+                       AutoSelectVectorization)
