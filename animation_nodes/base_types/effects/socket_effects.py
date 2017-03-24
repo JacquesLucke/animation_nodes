@@ -1,7 +1,7 @@
 import bpy
 from collections import OrderedDict, defaultdict
-from .. sockets.info import (isBase, isList, toBaseDataType, toListDataType,
-                             getAllowedInputDataTypes)
+from ... sockets.info import (isBase, isList, toBaseDataType, toListDataType,
+                              getAllowedInputDataTypes)
 
 class SocketEffect:
     def apply(self, node):
