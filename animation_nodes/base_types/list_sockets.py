@@ -1,4 +1,6 @@
-class ListSocket:
+from . socket import AnimationNodeSocket
+
+class ListSocket(AnimationNodeSocket):
     @classmethod
     def getDefaultValue(cls):
         raise NotImplementedError()

@@ -65,7 +65,7 @@ class InterpolationSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         except: return cls.getDefaultValue(), 2
 
 
-class InterpolationListSocket(bpy.types.NodeSocket, PythonListSocket, AnimationNodeSocket):
+class InterpolationListSocket(bpy.types.NodeSocket, PythonListSocket):
     bl_idname = "an_InterpolationListSocket"
     bl_label = "Interpolation List Socket"
     dataType = "Interpolation List"

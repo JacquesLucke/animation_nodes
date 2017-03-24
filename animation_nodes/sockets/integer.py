@@ -59,7 +59,7 @@ class IntegerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             except: return cls.getDefaultValue(), 2
 
 
-class IntegerListSocket(bpy.types.NodeSocket, CListSocket, AnimationNodeSocket):
+class IntegerListSocket(bpy.types.NodeSocket, CListSocket):
     bl_idname = "an_IntegerListSocket"
     bl_label = "Integer List Socket"
     dataType = "Integer List"

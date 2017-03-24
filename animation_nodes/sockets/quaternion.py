@@ -50,7 +50,7 @@ class QuaternionSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             except: return cls.getDefaultValue(), 2
 
 
-class QuaternionListSocket(bpy.types.NodeSocket, CListSocket, AnimationNodeSocket):
+class QuaternionListSocket(bpy.types.NodeSocket, CListSocket):
     bl_idname = "an_QuaternionListSocket"
     bl_label = "Quaternion List Socket"
     dataType = "Quaternion List"

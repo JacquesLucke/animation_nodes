@@ -58,7 +58,7 @@ class ShapeKeySocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return cls.getDefaultValue(), 2
 
 
-class ShapeKeyListSocket(bpy.types.NodeSocket, PythonListSocket, AnimationNodeSocket):
+class ShapeKeyListSocket(bpy.types.NodeSocket, PythonListSocket):
     bl_idname = "an_ShapeKeyListSocket"
     bl_label = "Shape Key List Socket"
     dataType = "Shape Key List"

@@ -26,7 +26,7 @@ class MeshDataSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return cls.getDefaultValue(), 2
 
 
-class MeshDataListSocket(bpy.types.NodeSocket, PythonListSocket, AnimationNodeSocket):
+class MeshDataListSocket(bpy.types.NodeSocket, PythonListSocket):
     bl_idname = "an_MeshDataListSocket"
     bl_label = "Mesh Data List Socket"
     dataType = "Mesh Data List"

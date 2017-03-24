@@ -55,7 +55,7 @@ class FloatSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             except: return cls.getDefaultValue(), 2
 
 
-class FloatListSocket(bpy.types.NodeSocket, CListSocket, AnimationNodeSocket):
+class FloatListSocket(bpy.types.NodeSocket, CListSocket):
     bl_idname = "an_FloatListSocket"
     bl_label = "Float List Socket"
     dataType = "Float List"

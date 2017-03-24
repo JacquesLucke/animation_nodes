@@ -30,7 +30,7 @@ class GenericSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return value, 0
 
 
-class GenericListSocket(bpy.types.NodeSocket, PythonListSocket, AnimationNodeSocket):
+class GenericListSocket(bpy.types.NodeSocket, PythonListSocket):
     bl_idname = "an_GenericListSocket"
     bl_label = "GenericListSocket"
     dataType = "Generic List"

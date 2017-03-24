@@ -52,7 +52,7 @@ class BooleanSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             except: return cls.getDefaultValue(), 2
 
 
-class BooleanListSocket(bpy.types.NodeSocket, CListSocket, AnimationNodeSocket):
+class BooleanListSocket(bpy.types.NodeSocket, CListSocket):
     bl_idname = "an_BooleanListSocket"
     bl_label = "Boolean List Socket"
     dataType = "Boolean List"

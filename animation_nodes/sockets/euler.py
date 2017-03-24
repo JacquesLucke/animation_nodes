@@ -49,7 +49,7 @@ class EulerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             except: return cls.getDefaultValue(), 2
 
 
-class EulerListSocket(bpy.types.NodeSocket, CListSocket, AnimationNodeSocket):
+class EulerListSocket(bpy.types.NodeSocket, CListSocket):
     bl_idname = "an_EulerListSocket"
     bl_label = "Euler List Socket"
     dataType = "Euler List"

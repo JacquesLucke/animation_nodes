@@ -26,7 +26,7 @@ class ParticleSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return cls.getDefaultValue(), 2
 
 
-class ParticleListSocket(bpy.types.NodeSocket, PythonListSocket, AnimationNodeSocket):
+class ParticleListSocket(bpy.types.NodeSocket, PythonListSocket):
     bl_idname = "an_ParticleListSocket"
     bl_label = "Particle List Socket"
     dataType = "Particle List"

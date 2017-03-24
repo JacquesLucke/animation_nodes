@@ -46,7 +46,7 @@ class TextSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return str(value), 1
 
 
-class TextListSocket(bpy.types.NodeSocket, PythonListSocket, AnimationNodeSocket):
+class TextListSocket(bpy.types.NodeSocket, PythonListSocket):
     bl_idname = "an_TextListSocket"
     bl_label = "Text List Socket"
     dataType = "Text List"

@@ -48,7 +48,7 @@ class SceneSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return cls.getDefaultValue(), 2
 
 
-class SceneListSocket(bpy.types.NodeSocket, PythonListSocket, AnimationNodeSocket):
+class SceneListSocket(bpy.types.NodeSocket, PythonListSocket):
     bl_idname = "an_SceneListSocket"
     bl_label = "Scene List Socket"
     dataType = "Scene List"

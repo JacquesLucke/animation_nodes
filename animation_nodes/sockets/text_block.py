@@ -54,7 +54,7 @@ class TextBlockSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return cls.getDefaultValue(), 2
 
 
-class TextBlockListSocket(bpy.types.NodeSocket, PythonListSocket, AnimationNodeSocket):
+class TextBlockListSocket(bpy.types.NodeSocket, PythonListSocket):
     bl_idname = "an_TextBlockListSocket"
     bl_label = "Text Block List Socket"
     dataType = "Text Block List"
