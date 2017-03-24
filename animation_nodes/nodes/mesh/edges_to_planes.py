@@ -5,7 +5,7 @@ from ... events import propertyChanged
 from ... base_types import AnimationNode
 from ... data_structures import Vector3DList, PolygonIndicesList
 
-class an_EdgesToPlanesNode(bpy.types.Node, AnimationNode):
+class EdgesToPlanesNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_EdgesToPlanesNode"
     bl_label = "Edges to Planes"
     bl_width_default = 150

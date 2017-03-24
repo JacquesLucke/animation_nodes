@@ -2,7 +2,7 @@ import bpy
 from ... base_types import AnimationNode
 from ... data_structures import EdgeIndicesList
 
-class an_EdgesOfPolygonsNode(bpy.types.Node, AnimationNode):
+class EdgesOfPolygonsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_EdgesOfPolygonsNode"
     bl_label = "Edges of Polygons"
 
