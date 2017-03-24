@@ -58,7 +58,7 @@ class AnimationNode:
     def setup(self):
         pass
 
-    # may be defined be nodes
+    # may be defined in nodes
     #def create(self):
     #    pass
 
@@ -102,6 +102,9 @@ class AnimationNode:
     def getExecutionCode(self):
         return []
 
+    def getCodeEffects(self):
+        return []
+
     def getBakeCode(self):
         return []
 
@@ -141,9 +144,8 @@ class AnimationNode:
             socket.alternativeIdentifiers = sourceSocket.alternativeIdentifiers
 
     def free(self):
-        self.clearSocketEffects()
         self.delete()
-        self.clearSockets()
+        self._clear()
 
     def draw_buttons(self, context, layout):
         if self.inInvalidNetwork: layout.label("Invalid Network", icon = "ERROR")
@@ -184,15 +186,23 @@ class AnimationNode:
     def _refresh(self):
         if not hasattr(self, "create"):
             return
-        self.clearSockets()
-        self.clearSocketEffects()
+
+        self._clear()
         self.create()
+
+    def _clear(self):
+        self.clearSockets()
+        self._clearSocketEffects()
+
+
+    # Socket Effects
+    ####################################################
 
     def applySocketEffects(self):
         for effect in socketEffectsByIdentifier[self.identifier]:
             effect.apply(self)
 
-    def clearSocketEffects(self):
+    def _clearSocketEffects(self):
         if self.identifier in socketEffectsByIdentifier:
             del socketEffectsByIdentifier[self.identifier]
 
@@ -490,18 +500,17 @@ class AnimationNode:
     # Code Generation
     ####################################################
 
-    def getTemplateCodeString(self):
-        return toString(self.getTemplateCode())
-
     def getLocalExecutionCode(self):
         inputVariables = self.inputVariables
         outputVariables = self.outputVariables
 
         functionName = self.getExecutionFunctionName()
         if functionName is not None and hasattr(self, self.getExecutionFunctionName()):
-            return self.getLocalExecutionCode_ExecutionFunction(inputVariables, outputVariables)
+            code = self.getLocalExecutionCode_ExecutionFunction(inputVariables, outputVariables)
         else:
-            return self.getLocalExecutionCode_GetExecutionCode(inputVariables, outputVariables)
+            code = self.getLocalExecutionCode_GetExecutionCode(inputVariables, outputVariables)
+
+        return self.applyCodeEffects(code)
 
     def getLocalExecutionCode_ExecutionFunction(self, inputVariables, outputVariables):
         parameterString = ", ".join(inputVariables[socket.identifier] for socket in self.inputs)
@@ -514,6 +523,11 @@ class AnimationNode:
 
     def getLocalExecutionCode_GetExecutionCode(self, inputVariables, outputVariables):
         return toString(self.getExecutionCode())
+
+    def applyCodeEffects(self, code):
+        for effect in self.getCodeEffects():
+            code = toString(effect.apply(self, code))
+        return code
 
     def getLocalBakeCode(self):
         return toString(self.getBakeCode())
