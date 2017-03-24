@@ -1,7 +1,7 @@
 import bpy
 import itertools
 from bpy.props import *
-from .. utils.nodes import getAnimationNodeClasses, newNodeAtCursor, invokeTranslation
+from .. utils.nodes import iterAnimationNodeClasses, newNodeAtCursor, invokeTranslation
 
 itemsByIdentifier = {}
 
@@ -53,7 +53,7 @@ class InsertItem:
 #################################
 
 def iterSingleNodeItems():
-    for node in getAnimationNodeClasses():
+    for node in iterAnimationNodeClasses():
         if not node.onlySearchTags:
             yield SingleNodeInsertionItem(node.bl_idname, node.bl_label)
         for customSearch in node.getSearchTags():
