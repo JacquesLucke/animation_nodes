@@ -68,4 +68,4 @@ def iterSubclassesWithAttribute(cls, attribute):
         if hasattr(subcls, attribute):
             yield subcls
         else:
-            yield from iterSubclassesWithAttribute(subcls)
+            yield from iterSubclassesWithAttribute(subcls, attribute)
