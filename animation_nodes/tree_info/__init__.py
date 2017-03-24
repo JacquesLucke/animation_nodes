@@ -14,17 +14,6 @@ def __setup():
     _networks = NodeNetworks()
 
 
-def updateAndRetryOnException(function):
-    def wrapper(*args, **kwargs):
-        try:
-            output = function(*args, **kwargs)
-        except:
-            update()
-            output = function(*args, **kwargs)
-        return output
-    return wrapper
-
-
 # Public API
 ##################################
 
@@ -55,12 +44,14 @@ def getNodeByIdentifier(identifier):
 def getIdentifierAmount():
     return len(_forestData.nodeByIdentifier)
 
-@updateAndRetryOnException
 def getNodesByType(idName, nodeByID = None):
     if nodeByID is None:
         return [idToNode(nodeID) for nodeID in _forestData.nodesByType[idName]]
     else:
         return [nodeByID[nodeID] for nodeID in _forestData.nodesByType[idName]]
+
+def nodeOfTypeExists(idName):
+    return len(_forestData.nodesByType[idName]) > 0
 
 
 def isSocketLinked(socket, node):

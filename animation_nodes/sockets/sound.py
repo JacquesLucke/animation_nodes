@@ -1,6 +1,7 @@
 import bpy
 from bpy.props import *
 from .. events import propertyChanged
+from .. tree_info import nodeOfTypeExists
 from .. base_types import AnimationNodeSocket
 from .. algorithms.hashing import strToEnumItemID
 from .. data_structures import AverageSound, SpectrumSound
@@ -23,8 +24,7 @@ def getBakeDataItems(self, context):
         if self.typeFilter in {"ALL", "SPECTRUM"}:
             items.extend(iterSpectrumItems(index, sequence))
 
-    if len(items) == 0:
-        return [("None", "None", "")]
+    items.append(("NONE", "None", "", "NONE", 0))
     return items
 
 def iterAverageItems(sequenceIndex, sequence):
@@ -59,12 +59,12 @@ class SoundSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def drawProperty(self, layout, text, node):
         row = layout.row(align = True)
         row.prop(self, "bakeData", text = text)
-        if self.bakeData == "None":
+        if self.bakeData == "NONE" and not nodeOfTypeExists("an_BakeSoundNode"):
             self.invokeFunction(row, node, "createSoundBakeNode", icon = "PLUS",
                 description = "Create sound bake node")
 
     def getValue(self):
-        if self.bakeData == "None":
+        if self.bakeData == "NONE":
             return None
 
         soundType, sequenceIndex, bakeIndex = self.bakeData.split("_")
@@ -84,7 +84,7 @@ class SoundSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return self.bakeData
 
     def createSoundBakeNode(self):
-        newNodeAtCursor("an_SoundBakeNode")
+        newNodeAtCursor("an_BakeSoundNode")
         invokeTranslation()
 
     @classmethod

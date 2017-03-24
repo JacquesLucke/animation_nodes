@@ -17,8 +17,8 @@ class SoundFrequencyRange(bpy.types.PropertyGroup):
 
 
 class SoundBakeNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_SoundBakeNode"
-    bl_label = "Sound Bake"
+    bl_idname = "an_BakeSoundNode"
+    bl_label = "Bake Sound"
     bl_width_default = 300
 
     soundName = StringProperty(name = "Sound")
