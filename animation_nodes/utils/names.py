@@ -2,6 +2,7 @@ import re
 import bpy
 import random
 import keyword
+from functools import lru_cache
 
 def toDataPath(name):
     return '["{}"]'.format(name)
@@ -41,6 +42,11 @@ def getPossibleName(field, name = "element"):
 def getRandomString(length):
     random.seed()
     return ''.join(random.choice("abcdefghijklmnopqrstuvwxyz") for _ in range(length))
+
+@lru_cache(maxsize = 2**15)
+def replaceVariableName(code, oldName, newName):
+    pattern = r"([^\.\"']|^)\b{}\b".format(oldName)
+    return re.sub(pattern, r"\1{}".format(newName), code)
 
 def toVariableName(name):
     variable = re.sub("\W+", "", name)
