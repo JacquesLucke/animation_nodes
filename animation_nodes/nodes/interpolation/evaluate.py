@@ -1,15 +1,25 @@
 import bpy
-from ... base_types import AnimationNode
+from ... base_types import VectorizedNode
 
-class EvaluateInterpolationNode(bpy.types.Node, AnimationNode):
+class EvaluateInterpolationNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_EvaluateInterpolationNode"
     bl_label = "Evaluate Interpolation"
     bl_width_default = 150
 
-    def create(self):
-        self.newInput("Float", "Position", "position").setRange(0, 1)
+    useList = VectorizedNode.newVectorizeProperty()
+
+    def createVectorized(self):
+        self.newVectorizedInput("Float", "useList",
+            ("Position", "position", dict(minValue = 0, maxValue = 1)),
+            ("Positions", "positions"))
+
         self.newInput("Interpolation", "Interpolation", "interpolation", defaultDrawType = "PROPERTY_ONLY")
-        self.newOutput("Float", "Value", "value")
+
+        self.newVectorizedOutput("Float", "useList",
+            ("Value", "value"), ("Values", "values"))
 
     def getExecutionCode(self):
-        return "value = interpolation(max(min(position, 1.0), 0.0))"
+        if self.useList:
+            return "values = interpolation.evaluateList(positions)"
+        else:
+            return "value = interpolation(max(min(position, 1.0), 0.0))"
