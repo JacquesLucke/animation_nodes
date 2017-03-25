@@ -1,7 +1,7 @@
 import bpy
 from collections import OrderedDict, defaultdict
 from ... sockets.info import (isBase, isList, toBaseDataType, toListDataType,
-                              getAllowedInputDataTypes)
+                              getAllowedInputDataTypes, getAllowedTargetDataTypes)
 
 class SocketEffect:
     def apply(self, node):
@@ -110,6 +110,7 @@ class AutoSelectVectorization(SocketEffect):
         self.inputListDataTypes = dict()
         self.inputBaseDataTypes = dict()
         self.outputDependencies = OrderedDict()
+        self.outputListDataTypes = dict()
 
     def input(self, node, propertyName, sockets, dependencies = []):
         if isinstance(sockets, bpy.types.NodeSocket):
@@ -150,8 +151,24 @@ class AutoSelectVectorization(SocketEffect):
 
         self.setSocketTransparency(sockets)
 
+        isCurrentlyList = self.evaluateOutputDependencies(node, dependencies)
+
         for socket in sockets:
             self.outputDependencies[socket.getIndex(node)] = dependencies
+            if isCurrentlyList: listType = socket.dataType
+            else: listType = toListDataType(socket.dataType)
+            self.outputListDataTypes[socket.dataType] = getAllowedTargetDataTypes(listType)
+
+    def evaluateOutputDependencies(self, node, dependencies):
+        for dependency in dependencies:
+            if isinstance(dependency, str):
+                if not getattr(node, dependency):
+                    return False
+            else:
+                if not any(getattr(node, prop) for prop in dependency):
+                    return False
+        return True
+
 
     def setSocketTransparency(self, sockets):
         for socket in sockets:
@@ -195,7 +212,7 @@ class AutoSelectVectorization(SocketEffect):
             if len(linkedTypes) != 1:
                 continue
             linkedType = linkedTypes[0]
-            if isList(linkedType): # TODO: needs to be generalised
+            if linkedType in self.outputListDataTypes[socket.dataType]:
                 for dependency in dependencies:
                     if isinstance(dependency, str):
                         if dependency not in fixedProperties:

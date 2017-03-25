@@ -14,6 +14,7 @@ class SocketInfo:
         self.classByType = dict()
         self.typeConversion = dict()
         self.allowedInputDataTypes = dict()
+        self.allowedTargetDataTypes = defaultdict(set)
 
         self.baseIdName = dict()
         self.listIdName = dict()
@@ -43,8 +44,13 @@ class SocketInfo:
                 inputTypes = self.dataTypes
             else:
                 inputTypes = socket.allowedInputTypes
+
             self.allowedInputDataTypes[socket.dataType] = inputTypes
             self.allowedInputDataTypes[socket.bl_idname] = inputTypes
+
+            for inputType in inputTypes:
+                self.allowedTargetDataTypes[inputType].add(socket.dataType)
+                self.allowedTargetDataTypes[self.typeConversion[inputType]].add(socket.dataType)
 
     def insertSocket(self, socketClass):
         idName = socketClass.bl_idname
@@ -159,6 +165,9 @@ def getCopyFunction(input):
 
 def getAllowedInputDataTypes(input):
     return _socketInfo.allowedInputDataTypes[input]
+
+def getAllowedTargetDataTypes(input):
+    return _socketInfo.allowedTargetDataTypes[input]
 
 def getSocketClass(input):
     return _socketInfo.classByType[input]
