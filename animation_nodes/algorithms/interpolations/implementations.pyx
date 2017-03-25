@@ -23,80 +23,75 @@ cdef class Linear(Interpolation):
 # Power
 #####################################################
 
-class PowerIn:
-    def __new__(cls, int exponent):
-        if exponent == 1: return Linear()
-        if exponent == 2: return PowerIn_Quadratic()
-        return PowerIn_Generic(exponent)
+ctypedef double (*PowFunction)(double base, double exponent)
 
-cdef class PowerIn_Quadratic(Interpolation):
-    cdef double evaluate(self, double x):
-        return x * x
+cdef double pow1(double x, double _):
+    return x
 
-cdef class PowerIn_Generic(Interpolation):
+cdef double pow2(double x, double _):
+    return x * x
+
+cdef double pow3(double x, double _):
+    return x * x * x
+
+cdef double pow4(double x, double _):
+    cdef double y = x * x
+    return y * y
+
+cdef double pow5(double x, double _):
+    cdef double y = x * x
+    return y * y * x
+
+cdef PowFunction getPowFunction(int exponent):
+    if exponent == 1: return pow1
+    elif exponent == 2: return pow2
+    elif exponent == 3: return pow3
+    elif exponent == 4: return pow4
+    elif exponent == 5: return pow5
+    else: return pow
+
+cdef class PowerIn(Interpolation):
     cdef int exponent
+    cdef PowFunction pow
 
     def __cinit__(self, int exponent):
         self.exponent = max(exponent, 1)
+        self.pow = getPowFunction(self.exponent)
         self.clamped = True
 
     cdef double evaluate(self, double x):
-        return pow(x, self.exponent)
+        return self.pow(x, self.exponent)
 
-
-class PowerOut:
-    def __new__(self, int exponent):
-        if exponent == 1: return Linear()
-        if exponent == 2: return PowerOut_Quadratic()
-        return PowerOut_Generic(exponent)
-
-cdef class PowerOut_Quadratic(Interpolation):
-    cdef double evaluate(self, double x):
-        return 1 - (1 - x) * (1 - x)
-
-cdef class PowerOut_Generic(Interpolation):
+cdef class PowerOut(Interpolation):
     cdef int exponent
     cdef int factor
+    cdef PowFunction pow
 
     def __cinit__(self, int exponent):
         self.exponent = max(exponent, 1)
         self.factor = -1 if self.exponent % 2 == 0 else 1
+        self.pow = getPowFunction(self.exponent)
         self.clamped = True
 
     cdef double evaluate(self, double x):
-        return pow(x - 1, self.exponent) * self.factor + 1
+        return self.pow(x - 1, self.exponent) * self.factor + 1
 
-
-class PowerInOut:
-    def __new__(cls, int exponent):
-        if exponent == 1: return Linear()
-        if exponent == 2: return PowerInOut_Quadratic()
-        return PowerInOut_Generic(exponent)
-
-cdef class PowerInOut_Quadratic(Interpolation):
-    cdef double evaluate(self, double x):
-        cdef double _x
-        if x <= 0.5:
-            _x = x * 2
-            return _x * _x / 2
-        else:
-            _x = (1 - x) * 2
-            return 1 - _x * _x / 2
-
-cdef class PowerInOut_Generic(Interpolation):
+cdef class PowerInOut(Interpolation):
     cdef int exponent
     cdef double factor
+    cdef PowFunction pow
 
     def __cinit__(self, int exponent):
         self.exponent = max(exponent, 1)
         self.factor = -0.5 if self.exponent % 2 == 0 else 0.5
+        self.pow = getPowFunction(self.exponent)
         self.clamped = True
 
     cdef double evaluate(self, double x):
         if x <= 0.5:
-            return pow(x * 2, self.exponent) / 2
+            return self.pow(x * 2, self.exponent) / 2
         else:
-            return pow((x - 1) * 2, self.exponent) * self.factor + 1
+            return self.pow((x - 1) * 2, self.exponent) * self.factor + 1
 
 
 # Exponential
@@ -198,7 +193,7 @@ cdef class BounceInterpolationBase(Interpolation):
     cdef:
         DoubleList widths, heights
 
-    def __cinit__(self, int bounces, float base):
+    def __cinit__(self, int bounces, double base):
         cdef int amount = max(1, bounces + 1)
 
         cdef:
@@ -337,7 +332,7 @@ cdef class CachedInterpolation(Interpolation):
     @cython.cdivision(True)
     cdef updateCache(self):
         self.cache = DoubleList(length = self.resolution)
-        cdef unsigned int i
+        cdef int i
         for i in range(self.resolution):
             self.cache.data[i] = self.original.evaluate(i / <double>(self.resolution - 1))
 
