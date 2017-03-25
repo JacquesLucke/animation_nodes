@@ -1,8 +1,8 @@
 import bpy
 from bpy.props import *
 from collections import OrderedDict
+from ... base_types import VectorizedNode
 from ... data_structures cimport DoubleList
-from ... base_types import AnimationNode, AutoSelectVectorization
 from ... math cimport min as minNumber
 from ... math cimport max as maxNumber
 from ... math cimport abs as absNumber
@@ -146,7 +146,7 @@ searchItems = {
     "Invert Number" : "Invert",
     "Reciprocal Number" : "Reciprocal"}
 
-class FloatMathNode(bpy.types.Node, AnimationNode):
+class FloatMathNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_FloatMathNode"
     bl_label = "Float Math"
     dynamicLabelType = "HIDDEN_ONLY"
@@ -154,34 +154,28 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
 
     operation = EnumProperty(name = "Operation", default = "Multiply",
         description = "Operation to perform on the inputs",
-        items = operationItems, update = AnimationNode.refresh)
+        items = operationItems, update = VectorizedNode.refresh)
 
     errorMessage = StringProperty()
 
-    useListA = BoolProperty(default = False, update = AnimationNode.refresh)
-    useListB = BoolProperty(default = False, update = AnimationNode.refresh)
-    useListBase = BoolProperty(default = False, update = AnimationNode.refresh)
-    useListExponent = BoolProperty(default = False, update = AnimationNode.refresh)
-    useListStep = BoolProperty(default = False, update = AnimationNode.refresh)
+    useListA = VectorizedNode.newVectorizeProperty()
+    useListB = VectorizedNode.newVectorizeProperty()
+    useListBase = VectorizedNode.newVectorizeProperty()
+    useListExponent = VectorizedNode.newVectorizeProperty()
+    useListStep = VectorizedNode.newVectorizeProperty()
 
-    def create(self):
-        vectorization = AutoSelectVectorization()
+    def createVectorized(self):
         usedProperties = []
 
         for name in self._operation.type.split("_"):
             listProperty = "useList" + name
-            socket = self.newInputGroup(getattr(self, listProperty),
-                ("Float", name, name.lower()),
-                ("Float List", name, name.lower()))
-            vectorization.input(self, listProperty, socket)
             usedProperties.append(listProperty)
 
-        self.newOutputGroup(self.generatesList,
-            ("Float", "Result", "result"),
-            ("Float List", "Result", "result"))
+            self.newVectorizedInput("Float", listProperty,
+                (name, name.lower()), (name, name.lower()))
 
-        vectorization.output(self, [usedProperties], self.outputs[0])
-        self.newSocketEffect(vectorization)
+        self.newVectorizedOutput("Float", [usedProperties],
+            ("Result", "result"), ("Results", "results"))
 
     def draw(self, layout):
         layout.prop(self, "operation", text = "")
@@ -197,18 +191,18 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
             yield "try:"
             yield "    self.errorMessage = ''"
             if currentType == "A":
-                yield "    result = self._operation.execute_A(a)"
+                yield "    results = self._operation.execute_A(a)"
             elif currentType == "A_B":
-                yield "    result = self._operation.execute_A_B(a, b)"
+                yield "    results = self._operation.execute_A_B(a, b)"
             elif currentType == "Base_Exponent":
-                yield "    result = self._operation.execute_A_B(base, exponent)"
+                yield "    results = self._operation.execute_A_B(base, exponent)"
             elif currentType == "A_Step":
-                yield "    result = self._operation.execute_A_B(a, step)"
+                yield "    results = self._operation.execute_A_B(a, step)"
             elif currentType == "A_Base":
-                yield "    result = self._operation.execute_A_B(a, base)"
+                yield "    results = self._operation.execute_A_B(a, base)"
             yield "except Exception as e:"
             yield "    self.errorMessage = str(e)"
-            yield "    result = self.outputs[0].getDefaultValue()"
+            yield "    results = self.outputs[0].getDefaultValue()"
         else:
             yield self._operation.expression
 
