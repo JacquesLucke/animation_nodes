@@ -157,4 +157,4 @@ class IDKeysFromSortedObjects(bpy.types.Operator):
         elif self.locationMode == "BOUDING_BOX_CENTER":
             p1 = Vector(object.bound_box[0])
             p2 = Vector(object.bound_box[6])
-            return (p1 + p2) / 2
+            return object.matrix_world * ((p1 + p2) / 2)
