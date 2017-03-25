@@ -1,6 +1,5 @@
 from bgl import *
 from . rectangle import Rectangle
-from .. algorithms.interpolations import sampleInterpolation
 
 class InterpolationPreview:
     def __init__(self, interpolation, position, width, resolution):
@@ -14,7 +13,7 @@ class InterpolationPreview:
         self.boundary.color = (0.9, 0.9, 0.9, 0.6)
         self.boundary.borderThickness = -1
         self.boundary.borderColor = (0.9, 0.76, 0.4, 1.0)
-        self.samples = sampleInterpolation(interpolation, amount = resolution)
+        self.samples = interpolation.sample(amount = resolution)
 
     def calculateBoundaries(self):
         minSample = min(self.samples)

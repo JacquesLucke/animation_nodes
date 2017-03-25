@@ -428,9 +428,9 @@ class CalculateSpectrumFrequencyRanges(bpy.types.Operator):
         return list(zip(steps[:-1], steps[1:]))
 
     def calculate_steps(self):
-        from ... algorithms.interpolations import ExponentialOut, sampleInterpolation
+        from ... algorithms.interpolations import ExponentialOut
         algorithm = ExponentialOut(self.base, self.exponent)
-        return sampleInterpolation(algorithm, self.amount + 1, self.frequencyRangeStart, self.frequencyRangeEnd)
+        return algorithm.sample(self.amount + 1, self.frequencyRangeStart, self.frequencyRangeEnd)
 
 
 
