@@ -2,10 +2,10 @@ import bpy
 from bpy.props import *
 from ... math import composeMatrixList
 from ... tree_info import getNodesByType
-from ... base_types import AnimationNode, AutoSelectVectorization
+from ... base_types import VectorizedNode
 from ... id_keys import keyDataTypeItems, IDKey, findsIDKeys, updateIdKeysList
 
-class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
+class ObjectIDKeyNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_ObjectIDKeyNode"
     bl_label = "Object ID Key"
     bl_width_default = 160
@@ -24,48 +24,36 @@ class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
     keyName = StringProperty(name = "Key Name", default = "",
         update = keyChanged)
 
-    useList = BoolProperty(default = False, update = AnimationNode.refresh)
+    useList = VectorizedNode.newVectorizeProperty()
 
-    def create(self):
-        self.newInputGroup(self.useList,
-            ("Object", "Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
-            ("Object List", "Objects", "objects"))
+    def createVectorized(self):
+        self.newVectorizedInput("Object", "useList",
+            ("Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
+            ("Objects", "objects"))
 
         if self.keyName != "":
             if self.keyDataType == "Transforms":
-                self.newOutputGroup(self.useList,
-                    ("Vector", "Location", "location"),
-                    ("Vector List", "Locations", "locations"))
-                self.newOutputGroup(self.useList,
-                    ("Euler", "Rotation", "rotation"),
-                    ("Euler List", "Rotations", "rotations"))
-                self.newOutputGroup(self.useList,
-                    ("Vector", "Scale", "scale"),
-                    ("Vector List", "Scales", "scales"))
-                self.newOutputGroup(self.useList,
-                    ("Matrix", "Matrix", "matrix"),
-                    ("Matrix List", "Matrices", "matrices"))
+                self.newVectorizedOutput("Vector", "useList",
+                    ("Location", "location"), ("Locations", "locations"))
+                self.newVectorizedOutput("Euler", "useList",
+                    ("Rotation", "rotation"), ("Rotations", "rotations"))
+                self.newVectorizedOutput("Vector", "useList",
+                    ("Scale", "scale"), ("Scales", "scales"))
+                self.newVectorizedOutput("Matrix", "useList",
+                    ("Matrix", "matrix"), ("Matrices", "matrices"))
             elif self.keyDataType == "Text":
-                self.newOutputGroup(self.useList,
-                    ("Text", "Text", "text"),
-                    ("Text List", "Texts", "texts"))
+                self.newVectorizedOutput("Text", "useList",
+                    ("Text", "text"), ("Texts", "texts"))
             elif self.keyDataType == "Integer":
-                self.newOutputGroup(self.useList,
-                    ("Integer", "Number", "number"),
-                    ("Integer List", "Numbers", "numbers"))
+                self.newVectorizedOutput("Integer", "useList",
+                    ("Number", "number"), ("Numbers", "numbers"))
             elif self.keyDataType == "Float":
-                self.newOutputGroup(self.useList,
-                    ("Float", "Number", "number"),
-                    ("Float List", "Numbers", "numbers"))
+                self.newVectorizedOutput("Float", "useList",
+                    ("Number", "number"), ("Numbers", "numbers"))
 
-            self.newOutputGroup(self.useList,
-                ("Boolean", "Exists", "exists", dict(hide = True)),
-                ("Boolean List", "Exists", "exists", dict(hide = True)))
-
-        vectorization = AutoSelectVectorization()
-        vectorization.input(self, "useList", list(self.inputs))
-        vectorization.output(self, "useList", list(self.outputs))
-        self.newSocketEffect(vectorization)
+            self.newVectorizedOutput("Boolean", "useList",
+                ("Exists", "exists", dict(hide = True)),
+                ("Exists", "exists", dict(hide = True)))
 
     def drawAdvanced(self, layout):
         col = layout.column()
