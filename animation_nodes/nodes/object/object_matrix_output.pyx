@@ -2,9 +2,9 @@ import bpy
 from bpy.props import *
 from ... math cimport toPyMatrix4
 from ... sockets.info import isList
+from ... base_types import VectorizedNode
 from ... events import executionCodeChanged
 from ... data_structures cimport Matrix4x4List
-from ... base_types import AnimationNode, AutoSelectVectorization
 
 outputItems = [	("BASIS", "Basis", "", "NONE", 0),
                 ("LOCAL", "Local", "", "NONE", 1),
@@ -12,33 +12,25 @@ outputItems = [	("BASIS", "Basis", "", "NONE", 0),
                 ("WORLD", "World", "", "NONE", 3) ]
 
 
-class ObjectMatrixOutputNode(bpy.types.Node, AnimationNode):
+class ObjectMatrixOutputNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_ObjectMatrixOutputNode"
     bl_label = "Object Matrix Output"
 
     outputType = EnumProperty(items = outputItems, update = executionCodeChanged, default = "WORLD")
 
-    useObjectList = BoolProperty(default = False, update = AnimationNode.refresh)
-    useMatrixList = BoolProperty(default = False, update = AnimationNode.refresh)
+    useObjectList = BoolProperty(default = False, update = VectorizedNode.refresh)
+    useMatrixList = BoolProperty(default = False, update = VectorizedNode.refresh)
 
-    def create(self):
-        self.newInputGroup(self.useObjectList,
-            ("Object", "Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
-            ("Object List", "Objects", "objects"))
+    def createVectorized(self):
+        self.newVectorizedInput("Object", "useObjectList",
+            ("Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
+            ("Objects", "objects"))
 
-        self.newInputGroup(self.useMatrixList,
-            ("Matrix", "Matrix", "matrix"),
-            ("Matrix List", "Matrices", "matrices"))
+        self.newVectorizedInput("Matrix", ("useMatrixList", ["useObjectList"]),
+            ("Matrix", "matrix"), ("Matrices", "matrices"))
 
-        self.newOutputGroup(self.useObjectList,
-            ("Object", "Object", "object"),
-            ("Object List", "Objects", "objects"))
-
-        vectorization = AutoSelectVectorization()
-        vectorization.input(self, "useObjectList", self.inputs[0])
-        vectorization.input(self, "useMatrixList", self.inputs[1], dependencies = ["useObjectList"])
-        vectorization.output(self, "useObjectList", self.outputs[0])
-        self.newSocketEffect(vectorization)
+        self.newVectorizedOutput("Object", "useObjectList",
+            ("Object", "object"), ("Objects", "objects"))
 
     def draw(self, layout):
         row = layout.row(align = True)

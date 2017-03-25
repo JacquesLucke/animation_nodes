@@ -1,43 +1,30 @@
 import bpy
 from bpy.props import *
-from ... base_types import AnimationNode, AutoSelectVectorization
+from ... base_types import VectorizedNode
 
-class ComposeMatrixNode(bpy.types.Node, AnimationNode):
+class ComposeMatrixNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_ComposeMatrixNode"
     bl_label = "Compose Matrix"
 
-    useTranslationList = BoolProperty(update = AnimationNode.refresh)
-    useRotationList = BoolProperty(update = AnimationNode.refresh)
-    useScaleList = BoolProperty(update = AnimationNode.refresh)
+    useTranslationList = BoolProperty(update = VectorizedNode.refresh)
+    useRotationList = BoolProperty(update = VectorizedNode.refresh)
+    useScaleList = BoolProperty(update = VectorizedNode.refresh)
 
-    def create(self):
-        self.newInputGroup(self.useTranslationList,
-            ("Vector", "Translation", "translation"),
-            ("Vector List", "Translations", "translations"))
+    def createVectorized(self):
+        self.newVectorizedInput("Vector", "useTranslationList",
+            ("Translation", "translation"), ("Translations", "translations"))
 
-        self.newInputGroup(self.useRotationList,
-            ("Euler", "Rotation", "rotation"),
-            ("Euler List", "Rotations", "rotations"))
+        self.newVectorizedInput("Euler", "useRotationList",
+            ("Rotation", "rotation"), ("Rotations", "rotations"))
 
-        self.newInputGroup(self.useScaleList,
-            ("Vector", "Scale", "scale", {"value" : (1, 1, 1)}),
-            ("Vector List", "Scales", "scales"))
+        self.newVectorizedInput("Vector", "useScaleList",
+            ("Scale", "scale"), ("Scales", "scales"))
 
-        self.newOutputGroup(self.generateList,
-            ("Matrix", "Matrix", "matrix"),
-            ("Matrix List", "Matrices", "matrices"))
-
-        vectorization = AutoSelectVectorization()
-        vectorization.input(self, "useTranslationList", self.inputs[0])
-        vectorization.input(self, "useRotationList", self.inputs[1])
-        vectorization.input(self, "useScaleList", self.inputs[2])
-        vectorization.output(self,
-            [("useTranslationList", "useRotationList", "useScaleList")],
-            self.outputs[0])
-        self.newSocketEffect(vectorization)
+        self.newVectorizedOutput("Matrix", [("useTranslationList", "useRotationList", "useScaleList")],
+            ("Matrix", "matrix"), ("Matrices", "matrices"))
 
     def getExecutionFunctionName(self):
-        if self.generateList:
+        if self.useTranslationList or self.useRotationList or self.useScaleList:
             return "execute_List"
 
     def getExecutionCode(self):
@@ -46,7 +33,3 @@ class ComposeMatrixNode(bpy.types.Node, AnimationNode):
     def execute_List(self, translations, rotations, scales):
         from . list_operation_utils import composeMatrices
         return composeMatrices(translations, rotations, scales)
-
-    @property
-    def generateList(self):
-        return self.useTranslationList or self.useRotationList or self.useScaleList

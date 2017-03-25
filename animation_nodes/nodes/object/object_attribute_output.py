@@ -1,10 +1,10 @@
 import bpy
 from bpy.props import *
 from ... utils.code import isCodeValid
+from ... base_types import VectorizedNode
 from ... events import executionCodeChanged
-from ... base_types import AnimationNode, AutoSelectVectorization
 
-class ObjectAttributeOutputNode(bpy.types.Node, AnimationNode):
+class ObjectAttributeOutputNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_ObjectAttributeOutputNode"
     bl_label = "Object Attribute Output"
     bl_width_default = 175
@@ -12,28 +12,23 @@ class ObjectAttributeOutputNode(bpy.types.Node, AnimationNode):
     attribute = StringProperty(name = "Attribute", default = "",
         update = executionCodeChanged)
 
-    useObjectList = BoolProperty(default = False, update = AnimationNode.refresh)
-    useValueList = BoolProperty(default = False, update = AnimationNode.refresh)
+    useObjectList = BoolProperty(default = False, update = VectorizedNode.refresh)
+    useValueList = BoolProperty(default = False, update = VectorizedNode.refresh)
 
     errorMessage = StringProperty()
 
-    def create(self):
-        self.newInputGroup(self.useObjectList,
-            ("Object", "Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
-            ("Object List", "Objects", "objects"))
+    def createVectorized(self):
+        self.newVectorizedInput("Object", "useObjectList",
+            ("Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
+            ("Objects", "objects"))
 
         self.newInputGroup(self.useValueList and self.useObjectList,
             ("Generic", "Value", "value"),
             ("Generic List", "Values", "values"))
 
-        self.newOutputGroup(self.useObjectList,
-            ("Object", "Object", "object"),
-            ("Object List", "Objects", "objects"))
-
-        vectorization = AutoSelectVectorization()
-        vectorization.input(self, "useObjectList", self.inputs[0])
-        vectorization.output(self, "useObjectList", self.outputs[0])
-        self.newSocketEffect(vectorization)
+        self.newVectorizedOutput("Object", "useObjectList",
+            ("Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
+            ("Objects", "objects"))
 
     def draw(self, layout):
         col = layout.column()
