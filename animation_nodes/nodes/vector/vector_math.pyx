@@ -1,11 +1,11 @@
 import bpy
 from bpy.props import *
+from ... base_types import VectorizedNode
 from ... math cimport (Vector3, toVector3,
                        absoluteVec3, addVec3, subVec3, multVec3, divideVec3,
                        crossVec3, projectVec3, reflectVec3, normalizeLengthVec3,
                        scaleVec3, snapVec3)
 from ... data_structures cimport Vector3DList, DoubleList
-from ... base_types import AnimationNode, AutoSelectVectorization
 
 ctypedef void (*SingleVectorFunction)(Vector3* target, Vector3* source)
 ctypedef void (*DoubleVectorFunction)(Vector3* target, Vector3* a, Vector3* b)
@@ -166,43 +166,37 @@ searchItems = {
     "Multiply Vectors" : "Multiply",
     "Normalize Vector" : "Normalize"}
 
-class VectorMathNode(bpy.types.Node, AnimationNode):
+class VectorMathNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_VectorMathNode"
     bl_label = "Vector Math"
     dynamicLabelType = "HIDDEN_ONLY"
     searchTags = [(name, {"operation" : repr(op)}) for name, op in searchItems.items()]
 
     operation = EnumProperty(name = "Operation", default = "Add",
-        items = operationItems, update = AnimationNode.refresh)
+        items = operationItems, update = VectorizedNode.refresh)
 
-    useListA = BoolProperty(default = False, update = AnimationNode.refresh)
-    useListB = BoolProperty(default = False, update = AnimationNode.refresh)
-    useListLength = BoolProperty(default = False, update = AnimationNode.refresh)
-    useListFactor = BoolProperty(default = False, update = AnimationNode.refresh)
-    useListStep = BoolProperty(default = False, update = AnimationNode.refresh)
+    useListA = VectorizedNode.newVectorizeProperty()
+    useListB = VectorizedNode.newVectorizeProperty()
+    useListLength = VectorizedNode.newVectorizeProperty()
+    useListFactor = VectorizedNode.newVectorizeProperty()
+    useListStep = VectorizedNode.newVectorizeProperty()
 
     errorMessage = StringProperty()
 
-    def create(self):
-        vectorization = AutoSelectVectorization()
+    def createVectorized(self):
         usedProperties = []
 
         for socketData in self._operation.type.split("_"):
             name = socketData[1:]
-            baseType, listType, default = dataTypeById[socketData[0]]
             listProperty = "useList" + name
-            socket = self.newInputGroup(getattr(self, listProperty),
-                (baseType, name, name.lower(), dict(value = default)),
-                (listType, name, name.lower()))
-            vectorization.input(self, listProperty, socket)
             usedProperties.append(listProperty)
+            baseType, *_ = dataTypeById[socketData[0]]
 
-        self.newOutputGroup(self.generatesList,
-            ("Vector", "Result", "result"),
-            ("Vector List", "Result", "result"))
+            self.newVectorizedInput(baseType, listProperty,
+                (name, name.lower()), (name, name.lower()))
 
-        vectorization.output(self, [usedProperties], self.outputs[0])
-        self.newSocketEffect(vectorization)
+        self.newVectorizedOutput("Vector", [usedProperties],
+            ("Result", "result"), ("Results", "results"))
 
     def draw(self, layout):
         layout.prop(self, "operation", text = "")
@@ -218,18 +212,18 @@ class VectorMathNode(bpy.types.Node, AnimationNode):
             yield "try:"
             yield "    self.errorMessage = ''"
             if currentType == "vA":
-                yield "    result = self._operation.execute_vA(a)"
+                yield "    results = self._operation.execute_vA(a)"
             if currentType == "vA_vB":
-                yield "    result = self._operation.execute_vA_vB(a, b)"
+                yield "    results = self._operation.execute_vA_vB(a, b)"
             elif currentType == "vA_fLength":
-                yield "    result = self._operation.execute_vA_fB(a, length)"
+                yield "    results = self._operation.execute_vA_fB(a, length)"
             elif currentType == "vA_fFactor":
-                yield "    result = self._operation.execute_vA_fB(a, factor)"
+                yield "    results = self._operation.execute_vA_fB(a, factor)"
             elif currentType == "vA_vStep":
-                yield "    result = self._operation.execute_vA_vB(a, step)"
+                yield "    results = self._operation.execute_vA_vB(a, step)"
             yield "except Exception as e:"
             yield "    self.errorMessage = str(e)"
-            yield "    result = self.outputs[0].getDefaultValue()"
+            yield "    results = self.outputs[0].getDefaultValue()"
         else:
             yield self._operation.expression
 
