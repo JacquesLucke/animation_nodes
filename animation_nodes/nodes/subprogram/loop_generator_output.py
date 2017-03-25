@@ -1,12 +1,12 @@
 import bpy
 import random
 from bpy.props import *
+from ... base_types import VectorizedNode
 from ... sockets.info import toBaseDataType
 from ... tree_info import getNodeByIdentifier
 from . subprogram_sockets import subprogramInterfaceChanged
-from ... base_types import AnimationNode, AutoSelectVectorization
 
-class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
+class LoopGeneratorOutputNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_LoopGeneratorOutputNode"
     bl_label = "Loop Generator Output"
     dynamicLabelType = "ALWAYS"
@@ -20,25 +20,21 @@ class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
     sortIndex = IntProperty(default = 0)
 
     listDataType = StringProperty(default = "Vector List", update = settingChanged)
-    useList = BoolProperty(default = False, update = settingChanged)
+    useList = VectorizedNode.newVectorizeProperty()
 
     def setup(self):
         self.sortIndex = getRandomInt()
         self.outputName = self.listDataType
 
-    def create(self):
+    def createVectorized(self):
         listDataType = self.listDataType
         baseDataType = toBaseDataType(listDataType)
 
-        self.newInputGroup(self.useList,
-            (baseDataType, baseDataType, "input", dict(defaultDrawType = "TEXT_ONLY")),
-            (listDataType, listDataType, "input", dict(defaultDrawType = "TEXT_ONLY")))
+        self.newVectorizedInput(baseDataType, "useList",
+            (baseDataType, "input", dict(defaultDrawType = "TEXT_ONLY")),
+            (listDataType, "input", dict(defaultDrawType = "TEXT_ONLY")))
 
         self.newInput("Boolean", "Condition", "condition", value = True, hide = True)
-
-        vectorization = AutoSelectVectorization()
-        vectorization.input(self, "useList", self.inputs[0])
-        self.newSocketEffect(vectorization)
 
     def draw(self, layout):
         node = self.loopInputNode
