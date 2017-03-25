@@ -6,7 +6,7 @@ class NodeControlSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_NodeControlSocket"
     bl_label = "Node Control Socket"
     dataType = "Node Control"
-    allowedInputTypes = ["None"]
+    allowedInputTypes = []
     drawColor = (0.0, 0.0, 0.0, 0.0)
     storable = False
     comparable = False
