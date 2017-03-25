@@ -23,7 +23,17 @@ cdef class Linear(Interpolation):
 # Power
 #####################################################
 
-cdef class PowerIn(Interpolation):
+class PowerIn:
+    def __new__(cls, int exponent):
+        if exponent == 1: return Linear()
+        if exponent == 2: return PowerIn_Quadratic()
+        return PowerIn_Generic(exponent)
+
+cdef class PowerIn_Quadratic(Interpolation):
+    cdef double evaluate(self, double x):
+        return x * x
+
+cdef class PowerIn_Generic(Interpolation):
     cdef int exponent
 
     def __cinit__(self, int exponent):
@@ -33,7 +43,18 @@ cdef class PowerIn(Interpolation):
     cdef double evaluate(self, double x):
         return pow(x, self.exponent)
 
-cdef class PowerOut(Interpolation):
+
+class PowerOut:
+    def __new__(self, int exponent):
+        if exponent == 1: return Linear()
+        if exponent == 2: return PowerOut_Quadratic()
+        return PowerOut_Generic(exponent)
+
+cdef class PowerOut_Quadratic(Interpolation):
+    cdef double evaluate(self, double x):
+        return 1 - (1 - x) * (1 - x)
+
+cdef class PowerOut_Generic(Interpolation):
     cdef int exponent
     cdef int factor
 
@@ -45,7 +66,24 @@ cdef class PowerOut(Interpolation):
     cdef double evaluate(self, double x):
         return pow(x - 1, self.exponent) * self.factor + 1
 
-cdef class PowerInOut(Interpolation):
+
+class PowerInOut:
+    def __new__(cls, int exponent):
+        if exponent == 1: return Linear()
+        if exponent == 2: return PowerInOut_Quadratic()
+        return PowerInOut_Generic(exponent)
+
+cdef class PowerInOut_Quadratic(Interpolation):
+    cdef double evaluate(self, double x):
+        cdef double _x
+        if x <= 0.5:
+            _x = x * 2
+            return _x * _x / 2
+        else:
+            _x = (1 - x) * 2
+            return 1 - _x * _x / 2
+
+cdef class PowerInOut_Generic(Interpolation):
     cdef int exponent
     cdef double factor
 
