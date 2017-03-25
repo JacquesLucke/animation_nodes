@@ -1,10 +1,10 @@
 import bpy
 from bpy.props import *
 from ... utils.layout import writeText
-from ... base_types import AnimationNode, AutoSelectVectorization
+from ... base_types import VectorizedNode
 from ... data_structures.splines.to_blender import setSplinesOnBlenderObject
 
-class CurveObjectOutputNode(bpy.types.Node, AnimationNode):
+class CurveObjectOutputNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_CurveObjectOutputNode"
     bl_label = "Curve Object Output"
     bl_width_default = 175
@@ -12,17 +12,18 @@ class CurveObjectOutputNode(bpy.types.Node, AnimationNode):
 
     errorMessage = StringProperty()
 
-    useSplineList = BoolProperty(default = False, update = AnimationNode.refresh)
+    useSplineList = VectorizedNode.newVectorizeProperty()
 
-    def create(self):
+    def createVectorized(self):
         socket = self.newInput("Object", "Object", "object")
         socket.defaultDrawType = "PROPERTY_ONLY"
         socket.objectCreationType = "CURVE"
 
         splineProps = {"showObjectInput" : False, "defaultDrawType" : "TEXT_ONLY"}
-        self.newInputGroup(self.useSplineList,
-            ("Spline", "Spline", "spline", splineProps),
-            ("Spline List", "Splines", "splines", splineProps))
+        self.newVectorizedInput("Spline", "useSplineList",
+            ("Spline", "spline", splineProps),
+            ("Splines", "splines", splineProps))
+
         self.newInput("Float", "Bevel Depth", "bevelDepth")
         self.newInput("Integer", "Bevel Resolution", "bevelResolution")
         self.newInput("Float", "Extrude", "extrude")
@@ -41,10 +42,6 @@ class CurveObjectOutputNode(bpy.types.Node, AnimationNode):
             socket.isUsed = False
         for socket in self.inputs[4:]:
             socket.hide = True
-
-        vectorization = AutoSelectVectorization()
-        vectorization.input(self, "useSplineList", self.inputs[1])
-        self.newSocketEffect(vectorization)
 
     def draw(self, layout):
         if self.errorMessage != "":
