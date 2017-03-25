@@ -1,5 +1,5 @@
 import bpy
-from .. events import treeChanged
+from .. base_types.update_file import updateFile
 
 class TagRetryExecution(bpy.types.Operator):
     bl_idname = "an.tag_retry_execution"
@@ -7,5 +7,5 @@ class TagRetryExecution(bpy.types.Operator):
     bl_description = "Rebuild internal node structures and check for problems again"
 
     def execute(self, context):
-        treeChanged()
+        updateFile()
         return {"FINISHED"}
