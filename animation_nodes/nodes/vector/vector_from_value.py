@@ -1,26 +1,19 @@
 import bpy
 from bpy.props import *
-from ... base_types import AnimationNode, AutoSelectVectorization
+from ... base_types import VectorizedNode
 
-class VectorFromValueNode(bpy.types.Node, AnimationNode):
+class VectorFromValueNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_VectorFromValueNode"
     bl_label = "Vector from Value"
 
-    useList = BoolProperty(update = AnimationNode.refresh)
+    useList = VectorizedNode.newVectorizeProperty()
 
-    def create(self):
-        self.newInputGroup(self.useList,
-            ("Float", "Value", "value"),
-            ("Float List", "Values", "values"))
+    def createVectorized(self):
+        self.newVectorizedInput("Float", "useList",
+            ("Value", "value"), ("Values", "values"))
 
-        self.newOutputGroup(self.useList,
-            ("Vector", "Vector", "vector"),
-            ("Vector List", "Vectors", "vectors"))
-
-        vectorization = AutoSelectVectorization()
-        vectorization.input(self, "useList", self.inputs[0])
-        vectorization.output(self, "useList", self.outputs[0])
-        self.newSocketEffect(vectorization)
+        self.newVectorizedOutput("Vector", "useList",
+            ("Vector", "vector"), ("Vectors", "vectors"))
 
     def getExecutionCode(self):
         if self.useList:
