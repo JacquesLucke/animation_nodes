@@ -1,43 +1,27 @@
 import bpy
 from bpy.props import *
+from ... base_types import VectorizedNode
 from ... data_structures import Vector3DList, DoubleList
-from ... base_types import AnimationNode, AutoSelectVectorization
 from . list_operation_utils import combineDoubleListsToVectorList
 
-class CombineVectorNode(bpy.types.Node, AnimationNode):
+class CombineVectorNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_CombineVectorNode"
     bl_label = "Combine Vector"
     dynamicLabelType = "HIDDEN_ONLY"
 
-    useListX = BoolProperty(update = AnimationNode.refresh)
-    useListY = BoolProperty(update = AnimationNode.refresh)
-    useListZ = BoolProperty(update = AnimationNode.refresh)
+    useListX = VectorizedNode.newVectorizeProperty()
+    useListY = VectorizedNode.newVectorizeProperty()
+    useListZ = VectorizedNode.newVectorizeProperty()
 
     errorMessage = StringProperty()
 
-    def create(self):
-        self.newInputGroup(self.useListX,
-            ("Float", "X", "x"),
-            ("Float List", "X", "x"))
+    def createVectorized(self):
+        self.newVectorizedInput("Float", "useListX", ("X", "x"), ("X", "x"))
+        self.newVectorizedInput("Float", "useListY", ("Y", "y"), ("Y", "y"))
+        self.newVectorizedInput("Float", "useListZ", ("Z", "z"), ("Z", "z"))
 
-        self.newInputGroup(self.useListY,
-            ("Float", "Y", "y"),
-            ("Float List", "Y", "y"))
-
-        self.newInputGroup(self.useListZ,
-            ("Float", "Z", "z"),
-            ("Float List", "Z", "z"))
-
-        self.newOutputGroup(self.generatesList,
-            ("Vector", "Vector", "vector"),
-            ("Vector List", "Vectors", "vectors"))
-
-        vectorization = AutoSelectVectorization()
-        vectorization.input(self, "useListX", self.inputs[0])
-        vectorization.input(self, "useListY", self.inputs[1])
-        vectorization.input(self, "useListZ", self.inputs[2])
-        vectorization.output(self, [("useListX", "useListY", "useListZ")], self.outputs[0])
-        self.newSocketEffect(vectorization)
+        self.newVectorizedOutput("Vector", [("useListX", "useListY", "useListZ")],
+            ("Vector", "vector"), ("Vectors", "vectors"))
 
     def draw(self, layout):
         if self.errorMessage != "":
