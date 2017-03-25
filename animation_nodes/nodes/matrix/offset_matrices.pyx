@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... events import propertyChanged
-from ... base_types import AnimationNode, AutoSelectVectorization
+from ... base_types import VectorizedNode
 from ... data_structures cimport (Vector3DList, EulerList, Matrix4x4List,
                                   FalloffEvaluator, CListMock)
 from ... algorithms.transform_matrix cimport (
@@ -18,7 +18,7 @@ specifiedStateItems = [
     ("END", "End", "", "Given matrices set the end state", 1)
 ]
 
-class OffsetMatricesNode(bpy.types.Node, AnimationNode):
+class OffsetMatricesNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_OffsetMatricesNode"
     bl_label = "Offset Matrices"
 
@@ -40,33 +40,25 @@ class OffsetMatricesNode(bpy.types.Node, AnimationNode):
     originAsScalePivot = BoolProperty(name = "Origin Scale", default = False,
         update = propertyChanged, description = "Use world center as scale pivot")
 
-    useTranslationList = BoolProperty(update = AnimationNode.refresh)
-    useRotationList = BoolProperty(update = AnimationNode.refresh)
-    useScaleList = BoolProperty(update = AnimationNode.refresh)
+    useTranslationList = VectorizedNode.newVectorizeProperty()
+    useRotationList = VectorizedNode.newVectorizeProperty()
+    useScaleList = VectorizedNode.newVectorizeProperty()
 
-    def create(self):
+    def createVectorized(self):
         self.newInput("Matrix List", "Matrices", "inMatrices")
         self.newInput("Falloff", "Falloff", "falloff", value = 1)
 
-        self.newInputGroup(self.useTranslationList,
-            ("Vector", "Translation", "translation"),
-            ("Vector List", "Translations", "translations"))
+        self.newVectorizedInput("Vector", "useTranslationList",
+            ("Translation", "translation"), ("Translations", "translations"))
 
-        self.newInputGroup(self.useRotationList,
-            ("Euler", "Rotation", "rotation"),
-            ("Euler List", "Rotations", "rotations"))
+        self.newVectorizedInput("Euler", "useRotationList",
+            ("Rotation", "rotation"), ("Rotations", "rotations"))
 
-        self.newInputGroup(self.useScaleList,
-            ("Vector", "Scale", "scale", {"value" : (1, 1, 1)}),
-            ("Vector List", "Scales", "scales"))
+        self.newVectorizedInput("Vector", "useScaleList",
+            ("Scale", "scale", dict(value = (1, 1, 1))),
+            ("Scales", "scales"))
 
         self.newOutput("Matrix List", "Matrices", "outMatrices")
-
-        vectorization = AutoSelectVectorization()
-        vectorization.input(self, "useTranslationList", self.inputs[2])
-        vectorization.input(self, "useRotationList", self.inputs[3])
-        vectorization.input(self, "useScaleList", self.inputs[4])
-        self.newSocketEffect(vectorization)
 
     def draw(self, layout):
         layout.prop(self, "specifiedState", expand = True)
