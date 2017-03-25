@@ -177,7 +177,11 @@ class AnimationNode:
         if not hasattr(self, "create"):
             return
 
-        keepNodeState(self._refresh)()
+        @keepNodeState
+        def createWrapper(self):
+            self._refresh()
+
+        createWrapper(self)
 
     def _refresh(self):
         if not hasattr(self, "create"):
