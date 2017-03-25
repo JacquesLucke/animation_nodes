@@ -1,28 +1,27 @@
 import bpy
 from bpy.props import *
 from ... math cimport clamp
+from ... base_types import VectorizedNode
 from ... data_structures cimport DoubleList, Interpolation
-from ... base_types import AnimationNode, AutoSelectVectorization
 
-class MapRangeNode(bpy.types.Node, AnimationNode):
+class MapRangeNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_MapRangeNode"
     bl_label = "Map Range"
     bl_width_default = 170
 
     clampInput = BoolProperty(name = "Clamp Input", default = True,
         description = "The input will be between Input Min and Input Max",
-        update = AnimationNode.refresh)
+        update = VectorizedNode.refresh)
 
     useInterpolation = BoolProperty(name = "Use Interpolation", default = False,
         description = "Don't use the normal linear interpolation between Min and Max (only available when clamp is turned on)",
-        update = AnimationNode.refresh)
+        update = VectorizedNode.refresh)
 
-    useValueList = BoolProperty(default = False, update = AnimationNode.refresh)
+    useValueList = VectorizedNode.newVectorizeProperty()
 
-    def create(self):
-        self.newInputGroup(self.useValueList,
-            ("Float", "Value", "value"),
-            ("Float List", "Values", "values"))
+    def createVectorized(self):
+        self.newVectorizedInput("Float", "useValueList",
+            ("Value", "value"), ("Values", "values"))
 
         self.newInput("Float", "Input Min", "inMin", value = 0)
         self.newInput("Float", "Input Max", "inMax", value = 1)
@@ -32,14 +31,8 @@ class MapRangeNode(bpy.types.Node, AnimationNode):
         if self.useInterpolation and self.clampInput:
             self.newInput("Interpolation", "Interpolation", "interpolation", defaultDrawType = "PROPERTY_ONLY")
 
-        self.newOutputGroup(self.useValueList,
-            ("Float", "Value", "newValue"),
-            ("Float List", "Values", "newValues"))
-
-        vectorization = AutoSelectVectorization()
-        vectorization.input(self, "useValueList", self.inputs[0])
-        vectorization.output(self, "useValueList", self.outputs[0])
-        self.newSocketEffect(vectorization)
+        self.newVectorizedOutput("Float", "useValueList",
+            ("Value", "newValue"), ("Values", "newValues"))
 
     def draw(self, layout):
         col = layout.column(align = True)
