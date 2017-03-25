@@ -1,30 +1,23 @@
 import bpy
 from bpy.props import *
+from ... base_types import VectorizedNode
 from ... data_structures cimport Matrix4x4List
 from ... math cimport multMatrix4, Matrix4, toMatrix4
-from ... base_types import AnimationNode, AutoSelectVectorization
 
-class TransformMatrixNode(bpy.types.Node, AnimationNode):
+class TransformMatrixNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_TransformMatrixNode"
     bl_label = "Transform Matrix"
 
-    useMatrixList = BoolProperty(update = AnimationNode.refresh)
+    useMatrixList = VectorizedNode.newVectorizeProperty()
 
-    def create(self):
-        self.newInputGroup(self.useMatrixList,
-            ("Matrix", "Matrix", "inMatrix"),
-            ("Matrix List", "Matrices", "inMatrices"))
+    def createVectorized(self):
+        self.newVectorizedInput("Matrix", "useMatrixList",
+            ("Matrix", "inMatrix"), ("Matrices", "inMatrices"))
 
         self.newInput("Matrix", "Transformation", "transformation")
 
-        self.newOutputGroup(self.useMatrixList,
-            ("Matrix", "Matrix", "outMatrix"),
-            ("Matrix List", "Matrices", "outMatrices"))
-
-        vectorization = AutoSelectVectorization()
-        vectorization.input(self, "useMatrixList", self.inputs[0])
-        vectorization.output(self, "useMatrixList", self.outputs[0])
-        self.newSocketEffect(vectorization)
+        self.newVectorizedOutput("Matrix", "useMatrixList",
+            ("Matrix", "outMatrix"), ("Matrices", "outMatrices"))
 
     def getExecutionFunctionName(self):
         if self.useMatrixList:

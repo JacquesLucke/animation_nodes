@@ -18,7 +18,8 @@ class ComposeMatrixNode(bpy.types.Node, VectorizedNode):
             ("Rotation", "rotation"), ("Rotations", "rotations"))
 
         self.newVectorizedInput("Vector", "useScaleList",
-            ("Scale", "scale"), ("Scales", "scales"))
+            ("Scale", "scale", dict(value = (1, 1, 1))),
+            ("Scales", "scales"))
 
         self.newVectorizedOutput("Matrix", [("useTranslationList", "useRotationList", "useScaleList")],
             ("Matrix", "matrix"), ("Matrices", "matrices"))
