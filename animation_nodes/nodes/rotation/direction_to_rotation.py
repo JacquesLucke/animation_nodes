@@ -1,12 +1,12 @@
 import bpy
 from bpy.props import *
 from ... events import propertyChanged
-from ... base_types import AnimationNode, AutoSelectVectorization
+from ... base_types import VectorizedNode
 
 trackAxisItems = [(axis, axis, "") for axis in ("X", "Y", "Z", "-X", "-Y", "-Z")]
 guideAxisItems  = [(axis, axis, "") for axis in ("X", "Y", "Z")]
 
-class DirectionToRotationNode(bpy.types.Node, AnimationNode):
+class DirectionToRotationNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_DirectionToRotationNode"
     bl_label = "Direction to Rotation"
     bl_width_default = 160
@@ -14,36 +14,30 @@ class DirectionToRotationNode(bpy.types.Node, AnimationNode):
     trackAxis = EnumProperty(items = trackAxisItems, update = propertyChanged, default = "Z")
     guideAxis = EnumProperty(items = guideAxisItems, update = propertyChanged, default = "X")
 
-    useDirectionList = BoolProperty(update = AnimationNode.refresh)
-    useGuideList = BoolProperty(update = AnimationNode.refresh)
+    useDirectionList = VectorizedNode.newVectorizeProperty()
+    useGuideList = VectorizedNode.newVectorizeProperty()
 
-    def create(self):
-        self.newInputGroup(self.useDirectionList,
-            ("Vector", "Direction", "direction"),
-            ("Vector List", "Directions", "directions"))
-        self.newInputGroup(self.useGuideList,
-            ("Vector", "Guide", "guide", {"value" : (0, 0, 1)}),
-            ("Vector List", "Guides", "guides"))
+    def createVectorized(self):
+        self.newVectorizedInput("Vector", "useDirectionList",
+            ("Direction", "direction"), ("Directions", "directions"))
 
-        generateList = self.useDirectionList or self.useGuideList
+        self.newVectorizedInput("Vector", "useGuideList",
+            ("Guide", "guide", dict(value = (0, 0, 0))),
+            ("Guides", "guides"))
 
-        self.newOutputGroup(generateList,
-            ("Euler", "Euler Rotation", "eulerRotation"),
-            ("Euler List", "Euler Rotations", "eulerRotations"))
+        useListProperties = [("useDirectionList", "useGuideList")]
 
-        self.newOutputGroup(generateList,
-            ("Quaternion", "Quaternion Rotation", "quaternionRotation", {"hide" : True}),
-            ("Quaternion List", "Quaternion Rotations", "quaternionRotations", {"hide" : True}))
+        self.newVectorizedOutput("Euler", useListProperties,
+            ("Euler Rotation", "eulerRotation"),
+            ("Euler Rotations", "eulerRotations"))
 
-        self.newOutputGroup(generateList,
-            ("Matrix", "Matrix Rotation", "matrixRotation"),
-            ("Matrix List", "Matrix Rotations", "matrixRotations"))
+        self.newVectorizedOutput("Quaternion", useListProperties,
+            ("Quaternion Rotation", "quaternionRotation", dict(hide = True)),
+            ("Quaternion Rotations", "quaternionRotations", dict(hide = True)))
 
-        vectorization = AutoSelectVectorization()
-        vectorization.input(self, "useDirectionList", self.inputs[0])
-        vectorization.input(self, "useGuideList", self.inputs[1])
-        vectorization.output(self, [("useDirectionList", "useGuideList")], list(self.outputs))
-        self.newSocketEffect(vectorization)
+        self.newVectorizedOutput("Matrix", useListProperties,
+            ("Matrix Rotation", "matrixRotation"),
+            ("Matrix Rotations", "matrixRotations"))
 
     def draw(self, layout):
         layout.prop(self, "trackAxis", expand = True)
