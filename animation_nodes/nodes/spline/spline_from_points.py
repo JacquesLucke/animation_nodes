@@ -37,7 +37,6 @@ class SplineFromPointsNode(bpy.types.Node, AnimationNode):
     def execute_Bezier(self, points, leftHandles, rightHandles, cyclic):
         self.correctHandlesListIfNecessary(points, leftHandles)
         self.correctHandlesListIfNecessary(points, rightHandles)
-        print(len(points), len(leftHandles), len(rightHandles))
         return BezierSpline(points, leftHandles, rightHandles, cyclic)
 
     def correctHandlesListIfNecessary(self, points, handles):
