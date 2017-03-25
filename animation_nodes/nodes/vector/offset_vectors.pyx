@@ -1,30 +1,27 @@
 import bpy
 from bpy.props import *
 from ... math cimport Vector3, setVector3
+from ... base_types import VectorizedNode
 from ... data_structures cimport FalloffEvaluator, Vector3DList
-from ... base_types import AnimationNode, AutoSelectVectorization
 
-class OffsetVectorsNode(bpy.types.Node, AnimationNode):
+class OffsetVectorsNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_OffsetVectorsNode"
     bl_label = "Offset Vectors"
 
-    useOffsetList = BoolProperty(default = False, update = AnimationNode.refresh)
+    useOffsetList = VectorizedNode.newVectorizeProperty()
 
     errorMessage = StringProperty()
     clampFalloff = BoolProperty(name = "Clamp Falloff", default = False)
 
-    def create(self):
+    def createVectorized(self):
         self.newInput("Vector List", "Vector List", "vectors", dataIsModified = True)
         self.newInput("Falloff", "Falloff", "falloff")
-        self.newInputGroup(self.useOffsetList,
-            ("Vector", "Offset", "offset", dict(value = (0, 0, 1))),
-            ("Vector List", "Offset List", "offsets"))
+
+        self.newVectorizedInput("Vector", "useOffsetList",
+            ("Offset", "offset", dict(value = (0, 0, 1))),
+            ("Offset List", "offsets"))
 
         self.newOutput("Vector List", "Vector List", "vectors")
-
-        vectorization = AutoSelectVectorization()
-        vectorization.input(self, "useOffsetList", self.inputs[2])
-        self.newSocketEffect(vectorization)
 
     def draw(self, layout):
         if self.errorMessage != "":
