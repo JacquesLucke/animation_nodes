@@ -49,7 +49,7 @@ class MixFalloffsNode(bpy.types.Node, AnimationNode):
         raise Exception("should not happen")
 
 
-cdef class MixFalloffsBase(CompoundFalloff):
+cdef class MixTwoFalloffsBase(CompoundFalloff):
     cdef:
         Falloff a, b
         double factor
@@ -62,18 +62,18 @@ cdef class MixFalloffsBase(CompoundFalloff):
     cdef list getDependencies(self):
         return [self.a, self.b]
 
-cdef class AddFalloffs(MixFalloffsBase):
+cdef class AddFalloffs(MixTwoFalloffsBase):
     cdef double evaluate(self, double* dependencyResults):
         return dependencyResults[0] + self.factor * dependencyResults[1]
 
-cdef class MultiplyFalloffs(MixFalloffsBase):
+cdef class MultiplyFalloffs(MixTwoFalloffsBase):
     cdef double evaluate(self, double* dependencyResults):
         return dependencyResults[0] * dependencyResults[1]
 
-cdef class MinFalloffs(MixFalloffsBase):
+cdef class MinFalloffs(MixTwoFalloffsBase):
     cdef double evaluate(self, double* dependencyResults):
         return min(dependencyResults[0], dependencyResults[1])
 
-cdef class MaxFalloffs(MixFalloffsBase):
+cdef class MaxFalloffs(MixTwoFalloffsBase):
     cdef double evaluate(self, double* dependencyResults):
         return max(dependencyResults[0], dependencyResults[1])
