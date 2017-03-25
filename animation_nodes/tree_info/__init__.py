@@ -128,6 +128,19 @@ def getLinkedOutputsDict(node):
     socketIDs = _forestData.socketsByNode[node.toID()][1]
     return {socketID[2] : len(linkedSockets[socketID]) > 0 for socketID in socketIDs}
 
+def getLinkedOutputsDict_ChangedIdentifiers(node, replacements):
+    linkedSockets = _forestData.linkedSockets
+    socketIDs = _forestData.socketsByNode[node.toID()][1]
+    isLinked = {}
+    for socketID in socketIDs:
+        identifier = socketID[2]
+        linked = len(linkedSockets[socketID]) > 0
+        if identifier in replacements:
+            isLinked[replacements[identifier]] = linked
+        else:
+            isLinked[identifier] = linked
+    return isLinked
+
 def iterLinkedOutputSockets(node):
     linkedSockets = _forestData.linkedSockets
     socketIDs = _forestData.socketsByNode[node.toID()][1]

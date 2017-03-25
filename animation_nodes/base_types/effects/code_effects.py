@@ -16,16 +16,18 @@ class VectorizeCodeEffect(CodeEffect):
         self.baseOutputNames = []
         self.listOutputNames = []
         self.newBaseOutputNames = []
+        self.outputIndices = []
 
     def input(self, baseName, listName):
         self.baseInputNames.append(baseName)
         self.listInputNames.append(listName)
         self.newBaseInputNames.append(self.rename(baseName))
 
-    def output(self, baseName, listName):
+    def output(self, baseName, listName, index):
         self.baseOutputNames.append(baseName)
         self.listOutputNames.append(listName)
         self.newBaseOutputNames.append(self.rename(baseName))
+        self.outputIndices.append(index)
 
     def rename(self, name):
         return "_base_" + name
@@ -34,6 +36,11 @@ class VectorizeCodeEffect(CodeEffect):
         if len(self.baseInputNames) == 0:
             yield code
             return
+
+        for name, index in zip(self.listOutputNames, self.outputIndices):
+            socket = node.outputs[index]
+            if socket.isLinked and name not in self.listInputNames:
+                yield "{} = self.outputs[{}].getDefaultValue()".format(name, index)
 
         baseInputNamesString = ", ".join(self.newBaseInputNames)
         listInputNamesString = ", ".join(self.listInputNames)
@@ -44,4 +51,10 @@ class VectorizeCodeEffect(CodeEffect):
 
         yield "for ({}, ) in zip({}):".format(baseInputNamesString, listInputNamesString)
         yield from self.iterIndented(code)
+
+        for baseName, listName, index in zip(self.newBaseOutputNames, self.listOutputNames, self.outputIndices):
+            socket = node.outputs[index]
+            if socket.isLinked and listName not in self.listInputNames:
+                yield "    {}.append({})".format(listName, baseName)
+
         yield "    pass"

@@ -2,16 +2,17 @@ from bpy.props import *
 from collections import defaultdict
 from . base_node import AnimationNode
 from ... sockets.info import toListDataType
+from ... tree_info import getLinkedOutputsDict_ChangedIdentifiers
 from .. effects import AutoSelectVectorization, VectorizeCodeEffect
 
-codeEffectByIdentifier = {}
+settingsByIdentifier = defaultdict(lambda: (VectorizeCodeEffect(), dict()))
 
 class VectorizedNode(AnimationNode):
     autoVectorizeExecution = False
 
     def create(self):
+        self._removeSettings()
         self.vectorization = AutoSelectVectorization()
-        self._reinitializeCodeEffect()
         self.createVectorized()
         self.newSocketEffect(self.vectorization)
 
@@ -45,9 +46,10 @@ class VectorizedNode(AnimationNode):
             [baseDataType] + list(baseData),
             [listDataType] + list(listData))
 
+        self._outputBaseByListName[listData[1]] = baseData[1]
         self.vectorization.output(self, properties, socket)
         if isCurrentlyList:
-            self._codeEffect.output(baseData[1], listData[1])
+            self._codeEffect.output(baseData[1], listData[1], len(self.outputs) - 1)
 
     def _formatInputProperties(self, properties):
         if isinstance(properties, str):
@@ -86,14 +88,17 @@ class VectorizedNode(AnimationNode):
             return []
         return [self._codeEffect]
 
-    def _reinitializeCodeEffect(self):
-        self._clearCodeEffect()
-        codeEffectByIdentifier[self.identifier] = VectorizeCodeEffect()
+    def getLinkedBaseOutputsDict(self):
+        return getLinkedOutputsDict_ChangedIdentifiers(self, self._outputBaseByListName)
 
-    def _clearCodeEffect(self):
-        if self.identifier in codeEffectByIdentifier:
-            del codeEffectByIdentifier[self.identifier]
+    def _removeSettings(self):
+        if self.identifier in settingsByIdentifier:
+            del settingsByIdentifier[self.identifier]
 
     @property
     def _codeEffect(self):
-        return codeEffectByIdentifier[self.identifier]
+        return settingsByIdentifier[self.identifier][0]
+
+    @property
+    def _outputBaseByListName(self):
+        return settingsByIdentifier[self.identifier][1]
