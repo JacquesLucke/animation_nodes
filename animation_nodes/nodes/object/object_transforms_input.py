@@ -1,44 +1,54 @@
 import bpy
 from bpy.props import *
+from ... base_types import VectorizedNode
 from ... events import executionCodeChanged
-from ... base_types import AnimationNode
 from ... utils.fcurve import getArrayValueAtFrame
 
 frameTypeItems = [
-    ("OFFSET", "Offset", ""),
-    ("ABSOLUTE", "Absolute", "") ]
+    ("OFFSET", "Offset", "", "NONE", 0),
+    ("ABSOLUTE", "Absolute", "", "NONE", 1)]
 
-class ObjectTransformsInputNode(bpy.types.Node, AnimationNode):
+class ObjectTransformsInputNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_ObjectTransformsInputNode"
     bl_label = "Object Transforms Input"
     bl_width_default = 165
-
-    def useCurrentTransformsChanged(self, context):
-        self.updateFrameSocket()
-        executionCodeChanged()
+    autoVectorizeExecution = True
 
     useCurrentTransforms = BoolProperty(
         name = "Use Current Transforms", default = True,
-        update = useCurrentTransformsChanged)
+        update = VectorizedNode.refresh)
 
     frameType = EnumProperty(
         name = "Frame Type", default = "OFFSET",
         items = frameTypeItems, update = executionCodeChanged)
 
-    def create(self):
-        self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
-        self.newOutput("Vector", "Location", "location")
-        self.newOutput("Euler", "Rotation", "rotation")
-        self.newOutput("Vector", "Scale", "scale")
-        self.newOutput("Quaternion", "Quaternion", "quaternion", hide = True)
+    useObjectList = VectorizedNode.newVectorizeProperty()
+    useFrameList = VectorizedNode.newVectorizeProperty()
 
-    def updateFrameSocket(self):
+    def createVectorized(self):
+        self.newVectorizedInput("Object", "useObjectList",
+            ("Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
+            ("Objects", "objects"))
+
         if self.useCurrentTransforms:
-            if "Frame" in self.inputs:
-                self.inputs["Frame"].remove()
+            props = "useObjectList"
         else:
-            if "Frame" not in self.inputs:
-                self.newInput("an_FloatSocket", "Frame", "frame")
+            self.newVectorizedInput("Float", "useFrameList",
+                ("Frame", "frame"), ("Frames", "frames"))
+            props = [("useObjectList", "useFrameList")]
+
+        self.newVectorizedOutput("Vector", props,
+            ("Location", "location"), ("Locations", "locations"))
+
+        self.newVectorizedOutput("Euler", props,
+            ("Rotation", "rotation"), ("Rotations", "rotations"))
+
+        self.newVectorizedOutput("Vector", props,
+            ("Scale", "scale"), ("Scales", "scales"))
+
+        self.newVectorizedOutput("Quaternion", props,
+            ("Quaternion", "quaternion", dict(hide = True)),
+            ("Quaternions", "quaternions"))
 
     def draw(self, layout):
         if not self.useCurrentTransforms:
@@ -52,7 +62,7 @@ class ObjectTransformsInputNode(bpy.types.Node, AnimationNode):
         self.invokeFunction(layout, "createAutoExecutionTrigger", text = "Create Execution Trigger")
 
     def getExecutionCode(self):
-        isLinked = self.getLinkedOutputsDict()
+        isLinked = self.getLinkedBaseOutputsDict()
         if not any(isLinked.values()): return
 
         yield "try:"
