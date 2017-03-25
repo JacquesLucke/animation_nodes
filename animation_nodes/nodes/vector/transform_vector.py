@@ -1,28 +1,22 @@
 import bpy
 from bpy.props import *
-from ... base_types import AnimationNode, AutoSelectVectorization
+from ... base_types import VectorizedNode
 
-class TransformVectorNode(bpy.types.Node, AnimationNode):
+class TransformVectorNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_TransformVectorNode"
     bl_label = "Transform Vector"
 
-    useVectorList = BoolProperty(default = False, update = AnimationNode.refresh)
+    useVectorList = VectorizedNode.newVectorizeProperty()
 
-    def create(self):
-        self.newInputGroup(self.useVectorList,
-            ("Vector", "Vector", "vector"),
-            ("Vector List", "Vectors", "vectors", dict(dataIsModified = True)))
+    def createVectorized(self):
+        self.newVectorizedInput("Vector", "useVectorList",
+            ("Vector", "vector"),
+            ("Vectors", "vectors", dict(dataIsModified = True)))
 
         self.newInput("Matrix", "Matrix", "matrix")
 
-        self.newOutputGroup(self.useVectorList,
-            ("Vector", "Vector", "transformedVector"),
-            ("Vector List", "Vectors", "vectors"))
-
-        vectorization = AutoSelectVectorization()
-        vectorization.input(self, "useVectorList", self.inputs[0])
-        vectorization.output(self, "useVectorList", self.outputs[0])
-        self.newSocketEffect(vectorization)
+        self.newVectorizedOutput("Vector", "useVectorList",
+            ("Vector", "transformedVector"), ("Vectors", "vectors"))
 
     def getExecutionCode(self):
         if self.useVectorList:
