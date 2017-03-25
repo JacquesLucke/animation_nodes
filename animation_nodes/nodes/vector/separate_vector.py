@@ -1,30 +1,21 @@
 import bpy
 from bpy.props import *
+from ... base_types import VectorizedNode
 from . list_operation_utils import getAxisListOfVectorList
-from ... base_types import AnimationNode, AutoSelectVectorization
 
-class SeparateVectorNode(bpy.types.Node, AnimationNode):
+class SeparateVectorNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_SeparateVectorNode"
     bl_label = "Separate Vector"
 
-    useList = BoolProperty(default = False, update = AnimationNode.refresh)
+    useList = VectorizedNode.newVectorizeProperty()
 
-    def create(self):
-        self.newInputGroup(self.useList,
-            ("Vector", "Vector", "vector"),
-            ("Vector List", "Vectors", "vectors"))
+    def createVectorized(self):
+        self.newVectorizedInput("Vector", "useList",
+            ("Vector", "vector"), ("Vectors", "vectors"))
 
         for axis in "XYZ":
-            self.newOutputGroup(self.useList,
-                ("Float", axis, axis.lower()),
-                ("Float List", axis, axis.lower()))
-
-        vectorization = AutoSelectVectorization()
-        vectorization.input(self, "useList", self.inputs[0])
-        vectorization.output(self, "useList", self.outputs[0])
-        vectorization.output(self, "useList", self.outputs[1])
-        vectorization.output(self, "useList", self.outputs[2])
-        self.newSocketEffect(vectorization)
+            self.newVectorizedOutput("Float", "useList",
+                (axis, axis.lower()), (axis, axis.lower()))
 
     def getExecutionCode(self):
         isLinked = self.getLinkedOutputsDict()
