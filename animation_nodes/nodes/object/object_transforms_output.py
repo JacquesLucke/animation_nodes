@@ -1,12 +1,13 @@
 import bpy
 from bpy.props import *
+from ... base_types import VectorizedNode
 from ... events import executionCodeChanged
-from ... base_types import AnimationNode
 
-class an_ObjectTransformsOutputNode(bpy.types.Node, AnimationNode):
+class an_ObjectTransformsOutputNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_ObjectTransformsOutputNode"
     bl_label = "Object Transforms Output"
     bl_width_default = 165
+    autoVectorizeExecution = True
 
     def checkedPropertiesChanged(self, context):
         self.updateSocketVisibility()
@@ -20,12 +21,27 @@ class an_ObjectTransformsOutputNode(bpy.types.Node, AnimationNode):
         description = "Apply changes on delta transforms",
         update = executionCodeChanged)
 
-    def create(self):
-        self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
-        self.newInput("Vector", "Location", "location")
-        self.newInput("Euler", "Rotation", "rotation")
-        self.newInput("Vector", "Scale", "scale", value = (1, 1, 1))
-        self.newOutput("Object", "Object", "object")
+    useObjectList = VectorizedNode.newVectorizeProperty()
+    useLocationList = VectorizedNode.newVectorizeProperty()
+    useRotationList = VectorizedNode.newVectorizeProperty()
+    useScaleList = VectorizedNode.newVectorizeProperty()
+
+    def createVectorized(self):
+        self.newVectorizedInput("Object", "useObjectList",
+            ("Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
+            ("Objects", "objects"))
+
+        self.newVectorizedInput("Vector", ("useLocationList", ["useObjectList"]),
+            ("Location", "location"), ("Locations", "locations"))
+        self.newVectorizedInput("Euler", ("useRotationList", ["useObjectList"]),
+            ("Rotation", "rotation"), ("Rotations", "rotations"))
+        self.newVectorizedInput("Vector", ("useScaleList", ["useObjectList"]),
+            ("Scale", "scale", dict(value = (1, 1, 1))), 
+            ("Scales", "scales"))
+
+        self.newVectorizedOutput("Object", "useObjectList",
+            ("Object", "object"), ("Objects", "objects"))
+
         self.updateSocketVisibility()
 
     def draw(self, layout):
@@ -54,9 +70,9 @@ class an_ObjectTransformsOutputNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "deltaTransforms")
 
     def updateSocketVisibility(self):
-        self.inputs["Location"].hide = not (self.useLocation[0] or self.useLocation[1] or self.useLocation[2])
-        self.inputs["Rotation"].hide = not (self.useRotation[0] or self.useRotation[1] or self.useRotation[2])
-        self.inputs["Scale"].hide = not (self.useScale[0] or self.useScale[1] or self.useScale[2])
+        self.inputs[1].hide = not (self.useLocation[0] or self.useLocation[1] or self.useLocation[2])
+        self.inputs[2].hide = not (self.useRotation[0] or self.useRotation[1] or self.useRotation[2])
+        self.inputs[3].hide = not (self.useScale[0] or self.useScale[1] or self.useScale[2])
 
     def getExecutionCode(self):
         useLoc = self.useLocation

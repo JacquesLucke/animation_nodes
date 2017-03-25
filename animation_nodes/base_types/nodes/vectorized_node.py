@@ -2,12 +2,16 @@ from bpy.props import *
 from collections import defaultdict
 from . base_node import AnimationNode
 from ... sockets.info import toListDataType
-from .. effects import AutoSelectVectorization
+from .. effects import AutoSelectVectorization, VectorizeCodeEffect
+
+codeEffectByIdentifier = {}
 
 class VectorizedNode(AnimationNode):
+    autoVectorizeExecution = False
 
     def create(self):
         self.vectorization = AutoSelectVectorization()
+        self._reinitializeCodeEffect()
         self.createVectorized()
         self.newSocketEffect(self.vectorization)
 
@@ -21,11 +25,14 @@ class VectorizedNode(AnimationNode):
         baseDataType = dataType
         listDataType = toListDataType(dataType)
 
-        socket = self.newInputGroup(getattr(self, properties[0]),
+        isCurrentlyList = getattr(self, properties[0])
+        socket = self.newInputGroup(isCurrentlyList,
             [baseDataType] + list(baseData),
             [listDataType] + list(listData))
 
         self.vectorization.input(self, properties[0], socket, properties[1])
+        if isCurrentlyList:
+            self._codeEffect.input(baseData[1], listData[1])
 
     def newVectorizedOutput(self, dataType, properties, baseData, listData):
         properties = self._formatOutputProperties(properties)
@@ -33,11 +40,14 @@ class VectorizedNode(AnimationNode):
         baseDataType = dataType
         listDataType = toListDataType(dataType)
 
-        socket = self.newOutputGroup(self._evaluateOutputProperties(properties),
+        isCurrentlyList = self._evaluateOutputProperties(properties)
+        socket = self.newOutputGroup(isCurrentlyList,
             [baseDataType] + list(baseData),
             [listDataType] + list(listData))
 
         self.vectorization.output(self, properties, socket)
+        if isCurrentlyList:
+            self._codeEffect.output(baseData[1], listData[1])
 
     def _formatInputProperties(self, properties):
         if isinstance(properties, str):
@@ -70,3 +80,20 @@ class VectorizedNode(AnimationNode):
                 if not any(getattr(self, prop) for prop in group):
                     return False
         return True
+
+    def getCodeEffects(self):
+        if not self.autoVectorizeExecution:
+            return []
+        return [self._codeEffect]
+
+    def _reinitializeCodeEffect(self):
+        self._clearCodeEffect()
+        codeEffectByIdentifier[self.identifier] = VectorizeCodeEffect()
+
+    def _clearCodeEffect(self):
+        if self.identifier in codeEffectByIdentifier:
+            del codeEffectByIdentifier[self.identifier]
+
+    @property
+    def _codeEffect(self):
+        return codeEffectByIdentifier[self.identifier]
