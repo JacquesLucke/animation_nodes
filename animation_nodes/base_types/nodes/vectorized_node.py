@@ -1,4 +1,4 @@
 from . base_node import AnimationNode
 
-class AutoVectorizedNode(AnimationNode):
+class VectorizedNode(AnimationNode):
     pass
