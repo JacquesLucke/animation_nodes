@@ -28,8 +28,6 @@ class MixFalloffsNode(bpy.types.Node, AnimationNode):
         else:
             self.newInput("Falloff", "A", "a")
             self.newInput("Falloff", "B", "b")
-            if self.mixType in useFactorTypes:
-                self.newInput("Float", "Factor", "factor", value = 1).setRange(0, 1)
         self.newOutput("Falloff", "Falloff", "falloff")
 
     def draw(self, layout):
@@ -41,55 +39,49 @@ class MixFalloffsNode(bpy.types.Node, AnimationNode):
         if self.mixFalloffList:
             return "execute_List"
         else:
-            if self.mixType in useFactorTypes:
-                return "execute_WithFactor"
-            else:
-                return "execute_WithoutFactor"
+            return "execute_Two"
 
     def execute_List(self, falloffs):
+        return MixFalloffs(falloffs, self.mixType, default = 1)
+
+    def execute_Two(self, a, b):
+        return MixFalloffs([a, b], self.mixType, default = 1)
+
+
+class MixFalloffs:
+    def __new__(cls, list falloffs not None, str method not None, double default = 1):
         if len(falloffs) == 0:
-            return ConstantFalloff(0)
-
-        if self.mixType == "ADD":
-            return AddFalloffs(falloffs)
-        elif self.mixType == "MULTIPLY":
-            return MultiplyFalloffs(falloffs)
-        elif self.mixType == "MIN":
-            return MinFalloffs(falloffs)
-        elif self.mixType == "MAX":
-            return MaxFalloffs(falloffs)
-
-    def execute_WithFactor(self, a, b, factor):
-        if self.mixType == "ADD":
-            return AddTwoFalloffs(a, b, factor)
-        raise Exception("should not happen")
-
-    def execute_WithoutFactor(self, a, b):
-        if self.mixType == "MULTIPLY":
-            return MultiplyTwoFalloffs(a, b)
-        elif self.mixType == "MIN":
-            return MinTwoFalloffs(a, b)
-        elif self.mixType == "MAX":
-            return MaxTwoFalloffs(a, b)
-        raise Exception("should not happen")
+            return ConstantFalloff(default)
+        elif len(falloffs) == 1:
+            return falloffs[0]
+        elif len(falloffs) == 2:
+            if method == "ADD": return AddTwoFalloffs(*falloffs)
+            elif method == "MULTIPLY": return MultiplyTwoFalloffs(*falloffs)
+            elif method == "MAX": return MaxTwoFalloffs(*falloffs)
+            elif method == "MIN": return MinTwoFalloffs(*falloffs)
+            raise Exception("invalid method")
+        else:
+            if method == "ADD": return AddFalloffs(falloffs)
+            elif method == "MULTIPLY": return MultiplyFalloffs(falloffs)
+            elif method == "MAX": return MaxFalloffs(falloffs)
+            elif method == "MIN": return MinFalloffs(falloffs)
+            raise Exception("invalid method")
 
 
 cdef class MixTwoFalloffsBase(CompoundFalloff):
     cdef:
         Falloff a, b
-        double factor
 
-    def __cinit__(self, Falloff a, Falloff b, double factor = 0):
+    def __cinit__(self, Falloff a, Falloff b):
         self.a = a
         self.b = b
-        self.factor = factor
 
     cdef list getDependencies(self):
         return [self.a, self.b]
 
 cdef class AddTwoFalloffs(MixTwoFalloffsBase):
     cdef double evaluate(self, double *dependencyResults):
-        return dependencyResults[0] + self.factor * dependencyResults[1]
+        return dependencyResults[0] + dependencyResults[1]
 
 cdef class MultiplyTwoFalloffs(MixTwoFalloffsBase):
     cdef double evaluate(self, double *dependencyResults):
