@@ -6,9 +6,9 @@ class ComposeMatrixNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_ComposeMatrixNode"
     bl_label = "Compose Matrix"
 
-    useTranslationList = BoolProperty(update = VectorizedNode.refresh)
-    useRotationList = BoolProperty(update = VectorizedNode.refresh)
-    useScaleList = BoolProperty(update = VectorizedNode.refresh)
+    useTranslationList = VectorizedNode.newVectorizeProperty()
+    useRotationList = VectorizedNode.newVectorizeProperty()
+    useScaleList = VectorizedNode.newVectorizeProperty()
 
     def createVectorized(self):
         self.newVectorizedInput("Vector", "useTranslationList",

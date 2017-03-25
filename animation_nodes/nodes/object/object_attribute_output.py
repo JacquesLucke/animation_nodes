@@ -12,8 +12,8 @@ class ObjectAttributeOutputNode(bpy.types.Node, VectorizedNode):
     attribute = StringProperty(name = "Attribute", default = "",
         update = executionCodeChanged)
 
-    useObjectList = BoolProperty(default = False, update = VectorizedNode.refresh)
-    useValueList = BoolProperty(default = False, update = VectorizedNode.refresh)
+    useObjectList = VectorizedNode.newVectorizeProperty()
+    useValueList = BoolProperty(update = VectorizedNode.refresh)
 
     errorMessage = StringProperty()
 

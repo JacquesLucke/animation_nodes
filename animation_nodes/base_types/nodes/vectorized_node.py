@@ -1,3 +1,4 @@
+from bpy.props import *
 from collections import defaultdict
 from . base_node import AnimationNode
 from ... sockets.info import toListDataType
@@ -9,6 +10,10 @@ class VectorizedNode(AnimationNode):
         self.vectorization = AutoSelectVectorization()
         self.createVectorized()
         self.newSocketEffect(self.vectorization)
+
+    @classmethod
+    def newVectorizeProperty(cls):
+        return BoolProperty(default = False, update = AnimationNode.refresh)
 
     def newVectorizedInput(self, dataType, properties, baseData, listData):
         properties = self._formatInputProperties(properties)

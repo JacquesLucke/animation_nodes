@@ -18,8 +18,8 @@ class ObjectMatrixOutputNode(bpy.types.Node, VectorizedNode):
 
     outputType = EnumProperty(items = outputItems, update = executionCodeChanged, default = "WORLD")
 
-    useObjectList = BoolProperty(default = False, update = VectorizedNode.refresh)
-    useMatrixList = BoolProperty(default = False, update = VectorizedNode.refresh)
+    useObjectList = VectorizedNode.newVectorizeProperty()
+    useMatrixList = VectorizedNode.newVectorizeProperty()
 
     def createVectorized(self):
         self.newVectorizedInput("Object", "useObjectList",
