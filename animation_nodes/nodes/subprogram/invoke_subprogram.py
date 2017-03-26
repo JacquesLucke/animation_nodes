@@ -24,11 +24,8 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
     bl_width_default = 170
     dynamicLabelType = "HIDDEN_ONLY"
 
-    def subprogramIdentifierChanged(self, context):
-        self.refresh()
-        executionCodeChanged()
-
-    subprogramIdentifier = StringProperty(name = "Subprogram Identifier", default = "", update = subprogramIdentifierChanged)
+    subprogramIdentifier = StringProperty(name = "Subprogram Identifier", default = "",
+        update = AnimationNode.refresh)
 
     def cacheTypeChanged(self, context):
         self.clearCache()
@@ -41,6 +38,15 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
 
     showCacheOptions = BoolProperty(name = "Show Cache Options", default = False,
         description = "Draw cache options in the node for easier access")
+
+    def create(self):
+        subprogram = self.subprogramNode
+        if subprogram is None: self.clearSockets()
+        else:
+            if subprogram.network.type == "Invalid": return
+            else: subprogram.getSocketData().apply(self)
+        self.checkCachingPossibilities()
+        self.clearCache()
 
     def drawLabel(self):
         network = self.subprogramNetwork
@@ -140,16 +146,6 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
             if not self.isOutputStorable: col.label("  - The output is not storable")
             if not self.isInputComparable: col.label("  - The input is not comparable")
         self.invokeFunction(layout, "clearCache", text = "Clear Cache")
-
-
-    def refresh(self):
-        subprogram = self.subprogramNode
-        if subprogram is None: self.clearSockets()
-        else:
-            if subprogram.network.type == "Invalid": return
-            else: subprogram.getSocketData().apply(self)
-        self.checkCachingPossibilities()
-        self.clearCache()
 
     def checkCachingPossibilities(self):
         self.isInputComparable = all(socket.comparable for socket in self.inputs)
