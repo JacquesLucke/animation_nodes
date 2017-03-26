@@ -16,15 +16,15 @@ class GridMeshNode(bpy.types.Node, AnimationNode):
         update = AnimationNode.refresh, items = modeItems)
 
     def create(self):
+        self.newInput("Integer", "X Divisions", "xDivisions", value = 10, minValue = 2)
+        self.newInput("Integer", "Y Divisions", "yDivisions", value = 10, minValue = 2)
+        
         if self.mode == "STEP":
             self.newInput("Float", "X Distance", "xDistance", value = 1)
             self.newInput("Float", "Y Distance", "yDistance", value = 1)
         elif self.mode == "SIZE":
             self.newInput("Float", "Length", "length", value = 10)
             self.newInput("Float", "Width", "width", value = 10)
-
-        self.newInput("Integer", "X Divisions", "xDivisions", value = 10, minValue = 2)
-        self.newInput("Integer", "Y Divisions", "yDivisions", value = 10, minValue = 2)
 
         self.newOutput("Vector List", "Vertices", "vertices")
         self.newOutput("Edge Indices List", "Edge Indices", "edgeIndices")
