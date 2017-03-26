@@ -58,6 +58,12 @@ class AnimationNode:
     def setup(self):
         pass
 
+    def preCreate(self):
+        pass
+
+    def postCreate(self):
+        pass
+
     # may be defined in nodes
     #def create(self):
     #    pass
@@ -128,9 +134,9 @@ class AnimationNode:
     def init(self, context):
         self.width_hidden = 100
         self.identifier = createIdentifier()
-        if hasattr(self, "create"):
-            self.create()
         self.setup()
+        if self.isRefreshable:
+            self.refresh()
 
     def update(self):
         '''Don't use this function at all!!'''
@@ -166,7 +172,7 @@ class AnimationNode:
         return self.bl_label
 
 
-    # Socket Effects
+    # Update and Refresh
     ####################################################
 
     def updateNode(self):
@@ -174,8 +180,8 @@ class AnimationNode:
         self.edit()
 
     def refresh(self, context = None):
-        if not hasattr(self, "create"):
-            return
+        if not self.isRefreshable:
+            raise Exception("node is not refreshable")
 
         @keepNodeState
         def refreshAndKeepNodeState(self):
@@ -184,15 +190,21 @@ class AnimationNode:
         refreshAndKeepNodeState(self)
 
     def _refresh(self):
-        if not hasattr(self, "create"):
-            return
-
         self._clear()
-        self.create()
+        self._create()
 
     def _clear(self):
         self.clearSockets()
         self._clearSocketEffects()
+
+    def _create(self):
+        self.preCreate()
+        self.create()
+        self.postCreate()
+
+    @property
+    def isRefreshable(self):
+        return hasattr(self, "create")
 
 
     # Socket Effects

@@ -8,7 +8,7 @@ class EvaluateInterpolationNode(bpy.types.Node, VectorizedNode):
 
     useList = VectorizedNode.newVectorizeProperty()
 
-    def createVectorized(self):
+    def create(self):
         self.newVectorizedInput("Float", "useList",
             ("Position", "position", dict(minValue = 0, maxValue = 1)),
             ("Positions", "positions"))

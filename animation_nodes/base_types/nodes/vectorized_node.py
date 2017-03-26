@@ -10,11 +10,14 @@ settingsByIdentifier = defaultdict(lambda: (VectorizeCodeEffect(), dict()))
 class VectorizedNode(AnimationNode):
     autoVectorizeExecution = False
 
-    def create(self):
+    def preCreate(self):
+        super().preCreate()
         self._removeSettings()
         self.vectorization = AutoSelectVectorization()
-        self.createVectorized()
+
+    def postCreate(self):
         self.newSocketEffect(self.vectorization)
+        super().postCreate()
 
     @classmethod
     def newVectorizeProperty(cls):

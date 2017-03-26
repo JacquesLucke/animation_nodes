@@ -10,7 +10,7 @@ class ComposeMatrixNode(bpy.types.Node, VectorizedNode):
     useRotationList = VectorizedNode.newVectorizeProperty()
     useScaleList = VectorizedNode.newVectorizeProperty()
 
-    def createVectorized(self):
+    def create(self):
         self.newVectorizedInput("Vector", "useTranslationList",
             ("Translation", "translation"), ("Translations", "translations"))
 

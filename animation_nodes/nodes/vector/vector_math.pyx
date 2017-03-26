@@ -183,7 +183,7 @@ class VectorMathNode(bpy.types.Node, VectorizedNode):
 
     errorMessage = StringProperty()
 
-    def createVectorized(self):
+    def create(self):
         usedProperties = []
 
         for socketData in self._operation.type.split("_"):

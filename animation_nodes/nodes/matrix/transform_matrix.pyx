@@ -10,7 +10,7 @@ class TransformMatrixNode(bpy.types.Node, VectorizedNode):
 
     useMatrixList = VectorizedNode.newVectorizeProperty()
 
-    def createVectorized(self):
+    def create(self):
         self.newVectorizedInput("Matrix", "useMatrixList",
             ("Matrix", "inMatrix"), ("Matrices", "inMatrices"))
 

@@ -16,7 +16,7 @@ class RotationToDirectionNode(bpy.types.Node, VectorizedNode):
     directionAxis = EnumProperty(name = "Direction Axis", default = "Z",
         items = directionAxisItems, update = propertyChanged)
 
-    def createVectorized(self):
+    def create(self):
         self.newVectorizedInput("Euler", "useRotationList",
             ("Rotation", "rotation"), ("Rotations", "rotations"))
 

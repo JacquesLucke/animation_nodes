@@ -26,7 +26,7 @@ class ObjectIDKeyNode(bpy.types.Node, VectorizedNode):
 
     useList = VectorizedNode.newVectorizeProperty()
 
-    def createVectorized(self):
+    def create(self):
         self.newVectorizedInput("Object", "useList",
             ("Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
             ("Objects", "objects"))

@@ -15,7 +15,7 @@ class CombineVectorNode(bpy.types.Node, VectorizedNode):
 
     errorMessage = StringProperty()
 
-    def createVectorized(self):
+    def create(self):
         self.newVectorizedInput("Float", "useListX", ("X", "x"), ("X", "x"))
         self.newVectorizedInput("Float", "useListY", ("Y", "y"), ("Y", "y"))
         self.newVectorizedInput("Float", "useListZ", ("Z", "z"), ("Z", "z"))

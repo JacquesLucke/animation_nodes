@@ -14,7 +14,7 @@ class CurveObjectOutputNode(bpy.types.Node, VectorizedNode):
 
     useSplineList = VectorizedNode.newVectorizeProperty()
 
-    def createVectorized(self):
+    def create(self):
         socket = self.newInput("Object", "Object", "object")
         socket.defaultDrawType = "PROPERTY_ONLY"
         socket.objectCreationType = "CURVE"

@@ -10,7 +10,7 @@ class TranslationMatrixNode(bpy.types.Node, VectorizedNode):
 
     useList = VectorizedNode.newVectorizeProperty()
 
-    def createVectorized(self):
+    def create(self):
         self.newVectorizedInput("Vector", "useList",
             ("Translation", "translation"), ("Translations", "translations"))
 

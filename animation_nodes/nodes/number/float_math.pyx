@@ -164,7 +164,7 @@ class FloatMathNode(bpy.types.Node, VectorizedNode):
     useListExponent = VectorizedNode.newVectorizeProperty()
     useListStep = VectorizedNode.newVectorizeProperty()
 
-    def createVectorized(self):
+    def create(self):
         usedProperties = []
 
         for name in self._operation.type.split("_"):

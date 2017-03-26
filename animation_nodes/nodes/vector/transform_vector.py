@@ -8,7 +8,7 @@ class TransformVectorNode(bpy.types.Node, VectorizedNode):
 
     useVectorList = VectorizedNode.newVectorizeProperty()
 
-    def createVectorized(self):
+    def create(self):
         self.newVectorizedInput("Vector", "useVectorList",
             ("Vector", "vector"),
             ("Vectors", "vectors", dict(dataIsModified = True)))

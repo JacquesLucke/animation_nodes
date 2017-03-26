@@ -19,7 +19,7 @@ class MapRangeNode(bpy.types.Node, VectorizedNode):
 
     useValueList = VectorizedNode.newVectorizeProperty()
 
-    def createVectorized(self):
+    def create(self):
         self.newVectorizedInput("Float", "useValueList",
             ("Value", "value"), ("Values", "values"))
 

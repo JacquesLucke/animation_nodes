@@ -13,7 +13,9 @@ def updateFile():
 
     tree_info.updateIfNecessary()
     for node in iterAnimationNodes():
-        try: node._refresh()
+        try:
+            if node.isRefreshable:
+                node._refresh()
         except: traceback.print_exc()
 
     setSocketProperties(socketProperties)

@@ -13,7 +13,7 @@ class OffsetVectorsNode(bpy.types.Node, VectorizedNode):
     errorMessage = StringProperty()
     clampFalloff = BoolProperty(name = "Clamp Falloff", default = False)
 
-    def createVectorized(self):
+    def create(self):
         self.newInput("Vector List", "Vector List", "vectors", dataIsModified = True)
         self.newInput("Falloff", "Falloff", "falloff")
 

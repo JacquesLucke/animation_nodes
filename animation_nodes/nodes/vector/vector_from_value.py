@@ -8,7 +8,7 @@ class VectorFromValueNode(bpy.types.Node, VectorizedNode):
 
     useList = VectorizedNode.newVectorizeProperty()
 
-    def createVectorized(self):
+    def create(self):
         self.newVectorizedInput("Float", "useList",
             ("Value", "value"), ("Values", "values"))
 

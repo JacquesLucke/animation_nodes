@@ -26,7 +26,7 @@ class LoopGeneratorOutputNode(bpy.types.Node, VectorizedNode):
         self.sortIndex = getRandomInt()
         self.outputName = self.listDataType
 
-    def createVectorized(self):
+    def create(self):
         listDataType = self.listDataType
         baseDataType = toBaseDataType(listDataType)
 

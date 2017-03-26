@@ -17,7 +17,7 @@ class DirectionToRotationNode(bpy.types.Node, VectorizedNode):
     useDirectionList = VectorizedNode.newVectorizeProperty()
     useGuideList = VectorizedNode.newVectorizeProperty()
 
-    def createVectorized(self):
+    def create(self):
         self.newVectorizedInput("Vector", "useDirectionList",
             ("Direction", "direction"), ("Directions", "directions"))
 

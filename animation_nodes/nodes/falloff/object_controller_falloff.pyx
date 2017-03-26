@@ -39,7 +39,7 @@ class ObjectControllerFalloffNode(bpy.types.Node, VectorizedNode):
 
     useObjectList = VectorizedNode.newVectorizeProperty()
 
-    def createVectorized(self):
+    def create(self):
         self.newVectorizedInput("Object", "useObjectList",
             ("Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
             ("Objects", "objects"))

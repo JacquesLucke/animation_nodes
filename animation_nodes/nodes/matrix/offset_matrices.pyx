@@ -44,7 +44,7 @@ class OffsetMatricesNode(bpy.types.Node, VectorizedNode):
     useRotationList = VectorizedNode.newVectorizeProperty()
     useScaleList = VectorizedNode.newVectorizeProperty()
 
-    def createVectorized(self):
+    def create(self):
         self.newInput("Matrix List", "Matrices", "inMatrices")
         self.newInput("Falloff", "Falloff", "falloff", value = 1)
 

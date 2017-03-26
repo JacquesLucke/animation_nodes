@@ -9,7 +9,7 @@ class SeparateVectorNode(bpy.types.Node, VectorizedNode):
 
     useList = VectorizedNode.newVectorizeProperty()
 
-    def createVectorized(self):
+    def create(self):
         self.newVectorizedInput("Vector", "useList",
             ("Vector", "vector"), ("Vectors", "vectors"))
 
