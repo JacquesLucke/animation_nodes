@@ -21,7 +21,10 @@ cdef class SpectrumSound(Sound):
         return createAverageSound(sequences, index)
 
     cpdef FloatList evaluate(self, float frame):
-        return self.evaluateInt(<int>frame)
+        cdef int intFrame = <int>frame
+        cdef FloatList before = self.evaluateInt(intFrame)
+        cdef FloatList after = self.evaluateInt(intFrame + 1)
+        return mixLists(before, after, frame - intFrame)
 
     cdef FloatList evaluateInt(self, int frame):
         if self.startFrame <= frame <= self.endFrame:
@@ -31,6 +34,13 @@ cdef class SpectrumSound(Sound):
 
     cpdef float evaluateFrequency(self, float frame, float frequency):
         return 0
+
+cdef FloatList mixLists(FloatList listA, FloatList listB, float factor):
+    cdef FloatList result = FloatList(length = len(listA))
+    cdef int i
+    for i in range(len(result)):
+        result.data[i] = listA.data[i] * (1 - factor) + listB.data[i] * factor
+    return result
 
 def createAverageSound(list sequences not None, int index):
     checkSpectrumSoundInput(sequences, index)
