@@ -25,7 +25,8 @@ class EdgeIndicesSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     @classmethod
     def correctValue(cls, value):
-        if isEdge(value): return value, 0
+        if isinstance(value, tuple) and len(value) == 2: return value, 0
+        elif isinstance(value, (list, set)) and len(value) == 2: return tuple(value), 1
         else: return cls.getDefaultValue(), 2
 
 
