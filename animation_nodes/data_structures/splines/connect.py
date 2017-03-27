@@ -14,12 +14,14 @@ def joinPolySplines(splines):
     newSpline = PolySpline()
     for spline in splines:
         newSpline.points.extend(spline.points)
+        newSpline.radii.extend(spline.radii)
     return newSpline
 
 def joinInBezierSpline(splines):
     newSpline = BezierSpline()
     for spline in splines:
         newSpline.points.extend(spline.points)
+        newSpline.radii.extend(spline.radii)
         if isinstance(spline, PolySpline):
             newSpline.leftHandles.extend(spline.points)
             newSpline.rightHandles.extend(spline.points)

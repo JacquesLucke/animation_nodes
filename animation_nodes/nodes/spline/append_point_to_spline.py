@@ -20,6 +20,7 @@ class AppendPointToSplineNode(bpy.types.Node, AnimationNode):
         if self.pointType == "BEZIER_POINT":
             self.newInput("Vector", "Left Handle", "leftHandle")
             self.newInput("Vector", "Right Handle", "rightHandle")
+        self.newInput("Float", "Radius", "radius")
         self.newOutput("Spline", "Spline", "outSpline")
 
     def draw(self, layout):
@@ -31,18 +32,18 @@ class AppendPointToSplineNode(bpy.types.Node, AnimationNode):
         elif self.pointType == "BEZIER_POINT":
             return "execute_BezierPoint"
 
-    def execute_Point(self, spline, point):
+    def execute_Point(self, spline, point, radius):
         if spline.type == "BEZIER":
-            spline.appendPoint(point, point, point)
+            spline.appendPoint(point, point, point, radius)
         else:
-            spline.appendPoint(point)
+            spline.appendPoint(point, radius)
         spline.markChanged()
         return spline
 
-    def execute_BezierPoint(self, spline, point, leftHandle, rightHandle):
+    def execute_BezierPoint(self, spline, point, leftHandle, rightHandle, radius):
         if self.pointType == "BEZIER_POINT" and spline.type == "BEZIER":
-            spline.appendPoint(point, leftHandle, rightHandle)
+            spline.appendPoint(point, leftHandle, rightHandle, radius)
         else:
-            spline.appendPoint(point)
+            spline.appendPoint(point, radius)
         spline.markChanged()
         return spline

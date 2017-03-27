@@ -21,7 +21,7 @@ class TrimSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
         col.prop(self, "resolution")
 
     def execute(self, spline, start, end):
-        if not spline.isEvaluable():
+        if not spline.isEvaluable() or (start < 0.00001 and end > 0.99999):
             return spline.copy()
 
         start = min(max(start, 0.0), 1.0)

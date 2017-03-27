@@ -10,19 +10,24 @@ from mathutils import Vector
 
 cdef class PolySpline(Spline):
 
-    def __cinit__(self, Vector3DList points = None, bint cyclic = False):
+    def __cinit__(self, Vector3DList points = None, FloatList radii = None, bint cyclic = False):
         if points is None: points = Vector3DList()
+        if radii is None: radii = FloatList.fromValues([0]) * len(points)
+        if len(points) != len(radii):
+            raise Exception("Point and radius amount has to be equal")
         self.cyclic = cyclic
         self.type = "POLY"
         self.points = points
+        self.radii = radii
         self.markChanged()
 
-    def appendPoint(self, point):
+    def appendPoint(self, point, float radius = 0):
         self.points.append(point)
+        self.radii.append(radius)
         self.markChanged()
 
     cpdef PolySpline copy(self):
-        return PolySpline(self.points.copy(), self.cyclic)
+        return PolySpline(self.points.copy(), self.radii.copy(), self.cyclic)
 
     cpdef transform(self, matrix):
         self.points.transform(matrix)
@@ -86,13 +91,21 @@ cdef class PolySpline(Spline):
 
         cdef:
             Vector3DList newPoints = Vector3DList(length = newPointAmount)
-            Vector3* _newPoints = newPoints.data
-            Vector3* _oldPoints = self.points.data
+            Vector3 *_newPoints = newPoints.data
+            Vector3 *_oldPoints = self.points.data
+            FloatList newRadii = FloatList(length = newPointAmount)
+            float *_newRadii = newRadii.data
+            float *_oldRadii = self.radii.data
 
         mixVec3(_newPoints, _oldPoints + startIndices[0], _oldPoints + startIndices[1], startT)
+        _newRadii[0] = _oldRadii[startIndices[0]] * (1 - startT) + _oldRadii[startIndices[1]] * startT
+
         mixVec3(_newPoints + newPointAmount - 1, _oldPoints + endIndices[0], _oldPoints + endIndices[1], endT)
-        memcpy(_newPoints + 1, _oldPoints + startIndices[1], 3 * sizeof(float) * (newPointAmount - 2))
-        return PolySpline(newPoints)
+        _newRadii[newPointAmount - 1] = _oldRadii[endIndices[0]] * (1 - endT) + _oldRadii[endIndices[1]] * endT
+
+        memcpy(_newPoints + 1, _oldPoints + startIndices[1], sizeof(Vector3) * (newPointAmount - 2))
+        memcpy(_newRadii + 1, _oldRadii + startIndices[1], sizeof(float) * (newPointAmount - 2))
+        return PolySpline(newPoints, newRadii)
 
     cpdef bint isEvaluable(self):
         return self.points.length >= 2

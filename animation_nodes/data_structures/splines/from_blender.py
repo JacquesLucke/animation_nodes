@@ -26,12 +26,14 @@ def createBezierSpline(bSpline):
     points = Vector3DList(length = amount)
     leftHandles = Vector3DList(length = amount)
     rightHandles = Vector3DList(length = amount)
+    radii = FloatList(length = amount)
 
     bSpline.bezier_points.foreach_get("co", points.asMemoryView())
     bSpline.bezier_points.foreach_get("handle_left", leftHandles.asMemoryView())
     bSpline.bezier_points.foreach_get("handle_right", rightHandles.asMemoryView())
+    bSpline.bezier_points.foreach_get("radius", radii.asMemoryView())
 
-    spline = BezierSpline(points, leftHandles, rightHandles)
+    spline = BezierSpline(points, leftHandles, rightHandles, radii)
     spline.cyclic = bSpline.use_cyclic_u
     return spline
 
@@ -41,6 +43,9 @@ def createPolySpline(bSpline):
     del pointArray[3::4]
     splinePoints = Vector3DList.fromFloatList(pointArray)
 
-    spline = PolySpline(splinePoints)
+    radii = FloatList(length = len(bSpline.points))
+    bSpline.points.foreach_get("radius", radii.asMemoryView())
+
+    spline = PolySpline(splinePoints, radii)
     spline.cyclic = bSpline.use_cyclic_u
     return spline

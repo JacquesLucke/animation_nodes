@@ -28,6 +28,7 @@ cdef appendBezierSpline(object bSplines, BezierSpline spline):
     bSpline.bezier_points.foreach_set("co", spline.points.asMemoryView())
     bSpline.bezier_points.foreach_set("handle_left", spline.leftHandles.asMemoryView())
     bSpline.bezier_points.foreach_set("handle_right", spline.rightHandles.asMemoryView())
+    bSpline.bezier_points.foreach_set("radius", spline.radii.asMemoryView())
 
 cdef appendPolySpline(object bSplines, PolySpline spline):
     # Blender stores 4 values for each point of a poly spline
@@ -49,3 +50,4 @@ cdef appendPolySpline(object bSplines, PolySpline spline):
     points = bSpline.points
     points.add(spline.points.length - 1)
     points.foreach_set("co", bPoints.asMemoryView())
+    points.foreach_set("radius", spline.radii.asMemoryView())
