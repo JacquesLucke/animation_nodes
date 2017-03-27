@@ -39,11 +39,11 @@ cdef void allocateMatrixTransformerFromSingleValues(
 
     allocateMatrixTransformer(outFunction, outSettings, &s)
 
-cdef void allocateMatrixTransformerFromCListMocks(
+cdef void allocateMatrixTransformerFromCDefaultLists(
             TransformMatrixFunction* outFunction, void** outSettings,
-            CListMock translations, bint localTranslationAxis,
-            CListMock rotations, bint localRotationAxis, bint localRotationPivot,
-            CListMock scales, bint localScaleAxis, bint localScalePivot):
+            CDefaultList translations, bint localTranslationAxis,
+            CDefaultList rotations, bint localRotationAxis, bint localRotationPivot,
+            CDefaultList scales, bint localScaleAxis, bint localScalePivot):
     cdef MatrixTransformerSettings s
 
     # TODO: Select optimized booleans

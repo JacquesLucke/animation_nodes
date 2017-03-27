@@ -3,9 +3,9 @@ from bpy.props import *
 from ... events import propertyChanged
 from ... base_types import VectorizedNode
 from ... data_structures cimport (Vector3DList, EulerList, Matrix4x4List,
-                                  FalloffEvaluator, CListMock)
+                                  FalloffEvaluator, CDefaultList)
 from ... algorithms.transform_matrix cimport (
-    allocateMatrixTransformerFromCListMocks, freeMatrixTransformer, TransformMatrixFunction)
+    allocateMatrixTransformerFromCDefaultLists, freeMatrixTransformer, TransformMatrixFunction)
 from ... math cimport Matrix4, Vector3, Euler3, toVector3, toEuler3
 from .. falloff.invert_falloff import InvertFalloff
 
@@ -81,9 +81,9 @@ class OffsetMatricesNode(bpy.types.Node, VectorizedNode):
 
     def execute(self, Matrix4x4List inMatrices, falloff, translations, rotations, scales):
         cdef:
-            CListMock _translations = CListMock(Vector3DList, translations, (0, 0, 0))
-            CListMock _rotations = CListMock(EulerList, rotations, (0, 0, 0))
-            CListMock _scales = CListMock(Vector3DList, scales, (1, 1, 1))
+            CDefaultList _translations = CDefaultList(Vector3DList, translations, (0, 0, 0))
+            CDefaultList _rotations = CDefaultList(EulerList, rotations, (0, 0, 0))
+            CDefaultList _scales = CDefaultList(Vector3DList, scales, (1, 1, 1))
 
             Matrix4x4List outMatrices = Matrix4x4List(length = inMatrices.length)
             FalloffEvaluator evaluator
@@ -99,7 +99,7 @@ class OffsetMatricesNode(bpy.types.Node, VectorizedNode):
             TransformMatrixFunction transformFunction
             void* transformSettings
 
-        allocateMatrixTransformerFromCListMocks(&transformFunction, &transformSettings,
+        allocateMatrixTransformerFromCDefaultLists(&transformFunction, &transformSettings,
             _translations, self.translationMode == "LOCAL",
             _rotations, self.rotationMode == "LOCAL", not self.originAsRotationPivot,
             _scales, self.scaleMode == "LOCAL", not self.originAsScalePivot)

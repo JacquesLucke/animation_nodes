@@ -1,6 +1,6 @@
 from .. lists.clist cimport CList
 
-cdef class CListMock(ListMock):
+cdef class CDefaultList(DefaultList):
     def __cinit__(self, dataType, listOrElement, defaultElement):
         if not issubclass(dataType, CList):
             raise TypeError("first argument has to be a subclass of CList")
@@ -30,5 +30,5 @@ cdef class CListMock(ListMock):
             return self.arrayStart + index * self.elementSize
         return self.default
 
-    cdef long getSuggestedLength(self):
+    cdef long getRealLength(self):
         return self.realListLength

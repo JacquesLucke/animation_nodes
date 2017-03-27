@@ -4,7 +4,7 @@ from math import pi as _pi
 from libc.limits cimport INT_MAX
 from libc.math cimport sin, cos
 from ... base_types import AnimationNode
-from ... data_structures cimport Matrix4x4List, Vector3DList, CListMock
+from ... data_structures cimport Matrix4x4List, Vector3DList, CDefaultList
 from ... algorithms.rotations.rotation_and_direction cimport directionToMatrix_LowLevel
 from ... math cimport (Matrix4, Vector3, setTranslationMatrix,
     setMatrixTranslation, setRotationZMatrix, toVector3)
@@ -134,9 +134,9 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
     def execute_Vertices(self, Vector3DList vertices, Vector3DList normals):
         cdef:
             int i
-            CListMock _vertices = CListMock(Vector3DList, vertices, (0, 0, 0))
-            CListMock _normals = CListMock(Vector3DList, normals, (0, 0, 0))
-            int amount = CListMock.getMaxLength(_vertices, _normals)
+            CDefaultList _vertices = CDefaultList(Vector3DList, vertices, (0, 0, 0))
+            CDefaultList _normals = CDefaultList(Vector3DList, normals, (0, 0, 0))
+            int amount = CDefaultList.getMaxLength(_vertices, _normals)
             Matrix4x4List matrices = Matrix4x4List(length = amount)
             Vector3 *normal
             Vector3 *position

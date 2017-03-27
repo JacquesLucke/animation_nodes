@@ -1,5 +1,5 @@
 from ... data_structures cimport (Vector3DList, EulerList, Matrix4x4List,
-                                  CListMock)
+                                  CDefaultList)
 
 from ... math cimport Vector3, Euler3, Matrix4, setTranslationRotationScaleMatrix
 from ... math import matrix4x4ListToEulerList
@@ -8,11 +8,11 @@ from libc.math cimport sqrt
 
 def composeMatrices(translations, rotations, scales):
     cdef:
-        CListMock _translations = CListMock(Vector3DList, translations, (0, 0, 0))
-        CListMock _rotations = CListMock(EulerList, rotations, (0, 0, 0))
-        CListMock _scales = CListMock(Vector3DList, scales, (1, 1, 1))
+        CDefaultList _translations = CDefaultList(Vector3DList, translations, (0, 0, 0))
+        CDefaultList _rotations = CDefaultList(EulerList, rotations, (0, 0, 0))
+        CDefaultList _scales = CDefaultList(Vector3DList, scales, (1, 1, 1))
 
-        long length = CListMock.getMaxLength(_translations, _rotations, _scales)
+        long length = CDefaultList.getMaxLength(_translations, _rotations, _scales)
         Matrix4x4List matrices = Matrix4x4List(length = length)
         long i
 

@@ -1,7 +1,7 @@
-from . list_mock cimport ListMock
+from . default_list cimport DefaultList
 from .. lists.clist cimport CList
 
-cdef class CListMock(ListMock):
+cdef class CDefaultList(DefaultList):
     cdef:
         object dataType
         CList realList

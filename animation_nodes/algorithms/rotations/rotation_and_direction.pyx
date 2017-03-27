@@ -1,4 +1,4 @@
-from ... data_structures cimport EulerList, Matrix4x4List, Vector3DList, CListMock
+from ... data_structures cimport EulerList, Matrix4x4List, Vector3DList, CDefaultList
 from ... math cimport (toVector3, toPyVector3, Matrix3, toEuler3,
                        transformVec3AsDirection_InPlace, setRotationMatrix,
                        setIdentityMatrix, toPyMatrix4, crossVec3, normalizeVec3,
@@ -124,10 +124,10 @@ def eulersToDirections(EulerList rotations, str axis):
 
 def directionsToMatrices(directions, guides, trackAxis = "Z", guideAxis = "X"):
     cdef:
-        CListMock _directions = CListMock(Vector3DList, directions, (0, 0, 0))
-        CListMock _guides = CListMock(Vector3DList, guides, (0, 0, 1))
+        CDefaultList _directions = CDefaultList(Vector3DList, directions, (0, 0, 0))
+        CDefaultList _guides = CDefaultList(Vector3DList, guides, (0, 0, 1))
 
-        Matrix4x4List matrices = Matrix4x4List(length = CListMock.getMaxLength(_directions, _guides))
+        Matrix4x4List matrices = Matrix4x4List(length = CDefaultList.getMaxLength(_directions, _guides))
         char _trackAxis = axixNumbers[trackAxis]
         char _guideAxis = axixNumbers[guideAxis]
         long i

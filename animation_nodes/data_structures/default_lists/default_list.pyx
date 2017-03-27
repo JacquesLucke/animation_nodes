@@ -1,16 +1,16 @@
-cdef class ListMock:
-    cdef long getSuggestedLength(self):
+cdef class DefaultList:
+    cdef long getRealLength(self):
         return 0
 
     @classmethod
     def getMaxLength(cls, *args):
         cdef:
-            ListMock listMock
+            DefaultList defaultList
             long maxLength = 0
             long length
 
-        for listMock in args:
-            length = listMock.getSuggestedLength()
+        for defaultList in args:
+            length = defaultList.getRealLength()
             if length > maxLength:
                 maxLength = length
         return maxLength
