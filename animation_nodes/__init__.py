@@ -51,20 +51,15 @@ if counter > 1:
         "Please uninstall/remove all older versions of the addon\n")
     raise Exception(message)
 
-try: from . import developer_utils
+
+try: from . import import_modules
 except: pass
 
-if "developer_utils" not in globals():
+if "import_modules" not in globals():
     message = ("\n\n"
-        "The Animation Nodes addon cannot be registered correctly\n"
-        "Troubleshooting:\n"
-        "  1. Try installing the addon in the newest official Blender version.\n"
-        "  2. Try installing the newest Animation Nodes version from Github.\n"
-        "  3. Go into the addons directory of Blender and rename the folder "
-             "'animation_nodes-###' to only 'animation_nodes'.\n"
-        "  4. Check that the 'animation_nodes' folder contains the __init__.py file.\n"
-        "  5. Enable 'Auto Run Python Scripts' in the User Preferences.\n"
-        "  6. If nothing else works report this error on Github or in the Forum.")
+        "The Animation Nodes addon cannot be registered correctly.\n"
+        "Please try to remove and install it again.\n"
+        "If it still does not work, report it.\n")
     raise Exception(message)
 
 
@@ -106,13 +101,14 @@ if "test_compile" not in globals():
 
 
 
-# load and reload submodules
+# Load all submodules
 ##################################
 
-import importlib
-from . import developer_utils
-importlib.reload(developer_utils)
-modules = developer_utils.setup_addon_modules(__path__, __name__, "bpy" in locals())
+from . import import_modules
+modules = import_modules.importAllSubmodules(__path__[0], __package__)
+
+if "bpy" in locals():
+    print("Animation Nodes can't be reloaded.")
 
 
 
@@ -132,11 +128,11 @@ from . register_files import registerFiles
 from . register_files import unregisterFiles
 
 def register():
-    bpy.utils.register_module(__name__)
+    bpy.utils.register_module(__name__, verbose = True)
     registerFiles()
     print("Registered Animation Nodes with {} modules.".format(len(modules)))
 
 def unregister():
-    bpy.utils.unregister_module(__name__)
+    bpy.utils.unregister_module(__name__, verbose = True)
     unregisterFiles()
-    print("Unregistered Animation Nodes")
+    print("Unregistered Animation Nodes.")
