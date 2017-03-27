@@ -4,8 +4,9 @@ from ... base_types import AnimationNode
 from ... data_structures cimport FalloffEvaluator, DoubleList, CList
 
 falloffTypeItems = [
-    ("Location", "Location", "", "", 0),
-    ("Transformation Matrix", "Transformation Matrix", "", "", 1)
+    ("None", "None", "", "", 0),
+    ("Location", "Location", "", "", 1),
+    ("Transformation Matrix", "Transformation Matrix", "", "", 2)
 ]
 
 class EvaluateFalloffNode(bpy.types.Node, AnimationNode):
@@ -17,16 +18,34 @@ class EvaluateFalloffNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.newInput("Falloff", "Falloff", "falloff")
-        if self.falloffType == "Location":
+
+        if self.falloffType == "None":
+            self.newInput("Integer", "Amount", "amount", value = 10, minValue = 0)
+        elif self.falloffType == "Location":
             self.newInput("Vector List", "Locations", "locations")
         elif self.falloffType == "Transformation Matrix":
             self.newInput("Matrix List", "Matrices", "matrices")
+
         self.newOutput("Float List", "Strengths", "strengths")
 
     def draw(self, layout):
         layout.prop(self, "falloffType", text = "")
 
-    def execute(self, falloff, myList):
+    def getExecutionFunctionName(self):
+        if self.falloffType == "None":
+            return "execute_None"
+        elif self.falloffType in ("Location", "Transformation Matrix"):
+            return "execute_CList"
+
+    def execute_None(self, falloff, amount):
+        cdef FalloffEvaluator _falloff = falloff.getEvaluator("", onlyC = True)
+        cdef DoubleList strengths = DoubleList(length = amount)
+        cdef int i
+        for i in range(amount):
+            strengths.data[i] = _falloff.evaluate(NULL, i)
+        return strengths
+
+    def execute_CList(self, falloff, myList):
         cdef FalloffEvaluator _falloff = falloff.getEvaluator(self.falloffType)
         return self.evaluate_CList(_falloff, myList)
 
