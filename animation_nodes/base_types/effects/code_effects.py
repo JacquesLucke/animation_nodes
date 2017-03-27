@@ -37,24 +37,31 @@ class VectorizeCodeEffect(CodeEffect):
             yield code
             return
 
+        yield from self.iterOutputListCreationLines(node)
+        yield self.getLoopStartLine()
+        yield from self.iterIndented(self.renameVariables(code))
+        yield from self.iterAppendToOutputListLines(node)
+        yield "    pass"
+
+    def iterOutputListCreationLines(self, node):
         for name, index in zip(self.listOutputNames, self.outputIndices):
             socket = node.outputs[index]
             if socket.isLinked and name not in self.listInputNames:
                 yield "{} = self.outputs[{}].getDefaultValue()".format(name, index)
 
-        baseInputNamesString = ", ".join(self.newBaseInputNames)
-        listInputNamesString = ", ".join(self.listInputNames)
+    def getLoopStartLine(self):
+        return "for ({}, ) in zip({}):".format(
+            ", ".join(self.newBaseInputNames),
+            ", ".join(self.listInputNames))
 
-        for oldName, newName in zip(self.baseInputNames + self.baseOutputNames,
-                                    self.newBaseInputNames + self.newBaseOutputNames):
-            code = replaceVariableName(code, oldName, newName)
-
-        yield "for ({}, ) in zip({}):".format(baseInputNamesString, listInputNamesString)
-        yield from self.iterIndented(code)
-
+    def iterAppendToOutputListLines(self, node):
         for baseName, listName, index in zip(self.newBaseOutputNames, self.listOutputNames, self.outputIndices):
             socket = node.outputs[index]
             if socket.isLinked and listName not in self.listInputNames:
                 yield "    {}.append({})".format(listName, baseName)
 
-        yield "    pass"
+    def renameVariables(self, code):
+        for oldName, newName in zip(self.baseInputNames + self.baseOutputNames,
+                                    self.newBaseInputNames + self.newBaseOutputNames):
+            code = replaceVariableName(code, oldName, newName)
+        return code
