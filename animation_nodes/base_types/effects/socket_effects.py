@@ -112,7 +112,7 @@ class AutoSelectVectorization(SocketEffect):
         self.outputDependencies = OrderedDict()
         self.outputListDataTypes = dict()
 
-    def input(self, node, propertyName, sockets, dependencies = []):
+    def input(self, node, propertyName, sockets, isCurrentlyList, dependencies = []):
         if isinstance(sockets, bpy.types.NodeSocket):
             sockets = [sockets]
         if any(socket.is_output for socket in sockets):
@@ -125,7 +125,7 @@ class AutoSelectVectorization(SocketEffect):
         self.inputSocketIndicesByProperty[propertyName] = socketIndices
         self.inputDependencies[propertyName] = dependencies
 
-        if getattr(node, propertyName):
+        if isCurrentlyList:
             self.inputListDataTypes[propertyName] = (
                 {index : getAllowedInputDataTypes(socket.dataType)
                  for socket, index in zip(sockets, socketIndices)})
@@ -140,7 +140,7 @@ class AutoSelectVectorization(SocketEffect):
                 {index : getAllowedInputDataTypes(socket.dataType)
                  for socket, index in zip(sockets, socketIndices)})
 
-    def output(self, node, dependencies, sockets):
+    def output(self, node, dependencies, sockets, isCurrentlyList):
         if isinstance(sockets, bpy.types.NodeSocket):
             sockets = [sockets]
         if any(not socket.is_output for socket in sockets):
@@ -151,24 +151,11 @@ class AutoSelectVectorization(SocketEffect):
 
         self.setSocketTransparency(sockets)
 
-        isCurrentlyList = self.evaluateOutputDependencies(node, dependencies)
-
         for socket in sockets:
             self.outputDependencies[socket.getIndex(node)] = dependencies
             if isCurrentlyList: listType = socket.dataType
             else: listType = toListDataType(socket.dataType)
             self.outputListDataTypes[socket.dataType] = getAllowedTargetDataTypes(listType)
-
-    def evaluateOutputDependencies(self, node, dependencies):
-        for dependency in dependencies:
-            if isinstance(dependency, str):
-                if not getattr(node, dependency):
-                    return False
-            else:
-                if not any(getattr(node, prop) for prop in dependency):
-                    return False
-        return True
-
 
     def setSocketTransparency(self, sockets):
         for socket in sockets:

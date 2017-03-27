@@ -29,12 +29,12 @@ class VectorizedNode(AnimationNode):
         baseDataType = dataType
         listDataType = toListDataType(dataType)
 
-        isCurrentlyList = getattr(self, properties[0])
+        isCurrentlyList = getattr(self, properties[0]) and self._evaluateDependencies(properties[1])
         socket = self.newInputGroup(isCurrentlyList,
             [baseDataType] + list(baseData),
             [listDataType] + list(listData))
 
-        self.vectorization.input(self, properties[0], socket, properties[1])
+        self.vectorization.input(self, properties[0], socket, isCurrentlyList, properties[1])
         if isCurrentlyList:
             self._codeEffect.input(baseData[1], listData[1])
 
@@ -44,13 +44,13 @@ class VectorizedNode(AnimationNode):
         baseDataType = dataType
         listDataType = toListDataType(dataType)
 
-        isCurrentlyList = self._evaluateOutputProperties(properties)
+        isCurrentlyList = self._evaluateDependencies(properties)
         socket = self.newOutputGroup(isCurrentlyList,
             [baseDataType] + list(baseData),
             [listDataType] + list(listData))
 
         self._outputBaseByListName[listData[1]] = baseData[1]
-        self.vectorization.output(self, properties, socket)
+        self.vectorization.output(self, properties, socket, isCurrentlyList)
         if isCurrentlyList:
             self._codeEffect.output(baseData[1], listData[1], len(self.outputs) - 1)
 
@@ -64,19 +64,7 @@ class VectorizedNode(AnimationNode):
             return [(properties, )]
         return properties
 
-    def _evaluateInputProperties(self, properties):
-        if not getattr(self, properties[0]):
-            return False
-        for group in properties[1]:
-            if isinstance(group, str):
-                if not getattr(self, group):
-                    return False
-            else:
-                if not any(getattr(self, prop) for prop in group):
-                    return False
-        return True
-
-    def _evaluateOutputProperties(self, properties):
+    def _evaluateDependencies(self, properties):
         for group in properties:
             if isinstance(group, str):
                 if not getattr(self, group):
