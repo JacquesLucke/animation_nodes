@@ -128,11 +128,11 @@ from . register_files import registerFiles
 from . register_files import unregisterFiles
 
 def register():
-    bpy.utils.register_module(__name__, verbose = True)
+    bpy.utils.register_module(__name__)
     registerFiles()
     print("Registered Animation Nodes with {} modules.".format(len(modules)))
 
 def unregister():
-    bpy.utils.unregister_module(__name__, verbose = True)
+    bpy.utils.unregister_module(__name__)
     unregisterFiles()
     print("Unregistered Animation Nodes.")
