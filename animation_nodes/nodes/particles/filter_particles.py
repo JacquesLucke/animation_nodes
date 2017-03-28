@@ -17,7 +17,7 @@ class FilterParticlesNode(bpy.types.Node, AnimationNode):
         self.newOutput("Particle List", "Particles", "filteredParticles")
 
     def draw(self, layout):
-        col = layout.column()
+        col = layout.column(align = True)
         col.prop(self, "outputUnborn", text = "Unborn")
         col.prop(self, "outputAlive", text = "Alive")
         col.prop(self, "outputDying", text = "Dying")
