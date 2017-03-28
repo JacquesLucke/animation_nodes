@@ -16,8 +16,8 @@ class InterpolationPreview:
         self.samples = interpolation.sample(amount = resolution)
 
     def calculateBoundaries(self):
-        minSample = min(self.samples)
-        maxSample = max(self.samples)
+        minSample = self.samples.getMinValue()
+        maxSample = self.samples.getMaxValue()
 
         bottomOvershoot = abs(min(0, minSample) * self.normalHeight)
         topOvershoot = abs(max(0, maxSample - 1) * self.normalHeight)
