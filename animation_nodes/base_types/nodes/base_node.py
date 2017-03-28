@@ -124,9 +124,7 @@ class AnimationNode:
     @classmethod
     def getSearchTags(cls):
         return cls.searchTags
-
-    def getTemplateCode(self):
-        return []
+        
 
     # Don't override these functions
     ######################################

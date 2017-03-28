@@ -83,10 +83,6 @@ class GroupInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
                 data.newOutputFromSocket(socket)
         return data
 
-    def getTemplateCode(self):
-        for socket in self.outputs[:-1]:
-            yield "self.newParameter({}, name = {})".format(repr(socket.dataType), repr(socket.text))
-
     @property
     def newParameterSocket(self):
         return self.outputs[-1]

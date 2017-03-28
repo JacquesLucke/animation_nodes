@@ -49,6 +49,3 @@ class DataInputNode(bpy.types.Node, AnimationNode):
     def assignSocketType(self, dataType):
         # this automatically recreates the sockets
         self.assignedType = dataType
-
-    def getTemplateCode(self):
-        return "self.assignedType = {}".format(repr(self.assignedType))
