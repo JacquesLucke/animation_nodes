@@ -114,6 +114,9 @@ class InterpolationFromCurveMappingNode(bpy.types.Node, AnimationNode):
             curvePoints[i].handle_type = point.handle_type
         self.mapping.update()
 
+    def save(self):
+        self.cacheCurveMap()
+
     @property
     def curve(self):
         return self.mapping.curves[3]
@@ -128,8 +131,3 @@ class InterpolationFromCurveMappingNode(bpy.types.Node, AnimationNode):
         node = material.node_tree.nodes.get(getattr(self, '["curveNodeName"]', self.identifier))
         if node is None: node = self.createCurveNode()
         return node
-
-@eventHandler("FILE_SAVE_PRE")
-def storeCurveMappingsInNodes():
-    for node in getNodesByType("an_InterpolationFromCurveMappingNode"):
-        node.cacheCurveMap()

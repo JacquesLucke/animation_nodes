@@ -77,6 +77,9 @@ class AnimationNode:
     def delete(self):
         pass
 
+    def save(self):
+        pass
+
     def draw(self, layout):
         pass
 
@@ -124,7 +127,7 @@ class AnimationNode:
     @classmethod
     def getSearchTags(cls):
         return cls.searchTags
-        
+
 
     # Don't override these functions
     ######################################
@@ -566,6 +569,12 @@ def toString(code):
     if hasattr(code, "__iter__"):
         return "\n".join(code)
     return ""
+
+
+@eventHandler("FILE_SAVE_PRE")
+def callSaveMethods():
+    for node in iterAnimationNodes():
+        node.save()
 
 
 nodeLabelMode = "DEFAULT"
