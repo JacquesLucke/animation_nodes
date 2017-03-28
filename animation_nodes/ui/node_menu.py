@@ -546,8 +546,7 @@ class GeometryMenu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        insertNode(layout, "an_ConvertPlaneTypeNode", "Point/Normal to Matrix", {"conversionType" : repr("POINT_NORMAL_TO_MATRIX")})
-        insertNode(layout, "an_ConvertPlaneTypeNode", "Matrix to Point/Normal", {"conversionType" : repr("MATRIX_TO_POINT_NORMAL")})
+        insertNode(layout, "an_ConvertPlaneTypeNode", "Convert Plane Type")
         insertNode(layout, "an_PointListNormalNode", "Point List Normal")
         layout.separator()
         insertNode(layout, "an_ProjectPointOnLineNode", "Project Point on Line")
