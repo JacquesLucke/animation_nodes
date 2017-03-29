@@ -55,6 +55,10 @@ cdef void setTranslationScaleMatrix(Matrix4* m, Vector3* t, Vector3* s):
     m.a41 = m.a42 = m.a43 = 0
 
 cdef void setRotationMatrix(Matrix3_or_Matrix4* m, Euler3* e):
+    if e.order == 0:
+        setRotationXYZMatrix(m, e)
+        return
+
     cdef Matrix3 xMat, yMat, zMat, rotation
     setRotationXMatrix(&xMat, e.x)
     setRotationYMatrix(&yMat, e.y)
@@ -144,6 +148,34 @@ cdef void setRotationZMatrix(Matrix3_or_Matrix4* m, float angle):
     m.a11 = m.a22 = cosValue
     m.a12 = -sinValue
     m.a21 = sinValue
+    if Matrix3_or_Matrix4 is Matrix4:
+        m.a14 = m.a24 = m.a34 = 0
+        m.a41 = m.a42 = m.a43 = 0
+        m.a44 = 1
+
+cdef void setRotationXYZMatrix(Matrix3_or_Matrix4 *m, Euler3 *rotation):
+    cdef float sx, sy, sz
+    cdef float cx, cy, cz
+    cdef float cc, cs, sc, ss
+
+    sx, sy, sz = sin(rotation.x), sin(rotation.y), sin(rotation.z)
+    cx, cy, cz = cos(rotation.x), cos(rotation.y), cos(rotation.z)
+
+    cc = cx * cz
+    cs = cx * sz
+    sc = sx * cz
+    ss = sx * sz
+
+    m.a11 = cy * cz
+    m.a12 = sy * sc - cs
+    m.a13 = sy * cc + ss
+    m.a21 = cy * sz
+    m.a22 = sy * ss + cc
+    m.a23 = sy * cs - sc
+    m.a31 = -sy
+    m.a32 = cy * sx
+    m.a33 = cy * cx
+
     if Matrix3_or_Matrix4 is Matrix4:
         m.a14 = m.a24 = m.a34 = 0
         m.a41 = m.a42 = m.a43 = 0
