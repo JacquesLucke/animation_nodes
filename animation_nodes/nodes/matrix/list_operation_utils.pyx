@@ -1,7 +1,10 @@
 from ... data_structures cimport (Vector3DList, EulerList, Matrix4x4List,
-                                  CDefaultList)
+                                  CDefaultList, FloatList, DoubleList)
 
-from ... math cimport Vector3, Euler3, Matrix4, setTranslationRotationScaleMatrix
+from ... math cimport (Vector3, Euler3, Matrix4,
+                       setTranslationRotationScaleMatrix,
+                       setRotationXMatrix, setRotationYMatrix, setRotationZMatrix,
+                       setRotationMatrix)
 from ... math import matrix4x4ListToEulerList
 
 from libc.math cimport sqrt
@@ -53,3 +56,24 @@ cdef void scaleFromMatrix(Vector3 *scale, Matrix4 *matrix):
     scale.x = sqrt(matrix.a11 * matrix.a11 + matrix.a21 * matrix.a21 + matrix.a31 * matrix.a31)
     scale.y = sqrt(matrix.a12 * matrix.a12 + matrix.a22 * matrix.a22 + matrix.a32 * matrix.a32)
     scale.z = sqrt(matrix.a13 * matrix.a13 + matrix.a23 * matrix.a23 + matrix.a33 * matrix.a33)
+
+def createAxisRotations(DoubleList angles, str axis):
+    cdef Matrix4x4List matrices = Matrix4x4List(length = len(angles))
+    cdef int i
+    if axis == "X":
+        for i in range(len(matrices)):
+            setRotationXMatrix(matrices.data + i, angles.data[i])
+    elif axis == "Y":
+        for i in range(len(matrices)):
+            setRotationYMatrix(matrices.data + i, angles.data[i])
+    elif axis == "Z":
+        for i in range(len(matrices)):
+            setRotationZMatrix(matrices.data + i, angles.data[i])
+    return matrices
+
+def createRotationsFromEulers(EulerList rotations):
+    cdef Matrix4x4List matrices = Matrix4x4List(length = len(rotations))
+    cdef int i
+    for i in range(len(matrices)):
+        setRotationMatrix(matrices.data + i, rotations.data + i)
+    return matrices
