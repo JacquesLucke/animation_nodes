@@ -1,5 +1,6 @@
 import bpy
 from collections import OrderedDict, defaultdict
+from ... utils.attributes import setattrRecursive, getattrRecursive
 from ... sockets.info import (isBase, isList, toBaseDataType, toListDataType,
                               getAllowedInputDataTypes, getAllowedTargetDataTypes)
 
@@ -38,14 +39,14 @@ class AutoSelectListDataType(SocketEffect):
                     self.checkFunctions.append(self.getLinkedBaseType_ListOutput)
 
     def apply(self, node):
-        currentType = getattr(node, self.propertyName)
+        currentType = getattrRecursive(node, self.propertyName)
         for socketID, getLinkedBaseType in zip(self.socketIDs, self.checkFunctions):
             linkedType = getLinkedBaseType(self.getSocket(node, socketID))
             if linkedType is not None:
                 if self.propertyType == "LIST":
                     linkedType = toListDataType(linkedType)
                 if linkedType != currentType:
-                    setattr(node, self.propertyName, linkedType)
+                    setattrRecursive(node, self.propertyName, linkedType)
                 break
 
     def getLinkedBaseType_BaseInput(self, socket):
@@ -83,7 +84,7 @@ class AutoSelectDataType(SocketEffect):
         self.socketIDs = self.toSocketIDs(sockets)
 
     def apply(self, node):
-        currentType = getattr(node, self.propertyName)
+        currentType = getattrRecursive(node, self.propertyName)
         for socketID in self.socketIDs:
             socket = self.getSocket(node, socketID)
 
@@ -95,11 +96,11 @@ class AutoSelectDataType(SocketEffect):
 
             if len(linkedDataTypes) == 1:
                 if linkedDataTypes[0] != currentType:
-                    setattr(node, self.propertyName, linkedDataTypes[0])
+                    setattrRecursive(node, self.propertyName, linkedDataTypes[0])
                 break
             elif len(linkedDataTypes) == 0 and self.default is not None:
                 if self.default != currentType:
-                    setattr(node, self.propertyName, self.default)
+                    setattrRecursive(node, self.propertyName, self.default)
 
 
 class AutoSelectVectorization(SocketEffect):
@@ -216,5 +217,5 @@ class AutoSelectVectorization(SocketEffect):
         # Update properties of node
         for propertyName in self.properties:
             state = states[propertyName] == "LIST"
-            if state != getattr(node, propertyName):
-                setattr(node, propertyName, state)
+            if state != getattrRecursive(node, propertyName):
+                setattrRecursive(node, propertyName, state)
