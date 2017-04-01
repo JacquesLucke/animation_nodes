@@ -110,12 +110,6 @@ class ExecutionCodeProperties(bpy.types.PropertyGroup):
 class AddonPreferences(bpy.types.AddonPreferences):
     bl_idname = addonName
 
-    redrawAllAfterAutoExecution = BoolProperty(
-        name = "Redraw All After Auto Execution", default = True)
-
-    sceneUpdateAfterAutoExecution = BoolProperty(
-        name = "Scene Update After Auto Execution", default = True)
-
     nodeColors = PointerProperty(type = NodeColorProperties)
     developer = PointerProperty(type = DeveloperProperties)
     executionCode = PointerProperty(type = ExecutionCodeProperties)
@@ -125,23 +119,15 @@ class AddonPreferences(bpy.types.AddonPreferences):
 
         row = layout.row()
 
-        col = row.column()
+        col = row.column(align = True)
+        col.label("Node Colors:")
+        col.row().prop(self.nodeColors, "mainNetwork")
+        col.row().prop(self.nodeColors, "invalidNetwork")
+        subrow = col.row(align = True)
+        subrow.prop(self.nodeColors, "subprogramValue", slider = True)
+        subrow.prop(self.nodeColors, "subprogramSaturation", slider = True)
 
-        subcol = col.column(align = True)
-        subcol.label("After Auto Execution:")
-        subcol.prop(self, "redrawAllAfterAutoExecution", text = "Redraw All")
-        subcol.prop(self, "sceneUpdateAfterAutoExecution", text = "Scene Update")
-
-        col = row.column()
-
-        subcol = col.column(align = True)
-        subcol.label("Node Colors:")
-        subcol.row().prop(self.nodeColors, "mainNetwork")
-        subcol.row().prop(self.nodeColors, "invalidNetwork")
-        subcol.prop(self.nodeColors, "subprogramValue", slider = True)
-        subcol.prop(self.nodeColors, "subprogramSaturation", slider = True)
-
-        col = layout.column(align = True)
+        col = row.column(align = True)
         col.prop(self.developer, "debug")
         col.prop(self.developer, "runTests")
 

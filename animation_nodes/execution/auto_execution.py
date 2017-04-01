@@ -15,11 +15,9 @@ def executeNodeTrees(nodeTrees):
         nodeTree.autoExecute()
 
 def afterExecution():
-    prefs = getPreferences()
-    if prefs.sceneUpdateAfterAutoExecution:
-        for scene in bpy.data.scenes:
-            scene.update()
+    for scene in bpy.data.scenes:
+        scene.update()
 
     from .. events import isRendering
-    if prefs.redrawAllAfterAutoExecution and not isRendering():
+    if not isRendering():
         redrawAll()
