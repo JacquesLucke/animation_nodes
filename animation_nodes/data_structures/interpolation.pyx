@@ -9,6 +9,13 @@ cdef class Interpolation:
     cdef double evaluate(self, double x):
         raise NotImplementedError()
 
+    cdef double derivative(self, double x):
+        cdef double width = 0.01
+        if x > width:
+            return (self.evaluate(x) - self.evaluate(x - width)) / width
+        else:
+            return (self.evaluate(x + width) - self.evaluate(x)) / width
+
     def __repr__(self):
         return "<Interpolation {}>".format(repr(self.__class__.__name__))
 
