@@ -5,3 +5,6 @@ cdef int clampInt(object value):
 
 cdef int clampLong(object value):
     return max(LONG_MIN, min(LONG_MAX, value))
+
+cdef double clamp(double value, double minValue, double maxValue):
+    return min(max(value, minValue), maxValue)
