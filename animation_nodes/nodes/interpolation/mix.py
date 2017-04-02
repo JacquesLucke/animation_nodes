@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... events import propertyChanged
 from ... base_types import AnimationNode
-from ... algorithms.interpolations import Mixed, Chained
+from ... algorithms.interpolations import MixedInterpolation, ChainedInterpolation
 
 modeItems = [
     ("OVERLAY", "Overlay", "Overlay two interpolations", "NONE", 0),
@@ -42,7 +42,7 @@ class MixInterpolationNode(bpy.types.Node, AnimationNode):
             return "execute_Chain"
 
     def execute_Overlay(self, factor, a, b):
-        return Mixed(factor, a, b)
+        return MixedInterpolation(factor, a, b)
 
     def execute_Chain(self, a, b, position, endA, startB, fadeWidth):
-        return Chained(a, b, position, endA, startB, fadeWidth)
+        return ChainedInterpolation(a, b, position, endA, startB, fadeWidth)

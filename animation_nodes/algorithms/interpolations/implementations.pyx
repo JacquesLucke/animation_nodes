@@ -292,7 +292,7 @@ cdef class SinInOut(SinInterpolationBase):
 # Specials
 #####################################################
 
-cdef class Mixed(Interpolation):
+cdef class MixedInterpolation(Interpolation):
     cdef:
         double factor
         Interpolation a, b
@@ -307,7 +307,7 @@ cdef class Mixed(Interpolation):
         return self.a.evaluate(x) * (1 - self.factor) + self.b.evaluate(x) * self.factor
 
 
-cdef class Chained(Interpolation):
+cdef class ChainedInterpolation(Interpolation):
     cdef:
         Interpolation a, b
         double position, endA, startB, fadeWidth
