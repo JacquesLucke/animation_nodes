@@ -408,7 +408,7 @@ cdef class FCurveMapping(Interpolation):
         return (self.fCurve.evaluate(x) + self.yMove) * self.yFactor
 
 
-cdef class MirrorInterpolation(Interpolation):
+cdef class MirroredAndChainedInterpolation(Interpolation):
     cdef Interpolation interpolation
 
     def __cinit__(self, Interpolation interpolation not None):
@@ -418,3 +418,12 @@ cdef class MirrorInterpolation(Interpolation):
         if x <= 0.5:
             return self.interpolation.evaluate(2 * x)
         return self.interpolation.evaluate(2 - 2 * x)
+
+cdef class MirroredInterpolation(Interpolation):
+    cdef Interpolation interpolation
+
+    def __cinit__(self, Interpolation interpolation not None):
+        self.interpolation = interpolation
+
+    cdef double evaluate(self, double x):
+        return self.interpolation.evaluate(1 - x)
