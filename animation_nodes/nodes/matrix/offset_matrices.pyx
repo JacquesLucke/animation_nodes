@@ -2,6 +2,12 @@ import bpy
 from bpy.props import *
 from ... events import propertyChanged
 from ... base_types import VectorizedNode
+from .. falloff.invert_falloff import InvertFalloff
+
+from ... algorithms.matrices.translation cimport translateMatrixList
+from ... algorithms.matrices.rotation cimport getRotatedMatrixList
+from ... algorithms.matrices.scale cimport scaleMatrixList
+
 from ... data_structures cimport (
     Falloff,
     FalloffEvaluator,
@@ -12,9 +18,10 @@ from ... data_structures cimport (
     CDefaultList
 )
 
-from ... algorithms.matrices.translation cimport translateMatrixList
-from ... algorithms.matrices.rotation cimport getRotatedMatrixList
-from ... algorithms.matrices.scale cimport scaleMatrixList
+specifiedStateItems = [
+    ("START", "Start", "", "Given matrices set the start state", 0),
+    ("END", "End", "", "Given matrices set the end state", 1)
+]
 
 translationModeItems = [
     ("LOCAL_AXIS", "Local Axis", "", "NONE", 0),
@@ -40,6 +47,10 @@ class OffsetMatricesNode(bpy.types.Node, VectorizedNode):
     bl_width_default = 190
 
     errorMessage = StringProperty()
+
+    specifiedState = EnumProperty(name = "Specified State", default = "START",
+        description = "Specify wether the given matrices are the start or end state",
+        items = specifiedStateItems, update = propertyChanged)
 
     useTranslation = BoolProperty(name = "Use Translation", default = False,
         update = VectorizedNode.refresh)
@@ -83,10 +94,14 @@ class OffsetMatricesNode(bpy.types.Node, VectorizedNode):
         self.newOutput("Matrix List", "Matrices", "outMatrices")
 
     def draw(self, layout):
-        row = layout.row(align = True)
+        col = layout.column()
+
+        row = col.row(align = True)
         row.prop(self, "useTranslation", text = "Loc", icon = "MAN_TRANS")
         row.prop(self, "useRotation", text = "Rot", icon = "MAN_ROT")
         row.prop(self, "useScale", text = "Scale", icon = "MAN_SCALE")
+
+        col.row().prop(self, "specifiedState", expand = True)
 
     def drawAdvanced(self, layout):
         col = layout.column(align = True)
@@ -99,10 +114,13 @@ class OffsetMatricesNode(bpy.types.Node, VectorizedNode):
 
 
     def execute(self, Matrix4x4List matrices, Falloff falloff, *args):
+        self.errorMessage = ""
         if len(args) == 0:
             return matrices
 
         cdef DoubleList influences = self.evaluateFalloff(matrices, falloff)
+        if influences is None:
+            return matrices
 
         if self.useScale:
             scaleMatrixList(matrices, self.scaleMode, self.getScales(args), influences)
@@ -114,9 +132,18 @@ class OffsetMatricesNode(bpy.types.Node, VectorizedNode):
         return matrices
 
     def evaluateFalloff(self, Matrix4x4List matrices, Falloff falloff):
-        cdef FalloffEvaluator evaluator = falloff.getEvaluator("Transformation Matrix")
+        if self.specifiedState == "END":
+            falloff = InvertFalloff(falloff)
+
         cdef Py_ssize_t i
+        cdef FalloffEvaluator evaluator
         cdef DoubleList influences = DoubleList(length = len(matrices))
+
+        try: evaluator = falloff.getEvaluator("Transformation Matrix")
+        except:
+            self.errorMessage = "Falloff cannot be evaluated for matrices"
+            return None
+
         for i in range(len(influences)):
             influences.data[i] = evaluator.evaluate(matrices.data + i, i)
         return influences
