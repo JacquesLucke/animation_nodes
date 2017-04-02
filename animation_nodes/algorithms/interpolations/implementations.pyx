@@ -1,5 +1,6 @@
 cimport cython
 from libc.math cimport M_PI as PI
+from ... utils.clamp cimport clamp
 from libc.math cimport pow, sqrt, sin, cos
 from ... utils.lists cimport findListSegment_LowLevel
 from ... data_structures cimport Interpolation, DoubleList
@@ -304,6 +305,50 @@ cdef class Mixed(Interpolation):
 
     cdef double evaluate(self, double x):
         return self.a.evaluate(x) * (1 - self.factor) + self.b.evaluate(x) * self.factor
+
+
+cdef class Chained(Interpolation):
+    cdef:
+        Interpolation a, b
+        double position, endA, startB, fadeWidth
+        double fadeWidthHalf, fadeStart, fadeEnd
+
+    def __cinit__(self, Interpolation a not None, Interpolation b not None,
+                        double position, double endA, double startB, double fadeWidth):
+        self.a = a
+        self.b = b
+        self.position = clamp(position, 0.0001, 0.9999)
+        self.endA = clamp(endA, 0, 1)
+        self.startB = clamp(startB, 0, 1)
+
+        self.fadeWidth = clamp(fadeWidth, 0.00001, 2 * min(self.position, 1 - self.position) - 0.0001)
+        self.fadeWidthHalf = self.fadeWidth / 2.0
+        self.fadeStart = self.position - self.fadeWidthHalf
+        self.fadeEnd = self.position + self.fadeWidthHalf
+
+        self.clamped = a.clamped and b.clamped
+
+    cdef double evaluate(self, double x):
+        if x < self.fadeStart:
+            return self.a.evaluate(self.mapA(x))
+        elif x > self.fadeEnd:
+            return self.b.evaluate(self.mapB(x))
+        else:
+            return self.calcFade(x)
+
+    cdef double calcFade(self, double x):
+        cdef double valueA = self.a.evaluate(self.mapA(self.fadeStart))
+        cdef double valueB = self.b.evaluate(self.mapB(self.fadeEnd))
+
+        cdef double factor = (x - self.fadeStart) / self.fadeWidth
+        return valueA * (1 - factor) + valueB * factor
+
+    cdef double mapA(self, double x):
+        return x / self.fadeStart * self.endA
+
+    cdef double mapB(self, double x):
+        cdef double y = (self.startB - 1) / (self.fadeEnd - 1)
+        return y * x + 1 - y
 
 
 cdef class PyInterpolation(Interpolation):
