@@ -2,143 +2,88 @@ import bpy
 from bpy.props import *
 from ... events import propertyChanged
 from ... base_types import VectorizedNode
-from ... data_structures cimport (Vector3DList, EulerList, Matrix4x4List,
-                                  FalloffEvaluator, CDefaultList)
-from ... algorithms.transform_matrix cimport (
-    allocateMatrixTransformerFromCDefaultLists, freeMatrixTransformer, TransformMatrixFunction)
-from ... math cimport Matrix4, Vector3, Euler3, toVector3, toEuler3
-from .. falloff.invert_falloff import InvertFalloff
+from ... data_structures cimport (
+    Falloff,
+    FalloffEvaluator,
+    Matrix4x4List,
+    Vector3DList,
+    EulerList,
+    DoubleList,
+    CDefaultList
+)
 
-localGlobalItems = [
-    ("LOCAL", "Local", "", "NONE", 0),
-    ("GLOBAL", "Global", "", "NONE", 1)]
+from ... algorithms.matrices.scale cimport scaleMatrixList
 
-specifiedStateItems = [
-    ("START", "Start", "", "Given matrices set the start state", 0),
-    ("END", "End", "", "Given matrices set the end state", 1)
+scaleModeItems = [
+    ("LOCAL_AXIS", "Local Axis", "", "NONE", 0),
+    ("GLOBAL_AXIS", "Global Axis", "", "NONE", 1),
+    ("INCLUDE_TRANSLATION", "Include Translation", "", "NONE", 2),
+    ("TRANSLATION_ONLY", "Translation Only", "", "NONE", 3)
 ]
 
 class OffsetMatricesNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_OffsetMatricesNode"
     bl_label = "Offset Matrices"
+    bl_width_default = 190
 
     errorMessage = StringProperty()
 
-    specifiedState = EnumProperty(name = "Specified State", default = "START",
-        description = "Specify if the given matrices are the start or end state",
-        items = specifiedStateItems, update = propertyChanged)
+    useTranslation = BoolProperty(name = "Use Translation", default = True,
+        update = VectorizedNode.refresh)
+    useRotation = BoolProperty(name = "Use Rotation", default = False,
+        update = VectorizedNode.refresh)
+    useScale = BoolProperty(name = "Use Scale", default = False,
+        update = VectorizedNode.refresh)
 
-    translationMode = EnumProperty(name = "Translation Mode", default = "GLOBAL",
-        items = localGlobalItems, update = propertyChanged)
-    rotationMode = EnumProperty(name = "Rotation Mode", default = "GLOBAL",
-        items = localGlobalItems, update = propertyChanged)
-    scaleMode = EnumProperty(name = "Scale Mode", default = "LOCAL",
-        items = localGlobalItems, update = propertyChanged)
-
-    originAsRotationPivot = BoolProperty(name = "Origin Rotation", default = False,
-        update = propertyChanged, description = "Use world center as rotation pivot")
-    originAsScalePivot = BoolProperty(name = "Origin Scale", default = False,
-        update = propertyChanged, description = "Use world center as scale pivot")
-
-    useTranslationList = VectorizedNode.newVectorizeProperty()
-    useRotationList = VectorizedNode.newVectorizeProperty()
     useScaleList = VectorizedNode.newVectorizeProperty()
 
+    scaleMode = EnumProperty(name = "Scale Mode", default = "LOCAL_AXIS",
+        items = scaleModeItems, update = propertyChanged)
+
     def create(self):
-        self.newInput("Matrix List", "Matrices", "inMatrices")
-        self.newInput("Falloff", "Falloff", "falloff", value = 1)
+        self.newInput("Matrix List", "Matrices", "inMatrices", dataIsModified = self.modifiesOriginalList)
+        self.newInput("Falloff", "Falloff", "falloff")
 
-        self.newVectorizedInput("Vector", "useTranslationList",
-            ("Translation", "translation"), ("Translations", "translations"))
-
-        self.newVectorizedInput("Euler", "useRotationList",
-            ("Rotation", "rotation"), ("Rotations", "rotations"))
-
-        self.newVectorizedInput("Vector", "useScaleList",
-            ("Scale", "scale", dict(value = (1, 1, 1))),
-            ("Scales", "scales"))
+        if self.useScale:
+            self.newVectorizedInput("Vector", "useScaleList",
+                ("Scale", "scale", dict(value = (1, 1, 1))),
+                ("Scales", "scales"))
 
         self.newOutput("Matrix List", "Matrices", "outMatrices")
 
     def draw(self, layout):
-        layout.prop(self, "specifiedState", expand = True)
-        if self.errorMessage != "":
-            layout.label(self.errorMessage, icon = "ERROR")
+        row = layout.row(align = True)
+        row.prop(self, "useTranslation", text = "Loc", icon = "MAN_TRANS")
+        row.prop(self, "useRotation", text = "Rot", icon = "MAN_ROT")
+        row.prop(self, "useScale", text = "Scale", icon = "MAN_SCALE")
 
     def drawAdvanced(self, layout):
-        col = layout.column(align = False)
-        row = col.row(align = True)
-        row.label("Translation")
-        row.prop(self, "translationMode", expand = True)
-        row = col.row(align = True)
-        row.label("Rotation")
-        row.prop(self, "rotationMode", expand = True)
-        row.prop(self, "originAsRotationPivot", icon = "MANIPUL", text = "")
-        row = col.row(align = True)
-        row.label("Scale")
-        row.prop(self, "scaleMode", expand = True)
-        row.prop(self, "originAsScalePivot", icon = "MANIPUL", text = "")
+        layout.prop(self, "scaleMode")
 
-    def execute(self, Matrix4x4List inMatrices, falloff, translations, rotations, scales):
-        cdef:
-            CDefaultList _translations = CDefaultList(Vector3DList, translations, (0, 0, 0))
-            CDefaultList _rotations = CDefaultList(EulerList, rotations, (0, 0, 0))
-            CDefaultList _scales = CDefaultList(Vector3DList, scales, (1, 1, 1))
+    def execute(self, Matrix4x4List matrices, Falloff falloff, *args):
+        if len(args) == 0:
+            return matrices
 
-            Matrix4x4List outMatrices = Matrix4x4List(length = inMatrices.length)
-            FalloffEvaluator evaluator
+        cdef DoubleList influences = self.evaluateFalloff(matrices, falloff)
 
-        self.errorMessage = ""
-        if self.specifiedState == "END": falloff = InvertFalloff(falloff)
-        try: evaluator = falloff.getEvaluator("Transformation Matrix")
-        except:
-            self.errorMessage = "Falloff cannot be evaluated for matrices"
-            return inMatrices.copy()
+        if self.useScale:
+            scaleMatrixList(matrices, self.scaleMode, self.getScales(args), influences)
 
-        cdef:
-            TransformMatrixFunction transformFunction
-            void* transformSettings
+        return matrices
 
-        allocateMatrixTransformerFromCDefaultLists(&transformFunction, &transformSettings,
-            _translations, self.translationMode == "LOCAL",
-            _rotations, self.rotationMode == "LOCAL", not self.originAsRotationPivot,
-            _scales, self.scaleMode == "LOCAL", not self.originAsScalePivot)
+    def evaluateFalloff(self, Matrix4x4List matrices, Falloff falloff):
+        cdef FalloffEvaluator evaluator = falloff.getEvaluator("Transformation Matrix")
+        cdef Py_ssize_t i
+        cdef DoubleList influences = DoubleList(length = len(matrices))
+        for i in range(len(influences)):
+            influences.data[i] = evaluator.evaluate(matrices.data + i, i)
+        return influences
 
-        cdef:
-            long i
-            double influence
+    def getScales(self, args):
+        if self.useScale:
+            return CDefaultList(Vector3DList, args[-1], (1, 1, 1))
+        return None
 
-            Vector3* translation
-            Euler3* rotation
-            Vector3* scale
-
-            Vector3 localTranslation
-            Euler3 localRotation
-            Vector3 localScale
-
-        for i in range(outMatrices.length):
-            influence = evaluator.evaluate(inMatrices.data + i, i)
-
-            translation = <Vector3*>_translations.get(i)
-            localTranslation.x = translation.x * influence
-            localTranslation.y = translation.y * influence
-            localTranslation.z = translation.z * influence
-
-            rotation = <Euler3*>_rotations.get(i)
-            localRotation.order = rotation.order
-            localRotation.x = rotation.x * influence
-            localRotation.y = rotation.y * influence
-            localRotation.z = rotation.z * influence
-
-            scale = <Vector3*>_scales.get(i)
-            localScale.x = scale.x * influence + (1 - influence)
-            localScale.y = scale.y * influence + (1 - influence)
-            localScale.z = scale.z * influence + (1 - influence)
-
-            transformFunction(transformSettings,
-                outMatrices.data + i,
-                inMatrices.data + i,
-                &localTranslation, &localRotation, &localScale)
-
-        freeMatrixTransformer(transformFunction, transformSettings)
-        return outMatrices
+    @property
+    def modifiesOriginalList(self):
+        return self.useRotation
