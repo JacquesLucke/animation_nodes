@@ -12,12 +12,19 @@ from ... data_structures cimport (
     CDefaultList
 )
 
-from ... algorithms.matrices.scale cimport scaleMatrixList
 from ... algorithms.matrices.translation cimport translateMatrixList
+from ... algorithms.matrices.rotation cimport getRotatedMatrixList
+from ... algorithms.matrices.scale cimport scaleMatrixList
 
 translationModeItems = [
     ("LOCAL_AXIS", "Local Axis", "", "NONE", 0),
     ("GLOBAL_AXIS", "Global Axis", "", "NONE", 1)
+]
+
+rotationModeItems = [
+    ("LOCAL_AXIS__LOCAL_PIVOT", "Local Axis - Local Pivot", "", "NONE", 0),
+    ("GLOBAL_AXIS__LOCAL_PIVOT", "Global Axis - Local Pivot", "", "NONE", 1),
+    ("GLOBAL_AXIS__GLOBAL_PIVOT", "Global Axis - Global Pivot", "", "NONE", 2)
 ]
 
 scaleModeItems = [
@@ -34,7 +41,7 @@ class OffsetMatricesNode(bpy.types.Node, VectorizedNode):
 
     errorMessage = StringProperty()
 
-    useTranslation = BoolProperty(name = "Use Translation", default = True,
+    useTranslation = BoolProperty(name = "Use Translation", default = False,
         update = VectorizedNode.refresh)
     useRotation = BoolProperty(name = "Use Rotation", default = False,
         update = VectorizedNode.refresh)
@@ -42,10 +49,14 @@ class OffsetMatricesNode(bpy.types.Node, VectorizedNode):
         update = VectorizedNode.refresh)
 
     useTranslationList = VectorizedNode.newVectorizeProperty()
+    useRotationList = VectorizedNode.newVectorizeProperty()
     useScaleList = VectorizedNode.newVectorizeProperty()
 
     translationMode = EnumProperty(name = "Translation Mode", default = "GLOBAL_AXIS",
         items = translationModeItems, update = propertyChanged)
+
+    rotationMode = EnumProperty(name = "Rotation Mode", default = "GLOBAL_AXIS__LOCAL_PIVOT",
+        items = rotationModeItems, update = propertyChanged)
 
     scaleMode = EnumProperty(name = "Scale Mode", default = "LOCAL_AXIS",
         items = scaleModeItems, update = propertyChanged)
@@ -58,6 +69,11 @@ class OffsetMatricesNode(bpy.types.Node, VectorizedNode):
             self.newVectorizedInput("Vector", "useTranslationList",
                 ("Translation", "translation"),
                 ("Translations", "translations"))
+
+        if self.useRotation:
+            self.newVectorizedInput("Euler", "useRotationList",
+                ("Rotation", "rotation"),
+                ("Rotations", "rotations"))
 
         if self.useScale:
             self.newVectorizedInput("Vector", "useScaleList",
@@ -73,8 +89,14 @@ class OffsetMatricesNode(bpy.types.Node, VectorizedNode):
         row.prop(self, "useScale", text = "Scale", icon = "MAN_SCALE")
 
     def drawAdvanced(self, layout):
-        layout.prop(self, "translationMode")
-        layout.prop(self, "scaleMode")
+        col = layout.column(align = True)
+        col.prop(self, "translationMode", text = "Translation")
+        col.prop(self, "rotationMode", text = "Rotation")
+        col.prop(self, "scaleMode", text = "Scale")
+
+        if self.scaleMode in ("GLOBAL_AXIS", "INCLUDE_TRANSLATION"):
+            layout.label("May result in invalid object matrices", icon = "INFO")
+
 
     def execute(self, Matrix4x4List matrices, Falloff falloff, *args):
         if len(args) == 0:
@@ -84,6 +106,8 @@ class OffsetMatricesNode(bpy.types.Node, VectorizedNode):
 
         if self.useScale:
             scaleMatrixList(matrices, self.scaleMode, self.getScales(args), influences)
+        if self.useRotation:
+            matrices = getRotatedMatrixList(matrices, self.rotationMode, self.getRotations(args), influences)
         if self.useTranslation:
             translateMatrixList(matrices, self.translationMode, self.getTranslations(args), influences)
 
@@ -102,6 +126,14 @@ class OffsetMatricesNode(bpy.types.Node, VectorizedNode):
             return CDefaultList(Vector3DList, args[0], (0, 0, 0))
         return None
 
+    def getRotations(self, args):
+        if self.useRotation:
+            if self.useTranslation:
+                return CDefaultList(EulerList, args[1], (0, 0, 0))
+            else:
+                return CDefaultList(EulerList, args[0], (0, 0, 0))
+        return None
+
     def getScales(self, args):
         if self.useScale:
             return CDefaultList(Vector3DList, args[-1], (1, 1, 1))
@@ -109,4 +141,4 @@ class OffsetMatricesNode(bpy.types.Node, VectorizedNode):
 
     @property
     def modifiesOriginalList(self):
-        return self.useRotation
+        return self.useScale or (self.useTranslation and not self.useRotation)
