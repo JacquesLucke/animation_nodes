@@ -27,6 +27,7 @@ axisDirectionItems = [(axis, axis, "") for axis in ("X", "Y", "Z", "-X", "-Y", "
 class ObjectControllerFalloffNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_ObjectControllerFalloffNode"
     bl_label = "Object Controller Falloff"
+    bl_width_default = 170
 
     falloffType = EnumProperty(name = "Falloff Type", items = falloffTypeItems,
         update = VectorizedNode.refresh)

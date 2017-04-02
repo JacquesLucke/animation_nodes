@@ -99,7 +99,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         self.invokeFunction(layout, "unlinkInstancesFromNode",
             confirm = True,
             text = "Unlink Instances from Node",
-            description = "This will make sure that the objects won't be removed if you remove the Replicate Node.")
+            description = "This will make sure that the objects won't be removed if you remove the Instancer Node.")
 
         layout.separator()
         self.invokeFunction(layout, "hideRelationshipLines", text = "Hide Relationship Lines", icon = "RESTRICT_VIEW_OFF")
