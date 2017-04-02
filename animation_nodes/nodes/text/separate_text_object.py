@@ -30,8 +30,11 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
     objectCount = IntProperty(default = 0)
     parentLetters = BoolProperty(name = "Parent to Main Container", default = True)
     materialName = StringProperty(name = "Material", default = "")
-    outputType = EnumProperty(name = "Output Type", items = outputTypeItems, default = "MESH")
-    originType = EnumProperty(name = "Origin Type", items = originTypeItems, default = "ORIGIN_CENTER_OF_MASS")
+
+    outputType = EnumProperty(name = "Output Type", default = "MESH",
+        items = outputTypeItems)
+    originType = EnumProperty(name = "Origin Type", default = "ORIGIN_CENTER_OF_MASS",
+        items = originTypeItems)
 
     def create(self):
         self.newOutput("Object List", "Text Objects", "textObjects")
