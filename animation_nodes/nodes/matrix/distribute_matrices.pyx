@@ -32,6 +32,8 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
     distanceMode = EnumProperty(name = "Distance Mode", default = "SIZE",
         items = distanceModeItems, update = AnimationNode.refresh)
 
+    exactCircleSegment = BoolProperty(name = "Exact Circle Segment", default = False)
+
     def create(self):
         if self.mode == "LINEAR":
             self.newInput("Integer", "Amount", "amount", value = 5)
@@ -54,7 +56,7 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
         elif self.mode == "CIRCLE":
             self.newInput("Integer", "Amount", "amount", value = 10, minValue = 0)
             self.newInput("Float", "Radius", "radius", value = 4)
-            self.newInput("Float", "Angle", value = 2 * PI)
+            self.newInput("Float", "Segment", "segment", value = 1)
         elif self.mode == "VERTICES":
             self.newInput("Vector List", "Vertices", "vertices")
             self.newInput("Vector List", "Normals", "normals")
@@ -66,6 +68,10 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "mode", text = "")
         if self.mode in ("LINEAR", "GRID"):
             layout.prop(self, "distanceMode", text = "")
+
+    def drawAdvanced(self, layout):
+        if self.mode == "CIRCLE":
+            layout.prop(self, "exactCircleSegment")
 
     def getExecutionFunctionName(self):
         if self.mode == "LINEAR":
@@ -112,14 +118,17 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
 
         return matrices
 
-    def execute_Circle(self, _amount, float radius, float angle):
+    def execute_Circle(self, _amount, float radius, float segment):
         cdef:
             int i
             double currentAngle
             Vector3 vector
             int amount = limitAmount(_amount)
-            double factor = angle / max(amount, 1)
+            double factor
             Matrix4x4List matrices = Matrix4x4List(length = amount)
+
+        if self.exactCircleSegment: factor = segment * 2 * PI / max(amount - 1, 1)
+        else:                       factor = segment * 2 * PI / max(amount, 1)
 
         for i in range(amount):
             currentAngle = i * factor
