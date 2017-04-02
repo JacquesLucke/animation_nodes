@@ -78,6 +78,18 @@ cdef void normalizeLengthVec3(Vector3* target, Vector3* v, float length):
     else:
         target.x = target.y = target.z = 0
 
+@cython.cdivision(True)
+cdef void normalizeLengthVec3_Inplace(Vector3* v, float length):
+    cdef float oldLength = sqrt(v.x * v.x + v.y * v.y + v.z * v.z)
+    cdef float factor
+    if oldLength != 0:
+        factor = length / oldLength
+        v.x *= factor
+        v.y *= factor
+        v.z *= factor
+    else:
+        v.x = v.y = v.z = 0
+
 cdef float distanceVec3(Vector3* a, Vector3* b):
     return sqrt(distanceSquaredVec3(a, b))
 

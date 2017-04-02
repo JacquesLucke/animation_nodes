@@ -13,6 +13,12 @@ from ... data_structures cimport (
 )
 
 from ... algorithms.matrices.scale cimport scaleMatrixList
+from ... algorithms.matrices.translation cimport translateMatrixList
+
+translationModeItems = [
+    ("LOCAL_AXIS", "Local Axis", "", "NONE", 0),
+    ("GLOBAL_AXIS", "Global Axis", "", "NONE", 1)
+]
 
 scaleModeItems = [
     ("LOCAL_AXIS", "Local Axis", "", "NONE", 0),
@@ -35,7 +41,11 @@ class OffsetMatricesNode(bpy.types.Node, VectorizedNode):
     useScale = BoolProperty(name = "Use Scale", default = False,
         update = VectorizedNode.refresh)
 
+    useTranslationList = VectorizedNode.newVectorizeProperty()
     useScaleList = VectorizedNode.newVectorizeProperty()
+
+    translationMode = EnumProperty(name = "Translation Mode", default = "GLOBAL_AXIS",
+        items = translationModeItems, update = propertyChanged)
 
     scaleMode = EnumProperty(name = "Scale Mode", default = "LOCAL_AXIS",
         items = scaleModeItems, update = propertyChanged)
@@ -43,6 +53,11 @@ class OffsetMatricesNode(bpy.types.Node, VectorizedNode):
     def create(self):
         self.newInput("Matrix List", "Matrices", "inMatrices", dataIsModified = self.modifiesOriginalList)
         self.newInput("Falloff", "Falloff", "falloff")
+
+        if self.useTranslation:
+            self.newVectorizedInput("Vector", "useTranslationList",
+                ("Translation", "translation"),
+                ("Translations", "translations"))
 
         if self.useScale:
             self.newVectorizedInput("Vector", "useScaleList",
@@ -58,6 +73,7 @@ class OffsetMatricesNode(bpy.types.Node, VectorizedNode):
         row.prop(self, "useScale", text = "Scale", icon = "MAN_SCALE")
 
     def drawAdvanced(self, layout):
+        layout.prop(self, "translationMode")
         layout.prop(self, "scaleMode")
 
     def execute(self, Matrix4x4List matrices, Falloff falloff, *args):
@@ -68,6 +84,8 @@ class OffsetMatricesNode(bpy.types.Node, VectorizedNode):
 
         if self.useScale:
             scaleMatrixList(matrices, self.scaleMode, self.getScales(args), influences)
+        if self.useTranslation:
+            translateMatrixList(matrices, self.translationMode, self.getTranslations(args), influences)
 
         return matrices
 
@@ -78,6 +96,11 @@ class OffsetMatricesNode(bpy.types.Node, VectorizedNode):
         for i in range(len(influences)):
             influences.data[i] = evaluator.evaluate(matrices.data + i, i)
         return influences
+
+    def getTranslations(self, args):
+        if self.useTranslation:
+            return CDefaultList(Vector3DList, args[0], (0, 0, 0))
+        return None
 
     def getScales(self, args):
         if self.useScale:

@@ -20,6 +20,7 @@ cdef void reflectVec3(Vector3* result, Vector3* v, Vector3* axis)
 
 cdef void normalizeVec3_InPlace(Vector3* v)
 cdef void normalizeVec3(Vector3* target, Vector3* v)
+cdef void normalizeLengthVec3_Inplace(Vector3* v, float length)
 cdef void normalizeLengthVec3(Vector3* target, Vector3* v, float length)
 
 cdef float distanceVec3(Vector3* a, Vector3* b)
