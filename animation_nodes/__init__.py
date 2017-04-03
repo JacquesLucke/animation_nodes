@@ -124,15 +124,17 @@ updateSocketInfo()
 ##################################
 
 import bpy
-from . register_files import registerFiles
-from . register_files import unregisterFiles
 
 def register():
     bpy.utils.register_module(__name__)
-    registerFiles()
+    for module in modules:
+        if hasattr(module, "register"):
+            module.register()
     print("Registered Animation Nodes with {} modules.".format(len(modules)))
 
 def unregister():
     bpy.utils.unregister_module(__name__)
-    unregisterFiles()
+    for module in modules:
+        if hasattr(module, "unregister"):
+            module.unregister()
     print("Unregistered Animation Nodes.")

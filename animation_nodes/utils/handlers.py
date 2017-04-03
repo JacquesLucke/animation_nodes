@@ -85,7 +85,7 @@ def renderCompleted(scene):
     for handler in renderCancelHandlers:
         handler()
 
-def registerHandlers():
+def register():
     bpy.app.handlers.frame_change_post.append(frameChangedPost)
     bpy.app.handlers.scene_update_post.append(sceneUpdatePost)
     bpy.app.handlers.load_post.append(loadPost)
@@ -99,7 +99,7 @@ def registerHandlers():
     global addonChanged
     addonChanged = True
 
-def unregisterHandlers():
+def unregister():
     bpy.app.handlers.frame_change_post.remove(frameChangedPost)
     bpy.app.handlers.scene_update_post.remove(sceneUpdatePost)
     bpy.app.handlers.load_post.remove(loadPost)

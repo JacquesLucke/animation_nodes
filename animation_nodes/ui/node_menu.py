@@ -637,8 +637,8 @@ def insertNode(layout, type, text, settings = {}, icon = "NONE"):
         item.value = value
     return operator
 
-def registerMenu():
+def register():
     bpy.types.NODE_MT_add.append(drawMenu)
 
-def unregisterMenu():
+def unregister():
     bpy.types.NODE_MT_add.remove(drawMenu)
