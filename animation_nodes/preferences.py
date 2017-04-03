@@ -107,12 +107,26 @@ class ExecutionCodeProperties(bpy.types.PropertyGroup):
         get = get_MeasureExecution, set = set_MeasureExecution,
         description = "Measure execution times of the individual nodes")
 
+class DrawMeshIndicesProperties(bpy.types.PropertyGroup):
+    activated = BoolProperty(name = "Activated", default = False)
+
+    fontSize = IntProperty(name = "Font Size", default = 12,
+        soft_min = 5, soft_max = 40, min = 0)
+
+    textColor = mainNetwork = FloatVectorProperty(name = "Text Color",
+        default = [1, 1, 1], subtype = "COLOR",
+        soft_min = 0.0, soft_max = 1.0)
+
+class DrawHandlerProperties(bpy.types.PropertyGroup):
+    meshIndices = PointerProperty(type = DrawMeshIndicesProperties)
+
 class AddonPreferences(bpy.types.AddonPreferences):
     bl_idname = addonName
 
     nodeColors = PointerProperty(type = NodeColorProperties)
     developer = PointerProperty(type = DeveloperProperties)
     executionCode = PointerProperty(type = ExecutionCodeProperties)
+    drawHandlers = PointerProperty(type = DrawHandlerProperties)
 
     def draw(self, context):
         layout = self.layout
@@ -145,6 +159,9 @@ def getExecutionCodeType():
 
 def getColorSettings():
     return getPreferences().nodeColors
+
+def getMeshIndicesSettings():
+    return getPreferences().drawHandlers.meshIndices
 
 def debuggingIsEnabled():
     return getPreferences().developer.debug
