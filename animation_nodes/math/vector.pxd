@@ -1,6 +1,8 @@
-# it is important that the compiler does not add padding here
 cdef struct Vector3:
     float x, y, z
+
+cdef struct Vector4:
+    float x, y, z, w
 
 cdef float lengthVec3(Vector3* v)
 

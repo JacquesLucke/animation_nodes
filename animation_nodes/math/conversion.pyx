@@ -20,6 +20,23 @@ cdef toPyVector3(Vector3* v):
     return Vector((v.x, v.y, v.z))
 
 
+cdef Vector4 toVector4(value) except *:
+    cdef Vector4 v
+    setVector4(&v, value)
+    return v
+
+cdef setVector4(Vector4* v, value):
+    if len(value) != 4:
+        raise TypeError("element is not a 3D vector")
+    v.x = value[0]
+    v.y = value[1]
+    v.z = value[2]
+    v.w = value[3]
+
+cdef toPyVector4(Vector4* v):
+    return Vector((v.x, v.y, v.z, v.w))
+
+
 # Matrices
 ##########################################################
 

@@ -24,6 +24,12 @@ cdef void transformVec3AsDirection(Vector3* target, Vector3* v, Matrix3_or_Matri
     target.y = v.x * m.a21 + v.y * m.a22 + v.z * m.a23
     target.z = v.x * m.a31 + v.y * m.a32 + v.z * m.a33
 
+cdef void multMatrix4AndVec4(Vector4* target, Matrix4* m, Vector4* v):
+    target.x = v.x * m.a11 + v.y * m.a12 + v.z * m.a13 + v.w * m.a14
+    target.y = v.x * m.a21 + v.y * m.a22 + v.z * m.a23 + v.w * m.a24
+    target.z = v.x * m.a31 + v.y * m.a32 + v.z * m.a33 + v.w * m.a34
+    target.w = v.x * m.a41 + v.y * m.a42 + v.z * m.a43 + v.w * m.a44
+
 cdef void setIdentityMatrix(Matrix3_or_Matrix4* m):
     m.a12 = m.a13 = 0
     m.a21 = m.a23 = 0

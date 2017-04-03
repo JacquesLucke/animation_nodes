@@ -1,9 +1,6 @@
 import cython
 from libc.math cimport sqrt, ceil
 
-if sizeof(Vector3) != 12:
-    raise MemoryError("The compiler added padding to the Vector3 struct")
-
 cdef void scaleVec3_Inplace(Vector3* v, float factor):
     v.x *= factor
     v.y *= factor

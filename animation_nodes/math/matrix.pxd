@@ -1,4 +1,4 @@
-from . vector cimport Vector3
+from . vector cimport Vector3, Vector4
 from . euler cimport Euler3
 
 cdef struct Matrix4:
@@ -21,6 +21,8 @@ cdef void transformVec3AsPoint(Vector3* target, Vector3* vector, Matrix4* matrix
 
 cdef void transformVec3AsDirection_InPlace(Vector3* v, Matrix3_or_Matrix4* m)
 cdef void transformVec3AsDirection(Vector3* target, Vector3* v, Matrix3_or_Matrix4* m)
+
+cdef void multMatrix4AndVec4(Vector4* target, Matrix4* m, Vector4* v)
 
 cdef void setIdentityMatrix(Matrix3_or_Matrix4* m)
 cdef void setTranslationMatrix(Matrix4* m, Vector3* v)
