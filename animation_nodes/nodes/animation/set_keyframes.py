@@ -6,7 +6,8 @@ from ... events import propertyChanged
 pathTypes = ("Custom", "Location", "Rotation", "Scale", "LocRotScale")
 pathTypeItems = [(pathType, pathType, "") for pathType in pathTypes]
 
-class an_KeyframePath(bpy.types.PropertyGroup):
+class KeyframePath(bpy.types.PropertyGroup):
+    bl_idname = "an_KeyframePath"
     path = StringProperty(default = "", update = propertyChanged, description = "Path to the property")
     index = IntProperty(default = -1, update = propertyChanged, min = -1, soft_max = 2, description = "Used index if the path points to an array (-1 will set a keyframe on every index)")
 
@@ -15,7 +16,7 @@ class SetKeyframesNode(bpy.types.Node, AnimationNode):
     bl_label = "Set Keyframes"
     bl_width_default = 200
 
-    paths = CollectionProperty(type = an_KeyframePath)
+    paths = CollectionProperty(type = KeyframePath)
 
     selectedPathType = EnumProperty(default = "Location", items = pathTypeItems, name = "Path Type")
     attributePath = StringProperty(default = "", name = "Attribute Path")

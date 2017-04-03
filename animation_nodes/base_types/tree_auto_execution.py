@@ -11,6 +11,7 @@ idTypeItems = [
     ("SCENE", "Scene", "", "SCENE_DATA", 1)]
 
 class AutoExecutionTrigger_MonitorProperty(bpy.types.PropertyGroup):
+    bl_idname = "an_AutoExecutionTrigger_MonitorProperty"
 
     idType = EnumProperty(name = "ID Type", default = "OBJECT",
         items = idTypeItems)
@@ -86,6 +87,7 @@ class AutoExecutionTrigger_MonitorProperty(bpy.types.PropertyGroup):
 
 
 class CustomAutoExecutionTriggers(bpy.types.PropertyGroup):
+    bl_idname = "an_CustomAutoExecutionTriggers"
 
     monitorPropertyTriggers = CollectionProperty(type = AutoExecutionTrigger_MonitorProperty)
 

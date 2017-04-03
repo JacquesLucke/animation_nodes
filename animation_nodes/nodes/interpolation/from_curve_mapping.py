@@ -7,10 +7,12 @@ from ... algorithms.interpolations import PyInterpolation, CachedInterpolation
 
 
 class CurveMapPointCache(bpy.types.PropertyGroup):
+    bl_idname = "an_CurveMapPointCache"
     handle_type = StringProperty()
     location = FloatVectorProperty(size = 2)
 
 class CurveMapCache(bpy.types.PropertyGroup):
+    bl_idname = "an_CurveMapCache"
     extend = StringProperty()
     points = CollectionProperty(type = CurveMapPointCache)
     dirty = BoolProperty(default = True)

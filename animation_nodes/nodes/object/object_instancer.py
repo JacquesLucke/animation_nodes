@@ -26,7 +26,8 @@ emptyDrawTypeItems = []
 for item in bpy.types.Object.bl_rna.properties["empty_draw_type"].enum_items:
     emptyDrawTypeItems.append((item.identifier, item.name, ""))
 
-class an_ObjectNamePropertyGroup(bpy.types.PropertyGroup):
+class ObjectNamePropertyGroup(bpy.types.PropertyGroup):
+    bl_idname = "an_ObjectNamePropertyGroup"
     objectName = StringProperty(name = "Object Name", default = "", update = propertyChanged)
     objectIndex = IntProperty(name = "Object Index", default = 0, update = propertyChanged)
 
@@ -45,7 +46,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         self.resetInstances = True
         propertyChanged()
 
-    linkedObjects = CollectionProperty(type = an_ObjectNamePropertyGroup)
+    linkedObjects = CollectionProperty(type = ObjectNamePropertyGroup)
     resetInstances = BoolProperty(default = False, update = propertyChanged)
 
     copyFromSource = BoolProperty(name = "Copy from Source",

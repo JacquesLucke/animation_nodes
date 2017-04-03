@@ -2,7 +2,8 @@ import bpy
 from bpy.props import *
 from ... base_types import Template
 
-class NodeSetting(bpy.types.PropertyGroup):
+class TemplateNodeSetting(bpy.types.PropertyGroup):
+    bl_idname = "an_TemplateNodeSetting"
     value = StringProperty()
 
 class InsertLinkedNodeOperatorTemplate(bpy.types.Operator, Template):
@@ -10,7 +11,7 @@ class InsertLinkedNodeOperatorTemplate(bpy.types.Operator, Template):
     bl_label = "Insert Linked Node"
 
     nodeIdName = StringProperty()
-    settings = CollectionProperty(name = "Settings", type = NodeSetting, options = {"SKIP_SAVE"})
+    settings = CollectionProperty(name = "Settings", type = TemplateNodeSetting, options = {"SKIP_SAVE"})
     fromIndex = IntProperty(default = 0)
     toIndex = IntProperty(default = 0)
 

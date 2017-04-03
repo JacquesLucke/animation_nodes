@@ -12,6 +12,7 @@ from .. execution.units import getMainUnitsByNodeTree, setupExecutionUnits, fini
 
 
 class LastTreeExecutionInfo(bpy.types.PropertyGroup):
+    bl_idname = "an_LastTreeExecutionInfo"
 
     isDefault = BoolProperty(default = True)
     executionTime = FloatProperty(name = "Execution Time")

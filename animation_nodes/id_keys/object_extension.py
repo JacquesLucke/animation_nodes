@@ -9,7 +9,7 @@ def checkIDKeyName(name):
         raise ValueError("property name must not be empty")
 
 class IDKeyProperties(bpy.types.PropertyGroup):
-    bl_idname = "an_id_key_properties"
+    bl_idname = "an_IDKeyProperties"
 
     def _getIDKeyData(self, dataType, propertyName):
         return dataTypeByIdentifier[dataType].get(self.id_data, propertyName)

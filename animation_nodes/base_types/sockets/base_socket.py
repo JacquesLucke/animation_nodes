@@ -11,17 +11,20 @@ from ... tree_info import (isSocketLinked, getLinkedSockets, getDirectlyLinkedSo
                            getLinkedDataTypes)
 
 class SocketTextProperties(bpy.types.PropertyGroup):
+    bl_idname = "an_SocketTextProperties"
     unique = BoolProperty(default = False)
     editable = BoolProperty(default = False)
     variable = BoolProperty(default = False)
 
 class SocketDisplayProperties(bpy.types.PropertyGroup):
+    bl_idname = "an_SocketDisplayProperties"
     text = BoolProperty(default = False)
     textInput = BoolProperty(default = False)
     moveOperators = BoolProperty(default = False)
     removeOperator = BoolProperty(default = False)
 
 class SocketLoopProperties(bpy.types.PropertyGroup):
+    bl_idname = "an_SocketLoopProperties"
 
     def socketLoopPropertyChanged(self, context):
         subprogramInterfaceChanged()
@@ -32,6 +35,7 @@ class SocketLoopProperties(bpy.types.PropertyGroup):
     copyAlways = BoolProperty(default = False, update = socketLoopPropertyChanged)
 
 class SocketExecutionProperties(bpy.types.PropertyGroup):
+    bl_idname = "an_SocketExecutionProperties"
     neededCopies = IntProperty(default = 0, min = 0)
 
 colorOverwritePerSocket = dict()

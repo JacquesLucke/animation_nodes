@@ -6,6 +6,7 @@ from bpy.props import *
 addonName = os.path.basename(os.path.dirname(__file__))
 
 class NodeColorProperties(bpy.types.PropertyGroup):
+    bl_idname = "an_NodeColorProperties"
 
     def changeNodeColors(self, context):
         from . ui.node_colors import colorAllNodes
@@ -42,6 +43,7 @@ class NodeColorProperties(bpy.types.PropertyGroup):
 
 
 class ProfilingProperties(bpy.types.PropertyGroup):
+    bl_idname = "an_ProfilingProperties"
 
     profilingFunctionItems = [
         ("EXECUTION", "Execution", "", "NONE", 0),
@@ -68,6 +70,7 @@ class ProfilingProperties(bpy.types.PropertyGroup):
         default = "cumtime", items = profileSortModeItems)
 
 class DeveloperProperties(bpy.types.PropertyGroup):
+    bl_idname = "an_DeveloperProperties"
 
     profiling = PointerProperty(type = ProfilingProperties)
 
@@ -78,6 +81,7 @@ class DeveloperProperties(bpy.types.PropertyGroup):
         description = "Run the test suite when Blender starts")
 
 class ExecutionCodeProperties(bpy.types.PropertyGroup):
+    bl_idname = "an_ExecutionCodeProperties"
 
     def settingChanged(self, context):
         from . events import executionCodeChanged
@@ -108,6 +112,8 @@ class ExecutionCodeProperties(bpy.types.PropertyGroup):
         description = "Measure execution times of the individual nodes")
 
 class DrawMeshIndicesProperties(bpy.types.PropertyGroup):
+    bl_idname = "an_DrawMeshIndicesProperties"
+
     activated = BoolProperty(name = "Activated", default = False)
 
     fontSize = IntProperty(name = "Font Size", default = 12,
@@ -118,6 +124,7 @@ class DrawMeshIndicesProperties(bpy.types.PropertyGroup):
         soft_min = 0.0, soft_max = 1.0)
 
 class DrawHandlerProperties(bpy.types.PropertyGroup):
+    bl_idname = "an_DrawHandlerProperties"
     meshIndices = PointerProperty(type = DrawMeshIndicesProperties)
 
 class AddonPreferences(bpy.types.AddonPreferences):
