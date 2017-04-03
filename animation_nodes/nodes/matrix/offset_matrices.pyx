@@ -103,6 +103,9 @@ class OffsetMatricesNode(bpy.types.Node, VectorizedNode):
 
         col.row().prop(self, "specifiedState", expand = True)
 
+        if self.errorMessage != "":
+            layout.label(self.errorMessage, icon = "ERROR")
+
     def drawAdvanced(self, layout):
         col = layout.column(align = True)
         col.prop(self, "translationMode", text = "Translation")
