@@ -4,12 +4,13 @@ from .. preferences import getMeshIndicesSettings
 from .. graphics.mesh_indices import (
     drawVertexIndices_ObjectMode,
     drawEdgeIndices_ObjectMode,
+    drawPolygonIndices_ObjectMode
 )
 
 @drawHandler("SpaceView3D", "WINDOW")
 def drawIndicesOfSelectedObjects():
     prefs = getMeshIndicesSettings()
-    if not (prefs.drawVertices or prefs.drawEdges):
+    if not (prefs.drawVertices or prefs.drawEdges or prefs.drawPolygons):
         return
 
     for object in bpy.context.selected_objects:
@@ -21,6 +22,10 @@ def drawIndicesOfSelectedObjects():
             if prefs.drawEdges:
                 drawEdgeIndices_ObjectMode(object,
                     color = prefs.edgesColor,
+                    fontSize = prefs.fontSize)
+            if prefs.drawPolygons:
+                drawPolygonIndices_ObjectMode(object,
+                    color = prefs.polygonsColor,
                     fontSize = prefs.fontSize)
 
 def drawPanel(self, context):
@@ -42,6 +47,12 @@ def drawPanel(self, context):
     subRow = row.row()
     subRow.active = prefs.drawEdges
     subRow.prop(prefs, "edgesColor", text = "")
+
+    row = col.row()
+    row.prop(prefs, "drawPolygons", text = "Polygons Indices")
+    subRow = row.row()
+    subRow.active = prefs.drawPolygons
+    subRow.prop(prefs, "polygonsColor", text = "")
 
 def register():
     bpy.types.VIEW3D_PT_view3d_display.append(drawPanel)

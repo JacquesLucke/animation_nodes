@@ -116,8 +116,9 @@ class DrawMeshIndicesProperties(bpy.types.PropertyGroup):
 
     drawVertices = BoolProperty(name = "Draw Vertices", default = False)
     drawEdges = BoolProperty(name = "Draw Edges", default = False)
+    drawPolygons = BoolProperty(name = "Draw Polygons", default = False)
 
-    fontSize = IntProperty(name = "Font Size", default = 12,
+    fontSize = IntProperty(name = "Font Size", default = 14,
         soft_min = 5, soft_max = 40, min = 0)
 
     verticesColor = FloatVectorProperty(
@@ -127,6 +128,11 @@ class DrawMeshIndicesProperties(bpy.types.PropertyGroup):
 
     edgesColor = FloatVectorProperty(
         name = "Edges Color",
+        default = [1, 1, 1], subtype = "COLOR",
+        soft_min = 0.0, soft_max = 1.0)
+
+    polygonsColor = FloatVectorProperty(
+        name = "Polygons Color",
         default = [1, 1, 1], subtype = "COLOR",
         soft_min = 0.0, soft_max = 1.0)
 

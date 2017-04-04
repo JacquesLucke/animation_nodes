@@ -24,8 +24,8 @@ def drawEdgeIndices_ObjectMode(object, color = (1, 1, 1), fontSize = 14):
 
     drawPointIndices(object, edgeCenters, color, fontSize)
 
-blfDraw = blf.draw
-blfPosition = blf.position
+def drawPolygonIndices_ObjectMode(object, color = (1, 1, 1), fontSize = 14):
+    drawPointIndices(object, object.data.an.getPolygonCenters(), color, fontSize)
 
 cdef drawPointIndices(object, Vector3DList points, color, fontSize):
     region = bpy.context.region
@@ -44,6 +44,9 @@ cdef Matrix4 getTransformationMatrix(object) except *:
     viewMatrix = bpy.context.space_data.region_3d.perspective_matrix
     objectMatrix = object.matrix_world
     return toMatrix4(viewMatrix * objectMatrix)
+
+blfDraw = blf.draw
+blfPosition = blf.position
 
 @cython.cdivision(True)
 cdef drawAtPoint(Vector3 *center, str text,
