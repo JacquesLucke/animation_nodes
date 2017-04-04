@@ -1,17 +1,33 @@
 import bpy
 from bpy.props import *
-from ... base_types import AnimationNode
+from ... base_types import VectorizedNode
+from . list_utils import clampDoubleList
 
-class FloatClampNode(bpy.types.Node, AnimationNode):
+class FloatClampNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_FloatClampNode"
     bl_label = "Clamp"
     dynamicLabelType = "HIDDEN_ONLY"
 
+    useValueList = VectorizedNode.newVectorizeProperty()
+
     def create(self):
-        self.newInput("Float", "Value", "value")
+        self.newVectorizedInput("Float", "useValueList",
+            ("Value", "value"),
+            ("Values", "values", dict(dataIsModified = True)))
+
         self.newInput("Float", "Min", "minValue", value = 0.0)
         self.newInput("Float", "Max", "maxValue", value = 1.0)
-        self.newOutput("Float", "Value", "outValue")
+
+        self.newVectorizedOutput("Float", "useValueList",
+            ("Value", "outValue"), ("Values", "outValues"))
+
+    def getExecutionFunctionName(self):
+        if self.useValueList:
+            return "execute_List"
+
+    def execute_List(self, values, minValue, maxValue):
+        clampDoubleList(values, minValue, maxValue)
+        return values
 
     def getExecutionCode(self):
         yield "outValue = min(max(value, minValue), maxValue)"
