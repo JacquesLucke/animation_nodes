@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... base_types import VectorizedNode
-from . list_utils import clampDoubleList
+from . list_utils import clamp_DoubleList
 
 class FloatClampNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_FloatClampNode"
@@ -26,7 +26,7 @@ class FloatClampNode(bpy.types.Node, VectorizedNode):
             return "execute_List"
 
     def execute_List(self, values, minValue, maxValue):
-        clampDoubleList(values, minValue, maxValue)
+        clamp_DoubleList(values, minValue, maxValue)
         return values
 
     def getExecutionCode(self):

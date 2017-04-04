@@ -1,11 +1,9 @@
 import bpy
 import random
 from bpy.props import *
-from libc.limits cimport INT_MAX
 from ... events import propertyChanged
 from ... base_types import AnimationNode
-from ... data_structures cimport DoubleList
-from ... algorithms.random cimport uniformRandomNumber
+from . list_utils import random_DoubleList
 
 class RandomNumberNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_RandomNumberNode"
@@ -45,17 +43,9 @@ class RandomNumberNode(bpy.types.Node, AnimationNode):
         else:
             yield "number = algorithms.random.uniformRandomNumberWithTwoSeeds(seed, self.nodeSeed, minValue, maxValue)"
 
-    def calcRandomNumbers(self, seed, count, double minValue, double maxValue):
-        cdef:
-            int length = min(max(count, 0), INT_MAX)
-            int startSeed = (seed * 234253 + self.nodeSeed * 5326534) % INT_MAX
-            DoubleList newList = DoubleList(length = length)
-            int i
-
-        for i in range(length):
-            newList.data[i] = uniformRandomNumber(startSeed + i, minValue, maxValue)
-
-        return newList
+    def calcRandomNumbers(self, seed, count, minValue, maxValue):
+        _seed = seed * 234123 + self.nodeSeed * 1234434
+        return random_DoubleList(_seed, count, minValue, maxValue)
 
     def duplicate(self, sourceNode):
         self.randomizeNodeSeed()
