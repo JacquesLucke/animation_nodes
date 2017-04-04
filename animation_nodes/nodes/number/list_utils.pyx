@@ -38,7 +38,7 @@ def range_DoubleList_StartStep(amount, double start, double step):
             newList.data[i] = start + i * step
     return newList
 
-def range_DoubleList_StartStop(Py_ssize_t amount, double start, double stop):
+def range_DoubleList_StartStop(amount, double start, double stop):
     if amount == 1:
         return DoubleList.fromValues([start])
     else:
