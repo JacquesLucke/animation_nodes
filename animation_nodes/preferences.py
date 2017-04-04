@@ -114,12 +114,19 @@ class ExecutionCodeProperties(bpy.types.PropertyGroup):
 class DrawMeshIndicesProperties(bpy.types.PropertyGroup):
     bl_idname = "an_DrawMeshIndicesProperties"
 
-    activated = BoolProperty(name = "Activated", default = False)
+    drawVertices = BoolProperty(name = "Draw Vertices", default = False)
+    drawEdges = BoolProperty(name = "Draw Edges", default = False)
 
     fontSize = IntProperty(name = "Font Size", default = 12,
         soft_min = 5, soft_max = 40, min = 0)
 
-    textColor = mainNetwork = FloatVectorProperty(name = "Text Color",
+    verticesColor = FloatVectorProperty(
+        name = "Vertices Color",
+        default = [1, 1, 1], subtype = "COLOR",
+        soft_min = 0.0, soft_max = 1.0)
+
+    edgesColor = FloatVectorProperty(
+        name = "Edges Color",
         default = [1, 1, 1], subtype = "COLOR",
         soft_min = 0.0, soft_max = 1.0)
 

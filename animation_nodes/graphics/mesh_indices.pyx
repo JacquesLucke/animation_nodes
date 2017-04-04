@@ -4,8 +4,8 @@ import bpy
 import bgl
 import blf
 from .. utils.blender_ui import getDpi
-from .. data_structures cimport Vector3DList
-from .. math cimport Matrix4, Vector3, Vector4, multMatrix4AndVec4, toMatrix4
+from .. data_structures cimport Vector3DList, EdgeIndicesList
+from .. math cimport Matrix4, Vector3, Vector4, multMatrix4AndVec4, toMatrix4, mixVec3
 
 def drawVertexIndices_ObjectMode(object, color = (1, 1, 1), fontSize = 14):
     region = bpy.context.region
@@ -20,6 +20,25 @@ def drawVertexIndices_ObjectMode(object, color = (1, 1, 1), fontSize = 14):
     bgl.glColor3f(*color)
     for i in range(len(vertices)):
         drawAtPoint(vertices.data + i, str(i), &transformation, width, height)
+
+def drawEdgeIndices_ObjectMode(object, color = (1, 1, 1), fontSize = 14):
+    region = bpy.context.region
+    cdef float width = region.width
+    cdef float height = region.height
+
+    cdef Py_ssize_t i
+    cdef Vector3DList vertices = object.data.an.getVertices()
+    cdef EdgeIndicesList edges = object.data.an.getEdgeIndices()
+    cdef Matrix4 transformation = getTransformationMatrix(object)
+    cdef Vector3 v1, v2, center
+
+    blf.size(0, fontSize, int(getDpi()))
+    bgl.glColor3f(*color)
+    for i in range(len(edges)):
+        v1 = vertices.data[edges.data[i].v1]
+        v2 = vertices.data[edges.data[i].v2]
+        mixVec3(&center, &v1, &v2, 0.5)
+        drawAtPoint(&center, str(i), &transformation, width, height)
 
 cdef Matrix4 getTransformationMatrix(object) except *:
     viewMatrix = bpy.context.space_data.region_3d.perspective_matrix
