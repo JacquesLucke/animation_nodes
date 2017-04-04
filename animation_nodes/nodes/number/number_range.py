@@ -2,7 +2,12 @@ import bpy
 from bpy.props import *
 from ... base_types import AnimationNode
 from ... sockets.info import toListDataType
-from ... data_structures cimport DoubleList, LongLongList
+
+from . list_utils import (
+    range_LongLongList_StartStep,
+    range_DoubleList_StartStep,
+    range_DoubleList_StartStop
+)
 
 floatStepTypeItems = [
     ("START_STEP", "Start / Step", "", "NONE", 0),
@@ -54,26 +59,11 @@ class NumberRangeNode(bpy.types.Node, AnimationNode):
             elif self.floatStepType == "START_STOP":
                 return "execute_FloatRange_StartStop"
 
-    def execute_IntegerRange(self, long amount, long start, long step):
-        cdef LongLongList newList = LongLongList(length = max(amount, 0))
-        cdef long i
-        for i in range(amount):
-            newList.data[i] = start + i * step
-        return newList
+    def execute_IntegerRange(self, amount, start, step):
+        return range_LongLongList_StartStep(amount, start, step)
 
-    def execute_FloatRange_StartStep(self, long amount, double start, double step):
-        cdef DoubleList newList = DoubleList(length = max(amount, 0))
-        cdef long i
-        for i in range(amount):
-            newList.data[i] = start + i * step
-        return newList
+    def execute_FloatRange_StartStep(self, amount, start, step):
+        return range_DoubleList_StartStep(amount, start, step)
 
-    def execute_FloatRange_StartStop(self, long amount, double start, double stop):
-        if amount == 0:
-            return DoubleList()
-        elif amount == 1:
-            return DoubleList.fromValues([start])
-        elif start == stop:
-            return DoubleList.fromValues([start]) * amount
-        else:
-            return self.execute_FloatRange_StartStep(amount, start, (stop - start) / (amount - 1))
+    def execute_FloatRange_StartStop(self, amount, start, stop):
+        return range_DoubleList_StartStop(amount, start, stop)
