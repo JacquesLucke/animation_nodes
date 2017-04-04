@@ -24,6 +24,7 @@ def range_LongLongList_StartStep(amount, start, step):
         newList.data[i] = _start + i * _step
     return newList
 
+def range_DoubleList_StartStep(amount, double start, double step):
     cdef DoubleList newList
     cdef Py_ssize_t i
     if step == 0:
