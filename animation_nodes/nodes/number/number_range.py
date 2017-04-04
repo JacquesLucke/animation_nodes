@@ -36,7 +36,7 @@ class NumberRangeNode(bpy.types.Node, AnimationNode):
             if self.floatStepType == "START_STEP":
                 self.newInput("Float", "Step", "step", value = 1)
             elif self.floatStepType == "START_STOP":
-                self.newInput("Float", "Stop", "stop", value = 4)
+                self.newInput("Float", "Stop", "stop", value = 1)
         elif self.dataType == "Integer":
             self.newInput("Integer", "Start", "start")
             self.newInput("Integer", "Step", "step", value = 1)

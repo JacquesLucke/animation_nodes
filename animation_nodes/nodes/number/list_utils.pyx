@@ -1,10 +1,11 @@
 from ... data_structures cimport (
     DoubleList,
-    LongLongList
+    LongLongList,
+    Interpolation
 )
 
 from libc.limits cimport INT_MAX
-from ... utils.clamp cimport clampLong
+from ... utils.clamp cimport clamp, clampLong
 from ... algorithms.random cimport uniformRandomNumber
 
 def clamp_DoubleList(DoubleList values, double minValue, double maxValue):
@@ -51,3 +52,41 @@ def random_DoubleList(seed, amount, double minValue, double maxValue):
     for i in range(len(newList)):
         newList.data[i] = uniformRandomNumber(_seed + i, minValue, maxValue)
     return newList
+
+def mapRange_DoubleList(DoubleList values, bint clamped,
+                        double inMin, double inMax,
+                        double outMin, double outMax):
+    if inMin == inMax:
+        return DoubleList.fromValues([0]) * len(values)
+
+    cdef:
+        DoubleList newValues = DoubleList(length = len(values))
+        double factor = (outMax - outMin) / (inMax - inMin)
+        double x
+        long i
+
+    for i in range(len(newValues)):
+        x = values.data[i]
+        if clamped: x = clamp(x, inMin, inMax)
+        newValues.data[i] = outMin + (x - inMin) * factor
+
+    return newValues
+
+def mapRange_DoubleList_Interpolated(DoubleList values, Interpolation interpolation,
+                                     double inMin, double inMax,
+                                     double outMin, double outMax):
+     if inMin == inMax:
+         return DoubleList.fromValues([0]) * values.length
+
+     cdef:
+         DoubleList newValues = DoubleList(length = len(values))
+         double factor1 = 1 / (inMax - inMin)
+         double factor2 = outMax - outMin
+         double x
+         long i
+
+     for i in range(len(newValues)):
+         x = clamp(values.data[i], inMin, inMax)
+         newValues.data[i] = outMin + interpolation.evaluate((x - inMin) * factor1) * factor2
+
+     return newValues

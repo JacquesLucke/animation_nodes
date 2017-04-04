@@ -1,8 +1,11 @@
 import bpy
 from bpy.props import *
-from ... math cimport clamp
 from ... base_types import VectorizedNode
-from ... data_structures cimport DoubleList, Interpolation
+
+from . list_utils import (
+    mapRange_DoubleList,
+    mapRange_DoubleList_Interpolated
+)
 
 class MapRangeNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_MapRangeNode"
@@ -64,41 +67,8 @@ class MapRangeNode(bpy.types.Node, VectorizedNode):
         else:
             yield "    newValue = outMin + (value - inMin) / (inMax - inMin) * (outMax - outMin)"
 
-    def execute_Multiple(self, DoubleList values,
-                         double inMin, double inMax, double outMin, double outMax):
-        if inMin == inMax:
-            return DoubleList.fromValues([0]) * values.length
+    def execute_Multiple(self, values, inMin, inMax, outMin, outMax):
+        return mapRange_DoubleList(values, self.clampInput, inMin, inMax, outMin, outMax)
 
-        cdef:
-            DoubleList newValues = DoubleList(length = values.length)
-            double factor = (outMax - outMin) / (inMax - inMin)
-            bint clamped = self.clampInput
-            double x
-            long i
-
-        for i in range(newValues.length):
-            x = values.data[i]
-            if clamped: x = clamp(x, inMin, inMax)
-            newValues.data[i] = outMin + (x - inMin) * factor
-
-        return newValues
-
-    def execute_Multiple_Interpolated(self, DoubleList values,
-                                double inMin, double inMax, double outMin, double outMax,
-                                Interpolation interpolation):
-        if inMin == inMax:
-            return DoubleList.fromValues([0]) * values.length
-
-        cdef:
-            DoubleList newValues = DoubleList(length = values.length)
-            double factor1 = 1 / (inMax - inMin)
-            double factor2 = outMax - outMin
-            bint clamped = self.clampInput
-            double x
-            long i
-
-        for i in range(newValues.length):
-            x = clamp(values.data[i], inMin, inMax)
-            newValues.data[i] = outMin + interpolation.evaluate((x - inMin) * factor1) * factor2
-
-        return newValues
+    def execute_Multiple_Interpolated(self, values, inMin, inMax, outMin, outMax, interpolation):
+        return mapRange_DoubleList_Interpolated(values, interpolation, inMin, inMax, outMin, outMax)
