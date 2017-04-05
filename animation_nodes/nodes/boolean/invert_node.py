@@ -1,13 +1,23 @@
 import bpy
-from ... base_types import AnimationNode
+from ... base_types import VectorizedNode
 
-class InvertNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_InvertNode"
+class InvertBooleanNode(bpy.types.Node, VectorizedNode):
+    bl_idname = "an_InvertBooleanNode"
     bl_label = "Invert Boolean"
 
+    useList = VectorizedNode.newVectorizeProperty()
+
     def create(self):
-        self.newInput("Boolean", "Input", "input")
-        self.newOutput("Boolean", "Output", "output")
+        self.newVectorizedInput("Boolean", "useList",
+            ("Input", "input"), ("Input", "input"))
+
+        self.newVectorizedOutput("Boolean", "useList",
+            ("Output", "output"),
+            ("Output", "output", dict(dataIsModified = True)))
 
     def getExecutionCode(self):
-        return "output = not input"
+        if self.useList:
+            yield "input.invertAll()"
+            yield "output = input"
+        else:
+            yield "output = not input"
