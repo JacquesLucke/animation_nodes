@@ -1,5 +1,5 @@
 from unittest import TestCase
-from . base_lists import ULongList
+from . base_lists import LongList
 from . polygon_indices_list import PolygonIndicesList
 
 class TestAppend(TestCase):
@@ -60,7 +60,7 @@ class TestCopyWithNewOrder(TestCase):
             (1, 2, 3), (4, 5, 6, 7), (8, 9, 0)])
 
     def testNormal(self):
-        order = ULongList.fromValues([1, 2, 0, 1])
+        order = LongList.fromValues([1, 2, 0, 1])
         newList = self.list.copyWithNewOrder(order)
         self.assertEqual(len(newList), 4)
         self.assertEqual(newList[0], (4, 5, 6, 7))
@@ -70,12 +70,12 @@ class TestCopyWithNewOrder(TestCase):
 
     def testEmptyList(self):
         myList = PolygonIndicesList()
-        order = ULongList.fromValues([1])
+        order = LongList.fromValues([1])
         with self.assertRaises(IndexError):
             newList = myList.copyWithNewOrder(order)
 
     def testTooHighIndex(self):
-        order = ULongList.fromValues([1, 0, 4, 2])
+        order = LongList.fromValues([1, 0, 4, 2])
         with self.assertRaises(IndexError):
             newList = self.list.copyWithNewOrder(order)
 
@@ -105,6 +105,43 @@ class TestGetValuesInSlice(TestCase):
         self.assertEqual(newList[0], (8, 9, 0))
         self.assertEqual(newList[1], (5, 4, 2))
         self.assertEqual(newList[2], (3, 4, 6, 2, 8))
+
+class TestGetValuesInIndexList(TestCase):
+    def setUp(self):
+        self.list = PolygonIndicesList.fromValues([
+            (1, 2, 3), (4, 5, 6, 7), (8, 9, 0), (3, 4, 5),
+            (5, 4, 2), (2, 7, 6), (3, 4, 6, 2, 8), (5, 3, 2)])
+
+    def testZeroElements(self):
+        newList = self.list[[]]
+        self.assertEqual(len(newList), 0)
+
+    def testOneElement(self):
+        newList = self.list[(1, )]
+        self.assertEqual(len(newList), 1)
+        self.assertEqual(newList[0], (4, 5, 6, 7))
+
+    def testMoreElements(self):
+        newList = self.list[(4, 6, 1)]
+        self.assertEqual(len(newList), 3)
+        self.assertEqual(newList[0], (5, 4, 2))
+        self.assertEqual(newList[1], (3, 4, 6, 2, 8))
+        self.assertEqual(newList[2], (4, 5, 6, 7))
+
+    def testNegativeIndices(self):
+        newList = self.list[(0, -1, -4)]
+        self.assertEqual(len(newList), 3)
+        self.assertEqual(newList[0], (1, 2, 3))
+        self.assertEqual(newList[1], (5, 3, 2))
+        self.assertEqual(newList[2], (5, 4, 2))
+
+    def testTooHighIndex(self):
+        with self.assertRaises(IndexError):
+            newList = self.list[(1, 2, 3, 20, 5)]
+
+    def testTooLowIndex(self):
+        with self.assertRaises(IndexError):
+            newList = self.list[(1, 2, 3, -5, -20)]
 
 class TestAdd(TestCase):
     def setUp(self):

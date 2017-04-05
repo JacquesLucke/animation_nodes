@@ -1,6 +1,6 @@
 from libc.string cimport memcpy
 from ... sockets.info import getSocketClass
-from ... data_structures cimport CList, BooleanList, PolygonIndicesList, ULongList
+from ... data_structures cimport CList, BooleanList, PolygonIndicesList, LongList
 
 def getMaskFunction(dataType):
     socketClass = getSocketClass(dataType)
@@ -59,7 +59,7 @@ def mask_PolygonIndicesList(PolygonIndicesList myList, BooleanList mask):
         raise ValueError("mask has a different length")
 
     cdef:
-        ULongList newIndices = ULongList(length = mask.countTrue())
+        LongList newIndices = LongList(length = mask.countTrue())
         long i, k
     k = 0
     for i in range(len(mask)):

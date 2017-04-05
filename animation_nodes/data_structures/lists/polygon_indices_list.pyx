@@ -21,6 +21,8 @@ cdef class PolygonIndicesList:
             return self.getElementAtIndex(key)
         elif isinstance(key, slice):
             return self.getValuesInSlice(key)
+        elif hasattr(key, "__iter__"):
+            return self.getValuesInIndexList(key)
         raise TypeError("expected int or slice")
 
     def __setitem__(self, key, value):
@@ -199,10 +201,20 @@ cdef class PolygonIndicesList:
         return index
 
     cdef getValuesInSlice(self, slice sliceObject):
-        cdef ULongList order = ULongList.fromValues(range(*sliceObject.indices(self.getLength())))
+        cdef LongList order = LongList.fromValues(range(*sliceObject.indices(self.getLength())))
         return self.copyWithNewOrder(order, checkIndices = False)
 
-    cpdef copyWithNewOrder(self, ULongList newOrder, checkIndices = True):
+    cdef getValuesInIndexList(self, keyList):
+        cdef LongList keys
+        if isinstance(keyList, LongList):
+            keys = keyList
+        else:
+            keys = LongList.fromValues(keyList)
+        return self.copyWithNewOrder(keys, checkIndices = True)
+
+    cpdef copyWithNewOrder(self, LongList newOrder, checkIndices = True):
+        cdef long i
+        cdef LongList _newOrder
         if newOrder.length == 0:
             return PolygonIndicesList()
         if self.getLength() == 0:
@@ -210,8 +222,17 @@ cdef class PolygonIndicesList:
         if checkIndices:
             if newOrder.getMaxValue() >= self.getLength():
                 raise IndexError("Not all indices in the new order exist")
+            if newOrder.getMinValue() < 0:
+                _newOrder = LongList(length = newOrder.length)
+                for i in range(newOrder.length):
+                    if newOrder.data[i] >= 0:
+                        _newOrder.data[i] = newOrder.data[i]
+                    else:
+                        _newOrder.data[i] = self.getLength() + newOrder.data[i]
+                        if _newOrder.data[i] < 0:
+                            raise IndexError("Not all indices in the new order exist")
+                newOrder = _newOrder
 
-        cdef long i
         cdef long indicesAmount = 0
         for i in range(newOrder.length):
             indicesAmount += self.polyLengths.data[newOrder.data[i]]
@@ -241,17 +262,17 @@ cdef class PolygonIndicesList:
 
     def reversed(self):
         cdef long i, length = self.getLength()
-        cdef ULongList newOrder = ULongList(length = self.getLength())
+        cdef LongList newOrder = LongList(length = self.getLength())
         for i in range(length):
             newOrder.data[i] = length - i - 1
         return self.copyWithNewOrder(newOrder, checkIndices = False)
 
     def repeated(self, *, length = -1, amount = -1):
         cdef long i
-        cdef ULongList preNewOrder = ULongList(length = self.getLength())
+        cdef LongList preNewOrder = LongList(length = self.getLength())
         for i in range(self.getLength()):
             preNewOrder.data[i] = i
-        cdef ULongList newOrder = preNewOrder.repeated(length = length, amount = amount)
+        cdef LongList newOrder = preNewOrder.repeated(length = length, amount = amount)
         return self.copyWithNewOrder(newOrder, checkIndices = False)
 
 

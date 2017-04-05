@@ -1,4 +1,4 @@
-from . base_lists cimport UIntegerList, ULongList
+from . base_lists cimport UIntegerList, LongList, LongList
 
 cdef class PolygonIndicesList:
     cdef:
@@ -17,6 +17,7 @@ cdef class PolygonIndicesList:
 
     cdef getElementAtIndex(self, long index)
     cdef getValuesInSlice(self, slice sliceObject)
+    cdef getValuesInIndexList(self, keyList)
 
     cdef setElementAtIndex(self, long index, value)
     cdef setElementAtIndex_SameLength(self, long index, value)
@@ -24,7 +25,7 @@ cdef class PolygonIndicesList:
 
     cdef removeElementAtIndex(self, long index)
 
-    cpdef copyWithNewOrder(self, ULongList newOrder, checkIndices = ?)
+    cpdef copyWithNewOrder(self, LongList newOrder, checkIndices = ?)
     cdef extend_SameType(self, PolygonIndicesList otherList)
 
     cdef isValueValid(self, value)

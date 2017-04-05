@@ -6,7 +6,7 @@ from libc.limits cimport INT_MAX
 from . shuffle import shuffle_CList
 from ... sockets.info import getSocketClass
 from .. random cimport randomNumber_Positive
-from ... data_structures cimport CList, PolygonIndicesList, IntegerList, ULongList
+from ... data_structures cimport CList, PolygonIndicesList, IntegerList, LongList
 
 def getSampleFunction(str dataType):
     socketClass = getSocketClass(dataType)
@@ -62,7 +62,7 @@ def sample_CList(CList sourceList, amount, seed):
 
 def sample_PolygonIndicesList(PolygonIndicesList sourceList, amount, seed):
     indices = getUniqueIndices(len(sourceList), amount, seed)
-    return sourceList.copyWithNewOrder(ULongList.fromValues(indices))
+    return sourceList.copyWithNewOrder(LongList.fromValues(indices))
 
 
 
