@@ -45,6 +45,11 @@ def fill_PolygonIndicesList(PolygonIndicesList myList, str direction, int length
     return joinListAndExtension(myList, extension, direction)
 
 cdef joinListAndExtension(myList, extension, direction):
+    if len(myList) == 0:
+        return extension
+    if len(extension) == 0:
+        return myList
+        
     if direction == "LEFT":
         return extension + myList
     elif direction == "RIGHT":
