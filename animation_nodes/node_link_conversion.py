@@ -100,14 +100,6 @@ class ConvertMeshDataListToMeshData(LinkCorrection):
     def insert(self, nodeTree, origin, target, dataOrigin):
         insertLinkedNode(nodeTree, "an_JoinMeshDataListNode", origin, target)
 
-class ConvertToIntegerList(LinkCorrection):
-    def check(self, origin, target):
-        return origin.dataType in ("Float List", "Edge Indices", "Polygon Indices") and target.dataType == "Integer List"
-    def insert(self, nodeTree, origin, target, dataOrigin):
-        node = insertLinkedNode(nodeTree, "an_ConvertToIntegerListNode", origin, target)
-        node.setOriginType(dataOrigin.dataType)
-        node.inputs[0].linkWith(origin)
-
 class ConvertFloatToScale(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType in ("Float", "Integer") and target.dataType == "Vector" and "scale" in target.name.lower()
@@ -246,7 +238,6 @@ def getSocketCenter(socket1, socket2):
 
 linkCorrectors = [
     ConvertMeshDataListToMeshData(),
-    ConvertToIntegerList(),
     ConvertNormalToEuler(),
     ConvertObjectToMeshData(),
     ConvertSeparatedMeshDataToBMesh(),

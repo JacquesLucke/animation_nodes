@@ -64,7 +64,7 @@ class IntegerListSocket(bpy.types.NodeSocket, CListSocket):
     bl_label = "Integer List Socket"
     dataType = "Integer List"
     baseDataType = "Integer"
-    allowedInputTypes = ["Integer List", "Float List"]
+    allowedInputTypes = ["Integer List", "Float List", "Edge Indices", "Polygon Indices"]
     drawColor = (0.3, 0.4, 1.0, 0.5)
     storable = True
     comparable = False
@@ -72,5 +72,5 @@ class IntegerListSocket(bpy.types.NodeSocket, CListSocket):
 
     @classmethod
     def getConversionCode(cls, dataType):
-        if dataType == "Float List":
+        if dataType in cls.allowedInputTypes:
             return "LongLongList.fromValues(value)"
