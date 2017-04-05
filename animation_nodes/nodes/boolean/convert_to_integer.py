@@ -1,13 +1,24 @@
 import bpy
-from ... base_types import AnimationNode
+from ... base_types import VectorizedNode
+from . list_utils import convert_BooleanList_to_LongLongList
 
-class BooleanToIntegerNode(bpy.types.Node, AnimationNode):
+class BooleanToIntegerNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_BooleanToIntegerNode"
     bl_label = "Boolean to Integer"
 
+    useList = VectorizedNode.newVectorizeProperty()
+
     def create(self):
-        self.newInput("Boolean", "Boolean", "boolean")
-        self.newOutput("Integer", "Number", "number")
+        self.newVectorizedInput("Boolean", "useList",
+            ("Boolean", "boolean"), ("Booleans", "booleans"))
+        self.newVectorizedOutput("Integer", "useList",
+            ("Number", "number"), ("Numbers", "numbers"))
 
     def getExecutionCode(self):
-        return "number = int(boolean)"
+        if self.useList:
+            return "numbers = self.convertToNumberList(booleans)"
+        else:
+            return "number = int(boolean)"
+
+    def convertToNumberList(self, booleans):
+        return convert_BooleanList_to_LongLongList(booleans)

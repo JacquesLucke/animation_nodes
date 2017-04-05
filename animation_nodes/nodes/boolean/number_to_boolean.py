@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... base_types import VectorizedNode
-from ... data_structures cimport DoubleList, BooleanList
+from . list_utils import convert_DoubleList_to_BooleanList
 
 class NumberToBooleanNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_NumberToBooleanNode"
@@ -22,9 +22,5 @@ class NumberToBooleanNode(bpy.types.Node, VectorizedNode):
         else:
             return "boolean = bool(number)"
 
-    def convertToBooleanList(self, DoubleList inList):
-        cdef BooleanList outList = BooleanList(length = inList.length)
-        cdef long i
-        for i in range(len(inList)):
-            outList.data[i] = inList.data[i] != 0
-        return outList
+    def convertToBooleanList(self, inList):
+        return convert_DoubleList_to_BooleanList(inList)
