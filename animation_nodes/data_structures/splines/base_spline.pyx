@@ -79,7 +79,7 @@ cdef class Spline:
 
         return toPyVector3(&nearestProjection), toPyVector3(&nearestTangent)
 
-    cdef project_LowLevel(self, Vector3* point):
+    cdef float project_LowLevel(self, Vector3* point):
         raise NotImplementedError()
 
     cpdef bint isEvaluable(self):

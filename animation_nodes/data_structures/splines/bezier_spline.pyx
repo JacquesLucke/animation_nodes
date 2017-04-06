@@ -52,7 +52,7 @@ cdef class BezierSpline(Spline):
         self.rightHandles.transform(matrix)
         self.markChanged()
 
-    cdef project_LowLevel(self, Vector3* _point):
+    cdef float project_LowLevel(self, Vector3* _point):
         # TODO: Speedup using cython
         # slowest part here is the root finding using numpy
         # maybe implement another numerical method to find the best parameter

@@ -21,7 +21,7 @@ cdef class Spline:
 
     cpdef project(self, point)
     cpdef projectExtended(self, point)
-    cdef project_LowLevel(self, Vector3* point)
+    cdef float project_LowLevel(self, Vector3* point)
 
     cpdef getTrimmedCopy(self, float start = ?, float end = ?)
     cdef Spline getTrimmedCopy_LowLevel(self, float start, float end)

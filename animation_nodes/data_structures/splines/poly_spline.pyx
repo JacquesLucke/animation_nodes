@@ -41,7 +41,7 @@ cdef class PolySpline(Spline):
         return length
 
     @cython.cdivision(True)
-    cdef project_LowLevel(self, Vector3* point):
+    cdef float project_LowLevel(self, Vector3* point):
         cdef:
             float closestParameter = 0
             float smallestDistance = 1e9
