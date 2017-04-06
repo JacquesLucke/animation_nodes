@@ -1,22 +1,38 @@
 import bpy
-from ... base_types import AnimationNode
+from ... base_types import VectorizedNode
 
-class FindNearestSurfacePointNode(bpy.types.Node, AnimationNode):
+class FindNearestSurfacePointNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_FindNearestSurfacePointNode"
     bl_label = "Find Nearest Surface Point"
     bl_width_default = 165
+    autoVectorizeExecution = True
+
+    useVectorList = VectorizedNode.newVectorizeProperty()
 
     def create(self):
         self.newInput("BVHTree", "BVHTree", "bvhTree")
-        self.newInput("Vector", "Vector", "vector", defaultDrawType = "PROPERTY_ONLY")
+
+        self.newVectorizedInput("Vector", "useVectorList",
+            ("Vector", "vector"), ("Vectors", "vectors"))
+
         self.newInput("Float", "Max Distance", "maxDistance",
                       minValue = 0, value = 1e6, hide = True)
 
-        self.newOutput("Vector", "Location", "location")
-        self.newOutput("Vector", "Normal", "normal")
-        self.newOutput("Float", "Distance", "distance")
-        self.newOutput("Integer", "Polygon Index", "polygonIndex").hide = True
-        self.newOutput("Boolean", "Hit", "hit")
+        self.newVectorizedOutput("Vector", "useVectorList",
+            ("Location", "location"), ("Locations", "locations"))
+
+        self.newVectorizedOutput("Vector", "useVectorList",
+            ("Normal", "normal"), ("Normals", "normals"))
+
+        self.newVectorizedOutput("Float", "useVectorList",
+            ("Distance", "distance"), ("Distances", "distances"))
+
+        self.newVectorizedOutput("Integer", "useVectorList",
+            ("Polygon Index", "polygonIndex", dict(hide = True)),
+            ("Polygon Indices", "polygonIndices", dict(hide = True)))
+
+        self.newVectorizedOutput("Boolean", "useVectorList",
+            ("Hit", "hit"), ("Hits", "hits"))
 
     def getExecutionCode(self):
         yield "location, normal, polygonIndex, distance = bvhTree.find_nearest(vector, maxDistance)"
