@@ -130,4 +130,4 @@ class an_ObjectTransformsOutputNode(bpy.types.Node, VectorizedNode):
 
     @property
     def scalePath(self):
-        return "delta_Scale" if self.deltaTransforms else "scale"
+        return "delta_scale" if self.deltaTransforms else "scale"
