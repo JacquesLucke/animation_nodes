@@ -4,15 +4,12 @@ from . vector cimport (subVec3, scaleVec3_Inplace, lengthVec3, dotVec3,
 
 @cython.cdivision(True)
 cdef float findNearestLineParameter(Vector3* lineStart, Vector3* lineDirection, Vector3* point):
-    cdef float directionLength = lengthVec3(lineDirection)
-    if directionLength == 0: return 0.0
-
-    cdef Vector3 normalizedLineDirection = lineDirection[0]
-    scaleVec3_Inplace(&normalizedLineDirection, 1 / directionLength)
-
-    cdef Vector3 pointDifference
-    subVec3(&pointDifference, point, lineStart)
-    return dotVec3(&normalizedLineDirection, &pointDifference) / directionLength
+    cdef float a = (lineDirection.x * (point.x - lineStart.x)
+                  + lineDirection.y * (point.y - lineStart.y)
+                  + lineDirection.z * (point.z - lineStart.z))
+    cdef float b = dotVec3(lineDirection, lineDirection)
+    if b == 0: return 0.0
+    return a / b
 
 cdef double distancePointToPlane(Vector3* planePoint, Vector3* planeNormal, Vector3* point):
     cdef Vector3 normPlaneNormal = planeNormal[0]
