@@ -34,23 +34,24 @@ def drawPanel(self, context):
 
     prefs = getMeshIndicesSettings()
 
-    col = self.layout.column()
+    col = self.layout.column(align = True)
+    col.label("Show Mesh Indices:")
 
-    row = col.row()
-    row.prop(prefs, "drawVertices", text = "Vertex Indices")
-    subRow = row.row()
+    row = col.row(align = True)
+    row.prop(prefs, "drawVertices", text = "Vertices", icon = "VERTEXSEL")
+    subRow = row.row(align = True)
     subRow.active = prefs.drawVertices
     subRow.prop(prefs, "verticesColor", text = "")
 
-    row = col.row()
-    row.prop(prefs, "drawEdges", text = "Edge Indices")
-    subRow = row.row()
+    row = col.row(align = True)
+    row.prop(prefs, "drawEdges", text = "Edges", icon = "EDGESEL")
+    subRow = row.row(align = True)
     subRow.active = prefs.drawEdges
     subRow.prop(prefs, "edgesColor", text = "")
 
-    row = col.row()
-    row.prop(prefs, "drawPolygons", text = "Polygons Indices")
-    subRow = row.row()
+    row = col.row(align = True)
+    row.prop(prefs, "drawPolygons", text = "Polygons", icon = "FACESEL")
+    subRow = row.row(align = True)
     subRow.active = prefs.drawPolygons
     subRow.prop(prefs, "polygonsColor", text = "")
 

@@ -113,10 +113,22 @@ class ExecutionCodeProperties(bpy.types.PropertyGroup):
 
 class DrawMeshIndicesProperties(bpy.types.PropertyGroup):
     bl_idname = "an_DrawMeshIndicesProperties"
+    _drawVertices = _drawEdges = _drawPolygons = False
 
-    drawVertices = BoolProperty(name = "Draw Vertices", default = False)
-    drawEdges = BoolProperty(name = "Draw Edges", default = False)
-    drawPolygons = BoolProperty(name = "Draw Polygons", default = False)
+    def setClassAttr(self, attribute, value):
+        from . utils.blender_ui import redrawAreaType
+        setattr(type(self), attribute, value)
+        redrawAreaType("VIEW_3D")
+
+    drawVertices = BoolProperty(name = "Draw Vertices",
+        get = lambda self: self._drawVertices,
+        set = lambda self, value: self.setClassAttr("_drawVertices", value))
+    drawEdges = BoolProperty(name = "Draw Edges",
+        get = lambda self: self._drawEdges,
+        set = lambda self, value: self.setClassAttr("_drawEdges", value))
+    drawPolygons = BoolProperty(name = "Draw Polygons",
+        get = lambda self: self._drawPolygons,
+        set = lambda self, value: self.setClassAttr("_drawPolygons", value))
 
     fontSize = IntProperty(name = "Font Size", default = 14,
         soft_min = 5, soft_max = 40, min = 0)
