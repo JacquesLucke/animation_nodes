@@ -15,6 +15,9 @@ class RandomVectorNode(bpy.types.Node, AnimationNode):
         description = "Create a list of random vectors",
         update = AnimationNode.refresh)
 
+    normalizedVector = BoolProperty(name = "Normalized Vector", default = False,
+        update = AnimationNode.refresh)
+
     def setup(self):
         self.randomizeNodeSeed()
 
@@ -34,14 +37,21 @@ class RandomVectorNode(bpy.types.Node, AnimationNode):
         row.prop(self, "nodeSeed", text = "Node Seed")
         row.prop(self, "createList", text = "", icon = "LINENUMBERS_ON")
 
+    def drawAdvanced(self, layout):
+        layout.prop(self, "normalizedVector")
+
     def getExecutionCode(self):
         if self.createList:
             yield "randomVectors = self.calcRandomVectors(seed, count, scale)"
         else:
-            yield "randomVector = Vector(algorithms.random.randomNumberTuple(seed + 34223 * self.nodeSeed, 3, scale))"
+            yield "_seed = seed + 25642 * self.nodeSeed"
+            if self.normalizedVector:
+                yield "randomVector = algorithms.random.getRandomNormalized3DVector(_seed, scale)"
+            else:
+                yield "randomVector = algorithms.random.getRandom3DVector(_seed, scale)"
 
     def calcRandomVectors(self, seed, count, scale):
-        return generateRandomVectors(seed + self.nodeSeed * 234144, count, scale)
+        return generateRandomVectors(seed + self.nodeSeed * 234144, count, scale, self.normalizedVector)
 
     def duplicate(self, sourceNode):
         self.randomizeNodeSeed()

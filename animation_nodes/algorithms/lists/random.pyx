@@ -1,27 +1,40 @@
 from libc.limits cimport INT_MAX
-from ... math cimport Euler3
-from .. random cimport uniformRandomNumber
-from ... data_structures cimport EulerList, Vector3DList
+from libc.math cimport M_PI as PI
+from libc.math cimport sqrt
 
-def generateRandomVectors(seed, count, double scale):
+from ... math cimport Euler3
+from ... data_structures cimport EulerList, Vector3DList
+from .. random cimport uniformRandomNumber, randomNormalized3DVector
+
+def generateRandomVectors(seed, count, double scale, bint normalized = False):
     cdef:
         int length = min(max(count, 0), INT_MAX)
         int startSeed = (seed * 763645) % INT_MAX
         Vector3DList newList = Vector3DList(length = length)
-        float* _data = <float*>newList.data
-        int i
 
-    for i in range(length * 3):
+    if normalized:
+        insertRandomVectors_Normalized(startSeed, newList, scale)
+    else:
+        insertRandomVectors_Simple(startSeed, newList, scale)
+    return newList
+
+cdef insertRandomVectors_Simple(int startSeed, Vector3DList vectors, double scale):
+    cdef Py_ssize_t i
+    cdef float *_data = <float*>vectors.data
+    for i in range(len(vectors) * 3):
         _data[i] = uniformRandomNumber(startSeed + i, -scale, scale)
 
-    return newList
+cdef insertRandomVectors_Normalized(int startSeed, Vector3DList vectors, float scale):
+    cdef Py_ssize_t i
+    for i in range(len(vectors)):
+        randomNormalized3DVector(startSeed + i, <float*>(vectors.data + i), scale)
 
 def generateRandomEulers(seed, count, double scale):
     cdef:
         int length = min(max(count, 0), INT_MAX)
         int startSeed = (seed * 876521) % INT_MAX
         EulerList newList = EulerList(length = length)
-        Euler3* _data = <Euler3*>newList.data
+        Euler3 *_data = <Euler3*>newList.data
         int i, seedOffset
 
     for i in range(length):
