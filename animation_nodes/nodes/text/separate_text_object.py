@@ -3,8 +3,8 @@ import random
 from bpy.props import *
 from mathutils import Vector, Matrix
 from ... base_types import AnimationNode
-from ... utils.blender_ui import executeInAreaType
 from ... nodes.container_provider import getMainObjectContainer
+from ... utils.blender_ui import executeInAreaType, iterActiveSpacesByType
 
 idPropertyName = "text separation node id"
 indexPropertyName = "text separation node index"
@@ -60,6 +60,10 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
 
     def drawAdvanced(self, layout):
         layout.prop(self, "parentLetters")
+
+        self.invokeFunction(layout, "hideRelationshipLines",
+            text = "Hide Relationship Lines",
+            icon = "RESTRICT_VIEW_OFF")
 
     def assignActiveObject(self):
         self.sourceObjectName = getattr(bpy.context.active_object, "name", "")
@@ -130,6 +134,10 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
         source = bpy.data.objects.get(self.sourceObjectName)
         if getattr(source, "type", "") == "FONT": return source
         return None
+
+    def hideRelationshipLines(self):
+        for space in iterActiveSpacesByType("VIEW_3D"):
+            space.show_relationship_lines = False
 
     def duplicate(self, sourceNode):
         self.createNewNodeID()
