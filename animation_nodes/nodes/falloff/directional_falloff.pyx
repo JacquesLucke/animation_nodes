@@ -33,7 +33,7 @@ class DirectionalFalloffNode(bpy.types.Node, AnimationNode):
         elif self.falloffRight:
             return UniDirectionalFalloff(position, direction, size)
         else:
-            return ConstantFalloff(1)
+            return ConstantFalloff(0)
 
 
 cdef class DirectionalFalloff(BaseFalloff):

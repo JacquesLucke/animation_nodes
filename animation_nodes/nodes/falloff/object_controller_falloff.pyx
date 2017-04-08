@@ -78,7 +78,7 @@ class ObjectControllerFalloffNode(bpy.types.Node, VectorizedNode):
             if object is not None:
                 falloffs.append(self.getSphereFalloff(object, offset, falloffWidth))
         if len(falloffs) == 0:
-            return ConstantFalloff(1)
+            return ConstantFalloff(0)
         else:
             return self.applyMixInterpolationAndInvert(falloffs, interpolation, invert)
 
@@ -88,7 +88,7 @@ class ObjectControllerFalloffNode(bpy.types.Node, VectorizedNode):
 
     def getSphereFalloff(self, object, offset, falloffWidth):
         if object is None:
-            return ConstantFalloff(1)
+            return ConstantFalloff(0)
 
         matrix = object.matrix_world
         center = matrix.to_translation()
@@ -101,7 +101,7 @@ class ObjectControllerFalloffNode(bpy.types.Node, VectorizedNode):
             if object is not None:
                 falloffs.append(self.getDirectionalFalloff(object))
         if len(falloffs) == 0:
-            return ConstantFalloff(1)
+            return ConstantFalloff(0)
         else:
             return self.applyMixInterpolationAndInvert(falloffs, interpolation, invert)
 
@@ -111,7 +111,7 @@ class ObjectControllerFalloffNode(bpy.types.Node, VectorizedNode):
 
     def getDirectionalFalloff(self, object):
         if object is None:
-            return ConstantFalloff(1)
+            return ConstantFalloff(0)
 
         matrix = object.matrix_world
         location = matrix.to_translation()

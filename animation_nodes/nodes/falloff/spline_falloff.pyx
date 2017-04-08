@@ -30,7 +30,7 @@ class SplineFalloffNode(bpy.types.Node, AnimationNode):
 
     def execute(self, spline, distance, width, interpolation):
         if not spline.isEvaluable():
-            return ConstantFalloff(1)
+            return ConstantFalloff(0)
 
         if spline.type == "POLY":
             falloffSpline = spline
