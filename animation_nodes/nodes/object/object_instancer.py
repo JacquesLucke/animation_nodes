@@ -103,8 +103,9 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
             description = "This will make sure that the objects won't be removed if you remove the Instancer Node.")
 
         layout.separator()
-        self.invokeFunction(layout, "hideRelationshipLines", text = "Hide Relationship Lines", icon = "RESTRICT_VIEW_OFF")
-
+        self.invokeFunction(layout, "hideRelationshipLines",
+            text = "Hide Relationship Lines",
+            icon = "RESTRICT_VIEW_OFF")
 
     def getExecutionCode(self):
         # support for older nodes which didn't have a scene list input
