@@ -1,7 +1,8 @@
 from ... data_structures cimport (Vector3DList, EulerList, Matrix4x4List,
                                   CDefaultList, FloatList, DoubleList)
 
-from ... math cimport (Vector3, Euler3, Matrix4,
+from ... math cimport (Vector3, Euler3, Matrix4, toMatrix4,
+                       multMatrix4,
                        setTranslationRotationScaleMatrix,
                        setRotationXMatrix, setRotationYMatrix, setRotationZMatrix,
                        setRotationMatrix)
@@ -77,3 +78,48 @@ def createRotationsFromEulers(EulerList rotations):
     for i in range(len(matrices)):
         setRotationMatrix(matrices.data + i, rotations.data + i)
     return matrices
+
+
+# Replicate Matrix
+###############################################
+
+def replicateMatrixAtMatrices(matrix, Matrix4x4List transformations):
+    cdef Matrix4 _matrix = toMatrix4(matrix)
+    cdef Matrix4x4List result = Matrix4x4List(length = len(transformations))
+    cdef Py_ssize_t i
+    for i in range(len(result)):
+        multMatrix4(result.data + i, transformations.data + i, &_matrix)
+    return result
+
+def replicateMatrixAtVectors(matrix, Vector3DList translations):
+    cdef Matrix4 _matrix = toMatrix4(matrix)
+    cdef Matrix4x4List result = Matrix4x4List(length = len(translations))
+    cdef Py_ssize_t i
+    for i in range(len(result)):
+        result.data[i] = _matrix
+        result.data[i].a14 += translations.data[i].x
+        result.data[i].a24 += translations.data[i].y
+        result.data[i].a34 += translations.data[i].z
+    return result
+
+def replicateMatricesAtMatrices(Matrix4x4List matrices, Matrix4x4List transformations):
+    cdef Matrix4x4List result = Matrix4x4List(length = len(matrices) * len(transformations))
+    cdef Py_ssize_t i, j
+    for i in range(len(transformations)):
+        for j in range(matrices.length):
+            multMatrix4(result.data + i * matrices.length + j,
+                        transformations.data + i,
+                        matrices.data + j)
+    return result
+
+def replicateMatricesAtVectors(Matrix4x4List matrices, Vector3DList translations):
+    cdef Matrix4x4List result = Matrix4x4List(length = len(matrices) * len(translations))
+    cdef Py_ssize_t i, j, index
+    for i in range(len(translations)):
+        for j in range(matrices.length):
+            index = i * matrices.length + j
+            result.data[index] = matrices.data[j]
+            result.data[index].a14 += translations.data[i].x
+            result.data[index].a24 += translations.data[i].y
+            result.data[index].a34 += translations.data[i].z
+    return result
