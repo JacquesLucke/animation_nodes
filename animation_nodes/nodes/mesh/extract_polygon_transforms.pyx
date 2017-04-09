@@ -3,7 +3,10 @@ cimport cython
 from bpy.props import *
 from ... base_types import AnimationNode
 from ... data_structures cimport Vector3DList, PolygonIndicesList, Matrix4x4List
-from ... math cimport Vector3, Matrix4, scaleVec3, subVec3, crossVec3, normalizeVec3_InPlace
+from ... math cimport (
+    Vector3, Matrix4, scaleVec3, subVec3, crossVec3,
+    normalizeVec3_InPlace, scaleVec3_Inplace
+)
 
 class ExtractPolygonTransformsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ExtractPolygonTransformsNode"
@@ -54,6 +57,7 @@ def extractPolygonTransforms(Vector3DList vertices, PolygonIndicesList polygons,
         normalizeVec3_InPlace(&normal)
         normalizeVec3_InPlace(&tangent)
         crossVec3(&bitangent, &tangent, &normal)
+        scaleVec3_Inplace(&bitangent, -1)
 
         if calcNormal:
             createMatrix(transforms.data + i, &center, &normal, &tangent, &bitangent)
@@ -75,7 +79,7 @@ cdef void extractPolygonData(Vector3 *vertices,
     cdef Py_ssize_t i
     cdef Vector3 *current
     cdef Vector3 sum = {"x" : 0, "y" : 0, "z" : 0}
-    
+
     for i in range(vertexAmount):
         current = vertices + indices[i]
         sum.x += current.x
