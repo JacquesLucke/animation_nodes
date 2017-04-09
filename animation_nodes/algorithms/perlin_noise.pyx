@@ -1,5 +1,6 @@
-from . random cimport randomNumber
 from libc.limits cimport INT_MAX
+from . random cimport randomNumber
+from .. data_structures cimport Vector3DList
 
 # http://freespace.virgin.net/hugo.elias/models/m_perlin.htm
 
@@ -13,6 +14,16 @@ def perlinNoiseVectorForNodes(seed, nodeSeed, double evolution, double speed, am
 def perlinNoiseForNodes(seed, nodeSeed, double evolution, double speed, double amplitude, octaves, double persistance):
     cdef double finalX = evolution * max(speed, 0) / 20 + seed * 545621 + nodeSeed * 3424536
     return perlinNoise1D(finalX, persistance, octaves % 0x7fffffff) * amplitude
+
+def wiggleVectorList(amount, double evolution, amplitude, int octaves, double persistance):
+    cdef Vector3DList result = Vector3DList(length = amount)
+    cdef float *values = <float*>result.data
+    cdef float _amplitude[3]
+    cdef Py_ssize_t i
+    _amplitude[0], _amplitude[1], _amplitude[2] = amplitude[0], amplitude[1], amplitude[2]
+    for i in range(amount * 3):
+        values[i] = perlinNoise1D(evolution + i * 354623, persistance, octaves) * _amplitude[i % 3]
+    return result
 
 cpdef double perlinNoise1D(double x, double persistance, int octaves):
     cdef:

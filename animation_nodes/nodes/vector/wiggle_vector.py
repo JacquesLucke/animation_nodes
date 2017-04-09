@@ -10,23 +10,39 @@ class VectorWiggleNode(bpy.types.Node, AnimationNode):
 
     nodeSeed = IntProperty(update = propertyChanged)
 
+    createList = BoolProperty(name = "Create List", default = False,
+        update = AnimationNode.refresh)
+
     def setup(self):
         self.randomizeNodeSeed()
 
     def create(self):
-        self.newInput("Float", "Seed", "seed")
+        self.newInput("Integer", "Seed", "seed")
+        if self.createList:
+            self.newInput("Integer", "Count", "count", value = 5)
         self.newInput("Float", "Evolution", "evolution")
         self.newInput("Float", "Speed", "speed", value = 1, minValue = 0)
         self.newInput("Vector", "Amplitude", "amplitude", value = [5, 5, 5])
-        self.newInput("Integer", "Octaves", "octaves", value = 2)
-        self.newInput("Float", "Persistance", "persistance", value = 0.3)
-        self.newOutput("Vector", "Vector", "vector")
+        self.newInput("Integer", "Octaves", "octaves", value = 2, hide = True)
+        self.newInput("Float", "Persistance", "persistance", value = 0.3, hide = True)
+
+        if self.createList:
+            self.newOutput("Vector List", "Vectors", "vectors")
+        else:
+            self.newOutput("Vector", "Vector", "vector")
 
     def draw(self, layout):
-        layout.prop(self, "nodeSeed", text = "Node Seed")
+        row = layout.row(align = True)
+        row.prop(self, "nodeSeed", text = "Node Seed")
+        row.prop(self, "createList", text = "", icon = "LINENUMBERS_ON")
 
     def getExecutionCode(self):
-        yield "vector = Vector(algorithms.perlin_noise.perlinNoiseVectorForNodes(seed, self.nodeSeed, evolution, speed, amplitude, octaves, persistance))"
+        if self.createList:
+            yield "_seed = seed * 23452 + self.nodeSeed * 643523"
+            yield "vectors = algorithms.perlin_noise.wiggleVectorList(count, _seed + evolution * speed / 20, amplitude, octaves, persistance)"
+        else:
+            yield ("vector = Vector(algorithms.perlin_noise.perlinNoiseVectorForNodes("
+                   "seed, self.nodeSeed, evolution, speed, amplitude, octaves, persistance))")
 
     def duplicate(self, sourceNode):
         self.randomizeNodeSeed()
