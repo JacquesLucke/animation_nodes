@@ -31,7 +31,7 @@ class PreparePolygonTransformationNode(bpy.types.Node, AnimationNode):
             return Matrix4x4List(), Vector3DList(), PolygonIndicesList()
 
         newVertices, newPolygons = separatePolygons(oldVertices, oldPolygonIndices)
-        transforms, invertedTransforms = extractPolygonTransforms(newVertices, newPolygons)
+        transforms, invertedTransforms = extractPolygonTransforms(newVertices, newPolygons, calcInverted = True)
         transformPolygons(newVertices, newPolygons, invertedTransforms)
 
         return newVertices, newPolygons, transforms
