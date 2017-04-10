@@ -2,6 +2,7 @@ import bpy
 from bpy.props import *
 from ... events import propertyChanged
 from ... base_types import VectorizedNode
+from ... utils.handlers import validCallback
 from .. falloff.invert_falloff import InvertFalloff
 
 from ... algorithms.matrices.translation cimport translateMatrixList
@@ -52,12 +53,17 @@ class OffsetMatricesNode(bpy.types.Node, VectorizedNode):
         description = "Specify wether the given matrices are the start or end state",
         items = specifiedStateItems, update = propertyChanged)
 
+    @validCallback
+    def checkedPropertiesChanged(self, context):
+        self.updateSocketVisibility()
+        propertyChanged()
+
     useTranslation = BoolProperty(name = "Use Translation", default = False,
-        update = VectorizedNode.refresh)
+        update = checkedPropertiesChanged)
     useRotation = BoolProperty(name = "Use Rotation", default = False,
-        update = VectorizedNode.refresh)
+        update = checkedPropertiesChanged)
     useScale = BoolProperty(name = "Use Scale", default = False,
-        update = VectorizedNode.refresh)
+        update = checkedPropertiesChanged)
 
     useTranslationList = VectorizedNode.newVectorizeProperty()
     useRotationList = VectorizedNode.newVectorizeProperty()
@@ -76,22 +82,26 @@ class OffsetMatricesNode(bpy.types.Node, VectorizedNode):
         self.newInput("Matrix List", "Matrices", "inMatrices", dataIsModified = self.modifiesOriginalList)
         self.newInput("Falloff", "Falloff", "falloff")
 
-        if self.useTranslation:
-            self.newVectorizedInput("Vector", "useTranslationList",
-                ("Translation", "translation"),
-                ("Translations", "translations"))
+        self.newVectorizedInput("Vector", "useTranslationList",
+            ("Translation", "translation"),
+            ("Translations", "translations"))
 
-        if self.useRotation:
-            self.newVectorizedInput("Euler", "useRotationList",
-                ("Rotation", "rotation"),
-                ("Rotations", "rotations"))
+        self.newVectorizedInput("Euler", "useRotationList",
+            ("Rotation", "rotation"),
+            ("Rotations", "rotations"))
 
-        if self.useScale:
-            self.newVectorizedInput("Vector", "useScaleList",
-                ("Scale", "scale", dict(value = (1, 1, 1))),
-                ("Scales", "scales"))
+        self.newVectorizedInput("Vector", "useScaleList",
+            ("Scale", "scale", dict(value = (1, 1, 1))),
+            ("Scales", "scales"))
 
         self.newOutput("Matrix List", "Matrices", "outMatrices")
+
+        self.updateSocketVisibility()
+
+    def updateSocketVisibility(self):
+        self.inputs[2].hide = not self.useTranslation
+        self.inputs[3].hide = not self.useRotation
+        self.inputs[4].hide = not self.useScale
 
     def draw(self, layout):
         col = layout.column()
@@ -116,21 +126,22 @@ class OffsetMatricesNode(bpy.types.Node, VectorizedNode):
             layout.label("May result in invalid object matrices", icon = "INFO")
 
 
-    def execute(self, Matrix4x4List matrices, Falloff falloff, *args):
+    def execute(self, Matrix4x4List matrices, Falloff falloff, translation, rotation, scale):
         self.errorMessage = ""
-        if len(args) == 0:
-            return matrices
 
         cdef DoubleList influences = self.evaluateFalloff(matrices, falloff)
         if influences is None:
             return matrices
 
         if self.useScale:
-            scaleMatrixList(matrices, self.scaleMode, self.getScales(args), influences)
+            scales = CDefaultList(Vector3DList, scale, (1, 1, 1))
+            scaleMatrixList(matrices, self.scaleMode, scales, influences)
         if self.useRotation:
-            matrices = getRotatedMatrixList(matrices, self.rotationMode, self.getRotations(args), influences)
+            rotations = CDefaultList(EulerList, rotation, (0, 0, 0))
+            matrices = getRotatedMatrixList(matrices, self.rotationMode, rotations, influences)
         if self.useTranslation:
-            translateMatrixList(matrices, self.translationMode, self.getTranslations(args), influences)
+            translations = CDefaultList(Vector3DList, translation, (0, 0, 0))
+            translateMatrixList(matrices, self.translationMode, translations, influences)
 
         return matrices
 
@@ -150,24 +161,6 @@ class OffsetMatricesNode(bpy.types.Node, VectorizedNode):
         for i in range(len(influences)):
             influences.data[i] = evaluator.evaluate(matrices.data + i, i)
         return influences
-
-    def getTranslations(self, args):
-        if self.useTranslation:
-            return CDefaultList(Vector3DList, args[0], (0, 0, 0))
-        return None
-
-    def getRotations(self, args):
-        if self.useRotation:
-            if self.useTranslation:
-                return CDefaultList(EulerList, args[1], (0, 0, 0))
-            else:
-                return CDefaultList(EulerList, args[0], (0, 0, 0))
-        return None
-
-    def getScales(self, args):
-        if self.useScale:
-            return CDefaultList(Vector3DList, args[-1], (1, 1, 1))
-        return None
 
     @property
     def modifiesOriginalList(self):
