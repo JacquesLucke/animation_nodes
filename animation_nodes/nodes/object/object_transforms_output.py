@@ -75,9 +75,9 @@ class an_ObjectTransformsOutputNode(bpy.types.Node, VectorizedNode):
         layout.prop(self, "deltaTransforms")
 
     def updateSocketVisibility(self):
-        self.inputs[1].hide = not (self.useLocation[0] or self.useLocation[1] or self.useLocation[2])
-        self.inputs[2].hide = not (self.useRotation[0] or self.useRotation[1] or self.useRotation[2])
-        self.inputs[3].hide = not (self.useScale[0] or self.useScale[1] or self.useScale[2])
+        self.inputs[1].hide = not any(self.useLocation)
+        self.inputs[2].hide = not any(self.useRotation)
+        self.inputs[3].hide = not any(self.useScale)
 
     def getExecutionCode(self):
         useLoc = self.useLocation
