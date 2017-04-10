@@ -45,7 +45,8 @@ def findIDKeysInCurrentFile():
 IDKey = namedtuple("IDKey", ["type", "name"])
 
 defaultIDKeys = [
-    IDKey("Transforms", "Initial Transforms")
+    IDKey("Transforms", "Initial Transforms"),
+    IDKey("Integer", "Index")
 ]
 
 findIDKeysFunctions = []
