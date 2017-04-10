@@ -27,7 +27,7 @@ class FillListNode(bpy.types.Node, AnimationNode):
 
         self.newInput(listDataType, "List", "inList", dataIsModified = True)
         self.newInput(baseDataType, "Element", "fillElement")
-        self.newInput("an_IntegerSocket", "Length", "length")
+        self.newInput("Integer", "Length", "length", minValue = 0)
         self.newOutput(listDataType, "List", "outList")
 
         self.newSocketEffect(AutoSelectListDataType("assignedType", "BASE",
