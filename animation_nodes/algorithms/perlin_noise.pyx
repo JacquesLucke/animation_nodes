@@ -1,3 +1,4 @@
+cimport cython
 from libc.limits cimport INT_MAX
 from . random cimport randomNumber
 from .. data_structures cimport Vector3DList
@@ -28,28 +29,29 @@ def wiggleVectorList(amount, double evolution, amplitude, int octaves, double pe
 cpdef double perlinNoise1D(double x, double persistance, int octaves):
     cdef:
         double total = 0
-        double frequency
-        double amplitude
+        double frequency = 1
+        double amplitude = 1
         int i
 
     for i in range(octaves):
-        frequency = 2**i
-        amplitude = persistance**i
         total += interpolatedNoise(x * frequency) * amplitude
+        frequency *= 2
+        amplitude *= persistance
 
     return total
 
+@cython.cdivision(True)
 cdef double interpolatedNoise(double x):
     x = x % INT_MAX
     cdef:
-        int intX = int(x)
+        int intX = <int>x
         double fracX = x - intX
-        double v0 = randomNumber(intX - 2)
-        double v1 = randomNumber(intX - 1)
-        double v2 = randomNumber(intX)
-        double v3 = randomNumber(intX + 1)
-        double v4 = randomNumber(intX + 2)
-        double v5 = randomNumber(intX + 3)
+        double v0 = _randomNumber(intX - 2)
+        double v1 = _randomNumber(intX - 1)
+        double v2 = _randomNumber(intX)
+        double v3 = _randomNumber(intX + 1)
+        double v4 = _randomNumber(intX + 2)
+        double v5 = _randomNumber(intX + 3)
 
     return cubicInterpolation(
             v0 / 4.0 + v1 / 2.0 + v2 / 4.0,
@@ -58,10 +60,16 @@ cdef double interpolatedNoise(double x):
             v3 / 4.0 + v4 / 2.0 + v5 / 4.0,
             fracX)
 
-cdef double cubicInterpolation(double v0, double v1, double v2, double v3, double x):
-    cdef double p, q, r, s
+cdef inline double cubicInterpolation(double v0, double v1, double v2, double v3, double x):
+    cdef double p, q, r, s, x2
     p = (v3 - v2) - (v0 - v1)
     q = (v0 - v1) - p
     r = v2 - v0
     s = v1
-    return p * x**3 + q * x**2 + r * x + s
+    x2 = x * x
+    return p * x2 * x + q * x2 + r * x + s
+
+cdef inline double _randomNumber(int x):
+    '''Generate a random number between -1 and 1 using a seed'''
+    x = (x<<13) ^ x
+    return 1.0 - ((x * (x * x * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0
