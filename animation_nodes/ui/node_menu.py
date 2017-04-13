@@ -181,6 +181,7 @@ class TextMenu(bpy.types.Menu):
         insertNode(layout, "an_JoinTextsNode", "Join")
         insertNode(layout, "an_TrimTextNode", "Trim")
         layout.separator()
+        insertNode(layout, "an_ReverseTextNode", "Reverse")
         insertNode(layout, "an_ReplaceTextNode", "Replace")
         insertNode(layout, "an_RepeatTextNode", "Repeat")
         insertNode(layout, "an_TextLengthNode", "Length")
