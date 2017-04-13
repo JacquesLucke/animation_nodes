@@ -20,7 +20,8 @@ class DataInputNode(bpy.types.Node, AnimationNode):
         description = "Draw the input of that node in the 'AN' category of the 3D view (Use the node label as name)")
 
     def create(self):
-        socket = self.newInput(self.assignedType, "Input", "value", dataIsModified = True)
+        socket = self.newInput(self.assignedType, "Input", "value",
+            dataIsModified = True, hide = True)
         self.setupSocket(socket)
         socket = self.newOutput(self.assignedType, "Output", "value")
         self.setupSocket(socket)
@@ -28,8 +29,15 @@ class DataInputNode(bpy.types.Node, AnimationNode):
     def setupSocket(self, socket):
         socket.display.text = True
         socket.text = self.assignedType
-        drawType = "TEXT_PROPERTY" if socket.dataType == "Boolean" else "PREFER_PROPERTY"
-        socket.defaultDrawType = drawType
+        socket.defaultDrawType = "PREFER_PROPERTY"
+
+    def draw(self, layout):
+        inputSocket = self.inputs[0]
+        if inputSocket.hide:
+            if hasattr(inputSocket, "drawProperty"):
+                inputSocket.drawProperty(layout, "", self)
+            else:
+                layout.label("Default Used", icon = "INFO")
 
     def drawLabel(self):
         return self.inputs[0].dataType + " Input"
