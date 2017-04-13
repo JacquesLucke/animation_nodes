@@ -149,7 +149,7 @@ searchItems = {
 class FloatMathNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_FloatMathNode"
     bl_label = "Float Math"
-    dynamicLabelType = "HIDDEN_ONLY"
+    dynamicLabelType = "ALWAYS"
     searchTags = [(name, {"operation" : repr(op)}) for name, op in searchItems.items()]
 
     operation = EnumProperty(name = "Operation", default = "Multiply",
@@ -183,7 +183,10 @@ class FloatMathNode(bpy.types.Node, VectorizedNode):
             layout.label(self.errorMessage, icon = "ERROR")
 
     def drawLabel(self):
-        return self._operation.label
+        if self.hide:
+            return self._operation.label
+        else:
+            return "Math"
 
     def getExecutionCode(self):
         if self.generatesList:
