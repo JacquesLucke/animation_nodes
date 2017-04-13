@@ -17,7 +17,7 @@ class SplitTextNode(bpy.types.Node, AnimationNode):
     bl_width_default = 190
 
     splitType = EnumProperty(
-        name = "Split Type", default = "REGULAR_EXPRESSION",
+        name = "Split Type", default = "LINES",
         items = splitTypeItems, update = AnimationNode.refresh)
 
     keepDelimiters = BoolProperty(default = False, update = propertyChanged)
