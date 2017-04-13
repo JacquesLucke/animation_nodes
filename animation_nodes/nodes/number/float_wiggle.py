@@ -18,7 +18,7 @@ class FloatWiggleNode(bpy.types.Node, AnimationNode):
         self.newInput("Float", "Evolution", "evolution")
         self.newInput("Float", "Speed", "speed", value = 1, minValue = 0)
         self.newInput("Float", "Amplitude", "amplitude", value = 1.0)
-        self.newInput("Integer", "Octaves", "octaves", value = 2)
+        self.newInput("Integer", "Octaves", "octaves", value = 2, minValue = 0)
         self.newInput("Float", "Persistance", "persistance", value = 0.3)
         self.newOutput("Float", "Number", "number")
 

@@ -23,8 +23,8 @@ class VectorWiggleNode(bpy.types.Node, AnimationNode):
         self.newInput("Float", "Evolution", "evolution")
         self.newInput("Float", "Speed", "speed", value = 1, minValue = 0)
         self.newInput("Vector", "Amplitude", "amplitude", value = [5, 5, 5])
-        self.newInput("Integer", "Octaves", "octaves", value = 2, hide = True)
-        self.newInput("Float", "Persistance", "persistance", value = 0.3, hide = True)
+        self.newInput("Integer", "Octaves", "octaves", value = 2, minValue = 0)
+        self.newInput("Float", "Persistance", "persistance", value = 0.3)
 
         if self.createList:
             self.newOutput("Vector List", "Vectors", "vectors")

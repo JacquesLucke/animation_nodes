@@ -33,7 +33,7 @@ cpdef double perlinNoise1D(double x, double persistance, int octaves):
         double amplitude = 1
         int i
 
-    for i in range(octaves):
+    for i in range(max(octaves, 0)):
         total += interpolatedNoise(x * frequency) * amplitude
         frequency *= 2
         amplitude *= persistance

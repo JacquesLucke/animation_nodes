@@ -14,7 +14,7 @@ class WiggleFalloffNode(bpy.types.Node, AnimationNode):
         self.newInput("Float", "Speed", "speed", value = 1, minValue = 0)
         self.newInput("Float", "Offset", "offset", value = 0.5)
         self.newInput("Float", "Amplitude", "amplitude", value = 0.5)
-        self.newInput("Integer", "Octaves", "octaves", value = 2)
+        self.newInput("Integer", "Octaves", "octaves", value = 2, minValue = 0)
         self.newInput("Float", "Persistance", "persistance", value = 0.3)
 
         self.newOutput("Falloff", "Falloff", "falloff")
