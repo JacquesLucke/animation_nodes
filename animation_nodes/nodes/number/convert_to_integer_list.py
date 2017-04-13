@@ -35,4 +35,4 @@ class ConvertToIntegerListNode(bpy.types.Node, AnimationNode):
             self.originType = dataType
 
     def getExecutionCode(self):
-        yield "integerList = LongLongList.fromValues(inList)"
+        yield "integerList = LongList.fromValues(inList)"

@@ -17,7 +17,7 @@ class FindNearestNPointsInKDTreeNode(bpy.types.Node, AnimationNode):
         yield "_amount = max(amount, 0)"
         yield "nearestVectors = Vector3DList(capacity = _amount)"
         yield "distances = DoubleList(capacity = _amount)"
-        yield "indices = LongLongList(capacity = _amount)"
+        yield "indices = LongList(capacity = _amount)"
         yield "for vector, index, distance in kdTree.find_n(searchVector, _amount):"
         yield "    nearestVectors.append(vector)"
         yield "    indices.append(index)"

@@ -6,7 +6,7 @@ def importDataStructures():
     from . lists.polygon_indices_list import PolygonIndicesList
     from . lists.base_lists import (
         Vector3DList, Matrix4x4List, EdgeIndicesList, EulerList, BooleanList,
-        FloatList, DoubleList, LongLongList, IntegerList, UShortList, CharList,
+        FloatList, DoubleList, LongList, IntegerList, UShortList, CharList,
         QuaternionList)
 
     from . splines.poly_spline import PolySpline

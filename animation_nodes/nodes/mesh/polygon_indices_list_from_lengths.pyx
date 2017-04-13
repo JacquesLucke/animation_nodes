@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... base_types import AnimationNode
-from ... data_structures cimport PolygonIndicesList, LongLongList
+from ... data_structures cimport PolygonIndicesList, LongList
 
 class PolygonIndicesListFromLengthsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_PolygonIndicesListFromLengthsNode"
@@ -17,7 +17,7 @@ class PolygonIndicesListFromLengthsNode(bpy.types.Node, AnimationNode):
         if self.errorMessage != "":
             layout.label(self.errorMessage, icon = "ERROR")
 
-    def execute(self, LongLongList polygonLengths):
+    def execute(self, LongList polygonLengths):
         self.errorMessage = ""
         cdef:
             cdef long i, polyLength, currentStart

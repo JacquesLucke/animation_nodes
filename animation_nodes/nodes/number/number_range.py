@@ -4,7 +4,7 @@ from ... base_types import AnimationNode
 from ... sockets.info import toListDataType
 
 from . list_utils import (
-    range_LongLongList_StartStep,
+    range_LongList_StartStep,
     range_DoubleList_StartStep,
     range_DoubleList_StartStop
 )
@@ -60,7 +60,7 @@ class NumberRangeNode(bpy.types.Node, AnimationNode):
                 return "execute_FloatRange_StartStop"
 
     def execute_IntegerRange(self, amount, start, step):
-        return range_LongLongList_StartStep(amount, start, step)
+        return range_LongList_StartStep(amount, start, step)
 
     def execute_FloatRange_StartStep(self, amount, start, step):
         return range_DoubleList_StartStep(amount, start, step)

@@ -1,6 +1,6 @@
 import bpy
 from ... base_types import VectorizedNode
-from . list_utils import convert_BooleanList_to_LongLongList
+from . list_utils import convert_BooleanList_to_LongList
 
 class BooleanToIntegerNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_BooleanToIntegerNode"
@@ -21,4 +21,4 @@ class BooleanToIntegerNode(bpy.types.Node, VectorizedNode):
             return "number = int(boolean)"
 
     def convertToNumberList(self, booleans):
-        return convert_BooleanList_to_LongLongList(booleans)
+        return convert_BooleanList_to_LongList(booleans)

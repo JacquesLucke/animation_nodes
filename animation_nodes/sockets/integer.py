@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from .. events import propertyChanged
-from .. data_structures import LongLongList
+from .. data_structures import LongList
 from .. base_types import AnimationNodeSocket, CListSocket
 
 def getValue(self):
@@ -68,9 +68,9 @@ class IntegerListSocket(bpy.types.NodeSocket, CListSocket):
     drawColor = (0.3, 0.4, 1.0, 0.5)
     storable = True
     comparable = False
-    listClass = LongLongList
+    listClass = LongList
 
     @classmethod
     def getConversionCode(cls, dataType):
         if dataType in cls.allowedInputTypes:
-            return "LongLongList.fromValues(value)"
+            return "LongList.fromValues(value)"

@@ -35,7 +35,7 @@ class SearchListElementNode(bpy.types.Node, AnimationNode):
         if not any(isLinked.values()): return
 
         if isLinked["allIndices"]:
-            yield "allIndices = LongLongList.fromValues(i for i, element in enumerate(list) if element == search)"
+            yield "allIndices = LongList.fromValues(i for i, element in enumerate(list) if element == search)"
             if isLinked["firstIndex"]:  yield "firstIndex = allIndices[0] if len(allIndices) > 0 else -1"
             if isLinked["occurrences"]: yield "occurrences = len(allIndices)"
         else:

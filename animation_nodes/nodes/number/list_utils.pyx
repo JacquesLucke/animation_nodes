@@ -1,6 +1,6 @@
 from ... data_structures cimport (
     DoubleList,
-    LongLongList,
+    LongList,
     Interpolation
 )
 
@@ -16,12 +16,12 @@ def clamp_DoubleList(DoubleList values, double minValue, double maxValue):
         elif values.data[i] > maxValue:
             values.data[i] = maxValue
 
-def range_LongLongList_StartStep(amount, start, step):
+def range_LongList_StartStep(amount, start, step):
     cdef long long _amount = clampLong(amount)
     cdef long long _start = clampLong(start)
     cdef long long _step = clampLong(step)
 
-    cdef LongLongList newList = LongLongList(length = max(_amount, 0))
+    cdef LongList newList = LongList(length = max(_amount, 0))
     cdef Py_ssize_t i
     for i in range(len(newList)):
         newList.data[i] = _start + i * _step

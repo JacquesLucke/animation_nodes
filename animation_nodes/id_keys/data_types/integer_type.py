@@ -3,7 +3,7 @@ import random
 from bpy.props import *
 from mathutils import Vector
 from . base import SingleIDKeyDataType
-from ... data_structures import LongLongList
+from ... data_structures import LongList
 from ... algorithms.lists import naturalSortKey
 from ... utils.blender_ui import getDpiFactor, redrawAll
 from ... utils.selection import getSortedSelectedObjects
@@ -16,7 +16,7 @@ class IntegerDataType(SingleIDKeyDataType):
     def getList(cls, objects, name):
         default = cls.default
         path = cls.getPath(name)
-        return LongLongList.fromValues(getattr(object, path, default) for object in objects)
+        return LongList.fromValues(getattr(object, path, default) for object in objects)
 
     @classmethod
     def drawExtras(cls, layout, object, name):
