@@ -2,6 +2,8 @@ import bpy
 from bpy.props import *
 from collections import OrderedDict
 from ... base_types import VectorizedNode
+from ... utils.handlers import validCallback
+
 from ... data_structures cimport DoubleList
 from ... math cimport min as minNumber
 from ... math cimport max as maxNumber
@@ -146,15 +148,23 @@ searchItems = {
     "Invert Number" : "Invert",
     "Reciprocal Number" : "Reciprocal"}
 
+justCopiedIdentifiers = set()
+
 class FloatMathNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_FloatMathNode"
     bl_label = "Float Math"
     dynamicLabelType = "ALWAYS"
     searchTags = [(name, {"operation" : repr(op)}) for name, op in searchItems.items()]
 
+    @validCallback
+    def operationChanged(self, context):
+        if self.identifier in justCopiedIdentifiers:
+            justCopiedIdentifiers.remove(self.identifier)
+        self.refresh()
+
     operation = EnumProperty(name = "Operation", default = "Multiply",
         description = "Operation to perform on the inputs",
-        items = operationItems, update = VectorizedNode.refresh)
+        items = operationItems, update = operationChanged)
 
     errorMessage = StringProperty()
 
@@ -178,15 +188,38 @@ class FloatMathNode(bpy.types.Node, VectorizedNode):
             ("Result", "result"), ("Results", "results"))
 
     def draw(self, layout):
-        layout.prop(self, "operation", text = "")
+        showQuickOptions = self.identifier in justCopiedIdentifiers
+
+        col = layout.column()
+        row = col.row(align = True)
+        row.prop(self, "operation", text = "")
+
+        if showQuickOptions:
+            self.invokeFunction(row, "setOperation", "", data = self.operation, icon = "FILE_TICK")
+
+            subcol = col.column(align = True)
+            row = subcol.row(align = True)
+            self.invokeFunction(row, "setOperation", "Add", data = "Add")
+            self.invokeFunction(row, "setOperation", "Sub", data = "Subtract")
+            row = subcol.row(align = True)
+            self.invokeFunction(row, "setOperation", "Mul", data = "Multiply")
+            self.invokeFunction(row, "setOperation", "Div", data = "Divide")
+
         if self.errorMessage != "":
             layout.label(self.errorMessage, icon = "ERROR")
+
+    def drawAdvanced(self, layout):
+        self.invokeFunction(layout, "removeQuickSettings", "Remove Quick Settings",
+            description = "Remove quick settings from all Float Math nodes.")
 
     def drawLabel(self):
         if self.hide:
             return self._operation.label
         else:
             return "Math"
+
+    def setOperation(self, operation):
+        self.operation = operation
 
     def getExecutionCode(self):
         if self.generatesList:
@@ -211,6 +244,13 @@ class FloatMathNode(bpy.types.Node, VectorizedNode):
 
     def getUsedModules(self):
         return ["math"]
+
+    def duplicate(self, sourceNode):
+        if len(bpy.context.selected_nodes) == 2: # this and source node
+            justCopiedIdentifiers.add(self.identifier)
+
+    def removeQuickSettings(self):
+        justCopiedIdentifiers.clear()
 
     @property
     def _operation(self):
