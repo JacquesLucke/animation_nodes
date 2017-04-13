@@ -16,7 +16,7 @@ class GroupInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     def setup(self):
         self.randomizeNetworkColor()
         self.subprogramName = "My Group"
-        socket = self.newOutput("an_NodeControlSocket", "New Parameter").margin = 0.15
+        self.newOutput("Node Control", "New Input", margin = 0.15)
 
     def draw(self, layout):
         layout.separator()
@@ -37,19 +37,19 @@ class GroupInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
 
     def drawControlSocket(self, layout, socket):
         left, right = splitAlignment(layout)
-        self.invokeSocketTypeChooser(left, "newParameter", icon = "ZOOMIN", emboss = False)
+        self.invokeSocketTypeChooser(left, "newGroupInput", icon = "ZOOMIN", emboss = False)
         right.label(socket.name)
 
     def edit(self):
-        for target in self.newParameterSocket.dataTargets:
+        for target in self.outputs[-1].dataTargets:
             if target.dataType == "Node Control": continue
-            socket = self.newParameter(target.dataType, target.getDisplayedName(), target.getProperty())
+            socket = self.newGroupInput(target.dataType, target.getDisplayedName(), target.getProperty())
             socket.linkWith(target)
-        self.newParameterSocket.removeLinks()
+        self.outputs[-1].removeLinks()
 
-    def newParameter(self, dataType, name = None, defaultValue = None):
+    def newGroupInput(self, dataType, name = None, defaultValue = None):
         if name is None: name = dataType
-        socket = self.newOutput(dataType, name, "parameter")
+        socket = self.newOutput(dataType, name, "groupInput")
         if defaultValue is not None: socket.setProperty(defaultValue)
         socket.text = name
         socket.moveable = True
@@ -82,10 +82,6 @@ class GroupInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
             for socket in self.outputNode.inputs[:-1]:
                 data.newOutputFromSocket(socket)
         return data
-
-    @property
-    def newParameterSocket(self):
-        return self.outputs[-1]
 
     @property
     def outputNode(self):
