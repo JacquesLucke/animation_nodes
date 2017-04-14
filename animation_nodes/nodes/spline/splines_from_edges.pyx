@@ -16,7 +16,8 @@ class SplinesFromEdgesNode(bpy.types.Node, VectorizedNode):
         self.newInput("Edge Indices List", "Edge Indices", "edgeIndices")
 
         self.newVectorizedInput("Float", "useRadiusList",
-            ("Radius", "radius"), ("Radii", "radii"))
+            ("Radius", "radius", dict(value = 0.1, minValue = 0)),
+            ("Radii", "radii"))
 
         self.newOutput("Spline List", "Splines", "splines")
 
