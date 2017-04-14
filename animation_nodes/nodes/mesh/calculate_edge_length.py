@@ -1,8 +1,7 @@
 import bpy
 from bpy.props import *
-from ... math cimport Vector3, distanceVec3
 from ... base_types import VectorizedNode
-from ... data_structures cimport Vector3DList, EdgeIndicesList, DoubleList
+from . c_utils import calculateEdgeLengths
 
 class CalculateEdgeLengthNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_CalculateEdgeLengthNode"
@@ -36,21 +35,7 @@ class CalculateEdgeLengthNode(bpy.types.Node, VectorizedNode):
         yield "    distance = 0"
         yield "    self.errorMessage = 'Edge is invalid'"
 
-    def execute_List(self, Vector3DList points, EdgeIndicesList edges):
+    def execute_List(self, points, edges):
         self.errorMessage = ""
-        if len(edges) == 0:
-            return DoubleList()
-
-        if edges.getMaxIndex() >= len(points):
-            self.errorMessage = "too high index"
-            return DoubleList()
-
-        cdef DoubleList distances = DoubleList(length = len(edges))
-        cdef Py_ssize_t i
-        cdef Vector3 *v1
-        cdef Vector3 *v2
-        for i in range(len(edges)):
-            v1 = points.data + edges.data[i].v1
-            v2 = points.data + edges.data[i].v2
-            distances.data[i] = distanceVec3(v1, v2)
-        return distances
+        try: return calculateEdgeLengths(points, edges)
+        except Exception as e: self.errorMessage = str(e)
