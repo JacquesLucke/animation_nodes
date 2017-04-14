@@ -35,7 +35,7 @@ Cleanup Repository:
 import sys
 
 v = sys.version_info
-if v.major < 3 or v.minor < 5:
+if v.major != 3 or v.minor != 5:
     print("Only works with Python 3.5.x")
     print("You are using: {}".format(sys.version))
     sys.exit()
