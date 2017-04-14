@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... base_types import VectorizedNode
-from . list_operation_utils import getAxisListOfVectorList
+from . c_utils import getAxisListOfVectorList
 
 class SeparateVectorNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_SeparateVectorNode"

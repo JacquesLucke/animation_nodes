@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... base_types import VectorizedNode
 from ... data_structures import Vector3DList, DoubleList
-from . list_operation_utils import combineDoubleListsToVectorList
+from . c_utils import combineDoubleListsToVectorList
 
 class CombineVectorNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_CombineVectorNode"

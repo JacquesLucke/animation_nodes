@@ -32,5 +32,5 @@ class ComposeMatrixNode(bpy.types.Node, VectorizedNode):
         yield "matrix = animation_nodes.utils.math.composeMatrix(translation, rotation, scale)"
 
     def execute_List(self, translations, rotations, scales):
-        from . list_operation_utils import composeMatrices
+        from . c_utils import composeMatrices
         return composeMatrices(translations, rotations, scales)

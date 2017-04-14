@@ -1,6 +1,6 @@
 import bpy
 from ... base_types import VectorizedNode
-from . list_operation_utils import (extractMatrixTranslations,
+from . c_utils import (extractMatrixTranslations,
                                     extractMatrixRotations,
                                     extractMatrixScales)
 

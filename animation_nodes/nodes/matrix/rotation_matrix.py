@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... base_types import VectorizedNode
-from . list_operation_utils import createAxisRotations, createRotationsFromEulers
+from . c_utils import createAxisRotations, createRotationsFromEulers
 
 axisItems = [
     ("X", "X", "", "", 0),
