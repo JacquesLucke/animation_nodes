@@ -1,11 +1,14 @@
 from ... data_structures cimport (
     DoubleList,
     Vector3DList,
-    EdgeIndicesList
+    Matrix4x4List,
+    EdgeIndicesList,
+    PolygonIndicesList
 )
 
 from ... math cimport (
-    Vector3, distanceVec3
+    Vector3, distanceVec3, transformVec3AsPoint_InPlace,
+    Matrix4
 )
 
 def createEdges(Vector3DList points1, Vector3DList points2):
@@ -39,3 +42,21 @@ def calculateEdgeLengths(Vector3DList vertices, EdgeIndicesList edges):
         v2 = vertices.data + edges.data[i].v2
         distances.data[i] = distanceVec3(v1, v2)
     return distances
+
+def transformPolygons(Vector3DList vertices, PolygonIndicesList polygons, Matrix4x4List matrices):
+    cdef:
+        Matrix4 *_matrices = matrices.data
+        Matrix4 *matrix
+        long i, j
+        long start, length
+        Vector3 *_vertices = vertices.data
+        unsigned int *_polyStarts = polygons.polyStarts.data
+        unsigned int *_polyLengths = polygons.polyLengths.data
+        unsigned int *_indices = polygons.indices.data
+
+    for i in range(matrices.length):
+        matrix = _matrices + i
+        start = _polyStarts[i]
+        length = _polyLengths[i]
+        for j in range(length):
+            transformVec3AsPoint_InPlace(_vertices + _indices[start + j], matrix)

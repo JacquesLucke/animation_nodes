@@ -1,8 +1,7 @@
 import bpy
 from bpy.props import *
 from ... base_types import AnimationNode
-from ... math cimport transformVec3AsPoint_InPlace, Matrix4, Vector3
-from ... data_structures cimport Vector3DList, PolygonIndicesList, Matrix4x4List
+from . c_utils import transformPolygons
 
 class TransformPolygonsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_TransformPolygonsNode"
@@ -22,7 +21,7 @@ class TransformPolygonsNode(bpy.types.Node, AnimationNode):
         if self.errorMessage != "":
             layout.label(self.errorMessage, icon = "ERROR")
 
-    def execute(self, Vector3DList vertices, PolygonIndicesList polygons, Matrix4x4List matrices):
+    def execute(self, vertices, polygons, matrices):
         self.errorMessage = ""
         if len(polygons) != 0 and polygons.getMaxIndex() >= len(vertices):
             self.errorMessage = "Invalid polygon indices"
@@ -33,21 +32,3 @@ class TransformPolygonsNode(bpy.types.Node, AnimationNode):
 
         transformPolygons(vertices, polygons, matrices)
         return vertices, polygons
-
-def transformPolygons(Vector3DList vertices, PolygonIndicesList polygons, Matrix4x4List matrices):
-    cdef:
-        Matrix4* _matrices = matrices.data
-        Matrix4* matrix
-        long i, j
-        long start, length
-        Vector3* _vertices = vertices.data
-        unsigned int* _polyStarts = polygons.polyStarts.data
-        unsigned int* _polyLengths = polygons.polyLengths.data
-        unsigned int* _indices = polygons.indices.data
-
-    for i in range(matrices.length):
-        matrix = _matrices + i
-        start = _polyStarts[i]
-        length = _polyLengths[i]
-        for j in range(length):
-            transformVec3AsPoint_InPlace(_vertices + _indices[start + j], matrix)
