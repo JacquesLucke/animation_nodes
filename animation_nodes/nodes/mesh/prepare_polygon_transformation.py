@@ -1,8 +1,7 @@
 import bpy
 from bpy.props import *
 from ... base_types import AnimationNode
-from . separate_polygons import separatePolygons
-from . transform_polygons import transformPolygons
+from . c_utils import transformPolygons, separatePolygons
 from . extract_polygon_transforms import extractPolygonTransforms
 from ... data_structures import Vector3DList, PolygonIndicesList, Matrix4x4List
 

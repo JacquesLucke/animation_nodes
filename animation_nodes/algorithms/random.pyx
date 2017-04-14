@@ -1,5 +1,4 @@
 import sys
-import numpy
 random = __import__("random")
 from mathutils import Vector, Euler, Quaternion, Color
 
