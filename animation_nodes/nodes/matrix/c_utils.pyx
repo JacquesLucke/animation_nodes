@@ -138,3 +138,15 @@ def replicateMatricesAtVectors(Matrix4x4List matrices, Vector3DList translations
             result.data[index].a24 += translations.data[i].y
             result.data[index].a34 += translations.data[i].z
     return result
+
+
+# Transform Matrix
+##########################################
+
+def transformMatrixList(Matrix4x4List matrices, _transformation):
+    cdef Matrix4 transformation = toMatrix4(_transformation)
+    cdef Matrix4x4List outMatrices = Matrix4x4List(length = len(matrices))
+    cdef long i
+    for i in range(len(outMatrices)):
+        multMatrix4(outMatrices.data + i, &transformation, matrices.data + i)
+    return outMatrices
