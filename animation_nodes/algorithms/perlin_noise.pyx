@@ -1,6 +1,6 @@
 cimport cython
-from libc.limits cimport INT_MAX
 from . random cimport randomNumber
+from .. utils.limits cimport INT_MAX
 from .. data_structures cimport Vector3DList
 
 # http://freespace.virgin.net/hugo.elias/models/m_perlin.htm

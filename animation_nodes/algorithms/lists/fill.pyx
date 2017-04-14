@@ -1,5 +1,5 @@
 import functools
-from libc.limits cimport INT_MAX
+from ... utils.limits cimport INT_MAX
 from ... data_structures cimport CList, PolygonIndicesList
 from ... sockets.info import getSocketClass, isCopyable, toBaseDataType, getCopyFunction
 
@@ -49,7 +49,7 @@ cdef joinListAndExtension(myList, extension, direction):
         return extension
     if len(extension) == 0:
         return myList
-        
+
     if direction == "LEFT":
         return extension + myList
     elif direction == "RIGHT":

@@ -1,8 +1,8 @@
-from libc.limits cimport INT_MAX
 from libc.math cimport M_PI as PI
 from libc.math cimport sqrt
 
 from ... math cimport Euler3
+from ... utils.limits cimport INT_MAX
 from ... data_structures cimport EulerList, Vector3DList
 from .. random cimport uniformRandomNumber, randomNormalized3DVector
 

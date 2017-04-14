@@ -3,7 +3,7 @@ import numpy
 random = __import__("random")
 from mathutils import Vector, Euler, Quaternion, Color
 
-from libc.limits cimport INT_MAX
+from .. utils.limits cimport INT_MAX
 from libc.math cimport M_PI as PI
 from libc.math cimport sqrt, sin, cos
 

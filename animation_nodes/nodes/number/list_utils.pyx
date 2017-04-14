@@ -4,7 +4,7 @@ from ... data_structures cimport (
     Interpolation
 )
 
-from libc.limits cimport INT_MAX
+from ... utils.limits cimport INT_MAX
 from ... utils.clamp cimport clamp, clampLong
 from ... algorithms.random cimport uniformRandomNumber
 

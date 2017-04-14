@@ -1,6 +1,5 @@
 import functools
 from itertools import islice, cycle
-from libc.limits cimport INT_MAX
 from ... data_structures cimport CList, PolygonIndicesList
 from ... sockets.info import getSocketClass, isCopyable, toBaseDataType, getCopyFunction
 

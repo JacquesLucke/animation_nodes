@@ -1,8 +1,8 @@
 import bpy
 from bpy.props import *
 from math import pi as _pi
-from libc.limits cimport INT_MAX
 from libc.math cimport sin, cos
+from ... utils.limits cimport INT_MAX
 from ... base_types import AnimationNode
 from ... data_structures cimport Matrix4x4List, Vector3DList, CDefaultList
 from ... algorithms.rotations.rotation_and_direction cimport directionToMatrix_LowLevel

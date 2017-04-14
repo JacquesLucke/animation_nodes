@@ -2,8 +2,8 @@ import random
 cimport cython
 from libc.math cimport log, pow
 from libc.string cimport memcpy
-from libc.limits cimport INT_MAX
 from . shuffle import shuffle_CList
+from ... utils.limits cimport INT_MAX
 from ... sockets.info import getSocketClass
 from .. random cimport randomNumber_Positive
 from ... data_structures cimport CList, PolygonIndicesList, IntegerList, LongList

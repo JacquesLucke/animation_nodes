@@ -1,7 +1,7 @@
 import bpy
 cimport cython
 from bpy.props import *
-from libc.limits cimport LONG_MIN, LONG_MAX
+from ... utils.limits cimport LONG_MIN, LONG_MAX
 from ... data_structures cimport BaseFalloff
 from ... algorithms.random cimport randomNumber_Positive
 from ... base_types import AnimationNode
