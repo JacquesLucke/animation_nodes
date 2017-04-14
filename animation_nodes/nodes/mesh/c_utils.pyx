@@ -71,6 +71,32 @@ def calculateEdgeLengths(Vector3DList vertices, EdgeIndicesList edges):
 # Polygon Operations
 ######################################################
 
+def polygonIndicesListFromVertexAmounts(LongList vertexAmounts):
+    cdef:
+        cdef long i, polyLength, currentStart
+        long totalLength = vertexAmounts.getSumOfElements()
+        long polygonAmount = len(vertexAmounts)
+        PolygonIndicesList polygonIndices
+
+    polygonIndices = PolygonIndicesList(
+        indicesAmount = totalLength,
+        polygonAmount = polygonAmount)
+
+    for i in range(totalLength):
+        polygonIndices.indices.data[i] = i
+
+    currentStart = 0
+    for i in range(polygonAmount):
+        polyLength = vertexAmounts.data[i]
+        if polyLength >= 3:
+            polygonIndices.polyStarts.data[i] = currentStart
+            polygonIndices.polyLengths.data[i] = polyLength
+            currentStart += polyLength
+        else:
+            raise Exception("vertex amount < 3")
+
+    return polygonIndices
+
 def transformPolygons(Vector3DList vertices, PolygonIndicesList polygons, Matrix4x4List matrices):
     cdef:
         Matrix4 *_matrices = matrices.data
