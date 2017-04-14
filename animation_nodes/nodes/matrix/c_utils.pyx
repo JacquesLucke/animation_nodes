@@ -10,6 +10,10 @@ from ... math import matrix4x4ListToEulerList
 
 from libc.math cimport sqrt
 
+
+# Compose/Create Matrix
+########################################
+
 def composeMatrices(translations, rotations, scales):
     cdef:
         CDefaultList _translations = CDefaultList(Vector3DList, translations, (0, 0, 0))
@@ -27,6 +31,31 @@ def composeMatrices(translations, rotations, scales):
             <Vector3*>_scales.get(i))
 
     return matrices
+
+def createAxisRotations(DoubleList angles, str axis):
+    cdef Matrix4x4List matrices = Matrix4x4List(length = len(angles))
+    cdef int i
+    if axis == "X":
+        for i in range(len(matrices)):
+            setRotationXMatrix(matrices.data + i, angles.data[i])
+    elif axis == "Y":
+        for i in range(len(matrices)):
+            setRotationYMatrix(matrices.data + i, angles.data[i])
+    elif axis == "Z":
+        for i in range(len(matrices)):
+            setRotationZMatrix(matrices.data + i, angles.data[i])
+    return matrices
+
+def createRotationsFromEulers(EulerList rotations):
+    cdef Matrix4x4List matrices = Matrix4x4List(length = len(rotations))
+    cdef int i
+    for i in range(len(matrices)):
+        setRotationMatrix(matrices.data + i, rotations.data + i)
+    return matrices
+
+
+# Extract Matrix Information
+################################################
 
 def extractMatrixTranslations(Matrix4x4List matrices):
     cdef Vector3DList translations = Vector3DList(length = len(matrices))
@@ -57,27 +86,6 @@ cdef void scaleFromMatrix(Vector3 *scale, Matrix4 *matrix):
     scale.x = sqrt(matrix.a11 * matrix.a11 + matrix.a21 * matrix.a21 + matrix.a31 * matrix.a31)
     scale.y = sqrt(matrix.a12 * matrix.a12 + matrix.a22 * matrix.a22 + matrix.a32 * matrix.a32)
     scale.z = sqrt(matrix.a13 * matrix.a13 + matrix.a23 * matrix.a23 + matrix.a33 * matrix.a33)
-
-def createAxisRotations(DoubleList angles, str axis):
-    cdef Matrix4x4List matrices = Matrix4x4List(length = len(angles))
-    cdef int i
-    if axis == "X":
-        for i in range(len(matrices)):
-            setRotationXMatrix(matrices.data + i, angles.data[i])
-    elif axis == "Y":
-        for i in range(len(matrices)):
-            setRotationYMatrix(matrices.data + i, angles.data[i])
-    elif axis == "Z":
-        for i in range(len(matrices)):
-            setRotationZMatrix(matrices.data + i, angles.data[i])
-    return matrices
-
-def createRotationsFromEulers(EulerList rotations):
-    cdef Matrix4x4List matrices = Matrix4x4List(length = len(rotations))
-    cdef int i
-    for i in range(len(matrices)):
-        setRotationMatrix(matrices.data + i, rotations.data + i)
-    return matrices
 
 
 # Replicate Matrix
