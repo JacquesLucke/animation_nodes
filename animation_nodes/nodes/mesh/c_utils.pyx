@@ -2,11 +2,13 @@ cimport cython
 from libc.string cimport memcpy
 
 from ... data_structures cimport (
+    LongList,
     DoubleList,
     Vector3DList,
     Matrix4x4List,
     EdgeIndicesList,
-    PolygonIndicesList
+    PolygonIndicesList,
+    CDefaultList
 )
 
 from ... math cimport (
@@ -17,6 +19,21 @@ from ... math cimport (
 
 # Edge Operations
 ###########################################
+
+def createEdgeIndices(_indices1, _indices2):
+    cdef CDefaultList indices1 = CDefaultList(LongList, _indices1, 0)
+    cdef CDefaultList indices2 = CDefaultList(LongList, _indices2, 0)
+    cdef Py_ssize_t amount = CDefaultList.getMaxLength(indices1, indices2)
+    cdef EdgeIndicesList edges = EdgeIndicesList(length = amount)
+    cdef int index1, index2
+    cdef Py_ssize_t i
+
+    for i in range(amount):
+        index1 = (<unsigned int*>indices1.get(i))[0]
+        index2 = (<unsigned int*>indices2.get(i))[0]
+        edges.data[i].v1 = index1 if index1 >= 0 else 0
+        edges.data[i].v2 = index2 if index2 >= 0 else 0
+    return edges
 
 def createEdges(Vector3DList points1, Vector3DList points2):
     assert(len(points1) == len(points2))
