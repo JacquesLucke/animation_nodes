@@ -3,10 +3,10 @@ from ... data_structures cimport (Vector3DList, EulerList, Matrix4x4List,
                                   FalloffEvaluator)
 
 from ... math cimport (Vector3, Euler3, Matrix4, toMatrix4,
-                       multMatrix4,
+                       multMatrix4, toPyMatrix4,
                        setTranslationRotationScaleMatrix,
                        setRotationXMatrix, setRotationYMatrix, setRotationZMatrix,
-                       setRotationMatrix, setTranslationMatrix)
+                       setRotationMatrix, setTranslationMatrix, setIdentityMatrix)
 from ... math import matrix4x4ListToEulerList
 
 from libc.math cimport sqrt
@@ -153,7 +153,7 @@ def transformMatrixList(Matrix4x4List matrices, _transformation):
     return outMatrices
 
 
-# Falloff
+# Various
 ###########################################
 
 def evaluateFalloffForMatrixList(Falloff falloff, Matrix4x4List matrices):
@@ -167,3 +167,27 @@ def evaluateFalloffForMatrixList(Falloff falloff, Matrix4x4List matrices):
     for i in range(len(influences)):
         influences.data[i] = evaluator.evaluate(matrices.data + i, i)
     return influences
+
+def reduceMatrixList(Matrix4x4List matrices, bint reversed):
+    cdef:
+        Py_ssize_t i
+        Matrix4 tmp, target
+        Py_ssize_t amount = len(matrices)
+
+    if amount == 0:
+        setIdentityMatrix(&target)
+    elif amount == 1:
+        target = matrices.data[0]
+    else:
+        if reversed:
+            tmp = matrices.data[amount - 1]
+            for i in range(amount - 2, -1, -1):
+                multMatrix4(&target, &tmp, matrices.data + i)
+                tmp = target
+        else:
+            tmp = matrices.data[0]
+            for i in range(1, amount):
+                multMatrix4(&target, &tmp, matrices.data + i)
+                tmp = target
+
+    return toPyMatrix4(&target)

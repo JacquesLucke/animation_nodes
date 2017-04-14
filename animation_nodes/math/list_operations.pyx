@@ -44,27 +44,6 @@ cdef void mixVec3Arrays(Vector3* target, Vector3* a, Vector3* b, long arrayLengt
     for i in range(arrayLength):
         mixVec3(target + i, a + i, b + i, factor)
 
-cdef void reduceMatrix4x4List(Matrix4* matrices, unsigned long amount, Matrix4* target, bint reversed = False):
-    cdef:
-        long i
-        Matrix4 tmp
-
-    if amount == 0:
-        setIdentityMatrix(target)
-    elif amount == 1:
-        target[0] = matrices[0]
-    else:
-        if reversed:
-            tmp = matrices[amount - 1]
-            for i in range(amount - 2, -1, -1):
-                multMatrix4(target, &tmp, matrices + i)
-                tmp = target[0]
-        else:
-            tmp = matrices[0]
-            for i in range(1, amount):
-                multMatrix4(target, &tmp, matrices + i)
-                tmp = target[0]
-
 def scaleVector3DList(Vector3DList vectors, float factor):
     cdef Vector3* data = vectors.data
     cdef long i
