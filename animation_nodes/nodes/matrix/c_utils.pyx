@@ -5,7 +5,7 @@ from ... math cimport (Vector3, Euler3, Matrix4, toMatrix4,
                        multMatrix4,
                        setTranslationRotationScaleMatrix,
                        setRotationXMatrix, setRotationYMatrix, setRotationZMatrix,
-                       setRotationMatrix)
+                       setRotationMatrix, setTranslationMatrix)
 from ... math import matrix4x4ListToEulerList
 
 from libc.math cimport sqrt
@@ -51,6 +51,13 @@ def createRotationsFromEulers(EulerList rotations):
     cdef int i
     for i in range(len(matrices)):
         setRotationMatrix(matrices.data + i, rotations.data + i)
+    return matrices
+
+def createTranslationMatrices(Vector3DList vectors):
+    cdef Matrix4x4List matrices = Matrix4x4List(length = vectors.length)
+    cdef size_t i
+    for i in range(vectors.length):
+        setTranslationMatrix(matrices.data + i, vectors.data + i)
     return matrices
 
 

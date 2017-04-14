@@ -1,8 +1,6 @@
 import bpy
-from bpy.props import *
 from ... base_types import VectorizedNode
-from ... math cimport setTranslationMatrix
-from ... data_structures cimport Matrix4x4List, Vector3DList
+from . c_utils import createTranslationMatrices
 
 class TranslationMatrixNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_TranslationMatrixNode"
@@ -23,9 +21,5 @@ class TranslationMatrixNode(bpy.types.Node, VectorizedNode):
         else:
             return "matrix = Matrix.Translation(translation)"
 
-    def calcMatrices(self, Vector3DList vectors):
-        cdef Matrix4x4List matrices = Matrix4x4List(length = vectors.length)
-        cdef size_t i
-        for i in range(vectors.length):
-            setTranslationMatrix(matrices.data + i, vectors.data + i)
-        return matrices
+    def calcMatrices(self, vectors):
+        return createTranslationMatrices(vectors)
