@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... base_types import VectorizedNode
-from . list_utils import convert_DoubleList_to_BooleanList
+from . c_utils import convert_DoubleList_to_BooleanList
 
 class NumberToBooleanNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_NumberToBooleanNode"

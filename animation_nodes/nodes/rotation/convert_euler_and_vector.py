@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... base_types import VectorizedNode
 from ... events import executionCodeChanged
-from . list_utils import vectorsToEulers, eulersToVectors
+from . c_utils import vectorsToEulers, eulersToVectors
 
 conversionTypeItems = [
     ("VECTOR_TO_EULER", "Vector to Euler", "", "NONE", 0),

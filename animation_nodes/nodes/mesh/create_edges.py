@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import *
-from . list_utils import createEdges
+from . c_utils import createEdges
 from ... base_types import AnimationNode
 from ... data_structures import Vector3DList, EdgeIndicesList
 

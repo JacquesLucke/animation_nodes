@@ -3,7 +3,7 @@ import random
 from bpy.props import *
 from ... events import propertyChanged
 from ... base_types import AnimationNode
-from . list_utils import random_DoubleList
+from . c_utils import random_DoubleList
 
 class RandomNumberNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_RandomNumberNode"

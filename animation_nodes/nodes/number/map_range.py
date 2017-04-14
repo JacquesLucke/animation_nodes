@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... base_types import VectorizedNode
 
-from . list_utils import (
+from . c_utils import (
     mapRange_DoubleList,
     mapRange_DoubleList_Interpolated
 )

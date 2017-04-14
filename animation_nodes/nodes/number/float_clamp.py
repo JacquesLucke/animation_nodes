@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... base_types import VectorizedNode
-from . list_utils import clamp_DoubleList
+from . c_utils import clamp_DoubleList
 
 class FloatClampNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_FloatClampNode"
