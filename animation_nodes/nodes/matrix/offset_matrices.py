@@ -4,19 +4,13 @@ from ... events import propertyChanged
 from ... base_types import VectorizedNode
 from ... utils.handlers import validCallback
 from .. falloff.invert_falloff import InvertFalloff
+from . c_utils import evaluateFalloffForMatrixList
+from ... data_structures import CDefaultList, Vector3DList, EulerList
 
-from ... algorithms.matrices.translation cimport translateMatrixList
-from ... algorithms.matrices.rotation cimport getRotatedMatrixList
-from ... algorithms.matrices.scale cimport scaleMatrixList
-
-from ... data_structures cimport (
-    Falloff,
-    FalloffEvaluator,
-    Matrix4x4List,
-    Vector3DList,
-    EulerList,
-    DoubleList,
-    CDefaultList
+from ... algorithms.matrices import (
+    translateMatrixList,
+    getRotatedMatrixList,
+    scaleMatrixList
 )
 
 specifiedStateItems = [
@@ -126,11 +120,12 @@ class OffsetMatricesNode(bpy.types.Node, VectorizedNode):
             layout.label("May result in invalid object matrices", icon = "INFO")
 
 
-    def execute(self, Matrix4x4List matrices, Falloff falloff, translation, rotation, scale):
+    def execute(self, matrices, falloff, translation, rotation, scale):
         self.errorMessage = ""
 
-        cdef DoubleList influences = self.evaluateFalloff(matrices, falloff)
+        influences = self.evaluateFalloff(matrices, falloff)
         if influences is None:
+            self.errorMessage = "cannot evaluate falloff"
             return matrices
 
         if self.useScale:
@@ -145,22 +140,11 @@ class OffsetMatricesNode(bpy.types.Node, VectorizedNode):
 
         return matrices
 
-    def evaluateFalloff(self, Matrix4x4List matrices, Falloff falloff):
+    def evaluateFalloff(self, matrices, falloff):
         if self.specifiedState == "END":
             falloff = InvertFalloff(falloff)
 
-        cdef Py_ssize_t i
-        cdef FalloffEvaluator evaluator
-        cdef DoubleList influences = DoubleList(length = len(matrices))
-
-        try: evaluator = falloff.getEvaluator("Transformation Matrix")
-        except:
-            self.errorMessage = "Falloff cannot be evaluated for matrices"
-            return None
-
-        for i in range(len(influences)):
-            influences.data[i] = evaluator.evaluate(matrices.data + i, i)
-        return influences
+        return evaluateFalloffForMatrixList(falloff, matrices)
 
     @property
     def modifiesOriginalList(self):

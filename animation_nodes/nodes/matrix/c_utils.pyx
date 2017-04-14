@@ -1,5 +1,6 @@
 from ... data_structures cimport (Vector3DList, EulerList, Matrix4x4List,
-                                  CDefaultList, FloatList, DoubleList)
+                                  CDefaultList, FloatList, DoubleList, Falloff,
+                                  FalloffEvaluator)
 
 from ... math cimport (Vector3, Euler3, Matrix4, toMatrix4,
                        multMatrix4,
@@ -150,3 +151,19 @@ def transformMatrixList(Matrix4x4List matrices, _transformation):
     for i in range(len(outMatrices)):
         multMatrix4(outMatrices.data + i, &transformation, matrices.data + i)
     return outMatrices
+
+
+# Falloff
+###########################################
+
+def evaluateFalloffForMatrixList(Falloff falloff, Matrix4x4List matrices):
+    cdef Py_ssize_t i
+    cdef FalloffEvaluator evaluator
+    cdef DoubleList influences = DoubleList(length = len(matrices))
+
+    try: evaluator = falloff.getEvaluator("Transformation Matrix")
+    except: return None
+
+    for i in range(len(influences)):
+        influences.data[i] = evaluator.evaluate(matrices.data + i, i)
+    return influences
