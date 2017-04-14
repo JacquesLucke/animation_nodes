@@ -1,6 +1,6 @@
 cimport cython
-from libc.stdlib cimport malloc, free, realloc
 from libc.string cimport memcpy, memmove, memcmp, memset
+from cpython cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
 from . utils cimport predictSliceLength, makeStepPositive, removeValuesInSlice, getValuesInSlice
 
 cdef class LISTNAME(CList):
@@ -18,7 +18,7 @@ cdef class LISTNAME(CList):
             raise ValueError("Length has to be >= 0")
         if capacity < length:
             capacity = length
-        self.data = <TYPE*>malloc(sizeof(TYPE) * capacity)
+        self.data = <TYPE*>PyMem_Malloc(sizeof(TYPE) * capacity)
         if self.data == NULL:
             raise MemoryError()
 
@@ -27,14 +27,14 @@ cdef class LISTNAME(CList):
 
     def __dealloc__(self):
         if self.data != NULL:
-            free(self.data)
+            PyMem_Free(self.data)
 
     cdef grow(self, Py_ssize_t minCapacity):
         if minCapacity < self.capacity:
             return
 
         cdef Py_ssize_t newCapacity = minCapacity * 2 + 1
-        self.data = <TYPE*>realloc(self.data, sizeof(TYPE) * newCapacity)
+        self.data = <TYPE*>PyMem_Realloc(self.data, sizeof(TYPE) * newCapacity)
         if self.data == NULL:
             self.length = 0
             self.capacity = 0
@@ -43,11 +43,11 @@ cdef class LISTNAME(CList):
 
     cdef void shrinkToLength(self):
         cdef Py_ssize_t newCapacity = max(1, self.length)
-        self.data = <TYPE*>realloc(self.data, sizeof(TYPE) * newCapacity)
+        self.data = <TYPE*>PyMem_Realloc(self.data, sizeof(TYPE) * newCapacity)
         self.capacity = newCapacity
 
     cdef replaceArray(self, TYPE* newData, Py_ssize_t newLength, Py_ssize_t newCapacity):
-        free(self.data)
+        PyMem_Free(self.data)
         self.data = newData
         self.length = newLength
         self.capacity = newCapacity
