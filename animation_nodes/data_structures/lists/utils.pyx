@@ -1,4 +1,4 @@
-from libc.stdlib cimport malloc
+from cpython cimport PyMem_Malloc
 from libc.math cimport ceil, floor
 from libc.string cimport memmove, memcpy
 
@@ -64,7 +64,7 @@ cdef getValuesInSlice(void* source, Py_ssize_t elementAmount, int elementSize,
 
     start, stop, step = sliceObject.indices(elementAmount)
     outLength = predictSliceLength(start, stop, step)
-    result = <char*>malloc(outLength * elementSize)
+    result = <char*>PyMem_Malloc(outLength * elementSize)
 
     realStart = start * elementSize
     realStop = stop * elementSize
