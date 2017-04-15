@@ -67,7 +67,7 @@ class LoopExecutionUnit:
         yield from iterIndented(self.iter_InitializeParametersLines(inputNode, variables))
         yield from iterIndented(self.iter_IterationsAmount_PrepareLoop(inputNode, variables))
         yield from iterIndented(self.iter_LoopBody(inputNode, nodes, variables, nodeByID), amount = 2)
-        yield from iterIndented(self.iter_UpdateDebugLoopNodes(nodeByID))
+        yield from iterIndented(self.iter_UpdateLoopViewerNodes(nodeByID))
         yield "    " + self.get_ReturnStatement(inputNode, variables, nodeByID)
 
     def get_IterationsAmount_Header(self, inputNode, variables):
@@ -94,7 +94,7 @@ class LoopExecutionUnit:
         yield from iterIndented(self.iter_InitializeParametersLines(inputNode, variables))
         yield from iterIndented(self.iter_IteratorLength_PrepareLoopLines(inputNode, variables))
         yield from iterIndented(self.iter_LoopBody(inputNode, nodes, variables, nodeByID), amount = 2)
-        yield from iterIndented(self.iter_UpdateDebugLoopNodes(nodeByID))
+        yield from iterIndented(self.iter_UpdateLoopViewerNodes(nodeByID))
         yield "    " + self.get_ReturnStatement(inputNode, variables, nodeByID)
 
     def get_IteratorLength_Header(self, inputNode, variables):
@@ -134,7 +134,7 @@ class LoopExecutionUnit:
         variables[inputNode.indexSocket] = "current_loop_index"
         variables[inputNode.iterationsSocket] = "loop_iterations"
 
-    def iter_UpdateDebugLoopNodes(self, nodeByID):
+    def iter_UpdateLoopViewerNodes(self, nodeByID):
         for node in getNodesByType("an_LoopViewerNode", nodeByID):
             if self.network == node.network:
                 yield "{}.updateTextBlock()".format(node.identifier)
