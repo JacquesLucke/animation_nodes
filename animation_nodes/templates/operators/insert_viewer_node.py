@@ -3,9 +3,9 @@ from bpy.props import *
 from ... sockets.info import isList
 from ... base_types import Template
 
-class InsertDebugNodeTemplateOperator(bpy.types.Operator, Template):
-    bl_idname = "an.insert_debug_node_template_operator"
-    bl_label = "Insert Debug Node"
+class InsertViewerNodeTemplateOperator(bpy.types.Operator, Template):
+    bl_idname = "an.insert_viewer_node_template_operator"
+    bl_label = "Insert Viewer Node"
 
     socketIndex = IntProperty(default = 0)
 

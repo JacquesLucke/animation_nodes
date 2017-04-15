@@ -20,7 +20,7 @@ class ContextPie(bpy.types.Menu, PieMenuHelper):
     def drawBottom(self, layout):
         amount = len(self.activeNode.getVisibleOutputs())
         if amount == 0: self.empty(layout, text = "Has no visible outputs")
-        else: layout.operator("an.insert_debug_node_template_operator", text = "Debug")
+        else: layout.operator("an.insert_viewer_node_template_operator", text = "Debug")
 
     def drawRight(self, layout):
         col = layout.column(align = False)
