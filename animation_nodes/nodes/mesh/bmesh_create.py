@@ -4,7 +4,7 @@ from bpy.props import *
 from ... base_types import AnimationNode
 
 class CreateBMeshFromMeshData(bpy.types.Node, AnimationNode):
-    bl_idname = "an_CreateBMeshFromMeshData"
+    bl_idname = "an_CreateBMeshFromMeshDataNode"
     bl_label = "Create BMesh"
 
     errorMessage = StringProperty(default = "")

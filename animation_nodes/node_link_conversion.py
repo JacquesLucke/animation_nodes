@@ -69,7 +69,7 @@ class SimpleConvert(LinkCorrection):
         ("Integer List", "Polygon Indices") : "an_CreatePolygonIndicesNode",
         ("Vector List", "Mesh Data") : "an_CombineMeshDataNode",
         ("Mesh Data", "Vector List") : "an_SeparateMeshDataNode",
-        ("Mesh Data", "BMesh") : "an_CreateBMeshFromMeshData",
+        ("Mesh Data", "BMesh") : "an_CreateBMeshFromMeshDataNode",
         ("Particle System", "Particle List") : "an_GetParticlesNode",
         ("Integer", "Euler") : "an_CombineEulerNode",
         ("Float", "Euler") : "an_CombineEulerNode",
@@ -161,7 +161,7 @@ class ConvertSeparatedMeshDataToBMesh(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType in self.separatedMeshDataTypes and target.dataType == "BMesh"
     def insert(self, nodeTree, origin, target, dataOrigin):
-        toMeshData, toMesh = insertNodes(nodeTree, ["an_CombineMeshDataNode", "an_CreateBMeshFromMeshData"], origin, target)
+        toMeshData, toMesh = insertNodes(nodeTree, ["an_CombineMeshDataNode", "an_CreateBMeshFromMeshDataNode"], origin, target)
         nodeTree.links.new(toMeshData.inputs[self.separatedMeshDataTypes.index(origin.dataType)], origin)
         nodeTree.links.new(toMesh.inputs[0], toMeshData.outputs[0])
         nodeTree.links.new(toMesh.outputs[0], target)
