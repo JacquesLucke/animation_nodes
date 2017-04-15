@@ -43,7 +43,12 @@ class SelectArea(bpy.types.Operator):
             elif nearestBorder == "CENTER":
                 selectedArea = area
             else:
-                selectedArea = self.createNewArea(area, nearestBorder, factor)
+                try:
+                    selectedArea = self.createNewArea(area, nearestBorder, factor)
+                except:
+                    self.finish()
+                    self.report({"INFO"}, "Cannot create new area")
+                    return {"CANCELLED"}
 
             self.finish()
             self.an_executeCallback(self.callback, selectedArea)
