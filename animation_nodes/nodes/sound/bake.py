@@ -195,7 +195,7 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
 
     def removeActiveSound(self):
         sound = self.sound
-        if sound.users == 0:
+        if sound is not None and sound.users == 0:
             bpy.data.sounds.remove(sound)
 
 
