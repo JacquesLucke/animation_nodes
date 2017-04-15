@@ -8,9 +8,9 @@ from ... graphics.interpolation_preview import InterpolationPreview
 
 interpolationByNode = {}
 
-class DebugInterpolationNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_DebugInterpolationNode"
-    bl_label = "Debug Interpolation"
+class InterpolationViewerNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_InterpolationViewerNode"
+    bl_label = "Interpolation Viewer"
     bl_width_default = 160
     options = {"NO_TIMING"}
 
@@ -27,7 +27,7 @@ class DebugInterpolationNode(bpy.types.Node, AnimationNode):
 
 @drawHandler("SpaceNodeEditor", "WINDOW")
 def drawInterpolationPreviews():
-    nodes = getNodesByType("an_DebugInterpolationNode")
+    nodes = getNodesByType("an_InterpolationViewerNode")
     nodesInCurrentTree = getattr(bpy.context.space_data.node_tree, "nodes", [])
     for node in nodes:
         if node.name in nodesInCurrentTree and not node.hide:

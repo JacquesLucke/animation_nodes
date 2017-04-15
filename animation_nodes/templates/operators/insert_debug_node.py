@@ -27,11 +27,11 @@ class InsertDebugNodeTemplateOperator(bpy.types.Operator, Template):
 
         dataType = socket.dataType
         if dataType == "Interpolation":
-            debugNode = self.newNode("an_DebugInterpolationNode")
+            viewerNode = self.newNode("an_InterpolationViewerNode")
         elif isList(dataType) or dataType == "Matrix":
-            debugNode = self.newNode("an_DebugDrawerNode")
+            viewerNode = self.newNode("an_DebugDrawerNode")
         else:
-            debugNode = self.newNode("an_DebugNode")
-        socket.linkWith(debugNode.inputs[0])
+            viewerNode = self.newNode("an_DebugNode")
+        socket.linkWith(viewerNode.inputs[0])
 
-        self.setActiveNode(debugNode)
+        self.setActiveNode(viewerNode)
