@@ -10,14 +10,14 @@ from . c_utils import (
 class MapRangeNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_MapRangeNode"
     bl_label = "Map Range"
-    bl_width_default = 170
+    bl_width_default = 190
 
     clampInput = BoolProperty(name = "Clamp Input", default = True,
         description = "The input will be between Input Min and Input Max",
         update = VectorizedNode.refresh)
 
     useInterpolation = BoolProperty(name = "Use Interpolation", default = False,
-        description = "Don't use the normal linear interpolation between Min and Max (only available when clamp is turned on)",
+        description = "Use custom interpolation between Min and Max (only available when clamp is turned on)",
         update = VectorizedNode.refresh)
 
     useValueList = VectorizedNode.newVectorizeProperty()
@@ -38,12 +38,12 @@ class MapRangeNode(bpy.types.Node, VectorizedNode):
             ("Value", "newValue"), ("Values", "newValues"))
 
     def draw(self, layout):
-        col = layout.column(align = True)
-        col.prop(self, "clampInput")
+        row = layout.row(align = True)
+        row.prop(self, "clampInput", icon = "FULLSCREEN_EXIT", text = "Clamp", toggle = False)
 
-        subcol = col.column(align = True)
-        subcol.active = self.clampInput
-        subcol.prop(self, "useInterpolation")
+        subrow = row.row(align = True)
+        subrow.active = self.clampInput
+        subrow.prop(self, "useInterpolation", icon = "IPO_BEZIER", text = "Interpolate")
 
     def getExecutionCode(self):
         if self.useValueList:
