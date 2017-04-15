@@ -590,7 +590,7 @@ class DebugMenu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         insertNode(layout, "an_DebugNode", "Debug")
-        insertNode(layout, "an_DebugLoopNode", "Debug Loop")
+        insertNode(layout, "an_LoopViewerNode", "Debug Loop")
         insertNode(layout, "an_DebugListNode", "Debug List")
         insertNode(layout, "an_DebugDrawerNode", "Debug Drawer")
         insertNode(layout, "an_InterpolationViewerNode", "Interpolation Viewer")

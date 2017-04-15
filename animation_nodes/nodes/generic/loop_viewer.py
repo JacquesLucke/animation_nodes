@@ -3,11 +3,11 @@ from bpy.props import *
 from collections import defaultdict
 from ... base_types import AnimationNode
 
-debugLinesByIdentifier = defaultdict(list)
+outputLinesByIdentifier = defaultdict(list)
 
-class DebugLoopNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_DebugLoopNode"
-    bl_label = "Debug Loop"
+class LoopViewerNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_LoopViewerNode"
+    bl_label = "Loop Viewer"
     bl_width_default = 160
 
     textBlockName = StringProperty(name = "Text")
@@ -55,31 +55,31 @@ class DebugLoopNode(bpy.types.Node, AnimationNode):
     def getExecutionCode(self):
         if self.network.type == "Loop":
             names = ["data_" + str(i) for i in range(len(self.inputs[:-1]))]
-            return "self.newDebugLine({})".format(", ".join(names))
+            return "self.newOutputLine({})".format(", ".join(names))
         else:
             return ""
 
-    def newDebugLine(self, *dataList):
+    def newOutputLine(self, *dataList):
         texts = []
         for data, socket in zip(dataList, self.inputs):
             if isinstance(data, float): text = str(round(data, 5))
             else: text = str(data)
             texts.append(text.rjust(socket["dataWidth"]))
-        debugLinesByIdentifier[self.identifier].append(" ".join(texts))
+        outputLinesByIdentifier[self.identifier].append(" ".join(texts))
 
     def updateTextBlock(self):
         textBlock = self.textBlock
         if textBlock is None: return
 
         textBlock.clear()
-        textBlock.write("\n".join(debugLinesByIdentifier[self.identifier]))
+        textBlock.write("\n".join(outputLinesByIdentifier[self.identifier]))
 
-    def clearDebugLines(self):
-        try: del debugLinesByIdentifier[self.identifier]
+    def clearOutputLines(self):
+        try: del outputLinesByIdentifier[self.identifier]
         except: pass
 
     def createNewTextBlock(self):
-        textBlock = bpy.data.texts.new(name = "Debug Loop")
+        textBlock = bpy.data.texts.new(name = "Loop Viewer")
         self.textBlockName = textBlock.name
 
     def viewTextBlockInArea(self, area):
@@ -91,4 +91,4 @@ class DebugLoopNode(bpy.types.Node, AnimationNode):
         return bpy.data.texts.get(self.textBlockName)
 
     def delete(self):
-        self.clearDebugLines()
+        self.clearOutputLines()

@@ -135,10 +135,10 @@ class LoopExecutionUnit:
         variables[inputNode.iterationsSocket] = "loop_iterations"
 
     def iter_UpdateDebugLoopNodes(self, nodeByID):
-        for node in getNodesByType("an_DebugLoopNode", nodeByID):
+        for node in getNodesByType("an_LoopViewerNode", nodeByID):
             if self.network == node.network:
                 yield "{}.updateTextBlock()".format(node.identifier)
-                yield "{}.clearDebugLines()".format(node.identifier)
+                yield "{}.clearOutputLines()".format(node.identifier)
 
     def iter_InitializeGeneratorsLines(self, inputNode, variables, nodeByID):
         for i, node in enumerate(inputNode.getSortedGeneratorNodes(nodeByID)):
