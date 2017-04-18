@@ -21,8 +21,8 @@ class ConvertNode(bpy.types.Node, AnimationNode):
             "dataType", [self.outputs[0]], ignore = {"Generic"}))
 
     def drawAdvanced(self, layout):
-        self.invokeSocketTypeChooser(layout, "assignOutputType",
-            socketGroup = "ALL", text = "Change Type", icon = "TRIA_RIGHT")
+        self.invokeSelector(layout, "DATA_TYPE", "assignOutputType",
+            text = "Change Type", icon = "TRIA_RIGHT")
 
     def assignOutputType(self, dataType):
         if self.dataType != dataType:

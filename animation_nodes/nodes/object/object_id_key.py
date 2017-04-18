@@ -64,7 +64,8 @@ class ObjectIDKeyNode(bpy.types.Node, VectorizedNode):
         col = layout.column()
         col.scale_y = 1.5
         text = "Choose ID Key" if self.keyName == "" else repr(self.keyName)
-        self.invokeIDKeyChooser(col, "assignIDKey", text = text, icon = "VIEWZOOM")
+        self.invokeSelector(col, "ID_KEY", "assignIDKey",
+            text = text, icon = "VIEWZOOM")
 
     def assignIDKey(self, dataType, name):
         self.keyDataType = dataType

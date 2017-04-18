@@ -39,7 +39,8 @@ class LoopViewerNode(bpy.types.Node, AnimationNode):
             if self.textBlock is None:
                 self.invokeFunction(row, "createNewTextBlock", icon = "ZOOMIN")
             else:
-                self.invokeAreaChooser(row, "viewTextBlockInArea", icon = "ZOOM_SELECTED")
+                self.invokeSelector(row, "AREA", "viewTextBlockInArea",
+                    icon = "ZOOM_SELECTED")
         else:
             layout.label("Has to be in a loop", icon = "INFO")
 

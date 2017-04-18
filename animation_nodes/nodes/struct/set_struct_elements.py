@@ -15,7 +15,8 @@ class SetStructElementsNode(bpy.types.Node, AnimationNode):
     def drawControlSocket(self, layout, socket):
         left, right = splitAlignment(layout)
         left.label(socket.name)
-        self.invokeSocketTypeChooser(right, "newInputSocket", icon = "ZOOMIN", emboss = False)
+        self.invokeSelector(right, "DATA_TYPE", "newInputSocket",
+            icon = "ZOOMIN", emboss = False)
 
     def edit(self):
         newInputSocket = self.inputs["New Input"]

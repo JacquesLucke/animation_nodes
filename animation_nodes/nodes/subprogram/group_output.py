@@ -37,7 +37,8 @@ class GroupOutputNode(bpy.types.Node, AnimationNode):
     def drawControlSocket(self, layout, socket):
         left, right = splitAlignment(layout)
         left.label(socket.name)
-        self.invokeSocketTypeChooser(right, "newGroupOutput", icon = "ZOOMIN", emboss = False)
+        self.invokeSelector(right, "DATA_TYPE", "newGroupOutput",
+            icon = "ZOOMIN", emboss = False)
 
     def edit(self):
         self.changeInputIdentifierIfNecessary()

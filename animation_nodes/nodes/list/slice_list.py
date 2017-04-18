@@ -54,8 +54,8 @@ class SliceListNode(bpy.types.Node, AnimationNode):
             col.prop(self, "sliceEndType", text = "End")
 
     def drawAdvanced(self, layout):
-        self.invokeSocketTypeChooser(layout, "assignListDataType",
-            socketGroup = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
+        self.invokeSelector(layout, "DATA_TYPE", "assignListDataType",
+            dataTypes = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
 
     def getExecutionCode(self):
         if self.useStart: yield "_start = start"

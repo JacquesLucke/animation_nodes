@@ -43,8 +43,8 @@ class CreateListNode(bpy.types.Node, AnimationNode):
         self.drawTypeSpecifics(layout)
 
     def drawAdvanced(self, layout):
-        self.invokeSocketTypeChooser(layout, "assignListDataType",
-            socketGroup = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
+        self.invokeSelector(layout, "DATA_TYPE", "assignListDataType",
+            dataTypes = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
 
         layout.prop(self, "hideInputs")
 

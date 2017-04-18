@@ -21,7 +21,7 @@ class SwitchNode(bpy.types.Node, AnimationNode):
         ))
 
     def drawAdvanced(self, layout):
-        self.invokeSocketTypeChooser(layout, "assignType",
+        self.invokeSelector(layout, "DATA_TYPE", "assignType",
             text = "Change Type", icon = "TRIA_RIGHT")
 
     def assignType(self, dataType):

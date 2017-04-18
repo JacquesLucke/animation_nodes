@@ -43,8 +43,8 @@ class FillListNode(bpy.types.Node, AnimationNode):
         col = layout.column()
         col.active = self.inputs["Element"].isCopyable()
         col.prop(self, "makeElementCopies")
-        self.invokeSocketTypeChooser(layout, "assignListDataType",
-            socketGroup = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
+        self.invokeSelector(layout, "DATA_TYPE", "assignListDataType",
+            dataTypes = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
 
     def getExecutionCode(self):
         yield ("outList = AN.algorithms.lists.fill('{}', inList, '{}', length, fillElement, {})"

@@ -51,8 +51,8 @@ class RemoveListElementNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "removeType", text = "")
 
     def drawAdvanced(self, layout):
-        self.invokeSocketTypeChooser(layout, "assignListDataType",
-            socketGroup = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
+        self.invokeSelector(layout, "DATA_TYPE", "assignListDataType",
+            dataTypes = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
 
     def getExecutionCode(self):
         yield "outList = inList"

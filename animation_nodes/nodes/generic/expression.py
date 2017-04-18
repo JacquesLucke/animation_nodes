@@ -57,7 +57,7 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         row = layout.row(align = True)
         row.prop(self, "expression", text = "")
-        self.invokeSocketTypeChooser(row, "changeOutputTypeManually", icon = "SCRIPTWIN")
+        self.invokeSelector(row, "DATA_TYPE", "changeOutputTypeManually", icon = "SCRIPTWIN")
 
         col = layout.column(align = True)
         if self.containsSyntaxError:
@@ -90,7 +90,8 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
     def drawControlSocket(self, layout, socket):
         left, right = splitAlignment(layout)
         left.label(socket.name)
-        self.invokeSocketTypeChooser(right, "newInputSocket", icon = "ZOOMIN", emboss = False)
+        self.invokeSelector(right, "DATA_TYPE", "newInputSocket",
+            icon = "ZOOMIN", emboss = False)
 
     @property
     def inputVariables(self):

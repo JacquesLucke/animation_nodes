@@ -34,8 +34,8 @@ class CombineListsNode(bpy.types.Node, AnimationNode):
             icon = "X")
 
     def drawAdvanced(self, layout):
-        self.invokeSocketTypeChooser(layout, "assignListDataType",
-            socketGroup = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
+        self.invokeSelector(layout, "DATA_TYPE", "assignListDataType",
+            dataTypes = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
 
     def drawLabel(self):
         return "Combine " + toListDataType(self.assignedType)

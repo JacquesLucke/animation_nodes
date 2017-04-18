@@ -43,7 +43,8 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
         layout.separator()
         col = layout.column()
         col.scale_y = 1.4
-        self.invokePathChooser(col, "loadSound", text = "Load New Sound", icon = "NEW")
+        self.invokeSelector(col, "PATH", "loadSound",
+            text = "Load New Sound", icon = "NEW")
         layout.separator()
 
         if len(bpy.data.sounds) == 0: return

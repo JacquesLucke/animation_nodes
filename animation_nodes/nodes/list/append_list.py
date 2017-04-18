@@ -24,8 +24,8 @@ class AppendListNode(bpy.types.Node, AnimationNode):
         ))
 
     def drawAdvanced(self, layout):
-        self.invokeSocketTypeChooser(layout, "assignListDataType",
-            socketGroup = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
+        self.invokeSelector(layout, "DATA_TYPE", "assignListDataType",
+            dataTypes = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
 
     def getExecutionCode(self):
         return "list.append(element)"

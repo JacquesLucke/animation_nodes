@@ -31,7 +31,7 @@ class GetStructListElementsNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         col = layout.column()
         col.prop(self, "elementKey")
-        self.invokeSocketTypeChooser(col, "assignType",
+        self.invokeSelector(col, "DATA_TYPE", "assignType",
             text = self.elementDataType, icon = "TRIA_RIGHT")
 
         if self.errorMessage != "":

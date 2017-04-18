@@ -43,8 +43,8 @@ class LoopGeneratorOutputNode(bpy.types.Node, VectorizedNode):
 
     def drawAdvanced(self, layout):
         layout.prop(self, "outputName", text = "Name")
-        self.invokeSocketTypeChooser(layout, "setListDataType",
-            socketGroup = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
+        self.invokeSelector(layout, "DATA_TYPE", "setListDataType",
+            dataTypes = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
 
     def drawLabel(self):
         return self.outputName

@@ -293,20 +293,6 @@ class AnimationNode:
         else:
             raise ValueError("invalid selector")
 
-    def replaceSocket(self, socket, dataType, name, identifier = None, **kwargs):
-        index = socket.getIndex(self)
-        linkedSockets = socket.linkedSockets
-        isInput = socket.isInput
-        socket.remove()
-        if isInput:
-            newSocket = self.newInput(dataType, name, identifier, **kwargs)
-        else:
-            newSocket = self.newOutput(dataType, name, identifier, **kwargs)
-        newSocket.moveTo(index)
-        for linkedSocket in linkedSockets:
-            newSocket.linkWith(linkedSocket)
-        return newSocket
-
     def clearSockets(self):
         self.clearInputs()
         self.clearOutputs()
@@ -333,7 +319,9 @@ class AnimationNode:
     # Draw Utilities
     ####################################################
 
-    def invokeFunction(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True, confirm = False, data = None, passEvent = False):
+    def invokeFunction(self, layout, functionName, text = "", icon = "NONE",
+                       description = "", emboss = True, confirm = False,
+                       data = None, passEvent = False):
         idName = getInvokeFunctionOperator(description)
         props = layout.operator(idName, text = text, icon = icon, emboss = emboss)
         props.callback = self.newCallback(functionName)
@@ -342,35 +330,49 @@ class AnimationNode:
         props.data = str(data)
         props.passEvent = passEvent
 
-    def invokeSocketTypeChooser(self, layout, functionName, socketGroup = "ALL", text = "", icon = "NONE", description = "", emboss = True):
-        data = functionName + "," + socketGroup
-        self.invokeFunction(layout, "_chooseSocketDataType", text = text, icon = icon, description = description, emboss = emboss, data = data)
+    def invokeSelector(self, layout, selectorType, functionName,
+                       text = "", icon = "NONE", description = "", emboss = True, **kwargs):
+        data, executionName = self._getInvokeSelectorData(selectorType, functionName, kwargs)
+        self.invokeFunction(layout, executionName,
+            text = text, icon = icon, description = description,
+            emboss = emboss, data = data)
 
-    def _chooseSocketDataType(self, data):
+    def _getInvokeSelectorData(self, selector, function, kwargs):
+        if selector == "DATA_TYPE":
+            dataTypes = kwargs.get("dataTypes", "ALL")
+            return function + "," + dataTypes, "_selector_DATA_TYPE"
+        elif selector == "PATH":
+            return function, "_selector_PATH"
+        elif selector == "ID_KEY":
+            return function, "_selector_ID_KEY"
+        elif selector == "AREA":
+            return function, "_selector_AREA"
+        else:
+            raise Exception("invalid selector type")
+
+    def _selector_DATA_TYPE(self, data):
         functionName, socketGroup = data.split(",")
         bpy.ops.an.choose_socket_type("INVOKE_DEFAULT",
             socketGroup = socketGroup,
             callback = self.newCallback(functionName))
 
-    def invokePathChooser(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True):
-        data = functionName
-        self.invokeFunction(layout, "_choosePath", text = text, icon = icon, description = description, emboss = emboss, data = data)
-
-    def _choosePath(self, data):
+    def _selector_PATH(self, data):
         bpy.ops.an.choose_path("INVOKE_DEFAULT",
             callback = self.newCallback(data))
 
-    def invokeIDKeyChooser(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True):
-        data = functionName
-        self.invokeFunction(layout, "_chooseIDKeys", text = text, icon = icon, description = description, emboss = emboss, data = data)
-
-    def _chooseIDKeys(self, data):
+    def _selector_ID_KEY(self, data):
         bpy.ops.an.choose_id_key("INVOKE_DEFAULT",
             callback = self.newCallback(data))
 
-    def invokePopup(self, layout, drawFunctionName, executeFunctionName = "", text = "", icon = "NONE", description = "", emboss = True, width = 250):
+    def _selector_AREA(self, data):
+        bpy.ops.an.select_area("INVOKE_DEFAULT",
+            callback = self.newCallback(data))
+
+    def invokePopup(self, layout, drawFunctionName, executeFunctionName = "",
+                    text = "", icon = "NONE", description = "", emboss = True, width = 250):
         data = drawFunctionName + "," + executeFunctionName + "," + str(width)
-        self.invokeFunction(layout, "_openNodePopup", text = text, icon = icon, description = description, emboss = emboss, data = data)
+        self.invokeFunction(layout, "_openNodePopup", text = text, icon = icon,
+                            description = description, emboss = emboss, data = data)
 
     def _openNodePopup(self, data):
         drawFunctionName, executeFunctionName, width = data.split(",")
@@ -379,14 +381,6 @@ class AnimationNode:
             drawFunctionName = drawFunctionName,
             executeFunctionName = executeFunctionName,
             width = int(width))
-
-    def invokeAreaChooser(self, layout, functionName, text = "", icon = "NONE", description = "", emboss = True):
-        data = functionName
-        self.invokeFunction(layout, "_chooseArea", text = text, icon = icon, description = description, emboss = emboss, data = data)
-
-    def _chooseArea(self, data):
-        bpy.ops.an.select_area("INVOKE_DEFAULT",
-            callback = self.newCallback(data))
 
     def newCallback(self, functionName):
         return newNodeCallback(self, functionName)

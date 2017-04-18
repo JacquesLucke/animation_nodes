@@ -28,7 +28,8 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     def draw(self, layout):
         layout.separator()
         left, right = splitAlignment(layout)
-        self.invokeSocketTypeChooser(left, "createGeneratorOutputNode", socketGroup = "LIST", text = "", icon = "ZOOMIN", emboss = False)
+        self.invokeSelector(left, "DATA_TYPE", "createGeneratorOutputNode",
+            dataTypes = "LIST", text = "", icon = "ZOOMIN", emboss = False)
         right.label("New Generator Output")
         layout.prop(self, "subprogramName", text = "", icon = "GROUP_VERTEX")
 
@@ -44,7 +45,8 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         box = col.box()
         for socket in self.getIteratorSockets():
             box.prop(socket.loop, "useAsOutput", text = "Use {} as Output".format(repr(socket.text)))
-        self.invokeSocketTypeChooser(box, "newIterator", socketGroup = "LIST", text = "New Iterator", icon = "PLUS")
+        self.invokeSelector(box, "DATA_TYPE", "newIterator",
+            dataTypes = "LIST", text = "New Iterator", icon = "PLUS")
 
         layout.separator()
 
@@ -63,7 +65,8 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
             subrow.active = socket.isCopyable()
             subrow.prop(socket.loop, "copyAlways", text = "Copy")
             socket.drawSocket(subcol, text = "Default", node = self, drawType = "PROPERTY_ONLY")
-        self.invokeSocketTypeChooser(box, "newParameter", text = "New Parameter", icon = "PLUS")
+        self.invokeSelector(box, "DATA_TYPE", "newParameter",
+            text = "New Parameter", icon = "PLUS")
 
         layout.separator()
 
@@ -76,7 +79,8 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
             row.label("{} - {}".format(repr(node.outputName), node.listDataType))
             self.invokeFunction(row, "moveGeneratorOutput", data = "{};-1".format(i), icon = "TRIA_UP")
             self.invokeFunction(row, "moveGeneratorOutput", data = "{};1".format(i), icon = "TRIA_DOWN")
-        self.invokeSocketTypeChooser(box, "createGeneratorOutputNode", socketGroup = "LIST", text = "New Generator", icon = "PLUS")
+        self.invokeSelector(box, "DATA_TYPE", "createGeneratorOutputNode",
+            dataTypes = "LIST", text = "New Generator", icon = "PLUS")
 
         self.invokeFunction(layout, "createBreakNode", text = "New Break Condition", icon = "PLUS")
 
@@ -98,10 +102,11 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
 
     def drawControlSocket(self, layout, socket):
         isParameterSocket = socket == self.outputs[-1]
-        function, socketGroup = ("newParameter", "ALL") if isParameterSocket else ("newIterator", "LIST")
+        function, dataTypes = ("newParameter", "ALL") if isParameterSocket else ("newIterator", "LIST")
 
         left, right = splitAlignment(layout)
-        self.invokeSocketTypeChooser(left, function, socketGroup = socketGroup, icon = "ZOOMIN", emboss = False)
+        self.invokeSelector(left, "DATA_TYPE", function,
+            dataTypes = dataTypes, icon = "ZOOMIN", emboss = False)
         right.label(socket.name)
 
 

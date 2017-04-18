@@ -41,7 +41,7 @@ class CompareNode(bpy.types.Node, AnimationNode):
         return label
 
     def drawAdvanced(self, layout):
-        self.invokeSocketTypeChooser(layout, "assignType",
+        self.invokeSelector(layout, "DATA_TYPE", "assignType",
             text = "Change Type", icon = "TRIA_RIGHT")
 
     def getExecutionCode(self):
