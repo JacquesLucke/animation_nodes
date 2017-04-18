@@ -336,3 +336,30 @@ class TestRemove(TestCase):
     def testNegativeNumbers(self):
         with self.assertRaises(ValueError):
             self.list.remove((4, -2, 3))
+
+class TestDeleteIndex(TestCase):
+    def setUp(self):
+        self.list = PolygonIndicesList.fromValues([
+            (1, 2, 3), (3, 4, 6, 2, 8), (5, 4, 2), (1, 2, 3)])
+
+    def testNormal(self):
+        del self.list[1]
+        self.assertEqual(len(self.list), 3)
+        self.assertEqual(self.list[0], (1, 2, 3))
+        self.assertEqual(self.list[1], (5, 4, 2))
+        self.assertEqual(self.list[2], (1, 2, 3))
+
+    def testNegativeIndex(self):
+        del self.list[-2]
+        self.assertEqual(len(self.list), 3)
+        self.assertEqual(self.list[0], (1, 2, 3))
+        self.assertEqual(self.list[1], (3, 4, 6, 2, 8))
+        self.assertEqual(self.list[2], (1, 2, 3))
+
+    def testTooHighIndex(self):
+        with self.assertRaises(IndexError):
+            del self.list[10]
+
+    def testTooLowIndex(self):
+        with self.assertRaises(IndexError):
+            del self.list[-10]

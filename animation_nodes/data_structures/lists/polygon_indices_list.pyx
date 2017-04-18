@@ -33,6 +33,12 @@ cdef class PolygonIndicesList:
         else:
             raise TypeError("expected int")
 
+    def __delitem__(self, key):
+        if isinstance(key, int):
+            self.removeElementAtIndex(key)
+        else:
+            raise TypeError("expected int")
+
     def __add__(a, b):
         cdef PolygonIndicesList newList = PolygonIndicesList()
         try:
