@@ -4,8 +4,6 @@ import types
 import random
 from bpy.props import *
 from collections import defaultdict
-from ... import tree_info
-from ... utils.timing import prettyTime
 from ... utils.handlers import eventHandler
 from ... ui.node_colors import colorAllNodes
 from ... preferences import getExecutionCodeType
@@ -15,7 +13,7 @@ from ... utils.blender_ui import iterNodeCornerLocations
 from ... execution.measurements import getMinExecutionTimeString
 from ... operators.dynamic_operators import getInvokeFunctionOperator
 from ... utils.nodes import getAnimationNodeTrees, iterAnimationNodes
-from ... tree_info import (getNetworkWithNode, getDirectlyLinkedSockets, getOriginNodes,
+from ... tree_info import (getNetworkWithNode, getOriginNodes,
                            getLinkedInputsDict, getLinkedOutputsDict, iterLinkedOutputSockets,
                            iterUnlinkedInputSockets, keepNodeState)
 
@@ -408,23 +406,6 @@ class AnimationNode:
         for identifier, variable in self.outputVariables.items():
             if variable in names:
                 yield (names[variable], identifier)
-
-    def getNodesWhenFollowingLinks(self, followInputs = False, followOutputs = False):
-        nodes = set()
-        nodesToCheck = {self}
-        while nodesToCheck:
-            node = nodesToCheck.pop()
-            nodes.add(node)
-            sockets = []
-            if followInputs: sockets.extend(node.inputs)
-            if followOutputs: sockets.extend(node.outputs)
-            for socket in sockets:
-                # cannot use a socket function because there are reroutes etc
-                for linkedSocket in getDirectlyLinkedSockets(socket):
-                    node = linkedSocket.node
-                    if node not in nodes: nodesToCheck.add(node)
-        nodes.remove(self)
-        return list(nodes)
 
     @property
     def nodeTree(self):
