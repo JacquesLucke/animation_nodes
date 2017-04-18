@@ -166,11 +166,6 @@ class AnimationNodeSocket:
         self.display.moveOperators = other.display.moveOperators
         self.display.removeOperator = other.display.removeOperator
 
-    def disableSocketEditingInNode(self):
-        self.display.textInput = False
-        self.display.moveOperators = False
-        self.display.removeOperator = False
-
     # Draw Utilities
     ##########################################################
 

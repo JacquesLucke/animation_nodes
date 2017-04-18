@@ -13,7 +13,6 @@ def draw(self, context):
 
 def drawNodeSettings(layout, node):
     drawSocketLists(layout, node)
-    drawSocketVisibilityOperators(layout, node)
 
     if debuggingIsEnabled():
         layout.separator()
@@ -47,15 +46,6 @@ def drawSocketLists(layout, node):
         subrow.operator("an.move_output", text = "", icon = "TRIA_UP").moveUp = True
         subrow.operator("an.move_output", text = "", icon = "TRIA_DOWN").moveUp = False
         col.template_list("an_SocketUiList_Normal", "", node, "outputs", node, "activeOutputIndex", rows = size, maxrows = size)
-
-def drawSocketVisibilityOperators(layout, node):
-    col = layout.column(align = True)
-    col.label("Toggle Operation Visibility:")
-    row = col.row(align = True)
-    node.invokeFunction(row, "toggleTextInputVisibility", text = "Name")
-    node.invokeFunction(row, "toggleMoveOperatorsVisibility", text = "Move")
-    node.invokeFunction(row, "toggleRemoveOperatorVisibility", text = "Remove")
-    node.invokeFunction(row, "disableSocketEditingInNode", icon = "FULLSCREEN")
 
 
 class SocketUiList_Normal(bpy.types.UIList):

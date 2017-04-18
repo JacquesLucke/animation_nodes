@@ -386,29 +386,6 @@ class AnimationNode:
         return newNodeCallback(self, functionName)
 
 
-    # Socket Editing Utilities
-    ####################################################
-
-    def disableSocketEditingInNode(self):
-        for socket in self.sockets:
-            socket.disableSocketEditingInNode()
-
-    def toggleTextInputVisibility(self):
-        self.toggleSocketDisplayProperty("textInput")
-
-    def toggleMoveOperatorsVisibility(self):
-        self.toggleSocketDisplayProperty("moveOperators")
-
-    def toggleRemoveOperatorVisibility(self):
-        self.toggleSocketDisplayProperty("removeOperator")
-
-    def toggleSocketDisplayProperty(self, name):
-        if len(self.sockets) == 0: return
-        state = not getattr(self.sockets[0].display, name)
-        for socket in self.sockets:
-            setattr(socket.display, name, state)
-
-
     # More Utilities
     ####################################################
 
