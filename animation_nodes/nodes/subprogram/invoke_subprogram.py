@@ -54,13 +54,11 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
             return "<" + network.name + ">"
         return "Invoke Subprogram"
 
-    @property
-    def inputVariables(self):
-        return { socket.identifier : "input_" + str(i) for i, socket in enumerate(self.inputs)}
+    def getInputSocketVariables(self):
+        return {socket.identifier : "input_" + str(i) for i, socket in enumerate(self.inputs)}
 
-    @property
-    def outputVariables(self):
-        return { socket.identifier : "output_" + str(i) for i, socket in enumerate(self.outputs)}
+    def getOutputSocketVariables(self):
+        return {socket.identifier : "output_" + str(i) for i, socket in enumerate(self.outputs)}
 
     def getExecutionCode(self):
         if self.subprogramNode is None: return ""

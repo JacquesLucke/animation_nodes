@@ -401,9 +401,9 @@ class AnimationNode:
 
     def iterInnerLinks(self):
         names = {}
-        for identifier, variable in self.inputVariables.items():
+        for identifier, variable in self.getInputSocketVariables().items():
             names[variable] = identifier
-        for identifier, variable in self.outputVariables.items():
+        for identifier, variable in self.getOutputSocketVariables().items():
             if variable in names:
                 yield (names[variable], identifier)
 
@@ -449,12 +449,10 @@ class AnimationNode:
     def sockets(self):
         return list(self.inputs) + list(self.outputs)
 
-    @property
-    def inputVariables(self):
+    def getInputSocketVariables(self):
         return {socket.identifier : socket.identifier for socket in self.inputs}
 
-    @property
-    def outputVariables(self):
+    def getOutputSocketVariables(self):
         return {socket.identifier : socket.identifier for socket in self.outputs}
 
 
@@ -462,8 +460,8 @@ class AnimationNode:
     ####################################################
 
     def getLocalExecutionCode(self):
-        inputVariables = self.inputVariables
-        outputVariables = self.outputVariables
+        inputVariables = self.getInputSocketVariables()
+        outputVariables = self.getOutputSocketVariables()
 
         functionName = self.getExecutionFunctionName()
         if functionName is not None and hasattr(self, self.getExecutionFunctionName()):

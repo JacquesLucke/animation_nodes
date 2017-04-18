@@ -195,10 +195,10 @@ def iterNodeBakeLines(node, variables):
 def makeGlobalExecutionCode(localCode, node, variables):
     code = replaceVariableName(localCode, "self", node.identifier)
     nodeInputs = node.inputsByIdentifier
-    for name, variable in node.inputVariables.items():
+    for name, variable in node.getInputSocketVariables().items():
         code = replaceVariableName(code, variable, variables[nodeInputs[name]])
     nodeOutputs = node.outputsByIdentifier
-    for name, variable in node.outputVariables.items():
+    for name, variable in node.getOutputSocketVariables().items():
         code = replaceVariableName(code, variable, variables[nodeOutputs[name]])
     return code
 

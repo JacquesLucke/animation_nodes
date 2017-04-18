@@ -93,8 +93,7 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
         self.invokeSelector(right, "DATA_TYPE", "newInputSocket",
             icon = "ZOOMIN", emboss = False)
 
-    @property
-    def inputVariables(self):
+    def getInputSocketVariables(self):
         return {socket.identifier : socket.text for socket in self.inputs}
 
     def getExecutionCode(self):

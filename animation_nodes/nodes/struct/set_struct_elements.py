@@ -42,8 +42,7 @@ class SetStructElementsNode(bpy.types.Node, AnimationNode):
         socket.moveUp()
         return socket
 
-    @property
-    def inputVariables(self):
+    def getInputSocketVariables(self):
         variables = {socket.identifier : "input_" + str(i) for i, socket in enumerate(self.inputs[1:-1])}
         variables["struct"] = "struct"
         variables["New Input"] = "newInput"

@@ -49,8 +49,7 @@ class LoopViewerNode(bpy.types.Node, AnimationNode):
         for i, socket in enumerate(self.inputs[:-1]):
             col.prop(socket, '["dataWidth"]', text = "Width " + str(i + 1))
 
-    @property
-    def inputVariables(self):
+    def getInputSocketVariables(self):
         return {socket.identifier : "data_" + str(i) for i, socket in enumerate(self.inputs)}
 
     def getExecutionCode(self):

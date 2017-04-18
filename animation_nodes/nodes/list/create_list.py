@@ -55,9 +55,8 @@ class CreateListNode(bpy.types.Node, AnimationNode):
     def drawLabel(self):
         return "Create " + toListDataType(self.assignedType)
 
-    @property
-    def inputVariables(self):
-        return { socket.identifier : "element_" + str(i) for i, socket in enumerate(self.inputs) }
+    def getInputSocketVariables(self):
+        return {socket.identifier : "element_" + str(i) for i, socket in enumerate(self.inputs)}
 
     def getExecutionCode(self):
         variableNames = ["element_" + str(i) for i, socket in enumerate(self.inputs) if socket.dataType != "Node Control"]

@@ -40,9 +40,8 @@ class CombineListsNode(bpy.types.Node, AnimationNode):
     def drawLabel(self):
         return "Combine " + toListDataType(self.assignedType)
 
-    @property
-    def inputVariables(self):
-        return { socket.identifier : "list_" + str(i) for i, socket in enumerate(self.inputs) }
+    def getInputSocketVariables(self):
+        return {socket.identifier : "list_" + str(i) for i, socket in enumerate(self.inputs)}
 
     def getExecutionCode(self):
         listNames = ["list_" + str(i) for i, socket in enumerate(self.inputs[:-1])]

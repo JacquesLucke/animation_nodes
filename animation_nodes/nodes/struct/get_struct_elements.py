@@ -51,8 +51,7 @@ class GetStructElementsNode(bpy.types.Node, AnimationNode):
         socket.moveUp()
         return socket
 
-    @property
-    def outputVariables(self):
+    def getOutputSocketVariables(self):
         variables = {socket.identifier : "output_" + str(i) for i, socket in enumerate(self.outputs[:-1])}
         variables["New Output"] = "newOutput"
         return variables
