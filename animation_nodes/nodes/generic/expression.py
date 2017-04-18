@@ -173,9 +173,9 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
         return socket
 
     def getNewSocketName(self):
-        inputs = self.inputsByText
+        inputNames = {socket.text for socket in self.inputs}
         for name in variableNames:
-            if name not in inputs: return name
+            if name not in inputNames: return name
         return "x"
 
     def socketChanged(self):

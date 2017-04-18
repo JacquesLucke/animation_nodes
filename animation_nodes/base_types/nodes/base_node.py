@@ -420,10 +420,6 @@ class AnimationNode:
         return {socket.identifier : socket for socket in self.outputs}
 
     @property
-    def inputsByText(self):
-        return {socket.text : socket for socket in self.inputs}
-
-    @property
     def linkedOutputs(self):
         return tuple(iterLinkedOutputSockets(self))
 
