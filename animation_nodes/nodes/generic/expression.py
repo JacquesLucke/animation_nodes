@@ -9,6 +9,8 @@ from ... base_types import AnimationNode
 
 variableNames = list("xyzabcdefghijklmnopqrstuvw")
 
+expressionByIdentifier = {}
+
 class ExpressionNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ExpressionNode"
     bl_label = "Expression"
@@ -44,6 +46,11 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
 
     fixedOutputDataType = BoolProperty(name = "Fixed Data Type", default = False,
         description = "When activated the output type does not automatically changes its type")
+
+    inlineExpression = BoolProperty(name = "Inline Expression", default = False,
+        description = ("Inlining improves performance but the modules can't be used directly"
+                       " (e.g. you will have to write math.sin(x) instead of just sin(x))"),
+        update = executionCodeChanged)
 
     def setup(self):
         self.newInput("Node Control", "New Input")
@@ -81,6 +88,7 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
         col = layout.column(align = True)
         col.prop(self, "debugMode")
         col.prop(self, "correctType")
+        col.prop(self, "inlineExpression")
 
         layout.prop(self, "fixedOutputDataType")
 
@@ -97,23 +105,39 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
         return {socket.identifier : socket.text for socket in self.inputs}
 
     def getExecutionCode(self):
-        expression = self.expression.strip()
-
-        if expression == "" or self.containsSyntaxError:
+        if self.expression.strip() == "" or self.containsSyntaxError:
             yield "self.errorMessage = ''"
             yield "result = self.outputs[0].getDefaultValue()"
-        elif self.debugMode:
+            return
+
+        settings = self.getExpressionFunctionSettings()
+        if self.identifier not in expressionByIdentifier:
+            self.updateExpressionFunction(settings)
+        elif expressionByIdentifier[self.identifier][0] != settings:
+            self.updateExpressionFunction(settings)
+
+        if self.debugMode:
             yield "try:"
-            yield "    result = " + expression
+            yield "    result = " + self.getExpressionCode()
             yield "    self.errorMessage = ''"
             yield "except:"
             yield "    result = None"
             yield "    self.errorMessage = str(sys.exc_info()[1])"
         else:
-            yield "result = " + expression
+            yield "result = " + self.getExpressionCode()
 
         if self.correctType:
             yield "result, self.lastCorrectionType = self.outputs[0].correctValue(result)"
+
+    def getExpressionCode(self):
+        if self.inlineExpression:
+            return self.expression
+        else:
+            if len(self.inputs) == 1:
+                return "self.expressionFunction()"
+            else:
+                parameterList = ", ".join(socket.text for socket in self.inputs[:-1])
+                return "self.expressionFunction({})".format(parameterList)
 
     def getUsedModules(self):
         moduleNames = re.split("\W+", self.moduleNames)
@@ -122,6 +146,19 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
 
     def clearErrorMessage(self):
         self.errorMessage = ""
+
+    def updateExpressionFunction(self, settings):
+        function = createExpressionFunction(*settings)
+        expressionByIdentifier[self.identifier] = (settings, function)
+
+    def getExpressionFunctionSettings(self):
+        parameters = [socket.text for socket in self.inputs[:-1]]
+        modules = self.getUsedModules()
+        return self.expression, parameters, modules
+
+    @property
+    def expressionFunction(self):
+        return expressionByIdentifier[self.identifier][1]
 
     def edit(self):
         self.edit_Inputs()
@@ -180,3 +217,17 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
     def socketChanged(self):
         self.settingChanged()
         executionCodeChanged()
+
+def createExpressionFunction(expression, variables, modules):
+    code = "\n".join(iterExpressionFunctionLines(expression, variables, modules))
+    globalsDict = {}
+    exec(code, globalsDict, globalsDict)
+    return globalsDict["main"]
+
+def iterExpressionFunctionLines(expression, variables, modules):
+    for name in modules:
+        yield "import " + name
+        yield "from {} import *".format(name)
+
+    yield "def main({}):".format(", ".join(variables))
+    yield "    return " + expression
