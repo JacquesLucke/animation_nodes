@@ -20,6 +20,10 @@ class ConvertNode(bpy.types.Node, AnimationNode):
         self.newSocketEffect(AutoSelectDataType(
             "dataType", [self.outputs[0]], ignore = {"Generic"}))
 
+    def draw(self, layout):
+        if self.lastCorrectionType == 2:
+            layout.label("Conversion Failed", icon = "ERROR")
+
     def drawAdvanced(self, layout):
         self.invokeSelector(layout, "DATA_TYPE", "assignOutputType",
             text = "Change Type", icon = "TRIA_RIGHT")
