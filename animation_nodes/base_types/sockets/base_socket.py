@@ -169,7 +169,9 @@ class AnimationNodeSocket:
     # Draw Utilities
     ##########################################################
 
-    def invokeFunction(self, layout, node, functionName, text = "", icon = "NONE", description = "", emboss = True, confirm = False, data = None, passEvent = False):
+    def invokeFunction(self, layout, node, functionName, text = "", icon = "NONE",
+                       description = "", emboss = True, confirm = False,
+                       data = None, passEvent = False):
         idName = getInvokeFunctionOperator(description)
         props = layout.operator(idName, text = text, icon = icon, emboss = emboss)
         props.callback = self.newCallback(node, functionName)
@@ -178,12 +180,27 @@ class AnimationNodeSocket:
         props.data = str(data)
         props.passEvent = passEvent
 
-    def invokePathChooser(self, layout, node, functionName, text = "", icon = "NONE", description = "", emboss = True):
-        data = functionName
-        self.invokeFunction(layout, node, "_choosePath", text = text, icon = icon, description = description, emboss = emboss, data = data)
+    def invokeSelector(self, layout, selectorType, node, functionName,
+                       text = "", icon = "NONE", description = "", emboss = True):
+        data, executionName = self._getInvokeSelectorData(selectorType, functionName)
+        self.invokeFunction(layout, node, executionName,
+            text = text, icon = icon, description = description,
+            emboss = emboss, data = data)
 
-    def _choosePath(self, data):
+    def _getInvokeSelectorData(self, selector, function):
+        if selector == "PATH":
+            return function, "_selector_PATH"
+        elif selector == "AREA":
+            return function, "_selector_AREA"
+        else:
+            raise Exception("invalid selector type")
+
+    def _selector_PATH(self, data):
         bpy.ops.an.choose_path("INVOKE_DEFAULT",
+            callback = self.newCallback(self.node, data))
+
+    def _selector_AREA(self, data):
+        bpy.ops.an.select_area("INVOKE_DEFAULT",
             callback = self.newCallback(self.node, data))
 
     def newCallback(self, node, functionName):

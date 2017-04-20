@@ -21,7 +21,7 @@ class TextSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         row = layout.row(align = True)
         row.prop(self, "value", text = text)
         if self.showFileChooser:
-            self.invokePathChooser(row, node, "setPath", icon = "EYEDROPPER")
+            self.invokeSelector(row, "PATH", node, "setPath", icon = "EYEDROPPER")
 
     def getValue(self):
         return self.value

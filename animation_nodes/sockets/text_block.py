@@ -20,7 +20,8 @@ class TextBlockSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         if self.getValue() is None:
             self.invokeFunction(row, node, "createTextBlock", icon = "ZOOMIN")
         else:
-            self.invokeFunction(row, node, "openAreaChooser", icon = "ZOOM_SELECTED")
+            self.invokeSelector(row, "AREA", node, "viewTextBlockInArea",
+                icon = "ZOOM_SELECTED")
 
     def getValue(self):
         return bpy.data.texts.get(self.textBlockName)
@@ -38,10 +39,6 @@ class TextBlockSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def createTextBlock(self):
         textBlock = bpy.data.texts.new("Text Block")
         self.textBlockName = textBlock.name
-
-    def openAreaChooser(self):
-        bpy.ops.an.select_area("INVOKE_DEFAULT",
-            callback = self.newCallback(self.node, "viewTextBlockInArea"))
 
     def viewTextBlockInArea(self, area):
         area.type = "TEXT_EDITOR"
