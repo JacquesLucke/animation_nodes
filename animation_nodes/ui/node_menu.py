@@ -109,7 +109,7 @@ class VectorMenu(bpy.types.Menu):
         insertNode(layout, "an_VectorMathNode", "Math")
         insertNode(layout, "an_VectorListMathNode", "List Math")
         insertNode(layout, "an_TransformVectorNode", "Transform")
-        insertNode(layout, "an_OffsetVectorsNode", "Offset")
+        insertNode(layout, "an_OffsetVectorNode", "Offset")
 
 class RotationMenu(bpy.types.Menu):
     bl_idname = "an_rotation_menu"

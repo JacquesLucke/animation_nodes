@@ -40,7 +40,6 @@ cdef createFalloffEvaluator(Falloff falloff, str sourceType, bint clamped = Fals
     createEvaluatorFunction(falloff, sourceType, clamped, &function, &settings)
     if function != NULL:
         evaluator = EvaluatorFunctionEvaluator()
-        evaluator.falloff = falloff
         evaluator.function = function
         evaluator.settings = settings
         evaluator.pyEvaluator = getPyEvaluator(sourceType)
@@ -237,17 +236,11 @@ cdef double evaluateClamping(void* settings, void* value, long index):
 #########################################################
 
 cdef class EvaluatorFunctionEvaluator(FalloffEvaluator):
-    cdef Falloff falloff # only used to make sure that a reference exists
     cdef void* settings
     cdef EvaluatorFunction function
 
     def __dealloc__(self):
         freeEvaluatorFunction(self.function, self.settings)
-
-    cdef set(self, Falloff falloff, void* settings, EvaluatorFunction function):
-        self.falloff = falloff
-        self.settings = settings
-        self.function = function
 
     cdef double evaluate(self, void* value, long index):
         return self.function(self.settings, value, index)

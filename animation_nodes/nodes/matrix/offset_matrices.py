@@ -14,8 +14,8 @@ from ... algorithms.matrices import (
 )
 
 specifiedStateItems = [
-    ("START", "Start", "", "Given matrices set the start state", 0),
-    ("END", "End", "", "Given matrices set the end state", 1)
+    ("START", "Start", "Given matrices set the start state", "NONE", 0),
+    ("END", "End", "Given matrices set the end state", "NONE", 1)
 ]
 
 translationModeItems = [
