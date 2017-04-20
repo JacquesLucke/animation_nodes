@@ -3,9 +3,10 @@ import bpy
 from bpy.props import *
 from ... utils.code import isCodeValid
 from ... tree_info import keepNodeState
+from ... base_types import AnimationNode
 from ... utils.layout import splitAlignment
 from ... events import executionCodeChanged
-from ... base_types import AnimationNode
+from ... execution.code_generator import iter_Imports
 
 variableNames = list("xyzabcdefghijklmnopqrstuvw")
 
@@ -120,9 +121,9 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
             yield "try:"
             yield "    result = " + self.getExpressionCode()
             yield "    self.errorMessage = ''"
-            yield "except:"
+            yield "except Exception as e:"
             yield "    result = None"
-            yield "    self.errorMessage = str(sys.exc_info()[1])"
+            yield "    self.errorMessage = str(e)"
         else:
             yield "result = " + self.getExpressionCode()
 
@@ -142,7 +143,7 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
     def getUsedModules(self):
         moduleNames = re.split("\W+", self.moduleNames)
         modules = [module for module in moduleNames if module != ""]
-        return ["sys"] + modules
+        return modules
 
     def clearErrorMessage(self):
         self.errorMessage = ""
@@ -225,6 +226,7 @@ def createExpressionFunction(expression, variables, modules):
     return globalsDict["main"]
 
 def iterExpressionFunctionLines(expression, variables, modules):
+    yield from iter_Imports()
     for name in modules:
         yield "import " + name
         yield "from {} import *".format(name)

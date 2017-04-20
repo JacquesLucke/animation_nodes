@@ -33,7 +33,7 @@ def iterSetupCodeLines(nodes, variables):
     yield from iter_GetNodeReferences(nodes)
     yield from iter_GetSocketValues(nodes, variables)
 
-def iter_Imports(nodes):
+def iter_Imports(nodes = []):
     yield get_ImportModules(nodes)
     yield "import itertools"
     yield "from time import perf_counter as getCurrentTime"
