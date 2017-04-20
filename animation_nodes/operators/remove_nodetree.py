@@ -3,14 +3,11 @@ import bpy
 class RemoveNodeTree(bpy.types.Operator):
     bl_idname = "an.remove_node_tree"
     bl_label = "Remove Animation Node Tree"
+    bl_description = "Remove the active animation node tree."
 
     @classmethod
     def poll(cls, context):
-        space = context.space_data
-        if not space: return False
-        if space.type != "NODE_EDITOR": return False
-        if space.tree_type != "an_AnimationNodeTree": return False
-        return space.node_tree is not None
+        return context.getActiveAnimationNodeTree() is not None
 
     def invoke(self, context, event):
         return context.window_manager.invoke_confirm(self, event)

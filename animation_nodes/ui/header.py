@@ -10,3 +10,5 @@ class TemplatesMenuInHeader(bpy.types.Header):
         layout = self.layout
         layout.separator()
         layout.menu("an_subprograms_menu", text = "Subprograms")
+
+        layout.operator("an.remove_node_tree", text = "Remove", emboss = False)
