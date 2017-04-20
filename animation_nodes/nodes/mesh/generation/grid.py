@@ -12,13 +12,13 @@ class GridMeshNode(bpy.types.Node, AnimationNode):
     bl_label = "Grid Mesh"
     bl_width_default = 160
 
-    mode = EnumProperty(name = "Mode", default = "STEP",
+    mode = EnumProperty(name = "Mode", default = "SIZE",
         update = AnimationNode.refresh, items = modeItems)
 
     def create(self):
         self.newInput("Integer", "X Divisions", "xDivisions", value = 10, minValue = 2)
         self.newInput("Integer", "Y Divisions", "yDivisions", value = 10, minValue = 2)
-        
+
         if self.mode == "STEP":
             self.newInput("Float", "X Distance", "xDistance", value = 1)
             self.newInput("Float", "Y Distance", "yDistance", value = 1)
