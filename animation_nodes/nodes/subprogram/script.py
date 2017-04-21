@@ -164,12 +164,16 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
 
     def createNewTextBlock(self):
         textBlock = bpy.data.texts.new(name = self.subprogramName)
+        textBlock.use_tabs_as_spaces = True
         self.textBlockName = textBlock.name
         self.writeToTextBlock()
 
     def viewTextBlockInArea(self, area):
         area.type = "TEXT_EDITOR"
-        area.spaces.active.text = self.textBlock
+        space = area.spaces.active
+        space.text = self.textBlock
+        space.show_line_numbers = True
+        space.show_syntax_highlight = True
 
     def writeToTextBlock(self):
         if not self.textBlock: return
