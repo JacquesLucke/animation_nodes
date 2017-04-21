@@ -15,6 +15,7 @@ specifiedStateItems = [
 class OffsetVectorNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_OffsetVectorNode"
     bl_label = "Offset Vector"
+    onlySearchTags = True
     searchTags = [("Offset Vectors", {"useVectorList" : repr(True)})]
 
     useVectorList = BoolProperty(name = "Use Vector List", default = False,
