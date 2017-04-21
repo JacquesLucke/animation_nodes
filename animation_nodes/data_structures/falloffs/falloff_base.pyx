@@ -15,6 +15,9 @@ cdef class BaseFalloff(Falloff):
     cdef double evaluate(BaseFalloff self, void* object, long index):
         raise NotImplementedError()
 
+    def __repr__(self):
+        return "{}".format(type(self).__name__)
+
 
 cdef class CompoundFalloff(Falloff):
     cdef list getDependencies(self):
@@ -25,3 +28,12 @@ cdef class CompoundFalloff(Falloff):
 
     cdef double evaluate(self, double* dependencyResults):
         raise NotImplementedError()
+
+    def __repr__(self):
+        return "\n".join(self._iterReprLines())
+
+    def _iterReprLines(self):
+        yield "{}:".format(type(self).__name__)
+        for falloff in self.getDependencies():
+            for line in str(falloff).splitlines():
+                yield "  " + line
