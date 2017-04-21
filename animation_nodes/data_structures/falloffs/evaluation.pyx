@@ -267,9 +267,13 @@ cdef double convert_TransformationMatrix_Location(BaseFalloff falloff, void* val
 ###########################################################
 
 cdef getPyEvaluator(str sourceType):
+    if sourceType == "": return evaluate_None
     if sourceType == "Location": return evaluate_PyVector
     if sourceType == "Transformation Matrix": return evaluate_PyMatrix
     return None
+
+def evaluate_None(FalloffEvaluator evaluator, object noObject, long index):
+    return evaluator.evaluate(NULL, index)
 
 def evaluate_PyVector(FalloffEvaluator evaluator, object pyVector, long index):
     cdef Vector3 vector = toVector3(pyVector)

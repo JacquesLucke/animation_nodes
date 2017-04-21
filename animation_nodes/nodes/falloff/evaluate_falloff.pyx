@@ -47,7 +47,7 @@ class EvaluateFalloffNode(bpy.types.Node, AnimationNode):
         cdef int i
 
         self.errorMessage = ""
-        try: _falloff = falloff.getEvaluator("", onlyC = True)
+        try: _falloff = falloff.getEvaluator("")
         except:
             self.errorMessage = "invalid falloff type"
             return DoubleList()
