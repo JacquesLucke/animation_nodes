@@ -16,7 +16,8 @@ class ObjectMatrixOutputNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_ObjectMatrixOutputNode"
     bl_label = "Object Matrix Output"
 
-    outputType = EnumProperty(items = outputItems, update = executionCodeChanged, default = "WORLD")
+    outputType = EnumProperty(name = "Type", default = "WORLD",
+        items = outputItems, update = executionCodeChanged)
 
     useObjectList = VectorizedNode.newVectorizeProperty()
     useMatrixList = VectorizedNode.newVectorizeProperty()
@@ -32,9 +33,10 @@ class ObjectMatrixOutputNode(bpy.types.Node, VectorizedNode):
         self.newVectorizedOutput("Object", "useObjectList",
             ("Object", "object"), ("Objects", "objects"))
 
-    def draw(self, layout):
-        row = layout.row(align = True)
-        row.prop(self, "outputType", text = "Type")
+    def drawAdvanced(self, layout):
+        layout.prop(self, "outputType", text = "Type")
+        if self.outputType != "WORLD":
+            layout.label("This mode might not work as expected", icon = "INFO")
 
     def getExecutionFunctionName(self):
         if isList(self.inputs[1].dataType):
