@@ -2,6 +2,7 @@ from . evaluation cimport FalloffEvaluator
 
 cdef class Falloff:
     cdef bint clamped
+    cdef dict evaluators
 
     cpdef FalloffEvaluator getEvaluator(self, str sourceType, bint clamped = ?, bint onlyC = ?)
 
