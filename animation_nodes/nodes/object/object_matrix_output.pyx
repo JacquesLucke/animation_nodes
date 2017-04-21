@@ -8,7 +8,7 @@ from ... data_structures cimport Matrix4x4List
 
 outputItems = [	("BASIS", "Basis", "", "NONE", 0),
                 ("LOCAL", "Local", "", "NONE", 1),
-                ("PARENT INVERSE", "Parent Inverse", "", "NONE", 2),
+                ("PARENT_INVERSE", "Parent Inverse", "", "NONE", 2),
                 ("WORLD", "World", "", "NONE", 3) ]
 
 
@@ -53,7 +53,7 @@ class ObjectMatrixOutputNode(bpy.types.Node, VectorizedNode):
         yield indent + "if object is not None:"
         if t == "BASIS":          yield indent + "    object.matrix_basis = matrix"
         if t == "LOCAL":          yield indent + "    object.matrix_local = matrix"
-        if t == "PARENT INVERSE": yield indent + "    object.matrix_parent_inverse = matrix"
+        if t == "PARENT_INVERSE": yield indent + "    object.matrix_parent_inverse = matrix"
         if t == "WORLD":          yield indent + "    object.matrix_world = matrix"
 
     def execute_List(self, list objects, Matrix4x4List matrices):
@@ -71,7 +71,7 @@ class ObjectMatrixOutputNode(bpy.types.Node, VectorizedNode):
                 obj = objects[i]
                 if obj is not None:
                     obj.matrix_local = toPyMatrix4(matrices.data + i)
-        elif attribute == "PARENT INVERSE":
+        elif attribute == "PARENT_INVERSE":
             for i in range(amount):
                 obj = objects[i]
                 if obj is not None:
