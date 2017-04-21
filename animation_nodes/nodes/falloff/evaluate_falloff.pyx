@@ -16,6 +16,8 @@ class EvaluateFalloffNode(bpy.types.Node, AnimationNode):
     falloffType = EnumProperty(name = "Falloff Type",
         items = falloffTypeItems, update = AnimationNode.refresh)
 
+    errorMessage = StringProperty()
+
     def create(self):
         self.newInput("Falloff", "Falloff", "falloff")
 
@@ -30,6 +32,8 @@ class EvaluateFalloffNode(bpy.types.Node, AnimationNode):
 
     def draw(self, layout):
         layout.prop(self, "falloffType", text = "")
+        if self.errorMessage != "":
+            layout.label(self.errorMessage, icon = "ERROR")
 
     def getExecutionFunctionName(self):
         if self.falloffType == "None":
@@ -38,15 +42,29 @@ class EvaluateFalloffNode(bpy.types.Node, AnimationNode):
             return "execute_CList"
 
     def execute_None(self, falloff, amount):
-        cdef FalloffEvaluator _falloff = falloff.getEvaluator("", onlyC = True)
-        cdef DoubleList strengths = DoubleList(length = amount)
+        cdef FalloffEvaluator _falloff
+        cdef DoubleList strengths
         cdef int i
+
+        self.errorMessage = ""
+        try: _falloff = falloff.getEvaluator("", onlyC = True)
+        except:
+            self.errorMessage = "invalid falloff type"
+            return DoubleList()
+
+        strengths = DoubleList(length = amount)
         for i in range(amount):
             strengths.data[i] = _falloff.evaluate(NULL, i)
         return strengths
 
     def execute_CList(self, falloff, myList):
-        cdef FalloffEvaluator _falloff = falloff.getEvaluator(self.falloffType)
+        cdef FalloffEvaluator _falloff
+        self.errorMessage = ""
+        try: _falloff = falloff.getEvaluator(self.falloffType)
+        except:
+            self.errorMessage = "invalid falloff type"
+            return DoubleList()
+
         return self.evaluate_CList(_falloff, myList)
 
     def evaluate_CList(self, FalloffEvaluator _falloff, CList myList):
