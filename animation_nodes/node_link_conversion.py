@@ -83,7 +83,8 @@ class SimpleConvert(LinkCorrection):
         ("Euler", "Vector") : "an_RotationToDirectionNode",
         ("Float", "Falloff") : "an_ConstantFalloffNode",
         ("Vector List", "Matrix List") : "an_TranslationMatrixNode",
-        ("Vector List", "Spline") : "an_SplineFromPointsNode"
+        ("Vector List", "Spline") : "an_SplineFromPointsNode",
+        ("Float List", "Falloff") : "an_CustomFalloffNode"
     }
 
     def check(self, origin, target):
