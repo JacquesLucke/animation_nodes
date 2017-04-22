@@ -244,6 +244,7 @@ class ListMenu(bpy.types.Menu):
         insertNode(layout, "an_SliceListNode", "Slice")
         insertNode(layout, "an_ShiftListNode", "Shift")
         insertNode(layout, "an_SortListNode", "Sort")
+        insertNode(layout, "an_MaskListNode", "Mask")
         layout.separator()
         insertNode(layout, "an_FillListNode", "Fill")
         insertNode(layout, "an_RepeatListNode", "Repeat")
