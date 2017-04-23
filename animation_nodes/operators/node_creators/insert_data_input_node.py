@@ -1,28 +1,36 @@
 import bpy
 from bpy.props import *
-from ... base_types import Template
+from . node_creator import NodeCreator
 from ... sockets.info import isList, toBaseDataType
 
-class InsertDataInputNodeTemplateOperator(bpy.types.Operator, Template):
-    bl_idname = "an.insert_data_input_node_template_operator"
-    bl_label = "Insert Data Input Node"
+class InsertDataCreationNode(bpy.types.Operator, NodeCreator):
+    bl_idname = "an.insert_data_creation_node"
+    bl_label = "Insert Data Creation Node"
 
     socketIndex = IntProperty(default = 0)
 
     @property
     def needsMenu(self):
-        return len(self.activeNode.getVisibleInputs()) > 1
+        return len(list(self.iterPossibleInputs())) > 1
 
     def drawMenu(self, layout):
         layout.operator_context = "EXEC_DEFAULT"
-        for socket in self.activeNode.getVisibleInputs():
-            props = layout.operator(self.bl_idname, text = socket.getDisplayedName())
-            props.socketIndex = socket.getIndex()
+        for socket in self.iterPossibleInputs():
+            if len(socket.allowedInputTypes) > 0:
+                props = layout.operator(self.bl_idname, text = socket.getDisplayedName())
+                props.socketIndex = socket.getIndex()
+
+    def iterPossibleInputs(self):
+        for socket in self.activeNode.inputs:
+            if not socket.hide and len(socket.allowedInputTypes) > 0:
+                yield socket
 
     def insert(self):
         activeNode = self.activeNode
         if self.usedMenu: socket = activeNode.inputs[self.socketIndex]
-        else: socket = activeNode.getVisibleInputs()[0]
+        else:
+            try: socket = self.iterPossibleInputs().__next__()
+            except: return
 
         if isList(socket.bl_idname):
             originNode = self.newNode("an_CreateListNode")

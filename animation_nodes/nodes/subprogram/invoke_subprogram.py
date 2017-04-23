@@ -120,7 +120,7 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
             props = row.operator("an.change_subprogram", text = text, icon = icon)
             props.nodeIdentifier = self.identifier
 
-        props = row.operator("an.empty_subprogram_template", icon = "NEW", text = "New Subprogram" if len(networks) == 0 else "")
+        props = row.operator("an.insert_empty_subprogram", icon = "NEW", text = "New Subprogram" if len(networks) == 0 else "")
         props.targetNodeIdentifier = self.identifier
 
         if self.showCacheOptions or self.cacheType != "DISABLED":

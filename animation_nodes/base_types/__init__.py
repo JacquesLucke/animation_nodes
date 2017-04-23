@@ -1,4 +1,3 @@
-from . template import Template
 from . node_tree import AnimationNodeTree
 
 from . nodes import (AnimationNode,

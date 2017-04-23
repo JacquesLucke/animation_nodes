@@ -1,10 +1,9 @@
 import bpy
 from bpy.props import *
-from ... sockets.info import isList
-from ... base_types import Template
+from . node_creator import NodeCreator
 
-class InsertViewerNodeTemplateOperator(bpy.types.Operator, Template):
-    bl_idname = "an.insert_viewer_node_template_operator"
+class InsertViewerNode(bpy.types.Operator, NodeCreator):
+    bl_idname = "an.insert_viewer_node"
     bl_label = "Insert Viewer Node"
 
     socketIndex = IntProperty(default = 0)

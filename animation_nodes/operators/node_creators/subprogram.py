@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import *
-from ... base_types import Template
+from . node_creator import NodeCreator
 from ... nodes.subprogram.subprogram_sockets import subprogramInterfaceChanged
 
 subprogramTypeItems = [
@@ -8,9 +8,9 @@ subprogramTypeItems = [
     ("LOOP", "Loop", ""),
     ("SCRIPT", "Script", "") ]
 
-class EmptySubprogramTemplate(bpy.types.Operator, Template):
-    bl_idname = "an.empty_subprogram_template"
-    bl_label = "Empty Subprogram"
+class InsertEmptySubprogram(bpy.types.Operator, NodeCreator):
+    bl_idname = "an.insert_empty_subprogram"
+    bl_label = "Insert Empty Subprogram"
 
     subprogramType = EnumProperty(name = "Subprogram Type", items = subprogramTypeItems)
 
