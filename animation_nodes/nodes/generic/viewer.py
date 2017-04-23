@@ -150,9 +150,7 @@ def handleNonList_Matrix(matrix):
 @lru_cache(maxsize = 1024)
 def getHandleListInfo(cls):
     from ... data_structures import Vector3DList, EulerList, QuaternionList, DoubleList
-    if cls is list:
-        return handleListElement_Generic, None
-    elif cls is Vector3DList:
+    if cls is Vector3DList:
         return handleListElement_Vector, 260
     elif cls is EulerList:
         return handleListElement_Euler, 320
@@ -160,6 +158,8 @@ def getHandleListInfo(cls):
         return handleListElement_Quaternion, 320
     elif cls is DoubleList:
         return handleListElement_Float, None
+    else:
+        return handleListElement_Generic, None
 
 def handleListElement_Generic(data):
     return str(data)
