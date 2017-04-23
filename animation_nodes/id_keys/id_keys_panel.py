@@ -59,10 +59,10 @@ class IDKeyPanel(bpy.types.Panel):
         left.label(idKey.name)
 
         if exists:
-            props = right.operator("an.copy_id_key_to_selected_objects",
+            props = right.operator("an.open_copy_id_key_menu",
                                    text = "", icon = "GHOST", emboss = False)
-            props.dataType = idKey.type
-            props.propertyName = idKey.name
+            props.keyDataType = idKey.type
+            props.keyName = idKey.name
 
             props = right.operator("an.remove_id_key_on_selected_objects",
                                    text = "", icon = "X", emboss = False)
@@ -87,17 +87,6 @@ def createIDKeyOnSelectedObjects(dataType, propertyName):
 def createIDKeyOnSelectedObjects(dataType, propertyName):
     for object in bpy.context.selected_objects:
         object.id_keys.remove(dataType, propertyName)
-
-@makeOperator("an.copy_id_key_to_selected_objects",
-              "Copy ID Key", arguments = ["String", "String"], confirm = True,
-              description = "Copy this ID Key from active to all selected objects.")
-def copyIDKeyToSelectedObjects(dataType, propertyName):
-    activeObject = bpy.context.active_object
-    if activeObject is None: return
-
-    value = activeObject.id_keys.get(dataType, propertyName)
-    for object in bpy.context.selected_objects:
-        object.id_keys.set(dataType, propertyName, value)
 
 @makeOperator("an.toggle_id_key_visibility",
               "Toogle ID Key Visibility", arguments = ["String", "String"])

@@ -40,6 +40,10 @@ class IDKeyDataType:
     def drawExtras(cls, layout, object, name):
         pass
 
+    @classmethod
+    def drawCopyMenu(cls, layout, object, name):
+        pass
+
 
 class CompoundIDKeyDataType(IDKeyDataType):
     pass
