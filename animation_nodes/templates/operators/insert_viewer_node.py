@@ -28,10 +28,8 @@ class InsertViewerNodeTemplateOperator(bpy.types.Operator, Template):
         dataType = socket.dataType
         if dataType == "Interpolation":
             viewerNode = self.newNode("an_InterpolationViewerNode")
-        elif isList(dataType) or dataType == "Matrix":
-            viewerNode = self.newNode("an_DebugDrawerNode")
         else:
-            viewerNode = self.newNode("an_DebugNode")
+            viewerNode = self.newNode("an_ViewerNode")
         socket.linkWith(viewerNode.inputs[0])
 
         self.setActiveNode(viewerNode)

@@ -42,7 +42,7 @@ def drawMenu(self, context):
     layout.menu("an_geometry_menu", text = "Geometry", icon = "MOD_DISPLACE")
     layout.menu("an_kdtree_bvhtree_menu", text = "KD & BVH Tree", icon = "STICKY_UVS_LOC")
     layout.separator()
-    layout.menu("an_debug_menu", text = "Debug", icon = "INFO")
+    layout.menu("an_viewer_menu", text = "Viewer", icon = "INFO")
     layout.menu("an_subprograms_menu", text = "Subprograms", icon = "FILE_SCRIPT")
     layout.menu("an_layout_menu", text = "Layout", icon = "IMGDISPLAY")
 
@@ -529,7 +529,6 @@ class SoundMenu(bpy.types.Menu):
         insertNode(layout, "an_BakeSoundNode", "Bake Sound")
         insertNode(layout, "an_SoundFromSequencesNode", "Sound from Sequences")
 
-
 class SequenceMenu(bpy.types.Menu):
     bl_idname = "an_sequence_menu"
     bl_label = "Sequence Menu"
@@ -540,7 +539,6 @@ class SequenceMenu(bpy.types.Menu):
         insertNode(layout, "an_GetAllSequencesNode", "Get All Sequences")
         insertNode(layout, "an_TextSequenceOutputNode", "Text Sequence Output")
         insertNode(layout, "an_SequenceInfoNode", "Sequence Info")
-
 
 class GeometryMenu(bpy.types.Menu):
     bl_idname = "an_geometry_menu"
@@ -583,17 +581,14 @@ class KDTreeAndBVHTreeMenu(bpy.types.Menu):
         insertNode(layout, "an_FindNearestSurfacePointNode", "Find Nearest")
         insertNode(layout, "an_IsInsideVolumeBVHTreeNode", "Is Inside Volume")
 
-
-class DebugMenu(bpy.types.Menu):
-    bl_idname = "an_debug_menu"
-    bl_label = "Debug Menu"
+class ViewerMenu(bpy.types.Menu):
+    bl_idname = "an_viewer_menu"
+    bl_label = "Viewer Menu"
 
     def draw(self, context):
         layout = self.layout
-        insertNode(layout, "an_DebugNode", "Debug")
-        insertNode(layout, "an_LoopViewerNode", "Debug Loop")
-        insertNode(layout, "an_DebugListNode", "Debug List")
-        insertNode(layout, "an_DebugDrawerNode", "Debug Drawer")
+        insertNode(layout, "an_ViewerNode", "Viewer")
+        insertNode(layout, "an_LoopViewerNode", "Loop Viewer")
         insertNode(layout, "an_InterpolationViewerNode", "Interpolation Viewer")
 
 class SubprogramsMenu(bpy.types.Menu):
