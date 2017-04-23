@@ -50,7 +50,6 @@ class TextBox:
                 self.lines.extend(textwrap.wrap("Some rows don't fit", maxCharactersPerLine))
                 break
 
-
     def calculateBoundaries(self):
         lineAmount = len(self.lines)
 
