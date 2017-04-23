@@ -11,16 +11,16 @@ class InsertDataCreationNode(bpy.types.Operator, NodeCreator):
 
     @property
     def needsMenu(self):
-        return len(list(self.iterPossibleInputs())) > 1
+        return len(list(self.iterPossibleSockets())) > 1
 
     def drawMenu(self, layout):
         layout.operator_context = "EXEC_DEFAULT"
-        for socket in self.iterPossibleInputs():
+        for socket in self.iterPossibleSockets():
             if len(socket.allowedInputTypes) > 0:
                 props = layout.operator(self.bl_idname, text = socket.getDisplayedName())
                 props.socketIndex = socket.getIndex()
 
-    def iterPossibleInputs(self):
+    def iterPossibleSockets(self):
         for socket in self.activeNode.inputs:
             if not socket.hide and len(socket.allowedInputTypes) > 0:
                 yield socket
@@ -29,7 +29,7 @@ class InsertDataCreationNode(bpy.types.Operator, NodeCreator):
         activeNode = self.activeNode
         if self.usedMenu: socket = activeNode.inputs[self.socketIndex]
         else:
-            try: socket = self.iterPossibleInputs().__next__()
+            try: socket = self.iterPossibleSockets().__next__()
             except: return
 
         if isList(socket.bl_idname):

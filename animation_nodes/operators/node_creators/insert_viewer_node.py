@@ -10,19 +10,26 @@ class InsertViewerNode(bpy.types.Operator, NodeCreator):
 
     @property
     def needsMenu(self):
-        return len(self.activeNode.getVisibleOutputs()) > 1
+        return len(list(self.iterPossibleSockets())) > 1
 
     def drawMenu(self, layout):
         layout.operator_context = "EXEC_DEFAULT"
-        for socket in self.activeNode.getVisibleOutputs():
+        for socket in self.iterPossibleSockets():
             props = layout.operator(self.bl_idname, text = socket.getDisplayedName())
             props.socketIndex = socket.getIndex()
+
+    def iterPossibleSockets(self):
+        for socket in self.activeNode.outputs:
+            if not socket.hide and len(socket.allowedInputTypes) > 0:
+                yield socket
 
     def insert(self):
         activeNode = self.activeNode
 
         if self.usedMenu: socket = activeNode.outputs[self.socketIndex]
-        else: socket = activeNode.getVisibleOutputs()[0]
+        else:
+            try: socket = activeNode.iterPossibleSockets().__next__()
+            except: return
 
         dataType = socket.dataType
         if dataType == "Interpolation":
