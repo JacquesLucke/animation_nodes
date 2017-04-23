@@ -48,27 +48,28 @@ class ViewerNode(bpy.types.Node, AnimationNode):
         length = len(data)
         startAmount = self.maxListStartElements
         endAmount = self.maxListEndElements
+        toString, minWidth = getHandleListInfo(type(data))
 
         if length <= startAmount + endAmount:
             indexWidth = len(str(length - 1))
-            text = "\n".join(self.iterListElements(data, 0, length, indexWidth))
+            text = "\n".join(self.iterListElements(data, 0, length, indexWidth, toString))
         else:
             if endAmount > 0: indexWidth = len(str(length - 1))
             else:             indexWidth = len(str(startAmount - 1))
 
             separator = ["..."]
-            startElements = self.iterListElements(data, 0, startAmount, indexWidth)
-            endElements = self.iterListElements(data, length - endAmount, endAmount, indexWidth)
+            startElements = self.iterListElements(data, 0, startAmount, indexWidth, toString)
+            endElements = self.iterListElements(data, length - endAmount, endAmount, indexWidth, toString)
             text = "\n".join(chain(startElements, separator, endElements))
 
         listInfo = "{} - Length: {}".format(type(data).__name__, length)
-        self.setViewData(listInfo, text)
+        self.setViewData(listInfo, text, minWidth)
 
-    def iterListElements(self, data, start, length, indexWidth):
+    def iterListElements(self, data, start, length, indexWidth, toString):
         if length == 0:
             return
         for i, element in enumerate(data[start:start + length], start):
-            yield "{}: {}".format(str(i).rjust(indexWidth), element)
+            yield "{}: {}".format(str(i).rjust(indexWidth), toString(element))
 
     def setViewData(self, nodeText, drawText, minWidth = None):
         self.inputs[0].name = nodeText
@@ -141,6 +142,39 @@ def handleNonList_Euler(euler):
 
 def handleNonList_Matrix(matrix):
     return "Type: {}x{} Matrix".format(len(matrix.row), len(matrix.col)), str(matrix), 330
+
+
+# List Helpers
+##################################
+
+@lru_cache(maxsize = 1024)
+def getHandleListInfo(cls):
+    from ... data_structures import Vector3DList, EulerList, QuaternionList, DoubleList
+    if cls is list:
+        return handleListElement_Generic, None
+    elif cls is Vector3DList:
+        return handleListElement_Vector, 260
+    elif cls is EulerList:
+        return handleListElement_Euler, 320
+    elif cls is QuaternionList:
+        return handleListElement_Quaternion, 320
+    elif cls is DoubleList:
+        return handleListElement_Float, None
+
+def handleListElement_Generic(data):
+    return str(data)
+
+def handleListElement_Vector(vector):
+    return "V({:>7.3f}, {:>7.3f}, {:>7.3f})".format(*vector)
+
+def handleListElement_Euler(euler):
+    return "E({:>7.3f}, {:>7.3f}, {:>7.3f}, order = {})".format(*euler, euler.order)
+
+def handleListElement_Quaternion(quaternion):
+    return "Q({:>7.3f}, {:>7.3f}, {:>7.3f}, {:>7.3f})".format(*quaternion)
+
+def handleListElement_Float(number):
+    return "{:>10.5f}".format(number)
 
 
 # Drawing
