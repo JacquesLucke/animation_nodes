@@ -95,6 +95,11 @@ class TransformDataType(CompoundIDKeyDataType):
         props.name = name
 
     @classmethod
+    def drawCopyMenu(cls, layout, object, name):
+        props = layout.operator("an.id_key_to_current_transforms", text = "to Transforms")
+        props.name = name
+
+    @classmethod
     def iterSubpropertyKeys(cls, name):
         yield "AN*Transforms*Location*" + name
         yield "AN*Transforms*Rotation*" + name
@@ -121,3 +126,13 @@ class TransformDataType(CompoundIDKeyDataType):
 def idKeyFromCurrentTransforms(name):
     for object in bpy.context.selected_objects:
         object.id_keys.set("Transforms", name, (object.location, object.rotation_euler, object.scale))
+
+@makeOperator("an.id_key_to_current_transforms", "To Current Transforms",
+              arguments = ["String"],
+              description = "Set transformation on object.")
+def idKeyToCurrentTransforms(name):
+    for object in bpy.context.selected_objects:
+        loc, rot, scale = object.id_keys.get("Transforms", name)
+        object.location = loc
+        object.rotation_euler = rot
+        object.scale = scale
