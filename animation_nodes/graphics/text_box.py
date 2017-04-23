@@ -61,10 +61,10 @@ class TextBox:
         self.boundary.resetPosition(x1, y1, x2, y2)
 
     def drawLines(self):
-        baseLineOffset = blf.dimensions(font, "V")[1]
+        offset = blf.dimensions(font, "Vg")[1]
         textBoundary = self.boundary.getInsetRectangle(self.padding)
 
         glColor4f(0, 0, 0, 1)
         for i, line in enumerate(self.lines):
-            blf.position(font, textBoundary.left, textBoundary.top - i * self.lineHeight - baseLineOffset, 0)
+            blf.position(font, textBoundary.left, textBoundary.top - i * self.lineHeight - offset, 0)
             blf.draw(font, line)
