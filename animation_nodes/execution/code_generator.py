@@ -138,7 +138,8 @@ def iterNodeExecutionLines_MeasureTimes(node, variables):
         yield "_execution_start_time = getCurrentTime()"
         yield from setupNodeForExecution(node, variables)
         yield from iterRealNodeExecutionLines(node, variables)
-        yield "_node_execution_times[{}].registerTime(getCurrentTime() - _execution_start_time)".format(repr(node.identifier))
+        yield "_execution_end_time = getCurrentTime()"
+        yield "_node_execution_times[{}].registerTime(_execution_end_time - _execution_start_time)".format(repr(node.identifier))
     except:
         handleExecutionCodeCreationException(node)
 
