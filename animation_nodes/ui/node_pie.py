@@ -13,13 +13,13 @@ class ContextPie(bpy.types.Menu, PieMenuHelper):
         except: return False
 
     def drawLeft(self, layout):
-        amount = len(self.activeNode.getVisibleInputs())
-        if amount == 0: self.empty(layout, text = "Has no visible inputs")
+        amount = countUsableSockets(self.activeNode.inputs)
+        if amount == 0: self.empty(layout, text = "Has no usable inputs")
         else: layout.operator("an.insert_data_creation_node", text = "Data Input")
 
     def drawBottom(self, layout):
-        amount = len(self.activeNode.getVisibleOutputs())
-        if amount == 0: self.empty(layout, text = "Has no visible outputs")
+        amount = countUsableSockets(self.activeNode.outputs)
+        if amount == 0: self.empty(layout, text = "Has no usable outputs")
         else: layout.operator("an.insert_viewer_node", text = "Viewer")
 
     def drawRight(self, layout):
@@ -47,3 +47,10 @@ class ContextPie(bpy.types.Menu, PieMenuHelper):
     @property
     def activeNode(self):
         return bpy.context.active_node
+
+def countUsableSockets(sockets):
+    counter = 0
+    for socket in sockets:
+        if not socket.hide and len(socket.allowedInputTypes) > 0:
+            counter += 1
+    return counter

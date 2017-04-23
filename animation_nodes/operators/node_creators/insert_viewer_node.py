@@ -28,7 +28,7 @@ class InsertViewerNode(bpy.types.Operator, NodeCreator):
 
         if self.usedMenu: socket = activeNode.outputs[self.socketIndex]
         else:
-            try: socket = activeNode.iterPossibleSockets().__next__()
+            try: socket = self.iterPossibleSockets().__next__()
             except: return
 
         dataType = socket.dataType
