@@ -67,7 +67,7 @@ class Template:
         except: return None
 
     def offsetNodesToMouse(self):
-        tempNode = newNodeAtCursor("an_DebugNode")
+        tempNode = newNodeAtCursor("an_DataInputNode")
         offset = tempNode.location
         self.nodeTree.nodes.remove(tempNode)
         for node in self.nodesToOffset:
