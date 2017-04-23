@@ -115,7 +115,8 @@ class TransformDataType(CompoundIDKeyDataType):
         return '["AN*Transforms*Rotation Order*%s"]' % name
 
 
-@makeOperator("an.id_key_from_current_transforms", "From Current Transforms", arguments = ["String"],
+@makeOperator("an.id_key_from_current_transforms", "From Current Transforms",
+              arguments = ["String"],
               description = "Assign transform ID Key based on current loc/rot/scale.")
 def idKeyFromCurrentTransforms(name):
     for object in bpy.context.selected_objects:

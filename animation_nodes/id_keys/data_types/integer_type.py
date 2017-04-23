@@ -23,6 +23,17 @@ class IntegerDataType(SingleIDKeyDataType):
         props = layout.operator("an.id_keys_from_sorted_objects", text = "Sort Objects", icon = "SORTSIZE")
         props.idKeyName = name
 
+    @classmethod
+    def drawCopyMenu(cls, layout, object, name):
+        props = layout.operator("an.copy_id_key_to_attribute", "to Pass Index")
+        props.dataType = "Integer"
+        props.propertyName = name
+        props.attribute = "pass_index"
+
+
+
+# Sorting
+###########################################
 
 sortModeItems = [
     ("SELECTION_ORDER", "Selection Order", "", "BORDER_RECT", 0),
