@@ -1,5 +1,6 @@
 import bpy
 from bpy.props import *
+from itertools import chain
 from functools import lru_cache
 from ... base_types import AnimationNode
 from ... draw_handler import drawHandler
@@ -10,18 +11,28 @@ drawTextByIdentifier = {}
 class ViewerNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ViewerNode"
     bl_label = "Viewer"
+    options = {"NO_TIMING"}
 
     maxRows = IntProperty(name = "Max Rows", default = 150, min = 0,
         description = "Max amount of lines visible in the floating text box.")
     fontSize = IntProperty(name = "Font Size", default = 12, min = 1, max = 1000)
+
+    maxListStartElements = IntProperty(name = "Max List Start Elements", default = 15, min = 0)
+    maxListEndElements = IntProperty(name = "Max List End Elements", default = 0, min = 0)
 
     def create(self):
         self.newInput("Generic", "None", "data")
 
     def drawAdvanced(self, layout):
         col = layout.column(align = True)
+        col.label("Display Settings:")
         col.prop(self, "fontSize")
         col.prop(self, "maxRows")
+
+        col = layout.column(align = True)
+        col.label("List Settings:")
+        col.prop(self, "maxListStartElements", text = "Start")
+        col.prop(self, "maxListEndElements", text = "End")
 
     def execute(self, data):
         if handleDataAsList(data):
@@ -34,7 +45,30 @@ class ViewerNode(bpy.types.Node, AnimationNode):
         self.setViewData(*function(data))
 
     def handleListData(self, data):
-        self.setViewData(type(data).__name__, "List")
+        length = len(data)
+        startAmount = self.maxListStartElements
+        endAmount = self.maxListEndElements
+
+        if length <= startAmount + endAmount:
+            indexWidth = len(str(length - 1))
+            text = "\n".join(self.iterListElements(data, 0, length, indexWidth))
+        else:
+            if endAmount > 0: indexWidth = len(str(length - 1))
+            else:             indexWidth = len(str(startAmount - 1))
+
+            separator = ["..."]
+            startElements = self.iterListElements(data, 0, startAmount, indexWidth)
+            endElements = self.iterListElements(data, length - endAmount, endAmount, indexWidth)
+            text = "\n".join(chain(startElements, separator, endElements))
+
+        listInfo = "{} - Length: {}".format(type(data).__name__, length)
+        self.setViewData(listInfo, text)
+
+    def iterListElements(self, data, start, length, indexWidth):
+        if length == 0:
+            return
+        for i, element in enumerate(data[start:start + length], start):
+            yield "{}: {}".format(str(i).rjust(indexWidth), element)
 
     def setViewData(self, nodeText, drawText, minWidth = None):
         self.inputs[0].name = nodeText
