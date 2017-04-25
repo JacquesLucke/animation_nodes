@@ -2,12 +2,12 @@ import bpy
 from bpy.props import *
 from mathutils import Vector
 from ... sockets.info import isList
-from ... base_types import Template
+from . node_creator import NodeCreator
 from ... tree_info import getNodeByIdentifier
 
-class InsertLoopForIteration(bpy.types.Operator, Template):
-    bl_idname = "an.insert_loop_for_iteration_template"
-    bl_label = "Insert Loop for Iteration"
+class InsertLoopForIterator(bpy.types.Operator, NodeCreator):
+    bl_idname = "an.insert_loop_for_iterator"
+    bl_label = "Insert Loop for Iterator"
 
     nodeIdentifier = StringProperty()
     socketIndex = IntProperty()

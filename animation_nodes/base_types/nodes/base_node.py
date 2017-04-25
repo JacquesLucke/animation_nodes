@@ -393,12 +393,6 @@ class AnimationNode:
     def getLinkedOutputsDict(self):
         return getLinkedOutputsDict(self)
 
-    def getVisibleInputs(self):
-        return [socket for socket in self.inputs if not socket.hide]
-
-    def getVisibleOutputs(self):
-        return [socket for socket in self.outputs if not socket.hide]
-
     def iterInnerLinks(self):
         names = {}
         for identifier, variable in self.getInputSocketVariables().items():

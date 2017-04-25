@@ -13,14 +13,14 @@ class ContextPie(bpy.types.Menu, PieMenuHelper):
         except: return False
 
     def drawLeft(self, layout):
-        amount = len(self.activeNode.getVisibleInputs())
-        if amount == 0: self.empty(layout, text = "Has no visible inputs")
-        else: layout.operator("an.insert_data_input_node_template_operator", text = "Data Input")
+        amount = countUsableSockets(self.activeNode.inputs)
+        if amount == 0: self.empty(layout, text = "Has no usable inputs")
+        else: layout.operator("an.insert_data_creation_node", text = "Data Input")
 
     def drawBottom(self, layout):
-        amount = len(self.activeNode.getVisibleOutputs())
-        if amount == 0: self.empty(layout, text = "Has no visible outputs")
-        else: layout.operator("an.insert_viewer_node_template_operator", text = "Debug")
+        amount = countUsableSockets(self.activeNode.outputs)
+        if amount == 0: self.empty(layout, text = "Has no usable outputs")
+        else: layout.operator("an.insert_viewer_node", text = "Viewer")
 
     def drawRight(self, layout):
         col = layout.column(align = False)
@@ -30,7 +30,7 @@ class ContextPie(bpy.types.Menu, PieMenuHelper):
     def insertInvokeNodeTemplate(self, layout):
         col = layout.column(align = True)
         if getattr(self.activeNode, "isSubprogramNode", False):
-            props = col.operator("an.insert_invoke_node_template_operator",
+            props = col.operator("an.insert_invoke_subprogram_node",
                 text = "Create Invoke Node", icon = "GROUP_VERTEX")
             props.subprogramIdentifier = self.activeNode.identifier
 
@@ -38,7 +38,7 @@ class ContextPie(bpy.types.Menu, PieMenuHelper):
         col = layout.column(align = True)
         for socket in self.activeNode.outputs:
             if not socket.hide and isList(socket.bl_idname):
-                props = col.operator("an.insert_loop_for_iteration_template",
+                props = col.operator("an.insert_loop_for_iterator",
                     text = "Loop through {}".format(repr(socket.getDisplayedName())),
                     icon = "MOD_ARRAY")
                 props.nodeIdentifier = self.activeNode.identifier
@@ -47,3 +47,10 @@ class ContextPie(bpy.types.Menu, PieMenuHelper):
     @property
     def activeNode(self):
         return bpy.context.active_node
+
+def countUsableSockets(sockets):
+    counter = 0
+    for socket in sockets:
+        if not socket.hide and len(socket.allowedInputTypes) > 0:
+            counter += 1
+    return counter

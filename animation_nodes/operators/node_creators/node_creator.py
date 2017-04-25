@@ -1,11 +1,11 @@
 import bpy
 from bpy.props import *
 from mathutils import Vector
-from .. tree_info import getNodeByIdentifier
-from .. nodes.subprogram import subprogram_sockets
-from .. utils.nodes import newNodeAtCursor, invokeTranslation
+from ... tree_info import getNodeByIdentifier
+from ... nodes.subprogram import subprogram_sockets
+from ... utils.nodes import newNodeAtCursor, invokeTranslation
 
-class Template:
+class NodeCreator:
     bl_options = {"INTERNAL"}
     nodeOffset = (0, 0)
     menuWidth = 400
