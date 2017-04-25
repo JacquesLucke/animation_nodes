@@ -21,8 +21,26 @@ class ViewerNode(bpy.types.Node, AnimationNode):
     maxListStartElements = IntProperty(name = "Max List Start Elements", default = 15, min = 0)
     maxListEndElements = IntProperty(name = "Max List End Elements", default = 0, min = 0)
 
+    outputConsole = BoolProperty(name = "Console Output", default = False,
+        description = "Output data in the terminal/console. May slow down execution a lot.")
+
+    outputTextBlock = BoolProperty(name = "Text Block Output", default = False,
+        description = "Output data in a text block. May slow down execution a lot.")
+
+    textBlockName = StringProperty(name = "Text Block Name")
+
     def create(self):
         self.newInput("Generic", "None", "data")
+
+    def draw(self, layout):
+        if self.outputTextBlock:
+            row = layout.row(align = True)
+            row.prop_search(self, "textBlockName",  bpy.data, "texts", text = "")
+            if self.getTextBlock():
+                self.invokeSelector(row, "AREA", "viewTextBlockInArea",
+                    icon = "ZOOM_SELECTED")
+            else:
+                self.invokeFunction(row, "createNewTextBlock", icon = "ZOOMIN")
 
     def drawAdvanced(self, layout):
         col = layout.column(align = True)
@@ -35,6 +53,11 @@ class ViewerNode(bpy.types.Node, AnimationNode):
         col.prop(self, "maxListStartElements", text = "Start")
         col.prop(self, "maxListEndElements", text = "End")
 
+        col = layout.column(align = True)
+        col.label("Output Settings:")
+        col.prop(self, "outputConsole", "Console")
+        col.prop(self, "outputTextBlock", "Text Block")
+
     def execute(self, data):
         if handleDataAsList(data):
             self.handleListData(data)
@@ -43,7 +66,10 @@ class ViewerNode(bpy.types.Node, AnimationNode):
 
     def handleNonListData(self, data):
         function = getHandleNonListFunction(type(data))
-        self.setViewData(*function(data))
+        nodeText, drawText, *args = function(data)
+        self.setViewData(nodeText, drawText, *args)
+        if self.outputTextBlock:
+            self.setTextBlockData(nodeText + "\n" + drawText)
 
     def handleListData(self, data):
         length = len(data)
@@ -58,13 +84,16 @@ class ViewerNode(bpy.types.Node, AnimationNode):
             if endAmount > 0: indexWidth = len(str(length - 1))
             else:             indexWidth = len(str(startAmount - 1))
 
-            separator = ["..."]
             startElements = self.iterListElements(data, 0, startAmount, indexWidth, toString)
             endElements = self.iterListElements(data, length - endAmount, endAmount, indexWidth, toString)
-            text = "\n".join(chain(startElements, separator, endElements))
+            text = "\n".join(chain(startElements, ["..."], endElements))
 
         listInfo = "{} - Length: {}".format(type(data).__name__, length)
         self.setViewData(listInfo, text, minWidth)
+
+        if self.outputTextBlock:
+            indexWidth = len(str(length - 1))
+            self.setTextBlockData("\n".join(self.iterListElements(data, 0, length, indexWidth, toString)))
 
     def iterListElements(self, data, start, length, indexWidth, toString):
         if length == 0:
@@ -79,9 +108,31 @@ class ViewerNode(bpy.types.Node, AnimationNode):
         if minWidth is not None:
             self.width = max(self.width, minWidth)
 
+        if self.outputConsole:
+            print("Viewer: '{}'".format(self.name))
+            print("  " + nodeText)
+            print("\n".join("  " + line for line in drawText.splitlines()))
+
+    def setTextBlockData(self, text):
+        textBlock = self.getTextBlock()
+        if textBlock is not None:
+            textBlock.clear()
+            textBlock.write(text)
+
     def delete(self):
         if self.identifier in drawTextByIdentifier:
             del drawTextByIdentifier[self.identifier]
+
+    def viewTextBlockInArea(self, area):
+        area.type = "TEXT_EDITOR"
+        area.spaces.active.text = self.getTextBlock()
+
+    def createNewTextBlock(self):
+        textBlock = bpy.data.texts.new(name = "Viewer")
+        self.textBlockName = textBlock.name
+
+    def getTextBlock(self):
+        return bpy.data.texts.get(self.textBlockName)
 
 
 def handleDataAsList(data):
