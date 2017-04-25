@@ -4,17 +4,17 @@ from collections import defaultdict
 drawHandlers = []
 registeredHandlersPerEditor = defaultdict(list)
 
-def drawHandler(editorName, regionName):
+def drawHandler(editorName, regionName, drawType = "POST_PIXEL"):
     def drawHandlerDecorator(function):
-        drawHandlers.append((function, editorName, regionName))
+        drawHandlers.append((function, editorName, regionName, drawType))
         return function
 
     return drawHandlerDecorator
 
 def register():
-    for function, editorName, regionName in drawHandlers:
+    for function, editorName, regionName, drawType in drawHandlers:
         editor = getattr(bpy.types, editorName)
-        handler = editor.draw_handler_add(function, (), regionName, "POST_PIXEL")
+        handler = editor.draw_handler_add(function, (), regionName, drawType)
         registeredHandlersPerEditor[editor].append((handler, regionName))
 
 def unregister():
