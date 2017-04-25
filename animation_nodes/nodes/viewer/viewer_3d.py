@@ -86,9 +86,7 @@ class Viewer3DNode(bpy.types.Node, AnimationNode):
 
     def freeDrawingData(self):
         if self.identifier in dataByIdentifier:
-            displayList = dataByIdentifier[self.identifier].displayList
-            if displayList is not None:
-                freeDisplayList(displayList)
+            freeDisplayList(dataByIdentifier[self.identifier].displayList)
             del dataByIdentifier[self.identifier]
 
     def getCurrentData(self):
