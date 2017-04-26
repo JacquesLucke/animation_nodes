@@ -232,4 +232,5 @@ def iterExpressionFunctionLines(expression, variables, modules):
         yield "from {} import *".format(name)
 
     yield "def main({}):".format(", ".join(variables))
-    yield "    return " + expression
+    yield "    __result__ = " + expression
+    yield "    return __result__"
