@@ -588,6 +588,7 @@ class ViewerMenu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         insertNode(layout, "an_ViewerNode", "Viewer")
+        insertNode(layout, "an_Viewer3DNode", "3D Viewer")
         insertNode(layout, "an_LoopViewerNode", "Loop Viewer")
         insertNode(layout, "an_InterpolationViewerNode", "Interpolation Viewer")
 
