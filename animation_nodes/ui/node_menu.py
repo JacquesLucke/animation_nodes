@@ -29,7 +29,7 @@ def drawMenu(self, context):
     layout.menu("an_object_menu", text = "Object", icon = "OBJECT_DATAMODE")
     layout.menu("an_mesh_menu", text = "Mesh", icon = "MESH_DATA")
     layout.menu("an_spline_menu", text = "Spline", icon = "CURVE_DATA")
-    layout.menu("an_particles_menu", text = "Particles", icon = "PARTICLE_DATA")
+    layout.menu("an_particle_system_menu", text = "Particle System", icon = "PARTICLE_DATA")
     layout.separator()
     layout.menu("an_animation_menu", text = "Animation", icon = "RENDER_ANIMATION")
     layout.menu("an_interpolation_menu", text = "Interpolation", icon = "IPO_BEZIER")
@@ -496,13 +496,13 @@ class MaterialMenu(bpy.types.Menu):
         insertNode(layout, "an_CyclesMaterialOutputNode", "Cycles Material Output")
         insertNode(layout, "an_ViewportColorNode", "Viewport Color")
 
-class ParticlesMenu(bpy.types.Menu):
-    bl_idname = "an_particles_menu"
-    bl_label = "Particles Menu"
+class ParticleSystemMenu(bpy.types.Menu):
+    bl_idname = "an_particle_system_menu"
+    bl_label = "Particle System Menu"
 
     def draw(self, context):
         layout = self.layout
-        insertNode(layout, "an_ParticleSystemsInputNode", "Systems Input")
+        insertNode(layout, "an_ParticleSystemsFromObjectNode", "From Object")
 
 class FCurveMenu(bpy.types.Menu):
     bl_idname = "an_fcurve_menu"
