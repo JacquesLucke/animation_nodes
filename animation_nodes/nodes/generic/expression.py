@@ -46,7 +46,7 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
     outputDataType = StringProperty(default = "Generic", update = outputDataTypeChanged)
 
     fixedOutputDataType = BoolProperty(name = "Fixed Data Type", default = False,
-        description = "When activated the output type does not automatically changes its type")
+        description = "When activated the output type does not automatically change")
 
     inlineExpression = BoolProperty(name = "Inline Expression", default = False,
         description = ("Inlining improves performance but the modules can't be used directly"
