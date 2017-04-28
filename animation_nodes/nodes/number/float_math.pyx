@@ -102,7 +102,7 @@ operations[8] = new("Arccosine", "acos A", "A",
     "result = math.acos(min(max(a, -1), 1))", <void*>acos_Save)
 operations[9] = new("Arctangent", "atan A", "A",
     "result = math.atan(a)", <void*>atan)
-operations[10] = new("Power", "A^B", "Base_Exponent",
+operations[10] = new("Power", "Base^Exponent", "Base_Exponent",
     "result = math.pow(base, exponent) if base >= 0 or exponent % 1 == 0 else 0",
     <void*>power_Save)
 operations[11] = new("Logarithm", "log A with Base", "A_Base",
@@ -137,7 +137,7 @@ operations[25] = new("Copy Sign", "A gets sign of B", "A_B",
 operations[26] = new("Floor Division", "floor(A / B)", "A_B",
     "result = a // b if b != 0 else 0", <void*>floorDivision_Save)
 
-operationItems = [(op.name, op.name, op.label, i) for i, op in operations.items()]
+operationItems = [(op.name, op.name, op.label, "NONE", i) for i, op in operations.items()]
 operationByName = {op.name : op for op in operations.values()}
 
 searchItems = {
@@ -213,10 +213,15 @@ class FloatMathNode(bpy.types.Node, VectorizedNode):
             description = "Remove quick settings from all Float Math nodes.")
 
     def drawLabel(self):
-        if self.hide:
-            return self._operation.label
-        else:
+        if not self.hide:
             return "Math"
+
+        operation = self._operation
+        label = operation.label
+        for socket in self.inputs:
+            if not socket.isLinked:
+                label = label.replace(socket.name, str(round(socket.value, 5)))
+        return label
 
     def setOperation(self, operation):
         self.operation = operation
