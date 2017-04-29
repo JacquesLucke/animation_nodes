@@ -10,14 +10,14 @@ class SmoothBezierSplineNode(bpy.types.Node, VectorizedNode):
 
     def create(self):
         socket = self.newVectorizedInput("Spline", "useSplineList",
-            ("Spline", "spline"), ("Splines", "inSplines"))
+            ("Spline", "spline"), ("Splines", "splines"))
         socket.showObjectInput = False
         socket.dataIsModified = True
 
         self.newInput("Float", "Smoothness", "smoothness", value = 0.3333)
 
         self.newVectorizedOutput("Spline", "useSplineList",
-            ("Spline", "spline"), ("Splines", "outSplines"))
+            ("Spline", "spline"), ("Splines", "splines"))
 
     def getExecutionCode(self):
         yield "if spline.type == 'BEZIER':"
