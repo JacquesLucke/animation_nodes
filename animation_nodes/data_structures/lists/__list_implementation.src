@@ -515,6 +515,10 @@ TO_PYOBJECT_CODE
         return newList
 
     @classmethod
+    def fromValue(cls, value, length = 1):
+        return LISTNAME.fromValues([value]) * length
+
+    @classmethod
     def fromListOrTuple(cls, list_or_tuple values):
         cdef LISTNAME newList = LISTNAME(len(values))
         cdef Py_ssize_t i
