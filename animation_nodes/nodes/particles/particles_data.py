@@ -65,16 +65,17 @@ class ParticleSystemParticlesDataNode(bpy.types.Node, VectorizedNode):
             yield "    values = self.getParticleProperties(system, '{}', {}, _mask)".format(attribute, CListType.__name__)
             yield "    {}.extend(values)".format(identifier)
 
+        # convert FloatList to DoubleList
+        for identifier, attribute, CListType in executionData:
+            if isLinked[identifier]:
+                if CListType is FloatList:
+                    yield "{0} = DoubleList.fromValues({0})".format(identifier)
+
     def getParticleProperties(self, particleSystem, attribute, CListType, mask):
         particles = particleSystem.particles
-        _values = CListType(length = len(particles))
-        particles.foreach_get(attribute, _values.asMemoryView())
-        values = mask_CList(_values, mask)
-
-        if type(values) == FloatList:
-            return DoubleList.fromValues(values)
-        else:
-            return values
+        values = CListType(length = len(particles))
+        particles.foreach_get(attribute, values.asMemoryView())
+        return mask_CList(values, mask)
 
     def getParticlesMask(self, particles):
         allowedStates = self.getIncludedParticleStates()
