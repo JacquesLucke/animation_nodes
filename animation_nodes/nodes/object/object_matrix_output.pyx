@@ -58,9 +58,9 @@ class ObjectMatrixOutputNode(bpy.types.Node, VectorizedNode):
 
     def execute_List(self, list objects, Matrix4x4List matrices):
         cdef:
-            size_t i
+            Py_ssize_t i
             str attribute = self.outputType
-            size_t amount = min(len(objects), len(matrices))
+            Py_ssize_t amount = min(len(objects), len(matrices))
         if attribute == "WORLD":
             for i in range(amount):
                 obj = objects[i]
