@@ -11,7 +11,7 @@ class SmoothBezierSplineNode(bpy.types.Node, VectorizedNode):
     def create(self):
         socket = self.newVectorizedInput("Spline", "useSplineList",
             ("Spline", "spline"), ("Splines", "splines"))
-        socket.showObjectInput = False
+        socket.defaultDrawType = "TEXT_ONLY"
         socket.dataIsModified = True
 
         self.newInput("Float", "Smoothness", "smoothness", value = 0.3333)

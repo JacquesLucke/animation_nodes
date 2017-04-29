@@ -18,10 +18,9 @@ class CurveObjectOutputNode(bpy.types.Node, VectorizedNode):
         socket.defaultDrawType = "PROPERTY_ONLY"
         socket.objectCreationType = "CURVE"
 
-        splineProps = {"showObjectInput" : False, "defaultDrawType" : "TEXT_ONLY"}
         self.newVectorizedInput("Spline", "useSplineList",
-            ("Spline", "spline", splineProps),
-            ("Splines", "splines", splineProps))
+            ("Spline", "spline", dict(defaultDrawType = "TEXT_ONLY")),
+            ("Splines", "splines", dict(defaultDrawType = "TEXT_ONLY")))
 
         self.newInput("Float", "Bevel Depth", "bevelDepth", minValue = 0)
         self.newInput("Integer", "Bevel Resolution", "bevelResolution")
