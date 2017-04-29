@@ -58,6 +58,7 @@ class ParticleSystemParticlesDataNode(bpy.types.Node, VectorizedNode):
 
         yield "for system in particleSystems:"
         yield "    if system is None: continue"
+        yield "    if system.settings.type != 'EMITTER': continue"
 
         yield "    _mask = self.getParticlesMask(system.particles)"
         for identifier, attribute, CListType in executionData:
