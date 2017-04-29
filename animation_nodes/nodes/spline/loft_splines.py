@@ -76,7 +76,7 @@ class LoftSplinesNode(bpy.types.Node, AnimationNode):
 
     def execute_Smooth(self, splines, splineSamples, surfaceSamples, cyclic, smoothness, start, end):
         loft = SmoothLoft()
-        loft.splines = splines
+        loft.splines = list(reversed(splines))
         loft.splineSamples = splineSamples
         loft.surfaceSamples = surfaceSamples
         loft.cyclic = cyclic
