@@ -13,11 +13,6 @@ class SplinesFromObjectNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SplinesFromObjectNode"
     bl_label = "Splines from Object"
 
-    useWorldSpace = BoolProperty(
-        name = "Use World Space",
-        description = "Use the position in global space",
-        default = True, update = propertyChanged)
-
     importType = EnumProperty(name = "Import Type", default = "ALL",
         items = importTypeItems, update = AnimationNode.refresh)
 
@@ -25,6 +20,7 @@ class SplinesFromObjectNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
+        self.newInput("Boolean", "Use World Space", "useWorldSpace", default = True)
         if self.importType == "SINGLE":
             self.newInput("Integer", "Index", "index", minValue = 0)
             self.newOutput("Spline", "Spline", "spline")
@@ -32,8 +28,6 @@ class SplinesFromObjectNode(bpy.types.Node, AnimationNode):
             self.newOutput("Spline List", "Splines", "splines")
 
     def draw(self, layout):
-        layout.prop(self, "useWorldSpace")
-
         if self.errorMessage != "":
             layout.label(self.errorMessage, icon = "ERROR")
 
@@ -43,11 +37,11 @@ class SplinesFromObjectNode(bpy.types.Node, AnimationNode):
     def getExecutionCode(self):
         yield "self.errorMessage = ''"
         if self.importType == "SINGLE":
-            yield "spline = self.getSingleSpline(object, index)"
+            yield "spline = self.getSingleSpline(object, useWorldSpace, index)"
         elif self.importType == "ALL":
-            yield "splines = self.getAllSplines(object)"
+            yield "splines = self.getAllSplines(object, useWorldSpace)"
 
-    def getSingleSpline(self, object, index):
+    def getSingleSpline(self, object, useWorldSpace, index):
         if object is None: return BezierSpline()
         if object.type != "CURVE":
             self.errorMessage = "Not a curve object"
@@ -58,7 +52,8 @@ class SplinesFromObjectNode(bpy.types.Node, AnimationNode):
             bSpline = bSplines[index]
             if bSpline.type in ("POLY", "BEZIER"):
                 spline = createSplineFromBlenderSpline(bSpline)
-                if self.useWorldSpace: spline.transform(object.matrix_world)
+                if useWorldSpace:
+                    spline.transform(object.matrix_world)
                 return spline
             else:
                 self.errorMessage = "Spline type not supported: " + bSpline.type
@@ -67,9 +62,9 @@ class SplinesFromObjectNode(bpy.types.Node, AnimationNode):
             self.errorMessage = "Index out of range"
             return BezierSpline()
 
-    def getAllSplines(self, object):
+    def getAllSplines(self, object, useWorldSpace):
         splines = createSplinesFromBlenderObject(object)
-        if self.useWorldSpace:
+        if useWorldSpace:
             for spline in splines:
                 spline.transform(object.matrix_world)
         return splines
