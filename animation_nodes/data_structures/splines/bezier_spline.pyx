@@ -188,10 +188,10 @@ cdef class BezierSpline(Spline):
         findListSegment_LowLevel(self.points.length, self.cyclic, end, endIndices, &endT)
 
         cdef long newPointAmount
-        if endIndices[1] > 0:
-            newPointAmount = endIndices[1] - startIndices[0] + 1
-        elif endIndices[1] == 0: # <- cyclic extension required
+        if endIndices[1] == 0: # <- cyclic extension required
             newPointAmount = self.points.length - startIndices[0] + 1
+        else:
+            newPointAmount = endIndices[1] - startIndices[0] + 1
 
         cdef:
             Vector3DList newPoints = Vector3DList(length = newPointAmount)
