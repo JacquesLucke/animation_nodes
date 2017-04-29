@@ -503,6 +503,7 @@ class ParticleSystemMenu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         insertNode(layout, "an_ParticleSystemsFromObjectNode", "From Object")
+        insertNode(layout, "an_ParticleSystemParticlesDataNode", "Particles Data")
 
 class FCurveMenu(bpy.types.Menu):
     bl_idname = "an_fcurve_menu"
