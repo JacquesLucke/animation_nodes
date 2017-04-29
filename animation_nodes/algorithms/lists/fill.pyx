@@ -3,6 +3,10 @@ from ... utils.limits cimport INT_MAX
 from ... data_structures cimport CList, PolygonIndicesList
 from ... sockets.info import getSocketClass, isCopyable, toBaseDataType, getCopyFunction
 
+def fill(str dataType, myList, str direction, length, element, bint makeElementCopies = True):
+    length = min(max(length, 0), INT_MAX)
+    return getFillFunction(dataType, makeElementCopies)(myList, direction, length, element)
+
 def getFillFunction(str dataType, bint makeElementCopies = True):
     socketClass = getSocketClass(dataType)
     defaultValue = socketClass.getDefaultValue()
@@ -19,10 +23,6 @@ def getFillFunction(str dataType, bint makeElementCopies = True):
         return fill_PolygonIndicesList
     else:
         raise NotImplementedError()
-
-def fill(str dataType, myList, str direction, length, element, bint makeElementCopies = True):
-    length = min(max(length, 0), INT_MAX)
-    return getFillFunction(dataType, makeElementCopies)(myList, direction, length, element)
 
 def fill_PythonList_Copy(copyFunction, list myList, str direction, int length, element):
     cdef int extendAmount = max(0, length - len(myList))
