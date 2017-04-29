@@ -23,21 +23,23 @@ class ParticleSystemHairDataNode(bpy.types.Node, VectorizedNode):
             ("Particle System", "particleSystem"),
             ("Particle Systems", "particleSystems"))
 
+        self.newInput("Boolean", "Use World Space", "useWorldSpace", value = True)
+
         self.newOutput("Spline List", "Hair Splines", "hairSplines")
 
     def draw(self, layout):
         layout.prop(self, "splineType", text = "")
 
-    def execute(self, particleSystems):
+    def execute(self, particleSystems, useWorldSpace):
         if not self.useParticleSystemList:
             particleSystems = [particleSystems]
 
         splines = []
         for particleSystem in particleSystems:
-            splines.extend(self.getHairSplines(particleSystem))
+            splines.extend(self.getHairSplines(particleSystem, useWorldSpace))
         return splines
 
-    def getHairSplines(self, particleSystem):
+    def getHairSplines(self, particleSystem, useWorldSpace):
         if particleSystem is None:
             return []
         if particleSystem.settings.type != "HAIR":
@@ -50,7 +52,8 @@ class ParticleSystemHairDataNode(bpy.types.Node, VectorizedNode):
         for particle in particleSystem.particles:
             points = Vector3DList(len(particle.hair_keys))
             particle.hair_keys.foreach_get("co", points.asMemoryView())
-            points.transform(worldMatrix)
+            if useWorldSpace:
+                points.transform(worldMatrix)
             splines.append(newSpline(points))
         return splines
 
