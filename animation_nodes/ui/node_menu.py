@@ -504,6 +504,7 @@ class ParticleSystemMenu(bpy.types.Menu):
         layout = self.layout
         insertNode(layout, "an_ParticleSystemsFromObjectNode", "From Object")
         insertNode(layout, "an_ParticleSystemParticlesDataNode", "Particles Data")
+        insertNode(layout, "an_ParticleSystemHairDataNode", "Hair Data")
 
 class FCurveMenu(bpy.types.Menu):
     bl_idname = "an_fcurve_menu"
