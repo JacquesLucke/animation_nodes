@@ -19,7 +19,7 @@ cdef class BezierSpline(Spline):
         if points is None: points = Vector3DList()
         if leftHandles is None: leftHandles = points.copy()
         if rightHandles is None: rightHandles = points.copy()
-        if radii is None: radii = FloatList.fromValues([0]) * len(points)
+        if radii is None: radii = FloatList.fromValues([0.1]) * len(points)
 
         if not (points.length == leftHandles.length == points.length == radii.length):
             raise ValueError("list lengths have to be equal")
