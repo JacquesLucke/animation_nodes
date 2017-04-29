@@ -15,9 +15,6 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MeshObjectOutputNode"
     bl_label = "Mesh Object Output"
     bl_width_default = 175
-    searchTags = [("Set Mesh Data on Object (old)", {"meshDataType" : repr("MESH_DATA")}),
-                  ("Set BMesh on Object (old)", {"meshDataType" : repr("BMESH")}),
-                  ("Set Vertices on Object (old)", {"meshDataType" : repr("VERTICES")}) ]
 
     meshDataType = EnumProperty(name = "Mesh Data Type", default = "MESH_DATA",
         items = meshDataTypeItems, update = AnimationNode.refresh)

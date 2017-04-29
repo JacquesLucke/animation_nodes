@@ -8,7 +8,6 @@ class CurveObjectOutputNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_CurveObjectOutputNode"
     bl_label = "Curve Object Output"
     bl_width_default = 175
-    searchTags = ["Set Splines on Object (old)"]
 
     errorMessage = StringProperty()
 
@@ -24,7 +23,7 @@ class CurveObjectOutputNode(bpy.types.Node, VectorizedNode):
             ("Spline", "spline", splineProps),
             ("Splines", "splines", splineProps))
 
-        self.newInput("Float", "Bevel Depth", "bevelDepth")
+        self.newInput("Float", "Bevel Depth", "bevelDepth", minValue = 0)
         self.newInput("Integer", "Bevel Resolution", "bevelResolution")
         self.newInput("Float", "Extrude", "extrude")
         self.newInput("Float", "Bevel Start", "bevelStart")

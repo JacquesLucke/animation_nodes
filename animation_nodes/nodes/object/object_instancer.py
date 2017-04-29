@@ -36,7 +36,6 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
     bl_label = "Object Instancer"
     bl_width_default = 160
     options = {"NOT_IN_SUBPROGRAM"}
-    searchTags = ["Object Replicator (old)"]
 
     def copyFromSourceChanged(self, context):
         self.refresh()
