@@ -238,3 +238,6 @@ cdef class Spline:
 
     cdef void evaluateUniformTangent_LowLevel(self, float parameter, Vector3* result):
         self.evaluateTangent_LowLevel(self.toUniformParameter_LowLevel(parameter), result)
+
+    def __repr__(self):
+        return "<{} object at {}>".format(type(self).__name__, hex(id(self)))
