@@ -417,6 +417,7 @@ class SplineMenu(bpy.types.Menu):
         insertNode(layout, "an_SetSplineRadiusNode", "Set Radius")
         insertNode(layout, "an_MakeSplineCyclicNode", "Make Cyclic")
         insertNode(layout, "an_SmoothBezierSplineNode", "Smooth Bezier")
+        insertNode(layout, "an_ChangeSplineTypeNode", "Change Type")
         layout.separator()
         insertNode(layout, "an_SplineInfoNode", "Info")
         insertNode(layout, "an_EvaluateSplineNode", "Evaluate")
