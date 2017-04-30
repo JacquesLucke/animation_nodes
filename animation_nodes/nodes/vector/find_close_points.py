@@ -3,6 +3,7 @@ from bpy.props import *
 from mathutils.kdtree import KDTree
 from ... base_types import AnimationNode
 from ... data_structures import EdgeIndicesList
+from .. mesh.c_utils import calculateEdgeLengths
 
 modeItems = [
     ("AMOUNT", "Amount", "Find a specific amount of neighbors for each point", "NONE", 0),
@@ -25,15 +26,19 @@ class FindClosePointsNode(bpy.types.Node, AnimationNode):
             self.newInput("Float", "Max Distance", "maxDistance", value = 0.3, minValue = 0)
 
         self.newOutput("Edge Indices List", "Edges", "edges")
+        self.newOutput("Float List", "Distances", "distances")
 
     def draw(self, layout):
         layout.prop(self, "mode")
 
-    def getExecutionFunctionName(self):
+    def getExecutionCode(self):
         if self.mode == "AMOUNT":
-            return "execute_Amount"
+            yield "edges = self.execute_Amount(points, amount)"
         elif self.mode == "DISTANCE":
-            return "execute_Distance"
+            yield "edges = self.execute_Distance(points, maxDistance)"
+
+        if self.outputs["Distances"].isLinked:
+            yield "distances = self.calculateEdgeLengths(points, edges)"
 
     def execute_Amount(self, points, amount):
         kdTree = self.buildKDTree(points)
@@ -79,3 +84,6 @@ class FindClosePointsNode(bpy.types.Node, AnimationNode):
             kdTree.insert(vector, i)
         kdTree.balance()
         return kdTree
+
+    def calculateEdgeLengths(self, points, edges):
+        return calculateEdgeLengths(points, edges)
