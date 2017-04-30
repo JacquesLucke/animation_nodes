@@ -2,6 +2,10 @@ from libc.string cimport memcpy
 from ... sockets.info import getSocketClass
 from ... data_structures cimport CList, BooleanList, PolygonIndicesList, LongList
 
+def mask(dataType, myList, mask):
+    function = getMaskFunction(dataType)
+    return function(myList, mask)
+
 def getMaskFunction(dataType):
     socketClass = getSocketClass(dataType)
     defaultValue = socketClass.getDefaultValue()
@@ -14,11 +18,6 @@ def getMaskFunction(dataType):
         return mask_PolygonIndicesList
     else:
         raise NotImplementedError()
-
-def mask(dataType, myList, mask):
-    function = getMaskFunction(dataType)
-    return function(myList, mask)
-
 
 def mask_PythonList(list myList, BooleanList mask):
     if len(myList) != len(mask):

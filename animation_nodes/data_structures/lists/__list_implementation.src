@@ -33,7 +33,10 @@ cdef class LISTNAME(CList):
         if minCapacity < self.capacity:
             return
 
-        cdef Py_ssize_t newCapacity = minCapacity * 2 + 1
+        cdef Py_ssize_t newCapacity = (self.capacity * 3) / 2 + 1
+        if newCapacity < minCapacity:
+            newCapacity = minCapacity
+
         self.data = <TYPE*>PyMem_Realloc(self.data, sizeof(TYPE) * newCapacity)
         if self.data == NULL:
             self.length = 0
@@ -510,6 +513,10 @@ TO_PYOBJECT_CODE
         cdef LISTNAME newList = LISTNAME()
         newList.extend(values)
         return newList
+
+    @classmethod
+    def fromValue(cls, value, length = 1):
+        return LISTNAME.fromValues([value]) * length
 
     @classmethod
     def fromListOrTuple(cls, list_or_tuple values):

@@ -31,7 +31,7 @@ class LoftSplinesNode(bpy.types.Node, AnimationNode):
         items = sampleDistributionTypeItems, update = propertyChanged)
 
     def create(self):
-        self.newInput("Spline List", "Splines", "splines")
+        self.newInput("Spline List", "Splines", "splines", defaultDrawType = "TEXT_ONLY")
         self.newInput("Integer", "Spline Samples", "splineSamples", value = 16, minValue = 2)
         if self.interpolationType == "LINEAR":
             self.newInput("Integer", "Subdivisions", "subdivisions", value = 0, minValue = 0)
@@ -76,7 +76,7 @@ class LoftSplinesNode(bpy.types.Node, AnimationNode):
 
     def execute_Smooth(self, splines, splineSamples, surfaceSamples, cyclic, smoothness, start, end):
         loft = SmoothLoft()
-        loft.splines = splines
+        loft.splines = list(reversed(splines))
         loft.splineSamples = splineSamples
         loft.surfaceSamples = surfaceSamples
         loft.cyclic = cyclic

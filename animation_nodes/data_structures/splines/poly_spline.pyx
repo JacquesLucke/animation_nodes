@@ -14,7 +14,7 @@ cdef class PolySpline(Spline):
         if points is None:
             points = Vector3DList()
         if radii is None:
-            radii = FloatList.fromValues([0]) * len(points)
+            radii = FloatList.fromValues([0.1]) * len(points)
         if points.length != radii.length:
             raise Exception("Point and radius amount has to be equal")
         self.cyclic = cyclic

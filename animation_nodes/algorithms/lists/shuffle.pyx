@@ -7,6 +7,9 @@ random = __import__("random") # to avoid cython name clashes
 
 from ... sockets.info import getSocketClass
 
+def shuffle(str dataType, myList, seed):
+    return getShuffleFunction(dataType)(myList, seed)
+
 def getShuffleFunction(str dataType):
     socketClass = getSocketClass(dataType)
     defaultValue = socketClass.getDefaultValue()
@@ -18,9 +21,6 @@ def getShuffleFunction(str dataType):
         return shuffle_PolygonIndicesList
     else:
         raise NotImplementedError()
-
-def shuffle(str dataType, myList, seed):
-    return getShuffleFunction(dataType)(myList, seed)
 
 def shuffle_PythonList(list myList, seed):
     random.seed(seed)

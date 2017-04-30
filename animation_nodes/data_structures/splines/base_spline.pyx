@@ -94,12 +94,10 @@ cdef class Spline:
         if start < 0 or end < 0 or start > 1 or end > 1:
             raise ValueError("start and end have to be between 0 and 1")
         cdef float _start, _end
-        if start <= end:
-            _start = start
-            _end = end
+        if start < end:
+            _start, _end = start, end
         else:
-            _start = end
-            _end = start
+            _start, _end = start, start
         cdef Spline trimmedSpline = self.getTrimmedCopy_LowLevel(_start, _end)
         return trimmedSpline
 
@@ -240,3 +238,6 @@ cdef class Spline:
 
     cdef void evaluateUniformTangent_LowLevel(self, float parameter, Vector3* result):
         self.evaluateTangent_LowLevel(self.toUniformParameter_LowLevel(parameter), result)
+
+    def __repr__(self):
+        return "<{} object at {}>".format(type(self).__name__, hex(id(self)))

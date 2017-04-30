@@ -37,6 +37,7 @@ class VectorizedNode(AnimationNode):
         self.vectorization.input(self, properties[0], socket, isCurrentlyList, properties[1])
         if isCurrentlyList:
             self._codeEffect.input(baseData[1], listData[1])
+        return socket
 
     def newVectorizedOutput(self, dataType, properties, baseData, listData):
         properties = self._formatOutputProperties(properties)
@@ -53,6 +54,7 @@ class VectorizedNode(AnimationNode):
         self.vectorization.output(self, properties, socket, isCurrentlyList)
         if isCurrentlyList:
             self._codeEffect.output(baseData[1], listData[1], len(self.outputs) - 1)
+        return socket
 
     def _formatInputProperties(self, properties):
         if isinstance(properties, str):

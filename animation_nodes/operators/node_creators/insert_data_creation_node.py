@@ -32,7 +32,21 @@ class InsertDataCreationNode(bpy.types.Operator, NodeCreator):
             try: socket = self.iterPossibleSockets().__next__()
             except: return
 
-        if isList(socket.bl_idname):
+        if socket.dataType == "Interpolation":
+            originNode = self.newNode("an_ConstructInterpolationNode")
+        elif socket.dataType == "Particle System":
+            originNode = self.newNode("an_ParticleSystemsFromObjectNode")
+        elif socket.dataType == "BVHTree":
+            originNode = self.newNode("an_ConstructBVHTreeNode")
+        elif socket.dataType == "KDTree":
+            originNode = self.newNode("an_ConstructKDTreeNode")
+        elif socket.dataType == "Edge Indices":
+            originNode = self.newNode("an_CreateEdgeIndicesNode")
+        elif socket.dataType == "Vector":
+            originNode = self.newNode("an_CombineVectorNode")
+        elif socket.dataType == "Euler":
+            originNode = self.newNode("an_CombineEulerNode")
+        elif isList(socket.bl_idname):
             originNode = self.newNode("an_CreateListNode")
             originNode.assignedType = toBaseDataType(socket.bl_idname)
         else:

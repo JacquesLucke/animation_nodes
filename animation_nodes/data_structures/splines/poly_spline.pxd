@@ -4,8 +4,8 @@ from .. lists.base_lists cimport FloatList, Vector3DList
 
 cdef class PolySpline(Spline):
     cdef:
-        readonly Vector3DList points
-        readonly FloatList radii
+        public Vector3DList points
+        public FloatList radii
 
     cpdef FloatList getUniformParameters(self, long amount)
     cdef inline int getSegmentAmount(self)

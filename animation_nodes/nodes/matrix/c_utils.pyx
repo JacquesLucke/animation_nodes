@@ -56,7 +56,7 @@ def createRotationsFromEulers(EulerList rotations):
 
 def createTranslationMatrices(Vector3DList vectors):
     cdef Matrix4x4List matrices = Matrix4x4List(length = vectors.length)
-    cdef size_t i
+    cdef Py_ssize_t i
     for i in range(vectors.length):
         setTranslationMatrix(matrices.data + i, vectors.data + i)
     return matrices

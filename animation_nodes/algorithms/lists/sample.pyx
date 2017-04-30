@@ -8,6 +8,9 @@ from ... sockets.info import getSocketClass
 from .. random cimport randomNumber_Positive
 from ... data_structures cimport CList, PolygonIndicesList, IntegerList, LongList
 
+def sample(str dataType, myList, amount, seed):
+    return getSampleFunction(dataType)(myList, amount, seed)
+
 def getSampleFunction(str dataType):
     socketClass = getSocketClass(dataType)
     defaultValue = socketClass.getDefaultValue()
@@ -20,9 +23,6 @@ def getSampleFunction(str dataType):
         return sample_PolygonIndicesList
     else:
         raise NotImplementedError()
-
-def sample(str dataType, myList, amount, seed):
-    return getSampleFunction(dataType)(myList, amount, seed)
 
 def sample_PythonList(list myList, amount, seed):
     if amount < 0 or amount > len(myList):

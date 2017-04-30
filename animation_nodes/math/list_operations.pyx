@@ -23,7 +23,7 @@ cpdef Matrix4x4List composeMatrixList(Vector3DList locations, EulerList rotation
         raise ValueError("lists have different lengths")
     cdef:
         Matrix4x4List newList = Matrix4x4List(length = len(locations))
-        size_t i
+        Py_ssize_t i
 
     for i in range(len(locations)):
         setComposedMatrix(newList.data + i, locations.data + i, rotations.data + i, scales.data + i)

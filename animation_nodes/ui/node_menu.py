@@ -29,7 +29,7 @@ def drawMenu(self, context):
     layout.menu("an_object_menu", text = "Object", icon = "OBJECT_DATAMODE")
     layout.menu("an_mesh_menu", text = "Mesh", icon = "MESH_DATA")
     layout.menu("an_spline_menu", text = "Spline", icon = "CURVE_DATA")
-    layout.menu("an_particles_menu", text = "Particles", icon = "PARTICLE_DATA")
+    layout.menu("an_particle_system_menu", text = "Particle System", icon = "PARTICLE_DATA")
     layout.separator()
     layout.menu("an_animation_menu", text = "Animation", icon = "RENDER_ANIMATION")
     layout.menu("an_interpolation_menu", text = "Interpolation", icon = "IPO_BEZIER")
@@ -414,8 +414,10 @@ class SplineMenu(bpy.types.Menu):
         insertNode(layout, "an_TransformSplineNode", "Transform")
         insertNode(layout, "an_ConnectSplinesNode", "Connect")
         insertNode(layout, "an_TrimSplineNode", "Trim")
+        insertNode(layout, "an_SetSplineRadiusNode", "Set Radius")
         insertNode(layout, "an_MakeSplineCyclicNode", "Make Cyclic")
         insertNode(layout, "an_SmoothBezierSplineNode", "Smooth Bezier")
+        insertNode(layout, "an_ChangeSplineTypeNode", "Change Type")
         layout.separator()
         insertNode(layout, "an_SplineInfoNode", "Info")
         insertNode(layout, "an_EvaluateSplineNode", "Evaluate")
@@ -496,18 +498,15 @@ class MaterialMenu(bpy.types.Menu):
         insertNode(layout, "an_CyclesMaterialOutputNode", "Cycles Material Output")
         insertNode(layout, "an_ViewportColorNode", "Viewport Color")
 
-class ParticlesMenu(bpy.types.Menu):
-    bl_idname = "an_particles_menu"
-    bl_label = "Particles Menu"
+class ParticleSystemMenu(bpy.types.Menu):
+    bl_idname = "an_particle_system_menu"
+    bl_label = "Particle System Menu"
 
     def draw(self, context):
         layout = self.layout
-        insertNode(layout, "an_ParticleSystemsInputNode", "Systems Input")
-        insertNode(layout, "an_GetParticlesNode", "Get Particles")
-        insertNode(layout, "an_ParticlesFromObjectNode", "Particles from Object")
-        insertNode(layout, "an_FilterParticlesNode", "State Filter")
-        insertNode(layout, "an_ParticleListInfoNode", "Particle List Info")
-        insertNode(layout, "an_ParticleInfoNode", "Particle Info")
+        insertNode(layout, "an_ParticleSystemsFromObjectNode", "From Object")
+        insertNode(layout, "an_ParticleSystemParticlesDataNode", "Particles Data")
+        insertNode(layout, "an_ParticleSystemHairDataNode", "Hair Data")
 
 class FCurveMenu(bpy.types.Menu):
     bl_idname = "an_fcurve_menu"

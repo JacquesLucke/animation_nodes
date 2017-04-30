@@ -17,9 +17,9 @@ cdef class BezierSpline(Spline):
                         FloatList radii = None,
                         bint cyclic = False):
         if points is None: points = Vector3DList()
-        if leftHandles is None: leftHandles = Vector3DList()
-        if rightHandles is None: rightHandles = Vector3DList()
-        if radii is None: radii = FloatList.fromValues([0]) * len(points)
+        if leftHandles is None: leftHandles = points.copy()
+        if rightHandles is None: rightHandles = points.copy()
+        if radii is None: radii = FloatList.fromValues([0.1]) * len(points)
 
         if not (points.length == leftHandles.length == points.length == radii.length):
             raise ValueError("list lengths have to be equal")
@@ -188,10 +188,10 @@ cdef class BezierSpline(Spline):
         findListSegment_LowLevel(self.points.length, self.cyclic, end, endIndices, &endT)
 
         cdef long newPointAmount
-        if endIndices[1] > 0:
-            newPointAmount = endIndices[1] - startIndices[0] + 1
-        elif endIndices[1] == 0: # <- cyclic extension required
+        if endIndices[1] == 0: # <- cyclic extension required
             newPointAmount = self.points.length - startIndices[0] + 1
+        else:
+            newPointAmount = endIndices[1] - startIndices[0] + 1
 
         cdef:
             Vector3DList newPoints = Vector3DList(length = newPointAmount)

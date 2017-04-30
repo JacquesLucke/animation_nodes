@@ -24,7 +24,8 @@ class SplineFromPointsNode(bpy.types.Node, VectorizedNode):
             self.newInput("Vector List", "Left Handles", "leftHandles", dataIsModified = True)
             self.newInput("Vector List", "Right Handles", "rightHandles", dataIsModified = True)
         self.newVectorizedInput("Float", "useRadiusList",
-            ("Radius", "radius"), ("Radii", "radii", dict(dataIsModified = True)))
+            ("Radius", "radius", dict(value = 0.1, minValue = 0)),
+            ("Radii", "radii", dict(dataIsModified = True)))
         self.newInput("Boolean", "Cyclic", "cyclic", value = False)
         self.newOutput("Spline", "Spline", "spline")
 
@@ -63,6 +64,6 @@ class SplineFromPointsNode(bpy.types.Node, VectorizedNode):
         if pointAmount > len(radii):
             radii.extend(FloatList.fromValues([0]) * (pointAmount - len(radii)))
         elif pointAmount < len(radii):
-            del radii[:pointAmount]
+            del radii[pointAmount:]
 
         return radii

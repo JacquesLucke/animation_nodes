@@ -1,19 +1,24 @@
 import bpy
-from ... base_types import AnimationNode
+from ... base_types import VectorizedNode
 
-class SmoothBezierSplineNode(bpy.types.Node, AnimationNode):
+class SmoothBezierSplineNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_SmoothBezierSplineNode"
     bl_label = "Smooth Bezier Spline"
+    autoVectorizeExecution = True
+
+    useSplineList = VectorizedNode.newVectorizeProperty()
 
     def create(self):
-        socket = self.newInput("Spline", "Spline", "spline")
-        socket.showObjectInput = False
+        socket = self.newVectorizedInput("Spline", "useSplineList",
+            ("Spline", "spline"), ("Splines", "splines"))
+        socket.defaultDrawType = "TEXT_ONLY"
         socket.dataIsModified = True
-        self.newInput("Float", "Smoothness", "smoothness", value = 0.3333)
-        self.newOutput("Spline", "Spline", "outSpline")
 
-    def execute(self, spline, smoothness):
-        if spline.type == "BEZIER":
-            spline.calculateSmoothHandles(smoothness)
-            spline.markChanged()
-        return spline
+        self.newInput("Float", "Smoothness", "smoothness", value = 0.3333)
+
+        self.newVectorizedOutput("Spline", "useSplineList",
+            ("Spline", "spline"), ("Splines", "splines"))
+
+    def getExecutionCode(self):
+        yield "if spline.type == 'BEZIER':"
+        yield "    spline.calculateSmoothHandles(smoothness)"

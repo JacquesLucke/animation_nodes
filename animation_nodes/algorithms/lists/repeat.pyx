@@ -3,6 +3,10 @@ from itertools import islice, cycle
 from ... data_structures cimport CList, PolygonIndicesList
 from ... sockets.info import getSocketClass, isCopyable, toBaseDataType, getCopyFunction
 
+def repeat(str dataType, myList, length):
+    function = getRepeatFunction(dataType)
+    return function(myList, length)
+
 def getRepeatFunction(str dataType, bint makeElementCopies = True):
     socketClass = getSocketClass(dataType)
     defaultValue = socketClass.getDefaultValue()
@@ -19,10 +23,6 @@ def getRepeatFunction(str dataType, bint makeElementCopies = True):
         return repeat_PolygonIndicesList
     else:
         raise NotImplementedError()
-
-def repeat(str dataType, myList, length):
-    function = getRepeatFunction(dataType)
-    return function(myList, length)
 
 def repeat_PythonList_NoCopy(list myList, length):
     return list(islice(cycle(myList), length))

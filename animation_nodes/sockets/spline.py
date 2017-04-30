@@ -24,8 +24,6 @@ class SplineSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         description = "Convert points to world space",
         update = propertyChanged)
 
-    showObjectInput = BoolProperty(default = True)
-
     def drawProperty(self, layout, text, node):
         row = layout.row(align = True)
         row.prop_search(self, "objectName",  bpy.context.scene, "objects", icon = "NONE", text = text)
@@ -111,8 +109,6 @@ class SplineListSocket(bpy.types.NodeSocket, PythonListSocket):
     useWorldSpace = BoolProperty(default = True,
         description = "Convert points to world space",
         update = propertyChanged)
-
-    showObjectInput = BoolProperty(default = True)
 
     def drawProperty(self, layout, text, node):
         row = layout.row(align = True)

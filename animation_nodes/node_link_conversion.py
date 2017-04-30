@@ -70,7 +70,6 @@ class SimpleConvert(LinkCorrection):
         ("Vector List", "Mesh Data") : "an_CombineMeshDataNode",
         ("Mesh Data", "Vector List") : "an_SeparateMeshDataNode",
         ("Mesh Data", "BMesh") : "an_CreateBMeshFromMeshDataNode",
-        ("Particle System", "Particle List") : "an_GetParticlesNode",
         ("Integer", "Euler") : "an_CombineEulerNode",
         ("Float", "Euler") : "an_CombineEulerNode",
         ("Euler", "Float") : "an_SeparateEulerNode",
