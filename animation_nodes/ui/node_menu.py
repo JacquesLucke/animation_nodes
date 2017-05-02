@@ -160,7 +160,6 @@ class MatrixMenu(bpy.types.Menu):
         insertNode(layout, "an_TransformMatrixNode", "Transform")
         insertNode(layout, "an_InvertMatrixNode", "Invert")
         insertNode(layout, "an_MixDataNode", "Mix", {"dataType" : repr("Matrix")})
-        insertNode(layout, "an_ChangeMatrixPivotNode", "Change Pivot")
         insertNode(layout, "an_MatrixMathNode", "Math")
         insertNode(layout, "an_MatrixCombineNode", "Combine")
         insertNode(layout, "an_OffsetMatricesNode", "Offset")
