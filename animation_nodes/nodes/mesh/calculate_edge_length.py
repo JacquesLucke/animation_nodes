@@ -18,7 +18,7 @@ class CalculateEdgeLengthNode(bpy.types.Node, VectorizedNode):
             ("Edge", "edge"), ("Edges", "edges"))
 
         self.newVectorizedOutput("Float", "useEdgeList",
-            ("Distance", "distance"), ("Distances", "distances"))
+            ("Length", "length"), ("Lengths", "lengths"))
 
     def draw(self, layout):
         if self.errorMessage != "":
@@ -30,9 +30,9 @@ class CalculateEdgeLengthNode(bpy.types.Node, VectorizedNode):
 
     def getExecutionCode(self):
         yield "self.errorMessage = ''"
-        yield "try: distance = (points[edge[0]] - points[edge[1]]).length"
+        yield "try: length = (points[edge[0]] - points[edge[1]]).length"
         yield "except IndexError:"
-        yield "    distance = 0"
+        yield "    length = 0"
         yield "    self.errorMessage = 'Edge is invalid'"
 
     def execute_List(self, points, edges):
