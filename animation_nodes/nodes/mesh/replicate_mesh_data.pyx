@@ -1,25 +1,31 @@
 import bpy
 from bpy.props import *
+from ... base_types import AnimationNode
+
 from libc.string cimport memcpy
 from ... math cimport transformVec3AsPoint, Vector3
-from ... base_types import AnimationNode, AutoSelectDataType
 from ... data_structures cimport (MeshData,
             Vector3DList, Matrix4x4List, EdgeIndicesList, PolygonIndicesList)
+
+transformationTypeItems = [
+    ("Matrix List", "Matrices", "", "NONE", 0),
+    ("Vector List", "Vectors", "", "NONE", 1)
+]
 
 class ReplicateMeshDataNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ReplicateMeshDataNode"
     bl_label = "Replicate Mesh Data"
 
-    transformationType = StringProperty(default = "Matrix List",
-        update = AnimationNode.refresh)
+    transformationType = EnumProperty(name = "Transformation Type", default = "Matrix List",
+        items = transformationTypeItems, update = AnimationNode.refresh)
 
     def create(self):
         self.newInput("Mesh Data", "Mesh Data", "sourceMeshData")
         self.newInput(self.transformationType, "Transformations", "transformations")
         self.newOutput("Mesh Data", "Mesh Data", "outMeshData")
 
-        self.newSocketEffect(AutoSelectDataType("transformationType", [self.inputs[1]],
-            use = ["Matrix List", "Vector List"], default = "Matrix List"))
+    def draw(self, layout):
+        layout.prop(self, "transformationType", text = "")
 
     def execute(self, MeshData source, transformations):
         cdef:
