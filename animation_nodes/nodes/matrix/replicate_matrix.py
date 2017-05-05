@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import *
-from ... base_types import VectorizedNode, AutoSelectDataType
+from ... base_types import VectorizedNode
 from . c_utils import (
     replicateMatrixAtMatrices,
     replicateMatrixAtVectors,
@@ -8,14 +8,19 @@ from . c_utils import (
     replicateMatricesAtVectors
 )
 
+transformationTypeItems = [
+    ("Matrix List", "Matrices", "", "NONE", 0),
+    ("Vector List", "Vectors", "", "NONE", 1)
+]
+
 class ReplicateMatrixNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_ReplicateMatrixNode"
     bl_label = "Replicate Matrix"
 
     useMatrixList = VectorizedNode.newVectorizeProperty()
 
-    transformationType = StringProperty(default = "Matrix List",
-        update = VectorizedNode.refresh)
+    transformationType = EnumProperty(name = "Transformation Type", default = "Matrix List",
+        items = transformationTypeItems, update = VectorizedNode.refresh)
 
     def create(self):
         self.newVectorizedInput("Matrix", "useMatrixList",
@@ -25,8 +30,8 @@ class ReplicateMatrixNode(bpy.types.Node, VectorizedNode):
 
         self.newOutput("Matrix List", "Matrices", "outMatrices")
 
-        self.newSocketEffect(AutoSelectDataType("transformationType", [self.inputs[1]],
-            use = ["Matrix List", "Vector List"], default = "Matrix List"))
+    def draw(self, layout):
+        layout.prop(self, "transformationType", text = "")
 
     def getExecutionFunctionName(self):
         if self.transformationType == "Matrix List":
