@@ -8,6 +8,7 @@ from . code_generator import (getInitialVariables,
                               iterNodeCommentLines,
                               getGlobalizeStatement,
                               getLoadSocketValueLine,
+                              iterInputConversionLines,
                               linkOutputSocketsToTargets,
                               getFunction_IterNodeExecutionLines)
 
@@ -184,6 +185,9 @@ class LoopExecutionUnit:
 
     def iter_ReassignParameters(self, inputNode, variables, nodeByID):
         for node in inputNode.getReassignParameterNodes(nodeByID):
+            yield from iterNodeCommentLines(node)
+            yield from iterInputConversionLines(node, variables)
+
             socket = node.inputs[0]
             if socket.isUnlinked and socket.isCopyable(): expression = getCopyExpression(socket, variables)
             else: expression = variables[socket]
@@ -192,7 +196,6 @@ class LoopExecutionUnit:
             else: conditionPrefix = "if {}: ".format(variables[node.conditionSocket])
 
             yield "{}{} = {}".format(conditionPrefix, variables[node.linkedParameterSocket], expression)
-
 
 
     def get_ReturnStatement(self, inputNode, variables, nodeByID):

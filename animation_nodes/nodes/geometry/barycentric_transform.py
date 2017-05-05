@@ -33,10 +33,10 @@ class BarycentricTransformNode(bpy.types.Node, AnimationNode):
             writeText(layout, self.errorMessage, icon = "ERROR", width = 21)
 
     def drawAdvanced(self, layout):
-        layout.label('Expected:')
-        layout.label('3 Different vectors for Source')
-        layout.label('3 vectors for Target')
-        writeText(layout, 'Only the first 3 points in each tri list will be considered', width = 21)
+        layout.label("Expected:")
+        layout.label("3 Different vectors for Source")
+        layout.label("3 vectors for Target")
+        writeText(layout, "Only the first 3 points in each tri list will be considered", width = 21)
 
     def getExecutionCode(self):
         yield "self.errorMessage = self.barycentricValidTriInputs(sourceTrianglePoints, targetTrianglePoints)"
@@ -53,15 +53,14 @@ class BarycentricTransformNode(bpy.types.Node, AnimationNode):
 
     def barycentricValidTriInputs(self, sourceTri, targetTri):
         if len(sourceTri) < 3:
-            return 'Expected 3 vectors for Source Triangle'
+            return "Expected 3 vectors for Source Triangle"
         if len(targetTri) < 3:
-            return 'Expected 3 vectors for Target Triangle'
+            return "Expected 3 vectors for Target Triangle"
         if any((sourceTri[0] == sourceTri[1],
                 sourceTri[1] == sourceTri[2],
                 sourceTri[2] == sourceTri[0])):
-            return 'Expected 3 Different vectors for Source'
-        return ''
-
+            return "Expected 3 Different vectors for Source"
+        return ""
 
     def barycentricTransform(self, vector, sourceTri, targetTri):
         return mathutils.geometry.barycentric_transform(vector,
