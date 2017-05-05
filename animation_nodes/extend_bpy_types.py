@@ -9,12 +9,14 @@ def register():
     bpy.types.Operator.an_executeCallback = _executeCallback
     bpy.types.Mesh.an = PointerProperty(type = MeshProperties)
     bpy.types.Object.an = PointerProperty(type = ObjectProperties)
+    bpy.types.ID.an_data = PointerProperty(type = IDProperties)
 
 def unregister():
     del bpy.types.Context.getActiveAnimationNodeTree
     del bpy.types.Operator.an_executeCallback
     del bpy.types.Mesh.an
     del bpy.types.Object.an
+    del bpy.types.ID.an_data
 
 def getActiveAnimationNodeTree(context):
     if context.area.type == "NODE_EDITOR":
@@ -86,3 +88,9 @@ class ObjectProperties(bpy.types.PropertyGroup):
         else:
             try: return object.to_mesh(scene, applyModifiers, settings)
             except: return None
+
+class IDProperties(bpy.types.PropertyGroup):
+    bl_idname = "an_IDProperties"
+
+    removeOnZeroUsers = BoolProperty(default = False,
+        description = "Data block should be removed when it has no users")

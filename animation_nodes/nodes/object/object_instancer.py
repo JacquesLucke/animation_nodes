@@ -4,6 +4,7 @@ from ... events import propertyChanged
 from ... base_types import AnimationNode
 from ... utils.names import getRandomString
 from ... utils.blender_ui import iterActiveSpacesByType
+from ... utils.data_blocks import removeNotUsedDataBlock
 from ... nodes.container_provider import getMainObjectContainer
 from ... utils.names import (getPossibleMeshName,
                              getPossibleCameraName,
@@ -233,23 +234,8 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
 
     def removeObjectData(self, data, type):
         if data is None: return # the object was an empty
-        if data.users == 0:
-            if type == "MESH":
-                bpy.data.meshes.remove(data)
-            elif type == "CAMERA":
-                bpy.data.cameras.remove(data)
-            elif type in ["FONT", "CURVE", "SURFACE"]:
-                bpy.data.curves.remove(data)
-            elif type == "META":
-                bpy.data.metaballs.remove(data)
-            elif type == "ARMATURE":
-                bpy.data.armatures.remove(data)
-            elif type == "LATTICE":
-                bpy.data.lattices.remove(data)
-            elif type == "LAMP":
-                bpy.data.lamps.remove(data)
-            elif type == "SPEAKER":
-                bpy.data.speakers.remove(data)
+        if data.an_data.removeOnZeroUsers and data.users == 0:
+            removeNotUsedDataBlock(data, type)
 
     def removeShapeKeys(self, object):
         # don't remove the shape key if it is used somewhere else
@@ -306,25 +292,30 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         return bpy.data.objects.new(name, instanceData)
 
     def getSourceObjectData(self, sourceObject):
+        data = None
         if self.copyFromSource:
             if self.deepCopy and sourceObject.data is not None:
-                return sourceObject.data.copy()
+                data = sourceObject.data.copy()
             else:
                 return sourceObject.data
         else:
             if self.objectType == "Mesh":
-                return bpy.data.meshes.new(getPossibleMeshName("instance mesh"))
+                data = bpy.data.meshes.new(getPossibleMeshName("instance mesh"))
             elif self.objectType == "Text":
-                return bpy.data.curves.new(getPossibleCurveName("instance text"), type = "FONT")
+                data = bpy.data.curves.new(getPossibleCurveName("instance text"), type = "FONT")
             elif self.objectType == "Camera":
-                return bpy.data.cameras.new(getPossibleCameraName("instance camera"))
+                data = bpy.data.cameras.new(getPossibleCameraName("instance camera"))
             elif self.objectType == "Point Lamp":
-                return bpy.data.lamps.new(getPossibleLampName("instance lamp"), type = "POINT")
+                data = bpy.data.lamps.new(getPossibleLampName("instance lamp"), type = "POINT")
             elif self.objectType.startswith("Curve"):
-                curve = bpy.data.curves.new(getPossibleCurveName("instance curve"), type = "CURVE")
-                curve.dimensions = self.objectType[-2:]
-                return curve
-        return None
+                data = bpy.data.curves.new(getPossibleCurveName("instance curve"), type = "CURVE")
+                data.dimensions = self.objectType[-2:]
+
+        if data is None:
+            return None
+        else:
+            data.an_data.removeOnZeroUsers = True
+            return data
 
     def unlinkInstance(self, object):
         if bpy.context.mode != "OBJECT" and bpy.context.active_object == object:
