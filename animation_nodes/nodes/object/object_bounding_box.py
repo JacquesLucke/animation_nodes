@@ -16,6 +16,7 @@ class ObjectBoundingBoxNode(bpy.types.Node, AnimationNode):
         self.newOutput("Vector List", "Vertices", "vertices")
         self.newOutput("Edge Indices List", "Edges", "edges")
         self.newOutput("Polygon Indices List", "Polygons", "polygons")
+        self.newOutput("Vector", "Center", "center")
 
     def drawAdvanced(self, layout):
         layout.prop(self, "useWorldSpace")
@@ -28,7 +29,8 @@ class ObjectBoundingBoxNode(bpy.types.Node, AnimationNode):
         if self.useWorldSpace:
             vertices.transform(object.matrix_world)
 
-        return vertices, edges.copy(), polygons.copy()
+        center = (vertices[0] + vertices[6]) / 2
+        return vertices, edges.copy(), polygons.copy(), center
 
 edges = EdgeIndicesList.fromValues(
     [(0, 1), (1, 2), (2, 3), (0, 3), (4, 5), (5, 6),
