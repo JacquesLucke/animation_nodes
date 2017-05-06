@@ -157,6 +157,7 @@ class MatrixMenu(bpy.types.Menu):
         insertNode(layout, "an_ScaleMatrixNode", "Scale")
         insertNode(layout, "an_ShearMatrixNode", "Shear")
         layout.separator()
+        insertNode(layout, "an_ReplicateMatrixNode", "Replicate")
         insertNode(layout, "an_TransformMatrixNode", "Transform")
         insertNode(layout, "an_InvertMatrixNode", "Invert")
         insertNode(layout, "an_MixDataNode", "Mix", {"dataType" : repr("Matrix")})
@@ -453,7 +454,7 @@ class InterpolationMenu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         insertNode(layout, "an_ConstructInterpolationNode", "Construct")
-        insertNode(layout, "an_InterpolationFromCurveMappingNode", "From Curve Mapping")
+        insertNode(layout, "an_InterpolationFromCurveNode", "From Curve")
         insertNode(layout, "an_InterpolationFromFCurveNode", "From FCurve")
         insertNode(layout, "an_MixInterpolationNode", "Mix")
         layout.separator()

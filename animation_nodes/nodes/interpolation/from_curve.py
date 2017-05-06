@@ -18,9 +18,9 @@ class CurveMapCache(bpy.types.PropertyGroup):
     dirty = BoolProperty(default = True)
 
 
-class InterpolationFromCurveMappingNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_InterpolationFromCurveMappingNode"
-    bl_label = "Interpolation from Curve Mapping"
+class CurveInterpolationNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_InterpolationFromCurveNode"
+    bl_label = "Curve Interpolation"
     bl_width_default = 200
 
     curveMapCache = PointerProperty(type = CurveMapCache)

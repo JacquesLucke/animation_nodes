@@ -32,20 +32,8 @@ class InsertDataCreationNode(bpy.types.Operator, NodeCreator):
             try: socket = self.iterPossibleSockets().__next__()
             except: return
 
-        if socket.dataType == "Interpolation":
-            originNode = self.newNode("an_ConstructInterpolationNode")
-        elif socket.dataType == "Particle System":
-            originNode = self.newNode("an_ParticleSystemsFromObjectNode")
-        elif socket.dataType == "BVHTree":
-            originNode = self.newNode("an_ConstructBVHTreeNode")
-        elif socket.dataType == "KDTree":
-            originNode = self.newNode("an_ConstructKDTreeNode")
-        elif socket.dataType == "Edge Indices":
-            originNode = self.newNode("an_CreateEdgeIndicesNode")
-        elif socket.dataType == "Vector":
-            originNode = self.newNode("an_CombineVectorNode")
-        elif socket.dataType == "Euler":
-            originNode = self.newNode("an_CombineEulerNode")
+        if socket.dataType in dataCreationNodes:
+            originNode = self.newNode(dataCreationNodes[socket.dataType])
         elif isList(socket.bl_idname):
             originNode = self.newNode("an_CreateListNode")
             originNode.assignedType = toBaseDataType(socket.bl_idname)
@@ -56,3 +44,17 @@ class InsertDataCreationNode(bpy.types.Operator, NodeCreator):
 
         socket.linkWith(originNode.outputs[0])
         self.setActiveNode(originNode)
+
+dataCreationNodes = {
+    "Interpolation" : "an_ConstructInterpolationNode",
+    "Particle System" : "an_ParticleSystemsFromObjectNode",
+    "BVHTree" : "an_ConstructBVHTreeNode",
+    "KDTree" : "an_ConstructKDTreeNode",
+    "Edge Indices" : "an_CreateEdgeIndicesNode",
+    "Vector" : "an_CombineVectorNode",
+    "Euler" : "an_CombineEulerNode",
+    "Struct" : "an_SetStructElementsNode",
+    "Quaternion" : "an_CombineQuaternionNode",
+    "Mesh Data" : "an_CombineMeshDataNode",
+    "Matrix" : "an_ComposeMatrixNode"
+}

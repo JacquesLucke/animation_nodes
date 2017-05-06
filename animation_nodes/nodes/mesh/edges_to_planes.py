@@ -64,5 +64,5 @@ class EdgesToPlanesNode(bpy.types.Node, AnimationNode):
                 appendVertex(vertices[index2] - offset)
 
         for i in range(0, len(edges) * 4, 4):
-            appendPolygon((i, i + 1, i + 2, i + 3))
+            appendPolygon((i + 3, i + 2, i + 1, i))
         return newVertices, polygons
