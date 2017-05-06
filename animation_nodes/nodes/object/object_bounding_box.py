@@ -23,7 +23,7 @@ class ObjectBoundingBoxNode(bpy.types.Node, AnimationNode):
 
     def execute(self, object):
         if object is None:
-            return Vector3DList(), EdgeIndicesList(), PolygonIndicesList()
+            return Vector3DList(), EdgeIndicesList(), PolygonIndicesList(), Vector((0, 0, 0))
 
         vertices = Vector3DList.fromValues(object.bound_box)
         if self.useWorldSpace:
