@@ -32,7 +32,9 @@ class SplinesFromEdgesNode(bpy.types.Node, VectorizedNode):
         self.newOutput("Spline List", "Splines", "splines")
 
     def draw(self, layout):
-        layout.prop(self, "radiusType", text = "")
+        if self.useRadiusList:
+            layout.prop(self, "radiusType", text = "")
+
         if self.errorMessage != "":
             layout.label(self.errorMessage, icon = "ERROR")
 
