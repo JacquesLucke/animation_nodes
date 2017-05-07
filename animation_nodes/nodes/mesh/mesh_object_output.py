@@ -1,10 +1,10 @@
 import bpy
 import bmesh
 from bpy.props import *
-from ... events import propertyChanged
 from ... utils.layout import writeText
 from ... base_types import AnimationNode
 from ... data_structures import UShortList
+from ... events import propertyChanged, executionCodeChanged
 
 meshDataTypeItems = [
     ("MESH_DATA", "Mesh Data", "Mesh Data object that contains only vertex locations, edge indices and polygon indices", "", 0),
@@ -32,6 +32,11 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
 
     validateMesh = BoolProperty(name = "Validate Mesh", default = False,
         description = "", update = propertyChanged)
+
+    makeMeshExportable = BoolProperty(name = "Make Mesh Exportable", default = True,
+        description = ("This might modify the mesh (in invisible ways) "
+                       "to allow exporters (Alembic) to export this mesh correctly"),
+        update = executionCodeChanged)
 
     errorMessage = StringProperty()
 
@@ -77,6 +82,8 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
 
         layout.prop(self, "validateMesh")
 
+        layout.prop(self, "makeMeshExportable")
+
     def getExecutionCode(self):
         yield "self.errorMessage = ''"
         yield "if self.isValidObject(object):"
@@ -90,6 +97,9 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
             if s["BMesh"].isUsed:        yield "    self.setBMesh(mesh, bm)"
         elif self.meshDataType == "VERTICES":
             if s["Vertices"].isUsed:     yield "    self.setVertices(mesh, vertices)"
+
+        if self.makeMeshExportable:
+            yield "    self.ensureExportable(object)"
 
         if s["Material Indices"].isUsed: yield "    self.setMaterialIndices(mesh, materialIndices)"
 
@@ -151,3 +161,21 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
 
         mesh.polygons.foreach_set("material_index", allMaterialIndices.asMemoryView())
         mesh.polygons[0].material_index = materialIndices[0]
+
+    def ensureExportable(self, object):
+        self.ensureMeshNotEmpty(object.data)
+        self.ensureObjectHasModifier(object)
+
+    def ensureMeshNotEmpty(self, mesh):
+        if len(mesh.vertices) == 0:
+            mesh.from_pydata([(0, 0, 0)], [], [])
+
+    def ensureObjectHasModifier(self, object):
+        if len(object.modifiers) == 0:
+            modifier = object.modifiers.new("DOES NOTHING", "ARRAY")
+            modifier.count = 1
+            modifier.show_expanded = False
+            modifier.show_in_editmode = False
+            modifier.show_render = False
+            modifier.show_viewport = False
+            modifier.show_on_cage = False
