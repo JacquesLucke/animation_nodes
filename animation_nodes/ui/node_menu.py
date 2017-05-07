@@ -374,6 +374,7 @@ class MeshGeneratorsMenu(bpy.types.Menu):
         layout = self.layout
         insertNode(layout, "an_LineMeshNode", "Line")
         insertNode(layout, "an_GridMeshNode", "Grid")
+        insertNode(layout, "an_CylinderMeshNode", "Cylinder")
 
 class MeshOperatorsMenu(bpy.types.Menu):
     bl_idname = "an_mesh_operators_menu"
