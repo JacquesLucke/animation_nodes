@@ -6,10 +6,10 @@ def splinesFromEdges(Vector3DList vertices, EdgeIndicesList edges, DoubleList ra
         raise Exception("Invalid edge indices")
     if radiusType == "EDGE":
         if edges.length != radii.length:
-            raise Exception("Wrong radius amount")
+            raise Exception("wrong radius amount")
     elif radiusType == "VERTEX":
         if vertices.length != radii.length:
-            raise Exception("Wrong radius amount")
+            raise Exception("wrong radius amount")
 
     cdef:
         long i
