@@ -59,7 +59,7 @@ def calculateEdgeLengths(Vector3DList vertices, EdgeIndicesList edges):
         return DoubleList()
 
     if edges.getMaxIndex() >= len(vertices):
-        raise Exception("Edges are invalid")
+        raise IndexError("Edges are invalid")
 
     cdef DoubleList distances = DoubleList(length = len(edges))
     cdef Py_ssize_t i
@@ -70,6 +70,27 @@ def calculateEdgeLengths(Vector3DList vertices, EdgeIndicesList edges):
         v2 = vertices.data + edges.data[i].v2
         distances.data[i] = distanceVec3(v1, v2)
     return distances
+
+def calculateEdgeCenters(Vector3DList vertices, EdgeIndicesList edges):
+    if len(edges) == 0:
+        return Vector3DList()
+
+    if edges.getMaxIndex() >= len(vertices):
+        raise IndexError("Edges are invalid")
+
+    cdef Vector3DList centers = Vector3DList(length = len(edges))
+    cdef Py_ssize_t i
+    cdef Vector3 *v1
+    cdef Vector3 *v2
+
+    for i in range(len(edges)):
+        v1 = vertices.data + edges.data[i].v1
+        v2 = vertices.data + edges.data[i].v2
+        centers.data[i].x = (v1.x + v2.x) / 2
+        centers.data[i].y = (v1.y + v2.y) / 2
+        centers.data[i].z = (v1.z + v2.z) / 2
+
+    return centers
 
 
 # Polygon Operations
@@ -241,7 +262,7 @@ normalizeVec3_InPlace(&upVector)
 
 def edgesToTubes(Vector3DList vertices, EdgeIndicesList edges, radius, Py_ssize_t resolution, bint caps = True):
     if len(edges) > 0 and edges.getMaxIndex() >= vertices.length:
-        raise Exception("invalid edges")
+        raise IndexError("invalid edges")
 
     cdef:
         Vector3DList tubeVertices = cylinder.vertices(radius = 1, height = 1, resolution = resolution)

@@ -383,11 +383,14 @@ class MeshOperatorsMenu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         insertNode(layout, "an_FindClosePointsNode", "Find Close Points")
-        insertNode(layout, "an_EdgesToPlanesNode", "Edges to Planes")
+        insertNode(layout, "an_EdgeToTubeNode", "Edge to Tube")
         layout.separator()
+        insertNode(layout, "an_CreateEdgesNode", "Create Edges")
         insertNode(layout, "an_CreateEdgeIndicesNode", "Create Edge Indices")
         insertNode(layout, "an_CreatePolygonIndicesNode", "Create Polygon Indices")
         insertNode(layout, "an_EdgesOfPolygonsNode", "Edges of Polygons")
+        layout.separator()
+        insertNode(layout, "an_EdgeInfoNode", "Edge Info")
 
 class MeshFinalizingMenu(bpy.types.Menu):
     bl_idname = "an_mesh_finalizing_menu"

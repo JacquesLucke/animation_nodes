@@ -5,7 +5,7 @@ from ... base_types import AnimationNode
 from ... data_structures import Vector3DList, EdgeIndicesList
 
 class CreateEdgesNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_EdgesNode"
+    bl_idname = "an_CreateEdgesNode"
     bl_label = "Create Edges"
     bl_width_default = 150
 
