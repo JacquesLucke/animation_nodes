@@ -1,6 +1,8 @@
 cimport cython
 from libc.string cimport memcpy
 
+from ... algorithms.mesh_generation import cylinder
+
 from ... data_structures cimport (
     LongList,
     DoubleList,
@@ -8,13 +10,15 @@ from ... data_structures cimport (
     Matrix4x4List,
     EdgeIndicesList,
     PolygonIndicesList,
-    CDefaultList
+    CDefaultList,
+    MeshData
 )
 
 from ... math cimport (
     Vector3, Matrix4,
-    scaleVec3, subVec3, crossVec3, distanceVec3,
-    transformVec3AsPoint_InPlace, normalizeVec3_InPlace, scaleVec3_Inplace
+    scaleVec3, subVec3, crossVec3, distanceVec3, lengthVec3, dotVec3,
+    transformVec3AsPoint_InPlace, normalizeVec3_InPlace, scaleVec3_Inplace,
+    normalizeLengthVec3_Inplace, transformVec3AsPoint
 )
 
 # Edge Operations
@@ -55,7 +59,7 @@ def calculateEdgeLengths(Vector3DList vertices, EdgeIndicesList edges):
         return DoubleList()
 
     if edges.getMaxIndex() >= len(vertices):
-        raise Exception("Edges are invalid")
+        raise IndexError("Edges are invalid")
 
     cdef DoubleList distances = DoubleList(length = len(edges))
     cdef Py_ssize_t i
@@ -66,6 +70,27 @@ def calculateEdgeLengths(Vector3DList vertices, EdgeIndicesList edges):
         v2 = vertices.data + edges.data[i].v2
         distances.data[i] = distanceVec3(v1, v2)
     return distances
+
+def calculateEdgeCenters(Vector3DList vertices, EdgeIndicesList edges):
+    if len(edges) == 0:
+        return Vector3DList()
+
+    if edges.getMaxIndex() >= len(vertices):
+        raise IndexError("Edges are invalid")
+
+    cdef Vector3DList centers = Vector3DList(length = len(edges))
+    cdef Py_ssize_t i
+    cdef Vector3 *v1
+    cdef Vector3 *v2
+
+    for i in range(len(edges)):
+        v1 = vertices.data + edges.data[i].v1
+        v2 = vertices.data + edges.data[i].v2
+        centers.data[i].x = (v1.x + v2.x) / 2
+        centers.data[i].y = (v1.y + v2.y) / 2
+        centers.data[i].z = (v1.z + v2.z) / 2
+
+    return centers
 
 
 # Polygon Operations
@@ -226,3 +251,136 @@ cdef void createInvertedMatrix(Matrix4 *m, Vector3 *center, Vector3 *normal, Vec
     m.a14 = -(tangent.x   * center.x + tangent.y   * center.y + tangent.z   * center.z)
     m.a24 = -(bitangent.x * center.x + bitangent.y * center.y + bitangent.z * center.z)
     m.a34 = -(normal.x    * center.x + normal.y    * center.y + normal.z    * center.z)
+
+
+# Edges to Tubes
+###########################################
+
+# random vector that is unlikely to be colinear to any input
+cdef Vector3 upVector = {"x" : 0.5234643, "y" : 0.9871562, "z" : 0.6132743}
+normalizeVec3_InPlace(&upVector)
+
+def edgesToTubes(Vector3DList vertices, EdgeIndicesList edges, radius, Py_ssize_t resolution, bint caps = True):
+    if len(edges) > 0 and edges.getMaxIndex() >= vertices.length:
+        raise IndexError("invalid edges")
+
+    cdef:
+        Vector3DList tubeVertices = cylinder.vertices(radius = 1, height = 1, resolution = resolution)
+        PolygonIndicesList tubePolygons = cylinder.polygons(resolution, caps)
+        MeshData tubeMesh = MeshData(tubeVertices, None, tubePolygons)
+        CDefaultList radii = CDefaultList(DoubleList, radius, 0)
+        Matrix4x4List transformations = Matrix4x4List(length = edges.length)
+        Py_ssize_t i
+        Matrix4 *m
+        Vector3 *v1
+        Vector3 *v2
+        Vector3 xDir, yDir, zDir
+        float _radius
+        float height
+
+    for i in range(edges.length):
+        v1 = vertices.data + edges.data[i].v1
+        v2 = vertices.data + edges.data[i].v2
+        subVec3(&zDir, v2, v1)
+        crossVec3(&xDir, &zDir, &upVector)
+        crossVec3(&yDir, &xDir, &zDir)
+        _radius = (<double*>radii.get(i))[0]
+        normalizeLengthVec3_Inplace(&xDir, _radius)
+        normalizeLengthVec3_Inplace(&yDir, _radius)
+
+        m = transformations.data + i
+        m.a11, m.a12, m.a13, m.a14 = -xDir.x, yDir.x, zDir.x, v1.x
+        m.a21, m.a22, m.a23, m.a24 = -xDir.y, yDir.y, zDir.y, v1.y
+        m.a31, m.a32, m.a33, m.a34 = -xDir.z, yDir.z, zDir.z, v1.z
+        m.a41, m.a42, m.a43, m.a44 = 0, 0, 0, 1
+
+    result = replicateMeshData(tubeMesh, transformations)
+    return result.vertices, result.polygons
+
+
+# Replicate Mesh Data
+###################################
+
+def replicateMeshData(MeshData source, transformations):
+    cdef:
+        Py_ssize_t i, j, offset
+        Py_ssize_t amount = len(transformations)
+        Py_ssize_t vertexAmount, edgeAmount, polygonAmount, polygonIndicesAmount
+        Vector3DList oldVertices, newVertices
+        EdgeIndicesList oldEdges, newEdges
+        PolygonIndicesList oldPolygons, newPolygons
+
+    oldVertices = source.vertices
+    oldEdges = source.edges
+    oldPolygons = source.polygons
+
+    vertexAmount = len(oldVertices)
+    edgeAmount = len(oldEdges)
+    polygonAmount = len(oldPolygons)
+    polygonIndicesAmount = len(oldPolygons.indices)
+
+    newVertices = getTransformedVertices(oldVertices, transformations)
+    newEdges = EdgeIndicesList(length = amount * edgeAmount)
+    newPolygons = PolygonIndicesList(indicesAmount = amount * polygonIndicesAmount,
+                                     polygonAmount = amount * polygonAmount)
+
+    # Edges
+    for i in range(amount):
+        offset = i * edgeAmount
+        for j in range(edgeAmount):
+            newEdges.data[offset + j].v1 = oldEdges.data[j].v1 + vertexAmount * i
+            newEdges.data[offset + j].v2 = oldEdges.data[j].v2 + vertexAmount * i
+
+    # Polygon Indices
+    for i in range(amount):
+        offset = i * polygonIndicesAmount
+        for j in range(polygonIndicesAmount):
+            newPolygons.indices.data[offset + j] = oldPolygons.indices.data[j] + vertexAmount * i
+    # Polygon Starts
+    for i in range(amount):
+        offset = i * polygonAmount
+        for j in range(polygonAmount):
+            newPolygons.polyStarts.data[offset + j] = oldPolygons.polyStarts.data[j] + polygonIndicesAmount * i
+    # Polygon Lengths
+    for i in range(amount):
+        memcpy(newPolygons.polyLengths.data + i * polygonAmount,
+               oldPolygons.polyLengths.data,
+               sizeof(unsigned int) * polygonAmount)
+
+    return MeshData(newVertices, newEdges, newPolygons)
+
+def getTransformedVertices(Vector3DList oldVertices, transformations):
+    if isinstance(transformations, Vector3DList):
+        return getTransformedVertices_VectorList(oldVertices, transformations)
+    elif isinstance(transformations, Matrix4x4List):
+        return getTransformedVertices_MatrixList(oldVertices, transformations)
+
+def getTransformedVertices_VectorList(Vector3DList oldVertices, Vector3DList transformations):
+    cdef:
+        Py_ssize_t i, j, offset
+        Vector3DList newVertices = Vector3DList(oldVertices.length * transformations.length)
+        Vector3* _oldVertices = oldVertices.data
+        Vector3* _newVertices = newVertices.data
+        Vector3* _transformations = transformations.data
+
+    for i in range(transformations.length):
+        offset = i * oldVertices.length
+        for j in range(oldVertices.length):
+            _newVertices[offset + j].x = _oldVertices[j].x + _transformations[i].x
+            _newVertices[offset + j].y = _oldVertices[j].y + _transformations[i].y
+            _newVertices[offset + j].z = _oldVertices[j].z + _transformations[i].z
+
+    return newVertices
+
+def getTransformedVertices_MatrixList(Vector3DList oldVertices, Matrix4x4List transformations):
+    cdef:
+        Py_ssize_t i, j, offset
+        Vector3DList newVertices = Vector3DList(oldVertices.length * transformations.length)
+
+    for i in range(transformations.length):
+        offset = i * oldVertices.length
+        for j in range(oldVertices.length):
+            transformVec3AsPoint(newVertices.data + offset + j,
+                                 oldVertices.data + j,
+                                 transformations.data + i)
+    return newVertices

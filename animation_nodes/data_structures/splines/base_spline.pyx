@@ -113,17 +113,18 @@ cdef class Spline:
             raise Exception("cannot evaluate uniform parameters, call spline.ensureUniformConverter() first")
 
     cpdef ensureUniformConverter(self, long resolution):
-        resolution = max(2, resolution)
+        cdef long pointAmount = len(self.points)
+        cdef long totalResolution = pointAmount + max((pointAmount - 1), 0) * max(0, resolution)
         if self.uniformParameters is None:
-            self.updateUniformParameters(resolution)
+            self.updateUniformParameters(totalResolution)
         elif self.uniformParameters.length < resolution:
-            self.updateUniformParameters(resolution)
+            self.updateUniformParameters(totalResolution)
 
-    cdef updateUniformParameters(self, long resolution):
+    cdef updateUniformParameters(self, long totalResolution):
         from . poly_spline import PolySpline
         if self.type == "POLY": polySpline = self
-        else: polySpline = PolySpline(self.getSamples(resolution))
-        self.uniformParameters = polySpline.getUniformParameters(resolution)
+        else: polySpline = PolySpline(self.getSamples(totalResolution))
+        self.uniformParameters = polySpline.getUniformParameters(totalResolution)
 
     cpdef toUniformParameter(self, float t):
         if self.uniformParameters is None:

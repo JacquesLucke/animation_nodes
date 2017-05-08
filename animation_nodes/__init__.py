@@ -92,10 +92,16 @@ if "test_compile" not in globals():
         "This build does not work at the moment.\n"
         "  1. Make sure that you are using compiled version of AN.\n"
         "     (Not a direct download of the repository from Github)\n"
-        "  2. If you are on windows you can try to install a library called\n"
+        "  2. Check if the build you downloaded has been compiled for the OS\n"
+        "     you are using. If not, download another one.\n"
+        "  3. If you are on windows you can try to install a library called\n"
         "     'Visual C++ 2015 Redistributable'. Should be easy to find using\n"
         "     your search engine of choice.\n"
-        "  3. Make a bug report on Github (prefered) and give as much information\n"
+        "  4. It is possible that you have a build for the correct platform\n"
+        "     but it still does not work. We experienced this mainly on linux.\n"
+        "     Try to find another build for your platform.\n"
+        "     If it still does not work, you have to compile AN yourself.\n"
+        "  5. Make a bug report on Github and give as much information\n"
         "     as you can. Specifically the full error message, your OS, version, ...")
     raise Exception(message)
 

@@ -157,6 +157,7 @@ class MatrixMenu(bpy.types.Menu):
         insertNode(layout, "an_ScaleMatrixNode", "Scale")
         insertNode(layout, "an_ShearMatrixNode", "Shear")
         layout.separator()
+        insertNode(layout, "an_DistributeMatricesNode", "Distribute")
         insertNode(layout, "an_ReplicateMatrixNode", "Replicate")
         insertNode(layout, "an_TransformMatrixNode", "Transform")
         insertNode(layout, "an_InvertMatrixNode", "Invert")
@@ -374,6 +375,7 @@ class MeshGeneratorsMenu(bpy.types.Menu):
         layout = self.layout
         insertNode(layout, "an_LineMeshNode", "Line")
         insertNode(layout, "an_GridMeshNode", "Grid")
+        insertNode(layout, "an_CylinderMeshNode", "Cylinder")
 
 class MeshOperatorsMenu(bpy.types.Menu):
     bl_idname = "an_mesh_operators_menu"
@@ -382,11 +384,14 @@ class MeshOperatorsMenu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         insertNode(layout, "an_FindClosePointsNode", "Find Close Points")
-        insertNode(layout, "an_EdgesToPlanesNode", "Edges to Planes")
+        insertNode(layout, "an_EdgeToTubeNode", "Edge to Tube")
         layout.separator()
+        insertNode(layout, "an_CreateEdgesNode", "Create Edges")
         insertNode(layout, "an_CreateEdgeIndicesNode", "Create Edge Indices")
         insertNode(layout, "an_CreatePolygonIndicesNode", "Create Polygon Indices")
         insertNode(layout, "an_EdgesOfPolygonsNode", "Edges of Polygons")
+        layout.separator()
+        insertNode(layout, "an_EdgeInfoNode", "Edge Info")
 
 class MeshFinalizingMenu(bpy.types.Menu):
     bl_idname = "an_mesh_finalizing_menu"

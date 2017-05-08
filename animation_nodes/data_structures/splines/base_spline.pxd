@@ -33,7 +33,7 @@ cdef class Spline:
     cpdef toUniformParameter(self, float parameter)
     cdef float toUniformParameter_LowLevel(self, float parameter)
     cpdef ensureUniformConverter(self, long resolution)
-    cdef updateUniformParameters(self, long resolution)
+    cdef updateUniformParameters(self, long totalResolution)
     cdef checkUniformConverter(self)
 
 
