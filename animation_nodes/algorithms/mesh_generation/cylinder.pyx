@@ -122,6 +122,6 @@ def polygons(Py_ssize_t resolution, bint caps = True):
             polygons.polyLengths.data[resolution + 1] = resolution
 
             for i in range(resolution):
-                polygons.indices.data[4 * resolution + i] = i
-                polygons.indices.data[5 * resolution + i] = 2 * resolution - i - 1
+                polygons.indices.data[4 * resolution + i] = resolution - i - 1
+                polygons.indices.data[5 * resolution + i] = resolution + i
     return polygons
