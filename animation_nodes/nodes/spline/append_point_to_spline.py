@@ -20,7 +20,7 @@ class AppendPointToSplineNode(bpy.types.Node, AnimationNode):
         if self.pointType == "BEZIER_POINT":
             self.newInput("Vector", "Left Handle", "leftHandle")
             self.newInput("Vector", "Right Handle", "rightHandle")
-        self.newInput("Float", "Radius", "radius")
+        self.newInput("Float", "Radius", "radius", value = 0.1, minValue = 0)
         self.newOutput("Spline", "Spline", "outSpline")
 
     def draw(self, layout):

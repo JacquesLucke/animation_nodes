@@ -66,7 +66,6 @@ class SimpleConvert(LinkCorrection):
         ("Vector", "Float") : "an_SeparateVectorNode",
         ("Float", "Vector") : "an_CombineVectorNode",
         ("Integer", "Vector") : "an_CombineVectorNode",
-        ("Integer List", "Polygon Indices") : "an_CreatePolygonIndicesNode",
         ("Vector List", "Mesh Data") : "an_CombineMeshDataNode",
         ("Mesh Data", "Vector List") : "an_SeparateMeshDataNode",
         ("Mesh Data", "BMesh") : "an_CreateBMeshFromMeshDataNode",

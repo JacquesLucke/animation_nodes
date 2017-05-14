@@ -51,6 +51,7 @@ dataCreationNodes = {
     "BVHTree" : "an_ConstructBVHTreeNode",
     "KDTree" : "an_ConstructKDTreeNode",
     "Edge Indices" : "an_CreateEdgeIndicesNode",
+    "Polygon Indices" : "an_CreatePolygonIndicesNode",
     "Vector" : "an_CombineVectorNode",
     "Euler" : "an_CombineEulerNode",
     "Struct" : "an_SetStructElementsNode",

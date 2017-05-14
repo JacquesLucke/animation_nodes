@@ -9,9 +9,10 @@ def importDataStructures():
         FloatList, DoubleList, LongList, IntegerList, UShortList, CharList,
         QuaternionList)
 
+    from . splines.base_spline import Spline
     from . splines.poly_spline import PolySpline
-    from . default_lists.c_default_list import CDefaultList
     from . splines.bezier_spline import BezierSpline
+    from . default_lists.c_default_list import CDefaultList
     from . interpolation import Interpolation
     from . falloffs.falloff_base import Falloff, BaseFalloff, CompoundFalloff
 
