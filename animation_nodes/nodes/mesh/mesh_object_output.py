@@ -19,23 +19,15 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
     meshDataType = EnumProperty(name = "Mesh Data Type", default = "MESH_DATA",
         items = meshDataTypeItems, update = AnimationNode.refresh)
 
-    updateMesh = BoolProperty(name = "Update Mesh", default = True,
-        description = "Update create mesh to recalculate other mesh related data",
-        update = propertyChanged)
-
-    recalcEdges = BoolProperty(name = "Recalculate Edges", default = True,
-        description = "Make sure that all connected vertices of polygons also exist as edge",
-        update = propertyChanged)
-
-    recalcTessFaces = BoolProperty(name = "Recalculate Tessellation Faces", default = False,
+    validateMesh = BoolProperty(name = "Validate Mesh", default = True,
         description = "", update = propertyChanged)
 
-    validateMesh = BoolProperty(name = "Validate Mesh", default = False,
-        description = "", update = propertyChanged)
+    validateMeshVerbose = BoolProperty(name = "Validate Mesh Verbose", default = False,
+        description = "Print results from validation in the console.", update = propertyChanged)
 
     makeMeshExportable = BoolProperty(name = "Make Mesh Exportable", default = True,
-        description = ("This might modify the mesh (in invisible ways) "
-                       "to allow exporters (Alembic) to export this mesh correctly"),
+        description = ("This might modify the mesh to allow exporters (e.g. Alembic) "
+                       "to export this mesh correctly. "),
         update = executionCodeChanged)
 
     errorMessage = StringProperty()
@@ -73,16 +65,13 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
         if self.meshDataType == "VERTICES": return self.inputs["Vertices"]
 
     def drawAdvanced(self, layout):
-        col = layout.column()
-        col.prop(self, "updateMesh")
-        subcol = col.column(align = True)
-        subcol.active = self.updateMesh
-        subcol.prop(self, "recalcEdges")
-        subcol.prop(self, "recalcTessFaces")
-
-        layout.prop(self, "validateMesh")
-
         layout.prop(self, "makeMeshExportable")
+
+        col = layout.column(align = True)
+        col.prop(self, "validateMesh")
+        subcol = col.column(align = True)
+        subcol.active = self.validateMesh
+        subcol.prop(self, "validateMeshVerbose", text = "Print Validation Info")
 
     def getExecutionCode(self):
         yield "self.errorMessage = ''"
@@ -129,13 +118,10 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
         mesh.edges.foreach_set("vertices", edges.asMemoryView())
         mesh.polygons.foreach_set("loop_total", polygons.polyLengths.asMemoryView())
         mesh.polygons.foreach_set("loop_start", polygons.polyStarts.asMemoryView())
-        mesh.polygons.foreach_set("vertices", polygons.indices.asMemoryView())
+        mesh.loops.foreach_set("vertex_index", polygons.indices.asMemoryView())
 
-        if self.updateMesh:
-            mesh.update(calc_edges = self.recalcEdges,
-                        calc_tessface = self.recalcTessFaces)
         if self.validateMesh:
-            mesh.validate()
+            mesh.validate(verbose = self.validateMeshVerbose)
 
     def setBMesh(self, mesh, bm):
         bm.to_mesh(mesh)
