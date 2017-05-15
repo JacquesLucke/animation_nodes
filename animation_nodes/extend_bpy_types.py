@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from . operators.callbacks import executeCallback
 from . data_structures import (Vector3DList, EdgeIndicesList, PolygonIndicesList,
-                               FloatList, DoubleList)
+                               FloatList, DoubleList, UShortList, LongList)
 
 def register():
     bpy.types.Context.getActiveAnimationNodeTree = getActiveAnimationNodeTree
@@ -68,6 +68,11 @@ class MeshProperties(bpy.types.PropertyGroup):
         areas = FloatList(length = len(self.mesh.polygons))
         self.mesh.polygons.foreach_get("area", areas.asMemoryView())
         return DoubleList.fromValues(areas)
+
+    def getPolygonMaterialIndices(self):
+        indices = UShortList(length = len(self.mesh.polygons))
+        self.mesh.polygons.foreach_get("material_index", indices.asMemoryView())
+        return LongList.fromValues(indices)
 
     @property
     def mesh(self):

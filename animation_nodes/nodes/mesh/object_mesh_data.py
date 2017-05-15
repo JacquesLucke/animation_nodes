@@ -20,6 +20,7 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
         self.newOutput("Vector List", "Polygon Centers", "polygonCenters", hide = True)
         self.newOutput("Vector List", "Polygon Normals", "polygonNormals", hide = True)
         self.newOutput("Float List", "Local Polygon Areas", "localPolygonAreas", hide = True)
+        self.newOutput("Integer List", "Material Indices", "materialIndices", hide = True)
         self.newOutput("Text", "Mesh Name", "meshName", hide = True)
 
     def getExecutionCode(self):
@@ -45,6 +46,8 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
             yield "    polygonCenters = self.getPolygonCenters(mesh, object, useWorldSpace)"
         if isLinked["localPolygonAreas"]:
             yield "    localPolygonAreas = mesh.an.getPolygonAreas()"
+        if isLinked["materialIndices"]:
+            yield "    materialIndices = mesh.an.getPolygonMaterialIndices()"
 
         yield "    if mesh.users == 0: bpy.data.meshes.remove(mesh)"
         yield "else:"
@@ -55,6 +58,7 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
         yield "    polygonNormals = Vector3DList()"
         yield "    polygonCenters = Vector3DList()"
         yield "    localPolygonAreas = DoubleList()"
+        yield "    materialIndices = LongList()"
 
     def getVertexLocations(self, mesh, object, useWorldSpace):
         vertices = mesh.an.getVertices()
