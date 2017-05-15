@@ -7,7 +7,7 @@ def importDataStructures():
     from . lists.base_lists import (
         Vector3DList, Matrix4x4List, EdgeIndicesList, EulerList, BooleanList,
         FloatList, DoubleList, LongList, IntegerList, UShortList, CharList,
-        QuaternionList)
+        QuaternionList, UIntegerList)
 
     from . splines.base_spline import Spline
     from . splines.poly_spline import PolySpline
