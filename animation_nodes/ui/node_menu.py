@@ -249,6 +249,7 @@ class ListMenu(bpy.types.Menu):
         layout.separator()
         insertNode(layout, "an_FillListNode", "Fill")
         insertNode(layout, "an_RepeatListNode", "Repeat")
+        insertNode(layout, "an_RandomListNode", "Random")
         insertNode(layout, "an_ListBooleanOperationsNode", "List Boolean Operations")
         layout.separator()
         insertNode(layout, "an_SetStructElementsNode", "Set Struct Elements")
