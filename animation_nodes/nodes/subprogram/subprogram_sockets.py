@@ -53,30 +53,14 @@ class SubprogramData:
         self.applyOutputs(node)
 
     def applyInputs(self, node):
-        self.applySockets(node, node.inputsByIdentifier, node.inputs, self.inputs)
+        self.applySockets(node, node.inputs, self.inputs)
 
     def applyOutputs(self, node):
-        self.applySockets(node, node.outputsByIdentifier, node.outputs, self.outputs)
+        self.applySockets(node, node.outputs, self.outputs)
 
-    def applySockets(self, node, oldSockets, nodeSockets, socketData):
-        for i, data in enumerate(socketData):
-            couldUseOldSocket = self.changeExistingSocket(oldSockets, data, node, i)
-            if couldUseOldSocket: continue
-            newSocket = self.newSocketFromData(node, nodeSockets, data)
-            newSocket.moveTo(i, node)
-
-        self.removeUnusedSockets(nodeSockets, socketData)
-
-    def changeExistingSocket(self, oldSockets, data, node, targetIndex):
-        if data.identifier in oldSockets:
-            socket = oldSockets[data.identifier]
-            if socket.bl_idname == data.idName:
-                socket.moveTo(targetIndex, node)
-                socket.text = data.text
-                return True
-            else:
-                socket.remove()
-        return False
+    def applySockets(self, node, nodeSockets, socketData):
+        for data in socketData:
+            self.newSocketFromData(node, nodeSockets, data)
 
     def newSocketFromData(self, node, nodeSockets, data):
         if nodeSockets.bl_rna.identifier == "NodeInputs":
@@ -90,10 +74,6 @@ class SubprogramData:
         newSocket.display.text = True
         newSocket.dataIsModified = True
         return newSocket
-
-    def removeUnusedSockets(self, nodeSockets, socketData):
-        for socket in nodeSockets[len(socketData):]:
-            socket.remove()
 
 class SocketData:
     def __init__(self, idName, identifier, text, defaultValue):

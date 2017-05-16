@@ -27,7 +27,7 @@ class ColorSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         self.value = data[:3]
 
     def getProperty(self):
-        return self.value
+        return self.value.copy()
 
     @classmethod
     def getDefaultValue(cls):

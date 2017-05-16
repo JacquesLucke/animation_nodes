@@ -1,9 +1,9 @@
 import re
 import bpy
 from bpy.props import *
-from ... events import networkChanged
-from ... utils.layout import splitAlignment
 from ... base_types import AnimationNode
+from ... utils.names import getRandomString
+from ... utils.layout import splitAlignment
 from . subprogram_base import SubprogramBaseNode
 from ... utils.nodes import newNodeAtCursor, invokeTranslation
 from . subprogram_sockets import SubprogramData, subprogramInterfaceChanged
@@ -50,7 +50,7 @@ class GroupInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
 
     def newGroupInput(self, dataType, name = None, defaultValue = None):
         if name is None: name = dataType
-        socket = self.newOutput(dataType, name, "groupInput")
+        socket = self.newOutput(dataType, name, getRandomString(10))
         if defaultValue is not None: socket.setProperty(defaultValue)
         socket.text = name
         socket.moveable = True

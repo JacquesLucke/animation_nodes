@@ -63,7 +63,7 @@ class GroupOutputNode(bpy.types.Node, AnimationNode):
 
     def newGroupOutput(self, dataType, name = None):
         if name is None: name = dataType
-        socket = self.newInput(dataType, name, "groupOutput")
+        socket = self.newInput(dataType, name, getRandomString(10))
         socket.dataIsModified = True
         socket.text = name
         socket.moveable = True
