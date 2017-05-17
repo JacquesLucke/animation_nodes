@@ -28,14 +28,16 @@ class GetSplineSamplesNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
 
         yield "if spline.isEvaluable():"
         yield "    amount = max(amount, 0.0)"
+        yield "    _start = min(max(start, 0), 1)"
+        yield "    _end = min(max(end, 0), 1)"
 
         if self.parameterType == "UNIFORM":
             yield "    spline.ensureUniformConverter(self.resolution)"
-            if isLinked["positions"]: yield "    positions = spline.getUniformSamples(amount, start, end)"
-            if isLinked["tangents"]:  yield "    tangents = spline.getUniformTangentSamples(amount, start, end)"
+            if isLinked["positions"]: yield "    positions = spline.getUniformSamples(amount, _start, _end)"
+            if isLinked["tangents"]:  yield "    tangents = spline.getUniformTangentSamples(amount, _start, _end)"
         elif self.parameterType == "RESOLUTION":
-            if isLinked["positions"]: yield "    positions = spline.getSamples(amount, start, end)"
-            if isLinked["tangents"]:  yield "    tangents = spline.getTangentSamples(amount, start, end)"
+            if isLinked["positions"]: yield "    positions = spline.getSamples(amount, _start, _end)"
+            if isLinked["tangents"]:  yield "    tangents = spline.getTangentSamples(amount, _start, _end)"
 
         yield "else:"
         yield "    positions = Vector3DList()"
