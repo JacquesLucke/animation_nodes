@@ -30,9 +30,12 @@ class LoopGeneratorOutputNode(bpy.types.Node, VectorizedNode):
         listDataType = self.listDataType
         baseDataType = toBaseDataType(listDataType)
 
-        self.newVectorizedInput(baseDataType, "useList",
-            (baseDataType, "input", dict(defaultDrawType = "TEXT_ONLY")),
-            (listDataType, "input", dict(defaultDrawType = "TEXT_ONLY")))
+        if self.listDataType == "Generic List":
+            self.newInput("Generic", "Generic", "input")
+        else:
+            self.newVectorizedInput(baseDataType, "useList",
+                (baseDataType, "input", dict(defaultDrawType = "TEXT_ONLY")),
+                (listDataType, "input", dict(defaultDrawType = "TEXT_ONLY")))
 
         self.newInput("Boolean", "Condition", "condition", value = True, hide = True)
 
@@ -45,6 +48,8 @@ class LoopGeneratorOutputNode(bpy.types.Node, VectorizedNode):
         layout.prop(self, "outputName", text = "Name")
         self.invokeSelector(layout, "DATA_TYPE", "setListDataType",
             dataTypes = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
+
+        layout.label("No vectorization for generic type.", icon = "INFO")
 
     def drawLabel(self):
         return self.outputName
@@ -79,6 +84,13 @@ class LoopGeneratorOutputNode(bpy.types.Node, VectorizedNode):
     @property
     def dataInputSocket(self):
         return self.inputs[0]
+
+    @property
+    def generatorType(self):
+        if self.listDataType == "Generic List":
+            return "append"
+        else:
+            return "extend" if self.useList else "append"
 
 def getRandomInt():
     random.seed()
