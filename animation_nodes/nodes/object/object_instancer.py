@@ -75,7 +75,8 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.newInput("Integer", "Instances", "instancesAmount", minValue = 0)
         if self.copyFromSource:
-            self.newInput("Object", "Source", "sourceObject", defaultDrawType = "PROPERTY_ONLY")
+            self.newInput("Object", "Source", "sourceObject",
+                defaultDrawType = "PROPERTY_ONLY", showHideToggle = True)
         self.newInput("Scene List", "Scenes", "scenes", hide = True)
 
         self.newOutput("an_ObjectListSocket", "Objects", "objects")
