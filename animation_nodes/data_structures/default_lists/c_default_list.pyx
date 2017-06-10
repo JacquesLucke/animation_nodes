@@ -20,15 +20,15 @@ cdef class CDefaultList(DefaultList):
 
         self.default = self.defaultElementList.getPointer()
 
-    def __getitem__(self, long index):
+    def __getitem__(self, Py_ssize_t index):
         if 0 <= index < self.realListLength:
             return self.realList[index]
         return self.defaultElementList[0]
 
-    cdef void* get(self, long index):
+    cdef void* get(self, Py_ssize_t index):
         if 0 <= index < self.realListLength:
             return self.arrayStart + index * self.elementSize
         return self.default
 
-    cdef long getRealLength(self):
+    cdef Py_ssize_t getRealLength(self):
         return self.realListLength
