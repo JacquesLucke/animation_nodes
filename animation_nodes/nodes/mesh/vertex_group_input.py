@@ -14,6 +14,9 @@ groupIdentifierTypeItems = [
     ("NAME", "Name", "Get vertex group based on the name", "NONE", 1)
 ]
 
+groupNotFoundMessage = "group not found"
+noMeshMessage = "no mesh object"
+
 class VertexGroupInputNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_VertexGroupInputNode"
     bl_label = "Vertex Group Input"
@@ -26,13 +29,15 @@ class VertexGroupInputNode(bpy.types.Node, VectorizedNode):
 
     useIndexList = VectorizedNode.newVectorizeProperty()
 
+    errorMessage = StringProperty();
+
     def create(self):
         self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
 
         if self.groupIdentifierType == "INDEX":
             self.newInput("Integer", "Group Index", "groupIndex")
         elif self.groupIdentifierType == "NAME":
-            self.newInput("Text", "Name", "name")
+            self.newInput("Text", "Name", "groupName")
 
         if self.mode == "INDEX":
             self.newVectorizedInput("Integer", "useIndexList",
@@ -44,6 +49,8 @@ class VertexGroupInputNode(bpy.types.Node, VectorizedNode):
 
     def draw(self, layout):
         layout.prop(self, "mode", text = "")
+        if self.errorMessage != "":
+            layout.label(self.errorMessage, icon = "ERROR")
 
     def drawAdvanced(self, layout):
         layout.prop(self, "groupIdentifierType", text = "Type")
@@ -58,12 +65,22 @@ class VertexGroupInputNode(bpy.types.Node, VectorizedNode):
             return "execute_All"
 
     def execute_Index(self, object, identifier, index):
-        try: return self.getVertexGroup(identifier).weight(index)
+        self.errorMessage = ""
+        if object is None:
+            return 0;
+        vertexGroup = self.getVertexGroup(object, identifier)
+        if vertexGroup is None:
+            self.errorMessage = groupNotFoundMessage
+
+        try: return vertexGroup.weight(index)
         except: return 0
 
     def execute_Indices(self, object, identifier, indices):
+        self.errorMessage = ""
         vertexGroup = self.getVertexGroup(object, identifier)
         if vertexGroup is None:
+            if object is not None:
+                self.errorMessage = groupNotFoundMessage
             return DoubleList()
 
         weights = DoubleList(length = len(indices))
@@ -75,11 +92,17 @@ class VertexGroupInputNode(bpy.types.Node, VectorizedNode):
         return weights
 
     def execute_All(self, object, identifier):
-        if getattr(object, "type", "") != "MESH":
+        self.errorMessage = ""
+        if object is None:
+            return DoubleList()
+
+        if object.type != "MESH":
+            self.errorMessage = noMeshMessage
             return DoubleList()
 
         vertexGroup = self.getVertexGroup(object, identifier)
         if vertexGroup is None:
+            self.errorMessage = groupNotFoundMessage
             return DoubleList()
 
         vertexAmount = len(object.data.vertices)
