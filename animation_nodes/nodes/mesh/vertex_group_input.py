@@ -3,6 +3,7 @@ from bpy.props import *
 from ... events import propertyChanged
 from ... base_types import VectorizedNode
 from ... data_structures import DoubleList
+from ... utils.data_blocks import removeNotUsedDataBlock
 
 modeItems = [
     ("ALL", "All", "Get weight of every vertex", "NONE", 0),
@@ -16,6 +17,7 @@ groupIdentifierTypeItems = [
 
 groupNotFoundMessage = "group not found"
 noMeshMessage = "no mesh object"
+noSceneMessage = "scene required"
 
 class VertexGroupInputNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_VertexGroupInputNode"
@@ -45,6 +47,8 @@ class VertexGroupInputNode(bpy.types.Node, VectorizedNode):
             self.newVectorizedOutput("Float", "useIndexList",
                 ("Weight", "weight"), ("Weights", "weights"))
         elif self.mode == "ALL":
+            self.newInput("Boolean", "Use Modifiers", "useModifiers")
+            self.newInput("Scene", "Scene", "scene", hide = True)
             self.newOutput("Float List", "Weights", "weights")
 
     def draw(self, layout):
@@ -91,7 +95,7 @@ class VertexGroupInputNode(bpy.types.Node, VectorizedNode):
             except: weights[i] = 0
         return weights
 
-    def execute_All(self, object, identifier):
+    def execute_All(self, object, identifier, useModifiers, *optionalScene):
         self.errorMessage = ""
         if object is None:
             return DoubleList()
@@ -105,6 +109,12 @@ class VertexGroupInputNode(bpy.types.Node, VectorizedNode):
             self.errorMessage = groupNotFoundMessage
             return DoubleList()
 
+        if useModifiers:
+            return self.execute_All_WithModifiers(object, vertexGroup, optionalScene[0])
+        else:
+            return self.execute_All_WithoutModifiers(object, vertexGroup)
+
+    def execute_All_WithoutModifiers(self, object, vertexGroup):
         vertexAmount = len(object.data.vertices)
         weights = DoubleList(length = vertexAmount)
         getWeight = vertexGroup.weight
@@ -112,6 +122,26 @@ class VertexGroupInputNode(bpy.types.Node, VectorizedNode):
         for i in range(vertexAmount):
             try: weights[i] = getWeight(i)
             except: weights[i] = 0
+        return weights
+
+    def execute_All_WithModifiers(self, object, vertexGroup, scene):
+        if scene is None:
+            self.errorMessage = noSceneMessage
+            return DoubleList()
+
+        mesh = object.an.getMesh(scene, applyModifiers = True)
+        index = vertexGroup.index
+        weights = DoubleList(length = len(mesh.vertices))
+        weights.fill(0)
+        for i, vertex in enumerate(mesh.vertices):
+            for vertexGroupElement in vertex.groups:
+                if vertexGroupElement.group == index:
+                    weights[i] = vertexGroupElement.weight
+                    break
+
+        if mesh.users == 0:
+            removeNotUsedDataBlock(mesh, "MESH")
+
         return weights
 
     def getVertexGroup(self, object, identifier):
