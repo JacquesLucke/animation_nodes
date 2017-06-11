@@ -329,6 +329,7 @@ class ObjectMenu(bpy.types.Menu):
         insertNode(layout, "an_CopyObjectDataNode", "Copy Data")
         insertNode(layout, "an_SetKeyframesNode", "Set Keyframes")
         insertNode(layout, "an_ObjectGroupOperationsNode", "Group Operations")
+        insertNode(layout, "an_ArmatureInfoNode", "Armature Info")
         layout.menu("an_object_utils_menu", text = "Utils")
         layout.separator()
         insertNode(layout, "an_ObjectInstancerNode", "Instancer")
