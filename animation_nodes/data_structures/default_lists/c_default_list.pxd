@@ -9,7 +9,7 @@ cdef class CDefaultList(DefaultList):
 
         char* arrayStart
         void* default
-        long realListLength
-        long elementSize
+        Py_ssize_t realListLength
+        Py_ssize_t elementSize
 
-    cdef void* get(self, long index)
+    cdef void* get(self, Py_ssize_t index)

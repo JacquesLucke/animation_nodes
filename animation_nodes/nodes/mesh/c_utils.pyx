@@ -29,12 +29,12 @@ def createEdgeIndices(_indices1, _indices2):
     cdef CDefaultList indices2 = CDefaultList(LongList, _indices2, 0)
     cdef Py_ssize_t amount = CDefaultList.getMaxLength(indices1, indices2)
     cdef EdgeIndicesList edges = EdgeIndicesList(length = amount)
-    cdef int index1, index2
+    cdef unsigned int index1, index2
     cdef Py_ssize_t i
 
     for i in range(amount):
-        index1 = (<unsigned int*>indices1.get(i))[0]
-        index2 = (<unsigned int*>indices2.get(i))[0]
+        index1 = (<long*>indices1.get(i))[0]
+        index2 = (<long*>indices2.get(i))[0]
         edges.data[i].v1 = index1 if index1 >= 0 else 0
         edges.data[i].v2 = index2 if index2 >= 0 else 0
     return edges
@@ -55,11 +55,7 @@ def createEdges(Vector3DList points1, Vector3DList points2):
     return newPoints, edges
 
 def calculateEdgeLengths(Vector3DList vertices, EdgeIndicesList edges):
-    if len(edges) == 0:
-        return DoubleList()
-
-    if edges.getMaxIndex() >= len(vertices):
-        raise IndexError("Edges are invalid")
+    ensureValidEdges(vertices, edges)
 
     cdef DoubleList distances = DoubleList(length = len(edges))
     cdef Py_ssize_t i
@@ -72,11 +68,7 @@ def calculateEdgeLengths(Vector3DList vertices, EdgeIndicesList edges):
     return distances
 
 def calculateEdgeCenters(Vector3DList vertices, EdgeIndicesList edges):
-    if len(edges) == 0:
-        return Vector3DList()
-
-    if edges.getMaxIndex() >= len(vertices):
-        raise IndexError("Edges are invalid")
+    ensureValidEdges(vertices, edges)
 
     cdef Vector3DList centers = Vector3DList(length = len(edges))
     cdef Py_ssize_t i
@@ -91,6 +83,34 @@ def calculateEdgeCenters(Vector3DList vertices, EdgeIndicesList edges):
         centers.data[i].z = (v1.z + v2.z) / 2
 
     return centers
+
+def getEdgeStartPoints(Vector3DList vertices, EdgeIndicesList edges):
+    return getEdgePoints(vertices, edges, 0)
+
+def getEdgeEndPoints(Vector3DList vertices, EdgeIndicesList edges):
+    return getEdgePoints(vertices, edges, 1)
+
+def getEdgePoints(Vector3DList vertices, EdgeIndicesList edges, int index):
+    ensureValidEdges(vertices, edges)
+    assert index in (0, 1)
+
+    cdef:
+        Vector3DList points = Vector3DList(length = len(edges))
+        Py_ssize_t i
+
+    if index == 0:
+        for i in range(len(points)):
+            points.data[i] = vertices.data[edges.data[i].v1]
+    elif index == 1:
+        for i in range(len(points)):
+            points.data[i] = vertices.data[edges.data[i].v2]
+    return points
+
+def ensureValidEdges(Vector3DList vertices, EdgeIndicesList edges):
+    if len(edges) == 0:
+        return Vector3DList()
+    if edges.getMaxIndex() >= len(vertices):
+        raise IndexError("Edges are invalid")
 
 
 # Polygon Operations

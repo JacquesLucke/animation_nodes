@@ -71,6 +71,7 @@ def main():
         preprocessor()
         if "--all" in initialArgs:
             removeCFiles()
+            removeCompiledFiles()
         compileCythonFiles()
         if "--export" in initialArgs:
             export()
@@ -159,6 +160,12 @@ def removeCFiles():
         os.remove(path)
     print("Remove generated .c files.")
 
+def removeCompiledFiles():
+    for path in iterPathsWithSuffix(".so"):
+        os.remove(path)
+    for path in iterPathsWithSuffix(".pyd"):
+        os.remove(path)
+    print("Remove compiled files.")
 
 
 # Copy to Blenders addons directory

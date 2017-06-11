@@ -16,6 +16,7 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     objectName = StringProperty(update = propertyChanged)
     objectCreationType = StringProperty(default = "")
+    showHideToggle = BoolProperty(default = False)
 
     def drawProperty(self, layout, text, node):
         row = layout.row(align = True)
@@ -26,6 +27,12 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
         if self.objectCreationType != "":
             self.invokeFunction(row, node, "createObject", icon = "PLUS")
+
+        if self.showHideToggle:
+            object = self.getValue()
+            if object is not None:
+                row.prop(object, "hide", text = "")
+
 
         self.invokeFunction(row, node, "handleEyedropperButton", icon = "EYEDROPPER", passEvent = True,
             description = "Assign active object to this socket (hold CTRL to open a rename object dialog)")

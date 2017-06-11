@@ -140,9 +140,16 @@ def handleDataAsList(data):
         return False
     elif isinstance(data, str):
         return False
-    elif hasattr(data, "__iter__") and hasattr(data, "__len__"):
+    elif hasattr(data, "__iter__") and hasattr(data, "__len__") and isSlicable(data):
         return True
     else:
+        return False
+
+def isSlicable(data):
+    try:
+        data[:0]
+        return True
+    except:
         return False
 
 

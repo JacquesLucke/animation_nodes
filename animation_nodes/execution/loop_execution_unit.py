@@ -146,7 +146,7 @@ class LoopExecutionUnit:
             name = "loop_generator_output_" + str(i)
             variables[node] = name
             yield "{} = bpy.types.{}.getDefaultValue()".format(name, toIdName(node.listDataType))
-            yield "{0}_{1} = {1}.{0}".format("extend" if node.useList else "append", name)
+            yield "{0}_{1} = {1}.{0}".format(node.generatorType, name)
 
     def iter_InitializeParametersLines(self, inputNode, variables):
         for socket in inputNode.getParameterSockets():
@@ -181,7 +181,7 @@ class LoopExecutionUnit:
             socket = node.dataInputSocket
             if socket.isUnlinked and socket.isCopyable(): expression = getCopyExpression(socket, variables)
             else: expression = variables[socket]
-            yield "    {}_{}({})".format("extend" if node.useList else "append", variables[node], expression)
+            yield "    {}_{}({})".format(node.generatorType, variables[node], expression)
 
     def iter_ReassignParameters(self, inputNode, variables, nodeByID):
         for node in inputNode.getReassignParameterNodes(nodeByID):

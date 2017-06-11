@@ -167,11 +167,13 @@ def iterNodePreExecutionLines(node, variables):
 def iterInputConversionLines(node, variables):
     for socket, dataType in iterLinkedInputSocketsWithOriginDataType(node):
         if socket.dataType != dataType and socket.dataType != "All":
-            conversionExpression = socket.getConversionCode(dataType)
-            if conversionExpression is not None:
-                conversion = conversionExpression.replace("value", variables[socket])
+            convertCode = socket.getConversionCode(dataType)
+            if convertCode is not None:
+                socketPath = node.identifier + ".inputs[{}]".format(socket.getIndex(node))
+                convertCode = replaceVariableName(convertCode, "value", variables[socket])
+                convertCode = replaceVariableName(convertCode, "self", socketPath)
                 newVariableName = variables[socket] + "_converted"
-                yield "{} = {}".format(newVariableName, conversion)
+                yield "{} = {}".format(newVariableName, convertCode)
                 variables[socket] = newVariableName
 
 def iterInputCopyLines(node, variables):
