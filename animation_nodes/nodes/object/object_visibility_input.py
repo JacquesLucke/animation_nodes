@@ -16,9 +16,9 @@ class ObjectVisibilityInputNode(bpy.types.Node, VectorizedNode):
         self.newVectorizedOutput("Boolean", "useObjectList",
             ("Hide", "hide"), ("Hide", "hide"))
         self.newVectorizedOutput("Boolean", "useObjectList",
-            ("Hide Select", "hideSelect"), ("Hide Select", "hideSelect"))
-        self.newVectorizedOutput("Boolean", "useObjectList",
             ("Hide Render", "hideRender"), ("Hide Render", "hideRender"))
+        self.newVectorizedOutput("Boolean", "useObjectList",
+            ("Hide Select", "hideSelect"), ("Hide Select", "hideSelect"))
         self.newVectorizedOutput("Boolean", "useObjectList",
             ("Show Name", "showName"), ("Show Name", "showName"))
         self.newVectorizedOutput("Boolean", "useObjectList",
@@ -26,9 +26,8 @@ class ObjectVisibilityInputNode(bpy.types.Node, VectorizedNode):
         self.newVectorizedOutput("Boolean", "useObjectList",
             ("Show Xray", "showXray"), ("Show Xray", "showXray"))
 
-        for socket in self.outputs:
-            if socket.name not in ("Hide", "Hide Render"):
-                socket.hide = True
+        for socket in self.outputs[2:]:
+            socket.hide = True
 
     def getExecutionCode(self):
         isLinked = self.getLinkedBaseOutputsDict()
