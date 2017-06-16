@@ -1,21 +1,37 @@
 import bpy
-from ... base_types import AnimationNode
+from ... base_types import VectorizedNode
 
-class ObjectVisibilityInputNode(bpy.types.Node, AnimationNode):
+class ObjectVisibilityInputNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_ObjectVisibilityInputNode"
     bl_label = "Object Visibility Input"
+    autoVectorizeExecution = True
+
+    useObjectList = VectorizedNode.newVectorizeProperty()
 
     def create(self):
-        self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
-        self.newOutput("Boolean", "Hide", "hide")
-        self.newOutput("Boolean", "Hide Select", "hideSelect", hide = True)
-        self.newOutput("Boolean", "Hide Render", "hideRender")
-        self.newOutput("Boolean", "Show Name", "showName", hide = True)
-        self.newOutput("Boolean", "Show Axis", "showAxis", hide = True)
-        self.newOutput("Boolean", "Show Xray", "showXray", hide = True)
+        self.newVectorizedInput("Object", "useObjectList",
+            ("Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
+            ("Objects", "objects"))
+
+        self.newVectorizedOutput("Boolean", "useObjectList",
+            ("Hide", "hide"), ("Hide", "hide"))
+        self.newVectorizedOutput("Boolean", "useObjectList",
+            ("Hide Select", "hideSelect"), ("Hide Select", "hideSelect"))
+        self.newVectorizedOutput("Boolean", "useObjectList",
+            ("Hide Render", "hideRender"), ("Hide Render", "hideRender"))
+        self.newVectorizedOutput("Boolean", "useObjectList",
+            ("Show Name", "showName"), ("Show Name", "showName"))
+        self.newVectorizedOutput("Boolean", "useObjectList",
+            ("Show Axis", "showAxis"), ("Show Axis", "showAxis"))
+        self.newVectorizedOutput("Boolean", "useObjectList",
+            ("Show Xray", "showXray"), ("Show Xray", "showXray"))
+
+        for socket in self.outputs:
+            if socket.name not in ("Hide", "Hide Render"):
+                socket.hide = True
 
     def getExecutionCode(self):
-        isLinked = self.getLinkedOutputsDict()
+        isLinked = self.getLinkedBaseOutputsDict()
         if not any(isLinked.values()): return
 
         yield "if object is not None:"
