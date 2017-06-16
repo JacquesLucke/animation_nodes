@@ -2,7 +2,6 @@ import bpy
 from bpy.props import *
 from ... base_types import AnimationNode
 from ... events import executionCodeChanged
-from ... data_structures import Vector3DList, Matrix4x4List, DoubleList
 
 stateItems = [
     ("REST", "Rest", "Return information in rest position.", "NONE", 0),
@@ -16,7 +15,7 @@ class ArmatureInfoNode(bpy.types.Node, AnimationNode):
         items = stateItems, update = executionCodeChanged)
 
     def create(self):
-        self.newInput("Object", "Armature", "armature")
+        self.newInput("Object", "Armature", "armature", defaultDrawType = "PROPERTY_ONLY")
         self.newOutput("Matrix List", "Matrices", "matrices")
         self.newOutput("Vector List", "Centers", "centers")
         self.newOutput("Vector List", "Directions", "directions")
