@@ -166,16 +166,16 @@ cdef class LISTNAME(CList):
     # Base operations for lists - mimic python list
     ###############################################
 
-    cpdef copy(self):
+    def copy(self):
         newList = LISTNAME(self.length)
         newList.overwrite(self)
         return newList
 
-    cpdef clear(self):
+    def clear(self):
         self.length = 0
         self.shrinkToLength()
 
-    cpdef fill(self, value):
+    def fill(self, value):
         cdef Py_ssize_t i
         cdef TYPE _value
         if value == 0:
@@ -185,13 +185,13 @@ cdef class LISTNAME(CList):
             for i in range(self.length):
                 self.data[i] = _value
 
-    cpdef append(self, value):
+    def append(self, value):
         if self.length >= self.capacity:
             self.grow(self.length + 1)
         self.tryConversion(value, self.data + self.length)
         self.length += 1
 
-    cpdef extend(self, values):
+    def extend(self, values):
         cdef Py_ssize_t oldLength, newLength, i
         if isinstance(values, LISTNAME):
             self.overwrite(values, self.length)
@@ -230,7 +230,7 @@ cdef class LISTNAME(CList):
             self.tryConversion(values[i], self.data + self.length + i)
         self.length = newLength
 
-    cpdef index(self, value):
+    def index(self, value):
         cdef TYPE _value
         self.tryConversion(value, &_value)
         cdef Py_ssize_t index = self.searchIndex(_value)
@@ -244,7 +244,7 @@ cdef class LISTNAME(CList):
                 return i
         return -1
 
-    cpdef count(self, value):
+    def count(self, value):
         cdef TYPE _value
         self.tryConversion(value, &_value)
         cdef Py_ssize_t i
@@ -254,7 +254,7 @@ cdef class LISTNAME(CList):
                 amount += 1
         return amount
 
-    cpdef remove(self, value):
+    def remove(self, value):
         cdef TYPE _value
         self.tryConversion(value, &_value)
         cdef Py_ssize_t index = self.searchIndex(_value)
@@ -263,7 +263,7 @@ cdef class LISTNAME(CList):
         else:
             self.removeValueAtIndex(index)
 
-    cpdef insert(self, Py_ssize_t index, value):
+    def insert(self, Py_ssize_t index, value):
         cdef TYPE _value
         if index >= self.length:
             self.append(value)
@@ -384,7 +384,7 @@ cdef class LISTNAME(CList):
     # Create new lists based on an existing list
     ###############################################
 
-    cpdef LISTNAME reversed(self):
+    def reversed(self):
         cdef:
             LISTNAME newList = LISTNAME(self.length)
             Py_ssize_t i, offset
@@ -465,7 +465,7 @@ TO_PYOBJECT_CODE
     # Memory Views
     ###############################################
 
-    cpdef asMemoryView(self):
+    def asMemoryView(self):
         if "MEMVIEW" == "NotExistentType":
             raise NotImplementedError("Cannot create memoryview for this type")
 
