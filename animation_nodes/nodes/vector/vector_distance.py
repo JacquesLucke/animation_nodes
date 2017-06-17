@@ -1,5 +1,5 @@
 import bpy
-from . c_utils import calculateDistances
+from . c_utils import calculateVectorDistances
 from ... base_types import VectorizedNode
 
 class VectorDistanceNode(bpy.types.Node, VectorizedNode):
@@ -25,4 +25,4 @@ class VectorDistanceNode(bpy.types.Node, VectorizedNode):
             yield "distance = (a - b).length"
 
     def calcDistances(self, a, b):
-        return calculateDistances(a, b)
+        return calculateVectorDistances(a, b)

@@ -35,7 +35,7 @@ def vectorsFromValues(DoubleList values):
         output.data[i].z = values.data[i]
     return output
 
-def calculateDistances(_vectors1, _vectors2):
+def calculateVectorDistances(_vectors1, _vectors2):
     cdef:
         CDefaultList vectors1 = CDefaultList(Vector3DList, _vectors1, (0, 0, 0))
         CDefaultList vectors2 = CDefaultList(Vector3DList, _vectors2, (0, 0, 0))
@@ -54,3 +54,16 @@ def calculateVectorLengths(Vector3DList vectors):
     for i in range(len(vectors)):
         lengths.data[i] = lengthVec3(vectors.data + i)
     return lengths
+
+def calculateVectorCenters(Vector3DList vectors1, Vector3DList vectors2):
+    assert len(vectors1) == len(vectors2)
+
+    cdef Vector3DList centers = Vector3DList(length = len(vectors1))
+    cdef Py_ssize_t i
+
+    for i in range(len(vectors1)):
+        centers.data[i].x = (vectors1.data[i].x + vectors2.data[i].x) * 0.5
+        centers.data[i].y = (vectors1.data[i].y + vectors2.data[i].y) * 0.5
+        centers.data[i].z = (vectors1.data[i].z + vectors2.data[i].z) * 0.5
+
+    return centers
