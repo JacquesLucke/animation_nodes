@@ -1,4 +1,4 @@
-from ... math cimport Vector3, distanceVec3
+from ... math cimport Vector3, distanceVec3, lengthVec3
 from ... data_structures cimport DoubleList, Vector3DList, CDefaultList
 
 def combineDoubleListsToVectorList(DoubleList x, DoubleList y, DoubleList z):
@@ -47,3 +47,10 @@ def calculateDistances(_vectors1, _vectors2):
         distances.data[i] = distanceVec3(<Vector3*>vectors1.get(i), <Vector3*>vectors2.get(i))
 
     return distances
+
+def calculateVectorLengths(Vector3DList vectors):
+    cdef Py_ssize_t i
+    cdef DoubleList lengths = DoubleList(length = len(vectors))
+    for i in range(len(vectors)):
+        lengths.data[i] = lengthVec3(vectors.data + i)
+    return lengths
