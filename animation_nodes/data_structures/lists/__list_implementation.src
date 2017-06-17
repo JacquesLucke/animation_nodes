@@ -381,57 +381,6 @@ cdef class LISTNAME(CList):
             newList.append(self.toPyObject(&element))
         return newList
 
-    # Create new lists based on an existing list
-    ###############################################
-
-    def reversed(self):
-        cdef:
-            LISTNAME newList = LISTNAME(self.length)
-            Py_ssize_t i, offset
-        offset = self.length - 1
-        for i in range(self.length):
-            newList.data[i] = self.data[offset - i]
-        return newList
-
-    def repeated(self, *, Py_ssize_t length = -1, Py_ssize_t amount = -1):
-        if length < 0 and amount < 0:
-            raise ValueError("'length' or 'amount' has to be non-negative")
-        elif length > 0 and amount > 0:
-            raise ValueError("Can only evaluate one parameter of 'length' and 'amount'")
-
-        if amount >= 0:
-            length = self.length * amount
-
-        if self.length == 0 and length > 0:
-            raise ValueError("Cannot repeat a list with zero elements to something longer")
-
-        if length <= self.length:
-            return self[:length]
-
-        cdef:
-            LISTNAME newList = LISTNAME(length)
-            Py_ssize_t done = 0
-            Py_ssize_t todo = length
-
-        # Copy First Segment
-        memcpy(newList.data, self.data, self.length * sizeof(TYPE))
-        done = self.length
-        todo -= self.length
-
-        # Replicate already copied segments
-        #  -> double the amount of elements that are copied at each step
-        while todo > 0:
-            if done < todo:
-                memcpy(newList.data + done, newList.data, done * sizeof(TYPE))
-                todo -= done
-                done *= 2
-            else:
-                memcpy(newList.data + done, newList.data, todo * sizeof(TYPE))
-                todo = 0
-                done = length
-
-        return newList
-
 
     # Low level utilities
     ###############################################
