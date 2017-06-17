@@ -73,7 +73,7 @@ lists.append(dict(LISTNAME = "Matrix4x4List",
                   TRY_CONVERSION_CODE = "setMatrix4(target, value)",
                   TO_PYOBJECT_CODE = "return toPyMatrix4(value)",
                   MORE_METHODS = readFile(matrixListFunctionsPath),
-                  DECLARATIONS = ["from ... math.matrix cimport Matrix4",
+                  DECLARATIONS = ["from ... math.matrix cimport Matrix4, transposeMatrix_Inplace, multMatrix4",
                                   "from ... math.conversion cimport setMatrix4, toPyMatrix4"]))
 
 lists.append(dict(LISTNAME = "QuaternionList",
@@ -129,6 +129,10 @@ if dependenciesChanged(declarationTargetPath, dependencies = [declarationSourceP
 if dependenciesChanged(implementationTargetPath, dependencies = [implementationSourcePath,
                                                                  numericListFunctionsPath,
                                                                  indicesListFunctionsPath,
+                                                                 matrixListFunctionsPath,
+                                                                 vectorListFunctionsPath,
+                                                                 booleanListFunctionsPath,
+                                                                 eulerListFunctionsPath,
                                                                  __file__]):
     implementation = readFile(implementationSourcePath)
 
