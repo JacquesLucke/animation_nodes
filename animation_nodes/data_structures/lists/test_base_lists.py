@@ -61,7 +61,6 @@ class TestRichComparison(TestCase):
         self.assertTrue([0, 1, 2, 3, 4] != a)
         self.assertTrue((0, 1, 2, 3, 4) != a)
 
-
     def testEquality_Both(self):
         a = IntegerList.fromValues((0, 1, 2, 3))
         b = IntegerList.fromValues((0, 1, 2, 3))
