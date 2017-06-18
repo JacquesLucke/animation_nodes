@@ -146,12 +146,19 @@ cdef class LISTNAME(CList):
         return False
 
     def __richcmp__(x, y, int operation):
-        if operation == 2: # '=='
+        if operation == 2: # ==
             if type(x) == type(y):
                 return (<LISTNAME>x).equals_SameType(y)
             if len(x) == len(y):
                 return all(a == b for a, b in zip(x, y))
             return False
+        elif operation == 3: # !=
+            if type(x) == type(y):
+                return not (<LISTNAME>x).equals_SameType(y)
+            if len(x) == len(y):
+                return any(a != b for a, b in zip(x, y))
+            return True
+
         raise NotImplementedError()
 
     cdef equals_SameType(self, LISTNAME other):
