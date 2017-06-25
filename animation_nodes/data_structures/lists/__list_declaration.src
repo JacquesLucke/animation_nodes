@@ -10,21 +10,9 @@ cdef class LISTNAME(CList):
     cdef void shrinkToLength(self)
     cdef replaceArray(self, TYPE* newData, Py_ssize_t newLength, Py_ssize_t newCapacity)
 
-    cpdef copy(self)
-    cpdef clear(self)
-    cpdef fill(self, value)
-
-    cpdef append(self, value)
-    cpdef extend(self, values)
     cdef extendList(self, list values)
     cdef extendTuple(self, tuple values)
-    cpdef remove(self, value)
-    cpdef index(self, value)
     cdef Py_ssize_t searchIndex(self, TYPE value)
-    cpdef count(self, value)
-    cpdef insert(self, Py_ssize_t index, value)
-
-    cpdef asMemoryView(self)
 
     cdef LISTNAME getValuesInSlice(self, slice sliceObject)
     cdef setValuesInSlice(self, slice sliceObject, values)
@@ -39,7 +27,6 @@ cdef class LISTNAME(CList):
 
     cdef getValuesInIndexList(self, indices)
 
-    cpdef LISTNAME reversed(self)
     cdef overwrite(self, LISTNAME other, Py_ssize_t index = ?)
     cdef overwriteArray(self, TYPE* array, Py_ssize_t arrayLength, Py_ssize_t index)
 

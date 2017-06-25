@@ -1,21 +1,34 @@
 import bpy
 from bpy.props import *
-from ... events import executionCodeChanged
-from ... base_types import AnimationNode
+from ... base_types import VectorizedNode
 
-class ObjectVisibilityOutputNode(bpy.types.Node, AnimationNode):
+attributes = [
+    ("Hide", "hide", "hide", "useHideList"),
+    ("Hide Render", "hideRender", "hide_render", "useHideRenderList"),
+    ("Hide Select", "hideSelect", "hide_select", "useHideSelectList"),
+    ("Show Name", "showName", "show_name", "useShowNameList"),
+    ("Show Axis", "showAxis", "show_axis", "useShowAxisList"),
+    ("Show X-Ray", "showXRay", "show_x_ray", "useShowXRayList")
+]
+
+class ObjectVisibilityOutputNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_ObjectVisibilityOutputNode"
     bl_label = "Object Visibility Output"
+    autoVectorizeExecution = True
+
+    useObjectList = VectorizedNode.newVectorizeProperty()
 
     def create(self):
-        self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
-        self.newInput("Boolean", "Hide", "hide")
-        self.newInput("Boolean", "Hide Render", "hideRender")
-        self.newInput("Boolean", "Hide Select", "hideSelect")
-        self.newInput("Boolean", "Show Name", "showName")
-        self.newInput("Boolean", "Show Axis", "showAxis")
-        self.newInput("Boolean", "Show X-Ray", "showXRay")
-        self.newOutput("Object", "Object", "object")
+        self.newVectorizedInput("Object", "useObjectList",
+            ("Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
+            ("Objects", "objects"))
+
+        for name, identifier, _, useListName in attributes:
+            self.newVectorizedInput("Boolean", (useListName, ["useObjectList"]),
+                (name, identifier), (name, identifier))
+
+        self.newVectorizedOutput("Object", "useObjectList",
+            ("Object", "object"), ("Objects", "objects"))
 
         for socket in self.inputs[1:]:
             socket.useIsUsedProperty = True
@@ -25,109 +38,19 @@ class ObjectVisibilityOutputNode(bpy.types.Node, AnimationNode):
         for socket in self.inputs[3:]:
             socket.hide = True
 
-    def drawAdvanced(self, layout):
-        layout.operator("wm.call_menu", text = "Node Info / Help", icon = "INFO").name = "an.show_object_visibility_output_help"
-
     def getExecutionCode(self):
         yield "if object is not None:"
-
-        s = self.inputs
-        if s["Hide"].isUsed:        yield "    object.hide = hide"
-        if s["Hide Render"].isUsed: yield "    object.hide_render = hideRender"
-        if s["Hide Select"].isUsed: yield "    object.hide_select = hideSelect"
-
-        if s["Show Name"].isUsed:   yield "    object.show_name = showName"
-        if s["Show Axis"].isUsed:   yield "    object.show_axis = showAxis"
-        if s["Show X-Ray"].isUsed:  yield "    object.show_x_ray = showXRay"
-
+        for name, identifier, attr, _ in attributes:
+            if self.inputs[name].isUsed:
+                yield "    object.{} = {}".format(attr, identifier)
         yield "    pass"
 
     def getBakeCode(self):
         yield "if object is not None:"
-        s = self.inputs
-        if s["Hide"].isUsed:        yield "    object.keyframe_insert('hide')"
-        if s["Hide Render"].isUsed: yield "    object.keyframe_insert('hide_render')"
-        if s["Hide Select"].isUsed: yield "    object.keyframe_insert('hide_select')"
+        for name, _, attr, _ in attributes:
+            if self.inputs[name].isUsed:
+                yield "    object.keyframe_insert('{}')".format(attr)
+        yield "    pass"
 
-        if s["Show Name"].isUsed:   yield "    object.keyframe_insert('show_name')"
-        if s["Show Axis"].isUsed:   yield "    object.keyframe_insert('show_axis')"
-        if s["Show X-Ray"].isUsed:  yield "    object.keyframe_insert('show_x_ray')"
-
-class ShowHelp(bpy.types.Menu):
-    bl_idname = "an.show_object_visibility_output_help"
-    bl_label = "Object Visibility Output node | Blender - Animation Nodes"
-    bl_icon = "FORCE_TURBULENCE"
-
-    helpText = StringProperty(default = "help here")
-    noteText = StringProperty(default = "note here")
-    helpLines = []
-    noteLines = []
-
-    def draw(self, context):
-        layout = self.layout
-        layout.operator_context = "INVOKE_DEFAULT"
-        layout.label('''Help, comments, notes.''', icon = "INFO")
-        row = layout.row(align = True)
-
-        col = row.column(align = True)
-        helpLines = self.helpText.split("\n")
-        for li in helpLines:
-            if li:
-                col.label(text = li)
-
-        col = row.column(align = True)
-        noteLines = self.noteText.split("\n")
-        for li in noteLines:
-            if li:
-                col.label(text = li)
-
-        layout.label("o.g. 08.2015", icon = "INFO")
-
-    helpText ='''
-Purpose:
-    This is a convenience node made to ease some ui procedures.
-    Especially useful for objects generated by AN, when many.
-
-    Allows hiding in the view or render, showing the names etc. ,
-    the commands usually found in Outliner and Object properties panels
-    Having as nodes is especially useful for many instanced objects,
-    or for hiding source of meshes.
-
-Usage:
-    Connect after the object you want to change state. Connect in loops
-    for changing many at once.
-    Check the upper buttons for the parameters you want to affect.
-    The props unchecked will not be affected in the object. This
-    is important for use in loops, where affecting many objects.
-
-    The top row of buttons correspond to the order of sockets:
-    [hide][hide select][hide render]    [show name][show axis][show Xray]
-       hide = hide in viewport
-       hide select = hide from selection
-       hide render = hide from rendering
-       show name = shows name of the object in the viewport
-       show axis = show origin and xyz tripod of the object
-       show Xray = shows the object in front of others, never hidden
-'''
-    noteText ='''
-notes:
-    By default, parameters are Not checked.
-    Normally it all are Unchecked so that nothing is changed by accident.
-    Also, the default values are False. This being more serious.
-
-    To change these go into the [an_object_visibility_output.py] file
-    (normally in animation nodes / nodes / object folder) and
-    by the lines 14 to 20 you'll find the default states of these buttons.
-    Change to True instead of False those that you consider by default
-
-    You should not change the default values, near the sockets,
-    as they can lead to unwanted, blind, hiding the moment you plug
-    an object
-
-To explore further:
-    there is also an Object Visibility Input brother node.
-    That reads the state from objects.
-
-    I think is less used, but it' there for convenience.
-    Normally it is not in menu, so use search (Shift A)
-'''
+for *_, useListName in attributes:
+    setattr(ObjectVisibilityOutputNode, useListName, VectorizedNode.newVectorizeProperty())

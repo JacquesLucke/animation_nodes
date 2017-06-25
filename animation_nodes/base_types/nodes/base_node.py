@@ -477,13 +477,13 @@ class AnimationNode:
     def getLocalExecutionCode_GetExecutionCode(self, inputVariables, outputVariables):
         return toString(self.getExecutionCode())
 
+    def getLocalBakeCode(self):
+        return self.applyCodeEffects(toString(self.getBakeCode()))
+
     def applyCodeEffects(self, code):
         for effect in self.getCodeEffects():
             code = toString(effect.apply(self, code))
         return code
-
-    def getLocalBakeCode(self):
-        return toString(self.getBakeCode())
 
 
 @eventHandler("SCENE_UPDATE_POST")

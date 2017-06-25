@@ -160,6 +160,9 @@ class AddonPreferences(bpy.types.AddonPreferences):
     executionCode = PointerProperty(type = ExecutionCodeProperties)
     drawHandlers = PointerProperty(type = DrawHandlerProperties)
 
+    showUninstallInfo = BoolProperty(name = "Show Deinstall Info", default = False,
+        options = {"SKIP_SAVE"})
+
     def draw(self, context):
         layout = self.layout
 
@@ -176,6 +179,13 @@ class AddonPreferences(bpy.types.AddonPreferences):
         col = row.column(align = True)
         col.prop(self.developer, "debug")
         col.prop(self.developer, "runTests")
+
+        col = layout.column(align = True)
+        col.split(0.25).prop(self, "showUninstallInfo", text = "How to Uninstall?",
+            toggle = True, icon = "INFO")
+        if self.showUninstallInfo:
+            col.label("1. Disable Animation Nodes and save the user settings.")
+            col.label("2. Restart Blender an remove addon (without enabling it first).")
 
 def getPreferences():
     return bpy.context.user_preferences.addons[addonName].preferences

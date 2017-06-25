@@ -146,12 +146,19 @@ cdef class LISTNAME(CList):
         return False
 
     def __richcmp__(x, y, int operation):
-        if operation == 2: # '=='
+        if operation == 2: # ==
             if type(x) == type(y):
                 return (<LISTNAME>x).equals_SameType(y)
             if len(x) == len(y):
                 return all(a == b for a, b in zip(x, y))
             return False
+        elif operation == 3: # !=
+            if type(x) == type(y):
+                return not (<LISTNAME>x).equals_SameType(y)
+            if len(x) == len(y):
+                return any(a != b for a, b in zip(x, y))
+            return True
+
         raise NotImplementedError()
 
     cdef equals_SameType(self, LISTNAME other):
@@ -166,16 +173,16 @@ cdef class LISTNAME(CList):
     # Base operations for lists - mimic python list
     ###############################################
 
-    cpdef copy(self):
+    def copy(self):
         newList = LISTNAME(self.length)
         newList.overwrite(self)
         return newList
 
-    cpdef clear(self):
+    def clear(self):
         self.length = 0
         self.shrinkToLength()
 
-    cpdef fill(self, value):
+    def fill(self, value):
         cdef Py_ssize_t i
         cdef TYPE _value
         if value == 0:
@@ -185,13 +192,13 @@ cdef class LISTNAME(CList):
             for i in range(self.length):
                 self.data[i] = _value
 
-    cpdef append(self, value):
+    def append(self, value):
         if self.length >= self.capacity:
             self.grow(self.length + 1)
         self.tryConversion(value, self.data + self.length)
         self.length += 1
 
-    cpdef extend(self, values):
+    def extend(self, values):
         cdef Py_ssize_t oldLength, newLength, i
         if isinstance(values, LISTNAME):
             self.overwrite(values, self.length)
@@ -230,7 +237,7 @@ cdef class LISTNAME(CList):
             self.tryConversion(values[i], self.data + self.length + i)
         self.length = newLength
 
-    cpdef index(self, value):
+    def index(self, value):
         cdef TYPE _value
         self.tryConversion(value, &_value)
         cdef Py_ssize_t index = self.searchIndex(_value)
@@ -244,7 +251,7 @@ cdef class LISTNAME(CList):
                 return i
         return -1
 
-    cpdef count(self, value):
+    def count(self, value):
         cdef TYPE _value
         self.tryConversion(value, &_value)
         cdef Py_ssize_t i
@@ -254,7 +261,7 @@ cdef class LISTNAME(CList):
                 amount += 1
         return amount
 
-    cpdef remove(self, value):
+    def remove(self, value):
         cdef TYPE _value
         self.tryConversion(value, &_value)
         cdef Py_ssize_t index = self.searchIndex(_value)
@@ -263,7 +270,7 @@ cdef class LISTNAME(CList):
         else:
             self.removeValueAtIndex(index)
 
-    cpdef insert(self, Py_ssize_t index, value):
+    def insert(self, Py_ssize_t index, value):
         cdef TYPE _value
         if index >= self.length:
             self.append(value)
@@ -381,57 +388,6 @@ cdef class LISTNAME(CList):
             newList.append(self.toPyObject(&element))
         return newList
 
-    # Create new lists based on an existing list
-    ###############################################
-
-    cpdef LISTNAME reversed(self):
-        cdef:
-            LISTNAME newList = LISTNAME(self.length)
-            Py_ssize_t i, offset
-        offset = self.length - 1
-        for i in range(self.length):
-            newList.data[i] = self.data[offset - i]
-        return newList
-
-    def repeated(self, *, Py_ssize_t length = -1, Py_ssize_t amount = -1):
-        if length < 0 and amount < 0:
-            raise ValueError("'length' or 'amount' has to be non-negative")
-        elif length > 0 and amount > 0:
-            raise ValueError("Can only evaluate one parameter of 'length' and 'amount'")
-
-        if amount >= 0:
-            length = self.length * amount
-
-        if self.length == 0 and length > 0:
-            raise ValueError("Cannot repeat a list with zero elements to something longer")
-
-        if length <= self.length:
-            return self[:length]
-
-        cdef:
-            LISTNAME newList = LISTNAME(length)
-            Py_ssize_t done = 0
-            Py_ssize_t todo = length
-
-        # Copy First Segment
-        memcpy(newList.data, self.data, self.length * sizeof(TYPE))
-        done = self.length
-        todo -= self.length
-
-        # Replicate already copied segments
-        #  -> double the amount of elements that are copied at each step
-        while todo > 0:
-            if done < todo:
-                memcpy(newList.data + done, newList.data, done * sizeof(TYPE))
-                todo -= done
-                done *= 2
-            else:
-                memcpy(newList.data + done, newList.data, todo * sizeof(TYPE))
-                todo = 0
-                done = length
-
-        return newList
-
 
     # Low level utilities
     ###############################################
@@ -465,7 +421,7 @@ TO_PYOBJECT_CODE
     # Memory Views
     ###############################################
 
-    cpdef asMemoryView(self):
+    def asMemoryView(self):
         if "MEMVIEW" == "NotExistentType":
             raise NotImplementedError("Cannot create memoryview for this type")
 

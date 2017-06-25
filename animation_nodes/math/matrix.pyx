@@ -263,3 +263,13 @@ cdef void normalizeMatrix_3x3_Part(Matrix3_or_Matrix4* t, Matrix3_or_Matrix4* m)
     if Matrix3_or_Matrix4 is Matrix4:
         t.a14, t.a24, t.a34 = m.a14, m.a24, m.a34
         t.a41, t.a42, t.a43, t.a44 = m.a41, m.a42, m.a43, m.a44
+
+cdef void transposeMatrix_Inplace(Matrix3_or_Matrix4 *m):
+    m.a12, m.a21 = m.a21, m.a12
+    m.a13, m.a31 = m.a31, m.a13
+    m.a23, m.a32 = m.a32, m.a23
+
+    if Matrix3_or_Matrix4 is Matrix4:
+        m.a14, m.a41 = m.a41, m.a14
+        m.a24, m.a42 = m.a42, m.a24
+        m.a34, m.a43 = m.a43, m.a34

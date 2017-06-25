@@ -6,7 +6,8 @@ from ... math cimport (Vector3, Euler3, Matrix4, toMatrix4,
                        multMatrix4, toPyMatrix4,
                        setTranslationRotationScaleMatrix,
                        setRotationXMatrix, setRotationYMatrix, setRotationZMatrix,
-                       setRotationMatrix, setTranslationMatrix, setIdentityMatrix)
+                       setRotationMatrix, setTranslationMatrix, setIdentityMatrix,
+                       transposeMatrix_Inplace)
 from ... math import matrix4x4ListToEulerList
 
 from libc.math cimport sqrt
@@ -147,7 +148,7 @@ def replicateMatricesAtVectors(Matrix4x4List matrices, Vector3DList translations
 def transformMatrixList(Matrix4x4List matrices, _transformation):
     cdef Matrix4 transformation = toMatrix4(_transformation)
     cdef Matrix4x4List outMatrices = Matrix4x4List(length = len(matrices))
-    cdef long i
+    cdef Py_ssize_t i
     for i in range(len(outMatrices)):
         multMatrix4(outMatrices.data + i, &transformation, matrices.data + i)
     return outMatrices

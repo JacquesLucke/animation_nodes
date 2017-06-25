@@ -35,28 +35,45 @@ class TestInsertion(TestCase):
         self.assertEqual(self.list, (30, 0, 1, 20, 2, 10, 3))
 
 class TestRichComparison(TestCase):
-    def testEqual_Left(self):
+    def testEquality_Left(self):
         a = IntegerList.fromValues((0, 1, 2, 3))
+
         self.assertTrue(a == (0, 1, 2, 3))
         self.assertTrue(a == [0, 1, 2, 3])
         self.assertFalse(a == [0, 1, 2, 3, 4])
         self.assertFalse(a == (0, 1, 2, 3, 4))
 
-    def testEqual_Right(self):
+        self.assertFalse(a != (0, 1, 2, 3))
+        self.assertFalse(a != [0, 1, 2, 3])
+        self.assertTrue(a != [0, 1, 2, 3, 4])
+        self.assertTrue(a != (0, 1, 2, 3, 4))
+
+    def testEquality_Right(self):
         a = IntegerList.fromValues((0, 1, 2, 3))
+
         self.assertTrue((0, 1, 2, 3) == a)
         self.assertTrue([0, 1, 2, 3] == a)
         self.assertFalse([0, 1, 2, 3, 4] == a)
         self.assertFalse((0, 1, 2, 3, 4) == a)
 
-    def testEqual_Both(self):
+        self.assertFalse((0, 1, 2, 3) != a)
+        self.assertFalse([0, 1, 2, 3] != a)
+        self.assertTrue([0, 1, 2, 3, 4] != a)
+        self.assertTrue((0, 1, 2, 3, 4) != a)
+
+    def testEquality_Both(self):
         a = IntegerList.fromValues((0, 1, 2, 3))
         b = IntegerList.fromValues((0, 1, 2, 3))
         c = IntegerList.fromValues((0, 1, 2, 3, 4))
         d = IntegerList.fromValues((0, 1, 2, 4))
+
         self.assertTrue(a == b)
         self.assertFalse(a == c)
         self.assertFalse(a == d)
+
+        self.assertFalse(a != b)
+        self.assertTrue(a != c)
+        self.assertTrue(a != d)
 
 class TestClear(TestCase):
     def testLengthAfterClear(self):
