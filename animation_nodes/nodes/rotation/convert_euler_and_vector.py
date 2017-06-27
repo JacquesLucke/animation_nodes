@@ -19,7 +19,7 @@ class ConvertVectorAndEulerNode(bpy.types.Node, VectorizedNode):
     useDegree = BoolProperty(name = "Use Degree", default = False,
         update = executionCodeChanged)
 
-    conversionType = EnumProperty(name = "Conversion Type", default = "VECTOR_TO_EULER",
+    conversionType = EnumProperty(name = "Conversion Type", default = "EULER_TO_VECTOR",
         update = VectorizedNode.refresh, items = conversionTypeItems)
 
     useList = VectorizedNode.newVectorizeProperty()
