@@ -70,6 +70,7 @@ class NumberMenu(bpy.types.Menu):
         insertNode(layout, "an_NumberRangeNode", "Integer Range", {"dataType" : repr("Integer")})
         insertNode(layout, "an_NumberRangeNode", "Float Range", {"dataType" : repr("Float")})
         insertNode(layout, "an_ParseNumberNode", "Parse Number")
+        insertNode(layout, "an_NumberConstantsNode", "Constants")
         layout.separator()
         insertNode(layout, "an_RandomNumberNode", "Random")
         insertNode(layout, "an_FloatWiggleNode", "Wiggle")
