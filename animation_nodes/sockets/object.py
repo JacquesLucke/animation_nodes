@@ -31,8 +31,9 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         if self.showHideToggle:
             object = self.getValue()
             if object is not None:
-                row.prop(object, "hide", text = "")
-
+                icon = "RESTRICT_VIEW_ON" if object.hide else "RESTRICT_VIEW_OFF"
+                self.invokeFunction(row, node, "toggleObjectVisibilty", icon = icon,
+                    description = "Toggle viewport and render visibility.")
 
         self.invokeFunction(row, node, "handleEyedropperButton", icon = "EYEDROPPER", passEvent = True,
             description = "Assign active object to this socket (hold CTRL to open a rename object dialog)")
@@ -74,6 +75,12 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         object = bpy.data.objects.new("Target", data)
         bpy.context.scene.objects.link(object)
         self.objectName = object.name
+
+    def toggleObjectVisibilty(self):
+        object = self.getValue()
+        if object is None: return
+        object.hide = not object.hide
+        object.hide_render = object.hide
 
     @classmethod
     def getDefaultValue(cls):
