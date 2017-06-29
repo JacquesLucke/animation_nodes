@@ -166,7 +166,7 @@ class MatrixMenu(bpy.types.Menu):
         insertNode(layout, "an_MixDataNode", "Mix", {"dataType" : repr("Matrix")})
         insertNode(layout, "an_MatrixMathNode", "Math")
         insertNode(layout, "an_MatrixCombineNode", "Combine")
-        insertNode(layout, "an_OffsetMatricesNode", "Offset")
+        insertNode(layout, "an_OffsetMatrixNode", "Offset", {"useMatrixList" : repr(True)})
 
 class TextMenu(bpy.types.Menu):
     bl_idname = "an_text_menu"

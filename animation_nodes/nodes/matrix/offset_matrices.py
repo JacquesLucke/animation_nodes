@@ -5,7 +5,13 @@ from ... base_types import VectorizedNode
 from ... utils.handlers import validCallback
 from .. falloff.invert_falloff import InvertFalloff
 from . c_utils import evaluateFalloffForMatrixList
-from ... data_structures import CDefaultList, Vector3DList, EulerList
+
+from ... data_structures import (
+    CDefaultList,
+    Vector3DList,
+    EulerList,
+    Matrix4x4List
+)
 
 from ... algorithms.matrices import (
     translateMatrixList,
@@ -36,12 +42,17 @@ scaleModeItems = [
     ("TRANSLATION_ONLY", "Translation Only", "", "NONE", 3)
 ]
 
-class OffsetMatricesNode(bpy.types.Node, VectorizedNode):
-    bl_idname = "an_OffsetMatricesNode"
-    bl_label = "Offset Matrices"
+class OffsetMatrixNode(bpy.types.Node, VectorizedNode):
+    bl_idname = "an_OffsetMatrixNode"
+    bl_label = "Offset Matrix"
     bl_width_default = 190
+    onlySearchTags = True
+    searchTags = [("Offset Matrices", {"useMatrixList" : repr(True)})]
 
     errorMessage = StringProperty()
+
+    useMatrixList = BoolProperty(name = "Use Matrix List", default = False,
+        update = VectorizedNode.refresh)
 
     specifiedState = EnumProperty(name = "Specified State", default = "START",
         description = "Specify wether the given matrices are the start or end state",
@@ -73,22 +84,30 @@ class OffsetMatricesNode(bpy.types.Node, VectorizedNode):
         items = scaleModeItems, update = propertyChanged)
 
     def create(self):
-        self.newInput("Matrix List", "Matrices", "inMatrices", dataIsModified = self.modifiesOriginalList)
-        self.newInput("Falloff", "Falloff", "falloff")
+        if self.useMatrixList:
+            self.newInput("Matrix List", "Matrices", "inMatrices", dataIsModified = self.modifiesOriginalList)
+            self.newInput("Falloff", "Falloff", "falloff")
 
-        self.newVectorizedInput("Vector", "useTranslationList",
-            ("Translation", "translation"),
-            ("Translations", "translations"))
+            self.newVectorizedInput("Vector", "useTranslationList",
+                ("Translation", "translation"),
+                ("Translations", "translations"))
 
-        self.newVectorizedInput("Euler", "useRotationList",
-            ("Rotation", "rotation"),
-            ("Rotations", "rotations"))
+            self.newVectorizedInput("Euler", "useRotationList",
+                ("Rotation", "rotation"),
+                ("Rotations", "rotations"))
 
-        self.newVectorizedInput("Vector", "useScaleList",
-            ("Scale", "scale", dict(value = (1, 1, 1))),
-            ("Scales", "scales"))
+            self.newVectorizedInput("Vector", "useScaleList",
+                ("Scale", "scale", dict(value = (1, 1, 1))),
+                ("Scales", "scales"))
 
-        self.newOutput("Matrix List", "Matrices", "outMatrices")
+            self.newOutput("Matrix List", "Matrices", "outMatrices")
+        else:
+            self.newInput("Matrix", "Matrix", "inMatrix")
+            self.newInput("Falloff", "Falloff", "falloff")
+            self.newInput("Vector", "Translation", "translation")
+            self.newInput("Euler", "Rotation", "rotation")
+            self.newInput("Vector", "Scale", "scale", value = (1, 1, 1))
+            self.newOutput("Matrix", "Matrix", "outMatrix")
 
         self.updateSocketVisibility()
 
@@ -105,7 +124,9 @@ class OffsetMatricesNode(bpy.types.Node, VectorizedNode):
         row.prop(self, "useRotation", text = "Rot", icon = "MAN_ROT")
         row.prop(self, "useScale", text = "Scale", icon = "MAN_SCALE")
 
-        col.row().prop(self, "specifiedState", expand = True)
+        row = col.row(align = True)
+        row.prop(self, "specifiedState", expand = True)
+        row.prop(self, "useMatrixList", text = "", icon = "LINENUMBERS_ON")
 
         if self.errorMessage != "":
             layout.label(self.errorMessage, icon = "ERROR")
@@ -119,8 +140,18 @@ class OffsetMatricesNode(bpy.types.Node, VectorizedNode):
         if self.scaleMode in ("GLOBAL_AXIS", "INCLUDE_TRANSLATION"):
             layout.label("May result in invalid object matrices", icon = "INFO")
 
+    def getExecutionFunctionName(self):
+        if self.useMatrixList:
+            return "execute_List"
+        else:
+            return "execute_Single"
 
-    def execute(self, matrices, falloff, translation, rotation, scale):
+    def execute_Single(self, matrix, falloff, translation, rotation, scale):
+        inMatrices = Matrix4x4List.fromValue(matrix)
+        outMatrices = self.execute_List(inMatrices, falloff, translation, rotation, scale)
+        return outMatrices[0]
+
+    def execute_List(self, matrices, falloff, translation, rotation, scale):
         self.errorMessage = ""
 
         influences = self.evaluateFalloff(matrices, falloff)
