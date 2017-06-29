@@ -13,7 +13,8 @@ def drawMenu(self, context):
     layout = self.layout
     layout.operator_context = "INVOKE_DEFAULT"
 
-    drawNodeTreeChooser(layout, context)
+    if drawNodeTreeChooser(layout, context):
+        return
 
     layout.operator("an.node_search", text = "Search", icon = "VIEWZOOM")
     layout.separator()
@@ -51,6 +52,8 @@ def drawNodeTreeChooser(layout, context):
         col = layout.column()
         col.scale_y = 1.6
         col.operator("an.create_node_tree", text = "New Node Tree", icon = "PLUS")
+        return True
+    return False
 
 @makeOperator("an.create_node_tree", "Create Node Tree")
 def createNodeTree():
