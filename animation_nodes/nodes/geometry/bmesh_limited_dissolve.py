@@ -5,7 +5,7 @@ from bmesh.ops import dissolve_limit
 from ... base_types import AnimationNode
 
 class BMeshLimitedDissolveNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_BMeshLimitedDissolve"
+    bl_idname = "an_BMeshLimitedDissolveNode"
     bl_label = "Limited Dissolve BMesh"
     bl_width_default = 160
 
