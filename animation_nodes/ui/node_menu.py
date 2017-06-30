@@ -13,7 +13,8 @@ def drawMenu(self, context):
     layout = self.layout
     layout.operator_context = "INVOKE_DEFAULT"
 
-    drawNodeTreeChooser(layout, context)
+    if drawNodeTreeChooser(layout, context):
+        return
 
     layout.operator("an.node_search", text = "Search", icon = "VIEWZOOM")
     layout.separator()
@@ -51,6 +52,8 @@ def drawNodeTreeChooser(layout, context):
         col = layout.column()
         col.scale_y = 1.6
         col.operator("an.create_node_tree", text = "New Node Tree", icon = "PLUS")
+        return True
+    return False
 
 @makeOperator("an.create_node_tree", "Create Node Tree")
 def createNodeTree():
@@ -70,6 +73,7 @@ class NumberMenu(bpy.types.Menu):
         insertNode(layout, "an_NumberRangeNode", "Integer Range", {"dataType" : repr("Integer")})
         insertNode(layout, "an_NumberRangeNode", "Float Range", {"dataType" : repr("Float")})
         insertNode(layout, "an_ParseNumberNode", "Parse Number")
+        insertNode(layout, "an_NumberConstantsNode", "Constants")
         layout.separator()
         insertNode(layout, "an_RandomNumberNode", "Random")
         insertNode(layout, "an_FloatWiggleNode", "Wiggle")
@@ -166,7 +170,7 @@ class MatrixMenu(bpy.types.Menu):
         insertNode(layout, "an_MixDataNode", "Mix", {"dataType" : repr("Matrix")})
         insertNode(layout, "an_MatrixMathNode", "Math")
         insertNode(layout, "an_MatrixCombineNode", "Combine")
-        insertNode(layout, "an_OffsetMatricesNode", "Offset")
+        insertNode(layout, "an_OffsetMatrixNode", "Offset", {"useMatrixList" : repr(True)})
 
 class TextMenu(bpy.types.Menu):
     bl_idname = "an_text_menu"
