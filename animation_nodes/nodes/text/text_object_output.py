@@ -12,8 +12,11 @@ class TextObjectOutputNode(bpy.types.Node, VectorizedNode):
 
     errorMessage = StringProperty()
 
-    useObjectList = VectorizedNode.newVectorizeProperty()
-    useTextList = VectorizedNode.newVectorizeProperty()
+    for attr in ["Object", "Text", "Size", "Extrude", "Shear", "BevelDepth",
+                 "BevelResolution", "LetterSpacing", "WordSpacing", "LineSpacing",
+                 "XOffset", "YOffset", "HorizontalAlign", "VerticalAlign", "Font",
+                 "FontBold", "FontItalic", "FontBoldItalic"]:
+        exec("use{}List = VectorizedNode.newVectorizeProperty()".format(attr), globals(), locals())
 
     def create(self):
         self.newVectorizedInput("Object", "useObjectList",
@@ -22,12 +25,19 @@ class TextObjectOutputNode(bpy.types.Node, VectorizedNode):
 
         self.newVectorizedInput("Text", "useTextList",
             ("Text", "text"), ("Texts", "texts"))
-
-        self.newInput("Float", "Size", "size", value = 1.0)
-        self.newInput("Float", "Extrude", "extrude")
-        self.newInput("Float", "Shear", "shear")
-        self.newInput("Float", "Bevel Depth", "bevelDepth")
-        self.newInput("Integer", "Bevel Resolution", "bevelResolution")
+        self.newVectorizedInput("Float", "useSizeList",
+            ("Size", "size", dict(value = 1)),
+            ("Sizes", "sizes"))
+        self.newVectorizedInput("Float", "useExtrudeList",
+            ("Extrude", "extrude"), ("Extrudes", "extrudes"))
+        self.newVectorizedInput("Float", "useShearList",
+            ("Shear", "shear"), ("Shears", "shears"))
+        self.newVectorizedInput("Float", "useBevelDepthList",
+            ("Bevel Depth", "bevelDepth"),
+            ("Bevel Depths", "bevelDepths"))
+        self.newVectorizedInput("Integer", "useBevelResolutionList",
+            ("Bevel Resolution", "bevelResolution"),
+            ("Bevel Resolutions", "bevelResolutions"))
 
         self.newInput("Float", "Letter Spacing", "letterSpacing", value = 1.0)
         self.newInput("Float", "Word Spacing", "wordSpacing", value = 1.0)
