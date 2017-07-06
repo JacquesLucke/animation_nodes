@@ -108,7 +108,7 @@ class StatisticsDrawer(bpy.types.Operator):
 
         table.clearColumns()
         table.newColumn("#", 30 * dpiFactor, "RIGHT", font = 1)
-        table.newColumn("Node", 170 * dpiFactor, "LEFT", font = 0)
+        table.newColumn("Key Node", 170 * dpiFactor, "LEFT", font = 0)
         table.newColumn("Amount", 80 * dpiFactor, "RIGHT", font = 1)
 
         table.rowHeight = 22 * dpiFactor
@@ -141,7 +141,7 @@ def createMostUsedNodesTable(statistics):
     for i, (name, amount) in enumerate(items, 1):
         table.newRow({
             "#" : str(i),
-            "Node" : name,
+            "Key Node" : name,
             "Amount" : amount})
 
     return table
