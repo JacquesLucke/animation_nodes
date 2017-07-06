@@ -2,24 +2,42 @@ import bpy
 from bpy.props import *
 from ... utils.layout import writeText
 from ... events import executionCodeChanged
-from ... base_types import AnimationNode
+from ... base_types import VectorizedNode
 
-class TextObjectOutputNode(bpy.types.Node, AnimationNode):
+class TextObjectOutputNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_TextObjectOutputNode"
     bl_label = "Text Object Output"
     bl_width_default = 170
+    autoVectorizeExecution = True
 
     errorMessage = StringProperty()
 
-    def create(self):
-        self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
+    for attr in ["Object", "Text", "Size", "Extrude", "Shear", "BevelDepth",
+                 "BevelResolution", "LetterSpacing", "WordSpacing", "LineSpacing",
+                 "XOffset", "YOffset", "HorizontalAlign", "VerticalAlign", "Font",
+                 "FontBold", "FontItalic", "FontBoldItalic"]:
+        exec("use{}List = VectorizedNode.newVectorizeProperty()".format(attr), globals(), locals())
 
-        self.newInput("Text", "Text", "text")
-        self.newInput("Float", "Size", "size", value = 1.0)
-        self.newInput("Float", "Extrude", "extrude")
-        self.newInput("Float", "Shear", "shear")
-        self.newInput("Float", "Bevel Depth", "bevelDepth")
-        self.newInput("Integer", "Bevel Resolution", "bevelResolution")
+    def create(self):
+        self.newVectorizedInput("Object", "useObjectList",
+            ("Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
+            ("Objects", "objects"))
+
+        self.newVectorizedInput("Text", "useTextList",
+            ("Text", "text"), ("Texts", "texts"))
+        self.newVectorizedInput("Float", "useSizeList",
+            ("Size", "size", dict(value = 1)),
+            ("Sizes", "sizes"))
+        self.newVectorizedInput("Float", "useExtrudeList",
+            ("Extrude", "extrude"), ("Extrudes", "extrudes"))
+        self.newVectorizedInput("Float", "useShearList",
+            ("Shear", "shear"), ("Shears", "shears"))
+        self.newVectorizedInput("Float", "useBevelDepthList",
+            ("Bevel Depth", "bevelDepth"),
+            ("Bevel Depths", "bevelDepths"))
+        self.newVectorizedInput("Integer", "useBevelResolutionList",
+            ("Bevel Resolution", "bevelResolution"),
+            ("Bevel Resolutions", "bevelResolutions"))
 
         self.newInput("Float", "Letter Spacing", "letterSpacing", value = 1.0)
         self.newInput("Float", "Word Spacing", "wordSpacing", value = 1.0)
@@ -41,7 +59,8 @@ class TextObjectOutputNode(bpy.types.Node, AnimationNode):
         for socket in self.inputs[4:]:
             socket.hide = True
 
-        self.newOutput("Object", "Object", "object")
+        self.newVectorizedOutput("Object", "useObjectList",
+            ("Object", "object"), ("Objects", "objects"))
 
     def draw(self, layout):
         if self.errorMessage != "":
@@ -57,26 +76,26 @@ class TextObjectOutputNode(bpy.types.Node, AnimationNode):
         yield "    textObject = object.data"
 
         s = self.inputs
-        if s["Text"].isUsed:                yield "    if str(textObject.body) != text: textObject.body = text"
-        if s["Size"].isUsed:                yield "    textObject.size = size"
-        if s["Extrude"].isUsed:             yield "    textObject.extrude = extrude"
-        if s["Shear"].isUsed:               yield "    textObject.shear = shear"
-        if s["Bevel Depth"].isUsed:         yield "    textObject.bevel_depth = bevelDepth"
-        if s["Bevel Resolution"].isUsed:    yield "    textObject.bevel_resolution = bevelResolution"
+        if s[1].isUsed: yield "    if str(textObject.body) != text: textObject.body = text"
+        if s[2].isUsed: yield "    textObject.size = size"
+        if s[3].isUsed: yield "    textObject.extrude = extrude"
+        if s[4].isUsed: yield "    textObject.shear = shear"
+        if s[5].isUsed: yield "    textObject.bevel_depth = bevelDepth"
+        if s[6].isUsed: yield "    textObject.bevel_resolution = bevelResolution"
 
-        if s["Letter Spacing"].isUsed:      yield "    textObject.space_character = letterSpacing"
-        if s["Word Spacing"].isUsed:        yield "    textObject.space_word = wordSpacing"
-        if s["Line Spacing"].isUsed:        yield "    textObject.space_line = lineSpacing"
+        if s[7].isUsed: yield "    textObject.space_character = letterSpacing"
+        if s[8].isUsed: yield "    textObject.space_word = wordSpacing"
+        if s[9].isUsed: yield "    textObject.space_line = lineSpacing"
 
-        if s["X Offset"].isUsed:            yield "    textObject.offset_x = xOffset"
-        if s["Y Offset"].isUsed:            yield "    textObject.offset_y = yOffset"
-        if s["Horizontal Align"].isUsed:    yield "    self.setAlignmentX(textObject, horizontalAlign)"
-        if s["Vertical Align"].isUsed:      yield "    self.setAlignmentY(textObject, verticalAlign)"
+        if s[10].isUsed: yield "    textObject.offset_x = xOffset"
+        if s[11].isUsed: yield "    textObject.offset_y = yOffset"
+        if s[12].isUsed: yield "    self.setAlignmentX(textObject, horizontalAlign)"
+        if s[13].isUsed: yield "    self.setAlignmentY(textObject, verticalAlign)"
 
-        if s["Font"].isUsed:                yield "    textObject.font = font"
-        if s["Bold Font"].isUsed:           yield "    textObject.font_bold = fontBold"
-        if s["Italic Font"].isUsed:         yield "    textObject.font_italic = fontItalic"
-        if s["Bold Italic Font"].isUsed:    yield "    textObject.font_bold_italic = fontBoldItalic"
+        if s[14].isUsed: yield "    textObject.font = font"
+        if s[15].isUsed: yield "    textObject.font_bold = fontBold"
+        if s[16].isUsed: yield "    textObject.font_italic = fontItalic"
+        if s[17].isUsed: yield "    textObject.font_bold_italic = fontBoldItalic"
 
     def setAlignmentX(self, textObject, align):
         if align in ("LEFT", "CENTER", "RIGHT", "JUSTIFY", "FLUSH"):
