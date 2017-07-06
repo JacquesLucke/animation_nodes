@@ -15,7 +15,7 @@ class TextObjectOutputNode(bpy.types.Node, VectorizedNode):
     for attr in ["Object", "Text", "Size", "Extrude", "Shear", "BevelDepth",
                  "BevelResolution", "LetterSpacing", "WordSpacing", "LineSpacing",
                  "XOffset", "YOffset", "HorizontalAlign", "VerticalAlign", "Font",
-                 "FontBold", "FontItalic", "FontBoldItalic"]:
+                 "BoldFont", "ItalicFont", "BoldItalicFont"]:
         exec("use{}List = VectorizedNode.newVectorizeProperty()".format(attr), globals(), locals())
 
     def create(self):
@@ -39,19 +39,35 @@ class TextObjectOutputNode(bpy.types.Node, VectorizedNode):
             ("Bevel Resolution", "bevelResolution"),
             ("Bevel Resolutions", "bevelResolutions"))
 
-        self.newInput("Float", "Letter Spacing", "letterSpacing", value = 1.0)
-        self.newInput("Float", "Word Spacing", "wordSpacing", value = 1.0)
-        self.newInput("Float", "Line Spacing", "lineSpacing", value = 1.0)
+        self.newVectorizedInput("Float", "useLetterSpacingList",
+            ("Letter Spacing", "letterSpacing", dict(value = 1)),
+            ("Letter Spacings", "letterSpacings"))
+        self.newVectorizedInput("Float", "useWordSpacingList",
+            ("Word Spacing", "wordSpacing", dict(value = 1)),
+            ("Word Spacings", "wordSpacings"))
+        self.newVectorizedInput("Float", "useLineSpacingList",
+            ("Line Spacing", "lineSpacing", dict(value = 1)),
+            ("Line Spacings", "lineSpacings"))
 
-        self.newInput("Float", "X Offset", "xOffset")
-        self.newInput("Float", "Y Offset", "yOffset")
-        self.newInput("Text", "Horizontal Align", "horizontalAlign", value = "CENTER")
-        self.newInput("Text", "Vertical Align", "verticalAlign", value = "CENTER")
+        self.newVectorizedInput("Float", "useXOffsetList",
+            ("X Offset", "xOffset"), ("X Offsets", "xOffsets"))
+        self.newVectorizedInput("Float", "useYOffsetList",
+            ("Y Offset", "yOffset"), ("Y Offsets", "yOffsets"))
+        self.newVectorizedInput("Text", "useHorizontalAlignList",
+            ("Horizontal Align", "horizontalAlign", dict(value = "CENTER")),
+            ("Horizontal Aligns", "horizontalAligns"))
+        self.newVectorizedInput("Text", "useVerticalAlignList",
+            ("Vertical Align", "verticalAlign", dict(value = "CENTER")),
+            ("Vertical Aligns", "verticalAligns"))
 
-        self.newInput("Font", "Font", "font")
-        self.newInput("Font", "Bold Font", "fontBold")
-        self.newInput("Font", "Italic Font", "fontItalic")
-        self.newInput("Font", "Bold Italic Font", "fontBoldItalic")
+        self.newVectorizedInput("Font", "useFontList",
+            ("Font", "font"), ("Fonts", "fonts"))
+        self.newVectorizedInput("Font", "useBoldFontList",
+            ("Bold Font", "boldFont"), ("Bold Fonts", "boldFonts"))
+        self.newVectorizedInput("Font", "useItalicFontList",
+            ("Italic Font", "italicFont"), ("Italic Fonts", "italicFonts"))
+        self.newVectorizedInput("Font", "useBoldItalicFontList",
+            ("Bold Italic Font", "boldItalicFont"), ("Bold Italic Fonts", "boldItalicFonts"))
 
         for socket in self.inputs[1:]:
             socket.useIsUsedProperty = True
@@ -93,9 +109,9 @@ class TextObjectOutputNode(bpy.types.Node, VectorizedNode):
         if s[13].isUsed: yield "    self.setAlignmentY(textObject, verticalAlign)"
 
         if s[14].isUsed: yield "    textObject.font = font"
-        if s[15].isUsed: yield "    textObject.font_bold = fontBold"
-        if s[16].isUsed: yield "    textObject.font_italic = fontItalic"
-        if s[17].isUsed: yield "    textObject.font_bold_italic = fontBoldItalic"
+        if s[15].isUsed: yield "    textObject.font_bold = boldFont"
+        if s[16].isUsed: yield "    textObject.font_italic = italicFont"
+        if s[17].isUsed: yield "    textObject.font_bold_italic = boldItalicFont"
 
     def setAlignmentX(self, textObject, align):
         if align in ("LEFT", "CENTER", "RIGHT", "JUSTIFY", "FLUSH"):
