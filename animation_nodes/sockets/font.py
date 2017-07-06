@@ -31,7 +31,7 @@ class FontSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def assignFontOfActiveObject(self):
         object = bpy.context.active_object
-        if object.type == "FONT":
+        if getattr(object, "type", "") == "FONT":
             self.fontName = object.data.font.name
 
     @classmethod
