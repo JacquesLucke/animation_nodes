@@ -9,11 +9,12 @@ class InvertBooleanNode(bpy.types.Node, VectorizedNode):
 
     def create(self):
         self.newVectorizedInput("Boolean", "useList",
-            ("Input", "input"), ("Input", "input"))
+            ("Input", "input"),
+            ("Input", "input", dict(dataIsModified = True)))
 
         self.newVectorizedOutput("Boolean", "useList",
             ("Output", "output"),
-            ("Output", "output", dict(dataIsModified = True)))
+            ("Output", "output"))
 
     def getExecutionCode(self):
         if self.useList:
