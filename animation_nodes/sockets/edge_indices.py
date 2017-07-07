@@ -20,10 +20,6 @@ class EdgeIndicesSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return "(0, 1)"
 
     @classmethod
-    def getCopyExpression(cls):
-        return "value[:]"
-
-    @classmethod
     def correctValue(cls, value):
         if isinstance(value, tuple) and len(value) == 2: return value, 0
         elif isinstance(value, (list, set)) and len(value) == 2: return tuple(value), 1

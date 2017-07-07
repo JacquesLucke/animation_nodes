@@ -20,10 +20,6 @@ class PolygonIndicesSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return "(0, 1, 2)"
 
     @classmethod
-    def getCopyExpression(cls):
-        return "value[:]"
-
-    @classmethod
     def correctValue(cls, value):
         if isPolygon(value): return value, 0
         else: return cls.getDefaultValue(), 2
