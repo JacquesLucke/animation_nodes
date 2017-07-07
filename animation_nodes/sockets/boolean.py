@@ -9,7 +9,7 @@ class BooleanSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_BooleanSocket"
     bl_label = "Boolean Socket"
     dataType = "Boolean"
-    allowedInputTypes = ["Boolean"]
+    allowedInputTypes = ["Boolean", "Integer", "Float"]
     drawColor = (0.7, 0.7, 0.4, 1)
     storable = True
     comparable = True
@@ -40,6 +40,11 @@ class BooleanSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         invokeTranslation()
 
     @classmethod
+    def getConversionCode(cls, dataType):
+        if dataType in ("Float", "Integer"):
+            return "bool(value)"
+
+    @classmethod
     def getDefaultValue(cls):
         return False
 
@@ -57,8 +62,15 @@ class BooleanListSocket(bpy.types.NodeSocket, CListSocket):
     bl_label = "Boolean List Socket"
     dataType = "Boolean List"
     baseDataType = "Boolean"
-    allowedInputTypes = ["Boolean List"]
+    allowedInputTypes = ["Boolean List", "Integer List", "Float List"]
     drawColor = (0.7, 0.7, 0.4, 0.5)
     storable = True
     comparable = False
     listClass = BooleanList
+
+    @classmethod
+    def getConversionCode(cls, dataType):
+        if dataType == "Float List":
+            return "AN.nodes.boolean.c_utils.convert_DoubleList_to_BooleanList(value)"
+        if dataType == "Integer List":
+            return "AN.nodes.boolean.c_utils.convert_LongList_to_BooleanList(value)"
