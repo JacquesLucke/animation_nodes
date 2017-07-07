@@ -14,7 +14,7 @@ class FloatSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_FloatSocket"
     bl_label = "Float Socket"
     dataType = "Float"
-    allowedInputTypes = ["Float", "Integer"]
+    allowedInputTypes = ["Float", "Integer", "Boolean"]
     drawColor = (0.4, 0.4, 0.7, 1)
     comparable = True
     storable = True
@@ -43,6 +43,11 @@ class FloatSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         self.maxValue = max
 
     @classmethod
+    def getConversionCode(cls, dataType):
+        if dataType in "Boolean":
+            return "float(value)"
+
+    @classmethod
     def getDefaultValue(cls):
         return 0
 
@@ -60,7 +65,7 @@ class FloatListSocket(bpy.types.NodeSocket, CListSocket):
     bl_label = "Float List Socket"
     dataType = "Float List"
     baseDataType = "Float"
-    allowedInputTypes = ["Float List", "Integer List", "Edge Indices", "Polygon Indices"]
+    allowedInputTypes = ["Float List", "Integer List", "Edge Indices", "Polygon Indices", "Boolean List"]
     drawColor = (0.4, 0.4, 0.7, 0.5)
     storable = True
     comparable = False
@@ -68,5 +73,7 @@ class FloatListSocket(bpy.types.NodeSocket, CListSocket):
 
     @classmethod
     def getConversionCode(cls, dataType):
+        if dataType == "Boolean List":
+            return "AN.nodes.boolean.c_utils.convert_BooleanList_to_DoubleList(value)"
         if dataType in cls.allowedInputTypes:
             return "DoubleList.fromValues(value)"
