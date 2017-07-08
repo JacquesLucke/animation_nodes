@@ -9,21 +9,24 @@ def register():
     km = wm.keyconfigs.addon.keymaps.new(name = "Node Editor", space_type = "NODE_EDITOR")
 
     # Open the ctrl-A search menu
-    kmi = km.keymap_items.new("an.node_search", type = "A", value = "PRESS", ctrl = True)
+    km.keymap_items.new("an.node_search", type = "A", value = "PRESS", ctrl = True)
 
     # Open the context sensitive pie menu
     kmi = km.keymap_items.new("wm.call_menu_pie", type = "W", value = "PRESS")
     kmi.properties.name = "an.context_pie"
 
     # Move view to subprogram nodes
-    kmi = km.keymap_items.new("an.network_navigation", type = "TAB", value = "PRESS")
+    km.keymap_items.new("an.network_navigation", type = "TAB", value = "PRESS")
 
     # Selection Pie Menu
     kmi = km.keymap_items.new("wm.call_menu_pie", type = "E", value = "PRESS")
     kmi.properties.name = "an.selection_pie"
 
     # Floating Node Settings
-    kmi = km.keymap_items.new("an.floating_node_settings_panel", type = "U", value = "PRESS")
+    km.keymap_items.new("an.floating_node_settings_panel", type = "U", value = "PRESS")
+
+    # Deactivate Auto Execution
+    km.keymap_items.new("an.deactivate_auto_execution", type = "Q", value = "PRESS", ctrl = True, shift = True)
 
     addon_keymaps.append(km)
 

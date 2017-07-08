@@ -214,8 +214,6 @@ class BooleanMenu(bpy.types.Menu):
         insertNode(layout, "an_SwitchNode", "Switch")
         insertNode(layout, "an_LogicOperatorsNode", "Logic")
         insertNode(layout, "an_BooleanListLogicNode", "List Logic")
-        insertNode(layout, "an_BooleanToIntegerNode", "Boolean to Integer")
-        insertNode(layout, "an_NumberToBooleanNode", "Number to Boolean")
 
 class ColorMenu(bpy.types.Menu):
     bl_idname = "an_color_menu"

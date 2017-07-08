@@ -59,8 +59,6 @@ class LinkCorrection:
 
 class SimpleConvert(LinkCorrection):
     rules = {
-        ("Boolean", "Integer") : "an_BooleanToIntegerNode",
-        ("Boolean", "Float") : "an_BooleanToIntegerNode",
         ("Vector", "Matrix") : "an_TranslationMatrixNode",
         ("Text Block", "Text") : "an_TextBlockReaderNode",
         ("Vector", "Float") : "an_SeparateVectorNode",
