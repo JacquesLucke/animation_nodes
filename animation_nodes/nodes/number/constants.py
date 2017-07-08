@@ -5,8 +5,8 @@ from ... base_types import AnimationNode
 from ... events import executionCodeChanged
 
 constantItems = [
-    ("PI", "Pi", str(math.pi)[:10] + "...", "NONE", 0),
-    ("E", "E", str(math.e)[:10] + "...", "NONE", 1)
+    ("Pi", "Pi", str(math.pi)[:10] + "...", "NONE", 0),
+    ("e", "e", str(math.e)[:10] + "...", "NONE", 1)
 ]
 
 factors = ["1/4", "1/3", "1/2", "1", "2", "3", "4"]
@@ -17,7 +17,7 @@ class NumberConstantsNode(bpy.types.Node, AnimationNode):
     bl_label = "Constants"
     dynamicLabelType = "HIDDEN_ONLY"
 
-    constant = EnumProperty(name = "Constant", default = "PI",
+    constant = EnumProperty(name = "Constant", default = "Pi",
         items = constantItems, update = executionCodeChanged)
 
     factor = EnumProperty(name = "Factor", default = "1",
@@ -37,9 +37,9 @@ class NumberConstantsNode(bpy.types.Node, AnimationNode):
         return self.factor + " " + self.constant
 
     def getExecutionCode(self):
-        if self.constant == "PI":
+        if self.constant == "Pi":
             yield "value = math.pi"
-        elif self.constant == "E":
+        elif self.constant == "e":
             yield "value = math.e"
 
         if self.factor != "1":
