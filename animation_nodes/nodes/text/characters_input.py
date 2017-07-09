@@ -1,12 +1,6 @@
 import bpy
+import string
 from ... base_types import AnimationNode
-
-lower = "abcdefghijklmnopqrstuvwxyz"
-upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-digits = "0123456789"
-special = "!$%&/()=?*+#'-_.:,;" + '"'
-lineBreak = "\n"
-allChars = lower + upper + digits + special
 
 class CharactersNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CharactersNode"
@@ -18,7 +12,20 @@ class CharactersNode(bpy.types.Node, AnimationNode):
         self.newOutput("Text", "Digits", "digits")
         self.newOutput("Text", "Special", "special")
         self.newOutput("Text", "Line Break", "lineBreak")
-        self.newOutput("Text", "All", "all")
+        self.newOutput("Text", "Tab", "tab")
 
-    def execute(self):
-        return lower, upper, digits, special, lineBreak, allChars
+    def getExecutionCode(self):
+        isLinked = self.getLinkedOutputsDict()
+
+        if isLinked["lower"]:
+            yield "lower = '{}'".format(string.ascii_lowercase)
+        if isLinked["upper"]:
+            yield "upper = '{}'".format(string.ascii_uppercase)
+        if isLinked["digits"]:
+            yield "digits = '{}'".format(string.digits)
+        if isLinked["special"]:
+            yield "special = '!$%&/\\()=?*+#\\'-_.:,;\"'"
+        if isLinked["lineBreak"]:
+            yield "lineBreak = '\\n'"
+        if isLinked["tab"]:
+            yield "tab = '\\t'"
