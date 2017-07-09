@@ -124,12 +124,12 @@ class RotationMenu(bpy.types.Menu):
         layout = self.layout
         insertNode(layout, "an_DirectionToRotationNode", "Direction to Rotation")
         insertNode(layout, "an_RotationToDirectionNode", "Rotation to Direction")
+        insertNode(layout, "an_ConvertVectorAndEulerNode", "Euler to/from Vector")
         insertNode(layout, "an_ConvertRotationsNode", "Convert Rotation Types", {"conversionType" : repr("MATRIX_TO_EULER")})
         layout.separator()
         insertNode(layout, "an_SeparateEulerNode", "Separate Euler")
         insertNode(layout, "an_CombineEulerNode", "Combine Euler")
         insertNode(layout, "an_CreateListNode", "List", {"assignedType" : repr("Euler")})
-        insertNode(layout, "an_EulerToVectorNode", "Euler to/from Vector")
         layout.separator()
         insertNode(layout, "an_EulerMathNode", "Euler Math")
         insertNode(layout, "an_MixDataNode", "Euler Mix", {"dataType" : repr("Euler")})
