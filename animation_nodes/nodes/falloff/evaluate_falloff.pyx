@@ -98,6 +98,7 @@ class EvaluateFalloffNode(bpy.types.Node, AnimationNode):
             self.errorMessage = invalidFalloffMessage
             return DoubleList()
 
+        amount = max(amount, 0)
         strengths = DoubleList(length = amount)
         for i in range(amount):
             strengths.data[i] = _falloff.evaluate(NULL, i)
