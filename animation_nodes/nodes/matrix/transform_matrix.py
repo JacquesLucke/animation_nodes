@@ -1,6 +1,6 @@
 import bpy
-from . c_utils import transformMatrixList
 from ... base_types import VectorizedNode
+from . c_utils import multiplyMatrixWithList
 
 class TransformMatrixNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_TransformMatrixNode"
@@ -27,4 +27,4 @@ class TransformMatrixNode(bpy.types.Node, VectorizedNode):
         return transformation * inMatrix
 
     def execute_MatrixList(self, inMatrices, _transformation):
-        return transformMatrixList(inMatrices, _transformation)
+        return multiplyMatrixWithList(inMatrices, _transformation, type = "LEFT")

@@ -142,15 +142,42 @@ def replicateMatricesAtVectors(Matrix4x4List matrices, Vector3DList translations
     return result
 
 
-# Transform Matrix
+# Multiply Matrices
 ##########################################
 
-def transformMatrixList(Matrix4x4List matrices, _transformation):
+def vectorizedMatrixMultiplication(matricesA, matricesB):
+    cdef bint isListA = isinstance(matricesA, Matrix4x4List)
+    cdef bint isListB = isinstance(matricesB, Matrix4x4List)
+    if isListA and isListB:
+        return multiplyMatrixLists(matricesA, matricesB)
+    elif isListA:
+        return multiplyMatrixWithList(matricesA, matricesB, "RIGHT")
+    elif isListB:
+        return multiplyMatrixWithList(matricesB, matricesA, "LEFT")
+    else:
+        return matricesA * matricesB
+
+def multiplyMatrixWithList(Matrix4x4List matrices, _transformation, str type):
     cdef Matrix4 transformation = toMatrix4(_transformation)
     cdef Matrix4x4List outMatrices = Matrix4x4List(length = len(matrices))
     cdef Py_ssize_t i
-    for i in range(len(outMatrices)):
-        multMatrix4(outMatrices.data + i, &transformation, matrices.data + i)
+    if type == "LEFT":
+        for i in range(len(outMatrices)):
+            multMatrix4(outMatrices.data + i, &transformation, matrices.data + i)
+    elif type == "RIGHT":
+        for i in range(len(outMatrices)):
+            multMatrix4(outMatrices.data + i, matrices.data + i, &transformation)
+    else:
+        raise Exception("type has to be 'LEFT' or 'RIGHT'")
+    return outMatrices
+
+def multiplyMatrixLists(Matrix4x4List listA, Matrix4x4List listB):
+    assert listA.length == listB.length
+
+    cdef Matrix4x4List outMatrices = Matrix4x4List(length = len(listA))
+    cdef Py_ssize_t i
+    for i in range(len(listA)):
+        multMatrix4(outMatrices.data + i, listA.data + i, listB.data + i)
     return outMatrices
 
 
