@@ -21,12 +21,16 @@ class BakeAnimation(bpy.types.Operator):
         return {"RUNNING_MODAL"}
 
     def modal(self, context, event):
+        if event.type in ("RIGHTMOUSE", "ESC"):
+            return self.finish()
+
         currentFrame = self.scene.frame_current
 
         if event.type == "TIMER":
             self.scene.frame_set(currentFrame + 1)
+            self.scene.update()
 
-        if event.type in {"RIGHTMOUSE", "ESC"} or self.scene.frame_current == self.endFrame:
+        if self.scene.frame_current == self.endFrame:
             return self.finish()
 
         return {"RUNNING_MODAL"}
