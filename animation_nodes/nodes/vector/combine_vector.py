@@ -29,9 +29,10 @@ class CombineVectorNode(bpy.types.Node, VectorizedNode):
 
     def drawLabel(self):
         label = "<X, Y, Z>"
-        for axis in "XYZ":
-            if not getattr(self, "useList" + axis):
-                label = label.replace(axis, str(round(self.inputs[axis].value, 4)))
+        for socket in self.inputs:
+            axis = socket.name
+            if not getattr(self, "useList" + axis) and not socket.isLinked:
+                label = label.replace(axis, str(round(socket.value, 4)))
         return label
 
     def getExecutionCode(self):
