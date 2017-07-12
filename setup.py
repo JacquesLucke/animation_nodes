@@ -32,18 +32,8 @@ Cleanup Repository:
     git clean -fdx       # make sure you don't have uncommited files!
 '''
 
-import sys
-
-v = sys.version_info
-if v.major != 3 or v.minor != 5:
-    print("Only works with Python 3.5.x")
-    print("You are using: {}".format(sys.version))
-    sys.exit()
-else:
-    print(sys.version)
-    print()
-
 import os
+import sys
 import shutil
 import traceback
 from os.path import abspath, dirname, join, relpath
@@ -53,17 +43,30 @@ currentDirectory = dirname(abspath(__file__))
 sourceDirectory = join(currentDirectory, addonName)
 configPath = join(currentDirectory, "config.py")
 defaultConfigPath = join(currentDirectory, "config.default.py")
+compilationInfoPath = join(sourceDirectory, "compilation_info.json")
 
 config = {}
 
 initialArgs = sys.argv[:]
 
-expectedArgs = {"--all", "--export", "--nocopy"}
+expectedArgs = {"--all", "--export", "--nocopy", "--noversioncheck"}
 unknownArgs = set(initialArgs[1:]) - expectedArgs
 if len(unknownArgs) > 0:
     print("Unknown arguments:", unknownArgs)
     print("Allowed arguments:", expectedArgs)
     sys.exit()
+
+
+v = sys.version_info
+if "--noversioncheck" not in initialArgs and (v.major != 3 or v.minor != 5):
+    print("Blender 2.78/2.79 officially uses Python 3.5.x.")
+    print("You are using: {}".format(sys.version))
+    print()
+    print("Use the --noversioncheck argument to disable this check.")
+    sys.exit()
+else:
+    print(sys.version)
+    print()
 
 def main():
     setupAndReadConfigFile()
@@ -73,6 +76,7 @@ def main():
             removeCFiles()
             removeCompiledFiles()
         compileCythonFiles()
+        writeCompilationInfoFile()
         if "--export" in initialArgs:
             export()
         if not "--nocopy" in initialArgs:
@@ -166,6 +170,27 @@ def removeCompiledFiles():
     for path in iterPathsWithSuffix(".pyd"):
         os.remove(path)
     print("Remove compiled files.")
+
+
+
+# Compilation Info File
+###################################################################
+
+def writeCompilationInfoFile():
+    import Cython
+
+    info = {}
+    info["sys.version"] = sys.version
+    info["sys.platform"] = sys.platform
+    info["sys.api_version"] = sys.api_version
+    info["sys.version_info"] = sys.version_info
+    info["Cython.__version__"] = Cython.__version__
+    info["os.name"] = os.name
+
+    import json
+    with open(compilationInfoPath, "w") as f:
+        f.write(json.dumps(info, indent = 4))
+    print("Save compilation info.")
 
 
 # Copy to Blenders addons directory
