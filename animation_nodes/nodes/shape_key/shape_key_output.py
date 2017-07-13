@@ -1,25 +1,34 @@
 import bpy
 from bpy.props import *
 from ... utils.layout import writeText
-from ... base_types import AnimationNode
+from ... base_types import VectorizedNode
 
-class ShapeKeyOutputNode(bpy.types.Node, AnimationNode):
+class ShapeKeyOutputNode(bpy.types.Node, VectorizedNode):
     bl_idname = "an_ShapeKeyOutputNode"
     bl_label = "Shape Key Output"
     bl_width_default = 160
+    autoVectorizeExecution = True
 
-    errorMessage = StringProperty()
+    useShapeKeyList = VectorizedNode.newVectorizeProperty()
+    useValueList = VectorizedNode.newVectorizeProperty()
 
     def create(self):
-        self.newInput("Shape Key", "Shape Key", "shapeKey").defaultDrawType = "PROPERTY_ONLY"
+        self.newVectorizedInput("Shape Key", "useShapeKeyList",
+            ("Shape Key", "shapeKey", dict(defaultDrawType = "PROPERTY_ONLY")),
+            ("Shape Keys", "shapeKeys"))
 
-        self.newInput("Float", "Value", "value").setRange(0, 1)
+        self.newVectorizedInput("Float", "useValueList",
+            ("Value", "value", dict(minValue = 0, maxValue = 1)),
+            ("Values", "values"))
+
         self.newInput("Float", "Slider Min", "sliderMin")
         self.newInput("Float", "Slider Max", "sliderMax")
-        self.newInput("Text", "Name", "name")
         self.newInput("Boolean", "Mute", "mute")
+        self.newInput("Text", "Name", "name")
 
-        self.newOutput("Shape Key", "Shape Key", "shapeKey")
+        self.newVectorizedOutput("Shape Key", "useShapeKeyList",
+            ("Shape Key", "shapeKey"),
+            ("Shape Keys", "shapeKeys"))
 
         for socket in self.inputs[1:]:
             socket.useIsUsedProperty = True
@@ -27,27 +36,20 @@ class ShapeKeyOutputNode(bpy.types.Node, AnimationNode):
         for socket in self.inputs[2:]:
             socket.hide = True
 
-    def draw(self, layout):
-        if self.errorMessage != "":
-            writeText(layout, self.errorMessage, width = 25, icon = "ERROR")
-
-    def drawAdvanced(self, layout):
-        writeText(layout, "")
-
     def getExecutionCode(self):
         yield "if shapeKey is not None:"
         s = self.inputs
-        if s["Value"].isUsed:      yield "    shapeKey.value = value"
-        if s["Slider Min"].isUsed: yield "    shapeKey.slider_min = sliderMin"
-        if s["Slider Max"].isUsed: yield "    shapeKey.slider_max = sliderMax"
-        if s["Name"].isUsed:       yield "    shapeKey.name = name"
-        if s["Mute"].isUsed:       yield "    shapeKey.mute = mute"
+        if s[1].isUsed: yield "    shapeKey.value = value"
+        if s[2].isUsed: yield "    shapeKey.slider_min = sliderMin"
+        if s[3].isUsed: yield "    shapeKey.slider_max = sliderMax"
+        if s[4].isUsed: yield "    shapeKey.mute = mute"
+        if s[5].isUsed: yield "    shapeKey.name = name"
         yield "    pass"
 
     def getBakeCode(self):
         yield "if shapeKey is not None:"
         s = self.inputs
-        if s["Value"].isUsed:      yield "    shapeKey.keyframe_insert('value')"
-        if s["Slider Min"].isUsed: yield "    shapeKey.keyframe_insert('slider_min')"
-        if s["Slider Max"].isUsed: yield "    shapeKey.keyframe_insert('slider_max')"
-        if s["Mute"].isUsed:       yield "    shapeKey.keyframe_insert('mute')"
+        if s[1].isUsed: yield "    shapeKey.keyframe_insert('value')"
+        if s[2].isUsed: yield "    shapeKey.keyframe_insert('slider_min')"
+        if s[3].isUsed: yield "    shapeKey.keyframe_insert('slider_max')"
+        if s[4].isUsed: yield "    shapeKey.keyframe_insert('mute')"
