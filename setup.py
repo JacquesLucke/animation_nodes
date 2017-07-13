@@ -21,9 +21,10 @@ Created by Jacques Lucke
 '''
 Command Line Arguments:
     python setup.py
-     --all            # recompile all
-     --export         # make redistributable version
-     --nocopy         # don't copy the build into Blenders addon directory
+     --all              # recompile all
+     --export           # make redistributable version
+     --nocopy           # don't copy the build into Blenders addon directory
+     --noversioncheck   # allow to create a build with any Python version
 
 Generate .html files to debug cython code:
     cython -a path/to/file.pyx
