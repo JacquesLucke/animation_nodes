@@ -141,9 +141,11 @@ class ConvertObjectToShapeKey(LinkCorrection):
     def insert(self, nodeTree, origin, target, dataOrigin):
         getShapeKeys, getListElement = insertNodes(nodeTree, ["an_ShapeKeysFromObjectNode", "an_GetListElementNode"], origin, target)
         getListElement.inputs[1].value = 1
-        nodeTree.links.new(getShapeKeys.inputs[0], origin)
-        nodeTree.links.new(getListElement.inputs[0], getShapeKeys.outputs[0])
-        nodeTree.links.new(getListElement.outputs[0], target)
+        getListElement.assignedType = "Shape Key"
+
+        origin.linkWith(getShapeKeys.inputs[0])
+        getShapeKeys.outputs[0].linkWith(getListElement.inputs[0])
+        getListElement.outputs[0].linkWith(target)
 
 class ConvertSeparatedMeshDataToBMesh(LinkCorrection):
     separatedMeshDataTypes = ["Vector List", "Edge Indices List", "Polygon Indices List"]
