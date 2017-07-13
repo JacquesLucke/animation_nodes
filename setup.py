@@ -189,9 +189,7 @@ def writeCompilationInfoFile():
     info["os.name"] = os.name
 
     import json
-    with open(compilationInfoPath, "w") as f:
-        f.write(json.dumps(info, indent = 4))
-    print("Save compilation info.")
+    writeFile(compilationInfoPath, json.dumps(info, indent = 4))
 
 
 # Copy to Blenders addons directory
