@@ -27,8 +27,8 @@ bl_info = {
     "blender":     (2, 78, 0),
     "location":    "Node Editor",
     "category":    "Node",
-    "warning":     "This is no official release, it's still work in progress"
-    }
+    "warning":     ""
+}
 
 
 
