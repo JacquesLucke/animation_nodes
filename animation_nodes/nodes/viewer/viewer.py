@@ -1,4 +1,5 @@
 import bpy
+import math
 from bpy.props import *
 from itertools import chain
 from functools import lru_cache
@@ -196,8 +197,13 @@ def handleNonList_Integer(number):
 def handleNonList_Vector(vector):
     return str(vector), "", 260
 
+radiansToDegreesFactor = 180 / math.pi
 def handleNonList_Euler(euler):
-    return str(euler), "", 340
+    return "<Euler (x={:.2f}°, y={:.2f}°, z={:.2f}°), order={}>".format(
+        euler[0] * radiansToDegreesFactor,
+        euler[1] * radiansToDegreesFactor,
+        euler[2] * radiansToDegreesFactor,
+        euler.order), "", 340
 
 def handleNonList_Matrix(matrix):
     return "Type: {}x{} Matrix".format(len(matrix.row), len(matrix.col)), str(matrix), 330
@@ -232,7 +238,11 @@ def handleListElement_Vector(vector):
     return "V({:>7.3f}, {:>7.3f}, {:>7.3f})".format(*vector)
 
 def handleListElement_Euler(euler):
-    return "E({:>7.3f}, {:>7.3f}, {:>7.3f}, order = {})".format(*euler, euler.order)
+    return "E({:>7.2f}°, {:>7.2f}°, {:>7.2f}°, order = {})".format(
+        euler[0] * radiansToDegreesFactor,
+        euler[1] * radiansToDegreesFactor,
+        euler[2] * radiansToDegreesFactor,
+        euler.order)
 
 def handleListElement_Quaternion(quaternion):
     return "Q({:>7.3f}, {:>7.3f}, {:>7.3f}, {:>7.3f})".format(*quaternion)
