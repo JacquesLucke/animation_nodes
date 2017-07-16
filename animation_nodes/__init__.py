@@ -38,10 +38,18 @@ bl_info = {
 import os
 import sys
 import traceback
-from os.path import dirname, join, abspath
+from os.path import dirname, join, abspath, basename
 currentDirectory = dirname(abspath(__file__))
 addonsDirectory = dirname(currentDirectory)
 compilationInfoPath = join(currentDirectory, "compilation_info.json")
+addonName = basename(currentDirectory)
+
+
+if addonName != "animation_nodes":
+    message = ("\n\n"
+        "The name of the folder containing this addon has to be 'animation_nodes'.\n"
+        "Please rename it.")
+    raise Exception(message)
 
 
 counter = 0
@@ -52,8 +60,8 @@ for name in os.listdir(addonsDirectory):
 
 if counter > 1:
     message = ("\n\n"
-        "There are multiple versions of the Animation Nodes addon installed\n"
-        "Please uninstall/remove all older versions of the addon\n")
+        "There are multiple versions of the Animation Nodes addon installed.\n"
+        "Please uninstall/remove all older versions of the addon.\n")
     raise Exception(message)
 
 
