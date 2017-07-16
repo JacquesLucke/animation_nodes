@@ -2,6 +2,7 @@ import bpy
 from collections import defaultdict
 from .. utils.enum_items import enumItemsFromList
 from .. utils.nodes import iterSubclassesWithAttribute
+from . implicit_conversion import iterTypesThatCanConvertTo
 
 class SocketInfo:
     def __init__(self):
@@ -40,10 +41,8 @@ class SocketInfo:
 
         # insert allowed input data types
         for socket in socketClasses:
-            if "All" in socket.allowedInputTypes:
-                inputTypes = self.dataTypes
-            else:
-                inputTypes = socket.allowedInputTypes
+            inputTypes = self.getAllowedInputDataTypes(socket)
+            print(socket.dataType, inputTypes)
 
             self.allowedInputDataTypes[socket.dataType] = inputTypes
             self.allowedInputDataTypes[socket.bl_idname] = inputTypes
@@ -89,6 +88,18 @@ class SocketInfo:
 
         self.baseDataTypes.add(baseDataType)
         self.listDataTypes.add(listDataType)
+
+    def getAllowedInputDataTypes(self, socket):
+        if hasattr(socket, "allowedInputTypes"):
+            if "All" in socket.allowedInputTypes:
+                inputTypes = self.dataTypes
+            else:
+                inputTypes = set(socket.allowedInputTypes)
+        else:
+            inputTypes = {socket.dataType}
+
+        inputTypes.update(iterTypesThatCanConvertTo(socket.dataType))
+        return inputTypes
 
 
 _socketInfo = SocketInfo()
@@ -162,6 +173,9 @@ def getCopyExpression(input):
 
 def getCopyFunction(input):
     return _socketInfo.copyFunctionByType[input]
+
+def hasAllowedInputDataTypes(input):
+    return len(_socketInfo.allowedInputDataTypes[input]) > 0
 
 def getAllowedInputDataTypes(input):
     return _socketInfo.allowedInputDataTypes[input]

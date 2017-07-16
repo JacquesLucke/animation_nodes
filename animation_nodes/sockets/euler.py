@@ -9,7 +9,6 @@ class EulerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_EulerSocket"
     bl_label = "Euler Socket"
     dataType = "Euler"
-    allowedInputTypes = ["Euler"]
     drawColor = (0.1, 0.0, 0.4, 1.0)
     storable = True
     comparable = False
@@ -54,7 +53,6 @@ class EulerListSocket(bpy.types.NodeSocket, CListSocket):
     bl_label = "Euler List Socket"
     dataType = "Euler List"
     baseDataType = "Euler"
-    allowedInputTypes = ["Euler List"]
     drawColor = (0.1, 0.0, 0.4, 0.5)
     storable = True
     comparable = False

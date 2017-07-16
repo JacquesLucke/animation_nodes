@@ -2,6 +2,8 @@ import re
 import traceback
 from itertools import chain
 from .. utils.names import replaceVariableName
+from .. sockets.info import getAllowedInputDataTypes
+from .. sockets.implicit_conversion import getConversionCode
 from .. problems import NodeFailesToCreateExecutionCode
 from .. preferences import addonName, getExecutionCodeType
 from .. tree_info import (iterLinkedSocketsWithInfo, isSocketLinked,
@@ -165,16 +167,17 @@ def iterNodePreExecutionLines(node, variables):
     yield from iterInputCopyLines(node, variables)
 
 def iterInputConversionLines(node, variables):
-    for socket, dataType in iterLinkedInputSocketsWithOriginDataType(node):
-        if socket.dataType != dataType and socket.dataType != "All":
-            convertCode = socket.getConversionCode(dataType)
+    for socket, originType in iterLinkedInputSocketsWithOriginDataType(node):
+        if socket.dataType != originType:
+            convertCode = getConversionCode(originType, socket.dataType)
             if convertCode is not None:
-                socketPath = node.identifier + ".inputs[{}]".format(socket.getIndex(node))
-                convertCode = replaceVariableName(convertCode, "value", variables[socket])
-                convertCode = replaceVariableName(convertCode, "self", socketPath)
-                newVariableName = variables[socket] + "_converted"
-                yield "{} = {}".format(newVariableName, convertCode)
-                variables[socket] = newVariableName
+                yield getConvertInputLine(node, socket, convertCode, variables)
+
+def getConvertInputLine(node, socket, convertCode, variables):
+    convertCode = replaceVariableName(convertCode, "value", variables[socket])
+    newVariableName = variables[socket] + "_converted"
+    variables[socket] = newVariableName
+    return "{} = {}".format(newVariableName, convertCode)
 
 def iterInputCopyLines(node, variables):
     for socket in node.inputs:

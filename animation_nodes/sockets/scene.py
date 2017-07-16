@@ -8,7 +8,6 @@ class SceneSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_SceneSocket"
     bl_label = "Scene Socket"
     dataType = "Scene"
-    allowedInputTypes = ["Scene"]
     drawColor = (0.2, 0.3, 0.4, 1)
     storable = False
     comparable = True
@@ -53,7 +52,6 @@ class SceneListSocket(bpy.types.NodeSocket, PythonListSocket):
     bl_label = "Scene List Socket"
     dataType = "Scene List"
     baseDataType = "Scene"
-    allowedInputTypes = ["Scene List"]
     drawColor = (0.2, 0.3, 0.4, 0.5)
     storable = False
     comparable = False

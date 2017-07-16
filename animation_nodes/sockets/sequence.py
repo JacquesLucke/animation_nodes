@@ -8,7 +8,6 @@ class SequenceSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_SequenceSocket"
     bl_label = "Sequence Socket"
     dataType = "Sequence"
-    allowedInputTypes = ["Sequence"]
     drawColor = (0, 0.644, 0, 1)
     storable = False
     comparable = True
@@ -65,7 +64,6 @@ class SequenceListSocket(bpy.types.NodeSocket, PythonListSocket):
     bl_label = "Sequence List Socket"
     dataType = "Sequence List"
     baseDataType = "Sequence"
-    allowedInputTypes = ["Sequence List"]
     drawColor = (0, 0.644, 0, 0.5)
     storable = False
     comparable = False

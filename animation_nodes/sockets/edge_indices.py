@@ -6,7 +6,6 @@ class EdgeIndicesSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_EdgeIndicesSocket"
     bl_label = "Edge Indices Socket"
     dataType = "Edge Indices"
-    allowedInputTypes = ["Edge Indices"]
     drawColor = (0.4, 0.6, 0.6, 1)
     comparable = True
     storable = True
@@ -31,7 +30,6 @@ class EdgeIndicesListSocket(bpy.types.NodeSocket, CListSocket):
     bl_label = "Edge Indices List Socket"
     dataType = "Edge Indices List"
     baseDataType = "Edge Indices"
-    allowedInputTypes = ["Edge Indices List"]
     drawColor = (0.4, 0.6, 0.6, 0.5)
     storable = True
     comparable = False

@@ -1,6 +1,7 @@
 import bpy
 from bpy.props import *
 from . node_creator import NodeCreator
+from ... sockets.info import hasAllowedInputDataTypes
 
 class InsertViewerNode(bpy.types.Operator, NodeCreator):
     bl_idname = "an.insert_viewer_node"
@@ -20,7 +21,7 @@ class InsertViewerNode(bpy.types.Operator, NodeCreator):
 
     def iterPossibleSockets(self):
         for socket in self.activeNode.outputs:
-            if not socket.hide and len(socket.allowedInputTypes) > 0:
+            if not socket.hide and hasAllowedInputDataTypes(socket.dataType):
                 yield socket
 
     def insert(self):

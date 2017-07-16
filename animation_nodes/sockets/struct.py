@@ -6,7 +6,6 @@ class StructSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_StructSocket"
     bl_label = "Struct Socket"
     dataType = "Struct"
-    allowedInputTypes = ["Struct"]
     drawColor = (0.3, 0.3, 0.3, 1)
     storable = True
     comparable = False
@@ -35,7 +34,6 @@ class StructListSocket(bpy.types.NodeSocket, PythonListSocket):
     bl_label = "Struct List Socket"
     dataType = "Struct List"
     baseDataType = "Struct"
-    allowedInputTypes = ["Struct List"]
     drawColor = (0.3, 0.3, 0.3, 0.5)
     storable = True
     comparable = False

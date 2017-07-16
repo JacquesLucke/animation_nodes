@@ -9,7 +9,6 @@ class VectorSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_VectorSocket"
     bl_label = "Vector Socket"
     dataType = "Vector"
-    allowedInputTypes = ["Vector"]
     drawColor = (0.15, 0.15, 0.8, 1.0)
     storable = True
     comparable = False
@@ -56,7 +55,6 @@ class VectorListSocket(bpy.types.NodeSocket, CListSocket):
     bl_label = "Vector List Socket"
     dataType = "Vector List"
     baseDataType = "Vector"
-    allowedInputTypes = ["Vector List"]
     drawColor = (0.15, 0.15, 0.8, 0.5)
     storable = True
     comparable = False

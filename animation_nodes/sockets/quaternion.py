@@ -9,7 +9,6 @@ class QuaternionSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_QuaternionSocket"
     bl_label = "Quaternion Socket"
     dataType = "Quaternion"
-    allowedInputTypes = ["Quaternion"]
     drawColor = (0.8, 0.6, 0.3, 1.0)
     storable = True
     comparable = False
@@ -55,7 +54,6 @@ class QuaternionListSocket(bpy.types.NodeSocket, CListSocket):
     bl_label = "Quaternion List Socket"
     dataType = "Quaternion List"
     baseDataType = "Quaternion"
-    allowedInputTypes = ["Quaternion List"]
     drawColor = (0.8, 0.6, 0.3, 0.5)
     storable = True
     comparable = False

@@ -9,7 +9,6 @@ class ShapeKeySocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_ShapeKeySocket"
     bl_label = "Shape Key Socket"
     dataType = "Shape Key"
-    allowedInputTypes = ["Shape Key"]
     drawColor = (1.0, 0.6, 0.5, 1)
     storable = False
     comparable = True
@@ -63,7 +62,6 @@ class ShapeKeyListSocket(bpy.types.NodeSocket, PythonListSocket):
     bl_label = "Shape Key List Socket"
     dataType = "Shape Key List"
     baseDataType = "Shape Key"
-    allowedInputTypes = ["Shape Key List"]
     drawColor = (1.0, 0.6, 0.5, 0.5)
     storable = False
     comparable = False

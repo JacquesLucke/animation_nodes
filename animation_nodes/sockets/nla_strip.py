@@ -7,7 +7,6 @@ class NLAStripSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_NLAStripSocket"
     bl_label = "NLA Strip Socket"
     dataType = "NlaStrip"
-    allowedInputTypes = ["NlaStrip"]
     drawColor = (0.26, 0.20, 0.06, 1)
     storable = False
     comparable = True
@@ -32,7 +31,6 @@ class NLAStripListSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_label = "NLA Strip List Socket"
     dataType = "NlaStrip List"
     baseDataType = "NlaStrip"
-    allowedInputTypes = ["NlaStrip List"]
     drawColor = (0.26, 0.20, 0.06, 0.5)
     storable = False
     comparable = False

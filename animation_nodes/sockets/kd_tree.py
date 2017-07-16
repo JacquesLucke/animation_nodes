@@ -6,7 +6,6 @@ class KDTreeSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_KDTreeSocket"
     bl_label = "KDTree Socket"
     dataType = "KDTree"
-    allowedInputTypes = ["KDTree"]
     drawColor = (0.32, 0.32, 0.18, 1)
     comparable = True
     storable = True

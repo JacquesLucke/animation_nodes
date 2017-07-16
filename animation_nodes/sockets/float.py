@@ -4,6 +4,7 @@ from bpy.props import *
 from .. events import propertyChanged
 from .. data_structures import DoubleList
 from .. base_types import AnimationNodeSocket, CListSocket
+from . implicit_conversion import registerImplicitConversion
 
 def getValue(self):
     return min(max(self.minValue, self.get("value", 0)), self.maxValue)
@@ -14,7 +15,6 @@ class FloatSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_FloatSocket"
     bl_label = "Float Socket"
     dataType = "Float"
-    allowedInputTypes = ["Float", "Integer", "Boolean"]
     drawColor = (0.4, 0.4, 0.7, 1)
     comparable = True
     storable = True
@@ -43,11 +43,6 @@ class FloatSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         self.maxValue = max
 
     @classmethod
-    def getConversionCode(cls, dataType):
-        if dataType in "Boolean":
-            return "float(value)"
-
-    @classmethod
     def getDefaultValue(cls):
         return 0
 
@@ -59,21 +54,22 @@ class FloatSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             try: return float(value), 1
             except: return cls.getDefaultValue(), 2
 
+registerImplicitConversion("Boolean", "Float", "float(value)")
+registerImplicitConversion("Integer", "Float", None)
+
 
 class FloatListSocket(bpy.types.NodeSocket, CListSocket):
     bl_idname = "an_FloatListSocket"
     bl_label = "Float List Socket"
     dataType = "Float List"
     baseDataType = "Float"
-    allowedInputTypes = ["Float List", "Integer List", "Edge Indices", "Polygon Indices", "Boolean List"]
     drawColor = (0.4, 0.4, 0.7, 0.5)
     storable = True
     comparable = False
     listClass = DoubleList
 
-    @classmethod
-    def getConversionCode(cls, dataType):
-        if dataType == "Boolean List":
-            return "AN.nodes.boolean.c_utils.convert_BooleanList_to_DoubleList(value)"
-        if dataType in cls.allowedInputTypes:
-            return "DoubleList.fromValues(value)"
+from .. nodes.boolean.c_utils import convert_BooleanList_to_DoubleList
+registerImplicitConversion("Boolean List", "Float List", convert_BooleanList_to_DoubleList)
+
+for dataType in ["Integer List", "Edge Indices", "Polygon Indices"]:
+    registerImplicitConversion(dataType, "Float List", "DoubleList.fromValues(value)")

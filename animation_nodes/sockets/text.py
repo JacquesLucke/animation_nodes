@@ -8,7 +8,6 @@ class TextSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_TextSocket"
     bl_label = "Text Socket"
     dataType = "Text"
-    allowedInputTypes = ["Text"]
     drawColor = (1, 1, 1, 1)
     comparable = True
     storable = True
@@ -51,7 +50,6 @@ class TextListSocket(bpy.types.NodeSocket, PythonListSocket):
     bl_label = "Text List Socket"
     dataType = "Text List"
     baseDataType = "Text"
-    allowedInputTypes = ["Text List"]
     drawColor = (1, 1, 1, 0.5)
     storable = True
     comparable = False
