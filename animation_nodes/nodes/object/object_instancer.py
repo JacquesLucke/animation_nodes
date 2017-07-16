@@ -272,6 +272,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         if self.copyObjectProperties and self.copyFromSource:
             newObject = sourceObject.copy()
             newObject.data = instanceData
+            newObject.layers = sourceObject.layers
         else:
             newObject = self.createObject(name, instanceData)
 
