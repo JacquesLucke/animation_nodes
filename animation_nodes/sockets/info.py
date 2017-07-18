@@ -42,7 +42,6 @@ class SocketInfo:
         # insert allowed input data types
         for socket in socketClasses:
             inputTypes = self.getAllowedInputDataTypes(socket)
-            print(socket.dataType, inputTypes)
 
             self.allowedInputDataTypes[socket.dataType] = inputTypes
             self.allowedInputDataTypes[socket.bl_idname] = inputTypes
