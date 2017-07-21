@@ -55,3 +55,4 @@ cdef void multMatrix3Parts(Matrix4* target, Matrix4* x, Matrix4* y, bint keepFir
 cdef void normalizeMatrix_3x3_Part(Matrix3_or_Matrix4* t, Matrix3_or_Matrix4* m)
 
 cdef void transposeMatrix_Inplace(Matrix3_or_Matrix4 *m)
+cdef void transposeMatrix(Matrix3_or_Matrix4 *t, Matrix3_or_Matrix4 *m)
