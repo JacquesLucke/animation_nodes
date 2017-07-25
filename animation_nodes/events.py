@@ -45,9 +45,13 @@ def evaluateRaisedEvents():
     event.reset()
 
 
+lastFrame = 0
 @eventHandler("FRAME_CHANGE_POST")
 def frameChanged(scene):
-    event.frameChanged = True
+    global lastFrame
+    if scene.frame_current != lastFrame:
+        lastFrame = scene.frame_current
+        event.frameChanged = True
 
 def propertyChanged(self = None, context = None):
     event.propertyChanged = True
