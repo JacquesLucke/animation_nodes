@@ -61,7 +61,9 @@ for name in os.listdir(addonsDirectory):
 if counter > 1:
     message = ("\n\n"
         "There are multiple versions of the Animation Nodes addon installed.\n"
-        "Please uninstall/remove all older versions of the addon.\n")
+        "Please uninstall/remove all older versions of the addon.\n\n"
+        "Animation Nodes has been found more than once in this folder:\n"
+        "  {}").format(addonsDirectory)
     raise Exception(message)
 
 
