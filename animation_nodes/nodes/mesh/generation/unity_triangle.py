@@ -1,13 +1,18 @@
 import bpy
 from .... base_types import AnimationNode
-from .... data_structures import Vector3DList, EdgeIndicesList, PolygonIndicesList, MeshData
+from .... data_structures import (
+    MeshData,
+    Vector3DList,
+    EdgeIndicesList,
+    PolygonIndicesList
+)
 
 class UnityTriangleMeshNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_UnityTriangleMeshNode"
     bl_label = "Unity Triangle Mesh"
 
     def create(self):
-        self.newOutput("an_MeshDataSocket", "Mesh Data", "meshData")
+        self.newOutput("Mesh Data", "Mesh Data", "meshData")
 
     def execute(self):
         return mesh.copy()
