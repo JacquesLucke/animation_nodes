@@ -9,23 +9,26 @@ addonsDirectory = os.path.join(currentDirectory, addonName)
 assert os.path.isdir(addonsDirectory)
 
 def main():
+    logger = TaskLogger()
     setupInfoList = getSetupInfoList()
-    execute_PyPreprocess(setupInfoList)
+    execute_PyPreprocess(setupInfoList, logger)
 
-def execute_PyPreprocess(setupInfoList):
-    processes = getPyProprocesses(setupInfoList)
-    for process in processes:
-        if process.dependenciesChanged():
-            process.execute()
-            print("Updated:", process.target)
+def execute_PyPreprocess(setupInfoList, logger):
+    tasks = getPyPreprocessTasks(setupInfoList)
+    for task in tasks:
+        logger.logExists(task)
+        if task.dependenciesChanged():
+            task.execute()
+            logger.logExecuted(task)
+            print("Updated:", task.target)
 
-def getPyProprocesses(setupInfoList):
-    allProcesses = []
+def getPyPreprocessTasks(setupInfoList):
+    allTasks = []
     for path in getPyPreprocessorFiles(setupInfoList):
-        allProcesses.extend(getPyPreprocessesOfFile(path))
-    return allProcesses
+        allTasks.extend(getPyPreprocessTasksOfFile(path))
+    return allTasks
 
-def getPyPreprocessesOfFile(path):
+def getPyPreprocessTasksOfFile(path):
     obj = executePythonFile(path)
 
     if "setup" in obj:
@@ -35,10 +38,10 @@ def getPyPreprocessesOfFile(path):
     if funcName not in obj:
         raise Exception("expected '{}' function in {}".format(funcName, path))
 
-    processes = obj[funcName](PyPreprocessTask, Utils)
-    if not all(isinstance(p, PyPreprocessTask) for p in processes):
+    tasks = obj[funcName](PyPreprocessTask, Utils)
+    if not all(isinstance(p, PyPreprocessTask) for p in tasks):
         raise Exception("no list of {} objects returned".format(PyPreprocessTask.__name__))
-    return processes
+    return tasks
 
 def getPyPreprocessorFiles(setupInfoList):
     paths = []
@@ -52,6 +55,17 @@ def getPyPreprocessorFiles(setupInfoList):
 
 # Tasks
 ###########################################
+
+class TaskLogger:
+    def __init__(self):
+        self.allTasks = []
+        self.executedTasks = []
+
+    def logExists(self, task):
+        self.allTasks.append(task)
+
+    def logExecuted(self, task):
+        self.executedTasks.append(task)
 
 class SetupTask:
     def __init__(self, target, dependencies, function):
@@ -78,7 +92,7 @@ class SetupTask:
 
 class PyPreprocessTask(SetupTask):
     pass
-    
+
 
 # Higher Level Utils
 ###########################################
