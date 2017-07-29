@@ -24,7 +24,7 @@ def execute_PyPreprocess(setupInfoList, logger):
 
 def getPyPreprocessTasks(setupInfoList):
     allTasks = []
-    for path in getPyPreprocessorFiles(setupInfoList):
+    for path in getPyPreprocessorProviders(setupInfoList):
         allTasks.extend(getPyPreprocessTasksOfFile(path))
     return allTasks
 
@@ -43,11 +43,12 @@ def getPyPreprocessTasksOfFile(path):
         raise Exception("no list of {} objects returned".format(PyPreprocessTask.__name__))
     return tasks
 
-def getPyPreprocessorFiles(setupInfoList):
+def getPyPreprocessorProviders(setupInfoList):
     paths = []
+    func = "getPyPreprocessorProviders"
     for info in setupInfoList:
-        if "getPyPreprocessorFiles" in info:
-            for name in info["getPyPreprocessorFiles"]():
+        if func in info:
+            for name in info[func]():
                 path = changeFileName(info["__file__"], name)
                 paths.append(path)
     return paths
@@ -67,7 +68,7 @@ class TaskLogger:
     def logExecuted(self, task):
         self.executedTasks.append(task)
 
-class SetupTask:
+class GenerateFileTask:
     def __init__(self, target, dependencies, function):
         self.target = target
         self.dependencies = dependencies
@@ -90,7 +91,7 @@ class SetupTask:
         return "<{} for '{}' depends on '{}'>".format(
             type(self).__name__, self.target, self.dependencies)
 
-class PyPreprocessTask(SetupTask):
+class PyPreprocessTask(GenerateFileTask):
     pass
 
 
