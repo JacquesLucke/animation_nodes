@@ -15,6 +15,7 @@ def main():
     setupInfoList = getSetupInfoList()
     execute_PyPreprocess(setupInfoList, logger)
     execute_Cythonize(setupInfoList, logger)
+    execute_Compile(setupInfoList, logger)
     execute_PrintSummary(logger)
 
 
@@ -81,6 +82,24 @@ def getCythonizeTasks():
 
 def iterCythonFilePaths():
     yield from iterPathsWithExtension(addonDirectory, ".pyx")
+
+
+# Compile
+###########################################
+
+def execute_Compile(setupInfoList, logger):
+    printHeader("Compile")
+    tasks = getCompileTasks()
+    for task in tasks:
+        logger.log(task)
+        task.execute()
+
+def getCompileTasks():
+    tasks = []
+    for path in iterCythonFilePaths():
+        cpath = changeFileExtension(path, ".c")
+        tasks.append(CompileExtModuleTask(cpath))
+    return tasks
 
 
 # Summary
@@ -163,6 +182,21 @@ class CythonizeTask(GenerateFileTask):
     def __repr__(self):
         return "<{} for '{}'>".format(type(self).__name__, self.target)
 
+class CompileExtModuleTask(GenerateFileTask):
+    def __init__(self, path):
+        super().__init__()
+        self.path = path
+
+    def execute(self):
+        from distutils.core import setup, Extension
+        metadata = getCythonMetadata(self.path)
+        extension = Extension(metadata["module_name"], [self.path])
+
+        oldArgs = sys.argv
+        sys.argv = [oldArgs[0], "build_ext", "--inplace"]
+        setup(ext_modules = [extension])
+        sys.argv = oldArgs
+
 
 # Higher Level Utils
 ###########################################
@@ -175,6 +209,10 @@ def getSetupInfoList():
 
 def iterSetupInfoPaths():
     return iterPathsWithFileName(addonDirectory, "__setup_info.py")
+
+def getCythonMetadata(path):
+    text = readLinesBetween(path, "BEGIN: Cython Metadata", "END: Cython Metadata")
+    return json.loads(text)
 
 
 # Utils
@@ -245,6 +283,26 @@ def tryGetLastModificationTime(path):
 def multiReplace(text, **replacements):
     pattern = "|".join(re.escape(key) for key in replacements.keys())
     return re.sub(pattern, lambda m: replacements[m.group(0)], text)
+
+def readLinesBetween(path, start, stop):
+    lines = []
+    with open(path, "rt") as f:
+        while True:
+            line = f.readline()
+            if line == "":
+                raise Exception("Line containing '{}' not found".format(start))
+            if start in line:
+                break
+
+        while True:
+            line = f.readline()
+            if line == "":
+                raise Exception("Line containing '{}' not found".format(stop))
+            if stop not in line:
+                lines.append(line)
+            else:
+                break
+    return "".join(lines)
 
 
 class Utils:
