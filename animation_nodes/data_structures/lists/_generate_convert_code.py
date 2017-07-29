@@ -13,12 +13,12 @@ def getPyPreprocessTasks(PyPreprocessTask, utils):
         paths["source"],
         paths["numericLists"]
     ]
-    pyxProcess = PyPreprocessTask(
+    pyxTask = PyPreprocessTask(
         target = utils.changeFileName(__file__, "convert.pyx"),
         dependencies = dependencies,
         function = generate
     )
-    return [pyxProcess]
+    return [pyxTask]
 
 def generate(target, utils):
     source = utils.readTextFile(paths["source"])

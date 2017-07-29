@@ -23,18 +23,22 @@ def getPyPreprocessTasks(PyPreprocessTask, utils):
     ]
     dependencies.extend(iterAdditionalMethodsSources(utils))
 
-    pyxProcess = PyPreprocessTask(
+    pyxTask = PyPreprocessTask(
         target = utils.changeFileName(__file__, "base_lists.pyx"),
         dependencies = dependencies,
         function = generate_pyx
     )
-    return [pyxProcess]
+    pxdTask = PyPreprocessTask(
+        target = utils.changeFileName(__file__, "base_lists.pxd"),
+        dependencies = dependencies,
+        function = generate_pxd
+    )
+    return [pyxTask, pxdTask]
 
 def generate_pyx(target, utils):
     implementation = utils.readTextFile(paths["implementation"])
 
     parts = []
-
     parts.append("cdef struct NotExistentType:\n    char tmp")
 
     for info in getListInfo(utils):
@@ -48,6 +52,28 @@ def generate_pyx(target, utils):
             TO_PYOBJECT_CODE = indent(info["TO_PYOBJECT_CODE"], " "*8)
         )
         parts.append(listCode)
+
+    utils.writeTextFile(target, "\n\n".join(parts))
+
+def generate_pxd(target, utils):
+    declaration = utils.readTextFile(paths["declaration"])
+    numericLists = utils.readJsonFile(paths["numericLists"])
+
+    parts = []
+    parts.append("ctypedef fused list_or_tuple:\n    list\n    tuple")
+
+    fusedTypeCode = "ctypedef fuxed NumericList:\n"
+    for listName, _ in numericLists:
+        fusedTypeCode += "    " + listName + "\n"
+    parts.append(fusedTypeCode)
+
+    for info in getListInfo(utils):
+        parts.extend(info["DECLARATIONS"])
+        parts.append(utils.multiReplace(declaration,
+            LISTNAME = info["LISTNAME"],
+            TYPE = info["TYPE"],
+            MEMVIEW = info["MEMVIEW"]
+        ))
 
     utils.writeTextFile(target, "\n\n".join(parts))
 
