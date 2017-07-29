@@ -2,7 +2,7 @@
     "BooleanList" : {
         "Type" : "char",
         "Buffer Type" : "char",
-        "Equals" : "\\1 == 0 ? \\2 == 0 : \\2 != 0",
+        "Equals" : "\\2 == 0 if \\1 == 0 else \\2 != 0",
         "Try Conversion" : "target[0] = value",
         "To PyObject" : "bool(value[0])",
         "Additional Methods" : "__boolean_list_functions.src",

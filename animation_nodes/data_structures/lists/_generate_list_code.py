@@ -62,7 +62,7 @@ def generate_pxd(target, utils):
     parts = []
     parts.append("ctypedef fused list_or_tuple:\n    list\n    tuple")
 
-    fusedTypeCode = "ctypedef fuxed NumericList:\n"
+    fusedTypeCode = "ctypedef fused NumericList:\n"
     for listName, _ in numericLists:
         fusedTypeCode += "    " + listName + "\n"
     parts.append(fusedTypeCode)
