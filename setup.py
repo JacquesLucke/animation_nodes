@@ -1,26 +1,35 @@
 import os
 import re
+import io
 import sys
 import json
+import contextlib
 
 addonName = "animation_nodes"
 currentDirectory = os.path.dirname(os.path.abspath(__file__))
-addonsDirectory = os.path.join(currentDirectory, addonName)
-assert os.path.isdir(addonsDirectory)
+addonDirectory = os.path.join(currentDirectory, addonName)
+assert os.path.isdir(addonDirectory)
 
 def main():
     logger = TaskLogger()
     setupInfoList = getSetupInfoList()
     execute_PyPreprocess(setupInfoList, logger)
+    execute_Cythonize(setupInfoList, logger)
+    execute_PrintSummary(logger)
+
+
+# PyProprocess
+###########################################
 
 def execute_PyPreprocess(setupInfoList, logger):
+    printHeader("Run PyPreprocessor")
+
     tasks = getPyPreprocessTasks(setupInfoList)
     for task in tasks:
-        logger.logExists(task)
-        if task.dependenciesChanged():
-            task.execute()
-            logger.logExecuted(task)
-            print("Updated:", task.target)
+        logger.log(task)
+        task.execute()
+        if task.targetChanged:
+            print("Updated:", os.path.relpath(task.target, addonDirectory))
 
 def getPyPreprocessTasks(setupInfoList):
     allTasks = []
@@ -54,22 +63,64 @@ def getPyPreprocessorProviders(setupInfoList):
     return paths
 
 
+# Cythonize
+###########################################
+
+def execute_Cythonize(setupInfoList, logger):
+    printHeader("Run Cythonize")
+    tasks = getCythonizeTasks()
+    for task in tasks:
+        logger.log(task)
+        task.execute()
+
+def getCythonizeTasks():
+    tasks = []
+    for path in iterCythonFilePaths():
+        tasks.append(CythonizeTask(path))
+    return tasks
+
+def iterCythonFilePaths():
+    yield from iterPathsWithExtension(addonDirectory, ".pyx")
+
+
+# Summary
+###########################################
+
+def execute_PrintSummary(logger):
+    printHeader("Summary")
+
+    changedPaths = logger.getModifiedPaths()
+    for path in changedPaths:
+        print("Changed: " + os.path.relpath(path, currentDirectory))
+
+    print("\n{} files changed".format(len(changedPaths)))
+
+
 # Tasks
 ###########################################
 
 class TaskLogger:
     def __init__(self):
         self.allTasks = []
-        self.executedTasks = []
 
-    def logExists(self, task):
+    def log(self, task):
         self.allTasks.append(task)
 
-    def logExecuted(self, task):
-        self.executedTasks.append(task)
+    def getModifiedPaths(self):
+        paths = []
+        for task in self.allTasks:
+            if task.targetChanged:
+                paths.append(task.target)
+        return paths
 
 class GenerateFileTask:
+    def __init__(self):
+        self.target = None
+        self.targetChanged = False
+
+class PyPreprocessTask(GenerateFileTask):
     def __init__(self, target, dependencies, function):
+        super().__init__()
         self.target = target
         self.dependencies = dependencies
         self.function = function
@@ -79,20 +130,38 @@ class GenerateFileTask:
             if not fileExists(path):
                 raise Exception("file not found: " + path)
 
-        self.function(self.target, Utils)
+        if dependenciesChanged(self.target, self.dependencies):
+            self.function(self.target, Utils)
+            self.targetChanged = True
 
         if not fileExists(self.target):
             raise Exception("target has not been generated: " + self.target)
-
-    def dependenciesChanged(self):
-        return dependenciesChanged(self.target, self.dependencies)
 
     def __repr__(self):
         return "<{} for '{}' depends on '{}'>".format(
             type(self).__name__, self.target, self.dependencies)
 
-class PyPreprocessTask(GenerateFileTask):
-    pass
+class CythonizeTask(GenerateFileTask):
+    def __init__(self, path):
+        super().__init__()
+        self.path = path
+        self.target = changeFileExtension(path, ".c")
+
+    def execute(self):
+        from Cython.Build import cythonize
+
+        timeBefore = tryGetLastModificationTime(self.target)
+        cythonize(self.path)
+        timeAfter = tryGetLastModificationTime(self.target)
+
+        if not fileExists(self.target):
+            raise Exception("target has not been generated: " + self.target)
+
+        if timeAfter > timeBefore:
+            self.targetChanged = True
+
+    def __repr__(self):
+        return "<{} for '{}'>".format(type(self).__name__, self.target)
 
 
 # Higher Level Utils
@@ -105,17 +174,31 @@ def getSetupInfoList():
     return setupInfoList
 
 def iterSetupInfoPaths():
-    return iterPathsWithFileName(addonsDirectory, "__setup_info.py")
+    return iterPathsWithFileName(addonDirectory, "__setup_info.py")
 
 
 # Utils
 ############################################
+
+def printHeader(text):
+    print()
+    print()
+    print(text)
+    print("-"*50)
+    print()
 
 def executePythonFile(path):
     code = readTextFile(path)
     context = {"__file__" : path}
     exec(code, context)
     return context
+
+def iterPathsWithExtension(basepath, extension):
+    for root, dirs, files in os.walk(basepath):
+        for filename in files:
+            _, ext = os.path.splitext(filename)
+            if ext == extension:
+                yield os.path.join(root, filename)
 
 def iterPathsWithFileName(basepath, filename):
     for root, dirs, files in os.walk(basepath):
@@ -135,6 +218,9 @@ def readJsonFile(path):
 
 def changeFileName(path, newName):
     return os.path.join(os.path.dirname(path), newName)
+
+def changeFileExtension(path, newExtension):
+    return os.path.splitext(path)[0] + newExtension
 
 def filesExist(paths):
     assert all(fileExists(path) for path in paths)
