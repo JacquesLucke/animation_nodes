@@ -16,11 +16,11 @@ def getPyPreprocessTasks(PyPreprocessTask, utils):
     pyxProcess = PyPreprocessTask(
         target = utils.changeFileName(__file__, "convert.pyx"),
         dependencies = dependencies,
-        function = generate_convert_pyx
+        function = generate
     )
     return [pyxProcess]
 
-def generate_convert_pyx(target, utils):
+def generate(target, utils):
     source = utils.readTextFile(paths["source"])
     numericLists = utils.readJsonFile(paths["numericLists"])
     listNames = ", ".join(name for name, _ in numericLists)
