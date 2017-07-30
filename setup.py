@@ -3,11 +3,13 @@ import re
 import io
 import sys
 import json
+import glob
 import contextlib
 
 addonName = "animation_nodes"
 currentDirectory = os.path.dirname(os.path.abspath(__file__))
 addonDirectory = os.path.join(currentDirectory, addonName)
+summaryPath = os.path.join(currentDirectory, "setup_summary.json")
 assert os.path.isdir(addonDirectory)
 
 def main():
@@ -17,6 +19,7 @@ def main():
     execute_Cythonize(setupInfoList, logger)
     execute_Compile(setupInfoList, logger)
     execute_PrintSummary(logger)
+    execute_SaveSummary(logger)
 
 
 # PyProprocess
@@ -26,8 +29,8 @@ def execute_PyPreprocess(setupInfoList, logger):
     printHeader("Run PyPreprocessor")
 
     tasks = getPyPreprocessTasks(setupInfoList)
+    logger.pyPreprocessTasks = tasks
     for task in tasks:
-        logger.log(task)
         task.execute()
         if task.targetChanged:
             print("Updated:", os.path.relpath(task.target, addonDirectory))
@@ -70,8 +73,8 @@ def getPyPreprocessorProviders(setupInfoList):
 def execute_Cythonize(setupInfoList, logger):
     printHeader("Run Cythonize")
     tasks = getCythonizeTasks()
+    logger.cythonizeTasks = tasks
     for task in tasks:
-        logger.log(task)
         task.execute()
 
 def getCythonizeTasks():
@@ -89,16 +92,15 @@ def iterCythonFilePaths():
 
 def execute_Compile(setupInfoList, logger):
     printHeader("Compile")
-    tasks = getCompileTasks()
+    tasks = getCompileTasks(logger.getFilesGeneratedByCython())
+    logger.compilationTasks = tasks
     for task in tasks:
-        logger.log(task)
         task.execute()
 
-def getCompileTasks():
+def getCompileTasks(filesToCompile):
     tasks = []
-    for path in iterCythonFilePaths():
-        cpath = changeFileExtension(path, ".c")
-        tasks.append(CompileExtModuleTask(cpath))
+    for path in filesToCompile:
+        tasks.append(CompileExtModuleTask(path))
     return tasks
 
 
@@ -115,27 +117,59 @@ def execute_PrintSummary(logger):
     print("\n{} files changed".format(len(changedPaths)))
 
 
+# Save Summary
+###########################################
+
+def execute_SaveSummary(logger):
+    summary = getSummary(logger)
+    writeJsonFile(summaryPath, summary)
+
+def getSummary(logger):
+    return {
+        "PyPreprocess" : getPyPreprocessSummary(logger),
+        "Cythonize" : getCythonizeSummary(logger),
+        "Compilation" : getCompilationSummary(logger)
+    }
+
+def getPyPreprocessSummary(logger):
+    return [task.getSummary() for task in logger.pyPreprocessTasks]
+
+def getCythonizeSummary(logger):
+    return [task.getSummary() for task in logger.cythonizeTasks]
+
+def getCompilationSummary(logger):
+    return [task.getSummary() for task in logger.compilationTasks]
+
+
 # Tasks
 ###########################################
 
 class TaskLogger:
     def __init__(self):
-        self.allTasks = []
+        self.pyPreprocessTasks = []
+        self.cythonizeTasks = []
+        self.compilationTasks = []
 
-    def log(self, task):
-        self.allTasks.append(task)
+    def getAllTasks(self):
+        return self.pyPreprocessTasks + self.cythonizeTasks + self.compilationTasks
 
     def getModifiedPaths(self):
         paths = []
-        for task in self.allTasks:
+        for task in self.getAllTasks():
             if task.targetChanged:
                 paths.append(task.target)
         return paths
+
+    def getFilesGeneratedByCython(self):
+        return [task.target for task in self.cythonizeTasks]
 
 class GenerateFileTask:
     def __init__(self):
         self.target = None
         self.targetChanged = False
+
+    def getSummary(self):
+        return None
 
 class PyPreprocessTask(GenerateFileTask):
     def __init__(self, target, dependencies, function):
@@ -155,6 +189,13 @@ class PyPreprocessTask(GenerateFileTask):
 
         if not fileExists(self.target):
             raise Exception("target has not been generated: " + self.target)
+
+    def getSummary(self):
+        return {
+            "Target" : self.target,
+            "Dependencies" : self.dependencies,
+            "Changed" : self.targetChanged
+        }
 
     def __repr__(self):
         return "<{} for '{}' depends on '{}'>".format(
@@ -179,6 +220,13 @@ class CythonizeTask(GenerateFileTask):
         if timeAfter > timeBefore:
             self.targetChanged = True
 
+    def getSummary(self):
+        return {
+            "Path" : self.path,
+            "Target" : self.target,
+            "Changed" : self.targetChanged
+        }
+
     def __repr__(self):
         return "<{} for '{}'>".format(type(self).__name__, self.target)
 
@@ -186,16 +234,50 @@ class CompileExtModuleTask(GenerateFileTask):
     def __init__(self, path):
         super().__init__()
         self.path = path
+        self.target = None
 
     def execute(self):
-        from distutils.core import setup, Extension
-        metadata = getCythonMetadata(self.path)
-        extension = Extension(metadata["module_name"], [self.path])
+        extension = getExtensionFromPath(self.path)
+        targetsBefore = getPossibleCompiledFilesWithTime(self.path)
+        buildExtensionInplace(extension)
+        targetsAfter = getPossibleCompiledFilesWithTime(self.path)
+        newTargets = set(targetsAfter) - set(targetsBefore)
 
-        oldArgs = sys.argv
-        sys.argv = [oldArgs[0], "build_ext", "--inplace"]
-        setup(ext_modules = [extension])
-        sys.argv = oldArgs
+        if len(targetsAfter) == 0:
+            raise Exception("target has not been generated for " + self.path)
+        elif len(newTargets) == 0:
+            self.target = max(targetsAfter, key = lambda x: x[1])[0]
+        elif len(newTargets) == 1:
+            self.target = newTargets.pop()[0]
+            self.targetChanged = True
+        else:
+            raise Exception("cannot choose the correct target for " + self.path)
+
+    def getSummary(self):
+        return {
+            "Path" : self.path,
+            "Target" : self.target,
+            "Changed" : self.targetChanged
+        }
+
+def getPossibleCompiledFilesWithTime(cpath):
+    directory = os.path.dirname(cpath)
+    name = getFileNameWithoutExtension(cpath)
+    pattern = os.path.join(directory, name) + ".*"
+    paths = glob.glob(pattern + ".pyd") + glob.glob(pattern + ".so")
+    return [(path, tryGetLastModificationTime(path)) for path in paths]
+
+def getExtensionFromPath(path):
+    from distutils.core import Extension
+    metadata = getCythonMetadata(path)
+    return Extension(metadata["module_name"], [path])
+
+def buildExtensionInplace(extension):
+    from distutils.core import setup
+    oldArgs = sys.argv
+    sys.argv = [oldArgs[0], "build_ext", "--inplace"]
+    setup(ext_modules = [extension])
+    sys.argv = oldArgs
 
 
 # Higher Level Utils
@@ -254,6 +336,9 @@ def writeTextFile(path, content):
 def readJsonFile(path):
     return json.loads(readTextFile(path))
 
+def writeJsonFile(path, content):
+    writeTextFile(path, json.dumps(content, sort_keys = True, indent = 4))
+
 def changeFileName(path, newName):
     return os.path.join(os.path.dirname(path), newName)
 
@@ -276,9 +361,16 @@ def dependenciesChanged(target, dependencies):
             return True
     return False
 
+def getNewestPath(paths):
+    pathsWithTime = [(path, tryGetLastModificationTime(path)) for path in paths]
+    return max(pathsWithTime, key = lambda x: x[1])[0]
+
 def tryGetLastModificationTime(path):
     try: return os.stat(path).st_mtime
     except: return 0
+
+def getFileNameWithoutExtension(path):
+    return os.path.basename(os.path.splitext(path)[0])
 
 def multiReplace(text, **replacements):
     pattern = "|".join(re.escape(key) for key in replacements.keys())

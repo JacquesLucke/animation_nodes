@@ -11,3 +11,4 @@
 build/
 config.py
 animation_nodes/compilation_info.json
+setup_summary.json
