@@ -7,6 +7,7 @@ import json
 import glob
 import shutil
 import zipfile
+import pathlib
 import textwrap
 import contextlib
 
@@ -18,7 +19,8 @@ defaultConfigPath = os.path.join(currentDirectory, "conf.default.json")
 configPath = os.path.join(currentDirectory, "conf.json")
 compilationInfoPath = os.path.join(addonDirectory, "compilation_info.json")
 exportPath = os.path.join(currentDirectory, "animation_nodes.zip")
-assert os.path.isdir(addonDirectory)
+exportCPath = os.path.join(currentDirectory, "animation_nodes_c.zip")
+exportCSetupPath = os.path.join(currentDirectory, "_export_c_setup.py")
 
 possibleCommands = ["build", "clean", "help"]
 
@@ -77,7 +79,7 @@ def main_Help():
 def main_Build(options):
     checkBuildEnvironment(
         checkCython = True,
-        checkPython = "--noversioncheck" not in options
+        checkPython = "--noversioncheck" not in options and "--nocompile" not in options
     )
     checkBuildOptions(options)
 
@@ -97,6 +99,8 @@ def main_Build(options):
 
     if "--export" in options:
         execute_Export()
+    if "--exportc" in options:
+        execute_ExportC()
 
 def checkBuildEnvironment(checkCython, checkPython):
     if checkCython:
@@ -147,9 +151,6 @@ def main_Clean():
     if directoryExists(buildDirectory):
         removeDirectory(buildDirectory)
         print("Removed build directory")
-
-    removeFile(summaryPath)
-    print("Removed last build summary")
 
 
 # PyProprocess
@@ -262,24 +263,6 @@ def execute_CopyAddon(logger):
     totalChanged = sum(len(l) for l in changes.values())
     print("\nModified {} files.".format(totalChanged))
 
-def iterRelativeAddonFiles(basepath):
-    for root, dirs, files in os.walk(basepath, topdown = True):
-        for directory in dirs:
-            if isAddonDirectoryIgnored(directory):
-                dirs.remove(directory)
-        for filename in files:
-            if not isAddonFileIgnored(filename):
-                fullpath = os.path.join(root, filename)
-                yield os.path.relpath(fullpath, basepath)
-
-def isAddonDirectoryIgnored(name):
-    return name in {".git", "__pycache__"}
-
-def isAddonFileIgnored(name):
-    extensions = [".src", ".pxd", ".pyx", ".html", ".c"]
-    names = {".gitignore", "__setup_info.py"}
-    return any(name.endswith(ext) for ext in extensions) or name in names
-
 # Summary
 ###########################################
 
@@ -344,6 +327,43 @@ def execute_Export():
     print("Exported Addon:")
     print("    " + exportPath)
 
+def execute_ExportC():
+    removeFile(exportCPath)
+
+    with zipfile.ZipFile(exportCPath, "w", zipfile.ZIP_DEFLATED) as zipFile:
+        for relativePath in iterRelativeExportCFiles(addonDirectory):
+            absolutePath = os.path.join(addonDirectory, relativePath)
+            zipFile.write(absolutePath, os.path.join(addonName, relativePath))
+
+        setupInfo = getExportCSetupInfo()
+        tmpPath = os.path.join(currentDirectory, "tmp.json")
+        writeJsonFile(tmpPath, setupInfo)
+        zipFile.write(tmpPath, "setup_info.json")
+        removeFile(tmpPath)
+
+        zipFile.write(exportCSetupPath, "setup.py")
+
+    print("Exported C Build:")
+    print("    " + exportCPath)
+
+def getExportCSetupInfo():
+    import Cython
+    return {
+        "Extensions" : getExportCExtensionsInfo(),
+        "Cython.__version__" : Cython.__version__
+    }
+
+def getExportCExtensionsInfo():
+    extensionsInfo = []
+    for task in getCompileTasks():
+        extension = getExtensionFromPath(task.path)
+        sources = [os.path.relpath(path, currentDirectory) for path in extension.sources]
+        info = {
+            "Module Name" : extension.name,
+            "Sources" : [splitPath(path) for path in sources]
+        }
+        extensionsInfo.append(info)
+    return extensionsInfo
 
 # Tasks
 ###########################################
@@ -499,6 +519,43 @@ def buildExtensionInplace(extension):
     sys.argv = oldArgs
 
 
+# Iterate Addon Files
+###########################################
+
+def iterRelativeAddonFiles(basepath):
+    for root, dirs, files in os.walk(basepath, topdown = True):
+        for directory in dirs:
+            if isAddonDirectoryIgnored(directory):
+                dirs.remove(directory)
+        for filename in files:
+            if not isAddonFileIgnored(filename):
+                fullpath = os.path.join(root, filename)
+                yield os.path.relpath(fullpath, basepath)
+
+def iterRelativeExportCFiles(basepath):
+    for root, dirs, files in os.walk(basepath, topdown = True):
+        for directory in dirs:
+            if isAddonDirectoryIgnored(directory):
+                dirs.remove(directory)
+        for filename in files:
+            if not isExportCFileIgnored(filename):
+                fullpath = os.path.join(root, filename)
+                yield os.path.relpath(fullpath, basepath)
+
+def isAddonDirectoryIgnored(name):
+    return name in {".git", "__pycache__"}
+
+def isAddonFileIgnored(name):
+    extensions = [".src", ".pxd", ".pyx", ".html", ".c"]
+    names = {".gitignore", "__setup_info.py"}
+    return any(name.endswith(ext) for ext in extensions) or name in names
+
+def isExportCFileIgnored(name):
+    extensions = [".src", ".pxd", ".pyx", ".html", ".so", ".pyd"]
+    names = {".gitignore", "__setup_info.py", "compilation_info.json"}
+    return any(name.endswith(ext) for ext in extensions) or name in names
+
+
 # Higher Level Utils
 ###########################################
 
@@ -640,7 +697,7 @@ def readJsonFile(path):
     return json.loads(readTextFile(path))
 
 def writeJsonFile(path, content):
-    writeTextFile(path, json.dumps(content, sort_keys = True, indent = 4))
+    writeTextFile(path, json.dumps(content, sort_keys = True, indent = 2))
 
 def changeFileName(path, newName):
     return os.path.join(os.path.dirname(path), newName)
@@ -674,6 +731,9 @@ def tryGetLastModificationTime(path):
 
 def getFileNameWithoutExtension(path):
     return os.path.basename(os.path.splitext(path)[0])
+
+def splitPath(path):
+    return pathlib.PurePath(path).parts
 
 def multiReplace(text, **replacements):
     pattern = "|".join(re.escape(key) for key in replacements.keys())
