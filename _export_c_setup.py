@@ -15,9 +15,10 @@ if currentDirectory not in sys.path:
 addonDirectory = os.path.join(currentDirectory, "animation_nodes")
 exportPath = os.path.join(currentDirectory, "animation_nodes.zip")
 
-from . setuputils.logger import Logger
-from . setuputils.compilation import execute_Compile
-from . setuputils.setup_info_files import getSetupInfoList
+from setuputils.logger import Logger
+from setuputils.export import execute_Export
+from setuputils.compilation import execute_Compile
+from setuputils.setup_info_files import getSetupInfoList
 
 logger = Logger()
 setupInfoList = getSetupInfoList(addonDirectory)
