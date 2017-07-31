@@ -15,18 +15,8 @@ addonDirectory = os.path.join(currentDirectory, addonName)
 summaryPath = os.path.join(currentDirectory, "setup_summary.json")
 defaultConfigPath = os.path.join(currentDirectory, "conf.default.json")
 configPath = os.path.join(currentDirectory, "conf.json")
+compilationInfoPath = os.path.join(addonDirectory, "compilation_info.json")
 assert os.path.isdir(addonDirectory)
-
-class SetupOptions:
-    def __init__(self):
-        self.cythonize = True
-        self.compile = True
-        self.force = False
-        self.copy = False
-        self.exportFull = False
-        self.exportC = False
-
-setupOptions = SetupOptions()
 
 possibleCommands = ["build", "clean", "help"]
 
@@ -82,7 +72,6 @@ def main_Help():
     The 'build' command has multiple options:'''))
     for option, description in buildOptionDescriptions:
         print("    {:20}{}".format(option, description))
-    sys.exit()
 
 def main_Build(options):
     checkBuildEnvironment(
@@ -91,7 +80,10 @@ def main_Build(options):
     )
     checkBuildOptions(options)
 
-    logger = TaskLogger()
+    if "--force" in options and fileExists(summaryPath):
+        main_Clean()
+
+    logger = Logger()
     setupInfoList = getSetupInfoList()
     execute_PyPreprocess(setupInfoList, logger)
     execute_Cythonize(setupInfoList, logger)
@@ -101,7 +93,6 @@ def main_Build(options):
         execute_CopyAddon(logger)
     execute_PrintSummary(logger)
     execute_SaveSummary(logger)
-    print("Let's build")
 
 def checkBuildEnvironment(checkCython, checkPython):
     if checkCython:
@@ -138,18 +129,13 @@ def checkBuildOptions(options):
             sys.exit()
 
 def main_Clean():
-    print("Clean")
-
-
-def _main():
-    logger = TaskLogger()
-    setupInfoList = getSetupInfoList()
-    execute_PyPreprocess(setupInfoList, logger)
-    execute_Cythonize(setupInfoList, logger)
-    execute_Compile(setupInfoList, logger)
-    execute_CopyAddon(logger)
-    execute_PrintSummary(logger)
-    execute_SaveSummary(logger)
+    if not fileExists(summaryPath):
+        print("No summary of previous compilation found.")
+        sys.exit()
+    summary = readJsonFile(summaryPath)
+    for path in summary["Generated Files"]:
+        removeFile(path)
+        print("Removed:", path)
 
 
 # PyProprocess
@@ -159,8 +145,8 @@ def execute_PyPreprocess(setupInfoList, logger):
     printHeader("Run PyPreprocessor")
 
     tasks = getPyPreprocessTasks(setupInfoList)
-    logger.pyPreprocessTasks = tasks
     for task in tasks:
+        logger.logPyPreprocessTask(task)
         task.execute()
         if task.targetChanged:
             print("Updated:", os.path.relpath(task.target, addonDirectory))
@@ -203,8 +189,8 @@ def getPyPreprocessorProviders(setupInfoList):
 def execute_Cythonize(setupInfoList, logger):
     printHeader("Run Cythonize")
     tasks = getCythonizeTasks()
-    logger.cythonizeTasks = tasks
     for task in tasks:
+        logger.logCythonizeTask(task)
         task.execute()
 
 def getCythonizeTasks():
@@ -222,16 +208,24 @@ def iterCythonFilePaths():
 
 def execute_Compile(setupInfoList, logger):
     printHeader("Compile")
-    tasks = getCompileTasks(logger.getFilesGeneratedByCython())
-    logger.compilationTasks = tasks
+    tasks = getCompileTasks()
     for task in tasks:
+        logger.logCompilationTask(task)
         task.execute()
 
-def getCompileTasks(filesToCompile):
+    compilationInfo = getPlatformSummary()
+    writeJsonFile(compilationInfoPath, compilationInfo)
+    logger.logGeneratedFile(compilationInfoPath)
+
+def getCompileTasks():
     tasks = []
-    for path in filesToCompile:
+    for path in iterFilesToCompile():
         tasks.append(CompileExtModuleTask(path))
     return tasks
+
+def iterFilesToCompile():
+    for path in iterPathsWithExtension(addonDirectory, ".pyx"):
+        yield changeFileExtension(path, ".c")
 
 
 # Copy Addon
@@ -276,7 +270,7 @@ def isAddonFileIgnored(name):
 def execute_PrintSummary(logger):
     printHeader("Summary")
 
-    changedPaths = logger.getModifiedPaths()
+    changedPaths = logger.getChangedFiles()
     for path in changedPaths:
         print("Changed: " + os.path.relpath(path, currentDirectory))
 
@@ -296,7 +290,8 @@ def getSummary(logger):
         "PyPreprocess" : getPyPreprocessSummary(logger),
         "Cythonize" : getCythonizeSummary(logger),
         "Compilation" : getCompilationSummary(logger),
-        "Platform" : getPlatformSummary()
+        "Platform" : getPlatformSummary(),
+        "Generated Files" : logger.getGeneratedFiles()
     }
 
 def getPyPreprocessSummary(logger):
@@ -309,47 +304,58 @@ def getCompilationSummary(logger):
     return [task.getSummary() for task in logger.compilationTasks]
 
 def getPlatformSummary():
-    summary = {
+    import Cython
+    return {
         "sys.version" : sys.version,
         "sys.platform" : sys.platform,
         "sys.api_version" : sys.api_version,
         "sys.version_info" : sys.version_info,
-        "os.name" : os.name
+        "os.name" : os.name,
+        "Cython.__version__" : Cython.__version__
     }
-    if setupOptions.cythonize:
-        import Cython
-        summary["Cython.__version__"] = Cython.__version__
-    else:
-        summary["Cython.__version__"] = "unused"
-    return summary
 
 
 # Tasks
 ###########################################
 
-class TaskLogger:
+class Logger:
     def __init__(self):
         self.pyPreprocessTasks = []
         self.cythonizeTasks = []
         self.compilationTasks = []
+        self.generatedFiles = []
+
+    def logPyPreprocessTask(self, task):
+        self.pyPreprocessTasks.append(task)
+
+    def logCythonizeTask(self, task):
+        self.cythonizeTasks.append(task)
+
+    def logCompilationTask(self, task):
+        self.compilationTasks.append(task)
+
+    def logGeneratedFile(self, path):
+        self.generatedFiles.append(path)
+
+    def getGeneratedFiles(self):
+        paths = []
+        paths.extend(task.target for task in self.getAllTasks() if task.target is not None)
+        paths.extend(self.generatedFiles)
+        return paths
+
+    def getChangedFiles(self):
+        paths = []
+        paths.extend(task.target for task in self.getAllTasks() if task.targetChanged)
+        paths.extend(self.generatedFiles)
+        return paths
 
     def getAllTasks(self):
         return self.pyPreprocessTasks + self.cythonizeTasks + self.compilationTasks
 
-    def getModifiedPaths(self):
-        paths = []
-        for task in self.getAllTasks():
-            if task.targetChanged:
-                paths.append(task.target)
-        return paths
-
-    def getFilesGeneratedByCython(self):
-        return [task.target for task in self.cythonizeTasks]
-
 class GenerateFileTask:
-    def __init__(self):
-        self.target = None
-        self.targetChanged = False
+    def __init__(self, target = None, targetChanged = False):
+        self.target = target
+        self.targetChanged = targetChanged
 
     def getSummary(self):
         return None
