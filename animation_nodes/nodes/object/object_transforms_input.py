@@ -61,7 +61,7 @@ class ObjectTransformsInputNode(bpy.types.Node, VectorizedNode):
         col.prop(self, "frameType")
         self.invokeFunction(layout, "createAutoExecutionTrigger", text = "Create Execution Trigger")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         isLinked = self.getLinkedBaseOutputsDict()
         if not any(isLinked.values()): return
 

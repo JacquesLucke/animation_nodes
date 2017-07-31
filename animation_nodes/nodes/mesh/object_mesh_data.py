@@ -23,7 +23,7 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
         self.newOutput("Integer List", "Material Indices", "materialIndices", hide = True)
         self.newOutput("Text", "Mesh Name", "meshName", hide = True)
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         isLinked = self.getLinkedOutputsDict()
         if not any(isLinked.values()): return
 

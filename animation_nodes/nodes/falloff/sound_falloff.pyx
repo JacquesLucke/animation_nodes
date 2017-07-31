@@ -85,7 +85,7 @@ class SoundFalloffNode(bpy.types.Node, AnimationNode):
         col.prop(self, "fadeLowFrequenciesToZero", text = "Low Frequencies")
         col.prop(self, "fadeHighFrequenciesToZero", text = "High Frequencies")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "if sound is not None and sound.type == self.soundType:"
         if self.useCurrentFrame: yield "    _frame = self.nodeTree.scene.frame_current_final"
         else:                    yield "    _frame = frame"

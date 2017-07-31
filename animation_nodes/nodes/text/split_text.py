@@ -41,7 +41,7 @@ class SplitTextNode(bpy.types.Node, AnimationNode):
         if self.errorMessage != "":
             layout.label(self.errorMessage, icon = "ERROR")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "self.errorMessage = ''"
         if self.splitType == "CHARACTERS":
             yield "textList = list(text)"

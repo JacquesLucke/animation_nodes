@@ -38,7 +38,7 @@ class BarycentricTransformNode(bpy.types.Node, AnimationNode):
         layout.label("3 vectors for Target")
         writeText(layout, "Only the first 3 points in each tri list will be considered", width = 21)
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "self.errorMessage = self.barycentricValidTriInputs(sourceTrianglePoints, targetTrianglePoints)"
         yield "if self.errorMessage == '':"
         if self.operationType == "POINT":

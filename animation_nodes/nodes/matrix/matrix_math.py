@@ -32,7 +32,7 @@ class MatrixMathNode(bpy.types.Node, VectorizedNode):
         if self.errorMessage != "":
             layout.label(self.errorMessage, icon = "ERROR")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "self.errorMessage = ''"
         if self.operation == "MULTIPLY":
             if self.useListA and self.useListB:

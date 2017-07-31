@@ -40,5 +40,5 @@ class ConvertNode(bpy.types.Node, AnimationNode):
         if self.dataType != dataType:
             self.dataType = dataType
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "new, self.lastCorrectionType = self.outputs[0].correctValue(old)"

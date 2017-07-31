@@ -29,7 +29,7 @@ class ObjectVisibilityInputNode(bpy.types.Node, VectorizedNode):
         for socket in self.outputs[2:]:
             socket.hide = True
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         isLinked = self.getLinkedBaseOutputsDict()
         if not any(isLinked.values()): return
 

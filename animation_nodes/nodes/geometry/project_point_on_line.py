@@ -17,7 +17,7 @@ class ProjectPointOnLineNode(bpy.types.Node, AnimationNode):
         self.newOutput("Float", "Projection Factor", "factor")
         self.newOutput("Float", "Distance", "distance")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         isLinked = self.getLinkedOutputsDict()
         if not any(isLinked.values()):
             return

@@ -36,7 +36,7 @@ class TextSequenceOutputNode(bpy.types.Node, AnimationNode):
         writeText(layout, "Possible values for 'X Align' are 'LEFT', 'CENTER' and 'RIGHT'")
         writeText(layout, "Possible values for 'Y Align' are 'TOP', 'CENTER' and 'BOTTOM'")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "if getattr(sequence, 'type', '') == 'TEXT':"
         yield "    self.errorMessage = ''"
 

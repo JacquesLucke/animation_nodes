@@ -14,7 +14,7 @@ class ReverseTextNode(bpy.types.Node, VectorizedNode):
         self.newVectorizedOutput("Text", "useList",
             ("Text", "outText"), ("Texts", "outTexts"))
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.useList:
             return "outTexts = [text[::-1] for text in inTexts]"
         else:

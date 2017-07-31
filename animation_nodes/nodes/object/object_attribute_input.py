@@ -26,7 +26,7 @@ class ObjectAttributeInputNode(bpy.types.Node, AnimationNode):
     def drawAdvanced(self, layout):
         self.invokeFunction(layout, "createAutoExecutionTrigger", text = "Create Execution Trigger")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         code = self.evaluationExpression
 
         if not isCodeValid(code):

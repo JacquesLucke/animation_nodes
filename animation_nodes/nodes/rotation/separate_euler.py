@@ -27,7 +27,7 @@ class SeparateEulerNode(bpy.types.Node, VectorizedNode):
     def draw(self, layout):
         layout.prop(self, "useDegree")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         isLinked = self.getLinkedOutputsDict()
         for i, axis in enumerate("xyz"):
             if isLinked[axis]:

@@ -79,7 +79,7 @@ class an_ObjectTransformsOutputNode(bpy.types.Node, VectorizedNode):
         self.inputs[2].hide = not any(self.useRotation)
         self.inputs[3].hide = not any(self.useScale)
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         useLoc = self.useLocation
         useRot = self.useRotation
         useScale = self.useScale

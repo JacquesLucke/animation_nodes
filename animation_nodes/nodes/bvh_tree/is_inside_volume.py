@@ -26,7 +26,7 @@ class IsInsideVolumeBVHTreeNode(bpy.types.Node, VectorizedNode):
         self.newVectorizedOutput("Boolean", "useVectorList",
             ("Is Inside", "isInside"), ("Are Inside", "areInside"))
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         return "isInside = self.execute_Single(bvhTree, vector)"
 
     def execute_Single(self, bvhTree, vector):

@@ -41,7 +41,7 @@ class EvaluateSoundNode(bpy.types.Node, AnimationNode):
     def drawAdvanced(self, layout):
         layout.prop(self, "useCurrentFrame")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "self.errorMessage = ''"
         if self.useCurrentFrame: yield "_frame = self.nodeTree.scene.frame_current_final"
         else:                    yield "_frame = frame"

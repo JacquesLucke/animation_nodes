@@ -13,6 +13,6 @@ class GetListLengthNode(bpy.types.Node, AnimationNode):
     def drawLabel(self):
         return "Get Length"
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         return ("try: length = len(list)",
                 "except: length = 0")

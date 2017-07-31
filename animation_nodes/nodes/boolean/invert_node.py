@@ -16,7 +16,7 @@ class InvertBooleanNode(bpy.types.Node, VectorizedNode):
             ("Output", "output"),
             ("Output", "output"))
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.useList:
             yield "input.invertAll()"
             yield "output = input"

@@ -21,7 +21,7 @@ class VectorListMathNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.prop(self, "operation", text = "")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.operation == "ADD":
             yield "result = vectors.getSumOfElements()"
         elif self.operation == "AVERAGE":

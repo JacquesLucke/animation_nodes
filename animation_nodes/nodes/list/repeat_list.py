@@ -55,7 +55,7 @@ class RepeatListNode(bpy.types.Node, AnimationNode):
         self.invokeSelector(layout, "DATA_TYPE", "assignListDataType",
             dataTypes = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "inLength = len(inList)"
         yield "if inLength == 0:"
         yield "    outList = self.outputs[0].getDefaultValue()"

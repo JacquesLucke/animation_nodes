@@ -20,7 +20,7 @@ class CopyObjectDataNode(bpy.types.Node, VectorizedNode):
         self.newVectorizedOutput("Object", "useToList",
             ("To", "outObject"), ("To", "outObjects"))
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         return "outObject = self.copyObjectData(fromObject, toObject)"
 
     def copyObjectData(self, fromObject, toObject):

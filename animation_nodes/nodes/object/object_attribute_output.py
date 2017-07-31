@@ -38,7 +38,7 @@ class ObjectAttributeOutputNode(bpy.types.Node, VectorizedNode):
         if self.errorMessage != "" and self.attribute != "":
             layout.label(self.errorMessage, icon = "ERROR")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         code = self.evaluationExpression
 
         if not isCodeValid(code):

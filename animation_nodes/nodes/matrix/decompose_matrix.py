@@ -24,7 +24,7 @@ class DecomposeMatrixNode(bpy.types.Node, VectorizedNode):
             ("Scale", "scale"), ("Scales", "scales"))
 
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         isLinked = self.getLinkedOutputsDict()
         if self.useMatrixList:
             if isLinked["translations"]: yield "translations = self.toTranslations(matrices)"

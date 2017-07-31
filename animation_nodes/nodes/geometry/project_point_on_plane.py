@@ -16,7 +16,7 @@ class ProjectPointOnPlaneNode(bpy.types.Node, AnimationNode):
         self.newOutput("Vector", "Projection", "projection")
         self.newOutput("Float", "Signed Distance", "distance")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         isLinked = self.getLinkedOutputsDict()
         if not any(isLinked.values()):
             return

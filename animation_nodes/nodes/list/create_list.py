@@ -58,7 +58,7 @@ class CreateListNode(bpy.types.Node, AnimationNode):
     def getInputSocketVariables(self):
         return {socket.identifier : "element_" + str(i) for i, socket in enumerate(self.inputs)}
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         variableNames = ["element_" + str(i) for i, socket in enumerate(self.inputs) if socket.dataType != "Node Control"]
         createPyListExpression = "[" + ", ".join(variableNames) + "]"
         createListExpression = self.outputs[0].getFromValuesCode().replace("value", createPyListExpression)

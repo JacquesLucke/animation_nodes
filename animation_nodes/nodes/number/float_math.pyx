@@ -226,7 +226,7 @@ class FloatMathNode(bpy.types.Node, VectorizedNode):
     def setOperation(self, operation):
         self.operation = operation
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.generatesList:
             currentType = self._operation.type
             yield "try:"

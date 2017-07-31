@@ -10,5 +10,5 @@ class RoundNumberNode(bpy.types.Node, AnimationNode):
         self.newInput("Integer", "Decimals", "decimals")
         self.newOutput("Float", "Result", "result")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "result  = int(round(number, decimals)) if decimals <= 0 else round(number, decimals)"

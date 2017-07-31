@@ -17,7 +17,7 @@ class SeparateVectorNode(bpy.types.Node, VectorizedNode):
             self.newVectorizedOutput("Float", "useList",
                 (axis, axis.lower()), (axis, axis.lower()))
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         isLinked = self.getLinkedOutputsDict()
         for i, axis in enumerate("xyz"):
             if isLinked[axis]:

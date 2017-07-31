@@ -25,7 +25,7 @@ class BMeshTriangulateNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "quad")
         layout.prop(self, "ngon")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         isLinked = self.getLinkedOutputsDict()
         if not any(isLinked.values()): return
 

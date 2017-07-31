@@ -26,7 +26,7 @@ class ConvertAngleNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.prop(self, "conversionType", text = "")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.conversionType == "DEGREE_TO_RADIAN": return "outAngle = inAngle / 180 * math.pi"
         if self.conversionType == "RADIAN_TO_DEGREE": return "outAngle = inAngle * 180 / math.pi"
 

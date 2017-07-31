@@ -32,7 +32,7 @@ class ArmatureInfoNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.prop(self, "state")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         isLinked = self.getLinkedOutputsDict()
         if not any(isLinked.values()): return
 

@@ -14,7 +14,7 @@ class CharactersNode(bpy.types.Node, AnimationNode):
         self.newOutput("Text", "Line Break", "lineBreak")
         self.newOutput("Text", "Tab", "tab")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         isLinked = self.getLinkedOutputsDict()
 
         if isLinked["lower"]:

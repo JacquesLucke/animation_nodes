@@ -17,7 +17,7 @@ class IntersectLineLineNode(bpy.types.Node, AnimationNode):
         self.newOutput("Vector", "Closest On Line 2", "closest2")
         self.newOutput("Boolean", "Is Valid", "isValid")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         isLinked = self.getLinkedOutputsDict()
         if not any(isLinked.values()): return
 

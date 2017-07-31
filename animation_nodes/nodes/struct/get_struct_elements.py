@@ -56,7 +56,7 @@ class GetStructElementsNode(bpy.types.Node, AnimationNode):
         variables["New Output"] = "newOutput"
         return variables
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "self.errorMessage = ''"
         for i, socket in enumerate(self.outputs[:-1]):
             name = "output_" + str(i)

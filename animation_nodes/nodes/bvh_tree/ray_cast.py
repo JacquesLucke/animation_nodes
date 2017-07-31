@@ -46,7 +46,7 @@ class RayCastBVHTreeNode(bpy.types.Node, VectorizedNode):
     def draw(self, layout):
         layout.prop(self, "startInInfinity")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "_direction = direction.normalized()"
         if self.startInInfinity:
             yield from self.iterStartInInfinityCode()

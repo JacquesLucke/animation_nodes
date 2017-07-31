@@ -28,7 +28,7 @@ class SplineInfoNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.prop(self, "splineType", text = "")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         isLinked = self.getLinkedOutputsDict()
 
         if isLinked["points"]:

@@ -36,7 +36,7 @@ class RotationMatrixNode(bpy.types.Node, VectorizedNode):
             else:
                 return "execute_List_Axis"
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if len(self.axis) == 1:
             return "matrix = Matrix.Rotation(angle, 4, '{}')".format(self.axis)
         else:

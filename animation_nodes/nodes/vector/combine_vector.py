@@ -35,7 +35,7 @@ class CombineVectorNode(bpy.types.Node, VectorizedNode):
                 label = label.replace(axis, str(round(socket.value, 4)))
         return label
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.generatesList:
             yield "vectors = self.createVectorList(x, y, z)"
         else:

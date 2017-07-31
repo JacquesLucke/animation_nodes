@@ -71,7 +71,7 @@ class ObjectIDKeyNode(bpy.types.Node, VectorizedNode):
         self.keyDataType = dataType
         self.keyName = name
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.keyName == "":
             return
 

@@ -24,7 +24,7 @@ class NumberListMathNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.prop(self, "operation", text = "")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.operation == "ADD":
             yield "result = numbers.getSumOfElements()"
         elif self.operation == "MULTIPLY":

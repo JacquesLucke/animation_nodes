@@ -22,7 +22,7 @@ class GetSplineSamplesNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
         col.active = self.parameterType == "UNIFORM"
         col.prop(self, "resolution")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         isLinked = self.getLinkedOutputsDict()
         if not (isLinked["positions"] or isLinked["tangents"]): return []
 

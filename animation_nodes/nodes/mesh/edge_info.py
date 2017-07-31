@@ -40,7 +40,7 @@ class EdgeInfoNode(bpy.types.Node, VectorizedNode):
         if self.errorMessage != "" and self.inputs[1].isLinked:
             layout.label(self.errorMessage, icon = "ERROR")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         isLinked = self.getLinkedOutputsDict()
         yield "self.errorMessage = ''"
         if self.useEdgeList:

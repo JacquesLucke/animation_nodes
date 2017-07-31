@@ -15,7 +15,7 @@ class CylinderMeshNode(bpy.types.Node, AnimationNode):
         self.newOutput("Edge Indices List", "Edge Indices", "edgeIndices")
         self.newOutput("Polygon Indices List", "Polygon Indices", "polygonIndices")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         isLinked = self.getLinkedOutputsDict()
         yield "_resolution = max(resolution, 2)"
         yield "cylinder = animation_nodes.algorithms.mesh_generation.cylinder"

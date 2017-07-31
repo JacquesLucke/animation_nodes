@@ -33,7 +33,7 @@ class AnimateDataNode(bpy.types.Node, AnimationNode):
     def drawLabel(self):
         return "Animate " + self.inputs[1].dataType
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "finalDuration = max(duration, 0.0001)"
         yield "influence = max(min(time / finalDuration, 1.0), 0.0)"
         yield "influence = interpolation(influence)"

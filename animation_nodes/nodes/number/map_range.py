@@ -45,7 +45,7 @@ class MapRangeNode(bpy.types.Node, VectorizedNode):
         subrow.active = self.clampInput
         subrow.prop(self, "useInterpolation", icon = "IPO_BEZIER", text = "Interpolate")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.useValueList:
             if self.useInterpolation and self.clampInput:
                 yield "newValues = self.execute_Multiple_Interpolated("

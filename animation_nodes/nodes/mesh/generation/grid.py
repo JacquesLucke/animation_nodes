@@ -33,7 +33,7 @@ class GridMeshNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.prop(self, "mode")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         isLinked = self.getLinkedOutputsDict()
         yield "_xDivisions =  max(xDivisions, 2)"
         yield "_yDivisions =  max(yDivisions, 2)"

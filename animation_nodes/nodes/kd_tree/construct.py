@@ -9,7 +9,7 @@ class ConstructKDTreeNode(bpy.types.Node, AnimationNode):
         self.newInput("Vector List", "Vector List", "vectorList")
         self.newOutput("KDTree", "KDTree", "kdTree")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "kdTree = mathutils.kdtree.KDTree(len(vectorList))"
         yield "for i, vector in enumerate(vectorList): kdTree.insert(vector, i)"
         yield "kdTree.balance()"

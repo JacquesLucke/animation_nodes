@@ -21,7 +21,7 @@ class TimeInfoNode(bpy.types.Node, AnimationNode):
             inputSocket.removeLinks()
             inputSocket.hide = True
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         isLinked = self.getLinkedOutputsDict()
         if not any(isLinked.values()): return
 

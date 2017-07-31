@@ -9,5 +9,5 @@ class ScaleMatrixNode(bpy.types.Node, AnimationNode):
         self.newInput("Vector", "Scale", "scale", value = [1, 1, 1])
         self.newOutput("Matrix", "Matrix", "matrix")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         return ("matrix = animation_nodes.utils.math.scaleMatrix(scale)")

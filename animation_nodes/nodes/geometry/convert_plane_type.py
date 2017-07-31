@@ -34,7 +34,7 @@ class ConvertPlaneTypeNode(bpy.types.Node, AnimationNode):
         for item in conversionTypeItems:
             if self.conversionType == item[0]: return item[1]
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         isLinked = self.getLinkedOutputsDict()
         if not any(isLinked.values()):
             return

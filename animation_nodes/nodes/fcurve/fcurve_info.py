@@ -10,7 +10,7 @@ class FCurveInfoNode(bpy.types.Node, AnimationNode):
         self.newOutput("Text", "Data Path", "dataPath")
         self.newOutput("Integer", "Array Index", "arrayIndex")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         isLinked = self.getLinkedOutputsDict()
         if not any(isLinked.values()): return
 

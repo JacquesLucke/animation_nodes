@@ -105,7 +105,7 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
     def getInputSocketVariables(self):
         return {socket.identifier : socket.text for socket in self.inputs}
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.expression.strip() == "" or self.containsSyntaxError:
             yield "self.errorMessage = ''"
             yield "result = self.outputs[0].getDefaultValue()"

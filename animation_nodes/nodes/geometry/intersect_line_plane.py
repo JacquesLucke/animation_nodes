@@ -16,7 +16,7 @@ class IntersectLinePlaneNode(bpy.types.Node, AnimationNode):
         self.newOutput("Vector", "Intersection", "intersection")
         self.newOutput("Boolean", "Is Valid", "isValid")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         isLinked = self.getLinkedOutputsDict()
         if not any(isLinked.values()): return
 

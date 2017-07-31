@@ -30,7 +30,7 @@ class ChangeSplineTypeNode(bpy.types.Node, VectorizedNode):
     def draw(self, layout):
         layout.prop(self, "targetType", text = "")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         return "outSpline = self.convertToTargetType(inSpline)"
 
     def convertToTargetType(self, spline):

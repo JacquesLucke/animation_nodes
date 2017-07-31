@@ -47,7 +47,7 @@ class ParticleSystemParticlesDataNode(bpy.types.Node, VectorizedNode):
         row.prop(self, "includeDying", text = "Dying", toggle = True)
         row.prop(self, "includeDead", text = "Dead", toggle = True)
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         isLinked = self.getLinkedOutputsDict()
         if not self.useParticleSystemList:
             yield "particleSystems = [particleSystem]"

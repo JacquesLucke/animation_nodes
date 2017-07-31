@@ -36,7 +36,7 @@ class ObjectLayerVisibilityOutputNode(bpy.types.Node, AnimationNode):
         if self.errorMessage != "":
             writeText(layout, self.errorMessage, icon = "ERROR", width = 20)
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "if object:"
         if self.layerChoosingType == "MULTIPLE":
             yield "    visibilities = [{}]".format(", ".join("layer" + str(i) for i in range(1, 21)))

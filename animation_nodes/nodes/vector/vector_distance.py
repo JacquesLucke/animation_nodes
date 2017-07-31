@@ -18,7 +18,7 @@ class VectorDistanceNode(bpy.types.Node, VectorizedNode):
         self.newVectorizedOutput("Float", [("useListA", "useListB")],
             ("Distance", "distance"), ("Distances", "distances"))
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.useListA or self.useListB:
             yield "distances = self.calcDistances(a, b)"
         else:

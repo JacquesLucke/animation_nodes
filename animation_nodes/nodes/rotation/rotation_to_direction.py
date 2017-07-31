@@ -28,7 +28,7 @@ class RotationToDirectionNode(bpy.types.Node, VectorizedNode):
     def draw(self, layout):
         layout.prop(self, "directionAxis", expand = True)
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.useRotationList:
             yield "directions = AN.algorithms.rotations.eulersToDirections(rotations, self.directionAxis)"
             yield "AN.math.scaleVector3DList(directions, length)"

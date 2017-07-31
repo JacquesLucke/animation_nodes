@@ -14,7 +14,7 @@ class BMeshMeshDataNode(bpy.types.Node, AnimationNode):
         self.newOutput("Edge Indices List", "Edge Indices", "edgeIndices")
         self.newOutput("Polygon Indices List", "Polygon Indices", "polygonIndices")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         isLinked = self.getLinkedOutputsDict()
         if not any(isLinked.values()): return
 

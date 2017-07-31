@@ -19,7 +19,7 @@ class CombineEulerNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.prop(self, "useDegree")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.useDegree:
             toRadian = "math.pi / 180"
             return "euler = Euler((x * {0}, y * {0}, z * {0}), 'XYZ')".format(toRadian)

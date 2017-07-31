@@ -44,7 +44,7 @@ class CompareNode(bpy.types.Node, AnimationNode):
         self.invokeSelector(layout, "DATA_TYPE", "assignType",
             text = "Change Type", icon = "TRIA_RIGHT")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         type = self.compareType
         if type == "A = B":     return "result = a == b"
         if type == "A != B":    return "result = a != b"

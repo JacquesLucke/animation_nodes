@@ -27,5 +27,5 @@ class BlendDataByNameNode(bpy.types.Node, AnimationNode):
     def drawLabel(self):
         return self.dataType + " by Name"
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         return "output = bpy.data.{}.get(name)".format(dataTypes[self.dataType])

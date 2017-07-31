@@ -36,7 +36,7 @@ class SequenceInfoNode(bpy.types.Node, AnimationNode):
         for socket in self.outputs[6:]:
             socket.hide = True
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         isLinked = self.getLinkedOutputsDict()
         if not any(isLinked.values()): return
 

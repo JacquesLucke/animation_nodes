@@ -46,7 +46,7 @@ class DirectionToRotationNode(bpy.types.Node, VectorizedNode):
         if self.trackAxis[-1:] == self.guideAxis[-1:]:
             layout.label("Must be different", icon = "ERROR")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         isLinked = self.getLinkedOutputsDict()
         generateList = self.useDirectionList or self.useGuideList
 

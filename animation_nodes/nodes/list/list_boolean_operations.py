@@ -34,7 +34,7 @@ class ListBooleanOperationsNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.prop(self, "operation", text = "")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         op = self.operation
         # I don't use sets here to keep the order the elements come in
         # But we could speedup this node by using sets to see if an element is already inserted

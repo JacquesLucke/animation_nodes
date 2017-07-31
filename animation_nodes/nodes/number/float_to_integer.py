@@ -24,7 +24,7 @@ class FloatToIntegerNode(bpy.types.Node, AnimationNode):
     def drawAdvanced(self, layout):
         layout.prop(self, "type", text = "")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.type == "ROUND": return "integer = int(round(float))"
         if self.type == "CEILING": return "integer = int(math.ceil(float))"
         if self.type == "FLOOR": return "integer = int(math.floor(float))"
