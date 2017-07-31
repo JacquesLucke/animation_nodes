@@ -1,7 +1,6 @@
 import bpy
 from ... base_types import AnimationNode
 
-
 class ObjectMatrixInputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectMatrixInputNode"
     bl_label = "Object Matrix Input"
@@ -14,16 +13,16 @@ class ObjectMatrixInputNode(bpy.types.Node, AnimationNode):
         self.newOutput("Matrix", "Parent Inverse", "parentInverse", hide = True)
 
     def getExecutionCode(self, required):
-        isLinked = self.getLinkedOutputsDict()
-        if not any(isLinked.values()): return
+        if len(required) == 0:
+            return
 
         yield "if object is None:"
-        if isLinked["world"]:         yield "    world = Matrix.Identity(4)"
-        if isLinked["basis"]:         yield "    basis = Matrix.Identity(4)"
-        if isLinked["local"]:         yield "    local = Matrix.Identity(4)"
-        if isLinked["parentInverse"]: yield "    parentInverse = Matrix.Identity(4)"
+        if "world" in required:         yield "    world = Matrix.Identity(4)"
+        if "basis" in required:         yield "    basis = Matrix.Identity(4)"
+        if "local" in required:         yield "    local = Matrix.Identity(4)"
+        if "parentInverse" in required: yield "    parentInverse = Matrix.Identity(4)"
         yield "else:"
-        if isLinked["world"]:         yield "    world = object.matrix_world"
-        if isLinked["basis"]:         yield "    basis = object.matrix_basis"
-        if isLinked["local"]:         yield "    local = object.matrix_local"
-        if isLinked["parentInverse"]: yield "    parentInverse = object.matrix_parent_inverse"
+        if "world" in required:         yield "    world = object.matrix_world"
+        if "basis" in required:         yield "    basis = object.matrix_basis"
+        if "local" in required:         yield "    local = object.matrix_local"
+        if "parentInverse" in required: yield "    parentInverse = object.matrix_parent_inverse"
