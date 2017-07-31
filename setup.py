@@ -2,8 +2,11 @@ import os
 import re
 import io
 import sys
+import stat
 import json
 import glob
+import shutil
+import textwrap
 import contextlib
 
 addonName = "animation_nodes"
@@ -12,12 +15,121 @@ addonDirectory = os.path.join(currentDirectory, addonName)
 summaryPath = os.path.join(currentDirectory, "setup_summary.json")
 assert os.path.isdir(addonDirectory)
 
+class SetupOptions:
+    def __init__(self):
+        self.cythonize = True
+        self.compile = True
+        self.force = False
+        self.copy = False
+        self.exportFull = False
+        self.exportC = False
+
+setupOptions = SetupOptions()
+
+possibleCommands = ["build", "clean", "help"]
+
+buildOptionDescriptions = [
+    ("--copy", "Copy build to location specified in the config.py file"),
+    ("--force", "Rebuild everything"),
+    ("--export", "Create installable .zip file"),
+    ("--exportc", "Create build that can be compiled without cython"),
+    ("--nocompile", "Don't compile the extension modules"),
+    ("--noversioncheck", "Don't check the used Python version")
+]
+buildOptions = {option for option, _ in buildOptionDescriptions}
+helpNote = "Use 'python setup.py help' to see the possible commands."
+
 def main():
+    args = sys.argv[1:]
+    if len(args) == 0 or args[0] == "help":
+        main_Help()
+    elif args[0] == "build":
+        main_Build(args[1:])
+    elif args[0] == "clean":
+        main_Clean()
+    else:
+        print("Invalid command: '{}'\n".format(args[0]))
+        print(helpNote)
+        sys.exit()
+
+def main_Help():
+    print(textwrap.dedent('''\
+    usage: python setup.py <command> [options]
+
+    Possible commands:
+        help                Show this help
+        build               Build the addon from sources
+        clean               Remove generated files
+
+    The 'build' command has multiple options:'''))
+    for option, description in buildOptionDescriptions:
+        print("    {:20}{}".format(option, description))
+    sys.exit()
+
+def main_Build(options):
+    checkBuildEnvironment(
+        checkCython = True,
+        checkPython = "--noversioncheck" not in options
+    )
+    checkBuildOptions(options)
+
+    logger = TaskLogger()
+    setupInfoList = getSetupInfoList()
+    execute_PyPreprocess(setupInfoList, logger)
+    execute_Cythonize(setupInfoList, logger)
+    if "--nocompile" not in options:
+        execute_Compile(setupInfoList, logger)
+    if "--copy" in options:
+        execute_CopyAddon(logger)
+    execute_PrintSummary(logger)
+    execute_SaveSummary(logger)
+    print("Let's build")
+
+def checkBuildEnvironment(checkCython, checkPython):
+    if checkCython:
+        try: import Cython
+        except:
+            print("Cython is not installed for this Python version.")
+            print(sys.version)
+            sys.exit()
+    if checkPython:
+        v = sys.version_info
+        if v.major != 3 or v.minor != 5:
+            print(textwrap.dedent('''\
+            Blender 2.78/2.79 officially uses Python 3.5.x.
+            You are using: {}
+
+            Use the --noversioncheck option to disable this check.\
+            '''.format(sys.version)))
+            sys.exit()
+
+def checkBuildOptions(options):
+    options = set(options)
+    invalidOptions = options - buildOptions
+    if len(invalidOptions) > 0:
+        print("Invalid build options: {}\n".format(invalidOptions))
+        print(helpNote)
+        sys.exit()
+
+    if "--nocompile" in options:
+        if "--copy" in options:
+            print("The options --nocompile and --copy don't work together.")
+            sys.exit()
+        if "--export" in options:
+            print("The options --nocompile and --export don't work together.")
+            sys.exit()
+
+def main_Clean():
+    print("Clean")
+
+
+def _main():
     logger = TaskLogger()
     setupInfoList = getSetupInfoList()
     execute_PyPreprocess(setupInfoList, logger)
     execute_Cythonize(setupInfoList, logger)
     execute_Compile(setupInfoList, logger)
+    execute_CopyAddon(logger)
     execute_PrintSummary(logger)
     execute_SaveSummary(logger)
 
@@ -104,6 +216,42 @@ def getCompileTasks(filesToCompile):
     return tasks
 
 
+# Copy Addon
+###########################################
+
+def execute_CopyAddon(logger):
+    printHeader("Copy Addon")
+    targetPath = "C:\\Users\\jacques\\AppData\\Roaming\\Blender Foundation\\Blender\\2.78\\scripts\\addons\\animation_nodes"
+    changes = syncDirectories(addonDirectory, targetPath, iterRelativeAddonFiles)
+
+    for path in changes["removed"]:
+        print("Removed:", os.path.relpath(path, targetPath))
+    for path in changes["updated"]:
+        print("Updated:", os.path.relpath(path, targetPath))
+    for path in changes["created"]:
+        print("Created:", os.path.relpath(path, targetPath))
+
+    totalChanged = sum(len(l) for l in changes.values())
+    print("\nModified {} files.".format(totalChanged))
+
+def iterRelativeAddonFiles(basepath):
+    for root, dirs, files in os.walk(basepath, topdown = True):
+        for directory in dirs:
+            if isAddonDirectoryIgnored(directory):
+                dirs.remove(directory)
+        for filename in files:
+            if not isAddonFileIgnored(filename):
+                fullpath = os.path.join(root, filename)
+                yield os.path.relpath(fullpath, basepath)
+
+def isAddonDirectoryIgnored(name):
+    return name in {".git", "__pycache__"}
+
+def isAddonFileIgnored(name):
+    extensions = [".src", ".pxd", ".pyx", ".html", ".c"]
+    names = {".gitignore", "__setup_info.py"}
+    return any(name.endswith(ext) for ext in extensions) or name in names
+
 # Summary
 ###########################################
 
@@ -123,12 +271,14 @@ def execute_PrintSummary(logger):
 def execute_SaveSummary(logger):
     summary = getSummary(logger)
     writeJsonFile(summaryPath, summary)
+    print("\nSave Summary: " + os.path.basename(summaryPath))
 
 def getSummary(logger):
     return {
         "PyPreprocess" : getPyPreprocessSummary(logger),
         "Cythonize" : getCythonizeSummary(logger),
-        "Compilation" : getCompilationSummary(logger)
+        "Compilation" : getCompilationSummary(logger),
+        "Platform" : getPlatformSummary()
     }
 
 def getPyPreprocessSummary(logger):
@@ -139,6 +289,21 @@ def getCythonizeSummary(logger):
 
 def getCompilationSummary(logger):
     return [task.getSummary() for task in logger.compilationTasks]
+
+def getPlatformSummary():
+    summary = {
+        "sys.version" : sys.version,
+        "sys.platform" : sys.platform,
+        "sys.api_version" : sys.api_version,
+        "sys.version_info" : sys.version_info,
+        "os.name" : os.name
+    }
+    if setupOptions.cythonize:
+        import Cython
+        summary["Cython.__version__"] = Cython.__version__
+    else:
+        summary["Cython.__version__"] = "unused"
+    return summary
 
 
 # Tasks
@@ -296,6 +461,46 @@ def getCythonMetadata(path):
     text = readLinesBetween(path, "BEGIN: Cython Metadata", "END: Cython Metadata")
     return json.loads(text)
 
+def syncDirectories(source, target, relpathSelector):
+    if not directoryExists(target):
+        os.mkdir(target)
+
+    existingFilesInSource = set(relpathSelector(source))
+    existingFilesInTarget = set(relpathSelector(target))
+
+    removedFiles = []
+    createdFiles = []
+    updatedFiles = []
+
+    filesToRemove = existingFilesInTarget - existingFilesInSource
+    for relativePath in filesToRemove:
+        path = os.path.join(target, relativePath)
+        removeFile(path)
+        removedFiles.append(path)
+
+    filesToCreate = existingFilesInSource - existingFilesInTarget
+    for relativePath in filesToCreate:
+        sourcePath = os.path.join(source, relativePath)
+        targetPath = os.path.join(target, relativePath)
+        copyFile(sourcePath, targetPath)
+        createdFiles.append(targetPath)
+
+    filesToUpdate = existingFilesInSource.intersection(existingFilesInTarget)
+    for relativePath in filesToUpdate:
+        sourcePath = os.path.join(source, relativePath)
+        targetPath = os.path.join(target, relativePath)
+        lastSourceModification = tryGetLastModificationTime(sourcePath)
+        lastTargetModification = tryGetLastModificationTime(targetPath)
+        if lastSourceModification > lastTargetModification:
+            overwriteFile(sourcePath, targetPath)
+            updatedFiles.append(targetPath)
+
+    return {
+        "removed" : removedFiles,
+        "created" : createdFiles,
+        "updated" : updatedFiles
+    }
+
 
 # Utils
 ############################################
@@ -314,16 +519,47 @@ def executePythonFile(path):
     return context
 
 def iterPathsWithExtension(basepath, extension):
+    extensions = setOfStrings(extension)
     for root, dirs, files in os.walk(basepath):
         for filename in files:
             _, ext = os.path.splitext(filename)
-            if ext == extension:
+            if ext in extensions:
                 yield os.path.join(root, filename)
+
+def setOfStrings(strings):
+    if isinstance(strings, str):
+        return {strings}
+    else:
+        return set(strings)
 
 def iterPathsWithFileName(basepath, filename):
     for root, dirs, files in os.walk(basepath):
         if filename in files:
             yield os.path.join(root, filename)
+
+def overwriteFile(source, target):
+    removeFile(target)
+    copyFile(source, target)
+
+def copyFile(source, target):
+    directory = os.path.dirname(target)
+    if not directoryExists(directory):
+        os.makedirs(directory)
+    shutil.copyfile(source, target)
+
+def removeFile(path):
+    try:
+        os.remove(path)
+    except:
+        if tryGetFileAccessPermission(path):
+            os.remove(path)
+
+def tryGetFileAccessPermission(path):
+    try:
+        os.chmod(path, stat.S_IWUSR)
+        return True
+    except:
+        return False
 
 def readTextFile(path):
     with open(path, "rt") as f:
