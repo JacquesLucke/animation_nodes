@@ -72,56 +72,54 @@ class ObjectIDKeyNode(bpy.types.Node, VectorizedNode):
         self.keyName = name
 
     def getExecutionCode(self, required):
-        if self.keyName == "":
+        if len(required) == 0 or self.keyName == "":
             return
 
         keyName = repr(self.keyName)
-        yield "_key = animation_nodes.id_keys.IDKeyTypes[{}]".format(repr(self.keyDataType))
+        yield "_key = AN.id_keys.IDKeyTypes[{}]".format(repr(self.keyDataType))
         if self.useList:
-            yield from self.getExecutionCode_List(keyName)
+            yield from self.getExecutionCode_List(keyName, required)
         else:
-            yield from self.getExecutionCode_Base(keyName)
+            yield from self.getExecutionCode_Base(keyName, required)
 
-    def getExecutionCode_Base(self, keyName):
+    def getExecutionCode_Base(self, keyName, required):
         dataType = self.keyDataType
-        isLinked = self.getLinkedOutputsDict()
 
-        if isLinked["exists"]:
+        if "exists" in required:
             yield "exists = _key.exists(object, %s)" % keyName
 
         yield "data = _key.get(object, %s)" % keyName
 
         if dataType == "Transforms":
             yield "location, rotation, scale = data"
-            if isLinked["matrix"]:
-                yield "matrix = animation_nodes.utils.math.composeMatrix(location, rotation, scale)"
+            if "matrix" in required:
+                yield "matrix = AN.utils.math.composeMatrix(location, rotation, scale)"
         elif dataType == "Text":
             yield "text = data"
         elif dataType in ("Integer", "Float"):
             yield "number = data"
 
-    def getExecutionCode_List(self, keyName):
+    def getExecutionCode_List(self, keyName, required):
         dataType = self.keyDataType
-        isLinked = self.getLinkedOutputsDict()
 
-        if isLinked["exists"]:
+        if "exists" in required:
             yield "exists = _key.existsList(objects, %s)" % keyName
 
         if dataType == "Transforms":
-            useMatrices = isLinked["matrices"]
-            if isLinked["locations"] or useMatrices:
+            useMatrices = "matrices" in required
+            if "locations" in required or useMatrices:
                 yield "locations = _key.getLocations(objects, %s)" % keyName
-            if isLinked["rotations"] or useMatrices:
+            if "rotations" in required or useMatrices:
                 yield "rotations = _key.getRotations(objects, %s)" % keyName
-            if isLinked["scales"] or useMatrices:
+            if "scales" in required or useMatrices:
                 yield "scales = _key.getScales(objects, %s)" % keyName
             if useMatrices:
                 yield "matrices = animation_nodes.math.composeMatrixList(locations, rotations, scales)"
         elif dataType == "Text":
-            if isLinked["texts"]:
+            if "texts" in required:
                 yield "texts = _key.getList(objects, %s)" % keyName
         elif dataType in ("Integer", "Float"):
-            if isLinked["numbers"]:
+            if "numbers" in required:
                 yield "numbers = _key.getList(objects, %s)" % keyName
 
     def getList_Exists(self, objects):
