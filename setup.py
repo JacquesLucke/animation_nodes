@@ -11,13 +11,31 @@ import pathlib
 import textwrap
 import contextlib
 
-addonName = "animation_nodes"
 currentDirectory = os.path.dirname(os.path.abspath(__file__))
-addonDirectory = os.path.join(currentDirectory, addonName)
+
+if not os.path.samefile(currentDirectory, os.getcwd()):
+    print("You are not in the correct directory.")
+    print("Expected:", currentDirectory)
+    print("Got:     ", os.getcwd())
+    sys.exit()
+
+if currentDirectory not in sys.path:
+    sys.path.append(currentDirectory)
+
+from setuputils.generic import *
+from setuputils.addon_files import *
+from setuputils.task import GenerateFileTask
+from setuputils.cythonize import execute_Cythonize
+from setuputils.compilation import execute_Compile
+from setuputils.copy_addon import execute_CopyAddon
+from setuputils.pypreprocess import execute_PyPreprocess
+from setuputils.setup_info_files import getSetupInfoList
+from setuputils.export import execute_Export, execute_ExportC
+
+addonDirectory = os.path.join(currentDirectory, "animation_nodes")
 summaryPath = os.path.join(currentDirectory, "setup_summary.json")
 defaultConfigPath = os.path.join(currentDirectory, "conf.default.json")
 configPath = os.path.join(currentDirectory, "conf.json")
-compilationInfoPath = os.path.join(addonDirectory, "compilation_info.json")
 exportPath = os.path.join(currentDirectory, "animation_nodes.zip")
 exportCPath = os.path.join(currentDirectory, "animation_nodes_c.zip")
 exportCSetupPath = os.path.join(currentDirectory, "_export_c_setup.py")
@@ -34,6 +52,10 @@ buildOptionDescriptions = [
 ]
 buildOptions = {option for option, _ in buildOptionDescriptions}
 helpNote = "Use 'python setup.py help' to see the possible commands."
+
+
+# Main
+####################################################
 
 def main():
     configs = setupConfigFile()
@@ -63,6 +85,10 @@ def setupConfigFile():
         '''))
     return readJsonFile(configPath)
 
+
+# Help
+####################################################
+
 def main_Help():
     print(textwrap.dedent('''\
     usage: python setup.py <command> [options]
@@ -76,6 +102,10 @@ def main_Help():
     for option, description in buildOptionDescriptions:
         print("    {:20}{}".format(option, description))
 
+
+# Build
+####################################################
+
 def main_Build(options):
     checkBuildEnvironment(
         checkCython = True,
@@ -87,20 +117,23 @@ def main_Build(options):
         main_Clean()
 
     logger = Logger()
-    setupInfoList = getSetupInfoList()
-    execute_PyPreprocess(setupInfoList, logger)
-    execute_Cythonize(setupInfoList, logger)
+    setupInfoList = getSetupInfoList(addonDirectory)
+
+    execute_PyPreprocess(setupInfoList, logger, addonDirectory)
+    execute_Cythonize(setupInfoList, logger, addonDirectory)
+
     if "--nocompile" not in options:
-        execute_Compile(setupInfoList, logger)
+        execute_Compile(setupInfoList, logger, addonDirectory)
     if "--copy" in options:
-        execute_CopyAddon(logger)
+        execute_CopyAddon(addonDirectory, "C:\\Users\\jacques\\AppData\\Roaming\\Blender Foundation\\Blender\\2.78\\scripts\\addons\\animation_nodes")
+
     execute_PrintSummary(logger)
     execute_SaveSummary(logger)
 
     if "--export" in options:
-        execute_Export()
+        execute_Export(addonDirectory, exportPath)
     if "--exportc" in options:
-        execute_ExportC()
+        execute_ExportC(addonDirectory, exportCPath, exportCSetupPath)
 
 def checkBuildEnvironment(checkCython, checkPython):
     if checkCython:
@@ -136,6 +169,10 @@ def checkBuildOptions(options):
             print("The options --nocompile and --export don't work together.")
             sys.exit()
 
+
+# Clean
+####################################################
+
 def main_Clean():
     if not fileExists(summaryPath):
         print("No summary of previous compilation found.")
@@ -152,116 +189,6 @@ def main_Clean():
         removeDirectory(buildDirectory)
         print("Removed build directory")
 
-
-# PyProprocess
-###########################################
-
-def execute_PyPreprocess(setupInfoList, logger):
-    printHeader("Run PyPreprocessor")
-
-    tasks = getPyPreprocessTasks(setupInfoList)
-    for task in tasks:
-        logger.logPyPreprocessTask(task)
-        task.execute()
-        if task.targetChanged:
-            print("Updated:", os.path.relpath(task.target, addonDirectory))
-
-def getPyPreprocessTasks(setupInfoList):
-    allTasks = []
-    for path in getPyPreprocessorProviders(setupInfoList):
-        allTasks.extend(getPyPreprocessTasksOfFile(path))
-    return allTasks
-
-def getPyPreprocessTasksOfFile(path):
-    obj = executePythonFile(path)
-
-    if "setup" in obj:
-        obj["setup"](Utils)
-
-    funcName = "getPyPreprocessTasks"
-    if funcName not in obj:
-        raise Exception("expected '{}' function in {}".format(funcName, path))
-
-    tasks = obj[funcName](PyPreprocessTask, Utils)
-    if not all(isinstance(p, PyPreprocessTask) for p in tasks):
-        raise Exception("no list of {} objects returned".format(PyPreprocessTask.__name__))
-    return tasks
-
-def getPyPreprocessorProviders(setupInfoList):
-    paths = []
-    func = "getPyPreprocessorProviders"
-    for info in setupInfoList:
-        if func in info:
-            for name in info[func]():
-                path = changeFileName(info["__file__"], name)
-                paths.append(path)
-    return paths
-
-
-# Cythonize
-###########################################
-
-def execute_Cythonize(setupInfoList, logger):
-    printHeader("Run Cythonize")
-    tasks = getCythonizeTasks()
-    for i, task in enumerate(tasks, 1):
-        print("{}/{}:".format(i, len(tasks)))
-        logger.logCythonizeTask(task)
-        task.execute()
-
-def getCythonizeTasks():
-    tasks = []
-    for path in iterCythonFilePaths():
-        tasks.append(CythonizeTask(path))
-    return tasks
-
-def iterCythonFilePaths():
-    yield from iterPathsWithExtension(addonDirectory, ".pyx")
-
-
-# Compile
-###########################################
-
-def execute_Compile(setupInfoList, logger):
-    printHeader("Compile")
-    tasks = getCompileTasks()
-    for i, task in enumerate(tasks, 1):
-        print("{}/{}:".format(i, len(tasks)))
-        logger.logCompilationTask(task)
-        task.execute()
-
-    compilationInfo = getPlatformSummary()
-    writeJsonFile(compilationInfoPath, compilationInfo)
-    logger.logGeneratedFile(compilationInfoPath)
-
-def getCompileTasks():
-    tasks = []
-    for path in iterFilesToCompile():
-        tasks.append(CompileExtModuleTask(path))
-    return tasks
-
-def iterFilesToCompile():
-    for path in iterPathsWithExtension(addonDirectory, ".pyx"):
-        yield changeFileExtension(path, ".c")
-
-
-# Copy Addon
-###########################################
-
-def execute_CopyAddon(logger):
-    printHeader("Copy Addon")
-    targetPath = "C:\\Users\\jacques\\AppData\\Roaming\\Blender Foundation\\Blender\\2.78\\scripts\\addons\\animation_nodes"
-    changes = syncDirectories(addonDirectory, targetPath, iterRelativeAddonFiles)
-
-    for path in changes["removed"]:
-        print("Removed:", os.path.relpath(path, targetPath))
-    for path in changes["updated"]:
-        print("Updated:", os.path.relpath(path, targetPath))
-    for path in changes["created"]:
-        print("Created:", os.path.relpath(path, targetPath))
-
-    totalChanged = sum(len(l) for l in changes.values())
-    print("\nModified {} files.".format(totalChanged))
 
 # Summary
 ###########################################
@@ -302,70 +229,9 @@ def getCythonizeSummary(logger):
 def getCompilationSummary(logger):
     return [task.getSummary() for task in logger.compilationTasks]
 
-def getPlatformSummary():
-    import Cython
-    return {
-        "sys.version" : sys.version,
-        "sys.platform" : sys.platform,
-        "sys.api_version" : sys.api_version,
-        "sys.version_info" : sys.version_info,
-        "os.name" : os.name,
-        "Cython.__version__" : Cython.__version__
-    }
 
-# Export
-###########################################
 
-def execute_Export():
-    removeFile(exportPath)
-
-    with zipfile.ZipFile(exportPath, "w", zipfile.ZIP_DEFLATED) as zipFile:
-        for relativePath in iterRelativeAddonFiles(addonDirectory):
-            absolutePath = os.path.join(addonDirectory, relativePath)
-            zipFile.write(absolutePath, os.path.join(addonName, relativePath))
-
-    print("Exported Addon:")
-    print("    " + exportPath)
-
-def execute_ExportC():
-    removeFile(exportCPath)
-
-    with zipfile.ZipFile(exportCPath, "w", zipfile.ZIP_DEFLATED) as zipFile:
-        for relativePath in iterRelativeExportCFiles(addonDirectory):
-            absolutePath = os.path.join(addonDirectory, relativePath)
-            zipFile.write(absolutePath, os.path.join(addonName, relativePath))
-
-        setupInfo = getExportCSetupInfo()
-        tmpPath = os.path.join(currentDirectory, "tmp.json")
-        writeJsonFile(tmpPath, setupInfo)
-        zipFile.write(tmpPath, "setup_info.json")
-        removeFile(tmpPath)
-
-        zipFile.write(exportCSetupPath, "setup.py")
-
-    print("Exported C Build:")
-    print("    " + exportCPath)
-
-def getExportCSetupInfo():
-    import Cython
-    return {
-        "Extensions" : getExportCExtensionsInfo(),
-        "Cython.__version__" : Cython.__version__
-    }
-
-def getExportCExtensionsInfo():
-    extensionsInfo = []
-    for task in getCompileTasks():
-        extension = getExtensionFromPath(task.path)
-        sources = [os.path.relpath(path, currentDirectory) for path in extension.sources]
-        info = {
-            "Module Name" : extension.name,
-            "Sources" : [splitPath(path) for path in sources]
-        }
-        extensionsInfo.append(info)
-    return extensionsInfo
-
-# Tasks
+# Logger
 ###########################################
 
 class Logger:
@@ -401,371 +267,6 @@ class Logger:
 
     def getAllTasks(self):
         return self.pyPreprocessTasks + self.cythonizeTasks + self.compilationTasks
-
-class GenerateFileTask:
-    def __init__(self, target = None, targetChanged = False):
-        self.target = target
-        self.targetChanged = targetChanged
-
-    def getSummary(self):
-        return None
-
-class PyPreprocessTask(GenerateFileTask):
-    def __init__(self, target, dependencies, function):
-        super().__init__()
-        self.target = target
-        self.dependencies = dependencies
-        self.function = function
-
-    def execute(self):
-        for path in self.dependencies:
-            if not fileExists(path):
-                raise Exception("file not found: " + path)
-
-        if dependenciesChanged(self.target, self.dependencies):
-            self.function(self.target, Utils)
-            self.targetChanged = True
-
-        if not fileExists(self.target):
-            raise Exception("target has not been generated: " + self.target)
-
-    def getSummary(self):
-        return {
-            "Target" : self.target,
-            "Dependencies" : self.dependencies,
-            "Changed" : self.targetChanged
-        }
-
-    def __repr__(self):
-        return "<{} for '{}' depends on '{}'>".format(
-            type(self).__name__, self.target, self.dependencies)
-
-class CythonizeTask(GenerateFileTask):
-    def __init__(self, path):
-        super().__init__()
-        self.path = path
-        self.target = changeFileExtension(path, ".c")
-
-    def execute(self):
-        from Cython.Build import cythonize
-
-        timeBefore = tryGetLastModificationTime(self.target)
-        cythonize(self.path)
-        timeAfter = tryGetLastModificationTime(self.target)
-
-        if not fileExists(self.target):
-            raise Exception("target has not been generated: " + self.target)
-
-        if timeAfter > timeBefore:
-            self.targetChanged = True
-
-    def getSummary(self):
-        return {
-            "Path" : self.path,
-            "Target" : self.target,
-            "Changed" : self.targetChanged
-        }
-
-    def __repr__(self):
-        return "<{} for '{}'>".format(type(self).__name__, self.target)
-
-class CompileExtModuleTask(GenerateFileTask):
-    def __init__(self, path):
-        super().__init__()
-        self.path = path
-        self.target = None
-
-    def execute(self):
-        extension = getExtensionFromPath(self.path)
-        targetsBefore = getPossibleCompiledFilesWithTime(self.path)
-        buildExtensionInplace(extension)
-        targetsAfter = getPossibleCompiledFilesWithTime(self.path)
-        newTargets = set(targetsAfter) - set(targetsBefore)
-
-        if len(targetsAfter) == 0:
-            raise Exception("target has not been generated for " + self.path)
-        elif len(newTargets) == 0:
-            self.target = max(targetsAfter, key = lambda x: x[1])[0]
-        elif len(newTargets) == 1:
-            self.target = newTargets.pop()[0]
-            self.targetChanged = True
-        else:
-            raise Exception("cannot choose the correct target for " + self.path)
-
-    def getSummary(self):
-        return {
-            "Path" : self.path,
-            "Target" : self.target,
-            "Changed" : self.targetChanged
-        }
-
-def getPossibleCompiledFilesWithTime(cpath):
-    directory = os.path.dirname(cpath)
-    name = getFileNameWithoutExtension(cpath)
-    pattern = os.path.join(directory, name) + ".*"
-    paths = glob.glob(pattern + ".pyd") + glob.glob(pattern + ".so")
-    return [(path, tryGetLastModificationTime(path)) for path in paths]
-
-def getExtensionFromPath(path):
-    from distutils.core import Extension
-    metadata = getCythonMetadata(path)
-    return Extension(metadata["module_name"], [path])
-
-def buildExtensionInplace(extension):
-    from distutils.core import setup
-    oldArgs = sys.argv
-    sys.argv = [oldArgs[0], "build_ext", "--inplace"]
-    setup(ext_modules = [extension])
-    sys.argv = oldArgs
-
-
-# Iterate Addon Files
-###########################################
-
-def iterRelativeAddonFiles(basepath):
-    for root, dirs, files in os.walk(basepath, topdown = True):
-        for directory in dirs:
-            if isAddonDirectoryIgnored(directory):
-                dirs.remove(directory)
-        for filename in files:
-            if not isAddonFileIgnored(filename):
-                fullpath = os.path.join(root, filename)
-                yield os.path.relpath(fullpath, basepath)
-
-def iterRelativeExportCFiles(basepath):
-    for root, dirs, files in os.walk(basepath, topdown = True):
-        for directory in dirs:
-            if isAddonDirectoryIgnored(directory):
-                dirs.remove(directory)
-        for filename in files:
-            if not isExportCFileIgnored(filename):
-                fullpath = os.path.join(root, filename)
-                yield os.path.relpath(fullpath, basepath)
-
-def isAddonDirectoryIgnored(name):
-    return name in {".git", "__pycache__"}
-
-def isAddonFileIgnored(name):
-    extensions = [".src", ".pxd", ".pyx", ".html", ".c"]
-    names = {".gitignore", "__setup_info.py"}
-    return any(name.endswith(ext) for ext in extensions) or name in names
-
-def isExportCFileIgnored(name):
-    extensions = [".src", ".pxd", ".pyx", ".html", ".so", ".pyd"]
-    names = {".gitignore", "__setup_info.py", "compilation_info.json"}
-    return any(name.endswith(ext) for ext in extensions) or name in names
-
-
-# Higher Level Utils
-###########################################
-
-def getSetupInfoList():
-    setupInfoList = []
-    for path in iterSetupInfoPaths():
-        setupInfoList.append(executePythonFile(path))
-    return setupInfoList
-
-def iterSetupInfoPaths():
-    return iterPathsWithFileName(addonDirectory, "__setup_info.py")
-
-def getCythonMetadata(path):
-    text = readLinesBetween(path, "BEGIN: Cython Metadata", "END: Cython Metadata")
-    return json.loads(text)
-
-def syncDirectories(source, target, relpathSelector):
-    if not directoryExists(target):
-        os.mkdir(target)
-
-    existingFilesInSource = set(relpathSelector(source))
-    existingFilesInTarget = set(relpathSelector(target))
-
-    removedFiles = []
-    createdFiles = []
-    updatedFiles = []
-
-    filesToRemove = existingFilesInTarget - existingFilesInSource
-    for relativePath in filesToRemove:
-        path = os.path.join(target, relativePath)
-        removeFile(path)
-        removedFiles.append(path)
-
-    filesToCreate = existingFilesInSource - existingFilesInTarget
-    for relativePath in filesToCreate:
-        sourcePath = os.path.join(source, relativePath)
-        targetPath = os.path.join(target, relativePath)
-        copyFile(sourcePath, targetPath)
-        createdFiles.append(targetPath)
-
-    filesToUpdate = existingFilesInSource.intersection(existingFilesInTarget)
-    for relativePath in filesToUpdate:
-        sourcePath = os.path.join(source, relativePath)
-        targetPath = os.path.join(target, relativePath)
-        lastSourceModification = tryGetLastModificationTime(sourcePath)
-        lastTargetModification = tryGetLastModificationTime(targetPath)
-        if lastSourceModification > lastTargetModification:
-            overwriteFile(sourcePath, targetPath)
-            updatedFiles.append(targetPath)
-
-    return {
-        "removed" : removedFiles,
-        "created" : createdFiles,
-        "updated" : updatedFiles
-    }
-
-
-# Utils
-############################################
-
-def printHeader(text):
-    print()
-    print()
-    print(text)
-    print("-"*50)
-    print()
-
-def executePythonFile(path):
-    code = readTextFile(path)
-    context = {"__file__" : path}
-    exec(code, context)
-    return context
-
-def iterPathsWithExtension(basepath, extension):
-    extensions = setOfStrings(extension)
-    for root, dirs, files in os.walk(basepath):
-        for filename in files:
-            _, ext = os.path.splitext(filename)
-            if ext in extensions:
-                yield os.path.join(root, filename)
-
-def setOfStrings(strings):
-    if isinstance(strings, str):
-        return {strings}
-    else:
-        return set(strings)
-
-def iterPathsWithFileName(basepath, filename):
-    for root, dirs, files in os.walk(basepath):
-        if filename in files:
-            yield os.path.join(root, filename)
-
-def overwriteFile(source, target):
-    removeFile(target)
-    copyFile(source, target)
-
-def copyFile(source, target):
-    directory = os.path.dirname(target)
-    if not directoryExists(directory):
-        os.makedirs(directory)
-    shutil.copyfile(source, target)
-
-def removeFile(path):
-    try:
-        os.remove(path)
-    except:
-        if tryGetFileAccessPermission(path):
-            os.remove(path)
-
-def removeDirectory(path):
-    try: shutil.rmtree(path, onerror = handlePermissionError)
-    except FileNotFoundError: pass
-
-def handlePermissionError(func, path, exc):
-    if tryGetFileAccessPermission(path):
-        func(path)
-    else:
-        raise
-
-def tryGetFileAccessPermission(path):
-    try:
-        if os.access(path, os.W_OK):
-            return False
-        else:
-            os.chmod(path, stat.S_IWUSR)
-            return True
-    except:
-        return False
-
-def readTextFile(path):
-    with open(path, "rt") as f:
-        return f.read()
-
-def writeTextFile(path, content):
-    with open(path, "wt") as f:
-        f.write(content)
-
-def readJsonFile(path):
-    return json.loads(readTextFile(path))
-
-def writeJsonFile(path, content):
-    writeTextFile(path, json.dumps(content, sort_keys = True, indent = 2))
-
-def changeFileName(path, newName):
-    return os.path.join(os.path.dirname(path), newName)
-
-def changeFileExtension(path, newExtension):
-    return os.path.splitext(path)[0] + newExtension
-
-def filesExist(paths):
-    assert all(fileExists(path) for path in paths)
-
-def fileExists(path):
-    return os.path.isfile(path)
-
-def directoryExists(path):
-    return os.path.isdir(path)
-
-def dependenciesChanged(target, dependencies):
-    targetTime = tryGetLastModificationTime(target)
-    for path in dependencies:
-        if tryGetLastModificationTime(path) > targetTime:
-            return True
-    return False
-
-def getNewestPath(paths):
-    pathsWithTime = [(path, tryGetLastModificationTime(path)) for path in paths]
-    return max(pathsWithTime, key = lambda x: x[1])[0]
-
-def tryGetLastModificationTime(path):
-    try: return os.stat(path).st_mtime
-    except: return 0
-
-def getFileNameWithoutExtension(path):
-    return os.path.basename(os.path.splitext(path)[0])
-
-def splitPath(path):
-    return pathlib.PurePath(path).parts
-
-def multiReplace(text, **replacements):
-    pattern = "|".join(re.escape(key) for key in replacements.keys())
-    return re.sub(pattern, lambda m: replacements[m.group(0)], text)
-
-def readLinesBetween(path, start, stop):
-    lines = []
-    with open(path, "rt") as f:
-        while True:
-            line = f.readline()
-            if line == "":
-                raise Exception("Line containing '{}' not found".format(start))
-            if start in line:
-                break
-
-        while True:
-            line = f.readline()
-            if line == "":
-                raise Exception("Line containing '{}' not found".format(stop))
-            if stop not in line:
-                lines.append(line)
-            else:
-                break
-    return "".join(lines)
-
-
-class Utils:
-    readTextFile = readTextFile
-    writeTextFile = writeTextFile
-    readJsonFile = readJsonFile
-    changeFileName = changeFileName
-    multiReplace = multiReplace
 
 
 # Run Main
