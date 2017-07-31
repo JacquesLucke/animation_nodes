@@ -1,6 +1,6 @@
-cpdef TARGETLIST toTARGETLIST(NumericList sourceList):
+def toTARGETLIST(NumericList sourceList):
     cdef TARGETLIST newList = TARGETLIST(sourceList.length)
-    cdef unsigned long i
-    for i in range(len(sourceList)):
+    cdef Py_ssize_t i
+    for i in range(sourceList.length):
             newList.data[i] = <TYPE>sourceList.data[i]
     return newList
