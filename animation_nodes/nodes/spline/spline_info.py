@@ -29,19 +29,17 @@ class SplineInfoNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "splineType", text = "")
 
     def getExecutionCode(self, required):
-        isLinked = self.getLinkedOutputsDict()
-
-        if isLinked["points"]:
+        if "points" in required:
             yield "points = spline.points"
-        if isLinked["radii"]:
+        if "radii" in required:
             yield "radii = DoubleList.fromValues(spline.radii)"
-        if isLinked["cyclic"]:
+        if "cyclic" in required:
             yield "cyclic = spline.cyclic"
-        if isLinked["pointAmount"]:
+        if "pointAmount" in required:
             yield "pointAmount = len(spline.points)"
 
         if self.splineType == "BEZIER":
-            if isLinked["leftHandles"]:
+            if "leftHandles" in required:
                 yield "leftHandles = spline.leftHandles if spline.type == 'BEZIER' else Vector3DList()"
-            if isLinked["rightHandles"]:
+            if "rightHandles" in required:
                 yield "rightHandles = spline.rightHandles if spline.type == 'BEZIER' else Vector3DList()"

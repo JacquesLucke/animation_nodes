@@ -17,18 +17,18 @@ class IntersectLinePlaneNode(bpy.types.Node, AnimationNode):
         self.newOutput("Boolean", "Is Valid", "isValid")
 
     def getExecutionCode(self, required):
-        isLinked = self.getLinkedOutputsDict()
-        if not any(isLinked.values()): return
+        if len(required) == 0:
+            return
 
         yield "if planeNormal.length_squared == 0: planeNormal = Vector((0, 0, 1))"
         yield "_intersection = mathutils.geometry.intersect_line_plane(lineStart, lineEnd, planePoint, planeNormal, False)"
 
         yield "if _intersection is None:"
-        if isLinked["intersection"]: yield "    intersection = Vector((0, 0, 0))"
-        if isLinked["isValid"]:      yield "    isValid = False"
+        if "intersection" in required: yield "    intersection = Vector((0, 0, 0))"
+        if "isValid" in required:      yield "    isValid = False"
         yield "else:"
-        if isLinked["intersection"]: yield "    intersection = _intersection"
-        if isLinked["isValid"]:      yield "    isValid = True"
+        if "intersection" in required: yield "    intersection = _intersection"
+        if "isValid" in required:      yield "    isValid = True"
 
     def getUsedModules(self):
         return ["mathutils"]

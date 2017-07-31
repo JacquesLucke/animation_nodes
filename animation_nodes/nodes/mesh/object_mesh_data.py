@@ -24,29 +24,29 @@ class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
         self.newOutput("Text", "Mesh Name", "meshName", hide = True)
 
     def getExecutionCode(self, required):
-        isLinked = self.getLinkedOutputsDict()
-        if not any(isLinked.values()): return
+        if len(required) == 0:
+            return
 
         yield "meshName = ''"
         yield "mesh = object.an.getMesh(scene, useModifiers) if object else None"
         yield "if mesh is not None:"
         yield "    meshName = mesh.name"
 
-        if isLinked["vertexLocations"]:
+        if "vertexLocations" in required:
             yield "    vertexLocations = self.getVertexLocations(mesh, object, useWorldSpace)"
-        if isLinked["edgeIndices"]:
+        if "edgeIndices" in required:
             yield "    edgeIndices = mesh.an.getEdgeIndices()"
-        if isLinked["polygonIndices"]:
+        if "polygonIndices" in required:
             yield "    polygonIndices = mesh.an.getPolygonIndices()"
-        if isLinked["vertexNormals"]:
+        if "vertexNormals" in required:
             yield "    vertexNormals = self.getVertexNormals(mesh, object, useWorldSpace)"
-        if isLinked["polygonNormals"]:
+        if "polygonNormals" in required:
             yield "    polygonNormals = self.getPolygonNormals(mesh, object, useWorldSpace)"
-        if isLinked["polygonCenters"]:
+        if "polygonCenters" in required:
             yield "    polygonCenters = self.getPolygonCenters(mesh, object, useWorldSpace)"
-        if isLinked["localPolygonAreas"]:
+        if "localPolygonAreas" in required:
             yield "    localPolygonAreas = mesh.an.getPolygonAreas()"
-        if isLinked["materialIndices"]:
+        if "materialIndices" in required:
             yield "    materialIndices = mesh.an.getPolygonMaterialIndices()"
 
         yield "    if mesh.users == 0: bpy.data.meshes.remove(mesh)"

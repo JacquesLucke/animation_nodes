@@ -11,10 +11,10 @@ class FCurveInfoNode(bpy.types.Node, AnimationNode):
         self.newOutput("Integer", "Array Index", "arrayIndex")
 
     def getExecutionCode(self, required):
-        isLinked = self.getLinkedOutputsDict()
-        if not any(isLinked.values()): return
+        if len(required) == 0:
+            return
 
         yield "if fCurve is not None:"
-        if isLinked["dataPath"]:   yield "    dataPath = fCurve.data_path"
-        if isLinked["arrayIndex"]: yield "    arrayIndex = fCurve.array_index"
+        if "dataPath" in required:   yield "    dataPath = fCurve.data_path"
+        if "arrayIndex" in required: yield "    arrayIndex = fCurve.array_index"
         yield "else: dataPath, arrayIndex = '', 0"

@@ -18,13 +18,13 @@ class IntersectPlanePlaneNode(bpy.types.Node, AnimationNode):
         self.newOutput("Boolean", "Is Valid", "isValid")
 
     def getExecutionCode(self, required):
-        isLinked = self.getLinkedOutputsDict()
-        if not any(isLinked.values()): return
+        if len(required) == 0:
+            return
 
-        intersection  = isLinked["intersection"]
-        direction  = isLinked["direction"]
-        angle  = isLinked["angle"]
-        isValid = isLinked["isValid"]
+        intersection  = "intersection" in required
+        direction  = "direction" in required
+        angle  = "angle" in required
+        isValid = "isValid" in required
 
         yield "if normal1[:] == (0,0,0): normal1 = Vector((0, 0, 1))"
         yield "if normal2[:] == (0,0,0): normal2 = Vector((0, 0, 1))"

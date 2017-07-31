@@ -17,12 +17,12 @@ class IntersectSpherePlaneNode(bpy.types.Node, AnimationNode):
         self.newOutput("Boolean", "Is Valid", "isValid", hide = True)
 
     def getExecutionCode(self, required):
-        isLinked = self.getLinkedOutputsDict()
-        if not any(isLinked.values()): return ""
+        if len(required) == 0:
+            return
 
-        center  = isLinked["center"]
-        radius  = isLinked["radius"]
-        isValid = isLinked["isValid"]
+        center  = "center" in required
+        radius  = "radius" in required
+        isValid = "isValid" in required
 
         yield "dist = mathutils.geometry.distance_point_to_plane(sphereCenter, point, normal)"
 

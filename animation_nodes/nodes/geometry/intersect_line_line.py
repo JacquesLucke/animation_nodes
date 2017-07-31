@@ -18,19 +18,19 @@ class IntersectLineLineNode(bpy.types.Node, AnimationNode):
         self.newOutput("Boolean", "Is Valid", "isValid")
 
     def getExecutionCode(self, required):
-        isLinked = self.getLinkedOutputsDict()
-        if not any(isLinked.values()): return
+        if len(required) == 0:
+            return
 
         yield "closestPoints = mathutils.geometry.intersect_line_line(lineStart1, lineEnd1, lineStart2, lineEnd2)"
 
         yield "if closestPoints is None:"
-        if isLinked["closest1"]: yield "    closest1 = Vector((0, 0, 0))"
-        if isLinked["closest2"]: yield "    closest2 = Vector((0, 0, 0))"
-        if isLinked["isValid"]:  yield "    isValid = False"
+        if "closest1" in required: yield "    closest1 = Vector((0, 0, 0))"
+        if "closest2" in required: yield "    closest2 = Vector((0, 0, 0))"
+        if "isValid" in required:  yield "    isValid = False"
         yield "else:"
-        if isLinked["closest1"]: yield "    closest1 = closestPoints[0]"
-        if isLinked["closest2"]: yield "    closest2 = closestPoints[1]"
-        if isLinked["isValid"]:  yield "    isValid = True"
+        if "closest1" in required: yield "    closest1 = closestPoints[0]"
+        if "closest2" in required: yield "    closest2 = closestPoints[1]"
+        if "isValid" in required:  yield "    isValid = True"
 
     def getUsedModules(self):
         return ["mathutils"]

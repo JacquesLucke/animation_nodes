@@ -18,13 +18,13 @@ class IntersectSphereSphereNode(bpy.types.Node, AnimationNode):
         self.newOutput("Boolean", "Is Valid", "isValid", hide = True)
 
     def getExecutionCode(self, required):
-        isLinked = self.getLinkedOutputsDict()
-        if not any(isLinked.values()): return ""
+        if len(required) == 0:
+            return
 
-        center  = isLinked["center"]
-        normal  = isLinked["normal"]
-        radius  = isLinked["radius"]
-        isValid = isLinked["isValid"]
+        center  = "center" in required
+        normal  = "normal" in required
+        radius  = "radius" in required
+        isValid = "isValid" in required
 
         yield "if center1 == center2: "
         if center : yield "    center = Vector((0,0,0))"

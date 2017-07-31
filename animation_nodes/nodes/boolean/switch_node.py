@@ -29,6 +29,5 @@ class SwitchNode(bpy.types.Node, AnimationNode):
         self.assignedType = dataType
 
     def getExecutionCode(self, required):
-        isLinked = self.getLinkedOutputsDict()
-        if isLinked["output"]: yield "output = ifTrue if condition else ifFalse"
-        if isLinked["other"]:  yield "other = ifFalse if condition else ifTrue"
+        if "output" in required: yield "output = ifTrue if condition else ifFalse"
+        if "other" in required:  yield "other = ifFalse if condition else ifTrue"

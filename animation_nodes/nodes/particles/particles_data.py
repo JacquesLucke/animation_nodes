@@ -48,12 +48,11 @@ class ParticleSystemParticlesDataNode(bpy.types.Node, VectorizedNode):
         row.prop(self, "includeDead", text = "Dead", toggle = True)
 
     def getExecutionCode(self, required):
-        isLinked = self.getLinkedOutputsDict()
         if not self.useParticleSystemList:
             yield "particleSystems = [particleSystem]"
 
         for identifier, attribute, CListType in executionData:
-            if isLinked[identifier]:
+            if identifier in required:
                 yield "{} = {}()".format(identifier, CListType.__name__)
 
         yield "for system in particleSystems:"
@@ -62,13 +61,13 @@ class ParticleSystemParticlesDataNode(bpy.types.Node, VectorizedNode):
 
         yield "    _mask = self.getParticlesMask(system.particles)"
         for identifier, attribute, CListType in executionData:
-            if not isLinked[identifier]: continue
+            if not identifier in required: continue
             yield "    values = self.getParticleProperties(system, '{}', {}, _mask)".format(attribute, CListType.__name__)
             yield "    {}.extend(values)".format(identifier)
 
         # convert FloatList to DoubleList
         for identifier, attribute, CListType in executionData:
-            if isLinked[identifier]:
+            if identifier in required:
                 if CListType is FloatList:
                     yield "{0} = DoubleList.fromValues({0})".format(identifier)
 

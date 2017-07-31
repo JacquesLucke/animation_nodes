@@ -18,9 +18,8 @@ class SeparateVectorNode(bpy.types.Node, VectorizedNode):
                 (axis, axis.lower()), (axis, axis.lower()))
 
     def getExecutionCode(self, required):
-        isLinked = self.getLinkedOutputsDict()
         for i, axis in enumerate("xyz"):
-            if isLinked[axis]:
+            if axis in required:
                 if self.useList:
                     yield "{0} = self.getAxisList(vectors, '{0}')".format(axis)
                 else:
