@@ -13,6 +13,8 @@ addonName = "animation_nodes"
 currentDirectory = os.path.dirname(os.path.abspath(__file__))
 addonDirectory = os.path.join(currentDirectory, addonName)
 summaryPath = os.path.join(currentDirectory, "setup_summary.json")
+defaultConfigPath = os.path.join(currentDirectory, "conf.default.json")
+configPath = os.path.join(currentDirectory, "conf.json")
 assert os.path.isdir(addonDirectory)
 
 class SetupOptions:
@@ -29,7 +31,7 @@ setupOptions = SetupOptions()
 possibleCommands = ["build", "clean", "help"]
 
 buildOptionDescriptions = [
-    ("--copy", "Copy build to location specified in the config.py file"),
+    ("--copy", "Copy build to location specified in the conf.json file"),
     ("--force", "Rebuild everything"),
     ("--export", "Create installable .zip file"),
     ("--exportc", "Create build that can be compiled without cython"),
@@ -40,6 +42,8 @@ buildOptions = {option for option, _ in buildOptionDescriptions}
 helpNote = "Use 'python setup.py help' to see the possible commands."
 
 def main():
+    configs = setupConfigFile()
+    print(configs)
     args = sys.argv[1:]
     if len(args) == 0 or args[0] == "help":
         main_Help()
@@ -51,6 +55,20 @@ def main():
         print("Invalid command: '{}'\n".format(args[0]))
         print(helpNote)
         sys.exit()
+
+def setupConfigFile():
+    if not fileExists(defaultConfigPath):
+        print("Expected conf.default.json file to exist.")
+        sys.exit()
+    if not fileExists(configPath):
+        copyFile(defaultConfigPath, configPath)
+        print(textwrap.dedent('''\
+        Copied the conf.default.json file to conf.json.
+        Please change it manually if needed.
+        Note: git ignorers it, so depending on the settings of your editor
+              it might not be shows inside it.
+        '''))
+    return readJsonFile(configPath)
 
 def main_Help():
     print(textwrap.dedent('''\
