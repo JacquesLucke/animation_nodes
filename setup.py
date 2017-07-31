@@ -6,6 +6,7 @@ import stat
 import json
 import glob
 import shutil
+import zipfile
 import textwrap
 import contextlib
 
@@ -16,6 +17,7 @@ summaryPath = os.path.join(currentDirectory, "setup_summary.json")
 defaultConfigPath = os.path.join(currentDirectory, "conf.default.json")
 configPath = os.path.join(currentDirectory, "conf.json")
 compilationInfoPath = os.path.join(addonDirectory, "compilation_info.json")
+exportPath = os.path.join(currentDirectory, "animation_nodes.zip")
 assert os.path.isdir(addonDirectory)
 
 possibleCommands = ["build", "clean", "help"]
@@ -33,7 +35,6 @@ helpNote = "Use 'python setup.py help' to see the possible commands."
 
 def main():
     configs = setupConfigFile()
-    print(configs)
     args = sys.argv[1:]
     if len(args) == 0 or args[0] == "help":
         main_Help()
@@ -94,6 +95,9 @@ def main_Build(options):
     execute_PrintSummary(logger)
     execute_SaveSummary(logger)
 
+    if "--export" in options:
+        execute_Export()
+
 def checkBuildEnvironment(checkCython, checkPython):
     if checkCython:
         try: import Cython
@@ -132,10 +136,20 @@ def main_Clean():
     if not fileExists(summaryPath):
         print("No summary of previous compilation found.")
         sys.exit()
+
     summary = readJsonFile(summaryPath)
     for path in summary["Generated Files"]:
-        removeFile(path)
-        print("Removed:", path)
+        if fileExists(path):
+            removeFile(path)
+            print("Removed:", path)
+
+    buildDirectory = os.path.join(currentDirectory, "build")
+    if directoryExists(buildDirectory):
+        removeDirectory(buildDirectory)
+        print("Removed build directory")
+
+    removeFile(summaryPath)
+    print("Removed last build summary")
 
 
 # PyProprocess
@@ -189,7 +203,8 @@ def getPyPreprocessorProviders(setupInfoList):
 def execute_Cythonize(setupInfoList, logger):
     printHeader("Run Cythonize")
     tasks = getCythonizeTasks()
-    for task in tasks:
+    for i, task in enumerate(tasks, 1):
+        print("{}/{}:".format(i, len(tasks)))
         logger.logCythonizeTask(task)
         task.execute()
 
@@ -209,7 +224,8 @@ def iterCythonFilePaths():
 def execute_Compile(setupInfoList, logger):
     printHeader("Compile")
     tasks = getCompileTasks()
-    for task in tasks:
+    for i, task in enumerate(tasks, 1):
+        print("{}/{}:".format(i, len(tasks)))
         logger.logCompilationTask(task)
         task.execute()
 
@@ -313,6 +329,20 @@ def getPlatformSummary():
         "os.name" : os.name,
         "Cython.__version__" : Cython.__version__
     }
+
+# Export
+###########################################
+
+def execute_Export():
+    removeFile(exportPath)
+
+    with zipfile.ZipFile(exportPath, "w", zipfile.ZIP_DEFLATED) as zipFile:
+        for relativePath in iterRelativeAddonFiles(addonDirectory):
+            absolutePath = os.path.join(addonDirectory, relativePath)
+            zipFile.write(absolutePath, os.path.join(addonName, relativePath))
+
+    print("Exported Addon:")
+    print("    " + exportPath)
 
 
 # Tasks
@@ -578,10 +608,23 @@ def removeFile(path):
         if tryGetFileAccessPermission(path):
             os.remove(path)
 
+def removeDirectory(path):
+    try: shutil.rmtree(path, onerror = handlePermissionError)
+    except FileNotFoundError: pass
+
+def handlePermissionError(func, path, exc):
+    if tryGetFileAccessPermission(path):
+        func(path)
+    else:
+        raise
+
 def tryGetFileAccessPermission(path):
     try:
-        os.chmod(path, stat.S_IWUSR)
-        return True
+        if os.access(path, os.W_OK):
+            return False
+        else:
+            os.chmod(path, stat.S_IWUSR)
+            return True
     except:
         return False
 
