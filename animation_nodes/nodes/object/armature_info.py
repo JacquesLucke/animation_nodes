@@ -33,13 +33,13 @@ class ArmatureInfoNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "state")
 
     def getExecutionCode(self, required):
-        isLinked = self.getLinkedOutputsDict()
-        if not any(isLinked.values()): return
+        if len(required) == 0:
+            return
 
-        loadMatrices = isLinked["matrices"]
-        headsAndTailsRequired = isLinked["directions"] or isLinked["lengths"] or isLinked["centers"]
-        loadHeads = isLinked["heads"] or headsAndTailsRequired
-        loadTails = isLinked["tails"] or headsAndTailsRequired
+        loadMatrices = "matrices" in required
+        headsAndTailsRequired = bool({"directions", "lengths", "centers"}.intersection(required))
+        loadHeads = "heads" in required or headsAndTailsRequired
+        loadTails = "tails" in required or headsAndTailsRequired
 
         yield "if getattr(armature, 'type', '') == 'ARMATURE':"
         if self.state == "REST":
@@ -66,14 +66,14 @@ class ArmatureInfoNode(bpy.types.Node, AnimationNode):
         if loadHeads:    yield "        heads.transform(worldMatrix)"
         if loadTails:    yield "        tails.transform(worldMatrix)"
 
-        if isLinked["directions"]:
+        if "directions" in required:
             yield "    directions = self.calcDirections(heads, tails)"
-        if isLinked["lengths"]:
+        if "lengths" in required:
             yield "    lengths = self.calcLengths(heads, tails)"
-        if isLinked["centers"]:
+        if "centers" in required:
             yield "    centers = self.calcCenters(heads, tails)"
 
-        if isLinked["names"]:
+        if "names" in required:
             yield "    names = [bone.name for bone in bones]"
 
         yield "else:"
