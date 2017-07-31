@@ -3,6 +3,8 @@ import zipfile
 from . generic import *
 from . addon_files import iterRelativeAddonFiles, iterRelativeExportCFiles
 
+currentDirectory = os.path.dirname(os.path.abspath(__file__))
+
 def execute_Export(addonDirectory, exportPath):
     removeFile(exportPath)
 
@@ -21,6 +23,10 @@ def execute_ExportC(addonDirectory, exportCPath, exportCSetupPath):
         for relativePath in iterRelativeExportCFiles(addonDirectory):
             absolutePath = os.path.join(addonDirectory, relativePath)
             zipFile.write(absolutePath, os.path.join("animation_nodes", relativePath))
+
+        for path in iterPathsWithExtension(currentDirectory, ".py"):
+            relativePath = os.path.relpath(path, currentDirectory)
+            zipFile.write(path, os.path.join("setuputils", relativePath))
 
         setupInfo = getPlatformSummary()
         tmpFileName = "tmp.json"

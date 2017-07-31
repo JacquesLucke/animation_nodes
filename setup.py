@@ -24,6 +24,7 @@ if currentDirectory not in sys.path:
 
 from setuputils.generic import *
 from setuputils.addon_files import *
+from setuputils.logger import Logger
 from setuputils.task import GenerateFileTask
 from setuputils.cythonize import execute_Cythonize
 from setuputils.compilation import execute_Compile
@@ -63,7 +64,7 @@ def main():
     if len(args) == 0 or args[0] == "help":
         main_Help()
     elif args[0] == "build":
-        main_Build(args[1:])
+        main_Build(args[1:], configs)
     elif args[0] == "clean":
         main_Clean()
     else:
@@ -106,7 +107,7 @@ def main_Help():
 # Build
 ####################################################
 
-def main_Build(options):
+def main_Build(options, configs):
     checkBuildEnvironment(
         checkCython = True,
         checkPython = "--noversioncheck" not in options and "--nocompile" not in options
@@ -124,12 +125,16 @@ def main_Build(options):
 
     if "--nocompile" not in options:
         execute_Compile(setupInfoList, logger, addonDirectory)
-    if "--copy" in options:
-        execute_CopyAddon(addonDirectory, "C:\\Users\\jacques\\AppData\\Roaming\\Blender Foundation\\Blender\\2.78\\scripts\\addons\\animation_nodes")
 
     execute_PrintSummary(logger)
     execute_SaveSummary(logger)
 
+    if "--copy" in options:
+        copyTarget = configs["Copy Target"]
+        if not directoryExists(copyTarget):
+            print("\nCopy Target not found. Please correct the conf.json file.")
+        else:
+            execute_CopyAddon(addonDirectory, configs["Copy Target"])
     if "--export" in options:
         execute_Export(addonDirectory, exportPath)
     if "--exportc" in options:
@@ -228,45 +233,6 @@ def getCythonizeSummary(logger):
 
 def getCompilationSummary(logger):
     return [task.getSummary() for task in logger.compilationTasks]
-
-
-
-# Logger
-###########################################
-
-class Logger:
-    def __init__(self):
-        self.pyPreprocessTasks = []
-        self.cythonizeTasks = []
-        self.compilationTasks = []
-        self.generatedFiles = []
-
-    def logPyPreprocessTask(self, task):
-        self.pyPreprocessTasks.append(task)
-
-    def logCythonizeTask(self, task):
-        self.cythonizeTasks.append(task)
-
-    def logCompilationTask(self, task):
-        self.compilationTasks.append(task)
-
-    def logGeneratedFile(self, path):
-        self.generatedFiles.append(path)
-
-    def getGeneratedFiles(self):
-        paths = []
-        paths.extend(task.target for task in self.getAllTasks() if task.target is not None)
-        paths.extend(self.generatedFiles)
-        return paths
-
-    def getChangedFiles(self):
-        paths = []
-        paths.extend(task.target for task in self.getAllTasks() if task.targetChanged)
-        paths.extend(self.generatedFiles)
-        return paths
-
-    def getAllTasks(self):
-        return self.pyPreprocessTasks + self.cythonizeTasks + self.compilationTasks
 
 
 # Run Main
