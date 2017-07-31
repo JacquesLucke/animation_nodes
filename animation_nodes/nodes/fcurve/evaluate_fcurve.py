@@ -23,7 +23,7 @@ class EvaluateFCurveNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.prop(self, "frameType", text = "Frame")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "evaluationFrame = frame"
         if self.frameType == "OFFSET":
             yield "evaluationFrame += self.nodeTree.scene.frame_current_final"

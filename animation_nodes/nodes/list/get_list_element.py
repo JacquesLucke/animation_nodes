@@ -64,7 +64,7 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
                 return "List[{}]".format(self.inputs["Index"].value)
         return "Get List Element"
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.useIndexList:
             yield from self.getExecutionCode_List()
         else:

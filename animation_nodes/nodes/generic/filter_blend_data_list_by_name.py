@@ -41,7 +41,7 @@ class FilterBlendDataListByNameNode(bpy.types.Node, AnimationNode):
     def drawLabel(self):
         return "Filter {} List".format(self.dataType)
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         operation = "startswith" if self.filterType == "STARTS_WITH" else "endswith"
 
         if self.caseSensitive:

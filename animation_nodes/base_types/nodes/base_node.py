@@ -106,7 +106,7 @@ class AnimationNode:
     def getExecutionFunctionName(self):
         return "execute"
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         return []
 
     def getCodeEffects(self):
@@ -453,7 +453,7 @@ class AnimationNode:
     # Code Generation
     ####################################################
 
-    def getLocalExecutionCode(self):
+    def getLocalExecutionCode(self, required):
         inputVariables = self.getInputSocketVariables()
         outputVariables = self.getOutputSocketVariables()
 
@@ -461,7 +461,7 @@ class AnimationNode:
         if functionName is not None and hasattr(self, self.getExecutionFunctionName()):
             code = self.getLocalExecutionCode_ExecutionFunction(inputVariables, outputVariables)
         else:
-            code = self.getLocalExecutionCode_GetExecutionCode(inputVariables, outputVariables)
+            code = self.getLocalExecutionCode_GetExecutionCode(inputVariables, outputVariables, required)
 
         return self.applyCodeEffects(code)
 
@@ -474,8 +474,8 @@ class AnimationNode:
         if outputString == "": return executionString
         else: return "{} = {}".format(outputString, executionString)
 
-    def getLocalExecutionCode_GetExecutionCode(self, inputVariables, outputVariables):
-        return toString(self.getExecutionCode())
+    def getLocalExecutionCode_GetExecutionCode(self, inputVariables, outputVariables, required):
+        return toString(self.getExecutionCode(required))
 
     def getLocalBakeCode(self):
         return self.applyCodeEffects(toString(self.getBakeCode()))

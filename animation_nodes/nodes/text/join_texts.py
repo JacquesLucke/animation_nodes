@@ -10,5 +10,5 @@ class JoinTextsNode(bpy.types.Node, AnimationNode):
         self.newInput("Text", "Separator", "separator")
         self.newOutput("Text", "Text", "text")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         return "text = separator.join(texts)"

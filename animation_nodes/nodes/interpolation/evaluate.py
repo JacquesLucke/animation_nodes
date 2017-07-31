@@ -18,7 +18,7 @@ class EvaluateInterpolationNode(bpy.types.Node, VectorizedNode):
         self.newVectorizedOutput("Float", "useList",
             ("Value", "value"), ("Values", "values"))
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.useList:
             return "values = interpolation.evaluateList(positions)"
         else:

@@ -38,7 +38,7 @@ class ObjectVisibilityOutputNode(bpy.types.Node, VectorizedNode):
         for socket in self.inputs[3:]:
             socket.hide = True
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "if object is not None:"
         for name, identifier, attr, _ in attributes:
             if self.inputs[name].isUsed:

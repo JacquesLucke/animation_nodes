@@ -46,7 +46,7 @@ class FillListNode(bpy.types.Node, AnimationNode):
         self.invokeSelector(layout, "DATA_TYPE", "assignListDataType",
             dataTypes = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield ("outList = AN.algorithms.lists.fill('{}', inList, '{}', length, fillElement, {})"
                .format(toListDataType(self.assignedType), self.fillMode, self.makeElementCopies))
 

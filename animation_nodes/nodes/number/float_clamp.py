@@ -29,7 +29,7 @@ class FloatClampNode(bpy.types.Node, VectorizedNode):
         clamp_DoubleList(values, minValue, maxValue)
         return values
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "outValue = min(max(value, minValue), maxValue)"
 
     def drawLabel(self):

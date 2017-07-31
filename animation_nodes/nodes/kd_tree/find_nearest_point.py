@@ -21,7 +21,7 @@ class FindNearestPointInKDTreeNode(bpy.types.Node, VectorizedNode):
         self.newVectorizedOutput("Integer", "useVectorList",
             ("Index", "index"), ("Indices", "indices"))
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "nearestVector, index, distance = kdTree.find(searchVector)"
         yield "if nearestVector is None:"
         yield "    nearestVector, index, distance = Vector((0, 0, 0)), 0.0, -1"

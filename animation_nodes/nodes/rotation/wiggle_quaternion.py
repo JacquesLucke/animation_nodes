@@ -26,7 +26,7 @@ class QuaternionWiggleNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.prop(self, "nodeSeed", text = "Node Seed")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "quaternion = Quaternion((1, *algorithms.perlin_noise.perlinNoiseVectorForNodes(seed, self.nodeSeed, evolution, speed, amplitude, octaves, persistance)))"
 
     def duplicate(self, sourceNode):

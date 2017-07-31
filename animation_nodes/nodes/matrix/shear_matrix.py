@@ -29,7 +29,7 @@ class ShearMatrixNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.prop(self, "plane", expand = True)
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "limit = math.pi / 2 - 0.00001"
         yield "_angleA = math.tan(min(max(angleA, -limit), limit))"
         yield "_angleB = math.tan(min(max(angleB, -limit), limit))"

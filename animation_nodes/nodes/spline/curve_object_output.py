@@ -48,7 +48,7 @@ class CurveObjectOutputNode(bpy.types.Node, VectorizedNode):
     def drawAdvanced(self, layout):
         writeText(layout, "Possible values for 'Fill Mode' are: \n3D Curve: 'FULL', 'HALF', 'BACK' and 'FRONT' \n2D Curve: 'NONE', 'BACK', 'FRONT' and 'BOTH'")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "if getattr(object, 'type', '') == 'CURVE':"
         yield "    curve = object.data"
 

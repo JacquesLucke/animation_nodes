@@ -189,9 +189,19 @@ def iterInputCopyLines(node, variables):
             yield line
 
 def iterRealNodeExecutionLines(node, variables):
-    localCode = node.getLocalExecutionCode()
+    requiredOutputs = getRequiredOutputIdentifiers(node)
+    localCode = node.getLocalExecutionCode(requiredOutputs)
     globalCode = makeGlobalExecutionCode(localCode, node, variables)
     yield from globalCode.splitlines()
+
+def getRequiredOutputIdentifiers(node):
+    requiredOutputs = set()
+    add = requiredOutputs.add
+    update = requiredOutputs.update
+    for socket in node.linkedOutputs:
+        add(socket.identifier)
+        update(socket.alternativeIdentifiers)
+    return requiredOutputs
 
 def iterNodeBakeLines(node, variables):
     localCode = node.getLocalBakeCode()

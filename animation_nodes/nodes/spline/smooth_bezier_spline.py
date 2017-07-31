@@ -19,6 +19,6 @@ class SmoothBezierSplineNode(bpy.types.Node, VectorizedNode):
         self.newVectorizedOutput("Spline", "useSplineList",
             ("Spline", "spline"), ("Splines", "splines"))
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "if spline.type == 'BEZIER':"
         yield "    spline.calculateSmoothHandles(smoothness)"

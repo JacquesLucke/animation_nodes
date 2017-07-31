@@ -54,7 +54,7 @@ class RemoveListElementNode(bpy.types.Node, AnimationNode):
         self.invokeSelector(layout, "DATA_TYPE", "assignListDataType",
             dataTypes = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "outList = inList"
         if self.removeType == "FIRST_OCCURRENCE":
             yield "try: inList.remove(element)"

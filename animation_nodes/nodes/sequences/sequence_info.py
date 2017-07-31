@@ -36,34 +36,34 @@ class SequenceInfoNode(bpy.types.Node, AnimationNode):
         for socket in self.outputs[6:]:
             socket.hide = True
 
-    def getExecutionCode(self):
-        isLinked = self.getLinkedOutputsDict()
-        if not any(isLinked.values()): return
+    def getExecutionCode(self, required):
+        if len(required) == 0:
+            return
 
         yield "if sequence is not None:"
-        if isLinked["opacity"]: yield "    opacity = sequence.blend_alpha"
-        if isLinked["blendType"]: yield "    blendType = sequence.blend_type"
-        if isLinked["channel"]: yield "    channel = sequence.channel"
-        if isLinked["effectFader"]: yield "    effectFader = sequence.effect_fader"
+        if "opacity" in required: yield "    opacity = sequence.blend_alpha"
+        if "blendType" in required: yield "    blendType = sequence.blend_type"
+        if "channel" in required: yield "    channel = sequence.channel"
+        if "effectFader" in required: yield "    effectFader = sequence.effect_fader"
 
-        if isLinked["totalDuration"]: yield "    totalDuration = sequence.frame_duration"
-        if isLinked["finalDuration"]: yield "    finalDuration = sequence.frame_final_duration"
-        if isLinked["finalStartFrame"]: yield "    finalStartFrame = sequence.frame_final_start"
-        if isLinked["finalEndFrame"]: yield "    finalEndFrame = sequence.frame_final_end"
-        if isLinked["startOffset"]: yield "    startOffset = sequence.frame_offset_start"
-        if isLinked["endOffset"]: yield "    endOffset = sequence.frame_offset_end"
-        if isLinked["startFrame"]: yield "    startFrame = sequence.frame_start"
-        if isLinked["stillFrameStart"]: yield "    stillFrameStart = sequence.frame_still_start"
-        if isLinked["stillFrameEnd"]: yield "    stillFrameEnd = sequence.frame_still_end"
+        if "totalDuration" in required: yield "    totalDuration = sequence.frame_duration"
+        if "finalDuration" in required: yield "    finalDuration = sequence.frame_final_duration"
+        if "finalStartFrame" in required: yield "    finalStartFrame = sequence.frame_final_start"
+        if "finalEndFrame" in required: yield "    finalEndFrame = sequence.frame_final_end"
+        if "startOffset" in required: yield "    startOffset = sequence.frame_offset_start"
+        if "endOffset" in required: yield "    endOffset = sequence.frame_offset_end"
+        if "startFrame" in required: yield "    startFrame = sequence.frame_start"
+        if "stillFrameStart" in required: yield "    stillFrameStart = sequence.frame_still_start"
+        if "stillFrameEnd" in required: yield "    stillFrameEnd = sequence.frame_still_end"
 
-        if isLinked["lock"]: yield "    lock = sequence.lock"
-        if isLinked["mute"]: yield "    mute = sequence.mute"
-        if isLinked["name"]: yield "    name = sequence.name"
-        if isLinked["select"]: yield "    select = sequence.select"
-        if isLinked["speedFactor"]: yield "    speedFactor = sequence.speed_factor"
-        if isLinked["type"]: yield "    type = sequence.type"
-        if isLinked["useDefaultFade"]: yield "    useDefaultFade = sequence.use_default_fade"
-        if isLinked["useLinearModifiers"]: yield "    useLinearModifiers = sequence.use_linear_modifiers"
+        if "lock" in required: yield "    lock = sequence.lock"
+        if "mute" in required: yield "    mute = sequence.mute"
+        if "name" in required: yield "    name = sequence.name"
+        if "select" in required: yield "    select = sequence.select"
+        if "speedFactor" in required: yield "    speedFactor = sequence.speed_factor"
+        if "type" in required: yield "    type = sequence.type"
+        if "useDefaultFade" in required: yield "    useDefaultFade = sequence.use_default_fade"
+        if "useLinearModifiers" in required: yield "    useLinearModifiers = sequence.use_linear_modifiers"
 
         yield "else:"
         yield "    opacity = 0.0"

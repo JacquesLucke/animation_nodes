@@ -46,17 +46,16 @@ class DirectionToRotationNode(bpy.types.Node, VectorizedNode):
         if self.trackAxis[-1:] == self.guideAxis[-1:]:
             layout.label("Must be different", icon = "ERROR")
 
-    def getExecutionCode(self):
-        isLinked = self.getLinkedOutputsDict()
+    def getExecutionCode(self, required):
         generateList = self.useDirectionList or self.useGuideList
 
         if generateList:
             yield "_directions = " + self.inputs[0].identifier
             yield "_guides = " + self.inputs[1].identifier
             yield "matrixRotations = AN.algorithms.rotations.directionsToMatrices(_directions, _guides, self.trackAxis, self.guideAxis)"
-            if isLinked["eulerRotations"]: yield "eulerRotations = matrixRotations.toEulers(isNormalized = True)"
-            if isLinked["quaternionRotations"]: yield "quaternionRotations = matrixRotations.toQuaternions(isNormalized = True)"
+            if "eulerRotations" in required: yield "eulerRotations = matrixRotations.toEulers(isNormalized = True)"
+            if "quaternionRotations" in required: yield "quaternionRotations = matrixRotations.toQuaternions(isNormalized = True)"
         else:
             yield "matrixRotation = AN.algorithms.rotations.directionToMatrix(direction, guide, self.trackAxis, self.guideAxis)"
-            if isLinked["eulerRotation"]: yield "eulerRotation = matrixRotation.to_euler()"
-            if isLinked["quaternionRotation"]: yield "quaternionRotation = matrixRotation.to_quaternion()"
+            if "eulerRotation" in required: yield "eulerRotation = matrixRotation.to_euler()"
+            if "quaternionRotation" in required: yield "quaternionRotation = matrixRotation.to_quaternion()"

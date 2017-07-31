@@ -20,7 +20,7 @@ class ShadeObjectSmooth(bpy.types.Node, VectorizedNode):
         self.newVectorizedOutput("Object", "useObjectList",
             ("Object", "object"), ("Objects", "objects"))
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         return "object = self.execute_Single(object, smooth)"
 
     def execute_Single(self, object, smooth):

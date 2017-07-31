@@ -88,7 +88,7 @@ class TextObjectOutputNode(bpy.types.Node, VectorizedNode):
         writeText(layout, "'Horizontal Align' in [LEFT, CENTER, RIGHT, JUSTIFY, FLUSH]", autoWidth = True)
         writeText(layout, "'Vertical Align' in ['TOP_BASELINE', 'TOP', 'CENTER', 'BOTTOM']", autoWidth = True)
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "self.errorMessage = ''"
         yield "if getattr(object, 'type', '') == 'FONT':"
         yield "    textObject = object.data"

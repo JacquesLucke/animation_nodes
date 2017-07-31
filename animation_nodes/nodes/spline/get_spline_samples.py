@@ -22,9 +22,9 @@ class GetSplineSamplesNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
         col.active = self.parameterType == "UNIFORM"
         col.prop(self, "resolution")
 
-    def getExecutionCode(self):
-        isLinked = self.getLinkedOutputsDict()
-        if not (isLinked["positions"] or isLinked["tangents"]): return []
+    def getExecutionCode(self, required):
+        if len(required) == 0:
+            return
 
         yield "if spline.isEvaluable():"
         yield "    amount = max(amount, 0.0)"
@@ -33,11 +33,11 @@ class GetSplineSamplesNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
 
         if self.parameterType == "UNIFORM":
             yield "    spline.ensureUniformConverter(self.resolution)"
-            if isLinked["positions"]: yield "    positions = spline.getUniformSamples(amount, _start, _end)"
-            if isLinked["tangents"]:  yield "    tangents = spline.getUniformTangentSamples(amount, _start, _end)"
+            if "positions" in required: yield "    positions = spline.getUniformSamples(amount, _start, _end)"
+            if "tangents" in required:  yield "    tangents = spline.getUniformTangentSamples(amount, _start, _end)"
         elif self.parameterType == "RESOLUTION":
-            if isLinked["positions"]: yield "    positions = spline.getSamples(amount, _start, _end)"
-            if isLinked["tangents"]:  yield "    tangents = spline.getTangentSamples(amount, _start, _end)"
+            if "positions" in required: yield "    positions = spline.getSamples(amount, _start, _end)"
+            if "tangents" in required:  yield "    tangents = spline.getTangentSamples(amount, _start, _end)"
 
         yield "else:"
         yield "    positions = Vector3DList()"

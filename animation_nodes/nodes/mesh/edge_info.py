@@ -40,32 +40,31 @@ class EdgeInfoNode(bpy.types.Node, VectorizedNode):
         if self.errorMessage != "" and self.inputs[1].isLinked:
             layout.label(self.errorMessage, icon = "ERROR")
 
-    def getExecutionCode(self):
-        isLinked = self.getLinkedOutputsDict()
+    def getExecutionCode(self, required):
         yield "self.errorMessage = ''"
         if self.useEdgeList:
-            yield from self.iterExecutionCode_List(isLinked)
+            yield from self.iterExecutionCode_List(required)
         else:
-            yield from self.iterExecutionCode_Single(isLinked)
+            yield from self.iterExecutionCode_Single(required)
 
-    def iterExecutionCode_Single(self, isLinked):
+    def iterExecutionCode_Single(self, required):
         yield "try:"
         yield "    i1, i2 = edgeIndices"
-        if isLinked["length"]: yield "    length = (points[i1] - points[i2]).length"
-        if isLinked["center"]: yield "    center = (points[i1] + points[i2]) / 2"
-        if isLinked["start"]:  yield "    start = points[i1]"
-        if isLinked["end"]:    yield "    end = points[i2]"
+        if "length" in required: yield "    length = (points[i1] - points[i2]).length"
+        if "center" in required: yield "    center = (points[i1] + points[i2]) / 2"
+        if "start" in required:  yield "    start = points[i1]"
+        if "end" in required:    yield "    end = points[i2]"
         yield "except IndexError:"
         yield "    self.errorMessage = 'invalid edge'"
         yield "    length, center = Vector((0, 0, 0)), Vector((0, 0, 0))"
         yield "    start, end = Vector((0, 0, 0)), Vector((0, 0, 0))"
 
-    def iterExecutionCode_List(self, isLinked):
+    def iterExecutionCode_List(self, required):
         yield "try:"
-        if isLinked["lengths"]: yield "    lengths = self.calculateEdgeLengths(points, edgeIndicesList)"
-        if isLinked["centers"]: yield "    centers = self.calculateEdgeCenters(points, edgeIndicesList)"
-        if isLinked["starts"]: yield "    starts = self.getEdgeStartPoints(points, edgeIndicesList)"
-        if isLinked["ends"]: yield "    ends = self.getEdgeEndPoints(points, edgeIndicesList)"
+        if "lengths" in required: yield "    lengths = self.calculateEdgeLengths(points, edgeIndicesList)"
+        if "centers" in required: yield "    centers = self.calculateEdgeCenters(points, edgeIndicesList)"
+        if "starts" in required: yield "    starts = self.getEdgeStartPoints(points, edgeIndicesList)"
+        if "ends" in required: yield "    ends = self.getEdgeEndPoints(points, edgeIndicesList)"
         yield "    pass"
         yield "except IndexError:"
         yield "    self.errorMessage = 'invalid edges'"

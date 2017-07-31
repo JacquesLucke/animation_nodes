@@ -51,7 +51,7 @@ class CombineColorNode(bpy.types.Node, AnimationNode):
     def drawLabel(self):
         return "Color from {}a".format(self.sourceType)
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.sourceType == "RGB":    yield "color = [red, green, blue, alpha]"
         elif self.sourceType == "HSV":  yield "color = [*colorsys.hsv_to_rgb(hue, saturation, value), alpha]"
         elif self.sourceType == "HSL":  yield "color = [*colorsys.hls_to_rgb(hue, lightness, saturation), alpha]"

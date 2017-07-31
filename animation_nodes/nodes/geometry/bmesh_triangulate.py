@@ -25,21 +25,19 @@ class BMeshTriangulateNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "quad")
         layout.prop(self, "ngon")
 
-    def getExecutionCode(self):
-        isLinked = self.getLinkedOutputsDict()
-        if not any(isLinked.values()): return
+    def getExecutionCode(self, required):
 
         yield "faces = bm.faces"
 
         # do not invert isLinked order, this needs original faces
-        if isLinked["ngonIndices"]:
+        if "ngonIndices" in required:
             yield "ngonIndices = list(range(len(faces)))"
             yield "for face in faces:"
             yield "    indf = face.index"
             yield "    lenf = len(face.verts) - 3"
             yield "    if lenf > 0: ngonIndices.extend(indf for i in range(lenf))"
 
-        if isLinked["bm"]:
+        if "bm" in required:
             yield "bmesh.ops.triangulate(bm, faces = faces,"
             yield "    quad_method = self.quad, ngon_method = self.ngon)"
 

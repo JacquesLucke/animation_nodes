@@ -15,7 +15,7 @@ class VectorFromValueNode(bpy.types.Node, VectorizedNode):
         self.newVectorizedOutput("Vector", "useList",
             ("Vector", "vector"), ("Vectors", "vectors"))
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.useList:
             return "vectors = AN.nodes.vector.c_utils.vectorsFromValues(values)"
         else:

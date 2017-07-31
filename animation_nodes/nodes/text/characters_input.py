@@ -14,18 +14,16 @@ class CharactersNode(bpy.types.Node, AnimationNode):
         self.newOutput("Text", "Line Break", "lineBreak")
         self.newOutput("Text", "Tab", "tab")
 
-    def getExecutionCode(self):
-        isLinked = self.getLinkedOutputsDict()
-
-        if isLinked["lower"]:
+    def getExecutionCode(self, required):
+        if "lower" in required:
             yield "lower = '{}'".format(string.ascii_lowercase)
-        if isLinked["upper"]:
+        if "upper" in required:
             yield "upper = '{}'".format(string.ascii_uppercase)
-        if isLinked["digits"]:
+        if "digits" in required:
             yield "digits = '{}'".format(string.digits)
-        if isLinked["special"]:
+        if "special" in required:
             yield "special = '!$%&/\\()=?*+#\\'-_.:,;\"'"
-        if isLinked["lineBreak"]:
+        if "lineBreak" in required:
             yield "lineBreak = '\\n'"
-        if isLinked["tab"]:
+        if "tab" in required:
             yield "tab = '\\t'"

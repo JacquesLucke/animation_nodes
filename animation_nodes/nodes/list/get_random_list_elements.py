@@ -44,7 +44,7 @@ class GetRandomListElementsNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "selectionType", text = "")
         layout.prop(self, "nodeSeed", text = "Node Seed")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "_seed = self.nodeSeed * 154245 + seed * 13412"
         if self.selectionType == "SINGLE":
             yield "random.seed(_seed)"

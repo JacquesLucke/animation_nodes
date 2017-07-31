@@ -43,7 +43,7 @@ class ObjectMatrixOutputNode(bpy.types.Node, VectorizedNode):
             return "execute_List"
         return None
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         indent = ""
         if isList(self.inputs[0].dataType):
             yield "for object in objects:"

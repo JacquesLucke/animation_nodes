@@ -20,7 +20,7 @@ class PointListNormalNode(bpy.types.Node, AnimationNode):
         if self.errorMessage != "":
             writeText(layout, self.errorMessage, icon = "ERROR", width = 20)
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "if len(points) >= 3:"
         yield "    normal = mathutils.geometry.normal(points)"
         yield "    self.errorMessage =  '' "

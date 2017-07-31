@@ -18,7 +18,7 @@ class TransformVectorNode(bpy.types.Node, VectorizedNode):
         self.newVectorizedOutput("Vector", "useVectorList",
             ("Vector", "transformedVector"), ("Vectors", "vectors"))
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.useVectorList:
             return "vectors.transform(matrix)"
         else:

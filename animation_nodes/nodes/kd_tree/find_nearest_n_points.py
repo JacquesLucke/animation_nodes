@@ -13,7 +13,7 @@ class FindNearestNPointsInKDTreeNode(bpy.types.Node, AnimationNode):
         self.newOutput("Float List", "Distances", "distances")
         self.newOutput("Integer List", "Indices", "indices")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "_amount = max(amount, 0)"
         yield "nearestVectors = Vector3DList(capacity = _amount)"
         yield "distances = DoubleList(capacity = _amount)"

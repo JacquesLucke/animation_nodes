@@ -21,14 +21,14 @@ class TimeInfoNode(bpy.types.Node, AnimationNode):
             inputSocket.removeLinks()
             inputSocket.hide = True
 
-    def getExecutionCode(self):
-        isLinked = self.getLinkedOutputsDict()
-        if not any(isLinked.values()): return
+    def getExecutionCode(self, required):
+        if len(required) == 0:
+            return
 
         yield "if scene is not None:"
-        if isLinked["frame"]:      yield "    frame = scene.frame_current_final"
-        if isLinked["startFrame"]: yield "    startFrame = scene.frame_start"
-        if isLinked["endFrame"]:   yield "    endFrame = scene.frame_end"
-        if isLinked["frameRate"]:  yield "    frameRate = scene.render.fps"
+        if "frame" in required:      yield "    frame = scene.frame_current_final"
+        if "startFrame" in required: yield "    startFrame = scene.frame_start"
+        if "endFrame" in required:   yield "    endFrame = scene.frame_end"
+        if "frameRate" in required:  yield "    frameRate = scene.render.fps"
         yield "else:"
-        yield "    frame, startFrame, endFrame, frameRate = 0, 0, 0, 0"
+        yield "    frame = startFrame = endFrame = frameRate = 0"

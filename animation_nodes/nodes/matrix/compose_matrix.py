@@ -28,7 +28,7 @@ class ComposeMatrixNode(bpy.types.Node, VectorizedNode):
         if self.useTranslationList or self.useRotationList or self.useScaleList:
             return "execute_List"
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "matrix = animation_nodes.utils.math.composeMatrix(translation, rotation, scale)"
 
     def execute_List(self, translations, rotations, scales):

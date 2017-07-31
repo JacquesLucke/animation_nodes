@@ -15,10 +15,13 @@ class CylinderMeshNode(bpy.types.Node, AnimationNode):
         self.newOutput("Edge Indices List", "Edge Indices", "edgeIndices")
         self.newOutput("Polygon Indices List", "Polygon Indices", "polygonIndices")
 
-    def getExecutionCode(self):
-        isLinked = self.getLinkedOutputsDict()
+    def getExecutionCode(self, required):
         yield "_resolution = max(resolution, 2)"
         yield "cylinder = animation_nodes.algorithms.mesh_generation.cylinder"
-        if isLinked["vertices"]:       yield "vertices = cylinder.vertices(max(radius, 0), max(height, 0), _resolution)"
-        if isLinked["edgeIndices"]:    yield "edgeIndices = cylinder.edges(_resolution)"
-        if isLinked["polygonIndices"]: yield "polygonIndices = cylinder.polygons(_resolution, caps)"
+        
+        if "vertices" in required:
+            yield "vertices = cylinder.vertices(max(radius, 0), max(height, 0), _resolution)"
+        if "edgeIndices" in required:
+            yield "edgeIndices = cylinder.edges(_resolution)"
+        if "polygonIndices" in required:
+            yield "polygonIndices = cylinder.polygons(_resolution, caps)"

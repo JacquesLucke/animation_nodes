@@ -36,7 +36,7 @@ class FadeFalloffNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.prop(self, "mode", text = "")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.mode == "START_END":
             yield "_start = startIndex"
             yield "_end = endIndex"

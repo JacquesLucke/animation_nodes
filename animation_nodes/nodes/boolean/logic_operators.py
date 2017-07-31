@@ -31,7 +31,7 @@ class LogicOperatorsNode(bpy.types.Node, AnimationNode):
     def drawLabel(self):
         return operationLabels[self.operation]
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         op = self.operation
         if op == "AND":  return "result = a and b"
         if op == "NAND": return "result = not (a and b)"

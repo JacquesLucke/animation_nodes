@@ -26,7 +26,7 @@ class CreateEdgeIndicesNode(bpy.types.Node, VectorizedNode):
         if self.useList1 or self.useList2:
             return "execute_List"
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         return "edgeIndices = (max(index1, 0), max(index2, 0))"
 
     def execute_List(self, indices1, indices2):

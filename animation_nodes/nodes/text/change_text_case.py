@@ -29,7 +29,7 @@ class ChangeTextCaseNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.prop(self, "caseType", text = "")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.caseType == "CAPWORDS":
             return "outText = string.capwords(inText)"
         return "outText = inText.{}()".format(caseTypeCode[self.caseType])

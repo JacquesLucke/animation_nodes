@@ -30,19 +30,19 @@ class SearchListElementNode(bpy.types.Node, AnimationNode):
         self.invokeSelector(layout, "DATA_TYPE", "assignListDataType",
             dataTypes = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
 
-    def getExecutionCode(self):
-        isLinked = self.getLinkedOutputsDict()
-        if not any(isLinked.values()): return
+    def getExecutionCode(self, required):
+        if len(required) == 0:
+            return
 
-        if isLinked["allIndices"]:
+        if "allIndices" in required:
             yield "allIndices = LongList.fromValues(i for i, element in enumerate(list) if element == search)"
-            if isLinked["firstIndex"]:  yield "firstIndex = allIndices[0] if len(allIndices) > 0 else -1"
-            if isLinked["occurrences"]: yield "occurrences = len(allIndices)"
+            if "firstIndex" in required:  yield "firstIndex = allIndices[0] if len(allIndices) > 0 else -1"
+            if "occurrences" in required: yield "occurrences = len(allIndices)"
         else:
-            if isLinked["firstIndex"]:
+            if "firstIndex" in required:
                 yield "try: firstIndex = list.index(search)"
                 yield "except: firstIndex = -1"
-            if isLinked["occurrences"]:
+            if "occurrences" in required:
                 yield "occurrences = list.count(search)"
 
     def assignListDataType(self, listDataType):

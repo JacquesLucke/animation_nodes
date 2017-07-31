@@ -18,5 +18,5 @@ class TransformSplineNode(bpy.types.Node, VectorizedNode):
         self.newVectorizedOutput("Spline", "useSplineList",
             ("Spline", "spline"), ("Splines", "splines"))
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         return "spline.transform(matrix)"

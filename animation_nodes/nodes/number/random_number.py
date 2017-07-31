@@ -37,7 +37,7 @@ class RandomNumberNode(bpy.types.Node, AnimationNode):
         row.prop(self, "nodeSeed", text = "Node Seed")
         row.prop(self, "createList", text = "", icon = "LINENUMBERS_ON")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.createList:
             yield "numbers = self.calcRandomNumbers(seed, count, minValue, maxValue)"
         else:

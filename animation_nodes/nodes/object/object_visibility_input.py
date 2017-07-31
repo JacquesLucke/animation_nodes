@@ -29,17 +29,17 @@ class ObjectVisibilityInputNode(bpy.types.Node, VectorizedNode):
         for socket in self.outputs[2:]:
             socket.hide = True
 
-    def getExecutionCode(self):
-        isLinked = self.getLinkedBaseOutputsDict()
-        if not any(isLinked.values()): return
+    def getExecutionCode(self, required):
+        if len(required) == 0:
+            return
 
         yield "if object is not None:"
+        if "hide" in required:        yield "    hide = object.hide"
+        if "hideSelect" in required:  yield "    hideSelect = object.hide_select"
+        if "hideRender" in required:  yield "    hideRender = object.hide_render"
+        if "showName" in required:    yield "    showName = object.show_name"
+        if "showAxis" in required:    yield "    showAxis = object.show_axis"
+        if "showXray" in required:    yield "    showXray = object.show_x_ray"
 
-        if isLinked["hide"]:        yield "    hide = object.hide"
-        if isLinked["hideSelect"]:  yield "    hideSelect = object.hide_select"
-        if isLinked["hideRender"]:  yield "    hideRender = object.hide_render"
-        if isLinked["showName"]:    yield "    showName = object.show_name"
-        if isLinked["showAxis"]:    yield "    showAxis = object.show_axis"
-        if isLinked["showXray"]:    yield "    showXray = object.show_x_ray"
-
-        yield "else: hide = hideSelect = hideRender = showName = showAxis = showXray = None"
+        yield "else:"
+        yield "    hide = hideSelect = hideRender = showName = showAxis = showXray = False"

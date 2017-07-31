@@ -15,5 +15,5 @@ class TextLengthNode(bpy.types.Node, VectorizedNode):
         self.newVectorizedOutput("Integer", "useTextList",
             ("Length", "length"), ("Lengths", "lengths"))
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         return "length = len(text)"

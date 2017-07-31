@@ -59,7 +59,7 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
     def getOutputSocketVariables(self):
         return {socket.identifier : "output_" + str(i) for i, socket in enumerate(self.outputs)}
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.subprogramNode is None: return ""
 
         parameterString = ", ".join(["input_" + str(i) for i in range(len(self.inputs))])

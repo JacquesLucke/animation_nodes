@@ -45,7 +45,7 @@ class ConvertVectorAndEulerNode(bpy.types.Node, VectorizedNode):
         for item in conversionTypeItems:
             if self.conversionType == item[0]: return item[1]
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.useList:
             if self.conversionType == "VECTOR_TO_EULER":
                 return "eulers = self.vectorsToEulers(vectors)"

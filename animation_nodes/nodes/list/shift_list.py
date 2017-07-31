@@ -21,7 +21,7 @@ class ShiftListNode(bpy.types.Node, AnimationNode):
              (self.outputs[0], "LIST")]
         ))
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "if len(inList) == 0: shiftedList = self.outputs[0].getDefaultValue()"
         yield "else:"
         yield "    shiftAmount = amount % len(inList)"

@@ -36,7 +36,7 @@ class TrimSplineNode(bpy.types.Node, VectorizedNode, SplineEvaluationBase):
         col.active = self.parameterType == "UNIFORM"
         col.prop(self, "resolution")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         return "trimmedSpline = self.trimSpline(spline, start, end)"
 
     def trimSpline(self, spline, start, end):

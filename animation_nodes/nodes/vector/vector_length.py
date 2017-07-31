@@ -15,7 +15,7 @@ class VectorLengthNode(bpy.types.Node, VectorizedNode):
         self.newVectorizedOutput("Float", "useList",
             ("Length", "length"), ("Lenghts", "lengths"))
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.useList:
             yield "lengths = self.calcLengths(vectors)"
         else:

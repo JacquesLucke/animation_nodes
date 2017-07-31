@@ -29,7 +29,7 @@ class BooleanListLogicNode(bpy.types.Node, AnimationNode):
     def drawLabel(self):
         return compareLabels[self.compareType]
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         t = self.compareType
 
         yield "if len(inList) > 0:"

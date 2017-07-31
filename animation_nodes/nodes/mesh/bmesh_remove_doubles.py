@@ -11,7 +11,7 @@ class BMeshRemoveDoublesNode(bpy.types.Node, AnimationNode):
         self.newInput("Float", "Distance", "distance", value = 0.0001, minValue = 0.0)
         self.newOutput("BMesh", "BMesh", "bm")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         return "bmesh.ops.remove_doubles(bm, verts = bm.verts, dist = distance)"
 
     def getUsedModules(self):

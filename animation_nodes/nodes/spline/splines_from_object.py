@@ -34,7 +34,7 @@ class SplinesFromObjectNode(bpy.types.Node, AnimationNode):
     def drawAdvanced(self, layout):
         layout.prop(self, "importType")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "self.errorMessage = ''"
         if self.importType == "SINGLE":
             yield "spline = self.getSingleSpline(object, useWorldSpace, index)"

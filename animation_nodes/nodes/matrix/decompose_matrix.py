@@ -24,16 +24,15 @@ class DecomposeMatrixNode(bpy.types.Node, VectorizedNode):
             ("Scale", "scale"), ("Scales", "scales"))
 
 
-    def getExecutionCode(self):
-        isLinked = self.getLinkedOutputsDict()
+    def getExecutionCode(self, required):
         if self.useMatrixList:
-            if isLinked["translations"]: yield "translations = self.toTranslations(matrices)"
-            if isLinked["rotations"]:    yield "rotations = self.toRotations(matrices)"
-            if isLinked["scales"]:       yield "scales = self.toScales(matrices)"
+            if "translations" in required: yield "translations = self.toTranslations(matrices)"
+            if "rotations" in required:    yield "rotations = self.toRotations(matrices)"
+            if "scales" in required:       yield "scales = self.toScales(matrices)"
         else:
-            if isLinked["translation"]: yield "translation = matrix.to_translation()"
-            if isLinked["rotation"]:    yield "rotation = matrix.to_euler()"
-            if isLinked["scale"]:       yield "scale = matrix.to_scale()"
+            if "translation" in required: yield "translation = matrix.to_translation()"
+            if "rotation" in required:    yield "rotation = matrix.to_euler()"
+            if "scale" in required:       yield "scale = matrix.to_scale()"
 
     def toTranslations(self, matrices):
         return extractMatrixTranslations(matrices)

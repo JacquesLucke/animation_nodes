@@ -9,5 +9,5 @@ class ConvertToTextNode(bpy.types.Node, AnimationNode):
         self.newInput("Generic", "Data", "data")
         self.newOutput("Text", "Text", "text")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         return "text = str(data)"

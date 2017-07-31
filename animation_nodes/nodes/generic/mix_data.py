@@ -37,7 +37,7 @@ class MixDataNode(bpy.types.Node, AnimationNode):
     def drawLabel(self):
         return nodeTypes[self.outputs[0].dataType]
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.clampFactor:
             yield "f = min(max(factor, 0.0), 1.0)"
         else:

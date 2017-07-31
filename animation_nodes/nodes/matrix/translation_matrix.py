@@ -15,7 +15,7 @@ class TranslationMatrixNode(bpy.types.Node, VectorizedNode):
         self.newVectorizedOutput("Matrix", "useList",
             ("Matrix", "matrix"), ("Matrices", "matrices"))
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.useList:
             return "matrices = self.calcMatrices(translations)"
         else:

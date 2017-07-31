@@ -52,7 +52,7 @@ class LoopViewerNode(bpy.types.Node, AnimationNode):
     def getInputSocketVariables(self):
         return {socket.identifier : "data_" + str(i) for i, socket in enumerate(self.inputs)}
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.network.type == "Loop":
             names = ["data_" + str(i) for i in range(len(self.inputs[:-1]))]
             return "self.newOutputLine({})".format(", ".join(names))

@@ -81,7 +81,7 @@ class EulerMathNode(bpy.types.Node, VectorizedNode):
     def drawLabel(self):
         return operationLabels[self.operation]
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         op = self.operation
 
         if op == "ADD":

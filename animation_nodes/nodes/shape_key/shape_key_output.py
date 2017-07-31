@@ -36,7 +36,7 @@ class ShapeKeyOutputNode(bpy.types.Node, VectorizedNode):
         for socket in self.inputs[2:]:
             socket.hide = True
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "if shapeKey is not None:"
         s = self.inputs
         if s[1].isUsed: yield "    shapeKey.value = value"

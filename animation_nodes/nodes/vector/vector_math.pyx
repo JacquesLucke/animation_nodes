@@ -206,7 +206,7 @@ class VectorMathNode(bpy.types.Node, VectorizedNode):
     def drawLabel(self):
         return self._operation.label
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.generatesList:
             currentType = self._operation.type
             yield "try:"

@@ -11,8 +11,8 @@ class VectorAngleNode(bpy.types.Node, AnimationNode):
         self.newOutput("Float", "Angle", "angle")
         self.newOutput("Quaternion", "Rotation Difference", "rotationDifference")
 
-    def getExecutionCode(self):
-        isLinked = self.getLinkedOutputsDict()
-
-        if isLinked["angle"]: yield "angle = a.angle(b, 0.0)"
-        if isLinked["rotationDifference"]: yield "rotationDifference = a.rotation_difference(b)"
+    def getExecutionCode(self, required):
+        if "angle" in required:
+            yield "angle = a.angle(b, 0.0)"
+        if "rotationDifference" in required:
+            yield "rotationDifference = a.rotation_difference(b)"

@@ -73,7 +73,7 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
         subcol.active = self.validateMesh
         subcol.prop(self, "validateMeshVerbose", text = "Print Validation Info")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "self.errorMessage = ''"
         yield "if self.isValidObject(object):"
         yield "    mesh = object.data"

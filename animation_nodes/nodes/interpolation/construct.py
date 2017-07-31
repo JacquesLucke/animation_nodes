@@ -56,7 +56,7 @@ class ConstructInterpolationNode(bpy.types.Node, AnimationNode):
             row.prop(self, "easeIn", text = "", icon = "IPO_EASE_IN")
             row.prop(self, "easeOut", text = "", icon = "IPO_EASE_OUT")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         c = self.category
         if not (self.easeIn or self.easeOut): return "interpolation = self.getLinear()"
         if c == "LINEAR":      return "interpolation = self.getLinear()"

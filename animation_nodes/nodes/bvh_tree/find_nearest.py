@@ -34,7 +34,7 @@ class FindNearestSurfacePointNode(bpy.types.Node, VectorizedNode):
         self.newVectorizedOutput("Boolean", "useVectorList",
             ("Hit", "hit"), ("Hits", "hits"))
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "location, normal, polygonIndex, distance = bvhTree.find_nearest(vector, maxDistance)"
         yield "if location is None:"
         yield "    location = Vector((0, 0, 0))"

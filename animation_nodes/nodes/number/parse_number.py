@@ -19,7 +19,7 @@ class ParseNumberNode(bpy.types.Node, VectorizedNode):
         if not self.parsingSuccessfull:
             layout.label("Parsing Error", icon = "ERROR")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.useList:
             yield "try:"
             yield "    numbers = DoubleList.fromValues(float(text) for text in texts)"
