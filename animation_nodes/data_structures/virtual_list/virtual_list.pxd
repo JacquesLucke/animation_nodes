@@ -1,3 +1,5 @@
+from .. lists.clist cimport CList
+
 cdef class VirtualList:
     pass
 

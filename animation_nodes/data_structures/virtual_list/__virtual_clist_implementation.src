@@ -1,0 +1,45 @@
+cdef class VirtualLISTNAME(VirtualList):
+    @classmethod
+    def fromListOrElement(cls, obj, default):
+        if isinstance(obj, LISTNAME):
+            return cls.fromList(obj, default)
+        else:
+            return VirtualLISTNAME_Element(obj)
+
+    @classmethod
+    def fromList(cls, LISTNAME realList, default):
+        if realList.length == 0:
+            return VirtualLISTNAME_Element(default)
+        elif realList.length == 1:
+            return VirtualLISTNAME_Element(realList[0])
+        else:
+            return VirtualLISTNAME_List(realList)
+
+    cdef TYPE *get(self, Py_ssize_t i):
+        return NULL
+
+cdef class VirtualLISTNAME_List(VirtualLISTNAME):
+    cdef LISTNAME realList
+    cdef TYPE *realData
+    cdef Py_ssize_t realLength
+
+    def __cinit__(self, LISTNAME realList):
+        self.realList = realList
+        self.realData = realList.data
+        self.realLength = realList.length
+        assert self.realLength > 0
+
+    @cython.cdivision(True)
+    cdef TYPE *get(self, Py_ssize_t i):
+        return self.realData + (i % self.realLength)
+
+cdef class VirtualLISTNAME_Element(VirtualLISTNAME):
+    cdef LISTNAME realList
+    cdef TYPE *realData
+
+    def __cinit__(self, element):
+        self.realList = LISTNAME.fromValue(element)
+        self.realData = self.realList.data
+
+    cdef TYPE *get(self, Py_ssize_t i):
+        return self.realData
