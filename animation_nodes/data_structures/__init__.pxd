@@ -3,7 +3,7 @@ from . data_structures.lists.base_lists cimport *
 from . data_structures.lists.polygon_indices_list cimport PolygonIndicesList
 
 from . data_structures.virtual_list.virtual_list cimport VirtualList, VirtualPyList
-from . data_structures.virtual_list.virtual_clist cimport *
+from . data_structures.virtual_list.virtual_clists cimport *
 
 from . data_structures.default_lists.c_default_list cimport CDefaultList
 from . data_structures.meshes.mesh_data cimport MeshData

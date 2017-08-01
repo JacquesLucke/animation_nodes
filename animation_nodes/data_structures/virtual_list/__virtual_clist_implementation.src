@@ -11,7 +11,7 @@ cdef class VirtualLISTNAME(VirtualList):
         if realList.length == 0:
             return VirtualLISTNAME_Element(default)
         elif realList.length == 1:
-            return VirtualLISTNAME_Element(realList[0])
+            return VirtualLISTNAME_Element(realList[0], realLength = 1)
         else:
             return VirtualLISTNAME_List(realList)
 
@@ -33,13 +33,21 @@ cdef class VirtualLISTNAME_List(VirtualLISTNAME):
     cdef TYPE *get(self, Py_ssize_t i):
         return self.realData + (i % self.realLength)
 
+    def getRealLength(self):
+        return self.realLength
+
 cdef class VirtualLISTNAME_Element(VirtualLISTNAME):
     cdef LISTNAME realList
     cdef TYPE *realData
+    cdef Py_ssize_t realLength
 
-    def __cinit__(self, element):
+    def __cinit__(self, element, realLength = 0):
         self.realList = LISTNAME.fromValue(element)
         self.realData = self.realList.data
+        self.realLength = realLength
 
     cdef TYPE *get(self, Py_ssize_t i):
         return self.realData
+
+    def getRealLength(self):
+        return self.realLength
