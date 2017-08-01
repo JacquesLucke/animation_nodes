@@ -1,6 +1,7 @@
 from ... data_structures cimport (Vector3DList, EulerList, Matrix4x4List,
                                   CDefaultList, FloatList, DoubleList, Falloff,
-                                  FalloffEvaluator)
+                                  FalloffEvaluator,
+                                  VirtualVector3DList, VirtualEulerList)
 
 from ... math cimport (Vector3, Euler3, Matrix4, toMatrix4,
                        multMatrix4, toPyMatrix4,
@@ -16,21 +17,14 @@ from libc.math cimport sqrt
 # Compose/Create Matrix
 ########################################
 
-def composeMatrices(translations, rotations, scales):
-    cdef:
-        CDefaultList _translations = CDefaultList(Vector3DList, translations, (0, 0, 0))
-        CDefaultList _rotations = CDefaultList(EulerList, rotations, (0, 0, 0))
-        CDefaultList _scales = CDefaultList(Vector3DList, scales, (1, 1, 1))
+def composeMatrices(Py_ssize_t amount, VirtualVector3DList translations,
+                    VirtualEulerList rotations, VirtualVector3DList scales):
+    cdef Matrix4x4List matrices = Matrix4x4List(length = amount)
+    cdef Py_ssize_t i
 
-        long length = CDefaultList.getMaxLength(_translations, _rotations, _scales)
-        Matrix4x4List matrices = Matrix4x4List(length = length)
-        long i
-
-    for i in range(matrices.length):
+    for i in range(amount):
         setTranslationRotationScaleMatrix(matrices.data + i,
-            <Vector3*>_translations.get(i),
-            <Euler3*>_rotations.get(i),
-            <Vector3*>_scales.get(i))
+            translations.get(i), rotations.get(i), scales.get(i))
 
     return matrices
 

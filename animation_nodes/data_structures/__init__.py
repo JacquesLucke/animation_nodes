@@ -9,6 +9,12 @@ def importDataStructures():
         FloatList, DoubleList, LongList, IntegerList, UShortList, CharList,
         QuaternionList, UIntegerList, ShortList, UShortList)
 
+    from . virtual_list.virtual_list import VirtualList, VirtualPyList
+    from . virtual_list.virtual_clists import (
+        VirtualVector3DList, VirtualMatrix4x4List, VirtualEulerList, VirtualBooleanList,
+        VirtualFloatList, VirtualDoubleList, VirtualLongList)
+
+
     from . splines.base_spline import Spline
     from . splines.poly_spline import PolySpline
     from . splines.bezier_spline import BezierSpline
