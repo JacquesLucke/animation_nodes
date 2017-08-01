@@ -31,6 +31,8 @@ cdef class VirtualPyList(VirtualList):
             return VirtualPyList_Element_Copy(element, copy)
 
 cdef class VirtualPyList_Element_NoCopy(VirtualPyList):
+    cdef object element
+
     def __cinit__(self, object element):
         self.element = element
 
@@ -38,6 +40,9 @@ cdef class VirtualPyList_Element_NoCopy(VirtualPyList):
         return self.element
 
 cdef class VirtualPyList_Element_Copy(VirtualPyList):
+    cdef object element
+    cdef object copy
+
     def __cinit__(self, object element, copy):
         self.element = element
         self.copy = copy
@@ -46,6 +51,9 @@ cdef class VirtualPyList_Element_Copy(VirtualPyList):
         return self.copy(self.element)
 
 cdef class VirtualPyList_List_NoCopy(VirtualPyList):
+    cdef list realList
+    cdef Py_ssize_t realLength
+
     def __cinit__(self, list realList):
         self.realList = realList
         self.realLength = len(realList)
@@ -55,6 +63,10 @@ cdef class VirtualPyList_List_NoCopy(VirtualPyList):
         return self.realList[index % self.realLength]
 
 cdef class VirtualPyList_List_Copy(VirtualPyList):
+    cdef list realList
+    cdef Py_ssize_t realLength
+    cdef object copy
+
     def __cinit__(self, list realList, copy):
         self.realList = realList
         self.realLength = len(realList)
