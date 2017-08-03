@@ -14,5 +14,8 @@ class SocketTemplate:
     def getRelatedPropertyNames(self):
         raise NotImplementedError()
 
+    def applyWithContext(self, node, socket, updatedProperties, fixedProperties):
+        return self.apply(node, socket)
+
     def apply(self, node, socket):
         raise NotImplementedError()

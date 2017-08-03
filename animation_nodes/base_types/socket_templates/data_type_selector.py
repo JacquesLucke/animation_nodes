@@ -26,7 +26,7 @@ class DataTypeSelectorSocket(SocketTemplate):
     def getRelatedPropertyNames(self):
         return {self.propertyName}
 
-    def apply(self, node, socket, updatedProperties, fixedProperties):
+    def apply(self, node, socket):
         linkedDataTypes = tuple(sorted(socket.linkedDataTypes - self.ignoredTypes))
         if len(linkedDataTypes) > 0:
             linkedType = linkedDataTypes[0]

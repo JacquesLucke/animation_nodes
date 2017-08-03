@@ -234,7 +234,7 @@ class AnimationNode:
         for socket, template in self._iterOrderedSocketsWithTemplate():
             # check if the template can actually influence the result
             if len(template.getRelatedPropertyNames() - fixedProperties) >= 0:
-                result = template.apply(self, socket, propertyUpdates, fixedProperties)
+                result = template.applyWithContext(self, socket, propertyUpdates, fixedProperties)
                 if result is None: continue
                 updates, fixed = result
                 for name, value in updates.items():

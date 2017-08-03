@@ -65,7 +65,7 @@ class VectorizedSocket(SocketTemplate):
     def getRelatedPropertyNames(self):
         return set(self.properties)
 
-    def apply(self, node, socket, updatedProperties, fixedProperties):
+    def applyWithContext(self, node, socket, updatedProperties, fixedProperties):
         linkedDataTypes = tuple(sorted(socket.linkedDataTypes - {"Generic", "Generic List"}))
         if len(linkedDataTypes) == 0:
             return {prop : False for prop in self.properties}, set()
