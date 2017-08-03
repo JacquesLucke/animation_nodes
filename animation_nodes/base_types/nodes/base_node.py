@@ -286,11 +286,13 @@ class AnimationNode:
                 socket = template.createAsInput(self)
                 socketData = infoByNode[self.identifier].inputs[socket.identifier]
                 socketData.initialize(template)
-        elif len(args) >= 3:
+        elif len(args) == 2:
+            socket = self.inputs.new(toSocketIdName(args[0]), args[1], args[1])
+        elif len(args) == 3:
             socket = self.inputs.new(toSocketIdName(args[0]), args[1], args[2])
-            self._setSocketProperties(socket, kwargs)
         else:
             raise Exception("invalid arguments")
+        self._setSocketProperties(socket, kwargs)
         return socket
 
     def newOutput(self, *args, **kwargs):
@@ -300,11 +302,13 @@ class AnimationNode:
                 socket = template.createAsOutput(self)
                 socketData = infoByNode[self.identifier].outputs[socket.identifier]
                 socketData.initialize(template)
-        elif len(args) >= 3:
+        elif len(args) == 2:
+            socket = self.outputs.new(toSocketIdName(args[0]), args[1], args[1])
+        elif len(args) == 3:
             socket = self.outputs.new(toSocketIdName(args[0]), args[1], args[2])
-            self._setSocketProperties(socket, kwargs)
         else:
             raise Exception("invalid arguments")
+        self._setSocketProperties(socket, kwargs)
         return socket
 
     def _setSocketProperties(self, socket, properties):
