@@ -24,11 +24,11 @@ socketEffectsByIdentifier = defaultdict(list)
 
 class NonPersistentSocketData:
     def __init__(self):
-        self.additionalIdentifiers = set()
+        self.extraIdentifiers = set()
         self.template = None
 
     def initialize(self, template):
-        self.additionalIdentifiers = template.getSocketIdentifiers()
+        self.extraIdentifiers = template.getSocketIdentifiers()
         self.template = template
 
 class NonPersistentNodeData:
@@ -164,8 +164,6 @@ class AnimationNode:
         self.identifier = createIdentifier()
         infoByNode[self.identifier] = infoByNode[sourceNode.identifier]
         self.duplicate(sourceNode)
-        for socket, sourceSocket in zip(self.sockets, sourceNode.sockets):
-            socket.alternativeIdentifiers = sourceSocket.alternativeIdentifiers
 
     def free(self):
         self.delete()
@@ -426,6 +424,13 @@ class AnimationNode:
         for identifier, variable in self.getOutputSocketVariables().items():
             if variable in names:
                 yield (names[variable], identifier)
+
+    def getAllIdentifiersOfSocket(self, socket):
+        ident = socket.identifier
+        if socket.is_output:
+            return infoByNode[self.identifier].outputs[ident].extraIdentifiers | {ident}
+        else:
+            return infoByNode[self.identifier].inputs[ident].extraIdentifiers | {ident}
 
     @property
     def nodeTree(self):
