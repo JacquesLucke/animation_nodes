@@ -1,28 +1,29 @@
 import bpy
 from bpy.props import *
-from ... base_types import VectorizedNode
+from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import Vector3DList, DoubleList
 from . c_utils import combineDoubleListsToVectorList
 
-class CombineVectorNode(bpy.types.Node, VectorizedNode):
+class CombineVectorNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CombineVectorNode"
     bl_label = "Combine Vector"
     dynamicLabelType = "HIDDEN_ONLY"
 
-    useListX = VectorizedNode.newVectorizeProperty()
-    useListY = VectorizedNode.newVectorizeProperty()
-    useListZ = VectorizedNode.newVectorizeProperty()
+    useListX = VectorizedSocket.newProperty()
+    useListY = VectorizedSocket.newProperty()
+    useListZ = VectorizedSocket.newProperty()
 
     errorMessage = StringProperty()
 
     def create(self):
-        self.newVectorizedInput("Float", "useListX", ("X", "x"), ("X", "x"))
-        self.newVectorizedInput("Float", "useListY", ("Y", "y"), ("Y", "y"))
-        self.newVectorizedInput("Float", "useListZ", ("Z", "z"), ("Z", "z"))
+        self.newInput(VectorizedSocket("Float", "useListX", ("X", "x"), ("X", "x")))
+        self.newInput(VectorizedSocket("Float", "useListY", ("Y", "y"), ("Y", "y")))
+        self.newInput(VectorizedSocket("Float", "useListZ", ("Z", "z"), ("Z", "z")))
 
-        self.newVectorizedOutput("Vector", [("useListX", "useListY", "useListZ")],
-            ("Vector", "vector"), ("Vectors", "vectors"))
-
+        self.newOutput(VectorizedSocket("Vector",
+            ["useListX", "useListY", "useListZ"],
+            ("Vector", "vector"), ("Vectors", "vectors")))
+            
     def draw(self, layout):
         if self.errorMessage != "":
             layout.label(self.errorMessage, icon = "ERROR")
