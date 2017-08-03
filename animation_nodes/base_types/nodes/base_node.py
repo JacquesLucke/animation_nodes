@@ -240,7 +240,7 @@ class AnimationNode:
                 for name, value in updates.items():
                     if name not in fixedProperties:
                         propertyUpdates[name] = value
-                    fixedProperties.update(fixed)
+                fixedProperties.update(fixed)
 
         propertiesChanged = False
         for name, value in propertyUpdates.items():

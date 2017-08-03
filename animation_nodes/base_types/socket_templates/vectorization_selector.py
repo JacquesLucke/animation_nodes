@@ -76,7 +76,9 @@ class VectorizedSocket(SocketTemplate):
                 if self.noneIsFixedBase(updatedProperties, fixedProperties):
                     return {prop : True for prop in self.properties}, set(self.properties)
             elif linkedType in self.inputBaseTypes:
-                return {prop : False for prop in self.properties}, set(self.properties)
+                prop = self.getPropertyThatShouldBeBase(updatedProperties, fixedProperties)
+                if prop is not None:
+                    return {prop : False}, {prop}
         else:
             if linkedType in self.outputListTypes:
                 prop = self.getPropertyThatShouldBeList(updatedProperties, fixedProperties)
@@ -88,6 +90,12 @@ class VectorizedSocket(SocketTemplate):
             if not updatedProperties.get(prop, False) and prop in fixedProperties:
                 return False
         return True
+
+    def getPropertyThatShouldBeBase(self, updatedProperties, fixedProperties):
+        for prop in self.properties:
+            if not (updatedProperties.get(prop, False) and prop in fixedProperties):
+                return prop
+        return None
 
     def getPropertyThatShouldBeList(self, updatedProperties, fixedProperties):
         # first check if there is already a list
