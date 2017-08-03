@@ -4,13 +4,16 @@ import types
 import random
 from bpy.props import *
 from collections import defaultdict
+from ... import tree_info
 from ... utils.handlers import eventHandler
 from ... ui.node_colors import colorAllNodes
+from .. socket_templates import SocketTemplate
 from ... preferences import getExecutionCodeType
 from ... operators.callbacks import newNodeCallback
 from ... sockets.info import toIdName as toSocketIdName
 from ... utils.blender_ui import iterNodeCornerLocations
 from ... execution.measurements import getMinExecutionTimeString
+from ... utils.attributes import setattrRecursive, getattrRecursive
 from ... operators.dynamic_operators import getInvokeFunctionOperator
 from ... utils.nodes import getAnimationNodeTrees, iterAnimationNodes
 from ... tree_info import (getNetworkWithNode, getOriginNodes,
@@ -18,6 +21,22 @@ from ... tree_info import (getNetworkWithNode, getOriginNodes,
                            iterUnlinkedInputSockets, keepNodeState)
 
 socketEffectsByIdentifier = defaultdict(list)
+
+class NonPersistentSocketData:
+    def __init__(self):
+        self.additionalIdentifiers = set()
+        self.template = None
+
+    def initialize(self, template):
+        self.additionalIdentifiers = template.getSocketIdentifiers()
+        self.template = template
+
+class NonPersistentNodeData:
+    def __init__(self):
+        self.inputs = defaultdict(NonPersistentSocketData)
+        self.outputs = defaultdict(NonPersistentSocketData)
+
+infoByNode = defaultdict(NonPersistentNodeData)
 
 class AnimationNode:
     bl_width_min = 40
@@ -143,7 +162,7 @@ class AnimationNode:
 
     def copy(self, sourceNode):
         self.identifier = createIdentifier()
-        self.copySocketEffects(sourceNode)
+        infoByNode[self.identifier] = infoByNode[sourceNode.identifier]
         self.duplicate(sourceNode)
         for socket, sourceSocket in zip(self.sockets, sourceNode.sockets):
             socket.alternativeIdentifiers = sourceSocket.alternativeIdentifiers
@@ -175,7 +194,8 @@ class AnimationNode:
     ####################################################
 
     def updateNode(self):
-        self.applySocketEffects()
+        self._applySocketTemplates()
+        tree_info.updateIfNecessary()
         self.edit()
 
     def refresh(self, context = None):
@@ -194,7 +214,7 @@ class AnimationNode:
 
     def _clear(self):
         self.clearSockets()
-        self._clearSocketEffects()
+        infoByNode.pop(self.identifier, None)
 
     def _create(self):
         self.preCreate()
@@ -206,22 +226,40 @@ class AnimationNode:
         return hasattr(self, "create")
 
 
-    # Socket Effects
+    # Socket Templates
     ####################################################
 
-    def applySocketEffects(self):
-        for effect in socketEffectsByIdentifier[self.identifier]:
-            effect.apply(self)
+    def _applySocketTemplates(self):
+        propertyUpdates = dict()
+        fixedProperties = set()
 
-    def _clearSocketEffects(self):
-        if self.identifier in socketEffectsByIdentifier:
-            del socketEffectsByIdentifier[self.identifier]
+        for socket, template in self._iterOrderedSocketsWithTemplate():
+            # check if the template can actually influence the result
+            if len(template.getRelatedPropertyNames() - fixedProperties) >= 0:
+                updates, fixed = template.apply(self, socket)
+                for name, value in updates.items():
+                    if name not in fixedProperties:
+                        propertyUpdates[name] = value
+                    fixedProperties.update(fixed)
 
-    def copySocketEffects(self, sourceNode):
-        socketEffectsByIdentifier[self.identifier] = socketEffectsByIdentifier[sourceNode.identifier]
+        propertiesChanged = False
+        for name, value in propertyUpdates.items():
+            if getattrRecursive(self, name) != value:
+                setattrRecursive(self, name, value)
+                propertiesChanged = True
+        if propertiesChanged:
+            self.refresh()
 
-    def newSocketEffect(self, effect):
-        socketEffectsByIdentifier[self.identifier].append(effect)
+    def _iterOrderedSocketsWithTemplate(self):
+        nodeInfo = infoByNode[self.identifier]
+        for socket in self.inputs:
+            template = nodeInfo.inputs[socket.identifier].template
+            if template is not None:
+                yield (socket, template)
+        for socket in self.outputs:
+            template = nodeInfo.outputs[socket.identifier].template
+            if template is not None:
+                yield (socket, template)
 
 
     # Remove Utilities
@@ -241,55 +279,37 @@ class AnimationNode:
     # Create/Update/Remove Sockets
     ####################################################
 
-    def newInput(self, type, name, identifier = None, alternativeIdentifier = None, **kwargs):
-        idName = toSocketIdName(type)
-        if idName is None:
-            raise ValueError("Socket type does not exist: {}".format(repr(type)))
-        if identifier is None: identifier = name
-        socket = self.inputs.new(idName, name, identifier)
-        self._setAlternativeIdentifier(socket, alternativeIdentifier)
-        self._setSocketProperties(socket, kwargs)
+    def newInput(self, *args, **kwargs):
+        if len(args) == 1:
+            if isinstance(args[0], SocketTemplate):
+                template = args[0]
+                socket = template.createAsInput(self)
+                socketData = infoByNode[self.identifier].inputs[socket.identifier]
+                socketData.initialize(template)
+        elif len(args) >= 3:
+            socket = self.inputs.new(toSocketIdName(args[0]), args[1], args[2])
+            self._setSocketProperties(socket, kwargs)
+        else:
+            raise Exception("invalid arguments")
         return socket
 
-    def newOutput(self, type, name, identifier = None, alternativeIdentifier = None, **kwargs):
-        idName = toSocketIdName(type)
-        if idName is None:
-            raise ValueError("Socket type does not exist: {}".format(repr(type)))
-        if identifier is None: identifier = name
-        socket = self.outputs.new(idName, name, identifier)
-        self._setAlternativeIdentifier(socket, alternativeIdentifier)
-        self._setSocketProperties(socket, kwargs)
+    def newOutput(self, *args, **kwargs):
+        if len(args) == 1:
+            if isinstance(args[0], SocketTemplate):
+                template = args[0]
+                socket = template.createAsOutput(self)
+                socketData = infoByNode[self.identifier].outputs[socket.identifier]
+                socketData.initialize(template)
+        elif len(args) >= 3:
+            socket = self.outputs.new(toSocketIdName(args[0]), args[1], args[2])
+            self._setSocketProperties(socket, kwargs)
+        else:
+            raise Exception("invalid arguments")
         return socket
-
-    def _setAlternativeIdentifier(self, socket, alternativeIdentifier):
-        if isinstance(alternativeIdentifier, str):
-            socket.alternativeIdentifiers = [alternativeIdentifier]
-        elif isinstance(alternativeIdentifier, (list, tuple, set)):
-            socket.alternativeIdentifiers = list(alternativeIdentifier)
 
     def _setSocketProperties(self, socket, properties):
         for key, value in properties.items():
             setattr(socket, key, value)
-
-    def newInputGroup(self, selector, *socketsData):
-        return self._newSocketGroup(int(selector), socketsData, self.newInput)
-
-    def newOutputGroup(self, selector, *socketsData):
-        return self._newSocketGroup(int(selector), socketsData, self.newOutput)
-
-    def _newSocketGroup(self, index, socketsData, newSocketFunction):
-        if 0 <= index < len(socketsData):
-            data = socketsData[index]
-            if len(data) == 3:
-                socket = newSocketFunction(data[0], data[1], data[2])
-            elif len(data) == 4:
-                socket = newSocketFunction(data[0], data[1], data[2], **data[3])
-            else:
-                raise ValueError("invalid socket data")
-            socket.alternativeIdentifiers = [data[2] for data in socketsData]
-            return socket
-        else:
-            raise ValueError("invalid selector")
 
     def clearSockets(self):
         self.clearInputs()

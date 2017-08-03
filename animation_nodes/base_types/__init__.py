@@ -11,3 +11,8 @@ from . sockets import (AnimationNodeSocket,
 from . effects import (AutoSelectListDataType,
                        AutoSelectDataType,
                        AutoSelectVectorization)
+
+from . socket_templates import (
+    SocketTemplate,
+    DataTypeSelectorSocket
+)
