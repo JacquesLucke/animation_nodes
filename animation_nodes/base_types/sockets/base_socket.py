@@ -91,10 +91,6 @@ class AnimationNodeSocket:
         '''
         raise NotImplementedError("All sockets have to define a correctValue method")
 
-    @classmethod
-    def getConversionCode(cls, dataType):
-        return None
-
 
     # Drawing
     ##########################################################
@@ -229,6 +225,10 @@ class AnimationNodeSocket:
 
     def getTemporaryIdentifier(self):
         return str(hash(self)) + self.identifier
+
+    def setAttributes(self, properties):
+        for key, value in properties.items():
+            setattr(self, key, value)
 
 
     # Move Utilities

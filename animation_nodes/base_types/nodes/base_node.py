@@ -236,7 +236,9 @@ class AnimationNode:
         for socket, template in self._iterOrderedSocketsWithTemplate():
             # check if the template can actually influence the result
             if len(template.getRelatedPropertyNames() - fixedProperties) >= 0:
-                updates, fixed = template.apply(self, socket)
+                result = template.apply(self, socket)
+                if result is None: continue
+                updates, fixed = result
                 for name, value in updates.items():
                     if name not in fixedProperties:
                         propertyUpdates[name] = value
@@ -308,7 +310,7 @@ class AnimationNode:
             socket = self.outputs.new(toSocketIdName(args[0]), args[1], args[2])
         else:
             raise Exception("invalid arguments")
-        self._setSocketProperties(socket, kwargs)
+        socket.setAttributes(kwargs)
         return socket
 
     def _setSocketProperties(self, socket, properties):
