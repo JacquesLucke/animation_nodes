@@ -4,11 +4,11 @@ from ... utils.attributes import getattrRecursive
 from ... sockets.info import toIdName as toSocketIdName
 
 class DataTypeSelectorSocket(SocketTemplate):
-    def __init__(self, name, identifier, propertyName):
+    def __init__(self, name, identifier, propertyName, ignore = set()):
         self.name = name
         self.identifier = identifier
         self.propertyName = propertyName
-        self.ignoredTypes = {"Node Control"}
+        self.ignoredTypes = {"Node Control"} | ignore
 
     @classmethod
     def newProperty(cls, default = "Float"):

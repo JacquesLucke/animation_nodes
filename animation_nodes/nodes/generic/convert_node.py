@@ -1,14 +1,13 @@
 import bpy
 from bpy.props import *
-from ... base_types import AnimationNode, AutoSelectDataType
-from ... sockets.info import toIdName
+from ... base_types import AnimationNode, DataTypeSelectorSocket
 
 class ConvertNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ConvertNode"
     bl_label = "Convert"
     bl_width = 100
 
-    dataType = StringProperty(default = "Generic", update = AnimationNode.refresh)
+    dataType = DataTypeSelectorSocket.newProperty(default = "Generic")
     lastCorrectionType = IntProperty()
 
     fixedOutputDataType = BoolProperty(name = "Fixed Data Type", default = False,
@@ -20,11 +19,11 @@ class ConvertNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.newInput("Generic", "Old", "old", dataIsModified = True)
-        self.newOutput(self.dataType, "New", "new")
 
-        if not self.fixedOutputDataType:
-            self.newSocketEffect(AutoSelectDataType(
-                "dataType", [self.outputs[0]], ignore = {"Generic"}))
+        if self.fixedOutputDataType:
+            self.newOutput(self.dataType, "New", "new")
+        else:
+            self.newOutput(DataTypeSelectorSocket("New", "new", "dataType", ignore = {"Generic"}))
 
     def draw(self, layout):
         row = layout.row(align = True)
@@ -39,6 +38,7 @@ class ConvertNode(bpy.types.Node, AnimationNode):
         self.fixedOutputDataType = True
         if self.dataType != dataType:
             self.dataType = dataType
+            self.refresh()
 
     def getExecutionCode(self, required):
         yield "new, self.lastCorrectionType = self.outputs[0].correctValue(old)"
