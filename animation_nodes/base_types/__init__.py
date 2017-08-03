@@ -8,9 +8,7 @@ from . sockets import (AnimationNodeSocket,
                        PythonListSocket,
                        CListSocket)
 
-from . effects import (AutoSelectListDataType,
-                       AutoSelectDataType,
-                       AutoSelectVectorization)
+from . effects import AutoSelectVectorization
 
 from . socket_templates import (
     SocketTemplate,
