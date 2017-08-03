@@ -1,8 +1,8 @@
 class SocketTemplate:
-    def createAsInput(self, node):
+    def createInput(self, node):
         return self.create(node, node.inputs)
 
-    def createAsOutput(self, node):
+    def createOutput(self, node):
         return self.create(node, node.outputs)
 
     def create(self, node, sockets):

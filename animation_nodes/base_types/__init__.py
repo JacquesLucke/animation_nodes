@@ -14,6 +14,7 @@ from . effects import (AutoSelectListDataType,
 
 from . socket_templates import (
     SocketTemplate,
+    VectorizedSocket,
     DataTypeSelectorSocket,
     ListTypeSelectorSocket
 )
