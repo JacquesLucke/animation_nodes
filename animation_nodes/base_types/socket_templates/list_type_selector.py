@@ -49,7 +49,7 @@ class ListTypeSelectorSocket(SocketTemplate):
         return {self.propertyName}
 
     def apply(self, node, socket):
-        linkedDataTypes = tuple(sorted(socket.linkedDataTypes))
+        linkedDataTypes = tuple(sorted(socket.linkedDataTypes - {"Generic"}))
         if len(linkedDataTypes) > 0:
             linkedType = linkedDataTypes[0]
             if self.check(linkedType):

@@ -3,7 +3,7 @@ import itertools
 from bpy.props import *
 from ... sockets.info import isList
 from ... events import executionCodeChanged
-from ... base_types import AnimationNode, AutoSelectListDataType
+from ... base_types import AnimationNode, ListTypeSelectorSocket
 
 operationItems = [
     ("UNION", "Union", "Elements that are at least in one of both lists", "NONE", 0),
@@ -18,18 +18,16 @@ class ListBooleanOperationsNode(bpy.types.Node, AnimationNode):
     operation = EnumProperty(name = "Operation", default = "UNION",
         items = operationItems, update = executionCodeChanged)
 
-    assignedType = StringProperty(update = AnimationNode.refresh, default = "Object List")
+    assignedType = ListTypeSelectorSocket.newProperty(default = "Object List")
 
     def create(self):
-        self.newInput(self.assignedType, "List 1", "list1", dataIsModified = True)
-        self.newInput(self.assignedType, "List 2", "list2", dataIsModified = True)
-        self.newOutput(self.assignedType, "List", "outList")
-
-        self.newSocketEffect(AutoSelectListDataType("assignedType", "LIST",
-            [(self.inputs[0], "LIST"),
-             (self.inputs[1], "LIST"),
-             (self.outputs[0], "LIST")]
-        ))
+        prop = ("assignedType", "LIST")
+        self.newInput(ListTypeSelectorSocket(
+            "List 1", "list1", "LIST", prop, dataIsModified = True))
+        self.newInput(ListTypeSelectorSocket(
+            "List 2", "list2", "LIST", prop, dataIsModified = True))
+        self.newOutput(ListTypeSelectorSocket(
+            "List", "outList", "LIST", prop))
 
     def draw(self, layout):
         layout.prop(self, "operation", text = "")
@@ -91,3 +89,4 @@ class ListBooleanOperationsNode(bpy.types.Node, AnimationNode):
         if not isList(listDataType): return
         if listDataType == self.assignedType: return
         self.assignedType = listDataType
+        self.refresh()
