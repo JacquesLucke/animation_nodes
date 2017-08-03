@@ -8,6 +8,7 @@ class DataTypeSelectorSocket(SocketTemplate):
         self.name = name
         self.identifier = identifier
         self.propertyName = propertyName
+        self.ignoredTypes = {"Node Control"}
 
     @classmethod
     def newProperty(cls, default = "Float"):
@@ -27,7 +28,7 @@ class DataTypeSelectorSocket(SocketTemplate):
 
     def apply(self, node, socket):
         currentType = socket.dataType
-        linkedDataTypes = tuple(sorted(socket.linkedDataTypes))
+        linkedDataTypes = tuple(sorted(socket.linkedDataTypes - self.ignoredTypes))
         if len(linkedDataTypes) == 0:
             return {self.propertyName : currentType}, set()
         else:
