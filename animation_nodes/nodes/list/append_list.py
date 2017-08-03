@@ -1,27 +1,21 @@
 import bpy
-from bpy.props import *
-from ... sockets.info import isBase, toBaseDataType, toListDataType
-from ... base_types import AnimationNode, AutoSelectListDataType
+from ... sockets.info import isBase, toBaseDataType
+from ... base_types import AnimationNode, ListTypeSelectorSocket
 
 class AppendListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_AppendListNode"
     bl_label = "Append to List"
 
-    assignedType = StringProperty(update = AnimationNode.refresh, default = "Float")
+    assignedType = ListTypeSelectorSocket.newProperty(default = "Float")
 
     def create(self):
-        baseDataType = self.assignedType
-        listDataType = toListDataType(self.assignedType)
-
-        self.newInput(listDataType, "List", "list", dataIsModified  = True)
-        self.newInput(baseDataType, "Element", "element", dataIsModified = True)
-        self.newOutput(listDataType, "List", "list")
-
-        self.newSocketEffect(AutoSelectListDataType("assignedType", "BASE",
-            [(self.inputs[0], "LIST"),
-             (self.inputs[1], "BASE"),
-             (self.outputs[0], "LIST")]
-        ))
+        prop = ("assignedType", "BASE")
+        self.newInput(ListTypeSelectorSocket(
+            "List", "list", "LIST", prop, dataIsModified = True))
+        self.newInput(ListTypeSelectorSocket(
+            "Element", "element", "BASE", prop, dataIsModified = True))
+        self.newOutput(ListTypeSelectorSocket(
+            "List", "list", "LIST", prop))
 
     def drawAdvanced(self, layout):
         self.invokeSelector(layout, "DATA_TYPE", "assignListDataType",
@@ -37,3 +31,4 @@ class AppendListNode(bpy.types.Node, AnimationNode):
         if not isBase(baseDataType): return
         if baseDataType == self.assignedType: return
         self.assignedType = baseDataType
+        self.refresh()
