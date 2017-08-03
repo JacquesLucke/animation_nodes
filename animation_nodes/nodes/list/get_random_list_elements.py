@@ -1,9 +1,9 @@
 import bpy
 import random
 from bpy.props import *
+from ... sockets.info import isList
 from ... events import propertyChanged
-from ... sockets.info import isList, toBaseDataType
-from ... base_types import AnimationNode, AutoSelectListDataType
+from ... base_types import AnimationNode, ListTypeSelectorSocket
 
 selectionTypeItems = [
     ("SINGLE", "Single", "Select only one random element from the list", "NONE", 0),
@@ -13,7 +13,7 @@ class GetRandomListElementsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GetRandomListElementsNode"
     bl_label = "Get Random List Elements"
 
-    assignedType = StringProperty(update = AnimationNode.refresh, default = "Float List")
+    assignedType = ListTypeSelectorSocket.newProperty(default = "Float List")
 
     selectionType = EnumProperty(name = "Select Type", default = "MULTIPLE",
         items = selectionTypeItems, update = AnimationNode.refresh)
@@ -24,21 +24,16 @@ class GetRandomListElementsNode(bpy.types.Node, AnimationNode):
         self.randomizeNodeSeed()
 
     def create(self):
-        listDataType = self.assignedType
-        baseDataType = toBaseDataType(listDataType)
-
+        prop = ("assignedType", "LIST")
         self.newInput("Integer", "Seed", "seed")
-        self.newInput(listDataType, "List", "inList", dataIsModified = True)
+        self.newInput(ListTypeSelectorSocket(
+            "List", "inList", "LIST", prop, dataIsModified = True))
+
         if self.selectionType == "SINGLE":
-            self.newOutput(baseDataType, "Element", "outElement")
+            self.newOutput(ListTypeSelectorSocket("Element", "outElement", "BASE", prop))
         elif self.selectionType == "MULTIPLE":
             self.newInput("Integer", "Amount", "amount", value = 3, minValue = 0)
-            self.newOutput(listDataType, "List", "outList")
-
-        self.newSocketEffect(AutoSelectListDataType("assignedType", "LIST",
-            [(self.inputs[1], "LIST"),
-             (self.outputs[0], "BASE" if self.selectionType == "SINGLE" else "LIST")]
-        ))
+            self.newOutput(ListTypeSelectorSocket("List", "outList", "LIST", prop))
 
     def draw(self, layout):
         layout.prop(self, "selectionType", text = "")
@@ -62,6 +57,7 @@ class GetRandomListElementsNode(bpy.types.Node, AnimationNode):
         if not isList(listDataType): return
         if listDataType == self.assignedType: return
         self.assignedType = listDataType
+        self.refresh()
 
     def duplicate(self, sourceNode):
         self.randomizeNodeSeed()
