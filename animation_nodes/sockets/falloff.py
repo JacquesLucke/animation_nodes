@@ -42,7 +42,7 @@ class FalloffListSocket(bpy.types.NodeSocket, PythonListSocket):
     bl_idname = "an_FalloffListSocket"
     bl_label = "Falloff List Socket"
     dataType = "Falloff List"
-    baseDataType = "Falloff"
+    baseType = FalloffSocket
     drawColor = (0.32, 1, 0.18, 0.5)
     storable = False
     comparable = False

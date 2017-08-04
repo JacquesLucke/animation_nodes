@@ -54,7 +54,7 @@ class TextBlockListSocket(bpy.types.NodeSocket, PythonListSocket):
     bl_idname = "an_TextBlockListSocket"
     bl_label = "Text Block List Socket"
     dataType = "Text Block List"
-    baseDataType = "Text Block"
+    baseType = TextBlockSocket
     drawColor = (0.5, 0.5, 0.5, 0.5)
     storable = False
     comparable = False

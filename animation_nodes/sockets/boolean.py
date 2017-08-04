@@ -59,7 +59,7 @@ class BooleanListSocket(bpy.types.NodeSocket, CListSocket):
     bl_idname = "an_BooleanListSocket"
     bl_label = "Boolean List Socket"
     dataType = "Boolean List"
-    baseDataType = "Boolean"
+    baseType = BooleanSocket
     drawColor = (0.7, 0.7, 0.4, 0.5)
     storable = True
     comparable = False

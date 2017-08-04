@@ -63,7 +63,7 @@ class SequenceListSocket(bpy.types.NodeSocket, PythonListSocket):
     bl_idname = "an_SequenceListSocket"
     bl_label = "Sequence List Socket"
     dataType = "Sequence List"
-    baseDataType = "Sequence"
+    baseType = SequenceSocket
     drawColor = (0, 0.644, 0, 0.5)
     storable = False
     comparable = False

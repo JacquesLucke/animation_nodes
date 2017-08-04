@@ -36,8 +36,8 @@ class SocketInfo:
 
         # then insert the socket connections
         for socket in socketClasses:
-            if hasattr(socket, "baseDataType"):
-                self.insertSocketConnection(socket.baseDataType, socket.dataType)
+            if hasattr(socket, "baseType"):
+                self.insertSocketConnection(socket.baseType.dataType, socket.dataType)
 
         # insert allowed input data types
         for socket in socketClasses:

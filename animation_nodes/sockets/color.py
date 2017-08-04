@@ -46,7 +46,7 @@ class ColorListSocket(bpy.types.NodeSocket, PythonListSocket):
     bl_idname = "an_ColorListSocket"
     bl_label = "Color List Socket"
     dataType = "Color List"
-    baseDataType = "Color"
+    baseType = ColorSocket
     drawColor = (0.8, 0.8, 0.2, 0.5)
     storable = True
     comparable = False

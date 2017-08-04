@@ -29,7 +29,7 @@ class EdgeIndicesListSocket(bpy.types.NodeSocket, CListSocket):
     bl_idname = "an_EdgeIndicesListSocket"
     bl_label = "Edge Indices List Socket"
     dataType = "Edge Indices List"
-    baseDataType = "Edge Indices"
+    baseType = EdgeIndicesSocket
     drawColor = (0.4, 0.6, 0.6, 0.5)
     storable = True
     comparable = False

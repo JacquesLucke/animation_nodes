@@ -54,7 +54,7 @@ class VectorListSocket(bpy.types.NodeSocket, CListSocket):
     bl_idname = "an_VectorListSocket"
     bl_label = "Vector List Socket"
     dataType = "Vector List"
-    baseDataType = "Vector"
+    baseType = VectorSocket
     drawColor = (0.15, 0.15, 0.8, 0.5)
     storable = True
     comparable = False

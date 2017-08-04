@@ -52,7 +52,7 @@ class EulerListSocket(bpy.types.NodeSocket, CListSocket):
     bl_idname = "an_EulerListSocket"
     bl_label = "Euler List Socket"
     dataType = "Euler List"
-    baseDataType = "Euler"
+    baseType = EulerSocket
     drawColor = (0.1, 0.0, 0.4, 0.5)
     storable = True
     comparable = False

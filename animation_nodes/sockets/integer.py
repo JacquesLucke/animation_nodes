@@ -61,7 +61,7 @@ class IntegerListSocket(bpy.types.NodeSocket, CListSocket):
     bl_idname = "an_IntegerListSocket"
     bl_label = "Integer List Socket"
     dataType = "Integer List"
-    baseDataType = "Integer"
+    baseType = IntegerSocket
     drawColor = (0.3, 0.4, 1.0, 0.5)
     storable = True
     comparable = False
