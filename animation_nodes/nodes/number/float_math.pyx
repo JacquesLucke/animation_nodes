@@ -1,8 +1,8 @@
 import bpy
 from bpy.props import *
 from collections import OrderedDict
-from ... base_types import VectorizedNode
 from ... utils.handlers import validCallback
+from ... base_types import AnimationNode, VectorizedSocket
 
 from ... data_structures cimport DoubleList
 from ... math cimport min as minNumber
@@ -150,7 +150,7 @@ searchItems = {
 
 justCopiedIdentifiers = set()
 
-class FloatMathNode(bpy.types.Node, VectorizedNode):
+class FloatMathNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_FloatMathNode"
     bl_label = "Float Math"
     dynamicLabelType = "ALWAYS"
@@ -168,11 +168,11 @@ class FloatMathNode(bpy.types.Node, VectorizedNode):
 
     errorMessage = StringProperty()
 
-    useListA = VectorizedNode.newVectorizeProperty()
-    useListB = VectorizedNode.newVectorizeProperty()
-    useListBase = VectorizedNode.newVectorizeProperty()
-    useListExponent = VectorizedNode.newVectorizeProperty()
-    useListStep = VectorizedNode.newVectorizeProperty()
+    useListA = VectorizedSocket.newProperty()
+    useListB = VectorizedSocket.newProperty()
+    useListBase = VectorizedSocket.newProperty()
+    useListExponent = VectorizedSocket.newProperty()
+    useListStep = VectorizedSocket.newProperty()
 
     def create(self):
         usedProperties = []
@@ -181,11 +181,11 @@ class FloatMathNode(bpy.types.Node, VectorizedNode):
             listProperty = "useList" + name
             usedProperties.append(listProperty)
 
-            self.newVectorizedInput("Float", listProperty,
-                (name, name.lower()), (name, name.lower()))
+            self.newInput(VectorizedSocket("Float", listProperty,
+                (name, name.lower()), (name, name.lower())))
 
-        self.newVectorizedOutput("Float", [usedProperties],
-            ("Result", "result"), ("Results", "results"))
+        self.newOutput(VectorizedSocket("Float", usedProperties,
+            ("Result", "result"), ("Results", "results")))
 
     def draw(self, layout):
         showQuickOptions = self.identifier in justCopiedIdentifiers
