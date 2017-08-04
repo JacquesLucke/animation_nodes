@@ -35,6 +35,7 @@ class NonPersistentNodeData:
     def __init__(self):
         self.inputs = defaultdict(NonPersistentSocketData)
         self.outputs = defaultdict(NonPersistentSocketData)
+        self.codeEffects = []
 
 infoByNode = defaultdict(NonPersistentNodeData)
 
@@ -64,6 +65,11 @@ class AnimationNode:
     # can be "NONE", "ALWAYS" or "HIDDEN_ONLY"
     dynamicLabelType = "NONE"
 
+    # should be a list of functions
+    # each function takes a node as input
+    # it should always return a CodeEffect
+    codeEffects = []
+
     @classmethod
     def poll(cls, nodeTree):
         return nodeTree.bl_idname == "an_AnimationNodeTree"
@@ -73,12 +79,6 @@ class AnimationNode:
     ######################################
 
     def setup(self):
-        pass
-
-    def preCreate(self):
-        pass
-
-    def postCreate(self):
         pass
 
     # may be defined in nodes
@@ -215,9 +215,13 @@ class AnimationNode:
         infoByNode.pop(self.identifier, None)
 
     def _create(self):
-        self.preCreate()
         self.create()
-        self.postCreate()
+        infoByNode[self.identifier].codeEffects = list(self._iterNewCodeEffects())
+
+    def _iterNewCodeEffects(self):
+        for createCodeEffect in self.codeEffects:
+            yield createCodeEffect(self)
+        yield from self.getCodeEffects()
 
     @property
     def isRefreshable(self):
@@ -231,9 +235,11 @@ class AnimationNode:
         propertyUpdates = dict()
         fixedProperties = set()
 
-        for socket, template in self._iterOrderedSocketsWithTemplate():
+        for socket, template in self.iterSocketsWithTemplate():
+            if template is None:
+                continue
             # check if the template can actually influence the result
-            if len(template.getRelatedPropertyNames() - fixedProperties) >= 0:
+            if len(template.getRelatedPropertyNames() - fixedProperties) > 0:
                 result = template.applyWithContext(self, socket, propertyUpdates, fixedProperties)
                 if result is None: continue
                 updates, fixed = result
@@ -250,16 +256,19 @@ class AnimationNode:
         if propertiesChanged:
             self.refresh()
 
-    def _iterOrderedSocketsWithTemplate(self):
-        nodeInfo = infoByNode[self.identifier]
+    def iterSocketsWithTemplate(self):
+        yield from self.iterInputSocketsWithTemplate()
+        yield from self.iterOutputSocketsWithTemplate()
+
+    def iterInputSocketsWithTemplate(self):
+        inputsInfo = infoByNode[self.identifier].inputs
         for socket in self.inputs:
-            template = nodeInfo.inputs[socket.identifier].template
-            if template is not None:
-                yield (socket, template)
+            yield (socket, inputsInfo[socket.identifier].template)
+
+    def iterOutputSocketsWithTemplate(self):
+        outputsInfo = infoByNode[self.identifier].outputs
         for socket in self.outputs:
-            template = nodeInfo.outputs[socket.identifier].template
-            if template is not None:
-                yield (socket, template)
+            yield (socket, outputsInfo[socket.identifier].template)
 
 
     # Remove Utilities
@@ -512,7 +521,7 @@ class AnimationNode:
         return self.applyCodeEffects(toString(self.getBakeCode()))
 
     def applyCodeEffects(self, code):
-        for effect in self.getCodeEffects():
+        for effect in infoByNode[self.identifier].codeEffects:
             code = toString(effect.apply(self, code))
         return code
 
