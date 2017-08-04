@@ -1,5 +1,6 @@
 from bpy.props import *
 from . base import SocketTemplate
+from .. effects import VectorizeCodeEffect
 from ... utils.attributes import getattrRecursive
 from ... sockets.info import toIdName as toSocketIdName
 from ... sockets.info import (
@@ -109,3 +110,19 @@ class VectorizedSocket(SocketTemplate):
                 return prop
 
         return None
+
+    @classmethod
+    def CodeEffect(cls, node):
+        effect = VectorizeCodeEffect()
+
+        for socket, template in node.iterInputSocketsWithTemplate():
+            if isinstance(template, VectorizedSocket):
+                if template.inputShouldBeList(node):
+                    effect.input(template.baseIdentifier, template.listIdentifier)
+
+        for i, (socket, template) in enumerate(node.iterOutputSocketsWithTemplate()):
+            if isinstance(template, VectorizedSocket):
+                if template.outputShouldBeList(node):
+                    effect.output(template.baseIdentifier, template.listIdentifier, i)
+
+        return effect
