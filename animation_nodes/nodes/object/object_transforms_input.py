@@ -1,31 +1,31 @@
 import bpy
-from ... base_types import VectorizedNode
+from ... base_types import AnimationNode, VectorizedSocket
 
-class ObjectTransformsInputNode(bpy.types.Node, VectorizedNode):
+class ObjectTransformsInputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectTransformsInputNode"
     bl_label = "Object Transforms Input"
     bl_width_default = 165
-    autoVectorizeExecution = True
+    codeEffects = [VectorizedSocket.CodeEffect]
 
-    useObjectList = VectorizedNode.newVectorizeProperty()
+    useObjectList = VectorizedSocket.newProperty()
 
     def create(self):
-        self.newVectorizedInput("Object", "useObjectList",
+        self.newInput(VectorizedSocket("Object", "useObjectList",
             ("Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
-            ("Objects", "objects"))
+            ("Objects", "objects")))
 
-        self.newVectorizedOutput("Vector", "useObjectList",
-            ("Location", "location"), ("Locations", "locations"))
+        self.newOutput(VectorizedSocket("Vector", "useObjectList",
+            ("Location", "location"), ("Locations", "locations")))
 
-        self.newVectorizedOutput("Euler", "useObjectList",
-            ("Rotation", "rotation"), ("Rotations", "rotations"))
+        self.newOutput(VectorizedSocket("Euler", "useObjectList",
+            ("Rotation", "rotation"), ("Rotations", "rotations")))
 
-        self.newVectorizedOutput("Vector", "useObjectList",
-            ("Scale", "scale"), ("Scales", "scales"))
+        self.newOutput(VectorizedSocket("Vector", "useObjectList",
+            ("Scale", "scale"), ("Scales", "scales")))
 
-        self.newVectorizedOutput("Quaternion", "useObjectList",
+        self.newOutput(VectorizedSocket("Quaternion", "useObjectList",
             ("Quaternion", "quaternion", dict(hide = True)),
-            ("Quaternions", "quaternions", dict(hide = True)))
+            ("Quaternions", "quaternions", dict(hide = True))))
 
     def drawAdvanced(self, layout):
         self.invokeFunction(layout, "createAutoExecutionTrigger", text = "Create Execution Trigger")
