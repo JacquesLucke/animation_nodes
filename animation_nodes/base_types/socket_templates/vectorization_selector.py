@@ -10,7 +10,7 @@ from ... sockets.info import (
 )
 
 class VectorizedSocket(SocketTemplate):
-    def __init__(self, dataType, properties, baseData, listData):
+    def __init__(self, dataType, properties, baseData, listData, codeProperties = {}):
         self.baseName = baseData[0]
         self.baseIdentifier = baseData[1]
         self.baseSettings = baseData[2] if len(baseData) == 3 else {}
@@ -30,6 +30,10 @@ class VectorizedSocket(SocketTemplate):
             self.properties = [properties]
         elif isinstance(properties, (list, tuple)):
             self.properties = properties
+
+        self.allowListExtension = codeProperties.pop("allowListExtension", True)
+        if len(codeProperties) > 0:
+            raise Exception("invalid code properties: " + str(list(codeProperties.keys())))
 
     @classmethod
     def newProperty(cls):
@@ -115,10 +119,10 @@ class VectorizedSocket(SocketTemplate):
     def CodeEffect(cls, node):
         effect = VectorizeCodeEffect()
 
-        for socket, template in node.iterInputSocketsWithTemplate():
+        for i, (socket, template) in enumerate(node.iterInputSocketsWithTemplate()):
             if isinstance(template, VectorizedSocket):
                 if template.inputShouldBeList(node):
-                    effect.input(template.baseIdentifier, template.listIdentifier)
+                    effect.input(template.baseIdentifier, template.listIdentifier, i, template.allowListExtension)
 
         for i, (socket, template) in enumerate(node.iterOutputSocketsWithTemplate()):
             if isinstance(template, VectorizedSocket):
