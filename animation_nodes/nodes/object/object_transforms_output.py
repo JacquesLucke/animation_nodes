@@ -3,7 +3,7 @@ from bpy.props import *
 from ... base_types import AnimationNode, VectorizedSocket
 from ... events import executionCodeChanged
 
-class an_ObjectTransformsOutputNode(bpy.types.Node, AnimationNode):
+class ObjectTransformsOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectTransformsOutputNode"
     bl_label = "Object Transforms Output"
     bl_width_default = 165
