@@ -1,6 +1,6 @@
 from bpy.props import *
 from . base import SocketTemplate
-from .. effects import VectorizeCodeEffect
+from .. effects.code_effects import VectorizeCodeEffect, DefaultBaseElement
 from ... utils.attributes import getattrRecursive
 from ... sockets.info import toIdName as toSocketIdName
 from ... sockets.info import (
@@ -32,6 +32,7 @@ class VectorizedSocket(SocketTemplate):
             self.properties = properties
 
         self.allowListExtension = codeProperties.pop("allowListExtension", True)
+        self.defaultElement = codeProperties.pop("default", DefaultBaseElement)
         if len(codeProperties) > 0:
             raise Exception("invalid code properties: " + str(list(codeProperties.keys())))
 
@@ -122,7 +123,7 @@ class VectorizedSocket(SocketTemplate):
         for i, (socket, template) in enumerate(node.iterInputSocketsWithTemplate()):
             if isinstance(template, VectorizedSocket):
                 if template.inputShouldBeList(node):
-                    effect.input(template.baseIdentifier, template.listIdentifier, i, template.allowListExtension)
+                    effect.input(template.baseIdentifier, template.listIdentifier, i, template.allowListExtension, template.defaultElement)
 
         for i, (socket, template) in enumerate(node.iterOutputSocketsWithTemplate()):
             if isinstance(template, VectorizedSocket):

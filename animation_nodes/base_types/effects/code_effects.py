@@ -1,4 +1,5 @@
 from ... utils.names import replaceVariableName
+from ... utils.attributes import hasEvaluableRepr
 
 class CodeEffect:
     def apply(self, node, code):
@@ -7,6 +8,9 @@ class CodeEffect:
     def iterIndented(self, code):
         yield from ("    " + line for line in code.splitlines())
 
+class DefaultBaseElement:
+    pass
+
 class VectorizeCodeEffect(CodeEffect):
     def __init__(self):
         self.baseInputNames = []
@@ -14,18 +18,24 @@ class VectorizeCodeEffect(CodeEffect):
         self.newBaseInputNames = []
         self.inputIndices = []
         self.allowInputListExtension = []
+        self.defaultInputElements = []
 
         self.baseOutputNames = []
         self.listOutputNames = []
         self.newBaseOutputNames = []
         self.outputIndices = []
 
-    def input(self, baseName, listName, index, allowListExtension = True):
+    def input(self, baseName, listName, index, allowListExtension = True, defaultElement = DefaultBaseElement):
         self.baseInputNames.append(baseName)
         self.listInputNames.append(listName)
         self.newBaseInputNames.append(self.rename(baseName))
         self.inputIndices.append(index)
         self.allowInputListExtension.append(allowListExtension)
+
+        if defaultElement is not DefaultBaseElement:
+            if not hasEvaluableRepr(defaultElement):
+                raise Exception("This type does not allow 'eval(repr(value))': " + str(defaultElement))
+        self.defaultInputElements.append(defaultElement)
 
     def output(self, baseName, listName, index):
         self.baseOutputNames.append(baseName)
@@ -61,11 +71,16 @@ class VectorizeCodeEffect(CodeEffect):
         else:
             amountName = "iterations"
             yield from self.iterGetIterationAmountLines(amountName)
-            for i, name in zip(self.inputIndices, self.listInputNames):
-                yield "if len({0}) == 0: {0}_iter = itertools.cycle([AN.sockets.info.getBaseDefaultValue(self.inputs[{1}].dataType)])".format(name, i)
-                yield "elif len({0}) < {1}: {0}_iter = itertools.cycle({0})".format(name, amountName)
-                yield "else: {0}_iter = {0}".format(name)
-            yield "{} = zip({})".format(iteratorName, ", ".join(name + "_iter" for name in self.listInputNames))
+            for i, (name, allowExtension) in enumerate(zip(self.listInputNames,
+                                                           self.allowInputListExtension)):
+                iterName = name + "_iter"
+                if allowExtension:
+                    yield from self.iterCreateInputListIteratorLines(i, name, iterName, amountName)
+                else:
+                    yield "{0}_iter = {0}".format(name)
+
+            iterators = ", ".join(name + "_iter" for name in self.listInputNames)
+            yield "{} = zip({})".format(iteratorName, iterators)
 
     def iterGetIterationAmountLines(self, amountName):
         noExtAmount = self.allowInputListExtension.count(False)
@@ -81,6 +96,19 @@ class VectorizeCodeEffect(CodeEffect):
                     lengths.append("len({})".format(name))
             yield "{} = min({})".format(amountName, ", ".join(lengths))
 
+    def iterCreateInputListIteratorLines(self, i, name, iterName, amountName):
+        default = self.defaultInputElements[i]
+        index = self.inputIndices[i]
+        if default is DefaultBaseElement:
+            _default = "self.inputs[{}].baseType.getDefaultValue()".format(index)
+        else:
+            defaultRepr = repr(default)
+            _default = "self.inputs[{}].baseType.correctValue({})[0]".format(index, defaultRepr)
+        yield "if len({}) == 0:".format(name)
+        yield "    {} = itertools.cycle([{}])".format(iterName, _default)
+        yield "elif len({}) < {}:".format(name, amountName)
+        yield "    {} = itertools.cycle({})".format(iterName, name)
+        yield "else: {} = {}".format(iterName, name)
 
     def getLoopStartLine(self, iteratorName):
         return "for {} in {}:".format(", ".join(self.newBaseInputNames), iteratorName)

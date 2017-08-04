@@ -176,7 +176,7 @@ def getDefaultValue(input):
     return _socketInfo.classByType[input].getDefaultValue()
 
 def getBaseDefaultValue(input):
-    return _socketInfo.classByType[toBaseDataType(input)].getDefaultValue()
+    return _socketInfo.classByType[input].baseType.getDefaultValue()
 
 
 def getListDataTypeItems():
