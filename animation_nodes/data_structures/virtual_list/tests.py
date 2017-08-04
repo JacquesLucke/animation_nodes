@@ -1,6 +1,7 @@
 from mathutils import Vector
 from unittest import TestCase
 from . virtual_list import VirtualPyList
+from .. lists.base_lists import Vector3DList
 
 vector = Vector((1, 2, 3))
 pyVectorList = [Vector((1, 2, 3)), Vector((4, 5, 6)), Vector((7, 8, 9))]
@@ -87,3 +88,11 @@ class TestVirtualPyList(TestCase):
         self.assertIsNot(vList[0], vector)
         self.assertIsNot(vList[10], vector)
         self.assertIsNot(vList[-20], vector)
+
+    def test_List_NonPy(self):
+        vecs = Vector3DList.fromValues([(1, 2, 3), (4, 5, 6)])
+        vList = VirtualPyList.fromList(vecs, Vector((0, 0, 0)))
+        self.assertEqual(vList[0], Vector((1, 2, 3)))
+        self.assertEqual(vList[1], Vector((4, 5, 6)))
+        self.assertEqual(vList[10], Vector((1, 2, 3)))
+        self.assertEqual(vList[-1], Vector((4, 5, 6)))

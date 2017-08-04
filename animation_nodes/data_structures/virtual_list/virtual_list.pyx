@@ -19,7 +19,7 @@ cdef class VirtualPyList(VirtualList):
             return cls.fromElement(obj, copy)
 
     @classmethod
-    def fromList(cls, list realList, default, copy = None):
+    def fromList(cls, realList, default, copy = None):
         if len(realList) == 0:
             return cls.fromElement(default, copy)
         elif len(realList) == 1:
@@ -68,10 +68,10 @@ cdef class VirtualPyList_Element_Copy(VirtualPyList):
         return self.realLength
 
 cdef class VirtualPyList_List_NoCopy(VirtualPyList):
-    cdef list realList
+    cdef object realList
     cdef Py_ssize_t realLength
 
-    def __cinit__(self, list realList):
+    def __cinit__(self, realList):
         self.realList = realList
         self.realLength = len(realList)
         assert self.realLength > 0
@@ -83,11 +83,11 @@ cdef class VirtualPyList_List_NoCopy(VirtualPyList):
         return self.realLength
 
 cdef class VirtualPyList_List_Copy(VirtualPyList):
-    cdef list realList
+    cdef object realList
     cdef Py_ssize_t realLength
     cdef object copy
 
-    def __cinit__(self, list realList, copy):
+    def __cinit__(self, realList, copy):
         self.realList = realList
         self.realLength = len(realList)
         self.copy = copy
