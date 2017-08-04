@@ -1,14 +1,16 @@
 from ... math cimport Vector3, distanceVec3, lengthVec3
-from ... data_structures cimport DoubleList, Vector3DList, CDefaultList
+from ... data_structures cimport (
+    DoubleList, Vector3DList, CDefaultList,
+    VirtualDoubleList)
 
-def combineDoubleListsToVectorList(DoubleList x, DoubleList y, DoubleList z):
-    assert x.length == y.length == z.length
-    cdef Vector3DList output = Vector3DList(length = x.length)
+def combineVectorList(Py_ssize_t amount,
+                      VirtualDoubleList x, VirtualDoubleList y, VirtualDoubleList z):
+    cdef Vector3DList output = Vector3DList(length = amount)
     cdef long i
-    for i in range(output.length):
-        output.data[i].x = x.data[i]
-        output.data[i].y = y.data[i]
-        output.data[i].z = z.data[i]
+    for i in range(amount):
+        output.data[i].x = x.get(i)[0]
+        output.data[i].y = y.get(i)[0]
+        output.data[i].z = z.get(i)[0]
     return output
 
 def getAxisListOfVectorList(Vector3DList myList, str axis):
