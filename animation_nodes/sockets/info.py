@@ -112,14 +112,6 @@ def getSocketClasses():
     return list(iterSubclassesWithAttribute(AnimationNodeSocket, "bl_idname"))
 
 
-def returnOnFailure(returnValue):
-    def failHandlingDecorator(function):
-        def wrapper(*args, **kwargs):
-            try: return function(*args, **kwargs)
-            except: return returnValue
-        return wrapper
-    return failHandlingDecorator
-
 # Check if list or base socket exists
 def isList(input):
     return input in _socketInfo.baseDataType.keys()
@@ -128,30 +120,24 @@ def isBase(input):
     return input in _socketInfo.listDataType.keys()
 
 # to Base
-@returnOnFailure(None)
 def toBaseIdName(input):
     return _socketInfo.baseIdName[input]
 
-@returnOnFailure(None)
 def toBaseDataType(input):
     return _socketInfo.baseDataType[input]
 
 # to List
-@returnOnFailure(None)
 def toListIdName(input):
     return _socketInfo.listIdName[input]
 
-@returnOnFailure(None)
 def toListDataType(input):
     return _socketInfo.listDataType[input]
 
 # Data Type <-> Id Name
-@returnOnFailure(None)
 def toIdName(input):
     if isIdName(input): return input
     return _socketInfo.typeConversion[input]
 
-@returnOnFailure(None)
 def toDataType(input):
     if isIdName(input):
         return _socketInfo.typeConversion[input]
@@ -184,6 +170,13 @@ def getAllowedTargetDataTypes(input):
 
 def getSocketClass(input):
     return _socketInfo.classByType[input]
+
+
+def getDefaultValue(input):
+    return _socketInfo.classByType[input].getDefaultValue()
+
+def getBaseDefaultValue(input):
+    return _socketInfo.classByType[toBaseDataType(input)].getDefaultValue()
 
 
 def getListDataTypeItems():
