@@ -1,13 +1,13 @@
 import bpy
 from bpy.props import *
-from ... base_types import VectorizedNode
+from ... base_types import AnimationNode, VectorizedSocket
 from ... events import executionCodeChanged
 
-class an_ObjectTransformsOutputNode(bpy.types.Node, VectorizedNode):
+class an_ObjectTransformsOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectTransformsOutputNode"
     bl_label = "Object Transforms Output"
     bl_width_default = 165
-    autoVectorizeExecution = True
+    codeEffects = [VectorizedSocket.CodeEffect]
 
     def checkedPropertiesChanged(self, context):
         self.updateSocketVisibility()
@@ -21,26 +21,28 @@ class an_ObjectTransformsOutputNode(bpy.types.Node, VectorizedNode):
         description = "Apply changes on delta transforms",
         update = executionCodeChanged)
 
-    useObjectList = VectorizedNode.newVectorizeProperty()
-    useLocationList = VectorizedNode.newVectorizeProperty()
-    useRotationList = VectorizedNode.newVectorizeProperty()
-    useScaleList = VectorizedNode.newVectorizeProperty()
+    useObjectList = VectorizedSocket.newProperty()
+    useLocationList = VectorizedSocket.newProperty()
+    useRotationList = VectorizedSocket.newProperty()
+    useScaleList = VectorizedSocket.newProperty()
 
     def create(self):
-        self.newVectorizedInput("Object", "useObjectList",
+        self.newInput(VectorizedSocket("Object", "useObjectList",
             ("Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
-            ("Objects", "objects"))
+            ("Objects", "objects"),
+            dict(allowListExtension = False)))
 
-        self.newVectorizedInput("Vector", ("useLocationList", ["useObjectList"]),
-            ("Location", "location"), ("Locations", "locations"))
-        self.newVectorizedInput("Euler", ("useRotationList", ["useObjectList"]),
-            ("Rotation", "rotation"), ("Rotations", "rotations"))
-        self.newVectorizedInput("Vector", ("useScaleList", ["useObjectList"]),
+        self.newInput(VectorizedSocket("Vector", ["useLocationList", "useObjectList"],
+            ("Location", "location"), ("Locations", "locations")))
+        self.newInput(VectorizedSocket("Euler", ["useRotationList", "useObjectList"],
+            ("Rotation", "rotation"), ("Rotations", "rotations")))
+        self.newInput(VectorizedSocket("Vector", ["useScaleList", "useObjectList"],
             ("Scale", "scale", dict(value = (1, 1, 1))),
-            ("Scales", "scales"))
+            ("Scales", "scales"),
+            dict(default = (1, 1, 1))))
 
-        self.newVectorizedOutput("Object", "useObjectList",
-            ("Object", "object"), ("Objects", "objects"))
+        self.newOutput(VectorizedSocket("Object", "useObjectList",
+            ("Object", "object"), ("Objects", "objects")))
 
         self.updateSocketVisibility()
 
