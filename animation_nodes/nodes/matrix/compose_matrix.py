@@ -1,30 +1,31 @@
 import bpy
-from bpy.props import *
 from . c_utils import composeMatrices
-from ... base_types import VectorizedNode
+from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import VirtualList, VirtualVector3DList, VirtualEulerList
 
-class ComposeMatrixNode(bpy.types.Node, VectorizedNode):
+class ComposeMatrixNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ComposeMatrixNode"
     bl_label = "Compose Matrix"
 
-    useTranslationList = VectorizedNode.newVectorizeProperty()
-    useRotationList = VectorizedNode.newVectorizeProperty()
-    useScaleList = VectorizedNode.newVectorizeProperty()
+    useTranslationList = VectorizedSocket.newProperty()
+    useRotationList = VectorizedSocket.newProperty()
+    useScaleList = VectorizedSocket.newProperty()
 
     def create(self):
-        self.newVectorizedInput("Vector", "useTranslationList",
-            ("Translation", "translation"), ("Translations", "translations"))
+        self.newInput(VectorizedSocket("Vector", "useTranslationList",
+            ("Translation", "translation"), ("Translations", "translations")))
 
-        self.newVectorizedInput("Euler", "useRotationList",
-            ("Rotation", "rotation"), ("Rotations", "rotations"))
+        self.newInput(VectorizedSocket("Euler", "useRotationList",
+            ("Rotation", "rotation"), ("Rotations", "rotations")))
 
-        self.newVectorizedInput("Vector", "useScaleList",
+        self.newInput(VectorizedSocket("Vector", "useScaleList",
             ("Scale", "scale", dict(value = (1, 1, 1))),
-            ("Scales", "scales"))
+            ("Scales", "scales"),
+            dict(default = (1, 1, 1))))
 
-        self.newVectorizedOutput("Matrix", [("useTranslationList", "useRotationList", "useScaleList")],
-            ("Matrix", "matrix"), ("Matrices", "matrices"))
+        self.newOutput(VectorizedSocket("Matrix",
+            ["useTranslationList", "useRotationList", "useScaleList"],
+            ("Matrix", "matrix"), ("Matrices", "matrices")))
 
     def getExecutionFunctionName(self):
         if self.useTranslationList or self.useRotationList or self.useScaleList:
@@ -37,5 +38,5 @@ class ComposeMatrixNode(bpy.types.Node, VectorizedNode):
         _translations = VirtualVector3DList.fromListOrElement(translations, (0, 0, 0))
         _rotations = VirtualEulerList.fromListOrElement(rotations, (0, 0, 0))
         _scales = VirtualVector3DList.fromListOrElement(scales, (1, 1, 1))
-        length = VirtualList.getMaxLength(_translations, _rotations, _scales)
+        length = VirtualList.getMaxRealLength(_translations, _rotations, _scales)
         return composeMatrices(length, _translations, _rotations, _scales)

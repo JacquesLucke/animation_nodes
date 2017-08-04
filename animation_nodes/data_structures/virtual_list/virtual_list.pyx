@@ -1,6 +1,6 @@
 cdef class VirtualList:
     @classmethod
-    def getMaxLength(cls, *args):
+    def getMaxRealLength(cls, *args):
         return max(obj.getRealLength() for obj in args)
 
     def getRealLength(self):
