@@ -22,8 +22,10 @@ class VectorizedSocket(SocketTemplate):
         self.baseDataType = dataType
         self.listDataType = toListDataType(dataType)
 
-        self.inputListTypes = getAllowedInputDataTypes(self.listDataType)
         self.inputBaseTypes = getAllowedInputDataTypes(self.baseDataType)
+        self.inputListTypes = getAllowedInputDataTypes(self.listDataType)
+
+        self.outputBaseTypes = getAllowedTargetDataTypes(self.baseDataType)
         self.outputListTypes = getAllowedTargetDataTypes(self.listDataType)
 
         if isinstance(properties, str):
@@ -90,6 +92,9 @@ class VectorizedSocket(SocketTemplate):
                 prop = self.getPropertyThatShouldBeList(updatedProperties, fixedProperties)
                 if prop is not None:
                     return {prop : True}, {prop}
+            elif linkedType in self.outputBaseTypes:
+                if self.canAllBeBase(updatedProperties, fixedProperties):
+                    return {prop : False for prop in self.properties}, set(self.properties)
 
     def noneIsFixedBase(self, updatedProperties, fixedProperties):
         for prop in self.properties:
@@ -115,6 +120,12 @@ class VectorizedSocket(SocketTemplate):
                 return prop
 
         return None
+
+    def canAllBeBase(self, updatedProperties, fixedProperties):
+        for prop in self.properties:
+            if updatedProperties.get(prop, False) and prop in fixedProperties:
+                return False
+        return True
 
     @classmethod
     def CodeEffect(cls, node):
