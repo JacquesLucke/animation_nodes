@@ -15,8 +15,8 @@ cdef class VirtualLISTNAME(VirtualList):
         else:
             return VirtualLISTNAME_List(realList)
 
-    cdef TYPE *get(self, Py_ssize_t i):
-        return NULL
+    cdef TYPE OPTIONAL_STAR get(self, Py_ssize_t i):
+        raise NotImplementedError()
 
 cdef class VirtualLISTNAME_List(VirtualLISTNAME):
     cdef LISTNAME realList
@@ -30,8 +30,8 @@ cdef class VirtualLISTNAME_List(VirtualLISTNAME):
         assert self.realLength > 0
 
     @cython.cdivision(True)
-    cdef TYPE *get(self, Py_ssize_t i):
-        return self.realData + (i % self.realLength)
+    cdef TYPE OPTIONAL_STAR get(self, Py_ssize_t i):
+        return (self.realData + (i % self.realLength))OPTIONAL_DEREF
 
     def getRealLength(self):
         return self.realLength
@@ -46,8 +46,8 @@ cdef class VirtualLISTNAME_Element(VirtualLISTNAME):
         self.realData = self.realList.data
         self.realLength = realLength
 
-    cdef TYPE *get(self, Py_ssize_t i):
-        return self.realData
+    cdef TYPE OPTIONAL_STAR get(self, Py_ssize_t i):
+        return (self.realData)OPTIONAL_DEREF
 
     def getRealLength(self):
         return self.realLength
