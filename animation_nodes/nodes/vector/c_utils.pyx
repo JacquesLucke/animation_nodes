@@ -8,9 +8,9 @@ def combineVectorList(Py_ssize_t amount,
     cdef Vector3DList output = Vector3DList(length = amount)
     cdef long i
     for i in range(amount):
-        output.data[i].x = x.get(i)[0]
-        output.data[i].y = y.get(i)[0]
-        output.data[i].z = z.get(i)[0]
+        output.data[i].x = <float>x.get(i)
+        output.data[i].y = <float>y.get(i)
+        output.data[i].z = <float>z.get(i)
     return output
 
 def getAxisListOfVectorList(Vector3DList myList, str axis):
@@ -32,9 +32,9 @@ def vectorsFromValues(DoubleList values):
     cdef Vector3DList output = Vector3DList(length = values.length)
     cdef long i
     for i in range(values.length):
-        output.data[i].x = values.data[i]
-        output.data[i].y = values.data[i]
-        output.data[i].z = values.data[i]
+        output.data[i].x = <float>values.data[i]
+        output.data[i].y = <float>values.data[i]
+        output.data[i].z = <float>values.data[i]
     return output
 
 def calculateVectorDistances(_vectors1, _vectors2):
@@ -64,8 +64,8 @@ def calculateVectorCenters(Vector3DList vectors1, Vector3DList vectors2):
     cdef Py_ssize_t i
 
     for i in range(len(vectors1)):
-        centers.data[i].x = (vectors1.data[i].x + vectors2.data[i].x) * 0.5
-        centers.data[i].y = (vectors1.data[i].y + vectors2.data[i].y) * 0.5
-        centers.data[i].z = (vectors1.data[i].z + vectors2.data[i].z) * 0.5
+        centers.data[i].x = (vectors1.data[i].x + vectors2.data[i].x) * <float>0.5
+        centers.data[i].y = (vectors1.data[i].y + vectors2.data[i].y) * <float>0.5
+        centers.data[i].z = (vectors1.data[i].z + vectors2.data[i].z) * <float>0.5
 
     return centers
