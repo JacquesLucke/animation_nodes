@@ -2,13 +2,13 @@ import bpy
 from bpy.props import *
 from ... utils.layout import writeText
 from ... events import executionCodeChanged
-from ... base_types import VectorizedNode
+from ... base_types import AnimationNode, VectorizedSocket
 
-class TextObjectOutputNode(bpy.types.Node, VectorizedNode):
+class TextObjectOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_TextObjectOutputNode"
     bl_label = "Text Object Output"
     bl_width_default = 170
-    autoVectorizeExecution = True
+    codeEffects = [VectorizedSocket.CodeEffect]
 
     errorMessage = StringProperty()
 
@@ -16,60 +16,62 @@ class TextObjectOutputNode(bpy.types.Node, VectorizedNode):
                  "BevelResolution", "LetterSpacing", "WordSpacing", "LineSpacing",
                  "XOffset", "YOffset", "HorizontalAlign", "VerticalAlign", "Font",
                  "BoldFont", "ItalicFont", "BoldItalicFont"]:
-        exec("use{}List = VectorizedNode.newVectorizeProperty()".format(attr), globals(), locals())
+        exec("use{}List = VectorizedSocket.newProperty()".format(attr), globals(), locals())
 
     def create(self):
-        self.newVectorizedInput("Object", "useObjectList",
+        self.newInput(VectorizedSocket("Object", "useObjectList",
             ("Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
-            ("Objects", "objects"))
+            ("Objects", "objects"), codeProperties = dict(allowListExtension = False)))
 
-        toProp = lambda prop: (prop, ["useObjectList"])
+        toProp = lambda prop: [prop, "useObjectList"]
 
-        self.newVectorizedInput("Text", toProp("useTextList"),
-            ("Text", "text"), ("Texts", "texts"))
-        self.newVectorizedInput("Float", toProp("useSizeList"),
+        self.newInput(VectorizedSocket("Text", toProp("useTextList"),
+            ("Text", "text"), ("Texts", "texts")))
+        self.newInput(VectorizedSocket("Float", toProp("useSizeList"),
             ("Size", "size", dict(value = 1)),
-            ("Sizes", "sizes"))
-        self.newVectorizedInput("Float", toProp("useExtrudeList"),
-            ("Extrude", "extrude"), ("Extrudes", "extrudes"))
-        self.newVectorizedInput("Float", toProp("useShearList"),
-            ("Shear", "shear"), ("Shears", "shears"))
-        self.newVectorizedInput("Float", toProp("useBevelDepthList"),
+            ("Sizes", "sizes")))
+        self.newInput(VectorizedSocket("Float", toProp("useExtrudeList"),
+            ("Extrude", "extrude"), ("Extrudes", "extrudes")))
+        self.newInput(VectorizedSocket("Float", toProp("useShearList"),
+            ("Shear", "shear"), ("Shears", "shears")))
+        self.newInput(VectorizedSocket("Float", toProp("useBevelDepthList"),
             ("Bevel Depth", "bevelDepth"),
-            ("Bevel Depths", "bevelDepths"))
-        self.newVectorizedInput("Integer", toProp("useBevelResolutionList"),
+            ("Bevel Depths", "bevelDepths")))
+        self.newInput(VectorizedSocket("Integer", toProp("useBevelResolutionList"),
             ("Bevel Resolution", "bevelResolution"),
-            ("Bevel Resolutions", "bevelResolutions"))
+            ("Bevel Resolutions", "bevelResolutions")))
 
-        self.newVectorizedInput("Float", toProp("useLetterSpacingList"),
+        self.newInput(VectorizedSocket("Float", toProp("useLetterSpacingList"),
             ("Letter Spacing", "letterSpacing", dict(value = 1)),
-            ("Letter Spacings", "letterSpacings"))
-        self.newVectorizedInput("Float", toProp("useWordSpacingList"),
+            ("Letter Spacings", "letterSpacings")))
+        self.newInput(VectorizedSocket("Float", toProp("useWordSpacingList"),
             ("Word Spacing", "wordSpacing", dict(value = 1)),
-            ("Word Spacings", "wordSpacings"))
-        self.newVectorizedInput("Float", toProp("useLineSpacingList"),
+            ("Word Spacings", "wordSpacings")))
+        self.newInput(VectorizedSocket("Float", toProp("useLineSpacingList"),
             ("Line Spacing", "lineSpacing", dict(value = 1)),
-            ("Line Spacings", "lineSpacings"))
+            ("Line Spacings", "lineSpacings")))
 
-        self.newVectorizedInput("Float", toProp("useXOffsetList"),
-            ("X Offset", "xOffset"), ("X Offsets", "xOffsets"))
-        self.newVectorizedInput("Float", toProp("useYOffsetList"),
-            ("Y Offset", "yOffset"), ("Y Offsets", "yOffsets"))
-        self.newVectorizedInput("Text", toProp("useHorizontalAlignList"),
+        self.newInput(VectorizedSocket("Float", toProp("useXOffsetList"),
+            ("X Offset", "xOffset"), ("X Offsets", "xOffsets")))
+        self.newInput(VectorizedSocket("Float", toProp("useYOffsetList"),
+            ("Y Offset", "yOffset"), ("Y Offsets", "yOffsets")))
+        self.newInput(VectorizedSocket("Text", toProp("useHorizontalAlignList"),
             ("Horizontal Align", "horizontalAlign", dict(value = "CENTER")),
-            ("Horizontal Aligns", "horizontalAligns"))
-        self.newVectorizedInput("Text", toProp("useVerticalAlignList"),
+            ("Horizontal Aligns", "horizontalAligns"),
+            codeProperties = dict(default = "CENTER")))
+        self.newInput(VectorizedSocket("Text", toProp("useVerticalAlignList"),
             ("Vertical Align", "verticalAlign", dict(value = "CENTER")),
-            ("Vertical Aligns", "verticalAligns"))
+            ("Vertical Aligns", "verticalAligns"),
+            codeProperties = dict(default = "CENTER")))
 
-        self.newVectorizedInput("Font", toProp("useFontList"),
-            ("Font", "font"), ("Fonts", "fonts"))
-        self.newVectorizedInput("Font", toProp("useBoldFontList"),
-            ("Bold Font", "boldFont"), ("Bold Fonts", "boldFonts"))
-        self.newVectorizedInput("Font", toProp("useItalicFontList"),
-            ("Italic Font", "italicFont"), ("Italic Fonts", "italicFonts"))
-        self.newVectorizedInput("Font", toProp("useBoldItalicFontList"),
-            ("Bold Italic Font", "boldItalicFont"), ("Bold Italic Fonts", "boldItalicFonts"))
+        self.newInput(VectorizedSocket("Font", toProp("useFontList"),
+            ("Font", "font"), ("Fonts", "fonts")))
+        self.newInput(VectorizedSocket("Font", toProp("useBoldFontList"),
+            ("Bold Font", "boldFont"), ("Bold Fonts", "boldFonts")))
+        self.newInput(VectorizedSocket("Font", toProp("useItalicFontList"),
+            ("Italic Font", "italicFont"), ("Italic Fonts", "italicFonts")))
+        self.newInput(VectorizedSocket("Font", toProp("useBoldItalicFontList"),
+            ("Bold Italic Font", "boldItalicFont"), ("Bold Italic Fonts", "boldItalicFonts")))
 
         for socket in self.inputs[1:]:
             socket.useIsUsedProperty = True
@@ -77,8 +79,8 @@ class TextObjectOutputNode(bpy.types.Node, VectorizedNode):
         for socket in self.inputs[4:]:
             socket.hide = True
 
-        self.newVectorizedOutput("Object", "useObjectList",
-            ("Object", "object"), ("Objects", "objects"))
+        self.newOutput(VectorizedSocket("Object", "useObjectList",
+            ("Object", "object"), ("Objects", "objects")))
 
     def draw(self, layout):
         if self.errorMessage != "":
