@@ -1,19 +1,19 @@
 import bpy
-from ... base_types import VectorizedNode
+from ... base_types import AnimationNode, VectorizedSocket
 
-class TextLengthNode(bpy.types.Node, VectorizedNode):
+class TextLengthNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_TextLengthNode"
     bl_label = "Text Length"
-    autoVectorizeExecution = True
+    codeEffects = [VectorizedSocket.CodeEffect]
 
-    useTextList = VectorizedNode.newVectorizeProperty()
+    useTextList = VectorizedSocket.newProperty()
 
     def create(self):
-        self.newVectorizedInput("Text", "useTextList",
-            ("Text", "text"), ("Texts", "texts"))
+        self.newInput(VectorizedSocket("Text", "useTextList",
+            ("Text", "text"), ("Texts", "texts")))
 
-        self.newVectorizedOutput("Integer", "useTextList",
-            ("Length", "length"), ("Lengths", "lengths"))
+        self.newOutput(VectorizedSocket("Integer", "useTextList",
+            ("Length", "length"), ("Lengths", "lengths")))
 
     def getExecutionCode(self, required):
         return "length = len(text)"
