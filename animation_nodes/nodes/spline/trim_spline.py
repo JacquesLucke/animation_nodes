@@ -1,32 +1,32 @@
 import bpy
-from ... base_types import VectorizedNode
 from . spline_evaluation_base import SplineEvaluationBase
+from ... base_types import AnimationNode, VectorizedSocket
 
-class TrimSplineNode(bpy.types.Node, VectorizedNode, SplineEvaluationBase):
+class TrimSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
     bl_idname = "an_TrimSplineNode"
     bl_label = "Trim Spline"
-    autoVectorizeExecution = True
+    codeEffects = [VectorizedSocket.CodeEffect]
 
-    useSplineList = VectorizedNode.newVectorizeProperty()
-    useStartList = VectorizedNode.newVectorizeProperty()
-    useEndList = VectorizedNode.newVectorizeProperty()
+    useSplineList = VectorizedSocket.newProperty()
+    useStartList = VectorizedSocket.newProperty()
+    useEndList = VectorizedSocket.newProperty()
 
     def create(self):
-        self.newVectorizedInput("Spline", "useSplineList",
+        self.newInput(VectorizedSocket("Spline", "useSplineList",
             ("Spline", "spline", dict(defaultDrawType = "PROPERTY_ONLY")),
-            ("Splines", "splines"))
+            ("Splines", "splines")))
 
-        self.newVectorizedInput("Float", ("useStartList", ["useSplineList"]),
+        self.newInput(VectorizedSocket("Float", "useStartList",
             ("Start", "start", dict(value = 0, minValue = 0, maxValue = 1)),
-            ("Starts", "starts"))
+            ("Starts", "starts")))
 
-        self.newVectorizedInput("Float", ("useEndList", ["useSplineList"]),
+        self.newInput(VectorizedSocket("Float", "useEndList",
             ("End", "end", dict(value = 1, minValue = 0, maxValue = 1)),
-            ("Ends", "ends"))
+            ("Ends", "ends")))
 
-        self.newVectorizedOutput("Spline", "useSplineList",
+        self.newOutput(VectorizedSocket("Spline", ["useSplineList", "useStartList", "useEndList"],
             ("Spline", "trimmedSpline"),
-            ("Splines", "trimmedSplines"))
+            ("Splines", "trimmedSplines")))
 
     def draw(self, layout):
         layout.prop(self, "parameterType", text = "")
