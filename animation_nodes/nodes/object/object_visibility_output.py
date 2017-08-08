@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import *
-from ... base_types import VectorizedNode
+from ... base_types import AnimationNode, VectorizedSocket
 
 attributes = [
     ("Hide", "hide", "hide", "useHideList"),
@@ -11,24 +11,25 @@ attributes = [
     ("Show X-Ray", "showXRay", "show_x_ray", "useShowXRayList")
 ]
 
-class ObjectVisibilityOutputNode(bpy.types.Node, VectorizedNode):
+class ObjectVisibilityOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectVisibilityOutputNode"
     bl_label = "Object Visibility Output"
-    autoVectorizeExecution = True
+    codeEffects = [VectorizedSocket.CodeEffect]
 
-    useObjectList = VectorizedNode.newVectorizeProperty()
+    useObjectList = VectorizedSocket.newProperty()
 
     def create(self):
-        self.newVectorizedInput("Object", "useObjectList",
+        self.newInput(VectorizedSocket("Object", "useObjectList",
             ("Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
-            ("Objects", "objects"))
+            ("Objects", "objects"),
+            codeProperties = dict(allowListExtension = False)))
 
         for name, identifier, _, useListName in attributes:
-            self.newVectorizedInput("Boolean", (useListName, ["useObjectList"]),
-                (name, identifier), (name, identifier))
+            self.newInput(VectorizedSocket("Boolean", [useListName, "useObjectList"],
+                (name, identifier), (name, identifier)))
 
-        self.newVectorizedOutput("Object", "useObjectList",
-            ("Object", "object"), ("Objects", "objects"))
+        self.newOutput(VectorizedSocket("Object", "useObjectList",
+            ("Object", "object"), ("Objects", "objects")))
 
         for socket in self.inputs[1:]:
             socket.useIsUsedProperty = True
@@ -53,4 +54,4 @@ class ObjectVisibilityOutputNode(bpy.types.Node, VectorizedNode):
         yield "    pass"
 
 for *_, useListName in attributes:
-    setattr(ObjectVisibilityOutputNode, useListName, VectorizedNode.newVectorizeProperty())
+    setattr(ObjectVisibilityOutputNode, useListName, VectorizedSocket.newProperty())

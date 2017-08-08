@@ -1,34 +1,33 @@
 import bpy
-from bpy.props import *
-from ... utils.layout import writeText
-from ... base_types import VectorizedNode
+from ... base_types import AnimationNode, VectorizedSocket
 
-class ShapeKeyOutputNode(bpy.types.Node, VectorizedNode):
+class ShapeKeyOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ShapeKeyOutputNode"
     bl_label = "Shape Key Output"
     bl_width_default = 160
-    autoVectorizeExecution = True
+    codeEffects = [VectorizedSocket.CodeEffect]
 
-    useShapeKeyList = VectorizedNode.newVectorizeProperty()
-    useValueList = VectorizedNode.newVectorizeProperty()
+    useShapeKeyList = VectorizedSocket.newProperty()
+    useValueList = VectorizedSocket.newProperty()
 
     def create(self):
-        self.newVectorizedInput("Shape Key", "useShapeKeyList",
+        self.newInput(VectorizedSocket("Shape Key", "useShapeKeyList",
             ("Shape Key", "shapeKey", dict(defaultDrawType = "PROPERTY_ONLY")),
-            ("Shape Keys", "shapeKeys"))
+            ("Shape Keys", "shapeKeys"),
+            codeProperties = dict(allowListExtension = False)))
 
-        self.newVectorizedInput("Float", "useValueList",
+        self.newInput(VectorizedSocket("Float", "useValueList",
             ("Value", "value", dict(minValue = 0, maxValue = 1)),
-            ("Values", "values"))
+            ("Values", "values")))
 
         self.newInput("Float", "Slider Min", "sliderMin")
         self.newInput("Float", "Slider Max", "sliderMax")
         self.newInput("Boolean", "Mute", "mute")
         self.newInput("Text", "Name", "name")
 
-        self.newVectorizedOutput("Shape Key", "useShapeKeyList",
+        self.newOutput(VectorizedSocket("Shape Key", "useShapeKeyList",
             ("Shape Key", "shapeKey"),
-            ("Shape Keys", "shapeKeys"))
+            ("Shape Keys", "shapeKeys")))
 
         for socket in self.inputs[1:]:
             socket.useIsUsedProperty = True

@@ -1,22 +1,22 @@
 import bpy
-from ... base_types import VectorizedNode
+from ... base_types import AnimationNode, VectorizedSocket
 
-class TransformSplineNode(bpy.types.Node, VectorizedNode):
+class TransformSplineNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_TransformSplineNode"
     bl_label = "Transform Spline"
-    autoVectorizeExecution = True
+    codeEffects = [VectorizedSocket.CodeEffect]
 
-    useSplineList = VectorizedNode.newVectorizeProperty()
+    useSplineList = VectorizedSocket.newProperty()
 
     def create(self):
-        socket = self.newVectorizedInput("Spline", "useSplineList",
-            ("Spline", "spline"), ("Splines", "splines"))
+        socket = self.newInput(VectorizedSocket("Spline", "useSplineList",
+            ("Spline", "spline"), ("Splines", "splines")))
         socket.dataIsModified = True
         socket.defaultDrawType = "PROPERTY_ONLY"
 
         self.newInput("Matrix", "Transformation", "matrix")
-        self.newVectorizedOutput("Spline", "useSplineList",
-            ("Spline", "spline"), ("Splines", "splines"))
+        self.newOutput(VectorizedSocket("Spline", "useSplineList",
+            ("Spline", "spline"), ("Splines", "splines")))
 
     def getExecutionCode(self, required):
         return "spline.transform(matrix)"
