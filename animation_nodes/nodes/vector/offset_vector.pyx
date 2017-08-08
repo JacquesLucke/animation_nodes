@@ -4,7 +4,7 @@ from mathutils import Vector
 from ... events import propertyChanged
 from ... utils.clamp cimport clampLong
 from ... math cimport Vector3, toVector3
-from ... base_types import VectorizedNode
+from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures cimport Falloff, FalloffEvaluator, Vector3DList, CDefaultList
 
 specifiedStateItems = [
@@ -12,15 +12,15 @@ specifiedStateItems = [
     ("END", "End", "Given vector(s) set the end state", "NONE", 1)
 ]
 
-class OffsetVectorNode(bpy.types.Node, VectorizedNode):
+class OffsetVectorNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_OffsetVectorNode"
     bl_label = "Offset Vector"
     onlySearchTags = True
     searchTags = [("Offset Vectors", {"useVectorList" : repr(True)})]
 
     useVectorList = BoolProperty(name = "Use Vector List", default = False,
-        update = VectorizedNode.refresh)
-    useOffsetList = VectorizedNode.newVectorizeProperty()
+        update = AnimationNode.refresh)
+    useOffsetList = VectorizedSocket.newProperty()
 
     specifiedState = EnumProperty(name = "Specified State", default = "START",
         description = "Specify wether the given vector(s) are the start or end state",
@@ -33,9 +33,9 @@ class OffsetVectorNode(bpy.types.Node, VectorizedNode):
         if self.useVectorList:
             self.newInput("Vector List", "Vectors", "inVectors", dataIsModified = True)
             self.newInput("Falloff", "Falloff", "falloff")
-            self.newVectorizedInput("Vector", "useOffsetList",
+            self.newInput(VectorizedSocket("Vector", "useOffsetList",
                 ("Offset", "offset", dict(value = (0, 0, 1))),
-                ("Offset List", "offsets"))
+                ("Offset List", "offsets")))
             self.newOutput("Vector List", "Vectors", "outVectors")
         else:
             self.newInput("Vector", "Vector", "inVector", dataIsModified = True)
