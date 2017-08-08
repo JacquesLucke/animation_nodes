@@ -5,7 +5,10 @@ from . addon_files import iterRelativeAddonFiles
 def execute_CopyAddon(addonDirectory, targetPath):
     targetPath = os.path.join(targetPath, "animation_nodes")
     printHeader("Copy Addon")
-    changes = syncDirectories(addonDirectory, targetPath, iterRelativeAddonFiles)
+    try:
+        changes = syncDirectories(addonDirectory, targetPath, iterRelativeAddonFiles)
+    except PermissionError:
+        raise Exception("\n\nGot a permission error.\nThis might happen when Blender is open while copying.")
 
     for path in changes["removed"]:
         print("Removed:", os.path.relpath(path, targetPath))
