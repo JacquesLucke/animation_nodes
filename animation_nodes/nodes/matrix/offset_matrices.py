@@ -1,16 +1,15 @@
 import bpy
 from bpy.props import *
 from ... events import propertyChanged
-from ... base_types import VectorizedNode
+from ... base_types import AnimationNode, VectorizedSocket
 from ... utils.handlers import validCallback
 from .. falloff.invert_falloff import InvertFalloff
 from . c_utils import evaluateFalloffForMatrixList
 
 from ... data_structures import (
-    CDefaultList,
-    Vector3DList,
-    EulerList,
-    Matrix4x4List
+    Matrix4x4List,
+    VirtualEulerList,
+    VirtualVector3DList
 )
 
 from ... algorithms.matrices import (
@@ -42,7 +41,7 @@ scaleModeItems = [
     ("TRANSLATION_ONLY", "Translation Only", "", "NONE", 3)
 ]
 
-class OffsetMatrixNode(bpy.types.Node, VectorizedNode):
+class OffsetMatrixNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_OffsetMatrixNode"
     bl_label = "Offset Matrix"
     bl_width_default = 190
@@ -52,7 +51,7 @@ class OffsetMatrixNode(bpy.types.Node, VectorizedNode):
     errorMessage = StringProperty()
 
     useMatrixList = BoolProperty(name = "Use Matrix List", default = False,
-        update = VectorizedNode.refresh)
+        update = AnimationNode.refresh)
 
     specifiedState = EnumProperty(name = "Specified State", default = "START",
         description = "Specify wether the given matrices are the start or end state",
@@ -70,9 +69,9 @@ class OffsetMatrixNode(bpy.types.Node, VectorizedNode):
     useScale = BoolProperty(name = "Use Scale", default = False,
         update = checkedPropertiesChanged)
 
-    useTranslationList = VectorizedNode.newVectorizeProperty()
-    useRotationList = VectorizedNode.newVectorizeProperty()
-    useScaleList = VectorizedNode.newVectorizeProperty()
+    useTranslationList = VectorizedSocket.newProperty()
+    useRotationList = VectorizedSocket.newProperty()
+    useScaleList = VectorizedSocket.newProperty()
 
     translationMode = EnumProperty(name = "Translation Mode", default = "GLOBAL_AXIS",
         items = translationModeItems, update = propertyChanged)
@@ -88,17 +87,17 @@ class OffsetMatrixNode(bpy.types.Node, VectorizedNode):
             self.newInput("Matrix List", "Matrices", "inMatrices", dataIsModified = self.modifiesOriginalList)
             self.newInput("Falloff", "Falloff", "falloff")
 
-            self.newVectorizedInput("Vector", "useTranslationList",
+            self.newInput(VectorizedSocket("Vector", "useTranslationList",
                 ("Translation", "translation"),
-                ("Translations", "translations"))
+                ("Translations", "translations")))
 
-            self.newVectorizedInput("Euler", "useRotationList",
+            self.newInput(VectorizedSocket("Euler", "useRotationList",
                 ("Rotation", "rotation"),
-                ("Rotations", "rotations"))
+                ("Rotations", "rotations")))
 
-            self.newVectorizedInput("Vector", "useScaleList",
+            self.newInput(VectorizedSocket("Vector", "useScaleList",
                 ("Scale", "scale", dict(value = (1, 1, 1))),
-                ("Scales", "scales"))
+                ("Scales", "scales")))
 
             self.newOutput("Matrix List", "Matrices", "outMatrices")
         else:
@@ -160,13 +159,13 @@ class OffsetMatrixNode(bpy.types.Node, VectorizedNode):
             return matrices
 
         if self.useScale:
-            scales = CDefaultList(Vector3DList, scale, (1, 1, 1))
+            scales = VirtualVector3DList.fromListOrElement(scale, (1, 1, 1))
             scaleMatrixList(matrices, self.scaleMode, scales, influences)
         if self.useRotation:
-            rotations = CDefaultList(EulerList, rotation, (0, 0, 0))
+            rotations = VirtualEulerList.fromListOrElement(rotation, (0, 0, 0))
             matrices = getRotatedMatrixList(matrices, self.rotationMode, rotations, influences)
         if self.useTranslation:
-            translations = CDefaultList(Vector3DList, translation, (0, 0, 0))
+            translations = VirtualVector3DList.fromListOrElement(translation, (0, 0, 0))
             translateMatrixList(matrices, self.translationMode, translations, influences)
 
         return matrices
