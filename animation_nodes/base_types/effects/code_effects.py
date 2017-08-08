@@ -104,11 +104,13 @@ class VectorizeCodeEffect(CodeEffect):
         else:
             defaultRepr = repr(default)
             _default = "self.inputs[{}].baseType.correctValue({})[0]".format(index, defaultRepr)
-        yield "if len({}) == 0:".format(name)
+
+        yield "if len({}) >= {}:".format(name, amountName)
+        yield "    {} = {}".format(iterName, name)
+        yield "elif len({}) == 0:".format(name)
         yield "    {} = itertools.cycle([{}])".format(iterName, _default)
         yield "elif len({}) < {}:".format(name, amountName)
         yield "    {} = itertools.cycle({})".format(iterName, name)
-        yield "else: {} = {}".format(iterName, name)
 
     def getLoopStartLine(self, iteratorName):
         return "for {} in {}:".format(", ".join(self.newBaseInputNames), iteratorName)
