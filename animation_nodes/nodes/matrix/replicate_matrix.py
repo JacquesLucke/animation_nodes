@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import *
-from ... base_types import VectorizedNode
+from ... base_types import AnimationNode, VectorizedSocket
 from . c_utils import (
     replicateMatrixAtMatrices,
     replicateMatrixAtVectors,
@@ -13,18 +13,18 @@ transformationTypeItems = [
     ("Vector List", "Vectors", "", "NONE", 1)
 ]
 
-class ReplicateMatrixNode(bpy.types.Node, VectorizedNode):
+class ReplicateMatrixNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ReplicateMatrixNode"
     bl_label = "Replicate Matrix"
 
-    useMatrixList = VectorizedNode.newVectorizeProperty()
+    useMatrixList = VectorizedSocket.newProperty()
 
     transformationType = EnumProperty(name = "Transformation Type", default = "Matrix List",
-        items = transformationTypeItems, update = VectorizedNode.refresh)
+        items = transformationTypeItems, update = AnimationNode.refresh)
 
     def create(self):
-        self.newVectorizedInput("Matrix", "useMatrixList",
-            ("Matrix", "inMatrix"), ("Matrices", "inMatrices"))
+        self.newInput(VectorizedSocket("Matrix", "useMatrixList",
+            ("Matrix", "inMatrix"), ("Matrices", "inMatrices")))
 
         self.newInput(self.transformationType, "Transformations", "transformations")
 
