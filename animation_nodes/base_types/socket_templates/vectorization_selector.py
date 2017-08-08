@@ -59,6 +59,7 @@ class VectorizedSocket(SocketTemplate):
             socketIdName = toSocketIdName(self.baseDataType)
             socket = sockets.new(socketIdName, self.baseName, self.baseIdentifier)
             socket.setAttributes(self.baseSettings)
+            socket.setTemporarySocketTransparency(0.80)
         return socket
 
     def inputShouldBeList(self, node):
