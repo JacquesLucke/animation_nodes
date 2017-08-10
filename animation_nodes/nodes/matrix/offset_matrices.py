@@ -2,7 +2,6 @@ import bpy
 from bpy.props import *
 from ... events import propertyChanged
 from ... base_types import AnimationNode, VectorizedSocket
-from ... utils.handlers import validCallback
 from .. falloff.invert_falloff import InvertFalloff
 from . c_utils import evaluateFalloffForMatrixList
 
@@ -57,7 +56,6 @@ class OffsetMatrixNode(bpy.types.Node, AnimationNode):
         description = "Specify wether the given matrices are the start or end state",
         items = specifiedStateItems, update = propertyChanged)
 
-    @validCallback
     def checkedPropertiesChanged(self, context):
         self.updateSocketVisibility()
         propertyChanged()
