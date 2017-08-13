@@ -14,6 +14,9 @@ cdef void scaleVec3(Vector3* target, Vector3* a, float factor):
 cdef float lengthVec3(Vector3* v):
     return sqrt(v.x ** 2 + v.y ** 2 + v.z ** 2)
 
+cdef float lengthSquaredVec3(Vector3* v):
+    return v.x ** 2 + v.y ** 2 + v.z ** 2
+
 cdef void addVec3(Vector3* target, Vector3* a, Vector3* b):
     target.x = a.x + b.x
     target.y = a.y + b.y

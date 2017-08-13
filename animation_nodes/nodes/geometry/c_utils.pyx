@@ -1,8 +1,9 @@
+from libc.math cimport sqrt
 from ... math cimport ( Vector3, dotVec3, scaleVec3,
-    addVec3, subVec3, crossVec3, lengthVec3)
+    addVec3, subVec3, crossVec3, lengthVec3, lengthSquaredVec3)
 from ... data_structures cimport (
-    Vector3DList, DoubleList,
-    VirtualVector3DList, BooleanList)
+    Vector3DList, DoubleList, VirtualDoubleList,
+    VirtualVector3DList, BooleanList, CharList)
 
 def IntersectLinePlane(Py_ssize_t amount,
                       VirtualVector3DList lineStart,
@@ -73,3 +74,55 @@ def IntersectLineLine(Py_ssize_t amount,
             nearestPoint1.data[i] = Vector3(0,0,0)
             nearestPoint2.data[i] = Vector3(0,0,0)
     return nearestPoint1, nearestPoint2, firstParameter, secondParameter, valid
+
+def IntersectLineSphere(Py_ssize_t amount,
+                        VirtualVector3DList LineStart,
+                        VirtualVector3DList LineEnd,
+                        VirtualVector3DList sphereCenter,
+                        VirtualDoubleList sphereRadius):
+    cdef Vector3DList intersection1 = Vector3DList(length = amount)
+    cdef Vector3DList intersection2 = Vector3DList(length = amount)
+    cdef DoubleList intersection1Parameter = DoubleList(length = amount)
+    cdef DoubleList intersection2Parameter = DoubleList(length = amount)
+    cdef CharList numberOfIntersections = CharList(length = amount)
+    cdef Vector3 direction, startingPoint, _intersection1, _intersection2
+    cdef double factor1, factor2, a, b, c
+    cdef Py_ssize_t i
+    for i in range(amount):
+        subVec3(&direction, LineEnd.get(i), LineStart.get(i))
+        subVec3(&startingPoint, LineStart.get(i), sphereCenter.get(i))
+        a = lengthSquaredVec3(&direction)
+        b = dotVec3(&direction, &startingPoint) * 2
+        c = lengthSquaredVec3(&startingPoint) - sphereRadius.get(i) ** 2
+        discriminant = b ** 2 - 4 * a * c
+        if discriminant > 0:
+            if discriminant > 1e-6:
+                sqrtDiscriminant = sqrt(discriminant)
+                factor1 = (-b + sqrtDiscriminant)/(2 * a)
+                factor2 = (-b - sqrtDiscriminant)/(2 * a)
+                scaleVec3(&_intersection1, &direction, factor1)
+                scaleVec3(&_intersection2, &direction, factor2)
+                addVec3(&_intersection1, LineStart.get(i), &_intersection1)
+                addVec3(&_intersection2, LineStart.get(i), &_intersection2)
+                intersection1.data[i] = _intersection1
+                intersection2.data[i] = _intersection2
+                intersection1Parameter.data[i] = factor1
+                intersection2Parameter.data[i] = factor2
+                numberOfIntersections.data[i] = 2
+            else:
+                factor = (-b + sqrt(discriminant))/(2 * a)
+                scaleVec3(&_intersection1, &direction, factor)
+                addVec3(&_intersection1, LineStart.get(i), &_intersection1)
+                intersection1.data[i] = _intersection1
+                intersection2.data[i] = _intersection1
+                intersection1Parameter.data[i] = factor
+                intersection2Parameter.data[i] = factor
+                numberOfIntersections.data[i] = 1
+        else:
+            intersection1.data[i] = Vector3(0,0,0)
+            intersection2.data[i] = Vector3(0,0,0)
+            intersection1Parameter.data[i] = 0
+            intersection2Parameter.data[i] = 0
+            numberOfIntersections.data[i] = 0
+
+    return intersection1, intersection2, intersection1Parameter, intersection2Parameter, numberOfIntersections
