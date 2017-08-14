@@ -1,47 +1,66 @@
 import bpy
-from ... base_types import AnimationNode
+from mathutils import Vector
+from . c_utils import IntersectPlanePlane
+from ... data_structures import VirtualVector3DList
+from ... base_types import AnimationNode, VectorizedSocket
 
 class IntersectPlanePlaneNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_IntersectPlanePlaneNode"
     bl_label = "Intersect Plane Plane"
     bl_width_default = 160
 
+    usePlane1PointList = VectorizedSocket.newProperty()
+    usePlane1NormalList = VectorizedSocket.newProperty()
+    usePlane2PointList = VectorizedSocket.newProperty()
+    usePlane2PointList = VectorizedSocket.newProperty()
+
     def create(self):
-        self.newInput("Vector", "Plane 1 Point", "point1")
-        self.newInput("Vector", "Plane 1 Normal", "normal1", value = (1, 0, 0))
-        self.newInput("Vector", "Plane 2 Point", "point2")
-        self.newInput("Vector", "Plane 2 Normal", "normal2", value = (0, 0, 1))
+        self.newInput(VectorizedSocket("Vector", "usePlane1PointList",
+            ("First Plane Point", "firstPlanePoint", dict(value = (0, 0, 0))),
+            ("First Planes Points", "firstPlanesPoints"),
+            codeProperties = dict(default = (0, 0, 0))))
+        self.newInput(VectorizedSocket("Vector", "usePlane1NormalList",
+            ("First Plane Normal", "firstPlaneNormal", dict(value = (0, 0, 1))),
+            ("First Planes Normals", "firstPlanesNormals"),
+            codeProperties = dict(default = (0, 0, 1))))
 
-        self.newOutput("Vector", "Intersection Point", "intersection")
-        self.newOutput("Vector", "Direction Vector", "direction")
-        self.newOutput("Float", "Angle", "angle")
-        self.newOutput("Boolean", "Is Valid", "isValid")
+        self.newInput(VectorizedSocket("Vector", "usePlane2PointList",
+            ("Second Plane Point", "secondPlanePoint", dict(value = (0, 0, 0))),
+            ("Second Planes Points", "secondPlanesPoints"),
+            codeProperties = dict(default = (0, 0, 0))))
+        self.newInput(VectorizedSocket("Vector", "usePlane2PointList",
+            ("Second Plane Normal", "secondPlaneNormal", dict(value = (1, 0, 0))),
+            ("Second Planes Normals", "secondPlanesNormals"),
+            codeProperties = dict(default = (1, 0, 0))))
 
-    def getExecutionCode(self, required):
-        if len(required) == 0:
-            return
+        self.newOutput(VectorizedSocket("Vector", ["usePlane1PointList", "usePlane1NormalList", "usePlane2PointList", "usePlane2PointList"],
+            ("Line Direction", "lineDirection"),
+            ("Lines Directions", "linesDirections")))
+        self.newOutput(VectorizedSocket("Vector", ["usePlane1PointList", "usePlane1NormalList", "usePlane2PointList", "usePlane2PointList"],
+            ("Line Point", "linePoint"),
+            ("Lines Points", "linesPoints")))
+        self.newOutput(VectorizedSocket("Boolean", ["usePlane1PointList", "usePlane1NormalList", "usePlane2PointList", "usePlane2PointList"],
+            ("Valid", "valid"),
+            ("Valids", "valids")))
 
-        intersection  = "intersection" in required
-        direction  = "direction" in required
-        angle  = "angle" in required
-        isValid = "isValid" in required
+    def getExecutionFunctionName(self):
+        if any((self.usePlane1PointList, self.usePlane1NormalList,
+        self.usePlane2PointList, self.usePlane2PointList)):
+            return "execute_List"
+        else:
+            return "execute_Single"
 
-        yield "if normal1[:] == (0,0,0): normal1 = Vector((0, 0, 1))"
-        yield "if normal2[:] == (0,0,0): normal2 = Vector((0, 0, 1))"
+    def execute_List(self, firstPlanesPoints, firstPlanesNormals, secondPlanesPoints, secondPlanesNormals):
+        return self.getLine(firstPlanesPoints, firstPlanesNormals, secondPlanesPoints, secondPlanesNormals, False)
 
-        if any([intersection, direction, isValid]):
-            yield "intersections = mathutils.geometry.intersect_plane_plane(point1, normal1, point2, normal2)"
+    def execute_Single(self, firstPlanePoint, firstPlaneNormal, secondPlanePoint, secondPlaneNormal):
+        return self.getLine(firstPlanePoint, firstPlaneNormal, secondPlanePoint, secondPlaneNormal, True)
 
-            yield "if intersections != (None, None):"
-            if intersection: yield "    intersection = intersections[0]"
-            if direction:    yield "    direction = intersections[1]"
-            if isValid:      yield "    isValid = True"
-            yield "else: "
-            if intersection: yield "    intersection = Vector((0,0,0))"
-            if direction:    yield "    direction = Vector((0,0,0))"
-            if isValid:      yield "    isValid = False"
-
-        if angle: yield "angle = math.pi - (normal1.angle(normal2, math.pi))"
-
-    def getUsedModules(self):
-        return ["mathutils, math"]
+    def getLine(self, firstPlanePoint, firstPlaneNormal, secondPlanePoint, secondPlaneNormal, singleElement):
+        _firstPlanePoint = VirtualVector3DList.fromListOrElement(firstPlanePoint, Vector((0, 0, 0)))
+        _firstPlaneNormal = VirtualVector3DList.fromListOrElement(firstPlaneNormal, Vector((0, 0, 1)))
+        _secondPlanePoint = VirtualVector3DList.fromListOrElement(secondPlanePoint, Vector((0, 0, 0)))
+        _secondPlaneNormal = VirtualVector3DList.fromListOrElement(secondPlaneNormal, Vector((1, 0, 0)))
+        amount = VirtualVector3DList.getMaxRealLength(_firstPlanePoint, _firstPlaneNormal, _secondPlanePoint, _secondPlaneNormal)
+        amount = 1 if singleElement else amount
+        return IntersectPlanePlane(amount, _firstPlanePoint, _firstPlaneNormal, _secondPlanePoint, _secondPlaneNormal)

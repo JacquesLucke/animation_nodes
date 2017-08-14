@@ -1,5 +1,5 @@
 from libc.math cimport sqrt
-from ... math cimport ( Vector3, dotVec3, scaleVec3,
+from ... math cimport ( Vector3, dotVec3, scaleVec3, normalizeVec3,
     addVec3, subVec3, crossVec3, lengthVec3, lengthSquaredVec3)
 from ... data_structures cimport (
     Vector3DList, DoubleList, VirtualDoubleList,
@@ -126,3 +126,36 @@ def IntersectLineSphere(Py_ssize_t amount,
             numberOfIntersections.data[i] = 0
 
     return intersection1, intersection2, intersection1Parameter, intersection2Parameter, numberOfIntersections
+
+def IntersectPlanePlane(Py_ssize_t amount,
+                        VirtualVector3DList Plane1Point,
+                        VirtualVector3DList Plane1Normal,
+                        VirtualVector3DList Plane2Point,
+                        VirtualVector3DList Plane2Normal):
+    cdef Vector3DList lineDirection = Vector3DList(length = amount)
+    cdef Vector3DList linePoint = Vector3DList(length = amount)
+    cdef BooleanList valid = BooleanList(length = amount)
+    cdef Vector3 direction, unitNormal1, unitNormal2, factor1, factor2, point
+    cdef Py_ssize_t i
+    for i in range(amount):
+        normalizeVec3(&unitNormal1, Plane1Normal.get(i))
+        normalizeVec3(&unitNormal2, Plane2Normal.get(i))
+        crossVec3(&direction, Plane1Normal.get(i), Plane2Normal.get(i))
+        if lengthVec3(&direction) > 1e-6:
+            h1 = dotVec3(Plane1Normal.get(i), Plane1Point.get(i))
+            h2 = dotVec3(Plane2Normal.get(i), Plane2Point.get(i))
+            dot = dotVec3(Plane1Normal.get(i), Plane2Normal.get(i))
+            invDotSquared = (1 - dot ** 2)
+            c1 = (h1 - h2 * dot)/invDotSquared
+            c2 = (h2 - h1 * dot)/invDotSquared
+            scaleVec3(&factor1, Plane1Normal.get(i), c1)
+            scaleVec3(&factor2, Plane2Normal.get(i), c2)
+            addVec3(&point, &factor1, &factor2)
+            lineDirection.data[i] = direction
+            linePoint.data[i] = point
+            valid.data[i] = True
+        else:
+            lineDirection.data[i] = Vector3(0,0,0)
+            linePoint.data[i] = Vector3(0,0,0)
+            valid.data[i] = False
+    return lineDirection, linePoint, valid
