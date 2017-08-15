@@ -188,3 +188,36 @@ def IntersectSpherePlane(Py_ssize_t amount,
             circleRadius.data[i] = 0
             valid.data[i] = False
     return circleCenter, circleRadius, valid
+
+def IntersectSphereSphere(Py_ssize_t amount,
+                        VirtualVector3DList Sphere1Center,
+                        VirtualDoubleList Sphere1Radius,
+                        VirtualVector3DList Sphere2Center,
+                        VirtualDoubleList Sphere2Radius):
+    cdef Vector3DList circleCenter = Vector3DList(length = amount)
+    cdef Vector3DList circleNormal = Vector3DList(length = amount)
+    cdef DoubleList circleRadius = DoubleList(length = amount)
+    cdef BooleanList valid = BooleanList(length = amount)
+    cdef Vector3 direction, scaledDirection, center
+    cdef double distance, r1, r2, h, r
+    cdef Py_ssize_t i
+    for i in range(amount):
+        subVec3(&direction, Sphere2Center.get(i), Sphere1Center.get(i))
+        distance = lengthVec3(&direction)
+        r1 = Sphere1Radius.get(i)
+        r2 = Sphere2Radius.get(i)
+        if (distance <= (r1 + r2)) and ((distance + min(r1, r2)) >= max(r1, r2)) and (distance != 0):
+            h = 0.5 + (r1 * r1 - r2 * r2)/(2 * distance * distance)
+            scaleVec3(&scaledDirection, &direction, h)
+            addVec3(&center, Sphere1Center.get(i), &scaledDirection)
+            r = sqrt(r1 * r1 - h * h * distance * distance)
+            circleCenter.data[i] = center
+            circleNormal.data[i] = direction
+            circleRadius.data[i] = r
+            valid.data[i] = True
+        else:
+            circleCenter.data[i] = Vector3(0,0,0)
+            circleNormal.data[i] = Vector3(0,0,0)
+            circleRadius.data[i] = 0
+            valid.data[i] = False
+    return circleCenter, circleNormal, circleRadius, valid

@@ -1,52 +1,70 @@
 import bpy
-from ... base_types import AnimationNode
+from mathutils import Vector
+from . c_utils import IntersectSphereSphere
+from ... data_structures import VirtualVector3DList, VirtualDoubleList
+from ... base_types import AnimationNode, VectorizedSocket
 
 class IntersectSphereSphereNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_IntersectSphereSphereNode"
     bl_label = "Intersect Sphere Sphere"
     bl_width_default = 160
 
+    useSphere1CenterList = VectorizedSocket.newProperty()
+    useSphere1RadiusList = VectorizedSocket.newProperty()
+    useSphere2CenterList = VectorizedSocket.newProperty()
+    useSphere2RadiusList = VectorizedSocket.newProperty()
+
     def create(self):
-        self.newInput("Vector", "Sphere 1 Center", "center1")
-        self.newInput("Float", "Sphere 1 Radius", "radius1", value = 1)
-        self.newInput("Vector", "Sphere 2 Center", "center2", value = (0, 0, 1))
-        self.newInput("Float", "Sphere 2 Radius", "radius2", value = 1)
+        self.newInput(VectorizedSocket("Vector", "useSphere1CenterList",
+            ("First Sphere Center", "firstSphereCenter", dict(value = (0, 0, -0.5))),
+            ("First Spheres Centers", "firstSpheresCenters"),
+            codeProperties = dict(default = (0, 0, -0.5))))
+        self.newInput(VectorizedSocket("Float", "useSphere1RadiusList",
+            ("First Sphere Radius", "firstSphereRadius", dict(value = 1)),
+            ("First Spheres Radii", "firstSpheresRadii"),
+            codeProperties = dict(default = 1)))
 
-        self.newOutput("Vector", "Circle Center", "center")
-        self.newOutput("Vector", "Circle Normal", "normal")
-        self.newOutput("Float", "Circle Radius", "radius")
-        self.newOutput("Boolean", "Is Valid", "isValid", hide = True)
+        self.newInput(VectorizedSocket("Vector", "useSphere2CenterList",
+            ("Second Sphere Center", "secondSphereCenter", dict(value = (0, 0, 0.5))),
+            ("Second Spheres Centers", "secondSpheresCenters"),
+            codeProperties = dict(default = (0, 0, 0.5))))
+        self.newInput(VectorizedSocket("Float", "useSphere2RadiusList",
+            ("Second Sphere Radius", "secondSphereRadius", dict(value = 1)),
+            ("Second Spheres Radii", "secondSpheresRadii"),
+            codeProperties = dict(default = 1)))
 
-    def getExecutionCode(self, required):
-        if len(required) == 0:
-            return
+        self.newOutput(VectorizedSocket("Vector", ["useSphere2CenterList", "useSphere2RadiusList", "useSphere1CenterList", "useSphere1RadiusList"],
+            ("Circle Center", "circleCenter"),
+            ("Circles Centers", "circlesCenters")))
+        self.newOutput(VectorizedSocket("Vector", ["useSphere2CenterList", "useSphere2RadiusList", "useSphere1CenterList", "useSphere1RadiusList"],
+            ("Circle Normal", "circleNormal"),
+            ("Circles Normals", "circlesNormals")))
+        self.newOutput(VectorizedSocket("Float", ["useSphere2CenterList", "useSphere2RadiusList", "useSphere1CenterList", "useSphere1RadiusList"],
+            ("Circle Radius", "circleRadius"),
+            ("Circles Radii", "circlesRadii")))
 
-        center  = "center" in required
-        normal  = "normal" in required
-        radius  = "radius" in required
-        isValid = "isValid" in required
+        self.newOutput(VectorizedSocket("Boolean", ["useSphere2CenterList", "useSphere2RadiusList", "useSphere1CenterList", "useSphere1RadiusList"],
+            ("Valid", "valid"),
+            ("Valids", "valids")))
 
-        yield "if center1 == center2: "
-        if center : yield "    center = Vector((0,0,0))"
-        if normal : yield "    normal = Vector((0,0,0))"
-        if radius : yield "    radius = 0"
-        if isValid: yield "    isValid = False"
+    def getExecutionFunctionName(self):
+        if any((self.useSphere2CenterList, self.useSphere2RadiusList,
+        self.useSphere1CenterList, self.useSphere1RadiusList)):
+            return "execute_List"
+        else:
+            return "execute_Single"
 
-        yield "else:"
-        yield "    dif = (center2 - center1)"
-        yield "    dist = dif.length"
-        yield "    _, intx = mathutils.geometry.intersect_sphere_sphere_2d( (0, 0), radius1, (dist, 0), radius2)"
+    def execute_List(self, firstSpheresCenters, firstSpheresRadii, secondSpheresCenters, secondSpheresRadii):
+        return self.getIntersections(firstSpheresCenters, firstSpheresRadii, secondSpheresCenters, secondSpheresRadii, False)
 
-        yield "    if intx is not None:"
-        if center : yield "        center = center1.lerp(center2, intx[0]/dist)"
-        if normal : yield "        normal = dif.normalized()"
-        if radius : yield "        radius = intx[1]"
-        if isValid: yield "        isValid = True"
-        yield "    else:"
-        if center : yield "        center = Vector((0,0,0))"
-        if normal : yield "        normal = Vector((0,0,0))"
-        if radius : yield "        radius = 0"
-        if isValid: yield "        isValid = False"
+    def execute_Single(self, firstSphereCenter, firstSphereRadius, secondSphereCenter, secondSphereRadius):
+        return self.getIntersections(firstSphereCenter, firstSphereRadius, secondSphereCenter, secondSphereRadius, True)
 
-    def getUsedModules(self):
-        return ["mathutils"]
+    def getIntersections(self, firstSphereCenter, firstSphereRadius, secondSphereCenter, secondSphereRadius, singleElement):
+        _firstSphereCenter = VirtualVector3DList.fromListOrElement(firstSphereCenter, Vector((0, 0, -0.5)))
+        _firstSphereRadius = VirtualDoubleList.fromListOrElement(firstSphereRadius, 1)
+        _secondSphereCenter = VirtualVector3DList.fromListOrElement(secondSphereCenter, Vector((0, 0, 0.5)))
+        _secondSphereRadius = VirtualDoubleList.fromListOrElement(secondSphereRadius, 1)
+        amount = VirtualVector3DList.getMaxRealLength(_firstSphereCenter, _firstSphereRadius, _secondSphereCenter, _secondSphereRadius)
+        amount = 1 if singleElement else amount
+        return IntersectSphereSphere(amount, _firstSphereCenter, _firstSphereRadius, _secondSphereCenter, _secondSphereRadius)
