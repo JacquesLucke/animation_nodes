@@ -1,39 +1,67 @@
 import bpy
-from ... base_types import AnimationNode
+from mathutils import Vector
+from . c_utils import IntersectSpherePlane
+from ... data_structures import VirtualVector3DList, VirtualDoubleList
+from ... base_types import AnimationNode, VectorizedSocket
 
 class IntersectSpherePlaneNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_IntersectSpherePlaneNode"
     bl_label = "Intersect Sphere Plane"
     bl_width_default = 160
 
+    useSphereCenterList = VectorizedSocket.newProperty()
+    useSphereRadiusList = VectorizedSocket.newProperty()
+    usePlanePointList = VectorizedSocket.newProperty()
+    usePlaneNormalList = VectorizedSocket.newProperty()
+
     def create(self):
-        self.newInput("Vector", "Sphere Center", "sphereCenter")
-        self.newInput("Float", "Sphere Radius", "sphereRadius", value = 1)
-        self.newInput("Vector", "Plane Point", "point")
-        self.newInput("Vector", "Plane Normal", "normal", value = (0, 0, 1))
+        self.newInput(VectorizedSocket("Vector", "useSphereCenterList",
+            ("Sphere Center", "sphereCenter", dict(value = (0, 0, 0))),
+            ("Spheres Centers", "spheresCenters"),
+            codeProperties = dict(default = (0, 0, 0))))
+        self.newInput(VectorizedSocket("Float", "useSphereRadiusList",
+            ("Sphere Radius", "sphereRadius", dict(value = 1)),
+            ("Spheres Radii", "spheresRadii"),
+            codeProperties = dict(default = 1)))
 
-        self.newOutput("Vector", "Circle Center", "center")
-        self.newOutput("Float", "Circle Radius", "radius")
-        self.newOutput("Boolean", "Is Valid", "isValid", hide = True)
+        self.newInput(VectorizedSocket("Vector", "usePlanePointList",
+            ("Plane Point", "planePoint", dict(value = (0, 0, 0))),
+            ("Planes Points", "planesPoints"),
+            codeProperties = dict(default = (0, 0, 0))))
+        self.newInput(VectorizedSocket("Vector", "usePlaneNormalList",
+            ("Plane Normal", "planeNormal", dict(value = (0, 0, 1))),
+            ("Planes Normals", "planesNormals"),
+            codeProperties = dict(default = (0, 0, 1))))
 
-    def getExecutionCode(self, required):
-        if len(required) == 0:
-            return
+        self.newOutput(VectorizedSocket("Vector", ["usePlanePointList", "usePlaneNormalList", "useSphereCenterList", "useSphereRadiusList"],
+            ("Circle Center", "circleCenter"),
+            ("Circles Centers", "circlesCenters")))
+        self.newOutput(VectorizedSocket("Float", ["usePlanePointList", "usePlaneNormalList", "useSphereCenterList", "useSphereRadiusList"],
+            ("Circle Radius", "circleRadius"),
+            ("Circles Radii", "circlesRadii")))
 
-        center  = "center" in required
-        radius  = "radius" in required
-        isValid = "isValid" in required
+        self.newOutput(VectorizedSocket("Boolean", ["usePlanePointList", "usePlaneNormalList", "useSphereCenterList", "useSphereRadiusList"],
+            ("Valid", "valid"),
+            ("Valids", "valids")))
 
-        yield "dist = mathutils.geometry.distance_point_to_plane(sphereCenter, point, normal)"
+    def getExecutionFunctionName(self):
+        if any((self.usePlanePointList, self.usePlaneNormalList,
+        self.useSphereCenterList, self.useSphereRadiusList)):
+            return "execute_List"
+        else:
+            return "execute_Single"
 
-        yield "if abs(dist) <= abs(sphereRadius) and sphereRadius != 0:"
-        if center:  yield "    center = (normal * -dist) + sphereCenter"
-        if radius:  yield "    radius = math.sqrt((sphereRadius**2) - (dist**2))"
-        if isValid: yield "    isValid = True"
-        yield "else:"
-        if center:  yield "    center = Vector((0,0,0))"
-        if radius:  yield "    radius = 0"
-        if isValid: yield "    isValid = False"
+    def execute_List(self, spheresCenters, spheresRadii, planesPoints, planesNormals):
+        return self.getIntersections(spheresCenters, spheresRadii, planesPoints, planesNormals, False)
 
-    def getUsedModules(self):
-        return ["mathutils", "math"]
+    def execute_Single(self, sphereCenter, sphereRadius, planePoint, planeNormal):
+        return self.getIntersections(sphereCenter, sphereRadius, planePoint, planeNormal, True)
+
+    def getIntersections(self, sphereCenter, sphereRadius, planePoint, planeNormal, singleElement):
+        _sphereCenter = VirtualVector3DList.fromListOrElement(sphereCenter, Vector((0, 0, 0)))
+        _sphereRadius = VirtualDoubleList.fromListOrElement(sphereRadius, 1)
+        _planePoint = VirtualVector3DList.fromListOrElement(planePoint, Vector((0, 0, 0)))
+        _planeNormal = VirtualVector3DList.fromListOrElement(planeNormal, Vector((0, 0, 1)))
+        amount = VirtualVector3DList.getMaxRealLength(_sphereCenter, _sphereRadius, _planePoint, _planeNormal)
+        amount = 1 if singleElement else amount
+        return IntersectSpherePlane(amount, _sphereCenter, _sphereRadius, _planePoint, _planeNormal)

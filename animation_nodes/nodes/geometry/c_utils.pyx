@@ -1,6 +1,7 @@
 from libc.math cimport sqrt
 from ... math cimport ( Vector3, dotVec3, scaleVec3, normalizeVec3,
-    addVec3, subVec3, crossVec3, lengthVec3, lengthSquaredVec3)
+    addVec3, subVec3, crossVec3, lengthVec3, lengthSquaredVec3,
+    distanceVec3)
 from ... data_structures cimport (
     Vector3DList, DoubleList, VirtualDoubleList,
     VirtualVector3DList, BooleanList, CharList)
@@ -159,3 +160,31 @@ def IntersectPlanePlane(Py_ssize_t amount,
             linePoint.data[i] = Vector3(0,0,0)
             valid.data[i] = False
     return lineDirection, linePoint, valid
+
+def IntersectSpherePlane(Py_ssize_t amount,
+                        VirtualVector3DList SphereCenter,
+                        VirtualDoubleList SphereRadius,
+                        VirtualVector3DList PlanePoint,
+                        VirtualVector3DList PlaneNormal):
+    cdef Vector3DList circleCenter = Vector3DList(length = amount)
+    cdef DoubleList circleRadius = DoubleList(length = amount)
+    cdef BooleanList valid = BooleanList(length = amount)
+    cdef Vector3 direction, unitNormal, scaledNormal, center
+    cdef double radius, distance
+    cdef Py_ssize_t i
+    for i in range(amount):
+        normalizeVec3(&unitNormal, PlaneNormal.get(i))
+        subVec3(&direction, SphereCenter.get(i), PlanePoint.get(i))
+        distance = dotVec3(&direction, &unitNormal)
+        if abs(distance) < SphereRadius.get(i):
+            radius = sqrt(SphereRadius.get(i) ** 2 - distance ** 2)
+            scaleVec3(&scaledNormal, &unitNormal, -distance)
+            addVec3(&center, SphereCenter.get(i), &scaledNormal)
+            circleCenter.data[i] = center
+            circleRadius.data[i] = radius
+            valid.data[i] = True
+        else:
+            circleCenter.data[i] = Vector3(0,0,0)
+            circleRadius.data[i] = 0
+            valid.data[i] = False
+    return circleCenter, circleRadius, valid
