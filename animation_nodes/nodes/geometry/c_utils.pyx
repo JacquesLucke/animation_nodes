@@ -1,3 +1,4 @@
+import cython
 from libc.math cimport sqrt
 from ... math cimport ( Vector3, dotVec3, scaleVec3, normalizeVec3,
     addVec3, subVec3, crossVec3, lengthVec3, lengthSquaredVec3,
@@ -221,3 +222,29 @@ def IntersectSphereSphere(Py_ssize_t amount,
             circleRadius.data[i] = 0
             valid.data[i] = False
     return circleCenter, circleNormal, circleRadius, valid
+
+@cython.cdivision(True)
+def ProjectPointOnLine(Py_ssize_t amount,
+                    VirtualVector3DList LineStart,
+                    VirtualVector3DList LineEnd,
+                    VirtualVector3DList Point):
+    cdef Vector3DList Projection = Vector3DList(length = amount)
+    cdef DoubleList Parameter = DoubleList(length = amount)
+    cdef DoubleList Distance = DoubleList(length = amount)
+    cdef Vector3 direction1, direction2, unitDirection, projVector, proj
+    cdef double factor, length, param, distance
+    cdef Py_ssize_t i
+    for i in range(amount):
+        subVec3(&direction1, LineEnd.get(i), LineStart.get(i))
+        subVec3(&direction2, Point.get(i), LineStart.get(i))
+        normalizeVec3(&unitDirection, &direction1)
+        factor = dotVec3(&direction2, &unitDirection)
+        scaleVec3(&projVector, &unitDirection, factor)
+        addVec3(&proj, LineStart.get(i), &projVector)
+        length = lengthVec3(&direction1)
+        param = factor / length
+        distance = distanceVec3(&projVector, Point.get(i))
+        Projection.data[i] = proj
+        Parameter.data[i] = param
+        Distance.data[i] = distance
+    return Projection, Parameter, Distance
