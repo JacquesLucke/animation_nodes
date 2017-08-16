@@ -248,3 +248,22 @@ def ProjectPointOnLine(Py_ssize_t amount,
         Parameter.data[i] = param
         Distance.data[i] = distance
     return Projection, Parameter, Distance
+
+def ProjectPointOnPlane(Py_ssize_t amount,
+                        VirtualVector3DList PlanePoint,
+                        VirtualVector3DList PlaneNormal,
+                        VirtualVector3DList Point):
+    cdef Vector3DList Projection = Vector3DList(length = amount)
+    cdef DoubleList Distance = DoubleList(length = amount)
+    cdef Vector3 direction, unitNormal, projVector, proj
+    cdef double distance
+    cdef Py_ssize_t i
+    for i in range(amount):
+        subVec3(&direction, Point.get(i), PlanePoint.get(i))
+        normalizeVec3(&unitNormal, PlaneNormal.get(i))
+        distance = dotVec3(&direction, &unitNormal)
+        scaleVec3(&projVector, &unitNormal, -distance)
+        addVec3(&proj, Point.get(i), &projVector)
+        Projection.data[i] = proj
+        Distance.data[i] = distance
+    return Projection, Distance
