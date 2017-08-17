@@ -33,27 +33,31 @@ class IntersectLineSphereNode(bpy.types.Node, AnimationNode):
             ("Spheres Radii", "spheresRadii"),
             codeProperties = dict(default = 1)))
 
-        self.newOutput(VectorizedSocket("Vector", ["useLineStartList", "useLineEndList", "useSphereCenterList", "useSphereRadiusList"],
+        props = ["useLineStartList", "useLineEndList",
+        "useSphereCenterList", "useSphereRadiusList"]
+
+        self.newOutput(VectorizedSocket("Vector", props,
             ("First Intersection", "firstIntersection"),
             ("First Intersections", "firstIntersections")))
-        self.newOutput(VectorizedSocket("Vector", ["useLineStartList", "useLineEndList", "useSphereCenterList", "useSphereRadiusList"],
+        self.newOutput(VectorizedSocket("Vector", props,
             ("Second Intersection", "secondIntersection"),
             ("Second Intersections", "secondIntersections")))
 
-        self.newOutput(VectorizedSocket("Float", ["useLineStartList", "useLineEndList", "useSphereCenterList", "useSphereRadiusList"],
+        self.newOutput(VectorizedSocket("Float", props,
             ("First Intersection Parameter", "firstIntersectionParameter"),
             ("First Intersections Parameters", "firstIntersectionsParameters")))
-        self.newOutput(VectorizedSocket("Float", ["useLineStartList", "useLineEndList", "useSphereCenterList", "useSphereRadiusList"],
+        self.newOutput(VectorizedSocket("Float", props,
             ("Second Intersection Parameter", "secondIntersectionParameter"),
             ("Second Intersections Parameters", "secondIntersectionsParameters")))
 
-        self.newOutput(VectorizedSocket("Integer", ["useLineStartList", "useLineEndList", "useSphereCenterList", "useSphereRadiusList"],
+        self.newOutput(VectorizedSocket("Integer", props,
             ("Number Of Intersections", "numberOfIntersections"),
             ("Number Of Intersections", "numberOfIntersections")))
 
     def getExecutionFunctionName(self):
-        if any((self.useLineStartList, self.useLineEndList,
-        self.useSphereCenterList, self.useSphereRadiusList)):
+        useList = any((self.useLineStartList, self.useLineEndList,
+        self.useSphereCenterList, self.useSphereRadiusList))
+        if useList:
             return "execute_List"
         else:
             return "execute_Single"
@@ -62,7 +66,8 @@ class IntersectLineSphereNode(bpy.types.Node, AnimationNode):
         return self.getIntersections(linesStart, linesEnd, spheresCenters, spheresRadii, False)
 
     def execute_Single(self, lineStart, lineEnd, sphereCenter, sphereRadius):
-        return self.getIntersections(lineStart, lineEnd, sphereCenter, sphereRadius, True)
+        result = self.getIntersections(lineStart, lineEnd, sphereCenter, sphereRadius, True)
+        return [x[0] for x in result]
 
     def getIntersections(self, lineStart, lineEnd, sphereCenter, sphereRadius, singleElement):
         _lineStart = VirtualVector3DList.fromListOrElement(lineStart, Vector((1, 1, 0)))
