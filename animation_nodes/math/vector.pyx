@@ -12,10 +12,10 @@ cdef void scaleVec3(Vector3* target, Vector3* a, float factor):
     target.z = a.z * factor
 
 cdef float lengthVec3(Vector3* v):
-    return sqrt(v.x ** 2 + v.y ** 2 + v.z ** 2)
+    return sqrt(v.x * v.x + v.y * v.y + v.z * v.z)
 
 cdef float lengthSquaredVec3(Vector3* v):
-    return v.x ** 2 + v.y ** 2 + v.z ** 2
+    return v.x * v.x + v.y * v.y + v.z * v.z
 
 cdef void addVec3(Vector3* target, Vector3* a, Vector3* b):
     target.x = a.x + b.x
@@ -32,6 +32,7 @@ cdef void multVec3(Vector3* target, Vector3* a, Vector3* b):
     target.y = a.y * b.y
     target.z = a.z * b.z
 
+@cython.cdivision(True)
 cdef void divideVec3(Vector3* target, Vector3* a, Vector3* b):
     target.x = a.x / b.x if b.x != 0 else 0
     target.y = a.y / b.y if b.y != 0 else 0
@@ -108,6 +109,7 @@ cdef void crossVec3(Vector3* result, Vector3* a, Vector3* b):
     result.y = a.z * b.x - a.x * b.z
     result.z = a.x * b.y - a.y * b.x
 
+@cython.cdivision(True)
 cdef void projectVec3(Vector3* result, Vector3* a, Vector3* b):
     # https://en.wikipedia.org/wiki/Vector_projection#Vector_projection_2
     if b.x != 0 or b.y != 0 or b.z != 0:
@@ -130,6 +132,7 @@ cdef void absoluteVec3(Vector3* target, Vector3* source):
     target.y = abs(source.y)
     target.z = abs(source.z)
 
+@cython.cdivision(True)
 cdef void snapVec3(Vector3* target, Vector3* v, Vector3* step):
     target.x = ceil(v.x / step.x - 0.5) * step.x if step.x != 0 else v.x
     target.y = ceil(v.y / step.y - 0.5) * step.y if step.y != 0 else v.y
