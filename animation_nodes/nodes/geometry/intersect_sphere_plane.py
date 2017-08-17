@@ -33,20 +33,24 @@ class IntersectSpherePlaneNode(bpy.types.Node, AnimationNode):
             ("Planes Normals", "planesNormals"),
             codeProperties = dict(default = (0, 0, 1))))
 
-        self.newOutput(VectorizedSocket("Vector", ["usePlanePointList", "usePlaneNormalList", "useSphereCenterList", "useSphereRadiusList"],
+        props = ["usePlanePointList", "usePlaneNormalList",
+        "useSphereCenterList", "useSphereRadiusList"]
+
+        self.newOutput(VectorizedSocket("Vector", props,
             ("Circle Center", "circleCenter"),
             ("Circles Centers", "circlesCenters")))
-        self.newOutput(VectorizedSocket("Float", ["usePlanePointList", "usePlaneNormalList", "useSphereCenterList", "useSphereRadiusList"],
+        self.newOutput(VectorizedSocket("Float", props,
             ("Circle Radius", "circleRadius"),
             ("Circles Radii", "circlesRadii")))
 
-        self.newOutput(VectorizedSocket("Boolean", ["usePlanePointList", "usePlaneNormalList", "useSphereCenterList", "useSphereRadiusList"],
+        self.newOutput(VectorizedSocket("Boolean", props,
             ("Valid", "valid"),
             ("Valids", "valids")))
 
     def getExecutionFunctionName(self):
-        if any((self.usePlanePointList, self.usePlaneNormalList,
-        self.useSphereCenterList, self.useSphereRadiusList)):
+        useList =  any((self.usePlanePointList, self.usePlaneNormalList,
+        self.useSphereCenterList, self.useSphereRadiusList))
+        if useList:
             return "execute_List"
         else:
             return "execute_Single"
@@ -55,7 +59,8 @@ class IntersectSpherePlaneNode(bpy.types.Node, AnimationNode):
         return self.getIntersections(spheresCenters, spheresRadii, planesPoints, planesNormals, False)
 
     def execute_Single(self, sphereCenter, sphereRadius, planePoint, planeNormal):
-        return self.getIntersections(sphereCenter, sphereRadius, planePoint, planeNormal, True)
+        result = self.getIntersections(sphereCenter, sphereRadius, planePoint, planeNormal, True)
+        return [x[0] for x in result]
 
     def getIntersections(self, sphereCenter, sphereRadius, planePoint, planeNormal, singleElement):
         _sphereCenter = VirtualVector3DList.fromListOrElement(sphereCenter, Vector((0, 0, 0)))
