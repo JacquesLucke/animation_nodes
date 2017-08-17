@@ -56,8 +56,9 @@ class IntersectLineLineNode(bpy.types.Node, AnimationNode):
             ("Valids", "valids")))
 
     def getExecutionFunctionName(self):
-        if any((self.useFirstLineStartList, self.useFirstLineEndList,
-        self.useSecondLineStartList, self.useSecondLineEndList)):
+        useList = any((self.useFirstLineStartList, self.useFirstLineEndList,
+        self.useSecondLineStartList, self.useSecondLineEndList))
+        if useList:
             return "execute_List"
         else:
             return "execute_Single"
