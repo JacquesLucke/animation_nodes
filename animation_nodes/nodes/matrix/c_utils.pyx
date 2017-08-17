@@ -3,12 +3,16 @@ from ... data_structures cimport (Vector3DList, EulerList, Matrix4x4List,
                                   FalloffEvaluator,
                                   VirtualVector3DList, VirtualEulerList)
 
-from ... math cimport (Vector3, Euler3, Matrix4, toMatrix4,
-                       multMatrix4, toPyMatrix4,
-                       setTranslationRotationScaleMatrix,
-                       setRotationXMatrix, setRotationYMatrix, setRotationZMatrix,
-                       setRotationMatrix, setTranslationMatrix, setIdentityMatrix,
-                       transposeMatrix_Inplace)
+from ... math cimport (
+    Vector3, Euler3, Matrix4, toMatrix4,
+    multMatrix4, toPyMatrix4,
+    setTranslationRotationScaleMatrix,
+    setRotationXMatrix, setRotationYMatrix, setRotationZMatrix,
+    setRotationMatrix, setTranslationMatrix, setIdentityMatrix,
+    setScaleMatrix,
+    setMatrixTranslation,
+    transposeMatrix_Inplace)
+
 from ... math import matrix4x4ListToEulerList
 
 from libc.math cimport sqrt
@@ -41,6 +45,36 @@ def createAxisRotations(DoubleList angles, str axis):
         for i in range(len(matrices)):
             setRotationZMatrix(matrices.data + i, angles.data[i])
     return matrices
+
+def rotationsFromVirtualEulers(Py_ssize_t amount, VirtualEulerList rotations):
+    cdef Matrix4x4List matrices = Matrix4x4List(length = amount)
+    cdef Py_ssize_t i
+    for i in range(amount):
+        setRotationMatrix(matrices.data + i, rotations.get(i))
+    return matrices
+
+def scalesFromVirtualVectors(Py_ssize_t amount, VirtualVector3DList scales):
+    cdef Matrix4x4List matrices = Matrix4x4List(length = amount)
+    cdef Py_ssize_t i
+    for i in range(amount):
+        setScaleMatrix(matrices.data + i, scales.get(i))
+    return matrices
+
+def scale3x3Parts(Matrix4x4List matrices, VirtualVector3DList scales):
+    cdef Py_ssize_t i
+    cdef Matrix4 *m
+    cdef Vector3 *s
+    for i in range(matrices.length):
+        m = matrices.data + i
+        s = scales.get(i)
+        m.a11 *= s.x; m.a12 *= s.y; m.a13 *= s.z
+        m.a21 *= s.x; m.a22 *= s.y; m.a23 *= s.z
+        m.a31 *= s.x; m.a32 *= s.y; m.a33 *= s.z
+
+def setLocations(Matrix4x4List matrices, VirtualVector3DList locations):
+    cdef Py_ssize_t i
+    for i in range(matrices.length):
+        setMatrixTranslation(matrices.data + i, locations.get(i))
 
 def createRotationsFromEulers(EulerList rotations):
     cdef Matrix4x4List matrices = Matrix4x4List(length = len(rotations))
