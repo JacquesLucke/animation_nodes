@@ -34,21 +34,24 @@ class IntersectLineLineNode(bpy.types.Node, AnimationNode):
             ("Second Lines End", "secondLinesEnd"),
             codeProperties = dict(default = (-1, 1, 0))))
 
-        self.newOutput(VectorizedSocket("Vector", ["useFirstLineStartList", "useFirstLineEndList", "useSecondLineStartList", "useSecondLineEndList"],
+        props = ["useFirstLineStartList", "useFirstLineEndList",
+        "useSecondLineStartList", "useSecondLineEndList"]
+
+        self.newOutput(VectorizedSocket("Vector", props,
             ("First Line Nearest Point", "firstNearestPoint"),
             ("First Lines Nearest Points", "firstNearestPoints")))
-        self.newOutput(VectorizedSocket("Vector", ["useFirstLineStartList", "useFirstLineEndList", "useSecondLineStartList", "useSecondLineEndList"],
+        self.newOutput(VectorizedSocket("Vector", props,
             ("Second Line Nearest Point", "secondNearestPoint"),
             ("Second Lines Nearest Points", "secondNearestPoints")))
 
-        self.newOutput(VectorizedSocket("Float", ["useFirstLineStartList", "useFirstLineEndList", "useSecondLineStartList", "useSecondLineEndList"],
+        self.newOutput(VectorizedSocket("Float", props,
             ("First Line Parameter", "firstParameter"),
             ("First Lines Parameters", "firstParameters")))
-        self.newOutput(VectorizedSocket("Float", ["useFirstLineStartList", "useFirstLineEndList", "useSecondLineStartList", "useSecondLineEndList"],
+        self.newOutput(VectorizedSocket("Float", props,
             ("Second Line Parameter", "secondParameter"),
             ("Second Lines Parameters", "secondParameters")))
 
-        self.newOutput(VectorizedSocket("Boolean", ["useFirstLineStartList", "useFirstLineEndList", "useSecondLineStartList", "useSecondLineEndList"],
+        self.newOutput(VectorizedSocket("Boolean", props,
             ("Valid", "valid"),
             ("Valids", "valids")))
 
@@ -63,7 +66,8 @@ class IntersectLineLineNode(bpy.types.Node, AnimationNode):
         return self.getPoints(firstLinesStart, firstLinesEnd, secondLinesStart, secondLinesEnd, False)
 
     def execute_Single(self, firstLineStart, firstLineEnd, secondLineStart, secondLineEnd):
-        return self.getPoints(firstLineStart, firstLineEnd, secondLineStart, secondLineEnd, True)
+        result = self.getPoints(firstLineStart, firstLineEnd, secondLineStart, secondLineEnd, True)
+        return [x[0] for x in result]
 
     def getPoints(self, firstLineStart, firstLineEnd, secondLineStart, secondLineEnd, singleElement):
         _firstLineStart = VirtualVector3DList.fromListOrElement(firstLineStart, Vector((1, 1, 0)))
