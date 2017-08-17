@@ -33,19 +33,23 @@ class IntersectPlanePlaneNode(bpy.types.Node, AnimationNode):
             ("Second Planes Normals", "secondPlanesNormals"),
             codeProperties = dict(default = (1, 0, 0))))
 
-        self.newOutput(VectorizedSocket("Vector", ["usePlane1PointList", "usePlane1NormalList", "usePlane2PointList", "usePlane2PointList"],
+        props = ["usePlane1PointList", "usePlane1NormalList",
+        "usePlane2PointList", "usePlane2PointList"]
+
+        self.newOutput(VectorizedSocket("Vector", props,
             ("Line Direction", "lineDirection"),
             ("Lines Directions", "linesDirections")))
-        self.newOutput(VectorizedSocket("Vector", ["usePlane1PointList", "usePlane1NormalList", "usePlane2PointList", "usePlane2PointList"],
+        self.newOutput(VectorizedSocket("Vector", props,
             ("Line Point", "linePoint"),
             ("Lines Points", "linesPoints")))
-        self.newOutput(VectorizedSocket("Boolean", ["usePlane1PointList", "usePlane1NormalList", "usePlane2PointList", "usePlane2PointList"],
+        self.newOutput(VectorizedSocket("Boolean", props,
             ("Valid", "valid"),
             ("Valids", "valids")))
 
     def getExecutionFunctionName(self):
-        if any((self.usePlane1PointList, self.usePlane1NormalList,
-        self.usePlane2PointList, self.usePlane2PointList)):
+        useList = any((self.usePlane1PointList, self.usePlane1NormalList,
+        self.usePlane2PointList, self.usePlane2PointList))
+        if useList:
             return "execute_List"
         else:
             return "execute_Single"
@@ -54,7 +58,8 @@ class IntersectPlanePlaneNode(bpy.types.Node, AnimationNode):
         return self.getLine(firstPlanesPoints, firstPlanesNormals, secondPlanesPoints, secondPlanesNormals, False)
 
     def execute_Single(self, firstPlanePoint, firstPlaneNormal, secondPlanePoint, secondPlaneNormal):
-        return self.getLine(firstPlanePoint, firstPlaneNormal, secondPlanePoint, secondPlaneNormal, True)
+        result = self.getLine(firstPlanePoint, firstPlaneNormal, secondPlanePoint, secondPlaneNormal, True)
+        return [x[0] for x in result]
 
     def getLine(self, firstPlanePoint, firstPlaneNormal, secondPlanePoint, secondPlaneNormal, singleElement):
         _firstPlanePoint = VirtualVector3DList.fromListOrElement(firstPlanePoint, Vector((0, 0, 0)))
