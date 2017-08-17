@@ -33,19 +33,23 @@ class IntersectLinePlaneNode(bpy.types.Node, AnimationNode):
             ("Planes Normal", "planesNormal"),
             codeProperties = dict(default = (0, 0, 1))))
 
-        self.newOutput(VectorizedSocket("Vector", ["useLineStartList", "useLineEndList", "usePlaneNormalList", "usePlanePointList"],
+        props = ["useLineStartList", "useLineEndList",
+        "usePlaneNormalList", "usePlanePointList"]
+
+        self.newOutput(VectorizedSocket("Vector", props,
             ("Intersection", "intersection"),
             ("Intersections", "intersections")))
-        self.newOutput(VectorizedSocket("Float", ["useLineStartList", "useLineEndList", "usePlaneNormalList", "usePlanePointList"],
+        self.newOutput(VectorizedSocket("Float", props,
             ("Parameter", "parameter"),
             ("Parameters", "parameters")))
-        self.newOutput(VectorizedSocket("Boolean", ["useLineStartList", "useLineEndList", "usePlaneNormalList", "usePlanePointList"],
+        self.newOutput(VectorizedSocket("Boolean", props,
             ("Valid", "valid"),
             ("Valids", "valids")))
 
     def getExecutionFunctionName(self):
-        if any((self.useLineStartList, self.useLineEndList,
-        self.usePlaneNormalList, self.usePlanePointList)):
+        useList = any((self.useLineStartList, self.useLineEndList,
+        self.usePlaneNormalList, self.usePlanePointList))
+        if useList:
             return "execute_List"
         else:
             return "execute_Single"
@@ -54,7 +58,8 @@ class IntersectLinePlaneNode(bpy.types.Node, AnimationNode):
         return self.getIntersection(linesStart, linesEnd, planesPoint, planesNormal, False)
 
     def execute_Single(self, lineStart, lineEnd, planePoint, planeNormal):
-        return self.getIntersection(lineStart, lineEnd, planePoint, planeNormal, True)
+        result = self.getIntersection(lineStart, lineEnd, planePoint, planeNormal, True)
+        return [x[0] for x in result]
 
     def getIntersection(self, lineStart, lineEnd, planePoint, planeNormal, singleElement):
         _lineStart = VirtualVector3DList.fromListOrElement(lineStart, Vector((0, 0, 1)))
