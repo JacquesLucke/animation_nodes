@@ -29,16 +29,19 @@ class ProjectPointOnPlaneNode(bpy.types.Node, AnimationNode):
             ("Points", "points"),
             codeProperties = dict(default = (0, 0, 1))))
 
-        self.newOutput(VectorizedSocket("Vector", ["usePlanePointList", "usePlaneNormalList", "usePointList"],
+        props = ["usePlanePointList", "usePlaneNormalList", "usePointList"]
+
+        self.newOutput(VectorizedSocket("Vector", props,
             ("Projection", "projection"),
             ("Projections", "projections")))
-        self.newOutput(VectorizedSocket("Float", ["usePlanePointList", "usePlaneNormalList", "usePointList"],
+        self.newOutput(VectorizedSocket("Float", props,
             ("Signed Distance", "distance"),
             ("Signed Distances", "distances")))
 
     def getExecutionFunctionName(self):
-        if any((self.usePlanePointList, self.usePlaneNormalList,
-        self.usePointList)):
+        useList = any((self.usePlanePointList, self.usePlaneNormalList,
+        self.usePointList))
+        if useList:
             return "execute_List"
         else:
             return "execute_Single"
@@ -47,7 +50,8 @@ class ProjectPointOnPlaneNode(bpy.types.Node, AnimationNode):
         return self.getPoints(planesPoints, planesNormals, points, False)
 
     def execute_Single(self, planePoint, planeNormal, point):
-        return self.getPoints(planePoint, planeNormal, point, True)
+        result = self.getPoints(planePoint, planeNormal, point, True)
+        return [x[0] for x in result]
 
     def getPoints(self, planePoint, planeNormal, point, singleElement):
         _planePoint = VirtualVector3DList.fromListOrElement(planePoint, Vector((0, 0, 0)))
