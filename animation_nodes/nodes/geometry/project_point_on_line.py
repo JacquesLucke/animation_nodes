@@ -29,19 +29,22 @@ class ProjectPointOnLineNode(bpy.types.Node, AnimationNode):
             ("Points", "points"),
             codeProperties = dict(default = (1, 1, 0))))
 
-        self.newOutput(VectorizedSocket("Vector", ["useLineStartList", "useLineEndList", "usePointList"],
+        props = ["useLineStartList", "useLineEndList", "usePointList"]
+
+        self.newOutput(VectorizedSocket("Vector", props,
             ("Projection", "projection"),
             ("Projections", "projections")))
-        self.newOutput(VectorizedSocket("Float", ["useLineStartList", "useLineEndList", "usePointList"],
+        self.newOutput(VectorizedSocket("Float", props,
             ("Parameter", "parameter"),
             ("Parameters", "parameters")))
-        self.newOutput(VectorizedSocket("Float", ["useLineStartList", "useLineEndList", "usePointList"],
+        self.newOutput(VectorizedSocket("Float", props,
             ("Distance", "distance"),
             ("Distances", "distances")))
 
     def getExecutionFunctionName(self):
-        if any((self.useLineStartList, self.useLineEndList,
-        self.usePointList)):
+        useList = any((self.useLineStartList, self.useLineEndList,
+        self.usePointList))
+        if useList:
             return "execute_List"
         else:
             return "execute_Single"
@@ -50,7 +53,8 @@ class ProjectPointOnLineNode(bpy.types.Node, AnimationNode):
         return self.getPoints(linesStart, linesEnd, points, False)
 
     def execute_Single(self, lineStart, lineEnd, point):
-        return self.getPoints(lineStart, lineEnd, point, True)
+        result = self.getPoints(lineStart, lineEnd, point, True)
+        return [x[0] for x in result]
 
     def getPoints(self, lineStart, lineEnd, point, singleElement):
         _lineStart = VirtualVector3DList.fromListOrElement(lineStart, Vector((0, 0, 0)))
