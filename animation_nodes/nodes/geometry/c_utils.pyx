@@ -36,10 +36,10 @@ def IntersectLinePlane(Py_ssize_t amount,
     return intersection, parameter, valid
 
 def IntersectLineLine(Py_ssize_t amount,
-                    VirtualVector3DList firstLineStart,
-                    VirtualVector3DList firstLineEnd,
-                    VirtualVector3DList secondLineStart,
-                    VirtualVector3DList secondLineEnd):
+                    VirtualVector3DList firstlineStart,
+                    VirtualVector3DList firstlineEnd,
+                    VirtualVector3DList secondlineStart,
+                    VirtualVector3DList secondlineEnd):
     cdef Vector3DList nearestPoint1 = Vector3DList(length = amount)
     cdef Vector3DList nearestPoint2 = Vector3DList(length = amount)
     cdef DoubleList firstParameter = DoubleList(length = amount)
@@ -50,23 +50,23 @@ def IntersectLineLine(Py_ssize_t amount,
     cdef double factor1, factor2
     cdef Py_ssize_t i
     for i in range(amount):
-        subVec3(&direction1, firstLineEnd.get(i), firstLineStart.get(i))
-        subVec3(&direction2, secondLineEnd.get(i), secondLineStart.get(i))
+        subVec3(&direction1, firstlineEnd.get(i), firstlineStart.get(i))
+        subVec3(&direction2, secondlineEnd.get(i), secondlineStart.get(i))
         crossVec3(&normal, &direction1, &direction2)
         if lengthVec3(&normal) > 1e-6:
             valid.data[i] = True
             crossVec3(&normal1, &direction1, &normal)
             crossVec3(&normal2, &direction2, &normal)
-            subVec3(&direction12, firstLineStart.get(i), secondLineStart.get(i))
-            subVec3(&direction21, secondLineStart.get(i), firstLineStart.get(i))
+            subVec3(&direction12, firstlineStart.get(i), secondlineStart.get(i))
+            subVec3(&direction21, secondlineStart.get(i), firstlineStart.get(i))
             factor1 = dotVec3(&direction21, &normal2)/ dotVec3(&direction1, &normal2)
             factor2 = dotVec3(&direction12, &normal1)/ dotVec3(&direction2, &normal1)
             firstParameter.data[i] = factor1
             secondParameter.data[i] = factor2
             scaleVec3(&scaledDirection1, &direction1, factor1)
             scaleVec3(&scaledDirection2, &direction2, factor2)
-            addVec3(&nearestPointA, firstLineStart.get(i), &scaledDirection1)
-            addVec3(&nearestPointB, secondLineStart.get(i), &scaledDirection2)
+            addVec3(&nearestPointA, firstlineStart.get(i), &scaledDirection1)
+            addVec3(&nearestPointB, secondlineStart.get(i), &scaledDirection2)
             nearestPoint1.data[i] = nearestPointA
             nearestPoint2.data[i] = nearestPointB
         else:
@@ -78,8 +78,8 @@ def IntersectLineLine(Py_ssize_t amount,
     return nearestPoint1, nearestPoint2, firstParameter, secondParameter, valid
 
 def IntersectLineSphere(Py_ssize_t amount,
-                        VirtualVector3DList LineStart,
-                        VirtualVector3DList LineEnd,
+                        VirtualVector3DList lineStart,
+                        VirtualVector3DList lineEnd,
                         VirtualVector3DList sphereCenter,
                         VirtualDoubleList sphereRadius):
     cdef Vector3DList intersection1 = Vector3DList(length = amount)
@@ -91,8 +91,8 @@ def IntersectLineSphere(Py_ssize_t amount,
     cdef double factor1, factor2, a, b, c
     cdef Py_ssize_t i
     for i in range(amount):
-        subVec3(&direction, LineEnd.get(i), LineStart.get(i))
-        subVec3(&startingPoint, LineStart.get(i), sphereCenter.get(i))
+        subVec3(&direction, lineEnd.get(i), lineStart.get(i))
+        subVec3(&startingPoint, lineStart.get(i), sphereCenter.get(i))
         a = lengthSquaredVec3(&direction)
         b = dotVec3(&direction, &startingPoint) * 2
         c = lengthSquaredVec3(&startingPoint) - sphereRadius.get(i) ** 2
@@ -104,8 +104,8 @@ def IntersectLineSphere(Py_ssize_t amount,
                 factor2 = (-b - sqrtDiscriminant)/(2 * a)
                 scaleVec3(&_intersection1, &direction, factor1)
                 scaleVec3(&_intersection2, &direction, factor2)
-                addVec3(&_intersection1, LineStart.get(i), &_intersection1)
-                addVec3(&_intersection2, LineStart.get(i), &_intersection2)
+                addVec3(&_intersection1, lineStart.get(i), &_intersection1)
+                addVec3(&_intersection2, lineStart.get(i), &_intersection2)
                 intersection1.data[i] = _intersection1
                 intersection2.data[i] = _intersection2
                 intersection1Parameter.data[i] = factor1
@@ -114,7 +114,7 @@ def IntersectLineSphere(Py_ssize_t amount,
             else:
                 factor = (-b + sqrt(discriminant))/(2 * a)
                 scaleVec3(&_intersection1, &direction, factor)
-                addVec3(&_intersection1, LineStart.get(i), &_intersection1)
+                addVec3(&_intersection1, lineStart.get(i), &_intersection1)
                 intersection1.data[i] = _intersection1
                 intersection2.data[i] = _intersection1
                 intersection1Parameter.data[i] = factor
@@ -130,28 +130,28 @@ def IntersectLineSphere(Py_ssize_t amount,
     return intersection1, intersection2, intersection1Parameter, intersection2Parameter, numberOfIntersections
 
 def IntersectPlanePlane(Py_ssize_t amount,
-                        VirtualVector3DList Plane1Point,
-                        VirtualVector3DList Plane1Normal,
-                        VirtualVector3DList Plane2Point,
-                        VirtualVector3DList Plane2Normal):
+                        VirtualVector3DList plane1Point,
+                        VirtualVector3DList plane1Normal,
+                        VirtualVector3DList plane2Point,
+                        VirtualVector3DList plane2Normal):
     cdef Vector3DList lineDirection = Vector3DList(length = amount)
     cdef Vector3DList linePoint = Vector3DList(length = amount)
     cdef BooleanList valid = BooleanList(length = amount)
     cdef Vector3 direction, unitNormal1, unitNormal2, factor1, factor2, point
     cdef Py_ssize_t i
     for i in range(amount):
-        normalizeVec3(&unitNormal1, Plane1Normal.get(i))
-        normalizeVec3(&unitNormal2, Plane2Normal.get(i))
-        crossVec3(&direction, Plane1Normal.get(i), Plane2Normal.get(i))
+        normalizeVec3(&unitNormal1, plane1Normal.get(i))
+        normalizeVec3(&unitNormal2, plane2Normal.get(i))
+        crossVec3(&direction, plane1Normal.get(i), plane2Normal.get(i))
         if lengthVec3(&direction) > 1e-6:
-            h1 = dotVec3(Plane1Normal.get(i), Plane1Point.get(i))
-            h2 = dotVec3(Plane2Normal.get(i), Plane2Point.get(i))
-            dot = dotVec3(Plane1Normal.get(i), Plane2Normal.get(i))
+            h1 = dotVec3(plane1Normal.get(i), plane1Point.get(i))
+            h2 = dotVec3(plane2Normal.get(i), plane2Point.get(i))
+            dot = dotVec3(plane1Normal.get(i), plane2Normal.get(i))
             invDotSquared = (1 - dot ** 2)
             c1 = (h1 - h2 * dot)/invDotSquared
             c2 = (h2 - h1 * dot)/invDotSquared
-            scaleVec3(&factor1, Plane1Normal.get(i), c1)
-            scaleVec3(&factor2, Plane2Normal.get(i), c2)
+            scaleVec3(&factor1, plane1Normal.get(i), c1)
+            scaleVec3(&factor2, plane2Normal.get(i), c2)
             addVec3(&point, &factor1, &factor2)
             lineDirection.data[i] = direction
             linePoint.data[i] = point
@@ -163,10 +163,10 @@ def IntersectPlanePlane(Py_ssize_t amount,
     return lineDirection, linePoint, valid
 
 def IntersectSpherePlane(Py_ssize_t amount,
-                        VirtualVector3DList SphereCenter,
-                        VirtualDoubleList SphereRadius,
-                        VirtualVector3DList PlanePoint,
-                        VirtualVector3DList PlaneNormal):
+                        VirtualVector3DList sphereCenter,
+                        VirtualDoubleList sphereRadius,
+                        VirtualVector3DList planePoint,
+                        VirtualVector3DList planeNormal):
     cdef Vector3DList circleCenter = Vector3DList(length = amount)
     cdef DoubleList circleRadius = DoubleList(length = amount)
     cdef BooleanList valid = BooleanList(length = amount)
@@ -174,13 +174,13 @@ def IntersectSpherePlane(Py_ssize_t amount,
     cdef double radius, distance
     cdef Py_ssize_t i
     for i in range(amount):
-        normalizeVec3(&unitNormal, PlaneNormal.get(i))
-        subVec3(&direction, SphereCenter.get(i), PlanePoint.get(i))
+        normalizeVec3(&unitNormal, planeNormal.get(i))
+        subVec3(&direction, sphereCenter.get(i), planePoint.get(i))
         distance = dotVec3(&direction, &unitNormal)
-        if abs(distance) < SphereRadius.get(i):
-            radius = sqrt(SphereRadius.get(i) ** 2 - distance ** 2)
+        if abs(distance) < sphereRadius.get(i):
+            radius = sqrt(sphereRadius.get(i) ** 2 - distance ** 2)
             scaleVec3(&scaledNormal, &unitNormal, -distance)
-            addVec3(&center, SphereCenter.get(i), &scaledNormal)
+            addVec3(&center, sphereCenter.get(i), &scaledNormal)
             circleCenter.data[i] = center
             circleRadius.data[i] = radius
             valid.data[i] = True
@@ -191,10 +191,10 @@ def IntersectSpherePlane(Py_ssize_t amount,
     return circleCenter, circleRadius, valid
 
 def IntersectSphereSphere(Py_ssize_t amount,
-                        VirtualVector3DList Sphere1Center,
-                        VirtualDoubleList Sphere1Radius,
-                        VirtualVector3DList Sphere2Center,
-                        VirtualDoubleList Sphere2Radius):
+                        VirtualVector3DList sphere1Center,
+                        VirtualDoubleList sphere1Radius,
+                        VirtualVector3DList sphere2Center,
+                        VirtualDoubleList sphere2Radius):
     cdef Vector3DList circleCenter = Vector3DList(length = amount)
     cdef Vector3DList circleNormal = Vector3DList(length = amount)
     cdef DoubleList circleRadius = DoubleList(length = amount)
@@ -203,14 +203,14 @@ def IntersectSphereSphere(Py_ssize_t amount,
     cdef double distance, r1, r2, h, r
     cdef Py_ssize_t i
     for i in range(amount):
-        subVec3(&direction, Sphere2Center.get(i), Sphere1Center.get(i))
+        subVec3(&direction, sphere2Center.get(i), sphere1Center.get(i))
         distance = lengthVec3(&direction)
-        r1 = Sphere1Radius.get(i)
-        r2 = Sphere2Radius.get(i)
+        r1 = sphere1Radius.get(i)
+        r2 = sphere2Radius.get(i)
         if (distance <= (r1 + r2)) and ((distance + min(r1, r2)) >= max(r1, r2)) and (distance != 0):
             h = 0.5 + (r1 * r1 - r2 * r2)/(2 * distance * distance)
             scaleVec3(&scaledDirection, &direction, h)
-            addVec3(&center, Sphere1Center.get(i), &scaledDirection)
+            addVec3(&center, sphere1Center.get(i), &scaledDirection)
             r = sqrt(r1 * r1 - h * h * distance * distance)
             circleCenter.data[i] = center
             circleNormal.data[i] = direction
@@ -225,9 +225,9 @@ def IntersectSphereSphere(Py_ssize_t amount,
 
 @cython.cdivision(True)
 def ProjectPointOnLine(Py_ssize_t amount,
-                    VirtualVector3DList LineStart,
-                    VirtualVector3DList LineEnd,
-                    VirtualVector3DList Point):
+                    VirtualVector3DList lineStart,
+                    VirtualVector3DList lineEnd,
+                    VirtualVector3DList point):
     cdef Vector3DList Projection = Vector3DList(length = amount)
     cdef DoubleList Parameter = DoubleList(length = amount)
     cdef DoubleList Distance = DoubleList(length = amount)
@@ -235,35 +235,35 @@ def ProjectPointOnLine(Py_ssize_t amount,
     cdef double factor, length, param, distance
     cdef Py_ssize_t i
     for i in range(amount):
-        subVec3(&direction1, LineEnd.get(i), LineStart.get(i))
-        subVec3(&direction2, Point.get(i), LineStart.get(i))
+        subVec3(&direction1, lineEnd.get(i), lineStart.get(i))
+        subVec3(&direction2, point.get(i), lineStart.get(i))
         normalizeVec3(&unitDirection, &direction1)
         factor = dotVec3(&direction2, &unitDirection)
         scaleVec3(&projVector, &unitDirection, factor)
-        addVec3(&proj, LineStart.get(i), &projVector)
+        addVec3(&proj, lineStart.get(i), &projVector)
         length = lengthVec3(&direction1)
-        param = factor / length
-        distance = distanceVec3(&projVector, Point.get(i))
+        param = factor / length if length != 0 else 0
+        distance = distanceVec3(&projVector, point.get(i))
         Projection.data[i] = proj
         Parameter.data[i] = param
         Distance.data[i] = distance
     return Projection, Parameter, Distance
 
 def ProjectPointOnPlane(Py_ssize_t amount,
-                        VirtualVector3DList PlanePoint,
-                        VirtualVector3DList PlaneNormal,
-                        VirtualVector3DList Point):
+                        VirtualVector3DList planePoint,
+                        VirtualVector3DList planeNormal,
+                        VirtualVector3DList point):
     cdef Vector3DList Projection = Vector3DList(length = amount)
     cdef DoubleList Distance = DoubleList(length = amount)
     cdef Vector3 direction, unitNormal, projVector, proj
     cdef double distance
     cdef Py_ssize_t i
     for i in range(amount):
-        subVec3(&direction, Point.get(i), PlanePoint.get(i))
-        normalizeVec3(&unitNormal, PlaneNormal.get(i))
+        subVec3(&direction, point.get(i), planePoint.get(i))
+        normalizeVec3(&unitNormal, planeNormal.get(i))
         distance = dotVec3(&direction, &unitNormal)
         scaleVec3(&projVector, &unitNormal, -distance)
-        addVec3(&proj, Point.get(i), &projVector)
+        addVec3(&proj, point.get(i), &projVector)
         Projection.data[i] = proj
         Distance.data[i] = distance
     return Projection, Distance
