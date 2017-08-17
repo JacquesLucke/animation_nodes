@@ -33,23 +33,27 @@ class IntersectSphereSphereNode(bpy.types.Node, AnimationNode):
             ("Second Spheres Radii", "secondSpheresRadii"),
             codeProperties = dict(default = 1)))
 
-        self.newOutput(VectorizedSocket("Vector", ["useSphere2CenterList", "useSphere2RadiusList", "useSphere1CenterList", "useSphere1RadiusList"],
+        props = ["useSphere2CenterList", "useSphere2RadiusList",
+        "useSphere1CenterList", "useSphere1RadiusList"]
+
+        self.newOutput(VectorizedSocket("Vector", props,
             ("Circle Center", "circleCenter"),
             ("Circles Centers", "circlesCenters")))
-        self.newOutput(VectorizedSocket("Vector", ["useSphere2CenterList", "useSphere2RadiusList", "useSphere1CenterList", "useSphere1RadiusList"],
+        self.newOutput(VectorizedSocket("Vector", props,
             ("Circle Normal", "circleNormal"),
             ("Circles Normals", "circlesNormals")))
-        self.newOutput(VectorizedSocket("Float", ["useSphere2CenterList", "useSphere2RadiusList", "useSphere1CenterList", "useSphere1RadiusList"],
+        self.newOutput(VectorizedSocket("Float", props,
             ("Circle Radius", "circleRadius"),
             ("Circles Radii", "circlesRadii")))
 
-        self.newOutput(VectorizedSocket("Boolean", ["useSphere2CenterList", "useSphere2RadiusList", "useSphere1CenterList", "useSphere1RadiusList"],
+        self.newOutput(VectorizedSocket("Boolean", props,
             ("Valid", "valid"),
             ("Valids", "valids")))
 
     def getExecutionFunctionName(self):
-        if any((self.useSphere2CenterList, self.useSphere2RadiusList,
-        self.useSphere1CenterList, self.useSphere1RadiusList)):
+        useList = any((self.useSphere2CenterList, self.useSphere2RadiusList,
+        self.useSphere1CenterList, self.useSphere1RadiusList))
+        if useList:
             return "execute_List"
         else:
             return "execute_Single"
@@ -58,7 +62,8 @@ class IntersectSphereSphereNode(bpy.types.Node, AnimationNode):
         return self.getIntersections(firstSpheresCenters, firstSpheresRadii, secondSpheresCenters, secondSpheresRadii, False)
 
     def execute_Single(self, firstSphereCenter, firstSphereRadius, secondSphereCenter, secondSphereRadius):
-        return self.getIntersections(firstSphereCenter, firstSphereRadius, secondSphereCenter, secondSphereRadius, True)
+        result = self.getIntersections(firstSphereCenter, firstSphereRadius, secondSphereCenter, secondSphereRadius, True)
+        return [x[0] for x in result]
 
     def getIntersections(self, firstSphereCenter, firstSphereRadius, secondSphereCenter, secondSphereRadius, singleElement):
         _firstSphereCenter = VirtualVector3DList.fromListOrElement(firstSphereCenter, Vector((0, 0, -0.5)))
