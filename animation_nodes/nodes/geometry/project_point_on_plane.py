@@ -1,8 +1,8 @@
 import bpy
 from mathutils import Vector
-from . c_utils import ProjectPointOnPlane
 from ... data_structures import VirtualVector3DList
 from ... base_types import AnimationNode, VectorizedSocket
+from . c_utils import projectPointOnPlaneList, projectPointOnPlaneSingle
 
 class ProjectPointOnPlaneNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ProjectPointOnPlaneNode"
@@ -17,11 +17,11 @@ class ProjectPointOnPlaneNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.newInput(VectorizedSocket("Vector", "usePlanePointList",
             ("Plane Point", "planePoint", dict(value = (0, 0, 0))),
-            ("Planes Points", "planesPoints"),
+            ("Plane Points", "planePoints"),
             codeProperties = dict(default = (0, 0, 0))))
         self.newInput(VectorizedSocket("Vector", "usePlaneNormalList",
             ("Plane Point", "planeNormal", dict(value = (0, 0, 1))),
-            ("Planes Points", "planesNormals"),
+            ("Plane Points", "planeNormals"),
             codeProperties = dict(default = (0, 0, 1))))
 
         self.newInput(VectorizedSocket("Vector", "usePointList",
@@ -46,17 +46,12 @@ class ProjectPointOnPlaneNode(bpy.types.Node, AnimationNode):
         else:
             return "execute_Single"
 
-    def execute_List(self, planesPoints, planesNormals, points):
-        return self.getPoints(planesPoints, planesNormals, points, False)
+    def execute_List(self, planePoints, planeNormals, points):
+        planePoints = VirtualVector3DList.fromListOrElement(planePoints, Vector((0, 0, 0)))
+        planeNormals = VirtualVector3DList.fromListOrElement(planeNormals, Vector((0, 0, 1)))
+        points = VirtualVector3DList.fromListOrElement(points, Vector((0, 0, 1)))
+        amount = VirtualVector3DList.getMaxRealLength(planePoints, planeNormals, points)
+        return projectPointOnPlaneList(amount, planePoints, planeNormals, points)
 
     def execute_Single(self, planePoint, planeNormal, point):
-        result = self.getPoints(planePoint, planeNormal, point, True)
-        return [x[0] for x in result]
-
-    def getPoints(self, planePoint, planeNormal, point, singleElement):
-        _planePoint = VirtualVector3DList.fromListOrElement(planePoint, Vector((0, 0, 0)))
-        _planeNormal = VirtualVector3DList.fromListOrElement(planeNormal, Vector((0, 0, 1)))
-        _point = VirtualVector3DList.fromListOrElement(point, Vector((0, 0, 1)))
-        amount = VirtualVector3DList.getMaxRealLength(_planePoint, _planeNormal, _point)
-        amount = 1 if singleElement else amount
-        return ProjectPointOnPlane(amount, _planePoint, _planeNormal, _point)
+        return projectPointOnPlaneSingle(planePoint, planeNormal, point)

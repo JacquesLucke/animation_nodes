@@ -220,7 +220,8 @@ def intersectLineSphereSingle(lineStart,
     cdef double firstParameter, secondParameter
     cdef char numberOfIntersections
     intersectLineSphere(&_lineStart, &_lineEnd, &_sphereCenter, sphereRadius,
-    &firstIntersection, &secondIntersection, &firstParameter, &secondParameter, &numberOfIntersections)
+    &firstIntersection, &secondIntersection,
+    &firstParameter,&secondParameter, &numberOfIntersections)
     return (toPyVector3(&firstIntersection), toPyVector3(&secondIntersection),
             firstParameter, secondParameter,
             numberOfIntersections)
@@ -452,21 +453,42 @@ def projectPointOnLineSingle(lineStart,
     projectPointOnLine(&_lineStart, &_lineEnd, &_point, &projection, &parameter, &distance)
     return toPyVector3(&projection), parameter, distance
 
-def ProjectPointOnPlane(Py_ssize_t amount,
-                        VirtualVector3DList planePoint,
-                        VirtualVector3DList planeNormal,
-                        VirtualVector3DList point):
-    cdef Vector3DList Projection = Vector3DList(length = amount)
-    cdef DoubleList Distance = DoubleList(length = amount)
-    cdef Vector3 direction, unitNormal, projVector, proj
+cdef projectPointOnPlane(Vector3 *planePoint, Vector3 *planeNormal, Vector3 *point,
+                        Vector3 *outProjection, double *outDistance):
+    cdef Vector3 direction, unitNormal, projVector, projection
+    cdef double distance
+    subVec3(&direction, point, planePoint)
+    normalizeVec3(&unitNormal, planeNormal)
+    distance = dotVec3(&direction, &unitNormal)
+    scaleVec3(&projVector, &unitNormal, -distance)
+    addVec3(&projection, point, &projVector)
+    outProjection[0] = projection
+    outDistance[0] = distance
+
+def projectPointOnPlaneList(Py_ssize_t amount,
+                            VirtualVector3DList planePointList,
+                            VirtualVector3DList planeNormalList,
+                            VirtualVector3DList pointList):
+    cdef Vector3DList projectionList = Vector3DList(length = amount)
+    cdef DoubleList distanceList = DoubleList(length = amount)
+    cdef Vector3 projection
     cdef double distance
     cdef Py_ssize_t i
     for i in range(amount):
-        subVec3(&direction, point.get(i), planePoint.get(i))
-        normalizeVec3(&unitNormal, planeNormal.get(i))
-        distance = dotVec3(&direction, &unitNormal)
-        scaleVec3(&projVector, &unitNormal, -distance)
-        addVec3(&proj, point.get(i), &projVector)
-        Projection.data[i] = proj
-        Distance.data[i] = distance
-    return Projection, Distance
+        projectPointOnPlane(planePointList.get(i), planeNormalList.get(i), pointList.get(i),
+        &projection, &distance)
+        projectionList.data[i] = projection
+        distanceList.data[i] = distance
+    return projectionList, distanceList
+
+def projectPointOnPlaneSingle(planePoint,
+                            planeNormal,
+                            point):
+    cdef Vector3 _planePoint = toVector3(planePoint)
+    cdef Vector3 _planeNormal = toVector3(planeNormal)
+    cdef Vector3 _point = toVector3(point)
+    cdef Vector3 projection
+    cdef double distance
+    projectPointOnPlane(&_planePoint, &_planeNormal, &_point,
+    &projection, &distance)
+    return toPyVector3(&projection), distance
