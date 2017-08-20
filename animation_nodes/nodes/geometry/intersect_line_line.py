@@ -1,8 +1,8 @@
 import bpy
 from mathutils import Vector
-from . c_utils import IntersectLineLine
 from ... data_structures import VirtualVector3DList
 from ... base_types import AnimationNode, VectorizedSocket
+from . c_utils import intersectLineLineList, intersectLineLineSingle
 
 class IntersectLineLineNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_IntersectLineLineNode"
@@ -64,17 +64,14 @@ class IntersectLineLineNode(bpy.types.Node, AnimationNode):
             return "execute_Single"
 
     def execute_List(self, firstLinesStart, firstLinesEnd, secondLinesStart, secondLinesEnd):
-        return self.getPoints(firstLinesStart, firstLinesEnd, secondLinesStart, secondLinesEnd, False)
+        firstLinesStart = VirtualVector3DList.fromListOrElement(firstLinesStart, Vector((1, 1, 0)))
+        firstLinesEnd = VirtualVector3DList.fromListOrElement(firstLinesEnd, Vector((-1, -1, 0)))
+        secondLinesStart = VirtualVector3DList.fromListOrElement(secondLinesStart, Vector((1, -1, 0)))
+        secondLinesEnd = VirtualVector3DList.fromListOrElement(secondLinesEnd, Vector((-1, 1, 0)))
+        amount = VirtualVector3DList.getMaxRealLength(firstLinesStart, firstLinesEnd,
+        secondLinesStart, secondLinesEnd)
+        return intersectLineLineList(amount, firstLinesStart, firstLinesEnd,
+        secondLinesStart, secondLinesEnd)
 
     def execute_Single(self, firstLineStart, firstLineEnd, secondLineStart, secondLineEnd):
-        result = self.getPoints(firstLineStart, firstLineEnd, secondLineStart, secondLineEnd, True)
-        return [x[0] for x in result]
-
-    def getPoints(self, firstLineStart, firstLineEnd, secondLineStart, secondLineEnd, singleElement):
-        _firstLineStart = VirtualVector3DList.fromListOrElement(firstLineStart, Vector((1, 1, 0)))
-        _firstLineEnd = VirtualVector3DList.fromListOrElement(firstLineEnd, Vector((-1, -1, 0)))
-        _secondLineStart = VirtualVector3DList.fromListOrElement(secondLineStart, Vector((1, -1, 0)))
-        _secondLineEnd = VirtualVector3DList.fromListOrElement(secondLineEnd, Vector((-1, 1, 0)))
-        amount = VirtualVector3DList.getMaxRealLength(_firstLineStart, _firstLineEnd, _secondLineStart, _secondLineEnd)
-        amount = 1 if singleElement else amount
-        return IntersectLineLine(amount, _firstLineStart, _firstLineEnd, _secondLineStart, _secondLineEnd)
+        return intersectLineLineSingle(firstLineStart, firstLineEnd, secondLineStart, secondLineEnd)

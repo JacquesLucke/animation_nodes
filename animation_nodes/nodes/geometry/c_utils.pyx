@@ -28,10 +28,10 @@ cdef intersectLinePlane(Vector3 *lineStart, Vector3 *lineEnd,
         outValid[0] = False
 
 def intersectLinePlaneList(Py_ssize_t amount,
-                        VirtualVector3DList lineStart,
-                        VirtualVector3DList lineEnd,
-                        VirtualVector3DList planePoint,
-                        VirtualVector3DList planeNormal):
+                        VirtualVector3DList lineStartList,
+                        VirtualVector3DList lineEndList,
+                        VirtualVector3DList planePointList,
+                        VirtualVector3DList planeNormalList):
     cdef Vector3DList intersectionList = Vector3DList(length = amount)
     cdef DoubleList parameterList = DoubleList(length = amount)
     cdef BooleanList validList = BooleanList(length = amount)
@@ -40,8 +40,8 @@ def intersectLinePlaneList(Py_ssize_t amount,
     cdef bint valid
     cdef Py_ssize_t i
     for i in range(amount):
-        intersectLinePlane(lineStart.get(i), lineEnd.get(i),
-        planePoint.get(i), planeNormal.get(i), &intersection, &parameter, &valid)
+        intersectLinePlane(lineStartList.get(i), lineEndList.get(i),
+        planePointList.get(i), planeNormalList.get(i), &intersection, &parameter, &valid)
         intersectionList.data[i] = intersection
         parameterList.data[i] = parameter
         validList.data[i] = valid
@@ -62,47 +62,79 @@ def intersectLinePlaneSingle(lineStart,
     &intersection, &parameter, &valid)
     return toPyVector3(&intersection), parameter, valid
 
-def IntersectLineLine(Py_ssize_t amount,
-                    VirtualVector3DList firstlineStart,
-                    VirtualVector3DList firstlineEnd,
-                    VirtualVector3DList secondlineStart,
-                    VirtualVector3DList secondlineEnd):
-    cdef Vector3DList nearestPoint1 = Vector3DList(length = amount)
-    cdef Vector3DList nearestPoint2 = Vector3DList(length = amount)
-    cdef DoubleList firstParameter = DoubleList(length = amount)
-    cdef DoubleList secondParameter = DoubleList(length = amount)
-    cdef BooleanList valid = BooleanList(length = amount)
+cdef intersectLineLine(Vector3 *firstLineStart, Vector3 *firstLineEnd,
+                        Vector3 *secondLineStart, Vector3 *secondLineEnd,
+                        Vector3 *outFirstNearestPoint, Vector3 *outSecondNearestPoint,
+                        double *outFirstParameter, double *outSecondParameter, bint *outValid):
     cdef Vector3 direction1, direction2, normal, normal1, normal2, direction12, direction21
     cdef Vector3 scaledDirection1, scaledDirection2, nearestPointA, nearestPointB
     cdef double factor1, factor2
+    subVec3(&direction1, firstLineEnd, firstLineStart)
+    subVec3(&direction2, secondLineEnd, secondLineStart)
+    crossVec3(&normal, &direction1, &direction2)
+    if lengthVec3(&normal) > 1e-6:
+        crossVec3(&normal1, &direction1, &normal)
+        crossVec3(&normal2, &direction2, &normal)
+        subVec3(&direction12, firstLineStart, secondLineStart)
+        subVec3(&direction21, secondLineStart, firstLineStart)
+        factor1 = dotVec3(&direction21, &normal2)/ dotVec3(&direction1, &normal2)
+        factor2 = dotVec3(&direction12, &normal1)/ dotVec3(&direction2, &normal1)
+        scaleVec3(&scaledDirection1, &direction1, factor1)
+        scaleVec3(&scaledDirection2, &direction2, factor2)
+        addVec3(&nearestPointA, firstLineStart, &scaledDirection1)
+        addVec3(&nearestPointB, secondLineStart, &scaledDirection2)
+        outFirstNearestPoint[0] = nearestPointA
+        outSecondNearestPoint[0] = nearestPointB
+        outFirstParameter[0] = factor1
+        outSecondParameter[0] = factor2
+        outValid[0] = True
+    else:
+        outFirstNearestPoint[0] = Vector3(0,0,0)
+        outSecondNearestPoint[0] = Vector3(0,0,0)
+        outFirstParameter[0] = 0
+        outSecondParameter[0] = 0
+        outValid[0] = False
+
+def intersectLineLineList(Py_ssize_t amount,
+                        VirtualVector3DList firstLineStartList,
+                        VirtualVector3DList firstLineEndList,
+                        VirtualVector3DList secondLineStartList,
+                        VirtualVector3DList secondLineEndList):
+    cdef Vector3DList firstNearestPointList = Vector3DList(length = amount)
+    cdef Vector3DList secondNearestPointList = Vector3DList(length = amount)
+    cdef DoubleList firstParameterList = DoubleList(length = amount)
+    cdef DoubleList secondParameterList = DoubleList(length = amount)
+    cdef BooleanList validList = BooleanList(length = amount)
+    cdef Vector3 firstNearestPoint, secondNearestPoint
+    cdef double firstParameter, secondParameter
+    cdef bint valid
     cdef Py_ssize_t i
     for i in range(amount):
-        subVec3(&direction1, firstlineEnd.get(i), firstlineStart.get(i))
-        subVec3(&direction2, secondlineEnd.get(i), secondlineStart.get(i))
-        crossVec3(&normal, &direction1, &direction2)
-        if lengthVec3(&normal) > 1e-6:
-            valid.data[i] = True
-            crossVec3(&normal1, &direction1, &normal)
-            crossVec3(&normal2, &direction2, &normal)
-            subVec3(&direction12, firstlineStart.get(i), secondlineStart.get(i))
-            subVec3(&direction21, secondlineStart.get(i), firstlineStart.get(i))
-            factor1 = dotVec3(&direction21, &normal2)/ dotVec3(&direction1, &normal2)
-            factor2 = dotVec3(&direction12, &normal1)/ dotVec3(&direction2, &normal1)
-            firstParameter.data[i] = factor1
-            secondParameter.data[i] = factor2
-            scaleVec3(&scaledDirection1, &direction1, factor1)
-            scaleVec3(&scaledDirection2, &direction2, factor2)
-            addVec3(&nearestPointA, firstlineStart.get(i), &scaledDirection1)
-            addVec3(&nearestPointB, secondlineStart.get(i), &scaledDirection2)
-            nearestPoint1.data[i] = nearestPointA
-            nearestPoint2.data[i] = nearestPointB
-        else:
-            valid.data[i] = False
-            firstParameter.data[i] = 0
-            secondParameter.data[i] = 0
-            nearestPoint1.data[i] = Vector3(0,0,0)
-            nearestPoint2.data[i] = Vector3(0,0,0)
-    return nearestPoint1, nearestPoint2, firstParameter, secondParameter, valid
+        intersectLineLine(firstLineStartList.get(i), firstLineEndList.get(i),
+                        secondLineStartList.get(i), secondLineEndList.get(i),
+                        &firstNearestPoint, &secondNearestPoint,
+                        &firstParameter, &secondParameter, &valid)
+        firstNearestPointList.data[i] = firstNearestPoint
+        secondNearestPointList.data[i] = secondNearestPoint
+        firstParameterList.data[i] = firstParameter
+        secondParameterList.data[i] = secondParameter
+        validList.data[i] = valid
+    return firstNearestPointList, secondNearestPointList, firstParameterList, secondParameterList, validList
+
+def intersectLineLineSingle(firstLineStart,
+                            firstLineEnd,
+                            secondLineStart,
+                            secondLineEnd):
+    cdef Vector3 _firstLineStart = toVector3(firstLineStart)
+    cdef Vector3 _firstLineEnd = toVector3(firstLineEnd)
+    cdef Vector3 _secondLineStart = toVector3(secondLineStart)
+    cdef Vector3 _secondLineEnd = toVector3(secondLineEnd)
+    cdef Vector3 firstNearestPoint, secondNearestPoint
+    cdef double firstParameter, secondParameter
+    cdef bint valid
+    intersectLineLine(&_firstLineStart, &_firstLineEnd, &_secondLineStart, &_secondLineEnd,
+    &firstNearestPoint, &secondNearestPoint, &firstParameter, &secondParameter, &valid)
+    return toPyVector3(&firstNearestPoint), toPyVector3(&secondNearestPoint), firstParameter, secondParameter, valid
 
 def IntersectLineSphere(Py_ssize_t amount,
                         VirtualVector3DList lineStart,
