@@ -1,8 +1,8 @@
 import bpy
 from mathutils import Vector
-from . c_utils import IntersectLinePlane
 from ... data_structures import VirtualVector3DList
 from ... base_types import AnimationNode, VectorizedSocket
+from . c_utils import intersectLinePlaneList, intersectLinePlaneSingle
 
 class IntersectLinePlaneNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_IntersectLinePlaneNode"
@@ -55,17 +55,12 @@ class IntersectLinePlaneNode(bpy.types.Node, AnimationNode):
             return "execute_Single"
 
     def execute_List(self, linesStart, linesEnd, planesPoint, planesNormal):
-        return self.getIntersection(linesStart, linesEnd, planesPoint, planesNormal, False)
+        linesStart = VirtualVector3DList.fromListOrElement(linesStart, Vector((0, 0, 1)))
+        linesEnd = VirtualVector3DList.fromListOrElement(linesEnd, Vector((0, 0, -1)))
+        planesPoint = VirtualVector3DList.fromListOrElement(planesPoint, Vector((0, 0, 0)))
+        planesNormal = VirtualVector3DList.fromListOrElement(planesNormal, Vector((0, 0, 1)))
+        amount = VirtualVector3DList.getMaxRealLength(linesStart, linesEnd, planesPoint, planesNormal)
+        return intersectLinePlaneList(amount, linesStart, linesEnd, planesPoint, planesNormal)
 
     def execute_Single(self, lineStart, lineEnd, planePoint, planeNormal):
-        result = self.getIntersection(lineStart, lineEnd, planePoint, planeNormal, True)
-        return [x[0] for x in result]
-
-    def getIntersection(self, lineStart, lineEnd, planePoint, planeNormal, singleElement):
-        _lineStart = VirtualVector3DList.fromListOrElement(lineStart, Vector((0, 0, 1)))
-        _lineEnd = VirtualVector3DList.fromListOrElement(lineEnd, Vector((0, 0, -1)))
-        _planePoint = VirtualVector3DList.fromListOrElement(planePoint, Vector((0, 0, 0)))
-        _planeNormal = VirtualVector3DList.fromListOrElement(planeNormal, Vector((0, 0, 1)))
-        amount = VirtualVector3DList.getMaxRealLength(_lineStart, _lineEnd, _planePoint, _planeNormal)
-        amount = 1 if singleElement else amount
-        return IntersectLinePlane(amount, _lineStart, _lineEnd, _planePoint, _planeNormal)
+        return intersectLinePlaneSingle(lineStart, lineEnd, planePoint, planeNormal)

@@ -2,38 +2,65 @@ import cython
 from libc.math cimport sqrt
 from ... math cimport ( Vector3, dotVec3, scaleVec3, normalizeVec3,
     addVec3, subVec3, crossVec3, lengthVec3, lengthSquaredVec3,
-    distanceVec3)
+    distanceVec3, toVector3, toPyVector3)
 from ... data_structures cimport (
     Vector3DList, DoubleList, VirtualDoubleList,
     VirtualVector3DList, BooleanList, CharList)
 
-def IntersectLinePlane(Py_ssize_t amount,
-                      VirtualVector3DList lineStart,
-                      VirtualVector3DList lineEnd,
-                      VirtualVector3DList planePoint,
-                      VirtualVector3DList planeNormal):
-    cdef Vector3DList intersection = Vector3DList(length = amount)
-    cdef DoubleList parameter = DoubleList(length = amount)
-    cdef BooleanList valid = BooleanList(length = amount)
-    cdef Vector3 direction, pointDirection, _intersection, intersectionVector
-    cdef double factor
+cdef intersectLinePlane(Vector3 *lineStart, Vector3 *lineEnd,
+                        Vector3 *planePoint, Vector3 *planeNormal,
+                        Vector3 *outIntersection, double *outParameter, bint *outValid):
+    cdef Vector3 direction, pointDirection, intersectionVector, intersection
+    cdef double parameter, dot
+    subVec3(&direction, lineEnd, lineStart)
+    dot = dotVec3(planeNormal, &direction)
+    if abs(dot) > 1e-6:
+        subVec3(&pointDirection, lineStart, planePoint)
+        factor = -dotVec3(planeNormal, &pointDirection) / dot
+        scaleVec3(&intersectionVector, &direction, factor)
+        addVec3(&intersection, lineStart, &intersectionVector)
+        outIntersection[0] = intersection
+        outParameter[0] = factor
+        outValid[0] = True
+    else:
+        outIntersection[0] = Vector3(0,0,0)
+        outParameter[0] = 0
+        outValid[0] = False
+
+def intersectLinePlaneList(Py_ssize_t amount,
+                        VirtualVector3DList lineStart,
+                        VirtualVector3DList lineEnd,
+                        VirtualVector3DList planePoint,
+                        VirtualVector3DList planeNormal):
+    cdef Vector3DList intersectionList = Vector3DList(length = amount)
+    cdef DoubleList parameterList = DoubleList(length = amount)
+    cdef BooleanList validList = BooleanList(length = amount)
+    cdef Vector3 intersection
+    cdef double parameter
+    cdef bint valid
     cdef Py_ssize_t i
     for i in range(amount):
-        subVec3(&direction, lineEnd.get(i), lineStart.get(i))
-        dot = dotVec3(planeNormal.get(i), &direction)
-        if abs(dot) > 1e-6:
-            subVec3(&pointDirection, lineStart.get(i), planePoint.get(i))
-            factor = -dotVec3(planeNormal.get(i), &pointDirection) / dot
-            scaleVec3(&intersectionVector, &direction, factor)
-            addVec3(&_intersection, lineStart.get(i), &intersectionVector)
-            intersection.data[i] = _intersection
-            parameter.data[i] = factor
-            valid.data[i] = True
-        else:
-            intersection.data[i] = Vector3(0,0,0)
-            parameter.data[i] = 0
-            valid.data[i] = False
-    return intersection, parameter, valid
+        intersectLinePlane(lineStart.get(i), lineEnd.get(i),
+        planePoint.get(i), planeNormal.get(i), &intersection, &parameter, &valid)
+        intersectionList.data[i] = intersection
+        parameterList.data[i] = parameter
+        validList.data[i] = valid
+    return intersectionList, parameterList, validList
+
+def intersectLinePlaneSingle(lineStart,
+                            lineEnd,
+                            planePoint,
+                            planeNormal):
+    cdef Vector3 _lineStart = toVector3(lineStart)
+    cdef Vector3 _lineEnd = toVector3(lineEnd)
+    cdef Vector3 _planePoint = toVector3(planePoint)
+    cdef Vector3 _planeNormal = toVector3(planeNormal)
+    cdef Vector3 intersection
+    cdef double parameter
+    cdef bint valid
+    intersectLinePlane(&_lineStart, &_lineEnd, &_planePoint, &_planeNormal,
+    &intersection, &parameter, &valid)
+    return toPyVector3(&intersection), parameter, valid
 
 def IntersectLineLine(Py_ssize_t amount,
                     VirtualVector3DList firstlineStart,
