@@ -1,75 +1,77 @@
 import bpy
 from mathutils import Vector
-from . c_utils import IntersectSphereSphere
-from ... data_structures import VirtualVector3DList, VirtualDoubleList
 from ... base_types import AnimationNode, VectorizedSocket
+from ... data_structures import VirtualVector3DList, VirtualDoubleList
+from . c_utils import intersectSphereSphereList, intersectSphereSphereSingle
 
 class IntersectSphereSphereNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_IntersectSphereSphereNode"
     bl_label = "Intersect Sphere Sphere"
     bl_width_default = 160
 
-    useSphere1CenterList = VectorizedSocket.newProperty()
-    useSphere1RadiusList = VectorizedSocket.newProperty()
-    useSphere2CenterList = VectorizedSocket.newProperty()
-    useSphere2RadiusList = VectorizedSocket.newProperty()
+    useFirstSphereCenterList = VectorizedSocket.newProperty()
+    useFirstSphereRadiusList = VectorizedSocket.newProperty()
+    useSecondSphereCenterList = VectorizedSocket.newProperty()
+    useSecondSphereRadiusList = VectorizedSocket.newProperty()
 
     def create(self):
-        self.newInput(VectorizedSocket("Vector", "useSphere1CenterList",
+        self.newInput(VectorizedSocket("Vector", "useFirstSphereCenterList",
             ("First Sphere Center", "firstSphereCenter", dict(value = (0, 0, -0.5))),
-            ("First Spheres Centers", "firstSpheresCenters"),
+            ("First Sphere Centers", "firstSphereCenters"),
             codeProperties = dict(default = (0, 0, -0.5))))
-        self.newInput(VectorizedSocket("Float", "useSphere1RadiusList",
+        self.newInput(VectorizedSocket("Float", "useFirstSphereRadiusList",
             ("First Sphere Radius", "firstSphereRadius", dict(value = 1)),
-            ("First Spheres Radii", "firstSpheresRadii"),
+            ("First Sphere Radii", "firstSphereRadii"),
             codeProperties = dict(default = 1)))
 
-        self.newInput(VectorizedSocket("Vector", "useSphere2CenterList",
+        self.newInput(VectorizedSocket("Vector", "useSecondSphereCenterList",
             ("Second Sphere Center", "secondSphereCenter", dict(value = (0, 0, 0.5))),
-            ("Second Spheres Centers", "secondSpheresCenters"),
+            ("Second Sphere Centers", "secondSphereCenters"),
             codeProperties = dict(default = (0, 0, 0.5))))
-        self.newInput(VectorizedSocket("Float", "useSphere2RadiusList",
+        self.newInput(VectorizedSocket("Float", "useSecondSphereRadiusList",
             ("Second Sphere Radius", "secondSphereRadius", dict(value = 1)),
-            ("Second Spheres Radii", "secondSpheresRadii"),
+            ("Second Sphere Radii", "secondSphereRadii"),
             codeProperties = dict(default = 1)))
 
-        props = ["useSphere2CenterList", "useSphere2RadiusList",
-        "useSphere1CenterList", "useSphere1RadiusList"]
+        props = ["useSecondSphereCenterList", "useSecondSphereRadiusList",
+        "useFirstSphereCenterList", "useFirstSphereRadiusList"]
 
         self.newOutput(VectorizedSocket("Vector", props,
             ("Circle Center", "circleCenter"),
-            ("Circles Centers", "circlesCenters")))
+            ("Circle Centers", "circleCenters")))
         self.newOutput(VectorizedSocket("Vector", props,
             ("Circle Normal", "circleNormal"),
-            ("Circles Normals", "circlesNormals")))
+            ("Circle Normals", "circleNormals")))
         self.newOutput(VectorizedSocket("Float", props,
             ("Circle Radius", "circleRadius"),
-            ("Circles Radii", "circlesRadii")))
+            ("Circle Radii", "circleRadii")))
 
         self.newOutput(VectorizedSocket("Boolean", props,
             ("Valid", "valid"),
             ("Valids", "valids")))
 
     def getExecutionFunctionName(self):
-        useList = any((self.useSphere2CenterList, self.useSphere2RadiusList,
-        self.useSphere1CenterList, self.useSphere1RadiusList))
+        useList = any((self.useSecondSphereCenterList, self.useSecondSphereRadiusList,
+        self.useFirstSphereCenterList, self.useFirstSphereRadiusList))
         if useList:
             return "execute_List"
         else:
             return "execute_Single"
 
-    def execute_List(self, firstSpheresCenters, firstSpheresRadii, secondSpheresCenters, secondSpheresRadii):
-        return self.getIntersections(firstSpheresCenters, firstSpheresRadii, secondSpheresCenters, secondSpheresRadii, False)
+    def execute_List(self, firstSphereCenters, firstSphereRadii,
+    secondSphereCenters, secondSphereRadii):
+        firstSphereCenters = VirtualVector3DList.fromListOrElement(firstSphereCenters,
+        Vector((0, 0, -0.5)))
+        firstSphereRadii = VirtualDoubleList.fromListOrElement(firstSphereRadii, 1)
+        secondSphereCenters = VirtualVector3DList.fromListOrElement(secondSphereCenters,
+        Vector((0, 0, 0.5)))
+        secondSphereRadii = VirtualDoubleList.fromListOrElement(secondSphereRadii, 1)
+        amount = VirtualVector3DList.getMaxRealLength(firstSphereCenters, firstSphereRadii,
+        secondSphereCenters, secondSphereRadii)
+        return intersectSphereSphereList(amount, firstSphereCenters, firstSphereRadii,
+        secondSphereCenters, secondSphereRadii)
 
-    def execute_Single(self, firstSphereCenter, firstSphereRadius, secondSphereCenter, secondSphereRadius):
-        result = self.getIntersections(firstSphereCenter, firstSphereRadius, secondSphereCenter, secondSphereRadius, True)
-        return [x[0] for x in result]
-
-    def getIntersections(self, firstSphereCenter, firstSphereRadius, secondSphereCenter, secondSphereRadius, singleElement):
-        _firstSphereCenter = VirtualVector3DList.fromListOrElement(firstSphereCenter, Vector((0, 0, -0.5)))
-        _firstSphereRadius = VirtualDoubleList.fromListOrElement(firstSphereRadius, 1)
-        _secondSphereCenter = VirtualVector3DList.fromListOrElement(secondSphereCenter, Vector((0, 0, 0.5)))
-        _secondSphereRadius = VirtualDoubleList.fromListOrElement(secondSphereRadius, 1)
-        amount = VirtualVector3DList.getMaxRealLength(_firstSphereCenter, _firstSphereRadius, _secondSphereCenter, _secondSphereRadius)
-        amount = 1 if singleElement else amount
-        return IntersectSphereSphere(amount, _firstSphereCenter, _firstSphereRadius, _secondSphereCenter, _secondSphereRadius)
+    def execute_Single(self, firstSphereCenter, firstSphereRadius,
+    secondSphereCenter, secondSphereRadius):
+        return intersectSphereSphereSingle(firstSphereCenter, firstSphereRadius,
+        secondSphereCenter, secondSphereRadius)

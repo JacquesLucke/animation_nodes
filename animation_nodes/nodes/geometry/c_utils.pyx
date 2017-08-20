@@ -342,38 +342,67 @@ def intersectSpherePlaneSingle(sphereCenter,
     &circleCenter, &circleRadius, &valid)
     return toPyVector3(&circleCenter), circleRadius, valid
 
-def IntersectSphereSphere(Py_ssize_t amount,
-                        VirtualVector3DList sphere1Center,
-                        VirtualDoubleList sphere1Radius,
-                        VirtualVector3DList sphere2Center,
-                        VirtualDoubleList sphere2Radius):
-    cdef Vector3DList circleCenter = Vector3DList(length = amount)
-    cdef Vector3DList circleNormal = Vector3DList(length = amount)
-    cdef DoubleList circleRadius = DoubleList(length = amount)
-    cdef BooleanList valid = BooleanList(length = amount)
+cdef intersectSphereSphere(Vector3 *firstSphereCenter, double firstSphereRadius,
+                            Vector3 *secondSphereCenter, double secondSphereRadius,
+                            Vector3 *outCircleCenter, Vector3 *outCircleNormal,
+                            double *outCircleRadius, bint *outValid):
     cdef Vector3 direction, scaledDirection, center
     cdef double distance, r1, r2, h, r
+    subVec3(&direction, secondSphereCenter, firstSphereCenter)
+    distance = lengthVec3(&direction)
+    r1 = firstSphereRadius
+    r2 = secondSphereRadius
+    if (distance <= (r1 + r2)) and ((distance + min(r1, r2)) >= max(r1, r2)) and (distance != 0):
+        h = 0.5 + (r1 * r1 - r2 * r2)/(2 * distance * distance)
+        scaleVec3(&scaledDirection, &direction, h)
+        addVec3(&center, firstSphereCenter, &scaledDirection)
+        r = sqrt(r1 * r1 - h * h * distance * distance)
+        outCircleCenter[0] = center
+        outCircleNormal[0] = direction
+        outCircleRadius[0] = r
+        outValid[0] = True
+    else:
+        outCircleCenter[0] = Vector3(0,0,0)
+        outCircleNormal[0] = Vector3(0,0,0)
+        outCircleRadius[0] = 0
+        outValid[0] = False
+
+def intersectSphereSphereList(Py_ssize_t amount,
+                            VirtualVector3DList firstSphereCenterList,
+                            VirtualDoubleList firstSphereRadiusList,
+                            VirtualVector3DList secondSphereCenterList,
+                            VirtualDoubleList secondSphereRadiusList):
+    cdef Vector3DList circleCenterList = Vector3DList(length = amount)
+    cdef Vector3DList circleNormalList = Vector3DList(length = amount)
+    cdef DoubleList circleRadiusList = DoubleList(length = amount)
+    cdef BooleanList validList = BooleanList(length = amount)
+    cdef Vector3 circleCenter, circleNormal
+    cdef double circleRadius
+    cdef bint valid
     cdef Py_ssize_t i
     for i in range(amount):
-        subVec3(&direction, sphere2Center.get(i), sphere1Center.get(i))
-        distance = lengthVec3(&direction)
-        r1 = sphere1Radius.get(i)
-        r2 = sphere2Radius.get(i)
-        if (distance <= (r1 + r2)) and ((distance + min(r1, r2)) >= max(r1, r2)) and (distance != 0):
-            h = 0.5 + (r1 * r1 - r2 * r2)/(2 * distance * distance)
-            scaleVec3(&scaledDirection, &direction, h)
-            addVec3(&center, sphere1Center.get(i), &scaledDirection)
-            r = sqrt(r1 * r1 - h * h * distance * distance)
-            circleCenter.data[i] = center
-            circleNormal.data[i] = direction
-            circleRadius.data[i] = r
-            valid.data[i] = True
-        else:
-            circleCenter.data[i] = Vector3(0,0,0)
-            circleNormal.data[i] = Vector3(0,0,0)
-            circleRadius.data[i] = 0
-            valid.data[i] = False
-    return circleCenter, circleNormal, circleRadius, valid
+        intersectSphereSphere(firstSphereCenterList.get(i), firstSphereRadiusList.get(i),
+        secondSphereCenterList.get(i), secondSphereRadiusList.get(i),
+        &circleCenter, &circleNormal, &circleRadius, &valid)
+        circleCenterList.data[i] = circleCenter
+        circleNormalList.data[i] = circleNormal
+        circleRadiusList.data[i] = circleRadius
+        validList.data[i] = valid
+    return circleCenterList, circleNormalList, circleRadiusList, validList
+
+def intersectSphereSphereSingle(firstSphereCenter,
+                                firstSphereRadius,
+                                secondSphereCenter,
+                                secondSphereRadius):
+    cdef Vector3 _firstSphereCenter = toVector3(firstSphereCenter)
+    cdef Vector3 _secondSphereCenter = toVector3(secondSphereCenter)
+    cdef Vector3 circleCenter, circleNormal
+    cdef double circleRadius
+    cdef bint valid
+    intersectSphereSphere(&_firstSphereCenter, firstSphereRadius,
+    &_secondSphereCenter, secondSphereRadius,
+    &circleCenter, &circleNormal, &circleRadius, &valid)
+    return toPyVector3(&circleCenter), toPyVector3(&circleNormal), circleRadius, valid
 
 @cython.cdivision(True)
 def ProjectPointOnLine(Py_ssize_t amount,

@@ -9,32 +9,32 @@ class IntersectPlanePlaneNode(bpy.types.Node, AnimationNode):
     bl_label = "Intersect Plane Plane"
     bl_width_default = 160
 
-    usePlane1PointList = VectorizedSocket.newProperty()
-    usePlane1NormalList = VectorizedSocket.newProperty()
-    usePlane2PointList = VectorizedSocket.newProperty()
-    usePlane2PointList = VectorizedSocket.newProperty()
+    useFirstPlanePointList = VectorizedSocket.newProperty()
+    useFirstPlaneNormalList = VectorizedSocket.newProperty()
+    useSecondPlanePointList = VectorizedSocket.newProperty()
+    useSecondPlaneNormalList = VectorizedSocket.newProperty()
 
     def create(self):
-        self.newInput(VectorizedSocket("Vector", "usePlane1PointList",
+        self.newInput(VectorizedSocket("Vector", "useFirstPlanePointList",
             ("First Plane Point", "firstPlanePoint", dict(value = (0, 0, 0))),
             ("First Plane Points", "firstPlanePoints"),
             codeProperties = dict(default = (0, 0, 0))))
-        self.newInput(VectorizedSocket("Vector", "usePlane1NormalList",
+        self.newInput(VectorizedSocket("Vector", "useFirstPlaneNormalList",
             ("First Plane Normal", "firstPlaneNormal", dict(value = (0, 0, 1))),
             ("First Plane Normals", "firstPlaneNormals"),
             codeProperties = dict(default = (0, 0, 1))))
 
-        self.newInput(VectorizedSocket("Vector", "usePlane2PointList",
+        self.newInput(VectorizedSocket("Vector", "useSecondPlanePointList",
             ("Second Plane Point", "secondPlanePoint", dict(value = (0, 0, 0))),
             ("Second Plane Points", "secondPlanePoints"),
             codeProperties = dict(default = (0, 0, 0))))
-        self.newInput(VectorizedSocket("Vector", "usePlane2PointList",
+        self.newInput(VectorizedSocket("Vector", "useSecondPlaneNormalList",
             ("Second Plane Normal", "secondPlaneNormal", dict(value = (1, 0, 0))),
             ("Second Plane Normals", "secondPlaneNormals"),
             codeProperties = dict(default = (1, 0, 0))))
 
-        props = ["usePlane1PointList", "usePlane1NormalList",
-        "usePlane2PointList", "usePlane2PointList"]
+        props = ["useFirstPlanePointList", "useFirstPlaneNormalList",
+        "useSecondPlanePointList", "useSecondPlaneNormalList"]
 
         self.newOutput(VectorizedSocket("Vector", props,
             ("Line Direction", "lineDirection"),
@@ -47,8 +47,8 @@ class IntersectPlanePlaneNode(bpy.types.Node, AnimationNode):
             ("Valids", "valids")))
 
     def getExecutionFunctionName(self):
-        useList = any((self.usePlane1PointList, self.usePlane1NormalList,
-        self.usePlane2PointList, self.usePlane2PointList))
+        useList = any((self.useFirstPlanePointList, self.useFirstPlaneNormalList,
+        self.useSecondPlanePointList, self.useSecondPlaneNormalList))
         if useList:
             return "execute_List"
         else:
