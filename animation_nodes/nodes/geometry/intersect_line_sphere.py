@@ -63,11 +63,15 @@ class IntersectLineSphereNode(bpy.types.Node, AnimationNode):
             return "execute_Single"
 
     def execute_List(self, lineStarts, lineEnds, sphereCenters, sphereRadii):
-        lineStarts = VirtualVector3DList.fromListOrElement(lineStarts, Vector((0, 0, 0)))
-        lineEnds = VirtualVector3DList.fromListOrElement(lineEnds, Vector((0, 0, 2)))
-        sphereCenters = VirtualVector3DList.fromListOrElement(sphereCenters, Vector((0, 0, 0)))
+        lineStarts = VirtualVector3DList.fromListOrElement(lineStarts,
+        Vector((0, 0, 0)))
+        lineEnds = VirtualVector3DList.fromListOrElement(lineEnds,
+        Vector((0, 0, 2)))
+        sphereCenters = VirtualVector3DList.fromListOrElement(sphereCenters,
+        Vector((0, 0, 0)))
         sphereRadii = VirtualDoubleList.fromListOrElement(sphereRadii, 1)
-        amount = VirtualVector3DList.getMaxRealLength(lineStarts, lineEnds, sphereCenters, sphereRadii)
+        amount = VirtualVector3DList.getMaxRealLength(lineStarts, lineEnds,
+        sphereCenters, sphereRadii)
         return intersectLineSphereList(amount, lineStarts, lineEnds, sphereCenters, sphereRadii)
 
     def execute_Single(self, lineStart, lineEnd, sphereCenter, sphereRadius):
