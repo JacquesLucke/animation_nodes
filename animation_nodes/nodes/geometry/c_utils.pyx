@@ -342,6 +342,7 @@ def intersectSpherePlaneSingle(sphereCenter,
     &circleCenter, &circleRadius, &valid)
     return toPyVector3(&circleCenter), circleRadius, valid
 
+@cython.cdivision(True)
 cdef intersectSphereSphere(Vector3 *firstSphereCenter, double firstSphereRadius,
                             Vector3 *secondSphereCenter, double secondSphereRadius,
                             Vector3 *outCircleCenter, Vector3 *outCircleNormal,
@@ -405,30 +406,51 @@ def intersectSphereSphereSingle(firstSphereCenter,
     return toPyVector3(&circleCenter), toPyVector3(&circleNormal), circleRadius, valid
 
 @cython.cdivision(True)
-def ProjectPointOnLine(Py_ssize_t amount,
-                    VirtualVector3DList lineStart,
-                    VirtualVector3DList lineEnd,
-                    VirtualVector3DList point):
-    cdef Vector3DList Projection = Vector3DList(length = amount)
-    cdef DoubleList Parameter = DoubleList(length = amount)
-    cdef DoubleList Distance = DoubleList(length = amount)
-    cdef Vector3 direction1, direction2, unitDirection, projVector, proj
-    cdef double factor, length, param, distance
+cdef projectPointOnLine(Vector3 *lineStart, Vector3 *lineEnd, Vector3 *point,
+                        Vector3 *outProjection, double *outParameter, double *outDistance):
+    cdef Vector3 direction1, direction2, unitDirection, projVector, projection
+    cdef double factor, length, parameter, distance
+    subVec3(&direction1, lineEnd, lineStart)
+    subVec3(&direction2, point, lineStart)
+    normalizeVec3(&unitDirection, &direction1)
+    factor = dotVec3(&direction2, &unitDirection)
+    scaleVec3(&projVector, &unitDirection, factor)
+    addVec3(&projection, lineStart, &projVector)
+    length = lengthVec3(&direction1)
+    parameter = factor / length if length != 0 else 0
+    distance = distanceVec3(&projVector, point)
+    outProjection[0] = projection
+    outParameter[0] = parameter
+    outDistance[0] = distance
+
+def projectPointOnLineList(Py_ssize_t amount,
+                            VirtualVector3DList lineStartList,
+                            VirtualVector3DList lineEndList,
+                            VirtualVector3DList pointList):
+    cdef Vector3DList projectionList = Vector3DList(length = amount)
+    cdef DoubleList parameterList = DoubleList(length = amount)
+    cdef DoubleList distanceList = DoubleList(length = amount)
+    cdef Vector3 projection
+    cdef double parameter, distance
     cdef Py_ssize_t i
     for i in range(amount):
-        subVec3(&direction1, lineEnd.get(i), lineStart.get(i))
-        subVec3(&direction2, point.get(i), lineStart.get(i))
-        normalizeVec3(&unitDirection, &direction1)
-        factor = dotVec3(&direction2, &unitDirection)
-        scaleVec3(&projVector, &unitDirection, factor)
-        addVec3(&proj, lineStart.get(i), &projVector)
-        length = lengthVec3(&direction1)
-        param = factor / length if length != 0 else 0
-        distance = distanceVec3(&projVector, point.get(i))
-        Projection.data[i] = proj
-        Parameter.data[i] = param
-        Distance.data[i] = distance
-    return Projection, Parameter, Distance
+        projectPointOnLine(lineStartList.get(i), lineEndList.get(i), pointList.get(i),
+        &projection, &parameter, &distance)
+        projectionList.data[i] = projection
+        parameterList.data[i] = parameter
+        distanceList.data[i] = distance
+    return projectionList, parameterList, distanceList
+
+def projectPointOnLineSingle(lineStart,
+                            lineEnd,
+                            point):
+    cdef Vector3 _lineStart = toVector3(lineStart)
+    cdef Vector3 _lineEnd = toVector3(lineEnd)
+    cdef Vector3 _point = toVector3(point)
+    cdef Vector3 projection
+    cdef double parameter, distance
+    projectPointOnLine(&_lineStart, &_lineEnd, &_point, &projection, &parameter, &distance)
+    return toPyVector3(&projection), parameter, distance
 
 def ProjectPointOnPlane(Py_ssize_t amount,
                         VirtualVector3DList planePoint,

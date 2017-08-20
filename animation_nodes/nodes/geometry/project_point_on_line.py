@@ -1,8 +1,8 @@
 import bpy
 from mathutils import Vector
-from . c_utils import ProjectPointOnLine
 from ... data_structures import VirtualVector3DList
 from ... base_types import AnimationNode, VectorizedSocket
+from . c_utils import projectPointOnLineList, projectPointOnLineSingle
 
 class ProjectPointOnLineNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ProjectPointOnLineNode"
@@ -17,11 +17,11 @@ class ProjectPointOnLineNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.newInput(VectorizedSocket("Vector", "useLineStartList",
             ("Line Start", "lineStart", dict(value = (0, 0, 0))),
-            ("Lines Start", "linesStart"),
+            ("Line Starts", "lineStarts"),
             codeProperties = dict(default = (0, 0, 0))))
         self.newInput(VectorizedSocket("Vector", "useLineEndList",
             ("Line End", "lineEnd", dict(value = (1, 0, 0))),
-            ("Lines End", "linesEnd"),
+            ("Line End", "lineEnds"),
             codeProperties = dict(default = (1, 0, 0))))
 
         self.newInput(VectorizedSocket("Vector", "usePointList",
@@ -49,17 +49,12 @@ class ProjectPointOnLineNode(bpy.types.Node, AnimationNode):
         else:
             return "execute_Single"
 
-    def execute_List(self, linesStart, linesEnd, points):
-        return self.getPoints(linesStart, linesEnd, points, False)
+    def execute_List(self, lineStarts, lineEnds, points):
+        lineStarts = VirtualVector3DList.fromListOrElement(lineStarts, Vector((0, 0, 0)))
+        lineEnds = VirtualVector3DList.fromListOrElement(lineEnds, Vector((1, 0, 0)))
+        points = VirtualVector3DList.fromListOrElement(points, Vector((1, 1, 0)))
+        amount = VirtualVector3DList.getMaxRealLength(lineStarts, lineEnds, points)
+        return projectPointOnLineList(amount, lineStarts, lineEnds, points)
 
     def execute_Single(self, lineStart, lineEnd, point):
-        result = self.getPoints(lineStart, lineEnd, point, True)
-        return [x[0] for x in result]
-
-    def getPoints(self, lineStart, lineEnd, point, singleElement):
-        _lineStart = VirtualVector3DList.fromListOrElement(lineStart, Vector((0, 0, 0)))
-        _lineEnd = VirtualVector3DList.fromListOrElement(lineEnd, Vector((1, 0, 0)))
-        _point = VirtualVector3DList.fromListOrElement(point, Vector((1, 1, 0)))
-        amount = VirtualVector3DList.getMaxRealLength(_lineStart, _lineEnd, _point)
-        amount = 1 if singleElement else amount
-        return ProjectPointOnLine(amount, _lineStart, _lineEnd, _point)
+        return projectPointOnLineSingle(lineStart, lineEnd, point)
