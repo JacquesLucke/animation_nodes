@@ -136,57 +136,92 @@ def intersectLineLineSingle(firstLineStart,
     &firstNearestPoint, &secondNearestPoint, &firstParameter, &secondParameter, &valid)
     return toPyVector3(&firstNearestPoint), toPyVector3(&secondNearestPoint), firstParameter, secondParameter, valid
 
-def IntersectLineSphere(Py_ssize_t amount,
-                        VirtualVector3DList lineStart,
-                        VirtualVector3DList lineEnd,
-                        VirtualVector3DList sphereCenter,
-                        VirtualDoubleList sphereRadius):
-    cdef Vector3DList intersection1 = Vector3DList(length = amount)
-    cdef Vector3DList intersection2 = Vector3DList(length = amount)
-    cdef DoubleList intersection1Parameter = DoubleList(length = amount)
-    cdef DoubleList intersection2Parameter = DoubleList(length = amount)
-    cdef CharList numberOfIntersections = CharList(length = amount)
-    cdef Vector3 direction, startingPoint, _intersection1, _intersection2
-    cdef double factor1, factor2, a, b, c
+cdef intersectLineSphere(Vector3 *lineStart, Vector3 *lineEnd,
+                        Vector3 *sphereCenter, double sphereRadius,
+                        Vector3 *outFirstIntersection, Vector3 *outSecondIntersection,
+                        double *outFirstParameter, double *outSecondParameter,
+                        char *outNumberOfIntersections):
+    cdef Vector3 direction, startingPoint, firstIntersection, secondIntersection
+    cdef double factor1, factor2, a, b, c, sqrtDiscriminant, discriminant
+    subVec3(&direction, lineEnd, lineStart)
+    subVec3(&startingPoint, lineStart, sphereCenter)
+    a = lengthSquaredVec3(&direction)
+    b = dotVec3(&direction, &startingPoint) * 2
+    c = lengthSquaredVec3(&startingPoint) - sphereRadius * sphereRadius
+    discriminant = b ** 2 - 4 * a * c
+    if discriminant > 0:
+        if discriminant > 1e-6:
+            sqrtDiscriminant = sqrt(discriminant)
+            factor1 = (-b + sqrtDiscriminant)/(2 * a)
+            factor2 = (-b - sqrtDiscriminant)/(2 * a)
+            scaleVec3(&firstIntersection, &direction, factor1)
+            scaleVec3(&secondIntersection, &direction, factor2)
+            addVec3(&firstIntersection, lineStart, &firstIntersection)
+            addVec3(&secondIntersection, lineStart, &secondIntersection)
+            outFirstIntersection[0] = firstIntersection
+            outSecondIntersection[0] = secondIntersection
+            outFirstParameter[0] = factor1
+            outSecondParameter[0] = factor2
+            outNumberOfIntersections[0] = 2
+        else:
+            factor = (-b + sqrt(discriminant))/(2 * a)
+            scaleVec3(&firstIntersection, &direction, factor)
+            addVec3(&firstIntersection, lineStart, &firstIntersection)
+            outFirstIntersection[0] = firstIntersection
+            outSecondIntersection[0] = firstIntersection
+            outFirstParameter[0] = factor
+            outSecondParameter[0] = factor
+            outNumberOfIntersections[0] = 1
+    else:
+        outFirstIntersection[0] = Vector3(0,0,0)
+        outSecondIntersection[0] = Vector3(0,0,0)
+        outFirstParameter[0] = 0
+        outSecondParameter[0] = 0
+        outNumberOfIntersections[0] = 0
+
+def intersectLineSphereList(Py_ssize_t amount,
+                            VirtualVector3DList lineStartList,
+                            VirtualVector3DList lineEndList,
+                            VirtualVector3DList sphereCenterList,
+                            VirtualDoubleList sphereRadiusList):
+    cdef Vector3DList firstIntersectionList = Vector3DList(length = amount)
+    cdef Vector3DList secondIntersectionList = Vector3DList(length = amount)
+    cdef DoubleList firstParameterList = DoubleList(length = amount)
+    cdef DoubleList secondParameterList = DoubleList(length = amount)
+    cdef CharList numberOfIntersectionsList = CharList(length = amount)
+    cdef Vector3 firstIntersection, secondIntersection
+    cdef double firstParameter, secondParameter
+    cdef char numberOfIntersections
     cdef Py_ssize_t i
     for i in range(amount):
-        subVec3(&direction, lineEnd.get(i), lineStart.get(i))
-        subVec3(&startingPoint, lineStart.get(i), sphereCenter.get(i))
-        a = lengthSquaredVec3(&direction)
-        b = dotVec3(&direction, &startingPoint) * 2
-        c = lengthSquaredVec3(&startingPoint) - sphereRadius.get(i) ** 2
-        discriminant = b ** 2 - 4 * a * c
-        if discriminant > 0:
-            if discriminant > 1e-6:
-                sqrtDiscriminant = sqrt(discriminant)
-                factor1 = (-b + sqrtDiscriminant)/(2 * a)
-                factor2 = (-b - sqrtDiscriminant)/(2 * a)
-                scaleVec3(&_intersection1, &direction, factor1)
-                scaleVec3(&_intersection2, &direction, factor2)
-                addVec3(&_intersection1, lineStart.get(i), &_intersection1)
-                addVec3(&_intersection2, lineStart.get(i), &_intersection2)
-                intersection1.data[i] = _intersection1
-                intersection2.data[i] = _intersection2
-                intersection1Parameter.data[i] = factor1
-                intersection2Parameter.data[i] = factor2
-                numberOfIntersections.data[i] = 2
-            else:
-                factor = (-b + sqrt(discriminant))/(2 * a)
-                scaleVec3(&_intersection1, &direction, factor)
-                addVec3(&_intersection1, lineStart.get(i), &_intersection1)
-                intersection1.data[i] = _intersection1
-                intersection2.data[i] = _intersection1
-                intersection1Parameter.data[i] = factor
-                intersection2Parameter.data[i] = factor
-                numberOfIntersections.data[i] = 1
-        else:
-            intersection1.data[i] = Vector3(0,0,0)
-            intersection2.data[i] = Vector3(0,0,0)
-            intersection1Parameter.data[i] = 0
-            intersection2Parameter.data[i] = 0
-            numberOfIntersections.data[i] = 0
+        intersectLineSphere(lineStartList.get(i), lineEndList.get(i),
+        sphereCenterList.get(i), sphereRadiusList.get(i),
+        &firstIntersection, &secondIntersection,
+        &firstParameter, &secondParameter, &numberOfIntersections)
+        firstIntersectionList.data[i] = firstIntersection
+        secondIntersectionList.data[i] = secondIntersection
+        firstParameterList.data[i] = firstParameter
+        secondParameterList.data[i] = secondParameter
+        numberOfIntersectionsList.data[i] = numberOfIntersections
+    return (firstIntersectionList, secondIntersectionList,
+            firstParameterList, secondParameterList,
+            numberOfIntersectionsList)
 
-    return intersection1, intersection2, intersection1Parameter, intersection2Parameter, numberOfIntersections
+def intersectLineSphereSingle(lineStart,
+                            lineEnd,
+                            sphereCenter,
+                            sphereRadius):
+    cdef Vector3 _lineStart = toVector3(lineStart)
+    cdef Vector3 _lineEnd = toVector3(lineEnd)
+    cdef Vector3 _sphereCenter = toVector3(sphereCenter)
+    cdef Vector3 firstIntersection, secondIntersection
+    cdef double firstParameter, secondParameter
+    cdef char numberOfIntersections
+    intersectLineSphere(&_lineStart, &_lineEnd, &_sphereCenter, sphereRadius,
+    &firstIntersection, &secondIntersection, &firstParameter, &secondParameter, &numberOfIntersections)
+    return (toPyVector3(&firstIntersection), toPyVector3(&secondIntersection),
+            firstParameter, secondParameter,
+            numberOfIntersections)
 
 def IntersectPlanePlane(Py_ssize_t amount,
                         VirtualVector3DList plane1Point,

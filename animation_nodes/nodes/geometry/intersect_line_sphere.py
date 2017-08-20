@@ -1,8 +1,8 @@
 import bpy
 from mathutils import Vector
-from . c_utils import IntersectLineSphere
-from ... data_structures import VirtualVector3DList, VirtualDoubleList
 from ... base_types import AnimationNode, VectorizedSocket
+from ... data_structures import VirtualVector3DList, VirtualDoubleList
+from . c_utils import intersectLineSphereList, intersectLineSphereSingle
 
 class IntersectLineSphereNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_IntersectLineSphereNode"
@@ -17,20 +17,20 @@ class IntersectLineSphereNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.newInput(VectorizedSocket("Vector", "useLineStartList",
             ("Line Start", "lineStart", dict(value = (0, 0, 0))),
-            ("Lines Start", "linesStart"),
+            ("Line Start", "lineStarts"),
             codeProperties = dict(default = (0, 0, 0))))
         self.newInput(VectorizedSocket("Vector", "useLineEndList",
             ("Line End", "lineEnd", dict(value = (0, 0, 2))),
-            ("Lines End", "linesEnd"),
+            ("Line Ends", "lineEnds"),
             codeProperties = dict(default = (0, 0, 2))))
 
         self.newInput(VectorizedSocket("Vector", "useSphereCenterList",
             ("Sphere Center", "sphereCenter", dict(value = (0, 0, 0))),
-            ("Spheres Centers", "spheresCenters"),
+            ("Sphere Centers", "sphereCenters"),
             codeProperties = dict(default = (0, 0, 0))))
         self.newInput(VectorizedSocket("Float", "useSphereRadiusList",
             ("Sphere Radius", "sphereRadius", dict(value = 1)),
-            ("Spheres Radii", "spheresRadii"),
+            ("Spheres Radii", "sphereRadii"),
             codeProperties = dict(default = 1)))
 
         props = ["useLineStartList", "useLineEndList",
@@ -44,11 +44,11 @@ class IntersectLineSphereNode(bpy.types.Node, AnimationNode):
             ("Second Intersections", "secondIntersections")))
 
         self.newOutput(VectorizedSocket("Float", props,
-            ("First Intersection Parameter", "firstIntersectionParameter"),
-            ("First Intersections Parameters", "firstIntersectionsParameters")))
+            ("First Parameter", "firstParameter"),
+            ("First Parameters", "firstParameters")))
         self.newOutput(VectorizedSocket("Float", props,
-            ("Second Intersection Parameter", "secondIntersectionParameter"),
-            ("Second Intersections Parameters", "secondIntersectionsParameters")))
+            ("Second Parameter", "secondParameter"),
+            ("Second Parameters", "secondParameters")))
 
         self.newOutput(VectorizedSocket("Integer", props,
             ("Number Of Intersections", "numberOfIntersections"),
@@ -62,18 +62,13 @@ class IntersectLineSphereNode(bpy.types.Node, AnimationNode):
         else:
             return "execute_Single"
 
-    def execute_List(self, linesStart, linesEnd, spheresCenters, spheresRadii):
-        return self.getIntersections(linesStart, linesEnd, spheresCenters, spheresRadii, False)
+    def execute_List(self, lineStarts, lineEnds, sphereCenters, sphereRadii):
+        lineStarts = VirtualVector3DList.fromListOrElement(lineStarts, Vector((0, 0, 0)))
+        lineEnds = VirtualVector3DList.fromListOrElement(lineEnds, Vector((0, 0, 2)))
+        sphereCenters = VirtualVector3DList.fromListOrElement(sphereCenters, Vector((0, 0, 0)))
+        sphereRadii = VirtualDoubleList.fromListOrElement(sphereRadii, 1)
+        amount = VirtualVector3DList.getMaxRealLength(lineStarts, lineEnds, sphereCenters, sphereRadii)
+        return intersectLineSphereList(amount, lineStarts, lineEnds, sphereCenters, sphereRadii)
 
     def execute_Single(self, lineStart, lineEnd, sphereCenter, sphereRadius):
-        result = self.getIntersections(lineStart, lineEnd, sphereCenter, sphereRadius, True)
-        return [x[0] for x in result]
-
-    def getIntersections(self, lineStart, lineEnd, sphereCenter, sphereRadius, singleElement):
-        _lineStart = VirtualVector3DList.fromListOrElement(lineStart, Vector((1, 1, 0)))
-        _lineEnd = VirtualVector3DList.fromListOrElement(lineEnd, Vector((-1, -1, 0)))
-        _sphereCenter = VirtualVector3DList.fromListOrElement(sphereCenter, Vector((1, -1, 0)))
-        _sphereRadius = VirtualDoubleList.fromListOrElement(sphereRadius, 1)
-        amount = VirtualVector3DList.getMaxRealLength(_lineStart, _lineEnd, _sphereCenter, _sphereRadius)
-        amount = 1 if singleElement else amount
-        return IntersectLineSphere(amount, _lineStart, _lineEnd, _sphereCenter, _sphereRadius)
+        return intersectLineSphereSingle(lineStart, lineEnd, sphereCenter, sphereRadius)
