@@ -1,8 +1,8 @@
 import bpy
 from mathutils import Vector
-from . c_utils import IntersectPlanePlane
 from ... data_structures import VirtualVector3DList
 from ... base_types import AnimationNode, VectorizedSocket
+from . c_utils import intersectPlanePlaneList, intersectPlanePlaneSingle
 
 class IntersectPlanePlaneNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_IntersectPlanePlaneNode"
@@ -17,20 +17,20 @@ class IntersectPlanePlaneNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.newInput(VectorizedSocket("Vector", "usePlane1PointList",
             ("First Plane Point", "firstPlanePoint", dict(value = (0, 0, 0))),
-            ("First Planes Points", "firstPlanesPoints"),
+            ("First Plane Points", "firstPlanePoints"),
             codeProperties = dict(default = (0, 0, 0))))
         self.newInput(VectorizedSocket("Vector", "usePlane1NormalList",
             ("First Plane Normal", "firstPlaneNormal", dict(value = (0, 0, 1))),
-            ("First Planes Normals", "firstPlanesNormals"),
+            ("First Plane Normals", "firstPlaneNormals"),
             codeProperties = dict(default = (0, 0, 1))))
 
         self.newInput(VectorizedSocket("Vector", "usePlane2PointList",
             ("Second Plane Point", "secondPlanePoint", dict(value = (0, 0, 0))),
-            ("Second Planes Points", "secondPlanesPoints"),
+            ("Second Plane Points", "secondPlanePoints"),
             codeProperties = dict(default = (0, 0, 0))))
         self.newInput(VectorizedSocket("Vector", "usePlane2PointList",
             ("Second Plane Normal", "secondPlaneNormal", dict(value = (1, 0, 0))),
-            ("Second Planes Normals", "secondPlanesNormals"),
+            ("Second Plane Normals", "secondPlaneNormals"),
             codeProperties = dict(default = (1, 0, 0))))
 
         props = ["usePlane1PointList", "usePlane1NormalList",
@@ -38,10 +38,10 @@ class IntersectPlanePlaneNode(bpy.types.Node, AnimationNode):
 
         self.newOutput(VectorizedSocket("Vector", props,
             ("Line Direction", "lineDirection"),
-            ("Lines Directions", "linesDirections")))
+            ("Line Directions", "lineDirections")))
         self.newOutput(VectorizedSocket("Vector", props,
             ("Line Point", "linePoint"),
-            ("Lines Points", "linesPoints")))
+            ("Line Points", "linePoints")))
         self.newOutput(VectorizedSocket("Boolean", props,
             ("Valid", "valid"),
             ("Valids", "valids")))
@@ -54,18 +54,22 @@ class IntersectPlanePlaneNode(bpy.types.Node, AnimationNode):
         else:
             return "execute_Single"
 
-    def execute_List(self, firstPlanesPoints, firstPlanesNormals, secondPlanesPoints, secondPlanesNormals):
-        return self.getLine(firstPlanesPoints, firstPlanesNormals, secondPlanesPoints, secondPlanesNormals, False)
+    def execute_List(self, firstPlanePoints, firstPlaneNormals,
+        secondPlanePoints, secondPlaneNormals):
+        firstPlanePoints = VirtualVector3DList.fromListOrElement(firstPlanePoints,
+        Vector((0, 0, 0)))
+        firstPlaneNormals = VirtualVector3DList.fromListOrElement(firstPlaneNormals,
+        Vector((0, 0, 1)))
+        secondPlanePoints = VirtualVector3DList.fromListOrElement(secondPlanePoints,
+        Vector((0, 0, 0)))
+        secondPlaneNormals = VirtualVector3DList.fromListOrElement(secondPlaneNormals,
+        Vector((1, 0, 0)))
+        amount = VirtualVector3DList.getMaxRealLength(firstPlanePoints, firstPlaneNormals,
+        secondPlanePoints, secondPlaneNormals)
+        return intersectPlanePlaneList(amount, firstPlanePoints, firstPlaneNormals,
+        secondPlanePoints, secondPlaneNormals)
 
-    def execute_Single(self, firstPlanePoint, firstPlaneNormal, secondPlanePoint, secondPlaneNormal):
-        result = self.getLine(firstPlanePoint, firstPlaneNormal, secondPlanePoint, secondPlaneNormal, True)
-        return [x[0] for x in result]
-
-    def getLine(self, firstPlanePoint, firstPlaneNormal, secondPlanePoint, secondPlaneNormal, singleElement):
-        _firstPlanePoint = VirtualVector3DList.fromListOrElement(firstPlanePoint, Vector((0, 0, 0)))
-        _firstPlaneNormal = VirtualVector3DList.fromListOrElement(firstPlaneNormal, Vector((0, 0, 1)))
-        _secondPlanePoint = VirtualVector3DList.fromListOrElement(secondPlanePoint, Vector((0, 0, 0)))
-        _secondPlaneNormal = VirtualVector3DList.fromListOrElement(secondPlaneNormal, Vector((1, 0, 0)))
-        amount = VirtualVector3DList.getMaxRealLength(_firstPlanePoint, _firstPlaneNormal, _secondPlanePoint, _secondPlaneNormal)
-        amount = 1 if singleElement else amount
-        return IntersectPlanePlane(amount, _firstPlanePoint, _firstPlaneNormal, _secondPlanePoint, _secondPlaneNormal)
+    def execute_Single(self, firstPlanePoint, firstPlaneNormal,
+        secondPlanePoint, secondPlaneNormal):
+        return intersectPlanePlaneSingle(firstPlanePoint, firstPlaneNormal,
+        secondPlanePoint, secondPlaneNormal)
