@@ -1,26 +1,27 @@
 import bpy
 from . c_utils import createEdgeIndices
-from ... base_types import VectorizedNode
+from ... data_structures import VirtualLongList
+from ... base_types import AnimationNode, VectorizedSocket
 
-class CreateEdgeIndicesNode(bpy.types.Node, VectorizedNode):
+class CreateEdgeIndicesNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CreateEdgeIndicesNode"
     bl_label = "Create Edge Indices"
 
-    useList1 = VectorizedNode.newVectorizeProperty()
-    useList2 = VectorizedNode.newVectorizeProperty()
+    useList1 = VectorizedSocket.newProperty()
+    useList2 = VectorizedSocket.newProperty()
 
     def create(self):
-        self.newVectorizedInput("Integer", "useList1",
+        self.newInput(VectorizedSocket("Integer", "useList1",
             ("Index 1", "index1", dict(value = 0, minValue = 0)),
-            ("Indices 1", "indices1"))
+            ("Indices 1", "indices1")))
 
-        self.newVectorizedInput("Integer", "useList2",
+        self.newInput(VectorizedSocket("Integer", "useList2",
             ("Index 2", "index2", dict(value = 1, minValue = 0)),
-            ("Indices 2", "indices2"))
+            ("Indices 2", "indices2")))
 
-        self.newVectorizedOutput("Edge Indices", [("useList1", "useList2")],
+        self.newOutput(VectorizedSocket("Edge Indices", ["useList1", "useList2"],
             ("Edge Indices", "edgeIndices"),
-            ("Edge Indices List", "edgeIndicesList"))
+            ("Edge Indices List", "edgeIndicesList")))
 
     def getExecutionFunctionName(self):
         if self.useList1 or self.useList2:
@@ -30,4 +31,7 @@ class CreateEdgeIndicesNode(bpy.types.Node, VectorizedNode):
         return "edgeIndices = (max(index1, 0), max(index2, 0))"
 
     def execute_List(self, indices1, indices2):
-        return createEdgeIndices(indices1, indices2)
+        _indices1 = VirtualLongList.fromListOrElement(indices1, 0)
+        _indices2 = VirtualLongList.fromListOrElement(indices2, 0)
+        amount = VirtualLongList.getMaxRealLength(_indices1, _indices2)
+        return createEdgeIndices(amount, _indices1, _indices2)
