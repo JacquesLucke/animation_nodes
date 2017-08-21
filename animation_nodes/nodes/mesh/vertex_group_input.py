@@ -1,9 +1,9 @@
 import bpy
 from bpy.props import *
 from ... events import propertyChanged
-from ... base_types import VectorizedNode
 from ... data_structures import DoubleList
 from ... utils.data_blocks import removeNotUsedDataBlock
+from ... base_types import AnimationNode, VectorizedSocket
 
 modeItems = [
     ("ALL", "All", "Get weight of every vertex", "NONE", 0),
@@ -19,17 +19,17 @@ groupNotFoundMessage = "group not found"
 noMeshMessage = "no mesh object"
 noSceneMessage = "scene required"
 
-class VertexGroupInputNode(bpy.types.Node, VectorizedNode):
+class VertexGroupInputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_VertexGroupInputNode"
     bl_label = "Vertex Group Input"
 
     mode = EnumProperty(name = "Mode", default = "ALL",
-        items = modeItems, update = VectorizedNode.refresh)
+        items = modeItems, update = AnimationNode.refresh)
 
     groupIdentifierType = EnumProperty(name = "Group Identifier Type", default = "INDEX",
-        items = groupIdentifierTypeItems, update = VectorizedNode.refresh)
+        items = groupIdentifierTypeItems, update = AnimationNode.refresh)
 
-    useIndexList = VectorizedNode.newVectorizeProperty()
+    useIndexList = VectorizedSocket.newProperty()
 
     errorMessage = StringProperty();
 
@@ -42,10 +42,10 @@ class VertexGroupInputNode(bpy.types.Node, VectorizedNode):
             self.newInput("Text", "Name", "groupName")
 
         if self.mode == "INDEX":
-            self.newVectorizedInput("Integer", "useIndexList",
-                ("Index", "index"), ("Indices", "indices"))
-            self.newVectorizedOutput("Float", "useIndexList",
-                ("Weight", "weight"), ("Weights", "weights"))
+            self.newInput(VectorizedSocket("Integer", "useIndexList",
+                ("Index", "index"), ("Indices", "indices")))
+            self.newOutput(VectorizedSocket("Float", "useIndexList",
+                ("Weight", "weight"), ("Weights", "weights")))
         elif self.mode == "ALL":
             self.newInput("Boolean", "Use Modifiers", "useModifiers")
             self.newInput("Scene", "Scene", "scene", hide = True)
