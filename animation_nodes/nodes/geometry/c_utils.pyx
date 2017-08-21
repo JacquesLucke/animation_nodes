@@ -226,66 +226,67 @@ def intersect_LineSphere_Single(lineStart,
             firstParameter, secondParameter,
             numberOfIntersections)
 
-cdef intersectPlanePlane(Vector3 *firstPlanePoint, Vector3 *firstPlaneNormal,
-                        Vector3 *secondPlanePoint, Vector3 *secondPlaneNormal,
-                        Vector3 *outLineDirection, Vector3 *outLinePoint, bint *outValid):
+# Plane-Plane Intersection
+################################################
+
+cdef intersect_PlanePlane(Vector3 *firstPlanePoint, Vector3 *firstPlaneNormal,
+                          Vector3 *secondPlanePoint, Vector3 *secondPlaneNormal,
+                          Vector3 *outLineDirection, Vector3 *outLinePoint, char *outValid):
     cdef Vector3 direction, unitNormal1, unitNormal2, factor1, factor2, point
     cdef double h1, h2, dot, c1, c2, invDotSquared
     normalizeVec3(&unitNormal1, firstPlaneNormal)
     normalizeVec3(&unitNormal2, secondPlaneNormal)
     crossVec3(&direction, firstPlaneNormal, secondPlaneNormal)
-    if lengthVec3(&direction) > 1e-6:
-        h1 = dotVec3(firstPlaneNormal, firstPlanePoint)
-        h2 = dotVec3(secondPlaneNormal, secondPlanePoint)
-        dot = dotVec3(firstPlaneNormal, secondPlaneNormal)
-        invDotSquared = (1 - dot ** 2)
-        c1 = (h1 - h2 * dot)/invDotSquared
-        c2 = (h2 - h1 * dot)/invDotSquared
-        scaleVec3(&factor1, firstPlaneNormal, c1)
-        scaleVec3(&factor2, secondPlaneNormal, c2)
-        addVec3(&point, &factor1, &factor2)
-        outLineDirection[0] = direction
-        outLinePoint[0] = point
-        outValid[0] = True
-    else:
+    if lengthVec3(&direction) < 1e-6:
         outLineDirection[0] = Vector3(0,0,0)
         outLinePoint[0] = Vector3(0,0,0)
         outValid[0] = False
+        return
 
-def intersectPlanePlaneList(Py_ssize_t amount,
-                            VirtualVector3DList firstPlanePointList,
-                            VirtualVector3DList firstPlaneNormalList,
-                            VirtualVector3DList secondPlanePointList,
-                            VirtualVector3DList secondPlaneNormalList):
+    h1 = dotVec3(firstPlaneNormal, firstPlanePoint)
+    h2 = dotVec3(secondPlaneNormal, secondPlanePoint)
+    dot = dotVec3(firstPlaneNormal, secondPlaneNormal)
+    invDotSquared = (1 - dot ** 2)
+    c1 = (h1 - h2 * dot)/invDotSquared
+    c2 = (h2 - h1 * dot)/invDotSquared
+    scaleVec3(&factor1, firstPlaneNormal, c1)
+    scaleVec3(&factor2, secondPlaneNormal, c2)
+    addVec3(&point, &factor1, &factor2)
+
+    outLineDirection[0] = direction
+    outLinePoint[0] = point
+    outValid[0] = True
+
+def intersect_PlanePlane_List(Py_ssize_t amount,
+                              VirtualVector3DList firstPlanePointList,
+                              VirtualVector3DList firstPlaneNormalList,
+                              VirtualVector3DList secondPlanePointList,
+                              VirtualVector3DList secondPlaneNormalList):
     cdef Vector3DList lineDirectionList = Vector3DList(length = amount)
     cdef Vector3DList linePointList = Vector3DList(length = amount)
     cdef BooleanList validList = BooleanList(length = amount)
-    cdef Vector3 lineDirection, linePoint
-    cdef bint valid
     cdef Py_ssize_t i
     for i in range(amount):
-        intersectPlanePlane(firstPlanePointList.get(i), firstPlaneNormalList.get(i),
-        secondPlanePointList.get(i), secondPlaneNormalList.get(i),
-        &lineDirection, &linePoint, &valid)
-        lineDirectionList.data[i] = lineDirection
-        linePointList.data[i] = linePoint
-        validList.data[i] = valid
+        intersect_PlanePlane(firstPlanePointList.get(i), firstPlaneNormalList.get(i),
+                             secondPlanePointList.get(i), secondPlaneNormalList.get(i),
+                             lineDirectionList.data + i, linePointList.data + i,
+                             validList.data + i)
     return lineDirectionList, linePointList, validList
 
-def intersectPlanePlaneSingle(firstPlanePoint,
-                            firstPlaneNormal,
-                            secondPlanePoint,
-                            secondPlaneNormal):
+def intersect_PlanePlane_Single(firstPlanePoint,
+                                firstPlaneNormal,
+                                secondPlanePoint,
+                                secondPlaneNormal):
     cdef Vector3 _firstPlanePoint = toVector3(firstPlanePoint)
     cdef Vector3 _firstPlaneNormal = toVector3(firstPlaneNormal)
     cdef Vector3 _secondPlanePoint = toVector3(secondPlanePoint)
     cdef Vector3 _secondPlaneNormal = toVector3(secondPlaneNormal)
     cdef Vector3 lineDirection, linePoint
-    cdef bint valid
-    intersectPlanePlane(&_firstPlanePoint, &_firstPlaneNormal,
-    &_secondPlanePoint, &_secondPlaneNormal,
-    &lineDirection, &linePoint, &valid)
-    return toPyVector3(&lineDirection), toPyVector3(&linePoint), valid
+    cdef char valid
+    intersect_PlanePlane(&_firstPlanePoint, &_firstPlaneNormal,
+                         &_secondPlanePoint, &_secondPlaneNormal,
+                         &lineDirection, &linePoint, &valid)
+    return toPyVector3(&lineDirection), toPyVector3(&linePoint), bool(valid)
 
 cdef intersectSpherePlane(Vector3 *sphereCenter, double sphereRadius,
                         Vector3 *planePoint, Vector3 *planeNormal,
