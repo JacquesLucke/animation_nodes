@@ -1,18 +1,18 @@
 import bpy
-from ... base_types import VectorizedNode
+from ... base_types import AnimationNode, VectorizedSocket
 
-class ReverseTextNode(bpy.types.Node, VectorizedNode):
+class ReverseTextNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ReverseTextNode"
     bl_label = "Reverse Text"
 
-    useList = VectorizedNode.newVectorizeProperty()
+    useList = VectorizedSocket.newProperty()
 
     def create(self):
-        self.newVectorizedInput("Text", "useList",
-            ("Text", "inText"), ("Texts", "inTexts"))
+        self.newInput(VectorizedSocket("Text", "useList",
+            ("Text", "inText"), ("Texts", "inTexts")))
 
-        self.newVectorizedOutput("Text", "useList",
-            ("Text", "outText"), ("Texts", "outTexts"))
+        self.newOutput(VectorizedSocket("Text", "useList",
+            ("Text", "outText"), ("Texts", "outTexts")))
 
     def getExecutionCode(self, required):
         if self.useList:
