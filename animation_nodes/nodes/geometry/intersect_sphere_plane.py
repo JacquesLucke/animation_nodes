@@ -2,7 +2,7 @@ import bpy
 from mathutils import Vector
 from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import VirtualVector3DList, VirtualDoubleList
-from . c_utils import intersectSpherePlaneList, intersectSpherePlaneSingle
+from . c_utils import intersect_SpherePlane_List, intersect_SpherePlane_Single
 
 class IntersectSpherePlaneNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_IntersectSpherePlaneNode"
@@ -34,7 +34,7 @@ class IntersectSpherePlaneNode(bpy.types.Node, AnimationNode):
             codeProperties = dict(default = (0, 0, 1))))
 
         props = ["usePlanePointList", "usePlaneNormalList",
-        "useSphereCenterList", "useSphereRadiusList"]
+                 "useSphereCenterList", "useSphereRadiusList"]
 
         self.newOutput(VectorizedSocket("Vector", props,
             ("Circle Center", "circleCenter"),
@@ -48,25 +48,23 @@ class IntersectSpherePlaneNode(bpy.types.Node, AnimationNode):
             ("Valids", "valids")))
 
     def getExecutionFunctionName(self):
-        useList =  any((self.usePlanePointList, self.usePlaneNormalList,
-        self.useSphereCenterList, self.useSphereRadiusList))
+        useList = any((self.usePlanePointList, self.usePlaneNormalList,
+                       self.useSphereCenterList, self.useSphereRadiusList))
         if useList:
             return "execute_List"
         else:
             return "execute_Single"
 
     def execute_List(self, sphereCenters, sphereRadii, planePoints, planeNormals):
-        sphereCenters = VirtualVector3DList.fromListOrElement(sphereCenters,
-        Vector((0, 0, 0)))
+        sphereCenters = VirtualVector3DList.fromListOrElement(sphereCenters, Vector((0, 0, 0)))
         sphereRadii = VirtualDoubleList.fromListOrElement(sphereRadii, 1)
-        planePoints = VirtualVector3DList.fromListOrElement(planePoints,
-        Vector((0, 0, 0)))
-        planeNormals = VirtualVector3DList.fromListOrElement(planeNormals,
-        Vector((0, 0, 1)))
+        planePoints = VirtualVector3DList.fromListOrElement(planePoints, Vector((0, 0, 0)))
+        planeNormals = VirtualVector3DList.fromListOrElement(planeNormals, Vector((0, 0, 1)))
         amount = VirtualVector3DList.getMaxRealLength(sphereCenters, sphereRadii,
-        planePoints, planeNormals)
-        return intersectSpherePlaneList(amount, sphereCenters, sphereRadii,
-        planePoints, planeNormals)
+                                                      planePoints, planeNormals)
+        return intersect_SpherePlane_List(amount,
+            sphereCenters, sphereRadii,
+            planePoints, planeNormals)
 
     def execute_Single(self, sphereCenter, sphereRadius, planePoint, planeNormal):
-        return intersectSpherePlaneSingle(sphereCenter, sphereRadius, planePoint, planeNormal)
+        return intersect_SpherePlane_Single(sphereCenter, sphereRadius, planePoint, planeNormal)
