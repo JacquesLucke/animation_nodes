@@ -1,28 +1,28 @@
 import bpy
 from bpy.props import *
 from ... events import executionCodeChanged
-from ... base_types import VectorizedNode
 from . c_utils import getAxisListOfEulerList
+from ... base_types import AnimationNode, VectorizedSocket
 
-class SeparateEulerNode(bpy.types.Node, VectorizedNode):
+class SeparateEulerNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SeparateEulerNode"
     bl_label = "Separate Euler"
 
     useDegree = BoolProperty(name = "Use Degree", default = False,
         update = executionCodeChanged)
 
-    useList = VectorizedNode.newVectorizeProperty()
+    useList = VectorizedSocket.newProperty()
 
     def create(self):
-        self.newVectorizedInput("Euler", "useList",
-            ("Euler", "euler"), ("Eulers", "eulers"))
+        self.newInput(VectorizedSocket("Euler", "useList",
+            ("Euler", "euler"), ("Eulers", "eulers")))
 
-        self.newVectorizedOutput("Float", "useList",
-            ("X", "x"), ("X", "x"))
-        self.newVectorizedOutput("Float", "useList",
-            ("Y", "y"), ("Y", "y"))
-        self.newVectorizedOutput("Float", "useList",
-            ("Z", "z"), ("Z", "z"))
+        self.newOutput(VectorizedSocket("Float", "useList",
+            ("X", "x"), ("X", "x")))
+        self.newOutput(VectorizedSocket("Float", "useList",
+            ("Y", "y"), ("Y", "y")))
+        self.newOutput(VectorizedSocket("Float", "useList",
+            ("Z", "z"), ("Z", "z")))
 
     def draw(self, layout):
         layout.prop(self, "useDegree")
