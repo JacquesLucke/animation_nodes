@@ -406,9 +406,12 @@ def intersect_SphereSphere_Single(firstSphereCenter,
                            &circleCenter, &circleNormal, &circleRadius, &valid)
     return toPyVector3(&circleCenter), toPyVector3(&circleNormal), circleRadius, bool(valid)
 
+# Project Point On Line
+################################################
+
 @cython.cdivision(True)
-cdef projectPointOnLine(Vector3 *lineStart, Vector3 *lineEnd, Vector3 *point,
-                        Vector3 *outProjection, double *outParameter, double *outDistance):
+cdef project_PointOnLine(Vector3 *lineStart, Vector3 *lineEnd, Vector3 *point,
+                         Vector3 *outProjection, double *outParameter, double *outDistance):
     cdef Vector3 direction1, direction2, unitDirection, projVector, projection
     cdef double factor, length, parameter, distance
     subVec3(&direction1, lineEnd, lineStart)
@@ -420,37 +423,34 @@ cdef projectPointOnLine(Vector3 *lineStart, Vector3 *lineEnd, Vector3 *point,
     length = lengthVec3(&direction1)
     parameter = factor / length if length != 0 else 0
     distance = distanceVec3(&projVector, point)
+
     outProjection[0] = projection
     outParameter[0] = parameter
     outDistance[0] = distance
 
-def projectPointOnLineList(Py_ssize_t amount,
-                            VirtualVector3DList lineStartList,
-                            VirtualVector3DList lineEndList,
-                            VirtualVector3DList pointList):
+def project_PointOnLine_List(Py_ssize_t amount,
+                             VirtualVector3DList lineStartList,
+                             VirtualVector3DList lineEndList,
+                             VirtualVector3DList pointList):
     cdef Vector3DList projectionList = Vector3DList(length = amount)
     cdef DoubleList parameterList = DoubleList(length = amount)
     cdef DoubleList distanceList = DoubleList(length = amount)
-    cdef Vector3 projection
-    cdef double parameter, distance
     cdef Py_ssize_t i
     for i in range(amount):
-        projectPointOnLine(lineStartList.get(i), lineEndList.get(i), pointList.get(i),
-        &projection, &parameter, &distance)
-        projectionList.data[i] = projection
-        parameterList.data[i] = parameter
-        distanceList.data[i] = distance
+        project_PointOnLine(lineStartList.get(i), lineEndList.get(i), pointList.get(i),
+                           projectionList.data + i, parameterList.data + i,
+                           distanceList.data + i)
     return projectionList, parameterList, distanceList
 
-def projectPointOnLineSingle(lineStart,
-                            lineEnd,
-                            point):
+def project_PointOnLine_Single(lineStart,
+                               lineEnd,
+                               point):
     cdef Vector3 _lineStart = toVector3(lineStart)
     cdef Vector3 _lineEnd = toVector3(lineEnd)
     cdef Vector3 _point = toVector3(point)
     cdef Vector3 projection
     cdef double parameter, distance
-    projectPointOnLine(&_lineStart, &_lineEnd, &_point, &projection, &parameter, &distance)
+    project_PointOnLine(&_lineStart, &_lineEnd, &_point, &projection, &parameter, &distance)
     return toPyVector3(&projection), parameter, distance
 
 cdef projectPointOnPlane(Vector3 *planePoint, Vector3 *planeNormal, Vector3 *point,
