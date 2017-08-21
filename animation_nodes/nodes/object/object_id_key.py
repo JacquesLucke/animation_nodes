@@ -2,10 +2,10 @@ import bpy
 from bpy.props import *
 from ... math import composeMatrixList
 from ... tree_info import getNodesByType
-from ... base_types import VectorizedNode
+from ... base_types import AnimationNode, VectorizedSocket
 from ... id_keys import keyDataTypeItems, IDKey, findsIDKeys, updateIdKeysList
 
-class ObjectIDKeyNode(bpy.types.Node, VectorizedNode):
+class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectIDKeyNode"
     bl_label = "Object ID Key"
     bl_width_default = 160
@@ -24,36 +24,38 @@ class ObjectIDKeyNode(bpy.types.Node, VectorizedNode):
     keyName = StringProperty(name = "Key Name", default = "",
         update = keyChanged)
 
-    useList = VectorizedNode.newVectorizeProperty()
+    useList = VectorizedSocket.newProperty()
 
     def create(self):
-        self.newVectorizedInput("Object", "useList",
+        self.newInput(VectorizedSocket("Object", "useList",
             ("Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
-            ("Objects", "objects"))
+            ("Objects", "objects")))
 
-        if self.keyName != "":
-            if self.keyDataType == "Transforms":
-                self.newVectorizedOutput("Vector", "useList",
-                    ("Location", "location"), ("Locations", "locations"))
-                self.newVectorizedOutput("Euler", "useList",
-                    ("Rotation", "rotation"), ("Rotations", "rotations"))
-                self.newVectorizedOutput("Vector", "useList",
-                    ("Scale", "scale"), ("Scales", "scales"))
-                self.newVectorizedOutput("Matrix", "useList",
-                    ("Matrix", "matrix"), ("Matrices", "matrices"))
-            elif self.keyDataType == "Text":
-                self.newVectorizedOutput("Text", "useList",
-                    ("Text", "text"), ("Texts", "texts"))
-            elif self.keyDataType == "Integer":
-                self.newVectorizedOutput("Integer", "useList",
-                    ("Number", "number"), ("Numbers", "numbers"))
-            elif self.keyDataType == "Float":
-                self.newVectorizedOutput("Float", "useList",
-                    ("Number", "number"), ("Numbers", "numbers"))
+        if self.keyName == "":
+            return
 
-            self.newVectorizedOutput("Boolean", "useList",
-                ("Exists", "exists", dict(hide = True)),
-                ("Exists", "exists", dict(hide = True)))
+        if self.keyDataType == "Transforms":
+            self.newOutput(VectorizedSocket("Vector", "useList",
+                ("Location", "location"), ("Locations", "locations")))
+            self.newOutput(VectorizedSocket("Euler", "useList",
+                ("Rotation", "rotation"), ("Rotations", "rotations")))
+            self.newOutput(VectorizedSocket("Vector", "useList",
+                ("Scale", "scale"), ("Scales", "scales")))
+            self.newOutput(VectorizedSocket("Matrix", "useList",
+                ("Matrix", "matrix"), ("Matrices", "matrices")))
+        elif self.keyDataType == "Text":
+            self.newOutput(VectorizedSocket("Text", "useList",
+                ("Text", "text"), ("Texts", "texts")))
+        elif self.keyDataType == "Integer":
+            self.newOutput(VectorizedSocket("Integer", "useList",
+                ("Number", "number"), ("Numbers", "numbers")))
+        elif self.keyDataType == "Float":
+            self.newOutput(VectorizedSocket("Float", "useList",
+                ("Number", "number"), ("Numbers", "numbers")))
+
+        self.newOutput(VectorizedSocket("Boolean", "useList",
+            ("Exists", "exists", dict(hide = True)),
+            ("Exists", "exists", dict(hide = True))))
 
     def drawAdvanced(self, layout):
         col = layout.column()
@@ -114,7 +116,7 @@ class ObjectIDKeyNode(bpy.types.Node, VectorizedNode):
             if "scales" in required or useMatrices:
                 yield "scales = _key.getScales(objects, %s)" % keyName
             if useMatrices:
-                yield "matrices = animation_nodes.math.composeMatrixList(locations, rotations, scales)"
+                yield "matrices = AN.math.composeMatrixList(locations, rotations, scales)"
         elif dataType == "Text":
             if "texts" in required:
                 yield "texts = _key.getList(objects, %s)" % keyName
