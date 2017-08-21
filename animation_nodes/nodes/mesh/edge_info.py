@@ -1,40 +1,40 @@
 import bpy
 from bpy.props import *
-from ... base_types import VectorizedNode
+from ... base_types import AnimationNode, VectorizedSocket
 from . c_utils import (
     calculateEdgeLengths, calculateEdgeCenters,
     getEdgeStartPoints, getEdgeEndPoints
 )
 
-class EdgeInfoNode(bpy.types.Node, VectorizedNode):
+class EdgeInfoNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_EdgeInfoNode"
     bl_label = "Edge Info"
 
-    useEdgeList = VectorizedNode.newVectorizeProperty()
+    useEdgeList = VectorizedSocket.newProperty()
     errorMessage = StringProperty()
 
     def create(self):
         self.newInput("Vector List", "Points", "points")
 
-        self.newVectorizedInput("Edge Indices", "useEdgeList",
+        self.newInput(VectorizedSocket("Edge Indices", "useEdgeList",
             ("Edge Indices", "edgeIndices"),
-            ("Edge Indices List", "edgeIndicesList"))
+            ("Edge Indices List", "edgeIndicesList")))
 
-        self.newVectorizedOutput("Vector", "useEdgeList",
+        self.newOutput(VectorizedSocket("Vector", "useEdgeList",
             ("Start", "start"),
-            ("Starts", "starts"))
+            ("Starts", "starts")))
 
-        self.newVectorizedOutput("Vector", "useEdgeList",
+        self.newOutput(VectorizedSocket("Vector", "useEdgeList",
             ("End", "end"),
-            ("Ends", "ends"))
+            ("Ends", "ends")))
 
-        self.newVectorizedOutput("Vector", "useEdgeList",
+        self.newOutput(VectorizedSocket("Vector", "useEdgeList",
             ("Center", "center"),
-            ("Centers", "centers"))
+            ("Centers", "centers")))
 
-        self.newVectorizedOutput("Float", "useEdgeList",
+        self.newOutput(VectorizedSocket("Float", "useEdgeList",
             ("Length", "length"),
-            ("Lengths", "lengths"))
+            ("Lengths", "lengths")))
 
     def draw(self, layout):
         if self.errorMessage != "" and self.inputs[1].isLinked:
@@ -61,10 +61,14 @@ class EdgeInfoNode(bpy.types.Node, VectorizedNode):
 
     def iterExecutionCode_List(self, required):
         yield "try:"
-        if "lengths" in required: yield "    lengths = self.calculateEdgeLengths(points, edgeIndicesList)"
-        if "centers" in required: yield "    centers = self.calculateEdgeCenters(points, edgeIndicesList)"
-        if "starts" in required: yield "    starts = self.getEdgeStartPoints(points, edgeIndicesList)"
-        if "ends" in required: yield "    ends = self.getEdgeEndPoints(points, edgeIndicesList)"
+        if "lengths" in required:
+            yield "    lengths = self.calculateEdgeLengths(points, edgeIndicesList)"
+        if "centers" in required:
+            yield "    centers = self.calculateEdgeCenters(points, edgeIndicesList)"
+        if "starts" in required:
+            yield "    starts = self.getEdgeStartPoints(points, edgeIndicesList)"
+        if "ends" in required:
+            yield "    ends = self.getEdgeEndPoints(points, edgeIndicesList)"
         yield "    pass"
         yield "except IndexError:"
         yield "    self.errorMessage = 'invalid edges'"
