@@ -2,7 +2,7 @@ import bpy
 from mathutils import Vector
 from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import VirtualVector3DList, VirtualDoubleList
-from . c_utils import intersectSphereSphereList, intersectSphereSphereSingle
+from . c_utils import intersect_SphereSphere_List, intersect_SphereSphere_Single
 
 class IntersectSphereSphereNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_IntersectSphereSphereNode"
@@ -34,7 +34,7 @@ class IntersectSphereSphereNode(bpy.types.Node, AnimationNode):
             codeProperties = dict(default = 1)))
 
         props = ["useSecondSphereCenterList", "useSecondSphereRadiusList",
-        "useFirstSphereCenterList", "useFirstSphereRadiusList"]
+                 "useFirstSphereCenterList", "useFirstSphereRadiusList"]
 
         self.newOutput(VectorizedSocket("Vector", props,
             ("Circle Center", "circleCenter"),
@@ -52,26 +52,25 @@ class IntersectSphereSphereNode(bpy.types.Node, AnimationNode):
 
     def getExecutionFunctionName(self):
         useList = any((self.useSecondSphereCenterList, self.useSecondSphereRadiusList,
-        self.useFirstSphereCenterList, self.useFirstSphereRadiusList))
+                       self.useFirstSphereCenterList, self.useFirstSphereRadiusList))
         if useList:
             return "execute_List"
         else:
             return "execute_Single"
 
     def execute_List(self, firstSphereCenters, firstSphereRadii,
-    secondSphereCenters, secondSphereRadii):
-        firstSphereCenters = VirtualVector3DList.fromListOrElement(firstSphereCenters,
-        Vector((0, 0, -0.5)))
+                           secondSphereCenters, secondSphereRadii):
+        firstSphereCenters = VirtualVector3DList.fromListOrElement(firstSphereCenters, Vector((0, 0, -0.5)))
         firstSphereRadii = VirtualDoubleList.fromListOrElement(firstSphereRadii, 1)
-        secondSphereCenters = VirtualVector3DList.fromListOrElement(secondSphereCenters,
-        Vector((0, 0, 0.5)))
+        secondSphereCenters = VirtualVector3DList.fromListOrElement(secondSphereCenters, Vector((0, 0, 0.5)))
         secondSphereRadii = VirtualDoubleList.fromListOrElement(secondSphereRadii, 1)
         amount = VirtualVector3DList.getMaxRealLength(firstSphereCenters, firstSphereRadii,
-        secondSphereCenters, secondSphereRadii)
-        return intersectSphereSphereList(amount, firstSphereCenters, firstSphereRadii,
-        secondSphereCenters, secondSphereRadii)
+                                                      secondSphereCenters, secondSphereRadii)
+        return intersect_SphereSphere_List(amount,
+            firstSphereCenters, firstSphereRadii,
+            secondSphereCenters, secondSphereRadii)
 
     def execute_Single(self, firstSphereCenter, firstSphereRadius,
-    secondSphereCenter, secondSphereRadius):
-        return intersectSphereSphereSingle(firstSphereCenter, firstSphereRadius,
-        secondSphereCenter, secondSphereRadius)
+                             secondSphereCenter, secondSphereRadius):
+        return intersect_SphereSphere_Single(firstSphereCenter, firstSphereRadius,
+                                             secondSphereCenter, secondSphereRadius)
