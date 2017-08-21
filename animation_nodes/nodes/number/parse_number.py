@@ -1,19 +1,19 @@
 import bpy
 from bpy.props import *
-from ... base_types import VectorizedNode
+from ... base_types import AnimationNode, VectorizedSocket
 
-class ParseNumberNode(bpy.types.Node, VectorizedNode):
+class ParseNumberNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ParseNumberNode"
     bl_label = "Parse Number"
 
     parsingSuccessfull = BoolProperty()
-    useList = VectorizedNode.newVectorizeProperty()
+    useList = VectorizedSocket.newProperty()
 
     def create(self):
-        self.newVectorizedInput("Text", "useList",
-            ("Text", "text", dict(value = "0")), ("Texts", "texts"))
-        self.newVectorizedOutput("Float", "useList",
-            ("Number", "number"), ("Numbers", "numbers"))
+        self.newInput(VectorizedSocket("Text", "useList",
+            ("Text", "text", dict(value = "0")), ("Texts", "texts")))
+        self.newOutput(VectorizedSocket("Float", "useList",
+            ("Number", "number"), ("Numbers", "numbers")))
 
     def draw(self, layout):
         if not self.parsingSuccessfull:
