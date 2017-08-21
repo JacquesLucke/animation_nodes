@@ -2,7 +2,7 @@ import bpy
 from mathutils import Vector
 from ... data_structures import VirtualVector3DList
 from ... base_types import AnimationNode, VectorizedSocket
-from . c_utils import projectPointOnPlaneList, projectPointOnPlaneSingle
+from . c_utils import project_PointOnPlane_List, project_PointOnPlane_Single
 
 class ProjectPointOnPlaneNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ProjectPointOnPlaneNode"
@@ -40,7 +40,7 @@ class ProjectPointOnPlaneNode(bpy.types.Node, AnimationNode):
 
     def getExecutionFunctionName(self):
         useList = any((self.usePlanePointList, self.usePlaneNormalList,
-        self.usePointList))
+                       self.usePointList))
         if useList:
             return "execute_List"
         else:
@@ -51,7 +51,7 @@ class ProjectPointOnPlaneNode(bpy.types.Node, AnimationNode):
         planeNormals = VirtualVector3DList.fromListOrElement(planeNormals, Vector((0, 0, 1)))
         points = VirtualVector3DList.fromListOrElement(points, Vector((0, 0, 1)))
         amount = VirtualVector3DList.getMaxRealLength(planePoints, planeNormals, points)
-        return projectPointOnPlaneList(amount, planePoints, planeNormals, points)
+        return project_PointOnPlane_List(amount, planePoints, planeNormals, points)
 
     def execute_Single(self, planePoint, planeNormal, point):
-        return projectPointOnPlaneSingle(planePoint, planeNormal, point)
+        return project_PointOnPlane_Single(planePoint, planeNormal, point)

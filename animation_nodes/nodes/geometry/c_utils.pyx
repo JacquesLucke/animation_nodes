@@ -453,8 +453,11 @@ def project_PointOnLine_Single(lineStart,
     project_PointOnLine(&_lineStart, &_lineEnd, &_point, &projection, &parameter, &distance)
     return toPyVector3(&projection), parameter, distance
 
-cdef projectPointOnPlane(Vector3 *planePoint, Vector3 *planeNormal, Vector3 *point,
-                        Vector3 *outProjection, double *outDistance):
+# Project Point On Line
+################################################
+
+cdef project_PointOnPlane(Vector3 *planePoint, Vector3 *planeNormal, Vector3 *point,
+                          Vector3 *outProjection, double *outDistance):
     cdef Vector3 direction, unitNormal, projVector, projection
     cdef double distance
     subVec3(&direction, point, planePoint)
@@ -462,33 +465,30 @@ cdef projectPointOnPlane(Vector3 *planePoint, Vector3 *planeNormal, Vector3 *poi
     distance = dotVec3(&direction, &unitNormal)
     scaleVec3(&projVector, &unitNormal, -distance)
     addVec3(&projection, point, &projVector)
+
     outProjection[0] = projection
     outDistance[0] = distance
 
-def projectPointOnPlaneList(Py_ssize_t amount,
-                            VirtualVector3DList planePointList,
-                            VirtualVector3DList planeNormalList,
-                            VirtualVector3DList pointList):
+def project_PointOnPlane_List(Py_ssize_t amount,
+                              VirtualVector3DList planePointList,
+                              VirtualVector3DList planeNormalList,
+                              VirtualVector3DList pointList):
     cdef Vector3DList projectionList = Vector3DList(length = amount)
     cdef DoubleList distanceList = DoubleList(length = amount)
-    cdef Vector3 projection
-    cdef double distance
     cdef Py_ssize_t i
     for i in range(amount):
-        projectPointOnPlane(planePointList.get(i), planeNormalList.get(i), pointList.get(i),
-        &projection, &distance)
-        projectionList.data[i] = projection
-        distanceList.data[i] = distance
+        project_PointOnPlane(planePointList.get(i), planeNormalList.get(i), pointList.get(i),
+                             projectionList.data + i, distanceList.data + i)
     return projectionList, distanceList
 
-def projectPointOnPlaneSingle(planePoint,
-                            planeNormal,
-                            point):
+def project_PointOnPlane_Single(planePoint,
+                                planeNormal,
+                                point):
     cdef Vector3 _planePoint = toVector3(planePoint)
     cdef Vector3 _planeNormal = toVector3(planeNormal)
     cdef Vector3 _point = toVector3(point)
     cdef Vector3 projection
     cdef double distance
-    projectPointOnPlane(&_planePoint, &_planeNormal, &_point,
-    &projection, &distance)
+    project_PointOnPlane(&_planePoint, &_planeNormal, &_point,
+                         &projection, &distance)
     return toPyVector3(&projection), distance
