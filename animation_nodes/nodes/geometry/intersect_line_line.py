@@ -2,7 +2,7 @@ import bpy
 from mathutils import Vector
 from ... data_structures import VirtualVector3DList
 from ... base_types import AnimationNode, VectorizedSocket
-from . c_utils import intersectLineLineList, intersectLineLineSingle
+from . c_utils import intersect_LineLine_List, intersect_LineLine_Single
 
 class IntersectLineLineNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_IntersectLineLineNode"
@@ -35,7 +35,7 @@ class IntersectLineLineNode(bpy.types.Node, AnimationNode):
             codeProperties = dict(default = (-1, 1, 0))))
 
         props = ["useFirstLineStartList", "useFirstLineEndList",
-        "useSecondLineStartList", "useSecondLineEndList"]
+                 "useSecondLineStartList", "useSecondLineEndList"]
 
         self.newOutput(VectorizedSocket("Vector", props,
             ("First Nearest Point", "firstNearestPoint"),
@@ -57,25 +57,23 @@ class IntersectLineLineNode(bpy.types.Node, AnimationNode):
 
     def getExecutionFunctionName(self):
         useList = any((self.useFirstLineStartList, self.useFirstLineEndList,
-        self.useSecondLineStartList, self.useSecondLineEndList))
+                       self.useSecondLineStartList, self.useSecondLineEndList))
         if useList:
             return "execute_List"
         else:
             return "execute_Single"
 
     def execute_List(self, firstLineStarts, firstLineEnds, secondLineStarts, secondLineEnds):
-        firstLineStarts = VirtualVector3DList.fromListOrElement(firstLineStarts,
-        Vector((1, 1, 0)))
-        firstLineEnds = VirtualVector3DList.fromListOrElement(firstLineEnds,
-        Vector((-1, -1, 0)))
-        secondLineStarts = VirtualVector3DList.fromListOrElement(secondLineStarts,
-        Vector((1, -1, 0)))
-        secondLineEnds = VirtualVector3DList.fromListOrElement(secondLineEnds,
-        Vector((-1, 1, 0)))
+        firstLineStarts = VirtualVector3DList.fromListOrElement(firstLineStarts, Vector((1, 1, 0)))
+        firstLineEnds = VirtualVector3DList.fromListOrElement(firstLineEnds, Vector((-1, -1, 0)))
+        secondLineStarts = VirtualVector3DList.fromListOrElement(secondLineStarts, Vector((1, -1, 0)))
+        secondLineEnds = VirtualVector3DList.fromListOrElement(secondLineEnds, Vector((-1, 1, 0)))
         amount = VirtualVector3DList.getMaxRealLength(firstLineStarts, firstLineEnds,
-        secondLineStarts, secondLineEnds)
-        return intersectLineLineList(amount, firstLineStarts, firstLineEnds,
-        secondLineStarts, secondLineEnds)
+                                                      secondLineStarts, secondLineEnds)
+        return intersect_LineLine_List(amount,
+            firstLineStarts, firstLineEnds,
+            secondLineStarts, secondLineEnds)
 
     def execute_Single(self, firstLineStart, firstLineEnd, secondLineStart, secondLineEnd):
-        return intersectLineLineSingle(firstLineStart, firstLineEnd, secondLineStart, secondLineEnd)
+        return intersect_LineLine_Single(firstLineStart, firstLineEnd,
+            secondLineStart, secondLineEnd)
