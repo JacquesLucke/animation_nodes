@@ -2,7 +2,7 @@ import bpy
 from mathutils import Vector
 from ... data_structures import VirtualVector3DList
 from ... base_types import AnimationNode, VectorizedSocket
-from . c_utils import intersectLinePlaneList, intersectLinePlaneSingle
+from . c_utils import intersect_LinePlane_List, intersect_LinePlane_Single
 
 class IntersectLinePlaneNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_IntersectLinePlaneNode"
@@ -34,7 +34,7 @@ class IntersectLinePlaneNode(bpy.types.Node, AnimationNode):
             codeProperties = dict(default = (0, 0, 1))))
 
         props = ["useLineStartList", "useLineEndList",
-        "usePlaneNormalList", "usePlanePointList"]
+                 "usePlaneNormalList", "usePlanePointList"]
 
         self.newOutput(VectorizedSocket("Vector", props,
             ("Intersection", "intersection"),
@@ -48,24 +48,20 @@ class IntersectLinePlaneNode(bpy.types.Node, AnimationNode):
 
     def getExecutionFunctionName(self):
         useList = any((self.useLineStartList, self.useLineEndList,
-        self.usePlaneNormalList, self.usePlanePointList))
+                       self.usePlaneNormalList, self.usePlanePointList))
         if useList:
             return "execute_List"
         else:
             return "execute_Single"
 
     def execute_List(self, lineStarts, lineEnds, planePoints, planeNormals):
-        lineStarts = VirtualVector3DList.fromListOrElement(lineStarts,
-        Vector((0, 0, 1)))
-        lineEnds = VirtualVector3DList.fromListOrElement(lineEnds,
-        Vector((0, 0, -1)))
-        planePoints = VirtualVector3DList.fromListOrElement(planePoints,
-        Vector((0, 0, 0)))
-        planeNormals = VirtualVector3DList.fromListOrElement(planeNormals,
-        Vector((0, 0, 1)))
+        lineStarts = VirtualVector3DList.fromListOrElement(lineStarts, Vector((0, 0, 1)))
+        lineEnds = VirtualVector3DList.fromListOrElement(lineEnds, Vector((0, 0, -1)))
+        planePoints = VirtualVector3DList.fromListOrElement(planePoints, Vector((0, 0, 0)))
+        planeNormals = VirtualVector3DList.fromListOrElement(planeNormals, Vector((0, 0, 1)))
         amount = VirtualVector3DList.getMaxRealLength(lineStarts, lineEnds,
-        planePoints, planeNormals)
-        return intersectLinePlaneList(amount, lineStarts, lineEnds, planePoints, planeNormals)
+                                                      planePoints, planeNormals)
+        return intersect_LinePlane_List(amount, lineStarts, lineEnds, planePoints, planeNormals)
 
     def execute_Single(self, lineStart, lineEnd, planePoint, planeNormal):
-        return intersectLinePlaneSingle(lineStart, lineEnd, planePoint, planeNormal)
+        return intersect_LinePlane_Single(lineStart, lineEnd, planePoint, planeNormal)
