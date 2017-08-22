@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import *
-from ... base_types import VectorizedNode
+from ... base_types import AnimationNode, VectorizedSocket
 from ... math cimport (Vector3, toVector3,
                        absoluteVec3, addVec3, subVec3, multVec3, divideVec3,
                        crossVec3, projectVec3, reflectVec3, normalizeLengthVec3,
@@ -166,20 +166,20 @@ searchItems = {
     "Multiply Vectors" : "Multiply",
     "Normalize Vector" : "Normalize"}
 
-class VectorMathNode(bpy.types.Node, VectorizedNode):
+class VectorMathNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_VectorMathNode"
     bl_label = "Vector Math"
     dynamicLabelType = "HIDDEN_ONLY"
     searchTags = [(name, {"operation" : repr(op)}) for name, op in searchItems.items()]
 
     operation = EnumProperty(name = "Operation", default = "Add",
-        items = operationItems, update = VectorizedNode.refresh)
+        items = operationItems, update = AnimationNode.refresh)
 
-    useListA = VectorizedNode.newVectorizeProperty()
-    useListB = VectorizedNode.newVectorizeProperty()
-    useListLength = VectorizedNode.newVectorizeProperty()
-    useListFactor = VectorizedNode.newVectorizeProperty()
-    useListStep = VectorizedNode.newVectorizeProperty()
+    useListA = VectorizedSocket.newProperty()
+    useListB = VectorizedSocket.newProperty()
+    useListLength = VectorizedSocket.newProperty()
+    useListFactor = VectorizedSocket.newProperty()
+    useListStep = VectorizedSocket.newProperty()
 
     errorMessage = StringProperty()
 
@@ -192,11 +192,11 @@ class VectorMathNode(bpy.types.Node, VectorizedNode):
             usedProperties.append(listProperty)
             baseType, *_ = dataTypeById[socketData[0]]
 
-            self.newVectorizedInput(baseType, listProperty,
-                (name, name.lower()), (name, name.lower()))
+            self.newInput(VectorizedSocket(baseType, listProperty,
+                (name, name.lower()), (name, name.lower())))
 
-        self.newVectorizedOutput("Vector", [usedProperties],
-            ("Result", "result"), ("Results", "results"))
+        self.newOutput(VectorizedSocket("Vector", usedProperties,
+            ("Result", "result"), ("Results", "results")))
 
     def draw(self, layout):
         layout.prop(self, "operation", text = "")
