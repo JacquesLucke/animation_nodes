@@ -1,7 +1,6 @@
 from . node_tree import AnimationNodeTree
 
-from . nodes import (AnimationNode,
-                     VectorizedNode)
+from . nodes import AnimationNode
 
 from . sockets import (AnimationNodeSocket,
                        ListSocket,
