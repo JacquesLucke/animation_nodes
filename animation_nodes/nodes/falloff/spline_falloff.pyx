@@ -1,8 +1,8 @@
 import bpy
 from bpy.props import *
-from ... base_types import VectorizedNode
 from ... events import propertyChanged
 from ... math cimport Vector3, distanceVec3
+from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures cimport Spline, PolySpline, BaseFalloff
 
 from . mix_falloffs import MixFalloffs
@@ -14,7 +14,7 @@ mixListTypeItems = [
     ("ADD", "Add", "", "NONE", 1)
 ]
 
-class SplineFalloffNode(bpy.types.Node, VectorizedNode):
+class SplineFalloffNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SplineFalloffNode"
     bl_label = "Spline Falloff"
     bl_width_default = 160
@@ -25,13 +25,14 @@ class SplineFalloffNode(bpy.types.Node, VectorizedNode):
     mixListType = EnumProperty(name = "Mix List Type", default = "MAX",
         items = mixListTypeItems, update = propertyChanged)
 
-    useSplineList = VectorizedNode.newVectorizeProperty()
+    useSplineList = VectorizedSocket.newProperty()
 
     def create(self):
         socketProps = dict(defaultDrawType = "PROPERTY_ONLY", dataIsModified = True)
-        self.newVectorizedInput("Spline", "useSplineList",
+        self.newInput(VectorizedSocket("Spline", "useSplineList",
             ("Spline", "spline", socketProps),
-            ("Splines", "splines", socketProps))
+            ("Splines", "splines", socketProps)))
+            
         self.newInput("Float", "Distance", "distance", value = 0)
         self.newInput("Float", "Width", "width", value = 1, minValue = 0)
         self.newInput("Interpolation", "Interpolation", "interpolation",

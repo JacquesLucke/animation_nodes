@@ -1,5 +1,3 @@
-from . socket_effects import (AutoSelectListDataType,
-                              AutoSelectDataType,
-                              AutoSelectVectorization)
+from . socket_effects import AutoSelectVectorization
 
 from . code_effects import VectorizeCodeEffect

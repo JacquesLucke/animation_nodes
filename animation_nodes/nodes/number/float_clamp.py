@@ -1,25 +1,25 @@
 import bpy
 from bpy.props import *
-from ... base_types import VectorizedNode
 from . c_utils import clamp_DoubleList
+from ... base_types import AnimationNode, VectorizedSocket
 
-class FloatClampNode(bpy.types.Node, VectorizedNode):
+class FloatClampNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_FloatClampNode"
     bl_label = "Clamp"
     dynamicLabelType = "HIDDEN_ONLY"
 
-    useValueList = VectorizedNode.newVectorizeProperty()
+    useValueList = VectorizedSocket.newProperty()
 
     def create(self):
-        self.newVectorizedInput("Float", "useValueList",
+        self.newInput(VectorizedSocket("Float", "useValueList",
             ("Value", "value"),
-            ("Values", "values", dict(dataIsModified = True)))
+            ("Values", "values", dict(dataIsModified = True))))
 
         self.newInput("Float", "Min", "minValue", value = 0.0)
         self.newInput("Float", "Max", "maxValue", value = 1.0)
 
-        self.newVectorizedOutput("Float", "useValueList",
-            ("Value", "outValue"), ("Values", "outValues"))
+        self.newOutput(VectorizedSocket("Float", "useValueList",
+            ("Value", "outValue"), ("Values", "outValues")))
 
     def getExecutionFunctionName(self):
         if self.useValueList:

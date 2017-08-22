@@ -1,14 +1,14 @@
 import bpy
 from bpy.props import *
 from ... events import executionCodeChanged
-from ... sockets.info import toBaseDataType, toListDataType, isBase
-from ... base_types import AnimationNode, AutoSelectListDataType
+from ... sockets.info import toBaseDataType, isBase
+from ... base_types import AnimationNode, ListTypeSelectorSocket
 
 class SetListElementNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SetListElementNode"
     bl_label = "Set List Element"
 
-    assignedType = StringProperty(update = AnimationNode.refresh, default = "Float")
+    assignedType = ListTypeSelectorSocket.newProperty(default = "Float")
 
     clampIndex = BoolProperty(name = "Clamp Index", default = False,
         description = "Clamp the index between the lowest and highest possible index",
@@ -21,19 +21,15 @@ class SetListElementNode(bpy.types.Node, AnimationNode):
     errorMessage = StringProperty()
 
     def create(self):
-        baseDataType = self.assignedType
-        listDataType = toListDataType(self.assignedType)
+        prop = ("assignedType", "BASE")
+        self.newInput(ListTypeSelectorSocket(
+            "List", "list", "LIST", prop, dataIsModified = True))
+        self.newInput(ListTypeSelectorSocket(
+            "Element", "element", "BASE", prop))
+        self.newInput("Integer", "Index", "index")
 
-        self.newInput(listDataType, "List", "list", dataIsModified = True)
-        self.newInput(baseDataType, "Element", "element")
-        self.newInput("an_IntegerSocket", "Index", "index")
-        self.newOutput(listDataType, "List", "list")
-
-        self.newSocketEffect(AutoSelectListDataType("assignedType", "BASE",
-            [(self.inputs[0], "LIST"),
-             (self.inputs[1], "BASE"),
-             (self.outputs[0], "LIST")]
-        ))
+        self.newOutput(ListTypeSelectorSocket(
+            "List", "list", "LIST", prop))
 
     def draw(self, layout):
         if self.errorMessage != "":
@@ -66,3 +62,4 @@ class SetListElementNode(bpy.types.Node, AnimationNode):
         if not isBase(baseDataType): return
         if baseDataType == self.assignedType: return
         self.assignedType = baseDataType
+        self.refresh()

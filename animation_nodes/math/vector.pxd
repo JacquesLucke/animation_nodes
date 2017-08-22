@@ -5,6 +5,7 @@ cdef struct Vector4:
     float x, y, z, w
 
 cdef float lengthVec3(Vector3* v)
+cdef float lengthSquaredVec3(Vector3* v)
 
 cdef void scaleVec3(Vector3* target, Vector3* a, float factor)
 cdef void scaleVec3_Inplace(Vector3* v, float factor)

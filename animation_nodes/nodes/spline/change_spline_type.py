@@ -1,31 +1,31 @@
 import bpy
 from bpy.props import *
 from ... events import propertyChanged
-from ... base_types import VectorizedNode
 from ... data_structures import PolySpline, BezierSpline
+from ... base_types import AnimationNode, VectorizedSocket
 
 targetTypeItems = [
     ("BEZIER", "Bezier", "Each control point has two handles", "CURVE_BEZCURVE", 0),
     ("POLY", "Poly", "Linear interpolation between the spline points", "NOCURVE", 1)
 ]
 
-class ChangeSplineTypeNode(bpy.types.Node, VectorizedNode):
+class ChangeSplineTypeNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ChangeSplineTypeNode"
     bl_label = "Change Spline Type"
-    autoVectorizeExecution = True
+    codeEffects = [VectorizedSocket.CodeEffect]
 
-    useSplineList = VectorizedNode.newVectorizeProperty()
+    useSplineList = VectorizedSocket.newProperty()
 
     targetType = EnumProperty(name = "Target Type", default = "POLY",
         items = targetTypeItems, update = propertyChanged)
 
     def create(self):
-        socket = self.newVectorizedInput("Spline", "useSplineList",
-            ("Spline", "inSpline"), ("Splines", "inSplines"))
+        socket = self.newInput(VectorizedSocket("Spline", "useSplineList",
+            ("Spline", "inSpline"), ("Splines", "inSplines")))
         socket.defaultDrawType = "PROPERTY_ONLY"
 
-        self.newVectorizedOutput("Spline", "useSplineList",
-            ("Spline", "outSpline"), ("Splines", "outSplines"))
+        self.newOutput(VectorizedSocket("Spline", "useSplineList",
+            ("Spline", "outSpline"), ("Splines", "outSplines")))
 
     def draw(self, layout):
         layout.prop(self, "targetType", text = "")

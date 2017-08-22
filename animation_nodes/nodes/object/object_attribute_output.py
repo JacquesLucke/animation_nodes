@@ -1,10 +1,10 @@
 import bpy
 from bpy.props import *
 from ... utils.code import isCodeValid
-from ... base_types import VectorizedNode
 from ... events import executionCodeChanged
+from ... base_types import AnimationNode, VectorizedSocket
 
-class ObjectAttributeOutputNode(bpy.types.Node, VectorizedNode):
+class ObjectAttributeOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectAttributeOutputNode"
     bl_label = "Object Attribute Output"
     bl_width_default = 175
@@ -12,23 +12,24 @@ class ObjectAttributeOutputNode(bpy.types.Node, VectorizedNode):
     attribute = StringProperty(name = "Attribute", default = "",
         update = executionCodeChanged)
 
-    useObjectList = VectorizedNode.newVectorizeProperty()
-    useValueList = BoolProperty(update = VectorizedNode.refresh)
+    useObjectList = VectorizedSocket.newProperty()
+    useValueList = BoolProperty(update = AnimationNode.refresh)
 
     errorMessage = StringProperty()
 
     def create(self):
-        self.newVectorizedInput("Object", "useObjectList",
+        self.newInput(VectorizedSocket("Object", "useObjectList",
             ("Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
-            ("Objects", "objects"))
+            ("Objects", "objects")))
 
-        self.newInputGroup(self.useValueList and self.useObjectList,
-            ("Generic", "Value", "value"),
-            ("Generic List", "Values", "values"))
+        if self.useValueList and self.useObjectList:
+            self.newInput("Generic List", "Values", "values")
+        else:
+            self.newInput("Generic", "Value", "value")
 
-        self.newVectorizedOutput("Object", "useObjectList",
+        self.newOutput(VectorizedSocket("Object", "useObjectList",
             ("Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
-            ("Objects", "objects"))
+            ("Objects", "objects")))
 
     def draw(self, layout):
         col = layout.column()
@@ -50,10 +51,9 @@ class ObjectAttributeOutputNode(bpy.types.Node, VectorizedNode):
         yield "    self.errorMessage = ''"
         if self.useObjectList:
             if self.useValueList:
-                yield "    if len(objects) != len(values):"
-                yield "        self.errorMessage = 'Lists have different length'"
-                yield "        raise Exception()"
-                yield "    for object, value in zip(objects, values):"
+                yield "    _values = [None] if len(values) == 0 else values"
+                yield "    _values = itertools.cycle(_values)"
+                yield "    for object, value in zip(objects, _values):"
             else:
                 yield "    for object in objects:"
             yield "        " + code

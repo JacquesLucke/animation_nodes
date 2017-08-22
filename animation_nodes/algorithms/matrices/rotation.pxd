@@ -6,12 +6,12 @@ from ... math cimport (
 from ... data_structures cimport (
     Matrix4x4List,
     DoubleList,
-    CDefaultList
+    VirtualEulerList
 )
 
 ctypedef void (*RotateFunction)(Matrix4 *target, Matrix4 *m, Euler3 *v)
 
 cpdef getRotatedMatrixList(Matrix4x4List matrices, str type,
-                           CDefaultList rotations, DoubleList influences)
+                           VirtualEulerList rotations, DoubleList influences)
 
 cdef RotateFunction getRotateFunction(str type) except *

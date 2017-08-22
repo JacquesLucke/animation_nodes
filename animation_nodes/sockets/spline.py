@@ -95,7 +95,7 @@ class SplineListSocket(bpy.types.NodeSocket, PythonListSocket):
     bl_idname = "an_SplineListSocket"
     bl_label = "Spline List Socket"
     dataType = "Spline List"
-    baseDataType = "Spline"
+    baseType = SplineSocket
     drawColor = (0.8, 0.4, 1.0, 0.7)
     storable = True
     comparable = False

@@ -48,7 +48,7 @@ class FontListSocket(bpy.types.NodeSocket, PythonListSocket):
     bl_idname = "an_FontListSocket"
     bl_label = "Font List Socket"
     dataType = "Font List"
-    baseDataType = "Font"
+    baseType = FontSocket
     drawColor = (0.444, 0.444, 0, 0.5)
     storable = False
     comparable = False

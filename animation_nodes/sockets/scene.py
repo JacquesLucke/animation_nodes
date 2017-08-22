@@ -51,7 +51,7 @@ class SceneListSocket(bpy.types.NodeSocket, PythonListSocket):
     bl_idname = "an_SceneListSocket"
     bl_label = "Scene List Socket"
     dataType = "Scene List"
-    baseDataType = "Scene"
+    baseType = SceneSocket
     drawColor = (0.2, 0.3, 0.4, 0.5)
     storable = False
     comparable = False

@@ -68,7 +68,7 @@ class InterpolationListSocket(bpy.types.NodeSocket, PythonListSocket):
     bl_idname = "an_InterpolationListSocket"
     bl_label = "Interpolation List Socket"
     dataType = "Interpolation List"
-    baseDataType = "Interpolation"
+    baseType = InterpolationSocket
     drawColor = (0.7, 0.4, 0.3, 0.5)
     storable = False
     comparable = False

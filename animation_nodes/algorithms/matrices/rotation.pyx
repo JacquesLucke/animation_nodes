@@ -6,7 +6,7 @@ from ... math cimport (
 )
 
 cpdef getRotatedMatrixList(Matrix4x4List matrices, str type,
-                           CDefaultList rotations, DoubleList influences):
+                           VirtualEulerList rotations, DoubleList influences):
     if len(matrices) != len(influences):
         raise Exception("amount of matrices and influences has to be equal")
 
@@ -19,7 +19,7 @@ cpdef getRotatedMatrixList(Matrix4x4List matrices, str type,
 
     for i in range(len(matrices)):
         influence = influences.data[i]
-        fullRotation = <Euler3*>rotations.get(i)
+        fullRotation = rotations.get(i)
         influencedRotation.x = fullRotation.x * influence
         influencedRotation.y = fullRotation.y * influence
         influencedRotation.z = fullRotation.z * influence

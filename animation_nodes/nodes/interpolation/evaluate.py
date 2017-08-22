@@ -1,22 +1,23 @@
 import bpy
-from ... base_types import VectorizedNode
+from ... base_types import AnimationNode, VectorizedSocket
 
-class EvaluateInterpolationNode(bpy.types.Node, VectorizedNode):
+class EvaluateInterpolationNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_EvaluateInterpolationNode"
     bl_label = "Evaluate Interpolation"
     bl_width_default = 150
 
-    useList = VectorizedNode.newVectorizeProperty()
+    useList = VectorizedSocket.newProperty()
 
     def create(self):
-        self.newVectorizedInput("Float", "useList",
+        self.newInput(VectorizedSocket("Float", "useList",
             ("Position", "position", dict(minValue = 0, maxValue = 1)),
-            ("Positions", "positions"))
+            ("Positions", "positions")))
 
-        self.newInput("Interpolation", "Interpolation", "interpolation", defaultDrawType = "PROPERTY_ONLY")
+        self.newInput("Interpolation", "Interpolation", "interpolation",
+            defaultDrawType = "PROPERTY_ONLY")
 
-        self.newVectorizedOutput("Float", "useList",
-            ("Value", "value"), ("Values", "values"))
+        self.newOutput(VectorizedSocket("Float", "useList",
+            ("Value", "value"), ("Values", "values")))
 
     def getExecutionCode(self, required):
         if self.useList:

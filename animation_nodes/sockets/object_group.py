@@ -41,7 +41,7 @@ class ObjectGroupListSocket(bpy.types.NodeSocket, PythonListSocket):
     bl_idname = "an_ObjectGroupListSocket"
     bl_label = "Object Group List Socket"
     dataType = "Object Group List"
-    baseDataType = "Object Group"
+    baseType = ObjectGroupSocket
     drawColor = (0.3, 0.1, 0.1, 0.5)
     storable = False
     comparable = False

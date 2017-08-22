@@ -1,16 +1,16 @@
 import bpy
 from bpy.props import *
-from ... base_types import VectorizedNode
 from ... events import executionCodeChanged
+from ... base_types import AnimationNode, VectorizedSocket
 
-class RayCastBVHTreeNode(bpy.types.Node, VectorizedNode):
+class RayCastBVHTreeNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_RayCastBVHTreeNode"
     bl_label = "Ray Cast BVHTree"
     bl_width_default = 150
-    autoVectorizeExecution = True
+    codeEffects = [VectorizedSocket.CodeEffect]
 
-    useStartList = VectorizedNode.newVectorizeProperty()
-    useDirectionList = VectorizedNode.newVectorizeProperty()
+    useStartList = VectorizedSocket.newProperty()
+    useDirectionList = VectorizedSocket.newProperty()
 
     startInInfinity = BoolProperty(name = "Start in Infinity", default = False,
         description = ("Ray cast the whole line defined by location and direction."
@@ -20,28 +20,29 @@ class RayCastBVHTreeNode(bpy.types.Node, VectorizedNode):
     def create(self):
         self.newInput("BVHTree", "BVHTree", "bvhTree")
 
-        self.newVectorizedInput("Vector", "useStartList",
-            ("Ray Start", "start"), ("Ray Starts", "starts"))
-        self.newVectorizedInput("Vector", "useDirectionList",
+        self.newInput(VectorizedSocket("Vector", "useStartList",
+            ("Ray Start", "start"), ("Ray Starts", "starts")))
+        self.newInput(VectorizedSocket("Vector", "useDirectionList",
             ("Ray Direction", "direction", dict(value = (0, 0, -1))),
-            ("Ray Directions", "directions"))
+            ("Ray Directions", "directions"),
+            codeProperties = dict(default = (0, 0, -1))))
 
         self.newInput("Float", "Min Distance", "minDistance", value = 0.001, hide = True)
         self.newInput("Float", "Max Distance", "maxDistance", value = 1e6, hide = True)
 
-        useListOutput = [("useStartList", "useDirectionList")]
+        useListOutput = ["useStartList", "useDirectionList"]
 
-        self.newVectorizedOutput("Vector", useListOutput,
-            ("Location", "location"), ("Locations", "locations"))
-        self.newVectorizedOutput("Vector", useListOutput,
-            ("Normal", "normal"), ("Normals", "normals"))
-        self.newVectorizedOutput("Float", useListOutput,
-            ("Distance", "distance"), ("Distances", "distances"))
-        self.newVectorizedOutput("Integer", useListOutput,
+        self.newOutput(VectorizedSocket("Vector", useListOutput,
+            ("Location", "location"), ("Locations", "locations")))
+        self.newOutput(VectorizedSocket("Vector", useListOutput,
+            ("Normal", "normal"), ("Normals", "normals")))
+        self.newOutput(VectorizedSocket("Float", useListOutput,
+            ("Distance", "distance"), ("Distances", "distances")))
+        self.newOutput(VectorizedSocket("Integer", useListOutput,
             ("Polygon Index", "polygonIndex", dict(hide = True)),
-            ("Polygon Indices", "polygonIndices", dict(hide = True)))
-        self.newVectorizedOutput("Boolean", useListOutput,
-            ("Hit", "hit"), ("Hits", "hits"))
+            ("Polygon Indices", "polygonIndices", dict(hide = True))))
+        self.newOutput(VectorizedSocket("Boolean", useListOutput,
+            ("Hit", "hit"), ("Hits", "hits")))
 
     def draw(self, layout):
         layout.prop(self, "startInInfinity")

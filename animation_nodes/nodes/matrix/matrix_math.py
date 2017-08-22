@@ -1,31 +1,31 @@
 import bpy
 from bpy.props import *
-from ... base_types import VectorizedNode
 from ... events import executionCodeChanged
 from ... data_structures import Matrix4x4List
 from . c_utils import vectorizedMatrixMultiplication
+from ... base_types import AnimationNode, VectorizedSocket
 
 operationItems = [("MULTIPLY", "Multiply", "", "NONE", 0)]
 
-class MatrixMathNode(bpy.types.Node, VectorizedNode):
+class MatrixMathNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MatrixMathNode"
     bl_label = "Matrix Math"
 
     operation = EnumProperty(name = "Operation", items = operationItems,
         update = executionCodeChanged)
 
-    useListA = VectorizedNode.newVectorizeProperty()
-    useListB = VectorizedNode.newVectorizeProperty()
+    useListA = VectorizedSocket.newProperty()
+    useListB = VectorizedSocket.newProperty()
 
     errorMessage = StringProperty()
 
     def create(self):
-        self.newVectorizedInput("Matrix", "useListA",
-            ("A", "a"), ("A", "a"))
-        self.newVectorizedInput("Matrix", "useListB",
-            ("B", "b"), ("B", "b"))
-        self.newVectorizedOutput("Matrix", [("useListA", "useListB")],
-            ("Result", "result"), ("Results", "results"))
+        self.newInput(VectorizedSocket("Matrix", "useListA",
+            ("A", "a"), ("A", "a")))
+        self.newInput(VectorizedSocket("Matrix", "useListB",
+            ("B", "b"), ("B", "b")))
+        self.newOutput(VectorizedSocket("Matrix", ["useListA", "useListB"],
+            ("Result", "result"), ("Results", "results")))
 
     def draw(self, layout):
         layout.prop(self, "operation", text = "")

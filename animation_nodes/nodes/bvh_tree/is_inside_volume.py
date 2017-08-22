@@ -1,7 +1,7 @@
 import bpy
 from random import random
 from mathutils import Vector
-from ... base_types import VectorizedNode
+from ... base_types import AnimationNode, VectorizedSocket
 
 # in some cases multiple tests have to done
 # to reduce the probability for errors
@@ -9,22 +9,22 @@ direction1 = Vector((random(), random(), random())).normalized()
 direction2 = Vector((random(), random(), random())).normalized()
 direction3 = Vector((random(), random(), random())).normalized()
 
-class IsInsideVolumeBVHTreeNode(bpy.types.Node, VectorizedNode):
+class IsInsideVolumeBVHTreeNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_IsInsideVolumeBVHTreeNode"
     bl_label = "Is Inside Volume"
-    autoVectorizeExecution = True
+    codeEffects = [VectorizedSocket.CodeEffect]
 
-    useVectorList = VectorizedNode.newVectorizeProperty()
+    useVectorList = VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput("BVHTree", "BVHTree", "bvhTree")
 
-        self.newVectorizedInput("Vector", "useVectorList",
+        self.newInput(VectorizedSocket("Vector", "useVectorList",
             ("Vector", "vector", dict(defaultDrawType = "PROPERTY_ONLY")),
-            ("Vectors", "vectors", dict(defaultDrawType = "PROPERTY_ONLY")))
+            ("Vectors", "vectors", dict(defaultDrawType = "PROPERTY_ONLY"))))
 
-        self.newVectorizedOutput("Boolean", "useVectorList",
-            ("Is Inside", "isInside"), ("Are Inside", "areInside"))
+        self.newOutput(VectorizedSocket("Boolean", "useVectorList",
+            ("Is Inside", "isInside"), ("Are Inside", "areInside")))
 
     def getExecutionCode(self, required):
         return "isInside = self.execute_Single(bvhTree, vector)"

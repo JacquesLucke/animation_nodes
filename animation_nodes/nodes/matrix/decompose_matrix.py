@@ -1,28 +1,29 @@
 import bpy
-from ... base_types import VectorizedNode
-from . c_utils import (extractMatrixTranslations,
-                                    extractMatrixRotations,
-                                    extractMatrixScales)
+from ... base_types import AnimationNode, VectorizedSocket
+from . c_utils import (
+    extractMatrixTranslations,
+    extractMatrixRotations,
+    extractMatrixScales
+)
 
-class DecomposeMatrixNode(bpy.types.Node, VectorizedNode):
+class DecomposeMatrixNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_DecomposeMatrixNode"
     bl_label = "Decompose Matrix"
 
-    useMatrixList = VectorizedNode.newVectorizeProperty()
+    useMatrixList = VectorizedSocket.newProperty()
 
     def create(self):
-        self.newVectorizedInput("Matrix", "useMatrixList",
-            ("Matrix", "matrix"), ("Matrices", "matrices"))
+        self.newInput(VectorizedSocket("Matrix", "useMatrixList",
+            ("Matrix", "matrix"), ("Matrices", "matrices")))
 
-        self.newVectorizedOutput("Vector", "useMatrixList",
-            ("Translation", "translation"), ("Translations", "translations"))
+        self.newOutput(VectorizedSocket("Vector", "useMatrixList",
+            ("Translation", "translation"), ("Translations", "translations")))
 
-        self.newVectorizedOutput("Euler", "useMatrixList",
-            ("Rotation", "rotation"), ("Rotations", "rotations"))
+        self.newOutput(VectorizedSocket("Euler", "useMatrixList",
+            ("Rotation", "rotation"), ("Rotations", "rotations")))
 
-        self.newVectorizedOutput("Vector", "useMatrixList",
-            ("Scale", "scale"), ("Scales", "scales"))
-
+        self.newOutput(VectorizedSocket("Vector", "useMatrixList",
+            ("Scale", "scale"), ("Scales", "scales")))
 
     def getExecutionCode(self, required):
         if self.useMatrixList:

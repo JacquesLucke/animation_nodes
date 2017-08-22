@@ -1,26 +1,26 @@
 import bpy
 from bpy.props import *
 from ... utils.layout import writeText
-from ... base_types import VectorizedNode
+from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures.splines.to_blender import setSplinesOnBlenderObject
 
-class CurveObjectOutputNode(bpy.types.Node, VectorizedNode):
+class CurveObjectOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CurveObjectOutputNode"
     bl_label = "Curve Object Output"
     bl_width_default = 175
 
     errorMessage = StringProperty()
 
-    useSplineList = VectorizedNode.newVectorizeProperty()
+    useSplineList = VectorizedSocket.newProperty()
 
     def create(self):
         socket = self.newInput("Object", "Object", "object")
         socket.defaultDrawType = "PROPERTY_ONLY"
         socket.objectCreationType = "CURVE"
 
-        self.newVectorizedInput("Spline", "useSplineList",
+        self.newInput(VectorizedSocket("Spline", "useSplineList",
             ("Spline", "spline", dict(defaultDrawType = "TEXT_ONLY")),
-            ("Splines", "splines", dict(defaultDrawType = "TEXT_ONLY")))
+            ("Splines", "splines", dict(defaultDrawType = "TEXT_ONLY"))))
 
         self.newInput("Float", "Bevel Depth", "bevelDepth", minValue = 0)
         self.newInput("Integer", "Bevel Resolution", "bevelResolution")

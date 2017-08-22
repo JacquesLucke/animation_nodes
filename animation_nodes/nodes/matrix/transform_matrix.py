@@ -1,21 +1,21 @@
 import bpy
-from ... base_types import VectorizedNode
+from ... base_types import AnimationNode, VectorizedSocket
 from . c_utils import multiplyMatrixWithList
 
-class TransformMatrixNode(bpy.types.Node, VectorizedNode):
+class TransformMatrixNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_TransformMatrixNode"
     bl_label = "Transform Matrix"
 
-    useMatrixList = VectorizedNode.newVectorizeProperty()
+    useMatrixList = VectorizedSocket.newProperty()
 
     def create(self):
-        self.newVectorizedInput("Matrix", "useMatrixList",
-            ("Matrix", "inMatrix"), ("Matrices", "inMatrices"))
+        self.newInput(VectorizedSocket("Matrix", "useMatrixList",
+            ("Matrix", "inMatrix"), ("Matrices", "inMatrices")))
 
         self.newInput("Matrix", "Transformation", "transformation")
 
-        self.newVectorizedOutput("Matrix", "useMatrixList",
-            ("Matrix", "outMatrix"), ("Matrices", "outMatrices"))
+        self.newOutput(VectorizedSocket("Matrix", "useMatrixList",
+            ("Matrix", "outMatrix"), ("Matrices", "outMatrices")))
 
     def getExecutionFunctionName(self):
         if self.useMatrixList:

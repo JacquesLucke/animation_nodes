@@ -1,8 +1,8 @@
 import bpy
 from bpy.props import *
-from ... base_types import VectorizedNode
 from ... events import executionCodeChanged
 from ... algorithms.lists import mask_CList
+from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import BooleanList, Vector3DList, DoubleList, FloatList
 
 particleAttributes = [
@@ -16,21 +16,25 @@ particleAttributes = [
 outputsData = [(type, name, identifier) for name, identifier, _, type, *_ in particleAttributes]
 executionData = [(identifier, attribute, CListType) for _, identifier, attribute, _, CListType in particleAttributes]
 
-class ParticleSystemParticlesDataNode(bpy.types.Node, VectorizedNode):
+class ParticleSystemParticlesDataNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ParticleSystemParticlesDataNode"
     bl_label = "Particles Data"
 
-    includeUnborn = BoolProperty(name = "Include Unborn", default = False, update = executionCodeChanged)
-    includeAlive = BoolProperty(name = "Include Alive", default = True, update = executionCodeChanged)
-    includeDying = BoolProperty(name = "Include Dying", default = False, update = executionCodeChanged)
-    includeDead = BoolProperty(name = "Include Dead", default = False, update = executionCodeChanged)
+    includeUnborn = BoolProperty(name = "Include Unborn", default = False,
+        update = executionCodeChanged)
+    includeAlive = BoolProperty(name = "Include Alive", default = True,
+        update = executionCodeChanged)
+    includeDying = BoolProperty(name = "Include Dying", default = False,
+        update = executionCodeChanged)
+    includeDead = BoolProperty(name = "Include Dead", default = False,
+        update = executionCodeChanged)
 
-    useParticleSystemList = VectorizedNode.newVectorizeProperty()
+    useParticleSystemList = VectorizedSocket.newProperty()
 
     def create(self):
-        self.newVectorizedInput("Particle System", "useParticleSystemList",
+        self.newInput(VectorizedSocket("Particle System", "useParticleSystemList",
             ("Particle System", "particleSystem"),
-            ("Particle Systems", "particleSystems"))
+            ("Particle Systems", "particleSystems")))
 
         for dataType, name, identifier in outputsData:
             self.newOutput(dataType, name, identifier)

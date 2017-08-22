@@ -37,7 +37,9 @@ def generatePyx(target, utils):
     for listName, info in types.items():
         code = utils.multiReplace(source,
             LISTNAME = listName,
-            TYPE = info["Type"])
+            TYPE = info["Type"],
+            OPTIONAL_STAR = "*" if info["Return"] == "Pointer" else "",
+            OPTIONAL_DEREF = "" if info["Return"] == "Pointer" else "[0]")
         parts.append(code)
 
     utils.writeTextFile(target, "\n\n".join(parts))
@@ -54,7 +56,8 @@ def generatePxd(target, utils):
         parts.append(info["Import"])
         code = utils.multiReplace(source,
             LISTNAME = listName,
-            TYPE = info["Type"])
+            TYPE = info["Type"],
+            OPTIONAL_STAR = "*" if info["Return"] == "Pointer" else "")
         parts.append(code)
 
     utils.writeTextFile(target, "\n\n".join(parts))

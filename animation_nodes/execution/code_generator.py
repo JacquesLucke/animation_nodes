@@ -199,8 +199,7 @@ def getRequiredOutputIdentifiers(node):
     add = requiredOutputs.add
     update = requiredOutputs.update
     for socket in node.linkedOutputs:
-        add(socket.identifier)
-        update(socket.alternativeIdentifiers)
+        update(node.getAllIdentifiersOfSocket(socket))
     return requiredOutputs
 
 def iterNodeBakeLines(node, variables):

@@ -29,7 +29,7 @@ class ParticleSystemListSocket(bpy.types.NodeSocket, PythonListSocket):
     bl_idname = "an_ParticleSystemListSocket"
     bl_label = "Particle System List Socket"
     dataType = "Particle System List"
-    baseDataType = "Particle System"
+    baseType = ParticleSystemSocket
     drawColor = (1.0, 0.8, 0.6, 0.5)
     storable = False
     comparable = False

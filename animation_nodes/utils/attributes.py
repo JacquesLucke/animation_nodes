@@ -15,3 +15,7 @@ def getAttributeSetter(propName):
 @functools.lru_cache(maxsize = 1024)
 def getAttributeGetter(propName):
     return eval("lambda owner: owner.{}".format(propName))
+
+def hasEvaluableRepr(value):
+    try: return eval(repr(value)) == value
+    except: return False

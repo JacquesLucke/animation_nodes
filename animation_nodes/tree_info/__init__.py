@@ -195,9 +195,7 @@ def getNodeConnections(node):
     connections = []
     for socketID, socket in zip(chain(inputIDs, outputIDs), node.sockets):
         for linkedID in _forestData.linkedSocketsWithReroutes[socketID]:
-            connections.append((socketID, linkedID))
-
-            for identifier in socket.alternativeIdentifiers:
+            for identifier in node.getAllIdentifiersOfSocket(socket):
                 connections.append(((socketID[0], socketID[1], identifier), linkedID))
     return connections
 
@@ -218,14 +216,13 @@ def keepSocketValues(function):
     return wrapper
 
 def getSocketValues(node):
-    inputs = [data for socket in node.inputs for data in getSocketData(socket)]
-    outputs = [data for socket in node.outputs for data in getSocketData(socket)]
+    inputs = [data for socket in node.inputs for data in getSocketData(node, socket)]
+    outputs = [data for socket in node.outputs for data in getSocketData(node, socket)]
     return inputs, outputs
 
-def getSocketData(socket):
+def getSocketData(node, socket):
     s = socket
-    yield (s.identifier, s.dataType, s.getProperty(), s.hide, s.isUsed, s.dataIsModified)
-    for identifier in socket.alternativeIdentifiers:
+    for identifier in node.getAllIdentifiersOfSocket(socket):
         yield (identifier, s.dataType, s.getProperty(), s.hide, s.isUsed, s.dataIsModified)
 
 def setSocketValues(node, inputs, outputs):

@@ -1,24 +1,25 @@
 import bpy
-from ... base_types import VectorizedNode
+from ... base_types import AnimationNode, VectorizedSocket
 from ... utils.data_blocks import removeNotUsedDataBlock
 
-class CopyObjectDataNode(bpy.types.Node, VectorizedNode):
+class CopyObjectDataNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CopyObjectDataNode"
     bl_label = "Copy Object Data"
-    autoVectorizeExecution = True
+    codeEffects = [VectorizedSocket.CodeEffect]
 
-    useFromList = VectorizedNode.newVectorizeProperty()
-    useToList = VectorizedNode.newVectorizeProperty()
+    useFromList = VectorizedSocket.newProperty()
+    useToList = VectorizedSocket.newProperty()
 
     def create(self):
-        self.newVectorizedInput("Object", ("useFromList", ["useToList"]),
-            ("From", "fromObject"), ("From", "fromObjects"))
+        self.newInput(VectorizedSocket("Object", ["useFromList", "useToList"],
+            ("From", "fromObject"), ("From", "fromObjects")))
 
-        self.newVectorizedInput("Object", "useToList",
-            ("To", "toObject"), ("To", "toObjects"))
+        self.newInput(VectorizedSocket("Object", "useToList",
+            ("To", "toObject"), ("To", "toObjects"),
+            codeProperties = dict(allowListExtension = False)))
 
-        self.newVectorizedOutput("Object", "useToList",
-            ("To", "outObject"), ("To", "outObjects"))
+        self.newOutput(VectorizedSocket("Object", "useToList",
+            ("To", "outObject"), ("To", "outObjects")))
 
     def getExecutionCode(self, required):
         return "outObject = self.copyObjectData(fromObject, toObject)"

@@ -151,14 +151,14 @@ def readLinesBetween(path, start, stop):
         while True:
             line = f.readline()
             if line == "":
-                raise Exception("Line containing '{}' not found".format(start))
+                raise Exception("Line containing '{}' not found in {}".format(start, path))
             if start in line:
                 break
 
         while True:
             line = f.readline()
             if line == "":
-                raise Exception("Line containing '{}' not found".format(stop))
+                raise Exception("Line containing '{}' not found in  {}".format(stop, path))
             if stop not in line:
                 lines.append(line)
             else:

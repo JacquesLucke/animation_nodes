@@ -1,25 +1,19 @@
 import bpy
-from bpy.props import *
-from ... sockets.info import isList
-from ... base_types import AnimationNode, AutoSelectListDataType
+from ... base_types import AnimationNode, ListTypeSelectorSocket
 
 class ShiftListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ShiftListNode"
     bl_label = "Shift List"
 
-    assignedType = StringProperty(update = AnimationNode.refresh, default = "Float List")
+    assignedType = ListTypeSelectorSocket.newProperty(default = "Float List")
 
     def create(self):
-        listDataType = self.assignedType
-
-        self.newInput(listDataType, "List", "inList", dataIsModified = True)
+        prop = ("assignedType", "LIST")
+        self.newInput(ListTypeSelectorSocket(
+            "List", "inList", "LIST", prop, dataIsModified = True))
         self.newInput("Integer", "Amount", "amount")
-        self.newOutput(listDataType, "Shifted List", "shiftedList")
-
-        self.newSocketEffect(AutoSelectListDataType("assignedType", "LIST",
-            [(self.inputs[0], "LIST"),
-             (self.outputs[0], "LIST")]
-        ))
+        self.newOutput(ListTypeSelectorSocket(
+            "Shifted List", "shiftedList", "LIST", prop, dataIsModified = True))
 
     def getExecutionCode(self, required):
         yield "if len(inList) == 0: shiftedList = self.outputs[0].getDefaultValue()"

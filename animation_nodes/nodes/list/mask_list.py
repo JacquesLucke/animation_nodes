@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... sockets.info import getCopyFunction
 from ... algorithms.lists import mask as maskList
-from ... base_types import AnimationNode, AutoSelectListDataType
+from ... base_types import AnimationNode, ListTypeSelectorSocket
 
 class MaskListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MaskListNode"
@@ -10,17 +10,15 @@ class MaskListNode(bpy.types.Node, AnimationNode):
 
     errorMessage = StringProperty()
 
-    assignedType = StringProperty(default = "Integer List", update = AnimationNode.refresh)
+    assignedType = ListTypeSelectorSocket.newProperty(default = "Integer List")
 
     def create(self):
-        self.newInput(self.assignedType, "List", "inList")
+        prop = ("assignedType", "LIST")
+        self.newInput(ListTypeSelectorSocket(
+            "List", "inList", "LIST", prop))
         self.newInput("Boolean List", "Mask", "mask")
-        self.newOutput(self.assignedType, "List", "outList")
-
-        self.newSocketEffect(AutoSelectListDataType("assignedType", "LIST",
-            [(self.inputs[0], "LIST"),
-             (self.outputs[0], "LIST")]
-        ))
+        self.newOutput(ListTypeSelectorSocket(
+            "List", "outList", "LIST", prop))
 
     def draw(self, layout):
         if self.errorMessage != "":

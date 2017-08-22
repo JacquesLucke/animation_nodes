@@ -96,7 +96,7 @@ class ObjectListSocket(bpy.types.NodeSocket, PythonListSocket):
     bl_idname = "an_ObjectListSocket"
     bl_label = "Object List Socket"
     dataType = "Object List"
-    baseDataType = "Object"
+    baseType = ObjectSocket
     drawColor = (0, 0, 0, 0.5)
     storable = False
     comparable = False

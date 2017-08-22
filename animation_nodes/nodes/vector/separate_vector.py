@@ -1,21 +1,21 @@
 import bpy
 from bpy.props import *
-from ... base_types import VectorizedNode
+from ... base_types import AnimationNode, VectorizedSocket
 from . c_utils import getAxisListOfVectorList
 
-class SeparateVectorNode(bpy.types.Node, VectorizedNode):
+class SeparateVectorNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SeparateVectorNode"
     bl_label = "Separate Vector"
 
-    useList = VectorizedNode.newVectorizeProperty()
+    useList = VectorizedSocket.newProperty()
 
     def create(self):
-        self.newVectorizedInput("Vector", "useList",
-            ("Vector", "vector"), ("Vectors", "vectors"))
+        self.newInput(VectorizedSocket("Vector", "useList",
+            ("Vector", "vector"), ("Vectors", "vectors")))
 
         for axis in "XYZ":
-            self.newVectorizedOutput("Float", "useList",
-                (axis, axis.lower()), (axis, axis.lower()))
+            self.newOutput(VectorizedSocket("Float", "useList",
+                (axis, axis.lower()), (axis, axis.lower())))
 
     def getExecutionCode(self, required):
         for i, axis in enumerate("xyz"):

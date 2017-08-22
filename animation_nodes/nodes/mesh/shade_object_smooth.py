@@ -1,24 +1,25 @@
 import bpy
-from ... base_types import VectorizedNode
+from ... base_types import AnimationNode, VectorizedSocket
 
-class ShadeObjectSmooth(bpy.types.Node, VectorizedNode):
+class ShadeObjectSmooth(bpy.types.Node, AnimationNode):
     bl_idname = "an_ShadeObjectSmoothNode"
     bl_label = "Shade Object Smooth"
-    autoVectorizeExecution = True
+    codeEffects = [VectorizedSocket.CodeEffect]
 
-    useObjectList = VectorizedNode.newVectorizeProperty()
-    useSmoothList = VectorizedNode.newVectorizeProperty()
+    useObjectList = VectorizedSocket.newProperty()
+    useSmoothList = VectorizedSocket.newProperty()
 
     def create(self):
-        self.newVectorizedInput("Object", "useObjectList",
+        self.newInput(VectorizedSocket("Object", "useObjectList",
             ("Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
-            ("Objects", "objects"))
+            ("Objects", "objects"),
+            codeProperties = dict(allowListExtension = False)))
 
-        self.newVectorizedInput("Boolean", "useSmoothList",
-            ("Smooth", "smooth"), ("Smooth", "smooth"))
+        self.newInput(VectorizedSocket("Boolean", "useSmoothList",
+            ("Smooth", "smooth"), ("Smooth", "smooth")))
 
-        self.newVectorizedOutput("Object", "useObjectList",
-            ("Object", "object"), ("Objects", "objects"))
+        self.newOutput(VectorizedSocket("Object", "useObjectList",
+            ("Object", "object"), ("Objects", "objects")))
 
     def getExecutionCode(self, required):
         return "object = self.execute_Single(object, smooth)"

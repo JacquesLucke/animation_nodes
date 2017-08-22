@@ -1,30 +1,24 @@
 import bpy
-from bpy.props import *
-from ... events import executionCodeChanged
-from ... sockets.info import isBase, toBaseDataType, toListDataType
-from ... base_types import AnimationNode, AutoSelectListDataType
+from ... sockets.info import isBase, toBaseDataType
+from ... base_types import AnimationNode, ListTypeSelectorSocket
 
 class SearchListElementNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SearchListElementNode"
     bl_label = "Search List Element"
 
-    assignedType = StringProperty(update = AnimationNode.refresh, default = "Float")
+    assignedType = ListTypeSelectorSocket.newProperty(default = "Float")
 
     def create(self):
-        baseDataType = self.assignedType
-        listDataType = toListDataType(self.assignedType)
+        prop = ("assignedType", "BASE")
 
-        self.newInput(listDataType, "List", "list", dataIsModified  = True)
-        self.newInput(baseDataType, "Search", "search", dataIsModified = True)
+        self.newInput(ListTypeSelectorSocket(
+            "List", "list", "LIST", prop, dataIsModified = True))
+        self.newInput(ListTypeSelectorSocket(
+            "Search", "search", "BASE", prop))
 
-        self.newOutput("an_IntegerSocket", "First Index", "firstIndex")
-        self.newOutput("an_IntegerListSocket", "All Indices", "allIndices")
-        self.newOutput("an_IntegerSocket", "Occurrences", "occurrences")
-
-        self.newSocketEffect(AutoSelectListDataType("assignedType", "BASE",
-            [(self.inputs[0], "LIST"),
-             (self.inputs[1], "BASE")]
-        ))
+        self.newOutput("Integer", "First Index", "firstIndex")
+        self.newOutput("Integer List", "All Indices", "allIndices")
+        self.newOutput("Integer", "Occurrences", "occurrences")
 
     def drawAdvanced(self, layout):
         self.invokeSelector(layout, "DATA_TYPE", "assignListDataType",
@@ -52,3 +46,4 @@ class SearchListElementNode(bpy.types.Node, AnimationNode):
         if not isBase(baseDataType): return
         if baseDataType == self.assignedType: return
         self.assignedType = baseDataType
+        self.refresh()

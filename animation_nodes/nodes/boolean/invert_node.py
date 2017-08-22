@@ -1,20 +1,20 @@
 import bpy
-from ... base_types import VectorizedNode
+from ... base_types import AnimationNode, VectorizedSocket
 
-class InvertBooleanNode(bpy.types.Node, VectorizedNode):
+class InvertBooleanNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_InvertBooleanNode"
     bl_label = "Invert Boolean"
 
-    useList = VectorizedNode.newVectorizeProperty()
+    useList = VectorizedSocket.newProperty()
 
     def create(self):
-        self.newVectorizedInput("Boolean", "useList",
+        self.newInput(VectorizedSocket("Boolean", "useList",
             ("Input", "input"),
-            ("Input", "input", dict(dataIsModified = True)))
+            ("Input", "input", dict(dataIsModified = True))))
 
-        self.newVectorizedOutput("Boolean", "useList",
+        self.newOutput(VectorizedSocket("Boolean", "useList",
             ("Output", "output"),
-            ("Output", "output"))
+            ("Output", "output")))
 
     def getExecutionCode(self, required):
         if self.useList:

@@ -129,7 +129,7 @@ class ConvertQuaternionToEuler(LinkCorrection):
 
 class ConvertElementToList(LinkCorrection):
     def check(self, origin, target):
-        return origin.bl_idname == toBaseIdName(target.bl_idname)
+        return isList(target.bl_idname) and origin.bl_idname == toBaseIdName(target.bl_idname)
     def insert(self, nodeTree, origin, target, dataOrigin):
         node = insertNode(nodeTree, "an_CreateListNode", origin, target)
         node.assignBaseDataType(dataOrigin.dataType, inputAmount = 1)

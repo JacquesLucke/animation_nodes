@@ -5,7 +5,7 @@ from ... math cimport (
 )
 
 cpdef translateMatrixList(Matrix4x4List matrices, str type,
-                          CDefaultList translations, DoubleList influences):
+                          VirtualVector3DList translations, DoubleList influences):
     if len(matrices) != len(influences):
         raise Exception("amoutn of matrices and influences has to be equal")
 
@@ -17,7 +17,7 @@ cpdef translateMatrixList(Matrix4x4List matrices, str type,
 
     for i in range(len(matrices)):
         influence = influences.data[i]
-        fullTranslation = <Vector3*>translations.get(i)
+        fullTranslation = translations.get(i)
         influencedTranslation.x = fullTranslation.x * influence
         influencedTranslation.y = fullTranslation.y * influence
         influencedTranslation.z = fullTranslation.z * influence

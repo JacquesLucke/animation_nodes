@@ -29,7 +29,7 @@ class FCurveListSocket(bpy.types.NodeSocket, PythonListSocket):
     bl_idname = "an_FCurveListSocket"
     bl_label = "FCurve List Socket"
     dataType = "FCurve List"
-    baseDataType = "FCurve"
+    baseType = FCurveSocket
     drawColor = (0.2, 0.26, 0.19, 0.5)
     storable = True
     comparable = False

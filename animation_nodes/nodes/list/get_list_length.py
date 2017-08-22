@@ -7,12 +7,12 @@ class GetListLengthNode(bpy.types.Node, AnimationNode):
     dynamicLabelType = "HIDDEN_ONLY"
 
     def create(self):
-        self.newInput("an_GenericSocket", "List", "list")
-        self.newOutput("an_IntegerSocket", "Length", "length")
+        self.newInput("Generic", "List", "list")
+        self.newOutput("Integer", "Length", "length")
 
     def drawLabel(self):
         return "Get Length"
 
     def getExecutionCode(self, required):
-        return ("try: length = len(list)",
-                "except: length = 0")
+        yield "try: length = len(list)"
+        yield "except: length = 0"

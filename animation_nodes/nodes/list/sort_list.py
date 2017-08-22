@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from collections import defaultdict
-from ... base_types import AnimationNode, AutoSelectListDataType
+from ... base_types import AnimationNode, ListTypeSelectorSocket
 
 class SortingTemplate:
     properties = {}
@@ -28,8 +28,7 @@ class SortListNode(bpy.types.Node, AnimationNode):
 
     errorMessage = StringProperty()
 
-    assignedType = StringProperty(default = "Object List",
-        update = AnimationNode.refresh)
+    assignedType = ListTypeSelectorSocket.newProperty(default = "Object List")
 
     templateData = PointerProperty(type = SortingTemplateProperties)
 
@@ -47,16 +46,15 @@ class SortListNode(bpy.types.Node, AnimationNode):
         self.activeTemplateIdentifier = "CUSTOM"
 
     def create(self):
-        self.newInput(self.assignedType, "List", "inList", dataIsModified = True)
+        prop = ("assignedType", "LIST")
+
+        self.newInput(ListTypeSelectorSocket(
+            "List", "inList", "LIST", prop, dataIsModified = True))
         self.newInput("Boolean", "Reverse", "reverseOutput", value = False)
-        self.newOutput(self.assignedType, "Sorted List", "outList")
+        self.newOutput(ListTypeSelectorSocket(
+            "Sorted List", "outList", "LIST", prop))
 
         self.activeTemplate.create(self, self.activeTemplateData)
-
-        self.newSocketEffect(AutoSelectListDataType("assignedType", "LIST",
-            [(self.inputs[0], "LIST"),
-             (self.outputs[0], "LIST")]
-        ))
 
     def draw(self, layout):
         layout.prop(self, "activeTemplateIdentifier", text = "")

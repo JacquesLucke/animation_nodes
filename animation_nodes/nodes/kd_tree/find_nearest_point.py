@@ -1,25 +1,25 @@
 import bpy
-from ... base_types import VectorizedNode
+from ... base_types import AnimationNode, VectorizedSocket
 
-class FindNearestPointInKDTreeNode(bpy.types.Node, VectorizedNode):
+class FindNearestPointInKDTreeNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_FindNearestPointInKDTreeNode"
     bl_label = "Find Nearest Point"
-    autoVectorizeExecution = True
+    codeEffects = [VectorizedSocket.CodeEffect]
 
-    useVectorList = VectorizedNode.newVectorizeProperty()
+    useVectorList = VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput("KDTree", "KDTree", "kdTree")
-        self.newVectorizedInput("Vector", "useVectorList",
+        self.newInput(VectorizedSocket("Vector", "useVectorList",
             ("Vector", "searchVector", dict(defaultDrawType = "PROPERTY_ONLY")),
-            ("Vectors", "searchVectors"))
+            ("Vectors", "searchVectors")))
 
-        self.newVectorizedOutput("Vector", "useVectorList",
-            ("Vector", "nearestVector"), ("Vectors", "nearestVectors"))
-        self.newVectorizedOutput("Float", "useVectorList",
-            ("Distance", "distance"), ("Distances", "distances"))
-        self.newVectorizedOutput("Integer", "useVectorList",
-            ("Index", "index"), ("Indices", "indices"))
+        self.newOutput(VectorizedSocket("Vector", "useVectorList",
+            ("Vector", "nearestVector"), ("Vectors", "nearestVectors")))
+        self.newOutput(VectorizedSocket("Float", "useVectorList",
+            ("Distance", "distance"), ("Distances", "distances")))
+        self.newOutput(VectorizedSocket("Integer", "useVectorList",
+            ("Index", "index"), ("Indices", "indices")))
 
     def getExecutionCode(self, required):
         yield "nearestVector, index, distance = kdTree.find(searchVector)"

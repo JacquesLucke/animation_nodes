@@ -62,7 +62,7 @@ class FloatListSocket(bpy.types.NodeSocket, CListSocket):
     bl_idname = "an_FloatListSocket"
     bl_label = "Float List Socket"
     dataType = "Float List"
-    baseDataType = "Float"
+    baseType = FloatSocket
     drawColor = (0.4, 0.4, 0.7, 0.5)
     storable = True
     comparable = False

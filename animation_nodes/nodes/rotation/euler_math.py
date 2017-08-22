@@ -1,7 +1,7 @@
 import bpy
 import math
 from bpy.props import *
-from ... base_types import VectorizedNode
+from ... base_types import AnimationNode, VectorizedSocket
 
 operationItems = [
     ("ADD", "Add", "", "", 0),
@@ -28,52 +28,54 @@ operationsWithSecondEuler = ["ADD", "SUBTRACT"]
 operationsWithVector = ["MULTIPLY", "DIVIDE"]
 operationsWithStepEuler = ["SNAP"]
 
-class EulerMathNode(bpy.types.Node, VectorizedNode):
+class EulerMathNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_EulerMathNode"
     bl_label = "Euler Math"
     dynamicLabelType = "HIDDEN_ONLY"
-    autoVectorizeExecution = True
+    codeEffects = [VectorizedSocket.CodeEffect]
 
     operation = EnumProperty(name = "Operation", default = "ADD",
-        items = operationItems, update = VectorizedNode.refresh)
+        items = operationItems, update = AnimationNode.refresh)
 
-    useListA = VectorizedNode.newVectorizeProperty()
-    useListEulerB = VectorizedNode.newVectorizeProperty()
-    useListVectorB = VectorizedNode.newVectorizeProperty()
-    useListScale = VectorizedNode.newVectorizeProperty()
-    useListStep = VectorizedNode.newVectorizeProperty()
+    useListA = VectorizedSocket.newProperty()
+    useListEulerB = VectorizedSocket.newProperty()
+    useListVectorB = VectorizedSocket.newProperty()
+    useListScale = VectorizedSocket.newProperty()
+    useListStep = VectorizedSocket.newProperty()
 
     def create(self):
         usedProperties = ["useListA"]
-        self.newVectorizedInput("Euler", "useListA",
-            ("A", "a"), ("A", "a"))
+        self.newInput(VectorizedSocket("Euler", "useListA",
+            ("A", "a"), ("A", "a")))
 
         if self.operation in operationsWithSecondEuler:
             usedProperties.append("useListEulerB")
-            self.newVectorizedInput("Euler", "useListEulerB",
-                ("B", "b"), ("B", "b"))
+            self.newInput(VectorizedSocket("Euler", "useListEulerB",
+                ("B", "b"), ("B", "b")))
 
         if self.operation in operationsWithVector:
             usedProperties.append("useListVectorB")
-            self.newVectorizedInput("Vector", "useListVectorB",
+            self.newInput(VectorizedSocket("Vector", "useListVectorB",
                 ("B", "b", dict(value = (1, 1, 1))),
-                ("B", "b"))
+                ("B", "b"),
+                codeProperties = dict(default = (1,1,1))))
 
         if self.operation in operationsWithFloat:
             usedProperties.append("useListScale")
-            self.newVectorizedInput("Float", "useListScale",
+            self.newInput(VectorizedSocket("Float", "useListScale",
                 ("Scale", "scale", dict(value = 1)),
-                ("Scales", "scales"))
+                ("Scales", "scales")))
 
         if self.operation in operationsWithStepEuler:
             v = math.radians(10)
             usedProperties.append("useListStep")
-            self.newVectorizedInput("Euler", "useListStep",
+            self.newInput(VectorizedSocket("Euler", "useListStep",
                 ("Step Size", "stepSize", dict(value = (v, v, v))),
-                ("Step Sizes", "stepSizes"))
+                ("Step Sizes", "stepSizes"),
+                codeProperties = dict(default = (v, v, v))))
 
-        self.newVectorizedOutput("Euler", [usedProperties],
-            ("Result", "result"), ("Results", "results"))
+        self.newOutput(VectorizedSocket("Euler", usedProperties,
+            ("Result", "result"), ("Results", "results")))
 
     def draw(self, layout):
         layout.prop(self, "operation", text = "")

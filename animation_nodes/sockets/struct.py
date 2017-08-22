@@ -33,7 +33,7 @@ class StructListSocket(bpy.types.NodeSocket, PythonListSocket):
     bl_idname = "an_StructListSocket"
     bl_label = "Struct List Socket"
     dataType = "Struct List"
-    baseDataType = "Struct"
+    baseType = StructSocket
     drawColor = (0.3, 0.3, 0.3, 0.5)
     storable = True
     comparable = False

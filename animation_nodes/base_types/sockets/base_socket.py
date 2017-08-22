@@ -39,7 +39,6 @@ class SocketExecutionProperties(bpy.types.PropertyGroup):
     neededCopies = IntProperty(default = 0, min = 0)
 
 colorOverwritePerSocket = dict()
-alternativeIdentifiersPerSocket = defaultdict(list)
 
 class AnimationNodeSocket:
     storable = True
@@ -90,10 +89,6 @@ class AnimationNodeSocket:
           if the value has a uncorrectable type: (default_value, 2)
         '''
         raise NotImplementedError("All sockets have to define a correctValue method")
-
-    @classmethod
-    def getConversionCode(cls, dataType):
-        return None
 
 
     # Drawing
@@ -211,24 +206,18 @@ class AnimationNodeSocket:
     ##########################################################
 
     def free(self):
-        try: del alternativeIdentifiersPerSocket[self.getTemporaryIdentifier()]
-        except: pass
         try: del colorOverwritePerSocket[self.getTemporaryIdentifier()]
         except: pass
-
-    @property
-    def alternativeIdentifiers(self):
-        return alternativeIdentifiersPerSocket[self.getTemporaryIdentifier()]
-
-    @alternativeIdentifiers.setter
-    def alternativeIdentifiers(self, value):
-        alternativeIdentifiersPerSocket[self.getTemporaryIdentifier()] = value
 
     def setTemporarySocketTransparency(self, transparency):
         colorOverwritePerSocket[self.getTemporaryIdentifier()] = list(self.drawColor[:3]) + [transparency]
 
     def getTemporaryIdentifier(self):
         return str(hash(self)) + self.identifier
+
+    def setAttributes(self, properties):
+        for key, value in properties.items():
+            setattr(self, key, value)
 
 
     # Move Utilities

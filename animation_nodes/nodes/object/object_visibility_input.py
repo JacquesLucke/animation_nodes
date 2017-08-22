@@ -1,30 +1,31 @@
 import bpy
-from ... base_types import VectorizedNode
+from ... base_types import AnimationNode, VectorizedSocket
 
-class ObjectVisibilityInputNode(bpy.types.Node, VectorizedNode):
+class ObjectVisibilityInputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectVisibilityInputNode"
     bl_label = "Object Visibility Input"
-    autoVectorizeExecution = True
+    codeEffects = [VectorizedSocket.CodeEffect]
 
-    useObjectList = VectorizedNode.newVectorizeProperty()
+    useObjectList = VectorizedSocket.newProperty()
 
     def create(self):
-        self.newVectorizedInput("Object", "useObjectList",
+        self.newInput(VectorizedSocket("Object", "useObjectList",
             ("Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
-            ("Objects", "objects"))
+            ("Objects", "objects"),
+            codeProperties = dict(allowListExtension = False)))
 
-        self.newVectorizedOutput("Boolean", "useObjectList",
-            ("Hide", "hide"), ("Hide", "hide"))
-        self.newVectorizedOutput("Boolean", "useObjectList",
-            ("Hide Render", "hideRender"), ("Hide Render", "hideRender"))
-        self.newVectorizedOutput("Boolean", "useObjectList",
-            ("Hide Select", "hideSelect"), ("Hide Select", "hideSelect"))
-        self.newVectorizedOutput("Boolean", "useObjectList",
-            ("Show Name", "showName"), ("Show Name", "showName"))
-        self.newVectorizedOutput("Boolean", "useObjectList",
-            ("Show Axis", "showAxis"), ("Show Axis", "showAxis"))
-        self.newVectorizedOutput("Boolean", "useObjectList",
-            ("Show Xray", "showXray"), ("Show Xray", "showXray"))
+        self.newOutput(VectorizedSocket("Boolean", "useObjectList",
+            ("Hide", "hide"), ("Hide", "hide")))
+        self.newOutput(VectorizedSocket("Boolean", "useObjectList",
+            ("Hide Render", "hideRender"), ("Hide Render", "hideRender")))
+        self.newOutput(VectorizedSocket("Boolean", "useObjectList",
+            ("Hide Select", "hideSelect"), ("Hide Select", "hideSelect")))
+        self.newOutput(VectorizedSocket("Boolean", "useObjectList",
+            ("Show Name", "showName"), ("Show Name", "showName")))
+        self.newOutput(VectorizedSocket("Boolean", "useObjectList",
+            ("Show Axis", "showAxis"), ("Show Axis", "showAxis")))
+        self.newOutput(VectorizedSocket("Boolean", "useObjectList",
+            ("Show Xray", "showXray"), ("Show Xray", "showXray")))
 
         for socket in self.outputs[2:]:
             socket.hide = True

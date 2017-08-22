@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... events import propertyChanged
-from ... base_types import VectorizedNode
+from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import PolySpline, BezierSpline, FloatList, DoubleList
 
 splineTypeItems = [
@@ -9,23 +9,23 @@ splineTypeItems = [
     ("POLY", "Poly", "Linear interpolation between the spline points", "NOCURVE", 1)
 ]
 
-class SplineFromPointsNode(bpy.types.Node, VectorizedNode):
+class SplineFromPointsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SplineFromPointsNode"
     bl_label = "Spline from Points"
 
     splineType = EnumProperty(name = "Spline Type", default = "BEZIER",
-        items = splineTypeItems, update = VectorizedNode.refresh)
+        items = splineTypeItems, update = AnimationNode.refresh)
 
-    useRadiusList = VectorizedNode.newVectorizeProperty()
+    useRadiusList = VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput("Vector List", "Points", "points", dataIsModified = True)
         if self.splineType == "BEZIER":
             self.newInput("Vector List", "Left Handles", "leftHandles", dataIsModified = True)
             self.newInput("Vector List", "Right Handles", "rightHandles", dataIsModified = True)
-        self.newVectorizedInput("Float", "useRadiusList",
+        self.newInput(VectorizedSocket("Float", "useRadiusList",
             ("Radius", "radius", dict(value = 0.1, minValue = 0)),
-            ("Radii", "radii", dict(dataIsModified = True)))
+            ("Radii", "radii")))
         self.newInput("Boolean", "Cyclic", "cyclic", value = False)
         self.newOutput("Spline", "Spline", "spline")
 

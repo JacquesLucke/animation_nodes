@@ -29,7 +29,7 @@ class MeshDataListSocket(bpy.types.NodeSocket, PythonListSocket):
     bl_idname = "an_MeshDataListSocket"
     bl_label = "Mesh Data List Socket"
     dataType = "Mesh Data List"
-    baseDataType = "Mesh Data"
+    baseType = MeshDataSocket
     drawColor = (0.3, 0.4, 0.18, 0.5)
     storable = True
     comparable = False

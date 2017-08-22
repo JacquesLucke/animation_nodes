@@ -3,15 +3,20 @@ from ... data_structures cimport (Vector3DList, EulerList, Matrix4x4List,
                                   FalloffEvaluator,
                                   VirtualVector3DList, VirtualEulerList)
 
-from ... math cimport (Vector3, Euler3, Matrix4, toMatrix4,
-                       multMatrix4, toPyMatrix4,
-                       setTranslationRotationScaleMatrix,
-                       setRotationXMatrix, setRotationYMatrix, setRotationZMatrix,
-                       setRotationMatrix, setTranslationMatrix, setIdentityMatrix,
-                       transposeMatrix_Inplace)
+from ... math cimport (
+    Vector3, Euler3, Matrix4, toMatrix4,
+    multMatrix4, toPyMatrix4,
+    setTranslationRotationScaleMatrix,
+    setRotationXMatrix, setRotationYMatrix, setRotationZMatrix,
+    setRotationMatrix, setTranslationMatrix, setIdentityMatrix,
+    setScaleMatrix,
+    setMatrixTranslation,
+    transposeMatrix_Inplace)
+
 from ... math import matrix4x4ListToEulerList
 
 from libc.math cimport sqrt
+from libc.math cimport M_PI as PI
 
 
 # Compose/Create Matrix
@@ -28,19 +33,51 @@ def composeMatrices(Py_ssize_t amount, VirtualVector3DList translations,
 
     return matrices
 
-def createAxisRotations(DoubleList angles, str axis):
-    cdef Matrix4x4List matrices = Matrix4x4List(length = len(angles))
-    cdef int i
+def createAxisRotations(DoubleList angles, str axis, bint useDegree):
+    cdef Matrix4x4List matrices = Matrix4x4List(length = angles.length)
+    cdef float factor = <float>(PI / 180 if useDegree else 1)
+
+    cdef Py_ssize_t i
     if axis == "X":
-        for i in range(len(matrices)):
-            setRotationXMatrix(matrices.data + i, angles.data[i])
+        for i in range(matrices.length):
+            setRotationXMatrix(matrices.data + i, <float>angles.data[i] * factor)
     elif axis == "Y":
-        for i in range(len(matrices)):
-            setRotationYMatrix(matrices.data + i, angles.data[i])
+        for i in range(matrices.length):
+            setRotationYMatrix(matrices.data + i, <float>angles.data[i] * factor)
     elif axis == "Z":
-        for i in range(len(matrices)):
-            setRotationZMatrix(matrices.data + i, angles.data[i])
+        for i in range(matrices.length):
+            setRotationZMatrix(matrices.data + i, <float>angles.data[i] * factor)
     return matrices
+
+def rotationsFromVirtualEulers(Py_ssize_t amount, VirtualEulerList rotations):
+    cdef Matrix4x4List matrices = Matrix4x4List(length = amount)
+    cdef Py_ssize_t i
+    for i in range(amount):
+        setRotationMatrix(matrices.data + i, rotations.get(i))
+    return matrices
+
+def scalesFromVirtualVectors(Py_ssize_t amount, VirtualVector3DList scales):
+    cdef Matrix4x4List matrices = Matrix4x4List(length = amount)
+    cdef Py_ssize_t i
+    for i in range(amount):
+        setScaleMatrix(matrices.data + i, scales.get(i))
+    return matrices
+
+def scale3x3Parts(Matrix4x4List matrices, VirtualVector3DList scales):
+    cdef Py_ssize_t i
+    cdef Matrix4 *m
+    cdef Vector3 *s
+    for i in range(matrices.length):
+        m = matrices.data + i
+        s = scales.get(i)
+        m.a11 *= s.x; m.a12 *= s.y; m.a13 *= s.z
+        m.a21 *= s.x; m.a22 *= s.y; m.a23 *= s.z
+        m.a31 *= s.x; m.a32 *= s.y; m.a33 *= s.z
+
+def setLocations(Matrix4x4List matrices, VirtualVector3DList locations):
+    cdef Py_ssize_t i
+    for i in range(matrices.length):
+        setMatrixTranslation(matrices.data + i, locations.get(i))
 
 def createRotationsFromEulers(EulerList rotations):
     cdef Matrix4x4List matrices = Matrix4x4List(length = len(rotations))
@@ -85,10 +122,10 @@ def extractMatrixScales(Matrix4x4List matrices):
 
     return scales
 
-cdef void scaleFromMatrix(Vector3 *scale, Matrix4 *matrix):
-    scale.x = sqrt(matrix.a11 * matrix.a11 + matrix.a21 * matrix.a21 + matrix.a31 * matrix.a31)
-    scale.y = sqrt(matrix.a12 * matrix.a12 + matrix.a22 * matrix.a22 + matrix.a32 * matrix.a32)
-    scale.z = sqrt(matrix.a13 * matrix.a13 + matrix.a23 * matrix.a23 + matrix.a33 * matrix.a33)
+cdef void scaleFromMatrix(Vector3 *scale, Matrix4 *m):
+    scale.x = <float>sqrt(m.a11 * m.a11 + m.a21 * m.a21 + m.a31 * m.a31)
+    scale.y = <float>sqrt(m.a12 * m.a12 + m.a22 * m.a22 + m.a32 * m.a32)
+    scale.z = <float>sqrt(m.a13 * m.a13 + m.a23 * m.a23 + m.a33 * m.a33)
 
 
 # Replicate Matrix

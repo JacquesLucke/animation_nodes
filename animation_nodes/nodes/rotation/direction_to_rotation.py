@@ -1,12 +1,12 @@
 import bpy
 from bpy.props import *
 from ... events import propertyChanged
-from ... base_types import VectorizedNode
+from ... base_types import AnimationNode, VectorizedSocket
 
 trackAxisItems = [(axis, axis, "") for axis in ("X", "Y", "Z", "-X", "-Y", "-Z")]
 guideAxisItems  = [(axis, axis, "") for axis in ("X", "Y", "Z")]
 
-class DirectionToRotationNode(bpy.types.Node, VectorizedNode):
+class DirectionToRotationNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_DirectionToRotationNode"
     bl_label = "Direction to Rotation"
     bl_width_default = 160
@@ -14,30 +14,30 @@ class DirectionToRotationNode(bpy.types.Node, VectorizedNode):
     trackAxis = EnumProperty(items = trackAxisItems, update = propertyChanged, default = "Z")
     guideAxis = EnumProperty(items = guideAxisItems, update = propertyChanged, default = "X")
 
-    useDirectionList = VectorizedNode.newVectorizeProperty()
-    useGuideList = VectorizedNode.newVectorizeProperty()
+    useDirectionList = VectorizedSocket.newProperty()
+    useGuideList = VectorizedSocket.newProperty()
 
     def create(self):
-        self.newVectorizedInput("Vector", "useDirectionList",
-            ("Direction", "direction"), ("Directions", "directions"))
+        self.newInput(VectorizedSocket("Vector", "useDirectionList",
+            ("Direction", "direction"), ("Directions", "directions")))
 
-        self.newVectorizedInput("Vector", "useGuideList",
+        self.newInput(VectorizedSocket("Vector", "useGuideList",
             ("Guide", "guide", dict(value = (0, 0, 1))),
-            ("Guides", "guides"))
+            ("Guides", "guides")))
 
-        useListProperties = [("useDirectionList", "useGuideList")]
+        useListProperties = ["useDirectionList", "useGuideList"]
 
-        self.newVectorizedOutput("Euler", useListProperties,
+        self.newOutput(VectorizedSocket("Euler", useListProperties,
             ("Euler Rotation", "eulerRotation"),
-            ("Euler Rotations", "eulerRotations"))
+            ("Euler Rotations", "eulerRotations")))
 
-        self.newVectorizedOutput("Quaternion", useListProperties,
+        self.newOutput(VectorizedSocket("Quaternion", useListProperties,
             ("Quaternion Rotation", "quaternionRotation", dict(hide = True)),
-            ("Quaternion Rotations", "quaternionRotations", dict(hide = True)))
+            ("Quaternion Rotations", "quaternionRotations", dict(hide = True))))
 
-        self.newVectorizedOutput("Matrix", useListProperties,
+        self.newOutput(VectorizedSocket("Matrix", useListProperties,
             ("Matrix Rotation", "matrixRotation"),
-            ("Matrix Rotations", "matrixRotations"))
+            ("Matrix Rotations", "matrixRotations")))
 
     def draw(self, layout):
         layout.prop(self, "trackAxis", expand = True)
