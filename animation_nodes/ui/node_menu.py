@@ -577,7 +577,7 @@ class GeometryMenu(bpy.types.Menu):
         insertNode(layout, "an_IntersectLinePlaneNode", "Intersect Line Plane")
         insertNode(layout, "an_IntersectLineSphereNode", "Intersect Line Sphere")
         insertNode(layout, "an_IntersectPlanePlaneNode", "Intersect Plane Plane")
-        insertNode(layout, "an_IntersectSpherePlaneNode", "Intersect Plane Sphere")
+        insertNode(layout, "an_IntersectSpherePlaneNode", "Intersect Sphere Plane")
         insertNode(layout, "an_IntersectSphereSphereNode", "Intersect Sphere Sphere")
         layout.separator()
         insertNode(layout, "an_BarycentricTransformNode", "Barycentric Transform")
