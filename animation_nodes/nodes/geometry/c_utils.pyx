@@ -21,7 +21,7 @@ cdef intersect_LineLine(Vector3 *firstLineStart, Vector3 *firstLineEnd,
     subVec3(&direction1, firstLineEnd, firstLineStart)
     subVec3(&direction2, secondLineEnd, secondLineStart)
     crossVec3(&normal, &direction1, &direction2)
-    if lengthVec3(&normal) < 1e-6 or lengthVec3(&direction1) == 0 or lengthVec3(&direction2) == 0:
+    if lengthVec3(&normal) < 1e-6:
         outFirstNearestPoint[0] = Vector3(0,0,0)
         outSecondNearestPoint[0] = Vector3(0,0,0)
         outFirstParameter[0] = 0

@@ -1,12 +1,12 @@
 from mathutils import Vector
 from unittest import TestCase
 from . c_utils import (
-                       intersect_LineLine_Single,
-                       intersect_LinePlane_Single,
-                       intersect_LineSphere_Single,
-                       intersect_PlanePlane_Single,
-                       intersect_SpherePlane_Single,
-                       intersect_SphereSphere_Single)
+    intersect_LineLine_Single,
+    intersect_LinePlane_Single,
+    intersect_LineSphere_Single,
+    intersect_PlanePlane_Single,
+    intersect_SpherePlane_Single,
+    intersect_SphereSphere_Single)
 
 class TestLineLine(TestCase):
     def testValidLineLine(self):

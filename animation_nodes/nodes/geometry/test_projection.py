@@ -1,8 +1,8 @@
 from mathutils import Vector
 from unittest import TestCase
 from . c_utils import (
-                       project_PointOnLine_Single,
-                       project_PointOnPlane_Single)
+    project_PointOnLine_Single,
+    project_PointOnPlane_Single)
 
 class TestProject(TestCase):
     def testProjectOnLine(self):
