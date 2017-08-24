@@ -156,7 +156,7 @@ cdef intersect_LineSphere(Vector3 *lineStart, Vector3 *lineEnd,
     a = lengthSquaredVec3(&direction)
     b = dotVec3(&direction, &startingPoint) * 2
     c = lengthSquaredVec3(&startingPoint) - sphereRadius * sphereRadius
-    discriminant = b ** 2 - 4 * a * c
+    discriminant = b * b - 4 * a * c
     if discriminant < 0 or a == 0:
         outFirstIntersection[0] = Vector3(0,0,0)
         outSecondIntersection[0] = Vector3(0,0,0)
