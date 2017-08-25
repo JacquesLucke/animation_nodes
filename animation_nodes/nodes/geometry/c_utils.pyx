@@ -10,6 +10,7 @@ from ... data_structures cimport (
 # Line-Line Intersection
 ################################################
 
+@cython.cdivision(True)
 cdef intersect_LineLine(Vector3 *firstLineStart, Vector3 *firstLineEnd,
                         Vector3 *secondLineStart, Vector3 *secondLineEnd,
                         Vector3 *outFirstNearestPoint, Vector3 *outSecondNearestPoint,
@@ -85,6 +86,7 @@ def intersect_LineLine_Single(firstLineStart,
 # Line-Plane Intersection
 ################################################
 
+@cython.cdivision(True)
 cdef intersect_LinePlane(Vector3 *lineStart, Vector3 *lineEnd,
                          Vector3 *planePoint, Vector3 *planeNormal,
                          Vector3 *outIntersection, double *outParameter, char *outValid):
@@ -141,6 +143,7 @@ def intersect_LinePlane_Single(lineStart,
 # Line-Sphere Intersection
 ################################################
 
+@cython.cdivision(True)
 cdef intersect_LineSphere(Vector3 *lineStart, Vector3 *lineEnd,
                           Vector3 *sphereCenter, double sphereRadius,
                           Vector3 *outFirstIntersection, Vector3 *outSecondIntersection,
@@ -153,8 +156,8 @@ cdef intersect_LineSphere(Vector3 *lineStart, Vector3 *lineEnd,
     a = lengthSquaredVec3(&direction)
     b = dotVec3(&direction, &startingPoint) * 2
     c = lengthSquaredVec3(&startingPoint) - sphereRadius * sphereRadius
-    discriminant = b ** 2 - 4 * a * c
-    if discriminant < 0:
+    discriminant = b * b - 4 * a * c
+    if discriminant < 0 or a == 0:
         outFirstIntersection[0] = Vector3(0,0,0)
         outSecondIntersection[0] = Vector3(0,0,0)
         outFirstParameter[0] = 0
@@ -229,6 +232,7 @@ def intersect_LineSphere_Single(lineStart,
 # Plane-Plane Intersection
 ################################################
 
+@cython.cdivision(True)
 cdef intersect_PlanePlane(Vector3 *firstPlanePoint, Vector3 *firstPlaneNormal,
                           Vector3 *secondPlanePoint, Vector3 *secondPlaneNormal,
                           Vector3 *outLineDirection, Vector3 *outLinePoint, char *outValid):
@@ -246,7 +250,7 @@ cdef intersect_PlanePlane(Vector3 *firstPlanePoint, Vector3 *firstPlaneNormal,
     h1 = dotVec3(firstPlaneNormal, firstPlanePoint)
     h2 = dotVec3(secondPlaneNormal, secondPlanePoint)
     dot = dotVec3(firstPlaneNormal, secondPlaneNormal)
-    invDotSquared = (1 - dot ** 2)
+    invDotSquared = (1 - dot * dot)
     c1 = (h1 - h2 * dot)/invDotSquared
     c2 = (h2 - h1 * dot)/invDotSquared
     scaleVec3(&factor1, firstPlaneNormal, c1)

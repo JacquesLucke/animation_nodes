@@ -20,8 +20,8 @@ class ProjectPointOnPlaneNode(bpy.types.Node, AnimationNode):
             ("Plane Points", "planePoints"),
             codeProperties = dict(default = (0, 0, 0))))
         self.newInput(VectorizedSocket("Vector", "usePlaneNormalList",
-            ("Plane Point", "planeNormal", dict(value = (0, 0, 1))),
-            ("Plane Points", "planeNormals"),
+            ("Plane Normal", "planeNormal", dict(value = (0, 0, 1))),
+            ("Plane Normals", "planeNormals"),
             codeProperties = dict(default = (0, 0, 1))))
 
         self.newInput(VectorizedSocket("Vector", "usePointList",
