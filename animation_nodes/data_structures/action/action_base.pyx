@@ -28,6 +28,8 @@ cdef class Action:
             defaults = FloatList.fromValue(defaults, length = len(channels))
         elif not isinstance(defaults, FloatList):
             defaults = FloatList.fromValues(defaults)
+        elif isinstance(defaults, FloatList):
+            pass
         else:
             raise Exception("defaults has to be a number or a list of numbers")
 
