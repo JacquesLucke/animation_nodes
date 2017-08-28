@@ -57,7 +57,7 @@ class ObjectActionOutputNode(bpy.types.Node, AnimationNode):
             ("location", 0, 1, 2),
             ("rotation_euler", 0, 1, 2),
             ("scale", 0, 1, 2)])
-            
+
         cdef FloatList defaults = FloatList.fromValues([0, 0, 0, 0, 0, 0, 1, 1, 1])
         cdef ActionEvaluator evaluator = action.getEvaluator(channels, defaults)
         cdef FloatList values = FloatList(length = len(channels))
@@ -95,6 +95,9 @@ class ObjectActionOutputNode(bpy.types.Node, AnimationNode):
 
     def execute_RawChannels(self, list objects, Action action, list channels, VirtualDoubleList frames):
         channels = self.getKnownChannels(channels)
+        if len(channels) == 0:
+            return
+            
         cdef tuple paths = tuple(channel.path for channel in channels)
         cdef ActionEvaluator evaluator = action.getEvaluator(channels)
         cdef FloatList values = FloatList(length = len(channels))
