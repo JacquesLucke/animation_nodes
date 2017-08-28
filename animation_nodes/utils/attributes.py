@@ -19,3 +19,18 @@ def getAttributeGetter(propName):
 def hasEvaluableRepr(value):
     try: return eval(repr(value)) == value
     except: return False
+
+def pathBelongsToArray(object, dataPath):
+    if "." in dataPath:
+        pathToProperty, propertyName = dataPath.rsplit(".", 1)
+        pathToProperty = "." + pathToProperty
+    else:
+        pathToProperty = ""
+        propertyName = dataPath
+
+    try:
+        amount = eval("object{}.bl_rna.properties[{}].array_length".format(pathToProperty, repr(propertyName)))
+        return amount > 0
+    except:
+        # Means that the property has not been found
+        return None
