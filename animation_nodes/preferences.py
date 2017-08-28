@@ -152,7 +152,7 @@ class DrawHandlerProperties(bpy.types.PropertyGroup):
     bl_idname = "an_DrawHandlerProperties"
     meshIndices = PointerProperty(type = DrawMeshIndicesProperties)
 
-class AddonPreferences(bpy.types.AddonPreferences):
+class AnimationNodesPreferences(bpy.types.AddonPreferences):
     bl_idname = addonName
 
     nodeColors = PointerProperty(type = NodeColorProperties)
