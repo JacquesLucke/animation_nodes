@@ -45,7 +45,7 @@ cdef class FCurveAction(BoundedAction):
         self.channels = set(channels)
         self.fCurveByChannel = {c : f for f, c in zip(fCurves, channels)}
 
-    cdef BoundedActionEvaluator getEvaluator(self, list channels):
+    cdef BoundedActionEvaluator getEvaluator_Limited(self, list channels):
         cdef list fCurves
         fCurves = [self.fCurveByChannel[c] for c in channels]
         return FCurveActionEvaluator(fCurves)
