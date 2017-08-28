@@ -34,7 +34,9 @@ cdef class Action:
         return self.getEvaluator_Full(channels, defaults)
 
     def __repr__(self):
-        text = "Action with {} channels:\n".format(len(self.channels))
+        bounded = isinstance(self, BoundedAction)
+        typeString = "Bounded" if bounded else "Unbounded"
+        text = "{} Action with {} channels:\n".format(typeString, len(self.channels))
         for channel in sorted(self.channels, key = str):
             text += "    {}\n".format(channel)
         return text
