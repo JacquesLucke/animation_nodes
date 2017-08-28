@@ -238,25 +238,29 @@ cdef class PathActionChannel(ActionChannel):
     def __repr__(self):
         return "<Channel '{}'>".format(self.path)
 
-cdef class PathIndexActionChannel(PathActionChannel):
-    def __init__(self, str path, Py_ssize_t index):
+cdef class PathIndexActionChannel(ActionChannel):
+    def __init__(self, str property, Py_ssize_t index):
         if index < 0:
             raise ValueError("Index must be >= 0")
 
-        self.path = path
+        self.property = property
         self.index = index
+
+    @property
+    def path(self):
+        return "{}[{}]".format(self.property, self.index)
 
     def __richcmp__(x, y, int op):
         if not isinstance(x, y.__class__):
             return NotImplemented
 
         if op == 2:
-            return x.path == y.path and x.index == y.index
+            return x.property == y.property and x.index == y.index
         elif op == 3:
-            return x.path != y.path or x.index != y.index
+            return x.property != y.property or x.index != y.index
 
     def __hash__(self):
-        return hash((self.path, self.index))
+        return hash((self.property, self.index))
 
     def __repr__(self):
-        return "<Channel '{}'[{}]>".format(self.path, self.index)
+        return "<Channel '{}'[{}]>".format(self.property, self.index)
