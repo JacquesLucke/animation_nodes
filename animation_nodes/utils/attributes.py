@@ -22,6 +22,7 @@ def getMultiAttibuteSetter(propNames):
     for i, prop in enumerate(propNames):
         line = getAttributeSetterLine("owner", prop, "values[{}]".format(i))
         code += "    " + line + "\n"
+    code += "    pass"
     variables = {}
     exec(code, variables)
     return variables["setter"]
