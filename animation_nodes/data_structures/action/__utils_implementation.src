@@ -18,8 +18,9 @@ cdef class FilledBOUNDTYPEActionEvaluator(BOUNDTYPEActionEvaluator):
         self.evaluatorMapping = IntegerList()
 
         cdef Py_ssize_t i, j
+        cdef set sourceChannels = source.getChannelSet()
         for i, channel in enumerate(channels):
-            if channel in source.channels:
+            if channel in sourceChannels:
                 evaluatorChannels.append(channel)
                 self.evaluatorMapping.append(i)
             else:

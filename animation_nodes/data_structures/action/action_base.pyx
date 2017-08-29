@@ -63,7 +63,8 @@ cdef class BoundedAction(Action):
         if len(channels) != defaults.length:
             raise Exception("unequal channel and default amount")
 
-        if all([channel in self.channels for channel in channels]):
+        cdef set myChannels = self.getChannelSet()
+        if all([channel in myChannels for channel in channels]):
             return self.getEvaluator_Limited(channels)
         else:
             return FilledBoundedActionEvaluator(self, channels, defaults)
@@ -76,7 +77,8 @@ cdef class UnboundedAction(Action):
         if len(channels) != defaults.length:
             raise Exception("unequal channel and default amount")
 
-        if all([channel in self.channels for channel in channels]):
+        cdef set myChannels = self.getChannelSet()
+        if all([channel in myChannels for channel in channels]):
             return self.getEvaluator_Limited(channels)
         else:
             return FilledUnboundedActionEvaluator(self, channels, defaults)
