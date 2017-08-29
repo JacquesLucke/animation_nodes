@@ -97,7 +97,7 @@ class ObjectActionOutputNode(bpy.types.Node, AnimationNode):
         channels = self.getKnownChannels(channels)
         if len(channels) == 0:
             return
-            
+
         cdef tuple paths = tuple(channel.path for channel in channels)
         cdef ActionEvaluator evaluator = action.getEvaluator(channels)
         cdef FloatList values = FloatList(length = len(channels))
