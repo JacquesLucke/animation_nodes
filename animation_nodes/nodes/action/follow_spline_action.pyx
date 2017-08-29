@@ -7,7 +7,7 @@ from ... data_structures cimport (
     Spline,
     PathIndexActionChannel,
     BoundedAction, BoundedActionEvaluator,
-    BoundedActionProvider, BoundedActionProviderEvaluator
+    BoundedActionProvider
 )
 
 class FollowSplineActionNode(bpy.types.Node, AnimationNode):
@@ -41,7 +41,7 @@ cdef class FollowSplineAction(BoundedAction):
 
     cdef BoundedActionEvaluator getEvaluator_Limited(self, list channels):
         provider = FollowSplineActionEvaluator(self.spline, self.duration)
-        return BoundedActionProviderEvaluator(provider, channels)
+        return self.getProviderEvaluator(provider, channels)
 
 cdef class FollowSplineActionEvaluator(BoundedActionProvider):
     cdef Spline spline
