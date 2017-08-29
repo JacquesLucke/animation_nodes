@@ -27,7 +27,6 @@ class FollowSplineActionNode(bpy.types.Node, AnimationNode):
 
 locationChannels = PathIndexActionChannel.initList([("location", 0, 1, 2)])
 rotationChannels = PathIndexActionChannel.initList([("rotation_euler", 0, 1, 2)])
-allChannels = locationChannels + rotationChannels
 
 cdef class FollowSplineAction(CustomBoundedAction):
     cdef Spline spline
@@ -36,7 +35,6 @@ cdef class FollowSplineAction(CustomBoundedAction):
     def __cinit__(self, Spline spline, float duration):
         self.spline = spline
         self.duration = max(duration, 0.001)
-        self.channels = set(allChannels)
 
     cdef list getEvaluateFunctions(self):
         cdef list functions = []

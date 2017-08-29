@@ -11,6 +11,12 @@ ctypedef fused set_or_list:
 #########################################################
 
 cdef class Action:
+    cdef set getChannelSet(self):
+        raise NotImplementedError()
+
+    def getChannels(self):
+        return self.getChannelSet()
+
     @classmethod
     def checkChannels(cls, set_or_list channels):
         if any((not isinstance(channel, ActionChannel) for channel in channels)):
@@ -40,10 +46,11 @@ cdef class Action:
         return self.getEvaluator_Full(channels, defaults)
 
     def __repr__(self):
+        cdef set channels = self.getChannelSet()
         bounded = isinstance(self, BoundedAction)
         typeString = "Bounded" if bounded else "Unbounded"
-        text = "{} Action with {} channels:\n".format(typeString, len(self.channels))
-        for channel in sorted(self.channels, key = str):
+        text = "{} Action with {} channels:\n".format(typeString, len(channels))
+        for channel in sorted(channels, key = str):
             text += "    {}\n".format(channel)
         return text
 

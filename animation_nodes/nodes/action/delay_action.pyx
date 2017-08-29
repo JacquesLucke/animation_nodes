@@ -25,7 +25,9 @@ cdef class DelayBoundedAction(BoundedAction):
     def __cinit__(self, BoundedAction action, float delay):
         self.action = action
         self.delay = delay
-        self.channels = action.channels
+
+    cdef set getChannelSet(self):
+        return self.action.getChannelSet()
 
     cdef BoundedActionEvaluator getEvaluator_Limited(self, list channels):
         return DelayBoundedActionEvaluator(self.action.getEvaluator_Limited(channels), self.delay)

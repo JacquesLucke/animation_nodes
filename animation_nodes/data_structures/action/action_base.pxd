@@ -1,7 +1,7 @@
 from .. lists.base_lists cimport FloatList, IntegerList
 
 cdef class Action:
-    cdef readonly set channels
+    cdef set getChannelSet(self)
 
 cdef class BoundedAction(Action):
     cdef BoundedActionEvaluator getEvaluator_Limited(self, list channels)

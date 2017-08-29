@@ -34,6 +34,7 @@ class ActionFromObjectNode(bpy.types.Node, AnimationNode):
 
 cdef class FCurveAction(BoundedAction):
     cdef dict fCurveByChannel
+    cdef set channels
 
     def __cinit__(self, list fCurves, list channels):
         if len(fCurves) != len(channels):
@@ -44,6 +45,9 @@ cdef class FCurveAction(BoundedAction):
         self.checkChannels(channels)
         self.channels = set(channels)
         self.fCurveByChannel = {c : f for f, c in zip(fCurves, channels)}
+
+    cdef set getChannelSet(self):
+        return self.channels
 
     cdef BoundedActionEvaluator getEvaluator_Limited(self, list channels):
         cdef list fCurves

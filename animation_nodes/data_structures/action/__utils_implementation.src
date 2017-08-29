@@ -105,6 +105,12 @@ cdef class CustomBOUNDTYPEAction(BOUNDTYPEAction):
         data.channels = channels
         return data
 
+    cdef set getChannelSet(self):
+        cdef set channels = set()
+        for data in self.getEvaluateFunctions():
+            channels.update(data.channels)
+        return channels
+
 #IF "BOUNDTYPE" == "Bounded"
     cdef float getStart(self, Py_ssize_t index):
         raise NotImplementedError()

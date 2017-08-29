@@ -45,7 +45,7 @@ class ObjectActionOutputNode(bpy.types.Node, AnimationNode):
             return objects
 
         cdef VirtualDoubleList _frames = VirtualDoubleList.fromListOrElement(frames, 0)
-        self.execute_RawChannels(objects, action, list(action.channels), _frames)
+        self.execute_RawChannels(objects, action, list(action.getChannelSet()), _frames)
 
         return objects
 
@@ -88,7 +88,7 @@ class ObjectActionOutputNode(bpy.types.Node, AnimationNode):
             multMatrix4(&finalMatrix, offset, &localMatrix)
             object.matrix_world = toPyMatrix4(&finalMatrix)
 
-        cdef list otherChannels = list(action.channels - set(channels))
+        cdef list otherChannels = list(action.getChannelSet() - set(channels))
         self.execute_RawChannels(objects, action, otherChannels, _frames)
 
         return objects
