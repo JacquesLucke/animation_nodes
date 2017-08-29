@@ -1,6 +1,6 @@
 import bpy
 from ... base_types import AnimationNode
-from ... data_structures cimport BoundedAction, UnboundedAction, ActionEvaluator, FloatList, UnboundedActionEvaluator, BoundedActionEvaluator, PathIndexActionChannel
+from ... data_structures cimport UnboundedAction, UnboundedActionEvaluator, FloatList, ActionChannel
 from ... algorithms.perlin_noise cimport perlinNoise1D
 
 class WiggleLocationActionNode(bpy.types.Node, AnimationNode):
@@ -8,26 +8,32 @@ class WiggleLocationActionNode(bpy.types.Node, AnimationNode):
     bl_label = "Wiggle Location Action"
 
     def create(self):
-        self.newInput("Float", "Amplitude", "amplitude")
+        self.newInput("Float", "Amplitude", "amplitude", value = 1)
         self.newOutput("Action", "Action", "action")
 
     def execute(self, amplitude):
-        return WiggleLocationAction(amplitude)
+        channels = ActionChannel.initList([("location", 0, 1, 2)])
+        return WiggleAction(amplitude, channels)
 
 
-cdef class WiggleLocationAction(UnboundedAction):
+cdef class WiggleAction(UnboundedAction):
     cdef float amplitude
+    cdef set channels
 
-    def __cinit__(self, float amplitude):
+    def __cinit__(self, float amplitude, list channels):
         self.amplitude = amplitude
-        self.channels = set(PathIndexActionChannel.initList([("location", 0, 1, 2)]))
+        self.channels = set(channels)
+        self.checkChannels(channels)
+
+    cdef set getChannelSet(self):
+        return self.channels
 
     cdef UnboundedActionEvaluator getEvaluator_Limited(self, list channels):
         cdef FloatList factors
         factors = FloatList.fromValue(self.amplitude, length = len(channels))
-        return WiggleChannelsEvaluator(factors)
+        return WiggleActionEvaluator(factors)
 
-cdef class WiggleChannelsEvaluator(UnboundedActionEvaluator):
+cdef class WiggleActionEvaluator(UnboundedActionEvaluator):
     cdef FloatList factors
 
     def __cinit__(self, FloatList factors):
