@@ -27,6 +27,5 @@ from . data_structures.action.action_base cimport (
 )
 
 from . data_structures.action.action_utilities cimport (
-    BoundedActionProvider, UnboundedActionProvider,
-    BoundedActionProviderEvaluator, UnboundedActionProviderEvaluator
+    CustomBoundedAction, CustomUnboundedAction
 )

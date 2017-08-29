@@ -6,8 +6,7 @@ from ... algorithms.rotations.rotation_and_direction cimport directionToMatrix_L
 from ... data_structures cimport (
     Spline,
     PathIndexActionChannel,
-    BoundedAction, BoundedActionEvaluator,
-    BoundedActionProvider
+    CustomBoundedAction
 )
 
 class FollowSplineActionNode(bpy.types.Node, AnimationNode):
@@ -30,7 +29,7 @@ locationChannels = PathIndexActionChannel.initList([("location", 0, 1, 2)])
 rotationChannels = PathIndexActionChannel.initList([("rotation_euler", 0, 1, 2)])
 allChannels = locationChannels + rotationChannels
 
-cdef class FollowSplineAction(BoundedAction):
+cdef class FollowSplineAction(CustomBoundedAction):
     cdef Spline spline
     cdef float duration
 
@@ -38,18 +37,6 @@ cdef class FollowSplineAction(BoundedAction):
         self.spline = spline
         self.duration = max(duration, 0.001)
         self.channels = set(allChannels)
-
-    cdef BoundedActionEvaluator getEvaluator_Limited(self, list channels):
-        provider = FollowSplineActionEvaluator(self.spline, self.duration)
-        return self.getProviderEvaluator(provider, channels)
-
-cdef class FollowSplineActionEvaluator(BoundedActionProvider):
-    cdef Spline spline
-    cdef float duration
-
-    def __cinit__(self, Spline spline, float duration):
-        self.spline = spline
-        self.duration = duration
 
     cdef list getEvaluateFunctions(self):
         cdef list functions = []

@@ -1,4 +1,4 @@
-cdef class BOUNDTYPEActionProvider:
+cdef class CustomBOUNDTYPEAction(BOUNDTYPEAction):
     cdef list getEvaluateFunctions(self)
     cdef newFunction(self, void *function, list channels)
 
@@ -8,8 +8,8 @@ cdef class BOUNDTYPEActionProvider:
     cdef float getLength(self, Py_ssize_t index)
 #ENDIF
 
-cdef class BOUNDTYPEActionProviderEvaluator(BOUNDTYPEActionEvaluator):
-    cdef BOUNDTYPEActionProvider provider
+cdef class BOUNDTYPECustomActionEvaluator(BOUNDTYPEActionEvaluator):
+    cdef CustomBOUNDTYPEAction action
     cdef EvaluateFunction *functions
     cdef IntegerList channelAmounts
     cdef IntegerList mapping

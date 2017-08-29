@@ -92,11 +92,10 @@ cdef class RemapBOUNDTYPEActionEvaluator(BoundedActionEvaluator):
 #ENDIF
 
 
+# Custom
+###########################################################
 
-# Provider
-##################################################
-
-cdef class BOUNDTYPEActionProvider:
+cdef class CustomBOUNDTYPEAction(BOUNDTYPEAction):
     cdef list getEvaluateFunctions(self):
         raise NotImplementedError()
 
@@ -117,15 +116,18 @@ cdef class BOUNDTYPEActionProvider:
         raise NotImplementedError()
 #ENDIF
 
-cdef class BOUNDTYPEActionProviderEvaluator(BOUNDTYPEActionEvaluator):
+    cdef BOUNDTYPEActionEvaluator getEvaluator_Limited(self, list channels):
+        return BOUNDTYPECustomActionEvaluator(self, channels)
 
-    def __cinit__(self, BOUNDTYPEActionProvider provider, list channels):
+cdef class BOUNDTYPECustomActionEvaluator(BOUNDTYPEActionEvaluator):
+
+    def __cinit__(self, CustomBOUNDTYPEAction action, list channels):
         cdef list requiredFunctions = []
         cdef set requiredChannels = set(channels)
         cdef list targetChannels = []
         cdef EvaluateFunctionData data
 
-        for data in provider.getEvaluateFunctions():
+        for data in action.getEvaluateFunctions():
             if not requiredChannels.isdisjoint(data.channels):
                 requiredFunctions.append(data)
                 targetChannels.extend(data.channels)
@@ -143,7 +145,7 @@ cdef class BOUNDTYPEActionProviderEvaluator(BOUNDTYPEActionEvaluator):
             self.mapping.data[i] = targetChannels.index(channels[i])
 
         self.target = FloatList(length = len(targetChannels))
-        self.provider = provider
+        self.action = action
 
     def __dealloc__(self):
         PyMem_Free(self.functions)
@@ -152,7 +154,7 @@ cdef class BOUNDTYPEActionProviderEvaluator(BOUNDTYPEActionEvaluator):
         cdef Py_ssize_t i
         cdef Py_ssize_t pos = 0
         for i in range(self.channelAmounts.length):
-            self.functions[i](<void*>self.provider, frame, index, self.target.data + pos)
+            self.functions[i](<void*>self.action, frame, index, self.target.data + pos)
             pos += self.channelAmounts.data[i]
 
         for i in range(self.channelAmount):
@@ -160,11 +162,11 @@ cdef class BOUNDTYPEActionProviderEvaluator(BOUNDTYPEActionEvaluator):
 
 #IF "BOUNDTYPE" == "Bounded"
     cpdef float getStart(self, Py_ssize_t index):
-        return self.provider.getStart(index)
+        return self.action.getStart(index)
 
     cpdef float getEnd(self, Py_ssize_t index):
-        return self.provider.getEnd(index)
+        return self.action.getEnd(index)
 
     cpdef float getLength(self, Py_ssize_t index):
-        return self.provider.getLength(index)
+        return self.action.getLength(index)
 #ENDIF

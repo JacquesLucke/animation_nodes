@@ -2,11 +2,6 @@ from . action_utilities import (
     FilledBoundedActionEvaluator, FilledUnboundedActionEvaluator
 )
 
-from . action_utilities cimport (
-    BoundedActionProvider, UnboundedActionProvider,
-    BoundedActionProviderEvaluator, UnboundedActionProviderEvaluator
-)
-
 ctypedef fused set_or_list:
     set
     list
@@ -65,9 +60,6 @@ cdef class BoundedAction(Action):
             return self.getEvaluator_Limited(channels)
         else:
             return FilledBoundedActionEvaluator(self, channels, defaults)
-
-    def getProviderEvaluator(self, BoundedActionProvider provider, list channels):
-        return BoundedActionProviderEvaluator(provider, channels)
 
 cdef class UnboundedAction(Action):
     cdef UnboundedActionEvaluator getEvaluator_Limited(self, list channels):
