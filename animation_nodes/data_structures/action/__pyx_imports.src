@@ -1,0 +1,5 @@
+from cpython cimport PyMem_Malloc, PyMem_Free
+
+cdef class EvaluateFunctionData:
+    cdef EvaluateFunction function
+    cdef list channels

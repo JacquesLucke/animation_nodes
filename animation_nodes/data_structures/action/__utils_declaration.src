@@ -1,0 +1,16 @@
+cdef class BOUNDTYPEActionProvider:
+    cdef list getEvaluateFunctions(self)
+    cdef newFunction(self, void *function, list channels)
+
+#IF "BOUNDTYPE" == "Bounded"
+    cdef float getStart(self, Py_ssize_t index)
+    cdef float getEnd(self, Py_ssize_t index)
+    cdef float getLength(self, Py_ssize_t index)
+#ENDIF
+
+cdef class BOUNDTYPEActionProviderEvaluator(BOUNDTYPEActionEvaluator):
+    cdef BOUNDTYPEActionProvider provider
+    cdef EvaluateFunction *functions
+    cdef IntegerList channelAmounts
+    cdef IntegerList mapping
+    cdef FloatList target

@@ -1,3 +1,7 @@
+from . action_utilities import (
+    FilledBoundedActionEvaluator, FilledUnboundedActionEvaluator
+)
+
 ctypedef fused set_or_list:
     set
     list
@@ -45,7 +49,8 @@ cdef class Action:
 
 cdef class BoundedAction(Action):
     cdef BoundedActionEvaluator getEvaluator_Limited(self, list channels):
-        raise NotImplementedError()
+        defaults = FloatList.fromValue(0, length = len(channels))
+        return self.getEvaluator_Full(channels, defaults)
 
     cpdef BoundedActionEvaluator getEvaluator_Full(self, list channels, FloatList defaults):
         if len(channels) != defaults.length:
@@ -104,97 +109,6 @@ cdef class BoundedActionEvaluator(ActionEvaluator):
 
     cpdef float getLength(self, Py_ssize_t index):
         return self.getEnd(index) - self.getStart(index)
-
-
-# Action Evaluator Helpers
-#########################################################
-
-cdef class FilledUnboundedActionEvaluator(UnboundedActionEvaluator):
-    cdef:
-        FloatList evaluatorTarget
-        FloatList defaults
-        IntegerList defaultMapping
-        IntegerList evaluatorMapping
-        UnboundedActionEvaluator evaluator
-
-    def __cinit__(self, UnboundedAction source, list channels, FloatList defaults):
-        self.channelAmount = len(channels)
-
-        cdef list evaluatorChannels = []
-        self.defaultMapping = IntegerList()
-        self.evaluatorMapping = IntegerList()
-
-        cdef Py_ssize_t i, j
-        for i, channel in enumerate(channels):
-            if channel in source.channels:
-                evaluatorChannels.append(channel)
-                self.evaluatorMapping.append(i)
-            else:
-                self.defaultMapping.append(i)
-
-        self.defaults = defaults
-        self.evaluator = source.getEvaluator(evaluatorChannels)
-        self.evaluatorTarget = FloatList(length = len(evaluatorChannels))
-
-    cdef void evaluate(self, float frame, Py_ssize_t index, float *target):
-        self.evaluator.evaluate(frame, index, self.evaluatorTarget.data)
-
-        cdef Py_ssize_t i
-        for i in range(self.evaluatorMapping.length):
-            target[self.evaluatorMapping.data[i]] = self.evaluatorTarget.data[i]
-
-        cdef Py_ssize_t j
-        for i in range(self.defaultMapping.length):
-            j = self.defaultMapping.data[i]
-            target[j] = self.defaults.data[j]
-
-cdef class FilledBoundedActionEvaluator(BoundedActionEvaluator):
-    cdef:
-        FloatList evaluatorTarget
-        FloatList defaults
-        IntegerList defaultMapping
-        IntegerList evaluatorMapping
-        BoundedActionEvaluator evaluator
-
-    def __cinit__(self, BoundedAction source, list channels, FloatList defaults):
-        self.channelAmount = len(channels)
-
-        cdef list evaluatorChannels = []
-        self.defaultMapping = IntegerList()
-        self.evaluatorMapping = IntegerList()
-
-        cdef Py_ssize_t i, j
-        for i, channel in enumerate(channels):
-            if channel in source.channels:
-                evaluatorChannels.append(channel)
-                self.evaluatorMapping.append(i)
-            else:
-                self.defaultMapping.append(i)
-
-        self.defaults = defaults
-        self.evaluator = source.getEvaluator(evaluatorChannels)
-        self.evaluatorTarget = FloatList(length = len(evaluatorChannels))
-
-    cdef void evaluate(self, float frame, Py_ssize_t index, float *target):
-        self.evaluator.evaluate(frame, index, self.evaluatorTarget.data)
-
-        cdef Py_ssize_t i
-        for i in range(self.evaluatorMapping.length):
-            target[self.evaluatorMapping.data[i]] = self.evaluatorTarget.data[i]
-
-        cdef Py_ssize_t j
-        for i in range(self.defaultMapping.length):
-            j = self.defaultMapping.data[i]
-            target[j] = self.defaults.data[j]
-
-    cpdef float getStart(self, Py_ssize_t index):
-        return self.evaluator.getStart(index)
-
-    cpdef float getEnd(self, Py_ssize_t index):
-        return self.evaluator.getEnd(index)
-
-    cpdef float getLength(self, Py_ssize_t index):
-        return self.evaluator.getLength(index)
 
 
 # Action Channel

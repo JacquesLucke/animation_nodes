@@ -25,3 +25,8 @@ from . data_structures.action.action_base cimport (
     ActionEvaluator, BoundedActionEvaluator, UnboundedActionEvaluator,
     ActionChannel, PathActionChannel, PathIndexActionChannel
 )
+
+from . data_structures.action.action_utilities cimport (
+    BoundedActionProvider, UnboundedActionProvider,
+    BoundedActionProviderEvaluator, UnboundedActionProviderEvaluator
+)
