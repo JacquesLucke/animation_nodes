@@ -5,8 +5,8 @@ paths = {}
 def setup(utils):
     global paths
     paths = {
-        "implementation" : utils.changeFileName(__file__, "__utils_implementation.src"),
-        "declaration" : utils.changeFileName(__file__, "__utils_declaration.src"),
+        "implementation" : utils.changeFileName(__file__, "__types_implementation.src"),
+        "declaration" : utils.changeFileName(__file__, "__types_declaration.src"),
         "pyx imports" : utils.changeFileName(__file__, "__pyx_imports.src"),
         "pxd imports" : utils.changeFileName(__file__, "__pxd_imports.src")
     }
@@ -20,13 +20,13 @@ def getPyPreprocessTasks(PyPreprocessTask, utils):
     ]
 
     pyxTask = PyPreprocessTask(
-        target = utils.changeFileName(__file__, "action_utilities.pyx"),
+        target = utils.changeFileName(__file__, "action_types.pyx"),
         dependencies = dependencies,
         function = generate_pyx
     )
 
     pxdTask = PyPreprocessTask(
-        target = utils.changeFileName(__file__, "action_utilities.pxd"),
+        target = utils.changeFileName(__file__, "action_types.pxd"),
         dependencies = dependencies,
         function = generate_pxd
     )

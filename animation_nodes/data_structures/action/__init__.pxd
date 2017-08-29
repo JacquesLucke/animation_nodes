@@ -1,12 +1,12 @@
-from . action_base import (
+from . action.action_base cimport (
     Action, ActionEvaluator, ActionChannel
 )
 
-from . action_channels import (
+from . action.action_channels cimport (
     PathActionChannel, PathIndexActionChannel
 )
 
-from . action_types import (
+from . action.action_types cimport (
     BoundedAction, UnboundedAction,
     BoundedActionEvaluator, UnboundedActionEvaluator,
     CustomBoundedAction, CustomUnboundedAction

@@ -27,10 +27,12 @@ def importDataStructures():
     from . sounds.average_sound import AverageSound
     from . sounds.spectrum_sound import SpectrumSound
 
-    from . action.action_base import (
-        Action, BoundedAction, UnboundedAction,
-        ActionEvaluator, BoundedActionEvaluator, UnboundedActionEvaluator,
-        ActionChannel, PathActionChannel, PathIndexActionChannel
+    from . action import (
+        Action, ActionEvaluator, ActionChannel,
+        PathActionChannel, PathIndexActionChannel,
+        BoundedAction, UnboundedAction,
+        BoundedActionEvaluator, UnboundedActionEvaluator,
+        CustomBoundedAction, CustomUnboundedAction
     )
 
     return locals()

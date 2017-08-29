@@ -1,4 +1,49 @@
 
+# Base Action
+#######################################################
+
+cdef class BOUNDTYPEAction(Action):
+    cdef BOUNDTYPEActionEvaluator getEvaluator_Limited(self, list channels):
+        defaults = FloatList.fromValue(0, length = len(channels))
+        return self.getEvaluator_Full(channels, defaults)
+
+    cpdef BOUNDTYPEActionEvaluator getEvaluator_Full(self, list channels, FloatList defaults):
+        if len(channels) != defaults.length:
+            raise Exception("unequal channel and default amount")
+
+        cdef set myChannels = self.getChannelSet()
+        if all([channel in myChannels for channel in channels]):
+            return self.getEvaluator_Limited(channels)
+        else:
+            return FilledBOUNDTYPEActionEvaluator(self, channels, defaults)
+
+    def __repr__(self):
+        cdef set channels = self.getChannelSet()
+        text = "BOUNDTYPE Action with {} channels:\n".format(len(channels))
+        for channel in sorted(channels, key = str):
+            text += "    {}\n".format(channel)
+        return text
+
+# Base Evaluator
+#######################################################
+
+cdef class BOUNDTYPEActionEvaluator(ActionEvaluator):
+    pass
+#IF "BOUNDTYPE" == "Bounded"
+    cdef void evaluateBounded(self, float t, Py_ssize_t index, float *target):
+        cdef float frame = t * self.getLength(index) + self.getStart(index)
+        self.evaluate(frame, index, target)
+
+    cpdef float getStart(self, Py_ssize_t index):
+        return self.getEnd(index) - self.getLength(index)
+
+    cpdef float getEnd(self, Py_ssize_t index):
+        return self.getStart(index) + self.getLength(index)
+
+    cpdef float getLength(self, Py_ssize_t index):
+        return self.getEnd(index) - self.getStart(index)
+#ENDIF
+
 # Fill
 #######################################################
 
@@ -127,6 +172,11 @@ cdef class CustomBOUNDTYPEAction(BOUNDTYPEAction):
         return BOUNDTYPECustomActionEvaluator(self, channels)
 
 cdef class BOUNDTYPECustomActionEvaluator(BOUNDTYPEActionEvaluator):
+    cdef CustomBOUNDTYPEAction action
+    cdef EvaluateFunction *functions
+    cdef IntegerList channelAmounts
+    cdef IntegerList mapping
+    cdef FloatList target
 
     def __cinit__(self, CustomBOUNDTYPEAction action, list channels):
         cdef list requiredFunctions = []
