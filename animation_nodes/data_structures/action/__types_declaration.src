@@ -12,7 +12,7 @@ cdef class BOUNDTYPEActionEvaluator(ActionEvaluator):
     cpdef float getLength(self, Py_ssize_t index)
 #ENDIF
 
-cdef class CustomBOUNDTYPEAction(BOUNDTYPEAction):
+cdef class SimpleBOUNDTYPEAction(BOUNDTYPEAction):
     cdef list getEvaluateFunctions(self)
     cdef newFunction(self, void *function, list channels)
 

@@ -138,10 +138,10 @@ cdef class RemapBOUNDTYPEActionEvaluator(BoundedActionEvaluator):
 #ENDIF
 
 
-# Custom
+# Simple
 ###########################################################
 
-cdef class CustomBOUNDTYPEAction(BOUNDTYPEAction):
+cdef class SimpleBOUNDTYPEAction(BOUNDTYPEAction):
     cdef list getEvaluateFunctions(self):
         raise NotImplementedError()
 
@@ -169,16 +169,16 @@ cdef class CustomBOUNDTYPEAction(BOUNDTYPEAction):
 #ENDIF
 
     cdef BOUNDTYPEActionEvaluator getEvaluator_Limited(self, list channels):
-        return BOUNDTYPECustomActionEvaluator(self, channels)
+        return BOUNDTYPESimpleActionEvaluator(self, channels)
 
-cdef class BOUNDTYPECustomActionEvaluator(BOUNDTYPEActionEvaluator):
-    cdef CustomBOUNDTYPEAction action
+cdef class BOUNDTYPESimpleActionEvaluator(BOUNDTYPEActionEvaluator):
+    cdef SimpleBOUNDTYPEAction action
     cdef EvaluateFunction *functions
     cdef IntegerList channelAmounts
     cdef IntegerList mapping
     cdef FloatList target
 
-    def __cinit__(self, CustomBOUNDTYPEAction action, list channels):
+    def __cinit__(self, SimpleBOUNDTYPEAction action, list channels):
         cdef list requiredFunctions = []
         cdef set requiredChannels = set(channels)
         cdef list targetChannels = []

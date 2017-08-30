@@ -9,5 +9,5 @@ from . action.action_channels cimport (
 from . action.action_types cimport (
     BoundedAction, UnboundedAction,
     BoundedActionEvaluator, UnboundedActionEvaluator,
-    CustomBoundedAction, CustomUnboundedAction
+    SimpleBoundedAction, SimpleUnboundedAction
 )

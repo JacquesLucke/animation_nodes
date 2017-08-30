@@ -32,7 +32,7 @@ def importDataStructures():
         PathActionChannel, PathIndexActionChannel,
         BoundedAction, UnboundedAction,
         BoundedActionEvaluator, UnboundedActionEvaluator,
-        CustomBoundedAction, CustomUnboundedAction
+        SimpleBoundedAction, SimpleUnboundedAction
     )
 
     return locals()
