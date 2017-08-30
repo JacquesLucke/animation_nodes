@@ -153,6 +153,7 @@ cdef class SimpleBOUNDTYPEAction(BOUNDTYPEAction):
 
     cdef set getChannelSet(self):
         cdef set channels = set()
+        cdef EvaluateFunctionData data
         for data in self.getEvaluateFunctions():
             channels.update(data.channels)
         return channels
