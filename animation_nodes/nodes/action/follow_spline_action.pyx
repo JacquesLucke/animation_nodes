@@ -25,8 +25,8 @@ class FollowSplineActionNode(bpy.types.Node, AnimationNode):
         return FollowSplineAction(spline, duration)
 
 
-locationChannels = PathIndexActionChannel.initList([("location", 0, 1, 2)])
-rotationChannels = PathIndexActionChannel.initList([("rotation_euler", 0, 1, 2)])
+locationChannels = PathIndexActionChannel.forArray("location", 3)
+rotationChannels = PathIndexActionChannel.forArray("rotation_euler", 3)
 
 cdef class FollowSplineAction(SimpleBoundedAction):
     cdef Spline spline

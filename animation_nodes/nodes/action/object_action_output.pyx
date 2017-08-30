@@ -79,10 +79,8 @@ class ObjectActionOutputNode(bpy.types.Node, AnimationNode):
         if action is None:
             return objects
 
-        cdef list channels = PathIndexActionChannel.initList([
-            ("location", 0, 1, 2),
-            ("rotation_euler", 0, 1, 2),
-            ("scale", 0, 1, 2)])
+        cdef list channels = PathIndexActionChannel.forArrays(
+            ["location", "rotation_euler", "scale"], 3)
 
         cdef FloatList defaults = FloatList.fromValues([0, 0, 0, 0, 0, 0, 1, 1, 1])
         cdef ActionEvaluator evaluator = action.getEvaluator(channels, defaults)

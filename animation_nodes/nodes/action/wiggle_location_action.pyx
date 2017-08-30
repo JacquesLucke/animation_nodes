@@ -1,6 +1,6 @@
 import bpy
 from ... base_types import AnimationNode
-from ... data_structures cimport UnboundedAction, UnboundedActionEvaluator, FloatList, ActionChannel
+from ... data_structures cimport UnboundedAction, UnboundedActionEvaluator, FloatList, PathIndexActionChannel
 from ... algorithms.perlin_noise cimport perlinNoise1D
 
 class WiggleLocationActionNode(bpy.types.Node, AnimationNode):
@@ -12,7 +12,7 @@ class WiggleLocationActionNode(bpy.types.Node, AnimationNode):
         self.newOutput("Action", "Action", "action")
 
     def execute(self, amplitude):
-        channels = ActionChannel.initList([("location", 0, 1, 2)])
+        channels = PathIndexActionChannel.forArray("location", 3)
         return WiggleAction(amplitude, channels)
 
 

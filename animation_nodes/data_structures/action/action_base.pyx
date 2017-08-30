@@ -19,9 +19,6 @@ cdef class Action:
     def getEvaluator(self, channels, defaults = None):
         if isinstance(channels, ActionChannel):
             channels = [channels]
-        elif isinstance(channels, list):
-            if len(channels) > 0 and not isinstance(channels[0], ActionChannel):
-                channels = ActionChannel.initList(channels)
         else:
             channels = list(channels)
         self.checkChannels(channels)
@@ -60,19 +57,3 @@ cdef class ActionChannel:
 
     def __hash__(self):
         raise NotImplementedError()
-
-    @classmethod
-    def initList(cls, list values):
-        from . action_channels import PathActionChannel, PathIndexActionChannel
-
-        cdef list channels = []
-        for value in values:
-            if isinstance(value, str):
-                channels.append(PathActionChannel(value))
-            elif isinstance(value, tuple):
-                path = value[0]
-                for index in value[1:]:
-                    channels.append(PathIndexActionChannel(path, index))
-            else:
-                raise Exception("cannot create channels from given data")
-        return channels

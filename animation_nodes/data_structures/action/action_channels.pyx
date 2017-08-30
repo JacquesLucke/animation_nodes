@@ -43,3 +43,11 @@ cdef class PathIndexActionChannel(ActionChannel):
 
     def __repr__(self):
         return "<Channel '{}'[{}]>".format(self.property, self.index)
+
+    @classmethod
+    def forArray(cls, str property, Py_ssize_t arrayLength):
+        return [cls(property, i) for i in range(arrayLength)]
+
+    @classmethod
+    def forArrays(cls, list properties, Py_ssize_t arrayLength):
+        return [c for p in properties for c in cls.forArray(p, arrayLength)]
