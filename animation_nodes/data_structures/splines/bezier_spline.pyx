@@ -39,14 +39,14 @@ cdef class BezierSpline(Spline):
         self.radii.append(radius)
         self.markChanged()
 
-    cpdef BezierSpline copy(self):
+    def BezierSpline copy(self):
         return BezierSpline(self.points.copy(),
                             self.leftHandles.copy(),
                             self.rightHandles.copy(),
                             self.radii.copy(),
                             self.cyclic)
 
-    cpdef transform(self, matrix):
+    def transform(self, matrix):
         self.points.transform(matrix)
         self.leftHandles.transform(matrix)
         self.rightHandles.transform(matrix)
@@ -58,7 +58,7 @@ cdef class BezierSpline(Spline):
         # maybe implement another numerical method to find the best parameter
         # http://jazzros.blogspot.be/2011/03/projecting-point-on-bezier-curve.html
         cdef:
-            int segmentAmount = self.getSegmentAmount()
+            int segmentAmount = getSegmentAmount(self)
             int i, leftIndex, rightIndex
             set possibleParameters = set()
             list coeffs = [0] * 6
@@ -96,17 +96,14 @@ cdef class BezierSpline(Spline):
             return min(sampledData, key = lambda item: item[1])[0]
         return 0
 
-    cdef inline int getSegmentAmount(self):
-        return self.points.length - 1 + self.cyclic
-
     cpdef bint isEvaluable(self):
         return self.points.length >= 2
 
-    cdef void evaluate_LowLevel(self, float parameter, Vector3* result):
+    cdef void evaluatePoint_LowLevel(self, float parameter, Vector3 *result):
         cdef:
             float t1
             Vector3* w[4]
-        self.getSegmentData(parameter, &t1, w)
+        getSegmentData(self, parameter, &t1, w)
         cdef:
             float t2 = t1 * t1
             float t3 = t2 * t1
@@ -123,7 +120,7 @@ cdef class BezierSpline(Spline):
         cdef:
             float t1
             Vector3* w[4]
-        self.getSegmentData(parameter, &t1, w)
+        getSegmentData(self, parameter, &t1, w)
         cdef:
             float t2 = t1 * t1
             float coeff0 = -3 +  6 * t1 - 3 * t2
@@ -134,15 +131,13 @@ cdef class BezierSpline(Spline):
         result.y = w[0].y*coeff0 + w[1].y*coeff1 + w[2].y*coeff2 + w[3].y*coeff3
         result.z = w[0].z*coeff0 + w[1].z*coeff1 + w[2].z*coeff2 + w[3].z*coeff3
 
-    cdef void getSegmentData(self, float parameter, float* t, Vector3** w):
+    cdef float evaluateRadius_LowLevel(self, float parameter):
         cdef long indices[2]
-        findListSegment_LowLevel(self.points.length, self.cyclic, parameter, indices, t)
-        w[0] = (self.points.data) + indices[0]
-        w[1] = (self.rightHandles.data) + indices[0]
-        w[2] = (self.leftHandles.data) + indices[1]
-        w[3] = (self.points.data) + indices[1]
+        cdef float t
+        findListSegment_LowLevel(self.points.length, self.cyclic, parameter, indices, &t)
+        return self.radii.data[indices[0]] * (1 - t) + self.radii.data[indices[1]] * t
 
-    cpdef calculateSmoothHandles(self, float strength = 1/3):
+    def calculateSmoothHandles(self, float strength = 1/3):
         cdef:
             Vector3* _points = self.points.data
             Vector3* _leftHandles = self.leftHandles.data
@@ -331,3 +326,15 @@ cdef calcRightTrimmedSegment(float t,
     outP4.x = t3 * P4.x - 3 * t2 * (t-1) * P3.x + 3 * t * (t-1) ** 2 * P2.x - (t-1) ** 3 * P1.x
     outP4.y = t3 * P4.y - 3 * t2 * (t-1) * P3.y + 3 * t * (t-1) ** 2 * P2.y - (t-1) ** 3 * P1.y
     outP4.z = t3 * P4.z - 3 * t2 * (t-1) * P3.z + 3 * t * (t-1) ** 2 * P2.z - (t-1) ** 3 * P1.z
+
+
+cdef inline void getSegmentData(BezierSpline spline, float parameter, float *t, Vector3 **w):
+    cdef long indices[2]
+    findListSegment_LowLevel(spline.points.length, spline.cyclic, parameter, indices, t)
+    w[0] = (spline.points.data) + indices[0]
+    w[1] = (spline.rightHandles.data) + indices[0]
+    w[2] = (spline.leftHandles.data) + indices[1]
+    w[3] = (spline.points.data) + indices[1]
+
+cdef inline int getSegmentAmount(BezierSpline spline):
+    return spline.points.length - 1 + spline.cyclic

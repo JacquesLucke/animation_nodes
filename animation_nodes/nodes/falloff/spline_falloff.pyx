@@ -32,7 +32,7 @@ class SplineFalloffNode(bpy.types.Node, AnimationNode):
         self.newInput(VectorizedSocket("Spline", "useSplineList",
             ("Spline", "spline", socketProps),
             ("Splines", "splines", socketProps)))
-            
+
         self.newInput("Float", "Distance", "distance", value = 0)
         self.newInput("Float", "Width", "width", value = 1, minValue = 0)
         self.newInput("Interpolation", "Interpolation", "interpolation",
@@ -97,7 +97,7 @@ cdef class SplineFalloff(BaseFalloff):
     cdef double evaluate(self, void *point, long index):
         cdef Vector3 closestPoint
         cdef float parameter = self.spline.project_LowLevel(<Vector3*>point)
-        self.spline.evaluate_LowLevel(parameter, &closestPoint)
+        self.spline.evaluatePoint_LowLevel(parameter, &closestPoint)
         cdef float distance = distanceVec3(<Vector3*>point, &closestPoint)
 
         if distance < self.distance:

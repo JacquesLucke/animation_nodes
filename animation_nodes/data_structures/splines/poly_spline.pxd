@@ -7,5 +7,4 @@ cdef class PolySpline(Spline):
         public Vector3DList points
         public FloatList radii
 
-    cpdef FloatList getUniformParameters(self, long amount)
     cdef inline int getSegmentAmount(self)

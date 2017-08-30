@@ -28,14 +28,14 @@ cdef class PolySpline(Spline):
         self.radii.append(radius)
         self.markChanged()
 
-    cpdef PolySpline copy(self):
+    def PolySpline copy(self):
         return PolySpline(self.points.copy(), self.radii.copy(), self.cyclic)
 
-    cpdef transform(self, matrix):
+    def transform(self, matrix):
         self.points.transform(matrix)
         self.markChanged()
 
-    cpdef double getLength(self, int resolution = 0):
+    def getLength(self, int resolution = 0):
         cdef double length = distanceSumOfVector3DList(self.points)
         if self.cyclic and self.points.length >= 2:
             length += distanceVec3(self.points.data + 0,
@@ -48,10 +48,10 @@ cdef class PolySpline(Spline):
             float closestParameter = 0
             float smallestDistance = 1e9
             float lineParameter, lineDistance
-            int segmentAmount = self.getSegmentAmount()
+            int segmentAmount = getSegmentAmount(self)
             int i, pointAmount = self.points.length
             Vector3 lineDirection, projectionOnLine
-            Vector3* _points = self.points.data
+            Vector3 *_points = self.points.data
             int endIndex
 
         for i in range(segmentAmount):
@@ -72,9 +72,6 @@ cdef class PolySpline(Spline):
                 closestParameter = (lineParameter + i) / <float>segmentAmount
 
         return closestParameter
-
-    cdef inline int getSegmentAmount(self):
-        return self.points.length - 1 + self.cyclic
 
     cdef PolySpline getTrimmedCopy_LowLevel(self, float start, float end):
         cdef:
@@ -112,33 +109,37 @@ cdef class PolySpline(Spline):
     cpdef bint isEvaluable(self):
         return self.points.length >= 2
 
-    cdef void evaluate_LowLevel(self, float parameter, Vector3* result):
+    cdef void evaluatePoint_LowLevel(self, float parameter, Vector3 *result):
         cdef:
-            Vector3* _points = self.points.data
+            Vector3 *_points = self.points.data
             long indices[2]
             float t
         findListSegment_LowLevel(self.points.length, self.cyclic, parameter, indices, &t)
         mixVec3(result, _points + indices[0], _points + indices[1], t)
 
-    cdef void evaluateTangent_LowLevel(self, float parameter, Vector3* result):
+    cdef void evaluateTangent_LowLevel(self, float parameter, Vector3 *result):
         cdef:
-            Vector3* _points = self.points.data
+            Vector3 *_points = self.points.data
             long indices[2]
             float t # not really needed here
         findListSegment_LowLevel(self.points.length, self.cyclic, parameter, indices, &t)
         subVec3(result, _points + indices[1], _points + indices[0])
 
+    cdef float evaluateRadius_LowLevel(self, float parameter):
+        cdef long indices[2]
+        cdef float t
+        findListSegment_LowLevel(self.points.length, self.cyclic, parameter, indices, &t)
+        return self.radii.data[indices[0]] * (1 - t) + self.radii.data[indices[1]] * t
+
     @cython.cdivision(True)
-    cpdef FloatList getUniformParameters(self, long amount):
+    def getUniformParameters(self, Py_ssize_t amount):
         cdef:
-            long i
-            FloatList parameters = FloatList(length = max(0, amount))
+            Py_ssize_t i
             Vector3* _points = self.points.data
-            long pointAmount = self.points.length
+            Py_ssize_t pointAmount = self.points.length
 
         if amount <= 1 or pointAmount <= 1:
-            parameters.fill(0)
-            return parameters
+            return FloatList.fromValue(0, length = amount)
 
         cdef FloatList distances = FloatList(length = pointAmount - 1 + int(self.cyclic))
         for i in range(pointAmount - 1):
@@ -148,8 +149,8 @@ cdef class PolySpline(Spline):
 
         cdef float totalLength = distances.getSumOfElements()
         if totalLength < 0.001: # <- necessary to remove the risk of running
-            parameters.fill(0)  #    into endless loops or division by 0
-            return parameters
+                                #    into endless loops or division by 0
+            return FloatList.fromValue(0, length = amount)
 
         cdef:
             # Safe Division: amount > 1
@@ -157,7 +158,8 @@ cdef class PolySpline(Spline):
             float factor = 1 / <float>distances.length
             float missingDistance = stepSize
             float residualDistance
-            long currentIndex = 1
+            Py_ssize_t currentIndex = 1
+            FloatList parameters = FloatList(length = max(0, amount))
 
         for i in range(distances.length):
             residualDistance = distances.data[i]
@@ -173,5 +175,9 @@ cdef class PolySpline(Spline):
         # It can happen that more than one element is 1 due to float inaccuracy
         for i in range(currentIndex, amount):
             parameters.data[i] = 1
-        parameters.data[amount - 1]
+
         return parameters
+
+
+cdef inline int getSegmentAmount(PolySpline spline):
+    return spline.points.length - 1 + spline.cyclic

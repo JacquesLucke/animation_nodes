@@ -8,7 +8,3 @@ cdef class BezierSpline(Spline):
         public Vector3DList leftHandles
         public Vector3DList rightHandles
         public FloatList radii
-
-    cdef void getSegmentData(self, float parameter, float* t, Vector3** w)
-    cpdef calculateSmoothHandles(self, float strength = ?)
-    cdef inline int getSegmentAmount(self)
