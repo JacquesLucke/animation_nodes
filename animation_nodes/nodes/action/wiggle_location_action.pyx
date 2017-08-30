@@ -3,6 +3,7 @@ from ... base_types import AnimationNode
 from ... data_structures cimport UnboundedAction, UnboundedActionEvaluator, FloatList, PathIndexActionChannel
 from ... algorithms.perlin_noise cimport perlinNoise1D
 
+# Will be replaced by a more generic node in the future
 class WiggleLocationActionNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_WiggleLocationActionNode"
     bl_label = "Wiggle Location Action"
