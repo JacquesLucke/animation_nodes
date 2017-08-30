@@ -18,38 +18,64 @@ class ObjectActionOutputNode(bpy.types.Node, AnimationNode):
     mode = EnumProperty(name = "Mode", default = "GENERIC",
         items = modeItems, update = AnimationNode.refresh)
 
+    useObjectList = VectorizedSocket.newProperty()
     useFrameList = VectorizedSocket.newProperty()
     useMatrixList = VectorizedSocket.newProperty()
 
     def create(self):
-        self.newInput("Object List", "Objects", "objects")
+        self.newInput(VectorizedSocket("Object", "useObjectList",
+            ("Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
+            ("Objects", "objects")))
+
         self.newInput("Action", "Action", "action")
-        self.newInput(VectorizedSocket("Float", "useFrameList",
+        self.newInput(VectorizedSocket("Float", ["useFrameList", "useObjectList"],
             ("Frame", "frame"), ("Frames", "frames")))
+
         if self.mode == "TRANSFORMS":
-            self.newInput(VectorizedSocket("Matrix", "useMatrixList",
+            self.newInput(VectorizedSocket("Matrix", ["useMatrixList", "useObjectList"],
                 ("Offset", "offset"), ("Offsets", "offsets")))
-        self.newOutput("Object List", "Objects", "objects")
+
+        if self.useObjectList:
+            self.newInput("Integer", "Start Index", "index")
+        else:
+            self.newInput("Integer", "Index", "index")
+
+        self.newOutput(VectorizedSocket("Object", "useObjectList",
+            ("Object", "object"), ("Objects", "objects")))
 
     def draw(self, layout):
         layout.prop(self, "mode", text = "")
 
     def getExecutionFunctionName(self):
         if self.mode == "GENERIC":
-            return "execute_Generic"
+            if self.useObjectList:
+                return "execute_Generic_List"
+            else:
+                return "execute_Generic_Single"
         elif self.mode == "TRANSFORMS":
-            return "execute_Transforms"
+            if self.useObjectList:
+                return "execute_Transforms_List"
+            else:
+                return "execute_Transforms_Single"
 
-    def execute_Generic(self, list objects, Action action, frames):
+    def execute_Generic_Single(self, object, Action action, frame, index):
+        self.execute_Generic_List([object], action, frame, index)
+        return object
+
+    def execute_Transforms_Single(self, object, Action action, frame, offset, index):
+        self.execute_Transforms_List([object], action, frame, offset, index)
+        return object
+
+    def execute_Generic_List(self, list objects, Action action, frames, Py_ssize_t startIndex):
         if action is None:
             return objects
 
         cdef VirtualDoubleList _frames = VirtualDoubleList.fromListOrElement(frames, 0)
-        self.execute_RawChannels(objects, action, list(action.getChannelSet()), _frames)
+        self.execute_RawChannels(objects, action, list(action.getChannelSet()), _frames, startIndex)
 
         return objects
 
-    def execute_Transforms(self, list objects, Action action, frames, offsets):
+    def execute_Transforms_List(self, list objects, Action action, frames, offsets, Py_ssize_t  startIndex):
         if action is None:
             return objects
 
@@ -77,7 +103,7 @@ class ObjectActionOutputNode(bpy.types.Node, AnimationNode):
             if object is None:
                 continue
 
-            evaluator.evaluate(<float>_frames.get(i), i, values.data)
+            evaluator.evaluate(<float>_frames.get(i), startIndex + i, values.data)
             offset = _offsets.get(i)
 
             location = <Vector3*>values.data
@@ -89,11 +115,11 @@ class ObjectActionOutputNode(bpy.types.Node, AnimationNode):
             object.matrix_world = toPyMatrix4(&finalMatrix)
 
         cdef list otherChannels = list(action.getChannelSet() - set(channels))
-        self.execute_RawChannels(objects, action, otherChannels, _frames)
+        self.execute_RawChannels(objects, action, otherChannels, _frames, startIndex)
 
         return objects
 
-    def execute_RawChannels(self, list objects, Action action, list channels, VirtualDoubleList frames):
+    def execute_RawChannels(self, list objects, Action action, list channels, VirtualDoubleList frames, Py_ssize_t startIndex):
         channels = self.getKnownChannels(channels)
         if len(channels) == 0:
             return
@@ -110,7 +136,7 @@ class ObjectActionOutputNode(bpy.types.Node, AnimationNode):
             if object is None:
                 continue
 
-            evaluator.evaluate(<float>frames.get(i), i, values.data)
+            evaluator.evaluate(<float>frames.get(i), startIndex + i, values.data)
             setAttributes(object, values)
 
     def getKnownChannels(self, list allChannels):
