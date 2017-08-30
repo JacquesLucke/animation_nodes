@@ -1,6 +1,7 @@
 import bpy
 from bpy.props import *
 from ... base_types import AnimationNode
+from ... utils.attributes import pathBelongsToArray
 
 class ObjectDataPathOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectDataPathOutputNode"
@@ -32,7 +33,7 @@ class ObjectDataPathOutputNode(bpy.types.Node, AnimationNode):
         except:
             self.errorMessage = "Error"
         return object
-    
+
     def getPropertyPath(self, object, path):
         if "." in path:
             propPath, propName = path.rsplit(".", 1)
@@ -44,7 +45,7 @@ class ObjectDataPathOutputNode(bpy.types.Node, AnimationNode):
             dataPath = object
             propName = path
         return dataPath, propName
-    
+
     def getBakeCode(self):
         yield "if object is not None:"
         yield "    try: object.keyframe_insert(path, index = arrayIndex)"
@@ -52,7 +53,7 @@ class ObjectDataPathOutputNode(bpy.types.Node, AnimationNode):
         yield "        dataPath, propName = self.getPropertyPath(object, path)"
         yield "        try: dataPath.keyframe_insert(propName, index = arrayIndex)"
         yield "        except: pass"
-    
+
     def clearCache(self):
         cache.clear()
 
@@ -66,7 +67,7 @@ def getSetFunction(object, attribute):
     return function
 
 def createSetFunction(object, dataPath):
-    needsIndex = dataPathBelongsToArray(object, dataPath)
+    needsIndex = pathBelongsToArray(object, dataPath)
     if needsIndex is None: return None
     data = {}
     if needsIndex:
@@ -85,18 +86,3 @@ setAttributeWithoutIndex = '''
 def setAttributeWithoutIndex(object, index, value):
     object.#dataPath# = value
 '''
-
-def dataPathBelongsToArray(object, dataPath):
-    if "." in dataPath:
-        pathToProperty, propertyName = dataPath.rsplit(".", 1)
-        pathToProperty = "." + pathToProperty
-    else:
-        pathToProperty = ""
-        propertyName = dataPath
-
-    try:
-        amount = eval("object{}.bl_rna.properties[{}].array_length".format(pathToProperty, repr(propertyName)))
-        return amount > 0
-    except:
-        # Means that the property has not been found
-        return None

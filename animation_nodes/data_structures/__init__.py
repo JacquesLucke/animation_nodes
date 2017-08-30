@@ -7,13 +7,14 @@ def importDataStructures():
     from . lists.base_lists import (
         Vector3DList, Matrix4x4List, EdgeIndicesList, EulerList, BooleanList,
         FloatList, DoubleList, LongList, IntegerList, UShortList, CharList,
-        QuaternionList, UIntegerList, ShortList, UShortList)
+        QuaternionList, UIntegerList, ShortList, UShortList
+    )
 
     from . virtual_list.virtual_list import VirtualList, VirtualPyList
     from . virtual_list.virtual_clists import (
         VirtualVector3DList, VirtualMatrix4x4List, VirtualEulerList, VirtualBooleanList,
-        VirtualFloatList, VirtualDoubleList, VirtualLongList)
-
+        VirtualFloatList, VirtualDoubleList, VirtualLongList
+    )
 
     from . splines.base_spline import Spline
     from . splines.poly_spline import PolySpline
@@ -25,6 +26,14 @@ def importDataStructures():
     from . sounds.sound import Sound
     from . sounds.average_sound import AverageSound
     from . sounds.spectrum_sound import SpectrumSound
+
+    from . action import (
+        Action, ActionEvaluator, ActionChannel,
+        PathActionChannel, PathIndexActionChannel,
+        BoundedAction, UnboundedAction,
+        BoundedActionEvaluator, UnboundedActionEvaluator,
+        SimpleBoundedAction, SimpleUnboundedAction
+    )
 
     return locals()
 

@@ -1,0 +1,23 @@
+cdef class BOUNDTYPEAction(Action):
+    cdef BOUNDTYPEActionEvaluator getEvaluator_Limited(self, list channels)
+    cpdef BOUNDTYPEActionEvaluator getEvaluator_Full(self, list channels, FloatList defaults)
+
+cdef class BOUNDTYPEActionEvaluator(ActionEvaluator):
+    pass
+#IF "BOUNDTYPE" == "Bounded"
+    cdef void evaluateBounded(self, float t, Py_ssize_t index, float *target)
+
+    cpdef float getStart(self, Py_ssize_t index)
+    cpdef float getEnd(self, Py_ssize_t index)
+    cpdef float getLength(self, Py_ssize_t index)
+#ENDIF
+
+cdef class SimpleBOUNDTYPEAction(BOUNDTYPEAction):
+    cdef list getEvaluateFunctions(self)
+    cdef newFunction(self, void *function, list channels)
+
+#IF "BOUNDTYPE" == "Bounded"
+    cdef float getStart(self, Py_ssize_t index)
+    cdef float getEnd(self, Py_ssize_t index)
+    cdef float getLength(self, Py_ssize_t index)
+#ENDIF

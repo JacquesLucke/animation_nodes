@@ -1,0 +1,4 @@
+from . action_base cimport *
+from .. lists.base_lists cimport FloatList, IntegerList
+
+ctypedef void (*EvaluateFunction)(void *self, float frame, Py_ssize_t index, float *target)
