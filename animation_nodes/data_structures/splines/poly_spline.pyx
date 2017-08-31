@@ -28,7 +28,7 @@ cdef class PolySpline(Spline):
         self.radii.append(radius)
         self.markChanged()
 
-    def PolySpline copy(self):
+    def copy(self):
         return PolySpline(self.points.copy(), self.radii.copy(), self.cyclic)
 
     def transform(self, matrix):

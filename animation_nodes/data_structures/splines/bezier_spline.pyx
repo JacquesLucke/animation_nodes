@@ -39,7 +39,7 @@ cdef class BezierSpline(Spline):
         self.radii.append(radius)
         self.markChanged()
 
-    def BezierSpline copy(self):
+    def copy(self):
         return BezierSpline(self.points.copy(),
                             self.leftHandles.copy(),
                             self.rightHandles.copy(),
@@ -91,7 +91,7 @@ cdef class BezierSpline(Spline):
             segmentParameters = [(i + t) / segmentAmount for t in realRoots]
             possibleParameters.update(segmentParameters)
 
-        sampledData = [(p, (point - self.evaluate(p)).length_squared) for p in possibleParameters]
+        sampledData = [(p, (point - self.evaluatePoint(p)).length_squared) for p in possibleParameters]
         if len(sampledData) > 0:
             return min(sampledData, key = lambda item: item[1])[0]
         return 0

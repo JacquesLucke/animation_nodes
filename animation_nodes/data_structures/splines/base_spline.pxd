@@ -12,6 +12,7 @@ cdef class Spline:
 
     cpdef void markChanged(self)
     cpdef bint isEvaluable(self)
+    cdef checkEvaluability(self)
 
 
     # Uniform Conversion
@@ -31,6 +32,19 @@ cdef class Spline:
     cdef void evaluateTangent_LowLevel(self, float t, Vector3 *result)
     cdef float evaluateRadius_LowLevel(self, float t)
 
+
+    # Evaluate Multiple Parameters
+    #############################################
+
+    cdef calcDistributedPoints_LowLevel(self, Py_ssize_t amount, Vector3 *result,
+        float start = ?, float end = ?,
+        str distributionType = ?)
+    cdef calcDistributedTangents_LowLevel(self, Py_ssize_t amount, Vector3 *result,
+        float start = ?, float end = ?,
+        str distributionType = ?)
+    cdef calcDistributedRadii_LowLevel(self, Py_ssize_t amount, float *result,
+        float start = ?, float end = ?,
+        str distributionType = ?)
 
     # Projection
     #############################################

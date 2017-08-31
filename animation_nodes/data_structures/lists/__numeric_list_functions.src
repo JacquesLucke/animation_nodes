@@ -46,7 +46,7 @@ def containsValueGreaterThan(self, TYPE value):
     return False
 
 def allValuesInRange(self, TYPE minValue, TYPE maxValue):
-    if i in range(self.length):
+    for i in range(self.length):
         if not (minValue <= self.data[i] <= maxValue):
             return False
     return True

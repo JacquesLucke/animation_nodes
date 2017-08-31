@@ -1,8 +1,6 @@
 from ... math cimport Vector3, mixVec3Arrays
 from ... data_structures cimport Vector3DList, Spline, BezierSpline
 from ... utils.lists cimport findListSegment_LowLevel, findListSegment
-from ... data_structures.splines.base_spline cimport SplineEvaluationFunction
-from lib.stdlib cimport memcpy
 
 from . import grid
 
@@ -112,10 +110,7 @@ cdef class LinearLoft:
         if self.distributionType == "UNIFORM":
             self.ensureUniformConverter(self.uniformResolution)
 
-        cdef Vector3DList samples = spline.getDistributedPoints(
-            self.splineSamples, distributionType = self.distributionType)
-
-        memcpy(target, samples.data, self.splineSamples * sizeof(Vector3))
+        spline.calcDistributedPoints_LowLevel(self.splineSamples, target, 0, 1, self.distributionType)
 
     cdef writeMixedLine(self, Vector3* target, Vector3* sourceA, Vector3* sourceB, float factor):
         mixVec3Arrays(target, sourceA, sourceB, self.splineSamples, factor)
@@ -225,9 +220,7 @@ cdef class SmoothLoft:
     cdef sampleSurfaceSpline(self, BezierSpline spline, Vector3* output):
         if self.surfaceDistributionType == "UNIFORM":
             spline.ensureUniformConverter(self.uniformResolution)
-            spline.getUniformSamples_LowLevel(self.surfaceSamples, self.start, self.end, output)
-        else:
-            spline.getSamples_LowLevel(self.surfaceSamples, self.start, self.end, output)
+        spline.calcDistributedPoints_LowLevel(self.surfaceSamples, output, self.start, self.end)
 
     def calcEdgeIndices(self):
         return grid.quadEdges(

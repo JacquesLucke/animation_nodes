@@ -10,20 +10,29 @@ ctypedef float (*EvaluateFloat)(Spline, float)
 
 cdef class Spline:
 
-    # Generic
-    #############################################
-
-    cpdef bint isEvaluable(self):
-        raise NotImplementedError()
-
     cpdef void markChanged(self):
         self.uniformParameters = None
+
+
+    # Generic
+    #############################################
 
     def copy(self):
         raise NotImplementedError()
 
     def transform(self, matrix):
         raise NotImplementedError()
+
+
+    # Evaluability
+    #############################################
+
+    cpdef bint isEvaluable(self):
+        raise NotImplementedError()
+
+    cdef checkEvaluability(self):
+        if not self.isEvaluable():
+            raise Exception("Spline is not evaluable")
 
 
     # Uniform Conversion
@@ -59,7 +68,7 @@ cdef class Spline:
         cdef FloatList result = FloatList(length = parameters.length)
         cdef Py_ssize_t i
         for i in range(parameters.length):
-            result.data[i] = toUniformParameter_LowLevel(parameters.data[i])
+            result.data[i] = self.toUniformParameter_LowLevel(parameters.data[i])
         return result
 
     cdef float toUniformParameter_LowLevel(self, float t):
@@ -73,44 +82,66 @@ cdef class Spline:
     # Get Multiple Samples
     #############################################
 
-    def Vector3DList getDistributedPoints(self, Py_ssize_t amount,
+    cdef calcDistributedPoints_LowLevel(self, Py_ssize_t amount, Vector3 *result,
+                                        float start = 0, float end = 1,
+                                        str distributionType = "RESOLUTION"):
+        evaluateDistributed(self, amount, self.evaluatePoint_LowLevel,
+            start, end, distributionType, result)
+
+    cdef calcDistributedTangents_LowLevel(self, Py_ssize_t amount, Vector3 *result,
                                           float start = 0, float end = 1,
                                           str distributionType = "RESOLUTION"):
-        parameters = calcSampleList(amount, start, end, self.cyclic)
-        return self.samplePoints(parameters, False, distributionType)
+        evaluateDistributed(self, amount, self.evaluateTangent_LowLevel,
+            start, end, distributionType, result)
 
-    def Vector3DList getDistributedTangents(self, Py_ssize_t amount,
-                                            float start = 0, float end = 1,
-                                            str distributionType = "RESOLUTION"):
-        parameters = calcSampleList(amount, start, end, self.cyclic)
-        return self.sampleTangents(parameters, False, distributionType)
-
-    def FloatList getDistributedRadii(self, Py_ssize_t amount,
-                                      float start = 0, float end = 1,
-                                      str distributionType = "RESOLUTION"):
-        parameters = calcSampleList(amount, start, end, self.cyclic)
-        return self.sampleRadii(parameters, False, distributionType)
+    cdef calcDistributedRadii_LowLevel(self, Py_ssize_t amount, float *result,
+                                    float start = 0, float end = 1,
+                                    str distributionType = "RESOLUTION"):
+        evaluateDistributed(self, amount, self.evaluateRadius_LowLevel,
+            start, end, distributionType, result)
 
 
-    def Vector3DList samplePoints(self, FloatList parameters,
-                                  bint checkRange = True, parameterType = "RESOLUTION"):
-        cdef FloatList _parameters = self._prepareParameters(parameter, checkRange, parameterType)
+    def getDistributedPoints(self, Py_ssize_t amount,
+                             float start = 0, float end = 1,
+                             str distributionType = "RESOLUTION"):
+        cdef Vector3DList result = Vector3DList(length = amount)
+        self.calcDistributedPoints_LowLevel(amount, result.data, start, end, distributionType)
+        return result
+
+    def getDistributedTangents(self, Py_ssize_t amount,
+                               float start = 0, float end = 1,
+                               str distributionType = "RESOLUTION"):
+        cdef Vector3DList result = Vector3DList(length = amount)
+        self.calcDistributedTangents_LowLevel(amount, result.data, start, end, distributionType)
+        return result
+
+    def getDistributedRadii(self, Py_ssize_t amount,
+                            float start = 0, float end = 1,
+                            str distributionType = "RESOLUTION"):
+        cdef FloatList result = FloatList(length = amount)
+        self.calcDistributedRadii_LowLevel(amount, result.data, start, end, distributionType)
+        return result
+
+
+    def samplePoints(self, FloatList parameters,
+                     bint checkRange = True, parameterType = "RESOLUTION"):
+        cdef FloatList _parameters = self._prepareParameters(parameters, checkRange, parameterType)
         cdef Vector3DList result = Vector3DList(length = parameters.length)
         evaluateVectorFunction_Array(self, self.evaluatePoint_LowLevel,
             _parameters.data, result.data, _parameters.length)
         return result
 
-    def Vector3DList sampleTangents(self, FloatList parameters,
-                                    bint checkRange = True, parameterType = "RESOLUTION"):
-        cdef FloatList _parameters = self._prepareParameters(parameter, checkRange, parameterType)
+    def sampleTangents(self, FloatList parameters,
+                       bint checkRange = True, parameterType = "RESOLUTION"):
+        cdef FloatList _parameters = self._prepareParameters(parameters, checkRange, parameterType)
         cdef Vector3DList result = Vector3DList(length = parameters.length)
         evaluateVectorFunction_Array(self, self.evaluateTangent_LowLevel,
             _parameters.data, result.data, _parameters.length)
         return result
 
-    def FloatList sampleRadii(self, FloatList parameters,
-                              bint checkRange = True, parameterType = "RESOLUTION"):
-        cdef FloatList _parameters = self._prepareParameters(parameter, checkRange, parameterType)
+    def sampleRadii(self, FloatList parameters,
+                    bint checkRange = True, parameterType = "RESOLUTION"):
+        cdef FloatList _parameters = self._prepareParameters(parameters, checkRange, parameterType)
         cdef FloatList result = FloatList(length = parameters.length)
         evaluateFloatFunction_Array(self, self.evaluateRadius_LowLevel,
             _parameters.data, result.data, _parameters.length)
@@ -136,15 +167,15 @@ cdef class Spline:
    #############################################
 
     def evaluatePoint(self, float t):
-        return evaluateVectorFunction_PyResult(self, self.evaluatePoint_LowLevel, t)
+        return evaluateFunction_PyResult(self, self.evaluatePoint_LowLevel, t)
 
     def evaluateTangent(self, float t):
-        return evaluateVectorFunction_PyResult(self, self.evaluateTangent_LowLevel, t)
+        return evaluateFunction_PyResult(self, self.evaluateTangent_LowLevel, t)
 
     def evaluateRadius(self, float t):
-        return evaluateFloatFunction_PyResult(self, self.evaluatePoint_LowLevel, t)
+        return evaluateFunction_PyResult(self, self.evaluateRadius_LowLevel, t)
 
-    cdef void evaluatePoint_LowLevel(self, float, t, Vector3 *result):
+    cdef void evaluatePoint_LowLevel(self, float t, Vector3 *result):
         raise NotImplementedError()
 
     cdef void evaluateTangent_LowLevel(self, float t, Vector3 *result):
@@ -164,9 +195,9 @@ cdef class Spline:
         return self.project_LowLevel(&_point)
 
     def projectExtended(self, point):
-        Vector3 _point = toVector3(point)
-        Vector3 nearestPoint, nearestTangent
-        self.projectExtended_LowLevel(_point, &nearestPoint, &nearestTangent)
+        cdef Vector3 _point = toVector3(point)
+        cdef Vector3 nearestPoint, nearestTangent
+        self.projectExtended_LowLevel(&_point, &nearestPoint, &nearestTangent)
         return toPyVector3(&nearestPoint), toPyVector3(&nearestTangent)
 
     cdef float project_LowLevel(self, Vector3 *point):
@@ -263,53 +294,67 @@ cdef class Spline:
 # Float Range
 ######################################################
 
-cdef FloatList calcSampleList(Py_ssize_t length, float start, float end, bint cyclic):
-    if length < 0:
-        raise Exception("length has to be >= 0")
-    if not (0 <= start <= 1 and 0 <= end <= 1):
-        raise Exception("start and end values have to be between 0 and 1")
+ctypedef fused EvaluateFunction:
+    EvaluateVector
+    EvaluateFloat
 
-    if length == 0:
-        return FloatList()
-    if length == 1:
-        return FloatList.fromValue((start + end) / 2)
+cdef evaluateDistributed(Spline spline, Py_ssize_t amount, EvaluateFunction evaluate, float start, float end, str distributionType, void *target):
+    spline.checkEvaluability()
+    if amount < 0:
+        raise ValueError("amount has to be >= 0")
+    if not (0 <= start <= 1 and 0 <= end <= 1):
+        raise ValueError("start and end values have to be between 0 and 1")
+    if distributionType not in ("RESOLUTION", "UNIFORM"):
+        raise ValueError("expected 'RESOLUTION' or 'UNIFORM' as distribution type")
+    if distributionType == "UNIFORM":
+        spline.checkUniformConverter()
+
+    if amount == 0:
+        return
+    if amount == 1:
+        if EvaluateFunction is EvaluateVector:
+            evaluate(spline, (start + end) / 2, <Vector3*>target)
+        elif EvaluateFunction is EvaluateFloat:
+            (<float*>target)[0] = evaluate(spline, (start + end) / 2)
+        return
 
     cdef float step
-    if cyclic and start == 0 and end == 1:
+    if spline.cyclic and start == 0 and end == 1:
         step = (end - start) / amount
     else:
         step = (end - start) / (amount - 1)
 
     cdef Py_ssize_t i
     cdef float t
-    cdef FloatList result = FloatList(length = length)
+    cdef bint convertToUniform = distributionType == "UNIFORM"
     for i in range(amount):
         t = start + i * step
         if t > 1: t = 1
-        if t < 0: t = 0
-        result.data[i] = t
-    return result
-
+        elif t < 0: t = 0
+        if convertToUniform:
+            t = spline.convertToUniform(t)
+        if EvaluateFunction is EvaluateVector:
+            evaluate(spline, t, <Vector3*>target + i)
+        elif EvaluateFunction is EvaluateFloat:
+            (<float*>target)[i] = evaluate(spline, t)
 
 
 # Evaluate Functions with PyObject Result
 ######################################################
 
-cdef evaluateVectorFunction_PyResult(Spline spline, EvaluateVector evaluate, float t):
+cdef evaluateFunction_PyResult(Spline spline, EvaluateFunction evaluate, float t):
     if t < 0 or t > 1:
         raise ValueError("parameter has to be between 0 and 1")
     if not spline.isEvaluable():
         raise Exception("spline is not evaluable")
-    cdef Vector3 result
-    evaluate(spline, t, &result)
-    return toPyVector3(&result)
 
-cdef evaluateFloatFunction_PyResult(Spline spline, EvaluateFloat evaluate, float t):
-    if t < 0 or t > 1:
-        raise ValueError("parameter has to be between 0 and 1")
-    if not spline.isEvaluable():
-        raise Exception("spline is not evaluable")
-    return evaluate(spline, t)
+    cdef Vector3 result
+    if EvaluateFunction is EvaluateVector:
+        evaluate(spline, t, &result)
+        return toPyVector3(&result)
+
+    if EvaluateFunction is EvaluateFloat:
+        return evaluate(spline, t)
 
 
 # Evaluate Function on Array
