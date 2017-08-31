@@ -127,7 +127,7 @@ cdef class Spline:
                      bint checkRange = True, parameterType = "RESOLUTION"):
         cdef FloatList _parameters = self._prepareParameters(parameters, checkRange, parameterType)
         cdef Vector3DList result = Vector3DList(length = parameters.length)
-        evaluateVectorFunction_Array(self, self.evaluatePoint_LowLevel,
+        evaluateFunction_Array(self, self.evaluatePoint_LowLevel,
             _parameters.data, result.data, _parameters.length)
         return result
 
@@ -135,7 +135,7 @@ cdef class Spline:
                        bint checkRange = True, parameterType = "RESOLUTION"):
         cdef FloatList _parameters = self._prepareParameters(parameters, checkRange, parameterType)
         cdef Vector3DList result = Vector3DList(length = parameters.length)
-        evaluateVectorFunction_Array(self, self.evaluateTangent_LowLevel,
+        evaluateFunction_Array(self, self.evaluateTangent_LowLevel,
             _parameters.data, result.data, _parameters.length)
         return result
 
@@ -143,7 +143,7 @@ cdef class Spline:
                     bint checkRange = True, parameterType = "RESOLUTION"):
         cdef FloatList _parameters = self._prepareParameters(parameters, checkRange, parameterType)
         cdef FloatList result = FloatList(length = parameters.length)
-        evaluateFloatFunction_Array(self, self.evaluateRadius_LowLevel,
+        evaluateFunction_Array(self, self.evaluateRadius_LowLevel,
             _parameters.data, result.data, _parameters.length)
         return result
 
@@ -332,7 +332,7 @@ cdef evaluateDistributed(Spline spline, Py_ssize_t amount, EvaluateFunction eval
         if t > 1: t = 1
         elif t < 0: t = 0
         if convertToUniform:
-            t = spline.convertToUniform(t)
+            t = spline.toUniformParameter_LowLevel(t)
         if EvaluateFunction is EvaluateVector:
             evaluate(spline, t, <Vector3*>target + i)
         elif EvaluateFunction is EvaluateFloat:
@@ -360,14 +360,11 @@ cdef evaluateFunction_PyResult(Spline spline, EvaluateFunction evaluate, float t
 # Evaluate Function on Array
 ######################################################
 
-cdef evaluateVectorFunction_Array(Spline spline, EvaluateVector evaluate,
-                                  float *ts, Vector3 *results, Py_ssize_t amount):
+cdef evaluateFunction_Array(Spline spline, EvaluateFunction evaluate,
+                            float *parameters, void *results, Py_ssize_t amount):
     cdef Py_ssize_t i
     for i in range(amount):
-        evaluate(spline, ts[i], results + i)
-
-cdef evaluateFloatFunction_Array(Spline spline, EvaluateFloat evaluate,
-                                 float *ts, float *results, Py_ssize_t amount):
-    cdef Py_ssize_t i
-    for i in range(amount):
-        results[i] = evaluate(spline, ts[i])
+        if EvaluateFunction is EvaluateVector:
+            evaluate(spline, parameters[i], <Vector3*>results + i)
+        elif EvaluateFunction is EvaluateFloat:
+            (<float*>results)[i] = evaluate(spline, parameters[i])

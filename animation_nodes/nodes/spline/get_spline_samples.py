@@ -33,11 +33,10 @@ class GetSplineSamplesNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
 
         if self.parameterType == "UNIFORM":
             yield "    spline.ensureUniformConverter(self.resolution)"
-            if "positions" in required: yield "    positions = spline.getUniformSamples(amount, _start, _end)"
-            if "tangents" in required:  yield "    tangents = spline.getUniformTangentSamples(amount, _start, _end)"
-        elif self.parameterType == "RESOLUTION":
-            if "positions" in required: yield "    positions = spline.getSamples(amount, _start, _end)"
-            if "tangents" in required:  yield "    tangents = spline.getTangentSamples(amount, _start, _end)"
+        if "positions" in required:
+            yield "    positions = spline.getDistributedPoints(amount, _start, _end, self.parameterType)"
+        if "tangents" in required:
+            yield "    tangents = spline.getDistributedTangents(amount, _start, _end, self.parameterType)"
 
         yield "else:"
         yield "    positions = Vector3DList()"

@@ -110,7 +110,8 @@ cdef class LinearLoft:
         if self.distributionType == "UNIFORM":
             self.ensureUniformConverter(self.uniformResolution)
 
-        spline.calcDistributedPoints_LowLevel(self.splineSamples, target, 0, 1, self.distributionType)
+        spline.calcDistributedPoints_LowLevel(self.splineSamples, target,
+            0, 1, self.distributionType)
 
     cdef writeMixedLine(self, Vector3* target, Vector3* sourceA, Vector3* sourceB, float factor):
         mixVec3Arrays(target, sourceA, sourceB, self.splineSamples, factor)
@@ -205,22 +206,20 @@ cdef class SmoothLoft:
             float t
             float tCyclic = index / <float>self.splineSamples
             float tNormal = index / <float>(self.splineSamples - 1)
-        if self.splineDistributionType == "RESOLUTION":
-            for k in range(len(self.splines)):
-                spline = self.splines[k]
-                t = tCyclic if spline.cyclic else tNormal
-                spline.evaluatePoint_LowLevel(t, _surfaceSplinePoints + k)
-        elif self.splineDistributionType == "UNIFORM":
-            for k in range(len(self.splines)):
-                spline = self.splines[k]
-                t = tCyclic if spline.cyclic else tNormal
+            bint useUniform = self.splineDistributionType == "UNIFORM"
+
+        for k in range(len(self.splines)):
+            spline = self.splines[k]
+            t = tCyclic if spline.cyclic else tNormal
+            if useUniform:
                 t = spline.toUniformParameter_LowLevel(t)
-                spline.evaluatePoint_LowLevel(t, _surfaceSplinePoints + k)
+            spline.evaluatePoint_LowLevel(t, _surfaceSplinePoints + k)
 
     cdef sampleSurfaceSpline(self, BezierSpline spline, Vector3* output):
         if self.surfaceDistributionType == "UNIFORM":
             spline.ensureUniformConverter(self.uniformResolution)
-        spline.calcDistributedPoints_LowLevel(self.surfaceSamples, output, self.start, self.end)
+        spline.calcDistributedPoints_LowLevel(self.surfaceSamples, output,
+            self.start, self.end, self.surfaceDistributionType)
 
     def calcEdgeIndices(self):
         return grid.quadEdges(

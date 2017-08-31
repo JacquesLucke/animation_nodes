@@ -28,6 +28,6 @@ class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
             if self.parameterType == "UNIFORM":
                 spline.ensureUniformConverter(self.resolution)
                 parameter = spline.toUniformParameter(parameter)
-            return spline.evaluate(parameter), spline.evaluateTangent(parameter)
+            return spline.evaluatePoint(parameter), spline.evaluateTangent(parameter)
         else:
             return Vector((0, 0, 0)), Vector((0, 0, 0))
