@@ -50,3 +50,10 @@ def allValuesInRange(self, TYPE minValue, TYPE maxValue):
         if not (minValue <= self.data[i] <= maxValue):
             return False
     return True
+
+def clamp(self, TYPE minValue, TYPE maxValue):
+    for i in range(self.length):
+        if self.data[i] < minValue:
+            self.data[i] = minValue
+        elif self.data[i] > maxValue:
+            self.data[i] = maxValue
