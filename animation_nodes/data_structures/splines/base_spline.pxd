@@ -19,10 +19,30 @@ cdef class Spline:
     #############################################
 
     cdef checkUniformConverter(self)
-    cpdef ensureUniformConverter(self, long resolution)
-    cdef _updateUniformParameters(self, long totalResolution)
+    cpdef ensureUniformConverter(self, Py_ssize_t minResolution)
+    cdef _updateUniformParameters(self, Py_ssize_t totalResolution)
 
     cdef float toUniformParameter_LowLevel(self, float parameter)
+
+
+    # Normals
+    #############################################
+
+    cdef checkNormals(self)
+    cpdef ensureNormals(self)
+
+    cdef void evaluateNormal_LowLevel(self, float t, Vector3 *result)
+    cdef void evaluateNormal_Approximated(self, float t, Vector3 *result)
+
+    cdef calcDistributedNormals_LowLevel(self, Py_ssize_t amount, Vector3 *result,
+        float start = ?, float end = ?,
+        str distributionType = ?)
+
+    cdef float evaluateTilt_LowLevel(self, float t)
+
+    cdef calcDistributedTilts_LowLevel(self, Py_ssize_t amount, float *result,
+        float start = ?, float end = ?,
+        str distributionType = ?)
 
 
     # Evaluate Single Parameter

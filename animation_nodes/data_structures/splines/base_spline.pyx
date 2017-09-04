@@ -1,9 +1,11 @@
 cimport cython
 from ... utils.lists cimport findListSegment_LowLevel
-from ... math.vector cimport distanceSquaredVec3
+from ... math.vector cimport distanceSquaredVec3, crossVec3, mixVec3, projectOnCenterPlaneVec3, almostZeroVec3, angleVec3, dotVec3
 from ... math.conversion cimport toPyVector3, toVector3
 from ... math.geometry cimport findNearestLineParameter
 from ... math.list_operations cimport distanceSumOfVector3DList
+from ... math.quaternion cimport rotateAroundAxisVec3
+from libc.math cimport M_PI as PI
 
 ctypedef void (*EvaluateVector)(Spline, float, Vector3*)
 ctypedef float (*EvaluateFloat)(Spline, float)
@@ -42,15 +44,15 @@ cdef class Spline:
         if self.uniformParameters is None:
             raise Exception("cannot evaluate uniform parameters, call spline.ensureUniformConverter(resolution) first")
 
-    cpdef ensureUniformConverter(self, long minResolution):
-        cdef long pointAmount = len(self.points)
-        cdef long totalResolution = pointAmount + max((pointAmount - 1), 0) * max(0, minResolution)
+    cpdef ensureUniformConverter(self, Py_ssize_t minResolution):
+        cdef Py_ssize_t pointAmount = len(self.points)
+        cdef Py_ssize_t totalResolution = pointAmount + max((pointAmount - 1), 0) * max(0, minResolution)
         if self.uniformParameters is None:
             self._updateUniformParameters(totalResolution)
         elif self.uniformParameters.length < totalResolution:
             self._updateUniformParameters(totalResolution)
 
-    cdef _updateUniformParameters(self, long totalResolution):
+    cdef _updateUniformParameters(self, Py_ssize_t totalResolution):
         from . poly_spline import PolySpline
         if isinstance(self, PolySpline): polySpline = self
         else: polySpline = PolySpline(self.getDistributedPoints(totalResolution))
@@ -77,6 +79,65 @@ cdef class Spline:
         findListSegment_LowLevel(self.uniformParameters.length, False, t, indices, &factor)
         return self.uniformParameters.data[indices[0]] * (1 - factor) + \
                self.uniformParameters.data[indices[1]] * factor
+
+
+    # Normals
+    #############################################
+
+    cdef checkNormals(self):
+        raise NotImplementedError()
+
+    cpdef ensureNormals(self):
+        raise NotImplementedError()
+
+    def evaluateNormal(self, float t):
+        self.checkNormals()
+        return evaluateFunction_PyResult(self, self.evaluateNormal_LowLevel, t)
+
+    cdef void evaluateNormal_LowLevel(self, float t, Vector3 *result):
+        cdef Vector3 approx
+        cdef Vector3 tangent
+        self.evaluateNormal_Approximated(t, &approx)
+        self.evaluateTangent_LowLevel(t, &tangent)
+        cdef float tilt = self.evaluateTilt_LowLevel(t)
+        cdef Vector3 rotated
+        rotateAroundAxisVec3(&rotated, &approx, &tangent, tilt)
+        projectOnCenterPlaneVec3(result, &rotated, &tangent)
+
+    cdef void evaluateNormal_Approximated(self, float parameter, Vector3 *result):
+        raise NotImplementedError()
+
+    cdef calcDistributedNormals_LowLevel(self, Py_ssize_t amount, Vector3 *result,
+                                         float start = 0, float end = 1,
+                                         str distributionType = "RESOLUTION"):
+        self.checkNormals()
+        evaluateDistributed(self, amount, self.evaluateNormal_LowLevel,
+            start, end, distributionType, result)
+
+    def getDistributedNormals(self, Py_ssize_t amount,
+                             float start = 0, float end = 1,
+                             str distributionType = "RESOLUTION"):
+        cdef Vector3DList result = Vector3DList(length = amount)
+        self.calcDistributedNormals_LowLevel(amount, result.data, start, end, distributionType)
+        return result
+
+    def sampleNormals(self, FloatList parameters,
+                     bint checkRange = True, parameterType = "RESOLUTION"):
+        self.checkNormals()
+        cdef FloatList _parameters = self._prepareParameters(parameters, checkRange, parameterType)
+        cdef Vector3DList result = Vector3DList(length = parameters.length)
+        evaluateFunction_Array(self, self.evaluateNormal_LowLevel,
+            _parameters.data, result.data, _parameters.length)
+        return result
+
+    cdef float evaluateTilt_LowLevel(self, float t):
+        raise NotImplementedError()
+
+    cdef calcDistributedTilts_LowLevel(self, Py_ssize_t amount, float *result,
+                                       float start = 0, float end = 1,
+                                       str distributionType = "RESOLUTION"):
+        evaluateDistributed(self, amount, self.evaluateTilt_LowLevel,
+            start, end, distributionType, result)
 
 
     # Get Multiple Samples
@@ -368,3 +429,82 @@ cdef evaluateFunction_Array(Spline spline, EvaluateFunction evaluate,
             evaluate(spline, parameters[i], <Vector3*>results + i)
         elif EvaluateFunction is EvaluateFloat:
             (<float*>results)[i] = evaluate(spline, parameters[i])
+
+
+# Calculate Normals
+######################################################
+
+testType = 0
+testRotation = 0
+
+def calculateNormalsForTangents(Vector3DList tangents not None, bint cyclic = False):
+    if tangents.length == 0:
+        return Vector3DList()
+
+    cdef Vector3DList normals = Vector3DList(length = tangents.length)
+    cdef Vector3 *_normals = normals.data
+    cdef Vector3 *_tangents = tangents.data
+
+    setInitialNormal(_tangents + 0, _normals + 0)
+
+    cdef Py_ssize_t i
+    for i in range(1, tangents.length):
+        calcNextNormal(_normals + i, _normals + i - 1, _tangents + i - 1, _tangents + i)
+
+    if cyclic:
+        makeNormalsCyclic(tangents, normals)
+
+    return normals
+
+cdef void calcNextNormal(Vector3 *target, Vector3 *lastNormal, Vector3 *lastTangent, Vector3 *currentTangent):
+    cdef Vector3 axis
+    crossVec3(&axis, lastTangent, currentTangent)
+    cdef float angle = angleVec3(lastTangent, currentTangent)
+    cdef Vector3 newNormal
+    rotateAroundAxisVec3(&newNormal, lastNormal, &axis, angle)
+    projectOnCenterPlaneVec3(target, &newNormal, currentTangent)
+
+cdef void setInitialNormal(Vector3 *tangent, Vector3 *target):
+    cdef Vector3 upVector = Vector3(0, 0, 1)
+
+    if almostZeroVec3(tangent):
+        target[0] = upVector
+        return
+
+    crossVec3(target, &upVector, tangent)
+    if almostZeroVec3(target):
+        upVector = Vector3(0, 1, 0)
+        crossVec3(target, &upVector, tangent)
+
+
+cdef makeNormalsCyclic(Vector3DList tangents, Vector3DList normals):
+    cdef Vector3 *firstNormal = normals.data + 0
+    cdef Vector3 lastNormal
+    calcNextNormal(&lastNormal, normals.data + normals.length - 1, tangents.data + tangents.length - 1, tangents.data + 0)
+
+    cdef float angle = angleVec3(firstNormal, &lastNormal)
+
+    cdef Vector3 cross
+    crossVec3(&cross, firstNormal, &lastNormal)
+    if dotVec3(&cross, tangents.data + 0) <= 0:
+        angle = -angle
+
+    applyRotationGradient(tangents, normals, -angle)
+
+
+cdef applyRotationGradient(Vector3DList tangents, Vector3DList normals, float fullAngle):
+    cdef Py_ssize_t i
+    cdef Vector3 normal
+    cdef float angle
+    cdef float remainingRotation = fullAngle
+    cdef float doneRotation = 0
+
+    for i in range(1, normals.length):
+        if angleVec3(tangents.data + i, tangents.data + i - 1) < 0.001:
+            rotateAroundAxisVec3(normals.data + i, &normal, tangents.data + i, doneRotation)
+        else:
+            angle = remainingRotation / (normals.length - i)
+            normal = normals.data[i]
+            rotateAroundAxisVec3(normals.data + i, &normal, tangents.data + i, angle + doneRotation)
+            remainingRotation -= angle
+            doneRotation += angle

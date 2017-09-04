@@ -6,8 +6,6 @@ from ... math cimport (Vector3, mixVec3, distanceVec3, subVec3, lengthVec3,
                        distanceSquaredVec3, findNearestLineParameter,
                        distanceSumOfVector3DList)
 
-from mathutils import Vector
-
 cdef class PolySpline(Spline):
 
     def __cinit__(self, Vector3DList points = None, FloatList radii = None, bint cyclic = False):
@@ -22,6 +20,10 @@ cdef class PolySpline(Spline):
         self.points = points
         self.radii = radii
         self.markChanged()
+
+    cpdef void markChanged(self):
+        Spline.markChanged(self)
+        self.normalsCache = None
 
     def appendPoint(self, point, float radius = 0):
         self.points.append(point)
@@ -41,6 +43,25 @@ cdef class PolySpline(Spline):
             length += distanceVec3(self.points.data + 0,
                                    self.points.data + self.points.length - 1)
         return length
+
+    # Normals
+    #################################################
+
+    cdef checkNormals(self):
+        if self.normalsCache is None:
+            raise Exception("normals are not available yet, please call spline.ensureNormals() first")
+
+    cpdef ensureNormals(self):
+        if self.normalsCache is not None:
+            return
+        if not self.isEvaluable():
+            raise Exception("cannot ensure normals when spline is not evaluable")
+
+
+        # TODO
+
+    # Projection
+    #################################################
 
     @cython.cdivision(True)
     cdef float project_LowLevel(self, Vector3* point):

@@ -8,3 +8,5 @@ cdef class BezierSpline(Spline):
         public Vector3DList leftHandles
         public Vector3DList rightHandles
         public FloatList radii
+        public FloatList tilts
+        Vector3DList normalsCache

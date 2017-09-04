@@ -23,6 +23,7 @@ class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
             self.newOutput("Vector List", "Locations", "locations")
             self.newOutput("Vector List", "Tangents", "tangents")
             self.newOutput("Float List", "Radii", "radii")
+            self.newOutput("Vector List", "Normals", "normals")
         else:
             self.newInput(VectorizedSocket("Float", "useParameterList",
                 ("Parameter", "parameter", dict(minValue = 0, maxValue = 1)),
@@ -37,6 +38,9 @@ class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
             self.newOutput(VectorizedSocket("Float", "useParameterList",
                 ("Radius", "radius"),
                 ("Radii", "radii")))
+            self.newOutput(VectorizedSocket("Vector", "useParameterList",
+                ("Normal", "normal"),
+                ("Normals", "normals")))
 
     def draw(self, layout):
         row = layout.row(align = True)
@@ -52,6 +56,8 @@ class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
         yield "if spline.isEvaluable():"
         if self.parameterType == "UNIFORM":
             yield "    spline.ensureUniformConverter(self.resolution)"
+        if "normal" in required or "normals" in required:
+            yield "    spline.ensureNormals()"
 
         if self.evaluateRange:
             yield from ("    " + c for c in self.getExecutionCode_Range(required))
@@ -74,6 +80,8 @@ class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
         if "radii" in required:
             yield "_radii = spline.getDistributedRadii(_amount, _start, _end, self.parameterType)"
             yield "radii = DoubleList.fromValues(_radii)"
+        if "normals" in required:
+            yield "normals = spline.getDistributedNormals(_amount, _start, _end, self.parameterType)"
 
     def getExecutionCode_Parameters(self, required):
         if self.useParameterList:
@@ -94,6 +102,8 @@ class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
             yield "tangents = spline.sampleTangents(_parameters, False, 'RESOLUTION')"
         if "radii" in required:
             yield "radii = spline.sampleRadii(_parameters, False, 'RESOLUTION')"
+        if "normals" in required:
+            yield "normals = spline.sampleNormals(_parameters, False, 'RESOLUTION')"
 
     def getExecutionCode_Parameters_Single(self, required):
         yield "_parameter = min(max(parameter, 0), 1)"
@@ -107,3 +117,5 @@ class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
             yield "tangent = spline.evaluateTangent(_parameter)"
         if "radius" in required:
             yield "radius = spline.evaluateRadius(_parameter)"
+        if "normal" in required:
+            yield "normal = spline.evaluateNormal(_parameter)"
