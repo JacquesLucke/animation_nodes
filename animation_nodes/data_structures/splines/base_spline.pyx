@@ -1,11 +1,13 @@
 cimport cython
 from ... utils.lists cimport findListSegment_LowLevel
-from ... math.vector cimport distanceSquaredVec3, crossVec3, mixVec3, projectOnCenterPlaneVec3, almostZeroVec3, angleVec3, dotVec3, normalizeVec3_InPlace
-from ... math.conversion cimport toPyVector3, toVector3
-from ... math.geometry cimport findNearestLineParameter
-from ... math.list_operations cimport distanceSumOfVector3DList
-from ... math.quaternion cimport rotateAroundAxisVec3
-from libc.math cimport M_PI as PI
+from ... math cimport (
+    distanceSquaredVec3, crossVec3, projectOnCenterPlaneVec3,
+    almostZeroVec3, angleVec3, dotVec3, normalizeVec3_InPlace,
+    toPyVector3, toVector3,
+    findNearestLineParameter,
+    distanceSumOfVector3DList,
+    rotateAroundAxisVec3
+)
 
 ctypedef void (*EvaluateVector)(Spline, float, Vector3*)
 ctypedef float (*EvaluateFloat)(Spline, float)

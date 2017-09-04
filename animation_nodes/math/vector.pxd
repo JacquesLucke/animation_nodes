@@ -36,3 +36,5 @@ cdef float distanceSquaredVec3(Vector3* a, Vector3* b)
 cdef void absoluteVec3(Vector3* target, Vector3* source)
 cdef void snapVec3(Vector3* target, Vector3* v, Vector3* step)
 cdef void mixVec3(Vector3* target, Vector3* a, Vector3* b, float factor)
+
+cdef void rotateAroundAxisVec3(Vector3 *target, Vector3 *v, Vector3 *axis, float angle)

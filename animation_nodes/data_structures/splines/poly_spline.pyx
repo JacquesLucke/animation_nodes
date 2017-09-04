@@ -3,9 +3,12 @@ from libc.math cimport floor
 from libc.string cimport memcpy
 from . base_spline import calculateNormalsForTangents
 from ... utils.lists cimport findListSegment_LowLevel
-from ... math cimport (Vector3, mixVec3, distanceVec3, subVec3, lengthVec3,
-                       distanceSquaredVec3, findNearestLineParameter,
-                       distanceSumOfVector3DList)
+
+from ... math cimport (
+    Vector3, mixVec3, distanceVec3, subVec3,
+    distanceSquaredVec3, findNearestLineParameter,
+    distanceSumOfVector3DList
+)
 
 cdef class PolySpline(Spline):
 
@@ -137,19 +140,31 @@ cdef class PolySpline(Spline):
             Vector3DList newPoints = Vector3DList(length = newPointAmount)
             Vector3 *_newPoints = newPoints.data
             Vector3 *_oldPoints = self.points.data
+
             FloatList newRadii = FloatList(length = newPointAmount)
             float *_newRadii = newRadii.data
             float *_oldRadii = self.radii.data
 
+            FloatList newTilts = FloatList(length = newPointAmount)
+            float *_newTilts = newTilts.data
+            float *_oldTilts = self.tilts.data
+
+        # First Point
         mixVec3(_newPoints, _oldPoints + startIndices[0], _oldPoints + startIndices[1], startT)
         _newRadii[0] = _oldRadii[startIndices[0]] * (1 - startT) + _oldRadii[startIndices[1]] * startT
+        _newTilts[0] = _oldTilts[startIndices[0]] * (1 - startT) + _oldTilts[startIndices[1]] * startT
 
+        # Last Point
         mixVec3(_newPoints + newPointAmount - 1, _oldPoints + endIndices[0], _oldPoints + endIndices[1], endT)
         _newRadii[newPointAmount - 1] = _oldRadii[endIndices[0]] * (1 - endT) + _oldRadii[endIndices[1]] * endT
+        _newTilts[newPointAmount - 1] = _oldTilts[endIndices[0]] * (1 - endT) + _oldTilts[endIndices[1]] * endT
 
+        # In between
         memcpy(_newPoints + 1, _oldPoints + startIndices[1], sizeof(Vector3) * (newPointAmount - 2))
         memcpy(_newRadii + 1, _oldRadii + startIndices[1], sizeof(float) * (newPointAmount - 2))
-        return PolySpline(newPoints, newRadii)
+        memcpy(_newTilts + 1, _oldTilts + startIndices[1], sizeof(float) * (newPointAmount - 2))
+
+        return PolySpline(newPoints, newRadii, newTilts)
 
     cpdef bint isEvaluable(self):
         return self.points.length >= 2

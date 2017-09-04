@@ -236,17 +236,25 @@ cdef class BezierSpline(Spline):
 
         cdef:
             Vector3DList newPoints = Vector3DList(length = newPointAmount)
-            Vector3DList newLeftHandles = Vector3DList(length = newPointAmount)
-            Vector3DList newRightHandles = Vector3DList(length = newPointAmount)
-            FloatList newRadii = FloatList(length = newPointAmount)
             Vector3* _newPoints = newPoints.data
-            Vector3* _newLeftHandles = newLeftHandles.data
-            Vector3* _newRightHandles = newRightHandles.data
-            float *_newRadii = newRadii.data
             Vector3* _oldPoints = self.points.data
+
+            Vector3DList newLeftHandles = Vector3DList(length = newPointAmount)
+            Vector3* _newLeftHandles = newLeftHandles.data
             Vector3* _oldLeftHandles = self.leftHandles.data
+
+            Vector3DList newRightHandles = Vector3DList(length = newPointAmount)
+            Vector3* _newRightHandles = newRightHandles.data
             Vector3* _oldRightHandles = self.rightHandles.data
+
+            FloatList newRadii = FloatList(length = newPointAmount)
+            float *_newRadii = newRadii.data
             float *_oldRadii = self.radii.data
+
+            FloatList newTilts = FloatList(length = newPointAmount)
+            float *_newTilts = newTilts.data
+            float *_oldTilts = self.tilts.data
+
             Vector3 tmp[4]
 
         if startIndices[0] == endIndices[0]: # <- result will contain only one segment
@@ -282,6 +290,9 @@ cdef class BezierSpline(Spline):
             memcpy(_newRadii + 1,
                    _oldRadii + startIndices[1],
                    sizeof(float) * (newPointAmount - 2))
+            memcpy(_newTilts + 1,
+                   _oldTilts + startIndices[1],
+                   sizeof(float) * (newPointAmount - 2))
 
             # Trim first segment
             calcLeftTrimmedSegment(startT,
@@ -303,7 +314,11 @@ cdef class BezierSpline(Spline):
         _newRadii[0] = _oldRadii[startIndices[0]] * (1 - startT) + _oldRadii[startIndices[1]] * startT
         _newRadii[newPointAmount - 1] = _oldRadii[endIndices[0]] * (1 - endT) + _oldRadii[endIndices[1]] * endT
 
-        return BezierSpline(newPoints, newLeftHandles, newRightHandles, newRadii)
+        # calculate tilt of first and last point
+        _newTilts[0] = _oldTilts[startIndices[0]] * (1 - startT) + _oldTilts[startIndices[1]] * startT
+        _newTilts[newPointAmount - 1] = _oldTilts[endIndices[0]] * (1 - endT) + _oldTilts[endIndices[1]] * endT
+
+        return BezierSpline(newPoints, newLeftHandles, newRightHandles, newRadii, newTilts)
 
 @cython.cdivision(True)
 cdef calculateSmoothControlPoints(

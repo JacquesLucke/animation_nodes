@@ -24,7 +24,7 @@ class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
             self.newOutput("Vector List", "Tangents", "tangents")
             self.newOutput("Vector List", "Normals", "normals")
             self.newOutput("Float List", "Radii", "radii")
-            self.newOutput("Float List", "Tilts", "tilts")
+            self.newOutput("Float List", "Tilts", "tilts", hide = True)
         else:
             self.newInput(VectorizedSocket("Float", "useParameterList",
                 ("Parameter", "parameter", dict(minValue = 0, maxValue = 1)),
@@ -43,8 +43,8 @@ class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
                 ("Radius", "radius"),
                 ("Radii", "radii")))
             self.newOutput(VectorizedSocket("Float", "useParameterList",
-                ("Tilt", "tilt"),
-                ("Tilts", "tilts")))
+                ("Tilt", "tilt", dict(hide = True)),
+                ("Tilts", "tilts", dict(hide = True))))
 
     def draw(self, layout):
         row = layout.row(align = True)

@@ -47,19 +47,3 @@ cdef void quatFromAxisAngle(Quaternion *q, Vector3 *axis, float angle):
     q.y = axis.y * factor
     q.z = axis.z * factor
     q.w = cq
-
-cdef void rotateAroundAxisVec3(Vector3 *target, Vector3 *v, Vector3 *axis, float angle):
-    cdef Vector3 n
-    normalizeVec3(&n, axis)
-    cdef Vector3 d
-    scaleVec3(&d, &n, dotVec3(&n, v))
-    cdef Vector3 r
-    subVec3(&r, v, &d)
-    cdef Vector3 g
-    crossVec3(&g, &n, &r)
-    cdef float ca = cos(angle)
-    cdef float sa = sin(angle)
-
-    target.x = d.x + r.x * ca + g.x * sa
-    target.y = d.y + r.y * ca + g.y * sa
-    target.z = d.z + r.z * ca + g.z * sa
