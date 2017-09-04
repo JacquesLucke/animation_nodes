@@ -22,8 +22,9 @@ class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
             self.newInput("Float", "End", "end", value = 1.0).setRange(0.0, 1.0)
             self.newOutput("Vector List", "Locations", "locations")
             self.newOutput("Vector List", "Tangents", "tangents")
-            self.newOutput("Float List", "Radii", "radii")
             self.newOutput("Vector List", "Normals", "normals")
+            self.newOutput("Float List", "Radii", "radii")
+            self.newOutput("Float List", "Tilts", "tilts")
         else:
             self.newInput(VectorizedSocket("Float", "useParameterList",
                 ("Parameter", "parameter", dict(minValue = 0, maxValue = 1)),
@@ -35,12 +36,15 @@ class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
             self.newOutput(VectorizedSocket("Vector", "useParameterList",
                 ("Tangent", "tangent"),
                 ("Tangents", "tangents")))
-            self.newOutput(VectorizedSocket("Float", "useParameterList",
-                ("Radius", "radius"),
-                ("Radii", "radii")))
             self.newOutput(VectorizedSocket("Vector", "useParameterList",
                 ("Normal", "normal"),
                 ("Normals", "normals")))
+            self.newOutput(VectorizedSocket("Float", "useParameterList",
+                ("Radius", "radius"),
+                ("Radii", "radii")))
+            self.newOutput(VectorizedSocket("Float", "useParameterList",
+                ("Tilt", "tilt"),
+                ("Tilts", "tilts")))
 
     def draw(self, layout):
         row = layout.row(align = True)
@@ -77,11 +81,14 @@ class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
             yield "locations = spline.getDistributedPoints(_amount, _start, _end, self.parameterType)"
         if "tangents" in required:
             yield "tangents = spline.getDistributedTangents(_amount, _start, _end, self.parameterType)"
+        if "normals" in required:
+            yield "normals = spline.getDistributedNormals(_amount, _start, _end, self.parameterType)"
         if "radii" in required:
             yield "_radii = spline.getDistributedRadii(_amount, _start, _end, self.parameterType)"
             yield "radii = DoubleList.fromValues(_radii)"
-        if "normals" in required:
-            yield "normals = spline.getDistributedNormals(_amount, _start, _end, self.parameterType)"
+        if "tilts" in required:
+            yield "_tilts = spline.getDistributedTilts(_amount, _start, _end, self.parameterType)"
+            yield "tilts = DoubleList.fromValues(_tilts)"
 
     def getExecutionCode_Parameters(self, required):
         if self.useParameterList:
@@ -100,10 +107,14 @@ class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
             yield "locations = spline.samplePoints(_parameters, False, 'RESOLUTION')"
         if "tangents" in required:
             yield "tangents = spline.sampleTangents(_parameters, False, 'RESOLUTION')"
-        if "radii" in required:
-            yield "radii = spline.sampleRadii(_parameters, False, 'RESOLUTION')"
         if "normals" in required:
             yield "normals = spline.sampleNormals(_parameters, False, 'RESOLUTION')"
+        if "radii" in required:
+            yield "_radii = spline.sampleRadii(_parameters, False, 'RESOLUTION')"
+            yield "radii = DoubleList.fromValues(_radii)"
+        if "tilts" in required:
+            yield "_tilts = spline.sampleTilts(_parameters, False, 'RESOLUTION')"
+            yield "tilts = DoubleList.fromValues(_tilts)"
 
     def getExecutionCode_Parameters_Single(self, required):
         yield "_parameter = min(max(parameter, 0), 1)"
@@ -115,7 +126,9 @@ class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
             yield "location = spline.evaluatePoint(_parameter)"
         if "tangent" in required:
             yield "tangent = spline.evaluateTangent(_parameter)"
-        if "radius" in required:
-            yield "radius = spline.evaluateRadius(_parameter)"
         if "normal" in required:
             yield "normal = spline.evaluateNormal(_parameter)"
+        if "radius" in required:
+            yield "radius = spline.evaluateRadius(_parameter)"
+        if "tilt" in required:
+            yield "tilt = spline.evaluateTilt(_parameter)"
