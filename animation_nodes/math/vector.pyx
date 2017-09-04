@@ -1,5 +1,8 @@
 import cython
-from libc.math cimport sqrt, ceil
+from libc.math cimport sqrt, ceil, acos
+
+cdef char almostZeroVec3(Vector3* v):
+    return lengthSquaredVec3(v) < 0.0000001
 
 cdef void scaleVec3_Inplace(Vector3* v, float factor):
     v.x *= factor
@@ -104,6 +107,16 @@ cdef float distanceSquaredVec3(Vector3* a, Vector3* b):
 cdef float dotVec3(Vector3* a, Vector3* b):
     return a.x * b.x + a.y * b.y + a.z * b.z
 
+cdef float angleVec3(Vector3 *a, Vector3 *b):
+    cdef float dot = dotVec3(a, b)
+    cdef float val
+    if abs(dot) > 0.000001:
+        val = dot / (lengthVec3(a) * lengthVec3(b))
+        if val > 1: val = 1
+        elif val < -1: val = -1
+        return acos(val)
+    return 0
+
 cdef void crossVec3(Vector3* result, Vector3* a, Vector3* b):
     result.x = a.y * b.z - a.z * b.y
     result.y = a.z * b.x - a.x * b.z
@@ -118,6 +131,13 @@ cdef void projectVec3(Vector3* result, Vector3* a, Vector3* b):
         result.x = 0
         result.y = 0
         result.z = 0
+
+cdef void projectOnCenterPlaneVec3(Vector3 *result, Vector3 *v, Vector3 *planeNormal):
+    cdef Vector3 unitNormal, projVector
+    normalizeVec3(&unitNormal, planeNormal)
+    cdef float distance = dotVec3(v, &unitNormal)
+    scaleVec3(&projVector, &unitNormal, -distance)
+    addVec3(result, v, &projVector)
 
 cdef void reflectVec3(Vector3* result, Vector3* v, Vector3* axis):
     cdef Vector3 _axis
