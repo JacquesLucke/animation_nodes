@@ -1,6 +1,6 @@
 cimport cython
 from ... utils.lists cimport findListSegment_LowLevel
-from ... math.vector cimport distanceSquaredVec3, crossVec3, mixVec3, projectOnCenterPlaneVec3, almostZeroVec3, angleVec3, dotVec3
+from ... math.vector cimport distanceSquaredVec3, crossVec3, mixVec3, projectOnCenterPlaneVec3, almostZeroVec3, angleVec3, dotVec3, normalizeVec3_InPlace
 from ... math.conversion cimport toPyVector3, toVector3
 from ... math.geometry cimport findNearestLineParameter
 from ... math.list_operations cimport distanceSumOfVector3DList
@@ -434,9 +434,6 @@ cdef evaluateFunction_Array(Spline spline, EvaluateFunction evaluate,
 # Calculate Normals
 ######################################################
 
-testType = 0
-testRotation = 0
-
 def calculateNormalsForTangents(Vector3DList tangents not None, bint cyclic = False):
     if tangents.length == 0:
         return Vector3DList()
@@ -456,14 +453,6 @@ def calculateNormalsForTangents(Vector3DList tangents not None, bint cyclic = Fa
 
     return normals
 
-cdef void calcNextNormal(Vector3 *target, Vector3 *lastNormal, Vector3 *lastTangent, Vector3 *currentTangent):
-    cdef Vector3 axis
-    crossVec3(&axis, lastTangent, currentTangent)
-    cdef float angle = angleVec3(lastTangent, currentTangent)
-    cdef Vector3 newNormal
-    rotateAroundAxisVec3(&newNormal, lastNormal, &axis, angle)
-    projectOnCenterPlaneVec3(target, &newNormal, currentTangent)
-
 cdef void setInitialNormal(Vector3 *tangent, Vector3 *target):
     cdef Vector3 upVector = Vector3(0, 0, 1)
 
@@ -475,7 +464,15 @@ cdef void setInitialNormal(Vector3 *tangent, Vector3 *target):
     if almostZeroVec3(target):
         upVector = Vector3(0, 1, 0)
         crossVec3(target, &upVector, tangent)
+        normalizeVec3_InPlace(target)
 
+cdef void calcNextNormal(Vector3 *target, Vector3 *lastNormal, Vector3 *lastTangent, Vector3 *currentTangent):
+    cdef Vector3 axis
+    crossVec3(&axis, lastTangent, currentTangent)
+    cdef float angle = angleVec3(lastTangent, currentTangent)
+    cdef Vector3 newNormal
+    rotateAroundAxisVec3(&newNormal, lastNormal, &axis, angle)
+    projectOnCenterPlaneVec3(target, &newNormal, currentTangent)
 
 cdef makeNormalsCyclic(Vector3DList tangents, Vector3DList normals):
     cdef Vector3 *firstNormal = normals.data + 0
@@ -490,7 +487,6 @@ cdef makeNormalsCyclic(Vector3DList tangents, Vector3DList normals):
         angle = -angle
 
     applyRotationGradient(tangents, normals, -angle)
-
 
 cdef applyRotationGradient(Vector3DList tangents, Vector3DList normals, float fullAngle):
     cdef Py_ssize_t i
