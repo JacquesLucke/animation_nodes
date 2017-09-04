@@ -90,55 +90,6 @@ cdef class Spline:
     cpdef ensureNormals(self):
         raise NotImplementedError()
 
-    def evaluateNormal(self, float t):
-        self.checkNormals()
-        return evaluateFunction_PyResult(self, self.evaluateNormal_LowLevel, t)
-
-    cdef void evaluateNormal_LowLevel(self, float t, Vector3 *result):
-        cdef Vector3 approx
-        cdef Vector3 tangent
-        self.evaluateNormal_Approximated(t, &approx)
-        self.evaluateTangent_LowLevel(t, &tangent)
-        cdef float tilt = self.evaluateTilt_LowLevel(t)
-        cdef Vector3 rotated
-        rotateAroundAxisVec3(&rotated, &approx, &tangent, tilt)
-        projectOnCenterPlaneVec3(result, &rotated, &tangent)
-
-    cdef void evaluateNormal_Approximated(self, float parameter, Vector3 *result):
-        raise NotImplementedError()
-
-    cdef calcDistributedNormals_LowLevel(self, Py_ssize_t amount, Vector3 *result,
-                                         float start = 0, float end = 1,
-                                         str distributionType = "RESOLUTION"):
-        self.checkNormals()
-        evaluateDistributed(self, amount, self.evaluateNormal_LowLevel,
-            start, end, distributionType, result)
-
-    def getDistributedNormals(self, Py_ssize_t amount,
-                             float start = 0, float end = 1,
-                             str distributionType = "RESOLUTION"):
-        cdef Vector3DList result = Vector3DList(length = amount)
-        self.calcDistributedNormals_LowLevel(amount, result.data, start, end, distributionType)
-        return result
-
-    def sampleNormals(self, FloatList parameters,
-                     bint checkRange = True, parameterType = "RESOLUTION"):
-        self.checkNormals()
-        cdef FloatList _parameters = self._prepareParameters(parameters, checkRange, parameterType)
-        cdef Vector3DList result = Vector3DList(length = parameters.length)
-        evaluateFunction_Array(self, self.evaluateNormal_LowLevel,
-            _parameters.data, result.data, _parameters.length)
-        return result
-
-    cdef float evaluateTilt_LowLevel(self, float t):
-        raise NotImplementedError()
-
-    cdef calcDistributedTilts_LowLevel(self, Py_ssize_t amount, float *result,
-                                       float start = 0, float end = 1,
-                                       str distributionType = "RESOLUTION"):
-        evaluateDistributed(self, amount, self.evaluateTilt_LowLevel,
-            start, end, distributionType, result)
-
 
     # Get Multiple Samples
     #############################################
@@ -155,10 +106,23 @@ cdef class Spline:
         evaluateDistributed(self, amount, self.evaluateTangent_LowLevel,
             start, end, distributionType, result)
 
+    cdef calcDistributedNormals_LowLevel(self, Py_ssize_t amount, Vector3 *result,
+                                         float start = 0, float end = 1,
+                                         str distributionType = "RESOLUTION"):
+        self.checkNormals()
+        evaluateDistributed(self, amount, self.evaluateNormal_LowLevel,
+            start, end, distributionType, result)
+
     cdef calcDistributedRadii_LowLevel(self, Py_ssize_t amount, float *result,
                                     float start = 0, float end = 1,
                                     str distributionType = "RESOLUTION"):
         evaluateDistributed(self, amount, self.evaluateRadius_LowLevel,
+            start, end, distributionType, result)
+
+    cdef calcDistributedTilts_LowLevel(self, Py_ssize_t amount, float *result,
+                                       float start = 0, float end = 1,
+                                       str distributionType = "RESOLUTION"):
+        evaluateDistributed(self, amount, self.evaluateTilt_LowLevel,
             start, end, distributionType, result)
 
 
@@ -176,6 +140,13 @@ cdef class Spline:
         self.calcDistributedTangents_LowLevel(amount, result.data, start, end, distributionType)
         return result
 
+    def getDistributedNormals(self, Py_ssize_t amount,
+                              float start = 0, float end = 1,
+                              str distributionType = "RESOLUTION"):
+        cdef Vector3DList result = Vector3DList(length = amount)
+        self.calcDistributedNormals_LowLevel(amount, result.data, start, end, distributionType)
+        return result
+
     def getDistributedRadii(self, Py_ssize_t amount,
                             float start = 0, float end = 1,
                             str distributionType = "RESOLUTION"):
@@ -183,10 +154,17 @@ cdef class Spline:
         self.calcDistributedRadii_LowLevel(amount, result.data, start, end, distributionType)
         return result
 
+    def getDistributedTilts(self, Py_ssize_t amount,
+                            float start = 0, float end = 1,
+                            str distributionType = "RESOLUTION"):
+        cdef FloatList result = FloatList(length = amount)
+        self.calcDistributedTilts_LowLevel(amount, result.data, start, end, distributionType)
+        return result
+
 
     def samplePoints(self, FloatList parameters,
                      bint checkRange = True, parameterType = "RESOLUTION"):
-        cdef FloatList _parameters = self._prepareParameters(parameters, checkRange, parameterType)
+        cdef FloatList _parameters = prepareSampleParameters(parameters, checkRange, parameterType)
         cdef Vector3DList result = Vector3DList(length = parameters.length)
         evaluateFunction_Array(self, self.evaluatePoint_LowLevel,
             _parameters.data, result.data, _parameters.length)
@@ -194,33 +172,38 @@ cdef class Spline:
 
     def sampleTangents(self, FloatList parameters,
                        bint checkRange = True, parameterType = "RESOLUTION"):
-        cdef FloatList _parameters = self._prepareParameters(parameters, checkRange, parameterType)
+        cdef FloatList _parameters = prepareSampleParameters(parameters, checkRange, parameterType)
         cdef Vector3DList result = Vector3DList(length = parameters.length)
         evaluateFunction_Array(self, self.evaluateTangent_LowLevel,
             _parameters.data, result.data, _parameters.length)
         return result
 
+    def sampleNormals(self, FloatList parameters,
+                     bint checkRange = True, parameterType = "RESOLUTION"):
+        self.checkNormals()
+        cdef FloatList _parameters = self._prepareParameters(parameters, checkRange, parameterType)
+        cdef Vector3DList result = Vector3DList(length = parameters.length)
+        evaluateFunction_Array(self, self.evaluateNormal_LowLevel,
+            _parameters.data, result.data, _parameters.length)
+        return result
+
     def sampleRadii(self, FloatList parameters,
                     bint checkRange = True, parameterType = "RESOLUTION"):
-        cdef FloatList _parameters = self._prepareParameters(parameters, checkRange, parameterType)
+        cdef FloatList _parameters = prepareSampleParameters(parameters, checkRange, parameterType)
         cdef FloatList result = FloatList(length = parameters.length)
         evaluateFunction_Array(self, self.evaluateRadius_LowLevel,
             _parameters.data, result.data, _parameters.length)
         return result
 
-    def _prepareParameters(self, FloatList parameters, bint checkRange, str parameterType):
-        if checkRange:
-            if not parameters.allValuesInRange(0, 1):
-                raise Exception("parameters have to be between 0 and 1")
+    def sampleTilts(self, FloatList parameters,
+                    bint checkRange = True, parameterType = "RESOLUTION"):
+        cdef FloatList _parameters = prepareSampleParameters(parameters, checkRange, parameterType)
+        cdef FloatList result = FloatList(length = parameters.length)
+        evaluateFunction_Array(self, self.evaluateTilt_LowLevel,
+            _parameters.data, result.data, _parameters.length)
+        return result
 
-        if parameterType == "RESOLUTION":
-            outParameters = parameters
-        elif parameterType == "UNIFORM":
-            outParameters = self.toUniformParameters(parameters)
-        else:
-            raise Exception("Unknown parameterType; expected 'RESOLUTION' or 'UNIFORM' but got {}".format(repr(parameterType)))
 
-        return outParameters
 
 
 
@@ -233,8 +216,16 @@ cdef class Spline:
     def evaluateTangent(self, float t):
         return evaluateFunction_PyResult(self, self.evaluateTangent_LowLevel, t)
 
+    def evaluateNormal(self, float t):
+        self.checkNormals()
+        return evaluateFunction_PyResult(self, self.evaluateNormal_LowLevel, t)
+
     def evaluateRadius(self, float t):
         return evaluateFunction_PyResult(self, self.evaluateRadius_LowLevel, t)
+
+    def evaluateTilt(self, float t):
+        return evaluateFunction_PyResult(self, self.evaluateTilt_LowLevel, t)
+
 
     cdef void evaluatePoint_LowLevel(self, float t, Vector3 *result):
         raise NotImplementedError()
@@ -242,7 +233,23 @@ cdef class Spline:
     cdef void evaluateTangent_LowLevel(self, float t, Vector3 *result):
         raise NotImplementedError()
 
+    cdef void evaluateNormal_LowLevel(self, float t, Vector3 *result):
+        cdef Vector3 approx
+        cdef Vector3 tangent
+        self.evaluateNormal_Approximated(t, &approx)
+        self.evaluateTangent_LowLevel(t, &tangent)
+        cdef float tilt = self.evaluateTilt_LowLevel(t)
+        cdef Vector3 rotated
+        rotateAroundAxisVec3(&rotated, &approx, &tangent, tilt)
+        projectOnCenterPlaneVec3(result, &rotated, &tangent)
+
+    cdef void evaluateNormal_Approximated(self, float parameter, Vector3 *result):
+        raise NotImplementedError()
+
     cdef float evaluateRadius_LowLevel(self, float t):
+        raise NotImplementedError()
+
+    cdef float evaluateTilt_LowLevel(self, float t):
         raise NotImplementedError()
 
 
@@ -399,6 +406,20 @@ cdef evaluateDistributed(Spline spline, Py_ssize_t amount, EvaluateFunction eval
         elif EvaluateFunction is EvaluateFloat:
             (<float*>target)[i] = evaluate(spline, t)
 
+def prepareSampleParameters(Spline spline, FloatList parameters,
+                            bint checkRange, str parameterType):
+    if checkRange:
+        if not parameters.allValuesInRange(0, 1):
+            raise Exception("parameters have to be between 0 and 1")
+
+    if parameterType == "RESOLUTION":
+        outParameters = parameters
+    elif parameterType == "UNIFORM":
+        outParameters = spline.toUniformParameters(parameters)
+    else:
+        raise Exception("Unknown parameterType; expected 'RESOLUTION' or 'UNIFORM' but got {}".format(repr(parameterType)))
+
+    return outParameters
 
 # Evaluate Functions with PyObject Result
 ######################################################
