@@ -26,7 +26,7 @@ cdef class BezierSpline(Spline):
         if radii is None: radii = FloatList.fromValue(0.1, length = points.length)
         if tilts is None: tilts = FloatList.fromValue(0, length = points.length)
 
-        if not (points.length == leftHandles.length == points.length == radii.length):
+        if not (points.length == leftHandles.length == points.length == radii.length == tilts.length):
             raise ValueError("list lengths have to be equal")
 
         self.points = points
@@ -112,7 +112,7 @@ cdef class BezierSpline(Spline):
     cdef float evaluateTilt_LowLevel(self, float parameter):
         cdef long indices[2]
         cdef float t
-        findListSegment_LowLevel(self.points.length, self.cyclic, parameter, indices, &t)
+        findListSegment_LowLevel(self.tilts.length, self.cyclic, parameter, indices, &t)
         return self.tilts.data[indices[0]] * (1 - t) + self.tilts.data[indices[1]] * t
 
     # Projection

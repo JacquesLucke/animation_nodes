@@ -6,4 +6,5 @@ cdef class PolySpline(Spline):
     cdef:
         public Vector3DList points
         public FloatList radii
+        public FloatList tilts
         Vector3DList normalsCache

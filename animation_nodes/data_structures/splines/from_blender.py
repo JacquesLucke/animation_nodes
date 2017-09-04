@@ -46,8 +46,10 @@ def createPolySpline(bSpline):
     splinePoints = Vector3DList.fromFloatList(pointArray)
 
     radii = FloatList(length = len(bSpline.points))
+    tilts = FloatList(length = len(bSpline.points))
     bSpline.points.foreach_get("radius", radii.asMemoryView())
+    bSpline.points.foreach_get("tilt", tilts.asMemoryView())
 
-    spline = PolySpline(splinePoints, radii)
+    spline = PolySpline(splinePoints, radii, tilts)
     spline.cyclic = bSpline.use_cyclic_u
     return spline

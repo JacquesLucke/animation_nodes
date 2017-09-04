@@ -1,6 +1,7 @@
 cimport cython
 from libc.math cimport floor
 from libc.string cimport memcpy
+from . base_spline import calculateNormalsForTangents
 from ... utils.lists cimport findListSegment_LowLevel
 from ... math cimport (Vector3, mixVec3, distanceVec3, subVec3, lengthVec3,
                        distanceSquaredVec3, findNearestLineParameter,
@@ -8,30 +9,35 @@ from ... math cimport (Vector3, mixVec3, distanceVec3, subVec3, lengthVec3,
 
 cdef class PolySpline(Spline):
 
-    def __cinit__(self, Vector3DList points = None, FloatList radii = None, bint cyclic = False):
+    def __cinit__(self, Vector3DList points = None, FloatList radii = None, FloatList tilts = None, bint cyclic = False):
         if points is None:
             points = Vector3DList()
         if radii is None:
-            radii = FloatList.fromValues([0.1]) * len(points)
-        if points.length != radii.length:
+            radii = FloatList.fromValue(0.1, length = points.length)
+        if tilts is None:
+            tilts = FloatList.fromValue(0, length = points.length)
+        if not (points.length == radii.length == tilts.length):
             raise Exception("Point and radius amount has to be equal")
-        self.cyclic = cyclic
+
         self.type = "POLY"
         self.points = points
         self.radii = radii
+        self.tilts = tilts
+        self.cyclic = cyclic
         self.markChanged()
 
     cpdef void markChanged(self):
         Spline.markChanged(self)
         self.normalsCache = None
 
-    def appendPoint(self, point, float radius = 0):
+    def appendPoint(self, point, float radius = 0, float tilt = 0):
         self.points.append(point)
         self.radii.append(radius)
+        self.tilts.append(tilt)
         self.markChanged()
 
     def copy(self):
-        return PolySpline(self.points.copy(), self.radii.copy(), self.cyclic)
+        return PolySpline(self.points.copy(), self.radii.copy(), self.tilts.copy(), self.cyclic)
 
     def transform(self, matrix):
         self.points.transform(matrix)
@@ -57,8 +63,26 @@ cdef class PolySpline(Spline):
         if not self.isEvaluable():
             raise Exception("cannot ensure normals when spline is not evaluable")
 
+        cdef Py_ssize_t segments = getSegmentAmount(self)
+        cdef Vector3DList tangents = Vector3DList(length = segments)
+        cdef Py_ssize_t i
+        cdef Vector3 start, end
+        for i in range(segments):
+            start = self.points.data[i]
+            end = self.points.data[(i + 1) % self.points.length]
+            subVec3(tangents.data + i, &end, &start)
 
-        # TODO
+        self.normalsCache = calculateNormalsForTangents(tangents, self.cyclic)
+
+    cdef void evaluateNormal_Approximated(self, float parameter, Vector3 *result):
+        cdef Py_ssize_t index = getSegmentIndex(self, parameter)
+        result[0] = self.normalsCache.data[index]
+
+    cdef float evaluateTilt_LowLevel(self, float parameter):
+        cdef long indices[2]
+        cdef float t
+        findListSegment_LowLevel(self.tilts.length, self.cyclic, parameter, indices, &t)
+        return self.tilts.data[indices[0]] * (1 - t) + self.tilts.data[indices[1]] * t
 
     # Projection
     #################################################
@@ -202,3 +226,9 @@ cdef class PolySpline(Spline):
 
 cdef inline int getSegmentAmount(PolySpline spline):
     return spline.points.length - 1 + spline.cyclic
+
+cdef inline Py_ssize_t getSegmentIndex(PolySpline spline, float parameter):
+    cdef long indices[2]
+    cdef float t
+    findListSegment_LowLevel(spline.points.length, spline.cyclic, parameter, indices, &t)
+    return indices[0]
