@@ -17,6 +17,7 @@ class SplineFromPointsNode(bpy.types.Node, AnimationNode):
         items = splineTypeItems, update = AnimationNode.refresh)
 
     useRadiusList = VectorizedSocket.newProperty()
+    useTiltList = VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput("Vector List", "Points", "points", dataIsModified = True)
@@ -26,6 +27,9 @@ class SplineFromPointsNode(bpy.types.Node, AnimationNode):
         self.newInput(VectorizedSocket("Float", "useRadiusList",
             ("Radius", "radius", dict(value = 0.1, minValue = 0)),
             ("Radii", "radii")))
+        self.newInput(VectorizedSocket("Float", "useTiltList",
+            ("Tilt", "tilt"),
+            ("Tilts", "tilts")))
         self.newInput("Boolean", "Cyclic", "cyclic", value = False)
         self.newOutput("Spline", "Spline", "spline")
 
@@ -38,11 +42,12 @@ class SplineFromPointsNode(bpy.types.Node, AnimationNode):
         elif self.splineType == "POLY":
             return "execute_Poly"
 
-    def execute_Bezier(self, points, leftHandles, rightHandles, radii, cyclic):
+    def execute_Bezier(self, points, leftHandles, rightHandles, radii, tilts, cyclic):
         self.correctHandlesListIfNecessary(points, leftHandles)
         self.correctHandlesListIfNecessary(points, rightHandles)
-        radii = self.prepareRadiusList(radii, len(points))
-        return BezierSpline(points, leftHandles, rightHandles, radii, cyclic)
+        _radii = self.prepareFloatList(radii, len(points))
+        _tilts = self.prepareFloatList(tilts, len(points))
+        return BezierSpline(points, leftHandles, rightHandles, _radii, _tilts, cyclic)
 
     def correctHandlesListIfNecessary(self, points, handles):
         if len(points) < len(handles):
@@ -50,20 +55,20 @@ class SplineFromPointsNode(bpy.types.Node, AnimationNode):
         elif len(points) > len(handles):
             handles += points[len(handles):]
 
-    def execute_Poly(self, points, radii, cyclic):
-        radii = self.prepareRadiusList(radii, len(points))
-        return PolySpline(points, radii, cyclic)
+    def execute_Poly(self, points, radii, tilts, cyclic):
+        _radii = self.prepareFloatList(radii, len(points))
+        _tilts = self.prepareFloatList(tilts, len(points))
+        return PolySpline(points, _radii, _tilts, cyclic)
 
-    def prepareRadiusList(self, radii, pointAmount):
-        if isinstance(radii, DoubleList):
-            radii = FloatList.fromValues(radii)
+    def prepareFloatList(self, source, pointAmount):
+        if isinstance(source, DoubleList):
+            floatList = FloatList.fromValues(source)
+            if len(floatList) == 0:
+                floatList.append(0)
+        else:
+            floatList = FloatList.fromValue(source)
 
-        if not isinstance(radii, FloatList):
-            radii = FloatList.fromValues([radii]) * pointAmount
-
-        if pointAmount > len(radii):
-            radii.extend(FloatList.fromValues([0]) * (pointAmount - len(radii)))
-        elif pointAmount < len(radii):
-            del radii[pointAmount:]
-
-        return radii
+        if len(floatList) == pointAmount:
+            return floatList
+        else:
+            return floatList.repeated(length = pointAmount)
