@@ -1,4 +1,3 @@
-cimport cython
 from ... utils.lists cimport findListSegment_LowLevel
 from ... math cimport (
     distanceSquaredVec3, crossVec3, projectOnCenterPlaneVec3,
@@ -116,8 +115,8 @@ cdef class Spline:
             start, end, distributionType, result)
 
     cdef calcDistributedRadii_LowLevel(self, Py_ssize_t amount, float *result,
-                                    float start = 0, float end = 1,
-                                    str distributionType = "RESOLUTION"):
+                                       float start = 0, float end = 1,
+                                       str distributionType = "RESOLUTION"):
         evaluateDistributed(self, amount, self.evaluateRadius_LowLevel,
             start, end, distributionType, result)
 

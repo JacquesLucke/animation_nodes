@@ -33,6 +33,9 @@ cdef class PolySpline(Spline):
         Spline.markChanged(self)
         self.normalsCache = None
 
+    cpdef bint isEvaluable(self):
+        return self.points.length >= 2
+
     def appendPoint(self, point, float radius = 0, float tilt = 0):
         self.points.append(point)
         self.radii.append(radius)
@@ -166,8 +169,6 @@ cdef class PolySpline(Spline):
 
         return PolySpline(newPoints, newRadii, newTilts)
 
-    cpdef bint isEvaluable(self):
-        return self.points.length >= 2
 
     cdef void evaluatePoint_LowLevel(self, float parameter, Vector3 *result):
         cdef:

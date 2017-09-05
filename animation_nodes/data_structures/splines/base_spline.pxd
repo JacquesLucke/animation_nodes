@@ -31,14 +31,9 @@ cdef class Spline:
     cdef checkNormals(self)
     cpdef ensureNormals(self)
 
-    cdef void evaluateNormal_LowLevel(self, float t, Vector3 *result)
-    cdef void evaluateNormal_Approximated(self, float t, Vector3 *result)
-
     cdef calcDistributedNormals_LowLevel(self, Py_ssize_t amount, Vector3 *result,
         float start = ?, float end = ?,
         str distributionType = ?)
-
-    cdef float evaluateTilt_LowLevel(self, float t)
 
     cdef calcDistributedTilts_LowLevel(self, Py_ssize_t amount, float *result,
         float start = ?, float end = ?,
@@ -50,7 +45,10 @@ cdef class Spline:
 
     cdef void evaluatePoint_LowLevel(self, float t, Vector3 *result)
     cdef void evaluateTangent_LowLevel(self, float t, Vector3 *result)
+    cdef void evaluateNormal_LowLevel(self, float t, Vector3 *result)
+    cdef void evaluateNormal_Approximated(self, float t, Vector3 *result)
     cdef float evaluateRadius_LowLevel(self, float t)
+    cdef float evaluateTilt_LowLevel(self, float t)
 
 
     # Evaluate Multiple Parameters
@@ -62,9 +60,16 @@ cdef class Spline:
     cdef calcDistributedTangents_LowLevel(self, Py_ssize_t amount, Vector3 *result,
         float start = ?, float end = ?,
         str distributionType = ?)
+    cdef calcDistributedNormals_LowLevel(self, Py_ssize_t amount, Vector3 *result,
+        float start = ?, float end = ?,
+        str distributionType = ?)
     cdef calcDistributedRadii_LowLevel(self, Py_ssize_t amount, float *result,
         float start = ?, float end = ?,
         str distributionType = ?)
+    cdef calcDistributedTilts_LowLevel(self, Py_ssize_t amount, float *result,
+        float start = ?, float end = ?,
+        str distributionType = ?)
+
 
     # Projection
     #############################################

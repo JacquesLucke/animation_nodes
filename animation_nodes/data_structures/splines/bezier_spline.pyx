@@ -42,6 +42,9 @@ cdef class BezierSpline(Spline):
         Spline.markChanged(self)
         self.normalsCache = None
 
+    cpdef bint isEvaluable(self):
+        return self.points.length >= 2
+
     def appendPoint(self, point, leftHandle, rightHandle, float radius = 0, float tilt = 0):
         self.points.append(point)
         self.leftHandles.append(leftHandle)
@@ -162,8 +165,6 @@ cdef class BezierSpline(Spline):
             return min(sampledData, key = lambda item: item[1])[0]
         return 0
 
-    cpdef bint isEvaluable(self):
-        return self.points.length >= 2
 
     cdef void evaluatePoint_LowLevel(self, float parameter, Vector3 *result):
         cdef float t
