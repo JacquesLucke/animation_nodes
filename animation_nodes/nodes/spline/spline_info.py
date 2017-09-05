@@ -22,6 +22,7 @@ class SplineInfoNode(bpy.types.Node, AnimationNode):
             self.newOutput("Vector List", "Left Handles", "leftHandles")
             self.newOutput("Vector List", "Right Handles", "rightHandles")
         self.newOutput("Float List", "Radii", "radii")
+        self.newOutput("Float List", "Tilts", "tilts")
         self.newOutput("Boolean", "Cyclic", "cyclic")
         self.newOutput("Integer", "Point Amount", "pointAmount")
 
@@ -33,6 +34,8 @@ class SplineInfoNode(bpy.types.Node, AnimationNode):
             yield "points = spline.points"
         if "radii" in required:
             yield "radii = DoubleList.fromValues(spline.radii)"
+        if "tilts" in required:
+            yield "tilts = DoubleList.fromValues(spline.tilts)"
         if "cyclic" in required:
             yield "cyclic = spline.cyclic"
         if "pointAmount" in required:

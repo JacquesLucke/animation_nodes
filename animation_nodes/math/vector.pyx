@@ -1,5 +1,11 @@
 import cython
-from libc.math cimport sqrt, ceil
+from libc.math cimport sqrt, ceil, acos, sin, cos
+
+cdef char almostZeroVec3(Vector3* v):
+    return lengthSquaredVec3(v) < 0.000001
+
+cdef char isCloseVec3(Vector3* a, Vector3* b):
+    return distanceSquaredVec3(a, b) < 0.000001
 
 cdef void scaleVec3_Inplace(Vector3* v, float factor):
     v.x *= factor
@@ -104,6 +110,16 @@ cdef float distanceSquaredVec3(Vector3* a, Vector3* b):
 cdef float dotVec3(Vector3* a, Vector3* b):
     return a.x * b.x + a.y * b.y + a.z * b.z
 
+cdef float angleVec3(Vector3 *a, Vector3 *b):
+    cdef float dot = dotVec3(a, b)
+    cdef float val
+    if abs(dot) > 0.000001:
+        val = dot / (lengthVec3(a) * lengthVec3(b))
+        if val > 1: val = 1
+        elif val < -1: val = -1
+        return acos(val)
+    return 0
+
 cdef void crossVec3(Vector3* result, Vector3* a, Vector3* b):
     result.x = a.y * b.z - a.z * b.y
     result.y = a.z * b.x - a.x * b.z
@@ -118,6 +134,13 @@ cdef void projectVec3(Vector3* result, Vector3* a, Vector3* b):
         result.x = 0
         result.y = 0
         result.z = 0
+
+cdef void projectOnCenterPlaneVec3(Vector3 *result, Vector3 *v, Vector3 *planeNormal):
+    cdef Vector3 unitNormal, projVector
+    normalizeVec3(&unitNormal, planeNormal)
+    cdef float distance = dotVec3(v, &unitNormal)
+    scaleVec3(&projVector, &unitNormal, -distance)
+    addVec3(result, v, &projVector)
 
 cdef void reflectVec3(Vector3* result, Vector3* v, Vector3* axis):
     cdef Vector3 _axis
@@ -137,3 +160,19 @@ cdef void snapVec3(Vector3* target, Vector3* v, Vector3* step):
     target.x = ceil(v.x / step.x - 0.5) * step.x if step.x != 0 else v.x
     target.y = ceil(v.y / step.y - 0.5) * step.y if step.y != 0 else v.y
     target.z = ceil(v.z / step.z - 0.5) * step.z if step.z != 0 else v.z
+
+cdef void rotateAroundAxisVec3(Vector3 *target, Vector3 *v, Vector3 *axis, float angle):
+    cdef Vector3 n
+    normalizeVec3(&n, axis)
+    cdef Vector3 d
+    scaleVec3(&d, &n, dotVec3(&n, v))
+    cdef Vector3 r
+    subVec3(&r, v, &d)
+    cdef Vector3 g
+    crossVec3(&g, &n, &r)
+    cdef float ca = cos(angle)
+    cdef float sa = sin(angle)
+
+    target.x = d.x + r.x * ca + g.x * sa
+    target.y = d.y + r.y * ca + g.y * sa
+    target.z = d.z + r.z * ca + g.z * sa

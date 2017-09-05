@@ -4,6 +4,9 @@ cdef struct Vector3:
 cdef struct Vector4:
     float x, y, z, w
 
+cdef char almostZeroVec3(Vector3* v)
+cdef char isCloseVec3(Vector3* a, Vector3* b)
+
 cdef float lengthVec3(Vector3* v)
 cdef float lengthSquaredVec3(Vector3* v)
 
@@ -16,10 +19,12 @@ cdef void multVec3(Vector3* target, Vector3* a, Vector3* b)
 cdef void divideVec3(Vector3* target, Vector3* a, Vector3* b)
 
 cdef float dotVec3(Vector3* a, Vector3* b)
+cdef float angleVec3(Vector3 *a, Vector3 *b)
 cdef void crossVec3(Vector3* result, Vector3* a, Vector3* b)
 
 cdef void projectVec3(Vector3* result, Vector3* a, Vector3* b)
 cdef void reflectVec3(Vector3* result, Vector3* v, Vector3* axis)
+cdef void projectOnCenterPlaneVec3(Vector3 *result, Vector3 *v, Vector3 *planeNormal)
 
 cdef void normalizeVec3_InPlace(Vector3* v)
 cdef void normalizeVec3(Vector3* target, Vector3* v)
@@ -32,3 +37,5 @@ cdef float distanceSquaredVec3(Vector3* a, Vector3* b)
 cdef void absoluteVec3(Vector3* target, Vector3* source)
 cdef void snapVec3(Vector3* target, Vector3* v, Vector3* step)
 cdef void mixVec3(Vector3* target, Vector3* a, Vector3* b, float factor)
+
+cdef void rotateAroundAxisVec3(Vector3 *target, Vector3 *v, Vector3 *axis, float angle)

@@ -1,6 +1,4 @@
 import bpy
-from bpy.props import *
-from . c_utils import clamp_DoubleList
 from ... base_types import AnimationNode, VectorizedSocket
 
 class FloatClampNode(bpy.types.Node, AnimationNode):
@@ -21,29 +19,17 @@ class FloatClampNode(bpy.types.Node, AnimationNode):
         self.newOutput(VectorizedSocket("Float", "useValueList",
             ("Value", "outValue"), ("Values", "outValues")))
 
-    def getExecutionFunctionName(self):
-        if self.useValueList:
-            return "execute_List"
-
-    def execute_List(self, values, minValue, maxValue):
-        clamp_DoubleList(values, minValue, maxValue)
-        return values
-
     def getExecutionCode(self, required):
-        yield "outValue = min(max(value, minValue), maxValue)"
+        if self.useValueList:
+            yield "outValues = values"
+            yield "outValues.clamp(minValue, maxValue)"
+        else:
+            yield "outValue = min(max(value, minValue), maxValue)"
 
     def drawLabel(self):
         label = "clamp(min, max)"
-        if self.minValueSocket.isUnlinked:
-            label = label.replace("min", str(round(self.minValueSocket.value, 4)))
-        if self.maxValueSocket.isUnlinked:
-            label = label.replace("max", str(round(self.maxValueSocket.value, 4)))
+        if self.inputs["Min"].isUnlinked:
+            label = label.replace("min", str(round(self.inputs["Min"].value, 4)))
+        if self.inputs["Max"].isUnlinked:
+            label = label.replace("max", str(round(self.inputs["Max"].value, 4)))
         return label
-
-    @property
-    def minValueSocket(self):
-        return self.inputs.get("Min")
-
-    @property
-    def maxValueSocket(self):
-        return self.inputs.get("Max")

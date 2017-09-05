@@ -44,7 +44,7 @@ cdef class FollowSplineAction(SimpleBoundedAction):
 
     cdef void evaluateLocation(self, float frame, Py_ssize_t index, float *target):
         cdef float t = min(max(frame / self.duration, 0), 1)
-        self.spline.evaluate_LowLevel(t, <Vector3*>target)
+        self.spline.evaluatePoint_LowLevel(t, <Vector3*>target)
 
     cdef void evaluateRotation(self, float frame, Py_ssize_t index, float *target):
         cdef float t = min(max(frame / self.duration, 0), 1)

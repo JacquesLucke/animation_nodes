@@ -16,15 +16,15 @@ class TestEvaluate(TestCase):
         self.spline.appendPoint((0, -2, 0), (1, -2, 0), (-1, -2, 0))
 
     def testStart(self):
-        testEqual(self, self.spline.evaluate(0), (-1, 0, 0))
+        testEqual(self, self.spline.evaluatePoint(0), (-1, 0, 0))
 
     def testEnd(self):
-        testEqual(self, self.spline.evaluate(1), (0, -2, 0))
+        testEqual(self, self.spline.evaluatePoint(1), (0, -2, 0))
 
     def testNormal(self):
-        testEqual(self, self.spline.evaluate(0.25), (0, 0, 0))
-        testEqual(self, self.spline.evaluate(0.5), (1, 0, 0))
-        testEqual(self, self.spline.evaluate(0.75), (0.875, -1.375, 0))
+        testEqual(self, self.spline.evaluatePoint(0.25), (0, 0, 0))
+        testEqual(self, self.spline.evaluatePoint(0.5), (1, 0, 0))
+        testEqual(self, self.spline.evaluatePoint(0.75), (0.875, -1.375, 0))
 
 class TestEvaluateTangent(TestCase):
     def setUp(self):
@@ -113,10 +113,10 @@ class TestGetTrimmedCopy(TestCase):
         spline = self.getMultiSegmentSpline()
         newSpline = spline.getTrimmedCopy(0, 1)
         self.assertEqual(len(spline.points), len(newSpline.points))
-        testEqual(self, newSpline.evaluate(0), spline.evaluate(0))
-        testEqual(self, newSpline.evaluate(0.123), spline.evaluate(0.123))
-        testEqual(self, newSpline.evaluate(0.567), spline.evaluate(0.567))
-        testEqual(self, newSpline.evaluate(1), spline.evaluate(1))
+        testEqual(self, newSpline.evaluatePoint(0), spline.evaluatePoint(0))
+        testEqual(self, newSpline.evaluatePoint(0.123), spline.evaluatePoint(0.123))
+        testEqual(self, newSpline.evaluatePoint(0.567), spline.evaluatePoint(0.567))
+        testEqual(self, newSpline.evaluatePoint(1), spline.evaluatePoint(1))
 
     def testNormalCyclic(self):
         spline = self.getMultiSegmentSpline()
@@ -127,8 +127,8 @@ class TestGetTrimmedCopy(TestCase):
         testEqual(self, newSpline.points[-1], (-0.992, -0.6, 0.104))
         testEqual(self, newSpline.rightHandles[0], (0.62, 1.3, 0.48))
         testEqual(self, newSpline.leftHandles[-1], (-0.64, -1.72, 0.36))
-        testEqual(self, spline.evaluate(0.1), newSpline.evaluate(0))
-        testEqual(self, spline.evaluate(0.95), newSpline.evaluate(1))
+        testEqual(self, spline.evaluatePoint(0.1), newSpline.evaluatePoint(0))
+        testEqual(self, spline.evaluatePoint(0.95), newSpline.evaluatePoint(1))
 
     def testFullSplineCyclic(self):
         spline = self.getMultiSegmentSpline()
@@ -136,10 +136,10 @@ class TestGetTrimmedCopy(TestCase):
         newSpline = spline.getTrimmedCopy(0, 1)
         self.assertFalse(newSpline.cyclic)
         self.assertEqual(len(spline.points) + 1, len(newSpline.points))
-        testEqual(self, newSpline.evaluate(0), spline.evaluate(0))
-        testEqual(self, newSpline.evaluate(0.123), spline.evaluate(0.123))
-        testEqual(self, newSpline.evaluate(0.567), spline.evaluate(0.567))
-        testEqual(self, newSpline.evaluate(1), spline.evaluate(1))
+        testEqual(self, newSpline.evaluatePoint(0), spline.evaluatePoint(0))
+        testEqual(self, newSpline.evaluatePoint(0.123), spline.evaluatePoint(0.123))
+        testEqual(self, newSpline.evaluatePoint(0.567), spline.evaluatePoint(0.567))
+        testEqual(self, newSpline.evaluatePoint(1), spline.evaluatePoint(1))
 
     def getSingleSegmentSpline(self):
         spline = BezierSpline()

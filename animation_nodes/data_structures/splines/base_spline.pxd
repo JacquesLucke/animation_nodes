@@ -1,8 +1,6 @@
 from ... math.vector cimport Vector3
 from .. lists.base_lists cimport FloatList, Vector3DList
 
-ctypedef void (*SplineEvaluationFunction)(Spline, float, Vector3*)
-
 cdef class Spline:
     cdef:
         public bint cyclic
@@ -12,61 +10,76 @@ cdef class Spline:
     # Generic
     #############################################
 
-    cpdef Spline copy(self)
     cpdef void markChanged(self)
     cpdef bint isEvaluable(self)
-    cpdef transform(self, matrix)
-    cpdef double getLength(self, int resolution = ?)
-    cpdef double getPartialLength(self, float start, float end, int resolution = ?)
-
-    cpdef project(self, point)
-    cpdef projectExtended(self, point)
-    cdef float project_LowLevel(self, Vector3* point)
-
-    cpdef getTrimmedCopy(self, float start = ?, float end = ?)
-    cdef Spline getTrimmedCopy_LowLevel(self, float start, float end)
+    cdef checkEvaluability(self)
 
 
     # Uniform Conversion
     #############################################
 
-    cpdef toUniformParameter(self, float parameter)
-    cdef float toUniformParameter_LowLevel(self, float parameter)
-    cpdef ensureUniformConverter(self, long resolution)
-    cdef updateUniformParameters(self, long totalResolution)
     cdef checkUniformConverter(self)
+    cpdef ensureUniformConverter(self, Py_ssize_t minResolution)
+    cdef _updateUniformParameters(self, Py_ssize_t totalResolution)
+
+    cdef float toUniformParameter_LowLevel(self, float parameter)
 
 
-    # Get Multiple Samples
+    # Normals
     #############################################
 
-    cpdef getSamples(self, long amount, float start = ?, float end = ?)
-    cpdef getTangentSamples(self, long amount, float start = ?, float end = ?)
-    cpdef getUniformSamples(self, long amount, float start = ?, float end = ?)
-    cpdef getUniformTangentSamples(self, long amount, float start = ?, float end = ?)
+    cdef checkNormals(self)
+    cpdef ensureNormals(self)
 
-    cdef getSamples_LowLevel(self, long amount, float start, float end, Vector3* output)
-    cdef getUniformSamples_LowLevel(self, long amount, float start, float end, Vector3* output)
+    cdef calcDistributedNormals_LowLevel(self, Py_ssize_t amount, Vector3 *result,
+        float start = ?, float end = ?,
+        str distributionType = ?)
 
-    cdef sampleEvaluationFunction(self, SplineEvaluationFunction evaluate,
-                                        long amount, float start, float end)
-
-    cdef void sampleEvaluationFunction_LowLevel(self, SplineEvaluationFunction evaluate,
-                                                long amount, float start, float end,
-                                                Vector3* output)
+    cdef calcDistributedTilts_LowLevel(self, Py_ssize_t amount, float *result,
+        float start = ?, float end = ?,
+        str distributionType = ?)
 
 
     # Evaluate Single Parameter
     #############################################
 
-    cpdef evaluate(self, float parameter)
-    cpdef evaluateTangent(self, float parameter)
-    cpdef evaluateUniform(self, float parameter)
-    cpdef evaluateUniformTangent(self, float parameter)
+    cdef void evaluatePoint_LowLevel(self, float t, Vector3 *result)
+    cdef void evaluateTangent_LowLevel(self, float t, Vector3 *result)
+    cdef void evaluateNormal_LowLevel(self, float t, Vector3 *result)
+    cdef void evaluateNormal_Approximated(self, float t, Vector3 *result)
+    cdef float evaluateRadius_LowLevel(self, float t)
+    cdef float evaluateTilt_LowLevel(self, float t)
 
-    cdef evaluateEvaluationFunction(self, SplineEvaluationFunction evaluate, float parameter)
 
-    cdef void evaluate_LowLevel(self, float parameter, Vector3* result)
-    cdef void evaluateTangent_LowLevel(self, float parameter, Vector3* result)
-    cdef void evaluateUniform_LowLevel(self, float parameter, Vector3* result)
-    cdef void evaluateUniformTangent_LowLevel(self, float parameter, Vector3* result)
+    # Evaluate Multiple Parameters
+    #############################################
+
+    cdef calcDistributedPoints_LowLevel(self, Py_ssize_t amount, Vector3 *result,
+        float start = ?, float end = ?,
+        str distributionType = ?)
+    cdef calcDistributedTangents_LowLevel(self, Py_ssize_t amount, Vector3 *result,
+        float start = ?, float end = ?,
+        str distributionType = ?)
+    cdef calcDistributedNormals_LowLevel(self, Py_ssize_t amount, Vector3 *result,
+        float start = ?, float end = ?,
+        str distributionType = ?)
+    cdef calcDistributedRadii_LowLevel(self, Py_ssize_t amount, float *result,
+        float start = ?, float end = ?,
+        str distributionType = ?)
+    cdef calcDistributedTilts_LowLevel(self, Py_ssize_t amount, float *result,
+        float start = ?, float end = ?,
+        str distributionType = ?)
+
+
+    # Projection
+    #############################################
+
+    cdef float project_LowLevel(self, Vector3 *point)
+    cdef void projectExtended_LowLevel(self, Vector3 *point,
+        Vector3 *resultPoint, Vector3 *resultTangent)
+
+
+    # Trimming
+    #############################################
+
+    cdef Spline getTrimmedCopy_LowLevel(self, float start, float end)
