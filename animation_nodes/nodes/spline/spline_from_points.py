@@ -74,13 +74,6 @@ class SplineFromPointsNode(bpy.types.Node, AnimationNode):
 
     def prepareFloatList(self, source, pointAmount):
         if isinstance(source, DoubleList):
-            floatList = FloatList.fromValues(source)
-            if len(floatList) == 0:
-                floatList.append(0)
+            return FloatList.fromValues(source).repeated(length = pointAmount, default = 0)
         else:
-            floatList = FloatList.fromValue(source)
-
-        if len(floatList) == pointAmount:
-            return floatList
-        else:
-            return floatList.repeated(length = pointAmount)
+            return FloatList.fromValue(source, length = pointAmount)
