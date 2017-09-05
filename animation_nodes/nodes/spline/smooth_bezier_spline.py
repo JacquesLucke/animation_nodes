@@ -21,4 +21,4 @@ class SmoothBezierSplineNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self, required):
         yield "if spline.type == 'BEZIER':"
-        yield "    spline.calculateSmoothHandles(smoothness)"
+        yield "    spline.smoothAllHandles(smoothness)"

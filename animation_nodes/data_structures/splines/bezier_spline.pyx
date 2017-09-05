@@ -187,40 +187,16 @@ cdef class BezierSpline(Spline):
         findListSegment_LowLevel(self.points.length, self.cyclic, parameter, indices, &t)
         return self.radii.data[indices[0]] * (1 - t) + self.radii.data[indices[1]] * t
 
-    def calculateSmoothHandles(self, float strength = 1/3):
-        cdef:
-            Vector3* _points = self.points.data
-            Vector3* _leftHandles = self.leftHandles.data
-            Vector3* _rightHandles = self.rightHandles.data
-            long indexLeft, i, indexRight
-            long pointAmount = self.points.length
+    def smoothAllHandles(self, float strength = 1/3):
+        cdef Py_ssize_t i
+        for i in range(self.points.length):
+            smoothPoint(self, i, strength)
+        self.markChanged()
 
-        if pointAmount < 2: return
-
-        for i in range(1, pointAmount - 1):
-            calculateSmoothControlPoints(
-                _points + i, _points + i - 1, _points + i + 1, strength,
-                _leftHandles + i, _rightHandles + i)
-
-        # End points need extra consideration
-        cdef long lastIndex = pointAmount - 1
-        if self.cyclic:
-            # Start Point
-            calculateSmoothControlPoints(
-                _points, _points + lastIndex, _points + 1, strength,
-                _leftHandles, _rightHandles)
-            # End Point
-            calculateSmoothControlPoints(
-                _points + lastIndex, _points + lastIndex - 1, _points, strength,
-                _leftHandles + lastIndex, _rightHandles + lastIndex)
-        else:
-            # Start Point
-            _leftHandles[0] = _points[0]
-            _rightHandles[0] = _points[0]
-            # End Point
-            _leftHandles[lastIndex] = _points[lastIndex]
-            _rightHandles[lastIndex] = _points[lastIndex]
-
+    def smoothHandle(self, Py_ssize_t index, float strength = 1/3):
+        if not (0 <= index < self.points.length):
+            raise IndexError("index is out of bounds")
+        smoothPoint(self, index, strength)
         self.markChanged()
 
     cpdef BezierSpline getTrimmedCopy_LowLevel(self, float start, float end):
@@ -332,6 +308,52 @@ cdef class BezierSpline(Spline):
             if isCloseVec3(w[0], w[1]) and isCloseVec3(w[2], w[3]):
                 mixVec3(w[1], w[0], w[3], 1.0 / 3.0)
                 mixVec3(w[2], w[0], w[3], 2.0 / 3.0)
+
+cdef smoothPoint(BezierSpline spline, Py_ssize_t index, float strength):
+    if 0 < index < spline.points.length - 1:
+        calculateSmoothControlPoints(spline.points.data + index,
+            spline.points.data + index - 1, spline.points.data + index + 1,
+            strength,
+            spline.leftHandles.data + index, spline.rightHandles.data + index)
+        return
+
+    cdef Py_ssize_t lastIndex = spline.points.length - 1
+
+    if index == 0:
+        if spline.cyclic:
+            calculateSmoothControlPoints(spline.points.data + 0,
+                spline.points.data + lastIndex, spline.points.data + 1,
+                strength,
+                spline.leftHandles.data + 0, spline.rightHandles.data + 0)
+            return
+        else:
+            mixVec3(spline.leftHandles.data + 0,
+                    spline.points.data + 0,
+                    spline.points.data + 1,
+                    -strength)
+            mixVec3(spline.rightHandles.data + 0,
+                    spline.points.data + 0,
+                    spline.points.data + 1,
+                    strength)
+            return
+
+    if index == lastIndex:
+        if spline.cyclic:
+            calculateSmoothControlPoints(spline.points.data + lastIndex,
+                spline.points.data + lastIndex - 1, spline.points.data + 0,
+                strength,
+                spline.leftHandles.data + lastIndex, spline.rightHandles.data + lastIndex)
+            return
+        else:
+            mixVec3(spline.leftHandles.data + lastIndex,
+                    spline.points.data + lastIndex,
+                    spline.points.data + lastIndex - 1,
+                    strength)
+            mixVec3(spline.rightHandles.data + lastIndex,
+                    spline.points.data + lastIndex,
+                    spline.points.data + lastIndex - 1,
+                    -strength)
+            return
 
 @cython.cdivision(True)
 cdef calculateSmoothControlPoints(

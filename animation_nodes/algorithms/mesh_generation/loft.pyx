@@ -194,7 +194,7 @@ cdef class SmoothLoft:
 
         for i in range(self.splineSamples):
             self.createSurfaceSpline(i, surfaceSplinePoints.data)
-            surfaceSpline.calculateSmoothHandles(self.smoothness)
+            surfaceSpline.smoothAllHandles(self.smoothness)
             self.sampleSurfaceSpline(surfaceSpline, vertices.data + i * self.surfaceSamples)
 
         return vertices
