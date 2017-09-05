@@ -5,10 +5,11 @@ import random
 from bpy.props import *
 from collections import defaultdict
 from ... import tree_info
+from .. effects import PrependCodeEffect
 from ... utils.handlers import eventHandler
 from ... ui.node_colors import colorAllNodes
 from .. socket_templates import SocketTemplate
-from . node_ui_extension import TextUIExtension
+from . node_ui_extension import ErrorUIExtension
 from ... preferences import getExecutionCodeType
 from ... operators.callbacks import newNodeCallback
 from ... sockets.info import toIdName as toSocketIdName
@@ -47,6 +48,7 @@ class NonPersistentNodeData:
         self.inputs = defaultdict(NonPersistentSocketData)
         self.outputs = defaultdict(NonPersistentSocketData)
         self.codeEffects = []
+        self.errorMessage = None
 
 infoByNode = defaultdict(NonPersistentNodeData)
 
@@ -75,6 +77,9 @@ class AnimationNode:
 
     # can be "NONE", "ALWAYS" or "HIDDEN_ONLY"
     dynamicLabelType = "NONE"
+
+    # can be "CUSTOM" or "MESSAGE"
+    errorHandlingType = "CUSTOM"
 
     # should be a list of functions
     # each function takes a node as input
@@ -236,6 +241,9 @@ class AnimationNode:
         for createCodeEffect in self.codeEffects:
             yield createCodeEffect(self)
         yield from self.getCodeEffects()
+        if self.errorHandlingType == "MESSAGE":
+            yield PrependCodeEffect("self.resetErrorMessage()")
+
 
     @property
     def isRefreshable(self):
@@ -439,12 +447,26 @@ class AnimationNode:
         if getExecutionCodeType() == "MEASURE":
             text = getMeasurementResultString(self)
             extensions.append(TextUIExtension(text))
+        if self.errorHandlingType == "MESSAGE":
+            message = infoByNode[self.identifier].errorMessage
+            if message is not None:
+                extensions.append(ErrorUIExtension(message))
 
         extraExtensions = self.getUIExtensions()
         if extraExtensions is not None:
             extensions.extend(extraExtensions)
 
         return extensions
+
+
+    # Error Handling
+    ####################################################
+
+    def resetErrorMessage(self):
+        infoByNode[self.identifier].errorMessage = None
+
+    def setErrorMessage(self, message):
+        infoByNode[self.identifier].errorMessage = message
 
 
     # More Utilities

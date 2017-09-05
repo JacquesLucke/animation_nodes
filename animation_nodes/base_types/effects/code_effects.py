@@ -126,3 +126,11 @@ class VectorizeCodeEffect(CodeEffect):
                                     self.newBaseInputNames + self.newBaseOutputNames):
             code = replaceVariableName(code, oldName, newName)
         return code
+
+class PrependCodeEffect(CodeEffect):
+    def __init__(self, codeToPrepend):
+        self.codeToPrepend = codeToPrepend
+
+    def apply(self, node, code):
+        yield self.codeToPrepend
+        yield code

@@ -3,6 +3,7 @@ from . node_tree import AnimationNodeTree
 from . nodes import (
     AnimationNode,
     InterpolationUIExtension,
+    ErrorUIExtension,
     TextUIExtension
 )
 
@@ -11,7 +12,10 @@ from . sockets import (AnimationNodeSocket,
                        PythonListSocket,
                        CListSocket)
 
-from . effects import AutoSelectVectorization
+from . effects import (
+    VectorizeCodeEffect,
+    PrependCodeEffect
+)
 
 from . socket_templates import (
     SocketTemplate,
