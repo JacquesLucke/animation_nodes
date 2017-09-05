@@ -1,6 +1,10 @@
 from . node_tree import AnimationNodeTree
 
-from . nodes import AnimationNode
+from . nodes import (
+    AnimationNode,
+    InterpolationUIExtension,
+    TextUIExtension
+)
 
 from . sockets import (AnimationNodeSocket,
                        ListSocket,

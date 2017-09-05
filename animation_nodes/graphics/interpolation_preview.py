@@ -34,6 +34,9 @@ class InterpolationPreview:
         self.interpolationTop = y1 - topOvershoot - self.padding
         self.interpolationBottom = y2 + bottomOvershoot + self.padding
 
+    def getHeight(self):
+        return self.boundary.height
+
     def draw(self):
         self.boundary.draw()
         self.drawInterpolationCurve()

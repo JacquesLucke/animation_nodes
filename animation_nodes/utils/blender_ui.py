@@ -88,27 +88,22 @@ def executeInAreaType(areaType):
     return changeAreaTypeDecorator
 
 
-def iterNodeCornerLocations(nodes, region, horizontal):
-    if horizontal == "LEFT":
-        yield from iterNodeBottomLeftCornerLocations(nodes, region)
-    elif horizontal == "RIGHT":
-        yield from iterNodeBottomRightCornerLocations(nodes, region)
+def getNodeCornerLocation_BottomLeft(node, region):
+    return getNodeBottomCornerLocations(node, region, getDpiFactor())[0]
 
-def iterNodeBottomLeftCornerLocations(nodes, region):
-    factor = getDpiFactor()
-    viewToRegion = region.view2d.view_to_region
-    for node in nodes:
-        location = node.viewLocation * factor
-        dimensions = node.dimensions
-        yield Vector(viewToRegion(location.x, location.y - dimensions.y, clip = False))
+def getNodeCornerLocation_BottomRight(node, region):
+    return getNodeBottomCornerLocations(node, region, getDpiFactor())[1]
 
-def iterNodeBottomRightCornerLocations(nodes, region):
-    factor = getDpiFactor()
+def getNodeBottomCornerLocations(node, region, dpiFactor):
+    location = node.viewLocation * dpiFactor
+    dimensions = node.dimensions
+    x = location.x
+    y = location.y - dimensions.y
+
     viewToRegion = region.view2d.view_to_region
-    for node in nodes:
-        location = node.viewLocation * factor
-        dimensions = node.dimensions
-        yield Vector(viewToRegion(location.x + dimensions.x, location.y - dimensions.y, clip = False))
+    leftBottom = Vector(viewToRegion(x, y, clip = False))
+    rightBottom = Vector(viewToRegion(x + dimensions.x, y, clip = False))
+    return leftBottom, rightBottom
 
 
 class PieMenuHelper:

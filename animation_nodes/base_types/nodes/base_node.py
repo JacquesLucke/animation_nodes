@@ -8,17 +8,28 @@ from ... import tree_info
 from ... utils.handlers import eventHandler
 from ... ui.node_colors import colorAllNodes
 from .. socket_templates import SocketTemplate
+from . node_ui_extension import TextUIExtension
 from ... preferences import getExecutionCodeType
 from ... operators.callbacks import newNodeCallback
 from ... sockets.info import toIdName as toSocketIdName
-from ... utils.blender_ui import iterNodeCornerLocations
-from ... execution.measurements import getMinExecutionTimeString
 from ... utils.attributes import setattrRecursive, getattrRecursive
 from ... operators.dynamic_operators import getInvokeFunctionOperator
 from ... utils.nodes import getAnimationNodeTrees, iterAnimationNodes
-from ... tree_info import (getNetworkWithNode, getOriginNodes,
-                           getLinkedInputsDict, getLinkedOutputsDict, iterLinkedOutputSockets,
-                           iterUnlinkedInputSockets, keepNodeState)
+
+from ... utils.blender_ui import (
+    getNodeCornerLocation_BottomLeft,
+    getNodeCornerLocation_BottomRight
+)
+
+from ... execution.measurements import (
+    getMinExecutionTimeString,
+    getMeasurementResultString
+)
+from ... tree_info import (
+    getNetworkWithNode, getOriginNodes,
+    getLinkedInputsDict, getLinkedOutputsDict, iterLinkedOutputSockets,
+    iterUnlinkedInputSockets, keepNodeState
+)
 
 socketEffectsByIdentifier = defaultdict(list)
 
@@ -59,7 +70,7 @@ class AnimationNode:
     searchTags = []
     onlySearchTags = False
     # can contain: 'NO_EXECUTION', 'NOT_IN_SUBPROGRAM',
-    #              'NO_AUTO_EXECUTION', 'NO_TIMING',
+    #              'NO_AUTO_EXECUTION'
     options = set()
 
     # can be "NONE", "ALWAYS" or "HIDDEN_ONLY"
@@ -136,6 +147,9 @@ class AnimationNode:
 
     def getUsedModules(self):
         return []
+
+    def getUIExtensions(self):
+        return None
 
     def drawControlSocket(self, layout, socket):
         layout.alignment = "LEFT" if socket.isInput else "RIGHT"
@@ -417,6 +431,22 @@ class AnimationNode:
         return newNodeCallback(self, functionName)
 
 
+    # UI Extensions
+    ####################################################
+
+    def getAllUIExtensions(self):
+        extensions = []
+        if getExecutionCodeType() == "MEASURE":
+            text = getMeasurementResultString(self)
+            extensions.append(TextUIExtension(text))
+
+        extraExtensions = self.getUIExtensions()
+        if extraExtensions is not None:
+            extensions.extend(extraExtensions)
+
+        return extensions
+
+
     # More Utilities
     ####################################################
 
@@ -583,14 +613,14 @@ def getViewLocation(node):
     location = node.location.copy()
     while node.parent:
         node = node.parent
-        location += node.location.copy()
+        location += node.location
     return location
 
 def getRegionBottomLeft(node, region):
-    return next(iterNodeCornerLocations([node], region, horizontal = "LEFT"))
+    return getNodeCornerLocation_BottomLeft(node, region)
 
 def getRegionBottomRight(node, region):
-    return next(iterNodeCornerLocations([node], region, horizontal = "RIGHT"))
+    return getNodeCornerLocation_BottomRight(node, region)
 
 def register():
     bpy.types.Node.toID = nodeToID
