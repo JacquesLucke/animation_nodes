@@ -2,7 +2,10 @@ cimport cython
 from libc.string cimport memcpy
 from numpy.polynomial import Polynomial
 from ... utils.lists cimport findListSegment_LowLevel
-from ... math cimport subVec3, normalizeVec3_InPlace, lengthVec3, toPyVector3, mixVec3
+from ... math cimport (
+    subVec3, normalizeVec3_InPlace, lengthVec3,
+    toPyVector3, mixVec3, isCloseVec3
+)
 
 from mathutils import Vector
 from . base_spline import calculateNormalsForTangents
@@ -320,6 +323,15 @@ cdef class BezierSpline(Spline):
         _newTilts[newPointAmount - 1] = _oldTilts[endIndices[0]] * (1 - endT) + _oldTilts[endIndices[1]] * endT
 
         return BezierSpline(newPoints, newLeftHandles, newRightHandles, newRadii, newTilts)
+
+    def improveStraightBezierSegments(self):
+        cdef Py_ssize_t i
+        cdef Vector3* w[4]
+        for i in range(getSegmentAmount(self)):
+            getSegmentData_Index(self, i, w)
+            if isCloseVec3(w[0], w[1]) and isCloseVec3(w[2], w[3]):
+                mixVec3(w[1], w[0], w[3], 1.0 / 3.0)
+                mixVec3(w[2], w[0], w[3], 2.0 / 3.0)
 
 @cython.cdivision(True)
 cdef calculateSmoothControlPoints(

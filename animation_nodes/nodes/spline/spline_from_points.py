@@ -16,6 +16,10 @@ class SplineFromPointsNode(bpy.types.Node, AnimationNode):
     splineType = EnumProperty(name = "Spline Type", default = "BEZIER",
         items = splineTypeItems, update = AnimationNode.refresh)
 
+    improveBezierHandles = BoolProperty(name = "Improve Bezier Handles",
+        description = "Tries to avoid that the handles are equal to the corresponding points.",
+        default = True, update = propertyChanged)
+
     useRadiusList = VectorizedSocket.newProperty()
     useTiltList = VectorizedSocket.newProperty()
 
@@ -36,6 +40,9 @@ class SplineFromPointsNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.prop(self, "splineType", text = "")
 
+    def drawAdvanced(self, layout):
+        layout.prop(self, "improveBezierHandles")
+
     def getExecutionFunctionName(self):
         if self.splineType == "BEZIER":
             return "execute_Bezier"
@@ -47,7 +54,12 @@ class SplineFromPointsNode(bpy.types.Node, AnimationNode):
         self.correctHandlesListIfNecessary(points, rightHandles)
         _radii = self.prepareFloatList(radii, len(points))
         _tilts = self.prepareFloatList(tilts, len(points))
-        return BezierSpline(points, leftHandles, rightHandles, _radii, _tilts, cyclic)
+
+        spline = BezierSpline(points, leftHandles, rightHandles, _radii, _tilts, cyclic)
+        if self.improveBezierHandles:
+            spline.improveStraightBezierSegments()
+
+        return spline
 
     def correctHandlesListIfNecessary(self, points, handles):
         if len(points) < len(handles):

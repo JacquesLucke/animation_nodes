@@ -2,7 +2,10 @@ import cython
 from libc.math cimport sqrt, ceil, acos, sin, cos
 
 cdef char almostZeroVec3(Vector3* v):
-    return lengthSquaredVec3(v) < 0.0000001
+    return lengthSquaredVec3(v) < 0.000001
+
+cdef char isCloseVec3(Vector3* a, Vector3* b):
+    return distanceSquaredVec3(a, b) < 0.000001
 
 cdef void scaleVec3_Inplace(Vector3* v, float factor):
     v.x *= factor

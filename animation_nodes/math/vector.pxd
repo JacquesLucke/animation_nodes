@@ -5,6 +5,7 @@ cdef struct Vector4:
     float x, y, z, w
 
 cdef char almostZeroVec3(Vector3* v)
+cdef char isCloseVec3(Vector3* a, Vector3* b)
 
 cdef float lengthVec3(Vector3* v)
 cdef float lengthSquaredVec3(Vector3* v)
