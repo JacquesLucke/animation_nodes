@@ -50,8 +50,7 @@ class EdgeInfoNode(bpy.types.Node, AnimationNode):
         if "start" in required:  yield "    start = points[i1]"
         if "end" in required:    yield "    end = points[i2]"
         yield "except IndexError:"
-        yield "    if self.inputs['Edge Indices'].isLinked:"
-        yield "        self.setErrorMessage('invalid edge')"
+        yield "    self.setErrorMessage('invalid edge', show = self.inputs[1].isLinked)"
         yield "    length, center = Vector((0, 0, 0)), Vector((0, 0, 0))"
         yield "    start, end = Vector((0, 0, 0)), Vector((0, 0, 0))"
 

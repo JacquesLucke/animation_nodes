@@ -7,7 +7,7 @@ from ... data_structures import Vector3DList, EdgeIndicesList, PolygonIndicesLis
 class EdgeToTubeNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_EdgeToTubeNode"
     bl_label = "Edge to Tube"
-    errorHandlingType = "MESSAGE"
+    errorHandlingType = "EXCEPTION"
 
     useEdgeIndicesList = VectorizedSocket.newProperty()
     useRadiusList = VectorizedSocket.newProperty()
@@ -38,13 +38,10 @@ class EdgeToTubeNode(bpy.types.Node, AnimationNode):
         try:
             return edgesToTubes(inPoints, EdgeIndicesList.fromValue(inEdge), radius, max(resolution, 2), caps)
         except Exception as e:
-            if self.inputs["Edge Indices"].isLinked:
-                self.setErrorMessage(str(e))
-            return Vector3DList(), PolygonIndicesList()
+            self.raiseErrorMessage(str(e), show = self.inputs["Edge Indices"].isLinked)
 
     def execute_List(self, inPoints, inEdges, radius, resolution, caps):
         try:
             return edgesToTubes(inPoints, inEdges, radius, max(resolution, 2), caps)
         except Exception as e:
-            self.setErrorMessage(str(e))
-            return Vector3DList(), PolygonIndicesList()
+            self.raiseErrorMessage(str(e))

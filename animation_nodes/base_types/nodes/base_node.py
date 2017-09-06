@@ -49,6 +49,7 @@ class NonPersistentNodeData:
         self.outputs = defaultdict(NonPersistentSocketData)
         self.codeEffects = []
         self.errorMessage = None
+        self.showErrorMessage = True
 
 infoByNode = defaultdict(NonPersistentNodeData)
 
@@ -457,8 +458,9 @@ class AnimationNode:
 
         errorType = self.getErrorHandlingType()
         if errorType in ("MESSAGE", "EXCEPTION"):
-            message = infoByNode[self.identifier].errorMessage
-            if message is not None:
+            data = infoByNode[self.identifier]
+            message = data.errorMessage
+            if message is not None and data.showErrorMessage:
                 extensions.append(ErrorUIExtension(message))
 
         extraExtensions = self.getUIExtensions()
@@ -477,11 +479,13 @@ class AnimationNode:
     def resetErrorMessage(self):
         infoByNode[self.identifier].errorMessage = None
 
-    def setErrorMessage(self, message):
-        infoByNode[self.identifier].errorMessage = message
+    def setErrorMessage(self, message, show = True):
+        data = infoByNode[self.identifier]
+        data.errorMessage = message
+        data.showErrorMessage = show
 
-    def raiseErrorMessage(self, message):
-        self.setErrorMessage(message)
+    def raiseErrorMessage(self, message, show = True):
+        self.setErrorMessage(message, show)
         raise self.ControlledExecutionException(message)
 
 
