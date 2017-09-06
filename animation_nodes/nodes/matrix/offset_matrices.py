@@ -45,9 +45,8 @@ class OffsetMatrixNode(bpy.types.Node, AnimationNode):
     bl_label = "Offset Matrix"
     bl_width_default = 190
     onlySearchTags = True
+    errorHandlingType = "MESSAGE"
     searchTags = [("Offset Matrices", {"useMatrixList" : repr(True)})]
-
-    errorMessage = StringProperty()
 
     useMatrixList = BoolProperty(name = "Use Matrix List", default = False,
         update = AnimationNode.refresh)
@@ -125,9 +124,6 @@ class OffsetMatrixNode(bpy.types.Node, AnimationNode):
         row.prop(self, "specifiedState", expand = True)
         row.prop(self, "useMatrixList", text = "", icon = "LINENUMBERS_ON")
 
-        if self.errorMessage != "":
-            layout.label(self.errorMessage, icon = "ERROR")
-
     def drawAdvanced(self, layout):
         col = layout.column(align = True)
         col.prop(self, "translationMode", text = "Translation")
@@ -149,11 +145,10 @@ class OffsetMatrixNode(bpy.types.Node, AnimationNode):
         return outMatrices[0]
 
     def execute_List(self, matrices, falloff, translation, rotation, scale):
-        self.errorMessage = ""
 
         influences = self.evaluateFalloff(matrices, falloff)
         if influences is None:
-            self.errorMessage = "cannot evaluate falloff"
+            self.setErrorMessage("cannot evaluate falloff")
             return matrices
 
         if self.useScale:

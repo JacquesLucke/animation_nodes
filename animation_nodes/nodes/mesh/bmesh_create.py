@@ -6,28 +6,19 @@ from ... base_types import AnimationNode
 class CreateBMeshFromMeshData(bpy.types.Node, AnimationNode):
     bl_idname = "an_CreateBMeshFromMeshDataNode"
     bl_label = "Create BMesh"
-
-    errorMessage = StringProperty(default = "")
+    errorHandlingType = "EXCEPTION"
 
     def create(self):
         self.newInput("Mesh Data", "Mesh Data", "meshData")
         self.newOutput("BMesh", "BMesh", "bm")
 
-    def draw(self, layout):
-        if self.errorMessage != "":
-            layout.label(self.errorMessage, icon = "ERROR")
-
     def execute(self, meshData):
         try:
-            bm = getBMeshFromMeshData(meshData)
-            self.errorMessage = ""
+            return getBMeshFromMeshData(meshData)
         except IndexError as e:
-            bm = bmesh.new()
-            self.errorMessage = "Missing vertices"
+            self.raiseErrorMessage("Missing vertices")
         except ValueError as e:
-            bm = bmesh.new()
-            self.errorMessage = "Multiple identical edges or polygons"
-        return bm
+            self.raiseErrorMessage("Multiple identical edges or polygons")
 
 
 def getBMeshFromMeshData(meshData):
