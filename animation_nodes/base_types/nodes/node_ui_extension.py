@@ -61,7 +61,7 @@ def drawNodeUIExtensions():
     for node in tree.nodes:
         if node.isAnimationNode:
             extensions = node.getAllUIExtensions()
-            if extensions is not None:
+            if len(extensions) > 0:
                 position, width = getDrawPositionAndWidth(node, region, dpiFactor)
                 drawExtensionsForNode(node, extensions, position, width)
 
