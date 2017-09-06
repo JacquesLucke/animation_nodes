@@ -16,6 +16,7 @@ class OffsetVectorNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_OffsetVectorNode"
     bl_label = "Offset Vector"
     onlySearchTags = True
+    errorHandlingType = "EXCEPTION"
     searchTags = [("Offset Vectors", {"useVectorList" : repr(True)})]
 
     useVectorList = BoolProperty(name = "Use Vector List", default = False,
@@ -26,7 +27,6 @@ class OffsetVectorNode(bpy.types.Node, AnimationNode):
         description = "Specify wether the given vector(s) are the start or end state",
         items = specifiedStateItems, update = propertyChanged)
 
-    errorMessage = StringProperty()
     clampFalloff = BoolProperty(name = "Clamp Falloff", default = False)
 
     def create(self):
@@ -49,9 +49,6 @@ class OffsetVectorNode(bpy.types.Node, AnimationNode):
         row.prop(self, "specifiedState", expand = True)
         row.prop(self, "useVectorList", text = "", icon = "LINENUMBERS_ON")
 
-        if self.errorMessage != "":
-            layout.label(self.errorMessage, icon = "ERROR")
-
     def getExecutionFunctionName(self):
         if self.useVectorList:
             return "execute_List"
@@ -60,17 +57,10 @@ class OffsetVectorNode(bpy.types.Node, AnimationNode):
 
     def execute_Single(self, vector, Falloff falloff, offset, index):
         cdef:
+            FalloffEvaluator evaluator = self.getFalloffEvaluator(falloff)
             Vector3 _vector = toVector3(vector)
             long _index = clampLong(index)
-            FalloffEvaluator evaluator
             double influence
-
-        self.errorMessage = ""
-        try:
-            evaluator = falloff.getEvaluator("Location", self.clampFalloff)
-        except:
-            self.errorMessage = "Falloff cannot be evaluated for vectors"
-            return vector
 
         influence = evaluator.evaluate(&_vector, _index)
         if self.specifiedState == "END":
@@ -82,19 +72,13 @@ class OffsetVectorNode(bpy.types.Node, AnimationNode):
 
     def execute_List(self, Vector3DList vectors, falloff, offset):
         cdef:
-            FalloffEvaluator evaluator
+            FalloffEvaluator evaluator = self.getFalloffEvaluator(falloff)
             Vector3 *_vectors = vectors.data
             CDefaultList _offsets = CDefaultList(Vector3DList, offset, (0, 0, 0))
             Vector3 *_offset
             double influence
             bint isStartState = self.specifiedState == "START"
             long i
-
-        self.errorMessage = ""
-        try: evaluator = falloff.getEvaluator("Location", self.clampFalloff)
-        except:
-            self.errorMessage = "Falloff cannot be evaluated for vectors"
-            return vectors
 
         for i in range(len(vectors)):
             influence = evaluator.evaluate(_vectors + i, i)
@@ -106,3 +90,7 @@ class OffsetVectorNode(bpy.types.Node, AnimationNode):
             _vectors[i].z += _offset.z * influence
 
         return vectors
+
+    def getFalloffEvaluator(self, falloff):
+        try: return falloff.getEvaluator("Location", self.clampFalloff)
+        except: self.raiseErrorMessage("This falloff cannot be evaluated for vectors")

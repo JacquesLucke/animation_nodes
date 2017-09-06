@@ -1,6 +1,5 @@
 import bpy
 from bpy.props import *
-from ... utils.layout import writeText
 from ... events import executionCodeChanged
 from ... base_types import AnimationNode, VectorizedSocket
 
@@ -9,8 +8,7 @@ class TextObjectOutputNode(bpy.types.Node, AnimationNode):
     bl_label = "Text Object Output"
     bl_width_default = 170
     codeEffects = [VectorizedSocket.CodeEffect]
-
-    errorMessage = StringProperty()
+    errorHandlingType = "MESSAGE"
 
     for attr in ["Object", "Text", "Size", "Extrude", "Shear", "BevelDepth",
                  "BevelResolution", "LetterSpacing", "WordSpacing", "LineSpacing",
@@ -82,16 +80,7 @@ class TextObjectOutputNode(bpy.types.Node, AnimationNode):
         self.newOutput(VectorizedSocket("Object", "useObjectList",
             ("Object", "object"), ("Objects", "objects")))
 
-    def draw(self, layout):
-        if self.errorMessage != "":
-            writeText(layout, self.errorMessage, width = 25, icon = "ERROR")
-
-    def drawAdvanced(self, layout):
-        writeText(layout, "'Horizontal Align' in [LEFT, CENTER, RIGHT, JUSTIFY, FLUSH]", autoWidth = True)
-        writeText(layout, "'Vertical Align' in ['TOP_BASELINE', 'TOP', 'CENTER', 'BOTTOM']", autoWidth = True)
-
     def getExecutionCode(self, required):
-        yield "self.errorMessage = ''"
         yield "if getattr(object, 'type', '') == 'FONT':"
         yield "    textObject = object.data"
 
@@ -118,16 +107,18 @@ class TextObjectOutputNode(bpy.types.Node, AnimationNode):
         if s[17].isUsed: yield "    textObject.font_bold_italic = boldItalicFont"
 
     def setAlignmentX(self, textObject, align):
-        if align in ("LEFT", "CENTER", "RIGHT", "JUSTIFY", "FLUSH"):
+        alignTypes = ("LEFT", "CENTER", "RIGHT", "JUSTIFY", "FLUSH")
+        if align in alignTypes:
             textObject.align_x = align
         else:
-            self.errorMessage = "Invalid align type. More info in the advanced panel"
+            self.setErrorMessage("Invalid align type. \n" + str(alignTypes))
 
     def setAlignmentY(self, textObject, align):
-        if align in ("TOP_BASELINE", "TOP", "CENTER", "BOTTOM"):
+        alignTypes = ("TOP_BASELINE", "TOP", "CENTER", "BOTTOM")
+        if align in alignTypes:
             textObject.align_y = align
         else:
-            self.errorMessage = "Invalid align type. More info in the advanced panel"
+            self.setErrorMessage("Invalid align type. \n" + str(alignTypes))
 
     def getBakeCode(self):
         yield "if getattr(object, 'type', '') == 'FONT':"

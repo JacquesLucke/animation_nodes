@@ -9,6 +9,7 @@ class GetStructListElementsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GetStructListElementsNode"
     bl_label = "Get Struct List Elements"
     bl_width_default = 170
+    errorHandlingType = "MESSAGE"
 
     makeCopies = BoolProperty(name = "Make Copies", default = True,
         description = "Copy the data before outputting it",
@@ -18,8 +19,6 @@ class GetStructListElementsNode(bpy.types.Node, AnimationNode):
 
     elementDataType = StringProperty(name = "Data Type", default = "Integer",
         update = AnimationNode.refresh)
-
-    errorMessage = StringProperty()
 
     def create(self):
         self.newInput("Struct List", "Struct List", "structList")
@@ -34,17 +33,13 @@ class GetStructListElementsNode(bpy.types.Node, AnimationNode):
         self.invokeSelector(col, "DATA_TYPE", "assignType",
             text = self.elementDataType, icon = "TRIA_RIGHT")
 
-        if self.errorMessage != "":
-            writeText(layout, self.errorMessage, icon = "ERROR")
-
     def assignType(self, dataType):
         self.elementDataType = dataType
 
     def execute(self, structList):
         key = (self.elementDataType, self.elementKey)
         try:
-            self.errorMessage = ""
             return [struct[key] for struct in structList]
         except:
-            self.errorMessage = "The key does not exist in all structs"
+            self.setErrorMessage("The key does not exist in all structs")
             return []
