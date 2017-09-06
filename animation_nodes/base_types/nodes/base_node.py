@@ -245,13 +245,6 @@ class AnimationNode:
             yield createCodeEffect(self)
         yield from self.getCodeEffects()
 
-        errorType = self.getErrorHandlingType()
-        if errorType in ("MESSAGE", "EXCEPTION"):
-            yield PrependCodeEffect("self.resetErrorMessage()")
-        if errorType == "EXCEPTION":
-            yield ReturnDefaultsOnExceptionCodeEffect("self.ControlledExecutionException")
-
-
     @property
     def isRefreshable(self):
         return hasattr(self, "create")
@@ -595,9 +588,18 @@ class AnimationNode:
         return self.applyCodeEffects(toString(self.getBakeCode()), required)
 
     def applyCodeEffects(self, code, required):
-        for effect in infoByNode[self.identifier].codeEffects:
+        for effect in self.iterCodeEffectsToApply():
             code = toString(effect.apply(self, code, required))
         return code
+
+    def iterCodeEffectsToApply(self):
+        yield from infoByNode[self.identifier].codeEffects
+
+        errorType = self.getErrorHandlingType()
+        if errorType in ("MESSAGE", "EXCEPTION"):
+            yield PrependCodeEffect("self.resetErrorMessage()")
+        if errorType == "EXCEPTION":
+            yield ReturnDefaultsOnExceptionCodeEffect("self.ControlledExecutionException")
 
 
 @eventHandler("SCENE_UPDATE_POST")
