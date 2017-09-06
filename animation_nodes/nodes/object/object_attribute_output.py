@@ -8,6 +8,7 @@ class ObjectAttributeOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectAttributeOutputNode"
     bl_label = "Object Attribute Output"
     bl_width_default = 175
+    errorHandlingType = "MESSAGE"
 
     attribute = StringProperty(name = "Attribute", default = "",
         update = executionCodeChanged)
@@ -15,7 +16,6 @@ class ObjectAttributeOutputNode(bpy.types.Node, AnimationNode):
     useObjectList = VectorizedSocket.newProperty()
     useValueList = BoolProperty(update = AnimationNode.refresh)
 
-    errorMessage = StringProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Object", "useObjectList",
@@ -36,19 +36,15 @@ class ObjectAttributeOutputNode(bpy.types.Node, AnimationNode):
         col.prop(self, "attribute", text = "")
         if self.useObjectList:
             col.prop(self, "useValueList", text = "Multiple Values")
-        if self.errorMessage != "" and self.attribute != "":
-            layout.label(self.errorMessage, icon = "ERROR")
 
     def getExecutionCode(self, required):
         code = self.evaluationExpression
 
         if not isCodeValid(code):
-            self.errorMessage = "Invalid Syntax"
+            yield "self.setErrorMessage('Invalid Syntax', show = len(self.attribute.strip()) > 0)"
             return
-        else: self.errorMessage = ""
 
         yield "try:"
-        yield "    self.errorMessage = ''"
         if self.useObjectList:
             if self.useValueList:
                 yield "    _values = [None] if len(values) == 0 else values"
@@ -60,16 +56,16 @@ class ObjectAttributeOutputNode(bpy.types.Node, AnimationNode):
         else:
             yield "    " + code
         yield "except AttributeError:"
-        yield "    if object: self.errorMessage = 'Attribute not found'"
+        yield "    if object: self.setErrorMessage('Attribute not found')"
         yield "except KeyError:"
-        yield "    if object: self.errorMessage = 'Key not found'"
+        yield "    if object: self.setErrorMessage('Key not found')"
         yield "except IndexError:"
-        yield "    if object: self.errorMessage = 'Index not found'"
+        yield "    if object: self.setErrorMessage('Index not found')"
         yield "except (ValueError, TypeError):"
-        yield "    if object: self.errorMessage = 'Value has a wrong type'"
+        yield "    if object: self.setErrorMessage('Value has a wrong type')"
         yield "except:"
-        yield "    if object and self.errorMessage == '':"
-        yield "        self.errorMessage = 'Unknown error'"
+        yield "    if object:"
+        yield "        self.setErrorMessage('Unknown error')"
 
     @property
     def evaluationExpression(self):
