@@ -579,7 +579,6 @@ class GeometryMenu(bpy.types.Menu):
         insertNode(layout, "an_IntersectSpherePlaneNode", "Intersect Sphere Plane")
         insertNode(layout, "an_IntersectSphereSphereNode", "Intersect Sphere Sphere")
         layout.separator()
-        insertNode(layout, "an_BarycentricTransformNode", "Barycentric Transform")
         insertNode(layout, "an_BMeshTriangulateNode", "Triangulate BMesh")
 
 class KDTreeAndBVHTreeMenu(bpy.types.Menu):
