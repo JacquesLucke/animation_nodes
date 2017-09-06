@@ -1,1 +1,1 @@
-from . code_effects import VectorizeCodeEffect, PrependCodeEffect
+from . code_effects import VectorizeCodeEffect, PrependCodeEffect, ReturnDefaultsOnExceptionCodeEffect

@@ -2,7 +2,7 @@ from ... utils.names import replaceVariableName
 from ... utils.attributes import hasEvaluableRepr
 
 class CodeEffect:
-    def apply(self, node, code):
+    def apply(self, node, code, required):
         return code
 
     def iterIndented(self, code):
@@ -46,7 +46,7 @@ class VectorizeCodeEffect(CodeEffect):
     def rename(self, name):
         return "_base_" + name
 
-    def apply(self, node, code):
+    def apply(self, node, code, required):
         if len(self.baseInputNames) == 0:
             yield code
             return
@@ -127,10 +127,29 @@ class VectorizeCodeEffect(CodeEffect):
             code = replaceVariableName(code, oldName, newName)
         return code
 
+
 class PrependCodeEffect(CodeEffect):
     def __init__(self, codeToPrepend):
         self.codeToPrepend = codeToPrepend
 
-    def apply(self, node, code):
+    def apply(self, node, code, required):
         yield self.codeToPrepend
         yield code
+
+
+class ReturnDefaultsOnExceptionCodeEffect(CodeEffect):
+    def __init__(self, exceptionString):
+        self.exceptionString = exceptionString
+
+    def apply(self, node, code, required):
+        yield "try:"
+        yield from self.iterIndented(code)
+        yield "    pass"
+        yield "except {}:".format(self.exceptionString)
+        for i, s in enumerate(node.outputs):
+            if s.identifier in required:
+                if hasattr(s, "getDefaultValueCode"):
+                    yield "    {} = {}".format(s.identifier, s.getDefaultValueCode())
+                else:
+                    yield "    {} = self.outputs[{}].getDefaultValue()".format(s.identifier, i)
+        yield "    pass"

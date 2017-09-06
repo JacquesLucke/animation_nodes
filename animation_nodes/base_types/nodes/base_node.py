@@ -5,7 +5,6 @@ import random
 from bpy.props import *
 from collections import defaultdict
 from ... import tree_info
-from .. effects import PrependCodeEffect
 from ... utils.handlers import eventHandler
 from ... ui.node_colors import colorAllNodes
 from .. socket_templates import SocketTemplate
@@ -16,6 +15,7 @@ from ... sockets.info import toIdName as toSocketIdName
 from ... utils.attributes import setattrRecursive, getattrRecursive
 from ... operators.dynamic_operators import getInvokeFunctionOperator
 from ... utils.nodes import getAnimationNodeTrees, iterAnimationNodes
+from .. effects import PrependCodeEffect, ReturnDefaultsOnExceptionCodeEffect
 
 from ... utils.blender_ui import (
     getNodeCornerLocation_BottomLeft,
@@ -78,8 +78,10 @@ class AnimationNode:
     # can be "NONE", "ALWAYS" or "HIDDEN_ONLY"
     dynamicLabelType = "NONE"
 
-    # can be "CUSTOM" or "MESSAGE"
+    # can be "CUSTOM", "MESSAGE" or "EXCEPTION"
     errorHandlingType = "CUSTOM"
+    class ControlledExecutionException(Exception):
+        pass
 
     # should be a list of functions
     # each function takes a node as input
@@ -241,8 +243,12 @@ class AnimationNode:
         for createCodeEffect in self.codeEffects:
             yield createCodeEffect(self)
         yield from self.getCodeEffects()
-        if self.errorHandlingType == "MESSAGE":
+
+        errorType = self.getErrorHandlingType()
+        if errorType in ("MESSAGE", "EXCEPTION"):
             yield PrependCodeEffect("self.resetErrorMessage()")
+        if errorType == "EXCEPTION":
+            yield ReturnDefaultsOnExceptionCodeEffect("self.ControlledExecutionException")
 
 
     @property
@@ -444,10 +450,13 @@ class AnimationNode:
 
     def getAllUIExtensions(self):
         extensions = []
+
         if getExecutionCodeType() == "MEASURE":
             text = getMeasurementResultString(self)
             extensions.append(TextUIExtension(text))
-        if self.errorHandlingType == "MESSAGE":
+
+        errorType = self.getErrorHandlingType()
+        if errorType in ("MESSAGE", "EXCEPTION"):
             message = infoByNode[self.identifier].errorMessage
             if message is not None:
                 extensions.append(ErrorUIExtension(message))
@@ -462,11 +471,18 @@ class AnimationNode:
     # Error Handling
     ####################################################
 
+    def getErrorHandlingType(self):
+        return self.errorHandlingType
+
     def resetErrorMessage(self):
         infoByNode[self.identifier].errorMessage = None
 
     def setErrorMessage(self, message):
         infoByNode[self.identifier].errorMessage = message
+
+    def raiseErrorMessage(self, message):
+        self.setErrorMessage(message)
+        raise self.ControlledExecutionException(message)
 
 
     # More Utilities
@@ -555,7 +571,7 @@ class AnimationNode:
         else:
             code = self.getLocalExecutionCode_GetExecutionCode(inputVariables, outputVariables, required)
 
-        return self.applyCodeEffects(code)
+        return self.applyCodeEffects(code, required)
 
     def getLocalExecutionCode_ExecutionFunction(self, inputVariables, outputVariables):
         parameterString = ", ".join(inputVariables[socket.identifier] for socket in self.inputs)
@@ -570,11 +586,13 @@ class AnimationNode:
         return toString(self.getExecutionCode(required))
 
     def getLocalBakeCode(self):
-        return self.applyCodeEffects(toString(self.getBakeCode()))
+        # TODO: get required outputs from caller
+        required = {s.identifier for s in self.outputs}
+        return self.applyCodeEffects(toString(self.getBakeCode()), required)
 
-    def applyCodeEffects(self, code):
+    def applyCodeEffects(self, code, required):
         for effect in infoByNode[self.identifier].codeEffects:
-            code = toString(effect.apply(self, code))
+            code = toString(effect.apply(self, code, required))
         return code
 
 

@@ -14,7 +14,8 @@ from . sockets import (AnimationNodeSocket,
 
 from . effects import (
     VectorizeCodeEffect,
-    PrependCodeEffect
+    PrependCodeEffect,
+    ReturnDefaultsOnExceptionCodeEffect
 )
 
 from . socket_templates import (
