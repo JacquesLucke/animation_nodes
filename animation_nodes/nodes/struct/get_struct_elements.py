@@ -7,20 +7,15 @@ from ... utils.layout import splitAlignment, writeText
 class GetStructElementsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GetStructElementsNode"
     bl_label = "Get Struct Elements"
+    errorHandlingType = "EXCEPTION"
 
     makeCopies = BoolProperty(name = "Make Copies", default = True,
         description = "Copy the data before outputting it",
         update = executionCodeChanged)
 
-    errorMessage = StringProperty()
-
     def setup(self):
         self.newInput("Struct", "Struct", "struct")
         self.newOutput("Node Control", "New Output")
-
-    def draw(self, layout):
-        if self.errorMessage != "":
-            writeText(layout, self.errorMessage, icon = "ERROR")
 
     def drawAdvanced(self, layout):
         layout.prop(self, "makeCopies")
@@ -57,7 +52,6 @@ class GetStructElementsNode(bpy.types.Node, AnimationNode):
         return variables
 
     def getExecutionCode(self, required):
-        yield "self.errorMessage = ''"
         for i, socket in enumerate(self.outputs[:-1]):
             name = "output_" + str(i)
             structAccess = "struct[({}, {})]".format(repr(socket.dataType), repr(socket.text))
@@ -70,13 +64,9 @@ class GetStructElementsNode(bpy.types.Node, AnimationNode):
 
             yield "except:"
             yield "    socket = self.outputs[{}]".format(i)
-            yield "    self.errorMessage = self.getErrorMessage(struct, socket)"
-            if hasattr(socket, "getDefaultValueCode"):
-                yield "    {} = {}".format(name, socket.getDefaultValueCode())
-            else:
-                yield "    {} = socket.getDefaultValue()".format(name)
+            yield "    self.raiseErrorMessage(self.getDetailedErrorMessage(struct, socket))"
 
-    def getErrorMessage(self, struct, socket):
+    def getDetailedErrorMessage(self, struct, socket):
         possibleDataTypes = struct.findDataTypesWithName(socket.text)
         if len(possibleDataTypes) == 0:
             possibleNames = struct.findNamesWithDataType(socket.dataType)

@@ -3,9 +3,7 @@ import math
 from bpy.props import *
 from itertools import chain
 from functools import lru_cache
-from ... base_types import AnimationNode
-from ... draw_handler import drawHandler
-from ... graphics.text_box import TextBox
+from ... base_types import AnimationNode, TextUIExtension
 
 drawTextByIdentifier = {}
 
@@ -13,7 +11,6 @@ class ViewerNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ViewerNode"
     bl_label = "Viewer"
     bl_width_default = 190
-    options = {"NO_TIMING"}
 
     maxRows = IntProperty(name = "Max Rows", default = 150, min = 0,
         description = "Max amount of lines visible in the floating text box.")
@@ -58,6 +55,15 @@ class ViewerNode(bpy.types.Node, AnimationNode):
         col.label("Output Settings:")
         col.prop(self, "outputConsole", "Console")
         col.prop(self, "outputTextBlock", "Text Block")
+
+    def getUIExtensions(self):
+        if self.hide:
+            return
+        text = drawTextByIdentifier.get(self.identifier, "")
+        if len(text) == 0:
+            return
+
+        return [TextUIExtension(text, self.fontSize, self.maxRows)]
 
     def execute(self, data):
         if handleDataAsList(data):
@@ -249,32 +255,3 @@ def handleListElement_Quaternion(quaternion):
 
 def handleListElement_Float(number):
     return "{:>10.5f}".format(number)
-
-
-# Drawing
-##################################
-
-@drawHandler("SpaceNodeEditor", "WINDOW")
-def drawTextBoxes():
-    tree = bpy.context.getActiveAnimationNodeTree()
-    if tree is None:
-        return
-
-    for node in tree.nodes:
-        if node.bl_idname == "an_ViewerNode" and not node.hide:
-            drawTextBoxForNode(node)
-
-def drawTextBoxForNode(node):
-    text = drawTextByIdentifier.get(node.identifier, "")
-    if text == "":
-        return
-
-    region = bpy.context.region
-    leftBottom = node.getRegionBottomLeft(region)
-    rightBottom = node.getRegionBottomRight(region)
-    width = rightBottom.x - leftBottom.x
-
-    textBox = TextBox(text, leftBottom, width,
-                      fontSize = node.fontSize / node.dimensions.x * width,
-                      maxRows = node.maxRows)
-    textBox.draw()

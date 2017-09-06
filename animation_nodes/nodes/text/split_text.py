@@ -15,14 +15,13 @@ class SplitTextNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SplitTextNode"
     bl_label = "Split Text"
     bl_width_default = 190
+    errorHandlingType = "MESSAGE"
 
     splitType = EnumProperty(
         name = "Split Type", default = "LINES",
         items = splitTypeItems, update = AnimationNode.refresh)
 
     keepDelimiters = BoolProperty(default = False, update = propertyChanged)
-
-    errorMessage = StringProperty()
 
     def create(self):
         self.newInput("Text", "Text", "text")
@@ -38,11 +37,8 @@ class SplitTextNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "splitType", text = "")
         if self.splitType == "REGULAR_EXPRESSION":
             layout.prop(self, "keepDelimiters", text = "Keep Delimiters")
-        if self.errorMessage != "":
-            layout.label(self.errorMessage, icon = "ERROR")
 
     def getExecutionCode(self, required):
-        yield "self.errorMessage = ''"
         if self.splitType == "CHARACTERS":
             yield "textList = list(text)"
         elif self.splitType == "WORDS":
@@ -64,7 +60,7 @@ class SplitTextNode(bpy.types.Node, AnimationNode):
                 if self.keepDelimiters: return re.split("("+splitBy+")", text)
                 else: return re.split(splitBy, text)
             except:
-                self.errorMessage = "Invalid Regular Expression"
+                self.setErrorMessage("Invalid Regular Expression")
                 return [text]
 
     def splitEveryNCharacters(self, text, n):

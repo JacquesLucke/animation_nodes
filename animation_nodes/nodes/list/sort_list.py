@@ -25,8 +25,7 @@ class SortListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SortListNode"
     bl_label = "Sort List"
     bl_width_default = 190
-
-    errorMessage = StringProperty()
+    errorHandlingType = "MESSAGE"
 
     assignedType = ListTypeSelectorSocket.newProperty(default = "Object List")
 
@@ -59,19 +58,16 @@ class SortListNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.prop(self, "activeTemplateIdentifier", text = "")
         self.activeTemplate.draw(layout, self.activeTemplateData)
-        if self.errorMessage != "":
-            layout.label(self.errorMessage, icon = "ERROR")
 
     def drawAdvanced(self, layout):
         self.activeTemplate.drawAdvanced(layout, self.activeTemplateData)
 
     def execute(self, *args):
-        self.errorMessage = ""
         try:
             sortedList = self.activeTemplate.execute(self.activeTemplateData, *args)
             return self.outputs[0].correctValue(sortedList)[0]
         except Exception as e:
-            self.errorMessage = str(e)
+            self.setErrorMessage(str(e))
             return self.outputs[0].getDefaultValue()
 
     @property

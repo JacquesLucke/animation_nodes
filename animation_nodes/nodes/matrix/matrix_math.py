@@ -10,14 +10,13 @@ operationItems = [("MULTIPLY", "Multiply", "", "NONE", 0)]
 class MatrixMathNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MatrixMathNode"
     bl_label = "Matrix Math"
+    errorHandlingType = "MESSAGE"
 
     operation = EnumProperty(name = "Operation", items = operationItems,
         update = executionCodeChanged)
 
     useListA = VectorizedSocket.newProperty()
     useListB = VectorizedSocket.newProperty()
-
-    errorMessage = StringProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Matrix", "useListA",
@@ -29,11 +28,8 @@ class MatrixMathNode(bpy.types.Node, AnimationNode):
 
     def draw(self, layout):
         layout.prop(self, "operation", text = "")
-        if self.errorMessage != "":
-            layout.label(self.errorMessage, icon = "ERROR")
 
     def getExecutionCode(self, required):
-        yield "self.errorMessage = ''"
         if self.operation == "MULTIPLY":
             if self.useListA and self.useListB:
                 yield "results = self.multMatrixLists(a, b)"
@@ -44,7 +40,7 @@ class MatrixMathNode(bpy.types.Node, AnimationNode):
 
     def multMatrixLists(self, listA, listB):
         if len(listA) != len(listB):
-            self.errorMessage = "different length"
+            self.setErrorMessage("different length")
             return Matrix4x4List()
         return vectorizedMatrixMultiplication(listA, listB)
 

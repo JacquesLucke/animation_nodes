@@ -8,17 +8,29 @@ from ... import tree_info
 from ... utils.handlers import eventHandler
 from ... ui.node_colors import colorAllNodes
 from .. socket_templates import SocketTemplate
+from . node_ui_extension import TextUIExtension, ErrorUIExtension
 from ... preferences import getExecutionCodeType
 from ... operators.callbacks import newNodeCallback
 from ... sockets.info import toIdName as toSocketIdName
-from ... utils.blender_ui import iterNodeCornerLocations
-from ... execution.measurements import getMinExecutionTimeString
 from ... utils.attributes import setattrRecursive, getattrRecursive
 from ... operators.dynamic_operators import getInvokeFunctionOperator
 from ... utils.nodes import getAnimationNodeTrees, iterAnimationNodes
-from ... tree_info import (getNetworkWithNode, getOriginNodes,
-                           getLinkedInputsDict, getLinkedOutputsDict, iterLinkedOutputSockets,
-                           iterUnlinkedInputSockets, keepNodeState)
+from .. effects import PrependCodeEffect, ReturnDefaultsOnExceptionCodeEffect
+
+from ... utils.blender_ui import (
+    getNodeCornerLocation_BottomLeft,
+    getNodeCornerLocation_BottomRight
+)
+
+from ... execution.measurements import (
+    getMinExecutionTimeString,
+    getMeasurementResultString
+)
+from ... tree_info import (
+    getNetworkWithNode, getOriginNodes,
+    getLinkedInputsDict, getLinkedOutputsDict, iterLinkedOutputSockets,
+    iterUnlinkedInputSockets, keepNodeState
+)
 
 socketEffectsByIdentifier = defaultdict(list)
 
@@ -36,6 +48,8 @@ class NonPersistentNodeData:
         self.inputs = defaultdict(NonPersistentSocketData)
         self.outputs = defaultdict(NonPersistentSocketData)
         self.codeEffects = []
+        self.errorMessage = None
+        self.showErrorMessage = True
 
 infoByNode = defaultdict(NonPersistentNodeData)
 
@@ -59,11 +73,16 @@ class AnimationNode:
     searchTags = []
     onlySearchTags = False
     # can contain: 'NO_EXECUTION', 'NOT_IN_SUBPROGRAM',
-    #              'NO_AUTO_EXECUTION', 'NO_TIMING',
+    #              'NO_AUTO_EXECUTION'
     options = set()
 
     # can be "NONE", "ALWAYS" or "HIDDEN_ONLY"
     dynamicLabelType = "NONE"
+
+    # can be "CUSTOM", "MESSAGE" or "EXCEPTION"
+    errorHandlingType = "CUSTOM"
+    class ControlledExecutionException(Exception):
+        pass
 
     # should be a list of functions
     # each function takes a node as input
@@ -136,6 +155,9 @@ class AnimationNode:
 
     def getUsedModules(self):
         return []
+
+    def getUIExtensions(self):
+        return None
 
     def drawControlSocket(self, layout, socket):
         layout.alignment = "LEFT" if socket.isInput else "RIGHT"
@@ -417,6 +439,49 @@ class AnimationNode:
         return newNodeCallback(self, functionName)
 
 
+    # UI Extensions
+    ####################################################
+
+    def getAllUIExtensions(self):
+        extensions = []
+
+        if getExecutionCodeType() == "MEASURE":
+            text = getMeasurementResultString(self)
+            extensions.append(TextUIExtension(text))
+
+        errorType = self.getErrorHandlingType()
+        if errorType in ("MESSAGE", "EXCEPTION"):
+            data = infoByNode[self.identifier]
+            message = data.errorMessage
+            if message is not None and data.showErrorMessage:
+                extensions.append(ErrorUIExtension(message))
+
+        extraExtensions = self.getUIExtensions()
+        if extraExtensions is not None:
+            extensions.extend(extraExtensions)
+
+        return extensions
+
+
+    # Error Handling
+    ####################################################
+
+    def getErrorHandlingType(self):
+        return self.errorHandlingType
+
+    def resetErrorMessage(self):
+        infoByNode[self.identifier].errorMessage = None
+
+    def setErrorMessage(self, message, show = True):
+        data = infoByNode[self.identifier]
+        data.errorMessage = message
+        data.showErrorMessage = show
+
+    def raiseErrorMessage(self, message, show = True):
+        self.setErrorMessage(message, show)
+        raise self.ControlledExecutionException(message)
+
+
     # More Utilities
     ####################################################
 
@@ -503,7 +568,7 @@ class AnimationNode:
         else:
             code = self.getLocalExecutionCode_GetExecutionCode(inputVariables, outputVariables, required)
 
-        return self.applyCodeEffects(code)
+        return self.applyCodeEffects(code, required)
 
     def getLocalExecutionCode_ExecutionFunction(self, inputVariables, outputVariables):
         parameterString = ", ".join(inputVariables[socket.identifier] for socket in self.inputs)
@@ -518,12 +583,23 @@ class AnimationNode:
         return toString(self.getExecutionCode(required))
 
     def getLocalBakeCode(self):
-        return self.applyCodeEffects(toString(self.getBakeCode()))
+        # TODO: get required outputs from caller
+        required = {s.identifier for s in self.outputs}
+        return self.applyCodeEffects(toString(self.getBakeCode()), required)
 
-    def applyCodeEffects(self, code):
-        for effect in infoByNode[self.identifier].codeEffects:
-            code = toString(effect.apply(self, code))
+    def applyCodeEffects(self, code, required):
+        for effect in self.iterCodeEffectsToApply():
+            code = toString(effect.apply(self, code, required))
         return code
+
+    def iterCodeEffectsToApply(self):
+        yield from infoByNode[self.identifier].codeEffects
+
+        errorType = self.getErrorHandlingType()
+        if errorType in ("MESSAGE", "EXCEPTION"):
+            yield PrependCodeEffect("self.resetErrorMessage()")
+        if errorType == "EXCEPTION":
+            yield ReturnDefaultsOnExceptionCodeEffect("self.ControlledExecutionException")
 
 
 @eventHandler("SCENE_UPDATE_POST")
@@ -583,14 +659,14 @@ def getViewLocation(node):
     location = node.location.copy()
     while node.parent:
         node = node.parent
-        location += node.location.copy()
+        location += node.location
     return location
 
 def getRegionBottomLeft(node, region):
-    return next(iterNodeCornerLocations([node], region, horizontal = "LEFT"))
+    return getNodeCornerLocation_BottomLeft(node, region)
 
 def getRegionBottomRight(node, region):
-    return next(iterNodeCornerLocations([node], region, horizontal = "RIGHT"))
+    return getNodeCornerLocation_BottomRight(node, region)
 
 def register():
     bpy.types.Node.toID = nodeToID

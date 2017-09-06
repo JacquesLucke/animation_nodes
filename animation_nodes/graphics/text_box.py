@@ -60,6 +60,9 @@ class TextBox:
 
         self.boundary.resetPosition(x1, y1, x2, y2)
 
+    def getHeight(self):
+        return self.boundary.height
+
     def drawLines(self):
         offset = blf.dimensions(font, "Vg")[1]
         textBoundary = self.boundary.getInsetRectangle(self.padding)

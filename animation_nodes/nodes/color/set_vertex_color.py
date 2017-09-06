@@ -8,10 +8,10 @@ from ... base_types import AnimationNode
 class SetVertexColorNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SetVertexColorNode"
     bl_label = "Set Vertex Color"
+    errorHandlingType = "EXCEPTION"
 
     vertexColorName = StringProperty(name = "Vertex Color Group", default = "Col", update = propertyChanged)
     checkIfColorIsSet = BoolProperty(default = True)
-    errorMessage = StringProperty()
 
     def create(self):
         self.newInput("Object", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
@@ -20,18 +20,15 @@ class SetVertexColorNode(bpy.types.Node, AnimationNode):
 
     def draw(self, layout):
         layout.prop(self, "vertexColorName", text = "", icon = "GROUP_VCOL")
-        if self.errorMessage != "":
-            layout.label(self.errorMessage, icon = "ERROR")
 
     def drawAdvanced(self, layout):
         layout.prop(self, "checkIfColorIsSet", text = "Check Color")
 
     def execute(self, object, color):
-        self.errorMessage = ""
         if object is None: return object
         if object.type != "MESH": return object
         if object.mode == "EDIT":
-            self.errorMessage = "Object is in edit mode"
+            self.raiseErrorMessage("Object is in edit mode")
             return object
 
         mesh = object.data

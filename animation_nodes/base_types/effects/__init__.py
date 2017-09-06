@@ -1,3 +1,1 @@
-from . socket_effects import AutoSelectVectorization
-
-from . code_effects import VectorizeCodeEffect
+from . code_effects import VectorizeCodeEffect, PrependCodeEffect, ReturnDefaultsOnExceptionCodeEffect
