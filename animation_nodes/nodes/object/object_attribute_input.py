@@ -8,11 +8,10 @@ class ObjectAttributeInputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectAttributeInputNode"
     bl_label = "Object Attribute Input"
     bl_width_default = 160
+    errorHandlingType = "MESSAGE"
 
     attribute = StringProperty(name = "Attribute", default = "",
         update = executionCodeChanged)
-
-    errorMessage = StringProperty()
 
     def create(self):
         self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
@@ -20,8 +19,6 @@ class ObjectAttributeInputNode(bpy.types.Node, AnimationNode):
 
     def draw(self, layout):
         layout.prop(self, "attribute", text = "")
-        if self.errorMessage != "":
-            layout.label(self.errorMessage, icon = "ERROR")
 
     def drawAdvanced(self, layout):
         self.invokeFunction(layout, "createAutoExecutionTrigger", text = "Create Execution Trigger")
@@ -30,16 +27,14 @@ class ObjectAttributeInputNode(bpy.types.Node, AnimationNode):
         code = self.evaluationExpression
 
         if not isCodeValid(code):
-            self.errorMessage = "Invalid Syntax"
+            yield "self.setErrorMessage('Invalid Syntax')"
             yield "value = None"
             return
-        else: self.errorMessage = ""
 
         yield "try:"
-        yield "    self.errorMessage = ''"
         yield "    " + code
         yield "except:"
-        yield "    if object: self.errorMessage = 'Attribute not found'"
+        yield "    if object: self.setErrorMessage('Attribute not found')"
         yield "    value = None"
 
     @property

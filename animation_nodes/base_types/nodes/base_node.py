@@ -8,7 +8,7 @@ from ... import tree_info
 from ... utils.handlers import eventHandler
 from ... ui.node_colors import colorAllNodes
 from .. socket_templates import SocketTemplate
-from . node_ui_extension import ErrorUIExtension
+from . node_ui_extension import TextUIExtension, ErrorUIExtension
 from ... preferences import getExecutionCodeType
 from ... operators.callbacks import newNodeCallback
 from ... sockets.info import toIdName as toSocketIdName

@@ -7,11 +7,10 @@ from ... data_structures import Vector3DList, EdgeIndicesList, PolygonIndicesLis
 class EdgeToTubeNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_EdgeToTubeNode"
     bl_label = "Edge to Tube"
+    errorHandlingType = "MESSAGE"
 
     useEdgeIndicesList = VectorizedSocket.newProperty()
     useRadiusList = VectorizedSocket.newProperty()
-
-    errorMessage = StringProperty()
 
     def create(self):
         self.newInput("Vector List", "Points", "inPoints")
@@ -29,10 +28,6 @@ class EdgeToTubeNode(bpy.types.Node, AnimationNode):
         self.newOutput("Vector List", "Vertices", "outVertices")
         self.newOutput("Polygon Indices List", "Polygon Indices", "outIndices")
 
-    def draw(self, layout):
-        if self.errorMessage != "" and self.inputs[1].isLinked:
-            layout.label(self.errorMessage, icon = "ERROR")
-
     def getExecutionFunctionName(self):
         if self.useEdgeIndicesList:
             return "execute_List"
@@ -41,16 +36,15 @@ class EdgeToTubeNode(bpy.types.Node, AnimationNode):
 
     def execute_Single(self, inPoints, inEdge, radius, resolution, caps):
         try:
-            self.errorMessage = ""
             return edgesToTubes(inPoints, EdgeIndicesList.fromValue(inEdge), radius, max(resolution, 2), caps)
         except Exception as e:
-            self.errorMessage = str(e)
+            if self.inputs["Edge Indices"].isLinked:
+                self.setErrorMessage(str(e))
             return Vector3DList(), PolygonIndicesList()
 
     def execute_List(self, inPoints, inEdges, radius, resolution, caps):
         try:
-            self.errorMessage = ""
             return edgesToTubes(inPoints, inEdges, radius, max(resolution, 2), caps)
         except Exception as e:
-            self.errorMessage = str(e)
+            self.setErrorMessage(str(e))
             return Vector3DList(), PolygonIndicesList()

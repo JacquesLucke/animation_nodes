@@ -9,9 +9,9 @@ from . c_utils import (
 class EdgeInfoNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_EdgeInfoNode"
     bl_label = "Edge Info"
+    errorHandlingType = "MESSAGE"
 
     useEdgeList = VectorizedSocket.newProperty()
-    errorMessage = StringProperty()
 
     def create(self):
         self.newInput("Vector List", "Points", "points")
@@ -36,12 +36,7 @@ class EdgeInfoNode(bpy.types.Node, AnimationNode):
             ("Length", "length"),
             ("Lengths", "lengths")))
 
-    def draw(self, layout):
-        if self.errorMessage != "" and self.inputs[1].isLinked:
-            layout.label(self.errorMessage, icon = "ERROR")
-
     def getExecutionCode(self, required):
-        yield "self.errorMessage = ''"
         if self.useEdgeList:
             yield from self.iterExecutionCode_List(required)
         else:
@@ -55,7 +50,8 @@ class EdgeInfoNode(bpy.types.Node, AnimationNode):
         if "start" in required:  yield "    start = points[i1]"
         if "end" in required:    yield "    end = points[i2]"
         yield "except IndexError:"
-        yield "    self.errorMessage = 'invalid edge'"
+        yield "    if self.inputs['Edge Indices'].isLinked:"
+        yield "        self.setErrorMessage('invalid edge')"
         yield "    length, center = Vector((0, 0, 0)), Vector((0, 0, 0))"
         yield "    start, end = Vector((0, 0, 0)), Vector((0, 0, 0))"
 
@@ -71,7 +67,7 @@ class EdgeInfoNode(bpy.types.Node, AnimationNode):
             yield "    ends = self.getEdgeEndPoints(points, edgeIndicesList)"
         yield "    pass"
         yield "except IndexError:"
-        yield "    self.errorMessage = 'invalid edges'"
+        yield "    self.setErrorMessage('invalid edge')"
         yield "    lengths, centers = DoubleList(), Vector3DList()"
 
     def calculateEdgeLengths(self, points, edges):

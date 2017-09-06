@@ -22,6 +22,7 @@ noSceneMessage = "scene required"
 class VertexGroupInputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_VertexGroupInputNode"
     bl_label = "Vertex Group Input"
+    errorHandlingType = "EXCEPTION"
 
     mode = EnumProperty(name = "Mode", default = "ALL",
         items = modeItems, update = AnimationNode.refresh)
@@ -30,8 +31,6 @@ class VertexGroupInputNode(bpy.types.Node, AnimationNode):
         items = groupIdentifierTypeItems, update = AnimationNode.refresh)
 
     useIndexList = VectorizedSocket.newProperty()
-
-    errorMessage = StringProperty();
 
     def create(self):
         self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
@@ -47,14 +46,12 @@ class VertexGroupInputNode(bpy.types.Node, AnimationNode):
             self.newOutput(VectorizedSocket("Float", "useIndexList",
                 ("Weight", "weight"), ("Weights", "weights")))
         elif self.mode == "ALL":
-            self.newInput("Boolean", "Use Modifiers", "useModifiers")
+            self.newInput("Boolean", "Use Modifiers", "useModifiers", value = False)
             self.newInput("Scene", "Scene", "scene", hide = True)
             self.newOutput("Float List", "Weights", "weights")
 
     def draw(self, layout):
         layout.prop(self, "mode", text = "")
-        if self.errorMessage != "":
-            layout.label(self.errorMessage, icon = "ERROR")
 
     def drawAdvanced(self, layout):
         layout.prop(self, "groupIdentifierType", text = "Type")
@@ -69,22 +66,21 @@ class VertexGroupInputNode(bpy.types.Node, AnimationNode):
             return "execute_All"
 
     def execute_Index(self, object, identifier, index):
-        self.errorMessage = ""
         if object is None:
-            return 0;
+            return 0
+
         vertexGroup = self.getVertexGroup(object, identifier)
         if vertexGroup is None:
-            self.errorMessage = groupNotFoundMessage
+            self.raiseErrorMessage(groupNotFoundMessage)
 
         try: return vertexGroup.weight(index)
         except: return 0
 
     def execute_Indices(self, object, identifier, indices):
-        self.errorMessage = ""
         vertexGroup = self.getVertexGroup(object, identifier)
         if vertexGroup is None:
             if object is not None:
-                self.errorMessage = groupNotFoundMessage
+                self.raiseErrorMessage(groupNotFoundMessage)
             return DoubleList()
 
         weights = DoubleList(length = len(indices))
@@ -96,18 +92,15 @@ class VertexGroupInputNode(bpy.types.Node, AnimationNode):
         return weights
 
     def execute_All(self, object, identifier, useModifiers, *optionalScene):
-        self.errorMessage = ""
         if object is None:
             return DoubleList()
 
         if object.type != "MESH":
-            self.errorMessage = noMeshMessage
-            return DoubleList()
+            self.raiseErrorMessage(noMeshMessage)
 
         vertexGroup = self.getVertexGroup(object, identifier)
         if vertexGroup is None:
-            self.errorMessage = groupNotFoundMessage
-            return DoubleList()
+            self.raiseErrorMessage(groupNotFoundMessage)
 
         if useModifiers:
             return self.execute_All_WithModifiers(object, vertexGroup, optionalScene[0])
@@ -126,8 +119,7 @@ class VertexGroupInputNode(bpy.types.Node, AnimationNode):
 
     def execute_All_WithModifiers(self, object, vertexGroup, scene):
         if scene is None:
-            self.errorMessage = noSceneMessage
-            return DoubleList()
+            self.raiseErrorMessage(noSceneMessage)
 
         mesh = object.an.getMesh(scene, applyModifiers = True)
         index = vertexGroup.index
