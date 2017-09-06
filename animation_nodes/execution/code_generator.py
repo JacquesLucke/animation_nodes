@@ -183,7 +183,8 @@ def iterInputCopyLines(node, variables):
     for socket in node.inputs:
         if socket.dataIsModified and socket.isCopyable() and not isSocketLinked(socket, node):
             newName = variables[socket] + "_copy"
-            if hasattr(socket, "getDefaultValueCode"): line = "{} = {}".format(newName, socket.getDefaultValueCode())
+            if hasattr(socket, "getDefaultValueCode"):
+                line = "{} = {}".format(newName, socket.getDefaultValueCode())
             else: line = getCopyLine(socket, newName, variables)
             variables[socket] = newName
             yield line
