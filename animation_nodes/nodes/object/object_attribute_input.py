@@ -27,7 +27,7 @@ class ObjectAttributeInputNode(bpy.types.Node, AnimationNode):
         code = self.evaluationExpression
 
         if not isCodeValid(code):
-            yield "self.setErrorMessage('Invalid Syntax')"
+            yield "self.setErrorMessage('Invalid Syntax', show = len(self.attribute.strip()) > 0)"
             yield "value = None"
             return
 
