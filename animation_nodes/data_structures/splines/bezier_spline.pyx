@@ -131,20 +131,19 @@ cdef class BezierSpline(Spline):
         # http://jazzros.blogspot.be/2011/03/projecting-point-on-bezier-curve.html
         cdef:
             int segmentAmount = getSegmentAmount(self)
-            int i, leftIndex, rightIndex
+            Py_ssize_t i
+            Vector3 *w[4]
             set possibleParameters = set()
             list coeffs = [0] * 6
 
         point = toPyVector3(_point)
 
         for i in range(segmentAmount):
-            leftIndex = i
-            rightIndex = (i + 1) % (segmentAmount + 1)
-
-            p0 = self.points[leftIndex] - point
-            p1 = self.rightHandles[leftIndex] - point
-            p2 = self.leftHandles[rightIndex] - point
-            p3 = self.points[rightIndex] - point
+            getSegmentData_Index(self, i, w)
+            p0 = toPyVector3(w[0]) - point
+            p1 = toPyVector3(w[1]) - point
+            p2 = toPyVector3(w[2]) - point
+            p3 = toPyVector3(w[3]) - point
 
             a = p3 - 3 * p2 + 3 * p1 - p0
             b = 3 * p2 - 6 * p1 + 3 * p0

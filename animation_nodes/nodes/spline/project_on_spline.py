@@ -30,7 +30,7 @@ class ProjectOnSplineNode(bpy.types.Node, AnimationNode):
             yield "    position, tangent = spline.projectExtended(location)"
         else:
             yield "    parameter = spline.project(location)"
-            yield "    position = spline.evaluate(parameter)"
+            yield "    position = spline.evaluatePoint(parameter)"
             yield "    tangent = spline.evaluateTangent(parameter)"
         yield "    distance = (position - location).length"
         yield "else:"
