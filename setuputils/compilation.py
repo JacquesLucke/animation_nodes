@@ -69,7 +69,16 @@ def getPossibleCompiledFilesWithTime(cpath):
 def getExtensionFromPath(path):
     from distutils.core import Extension
     metadata = getCythonMetadata(path)
-    return Extension(metadata["module_name"], [path])
+    moduleName = metadata["module_name"]
+
+    if "distutils" in metadata:
+        directory = os.path.dirname(path)
+        files = metadata["distutils"].get("sources", [])
+        sources = [os.path.join(directory, filePath) for filePath in files]
+    else:
+        sources = []
+        
+    return Extension(moduleName, [path] + sources)
 
 def buildExtensionInplace(extension):
     from distutils.core import setup
