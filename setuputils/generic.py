@@ -165,6 +165,13 @@ def readLinesBetween(path, start, stop):
                 break
     return "".join(lines)
 
+def getPyxTargetLanguage(path):
+    text = readTextFile(path)
+    if re.search(r"#\s*distutils\s*:\s*language\s*=\s*c\+\+", text):
+        return "c++"
+    else:
+        return "c"
+
 def syncDirectories(source, target, relpathSelector):
     if not directoryExists(target):
         os.mkdir(target)

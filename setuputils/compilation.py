@@ -26,7 +26,11 @@ def getCompileTasks(addonDirectory):
 
 def iterFilesToCompile(addonDirectory):
     for path in iterPathsWithExtension(addonDirectory, ".pyx"):
-        yield changeFileExtension(path, ".c")
+        language = getPyxTargetLanguage(path)
+        if language == "c++":
+            yield changeFileExtension(path, ".cpp")
+        elif language == "c":
+            yield changeFileExtension(path, ".c")
 
 
 class CompileExtModuleTask(GenerateFileTask):
@@ -77,7 +81,7 @@ def getExtensionFromPath(path):
         sources = [os.path.join(directory, filePath) for filePath in files]
     else:
         sources = []
-        
+
     return Extension(moduleName, [path] + sources)
 
 def buildExtensionInplace(extension):

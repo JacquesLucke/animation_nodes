@@ -22,7 +22,11 @@ class CythonizeTask(GenerateFileTask):
     def __init__(self, path):
         super().__init__()
         self.path = path
-        self.target = changeFileExtension(path, ".c")
+        language = getPyxTargetLanguage(path)
+        if language == "c++":
+            self.target = changeFileExtension(path, ".cpp")
+        elif language == "c":
+            self.target = changeFileExtension(path, ".c")
 
     def execute(self):
         from Cython.Build import cythonize
