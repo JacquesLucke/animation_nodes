@@ -1,6 +1,7 @@
 import bpy
 from bpy.props import *
 from ... utils.names import toInterfaceName
+from ... events import propertyChanged
 
 from . wrapper import (
     PyNoise,
@@ -22,7 +23,8 @@ fractalTypeItems = [(t, pretty(t), "") for t in fractalTypesList]
 
 class Noise3DNodeBase:
     def _runRefresh(self, context):
-        self.refresh()
+        self.updateNoiseSocketsHideStatus()
+        propertyChanged()
 
     noiseType = EnumProperty(name = "Noise Type", default = "SIMPLEX",
         items = noiseTypeItems, update = _runRefresh)
@@ -47,36 +49,55 @@ class Noise3DNodeBase:
         layout.prop(self, "noiseType", text = "")
         if self.noiseType == "CELLULAR":
             layout.prop(self, "cellularReturnType", text = "")
-            layout.prop(self, "cellularLookupType", text = "")
-            layout.prop(self, "cellularDistanceFunction", text = "")
-        layout.prop(self, "perturbType", text = "")
-        if "FRACTAL" in self.noiseType:
-            layout.prop(self, "fractalType", text = "")
+            if self.cellularReturnType == "NOISE_LOOKUP":
+                layout.prop(self, "cellularLookupType", text = "")
+
+    def drawAdvancedNoiseSettings(self, layout):
+        layout.prop(self, "fractalType")
+        layout.prop(self, "perturbType")
+
+        col = layout.column()
+        col.active = self.noiseType == "CELLULAR" and "DISTANCE" in self.cellularReturnType
+        col.prop(self, "cellularDistanceFunction", text = "Distance")
+
+    def updateNoiseSocketsHideStatus(self):
+        self.inputs["Jitter"].hide = self.noiseType != "CELLULAR"
+        self.inputs["Lookup Frequency"].hide = self.noiseType != "CELLULAR"
+        self.inputs["Octaves"].hide = self.noiseType in ("WHITE_NOISE", "CELLULAR")
+        self.inputs["Perturb Frequency"].hide = self.perturbType == "NONE"
+        self.inputs["Lookup Frequency"].hide = not (self.noiseType == "CELLULAR" and self.cellularReturnType == "NOISE_LOOKUP")
 
     def createSettingsInputs(self):
         self.newInput("Integer", "Seed", "seed")
         self.newInput("Float", "Frequency", "frequency", value = 0.1)
-        self.newInput("Vector", "Axis Scale", "axisScale", value = (1, 1, 1))
-        self.newInput("Float", "Perturb Frequency", "perturbFrequency", value = 0.1)
+        self.newInput("Float", "Amplitude", "amplitude", value = 1)
+        self.newInput("Vector", "Axis Scale", "axisScale", value = (1, 1, 1), hide = True)
+        self.newInput("Vector", "Offset", "offset")
         self.newInput("Integer", "Octaves", "octaves", value = 3).setRange(1, 10)
-        if self.noiseType == "CELLULAR":
-            self.newInput("Float", "Jitter", "jitter", value = 0.45)
-            self.newInput("Float", "Lookup Frequency", "lookupFrequency", value = 0.2)
+        self.newInput("Float", "Jitter", "jitter", value = 0.45)
+        self.newInput("Float", "Lookup Frequency", "lookupFrequency", value = 0.2)
+        self.newInput("Float", "Perturb Frequency", "perturbFrequency", value = 0.1)
+        self.updateNoiseSocketsHideStatus()
 
-    def calculateNoise(self, vectors, settings):
+    def calculateNoise(self, vectors, seed, frequency, amplitude, axisScale, offset, octaves, jitter, lookupFrequency, perturbFrequency):
         noise = PyNoise()
-        noise.setSeed(settings[0])
-        noise.setFrequency(settings[1])
-        noise.setAxisScales(*settings[2])
         noise.setNoiseType(self.noiseType)
-        noise.setPerturbFrequency(settings[3])
         noise.setFractalType(self.fractalType)
-        noise.setFractalOctaves(min(max(settings[4], 1), 10))
+        noise.setPerturbType(self.perturbType)
+
+        noise.setSeed(seed)
+        noise.setFrequency(frequency)
+        noise.setAxisScales(axisScale)
+        noise.setOctaves(min(max(octaves, 1), 10))
+
+        if self.perturbType != "NONE":
+            noise.setPerturbFrequency(perturbFrequency)
+
         if self.noiseType == "CELLULAR":
             noise.setCellularReturnType(self.cellularReturnType)
-            noise.setCellularJitter(settings[5])
             noise.setCellularNoiseLookupType(self.cellularLookupType)
-            noise.setCellularNoiseLookupFrequency(settings[6])
             noise.setCellularDistanceFunction(self.cellularDistanceFunction)
-        noise.setPerturbType(self.perturbType)
-        return noise.calculateList(vectors)
+            noise.setCellularJitter(jitter)
+            noise.setCellularNoiseLookupFrequency(lookupFrequency)
+
+        return noise.calculateList(vectors, amplitude, offset)

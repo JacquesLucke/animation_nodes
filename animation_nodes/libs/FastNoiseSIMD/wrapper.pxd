@@ -23,7 +23,7 @@ cdef extern from "source/FastNoiseSIMD.h":
 
         void SetFractalType(FractalType fractalType)
 
-        void FillNoiseSet(float *noiseSet, FastNoiseVectorSet *vectorSet)
+        void FillNoiseSet(float *noiseSet, FastNoiseVectorSet *vectorSet, float xOffset, float yOffset, float zOffset)
 
     cdef struct FastNoiseVectorSet:
         int size

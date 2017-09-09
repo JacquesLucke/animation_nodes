@@ -9,6 +9,7 @@ from ... data_structures import DoubleList
 class VectorNoiseNode(bpy.types.Node, AnimationNode, Noise3DNodeBase):
     bl_idname = "an_VectorNoiseNode"
     bl_label = "Vector Noise"
+    bl_width_default = 170
 
     def create(self):
         self.newInput("Vector List", "Vectors", "vectors")
@@ -18,6 +19,9 @@ class VectorNoiseNode(bpy.types.Node, AnimationNode, Noise3DNodeBase):
     def draw(self, layout):
         self.drawNoiseSettings(layout)
 
+    def drawAdvanced(self, layout):
+        self.drawAdvancedNoiseSettings(layout)
+
     def execute(self, vectors, *settings):
-        noise = self.calculateNoise(vectors, settings)
+        noise = self.calculateNoise(vectors, *settings)
         return DoubleList.fromValues(noise)

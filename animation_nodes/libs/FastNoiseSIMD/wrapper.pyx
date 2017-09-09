@@ -15,16 +15,12 @@ cdef dict simdLevels = {
 }
 
 cdef dict noiseTypes = {
-    "VALUE" :           NoiseType.Value,
-    "VALUE_FRACTAL" :   NoiseType.ValueFractal,
-    "PERLIN" :          NoiseType.Perlin,
-    "PERLIN_FRACTAL" :  NoiseType.PerlinFractal,
-    "SIMPLEX" :         NoiseType.Simplex,
-    "SIMPLEX_FRACTAL" : NoiseType.SimplexFractal,
+    "VALUE" :           NoiseType.ValueFractal,
+    "PERLIN" :          NoiseType.PerlinFractal,
+    "SIMPLEX" :         NoiseType.SimplexFractal,
     "WHITE_NOISE" :     NoiseType.WhiteNoise,
     "CELLULAR" :        NoiseType.Cellular,
-    "CUBIC" :           NoiseType.Cubic,
-    "CUBIC_FRACTAL" :   NoiseType.CubicFractal
+    "CUBIC" :           NoiseType.CubicFractal
 }
 
 cdef dict cellularReturnTypes = {
@@ -83,8 +79,8 @@ cdef class PyNoise:
     def setFrequency(self, float frequency):
         self.fn.SetFrequency(frequency)
 
-    def setAxisScales(self, float xScale, float yScale, float zScale):
-        self.fn.SetAxisScales(xScale, yScale, zScale)
+    def setAxisScales(self, scales):
+        self.fn.SetAxisScales(scales[0], scales[1], scales[2])
 
     def setNoiseType(self, str t):
         self.fn.SetNoiseType(noiseTypes[t])
@@ -99,6 +95,7 @@ cdef class PyNoise:
         self.fn.SetCellularNoiseLookupType(noiseTypes[t])
 
     def setCellularNoiseLookupFrequency(self, float frequency):
+        print(frequency)
         self.fn.SetCellularNoiseLookupFrequency(frequency)
 
     def setCellularDistanceFunction(self, str t):
@@ -113,26 +110,28 @@ cdef class PyNoise:
     def setFractalType(self, str t):
         self.fn.SetFractalType(fractalTypes[t])
 
-    def setFractalOctaves(self, int octaves):
+    def setOctaves(self, int octaves):
         if 1 <= octaves <= 10:
             self.fn.SetFractalOctaves(octaves)
         else:
             raise ValueError("octaves has to be between 1 and 10")
 
 
-    def calculateList(self, Vector3DList vectors not None):
+    def calculateList(self, Vector3DList vectors not None, float amplitude, offset = (0, 0, 0)):
+        cdef Vector3 _offset = toVector3(offset)
         cdef FloatList result = FloatList(length = vectors.length)
-        calcNoise(self, result.data, vectors.data, vectors.length)
+        calcNoise(self, result.data, vectors.data, &_offset, amplitude, vectors.length)
         return result
 
     def calculateSingle(self, vector):
         cdef Vector3 _vector = toVector3(vector)
+        cdef Vector3 offset = Vector3(0, 0, 0)
         cdef float result
-        calcNoise(self, &result, &_vector, 1)
+        calcNoise(self, &result, &_vector, &offset, 1, 1)
         return result
 
 
-cdef void calcNoise(PyNoise noise, float *results, Vector3 *vectors, Py_ssize_t amount):
+cdef void calcNoise(PyNoise noise, float *results, Vector3 *vectors, Vector3 *offset, float amplitude, Py_ssize_t amount):
     cdef FastNoiseVectorSet vectorSet
     vectorSet.SetSize(amount)
     vectorSet.sampleScale = 0
@@ -143,6 +142,9 @@ cdef void calcNoise(PyNoise noise, float *results, Vector3 *vectors, Py_ssize_t 
         vectorSet.ySet[i] = vectors[i].y
         vectorSet.zSet[i] = vectors[i].z
 
-    noise.fn.FillNoiseSet(results, &vectorSet)
+    noise.fn.FillNoiseSet(results, &vectorSet, offset.x, offset.y, offset.z)
 
     vectorSet.Free()
+
+    for i in range(amount):
+        results[i] *= amplitude
