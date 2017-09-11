@@ -26,7 +26,7 @@ def isAddonDirectoryIgnored(name):
     return name in {".git", "__pycache__"}
 
 def isAddonFileIgnored(name):
-    extensions = [".src", ".pxd", ".pyx", ".html", ".c", ".cpp", ".h", ".lib"]
+    extensions = [".src", ".pxd", ".pyx", ".html", ".c", ".cpp", ".h", ".lib", ".a", ".o", ".obj", ".sh", ".bat"]
     names = {".gitignore", "__setup_info.py"}
     return any(name.endswith(ext) for ext in extensions) or name in names
 

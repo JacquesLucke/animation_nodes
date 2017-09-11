@@ -82,7 +82,7 @@ def getExtensionFromPath(path):
 
     directory = os.path.dirname(path)
     usedRelPathAttributes = ["sources", "extra_objects"]
-    usedUnchangedAttributes = ["libraries", "depends", "extra_link_args"]
+    usedUnchangedAttributes = ["libraries", "depends", "extra_link_args", "extra_compile_args"]
 
     if "distutils" in metadata:
 
