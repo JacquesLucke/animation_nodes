@@ -43,7 +43,7 @@
 
 // To compile AVX2 set C++ code generation to use /arch:AVX(2) on FastNoiseSIMD_avx2.cpp
 // Note: This does not break support for pre AVX CPUs, AVX code is only run if support is detected
-//#define FN_COMPILE_AVX2
+// #define FN_COMPILE_AVX2
 
 // Only the latest compilers will support this
 //#define FN_COMPILE_AVX512
@@ -93,6 +93,16 @@ Intel Haswell - Q2 2013
 AMD Piledriver - 2012
 */
 
+#if defined(_MSC_VER)
+    #define EXPORT __declspec(dllexport)
+#elif defined(__GNUC__)
+    //  GCC
+    #define EXPORT __attribute__((visibility("default")))
+#else
+    //  do nothing and hope for the best?
+    #define EXPORT
+#endif
+
 struct FastNoiseVectorSet;
 
 class FastNoiseSIMD
@@ -107,7 +117,7 @@ public:
 	enum CellularReturnType { CellValue, Distance, Distance2, Distance2Add, Distance2Sub, Distance2Mul, Distance2Div, NoiseLookup, Distance2Cave };
 
 	// Creates new FastNoiseSIMD for the highest supported instuction set of the CPU
-	static FastNoiseSIMD* NewFastNoiseSIMD(int seed = 1337);
+	EXPORT static FastNoiseSIMD* NewFastNoiseSIMD(int seed = 1337);
 
 	// Returns highest detected level of CPU support
 	// 5: ARM NEON
@@ -116,7 +126,7 @@ public:
 	// 2: SSE4.1
 	// 1: SSE2
 	// 0: Fallback, no SIMD support
-	static int GetSIMDLevel(void);
+	EXPORT static int GetSIMDLevel(void);
 
 	// Sets the SIMD level for newly created FastNoiseSIMD objects
 	// 5: ARM NEON
@@ -128,114 +138,114 @@ public:
 	// -1: Auto-detect fastest supported (Default)
 	// Caution: Setting this manually can cause crashes on CPUs that do not support that level
 	// Caution: Changing this after creating FastNoiseSIMD objects has undefined behaviour
-	static void SetSIMDLevel(int level) { s_currentSIMDLevel = level; }
+	EXPORT static void SetSIMDLevel(int level) { s_currentSIMDLevel = level; }
 
 	// Free a noise set from memory
-	static void FreeNoiseSet(float* noiseSet);
+	EXPORT static void FreeNoiseSet(float* noiseSet);
 
 	// Create an empty (aligned) noise set for use with FillNoiseSet()
-	static float* GetEmptySet(int size);
+	EXPORT static float* GetEmptySet(int size);
 
 	// Create an empty (aligned) noise set for use with FillNoiseSet()
-	static float* GetEmptySet(int xSize, int ySize, int zSize) { return GetEmptySet(xSize*ySize*zSize); }
+	EXPORT static float* GetEmptySet(int xSize, int ySize, int zSize) { return GetEmptySet(xSize*ySize*zSize); }
 
 	// Rounds the size up to the nearest aligned size for the current SIMD level
-	static int AlignedSize(int size);
+	EXPORT static int AlignedSize(int size);
 
 
 	// Returns seed used for all noise types
-	int GetSeed(void) const { return m_seed; }
+	EXPORT int GetSeed(void) const { return m_seed; }
 
 	// Sets seed used for all noise types
 	// Default: 1337
-	void SetSeed(int seed) { m_seed = seed; }
+	EXPORT void SetSeed(int seed) { m_seed = seed; }
 
 	// Sets frequency for all noise types
 	// Default: 0.01
-	void SetFrequency(float frequency) { m_frequency = frequency; }
+	EXPORT void SetFrequency(float frequency) { m_frequency = frequency; }
 
 	// Sets noise return type of (Get/Fill)NoiseSet()
 	// Default: Simplex
-	void SetNoiseType(NoiseType noiseType) { m_noiseType = noiseType; }
+	EXPORT void SetNoiseType(NoiseType noiseType) { m_noiseType = noiseType; }
 
 	// Sets scaling factor for individual axis
 	// Defaults: 1.0
-	void SetAxisScales(float xScale, float yScale, float zScale) { m_xScale = xScale; m_yScale = yScale; m_zScale = zScale; }
+	EXPORT void SetAxisScales(float xScale, float yScale, float zScale) { m_xScale = xScale; m_yScale = yScale; m_zScale = zScale; }
 
 
 	// Sets octave count for all fractal noise types
 	// Default: 3
-	void SetFractalOctaves(int octaves) { m_octaves = octaves; m_fractalBounding = CalculateFractalBounding(m_octaves, m_gain);	}
+	EXPORT void SetFractalOctaves(int octaves) { m_octaves = octaves; m_fractalBounding = CalculateFractalBounding(m_octaves, m_gain);	}
 
 	// Sets octave lacunarity for all fractal noise types
 	// Default: 2.0
-	void SetFractalLacunarity(float lacunarity) { m_lacunarity = lacunarity; }
+	EXPORT void SetFractalLacunarity(float lacunarity) { m_lacunarity = lacunarity; }
 
 	// Sets octave gain for all fractal noise types
 	// Default: 0.5
-	void SetFractalGain(float gain) { m_gain = gain; m_fractalBounding = CalculateFractalBounding(m_octaves, m_gain); }
+	EXPORT void SetFractalGain(float gain) { m_gain = gain; m_fractalBounding = CalculateFractalBounding(m_octaves, m_gain); }
 
 	// Sets method for combining octaves in all fractal noise types
 	// Default: FBM
-	void SetFractalType(FractalType fractalType) { m_fractalType = fractalType; }
+	EXPORT void SetFractalType(FractalType fractalType) { m_fractalType = fractalType; }
 
 
 	// Sets return type from cellular noise calculations
 	// Default: Distance
-	void SetCellularReturnType(CellularReturnType cellularReturnType) { m_cellularReturnType = cellularReturnType; }
+	EXPORT void SetCellularReturnType(CellularReturnType cellularReturnType) { m_cellularReturnType = cellularReturnType; }
 
 	// Sets distance function used in cellular noise calculations
 	// Default: Euclidean
-	void SetCellularDistanceFunction(CellularDistanceFunction cellularDistanceFunction) { m_cellularDistanceFunction = cellularDistanceFunction; }
+	EXPORT void SetCellularDistanceFunction(CellularDistanceFunction cellularDistanceFunction) { m_cellularDistanceFunction = cellularDistanceFunction; }
 
 	// Sets the type of noise used if cellular return type is set the NoiseLookup
 	// Default: Simplex
-	void SetCellularNoiseLookupType(NoiseType cellularNoiseLookupType) { m_cellularNoiseLookupType = cellularNoiseLookupType; }
+	EXPORT void SetCellularNoiseLookupType(NoiseType cellularNoiseLookupType) { m_cellularNoiseLookupType = cellularNoiseLookupType; }
 
 	// Sets relative frequency on the cellular noise lookup return type
 	// Default: 0.2
-	void SetCellularNoiseLookupFrequency(float cellularNoiseLookupFrequency) { m_cellularNoiseLookupFrequency = cellularNoiseLookupFrequency; }
+	EXPORT void SetCellularNoiseLookupFrequency(float cellularNoiseLookupFrequency) { m_cellularNoiseLookupFrequency = cellularNoiseLookupFrequency; }
 
 	// Sets the 2 distance indicies used for distance2 return types
 	// Default: 0, 1
 	// Note: index0 should be lower than index1
 	// Both indicies must be >= 0, index1 must be < 4
-	void SetCellularDistance2Indicies(int cellularDistanceIndex0, int cellularDistanceIndex1);
+	EXPORT void SetCellularDistance2Indicies(int cellularDistanceIndex0, int cellularDistanceIndex1);
 
 	// Sets the maximum distance a cellular point can move from it's grid position
 	// Setting this high will make artifacts more common
 	// Default: 0.45
-	void SetCellularJitter(float cellularJitter) { m_cellularJitter = cellularJitter; }
+	EXPORT void SetCellularJitter(float cellularJitter) { m_cellularJitter = cellularJitter; }
 
 
 	// Enables position perturbing for all noise types
 	// Default: None
-	void SetPerturbType(PerturbType perturbType) { m_perturbType = perturbType; }
+	EXPORT void SetPerturbType(PerturbType perturbType) { m_perturbType = perturbType; }
 
 	// Sets the maximum distance the input position can be perturbed
 	// Default: 1.0
-	void SetPerturbAmp(float perturbAmp) { m_perturbAmp = perturbAmp / 511.5f; }
+	EXPORT void SetPerturbAmp(float perturbAmp) { m_perturbAmp = perturbAmp / 511.5f; }
 
 	// Set the relative frequency for the perturb gradient
 	// Default: 0.5
-	void SetPerturbFrequency(float perturbFrequency) { m_perturbFrequency = perturbFrequency; }
+	EXPORT void SetPerturbFrequency(float perturbFrequency) { m_perturbFrequency = perturbFrequency; }
 
 
 	// Sets octave count for perturb fractal types
 	// Default: 3
-	void SetPerturbFractalOctaves(int perturbOctaves) { m_perturbOctaves = perturbOctaves; m_perturbFractalBounding = CalculateFractalBounding(m_perturbOctaves, m_perturbGain); }
+	EXPORT void SetPerturbFractalOctaves(int perturbOctaves) { m_perturbOctaves = perturbOctaves; m_perturbFractalBounding = CalculateFractalBounding(m_perturbOctaves, m_perturbGain); }
 
 	// Sets octave lacunarity for perturb fractal types
 	// Default: 2.0
-	void SetPerturbFractalLacunarity(float perturbLacunarity) { m_perturbLacunarity = perturbLacunarity; }
+	EXPORT void SetPerturbFractalLacunarity(float perturbLacunarity) { m_perturbLacunarity = perturbLacunarity; }
 
 	// Sets octave gain for perturb fractal types
 	// Default: 0.5
-	void SetPerturbFractalGain(float perturbGain) { m_perturbGain = perturbGain; m_perturbFractalBounding = CalculateFractalBounding(m_perturbOctaves, m_perturbGain);	}
+	EXPORT void SetPerturbFractalGain(float perturbGain) { m_perturbGain = perturbGain; m_perturbFractalBounding = CalculateFractalBounding(m_perturbOctaves, m_perturbGain);	}
 
 	// Sets the length for vectors after perturb normalising
 	// Default: 1.0
-	void SetPerturbNormaliseLength(float perturbNormaliseLength) { m_perturbNormaliseLength = perturbNormaliseLength; }
+	EXPORT void SetPerturbNormaliseLength(float perturbNormaliseLength) { m_perturbNormaliseLength = perturbNormaliseLength; }
 
 
 	static FastNoiseVectorSet* GetVectorSet(int xSize, int ySize, int zSize);
@@ -244,8 +254,8 @@ public:
 	static void FillSamplingVectorSet(FastNoiseVectorSet* vectorSet, int sampleScale, int xSize, int ySize, int zSize);
 
 	float* GetNoiseSet(int xStart, int yStart, int zStart, int xSize, int ySize, int zSize, float scaleModifier = 1.0f);
-	void FillNoiseSet(float* noiseSet, int xStart, int yStart, int zStart, int xSize, int ySize, int zSize, float scaleModifier = 1.0f);
-	void FillNoiseSet(float* noiseSet, FastNoiseVectorSet* vectorSet, float xOffset = 0.0f, float yOffset = 0.0f, float zOffset = 0.0f);
+	EXPORT void FillNoiseSet(float* noiseSet, int xStart, int yStart, int zStart, int xSize, int ySize, int zSize, float scaleModifier = 1.0f);
+	EXPORT void FillNoiseSet(float* noiseSet, FastNoiseVectorSet* vectorSet, float xOffset = 0.0f, float yOffset = 0.0f, float zOffset = 0.0f);
 
 	float* GetSampledNoiseSet(int xStart, int yStart, int zStart, int xSize, int ySize, int zSize, int sampleScale);
 	virtual void FillSampledNoiseSet(float* noiseSet, int xStart, int yStart, int zStart, int xSize, int ySize, int zSize, int sampleScale) = 0;
@@ -287,7 +297,7 @@ public:
 	virtual void FillCubicSet(float* noiseSet, FastNoiseVectorSet* vectorSet, float xOffset = 0.0f, float yOffset = 0.0f, float zOffset = 0.0f) = 0;
 	virtual void FillCubicFractalSet(float* noiseSet, FastNoiseVectorSet* vectorSet, float xOffset = 0.0f, float yOffset = 0.0f, float zOffset = 0.0f) = 0;
 
-	virtual ~FastNoiseSIMD() { }
+	EXPORT virtual ~FastNoiseSIMD() { }
 
 protected:
 	int m_seed = 1337;
@@ -323,7 +333,7 @@ protected:
 	float m_perturbNormaliseLength = 1.0f;
 
 	static int s_currentSIMDLevel;
-	static float CalculateFractalBounding(int octaves, float gain);
+	EXPORT static float CalculateFractalBounding(int octaves, float gain);
 };
 
 struct FastNoiseVectorSet
@@ -340,15 +350,15 @@ public:
 	int sampleSizeY = -1;
 	int sampleSizeZ = -1;
 
-	FastNoiseVectorSet() {}
+	EXPORT FastNoiseVectorSet() {}
 
-	FastNoiseVectorSet(int _size) { SetSize(_size); }
+	EXPORT FastNoiseVectorSet(int _size) { SetSize(_size); }
 
-	~FastNoiseVectorSet() { Free(); }
+	EXPORT ~FastNoiseVectorSet() { Free(); }
 
-	void Free();
+	EXPORT void Free();
 
-	void SetSize(int _size);
+	EXPORT void SetSize(int _size);
 };
 
 #define FN_CELLULAR_INDEX_MAX 3

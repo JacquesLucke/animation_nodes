@@ -75,14 +75,27 @@ def getExtensionFromPath(path):
     metadata = getCythonMetadata(path)
     moduleName = metadata["module_name"]
 
-    if "distutils" in metadata:
-        directory = os.path.dirname(path)
-        files = metadata["distutils"].get("sources", [])
-        sources = [os.path.join(directory, filePath) for filePath in files]
-    else:
-        sources = []
+    kwargs = {
+        "sources" : [],
+        "library_dirs" : []
+    }
 
-    return Extension(moduleName, [path] + sources)
+    directory = os.path.dirname(path)
+    usedRelPathAttributes = ["sources", "extra_objects"]
+    usedUnchangedAttributes = ["libraries", "depends", "extra_link_args"]
+
+    if "distutils" in metadata:
+
+        for attribute in usedRelPathAttributes:
+            _paths = metadata["distutils"].get(attribute, [])
+            kwargs[attribute] = [os.path.join(directory, p) for o in _paths]
+
+        for attribute in usedUnchangedAttributes:
+            kwargs[attribute] = metadata["distutils"].get(attribute, [])
+
+    kwargs["sources"].append(path)
+    kwargs["library_dirs"].append(directory)
+    return Extension(moduleName, **kwargs)
 
 def buildExtensionInplace(extension):
     from distutils.core import setup

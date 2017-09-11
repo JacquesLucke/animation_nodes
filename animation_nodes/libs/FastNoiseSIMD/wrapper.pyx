@@ -1,6 +1,6 @@
 # distutils: language = c++
-# TODO: make path cross platform
-# distutils: sources = source/FastNoiseSIMD.cpp source/FastNoiseSIMD_sse2.cpp source/FastNoiseSIMD_sse41.cpp source/FastNoiseSIMD_internal.cpp
+# distutils: libraries = FastNoiseSIMD
+# distutils: extra_link_args = /NODEFAULTLIB:LIBCMT
 
 from ... math cimport Vector3, toVector3
 from ... data_structures cimport Vector3DList, FloatList
