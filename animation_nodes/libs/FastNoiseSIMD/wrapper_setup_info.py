@@ -22,8 +22,8 @@ def getWindowsArgs(utils):
         raise Exception(errorMessage)
 
     return {
-        "extra_link_args" : ["/NODEFAULTLIB:LIBCMT"],
-        "libraries" : ["FastNoiseSIMD_windows"]
+        "libraries" : ["FastNoiseSIMD_windows"],
+        "extra_link_args" : ["/NODEFAULTLIB:LIBCMT"]
     }
 
 def getLinuxArgs(utils):
@@ -31,7 +31,8 @@ def getLinuxArgs(utils):
         raise Exception(errorMessage)
 
     return {
-        "libraries" : ["FastNoiseSIMD_linux"]
+        "libraries" : ["FastNoiseSIMD_linux"],
+        "extra_compile_args" : ["-std=c++11"]
     }
 
 def getMacosArgs(utils):
