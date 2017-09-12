@@ -1,6 +1,4 @@
 # distutils: language = c++
-# distutils: libraries = FastNoiseSIMD
-# distutils: extra_link_args = /NODEFAULTLIB:LIBCMT
 
 from ... math cimport Vector3, toVector3
 from ... data_structures cimport Vector3DList, FloatList

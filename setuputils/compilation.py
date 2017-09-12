@@ -76,26 +76,36 @@ def getExtensionFromPath(path):
     moduleName = metadata["module_name"]
 
     kwargs = {
-        "sources" : [],
-        "library_dirs" : []
+        "sources" : [path],
+        "include_dirs" : [],
+        "define_macros" : [],
+        "undef_macros" : [],
+        "library_dirs" : [],
+        "libraries" : [],
+        "runtime_library_dirs" : [],
+        "extra_objects" : [],
+        "extra_compile_args" : [],
+        "extra_link_args" : [],
+        "export_symbols" : [],
+        "depends" : []
     }
 
-    directory = os.path.dirname(path)
-    usedRelPathAttributes = ["sources", "extra_objects"]
-    usedUnchangedAttributes = ["libraries", "depends", "extra_link_args", "extra_compile_args"]
+    infoFile = changeFileExtension(path, "_setup_info.py")
+    for key, values in getExtensionsArgsFromInfoFile(infoFile).items():
+        kwargs[key].extend(values)
 
-    if "distutils" in metadata:
-
-        for attribute in usedRelPathAttributes:
-            _paths = metadata["distutils"].get(attribute, [])
-            kwargs[attribute] = [os.path.join(directory, p) for o in _paths]
-
-        for attribute in usedUnchangedAttributes:
-            kwargs[attribute] = metadata["distutils"].get(attribute, [])
-
-    kwargs["sources"].append(path)
-    kwargs["library_dirs"].append(directory)
     return Extension(moduleName, **kwargs)
+
+def getExtensionsArgsFromInfoFile(infoFilePath):
+    if not fileExists(infoFilePath):
+        return {}
+
+    data = executePythonFile(infoFilePath)
+    fName = "getExtensionArgs"
+    if fName not in data:
+        return {}
+
+    return data[fName](Utils)
 
 def buildExtensionInplace(extension):
     from distutils.core import setup

@@ -1,4 +1,4 @@
-cdef extern from "FastNoiseSIMD.h":
+cdef extern from "source\FastNoiseSIMD.h":
     cdef cppclass FastNoiseSIMD:
 
         @staticmethod

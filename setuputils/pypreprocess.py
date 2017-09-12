@@ -72,10 +72,3 @@ class PyPreprocessTask(GenerateFileTask):
     def __repr__(self):
         return "<{} for '{}' depends on '{}'>".format(
             type(self).__name__, self.target, self.dependencies)
-
-class Utils:
-    readTextFile = readTextFile
-    writeTextFile = writeTextFile
-    readJsonFile = readJsonFile
-    changeFileName = changeFileName
-    multiReplace = multiReplace
