@@ -13,7 +13,7 @@ class VectorNoiseNode(bpy.types.Node, AnimationNode, Noise3DNodeBase):
 
     def create(self):
         self.newInput("Vector List", "Vectors", "vectors")
-        self.createSettingsInputs()
+        self.createNoiseInputs()
         self.newOutput("Float List", "Value", "value")
 
     def draw(self, layout):
