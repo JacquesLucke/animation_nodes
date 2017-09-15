@@ -36,10 +36,12 @@ def getLinuxArgs(utils):
     }
 
 def getMacosArgs(utils):
-    raise Exception("MacOS is not yet supported")
+    if not utils.fileExists(os.path.join(libraryDir, "libFastNoiseSIMD_macos.a")):
+        raise Exception(errorMessage)
 
     return {
-        "libraries" : ["FastNoiseSIMD_macos"]
+        "libraries" : ["FastNoiseSIMD_macos"],
+        "extra_compile_args" : ["-std=c++11"]
     }
 
 errorMessage = dedent("""
