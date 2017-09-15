@@ -13,8 +13,8 @@ def compile_FastNoiseSIMD(utils):
     if _platform.startswith("win"):
         subprocess.run(os.path.join(sourceDir, "compile_windows.bat"))
     elif _platform.startswith("linux"):
-        subprocess.run(os.path.join(sourceDir, "compile_linux.sh"))
+        subprocess.run(["sh", os.path.join(sourceDir, "compile_linux.sh")])
     elif _platform == "darwin":
-        subprocess.run(os.path.join(sourceDir, "compile_macos.sh"))
+        subprocess.run(["sh", os.path.join(sourceDir, "compile_macos.sh")])
     else:
         raise Exception("unknown platform, cannot compile")
