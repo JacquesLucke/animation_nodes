@@ -15,7 +15,7 @@ def compile_FastNoiseSIMD(utils):
     targetFile = os.path.join(sourceDir, targetName)
 
     if utils.dependenciesChanged(targetFile, sourceFiles):
-        subprocess.run(command)
+        subprocess.run(command, cwd = sourceDir)
     else:
         print("Nothing changed. Skipping.")
 

@@ -2,7 +2,6 @@
 :: If you don't have it, install Visual Studio 2017
 @echo off
 setlocal
-cd %~dp0
 
 :: -c      Create only .obj file
 :: /EHsc   Set appropriate error handling

@@ -1,4 +1,3 @@
-cd "${0%/*}"
 gcc -c FastNoiseSIMD.cpp -std=c++11 -fPIC -O3
 gcc -c FastNoiseSIMD_internal.cpp -std=c++11 -fPIC -O3
 gcc -c FastNoiseSIMD_sse2.cpp -std=c++11 -fPIC -O3 -msse2
