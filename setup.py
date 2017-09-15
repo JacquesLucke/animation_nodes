@@ -32,6 +32,7 @@ from setuputils.copy_addon import execute_CopyAddon
 from setuputils.pypreprocess import execute_PyPreprocess
 from setuputils.setup_info_files import getSetupInfoList
 from setuputils.export import execute_Export, execute_ExportC
+from setuputils.compile_libraries import execute_CompileLibraries
 
 addonDirectory = os.path.join(currentDirectory, "animation_nodes")
 summaryPath = os.path.join(currentDirectory, "setup_summary.json")
@@ -45,6 +46,7 @@ possibleCommands = ["build", "clean", "help"]
 
 buildOptionDescriptions = [
     ("--copy", "Copy build to location specified in the conf.json file"),
+    ("--libs", "Compile libraries"),
     ("--force", "Rebuild everything"),
     ("--export", "Create installable .zip file"),
     ("--exportc", "Create build that can be compiled without cython"),
@@ -124,6 +126,8 @@ def main_Build(options, configs):
     execute_Cythonize(setupInfoList, logger, addonDirectory)
 
     if "--nocompile" not in options:
+        if "--libs" in options:
+            execute_CompileLibraries(setupInfoList, logger, addonDirectory)
         execute_Compile(setupInfoList, logger, addonDirectory)
 
     execute_PrintSummary(logger)
@@ -169,6 +173,9 @@ def checkBuildOptions(options):
     if "--nocompile" in options:
         if "--copy" in options:
             print("The options --nocompile and --copy don't work together.")
+            sys.exit()
+        if "--libs" in options:
+            print("The options --nocompile and --libs don't work together.")
             sys.exit()
         if "--export" in options:
             print("The options --nocompile and --export don't work together.")
