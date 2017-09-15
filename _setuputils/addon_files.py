@@ -31,6 +31,6 @@ def isAddonFileIgnored(name):
     return any(name.endswith(ext) for ext in extensions) or name in names
 
 def isExportCFileIgnored(name):
-    extensions = [".src", ".html", ".so", ".pyd"]
-    names = {".gitignore", "__setup_info.py", "compilation_info.json"}
+    extensions = [".src", ".html", ".so", ".pyd", ".lib", ".a", ".obj"]
+    names = {".gitignore", "compilation_info.json"}
     return any(name.endswith(ext) for ext in extensions) or name in names

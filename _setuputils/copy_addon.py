@@ -2,8 +2,8 @@ import os
 from . generic import *
 from . addon_files import iterRelativeAddonFiles
 
-def execute_CopyAddon(addonDirectory, targetPath):
-    targetPath = os.path.join(targetPath, "animation_nodes")
+def execute_CopyAddon(addonDirectory, targetPath, addonName):
+    targetPath = os.path.join(targetPath, addonName)
     printHeader("Copy Addon")
     try:
         changes = syncDirectories(addonDirectory, targetPath, iterRelativeAddonFiles)

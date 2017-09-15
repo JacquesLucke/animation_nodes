@@ -1,52 +1,43 @@
 import os
-import sys
-from textwrap import dedent
+import subprocess
 
 directory = os.path.dirname(__file__)
-libraryDir = os.path.join(directory, "source")
+sourceDir = os.path.join(directory, "source")
+
+def getCompileLibraryTasks(utils):
+    return [compile_FastNoiseSIMD]
+
+def compile_FastNoiseSIMD(utils):
+    print("Compile FastNoiseSIMD\n")
+
+    sourceFiles = list(utils.iterPathsWithExtension(sourceDir, [".cpp", ".h"]))
+    targetName, command, _ = getCompileInfo(utils)
+    targetFile = os.path.join(sourceDir, targetName)
+
+    if utils.dependenciesChanged(targetFile, sourceFiles):
+        subprocess.run(command)
+    else:
+        print("Nothing changed. Skipping.")
 
 def getExtensionArgs(utils):
-    _platform = sys.platform
-    if _platform.startswith("win"):
-        args = getWindowsArgs(utils)
-    elif _platform.startswith("linux"):
-        args = getLinuxArgs(utils)
-    elif _platform == "darwin":
-        args = getMacosArgs(utils)
-
-    args["library_dirs"] = [libraryDir]
+    args = getCompileInfo(utils)[2]
+    args["library_dirs"] = [sourceDir]
     return args
 
-def getWindowsArgs(utils):
-    if not utils.fileExists(os.path.join(libraryDir, "FastNoiseSIMD_windows.lib")):
-        raise Exception(errorMessage)
-
-    return {
-        "libraries" : ["FastNoiseSIMD_windows"],
-        "extra_link_args" : ["/NODEFAULTLIB:LIBCMT"]
-    }
-
-def getLinuxArgs(utils):
-    if not utils.fileExists(os.path.join(libraryDir, "libFastNoiseSIMD_linux.a")):
-        raise Exception(errorMessage)
-
-    return {
-        "libraries" : ["FastNoiseSIMD_linux"],
-        "extra_compile_args" : ["-std=c++11"]
-    }
-
-def getMacosArgs(utils):
-    if not utils.fileExists(os.path.join(libraryDir, "libFastNoiseSIMD_macos.a")):
-        raise Exception(errorMessage)
-
-    return {
-        "libraries" : ["FastNoiseSIMD_macos"],
-        "extra_compile_args" : ["-std=c++11"]
-    }
-
-errorMessage = dedent("""
-
-    A precompiled static library of the FastNoiseSIMD library has not been found.
-    Please compile it by running the correct compilation script in this folder:
-        {}
-    """.format(libraryDir))
+def getCompileInfo(utils):
+    if utils.onWindows:
+        return ("FastNoiseSIMD_windows.lib",
+                [os.path.join(sourceDir, "compile_windows.bat")],
+                {"libraries" : ["FastNoiseSIMD_windows"],
+                 "extra_link_args" : ["/NODEFAULTLIB:LIBCMT"]})
+    if utils.onLinux:
+        return ("libFastNoiseSIMD_linux.a",
+                ["sh", os.path.join(sourceDir, "compile_linux.sh")],
+                {"libraries" : ["FastNoiseSIMD_linux"],
+                 "extra_compile_args" : ["-std=c++11"]})
+    if utils.onMacOS:
+        return ("libFastNoiseSIMD_macos.a",
+                ["sh", os.path.join(sourceDir, "compile_macos.sh")],
+                {"libraries" : ["FastNoiseSIMD_macos"],
+                 "extra_compile_args" : ["-std=c++11"]})
+    raise Exception("unknown platform")
