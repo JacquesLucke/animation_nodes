@@ -5,8 +5,13 @@ import stat
 import json
 import shutil
 import pathlib
+import functools
 
 _globals = set(globals().keys())
+
+onLinux = sys.platform.startswith("linux")
+onWindows = sys.platform.startswith("win")
+onMacOS = sys.platform == "darwin"
 
 def getPlatformSummary():
     summary = {
@@ -54,6 +59,11 @@ def iterPathsWithFileName(basepath, filename):
         if filename in files:
             yield os.path.join(root, filename)
 
+def iterAllFilePathsRecursive(directory):
+    for root, dirs, files in os.walk(directory):
+        for name in files:
+            yield os.path.join(root, name)
+
 def overwriteFile(source, target):
     removeFile(target)
     copyFile(source, target)
@@ -90,6 +100,14 @@ def tryGetFileAccessPermission(path):
             return True
     except:
         return False
+
+def readBinaryFile(path):
+    with open(path, "rb") as f:
+        return f.read()
+
+def writeBinaryFile(path, content):
+    with open(path, "wb") as f:
+        f.write(content)
 
 def readTextFile(path):
     with open(path, "rt") as f:
@@ -165,6 +183,13 @@ def readLinesBetween(path, start, stop):
                 break
     return "".join(lines)
 
+def getPyxTargetLanguage(path):
+    text = readTextFile(path)
+    if re.search(r"#\s*distutils\s*:\s*language\s*=\s*c\+\+", text):
+        return "c++"
+    else:
+        return "c"
+
 def syncDirectories(source, target, relpathSelector):
     if not directoryExists(target):
         os.mkdir(target)
@@ -205,4 +230,41 @@ def syncDirectories(source, target, relpathSelector):
         "updated" : updatedFiles
     }
 
-__all__ = list(set(globals().keys()) - _globals - {"_globals"})
+def returnChangedFileStates(directory):
+    def _returnChangedFileStates(function):
+        @functools.wraps(function)
+        def wrapper(*args, **kwargs):
+            before = getAllFilesWithTimestamps(directory)
+            function(*args, **kwargs)
+            after = getAllFilesWithTimestamps(directory)
+
+            newFiles = set(after.keys()) - set(before.keys())
+            removedFiles = set(before.keys()) - set(after.keys())
+            changedFiles = {path for path, t in after.items() if t > before.get(path, 0)} - newFiles
+
+            return {
+                "new" : newFiles,
+                "removed" : removedFiles,
+                "changed" : changedFiles
+            }
+        return wrapper
+    return _returnChangedFileStates
+
+def getAllFilesWithTimestamps(directory):
+    result = {}
+    for path in iterAllFilePathsRecursive(directory):
+        result[path] = tryGetLastModificationTime(path)
+    return result
+
+
+allFunctions = list(set(globals().keys()) - _globals - {"_globals"})
+
+
+class Utils:
+    pass
+
+for fName in allFunctions:
+    setattr(Utils, fName, globals()[fName])
+
+
+__all__ = allFunctions + ["Utils"]

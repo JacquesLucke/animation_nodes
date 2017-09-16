@@ -12,17 +12,19 @@ if not os.path.samefile(currentDirectory, os.getcwd()):
 if currentDirectory not in sys.path:
     sys.path.append(currentDirectory)
 
-addonDirectory = os.path.join(currentDirectory, "animation_nodes")
-exportPath = os.path.join(currentDirectory, "animation_nodes.zip")
+addonName = "animation_nodes"
+addonDirectory = os.path.join(currentDirectory, addonName)
+exportPath = os.path.join(currentDirectory, "{}.zip".format(addonName))
 
-from setuputils.logger import Logger
-from setuputils.export import execute_Export
-from setuputils.compilation import execute_Compile
-from setuputils.setup_info_files import getSetupInfoList
+from _setuputils.export import execute_Export
+from _setuputils.compilation import execute_Compile
+from _setuputils.compile_libraries import execute_CompileLibraries
+from _setuputils.setup_info_files import getSetupInfoList
 
-logger = Logger()
 setupInfoList = getSetupInfoList(addonDirectory)
-execute_Compile(setupInfoList, logger, addonDirectory)
-execute_Export(addonDirectory, exportPath)
+
+execute_CompileLibraries(setupInfoList, addonDirectory)
+execute_Compile(setupInfoList, addonDirectory)
+execute_Export(addonDirectory, exportPath, addonName)
 
 print("\nDone.")

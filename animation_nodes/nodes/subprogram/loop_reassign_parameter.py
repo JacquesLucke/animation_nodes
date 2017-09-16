@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... base_types import AnimationNode
-from ... tree_info import getNodeByIdentifier, keepNodeState
+from ... tree_info import getNodeByIdentifier
 
 class ReassignLoopParameterNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ReassignLoopParameterNode"
@@ -34,7 +34,7 @@ class ReassignLoopParameterNode(bpy.types.Node, AnimationNode):
         if self.loopInputIdentifier == loopInput.identifier: return
         self.loopInputIdentifier = loopInput.identifier
 
-    @keepNodeState
+    @AnimationNode.keepNodeState
     def generateSockets(self):
         self.clearSockets()
         self.newInput(self.parameterDataType, "New Value", "newValue", defaultDrawType = "TEXT_ONLY")

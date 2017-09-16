@@ -1,15 +1,9 @@
 import os
-import re
-import io
 import sys
-import stat
 import json
-import glob
-import shutil
-import zipfile
-import pathlib
 import textwrap
-import contextlib
+import subprocess
+from pprint import pprint
 
 currentDirectory = os.path.dirname(os.path.abspath(__file__))
 
@@ -22,30 +16,28 @@ if not os.path.samefile(currentDirectory, os.getcwd()):
 if currentDirectory not in sys.path:
     sys.path.append(currentDirectory)
 
-from setuputils.generic import *
-from setuputils.addon_files import *
-from setuputils.logger import Logger
-from setuputils.task import GenerateFileTask
-from setuputils.cythonize import execute_Cythonize
-from setuputils.compilation import execute_Compile
-from setuputils.copy_addon import execute_CopyAddon
-from setuputils.pypreprocess import execute_PyPreprocess
-from setuputils.setup_info_files import getSetupInfoList
-from setuputils.export import execute_Export, execute_ExportC
+from _setuputils.generic import *
+from _setuputils.addon_files import *
+from _setuputils.cythonize import execute_Cythonize
+from _setuputils.compilation import execute_Compile
+from _setuputils.copy_addon import execute_CopyAddon
+from _setuputils.pypreprocess import execute_PyPreprocess
+from _setuputils.setup_info_files import getSetupInfoList
+from _setuputils.export import execute_Export, execute_ExportC
+from _setuputils.compile_libraries import execute_CompileLibraries
 
-addonDirectory = os.path.join(currentDirectory, "animation_nodes")
-summaryPath = os.path.join(currentDirectory, "setup_summary.json")
+addonName = "animation_nodes"
+addonDirectory = os.path.join(currentDirectory, addonName)
 defaultConfigPath = os.path.join(currentDirectory, "conf.default.json")
 configPath = os.path.join(currentDirectory, "conf.json")
-exportPath = os.path.join(currentDirectory, "animation_nodes.zip")
-exportCPath = os.path.join(currentDirectory, "animation_nodes_c.zip")
+exportPath = os.path.join(currentDirectory, "{}.zip".format(addonName))
+exportCPath = os.path.join(currentDirectory, "{}_c.zip".format(addonName))
 exportCSetupPath = os.path.join(currentDirectory, "_export_c_setup.py")
 
-possibleCommands = ["build", "clean", "help"]
+possibleCommands = ["build", "help", "clean"]
 
 buildOptionDescriptions = [
     ("--copy", "Copy build to location specified in the conf.json file"),
-    ("--force", "Rebuild everything"),
     ("--export", "Create installable .zip file"),
     ("--exportc", "Create build that can be compiled without cython"),
     ("--nocompile", "Don't compile the extension modules"),
@@ -97,11 +89,44 @@ def main_Help():
     Possible commands:
         help                Show this help
         build               Build the addon from sources
-        clean               Remove generated files
+        clean               Remove all untracked files except conf.py
 
     The 'build' command has multiple options:'''))
     for option, description in buildOptionDescriptions:
         print("    {:20}{}".format(option, description))
+
+
+# Clean
+####################################################
+
+def main_Clean():
+    answer = input("Remove all files? [y/n] ").lower()
+    print()
+    if answer == "y":
+        removedFiles = removeUntrackedFiles(filesToKeep = ["conf.json"])["removed"]
+        print("Cleanup Finished.")
+        print("Removed {} files.".format(len(removedFiles)))
+    else:
+        print("Operation canceled.")
+        sys.exit()
+
+@returnChangedFileStates(currentDirectory)
+def removeUntrackedFiles(filesToKeep):
+    storedFiles = {}
+    for path in filesToKeep:
+        if fileExists(path):
+            storedFiles[path] = readBinaryFile(path)
+
+    try:
+        pipe = subprocess.PIPE
+        subprocess.run(["git", "clean", "-fdx"], stdout = pipe, stderr = pipe)
+    except FileNotFoundError:
+        print("git is required but not installed")
+        sys.exit()
+
+    for path, content in storedFiles.items():
+        writeBinaryFile(path, content)
+
 
 
 # Build
@@ -114,31 +139,48 @@ def main_Build(options, configs):
     )
     checkBuildOptions(options)
 
-    if "--force" in options and fileExists(summaryPath):
-        main_Clean()
-
-    logger = Logger()
-    setupInfoList = getSetupInfoList(addonDirectory)
-
-    execute_PyPreprocess(setupInfoList, logger, addonDirectory)
-    execute_Cythonize(setupInfoList, logger, addonDirectory)
-
-    if "--nocompile" not in options:
-        execute_Compile(setupInfoList, logger, addonDirectory)
-
-    execute_PrintSummary(logger)
-    execute_SaveSummary(logger)
+    changedFileStates = build(skipCompilation = "--nocompile" in options)
+    printChangedFileStates(changedFileStates, currentDirectory)
 
     if "--copy" in options:
         copyTarget = configs["Copy Target"]
         if not directoryExists(copyTarget):
-            print("\nCopy Target not found. Please correct the conf.json file.")
+            print("Copy Target not found. Please correct the conf.json file.")
         else:
-            execute_CopyAddon(addonDirectory, configs["Copy Target"])
+            execute_CopyAddon(addonDirectory, configs["Copy Target"], addonName)
+            print()
     if "--export" in options:
-        execute_Export(addonDirectory, exportPath)
+        execute_Export(addonDirectory, exportPath, addonName)
     if "--exportc" in options:
-        execute_ExportC(addonDirectory, exportCPath, exportCSetupPath)
+        execute_ExportC(addonDirectory, exportCPath, exportCSetupPath, addonName)
+
+def printChangedFileStates(states, basepath):
+    printHeader("File System Changes")
+
+    print("New Files:")
+    printIndentedPathList(states["new"], basepath)
+    print("\nRemoved Files:")
+    printIndentedPathList(states["removed"], basepath)
+    print("\nModified Files:")
+    printIndentedPathList(states["changed"], basepath)
+
+def printIndentedPathList(paths, basepath):
+    if len(paths) == 0:
+        print("  <none>")
+    else:
+        for path in sorted(paths):
+            print("  {}".format(os.path.relpath(path, basepath)))
+
+@returnChangedFileStates(currentDirectory)
+def build(skipCompilation = False):
+    setupInfoList = getSetupInfoList(addonDirectory)
+
+    execute_PyPreprocess(setupInfoList, addonDirectory)
+    execute_Cythonize(setupInfoList, addonDirectory)
+
+    if not skipCompilation:
+        execute_CompileLibraries(setupInfoList, addonDirectory)
+        execute_Compile(setupInfoList, addonDirectory)
 
 def checkBuildEnvironment(checkCython, checkPython):
     if checkCython:
@@ -173,66 +215,6 @@ def checkBuildOptions(options):
         if "--export" in options:
             print("The options --nocompile and --export don't work together.")
             sys.exit()
-
-
-# Clean
-####################################################
-
-def main_Clean():
-    if not fileExists(summaryPath):
-        print("No summary of previous compilation found.")
-        sys.exit()
-
-    summary = readJsonFile(summaryPath)
-    for path in summary["Generated Files"]:
-        if fileExists(path):
-            removeFile(path)
-            print("Removed:", path)
-
-    buildDirectory = os.path.join(currentDirectory, "build")
-    if directoryExists(buildDirectory):
-        removeDirectory(buildDirectory)
-        print("Removed build directory")
-
-
-# Summary
-###########################################
-
-def execute_PrintSummary(logger):
-    printHeader("Summary")
-
-    changedPaths = logger.getChangedFiles()
-    for path in changedPaths:
-        print("Changed: " + os.path.relpath(path, currentDirectory))
-
-    print("\n{} files changed".format(len(changedPaths)))
-
-
-# Save Summary
-###########################################
-
-def execute_SaveSummary(logger):
-    summary = getSummary(logger)
-    writeJsonFile(summaryPath, summary)
-    print("\nSave Summary: " + os.path.basename(summaryPath))
-
-def getSummary(logger):
-    return {
-        "PyPreprocess" : getPyPreprocessSummary(logger),
-        "Cythonize" : getCythonizeSummary(logger),
-        "Compilation" : getCompilationSummary(logger),
-        "Platform" : getPlatformSummary(),
-        "Generated Files" : logger.getGeneratedFiles()
-    }
-
-def getPyPreprocessSummary(logger):
-    return [task.getSummary() for task in logger.pyPreprocessTasks]
-
-def getCythonizeSummary(logger):
-    return [task.getSummary() for task in logger.cythonizeTasks]
-
-def getCompilationSummary(logger):
-    return [task.getSummary() for task in logger.compilationTasks]
 
 
 # Run Main

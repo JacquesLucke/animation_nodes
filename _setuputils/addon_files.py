@@ -26,11 +26,11 @@ def isAddonDirectoryIgnored(name):
     return name in {".git", "__pycache__"}
 
 def isAddonFileIgnored(name):
-    extensions = [".src", ".pxd", ".pyx", ".html", ".c"]
+    extensions = [".src", ".pxd", ".pyx", ".html", ".c", ".cpp", ".h", ".lib", ".a", ".o", ".obj", ".sh", ".bat"]
     names = {".gitignore", "__setup_info.py"}
     return any(name.endswith(ext) for ext in extensions) or name in names
 
 def isExportCFileIgnored(name):
-    extensions = [".src", ".html", ".so", ".pyd"]
-    names = {".gitignore", "__setup_info.py", "compilation_info.json"}
+    extensions = [".src", ".html", ".so", ".pyd", ".lib", ".a", ".obj"]
+    names = {".gitignore", "compilation_info.json"}
     return any(name.endswith(ext) for ext in extensions) or name in names

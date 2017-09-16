@@ -2,7 +2,6 @@ import re
 import bpy
 from bpy.props import *
 from ... utils.code import isCodeValid
-from ... tree_info import keepNodeState
 from ... base_types import AnimationNode
 from ... utils.layout import splitAlignment
 from ... events import executionCodeChanged
@@ -57,7 +56,7 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
         self.newInput("Node Control", "New Input")
         self.newOutput("Generic", "Result", "result")
 
-    @keepNodeState
+    @AnimationNode.keepNodeState
     def recreateOutputSocket(self):
         self.clearOutputs()
         self.newOutput(self.outputDataType, "Result", "result")

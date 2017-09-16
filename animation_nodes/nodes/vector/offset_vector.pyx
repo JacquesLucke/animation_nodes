@@ -40,7 +40,7 @@ class OffsetVectorNode(bpy.types.Node, AnimationNode):
         else:
             self.newInput("Vector", "Vector", "inVector", dataIsModified = True)
             self.newInput("Falloff", "Falloff", "falloff")
-            self.newInput("Vector", "Offset", "offset")
+            self.newInput("Vector", "Offset", "offset", value = (0, 0, 1))
             self.newInput("Integer", "Index", "index")
             self.newOutput("Vector", "Vector", "outVector")
 

@@ -2,6 +2,7 @@ import re
 import bpy
 import types
 import random
+import functools
 from bpy.props import *
 from collections import defaultdict
 from ... import tree_info
@@ -14,7 +15,7 @@ from ... operators.callbacks import newNodeCallback
 from ... sockets.info import toIdName as toSocketIdName
 from ... utils.attributes import setattrRecursive, getattrRecursive
 from ... operators.dynamic_operators import getInvokeFunctionOperator
-from ... utils.nodes import getAnimationNodeTrees, iterAnimationNodes
+from ... utils.nodes import getAnimationNodeTrees, iterAnimationNodes, idToSocket
 from .. effects import PrependCodeEffect, ReturnDefaultsOnExceptionCodeEffect
 
 from ... utils.blender_ui import (
@@ -29,29 +30,9 @@ from ... execution.measurements import (
 from ... tree_info import (
     getNetworkWithNode, getOriginNodes,
     getLinkedInputsDict, getLinkedOutputsDict, iterLinkedOutputSockets,
-    iterUnlinkedInputSockets, keepNodeState
+    iterUnlinkedInputSockets, getDirectlyLinkedSocketsIDs
 )
 
-socketEffectsByIdentifier = defaultdict(list)
-
-class NonPersistentSocketData:
-    def __init__(self):
-        self.extraIdentifiers = set()
-        self.template = None
-
-    def initialize(self, template):
-        self.extraIdentifiers = template.getSocketIdentifiers()
-        self.template = template
-
-class NonPersistentNodeData:
-    def __init__(self):
-        self.inputs = defaultdict(NonPersistentSocketData)
-        self.outputs = defaultdict(NonPersistentSocketData)
-        self.codeEffects = []
-        self.errorMessage = None
-        self.showErrorMessage = True
-
-infoByNode = defaultdict(NonPersistentNodeData)
 
 class AnimationNode:
     bl_width_min = 40
@@ -72,6 +53,7 @@ class AnimationNode:
 
     searchTags = []
     onlySearchTags = False
+
     # can contain: 'NO_EXECUTION', 'NOT_IN_SUBPROGRAM',
     #              'NO_AUTO_EXECUTION'
     options = set()
@@ -222,7 +204,7 @@ class AnimationNode:
         if not self.isRefreshable:
             raise Exception("node is not refreshable")
 
-        @keepNodeState
+        @AnimationNode.keepNodeState
         def refreshAndKeepNodeState(self):
             self._refresh()
 
@@ -234,7 +216,7 @@ class AnimationNode:
 
     def _clear(self):
         self.clearSockets()
-        infoByNode.pop(self.identifier, None)
+        infoByNode[self.identifier].clearCurrentStateData()
 
     def _create(self):
         self.create()
@@ -248,6 +230,18 @@ class AnimationNode:
     @property
     def isRefreshable(self):
         return hasattr(self, "create")
+
+    @classmethod
+    def keepNodeState(cls, function):
+        @functools.wraps(function)
+        def wrapper(self, *args, **kwargs):
+            infoByNode[self.identifier].fullState.update(self)
+            result = function(self, *args, **kwargs)
+            infoByNode[self.identifier].fullState.tryToReapplyState(self)
+            return result
+        return wrapper
+
+
 
 
     # Socket Templates
@@ -602,6 +596,98 @@ class AnimationNode:
             yield ReturnDefaultsOnExceptionCodeEffect("self.ControlledExecutionException")
 
 
+
+# Non-Persistent data (will be removed when Blender is closed)
+###########################################################################
+
+nodeLabelMode = "DEFAULT"
+
+def updateNodeLabelMode():
+    global nodeLabelMode
+    nodeLabelMode = "DEFAULT"
+    if getExecutionCodeType() == "MEASURE":
+        nodeLabelMode = "MEASURE"
+
+
+class CurrentSocketData:
+    def __init__(self):
+        self.extraIdentifiers = set()
+        self.template = None
+
+    def initialize(self, template):
+        self.extraIdentifiers = template.getSocketIdentifiers()
+        self.template = template
+
+class SocketPropertyState:
+    @classmethod
+    def fromSocket(cls, node, socket):
+        self = cls()
+        self.hide = socket.hide
+        self.isUsed = socket.isUsed
+        self.data = socket.getProperty()
+        self.allIdentifiers = node.getAllIdentifiersOfSocket(socket)
+        return self
+
+class FullNodeState:
+    def __init__(self):
+        self.inputProperties = dict()
+        self.outputProperties = dict()
+        self.inputLinks = dict()
+        self.outputLinks = dict()
+
+    def update(self, node):
+        for socket in node.inputs:
+            state = SocketPropertyState.fromSocket(node, socket)
+            self.inputProperties[(socket.identifier, socket.dataType)] = state
+            self.inputLinks[socket.identifier] = getDirectlyLinkedSocketsIDs(socket)
+        for socket in node.outputs:
+            state = SocketPropertyState.fromSocket(node, socket)
+            self.outputProperties[(socket.identifier, socket.dataType)] = state
+            self.outputLinks[socket.identifier] = getDirectlyLinkedSocketsIDs(socket)
+
+    def tryToReapplyState(self, node):
+        for socket in node.inputs:
+            self.tryToReapplySocketState(socket, self.inputProperties, self.inputLinks)
+        for socket in node.outputs:
+            self.tryToReapplySocketState(socket, self.outputProperties, self.outputLinks)
+
+    def tryToReapplySocketState(self, socket, propertyData, linkData):
+        info = propertyData.get((socket.identifier, socket.dataType), None)
+        if info is None:
+            for info in propertyData.values():
+                if socket.identifier in info.allIdentifiers:
+                    socket.hide = info.hide
+                    socket.isUsed = info.isUsed
+                    break
+        else:
+            socket.hide = info.hide
+            socket.isUsed = info.isUsed
+            socket.setProperty(info.data)
+
+        for socketID in linkData.get(socket.identifier, []):
+            try: socket.linkWith(idToSocket(socketID))
+            except: pass
+
+class NonPersistentNodeData:
+    def __init__(self):
+        self.clearCurrentStateData()
+        self.fullState = FullNodeState()
+
+    def clearCurrentStateData(self):
+        '''data that can be cleared during every refresh'''
+        self.inputs = defaultdict(CurrentSocketData)
+        self.outputs = defaultdict(CurrentSocketData)
+        self.codeEffects = []
+        self.errorMessage = None
+        self.showErrorMessage = True
+
+infoByNode = defaultdict(NonPersistentNodeData)
+
+
+
+# Identifiers
+#####################################################
+
 @eventHandler("SCENE_UPDATE_POST")
 def createMissingIdentifiers(scene = None):
     def unidentifiedNodes():
@@ -631,15 +717,6 @@ def toString(code):
 def callSaveMethods():
     for node in iterAnimationNodes():
         node.save()
-
-
-nodeLabelMode = "DEFAULT"
-
-def updateNodeLabelMode():
-    global nodeLabelMode
-    nodeLabelMode = "DEFAULT"
-    if getExecutionCodeType() == "MEASURE":
-        nodeLabelMode = "MEASURE"
 
 
 

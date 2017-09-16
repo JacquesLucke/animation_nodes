@@ -2,12 +2,16 @@
 *.pyd
 *.py~
 *.c
+*.h
+*.cpp
 *.exp
 *.lib
 *.obj
 *.html
 *.so
 *.zip
+*.a
+*.o
 build/
 conf.json
 animation_nodes/compilation_info.json
