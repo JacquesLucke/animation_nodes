@@ -5,7 +5,9 @@ def execute_PyPreprocess(setupInfoList, addonDirectory):
     printHeader("Run PyPreprocessor")
 
     tasks = getPyPreprocessTasks(setupInfoList)
-    for task in tasks:
+    for i, task in enumerate(tasks):
+        relativePath = os.path.relpath(task.target, addonDirectory)
+        print("{}/{}: {}".format(i+1, len(tasks), relativePath))
         task.execute()
 
 def getPyPreprocessTasks(setupInfoList):
