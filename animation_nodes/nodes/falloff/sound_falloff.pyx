@@ -2,9 +2,8 @@ import bpy
 from bpy.props import *
 from ... base_types import AnimationNode
 from . constant_falloff import ConstantFalloff
+from ... data_structures cimport AverageSound, BaseFalloff, Interpolation
 from . interpolate_list_falloff import createIndexBasedFalloff, createFalloffBasedFalloff
-from ... data_structures cimport (AverageSound, BaseFalloff, CompoundFalloff,
-                                  DoubleList, Interpolation)
 
 soundTypeItems = [
     ("AVERAGE", "Average", "", "FORCE_TURBULENCE", 0),
@@ -117,7 +116,7 @@ class SoundFalloffNode(bpy.types.Node, AnimationNode):
         return createFalloffBasedFalloff(falloff, myList, interpolation)
 
     def getFrequenciesAtFrame(self, sound, frame):
-        myList = DoubleList.fromValues(sound.evaluate(frame))
+        myList = sound.evaluate(frame)
         if self.fadeLowFrequenciesToZero:
             myList = [0] + myList
         if self.fadeHighFrequenciesToZero:
@@ -136,5 +135,5 @@ cdef class Average_IndexOffset_SoundFalloff(BaseFalloff):
         self.dataType = "All"
         self.clamped = False
 
-    cdef double evaluate(self, void *object, long index):
+    cdef float evaluate(self, void *object, Py_ssize_t index):
         return self.sound.evaluate(self.frame - index * self.offsetInverse)

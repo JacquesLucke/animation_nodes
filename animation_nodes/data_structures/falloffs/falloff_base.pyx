@@ -12,7 +12,7 @@ cdef class Falloff:
 
 cdef class BaseFalloff(Falloff):
 
-    cdef double evaluate(BaseFalloff self, void* object, long index):
+    cdef float evaluate(self, void *object, Py_ssize_t index):
         raise NotImplementedError()
 
     def __repr__(self):
@@ -26,7 +26,7 @@ cdef class CompoundFalloff(Falloff):
     cdef list getClampingRequirements(self):
         return [False] * len(self.getDependencies())
 
-    cdef double evaluate(self, double* dependencyResults):
+    cdef float evaluate(self, float *dependencyResults):
         raise NotImplementedError()
 
     def __repr__(self):

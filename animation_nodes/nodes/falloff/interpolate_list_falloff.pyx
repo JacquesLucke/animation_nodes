@@ -1,9 +1,9 @@
 from . constant_falloff import ConstantFalloff
-from ... data_structures cimport (DoubleList, Falloff, BaseFalloff,
+from ... data_structures cimport (FloatList, Falloff, BaseFalloff,
                                   CompoundFalloff, Interpolation)
 
-def createIndexBasedFalloff(str extensionMode, DoubleList myList,
-                double length, double offset, Interpolation interpolation):
+def createIndexBasedFalloff(str extensionMode, FloatList myList,
+                float length, float offset, Interpolation interpolation):
     if len(myList) == 0:
         return ConstantFalloff(0)
     if len(myList) == 1 or length == 0:
@@ -18,7 +18,7 @@ def createIndexBasedFalloff(str extensionMode, DoubleList myList,
     else:
         raise Exception("invalid extension mode")
 
-def createFalloffBasedFalloff(Falloff falloff, DoubleList myList, Interpolation interpolation):
+def createFalloffBasedFalloff(Falloff falloff, FloatList myList, Interpolation interpolation):
     if len(myList) == 0:
         return ConstantFalloff(0)
     if len(myList) == 1:
@@ -26,10 +26,10 @@ def createFalloffBasedFalloff(Falloff falloff, DoubleList myList, Interpolation 
 
     return Falloff_InterpolateDoubleListFalloff(falloff, myList, interpolation)
 
-cdef double evaluatePosition(double x, DoubleList myList, Interpolation interpolation):
-    cdef long indexBefore = <int>x
+cdef float evaluatePosition(float x, FloatList myList, Interpolation interpolation):
+    cdef Py_ssize_t indexBefore = <Py_ssize_t>x
     cdef float influence = interpolation.evaluate(x - <float>indexBefore)
-    cdef long indexAfter
+    cdef Py_ssize_t indexAfter
     if indexBefore < myList.length - 1:
         indexAfter = indexBefore + 1
     else:
@@ -38,11 +38,11 @@ cdef double evaluatePosition(double x, DoubleList myList, Interpolation interpol
 
 cdef class BaseInterpolateDoubleListFalloff(BaseFalloff):
     cdef:
-        DoubleList myList
+        FloatList myList
         Interpolation interpolation
-        double length, offset
+        float length, offset
 
-    def __cinit__(self, DoubleList myList, double length, double offset, Interpolation interpolation):
+    def __cinit__(self, FloatList myList, float length, float offset, Interpolation interpolation):
         self.myList = myList
         self.length = length
         self.offset = offset
@@ -51,26 +51,26 @@ cdef class BaseInterpolateDoubleListFalloff(BaseFalloff):
         self.clamped = False
 
 cdef class Loop_InterpolateDoubleListFalloff(BaseInterpolateDoubleListFalloff):
-    cdef double evaluate(self, void *object, long _index):
-        cdef double index = (<double>_index + self.offset) % self.length
-        cdef double x = index / (self.length - 1) * (self.myList.length - 1)
+    cdef float evaluate(self, void *object, Py_ssize_t _index):
+        cdef float index = (<float>_index + self.offset) % self.length
+        cdef float x = index / (self.length - 1) * (self.myList.length - 1)
         return evaluatePosition(x, self.myList, self.interpolation)
 
 cdef class Extend_InterpolateDoubleListFalloff(BaseInterpolateDoubleListFalloff):
-    cdef double evaluate(self, void *object, long _index):
-        cdef double index = <double>_index + self.offset
+    cdef float evaluate(self, void *object, Py_ssize_t _index):
+        cdef float index = <float>_index + self.offset
         index = min(max(index, 0), self.length - 1)
-        cdef double x = index / (self.length - 1) * (self.myList.length - 1)
+        cdef float x = index / (self.length - 1) * (self.myList.length - 1)
         return evaluatePosition(x, self.myList, self.interpolation)
 
 
 cdef class Falloff_InterpolateDoubleListFalloff(CompoundFalloff):
     cdef:
         Falloff falloff
-        DoubleList myList
+        FloatList myList
         Interpolation interpolation
 
-    def __cinit__(self, Falloff falloff, DoubleList myList, Interpolation interpolation):
+    def __cinit__(self, Falloff falloff, FloatList myList, Interpolation interpolation):
         self.falloff = falloff
         self.myList = myList
         self.interpolation = interpolation
@@ -82,6 +82,6 @@ cdef class Falloff_InterpolateDoubleListFalloff(CompoundFalloff):
     cdef list getClampingRequirements(self):
         return [True]
 
-    cdef double evaluate(self, double *dependencyResults):
-        cdef double x = dependencyResults[0] * (self.myList.length - 1)
+    cdef float evaluate(self, float *dependencyResults):
+        cdef float x = dependencyResults[0] * (self.myList.length - 1)
         return evaluatePosition(x, self.myList, self.interpolation)

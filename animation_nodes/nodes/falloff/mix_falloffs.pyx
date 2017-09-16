@@ -80,19 +80,19 @@ cdef class MixTwoFalloffsBase(CompoundFalloff):
         return [self.a, self.b]
 
 cdef class AddTwoFalloffs(MixTwoFalloffsBase):
-    cdef double evaluate(self, double *dependencyResults):
+    cdef float evaluate(self, float *dependencyResults):
         return dependencyResults[0] + dependencyResults[1]
 
 cdef class MultiplyTwoFalloffs(MixTwoFalloffsBase):
-    cdef double evaluate(self, double *dependencyResults):
+    cdef float evaluate(self, float *dependencyResults):
         return dependencyResults[0] * dependencyResults[1]
 
 cdef class MinTwoFalloffs(MixTwoFalloffsBase):
-    cdef double evaluate(self, double *dependencyResults):
+    cdef float evaluate(self, float *dependencyResults):
         return min(dependencyResults[0], dependencyResults[1])
 
 cdef class MaxTwoFalloffs(MixTwoFalloffsBase):
-    cdef double evaluate(self, double *dependencyResults):
+    cdef float evaluate(self, float *dependencyResults):
         return max(dependencyResults[0], dependencyResults[1])
 
 
@@ -110,34 +110,34 @@ cdef class MixFalloffsBase(CompoundFalloff):
         return self.falloffs
 
 cdef class AddFalloffs(MixFalloffsBase):
-    cdef double evaluate(self, double *dependencyResults):
+    cdef float evaluate(self, float *dependencyResults):
         cdef int i
-        cdef double sum = 0
+        cdef float sum = 0
         for i in range(self.amount):
             sum += dependencyResults[i]
         return sum
 
 cdef class MultiplyFalloffs(MixFalloffsBase):
-    cdef double evaluate(self, double *dependencyResults):
+    cdef float evaluate(self, float *dependencyResults):
         cdef int i
-        cdef double product = 1
+        cdef float product = 1
         for i in range(self.amount):
             product *= dependencyResults[i]
         return product
 
 cdef class MinFalloffs(MixFalloffsBase):
-    cdef double evaluate(self, double *dependencyResults):
+    cdef float evaluate(self, float *dependencyResults):
         cdef int i
-        cdef double minValue = dependencyResults[0]
+        cdef float minValue = dependencyResults[0]
         for i in range(1, self.amount):
             if dependencyResults[i] < minValue:
                 minValue = dependencyResults[i]
         return minValue
 
 cdef class MaxFalloffs(MixFalloffsBase):
-    cdef double evaluate(self, double *dependencyResults):
+    cdef float evaluate(self, float *dependencyResults):
         cdef int i
-        cdef double maxValue = dependencyResults[0]
+        cdef float maxValue = dependencyResults[0]
         for i in range(1, self.amount):
             if dependencyResults[i] > maxValue:
                 maxValue = dependencyResults[i]
