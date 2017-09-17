@@ -5,7 +5,7 @@ from ... events import propertyChanged
 from ... utils.clamp cimport clampLong
 from ... math cimport Vector3, toVector3
 from ... base_types import AnimationNode, VectorizedSocket
-from ... data_structures cimport Falloff, FalloffEvaluator, Vector3DList, CDefaultList
+from ... data_structures cimport Falloff, FalloffEvaluator, Vector3DList, VirtualVector3DList, FloatList
 
 specifiedStateItems = [
     ("START", "Start", "Given vector(s) set the start state", "NONE", 0),
@@ -56,38 +56,37 @@ class OffsetVectorNode(bpy.types.Node, AnimationNode):
             return "execute_Single"
 
     def execute_Single(self, vector, Falloff falloff, offset, index):
-        cdef:
-            FalloffEvaluator evaluator = self.getFalloffEvaluator(falloff)
-            Vector3 _vector = toVector3(vector)
-            long _index = clampLong(index)
-            double influence
+        cdef FalloffEvaluator evaluator = self.getFalloffEvaluator(falloff)
+        cdef float influence = evaluator(vector, index)
 
-        influence = evaluator.evaluate(&_vector, _index)
         if self.specifiedState == "END":
-            influence = 1 - influence
+            influence = <float>1 - influence
+
         vector[0] += offset[0] * influence
         vector[1] += offset[1] * influence
         vector[2] += offset[2] * influence
         return vector
 
     def execute_List(self, Vector3DList vectors, falloff, offset):
-        cdef:
-            FalloffEvaluator evaluator = self.getFalloffEvaluator(falloff)
-            Vector3 *_vectors = vectors.data
-            CDefaultList _offsets = CDefaultList(Vector3DList, offset, (0, 0, 0))
-            Vector3 *_offset
-            double influence
-            bint isStartState = self.specifiedState == "START"
-            long i
+        cdef FalloffEvaluator evaluator = self.getFalloffEvaluator(falloff)
+        cdef FloatList influences = evaluator.evaluateList(vectors)
+        cdef VirtualVector3DList _offsets = VirtualVector3DList.fromListOrElement(offset, (0, 0, 0))
+        cdef bint isStartState = self.specifiedState == "START"
+
+        cdef Vector3 *_offset
+        cdef float influence
+        cdef Py_ssize_t i
 
         for i in range(len(vectors)):
-            influence = evaluator.evaluate(_vectors + i, i)
+            influence = influences.data[i]
+
             if not isStartState:
-                influence = 1 - influence
-            _offset = <Vector3*>_offsets.get(i)
-            _vectors[i].x += _offset.x * influence
-            _vectors[i].y += _offset.y * influence
-            _vectors[i].z += _offset.z * influence
+                influence = <float>1 - influence
+
+            _offset = _offsets.get(i)
+            vectors.data[i].x += _offset.x * influence
+            vectors.data[i].y += _offset.y * influence
+            vectors.data[i].z += _offset.z * influence
 
         return vectors
 
