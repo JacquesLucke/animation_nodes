@@ -112,8 +112,8 @@ cdef createCompoundEvaluator_Generic(CompoundFalloff falloff, str sourceType, Ev
 
     settings.falloff = <PyObject*>falloff
     settings.dependencyAmount = amount
-    settings.dependencyResults = <float*>PyMem_Malloc(sizeof(float)  *amount)
-    settings.dependencySettings = <void**>PyMem_Malloc(sizeof(char*)  *amount)
+    settings.dependencyResults = <float*>PyMem_Malloc(sizeof(float) * amount)
+    settings.dependencySettings = <void**>PyMem_Malloc(sizeof(void*) * amount)
     settings.dependencyFunctions = <EvaluatorFunction*>PyMem_Malloc(sizeof(EvaluatorFunction)  *amount)
 
     for i in range(amount):
@@ -241,7 +241,6 @@ cdef float evaluateClamping(void *settings, void *value, Py_ssize_t index):
 
 # Evaluator Function Wrapper
 #########################################################
-from ... math cimport toPyVector3, Vector3
 
 cdef class EvaluatorFunctionEvaluator(FalloffEvaluator):
     cdef void *settings
