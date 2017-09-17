@@ -34,6 +34,27 @@ cdef class FalloffEvaluator:
     def __call__(self, object value, Py_ssize_t index):
         return self.pyEvaluate(value, index)
 
+
+cdef class EvaluatorFunctionEvaluator(FalloffEvaluator):
+    cdef void *settings
+    cdef EvaluatorFunction function
+    cdef void *pyConversionBuffer
+
+    cdef allocatePyConversionBuffer(self):
+        self.pyConversionBuffer = PyMem_Malloc(self.sourceType.cSize)
+
+    def __dealloc__(self):
+        freeEvaluatorFunction(self.function, self.settings)
+        PyMem_Free(self.pyConversionBuffer)
+
+    cdef float evaluate(self, void *value, Py_ssize_t index):
+        return self.function(self.settings, value, index)
+
+    cdef pyEvaluate(self, object value, Py_ssize_t index):
+        self.sourceType.pyConversion(value, self.pyConversionBuffer)
+        return self.evaluate(self.pyConversionBuffer, index)
+
+
 cdef createFalloffEvaluator(Falloff falloff, str sourceType, bint clamped = False):
     cdef:
         EvaluatorFunctionEvaluator evaluator
@@ -114,7 +135,7 @@ cdef createCompoundEvaluator_Generic(CompoundFalloff falloff, str sourceType, Ev
     settings.dependencyAmount = amount
     settings.dependencyResults = <float*>PyMem_Malloc(sizeof(float) * amount)
     settings.dependencySettings = <void**>PyMem_Malloc(sizeof(void*) * amount)
-    settings.dependencyFunctions = <EvaluatorFunction*>PyMem_Malloc(sizeof(EvaluatorFunction)  *amount)
+    settings.dependencyFunctions = <EvaluatorFunction*>PyMem_Malloc(sizeof(EvaluatorFunction) * amount)
 
     for i in range(amount):
         createEvaluatorFunction(dependencies[i], sourceType, clampingRequirements[i],
@@ -237,26 +258,3 @@ cdef float evaluateClamping(void *settings, void *value, Py_ssize_t index):
     if result > 1: return 1
     if result < 0: return 0
     return result
-
-
-# Evaluator Function Wrapper
-#########################################################
-
-cdef class EvaluatorFunctionEvaluator(FalloffEvaluator):
-    cdef void *settings
-    cdef EvaluatorFunction function
-    cdef void *pyConversionBuffer
-
-    cdef allocatePyConversionBuffer(self):
-        self.pyConversionBuffer = PyMem_Malloc(self.sourceType.cSize)
-
-    def __dealloc__(self):
-        freeEvaluatorFunction(self.function, self.settings)
-        PyMem_Free(self.pyConversionBuffer)
-
-    cdef float evaluate(self, void *value, Py_ssize_t index):
-        return self.function(self.settings, value, index)
-
-    cdef pyEvaluate(self, object value, Py_ssize_t index):
-        self.sourceType.pyConversion(value, self.pyConversionBuffer)
-        return self.evaluate(self.pyConversionBuffer, index)
