@@ -3,10 +3,10 @@ cdef class Falloff:
         self.clamped = False
         self.evaluators = dict()
 
-    cpdef FalloffEvaluator getEvaluator(self, str sourceType, bint clamped = False, bint onlyC = False):
-        settings = (sourceType, clamped, onlyC)
+    cpdef FalloffEvaluator getEvaluator(self, str sourceType, bint clamped = False):
+        settings = (sourceType, clamped)
         if settings not in self.evaluators:
-            self.evaluators[settings] = FalloffEvaluator.create(self, sourceType, clamped, onlyC)
+            self.evaluators[settings] = FalloffEvaluator.create(self, sourceType, clamped)
         return self.evaluators[settings]
 
 

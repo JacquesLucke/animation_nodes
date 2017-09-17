@@ -3,9 +3,9 @@ from cpython.mem cimport PyMem_Malloc, PyMem_Free
 
 from . falloff_base cimport Falloff
 from . falloff_base cimport BaseFalloff, CompoundFalloff
+from . types cimport getFalloffSourceType, sourceTypeExists, EvaluateBaseConverted
 from ... math cimport Matrix4, Vector3, toVector3, toMatrix4
 
-ctypedef float (*BaseEvaluatorWithConversion)(BaseFalloff, void*, Py_ssize_t index)
 ctypedef float (*EvaluatorFunction)(void *settings, void *value, Py_ssize_t index)
 
 
@@ -14,20 +14,25 @@ ctypedef float (*EvaluatorFunction)(void *settings, void *value, Py_ssize_t inde
 
 cdef class FalloffEvaluator:
     @staticmethod
-    def create(Falloff falloff, str sourceType, bint clamped, bint onlyC):
-        cdef FalloffEvaluator evaluator = createFalloffEvaluator(falloff, sourceType, clamped)
+    def create(Falloff falloff, str sourceType, bint clamped):
+        if not sourceTypeExists(sourceType):
+            raise Exception("Unknown source type")
+
+        cdef FalloffEvaluator evaluator
+        evaluator = createFalloffEvaluator(falloff, sourceType, clamped)
+
         if evaluator is None:
             raise Exception("Cannot create FalloffEvaluator for this source type")
-        if not onlyC and evaluator.pyEvaluator is None:
-            raise Exception("Cannot evaluate this source type from Python. "
-                            "Consider to set the 'onlyC' parameter to True.")
         return evaluator
 
     cdef float evaluate(self, void *value, Py_ssize_t index):
         raise NotImplementedError()
 
+    cdef float pyEvaluate(self, object value, Py_ssize_t index):
+        raise NotImplementedError()
+
     def __call__(self, object value, Py_ssize_t index):
-        return self.pyEvaluator(self, value, index)
+        return self.pyEvaluate(value, index)
 
 cdef createFalloffEvaluator(Falloff falloff, str sourceType, bint clamped = False):
     cdef:
@@ -42,7 +47,8 @@ cdef createFalloffEvaluator(Falloff falloff, str sourceType, bint clamped = Fals
         evaluator = EvaluatorFunctionEvaluator()
         evaluator.function = function
         evaluator.settings = settings
-        evaluator.pyEvaluator = getPyEvaluator(sourceType)
+        evaluator.sourceType = getFalloffSourceType(sourceType)
+        evaluator.allocatePyConversionBuffer()
         return evaluator
     else:
         return None
@@ -51,7 +57,8 @@ cdef createFalloffEvaluator(Falloff falloff, str sourceType, bint clamped = Fals
 # Create Falloff Evaluators
 #########################################################
 
-cdef createEvaluatorFunction(Falloff falloff, str sourceType, bint clamped, EvaluatorFunction *outFunction, void **outSettings):
+cdef createEvaluatorFunction(Falloff falloff, str sourceType, bint clamped,
+                             EvaluatorFunction *outFunction, void **outSettings):
     cdef:
         EvaluatorFunction function = NULL
         void *settings = NULL
@@ -84,8 +91,8 @@ cdef createBaseEvaluator_NoConversion(BaseFalloff falloff, EvaluatorFunction *ou
     outSettings[0] = settings
 
 cdef createBaseEvaluator_Conversion(BaseFalloff falloff, str sourceType, EvaluatorFunction *outFunction, void **outSettings):
-    cdef BaseEvaluatorWithConversion evaluator
-    evaluator = getEvaluatorWithConversion(sourceType, falloff.dataType)
+    cdef EvaluateBaseConverted evaluator
+    evaluator = getFalloffSourceType(falloff.dataType).getConvertedCall(sourceType)
     if evaluator == NULL: return
 
     settings = <BaseSettings_Conversion*>PyMem_Malloc(sizeof(BaseSettings_Conversion))
@@ -182,7 +189,7 @@ cdef struct BaseSettings_NoConversion:
 
 cdef struct BaseSettings_Conversion:
     PyObject *falloff
-    BaseEvaluatorWithConversion evaluator
+    EvaluateBaseConverted evaluator
 
 cdef struct CompoundSettings_Generic:
     PyObject *falloff
@@ -238,47 +245,18 @@ cdef float evaluateClamping(void *settings, void *value, Py_ssize_t index):
 cdef class EvaluatorFunctionEvaluator(FalloffEvaluator):
     cdef void *settings
     cdef EvaluatorFunction function
+    cdef void *pyConversionBuffer
+
+    cdef allocatePyConversionBuffer(self):
+        self.pyConversionBuffer = PyMem_Malloc(self.sourceType.cSize)
 
     def __dealloc__(self):
         freeEvaluatorFunction(self.function, self.settings)
+        PyMem_Free(self.pyConversionBuffer)
 
     cdef float evaluate(self, void *value, Py_ssize_t index):
         return self.function(self.settings, value, index)
 
-
-# Value Conversion
-###########################################################
-
-cdef BaseEvaluatorWithConversion getEvaluatorWithConversion(str sourceType, str targetType):
-    if sourceType == "Transformation Matrix" and targetType == "Location":
-        return convert_TransformationMatrix_Location
-    return NULL
-
-cdef float convert_TransformationMatrix_Location(BaseFalloff falloff, void *value, Py_ssize_t index):
-    cdef Matrix4 *matrix = <Matrix4*>value
-    cdef Vector3 vector
-    vector.x = matrix.a14
-    vector.y = matrix.a24
-    vector.z = matrix.a34
-    return falloff.evaluate(&vector, index)
-
-
-# Evaluate falloff with Python objects
-###########################################################
-
-cdef getPyEvaluator(str sourceType):
-    if sourceType == "": return evaluate_None
-    if sourceType == "Location": return evaluate_PyVector
-    if sourceType == "Transformation Matrix": return evaluate_PyMatrix
-    return None
-
-def evaluate_None(FalloffEvaluator evaluator, object noObject, Py_ssize_t index):
-    return evaluator.evaluate(NULL, index)
-
-def evaluate_PyVector(FalloffEvaluator evaluator, object pyVector, Py_ssize_t index):
-    cdef Vector3 vector = toVector3(pyVector)
-    return evaluator.evaluate(&vector, index)
-
-def evaluate_PyMatrix(FalloffEvaluator evaluator, object pyMatrix, Py_ssize_t index):
-    cdef Matrix4 matrix = toMatrix4(pyMatrix)
-    return evaluator.evaluate(&matrix, index)
+    cdef float pyEvaluate(self, object value, Py_ssize_t index):
+        self.sourceType.pyConversion(value, self.pyConversionBuffer)
+        return self.evaluate(&self.pyConversionBuffer, index)
