@@ -28,7 +28,7 @@ cdef class FalloffEvaluator:
     cdef float evaluate(self, void *value, Py_ssize_t index):
         raise NotImplementedError()
 
-    cdef float pyEvaluate(self, object value, Py_ssize_t index):
+    cdef pyEvaluate(self, object value, Py_ssize_t index):
         raise NotImplementedError()
 
     def __call__(self, object value, Py_ssize_t index):
@@ -241,6 +241,7 @@ cdef float evaluateClamping(void *settings, void *value, Py_ssize_t index):
 
 # Evaluator Function Wrapper
 #########################################################
+from ... math cimport toPyVector3, Vector3
 
 cdef class EvaluatorFunctionEvaluator(FalloffEvaluator):
     cdef void *settings
@@ -257,6 +258,6 @@ cdef class EvaluatorFunctionEvaluator(FalloffEvaluator):
     cdef float evaluate(self, void *value, Py_ssize_t index):
         return self.function(self.settings, value, index)
 
-    cdef float pyEvaluate(self, object value, Py_ssize_t index):
+    cdef pyEvaluate(self, object value, Py_ssize_t index):
         self.sourceType.pyConversion(value, self.pyConversionBuffer)
-        return self.evaluate(&self.pyConversionBuffer, index)
+        return self.evaluate(self.pyConversionBuffer, index)
