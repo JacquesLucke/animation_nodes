@@ -215,18 +215,6 @@ def multiplyMatrixLists(Matrix4x4List listA, Matrix4x4List listB):
 # Various
 ###########################################
 
-def evaluateFalloffForMatrixList(Falloff falloff, Matrix4x4List matrices):
-    cdef Py_ssize_t i
-    cdef FalloffEvaluator evaluator
-    cdef DoubleList influences = DoubleList(length = len(matrices))
-
-    try: evaluator = falloff.getEvaluator("Transformation Matrix")
-    except: return None
-
-    for i in range(len(influences)):
-        influences.data[i] = evaluator.evaluate(matrices.data + i, i)
-    return influences
-
 def reduceMatrixList(Matrix4x4List matrices, bint reversed):
     cdef:
         Py_ssize_t i

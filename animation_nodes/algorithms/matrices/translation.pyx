@@ -5,7 +5,7 @@ from ... math cimport (
 )
 
 cpdef translateMatrixList(Matrix4x4List matrices, str type,
-                          VirtualVector3DList translations, DoubleList influences):
+                          VirtualVector3DList translations, FloatList influences):
     if len(matrices) != len(influences):
         raise Exception("amoutn of matrices and influences has to be equal")
 
