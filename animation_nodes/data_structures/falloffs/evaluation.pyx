@@ -12,6 +12,9 @@ ctypedef float (*EvaluatorFunction)(void *settings, void *value, Py_ssize_t inde
 # Interface for other files
 #########################################################
 
+from .. lists.clist cimport CList
+from .. lists.base_lists cimport FloatList
+
 cdef class FalloffEvaluator:
     @staticmethod
     def create(Falloff falloff, str sourceType, bint clamped):
@@ -30,6 +33,20 @@ cdef class FalloffEvaluator:
 
     cdef pyEvaluate(self, object value, Py_ssize_t index):
         raise NotImplementedError()
+
+    cdef void evaluateList_LowLevel(self, void *values, Py_ssize_t startIndex,
+                                    Py_ssize_t amount, float *target):
+        cdef Py_ssize_t offset = 0
+        cdef Py_ssize_t i
+        for i in range(amount):
+            target[i] = self.evaluate(<char*>values + offset, startIndex + i)
+            offset += self.sourceType.cSize
+
+    def evaluateList(self, CList values, Py_ssize_t startIndex = 0):
+        cdef Py_ssize_t amount = values.getLength()
+        cdef FloatList result = FloatList(length = amount)
+        self.evaluateList_LowLevel(values.getPointer(), startIndex, amount, result.data)
+        return result
 
     def __call__(self, object value, Py_ssize_t index):
         return self.pyEvaluate(value, index)
