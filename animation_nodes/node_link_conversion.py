@@ -59,7 +59,6 @@ class LinkCorrection:
 
 class SimpleConvert(LinkCorrection):
     rules = {
-        ("Vector", "Matrix") : "an_TranslationMatrixNode",
         ("Text Block", "Text") : "an_TextBlockReaderNode",
         ("Vector", "Float") : "an_SeparateVectorNode",
         ("Float", "Vector") : "an_CombineVectorNode",
@@ -78,7 +77,6 @@ class SimpleConvert(LinkCorrection):
         ("Vector", "Euler") : "an_DirectionToRotationNode",
         ("Euler", "Vector") : "an_RotationToDirectionNode",
         ("Float", "Falloff") : "an_ConstantFalloffNode",
-        ("Vector List", "Matrix List") : "an_TranslationMatrixNode",
         ("Vector List", "Spline") : "an_SplineFromPointsNode",
         ("Float List", "Falloff") : "an_CustomFalloffNode"
     }
