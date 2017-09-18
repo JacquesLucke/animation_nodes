@@ -132,7 +132,7 @@ cdef class Average_IndexOffset_SoundFalloff(BaseFalloff):
         self.sound = sound
         self.frame = frame
         self.offsetInverse = 1 / offset if offset != 0 else 0
-        self.dataType = "All"
+        self.dataType = "None"
         self.clamped = False
 
     cdef float evaluate(self, void *object, Py_ssize_t index):

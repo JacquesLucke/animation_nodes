@@ -1,3 +1,6 @@
+from libc.stdlib cimport malloc, free
+from . types cimport getSizeOfFalloffDataType
+
 cdef class Falloff:
     def __cinit__(self):
         self.clamped = False
@@ -11,9 +14,15 @@ cdef class Falloff:
 
 
 cdef class BaseFalloff(Falloff):
-
     cdef float evaluate(self, void *object, Py_ssize_t index):
         raise NotImplementedError()
+
+    cdef void evaluateList(self, void *objects, Py_ssize_t startIndex,
+                           Py_ssize_t amount, float *target):
+        cdef Py_ssize_t i
+        cdef Py_ssize_t elementSize = getSizeOfFalloffDataType(self.dataType)
+        for i in range(amount):
+            target[i] = self.evaluate(<char*>objects + i * elementSize, i + startIndex)
 
     def __repr__(self):
         return "{}".format(type(self).__name__)
@@ -29,6 +38,19 @@ cdef class CompoundFalloff(Falloff):
     cdef float evaluate(self, float *dependencyResults):
         raise NotImplementedError()
 
+    cdef void evaluateList(self, float **dependencyResults, Py_ssize_t amount, float *target):
+        cdef Py_ssize_t i, j
+        cdef Py_ssize_t depsAmount = len(self.getDependencies)
+        cdef float *buffer = <float*>malloc(sizeof(float) * depsAmount)
+
+        for i in range(amount):
+            for j in range(depsAmount):
+                buffer[j] = dependencyResults[j][i]
+            target[i] = self.evaluate(buffer)
+
+        free(buffer)
+
+
     def __repr__(self):
         return "\n".join(self._iterReprLines())
 
@@ -37,3 +59,42 @@ cdef class CompoundFalloff(Falloff):
         for falloff in self.getDependencies():
             for line in str(falloff).splitlines():
                 yield "  " + line
+
+
+from libc.stdlib cimport malloc, free
+from .. lists.base_lists cimport FloatList
+from .. lists.clist cimport CList
+
+def evaluateFalloffRecursive(Falloff falloff, CList sourceData):
+    if isinstance(falloff, BaseFalloff):
+        return evaluateBaseFalloff(falloff, sourceData)
+    elif isinstance(falloff, CompoundFalloff):
+        return evaluateCompoundFalloff(falloff, sourceData)
+    else:
+        raise Exception("unknown falloff type")
+
+def evaluateBaseFalloff(BaseFalloff falloff not None, CList sourceData not None):
+    cdef FloatList result = FloatList(length = sourceData.getLength())
+    falloff.evaluateList(sourceData.getPointer(), 0, sourceData.getLength(), result.data)
+    return result
+
+def evaluateCompoundFalloff(CompoundFalloff falloff, CList sourceData):
+    cdef list deps = falloff.getDependencies()
+    cdef list clampRequirements = falloff.getClampingRequirements()
+    cdef Py_ssize_t depsAmount = len(deps)
+    cdef list depsResults = []
+    for subFalloff, needsClamping in zip(deps, clampRequirements):
+        subResult = evaluateFalloffRecursive(subFalloff, sourceData)
+        if needsClamping:
+            subResult.clamp(0, 1)
+        depsResults.append(subResult)
+
+    cdef float **_depsResults = <float**>malloc(sizeof(float*) * depsAmount)
+    cdef Py_ssize_t i
+    for i in range(depsAmount):
+        _depsResults[i] = (<FloatList>depsResults[i]).data
+
+    cdef FloatList result = FloatList(length = sourceData.getLength())
+    falloff.evaluateList(_depsResults, sourceData.getLength(), result.data)
+    free(_depsResults)
+    return result

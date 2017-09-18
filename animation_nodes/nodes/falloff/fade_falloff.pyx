@@ -67,7 +67,7 @@ cdef class FadeFalloff(BaseFalloff):
         self.endValue = endValue
         self.interpolation = interpolation
         self.clamped = True
-        self.dataType = "All"
+        self.dataType = "None"
 
     @cython.cdivision(True)
     cdef float evaluate(self, void *object, Py_ssize_t index):

@@ -1,23 +1,88 @@
 from libc.stdint cimport intptr_t
 from ... math cimport Vector3, Matrix4, setVector3, setMatrix4
 
-cdef class FalloffSourceType:
-    def __cinit__(self, str identifier, Py_ssize_t cSize):
-        self.identifier = identifier
-        self.cSize = cSize
-        self.callConvertedFunctions = {}
-        self.pyConversion = NULL
 
-    cdef setPyConversion(self, PyConversionFunction pyConversion):
-        self.pyConversion = pyConversion
+# Public Interface
+############################################################
 
-    cdef addConvertedCall(self, str sourceType, EvaluateBaseConverted function):
-        self.callConvertedFunctions[sourceType] = <intptr_t>function
+cdef set getFalloffDataTypes():
+    return dataTypes
 
-    cdef EvaluateBaseConverted getConvertedCall(self, str sourceType):
-        return (<EvaluateBaseConverted><intptr_t>
-                self.callConvertedFunctions.get(sourceType, 0))
+cdef bint falloffDataTypeExists(str dataType):
+    return dataType in dataTypes
 
+cdef getSizeOfFalloffDataType(str dataType):
+    return cSizePerDataType[dataType]
+
+cdef typeConversionRequired(str sourceType, str dataType):
+    return (sourceType, dataType) not in noConversionRequired
+
+cdef EvaluateBaseConverted getCallConvertedFunction(str sourceType, str dataType):
+    return <EvaluateBaseConverted><intptr_t>conversions.get((sourceType, dataType), 0)
+
+cdef PyConversionFunction getPyConversionFunction(str dataType):
+    return <PyConversionFunction><intptr_t>pyConversionPerDataType.get(dataType, 0)
+
+cdef bint isValidSourceForDataTypes(str sourceType, dataTypes):
+    cdef str dataType
+    for dataType in dataTypes:
+        if not isValidSourceForDataType(sourceType, dataType):
+            return False
+    return True
+
+cdef bint isValidSourceForDataType(str sourceType, str dataType):
+    return (sourceType, dataType) in noConversionRequired or (sourceType, dataType) in conversions
+
+
+# Data structure for public interface
+############################################################
+
+cdef set dataTypes = set()
+cdef dict cSizePerDataType = dict()
+cdef dict conversions = dict()
+cdef set noConversionRequired = set()
+cdef dict pyConversionPerDataType = dict()
+
+cdef initializeFalloffDataTypes():
+    dataTypes.add("None")
+    cSizePerDataType["None"] = 0
+    noConversionRequired.add(("None", "None"))
+    pyConversionPerDataType["None"] = <intptr_t>pyToNone
+
+cdef registerFalloffDataType(str identifier, Py_ssize_t cSize, PyConversionFunction pyConversion):
+    dataTypes.add(identifier)
+    cSizePerDataType[identifier] = cSize
+    noConversionRequired.add((identifier, "None"))
+    noConversionRequired.add((identifier, identifier))
+    pyConversionPerDataType[identifier] = <intptr_t>pyConversion
+
+cdef registerConversion(str source, str target, EvaluateBaseConverted callConverted):
+    conversions[(source, target)] = <intptr_t>callConverted
+
+
+
+# Create default types
+############################################################
+
+initializeFalloffDataTypes()
+
+registerFalloffDataType(
+    identifier = "Location",
+    cSize = sizeof(Vector3),
+    pyConversion = pyToLocation
+)
+
+registerFalloffDataType(
+    identifier = "Transformation Matrix",
+    cSize = sizeof(Matrix4),
+    pyConversion = pyToTransformationMatrix
+)
+
+registerConversion("Transformation Matrix", "Location",
+    callConverted = callConverted_TransformationMatrix_Location)
+
+# Internals
+##################################################################
 
 cdef float callConverted_TransformationMatrix_Location(BaseFalloff falloff,
                                                        void *value, Py_ssize_t index):
@@ -34,31 +99,3 @@ cdef pyToTransformationMatrix(object source, void *m):
 
 cdef pyToNone(object source, void *target):
     pass
-
-
-cdef FalloffSourceType none, location, transformationMatrix
-none = FalloffSourceType("None", 0)
-location = FalloffSourceType("Location", sizeof(Vector3))
-transformationMatrix = FalloffSourceType("Transformation Matrix", sizeof(Matrix4))
-
-none.setPyConversion(pyToNone)
-location.setPyConversion(pyToLocation)
-transformationMatrix.setPyConversion(pyToTransformationMatrix)
-
-location.addConvertedCall(transformationMatrix.identifier,
-    callConverted_TransformationMatrix_Location)
-
-cdef dict sourceTypes = {
-    none.identifier : none,
-    location.identifier : location,
-    transformationMatrix.identifier : transformationMatrix
-}
-
-cdef dict getFalloffSourceTypes():
-    return sourceTypes
-
-cdef FalloffSourceType getFalloffSourceType(str sourceType):
-    return sourceTypes[sourceType]
-
-cdef sourceTypeExists(str sourceType):
-    return sourceType in sourceTypes

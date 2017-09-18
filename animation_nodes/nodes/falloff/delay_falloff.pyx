@@ -32,7 +32,7 @@ cdef class DelayFalloff(BaseFalloff):
         self.duration = duration
         self.offsets = FloatList() if offsets is None else offsets
         self.clamped = True
-        self.dataType = "All"
+        self.dataType = "None"
 
     cdef float evaluate(self, void *object, Py_ssize_t index):
         cdef float offset

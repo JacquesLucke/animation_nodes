@@ -20,7 +20,7 @@ cdef class ConstantFalloff(BaseFalloff):
     def __cinit__(self, float value):
         self.value = value
         self.clamped = 0 <= value <= 1
-        self.dataType = "All"
+        self.dataType = "None"
 
     cdef float evaluate(self, void *object, Py_ssize_t index):
         return self.value
