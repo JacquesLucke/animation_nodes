@@ -24,3 +24,9 @@ cdef class ConstantFalloff(BaseFalloff):
 
     cdef float evaluate(self, void *object, Py_ssize_t index):
         return self.value
+
+    cdef void evaluateList(self, void *values, Py_ssize_t startIndex,
+                           Py_ssize_t amount, float *target):
+        cdef Py_ssize_t i
+        for i in range(amount):
+            target[i] = self.value

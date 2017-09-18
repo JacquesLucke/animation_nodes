@@ -29,6 +29,8 @@ class OffsetVectorNode(bpy.types.Node, AnimationNode):
 
     clampFalloff = BoolProperty(name = "Clamp Falloff", default = False)
 
+    test = BoolProperty(update = propertyChanged)
+
     def create(self):
         if self.useVectorList:
             self.newInput("Vector List", "Vectors", "inVectors", dataIsModified = True)
@@ -45,6 +47,7 @@ class OffsetVectorNode(bpy.types.Node, AnimationNode):
             self.newOutput("Vector", "Vector", "outVector")
 
     def draw(self, layout):
+        layout.prop(self, "test")
         row = layout.row(align = True)
         row.prop(self, "specifiedState", expand = True)
         row.prop(self, "useVectorList", text = "", icon = "LINENUMBERS_ON")
@@ -69,13 +72,20 @@ class OffsetVectorNode(bpy.types.Node, AnimationNode):
 
     def execute_List(self, Vector3DList vectors, falloff, offset):
         cdef FalloffEvaluator evaluator = self.getFalloffEvaluator(falloff)
-        cdef FloatList influences = evaluator.evaluateList(vectors)
+        cdef FloatList influences
         cdef VirtualVector3DList _offsets = VirtualVector3DList.fromListOrElement(offset, (0, 0, 0))
         cdef bint isStartState = self.specifiedState == "START"
 
+        cdef Py_ssize_t i
+        if self.test:
+            influences = evaluator.evaluateList(vectors)
+        else:
+            influences = FloatList(length = vectors.length)
+            for i in range(len(vectors)):
+                influences.data[i] = evaluator.evaluate(vectors.data + i, i)
+
         cdef Vector3 *_offset
         cdef float influence
-        cdef Py_ssize_t i
 
         for i in range(len(vectors)):
             influence = influences.data[i]

@@ -39,7 +39,17 @@ cdef class PointDistanceFalloff(BaseFalloff):
         self.clamped = True
 
     cdef float evaluate(self, void *value, Py_ssize_t index):
-        cdef float distance = distanceVec3(&self.origin, <Vector3*>value)
-        if distance <= self.minDistance: return 1
-        if distance <= self.maxDistance: return 1 - (distance - self.minDistance) * self.factor
-        return 0
+        return calcDistance(self, <Vector3*>value)
+
+    cdef void evaluateList(self, void *values, Py_ssize_t startIndex,
+                           Py_ssize_t amount, float *target):
+        cdef Py_ssize_t i
+        for i in range(amount):
+            target[i] = calcDistance(self, <Vector3*>values + i)
+
+
+cdef inline float calcDistance(PointDistanceFalloff self, Vector3 *v):
+    cdef float distance = distanceVec3(&self.origin, v)
+    if distance <= self.minDistance: return 1
+    if distance <= self.maxDistance: return 1 - (distance - self.minDistance) * self.factor
+    return 0

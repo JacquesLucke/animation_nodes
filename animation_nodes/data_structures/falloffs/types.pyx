@@ -1,6 +1,4 @@
 from libc.stdint cimport intptr_t
-from ... math cimport Vector3, Matrix4, setVector3, setMatrix4
-
 
 # Public Interface
 ############################################################
@@ -23,6 +21,9 @@ cdef EvaluateBaseConverted getCallConvertedFunction(str sourceType, str dataType
 cdef PyConversionFunction getPyConversionFunction(str dataType):
     return <PyConversionFunction><intptr_t>pyConversionPerDataType.get(dataType, 0)
 
+cdef ConvertList getConvertListFunction(str sourceType, str dataType):
+    return <ConvertList><intptr_t>convertListFunctions.get((sourceType, dataType), 0)
+
 cdef bint isValidSourceForDataTypes(str sourceType, dataTypes):
     cdef str dataType
     for dataType in dataTypes:
@@ -42,6 +43,7 @@ cdef dict cSizePerDataType = dict()
 cdef dict conversions = dict()
 cdef set noConversionRequired = set()
 cdef dict pyConversionPerDataType = dict()
+cdef dict convertListFunctions = dict()
 
 cdef initializeFalloffDataTypes():
     dataTypes.add("None")
@@ -56,9 +58,10 @@ cdef registerFalloffDataType(str identifier, Py_ssize_t cSize, PyConversionFunct
     noConversionRequired.add((identifier, identifier))
     pyConversionPerDataType[identifier] = <intptr_t>pyConversion
 
-cdef registerConversion(str source, str target, EvaluateBaseConverted callConverted):
+cdef registerConversion(str source, str target,
+                        EvaluateBaseConverted callConverted, ConvertList convertList):
     conversions[(source, target)] = <intptr_t>callConverted
-
+    convertListFunctions[(source, target)] = <intptr_t>convertList
 
 
 # Create default types
@@ -79,10 +82,16 @@ registerFalloffDataType(
 )
 
 registerConversion("Transformation Matrix", "Location",
-    callConverted = callConverted_TransformationMatrix_Location)
+    callConverted = callConverted_TransformationMatrix_Location,
+    convertList = convertList_TransformationMatrix_Location
+)
+
 
 # Internals
 ##################################################################
+
+from .. lists.base_lists cimport Vector3DList, Matrix4x4List
+from ... math cimport Vector3, Matrix4, setVector3, setMatrix4
 
 cdef float callConverted_TransformationMatrix_Location(BaseFalloff falloff,
                                                        void *value, Py_ssize_t index):
@@ -99,3 +108,11 @@ cdef pyToTransformationMatrix(object source, void *m):
 
 cdef pyToNone(object source, void *target):
     pass
+
+cdef void convertList_TransformationMatrix_Location(void *source, void *target, Py_ssize_t amount):
+    cdef Matrix4 *matrices = <Matrix4*>source
+    cdef Vector3 *vectors = <Vector3*>target
+    for i in range(amount):
+        vectors[i].x = matrices[i].a14
+        vectors[i].y = matrices[i].a24
+        vectors[i].z = matrices[i].a34

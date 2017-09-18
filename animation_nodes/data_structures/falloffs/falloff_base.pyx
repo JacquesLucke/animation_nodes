@@ -40,7 +40,7 @@ cdef class CompoundFalloff(Falloff):
 
     cdef void evaluateList(self, float **dependencyResults, Py_ssize_t amount, float *target):
         cdef Py_ssize_t i, j
-        cdef Py_ssize_t depsAmount = len(self.getDependencies)
+        cdef Py_ssize_t depsAmount = len(self.getDependencies())
         cdef float *buffer = <float*>malloc(sizeof(float) * depsAmount)
 
         for i in range(amount):
@@ -59,42 +59,3 @@ cdef class CompoundFalloff(Falloff):
         for falloff in self.getDependencies():
             for line in str(falloff).splitlines():
                 yield "  " + line
-
-
-from libc.stdlib cimport malloc, free
-from .. lists.base_lists cimport FloatList
-from .. lists.clist cimport CList
-
-def evaluateFalloffRecursive(Falloff falloff, CList sourceData):
-    if isinstance(falloff, BaseFalloff):
-        return evaluateBaseFalloff(falloff, sourceData)
-    elif isinstance(falloff, CompoundFalloff):
-        return evaluateCompoundFalloff(falloff, sourceData)
-    else:
-        raise Exception("unknown falloff type")
-
-def evaluateBaseFalloff(BaseFalloff falloff not None, CList sourceData not None):
-    cdef FloatList result = FloatList(length = sourceData.getLength())
-    falloff.evaluateList(sourceData.getPointer(), 0, sourceData.getLength(), result.data)
-    return result
-
-def evaluateCompoundFalloff(CompoundFalloff falloff, CList sourceData):
-    cdef list deps = falloff.getDependencies()
-    cdef list clampRequirements = falloff.getClampingRequirements()
-    cdef Py_ssize_t depsAmount = len(deps)
-    cdef list depsResults = []
-    for subFalloff, needsClamping in zip(deps, clampRequirements):
-        subResult = evaluateFalloffRecursive(subFalloff, sourceData)
-        if needsClamping:
-            subResult.clamp(0, 1)
-        depsResults.append(subResult)
-
-    cdef float **_depsResults = <float**>malloc(sizeof(float*) * depsAmount)
-    cdef Py_ssize_t i
-    for i in range(depsAmount):
-        _depsResults[i] = (<FloatList>depsResults[i]).data
-
-    cdef FloatList result = FloatList(length = sourceData.getLength())
-    falloff.evaluateList(_depsResults, sourceData.getLength(), result.data)
-    free(_depsResults)
-    return result

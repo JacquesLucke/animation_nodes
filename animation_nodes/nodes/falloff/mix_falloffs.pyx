@@ -83,17 +83,45 @@ cdef class AddTwoFalloffs(MixTwoFalloffsBase):
     cdef float evaluate(self, float *dependencyResults):
         return dependencyResults[0] + dependencyResults[1]
 
+    cdef void evaluateList(self, float **dependencyResults, Py_ssize_t amount, float *target):
+        cdef Py_ssize_t i
+        cdef float *a = dependencyResults[0]
+        cdef float *b = dependencyResults[1]
+        for i in range(amount):
+            target[i] = a[i] + b[i]
+
 cdef class MultiplyTwoFalloffs(MixTwoFalloffsBase):
     cdef float evaluate(self, float *dependencyResults):
         return dependencyResults[0] * dependencyResults[1]
+
+    cdef void evaluateList(self, float **dependencyResults, Py_ssize_t amount, float *target):
+        cdef Py_ssize_t i
+        cdef float *a = dependencyResults[0]
+        cdef float *b = dependencyResults[1]
+        for i in range(amount):
+            target[i] = a[i] * b[i]
 
 cdef class MinTwoFalloffs(MixTwoFalloffsBase):
     cdef float evaluate(self, float *dependencyResults):
         return min(dependencyResults[0], dependencyResults[1])
 
+    cdef void evaluateList(self, float **dependencyResults, Py_ssize_t amount, float *target):
+        cdef Py_ssize_t i
+        cdef float *a = dependencyResults[0]
+        cdef float *b = dependencyResults[1]
+        for i in range(amount):
+            target[i] = min(a[i], b[i])
+
 cdef class MaxTwoFalloffs(MixTwoFalloffsBase):
     cdef float evaluate(self, float *dependencyResults):
         return max(dependencyResults[0], dependencyResults[1])
+
+    cdef void evaluateList(self, float **dependencyResults, Py_ssize_t amount, float *target):
+        cdef Py_ssize_t i
+        cdef float *a = dependencyResults[0]
+        cdef float *b = dependencyResults[1]
+        for i in range(amount):
+            target[i] = max(a[i], b[i])
 
 
 cdef class MixFalloffsBase(CompoundFalloff):
