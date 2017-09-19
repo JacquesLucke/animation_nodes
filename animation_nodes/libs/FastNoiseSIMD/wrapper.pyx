@@ -1,6 +1,6 @@
 # distutils: language = c++
 
-from ... math cimport Vector3, toVector3
+from ... math cimport toVector3
 from ... data_structures cimport Vector3DList, FloatList
 
 cdef dict simdLevels = {
@@ -119,23 +119,32 @@ cdef class PyNoise:
         else:
             raise ValueError("octaves has to be between 1 and 10")
 
+    def setAmplitude(self, float amplitude):
+        self.amplitude = amplitude
 
-    def calculateList(self, Vector3DList vectors not None, float amplitude, offset = (0, 0, 0)):
-        cdef Vector3 _offset = toVector3(offset)
+    def setOffset(self, vector):
+        self.offset = toVector3(vector)
+
+
+    def calculateList(self, Vector3DList vectors not None):
         cdef FloatList result = FloatList(length = vectors.length)
-
-        calcNoise(self, result.data, vectors.data, &_offset, amplitude, vectors.length)
+        self.calculateList_LowLevel(vectors.data, vectors.length, result.data)
         return result
+
+    cdef calculateList_LowLevel(self, Vector3 *vectors, Py_ssize_t amount, float *target):
+        calcNoise(self, target, vectors, amount)
 
     def calculateSingle(self, vector):
         cdef Vector3 _vector = toVector3(vector)
-        cdef Vector3 offset = Vector3(0, 0, 0)
+        return self.calculateSingle_LowLevel(&_vector)
+
+    cdef calculateSingle_LowLevel(self, Vector3 *vector):
         cdef float result
-        calcNoise(self, &result, &_vector, &offset, 1, 1)
+        calcNoise(self, &result, vector, 1)
         return result
 
 
-cdef void calcNoise(PyNoise noise, float *results, Vector3 *vectors, Vector3 *offset, float amplitude, Py_ssize_t amount):
+cdef void calcNoise(PyNoise noise, float *results, Vector3 *vectors, Py_ssize_t amount):
     cdef FastNoiseVectorSet vectorSet
     vectorSet.SetSize(amount)
     vectorSet.sampleScale = 0
@@ -146,9 +155,11 @@ cdef void calcNoise(PyNoise noise, float *results, Vector3 *vectors, Vector3 *of
         vectorSet.ySet[i] = vectors[i].y
         vectorSet.zSet[i] = vectors[i].z
 
+    cdef Vector3 offset = noise.offset
     noise.fn.FillNoiseSet(results, &vectorSet, offset.x, offset.y, offset.z)
 
     vectorSet.Free()
 
+    cdef float amplitude = noise.amplitude
     for i in range(amount):
         results[i] *= amplitude

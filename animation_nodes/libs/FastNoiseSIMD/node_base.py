@@ -24,14 +24,7 @@ distanceFunctionItems = itemsFromEnumData(cellularDistanceFunctionsData)
 noisePerNode = {}
 
 class Noise3DNodeBase:
-    def noiseSettingChanged(self, context = None):
-        noise = self.getNoiseObject()
-        noise.setNoiseType(self.noiseType)
-        noise.setFractalType(self.fractalType)
-        noise.setPerturbType(self.perturbType)
-        noise.setCellularReturnType(self.cellularReturnType)
-        noise.setCellularNoiseLookupType(self.cellularLookupType)
-        noise.setCellularDistanceFunction(self.cellularDistanceFunction)
+    def noiseSettingChanged(self, context):
         self.refresh()
 
     noiseType = EnumProperty(name = "Noise Type", default = "SIMPLEX",
@@ -52,7 +45,6 @@ class Noise3DNodeBase:
     cellularDistanceFunction = EnumProperty(name = "Cellular Distance Function",
         default = "EUCLIDEAN", items = distanceFunctionItems,
         update = noiseSettingChanged)
-
 
     def drawNoiseSettings(self, layout):
         layout.prop(self, "noiseType", text = "")
@@ -76,34 +68,39 @@ class Noise3DNodeBase:
             self.newInput(dataType, name, identifier, **extra)
 
     def calculateNoise(self, vectors, *args):
+        noise = self.getNoiseObject(args)
+        return noise.calculateList(vectors)
+
+    def getNoiseObject(self, args):
+        noise = PyNoise()
+
+        noise.setNoiseType(self.noiseType)
+        noise.setFractalType(self.fractalType)
+        noise.setPerturbType(self.perturbType)
+        noise.setCellularReturnType(self.cellularReturnType)
+        noise.setCellularNoiseLookupType(self.cellularLookupType)
+        noise.setCellularDistanceFunction(self.cellularDistanceFunction)
+
         allArgs = defaultsArgs.copy()
         noiseInputData = iterNoiseInputData(*self.getNoiseTypeTuple())
         for value, (_, _, identifier, _) in zip(args, noiseInputData):
             allArgs[identifier] = value
 
-        noise = self.getNoiseObject()
         noise.setSeed(allArgs["seed"])
         noise.setFrequency(allArgs["frequency"])
         noise.setAxisScales(allArgs["axisScale"])
+        noise.setAmplitude(allArgs["amplitude"])
+        noise.setOffset(allArgs["offset"])
         noise.setOctaves(min(max(allArgs["octaves"], 1), 10))
         noise.setCellularJitter(allArgs["jitter"])
         noise.setCellularNoiseLookupFrequency(allArgs["lookupFrequency"])
 
-        return noise.calculateList(vectors, allArgs["amplitude"], allArgs["offset"])
+        return noise
 
     def getNoiseTypeTuple(self):
         return (self.noiseType,
                 self.perturbType, self.fractalType,
                 self.cellularReturnType, self.cellularLookupType)
-
-    def getNoiseObject(self):
-        if self.identifier not in noisePerNode:
-            noisePerNode[self.identifier] = PyNoise()
-            self.noiseSettingChanged()
-        return noisePerNode[self.identifier]
-
-    def delete(self):
-        noisePerNode.pop(self.identifier, None)
 
 
 defaultsArgs = {

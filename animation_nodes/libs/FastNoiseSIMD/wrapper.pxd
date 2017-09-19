@@ -1,4 +1,6 @@
-cdef extern from "source/FastNoiseSIMD.h":
+from ... math cimport Vector3
+
+cdef extern from "FastNoiseSIMD.h":
     cdef cppclass FastNoiseSIMD:
 
         @staticmethod
@@ -84,3 +86,8 @@ cdef extern from "source/FastNoiseSIMD.h":
 
 cdef class PyNoise:
     cdef FastNoiseSIMD *fn
+    cdef Vector3 offset
+    cdef float amplitude
+
+    cdef calculateList_LowLevel(self, Vector3 *vectors, Py_ssize_t amount, float *target)
+    cdef calculateSingle_LowLevel(self, Vector3 *vector)
