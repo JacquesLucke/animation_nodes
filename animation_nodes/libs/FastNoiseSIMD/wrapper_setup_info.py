@@ -33,11 +33,9 @@ def getCompileInfo(utils):
     if utils.onLinux:
         return ("libFastNoiseSIMD_linux.a",
                 ["sh", os.path.join(sourceDir, "compile_linux.sh")],
-                {"libraries" : ["FastNoiseSIMD_linux"],
-                 "extra_compile_args" : ["-std=c++11"]})
+                {"libraries" : ["FastNoiseSIMD_linux"]})
     if utils.onMacOS:
         return ("libFastNoiseSIMD_macos.a",
                 ["sh", os.path.join(sourceDir, "compile_macos.sh")],
-                {"libraries" : ["FastNoiseSIMD_macos"],
-                 "extra_compile_args" : ["-std=c++11"]})
+                {"libraries" : ["FastNoiseSIMD_macos"]})
     raise Exception("unknown platform")

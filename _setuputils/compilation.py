@@ -1,7 +1,7 @@
 import os
+import re
 import sys
 import glob
-import json
 from . generic import *
 
 def execute_Compile(setupInfoList, addonDirectory):
@@ -74,6 +74,9 @@ def getExtensionFromPath(path, addonDirectory, includeDirs = []):
         "depends" : []
     }
 
+    for key, value in getExtensionArgsFromSetupOptions(getSetupOptions(path)):
+        kwargs[key].extend(values)
+
     infoFile = changeFileExtension(path, "_setup_info.py")
     for key, values in getExtensionsArgsFromInfoFile(infoFile).items():
         kwargs[key].extend(values)
@@ -101,3 +104,21 @@ def buildExtensionInplace(extension):
     sys.argv = [oldArgs[0], "build_ext", "--inplace"]
     setup(ext_modules = [extension])
     sys.argv = oldArgs
+
+def getSetupOptions(path):
+    pyxPath = changeFileExtension(path, ".pyx")
+    if not fileExists(pyxPath):
+        return set()
+
+    options = set()
+    text = readTextFile(pyxPath)
+    for match in re.finditer(r"^#\s*setup\s*:\s*options\s*=(.*)$", text, flags = re.MULTILINE):
+        options.update(match.group(1).split())
+    return options
+
+def getExtensionArgsFromSetupOptions(options):
+    args = {}
+    if "c++11" in options:
+        if onLinux or onMacOS:
+            args["extra_compile_args"] = ["-std=c++11"]
+    return args

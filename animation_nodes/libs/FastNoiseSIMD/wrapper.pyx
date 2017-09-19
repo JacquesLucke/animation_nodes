@@ -1,4 +1,5 @@
 # distutils: language = c++
+# setup: options = c++11
 
 from ... math cimport toVector3
 from ... data_structures cimport Vector3DList, FloatList

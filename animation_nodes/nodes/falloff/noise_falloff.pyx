@@ -1,4 +1,5 @@
 # distutils: language = c++
+# setup: options = c++11
 
 import bpy
 from ... base_types import AnimationNode

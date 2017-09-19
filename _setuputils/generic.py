@@ -185,7 +185,7 @@ def readLinesBetween(path, start, stop):
 
 def getPyxTargetLanguage(path):
     text = readTextFile(path)
-    if re.search(r"^#\s*distutils\s*:\s*language\s*=\s*c\+\+", text):
+    if re.search(r"^#\s*distutils\s*:\s*language\s*=\s*c\+\+", text, flags = re.MULTILINE):
         return "c++"
     else:
         return "c"
