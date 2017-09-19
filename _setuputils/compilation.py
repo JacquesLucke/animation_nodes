@@ -20,7 +20,7 @@ def getCompileTasks(setupInfoList, addonDirectory):
 
     tasks = []
     for path in iterFilesToCompile(addonDirectory):
-        tasks.append(CompileExtModuleTask(path, includeDirs))
+        tasks.append(CompileExtModuleTask(path, addonDirectory, includeDirs))
     return tasks
 
 def iterFilesToCompile(addonDirectory):
@@ -39,12 +39,13 @@ def iterCustomIncludeDirs(setupInfoList):
                 yield changeFileName(setupInfo["__file__"], name)
 
 class CompileExtModuleTask:
-    def __init__(self, path, includeDirs = []):
+    def __init__(self, path, addonDirectory, includeDirs = []):
         self.path = path
+        self.addonDirectory = addonDirectory
         self.includeDirs = includeDirs
 
     def execute(self):
-        extension = getExtensionFromPath(self.path, self.includeDirs)
+        extension = getExtensionFromPath(self.path, self.addonDirectory, self.includeDirs)
         buildExtensionInplace(extension)
 
 def getPossibleCompiledFilesWithTime(cpath):
@@ -54,10 +55,9 @@ def getPossibleCompiledFilesWithTime(cpath):
     paths = glob.glob(pattern + ".pyd") + glob.glob(pattern + ".so")
     return [(path, tryGetLastModificationTime(path)) for path in paths]
 
-def getExtensionFromPath(path, includeDirs = []):
+def getExtensionFromPath(path, addonDirectory, includeDirs = []):
     from distutils.core import Extension
-    metadata = getCythonMetadata(path)
-    moduleName = metadata["module_name"]
+    moduleName = getModuleNameOfPath(path, addonDirectory)
 
     kwargs = {
         "sources" : [path],
@@ -80,6 +80,10 @@ def getExtensionFromPath(path, includeDirs = []):
 
     return Extension(moduleName, **kwargs)
 
+def getModuleNameOfPath(path, basePath):
+    relativePath = os.path.relpath(os.path.splitext(path)[0], os.path.dirname(basePath))
+    return ".".join(splitPath(relativePath))
+
 def getExtensionsArgsFromInfoFile(infoFilePath):
     if not fileExists(infoFilePath):
         return {}
@@ -97,7 +101,3 @@ def buildExtensionInplace(extension):
     sys.argv = [oldArgs[0], "build_ext", "--inplace"]
     setup(ext_modules = [extension])
     sys.argv = oldArgs
-
-def getCythonMetadata(path):
-    text = readLinesBetween(path, "BEGIN: Cython Metadata", "END: Cython Metadata")
-    return json.loads(text)
