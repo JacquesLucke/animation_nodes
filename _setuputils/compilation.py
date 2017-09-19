@@ -74,7 +74,7 @@ def getExtensionFromPath(path, addonDirectory, includeDirs = []):
         "depends" : []
     }
 
-    for key, value in getExtensionArgsFromSetupOptions(getSetupOptions(path)):
+    for key, value in getExtensionArgsFromSetupOptions(getSetupOptions(path)).items():
         kwargs[key].extend(values)
 
     infoFile = changeFileExtension(path, "_setup_info.py")
