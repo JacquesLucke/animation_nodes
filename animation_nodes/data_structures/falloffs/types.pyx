@@ -1,4 +1,4 @@
-from libc.stdint cimport intptr_t
+from ... utils.pointers cimport intToPointer, pointerToInt
 
 # Public Interface
 ############################################################
@@ -16,13 +16,13 @@ cdef typeConversionRequired(str sourceType, str dataType):
     return (sourceType, dataType) not in noConversionRequired
 
 cdef EvaluateBaseConverted getCallConvertedFunction(str sourceType, str dataType):
-    return <EvaluateBaseConverted><intptr_t>conversions.get((sourceType, dataType), 0)
+    return <EvaluateBaseConverted>intToPointer(conversions.get((sourceType, dataType), 0))
 
 cdef PyConversionFunction getPyConversionFunction(str dataType):
-    return <PyConversionFunction><intptr_t>pyConversionPerDataType.get(dataType, 0)
+    return <PyConversionFunction>intToPointer(pyConversionPerDataType.get(dataType, 0))
 
 cdef ConvertList getConvertListFunction(str sourceType, str dataType):
-    return <ConvertList><intptr_t>convertListFunctions.get((sourceType, dataType), 0)
+    return <ConvertList>intToPointer(convertListFunctions.get((sourceType, dataType), 0))
 
 cdef bint isValidSourceForDataTypes(str sourceType, dataTypes):
     cdef str dataType
@@ -49,19 +49,19 @@ cdef initializeFalloffDataTypes():
     dataTypes.add("None")
     cSizePerDataType["None"] = 0
     noConversionRequired.add(("None", "None"))
-    pyConversionPerDataType["None"] = <intptr_t>pyToNone
+    pyConversionPerDataType["None"] = pointerToInt(<void*>pyToNone)
 
 cdef registerFalloffDataType(str identifier, Py_ssize_t cSize, PyConversionFunction pyConversion):
     dataTypes.add(identifier)
     cSizePerDataType[identifier] = cSize
     noConversionRequired.add((identifier, "None"))
     noConversionRequired.add((identifier, identifier))
-    pyConversionPerDataType[identifier] = <intptr_t>pyConversion
+    pyConversionPerDataType[identifier] = pointerToInt(<void*>pyConversion)
 
 cdef registerConversion(str source, str target,
                         EvaluateBaseConverted callConverted, ConvertList convertList):
-    conversions[(source, target)] = <intptr_t>callConverted
-    convertListFunctions[(source, target)] = <intptr_t>convertList
+    conversions[(source, target)] = pointerToInt(<void*>callConverted)
+    convertListFunctions[(source, target)] = pointerToInt(<void*>convertList)
 
 
 # Create default types

@@ -1,4 +1,3 @@
-from libc.stdint cimport intptr_t
 from cpython.mem cimport PyMem_Malloc, PyMem_Free
 from cpython.ref cimport PyObject, Py_INCREF, Py_DECREF
 
@@ -15,6 +14,8 @@ from . types cimport (
     PyConversionFunction,
     getConvertListFunction
 )
+
+from ... utils.pointers cimport pointerToInt, intToPointer
 from ... math cimport Matrix4, Vector3, toVector3, toMatrix4
 
 ctypedef float (*EvaluatorFunction)(void *settings, void *value, Py_ssize_t index)
@@ -331,24 +332,14 @@ cdef void evaluateList(void *_settings, void *values, Py_ssize_t startIndex,
     cdef str sourceType = <str>settings.sourceType
 
     cdef set dataTypes = getBaseFalloffTypes(falloff)
-    cdef set listsToFree = set()
-    cdef dict preparedLists = dict()
 
-    cdef void *ptr
-    for dataType in dataTypes:
-        if typeConversionRequired(sourceType, dataType):
-            elementSize = getSizeOfFalloffDataType(dataType)
-            ptr = PyMem_Malloc(amount * elementSize)
-            getConvertListFunction(sourceType, dataType)(values, ptr, amount)
-            preparedLists[dataType] = <intptr_t>ptr
-            listsToFree.add(dataType)
-        else:
-            preparedLists[dataType] = <intptr_t>values
+    cdef dict preparedLists
+    cdef set listsToFree
+    preparedLists, listsToFree = getListsForDataTypes(sourceType, dataTypes, values, amount)
 
     evaluateList_UnknownType(falloff, preparedLists, startIndex, amount, target)
 
-    for dataType in listsToFree:
-        PyMem_Free(<void*><intptr_t>preparedLists[dataType])
+    freeListsForDataTypes(preparedLists, listsToFree)
 
 cdef evaluateList_UnknownType(Falloff falloff, dict preparedLists, Py_ssize_t startIndex,
                               Py_ssize_t amount, float *target):
@@ -359,7 +350,7 @@ cdef evaluateList_UnknownType(Falloff falloff, dict preparedLists, Py_ssize_t st
 
 cdef evaluateList_BaseFalloff(BaseFalloff falloff, dict preparedLists, Py_ssize_t startIndex,
                               Py_ssize_t amount, float *target):
-    cdef void *data = <void*><intptr_t>preparedLists[falloff.dataType]
+    cdef void *data = intToPointer(preparedLists[falloff.dataType])
     falloff.evaluateList(data, startIndex, amount, target)
 
 cdef evaluateList_CompoundFalloff(CompoundFalloff falloff, dict preparedLists,
@@ -379,10 +370,10 @@ cdef evaluateList_CompoundFalloff(CompoundFalloff falloff, dict preparedLists,
         dependencyResults.append(subResult)
 
     cdef float **depsResults = <float**>PyMem_Malloc(sizeof(float*) * len(dependencies))
+
     cdef Py_ssize_t i
     for i in range(len(dependencies)):
         depsResults[i] = (<FloatList>dependencyResults[i]).data
-
     falloff.evaluateList(depsResults, amount, target)
 
     PyMem_Free(depsResults)
@@ -395,3 +386,22 @@ cdef set getBaseFalloffTypes(Falloff falloff):
     if isinstance(falloff, CompoundFalloff):
         deps = (<CompoundFalloff>falloff).getDependencies()
         return {t for d in deps for t in getBaseFalloffTypes(d)}
+
+cdef getListsForDataTypes(str sourceType, set dataTypes, void *values, Py_ssize_t amount):
+    cdef dict lists = {}
+    cdef set listsToFree = set()
+    cdef void *ptr
+    for dataType in dataTypes:
+        if typeConversionRequired(sourceType, dataType):
+            elementSize = getSizeOfFalloffDataType(dataType)
+            ptr = PyMem_Malloc(amount * elementSize)
+            getConvertListFunction(sourceType, dataType)(values, ptr, amount)
+            lists[dataType] = pointerToInt(ptr)
+            listsToFree.add(dataType)
+        else:
+            lists[dataType] = pointerToInt(values)
+    return lists, listsToFree
+
+cdef freeListsForDataTypes(dict lists, set listsToFree):
+    for dataType in listsToFree:
+        PyMem_Free(intToPointer(lists[dataType]))
