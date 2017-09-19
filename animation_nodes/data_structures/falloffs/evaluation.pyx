@@ -357,26 +357,32 @@ cdef evaluateList_CompoundFalloff(CompoundFalloff falloff, dict preparedLists,
                                   Py_ssize_t startIndex, Py_ssize_t amount, float *target):
     cdef list dependencies = falloff.getDependencies()
     cdef list clampingRequirements = falloff.getClampingRequirements()
-    cdef list dependencyResults = []
+    cdef list subResults = evaluateList_UnkownType_Multiple(dependencies, preparedLists,
+                                                            startIndex, amount)
 
     cdef Falloff subFalloff
-    cdef bint clampRequired
-    cdef FloatList subResult
-    for subFalloff, clampRequired in zip(dependencies, clampingRequirements):
-        subResult = FloatList(length = amount)
-        evaluateList_UnknownType(subFalloff, preparedLists, startIndex, amount, subResult.data)
+    for subFalloff, subResult, clampRequired in zip(dependencies, subResults, clampingRequirements):
         if clampRequired and not subFalloff.clamped:
             subResult.clamp(0, 1)
-        dependencyResults.append(subResult)
 
     cdef float **depsResults = <float**>PyMem_Malloc(sizeof(float*) * len(dependencies))
 
     cdef Py_ssize_t i
     for i in range(len(dependencies)):
-        depsResults[i] = (<FloatList>dependencyResults[i]).data
+        depsResults[i] = (<FloatList>subResults[i]).data
     falloff.evaluateList(depsResults, amount, target)
 
     PyMem_Free(depsResults)
+
+cdef evaluateList_UnkownType_Multiple(list falloffs, dict preparedLists,
+                                      Py_ssize_t startIndex, Py_ssize_t amount):
+    cdef list results = []
+    cdef FloatList result
+    for falloff in falloffs:
+        result = FloatList(length = amount)
+        evaluateList_UnknownType(falloff, preparedLists, startIndex, amount, result.data)
+        results.append(result)
+    return results
 
 cdef set getBaseFalloffTypes(Falloff falloff):
     if isinstance(falloff, BaseFalloff):
