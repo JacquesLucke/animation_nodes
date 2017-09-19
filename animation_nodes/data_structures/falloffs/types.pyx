@@ -87,7 +87,7 @@ registerConversion("Transformation Matrix", "Location",
 )
 
 
-# Internals
+# Actual types
 ##################################################################
 
 from .. lists.base_lists cimport Vector3DList, Matrix4x4List
