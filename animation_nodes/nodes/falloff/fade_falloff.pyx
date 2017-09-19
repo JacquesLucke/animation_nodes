@@ -55,25 +55,25 @@ class FadeFalloffNode(bpy.types.Node, AnimationNode):
 cdef class FadeFalloff(BaseFalloff):
     cdef:
         long startIndex, endIndex
-        double indexDiff
-        double startValue, endValue
+        float indexDiff
+        float startValue, endValue
         Interpolation interpolation
 
     def __cinit__(self, startIndex, endIndex, startValue, endValue, interpolation):
         self.startIndex = clampLong(startIndex)
         self.endIndex = clampLong(endIndex)
-        self.indexDiff = <double>(self.endIndex - self.startIndex)
+        self.indexDiff = <float>(self.endIndex - self.startIndex)
         self.startValue = startValue
         self.endValue = endValue
         self.interpolation = interpolation
         self.clamped = True
-        self.dataType = "All"
+        self.dataType = "None"
 
     @cython.cdivision(True)
-    cdef double evaluate(self, void *object, long index):
+    cdef float evaluate(self, void *object, Py_ssize_t index):
         if index <= self.startIndex: return self.startValue
         if index >= self.endIndex: return self.endValue
         # indexDiff cannot be zero when this point is reached
-        cdef double influence = <double>(index - self.startIndex) / self.indexDiff
+        cdef float influence = <float>(index - self.startIndex) / self.indexDiff
         influence = self.interpolation.evaluate(influence)
         return self.startValue * (1 - influence) + self.endValue * influence

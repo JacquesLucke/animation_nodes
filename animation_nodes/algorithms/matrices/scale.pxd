@@ -5,13 +5,13 @@ from ... math cimport (
 
 from ... data_structures cimport (
     Matrix4x4List,
-    DoubleList,
+    FloatList,
     VirtualVector3DList
 )
 
 ctypedef void (*ScaleFunction)(Matrix4 *m, Vector3 *v)
 
 cpdef scaleMatrixList(Matrix4x4List matrices, str type,
-                      VirtualVector3DList scales, DoubleList influences)
+                      VirtualVector3DList scales, FloatList influences)
 
 cdef ScaleFunction getScaleFunction(str type) except *

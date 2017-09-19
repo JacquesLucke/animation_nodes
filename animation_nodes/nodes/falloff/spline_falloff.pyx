@@ -77,7 +77,7 @@ class SplineFalloffNode(bpy.types.Node, AnimationNode):
         if spline.type == "POLY":
             falloffSpline = spline
         else:
-            falloffSpline = PolySpline(spline.getSamples(self.resolution * (len(spline.points) - 1)))
+            falloffSpline = PolySpline(spline.getDistributedPoints(self.resolution * (len(spline.points) - 1)))
             falloffSpline.cyclic = spline.cyclic
 
         return SplineFalloff(falloffSpline, distance, width)
@@ -94,7 +94,7 @@ cdef class SplineFalloff(BaseFalloff):
         self.clamped = False
         self.dataType = "Location"
 
-    cdef double evaluate(self, void *point, long index):
+    cdef float evaluate(self, void *point, Py_ssize_t index):
         cdef Vector3 closestPoint
         cdef float parameter = self.spline.project_LowLevel(<Vector3*>point)
         self.spline.evaluatePoint_LowLevel(parameter, &closestPoint)

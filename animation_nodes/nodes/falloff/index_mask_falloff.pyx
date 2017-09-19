@@ -47,36 +47,36 @@ class IndexMaskFalloffNode(bpy.types.Node, AnimationNode):
         return MaskRandomFalloff(seed, probability, valueA, valueB)
 
 cdef class MaskEveryNthFalloff(BaseFalloff):
-    cdef long step, offset
-    cdef double valueA, valueB
+    cdef Py_ssize_t step, offset
+    cdef float valueA, valueB
 
-    def __cinit__(self, step, offset, double valueA, double valueB):
+    def __cinit__(self, step, offset, float valueA, float valueB):
         self.step = max(min(step, LONG_MAX), 1)
         self.offset = max(min(offset, LONG_MAX), LONG_MIN)
         self.valueA = valueA
         self.valueB = valueB
-        self.dataType = "All"
+        self.dataType = "None"
 
     @cython.cdivision(True)
-    cdef double evaluate(self, void* object, long index):
+    cdef float evaluate(self, void *object, Py_ssize_t index):
         if (index + self.offset) % self.step != 0:
             return self.valueA
         return self.valueB
 
 cdef class MaskRandomFalloff(BaseFalloff):
-    cdef long seed
-    cdef double probability
-    cdef double valueA, valueB
+    cdef Py_ssize_t seed
+    cdef float probability
+    cdef float valueA, valueB
 
-    def __cinit__(self, seed, double probability, double valueA, double valueB):
+    def __cinit__(self, seed, float probability, float valueA, float valueB):
         self.seed = (seed * 7856353) % LONG_MAX
         self.probability = probability
         self.valueA = valueA
         self.valueB = valueB
-        self.dataType = "All"
+        self.dataType = "None"
 
     @cython.cdivision(True)
-    cdef double evaluate(self, void* object, long index):
+    cdef float evaluate(self, void *object, Py_ssize_t index):
         if randomNumber_Positive(index + self.seed) < self.probability:
             return self.valueA
         return self.valueB

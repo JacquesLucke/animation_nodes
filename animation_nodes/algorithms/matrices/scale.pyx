@@ -1,7 +1,7 @@
 from ... math cimport Matrix4, Vector3
 
 cpdef scaleMatrixList(Matrix4x4List matrices, str type,
-                      VirtualVector3DList scales, DoubleList influences):
+                      VirtualVector3DList scales, FloatList influences):
     if len(matrices) != len(influences):
         raise Exception("amount of matrices and influences has to be equal")
 

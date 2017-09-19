@@ -5,13 +5,13 @@ from ... math cimport (
 
 from ... data_structures cimport (
     Matrix4x4List,
-    DoubleList,
+    FloatList,
     VirtualVector3DList
 )
 
 ctypedef void (*TranslationFunction)(Matrix4 *m, Vector3 *v)
 
 cpdef translateMatrixList(Matrix4x4List matrices, str type,
-                          VirtualVector3DList translations, DoubleList influences)
+                          VirtualVector3DList translations, FloatList influences)
 
 cdef TranslationFunction getTranslationFunction(str type) except *

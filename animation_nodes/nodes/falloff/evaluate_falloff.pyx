@@ -58,19 +58,19 @@ class EvaluateFalloffNode(bpy.types.Node, AnimationNode):
                 return "execute_Single_Object"
 
     def execute_Single_None(self, Falloff falloff, index):
-        cdef long _index = clampLong(index)
-        cdef FalloffEvaluator evaluator = self.getFalloffEvaluator(falloff, "")
+        cdef Py_ssize_t _index = clampLong(index)
+        cdef FalloffEvaluator evaluator = self.getFalloffEvaluator(falloff, "None")
         return evaluator.evaluate(NULL, _index)
 
     def execute_Single_Object(self, Falloff falloff, object, index):
-        cdef long _index = clampLong(index)
+        cdef Py_ssize_t _index = clampLong(index)
         cdef FalloffEvaluator evaluator = self.getFalloffEvaluator(falloff, self.falloffType)
         return evaluator(object, _index)
 
     def execute_List_None(self, falloff, amount):
-        cdef int i
+        cdef Py_ssize_t i
         cdef DoubleList strengths
-        cdef FalloffEvaluator _falloff = self.getFalloffEvaluator(falloff, "")
+        cdef FalloffEvaluator _falloff = self.getFalloffEvaluator(falloff, "None")
 
         amount = max(amount, 0)
         strengths = DoubleList(length = amount)
@@ -83,7 +83,7 @@ class EvaluateFalloffNode(bpy.types.Node, AnimationNode):
         return self.evaluate_CList(_falloff, myList)
 
     def evaluate_CList(self, FalloffEvaluator _falloff, CList myList):
-        cdef long i
+        cdef Py_ssize_t i
         cdef char *data = <char*>myList.getPointer()
         cdef int elementSize = myList.getElementSize()
         cdef DoubleList strengths = DoubleList(length = myList.getLength())

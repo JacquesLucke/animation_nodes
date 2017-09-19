@@ -2,7 +2,6 @@ import bpy
 from bpy.props import *
 from ... events import propertyChanged
 from ... algorithms.rotations import eulerToDirection
-from ... data_structures cimport BaseFalloff, DoubleList
 from ... base_types import AnimationNode, VectorizedSocket
 
 from . mix_falloffs import MixFalloffs

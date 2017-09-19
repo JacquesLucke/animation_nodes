@@ -1,9 +1,8 @@
 import bpy
 from bpy.props import *
 from ... events import propertyChanged
-from ... base_types import AnimationNode, VectorizedSocket
 from .. falloff.invert_falloff import InvertFalloff
-from . c_utils import evaluateFalloffForMatrixList
+from ... base_types import AnimationNode, VectorizedSocket
 
 from ... data_structures import (
     Matrix4x4List,
@@ -45,7 +44,7 @@ class OffsetMatrixNode(bpy.types.Node, AnimationNode):
     bl_label = "Offset Matrix"
     bl_width_default = 190
     onlySearchTags = True
-    errorHandlingType = "MESSAGE"
+    errorHandlingType = "EXCEPTION"
     searchTags = [("Offset Matrices", {"useMatrixList" : repr(True)})]
 
     useMatrixList = BoolProperty(name = "Use Matrix List", default = False,
@@ -145,11 +144,7 @@ class OffsetMatrixNode(bpy.types.Node, AnimationNode):
         return outMatrices[0]
 
     def execute_List(self, matrices, falloff, translation, rotation, scale):
-
         influences = self.evaluateFalloff(matrices, falloff)
-        if influences is None:
-            self.setErrorMessage("cannot evaluate falloff")
-            return matrices
 
         if self.useScale:
             scales = VirtualVector3DList.fromListOrElement(scale, (1, 1, 1))
@@ -167,7 +162,10 @@ class OffsetMatrixNode(bpy.types.Node, AnimationNode):
         if self.specifiedState == "END":
             falloff = InvertFalloff(falloff)
 
-        return evaluateFalloffForMatrixList(falloff, matrices)
+        try: evaluator = falloff.getEvaluator("Transformation Matrix")
+        except: self.raiseErrorMessage("cannot evaluate falloff with matrices")
+
+        return evaluator.evaluateList(matrices)
 
     @property
     def modifiesOriginalList(self):

@@ -31,5 +31,11 @@ cdef class InterpolateFalloff(CompoundFalloff):
     cdef list getClampingRequirements(self):
         return [True]
 
-    cdef double evaluate(self, double *dependencyResults):
+    cdef float evaluate(self, float *dependencyResults):
         return self.interpolation.evaluate(dependencyResults[0])
+
+    cdef void evaluateList(self, float **dependencyResults, Py_ssize_t amount, float *target):
+        cdef float *data = dependencyResults[0]
+        cdef Py_ssize_t i
+        for i in range(amount):
+            target[i] = self.interpolation.evaluate(data[i])

@@ -632,41 +632,39 @@ class FullNodeState:
     def __init__(self):
         self.inputProperties = dict()
         self.outputProperties = dict()
-        self.inputLinks = dict()
-        self.outputLinks = dict()
+        self.inputStates = dict()
+        self.outputStates = dict()
 
     def update(self, node):
         for socket in node.inputs:
-            state = SocketPropertyState.fromSocket(node, socket)
-            self.inputProperties[(socket.identifier, socket.dataType)] = state
-            self.inputLinks[socket.identifier] = getDirectlyLinkedSocketsIDs(socket)
+            self.inputProperties[(socket.identifier, socket.dataType)] = socket.getProperty()
+            linkedSocketIDs = getDirectlyLinkedSocketsIDs(socket)
+            for identifier in node.getAllIdentifiersOfSocket(socket):
+                self.inputStates[identifier] = (socket.hide, socket.isUsed, linkedSocketIDs)
+
         for socket in node.outputs:
-            state = SocketPropertyState.fromSocket(node, socket)
-            self.outputProperties[(socket.identifier, socket.dataType)] = state
-            self.outputLinks[socket.identifier] = getDirectlyLinkedSocketsIDs(socket)
+            self.outputProperties[(socket.identifier, socket.dataType)] = socket.getProperty()
+            linkedSocketIDs = getDirectlyLinkedSocketsIDs(socket)
+            for identifier in node.getAllIdentifiersOfSocket(socket):
+                self.outputStates[identifier] = (socket.hide, socket.isUsed, linkedSocketIDs)
 
     def tryToReapplyState(self, node):
         for socket in node.inputs:
-            self.tryToReapplySocketState(socket, self.inputProperties, self.inputLinks)
+            self.tryToReapplySocketState(socket, self.inputProperties, self.inputStates)
         for socket in node.outputs:
-            self.tryToReapplySocketState(socket, self.outputProperties, self.outputLinks)
+            self.tryToReapplySocketState(socket, self.outputProperties, self.outputStates)
 
-    def tryToReapplySocketState(self, socket, propertyData, linkData):
-        info = propertyData.get((socket.identifier, socket.dataType), None)
-        if info is None:
-            for info in propertyData.values():
-                if socket.identifier in info.allIdentifiers:
-                    socket.hide = info.hide
-                    socket.isUsed = info.isUsed
-                    break
-        else:
-            socket.hide = info.hide
-            socket.isUsed = info.isUsed
-            socket.setProperty(info.data)
+    def tryToReapplySocketState(self, socket, propertyData, stateData):
+        if (socket.identifier, socket.dataType) in propertyData:
+            socket.setProperty(propertyData[(socket.identifier, socket.dataType)])
 
-        for socketID in linkData.get(socket.identifier, []):
-            try: socket.linkWith(idToSocket(socketID))
-            except: pass
+        if socket.identifier in stateData:
+            data = stateData[socket.identifier]
+            socket.hide = data[0]
+            socket.isUsed = data[1]
+            for socketID in data[2]:
+                try: socket.linkWith(idToSocket(socketID))
+                except: pass
 
 class NonPersistentNodeData:
     def __init__(self):

@@ -6,7 +6,7 @@ from . generic import *
 
 def execute_Compile(setupInfoList, addonDirectory):
     printHeader("Compile")
-    tasks = getCompileTasks(addonDirectory)
+    tasks = getCompileTasks(setupInfoList, addonDirectory)
     for i, task in enumerate(tasks, 1):
         print("{}/{}:".format(i, len(tasks)))
         task.execute()
@@ -15,10 +15,12 @@ def execute_Compile(setupInfoList, addonDirectory):
     compilationInfoPath = os.path.join(addonDirectory, "compilation_info.json")
     writeJsonFile(compilationInfoPath, compilationInfo)
 
-def getCompileTasks(addonDirectory):
+def getCompileTasks(setupInfoList, addonDirectory):
+    includeDirs = list(iterCustomIncludeDirs(setupInfoList))
+
     tasks = []
     for path in iterFilesToCompile(addonDirectory):
-        tasks.append(CompileExtModuleTask(path))
+        tasks.append(CompileExtModuleTask(path, includeDirs))
     return tasks
 
 def iterFilesToCompile(addonDirectory):
@@ -29,13 +31,20 @@ def iterFilesToCompile(addonDirectory):
         elif language == "c":
             yield changeFileExtension(path, ".c")
 
+def iterCustomIncludeDirs(setupInfoList):
+    fName = "getIncludeDirs"
+    for setupInfo in setupInfoList:
+        if fName in setupInfo:
+            for name in setupInfo[fName]():
+                yield changeFileName(setupInfo["__file__"], name)
 
 class CompileExtModuleTask:
-    def __init__(self, path):
+    def __init__(self, path, includeDirs = []):
         self.path = path
+        self.includeDirs = includeDirs
 
     def execute(self):
-        extension = getExtensionFromPath(self.path)
+        extension = getExtensionFromPath(self.path, self.includeDirs)
         buildExtensionInplace(extension)
 
 def getPossibleCompiledFilesWithTime(cpath):
@@ -45,14 +54,14 @@ def getPossibleCompiledFilesWithTime(cpath):
     paths = glob.glob(pattern + ".pyd") + glob.glob(pattern + ".so")
     return [(path, tryGetLastModificationTime(path)) for path in paths]
 
-def getExtensionFromPath(path):
+def getExtensionFromPath(path, includeDirs = []):
     from distutils.core import Extension
     metadata = getCythonMetadata(path)
     moduleName = metadata["module_name"]
 
     kwargs = {
         "sources" : [path],
-        "include_dirs" : [],
+        "include_dirs" : includeDirs,
         "define_macros" : [],
         "undef_macros" : [],
         "library_dirs" : [],
