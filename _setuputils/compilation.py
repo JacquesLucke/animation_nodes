@@ -2,6 +2,7 @@ import os
 import re
 import sys
 import glob
+import time
 from . generic import *
 
 def execute_Compile(setupInfoList, addonDirectory):
@@ -12,6 +13,7 @@ def execute_Compile(setupInfoList, addonDirectory):
         task.execute()
 
     compilationInfo = getPlatformSummary()
+    compilationInfo["date"] = int(time.time())
     compilationInfoPath = os.path.join(addonDirectory, "compilation_info.json")
     writeJsonFile(compilationInfoPath, compilationInfo)
 
