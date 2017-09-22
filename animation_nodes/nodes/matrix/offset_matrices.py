@@ -3,6 +3,8 @@ from bpy.props import *
 from ... events import propertyChanged
 from .. falloff.invert_falloff import InvertFalloff
 from ... base_types import AnimationNode, VectorizedSocket
+from ... data_structures import FloatList, BoundedAction
+from . c_utils import evaluateTransformationAction, evaluateBoundedTransformationAction
 
 from ... data_structures import (
     Matrix4x4List,
@@ -19,6 +21,11 @@ from ... algorithms.matrices import (
 specifiedStateItems = [
     ("START", "Start", "Given matrices set the start state", "NONE", 0),
     ("END", "End", "Given matrices set the end state", "NONE", 1)
+]
+
+transformationSourceItems = [
+    ("LOC_ROT_SCALE", "Loc/Rot/Scale", "", "NONE", 0),
+    ("ACTION", "Action", "", "NONE", 1)
 ]
 
 translationModeItems = [
@@ -39,6 +46,11 @@ scaleModeItems = [
     ("TRANSLATION_ONLY", "Translation Only", "", "NONE", 3)
 ]
 
+evaluationTimeModeItems = [
+    ("FIXED", "Fixed", "Evaluate all actions at the same frame", "NONE", 0),
+    ("FALLOFF", "Falloff", "Use Falloff to determine the frame to evaluate (only works with bounded actions)", "NONE", 1)
+]
+
 class OffsetMatrixNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_OffsetMatrixNode"
     bl_label = "Offset Matrix"
@@ -47,6 +59,9 @@ class OffsetMatrixNode(bpy.types.Node, AnimationNode):
     errorHandlingType = "EXCEPTION"
     searchTags = [("Offset Matrices", {"useMatrixList" : repr(True)})]
 
+    transformationSource = EnumProperty(name = "Transformation Source", default = "LOC_ROT_SCALE",
+        items = transformationSourceItems, update = AnimationNode.refresh)
+
     useMatrixList = BoolProperty(name = "Use Matrix List", default = False,
         update = AnimationNode.refresh)
 
@@ -54,16 +69,12 @@ class OffsetMatrixNode(bpy.types.Node, AnimationNode):
         description = "Specify wether the given matrices are the start or end state",
         items = specifiedStateItems, update = propertyChanged)
 
-    def checkedPropertiesChanged(self, context):
-        self.updateSocketVisibility()
-        propertyChanged()
-
     useTranslation = BoolProperty(name = "Use Translation", default = False,
-        update = checkedPropertiesChanged)
+        update = AnimationNode.refresh)
     useRotation = BoolProperty(name = "Use Rotation", default = False,
-        update = checkedPropertiesChanged)
+        update = AnimationNode.refresh)
     useScale = BoolProperty(name = "Use Scale", default = False,
-        update = checkedPropertiesChanged)
+        update = AnimationNode.refresh)
 
     useTranslationList = VectorizedSocket.newProperty()
     useRotationList = VectorizedSocket.newProperty()
@@ -78,46 +89,59 @@ class OffsetMatrixNode(bpy.types.Node, AnimationNode):
     scaleMode = EnumProperty(name = "Scale Mode", default = "LOCAL_AXIS",
         items = scaleModeItems, update = propertyChanged)
 
+    evaluationTimeMode = EnumProperty(name = "Evaluation Time Mode", default = "FIXED",
+        items = evaluationTimeModeItems, update = AnimationNode.refresh)
+
     def create(self):
         if self.useMatrixList:
-            self.newInput("Matrix List", "Matrices", "inMatrices", dataIsModified = self.modifiesOriginalList)
-            self.newInput("Falloff", "Falloff", "falloff")
-
-            self.newInput(VectorizedSocket("Vector", "useTranslationList",
-                ("Translation", "translation"),
-                ("Translations", "translations")))
-
-            self.newInput(VectorizedSocket("Euler", "useRotationList",
-                ("Rotation", "rotation"),
-                ("Rotations", "rotations")))
-
-            self.newInput(VectorizedSocket("Vector", "useScaleList",
-                ("Scale", "scale", dict(value = (1, 1, 1))),
-                ("Scales", "scales")))
-
+            self.newInput("Matrix List", "Matrices", "inMatrices",
+                dataIsModified = self.modifiesOriginalList)
             self.newOutput("Matrix List", "Matrices", "outMatrices")
         else:
             self.newInput("Matrix", "Matrix", "inMatrix")
-            self.newInput("Falloff", "Falloff", "falloff")
-            self.newInput("Vector", "Translation", "translation")
-            self.newInput("Euler", "Rotation", "rotation")
-            self.newInput("Vector", "Scale", "scale", value = (1, 1, 1))
             self.newOutput("Matrix", "Matrix", "outMatrix")
 
-        self.updateSocketVisibility()
 
-    def updateSocketVisibility(self):
-        self.inputs[2].hide = not self.useTranslation
-        self.inputs[3].hide = not self.useRotation
-        self.inputs[4].hide = not self.useScale
+        if self.transformationSource == "LOC_ROT_SCALE":
+            self.newInput("Falloff", "Falloff", "falloff")
+            if self.useMatrixList:
+                if self.useTranslation:
+                    self.newInput(VectorizedSocket("Vector", "useTranslationList",
+                        ("Translation", "translation"),
+                        ("Translations", "translations")))
+                if self.useRotation:
+                    self.newInput(VectorizedSocket("Euler", "useRotationList",
+                        ("Rotation", "rotation"),
+                        ("Rotations", "rotations")))
+                if self.useScale:
+                    self.newInput(VectorizedSocket("Vector", "useScaleList",
+                        ("Scale", "scale", dict(value = (1, 1, 1))),
+                        ("Scales", "scales")))
+            else:
+                if self.useTranslation:
+                    self.newInput("Vector", "Translation", "translation")
+                if self.useRotation:
+                    self.newInput("Euler", "Rotation", "rotation")
+                if self.useScale:
+                    self.newInput("Vector", "Scale", "scale", value = (1, 1, 1))
+        elif self.transformationSource == "ACTION":
+            self.newInput("Action", "Action", "action")
+            if self.evaluationTimeMode == "FIXED":
+                self.newInput("Float", "Frame", "frame")
+            elif self.evaluationTimeMode == "FALLOFF":
+                self.newInput("Falloff", "Falloff", "falloff")
 
     def draw(self, layout):
         col = layout.column()
+        col.prop(self, "transformationSource", text = "")
 
-        row = col.row(align = True)
-        row.prop(self, "useTranslation", text = "Loc", icon = "MAN_TRANS")
-        row.prop(self, "useRotation", text = "Rot", icon = "MAN_ROT")
-        row.prop(self, "useScale", text = "Scale", icon = "MAN_SCALE")
+        if self.transformationSource == "LOC_ROT_SCALE":
+            row = col.row(align = True)
+            row.prop(self, "useTranslation", text = "Loc", icon = "MAN_TRANS")
+            row.prop(self, "useRotation", text = "Rot", icon = "MAN_ROT")
+            row.prop(self, "useScale", text = "Scale", icon = "MAN_SCALE")
+        elif self.transformationSource == "ACTION":
+            col.prop(self, "evaluationTimeMode", text = "")
 
         row = col.row(align = True)
         row.prop(self, "specifiedState", expand = True)
@@ -133,28 +157,100 @@ class OffsetMatrixNode(bpy.types.Node, AnimationNode):
             layout.label("May result in invalid object matrices", icon = "INFO")
 
     def getExecutionFunctionName(self):
-        if self.useMatrixList:
-            return "execute_List"
-        else:
-            return "execute_Single"
+        if self.transformationSource == "LOC_ROT_SCALE":
+            if self.useMatrixList:
+                return "execute_LocRotScale_List"
+            else:
+                return "execute_LocRotScale_Single"
+        elif self.transformationSource == "ACTION":
+            if self.evaluationTimeMode == "FIXED":
+                if self.useMatrixList:
+                    return "execute_Action_FixedFrame_List"
+                else:
+                    return "execute_Action_FixedFrame_Single"
+            elif self.evaluationTimeMode == "FALLOFF":
+                if self.useMatrixList:
+                    return "execute_Action_FalloffFrame_List"
+                else:
+                    return "execute_Action_FalloffFrame_Single"
 
-    def execute_Single(self, matrix, falloff, translation, rotation, scale):
+
+    # Loc/Rot/Scale
+    #########################################################
+
+    def execute_LocRotScale_Single(self, matrix, falloff, *args):
         inMatrices = Matrix4x4List.fromValue(matrix)
-        outMatrices = self.execute_List(inMatrices, falloff, translation, rotation, scale)
+        outMatrices = self.execute_LocRotScale_List(inMatrices, falloff, *args)
         return outMatrices[0]
 
-    def execute_List(self, matrices, falloff, translation, rotation, scale):
+    def execute_LocRotScale_List(self, matrices, falloff, *args):
         influences = self.evaluateFalloff(matrices, falloff)
 
+        # count index backwards
+        index = -1
         if self.useScale:
-            scales = VirtualVector3DList.fromListOrElement(scale, (1, 1, 1))
+            scales = VirtualVector3DList.fromListOrElement(args[index], (1, 1, 1))
             scaleMatrixList(matrices, self.scaleMode, scales, influences)
+            index -= 1
         if self.useRotation:
-            rotations = VirtualEulerList.fromListOrElement(rotation, (0, 0, 0))
+            rotations = VirtualEulerList.fromListOrElement(args[index], (0, 0, 0))
             matrices = getRotatedMatrixList(matrices, self.rotationMode, rotations, influences)
+            index -= 1
         if self.useTranslation:
-            translations = VirtualVector3DList.fromListOrElement(translation, (0, 0, 0))
+            translations = VirtualVector3DList.fromListOrElement(args[index], (0, 0, 0))
             translateMatrixList(matrices, self.translationMode, translations, influences)
+
+        return matrices
+
+
+    # Action - Fixed Frame
+    #########################################################
+
+    def execute_Action_FixedFrame_Single(self, matrix, action, frame):
+        inMatrices = Matrix4x4List.fromValue(matrix)
+        outMatrices = self.execute_Action_FixedFrame_List(inMatrices, action, frame)
+        return outMatrices[0]
+
+    def execute_Action_FixedFrame_List(self, matrices, action, frame):
+        if action is None:
+            return matrices
+
+        loc, rot, scale = evaluateTransformationAction(action, frame, len(matrices))
+        return self.computeNewMatrices(matrices, loc, rot, scale)
+
+
+    # Action - Falloff Frame
+    #########################################################
+
+    def execute_Action_FalloffFrame_Single(self, matrix, action, falloff):
+        inMatrices = Matrix4x4List.fromValue(matrix)
+        outMatrices = self.execute_Action_FalloffFrame_List(inMatrices, action, falloff)
+        return outMatrices[0]
+
+    def execute_Action_FalloffFrame_List(self, matrices, action, falloff):
+        if action is None:
+            return matrices
+        if not isinstance(action, BoundedAction):
+            self.raiseErrorMessage("action is not bounded (has no start and end)")
+
+        parameters = self.evaluateFalloff(matrices, falloff)
+        loc, rot, scale = evaluateBoundedTransformationAction(action, parameters)
+        return self.computeNewMatrices(matrices, loc, rot, scale)
+
+
+    # Utilities
+    #########################################################
+
+    def computeNewMatrices(self, matrices, translations, rotations, scales):
+        influences = FloatList.fromValue(1, length = len(matrices))
+
+        _translations = VirtualVector3DList.fromList(translations, (0, 0, 0))
+        _rotations = VirtualEulerList.fromList(rotations, (0, 0, 0))
+        _scales = VirtualVector3DList.fromList(scales, (1, 1, 1))
+
+        scaleMatrixList(matrices, self.scaleMode, _scales, influences)
+        matrices = getRotatedMatrixList(matrices, self.rotationMode, _rotations, influences)
+        translateMatrixList(matrices, self.translationMode, _translations, influences)
 
         return matrices
 
@@ -169,4 +265,6 @@ class OffsetMatrixNode(bpy.types.Node, AnimationNode):
 
     @property
     def modifiesOriginalList(self):
-        return self.useScale or (self.useTranslation and not self.useRotation)
+        return (self.transformationSource == "ACTION"
+                or self.useScale
+                or (self.useTranslation and not self.useRotation))

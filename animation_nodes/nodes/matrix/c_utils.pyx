@@ -1,7 +1,10 @@
-from ... data_structures cimport (Vector3DList, EulerList, Matrix4x4List,
-                                  CDefaultList, FloatList, DoubleList, Falloff,
-                                  FalloffEvaluator,
-                                  VirtualVector3DList, VirtualEulerList)
+from ... data_structures cimport (
+    DoubleList, FloatList,
+    Vector3DList, EulerList, Matrix4x4List,
+    VirtualVector3DList, VirtualEulerList, VirtualFloatList,
+    Action, ActionEvaluator, PathIndexActionChannel,
+    BoundedAction, BoundedActionEvaluator
+)
 
 from ... math cimport (
     Vector3, Euler3, Matrix4, toMatrix4,
@@ -238,3 +241,50 @@ def reduceMatrixList(Matrix4x4List matrices, bint reversed):
                 tmp = target
 
     return toPyMatrix4(&target)
+
+
+cdef list transformationChannels = PathIndexActionChannel.forArrays(
+    ["location", "rotation_euler", "scale"], 3)
+cdef FloatList transformationDefaults = FloatList.fromValues(
+    [0, 0, 0,  0, 0, 0,  1, 1, 1])
+
+def evaluateTransformationAction(Action action, float frame, Py_ssize_t amount):
+    cdef ActionEvaluator evaluator = action.getEvaluator(
+        transformationChannels, transformationDefaults)
+
+    cdef FloatList results = FloatList(length = len(transformationChannels))
+    cdef float *_results = results.data
+
+    cdef Vector3DList locations = Vector3DList(length = amount)
+    cdef EulerList rotations = EulerList(length = amount)
+    cdef Vector3DList scales = Vector3DList(length = amount)
+
+    cdef Py_ssize_t i
+    for i in range(amount):
+        evaluator.evaluate(frame, i, _results)
+        locations.data[i] = Vector3(_results[0], _results[1], _results[2])
+        rotations.data[i] = Euler3(_results[3], _results[4], _results[5], 0)
+        scales.data[i] = Vector3(_results[6], _results[7], _results[8])
+
+    return locations, rotations, scales
+
+def evaluateBoundedTransformationAction(BoundedAction action, FloatList parameters):
+    cdef BoundedActionEvaluator evaluator = action.getEvaluator(
+        transformationChannels, transformationDefaults)
+
+    cdef FloatList results = FloatList(length = len(transformationDefaults))
+    cdef float *_results = results.data
+
+    cdef Py_ssize_t amount = parameters.length
+    cdef Vector3DList locations = Vector3DList(length = amount)
+    cdef EulerList rotations = EulerList(length = amount)
+    cdef Vector3DList scales = Vector3DList(length = amount)
+
+    cdef Py_ssize_t i
+    for i in range(amount):
+        evaluator.evaluateBounded(parameters.data[i], i, _results)
+        locations.data[i] = Vector3(_results[0], _results[1], _results[2])
+        rotations.data[i] = Euler3(_results[3], _results[4], _results[5], 0)
+        scales.data[i] = Vector3(_results[6], _results[7], _results[8])
+
+    return locations, rotations, scales
