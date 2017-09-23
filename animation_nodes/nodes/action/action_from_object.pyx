@@ -11,7 +11,7 @@ class ActionFromObjectNode(bpy.types.Node, AnimationNode):
     bl_label = "Action from Object"
 
     def create(self):
-        self.newInput("Object", "Object", "object")
+        self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
         self.newOutput("Action", "Action", "action")
 
     def execute(self, object):
