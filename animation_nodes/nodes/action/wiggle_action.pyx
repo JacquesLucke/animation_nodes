@@ -2,31 +2,73 @@ import bpy
 from bpy.props import *
 from ... base_types import AnimationNode
 from ... algorithms.perlin_noise cimport perlinNoise1D
+from ... events import propertyChanged
 from ... data_structures cimport (
     UnboundedAction,
     UnboundedActionEvaluator,
     FloatList,
+    PathActionChannel,
     PathIndexActionChannel
 )
 
-class WiggleActionNode(bpy.types.Node, AnimationNode):
+actionChannelTypeItems = [
+    ("PATH", "Path", "", "NONE", 0),
+    ("PATH_INDEX", "Path Index", "", "NONE", 1)
+]
+
+class ActionChannelProperty(bpy.types.PropertyGroup):
+    bl_idname = "an_ActionChannelProperty"
+
+    channelType = EnumProperty(name = "Channel Type", default = "PATH",
+        items = actionChannelTypeItems, update = propertyChanged)
+
+    channelPath = StringProperty(name = "Channel Path")
+    channelIndex = IntProperty(name = "Channel Index", min = 0)
+
+    def draw(self, layout):
+        col = layout.column(align = True)
+        col.prop(self, "channelType", text = "")
+        row = col.row(align = True)
+        row.prop(self, "channelPath", text = "")
+        if self.channelType == "PATH_INDEX":
+            row.prop(self, "channelIndex", text = "")
+
+    def getChannel(self):
+        if self.channelType == "PATH":
+            return PathActionChannel(self.channelPath)
+        elif self.channelType == "PATH_INDEX":
+            return PathIndexActionChannel(self.channelPath, self.channelIndex)
+
+class ActionChannelsNodeBase:
+    channels = CollectionProperty(type = ActionChannelProperty)
+
+    def drawChannels(self, layout):
+        col = layout.column()
+        for channel in self.channels:
+            channel.draw(layout)
+
+        self.invokeFunction(layout, "addChannel", text = "Add", icon = "PLUS")
+
+    def addChannel(self):
+        self.channels.add()
+
+    def getChannels(self):
+        return [item.getChannel() for item in self.channels]
+
+class WiggleActionNode(bpy.types.Node, AnimationNode, ActionChannelsNodeBase):
     bl_idname = "an_WiggleActionNode"
     bl_label = "Wiggle Action"
 
-    channelName = StringProperty()
-    channelIndex = IntProperty()
-
     def create(self):
         self.newInput("Integer", "Seed", "seed")
-        self.newInput("Float", "Amplitude", "amplitude", value = 1)
+        self.newInput("Float", "Amplitude", "amplitude", value = 3)
         self.newOutput("Action", "Action", "action")
 
     def draw(self, layout):
-        layout.prop(self, "channelName", text = "")
-        layout.prop(self, "channelIndex", text = "")
+        self.drawChannels(layout)
 
     def execute(self, seed, amplitude):
-        channels = [PathIndexActionChannel(self.channelName, self.channelIndex)]
+        channels = self.getChannels()
         return WiggleAction(amplitude, channels, seed)
 
 cdef class WiggleAction(UnboundedAction):
