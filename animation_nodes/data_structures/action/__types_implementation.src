@@ -28,7 +28,10 @@ cdef class BOUNDTYPEAction(Action):
 #######################################################
 
 cdef class BOUNDTYPEActionEvaluator(ActionEvaluator):
-    pass
+#IF "BOUNDTYPE" == "Unbounded"
+    def drawPreview(self, Py_ssize_t index, rectangle):
+        rectangle.draw(color = (0.7, 0.7, 0.7, 1))
+#ENDIF
 #IF "BOUNDTYPE" == "Bounded"
     cdef void evaluateBounded(self, float t, Py_ssize_t index, float *target):
         cdef float frame = t * self.getLength(index) + self.getStart(index)
@@ -42,6 +45,11 @@ cdef class BOUNDTYPEActionEvaluator(ActionEvaluator):
 
     cpdef float getLength(self, Py_ssize_t index):
         return self.getEnd(index) - self.getStart(index)
+
+    def drawPreview(self, Py_ssize_t index, rectangle):
+        subRec = rectangle.getClampedSubFrameRange(self.getStart(index), self.getEnd(index))
+        if subRec.width > 0:
+            subRec.draw(color = (0.9, 0.9, 0.9, 1))
 #ENDIF
 
 # Fill

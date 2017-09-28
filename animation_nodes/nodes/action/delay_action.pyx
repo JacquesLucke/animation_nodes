@@ -52,3 +52,10 @@ cdef class DelayBoundedActionEvaluator(BoundedActionEvaluator):
 
     cpdef float getLength(self, Py_ssize_t index):
         return self.evaluator.getLength(index)
+
+    def drawPreview(self, Py_ssize_t index, rectangle):
+        offset = self.delay * index
+        rec = rectangle.copy()
+        rec.startFrame -= offset
+        rec.endFrame -= offset
+        self.evaluator.drawPreview(index, rec)

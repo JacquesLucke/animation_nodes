@@ -2,6 +2,8 @@ import bpy
 from bpy.props import *
 from ... events import propertyChanged
 from ... base_types import AnimationNode
+from ... graphics import Rectangle
+from ... graphics.drawing_2d import drawVerticalLine
 from ... data_structures cimport (
     BoundedAction, BoundedActionEvaluator,
     FloatList
@@ -89,3 +91,16 @@ cdef class ChainActionEvaluator(BoundedActionEvaluator):
 
     cpdef float getLength(self, Py_ssize_t index):
         return self.a.getLength(index) + self.b.getLength(index)
+
+    def drawPreview(self, Py_ssize_t index, rectangle):
+        aEnd = self.a.getEnd(index)
+        recA = rectangle.getClampedSubFrameRange(self.a.getStart(index), aEnd)
+        recB = rectangle.getClampedSubFrameRange(aEnd, aEnd + self.b.getLength(index))
+        recB.shiftFrameRange(self.b.getStart(index) - aEnd)
+        if recA.width > 0:
+            self.a.drawPreview(index, recA)
+        if recB.width > 0:
+            self.b.drawPreview(index, recB)
+        if recA.width > 0 and recB.width > 0:
+            drawVerticalLine(recA.right, rectangle.top, -rectangle.height,
+                thickness = 1, color = (0.1, 0.1, 0.1, 1))

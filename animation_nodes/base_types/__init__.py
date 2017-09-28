@@ -2,6 +2,7 @@ from . node_tree import AnimationNodeTree
 
 from . nodes import (
     AnimationNode,
+    NodeUIExtension,
     InterpolationUIExtension,
     ErrorUIExtension,
     TextUIExtension

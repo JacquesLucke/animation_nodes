@@ -1,5 +1,7 @@
 import bpy
 from ... base_types import AnimationNode
+from ... graphics import Rectangle
+from ... graphics.drawing_2d import drawHorizontalLine
 from ... data_structures cimport (
     FloatList,
     Action, ActionEvaluator,
@@ -72,6 +74,22 @@ cdef class OverlayActionEvaluator(BoundedActionEvaluator):
 
     cpdef float getLength(self, Py_ssize_t index):
         return self.base.getLength(index)
+
+    def drawPreview(self, Py_ssize_t index, rectangle):
+        sub = rectangle.getClampedSubFrameRange(self.getStart(index), self.getEnd(index))
+        overlayRec = type(sub)(sub.left, sub.top,
+                               sub.right, sub.centerY,
+                               sub.startFrame, sub.endFrame)
+        baseRec = type(sub)(sub.left, sub.centerY,
+                            sub.right, sub.bottom,
+                            sub.startFrame, sub.endFrame)
+        if overlayRec.width > 0:
+            self.overlay.drawPreview(index, overlayRec)
+        if overlayRec.width > 0:
+            self.base.drawPreview(index, baseRec)
+        if sub.width > 0:
+            drawHorizontalLine(sub.left, sub.centerY, sub.width,
+                color = (0.1, 0.1, 0.1, 1.0), thickness = 1)
 
 
 cdef class UnboundedOverlayAction(UnboundedAction):

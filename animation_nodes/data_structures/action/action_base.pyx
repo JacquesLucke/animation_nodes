@@ -51,6 +51,9 @@ cdef class ActionEvaluator:
         else:
             return "<ActionEvaluator for {} channels>".format(self.channelAmount)
 
+    def drawPreview(self, Py_ssize_t index, rectangle, float recBeginFrame, float recEndFrame):
+        raise NotImplementedError()
+
 cdef class ActionChannel:
     def __richcmp__(x, y, int op):
         raise NotImplementedError()
