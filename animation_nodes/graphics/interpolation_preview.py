@@ -9,10 +9,8 @@ class InterpolationPreview:
         self.normalHeight = width
         self.resolution = resolution
         self.padding = 5
+
         self.boundary = Rectangle()
-        self.boundary.color = (0.9, 0.9, 0.9, 0.6)
-        self.boundary.borderThickness = -1
-        self.boundary.borderColor = (0.9, 0.76, 0.4, 1.0)
         self.samples = interpolation.sample(amount = resolution)
 
     def calculateBoundaries(self):
@@ -37,8 +35,14 @@ class InterpolationPreview:
     def getHeight(self):
         return self.boundary.height
 
-    def draw(self):
-        self.boundary.draw()
+    def draw(self, backgroundColor = (0.9, 0.9, 0.9, 0.6),
+                   borderColor = (0.9, 0.76, 0.4, 1.0),
+                   borderThickness = -1):
+        self.boundary.draw(
+            color = backgroundColor,
+            borderColor = borderColor,
+            borderThickness = borderThickness
+        )
         self.drawInterpolationCurve()
         self.drawRangeLines()
 

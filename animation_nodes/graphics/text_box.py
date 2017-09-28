@@ -17,15 +17,20 @@ class TextBox:
         self.lineHeight = self.fontSize * lineHeightFactor * getDpiFactor() * 1.2
 
         self.boundary = Rectangle()
-        self.boundary.color = (0.9, 0.9, 0.9, 0.6)
-        self.boundary.borderThickness = -1
-        self.boundary.borderColor = (0.9, 0.76, 0.4, 1.0)
+
+        self.color = (0.9, 0.9, 0.9, 0.6)
+        self.borderColor = (0.9, 0.76, 0.4, 1.0)
+        self.borderThickness = -1
 
     def draw(self):
         self.prepareFontDrawing()
         self.separateLines()
         self.calculateBoundaries()
-        self.boundary.draw()
+        self.boundary.draw(
+            color = self.color,
+            borderColor = self.borderColor,
+            borderThickness = self.borderThickness
+        )
         self.drawLines()
 
     def prepareFontDrawing(self):
