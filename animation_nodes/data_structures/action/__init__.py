@@ -9,5 +9,6 @@ from . action_channels import (
 from . action_types import (
     BoundedAction, UnboundedAction,
     BoundedActionEvaluator, UnboundedActionEvaluator,
-    SimpleBoundedAction, SimpleUnboundedAction
+    SimpleBoundedAction, SimpleUnboundedAction,
+    DelayAction
 )
