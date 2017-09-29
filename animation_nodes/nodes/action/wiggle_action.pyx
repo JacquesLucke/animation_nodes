@@ -102,4 +102,4 @@ cdef class WiggleActionEvaluator(UnboundedActionEvaluator):
     cdef void evaluate(self, float frame, Py_ssize_t index, float *target):
         cdef Py_ssize_t i
         for i in range(self.factors.length):
-            target[i] = self.factors.data[i] * perlinNoise1D(frame / 20 + index * 123124 + i * 43543 + self.seed * 3452, 0.5, 3)
+            target[i] = self.factors.data[i] * perlinNoise1D((frame + 23424) / 20 + index * 123124 + i * 43543 + self.seed * 3452, 0.5, 3)
