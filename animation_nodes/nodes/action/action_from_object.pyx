@@ -78,6 +78,10 @@ cdef class FCurveActionEvaluator(BoundedActionEvaluator):
             if _end > end:
                 end = _end
 
+        if end < start:
+            # can happen due to a Blender bug when the user moves a keyframe
+            start, end = end, start
+            
         return start, end
 
     cdef void evaluate(self, float frame, Py_ssize_t index, float *target):

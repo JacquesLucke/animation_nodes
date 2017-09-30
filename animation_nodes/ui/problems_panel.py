@@ -57,7 +57,8 @@ class ProblemsPanel(bpy.types.Panel):
 def drawWarningOverlay():
     if problems.problemsExist():
         rectangle = Rectangle.fromRegionDimensions(bpy.context.region)
-        rectangle.color = (0, 0, 0, 0)
-        rectangle.borderColor = (0.9, 0.1, 0.1, 0.6)
-        rectangle.borderThickness = 4 * getDpiFactor()
-        rectangle.draw()
+        rectangle.draw(
+            color = (0, 0, 0, 0),
+            borderColor = (0.9, 0.1, 0.1, 0.6),
+            borderThickness = 4 * getDpiFactor()
+        )

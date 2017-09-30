@@ -41,8 +41,8 @@ class ErrorUIExtension(NodeUIExtension):
     def draw(self, node, position, width):
         textBox = TextBox(self.text, position, width,
                           fontSize = 12 / node.dimensions.x * width)
-        textBox.boundary.borderColor = (0.8, 0.2, 0.2, 1)
-        textBox.boundary.thickness = 2
+        textBox.borderColor = (0.8, 0.2, 0.2, 1)
+        textBox.borderThickness = 2
         textBox.draw()
         return textBox.getHeight()
 

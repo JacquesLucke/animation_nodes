@@ -2,9 +2,11 @@ import bpy
 from bpy.props import *
 from ... events import propertyChanged
 from ... base_types import AnimationNode
+from ... graphics import Rectangle
+from ... graphics.drawing_2d import drawVerticalLine
 from ... data_structures cimport (
     BoundedAction, BoundedActionEvaluator,
-    FloatList
+    FloatList, BooleanList
 )
 
 class ChainActionsNode(bpy.types.Node, AnimationNode):
@@ -49,21 +51,27 @@ cdef class ChainAction(BoundedAction):
         return self.channels
 
     cdef BoundedActionEvaluator getEvaluator_Limited(self, list channels):
+        # TODO: generalize decision which elements to add/multiply
+        multiplyElements = BooleanList.fromValues(["scale" in c.path for c in channels])
         return ChainActionEvaluator(
             self.a.getEvaluator(channels),
             self.b.getEvaluator(channels),
-            self.relative
+            self.relative,
+            multiplyElements
         )
 
 cdef class ChainActionEvaluator(BoundedActionEvaluator):
     cdef BoundedActionEvaluator a, b
     cdef bint relative
     cdef FloatList relativeBuffer
+    cdef BooleanList multiplyElements
 
-    def __cinit__(self, BoundedActionEvaluator a, BoundedActionEvaluator b, bint relative):
+    def __cinit__(self, BoundedActionEvaluator a, BoundedActionEvaluator b,
+                  bint relative, BooleanList multiplyElements):
         self.a = a
         self.b = b
         self.relative = relative
+        self.multiplyElements = multiplyElements
         self.relativeBuffer = FloatList(length = a.channelAmount)
         self.channelAmount = a.channelAmount
 
@@ -77,7 +85,10 @@ cdef class ChainActionEvaluator(BoundedActionEvaluator):
                 self.a.evaluate(min(frame, aEnd), index, self.relativeBuffer.data)
                 self.b.evaluate(frame - aEnd + self.b.getStart(index), index, target)
                 for i in range(self.channelAmount):
-                    target[i] += self.relativeBuffer.data[i]
+                    if self.multiplyElements.data[i]:
+                        target[i] *= self.relativeBuffer.data[i]
+                    else:
+                        target[i] += self.relativeBuffer.data[i]
             else:
                 self.b.evaluate(frame - aEnd + self.b.getStart(index), index, target)
 
@@ -89,3 +100,16 @@ cdef class ChainActionEvaluator(BoundedActionEvaluator):
 
     cpdef float getLength(self, Py_ssize_t index):
         return self.a.getLength(index) + self.b.getLength(index)
+
+    def drawPreview(self, Py_ssize_t index, rectangle):
+        aEnd = self.a.getEnd(index)
+        recA = rectangle.getClampedSubFrameRange(self.a.getStart(index), aEnd)
+        recB = rectangle.getClampedSubFrameRange(aEnd, aEnd + self.b.getLength(index))
+        recB.shiftFrameRange(self.b.getStart(index) - aEnd)
+        if recA.width > 0:
+            self.a.drawPreview(index, recA)
+        if recB.width > 0:
+            self.b.drawPreview(index, recB)
+        if recA.width > 0 and recB.width > 0:
+            drawVerticalLine(recA.right, rectangle.top, -rectangle.height,
+                thickness = 1, color = (0.1, 0.1, 0.1, 1))

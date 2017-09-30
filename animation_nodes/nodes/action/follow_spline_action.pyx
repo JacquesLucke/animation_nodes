@@ -27,6 +27,7 @@ class FollowSplineActionNode(bpy.types.Node, AnimationNode):
 
 locationChannels = PathIndexActionChannel.forArray("location", 3)
 rotationChannels = PathIndexActionChannel.forArray("rotation_euler", 3)
+scaleChannels = PathIndexActionChannel.forArray("scale", 3)
 
 cdef class FollowSplineAction(SimpleBoundedAction):
     cdef Spline spline
@@ -40,6 +41,7 @@ cdef class FollowSplineAction(SimpleBoundedAction):
         cdef list functions = []
         functions.append(self.newFunction(<void*>self.evaluateLocation, locationChannels))
         functions.append(self.newFunction(<void*>self.evaluateRotation, rotationChannels))
+        functions.append(self.newFunction(<void*>self.evaluateScale, scaleChannels))
         return functions
 
     cdef void evaluateLocation(self, float frame, Py_ssize_t index, float *target):
@@ -58,6 +60,11 @@ cdef class FollowSplineAction(SimpleBoundedAction):
         target[0] = rotation.x
         target[1] = rotation.y
         target[2] = rotation.z
+
+    cdef void evaluateScale(self, float frame, Py_ssize_t index, float *target):
+        target[0] = 1
+        target[1] = 1
+        target[2] = 1
 
     cdef float getStart(self, Py_ssize_t index):
         return 0

@@ -28,7 +28,10 @@ cdef class BOUNDTYPEAction(Action):
 #######################################################
 
 cdef class BOUNDTYPEActionEvaluator(ActionEvaluator):
-    pass
+#IF "BOUNDTYPE" == "Unbounded"
+    def drawPreview(self, Py_ssize_t index, rectangle):
+        rectangle.draw(color = (0.7, 0.7, 0.7, 1))
+#ENDIF
 #IF "BOUNDTYPE" == "Bounded"
     cdef void evaluateBounded(self, float t, Py_ssize_t index, float *target):
         cdef float frame = t * self.getLength(index) + self.getStart(index)
@@ -42,6 +45,11 @@ cdef class BOUNDTYPEActionEvaluator(ActionEvaluator):
 
     cpdef float getLength(self, Py_ssize_t index):
         return self.getEnd(index) - self.getStart(index)
+
+    def drawPreview(self, Py_ssize_t index, rectangle):
+        subRec = rectangle.getClampedSubFrameRange(self.getStart(index), self.getEnd(index))
+        if subRec.width > 0:
+            subRec.draw(color = (0.9, 0.9, 0.9, 1))
 #ENDIF
 
 # Fill
@@ -228,3 +236,95 @@ cdef class BOUNDTYPESimpleActionEvaluator(BOUNDTYPEActionEvaluator):
     cpdef float getLength(self, Py_ssize_t index):
         return self.action.getLength(index)
 #ENDIF
+
+
+# Delay
+###########################################################
+
+class DelayAction:
+    def __new__(self, Action action, float delay, bint relative = False):
+        if isinstance(action, BoundedAction):
+            return DelayBoundedAction(action, delay, relative)
+        elif isinstance(action, UnboundedAction):
+            return DelayUnboundedAction(action, delay, relative)
+        else:
+            raise Exception("unknown action type")
+
+cdef class DelayBOUNDTYPEAction(BOUNDTYPEAction):
+    cdef BOUNDTYPEAction action
+    cdef float delay
+    cdef bint relative
+
+    def __cinit__(self, BOUNDTYPEAction action, float delay, bint relative):
+        self.action = action
+        self.delay = delay
+        self.relative = relative
+
+    cdef set getChannelSet(self):
+        return self.action.getChannelSet()
+
+    cdef BOUNDTYPEActionEvaluator getEvaluator_Limited(self, list channels):
+        cdef BOUNDTYPEActionEvaluator subEvaluator = self.action.getEvaluator_Limited(channels)
+        if self.relative:
+            return RelativeDelayBOUNDTYPEActionEvaluator(subEvaluator, self.delay)
+        else:
+            return ConstantDelayBOUNDTYPEActionEvaluator(subEvaluator, self.delay)
+
+cdef class RelativeDelayBOUNDTYPEActionEvaluator(BOUNDTYPEActionEvaluator):
+    cdef BOUNDTYPEActionEvaluator evaluator
+    cdef float delay
+
+    def __cinit__(self, BOUNDTYPEActionEvaluator evaluator, float delay):
+        self.evaluator = evaluator
+        self.delay = delay
+        self.channelAmount = evaluator.channelAmount
+
+    cdef void evaluate(self, float frame, Py_ssize_t index, float *target):
+        self.evaluator.evaluate(frame - index * self.delay, index, target)
+
+#IF "BOUNDTYPE" == "Bounded"
+    cpdef float getStart(self, Py_ssize_t index):
+        return self.evaluator.getStart(index) + index * self.delay
+
+    cpdef float getEnd(self, Py_ssize_t index):
+        return self.evaluator.getEnd(index) + index * self.delay
+
+    cpdef float getLength(self, Py_ssize_t index):
+        return self.evaluator.getLength(index)
+#ENDIF
+
+    def drawPreview(self, Py_ssize_t index, rectangle):
+        offset = self.delay * index
+        rec = rectangle.copy()
+        rec.startFrame -= offset
+        rec.endFrame -= offset
+        self.evaluator.drawPreview(index, rec)
+
+cdef class ConstantDelayBOUNDTYPEActionEvaluator(BOUNDTYPEActionEvaluator):
+    cdef BOUNDTYPEActionEvaluator evaluator
+    cdef float delay
+
+    def __cinit__(self, BOUNDTYPEActionEvaluator evaluator, float delay):
+        self.evaluator = evaluator
+        self.delay = delay
+        self.channelAmount = evaluator.channelAmount
+
+    cdef void evaluate(self, float frame, Py_ssize_t index, float *target):
+        self.evaluator.evaluate(frame - self.delay, index, target)
+
+#IF "BOUNDTYPE" == "Bounded"
+    cpdef float getStart(self, Py_ssize_t index):
+        return self.evaluator.getStart(index) + self.delay
+
+    cpdef float getEnd(self, Py_ssize_t index):
+        return self.evaluator.getEnd(index) + self.delay
+
+    cpdef float getLength(self, Py_ssize_t index):
+        return self.evaluator.getLength(index)
+#ENDIF
+
+    def drawPreview(self, Py_ssize_t index, rectangle):
+        rec = rectangle.copy()
+        rec.startFrame -= self.delay
+        rec.endFrame -= self.delay
+        self.evaluator.drawPreview(index, rec)
