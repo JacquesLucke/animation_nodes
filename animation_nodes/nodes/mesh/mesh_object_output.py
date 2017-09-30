@@ -7,7 +7,7 @@ from ... data_structures import UShortList
 from ... events import propertyChanged, executionCodeChanged
 
 meshDataTypeItems = [
-    ("MESH_DATA", "Mesh Data", "Mesh Data object that contains only vertex locations, edge indices and polygon indices", "", 0),
+    ("MESH_DATA", "Mesh", "Mesh object that contains only vertex locations, edge indices and polygon indices", "", 0),
     ("BMESH", "BMesh", "BMesh object", "", 1),
     ("VERTICES", "Vertices", "A list of vertex locations; The length of this list has to be equal to the amount of vertices the mesh already has", "", 2) ]
 
@@ -17,7 +17,7 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
     bl_width_default = 175
     errorHandlingType = "MESSAGE"
 
-    meshDataType = EnumProperty(name = "Mesh Data Type", default = "MESH_DATA",
+    meshDataType = EnumProperty(name = "Mesh Type", default = "MESH_DATA",
         items = meshDataTypeItems, update = AnimationNode.refresh)
 
     validateMesh = BoolProperty(name = "Validate Mesh", default = True,
@@ -37,7 +37,7 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
         socket.objectCreationType = "MESH"
 
         if self.meshDataType == "MESH_DATA":
-            self.newInput("Mesh Data", "Mesh Data", "meshData")
+            self.newInput("Mesh", "Mesh", "meshData")
         elif self.meshDataType == "BMESH":
             self.newInput("BMesh", "BMesh", "bm")
         elif self.meshDataType == "VERTICES":
@@ -57,7 +57,7 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
 
     @property
     def meshInputSocket(self):
-        if self.meshDataType == "MESH_DATA": return self.inputs["Mesh Data"]
+        if self.meshDataType == "MESH_DATA": return self.inputs["Mesh"]
         if self.meshDataType == "BMESH": return self.inputs["BMesh"]
         if self.meshDataType == "VERTICES": return self.inputs["Vertices"]
 
@@ -77,7 +77,7 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
         s = self.inputs
 
         if self.meshDataType == "MESH_DATA":
-            if s["Mesh Data"].isUsed:    yield "    self.setMeshData(mesh, meshData)"
+            if s["Mesh"].isUsed:    yield "    self.setMesh(mesh, meshData)"
         elif self.meshDataType == "BMESH":
             if s["BMesh"].isUsed:        yield "    self.setBMesh(mesh, bm)"
         elif self.meshDataType == "VERTICES":
@@ -95,16 +95,16 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
             return False
         return True
 
-    def setMeshData(self, mesh, meshData):
+    def setMesh(self, mesh, meshData):
         # clear existing mesh
         bmesh.new().to_mesh(mesh)
 
         if meshData.isValid():
-            self.setValidMeshData(mesh, meshData.vertices, meshData.edges, meshData.polygons)
+            self.setValidMesh(mesh, meshData.vertices, meshData.edges, meshData.polygons)
         else:
             self.setErrorMessage("The mesh data is invalid")
 
-    def setValidMeshData(self, mesh, vertices, edges, polygons):
+    def setValidMesh(self, mesh, vertices, edges, polygons):
         mesh.vertices.add(len(vertices))
         mesh.edges.add(len(edges))
         mesh.loops.add(len(polygons.indices))

@@ -11,7 +11,7 @@ from ... data_structures cimport (
     EdgeIndicesList,
     PolygonIndicesList,
     CDefaultList,
-    MeshData,
+    Mesh,
     VirtualLongList
 )
 
@@ -287,7 +287,7 @@ def edgesToTubes(Vector3DList vertices, EdgeIndicesList edges, radius, Py_ssize_
     cdef:
         Vector3DList tubeVertices = cylinder.vertices(radius = 1, height = 1, resolution = resolution)
         PolygonIndicesList tubePolygons = cylinder.polygons(resolution, caps)
-        MeshData tubeMesh = MeshData(tubeVertices, None, tubePolygons)
+        Mesh tubeMesh = Mesh(tubeVertices, None, tubePolygons)
         CDefaultList radii = CDefaultList(DoubleList, radius, 0)
         Matrix4x4List transformations = Matrix4x4List(length = edges.length)
         Py_ssize_t i
@@ -314,14 +314,14 @@ def edgesToTubes(Vector3DList vertices, EdgeIndicesList edges, radius, Py_ssize_
         m.a31, m.a32, m.a33, m.a34 = -xDir.z, yDir.z, zDir.z, v1.z
         m.a41, m.a42, m.a43, m.a44 = 0, 0, 0, 1
 
-    result = replicateMeshData(tubeMesh, transformations)
+    result = replicateMesh(tubeMesh, transformations)
     return result.vertices, result.polygons
 
 
-# Replicate Mesh Data
+# Replicate Mesh
 ###################################
 
-def replicateMeshData(MeshData source, transformations):
+def replicateMesh(Mesh source, transformations):
     cdef:
         Py_ssize_t i, j, offset
         Py_ssize_t amount = len(transformations)
@@ -367,7 +367,7 @@ def replicateMeshData(MeshData source, transformations):
                oldPolygons.polyLengths.data,
                sizeof(unsigned int) * polygonAmount)
 
-    return MeshData(newVertices, newEdges, newPolygons)
+    return Mesh(newVertices, newEdges, newPolygons)
 
 def getTransformedVertices(Vector3DList oldVertices, transformations):
     if isinstance(transformations, Vector3DList):

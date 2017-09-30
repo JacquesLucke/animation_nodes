@@ -56,6 +56,6 @@ dataCreationNodes = {
     "Euler" : "an_CombineEulerNode",
     "Struct" : "an_SetStructElementsNode",
     "Quaternion" : "an_CombineQuaternionNode",
-    "Mesh Data" : "an_CombineMeshDataNode",
+    "Mesh" : "an_CombineMeshNode",
     "Matrix" : "an_ComposeMatrixNode"
 }

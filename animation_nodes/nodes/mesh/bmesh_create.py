@@ -3,25 +3,25 @@ import bmesh
 from bpy.props import *
 from ... base_types import AnimationNode
 
-class CreateBMeshFromMeshData(bpy.types.Node, AnimationNode):
-    bl_idname = "an_CreateBMeshFromMeshDataNode"
+class CreateBMeshFromMesh(bpy.types.Node, AnimationNode):
+    bl_idname = "an_CreateBMeshFromMeshNode"
     bl_label = "Create BMesh"
     errorHandlingType = "EXCEPTION"
 
     def create(self):
-        self.newInput("Mesh Data", "Mesh Data", "meshData")
+        self.newInput("Mesh", "Mesh", "meshData")
         self.newOutput("BMesh", "BMesh", "bm")
 
     def execute(self, meshData):
         try:
-            return getBMeshFromMeshData(meshData)
+            return getBMeshFromMesh(meshData)
         except IndexError as e:
             self.raiseErrorMessage("Missing vertices")
         except ValueError as e:
             self.raiseErrorMessage("Multiple identical edges or polygons")
 
 
-def getBMeshFromMeshData(meshData):
+def getBMeshFromMesh(meshData):
     bm = bmesh.new()
     for co in meshData.vertices:
         bm.verts.new(co)

@@ -1,4 +1,4 @@
-cdef class MeshData:
+cdef class Mesh:
 
     def __cinit__(self, Vector3DList vertices = None,
                         EdgeIndicesList edges = None,
@@ -13,7 +13,7 @@ cdef class MeshData:
         self.polygons = polygons
 
     def copy(self):
-        return MeshData(self.vertices.copy(), self.edges.copy(), self.polygons.copy())
+        return Mesh(self.vertices.copy(), self.edges.copy(), self.polygons.copy())
 
     def isValid(self):
         if len(self.edges) > 0:
@@ -25,17 +25,17 @@ cdef class MeshData:
         return True
 
     def __repr__(self):
-        return "<AN Mesh Data Object: Vertices: {}, Edges: {}, Polygons: {}>".format(
+        return "<AN Mesh Object: Vertices: {}, Edges: {}, Polygons: {}>".format(
                 len(self.vertices), len(self.edges), len(self.polygons))
 
     @classmethod
     def join(cls, *meshes):
-        cdef MeshData newMeshData = MeshData()
+        cdef Mesh newMesh = Mesh()
         for meshData in meshes:
-            newMeshData.append(meshData)
-        return newMeshData
+            newMesh.append(meshData)
+        return newMesh
 
-    def append(self, MeshData meshData):
+    def append(self, Mesh meshData):
         cdef long vertexOffset = self.vertices.length
         cdef long edgeOffset = self.edges.length
         cdef long polygonIndicesOffset = self.polygons.indices.length

@@ -3,9 +3,9 @@ from bpy.props import *
 from ... events import isRendering
 from ... base_types import AnimationNode
 
-class ObjectMeshDataNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_ObjectMeshDataNode"
-    bl_label = "Object Mesh Data"
+class ObjectMeshNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_ObjectMeshNode"
+    bl_label = "Object Mesh"
 
     def create(self):
         self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")

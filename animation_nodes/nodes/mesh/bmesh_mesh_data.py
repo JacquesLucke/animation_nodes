@@ -3,9 +3,9 @@ from bpy.props import *
 from ... base_types import AnimationNode
 from ... data_structures import Vector3DList, EdgeIndicesList, PolygonIndicesList
 
-class BMeshMeshDataNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_BMeshMeshDataNode"
-    bl_label = "BMesh Mesh Data"
+class BMeshMeshNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_BMeshMeshNode"
+    bl_label = "BMesh Mesh"
 
     def create(self):
         self.newInput("BMesh", "BMesh", "bm")
