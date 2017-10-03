@@ -95,29 +95,31 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
             return False
         return True
 
-    def setMesh(self, mesh, meshData):
+    def setMesh(self, outMesh, mesh):
         # clear existing mesh
-        bmesh.new().to_mesh(mesh)
+        bmesh.new().to_mesh(outMesh)
 
-        if meshData.isValid():
-            self.setValidMesh(mesh, meshData.vertices, meshData.edges, meshData.polygons)
-        else:
-            self.setErrorMessage("The mesh data is invalid")
+        # allocate memory
+        outMesh.vertices.add(len(mesh.vertices))
+        outMesh.edges.add(len(mesh.edges))
+        outMesh.loops.add(len(mesh.polygons.indices))
+        outMesh.polygons.add(len(mesh.polygons))
 
-    def setValidMesh(self, mesh, vertices, edges, polygons):
-        mesh.vertices.add(len(vertices))
-        mesh.edges.add(len(edges))
-        mesh.loops.add(len(polygons.indices))
-        mesh.polygons.add(len(polygons))
+        # Vertices
+        outMesh.vertices.foreach_set("co", mesh.vertices.asMemoryView())
+        outMesh.vertices.foreach_set("normal", mesh.getVertexNormals().asMemoryView())
 
-        mesh.vertices.foreach_set("co", vertices.asMemoryView())
-        mesh.edges.foreach_set("vertices", edges.asMemoryView())
-        mesh.polygons.foreach_set("loop_total", polygons.polyLengths.asMemoryView())
-        mesh.polygons.foreach_set("loop_start", polygons.polyStarts.asMemoryView())
-        mesh.loops.foreach_set("vertex_index", polygons.indices.asMemoryView())
+        # Edges
+        outMesh.edges.foreach_set("vertices", mesh.edges.asMemoryView())
+
+        # Polygons
+        outMesh.polygons.foreach_set("loop_total", mesh.polygons.polyLengths.asMemoryView())
+        outMesh.polygons.foreach_set("loop_start", mesh.polygons.polyStarts.asMemoryView())
+        outMesh.loops.foreach_set("vertex_index", mesh.polygons.indices.asMemoryView())
+        outMesh.loops.foreach_set("edge_index", mesh.getLoopEdges().asMemoryView())
 
         if self.validateMesh:
-            mesh.validate(verbose = self.validateMeshVerbose)
+            outMesh.validate(verbose = self.validateMeshVerbose)
 
     def setBMesh(self, mesh, bm):
         bm.to_mesh(mesh)

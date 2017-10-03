@@ -5,6 +5,7 @@ from ... base_types import AnimationNode
 class CombineMeshNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CombineMeshNode"
     bl_label = "Combine Mesh"
+    errorHandlingType = "EXCEPTION"
 
     def create(self):
         self.newInput("Vector List", "Vertex Locations", "vertexLocations", dataIsModified = True)
@@ -13,4 +14,6 @@ class CombineMeshNode(bpy.types.Node, AnimationNode):
         self.newOutput("an_MeshSocket", "Mesh", "meshData")
 
     def execute(self, vertexLocations, edgeIndices, polygonIndices):
-        return Mesh(vertexLocations, edgeIndices, polygonIndices)
+        try: return Mesh(vertexLocations, edgeIndices, polygonIndices)
+        except Exception as e:
+            self.raiseErrorMessage(str(e))
