@@ -1,3 +1,4 @@
+# cython: profile=True
 from libc.stdint cimport uint32_t
 from cpython.ref cimport PyObject
 from .. lists.base_lists cimport UIntegerList, EdgeIndices, IntegerList, Vector3DList
@@ -7,13 +8,15 @@ cdef class Mesh:
 
     def __cinit__(self, Vector3DList vertices = None,
                         EdgeIndicesList edges = None,
-                        PolygonIndicesList polygons = None):
+                        PolygonIndicesList polygons = None,
+                        bint skipValidation = False):
 
         if vertices is None: vertices = Vector3DList()
         if edges is None: edges = EdgeIndicesList()
         if polygons is None: polygons = PolygonIndicesList()
 
-        checkMeshData(vertices, edges, polygons)
+        if not skipValidation:
+            checkMeshData(vertices, edges, polygons)
 
         self.vertices = vertices
         self.edges = edges
@@ -107,7 +110,7 @@ def checkMeshData(Vector3DList vertices, EdgeIndicesList edges, PolygonIndicesLi
     cdef UIntegerList edgeHashes = getEdgeHashes(edges)
     cdef UIntegerList polygonHashes = getPolygonHashes(polygons)
 
-    cdef IntegerList edgesDict = getDictForEdgeHashes(edgeHashes, edges)
+    cdef IntegerList edgesDict = getDictForEdgeHashes(edgeHashes, edges, ignoreDuplicates = False)
     cdef IntegerList polygonsDict = getDictForPolygonHashes(polygonHashes, polygons)
 
     checkIfAllRequiredEdgesExist(polygons, edges, edgeHashes, edgesDict)
@@ -268,23 +271,28 @@ def getDictForPolygonHashes(UIntegerList hashes, PolygonIndicesList polygons):
     data.polyLengths = polygons.polyLengths.data
     return createDictForHashes(hashes, comparePolygons, &data)
 
-def getDictForEdgeHashes(UIntegerList hashes, EdgeIndicesList edges):
-    return createDictForHashes(hashes, compareEdges, edges.data)
-
 cdef struct PolygonListData:
     unsigned int *indices
     unsigned int *polyStarts
     unsigned int *polyLengths
 
-cdef char compareEdges(void *settings, unsigned int i1, unsigned int i2):
+def getDictForEdgeHashes(UIntegerList hashes, EdgeIndicesList edges, bint ignoreDuplicates = False):
+    if ignoreDuplicates:
+        return createDictForHashes(hashes, compareEdges_IgnoreDuplicate, edges.data)
+    else:
+        return createDictForHashes(hashes, compareEdges_FailOnDuplicate, edges.data)
+
+cdef char compareEdges_FailOnDuplicate(void *settings, unsigned int i1, unsigned int i2):
+    return 2 if areEdgesEqual(settings, i1, i2) else 0
+
+cdef char compareEdges_IgnoreDuplicate(void *settings, unsigned int i1, unsigned int i2):
+    return 1 if areEdgesEqual(settings, i1, i2) else 0
+
+cdef inline char areEdgesEqual(void *settings, unsigned int i1, unsigned int i2):
     cdef EdgeIndices *edges = <EdgeIndices*>settings
-    cdef bint equal = (
-            (edges[i1].v1 == edges[i2].v1 and edges[i1].v2 == edges[i2].v2)
+    return ((edges[i1].v1 == edges[i2].v1 and edges[i1].v2 == edges[i2].v2)
          or (edges[i1].v1 == edges[i2].v2 and edges[i1].v2 == edges[i2].v1))
 
-    if equal:
-        return 2
-    return 0
 
 cdef char comparePolygons(void *settings, unsigned int i1, unsigned int i2):
     cdef PolygonListData *data = <PolygonListData*>settings
@@ -419,3 +427,45 @@ def calculateVertexNormals(Vector3DList vertices, PolygonIndicesList polygons, V
             _vertexNormals[i] = vertices.data[i]
 
     return vertexNormals
+
+
+def createValidEdgesList(EdgeIndicesList edges, PolygonIndicesList polygons):
+    cdef EdgeIndicesList allEdges = edges + getAllPolygonEdges(polygons)
+    cdef UIntegerList edgeHashes = getEdgeHashes(allEdges)
+    cdef IntegerList edgesDict = getDictForEdgeHashes(edgeHashes, allEdges, ignoreDuplicates = True)
+
+    cdef EdgeIndicesList newEdges = EdgeIndicesList(capacity = allEdges.length)
+    cdef Py_ssize_t index = 0
+    cdef Py_ssize_t i
+    for i in range(edgesDict.length):
+        if edgesDict.data[i] >= 0:
+            newEdges.data[index] = allEdges.data[edgesDict.data[i]]
+            index += 1
+    newEdges.length = index
+    newEdges.shrinkToLength()
+    return newEdges
+
+def getAllPolygonEdges(PolygonIndicesList polygons):
+    cdef EdgeIndicesList edges = EdgeIndicesList(length = polygons.indices.length)
+
+    cdef unsigned int *indices = polygons.indices.data
+    cdef unsigned int *polyStarts = polygons.polyStarts.data
+    cdef unsigned int *polyLengths = polygons.polyLengths.data
+    cdef unsigned int start, length
+
+    cdef Py_ssize_t i, j
+    cdef Py_ssize_t index = 0
+    for i in range(polygons.getLength()):
+        start = polyStarts[i]
+        length = polyLengths[i]
+
+        for j in range(start, start + length - 1):
+            edges.data[index].v1 = indices[j]
+            edges.data[index].v2 = indices[j+1]
+            index += 1
+
+        edges.data[index].v1 = indices[start]
+        edges.data[index].v2 = indices[start + length - 1]
+        index += 1
+
+    return edges

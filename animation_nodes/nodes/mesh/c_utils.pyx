@@ -1,25 +1,29 @@
+# cython: profile=True
 cimport cython
 from libc.string cimport memcpy
 
-from ... algorithms.mesh_generation import cylinder
+from ... algorithms.mesh_generation.cylinder import getCylinderMesh
 
 from ... data_structures cimport (
     LongList,
     DoubleList,
+    UIntegerList,
     Vector3DList,
     Matrix4x4List,
     EdgeIndicesList,
     PolygonIndicesList,
     CDefaultList,
     Mesh,
-    VirtualLongList
+    VirtualLongList,
+    VirtualDoubleList,
+    EdgeIndices
 )
 
 from ... math cimport (
     Vector3, Matrix4,
     scaleVec3, subVec3, crossVec3, distanceVec3, lengthVec3, dotVec3,
     transformVec3AsPoint_InPlace, normalizeVec3_InPlace, scaleVec3_Inplace,
-    normalizeLengthVec3_Inplace, transformVec3AsPoint
+    normalizeLengthVec3_Inplace, transformVec3AsPoint, transformVec3AsDirection
 )
 
 # Edge Operations
@@ -284,19 +288,21 @@ def edgesToTubes(Vector3DList vertices, EdgeIndicesList edges, radius, Py_ssize_
     if len(edges) > 0 and edges.getMaxIndex() >= vertices.length:
         raise IndexError("invalid edges")
 
+    cdef Mesh tube = getCylinderMesh(1, 1, resolution, caps)
+    cdef VirtualDoubleList radii = VirtualDoubleList.fromListOrElement(radius, 0)
+    transformations = getEdgeMatrices(vertices, edges, radii)
+    return replicateMesh(tube, transformations)
+
+def getEdgeMatrices(Vector3DList vertices, EdgeIndicesList edges, VirtualDoubleList radii):
+    cdef Matrix4x4List matrices = Matrix4x4List(length = edges.length)
+
     cdef:
-        Vector3DList tubeVertices = cylinder.vertices(radius = 1, height = 1, resolution = resolution)
-        PolygonIndicesList tubePolygons = cylinder.polygons(resolution, caps)
-        Mesh tubeMesh = Mesh(tubeVertices, None, tubePolygons)
-        CDefaultList radii = CDefaultList(DoubleList, radius, 0)
-        Matrix4x4List transformations = Matrix4x4List(length = edges.length)
         Py_ssize_t i
         Matrix4 *m
         Vector3 *v1
         Vector3 *v2
         Vector3 xDir, yDir, zDir
-        float _radius
-        float height
+        float radius, height
 
     for i in range(edges.length):
         v1 = vertices.data + edges.data[i].v1
@@ -304,103 +310,178 @@ def edgesToTubes(Vector3DList vertices, EdgeIndicesList edges, radius, Py_ssize_
         subVec3(&zDir, v2, v1)
         crossVec3(&xDir, &zDir, &upVector)
         crossVec3(&yDir, &xDir, &zDir)
-        _radius = (<double*>radii.get(i))[0]
-        normalizeLengthVec3_Inplace(&xDir, _radius)
-        normalizeLengthVec3_Inplace(&yDir, _radius)
+        radius = radii.get(i)
+        normalizeLengthVec3_Inplace(&xDir, radius)
+        normalizeLengthVec3_Inplace(&yDir, radius)
 
-        m = transformations.data + i
+        m = matrices.data + i
         m.a11, m.a12, m.a13, m.a14 = -xDir.x, yDir.x, zDir.x, v1.x
         m.a21, m.a22, m.a23, m.a24 = -xDir.y, yDir.y, zDir.y, v1.y
         m.a31, m.a32, m.a33, m.a34 = -xDir.z, yDir.z, zDir.z, v1.z
         m.a41, m.a42, m.a43, m.a44 = 0, 0, 0, 1
 
-    result = replicateMesh(tubeMesh, transformations)
-    return result.vertices, result.polygons
+    return matrices
 
 
 # Replicate Mesh
 ###################################
 
 def replicateMesh(Mesh source, transformations):
-    cdef:
-        Py_ssize_t i, j, offset
-        Py_ssize_t amount = len(transformations)
-        Py_ssize_t vertexAmount, edgeAmount, polygonAmount, polygonIndicesAmount
-        Vector3DList oldVertices, newVertices
-        EdgeIndicesList oldEdges, newEdges
-        PolygonIndicesList oldPolygons, newPolygons
+    cdef Py_ssize_t vertexAmount = source.vertices.length
+    cdef Py_ssize_t edgeAmount = source.edges.length
 
-    oldVertices = source.vertices
-    oldEdges = source.edges
-    oldPolygons = source.polygons
+    newVertices = getReplicatedVertices(source.vertices, transformations)
+    newEdges = getReplicatedEdges(source.edges, len(transformations), vertexAmount)
+    newPolygons = getReplicatedPolygons(source.polygons, len(transformations), vertexAmount)
 
-    vertexAmount = len(oldVertices)
-    edgeAmount = len(oldEdges)
-    polygonAmount = len(oldPolygons)
-    polygonIndicesAmount = len(oldPolygons.indices)
+    newVertexNormals = getReplicatedNormals(source.getVertexNormals(), transformations)
+    newPolygonNormals = getReplicatedNormals(source.getPolygonNormals(), transformations)
+    newLoopEdges = getReplicatedLoopEdges(source.getLoopEdges(), len(transformations), edgeAmount)
 
-    newVertices = getTransformedVertices(oldVertices, transformations)
-    newEdges = EdgeIndicesList(length = amount * edgeAmount)
-    newPolygons = PolygonIndicesList(indicesAmount = amount * polygonIndicesAmount,
-                                     polygonAmount = amount * polygonAmount)
+    mesh = Mesh(newVertices, newEdges, newPolygons, skipValidation = True)
+    mesh.setVertexNormals(newVertexNormals)
+    mesh.setPolygonNormals(newPolygonNormals)
+    mesh.setLoopEdges(newLoopEdges)
 
-    # Edges
+    return mesh
+
+def getReplicatedVertices(Vector3DList oldVertices, transformations):
+    if isinstance(transformations, Vector3DList):
+        return getReplicatedVertices_VectorList(oldVertices, transformations)
+    elif isinstance(transformations, Matrix4x4List):
+        return getReplicatedVertices_MatrixList(oldVertices, transformations)
+
+def getReplicatedVertices_VectorList(Vector3DList oldVertices, Vector3DList transformations):
+    cdef Vector3DList newVertices = Vector3DList(oldVertices.length * transformations.length)
+    cdef Vector3* _oldVertices = oldVertices.data
+    cdef Vector3* _newVertices = newVertices.data
+    cdef Vector3* _transformations = transformations.data
+
+    cdef Py_ssize_t i, j
+    cdef Py_ssize_t index = 0
+    for i in range(transformations.length):
+        for j in range(oldVertices.length):
+            _newVertices[index].x = _oldVertices[j].x + _transformations[i].x
+            _newVertices[index].y = _oldVertices[j].y + _transformations[i].y
+            _newVertices[index].z = _oldVertices[j].z + _transformations[i].z
+            index += 1
+
+    return newVertices
+
+def getReplicatedVertices_MatrixList(Vector3DList oldVertices, Matrix4x4List matrices):
+    cdef Vector3DList newVertices = Vector3DList(oldVertices.length * matrices.length)
+    cdef Vector3 *_newVertices = newVertices.data
+    cdef Vector3 *_oldVertices = oldVertices.data
+    cdef Matrix4 *_matrices = matrices.data
+
+    cdef Py_ssize_t i, j
+    cdef Py_ssize_t index = 0
+    for i in range(matrices.length):
+        for j in range(oldVertices.length):
+            transformVec3AsPoint(_newVertices + index,
+                                 _oldVertices + j,
+                                 _matrices + i)
+            index += 1
+    return newVertices
+
+def getReplicatedEdges(EdgeIndicesList edges, Py_ssize_t amount, Py_ssize_t vertexAmount):
+    cdef Py_ssize_t edgeAmount = edges.length
+    cdef EdgeIndicesList newEdges = EdgeIndicesList(length = edges.length * amount)
+
+    cdef EdgeIndices *_oldEdges = edges.data
+    cdef EdgeIndices *_newEdges = newEdges.data
+
+    cdef Py_ssize_t i, j, offset
+    cdef Py_ssize_t index = 0
     for i in range(amount):
-        offset = i * edgeAmount
+        offset = vertexAmount * i
         for j in range(edgeAmount):
-            newEdges.data[offset + j].v1 = oldEdges.data[j].v1 + vertexAmount * i
-            newEdges.data[offset + j].v2 = oldEdges.data[j].v2 + vertexAmount * i
+            _newEdges[index].v1 = _oldEdges[j].v1 + offset
+            _newEdges[index].v2 = _oldEdges[j].v2 + offset
+            index += 1
+    return newEdges
+
+def getReplicatedPolygons(PolygonIndicesList polygons, Py_ssize_t amount, Py_ssize_t vertexAmount):
+    cdef Py_ssize_t indicesAmount = polygons.indices.length
+    cdef Py_ssize_t polygonAmount = polygons.getLength()
+    cdef PolygonIndicesList newPolygons = PolygonIndicesList(
+        indicesAmount = amount * indicesAmount,
+        polygonAmount = amount * polygonAmount)
+
+    cdef unsigned int *_oldIndices = polygons.indices.data
+    cdef unsigned int *_oldPolyStarts = polygons.polyStarts.data
+    cdef unsigned int *_oldPolyLengths = polygons.polyLengths.data
+
+    cdef unsigned int *_newIndices = newPolygons.indices.data
+    cdef unsigned int *_newPolyStarts = newPolygons.polyStarts.data
+    cdef unsigned int *_newPolyLengths = newPolygons.polyLengths.data
+
+    cdef Py_ssize_t i, j, offset, index
 
     # Polygon Indices
+    index = 0
     for i in range(amount):
-        offset = i * polygonIndicesAmount
-        for j in range(polygonIndicesAmount):
-            newPolygons.indices.data[offset + j] = oldPolygons.indices.data[j] + vertexAmount * i
+        offset = vertexAmount * i
+        for j in range(indicesAmount):
+            _newIndices[index] = _oldIndices[j] + offset
+            index += 1
+
     # Polygon Starts
+    index = 0
     for i in range(amount):
-        offset = i * polygonAmount
+        offset = indicesAmount * i
         for j in range(polygonAmount):
-            newPolygons.polyStarts.data[offset + j] = oldPolygons.polyStarts.data[j] + polygonIndicesAmount * i
+            _newPolyStarts[index] = _oldPolyStarts[j] + offset
+            index += 1
+
     # Polygon Lengths
     for i in range(amount):
-        memcpy(newPolygons.polyLengths.data + i * polygonAmount,
-               oldPolygons.polyLengths.data,
+        memcpy(_newPolyLengths + i * polygonAmount,
+               _oldPolyLengths,
                sizeof(unsigned int) * polygonAmount)
 
-    return Mesh(newVertices, newEdges, newPolygons)
+    return newPolygons
 
-def getTransformedVertices(Vector3DList oldVertices, transformations):
+def getReplicatedNormals(Vector3DList normals, transformations):
     if isinstance(transformations, Vector3DList):
-        return getTransformedVertices_VectorList(oldVertices, transformations)
+        return getReplicatedNormals_Vector3DList(normals, transformations)
     elif isinstance(transformations, Matrix4x4List):
-        return getTransformedVertices_MatrixList(oldVertices, transformations)
+        return getReplicatedNormals_Matrix4x4List(normals, transformations)
 
-def getTransformedVertices_VectorList(Vector3DList oldVertices, Vector3DList transformations):
-    cdef:
-        Py_ssize_t i, j, offset
-        Vector3DList newVertices = Vector3DList(oldVertices.length * transformations.length)
-        Vector3* _oldVertices = oldVertices.data
-        Vector3* _newVertices = newVertices.data
-        Vector3* _transformations = transformations.data
+def getReplicatedNormals_Vector3DList(Vector3DList normals, Vector3DList transformations):
+    return normals.repeated(amount = len(transformations))
 
-    for i in range(transformations.length):
-        offset = i * oldVertices.length
-        for j in range(oldVertices.length):
-            _newVertices[offset + j].x = _oldVertices[j].x + _transformations[i].x
-            _newVertices[offset + j].y = _oldVertices[j].y + _transformations[i].y
-            _newVertices[offset + j].z = _oldVertices[j].z + _transformations[i].z
+def getReplicatedNormals_Matrix4x4List(Vector3DList normals, Matrix4x4List matrices):
+    cdef Py_ssize_t normalsAmount = normals.length
+    cdef Vector3DList newNormals = Vector3DList(length = normalsAmount * matrices.length)
 
-    return newVertices
+    cdef Vector3 *_normals = normals.data
+    cdef Vector3 *_newNormals = newNormals.data
+    cdef Matrix4 *_matrices = matrices.data
 
-def getTransformedVertices_MatrixList(Vector3DList oldVertices, Matrix4x4List transformations):
-    cdef:
-        Py_ssize_t i, j, offset
-        Vector3DList newVertices = Vector3DList(oldVertices.length * transformations.length)
+    cdef Py_ssize_t i, j
+    cdef Py_ssize_t index = 0
+    for i in range(matrices.length):
+        for j in range(normalsAmount):
+            transformVec3AsDirection(
+                _newNormals + index,
+                _normals + j,
+                _matrices + i)
+            index += 1
+    return newNormals
 
-    for i in range(transformations.length):
-        offset = i * oldVertices.length
-        for j in range(oldVertices.length):
-            transformVec3AsPoint(newVertices.data + offset + j,
-                                 oldVertices.data + j,
-                                 transformations.data + i)
-    return newVertices
+def getReplicatedLoopEdges(UIntegerList loopEdges, Py_ssize_t amount, Py_ssize_t edgeAmount):
+    cdef Py_ssize_t loopEdgesAmount = loopEdges.length
+    cdef UIntegerList newLoopEdges = UIntegerList(length = amount * loopEdgesAmount)
+
+    cdef unsigned int *_loopEdges = loopEdges.data
+    cdef unsigned int *_newLoopEdges = newLoopEdges.data
+
+    cdef Py_ssize_t i, j, offset
+    cdef Py_ssize_t index = 0
+    for i in range(amount):
+        offset = edgeAmount * i
+        for j in range(loopEdgesAmount):
+            _newLoopEdges[index] = _loopEdges[j] + offset
+            index += 1
+    return newLoopEdges
