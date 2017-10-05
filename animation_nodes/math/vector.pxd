@@ -1,3 +1,6 @@
+cdef struct Vector2:
+    float x, y
+
 cdef struct Vector3:
     float x, y, z
 

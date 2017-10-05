@@ -5,7 +5,7 @@ def importDataStructures():
     from . lists.clist import CList
     from . lists.polygon_indices_list import PolygonIndicesList
     from . lists.base_lists import (
-        Vector3DList, Matrix4x4List, EdgeIndicesList, EulerList, BooleanList,
+        Vector3DList, Vector2DList, Matrix4x4List, EdgeIndicesList, EulerList, BooleanList,
         FloatList, DoubleList, LongList, IntegerList, UShortList, CharList,
         QuaternionList, UIntegerList, ShortList, UShortList
     )
