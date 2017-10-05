@@ -16,6 +16,7 @@
         "To PyObject" : "toPyVector3(value)",
         "Additional Methods" : "__vector_list_functions.src",
         "Declarations" : [
+            "from libc.math cimport sqrt",
             "from ... math.vector cimport Vector3",
             "from ... math.conversion cimport setVector3, toPyVector3"
         ]
