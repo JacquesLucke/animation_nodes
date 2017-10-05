@@ -1,11 +1,34 @@
 # cython: profile=True
 from libc.stdint cimport uint32_t
 from cpython.ref cimport PyObject
+from collections import namedtuple
+import functools
 from .. lists.base_lists cimport UIntegerList, EdgeIndices, IntegerList, Vector3DList
 from ... math cimport Vector3, crossVec3, subVec3, addVec3_Inplace, isExactlyZeroVec3, normalizeVec3
 
-cdef class Mesh:
+def derivedMeshDataCacheHelper(name, handleNormalization = False):
+    def decorator(function):
+        if handleNormalization:
+            @functools.wraps(function)
+            def wrapper(Mesh self, normalized = False, **kwargs):
+                if name not in self.derivedMeshDataCache:
+                    vectors = function(self, **kwargs)
+                    self.derivedMeshDataCache[name] = (vectors, False)
+                vectors, isNorm = self.derivedMeshDataCache[name]
+                if normalized and not isNorm:
+                    vectors.normalize()
+                    self.derivedMeshDataCache[name] = (vectors, True)
+                return vectors
+        else:
+            @functools.wraps(function)
+            def wrapper(Mesh self, **kwargs):
+                if name not in self.derivedMeshDataCache:
+                    self.derivedMeshDataCache[name] = function(self, **kwargs)
+                return self.derivedMeshDataCache[name]
+        return wrapper
+    return decorator
 
+cdef class Mesh:
     def __cinit__(self, Vector3DList vertices = None,
                         EdgeIndicesList edges = None,
                         PolygonIndicesList polygons = None,
@@ -28,25 +51,36 @@ cdef class Mesh:
         self.polygonProperties = {}
         self.loopProperties = {}
 
+    def verticesChanged(self):
+        self.derivedMeshDataCache.pop("Vertex Normals", None)
+        self.derivedMeshDataCache.pop("Polygon Centers", None)
+        self.derivedMeshDataCache.pop("Polygon Normals", None)
+        self.derivedMeshDataCache.pop("Polygon Tangents", None)
+        self.derivedMeshDataCache.pop("Polygon Bitangents", None)
+
+    @derivedMeshDataCacheHelper("Loop Edges")
     def getLoopEdges(self):
-        name = "Loop Edges"
-        if name not in self.derivedMeshDataCache:
-            self.derivedMeshDataCache[name] = calculateLoopEdges(self.edges, self.polygons)
-        return self.derivedMeshDataCache[name]
+        return calculateLoopEdges(self.edges, self.polygons)
 
+    @derivedMeshDataCacheHelper("Polygon Normals", handleNormalization = True)
     def getPolygonNormals(self):
-        name = "Polygon Normals"
-        if name not in self.derivedMeshDataCache:
-            self.derivedMeshDataCache[name] = calculatePolygonNormals(self.vertices, self.polygons)
-        return self.derivedMeshDataCache[name]
+        return calculatePolygonNormals(self.vertices, self.polygons)
 
-    def getVertexNormals(self):
-        name = "Vertex Normals"
-        if name not in self.derivedMeshDataCache:
-            polygonNormals = self.getPolygonNormals()
-            vertexNormals = calculateVertexNormals(self.vertices, self.polygons, polygonNormals)
-            self.derivedMeshDataCache[name] = vertexNormals
-        return self.derivedMeshDataCache[name]
+    @derivedMeshDataCacheHelper("Vertex Normals", handleNormalization = True)
+    def getVertexNormals(self, normalized = False):
+        return calculateVertexNormals(self.vertices, self.polygons, self.getPolygonNormals())
+
+    @derivedMeshDataCacheHelper("Polygon Centers")
+    def getPolygonCenters(self):
+        return calculatePolygonCenters(self.vertices, self.polygons)
+
+    @derivedMeshDataCacheHelper("Polygon Tangents", handleNormalization = True)
+    def getPolygonTangents(self):
+        return calculatePolygonTangents(self.vertices, self.polygons)
+
+    @derivedMeshDataCacheHelper("Polygon Bitangents", handleNormalization = True)
+    def getPolygonBitangents(self):
+        return calculatePolygonBitangents(self.getPolygonTangents(), self.getPolygonNormals())
 
     def setLoopEdges(self, UIntegerList loopEdges):
         if len(loopEdges) == len(self.polygons.indices):
@@ -469,3 +503,60 @@ def getAllPolygonEdges(PolygonIndicesList polygons):
         index += 1
 
     return edges
+
+def calculatePolygonCenters(Vector3DList vertices, PolygonIndicesList polygons):
+    cdef Vector3DList centers = Vector3DList(length = polygons.getLength())
+    centers.fill(0)
+
+    cdef Vector3 *_centers = centers.data
+    cdef Vector3 *_vertices = vertices.data
+
+    cdef unsigned int *indices = polygons.indices.data
+    cdef unsigned int *polyStarts = polygons.polyStarts.data
+    cdef unsigned int *polyLengths = polygons.polyLengths.data
+    cdef unsigned int start, length
+
+    cdef Py_ssize_t i, j
+    for i in range(polygons.getLength()):
+        start = polyStarts[i]
+        length = polyLengths[i]
+
+        for j in range(start, start + length):
+            _centers[i].x += _vertices[indices[j]].x
+            _centers[i].y += _vertices[indices[j]].y
+            _centers[i].z += _vertices[indices[j]].z
+
+        _centers[i].x /= length
+        _centers[i].y /= length
+        _centers[i].z /= length
+
+    return centers
+
+def calculatePolygonTangents(Vector3DList vertices, PolygonIndicesList polygons):
+    cdef Vector3DList tangents = Vector3DList(length = polygons.getLength())
+
+    cdef Vector3 *_tangents = tangents.data
+    cdef Vector3 *_vertices = vertices.data
+
+    cdef unsigned int *indices = polygons.indices.data
+    cdef unsigned int *polyStarts = polygons.polyStarts.data
+    cdef unsigned int *polyLengths = polygons.polyLengths.data
+    cdef unsigned int start, length
+
+    cdef Py_ssize_t i, indexA, indexB
+    for i in range(polygons.getLength()):
+        start = polyStarts[i]
+        indexA = indices[start + 0]
+        indexB = indices[start + 1]
+        _tangents[i].x = _vertices[indexB].x - _vertices[indexA].x
+        _tangents[i].y = _vertices[indexB].y - _vertices[indexA].y
+        _tangents[i].z = _vertices[indexB].z - _vertices[indexA].z
+
+    return tangents
+
+def calculatePolygonBitangents(Vector3DList tangents, Vector3DList normals):
+    cdef Vector3DList bitangents = Vector3DList(length = tangents.length)
+    cdef Py_ssize_t i
+    for i in range(bitangents.length):
+        crossVec3(bitangents.data + i, tangents.data + i, normals.data + i)
+    return bitangents

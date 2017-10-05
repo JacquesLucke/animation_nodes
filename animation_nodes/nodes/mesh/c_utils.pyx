@@ -194,8 +194,105 @@ def separatePolygons(Vector3DList oldVertices, PolygonIndicesList oldPolygons):
     return newVertices, newPolygons
 
 
+# Get Individual Polygons Mesh
+###########################################
+
+def getIndividualPolygonsMesh(Mesh mesh):
+    newVertices = getIndividualPolygons_Vertices(mesh.vertices, mesh.polygons)
+    newEdges = getIndividualPolygons_Edges(mesh.polygons)
+    newPolygons = getIndividualPolygons_Polygons(mesh.polygons)
+
+    newLoopEdges = getIndividualPolygons_LoopEdges(mesh.polygons)
+
+    newMesh = Mesh(newVertices, newEdges, newPolygons, skipValidation = True)
+    newMesh.setLoopEdges(newLoopEdges)
+    return newMesh
+
+def getIndividualPolygons_Vertices(Vector3DList oldVertices, PolygonIndicesList oldPolygons):
+    cdef Vector3DList newVertices = Vector3DList(length = oldPolygons.indices.length)
+    cdef Py_ssize_t i
+    for i in range(newVertices.length):
+        newVertices.data[i] = oldVertices.data[oldPolygons.indices.data[i]]
+    return newVertices
+
+def getIndividualPolygons_Edges(PolygonIndicesList oldPolygons):
+    cdef EdgeIndicesList newEdges = EdgeIndicesList(length = oldPolygons.indices.length)
+    cdef Py_ssize_t i, j, start, length
+    for i in range(oldPolygons.getLength()):
+        start = oldPolygons.polyStarts.data[i]
+        length = oldPolygons.polyLengths.data[i]
+        for j in range(start, start + length - 1):
+            newEdges.data[j].v1 = j
+            newEdges.data[j].v2 = j + 1
+        newEdges.data[start + length - 1].v1 = start + length - 1
+        newEdges.data[start + length - 1].v2 = start
+    return newEdges
+
+def getIndividualPolygons_Polygons(PolygonIndicesList oldPolygons):
+    cdef PolygonIndicesList newPolygons = PolygonIndicesList(
+        indicesAmount = oldPolygons.indices.length,
+        polygonAmount = oldPolygons.getLength())
+
+    # polyStarts is identical
+    memcpy(newPolygons.polyStarts.data,
+           oldPolygons.polyStarts.data,
+           oldPolygons.polyStarts.length * oldPolygons.polyStarts.getElementSize())
+
+    # polyLengths is identical
+    memcpy(newPolygons.polyLengths.data,
+           oldPolygons.polyLengths.data,
+           oldPolygons.polyLengths.length * oldPolygons.polyLengths.getElementSize())
+
+    cdef Py_ssize_t i
+    for i in range(oldPolygons.indices.length):
+        newPolygons.indices.data[i] = i
+
+    return newPolygons
+
+def getIndividualPolygons_LoopEdges(PolygonIndicesList oldPolygons):
+    cdef UIntegerList loopEdges = UIntegerList(length = oldPolygons.indices.length)
+    cdef Py_ssize_t i
+    for i in range(loopEdges.length):
+        loopEdges.data[i] = i
+    return loopEdges
+
+
 # Extract Polygon Transforms
 ###########################################
+
+def extractMeshPolygonTransforms(Mesh mesh):
+    centers = mesh.getPolygonCenters()
+    normals = mesh.getPolygonNormals(normalized = True)
+    tangents = mesh.getPolygonTangents(normalized = True)
+    bitangents = mesh.getPolygonBitangents(normalized = True)
+    return matricesFromNormalizedAxisData(centers, tangents, bitangents, normals)
+
+def extractInvertedPolygonTransforms(Mesh mesh):
+    centers = mesh.getPolygonCenters()
+    normals = mesh.getPolygonNormals(normalized = True)
+    tangents = mesh.getPolygonTangents(normalized = True)
+    bitangents = mesh.getPolygonBitangents(normalized = True)
+    return invertedMatricesFromNormalizedAxisData(centers, tangents, bitangents, normals)
+
+def matricesFromNormalizedAxisData(Vector3DList origins, Vector3DList xDirections,
+                                   Vector3DList yDirections, Vector3DList zDirections):
+    assert origins.length == xDirections.length == yDirections.length == zDirections.length
+    cdef Matrix4x4List matrices = Matrix4x4List(length = origins.length)
+    cdef Py_ssize_t i
+    for i in range(matrices.length):
+        createMatrix(matrices.data + i, origins.data + i,
+            xDirections.data + i, yDirections.data + i, zDirections.data + i)
+    return matrices
+
+def invertedMatricesFromNormalizedAxisData(Vector3DList origins, Vector3DList xDirections,
+                                           Vector3DList yDirections, Vector3DList zDirections):
+    assert origins.length == xDirections.length == yDirections.length == zDirections.length
+    cdef Matrix4x4List matrices = Matrix4x4List(length = origins.length)
+    cdef Py_ssize_t i
+    for i in range(matrices.length):
+        createInvertedMatrix(matrices.data + i, origins.data + i,
+            xDirections.data + i, yDirections.data + i, zDirections.data + i)
+    return matrices
 
 def extractPolygonTransforms(Vector3DList vertices, PolygonIndicesList polygons,
                              bint calcNormal = True, bint calcInverted = False):
@@ -236,7 +333,7 @@ def extractPolygonTransforms(Vector3DList vertices, PolygonIndicesList polygons,
         return invertedTransforms
 
 @cython.cdivision(True)
-cdef void extractPolygonData(Vector3 *vertices,
+cdef inline void extractPolygonData(Vector3 *vertices,
                         unsigned int *indices, unsigned int vertexAmount,
                         Vector3 *center, Vector3 *normal, Vector3 *tangent):
     # Center
@@ -260,13 +357,15 @@ cdef void extractPolygonData(Vector3 *vertices,
     # Tangent
     tangent[0] = a
 
-cdef void createMatrix(Matrix4 *m, Vector3 *center, Vector3 *normal, Vector3 *tangent, Vector3 *bitangent):
+cdef inline void createMatrix(Matrix4 *m, Vector3 *center, Vector3 *tangent,
+                              Vector3 *bitangent, Vector3 *normal):
     m.a11, m.a12, m.a13, m.a14 = tangent.x, bitangent.x, normal.x, center.x
     m.a21, m.a22, m.a23, m.a24 = tangent.y, bitangent.y, normal.y, center.y
     m.a31, m.a32, m.a33, m.a34 = tangent.z, bitangent.z, normal.z, center.z
     m.a41, m.a42, m.a43, m.a44 = 0, 0, 0, 1
 
-cdef void createInvertedMatrix(Matrix4 *m, Vector3 *center, Vector3 *normal, Vector3 *tangent, Vector3 *bitangent):
+cdef inline void createInvertedMatrix(Matrix4 *m, Vector3 *center, Vector3 *tangent,
+                                      Vector3 *bitangent, Vector3 *normal):
     m.a11, m.a12, m.a13 = tangent.x,   tangent.y,   tangent.z,
     m.a21, m.a22, m.a23 = bitangent.x, bitangent.y, bitangent.z
     m.a31, m.a32, m.a33 = normal.x,    normal.y,    normal.z

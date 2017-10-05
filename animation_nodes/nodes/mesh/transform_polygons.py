@@ -1,13 +1,14 @@
 import bpy
 from ... base_types import AnimationNode
 from .. matrix.transformation_base_node import MatrixTransformationBase
-from . c_utils import transformPolygons, separatePolygons, extractPolygonTransforms
+from . c_utils import transformPolygons, getIndividualPolygonsMesh, extractMeshPolygonTransforms, extractInvertedPolygonTransforms
 from ... data_structures import Mesh, EdgeIndicesList
 from ... data_structures.meshes.mesh_data import createValidEdgesList
 
 class TransformPolygonsNode(bpy.types.Node, AnimationNode, MatrixTransformationBase):
     bl_idname = "an_TransformPolygonsNode"
     bl_label = "Transform Polygons"
+    bl_width_default = 190
     errorHandlingType = "EXCEPTION"
 
     def create(self):
@@ -22,13 +23,17 @@ class TransformPolygonsNode(bpy.types.Node, AnimationNode, MatrixTransformationB
         self.drawAdvanced_MatrixTransformationProperties(layout)
 
     def execute(self, mesh, *transformationArgs):
-        newVertices, newPolygons = separatePolygons(mesh.vertices, mesh.polygons)
-        transforms, invertedTransforms = extractPolygonTransforms(newVertices, newPolygons, calcInverted = True)
-        transformPolygons(newVertices, newPolygons, invertedTransforms)
+        newMesh = getIndividualPolygonsMesh(mesh)
+
+        transforms = extractMeshPolygonTransforms(newMesh)
+        invertedTransforms = extractInvertedPolygonTransforms(newMesh)
+        transformPolygons(newMesh.vertices, newMesh.polygons, invertedTransforms)
+
         newTransforms = self.transformMatrices(transforms, transformationArgs)
-        transformPolygons(newVertices, newPolygons, newTransforms)
-        newEdges = createValidEdgesList(EdgeIndicesList(), newPolygons)
-        return Mesh(newVertices, newEdges, newPolygons)
+
+        transformPolygons(newMesh.vertices, newMesh.polygons, newTransforms)
+        newMesh.verticesChanged()
+        return newMesh
 
     def transformMatrices(self, matrices, args):
         name = self.getMatrixTransformationFunctionName(useMatrixList = True)

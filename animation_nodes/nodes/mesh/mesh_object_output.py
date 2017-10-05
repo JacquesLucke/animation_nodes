@@ -20,7 +20,7 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
     meshDataType = EnumProperty(name = "Mesh Type", default = "MESH_DATA",
         items = meshDataTypeItems, update = AnimationNode.refresh)
 
-    validateMesh = BoolProperty(name = "Validate Mesh", default = True,
+    validateMesh = BoolProperty(name = "Validate Mesh", default = False,
         description = "", update = propertyChanged)
 
     validateMeshVerbose = BoolProperty(name = "Validate Mesh Verbose", default = False,
