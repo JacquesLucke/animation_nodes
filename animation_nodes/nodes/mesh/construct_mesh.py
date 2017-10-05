@@ -12,7 +12,7 @@ class ConstructMeshNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ConstructMeshNode"
     bl_label = "Construct Mesh"
 
-    source = EnumProperty(name = "Source", default = "MESH_DATA",
+    source = EnumProperty(name = "Source", default = "OBJECT",
         items = sourceItems, update = AnimationNode.refresh)
 
     def create(self):
