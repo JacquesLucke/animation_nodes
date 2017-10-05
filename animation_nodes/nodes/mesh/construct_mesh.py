@@ -1,6 +1,7 @@
 import bpy
 from bpy.props import *
 from ... data_structures import Mesh
+from ... events import propertyChanged
 from ... base_types import AnimationNode
 
 sourceItems = [
@@ -14,6 +15,9 @@ class ConstructMeshNode(bpy.types.Node, AnimationNode):
 
     source = EnumProperty(name = "Source", default = "OBJECT",
         items = sourceItems, update = AnimationNode.refresh)
+
+    useUVs = BoolProperty(name = "Use UVs", default = False,
+        update = propertyChanged)
 
     def create(self):
         if self.source == "MESH_DATA":
@@ -29,6 +33,7 @@ class ConstructMeshNode(bpy.types.Node, AnimationNode):
 
     def draw(self, layout):
         layout.prop(self, "source", text = "")
+        layout.prop(self, "useUVs", toggle = True)
 
     def getExecutionFunctionName(self):
         if self.source == "MESH_DATA":
@@ -44,6 +49,8 @@ class ConstructMeshNode(bpy.types.Node, AnimationNode):
             return Mesh()
 
         sourceMesh = object.an.getMesh(scene, useModifiers)
+        if sourceMesh is None:
+            return Mesh()
 
         vertices = sourceMesh.an.getVertices()
         if useWorldSpace:
@@ -52,7 +59,15 @@ class ConstructMeshNode(bpy.types.Node, AnimationNode):
         edges = sourceMesh.an.getEdgeIndices()
         polygons = sourceMesh.an.getPolygonIndices()
 
+        outMesh = Mesh(vertices, edges, polygons, skipValidation = True)
+
+        if self.useUVs:
+            if object.mode == "OBJECT":
+                for uvMapName in sourceMesh.uv_layers.keys():
+                    outMesh.insertUVMap(uvMapName, sourceMesh.an.getUVMap(uvMapName))
+
+
         if sourceMesh.users == 0:
             bpy.data.meshes.remove(sourceMesh)
 
-        return Mesh(vertices, edges, polygons, skipValidation = True)
+        return outMesh

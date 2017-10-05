@@ -118,6 +118,11 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
         outMesh.loops.foreach_set("vertex_index", mesh.polygons.indices.asMemoryView())
         outMesh.loops.foreach_set("edge_index", mesh.getLoopEdges().asMemoryView())
 
+        # UV Maps
+        for name, data in mesh.getUVMaps():
+            outMesh.uv_textures.new(name)
+            outMesh.uv_layers[name].data.foreach_set("uv", data.asMemoryView())
+
         if self.validateMesh:
             outMesh.validate(verbose = self.validateMeshVerbose)
 

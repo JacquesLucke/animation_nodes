@@ -2,8 +2,9 @@
 from libc.stdint cimport uint32_t
 from cpython.ref cimport PyObject
 from collections import namedtuple
+import textwrap
 import functools
-from .. lists.base_lists cimport UIntegerList, EdgeIndices, IntegerList, Vector3DList
+from .. lists.base_lists cimport UIntegerList, EdgeIndices, IntegerList, Vector3DList, Vector2DList
 from ... math cimport Vector3, crossVec3, subVec3, addVec3_Inplace, isExactlyZeroVec3, normalizeVec3
 
 def derivedMeshDataCacheHelper(name, handleNormalization = False):
@@ -46,6 +47,8 @@ cdef class Mesh:
         self.polygons = polygons
 
         self.derivedMeshDataCache = {}
+        self.uvMaps = {}
+
         self.vertexProperties = {}
         self.edgeProperties = {}
         self.polygonProperties = {}
@@ -90,22 +93,36 @@ cdef class Mesh:
 
     def setPolygonNormals(self, Vector3DList normals):
         if len(normals) == len(self.polygons):
-            self.derivedMeshDataCache["Polygon Normals"] = normals
+            self.derivedMeshDataCache["Polygon Normals"] = (normals, False)
         else:
             raise Exception("invalid length")
 
     def setVertexNormals(self, Vector3DList normals):
         if len(normals) == len(self.vertices):
-            self.derivedMeshDataCache["Vertex Normals"] = normals
+            self.derivedMeshDataCache["Vertex Normals"] = (normals, False)
         else:
             raise Exception("invalid length")
+
+    def insertUVMap(self, str name, Vector2DList uvs):
+        if len(uvs) == len(self.polygons.indices):
+            self.uvMaps[name] = uvs
+        else:
+            raise Exception("invalid length")
+
+    def getUVMaps(self):
+        return list(self.uvMaps.items())
 
     def copy(self):
         return Mesh(self.vertices.copy(), self.edges.copy(), self.polygons.copy())
 
     def __repr__(self):
-        return "<AN Mesh Object: Vertices: {}, Edges: {}, Polygons: {}>".format(
-                len(self.vertices), len(self.edges), len(self.polygons))
+        return textwrap.dedent("""\
+            AN Mesh Object:
+                Vertices: {}
+                Edges: {}
+                Polygons: {}
+                UV Maps: {}\
+            """.format(len(self.vertices), len(self.edges), len(self.polygons), list(self.uvMaps.keys())))
 
     @classmethod
     def join(cls, *meshes):

@@ -8,6 +8,7 @@ from ... data_structures cimport (
     LongList,
     DoubleList,
     UIntegerList,
+    Vector2DList,
     Vector3DList,
     Matrix4x4List,
     EdgeIndicesList,
@@ -206,6 +207,10 @@ def getIndividualPolygonsMesh(Mesh mesh):
 
     newMesh = Mesh(newVertices, newEdges, newPolygons, skipValidation = True)
     newMesh.setLoopEdges(newLoopEdges)
+
+    for name, uvMap in mesh.getUVMaps():
+        newMesh.insertUVMap(name, uvMap.copy())
+
     return newMesh
 
 def getIndividualPolygons_Vertices(Vector3DList oldVertices, PolygonIndicesList oldPolygons):
@@ -441,6 +446,9 @@ def replicateMesh(Mesh source, transformations):
     mesh.setVertexNormals(newVertexNormals)
     mesh.setPolygonNormals(newPolygonNormals)
     mesh.setLoopEdges(newLoopEdges)
+
+    for name, data in source.getUVMaps():
+        mesh.insertUVMap(name, data.repeated(amount = len(transformations)))
 
     return mesh
 

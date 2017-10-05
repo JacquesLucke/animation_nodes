@@ -11,3 +11,4 @@ cdef class Mesh:
         dict edgeProperties
         dict polygonProperties
         dict loopProperties
+        dict uvMaps
