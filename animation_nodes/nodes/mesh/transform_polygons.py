@@ -3,7 +3,6 @@ from ... base_types import AnimationNode
 from .. matrix.transformation_base_node import MatrixTransformationBase
 from . c_utils import transformPolygons, getIndividualPolygonsMesh, extractMeshPolygonTransforms, extractInvertedPolygonTransforms
 from ... data_structures import Mesh, EdgeIndicesList
-from ... data_structures.meshes.mesh_data import createValidEdgesList
 
 class TransformPolygonsNode(bpy.types.Node, AnimationNode, MatrixTransformationBase):
     bl_idname = "an_TransformPolygonsNode"
