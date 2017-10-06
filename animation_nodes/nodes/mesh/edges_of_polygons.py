@@ -1,6 +1,7 @@
 import bpy
 from ... base_types import AnimationNode
 from ... data_structures import EdgeIndicesList
+from ... data_structures.meshes.validate import createValidEdgesList
 
 class EdgesOfPolygonsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_EdgesOfPolygonsNode"
@@ -11,10 +12,4 @@ class EdgesOfPolygonsNode(bpy.types.Node, AnimationNode):
         self.newOutput("Edge Indices List", "Edges", "edges")
 
     def execute(self, polygons):
-        edges = []
-        for polygon in polygons:
-            for i, index in enumerate(polygon):
-                startIndex = polygon[i - 1]
-                edge = (startIndex, index) if index > startIndex else (index, startIndex)
-                edges.append(edge)
-        return EdgeIndicesList.fromValues(set(edges))
+        return createValidEdgesList(polygons = polygons)
