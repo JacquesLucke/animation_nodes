@@ -12,6 +12,7 @@ sourceItems = [
 class ConstructMeshNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ConstructMeshNode"
     bl_label = "Construct Mesh"
+    errorHandlingType = "EXCEPTION"
 
     source = EnumProperty(name = "Source", default = "OBJECT",
         items = sourceItems, update = AnimationNode.refresh)
@@ -42,7 +43,10 @@ class ConstructMeshNode(bpy.types.Node, AnimationNode):
             return "execute_Object"
 
     def execute_MeshData(self, vertices, edgeIndices, polygonIndices):
-        return Mesh(vertices, edgeIndices, polygonIndices)
+        try:
+            return Mesh(vertices, edgeIndices, polygonIndices)
+        except Exception as e:
+            self.raiseErrorMessage(str(e))
 
     def execute_Object(self, object, useWorldSpace, useModifiers, scene):
         if object is None:

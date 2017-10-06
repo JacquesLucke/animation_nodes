@@ -7,10 +7,11 @@ from .. lists.base_lists cimport (
 )
 
 def checkMeshData(Vector3DList vertices, EdgeIndicesList edges, PolygonIndicesList polygons):
+    # TODO: maybe check vertices for NaN and inf
     if edges.length > 0 and edges.getMaxIndex() >= vertices.length:
-        raise Exception("there is an edge that references a not existing vertex")
+        raise Exception("There is an edge that references a not existing vertex")
     if polygons.getLength() > 0 and polygons.getMaxIndex() >= vertices.length:
-        raise Exception("there is a polygon that references a not existing vertex")
+        raise Exception("There is a polygon that references a not existing vertex")
 
     checkIndividualEdgeVadility(edges)
     checkIndividualPolygonValidity(polygons)
@@ -23,6 +24,11 @@ def checkMeshData(Vector3DList vertices, EdgeIndicesList edges, PolygonIndicesLi
 
     checkIfAllRequiredEdgesExist(polygons, edges, edgeHashes, edgesLookup)
 
+def validMeshDataFromSourceData(Vector3DList sourceVertices,
+                                EdgeIndicesList sourceEdges, PolygonIndicesList sourcePolygons):
+    cdef UIntegerList edgeHashes = getEdgeHashes(sourceEdges)
+    cdef IntegerList edgesLookup = getLookupForEdgeHashes(edgeHashes, sourceEdges, ignoreDuplicates = True)
+
 
 # Check individual edges/polygons
 ####################################################
@@ -32,8 +38,8 @@ def checkIndividualEdgeVadility(EdgeIndicesList edges):
     cdef EdgeIndices *_edges = edges.data
     for i in range(edges.length):
         if _edges[i].v1 == _edges[i].v2:
-            raise Exception("Vertex cannot be connected to itself (index: {}, value: {})"
-                            .format(i, edges[i]))
+            raise Exception(("An edge connects a point with itself.\n"
+                             "pos {}: {}").format(i, edges[i]))
 
 def checkIndividualPolygonValidity(PolygonIndicesList polygons):
     cdef unsigned int *indices = polygons.indices.data
@@ -65,8 +71,8 @@ def checkIndividualPolygonValidity(PolygonIndicesList polygons):
                     invalid = invalid or (indices[j] == indices[k])
 
         if invalid:
-            raise Exception("Polygon cannot use a Vertex twice (index: {}, value: {})"
-                            .format(i, polygons[i]))
+            raise Exception(("A polygon uses the same vertex twice:\n"
+                             "pos {}: {}").format(i, polygons[i]))
 
 # Edge/Polygon relations
 ####################################################
@@ -87,10 +93,18 @@ def checkIfAllRequiredEdgesExist(PolygonIndicesList polygons, EdgeIndicesList ed
 
         for j in range(start, start + length - 1):
             if not edgeExistsInLookup(indices[j], indices[j+1], edges.data, edgesLookup.data, mask):
-                raise Exception("an edge is not available for polygon {}".format(i))
+                edge = (indices[j], indices[j+1])
+                raiseMissingEdgeForPolygonException(i, polygons[i], edge)
 
         if not edgeExistsInLookup(indices[start], indices[start + length - 1], edges.data, edgesLookup.data, mask):
-            raise Exception("an edge is not available for polygon {}".format(i))
+            edge = (indices[start], indices[start + length - 1])
+            raiseMissingEdgeForPolygonException(i, polygons[i], edge)
+
+def raiseMissingEdgeForPolygonException(index, polygon, edge):
+    raise Exception(("A polygon requires an edge that does not exist.\n"
+                     "polygon: {} at {}\n"
+                     "missing edge: {}")
+                     .format(polygon, index, edge))
 
 def calculateLoopEdges(EdgeIndicesList edges, PolygonIndicesList polygons):
     cdef UIntegerList edgeHashes = getEdgeHashes(edges)
@@ -116,8 +130,13 @@ def calculateLoopEdges(EdgeIndicesList edges, PolygonIndicesList polygons):
 
     return result
 
-def createValidEdgesList(EdgeIndicesList edges, PolygonIndicesList polygons):
-    cdef EdgeIndicesList allEdges = edges + getAllPolygonEdges(polygons)
+def createValidEdgesList(EdgeIndicesList edges = EdgeIndicesList(),
+                         PolygonIndicesList polygons = PolygonIndicesList()):
+    cdef EdgeIndicesList allEdges
+    if len(edges) == 0: allEdges = getAllPolygonEdges(polygons)
+    elif len(polygons) == 0: allEdges = edges
+    else: allEdges = edges + getAllPolygonEdges(polygons)
+
     cdef UIntegerList edgeHashes = getEdgeHashes(allEdges)
     cdef IntegerList edgesLookup = getLookupForEdgeHashes(edgeHashes, allEdges, ignoreDuplicates = True)
 
@@ -213,18 +232,31 @@ cdef struct PolygonListData:
     unsigned int *polyStarts
     unsigned int *polyLengths
 
-def getLookupForEdgeHashes(UIntegerList hashes, EdgeIndicesList edges, bint ignoreDuplicates = False):
+def getLookupForEdgeHashes(UIntegerList hashes, EdgeIndicesList edges,
+                           bint ignoreDuplicates = False):
     if ignoreDuplicates:
         return createLookupForHashes(hashes, compareEdges_IgnoreDuplicate, edges.data)
     else:
-        return createLookupForHashes(hashes, compareEdges_FailOnDuplicate, edges.data)
+        try:
+            return createLookupForHashes(hashes, compareEdges_FailOnDuplicate, edges.data)
+        except DuplicatedElementError as e:
+            raise Exception(("Two edges use the exact same vertices:\n"
+                             "pos {}: {}\n"
+                             "pos {}: {}")
+                            .format(e.index1, edges[e.index1], e.index2, edges[e.index2]))
 
 def getLookupForPolygonHashes(UIntegerList hashes, PolygonIndicesList polygons):
     cdef PolygonListData data
     data.indices = polygons.indices.data
     data.polyStarts = polygons.polyStarts.data
     data.polyLengths = polygons.polyLengths.data
-    return createLookupForHashes(hashes, comparePolygons, &data)
+    try:
+        return createLookupForHashes(hashes, comparePolygons, &data)
+    except DuplicatedElementError as e:
+        raise Exception(("Two polygons use the exact same vertices:\n"
+                         "pos {}: {}\n"
+                         "pos {}: {}")
+                         .format(e.index1, polygons[e.index1], e.index2, polygons[e.index2]))
 
 cdef inline char edgeExistsInLookup(unsigned int i1, unsigned int i2,
                                   EdgeIndices *edges, int *edgesLookup,
@@ -273,7 +305,7 @@ cdef createLookupForHashes(UIntegerList hashes,
                 if duplicateType == 1:
                     break # ignore duplicate
                 elif duplicateType == 2:
-                    raise Exception("duplicates at {} and {}".format(i, indexInSlot))
+                    raise DuplicatedElementError(indexInSlot, i)
 
             slot = (slot + 1) & mask
             indexInSlot = _lookup[slot]
@@ -337,3 +369,13 @@ cdef char comparePolygons(void *settings, unsigned int i1, unsigned int i2):
             return 2
 
     return 0
+
+
+# Exceptions
+####################################################
+
+class DuplicatedElementError(Exception):
+    def __init__(self, index1, index2):
+        super().__init__("Duplicated elements at {} and {}".format(index1, index2))
+        self.index1 = index1
+        self.index2 = index2
