@@ -362,8 +362,6 @@ class MeshMenu(bpy.types.Menu):
         insertNode(layout, "an_ObjectBoundingBoxNode", "Get Bounding Box")
         insertNode(layout, "an_VertexGroupInputNode", "Vertex Group Input")
         layout.separator()
-        insertNode(layout, "an_SeparateMeshNode", "Separate")
-        insertNode(layout, "an_CombineMeshNode", "Combine")
         insertNode(layout, "an_TransformPolygonsNode", "Transform Polygons")
         insertNode(layout, "an_SeparatePolygonsNode", "Separate Polygons")
         insertNode(layout, "an_ExtractPolygonTransformsNode", "Extract Polygon Transforms")

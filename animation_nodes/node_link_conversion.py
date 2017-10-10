@@ -64,7 +64,6 @@ class SimpleConvert(LinkCorrection):
         ("Float", "Vector") : "an_CombineVectorNode",
         ("Integer", "Vector") : "an_CombineVectorNode",
         ("Vector List", "Mesh") : "an_CombineMeshNode",
-        ("Mesh", "Vector List") : "an_SeparateMeshNode",
         ("Mesh", "BMesh") : "an_CreateBMeshFromMeshNode",
         ("Integer", "Euler") : "an_CombineEulerNode",
         ("Float", "Euler") : "an_CombineEulerNode",
