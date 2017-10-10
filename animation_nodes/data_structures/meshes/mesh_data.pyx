@@ -1,6 +1,7 @@
 # cython: profile=True
 import textwrap
 import functools
+from collections import OrderedDict
 from . validate import checkMeshData, calculateLoopEdges
 from .. lists.base_lists cimport UIntegerList, EdgeIndices, Vector3DList, Vector2DList
 from ... math cimport Vector3, crossVec3, subVec3, addVec3_Inplace, isExactlyZeroVec3, normalizeVec3
@@ -45,12 +46,7 @@ cdef class Mesh:
         self.polygons = polygons
 
         self.derivedMeshDataCache = {}
-        self.uvMaps = {}
-
-        self.vertexProperties = {}
-        self.edgeProperties = {}
-        self.polygonProperties = {}
-        self.loopProperties = {}
+        self.uvMaps = OrderedDict()
 
     def verticesChanged(self):
         self.derivedMeshDataCache.pop("Vertex Normals", None)
@@ -109,6 +105,9 @@ cdef class Mesh:
 
     def getUVMaps(self):
         return list(self.uvMaps.items())
+
+    def getUVMapNames(self):
+        return list(self.uvMaps.keys())
 
     def copy(self):
         mesh = Mesh(self.vertices.copy(), self.edges.copy(), self.polygons.copy())

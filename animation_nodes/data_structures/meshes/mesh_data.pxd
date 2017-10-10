@@ -7,8 +7,4 @@ cdef class Mesh:
         readonly EdgeIndicesList edges
         readonly PolygonIndicesList polygons
         dict derivedMeshDataCache
-        dict vertexProperties
-        dict edgeProperties
-        dict polygonProperties
-        dict loopProperties
-        dict uvMaps
+        object uvMaps
