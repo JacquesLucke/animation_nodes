@@ -208,8 +208,8 @@ def getIndividualPolygonsMesh(Mesh mesh):
     newMesh = Mesh(newVertices, newEdges, newPolygons, skipValidation = True)
     newMesh.setLoopEdges(newLoopEdges)
 
-    for name, uvMap in mesh.getUVMaps():
-        newMesh.insertUVMap(name, uvMap.copy())
+    newMesh.transferMeshProperties(mesh,
+        calcNewLoopProperty = lambda x: x.copy())
 
     return newMesh
 
@@ -447,8 +447,8 @@ def replicateMesh(Mesh source, transformations):
     mesh.setPolygonNormals(newPolygonNormals)
     mesh.setLoopEdges(newLoopEdges)
 
-    for name, data in source.getUVMaps():
-        mesh.insertUVMap(name, data.repeated(amount = len(transformations)))
+    mesh.transferMeshProperties(source,
+        calcNewLoopProperty = lambda x: x.repeated(amount = len(transformations)))
 
     return mesh
 

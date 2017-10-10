@@ -122,6 +122,11 @@ cdef class Mesh:
                 UV Maps: {}\
             """.format(len(self.vertices), len(self.edges), len(self.polygons), list(self.uvMaps.keys())))
 
+    def transferMeshProperties(self, Mesh source, *, calcNewLoopProperty = None):
+        if calcNewLoopProperty is not None:
+            for name, uvMap in source.uvMaps.items():
+                self.uvMaps[name] = calcNewLoopProperty(uvMap)
+
     @classmethod
     def join(cls, *meshes):
         cdef Mesh newMesh = Mesh()
