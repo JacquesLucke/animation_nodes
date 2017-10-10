@@ -27,7 +27,7 @@ class ConstructMeshNode(bpy.types.Node, AnimationNode):
             self.newInput("Polygon Indices List", "Polygon Indices", "polygonIndices")
         elif self.source == "OBJECT":
             self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
-            self.newInput("Boolean", "Use World Space", "useWorldSpace", value = True)
+            self.newInput("Boolean", "Use World Space", "useWorldSpace", value = False)
             self.newInput("Boolean", "Use Modifiers", "useModifiers", value = False)
             self.newInput("Scene", "Scene", "scene", hide = True)
         self.newOutput("Mesh", "Mesh", "mesh")

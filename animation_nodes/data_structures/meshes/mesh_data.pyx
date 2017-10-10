@@ -68,7 +68,7 @@ cdef class Mesh:
         return calculatePolygonNormals(self.vertices, self.polygons)
 
     @derivedMeshDataCacheHelper("Vertex Normals", handleNormalization = True)
-    def getVertexNormals(self, normalized = False):
+    def getVertexNormals(self):
         return calculateVertexNormals(self.vertices, self.polygons, self.getPolygonNormals())
 
     @derivedMeshDataCacheHelper("Polygon Centers")
@@ -111,7 +111,10 @@ cdef class Mesh:
         return list(self.uvMaps.items())
 
     def copy(self):
-        return Mesh(self.vertices.copy(), self.edges.copy(), self.polygons.copy())
+        mesh = Mesh(self.vertices.copy(), self.edges.copy(), self.polygons.copy())
+        mesh.transferMeshProperties(self,
+            calcNewLoopProperty = lambda x: x.copy())
+        return mesh
 
     def __repr__(self):
         return textwrap.dedent("""\
