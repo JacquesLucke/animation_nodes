@@ -16,6 +16,7 @@
         "To PyObject" : "toPyVector3(value)",
         "Additional Methods" : "__vector_list_functions.src",
         "Declarations" : [
+            "from libc.math cimport sqrt",
             "from ... math.vector cimport Vector3",
             "from ... math.conversion cimport setVector3, toPyVector3"
         ]
@@ -65,6 +66,18 @@
         "Additional Methods" : "__indices_list_functions.src",
         "Declarations" : [
             "cdef struct EdgeIndices:\n    unsigned int v1, v2"
+        ]
+    },
+    "Vector2DList" : {
+        "Type" : "Vector2",
+        "Buffer Type" : "float",
+        "Equals" : "not memcmp(&(\\1), &(\\2), sizeof(Vector2))",
+        "Try Conversion" : "setVector2(target, value)",
+        "To PyObject" : "toPyVector2(value)",
+        "Additional Methods" : "",
+        "Declarations" : [
+            "from ... math.vector cimport Vector2",
+            "from ... math.conversion cimport setVector2, toPyVector2"
         ]
     }
 }

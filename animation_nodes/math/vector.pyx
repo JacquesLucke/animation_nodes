@@ -1,6 +1,9 @@
 import cython
 from libc.math cimport sqrt, ceil, acos, sin, cos
 
+cdef char isExactlyZeroVec3(Vector3* v):
+    return v.x == v.y == v.z == 0
+
 cdef char almostZeroVec3(Vector3* v):
     return lengthSquaredVec3(v) < 0.000001
 
@@ -27,6 +30,11 @@ cdef void addVec3(Vector3* target, Vector3* a, Vector3* b):
     target.x = a.x + b.x
     target.y = a.y + b.y
     target.z = a.z + b.z
+
+cdef void addVec3_Inplace(Vector3* target, Vector3* other):
+    target.x += other.x
+    target.y += other.y
+    target.z += other.z
 
 cdef void subVec3(Vector3* target, Vector3* a, Vector3* b):
     target.x = a.x - b.x

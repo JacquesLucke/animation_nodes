@@ -1,9 +1,13 @@
+cdef struct Vector2:
+    float x, y
+
 cdef struct Vector3:
     float x, y, z
 
 cdef struct Vector4:
     float x, y, z, w
 
+cdef char isExactlyZeroVec3(Vector3* v)
 cdef char almostZeroVec3(Vector3* v)
 cdef char isCloseVec3(Vector3* a, Vector3* b)
 
@@ -14,6 +18,7 @@ cdef void scaleVec3(Vector3* target, Vector3* a, float factor)
 cdef void scaleVec3_Inplace(Vector3* v, float factor)
 
 cdef void addVec3(Vector3* target, Vector3* a, Vector3* b)
+cdef void addVec3_Inplace(Vector3* target, Vector3* other)
 cdef void subVec3(Vector3* target, Vector3* a, Vector3* b)
 cdef void multVec3(Vector3* target, Vector3* a, Vector3* b)
 cdef void divideVec3(Vector3* target, Vector3* a, Vector3* b)

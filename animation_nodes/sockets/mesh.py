@@ -1,18 +1,18 @@
 import bpy
-from .. data_structures import MeshData
+from .. data_structures import Mesh
 from .. base_types import AnimationNodeSocket, PythonListSocket
 
-class MeshDataSocket(bpy.types.NodeSocket, AnimationNodeSocket):
-    bl_idname = "an_MeshDataSocket"
-    bl_label = "Mesh Data Socket"
-    dataType = "Mesh Data"
-    drawColor = (0.3, 0.4, 0.18, 1)
+class MeshSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+    bl_idname = "an_MeshSocket"
+    bl_label = "Mesh Socket"
+    dataType = "Mesh"
+    drawColor = (0.2, 0.7, 1, 1)
     storable = True
     comparable = False
 
     @classmethod
     def getDefaultValue(cls):
-        return MeshData()
+        return Mesh()
 
     @classmethod
     def getCopyExpression(cls):
@@ -20,17 +20,17 @@ class MeshDataSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     @classmethod
     def correctValue(cls, value):
-        if isinstance(value, MeshData):
+        if isinstance(value, Mesh):
             return value, 0
         return cls.getDefaultValue(), 2
 
 
-class MeshDataListSocket(bpy.types.NodeSocket, PythonListSocket):
-    bl_idname = "an_MeshDataListSocket"
-    bl_label = "Mesh Data List Socket"
-    dataType = "Mesh Data List"
-    baseType = MeshDataSocket
-    drawColor = (0.3, 0.4, 0.18, 0.5)
+class MeshListSocket(bpy.types.NodeSocket, PythonListSocket):
+    bl_idname = "an_MeshListSocket"
+    bl_label = "Mesh List Socket"
+    dataType = "Mesh List"
+    baseType = MeshSocket
+    drawColor = (0.18, 0.32, 1, 0.5)
     storable = True
     comparable = False
 
@@ -41,6 +41,6 @@ class MeshDataListSocket(bpy.types.NodeSocket, PythonListSocket):
     @classmethod
     def correctValue(cls, value):
         if isinstance(value, list):
-            if all(isinstance(element, MeshData) for element in value):
+            if all(isinstance(element, Mesh) for element in value):
                 return value, 0
         return cls.getDefaultValue(), 2

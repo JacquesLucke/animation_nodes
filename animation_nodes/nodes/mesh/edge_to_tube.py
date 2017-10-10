@@ -25,8 +25,7 @@ class EdgeToTubeNode(bpy.types.Node, AnimationNode):
         self.newInput("Integer", "Resolution", "resolution", value = 3, minValue = 2)
         self.newInput("Boolean", "Caps", "caps", value = True)
 
-        self.newOutput("Vector List", "Vertices", "outVertices")
-        self.newOutput("Polygon Indices List", "Polygon Indices", "outIndices")
+        self.newOutput("Mesh", "Mesh", "mesh")
 
     def getExecutionFunctionName(self):
         if self.useEdgeIndicesList:

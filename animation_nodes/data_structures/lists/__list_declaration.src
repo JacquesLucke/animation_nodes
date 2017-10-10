@@ -10,6 +10,7 @@ cdef class LISTNAME(CList):
     cdef void shrinkToLength(self)
     cdef replaceArray(self, TYPE* newData, Py_ssize_t newLength, Py_ssize_t newCapacity)
 
+    cdef append_LowLevel(self, TYPE value)
     cdef extendList(self, list values)
     cdef extendTuple(self, tuple values)
     cdef Py_ssize_t searchIndex(self, TYPE value)
