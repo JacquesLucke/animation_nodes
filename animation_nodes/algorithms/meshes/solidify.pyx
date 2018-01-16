@@ -10,7 +10,7 @@ from ... data_structures cimport (
 )
 
 def solidify(Mesh mesh, int loops = 0):
-    cdef int i, j, vertexIndex, boundaryIndex
+    cdef int i, j
     cdef double normalLength
 
     cdef Vector3DList vertices = mesh.vertices
@@ -23,7 +23,7 @@ def solidify(Mesh mesh, int loops = 0):
     cdef int verticesAmount = len(vertices)
     cdef int edgesAmount = len(edges)
     cdef int indicesAmount = len(polygons.indices)
-    cdef int polygonsAmount = len(polygons.polyStarts)
+    cdef int polygonAmount = len(polygons.polyStarts)
 
     # =============================== Vertices ===============================
     cdef int *boundaryValues = <int*>PyMem_Malloc(verticesAmount * sizeof(int))
@@ -33,13 +33,15 @@ def solidify(Mesh mesh, int loops = 0):
         (boundaryValues + edges.data[i].v1)[0] += 1
         (boundaryValues + edges.data[i].v2)[0] += 1
 
-    for i in range(polygonsAmount):
+    for i in range(polygonAmount):
         for j in range(polyLengths[i]):
             (boundaryValues + polyIndices[polyStarts[i] + j])[0] -= 1
 
     cdef int boundaryCount = 0
     cdef int *boundaryIndices = <int*>PyMem_Malloc(verticesAmount * sizeof(int))
+    cdef int *boundaryMap = <int*>PyMem_Malloc(verticesAmount * sizeof(int))
     for i in range(verticesAmount):
+        (boundaryMap + i)[0] = boundaryCount + verticesAmount
         if (boundaryValues + i)[0]:
             (boundaryIndices + boundaryCount)[0] = i
             boundaryCount += 1
@@ -53,6 +55,7 @@ def solidify(Mesh mesh, int loops = 0):
         newVertices.data[i].y = vertices.data[i].y
         newVertices.data[i].z = vertices.data[i].z
 
+    cdef int vertexIndex
     j = verticesAmount + boundaryCount * loops
     for i in range(verticesAmount):
         normalLength = lengthVec3(normals.data + i)
@@ -61,6 +64,7 @@ def solidify(Mesh mesh, int loops = 0):
         newVertices.data[vertexIndex].y = vertices.data[i].y + normals.data[i].y / normalLength
         newVertices.data[vertexIndex].z = vertices.data[i].z + normals.data[i].z / normalLength
 
+    cdef int boundaryIndex
     cdef float heightFactor = 1./(loops + 1)
     for i in range(boundaryCount):
         boundaryIndex = (boundaryIndices + i)[0]
@@ -75,9 +79,100 @@ def solidify(Mesh mesh, int loops = 0):
             newVertices.data[vertexIndex].z = (vertices.data[boundaryIndex].z +
             (normals.data[boundaryIndex].z / normalLength) * heightFactor * j)
 
-    PyMem_Free(boundaryValues)
+    # ============================= Polygons =============================
+    cdef int *boundaryEdges = <int*>PyMem_Malloc(edgesAmount * sizeof(int))
+    cdef int edgeCount = 0
+    for i in range(edgesAmount):
+        if (boundaryValues + edges.data[i].v1)[0] and (boundaryValues + edges.data[i].v2)[0]:
+            (boundaryEdges + edgeCount)[0] = i
+            edgeCount += 1
+    boundaryEdges = <int*>PyMem_Realloc(boundaryEdges, edgeCount * sizeof(int))
+
+    cdef PolygonIndicesList newPolygons = PolygonIndicesList(
+        indicesAmount = indicesAmount * 2 + edgeCount * (loops + 1) * 4,
+        polygonAmount = polygonAmount * 2 + edgeCount * (loops + 1))
+
+    boundaryIndex = boundaryCount * (loops + 1)
+    for i in range(polygonAmount):
+        newPolygons.polyStarts.data[i] = polygons.polyStarts.data[i]
+        newPolygons.polyLengths.data[i] = polygons.polyLengths.data[i]
+
+        newPolygons.polyStarts.data[boundaryIndex + polygonAmount + i] = polygons.polyStarts.data[i] + indicesAmount + boundaryIndex * 4
+        newPolygons.polyLengths.data[boundaryIndex + polygonAmount + i] = polygons.polyLengths.data[i]
+
+        for j in range(polygons.polyLengths.data[i]):
+            newPolygons.indices.data[polygons.polyStarts.data[i] + j] = (
+            polygons.indices.data[polygons.polyStarts.data[i] + j])
+
+            newPolygons.indices.data[(indicesAmount + boundaryIndex * 4 +
+            polygons.polyStarts.data[i] + j)] = (
+            polygons.indices.data[polygons.polyStarts.data[i] + j] +
+            verticesAmount + boundaryCount * loops)
+
+    # ========== Dummy ===========
+    for i in range(boundaryIndex):
+        newPolygons.polyStarts.data[polygonAmount + i] = indicesAmount + i * 4
+        newPolygons.polyLengths.data[polygonAmount + i] = 4
+
+        newPolygons.indices.data[indicesAmount + i * 4 + 0] = i
+        newPolygons.indices.data[indicesAmount + i * 4 + 1] = i + 1
+        newPolygons.indices.data[indicesAmount + i * 4 + 2] = i + 2
+        newPolygons.indices.data[indicesAmount + i * 4 + 3] = i + 3
+
+    cdef int v1, v2, vb1, vb2, polygonIndex, startIndex
+    if loops:
+        for i in range(edgeCount):
+            v1 = edges.data[(boundaryEdges + i)[0]].v1
+            v2 = edges.data[(boundaryEdges + i)[0]].v2
+
+            polygonIndex = polygonAmount + i
+            startIndex = indicesAmount + i * 4
+            newPolygons.polyStarts.data[polygonIndex] = startIndex
+            newPolygons.polyLengths.data[polygonIndex] = 4
+
+            newPolygons.indices.data[startIndex + 0] = v1
+            newPolygons.indices.data[startIndex + 1] = v2
+            vb1 = (boundaryMap + v1)[0]
+            vb2 = (boundaryMap + v2)[0]
+            newPolygons.indices.data[startIndex + 2] = vb2
+            newPolygons.indices.data[startIndex + 3] = vb1
+
+            for j in range(loops - 1):
+                polygonIndex = polygonAmount + (j + 1) * edgeCount + i
+                startIndex = indicesAmount + ((j + 1) * edgeCount + i) * 4
+                newPolygons.polyStarts.data[polygonIndex] = startIndex
+                newPolygons.polyLengths.data[polygonIndex] = 4
+
+                newPolygons.indices.data[startIndex + 0] = vb1 + j * boundaryCount
+                newPolygons.indices.data[startIndex + 1] = vb2 + j * boundaryCount
+                newPolygons.indices.data[startIndex + 2] = vb2 + (j + 1) * boundaryCount
+                newPolygons.indices.data[startIndex + 3] = vb1 + (j + 1) * boundaryCount
+
+            polygonIndex = polygonAmount + loops * edgeCount + i
+            startIndex = indicesAmount + (loops * edgeCount + i) * 4
+            newPolygons.polyStarts.data[polygonIndex] = startIndex
+            newPolygons.polyLengths.data[polygonIndex] = 4
+
+            newPolygons.indices.data[startIndex + 0] = vb1 + (loops - 1) * boundaryCount
+            newPolygons.indices.data[startIndex + 1] = vb2 + (loops - 1) * boundaryCount
+            newPolygons.indices.data[startIndex + 2] = v2 + loops * boundaryCount + verticesAmount
+            newPolygons.indices.data[startIndex + 3] = v1 + loops * boundaryCount + verticesAmount
+    else:
+        for i in range(edgeCount):
+            v1 = edges.data[(boundaryEdges + i)[0]].v1
+            v2 = edges.data[(boundaryEdges + i)[0]].v2
+            polygonIndex = polygonAmount + i
+            startIndex = indicesAmount + i * 4
+            newPolygons.polyStarts.data[polygonIndex] = startIndex
+            newPolygons.polyLengths.data[polygonIndex] = 4
+
+            newPolygons.indices.data[startIndex + 0] = v1
+            newPolygons.indices.data[startIndex + 1] = v2
+            newPolygons.indices.data[startIndex + 2] = v2 + verticesAmount
+            newPolygons.indices.data[startIndex + 3] = v1 + verticesAmount
+
     PyMem_Free(boundaryIndices)
-
-
-
-    return(newVertices)
+    PyMem_Free(boundaryValues)
+    PyMem_Free(boundaryEdges)
+    PyMem_Free(boundaryMap)
+    return(newVertices, newPolygons)
