@@ -1,6 +1,7 @@
 from ... math cimport lengthVec3
 from libc.string cimport memset
 from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
+from ... data_structures.meshes.validate import createValidEdgesList
 from ... data_structures cimport (
     Vector3DList,
     PolygonIndicesList,
@@ -9,12 +10,9 @@ from ... data_structures cimport (
     Mesh
 )
 
-def solidify(Mesh mesh, int loops = 0):
+def solidify(Mesh mesh, int loops, double thickness, VirtualDoubleList offsets):
     cdef int i, j
-    cdef double normalLength
-
     cdef Vector3DList vertices = mesh.vertices
-    cdef Vector3DList normals = mesh.getVertexNormals()
     cdef EdgeIndicesList edges = mesh.edges
     cdef PolygonIndicesList polygons = mesh.polygons
     cdef unsigned int *polyLengths = polygons.polyLengths.data
@@ -24,6 +22,14 @@ def solidify(Mesh mesh, int loops = 0):
     cdef int edgesAmount = len(edges)
     cdef int indicesAmount = len(polygons.indices)
     cdef int polygonAmount = len(polygons.polyStarts)
+
+    loops = max(loops, 0)
+
+    # Normals
+    cdef Vector3DList normals = mesh.getVertexNormals()
+    cdef float *heightFactors = <float*>PyMem_Malloc(verticesAmount * sizeof(float))
+    for i in range(verticesAmount):
+        (heightFactors + i)[0] = (thickness + offsets.get(i)) / (lengthVec3(normals.data + i) * (loops + 1))
 
     # =============================== Vertices ===============================
     cdef int *boundaryValues = <int*>PyMem_Malloc(verticesAmount * sizeof(int))
@@ -58,26 +64,26 @@ def solidify(Mesh mesh, int loops = 0):
     cdef int vertexIndex
     j = verticesAmount + boundaryCount * loops
     for i in range(verticesAmount):
-        normalLength = lengthVec3(normals.data + i)
         vertexIndex = j + i
-        newVertices.data[vertexIndex].x = vertices.data[i].x + normals.data[i].x / normalLength
-        newVertices.data[vertexIndex].y = vertices.data[i].y + normals.data[i].y / normalLength
-        newVertices.data[vertexIndex].z = vertices.data[i].z + normals.data[i].z / normalLength
+        newVertices.data[vertexIndex].x = (vertices.data[i].x + normals.data[i].x *
+        (heightFactors + i)[0] * (loops + 1))
+        newVertices.data[vertexIndex].y = (vertices.data[i].y + normals.data[i].y *
+        (heightFactors + i)[0] * (loops + 1))
+        newVertices.data[vertexIndex].z = (vertices.data[i].z + normals.data[i].z *
+        (heightFactors + i)[0] * (loops + 1))
 
     cdef int boundaryIndex
-    cdef float heightFactor = 1./(loops + 1)
     for i in range(boundaryCount):
         boundaryIndex = (boundaryIndices + i)[0]
-        normalLength = lengthVec3(normals.data + boundaryIndex)
         for j in range(loops):
             vertexIndex = verticesAmount + j * boundaryCount + i
             j += 1
             newVertices.data[vertexIndex].x = (vertices.data[boundaryIndex].x +
-            (normals.data[boundaryIndex].x / normalLength) * heightFactor * j)
+            normals.data[boundaryIndex].x * (heightFactors + boundaryIndex)[0] * j)
             newVertices.data[vertexIndex].y = (vertices.data[boundaryIndex].y +
-            (normals.data[boundaryIndex].y / normalLength) * heightFactor * j)
+            normals.data[boundaryIndex].y * (heightFactors + boundaryIndex)[0] * j)
             newVertices.data[vertexIndex].z = (vertices.data[boundaryIndex].z +
-            (normals.data[boundaryIndex].z / normalLength) * heightFactor * j)
+            normals.data[boundaryIndex].z * (heightFactors + boundaryIndex)[0] * j)
 
     # ============================= Polygons =============================
     cdef int *boundaryEdges = <int*>PyMem_Malloc(edgesAmount * sizeof(int))
@@ -175,4 +181,5 @@ def solidify(Mesh mesh, int loops = 0):
     PyMem_Free(boundaryValues)
     PyMem_Free(boundaryEdges)
     PyMem_Free(boundaryMap)
-    return(newVertices, newPolygons)
+    return(Mesh(newVertices, createValidEdgesList(polygons = newPolygons), newPolygons,
+                skipValidation = True))
