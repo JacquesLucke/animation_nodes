@@ -11,7 +11,6 @@ class SplineSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_SplineSocket"
     bl_label = "Spline Socket"
     dataType = "Spline"
-    allowedInputTypes = ["Spline"]
     drawColor = (0.8, 0.4, 1.0, 1.0)
     storable = True
     comparable = False
@@ -96,8 +95,7 @@ class SplineListSocket(bpy.types.NodeSocket, PythonListSocket):
     bl_idname = "an_SplineListSocket"
     bl_label = "Spline List Socket"
     dataType = "Spline List"
-    baseDataType = "Spline"
-    allowedInputTypes = ["Spline List"]
+    baseType = SplineSocket
     drawColor = (0.8, 0.4, 1.0, 0.7)
     storable = True
     comparable = False

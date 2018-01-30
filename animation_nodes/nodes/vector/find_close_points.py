@@ -31,7 +31,7 @@ class FindClosePointsNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.prop(self, "mode")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.mode == "AMOUNT":
             yield "edges = self.execute_Amount(points, amount)"
         elif self.mode == "DISTANCE":

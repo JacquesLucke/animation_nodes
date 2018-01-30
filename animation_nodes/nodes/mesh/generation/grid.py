@@ -33,18 +33,17 @@ class GridMeshNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.prop(self, "mode")
 
-    def getExecutionCode(self):
-        isLinked = self.getLinkedOutputsDict()
+    def getExecutionCode(self, required):
         yield "_xDivisions =  max(xDivisions, 2)"
         yield "_yDivisions =  max(yDivisions, 2)"
-        if isLinked["vertices"]:
+        if "vertices" in required:
             if self.mode == "STEP":
                 yield "vertices = self.calcVertices_Step(xDistance, yDistance, _xDivisions, _yDivisions)"
             elif self.mode == "SIZE":
                 yield "vertices = self.calcVertices_Size(length, width, _xDivisions, _yDivisions)"
-        if isLinked["edgeIndices"]:
+        if "edgeIndices" in required:
             yield "edgeIndices = self.calcEdgeIndices(_xDivisions, _yDivisions)"
-        if isLinked["polygonIndices"]:
+        if "polygonIndices" in required:
             yield "polygonIndices = self.calcPolygonIndices(_xDivisions, _yDivisions)"
 
     def calcVertices_Step(self, xDistance, yDistance, xDivisions, yDivisions):

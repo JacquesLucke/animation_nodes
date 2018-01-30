@@ -61,7 +61,7 @@ class QuaternionMathNode(bpy.types.Node, AnimationNode):
     def drawLabel(self):
         return operationLabels[self.operation]
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         op = self.operation
 
         if op == "ADD": return "result = a + b"

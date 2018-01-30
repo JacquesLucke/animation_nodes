@@ -197,6 +197,16 @@ class TestRepeated(TestCase):
         b = a.repeated(length = 12)
         self.assertEqual(b, (0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1))
 
+    def testEmpty(self):
+        with self.assertRaises(Exception):
+            IntegerList().repeated(length = 1)
+
+    def testEmptyWithDefault(self):
+        a = IntegerList()
+        b = a.repeated(length = 3, default = 1)
+        self.assertEqual(len(b), 3)
+        self.assertEqual(b, [1, 1, 1])
+
 class TestDeleteElement(TestCase):
     def testLengthUpdate(self):
         a = IntegerList.fromValues((0, 1, 2))

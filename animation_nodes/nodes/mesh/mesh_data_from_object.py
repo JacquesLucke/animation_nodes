@@ -1,12 +1,12 @@
 import bpy
 from bpy.props import *
 from ... events import propertyChanged
-from ... data_structures import MeshData
+from ... data_structures import Mesh
 from ... base_types import AnimationNode
 
-class MeshDataFromObjectNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_MeshDataFromObjectNode"
-    bl_label = "Mesh Data from Object"
+class MeshFromObjectNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_MeshFromObjectNode"
+    bl_label = "Mesh from Object"
     bl_width_default = 160
 
     loadEdges = BoolProperty(name = "Load Edges", default = True,
@@ -21,7 +21,7 @@ class MeshDataFromObjectNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
         self.newInput("Scene", "Scene", "scene", hide = True)
-        self.newOutput("Mesh Data", "Mesh Data", "meshData")
+        self.newOutput("Mesh", "Mesh", "meshData")
 
     def draw(self, layout):
         col = layout.column()
@@ -37,12 +37,12 @@ class MeshDataFromObjectNode(bpy.types.Node, AnimationNode):
 
     def meshDataFromObject(self, object, scene):
         if object is None:
-            return MeshData()
+            return Mesh()
 
         mesh = object.an.getMesh(scene, self.useModifiers)
 
         if mesh is None:
-            return MeshData()
+            return Mesh()
 
         vertices = mesh.an.getVertices()
         if self.useWorldSpace:
@@ -56,4 +56,4 @@ class MeshDataFromObjectNode(bpy.types.Node, AnimationNode):
         if mesh.users == 0:
             bpy.data.meshes.remove(mesh)
 
-        return MeshData(vertices, edges, polygons)
+        return Mesh(vertices, edges, polygons)

@@ -68,7 +68,7 @@ class ConvertRotationsNode(bpy.types.Node, AnimationNode):
         for item in conversionTypeItems:
             if self.conversionType == item[0]: return item[1]
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.conversionType == "QUATERNION_TO_EULER":
             return "euler = quaternion.to_euler('XYZ')"
         if self.conversionType == "EULER_TO_QUATERNION":

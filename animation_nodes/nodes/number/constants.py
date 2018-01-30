@@ -36,7 +36,7 @@ class NumberConstantsNode(bpy.types.Node, AnimationNode):
             return self.constant
         return self.factor + " " + self.constant
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.constant == "Pi":
             yield "value = math.pi"
         elif self.constant == "e":

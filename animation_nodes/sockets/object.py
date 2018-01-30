@@ -9,7 +9,6 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_ObjectSocket"
     bl_label = "Object Socket"
     dataType = "Object"
-    allowedInputTypes = ["Object"]
     drawColor = (0, 0, 0, 1)
     storable = False
     comparable = True
@@ -97,8 +96,7 @@ class ObjectListSocket(bpy.types.NodeSocket, PythonListSocket):
     bl_idname = "an_ObjectListSocket"
     bl_label = "Object List Socket"
     dataType = "Object List"
-    baseDataType = "Object"
-    allowedInputTypes = ["Object List"]
+    baseType = ObjectSocket
     drawColor = (0, 0, 0, 0.5)
     storable = False
     comparable = False

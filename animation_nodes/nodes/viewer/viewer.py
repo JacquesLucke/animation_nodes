@@ -1,10 +1,9 @@
 import bpy
+import math
 from bpy.props import *
 from itertools import chain
 from functools import lru_cache
-from ... base_types import AnimationNode
-from ... draw_handler import drawHandler
-from ... graphics.text_box import TextBox
+from ... base_types import AnimationNode, TextUIExtension
 
 drawTextByIdentifier = {}
 
@@ -12,7 +11,6 @@ class ViewerNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ViewerNode"
     bl_label = "Viewer"
     bl_width_default = 190
-    options = {"NO_TIMING"}
 
     maxRows = IntProperty(name = "Max Rows", default = 150, min = 0,
         description = "Max amount of lines visible in the floating text box.")
@@ -57,6 +55,15 @@ class ViewerNode(bpy.types.Node, AnimationNode):
         col.label("Output Settings:")
         col.prop(self, "outputConsole", "Console")
         col.prop(self, "outputTextBlock", "Text Block")
+
+    def getUIExtensions(self):
+        if self.hide:
+            return
+        text = drawTextByIdentifier.get(self.identifier, "")
+        if len(text) == 0:
+            return
+
+        return [TextUIExtension(text, self.fontSize, self.maxRows)]
 
     def execute(self, data):
         if handleDataAsList(data):
@@ -196,8 +203,13 @@ def handleNonList_Integer(number):
 def handleNonList_Vector(vector):
     return str(vector), "", 260
 
+radiansToDegreesFactor = 180 / math.pi
 def handleNonList_Euler(euler):
-    return str(euler), "", 340
+    return "<Euler (x={:.2f}°, y={:.2f}°, z={:.2f}°), order={}>".format(
+        euler[0] * radiansToDegreesFactor,
+        euler[1] * radiansToDegreesFactor,
+        euler[2] * radiansToDegreesFactor,
+        euler.order), "", 340
 
 def handleNonList_Matrix(matrix):
     return "Type: {}x{} Matrix".format(len(matrix.row), len(matrix.col)), str(matrix), 330
@@ -232,39 +244,14 @@ def handleListElement_Vector(vector):
     return "V({:>7.3f}, {:>7.3f}, {:>7.3f})".format(*vector)
 
 def handleListElement_Euler(euler):
-    return "E({:>7.3f}, {:>7.3f}, {:>7.3f}, order = {})".format(*euler, euler.order)
+    return "E({:>7.2f}°, {:>7.2f}°, {:>7.2f}°, order = {})".format(
+        euler[0] * radiansToDegreesFactor,
+        euler[1] * radiansToDegreesFactor,
+        euler[2] * radiansToDegreesFactor,
+        euler.order)
 
 def handleListElement_Quaternion(quaternion):
     return "Q({:>7.3f}, {:>7.3f}, {:>7.3f}, {:>7.3f})".format(*quaternion)
 
 def handleListElement_Float(number):
     return "{:>10.5f}".format(number)
-
-
-# Drawing
-##################################
-
-@drawHandler("SpaceNodeEditor", "WINDOW")
-def drawTextBoxes():
-    tree = bpy.context.getActiveAnimationNodeTree()
-    if tree is None:
-        return
-
-    for node in tree.nodes:
-        if node.bl_idname == "an_ViewerNode" and not node.hide:
-            drawTextBoxForNode(node)
-
-def drawTextBoxForNode(node):
-    text = drawTextByIdentifier.get(node.identifier, "")
-    if text == "":
-        return
-
-    region = bpy.context.region
-    leftBottom = node.getRegionBottomLeft(region)
-    rightBottom = node.getRegionBottomRight(region)
-    width = rightBottom.x - leftBottom.x
-
-    textBox = TextBox(text, leftBottom, width,
-                      fontSize = node.fontSize / node.dimensions.x * width,
-                      maxRows = node.maxRows)
-    textBox.draw()

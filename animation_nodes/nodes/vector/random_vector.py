@@ -40,7 +40,7 @@ class RandomVectorNode(bpy.types.Node, AnimationNode):
     def drawAdvanced(self, layout):
         layout.prop(self, "normalizedVector")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.createList:
             yield "randomVectors = self.calcRandomVectors(seed, count, scale)"
         else:

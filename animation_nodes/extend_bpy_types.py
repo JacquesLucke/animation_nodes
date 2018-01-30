@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from . operators.callbacks import executeCallback
 from . data_structures import (Vector3DList, EdgeIndicesList, PolygonIndicesList,
-                               FloatList, DoubleList, UShortList, LongList)
+                               FloatList, UShortList, UIntegerList, Vector2DList)
 
 def register():
     bpy.types.Context.getActiveAnimationNodeTree = getActiveAnimationNodeTree
@@ -67,12 +67,23 @@ class MeshProperties(bpy.types.PropertyGroup):
     def getPolygonAreas(self):
         areas = FloatList(length = len(self.mesh.polygons))
         self.mesh.polygons.foreach_get("area", areas.asMemoryView())
-        return DoubleList.fromValues(areas)
+        return areas
 
     def getPolygonMaterialIndices(self):
         indices = UShortList(length = len(self.mesh.polygons))
         self.mesh.polygons.foreach_get("material_index", indices.asMemoryView())
-        return LongList.fromValues(indices)
+        return indices
+
+    def getLoopEdges(self):
+        loopEdges = UIntegerList(length = len(self.mesh.loops))
+        self.mesh.loops.foreach_get("edge_index", loopEdges.asMemoryView())
+        return loopEdges
+
+    def getUVMap(self, name):
+        uvLayer = self.mesh.uv_layers[name]
+        uvMap = Vector2DList(length = len(self.mesh.loops))
+        uvLayer.data.foreach_get("uv", uvMap.asMemoryView())
+        return uvMap
 
     @property
     def mesh(self):

@@ -11,5 +11,5 @@ class ReplaceTextNode(bpy.types.Node, AnimationNode):
         self.newInput("Text", "New", "new")
         self.newOutput("Text", "Text", "newText")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         return "newText = text.replace(old, new)"

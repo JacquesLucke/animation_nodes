@@ -26,7 +26,7 @@ class DataInterfaceNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.prop(self, "dataDirection", text = "")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.dataDirection == "EXPORT":
             return "self.setValue(value)"
         if self.dataDirection == "IMPORT":

@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from collections import defaultdict
-from ... base_types import AnimationNode, AutoSelectListDataType
+from ... base_types import AnimationNode, ListTypeSelectorSocket
 
 class SortingTemplate:
     properties = {}
@@ -25,11 +25,9 @@ class SortListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SortListNode"
     bl_label = "Sort List"
     bl_width_default = 190
+    errorHandlingType = "MESSAGE"
 
-    errorMessage = StringProperty()
-
-    assignedType = StringProperty(default = "Object List",
-        update = AnimationNode.refresh)
+    assignedType = ListTypeSelectorSocket.newProperty(default = "Object List")
 
     templateData = PointerProperty(type = SortingTemplateProperties)
 
@@ -47,33 +45,29 @@ class SortListNode(bpy.types.Node, AnimationNode):
         self.activeTemplateIdentifier = "CUSTOM"
 
     def create(self):
-        self.newInput(self.assignedType, "List", "inList", dataIsModified = True)
+        prop = ("assignedType", "LIST")
+
+        self.newInput(ListTypeSelectorSocket(
+            "List", "inList", "LIST", prop, dataIsModified = True))
         self.newInput("Boolean", "Reverse", "reverseOutput", value = False)
-        self.newOutput(self.assignedType, "Sorted List", "outList")
+        self.newOutput(ListTypeSelectorSocket(
+            "Sorted List", "outList", "LIST", prop))
 
         self.activeTemplate.create(self, self.activeTemplateData)
-
-        self.newSocketEffect(AutoSelectListDataType("assignedType", "LIST",
-            [(self.inputs[0], "LIST"),
-             (self.outputs[0], "LIST")]
-        ))
 
     def draw(self, layout):
         layout.prop(self, "activeTemplateIdentifier", text = "")
         self.activeTemplate.draw(layout, self.activeTemplateData)
-        if self.errorMessage != "":
-            layout.label(self.errorMessage, icon = "ERROR")
 
     def drawAdvanced(self, layout):
         self.activeTemplate.drawAdvanced(layout, self.activeTemplateData)
 
     def execute(self, *args):
-        self.errorMessage = ""
         try:
             sortedList = self.activeTemplate.execute(self.activeTemplateData, *args)
             return self.outputs[0].correctValue(sortedList)[0]
         except Exception as e:
-            self.errorMessage = str(e)
+            self.setErrorMessage(str(e))
             return self.outputs[0].getDefaultValue()
 
     @property

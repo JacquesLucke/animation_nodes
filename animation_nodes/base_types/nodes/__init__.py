@@ -1,2 +1,8 @@
 from . base_node import AnimationNode
-from . vectorized_node import VectorizedNode
+
+from . node_ui_extension import (
+    NodeUIExtension,
+    InterpolationUIExtension,
+    ErrorUIExtension,
+    TextUIExtension
+)

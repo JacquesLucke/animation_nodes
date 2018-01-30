@@ -4,7 +4,7 @@ from mathutils.bvhtree import BVHTree
 from ... base_types import AnimationNode
 
 sourceTypeItems = [
-    ("MESH_DATA", "Mesh Data", "", "NONE", 0),
+    ("MESH_DATA", "Mesh", "", "NONE", 0),
     ("BMESH", "BMesh", "", "NONE", 1),
     ("OBJECT", "Object", "", "NONE", 2) ]
 
@@ -33,13 +33,13 @@ class ConstructBVHTreeNode(bpy.types.Node, AnimationNode):
 
     def getExecutionFunctionName(self):
         if self.sourceType == "MESH_DATA":
-            return "execute_MeshData"
+            return "execute_Mesh"
         elif self.sourceType == "BMESH":
             return "execute_BMesh"
         elif self.sourceType == "OBJECT":
             return "execute_Object"
 
-    def execute_MeshData(self, vectorList, polygonsIndices, epsilon):
+    def execute_Mesh(self, vectorList, polygonsIndices, epsilon):
         if len(polygonsIndices) == 0:
             return self.getFallbackBVHTree()
 
@@ -59,7 +59,7 @@ class ConstructBVHTreeNode(bpy.types.Node, AnimationNode):
         vertices = mesh.an.getVertices()
         vertices.transform(object.matrix_world)
         polygons = mesh.an.getPolygonIndices()
-        return self.execute_MeshData(vertices, polygons, epsilon)
+        return self.execute_Mesh(vertices, polygons, epsilon)
 
     def getFallbackBVHTree(self):
         return self.outputs[0].getDefaultValue()

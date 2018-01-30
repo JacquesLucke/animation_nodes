@@ -1,14 +1,11 @@
 import bpy
-from bpy.props import *
-from ... utils.layout import writeText
 from ... base_types import AnimationNode
 
 class TextSequenceOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_TextSequenceOutputNode"
     bl_label = "Text Sequence Output"
     bl_width_default = 160
-
-    errorMessage = StringProperty()
+    errorHandlingType = "MESSAGE"
 
     def create(self):
         self.newInput("Sequence", "Sequence", "sequence", defaultDrawType = "PROPERTY_ONLY")
@@ -28,17 +25,9 @@ class TextSequenceOutputNode(bpy.types.Node, AnimationNode):
         for socket in self.inputs[4:]:
             socket.hide = True
 
-    def draw(self, layout):
-        if self.errorMessage != "":
-            writeText(layout, self.errorMessage, width = 25, icon = "ERROR")
-
-    def drawAdvanced(self, layout):
-        writeText(layout, "Possible values for 'X Align' are 'LEFT', 'CENTER' and 'RIGHT'")
-        writeText(layout, "Possible values for 'Y Align' are 'TOP', 'CENTER' and 'BOTTOM'")
-
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "if getattr(sequence, 'type', '') == 'TEXT':"
-        yield "    self.errorMessage = ''"
+        yield "    pass"
 
         s = self.inputs
         if s["Text"].isUsed:        yield "    sequence.text = text"
@@ -51,19 +40,22 @@ class TextSequenceOutputNode(bpy.types.Node, AnimationNode):
         if s["Wrap Width"].isUsed:  yield "    sequence.wrap_width = wrapWidth"
 
     def setXAlignment(self, sequence, align):
-        if align in ("LEFT", "CENTER", "RIGHT"):
+        alignTypes = ("LEFT", "CENTER", "RIGHT")
+        if align in alignTypes:
             sequence.align_x = align
         else:
-            self.errorMessage = "X Align must be LEFT, CENTER or RIGHT"
+            self.setErrorMessage("X Align must be in " + str(alignTypes))
 
     def setYAlignment(self, sequence, align):
-        if align in ("TOP", "CENTER", "BOTTOM"):
+        alignTypes = ("TOP", "CENTER", "BOTTOM")
+        if align in alignTypes:
             sequence.align_y = align
         else:
-            self.errorMessage = "Y Align must be TOP, CENTER or BOTTOM"
+            self.setErrorMessage("Y Align must be in " + str(alignTypes))
 
     def getBakeCode(self):
         yield "if getattr(sequence, 'type', '') == 'TEXT':"
+        yield "    pass"
         s = self.inputs
         if s["Size"].isUsed:        yield "    sequence.keyframe_insert('font_size')"
         if s["Shadow"].isUsed:      yield "    sequence.keyframe_insert('use_shadow')"

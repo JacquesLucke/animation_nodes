@@ -19,5 +19,5 @@ class DelayTimeNode(bpy.types.Node, AnimationNode):
             else: return "Delay " + str(round(value, 2)) + " Frames"
         else: return "Delay Time"
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         return "outTime = time - delay"

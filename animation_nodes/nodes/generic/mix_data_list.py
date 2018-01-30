@@ -39,7 +39,7 @@ class MixDataListNode(bpy.types.Node, AnimationNode):
     def drawLabel(self):
         return nodeTypes[self.dataType]
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "length = len(dataList)"
         yield "if length > 0:"
         yield "    f = (factor{}) * (length - 1)".format(" % 1" if self.repeat else "")

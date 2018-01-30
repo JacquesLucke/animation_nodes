@@ -2,8 +2,11 @@ from . data_structures.lists.clist import CList
 from . data_structures.lists.base_lists cimport *
 from . data_structures.lists.polygon_indices_list cimport PolygonIndicesList
 
+from . data_structures.virtual_list.virtual_list cimport VirtualList, VirtualPyList
+from . data_structures.virtual_list.virtual_clists cimport *
+
 from . data_structures.default_lists.c_default_list cimport CDefaultList
-from . data_structures.meshes.mesh_data cimport MeshData
+from . data_structures.meshes.mesh_data cimport Mesh
 
 from . data_structures.splines.base_spline cimport Spline
 from . data_structures.splines.poly_spline cimport PolySpline
@@ -16,3 +19,5 @@ from . data_structures.interpolation cimport InterpolationFunction, Interpolatio
 from . data_structures.sounds.sound cimport Sound
 from . data_structures.sounds.average_sound cimport AverageSound
 from . data_structures.sounds.spectrum_sound cimport SpectrumSound
+
+from . data_structures.action cimport *

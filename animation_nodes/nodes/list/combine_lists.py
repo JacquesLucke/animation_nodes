@@ -43,7 +43,7 @@ class CombineListsNode(bpy.types.Node, AnimationNode):
     def getInputSocketVariables(self):
         return {socket.identifier : "list_" + str(i) for i, socket in enumerate(self.inputs)}
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         listNames = ["list_" + str(i) for i, socket in enumerate(self.inputs[:-1])]
         joinListsCode = self.outputs[0].getJoinListsCode()
         yield "outList = " + joinListsCode.replace("value", ", ".join(listNames))

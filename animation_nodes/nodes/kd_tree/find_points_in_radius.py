@@ -14,7 +14,7 @@ class FindPointsInRadiusInKDTreeNode(bpy.types.Node, AnimationNode):
         self.newOutput("an_FloatListSocket", "Distances", "distances")
         self.newOutput("an_IntegerListSocket", "Indices", "indices")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "nearestVectors = Vector3DList()"
         yield "distances = DoubleList()"
         yield "indices = LongList()"

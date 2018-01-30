@@ -13,9 +13,8 @@ class LineMeshNode(bpy.types.Node, AnimationNode):
         self.newOutput("Vector List", "Vertices", "vertices")
         self.newOutput("Edge Indices List", "Edge Indices", "edgeIndices")
 
-    def getExecutionCode(self):
-        isLinked = self.getLinkedOutputsDict()
+    def getExecutionCode(self, required):
         yield "_steps = max(steps, 2)"
         yield "line = animation_nodes.algorithms.mesh_generation.line"
-        if isLinked["vertices"]:    yield "vertices = line.vertices(start, end, steps)"
-        if isLinked["edgeIndices"]: yield "edgeIndices = line.edges(steps)"
+        if "vertices" in required:    yield "vertices = line.vertices(start, end, steps)"
+        if "edgeIndices" in required: yield "edgeIndices = line.edges(steps)"

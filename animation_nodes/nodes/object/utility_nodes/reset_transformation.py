@@ -9,7 +9,7 @@ class ResetObjectTransformsNode(bpy.types.Node, AnimationNode):
         self.newInput("Object", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
         self.newOutput("Object", "Object", "object")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         return "if object: object.matrix_world = mathutils.Matrix.Identity(4)"
 
     def getUsedModules(self):

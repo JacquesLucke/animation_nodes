@@ -31,7 +31,7 @@ class CharacterPropertiesOutputNode(bpy.types.Node, AnimationNode):
     def drawAdvanced(self, layout):
         layout.prop(self, "allowNegativeIndex")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         lines = []
 
         if any([socket.isUsed for socket in self.inputs[3:]]):

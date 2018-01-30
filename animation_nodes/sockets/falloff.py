@@ -9,7 +9,6 @@ class FalloffSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_FalloffSocket"
     bl_label = "Falloff Socket"
     dataType = "Falloff"
-    allowedInputTypes = ["Falloff"]
     drawColor = (0.32, 1, 0.18, 1)
     comparable = False
     storable = False
@@ -43,8 +42,7 @@ class FalloffListSocket(bpy.types.NodeSocket, PythonListSocket):
     bl_idname = "an_FalloffListSocket"
     bl_label = "Falloff List Socket"
     dataType = "Falloff List"
-    baseDataType = "Falloff"
-    allowedInputTypes = ["Falloff List"]
+    baseType = FalloffSocket
     drawColor = (0.32, 1, 0.18, 0.5)
     storable = False
     comparable = False

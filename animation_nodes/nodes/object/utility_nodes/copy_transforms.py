@@ -40,7 +40,7 @@ class CopyTransformsNode(bpy.types.Node, AnimationNode):
         col.active = not self.useCurrentTransforms
         col.prop(self, "frameType")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "if fromObject and toObject:"
         if self.useCurrentTransforms:
             yield "    toObject.location = fromObject.location"

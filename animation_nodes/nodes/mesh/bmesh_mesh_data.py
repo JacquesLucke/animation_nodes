@@ -3,9 +3,9 @@ from bpy.props import *
 from ... base_types import AnimationNode
 from ... data_structures import Vector3DList, EdgeIndicesList, PolygonIndicesList
 
-class BMeshMeshDataNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_BMeshMeshDataNode"
-    bl_label = "BMesh Mesh Data"
+class BMeshMeshNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_BMeshMeshNode"
+    bl_label = "BMesh Mesh"
 
     def create(self):
         self.newInput("BMesh", "BMesh", "bm")
@@ -14,16 +14,16 @@ class BMeshMeshDataNode(bpy.types.Node, AnimationNode):
         self.newOutput("Edge Indices List", "Edge Indices", "edgeIndices")
         self.newOutput("Polygon Indices List", "Polygon Indices", "polygonIndices")
 
-    def getExecutionCode(self):
-        isLinked = self.getLinkedOutputsDict()
-        if not any(isLinked.values()): return
+    def getExecutionCode(self, required):
+        if len(required) == 0:
+            return
 
         yield "if bm:"
-        if isLinked["vertexLocations"]:
+        if "vertexLocations" in required:
             yield "    vertexLocations = self.getVertexLocations(bm)"
-        if isLinked["edgeIndices"]:
+        if "edgeIndices" in required:
             yield "    edgeIndices = self.getEdgeIndices(bm)"
-        if isLinked["polygonIndices"]:
+        if "polygonIndices" in required:
             yield "    polygonIndices = self.getPolygonIndices(bm)"
 
         yield "else:"

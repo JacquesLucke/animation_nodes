@@ -67,7 +67,7 @@ class CyclesMaterialOutputNode(bpy.types.Node, AnimationNode):
                 return True
         return False
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         inputSocket = self.inputs.get("Data")
         if inputSocket is None: return
 

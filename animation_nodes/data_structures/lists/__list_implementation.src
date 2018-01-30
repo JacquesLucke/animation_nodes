@@ -198,6 +198,12 @@ cdef class LISTNAME(CList):
         self.tryConversion(value, self.data + self.length)
         self.length += 1
 
+    cdef append_LowLevel(self, TYPE value):
+        if self.length >= self.capacity:
+            self.grow(self.length + 1)
+        self.data[self.length] = value
+        self.length += 1
+
     def extend(self, values):
         cdef Py_ssize_t oldLength, newLength, i
         if isinstance(values, LISTNAME):

@@ -1,12 +1,12 @@
 import bpy
 import random
 from bpy.props import *
-from ... base_types import VectorizedNode
 from ... sockets.info import toBaseDataType
 from ... tree_info import getNodeByIdentifier
+from ... base_types import AnimationNode, VectorizedSocket
 from . subprogram_sockets import subprogramInterfaceChanged
 
-class LoopGeneratorOutputNode(bpy.types.Node, VectorizedNode):
+class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_LoopGeneratorOutputNode"
     bl_label = "Loop Generator Output"
     dynamicLabelType = "ALWAYS"
@@ -20,7 +20,7 @@ class LoopGeneratorOutputNode(bpy.types.Node, VectorizedNode):
     sortIndex = IntProperty(default = 0)
 
     listDataType = StringProperty(default = "Vector List", update = settingChanged)
-    useList = VectorizedNode.newVectorizeProperty()
+    useList = VectorizedSocket.newProperty()
 
     def setup(self):
         self.sortIndex = getRandomInt()
@@ -33,9 +33,9 @@ class LoopGeneratorOutputNode(bpy.types.Node, VectorizedNode):
         if self.listDataType == "Generic List":
             self.newInput("Generic", "Generic", "input")
         else:
-            self.newVectorizedInput(baseDataType, "useList",
+            self.newInput(VectorizedSocket(baseDataType, "useList",
                 (baseDataType, "input", dict(defaultDrawType = "TEXT_ONLY")),
-                (listDataType, "input", dict(defaultDrawType = "TEXT_ONLY")))
+                (listDataType, "input", dict(defaultDrawType = "TEXT_ONLY"))))
 
         self.newInput("Boolean", "Condition", "condition", value = True, hide = True)
 

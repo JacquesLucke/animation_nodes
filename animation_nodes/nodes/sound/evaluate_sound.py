@@ -11,14 +11,13 @@ modeItems = [
 class EvaluateSoundNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_EvaluateSoundNode"
     bl_label = "Evaluate Sound"
+    errorHandlingType = "MESSAGE"
 
     mode = EnumProperty(name = "Mode", default = "AVERAGE",
         items = modeItems, update = AnimationNode.refresh)
 
     useCurrentFrame = BoolProperty(name = "Use Current Frame", default = True,
         update = AnimationNode.refresh)
-
-    errorMessage = StringProperty()
 
     def create(self):
         self.newInput("Sound", "Sound", "sound",
@@ -35,14 +34,10 @@ class EvaluateSoundNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.prop(self, "mode", text = "")
 
-        if self.errorMessage != "":
-            layout.label(self.errorMessage, icon = "ERROR")
-
     def drawAdvanced(self, layout):
         layout.prop(self, "useCurrentFrame")
 
-    def getExecutionCode(self):
-        yield "self.errorMessage = ''"
+    def getExecutionCode(self, required):
         if self.useCurrentFrame: yield "_frame = self.nodeTree.scene.frame_current_final"
         else:                    yield "_frame = frame"
 
@@ -54,13 +49,13 @@ class EvaluateSoundNode(bpy.types.Node, AnimationNode):
     def execute_Average(self, sound, frame):
         if sound is None: return 0
         if sound.type != "AVERAGE":
-            self.errorMessage = "Wrong sound type"
+            self.setErrorMessage("Wrong sound type")
             return 0
         return sound.evaluate(frame)
 
     def execute_Spectrum(self, sound, frame):
         if sound is None: return DoubleList()
         if sound.type != "SPECTRUM":
-            self.errorMessage = "Wrong sound type"
+            self.setErrorMessage("Wrong sound type")
             return DoubleList()
         return DoubleList.fromValues(sound.evaluate(frame))

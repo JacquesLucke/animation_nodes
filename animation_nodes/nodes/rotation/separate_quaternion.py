@@ -12,5 +12,5 @@ class SeparateQuaternionNode(bpy.types.Node, AnimationNode):
         self.newOutput("Float", "Y", "y")
         self.newOutput("Float", "Z", "z")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         return "w, x, y, z = quaternion"

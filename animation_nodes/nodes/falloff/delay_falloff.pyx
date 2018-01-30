@@ -1,6 +1,6 @@
 import bpy
 from ... base_types import AnimationNode
-from ... data_structures cimport BaseFalloff, DoubleList
+from ... data_structures cimport BaseFalloff, FloatList
 from . interpolate_falloff import InterpolateFalloff
 
 class DelayFalloffNode(bpy.types.Node, AnimationNode):
@@ -16,29 +16,30 @@ class DelayFalloffNode(bpy.types.Node, AnimationNode):
         self.newOutput("Falloff", "Falloff", "falloff")
 
     def execute(self, frame, delay, duration, interpolation, offsets):
-        falloff = DelayFalloff(frame, delay, duration, offsets)
+        _offsets = FloatList.fromValues(offsets)
+        falloff = DelayFalloff(frame, delay, duration, _offsets)
         return InterpolateFalloff(falloff, interpolation)
 
 cdef class DelayFalloff(BaseFalloff):
-    cdef double frame
-    cdef double delay
-    cdef double duration
-    cdef DoubleList offsets
+    cdef float frame
+    cdef float delay
+    cdef float duration
+    cdef FloatList offsets
 
-    def __cinit__(self, double frame, double delay, double duration, DoubleList offsets = None):
+    def __cinit__(self, float frame, float delay, float duration, FloatList offsets = None):
         self.frame = frame
         self.delay = delay
         self.duration = duration
-        self.offsets = DoubleList() if offsets is None else offsets
+        self.offsets = FloatList() if offsets is None else offsets
         self.clamped = True
-        self.dataType = "All"
+        self.dataType = "None"
 
-    cdef double evaluate(self, void* object, long index):
-        cdef double offset
+    cdef float evaluate(self, void *object, Py_ssize_t index):
+        cdef float offset
         if index >= self.offsets.length: offset = index
         else: offset = self.offsets.data[index]
 
-        cdef double localFrame = self.frame - offset * self.delay
+        cdef float localFrame = self.frame - offset * self.delay
         if localFrame <= 0: return 0
         if localFrame <= self.duration: return localFrame / self.duration
         return 1

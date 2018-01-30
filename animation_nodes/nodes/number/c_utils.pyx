@@ -8,14 +8,6 @@ from ... utils.limits cimport INT_MAX
 from ... utils.clamp cimport clamp, clampLong
 from ... algorithms.random cimport uniformRandomNumber
 
-def clamp_DoubleList(DoubleList values, double minValue, double maxValue):
-    cdef Py_ssize_t i
-    for i in range(len(values)):
-        if values.data[i] < minValue:
-            values.data[i] = minValue
-        elif values.data[i] > maxValue:
-            values.data[i] = maxValue
-
 def range_LongList_StartStep(amount, start, step):
     cdef long long _amount = clampLong(amount)
     cdef long long _start = clampLong(start)

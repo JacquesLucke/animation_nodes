@@ -154,20 +154,19 @@ class MatrixMenu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        insertNode(layout, "an_DecomposeMatrixNode", "Decompose")
         insertNode(layout, "an_ComposeMatrixNode", "Compose")
+        insertNode(layout, "an_DecomposeMatrixNode", "Decompose")
         insertNode(layout, "an_CreateListNode", "List", {"assignedType" : repr("Matrix")})
-        layout.separator()
-        insertNode(layout, "an_TranslationMatrixNode", "Translation")
-        insertNode(layout, "an_RotationMatrixNode", "Rotation")
-        insertNode(layout, "an_ScaleMatrixNode", "Scale")
-        insertNode(layout, "an_ShearMatrixNode", "Shear")
         layout.separator()
         insertNode(layout, "an_DistributeMatricesNode", "Distribute")
         insertNode(layout, "an_ReplicateMatrixNode", "Replicate")
         insertNode(layout, "an_TransformMatrixNode", "Transform")
         insertNode(layout, "an_InvertMatrixNode", "Invert")
         insertNode(layout, "an_MixDataNode", "Mix", {"dataType" : repr("Matrix")})
+        layout.separator()
+        insertNode(layout, "an_ShearMatrixNode", "Shear")
+        insertNode(layout, "an_AxisRotationMatrixNode", "Axis Rotation")
+        layout.separator()
         insertNode(layout, "an_MatrixMathNode", "Math")
         insertNode(layout, "an_MatrixCombineNode", "Combine")
         insertNode(layout, "an_OffsetMatrixNode", "Offset", {"useMatrixList" : repr(True)})
@@ -359,12 +358,10 @@ class MeshMenu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        insertNode(layout, "an_ObjectMeshDataNode", "Object Mesh Data")
+        insertNode(layout, "an_ObjectMeshNode", "Object Mesh")
         insertNode(layout, "an_ObjectBoundingBoxNode", "Get Bounding Box")
         insertNode(layout, "an_VertexGroupInputNode", "Vertex Group Input")
         layout.separator()
-        insertNode(layout, "an_SeparateMeshDataNode", "Separate")
-        insertNode(layout, "an_CombineMeshDataNode", "Combine")
         insertNode(layout, "an_TransformPolygonsNode", "Transform Polygons")
         insertNode(layout, "an_SeparatePolygonsNode", "Separate Polygons")
         insertNode(layout, "an_ExtractPolygonTransformsNode", "Extract Polygon Transforms")
@@ -372,11 +369,11 @@ class MeshMenu(bpy.types.Menu):
         layout.menu("an_mesh_generators_menu", text = "Generators")
         layout.menu("an_mesh_operators_menu", text = "Operators")
         layout.separator()
-        insertNode(layout, "an_CreateListNode", "Mesh Data List", {"assignedType" : repr("Mesh Data")})
-        insertNode(layout, "an_MeshDataFromObjectNode", "Mesh Data from Object")
-        insertNode(layout, "an_JoinMeshDataListNode", "Join Mesh Data List")
-        insertNode(layout, "an_BMeshMeshDataNode", "BMesh Mesh Data")
-        insertNode(layout, "an_CreateBMeshFromMeshDataNode", "BMesh from Mesh Data")
+        insertNode(layout, "an_CreateListNode", "Mesh List", {"assignedType" : repr("Mesh")})
+        insertNode(layout, "an_MeshFromObjectNode", "Mesh from Object")
+        insertNode(layout, "an_JoinMeshListNode", "Join Mesh List")
+        insertNode(layout, "an_BMeshMeshNode", "BMesh Mesh")
+        insertNode(layout, "an_CreateBMeshFromMeshNode", "BMesh from Mesh")
         insertNode(layout, "an_BMeshFromObjectNode", "BMesh from Object")
         layout.menu("an_mesh_finalizing_menu", text = "Tools")
         layout.separator()
@@ -391,6 +388,7 @@ class MeshGeneratorsMenu(bpy.types.Menu):
         insertNode(layout, "an_LineMeshNode", "Line")
         insertNode(layout, "an_GridMeshNode", "Grid")
         insertNode(layout, "an_CylinderMeshNode", "Cylinder")
+        insertNode(layout, "an_UnityTriangleMeshNode", "Unity Triangle")
 
 class MeshOperatorsMenu(bpy.types.Menu):
     bl_idname = "an_mesh_operators_menu"
@@ -444,7 +442,6 @@ class SplineMenu(bpy.types.Menu):
         insertNode(layout, "an_EvaluateSplineNode", "Evaluate")
         insertNode(layout, "an_ProjectOnSplineNode", "Project")
         insertNode(layout, "an_GetSplineLengthNode", "Get Length")
-        insertNode(layout, "an_GetSplineSamplesNode", "Get Samples")
         layout.separator()
         insertNode(layout, "an_CurveObjectOutputNode", "Object Output")
         layout.separator()
@@ -577,10 +574,9 @@ class GeometryMenu(bpy.types.Menu):
         insertNode(layout, "an_IntersectLinePlaneNode", "Intersect Line Plane")
         insertNode(layout, "an_IntersectLineSphereNode", "Intersect Line Sphere")
         insertNode(layout, "an_IntersectPlanePlaneNode", "Intersect Plane Plane")
-        insertNode(layout, "an_IntersectSpherePlaneNode", "Intersect Plane Sphere")
+        insertNode(layout, "an_IntersectSpherePlaneNode", "Intersect Sphere Plane")
         insertNode(layout, "an_IntersectSphereSphereNode", "Intersect Sphere Sphere")
         layout.separator()
-        insertNode(layout, "an_BarycentricTransformNode", "Barycentric Transform")
         insertNode(layout, "an_BMeshTriangulateNode", "Triangulate BMesh")
 
 class KDTreeAndBVHTreeMenu(bpy.types.Menu):

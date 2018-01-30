@@ -1,5 +1,5 @@
 import bpy
-from .. sockets.info import isList
+from .. sockets.info import isList, getAllowedInputDataTypes
 from .. utils.blender_ui import PieMenuHelper
 from .. nodes.subprogram.subprogram_base import SubprogramBaseNode
 
@@ -51,6 +51,6 @@ class ContextPie(bpy.types.Menu, PieMenuHelper):
 def countUsableSockets(sockets):
     counter = 0
     for socket in sockets:
-        if not socket.hide and len(socket.allowedInputTypes) > 0:
+        if not socket.hide and len(getAllowedInputDataTypes(socket.dataType)) > 0:
             counter += 1
     return counter

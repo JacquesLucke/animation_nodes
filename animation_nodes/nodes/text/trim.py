@@ -32,7 +32,7 @@ class TrimTextNode(bpy.types.Node, AnimationNode):
     def drawAdvanced(self, layout):
         layout.prop(self, "allowNegativeIndex", text = "Negative Indices")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if not self.trimStart:
             yield "start = 0"
         if not self.trimEnd:

@@ -50,7 +50,7 @@ class DataInputNode(bpy.types.Node, AnimationNode):
         col.active = self.inputs[0].hasProperty()
         col.prop(self, "showInViewport")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         # needs no execution, because no value is changed
         return []
 

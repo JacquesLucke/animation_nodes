@@ -12,5 +12,5 @@ class InvertMatrixNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.separator()
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         return "invertedMatrix = matrix.inverted(Matrix.Identity(4))"

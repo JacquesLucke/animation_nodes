@@ -20,10 +20,10 @@ class RemapFalloffNode(bpy.types.Node, AnimationNode):
 cdef class RemapFalloff(CompoundFalloff):
     cdef:
         Falloff falloff
-        double outputMin, outputMax
-        double factor
+        float outputMin, outputMax
+        float factor
 
-    def __cinit__(self, Falloff falloff, double outMin, double outMax):
+    def __cinit__(self, Falloff falloff, float outMin, float outMax):
         self.falloff = falloff
         self.outputMin = outMin
         self.outputMax = outMax
@@ -33,5 +33,5 @@ cdef class RemapFalloff(CompoundFalloff):
     cdef list getDependencies(self):
         return [self.falloff]
 
-    cdef double evaluate(self, double* dependencyResults):
+    cdef float evaluate(self, float *dependencyResults):
         return dependencyResults[0] * self.factor + self.outputMin

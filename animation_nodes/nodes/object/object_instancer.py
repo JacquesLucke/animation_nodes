@@ -108,7 +108,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
             text = "Hide Relationship Lines",
             icon = "RESTRICT_VIEW_OFF")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         # support for older nodes which didn't have a scene list input
         if "Scenes" in self.inputs: yield "_scenes = set(scenes)"
         else: yield "_scenes = {scene}"
@@ -272,6 +272,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         if self.copyObjectProperties and self.copyFromSource:
             newObject = sourceObject.copy()
             newObject.data = instanceData
+            newObject.layers = sourceObject.layers
         else:
             newObject = self.createObject(name, instanceData)
 

@@ -22,7 +22,7 @@ class RepeatTimeNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.prop(self, "repetitionType", text = "Type")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.repetitionType == "LOOP":
             yield "outTime = time % max(rate, 0.0001)"
         if self.repetitionType == "PING_PONG":

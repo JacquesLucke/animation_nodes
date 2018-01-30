@@ -4,9 +4,6 @@ from mathutils import Vector
 class Rectangle:
     def __init__(self, x1 = 0, y1 = 0, x2 = 0, y2 = 0):
         self.resetPosition(x1, y1, x2, y2)
-        self.color = (0.8, 0.8, 0.8, 1.0)
-        self.borderColor = (0.1, 0.1, 0.1, 1.0)
-        self.borderThickness = 0
 
     @classmethod
     def fromRegionDimensions(cls, region):
@@ -17,6 +14,9 @@ class Rectangle:
         self.y1 =  float(y1)
         self.x2 =  float(x2)
         self.y2 =  float(y2)
+
+    def copy(self):
+        return Rectangle(self.x1, self.y1, self.x2, self.y2)
 
     @property
     def width(self):
@@ -60,8 +60,8 @@ class Rectangle:
     def contains(self, point):
         return self.left <= point[0] <= self.right and self.bottom <= point[1] <= self.top
 
-    def draw(self):
-        glColor4f(*self.color)
+    def draw(self, color = (0.8, 0.8, 0.8, 1.0), borderColor = (0.1, 0.1, 0.1, 1.0), borderThickness = 0):
+        glColor4f(*color)
         glEnable(GL_BLEND)
         glBegin(GL_POLYGON)
         glVertex2f(self.x1, self.y1)
@@ -70,14 +70,13 @@ class Rectangle:
         glVertex2f(self.x1, self.y2)
         glEnd()
 
-        if self.borderThickness != 0:
-            if abs(self.borderThickness) == 1:
-                self.drawBorderWithLines()
+        if borderThickness != 0:
+            if abs(borderThickness) == 1:
+                self.drawBorderWithLines(borderColor, borderThickness)
             else:
-                self.drawBorderwithRectangles()
+                self.drawBorderwithRectangles(borderColor, borderThickness)
 
-    def drawBorderwithRectangles(self):
-        thickness = self.borderThickness
+    def drawBorderwithRectangles(self, borderColor, thickness):
         thickness = min(abs(self.x1 - self.x2) / 2, abs(self.y1 - self.y2) / 2, thickness)
         left, right = sorted([self.x1, self.x2])
         bottom, top = sorted([self.y1, self.y2])
@@ -92,12 +91,11 @@ class Rectangle:
         rightBorder = Rectangle(right - thickness, top, right, bottom)
 
         for border in (topBorder, bottomBorder, leftBorder, rightBorder):
-            border.color = self.borderColor
-            border.draw()
+            border.draw(color = borderColor)
 
-    def drawBorderWithLines(self):
-        glColor4f(*self.borderColor)
-        glLineWidth(self.borderThickness)
+    def drawBorderWithLines(self, borderColor, thickness):
+        glColor4f(*borderColor)
+        glLineWidth(thickness)
         glBegin(GL_LINE_STRIP)
         glVertex2f(self.left, self.bottom)
         glVertex2f(self.right, self.bottom)

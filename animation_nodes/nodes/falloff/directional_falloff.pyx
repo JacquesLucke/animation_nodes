@@ -37,10 +37,10 @@ class DirectionalFalloffNode(bpy.types.Node, AnimationNode):
 
 
 cdef class DirectionalFalloff(BaseFalloff):
-    cdef double size
+    cdef float size
     cdef Vector3 position, direction
 
-    def __cinit__(self, position, direction, double size):
+    def __cinit__(self, position, direction, float size):
         assert size >= 0
         if size == 0: size = 0.00001
         setVector3(&self.position, position)
@@ -51,16 +51,16 @@ cdef class DirectionalFalloff(BaseFalloff):
         self.dataType = "Location"
 
 cdef class UniDirectionalFalloff(DirectionalFalloff):
-    cdef double evaluate(self, void* value, long index):
-        cdef double distance = signedDistance(&self.position, &self.direction, <Vector3*>value)
-        cdef double result = 1 - distance / self.size
+    cdef float evaluate(self, void *value, Py_ssize_t index):
+        cdef float distance = signedDistance(&self.position, &self.direction, <Vector3*>value)
+        cdef float result = 1 - distance / self.size
         if result < 0: return 0
         if result > 1: return 1
         return result
 
 cdef class BiDirectionalFalloff(DirectionalFalloff):
-    cdef double evaluate(self, void* value, long index):
-        cdef double distance = abs(signedDistance(&self.position, &self.direction, <Vector3*>value))
-        cdef double result = 1 - distance / self.size
+    cdef float evaluate(self, void *value, Py_ssize_t index):
+        cdef float distance = abs(signedDistance(&self.position, &self.direction, <Vector3*>value))
+        cdef float result = 1 - distance / self.size
         if result < 0: return 0
         return result

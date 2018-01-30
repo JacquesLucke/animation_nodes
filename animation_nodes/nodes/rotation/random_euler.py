@@ -32,10 +32,10 @@ class RandomEulerNode(bpy.types.Node, AnimationNode):
         row.prop(self, "nodeSeed", text = "Node Seed")
         row.prop(self, "createList", text = "", icon = "LINENUMBERS_ON")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "randomEuler = Euler(algorithms.random.randomNumberTuple(seed + 45234 * self.nodeSeed, 3, scale))"
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.createList:
             yield "randomEulers = self.calcRandomEulers(seed, count, scale)"
         else:

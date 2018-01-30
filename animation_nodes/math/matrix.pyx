@@ -273,3 +273,13 @@ cdef void transposeMatrix_Inplace(Matrix3_or_Matrix4 *m):
         m.a14, m.a41 = m.a41, m.a14
         m.a24, m.a42 = m.a42, m.a24
         m.a34, m.a43 = m.a43, m.a34
+
+cdef void transposeMatrix(Matrix3_or_Matrix4 *t, Matrix3_or_Matrix4 *m):
+    t.a11, t.a21, t.a31 = m.a11, m.a12, m.a13
+    t.a12, t.a22, t.a32 = m.a21, m.a22, m.a23
+    t.a13, t.a23, t.a33 = m.a31, m.a32, m.a33
+
+    if Matrix3_or_Matrix4 is Matrix4:
+        t.a14, t.a24, t.a34 = m.a41, m.a42, m.a43
+        t.a41, t.a42, t.a43 = m.a14, m.a24, m.a34
+        t.a44 = m.a44
