@@ -56,18 +56,17 @@ cdef vertices(Py_ssize_t radialLoops, Py_ssize_t innerLoops,
    cdef:
        Py_ssize_t i, j, numVerts, dummyIndex
        Vector3DList vertices
-       double outerRadiusCos, outerRadiusSin, innerRadiusCos, innerRadiusSin, iRadius, newCos
-       double innerStep = (outerRadius if mergeCenter else outerRadius - innerRadius) / (innerLoops + 1)
-       double angleStep = (2 * PI if mergeStartEnd else endAngle - startAngle) / (radialLoops if mergeStartEnd else radialLoops - 1)
-       double iCos = cos(startAngle)
-       double iSin = sin(startAngle)
-       double eCos = cos(endAngle)
-       double eSin = sin(endAngle)
-       double stepCos = cos(angleStep)
-       double stepSin = sin(angleStep)
+       double innerStep, angleStep, iCos, iSin, stepCos, stepSin, iRadius, newCos
 
    numVerts = radialLoops * (innerLoops + 1 + (not mergeCenter)) + mergeCenter
    vertices = Vector3DList(length = numVerts, capacity = numVerts)
+
+   innerStep = (outerRadius if mergeCenter else outerRadius - innerRadius) / (innerLoops + 1)
+   angleStep = (2 * PI if mergeStartEnd else endAngle - startAngle) / (radialLoops if mergeStartEnd else radialLoops - 1)
+   iCos = cos(startAngle)
+   iSin = sin(startAngle)
+   stepCos = cos(angleStep)
+   stepSin = sin(angleStep)
 
    for i in range(radialLoops):
        for j in range(innerLoops + 1 + (not mergeCenter)):
