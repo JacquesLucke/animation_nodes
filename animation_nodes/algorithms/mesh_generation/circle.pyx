@@ -25,20 +25,20 @@ def getCircleMeshList(Py_ssize_t amount,
                         VirtualDoubleList innerRadius,
                         VirtualDoubleList startAngle,
                         VirtualDoubleList endAngle,
-                        VirtualBooleanList mergeStartEnd,
-                        VirtualBooleanList mergeCenter):
+                        bint mergeStartEnd,
+                        bint mergeCenter):
 
    cdef list meshes = []
    cdef Py_ssize_t i
    cdef PolygonIndicesList polygonsIndices
    for i in range(amount):
        polygonsIndices = polygons(radialLoops.get(i), innerLoops.get(i),
-                                  mergeStartEnd.get(i), mergeCenter.get(i))
+                                  mergeStartEnd, mergeCenter)
 
        meshes.append(Mesh(vertices(radialLoops.get(i),  innerLoops.get(i),
                                    outerRadius.get(i), innerRadius.get(i),
                                    startAngle.get(i), endAngle.get(i),
-                                   mergeStartEnd.get(i), mergeCenter.get(i)),
+                                   mergeStartEnd, mergeCenter),
                                    createValidEdgesList(polygons = polygonsIndices),
                                    polygonsIndices, skipValidation = True))
 

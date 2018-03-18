@@ -1,6 +1,8 @@
 import bpy
+from bpy.props import *
+from .... events import executionCodeChanged
 from .... base_types import AnimationNode, VectorizedSocket
-from .... data_structures import VirtualDoubleList, VirtualLongList, VirtualBooleanList
+from .... data_structures import VirtualDoubleList, VirtualLongList
 from .... algorithms.mesh_generation.circle import getCircleMesh, getCircleMeshList
 
 class Circle(bpy.types.Node, AnimationNode):
@@ -8,14 +10,29 @@ class Circle(bpy.types.Node, AnimationNode):
     bl_label = "Circle"
     bl_width_default = 160
 
+    def checkedPropertiesChanged(self, context):
+        self.updateSocketVisibility()
+        executionCodeChanged()
+
+    mergeStartEnd = BoolProperty(name = "Merge Start End", default = True,
+        description = "Merge the start and end of the circle.",
+        update = checkedPropertiesChanged)
+    mergeCenter = BoolProperty(name = "Merge Center", default = True,
+        description = "Merge the center of the circle using a triangle fan.",
+        update = checkedPropertiesChanged)
+
     useRadialLoopsList = VectorizedSocket.newProperty()
     useInnerLoopsList = VectorizedSocket.newProperty()
     useOuterRadiusList = VectorizedSocket.newProperty()
     useInnerRadiusList = VectorizedSocket.newProperty()
     useStartAngleList = VectorizedSocket.newProperty()
     useEndAngleList = VectorizedSocket.newProperty()
-    useMergeStartEndList = VectorizedSocket.newProperty()
-    useMergeCenterList = VectorizedSocket.newProperty()
+
+    def draw(self, layout):
+        col = layout.column()
+        subcol = col.column(align = True)
+        subcol.prop(self, "mergeStartEnd", text = "Merge Start End", icon = "PROP_CON")
+        subcol.prop(self, "mergeCenter", text = "Merge Center", icon = "AUTOMERGE_ON")
 
     def create(self):
         self.newInput(VectorizedSocket("Integer", "useRadialLoopsList",
@@ -31,10 +48,12 @@ class Circle(bpy.types.Node, AnimationNode):
             ("Outer Radius", "outerRadius", dict(value = 1)),
             ("Outer Radii", "outerRadii"),
             codeProperties = dict(default = 1)))
+
         self.newInput(VectorizedSocket("Float", "useInnerRadiusList",
             ("Inner Radius", "innerRadii", dict(value = 0.5)),
             ("Inner Radii", "innerRadii"),
             codeProperties = dict(default = 0.5)))
+
         self.newInput(VectorizedSocket("Float", "useStartAngleList",
             ("Start Angle", "startAngle", dict(value = 0)),
             ("Start Angles", "startAngles"),
@@ -44,53 +63,46 @@ class Circle(bpy.types.Node, AnimationNode):
             ("End Angles", "endAngles"),
             codeProperties = dict(default = 5)))
 
-        self.newInput(VectorizedSocket("Boolean", "useMergeStartEndList",
-            ("Merge Start End", "mergeStartEnd", dict(value = True)),
-            ("Merge Start Ends", "mergeStartEnds"),
-            codeProperties = dict(default = True)))
-        self.newInput(VectorizedSocket("Boolean", "useMergeCenterList",
-            ("Merge Center", "mergeCenter", dict(value = True)),
-            ("Merge Centers", "mergeCenters"),
-            codeProperties = dict(default = True)))
-
         props = ["useRadialLoopsList", "useInnerLoopsList",
                  "useOuterRadiusList", "useInnerRadiusList",
-                 "useStartAngleList", "useEndAngleList",
-                 "useMergeStartEndList", "useMergeCenterList"]
+                 "useStartAngleList", "useEndAngleList"]
 
         self.newOutput(VectorizedSocket("Mesh", props,
             ("Mesh", "Mesh"),
             ("Meshes", "Meshes")))
 
+        self.updateSocketVisibility()
+
+    def updateSocketVisibility(self):
+        self.inputs[3].hide = self.mergeCenter
+        self.inputs[4].hide = self.mergeStartEnd
+        self.inputs[5].hide = self.mergeStartEnd
+
     def getExecutionFunctionName(self):
         useList = any((self.useRadialLoopsList, self.useInnerLoopsList,
                        self.useOuterRadiusList, self.useInnerRadiusList,
-                       self.useStartAngleList, self.useEndAngleList,
-                       self.useMergeStartEndList, self.useMergeCenterList))
+                       self.useStartAngleList, self.useEndAngleList))
         if useList:
             return "execute_List"
         else:
             return "execute_Single"
 
     def execute_List(self, radialLoops, innerLoops, outerRadii, innerRadii,
-                     startAngles, endAngles, mergeStartEnds, mergeCenters):
+                           startAngles, endAngles):
         radialLoops = VirtualLongList.fromListOrElement(radialLoops, 10)
         innerLoops = VirtualLongList.fromListOrElement(innerLoops, 0)
         outerRadii = VirtualDoubleList.fromListOrElement(outerRadii, 1)
         innerRadii = VirtualDoubleList.fromListOrElement(innerRadii, 0.5)
         startAngles = VirtualDoubleList.fromListOrElement(startAngles, 0)
         endAngles = VirtualDoubleList.fromListOrElement(endAngles, 5)
-        mergeStartEnds = VirtualBooleanList.fromListOrElement(mergeStartEnds, True)
-        mergeCenters = VirtualBooleanList.fromListOrElement(mergeCenters, True)
         amount = VirtualLongList.getMaxRealLength(radialLoops, innerLoops,
                                                   outerRadii, innerRadii,
-                                                  startAngles, endAngles,
-                                                  mergeStartEnds, mergeCenters)
+                                                  startAngles, endAngles)
         return getCircleMeshList(amount, radialLoops, innerLoops,
                                    outerRadii, innerRadii, startAngles,
-                                   endAngles, mergeStartEnds, mergeCenters)
+                                   endAngles, self.mergeStartEnd, self.mergeCenter)
 
     def execute_Single(self, radialLoops, innerLoops, outerRadius, innerRadius,
-                             startAngle, endAngle, mergeStartEnd, mergeCenter):
+                             startAngle, endAngle):
         return getCircleMesh(radialLoops, innerLoops, outerRadius, innerRadius,
-                               startAngle, endAngle, mergeStartEnd, mergeCenter)
+                               startAngle, endAngle, self.mergeStartEnd, self.mergeCenter)
