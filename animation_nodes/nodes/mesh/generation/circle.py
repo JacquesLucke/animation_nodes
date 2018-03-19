@@ -5,9 +5,9 @@ from .... base_types import AnimationNode, VectorizedSocket
 from .... data_structures import VirtualDoubleList, VirtualLongList
 from .... algorithms.mesh_generation.circle import getCircleMesh, getCircleMeshList
 
-class Circle(bpy.types.Node, AnimationNode):
-    bl_idname = "an_CircleNode"
-    bl_label = "Circle"
+class CircleMeshNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_CircleMeshNode"
+    bl_label = "Circle Mesh"
     bl_width_default = 160
 
     def checkedPropertiesChanged(self, context):
@@ -17,6 +17,7 @@ class Circle(bpy.types.Node, AnimationNode):
     mergeStartEnd = BoolProperty(name = "Merge Start End", default = True,
         description = "Merge the start and end of the circle.",
         update = checkedPropertiesChanged)
+
     mergeCenter = BoolProperty(name = "Merge Center", default = True,
         description = "Merge the center of the circle using a triangle fan.",
         update = checkedPropertiesChanged)
@@ -48,7 +49,6 @@ class Circle(bpy.types.Node, AnimationNode):
             ("Outer Radius", "outerRadius", dict(value = 1)),
             ("Outer Radii", "outerRadii"),
             codeProperties = dict(default = 1)))
-
         self.newInput(VectorizedSocket("Float", "useInnerRadiusList",
             ("Inner Radius", "innerRadii", dict(value = 0.5)),
             ("Inner Radii", "innerRadii"),
@@ -68,8 +68,7 @@ class Circle(bpy.types.Node, AnimationNode):
                  "useStartAngleList", "useEndAngleList"]
 
         self.newOutput(VectorizedSocket("Mesh", props,
-            ("Mesh", "Mesh"),
-            ("Meshes", "Meshes")))
+            ("Mesh", "Mesh"), ("Meshes", "Meshes")))
 
         self.updateSocketVisibility()
 
@@ -89,18 +88,21 @@ class Circle(bpy.types.Node, AnimationNode):
 
     def execute_List(self, radialLoops, innerLoops, outerRadii, innerRadii,
                            startAngles, endAngles):
-        radialLoops, innerLoops = VirtualLongList.createMultiple((radialLoops, 10), (innerLoops, 0))
-        outerRadii, innerRadii, startAngles, endAngles = VirtualDoubleList.createMultiple(
-                                                         (outerRadii, 1), (innerRadii, 0.5),
-                                                         (startAngles, 0), (endAngles, 5))
+        radialLoops, innerLoops = VirtualLongList.createMultiple(
+            (radialLoops, 10), (innerLoops, 0))
+        outerRadii, innerRadii = VirtualDoubleList.createMultiple(
+            (outerRadii, 1), (innerRadii, 0.5))
+        startAngles, endAngles = VirtualDoubleList.createMultiple(
+            (startAngles, 0), (endAngles, 5))
+
         amount = VirtualLongList.getMaxRealLength(radialLoops, innerLoops,
-                                                  outerRadii, innerRadii,
-                                                  startAngles, endAngles)
+            outerRadii, innerRadii, startAngles, endAngles)
+
         return getCircleMeshList(amount, radialLoops, innerLoops,
-                                         outerRadii, innerRadii, startAngles,
-                                         endAngles, self.mergeStartEnd, self.mergeCenter)
+            outerRadii, innerRadii, startAngles, endAngles,
+            self.mergeStartEnd, self.mergeCenter)
 
     def execute_Single(self, radialLoops, innerLoops, outerRadius, innerRadius,
                              startAngle, endAngle):
         return getCircleMesh(radialLoops, innerLoops, outerRadius, innerRadius,
-                               startAngle, endAngle, self.mergeStartEnd, self.mergeCenter)
+            startAngle, endAngle, self.mergeStartEnd, self.mergeCenter)
