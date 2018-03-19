@@ -387,6 +387,7 @@ class MeshGeneratorsMenu(bpy.types.Menu):
         layout = self.layout
         insertNode(layout, "an_LineMeshNode", "Line")
         insertNode(layout, "an_GridMeshNode", "Grid")
+        insertNode(layout, "an_CircleMeshNode", "Circle")
         insertNode(layout, "an_CylinderMeshNode", "Cylinder")
         insertNode(layout, "an_UnityTriangleMeshNode", "Unity Triangle")
 
