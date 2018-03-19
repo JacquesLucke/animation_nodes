@@ -8,6 +8,7 @@
 *.html
 *.so
 *.zip
+.vscode
 build/
 animation_nodes/data_structures/lists/base_lists.pxd
 animation_nodes/data_structures/lists/base_lists.pyx
