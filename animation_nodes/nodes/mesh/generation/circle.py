@@ -89,18 +89,16 @@ class Circle(bpy.types.Node, AnimationNode):
 
     def execute_List(self, radialLoops, innerLoops, outerRadii, innerRadii,
                            startAngles, endAngles):
-        radialLoops = VirtualLongList.fromListOrElement(radialLoops, 10)
-        innerLoops = VirtualLongList.fromListOrElement(innerLoops, 0)
-        outerRadii = VirtualDoubleList.fromListOrElement(outerRadii, 1)
-        innerRadii = VirtualDoubleList.fromListOrElement(innerRadii, 0.5)
-        startAngles = VirtualDoubleList.fromListOrElement(startAngles, 0)
-        endAngles = VirtualDoubleList.fromListOrElement(endAngles, 5)
+        radialLoops, innerLoops = VirtualLongList.createMultiple((radialLoops, 10), (innerLoops, 0))
+        outerRadii, innerRadii, startAngles, endAngles = VirtualDoubleList.createMultiple(
+                                                         (outerRadii, 1), (innerRadii, 0.5),
+                                                         (startAngles, 0), (endAngles, 5))
         amount = VirtualLongList.getMaxRealLength(radialLoops, innerLoops,
                                                   outerRadii, innerRadii,
                                                   startAngles, endAngles)
         return getCircleMeshList(amount, radialLoops, innerLoops,
-                                   outerRadii, innerRadii, startAngles,
-                                   endAngles, self.mergeStartEnd, self.mergeCenter)
+                                         outerRadii, innerRadii, startAngles,
+                                         endAngles, self.mergeStartEnd, self.mergeCenter)
 
     def execute_Single(self, radialLoops, innerLoops, outerRadius, innerRadius,
                              startAngle, endAngle):
