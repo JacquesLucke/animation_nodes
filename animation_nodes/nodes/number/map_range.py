@@ -10,7 +10,7 @@ from . c_utils import (
 class MapRangeNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MapRangeNode"
     bl_label = "Map Range"
-    bl_width_default = 190
+    bl_width_default = 200
 
     clampInput = BoolProperty(name = "Clamp Input", default = True,
         description = "The input will be between Input Min and Input Max",

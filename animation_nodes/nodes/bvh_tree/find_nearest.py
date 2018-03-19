@@ -4,7 +4,7 @@ from ... base_types import AnimationNode, VectorizedSocket
 class FindNearestSurfacePointNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_FindNearestSurfacePointNode"
     bl_label = "Find Nearest Surface Point"
-    bl_width_default = 165
+    bl_width_default = 160
     codeEffects = [VectorizedSocket.CodeEffect]
 
     useVectorList = VectorizedSocket.newProperty()

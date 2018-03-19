@@ -21,7 +21,7 @@ inputBasedCache = {}
 class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_InvokeSubprogramNode"
     bl_label = "Invoke Subprogram"
-    bl_width_default = 170
+    bl_width_default = 160
     dynamicLabelType = "HIDDEN_ONLY"
 
     subprogramIdentifier = StringProperty(name = "Subprogram Identifier", default = "",

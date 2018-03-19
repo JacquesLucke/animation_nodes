@@ -6,7 +6,7 @@ from ... base_types import AnimationNode, VectorizedSocket
 class TextObjectOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_TextObjectOutputNode"
     bl_label = "Text Object Output"
-    bl_width_default = 170
+    bl_width_default = 160
     codeEffects = [VectorizedSocket.CodeEffect]
     errorHandlingType = "MESSAGE"
 

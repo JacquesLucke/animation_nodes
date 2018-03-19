@@ -24,7 +24,7 @@ class SortingTemplateProperties(bpy.types.PropertyGroup):
 class SortListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SortListNode"
     bl_label = "Sort List"
-    bl_width_default = 190
+    bl_width_default = 200
     errorHandlingType = "MESSAGE"
 
     assignedType = ListTypeSelectorSocket.newProperty(default = "Object List")

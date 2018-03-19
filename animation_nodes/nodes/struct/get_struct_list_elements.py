@@ -7,7 +7,7 @@ from ... events import executionCodeChanged, propertyChanged
 class GetStructListElementsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GetStructListElementsNode"
     bl_label = "Get Struct List Elements"
-    bl_width_default = 170
+    bl_width_default = 160
     errorHandlingType = "MESSAGE"
 
     makeCopies = BoolProperty(name = "Make Copies", default = True,

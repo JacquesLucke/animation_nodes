@@ -24,7 +24,7 @@ originalTransformTypeItems = [
 class TransformPolygonsNode(bpy.types.Node, AnimationNode, MatrixTransformationBase):
     bl_idname = "an_TransformPolygonsNode"
     bl_label = "Transform Polygons"
-    bl_width_default = 190
+    bl_width_default = 200
     errorHandlingType = "EXCEPTION"
 
     originalTransformType = EnumProperty(name = "Original Transform Type", default = "DEFAULT",

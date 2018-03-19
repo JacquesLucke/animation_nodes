@@ -12,7 +12,7 @@ modeItems = [
 class MixInterpolationNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MixInterpolationNode"
     bl_label = "Mix Interpolation"
-    bl_width_default = 175
+    bl_width_default = 180
 
     mode = EnumProperty(name = "Mode", default = "OVERLAY",
         items = modeItems, update = AnimationNode.refresh)

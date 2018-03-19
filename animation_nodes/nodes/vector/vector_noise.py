@@ -9,7 +9,7 @@ from ... data_structures import DoubleList
 class VectorNoiseNode(bpy.types.Node, AnimationNode, Noise3DNodeBase):
     bl_idname = "an_VectorNoiseNode"
     bl_label = "Vector Noise"
-    bl_width_default = 170
+    bl_width_default = 160
 
     def create(self):
         self.newInput("Vector List", "Vectors", "vectors")

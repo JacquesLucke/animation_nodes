@@ -7,7 +7,7 @@ from . c_utils import project_PointOnPlane_List, project_PointOnPlane_Single
 class ProjectPointOnPlaneNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ProjectPointOnPlaneNode"
     bl_label = "Project Point on Plane"
-    bl_width_default = 170
+    bl_width_default = 160
     searchTags = ["Distance Point to Plane", "Closest Point on Plane"]
 
     usePlanePointList = VectorizedSocket.newProperty()

@@ -7,7 +7,7 @@ from ... events import executionCodeChanged
 class AnimateDataNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_AnimateDataNode"
     bl_label = "Animate Data"
-    bl_width_default = 150
+    bl_width_default = 160
     dynamicLabelType = "ALWAYS"
 
     onlySearchTags = True

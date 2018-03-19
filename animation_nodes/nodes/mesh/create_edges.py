@@ -5,7 +5,7 @@ from ... base_types import AnimationNode
 class CreateEdgesNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CreateEdgesNode"
     bl_label = "Create Edges"
-    bl_width_default = 150
+    bl_width_default = 140
     errorHandlingType = "EXCEPTION"
 
     def create(self):

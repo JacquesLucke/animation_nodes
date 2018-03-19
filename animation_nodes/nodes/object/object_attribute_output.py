@@ -7,7 +7,7 @@ from ... base_types import AnimationNode, VectorizedSocket
 class ObjectAttributeOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectAttributeOutputNode"
     bl_label = "Object Attribute Output"
-    bl_width_default = 175
+    bl_width_default = 180
     errorHandlingType = "MESSAGE"
 
     attribute = StringProperty(name = "Attribute", default = "",
