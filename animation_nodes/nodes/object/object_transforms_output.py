@@ -112,6 +112,7 @@ class an_ObjectTransformsOutputNode(bpy.types.Node, VectorizedNode):
 
     def getBakeCode(self):
         yield "if object is not None:"
+        yield "    pass"
 
         for i in range(3):
             if self.useLocation[i]:
