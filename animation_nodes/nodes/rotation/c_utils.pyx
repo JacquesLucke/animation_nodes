@@ -1,7 +1,25 @@
-from ... data_structures cimport Vector3DList, EulerList, DoubleList
 from libc.math cimport M_PI as PI
+
+from ... data_structures cimport (
+    Vector3DList, EulerList, DoubleList,
+    VirtualDoubleList
+)
+
 cdef float degreeToRadianFactor = <float>(PI / 180)
 cdef float radianToDegreeFactor = <float>(180 / PI)
+
+def combineEulerList(Py_ssize_t amount,
+                     VirtualDoubleList x, VirtualDoubleList y, VirtualDoubleList z,
+                     bint useDegree = False):
+    cdef EulerList output = EulerList(length = amount)
+    cdef float factor = degreeToRadianFactor if useDegree else 1
+    cdef Py_ssize_t i
+    for i in range(amount):
+        output.data[i].x = <float>x.get(i) * factor
+        output.data[i].y = <float>y.get(i) * factor
+        output.data[i].z = <float>z.get(i) * factor
+        output.data[i].order = 0
+    return output
 
 def vectorsToEulers(Vector3DList vectors, bint useDegree):
     cdef EulerList eulers = EulerList(length = len(vectors))
