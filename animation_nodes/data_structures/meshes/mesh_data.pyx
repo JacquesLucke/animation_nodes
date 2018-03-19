@@ -55,6 +55,12 @@ cdef class Mesh:
         self.derivedMeshDataCache.pop("Polygon Tangents", None)
         self.derivedMeshDataCache.pop("Polygon Bitangents", None)
 
+    def getPolygonOrientationMatrices(self, normalized = True):
+        normals = self.getPolygonNormals(normalized)
+        tangents = self.getPolygonTangents(normalized)
+        bitangents = self.getPolygonBitangents(normalized)
+        return normals, tangents, bitangents
+
     @derivedMeshDataCacheHelper("Loop Edges")
     def getLoopEdges(self):
         return calculateLoopEdges(self.edges, self.polygons)
