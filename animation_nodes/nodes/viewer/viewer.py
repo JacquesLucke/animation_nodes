@@ -10,7 +10,7 @@ drawTextByIdentifier = {}
 class ViewerNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ViewerNode"
     bl_label = "Viewer"
-    bl_width_default = 190
+    bl_width_default = 180
 
     maxRows = IntProperty(name = "Max Rows", default = 150, min = 0,
         description = "Max amount of lines visible in the floating text box.")

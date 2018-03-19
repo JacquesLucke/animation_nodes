@@ -9,7 +9,7 @@ conversionTypeItems = [
 class ConvertPlaneTypeNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ConvertPlaneTypeNode"
     bl_label = "Convert Plane Type"
-    bl_width_default = 170
+    bl_width_default = 180
     dynamicLabelType = "HIDDEN_ONLY"
 
     searchTags = [(name, {"conversionType" : repr(type)}) for type, name, _,_,_ in conversionTypeItems]

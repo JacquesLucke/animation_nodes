@@ -6,7 +6,7 @@ from ... data_structures.splines.to_blender import setSplinesOnBlenderObject
 class CurveObjectOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CurveObjectOutputNode"
     bl_label = "Curve Object Output"
-    bl_width_default = 175
+    bl_width_default = 180
     errorHandlingType = "MESSAGE"
 
     useSplineList = VectorizedSocket.newProperty()

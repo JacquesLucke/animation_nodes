@@ -10,7 +10,7 @@ sliceEndType = [
 class SliceListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SliceListNode"
     bl_label = "Slice List"
-    bl_width_default = 170
+    bl_width_default = 180
 
     assignedType = ListTypeSelectorSocket.newProperty(default = "Float")
 

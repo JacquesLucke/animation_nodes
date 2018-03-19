@@ -7,7 +7,7 @@ from ... base_types import AnimationNode, ListTypeSelectorSocket
 class GetListElementNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GetListElementNode"
     bl_label = "Get List Element"
-    bl_width_default = 170
+    bl_width_default = 180
     dynamicLabelType = "HIDDEN_ONLY"
 
     assignedType = ListTypeSelectorSocket.newProperty(default = "Float")

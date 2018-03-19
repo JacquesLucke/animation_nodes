@@ -4,7 +4,7 @@ from ... base_types import AnimationNode, VectorizedSocket
 class EvaluateInterpolationNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_EvaluateInterpolationNode"
     bl_label = "Evaluate Interpolation"
-    bl_width_default = 150
+    bl_width_default = 160
 
     useList = VectorizedSocket.newProperty()
 

@@ -6,7 +6,7 @@ from . transformation_base_node import MatrixTransformationBase
 class OffsetMatrixNode(bpy.types.Node, AnimationNode, MatrixTransformationBase):
     bl_idname = "an_OffsetMatrixNode"
     bl_label = "Offset Matrix"
-    bl_width_default = 190
+    bl_width_default = 200
     onlySearchTags = True
     errorHandlingType = "EXCEPTION"
     searchTags = [("Offset Matrices", {"useMatrixList" : repr(True)})]

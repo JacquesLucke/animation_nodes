@@ -23,7 +23,7 @@ from . c_utils import (
 class ComposeMatrixNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ComposeMatrixNode"
     bl_label = "Compose Matrix"
-    bl_width_default = 190
+    bl_width_default = 180
 
     onlySearchTags = True
     searchTags = [

@@ -4,7 +4,7 @@ from ... base_types import AnimationNode
 class ParticleSystemsInputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ParticleSystemsFromObjectNode"
     bl_label = "Particle Systems from Object"
-    bl_width_default = 150
+    bl_width_default = 160
 
     def create(self):
         self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")

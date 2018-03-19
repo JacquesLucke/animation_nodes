@@ -12,7 +12,7 @@ modeItems = [
 class CreatePolygonIndicesNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CreatePolygonIndicesNode"
     bl_label = "Create Polygon Indices"
-    bl_width_default = 150
+    bl_width_default = 160
     errorHandlingType = "MESSAGE"
 
     mode = EnumProperty(name = "Mode", default = "VERTEX_AMOUNT",

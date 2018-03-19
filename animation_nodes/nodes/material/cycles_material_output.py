@@ -12,7 +12,7 @@ allowedSocketTypes = {
 class CyclesMaterialOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CyclesMaterialOutputNode"
     bl_label = "Cycles Material Output"
-    bl_width_default = 165
+    bl_width_default = 160
 
     def getPossibleSocketItems(self, context):
         sockets = self.getPossibleSockets()

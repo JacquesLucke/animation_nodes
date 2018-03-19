@@ -14,7 +14,7 @@ meshDataTypeItems = [
 class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MeshObjectOutputNode"
     bl_label = "Mesh Object Output"
-    bl_width_default = 175
+    bl_width_default = 180
     errorHandlingType = "MESSAGE"
 
     meshDataType = EnumProperty(name = "Mesh Type", default = "MESH_DATA",

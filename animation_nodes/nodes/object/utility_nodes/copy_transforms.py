@@ -10,7 +10,7 @@ frameTypeItems = [
 class CopyTransformsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CopyTransformsNode"
     bl_label = "Copy Transforms"
-    bl_width_default = 170
+    bl_width_default = 160
 
     def useCurrentTransformsChanged(self, context):
         self.inputs["Frame"].hide = self.useCurrentTransforms

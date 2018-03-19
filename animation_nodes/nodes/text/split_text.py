@@ -14,7 +14,7 @@ splitTypeItems = [
 class SplitTextNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SplitTextNode"
     bl_label = "Split Text"
-    bl_width_default = 190
+    bl_width_default = 180
     errorHandlingType = "MESSAGE"
 
     splitType = EnumProperty(

@@ -8,7 +8,7 @@ from . c_utils import random_DoubleList
 class RandomNumberNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_RandomNumberNode"
     bl_label = "Random Number"
-    bl_width_default = 150
+    bl_width_default = 160
 
     nodeSeed = IntProperty(update = propertyChanged)
 

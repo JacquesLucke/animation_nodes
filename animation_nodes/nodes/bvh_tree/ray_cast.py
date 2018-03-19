@@ -6,7 +6,7 @@ from ... base_types import AnimationNode, VectorizedSocket
 class RayCastBVHTreeNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_RayCastBVHTreeNode"
     bl_label = "Ray Cast BVHTree"
-    bl_width_default = 150
+    bl_width_default = 160
     codeEffects = [VectorizedSocket.CodeEffect]
 
     useStartList = VectorizedSocket.newProperty()

@@ -6,7 +6,7 @@ from ... events import executionCodeChanged
 class ObjectTransformsOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectTransformsOutputNode"
     bl_label = "Object Transforms Output"
-    bl_width_default = 165
+    bl_width_default = 180
     codeEffects = [VectorizedSocket.CodeEffect]
 
     def checkedPropertiesChanged(self, context):
