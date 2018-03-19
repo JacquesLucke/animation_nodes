@@ -31,7 +31,7 @@ class CreateEdgeIndicesNode(bpy.types.Node, AnimationNode):
         return "edgeIndices = (max(index1, 0), max(index2, 0))"
 
     def execute_List(self, indices1, indices2):
-        _indices1 = VirtualLongList.fromListOrElement(indices1, 0)
-        _indices2 = VirtualLongList.fromListOrElement(indices2, 0)
+        _indices1 = VirtualLongList.create(indices1, 0)
+        _indices2 = VirtualLongList.create(indices2, 0)
         amount = VirtualLongList.getMaxRealLength(_indices1, _indices2)
         return createEdgeIndices(amount, _indices1, _indices2)

@@ -167,15 +167,15 @@ class MatrixTransformationBase:
         # count index backwards
         index = -1
         if self.useScale:
-            scales = VirtualVector3DList.fromListOrElement(args[index], (1, 1, 1))
+            scales = VirtualVector3DList.create(args[index], (1, 1, 1))
             scaleMatrixList(matrices, self.scaleMode, scales, influences)
             index -= 1
         if self.useRotation:
-            rotations = VirtualEulerList.fromListOrElement(args[index], (0, 0, 0))
+            rotations = VirtualEulerList.create(args[index], (0, 0, 0))
             matrices = getRotatedMatrixList(matrices, self.rotationMode, rotations, influences)
             index -= 1
         if self.useTranslation:
-            translations = VirtualVector3DList.fromListOrElement(args[index], (0, 0, 0))
+            translations = VirtualVector3DList.create(args[index], (0, 0, 0))
             translateMatrixList(matrices, self.translationMode, translations, influences)
 
         return matrices

@@ -56,10 +56,10 @@ class IntersectPlanePlaneNode(bpy.types.Node, AnimationNode):
 
     def execute_List(self, firstPlanePoints, firstPlaneNormals,
                            secondPlanePoints, secondPlaneNormals):
-        firstPlanePoints = VirtualVector3DList.fromListOrElement(firstPlanePoints, Vector((0, 0, 0)))
-        firstPlaneNormals = VirtualVector3DList.fromListOrElement(firstPlaneNormals, Vector((0, 0, 1)))
-        secondPlanePoints = VirtualVector3DList.fromListOrElement(secondPlanePoints, Vector((0, 0, 0)))
-        secondPlaneNormals = VirtualVector3DList.fromListOrElement(secondPlaneNormals, Vector((1, 0, 0)))
+        firstPlanePoints = VirtualVector3DList.create(firstPlanePoints, Vector((0, 0, 0)))
+        firstPlaneNormals = VirtualVector3DList.create(firstPlaneNormals, Vector((0, 0, 1)))
+        secondPlanePoints = VirtualVector3DList.create(secondPlanePoints, Vector((0, 0, 0)))
+        secondPlaneNormals = VirtualVector3DList.create(secondPlaneNormals, Vector((1, 0, 0)))
         amount = VirtualVector3DList.getMaxRealLength(firstPlanePoints, firstPlaneNormals,
                                                       secondPlanePoints, secondPlaneNormals)
         return intersect_PlanePlane_List(amount,

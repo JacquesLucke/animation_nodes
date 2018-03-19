@@ -26,7 +26,7 @@ class VectorDistanceNode(bpy.types.Node, AnimationNode):
             yield "distance = (a - b).length"
 
     def calcDistances(self, a, b):
-        vectors1 = VirtualVector3DList.fromListOrElement(a, (0, 0, 0))
-        vectors2 = VirtualVector3DList.fromListOrElement(b, (0, 0, 0))
+        vectors1 = VirtualVector3DList.create(a, (0, 0, 0))
+        vectors2 = VirtualVector3DList.create(b, (0, 0, 0))
         amount = VirtualVector3DList.getMaxRealLength(vectors1, vectors2)
         return calculateVectorDistances(amount, vectors1, vectors2)

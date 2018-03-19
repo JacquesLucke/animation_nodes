@@ -55,10 +55,10 @@ class IntersectLinePlaneNode(bpy.types.Node, AnimationNode):
             return "execute_Single"
 
     def execute_List(self, lineStarts, lineEnds, planePoints, planeNormals):
-        lineStarts = VirtualVector3DList.fromListOrElement(lineStarts, Vector((0, 0, 1)))
-        lineEnds = VirtualVector3DList.fromListOrElement(lineEnds, Vector((0, 0, -1)))
-        planePoints = VirtualVector3DList.fromListOrElement(planePoints, Vector((0, 0, 0)))
-        planeNormals = VirtualVector3DList.fromListOrElement(planeNormals, Vector((0, 0, 1)))
+        lineStarts = VirtualVector3DList.create(lineStarts, Vector((0, 0, 1)))
+        lineEnds = VirtualVector3DList.create(lineEnds, Vector((0, 0, -1)))
+        planePoints = VirtualVector3DList.create(planePoints, Vector((0, 0, 0)))
+        planeNormals = VirtualVector3DList.create(planeNormals, Vector((0, 0, 1)))
         amount = VirtualVector3DList.getMaxRealLength(lineStarts, lineEnds,
                                                       planePoints, planeNormals)
         return intersect_LinePlane_List(amount, lineStarts, lineEnds, planePoints, planeNormals)
