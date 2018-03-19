@@ -59,15 +59,6 @@ class VectorizeCodeEffect(CodeEffect):
         yield from self.iterAppendToOutputListLines(node)
         yield "    pass"
 
-    def applyBake(self, node, code):
-        if len(self.baseInputNames) == 0:
-            yield code
-            return
-
-        yield self.getLoopStartLine()
-        yield from self.iterIndented(self.renameVariables(code))
-        yield "    pass"
-
     def iterOutputListCreationLines(self, node):
         for name, index in zip(self.listOutputNames, self.outputIndices):
             socket = node.outputs[index]
