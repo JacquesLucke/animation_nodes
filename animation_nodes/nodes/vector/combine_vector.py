@@ -37,11 +37,9 @@ class CombineVectorNode(bpy.types.Node, AnimationNode):
             yield "vector = Vector((x, y, z))"
 
     def createVectorList(self, x, y, z):
-        _x = VirtualDoubleList.fromListOrElement(x, 0)
-        _y = VirtualDoubleList.fromListOrElement(y, 0)
-        _z = VirtualDoubleList.fromListOrElement(z, 0)
-        amount = VirtualDoubleList.getMaxRealLength(_x, _y, _z)
-        return combineVectorList(amount, _x, _y, _z)
+        x, y, z = VirtualDoubleList.createMultiple((x, 0), (y, 0), (z, 0))
+        amount = VirtualDoubleList.getMaxRealLength(x, y, z)
+        return combineVectorList(amount, x, y, z)
 
     @property
     def generatesList(self):

@@ -15,6 +15,13 @@ cdef class VirtualLISTNAME(VirtualList):
         else:
             return VirtualLISTNAME_List(realList)
 
+    @classmethod
+    def createMultiple(cls, *elements):
+        cdef list virtualLists = []
+        for src, default in elements:
+            virtualLists.append(VirtualLISTNAME.fromListOrElement(src, default))
+        return virtualLists
+
     cdef TYPE OPTIONAL_STAR get(self, Py_ssize_t i):
         raise NotImplementedError()
 
