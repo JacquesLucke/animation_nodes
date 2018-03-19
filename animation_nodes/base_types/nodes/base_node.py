@@ -478,11 +478,16 @@ class AnimationNode:
         return toString(self.getExecutionCode())
 
     def getLocalBakeCode(self):
-        return self.applyCodeEffects(toString(self.getBakeCode()))
+        return self.applyBakeCodeEffects(toString(self.getBakeCode()))
 
     def applyCodeEffects(self, code):
         for effect in self.getCodeEffects():
             code = toString(effect.apply(self, code))
+        return code
+
+    def applyBakeCodeEffects(self, code):
+        for effect in self.getCodeEffects():
+            code = toString(effect.applyBake(self, code))
         return code
 
 
