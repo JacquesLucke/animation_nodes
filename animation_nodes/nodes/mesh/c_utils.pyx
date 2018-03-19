@@ -21,7 +21,7 @@ from ... data_structures cimport (
 )
 
 from ... math cimport (
-    Vector3, Matrix4,
+    Vector3, Matrix4, toVector3,
     scaleVec3, subVec3, crossVec3, distanceVec3, lengthVec3, dotVec3,
     transformVec3AsPoint_InPlace, normalizeVec3_InPlace, scaleVec3_Inplace,
     normalizeLengthVec3_Inplace, transformVec3AsPoint, transformVec3AsDirection
@@ -264,6 +264,35 @@ def getIndividualPolygons_LoopEdges(PolygonIndicesList oldPolygons):
 
 # Extract Polygon Transforms
 ###########################################
+
+cdef float inf = float("inf")
+
+def extractPolygonPoints_Direction(Vector3DList vertices, PolygonIndicesList polygons, direction):
+    cdef Vector3DList points = Vector3DList(length = len(polygons))
+    cdef Py_ssize_t pIndex, i
+    cdef unsigned int polyStart, polyLength
+
+    cdef Vector3 _direction = toVector3(direction)
+    cdef Vector3 *_vertices = vertices.data
+    cdef unsigned int *_indices = polygons.indices.data
+    cdef unsigned int *_polyStarts = polygons.polyStarts.data
+    cdef unsigned int *_polyLengths = polygons.polyLengths.data
+
+    cdef float distance
+    cdef float maxDistance
+    cdef Py_ssize_t maxIndex
+    for pIndex in range(len(polygons)):
+        maxDistance = -inf
+        polyStart = _polyStarts[pIndex]
+        polyLength = _polyLengths[pIndex]
+        for i in range(polyStart, polyStart + polyLength):
+            distance = dotVec3(&_direction, _vertices + _indices[i])
+            if distance > maxDistance:
+                maxDistance = distance
+                maxIndex = i
+
+        points.data[pIndex] = _vertices[_indices[maxIndex]]
+    return points
 
 def extractMeshPolygonTransforms(Mesh mesh):
     centers = mesh.getPolygonCenters()
