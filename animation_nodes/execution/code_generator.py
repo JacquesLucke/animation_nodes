@@ -149,8 +149,7 @@ def iterNodeExecutionLines_Bake(node, variables):
     yield from iterNodeCommentLines(node)
     yield from setupNodeForExecution(node, variables)
     try:
-        yield from iterRealNodeExecutionLines(node, variables)
-        yield from iterNodeBakeLines(node, variables)
+        yield from iterRealNodeExecutionLines(node, variables, bake = True)
     except:
         handleExecutionCodeCreationException(node)
 
@@ -189,9 +188,9 @@ def iterInputCopyLines(node, variables):
             variables[socket] = newName
             yield line
 
-def iterRealNodeExecutionLines(node, variables):
+def iterRealNodeExecutionLines(node, variables, bake = False):
     requiredOutputs = getRequiredOutputIdentifiers(node)
-    localCode = node.getLocalExecutionCode(requiredOutputs)
+    localCode = node.getLocalExecutionCode(requiredOutputs, bake)
     globalCode = makeGlobalExecutionCode(localCode, node, variables)
     yield from globalCode.splitlines()
 
@@ -202,11 +201,6 @@ def getRequiredOutputIdentifiers(node):
     for socket in node.linkedOutputs:
         update(node.getAllIdentifiersOfSocket(socket))
     return requiredOutputs
-
-def iterNodeBakeLines(node, variables):
-    localCode = node.getLocalBakeCode()
-    globalCode = makeGlobalExecutionCode(localCode, node, variables)
-    yield from globalCode.splitlines()
 
 def makeGlobalExecutionCode(localCode, node, variables):
     code = replaceVariableName(localCode, "self", node.identifier)

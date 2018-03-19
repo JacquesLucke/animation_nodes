@@ -92,7 +92,7 @@ class ObjectActionOutputNode(bpy.types.Node, AnimationNode):
         cdef ActionEvaluator evaluator = action.getEvaluator(channels, defaults)
         cdef FloatList values = FloatList(length = len(channels))
 
-        cdef VirtualMatrix4x4List _offsets = VirtualMatrix4x4List.fromListOrElement(offsets, Matrix.Identity(4))
+        cdef VirtualMatrix4x4List _offsets = VirtualMatrix4x4List.create(offsets, Matrix.Identity(4))
 
         cdef Matrix4 *offset
         cdef Vector3 *location

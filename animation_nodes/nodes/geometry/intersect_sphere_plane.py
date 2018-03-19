@@ -56,10 +56,10 @@ class IntersectSpherePlaneNode(bpy.types.Node, AnimationNode):
             return "execute_Single"
 
     def execute_List(self, sphereCenters, sphereRadii, planePoints, planeNormals):
-        sphereCenters = VirtualVector3DList.fromListOrElement(sphereCenters, Vector((0, 0, 0)))
-        sphereRadii = VirtualDoubleList.fromListOrElement(sphereRadii, 1)
-        planePoints = VirtualVector3DList.fromListOrElement(planePoints, Vector((0, 0, 0)))
-        planeNormals = VirtualVector3DList.fromListOrElement(planeNormals, Vector((0, 0, 1)))
+        sphereCenters = VirtualVector3DList.create(sphereCenters, Vector((0, 0, 0)))
+        sphereRadii = VirtualDoubleList.create(sphereRadii, 1)
+        planePoints = VirtualVector3DList.create(planePoints, Vector((0, 0, 0)))
+        planeNormals = VirtualVector3DList.create(planeNormals, Vector((0, 0, 1)))
         amount = VirtualVector3DList.getMaxRealLength(sphereCenters, sphereRadii,
                                                       planePoints, planeNormals)
         return intersect_SpherePlane_List(amount,

@@ -393,7 +393,7 @@ def edgesToTubes(Vector3DList vertices, EdgeIndicesList edges, radius, Py_ssize_
         raise IndexError("invalid edges")
 
     cdef Mesh tube = getCylinderMesh(1, 1, resolution, caps)
-    cdef VirtualDoubleList radii = VirtualDoubleList.fromListOrElement(radius, 0)
+    cdef VirtualDoubleList radii = VirtualDoubleList.create(radius, 0)
     transformations = getEdgeMatrices(vertices, edges, radii)
     return replicateMesh(tube, transformations)
 

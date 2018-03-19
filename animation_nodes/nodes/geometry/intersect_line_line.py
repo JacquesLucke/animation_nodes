@@ -64,15 +64,14 @@ class IntersectLineLineNode(bpy.types.Node, AnimationNode):
             return "execute_Single"
 
     def execute_List(self, firstLineStarts, firstLineEnds, secondLineStarts, secondLineEnds):
-        firstLineStarts = VirtualVector3DList.fromListOrElement(firstLineStarts, Vector((1, 1, 0)))
-        firstLineEnds = VirtualVector3DList.fromListOrElement(firstLineEnds, Vector((-1, -1, 0)))
-        secondLineStarts = VirtualVector3DList.fromListOrElement(secondLineStarts, Vector((1, -1, 0)))
-        secondLineEnds = VirtualVector3DList.fromListOrElement(secondLineEnds, Vector((-1, 1, 0)))
-        amount = VirtualVector3DList.getMaxRealLength(firstLineStarts, firstLineEnds,
-                                                      secondLineStarts, secondLineEnds)
-        return intersect_LineLine_List(amount,
-            firstLineStarts, firstLineEnds,
-            secondLineStarts, secondLineEnds)
+        starts1, ends1, starts2, ends2 = VirtualVector3DList.createMultiple(
+            (firstLineStarts, (1, 1, 0)),
+            (firstLineEnds, (-1, -1, 0)),
+            (secondLineStarts, (1, -1, 0)),
+            (secondLineEnds, (-1, 1, 0))
+        )
+        amount = VirtualVector3DList.getMaxRealLength(starts1, ends1, starts2, ends2)
+        return intersect_LineLine_List(amount, starts1, ends1, starts2, ends2)
 
     def execute_Single(self, firstLineStart, firstLineEnd, secondLineStart, secondLineEnd):
         return intersect_LineLine_Single(firstLineStart, firstLineEnd,

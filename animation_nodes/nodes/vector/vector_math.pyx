@@ -49,8 +49,8 @@ cdef class Operation:
     #####################################################
 
     def execute_vA_vB(self, a, b):
-        cdef VirtualVector3DList _a = VirtualVector3DList.fromListOrElement(a, (0, 0, 0))
-        cdef VirtualVector3DList _b = VirtualVector3DList.fromListOrElement(b, (0, 0, 0))
+        cdef VirtualVector3DList _a = VirtualVector3DList.create(a, (0, 0, 0))
+        cdef VirtualVector3DList _b = VirtualVector3DList.create(b, (0, 0, 0))
         cdef Py_ssize_t amount = VirtualVector3DList.getMaxRealLength(_a, _b)
 
         cdef VectorVectorFunction f = <VectorVectorFunction>self.function
@@ -65,8 +65,8 @@ cdef class Operation:
     #####################################################
 
     def execute_vA_fB(self, a, b):
-        cdef VirtualVector3DList _a = VirtualVector3DList.fromListOrElement(a, (0, 0, 0))
-        cdef VirtualDoubleList _b = VirtualDoubleList.fromListOrElement(b, 0)
+        cdef VirtualVector3DList _a = VirtualVector3DList.create(a, (0, 0, 0))
+        cdef VirtualDoubleList _b = VirtualDoubleList.create(b, 0)
         cdef Py_ssize_t amount = VirtualVector3DList.getMaxRealLength(_a, _b)
 
         cdef VectorFloatFunction f = <VectorFloatFunction>self.function

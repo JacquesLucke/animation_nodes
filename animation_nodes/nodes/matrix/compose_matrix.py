@@ -119,9 +119,9 @@ class ComposeMatrixNode(bpy.types.Node, AnimationNode):
             yield "matrix = AN.utils.math.composeMatrix(translation, rotation, scale)"
 
     def calculateMatrices(self, translation, rotation, scale):
-        translations = VirtualVector3DList.fromListOrElement(translation, (0, 0, 0))
-        rotations = VirtualEulerList.fromListOrElement(rotation, (0, 0, 0))
-        scales = VirtualVector3DList.fromListOrElement(scale, (1, 1, 1))
+        translations = VirtualVector3DList.create(translation, (0, 0, 0))
+        rotations = VirtualEulerList.create(rotation, (0, 0, 0))
+        scales = VirtualVector3DList.create(scale, (1, 1, 1))
 
         lists = []
         if self.useTranslation: lists.append(translations)

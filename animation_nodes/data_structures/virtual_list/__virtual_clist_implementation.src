@@ -1,5 +1,9 @@
 cdef class VirtualLISTNAME(VirtualList):
     @classmethod
+    def create(cls, source, default):
+        return cls.fromListOrElement(source, default)
+
+    @classmethod
     def fromListOrElement(cls, obj, default):
         if isinstance(obj, LISTNAME):
             return cls.fromList(obj, default)
@@ -14,6 +18,20 @@ cdef class VirtualLISTNAME(VirtualList):
             return VirtualLISTNAME_Element(realList[0], realLength = 1)
         else:
             return VirtualLISTNAME_List(realList)
+
+    @classmethod
+    def createMultiple(cls, *elements):
+        cdef list virtualLists = []
+        for src, default in elements:
+            virtualLists.append(VirtualLISTNAME.fromListOrElement(src, default))
+        return virtualLists
+
+    def materialize(self, Py_ssize_t length):
+        cdef LISTNAME newList = LISTNAME(length = length)
+        cdef Py_ssize_t i
+        for i in range(length):
+            newList.data[i] = self.get(i)OPTIONAL_INV_DEREF
+        return newList
 
     cdef TYPE OPTIONAL_STAR get(self, Py_ssize_t i):
         raise NotImplementedError()

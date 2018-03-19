@@ -50,9 +50,9 @@ class ProjectPointOnLineNode(bpy.types.Node, AnimationNode):
             return "execute_Single"
 
     def execute_List(self, lineStarts, lineEnds, points):
-        lineStarts = VirtualVector3DList.fromListOrElement(lineStarts, Vector((0, 0, 0)))
-        lineEnds = VirtualVector3DList.fromListOrElement(lineEnds, Vector((1, 0, 0)))
-        points = VirtualVector3DList.fromListOrElement(points, Vector((1, 1, 0)))
+        lineStarts = VirtualVector3DList.create(lineStarts, Vector((0, 0, 0)))
+        lineEnds = VirtualVector3DList.create(lineEnds, Vector((1, 0, 0)))
+        points = VirtualVector3DList.create(points, Vector((1, 1, 0)))
         amount = VirtualVector3DList.getMaxRealLength(lineStarts, lineEnds, points)
         return project_PointOnLine_List(amount, lineStarts, lineEnds, points)
 

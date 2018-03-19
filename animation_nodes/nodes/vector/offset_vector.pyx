@@ -70,7 +70,7 @@ class OffsetVectorNode(bpy.types.Node, AnimationNode):
     def execute_List(self, Vector3DList vectors, falloff, offset):
         cdef FalloffEvaluator evaluator = self.getFalloffEvaluator(falloff)
         cdef FloatList influences = evaluator.evaluateList(vectors)
-        cdef VirtualVector3DList _offsets = VirtualVector3DList.fromListOrElement(offset, (0, 0, 0))
+        cdef VirtualVector3DList _offsets = VirtualVector3DList.create(offset, (0, 0, 0))
         cdef bint isStartState = self.specifiedState == "START"
 
         cdef Vector3 *_offset

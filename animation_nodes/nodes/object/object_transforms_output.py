@@ -114,6 +114,7 @@ class ObjectTransformsOutputNode(bpy.types.Node, AnimationNode):
 
     def getBakeCode(self):
         yield "if object is not None:"
+        yield "    pass"
 
         for i in range(3):
             if self.useLocation[i]:

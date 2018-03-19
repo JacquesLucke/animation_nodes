@@ -9,6 +9,7 @@ from ... data_structures cimport (
 from ... math cimport (
     Vector3, Euler3, Matrix4, toMatrix4,
     multMatrix4, toPyMatrix4,
+    invertOrthogonalTransformation,
     setTranslationRotationScaleMatrix,
     setRotationXMatrix, setRotationYMatrix, setRotationZMatrix,
     setRotationMatrix, setTranslationMatrix, setIdentityMatrix,
@@ -288,3 +289,10 @@ def evaluateBoundedTransformationAction(BoundedAction action, FloatList paramete
         scales.data[i] = Vector3(_results[6], _results[7], _results[8])
 
     return locations, rotations, scales
+
+def getInvertedOrthogonalMatrices(Matrix4x4List matrices):
+    cdef Matrix4x4List newList = Matrix4x4List(length = len(matrices))
+    cdef Py_ssize_t i
+    for i in range(len(newList)):
+        invertOrthogonalTransformation(newList.data + i, matrices.data + i)
+    return newList

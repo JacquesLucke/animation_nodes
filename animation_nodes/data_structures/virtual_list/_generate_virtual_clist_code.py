@@ -39,7 +39,8 @@ def generatePyx(target, utils):
             LISTNAME = listName,
             TYPE = info["Type"],
             OPTIONAL_STAR = "*" if info["Return"] == "Pointer" else "",
-            OPTIONAL_DEREF = "" if info["Return"] == "Pointer" else "[0]")
+            OPTIONAL_DEREF = "" if info["Return"] == "Pointer" else "[0]",
+            OPTIONAL_INV_DEREF = "[0]" if info["Return"] == "Pointer" else "")
         parts.append(code)
 
     utils.writeTextFile(target, "\n\n".join(parts))

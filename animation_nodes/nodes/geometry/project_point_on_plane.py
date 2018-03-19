@@ -47,9 +47,9 @@ class ProjectPointOnPlaneNode(bpy.types.Node, AnimationNode):
             return "execute_Single"
 
     def execute_List(self, planePoints, planeNormals, points):
-        planePoints = VirtualVector3DList.fromListOrElement(planePoints, Vector((0, 0, 0)))
-        planeNormals = VirtualVector3DList.fromListOrElement(planeNormals, Vector((0, 0, 1)))
-        points = VirtualVector3DList.fromListOrElement(points, Vector((0, 0, 1)))
+        planePoints = VirtualVector3DList.create(planePoints, Vector((0, 0, 0)))
+        planeNormals = VirtualVector3DList.create(planeNormals, Vector((0, 0, 1)))
+        points = VirtualVector3DList.create(points, Vector((0, 0, 1)))
         amount = VirtualVector3DList.getMaxRealLength(planePoints, planeNormals, points)
         return project_PointOnPlane_List(amount, planePoints, planeNormals, points)
 
