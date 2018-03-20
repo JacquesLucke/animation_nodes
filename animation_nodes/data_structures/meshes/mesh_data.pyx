@@ -266,8 +266,17 @@ def calculatePolygonTangents(Vector3DList vertices, PolygonIndicesList polygons)
     return tangents
 
 def calculatePolygonBitangents(Vector3DList tangents, Vector3DList normals):
-    cdef Vector3DList bitangents = Vector3DList(length = tangents.length)
+    return calculateCrossProducts(tangents, normals)
+
+def calculateCrossProducts(Vector3DList a, Vector3DList b):
+    cdef Vector3DList result = Vector3DList(length = a.length)
     cdef Py_ssize_t i
-    for i in range(bitangents.length):
-        crossVec3(bitangents.data + i, tangents.data + i, normals.data + i)
-    return bitangents
+
+    cdef Vector3 *_result = result.data
+    cdef Vector3 *_a = a.data
+    cdef Vector3 *_b = b.data
+
+    for i in range(len(result)):
+        crossVec3(_result + i, _a + i, _b + i)
+
+    return result

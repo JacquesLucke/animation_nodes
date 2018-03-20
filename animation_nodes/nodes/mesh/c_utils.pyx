@@ -89,6 +89,22 @@ def calculateEdgeCenters(Vector3DList vertices, EdgeIndicesList edges):
 
     return centers
 
+def calculateEdgeDirections(Vector3DList vertices, EdgeIndicesList edges):
+    cdef Vector3DList directions = Vector3DList(length = len(edges))
+    cdef Py_ssize_t i
+    cdef Vector3 *v1
+    cdef Vector3 *v2
+
+    for i in range(len(edges)):
+        v1 = vertices.data + edges.data[i].v1
+        v2 = vertices.data + edges.data[i].v2
+        directions.data[i].x = v1.x - v2.x
+        directions.data[i].y = v1.y - v2.y
+        directions.data[i].z = v1.z - v2.z
+
+    return directions
+
+
 def getEdgeStartPoints(Vector3DList vertices, EdgeIndicesList edges):
     return getEdgePoints(vertices, edges, 0)
 
@@ -267,13 +283,13 @@ def getIndividualPolygons_LoopEdges(PolygonIndicesList oldPolygons):
 
 cdef float inf = float("inf")
 
-def extractPolygonPoints_Direction(Vector3DList vertices, PolygonIndicesList polygons, direction):
+def getPolygonVerticesInDirection(Vector3DList vertices, PolygonIndicesList polygons, direction):
     cdef Vector3DList points = Vector3DList(length = len(polygons))
-    cdef Py_ssize_t pIndex, i
-    cdef unsigned int polyStart, polyLength
 
     cdef Vector3 _direction = toVector3(direction)
     cdef Vector3 *_vertices = vertices.data
+
+    cdef unsigned int polyStart, polyLength
     cdef unsigned int *_indices = polygons.indices.data
     cdef unsigned int *_polyStarts = polygons.polyStarts.data
     cdef unsigned int *_polyLengths = polygons.polyLengths.data
@@ -281,6 +297,7 @@ def extractPolygonPoints_Direction(Vector3DList vertices, PolygonIndicesList pol
     cdef float distance
     cdef float maxDistance
     cdef Py_ssize_t maxIndex
+    cdef Py_ssize_t pIndex, i
     for pIndex in range(len(polygons)):
         maxDistance = -inf
         polyStart = _polyStarts[pIndex]
@@ -293,6 +310,64 @@ def extractPolygonPoints_Direction(Vector3DList vertices, PolygonIndicesList pol
 
         points.data[pIndex] = _vertices[_indices[maxIndex]]
     return points
+
+@cython.cdivision(True)
+def getPolygonEdgeDirectionsByIndex(Vector3DList vertices, PolygonIndicesList polygons, Py_ssize_t index):
+    assert index >= 0
+    cdef Vector3DList directions = Vector3DList(length = len(polygons))
+
+    cdef Vector3 *_vertices = vertices.data
+    cdef unsigned int polyStart, polyLength
+    cdef unsigned int *_indices = polygons.indices.data
+    cdef unsigned int *_polyStarts = polygons.polyStarts.data
+    cdef unsigned int *_polyLengths = polygons.polyLengths.data
+
+    cdef Py_ssize_t pIndex, i1, i2
+    for pIndex in range(len(polygons)):
+        polyStart = _polyStarts[pIndex]
+        polyLength = _polyLengths[pIndex]
+        i1 = _indices[polyStart + index % polyLength]
+        i2 = _indices[polyStart + (index + 1) % polyLength]
+
+        subVec3(directions.data + pIndex, _vertices + i2, _vertices + i1)
+
+    return directions
+
+@cython.cdivision(True)
+def getPolygonEdgesInDirection(Vector3DList vertices, PolygonIndicesList polygons, direction):
+    cdef EdgeIndicesList edges = EdgeIndicesList(length = len(polygons))
+    cdef EdgeIndices *_edges = edges.data
+
+    cdef Vector3 _direction = toVector3(direction)
+    cdef Vector3 *_vertices = vertices.data
+    cdef unsigned int polyStart, polyLength
+    cdef unsigned int *_indices = polygons.indices.data
+    cdef unsigned int *_polyStarts = polygons.polyStarts.data
+    cdef unsigned int *_polyLengths = polygons.polyLengths.data
+
+    cdef Vector3 center
+    cdef Py_ssize_t pIndex, i, maxIndex, i1, i2
+    cdef float maxDistance, distance
+    for pIndex in range(len(polygons)):
+        maxDistance = -inf
+        polyStart = _polyStarts[pIndex]
+        polyLength = _polyLengths[pIndex]
+        for i in range(polyLength):
+            i1 = _indices[polyStart + i]
+            i2 = _indices[polyStart + (i + 1) % polyLength]
+            centerVec3(&center, _vertices + i1, _vertices + i2)
+            distance = dotVec3(&_direction, &center)
+            if distance > maxDistance:
+                maxDistance = distance
+                _edges[pIndex].v1 = i1
+                _edges[pIndex].v2 = i2
+
+    return edges
+
+cdef inline void centerVec3(Vector3 *t, Vector3 *a, Vector3 *b):
+    t.x = (a.x + b.x) / <float>2.0
+    t.y = (a.y + b.y) / <float>2.0
+    t.z = (a.z + b.z) / <float>2.0
 
 def extractMeshPolygonTransforms(Mesh mesh):
     centers = mesh.getPolygonCenters()
