@@ -15,10 +15,10 @@ from . c_utils import (
     transformPolygons, getIndividualPolygonsMesh
 )
 
-originalTransformTypeItems = [
+pivotSourceItems = [
     ("DEFAULT", "Default", "Use the center as pivot and guess some tangent and bitangent.", "NONE", 0),
-    ("CUSTOM_PIVOTS", "Custom Pivots", "Provide custom privots for every polygon. Tangent and bitangent are guessed.", "NONE", 1),
-    ("CUSTOM", "Custom", "Provide a transformation matrix for each polygon that represents it. The rotation part of the matrices has to be orthogonal.", "NONE", 2)
+    ("CUSTOM_POINTS", "Custom Points", "Provide custom pivots for every polygon. Tangent and bitangent are guessed.", "NONE", 1),
+    ("CUSTOM_MATRICES", "Custom Matrices", "Provide a transformation matrix for each polygon that represents it. The rotation part of the matrices has to be orthogonal.", "NONE", 2)
 ]
 
 class TransformPolygonsNode(bpy.types.Node, AnimationNode, MatrixTransformationBase):
@@ -27,17 +27,17 @@ class TransformPolygonsNode(bpy.types.Node, AnimationNode, MatrixTransformationB
     bl_width_default = 200
     errorHandlingType = "EXCEPTION"
 
-    originalTransformType = EnumProperty(name = "Original Transform Type", default = "DEFAULT",
+    pivotSource = EnumProperty(name = "Pivot Source", default = "DEFAULT",
         description = "Determines the pivot and rotation axis for each polygon.",
-        items = originalTransformTypeItems, update = AnimationNode.refresh)
+        items = pivotSourceItems, update = AnimationNode.refresh)
 
     def create(self):
         self.newInput("Mesh", "Mesh", "inMesh")
         self.createMatrixTransformationInputs(useMatrixList = True)
 
-        if self.originalTransformType == "CUSTOM_PIVOTS":
+        if self.pivotSource == "CUSTOM_POINTS":
             self.newInput("Vector List", "Pivots", "pivots")
-        elif self.originalTransformType == "CUSTOM":
+        elif self.pivotSource == "CUSTOM_MATRICES":
             self.newInput("Matrix List", "Matrices", "matrices")
 
         self.newOutput("Mesh", "Mesh", "outMesh")
@@ -46,15 +46,15 @@ class TransformPolygonsNode(bpy.types.Node, AnimationNode, MatrixTransformationB
         self.draw_MatrixTransformationProperties(layout)
 
     def drawAdvanced(self, layout):
-        layout.prop(self, "originalTransformType", text = "Basis")
+        layout.prop(self, "pivotSource", text = "Local Pivots")
         self.drawAdvanced_MatrixTransformationProperties(layout)
 
     def getExecutionFunctionName(self):
-        if self.originalTransformType == "DEFAULT":
+        if self.pivotSource == "DEFAULT":
             return "execute_Normal"
-        elif self.originalTransformType == "CUSTOM_PIVOTS":
+        elif self.pivotSource == "CUSTOM_POINTS":
             return "execute_CustomPivots"
-        elif self.originalTransformType == "CUSTOM":
+        elif self.pivotSource == "CUSTOM_MATRICES":
             return "execute_Custom"
 
     def execute_Normal(self, mesh, *transformationArgs):
