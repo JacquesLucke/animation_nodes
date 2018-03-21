@@ -661,7 +661,10 @@ class FullNodeState:
             socket.hide = data[0]
             socket.isUsed = data[1]
             for socketID in data[2]:
-                try: socket.linkWith(idToSocket(socketID))
+                try:
+                    otherSocket = idToSocket(socketID)
+                    if otherSocket.is_output or not otherSocket.is_linked:
+                        socket.linkWith(idToSocket(socketID))
                 except: pass
 
 class NonPersistentNodeData:
