@@ -47,6 +47,10 @@ class TransformPolygonsNode(bpy.types.Node, AnimationNode, MatrixTransformationB
 
     def drawAdvanced(self, layout):
         layout.prop(self, "pivotSource", text = "Local Pivots")
+
+        if self.pivotSource == "CUSTOM_MATRICES" and "LOCAL_AXIS" not in self.rotationMode:
+            layout.label("Try to change the rotation mode.", icon = "INFO")
+
         self.drawAdvanced_MatrixTransformationProperties(layout)
 
     def getExecutionFunctionName(self):
@@ -70,7 +74,6 @@ class TransformPolygonsNode(bpy.types.Node, AnimationNode, MatrixTransformationB
 
         virtualizedPivots = VirtualVector3DList.create(pivots, (0, 0, 0))
         pivots = virtualizedPivots.materialize(len(newMesh.polygons), canUseOriginal = True)
-        print(len(pivots), len(newMesh.polygons))
 
         normals, tangents, bitangents = newMesh.getPolygonOrientationMatrices(normalized = True)
         transforms = matricesFromNormalizedAxisData(pivots, tangents, bitangents, normals)
