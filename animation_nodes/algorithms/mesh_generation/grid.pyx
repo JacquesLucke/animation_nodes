@@ -1,4 +1,19 @@
-from ... data_structures cimport Vector3DList, EdgeIndicesList, PolygonIndicesList
+from ... data_structures cimport (
+    Mesh, Vector3DList, EdgeIndicesList, PolygonIndicesList
+)
+
+def getGridMesh_Step(float xDistance, float yDistance, int xDivisions, int yDivisions):
+    vertices = vertices_Step(xDistance, yDistance, xDivisions, yDivisions)
+    edges = innerQuadEdges(xDivisions, yDivisions)
+    polygons = innerQuadPolygons(xDivisions, yDivisions)
+    return Mesh(vertices, edges, polygons, skipValidation = True)
+
+def getGridMesh_Size(float length, float width, int xDivisions, int yDivisions):
+    vertices = vertices_Size(length, width, xDivisions, yDivisions)
+    edges = innerQuadEdges(xDivisions, yDivisions)
+    polygons = innerQuadPolygons(xDivisions, yDivisions)
+    return Mesh(vertices, edges, polygons, skipValidation = True)
+
 
 # Vertices
 ############################################

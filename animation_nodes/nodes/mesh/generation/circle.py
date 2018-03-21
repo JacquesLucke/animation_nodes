@@ -46,11 +46,11 @@ class CircleMeshNode(bpy.types.Node, AnimationNode):
             codeProperties = dict(default = 0)))
 
         self.newInput(VectorizedSocket("Float", "useOuterRadiusList",
-            ("Outer Radius", "outerRadius", dict(value = 1)),
+            ("Outer Radius", "outerRadius", dict(value = 1, minValue = 0)),
             ("Outer Radii", "outerRadii"),
             codeProperties = dict(default = 1)))
         self.newInput(VectorizedSocket("Float", "useInnerRadiusList",
-            ("Inner Radius", "innerRadii", dict(value = 0.5)),
+            ("Inner Radius", "innerRadii", dict(value = 0.5, minValue = 0)),
             ("Inner Radii", "innerRadii"),
             codeProperties = dict(default = 0.5)))
 
