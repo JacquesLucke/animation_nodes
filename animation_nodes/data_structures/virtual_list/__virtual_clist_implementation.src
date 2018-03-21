@@ -1,9 +1,5 @@
 cdef class VirtualLISTNAME(VirtualList):
     @classmethod
-    def create(cls, source, default):
-        return cls.fromListOrElement(source, default)
-
-    @classmethod
     def fromListOrElement(cls, obj, default):
         if isinstance(obj, LISTNAME):
             return cls.fromList(obj, default)
