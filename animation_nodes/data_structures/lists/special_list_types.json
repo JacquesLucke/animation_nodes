@@ -18,7 +18,7 @@
         "Declarations" : [
             "from libc.math cimport sqrt",
             "from ... math.vector cimport Vector3",
-            "from ... math.conversion cimport setVector3, toPyVector3"
+            "from ... math.conversion cimport setVector3, toPyVector3, toVector3"
         ]
     },
     "EulerList" : {

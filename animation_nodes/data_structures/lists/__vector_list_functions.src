@@ -10,6 +10,14 @@ def transform(self, matrix, bint ignoreTranslation = False):
     from ... math import transformVector3DList
     transformVector3DList(self, matrix, ignoreTranslation)
 
+def move(self, translation):
+    cdef Vector3 _translation = toVector3(translation)
+    cdef Py_ssize_t i
+    for i in range(self.length):
+        self.data[i].x += _translation.x
+        self.data[i].y += _translation.y
+        self.data[i].z += _translation.z
+
 def getSumOfElements(self):
     cdef Vector3 sum = {"x": 0, "y" : 0, "z" : 0}
     cdef Py_ssize_t i
