@@ -94,7 +94,7 @@ class TransformPolygonsNode(bpy.types.Node, AnimationNode, MatrixTransformationB
         transformPolygons(mesh.vertices, mesh.polygons, invertedTransforms)
         newTransforms = self.transformMatrices(transforms, transformationArgs)
         transformPolygons(mesh.vertices, mesh.polygons, newTransforms)
-        mesh.verticesChanged()
+        mesh.verticesTransformed()
 
         return mesh
 
