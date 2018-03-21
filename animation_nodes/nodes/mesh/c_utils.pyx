@@ -21,7 +21,7 @@ from ... data_structures cimport (
 )
 
 from ... math cimport (
-    Vector3, Matrix4, toVector3,
+    Vector3, Matrix4, toVector3, distanceSquaredVec3,
     scaleVec3, subVec3, crossVec3, distanceVec3, lengthVec3, dotVec3,
     transformVec3AsPoint_InPlace, normalizeVec3_InPlace, scaleVec3_Inplace,
     normalizeLengthVec3_Inplace, transformVec3AsPoint, transformVec3AsDirection
@@ -333,34 +333,53 @@ def getPolygonEdgeDirectionsByIndex(Vector3DList vertices, PolygonIndicesList po
 
     return directions
 
+ctypedef float (*DistanceFunction)(Vector3 *a, Vector3 *b)
+
 @cython.cdivision(True)
-def getPolygonEdgesInDirection(Vector3DList vertices, PolygonIndicesList polygons, direction):
+def getPolygonEdgesByDirection(Vector3DList vertices, PolygonIndicesList polygons,
+                               direction, bint useFurthest):
+    return getPolygonEdgesByDistanceFunction(vertices, polygons, direction, dotVec3, useFurthest)
+
+@cython.cdivision
+def getPolygonEdgesByDistance(Vector3DList vertices, PolygonIndicesList polygons,
+                              center, bint useFurthest):
+    return getPolygonEdgesByDistanceFunction(vertices, polygons, center, distanceSquaredVec3, useFurthest)
+
+@cython.cdivision
+cdef getPolygonEdgesByDistanceFunction(Vector3DList vertices, PolygonIndicesList polygons,
+                                       parameter, DistanceFunction calcDistance, bint useFurthest):
     cdef EdgeIndicesList edges = EdgeIndicesList(length = len(polygons))
     cdef EdgeIndices *_edges = edges.data
 
-    cdef Vector3 _direction = toVector3(direction)
+    cdef Vector3 _parameter = toVector3(parameter)
     cdef Vector3 *_vertices = vertices.data
     cdef unsigned int polyStart, polyLength
     cdef unsigned int *_indices = polygons.indices.data
     cdef unsigned int *_polyStarts = polygons.polyStarts.data
     cdef unsigned int *_polyLengths = polygons.polyLengths.data
 
-    cdef Vector3 center
-    cdef Py_ssize_t pIndex, i, maxIndex, i1, i2
-    cdef float maxDistance, distance
+    cdef Vector3 edgeCenter
+    cdef Py_ssize_t pIndex, i, i1, i2
+    cdef float selectedDistance, distance
     for pIndex in range(len(polygons)):
-        maxDistance = -inf
+        selectedDistance = -inf if useFurthest else inf
         polyStart = _polyStarts[pIndex]
         polyLength = _polyLengths[pIndex]
         for i in range(polyLength):
             i1 = _indices[polyStart + i]
             i2 = _indices[polyStart + (i + 1) % polyLength]
-            centerVec3(&center, _vertices + i1, _vertices + i2)
-            distance = dotVec3(&_direction, &center)
-            if distance > maxDistance:
-                maxDistance = distance
-                _edges[pIndex].v1 = i1
-                _edges[pIndex].v2 = i2
+            centerVec3(&edgeCenter, _vertices + i1, _vertices + i2)
+            distance = calcDistance(&_parameter, &edgeCenter)
+            if useFurthest:
+                if distance > selectedDistance:
+                    selectedDistance = distance
+                    _edges[pIndex].v1 = i1
+                    _edges[pIndex].v2 = i2
+            else:
+                if distance < selectedDistance:
+                    selectedDistance = distance
+                    _edges[pIndex].v1 = i1
+                    _edges[pIndex].v2 = i2
 
     return edges
 
