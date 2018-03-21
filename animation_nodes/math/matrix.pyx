@@ -293,3 +293,16 @@ cdef inline void transpose3x3Part(Matrix3_or_Matrix4 *t, Matrix3_or_Matrix4 *m):
     t.a11, t.a21, t.a31 = m.a11, m.a12, m.a13
     t.a12, t.a22, t.a32 = m.a21, m.a22, m.a23
     t.a13, t.a23, t.a33 = m.a31, m.a32, m.a33
+
+cdef void scaleMatrix3x3Part(Matrix3_or_Matrix4 *m, float s):
+    m.a11 *= s
+    m.a21 *= s
+    m.a31 *= s
+
+    m.a12 *= s
+    m.a22 *= s
+    m.a32 *= s
+
+    m.a13 *= s
+    m.a23 *= s
+    m.a33 *= s
