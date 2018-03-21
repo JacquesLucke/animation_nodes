@@ -77,7 +77,8 @@ class SimpleConvert(LinkCorrection):
         ("Euler", "Vector") : "an_RotationToDirectionNode",
         ("Float", "Falloff") : "an_ConstantFalloffNode",
         ("Vector List", "Spline") : "an_SplineFromPointsNode",
-        ("Float List", "Falloff") : "an_CustomFalloffNode"
+        ("Float List", "Falloff") : "an_CustomFalloffNode",
+        ("Object", "Mesh") : "an_MeshObjectInputNode"
     }
 
     def check(self, origin, target):
@@ -154,16 +155,6 @@ class ConvertSeparatedMeshToBMesh(LinkCorrection):
         nodeTree.links.new(toMesh.inputs[0], toMesh.outputs[0])
         nodeTree.links.new(toMesh.outputs[0], target)
 
-class ConvertObjectToMesh(LinkCorrection):
-    def check(self, origin, target):
-        return origin.dataType == "Object" and target.dataType == "Mesh"
-    def insert(self, nodeTree, origin, target, dataOrigin):
-        objectMesh, toMesh = insertNodes(nodeTree, ["an_ObjectMeshNode", "an_CombineMeshNode"], origin, target)
-        origin.linkWith(objectMesh.inputs[0])
-        for i in range(3):
-            objectMesh.outputs[i].linkWith(toMesh.inputs[i])
-        toMesh.outputs[0].linkWith(target)
-
 class ConvertListToLength(LinkCorrection):
     def check(self, origin, target):
         return "List" in origin.dataType and target.dataType == "Integer"
@@ -227,7 +218,6 @@ def getSocketCenter(socket1, socket2):
 linkCorrectors = [
     ConvertMeshListToMesh(),
     ConvertNormalToEuler(),
-    ConvertObjectToMesh(),
     ConvertSeparatedMeshToBMesh(),
     ConvertEulerToQuaternion(),
     ConvertQuaternionToEuler(),

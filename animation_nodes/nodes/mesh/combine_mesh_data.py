@@ -14,6 +14,7 @@ class CombineMeshNode(bpy.types.Node, AnimationNode):
         self.newOutput("an_MeshSocket", "Mesh", "meshData")
 
     def execute(self, vertexLocations, edgeIndices, polygonIndices):
-        try: return Mesh(vertexLocations, edgeIndices, polygonIndices)
+        try:
+            return Mesh(vertexLocations, edgeIndices, polygonIndices)
         except Exception as e:
             self.raiseErrorMessage(str(e))

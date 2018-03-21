@@ -6,11 +6,14 @@ from ... base_types import AnimationNode, VectorizedSocket
 class MeshObjectInputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MeshObjectInputNode"
     bl_label = "Mesh Object Input"
+    errorHandlingType = "MESSAGE"
+    searchTags = ["Object Mesh Data", "Mesh from Object"]
 
     def create(self):
         self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
         self.newInput("Boolean", "Use World Space", "useWorldSpace")
-        self.newInput("Boolean", "Use Modifiers", "useModifiers")
+        self.newInput("Boolean", "Use Modifiers", "useModifiers", value = False)
+        self.newInput("Boolean", "Load UVs", "loadUVs", value = False)
         self.newInput("Scene", "Scene", "scene", hide = True)
 
         self.newOutput("Mesh", "Mesh", "mesh")
@@ -29,8 +32,9 @@ class MeshObjectInputNode(bpy.types.Node, AnimationNode):
 
         self.newOutput("Text", "Mesh Name", "meshName")
 
-        for socket in self.outputs[5:]:
-            socket.hide = True
+        visibleOutputs = ("Mesh", "Vertex Locations", "Polygon Centers")
+        for socket in self.outputs:
+            socket.hide = socket.name not in visibleOutputs
 
     def draw(self, layout):
         pass
@@ -83,7 +87,7 @@ class MeshObjectInputNode(bpy.types.Node, AnimationNode):
             yield "mesh.setVertexNormals(vertexNormals)"
             yield "mesh.setPolygonNormals(polygonNormals)"
             yield "mesh.setLoopEdges(sourceMesh.an.getLoopEdges())"
-
+            yield "if loadUVs: self.loadUVs(mesh, sourceMesh, object)"
 
     def getVertexLocations(self, mesh, object, useWorldSpace):
         vertices = mesh.an.getVertices()
@@ -108,3 +112,10 @@ class MeshObjectInputNode(bpy.types.Node, AnimationNode):
         if useWorldSpace:
             centers.transform(object.matrix_world)
         return centers
+
+    def loadUVs(self, mesh, sourceMesh, object):
+        if object.mode == "OBJECT":
+            for uvMapName in sourceMesh.uv_layers.keys():
+                mesh.insertUVMap(uvMapName, sourceMesh.an.getUVMap(uvMapName))
+        else:
+            self.setErrorMessage("Object has to be in object mode to load UV maps.")

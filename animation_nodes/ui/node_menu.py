@@ -358,14 +358,13 @@ class MeshMenu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        insertNode(layout, "an_ObjectMeshNode", "Object Mesh")
+        insertNode(layout, "an_MeshObjectInputNode", "Mesh Input")
         insertNode(layout, "an_ObjectBoundingBoxNode", "Get Bounding Box")
         insertNode(layout, "an_VertexGroupInputNode", "Vertex Group Input")
         layout.separator()
         insertNode(layout, "an_TransformPolygonsNode", "Transform Polygons")
         insertNode(layout, "an_SeparatePolygonsNode", "Separate Polygons")
         insertNode(layout, "an_ExtractPolygonTransformsNode", "Extract Polygon Transforms")
-        insertNode(layout, "an_PreparePolygonTransformationNode", "Prepare Polygon Transformation")
         layout.menu("an_mesh_generators_menu", text = "Generators")
         layout.menu("an_mesh_operators_menu", text = "Operators")
         layout.separator()
