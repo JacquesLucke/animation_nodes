@@ -1,5 +1,12 @@
 from ... math cimport Vector3, toVector3
-from ... data_structures cimport Vector3DList, EdgeIndicesList
+from ... data_structures cimport Vector3DList, EdgeIndicesList, Mesh
+
+def getLineMesh(start, stop, long steps):
+    return Mesh(
+        vertices = vertices(start, stop, steps),
+        edges = edges(steps),
+        skipValidation = True
+    )
 
 # Vertices
 ###########################################
