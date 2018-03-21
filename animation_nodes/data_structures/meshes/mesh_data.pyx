@@ -4,7 +4,10 @@ import functools
 from collections import OrderedDict
 from . validate import checkMeshData, calculateLoopEdges
 from .. lists.base_lists cimport UIntegerList, EdgeIndices, Vector3DList, Vector2DList
-from ... math cimport Vector3, crossVec3, subVec3, addVec3_Inplace, isExactlyZeroVec3, normalizeVec3
+from ... math cimport (
+    Vector3, crossVec3, subVec3, addVec3_Inplace, isExactlyZeroVec3, normalizeVec3,
+    Matrix4, toMatrix4
+)
 
 def derivedMeshDataCacheHelper(name, handleNormalization = False):
     def decorator(function):
@@ -48,12 +51,15 @@ cdef class Mesh:
         self.derivedMeshDataCache = {}
         self.uvMaps = OrderedDict()
 
-    def verticesChanged(self):
+    def verticesTransformed(self):
         self.derivedMeshDataCache.pop("Vertex Normals", None)
         self.derivedMeshDataCache.pop("Polygon Centers", None)
         self.derivedMeshDataCache.pop("Polygon Normals", None)
         self.derivedMeshDataCache.pop("Polygon Tangents", None)
         self.derivedMeshDataCache.pop("Polygon Bitangents", None)
+
+    def verticesMoved(self):
+        self.derivedMeshDataCache.pop("Polygon Centers", None)
 
     def getPolygonOrientationMatrices(self, normalized = True):
         normals = self.getPolygonNormals(normalized)
@@ -120,6 +126,14 @@ cdef class Mesh:
         mesh.transferMeshProperties(self,
             calcNewLoopProperty = lambda x: x.copy())
         return mesh
+
+    def transform(self, transformation):
+        self.vertices.transform(transformation)
+        self.verticesTransformed()
+
+    def move(self, translation):
+        self.vertices.move(translation)
+        self.verticesMoved()
 
     def __repr__(self):
         return textwrap.dedent("""\
