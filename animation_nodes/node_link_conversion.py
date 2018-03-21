@@ -78,7 +78,8 @@ class SimpleConvert(LinkCorrection):
         ("Float", "Falloff") : "an_ConstantFalloffNode",
         ("Vector List", "Spline") : "an_SplineFromPointsNode",
         ("Float List", "Falloff") : "an_CustomFalloffNode",
-        ("Object", "Mesh") : "an_MeshObjectInputNode"
+        ("Object", "Mesh") : "an_MeshObjectInputNode",
+        ("Mesh", "Vector List") : "an_MeshInfoNode"
     }
 
     def check(self, origin, target):
