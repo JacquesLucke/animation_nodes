@@ -68,7 +68,10 @@ class TransformPolygonsNode(bpy.types.Node, AnimationNode, MatrixTransformationB
         *transformationArgs, pivots = args
         newMesh = getIndividualPolygonsMesh(mesh)
 
-        pivots = VirtualVector3DList.create(pivots, (0, 0, 0)).materialize(len(newMesh.polygons))
+        virtualizedPivots = VirtualVector3DList.create(pivots, (0, 0, 0))
+        pivots = virtualizedPivots.materialize(len(newMesh.polygons), canUseOriginal = True)
+        print(len(pivots), len(newMesh.polygons))
+
         normals, tangents, bitangents = newMesh.getPolygonOrientationMatrices(normalized = True)
         transforms = matricesFromNormalizedAxisData(pivots, tangents, bitangents, normals)
         return self.transformMeshPolygons(newMesh, transforms, transformationArgs)
@@ -77,7 +80,9 @@ class TransformPolygonsNode(bpy.types.Node, AnimationNode, MatrixTransformationB
         *transformationArgs, transforms = args
         newMesh = getIndividualPolygonsMesh(mesh)
 
-        transforms = VirtualMatrix4x4List.create(transforms, Matrix()).materialize(len(newMesh.polygons))
+        virtualizedTransforms = VirtualMatrix4x4List.create(transforms, Matrix())
+        transforms = virtualizedTransforms.materialize(len(newMesh.polygons), canUseOriginal = True)
+
         return self.transformMeshPolygons(newMesh, transforms, transformationArgs)
 
     def transformMeshPolygons(self, mesh, transforms, transformationArgs):

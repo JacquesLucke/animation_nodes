@@ -26,7 +26,7 @@ cdef class VirtualLISTNAME(VirtualList):
             virtualLists.append(VirtualLISTNAME.fromListOrElement(src, default))
         return virtualLists
 
-    def materialize(self, Py_ssize_t length):
+    def materialize(self, Py_ssize_t length, bint canUseOriginal = False):
         cdef LISTNAME newList = LISTNAME(length = length)
         cdef Py_ssize_t i
         for i in range(length):
@@ -53,6 +53,12 @@ cdef class VirtualLISTNAME_List(VirtualLISTNAME):
 
     def getRealLength(self):
         return self.realLength
+
+    def materialize(self, Py_ssize_t length, bint canUseOriginal = False):
+        if canUseOriginal and self.realLength == length:
+            return self.realList
+        else:
+            return super().materialize(length, canUseOriginal)
 
 cdef class VirtualLISTNAME_Element(VirtualLISTNAME):
     cdef LISTNAME realList

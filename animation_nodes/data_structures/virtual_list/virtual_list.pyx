@@ -6,6 +6,9 @@ cdef class VirtualList:
     def getRealLength(self):
         return 0
 
+    def materialize(self, Py_ssize_t length, bint canUseOriginal = False):
+        raise NotImplementedError()
+
 ctypedef fused PyListOrElement:
     list
     object
@@ -36,6 +39,9 @@ cdef class VirtualPyList(VirtualList):
             return VirtualPyList_Element_NoCopy(element, realLength)
         else:
             return VirtualPyList_Element_Copy(element, copy, realLength)
+
+    def materialize(self, Py_ssize_t length, bint canUseOriginal = False):
+        return [self[i] for i in range(length)]
 
 cdef class VirtualPyList_Element_NoCopy(VirtualPyList):
     cdef object element
@@ -82,6 +88,12 @@ cdef class VirtualPyList_List_NoCopy(VirtualPyList):
     def getRealLength(self):
         return self.realLength
 
+    def materialize(self, Py_ssize_t length, bint canUseOriginal = False):
+        if canUseOriginal and self.realLength == length:
+            return self.realList
+        else:
+            return super().materialize(length, canUseOriginal)
+
 cdef class VirtualPyList_List_Copy(VirtualPyList):
     cdef object realList
     cdef Py_ssize_t realLength
@@ -98,3 +110,9 @@ cdef class VirtualPyList_List_Copy(VirtualPyList):
 
     def getRealLength(self):
         return self.realLength
+
+    def materialize(self, Py_ssize_t length, bint canUseOriginal = False):
+        if canUseOriginal and self.realLength == length:
+            return self.realList
+        else:
+            return super().materialize(length, canUseOriginal)

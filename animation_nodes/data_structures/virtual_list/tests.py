@@ -1,7 +1,8 @@
 from mathutils import Vector
 from unittest import TestCase
 from . virtual_list import VirtualPyList
-from .. lists.base_lists import Vector3DList
+from . virtual_clists import VirtualLongList
+from .. lists.base_lists import Vector3DList, LongList
 
 vector = Vector((1, 2, 3))
 pyVectorList = [Vector((1, 2, 3)), Vector((4, 5, 6)), Vector((7, 8, 9))]
@@ -83,7 +84,7 @@ class TestVirtualPyList(TestCase):
         self.assertEqual(vList[10], vector)
         self.assertEqual(vList[-20], vector)
 
-    def test_List_NoCopy_Default_Reference(self):
+    def test_List_Copy_Default_Reference(self):
         vList = VirtualPyList.fromList([], default = vector, copy = copyVector)
         self.assertIsNot(vList[0], vector)
         self.assertIsNot(vList[10], vector)
@@ -96,3 +97,37 @@ class TestVirtualPyList(TestCase):
         self.assertEqual(vList[1], Vector((4, 5, 6)))
         self.assertEqual(vList[10], Vector((1, 2, 3)))
         self.assertEqual(vList[-1], Vector((4, 5, 6)))
+
+    def test_List_Materialize(self):
+        original = [1, 2, 3]
+        vList = VirtualPyList.fromList(original, 0)
+
+        newList = vList.materialize(5)
+        self.assertEqual(len(newList), 5)
+        self.assertEqual(newList[2], 3)
+        self.assertEqual(newList[4], 2)
+
+        newList = vList.materialize(3, canUseOriginal = False)
+        self.assertIsNot(original, newList)
+        self.assertEqual(original, newList)
+
+        newList = vList.materialize(3, canUseOriginal = True)
+        self.assertIs(original, newList)
+        self.assertEqual(original, newList)
+
+    def test_CList_Materialize(self):
+        original = LongList.fromValues([1, 2, 3])
+        vList = VirtualLongList.fromList(original, 0)
+
+        newList = vList.materialize(5)
+        self.assertEqual(len(newList), 5)
+        self.assertEqual(newList[2], 3)
+        self.assertEqual(newList[4], 2)
+
+        newList = vList.materialize(3, canUseOriginal = False)
+        self.assertIsNot(original, newList)
+        self.assertEqual(original, newList)
+
+        newList = vList.materialize(3, canUseOriginal = True)
+        self.assertIs(original, newList)
+        self.assertEqual(original, newList)
