@@ -4,33 +4,44 @@ from math import pi as _pi
 from libc.math cimport sin, cos
 from ... utils.limits cimport INT_MAX
 from ... base_types import AnimationNode
-from ... data_structures cimport Matrix4x4List, Vector3DList, CDefaultList
+from ... data_structures cimport Mesh, Matrix4x4List, Vector3DList
 from ... algorithms.rotations.rotation_and_direction cimport directionToMatrix_LowLevel
 from ... math cimport (Matrix4, Vector3, setTranslationMatrix,
-    setMatrixTranslation, setRotationZMatrix, toVector3)
+    setMatrixTranslation, setRotationZMatrix, toVector3, scaleMatrix3x3Part)
 cdef double PI = _pi # cimporting pi does not work for some reason...
 
 modeItems = [
-    ("LINEAR", "Linear", "", "", 0),
-    ("GRID", "Grid", "", "", 1),
-    ("CIRCLE", "Circle", "", "", 2),
-    ("VERTICES", "Vertices", "", "", 3)
+    ("LINEAR", "Linear", "", "NONE", 0),
+    ("GRID", "Grid", "", "NONE", 1),
+    ("CIRCLE", "Circle", "", "NONE", 2),
+    ("MESH", "Mesh", "", "NONE", 3),
+    ("SPIRAL", "Spiral", "", "NONE", 4)
 ]
 
 distanceModeItems = [
-    ("STEP", "Step", "Define the distance between two points", 0),
-    ("SIZE", "Size", "Define how large the grid will be in total", 1)
+    ("STEP", "Step", "Define the distance between two points", "NONE", 0),
+    ("SIZE", "Size", "Define how large the grid will be in total", "NONE", 1)
 ]
+
+meshModeItems = [
+    ("VERTICES", "Vertices", "","NONE", 0),
+    ("POLYGONS", "Polygons", "", "NONE", 1)
+]
+
 
 class DistributeMatricesNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_DistributeMatricesNode"
     bl_label = "Distribute Matrices"
+    bl_width_default = 160
 
-    mode = EnumProperty(name = "Mode", default = "LINEAR",
+    mode = EnumProperty(name = "Mode", default = "GRID",
         items = modeItems, update = AnimationNode.refresh)
 
     distanceMode = EnumProperty(name = "Distance Mode", default = "SIZE",
         items = distanceModeItems, update = AnimationNode.refresh)
+
+    meshMode = EnumProperty(name = "Mesh Mode", default = "VERTICES",
+        items = meshModeItems, update = AnimationNode.refresh)
 
     exactCircleSegment = BoolProperty(name = "Exact Circle Segment", default = False)
 
@@ -57,17 +68,26 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
             self.newInput("Integer", "Amount", "amount", value = 10, minValue = 0)
             self.newInput("Float", "Radius", "radius", value = 4)
             self.newInput("Float", "Segment", "segment", value = 1)
-        elif self.mode == "VERTICES":
-            self.newInput("Vector List", "Vertices", "vertices")
-            self.newInput("Vector List", "Normals", "normals")
+        elif self.mode == "MESH":
+            self.newInput("Mesh", "Mesh", "mesh")
+        elif self.mode == "SPIRAL":
+            self.newInput("Integer", "Amount", "amount", value = 100, minValue = 0)
+            self.newInput("Float", "Start Radius", "startRadius", value = 0, minValue = 0)
+            self.newInput("Float", "End Radius", "endRadius", value = 2 * PI, minValue = 0)
+            self.newInput("Float", "Start Size", "startSize", value = 0.1, minValue = 0)
+            self.newInput("Float", "End Size", "endSize", value = 0.5, minValue = 0)
+            self.newInput("Float", "Start Angle", "startAngle", value = 0)
+            self.newInput("Float", "End Angle", "endAngel", value = 6 * PI)
 
         self.newOutput("Matrix List", "Matrices", "matrices")
 
     def draw(self, layout):
         col = layout.column()
-        layout.prop(self, "mode", text = "")
+        col.prop(self, "mode", text = "")
         if self.mode in ("LINEAR", "GRID"):
-            layout.prop(self, "distanceMode", text = "")
+            col.prop(self, "distanceMode", text = "")
+        if self.mode == "MESH":
+            col.prop(self, "meshMode", text = "")
 
     def drawAdvanced(self, layout):
         if self.mode == "CIRCLE":
@@ -80,8 +100,13 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
             return "execute_Grid"
         elif self.mode == "CIRCLE":
             return "execute_Circle"
-        elif self.mode == "VERTICES":
-            return "execute_Vertices"
+        elif self.mode == "MESH":
+            if self.meshMode == "VERTICES":
+                return "execute_Vertices"
+            elif self.meshMode == "POLYGONS":
+                return "execute_Polygons"
+        elif self.mode == "SPIRAL":
+            return "execute_Spiral"
 
     def execute_Linear(self, amount, size):
         return self.execute_Grid(amount, 1, 1, size, 0, 0)
@@ -140,22 +165,48 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
 
         return matrices
 
-    def execute_Vertices(self, Vector3DList vertices, Vector3DList normals):
+    def execute_Vertices(self, Mesh mesh):
+        return self.matricesFromPointsAndNormals(mesh.vertices, mesh.getVertexNormals())
+
+    def execute_Polygons(self, Mesh mesh):
+        return self.matricesFromPointsAndNormals(mesh.getPolygonCenters(), mesh.getPolygonNormals())
+
+    def matricesFromPointsAndNormals(self, Vector3DList points, Vector3DList normals):
+        assert len(points) == len(normals)
         cdef:
-            int i
-            CDefaultList _vertices = CDefaultList(Vector3DList, vertices, (0, 0, 0))
-            CDefaultList _normals = CDefaultList(Vector3DList, normals, (0, 0, 0))
-            int amount = CDefaultList.getMaxLength(_vertices, _normals)
-            Matrix4x4List matrices = Matrix4x4List(length = amount)
+            Py_ssize_t i
             Vector3 *normal
             Vector3 *position
             Vector3 guide = toVector3((0, 0, 1))
+            Matrix4x4List matrices = Matrix4x4List(length = len(points))
+
+        for i in range(len(matrices)):
+            directionToMatrix_LowLevel(matrices.data + i, normals.data + i, &guide, 2, 0)
+            setMatrixTranslation(matrices.data + i, points.data + i)
+
+        return matrices
+
+    def execute_Spiral(self, Py_ssize_t amount, float startRadius, float endRadius, float startSize, float endSize, float startAngle, float endAngel):
+        cdef Py_ssize_t i
+        cdef Vector3 position
+        cdef float f, size, angle
+        cdef Matrix4x4List matrices = Matrix4x4List(length = amount)
+        cdef float factor = 1 / <float>(amount - 1) if amount > 1 else 0
 
         for i in range(amount):
-            normal = <Vector3*>_normals.get(i)
-            position = <Vector3*>_vertices.get(i)
-            directionToMatrix_LowLevel(matrices.data + i, normal, &guide, 2, 0)
-            setMatrixTranslation(matrices.data + i, position)
+            f = <float>i * factor
+
+            size = f * (endSize - startSize) + startSize
+            angle = f * (endAngel - startAngle) + startAngle
+            radius = f * (endRadius - startRadius) + startRadius
+
+            position.x = cos(angle) * radius
+            position.y = sin(angle) * radius
+            position.z = 0
+
+            setRotationZMatrix(matrices.data + i, angle)
+            scaleMatrix3x3Part(matrices.data + i, size)
+            setMatrixTranslation(matrices.data + i, &position)
 
         return matrices
 
