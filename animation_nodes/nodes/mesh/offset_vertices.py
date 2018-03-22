@@ -14,7 +14,8 @@ class OffsetVerticesNode(bpy.types.Node, AnimationNode):
         self.newInput("Mesh", "Mesh", "mesh")
         self.newInput("Falloff", "Falloff", "falloff")
         self.newInput(VectorizedSocket("Vector", "useVectorList",
-            ("Offset", "offset"), ("Offsets", "offsets")))
+            ("Offset", "offset", dict(value = (0, 0, 1))),
+            ("Offsets", "offsets")))
         self.newOutput("Mesh", "Mesh", "mesh")
 
     def execute(self, mesh, falloff, offsets):
