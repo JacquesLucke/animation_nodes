@@ -148,7 +148,7 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
             int i
             Vector3 vector
             int amount = limitAmount(_amount)
-            double angleStep, iCos, iSin, stepCos, stepSin, newCos
+            float angleStep, iCos, iSin, stepCos, stepSin
             Matrix4x4List matrices = Matrix4x4List(length = amount)
 
         if self.exactCircleSegment: angleStep = segment * 2 * PI / max(amount - 1, 1)
@@ -166,9 +166,7 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
             setTranslationMatrix(matrices.data + i, &vector)
             setMatrixCustomZRotation(matrices.data + i, iCos, iSin)
 
-            newCos = stepCos * iCos - stepSin * iSin
-            iSin = stepSin * iCos + stepCos * iSin
-            iCos = newCos
+            rotateStep(&iCos, &iSin, stepCos, stepSin)
 
         return matrices
 
@@ -197,7 +195,7 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
                              float startSize, float endSize, float startAngle, float endAngle):
         cdef Py_ssize_t i
         cdef Vector3 position
-        cdef float iCos, iSin, stepCos, stepSin, newCos, f, size
+        cdef float iCos, iSin, stepCos, stepSin, f, size
         cdef Matrix4x4List matrices = Matrix4x4List(length = amount)
         cdef float factor = 1 / <float>(amount - 1) if amount > 1 else 0
         cdef float angleStep = (endAngle - startAngle) / (amount - 1)
@@ -221,16 +219,18 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
             setMatrixCustomZRotation(matrices.data + i, iCos, iSin)
             scaleMatrix3x3Part(matrices.data + i, size)
 
-            newCos = stepCos * iCos - stepSin * iSin
-            iSin = stepSin * iCos + stepCos * iSin
-            iCos = newCos
+            rotateStep(&iCos, &iSin, stepCos, stepSin)
 
         return matrices
 
 cdef int limitAmount(n):
     return max(min(n, INT_MAX), 0)
 
-cdef void setMatrixCustomZRotation(Matrix4* m, double iCos, double iSin):
+cdef inline void setMatrixCustomZRotation(Matrix4* m, double iCos, double iSin):
     m.a11 = m.a22 = iCos
-    m.a12 = -iSin
-    m.a21 = iSin
+    m.a12, m.a21 = -iSin, iSin
+
+cdef inline void rotateStep(float *iCos, float *iSin, float stepCos, float stepSin):
+    cdef float newCos = stepCos * iCos[0] - stepSin * iSin[0]
+    iSin[0] = stepSin * iCos[0] + stepCos * iSin[0]
+    iCos[0] = newCos
