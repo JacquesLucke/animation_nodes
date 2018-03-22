@@ -109,7 +109,7 @@ def main_Help():
 ####################################################
 
 def main_Clean():
-    answer = input("Remove all files? [y/n] ").lower()
+    answer = input("Remove all files? [y/N] ").lower()
     print()
     if answer == "y":
         removedFiles = removeUntrackedFiles(filesToKeep = ["conf.json"])["removed"]
