@@ -18,7 +18,6 @@ class MeshFromSplineNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.newInput("Spline", "Spline", "spline", defaultDrawType = "PROPERTY_ONLY")
         self.newInput("Float", "Size", "size", value = 0.3, minValue = 0)
-        self.newInput("Boolean", "Cap Ends", "capEnds", value = False)
         self.newInput("Integer", "Spline Resolution", "splineResolution", value = 5, minValue = 0)
 
         if self.useCustomShape:
@@ -27,6 +26,7 @@ class MeshFromSplineNode(bpy.types.Node, AnimationNode):
         else:
             self.newInput("Integer", "Bevel Resolution", "bevelResolution", value = 4, minValue = 2)
 
+        self.newInput("Boolean", "Cap Ends", "capEnds", value = False)
         self.newOutput("Mesh", "Mesh", "mesh")
 
     def draw(self, layout):
@@ -38,13 +38,13 @@ class MeshFromSplineNode(bpy.types.Node, AnimationNode):
         else:
             return "execute_CircleShape"
 
-    def execute_CircleShape(self, spline, size, capEnds, splineResolution, bevelResolution):
+    def execute_CircleShape(self, spline, size, splineResolution, bevelResolution, capEnds):
         size = max(size, 0)
         bevelResolution = max(bevelResolution, 2)
         circlePoints = getPointsOnCircle(bevelResolution, size)
         return self.createSplineMesh(spline, capEnds, splineResolution, circlePoints, True)
 
-    def execute_CustomShape(self, spline, size, capEnds, splineResolution, shapeBorder, closedShape):
+    def execute_CustomShape(self, spline, size, splineResolution, shapeBorder, closedShape, capEnds):
         size = max(size, 0)
         shapeBorder.scale(size)
         return self.createSplineMesh(spline, capEnds, splineResolution, shapeBorder, closedShape)
