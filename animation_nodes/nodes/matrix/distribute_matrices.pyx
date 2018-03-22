@@ -146,22 +146,29 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
     def execute_Circle(self, _amount, float radius, float segment):
         cdef:
             int i
-            double currentAngle
             Vector3 vector
             int amount = limitAmount(_amount)
-            double factor
+            double angleStep, iCos, iSin, stepCos, stepSin, newCos
             Matrix4x4List matrices = Matrix4x4List(length = amount)
 
-        if self.exactCircleSegment: factor = segment * 2 * PI / max(amount - 1, 1)
-        else:                       factor = segment * 2 * PI / max(amount, 1)
+        if self.exactCircleSegment: angleStep = segment * 2 * PI / max(amount - 1, 1)
+        else:                       angleStep = segment * 2 * PI / max(amount, 1)
+
+        iCos = 1
+        iSin = 0
+        stepCos = cos(angleStep)
+        stepSin = sin(angleStep)
 
         for i in range(amount):
-            currentAngle = i * factor
-            vector.x = <float>cos(currentAngle) * radius
-            vector.y = <float>sin(currentAngle) * radius
+            vector.x = iCos * radius
+            vector.y = iSin * radius
             vector.z = 0
-            setRotationZMatrix(matrices.data + i, currentAngle)
-            setMatrixTranslation(matrices.data + i, &vector)
+            setTranslationMatrix(matrices.data + i, &vector)
+            setMatrixCustomZRotation(matrices.data + i, iCos, iSin)
+
+            newCos = stepCos * iCos - stepSin * iSin
+            iSin = stepSin * iCos + stepCos * iSin
+            iCos = newCos
 
         return matrices
 
@@ -212,3 +219,8 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
 
 cdef int limitAmount(n):
     return max(min(n, INT_MAX), 0)
+
+cdef void setMatrixCustomZRotation(Matrix4* m, double iCos, double iSin):
+    m.a11 = m.a22 = iCos
+    m.a12 = -iSin
+    m.a21 = iSin
