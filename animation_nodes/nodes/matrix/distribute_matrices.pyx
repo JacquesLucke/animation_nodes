@@ -193,27 +193,37 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
 
         return matrices
 
-    def execute_Spiral(self, Py_ssize_t amount, float startRadius, float endRadius, float startSize, float endSize, float startAngle, float endAngel):
+    def execute_Spiral(self, Py_ssize_t amount, float startRadius, float endRadius,
+                             float startSize, float endSize, float startAngle, float endAngle):
         cdef Py_ssize_t i
         cdef Vector3 position
-        cdef float f, size, angle
+        cdef float iCos, iSin, stepCos, stepSin, newCos, f, size
         cdef Matrix4x4List matrices = Matrix4x4List(length = amount)
         cdef float factor = 1 / <float>(amount - 1) if amount > 1 else 0
+        cdef float angleStep = (endAngle - startAngle) / (amount - 1)
+
+        iCos = cos(startAngle)
+        iSin = sin(startAngle)
+        stepCos = cos(angleStep)
+        stepSin = sin(angleStep)
 
         for i in range(amount):
             f = <float>i * factor
 
             size = f * (endSize - startSize) + startSize
-            angle = f * (endAngel - startAngle) + startAngle
             radius = f * (endRadius - startRadius) + startRadius
 
-            position.x = cos(angle) * radius
-            position.y = sin(angle) * radius
+            position.x = iCos * radius
+            position.y = iSin * radius
             position.z = 0
 
-            setRotationZMatrix(matrices.data + i, angle)
+            setTranslationMatrix(matrices.data + i, &position)
+            setMatrixCustomZRotation(matrices.data + i, iCos, iSin)
             scaleMatrix3x3Part(matrices.data + i, size)
-            setMatrixTranslation(matrices.data + i, &position)
+
+            newCos = stepCos * iCos - stepSin * iSin
+            iSin = stepSin * iCos + stepCos * iSin
+            iCos = newCos
 
         return matrices
 
