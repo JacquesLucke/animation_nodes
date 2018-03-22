@@ -170,3 +170,16 @@ cdef polygons(Py_ssize_t radialLoops, Py_ssize_t innerLoops,
             polygons.indices.data[indicesAmount + 2] = dummyIndexII
 
     return polygons
+
+def getPointsOnCircle(Py_ssize_t amount, float radius = 1):
+    assert amount > 0
+    cdef Vector3DList points = Vector3DList(length = amount)
+
+    cdef Py_ssize_t i
+    cdef float factor = PI / <float>amount * 2
+    for i in range(amount):
+        points.data[i].x = cos(i * factor) * radius
+        points.data[i].y = sin(i * factor) * radius
+        points.data[i].z = 0
+
+    return points

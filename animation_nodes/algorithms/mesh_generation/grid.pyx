@@ -141,4 +141,4 @@ def joinVerticalEdgesQuadPolygons(xDivisions, yDivisions):
     return polygons
 
 def joinCornersWithQuad(xDivisions, yDivisions):
-    return (0, yDivisions - 1, yDivisions * xDivisions - 1, yDivisions * (xDivisions - 1))
+    return (yDivisions * (xDivisions - 1), yDivisions * xDivisions - 1, yDivisions - 1, 0)
