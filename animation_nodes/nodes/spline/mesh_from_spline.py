@@ -70,7 +70,7 @@ class MeshFromSplineNode(bpy.types.Node, AnimationNode):
             joinVertical = len(shape) > 2 and closedShape,
             joinHorizontal = spline.cyclic)
 
-        if capEnds and not spline.cyclic:
+        if capEnds and not spline.cyclic and len(shape) > 2:
             allPolygons.append(tuple(range(len(shape))))
             allPolygons.append(tuple(reversed(range((amount - 1) * len(shape), amount * len(shape)))))
 
