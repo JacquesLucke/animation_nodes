@@ -44,6 +44,9 @@ class Viewer3DNode(bpy.types.Node, AnimationNode):
         soft_min = 0.0, soft_max = 1.0,
         update = drawPropertyChanged)
 
+    drawOrientationLetters = BoolProperty(name = "Draw Orientation Letters", default = False,
+        update = drawPropertyChanged)
+
     def create(self):
         self.newInput("Generic", "Data", "data")
 
@@ -60,7 +63,9 @@ class Viewer3DNode(bpy.types.Node, AnimationNode):
         row.prop(self, "enabled", text = "", icon = icon)
 
         if isinstance(data, (Matrix, Matrix4x4List)):
-            col.prop(self, "matrixSize", text = "Size")
+            row = col.row(align = True)
+            row.prop(self, "matrixSize", text = "Size")
+            row.prop(self, "drawOrientationLetters", text = "", icon = "AXIS_TOP")
         elif isinstance(data, (Vector, Vector3DList)):
             col.prop(self, "pointSize", text = "Size")
 
@@ -72,11 +77,11 @@ class Viewer3DNode(bpy.types.Node, AnimationNode):
             if isinstance(data, Vector3DList):
                 displayList = createDisplayList(drawVectors, data, self.pointSize, self.drawColor)
             elif isinstance(data, Matrix4x4List):
-                displayList = createDisplayList(drawMatrices, data, self.matrixSize, self.drawColor)
+                displayList = createDisplayList(drawMatrices, data, self.matrixSize, self.drawColor, self.drawOrientationLetters)
             elif isinstance(data, Vector):
                 displayList = createDisplayList(drawVector, data, self.pointSize, self.drawColor)
             elif isinstance(data, Matrix):
-                displayList = createDisplayList(drawMatrix, data, self.matrixSize, self.drawColor)
+                displayList = createDisplayList(drawMatrix, data, self.matrixSize, self.drawColor, self.drawOrientationLetters)
 
             if displayList is not None:
                 dataByIdentifier[self.identifier] = DrawData(data, displayList)
@@ -99,8 +104,8 @@ from bgl import *
 def drawVector(vector, pointSize, color):
     drawVectors(Vector3DList.fromValues([vector]), pointSize, color)
 
-def drawMatrix(matrix, size, color):
-    drawMatrices(Matrix4x4List.fromValues([matrix]), size, color)
+def drawMatrix(matrix, size, color, drawLetters):
+    drawMatrices(Matrix4x4List.fromValues([matrix]), size, color, drawLetters)
 
 def drawVectors(vectors, pointSize, color):
     glEnable(GL_POINT_SIZE)
@@ -114,9 +119,9 @@ def drawVectors(vectors, pointSize, color):
     glDisable(GL_POINT_SIZE)
     glDisable(GL_POINT_SMOOTH)
 
-def drawMatrices(matrices, size, color):
+def drawMatrices(matrices, size, color, drawLetters):
     glColor3f(*color)
-    drawMatrix4x4List(matrices, size)
+    drawMatrix4x4List(matrices, size, drawLetters)
 
 @drawHandler("SpaceView3D", "WINDOW", "POST_VIEW")
 def draw():
