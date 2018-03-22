@@ -27,9 +27,9 @@ class OffsetMatrixNode(bpy.types.Node, AnimationNode, MatrixTransformationBase):
 
     def draw(self, layout):
         self.draw_MatrixTransformationProperties(layout)
-        layout.prop(self, "useMatrixList", text = "", icon = "LINENUMBERS_ON")
 
     def drawAdvanced(self, layout):
+        layout.prop(self, "useMatrixList")
         self.drawAdvanced_MatrixTransformationProperties(layout)
 
     def getExecutionFunctionName(self):
