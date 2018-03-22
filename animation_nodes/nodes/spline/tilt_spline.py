@@ -14,7 +14,7 @@ class TiltSplineNode(bpy.types.Node, AnimationNode):
         update = propertyChanged)
 
     def create(self):
-        self.newInput("Spline", "Spline", "spline")
+        self.newInput("Spline", "Spline", "spline", defaultDrawType = "PROPERTY_ONLY")
         self.newInput(VectorizedSocket("Float", "useTiltList",
             ("Tilt", "tilt"), ("Tilts", "tilts")))
         self.newOutput("Spline", "Spline", "spline")
