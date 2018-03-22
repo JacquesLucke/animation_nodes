@@ -13,6 +13,9 @@ onLinux = sys.platform.startswith("linux")
 onWindows = sys.platform.startswith("win")
 onMacOS = sys.platform == "darwin"
 
+if not (onLinux or onWindows or onMacOS):
+    raise Exception("unknown OS")
+
 def getPlatformSummary():
     summary = {
         "sys.version" : sys.version,
@@ -255,6 +258,12 @@ def getAllFilesWithTimestamps(directory):
     for path in iterAllFilePathsRecursive(directory):
         result[path] = tryGetLastModificationTime(path)
     return result
+
+def getAddonVersion(initPath):
+    match = re.search(r'"version"\s*:\s*(\(\s*[0-9]+\s*,\s*[0-9]+\s*,\s*[0-9]+\s*\))', readTextFile(initPath))
+    if match is None:
+        raise Exception("cannot determine addon version")
+    return eval(match.group(1))
 
 
 allFunctions = list(set(globals().keys()) - _globals - {"_globals"})

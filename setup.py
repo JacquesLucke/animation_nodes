@@ -30,7 +30,16 @@ addonName = "animation_nodes"
 addonDirectory = os.path.join(currentDirectory, addonName)
 defaultConfigPath = os.path.join(currentDirectory, "conf.default.json")
 configPath = os.path.join(currentDirectory, "conf.json")
-exportPath = os.path.join(currentDirectory, "{}.zip".format(addonName))
+initPath = os.path.join(currentDirectory, addonName, "__init__.py")
+
+if onLinux: currentOS = "linux"
+elif onWindows: currentOS = "windows"
+elif onMacOS: currentOS = "macOS"
+addonVersion = getAddonVersion(initPath)
+exportName = "{}_v{}_{}_{}_py{}{}".format(
+    addonName, *addonVersion[:2], currentOS, *sys.version_info[:2])
+
+exportPath = os.path.join(currentDirectory, exportName + ".zip")
 exportCPath = os.path.join(currentDirectory, "{}_c.zip".format(addonName))
 exportCSetupPath = os.path.join(currentDirectory, "_export_c_setup.py")
 
