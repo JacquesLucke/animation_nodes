@@ -34,6 +34,13 @@ def getAverageOfElements(self):
     else:
         return self.getSumOfElements() / self.length
 
+def scale(self, float factor):
+    cdef Py_ssize_t i
+    for i in range(self.length):
+        self.data[i].x *= factor
+        self.data[i].y *= factor
+        self.data[i].z *= factor
+
 def normalize(self):
     cdef Vector3 *vectors = self.data
     cdef Vector3 *v

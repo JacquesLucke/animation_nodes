@@ -16,6 +16,10 @@ cdef class VirtualLISTNAME(VirtualList):
             return VirtualLISTNAME_List(realList)
 
     @classmethod
+    def fromElement(cls, element):
+        return VirtualLISTNAME_Element(element)
+
+    @classmethod
     def createMultiple(cls, *elements):
         cdef list virtualLists = []
         for src, default in elements:
