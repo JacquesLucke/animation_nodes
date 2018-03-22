@@ -146,22 +146,27 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
     def execute_Circle(self, _amount, float radius, float segment):
         cdef:
             int i
-            double currentAngle
             Vector3 vector
             int amount = limitAmount(_amount)
-            double factor
+            float angleStep, iCos, iSin, stepCos, stepSin
             Matrix4x4List matrices = Matrix4x4List(length = amount)
 
-        if self.exactCircleSegment: factor = segment * 2 * PI / max(amount - 1, 1)
-        else:                       factor = segment * 2 * PI / max(amount, 1)
+        if self.exactCircleSegment: angleStep = segment * 2 * PI / max(amount - 1, 1)
+        else:                       angleStep = segment * 2 * PI / max(amount, 1)
+
+        iCos = 1
+        iSin = 0
+        stepCos = cos(angleStep)
+        stepSin = sin(angleStep)
 
         for i in range(amount):
-            currentAngle = i * factor
-            vector.x = <float>cos(currentAngle) * radius
-            vector.y = <float>sin(currentAngle) * radius
+            vector.x = iCos * radius
+            vector.y = iSin * radius
             vector.z = 0
-            setRotationZMatrix(matrices.data + i, currentAngle)
-            setMatrixTranslation(matrices.data + i, &vector)
+            setTranslationMatrix(matrices.data + i, &vector)
+            setMatrixCustomZRotation(matrices.data + i, iCos, iSin)
+
+            rotateStep(&iCos, &iSin, stepCos, stepSin)
 
         return matrices
 
@@ -186,29 +191,46 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
 
         return matrices
 
-    def execute_Spiral(self, Py_ssize_t amount, float startRadius, float endRadius, float startSize, float endSize, float startAngle, float endAngel):
+    def execute_Spiral(self, Py_ssize_t amount, float startRadius, float endRadius,
+                             float startSize, float endSize, float startAngle, float endAngle):
         cdef Py_ssize_t i
         cdef Vector3 position
-        cdef float f, size, angle
+        cdef float iCos, iSin, stepCos, stepSin, f, size
         cdef Matrix4x4List matrices = Matrix4x4List(length = amount)
         cdef float factor = 1 / <float>(amount - 1) if amount > 1 else 0
+        cdef float angleStep = (endAngle - startAngle) / (amount - 1)
+
+        iCos = cos(startAngle)
+        iSin = sin(startAngle)
+        stepCos = cos(angleStep)
+        stepSin = sin(angleStep)
 
         for i in range(amount):
             f = <float>i * factor
 
             size = f * (endSize - startSize) + startSize
-            angle = f * (endAngel - startAngle) + startAngle
             radius = f * (endRadius - startRadius) + startRadius
 
-            position.x = cos(angle) * radius
-            position.y = sin(angle) * radius
+            position.x = iCos * radius
+            position.y = iSin * radius
             position.z = 0
 
-            setRotationZMatrix(matrices.data + i, angle)
+            setTranslationMatrix(matrices.data + i, &position)
+            setMatrixCustomZRotation(matrices.data + i, iCos, iSin)
             scaleMatrix3x3Part(matrices.data + i, size)
-            setMatrixTranslation(matrices.data + i, &position)
+
+            rotateStep(&iCos, &iSin, stepCos, stepSin)
 
         return matrices
 
 cdef int limitAmount(n):
     return max(min(n, INT_MAX), 0)
+
+cdef inline void setMatrixCustomZRotation(Matrix4* m, double iCos, double iSin):
+    m.a11 = m.a22 = iCos
+    m.a12, m.a21 = -iSin, iSin
+
+cdef inline void rotateStep(float *iCos, float *iSin, float stepCos, float stepSin):
+    cdef float newCos = stepCos * iCos[0] - stepSin * iSin[0]
+    iSin[0] = stepSin * iCos[0] + stepCos * iSin[0]
+    iCos[0] = newCos
