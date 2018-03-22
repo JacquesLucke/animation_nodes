@@ -40,13 +40,13 @@ def splinesFromEdges(Vector3DList vertices, EdgeIndicesList edges, DoubleList ra
         splines.append(PolySpline.__new__(PolySpline, edgeVertices, edgeRadii))
     return splines
 
-def getMatricesAlongSpline(Spline spline, Py_ssize_t amount):
+def getMatricesAlongSpline(Spline spline, Py_ssize_t amount, distribution):
     assert spline.isEvaluable()
     spline.ensureNormals()
-    cdef Vector3DList points = spline.getDistributedPoints(amount)
-    cdef Vector3DList tangents = spline.getDistributedTangents(amount)
-    cdef Vector3DList normals = spline.getDistributedNormals(amount)
-    cdef FloatList radii = spline.getDistributedRadii(amount)
+    cdef Vector3DList points = spline.getDistributedPoints(amount, distributionType = distribution)
+    cdef Vector3DList tangents = spline.getDistributedTangents(amount, distributionType = distribution)
+    cdef Vector3DList normals = spline.getDistributedNormals(amount, distributionType = distribution)
+    cdef FloatList radii = spline.getDistributedRadii(amount, distributionType = distribution)
 
     tangents.normalize()
     normals.normalize()

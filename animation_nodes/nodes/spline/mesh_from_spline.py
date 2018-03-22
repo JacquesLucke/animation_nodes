@@ -4,10 +4,11 @@ from ... data_structures import Mesh
 from ... base_types import AnimationNode
 from . c_utils import getMatricesAlongSpline
 from .. mesh.c_utils import getReplicatedVertices
+from . spline_evaluation_base import SplineEvaluationBase
 from ... algorithms.mesh_generation.circle import getPointsOnCircle
 from ... algorithms.mesh_generation.grid import quadEdges, quadPolygons
 
-class MeshFromSplineNode(bpy.types.Node, AnimationNode):
+class MeshFromSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
     bl_idname = "an_MeshFromSplineNode"
     bl_label = "Mesh from Spline"
     bl_width_default = 160
@@ -31,6 +32,13 @@ class MeshFromSplineNode(bpy.types.Node, AnimationNode):
 
     def draw(self, layout):
         layout.prop(self, "useCustomShape")
+
+    def drawAdvanced(self, layout):
+        col = layout.column()
+        col.prop(self, "parameterType")
+        subcol = col.column()
+        subcol.active = self.parameterType == "UNIFORM"
+        subcol.prop(self, "resolution")
 
     def getExecutionFunctionName(self):
         if self.useCustomShape:
@@ -60,7 +68,8 @@ class MeshFromSplineNode(bpy.types.Node, AnimationNode):
         else:
             amount = len(spline.points) + splineResolution * (len(spline.points) - 1)
 
-        matrices = getMatricesAlongSpline(spline, amount)
+        spline.ensureUniformConverter(self.resolution)
+        matrices = getMatricesAlongSpline(spline, amount, self.parameterType)
         allVertices = getReplicatedVertices(shape, matrices)
 
         allEdges = quadEdges(amount, len(shape),
