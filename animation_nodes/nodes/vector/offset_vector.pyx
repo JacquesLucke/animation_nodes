@@ -68,28 +68,30 @@ class OffsetVectorNode(bpy.types.Node, AnimationNode):
         return vector
 
     def execute_List(self, Vector3DList vectors, falloff, offset):
-        cdef FalloffEvaluator evaluator = self.getFalloffEvaluator(falloff)
-        cdef FloatList influences = evaluator.evaluateList(vectors)
-        cdef VirtualVector3DList _offsets = VirtualVector3DList.create(offset, (0, 0, 0))
-        cdef bint isStartState = self.specifiedState == "START"
-
-        cdef Vector3 *_offset
-        cdef float influence
-        cdef Py_ssize_t i
-
-        for i in range(len(vectors)):
-            influence = influences.data[i]
-
-            if not isStartState:
-                influence = <float>1 - influence
-
-            _offset = _offsets.get(i)
-            vectors.data[i].x += _offset.x * influence
-            vectors.data[i].y += _offset.y * influence
-            vectors.data[i].z += _offset.z * influence
-
+        evaluator = self.getFalloffEvaluator(falloff)
+        _offsets = VirtualVector3DList.create(offset, (0, 0, 0))
+        offsetVector3DList(vectors, _offsets, evaluator, self.specifiedState == "END")
         return vectors
 
     def getFalloffEvaluator(self, falloff):
         try: return falloff.getEvaluator("Location", self.clampFalloff)
         except: self.raiseErrorMessage("This falloff cannot be evaluated for vectors")
+
+
+def offsetVector3DList(Vector3DList vectors, VirtualVector3DList offsets, FalloffEvaluator falloffEvaluator, bint invert = False):
+    cdef FloatList influences = falloffEvaluator.evaluateList(vectors)
+
+    cdef Vector3 *offset
+    cdef float influence
+    cdef Py_ssize_t i
+
+    for i in range(len(vectors)):
+        influence = influences.data[i]
+
+        if invert:
+            influence = <float>1 - influence
+
+        offset = offsets.get(i)
+        vectors.data[i].x += offset.x * influence
+        vectors.data[i].y += offset.y * influence
+        vectors.data[i].z += offset.z * influence
