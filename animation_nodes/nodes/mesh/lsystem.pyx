@@ -239,11 +239,14 @@ cdef void appendSymbol(SymbolString *symbols, unsigned char prefix, Command comm
 cdef void appendNoArgSymbol(SymbolString *symbols, unsigned char prefix):
     appendSymbol(symbols, prefix, NoArgCommand(0))
 
-cdef appendSymbolBuffer(SymbolString *symbols, void *buffer, Py_ssize_t length):
+cdef void appendSymbolBuffer(SymbolString *symbols, void *buffer, Py_ssize_t length):
     if symbols.length + length > symbols.capacity:
         growSymbolString(symbols, length)
     memcpy(symbols.data + symbols.length, buffer, length)
     symbols.length += length
+
+cdef void appendSymbolString(SymbolString *symbols, SymbolString *other):
+    appendSymbolBuffer(symbols, other.data, other.length)
 
 
 
@@ -300,7 +303,8 @@ cdef SymbolString applyGrammarRules_OneGeneration(SymbolString source, RuleSet r
             i += sizeof(MoveForwardNoGeoCommand)
         elif c == "A":
             replacement = getReplacement(&rules, c)
-            appendSymbolBuffer(&generated, replacement.data, replacement.length)
+            if replacement != NULL:
+                appendSymbolString(&generated, replacement)
 
     return generated
 
@@ -522,7 +526,8 @@ cdef inline void branchStart(TurtleStack *stack, Turtle *current):
     pushTurtle(stack, turtle)
 
 cdef inline void branchEnd(TurtleStack *stack, TurtleStack *allTurtles):
-    pushTurtle(allTurtles, popTurtle(stack))
+    if stack.amount > 1:
+        pushTurtle(allTurtles, popTurtle(stack))
 
 cdef inline void scaleStepSize(Turtle *turtle, ScaleStepSizeCommand *command):
     turtle.stepSize *= command.factor
