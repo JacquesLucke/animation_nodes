@@ -46,16 +46,21 @@ class LSystemNode(bpy.types.Node, AnimationNode):
             "Gravity" : gravity
         }
 
-        cdef SymbolString symbols
+        cdef SymbolString _axiom = parseSymbolString(axiom, defaults)
 
-        symbols = applyGrammarRules_String(axiom, rules, generations, defaults)
-        #return Mesh()
-        #try:
-        #    symbols = parseSymbolString(text, defaults)
-        #except Exception as e:
-        #    self.raiseErrorMessage(str(e))
+        cdef RuleSet ruleSet
+        initRuleSet(&ruleSet, rules, defaults)
 
-        return geometryFromSymbolString(symbols)
+        cdef SymbolString symbols = applyGrammarRules(_axiom, ruleSet, generations)
+
+        freeRuleSet(&ruleSet)
+        freeSymbolString(&_axiom)
+
+        mesh = geometryFromSymbolString(symbols)
+
+        freeSymbolString(&symbols)
+
+        return mesh
 
 
 # Parse Input
@@ -205,6 +210,15 @@ cdef void initSymbolString(SymbolString *symbols):
     symbols.length = 0
     symbols.capacity = DEFAULT_SIZE
 
+cdef void freeSymbolString(SymbolString *symbols):
+    PyMem_Free(symbols.data)
+
+cdef void copySymbolString(SymbolString *target, SymbolString *source):
+    target.data = <unsigned char*>PyMem_Malloc(source.length)
+    memcpy(target.data, source.data, source.length)
+    target.length = source.length
+    target.capacity = source.length
+
 cdef void growSymbolString(SymbolString *symbols, Py_ssize_t minIncrease):
     cdef Py_ssize_t newCapacity = symbols.capacity * 2 + minIncrease
     symbols.data = <unsigned char*>PyMem_Realloc(symbols.data, newCapacity)
@@ -243,18 +257,17 @@ cdef struct RuleSet:
     Rule **rules
     unsigned char *lengths
 
-cdef SymbolString applyGrammarRules_String(str axiom, rules, generations, defaults):
-    cdef SymbolString _axiom = parseSymbolString(axiom, defaults)
-    cdef RuleSet ruleSet
-    initRuleSet(&ruleSet, rules, defaults)
-    return applyGrammarRules(_axiom, ruleSet, generations)
-
 cdef SymbolString applyGrammarRules(SymbolString axiom, RuleSet rules, generations):
-    cdef SymbolString currentGeneration = axiom
+    cdef SymbolString currentGeneration
     cdef SymbolString nextGeneration
+
+    copySymbolString(&currentGeneration, &axiom)
+
     for i in range(generations):
         nextGeneration = applyGrammarRules_OneGeneration(currentGeneration, rules)
+        freeSymbolString(&currentGeneration)
         currentGeneration = nextGeneration
+
     return currentGeneration
 
 cdef SymbolString applyGrammarRules_OneGeneration(SymbolString source, RuleSet rules):
@@ -312,6 +325,19 @@ cdef initRuleSet(RuleSet *ruleSet, rules, defaults):
         rule = ruleSet.rules[ord(symbol)] + insertedAmount[ord(symbol)]
         rule.replacement = parseSymbolString(replacement, defaults)
         insertedAmount[ord(symbol)] += 1
+
+cdef freeRuleSet(RuleSet *ruleSet):
+    cdef Py_ssize_t symbol, j
+    for symbol in range(256):
+        for j in range(ruleSet.lengths[symbol]):
+            freeRule(ruleSet.rules[symbol] + j)
+        if ruleSet.lengths[symbol] > 0:
+            PyMem_Free(ruleSet.rules[symbol])
+    PyMem_Free(ruleSet.rules)
+    PyMem_Free(ruleSet.lengths)
+
+cdef freeRule(Rule *rule):
+    freeSymbolString(&rule.replacement)
 
 cdef SymbolString *getReplacement(RuleSet *rules, unsigned char symbol):
     if rules.lengths[symbol] > 0:
@@ -435,7 +461,7 @@ cdef meshFromTurtles(Turtle *turtles, Py_ssize_t amount):
         vertexOffset += turtles[i].pointAmount
         edgeOffset += turtles[i].edgeAmount
 
-    return Mesh(vertices, edges)
+    return Mesh(vertices, edges, skipValidation = True)
 
 
 cdef inline void moveForward_Geo(Turtle *turtle, MoveForwardGeoCommand *command):
