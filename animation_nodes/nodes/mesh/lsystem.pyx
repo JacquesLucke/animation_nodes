@@ -1,5 +1,5 @@
 import bpy
-import re
+import traceback
 from collections import Counter
 from ... base_types import AnimationNode
 from ... algorithms.random cimport uniformRandomFloat
@@ -46,20 +46,26 @@ class LSystemNode(bpy.types.Node, AnimationNode):
             "Gravity" : gravity
         }
 
-        cdef SymbolString _axiom = parseSymbolString(axiom, defaults)
+        cdef SymbolString _axiom
+        try:
+            _axiom = parseSymbolString(axiom, defaults)
+        except:
+            traceback.print_exc()
+            self.raiseErrorMessage("error when parsing axiom")
 
         cdef RuleSet ruleSet
-        initRuleSet(&ruleSet, rules, defaults)
+        try:
+            initRuleSet(&ruleSet, rules, defaults)
+        except:
+            traceback.print_exc()
+            self.raiseErrorMessage("error when parsing rules")
 
         cdef SymbolString symbols = applyGrammarRules(_axiom, ruleSet, generations)
-
         freeRuleSet(&ruleSet)
         freeSymbolString(&_axiom)
 
         mesh = geometryFromSymbolString(symbols)
-
         freeSymbolString(&symbols)
-
         return mesh
 
 
