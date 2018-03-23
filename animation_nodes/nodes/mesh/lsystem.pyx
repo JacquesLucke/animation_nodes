@@ -116,7 +116,7 @@ cdef SymbolString parseSymbolString(str source, dict defaults) except *:
             size = parse_ScaleStepSize(&symbols, source, i, defaults["Scale Step Size"])
         elif c == "T":
             size = parse_Tropism(&symbols, source, i, defaults["Gravity"])
-        elif c == "A":
+        elif c in ("A", "B"):
             size = parse_SingleLetter(&symbols, c)
         else:
             size = 1
@@ -299,6 +299,10 @@ cdef SymbolString applyGrammarRules_OneGeneration(SymbolString source, RuleSet r
             replacement = getReplacement(&ruleSet, c)
             if replacement != NULL:
                 appendSymbolString(&generated, replacement)
+                if c == "F":
+                    i += sizeof(MoveForwardGeoCommand)
+                elif c == "f":
+                    i += sizeof(MoveForwardNoGeoCommand)
             else:
                 if c == "F":
                     appendSymbol(&generated, c, (<MoveForwardGeoCommand*>command)[0])
@@ -306,7 +310,7 @@ cdef SymbolString applyGrammarRules_OneGeneration(SymbolString source, RuleSet r
                 elif c == "f":
                     appendSymbol(&generated, c, (<MoveForwardNoGeoCommand*>command)[0])
                     i += sizeof(MoveForwardNoGeoCommand)
-                elif c == "A":
+                elif c in ("A", "B"):
                     appendNoArgSymbol(&generated, c)
 
     return generated
@@ -432,7 +436,7 @@ cdef geometryFromSymbolString(SymbolString symbols):
         elif c == "~":
             rotateRandom(turtle, <RotateCommand*>command, seed)
             i += sizeof(RotateCommand)
-        elif c == "A":
+        elif c in ("A", "B"):
             pass
         else:
             raise Exception("unknown opcode")
