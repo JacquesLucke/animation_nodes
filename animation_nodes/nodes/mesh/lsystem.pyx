@@ -28,7 +28,7 @@ class LSystemNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.newInput("Text", "Axiom", "axiom")
-        self.newInput("Generic", "Rules", "rules")
+        self.newInput("Text List", "Rules", "rules")
         self.newInput("Integer", "Generations", "generations")
         self.newInput("Float", "Step Size", "stepSize", value = 1)
         self.newInput("Float", "Angle", "angle", value = 90)
@@ -206,6 +206,12 @@ cdef bint letterAtIndexIs(str source, Py_ssize_t index, str letter):
     else:
         return False
 
+cdef parse_Rule(str source, Rule *rule, defaults):
+    left, right = source.split("=")
+    rule.symbol = ord(left.strip())
+    rule.replacement = parseSymbolString(right.strip(), defaults)
+
+
 
 # Symbol String Utilities
 ##################################
@@ -219,18 +225,21 @@ cdef void initSymbolString(SymbolString *symbols):
 cdef void freeSymbolString(SymbolString *symbols):
     PyMem_Free(symbols.data)
 
+cdef void resetSymbolString(SymbolString *symbols):
+    symbols.length = 0
+
 cdef void copySymbolString(SymbolString *target, SymbolString *source):
     target.data = <unsigned char*>PyMem_Malloc(source.length)
     memcpy(target.data, source.data, source.length)
     target.length = source.length
     target.capacity = source.length
 
-cdef void growSymbolString(SymbolString *symbols, Py_ssize_t minIncrease):
+cdef inline void growSymbolString(SymbolString *symbols, Py_ssize_t minIncrease):
     cdef Py_ssize_t newCapacity = symbols.capacity * 2 + minIncrease
     symbols.data = <unsigned char*>PyMem_Realloc(symbols.data, newCapacity)
     symbols.capacity = newCapacity
 
-cdef void appendSymbol(SymbolString *symbols, unsigned char prefix, Command command):
+cdef inline void appendSymbol(SymbolString *symbols, unsigned char prefix, Command command):
     cdef Py_ssize_t size = 1 + sizeof(Command)
     if symbols.length + size > symbols.capacity:
         growSymbolString(symbols, size)
@@ -242,16 +251,16 @@ cdef void appendSymbol(SymbolString *symbols, unsigned char prefix, Command comm
         memcpy(symbols.data + symbols.length, &command, sizeof(Command))
         symbols.length += sizeof(Command)
 
-cdef void appendNoArgSymbol(SymbolString *symbols, unsigned char prefix):
+cdef inline void appendNoArgSymbol(SymbolString *symbols, unsigned char prefix):
     appendSymbol(symbols, prefix, NoArgCommand(0))
 
-cdef void appendSymbolBuffer(SymbolString *symbols, void *buffer, Py_ssize_t length):
+cdef inline void appendSymbolBuffer(SymbolString *symbols, void *buffer, Py_ssize_t length):
     if symbols.length + length > symbols.capacity:
         growSymbolString(symbols, length)
     memcpy(symbols.data + symbols.length, buffer, length)
     symbols.length += length
 
-cdef void appendSymbolString(SymbolString *symbols, SymbolString *other):
+cdef inline void appendSymbolString(SymbolString *symbols, SymbolString *other):
     appendSymbolBuffer(symbols, other.data, other.length)
 
 
@@ -260,6 +269,7 @@ cdef void appendSymbolString(SymbolString *symbols, SymbolString *other):
 ######################################
 
 cdef struct Rule:
+    unsigned char symbol
     SymbolString replacement
 
 cdef struct RuleSet:
@@ -267,22 +277,26 @@ cdef struct RuleSet:
     unsigned char *lengths
 
 cdef SymbolString applyGrammarRules(SymbolString axiom, RuleSet rules, generations):
-    cdef SymbolString currentGeneration
-    cdef SymbolString nextGeneration
+    cdef SymbolString currentGen
+    cdef SymbolString nextGen
 
-    copySymbolString(&currentGeneration, &axiom)
+    copySymbolString(&currentGen, &axiom)
+
+    if generations <= 0:
+        return currentGen
+    else:
+        initSymbolString(&nextGen)
 
     for i in range(generations):
-        nextGeneration = applyGrammarRules_OneGeneration(currentGeneration, rules)
-        freeSymbolString(&currentGeneration)
-        currentGeneration = nextGeneration
+        resetSymbolString(&nextGen)
+        applyGrammarRules_OneGeneration(currentGen, rules, &nextGen)
+        currentGen, nextGen = nextGen, currentGen
 
-    return currentGeneration
+    freeSymbolString(&nextGen)
 
-cdef SymbolString applyGrammarRules_OneGeneration(SymbolString source, RuleSet ruleSet):
-    cdef SymbolString generated
-    initSymbolString(&generated)
+    return currentGen
 
+cdef applyGrammarRules_OneGeneration(SymbolString source, RuleSet ruleSet, SymbolString *target):
     cdef SymbolString *replacement
 
     cdef Py_ssize_t i = 0
@@ -293,33 +307,31 @@ cdef SymbolString applyGrammarRules_OneGeneration(SymbolString source, RuleSet r
         i += 1
         command = source.data + i
         if c in ("[", "]"):
-            appendNoArgSymbol(&generated, c)
+            appendNoArgSymbol(target, c)
             i += 0
         elif c in ("+", "-", "&", "^", "\\", "/", "~"):
-            appendSymbol(&generated, c, (<RotateCommand*>command)[0])
+            appendSymbol(target, c, (<RotateCommand*>command)[0])
             i += sizeof(RotateCommand)
         elif c == '"':
-            appendSymbol(&generated, c, (<ScaleStepSizeCommand*>command)[0])
+            appendSymbol(target, c, (<ScaleStepSizeCommand*>command)[0])
             i += sizeof(ScaleStepSizeCommand)
         else:
             replacement = getReplacement(&ruleSet, c)
             if replacement != NULL:
-                appendSymbolString(&generated, replacement)
+                appendSymbolString(target, replacement)
                 if c == "F":
                     i += sizeof(MoveForwardGeoCommand)
                 elif c == "f":
                     i += sizeof(MoveForwardNoGeoCommand)
             else:
                 if c == "F":
-                    appendSymbol(&generated, c, (<MoveForwardGeoCommand*>command)[0])
+                    appendSymbol(target, c, (<MoveForwardGeoCommand*>command)[0])
                     i += sizeof(MoveForwardGeoCommand)
                 elif c == "f":
-                    appendSymbol(&generated, c, (<MoveForwardNoGeoCommand*>command)[0])
+                    appendSymbol(target, c, (<MoveForwardNoGeoCommand*>command)[0])
                     i += sizeof(MoveForwardNoGeoCommand)
                 elif c in ("A", "B"):
-                    appendNoArgSymbol(&generated, c)
-
-    return generated
+                    appendNoArgSymbol(target, c)
 
 
 cdef initRuleSet(RuleSet *ruleSet, rules, defaults):
@@ -338,9 +350,9 @@ cdef initRuleSet(RuleSet *ruleSet, rules, defaults):
     memset(insertedAmount, 0, 256)
 
     cdef Rule *rule
-    for symbol, replacement in rules:
+    for sourceRule in rules:
         rule = ruleSet.rules[ord(symbol)] + insertedAmount[ord(symbol)]
-        rule.replacement = parseSymbolString(replacement, defaults)
+        parse_Rule(sourceRule, rule, defaults)
         insertedAmount[ord(symbol)] += 1
 
 cdef freeRuleSet(RuleSet *ruleSet):
@@ -356,7 +368,7 @@ cdef freeRuleSet(RuleSet *ruleSet):
 cdef freeRule(Rule *rule):
     freeSymbolString(&rule.replacement)
 
-cdef SymbolString *getReplacement(RuleSet *rules, unsigned char symbol):
+cdef inline SymbolString *getReplacement(RuleSet *rules, unsigned char symbol):
     if rules.lengths[symbol] > 0:
         return &(rules.rules[symbol] + 0).replacement
     else:
