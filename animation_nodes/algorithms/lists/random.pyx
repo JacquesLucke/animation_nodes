@@ -4,7 +4,7 @@ from libc.math cimport sqrt
 from ... math cimport Euler3
 from ... utils.limits cimport INT_MAX
 from ... data_structures cimport EulerList, Vector3DList
-from .. random cimport uniformRandomNumber, randomNormalized3DVector
+from .. random cimport uniformRandomDouble, randomNormalized3DVector
 
 def generateRandomVectors(seed, count, double scale, bint normalized = False):
     cdef:
@@ -22,7 +22,7 @@ cdef insertRandomVectors_Simple(int startSeed, Vector3DList vectors, double scal
     cdef Py_ssize_t i
     cdef float *_data = <float*>vectors.data
     for i in range(len(vectors) * 3):
-        _data[i] = uniformRandomNumber(startSeed + i, -scale, scale)
+        _data[i] = uniformRandomDouble(startSeed + i, -scale, scale)
 
 cdef insertRandomVectors_Normalized(int startSeed, Vector3DList vectors, float scale):
     cdef Py_ssize_t i
@@ -39,9 +39,9 @@ def generateRandomEulers(seed, count, double scale):
 
     for i in range(length):
         seedOffset = i * 3
-        _data[i].x = uniformRandomNumber(startSeed + seedOffset + 0, -scale, scale)
-        _data[i].y = uniformRandomNumber(startSeed + seedOffset + 1, -scale, scale)
-        _data[i].z = uniformRandomNumber(startSeed + seedOffset + 2, -scale, scale)
+        _data[i].x = uniformRandomDouble(startSeed + seedOffset + 0, -scale, scale)
+        _data[i].y = uniformRandomDouble(startSeed + seedOffset + 1, -scale, scale)
+        _data[i].z = uniformRandomDouble(startSeed + seedOffset + 2, -scale, scale)
         _data[i].order = 0
 
     return newList

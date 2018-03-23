@@ -1,7 +1,7 @@
 import bpy
 from ... data_structures cimport BaseFalloff
 from ... base_types import AnimationNode
-from ... algorithms.random cimport uniformRandomNumber
+from ... algorithms.random cimport uniformRandomDouble
 
 class RandomFalloffNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_RandomFalloffNode"
@@ -30,4 +30,4 @@ cdef class RandomFalloff(BaseFalloff):
         self.clamped = 0 <= min(minValue, maxValue) <= max(minValue, maxValue) <= 1
 
     cdef float evaluate(self, void *object, Py_ssize_t index):
-        return uniformRandomNumber((self.seed + index) % 0x7fffffff, self.minValue, self.maxValue)
+        return uniformRandomDouble((self.seed + index) % 0x7fffffff, self.minValue, self.maxValue)

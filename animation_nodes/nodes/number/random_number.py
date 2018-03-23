@@ -41,7 +41,7 @@ class RandomNumberNode(bpy.types.Node, AnimationNode):
         if self.createList:
             yield "numbers = self.calcRandomNumbers(seed, count, minValue, maxValue)"
         else:
-            yield "number = algorithms.random.uniformRandomNumberWithTwoSeeds(seed, self.nodeSeed, minValue, maxValue)"
+            yield "number = algorithms.random.uniformRandomDoubleWithTwoSeeds(seed, self.nodeSeed, minValue, maxValue)"
 
     def calcRandomNumbers(self, seed, count, minValue, maxValue):
         _seed = seed * 234123 + self.nodeSeed * 1234434
