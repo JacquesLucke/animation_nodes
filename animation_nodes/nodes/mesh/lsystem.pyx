@@ -273,7 +273,7 @@ cdef SymbolString applyGrammarRules(SymbolString axiom, RuleSet rules, generatio
 
     return currentGeneration
 
-cdef SymbolString applyGrammarRules_OneGeneration(SymbolString source, RuleSet rules):
+cdef SymbolString applyGrammarRules_OneGeneration(SymbolString source, RuleSet ruleSet):
     cdef SymbolString generated
     initSymbolString(&generated)
 
@@ -295,16 +295,19 @@ cdef SymbolString applyGrammarRules_OneGeneration(SymbolString source, RuleSet r
         elif c == '"':
             appendSymbol(&generated, c, (<ScaleStepSizeCommand*>command)[0])
             i += sizeof(ScaleStepSizeCommand)
-        elif c == "F":
-            appendSymbol(&generated, c, (<MoveForwardGeoCommand*>command)[0])
-            i += sizeof(MoveForwardGeoCommand)
-        elif c == "f":
-            appendSymbol(&generated, c, (<MoveForwardNoGeoCommand*>command)[0])
-            i += sizeof(MoveForwardNoGeoCommand)
-        elif c == "A":
-            replacement = getReplacement(&rules, c)
+        else:
+            replacement = getReplacement(&ruleSet, c)
             if replacement != NULL:
                 appendSymbolString(&generated, replacement)
+            else:
+                if c == "F":
+                    appendSymbol(&generated, c, (<MoveForwardGeoCommand*>command)[0])
+                    i += sizeof(MoveForwardGeoCommand)
+                elif c == "f":
+                    appendSymbol(&generated, c, (<MoveForwardNoGeoCommand*>command)[0])
+                    i += sizeof(MoveForwardNoGeoCommand)
+                elif c == "A":
+                    appendNoArgSymbol(&generated, c)
 
     return generated
 
