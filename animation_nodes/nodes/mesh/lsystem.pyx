@@ -435,7 +435,9 @@ cdef geometryFromSymbolString(SymbolString symbols):
     while peekTopTurtle(&stack) != NULL:
         pushTurtle(&allTurtles, popTurtle(&stack))
 
-    return meshFromTurtles(allTurtles.turtles, allTurtles.amount)
+    cdef Mesh mesh = meshFromTurtles(allTurtles.turtles, allTurtles.amount)
+    freeTurtleStack(&allTurtles, freeTurtles = True)
+    return mesh
 
 cdef meshFromTurtles(Turtle *turtles, Py_ssize_t amount):
     cdef Py_ssize_t pointAmount = 0
@@ -536,6 +538,10 @@ cdef void initTurtle(Turtle *turtle):
     turtle.currentPositionStored = False
     initTurtleArrays(turtle)
 
+cdef void freeTurtle(Turtle *turtle):
+    PyMem_Free(turtle.points)
+    PyMem_Free(turtle.edges)
+
 cdef void initBranch(Turtle *turtle, Turtle *source):
     turtle.orientation = source.orientation
     turtle.position = source.position
@@ -613,6 +619,13 @@ cdef void initTurtleStack(TurtleStack *stack):
     stack.amount = 0
     stack.capacity = DEFAULT_SIZE
     stack.turtles = <Turtle*>PyMem_Malloc(DEFAULT_SIZE * sizeof(Turtle))
+
+cdef void freeTurtleStack(TurtleStack *stack, bint freeTurtles = False):
+    cdef Py_ssize_t i
+    if freeTurtles:
+        for i in range(stack.amount):
+            freeTurtle(stack.turtles + i)
+    PyMem_Free(stack.turtles)
 
 cdef inline void pushTurtle(TurtleStack *stack, Turtle turtle):
     if stack.amount == stack.capacity:
