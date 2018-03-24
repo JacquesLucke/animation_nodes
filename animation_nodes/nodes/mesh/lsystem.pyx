@@ -398,12 +398,15 @@ cdef geometryFromSymbolString(SymbolString symbols):
     cdef TurtleStack stack
     initTurtleStack(&stack)
 
+    cdef TurtleStack availableStack
+    initTurtleStack(&availableStack)
+
     cdef Turtle initialTurtle
     initTurtle(&initialTurtle)
     pushTurtle(&stack, initialTurtle)
 
-    cdef TurtleStack allTurtles
-    initTurtleStack(&allTurtles)
+    cdef Vector3DList vertices = Vector3DList()
+    cdef EdgeIndicesList edges = EdgeIndicesList()
 
     cdef char c
     cdef void *command
@@ -424,9 +427,9 @@ cdef geometryFromSymbolString(SymbolString symbols):
             moveForward_NoGeo(turtle, <MoveForwardNoGeoCommand*>command)
             i += sizeof(MoveForwardNoGeoCommand)
         elif c == "[":
-            branchStart(&stack, turtle)
+            branchStart(&stack, turtle, &availableStack)
         elif c == "]":
-            branchEnd(&stack, &allTurtles)
+            branchEnd(&stack, vertices, edges, &availableStack)
         elif c == '"':
             scaleStepSize(turtle, <ScaleStepSizeCommand*>command)
             i += sizeof(ScaleStepSizeCommand)
@@ -461,12 +464,17 @@ cdef geometryFromSymbolString(SymbolString symbols):
 
         seed += 123
 
-    while peekTopTurtle(&stack) != NULL:
-        pushTurtle(&allTurtles, popTurtle(&stack))
+    cdef Turtle _turtle
+    while stackHasElements(&stack):
+        _turtle = popTurtle(&stack)
+        appendTurtleData(&_turtle, vertices, edges)
+        freeTurtle(&_turtle)
 
-    cdef Mesh mesh = meshFromTurtles(allTurtles.turtles, allTurtles.amount)
-    freeTurtleStack(&allTurtles, freeTurtles = True)
-    return mesh
+    while stackHasElements(&availableStack):
+        _turtle = popTurtle(&availableStack)
+        freeTurtle(&_turtle)
+
+    return Mesh(vertices, edges, skipValidation = True)
 
 cdef meshFromTurtles(Turtle *turtles, Py_ssize_t amount):
     cdef Py_ssize_t pointAmount = 0
@@ -494,6 +502,13 @@ cdef meshFromTurtles(Turtle *turtles, Py_ssize_t amount):
 
     return Mesh(vertices, edges, skipValidation = True)
 
+cdef inline appendTurtleData(Turtle *turtle, Vector3DList vertices, EdgeIndicesList edges):
+    cdef Py_ssize_t i
+    cdef Py_ssize_t offset = vertices.length
+    for i in range(turtle.pointAmount):
+        vertices.append_LowLevel(turtle.points[i])
+    for i in range(turtle.edgeAmount):
+        edges.append_LowLevel(EdgeIndices(turtle.edges[i].v1 + offset, turtle.edges[i].v2 + offset))
 
 cdef inline void moveForward_Geo(Turtle *turtle, MoveForwardGeoCommand *command):
     cdef Vector3 translation = Vector3(0, 0, turtle.stepSize * command.distance)
@@ -545,14 +560,21 @@ cdef inline void rotateRandom(Turtle *turtle, RotateCommand *command, Py_ssize_t
     setRotationMatrix(&rotation, &euler)
     transformOrientation_Local(turtle, &rotation)
 
-cdef inline void branchStart(TurtleStack *stack, Turtle *current):
+cdef inline void branchStart(TurtleStack *stack, Turtle *current, TurtleStack *availableStack):
     cdef Turtle turtle
+    if stackHasElements(availableStack):
+        turtle = popTurtle(availableStack)
+    else:
+        initTurtle(&turtle)
     initBranch(&turtle, current)
     pushTurtle(stack, turtle)
 
-cdef inline void branchEnd(TurtleStack *stack, TurtleStack *allTurtles):
-    if stack.amount > 1:
-        pushTurtle(allTurtles, popTurtle(stack))
+cdef inline void branchEnd(TurtleStack *stack, Vector3DList vertices, EdgeIndicesList edges, TurtleStack *availableStack):
+    if stack.amount <= 1:
+        return
+    cdef Turtle turtle = popTurtle(stack)
+    appendTurtleData(&turtle, vertices, edges)
+    pushTurtle(availableStack, turtle)
 
 cdef inline void scaleStepSize(Turtle *turtle, ScaleStepSizeCommand *command):
     turtle.stepSize *= command.factor
@@ -581,7 +603,16 @@ cdef void initTurtle(Turtle *turtle):
     turtle.position = Vector3(0, 0, 0)
     turtle.stepSize = 1
     turtle.currentPositionStored = False
-    initTurtleArrays(turtle)
+
+    cdef Py_ssize_t DEFAULT_SIZE = 4
+
+    turtle.pointAmount = 0
+    turtle.pointCapacity = DEFAULT_SIZE
+    turtle.points = <Vector3*>PyMem_Malloc(DEFAULT_SIZE * sizeof(Vector3))
+
+    turtle.edgeAmount = 0
+    turtle.edgeCapacity = DEFAULT_SIZE
+    turtle.edges = <EdgeIndices*>PyMem_Malloc(DEFAULT_SIZE * sizeof(EdgeIndices))
 
 cdef void freeTurtle(Turtle *turtle):
     PyMem_Free(turtle.points)
@@ -592,18 +623,8 @@ cdef void initBranch(Turtle *turtle, Turtle *source):
     turtle.position = source.position
     turtle.stepSize = source.stepSize
     turtle.currentPositionStored = False
-    initTurtleArrays(turtle)
-
-cdef void initTurtleArrays(Turtle *turtle):
-    cdef Py_ssize_t DEFAULT_SIZE = 4
-
     turtle.pointAmount = 0
-    turtle.pointCapacity = DEFAULT_SIZE
-    turtle.points = <Vector3*>PyMem_Malloc(DEFAULT_SIZE * sizeof(Vector3))
-
     turtle.edgeAmount = 0
-    turtle.edgeCapacity = DEFAULT_SIZE
-    turtle.edges = <EdgeIndices*>PyMem_Malloc(DEFAULT_SIZE * sizeof(EdgeIndices))
 
 cdef inline void growPointsArray(Turtle *turtle):
     cdef Py_ssize_t newCapacity = turtle.pointCapacity * 2
@@ -690,11 +711,14 @@ cdef inline Turtle *peekTopTurtle(TurtleStack *stack):
         return NULL
 
 cdef inline Turtle popTurtle(TurtleStack *stack):
-    cdef Turtle *turtle = peekTopTurtle(stack)
+    # undefined behavior when the stack is empty
     stack.amount -= 1
-    return turtle[0]
+    return stack.turtles[stack.amount]
 
 cdef inline void growTurtleStack(TurtleStack *stack):
     cdef Py_ssize_t newCapacity = stack.capacity * 2
     stack.turtles = <Turtle*>PyMem_Realloc(stack.turtles, newCapacity * sizeof(Turtle))
     stack.capacity = newCapacity
+
+cdef inline bint stackHasElements(TurtleStack *stack):
+    return stack.amount > 0
