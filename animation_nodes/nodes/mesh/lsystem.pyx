@@ -23,16 +23,17 @@ class LSystemNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.newInput("Text", "Axiom", "axiom")
         self.newInput("Text List", "Rules", "rules")
-        self.newInput("Integer", "Generations", "generations")
+        self.newInput("Float", "Generations", "generations", minValue = 0)
         self.newInput("Integer", "Seed", "seed")
         self.newInput("Float", "Step Size", "stepSize", value = 1)
         self.newInput("Float", "Angle", "angle", value = 90)
         self.newInput("Float", "Random Angle", "randomAngle", value = 180)
         self.newInput("Float", "Scale Step Size", "scaleStepSize", value = 0.9)
         self.newInput("Float", "Gravity", "gravity", value = 0)
+        self.newInput("Boolean", "Partial Rotations", "partialRotations")
         self.newOutput("Mesh", "Mesh", "mesh")
 
-    def execute(self, axiom, rules, generations, seed, stepSize, angle, randomAngle, scaleStepSize, gravity):
+    def execute(self, axiom, rules, generations, seed, stepSize, angle, randomAngle, scaleStepSize, gravity, partialRotations):
         parseDefaults = {
             "Step Size" : stepSize,
             "Angle" : angle,
@@ -55,7 +56,7 @@ class LSystemNode(bpy.types.Node, AnimationNode):
             traceback.print_exc()
             self.raiseErrorMessage("error when parsing rules")
 
-        cdef SymbolString symbols = applyGrammarRules(_axiom, ruleSet, generations)
+        cdef SymbolString symbols = applyGrammarRules(_axiom, ruleSet, generations, partialRotations)
         freeRuleSet(&ruleSet)
         freeSymbolString(&_axiom)
 
@@ -275,7 +276,7 @@ cdef struct RuleSet:
     Rule **rules
     unsigned char *lengths
 
-cdef SymbolString applyGrammarRules(SymbolString axiom, RuleSet rules, generations):
+cdef SymbolString applyGrammarRules(SymbolString axiom, RuleSet rules, float generations, bint partialRotations = False):
     cdef SymbolString currentGen
     cdef SymbolString nextGen
 
@@ -286,9 +287,14 @@ cdef SymbolString applyGrammarRules(SymbolString axiom, RuleSet rules, generatio
     else:
         initSymbolString(&nextGen)
 
-    for i in range(generations):
+    for i in range(int(generations)):
         resetSymbolString(&nextGen)
         applyGrammarRules_OneGeneration(currentGen, rules, &nextGen)
+        currentGen, nextGen = nextGen, currentGen
+
+    if generations % 1 != 0:
+        resetSymbolString(&nextGen)
+        applyGrammarRules_PartialGeneration(currentGen, rules, &nextGen, generations % 1, partialRotations)
         currentGen, nextGen = nextGen, currentGen
 
     freeSymbolString(&nextGen)
@@ -334,6 +340,99 @@ cdef applyGrammarRules_OneGeneration(SymbolString source, RuleSet ruleSet, Symbo
                     i += sizeof(MoveForwardNoGeoCommand)
                 elif c in ("A", "B"):
                     appendNoArgSymbol(target, c)
+
+cdef applyGrammarRules_PartialGeneration(SymbolString source, RuleSet ruleSet, SymbolString *target, float genRemainder, bint partialRotations):
+    cdef SymbolString *replacement
+    cdef MoveForwardGeoCommand moveForwardGeoCommand
+    cdef MoveForwardNoGeoCommand moveForwardNoGeoCommand
+
+    cdef Py_ssize_t i = 0
+    cdef unsigned char c
+    cdef void *command
+    while i < source.length:
+        c = source.data[i]
+        i += 1
+        command = source.data + i
+        if c in ("[", "]"):
+            appendNoArgSymbol(target, c)
+            i += 0
+        elif c in ("+", "-", "&", "^", "\\", "/", "~"):
+            appendSymbol(target, c, (<RotateCommand*>command)[0])
+            i += sizeof(RotateCommand)
+        elif c == '"':
+            appendSymbol(target, c, (<ScaleStepSizeCommand*>command)[0])
+            i += sizeof(ScaleStepSizeCommand)
+        elif c == "T":
+            appendSymbol(target, c, (<TropismCommand*>command)[0])
+            i += sizeof(TropismCommand)
+        else:
+            replacement = getReplacement(&ruleSet, c)
+            if replacement != NULL:
+                if c == "F":
+                    moveForwardGeoCommand = (<MoveForwardGeoCommand*>command)[0]
+                    moveForwardGeoCommand.distance *= 1 - genRemainder
+                    appendSymbol(target, c, moveForwardGeoCommand)
+                    i += sizeof(MoveForwardGeoCommand)
+                elif c == "f":
+                    moveForwardNoGeoCommand = (<MoveForwardNoGeoCommand*>command)[0]
+                    moveForwardNoGeoCommand.distance *= 1 - genRemainder
+                    appendSymbol(target, c, moveForwardNoGeoCommand)
+                    i += sizeof(MoveForwardNoGeoCommand)
+                appendScaledSymbolString(target, replacement, genRemainder, partialRotations)
+            else:
+                if c == "F":
+                    appendSymbol(target, c, (<MoveForwardGeoCommand*>command)[0])
+                    i += sizeof(MoveForwardGeoCommand)
+                elif c == "f":
+                    appendSymbol(target, c, (<MoveForwardNoGeoCommand*>command)[0])
+                    i += sizeof(MoveForwardNoGeoCommand)
+                elif c in ("A", "B"):
+                    appendNoArgSymbol(target, c)
+
+cdef inline void appendScaledSymbolString(SymbolString *target, SymbolString *source, float factor, bint partialRotations):
+    cdef TropismCommand tropismCommand
+    cdef RotateCommand rotateCommand
+    cdef ScaleStepSizeCommand scaleStepSizeCommand
+    cdef MoveForwardGeoCommand moveForwardGeoCommand
+    cdef MoveForwardNoGeoCommand moveForwardNoGeoCommand
+
+    cdef Py_ssize_t i = 0
+    cdef unsigned char c
+    cdef void *command
+    while i < source.length:
+        c = source.data[i]
+        i += 1
+        command = source.data + i
+        if c in ("[", "]"):
+            appendNoArgSymbol(target, c)
+            i += 0
+        elif c in ("+", "-", "&", "^", "\\", "/", "~"):
+            rotateCommand = (<RotateCommand*>command)[0]
+            if partialRotations: rotateCommand.angle *= factor
+            appendSymbol(target, c, rotateCommand)
+            i += sizeof(RotateCommand)
+        elif c == '"':
+            scaleStepSizeCommand = (<ScaleStepSizeCommand*>command)[0]
+            scaleStepSizeCommand.factor = (1 - factor) * 1 + factor * scaleStepSizeCommand.factor
+            appendSymbol(target, c, scaleStepSizeCommand)
+            i += sizeof(ScaleStepSizeCommand)
+        elif c == "T":
+            tropismCommand = (<TropismCommand*>command)[0]
+            tropismCommand.gravity *= factor
+            appendSymbol(target, c, tropismCommand)
+            i += sizeof(TropismCommand)
+        elif c == "F":
+            moveForwardGeoCommand = (<MoveForwardGeoCommand*>command)[0]
+            moveForwardGeoCommand.distance *= factor
+            appendSymbol(target, c, moveForwardGeoCommand)
+            i += sizeof(MoveForwardGeoCommand)
+        elif c == "f":
+            moveForwardNoGeoCommand = (<MoveForwardNoGeoCommand*>command)[0]
+            moveForwardNoGeoCommand.distance *= factor
+            appendSymbol(target, c, moveForwardNoGeoCommand)
+            i += sizeof(MoveForwardNoGeoCommand)
+        elif c in ("A", "B"):
+            appendNoArgSymbol(target, c)
 
 cdef inline SymbolString *getReplacement(RuleSet *rules, unsigned char symbol):
     if rules.lengths[symbol] > 0:
@@ -457,16 +556,16 @@ cdef geometryFromSymbolString(SymbolString symbols, Py_ssize_t seed = 0, dict de
             scaleStepSize(turtle, <ScaleStepSizeCommand*>command)
             i += sizeof(ScaleStepSizeCommand)
         elif c == "+":
-            rotateRight(turtle, <RotateCommand*>command, defaultAngle, &defaultXRotation)
+            rotateRight(turtle, <RotateCommand*>command, defaultAngle, &defaultYRotation)
             i += sizeof(RotateCommand)
         elif c == "-":
-            rotateLeft(turtle, <RotateCommand*>command, defaultAngle, &defaultXRotationNeg)
+            rotateLeft(turtle, <RotateCommand*>command, defaultAngle, &defaultYRotationNeg)
             i += sizeof(RotateCommand)
         elif c == "&":
-            pitchUp(turtle, <RotateCommand*>command, defaultAngle, &defaultYRotation)
+            pitchUp(turtle, <RotateCommand*>command, defaultAngle, &defaultXRotation)
             i += sizeof(RotateCommand)
         elif c == "^":
-            pitchDown(turtle, <RotateCommand*>command, defaultAngle, &defaultYRotationNeg)
+            pitchDown(turtle, <RotateCommand*>command, defaultAngle, &defaultXRotationNeg)
             i += sizeof(RotateCommand)
         elif c == "\\":
             rollClockwise(turtle, <RotateCommand*>command, defaultAngle, &defaultZRotationNeg)
