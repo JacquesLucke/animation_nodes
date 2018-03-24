@@ -3,7 +3,7 @@ import traceback
 from collections import Counter
 from ... base_types import AnimationNode
 from bpy.props import IntProperty, BoolProperty
-from ... algorithms.random cimport uniformRandomFloat
+from ... algorithms.random cimport uniformRandomFloat, randomFloat_Positive
 
 from libc.math cimport M_PI as PI
 from libc.string cimport memcpy, memset
@@ -77,7 +77,7 @@ class LSystemNode(bpy.types.Node, AnimationNode):
         try:
             limit = self.symbolLimit if self.useSymbolLimit else None
             symbols = applyGrammarRules(_axiom, ruleSet,
-                generations, partialRotations, limit)
+                generations, (<int>seed + 34521) * 4523, partialRotations, limit)
         except SymbolLimitReachedException:
             self.raiseErrorMessage("symbol limit reached, you can increase it in the advanced settings")
         except:
@@ -239,11 +239,6 @@ cdef bint letterAtIndexIs(str source, Py_ssize_t index, str letter):
     else:
         return False
 
-cdef parse_Rule(str source, Rule *rule, defaults):
-    left, right = source.split("=")
-    rule.symbol = ord(left.strip())
-    rule.replacement = parseSymbolString(right.strip(), defaults)
-
 
 
 # Symbol String Utilities
@@ -303,13 +298,15 @@ cdef inline void appendSymbolString(SymbolString *symbols, SymbolString *other):
 
 cdef struct Rule:
     unsigned char symbol
+    unsigned char hasProbability
+    float probability
     SymbolString replacement
 
 cdef struct RuleSet:
     Rule **rules
     unsigned char *lengths
 
-cdef SymbolString applyGrammarRules(SymbolString axiom, RuleSet rules, float generations,
+cdef SymbolString applyGrammarRules(SymbolString axiom, RuleSet rules, float generations, int seed = 0,
                                     bint partialRotations = False, symbolLimit = None) except *:
     cdef SymbolString currentGen
     cdef SymbolString nextGen
@@ -323,21 +320,23 @@ cdef SymbolString applyGrammarRules(SymbolString axiom, RuleSet rules, float gen
 
     for i in range(int(generations)):
         resetSymbolString(&nextGen)
-        applyGrammarRules_OneGeneration(currentGen, rules, &nextGen)
+        applyGrammarRules_OneGeneration(currentGen, rules, &nextGen, seed)
         currentGen, nextGen = nextGen, currentGen
 
         if symbolLimit is not None and currentGen.length >= symbolLimit:
             raise SymbolLimitReachedException()
 
+        seed += 654321
+
     if generations % 1 != 0:
         resetSymbolString(&nextGen)
-        applyGrammarRules_PartialGeneration(currentGen, rules, &nextGen, generations % 1, partialRotations)
+        applyGrammarRules_PartialGeneration(currentGen, rules, &nextGen, seed, generations % 1, partialRotations)
         currentGen, nextGen = nextGen, currentGen
 
     freeSymbolString(&nextGen)
     return currentGen
 
-cdef applyGrammarRules_OneGeneration(SymbolString source, RuleSet ruleSet, SymbolString *target):
+cdef applyGrammarRules_OneGeneration(SymbolString source, RuleSet ruleSet, SymbolString *target, int seed):
     cdef SymbolString *replacement
 
     cdef Py_ssize_t i = 0
@@ -360,7 +359,7 @@ cdef applyGrammarRules_OneGeneration(SymbolString source, RuleSet ruleSet, Symbo
             appendSymbol(target, c, (<TropismCommand*>command)[0])
             i += sizeof(TropismCommand)
         else:
-            replacement = getReplacement(&ruleSet, c)
+            replacement = getReplacement(&ruleSet, c, seed)
             if replacement != NULL:
                 appendSymbolString(target, replacement)
                 if c == "F":
@@ -377,7 +376,9 @@ cdef applyGrammarRules_OneGeneration(SymbolString source, RuleSet ruleSet, Symbo
                 elif c in ("A", "B", "X", "Y", "Z"):
                     appendNoArgSymbol(target, c)
 
-cdef applyGrammarRules_PartialGeneration(SymbolString source, RuleSet ruleSet, SymbolString *target, float genRemainder, bint partialRotations):
+        seed += 4321
+
+cdef applyGrammarRules_PartialGeneration(SymbolString source, RuleSet ruleSet, SymbolString *target, int seed, float genRemainder, bint partialRotations):
     cdef SymbolString *replacement
     cdef MoveForwardGeoCommand moveForwardGeoCommand
     cdef MoveForwardNoGeoCommand moveForwardNoGeoCommand
@@ -402,7 +403,7 @@ cdef applyGrammarRules_PartialGeneration(SymbolString source, RuleSet ruleSet, S
             appendSymbol(target, c, (<TropismCommand*>command)[0])
             i += sizeof(TropismCommand)
         else:
-            replacement = getReplacement(&ruleSet, c)
+            replacement = getReplacement(&ruleSet, c, seed)
             if replacement != NULL:
                 if c == "F":
                     moveForwardGeoCommand = (<MoveForwardGeoCommand*>command)[0]
@@ -424,6 +425,8 @@ cdef applyGrammarRules_PartialGeneration(SymbolString source, RuleSet ruleSet, S
                     i += sizeof(MoveForwardNoGeoCommand)
                 elif c in ("A", "B", "X", "Y", "Z"):
                     appendNoArgSymbol(target, c)
+
+        seed += 4321
 
 cdef inline void appendScaledSymbolString(SymbolString *target, SymbolString *source, float factor, bint partialRotations):
     cdef TropismCommand tropismCommand
@@ -470,9 +473,18 @@ cdef inline void appendScaledSymbolString(SymbolString *target, SymbolString *so
         elif c in ("A", "B", "X", "Y", "Z"):
             appendNoArgSymbol(target, c)
 
-cdef inline SymbolString *getReplacement(RuleSet *rules, unsigned char symbol):
-    if rules.lengths[symbol] > 0:
-        return &(rules.rules[symbol] + 0).replacement
+cdef inline SymbolString *getReplacement(RuleSet *ruleSet, unsigned char symbol, int seed):
+    cdef Py_ssize_t i
+    cdef Rule *rule
+    cdef float randomNumber
+    for i in range(ruleSet.lengths[symbol]):
+        rule = ruleSet.rules[symbol] + i
+        if rule.hasProbability:
+            randomNumber = randomFloat_Positive(seed+i)
+            if randomNumber < rule.probability:
+                return &rule.replacement
+        else:
+            return &rule.replacement
     else:
         return NULL
 
@@ -500,6 +512,29 @@ cdef initRuleSet(RuleSet *ruleSet, rules, defaults):
 
 def getRuleSymbol(str rule):
     return rule.strip()[0]
+
+cdef parse_Rule(str source, Rule *rule, defaults):
+    parts = source.split("=")
+    if len(parts) != 2:
+        raise Exception("Rule must have an '='")
+    parse_RulePremise(rule, parts[0])
+    parse_RuleProduction(rule, parts[1], defaults)
+
+cdef parse_RulePremise(Rule *rule, str source):
+    source = source.strip()
+    if len(source) != 1:
+        raise Exception("Left side of rule must be a single symbol")
+    rule.symbol = ord(source)
+
+cdef parse_RuleProduction(Rule *rule, str source, defaults):
+    if ":" in source:
+        left, right = source.split(":")
+        rule.replacement = parseSymbolString(left.strip(), defaults)
+        rule.hasProbability = True
+        rule.probability = float(right.strip())
+    else:
+        rule.replacement = parseSymbolString(source.strip(), defaults)
+        rule.hasProbability = False
 
 cdef freeRuleSet(RuleSet *ruleSet):
     cdef Py_ssize_t symbol, j
