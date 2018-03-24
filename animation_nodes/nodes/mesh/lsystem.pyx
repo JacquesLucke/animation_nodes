@@ -50,6 +50,7 @@ class LSystemNode(bpy.types.Node, AnimationNode):
             self.raiseErrorMessage("error when parsing axiom")
 
         cdef RuleSet ruleSet
+        rules = [rule for rule in rules if len(rule.strip()) > 0]
         try:
             initRuleSet(&ruleSet, rules, parseDefaults)
         except:
@@ -66,6 +67,7 @@ class LSystemNode(bpy.types.Node, AnimationNode):
 
         mesh = geometryFromSymbolString(symbols, seed, geometryDefaults)
         freeSymbolString(&symbols)
+
         return mesh
 
 
@@ -298,7 +300,6 @@ cdef SymbolString applyGrammarRules(SymbolString axiom, RuleSet rules, float gen
         currentGen, nextGen = nextGen, currentGen
 
     freeSymbolString(&nextGen)
-
     return currentGen
 
 cdef applyGrammarRules_OneGeneration(SymbolString source, RuleSet ruleSet, SymbolString *target):
@@ -447,7 +448,7 @@ cdef initRuleSet(RuleSet *ruleSet, rules, defaults):
     ruleSet.lengths = <unsigned char*>PyMem_Malloc(256 * sizeof(unsigned char))
     memset(ruleSet.lengths, 0, 256 * sizeof(unsigned char))
 
-    counter = Counter([r[0] for r in rules])
+    counter = Counter([getRuleSymbol(r) for r in rules])
     for symbol, amount in counter.items():
         ruleSet.lengths[ord(symbol)] = amount
         ruleSet.rules[ord(symbol)] = <Rule*>PyMem_Malloc(amount * sizeof(Rule))
@@ -457,15 +458,19 @@ cdef initRuleSet(RuleSet *ruleSet, rules, defaults):
 
     cdef Rule *rule
     for sourceRule in rules:
+        symbol = getRuleSymbol(sourceRule)
         rule = ruleSet.rules[ord(symbol)] + insertedAmount[ord(symbol)]
         parse_Rule(sourceRule, rule, defaults)
         insertedAmount[ord(symbol)] += 1
+
+def getRuleSymbol(str rule):
+    return rule.strip()[0]
 
 cdef freeRuleSet(RuleSet *ruleSet):
     cdef Py_ssize_t symbol, j
     for symbol in range(256):
         for j in range(ruleSet.lengths[symbol]):
-            freeRule(ruleSet.rules[symbol] + j)
+            freeRule(&ruleSet.rules[symbol][j])
         if ruleSet.lengths[symbol] > 0:
             PyMem_Free(ruleSet.rules[symbol])
     PyMem_Free(ruleSet.rules)
