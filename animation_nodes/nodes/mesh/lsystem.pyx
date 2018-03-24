@@ -124,7 +124,7 @@ cdef SymbolString parseSymbolString(str source, dict defaults) except *:
             size = parse_ScaleStepSize(&symbols, source, i, defaults["Scale Step Size"])
         elif c == "T":
             size = parse_Tropism(&symbols, source, i, defaults["Gravity"])
-        elif c in ("A", "B"):
+        elif c in ("A", "B", "X", "Y", "Z"):
             size = parse_SingleLetter(&symbols, c)
         else:
             size = 1
@@ -339,7 +339,7 @@ cdef applyGrammarRules_OneGeneration(SymbolString source, RuleSet ruleSet, Symbo
                 elif c == "f":
                     appendSymbol(target, c, (<MoveForwardNoGeoCommand*>command)[0])
                     i += sizeof(MoveForwardNoGeoCommand)
-                elif c in ("A", "B"):
+                elif c in ("A", "B", "X", "Y", "Z"):
                     appendNoArgSymbol(target, c)
 
 cdef applyGrammarRules_PartialGeneration(SymbolString source, RuleSet ruleSet, SymbolString *target, float genRemainder, bint partialRotations):
@@ -387,7 +387,7 @@ cdef applyGrammarRules_PartialGeneration(SymbolString source, RuleSet ruleSet, S
                 elif c == "f":
                     appendSymbol(target, c, (<MoveForwardNoGeoCommand*>command)[0])
                     i += sizeof(MoveForwardNoGeoCommand)
-                elif c in ("A", "B"):
+                elif c in ("A", "B", "X", "Y", "Z"):
                     appendNoArgSymbol(target, c)
 
 cdef inline void appendScaledSymbolString(SymbolString *target, SymbolString *source, float factor, bint partialRotations):
@@ -432,7 +432,7 @@ cdef inline void appendScaledSymbolString(SymbolString *target, SymbolString *so
             moveForwardNoGeoCommand.distance *= factor
             appendSymbol(target, c, moveForwardNoGeoCommand)
             i += sizeof(MoveForwardNoGeoCommand)
-        elif c in ("A", "B"):
+        elif c in ("A", "B", "X", "Y", "Z"):
             appendNoArgSymbol(target, c)
 
 cdef inline SymbolString *getReplacement(RuleSet *rules, unsigned char symbol):
@@ -584,7 +584,7 @@ cdef geometryFromSymbolString(SymbolString symbols, Py_ssize_t seed = 0, dict de
         elif c == "T":
             applyTropism(turtle, <TropismCommand*>command)
             i += sizeof(TropismCommand)
-        elif c in ("A", "B"):
+        elif c in ("A", "B", "X", "Y", "Z"):
             pass
         else:
             raise Exception("unknown opcode")
