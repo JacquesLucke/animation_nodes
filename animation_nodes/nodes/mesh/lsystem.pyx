@@ -1,8 +1,8 @@
 import bpy
 import traceback
 from collections import Counter
-from bpy.props import IntProperty
 from ... base_types import AnimationNode
+from bpy.props import IntProperty, BoolProperty
 from ... algorithms.random cimport uniformRandomFloat
 
 from libc.math cimport M_PI as PI
@@ -22,6 +22,8 @@ class LSystemNode(bpy.types.Node, AnimationNode):
     errorHandlingType = "EXCEPTION"
     bl_width_default = 180
 
+    useSymbolLimit = BoolProperty(name = "Use Symbol Limit", default = True)
+
     symbolLimit = IntProperty(name = "Symbol Limit", default = 100000,
         description = "To prevent freezing Blender when trying to calculate too many generations.",
         min = 0)
@@ -36,11 +38,16 @@ class LSystemNode(bpy.types.Node, AnimationNode):
         self.newInput("Float", "Random Angle", "randomAngle", value = 180)
         self.newInput("Float", "Scale Step Size", "scaleStepSize", value = 0.9)
         self.newInput("Float", "Gravity", "gravity", value = 0)
-        self.newInput("Boolean", "Partial Rotations", "partialRotations")
+        self.newInput("Boolean", "Partial Rotations", "partialRotations", value = False)
         self.newOutput("Mesh", "Mesh", "mesh")
 
     def drawAdvanced(self, layout):
-        layout.prop(self, "symbolLimit")
+        row = layout.row(align = True)
+        subrow = row.row(align = True)
+        subrow.active = self.useSymbolLimit
+        subrow.prop(self, "symbolLimit")
+        icon = "LAYER_ACTIVE" if self.useSymbolLimit else "LAYER_USED"
+        row.prop(self, "useSymbolLimit", text = "", icon = icon)
 
     def execute(self, axiom, rules, generations, seed, stepSize, angle, randomAngle, scaleStepSize, gravity, partialRotations):
         parseDefaults = {
@@ -68,8 +75,9 @@ class LSystemNode(bpy.types.Node, AnimationNode):
 
         cdef SymbolString symbols
         try:
+            limit = self.symbolLimit if self.useSymbolLimit else None
             symbols = applyGrammarRules(_axiom, ruleSet,
-                generations, partialRotations, self.symbolLimit)
+                generations, partialRotations, limit)
         except SymbolLimitReachedException:
             self.raiseErrorMessage("symbol limit reached, you can increase it in the advanced settings")
         except:
@@ -302,7 +310,7 @@ cdef struct RuleSet:
     unsigned char *lengths
 
 cdef SymbolString applyGrammarRules(SymbolString axiom, RuleSet rules, float generations,
-                                    bint partialRotations = False, Py_ssize_t symbolLimit = 100000000) except *:
+                                    bint partialRotations = False, symbolLimit = None) except *:
     cdef SymbolString currentGen
     cdef SymbolString nextGen
 
@@ -318,7 +326,7 @@ cdef SymbolString applyGrammarRules(SymbolString axiom, RuleSet rules, float gen
         applyGrammarRules_OneGeneration(currentGen, rules, &nextGen)
         currentGen, nextGen = nextGen, currentGen
 
-        if currentGen.length >= symbolLimit:
+        if symbolLimit is not None and currentGen.length >= symbolLimit:
             raise SymbolLimitReachedException()
 
     if generations % 1 != 0:
