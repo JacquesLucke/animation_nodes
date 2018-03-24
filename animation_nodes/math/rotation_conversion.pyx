@@ -105,9 +105,12 @@ cdef void normalizedMatrixToQuaternion(Quaternion* q, Matrix3_or_Matrix4* m):
 # Axis Angle to Matrix
 ###########################################
 
-cdef normalizedAxisAngleToMatrix(Matrix3_or_Matrix4* m, Vector3* axis, float angle):
-    cdef float c = cos(angle)
-    cdef float s = sin(angle)
+cdef void normalizedAxisAngleToMatrix(Matrix3_or_Matrix4* m, Vector3* axis, float angle):
+    normalizedAxisCosAngleToMatrix(m, axis, cos(angle))
+
+cdef void normalizedAxisCosAngleToMatrix(Matrix3_or_Matrix4* m, Vector3* axis, float cosAngle):
+    cdef float c = cosAngle
+    cdef float s = sqrt(1.0 - c * c)
     cdef float t = 1 - c
     cdef float x, y, z
     x, y, z = axis.x, axis.y, axis.z

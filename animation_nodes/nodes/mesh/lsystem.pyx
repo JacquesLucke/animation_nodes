@@ -11,19 +11,13 @@ from cpython cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
 from ... data_structures cimport (
     Vector3DList, EdgeIndices, EdgeIndicesList, Mesh
 )
-from ... math cimport (
-    Matrix4, setIdentityMatrix, Vector3, setTranslationMatrix, multMatrix4, toPyVector3,
-    setRotationXMatrix, setRotationYMatrix, setRotationZMatrix, Matrix3, addVec3_Inplace,
-    multMatrix3, transformVec3AsDirection_InPlace, setRotationMatrix, Euler3,
-    normalizedAxisAngleToMatrix, crossVec3, normalizeVec3_InPlace, lengthVec3,
-    dotVec3
-)
+from ... math cimport *
 
 cdef float degToRadFactor = PI / 180.0
 
 class LSystemNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_LSystemNode"
-    bl_label = "L System"
+    bl_label = "LSystem"
     errorHandlingType = "EXCEPTION"
 
     def create(self):
@@ -315,6 +309,9 @@ cdef applyGrammarRules_OneGeneration(SymbolString source, RuleSet ruleSet, Symbo
         elif c == '"':
             appendSymbol(target, c, (<ScaleStepSizeCommand*>command)[0])
             i += sizeof(ScaleStepSizeCommand)
+        elif c == "T":
+            appendSymbol(target, c, (<TropismCommand*>command)[0])
+            i += sizeof(TropismCommand)
         else:
             replacement = getReplacement(&ruleSet, c)
             if replacement != NULL:
@@ -454,6 +451,9 @@ cdef geometryFromSymbolString(SymbolString symbols):
         elif c == "~":
             rotateRandom(turtle, <RotateCommand*>command, seed)
             i += sizeof(RotateCommand)
+        elif c == "T":
+            applyTropism(turtle, <TropismCommand*>command)
+            i += sizeof(TropismCommand)
         elif c in ("A", "B"):
             pass
         else:
@@ -508,32 +508,32 @@ cdef inline void moveForward_NoGeo(Turtle *turtle, MoveForwardNoGeoCommand *comm
 cdef inline void rotateRight(Turtle *turtle, RotateCommand *command):
     cdef Matrix3 rotation
     setRotationYMatrix(&rotation, command.angle)
-    transformOrientation(turtle, &rotation)
+    transformOrientation_Local(turtle, &rotation)
 
 cdef inline void rotateLeft(Turtle *turtle, RotateCommand *command):
     cdef Matrix3 rotation
     setRotationYMatrix(&rotation, -command.angle)
-    transformOrientation(turtle, &rotation)
+    transformOrientation_Local(turtle, &rotation)
 
 cdef inline void pitchUp(Turtle *turtle, RotateCommand *command):
     cdef Matrix3 rotation
     setRotationXMatrix(&rotation, command.angle)
-    transformOrientation(turtle, &rotation)
+    transformOrientation_Local(turtle, &rotation)
 
 cdef inline void pitchDown(Turtle *turtle, RotateCommand *command):
     cdef Matrix3 rotation
     setRotationXMatrix(&rotation, -command.angle)
-    transformOrientation(turtle, &rotation)
+    transformOrientation_Local(turtle, &rotation)
 
 cdef inline void rollClockwise(Turtle *turtle, RotateCommand *command):
     cdef Matrix3 rotation
     setRotationZMatrix(&rotation, -command.angle)
-    transformOrientation(turtle, &rotation)
+    transformOrientation_Local(turtle, &rotation)
 
 cdef inline void rollCounterClockwise(Turtle *turtle, RotateCommand *command):
     cdef Matrix3 rotation
     setRotationZMatrix(&rotation, command.angle)
-    transformOrientation(turtle, &rotation)
+    transformOrientation_Local(turtle, &rotation)
 
 cdef inline void rotateRandom(Turtle *turtle, RotateCommand *command, Py_ssize_t seed):
     cdef Matrix3 rotation
@@ -543,7 +543,7 @@ cdef inline void rotateRandom(Turtle *turtle, RotateCommand *command, Py_ssize_t
     euler.y = uniformRandomFloat(seed + 1, -command.angle, command.angle)
     euler.z = uniformRandomFloat(seed + 2, -command.angle, command.angle)
     setRotationMatrix(&rotation, &euler)
-    transformOrientation(turtle, &rotation)
+    transformOrientation_Local(turtle, &rotation)
 
 cdef inline void branchStart(TurtleStack *stack, Turtle *current):
     cdef Turtle turtle
@@ -556,6 +556,21 @@ cdef inline void branchEnd(TurtleStack *stack, TurtleStack *allTurtles):
 
 cdef inline void scaleStepSize(Turtle *turtle, ScaleStepSizeCommand *command):
     turtle.stepSize *= command.factor
+
+cdef inline void applyTropism(Turtle *turtle, TropismCommand *command):
+    cdef Vector3 forward = Vector3(turtle.orientation.a13, turtle.orientation.a23, turtle.orientation.a33)
+    cdef Vector3 newForward = Vector3(forward.x, forward.y, forward.z - command.gravity)
+    normalizeVec3_InPlace(&newForward)
+
+    cdef float cosAngle = dotVec3(&forward, &newForward)
+    cdef Vector3 axis
+    crossVec3(&axis, &forward, &newForward)
+    normalizeVec3_InPlace(&axis)
+
+    cdef Matrix3 rotation
+    normalizedAxisCosAngleToMatrix(&rotation, &axis, cosAngle)
+    transformOrientation_Global(turtle, &rotation)
+
 
 
 # Turtle Utilities
@@ -625,9 +640,14 @@ cdef inline void connectLastTwoPoints(Turtle *turtle):
     turtle.edges[turtle.edgeAmount].v2 = turtle.pointAmount - 1
     turtle.edgeAmount += 1
 
-cdef inline void transformOrientation(Turtle *turtle, Matrix3 *rotation):
+cdef inline void transformOrientation_Local(Turtle *turtle, Matrix3 *rotation):
     cdef Matrix3 newOrientation
     multMatrix3(&newOrientation, &turtle.orientation, rotation)
+    turtle.orientation = newOrientation
+
+cdef inline void transformOrientation_Global(Turtle *turtle, Matrix3 *rotation):
+    cdef Matrix3 newOrientation
+    multMatrix3(&newOrientation, rotation, &turtle.orientation)
     turtle.orientation = newOrientation
 
 cdef Vector3DList getTurtlePoints(Turtle *turtle):
