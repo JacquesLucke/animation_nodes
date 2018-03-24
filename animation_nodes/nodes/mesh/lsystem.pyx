@@ -1,11 +1,12 @@
 import bpy
 import traceback
 from collections import Counter
+from bpy.props import IntProperty
 from ... base_types import AnimationNode
 from ... algorithms.random cimport uniformRandomFloat
 
-from libc.string cimport memcpy, memset
 from libc.math cimport M_PI as PI
+from libc.string cimport memcpy, memset
 from cpython cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
 
 from ... data_structures cimport (
@@ -13,12 +14,17 @@ from ... data_structures cimport (
 )
 from ... math cimport *
 
-cdef float degToRadFactor = PI / 180.0
+cdef float degToRadFactor = PI / 180
 
 class LSystemNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_LSystemNode"
     bl_label = "LSystem"
     errorHandlingType = "EXCEPTION"
+    bl_width_default = 180
+
+    symbolLimit = IntProperty(name = "Symbol Limit", default = 100000,
+        description = "To prevent freezing Blender when trying to calculate too many generations.",
+        min = 0)
 
     def create(self):
         self.newInput("Text", "Axiom", "axiom")
@@ -32,6 +38,9 @@ class LSystemNode(bpy.types.Node, AnimationNode):
         self.newInput("Float", "Gravity", "gravity", value = 0)
         self.newInput("Boolean", "Partial Rotations", "partialRotations")
         self.newOutput("Mesh", "Mesh", "mesh")
+
+    def drawAdvanced(self, layout):
+        layout.prop(self, "symbolLimit")
 
     def execute(self, axiom, rules, generations, seed, stepSize, angle, randomAngle, scaleStepSize, gravity, partialRotations):
         parseDefaults = {
@@ -57,7 +66,16 @@ class LSystemNode(bpy.types.Node, AnimationNode):
             traceback.print_exc()
             self.raiseErrorMessage("error when parsing rules")
 
-        cdef SymbolString symbols = applyGrammarRules(_axiom, ruleSet, generations, partialRotations)
+        cdef SymbolString symbols
+        try:
+            symbols = applyGrammarRules(_axiom, ruleSet,
+                generations, partialRotations, self.symbolLimit)
+        except SymbolLimitReachedException:
+            self.raiseErrorMessage("symbol limit reached, you can increase it in the advanced settings")
+        except:
+            traceback.print_exc()
+            self.raiseErrorMessage("error while applying grammar rules")
+
         freeRuleSet(&ruleSet)
         freeSymbolString(&_axiom)
 
@@ -69,6 +87,9 @@ class LSystemNode(bpy.types.Node, AnimationNode):
         freeSymbolString(&symbols)
 
         return mesh
+
+class SymbolLimitReachedException(Exception):
+    pass
 
 
 # Parse Input
@@ -126,8 +147,10 @@ cdef SymbolString parseSymbolString(str source, dict defaults) except *:
             size = parse_Tropism(&symbols, source, i, defaults["Gravity"])
         elif c in ("A", "B", "X", "Y", "Z"):
             size = parse_SingleLetter(&symbols, c)
-        else:
+        elif c == " ":
             size = 1
+        else:
+            raise Exception("unkown symbol")
 
         i += size
 
@@ -278,7 +301,8 @@ cdef struct RuleSet:
     Rule **rules
     unsigned char *lengths
 
-cdef SymbolString applyGrammarRules(SymbolString axiom, RuleSet rules, float generations, bint partialRotations = False):
+cdef SymbolString applyGrammarRules(SymbolString axiom, RuleSet rules, float generations,
+                                    bint partialRotations = False, Py_ssize_t symbolLimit = 100000000) except *:
     cdef SymbolString currentGen
     cdef SymbolString nextGen
 
@@ -293,6 +317,9 @@ cdef SymbolString applyGrammarRules(SymbolString axiom, RuleSet rules, float gen
         resetSymbolString(&nextGen)
         applyGrammarRules_OneGeneration(currentGen, rules, &nextGen)
         currentGen, nextGen = nextGen, currentGen
+
+        if currentGen.length >= symbolLimit:
+            raise SymbolLimitReachedException()
 
     if generations % 1 != 0:
         resetSymbolString(&nextGen)
