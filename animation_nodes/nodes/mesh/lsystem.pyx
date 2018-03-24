@@ -10,7 +10,7 @@ from libc.string cimport memcpy, memset
 from cpython cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
 
 from ... data_structures cimport (
-    Vector3DList, EdgeIndices, EdgeIndicesList, Mesh
+    Vector3DList, EdgeIndices, EdgeIndicesList, Mesh, FloatList, DoubleList
 )
 from ... math cimport *
 
@@ -39,7 +39,9 @@ class LSystemNode(bpy.types.Node, AnimationNode):
         self.newInput("Float", "Scale Step Size", "scaleStepSize", value = 0.9)
         self.newInput("Float", "Gravity", "gravity", value = 0)
         self.newInput("Boolean", "Partial Rotations", "partialRotations", value = False)
+        self.newInput("Float", "Width Scale", "widthScale", value = 0.9)
         self.newOutput("Mesh", "Mesh", "mesh")
+        self.newOutput("Float List", "Widths", "widths")
 
     def drawAdvanced(self, layout):
         row = layout.row(align = True)
@@ -49,13 +51,14 @@ class LSystemNode(bpy.types.Node, AnimationNode):
         icon = "LAYER_ACTIVE" if self.useSymbolLimit else "LAYER_USED"
         row.prop(self, "useSymbolLimit", text = "", icon = icon)
 
-    def execute(self, axiom, rules, generations, seed, stepSize, angle, randomAngle, scaleStepSize, gravity, partialRotations):
+    def execute(self, axiom, rules, generations, seed, stepSize, angle, randomAngle, scaleStepSize, gravity, partialRotations, widthScale):
         parseDefaults = {
             "Step Size" : stepSize,
             "Angle" : angle,
             "Random Angle" : randomAngle,
             "Scale Step Size" : scaleStepSize,
-            "Gravity" : gravity
+            "Gravity" : gravity,
+            "Width Scale" : widthScale
         }
 
         cdef SymbolString _axiom
@@ -91,10 +94,10 @@ class LSystemNode(bpy.types.Node, AnimationNode):
             "Angle" : angle * degToRadFactor
         }
 
-        vertices, edges = geometryFromSymbolString(symbols, seed, geometryDefaults)
+        vertices, edges, widths = geometryFromSymbolString(symbols, seed, geometryDefaults)
         freeSymbolString(&symbols)
 
-        return Mesh(vertices, edges, skipValidation = True)
+        return Mesh(vertices, edges, skipValidation = True), DoubleList.fromValues(widths)
 
 class SymbolLimitReachedException(Exception):
     pass
@@ -116,7 +119,7 @@ cdef struct MoveForwardNoGeoCommand:
     float distance
 cdef struct RotateCommand:
     float angle
-cdef struct ScaleStepSizeCommand:
+cdef struct ScaleCommand:
     float factor
 cdef struct TropismCommand:
     float gravity
@@ -126,7 +129,7 @@ ctypedef fused Command:
     MoveForwardGeoCommand
     MoveForwardNoGeoCommand
     RotateCommand
-    ScaleStepSizeCommand
+    ScaleCommand
     TropismCommand
 
 cdef SymbolString parseSymbolString(str source, dict defaults) except *:
@@ -149,8 +152,10 @@ cdef SymbolString parseSymbolString(str source, dict defaults) except *:
             size = parse_BranchStart(&symbols)
         elif c == "]":
             size = parse_BranchEnd(&symbols)
-        elif c == '"':
-            size = parse_ScaleStepSize(&symbols, source, i, defaults["Scale Step Size"])
+        elif c in '"':
+            size = parse_Scale(&symbols, source, i, c, defaults["Scale Step Size"])
+        elif c == "!":
+            size = parse_Scale(&symbols, source, i, c, defaults["Width Scale"])
         elif c == "T":
             size = parse_Tropism(&symbols, source, i, defaults["Gravity"])
         elif c in ("A", "B", "X", "Y", "Z"):
@@ -191,10 +196,10 @@ cdef parse_BranchEnd(SymbolString *symbols):
     appendNoArgSymbol(symbols, ord("]"))
     return 1
 
-cdef parse_ScaleStepSize(SymbolString *symbols, str source, Py_ssize_t index, float default):
+cdef parse_Scale(SymbolString *symbols, str source, Py_ssize_t index, letter, float default):
     (factor,), argLength = parseArguments(source, index + 1, ["float"])
     if factor is None: factor = default
-    appendSymbol(symbols, ord('"'), ScaleStepSizeCommand(<float>factor))
+    appendSymbol(symbols, ord(letter), ScaleCommand(<float>factor))
     return argLength + 1
 
 cdef parse_Tropism(SymbolString *symbols, str source, Py_ssize_t index, float default):
@@ -352,9 +357,9 @@ cdef applyGrammarRules_OneGeneration(SymbolString source, RuleSet ruleSet, Symbo
         elif c in ("+", "-", "&", "^", "\\", "/", "~"):
             appendSymbol(target, c, (<RotateCommand*>command)[0])
             i += sizeof(RotateCommand)
-        elif c == '"':
-            appendSymbol(target, c, (<ScaleStepSizeCommand*>command)[0])
-            i += sizeof(ScaleStepSizeCommand)
+        elif c in ('"', "!"):
+            appendSymbol(target, c, (<ScaleCommand*>command)[0])
+            i += sizeof(ScaleCommand)
         elif c == "T":
             appendSymbol(target, c, (<TropismCommand*>command)[0])
             i += sizeof(TropismCommand)
@@ -396,9 +401,9 @@ cdef applyGrammarRules_PartialGeneration(SymbolString source, RuleSet ruleSet, S
         elif c in ("+", "-", "&", "^", "\\", "/", "~"):
             appendSymbol(target, c, (<RotateCommand*>command)[0])
             i += sizeof(RotateCommand)
-        elif c == '"':
-            appendSymbol(target, c, (<ScaleStepSizeCommand*>command)[0])
-            i += sizeof(ScaleStepSizeCommand)
+        elif c in ('"', "!"):
+            appendSymbol(target, c, (<ScaleCommand*>command)[0])
+            i += sizeof(ScaleCommand)
         elif c == "T":
             appendSymbol(target, c, (<TropismCommand*>command)[0])
             i += sizeof(TropismCommand)
@@ -431,7 +436,7 @@ cdef applyGrammarRules_PartialGeneration(SymbolString source, RuleSet ruleSet, S
 cdef inline void appendScaledSymbolString(SymbolString *target, SymbolString *source, float factor, bint partialRotations):
     cdef TropismCommand tropismCommand
     cdef RotateCommand rotateCommand
-    cdef ScaleStepSizeCommand scaleStepSizeCommand
+    cdef ScaleCommand scaleCommand
     cdef MoveForwardGeoCommand moveForwardGeoCommand
     cdef MoveForwardNoGeoCommand moveForwardNoGeoCommand
 
@@ -450,11 +455,11 @@ cdef inline void appendScaledSymbolString(SymbolString *target, SymbolString *so
             if partialRotations: rotateCommand.angle *= factor
             appendSymbol(target, c, rotateCommand)
             i += sizeof(RotateCommand)
-        elif c == '"':
-            scaleStepSizeCommand = (<ScaleStepSizeCommand*>command)[0]
-            scaleStepSizeCommand.factor = (1 - factor) * 1 + factor * scaleStepSizeCommand.factor
-            appendSymbol(target, c, scaleStepSizeCommand)
-            i += sizeof(ScaleStepSizeCommand)
+        elif c in ('"', "!"):
+            scaleCommand = (<ScaleCommand*>command)[0]
+            scaleCommand.factor = (1 - factor) * 1 + factor * scaleCommand.factor
+            appendSymbol(target, c, scaleCommand)
+            i += sizeof(ScaleCommand)
         elif c == "T":
             tropismCommand = (<TropismCommand*>command)[0]
             tropismCommand.gravity *= factor
@@ -557,6 +562,7 @@ cdef freeRule(Rule *rule):
 cdef struct Turtle:
     Matrix3 orientation
     Vector3 position
+    float width
     float stepSize
     bint currentPositionStored
 
@@ -566,7 +572,11 @@ cdef struct Turtle:
 
     Py_ssize_t edgeAmount
     Py_ssize_t edgeCapacity
-    EdgeIndices *edges
+    TurtleEdge *edges
+
+    Py_ssize_t widthAmount
+    Py_ssize_t widthCapacity
+    float *widths
 
 cdef struct TurtleStack:
     Turtle *turtles
@@ -605,6 +615,7 @@ cdef geometryFromSymbolString(SymbolString symbols, Py_ssize_t seed = 0, dict de
 
     cdef Vector3DList vertices = Vector3DList()
     cdef EdgeIndicesList edges = EdgeIndicesList()
+    cdef FloatList widths = FloatList()
 
     cdef char c
     cdef void *command
@@ -626,10 +637,13 @@ cdef geometryFromSymbolString(SymbolString symbols, Py_ssize_t seed = 0, dict de
         elif c == "[":
             branchStart(&stack, turtle, &availableStack)
         elif c == "]":
-            branchEnd(&stack, vertices, edges, &availableStack)
+            branchEnd(&stack, vertices, edges, widths, &availableStack)
         elif c == '"':
-            scaleStepSize(turtle, <ScaleStepSizeCommand*>command)
-            i += sizeof(ScaleStepSizeCommand)
+            scaleStepSize(turtle, <ScaleCommand*>command)
+            i += sizeof(ScaleCommand)
+        elif c == "!":
+            scaleWidth(turtle, <ScaleCommand*>command)
+            i += sizeof(ScaleCommand)
         elif c == "+":
             rotateRight(turtle, <RotateCommand*>command, defaultAngle, &defaultYRotation)
             i += sizeof(RotateCommand)
@@ -664,22 +678,25 @@ cdef geometryFromSymbolString(SymbolString symbols, Py_ssize_t seed = 0, dict de
     cdef Turtle _turtle
     while stackHasElements(&stack):
         _turtle = popTurtle(&stack)
-        appendTurtleData(&_turtle, vertices, edges)
+        appendTurtleData(&_turtle, vertices, edges, widths)
         freeTurtle(&_turtle)
 
     while stackHasElements(&availableStack):
         _turtle = popTurtle(&availableStack)
         freeTurtle(&_turtle)
 
-    return vertices, edges
+    return vertices, edges, widths
 
-cdef inline appendTurtleData(Turtle *turtle, Vector3DList vertices, EdgeIndicesList edges):
+cdef inline appendTurtleData(Turtle *turtle, Vector3DList vertices, EdgeIndicesList edges, FloatList widths):
     cdef Py_ssize_t i
     cdef Py_ssize_t offset = vertices.length
     for i in range(turtle.pointAmount):
         vertices.append_LowLevel(turtle.points[i])
     for i in range(turtle.edgeAmount):
-        edges.append_LowLevel(EdgeIndices(turtle.edges[i].v1 + offset, turtle.edges[i].v2 + offset))
+        edges.append_LowLevel(EdgeIndices(
+            turtle.edges[i].indices.v1 + offset,
+            turtle.edges[i].indices.v2 + offset))
+        widths.append_LowLevel(turtle.edges[i].width)
 
 cdef inline void moveForward_Geo(Turtle *turtle, MoveForwardGeoCommand *command):
     cdef Vector3 translation = Vector3(0, 0, turtle.stepSize * command.distance)
@@ -758,15 +775,18 @@ cdef inline void branchStart(TurtleStack *stack, Turtle *current, TurtleStack *a
     initBranch(&turtle, current)
     pushTurtle(stack, turtle)
 
-cdef inline void branchEnd(TurtleStack *stack, Vector3DList vertices, EdgeIndicesList edges, TurtleStack *availableStack):
+cdef inline void branchEnd(TurtleStack *stack, Vector3DList vertices, EdgeIndicesList edges, FloatList widths, TurtleStack *availableStack):
     if stack.amount <= 1:
         return
     cdef Turtle turtle = popTurtle(stack)
-    appendTurtleData(&turtle, vertices, edges)
+    appendTurtleData(&turtle, vertices, edges, widths)
     pushTurtle(availableStack, turtle)
 
-cdef inline void scaleStepSize(Turtle *turtle, ScaleStepSizeCommand *command):
+cdef inline void scaleStepSize(Turtle *turtle, ScaleCommand *command):
     turtle.stepSize *= command.factor
+
+cdef inline void scaleWidth(Turtle *turtle, ScaleCommand *command):
+    turtle.width *= command.factor
 
 cdef inline void applyTropism(Turtle *turtle, TropismCommand *command):
     cdef Vector3 forward = Vector3(turtle.orientation.a13, turtle.orientation.a23, turtle.orientation.a33)
@@ -787,10 +807,15 @@ cdef inline void applyTropism(Turtle *turtle, TropismCommand *command):
 # Turtle Utilities
 ##########################################
 
+cdef struct TurtleEdge:
+    EdgeIndices indices
+    float width
+
 cdef void initTurtle(Turtle *turtle):
     setIdentityMatrix(&turtle.orientation)
     turtle.position = Vector3(0, 0, 0)
     turtle.stepSize = 1
+    turtle.width = 1
     turtle.currentPositionStored = False
 
     cdef Py_ssize_t DEFAULT_SIZE = 4
@@ -801,7 +826,7 @@ cdef void initTurtle(Turtle *turtle):
 
     turtle.edgeAmount = 0
     turtle.edgeCapacity = DEFAULT_SIZE
-    turtle.edges = <EdgeIndices*>PyMem_Malloc(DEFAULT_SIZE * sizeof(EdgeIndices))
+    turtle.edges = <TurtleEdge*>PyMem_Malloc(DEFAULT_SIZE * sizeof(TurtleEdge))
 
 cdef void freeTurtle(Turtle *turtle):
     PyMem_Free(turtle.points)
@@ -811,6 +836,7 @@ cdef void initBranch(Turtle *turtle, Turtle *source):
     turtle.orientation = source.orientation
     turtle.position = source.position
     turtle.stepSize = source.stepSize
+    turtle.width = source.width
     turtle.currentPositionStored = False
     turtle.pointAmount = 0
     turtle.edgeAmount = 0
@@ -822,7 +848,7 @@ cdef inline void growPointsArray(Turtle *turtle):
 
 cdef inline void growEdgesArray(Turtle *turtle):
     cdef Py_ssize_t newCapacity = turtle.edgeCapacity * 2
-    turtle.edges = <EdgeIndices*>PyMem_Realloc(turtle.edges, newCapacity * sizeof(EdgeIndices))
+    turtle.edges = <TurtleEdge*>PyMem_Realloc(turtle.edges, newCapacity * sizeof(TurtleEdge))
     turtle.edgeCapacity = newCapacity
 
 cdef inline void move_NoGeometry(Turtle *turtle, Vector3 *translation):
@@ -846,8 +872,9 @@ cdef inline void storeCurrentPosition(Turtle *turtle):
 cdef inline void connectLastTwoPoints(Turtle *turtle):
     if turtle.edgeAmount == turtle.edgeCapacity:
         growEdgesArray(turtle)
-    turtle.edges[turtle.edgeAmount].v1 = turtle.pointAmount - 2
-    turtle.edges[turtle.edgeAmount].v2 = turtle.pointAmount - 1
+    turtle.edges[turtle.edgeAmount].indices.v1 = turtle.pointAmount - 2
+    turtle.edges[turtle.edgeAmount].indices.v2 = turtle.pointAmount - 1
+    turtle.edges[turtle.edgeAmount].width = turtle.width
     turtle.edgeAmount += 1
 
 cdef inline void transformOrientation_Local(Turtle *turtle, Matrix3 *rotation):
@@ -859,16 +886,6 @@ cdef inline void transformOrientation_Global(Turtle *turtle, Matrix3 *rotation):
     cdef Matrix3 newOrientation
     multMatrix3(&newOrientation, rotation, &turtle.orientation)
     turtle.orientation = newOrientation
-
-cdef Vector3DList getTurtlePoints(Turtle *turtle):
-    cdef Vector3DList vectors = Vector3DList(length = turtle.pointAmount)
-    memcpy(vectors.data, turtle.points, turtle.pointAmount * sizeof(Vector3))
-    return vectors
-
-cdef EdgeIndicesList getTurtleEdges(Turtle *turtle):
-    cdef EdgeIndicesList edges = EdgeIndicesList(length = turtle.edgeAmount)
-    memcpy(edges.data, turtle.edges, turtle.edgeAmount * sizeof(EdgeIndices))
-    return edges
 
 
 # Turtle Stack Utilities
