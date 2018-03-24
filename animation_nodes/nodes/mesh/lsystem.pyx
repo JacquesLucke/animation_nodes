@@ -330,6 +330,11 @@ cdef applyGrammarRules_OneGeneration(SymbolString source, RuleSet ruleSet, Symbo
                 elif c in ("A", "B"):
                     appendNoArgSymbol(target, c)
 
+cdef inline SymbolString *getReplacement(RuleSet *rules, unsigned char symbol):
+    if rules.lengths[symbol] > 0:
+        return &(rules.rules[symbol] + 0).replacement
+    else:
+        return NULL
 
 cdef initRuleSet(RuleSet *ruleSet, rules, defaults):
     ruleSet.rules = <Rule**>PyMem_Malloc(256 * sizeof(Rule*))
@@ -365,11 +370,6 @@ cdef freeRuleSet(RuleSet *ruleSet):
 cdef freeRule(Rule *rule):
     freeSymbolString(&rule.replacement)
 
-cdef inline SymbolString *getReplacement(RuleSet *rules, unsigned char symbol):
-    if rules.lengths[symbol] > 0:
-        return &(rules.rules[symbol] + 0).replacement
-    else:
-        return NULL
 
 
 # Create Geometry from SymbolString
