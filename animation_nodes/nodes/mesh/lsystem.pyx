@@ -91,10 +91,10 @@ class LSystemNode(bpy.types.Node, AnimationNode):
             "Angle" : angle * degToRadFactor
         }
 
-        mesh = geometryFromSymbolString(symbols, seed, geometryDefaults)
+        vertices, edges = geometryFromSymbolString(symbols, seed, geometryDefaults)
         freeSymbolString(&symbols)
 
-        return mesh
+        return Mesh(vertices, edges, skipValidation = True)
 
 class SymbolLimitReachedException(Exception):
     pass
@@ -671,7 +671,7 @@ cdef geometryFromSymbolString(SymbolString symbols, Py_ssize_t seed = 0, dict de
         _turtle = popTurtle(&availableStack)
         freeTurtle(&_turtle)
 
-    return Mesh(vertices, edges, skipValidation = True)
+    return vertices, edges
 
 cdef inline appendTurtleData(Turtle *turtle, Vector3DList vertices, EdgeIndicesList edges):
     cdef Py_ssize_t i
