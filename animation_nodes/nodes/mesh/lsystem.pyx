@@ -41,7 +41,7 @@ class LSystemNode(bpy.types.Node, AnimationNode):
         self.newInput("Boolean", "Partial Rotations", "partialRotations", value = False)
         self.newInput("Float", "Width Scale", "widthScale", value = 0.9)
         self.newOutput("Mesh", "Mesh", "mesh")
-        self.newOutput("Float List", "Widths", "widths")
+        self.newOutput("Float List", "Edge Widths", "edgeWidths")
 
     def drawAdvanced(self, layout):
         row = layout.row(align = True)
