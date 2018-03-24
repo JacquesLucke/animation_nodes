@@ -24,6 +24,7 @@ class LSystemNode(bpy.types.Node, AnimationNode):
         self.newInput("Text", "Axiom", "axiom")
         self.newInput("Text List", "Rules", "rules")
         self.newInput("Integer", "Generations", "generations")
+        self.newInput("Integer", "Seed", "seed")
         self.newInput("Float", "Step Size", "stepSize", value = 1)
         self.newInput("Float", "Angle", "angle", value = 90)
         self.newInput("Float", "Random Angle", "randomAngle", value = 180)
@@ -31,8 +32,8 @@ class LSystemNode(bpy.types.Node, AnimationNode):
         self.newInput("Float", "Gravity", "gravity", value = 0)
         self.newOutput("Mesh", "Mesh", "mesh")
 
-    def execute(self, axiom, rules, generations, stepSize, angle, randomAngle, scaleStepSize, gravity):
-        defaults = {
+    def execute(self, axiom, rules, generations, seed, stepSize, angle, randomAngle, scaleStepSize, gravity):
+        parseDefaults = {
             "Step Size" : stepSize,
             "Angle" : angle,
             "Random Angle" : randomAngle,
@@ -42,14 +43,14 @@ class LSystemNode(bpy.types.Node, AnimationNode):
 
         cdef SymbolString _axiom
         try:
-            _axiom = parseSymbolString(axiom, defaults)
+            _axiom = parseSymbolString(axiom, parseDefaults)
         except:
             traceback.print_exc()
             self.raiseErrorMessage("error when parsing axiom")
 
         cdef RuleSet ruleSet
         try:
-            initRuleSet(&ruleSet, rules, defaults)
+            initRuleSet(&ruleSet, rules, parseDefaults)
         except:
             traceback.print_exc()
             self.raiseErrorMessage("error when parsing rules")
@@ -58,7 +59,11 @@ class LSystemNode(bpy.types.Node, AnimationNode):
         freeRuleSet(&ruleSet)
         freeSymbolString(&_axiom)
 
-        mesh = geometryFromSymbolString(symbols)
+        geometryDefaults = {
+            "Angle" : angle * degToRadFactor
+        }
+
+        mesh = geometryFromSymbolString(symbols, seed, geometryDefaults)
         freeSymbolString(&symbols)
         return mesh
 
@@ -394,7 +399,26 @@ cdef struct TurtleStack:
     Py_ssize_t amount
     Py_ssize_t capacity
 
-cdef geometryFromSymbolString(SymbolString symbols):
+cdef geometryFromSymbolString(SymbolString symbols, Py_ssize_t seed = 0, dict defaults = {}):
+    # Calculate default matrices to speedup the common case
+    cdef float defaultAngle = defaults.get("Angle", 0)
+
+    cdef Matrix3 defaultXRotation
+    setRotationXMatrix(&defaultXRotation, defaultAngle)
+    cdef Matrix3 defaultXRotationNeg
+    setRotationXMatrix(&defaultXRotationNeg, -defaultAngle)
+
+    cdef Matrix3 defaultYRotation
+    setRotationYMatrix(&defaultYRotation, defaultAngle)
+    cdef Matrix3 defaultYRotationNeg
+    setRotationYMatrix(&defaultYRotationNeg, -defaultAngle)
+
+    cdef Matrix3 defaultZRotation
+    setRotationZMatrix(&defaultZRotation, defaultAngle)
+    cdef Matrix3 defaultZRotationNeg
+    setRotationZMatrix(&defaultZRotationNeg, -defaultAngle)
+
+
     cdef TurtleStack stack
     initTurtleStack(&stack)
 
@@ -412,7 +436,6 @@ cdef geometryFromSymbolString(SymbolString symbols):
     cdef void *command
     cdef Turtle *turtle
     cdef Py_ssize_t i = 0
-    cdef Py_ssize_t seed = 1234
 
     while i < symbols.length:
         turtle = peekTopTurtle(&stack)
@@ -434,22 +457,22 @@ cdef geometryFromSymbolString(SymbolString symbols):
             scaleStepSize(turtle, <ScaleStepSizeCommand*>command)
             i += sizeof(ScaleStepSizeCommand)
         elif c == "+":
-            rotateRight(turtle, <RotateCommand*>command)
+            rotateRight(turtle, <RotateCommand*>command, defaultAngle, &defaultXRotation)
             i += sizeof(RotateCommand)
         elif c == "-":
-            rotateLeft(turtle, <RotateCommand*>command)
+            rotateLeft(turtle, <RotateCommand*>command, defaultAngle, &defaultXRotationNeg)
             i += sizeof(RotateCommand)
         elif c == "&":
-            pitchUp(turtle, <RotateCommand*>command)
+            pitchUp(turtle, <RotateCommand*>command, defaultAngle, &defaultYRotation)
             i += sizeof(RotateCommand)
         elif c == "^":
-            pitchDown(turtle, <RotateCommand*>command)
+            pitchDown(turtle, <RotateCommand*>command, defaultAngle, &defaultYRotationNeg)
             i += sizeof(RotateCommand)
         elif c == "\\":
-            rollClockwise(turtle, <RotateCommand*>command)
+            rollClockwise(turtle, <RotateCommand*>command, defaultAngle, &defaultZRotationNeg)
             i += sizeof(RotateCommand)
         elif c == "/":
-            rollCounterClockwise(turtle, <RotateCommand*>command)
+            rollCounterClockwise(turtle, <RotateCommand*>command, defaultAngle, &defaultZRotation)
             i += sizeof(RotateCommand)
         elif c == "~":
             rotateRandom(turtle, <RotateCommand*>command, seed)
@@ -476,32 +499,6 @@ cdef geometryFromSymbolString(SymbolString symbols):
 
     return Mesh(vertices, edges, skipValidation = True)
 
-cdef meshFromTurtles(Turtle *turtles, Py_ssize_t amount):
-    cdef Py_ssize_t pointAmount = 0
-    cdef Py_ssize_t edgeAmount = 0
-    cdef Py_ssize_t i
-    for i in range(amount):
-        pointAmount += turtles[i].pointAmount
-        edgeAmount += turtles[i].edgeAmount
-
-    cdef Vector3DList vertices = Vector3DList(length = pointAmount)
-    cdef EdgeIndicesList edges = EdgeIndicesList(length = edgeAmount)
-
-    cdef Py_ssize_t vertexOffset = 0
-    cdef Py_ssize_t edgeOffset = 0
-    cdef Py_ssize_t j
-    for i in range(amount):
-        memcpy(vertices.data + vertexOffset, turtles[i].points, turtles[i].pointAmount * sizeof(Vector3))
-
-        for j in range(turtles[i].edgeAmount):
-            edges.data[edgeOffset + j].v1 = turtles[i].edges[j].v1 + vertexOffset
-            edges.data[edgeOffset + j].v2 = turtles[i].edges[j].v2 + vertexOffset
-
-        vertexOffset += turtles[i].pointAmount
-        edgeOffset += turtles[i].edgeAmount
-
-    return Mesh(vertices, edges, skipValidation = True)
-
 cdef inline appendTurtleData(Turtle *turtle, Vector3DList vertices, EdgeIndicesList edges):
     cdef Py_ssize_t i
     cdef Py_ssize_t offset = vertices.length
@@ -520,35 +517,53 @@ cdef inline void moveForward_NoGeo(Turtle *turtle, MoveForwardNoGeoCommand *comm
     transformVec3AsDirection_InPlace(&translation, &turtle.orientation)
     move_NoGeometry(turtle, &translation)
 
-cdef inline void rotateRight(Turtle *turtle, RotateCommand *command):
+cdef inline void rotateRight(Turtle *turtle, RotateCommand *command, float defaultAngle, Matrix3 *defaultRot):
     cdef Matrix3 rotation
-    setRotationYMatrix(&rotation, command.angle)
-    transformOrientation_Local(turtle, &rotation)
+    if command.angle == defaultAngle:
+        transformOrientation_Local(turtle, defaultRot)
+    else:
+        setRotationYMatrix(&rotation, command.angle)
+        transformOrientation_Local(turtle, &rotation)
 
-cdef inline void rotateLeft(Turtle *turtle, RotateCommand *command):
+cdef inline void rotateLeft(Turtle *turtle, RotateCommand *command, float defaultAngle, Matrix3 *defaultRot):
     cdef Matrix3 rotation
-    setRotationYMatrix(&rotation, -command.angle)
-    transformOrientation_Local(turtle, &rotation)
+    if command.angle == defaultAngle:
+        transformOrientation_Local(turtle, defaultRot)
+    else:
+        setRotationYMatrix(&rotation, -command.angle)
+        transformOrientation_Local(turtle, &rotation)
 
-cdef inline void pitchUp(Turtle *turtle, RotateCommand *command):
+cdef inline void pitchUp(Turtle *turtle, RotateCommand *command, float defaultAngle, Matrix3 *defaultRot):
     cdef Matrix3 rotation
-    setRotationXMatrix(&rotation, command.angle)
-    transformOrientation_Local(turtle, &rotation)
+    if command.angle == defaultAngle:
+        transformOrientation_Local(turtle, defaultRot)
+    else:
+        setRotationXMatrix(&rotation, command.angle)
+        transformOrientation_Local(turtle, &rotation)
 
-cdef inline void pitchDown(Turtle *turtle, RotateCommand *command):
+cdef inline void pitchDown(Turtle *turtle, RotateCommand *command, float defaultAngle, Matrix3 *defaultRot):
     cdef Matrix3 rotation
-    setRotationXMatrix(&rotation, -command.angle)
-    transformOrientation_Local(turtle, &rotation)
+    if command.angle == defaultAngle:
+        transformOrientation_Local(turtle, defaultRot)
+    else:
+        setRotationXMatrix(&rotation, -command.angle)
+        transformOrientation_Local(turtle, &rotation)
 
-cdef inline void rollClockwise(Turtle *turtle, RotateCommand *command):
+cdef inline void rollClockwise(Turtle *turtle, RotateCommand *command, float defaultAngle, Matrix3 *defaultRot):
     cdef Matrix3 rotation
-    setRotationZMatrix(&rotation, -command.angle)
-    transformOrientation_Local(turtle, &rotation)
+    if command.angle == defaultAngle:
+        transformOrientation_Local(turtle, defaultRot)
+    else:
+        setRotationZMatrix(&rotation, -command.angle)
+        transformOrientation_Local(turtle, &rotation)
 
-cdef inline void rollCounterClockwise(Turtle *turtle, RotateCommand *command):
+cdef inline void rollCounterClockwise(Turtle *turtle, RotateCommand *command, float defaultAngle, Matrix3 *defaultRot):
     cdef Matrix3 rotation
-    setRotationZMatrix(&rotation, command.angle)
-    transformOrientation_Local(turtle, &rotation)
+    if command.angle == defaultAngle:
+        transformOrientation_Local(turtle, defaultRot)
+    else:
+        setRotationZMatrix(&rotation, command.angle)
+        transformOrientation_Local(turtle, &rotation)
 
 cdef inline void rotateRandom(Turtle *turtle, RotateCommand *command, Py_ssize_t seed):
     cdef Matrix3 rotation
