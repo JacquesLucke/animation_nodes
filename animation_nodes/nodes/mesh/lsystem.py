@@ -1,7 +1,6 @@
 import bpy
-import traceback
+from bpy.props import *
 from ... base_types import AnimationNode
-from bpy.props import IntProperty, BoolProperty
 from ... data_structures import Mesh, DoubleList
 from ... algorithms.lsystem import calculateLSystem
 
@@ -11,11 +10,16 @@ class LSystemNode(bpy.types.Node, AnimationNode):
     errorHandlingType = "EXCEPTION"
     bl_width_default = 180
 
+    def getPresetItems(self, context):
+        return [(name, name, "") for name in presets.keys()]
+
     useSymbolLimit = BoolProperty(name = "Use Symbol Limit", default = True)
 
     symbolLimit = IntProperty(name = "Symbol Limit", default = 100000,
         description = "To prevent freezing Blender when trying to calculate too many generations.",
         min = 0)
+
+    preset = EnumProperty(name = "Preset", items = getPresetItems)
 
     def create(self):
         self.newInput("Text", "Axiom", "axiom")
@@ -42,6 +46,14 @@ class LSystemNode(bpy.types.Node, AnimationNode):
         icon = "LAYER_ACTIVE" if self.useSymbolLimit else "LAYER_USED"
         row.prop(self, "useSymbolLimit", text = "", icon = icon)
 
+        box = layout.box()
+        col = box.column(align = True)
+        col.prop(self, "preset")
+        preset = presets[self.preset]
+        col.label("Axiom: " + preset.axiom)
+        for i, rule in enumerate(preset.rules):
+            col.label("Rule {}: {}".format(i, rule))
+
     def execute(self, axiom, rules, generations, stepSize, angle, seed, scaleWidth, scaleStepSize, gravity, randomAngle, onlyPartialMoves):
         defaults = {
             "Step Size" : stepSize,
@@ -66,3 +78,38 @@ class LSystemNode(bpy.types.Node, AnimationNode):
         mesh = Mesh(vertices, edges, skipValidation = True)
         widths = DoubleList.fromValues(widths)
         return mesh, widths
+
+
+class LSystemPreset:
+    def __init__(self, axiom, rules, angle, generations):
+        self.axiom = axiom
+        self.rules = rules
+        self.angle = angle
+        self.generations = generations
+
+presets = {
+    "Koch Snowflake": LSystemPreset(
+        axiom = "F--F--F",
+        rules = ["F = F+F--F+F"],
+        angle = 60,
+        generations = 2
+    ),
+    "Hilbert Curve" : LSystemPreset(
+        axiom = "A",
+        rules = ["A = -BF+AFA+FB-", "B = +AF-BFB-FA+"],
+        angle = 90,
+        generations = 4
+    ),
+    "Tree" : LSystemPreset(
+        axiom = "FFFA",
+        rules = ["A = \"! [&FFFA] //// [&FFFA] //// [&FFFA]"],
+        angle = 3,
+        generations = 4
+    ),
+    "Cracy Cubes" : LSystemPreset(
+        axiom = "A",
+        rules = ["A = F[+FA][-^FA]"],
+        angle = 90,
+        generations = 4
+    )
+}
