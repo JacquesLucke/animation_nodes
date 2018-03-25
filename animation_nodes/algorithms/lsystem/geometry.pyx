@@ -230,6 +230,9 @@ cdef inline void applyTropism(Turtle *turtle, TropismCommand *command):
     normalizeVec3_InPlace(&newForward)
 
     cdef float cosAngle = dotVec3(&forward, &newForward)
+    if not (-0.999 < cosAngle < 0.999):
+        return
+
     cdef Vector3 axis
     crossVec3(&axis, &forward, &newForward)
     normalizeVec3_InPlace(&axis)
