@@ -9,6 +9,7 @@ cdef struct SymbolString:
 cdef struct NoArgCommand:
     char dummy
 cdef struct MoveForwardGeoCommand:
+    unsigned char id
     float distance
 cdef struct MoveForwardNoGeoCommand:
     float distance

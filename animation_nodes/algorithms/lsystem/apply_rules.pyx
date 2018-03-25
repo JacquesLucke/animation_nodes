@@ -58,7 +58,7 @@ cdef applyGrammarRules_Single(
             appendSymbol(target, c, (<TropismCommand*>command)[0])
             i += sizeof(TropismCommand)
         else:
-            replacement = getReplacement(&ruleSet, c, seed)
+            replacement = getReplacement(&ruleSet, c, command, seed)
             if replacement == NULL:
                 if c == "F":
                     appendSymbol(target, c, (<MoveForwardGeoCommand*>command)[0])

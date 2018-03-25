@@ -3,30 +3,52 @@ from .. random cimport randomFloat_Positive
 from cpython cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
 from libc.string cimport memset
 
+cdef enum:
+    RULE_HAS_PROBABILITY = 1
+    RULE_HAS_CONDITION = 2
+
+ctypedef bint (*RuleConditionFunction)(RuleConditionData data, void *command)
+
+cdef struct RuleConditionData:
+    unsigned char id
+
+cdef struct RuleCondition:
+    RuleConditionFunction function
+    RuleConditionData data
+
 cdef struct Rule:
     unsigned char symbol
-    unsigned char hasProbability
+    unsigned char flags
     float probability
+    RuleCondition condition
     SymbolString replacement
 
 cdef struct RuleSet:
     Rule **rules
     unsigned char *lengths
 
-cdef inline SymbolString *getReplacement(RuleSet *ruleSet, unsigned char symbol, int seed):
+cdef inline SymbolString *getReplacement(RuleSet *ruleSet, unsigned char symbol, void *command, int seed):
     cdef Py_ssize_t i
     cdef Rule *rule
     cdef float randomNumber
     for i in range(ruleSet.lengths[symbol]):
         rule = ruleSet.rules[symbol] + i
-        if rule.hasProbability:
+
+        if rule.flags & RULE_HAS_CONDITION:
+            if not rule.condition.function(rule.condition.data, command):
+                continue
+
+        if rule.flags & RULE_HAS_PROBABILITY:
             randomNumber = randomFloat_Positive(seed+i)
-            if randomNumber < rule.probability:
-                return &rule.replacement
-        else:
-            return &rule.replacement
+            if randomNumber > rule.probability:
+                continue
+
+        return &rule.replacement
     else:
         return NULL
+
+cdef inline initRule(Rule *rule):
+    memset(rule, 0, sizeof(Rule))
 
 cdef inline initRuleSet(RuleSet *ruleSet):
     ruleSet.rules = <Rule**>PyMem_Malloc(256 * sizeof(Rule*))
