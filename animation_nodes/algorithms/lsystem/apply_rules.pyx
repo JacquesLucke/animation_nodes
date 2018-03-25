@@ -1,5 +1,5 @@
 cdef SymbolString applyGrammarRules(SymbolString axiom, RuleSet rules, float generations, int seed = 0,
-                                    bint partialRotations = False, symbolLimit = None) except *:
+                                    bint onlyPartialMoves = True, symbolLimit = None) except *:
     cdef SymbolString currentGen
     cdef SymbolString nextGen
 
@@ -22,7 +22,7 @@ cdef SymbolString applyGrammarRules(SymbolString axiom, RuleSet rules, float gen
 
     if generations % 1 != 0:
         resetSymbolString(&nextGen)
-        applyGrammarRules_Single(currentGen, rules, &nextGen, seed, generations % 1, partialRotations)
+        applyGrammarRules_Single(currentGen, rules, &nextGen, seed, generations % 1, onlyPartialMoves)
         currentGen, nextGen = nextGen, currentGen
 
     freeSymbolString(&nextGen)
@@ -30,7 +30,7 @@ cdef SymbolString applyGrammarRules(SymbolString axiom, RuleSet rules, float gen
 
 cdef applyGrammarRules_Single(
         SymbolString source, RuleSet ruleSet, SymbolString *target, int seed,
-        float generationPart = 1, bint partialRotations = True):
+        float generationPart = 1, bint onlyPartialMoves = True):
     assert 0 <= generationPart <= 1
 
     cdef SymbolString *replacement
@@ -86,12 +86,12 @@ cdef applyGrammarRules_Single(
                         moveForwardNoGeoCommand.distance *= 1 - generationPart
                         appendSymbol(target, c, moveForwardNoGeoCommand)
                         i += sizeof(MoveForwardNoGeoCommand)
-                    appendScaledSymbolString(target, replacement, generationPart, partialRotations)
+                    appendScaledSymbolString(target, replacement, generationPart, onlyPartialMoves)
 
 
         seed += 4321
 
-cdef inline void appendScaledSymbolString(SymbolString *target, SymbolString *source, float factor, bint partialRotations):
+cdef inline void appendScaledSymbolString(SymbolString *target, SymbolString *source, float factor, bint onlyPartialMoves):
     cdef TropismCommand tropismCommand
     cdef RotateCommand rotateCommand
     cdef ScaleCommand scaleCommand
@@ -110,17 +110,20 @@ cdef inline void appendScaledSymbolString(SymbolString *target, SymbolString *so
             i += 0
         elif c in ("+", "-", "&", "^", "\\", "/", "~"):
             rotateCommand = (<RotateCommand*>command)[0]
-            if partialRotations: rotateCommand.angle *= factor
+            if not onlyPartialMoves:
+                rotateCommand.angle *= factor
             appendSymbol(target, c, rotateCommand)
             i += sizeof(RotateCommand)
         elif c in ('"', "!"):
             scaleCommand = (<ScaleCommand*>command)[0]
-            scaleCommand.factor = (1 - factor) * 1 + factor * scaleCommand.factor
+            if not onlyPartialMoves:
+                scaleCommand.factor = (1 - factor) * 1 + factor * scaleCommand.factor
             appendSymbol(target, c, scaleCommand)
             i += sizeof(ScaleCommand)
         elif c == "T":
             tropismCommand = (<TropismCommand*>command)[0]
-            tropismCommand.gravity *= factor
+            if not onlyPartialMoves:
+                tropismCommand.gravity *= factor
             appendSymbol(target, c, tropismCommand)
             i += sizeof(TropismCommand)
         elif c == "F":

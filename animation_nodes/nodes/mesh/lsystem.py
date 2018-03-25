@@ -21,14 +21,16 @@ class LSystemNode(bpy.types.Node, AnimationNode):
         self.newInput("Text", "Axiom", "axiom")
         self.newInput("Text List", "Rules", "rules")
         self.newInput("Float", "Generations", "generations", minValue = 0)
-        self.newInput("Integer", "Seed", "seed")
         self.newInput("Float", "Step Size", "stepSize", value = 1)
         self.newInput("Float", "Angle", "angle", value = 90)
-        self.newInput("Float", "Random Angle", "randomAngle", value = 180)
-        self.newInput("Float", "Scale Step Size", "scaleStepSize", value = 0.9)
-        self.newInput("Float", "Gravity", "gravity", value = 0)
-        self.newInput("Boolean", "Partial Rotations", "partialRotations", value = False)
-        self.newInput("Float", "Width Scale", "widthScale", value = 0.9)
+        self.newInput("Integer", "Seed", "seed")
+
+        self.newInput("Float", "Scale Width", "scaleWidth", value = 0.8, hide = True)
+        self.newInput("Float", "Scale Step Size", "scaleStepSize", value = 0.9, hide = True)
+        self.newInput("Float", "Gravity", "gravity", value = 0, hide = True)
+        self.newInput("Float", "Random Angle", "randomAngle", value = 180, hide = True)
+        self.newInput("Boolean", "Only Partial Moves", "onlyPartialMoves", value = True, hide = True)
+
         self.newOutput("Mesh", "Mesh", "mesh")
         self.newOutput("Float List", "Edge Widths", "edgeWidths")
 
@@ -40,14 +42,14 @@ class LSystemNode(bpy.types.Node, AnimationNode):
         icon = "LAYER_ACTIVE" if self.useSymbolLimit else "LAYER_USED"
         row.prop(self, "useSymbolLimit", text = "", icon = icon)
 
-    def execute(self, axiom, rules, generations, seed, stepSize, angle, randomAngle, scaleStepSize, gravity, partialRotations, widthScale):
+    def execute(self, axiom, rules, generations, stepSize, angle, seed, scaleWidth, scaleStepSize, gravity, randomAngle, onlyPartialMoves):
         defaults = {
             "Step Size" : stepSize,
             "Angle" : angle,
             "Random Angle" : randomAngle,
             "Scale Step Size" : scaleStepSize,
             "Gravity" : gravity,
-            "Width Scale" : widthScale
+            "Scale Width" : scaleWidth
         }
 
         rules = [rule.strip() for rule in rules if len(rule.strip()) > 0]
@@ -56,7 +58,7 @@ class LSystemNode(bpy.types.Node, AnimationNode):
         try:
             vertices, edges, widths = calculateLSystem(
                 axiom, rules, generations, seed, defaults,
-                partialRotations, limit
+                onlyPartialMoves, limit
             )
         except Exception as e:
             self.raiseErrorMessage(str(e))

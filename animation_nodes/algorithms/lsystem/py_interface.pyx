@@ -9,7 +9,7 @@ from . geometry cimport geometryFromSymbolString
 from . parsing cimport parseRuleSet, parseSymbolString
 
 
-def calculateLSystem(axiom, rules, generations, seed, defaults, partialRotations, limit):
+def calculateLSystem(axiom, rules, generations, seed, defaults, onlyPartialMoves = True, limit = None):
     assert generations >= 0
 
     cdef SymbolString _axiom = parseSymbolString(axiom, defaults)
@@ -17,7 +17,7 @@ def calculateLSystem(axiom, rules, generations, seed, defaults, partialRotations
 
     cdef SymbolString symbols = applyGrammarRules(
         _axiom, _ruleSet, generations, randomInteger(seed),
-        partialRotations, limit
+        onlyPartialMoves, limit
     )
 
     freeRuleSet(&_ruleSet)
