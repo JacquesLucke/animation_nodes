@@ -53,6 +53,7 @@ class LSystemNode(bpy.types.Node, AnimationNode):
         col.label("Axiom: " + preset.axiom)
         for i, rule in enumerate(preset.rules):
             col.label("Rule {}: {}".format(i, rule))
+        col.label("Angle: " + str(preset.angle))
 
     def execute(self, axiom, rules, generations, stepSize, angle, seed, scaleWidth, scaleStepSize, gravity, randomAngle, onlyPartialMoves):
         defaults = {
@@ -111,5 +112,18 @@ presets = {
         rules = ["A = F[+FA][-^FA]"],
         angle = 90,
         generations = 4
+    ),
+    "Twin Dragon" : LSystemPreset(
+        axiom = "FX+FX+",
+        rules = ["X = X+YF", "Y = FX-Y"],
+        angle = 90,
+        generations = 9
+    ),
+    "Dragon Curve" : LSystemPreset(
+        axiom = "F1",
+        rules = ["F1 = F1+F2+", "F2 = -F1-F2"],
+        angle = 90,
+        generations = 9
     )
+
 }
