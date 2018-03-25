@@ -3,7 +3,7 @@ cimport cython
 from bpy.props import *
 from ... utils.limits cimport LONG_MIN, LONG_MAX
 from ... data_structures cimport BaseFalloff
-from ... algorithms.random cimport randomNumber_Positive
+from ... algorithms.random cimport randomDouble_Positive
 from ... base_types import AnimationNode
 
 maskTypeItems = [
@@ -77,6 +77,6 @@ cdef class MaskRandomFalloff(BaseFalloff):
 
     @cython.cdivision(True)
     cdef float evaluate(self, void *object, Py_ssize_t index):
-        if randomNumber_Positive(index + self.seed) < self.probability:
+        if randomDouble_Positive(index + self.seed) < self.probability:
             return self.valueA
         return self.valueB

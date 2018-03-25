@@ -5,4 +5,5 @@ from . quaternion cimport Quaternion
 from . vector cimport Vector3
 
 cdef matrixToEuler(Euler3* target, Matrix3_or_Matrix4* m)
-cdef normalizedAxisAngleToMatrix(Matrix3_or_Matrix4* m, Vector3* axis, float angle)
+cdef void normalizedAxisAngleToMatrix(Matrix3_or_Matrix4* m, Vector3* axis, float angle)
+cdef void normalizedAxisCosAngleToMatrix(Matrix3_or_Matrix4* m, Vector3* axis, float cosAngle)
