@@ -165,7 +165,7 @@ cdef class Spline:
 
     def samplePoints(self, FloatList parameters,
                      bint checkRange = True, parameterType = "RESOLUTION"):
-        cdef FloatList _parameters = prepareSampleParameters(parameters, checkRange, parameterType)
+        cdef FloatList _parameters = prepareSampleParameters(self, parameters, checkRange, parameterType)
         cdef Vector3DList result = Vector3DList(length = parameters.length)
         evaluateFunction_Array(self, self.evaluatePoint_LowLevel,
             _parameters.data, result.data, _parameters.length)
@@ -173,7 +173,7 @@ cdef class Spline:
 
     def sampleTangents(self, FloatList parameters,
                        bint checkRange = True, parameterType = "RESOLUTION"):
-        cdef FloatList _parameters = prepareSampleParameters(parameters, checkRange, parameterType)
+        cdef FloatList _parameters = prepareSampleParameters(self, parameters, checkRange, parameterType)
         cdef Vector3DList result = Vector3DList(length = parameters.length)
         evaluateFunction_Array(self, self.evaluateTangent_LowLevel,
             _parameters.data, result.data, _parameters.length)
@@ -190,7 +190,7 @@ cdef class Spline:
 
     def sampleRadii(self, FloatList parameters,
                     bint checkRange = True, parameterType = "RESOLUTION"):
-        cdef FloatList _parameters = prepareSampleParameters(parameters, checkRange, parameterType)
+        cdef FloatList _parameters = prepareSampleParameters(self, parameters, checkRange, parameterType)
         cdef FloatList result = FloatList(length = parameters.length)
         evaluateFunction_Array(self, self.evaluateRadius_LowLevel,
             _parameters.data, result.data, _parameters.length)
@@ -198,7 +198,7 @@ cdef class Spline:
 
     def sampleTilts(self, FloatList parameters,
                     bint checkRange = True, parameterType = "RESOLUTION"):
-        cdef FloatList _parameters = prepareSampleParameters(parameters, checkRange, parameterType)
+        cdef FloatList _parameters = prepareSampleParameters(self, parameters, checkRange, parameterType)
         cdef FloatList result = FloatList(length = parameters.length)
         evaluateFunction_Array(self, self.evaluateTilt_LowLevel,
             _parameters.data, result.data, _parameters.length)
