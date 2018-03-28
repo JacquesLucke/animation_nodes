@@ -1,5 +1,5 @@
 cimport cython
-from . random cimport randomNumber
+from . random cimport randomDouble_UnitRange
 from .. utils.limits cimport INT_MAX
 from .. data_structures cimport Vector3DList
 
@@ -46,12 +46,12 @@ cdef double interpolatedNoise(double x):
     cdef:
         int intX = <int>x
         double fracX = x - intX
-        double v0 = _randomNumber(intX - 2)
-        double v1 = _randomNumber(intX - 1)
-        double v2 = _randomNumber(intX)
-        double v3 = _randomNumber(intX + 1)
-        double v4 = _randomNumber(intX + 2)
-        double v5 = _randomNumber(intX + 3)
+        double v0 = randomDouble_UnitRange(intX - 2)
+        double v1 = randomDouble_UnitRange(intX - 1)
+        double v2 = randomDouble_UnitRange(intX)
+        double v3 = randomDouble_UnitRange(intX + 1)
+        double v4 = randomDouble_UnitRange(intX + 2)
+        double v5 = randomDouble_UnitRange(intX + 3)
 
     return cubicInterpolation(
             v0 / 4.0 + v1 / 2.0 + v2 / 4.0,
@@ -68,8 +68,3 @@ cdef inline double cubicInterpolation(double v0, double v1, double v2, double v3
     s = v1
     x2 = x * x
     return p * x2 * x + q * x2 + r * x + s
-
-cdef inline double _randomNumber(int x):
-    '''Generate a random number between -1 and 1 using a seed'''
-    x = (x<<13) ^ x
-    return 1.0 - ((x * (x * x * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0

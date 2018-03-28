@@ -6,7 +6,7 @@ from ... data_structures cimport (
     Vector3DList, EdgeIndicesList, FloatList, EdgeIndices, Matrix4x4List
 )
 
-from .. random cimport uniformRandomFloat
+from .. random cimport randomFloat_ScaledRange
 
 cdef struct Turtle:
     Matrix3 orientation
@@ -219,9 +219,9 @@ cdef inline void rotateRandom(Turtle *turtle, RotateCommand *command, Py_ssize_t
     cdef Matrix3 rotation
     cdef Euler3 euler
     euler.order = 0
-    euler.x = uniformRandomFloat(seed + 0, -command.angle, command.angle)
-    euler.y = uniformRandomFloat(seed + 1, -command.angle, command.angle)
-    euler.z = uniformRandomFloat(seed + 2, -command.angle, command.angle)
+    euler.x = randomFloat_ScaledRange(seed + 0, command.angle)
+    euler.y = randomFloat_ScaledRange(seed + 1, command.angle)
+    euler.z = randomFloat_ScaledRange(seed + 2, command.angle)
     setRotationMatrix(&rotation, &euler)
     transformOrientation_Local(turtle, &rotation)
 
