@@ -66,7 +66,7 @@ cdef applyGrammarRules_Single(
                 elif c == "f":
                     appendSymbol(target, c, (<MoveForwardNoGeoCommand*>command)[0])
                     i += sizeof(MoveForwardNoGeoCommand)
-                elif c in ("A", "B", "X", "Y", "Z"):
+                elif c in ("A", "B", "X", "Y", "Z", "J", "K", "M"):
                     appendNoArgSymbol(target, c)
             else:
                 if isFullGeneration:
@@ -136,5 +136,5 @@ cdef inline void appendScaledSymbolString(SymbolString *target, SymbolString *so
             moveForwardNoGeoCommand.distance *= factor
             appendSymbol(target, c, moveForwardNoGeoCommand)
             i += sizeof(MoveForwardNoGeoCommand)
-        elif c in ("A", "B", "X", "Y", "Z"):
+        elif c in ("A", "B", "X", "Y", "Z", "J", "K", "M"):
             appendNoArgSymbol(target, c)

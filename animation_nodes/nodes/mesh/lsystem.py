@@ -37,6 +37,9 @@ class LSystemNode(bpy.types.Node, AnimationNode):
 
         self.newOutput("Mesh", "Mesh", "mesh")
         self.newOutput("Float List", "Edge Widths", "edgeWidths")
+        self.newOutput("Matrix List", "J", "statesJ", hide = True)
+        self.newOutput("Matrix List", "K", "statesK", hide = True)
+        self.newOutput("Matrix List", "M", "statesM", hide = True)
 
     def drawAdvanced(self, layout):
         row = layout.row(align = True)
@@ -69,7 +72,7 @@ class LSystemNode(bpy.types.Node, AnimationNode):
         limit = self.symbolLimit if self.useSymbolLimit else None
 
         try:
-            vertices, edges, widths = calculateLSystem(
+            vertices, edges, widths, statesJ, statesK, statesM = calculateLSystem(
                 axiom, rules, generations, seed, defaults,
                 onlyPartialMoves, limit
             )
@@ -78,7 +81,7 @@ class LSystemNode(bpy.types.Node, AnimationNode):
 
         mesh = Mesh(vertices, edges, skipValidation = True)
         widths = DoubleList.fromValues(widths)
-        return mesh, widths
+        return mesh, widths, statesJ, statesK, statesM
 
 
 class LSystemPreset:

@@ -27,10 +27,10 @@ def calculateLSystem(axiom, rules, generations, seed, defaults, onlyPartialMoves
         "Angle" : radians(defaults["Angle"])
     }
 
-    vertices, edges, widths = geometryFromSymbolString(
+    vertices, edges, widths, statesJ, statesK, statesM = geometryFromSymbolString(
         symbols, randomInteger(seed + 1), geometryDefaults
     )
 
     freeSymbolString(&symbols)
 
-    return vertices, edges, widths
+    return vertices, edges, widths, statesJ, statesK, statesM

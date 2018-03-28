@@ -37,7 +37,7 @@ cdef SymbolString parseSymbolString(str source, dict defaults) except *:
             size = parse_Scale(&symbols, source, i, c, defaults["Scale Width"])
         elif c == "T":
             size = parse_Tropism(&symbols, source, i, defaults["Gravity"])
-        elif c in ("A", "B", "X", "Y", "Z"):
+        elif c in ("A", "B", "X", "Y", "Z", "J", "K", "M"):
             size = parse_SingleLetter(&symbols, c)
         elif c == " ":
             size = 1

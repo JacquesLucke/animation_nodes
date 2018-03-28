@@ -3,7 +3,7 @@ from cpython cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
 from ... math cimport *
 from . symbol_string cimport *
 from ... data_structures cimport (
-    Vector3DList, EdgeIndicesList, FloatList, EdgeIndices
+    Vector3DList, EdgeIndicesList, FloatList, EdgeIndices, Matrix4x4List
 )
 
 from .. random cimport uniformRandomFloat
@@ -53,6 +53,10 @@ cdef geometryFromSymbolString(SymbolString symbols, Py_ssize_t seed = 0, dict de
     cdef Vector3DList vertices = Vector3DList()
     cdef EdgeIndicesList edges = EdgeIndicesList()
     cdef FloatList widths = FloatList()
+
+    cdef Matrix4x4List statesJ = Matrix4x4List()
+    cdef Matrix4x4List statesK = Matrix4x4List()
+    cdef Matrix4x4List statesM = Matrix4x4List()
 
     cdef char c
     cdef void *command
@@ -105,6 +109,12 @@ cdef geometryFromSymbolString(SymbolString symbols, Py_ssize_t seed = 0, dict de
         elif c == "T":
             applyTropism(turtle, <TropismCommand*>command)
             i += sizeof(TropismCommand)
+        elif c == "J":
+            storeTurtleState(turtle, statesJ)
+        elif c == "K":
+            storeTurtleState(turtle, statesK)
+        elif c == "M":
+            storeTurtleState(turtle, statesM)
         elif c in ("A", "B", "X", "Y", "Z"):
             pass
         else:
@@ -121,7 +131,19 @@ cdef geometryFromSymbolString(SymbolString symbols, Py_ssize_t seed = 0, dict de
         _turtle = popTurtle(&availableStack)
         freeTurtle(&_turtle)
 
-    return vertices, edges, widths
+    return vertices, edges, widths, statesJ, statesK, statesM
+
+cdef inline void storeTurtleState(Turtle *turtle, Matrix4x4List matrices):
+    cdef float size = turtle.stepSize
+    cdef Matrix3 *s = &turtle.orientation
+    cdef Matrix4 t
+
+    t.a11, t.a12, t.a13, t.a14 = s.a11 * size, s.a12 * size, s.a13 * size, turtle.position.x
+    t.a21, t.a22, t.a23, t.a24 = s.a21 * size, s.a22 * size, s.a23 * size, turtle.position.y
+    t.a31, t.a32, t.a33, t.a34 = s.a31 * size, s.a32 * size, s.a33 * size, turtle.position.z
+    t.a41, t.a42, t.a43, t.a44 = 0, 0, 0, 1
+
+    matrices.append_LowLevel(t)
 
 cdef inline void moveForward_Geo(Turtle *turtle, MoveForwardGeoCommand *command,
         Vector3DList vertices, EdgeIndicesList edges, FloatList widths):
