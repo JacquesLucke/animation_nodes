@@ -5,9 +5,9 @@ from ... data_structures import FloatList
 from ... utils.names import getRandomString
 from ... tree_info import getNodeByIdentifier
 from ... base_types import AnimationNode
-from ... utils.blender_ui import getDpiFactor
 from ... utils.path import getAbsolutePathOfSound
 from ... utils.fcurve import getSingleFCurveWithDataPath
+from ... utils.blender_ui import getDpiFactor, executeInAreaType
 from ... utils.sequence_editor import getOrCreateSequencer, getEmptyChannel
 
 class SoundFrequencyRange(bpy.types.PropertyGroup):
@@ -313,8 +313,9 @@ class BakeSpectrumData(bpy.types.Operator):
 def bake(sound, low = 0.0, high = 100000, attack = 0.005, release = 0.2):
     '''Returns a float list containing the sampled data'''
     object = createObjectWithFCurveAsTarget()
+
+    oldAreaType = switchArea("GRAPH_EDITOR")
     oldFrame = setCurrentFrame(0)
-    oldArea = switchArea("GRAPH_EDITOR")
     usedUnpacking, filepath = getRealFilePath(sound)
 
     bpy.ops.graph.sound_bake(
@@ -328,10 +329,13 @@ def bake(sound, low = 0.0, high = 100000, attack = 0.005, release = 0.2):
     soundData = getSamplesFromFCurve(object)
     removeObject(object)
     setCurrentFrame(oldFrame)
-    switchArea(oldArea)
+    switchArea(oldAreaType)
     return soundData
 
+@executeInAreaType("VIEW_3D")
 def createObjectWithFCurveAsTarget():
+    if getattr(bpy.context.active_object, "mode", "OBJECT") != "OBJECT":
+        bpy.ops.object.mode_set(mode = "OBJECT")
     bpy.ops.object.add()
     object = bpy.context.active_object
     object.keyframe_insert(frame = 0, data_path = "location", index = 0)
