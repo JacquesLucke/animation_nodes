@@ -20,3 +20,6 @@ class SelectionPie(bpy.types.Menu, PieMenuHelper):
 
     def drawBottom(self, layout):
         layout.operator("an.select_network")
+
+    def drawTop(self, layout):
+        layout.operator("an.frame_active_network")
