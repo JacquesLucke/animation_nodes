@@ -58,7 +58,7 @@ def drawNodeTreeChooser(layout, context):
 @makeOperator("an.create_node_tree", "Create Node Tree")
 def createNodeTree():
     tree = bpy.data.node_groups.new("AN Tree", "an_AnimationNodeTree")
-    bpy.context.space_data.node_tree = tree;
+    bpy.context.space_data.node_tree = tree
 
 class NumberMenu(bpy.types.Menu):
     bl_idname = "an_number_menu"
@@ -369,7 +369,6 @@ class MeshMenu(bpy.types.Menu):
         layout.menu("an_mesh_operators_menu", text = "Operators")
         layout.separator()
         insertNode(layout, "an_CreateListNode", "Mesh List", {"assignedType" : repr("Mesh")})
-        insertNode(layout, "an_MeshFromObjectNode", "Mesh from Object")
         insertNode(layout, "an_JoinMeshListNode", "Join Mesh List")
         insertNode(layout, "an_BMeshMeshNode", "BMesh Mesh")
         insertNode(layout, "an_CreateBMeshFromMeshNode", "BMesh from Mesh")
