@@ -148,11 +148,12 @@ if "test_compile" not in globals():
         "  2. If you are on windows you can try to install a library called\n"
         "     'Visual C++ 2015 Redistributable'. Should be easy to find using\n"
         "     your search engine of choice.\n"
-        "  3. It is possible that you have a build for the correct platform\n"
+        "  3. Try to use an official Blender release downloaded from blender.org.\n"
+        "  4. It is possible that you have a build for the correct platform\n"
         "     but it still does not work. We experienced this mainly on linux.\n"
         "     Try to find another build for your platform.\n"
         "     If it still does not work, you have to compile AN yourself.\n"
-        "  4. Make a bug report on Github and give as much information\n"
+        "  5. Make a bug report on Github and give as much information\n"
         "     as you can. Specifically the full error message, your OS, version, ...")
     raise Exception(message)
 
