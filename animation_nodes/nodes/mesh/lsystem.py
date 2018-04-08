@@ -37,6 +37,7 @@ class LSystemNode(bpy.types.Node, AnimationNode):
 
         self.newOutput("Mesh", "Mesh", "mesh")
         self.newOutput("Float List", "Edge Widths", "edgeWidths")
+        self.newOutput("Text", "Symbols", "symbols")
         self.newOutput("Matrix List", "J", "statesJ", hide = True)
         self.newOutput("Matrix List", "K", "statesK", hide = True)
         self.newOutput("Matrix List", "M", "statesM", hide = True)
@@ -72,7 +73,7 @@ class LSystemNode(bpy.types.Node, AnimationNode):
         limit = self.symbolLimit if self.useSymbolLimit else None
 
         try:
-            vertices, edges, widths, statesJ, statesK, statesM = calculateLSystem(
+            vertices, edges, widths, finalSymbols, statesJ, statesK, statesM = calculateLSystem(
                 axiom, rules, generations, seed, defaults,
                 onlyPartialMoves, limit
             )
@@ -81,7 +82,9 @@ class LSystemNode(bpy.types.Node, AnimationNode):
 
         mesh = Mesh(vertices, edges, skipValidation = True)
         widths = DoubleList.fromValues(widths)
-        return mesh, widths, statesJ, statesK, statesM
+        symbols = finalSymbols.toString() if self.outputs["Symbols"].isLinked else ""
+
+        return mesh, widths, symbols, statesJ, statesK, statesM
 
 
 class LSystemPreset:

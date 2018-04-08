@@ -2,7 +2,7 @@ from math import radians
 from .. random cimport randomInteger
 
 from . rule cimport RuleSet, freeRuleSet
-from . symbol_string cimport SymbolString, freeSymbolString
+from . symbol_string cimport SymbolString, freeSymbolString, LSystemSymbolString
 
 from . apply_rules cimport applyGrammarRules
 from . geometry cimport geometryFromSymbolString
@@ -31,6 +31,6 @@ def calculateLSystem(axiom, rules, generations, seed, defaults, onlyPartialMoves
         symbols, randomInteger(seed + 1), geometryDefaults
     )
 
-    freeSymbolString(&symbols)
+    outputSymbols = LSystemSymbolString.fromSymbolString(symbols)
 
-    return vertices, edges, widths, statesJ, statesK, statesM
+    return vertices, edges, widths, outputSymbols, statesJ, statesK, statesM

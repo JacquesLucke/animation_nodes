@@ -6,6 +6,13 @@ cdef struct SymbolString:
     Py_ssize_t length
     Py_ssize_t capacity
 
+cdef class LSystemSymbolString:
+    cdef SymbolString symbols
+
+    @staticmethod
+    cdef fromSymbolString(SymbolString symbols)
+
+
 cdef struct NoArgCommand:
     char dummy
 cdef struct MoveForwardGeoCommand:
