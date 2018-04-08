@@ -69,9 +69,9 @@ class ForestData:
                 chainedSockets = chain(node.inputs, node.outputs)
                 chainedSocketIDs = chain(inputIDs, outputIDs)
                 for socket, socketID in zip(chainedSockets, chainedSocketIDs):
-                        dataTypeBySocket[socketID] = socket.dataType
-                        if hasattr(socket, "updateProperty"):
-                            socketsThatNeedUpdate.add(socketID)
+                    dataTypeBySocket[socketID] = socket.dataType
+                    if hasattr(socket, "updateProperty"):
+                        socketsThatNeedUpdate.add(socketID)
 
 
     def insertLinks(self, links, treeName):
