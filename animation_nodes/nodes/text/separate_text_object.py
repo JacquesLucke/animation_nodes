@@ -3,6 +3,7 @@ import random
 from bpy.props import *
 from mathutils import Vector, Matrix
 from ... base_types import AnimationNode
+from ... utils.objects import enterObjectMode
 from ... nodes.container_provider import getMainObjectContainer
 from ... utils.blender_ui import executeInAreaType, iterActiveSpacesByType
 
@@ -143,7 +144,10 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
     def duplicate(self, sourceNode):
         self.createNewNodeID()
 
+@executeInAreaType("VIEW_3D")
 def splitTextObject(sourceObject):
+    enterObjectMode()
+
     objects = []
     # each character can consist of multiple splines
     # but the splines for one character are in a specific order
@@ -210,11 +214,9 @@ def newCurveFromActiveObject():
     bpy.ops.object.convert(target = "CURVE", keep_original = True)
     return bpy.context.scene.objects.active
 
-@executeInAreaType("VIEW_3D")
 def convertSelectedObjects(type = "MESH"):
     bpy.ops.object.convert(target = type)
 
-@executeInAreaType("VIEW_3D")
 def setOriginType(type = "ORIGIN_GEOMETRY"):
     bpy.ops.object.origin_set(type = type)
 

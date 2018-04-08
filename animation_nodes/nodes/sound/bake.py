@@ -5,6 +5,8 @@ from ... data_structures import FloatList
 from ... utils.names import getRandomString
 from ... tree_info import getNodeByIdentifier
 from ... base_types import AnimationNode
+
+from ... utils.objects import enterObjectMode
 from ... utils.path import getAbsolutePathOfSound
 from ... utils.fcurve import getSingleFCurveWithDataPath
 from ... utils.blender_ui import getDpiFactor, executeInAreaType
@@ -334,8 +336,7 @@ def bake(sound, low = 0.0, high = 100000, attack = 0.005, release = 0.2):
 
 @executeInAreaType("VIEW_3D")
 def createObjectWithFCurveAsTarget():
-    if getattr(bpy.context.active_object, "mode", "OBJECT") != "OBJECT":
-        bpy.ops.object.mode_set(mode = "OBJECT")
+    enterObjectMode()
     bpy.ops.object.add()
     object = bpy.context.active_object
     object.keyframe_insert(frame = 0, data_path = "location", index = 0)
