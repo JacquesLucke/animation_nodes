@@ -360,6 +360,7 @@ class MeshMenu(bpy.types.Menu):
         layout = self.layout
         insertNode(layout, "an_MeshObjectInputNode", "Mesh Input")
         insertNode(layout, "an_ObjectBoundingBoxNode", "Get Bounding Box")
+        insertNode(layout, "an_CombineMeshNode", "Combine Mesh")
         insertNode(layout, "an_VertexGroupInputNode", "Vertex Group Input")
         layout.separator()
         insertNode(layout, "an_OffsetPolygonsNode", "Offset Polygons")
