@@ -43,3 +43,18 @@ cdef symbolsToPyString(SymbolString symbols):
             raise Exception("unknown opcode")
 
     return chars.data[:chars.length].decode("UTF-8")
+
+
+cdef char commandLengths[256]
+memset(commandLengths, 0, 256)
+for symbols, size in {
+        ("+", "-", "&", "^", "\\", "/", "~") : sizeof(RotateCommand),
+        ('"', "!") : sizeof(ScaleCommand),
+        ("F", ) : sizeof(MoveForwardGeoCommand),
+        ("f", ) : sizeof(MoveForwardNoGeoCommand),
+        ("T", ) : sizeof(TropismCommand)}.items():
+    for symbol in symbols:
+        commandLengths[ord(symbol)] = size
+
+cdef char *getCommandLengthsArray():
+    return commandLengths

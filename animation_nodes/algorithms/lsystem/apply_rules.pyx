@@ -1,9 +1,42 @@
-cdef SymbolString applyGrammarRules(SymbolString axiom, RuleSet rules, float generations, int seed = 0,
-                                    bint onlyPartialMoves = True, symbolLimit = None) except *:
+from libc.math cimport floor
+from cpython cimport PyMem_Malloc, PyMem_Free
+from ... data_structures cimport IntegerList
+from ... algorithms.random cimport randomInteger
+
+
+usedAlgorithm = ["Recursive", "Layered"][0]
+cdef char *commandLengths = getCommandLengthsArray()
+
+cdef SymbolString applyGrammarRules(SymbolString axiom, RuleSet ruleSet, float generations,
+        int seed = 0, bint onlyPartialMoves = True, symbolLimit = None) except *:
+
+    cdef Py_ssize_t usedSymbolLimit
+    if symbolLimit is None:
+        usedSymbolLimit = 2 ** (sizeof(Py_ssize_t) * 8 - 1) - 1
+    else:
+        usedSymbolLimit = symbolLimit
+
+    if usedAlgorithm == "Layered":
+        return applyGrammarRules_Layered(axiom, ruleSet, generations, seed, usedSymbolLimit, onlyPartialMoves)
+    elif usedAlgorithm == "Recursive":
+        return applyGrammarRules_Recursive(axiom, ruleSet, generations, seed, usedSymbolLimit, onlyPartialMoves)
+    else:
+        raise Exception("unknown algorithm")
+
+
+
+# Algorithm 1: Layered
+#
+# Calculate generations one after the other.
+###############################################################
+
+cdef SymbolString applyGrammarRules_Layered(SymbolString source, RuleSet ruleSet,
+        float generations, int seed, Py_ssize_t symbolLimit, bint onlyPartialMoves = True) except *:
+
     cdef SymbolString currentGen
     cdef SymbolString nextGen
 
-    copySymbolString(&currentGen, &axiom)
+    copySymbolString(&currentGen, &source)
 
     if generations <= 0:
         return currentGen
@@ -12,7 +45,7 @@ cdef SymbolString applyGrammarRules(SymbolString axiom, RuleSet rules, float gen
 
     for i in range(int(generations)):
         resetSymbolString(&nextGen)
-        applyGrammarRules_Single(currentGen, rules, &nextGen, seed)
+        applyGrammarRules_FullGeneration(currentGen, ruleSet, &nextGen, seed)
         currentGen, nextGen = nextGen, currentGen
 
         if symbolLimit is not None and currentGen.length >= symbolLimit:
@@ -22,82 +55,158 @@ cdef SymbolString applyGrammarRules(SymbolString axiom, RuleSet rules, float gen
 
     if generations % 1 != 0:
         resetSymbolString(&nextGen)
-        applyGrammarRules_Single(currentGen, rules, &nextGen, seed, generations % 1, onlyPartialMoves)
+        applyGrammarRules_PartialGeneration(currentGen, ruleSet, &nextGen, seed, generations % 1, onlyPartialMoves)
         currentGen, nextGen = nextGen, currentGen
 
     freeSymbolString(&nextGen)
     return currentGen
 
-cdef applyGrammarRules_Single(
-        SymbolString source, RuleSet ruleSet, SymbolString *target, int seed,
-        float generationPart = 1, bint onlyPartialMoves = True):
-    assert 0 <= generationPart <= 1
-
-    cdef SymbolString *replacement
-    cdef MoveForwardGeoCommand moveForwardGeoCommand
-    cdef MoveForwardNoGeoCommand moveForwardNoGeoCommand
-
+cdef applyGrammarRules_FullGeneration(SymbolString source, RuleSet ruleSet, SymbolString *target, int seed):
     cdef Py_ssize_t i = 0
     cdef unsigned char c
     cdef void *command
-    cdef bint isFullGeneration = generationPart == 1
+    cdef RuleResultType ruleResult
+    cdef SymbolString *replacement
+
     while i < source.length:
         c = source.data[i]
         i += 1
         command = source.data + i
-        if c in ("[", "]"):
-            appendNoArgSymbol(target, c)
-            i += 0
-        elif c in ("+", "-", "&", "^", "\\", "/", "~"):
-            appendSymbol(target, c, (<RotateCommand*>command)[0])
-            i += sizeof(RotateCommand)
-        elif c in ('"', "!"):
-            appendSymbol(target, c, (<ScaleCommand*>command)[0])
-            i += sizeof(ScaleCommand)
-        elif c == "T":
-            appendSymbol(target, c, (<TropismCommand*>command)[0])
-            i += sizeof(TropismCommand)
-        else:
-            replacement = getReplacement(&ruleSet, c, command, seed)
-            if replacement == NULL:
-                if c == "F":
-                    appendSymbol(target, c, (<MoveForwardGeoCommand*>command)[0])
-                    i += sizeof(MoveForwardGeoCommand)
-                elif c == "f":
-                    appendSymbol(target, c, (<MoveForwardNoGeoCommand*>command)[0])
-                    i += sizeof(MoveForwardNoGeoCommand)
-                elif c in ("A", "B", "X", "Y", "Z", "J", "K", "M"):
-                    appendNoArgSymbol(target, c)
-            else:
-                if isFullGeneration:
-                    appendSymbolString(target, replacement)
-                    if c == "F":
-                        i += sizeof(MoveForwardGeoCommand)
-                    elif c == "f":
-                        i += sizeof(MoveForwardNoGeoCommand)
-                else:
-                    if c == "F":
-                        moveForwardGeoCommand = (<MoveForwardGeoCommand*>command)[0]
-                        moveForwardGeoCommand.distance *= 1 - generationPart
-                        appendSymbol(target, c, moveForwardGeoCommand)
-                        i += sizeof(MoveForwardGeoCommand)
-                    elif c == "f":
-                        moveForwardNoGeoCommand = (<MoveForwardNoGeoCommand*>command)[0]
-                        moveForwardNoGeoCommand.distance *= 1 - generationPart
-                        appendSymbol(target, c, moveForwardNoGeoCommand)
-                        i += sizeof(MoveForwardNoGeoCommand)
-                    appendScaledSymbolString(target, replacement, generationPart, onlyPartialMoves)
+        i += commandLengths[c]
 
+        ruleResult = getReplacement(&replacement, &ruleSet, c, command, seed)
+        if ruleResult in (RuleResultType.PassOn, RuleResultType.Keep):
+            appendSingleSymbol(target, c, command, commandLengths[c])
+        else:
+            appendSymbolString(target, replacement)
 
         seed += 4321
 
-cdef inline void appendScaledSymbolString(SymbolString *target, SymbolString *source, float factor, bint onlyPartialMoves):
-    cdef TropismCommand tropismCommand
-    cdef RotateCommand rotateCommand
-    cdef ScaleCommand scaleCommand
-    cdef MoveForwardGeoCommand moveForwardGeoCommand
-    cdef MoveForwardNoGeoCommand moveForwardNoGeoCommand
+cdef applyGrammarRules_PartialGeneration(SymbolString source, RuleSet ruleSet, SymbolString *target, int seed,
+        float part, bint onlyPartialMoves = True):
+    cdef Py_ssize_t i = 0
+    cdef unsigned char c
+    cdef void *command
+    cdef RuleResultType ruleResult
+    cdef SymbolString *replacement
 
+    while i < source.length:
+        c = source.data[i]
+        i += 1
+        command = source.data + i
+        i += commandLengths[c]
+
+        ruleResult = getReplacement(&replacement, &ruleSet, c, command, seed)
+        if ruleResult in (RuleResultType.PassOn, RuleResultType.Keep):
+            appendSingleSymbol(target, c, command, commandLengths[c])
+        else:
+            if c in ("F", "f"):
+                appendUnknownPartialSymbol(target, c, command, 1 - part, onlyPartialMoves)
+            appendPartialSymbolString(target, replacement, part, onlyPartialMoves)
+
+        seed += 4321
+
+
+
+# Algorithm 2: Recursive
+#
+# Mixed calculation of all generations using left recursion.
+# Benefit: Symbols that will definitely not change, will not be checked again.
+###############################################################################
+
+cdef SymbolString applyGrammarRules_Recursive(
+        SymbolString source, RuleSet ruleSet, float generations,
+        int seed, Py_ssize_t symbolLimit, bint onlyPartialMoves = True) except *:
+
+    cdef SymbolString target
+    initSymbolString(&target)
+
+    if generations == 0:
+        appendSymbolString(&target, &source)
+        return target
+
+    cdef int fullGenerations = <int>floor(generations)
+    cdef float partialGeneration = generations % 1
+    cdef int stackSize = 1 + fullGenerations - bool(partialGeneration == 0)
+
+    # create stack of SymbolStrings to simulate recursion
+    # the top of the stack will contain the source symbols
+    cdef SymbolString *stack = <SymbolString*>PyMem_Malloc(sizeof(SymbolString) * stackSize)
+    copySymbolString(stack + 0, &source)
+    cdef Py_ssize_t i
+    for i in range(1, stackSize):
+        initSymbolString(stack + i)
+
+    # one index per generation -> index of symbol that is evaluated atm
+    cdef int *indices = <int*>PyMem_Malloc(sizeof(int) * stackSize)
+    memset(indices, 0, sizeof(int) * stackSize)
+
+    # one seed per generation to make growing possible
+    cdef int *seeds = <int*>PyMem_Malloc(sizeof(int) * stackSize)
+    for i in range(stackSize):
+        seeds[i] = randomInteger(seed * 3421 + i)
+
+    cdef void *command
+    cdef unsigned char c
+    cdef int currentGen = 0
+    cdef RuleResultType ruleResult
+    cdef SymbolString *replacement
+
+    while currentGen > 0 or indices[0] < stack[0].length:
+        c = stack[currentGen].data[indices[currentGen]]
+        indices[currentGen] += 1
+
+        command = stack[currentGen].data + indices[currentGen]
+        indices[currentGen] += commandLengths[c]
+
+        ruleResult = getReplacement(&replacement, &ruleSet, c, command, seeds[currentGen])
+        seeds[currentGen] += 1
+
+        if currentGen < stackSize - 1: # currently not in the last generation
+            if ruleResult == RuleResultType.Keep:
+                appendSingleSymbol(&target, c, command, commandLengths[c])
+            else:
+                currentGen += 1
+                resetSymbolString(stack + currentGen)
+                indices[currentGen] = 0
+                if ruleResult == RuleResultType.PassOn:
+                    appendSingleSymbol(stack + currentGen, c, command, commandLengths[c])
+                else:
+                    appendSymbolString(stack + currentGen, replacement)
+        else: # last generation
+            if partialGeneration > 0: # partial last generation
+                if ruleResult in (RuleResultType.Keep, RuleResultType.PassOn):
+                    appendSingleSymbol(&target, c, command, commandLengths[c])
+                else:
+                    if c in ("F", "f"):
+                        appendUnknownPartialSymbol(&target, c, command, 1 - partialGeneration, onlyPartialMoves)
+                    appendPartialSymbolString(&target, replacement, partialGeneration, onlyPartialMoves)
+            else: # complete last generation
+                if ruleResult in (RuleResultType.Keep, RuleResultType.PassOn):
+                    appendSingleSymbol(&target, c, command, commandLengths[c])
+                else:
+                    appendSymbolString(&target, replacement)
+
+        while stack[currentGen].length == indices[currentGen]:
+            currentGen -= 1
+
+        if target.length > symbolLimit:
+            raise Exception("Symbol limit reached. You have to increase it to make more complex objects.")
+
+    for i in range(fullGenerations):
+        freeSymbolString(stack + i)
+    PyMem_Free(stack)
+    PyMem_Free(seeds)
+    PyMem_Free(indices)
+
+    return target
+
+
+
+# Partial Symbol Utilities
+#################################################
+
+cdef inline void appendPartialSymbolString(SymbolString *target, SymbolString *source, float part, bint onlyPartialMoves):
     cdef Py_ssize_t i = 0
     cdef unsigned char c
     cdef void *command
@@ -105,36 +214,22 @@ cdef inline void appendScaledSymbolString(SymbolString *target, SymbolString *so
         c = source.data[i]
         i += 1
         command = source.data + i
-        if c in ("[", "]"):
-            appendNoArgSymbol(target, c)
-            i += 0
-        elif c in ("+", "-", "&", "^", "\\", "/", "~"):
-            rotateCommand = (<RotateCommand*>command)[0]
-            if not onlyPartialMoves:
-                rotateCommand.angle *= factor
-            appendSymbol(target, c, rotateCommand)
-            i += sizeof(RotateCommand)
-        elif c in ('"', "!"):
-            scaleCommand = (<ScaleCommand*>command)[0]
-            if not onlyPartialMoves:
-                scaleCommand.factor = (1 - factor) * 1 + factor * scaleCommand.factor
-            appendSymbol(target, c, scaleCommand)
-            i += sizeof(ScaleCommand)
-        elif c == "T":
-            tropismCommand = (<TropismCommand*>command)[0]
-            if not onlyPartialMoves:
-                tropismCommand.gravity *= factor
-            appendSymbol(target, c, tropismCommand)
-            i += sizeof(TropismCommand)
-        elif c == "F":
-            moveForwardGeoCommand = (<MoveForwardGeoCommand*>command)[0]
-            moveForwardGeoCommand.distance *= factor
-            appendSymbol(target, c, moveForwardGeoCommand)
-            i += sizeof(MoveForwardGeoCommand)
-        elif c == "f":
-            moveForwardNoGeoCommand = (<MoveForwardNoGeoCommand*>command)[0]
-            moveForwardNoGeoCommand.distance *= factor
-            appendSymbol(target, c, moveForwardNoGeoCommand)
-            i += sizeof(MoveForwardNoGeoCommand)
-        elif c in ("A", "B", "X", "Y", "Z", "J", "K", "M"):
-            appendNoArgSymbol(target, c)
+        i += commandLengths[c]
+        appendUnknownPartialSymbol(target, c, command, part, onlyPartialMoves)
+
+cdef inline void appendUnknownPartialSymbol(SymbolString *symbols, unsigned char opcode,
+        void *command, float part, bint onlyPartialMoves):
+    if opcode == "F":
+        appendPartialSymbol(symbols, opcode, (<MoveForwardGeoCommand*>command)[0], part, onlyPartialMoves)
+    elif opcode == "f":
+        appendPartialSymbol(symbols, opcode, (<MoveForwardNoGeoCommand*>command)[0], part, onlyPartialMoves)
+    elif opcode in ("[", "]"):
+        appendPartialSymbol(symbols, opcode, (<NoArgCommand*>command)[0], part, onlyPartialMoves)
+    elif opcode in ("+", "-", "&", "^", "\\", "/", "~"):
+        appendPartialSymbol(symbols, opcode, (<RotateCommand*>command)[0], part, onlyPartialMoves)
+    elif opcode in ('"', "!"):
+        appendPartialSymbol(symbols, opcode, (<ScaleCommand*>command)[0], part, onlyPartialMoves)
+    elif opcode == "T":
+        appendPartialSymbol(symbols, opcode, (<TropismCommand*>command)[0], part, onlyPartialMoves)
+    elif opcode in ("A", "B", "X", "Y", "Z", "J", "K", "M"):
+        appendPartialSymbol(symbols, opcode, (<NoArgCommand*>command)[0], part, onlyPartialMoves)

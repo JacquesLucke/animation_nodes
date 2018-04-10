@@ -27,7 +27,16 @@ cdef struct RuleSet:
     Rule **rules
     unsigned char *lengths
 
-cdef inline SymbolString *getReplacement(RuleSet *ruleSet, unsigned char symbol, void *command, int seed):
+cdef enum RuleResultType:
+    Replaced
+    PassOn
+    Keep
+
+
+cdef inline RuleResultType getReplacement(SymbolString **replacement, RuleSet *ruleSet, unsigned char symbol, void *command, int seed):
+    if ruleSet.lengths[symbol] == 0:
+        return RuleResultType.Keep
+
     cdef Py_ssize_t i
     cdef Rule *rule
     cdef float randomNumber
@@ -39,13 +48,14 @@ cdef inline SymbolString *getReplacement(RuleSet *ruleSet, unsigned char symbol,
                 continue
 
         if rule.flags & RULE_HAS_PROBABILITY:
-            randomNumber = randomFloat_Positive(seed+i)
+            randomNumber = randomFloat_Positive(seed + i)
             if randomNumber > rule.probability:
                 continue
 
-        return &rule.replacement
+        replacement[0] = &rule.replacement
+        return RuleResultType.Replaced
     else:
-        return NULL
+        return RuleResultType.PassOn
 
 cdef inline initRule(Rule *rule):
     memset(rule, 0, sizeof(Rule))
