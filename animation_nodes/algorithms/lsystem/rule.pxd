@@ -40,6 +40,7 @@ cdef inline RuleResultType getReplacement(SymbolString **replacement, RuleSet *r
     cdef Py_ssize_t i
     cdef Rule *rule
     cdef float randomNumber
+    cdef bint probabilityFailed = False
     for i in range(ruleSet.lengths[symbol]):
         rule = ruleSet.rules[symbol] + i
 
@@ -50,12 +51,16 @@ cdef inline RuleResultType getReplacement(SymbolString **replacement, RuleSet *r
         if rule.flags & RULE_HAS_PROBABILITY:
             randomNumber = randomFloat_Positive(seed + i)
             if randomNumber > rule.probability:
+                probabilityFailed = True
                 continue
 
         replacement[0] = &rule.replacement
         return RuleResultType.Replaced
     else:
-        return RuleResultType.PassOn
+        if probabilityFailed:
+            return RuleResultType.PassOn
+        else:
+            return RuleResultType.Keep
 
 cdef inline initRule(Rule *rule):
     memset(rule, 0, sizeof(Rule))
