@@ -29,13 +29,13 @@ cdef struct RuleSet:
 
 cdef enum RuleResultType:
     Replaced
-    PassOn
-    Keep
+    CanChange
+    WillNotChange
 
 
 cdef inline RuleResultType getReplacement(SymbolString **replacement, RuleSet *ruleSet, unsigned char symbol, void *command, int seed):
     if ruleSet.lengths[symbol] == 0:
-        return RuleResultType.Keep
+        return RuleResultType.WillNotChange
 
     cdef Py_ssize_t i
     cdef Rule *rule
@@ -58,9 +58,9 @@ cdef inline RuleResultType getReplacement(SymbolString **replacement, RuleSet *r
         return RuleResultType.Replaced
     else:
         if probabilityFailed:
-            return RuleResultType.PassOn
+            return RuleResultType.CanChange
         else:
-            return RuleResultType.Keep
+            return RuleResultType.WillNotChange
 
 cdef inline initRule(Rule *rule):
     memset(rule, 0, sizeof(Rule))

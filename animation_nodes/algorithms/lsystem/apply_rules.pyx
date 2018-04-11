@@ -75,7 +75,7 @@ cdef applyGrammarRules_FullGeneration(SymbolString source, RuleSet ruleSet, Symb
         i += commandLengths[c]
 
         ruleResult = getReplacement(&replacement, &ruleSet, c, command, seed)
-        if ruleResult in (RuleResultType.PassOn, RuleResultType.Keep):
+        if ruleResult in (RuleResultType.CanChange, RuleResultType.WillNotChange):
             appendSingleSymbol(target, c, command, commandLengths[c])
         else:
             appendSymbolString(target, replacement)
@@ -97,7 +97,7 @@ cdef applyGrammarRules_PartialGeneration(SymbolString source, RuleSet ruleSet, S
         i += commandLengths[c]
 
         ruleResult = getReplacement(&replacement, &ruleSet, c, command, seed)
-        if ruleResult in (RuleResultType.PassOn, RuleResultType.Keep):
+        if ruleResult in (RuleResultType.CanChange, RuleResultType.WillNotChange):
             appendSingleSymbol(target, c, command, commandLengths[c])
         else:
             if c in ("F", "f"):
@@ -163,26 +163,26 @@ cdef SymbolString applyGrammarRules_Recursive(
         seeds[currentGen] += 1
 
         if currentGen < stackSize - 1: # currently not in the last generation
-            if ruleResult == RuleResultType.Keep:
+            if ruleResult == RuleResultType.WillNotChange:
                 appendSingleSymbol(&target, c, command, commandLengths[c])
             else:
                 currentGen += 1
                 resetSymbolString(stack + currentGen)
                 indices[currentGen] = 0
-                if ruleResult == RuleResultType.PassOn:
+                if ruleResult == RuleResultType.CanChange:
                     appendSingleSymbol(stack + currentGen, c, command, commandLengths[c])
                 else:
                     appendSymbolString(stack + currentGen, replacement)
         else: # last generation
             if partialGeneration > 0: # partial last generation
-                if ruleResult in (RuleResultType.Keep, RuleResultType.PassOn):
+                if ruleResult in (RuleResultType.WillNotChange, RuleResultType.CanChange):
                     appendSingleSymbol(&target, c, command, commandLengths[c])
                 else:
                     if c in ("F", "f"):
                         appendUnknownPartialSymbol(&target, c, command, 1 - partialGeneration, onlyPartialMoves)
                     appendPartialSymbolString(&target, replacement, partialGeneration, onlyPartialMoves)
             else: # complete last generation
-                if ruleResult in (RuleResultType.Keep, RuleResultType.PassOn):
+                if ruleResult in (RuleResultType.WillNotChange, RuleResultType.CanChange):
                     appendSingleSymbol(&target, c, command, commandLengths[c])
                 else:
                     appendSymbolString(&target, replacement)
