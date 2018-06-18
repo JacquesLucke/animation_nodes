@@ -64,7 +64,7 @@ def redrawAreaType(areaType):
         area.tag_redraw()
 
 def isViewportRendering():
-    return any([space.shading.type == "RENDERED" for space in iterActiveSpacesByType("VIEW_3D")])
+    return any([space.viewport_shade == "RENDERED" for space in iterActiveSpacesByType("VIEW_3D")])
 
 def getDpiFactor():
     return getDpi() / 72

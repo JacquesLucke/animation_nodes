@@ -3,7 +3,7 @@ from .. data_structures cimport Vector3DList, Matrix4x4List
 from .. math cimport Vector3, Matrix4
 from .. math cimport transformVec3AsPoint_InPlace
 
-# cdef object vertex3f = glVertex3f
+cdef object vertex3f = glVertex3f
 
 def drawVector3DListPoints(Vector3DList vectors):
     cdef Py_ssize_t i
