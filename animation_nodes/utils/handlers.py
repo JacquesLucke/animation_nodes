@@ -87,7 +87,7 @@ def renderCompleted(scene):
 
 def register():
     bpy.app.handlers.frame_change_post.append(frameChangedPost)
-    bpy.app.handlers.scene_update_post.append(sceneUpdatePost)
+    bpy.app.handlers.frame_change_post.append(sceneUpdatePost)
     bpy.app.handlers.load_post.append(loadPost)
     bpy.app.handlers.save_pre.append(savePre)
 
@@ -101,7 +101,7 @@ def register():
 
 def unregister():
     bpy.app.handlers.frame_change_post.remove(frameChangedPost)
-    bpy.app.handlers.scene_update_post.remove(sceneUpdatePost)
+    bpy.app.handlers.frame_change_post.remove(sceneUpdatePost)
     bpy.app.handlers.load_post.remove(loadPost)
     bpy.app.handlers.save_pre.remove(savePre)
 
