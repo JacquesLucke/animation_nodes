@@ -49,6 +49,7 @@ def splinesFromBranches(Vector3DList vertices, EdgeIndicesList edges, VirtualDou
     # Generate Splines.
     cdef list splines = []
     cdef PolySpline spline
+    cdef FloatList splineRadii
     cdef Vector3DList splineVertices
     cdef int nonBipolarVertex, currentVertex, nextVertex
     for i in range(nonBipolarVertsCount):
@@ -56,8 +57,8 @@ def splinesFromBranches(Vector3DList vertices, EdgeIndicesList edges, VirtualDou
         for j in range(neighboursAmounts[nonBipolarVertex]):
             nextVertex = neighbours[neighboursStarts[nonBipolarVertex] + j]
             if filledSpaces[nextVertex] == neighboursAmounts[nextVertex]:
-                splineVertices = Vector3DList(capacity = verticesAmount)
-                splineRadii = FloatList(capacity = verticesAmount)
+                splineVertices = Vector3DList.__new__(Vector3DList, capacity = verticesAmount)
+                splineRadii = FloatList.__new__(FloatList, capacity = verticesAmount)
 
                 splineVertices.append(vertices[nonBipolarVertex])
                 splineRadii.append(radii.get(nonBipolarVertex))
@@ -65,7 +66,7 @@ def splinesFromBranches(Vector3DList vertices, EdgeIndicesList edges, VirtualDou
                 splineRadii.append(radii.get(nextVertex))
                 filledSpaces[nonBipolarVertex] -= 1
                 filledSpaces[nextVertex] -= 1
-                
+
                 currentVertex = nonBipolarVertex
                 for _ in range(verticesAmount):
                     if neighboursAmounts[nextVertex] == 2:
@@ -80,7 +81,7 @@ def splinesFromBranches(Vector3DList vertices, EdgeIndicesList edges, VirtualDou
                         filledSpaces[nextVertex] -= 1
                     else:
                         break
-                splines.append(PolySpline(splineVertices, splineRadii))
+                splines.append(PolySpline.__new__(PolySpline, splineVertices, splineRadii))
 
     PyMem_Free(nonBipolarVertices)
     PyMem_Free(neighboursAmounts)
