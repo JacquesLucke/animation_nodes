@@ -50,4 +50,4 @@ class SplinesFromEdgesNode(bpy.types.Node, AnimationNode):
         if self.algorithmType == "EDGE":
             return splinesFromEdges(vertices, edgeIndices, radii, self.radiusType == "VERTEX")
         else:
-            return splinesFromBranches(vertices, edgeIndices)
+            return splinesFromBranches(vertices, edgeIndices, radii)

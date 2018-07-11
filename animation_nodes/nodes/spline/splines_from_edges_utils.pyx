@@ -5,10 +5,10 @@ from ... data_structures cimport (
     VirtualDoubleList, FloatList
 )
 
-def splinesFromBranches(Vector3DList vertices, EdgeIndicesList edges):
+def splinesFromBranches(Vector3DList vertices, EdgeIndicesList edges, VirtualDoubleList radii):
     cdef int i, j
-    cdef int verticesAmount = len(vertices)
     cdef int edgesAmount = len(edges)
+    cdef int verticesAmount = len(vertices)
 
     # Compute how many neighbour each vertex have.
     cdef int *neighboursAmounts = <int*>PyMem_Malloc(verticesAmount * sizeof(int))
@@ -57,10 +57,15 @@ def splinesFromBranches(Vector3DList vertices, EdgeIndicesList edges):
             nextVertex = neighbours[neighboursStarts[nonBipolarVertex] + j]
             if filledSpaces[nextVertex] == neighboursAmounts[nextVertex]:
                 splineVertices = Vector3DList(capacity = verticesAmount)
+                splineRadii = FloatList(capacity = verticesAmount)
+
                 splineVertices.append(vertices[nonBipolarVertex])
+                splineRadii.append(radii.get(nonBipolarVertex))
                 splineVertices.append(vertices[nextVertex])
+                splineRadii.append(radii.get(nextVertex))
                 filledSpaces[nonBipolarVertex] -= 1
                 filledSpaces[nextVertex] -= 1
+                
                 currentVertex = nonBipolarVertex
                 for _ in range(verticesAmount):
                     if neighboursAmounts[nextVertex] == 2:
@@ -71,10 +76,11 @@ def splinesFromBranches(Vector3DList vertices, EdgeIndicesList edges):
                         else:
                             nextVertex = neighbours[neighboursStarts[nextVertex]]
                         splineVertices.append(vertices[nextVertex])
+                        splineRadii.append(radii.get(nextVertex))
                         filledSpaces[nextVertex] -= 1
                     else:
                         break
-                splines.append(PolySpline(splineVertices))
+                splines.append(PolySpline(splineVertices, splineRadii))
 
     PyMem_Free(nonBipolarVertices)
     PyMem_Free(neighboursAmounts)
