@@ -1,11 +1,12 @@
 from libc.string cimport memset
 from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
-from ... data_structures cimport Mesh, Vector3DList, EdgeIndicesList, PolySpline
+from ... data_structures cimport (
+    Mesh, Vector3DList, EdgeIndicesList, PolySpline,
+    VirtualDoubleList, FloatList
+)
 
-def connectedSplinesFromEdges(Mesh mesh):
+def splinesFromBranches(Vector3DList vertices, EdgeIndicesList edges):
     cdef int i, j
-    cdef Vector3DList vertices = mesh.vertices
-    cdef EdgeIndicesList edges = mesh.edges
     cdef int verticesAmount = len(vertices)
     cdef int edgesAmount = len(edges)
 
@@ -81,4 +82,28 @@ def connectedSplinesFromEdges(Mesh mesh):
     PyMem_Free(filledSpaces)
     PyMem_Free(neighbours)
 
+    return splines
+
+def splinesFromEdges(Vector3DList vertices, EdgeIndicesList edges, VirtualDoubleList radii,
+                     bint isVertexRadius):
+    cdef:
+        long i
+        list splines = []
+        Vector3DList edgeVertices
+        FloatList edgeRadii
+
+    for i in range(edges.length):
+        edgeVertices = Vector3DList.__new__(Vector3DList, length = 2)
+        edgeVertices.data[0] = vertices.data[edges.data[i].v1]
+        edgeVertices.data[1] = vertices.data[edges.data[i].v2]
+
+        edgeRadii = FloatList.__new__(FloatList, length = 2)
+        if isVertexRadius:
+            edgeRadii.data[0] = radii.get(edges.data[i].v1)
+            edgeRadii.data[1] = radii.get(edges.data[i].v2)
+        else:
+            edgeRadii.data[0] = radii.get(i)
+            edgeRadii.data[1] = radii.get(i)
+
+        splines.append(PolySpline.__new__(PolySpline, edgeVertices, edgeRadii))
     return splines
