@@ -47,6 +47,7 @@ def splinesFromBranches(Vector3DList vertices, EdgeIndicesList edges, VirtualDou
     nonBipolarVertices = <int*>PyMem_Realloc(nonBipolarVertices, nonBipolarVertsCount * sizeof(int))
 
     # Generate Splines.
+    cdef int count
     cdef list splines = []
     cdef PolySpline spline
     cdef FloatList splineRadii
@@ -58,27 +59,31 @@ def splinesFromBranches(Vector3DList vertices, EdgeIndicesList edges, VirtualDou
             nextVertex = neighbours[neighboursStarts[nonBipolarVertex] + j]
             if (filledSpaces[nextVertex] == neighboursAmounts[nextVertex] or
                                            neighboursAmounts[nextVertex] != 2):
-                splineVertices = Vector3DList.__new__(Vector3DList, capacity = verticesAmount)
-                splineRadii = FloatList.__new__(FloatList, capacity = verticesAmount)
+                splineVertices = Vector3DList.__new__(Vector3DList, length = verticesAmount)
+                splineRadii = FloatList.__new__(FloatList, length = verticesAmount)
 
-                splineVertices.append(vertices[nonBipolarVertex])
-                splineRadii.append(radii.get(nonBipolarVertex))
-                splineVertices.append(vertices[nextVertex])
-                splineRadii.append(radii.get(nextVertex))
+                splineVertices.data[0] = vertices.data[nonBipolarVertex]
+                splineRadii.data[0] = radii.get(nonBipolarVertex)
+                splineVertices.data[1] = vertices.data[nextVertex]
+                splineRadii.data[1] = radii.get(nextVertex)
                 filledSpaces[nonBipolarVertex] -= 1
                 filledSpaces[nextVertex] -= 1
 
+                count = 2
                 currentVertex = nonBipolarVertex
                 while neighboursAmounts[nextVertex] == 2:
-                    i = currentVertex
-                    currentVertex = nextVertex
-                    if neighbours[neighboursStarts[nextVertex]] == i:
+                    if neighbours[neighboursStarts[nextVertex]] == currentVertex:
+                        currentVertex = nextVertex
                         nextVertex = neighbours[neighboursStarts[nextVertex] + 1]
                     else:
+                        currentVertex = nextVertex
                         nextVertex = neighbours[neighboursStarts[nextVertex]]
-                    splineVertices.append(vertices[nextVertex])
-                    splineRadii.append(radii.get(nextVertex))
+                    splineVertices.data[count] = vertices.data[nextVertex]
+                    splineRadii.data[count] = radii.get(nextVertex)
                     filledSpaces[nextVertex] -= 1
+                    count += 1
+                splineVertices.length = count
+                splineRadii.length = count
                 splines.append(PolySpline.__new__(PolySpline, splineVertices, splineRadii))
 
     PyMem_Free(nonBipolarVertices)
