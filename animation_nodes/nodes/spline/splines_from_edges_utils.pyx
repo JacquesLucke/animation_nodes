@@ -56,7 +56,8 @@ def splinesFromBranches(Vector3DList vertices, EdgeIndicesList edges, VirtualDou
         nonBipolarVertex = nonBipolarVertices[i]
         for j in range(neighboursAmounts[nonBipolarVertex]):
             nextVertex = neighbours[neighboursStarts[nonBipolarVertex] + j]
-            if filledSpaces[nextVertex] == neighboursAmounts[nextVertex]:
+            if (filledSpaces[nextVertex] == neighboursAmounts[nextVertex] or
+                                           neighboursAmounts[nextVertex] != 2):
                 splineVertices = Vector3DList.__new__(Vector3DList, capacity = verticesAmount)
                 splineRadii = FloatList.__new__(FloatList, capacity = verticesAmount)
 
