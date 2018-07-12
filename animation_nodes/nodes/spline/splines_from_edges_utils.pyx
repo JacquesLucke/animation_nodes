@@ -93,7 +93,7 @@ def splinesFromBranches(Vector3DList vertices, EdgeIndicesList edges, VirtualDou
     return splines
 
 def splinesFromEdges(Vector3DList vertices, EdgeIndicesList edges, VirtualDoubleList radii,
-                     bint isVertexRadius):
+                     str radiusType):
     cdef:
         long i
         list splines = []
@@ -106,7 +106,7 @@ def splinesFromEdges(Vector3DList vertices, EdgeIndicesList edges, VirtualDouble
         edgeVertices.data[1] = vertices.data[edges.data[i].v2]
 
         edgeRadii = FloatList.__new__(FloatList, length = 2)
-        if isVertexRadius:
+        if radiusType == "VERTEX":
             edgeRadii.data[0] = radii.get(edges.data[i].v1)
             edgeRadii.data[1] = radii.get(edges.data[i].v2)
         else:

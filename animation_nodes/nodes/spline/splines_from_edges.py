@@ -5,7 +5,7 @@ from ... data_structures import VirtualDoubleList
 from ... base_types import AnimationNode, VectorizedSocket
 from . splines_from_edges_utils import splinesFromBranches, splinesFromEdges
 
-algorithmItems = [
+algorithmTypeItems = [
     ("EDGE", "Spline Per Edge", "", "NONE", 0),
     ("BRANCH", "Spline Per Branch", "", "NONE", 1)
 ]
@@ -21,7 +21,7 @@ class SplinesFromEdgesNode(bpy.types.Node, AnimationNode):
 
     algorithmType = EnumProperty(name = "Algorithm Type", default = "EDGE",
         description = "Choose the algorithm used for generating the splines.",
-        update = propertyChanged, items = algorithmItems)
+        update = propertyChanged, items = algorithmTypeItems)
 
     radiusType = EnumProperty(name = "Radius Type", default = "EDGE",
         description = "Only important if there is a list of radii.",
@@ -48,6 +48,6 @@ class SplinesFromEdgesNode(bpy.types.Node, AnimationNode):
     def execute(self, vertices, edgeIndices, radii):
         radii = VirtualDoubleList.create(radii, 0.1)
         if self.algorithmType == "EDGE":
-            return splinesFromEdges(vertices, edgeIndices, radii, self.radiusType == "VERTEX")
+            return splinesFromEdges(vertices, edgeIndices, radii, self.radiusType)
         else:
             return splinesFromBranches(vertices, edgeIndices, radii)
