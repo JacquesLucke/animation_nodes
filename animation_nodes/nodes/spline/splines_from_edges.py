@@ -47,7 +47,8 @@ class SplinesFromEdgesNode(bpy.types.Node, AnimationNode):
             layout.prop(self, "radiusType", text = "")
 
     def execute(self, vertices, edgeIndices, radii):
-        if len(edgeIndices) == 0 or edgeIndices.getMaxIndex() >= len(vertices):
+        if len(edgeIndices) == 0: return []
+        if edgeIndices.getMaxIndex() >= len(vertices):
             self.raiseErrorMessage("Invalid Edge Indices.")
 
         radii = VirtualDoubleList.create(radii, 0.1)
