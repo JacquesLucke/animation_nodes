@@ -6,10 +6,6 @@ from ... data_structures cimport (
 )
 
 def splinesFromBranches(Vector3DList vertices, EdgeIndicesList edges, VirtualDoubleList radii):
-    if edges.length == 0: return []
-    if edges.getMaxIndex() >= vertices.length:
-        raise Exception("Invalid edge indices")
-
     cdef int i, j
     cdef int edgesAmount = edges.length
     cdef int verticesAmount = vertices.length
@@ -95,10 +91,6 @@ def splinesFromBranches(Vector3DList vertices, EdgeIndicesList edges, VirtualDou
 
 def splinesFromEdges(Vector3DList vertices, EdgeIndicesList edges, VirtualDoubleList radii,
                      str radiusType):
-    if edges.length == 0: return []
-    if edges.getMaxIndex() >= vertices.length:
-        raise Exception("Invalid edge indices")
-
     cdef:
         long i
         list splines = []

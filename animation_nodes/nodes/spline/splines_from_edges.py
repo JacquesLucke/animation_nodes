@@ -17,6 +17,7 @@ radiusTypeItems = [
 class SplinesFromEdgesNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SplinesFromEdgesNode"
     bl_label = "Splines from Edges"
+    errorHandlingType = "EXCEPTION"
     bl_width_default = 160
 
     algorithmType = EnumProperty(name = "Algorithm Type", default = "EDGE",
@@ -46,6 +47,9 @@ class SplinesFromEdgesNode(bpy.types.Node, AnimationNode):
             layout.prop(self, "radiusType", text = "")
 
     def execute(self, vertices, edgeIndices, radii):
+        if len(edgeIndices) == 0 or edgeIndices.getMaxIndex() >= len(vertices):
+            self.raiseErrorMessage("Invalid Edge Indices.")
+
         radii = VirtualDoubleList.create(radii, 0.1)
         if self.algorithmType == "EDGE":
             return splinesFromEdges(vertices, edgeIndices, radii, self.radiusType)
