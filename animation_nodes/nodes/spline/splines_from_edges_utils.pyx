@@ -73,19 +73,16 @@ def splinesFromBranches(Vector3DList vertices, EdgeIndicesList edges, VirtualDou
                 filledSpaces[nextVertex] -= 1
 
                 currentVertex = nonBipolarVertex
-                for _ in range(verticesAmount):
-                    if neighboursAmounts[nextVertex] == 2:
-                        i = currentVertex
-                        currentVertex = nextVertex
-                        if neighbours[neighboursStarts[nextVertex]] == i:
-                            nextVertex = neighbours[neighboursStarts[nextVertex] + 1]
-                        else:
-                            nextVertex = neighbours[neighboursStarts[nextVertex]]
-                        splineVertices.append(vertices[nextVertex])
-                        splineRadii.append(radii.get(nextVertex))
-                        filledSpaces[nextVertex] -= 1
+                while neighboursAmounts[nextVertex] == 2:
+                    i = currentVertex
+                    currentVertex = nextVertex
+                    if neighbours[neighboursStarts[nextVertex]] == i:
+                        nextVertex = neighbours[neighboursStarts[nextVertex] + 1]
                     else:
-                        break
+                        nextVertex = neighbours[neighboursStarts[nextVertex]]
+                    splineVertices.append(vertices[nextVertex])
+                    splineRadii.append(radii.get(nextVertex))
+                    filledSpaces[nextVertex] -= 1
                 splines.append(PolySpline.__new__(PolySpline, splineVertices, splineRadii))
 
     PyMem_Free(nonBipolarVertices)
