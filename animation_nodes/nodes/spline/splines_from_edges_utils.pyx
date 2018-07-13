@@ -25,15 +25,15 @@ def splinesFromBranches(Vector3DList vertices, EdgeIndicesList edges, VirtualDou
     cdef IntegerList filledSpaces = IntegerList.fromValue(0, length = verticesAmount)
 
     # Compute the indices of neighbouring vertices of each vertex.
+    cdef unsigned int v1, v2
     cdef IntegerList neighbours = IntegerList(length = edgesAmount * 2)
     for i in range(edgesAmount):
-        neighbours.data[neighboursStarts.data[edges.data[i].v1] +
-        filledSpaces.data[edges.data[i].v1]] = edges.data[i].v2
-        filledSpaces.data[edges.data[i].v1] += 1
+        v1, v2 = edges.data[i].v1, edges.data[i].v2
+        neighbours.data[neighboursStarts.data[v1] + filledSpaces.data[v1]] = v2
+        filledSpaces.data[v1] += 1
 
-        neighbours.data[neighboursStarts.data[edges.data[i].v2] +
-        filledSpaces.data[edges.data[i].v2]] = edges.data[i].v1
-        filledSpaces.data[edges.data[i].v2] += 1
+        neighbours.data[neighboursStarts.data[v2] + filledSpaces.data[v2]] = v1
+        filledSpaces.data[v2] += 1
 
     # Find the indices of the vertices that are not connected to two vertices.
     cdef IntegerList nonBipolarVertices = IntegerList(length = verticesAmount)
@@ -46,7 +46,6 @@ def splinesFromBranches(Vector3DList vertices, EdgeIndicesList edges, VirtualDou
     nonBipolarVertices.shrinkToLength()
 
     # Generate Splines.
-    cdef int count
     cdef list splines = []
     cdef PolySpline spline
     cdef FloatList splineRadii
@@ -58,17 +57,16 @@ def splinesFromBranches(Vector3DList vertices, EdgeIndicesList edges, VirtualDou
             nextVertex = neighbours.data[neighboursStarts.data[nonBipolarVertex] + j]
             if (filledSpaces.data[nextVertex] == neighboursAmounts.data[nextVertex] or
                                                 neighboursAmounts.data[nextVertex] != 2):
-                splineVertices = Vector3DList.__new__(Vector3DList, length = verticesAmount)
-                splineRadii = FloatList.__new__(FloatList, length = verticesAmount)
+                splineVertices = Vector3DList.__new__(Vector3DList)
+                splineRadii = FloatList.__new__(FloatList)
 
-                splineVertices.data[0] = vertices.data[nonBipolarVertex]
-                splineRadii.data[0] = radii.get(nonBipolarVertex)
-                splineVertices.data[1] = vertices.data[nextVertex]
-                splineRadii.data[1] = radii.get(nextVertex)
+                splineVertices.append_LowLevel(vertices.data[nonBipolarVertex])
+                splineRadii.append_LowLevel(radii.get(nonBipolarVertex))
+                splineVertices.append_LowLevel(vertices.data[nextVertex])
+                splineRadii.append_LowLevel(radii.get(nextVertex))
                 filledSpaces.data[nonBipolarVertex] -= 1
                 filledSpaces.data[nextVertex] -= 1
 
-                count = 2
                 currentVertex = nonBipolarVertex
                 while neighboursAmounts.data[nextVertex] == 2:
                     if neighbours.data[neighboursStarts.data[nextVertex]] == currentVertex:
@@ -77,12 +75,9 @@ def splinesFromBranches(Vector3DList vertices, EdgeIndicesList edges, VirtualDou
                     else:
                         currentVertex = nextVertex
                         nextVertex = neighbours.data[neighboursStarts.data[nextVertex]]
-                    splineVertices.data[count] = vertices.data[nextVertex]
-                    splineRadii.data[count] = radii.get(nextVertex)
+                    splineVertices.append_LowLevel(vertices.data[nextVertex])
+                    splineRadii.append_LowLevel(radii.get(nextVertex))
                     filledSpaces.data[nextVertex] -= 1
-                    count += 1
-                splineVertices.length = count
-                splineRadii.length = count
                 splines.append(PolySpline.__new__(PolySpline, splineVertices, splineRadii))
 
     return splines
