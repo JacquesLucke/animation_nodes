@@ -1,8 +1,6 @@
-from libc.string cimport memset
-from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
 from ... data_structures cimport (
     Mesh, Vector3DList, EdgeIndicesList, PolySpline,
-    VirtualDoubleList, FloatList
+    VirtualDoubleList, FloatList, IntegerList
 )
 
 def splinesFromBranches(Vector3DList vertices, EdgeIndicesList edges, VirtualDoubleList radii):
@@ -11,25 +9,23 @@ def splinesFromBranches(Vector3DList vertices, EdgeIndicesList edges, VirtualDou
     cdef int verticesAmount = vertices.length
 
     # Compute how many neighbour each vertex have.
-    cdef int *neighboursAmounts = <int*>PyMem_Malloc(verticesAmount * sizeof(int))
-    memset(neighboursAmounts, 0, verticesAmount * sizeof(int))
+    cdef IntegerList neighboursAmounts = IntegerList.fromValue(0, length = verticesAmount)
     for i in range(edgesAmount):
         neighboursAmounts[edges.data[i].v1] += 1
         neighboursAmounts[edges.data[i].v2] += 1
 
     # Compute the start index of each group of neighbours of each vertex.
-    cdef int *neighboursStarts = <int*>PyMem_Malloc(verticesAmount * sizeof(int))
+    cdef IntegerList neighboursStarts = IntegerList(length = verticesAmount)
     cdef int start = 0
     for i in range(verticesAmount):
         neighboursStarts[i] = start
         start += neighboursAmounts[i]
 
     # Keep track of how many index is in each group of neighbours at each iteration.
-    cdef int *filledSpaces = <int*>PyMem_Malloc(verticesAmount * sizeof(int))
-    memset(filledSpaces, 0, verticesAmount * sizeof(int))
+    cdef IntegerList filledSpaces = IntegerList.fromValue(0, length = verticesAmount)
 
     # Compute the indices of neighbouring vertices of each vertex.
-    cdef int *neighbours = <int*>PyMem_Malloc(edgesAmount * 2 * sizeof(int))
+    cdef IntegerList neighbours = IntegerList(length = edgesAmount * 2)
     for i in range(edgesAmount):
         neighbours[neighboursStarts[edges.data[i].v1] + filledSpaces[edges.data[i].v1]] = edges.data[i].v2
         filledSpaces[edges.data[i].v1] += 1
@@ -38,13 +34,14 @@ def splinesFromBranches(Vector3DList vertices, EdgeIndicesList edges, VirtualDou
         filledSpaces[edges.data[i].v2] += 1
 
     # Find the indices of the vertices that are not connected to two vertices.
-    cdef int *nonBipolarVertices = <int*>PyMem_Malloc(verticesAmount * sizeof(int))
+    cdef IntegerList nonBipolarVertices = IntegerList(length = verticesAmount)
     cdef int nonBipolarVertsCount = 0
     for i in range(verticesAmount):
         if neighboursAmounts[i] != 2:
             nonBipolarVertices[nonBipolarVertsCount] = i
             nonBipolarVertsCount += 1
-    nonBipolarVertices = <int*>PyMem_Realloc(nonBipolarVertices, nonBipolarVertsCount * sizeof(int))
+    nonBipolarVertices.length = nonBipolarVertsCount
+    nonBipolarVertices.shrinkToLength()
 
     # Generate Splines.
     cdef int count
@@ -85,12 +82,6 @@ def splinesFromBranches(Vector3DList vertices, EdgeIndicesList edges, VirtualDou
                 splineVertices.length = count
                 splineRadii.length = count
                 splines.append(PolySpline.__new__(PolySpline, splineVertices, splineRadii))
-
-    PyMem_Free(nonBipolarVertices)
-    PyMem_Free(neighboursAmounts)
-    PyMem_Free(neighboursStarts)
-    PyMem_Free(filledSpaces)
-    PyMem_Free(neighbours)
 
     return splines
 
