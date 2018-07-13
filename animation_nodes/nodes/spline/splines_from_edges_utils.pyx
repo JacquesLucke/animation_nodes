@@ -45,6 +45,9 @@ def splinesFromBranches(Vector3DList vertices, EdgeIndicesList edges, VirtualDou
     nonBipolarVertices.length = nonBipolarVertsCount
     nonBipolarVertices.shrinkToLength()
 
+    if nonBipolarVertsCount == verticesAmount:
+        return splinesFromEdges(vertices, edges, radii, "VERTEX")
+
     # Generate Splines.
     cdef list splines = []
     cdef PolySpline spline
