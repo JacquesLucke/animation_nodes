@@ -52,37 +52,34 @@ def splinesFromBranches(Vector3DList vertices, EdgeIndicesList edges, VirtualDou
     cdef list splines = []
     cdef PolySpline spline
     cdef FloatList splineRadii
+    cdef bint isFirstIteration
     cdef Vector3DList splineVertices
     cdef int nonBipolarVertex, currentVertex, nextVertex
     for i in range(nonBipolarVertsCount):
         nonBipolarVertex = nonBipolarVertices.data[i]
         for j in range(neighboursAmounts.data[nonBipolarVertex]):
+            currentVertex = nonBipolarVertex
             nextVertex = neighbours.data[neighboursStarts.data[nonBipolarVertex] + j]
             if (filledSpaces.data[nextVertex] == neighboursAmounts.data[nextVertex] or
                                                 neighboursAmounts.data[nextVertex] != 2):
                 splineVertices = Vector3DList.__new__(Vector3DList)
                 splineRadii = FloatList.__new__(FloatList)
+                isFirstIteration = True
+                while True:
+                    splineVertices.append_LowLevel(vertices.data[currentVertex])
+                    splineRadii.append_LowLevel(radii.get(currentVertex))
+                    filledSpaces.data[currentVertex] -= 1
+                    if neighboursAmounts.data[currentVertex] != 2 and not isFirstIteration:
+                        break
 
-                splineVertices.append_LowLevel(vertices.data[nonBipolarVertex])
-                splineRadii.append_LowLevel(radii.get(nonBipolarVertex))
-                splineVertices.append_LowLevel(vertices.data[nextVertex])
-                splineRadii.append_LowLevel(radii.get(nextVertex))
-                filledSpaces.data[nonBipolarVertex] -= 1
-                filledSpaces.data[nextVertex] -= 1
-
-                currentVertex = nonBipolarVertex
-                while neighboursAmounts.data[nextVertex] == 2:
                     if neighbours.data[neighboursStarts.data[nextVertex]] == currentVertex:
                         currentVertex = nextVertex
                         nextVertex = neighbours.data[neighboursStarts.data[nextVertex] + 1]
                     else:
                         currentVertex = nextVertex
                         nextVertex = neighbours.data[neighboursStarts.data[nextVertex]]
-                    splineVertices.append_LowLevel(vertices.data[nextVertex])
-                    splineRadii.append_LowLevel(radii.get(nextVertex))
-                    filledSpaces.data[nextVertex] -= 1
+                    isFirstIteration = False
                 splines.append(PolySpline.__new__(PolySpline, splineVertices, splineRadii))
-
     return splines
 
 def splinesFromEdges(Vector3DList vertices, EdgeIndicesList edges, VirtualDoubleList radii,
