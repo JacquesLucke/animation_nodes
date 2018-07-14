@@ -8,7 +8,7 @@ def splinesFromBranches(Vector3DList vertices, EdgeIndicesList edges, VirtualDou
     cdef int edgesAmount = edges.length
     cdef int verticesAmount = vertices.length
 
-    # Compute how many neighbour each vertex have.
+    # Compute how many neighbours each vertex have.
     cdef IntegerList neighboursAmounts = IntegerList.fromValue(0, length = verticesAmount)
     for i in range(edgesAmount):
         neighboursAmounts.data[edges.data[i].v1] += 1
@@ -21,7 +21,7 @@ def splinesFromBranches(Vector3DList vertices, EdgeIndicesList edges, VirtualDou
         neighboursStarts.data[i] = start
         start += neighboursAmounts.data[i]
 
-    # Keep track of how many index is in each group of neighbours at each iteration.
+    # Keep track of how many indices are there in each group of neighbours at each iteration.
     cdef IntegerList usedSlots = IntegerList.fromValue(0, length = verticesAmount)
 
     # Compute the indices of neighbouring vertices of each vertex.
@@ -30,9 +30,8 @@ def splinesFromBranches(Vector3DList vertices, EdgeIndicesList edges, VirtualDou
     for i in range(edgesAmount):
         v1, v2 = edges.data[i].v1, edges.data[i].v2
         neighbours.data[neighboursStarts.data[v1] + usedSlots.data[v1]] = v2
-        usedSlots.data[v1] += 1
-
         neighbours.data[neighboursStarts.data[v2] + usedSlots.data[v2]] = v1
+        usedSlots.data[v1] += 1
         usedSlots.data[v2] += 1
 
     # Generate Splines.
@@ -43,15 +42,15 @@ def splinesFromBranches(Vector3DList vertices, EdgeIndicesList edges, VirtualDou
     cdef IntegerList unusedEdges = usedSlots
     del usedSlots
 
-    cdef int startVertex, lastVertex, currentVertex, nextVertex
     cdef int offset, n1, n2
+    cdef int startVertex, lastVertex, currentVertex, nextVertex
 
     for startVertex in range(verticesAmount):
-        # is part of another spline
+        # Is part of another spline.
         if neighboursAmounts.data[startVertex] == 2:
             continue
 
-        # has no unused outgoing edges
+        # Has no unused outgoing edges.
         if unusedEdges.data[startVertex] == 0:
             continue
 
@@ -59,7 +58,7 @@ def splinesFromBranches(Vector3DList vertices, EdgeIndicesList edges, VirtualDou
             currentVertex = startVertex
             nextVertex = neighbours.data[neighboursStarts.data[currentVertex] + j]
 
-            # check if this neighbour can be connected
+            # Check if this neighbour can be connected.
             if unusedEdges.data[nextVertex] == 0:
                 continue
 
@@ -69,21 +68,21 @@ def splinesFromBranches(Vector3DList vertices, EdgeIndicesList edges, VirtualDou
             splineVertices.append_LowLevel(vertices.data[currentVertex])
             splineRadii.append_LowLevel(radii.get(currentVertex))
 
-            # follow branch until the next non bipolar vertex
+            # Follow branch until the next non bipolar vertex.
             while True:
                 lastVertex = currentVertex
                 currentVertex = nextVertex
 
                 splineVertices.append_LowLevel(vertices.data[currentVertex])
                 splineRadii.append_LowLevel(radii.get(currentVertex))
-                unusedEdges.data[lastVertex] -= 1
                 unusedEdges.data[currentVertex] -= 1
+                unusedEdges.data[lastVertex] -= 1
 
-                # stop at another non bipolar vertex
+                # Stop at another non bipolar vertex.
                 if neighboursAmounts.data[currentVertex] != 2:
                     break
 
-                # choose next vertex to be the one we are not coming from
+                # Choose next vertex to be the one we are not coming from.
                 offset = neighboursStarts.data[currentVertex]
                 n1 = neighbours.data[offset + 0]
                 n2 = neighbours.data[offset + 1]
