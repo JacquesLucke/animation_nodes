@@ -36,7 +36,6 @@ def splinesFromBranches(Vector3DList vertices, EdgeIndicesList edges, VirtualDou
 
     # Generate Splines.
     cdef list splines = []
-    cdef PolySpline spline
     cdef FloatList splineRadii
     cdef Vector3DList splineVertices
     cdef IntegerList unusedEdges = usedSlots
