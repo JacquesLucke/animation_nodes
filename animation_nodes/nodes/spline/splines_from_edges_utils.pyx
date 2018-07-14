@@ -52,7 +52,6 @@ def splinesFromBranches(Vector3DList vertices, EdgeIndicesList edges, VirtualDou
     cdef list splines = []
     cdef PolySpline spline
     cdef FloatList splineRadii
-    cdef bint isFirstIteration
     cdef Vector3DList splineVertices
     cdef int nonBipolarVertex, currentVertex, nextVertex
     for i in range(nonBipolarVertsCount):
@@ -64,21 +63,24 @@ def splinesFromBranches(Vector3DList vertices, EdgeIndicesList edges, VirtualDou
                                                 neighboursAmounts.data[nextVertex] != 2):
                 splineVertices = Vector3DList.__new__(Vector3DList)
                 splineRadii = FloatList.__new__(FloatList)
-                isFirstIteration = True
-                while True:
-                    splineVertices.append_LowLevel(vertices.data[currentVertex])
-                    splineRadii.append_LowLevel(radii.get(currentVertex))
-                    filledSpaces.data[currentVertex] -= 1
-                    if neighboursAmounts.data[currentVertex] != 2 and not isFirstIteration:
-                        break
 
+                splineVertices.append_LowLevel(vertices.data[currentVertex])
+                splineRadii.append_LowLevel(radii.get(currentVertex))
+                filledSpaces.data[currentVertex] -= 1
+                while True:
                     if neighbours.data[neighboursStarts.data[nextVertex]] == currentVertex:
                         currentVertex = nextVertex
                         nextVertex = neighbours.data[neighboursStarts.data[nextVertex] + 1]
                     else:
                         currentVertex = nextVertex
                         nextVertex = neighbours.data[neighboursStarts.data[nextVertex]]
-                    isFirstIteration = False
+
+                    splineVertices.append_LowLevel(vertices.data[currentVertex])
+                    splineRadii.append_LowLevel(radii.get(currentVertex))
+                    filledSpaces.data[currentVertex] -= 1
+
+                    if neighboursAmounts.data[currentVertex] != 2:
+                        break
                 splines.append(PolySpline.__new__(PolySpline, splineVertices, splineRadii))
     return splines
 
