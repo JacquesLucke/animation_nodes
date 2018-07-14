@@ -1,5 +1,5 @@
 from ... data_structures cimport (
-    Mesh, Vector3DList, EdgeIndicesList, PolySpline,
+    Vector3DList, EdgeIndicesList, PolySpline,
     VirtualDoubleList, FloatList, IntegerList
 )
 
