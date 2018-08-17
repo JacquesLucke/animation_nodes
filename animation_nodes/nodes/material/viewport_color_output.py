@@ -1,7 +1,5 @@
 import bpy
-from bpy.props import *
 from math import isclose
-from ... events import propertyChanged
 from ... base_types import AnimationNode
 
 class ViewportColorNode(bpy.types.Node, AnimationNode):
