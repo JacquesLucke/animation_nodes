@@ -11,7 +11,7 @@ class SetObjectMaterialsNode(bpy.types.Node, AnimationNode):
         self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
         self.newInput(VectorizedSocket("Material", "useList",
             ("Material", "material"),
-            ("Materials", "materials")))
+            ("Materials", "materials")), defaultDrawType = "PROPERTY_ONLY")
 
         self.newOutput("Object", "Object", "object")
 
