@@ -23,28 +23,13 @@ class SetObjectMaterialsNode(bpy.types.Node, AnimationNode):
 
     def executeSingle(self, object, material):
         if object == None: return object
-        slotCount = len(object.data.materials)
-
-        if slotCount == 0:
-            object.data.materials.append(material)
-        else:
-            object.data.materials[0] = material
-            for i in range(slotCount - 1):
-                object.data.materials.pop()
-
+        object.data.materials.clear()
+        object.data.materials.append(material)
         return object
 
     def executeList(self, object, materials):
         if object == None: return object
-        slotCount = len(object.data.materials)
-
-        for i, material in enumerate(materials[:slotCount]):
-            object.data.materials[i] = material
-        if slotCount < len(materials):
-            for i in range(slotCount, len(materials)):
-                object.data.materials.append(materials[i])
-        else:
-            for i in range(slotCount - len(materials)):
-                object.data.materials.pop()
-
+        object.data.materials.clear()
+        for material in materials:
+            object.data.materials.append(material)
         return object
