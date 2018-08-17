@@ -29,8 +29,8 @@ class SetObjectMaterialsNode(bpy.types.Node, AnimationNode):
             object.data.materials.append(material)
         else:
             object.data.materials[0] = material
-            for i in range(1, slotCount):
-                object.data.materials.pop(i, update_data = True)
+            for i in range(slotCount - 1):
+                object.data.materials.pop()
 
         return object
 
@@ -44,7 +44,7 @@ class SetObjectMaterialsNode(bpy.types.Node, AnimationNode):
             for i in range(slotCount, len(materials)):
                 object.data.materials.append(materials[i])
         else:
-            for i in range(len(materials), slotCount):
-                object.data.materials.pop(i, update_data = True)
+            for i in range(slotCount - len(materials)):
+                object.data.materials.pop()
 
         return object
