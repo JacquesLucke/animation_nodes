@@ -42,6 +42,13 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
     meshMode = EnumProperty(name = "Mesh Mode", default = "VERTICES",
         items = meshModeItems, update = AnimationNode.refresh)
 
+    centerAlongX = BoolProperty(name = "Center Along X", default = True,
+        description = "Center the grid along the x axis.", update = AnimationNode.refresh)
+    centerAlongY = BoolProperty(name = "Center Along Y", default = True,
+        description = "Center the grid along the y axis.", update = AnimationNode.refresh)
+    centerAlongZ = BoolProperty(name = "Center Along Z", default = False,
+        description = "Center the grid along the z axis.", update = AnimationNode.refresh)
+
     exactCircleSegment = BoolProperty(name = "Exact Circle Segment", default = False)
 
     def create(self):
@@ -88,6 +95,11 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
             col.prop(self, "distanceMode", text = "")
         if self.mode == "MESH":
             col.prop(self, "meshMode", text = "")
+        if self.mode == "GRID":
+            row = col.row(align = True)
+            row.prop(self, "centerAlongX", text = "X", toggle = True)
+            row.prop(self, "centerAlongY", text = "Y", toggle = True)
+            row.prop(self, "centerAlongZ", text = "Z", toggle = True)
 
     def drawAdvanced(self, layout):
         if self.mode == "CIRCLE":
@@ -139,8 +151,9 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
             yDis = size2 / max(yDiv - 1, 1)
             zDis = size3 / max(zDiv - 1, 1)
 
-        xOffset = xDis * (xDiv - 1) / 2
-        yOffset = yDis * (yDiv - 1) / 2
+        xOffset = xDis * (xDiv - 1) / 2 * self.centerAlongX
+        yOffset = yDis * (yDiv - 1) / 2 * self.centerAlongY
+        zOffset = zDis * (zDiv - 1) / 2 * self.centerAlongZ
 
         for x in range(xDiv):
             for y in range(yDiv):
@@ -148,7 +161,7 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
                     index = z * xDiv * yDiv + y * xDiv + x
                     vector.x = <float>(x * xDis - xOffset)
                     vector.y = <float>(y * yDis - yOffset)
-                    vector.z = <float>(z * zDis)
+                    vector.z = <float>(z * zDis - zOffset)
                     setTranslationMatrix(matrices.data + index, &vector)
 
         return matrices
