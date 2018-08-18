@@ -145,7 +145,7 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
         for x in range(xDiv):
             for y in range(yDiv):
                 for z in range(zDiv):
-                    index = x * yDiv * zDiv + y * zDiv + z
+                    index = z * xDiv * yDiv + y * xDiv + x
                     vector.x = <float>(x * xDis - xOffset)
                     vector.y = <float>(y * yDis - yOffset)
                     vector.z = <float>(z * zDis)
