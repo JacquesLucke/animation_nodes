@@ -28,7 +28,6 @@ meshModeItems = [
     ("POLYGONS", "Polygons", "", "NONE", 1)
 ]
 
-
 class DistributeMatricesNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_DistributeMatricesNode"
     bl_label = "Distribute Matrices"
@@ -80,6 +79,7 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
             self.newInput("Float", "End Angle", "endAngel", value = 6 * PI)
 
         self.newOutput("Matrix List", "Matrices", "matrices")
+        self.newOutput("Vector List", "Vectors", "vectors")
 
     def draw(self, layout):
         col = layout.column()
@@ -93,20 +93,30 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
         if self.mode == "CIRCLE":
             layout.prop(self, "exactCircleSegment")
 
-    def getExecutionFunctionName(self):
+    def getExecutionCode(self, required):
         if self.mode == "LINEAR":
-            return "execute_Linear"
+            if self.distanceMode == "STEP":
+                list = ["matrices = self.execute_Linear(amount, distance)"]
+            else:
+                list = ["matrices = self.execute_Linear(amount, size)"]
         elif self.mode == "GRID":
-            return "execute_Grid"
+            if self.distanceMode == "STEP":
+                list = ["matrices = self.execute_Grid(xDivisions, yDivisions, zDivisions, xDistance, yDistance, zDistance)"]
+            else:
+                list = ["matrices = self.execute_Grid(xDivisions, yDivisions, zDivisions, width, length, height)"]
         elif self.mode == "CIRCLE":
-            return "execute_Circle"
+            list = ["matrices = self.execute_Circle(amount, radius, segment)"]
         elif self.mode == "MESH":
             if self.meshMode == "VERTICES":
-                return "execute_Vertices"
+                list = ["matrices = self.execute_Vertices(mesh)"]
             elif self.meshMode == "POLYGONS":
-                return "execute_Polygons"
+                list = ["matrices = self.execute_Polygons(mesh)"]
         elif self.mode == "SPIRAL":
-            return "execute_Spiral"
+            list = ["matrices = self.execute_Spiral(amount, startRadius, endRadius, startSize, endSize, startAngle, endAngel)"]
+
+        if "vectors" in required:
+            list.append("vectors = AN.nodes.matrix.c_utils.extractMatrixTranslations(matrices)")
+        return list
 
     def execute_Linear(self, amount, size):
         return self.execute_Grid(amount, 1, 1, size, 0, 0)
