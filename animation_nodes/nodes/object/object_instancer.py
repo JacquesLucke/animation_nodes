@@ -261,7 +261,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
     def appendNewObject(self, name, sourceObject, scenes):
         object = self.newInstance(name, sourceObject, scenes)
         for scene in scenes:
-            if scene is not None: scene.objects.link(object)
+            if scene is not None: scene.collection.objects.link(object)
         linkedItem = self.linkedObjects.add()
         linkedItem.objectName = object.name
         linkedItem.objectIndex = bpy.data.objects.find(object.name)

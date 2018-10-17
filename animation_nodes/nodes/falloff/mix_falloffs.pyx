@@ -16,10 +16,12 @@ class MixFalloffsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MixFalloffsNode"
     bl_label = "Mix Falloffs"
 
-    mixType: EnumProperty(name = "Mix Type", items = mixTypeItems,
+    __annotations__ = {}
+
+    __annotations__["mixType"] = EnumProperty(name = "Mix Type", items = mixTypeItems,
         default = "MAX", update = AnimationNode.refresh)
 
-    mixFalloffList: BoolProperty(name = "Mix Falloff List", default = False,
+    __annotations__["mixFalloffList"] = BoolProperty(name = "Mix Falloff List", default = False,
         update = AnimationNode.refresh)
 
     def create(self):

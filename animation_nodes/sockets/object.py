@@ -72,7 +72,7 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             data.dimensions = "3D"
             data.fill_mode = "FULL"
         object = bpy.data.objects.new("Target", data)
-        bpy.context.scene.objects.link(object)
+        bpy.context.collection.objects.link(object)
         self.objectName = object.name
 
     def toggleObjectVisibilty(self):

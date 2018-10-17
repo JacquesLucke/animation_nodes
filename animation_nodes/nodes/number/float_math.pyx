@@ -166,15 +166,17 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
             justCopiedIdentifiers.remove(self.identifier)
         self.refresh()
 
-    operation: EnumProperty(name = "Operation", default = "Multiply",
+    __annotations__ = {}
+
+    __annotations__["operation"] = EnumProperty(name = "Operation", default = "Multiply",
         description = "Operation to perform on the inputs",
         items = operationItems, update = operationChanged)
 
-    useListA: VectorizedSocket.newProperty()
-    useListB: VectorizedSocket.newProperty()
-    useListBase: VectorizedSocket.newProperty()
-    useListExponent: VectorizedSocket.newProperty()
-    useListStep: VectorizedSocket.newProperty()
+    __annotations__["useListA"] = VectorizedSocket.newProperty()
+    __annotations__["useListB"] = VectorizedSocket.newProperty()
+    __annotations__["useListBase"] = VectorizedSocket.newProperty()
+    __annotations__["useListExponent"] = VectorizedSocket.newProperty()
+    __annotations__["useListStep"] = VectorizedSocket.newProperty()
 
     def create(self):
         usedProperties = []

@@ -22,4 +22,4 @@ class CythonizeTask:
 
     def execute(self):
         from Cython.Build import cythonize
-        cythonize(self.path)
+        cythonize(self.path, compiler_directives = {"language_level" : "3"})

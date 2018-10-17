@@ -28,16 +28,18 @@ class ObjectControllerFalloffNode(bpy.types.Node, AnimationNode):
     bl_label = "Object Controller Falloff"
     bl_width_default = 160
 
-    falloffType: EnumProperty(name = "Falloff Type", items = falloffTypeItems,
+    __annotations__ = {}
+
+    __annotations__["falloffType"] = EnumProperty(name = "Falloff Type", items = falloffTypeItems,
         update = AnimationNode.refresh)
 
-    axisDirection: EnumProperty(name = "Axis Direction", default = "Z",
+    __annotations__["axisDirection"] = EnumProperty(name = "Axis Direction", default = "Z",
         items = axisDirectionItems, update = propertyChanged)
 
-    mixListType: EnumProperty(name = "Mix List Type", default = "MAX",
+    __annotations__["mixListType"] = EnumProperty(name = "Mix List Type", default = "MAX",
         items = mixListTypeItems, update = propertyChanged)
 
-    useObjectList: VectorizedSocket.newProperty()
+    __annotations__["useObjectList"] = VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Object", "useObjectList",

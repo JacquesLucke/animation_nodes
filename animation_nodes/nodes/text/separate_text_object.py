@@ -175,7 +175,7 @@ def newCharacterObject(name, sourceData, index):
     copyTextCharacterFormat(sourceData.body_format[index], newTextData.body_format[0])
 
     characterObject = bpy.data.objects.new(name, newTextData)
-    bpy.context.scene.objects.link(characterObject)
+    bpy.context.collection.objects.link(characterObject)
     return characterObject
 
 def copyTextCharacterFormat(source, target):

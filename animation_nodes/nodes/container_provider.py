@@ -10,7 +10,7 @@ def getMainObjectContainer(scene):
     if objectContainer is None:
         objectContainer = newMainObjectContainer()
     if objectContainer.name not in scene.objects:
-        scene.objects.link(objectContainer)
+        scene.collection.objects.link(objectContainer)
     return objectContainer
 
 def newMainObjectContainer():
