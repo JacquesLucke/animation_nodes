@@ -27,10 +27,10 @@ class TreePanel(bpy.types.Panel):
         props.name = tree.name
 
         if not canExecute():
-            layout.label("Look in the 'Problems' panel", icon = "INFO")
+            layout.label(text = "Look in the 'Problems' panel", icon = "INFO")
 
         row = layout.row(align = True)
-        row.label(prettyTime(tree.lastExecutionInfo.executionTime), icon = "TIME")
+        row.label(text = prettyTime(tree.lastExecutionInfo.executionTime), icon = "TIME")
         row.prop(getExecutionCodeSettings(), "measureExecution", text = "Details", emboss = False)
 
         layout.separator()

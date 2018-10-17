@@ -143,4 +143,4 @@ class PieMenuHelper:
         self.empty(layout)
 
     def empty(self, layout, text = ""):
-        layout.row().label(text)
+        layout.row().label(text = text)

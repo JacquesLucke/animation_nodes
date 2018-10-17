@@ -36,7 +36,7 @@ class DeveloperPanel(bpy.types.Panel):
 
     def drawExecutionCodeSettings(self, layout, preferences):
         executionCode = preferences.executionCode
-        layout.label("Execution Code:")
+        layout.label(text = "Execution Code:")
 
         col = layout.column(align = True)
 

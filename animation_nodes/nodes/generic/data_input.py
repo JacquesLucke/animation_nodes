@@ -37,7 +37,7 @@ class DataInputNode(bpy.types.Node, AnimationNode):
             if hasattr(inputSocket, "drawProperty"):
                 inputSocket.drawProperty(layout, "", self)
             else:
-                layout.label("Default Used", icon = "INFO")
+                layout.label(text = "Default Used", icon = "INFO")
 
     def drawLabel(self):
         return self.inputs[0].dataType + " Input"

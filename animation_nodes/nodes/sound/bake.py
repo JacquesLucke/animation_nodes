@@ -59,7 +59,7 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
 
         if self.sound is None:
             if len(bpy.data.sounds) > 0:
-                layout.label("Select a sound for more settings", icon = "INFO")
+                layout.label(text = "Select a sound for more settings", icon = "INFO")
             return
 
         box = col.box()
@@ -85,7 +85,7 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
         self.drawSpectrumFrequencyRanges(layout)
 
         if self.bakeProgress != "":
-            layout.label(self.bakeProgress, icon = "INFO")
+            layout.label(text = self.bakeProgress, icon = "INFO")
 
         self.drawBakedData_Average(layout, sound)
         self.drawBakedData_Spectrum(layout, sound)
@@ -103,7 +103,7 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
             for i, item in enumerate(self.spectrumFrequencyRanges):
                 row = subcol.row(align = True)
                 row.alignment = "RIGHT"
-                row.label(str(i) + ":")
+                row.label(text = str(i) + ":")
                 right = row.split(percentage = 0.5, align = True)
                 right.prop(item, "low")
                 right.prop(item, "high")
@@ -113,7 +113,7 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
         if len(items) > 0:
             col = layout.column()
             row = col.row(align = True)
-            row.label("Average Data:")
+            row.label(text = "Average Data:")
             self.invokeFunction(row, "moveItemUp", icon = "TRIA_UP")
             self.invokeFunction(row, "moveItemDown", icon = "TRIA_DOWN")
             col.template_list("an_AverageItemsUiList", "", sound.bakedData, "average",
@@ -124,7 +124,7 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
         if len(items) > 0:
             col = layout.column()
             row = col.row()
-            row.label("Spectrum Data:")
+            row.label(text = "Spectrum Data:")
             col.template_list("an_SpectrumItemsUiList", "", sound.bakedData, "spectrum",
                 self, "activeSpectrumDataIndex", rows = len(items) + 1)
 
@@ -211,11 +211,11 @@ class AverageItemsUiList(bpy.types.UIList):
     bl_idname = "an_AverageItemsUiList"
 
     def draw_item(self, context, layout, bakedData, item, icon, node, activePropname):
-        layout.label("#" + str(list(bakedData.average).index(item)))
-        layout.label(str(round(item.low)))
-        layout.label(str(round(item.high)))
-        layout.label(str(round(item.attack, 3)))
-        layout.label(str(round(item.release, 3)))
+        layout.label(text = "#" + str(list(bakedData.average).index(item)))
+        layout.label(text = str(round(item.low)))
+        layout.label(text = str(round(item.high)))
+        layout.label(text = str(round(item.attack, 3)))
+        layout.label(text = str(round(item.release, 3)))
         node.invokeFunction(layout, "removeAverageBakedData", icon = "X", emboss = False,
             data = list(bakedData.average).index(item))
 
@@ -223,9 +223,9 @@ class SpectrumItemsUiList(bpy.types.UIList):
     bl_idname = "an_SpectrumItemsUiList"
 
     def draw_item(self, context, layout, bakedData, item, icon, node, activePropname):
-        layout.label("#" + str(list(bakedData.spectrum).index(item)))
-        layout.label(str(round(item.attack, 3)))
-        layout.label(str(round(item.release, 3)))
+        layout.label(text = "#" + str(list(bakedData.spectrum).index(item)))
+        layout.label(text = str(round(item.attack, 3)))
+        layout.label(text = str(round(item.release, 3)))
         node.invokeFunction(layout, "removeSpectrumBakedData", icon = "X", emboss = False,
             data = list(bakedData.spectrum).index(item))
 
@@ -421,8 +421,8 @@ class CalculateSpectrumFrequencyRanges(bpy.types.Operator):
         col = layout.column(align = True)
         for low, high in self.calculate_ranges():
             row = col.row(align = True)
-            row.label(str(int(low)))
-            row.label(str(int(high)))
+            row.label(text = str(int(low)))
+            row.label(text = str(int(high)))
 
     def execute(self, context):
         node = getNodeByIdentifier(self.nodeIdentifier)

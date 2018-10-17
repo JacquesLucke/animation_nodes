@@ -46,7 +46,7 @@ class CombineColorNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "sourceType", expand = True)
 
     def drawAdvanced(self, layout):
-        layout.label("Uses linear color space", icon = "INFO")
+        layout.label(text = "Uses linear color space", icon = "INFO")
 
     def drawLabel(self):
         return "Color from {}a".format(self.sourceType)

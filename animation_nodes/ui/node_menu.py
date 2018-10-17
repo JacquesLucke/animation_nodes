@@ -616,7 +616,7 @@ class SubprogramsMenu(bpy.types.Menu):
         insertNode(layout, "an_InvokeSubprogramNode", "Invoke Subprogram")
         subprograms = getSubprogramNetworks()
         if len(subprograms) == 0:
-            layout.label("   There are no subprograms yet")
+            layout.label(text = "   There are no subprograms yet")
         else:
             for network in sorted(subprograms, key = lambda x: x.name.lower()):
                 insertNode(layout, "an_InvokeSubprogramNode", "-  " + network.name, {"subprogramIdentifier" : repr(network.identifier)})

@@ -35,7 +35,7 @@ class IDKeyPanel(bpy.types.Panel):
                                  icon = icon, emboss = False)
             props.dataType = idKey.type
             props.propertyName = idKey.name
-            row.label(idKey.name)
+            row.label(text = idKey.name)
 
             if idKey not in unremovableIDKeys:
                 props = row.operator("an.remove_id_key", text = "", icon = "X", emboss = False)
@@ -56,7 +56,7 @@ class IDKeyPanel(bpy.types.Panel):
 
     def drawIDKeyHeader(self, layout, object, idKey, exists):
         left, right = splitAlignment(layout)
-        left.label(idKey.name)
+        left.label(text = idKey.name)
 
         if exists:
             props = right.operator("an.open_copy_id_key_menu",

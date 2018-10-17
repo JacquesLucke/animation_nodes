@@ -42,17 +42,17 @@ class ViewerNode(bpy.types.Node, AnimationNode):
 
     def drawAdvanced(self, layout):
         col = layout.column(align = True)
-        col.label("Display Settings:")
+        col.label(text = "Display Settings:")
         col.prop(self, "fontSize")
         col.prop(self, "maxRows")
 
         col = layout.column(align = True)
-        col.label("List Settings:")
+        col.label(text = "List Settings:")
         col.prop(self, "maxListStartElements", text = "Start")
         col.prop(self, "maxListEndElements", text = "End")
 
         col = layout.column(align = True)
-        col.label("Output Settings:")
+        col.label(text = "Output Settings:")
         col.prop(self, "outputConsole", "Console")
         col.prop(self, "outputTextBlock", "Text Block")
 

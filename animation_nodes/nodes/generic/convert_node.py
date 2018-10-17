@@ -32,7 +32,7 @@ class ConvertNode(bpy.types.Node, AnimationNode):
         row.prop(self, "fixedOutputDataType", icon = icon, text = "")
 
         if self.lastCorrectionType == 2:
-            layout.label("Conversion Failed", icon = "ERROR")
+            layout.label(text = "Conversion Failed", icon = "ERROR")
 
     def assignOutputType(self, dataType):
         self.fixedOutputDataType = True

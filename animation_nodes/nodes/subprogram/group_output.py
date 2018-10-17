@@ -31,13 +31,13 @@ class GroupOutputNode(bpy.types.Node, AnimationNode):
         layout.separator()
 
         inputNode = self.network.getGroupInputNode()
-        if inputNode: layout.label(inputNode.subprogramName, icon = "GROUP_VERTEX")
+        if inputNode: layout.label(text = inputNode.subprogramName, icon = "GROUP_VERTEX")
         else: self.invokeFunction(layout, "createGroupInputNode", text = "Input Node", icon = "PLUS")
         layout.separator()
 
     def drawControlSocket(self, layout, socket):
         left, right = splitAlignment(layout)
-        left.label(socket.name)
+        left.label(text = socket.name)
         self.invokeSelector(right, "DATA_TYPE", "newGroupOutput",
             icon = "ZOOMIN", emboss = False)
 

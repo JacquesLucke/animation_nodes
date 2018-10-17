@@ -81,7 +81,7 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
 
     def drawErrorMessages(self, layout, onlyErrors = False):
         if self.errorMessage != "":
-            layout.label(self.errorMessage, icon = "ERROR")
+            layout.label(text = self.errorMessage, icon = "ERROR")
             return
 
         col = layout.column(align = True)
@@ -89,17 +89,17 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
             variableName = socket.text
             if self.initializeMissingOutputs:
                 if not getattr(socket, '["variableInitialized"]', True):
-                    col.label("'{}' - Not Initialized, used default".format(variableName), icon = "ERROR")
+                    col.label(text = "'{}' - Not Initialized, used default".format(variableName), icon = "ERROR")
             if self.correctOutputTypes:
                 correctionType = getattr(socket, '["correctionType"]', 0)
                 if correctionType == 1 and not onlyErrors:
-                    col.label("'{}' - Type Corrected".format(variableName), icon = "INFO")
+                    col.label(text = "'{}' - Type Corrected".format(variableName), icon = "INFO")
                 elif correctionType == 2:
-                    col.label("'{}' - Wrong Type, expected '{}'".format(variableName, socket.dataType), icon = "ERROR")
+                    col.label(text = "'{}' - Wrong Type, expected '{}'".format(variableName, socket.dataType), icon = "ERROR")
 
     def drawAdvanced(self, layout):
         col = layout.column()
-        col.label("Description:")
+        col.label(text = "Description:")
         col.prop(self, "subprogramDescription", text = "")
         layout.prop(self, "interactiveMode")
         col = layout.column(align = True)

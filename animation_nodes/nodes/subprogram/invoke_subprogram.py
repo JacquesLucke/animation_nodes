@@ -139,9 +139,9 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
         col.prop(self, "cacheType")
         if not self.canCache:
             col = layout.column(align = True)
-            col.label("This caching method is not available:")
-            if not self.isOutputStorable: col.label("  - The output is not storable")
-            if not self.isInputComparable: col.label("  - The input is not comparable")
+            col.label(text = "This caching method is not available:")
+            if not self.isOutputStorable: col.label(text = "  - The output is not storable")
+            if not self.isInputComparable: col.label(text = "  - The input is not comparable")
         self.invokeFunction(layout, "clearCache", text = "Clear Cache")
 
     def checkCachingPossibilities(self):
@@ -206,7 +206,7 @@ class ChangeSubprogram(bpy.types.Operator):
 
         network = getNetworkByIdentifier(self.subprogram)
         if network:
-            layout.label("Desription: " + network.description)
+            layout.label(text = "Desription: " + network.description)
             layout.separator()
             if network.type == "Group":
                 socketData = network.getGroupInputNode().getSocketData()
@@ -216,19 +216,19 @@ class ChangeSubprogram(bpy.types.Operator):
                 socketData = network.getScriptNode().getSocketData()
 
             col = layout.column()
-            col.label("Inputs:")
+            col.label(text = "Inputs:")
             self.drawSockets(col, socketData.inputs)
 
             col = layout.column()
-            col.label("Outputs:")
+            col.label(text = "Outputs:")
             self.drawSockets(col, socketData.outputs)
 
     def drawSockets(self, layout, sockets):
         col = layout.column(align = True)
         for data in sockets:
             row = col.row()
-            row.label(" "*8 + data.text)
-            row.label("<  {}  >".format(toDataType(data.idName)))
+            row.label(text = " "*8 + data.text)
+            row.label(text = "<  {}  >".format(toDataType(data.idName)))
 
     @property
     def expandSubprograms(self):

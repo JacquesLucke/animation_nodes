@@ -20,7 +20,7 @@ class ProblemsPanel(bpy.types.Panel):
         return tree.bl_idname == "an_AnimationNodeTree" and problems.problemsExist()
 
     def draw_header(self, context):
-        self.layout.label("", icon = "ERROR")
+        self.layout.label(text = "", icon = "ERROR")
 
     def draw(self, context):
         layout = self.layout
@@ -38,9 +38,9 @@ class ProblemsPanel(bpy.types.Panel):
         col = layout.column(align = True)
         tree = self.getTree()
         lastExec = tree.lastExecutionInfo
-        col.label("Last successful execution using:")
-        col.label("    Blender:   v{}".format(lastExec.blenderVersionString))
-        col.label("    Animation Nodes:   v{}".format(lastExec.animationNodesVersionString))
+        col.label(text = "Last successful execution using:")
+        col.label(text = "    Blender:   v{}".format(lastExec.blenderVersionString))
+        col.label(text = "    Animation Nodes:   v{}".format(lastExec.animationNodesVersionString))
 
         if lastExec.isDefault:
             writeText(col,

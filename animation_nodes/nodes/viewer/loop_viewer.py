@@ -42,7 +42,7 @@ class LoopViewerNode(bpy.types.Node, AnimationNode):
                 self.invokeSelector(row, "AREA", "viewTextBlockInArea",
                     icon = "ZOOM_SELECTED")
         else:
-            layout.label("Has to be in a loop", icon = "INFO")
+            layout.label(text = "Has to be in a loop", icon = "INFO")
 
     def drawAdvanced(self, layout):
         col = layout.column(align = True)

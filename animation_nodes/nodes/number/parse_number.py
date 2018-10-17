@@ -17,7 +17,7 @@ class ParseNumberNode(bpy.types.Node, AnimationNode):
 
     def draw(self, layout):
         if not self.parsingSuccessfull:
-            layout.label("Parsing Error", icon = "ERROR")
+            layout.label(text = "Parsing Error", icon = "ERROR")
 
     def getExecutionCode(self, required):
         if self.useList:

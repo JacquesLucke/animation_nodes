@@ -35,7 +35,7 @@ def drawPanel(self, context):
     prefs = getMeshIndicesSettings()
 
     col = self.layout.column(align = True)
-    col.label("Show Mesh Indices:")
+    col.label(text = "Show Mesh Indices:")
 
     row = col.row(align = True)
     row.prop(prefs, "drawVertices", text = "Vertices", icon = "VERTEXSEL")

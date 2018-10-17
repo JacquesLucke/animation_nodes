@@ -64,7 +64,7 @@ class AutoExecutionTrigger_MonitorProperty(bpy.types.PropertyGroup):
     def draw(self, layout, index):
         row = layout.row(align = True)
         if self.hasError:
-            row.label("", icon = "ERROR")
+            row.label(text = "", icon = "ERROR")
 
         icon = "LAYER_ACTIVE" if self.enabled else "LAYER_USED"
         row.prop(self, "enabled", icon = icon, text = "")

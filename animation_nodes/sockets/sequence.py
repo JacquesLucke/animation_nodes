@@ -22,7 +22,7 @@ class SequenceSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             row.prop_search(self, "sequenceName",  editor, "sequences", icon = "NLA", text = text)
             self.invokeFunction(row, node, "assignActiveSequence", icon = "EYEDROPPER")
         else:
-            row.label("No Sequence Editor")
+            row.label(text = "No Sequence Editor")
 
 
     def getValue(self):

@@ -169,7 +169,7 @@ class AnimationNodesPreferences(bpy.types.AddonPreferences):
         row = layout.row()
 
         col = row.column(align = True)
-        col.label("Node Colors:")
+        col.label(text = "Node Colors:")
         col.row().prop(self.nodeColors, "mainNetwork")
         col.row().prop(self.nodeColors, "invalidNetwork")
         subrow = col.row(align = True)
@@ -184,8 +184,8 @@ class AnimationNodesPreferences(bpy.types.AddonPreferences):
         col.split(0.25).prop(self, "showUninstallInfo", text = "How to Uninstall?",
             toggle = True, icon = "INFO")
         if self.showUninstallInfo:
-            col.label("1. Disable Animation Nodes and save the user settings.")
-            col.label("2. Restart Blender and remove the addon (without enabling it first).")
+            col.label(text = "1. Disable Animation Nodes and save the user settings.")
+            col.label(text = "2. Restart Blender and remove the addon (without enabling it first).")
 
 def getPreferences():
     return bpy.context.user_preferences.addons[addonName].preferences

@@ -105,7 +105,7 @@ class AnimationNodeSocket:
                 self.drawSocket(row, displayText, node, self.defaultDrawType)
             else:
                 if self.isOutput: row.alignment = "RIGHT"
-                row.label(displayText)
+                row.label(text = displayText)
 
         if self.moveable and self.display.moveOperators:
             row.separator()
@@ -118,8 +118,8 @@ class AnimationNodeSocket:
 
         if self.useIsUsedProperty:
             if self.is_linked and not self.isUsed:
-                row.label("", icon = "QUESTION")
-                row.label("", icon = "TRIA_RIGHT")
+                row.label(text = "", icon = "QUESTION")
+                row.label(text = "", icon = "TRIA_RIGHT")
             icon = "LAYER_ACTIVE" if self.isUsed else "LAYER_USED"
             row.prop(self, "isUsed", text = "", icon = icon)
 
@@ -141,11 +141,11 @@ class AnimationNodeSocket:
 
         if drawType == "TEXT_PROPERTY":
             if self.hasProperty(): self.drawProperty(layout, text, node)
-            else: layout.label(text)
+            else: layout.label(text = text)
         elif drawType == "PROPERTY_ONLY":
             if self.hasProperty(): self.drawProperty(layout, text = "", node = node)
         elif drawType == "TEXT_ONLY":
-            layout.label(text)
+            layout.label(text = text)
 
     def getDisplayedName(self):
         if self.display.text or (self.textProps.editable and self.display.textInput):

@@ -133,7 +133,7 @@ class MatrixTransformationBase:
         col.prop(self, "scaleMode", text = "Scale")
 
         if self.scaleMode in ("GLOBAL_AXIS", "INCLUDE_TRANSLATION"):
-            layout.label("May result in invalid object matrices", icon = "INFO")
+            layout.label(text = "May result in invalid object matrices", icon = "INFO")
 
     def getMatrixTransformationFunctionName(self, useMatrixList):
         if self.transformationSource == "LOC_ROT_SCALE":

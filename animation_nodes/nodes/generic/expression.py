@@ -68,19 +68,19 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
 
         col = layout.column(align = True)
         if self.containsSyntaxError:
-            col.label("Syntax Error", icon = "ERROR")
+            col.label(text = "Syntax Error", icon = "ERROR")
         else:
             if self.debugMode and self.expression != "":
                 if self.errorMessage != "":
                     row = col.row()
-                    row.label(self.errorMessage, icon = "ERROR")
+                    row.label(text = self.errorMessage, icon = "ERROR")
                     self.invokeFunction(row, "clearErrorMessage", icon = "X", emboss = False)
             if self.correctType:
                 if self.lastCorrectionType == 1:
-                    col.label("Automatic Type Correction", icon = "INFO")
+                    col.label(text = "Automatic Type Correction", icon = "INFO")
                 elif self.lastCorrectionType == 2:
-                    col.label("Wrong Output Type", icon = "ERROR")
-                    col.label("Expected {}".format(repr(self.outputDataType)), icon = "INFO")
+                    col.label(text = "Wrong Output Type", icon = "ERROR")
+                    col.label(text = "Expected {}".format(repr(self.outputDataType)), icon = "INFO")
 
     def drawAdvanced(self, layout):
         layout.prop(self, "moduleNames")
@@ -97,7 +97,7 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
 
     def drawControlSocket(self, layout, socket):
         left, right = splitAlignment(layout)
-        left.label(socket.name)
+        left.label(text = socket.name)
         self.invokeSelector(right, "DATA_TYPE", "newInputSocket",
             icon = "ZOOMIN", emboss = False)
 

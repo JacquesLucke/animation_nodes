@@ -29,7 +29,7 @@ class AutoExecutionPanel(bpy.types.Panel):
         isRendering = isViewportRendering()
 
         if not canExecute():
-            layout.label("Look in the 'Problems' panel", icon = "INFO")
+            layout.label(text = "Look in the 'Problems' panel", icon = "INFO")
 
         layout.active = autoExecution.enabled
 

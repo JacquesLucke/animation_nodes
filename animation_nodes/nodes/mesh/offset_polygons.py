@@ -49,7 +49,7 @@ class OffsetPolygonsNode(bpy.types.Node, AnimationNode, MatrixTransformationBase
         layout.prop(self, "pivotSource", text = "Local Pivots")
 
         if self.pivotSource == "CUSTOM_MATRICES" and "LOCAL_AXIS" not in self.rotationMode:
-            layout.label("Try to change the rotation mode.", icon = "INFO")
+            layout.label(text = "Try to change the rotation mode.", icon = "INFO")
 
         self.drawAdvanced_MatrixTransformationProperties(layout)
 

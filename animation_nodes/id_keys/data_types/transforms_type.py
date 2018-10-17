@@ -86,7 +86,7 @@ class TransformDataType(CompoundIDKeyDataType):
             col = row.column(align = True)
             if label == "Rotation":
                 label += " ({})".format(cls.getRotationOrder(object, name))
-            col.label(label)
+            col.label(text = label)
             col.prop(object, path, text = "")
 
     @classmethod

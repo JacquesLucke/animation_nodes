@@ -20,7 +20,7 @@ class SceneSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         row = layout.row(align = True)
         if self.useGlobalScene:
             if text != "": text += ": "
-            row.label(text + repr(self.nodeTree.scene.name))
+            row.label(text = text + repr(self.nodeTree.scene.name))
         else:
             row.prop_search(self, "sceneName",  bpy.data, "scenes", text = text)
         row.prop(self, "useGlobalScene", text = "", icon = "WORLD")
@@ -63,10 +63,10 @@ class SceneListSocket(bpy.types.NodeSocket, PythonListSocket):
         row = layout.row(align = True)
         if self.useGlobalScene:
             if text != "": text += ": "
-            row.label(text + "[{}]".format(repr(self.nodeTree.scene.name)))
+            row.label(text = text + "[{}]".format(repr(self.nodeTree.scene.name)))
         else:
             if text is "": text = self.text
-            row.label(text)
+            row.label(text = text)
         row.prop(self, "useGlobalScene", icon = "WORLD", text = "")
 
     def getValue(self):

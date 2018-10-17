@@ -84,7 +84,7 @@ class IDKeysFromSortedObjects(bpy.types.Operator):
             layout.prop(self, "threshold")
         elif self.sortMode == "DISTANCE":
             if context.active_object is None:
-                layout.label("No active object.", icon = "INFO")
+                layout.label(text = "No active object.", icon = "INFO")
             else:
                 layout.prop(self, "locationMode", text = "Location")
                 layout.prop(self, "threshold")

@@ -17,7 +17,7 @@ class QuaternionSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def drawProperty(self, layout, text, node):
         col = layout.column(align = True)
-        if text != "": col.label(text)
+        if text != "": col.label(text = text)
         col.prop(self, "value", index = 0, text = "W")
         col.prop(self, "value", index = 1, text = "X")
         col.prop(self, "value", index = 2, text = "Y")

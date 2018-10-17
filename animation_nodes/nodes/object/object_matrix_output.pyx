@@ -36,7 +36,7 @@ class ObjectMatrixOutputNode(bpy.types.Node, AnimationNode):
     def drawAdvanced(self, layout):
         layout.prop(self, "outputType", text = "Type")
         if self.outputType != "WORLD":
-            layout.label("This mode might not work as expected", icon = "INFO")
+            layout.label(text = "This mode might not work as expected", icon = "INFO")
 
     def getExecutionFunctionName(self):
         if isList(self.inputs[1].dataType):

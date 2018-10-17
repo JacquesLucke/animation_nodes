@@ -21,7 +21,7 @@ class CombineMeshNode(bpy.types.Node, AnimationNode):
 
     def draw(self, layout):
         if self.skipValidation:
-            layout.label("Validation skipped", icon = "INFO")
+            layout.label(text = "Validation skipped", icon = "INFO")
 
     def drawAdvanced(self, layout):
         layout.prop(self, "skipValidation")

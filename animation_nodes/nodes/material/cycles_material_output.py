@@ -58,7 +58,7 @@ class CyclesMaterialOutputNode(bpy.types.Node, AnimationNode):
         if self.hasPossibleInputs(node):
             layout.prop(self, "socketIdentifier", text = "")
         else:
-            layout.label("No Animatable Inputs", icon = "INFO")
+            layout.label(text = "No Animatable Inputs", icon = "INFO")
 
     def hasPossibleInputs(self, node):
         keys = allowedSocketTypes.keys()

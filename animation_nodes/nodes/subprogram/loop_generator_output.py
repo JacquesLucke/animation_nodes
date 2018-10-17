@@ -42,14 +42,14 @@ class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         node = self.loopInputNode
         if node is not None:
-            layout.label(node.subprogramName, icon = "GROUP_VERTEX")
+            layout.label(text = node.subprogramName, icon = "GROUP_VERTEX")
 
     def drawAdvanced(self, layout):
         layout.prop(self, "outputName", text = "Name")
         self.invokeSelector(layout, "DATA_TYPE", "setListDataType",
             dataTypes = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
 
-        layout.label("No vectorization for generic type.", icon = "INFO")
+        layout.label(text = "No vectorization for generic type.", icon = "INFO")
 
     def drawLabel(self):
         return self.outputName

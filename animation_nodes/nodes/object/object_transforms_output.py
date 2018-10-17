@@ -50,28 +50,28 @@ class ObjectTransformsOutputNode(bpy.types.Node, AnimationNode):
         col = layout.column()
 
         row = col.row()
-        row.label("", icon = "MAN_TRANS")
+        row.label(text = "", icon = "MAN_TRANS")
         subrow = row.row(align = True)
         subrow.prop(self, "useLocation", index = 0, text = "X", toggle = True)
         subrow.prop(self, "useLocation", index = 1, text = "Y", toggle = True)
         subrow.prop(self, "useLocation", index = 2, text = "Z", toggle = True)
 
         row = col.row()
-        row.label("", icon = "MAN_ROT")
+        row.label(text = "", icon = "MAN_ROT")
         subrow = row.row(align = True)
         subrow.prop(self, "useRotation", index = 0, text = "X", toggle = True)
         subrow.prop(self, "useRotation", index = 1, text = "Y", toggle = True)
         subrow.prop(self, "useRotation", index = 2, text = "Z", toggle = True)
 
         row = col.row()
-        row.label("", icon = "MAN_SCALE")
+        row.label(text = "", icon = "MAN_SCALE")
         subrow = row.row(align = True)
         subrow.prop(self, "useScale", index = 0, text = "X", toggle = True)
         subrow.prop(self, "useScale", index = 1, text = "Y", toggle = True)
         subrow.prop(self, "useScale", index = 2, text = "Z", toggle = True)
 
         if self.deltaTransforms:
-            col.label("Delta Transforms", icon = "INFO")
+            col.label(text = "Delta Transforms", icon = "INFO")
 
     def drawAdvanced(self, layout):
         layout.prop(self, "deltaTransforms")

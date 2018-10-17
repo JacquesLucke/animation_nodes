@@ -34,12 +34,12 @@ class InterpolationSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def drawProperty(self, layout, text, node):
         col = layout.column(align = True)
-        if text != "": col.label(text)
+        if text != "": col.label(text = text)
         row = col.row(align = True)
         row.prop(self, "category", text = "")
         if self.category != "LINEAR":
             if not (self.easeIn or self.easeOut):
-                row.label(icon = "ERROR", text = "")
+                row.label(text = icon = "ERROR", text = "")
             row.prop(self, "easeIn", text = "", icon = "IPO_EASE_IN")
             row.prop(self, "easeOut", text = "", icon = "IPO_EASE_OUT")
 

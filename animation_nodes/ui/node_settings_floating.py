@@ -33,7 +33,7 @@ class FloatingNodeSettingsPanel(bpy.types.Operator):
         try:
             node = getNodeByIdentifier(self.nodeIdentifier)
         except:
-            self.layout.label("An error occured during drawing", icon = "INFO")
+            self.layout.label(text = "An error occured during drawing", icon = "INFO")
             return
 
         layout = self.layout

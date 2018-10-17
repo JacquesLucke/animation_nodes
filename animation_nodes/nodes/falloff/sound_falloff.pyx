@@ -80,7 +80,7 @@ class SoundFalloffNode(bpy.types.Node, AnimationNode):
 
     def drawAdvanced(self, layout):
         col = layout.column(align = True)
-        col.label("Fade to zero:")
+        col.label(text = "Fade to zero:")
         col.prop(self, "fadeLowFrequenciesToZero", text = "Low Frequencies")
         col.prop(self, "fadeHighFrequenciesToZero", text = "High Frequencies")
 

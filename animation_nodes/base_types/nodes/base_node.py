@@ -105,7 +105,7 @@ class AnimationNode:
         return self.bl_label
 
     def drawAdvanced(self, layout):
-        layout.label("Has no advanced settings")
+        layout.label(text = "Has no advanced settings")
 
     def socketRemoved(self):
         self.socketChanged()
@@ -143,7 +143,7 @@ class AnimationNode:
 
     def drawControlSocket(self, layout, socket):
         layout.alignment = "LEFT" if socket.isInput else "RIGHT"
-        layout.label(socket.name)
+        layout.label(text = socket.name)
 
     @classmethod
     def getSearchTags(cls):
@@ -174,7 +174,7 @@ class AnimationNode:
         self._clear()
 
     def draw_buttons(self, context, layout):
-        if self.inInvalidNetwork: layout.label("Invalid Network", icon = "ERROR")
+        if self.inInvalidNetwork: layout.label(text = "Invalid Network", icon = "ERROR")
         if self.nodeTree.editNodeLabels: layout.prop(self, "label", text = "")
         self.draw(layout)
 

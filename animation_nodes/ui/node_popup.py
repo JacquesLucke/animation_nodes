@@ -18,7 +18,7 @@ class NodePopup(bpy.types.Operator):
 
     def draw(self, context):
         try: node = getNodeByIdentifier(self.nodeIdentifier)
-        except: self.layout.label("Node not found", icon = "INFO")
+        except: self.layout.label(text = "Node not found", icon = "INFO")
 
         drawFunction = getattr(node, self.drawFunctionName)
         drawFunction(self.layout)

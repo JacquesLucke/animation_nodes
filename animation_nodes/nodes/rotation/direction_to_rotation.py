@@ -44,7 +44,7 @@ class DirectionToRotationNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "guideAxis", expand = True)
 
         if self.trackAxis[-1:] == self.guideAxis[-1:]:
-            layout.label("Must be different", icon = "ERROR")
+            layout.label(text = "Must be different", icon = "ERROR")
 
     def getExecutionCode(self, required):
         generateList = self.useDirectionList or self.useGuideList

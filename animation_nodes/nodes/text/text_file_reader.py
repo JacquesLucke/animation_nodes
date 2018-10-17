@@ -23,7 +23,7 @@ class TextFileReaderNode(bpy.types.Node, AnimationNode):
         if self.inputs[0].isUnlinked:
             name = os.path.basename(self.inputs[0].value)
             if name != "":
-                layout.label(name, icon = "FILE_TEXT")
+                layout.label(text = name, icon = "FILE_TEXT")
 
     def drawAdvanced(self, layout):
         self.invokeFunction(layout, "clearCache", text = "Clear Cache")
