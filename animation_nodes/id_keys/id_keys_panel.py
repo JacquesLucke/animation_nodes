@@ -21,7 +21,7 @@ class IDKeyPanel(bpy.types.Panel):
     def drawHeader(self, layout):
         col = layout.column(align = True)
         row = col.row(align = True)
-        row.operator("an.new_id_key", text = "New", icon = "NEW")
+        row.operator("an.new_id_key", text = "New", icon = "FILE_NEW")
         row.operator("an.update_id_keys_list", text = "Update", icon = "FILE_REFRESH")
         self.drawIDKeyList(col)
 

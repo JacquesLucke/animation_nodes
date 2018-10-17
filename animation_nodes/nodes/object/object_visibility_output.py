@@ -18,6 +18,9 @@ class ObjectVisibilityOutputNode(bpy.types.Node, AnimationNode):
 
     useObjectList: VectorizedSocket.newProperty()
 
+    for *_, useListName in attributes:
+        __annotations__[useListName] = VectorizedSocket.newProperty()
+
     def create(self):
         self.newInput(VectorizedSocket("Object", "useObjectList",
             ("Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
@@ -52,6 +55,3 @@ class ObjectVisibilityOutputNode(bpy.types.Node, AnimationNode):
             if self.inputs[name].isUsed:
                 yield "    object.keyframe_insert('{}')".format(attr)
         yield "    pass"
-
-for *_, useListName in attributes:
-    setattr(ObjectVisibilityOutputNode, useListName, VectorizedSocket.newProperty())

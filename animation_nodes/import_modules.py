@@ -10,7 +10,7 @@ def importAllSubmodules(path, packageName):
     return modules
 
 def iterSubModuleNames(path, root = ""):
-    for importer, moduleName, isPackage in pkgutil.iter_modules([path]):
+    for _, moduleName, isPackage in pkgutil.iter_modules([path]):
         if isPackage:
             subPath = os.path.join(path, moduleName)
             subRoot = root + moduleName + "."

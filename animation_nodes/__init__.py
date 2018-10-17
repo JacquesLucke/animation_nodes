@@ -182,16 +182,72 @@ updateSocketInfo()
 ##################################
 
 import bpy
+import inspect
+import typing
+
+types_to_register = tuple(getattr(bpy.types, name) for name in [
+    "Node",
+    "NodeSocket",
+    "NodeTree",
+    "Menu",
+    "Header",
+    "UIList",
+    "Panel",
+    "Operator",
+    "PropertyGroup",
+    "AddonPreferences"
+])
+
+classes = set()
+
+for module in modules:
+    for value in module.__dict__.values():
+        if inspect.isclass(value):
+            if issubclass(value, types_to_register):
+                classes.add(value)
+
+def iter_register_dependencies(cls):
+    if not hasattr(cls, "__annotations__"):
+        return
+    for value in typing.get_type_hints(cls, {}, {}).values():
+        if isinstance(value, tuple) and len(value) == 2:
+            if value[0] in (bpy.props.PointerProperty, bpy.props.CollectionProperty):
+                dependency = value[1]["type"]
+                yield dependency
+
+dependencies = {}
+for cls in classes:
+    dependencies[cls] = set(iter_register_dependencies(cls))
+
+def toposort(dependency_dict):
+    sorted_list = []
+    has_been_sorted = set()
+    while len(dependency_dict) > 0:
+        still_unsorted = []
+        for element, dependencies in dependency_dict.items():
+            if len(dependencies) == 0:
+                sorted_list.append(element)
+                has_been_sorted.add(element)
+            else:
+                still_unsorted.append(element)
+
+        dependency_dict = {element : dependency_dict[element] - has_been_sorted for element in still_unsorted}
+    return sorted_list
+
+
+sorted_classes = toposort(dependencies)
 
 def register():
-    bpy.utils.register_module(__name__)
+    for cls in sorted_classes:
+        bpy.utils.register_class(cls)
     for module in modules:
         if hasattr(module, "register"):
             module.register()
     print("Registered Animation Nodes with {} modules.".format(len(modules)))
 
 def unregister():
-    bpy.utils.unregister_module(__name__)
+    for cls in reversed(sorted_classes):
+        bpy.utils.unregister_class(cls)
     for module in modules:
         if hasattr(module, "unregister"):
             module.unregister()
