@@ -26,7 +26,7 @@ def drawLine(x1, y1, x2, y2, color = None, thickness = None):
 def drawText(text, x, y, font = 0, align = "LEFT", verticalAlignment = "BASELINE", size = 12, color = (1, 1, 1, 1)):
     text = str(text)
     blf.size(font, size, int(dpi))
-    glColor4f(*color)
+    blf.color(font, *color)
 
     if align == "LEFT" and verticalAlignment == "BASELINE":
         blf.position(font, x, y, 0)

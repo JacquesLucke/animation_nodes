@@ -56,7 +56,9 @@ def drawPanel(self, context):
     subRow.prop(prefs, "polygonsColor", text = "")
 
 def register():
-    bpy.types.VIEW3D_PT_view3d_display.append(drawPanel)
+    #bpy.types.VIEW3D_PT_view3d_display.append(drawPanel)
+    pass
 
 def unregister():
-    bpy.types.VIEW3D_PT_view3d_display.remove(drawPanel)
+    #bpy.types.VIEW3D_PT_view3d_display.remove(drawPanel)
+    pass

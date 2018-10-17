@@ -55,6 +55,7 @@ class ProblemsPanel(bpy.types.Panel):
 
 @drawHandler("SpaceNodeEditor", "WINDOW")
 def drawWarningOverlay():
+    return
     if problems.problemsExist():
         rectangle = Rectangle.fromRegionDimensions(bpy.context.region)
         rectangle.draw(

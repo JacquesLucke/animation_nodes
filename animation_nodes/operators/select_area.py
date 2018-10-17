@@ -82,6 +82,7 @@ class SelectArea(bpy.types.Operator):
         return None, None, None
 
     def drawCallback(self):
+        return
         if not hasattr(self, "mousePosition"):
             return
         if bpy.context.window != self.window:

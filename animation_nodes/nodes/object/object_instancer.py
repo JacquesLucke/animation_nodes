@@ -23,9 +23,9 @@ objectTypeItems = [
     ("Curve 3D", "Curve 3D", "", "CURVE_DATA", 5),
     ("Empty", "Empty", "", "EMPTY_DATA", 6) ]
 
-emptyDrawTypeItems = []
-for item in bpy.types.Object.bl_rna.properties["empty_draw_type"].enum_items:
-    emptyDrawTypeItems.append((item.identifier, item.name, ""))
+emptyDisplayTypeItems = []
+for item in bpy.types.Object.bl_rna.properties["empty_display_type"].enum_items:
+    emptyDisplayTypeItems.append((item.identifier, item.name, ""))
 
 class ObjectNamePropertyGroup(bpy.types.PropertyGroup):
     bl_idname = "an_ObjectNamePropertyGroup"
@@ -69,8 +69,8 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
     parentInstances = BoolProperty(name = "Parent to Main Container",
         default = True, update = resetInstancesEvent)
 
-    emptyDrawType = EnumProperty(name = "Empty Draw Type", default = "PLAIN_AXES",
-        items = emptyDrawTypeItems, update = resetInstancesEvent)
+    emptyDisplayType = EnumProperty(name = "Empty Draw Type", default = "PLAIN_AXES",
+        items = emptyDisplayTypeItems, update = resetInstancesEvent)
 
     def create(self):
         self.newInput("Integer", "Instances", "instancesAmount", minValue = 0)
@@ -89,7 +89,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         else:
             layout.prop(self, "objectType", text = "")
             if self.objectType == "Empty":
-                layout.prop(self, "emptyDrawType", text = "")
+                layout.prop(self, "emptyDisplayType", text = "")
 
     def drawAdvanced(self, layout):
         layout.prop(self, "parentInstances")
@@ -287,7 +287,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         newObject.hide = False
         newObject.hide_render = False
         if not self.copyFromSource and self.objectType == "Empty":
-            newObject.empty_draw_type = self.emptyDrawType
+            newObject.empty_display_type = self.emptyDisplayType
         return newObject
 
     def createObject(self, name, instanceData):

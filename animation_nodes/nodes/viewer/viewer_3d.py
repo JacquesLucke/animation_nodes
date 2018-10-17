@@ -125,6 +125,7 @@ def drawMatrices(matrices, size, color, drawLetters):
 
 @drawHandler("SpaceView3D", "WINDOW", "POST_VIEW")
 def draw():
+    return
     for node in getNodesByType("an_Viewer3DNode"):
         if node.enabled and node.identifier in dataByIdentifier:
             drawDisplayList(dataByIdentifier[node.identifier].displayList)
