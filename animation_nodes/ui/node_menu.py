@@ -35,7 +35,7 @@ def drawMenu(self, context):
     layout.menu("an_animation_menu", text = "Animation", icon = "RENDER_ANIMATION")
     layout.menu("an_interpolation_menu", text = "Interpolation", icon = "IPO_BEZIER")
     layout.menu("an_falloff_menu", text = "Falloff", icon = "SMOOTHCURVE")
-    layout.menu("an_fcurve_menu", text = "FCurves", icon = "IPO")
+    layout.menu("an_fcurve_menu", text = "FCurves", icon = "FCURVE")
     layout.menu("an_material_menu", text = "Material", icon = "MATERIAL_DATA")
     layout.menu("an_sound_menu", text = "Sound", icon = "SPEAKER")
     layout.menu("an_sequence_menu", text = "Sequence", icon = "SEQUENCE")

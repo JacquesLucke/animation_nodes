@@ -33,12 +33,15 @@ def createOperatorWithDescription(description):
         "bl_label" : "Are you sure?",
         "bl_description" : description,
         "invoke" : invoke_InvokeFunction,
-        "execute" : execute_InvokeFunction })
-    operator.callback: StringProperty()
-    operator.invokeWithData: BoolProperty(default = False)
-    operator.confirm: BoolProperty()
-    operator.data: StringProperty()
-    operator.passEvent: BoolProperty()
+        "execute" : execute_InvokeFunction,
+        "__annotations__" : {
+            "callback" : StringProperty(),
+            "invokeWithData" : BoolProperty(default = False),
+            "confirm" : BoolProperty(),
+            "data" : StringProperty(),
+            "passEvent" : BoolProperty()
+        }
+    })
 
     return operator
 

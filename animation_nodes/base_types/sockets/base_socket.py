@@ -424,10 +424,10 @@ def register():
     bpy.types.NodeSocket.getIndex = getSocketIndex
     bpy.types.NodeSocket.getNodeTree = getNodeTree
 
-    bpy.types.NodeSocket.show: BoolProperty(default = True,
+    bpy.types.NodeSocket.show = BoolProperty(default = True,
         get = getSocketVisibility, set = setSocketVisibility)
 
-    bpy.types.NodeSocket.isAnimationNodeSocket: BoolProperty(default = False,
+    bpy.types.NodeSocket.isAnimationNodeSocket = BoolProperty(default = False,
         get = isAnimationNodeSocket)
 
 def unregister():

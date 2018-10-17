@@ -492,7 +492,7 @@ class BakedData(bpy.types.PropertyGroup):
     spectrum: CollectionProperty(name = "Spectrum Data", type = SpectrumData)
 
 def register():
-    bpy.types.Sound.bakedData: PointerProperty(name = "Baked Data", type = BakedData)
+    bpy.types.Sound.bakedData = PointerProperty(name = "Baked Data", type = BakedData)
 
 def unregister():
     del bpy.types.Sound.bakedData

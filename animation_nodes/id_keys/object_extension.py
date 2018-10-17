@@ -42,7 +42,7 @@ class IDKeyProperties(bpy.types.PropertyGroup):
     drawExtras = _drawExtras
 
 def register():
-    bpy.types.ID.id_keys: PointerProperty(name = "ID Keys", type = IDKeyProperties)
+    bpy.types.ID.id_keys = PointerProperty(name = "ID Keys", type = IDKeyProperties)
 
 def unregister():
     del bpy.types.ID.id_keys

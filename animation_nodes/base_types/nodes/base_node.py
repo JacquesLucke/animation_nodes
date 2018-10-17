@@ -312,9 +312,9 @@ class AnimationNode:
                 socketData = infoByNode[self.identifier].inputs[socket.identifier]
                 socketData.initialize(template)
         elif len(args) == 2:
-            socket = self.inputs.new(toSocketIdName(args[0]), args[1], args[1])
+            socket = self.inputs.new(toSocketIdName(args[0]), args[1], identifier = args[1])
         elif len(args) == 3:
-            socket = self.inputs.new(toSocketIdName(args[0]), args[1], args[2])
+            socket = self.inputs.new(toSocketIdName(args[0]), args[1], identifier = args[2])
         else:
             raise Exception("invalid arguments")
         self._setSocketProperties(socket, kwargs)
@@ -328,9 +328,9 @@ class AnimationNode:
                 socketData = infoByNode[self.identifier].outputs[socket.identifier]
                 socketData.initialize(template)
         elif len(args) == 2:
-            socket = self.outputs.new(toSocketIdName(args[0]), args[1], args[1])
+            socket = self.outputs.new(toSocketIdName(args[0]), args[1], identifier = args[1])
         elif len(args) == 3:
-            socket = self.outputs.new(toSocketIdName(args[0]), args[1], args[2])
+            socket = self.outputs.new(toSocketIdName(args[0]), args[1], identifier = args[2])
         else:
             raise Exception("invalid arguments")
         socket.setAttributes(kwargs)
@@ -746,8 +746,8 @@ def getRegionBottomRight(node, region):
 
 def register():
     bpy.types.Node.toID = nodeToID
-    bpy.types.Node.isAnimationNode: BoolProperty(name = "Is Animation Node", get = isAnimationNode)
-    bpy.types.Node.viewLocation: FloatVectorProperty(name = "Region Location", size = 2, subtype = "XYZ", get = getViewLocation)
+    bpy.types.Node.isAnimationNode = BoolProperty(name = "Is Animation Node", get = isAnimationNode)
+    bpy.types.Node.viewLocation = FloatVectorProperty(name = "Region Location", size = 2, subtype = "XYZ", get = getViewLocation)
     bpy.types.Node.getNodeTree = getNodeTree
     bpy.types.Node.getRegionBottomLeft = getRegionBottomLeft
     bpy.types.Node.getRegionBottomRight = getRegionBottomRight
