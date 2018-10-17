@@ -13,15 +13,15 @@ idTypeItems = [
 class AutoExecutionTrigger_MonitorProperty(bpy.types.PropertyGroup):
     bl_idname = "an_AutoExecutionTrigger_MonitorProperty"
 
-    idType = EnumProperty(name = "ID Type", default = "OBJECT",
+    idType: EnumProperty(name = "ID Type", default = "OBJECT",
         items = idTypeItems)
 
-    idObjectName = StringProperty(name = "ID Object Name", default = "")
-    dataPath = StringProperty(name = "Data Path", default = "")
+    idObjectName: StringProperty(name = "ID Object Name", default = "")
+    dataPath: StringProperty(name = "Data Path", default = "")
 
-    lastState = StringProperty(default = "")
-    enabled = BoolProperty(default = True)
-    hasError = BoolProperty(default = False)
+    lastState: StringProperty(default = "")
+    enabled: BoolProperty(default = True)
+    hasError: BoolProperty(default = False)
 
     def update(self):
         lastState = self.lastState
@@ -89,7 +89,7 @@ class AutoExecutionTrigger_MonitorProperty(bpy.types.PropertyGroup):
 class CustomAutoExecutionTriggers(bpy.types.PropertyGroup):
     bl_idname = "an_CustomAutoExecutionTriggers"
 
-    monitorPropertyTriggers = CollectionProperty(type = AutoExecutionTrigger_MonitorProperty)
+    monitorPropertyTriggers: CollectionProperty(type = AutoExecutionTrigger_MonitorProperty)
 
     def new(self, type, **kwargs):
         if type == "MONITOR_PROPERTY":
@@ -109,28 +109,28 @@ class CustomAutoExecutionTriggers(bpy.types.PropertyGroup):
 
 class AutoExecutionProperties(bpy.types.PropertyGroup):
 
-    customTriggers = PointerProperty(type = CustomAutoExecutionTriggers)
+    customTriggers: PointerProperty(type = CustomAutoExecutionTriggers)
 
-    enabled = BoolProperty(default = True, name = "Enabled",
+    enabled: BoolProperty(default = True, name = "Enabled",
         description = "Enable auto execution for this node tree")
 
-    sceneUpdate = BoolProperty(default = True, name = "Scene Update",
+    sceneUpdate: BoolProperty(default = True, name = "Scene Update",
         description = "Execute many times per second to react on all changes in real time (deactivated during preview rendering)")
 
-    frameChanged = BoolProperty(default = False, name = "Frame Changed",
+    frameChanged: BoolProperty(default = False, name = "Frame Changed",
         description = "Execute after the frame changed")
 
-    propertyChanged = BoolProperty(default = False, name = "Property Changed",
+    propertyChanged: BoolProperty(default = False, name = "Property Changed",
         description = "Execute when a attribute in a animation node tree changed")
 
-    treeChanged = BoolProperty(default = False, name = "Tree Changed",
+    treeChanged: BoolProperty(default = False, name = "Tree Changed",
         description = "Execute when the node tree changes (create/remove links and nodes)")
 
-    minTimeDifference = FloatProperty(name = "Min Time Difference",
+    minTimeDifference: FloatProperty(name = "Min Time Difference",
         description = "Auto execute not that often; E.g. only every 0.5 seconds",
         default = 0.0, min = 0.0, soft_max = 1.0)
 
-    lastExecutionTimestamp = FloatProperty(default = 0.0)
+    lastExecutionTimestamp: FloatProperty(default = 0.0)
 
 
 class AddAutoExecutionTrigger(bpy.types.Operator):
@@ -138,10 +138,10 @@ class AddAutoExecutionTrigger(bpy.types.Operator):
     bl_label = "Add Auto Execution Trigger"
     bl_options = {"UNDO"}
 
-    triggerType = EnumProperty(name = "Trigger Type", default = "MONITOR_PROPERTY",
+    triggerType: EnumProperty(name = "Trigger Type", default = "MONITOR_PROPERTY",
         items = triggerTypeItems)
 
-    idType = EnumProperty(name = "ID Type", default = "OBJECT",
+    idType: EnumProperty(name = "ID Type", default = "OBJECT",
         items = idTypeItems)
 
     @classmethod
@@ -174,8 +174,8 @@ class RemoveAutoExecutionTrigger(bpy.types.Operator):
     bl_label = "Remove Auto Execution Trigger"
     bl_options = {"UNDO"}
 
-    triggerType = EnumProperty(items = triggerTypeItems)
-    index = IntProperty()
+    triggerType: EnumProperty(items = triggerTypeItems)
+    index: IntProperty()
 
     @classmethod
     def poll(cls, context):
@@ -195,7 +195,7 @@ class AssignActiveObjectToAutoExecutionTrigger(bpy.types.Operator):
     bl_label = "Assign Active Object to Auto Execution Trigger"
     bl_options = {"UNDO"}
 
-    index = IntProperty()
+    index: IntProperty()
 
     @classmethod
     def poll(cls, context):

@@ -11,7 +11,7 @@ class EdgeInfoNode(bpy.types.Node, AnimationNode):
     bl_label = "Edge Info"
     errorHandlingType = "MESSAGE"
 
-    useEdgeList = VectorizedSocket.newProperty()
+    useEdgeList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput("Vector List", "Points", "points")

@@ -12,16 +12,16 @@ from ... tree_info import (isSocketLinked, getLinkedSockets, getDirectlyLinkedSo
 
 class SocketTextProperties(bpy.types.PropertyGroup):
     bl_idname = "an_SocketTextProperties"
-    unique = BoolProperty(default = False)
-    editable = BoolProperty(default = False)
-    variable = BoolProperty(default = False)
+    unique: BoolProperty(default = False)
+    editable: BoolProperty(default = False)
+    variable: BoolProperty(default = False)
 
 class SocketDisplayProperties(bpy.types.PropertyGroup):
     bl_idname = "an_SocketDisplayProperties"
-    text = BoolProperty(default = False)
-    textInput = BoolProperty(default = False)
-    moveOperators = BoolProperty(default = False)
-    removeOperator = BoolProperty(default = False)
+    text: BoolProperty(default = False)
+    textInput: BoolProperty(default = False)
+    moveOperators: BoolProperty(default = False)
+    removeOperator: BoolProperty(default = False)
 
 class SocketLoopProperties(bpy.types.PropertyGroup):
     bl_idname = "an_SocketLoopProperties"
@@ -30,13 +30,13 @@ class SocketLoopProperties(bpy.types.PropertyGroup):
         subprogramInterfaceChanged()
         executionCodeChanged()
 
-    useAsInput = BoolProperty(default = False, update = socketLoopPropertyChanged)
-    useAsOutput = BoolProperty(default = False, update = socketLoopPropertyChanged)
-    copyAlways = BoolProperty(default = False, update = socketLoopPropertyChanged)
+    useAsInput: BoolProperty(default = False, update = socketLoopPropertyChanged)
+    useAsOutput: BoolProperty(default = False, update = socketLoopPropertyChanged)
+    copyAlways: BoolProperty(default = False, update = socketLoopPropertyChanged)
 
 class SocketExecutionProperties(bpy.types.PropertyGroup):
     bl_idname = "an_SocketExecutionProperties"
-    neededCopies = IntProperty(default = 0, min = 0)
+    neededCopies: IntProperty(default = 0, min = 0)
 
 colorOverwritePerSocket = dict()
 
@@ -48,23 +48,23 @@ class AnimationNodeSocket:
     def textChanged(self, context):
         updateText(self)
 
-    text = StringProperty(default = "custom name", update = textChanged)
-    removeable = BoolProperty(default = False)
-    moveable = BoolProperty(default = False)
-    moveGroup = IntProperty(default = 0)
+    text: StringProperty(default = "custom name", update = textChanged)
+    removeable: BoolProperty(default = False)
+    moveable: BoolProperty(default = False)
+    moveGroup: IntProperty(default = 0)
 
-    isUsed = BoolProperty(name = "Is Used", default = True,
+    isUsed: BoolProperty(name = "Is Used", default = True,
         description = "Enable this socket (orange point means that the socket will be evaluated)",
         update = executionCodeChanged)
-    useIsUsedProperty = BoolProperty(default = False)
+    useIsUsedProperty: BoolProperty(default = False)
 
-    display = PointerProperty(type = SocketDisplayProperties)
-    textProps = PointerProperty(type = SocketTextProperties)
-    loop = PointerProperty(type = SocketLoopProperties)
-    execution = PointerProperty(type = SocketExecutionProperties)
+    display: PointerProperty(type = SocketDisplayProperties)
+    textProps: PointerProperty(type = SocketTextProperties)
+    loop: PointerProperty(type = SocketLoopProperties)
+    execution: PointerProperty(type = SocketExecutionProperties)
 
-    dataIsModified = BoolProperty(default = False, update = executionCodeChanged)
-    defaultDrawType = StringProperty(default = "TEXT_PROPERTY")
+    dataIsModified: BoolProperty(default = False, update = executionCodeChanged)
+    defaultDrawType: StringProperty(default = "TEXT_PROPERTY")
 
 
     # Overwrite in subclasses
@@ -424,10 +424,10 @@ def register():
     bpy.types.NodeSocket.getIndex = getSocketIndex
     bpy.types.NodeSocket.getNodeTree = getNodeTree
 
-    bpy.types.NodeSocket.show = BoolProperty(default = True,
+    bpy.types.NodeSocket.show: BoolProperty(default = True,
         get = getSocketVisibility, set = setSocketVisibility)
 
-    bpy.types.NodeSocket.isAnimationNodeSocket = BoolProperty(default = False,
+    bpy.types.NodeSocket.isAnimationNodeSocket: BoolProperty(default = False,
         get = isAnimationNodeSocket)
 
 def unregister():

@@ -12,7 +12,7 @@ class RepeatTextNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_RepeatTextNode"
     bl_label = "Repeat Text"
 
-    mode = EnumProperty(name = "Mode", default = "END",
+    mode: EnumProperty(name = "Mode", default = "END",
         items = modeItems, update = propertyChanged)
 
     def create(self):

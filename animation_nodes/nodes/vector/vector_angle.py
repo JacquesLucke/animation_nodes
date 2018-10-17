@@ -6,8 +6,8 @@ class VectorAngleNode(bpy.types.Node, AnimationNode):
     bl_label = "Vector Angle"
     codeEffects = [VectorizedSocket.CodeEffect]
 
-    useListA = VectorizedSocket.newProperty()
-    useListB = VectorizedSocket.newProperty()
+    useListA: VectorizedSocket.newProperty()
+    useListB: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Vector", "useListA",

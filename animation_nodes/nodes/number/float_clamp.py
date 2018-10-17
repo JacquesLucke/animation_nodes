@@ -6,7 +6,7 @@ class FloatClampNode(bpy.types.Node, AnimationNode):
     bl_label = "Clamp"
     dynamicLabelType = "HIDDEN_ONLY"
 
-    useValueList = VectorizedSocket.newProperty()
+    useValueList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Float", "useValueList",

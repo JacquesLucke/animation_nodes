@@ -6,7 +6,7 @@ class ProjectOnSplineNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ProjectOnSplineNode"
     bl_label = "Project on Spline"
 
-    extended = BoolProperty(
+    extended: BoolProperty(
         name = "Extended Spline",
         description = "Project point on extended spline. If this is turned on the parameter is not computable.",
         update = AnimationNode.refresh)

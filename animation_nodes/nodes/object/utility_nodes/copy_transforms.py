@@ -16,11 +16,11 @@ class CopyTransformsNode(bpy.types.Node, AnimationNode):
         self.inputs["Frame"].hide = self.useCurrentTransforms
         executionCodeChanged()
 
-    useCurrentTransforms = BoolProperty(
+    useCurrentTransforms: BoolProperty(
         name = "Use Current Transforms", default = True,
         update = useCurrentTransformsChanged)
 
-    frameType = EnumProperty(
+    frameType: EnumProperty(
         name = "Frame Type", default = "OFFSET",
         items = frameTypeItems, update = executionCodeChanged)
 

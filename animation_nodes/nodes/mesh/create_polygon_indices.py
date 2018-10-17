@@ -15,10 +15,10 @@ class CreatePolygonIndicesNode(bpy.types.Node, AnimationNode):
     bl_width_default = 160
     errorHandlingType = "MESSAGE"
 
-    mode = EnumProperty(name = "Mode", default = "VERTEX_AMOUNT",
+    mode: EnumProperty(name = "Mode", default = "VERTEX_AMOUNT",
         items = modeItems, update = AnimationNode.refresh)
 
-    useList = BoolProperty(name = "Use List", default = False,
+    useList: BoolProperty(name = "Use List", default = False,
         update = AnimationNode.refresh)
 
     def create(self):

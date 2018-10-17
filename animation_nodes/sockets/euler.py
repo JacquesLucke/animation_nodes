@@ -13,7 +13,7 @@ class EulerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = True
     comparable = False
 
-    value = FloatVectorProperty(default = [0, 0, 0], update = propertyChanged, subtype = "EULER")
+    value: FloatVectorProperty(default = [0, 0, 0], update = propertyChanged, subtype = "EULER")
 
     def drawProperty(self, layout, text, node):
         col = layout.column(align = True)

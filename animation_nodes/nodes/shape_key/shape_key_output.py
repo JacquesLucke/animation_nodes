@@ -7,8 +7,8 @@ class ShapeKeyOutputNode(bpy.types.Node, AnimationNode):
     bl_width_default = 160
     codeEffects = [VectorizedSocket.CodeEffect]
 
-    useShapeKeyList = VectorizedSocket.newProperty()
-    useValueList = VectorizedSocket.newProperty()
+    useShapeKeyList: VectorizedSocket.newProperty()
+    useValueList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Shape Key", "useShapeKeyList",

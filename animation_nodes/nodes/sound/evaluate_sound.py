@@ -13,10 +13,10 @@ class EvaluateSoundNode(bpy.types.Node, AnimationNode):
     bl_label = "Evaluate Sound"
     errorHandlingType = "MESSAGE"
 
-    mode = EnumProperty(name = "Mode", default = "AVERAGE",
+    mode: EnumProperty(name = "Mode", default = "AVERAGE",
         items = modeItems, update = AnimationNode.refresh)
 
-    useCurrentFrame = BoolProperty(name = "Use Current Frame", default = True,
+    useCurrentFrame: BoolProperty(name = "Use Current Frame", default = True,
         update = AnimationNode.refresh)
 
     def create(self):

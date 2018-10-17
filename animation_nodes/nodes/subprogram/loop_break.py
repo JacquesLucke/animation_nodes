@@ -8,7 +8,7 @@ class LoopBreakNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_LoopBreakNode"
     bl_label = "Loop Break"
 
-    loopInputIdentifier = StringProperty(update = treeChanged)
+    loopInputIdentifier: StringProperty(update = treeChanged)
 
     def create(self):
         self.newInput("Boolean", "Continue", "continueCondition", value = True)

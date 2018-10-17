@@ -6,7 +6,7 @@ class SearchListElementNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SearchListElementNode"
     bl_label = "Search List Element"
 
-    assignedType = ListTypeSelectorSocket.newProperty(default = "Float")
+    assignedType: ListTypeSelectorSocket.newProperty(default = "Float")
 
     def create(self):
         prop = ("assignedType", "BASE")

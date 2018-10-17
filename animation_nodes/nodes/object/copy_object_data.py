@@ -7,8 +7,8 @@ class CopyObjectDataNode(bpy.types.Node, AnimationNode):
     bl_label = "Copy Object Data"
     codeEffects = [VectorizedSocket.CodeEffect]
 
-    useFromList = VectorizedSocket.newProperty()
-    useToList = VectorizedSocket.newProperty()
+    useFromList: VectorizedSocket.newProperty()
+    useToList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Object", ["useFromList", "useToList"],

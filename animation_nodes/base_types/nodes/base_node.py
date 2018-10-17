@@ -43,13 +43,13 @@ class AnimationNode:
         colorAllNodes()
 
     # unique string for each node; don't change it at all
-    identifier = StringProperty(name = "Identifier", default = "")
-    inInvalidNetwork = BoolProperty(name = "In Invalid Network", default = False)
-    useNetworkColor = BoolProperty(name = "Use Network Color", default = True, update = useNetworkColorChanged)
+    identifier: StringProperty(name = "Identifier", default = "")
+    inInvalidNetwork: BoolProperty(name = "In Invalid Network", default = False)
+    useNetworkColor: BoolProperty(name = "Use Network Color", default = True, update = useNetworkColorChanged)
 
     # used for the listboxes in the sidebar
-    activeInputIndex = IntProperty()
-    activeOutputIndex = IntProperty()
+    activeInputIndex: IntProperty()
+    activeOutputIndex: IntProperty()
 
     searchTags = []
     onlySearchTags = False
@@ -622,7 +622,7 @@ class SocketPropertyState:
         self = cls()
         self.hide = socket.hide
         self.isUsed = socket.isUsed
-        self.data = socket.getProperty()
+        self.data: socket.getProperty()
         self.allIdentifiers = node.getAllIdentifiersOfSocket(socket)
         return self
 
@@ -635,13 +635,13 @@ class FullNodeState:
 
     def update(self, node):
         for socket in node.inputs:
-            self.inputProperties[(socket.identifier, socket.dataType)] = socket.getProperty()
+            self.inputProperties[(socket.identifier, socket.dataType)]: socket.getProperty()
             linkedSocketIDs = getDirectlyLinkedSocketsIDs(socket)
             for identifier in node.getAllIdentifiersOfSocket(socket):
                 self.inputStates[identifier] = (socket.hide, socket.isUsed, linkedSocketIDs)
 
         for socket in node.outputs:
-            self.outputProperties[(socket.identifier, socket.dataType)] = socket.getProperty()
+            self.outputProperties[(socket.identifier, socket.dataType)]: socket.getProperty()
             linkedSocketIDs = getDirectlyLinkedSocketsIDs(socket)
             for identifier in node.getAllIdentifiersOfSocket(socket):
                 self.outputStates[identifier] = (socket.hide, socket.isUsed, linkedSocketIDs)
@@ -746,8 +746,8 @@ def getRegionBottomRight(node, region):
 
 def register():
     bpy.types.Node.toID = nodeToID
-    bpy.types.Node.isAnimationNode = BoolProperty(name = "Is Animation Node", get = isAnimationNode)
-    bpy.types.Node.viewLocation = FloatVectorProperty(name = "Region Location", size = 2, subtype = "XYZ", get = getViewLocation)
+    bpy.types.Node.isAnimationNode: BoolProperty(name = "Is Animation Node", get = isAnimationNode)
+    bpy.types.Node.viewLocation: FloatVectorProperty(name = "Region Location", size = 2, subtype = "XYZ", get = getViewLocation)
     bpy.types.Node.getNodeTree = getNodeTree
     bpy.types.Node.getRegionBottomLeft = getRegionBottomLeft
     bpy.types.Node.getRegionBottomRight = getRegionBottomRight

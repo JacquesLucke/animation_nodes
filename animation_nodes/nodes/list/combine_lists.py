@@ -17,7 +17,7 @@ class CombineListsNode(bpy.types.Node, AnimationNode):
     def assignedTypeChanged(self, context):
         self.recreateSockets()
 
-    assignedType = StringProperty(update = assignedTypeChanged)
+    assignedType: StringProperty(update = assignedTypeChanged)
 
     def setup(self):
         self.assignedType = "Float"

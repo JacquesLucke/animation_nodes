@@ -8,10 +8,10 @@ class SeparateEulerNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SeparateEulerNode"
     bl_label = "Separate Euler"
 
-    useDegree = BoolProperty(name = "Use Degree", default = False,
+    useDegree: BoolProperty(name = "Use Degree", default = False,
         update = executionCodeChanged)
 
-    useList = VectorizedSocket.newProperty()
+    useList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Euler", "useList",

@@ -7,7 +7,7 @@ class InsertDataCreationNode(bpy.types.Operator, NodeCreator):
     bl_idname = "an.insert_data_creation_node"
     bl_label = "Insert Data Creation Node"
 
-    socketIndex = IntProperty(default = 0)
+    socketIndex: IntProperty(default = 0)
 
     @property
     def needsMenu(self):

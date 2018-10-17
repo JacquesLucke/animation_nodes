@@ -6,7 +6,7 @@ class FindNearestPointInKDTreeNode(bpy.types.Node, AnimationNode):
     bl_label = "Find Nearest Point"
     codeEffects = [VectorizedSocket.CodeEffect]
 
-    useVectorList = VectorizedSocket.newProperty()
+    useVectorList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput("KDTree", "KDTree", "kdTree")

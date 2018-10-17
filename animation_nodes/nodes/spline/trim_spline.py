@@ -7,9 +7,9 @@ class TrimSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
     bl_label = "Trim Spline"
     codeEffects = [VectorizedSocket.CodeEffect]
 
-    useSplineList = VectorizedSocket.newProperty()
-    useStartList = VectorizedSocket.newProperty()
-    useEndList = VectorizedSocket.newProperty()
+    useSplineList: VectorizedSocket.newProperty()
+    useStartList: VectorizedSocket.newProperty()
+    useEndList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Spline", "useSplineList",

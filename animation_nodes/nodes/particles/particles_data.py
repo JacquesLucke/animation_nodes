@@ -20,16 +20,16 @@ class ParticleSystemParticlesDataNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ParticleSystemParticlesDataNode"
     bl_label = "Particles Data"
 
-    includeUnborn = BoolProperty(name = "Include Unborn", default = False,
+    includeUnborn: BoolProperty(name = "Include Unborn", default = False,
         update = executionCodeChanged)
-    includeAlive = BoolProperty(name = "Include Alive", default = True,
+    includeAlive: BoolProperty(name = "Include Alive", default = True,
         update = executionCodeChanged)
-    includeDying = BoolProperty(name = "Include Dying", default = False,
+    includeDying: BoolProperty(name = "Include Dying", default = False,
         update = executionCodeChanged)
-    includeDead = BoolProperty(name = "Include Dead", default = False,
+    includeDead: BoolProperty(name = "Include Dead", default = False,
         update = executionCodeChanged)
 
-    useParticleSystemList = VectorizedSocket.newProperty()
+    useParticleSystemList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Particle System", "useParticleSystemList",

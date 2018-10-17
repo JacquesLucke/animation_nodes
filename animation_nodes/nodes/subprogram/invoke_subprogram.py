@@ -24,7 +24,7 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
     bl_width_default = 160
     dynamicLabelType = "HIDDEN_ONLY"
 
-    subprogramIdentifier = StringProperty(name = "Subprogram Identifier", default = "",
+    subprogramIdentifier: StringProperty(name = "Subprogram Identifier", default = "",
         update = AnimationNode.refresh)
 
     def cacheTypeChanged(self, context):
@@ -32,11 +32,11 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
         executionCodeChanged()
         self.showCacheOptions = True
 
-    cacheType = EnumProperty(name = "Cache Type", items = cacheTypeItems, update = cacheTypeChanged)
-    isOutputStorable = BoolProperty(default = False)
-    isInputComparable = BoolProperty(default = False)
+    cacheType: EnumProperty(name = "Cache Type", items = cacheTypeItems, update = cacheTypeChanged)
+    isOutputStorable: BoolProperty(default = False)
+    isInputComparable: BoolProperty(default = False)
 
-    showCacheOptions = BoolProperty(name = "Show Cache Options", default = False,
+    showCacheOptions: BoolProperty(name = "Show Cache Options", default = False,
         description = "Draw cache options in the node for easier access")
 
     def create(self):
@@ -182,8 +182,8 @@ class ChangeSubprogram(bpy.types.Operator):
             items.append((network.identifier, network.name, network.description))
         return items
 
-    nodeIdentifier = StringProperty()
-    subprogram = EnumProperty(name = "Subprogram", items = getSubprogramItems)
+    nodeIdentifier: StringProperty()
+    subprogram: EnumProperty(name = "Subprogram", items = getSubprogramItems)
 
     @classmethod
     def poll(cls, context):

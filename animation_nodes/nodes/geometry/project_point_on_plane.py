@@ -10,9 +10,9 @@ class ProjectPointOnPlaneNode(bpy.types.Node, AnimationNode):
     bl_width_default = 160
     searchTags = ["Distance Point to Plane", "Closest Point on Plane"]
 
-    usePlanePointList = VectorizedSocket.newProperty()
-    usePlaneNormalList = VectorizedSocket.newProperty()
-    usePointList = VectorizedSocket.newProperty()
+    usePlanePointList: VectorizedSocket.newProperty()
+    usePlaneNormalList: VectorizedSocket.newProperty()
+    usePointList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Vector", "usePlanePointList",

@@ -11,7 +11,7 @@ class RepeatTimeNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_RepeatTimeNode"
     bl_label = "Repeat Time"
 
-    repetitionType = EnumProperty(name = "Repetition Type", default = "LOOP",
+    repetitionType: EnumProperty(name = "Repetition Type", default = "LOOP",
         items = repetitionTypeItems, update = executionCodeChanged)
 
     def create(self):

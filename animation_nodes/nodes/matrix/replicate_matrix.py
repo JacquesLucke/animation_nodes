@@ -17,9 +17,9 @@ class ReplicateMatrixNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ReplicateMatrixNode"
     bl_label = "Replicate Matrix"
 
-    useMatrixList = VectorizedSocket.newProperty()
+    useMatrixList: VectorizedSocket.newProperty()
 
-    transformationType = EnumProperty(name = "Transformation Type", default = "Matrix List",
+    transformationType: EnumProperty(name = "Transformation Type", default = "Matrix List",
         items = transformationTypeItems, update = AnimationNode.refresh)
 
     def create(self):

@@ -14,7 +14,7 @@ class ArmatureInfoNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ArmatureInfoNode"
     bl_label = "Armature Info"
 
-    state = EnumProperty(name = "State", default = "POSE",
+    state: EnumProperty(name = "State", default = "POSE",
         items = stateItems, update = executionCodeChanged)
 
     def create(self):

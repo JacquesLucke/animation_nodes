@@ -6,8 +6,8 @@ class ShadeObjectSmooth(bpy.types.Node, AnimationNode):
     bl_label = "Shade Object Smooth"
     codeEffects = [VectorizedSocket.CodeEffect]
 
-    useObjectList = VectorizedSocket.newProperty()
-    useSmoothList = VectorizedSocket.newProperty()
+    useObjectList: VectorizedSocket.newProperty()
+    useSmoothList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Object", "useObjectList",

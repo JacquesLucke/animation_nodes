@@ -39,16 +39,16 @@ class ComposeMatrixNode(bpy.types.Node, AnimationNode):
         self.updateSocketVisibility()
         executionCodeChanged()
 
-    useTranslation = BoolProperty(name = "Use Translation", default = False,
+    useTranslation: BoolProperty(name = "Use Translation", default = False,
         update = checkedPropertiesChanged)
-    useRotation = BoolProperty(name = "Use Rotation", default = False,
+    useRotation: BoolProperty(name = "Use Rotation", default = False,
         update = checkedPropertiesChanged)
-    useScale = BoolProperty(name = "Use Scale", default = False,
+    useScale: BoolProperty(name = "Use Scale", default = False,
         update = checkedPropertiesChanged)
 
-    useTranslationList = VectorizedSocket.newProperty()
-    useRotationList = VectorizedSocket.newProperty()
-    useScaleList = VectorizedSocket.newProperty()
+    useTranslationList: VectorizedSocket.newProperty()
+    useRotationList: VectorizedSocket.newProperty()
+    useScaleList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Vector", "useTranslationList",

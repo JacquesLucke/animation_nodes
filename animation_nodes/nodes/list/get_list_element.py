@@ -10,21 +10,21 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
     bl_width_default = 180
     dynamicLabelType = "HIDDEN_ONLY"
 
-    assignedType = ListTypeSelectorSocket.newProperty(default = "Float")
+    assignedType: ListTypeSelectorSocket.newProperty(default = "Float")
 
-    clampIndex = BoolProperty(name = "Clamp Index", default = False,
+    clampIndex: BoolProperty(name = "Clamp Index", default = False,
         description = "Clamp the index between the lowest and highest possible index",
         update = executionCodeChanged)
 
-    allowNegativeIndex = BoolProperty(name = "Allow Negative Index",
+    allowNegativeIndex: BoolProperty(name = "Allow Negative Index",
         description = "-2 means the second last list element",
         update = executionCodeChanged, default = True)
 
-    makeCopy = BoolProperty(name = "Make Copy", default = True,
+    makeCopy: BoolProperty(name = "Make Copy", default = True,
         description = "Output a copy of the list element to make it independed",
         update = executionCodeChanged)
 
-    useIndexList = BoolProperty(name = "Use Index List", default = False,
+    useIndexList: BoolProperty(name = "Use Index List", default = False,
         update = AnimationNode.refresh)
 
     def create(self):

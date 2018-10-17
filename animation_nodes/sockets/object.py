@@ -13,9 +13,9 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = False
     comparable = True
 
-    objectName = StringProperty(update = propertyChanged)
-    objectCreationType = StringProperty(default = "")
-    showHideToggle = BoolProperty(default = False)
+    objectName: StringProperty(update = propertyChanged)
+    objectCreationType: StringProperty(default = "")
+    showHideToggle: BoolProperty(default = False)
 
     def drawProperty(self, layout, text, node):
         row = layout.row(align = True)

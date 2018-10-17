@@ -14,8 +14,8 @@ from ... utils.sequence_editor import getOrCreateSequencer, getEmptyChannel
 
 class SoundFrequencyRange(bpy.types.PropertyGroup):
     bl_idname = "an_SoundFrequencyRange"
-    low = IntProperty(name = "Low", min = 0)
-    high = IntProperty(name = "High", min = 0)
+    low: IntProperty(name = "Low", min = 0)
+    high: IntProperty(name = "High", min = 0)
 
 
 class SoundBakeNode(bpy.types.Node, AnimationNode):
@@ -23,20 +23,20 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
     bl_label = "Bake Sound"
     bl_width_default = 300
 
-    soundName = StringProperty(name = "Sound")
+    soundName: StringProperty(name = "Sound")
 
-    activeBakeDataIndex = IntProperty()
-    activeSpectrumDataIndex = IntProperty()
+    activeBakeDataIndex: IntProperty()
+    activeSpectrumDataIndex: IntProperty()
 
-    low = IntProperty(name = "Low", default = 0, min = 0, max = 20000)
-    high = IntProperty(name = "High", default = 10000, min = 0, max = 20000)
-    attack = FloatProperty(name = "Attack", default = 0.005, precision = 3)
-    release = FloatProperty(name = "Release", default = 0.2, precision = 3)
+    low: IntProperty(name = "Low", default = 0, min = 0, max = 20000)
+    high: IntProperty(name = "High", default = 10000, min = 0, max = 20000)
+    attack: FloatProperty(name = "Attack", default = 0.005, precision = 3)
+    release: FloatProperty(name = "Release", default = 0.2, precision = 3)
 
-    showSpectrumFrequencyRanges = BoolProperty(default = False)
-    spectrumFrequencyRanges = CollectionProperty(type = SoundFrequencyRange)
+    showSpectrumFrequencyRanges: BoolProperty(default = False)
+    spectrumFrequencyRanges: CollectionProperty(type = SoundFrequencyRange)
 
-    bakeProgress = StringProperty()
+    bakeProgress: StringProperty()
 
     def setup(self):
         self.setSpectrumFrequencyRanges(frequencyRanges)
@@ -241,13 +241,13 @@ class BakeSpectrumData(bpy.types.Operator):
     bl_idname = "an.bake_sound_spectrum_data"
     bl_label = "Bake Spectrum Data"
 
-    nodeIdentifier = StringProperty()
+    nodeIdentifier: StringProperty()
 
-    soundName = StringProperty()
-    attack = FloatProperty()
-    release = FloatProperty()
+    soundName: StringProperty()
+    attack: FloatProperty()
+    release: FloatProperty()
 
-    frequencyRanges = CollectionProperty(type = SoundFrequencyRange)
+    frequencyRanges: CollectionProperty(type = SoundFrequencyRange)
 
     def invoke(self, context, event):
         if len(self.frequencyRanges) == 0:
@@ -392,13 +392,13 @@ class CalculateSpectrumFrequencyRanges(bpy.types.Operator):
     bl_label = "Calculate Frequency Ranges"
     bl_options = {"INTERNAL", "REGISTER"}
 
-    nodeIdentifier = StringProperty()
-    amount = IntProperty(name = "Amount", default = 10, min = 1, soft_max = 50)
-    frequencyRangeStart = IntProperty(name = "Frequency Range Start", default = 0, min = 0)
-    frequencyRangeEnd = IntProperty(name = "Frequency Range End", default = 20000, min = 0)
+    nodeIdentifier: StringProperty()
+    amount: IntProperty(name = "Amount", default = 10, min = 1, soft_max = 50)
+    frequencyRangeStart: IntProperty(name = "Frequency Range Start", default = 0, min = 0)
+    frequencyRangeEnd: IntProperty(name = "Frequency Range End", default = 20000, min = 0)
 
-    base = FloatProperty(name = "Base", min = 0.001, default = 0.22)
-    exponent = IntProperty(name = "Exponent", min = 1, max = 20, default = 4)
+    base: FloatProperty(name = "Base", min = 0.001, default = 0.22)
+    exponent: IntProperty(name = "Exponent", min = 1, max = 20, default = 4)
 
     def invoke(self, context, event):
         return context.window_manager.invoke_props_dialog(self, width = 200 * getDpiFactor())
@@ -457,11 +457,11 @@ def getAverageDataItem(sound, low, high, attack, release):
 
 class AverageData(bpy.types.PropertyGroup):
     bl_idname = "an_SoundAverageData"
-    low = IntProperty(name = "Low")
-    high = IntProperty(name = "High")
-    attack = FloatProperty(name = "Attack", precision = 3)
-    release = FloatProperty(name = "Release", precision = 3)
-    identifier = StringProperty(name = "Identifier", default = "")
+    low: IntProperty(name = "Low")
+    high: IntProperty(name = "High")
+    attack: FloatProperty(name = "Attack", precision = 3)
+    release: FloatProperty(name = "Release", precision = 3)
+    identifier: StringProperty(name = "Identifier", default = "")
 
     def setSamples(self, samples):
         self["samples"] = samples
@@ -471,10 +471,10 @@ class AverageData(bpy.types.PropertyGroup):
 
 class SpectrumData(bpy.types.PropertyGroup):
     bl_idname = "an_SoundSpectrumData"
-    attack = FloatProperty(name = "Attack", precision = 3)
-    release = FloatProperty(name = "Release", precision = 3)
-    frequencyAmount = IntProperty(name = "Frequency Amount")
-    identifier = StringProperty(name = "Identifier", default = "")
+    attack: FloatProperty(name = "Attack", precision = 3)
+    release: FloatProperty(name = "Release", precision = 3)
+    frequencyAmount: IntProperty(name = "Frequency Amount")
+    identifier: StringProperty(name = "Identifier", default = "")
 
     def setSamples(self, samples, frequencyAmount):
         if len(samples) % frequencyAmount != 0:
@@ -488,11 +488,11 @@ class SpectrumData(bpy.types.PropertyGroup):
 class BakedData(bpy.types.PropertyGroup):
     bl_idname = "an_SoundBakedData"
 
-    average = CollectionProperty(name = "Average Data", type = AverageData)
-    spectrum = CollectionProperty(name = "Spectrum Data", type = SpectrumData)
+    average: CollectionProperty(name = "Average Data", type = AverageData)
+    spectrum: CollectionProperty(name = "Spectrum Data", type = SpectrumData)
 
 def register():
-    bpy.types.Sound.bakedData = PointerProperty(name = "Baked Data", type = BakedData)
+    bpy.types.Sound.bakedData: PointerProperty(name = "Baked Data", type = BakedData)
 
 def unregister():
     del bpy.types.Sound.bakedData

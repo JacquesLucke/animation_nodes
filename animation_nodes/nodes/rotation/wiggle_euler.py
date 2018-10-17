@@ -10,7 +10,7 @@ class EulerWiggleNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_EulerWiggleNode"
     bl_label = "Euler Wiggle"
 
-    nodeSeed = IntProperty(update = propertyChanged)
+    nodeSeed: IntProperty(update = propertyChanged)
 
     def setup(self):
         self.randomizeNodeSeed()

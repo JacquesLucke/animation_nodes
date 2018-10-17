@@ -16,7 +16,7 @@ class SplinesFromObjectNode(bpy.types.Node, AnimationNode):
     bl_label = "Splines from Object"
     errorHandlingType = "EXCEPTION"
 
-    importType = EnumProperty(name = "Import Type", default = "ALL",
+    importType: EnumProperty(name = "Import Type", default = "ALL",
         items = importTypeItems, update = AnimationNode.refresh)
 
     def create(self):

@@ -13,7 +13,7 @@ class VectorSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = True
     comparable = False
 
-    value = FloatVectorProperty(default = [0, 0, 0], update = propertyChanged, subtype = "XYZ")
+    value: FloatVectorProperty(default = [0, 0, 0], update = propertyChanged, subtype = "XYZ")
 
     def drawProperty(self, layout, text, node):
         col = layout.column(align = True)

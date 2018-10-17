@@ -8,7 +8,7 @@ class OffsetVerticesNode(bpy.types.Node, AnimationNode):
     bl_label = "Offset Vertices"
     errorHandlingType = "EXCEPTION"
 
-    useVectorList = VectorizedSocket.newProperty()
+    useVectorList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput("Mesh", "Mesh", "mesh")

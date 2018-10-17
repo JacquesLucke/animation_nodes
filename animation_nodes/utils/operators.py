@@ -36,6 +36,7 @@ def getOperatorForFunction(function, idName, label, arguments, redraw, confirm, 
         "bl_options" : options,
         "invoke" : invoke,
         "execute" : execute })
+    operator.__annotations__ = {}
 
     parameters = list(iterParameterNamesAndDefaults(function))
     for argument, (name, default) in zip(arguments, parameters):
@@ -43,8 +44,8 @@ def getOperatorForFunction(function, idName, label, arguments, redraw, confirm, 
         elif argument == "String": propertyType = StringProperty
         else: raise ValueError("cannot create property of this type")
 
-        if default is None: setattr(operator, name, propertyType())
-        else: setattr(operator, name, propertyType(default = default))
+        if default is None: operator.__annotations__[name] = propertyType()
+        else: operator.__annotations__[name] = propertyType(default = default)
 
     return operator
 

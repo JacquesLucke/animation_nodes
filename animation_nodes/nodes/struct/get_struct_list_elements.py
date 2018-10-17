@@ -10,13 +10,13 @@ class GetStructListElementsNode(bpy.types.Node, AnimationNode):
     bl_width_default = 160
     errorHandlingType = "MESSAGE"
 
-    makeCopies = BoolProperty(name = "Make Copies", default = True,
+    makeCopies: BoolProperty(name = "Make Copies", default = True,
         description = "Copy the data before outputting it",
         update = executionCodeChanged)
 
-    elementKey = StringProperty(name = "Key", update = propertyChanged)
+    elementKey: StringProperty(name = "Key", update = propertyChanged)
 
-    elementDataType = StringProperty(name = "Data Type", default = "Integer",
+    elementDataType: StringProperty(name = "Data Type", default = "Integer",
         update = AnimationNode.refresh)
 
     def create(self):

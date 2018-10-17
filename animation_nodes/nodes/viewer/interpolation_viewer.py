@@ -9,7 +9,7 @@ class InterpolationViewerNode(bpy.types.Node, AnimationNode):
     bl_label = "Interpolation Viewer"
     bl_width_default = 160
 
-    resolution = IntProperty(name = "Resolution", min = 5, default = 100)
+    resolution: IntProperty(name = "Resolution", min = 5, default = 100)
 
     def create(self):
         self.newInput("Interpolation", "Interpolation", "interpolation", defaultDrawType = "PROPERTY_ONLY")

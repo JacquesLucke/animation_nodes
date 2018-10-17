@@ -13,7 +13,7 @@ class MeshFromSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
     bl_label = "Mesh from Spline"
     bl_width_default = 160
 
-    useCustomShape = BoolProperty(name = "Use Custom Shape", default = False,
+    useCustomShape: BoolProperty(name = "Use Custom Shape", default = False,
         update = AnimationNode.refresh)
 
     def create(self):

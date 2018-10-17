@@ -11,9 +11,9 @@ class RotationToDirectionNode(bpy.types.Node, AnimationNode):
     bl_label = "Rotation to Direction"
     bl_width_default = 160
 
-    useRotationList = VectorizedSocket.newProperty()
+    useRotationList: VectorizedSocket.newProperty()
 
-    directionAxis = EnumProperty(name = "Direction Axis", default = "Z",
+    directionAxis: EnumProperty(name = "Direction Axis", default = "Z",
         items = directionAxisItems, update = propertyChanged)
 
     def create(self):

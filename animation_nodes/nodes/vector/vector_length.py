@@ -6,7 +6,7 @@ class VectorLengthNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_VectorLengthNode"
     bl_label = "Vector Length"
 
-    useList = VectorizedSocket.newProperty()
+    useList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Vector", "useList",

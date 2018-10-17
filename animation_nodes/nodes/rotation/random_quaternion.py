@@ -8,7 +8,7 @@ class RandomQuaternionNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_RandomQuaternionNode"
     bl_label = "Random Quaternion"
 
-    nodeSeed = IntProperty(name = "Node Seed", update = propertyChanged, max = 1000, min = 0)
+    nodeSeed: IntProperty(name = "Node Seed", update = propertyChanged, max = 1000, min = 0)
 
     def create(self):
         self.newInput("Integer", "Seed", "seed")

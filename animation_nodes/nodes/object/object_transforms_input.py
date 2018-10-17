@@ -7,7 +7,7 @@ class ObjectTransformsInputNode(bpy.types.Node, AnimationNode):
     bl_width_default = 160
     codeEffects = [VectorizedSocket.CodeEffect]
 
-    useObjectList = VectorizedSocket.newProperty()
+    useObjectList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Object", "useObjectList",

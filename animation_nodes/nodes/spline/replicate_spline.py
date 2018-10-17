@@ -13,9 +13,9 @@ class ReplicateSplineNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ReplicateSplineNode"
     bl_label = "Replicate Spline"
 
-    useSplineList = VectorizedSocket.newProperty()
+    useSplineList: VectorizedSocket.newProperty()
 
-    transformationType = EnumProperty(name = "Transformation Type", default = "Matrix List",
+    transformationType: EnumProperty(name = "Transformation Type", default = "Matrix List",
         items = transformationTypeItems, update = AnimationNode.refresh)
 
     def create(self):

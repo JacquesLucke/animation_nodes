@@ -11,7 +11,7 @@ class TextBlockSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = False
     comparable = True
 
-    textBlockName = StringProperty(update = propertyChanged)
+    textBlockName: StringProperty(update = propertyChanged)
 
     def drawProperty(self, layout, text, node):
         row = layout.row(align = True)

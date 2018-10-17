@@ -52,34 +52,34 @@ evaluationTimeModeItems = [
 ]
 
 class MatrixTransformationBase:
-    transformationSource = EnumProperty(name = "Transformation Source", default = "LOC_ROT_SCALE",
+    transformationSource: EnumProperty(name = "Transformation Source", default = "LOC_ROT_SCALE",
         items = transformationSourceItems, update = AnimationNode.refresh)
 
-    specifiedState = EnumProperty(name = "Specified State", default = "START",
+    specifiedState: EnumProperty(name = "Specified State", default = "START",
         description = "Specify wether the given matrices are the start or end state",
         items = specifiedStateItems, update = propertyChanged)
 
-    useTranslation = BoolProperty(name = "Use Translation", default = False,
+    useTranslation: BoolProperty(name = "Use Translation", default = False,
         update = AnimationNode.refresh)
-    useRotation = BoolProperty(name = "Use Rotation", default = False,
+    useRotation: BoolProperty(name = "Use Rotation", default = False,
         update = AnimationNode.refresh)
-    useScale = BoolProperty(name = "Use Scale", default = False,
+    useScale: BoolProperty(name = "Use Scale", default = False,
         update = AnimationNode.refresh)
 
-    useTranslationList = VectorizedSocket.newProperty()
-    useRotationList = VectorizedSocket.newProperty()
-    useScaleList = VectorizedSocket.newProperty()
+    useTranslationList: VectorizedSocket.newProperty()
+    useRotationList: VectorizedSocket.newProperty()
+    useScaleList: VectorizedSocket.newProperty()
 
-    translationMode = EnumProperty(name = "Translation Mode", default = "GLOBAL_AXIS",
+    translationMode: EnumProperty(name = "Translation Mode", default = "GLOBAL_AXIS",
         items = translationModeItems, update = propertyChanged)
 
-    rotationMode = EnumProperty(name = "Rotation Mode", default = "GLOBAL_AXIS__LOCAL_PIVOT",
+    rotationMode: EnumProperty(name = "Rotation Mode", default = "GLOBAL_AXIS__LOCAL_PIVOT",
         items = rotationModeItems, update = propertyChanged)
 
-    scaleMode = EnumProperty(name = "Scale Mode", default = "LOCAL_AXIS",
+    scaleMode: EnumProperty(name = "Scale Mode", default = "LOCAL_AXIS",
         items = scaleModeItems, update = propertyChanged)
 
-    evaluationTimeMode = EnumProperty(name = "Evaluation Time Mode", default = "FIXED",
+    evaluationTimeMode: EnumProperty(name = "Evaluation Time Mode", default = "FIXED",
         items = evaluationTimeModeItems, update = AnimationNode.refresh)
 
     def createMatrixTransformationInputs(self, useMatrixList):

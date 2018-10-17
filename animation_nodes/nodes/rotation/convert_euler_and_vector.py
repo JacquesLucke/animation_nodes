@@ -16,13 +16,13 @@ class ConvertVectorAndEulerNode(bpy.types.Node, AnimationNode):
     onlySearchTags = True
     searchTags = [(name, {"conversionType" : repr(type)}) for type, name, _,_,_ in conversionTypeItems]
 
-    useDegree = BoolProperty(name = "Use Degree", default = False,
+    useDegree: BoolProperty(name = "Use Degree", default = False,
         update = executionCodeChanged)
 
-    conversionType = EnumProperty(name = "Conversion Type", default = "EULER_TO_VECTOR",
+    conversionType: EnumProperty(name = "Conversion Type", default = "EULER_TO_VECTOR",
         update = AnimationNode.refresh, items = conversionTypeItems)
 
-    useList = VectorizedSocket.newProperty()
+    useList: VectorizedSocket.newProperty()
 
     def create(self):
         if self.conversionType == "VECTOR_TO_EULER":

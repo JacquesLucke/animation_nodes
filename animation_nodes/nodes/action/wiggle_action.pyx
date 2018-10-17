@@ -19,11 +19,11 @@ actionChannelTypeItems = [
 class ActionChannelProperty(bpy.types.PropertyGroup):
     bl_idname = "an_ActionChannelProperty"
 
-    channelType = EnumProperty(name = "Channel Type", default = "PATH",
+    channelType: EnumProperty(name = "Channel Type", default = "PATH",
         items = actionChannelTypeItems, update = propertyChanged)
 
-    channelPath = StringProperty(name = "Channel Path")
-    channelIndex = IntProperty(name = "Channel Index", min = 0)
+    channelPath: StringProperty(name = "Channel Path")
+    channelIndex: IntProperty(name = "Channel Index", min = 0)
 
     def draw(self, layout):
         col = layout.column(align = True)
@@ -40,7 +40,7 @@ class ActionChannelProperty(bpy.types.PropertyGroup):
             return PathIndexActionChannel(self.channelPath, self.channelIndex)
 
 class ActionChannelsNodeBase:
-    channels = CollectionProperty(type = ActionChannelProperty)
+    channels: CollectionProperty(type = ActionChannelProperty)
 
     def drawChannels(self, layout):
         col = layout.column()

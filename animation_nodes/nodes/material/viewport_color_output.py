@@ -8,7 +8,7 @@ class ViewportColorNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ViewportColorNode"
     bl_label = "Viewport Color"
 
-    materialName = StringProperty(update = propertyChanged)
+    materialName: StringProperty(update = propertyChanged)
 
     def create(self):
         self.newInput("Color", "Color", "color")

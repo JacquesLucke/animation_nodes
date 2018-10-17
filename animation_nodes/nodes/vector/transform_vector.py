@@ -5,7 +5,7 @@ class TransformVectorNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_TransformVectorNode"
     bl_label = "Transform Vector"
 
-    useVectorList = VectorizedSocket.newProperty()
+    useVectorList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Vector", "useVectorList",

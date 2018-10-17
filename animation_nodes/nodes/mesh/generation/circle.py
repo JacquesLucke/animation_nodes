@@ -14,20 +14,20 @@ class CircleMeshNode(bpy.types.Node, AnimationNode):
         self.updateSocketVisibility()
         executionCodeChanged()
 
-    mergeStartEnd = BoolProperty(name = "Merge Start End", default = True,
+    mergeStartEnd: BoolProperty(name = "Merge Start End", default = True,
         description = "Merge the start and end of the circle.",
         update = checkedPropertiesChanged)
 
-    mergeCenter = BoolProperty(name = "Merge Center", default = True,
+    mergeCenter: BoolProperty(name = "Merge Center", default = True,
         description = "Merge the center of the circle using a triangle fan.",
         update = checkedPropertiesChanged)
 
-    useRadialLoopsList = VectorizedSocket.newProperty()
-    useInnerLoopsList = VectorizedSocket.newProperty()
-    useOuterRadiusList = VectorizedSocket.newProperty()
-    useInnerRadiusList = VectorizedSocket.newProperty()
-    useStartAngleList = VectorizedSocket.newProperty()
-    useEndAngleList = VectorizedSocket.newProperty()
+    useRadialLoopsList: VectorizedSocket.newProperty()
+    useInnerLoopsList: VectorizedSocket.newProperty()
+    useOuterRadiusList: VectorizedSocket.newProperty()
+    useInnerRadiusList: VectorizedSocket.newProperty()
+    useStartAngleList: VectorizedSocket.newProperty()
+    useEndAngleList: VectorizedSocket.newProperty()
 
     def draw(self, layout):
         col = layout.column()

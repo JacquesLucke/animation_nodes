@@ -6,7 +6,7 @@ class CharacterPropertiesOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CharacterPropertiesOutputNode"
     bl_label = "Character Properties Output"
 
-    allowNegativeIndex = BoolProperty(default = True)
+    allowNegativeIndex: BoolProperty(default = True)
 
     def create(self):
         self.newInput("Object", "Text Object", "object", defaultDrawType = "PROPERTY_ONLY")

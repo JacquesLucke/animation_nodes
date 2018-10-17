@@ -55,17 +55,17 @@ class IDKeysFromSortedObjects(bpy.types.Operator):
     bl_label = "ID Keys from Sorted Objects"
     bl_description = "Assign ID Keys based on the selected sorting method."
 
-    idKeyName = StringProperty()
-    sortMode = EnumProperty(name = "Sorting Method", default = "SELECTION_ORDER",
+    idKeyName: StringProperty()
+    sortMode: EnumProperty(name = "Sorting Method", default = "SELECTION_ORDER",
         items = sortModeItems)
 
-    offset = IntProperty(name = "Offset", default = 0)
-    reverse = BoolProperty(name = "Reverse", default = False)
+    offset: IntProperty(name = "Offset", default = 0)
+    reverse: BoolProperty(name = "Reverse", default = False)
 
-    axis = EnumProperty(name = "Axis", default = "X", items = axisItems)
-    threshold = FloatProperty(name = "Threshold", default = 0.01,
+    axis: EnumProperty(name = "Axis", default = "X", items = axisItems)
+    threshold: FloatProperty(name = "Threshold", default = 0.01,
         description = "Objects with similar location should get the same index")
-    locationMode = EnumProperty(name = "Location Mode", default = "ORIGIN",
+    locationMode: EnumProperty(name = "Location Mode", default = "ORIGIN",
         items = locationModeItems)
 
     def invoke(self, context, event):

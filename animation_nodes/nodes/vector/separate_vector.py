@@ -7,7 +7,7 @@ class SeparateVectorNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SeparateVectorNode"
     bl_label = "Separate Vector"
 
-    useList = VectorizedSocket.newProperty()
+    useList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Vector", "useList",

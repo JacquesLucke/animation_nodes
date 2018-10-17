@@ -20,15 +20,15 @@ class SplinesFromEdgesNode(bpy.types.Node, AnimationNode):
     errorHandlingType = "EXCEPTION"
     bl_width_default = 160
 
-    algorithmType = EnumProperty(name = "Algorithm Type", default = "EDGE",
+    algorithmType: EnumProperty(name = "Algorithm Type", default = "EDGE",
         description = "Choose the algorithm used for generating the splines.",
         update = propertyChanged, items = algorithmTypeItems)
 
-    radiusType = EnumProperty(name = "Radius Type", default = "EDGE",
+    radiusType: EnumProperty(name = "Radius Type", default = "EDGE",
         description = "Only important if there is a list of radii.",
         update = propertyChanged, items = radiusTypeItems)
 
-    useRadiusList = VectorizedSocket.newProperty()
+    useRadiusList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput("Vector List", "Vertices", "vertices", dataIsModified = True)

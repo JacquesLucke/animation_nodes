@@ -10,9 +10,9 @@ class ProjectPointOnLineNode(bpy.types.Node, AnimationNode):
     bl_width_default = 160
     searchTags = ["Distance Point to Line", "Closest Point on Line"]
 
-    useLineStartList = VectorizedSocket.newProperty()
-    useLineEndList = VectorizedSocket.newProperty()
-    usePointList = VectorizedSocket.newProperty()
+    useLineStartList: VectorizedSocket.newProperty()
+    useLineEndList: VectorizedSocket.newProperty()
+    usePointList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Vector", "useLineStartList",

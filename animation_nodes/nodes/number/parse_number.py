@@ -6,8 +6,8 @@ class ParseNumberNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ParseNumberNode"
     bl_label = "Parse Number"
 
-    parsingSuccessfull = BoolProperty()
-    useList = VectorizedSocket.newProperty()
+    parsingSuccessfull: BoolProperty()
+    useList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Text", "useList",

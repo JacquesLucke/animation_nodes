@@ -14,7 +14,7 @@ class TextObjectOutputNode(bpy.types.Node, AnimationNode):
                  "BevelResolution", "LetterSpacing", "WordSpacing", "LineSpacing",
                  "XOffset", "YOffset", "HorizontalAlign", "VerticalAlign", "Font",
                  "BoldFont", "ItalicFont", "BoldItalicFont"]:
-        exec("use{}List = VectorizedSocket.newProperty()".format(attr), globals(), locals())
+        exec("use{}List: VectorizedSocket.newProperty()".format(attr), globals(), locals())
 
     def create(self):
         self.newInput(VectorizedSocket("Object", "useObjectList",

@@ -6,7 +6,7 @@ class EvaluateInterpolationNode(bpy.types.Node, AnimationNode):
     bl_label = "Evaluate Interpolation"
     bl_width_default = 160
 
-    useList = VectorizedSocket.newProperty()
+    useList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Float", "useList",

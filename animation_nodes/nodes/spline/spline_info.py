@@ -12,7 +12,7 @@ class SplineInfoNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SplineInfoNode"
     bl_label = "Spline Info"
 
-    splineType = EnumProperty(name = "Spline Type", default = "POLY",
+    splineType: EnumProperty(name = "Spline Type", default = "POLY",
         items = splineTypeItems, update = AnimationNode.refresh)
 
     def create(self):

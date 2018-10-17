@@ -9,9 +9,9 @@ class CombineVectorNode(bpy.types.Node, AnimationNode):
     bl_label = "Combine Vector"
     dynamicLabelType = "HIDDEN_ONLY"
 
-    useListX = VectorizedSocket.newProperty()
-    useListY = VectorizedSocket.newProperty()
-    useListZ = VectorizedSocket.newProperty()
+    useListX: VectorizedSocket.newProperty()
+    useListY: VectorizedSocket.newProperty()
+    useListZ: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Float", "useListX", ("X", "x"), ("X", "x")))

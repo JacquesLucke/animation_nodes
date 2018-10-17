@@ -9,8 +9,8 @@ class EdgeToTubeNode(bpy.types.Node, AnimationNode):
     bl_label = "Edge to Tube"
     errorHandlingType = "EXCEPTION"
 
-    useEdgeIndicesList = VectorizedSocket.newProperty()
-    useRadiusList = VectorizedSocket.newProperty()
+    useEdgeIndicesList: VectorizedSocket.newProperty()
+    useRadiusList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput("Vector List", "Points", "inPoints")

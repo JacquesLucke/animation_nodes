@@ -12,9 +12,9 @@ class TextSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     comparable = True
     storable = True
 
-    value = StringProperty(default = "", update = propertyChanged, options = {"TEXTEDIT_UPDATE"})
+    value: StringProperty(default = "", update = propertyChanged, options = {"TEXTEDIT_UPDATE"})
 
-    showFileChooser = BoolProperty(default = False)
+    showFileChooser: BoolProperty(default = False)
 
     def drawProperty(self, layout, text, node):
         row = layout.row(align = True)

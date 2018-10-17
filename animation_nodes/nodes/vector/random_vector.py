@@ -9,13 +9,13 @@ class RandomVectorNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_RandomVectorNode"
     bl_label = "Random Vector"
 
-    nodeSeed = IntProperty(name = "Node Seed", update = propertyChanged, max = 1000, min = 0)
+    nodeSeed: IntProperty(name = "Node Seed", update = propertyChanged, max = 1000, min = 0)
 
-    createList = BoolProperty(name = "Create List", default = False,
+    createList: BoolProperty(name = "Create List", default = False,
         description = "Create a list of random vectors",
         update = AnimationNode.refresh)
 
-    normalizedVector = BoolProperty(name = "Normalized Vector", default = False,
+    normalizedVector: BoolProperty(name = "Normalized Vector", default = False,
         update = AnimationNode.refresh)
 
     def setup(self):

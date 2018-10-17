@@ -6,7 +6,7 @@ class ReplaceTextNode(bpy.types.Node, AnimationNode):
     bl_label = "Replace Text"
     codeEffects = [VectorizedSocket.CodeEffect]
 
-    useTextList = VectorizedSocket.newProperty()
+    useTextList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Text", "useTextList",

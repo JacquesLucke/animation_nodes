@@ -9,8 +9,8 @@ class CopyIDKeyMenuOpener(bpy.types.Operator):
     bl_label = "Open Copy ID Key Menu"
     bl_options = {"INTERNAL"}
 
-    keyDataType = StringProperty()
-    keyName = StringProperty()
+    keyDataType: StringProperty()
+    keyName: StringProperty()
 
     @classmethod
     def poll(cls, context):

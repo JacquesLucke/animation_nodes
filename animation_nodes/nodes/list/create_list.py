@@ -18,13 +18,13 @@ class CreateListNode(bpy.types.Node, AnimationNode):
     def assignedTypeChanged(self, context):
         self.recreateSockets()
 
-    assignedType = StringProperty(update = assignedTypeChanged)
+    assignedType: StringProperty(update = assignedTypeChanged)
 
     def hideStatusChanged(self, context):
         for socket in self.inputs:
             socket.hide = self.hideInputs
 
-    hideInputs = BoolProperty(name = "Hide Inputs", default = False, update = hideStatusChanged)
+    hideInputs: BoolProperty(name = "Hide Inputs", default = False, update = hideStatusChanged)
 
     def setup(self):
         self.assignedType = "Float"

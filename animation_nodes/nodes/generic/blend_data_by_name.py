@@ -17,7 +17,7 @@ class BlendDataByNameNode(bpy.types.Node, AnimationNode):
     searchTags = [(name + " by Name", {"dataType" : repr(name)}) for name in dataTypes.keys()]
 
     # Should be set only on node creation
-    dataType = StringProperty(name = "Data Type", default = "Object",
+    dataType: StringProperty(name = "Data Type", default = "Object",
         update = AnimationNode.refresh)
 
     def create(self):

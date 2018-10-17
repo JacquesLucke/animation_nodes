@@ -14,9 +14,9 @@ class ChangeSplineTypeNode(bpy.types.Node, AnimationNode):
     bl_label = "Change Spline Type"
     codeEffects = [VectorizedSocket.CodeEffect]
 
-    useSplineList = VectorizedSocket.newProperty()
+    useSplineList: VectorizedSocket.newProperty()
 
-    targetType = EnumProperty(name = "Target Type", default = "POLY",
+    targetType: EnumProperty(name = "Target Type", default = "POLY",
         items = targetTypeItems, update = propertyChanged)
 
     def create(self):

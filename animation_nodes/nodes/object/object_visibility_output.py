@@ -16,7 +16,7 @@ class ObjectVisibilityOutputNode(bpy.types.Node, AnimationNode):
     bl_label = "Object Visibility Output"
     codeEffects = [VectorizedSocket.CodeEffect]
 
-    useObjectList = VectorizedSocket.newProperty()
+    useObjectList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Object", "useObjectList",

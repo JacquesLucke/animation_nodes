@@ -19,9 +19,9 @@ class RemoveListElementNode(bpy.types.Node, AnimationNode):
         else:
             self.reset_and_show_error()
 
-    assignedType = ListTypeSelectorSocket.newProperty(default = "Integer")
+    assignedType: ListTypeSelectorSocket.newProperty(default = "Integer")
 
-    removeType = EnumProperty(name = "Remove Type", default = "FIRST_OCCURRENCE",
+    removeType: EnumProperty(name = "Remove Type", default = "FIRST_OCCURRENCE",
         items = removeTypeItems, update = typeChanged)
 
     def create(self):

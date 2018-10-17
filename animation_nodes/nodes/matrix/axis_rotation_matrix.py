@@ -14,13 +14,13 @@ class AxisRotationMatrixNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_AxisRotationMatrixNode"
     bl_label = "Axis Rotation Matrix"
 
-    axis = EnumProperty(default = "X", items = axisItems,
+    axis: EnumProperty(default = "X", items = axisItems,
         update = AnimationNode.refresh)
 
-    useDegree = BoolProperty(name = "Use Degree", default = False,
+    useDegree: BoolProperty(name = "Use Degree", default = False,
         update = executionCodeChanged)
 
-    useList = VectorizedSocket.newProperty()
+    useList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Float", "useList",

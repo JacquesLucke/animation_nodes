@@ -34,14 +34,14 @@ class EulerMathNode(bpy.types.Node, AnimationNode):
     dynamicLabelType = "HIDDEN_ONLY"
     codeEffects = [VectorizedSocket.CodeEffect]
 
-    operation = EnumProperty(name = "Operation", default = "ADD",
+    operation: EnumProperty(name = "Operation", default = "ADD",
         items = operationItems, update = AnimationNode.refresh)
 
-    useListA = VectorizedSocket.newProperty()
-    useListEulerB = VectorizedSocket.newProperty()
-    useListVectorB = VectorizedSocket.newProperty()
-    useListScale = VectorizedSocket.newProperty()
-    useListStep = VectorizedSocket.newProperty()
+    useListA: VectorizedSocket.newProperty()
+    useListEulerB: VectorizedSocket.newProperty()
+    useListVectorB: VectorizedSocket.newProperty()
+    useListScale: VectorizedSocket.newProperty()
+    useListStep: VectorizedSocket.newProperty()
 
     def create(self):
         usedProperties = ["useListA"]

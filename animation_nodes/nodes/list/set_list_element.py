@@ -9,13 +9,13 @@ class SetListElementNode(bpy.types.Node, AnimationNode):
     bl_label = "Set List Element"
     errorHandlingType = "MESSAGE"
 
-    assignedType = ListTypeSelectorSocket.newProperty(default = "Float")
+    assignedType: ListTypeSelectorSocket.newProperty(default = "Float")
 
-    clampIndex = BoolProperty(name = "Clamp Index", default = False,
+    clampIndex: BoolProperty(name = "Clamp Index", default = False,
         description = "Clamp the index between the lowest and highest possible index",
         update = executionCodeChanged)
 
-    allowNegativeIndex = BoolProperty(name = "Allow Negative Index",
+    allowNegativeIndex: BoolProperty(name = "Allow Negative Index",
         description = "-2 means the second last list element",
         update = executionCodeChanged, default = False)
 

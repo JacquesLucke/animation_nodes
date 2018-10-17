@@ -12,15 +12,15 @@ class MapRangeNode(bpy.types.Node, AnimationNode):
     bl_label = "Map Range"
     bl_width_default = 200
 
-    clampInput = BoolProperty(name = "Clamp Input", default = True,
+    clampInput: BoolProperty(name = "Clamp Input", default = True,
         description = "The input will be between Input Min and Input Max",
         update = AnimationNode.refresh)
 
-    useInterpolation = BoolProperty(name = "Use Interpolation", default = False,
+    useInterpolation: BoolProperty(name = "Use Interpolation", default = False,
         description = "Use custom interpolation between Min and Max (only available when clamp is turned on)",
         update = AnimationNode.refresh)
 
-    useValueList = VectorizedSocket.newProperty()
+    useValueList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Float", "useValueList",

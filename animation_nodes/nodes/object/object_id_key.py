@@ -18,13 +18,13 @@ class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
                    {"keyDataType" : repr("Transforms"),
                     "keyName" : repr("Initial Transforms")})]
 
-    keyDataType = EnumProperty(name = "Key Data Type", default = "Transforms",
+    keyDataType: EnumProperty(name = "Key Data Type", default = "Transforms",
         items = keyDataTypeItems, update = keyChanged)
 
-    keyName = StringProperty(name = "Key Name", default = "",
+    keyName: StringProperty(name = "Key Name", default = "",
         update = keyChanged)
 
-    useList = VectorizedSocket.newProperty()
+    useList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Object", "useList",

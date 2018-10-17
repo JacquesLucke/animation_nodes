@@ -15,10 +15,10 @@ class ListBooleanOperationsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ListBooleanOperationsNode"
     bl_label = "List Boolean Operations"
 
-    operation = EnumProperty(name = "Operation", default = "UNION",
+    operation: EnumProperty(name = "Operation", default = "UNION",
         items = operationItems, update = executionCodeChanged)
 
-    assignedType = ListTypeSelectorSocket.newProperty(default = "Object List")
+    assignedType: ListTypeSelectorSocket.newProperty(default = "Object List")
 
     def create(self):
         prop = ("assignedType", "LIST")

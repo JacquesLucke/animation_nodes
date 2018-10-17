@@ -8,9 +8,9 @@ class RandomListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_RandomListNode"
     bl_label = "Random List"
 
-    assignedType = ListTypeSelectorSocket.newProperty(default = "Float List")
+    assignedType: ListTypeSelectorSocket.newProperty(default = "Float List")
 
-    nodeSeed = IntProperty(name = "Node Seed", update = propertyChanged)
+    nodeSeed: IntProperty(name = "Node Seed", update = propertyChanged)
 
     def create(self):
         self.newInput("Integer", "Seed", "seed")

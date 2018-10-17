@@ -12,11 +12,11 @@ class MatrixMathNode(bpy.types.Node, AnimationNode):
     bl_label = "Matrix Math"
     errorHandlingType = "MESSAGE"
 
-    operation = EnumProperty(name = "Operation", items = operationItems,
+    operation: EnumProperty(name = "Operation", items = operationItems,
         update = executionCodeChanged)
 
-    useListA = VectorizedSocket.newProperty()
-    useListB = VectorizedSocket.newProperty()
+    useListA: VectorizedSocket.newProperty()
+    useListB: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Matrix", "useListA",

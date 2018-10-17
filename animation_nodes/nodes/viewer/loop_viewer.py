@@ -10,7 +10,7 @@ class LoopViewerNode(bpy.types.Node, AnimationNode):
     bl_label = "Loop Viewer"
     bl_width_default = 160
 
-    textBlockName = StringProperty(name = "Text")
+    textBlockName: StringProperty(name = "Text")
 
     def setup(self):
         self.newInput("Node Control", "...", "control")

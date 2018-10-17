@@ -8,9 +8,9 @@ class VectorWiggleNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_VectorWiggleNode"
     bl_label = "Vector Wiggle"
 
-    nodeSeed = IntProperty(update = propertyChanged)
+    nodeSeed: IntProperty(update = propertyChanged)
 
-    createList = BoolProperty(name = "Create List", default = False,
+    createList: BoolProperty(name = "Create List", default = False,
         update = AnimationNode.refresh)
 
     def setup(self):

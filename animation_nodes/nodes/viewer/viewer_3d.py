@@ -30,21 +30,21 @@ class Viewer3DNode(bpy.types.Node, AnimationNode):
     def redrawViewport(self, context):
         redrawAll()
 
-    enabled = BoolProperty(name = "Enabled", default = True,
+    enabled: BoolProperty(name = "Enabled", default = True,
         update = redrawViewport)
 
-    pointSize = IntProperty(name = "Point Size", default = 2, min = 1,
+    pointSize: IntProperty(name = "Point Size", default = 2, min = 1,
         update = drawPropertyChanged)
 
-    matrixSize = FloatProperty(name = "Matrix Size", default = 1, min = 0,
+    matrixSize: FloatProperty(name = "Matrix Size", default = 1, min = 0,
         update = drawPropertyChanged)
 
-    drawColor = FloatVectorProperty(name = "Draw Color",
+    drawColor: FloatVectorProperty(name = "Draw Color",
         default = [0.9, 0.9, 0.9], subtype = "COLOR",
         soft_min = 0.0, soft_max = 1.0,
         update = drawPropertyChanged)
 
-    drawOrientationLetters = BoolProperty(name = "Draw Orientation Letters", default = False,
+    drawOrientationLetters: BoolProperty(name = "Draw Orientation Letters", default = False,
         update = drawPropertyChanged)
 
     def create(self):

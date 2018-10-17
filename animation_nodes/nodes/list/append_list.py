@@ -6,7 +6,7 @@ class AppendListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_AppendListNode"
     bl_label = "Append to List"
 
-    assignedType = ListTypeSelectorSocket.newProperty(default = "Float")
+    assignedType: ListTypeSelectorSocket.newProperty(default = "Float")
 
     def create(self):
         prop = ("assignedType", "BASE")

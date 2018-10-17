@@ -5,7 +5,7 @@ class ReverseTextNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ReverseTextNode"
     bl_label = "Reverse Text"
 
-    useList = VectorizedSocket.newProperty()
+    useList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Text", "useList",

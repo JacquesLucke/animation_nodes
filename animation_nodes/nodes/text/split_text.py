@@ -17,11 +17,11 @@ class SplitTextNode(bpy.types.Node, AnimationNode):
     bl_width_default = 180
     errorHandlingType = "MESSAGE"
 
-    splitType = EnumProperty(
+    splitType: EnumProperty(
         name = "Split Type", default = "LINES",
         items = splitTypeItems, update = AnimationNode.refresh)
 
-    keepDelimiters = BoolProperty(default = False, update = propertyChanged)
+    keepDelimiters: BoolProperty(default = False, update = propertyChanged)
 
     def create(self):
         self.newInput("Text", "Text", "text")

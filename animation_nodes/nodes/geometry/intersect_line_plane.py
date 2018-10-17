@@ -9,10 +9,10 @@ class IntersectLinePlaneNode(bpy.types.Node, AnimationNode):
     bl_label = "Intersect Line Plane"
     bl_width_default = 160
 
-    useLineStartList = VectorizedSocket.newProperty()
-    useLineEndList = VectorizedSocket.newProperty()
-    usePlaneNormalList = VectorizedSocket.newProperty()
-    usePlanePointList = VectorizedSocket.newProperty()
+    useLineStartList: VectorizedSocket.newProperty()
+    useLineEndList: VectorizedSocket.newProperty()
+    usePlaneNormalList: VectorizedSocket.newProperty()
+    usePlanePointList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Vector", "useLineStartList",

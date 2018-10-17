@@ -10,10 +10,10 @@ class IntersectLineLineNode(bpy.types.Node, AnimationNode):
     bl_width_default = 160
     searchTags = ["Nearest Points on 2 Lines"]
 
-    useFirstLineStartList = VectorizedSocket.newProperty()
-    useFirstLineEndList = VectorizedSocket.newProperty()
-    useSecondLineStartList = VectorizedSocket.newProperty()
-    useSecondLineEndList = VectorizedSocket.newProperty()
+    useFirstLineStartList: VectorizedSocket.newProperty()
+    useFirstLineEndList: VectorizedSocket.newProperty()
+    useSecondLineStartList: VectorizedSocket.newProperty()
+    useSecondLineEndList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Vector", "useFirstLineStartList",

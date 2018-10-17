@@ -12,7 +12,7 @@ class FloatToIntegerNode(bpy.types.Node, AnimationNode):
     bl_label = "Float to Integer"
     dynamicLabelType = "ALWAYS"
 
-    type = EnumProperty(name = "Conversion Type", items = items, default = "FLOOR", update = executionCodeChanged)
+    type: EnumProperty(name = "Conversion Type", items = items, default = "FLOOR", update = executionCodeChanged)
 
     def create(self):
         self.newInput("Float", "Float", "float")

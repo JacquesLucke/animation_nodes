@@ -14,7 +14,7 @@ class ChainActionsNode(bpy.types.Node, AnimationNode):
     bl_label = "Chain Actions"
     errorHandlingType = "EXCEPTION"
 
-    relative = BoolProperty(name = "Relative", default = True,
+    relative: BoolProperty(name = "Relative", default = True,
         description = "Use last frame of first action as starting point of the second.",
         update = propertyChanged)
 

@@ -7,8 +7,8 @@ class BakeAnimation(bpy.types.Operator):
     bl_label = "Bake to Keyframes"
     bl_description = "Playback animation and make keyframes (only supported nodes)"
 
-    startFrame = IntProperty(default = 1)
-    endFrame = IntProperty(default = 250)
+    startFrame: IntProperty(default = 1)
+    endFrame: IntProperty(default = 250)
 
     def invoke(self, context, event):
         context.window_manager.modal_handler_add(self)

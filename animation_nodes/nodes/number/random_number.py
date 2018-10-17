@@ -10,9 +10,9 @@ class RandomNumberNode(bpy.types.Node, AnimationNode):
     bl_label = "Random Number"
     bl_width_default = 160
 
-    nodeSeed = IntProperty(update = propertyChanged)
+    nodeSeed: IntProperty(update = propertyChanged)
 
-    createList = BoolProperty(name = "Create List", default = False,
+    createList: BoolProperty(name = "Create List", default = False,
         description = "Create a list of random numbers",
         update = AnimationNode.refresh)
 

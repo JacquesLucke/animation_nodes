@@ -50,10 +50,10 @@ class SoundSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = False
     comparable = False
 
-    bakeData = EnumProperty(name = "Bake Data", items = getBakeDataItems,
+    bakeData: EnumProperty(name = "Bake Data", items = getBakeDataItems,
         update = propertyChanged)
 
-    typeFilter = EnumProperty(items = typeFilterItems, default = "ALL")
+    typeFilter: EnumProperty(items = typeFilterItems, default = "ALL")
 
     def drawProperty(self, layout, text, node):
         row = layout.row(align = True)

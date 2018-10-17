@@ -24,13 +24,13 @@ class VertexGroupInputNode(bpy.types.Node, AnimationNode):
     bl_label = "Vertex Group Input"
     errorHandlingType = "EXCEPTION"
 
-    mode = EnumProperty(name = "Mode", default = "ALL",
+    mode: EnumProperty(name = "Mode", default = "ALL",
         items = modeItems, update = AnimationNode.refresh)
 
-    groupIdentifierType = EnumProperty(name = "Group Identifier Type", default = "INDEX",
+    groupIdentifierType: EnumProperty(name = "Group Identifier Type", default = "INDEX",
         items = groupIdentifierTypeItems, update = AnimationNode.refresh)
 
-    useIndexList = VectorizedSocket.newProperty()
+    useIndexList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")

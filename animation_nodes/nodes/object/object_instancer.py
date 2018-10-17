@@ -29,8 +29,8 @@ for item in bpy.types.Object.bl_rna.properties["empty_display_type"].enum_items:
 
 class ObjectNamePropertyGroup(bpy.types.PropertyGroup):
     bl_idname = "an_ObjectNamePropertyGroup"
-    objectName = StringProperty(name = "Object Name", default = "", update = propertyChanged)
-    objectIndex = IntProperty(name = "Object Index", default = 0, update = propertyChanged)
+    objectName: StringProperty(name = "Object Name", default = "", update = propertyChanged)
+    objectIndex: IntProperty(name = "Object Index", default = 0, update = propertyChanged)
 
 class ObjectInstancerNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectInstancerNode"
@@ -46,30 +46,30 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         self.resetInstances = True
         propertyChanged()
 
-    linkedObjects = CollectionProperty(type = ObjectNamePropertyGroup)
-    resetInstances = BoolProperty(default = False, update = propertyChanged)
+    linkedObjects: CollectionProperty(type = ObjectNamePropertyGroup)
+    resetInstances: BoolProperty(default = False, update = propertyChanged)
 
-    copyFromSource = BoolProperty(name = "Copy from Source",
+    copyFromSource: BoolProperty(name = "Copy from Source",
         default = True, update = copyFromSourceChanged)
 
-    deepCopy = BoolProperty(name = "Deep Copy", default = False, update = resetInstancesEvent,
+    deepCopy: BoolProperty(name = "Deep Copy", default = False, update = resetInstancesEvent,
         description = "Make the instances independent of the source object (e.g. copy mesh)")
 
-    objectType = EnumProperty(name = "Object Type", default = "Mesh",
+    objectType: EnumProperty(name = "Object Type", default = "Mesh",
         items = objectTypeItems, update = resetInstancesEvent)
 
-    copyObjectProperties = BoolProperty(name = "Copy Full Object", default = False,
+    copyObjectProperties: BoolProperty(name = "Copy Full Object", default = False,
         description = "Enable this to copy modifiers/constraints/... from the source object.",
         update = resetInstancesEvent)
 
-    removeAnimationData = BoolProperty(name = "Remove Animation Data", default = True,
+    removeAnimationData: BoolProperty(name = "Remove Animation Data", default = True,
         description = "Remove the active action on the instance; This is useful when you want to animate the object yourself",
         update = resetInstancesEvent)
 
-    parentInstances = BoolProperty(name = "Parent to Main Container",
+    parentInstances: BoolProperty(name = "Parent to Main Container",
         default = True, update = resetInstancesEvent)
 
-    emptyDisplayType = EnumProperty(name = "Empty Draw Type", default = "PLAIN_AXES",
+    emptyDisplayType: EnumProperty(name = "Empty Draw Type", default = "PLAIN_AXES",
         items = emptyDisplayTypeItems, update = resetInstancesEvent)
 
     def create(self):

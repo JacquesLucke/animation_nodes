@@ -29,22 +29,22 @@ class SoundFalloffNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SoundFalloffNode"
     bl_label = "Sound Falloff"
 
-    soundType = EnumProperty(name = "Sound Type", default = "AVERAGE",
+    soundType: EnumProperty(name = "Sound Type", default = "AVERAGE",
         items = soundTypeItems, update = AnimationNode.refresh)
 
-    averageFalloffType = EnumProperty(name = "Average Falloff Type", default = "INDEX_OFFSET",
+    averageFalloffType: EnumProperty(name = "Average Falloff Type", default = "INDEX_OFFSET",
         items = averageFalloffTypeItems, update = AnimationNode.refresh)
 
-    spectrumFalloffType = EnumProperty(name = "Spectrum Falloff Type", default = "INDEX_FREQUENCY",
+    spectrumFalloffType: EnumProperty(name = "Spectrum Falloff Type", default = "INDEX_FREQUENCY",
         items = spectrumFalloffTypeItems, update = AnimationNode.refresh)
 
-    indexFrequencyExtensionType = EnumProperty(name = "Index Frequency Extension Type", default = "LOOP",
+    indexFrequencyExtensionType: EnumProperty(name = "Index Frequency Extension Type", default = "LOOP",
         items = indexFrequencyExtensionTypeItems, update = AnimationNode.refresh)
 
-    fadeLowFrequenciesToZero = BoolProperty(name = "Fade Low Frequencies to Zero", default = False)
-    fadeHighFrequenciesToZero = BoolProperty(name = "Fade High Frequencies to Zero", default = False)
+    fadeLowFrequenciesToZero: BoolProperty(name = "Fade Low Frequencies to Zero", default = False)
+    fadeHighFrequenciesToZero: BoolProperty(name = "Fade High Frequencies to Zero", default = False)
 
-    useCurrentFrame = BoolProperty(name = "Use Current Frame", default = True,
+    useCurrentFrame: BoolProperty(name = "Use Current Frame", default = True,
         update = AnimationNode.refresh)
 
     def create(self):

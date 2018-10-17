@@ -70,7 +70,7 @@ class MoveInputSocket(bpy.types.Operator):
     bl_idname = "an.move_input"
     bl_label = "Move Input"
 
-    moveUp = BoolProperty()
+    moveUp: BoolProperty()
 
     @classmethod
     def poll(cls, context):
@@ -84,7 +84,7 @@ class MoveOutputSocket(bpy.types.Operator):
     bl_idname = "an.move_output"
     bl_label = "Move Output"
 
-    moveUp = BoolProperty()
+    moveUp: BoolProperty()
 
     @classmethod
     def poll(cls, context):

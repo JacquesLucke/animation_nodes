@@ -7,8 +7,8 @@ class VectorDistanceNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_VectorDistanceNode"
     bl_label = "Vector Distance"
 
-    useListA = VectorizedSocket.newProperty()
-    useListB = VectorizedSocket.newProperty()
+    useListA: VectorizedSocket.newProperty()
+    useListB: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Vector", "useListA",

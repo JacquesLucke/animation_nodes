@@ -17,10 +17,10 @@ class NumberConstantsNode(bpy.types.Node, AnimationNode):
     bl_label = "Constants"
     dynamicLabelType = "HIDDEN_ONLY"
 
-    constant = EnumProperty(name = "Constant", default = "Pi",
+    constant: EnumProperty(name = "Constant", default = "Pi",
         items = constantItems, update = executionCodeChanged)
 
-    factor = EnumProperty(name = "Factor", default = "1",
+    factor: EnumProperty(name = "Factor", default = "1",
         items = factorItems, update = executionCodeChanged)
 
     def create(self):

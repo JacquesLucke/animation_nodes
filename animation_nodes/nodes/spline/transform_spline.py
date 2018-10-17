@@ -6,7 +6,7 @@ class TransformSplineNode(bpy.types.Node, AnimationNode):
     bl_label = "Transform Spline"
     codeEffects = [VectorizedSocket.CodeEffect]
 
-    useSplineList = VectorizedSocket.newProperty()
+    useSplineList: VectorizedSocket.newProperty()
 
     def create(self):
         socket = self.newInput(VectorizedSocket("Spline", "useSplineList",

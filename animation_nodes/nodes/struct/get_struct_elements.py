@@ -9,7 +9,7 @@ class GetStructElementsNode(bpy.types.Node, AnimationNode):
     bl_label = "Get Struct Elements"
     errorHandlingType = "EXCEPTION"
 
-    makeCopies = BoolProperty(name = "Make Copies", default = True,
+    makeCopies: BoolProperty(name = "Make Copies", default = True,
         description = "Copy the data before outputting it",
         update = executionCodeChanged)
 

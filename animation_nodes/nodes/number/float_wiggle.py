@@ -8,7 +8,7 @@ class FloatWiggleNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_FloatWiggleNode"
     bl_label = "Number Wiggle"
 
-    nodeSeed = IntProperty(update = propertyChanged)
+    nodeSeed: IntProperty(update = propertyChanged)
 
     def setup(self):
         self.randomizeNodeSeed()

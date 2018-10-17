@@ -9,10 +9,10 @@ class IntersectSphereSphereNode(bpy.types.Node, AnimationNode):
     bl_label = "Intersect Sphere Sphere"
     bl_width_default = 160
 
-    useFirstSphereCenterList = VectorizedSocket.newProperty()
-    useFirstSphereRadiusList = VectorizedSocket.newProperty()
-    useSecondSphereCenterList = VectorizedSocket.newProperty()
-    useSecondSphereRadiusList = VectorizedSocket.newProperty()
+    useFirstSphereCenterList: VectorizedSocket.newProperty()
+    useFirstSphereRadiusList: VectorizedSocket.newProperty()
+    useSecondSphereCenterList: VectorizedSocket.newProperty()
+    useSecondSphereRadiusList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Vector", "useFirstSphereCenterList",

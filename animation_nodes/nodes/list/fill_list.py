@@ -12,12 +12,12 @@ class FillListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_FillListNode"
     bl_label = "Fill List"
 
-    assignedType = ListTypeSelectorSocket.newProperty(default = "Float")
+    assignedType: ListTypeSelectorSocket.newProperty(default = "Float")
 
-    fillMode = EnumProperty(name = "Fill Mode", default = "RIGHT",
+    fillMode: EnumProperty(name = "Fill Mode", default = "RIGHT",
         items = fillModeItems, update = executionCodeChanged)
 
-    makeElementCopies = BoolProperty(name = "Make Element Copies", default = True,
+    makeElementCopies: BoolProperty(name = "Make Element Copies", default = True,
         description = "Insert copies of the original fill element",
         update = executionCodeChanged)
 

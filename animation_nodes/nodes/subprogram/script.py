@@ -20,21 +20,21 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         self.errorMessage = ""
         executionCodeChanged()
 
-    executionCode = StringProperty(default = "")
-    textBlockName = StringProperty(default = "")
+    executionCode: StringProperty(default = "")
+    textBlockName: StringProperty(default = "")
 
-    debugMode = BoolProperty(name = "Debug Mode", default = True,
+    debugMode: BoolProperty(name = "Debug Mode", default = True,
         description = "Give error message inside the node", update = scriptExecutionCodeChanged)
-    errorMessage = StringProperty()
+    errorMessage: StringProperty()
 
-    interactiveMode = BoolProperty(name = "Interactive Mode", default = True,
+    interactiveMode: BoolProperty(name = "Interactive Mode", default = True,
         description = "Recompile the script on each change in the text block")
 
-    initializeMissingOutputs = BoolProperty(name = "Initialize Missing Outputs",
+    initializeMissingOutputs: BoolProperty(name = "Initialize Missing Outputs",
         default = True, description = "Use default values for uninitialized outputs",
         update = scriptExecutionCodeChanged)
 
-    correctOutputTypes = BoolProperty(name = "Correct Output Types", default = True,
+    correctOutputTypes: BoolProperty(name = "Correct Output Types", default = True,
         description = "Try to correct the type of variables, return default otherwise",
         update = scriptExecutionCodeChanged)
 

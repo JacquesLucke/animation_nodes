@@ -12,7 +12,7 @@ class SequenceSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = False
     comparable = True
 
-    sequenceName = StringProperty(update = propertyChanged)
+    sequenceName: StringProperty(update = propertyChanged)
 
     def drawProperty(self, layout, text, node):
         row = layout.row(align = True)

@@ -12,9 +12,9 @@ class CompareNode(bpy.types.Node, AnimationNode):
     bl_label = "Compare"
     dynamicLabelType = "HIDDEN_ONLY"
 
-    assignedType = DataTypeSelectorSocket.newProperty(default = "Integer")
+    assignedType: DataTypeSelectorSocket.newProperty(default = "Integer")
 
-    compareType = EnumProperty(name = "Compare Type",
+    compareType: EnumProperty(name = "Compare Type",
         items = compare_types_items, update = AnimationNode.refresh)
 
     def create(self):

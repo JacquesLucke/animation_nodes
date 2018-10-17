@@ -7,7 +7,7 @@ class InsertViewerNode(bpy.types.Operator, NodeCreator):
     bl_idname = "an.insert_viewer_node"
     bl_label = "Insert Viewer Node"
 
-    socketIndex = IntProperty(default = 0)
+    socketIndex: IntProperty(default = 0)
 
     @property
     def needsMenu(self):

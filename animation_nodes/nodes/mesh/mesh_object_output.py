@@ -17,16 +17,16 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
     bl_width_default = 180
     errorHandlingType = "MESSAGE"
 
-    meshDataType = EnumProperty(name = "Mesh Type", default = "MESH_DATA",
+    meshDataType: EnumProperty(name = "Mesh Type", default = "MESH_DATA",
         items = meshDataTypeItems, update = AnimationNode.refresh)
 
-    validateMesh = BoolProperty(name = "Validate Mesh", default = False,
+    validateMesh: BoolProperty(name = "Validate Mesh", default = False,
         description = "", update = propertyChanged)
 
-    validateMeshVerbose = BoolProperty(name = "Validate Mesh Verbose", default = False,
+    validateMeshVerbose: BoolProperty(name = "Validate Mesh Verbose", default = False,
         description = "Print results from validation in the console.", update = propertyChanged)
 
-    ensureAnimationData = BoolProperty(name = "Ensure Animation Data", default = True,
+    ensureAnimationData: BoolProperty(name = "Ensure Animation Data", default = True,
         description = ("Make sure that the mesh has animation data so that "
                        "it will be exported as animation by exporters (mainly Alembic)"),
         update = propertyChanged)

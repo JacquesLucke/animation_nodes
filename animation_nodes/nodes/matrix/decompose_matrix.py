@@ -10,7 +10,7 @@ class DecomposeMatrixNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_DecomposeMatrixNode"
     bl_label = "Decompose Matrix"
 
-    useMatrixList = VectorizedSocket.newProperty()
+    useMatrixList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Matrix", "useMatrixList",

@@ -13,9 +13,9 @@ class FloatingNodeSettingsPanel(bpy.types.Operator):
     bl_idname = "an.floating_node_settings_panel"
     bl_label = "Node Settings"
 
-    nodeIdentifier = StringProperty(default = "")
+    nodeIdentifier: StringProperty(default = "")
 
-    mode = EnumProperty(name = "Mode", items = modeItems, default = "ADVANCED_SETTINGS")
+    mode: EnumProperty(name = "Mode", items = modeItems, default = "ADVANCED_SETTINGS")
 
     @classmethod
     def poll(cls, context):

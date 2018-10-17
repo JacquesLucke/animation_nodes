@@ -34,11 +34,11 @@ def createOperatorWithDescription(description):
         "bl_description" : description,
         "invoke" : invoke_InvokeFunction,
         "execute" : execute_InvokeFunction })
-    operator.callback = StringProperty()
-    operator.invokeWithData = BoolProperty(default = False)
-    operator.confirm = BoolProperty()
-    operator.data = StringProperty()
-    operator.passEvent = BoolProperty()
+    operator.callback: StringProperty()
+    operator.invokeWithData: BoolProperty(default = False)
+    operator.confirm: BoolProperty()
+    operator.data: StringProperty()
+    operator.passEvent: BoolProperty()
 
     return operator
 

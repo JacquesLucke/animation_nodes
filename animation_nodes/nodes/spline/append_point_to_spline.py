@@ -11,7 +11,7 @@ class AppendPointToSplineNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_AppendPointToSplineNode"
     bl_label = "Append Point to Spline"
 
-    pointType = EnumProperty(name = "Point Type", default = "POINT",
+    pointType: EnumProperty(name = "Point Type", default = "POINT",
         items = pointTypeItems, update = AnimationNode.refresh)
 
     def create(self):

@@ -11,7 +11,7 @@ class ObjectLayerVisibilityOutputNode(bpy.types.Node, AnimationNode):
     bl_label = "Object Layer Visibility Output"
     errorHandlingType = "MESSAGE"
 
-    layerChoosingType = EnumProperty(name = "Layer Choosing Type", default = "MULTIPLE",
+    layerChoosingType: EnumProperty(name = "Layer Choosing Type", default = "MULTIPLE",
         items = layerChoosingTypeItems, update = AnimationNode.refresh)
 
     def create(self):

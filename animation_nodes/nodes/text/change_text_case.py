@@ -18,7 +18,7 @@ class ChangeTextCaseNode(bpy.types.Node, AnimationNode):
     def caseTypeChanges(self, context):
         executionCodeChanged()
 
-    caseType = EnumProperty(
+    caseType: EnumProperty(
         name = "Case Type", default = "CAPITALIZE",
         items = caseTypeItems, update = caseTypeChanges)
 

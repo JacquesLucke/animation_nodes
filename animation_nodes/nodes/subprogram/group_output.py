@@ -16,7 +16,7 @@ class GroupOutputNode(bpy.types.Node, AnimationNode):
         subprogramInterfaceChanged()
         treeChanged()
 
-    groupInputIdentifier = StringProperty(update = inputNodeIdentifierChanged)
+    groupInputIdentifier: StringProperty(update = inputNodeIdentifierChanged)
 
     def setup(self):
         self.newInput("Node Control", "New Output", margin = 0.15)

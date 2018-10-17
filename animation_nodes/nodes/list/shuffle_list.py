@@ -8,9 +8,9 @@ class ShuffleListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ShuffleListNode"
     bl_label = "Shuffle List"
 
-    nodeSeed = IntProperty(name = "Node Seed", update = propertyChanged)
+    nodeSeed: IntProperty(name = "Node Seed", update = propertyChanged)
 
-    assignedType = ListTypeSelectorSocket.newProperty(default = "Float List")
+    assignedType: ListTypeSelectorSocket.newProperty(default = "Float List")
 
     def setup(self):
         self.randomizeNodeSeed()

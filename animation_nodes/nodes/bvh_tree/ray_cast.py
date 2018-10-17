@@ -9,10 +9,10 @@ class RayCastBVHTreeNode(bpy.types.Node, AnimationNode):
     bl_width_default = 160
     codeEffects = [VectorizedSocket.CodeEffect]
 
-    useStartList = VectorizedSocket.newProperty()
-    useDirectionList = VectorizedSocket.newProperty()
+    useStartList: VectorizedSocket.newProperty()
+    useDirectionList: VectorizedSocket.newProperty()
 
-    startInInfinity = BoolProperty(name = "Start in Infinity", default = False,
+    startInInfinity: BoolProperty(name = "Start in Infinity", default = False,
         description = ("Ray cast the whole line defined by location and direction."
                        " This makes the distance sockets unusable."),
         update = executionCodeChanged)

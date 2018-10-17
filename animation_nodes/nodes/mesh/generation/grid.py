@@ -13,7 +13,7 @@ class GridMeshNode(bpy.types.Node, AnimationNode):
     bl_label = "Grid Mesh"
     bl_width_default = 160
 
-    mode = EnumProperty(name = "Mode", default = "SIZE",
+    mode: EnumProperty(name = "Mode", default = "SIZE",
         update = AnimationNode.refresh, items = modeItems)
 
     def create(self):

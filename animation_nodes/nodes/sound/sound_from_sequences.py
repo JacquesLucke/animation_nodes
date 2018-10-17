@@ -14,7 +14,7 @@ class SoundFromSequencesNode(bpy.types.Node, AnimationNode):
     bl_width_default = 160
     errorHandlingType = "MESSAGE"
 
-    soundType = EnumProperty(name = "Sound Type", items = soundTypeItems)
+    soundType: EnumProperty(name = "Sound Type", items = soundTypeItems)
 
     def create(self):
         self.newInput("Sequence List", "Sequences", "sequences")

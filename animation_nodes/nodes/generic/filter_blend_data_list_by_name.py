@@ -19,13 +19,13 @@ class FilterBlendDataListByNameNode(bpy.types.Node, AnimationNode):
     searchTags = [("Filter {} List by Name".format(name), {"dataType" : repr(name)}) for name in dataTypes]
 
     # Should be set only on node creation
-    dataType = StringProperty(name = "Data Type", default = "Object",
+    dataType: StringProperty(name = "Data Type", default = "Object",
         update = AnimationNode.refresh)
 
-    filterType = EnumProperty(name = "Filter Type", default = "STARTS_WITH",
+    filterType: EnumProperty(name = "Filter Type", default = "STARTS_WITH",
         items = filterTypeItems, update = executionCodeChanged)
 
-    caseSensitive = BoolProperty(name = "Case Sensitive", default = False,
+    caseSensitive: BoolProperty(name = "Case Sensitive", default = False,
         update = executionCodeChanged)
 
     def create(self):

@@ -19,9 +19,9 @@ class MixDataNode(bpy.types.Node, AnimationNode):
     onlySearchTags = True
     searchTags = [(tag, {"dataType" : repr(type)}) for type, tag in nodeTypes.items()]
 
-    dataType = StringProperty(default = "Float", update = AnimationNode.refresh)
-    
-    clampFactor = BoolProperty(name = "Clamp Factor",
+    dataType: StringProperty(default = "Float", update = AnimationNode.refresh)
+
+    clampFactor: BoolProperty(name = "Clamp Factor",
         description = "Clamp factor between 0 and 1",
         default = False, update = executionCodeChanged)
 

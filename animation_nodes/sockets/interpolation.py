@@ -26,11 +26,11 @@ class InterpolationSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     comparable = True
     storable = True
 
-    category = EnumProperty(name = "Interpolation Category", default = "LINEAR",
+    category: EnumProperty(name = "Interpolation Category", default = "LINEAR",
                             items = categoryItems, update = propertyChanged)
 
-    easeIn = BoolProperty(name = "Ease In", default = False, update = propertyChanged)
-    easeOut = BoolProperty(name = "Ease Out", default = True, update = propertyChanged)
+    easeIn: BoolProperty(name = "Ease In", default = False, update = propertyChanged)
+    easeOut: BoolProperty(name = "Ease Out", default = True, update = propertyChanged)
 
     def drawProperty(self, layout, text, node):
         col = layout.column(align = True)

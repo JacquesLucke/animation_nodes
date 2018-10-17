@@ -9,7 +9,7 @@ class CurveObjectOutputNode(bpy.types.Node, AnimationNode):
     bl_width_default = 180
     errorHandlingType = "MESSAGE"
 
-    useSplineList = VectorizedSocket.newProperty()
+    useSplineList: VectorizedSocket.newProperty()
 
     def create(self):
         socket = self.newInput("Object", "Object", "object")

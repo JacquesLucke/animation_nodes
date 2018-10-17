@@ -8,14 +8,14 @@ from ... algorithms.interpolations import PyInterpolation, CachedInterpolation
 
 class CurveMapPointCache(bpy.types.PropertyGroup):
     bl_idname = "an_CurveMapPointCache"
-    handle_type = StringProperty()
-    location = FloatVectorProperty(size = 2)
+    handle_type: StringProperty()
+    location: FloatVectorProperty(size = 2)
 
 class CurveMapCache(bpy.types.PropertyGroup):
     bl_idname = "an_CurveMapCache"
-    extend = StringProperty()
-    points = CollectionProperty(type = CurveMapPointCache)
-    dirty = BoolProperty(default = True)
+    extend: StringProperty()
+    points: CollectionProperty(type = CurveMapPointCache)
+    dirty: BoolProperty(default = True)
 
 
 class CurveInterpolationNode(bpy.types.Node, AnimationNode):
@@ -23,8 +23,8 @@ class CurveInterpolationNode(bpy.types.Node, AnimationNode):
     bl_label = "Curve Interpolation"
     bl_width_default = 200
 
-    curveMapCache = PointerProperty(type = CurveMapCache)
-    cacheInterpolation = BoolProperty(name = "Cache Interpolation", default = False,
+    curveMapCache: PointerProperty(type = CurveMapCache)
+    cacheInterpolation: BoolProperty(name = "Cache Interpolation", default = False,
         description = "Allows much faster evaluation of the interpolation",
         update = propertyChanged)
 

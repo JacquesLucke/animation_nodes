@@ -6,7 +6,7 @@ class MaskListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MaskListNode"
     bl_label = "Mask List"
 
-    assignedType = ListTypeSelectorSocket.newProperty(default = "Integer List")
+    assignedType: ListTypeSelectorSocket.newProperty(default = "Integer List")
 
     def create(self):
         prop = ("assignedType", "LIST")

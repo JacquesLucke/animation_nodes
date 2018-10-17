@@ -6,7 +6,7 @@ class VectorFromValueNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_VectorFromValueNode"
     bl_label = "Vector from Value"
 
-    useList = VectorizedSocket.newProperty()
+    useList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Float", "useList",

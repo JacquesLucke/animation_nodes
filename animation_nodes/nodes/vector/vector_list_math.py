@@ -11,7 +11,7 @@ class VectorListMathNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_VectorListMathNode"
     bl_label = "Vector List Math"
 
-    operation = EnumProperty(name = "Operation", default = "ADD",
+    operation: EnumProperty(name = "Operation", default = "ADD",
         items = operationItems, update = executionCodeChanged)
 
     def create(self):

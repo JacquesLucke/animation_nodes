@@ -14,7 +14,7 @@ class FindClosePointsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_FindClosePointsNode"
     bl_label = "Find Close Points"
 
-    mode = EnumProperty(name = "Mode", default = "AMOUNT",
+    mode: EnumProperty(name = "Mode", default = "AMOUNT",
         items = modeItems, update = AnimationNode.refresh)
 
     def create(self):

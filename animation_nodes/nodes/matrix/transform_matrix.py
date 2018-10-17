@@ -6,7 +6,7 @@ class TransformMatrixNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_TransformMatrixNode"
     bl_label = "Transform Matrix"
 
-    useMatrixList = VectorizedSocket.newProperty()
+    useMatrixList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Matrix", "useMatrixList",

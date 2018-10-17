@@ -18,10 +18,10 @@ class ChooseSocketType(bpy.types.Operator):
         if self.socketGroup == "LIST":
             return getListDataTypeItems()
 
-    selectedDataType = EnumProperty(items = getItems)
-    socketGroup = EnumProperty(items = socketGroupItems)
+    selectedDataType: EnumProperty(items = getItems)
+    socketGroup: EnumProperty(items = socketGroupItems)
 
-    callback = StringProperty()
+    callback: StringProperty()
 
     def invoke(self, context, event):
         context.window_manager.invoke_search_popup(self)

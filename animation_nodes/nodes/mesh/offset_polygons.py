@@ -27,7 +27,7 @@ class OffsetPolygonsNode(bpy.types.Node, AnimationNode, MatrixTransformationBase
     bl_width_default = 200
     errorHandlingType = "EXCEPTION"
 
-    pivotSource = EnumProperty(name = "Pivot Source", default = "DEFAULT",
+    pivotSource: EnumProperty(name = "Pivot Source", default = "DEFAULT",
         description = "Determines the pivot and rotation axis for each polygon.",
         items = pivotSourceItems, update = AnimationNode.refresh)
 

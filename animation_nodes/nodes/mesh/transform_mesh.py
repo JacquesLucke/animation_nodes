@@ -14,14 +14,14 @@ class TransformMeshNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_TransformMeshNode"
     bl_label = "Transform Mesh"
 
-    transformationType = EnumProperty(name = "Transformation Type", default = "MATRIX",
+    transformationType: EnumProperty(name = "Transformation Type", default = "MATRIX",
         items = transformationTypeItems, update = AnimationNode.refresh)
 
-    joinMeshes = BoolProperty(name = "Join Meshes", default = True,
+    joinMeshes: BoolProperty(name = "Join Meshes", default = True,
         update = AnimationNode.refresh)
 
-    useMeshList = VectorizedSocket.newProperty()
-    useTransformationList = VectorizedSocket.newProperty()
+    useMeshList: VectorizedSocket.newProperty()
+    useTransformationList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Mesh", "useMeshList",

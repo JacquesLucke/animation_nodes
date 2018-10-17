@@ -25,29 +25,29 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
     def outputDataTypeChanged(self, context):
         self.recreateOutputSocket()
 
-    expression = StringProperty(name = "Expression", update = settingChanged)
-    errorMessage = StringProperty()
-    lastCorrectionType = IntProperty()
-    containsSyntaxError = BoolProperty()
+    expression: StringProperty(name = "Expression", update = settingChanged)
+    errorMessage: StringProperty()
+    lastCorrectionType: IntProperty()
+    containsSyntaxError: BoolProperty()
 
-    debugMode = BoolProperty(name = "Debug Mode", default = True,
+    debugMode: BoolProperty(name = "Debug Mode", default = True,
         description = "Show detailed error messages in the node but is slower.",
         update = executionCodeChanged)
 
-    correctType = BoolProperty(name = "Correct Type", default = True,
+    correctType: BoolProperty(name = "Correct Type", default = True,
         description = "Check the type of the result and correct it if necessary",
         update = executionCodeChanged)
 
-    moduleNames = StringProperty(name = "Modules", default = "math",
+    moduleNames: StringProperty(name = "Modules", default = "math",
         description = "Comma separated module names which can be used inside the expression",
         update = executionCodeChanged,)
 
-    outputDataType = StringProperty(default = "Generic", update = outputDataTypeChanged)
+    outputDataType: StringProperty(default = "Generic", update = outputDataTypeChanged)
 
-    fixedOutputDataType = BoolProperty(name = "Fixed Data Type", default = False,
+    fixedOutputDataType: BoolProperty(name = "Fixed Data Type", default = False,
         description = "When activated the output type does not automatically change")
 
-    inlineExpression = BoolProperty(name = "Inline Expression", default = False,
+    inlineExpression: BoolProperty(name = "Inline Expression", default = False,
         description = ("Inlining improves performance but the modules can't be used directly"
                        " (e.g. you will have to write math.sin(x) instead of just sin(x))"),
         update = executionCodeChanged)

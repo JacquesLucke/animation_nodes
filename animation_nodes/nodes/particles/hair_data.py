@@ -13,9 +13,9 @@ class ParticleSystemHairDataNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ParticleSystemHairDataNode"
     bl_label = "Hair Data"
 
-    useParticleSystemList = VectorizedSocket.newProperty()
+    useParticleSystemList: VectorizedSocket.newProperty()
 
-    splineType = EnumProperty(name = "Spline Type", default = "POLY",
+    splineType: EnumProperty(name = "Spline Type", default = "POLY",
         items = splineTypeItems, update = propertyChanged)
 
     def create(self):

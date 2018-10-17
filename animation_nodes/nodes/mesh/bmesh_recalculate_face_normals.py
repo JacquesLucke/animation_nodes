@@ -7,7 +7,7 @@ class BMeshRecalculateFaceNormalsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_BMeshRecalculateFaceNormalsNode"
     bl_label = "BMesh Recalculate Normals"
 
-    invert = BoolProperty(name = "Invert Normals", update = executionCodeChanged)
+    invert: BoolProperty(name = "Invert Normals", update = executionCodeChanged)
 
     def create(self):
         self.newInput("BMesh", "BMesh", "bm").dataIsModified = True

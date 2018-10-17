@@ -10,8 +10,8 @@ class SetVertexColorNode(bpy.types.Node, AnimationNode):
     bl_label = "Set Vertex Color"
     errorHandlingType = "EXCEPTION"
 
-    vertexColorName = StringProperty(name = "Vertex Color Group", default = "Col", update = propertyChanged)
-    checkIfColorIsSet = BoolProperty(default = True)
+    vertexColorName: StringProperty(name = "Vertex Color Group", default = "Col", update = propertyChanged)
+    checkIfColorIsSet: BoolProperty(default = True)
 
     def create(self):
         self.newInput("Object", "Object", "object").defaultDrawType = "PROPERTY_ONLY"

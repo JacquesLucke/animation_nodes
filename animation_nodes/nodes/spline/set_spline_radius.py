@@ -6,8 +6,8 @@ class SetSplineRadiusNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SetSplineRadiusNode"
     bl_label = "Set Spline Radius"
 
-    useSplineList = VectorizedSocket.newProperty()
-    useRadiusList = VectorizedSocket.newProperty()
+    useSplineList: VectorizedSocket.newProperty()
+    useRadiusList: VectorizedSocket.newProperty()
 
     def create(self):
         socket = self.newInput(VectorizedSocket("Spline", "useSplineList",

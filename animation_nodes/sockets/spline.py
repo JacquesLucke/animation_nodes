@@ -15,11 +15,11 @@ class SplineSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = True
     comparable = False
 
-    objectName = StringProperty(default = "",
+    objectName: StringProperty(default = "",
         description = "Use the first spline from this object",
         update = propertyChanged)
 
-    useWorldSpace = BoolProperty(default = True,
+    useWorldSpace: BoolProperty(default = True,
         description = "Convert points to world space",
         update = propertyChanged)
 
@@ -100,11 +100,11 @@ class SplineListSocket(bpy.types.NodeSocket, PythonListSocket):
     storable = True
     comparable = False
 
-    objectName = StringProperty(default = "",
+    objectName: StringProperty(default = "",
         description = "Use the splines from this object",
         update = propertyChanged)
 
-    useWorldSpace = BoolProperty(default = True,
+    useWorldSpace: BoolProperty(default = True,
         description = "Convert points to world space",
         update = propertyChanged)
 

@@ -11,11 +11,11 @@ class DirectionToRotationNode(bpy.types.Node, AnimationNode):
     bl_label = "Direction to Rotation"
     bl_width_default = 160
 
-    trackAxis = EnumProperty(items = trackAxisItems, update = propertyChanged, default = "Z")
-    guideAxis = EnumProperty(items = guideAxisItems, update = propertyChanged, default = "X")
+    trackAxis: EnumProperty(items = trackAxisItems, update = propertyChanged, default = "Z")
+    guideAxis: EnumProperty(items = guideAxisItems, update = propertyChanged, default = "X")
 
-    useDirectionList = VectorizedSocket.newProperty()
-    useGuideList = VectorizedSocket.newProperty()
+    useDirectionList: VectorizedSocket.newProperty()
+    useGuideList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Vector", "useDirectionList",

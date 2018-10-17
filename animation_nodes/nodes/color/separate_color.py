@@ -21,7 +21,7 @@ class SeparateColorNode(bpy.types.Node, AnimationNode):
     def targetTypeChanged(self, context):
         self.recreateOutputs()
 
-    targetType = EnumProperty(name = "Target Type", items = targetTypeItems,
+    targetType: EnumProperty(name = "Target Type", items = targetTypeItems,
         default = "RGB", update = AnimationNode.refresh)
 
     def create(self):

@@ -14,7 +14,7 @@ class IsInsideVolumeBVHTreeNode(bpy.types.Node, AnimationNode):
     bl_label = "Is Inside Volume"
     codeEffects = [VectorizedSocket.CodeEffect]
 
-    useVectorList = VectorizedSocket.newProperty()
+    useVectorList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput("BVHTree", "BVHTree", "bvhTree")

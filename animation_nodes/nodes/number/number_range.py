@@ -23,9 +23,9 @@ class NumberRangeNode(bpy.types.Node, AnimationNode):
     searchTags = [ ("Float Range", {"dataType" : repr("Float")}),
                    ("Integer Range", {"dataType" : repr("Integer")}) ]
 
-    dataType = StringProperty(default = "Float", update = AnimationNode.refresh)
+    dataType: StringProperty(default = "Float", update = AnimationNode.refresh)
 
-    floatStepType = EnumProperty(name = "Float Step Type", default = "START_STEP",
+    floatStepType: EnumProperty(name = "Float Step Type", default = "START_STEP",
         items = floatStepTypeItems, update = AnimationNode.refresh)
 
     def create(self):

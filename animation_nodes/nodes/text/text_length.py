@@ -6,7 +6,7 @@ class TextLengthNode(bpy.types.Node, AnimationNode):
     bl_label = "Text Length"
     codeEffects = [VectorizedSocket.CodeEffect]
 
-    useTextList = VectorizedSocket.newProperty()
+    useTextList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Text", "useTextList",

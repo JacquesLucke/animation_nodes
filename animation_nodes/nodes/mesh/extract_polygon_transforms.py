@@ -52,24 +52,24 @@ class ExtractPolygonTransformsNode(bpy.types.Node, AnimationNode):
     bl_label = "Extract Polygon Transforms"
     errorHandlingType = "EXCEPTION"
 
-    sourceType = EnumProperty(name = "Source Type", default = "MESH",
+    sourceType: EnumProperty(name = "Source Type", default = "MESH",
         update = AnimationNode.refresh, items = sourceTypeItems)
 
-    extractionType = EnumProperty(name = "Extraction Type", default = "DEFAULT",
+    extractionType: EnumProperty(name = "Extraction Type", default = "DEFAULT",
         update = AnimationNode.refresh, items = extractionTypeItems)
 
-    edgeSelectionType = EnumProperty(name = "Edge Selection Type", default = "DIRECTION",
+    edgeSelectionType: EnumProperty(name = "Edge Selection Type", default = "DIRECTION",
         update = AnimationNode.refresh, items = edgeSelectionTypeItems)
 
-    directionType = EnumProperty(name = "Direction Type", default = "X",
+    directionType: EnumProperty(name = "Direction Type", default = "X",
         update = AnimationNode.refresh, items = directionTypeItems)
 
-    negateDirection = BoolProperty(name = "Negate Vertex Direction", default = False)
+    negateDirection: BoolProperty(name = "Negate Vertex Direction", default = False)
 
-    distanceType = EnumProperty(name = "Distance Type", default = "CLOSEST",
+    distanceType: EnumProperty(name = "Distance Type", default = "CLOSEST",
         update = AnimationNode.refresh, items = distanceTypeItems)
 
-    polygonsAreFlat = BoolProperty(name = "Polygons are Flat", default = False,
+    polygonsAreFlat: BoolProperty(name = "Polygons are Flat", default = False,
         description = ("Performance can be improved when you are certain that all polygons are flat. "
                        "Enabling this can lead to artifacts when the polygons are not actually flat."),
         update = propertyChanged)

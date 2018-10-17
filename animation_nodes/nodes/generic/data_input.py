@@ -14,9 +14,9 @@ class DataInputNode(bpy.types.Node, AnimationNode):
         return [(socket.dataType + " Input", {"assignedType" : repr(socket.dataType)})
                  for socket in getSocketClasses() if socket.hasProperty()]
 
-    assignedType = StringProperty(default = "Float", update = AnimationNode.refresh)
+    assignedType: StringProperty(default = "Float", update = AnimationNode.refresh)
 
-    showInViewport = BoolProperty(default = False, name = "Show in Viewport",
+    showInViewport: BoolProperty(default = False, name = "Show in Viewport",
         description = "Draw the input of that node in the 'AN' category of the 3D view (Use the node label as name)")
 
     def create(self):

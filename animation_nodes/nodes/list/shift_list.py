@@ -5,7 +5,7 @@ class ShiftListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ShiftListNode"
     bl_label = "Shift List"
 
-    assignedType = ListTypeSelectorSocket.newProperty(default = "Float List")
+    assignedType: ListTypeSelectorSocket.newProperty(default = "Float List")
 
     def create(self):
         prop = ("assignedType", "LIST")

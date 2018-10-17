@@ -13,15 +13,15 @@ class SplineFromPointsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SplineFromPointsNode"
     bl_label = "Spline from Points"
 
-    splineType = EnumProperty(name = "Spline Type", default = "BEZIER",
+    splineType: EnumProperty(name = "Spline Type", default = "BEZIER",
         items = splineTypeItems, update = AnimationNode.refresh)
 
-    improveBezierHandles = BoolProperty(name = "Improve Bezier Handles",
+    improveBezierHandles: BoolProperty(name = "Improve Bezier Handles",
         description = "Tries to avoid that the handles are equal to the corresponding points.",
         default = True, update = propertyChanged)
 
-    useRadiusList = VectorizedSocket.newProperty()
-    useTiltList = VectorizedSocket.newProperty()
+    useRadiusList: VectorizedSocket.newProperty()
+    useTiltList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput("Vector List", "Points", "points", dataIsModified = True)

@@ -11,7 +11,7 @@ class ColorSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = True
     comparable = False
 
-    value = FloatVectorProperty(
+    value: FloatVectorProperty(
         default = [0.5, 0.5, 0.5], subtype = "COLOR",
         soft_min = 0.0, soft_max = 1.0,
         update = propertyChanged)

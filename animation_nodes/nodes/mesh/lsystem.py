@@ -13,13 +13,13 @@ class LSystemNode(bpy.types.Node, AnimationNode):
     def getPresetItems(self, context):
         return [(name, name, "") for name in presets.keys()]
 
-    useSymbolLimit = BoolProperty(name = "Use Symbol Limit", default = True)
+    useSymbolLimit: BoolProperty(name = "Use Symbol Limit", default = True)
 
-    symbolLimit = IntProperty(name = "Symbol Limit", default = 100000,
+    symbolLimit: IntProperty(name = "Symbol Limit", default = 100000,
         description = "To prevent freezing Blender when trying to calculate too many generations.",
         min = 0)
 
-    preset = EnumProperty(name = "Preset", items = getPresetItems)
+    preset: EnumProperty(name = "Preset", items = getPresetItems)
 
     def create(self):
         self.newInput("Text", "Axiom", "axiom")

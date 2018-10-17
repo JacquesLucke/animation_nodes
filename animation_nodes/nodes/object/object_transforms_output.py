@@ -13,18 +13,18 @@ class ObjectTransformsOutputNode(bpy.types.Node, AnimationNode):
         self.updateSocketVisibility()
         executionCodeChanged()
 
-    useLocation = BoolVectorProperty(update = checkedPropertiesChanged)
-    useRotation = BoolVectorProperty(update = checkedPropertiesChanged)
-    useScale = BoolVectorProperty(update = checkedPropertiesChanged)
+    useLocation: BoolVectorProperty(update = checkedPropertiesChanged)
+    useRotation: BoolVectorProperty(update = checkedPropertiesChanged)
+    useScale: BoolVectorProperty(update = checkedPropertiesChanged)
 
-    deltaTransforms = BoolProperty(name = "Delta Transforms", default = False,
+    deltaTransforms: BoolProperty(name = "Delta Transforms", default = False,
         description = "Apply changes on delta transforms",
         update = executionCodeChanged)
 
-    useObjectList = VectorizedSocket.newProperty()
-    useLocationList = VectorizedSocket.newProperty()
-    useRotationList = VectorizedSocket.newProperty()
-    useScaleList = VectorizedSocket.newProperty()
+    useObjectList: VectorizedSocket.newProperty()
+    useLocationList: VectorizedSocket.newProperty()
+    useRotationList: VectorizedSocket.newProperty()
+    useScaleList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Object", "useObjectList",

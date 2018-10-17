@@ -7,11 +7,11 @@ class NodePopup(bpy.types.Operator):
     bl_idname = "an.node_popup"
     bl_label = "Node Popup"
 
-    nodeIdentifier = StringProperty(default = "")
+    nodeIdentifier: StringProperty(default = "")
 
-    width = IntProperty(default = 250)
-    drawFunctionName = StringProperty(default = "")
-    executeFunctionName = StringProperty(default = "")
+    width: IntProperty(default = 250)
+    drawFunctionName: StringProperty(default = "")
+    executeFunctionName: StringProperty(default = "")
 
     def invoke(self, context, event):
         return context.window_manager.invoke_props_dialog(self, width = self.width * getDpiFactor())

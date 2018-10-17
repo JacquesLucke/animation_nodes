@@ -7,10 +7,10 @@ class ConvertNode(bpy.types.Node, AnimationNode):
     bl_label = "Convert"
     bl_width = 100
 
-    dataType = DataTypeSelectorSocket.newProperty(default = "Generic")
-    lastCorrectionType = IntProperty()
+    dataType: DataTypeSelectorSocket.newProperty(default = "Generic")
+    lastCorrectionType: IntProperty()
 
-    fixedOutputDataType = BoolProperty(name = "Fixed Data Type", default = False,
+    fixedOutputDataType: BoolProperty(name = "Fixed Data Type", default = False,
         description = "When activated the output type does not automatically change",
         update = AnimationNode.refresh)
 

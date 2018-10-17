@@ -5,7 +5,7 @@ class InvertBooleanNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_InvertBooleanNode"
     bl_label = "Invert Boolean"
 
-    useList = VectorizedSocket.newProperty()
+    useList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Boolean", "useList",

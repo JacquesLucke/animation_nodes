@@ -7,9 +7,9 @@ from . data_structures import (Vector3DList, EdgeIndicesList, PolygonIndicesList
 def register():
     bpy.types.Context.getActiveAnimationNodeTree = getActiveAnimationNodeTree
     bpy.types.Operator.an_executeCallback = _executeCallback
-    bpy.types.Mesh.an = PointerProperty(type = MeshProperties)
-    bpy.types.Object.an = PointerProperty(type = ObjectProperties)
-    bpy.types.ID.an_data = PointerProperty(type = IDProperties)
+    bpy.types.Mesh.an: PointerProperty(type = MeshProperties)
+    bpy.types.Object.an: PointerProperty(type = ObjectProperties)
+    bpy.types.ID.an_data: PointerProperty(type = IDProperties)
 
 def unregister():
     del bpy.types.Context.getActiveAnimationNodeTree
@@ -108,5 +108,5 @@ class ObjectProperties(bpy.types.PropertyGroup):
 class IDProperties(bpy.types.PropertyGroup):
     bl_idname = "an_IDProperties"
 
-    removeOnZeroUsers = BoolProperty(default = False,
+    removeOnZeroUsers: BoolProperty(default = False,
         description = "Data block should be removed when it has no users")

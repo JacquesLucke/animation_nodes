@@ -7,7 +7,7 @@ class FindNearestSurfacePointNode(bpy.types.Node, AnimationNode):
     bl_width_default = 160
     codeEffects = [VectorizedSocket.CodeEffect]
 
-    useVectorList = VectorizedSocket.newProperty()
+    useVectorList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput("BVHTree", "BVHTree", "bvhTree")

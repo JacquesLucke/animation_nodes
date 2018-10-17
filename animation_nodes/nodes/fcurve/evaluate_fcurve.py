@@ -11,7 +11,7 @@ class EvaluateFCurveNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_EvaluateFCurveNode"
     bl_label = "Evaluate FCurve"
 
-    frameType = EnumProperty(
+    frameType: EnumProperty(
         name = "Frame Type", default = "OFFSET",
         items = frameTypeItems, update = executionCodeChanged)
 

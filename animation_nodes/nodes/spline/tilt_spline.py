@@ -9,8 +9,8 @@ class TiltSplineNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_TiltSplineNode"
     bl_label = "Tilt Spline"
 
-    useTiltList = VectorizedSocket.newProperty()
-    accumulateTilts = BoolProperty(name = "Accumulate Tilts", default = False,
+    useTiltList: VectorizedSocket.newProperty()
+    accumulateTilts: BoolProperty(name = "Accumulate Tilts", default = False,
         update = propertyChanged)
 
     def create(self):

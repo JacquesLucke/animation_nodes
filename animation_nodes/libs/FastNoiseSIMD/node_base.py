@@ -27,22 +27,22 @@ class Noise3DNodeBase:
     def noiseSettingChanged(self, context):
         self.refresh()
 
-    noiseType = EnumProperty(name = "Noise Type", default = "SIMPLEX",
+    noiseType: EnumProperty(name = "Noise Type", default = "SIMPLEX",
         items = noiseTypeItems, update = noiseSettingChanged)
 
-    perturbType = EnumProperty(name = "Perturb Type", default = "NONE",
+    perturbType: EnumProperty(name = "Perturb Type", default = "NONE",
         items = perturbTypeItems, update = noiseSettingChanged)
 
-    fractalType = EnumProperty(name = "Fractal Type", default = "FBM",
+    fractalType: EnumProperty(name = "Fractal Type", default = "FBM",
         items = fractalTypeItems, update = noiseSettingChanged)
 
-    cellularReturnType = EnumProperty(name = "Cellular Return Type", default = "CELL_VALUE",
+    cellularReturnType: EnumProperty(name = "Cellular Return Type", default = "CELL_VALUE",
         items = cellularReturnTypeItems, update = noiseSettingChanged)
 
-    cellularLookupType = EnumProperty(name = "Cellular Lookup Type", default = "SIMPLEX",
+    cellularLookupType: EnumProperty(name = "Cellular Lookup Type", default = "SIMPLEX",
         items = noiseTypeItems, update = noiseSettingChanged)
 
-    cellularDistanceFunction = EnumProperty(name = "Cellular Distance Function",
+    cellularDistanceFunction: EnumProperty(name = "Cellular Distance Function",
         default = "EUCLIDEAN", items = distanceFunctionItems,
         update = noiseSettingChanged)
 

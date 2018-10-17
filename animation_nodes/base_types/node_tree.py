@@ -14,10 +14,10 @@ from .. execution.units import getMainUnitsByNodeTree, setupExecutionUnits, fini
 class LastTreeExecutionInfo(bpy.types.PropertyGroup):
     bl_idname = "an_LastTreeExecutionInfo"
 
-    isDefault = BoolProperty(default = True)
-    executionTime = FloatProperty(name = "Execution Time")
-    blenderVersion = IntVectorProperty(name = "Blender Version", default = (2, 77, 0))
-    animationNodesVersion = IntVectorProperty(name = "Animation Nodes Version", default = (1, 0, 1))
+    isDefault: BoolProperty(default = True)
+    executionTime: FloatProperty(name = "Execution Time")
+    blenderVersion: IntVectorProperty(name = "Blender Version", default = (2, 77, 0))
+    animationNodesVersion: IntVectorProperty(name = "Animation Nodes Version", default = (1, 0, 1))
 
     def updateVersions(self):
         self.blenderVersion = getBlenderVersion()
@@ -41,13 +41,13 @@ class AnimationNodeTree(bpy.types.NodeTree):
     bl_label = "Animation"
     bl_icon = "ACTION"
 
-    autoExecution = PointerProperty(type = AutoExecutionProperties)
-    lastExecutionInfo = PointerProperty(type = LastTreeExecutionInfo)
+    autoExecution: PointerProperty(type = AutoExecutionProperties)
+    lastExecutionInfo: PointerProperty(type = LastTreeExecutionInfo)
 
-    sceneName = StringProperty(name = "Scene",
+    sceneName: StringProperty(name = "Scene",
         description = "The global scene used by this node tree (never none)")
 
-    editNodeLabels = BoolProperty(name = "Edit Node Labels", default = False)
+    editNodeLabels: BoolProperty(name = "Edit Node Labels", default = False)
 
     def update(self):
         treeChanged()

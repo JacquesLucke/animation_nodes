@@ -15,10 +15,10 @@ class EvaluateFalloffNode(bpy.types.Node, AnimationNode):
     bl_label = "Evaluate Falloff"
     errorHandlingType = "EXCEPTION"
 
-    falloffType = EnumProperty(name = "Falloff Type",
+    falloffType: EnumProperty(name = "Falloff Type",
         items = falloffTypeItems, update = AnimationNode.refresh)
 
-    useList = BoolProperty(name = "Use List", default = False,
+    useList: BoolProperty(name = "Use List", default = False,
         update = AnimationNode.refresh)
 
     def create(self):

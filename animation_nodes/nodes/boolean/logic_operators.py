@@ -17,7 +17,7 @@ class LogicOperatorsNode(bpy.types.Node, AnimationNode):
     bl_label = "Logic Operators"
     dynamicLabelType = "HIDDEN_ONLY"
 
-    operation = EnumProperty(name = "Operation", default = "AND",
+    operation: EnumProperty(name = "Operation", default = "AND",
         items = operationItems, update = executionCodeChanged)
 
     def create(self):

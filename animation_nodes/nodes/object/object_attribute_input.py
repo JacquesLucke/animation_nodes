@@ -10,7 +10,7 @@ class ObjectAttributeInputNode(bpy.types.Node, AnimationNode):
     bl_width_default = 160
     errorHandlingType = "MESSAGE"
 
-    attribute = StringProperty(name = "Attribute", default = "",
+    attribute: StringProperty(name = "Attribute", default = "",
         update = executionCodeChanged)
 
     def create(self):

@@ -15,12 +15,12 @@ class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
         self.refresh()
         subprogramInterfaceChanged()
 
-    outputName = StringProperty(name = "Generator Name", update = settingChanged)
-    loopInputIdentifier = StringProperty(update = settingChanged)
-    sortIndex = IntProperty(default = 0)
+    outputName: StringProperty(name = "Generator Name", update = settingChanged)
+    loopInputIdentifier: StringProperty(update = settingChanged)
+    sortIndex: IntProperty(default = 0)
 
-    listDataType = StringProperty(default = "Vector List", update = settingChanged)
-    useList = VectorizedSocket.newProperty()
+    listDataType: StringProperty(default = "Vector List", update = settingChanged)
+    useList: VectorizedSocket.newProperty()
 
     def setup(self):
         self.sortIndex = getRandomInt()

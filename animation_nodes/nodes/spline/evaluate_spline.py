@@ -8,11 +8,11 @@ class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
     bl_idname = "an_EvaluateSplineNode"
     bl_label = "Evaluate Spline"
 
-    evaluateRange = BoolProperty(name = "Evaluate Range", default = False,
+    evaluateRange: BoolProperty(name = "Evaluate Range", default = False,
         description = "Evaluate automatically distributed parameters on the spline",
         update = AnimationNode.refresh)
 
-    useParameterList = VectorizedSocket.newProperty()
+    useParameterList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput("Spline", "Spline", "spline", defaultDrawType = "PROPERTY_ONLY")

@@ -6,7 +6,7 @@ class SwitchNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SwitchNode"
     bl_label = "Switch"
 
-    assignedType = DataTypeSelectorSocket.newProperty(default = "Float")
+    assignedType: DataTypeSelectorSocket.newProperty(default = "Float")
 
     def create(self):
         self.newInput("an_BooleanSocket", "Condition", "condition")

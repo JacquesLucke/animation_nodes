@@ -7,8 +7,8 @@ class CreateEdgeIndicesNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CreateEdgeIndicesNode"
     bl_label = "Create Edge Indices"
 
-    useList1 = VectorizedSocket.newProperty()
-    useList2 = VectorizedSocket.newProperty()
+    useList1: VectorizedSocket.newProperty()
+    useList2: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Integer", "useList1",

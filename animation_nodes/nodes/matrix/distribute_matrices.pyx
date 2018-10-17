@@ -34,16 +34,16 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
     bl_label = "Distribute Matrices"
     bl_width_default = 160
 
-    mode = EnumProperty(name = "Mode", default = "GRID",
+    mode: EnumProperty(name = "Mode", default = "GRID",
         items = modeItems, update = AnimationNode.refresh)
 
-    distanceMode = EnumProperty(name = "Distance Mode", default = "SIZE",
+    distanceMode: EnumProperty(name = "Distance Mode", default = "SIZE",
         items = distanceModeItems, update = AnimationNode.refresh)
 
-    meshMode = EnumProperty(name = "Mesh Mode", default = "VERTICES",
+    meshMode: EnumProperty(name = "Mesh Mode", default = "VERTICES",
         items = meshModeItems, update = AnimationNode.refresh)
 
-    exactCircleSegment = BoolProperty(name = "Exact Circle Segment", default = False)
+    exactCircleSegment: BoolProperty(name = "Exact Circle Segment", default = False)
 
     def create(self):
         if self.mode == "LINEAR":

@@ -16,7 +16,7 @@ class IndexMaskFalloffNode(bpy.types.Node, AnimationNode):
     bl_label = "Index Mask Falloff"
     bl_width_default = 160
 
-    maskType = EnumProperty(name = "Mask Type",
+    maskType: EnumProperty(name = "Mask Type",
         items = maskTypeItems, update = AnimationNode.refresh)
 
     def create(self):

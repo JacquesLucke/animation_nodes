@@ -11,7 +11,7 @@ class SelectArea(bpy.types.Operator):
     bl_description = ""
     bl_options = {"REGISTER"}
 
-    callback = StringProperty(default = "")
+    callback: StringProperty(default = "")
 
     def invoke(self, context, event):
         self.registerDrawHandlers()

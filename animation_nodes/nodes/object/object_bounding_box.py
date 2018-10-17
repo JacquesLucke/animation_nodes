@@ -9,7 +9,7 @@ class ObjectBoundingBoxNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectBoundingBoxNode"
     bl_label = "Object Bounding Box"
 
-    useWorldSpace = BoolProperty(name = "Use World Space", default = True, update = propertyChanged)
+    useWorldSpace: BoolProperty(name = "Use World Space", default = True, update = propertyChanged)
 
     def create(self):
         self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")

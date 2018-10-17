@@ -10,9 +10,9 @@ class RandomEulerNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_RandomEulerNode"
     bl_label = "Random Euler"
 
-    nodeSeed = IntProperty(name = "Node Seed", update = propertyChanged, max = 1000, min = 0)
+    nodeSeed: IntProperty(name = "Node Seed", update = propertyChanged, max = 1000, min = 0)
 
-    createList = BoolProperty(name = "Create List", default = False,
+    createList: BoolProperty(name = "Create List", default = False,
         description = "Create a list of random eulers",
         update = AnimationNode.refresh)
 

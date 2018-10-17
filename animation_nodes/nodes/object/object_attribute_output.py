@@ -10,11 +10,11 @@ class ObjectAttributeOutputNode(bpy.types.Node, AnimationNode):
     bl_width_default = 180
     errorHandlingType = "MESSAGE"
 
-    attribute = StringProperty(name = "Attribute", default = "",
+    attribute: StringProperty(name = "Attribute", default = "",
         update = executionCodeChanged)
 
-    useObjectList = VectorizedSocket.newProperty()
-    useValueList = BoolProperty(update = AnimationNode.refresh)
+    useObjectList: VectorizedSocket.newProperty()
+    useValueList: BoolProperty(update = AnimationNode.refresh)
 
 
     def create(self):

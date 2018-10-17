@@ -13,7 +13,7 @@ class QuaternionSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = True
     comparable = False
 
-    value = FloatVectorProperty(default = [1, 0, 0, 0], size = 4, update = propertyChanged)
+    value: FloatVectorProperty(default = [1, 0, 0, 0], size = 4, update = propertyChanged)
 
     def drawProperty(self, layout, text, node):
         col = layout.column(align = True)

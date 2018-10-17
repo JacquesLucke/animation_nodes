@@ -11,7 +11,7 @@ class OffsetMatrixNode(bpy.types.Node, AnimationNode, MatrixTransformationBase):
     errorHandlingType = "EXCEPTION"
     searchTags = [("Offset Matrices", {"useMatrixList" : repr(True)})]
 
-    useMatrixList = BoolProperty(name = "Use Matrix List", default = False,
+    useMatrixList: BoolProperty(name = "Use Matrix List", default = False,
         update = AnimationNode.refresh)
 
     def create(self):

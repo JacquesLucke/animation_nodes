@@ -12,7 +12,7 @@ class ConvertAngleNode(bpy.types.Node, AnimationNode):
 
     searchTags = [(name, {"conversionType" : repr(type)}) for type, name, *_ in conversionTypeItems]
 
-    conversionType = EnumProperty(name = "Conversion Type", default = "DEGREE_TO_RADIAN",
+    conversionType: EnumProperty(name = "Conversion Type", default = "DEGREE_TO_RADIAN",
         items = conversionTypeItems, update = AnimationNode.refresh)
 
     def create(self):

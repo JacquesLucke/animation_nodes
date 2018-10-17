@@ -8,9 +8,9 @@ class ProfileAnimationNodes(bpy.types.Operator):
     bl_idname = "an.profile"
     bl_label = "Profile"
 
-    function = StringProperty()
-    output = StringProperty()
-    sort = StringProperty()
+    function: StringProperty()
+    output: StringProperty()
+    sort: StringProperty()
 
     def execute(self, context):
         result = self.getProfilingResult()

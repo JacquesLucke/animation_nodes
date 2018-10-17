@@ -9,11 +9,11 @@ class CombineEulerNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CombineEulerNode"
     bl_label = "Combine Euler"
 
-    useListX = VectorizedSocket.newProperty()
-    useListY = VectorizedSocket.newProperty()
-    useListZ = VectorizedSocket.newProperty()
+    useListX: VectorizedSocket.newProperty()
+    useListY: VectorizedSocket.newProperty()
+    useListZ: VectorizedSocket.newProperty()
 
-    useDegree = BoolProperty(name = "Use Degree", default = False,
+    useDegree: BoolProperty(name = "Use Degree", default = False,
         update = executionCodeChanged)
 
     def create(self):

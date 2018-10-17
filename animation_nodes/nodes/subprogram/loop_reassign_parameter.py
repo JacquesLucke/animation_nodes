@@ -15,9 +15,9 @@ class ReassignLoopParameterNode(bpy.types.Node, AnimationNode):
             self.parameterDataType = self.linkedParameterSocket.dataType
             self.generateSockets()
 
-    loopInputIdentifier = StringProperty(update = identifierChanged)
-    parameterIdentifier = StringProperty(update = identifierChanged)
-    parameterDataType = StringProperty()
+    loopInputIdentifier: StringProperty(update = identifierChanged)
+    parameterIdentifier: StringProperty(update = identifierChanged)
+    parameterDataType: StringProperty()
 
     def draw(self, layout):
         socket = self.linkedParameterSocket

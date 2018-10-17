@@ -12,7 +12,7 @@ class FontSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = False
     comparable = True
 
-    fontName = StringProperty(update = propertyChanged)
+    fontName: StringProperty(update = propertyChanged)
 
     def drawProperty(self, layout, text, node):
         row = layout.row(align = True)

@@ -9,8 +9,8 @@ class InsertLoopForIterator(bpy.types.Operator, NodeCreator):
     bl_idname = "an.insert_loop_for_iterator"
     bl_label = "Insert Loop for Iterator"
 
-    nodeIdentifier = StringProperty()
-    socketIndex = IntProperty()
+    nodeIdentifier: StringProperty()
+    socketIndex: IntProperty()
 
     def insert(self):
         try:
