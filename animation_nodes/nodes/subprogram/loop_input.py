@@ -29,7 +29,7 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         layout.separator()
         left, right = splitAlignment(layout)
         self.invokeSelector(left, "DATA_TYPE", "createGeneratorOutputNode",
-            dataTypes = "LIST", text = "", icon = "ZOOMIN", emboss = False)
+            dataTypes = "LIST", text = "", icon = "ADD", emboss = False)
         right.label(text = "New Generator Output")
         layout.prop(self, "subprogramName", text = "", icon = "GROUP_VERTEX")
 
@@ -106,7 +106,7 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
 
         left, right = splitAlignment(layout)
         self.invokeSelector(left, "DATA_TYPE", function,
-            dataTypes = dataTypes, icon = "ZOOMIN", emboss = False)
+            dataTypes = dataTypes, icon = "ADD", emboss = False)
         right.label(text = socket.name)
 
 

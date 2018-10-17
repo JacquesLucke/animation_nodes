@@ -16,7 +16,7 @@ class SetStructElementsNode(bpy.types.Node, AnimationNode):
         left, right = splitAlignment(layout)
         left.label(text = socket.name)
         self.invokeSelector(right, "DATA_TYPE", "newInputSocket",
-            icon = "ZOOMIN", emboss = False)
+            icon = "ADD", emboss = False)
 
     def edit(self):
         newInputSocket = self.inputs["New Input"]

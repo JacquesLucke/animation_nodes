@@ -99,7 +99,7 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
         left, right = splitAlignment(layout)
         left.label(text = socket.name)
         self.invokeSelector(right, "DATA_TYPE", "newInputSocket",
-            icon = "ZOOMIN", emboss = False)
+            icon = "ADD", emboss = False)
 
     def getInputSocketVariables(self):
         return {socket.identifier : socket.text for socket in self.inputs}

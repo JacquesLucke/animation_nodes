@@ -37,7 +37,7 @@ class LoopViewerNode(bpy.types.Node, AnimationNode):
             row = layout.row(align = True)
             row.prop_search(self, "textBlockName", bpy.data, "texts", text = "")
             if self.textBlock is None:
-                self.invokeFunction(row, "createNewTextBlock", icon = "ZOOMIN")
+                self.invokeFunction(row, "createNewTextBlock", icon = "ADD")
             else:
                 self.invokeSelector(row, "AREA", "viewTextBlockInArea",
                     icon = "ZOOM_SELECTED")

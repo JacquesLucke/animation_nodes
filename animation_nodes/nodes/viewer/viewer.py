@@ -38,7 +38,7 @@ class ViewerNode(bpy.types.Node, AnimationNode):
                 self.invokeSelector(row, "AREA", "viewTextBlockInArea",
                     icon = "ZOOM_SELECTED")
             else:
-                self.invokeFunction(row, "createNewTextBlock", icon = "ZOOMIN")
+                self.invokeFunction(row, "createNewTextBlock", icon = "ADD")
 
     def drawAdvanced(self, layout):
         col = layout.column(align = True)

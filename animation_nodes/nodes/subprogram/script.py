@@ -50,7 +50,7 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         col = layout.column(align = True)
         row = col.row(align = True)
         if self.textBlock is None:
-            self.invokeFunction(row, "createNewTextBlock", icon = "ZOOMIN")
+            self.invokeFunction(row, "createNewTextBlock", icon = "ADD")
         else:
             self.invokeSelector(row, "AREA", "viewTextBlockInArea",
                 icon = "ZOOM_SELECTED")
@@ -110,10 +110,10 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     def drawControlSocket(self, layout, socket):
         if socket in list(self.inputs):
             self.invokeSelector(layout, "DATA_TYPE", "newInputSocket",
-                text = "New Input", icon = "ZOOMIN")
+                text = "New Input", icon = "ADD")
         else:
             self.invokeSelector(layout, "DATA_TYPE", "newOutputSocket",
-                text = "New Output", icon = "ZOOMIN")
+                text = "New Output", icon = "ADD")
 
     def edit(self):
         removedLink = self.removeLinks()

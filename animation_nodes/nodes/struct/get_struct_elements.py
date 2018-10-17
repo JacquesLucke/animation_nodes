@@ -24,7 +24,7 @@ class GetStructElementsNode(bpy.types.Node, AnimationNode):
         left, right = splitAlignment(layout)
         left.label(text = socket.name)
         self.invokeSelector(right, "DATA_TYPE", "newOutputSocket",
-            icon = "ZOOMIN", emboss = False)
+            icon = "ADD", emboss = False)
 
     def edit(self):
         for target in self.outputs["New Output"].dataTargets:
