@@ -25,7 +25,7 @@ class IntegerDataType(SingleIDKeyDataType):
 
     @classmethod
     def drawCopyMenu(cls, layout, object, name):
-        props = layout.operator("an.copy_id_key_to_attribute", "to Pass Index")
+        props = layout.operator("an.copy_id_key_to_attribute", text = "to Pass Index")
         props.dataType = "Integer"
         props.propertyName = name
         props.attribute = "pass_index"
