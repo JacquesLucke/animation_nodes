@@ -17,7 +17,7 @@ cdef uint32_t murmur3_32(char* key, uint32_t len, uint32_t seed):
         uint32_t n = 0xe6546b64
 
         uint32_t hash = seed
-        int nBlocks = len / 4
+        int nBlocks = len // 4
         uint32_t* blocks = <uint32_t*>key
         int i
         uint32_t k

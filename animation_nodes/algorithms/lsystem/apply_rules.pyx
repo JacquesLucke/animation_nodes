@@ -100,7 +100,7 @@ cdef applyGrammarRules_PartialGeneration(SymbolString source, RuleSet ruleSet, S
         if ruleResult in (RuleResultType.CanChange, RuleResultType.WillNotChange):
             appendSingleSymbol(target, c, command, commandLengths[c])
         else:
-            if c in ("F", "f"):
+            if c in (b"F", b"f"):
                 appendUnknownPartialSymbol(target, c, command, 1 - part, onlyPartialMoves)
             appendPartialSymbolString(target, replacement, part, onlyPartialMoves)
 
@@ -178,7 +178,7 @@ cdef SymbolString applyGrammarRules_Recursive(
                 if ruleResult in (RuleResultType.WillNotChange, RuleResultType.CanChange):
                     appendSingleSymbol(&target, c, command, commandLengths[c])
                 else:
-                    if c in ("F", "f"):
+                    if c in (b"F", b"f"):
                         appendUnknownPartialSymbol(&target, c, command, 1 - partialGeneration, onlyPartialMoves)
                     appendPartialSymbolString(&target, replacement, partialGeneration, onlyPartialMoves)
             else: # complete last generation
@@ -219,17 +219,17 @@ cdef inline void appendPartialSymbolString(SymbolString *target, SymbolString *s
 
 cdef inline void appendUnknownPartialSymbol(SymbolString *symbols, unsigned char opcode,
         void *command, float part, bint onlyPartialMoves):
-    if opcode == "F":
+    if opcode == b"F":
         appendPartialSymbol(symbols, opcode, (<MoveForwardGeoCommand*>command)[0], part, onlyPartialMoves)
-    elif opcode == "f":
+    elif opcode == b"f":
         appendPartialSymbol(symbols, opcode, (<MoveForwardNoGeoCommand*>command)[0], part, onlyPartialMoves)
-    elif opcode in ("[", "]"):
+    elif opcode in (b"[", b"]"):
         appendPartialSymbol(symbols, opcode, (<NoArgCommand*>command)[0], part, onlyPartialMoves)
-    elif opcode in ("+", "-", "&", "^", "\\", "/", "~"):
+    elif opcode in (b"+", b"-", b"&", b"^", b"\\", b"/", b"~"):
         appendPartialSymbol(symbols, opcode, (<RotateCommand*>command)[0], part, onlyPartialMoves)
-    elif opcode in ('"', "!"):
+    elif opcode in (b'"', b"!"):
         appendPartialSymbol(symbols, opcode, (<ScaleCommand*>command)[0], part, onlyPartialMoves)
-    elif opcode == "T":
+    elif opcode == b"T":
         appendPartialSymbol(symbols, opcode, (<TropismCommand*>command)[0], part, onlyPartialMoves)
-    elif opcode in ("A", "B", "X", "Y", "Z", "J", "K", "M"):
+    elif opcode in (b"A", b"B", b"X", b"Y", b"Z", b"J", b"K", b"M"):
         appendPartialSymbol(symbols, opcode, (<NoArgCommand*>command)[0], part, onlyPartialMoves)

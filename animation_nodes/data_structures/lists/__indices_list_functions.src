@@ -4,7 +4,7 @@ def getMinIndex(self):
 
     cdef MEMVIEW* data = <MEMVIEW*>self.data
     cdef MEMVIEW minValue = data[0]
-    for i in range(self.length * sizeof(TYPE) / sizeof(MEMVIEW)):
+    for i in range(self.length * sizeof(TYPE) // sizeof(MEMVIEW)):
         if data[i] < minValue:
             minValue = data[i]
     return minValue
@@ -15,7 +15,7 @@ def getMaxIndex(self):
 
     cdef MEMVIEW* data = <MEMVIEW*>self.data
     cdef MEMVIEW maxValue = data[0]
-    for i in range(self.length * sizeof(TYPE) / sizeof(MEMVIEW)):
+    for i in range(self.length * sizeof(TYPE) // sizeof(MEMVIEW)):
         if data[i] > maxValue:
             maxValue = data[i]
     return maxValue

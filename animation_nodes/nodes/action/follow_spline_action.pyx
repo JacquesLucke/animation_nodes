@@ -54,7 +54,7 @@ cdef class FollowSplineAction(SimpleBoundedAction):
         self.spline.evaluateTangent_LowLevel(t, &tangent)
         cdef Matrix4 matrix
         cdef Vector3 guide = Vector3(0, 0, 1)
-        directionToMatrix_LowLevel(&matrix, &tangent, &guide, "Z", "X")
+        directionToMatrix_LowLevel(&matrix, &tangent, &guide, b"Z", b"X")
         cdef Euler3 rotation
         matrixToEuler(&rotation, &matrix)
         target[0] = rotation.x

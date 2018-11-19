@@ -27,17 +27,17 @@ cdef symbolsToPyString(SymbolString symbols):
         chars.append_LowLevel(c)
 
         i += 1
-        if c == "F":
+        if c == b"F":
             i += sizeof(MoveForwardGeoCommand)
-        elif c == "f":
+        elif c == b"f":
             i += sizeof(MoveForwardNoGeoCommand)
-        elif c in ('"', "!"):
+        elif c in (b'"', b"!"):
             i += sizeof(ScaleCommand)
-        elif c in ("+", "-", "&", "^", "\\", "/", "~"):
+        elif c in (b"+", b"-", b"&", b"^", b"\\", b"/", b"~"):
             i += sizeof(RotateCommand)
-        elif c == "T":
+        elif c == b"T":
             i += sizeof(TropismCommand)
-        elif c in ("[", "]", "J", "K", "M", "A", "B", "X", "Y", "Z"):
+        elif c in (b"[", b"]", b"J", b"K", b"M", b"A", b"B", b"X", b"Y", b"Z"):
             pass
         else:
             raise Exception("unknown opcode")
@@ -48,11 +48,11 @@ cdef symbolsToPyString(SymbolString symbols):
 cdef char commandLengths[256]
 memset(commandLengths, 0, 256)
 for symbols, size in {
-        ("+", "-", "&", "^", "\\", "/", "~") : sizeof(RotateCommand),
-        ('"', "!") : sizeof(ScaleCommand),
-        ("F", ) : sizeof(MoveForwardGeoCommand),
-        ("f", ) : sizeof(MoveForwardNoGeoCommand),
-        ("T", ) : sizeof(TropismCommand)}.items():
+        (b"+", b"-", b"&", b"^", b"\\", b"/", b"~") : sizeof(RotateCommand),
+        (b'"', b"!") : sizeof(ScaleCommand),
+        (b"F", ) : sizeof(MoveForwardGeoCommand),
+        (b"f", ) : sizeof(MoveForwardNoGeoCommand),
+        (b"T", ) : sizeof(TropismCommand)}.items():
     for symbol in symbols:
         commandLengths[ord(symbol)] = size
 

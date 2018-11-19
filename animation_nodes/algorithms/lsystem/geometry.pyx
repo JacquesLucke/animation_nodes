@@ -69,53 +69,53 @@ cdef geometryFromSymbolString(SymbolString symbols, Py_ssize_t seed = 0, dict de
         i += 1
         command = symbols.data + i
 
-        if c == "F":
+        if c == b"F":
             moveForward_Geo(turtle, <MoveForwardGeoCommand*>command, vertices, edges, widths)
             i += sizeof(MoveForwardGeoCommand)
-        elif c == "f":
+        elif c == b"f":
             moveForward_NoGeo(turtle, <MoveForwardNoGeoCommand*>command)
             i += sizeof(MoveForwardNoGeoCommand)
-        elif c == "[":
+        elif c == b"[":
             branchStart(&stack, turtle, &availableStack)
-        elif c == "]":
+        elif c == b"]":
             branchEnd(&stack, &availableStack)
-        elif c == '"':
+        elif c == b'"':
             scaleStepSize(turtle, <ScaleCommand*>command)
             i += sizeof(ScaleCommand)
-        elif c == "!":
+        elif c == b"!":
             scaleWidth(turtle, <ScaleCommand*>command)
             i += sizeof(ScaleCommand)
-        elif c == "+":
+        elif c == b"+":
             rotateRight(turtle, <RotateCommand*>command, defaultAngle, &defaultYRotation)
             i += sizeof(RotateCommand)
-        elif c == "-":
+        elif c == b"-":
             rotateLeft(turtle, <RotateCommand*>command, defaultAngle, &defaultYRotationNeg)
             i += sizeof(RotateCommand)
-        elif c == "&":
+        elif c == b"&":
             pitchUp(turtle, <RotateCommand*>command, defaultAngle, &defaultXRotation)
             i += sizeof(RotateCommand)
-        elif c == "^":
+        elif c == b"^":
             pitchDown(turtle, <RotateCommand*>command, defaultAngle, &defaultXRotationNeg)
             i += sizeof(RotateCommand)
-        elif c == "\\":
+        elif c == b"\\":
             rollClockwise(turtle, <RotateCommand*>command, defaultAngle, &defaultZRotationNeg)
             i += sizeof(RotateCommand)
-        elif c == "/":
+        elif c == b"/":
             rollCounterClockwise(turtle, <RotateCommand*>command, defaultAngle, &defaultZRotation)
             i += sizeof(RotateCommand)
-        elif c == "~":
+        elif c == b"~":
             rotateRandom(turtle, <RotateCommand*>command, seed)
             i += sizeof(RotateCommand)
-        elif c == "T":
+        elif c == b"T":
             applyTropism(turtle, <TropismCommand*>command)
             i += sizeof(TropismCommand)
-        elif c == "J":
+        elif c == b"J":
             storeTurtleState(turtle, statesJ)
-        elif c == "K":
+        elif c == b"K":
             storeTurtleState(turtle, statesK)
-        elif c == "M":
+        elif c == b"M":
             storeTurtleState(turtle, statesM)
-        elif c in ("A", "B", "X", "Y", "Z"):
+        elif c in (b"A", b"B", b"X", b"Y", b"Z"):
             pass
         else:
             raise Exception("unknown opcode")
