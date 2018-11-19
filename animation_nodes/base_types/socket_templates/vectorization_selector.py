@@ -53,11 +53,11 @@ class VectorizedSocket(SocketTemplate):
     def createSocket(self, node, sockets, shouldBeList):
         if shouldBeList:
             socketIdName = toSocketIdName(self.listDataType)
-            socket = sockets.new(socketIdName, self.listName, self.listIdentifier)
+            socket = sockets.new(socketIdName, self.listName, identifier = self.listIdentifier)
             socket.setAttributes(self.listSettings)
         else:
             socketIdName = toSocketIdName(self.baseDataType)
-            socket = sockets.new(socketIdName, self.baseName, self.baseIdentifier)
+            socket = sockets.new(socketIdName, self.baseName, identifier = self.baseIdentifier)
             socket.setAttributes(self.baseSettings)
             socket.setTemporarySocketTransparency(0.80)
         return socket

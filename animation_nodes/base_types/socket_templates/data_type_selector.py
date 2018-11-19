@@ -18,7 +18,7 @@ class DataTypeSelectorSocket(SocketTemplate):
     def create(self, node, sockets):
         dataType = getattrRecursive(node, self.propertyName)
         socketIdName = toSocketIdName(dataType)
-        return sockets.new(socketIdName, self.name, self.identifier)
+        return sockets.new(socketIdName, self.name, identifier = self.identifier)
 
     def getSocketIdentifiers(self):
         return {self.identifier}

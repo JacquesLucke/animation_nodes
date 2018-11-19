@@ -38,7 +38,7 @@ class ListTypeSelectorSocket(SocketTemplate):
     def create(self, node, sockets):
         dataType = self.toType(getattrRecursive(node, self.propertyName))
         socketIdName = toSocketIdName(dataType)
-        socket = sockets.new(socketIdName, self.name, self.identifier)
+        socket = sockets.new(socketIdName, self.name, identifier = self.identifier)
         socket.setAttributes(self.socketSettings)
         return socket
 
