@@ -17,7 +17,7 @@ class CopyIDKeyMenuOpener(bpy.types.Operator):
         return context.active_object is not None
 
     def invoke(self, context, event):
-        context.window_manager.popup_menu(self.drawMenu, title = "Copy ID Key", icon = "GHOST")
+        context.window_manager.popup_menu(self.drawMenu, title = "Copy ID Key", icon = "COPYDOWN")
         return {"FINISHED"}
 
     def drawMenu(self, menu, context):

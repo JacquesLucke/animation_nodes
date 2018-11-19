@@ -72,9 +72,9 @@ class ComposeMatrixNode(bpy.types.Node, AnimationNode):
 
     def draw(self, layout):
         row = layout.row(align = True)
-        row.prop(self, "useTranslation", text = "Loc", icon = "MAN_TRANS")
-        row.prop(self, "useRotation", text = "Rot", icon = "MAN_ROT")
-        row.prop(self, "useScale", text = "Scale", icon = "MAN_SCALE")
+        row.prop(self, "useTranslation", text = "Loc", icon = "EXPORT")
+        row.prop(self, "useRotation", text = "Rot", icon = "FILE_REFRESH")
+        row.prop(self, "useScale", text = "Scale", icon = "FULLSCREEN_ENTER")
 
     def updateSocketVisibility(self):
         self.inputs[0].hide = not self.useTranslation

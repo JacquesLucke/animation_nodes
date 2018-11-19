@@ -39,7 +39,7 @@ class LastTreeExecutionInfo(bpy.types.PropertyGroup):
 class AnimationNodeTree(bpy.types.NodeTree):
     bl_idname = "an_AnimationNodeTree"
     bl_label = "Animation Nodes"
-    bl_icon = "ACTION"
+    bl_icon = "ONIONSKIN_ON"
 
     autoExecution: PointerProperty(type = AutoExecutionProperties)
     lastExecutionInfo: PointerProperty(type = LastTreeExecutionInfo)

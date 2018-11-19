@@ -60,7 +60,7 @@ class IDKeyPanel(bpy.types.Panel):
 
         if exists:
             props = right.operator("an.open_copy_id_key_menu",
-                                   text = "", icon = "GHOST", emboss = False)
+                                   text = "", icon = "COPYDOWN", emboss = False)
             props.keyDataType = idKey.type
             props.keyName = idKey.name
 

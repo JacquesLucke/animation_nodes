@@ -49,7 +49,7 @@ class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
     def draw(self, layout):
         row = layout.row(align = True)
         row.prop(self, "parameterType", text = "")
-        row.prop(self, "evaluateRange", text = "", icon = "ALIGN")
+        row.prop(self, "evaluateRange", text = "", icon = "CENTER_ONLY")
 
     def drawAdvanced(self, layout):
         col = layout.column()

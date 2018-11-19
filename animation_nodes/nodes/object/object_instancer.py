@@ -18,7 +18,7 @@ objectTypeItems = [
     ("Mesh", "Mesh", "", "MESH_DATA", 0),
     ("Text", "Text", "", "FONT_DATA", 1),
     ("Camera", "Camera", "", "CAMERA_DATA", 2),
-    ("Point Lamp", "Point Lamp", "", "LAMP_POINT", 3),
+    ("Point Lamp", "Point Lamp", "", "LIGHT_POINT", 3),
     ("Curve 2D", "Curve 2D", "", "FORCE_CURVE", 4),
     ("Curve 3D", "Curve 3D", "", "CURVE_DATA", 5),
     ("Empty", "Empty", "", "EMPTY_DATA", 6) ]

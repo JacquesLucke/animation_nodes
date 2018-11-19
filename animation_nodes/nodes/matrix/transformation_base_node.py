@@ -118,9 +118,9 @@ class MatrixTransformationBase:
 
         if self.transformationSource == "LOC_ROT_SCALE":
             row = col.row(align = True)
-            row.prop(self, "useTranslation", text = "Loc", icon = "MAN_TRANS")
-            row.prop(self, "useRotation", text = "Rot", icon = "MAN_ROT")
-            row.prop(self, "useScale", text = "Scale", icon = "MAN_SCALE")
+            row.prop(self, "useTranslation", text = "Loc", icon = "EXPORT")
+            row.prop(self, "useRotation", text = "Rot", icon = "FILE_REFRESH")
+            row.prop(self, "useScale", text = "Scale", icon = "FULLSCREEN_ENTER")
         elif self.transformationSource == "ACTION":
             col.prop(self, "evaluationTimeMode", text = "")
 

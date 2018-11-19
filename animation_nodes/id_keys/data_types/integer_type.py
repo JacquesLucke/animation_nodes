@@ -36,11 +36,11 @@ class IntegerDataType(SingleIDKeyDataType):
 ###########################################
 
 sortModeItems = [
-    ("SELECTION_ORDER", "Selection Order", "", "BORDER_RECT", 0),
+    ("SELECTION_ORDER", "Selection Order", "", "BORDERMOVE", 0),
     ("NAME", "Object Name", "Sort objects alphanumerically", "SORTALPHA", 1),
     ("DISTANCE", "Distance", "Sort by distance to active object", "FULLSCREEN_ENTER", 2),
     ("RANDOM", "Random", "", "MOD_PARTICLES", 3),
-    ("AXIS", "Axis", "", "MANIPUL", 4)
+    ("AXIS", "Axis", "", "ORIENTATION_GLOBAL", 4)
 ]
 
 axisItems = [(axis, axis, "") for axis in ("X", "Y", "Z")]

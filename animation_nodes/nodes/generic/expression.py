@@ -64,7 +64,7 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         row = layout.row(align = True)
         row.prop(self, "expression", text = "")
-        self.invokeSelector(row, "DATA_TYPE", "changeOutputTypeManually", icon = "SCRIPTWIN")
+        self.invokeSelector(row, "DATA_TYPE", "changeOutputTypeManually", icon = "PREFERENCES")
 
         col = layout.column(align = True)
         if self.containsSyntaxError:

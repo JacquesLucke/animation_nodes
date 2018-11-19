@@ -97,7 +97,7 @@ class ExtractPolygonTransformsNode(bpy.types.Node, AnimationNode):
             subcol.prop(self, "edgeSelectionType", text = "")
             if self.edgeSelectionType == "DIRECTION":
                 row = subcol.row(align = True)
-                row.prop(self, "negateDirection", text = "", icon = "ZOOMOUT")
+                row.prop(self, "negateDirection", text = "", icon = "REMOVE")
                 row.prop(self, "directionType", text = "")
             elif self.edgeSelectionType == "DISTANCE":
                 subcol.prop(self, "distanceType", text = "")
