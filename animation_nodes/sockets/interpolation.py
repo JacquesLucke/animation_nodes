@@ -39,7 +39,7 @@ class InterpolationSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         row.prop(self, "category", text = "")
         if self.category != "LINEAR":
             if not (self.easeIn or self.easeOut):
-                row.label(text = icon = "ERROR", text = "")
+                row.label(icon = "ERROR", text = "")
             row.prop(self, "easeIn", text = "", icon = "IPO_EASE_IN")
             row.prop(self, "easeOut", text = "", icon = "IPO_EASE_OUT")
 

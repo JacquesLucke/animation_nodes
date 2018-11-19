@@ -6,7 +6,7 @@ class DataInputPanel(bpy.types.Panel):
     bl_idname = "an_data_input_panel"
     bl_label = "Data Input"
     bl_space_type = "VIEW_3D"
-    bl_region_type = "TOOLS"
+    bl_region_type = "UI"
     bl_category = "AN"
 
     def draw(self, context):
