@@ -13,7 +13,7 @@ cdef class SpectrumSound(Sound):
         self.samples = samples
         self.samplesPerFrame = samplesPerFrame
         self.startFrame = startFrame
-        self.endFrame = startFrame + len(samples) / samplesPerFrame - 1
+        self.endFrame = startFrame + len(samples) // samplesPerFrame - 1
         self.zeroList = FloatList.fromValues([0]) * self.samplesPerFrame
 
     @classmethod
