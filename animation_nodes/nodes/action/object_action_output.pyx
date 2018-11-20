@@ -24,11 +24,11 @@ class ObjectActionOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectActionOutputNode"
     bl_label = "Object Action Output"
 
-    mode: EnumProperty(name = "Mode", default = "GENERIC",
+    __annotations__ = {}
+    __annotations__["mode"] = EnumProperty(name = "Mode", default = "GENERIC",
         items = modeItems, update = AnimationNode.refresh)
-
-    useObjectList: VectorizedSocket.newProperty()
-    useMatrixList: VectorizedSocket.newProperty()
+    __annotations__["useObjectList"] = VectorizedSocket.newProperty()
+    __annotations__["useMatrixList"] = VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Object", "useObjectList",

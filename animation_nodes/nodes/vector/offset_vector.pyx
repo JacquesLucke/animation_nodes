@@ -19,15 +19,17 @@ class OffsetVectorNode(bpy.types.Node, AnimationNode):
     errorHandlingType = "EXCEPTION"
     searchTags = [("Offset Vectors", {"useVectorList" : repr(True)})]
 
-    useVectorList: BoolProperty(name = "Use Vector List", default = False,
-        update = AnimationNode.refresh)
-    useOffsetList: VectorizedSocket.newProperty()
+    __annotations__ = {}
 
-    specifiedState: EnumProperty(name = "Specified State", default = "START",
+    __annotations__["useVectorList"] = BoolProperty(name = "Use Vector List", default = False,
+        update = AnimationNode.refresh)
+    __annotations__["useOffsetList"] = VectorizedSocket.newProperty()
+
+    __annotations__["specifiedState"] = EnumProperty(name = "Specified State", default = "START",
         description = "Specify wether the given vector(s) are the start or end state",
         items = specifiedStateItems, update = propertyChanged)
 
-    clampFalloff: BoolProperty(name = "Clamp Falloff", default = False)
+    __annotations__["clampFalloff"] = BoolProperty(name = "Clamp Falloff", default = False)
 
     def create(self):
         if self.useVectorList:

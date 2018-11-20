@@ -7,7 +7,8 @@ class DelayActionNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_DelayActionNode"
     bl_label = "Delay Action"
 
-    relative: BoolProperty(name = "Relative", default = True)
+    __annotations__ = {}
+    __annotations__["relative"] = BoolProperty(name = "Relative", default = True)
 
     def create(self):
         self.newInput("Action", "Action", "inAction")

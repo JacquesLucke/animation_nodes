@@ -133,14 +133,16 @@ class VectorMathNode(bpy.types.Node, AnimationNode):
     dynamicLabelType = "HIDDEN_ONLY"
     searchTags = [(name, {"operation" : repr(op)}) for name, op in searchItems.items()]
 
-    operation: EnumProperty(name = "Operation", default = "Add",
+    __annotations__ = {}
+
+    __annotations__["operation"] = EnumProperty(name = "Operation", default = "Add",
         items = operationItems, update = AnimationNode.refresh)
 
-    useListA: VectorizedSocket.newProperty()
-    useListB: VectorizedSocket.newProperty()
-    useListLength: VectorizedSocket.newProperty()
-    useListFactor: VectorizedSocket.newProperty()
-    useListStep: VectorizedSocket.newProperty()
+    __annotations__["useListA"] = VectorizedSocket.newProperty()
+    __annotations__["useListB"] = VectorizedSocket.newProperty()
+    __annotations__["useListLength"] = VectorizedSocket.newProperty()
+    __annotations__["useListFactor"] = VectorizedSocket.newProperty()
+    __annotations__["useListStep"] = VectorizedSocket.newProperty()
 
     def create(self):
         usedProperties = []

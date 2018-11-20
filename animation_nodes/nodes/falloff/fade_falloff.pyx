@@ -16,7 +16,8 @@ class FadeFalloffNode(bpy.types.Node, AnimationNode):
     bl_label = "Fade Falloff"
     bl_width_default = 160
 
-    mode: EnumProperty(name = "Mode", default = "START_AMOUNT",
+    __annotations__ = {}
+    __annotations__["mode"] = EnumProperty(name = "Mode", default = "START_AMOUNT",
         items = modeItems, update = AnimationNode.refresh)
 
     def create(self):

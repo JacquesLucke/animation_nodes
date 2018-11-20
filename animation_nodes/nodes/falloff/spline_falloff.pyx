@@ -19,13 +19,15 @@ class SplineFalloffNode(bpy.types.Node, AnimationNode):
     bl_label = "Spline Falloff"
     bl_width_default = 160
 
-    resolution: IntProperty(name = "Resolution", default = 5, min = 2,
+    __annotations__ = {}
+
+    __annotations__["resolution"] = IntProperty(name = "Resolution", default = 5, min = 2,
         description = "Poly spline segments per bezier spline segments")
 
-    mixListType: EnumProperty(name = "Mix List Type", default = "MAX",
+    __annotations__["mixListType"] = EnumProperty(name = "Mix List Type", default = "MAX",
         items = mixListTypeItems, update = propertyChanged)
 
-    useSplineList: VectorizedSocket.newProperty()
+    __annotations__["useSplineList"] = VectorizedSocket.newProperty()
 
     def create(self):
         socketProps = dict(defaultDrawType = "PROPERTY_ONLY", dataIsModified = True)

@@ -10,8 +10,9 @@ class DirectionalFalloffNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_DirectionalFalloffNode"
     bl_label = "Directional Falloff"
 
-    falloffLeft: BoolProperty(name = "Falloff Left", default = False)
-    falloffRight: BoolProperty(name = "Falloff Right", default = True)
+    __annotations__ = {}
+    __annotations__["falloffLeft"] = BoolProperty(name = "Falloff Left", default = False)
+    __annotations__["falloffRight"] = BoolProperty(name = "Falloff Right", default = True)
 
     def create(self):
         self.newInput("Vector", "Position", "position")

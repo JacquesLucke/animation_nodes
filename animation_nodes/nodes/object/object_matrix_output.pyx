@@ -16,11 +16,13 @@ class ObjectMatrixOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectMatrixOutputNode"
     bl_label = "Object Matrix Output"
 
-    outputType: EnumProperty(name = "Type", default = "WORLD",
+    __annotations__ = {}
+
+    __annotations__["outputType"] = EnumProperty(name = "Type", default = "WORLD",
         items = outputItems, update = executionCodeChanged)
 
-    useObjectList: VectorizedSocket.newProperty()
-    useMatrixList: VectorizedSocket.newProperty()
+    __annotations__["useObjectList"] = VectorizedSocket.newProperty()
+    __annotations__["useMatrixList"] = VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Object", "useObjectList",
