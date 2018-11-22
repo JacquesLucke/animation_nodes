@@ -10,15 +10,18 @@ def getMatricesVBOandIBO(Matrix4x4List matrices, float scale):
     for i in range(length):
         x, y, z = matrices.data[i].a14, matrices.data[i].a24, matrices.data[i].a34
         vectors.data[i * 4] = Vector3(x, y, z)
-        vectors.data[i * 4 + 1] = Vector3(matrices.data[i].a11 * scale + x,
-                                          matrices.data[i].a21 * scale + y,
-                                          matrices.data[i].a31 * scale + z)
-        vectors.data[i * 4 + 2] = Vector3(matrices.data[i].a12 * scale + x,
-                                          matrices.data[i].a22 * scale + y,
-                                          matrices.data[i].a32 * scale + z)
-        vectors.data[i * 4 + 3] = Vector3(matrices.data[i].a13 * scale + x,
-                                          matrices.data[i].a23 * scale + y,
-                                          matrices.data[i].a33 * scale + z)
+        vectors.data[i * 4 + 1] = Vector3(
+            x + matrices.data[i].a11 * scale,
+            y + matrices.data[i].a21 * scale,
+            z + matrices.data[i].a31 * scale)
+        vectors.data[i * 4 + 2] = Vector3(
+            x + matrices.data[i].a12 * scale,
+            y + matrices.data[i].a22 * scale,
+            z + matrices.data[i].a32 * scale)
+        vectors.data[i * 4 + 3] = Vector3(
+            x + matrices.data[i].a13 * scale,
+            y + matrices.data[i].a23 * scale,
+            z + matrices.data[i].a33 * scale)
         indices.data[i * 6] = i * 4
         indices.data[i * 6 + 1] = i * 4 + 1
         indices.data[i * 6 + 2] = i * 4

@@ -88,26 +88,23 @@ class Viewer3DNode(bpy.types.Node, AnimationNode):
         shader.bind()
         shader.uniform_float("color", (*self.drawColor, 1))
 
-        glEnable(GL_PROGRAM_POINT_SIZE)
         glPointSize(self.width)
         batch.draw(shader)
-        glDisable(GL_PROGRAM_POINT_SIZE)
 
     def drawMatrices(self, matrices):
         shader = matricesShader
         vbo, ibo = getMatricesVBOandIBO(matrices, self.matrixScale)
-        batch = batch_for_shader(shader, 'LINES', {"pos": vbo.asNumpyArray().reshape(-1, 3)},
-                                                indices = ibo.asNumpyArray().reshape(-1, 2))
+        batch = batch_for_shader(shader, 'LINES',
+            {"pos": vbo.asNumpyArray().reshape(-1, 3)},
+            indices = ibo.asNumpyArray().reshape(-1, 2))
 
         shader.bind()
         viewMatrix = bpy.context.region_data.perspective_matrix
-        shader.uniform_float("viewProjectionMatrix", viewMatrix)
-        shader.uniform_int("count", len(matrices))
+        shader.uniform_float("u_ViewProjectionMatrix", viewMatrix)
+        shader.uniform_int("u_Count", len(matrices))
 
-        glEnable(GL_LINE_SMOOTH)
         glLineWidth(self.width)
         batch.draw(shader)
-        glDisable(GL_LINE_SMOOTH)
 
     def delete(self):
         self.freeDrawingData()
