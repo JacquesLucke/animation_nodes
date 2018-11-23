@@ -53,8 +53,8 @@ class ViewerNode(bpy.types.Node, AnimationNode):
 
         col = layout.column(align = True)
         col.label(text = "Output Settings:")
-        col.prop(self, "outputConsole", "Console")
-        col.prop(self, "outputTextBlock", "Text Block")
+        col.prop(self, "outputConsole", text = "Console")
+        col.prop(self, "outputTextBlock", text = "Text Block")
 
     def getUIExtensions(self):
         if self.hide:
