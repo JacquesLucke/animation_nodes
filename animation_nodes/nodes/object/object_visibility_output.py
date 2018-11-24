@@ -3,12 +3,12 @@ from bpy.props import *
 from ... base_types import AnimationNode, VectorizedSocket
 
 attributes = [
-    ("Hide", "hide", "hide", "useHideList"),
+    ("Hide Viewport", "hide", "hide_viewport", "useHideViewportList"),
     ("Hide Render", "hideRender", "hide_render", "useHideRenderList"),
     ("Hide Select", "hideSelect", "hide_select", "useHideSelectList"),
     ("Show Name", "showName", "show_name", "useShowNameList"),
     ("Show Axis", "showAxis", "show_axis", "useShowAxisList"),
-    ("Show X-Ray", "showXRay", "show_x_ray", "useShowXRayList")
+    ("Show In Front", "showInFront", "show_in_front", "useShowInFrontList")
 ]
 
 class ObjectVisibilityOutputNode(bpy.types.Node, AnimationNode):
