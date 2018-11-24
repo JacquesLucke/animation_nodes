@@ -125,8 +125,8 @@ class CreateListNode(bpy.types.Node, AnimationNode):
     def drawAdvancedTypeSpecific(self, layout):
         if self.assignedType in ("Object", "Spline"):
             self.invokeFunction(layout, "createInputsForSelectedObjects", text = "From Selection", icon = "PLUS")
-        if self.assignedType == "Object Group":
-            self.invokeFunction(layout, "createInputsForSelectedObjectGroups", text = "From Selection", icon = "PLUS")
+        if self.assignedType == "Collection":
+            self.invokeFunction(layout, "createInputsForSelectedObjectCollections", text = "From Selection", icon = "PLUS")
 
     def createInputsForSelectedObjects(self):
         names = getSortedSelectedObjectNames()
@@ -134,14 +134,14 @@ class CreateListNode(bpy.types.Node, AnimationNode):
             socket = self.newInputSocket()
             socket.objectName = name
 
-    def createInputsForSelectedObjectGroups(self):
-        groups = self.getGroupsOfObjects(bpy.context.selected_objects)
-        for group in groups:
+    def createInputsForSelectedObjectCollections(self):
+        collections = self.getCollectionsOfObjects(bpy.context.selected_objects)
+        for collection in collections:
             socket = self.newInputSocket()
-            socket.groupName = group.name
+            socket.collectionName = collection.name
 
-    def getGroupsOfObjects(self, objects):
-        groups = set()
+    def getCollectionsOfObjects(self, objects):
+        collections = set()
         for object in objects:
-            groups.update(group for group in bpy.data.groups if object.name in group.objects)
-        return list(groups)
+            collections.update(col for col in bpy.data.collections if object.name in col.objects)
+        return list(collections)
