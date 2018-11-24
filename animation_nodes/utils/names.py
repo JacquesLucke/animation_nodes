@@ -19,8 +19,8 @@ def getPossibleMeshName(name = "mesh"):
 def getPossibleCameraName(name = "camera"):
     return getPossibleName(bpy.data.cameras, name)
 
-def getPossibleLampName(name = "lamp"):
-    return getPossibleName(bpy.data.lamps, name)
+def getPossibleLightName(name = "lamp"):
+    return getPossibleName(bpy.data.lights, name)
 
 def getPossibleNodeName(nodeTree, name = "node"):
     return getPossibleName(nodeTree.nodes, name)

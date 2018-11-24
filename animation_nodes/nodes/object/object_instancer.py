@@ -8,7 +8,7 @@ from ... utils.data_blocks import removeNotUsedDataBlock
 from ... nodes.container_provider import getMainObjectContainer
 from ... utils.names import (getPossibleMeshName,
                              getPossibleCameraName,
-                             getPossibleLampName,
+                             getPossibleLightName,
                              getPossibleCurveName)
 
 lastSourceHashes = {}
@@ -104,8 +104,8 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
             description = "This will make sure that the objects won't be removed if you remove the Instancer Node.")
 
         layout.separator()
-        self.invokeFunction(layout, "hideRelationshipLines",
-            text = "Hide Relationship Lines",
+        self.invokeFunction(layout, "toggleRelationshipLines",
+            text = "Toggle Relationship Lines",
             icon = "RESTRICT_VIEW_OFF")
 
     def getExecutionCode(self, required):
@@ -272,7 +272,6 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         if self.copyObjectProperties and self.copyFromSource:
             newObject = sourceObject.copy()
             newObject.data = instanceData
-            newObject.layers = sourceObject.layers
         else:
             newObject = self.createObject(name, instanceData)
 
@@ -283,8 +282,8 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
                     break
         if self.removeAnimationData and newObject.animation_data is not None:
             newObject.animation_data.action = None
-        newObject.select = False
-        newObject.hide = False
+        newObject.hide_select = False
+        newObject.hide_viewport = False
         newObject.hide_render = False
         if not self.copyFromSource and self.objectType == "Empty":
             newObject.empty_display_type = self.emptyDisplayType
@@ -308,7 +307,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
             elif self.objectType == "Camera":
                 data = bpy.data.cameras.new(getPossibleCameraName("instance camera"))
             elif self.objectType == "Point Lamp":
-                data = bpy.data.lamps.new(getPossibleLampName("instance lamp"), type = "POINT")
+                data = bpy.data.lights.new(getPossibleLightName("instance lamp"), type = "POINT")
             elif self.objectType.startswith("Curve"):
                 data = bpy.data.curves.new(getPossibleCurveName("instance curve"), type = "CURVE")
                 data.dimensions = self.objectType[-2:]
@@ -324,7 +323,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
             bpy.ops.object.mode_set(mode = "OBJECT")
         for scene in bpy.data.scenes:
             if object.name in scene.objects:
-                scene.objects.unlink(object)
+                scene.collection.objects.unlink(object)
 
     def resetObjectDataOnAllInstances(self):
         self.resetInstances = True
@@ -339,6 +338,6 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
     def duplicate(self, sourceNode):
         self.linkedObjects.clear()
 
-    def hideRelationshipLines(self):
+    def toggleRelationshipLines(self):
         for space in iterActiveSpacesByType("VIEW_3D"):
-            space.show_relationship_lines = False
+            space.overlay.show_relationship_lines = not space.overlay.show_relationship_lines

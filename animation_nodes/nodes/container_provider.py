@@ -15,7 +15,7 @@ def getMainObjectContainer(scene):
 
 def newMainObjectContainer():
     objectContainer = bpy.data.objects.new(mainObjectContainerName, None)
-    objectContainer.hide = True
+    objectContainer.hide_viewport = True
     objectContainer.hide_render = True
     objectContainer.hide_select = True
     return objectContainer
