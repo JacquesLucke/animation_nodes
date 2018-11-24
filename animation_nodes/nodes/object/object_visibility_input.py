@@ -15,7 +15,7 @@ class ObjectVisibilityInputNode(bpy.types.Node, AnimationNode):
             codeProperties = dict(allowListExtension = False)))
 
         self.newOutput(VectorizedSocket("Boolean", "useObjectList",
-            ("Hide", "hide"), ("Hide", "hide")))
+            ("Hide Viewport", "hideViewport"), ("Hide Viewport", "hideViewport")))
         self.newOutput(VectorizedSocket("Boolean", "useObjectList",
             ("Hide Render", "hideRender"), ("Hide Render", "hideRender")))
         self.newOutput(VectorizedSocket("Boolean", "useObjectList",
@@ -25,7 +25,7 @@ class ObjectVisibilityInputNode(bpy.types.Node, AnimationNode):
         self.newOutput(VectorizedSocket("Boolean", "useObjectList",
             ("Show Axis", "showAxis"), ("Show Axis", "showAxis")))
         self.newOutput(VectorizedSocket("Boolean", "useObjectList",
-            ("Show Xray", "showXray"), ("Show Xray", "showXray")))
+            ("Show In Front", "showInFront"), ("Show In Front", "showInFront")))
 
         for socket in self.outputs[2:]:
             socket.hide = True
@@ -35,12 +35,12 @@ class ObjectVisibilityInputNode(bpy.types.Node, AnimationNode):
             return
 
         yield "if object is not None:"
-        if "hide" in required:        yield "    hide = object.hide"
+        if "hideViewport" in required:        yield "    hideViewport = object.hide_viewport"
         if "hideSelect" in required:  yield "    hideSelect = object.hide_select"
         if "hideRender" in required:  yield "    hideRender = object.hide_render"
         if "showName" in required:    yield "    showName = object.show_name"
         if "showAxis" in required:    yield "    showAxis = object.show_axis"
-        if "showXray" in required:    yield "    showXray = object.show_x_ray"
+        if "showInFront" in required:    yield "    showInFront = object.show_in_front"
 
         yield "else:"
-        yield "    hide = hideSelect = hideRender = showName = showAxis = showXray = False"
+        yield "    hideViewport = hideSelect = hideRender = showName = showAxis = showInFront = False"
