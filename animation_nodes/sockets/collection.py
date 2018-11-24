@@ -12,7 +12,7 @@ class CollectionSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = False
     comparable = True
 
-    collectionName = StringProperty(update = propertyChanged)
+    collectionName: StringProperty(update = propertyChanged)
 
     def drawProperty(self, layout, text, node):
         layout.prop_search(self, "collectionName", bpy.data, "collections", text = text)
