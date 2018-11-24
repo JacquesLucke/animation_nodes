@@ -311,7 +311,6 @@ class ObjectMenu(bpy.types.Menu):
 
         insertNode(layout, "an_DataInputNode", "Object", {"assignedType" : repr("Object")})
         insertNode(layout, "an_CreateListNode", "List", {"assignedType" : repr("Object")})
-        insertNode(layout, "an_GetObjectsFromGroupNode", "From Group")
         layout.separator()
         insertNode(layout, "an_ObjectTransformsInputNode", "Transforms Input")
         insertNode(layout, "an_ObjectTransformsOutputNode", "Transforms Output")
@@ -323,7 +322,6 @@ class ObjectMenu(bpy.types.Menu):
         layout.separator()
         insertNode(layout, "an_ObjectVisibilityInputNode", "Visibility Input")
         insertNode(layout, "an_ObjectVisibilityOutputNode", "Visibility Output")
-        insertNode(layout, "an_ObjectLayerVisibilityOutputNode", "Layer Visibility Output")
         layout.separator()
         insertNode(layout, "an_ShapeKeysFromObjectNode", "Shape Keys from Object")
         insertNode(layout, "an_ShapeKeyOutputNode", "Shape Key Output")
