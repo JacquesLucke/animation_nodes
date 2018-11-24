@@ -70,7 +70,7 @@ class Rectangle:
             (self.x2, self.y1),
             (self.x1, self.y2),
             (self.x2, self.y2))
-        batch = batch_for_shader(shader, 'TRI_STRIP',{"pos": locations})
+        batch = batch_for_shader(shader, 'TRI_STRIP', {"pos": locations})
 
         shader.bind()
         shader.uniform_float("color", color)

@@ -82,7 +82,6 @@ class SelectArea(bpy.types.Operator):
         return None, None, None
 
     def drawCallback(self):
-        return
         if not hasattr(self, "mousePosition"):
             return
         if bpy.context.window != self.window:
@@ -149,7 +148,6 @@ def drawSelection(area, xOffset, yOffset, border, factor):
     #############################################
 
     glEnable(GL_LINE_SMOOTH)
-    glEnable(GL_POLYGON_SMOOTH)
     glLineWidth(lineThickness * getDpiFactor())
 
     # Draw Polygon
@@ -159,31 +157,27 @@ def drawSelection(area, xOffset, yOffset, border, factor):
     if border == "TOP":    drawPolygon(polyTop, polyColor)
     if border == "CENTER": drawPolygon(polyCenter, polyColor)
 
-    # Draw Factor Indicator
-    glColor4f(*lineColor)
-
     factorIndicatorX = areaLeft + area.width * factor
     factorIndicatorY = areaBottom + area.height * factor
     if border in ("LEFT", "RIGHT"):
         height = area.height * (0.5 - factor) * 2
-        drawVerticalLine(factorIndicatorX, factorIndicatorY, height)
+        drawVerticalLine(factorIndicatorX, factorIndicatorY, height, color = lineColor)
     if border in ("BOTTOM", "TOP"):
         width = area.width * (0.5 - factor) * 2
-        drawHorizontalLine(factorIndicatorX, factorIndicatorY, width)
+        drawHorizontalLine(factorIndicatorX, factorIndicatorY, width, color = lineColor)
 
     # Draw Center Rectangle
-    drawHorizontalLine(centerLeft, centerBottom, centerWidth)
-    drawHorizontalLine(centerLeft, centerTop, centerWidth)
-    drawVerticalLine(centerLeft, centerBottom, centerHeight)
-    drawVerticalLine(centerRight, centerBottom, centerHeight)
+    drawHorizontalLine(centerLeft, centerBottom, centerWidth, color = lineColor)
+    drawHorizontalLine(centerLeft, centerTop, centerWidth, color = lineColor)
+    drawVerticalLine(centerLeft, centerBottom, centerHeight, color = lineColor)
+    drawVerticalLine(centerRight, centerBottom, centerHeight, color = lineColor)
 
     # Draw Diagonals
-    drawLine(areaLeft, areaBottom, centerLeft, centerBottom)
-    drawLine(centerRight, centerTop, areaRight, areaTop)
-    drawLine(areaLeft, areaTop, centerLeft, centerTop)
-    drawLine(centerRight, centerBottom, areaRight, areaBottom)
+    drawLine(areaLeft, areaBottom, centerLeft, centerBottom, color = lineColor)
+    drawLine(centerRight, centerTop, areaRight, areaTop, color = lineColor)
+    drawLine(areaLeft, areaTop, centerLeft, centerTop, color = lineColor)
+    drawLine(centerRight, centerBottom, areaRight, areaBottom, color = lineColor)
 
-    glDisable(GL_POLYGON_SMOOTH)
     glDisable(GL_LINE_SMOOTH)
     glLineWidth(1)
 
