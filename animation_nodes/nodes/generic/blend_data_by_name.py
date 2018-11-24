@@ -5,6 +5,7 @@ from ... base_types import AnimationNode
 dataTypes = {
     "Object" : "objects",
     "Scene" : "scenes",
+    "Collection" : "collections",
     "Text Block" : "texts" }
 
 class BlendDataByNameNode(bpy.types.Node, AnimationNode):

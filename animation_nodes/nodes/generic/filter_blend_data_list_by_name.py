@@ -4,7 +4,7 @@ from ... base_types import AnimationNode
 from ... sockets.info import toListDataType
 from ... events import executionCodeChanged
 
-dataTypes = ["Object", "Scene", "Text Block"]
+dataTypes = ["Object", "Scene", "Text Block", "Collection"]
 
 filterTypeItems = [("STARTS_WITH", "Starts With", "All Objects with names starting with"),
                    ("ENDS_WITH", "Ends With", "All Objects with names ending with")]
