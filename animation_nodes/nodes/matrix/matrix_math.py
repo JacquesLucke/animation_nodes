@@ -36,7 +36,7 @@ class MatrixMathNode(bpy.types.Node, AnimationNode):
             elif self.useListA or self.useListB:
                 yield "results = self.multMatrixWithList(a, b)"
             else:
-                yield "result = a * b"
+                yield "result = a @ b"
 
     def multMatrixLists(self, listA, listB):
         if len(listA) != len(listB):

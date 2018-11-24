@@ -24,7 +24,7 @@ class TransformMatrixNode(bpy.types.Node, AnimationNode):
             return "execute_Matrix"
 
     def execute_Matrix(self, inMatrix, transformation):
-        return transformation * inMatrix
+        return transformation @ inMatrix
 
     def execute_MatrixList(self, inMatrices, _transformation):
         return multiplyMatrixWithList(inMatrices, _transformation, type = "LEFT")
