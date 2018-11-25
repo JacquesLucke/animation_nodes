@@ -120,7 +120,7 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
 
         # UV Maps
         for name, data in mesh.getUVMaps():
-            outMesh.uv_textures.new(name)
+            outMesh.uv_layers.new(name = name)
             outMesh.uv_layers[name].data.foreach_set("uv", data.asMemoryView())
 
         if self.validateMesh:
