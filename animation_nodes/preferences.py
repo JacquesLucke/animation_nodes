@@ -181,7 +181,7 @@ class AnimationNodesPreferences(bpy.types.AddonPreferences):
         col.prop(self.developer, "runTests")
 
         col = layout.column(align = True)
-        col.split(0.25).prop(self, "showUninstallInfo", text = "How to Uninstall?",
+        col.split(factor = 0.25).prop(self, "showUninstallInfo", text = "How to Uninstall?",
             toggle = True, icon = "INFO")
         if self.showUninstallInfo:
             col.label(text = "1. Disable Animation Nodes and save the user settings.")

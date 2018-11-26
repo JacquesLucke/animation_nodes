@@ -104,7 +104,7 @@ class SoundBakeNode(bpy.types.Node, AnimationNode):
                 row = subcol.row(align = True)
                 row.alignment = "RIGHT"
                 row.label(text = str(i) + ":")
-                right = row.split(percentage = 0.5, align = True)
+                right = row.split(factor = 0.5, align = True)
                 right.prop(item, "low")
                 right.prop(item, "high")
 

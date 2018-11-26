@@ -35,7 +35,7 @@ class SetKeyframesNode(bpy.types.Node, AnimationNode):
         col = layout.column(align = True)
         for i, item in enumerate(self.paths):
             row = col.row(align = True)
-            split = row.split(align = True, percentage = 0.7)
+            split = row.split(align = True, factor = 0.7)
             split.prop(item, "path", text = "")
             split.prop(item, "index", text = "")
             self.invokeFunction(row, "removeItemFromList", icon = "X", data = str(i))
