@@ -182,7 +182,7 @@ cdef class Spline:
     def sampleNormals(self, FloatList parameters,
                      bint checkRange = True, parameterType = "RESOLUTION"):
         self.checkNormals()
-        cdef FloatList _parameters = self._prepareParameters(parameters, checkRange, parameterType)
+        cdef FloatList _parameters = prepareSampleParameters(self, parameters, checkRange, parameterType)
         cdef Vector3DList result = Vector3DList(length = parameters.length)
         evaluateFunction_Array(self, self.evaluateNormal_LowLevel,
             _parameters.data, result.data, _parameters.length)
