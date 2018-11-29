@@ -8,7 +8,6 @@ class DeveloperPanel(bpy.types.Panel):
     bl_label = "Developer"
     bl_space_type = "NODE_EDITOR"
     bl_region_type = "TOOLS"
-    bl_category = "Animation Nodes"
     bl_options = {"DEFAULT_CLOSED"}
 
     @classmethod

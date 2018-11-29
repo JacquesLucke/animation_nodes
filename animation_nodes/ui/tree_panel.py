@@ -9,7 +9,6 @@ class TreePanel(bpy.types.Panel):
     bl_label = "Animation Node Tree"
     bl_space_type = "NODE_EDITOR"
     bl_region_type = "TOOLS"
-    bl_category = "Animation Nodes"
 
     @classmethod
     def poll(cls, context):
