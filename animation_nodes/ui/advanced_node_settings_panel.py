@@ -5,6 +5,7 @@ class NodeSettingsPanel(bpy.types.Panel):
     bl_label = "Advanced Node Settings"
     bl_space_type = "NODE_EDITOR"
     bl_region_type = "UI"
+    bl_category = "Node"
     bl_options = {"DEFAULT_CLOSED"}
 
     @classmethod
