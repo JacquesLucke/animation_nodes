@@ -3,6 +3,7 @@ import re
 import sys
 import glob
 import time
+import numpy
 from . generic import *
 
 def execute_Compile(setupInfoList, addonDirectory):
@@ -19,6 +20,7 @@ def execute_Compile(setupInfoList, addonDirectory):
 
 def getCompileTasks(setupInfoList, addonDirectory):
     includeDirs = list(iterCustomIncludeDirs(setupInfoList))
+    includeDirs.append(numpy.get_include())
 
     tasks = []
     for path in iterFilesToCompile(addonDirectory):
