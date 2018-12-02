@@ -82,6 +82,7 @@ class NumberMenu(bpy.types.Menu):
         layout.separator()
         insertNode(layout, "an_FloatMathNode", "Math")
         insertNode(layout, "an_NumberListMathNode", "List Math")
+        insertNode(layout, "an_SortNode", "Sort")
         insertNode(layout, "an_FloatClampNode", "Clamp")
         insertNode(layout, "an_RoundNumberNode", "Round")
         insertNode(layout, "an_ConvertAngleNode", "Convert Angle")
