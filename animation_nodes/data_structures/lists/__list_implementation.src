@@ -485,9 +485,9 @@ TO_PYOBJECT_CODE
     @classmethod
     def fromNumpyArray(cls, MEMVIEW [:] input):
         cdef MEMVIEW* inputPointer = &input[0]
-        cdef int l = input.shape[0] // (sizeof(TYPE) // sizeof(MEMVIEW))
-        cdef LISTNAME values = LISTNAME(length = l)
-        memcpy(values.data, inputPointer, l * sizeof(TYPE))
+        cdef int length = input.shape[0] // (sizeof(TYPE) // sizeof(MEMVIEW))
+        cdef LISTNAME values = LISTNAME(length = length)
+        memcpy(values.data, inputPointer, length * sizeof(TYPE))
         return values
 
 
