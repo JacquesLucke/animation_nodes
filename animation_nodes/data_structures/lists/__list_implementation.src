@@ -482,6 +482,14 @@ TO_PYOBJECT_CODE
             newList.tryConversion(value, newList.data + i)
         return newList
 
+    @classmethod
+    def fromNumpyArray(cls, MEMVIEW [:] input):
+        cdef MEMVIEW* inputPointer = &input[0]
+        cdef int l = input.shape[0] // (sizeof(TYPE) // sizeof(MEMVIEW))
+        cdef LISTNAME values = LISTNAME(length = l)
+        memcpy(values.data, inputPointer, l * sizeof(TYPE))
+        return values
+
 
     # String Representations
     ###############################################

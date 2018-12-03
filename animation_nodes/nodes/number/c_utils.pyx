@@ -1,7 +1,3 @@
-import numpy
-cimport numpy
-import cython
-from libc.string cimport memcpy
 from ... data_structures cimport (
     DoubleList,
     LongList,
@@ -86,19 +82,3 @@ def mapRange_DoubleList_Interpolated(DoubleList values, Interpolation interpolat
          newValues.data[i] = outMin + interpolation.evaluate((x - inMin) * factor1) * factor2
 
      return newValues
-
-def longListFromNumpyArray(numpy.ndarray[long, ndim=1, mode="c"] input):
-    cdef long* inputPointer = &input[0]
-    cdef int l = input.shape[0]
-    cdef Py_ssize_t nbytes = input.nbytes
-    cdef LongList values = LongList(length = l)
-    memcpy(values.data, inputPointer, nbytes)
-    return values
-
-def doubleListFromNumpyArray(numpy.ndarray[double, ndim=1, mode="c"] input):
-    cdef double* inputPointer = &input[0]
-    cdef int l = input.shape[0]
-    cdef Py_ssize_t nbytes = input.nbytes
-    cdef DoubleList values = DoubleList(length = l)
-    memcpy(values.data, inputPointer, nbytes)
-    return values
