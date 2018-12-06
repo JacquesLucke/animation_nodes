@@ -77,10 +77,6 @@ def getLinkedSockets(socket):
 def getDirectlyLinkedSocketsIDs(socket):
     return _forestData.linkedSocketsWithReroutes[socket.toID()]
 
-def iterSocketsThatNeedUpdate():
-    for socketID in _forestData.socketsThatNeedUpdate:
-        yield idToSocket(socketID)
-
 def getUndefinedNodes(nodeByID):
     return [nodeByID[nodeID] for nodeID in _forestData.nodesByType["NodeUndefined"]]
 
