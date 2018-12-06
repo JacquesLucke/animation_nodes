@@ -18,9 +18,6 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def drawProperty(self, layout, text, node):
         row = layout.row(align = True)
-
-        scene = self.nodeTree.scene
-        if scene is None: scene = bpy.context.scene
         row.prop(self, "object", text = text)
 
         if self.objectCreationType != "":
