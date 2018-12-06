@@ -2,7 +2,6 @@ import bpy
 from bpy.props import *
 from .. events import propertyChanged
 from .. data_structures import BezierSpline, PolySpline
-from .. utils.id_reference import tryToFindObjectReference
 from .. base_types import AnimationNodeSocket, PythonListSocket
 from .. data_structures.splines.from_blender import (createSplinesFromBlenderObject,
                                                      createSplineFromBlenderSpline)
@@ -15,7 +14,7 @@ class SplineSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = True
     comparable = False
 
-    objectName: StringProperty(default = "",
+    object: PointerProperty(type = bpy.types.Object,
         description = "Use the first spline from this object",
         update = propertyChanged)
 
@@ -25,56 +24,46 @@ class SplineSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def drawProperty(self, layout, text, node):
         row = layout.row(align = True)
-        row.prop_search(self, "objectName",  bpy.context.scene, "objects", icon = "NONE", text = text)
+        row.prop(self, "object", text = text)
         self.invokeFunction(row, node, "handleEyedropperButton", icon = "EYEDROPPER", passEvent = True,
             description = "Assign active object to this socket (hold CTRL to open a rename object dialog)")
-        if self.objectName != "":
+        if self.object:
             row.prop(self, "useWorldSpace", text = "", icon = "WORLD")
 
     def getValue(self):
-        object = self.getObject()
-        if getattr(object, "type", "") != "CURVE":
+        if getattr(self.object, "type", "") != "CURVE":
             return BezierSpline()
 
-        bSplines = object.data.splines
+        bSplines = self.object.data.splines
         if len(bSplines) > 0:
             spline = createSplineFromBlenderSpline(bSplines[0])
             # is None when the spline type is not supported
             if spline is not None:
                 if self.useWorldSpace:
-                    spline.transform(object.matrix_world)
+                    spline.transform(self.object.matrix_world)
                 return spline
 
         return BezierSpline()
 
-    def getObject(self):
-        if self.objectName == "": return None
-
-        object = tryToFindObjectReference(self.objectName)
-        name = getattr(object, "name", "")
-        if name != self.objectName: self.objectName = name
-        return object
-
     def setProperty(self, data):
-        self.objectName, self.useWorldSpace = data
+        self.object, self.useWorldSpace = data
 
     def getProperty(self):
-        return self.objectName, self.useWorldSpace
+        return self.object, self.useWorldSpace
 
     def updateProperty(self):
-        self.getObject()
-
+        self.object
 
     def handleEyedropperButton(self, event):
         if event.ctrl:
             bpy.ops.an.rename_datablock_popup("INVOKE_DEFAULT",
-                oldName = self.objectName,
+                oldName = self.object.name,
                 path = "bpy.data.objects",
                 icon = "OUTLINER_OB_CURVE")
         else:
             object = bpy.context.active_object
             if getattr(object, "type", "") == "CURVE":
-                self.objectName = object.name
+                self.object = object
 
     @classmethod
     def getDefaultValue(cls):
@@ -100,7 +89,7 @@ class SplineListSocket(bpy.types.NodeSocket, PythonListSocket):
     storable = True
     comparable = False
 
-    objectName: StringProperty(default = "",
+    object: PointerProperty(type = bpy.types.Object,
         description = "Use the splines from this object",
         update = propertyChanged)
 
@@ -110,38 +99,29 @@ class SplineListSocket(bpy.types.NodeSocket, PythonListSocket):
 
     def drawProperty(self, layout, text, node):
         row = layout.row(align = True)
-        row.prop_search(self, "objectName",  bpy.context.scene, "objects", icon = "NONE", text = text)
+        row.prop(self, "object", text = text)
         self.invokeFunction(row, node, "assignActiveObject", icon = "EYEDROPPER")
-        if self.objectName != "":
+        if self.object:
             row.prop(self, "useWorldSpace", text = "", icon = "WORLD")
 
     def getValue(self):
-        object = self.getObject()
-        splines = createSplinesFromBlenderObject(object)
+        splines = createSplinesFromBlenderObject(self.object)
         if self.useWorldSpace:
             for spline in splines:
-                spline.transform(object.matrix_world)
+                spline.transform(self.object.matrix_world)
         return splines
 
-    def getObject(self):
-        if self.objectName == "": return None
-
-        object = tryToFindObjectReference(self.objectName)
-        name = getattr(object, "name", "")
-        if name != self.objectName: self.objectName = name
-        return object
-
     def setProperty(self, data):
-        self.objectName, self.useWorldSpace = data
+        self.object, self.useWorldSpace = data
 
     def getProperty(self):
-        return self.objectName, self.useWorldSpace
+        return self.object, self.useWorldSpace
 
 
     def assignActiveObject(self):
         object = bpy.context.active_object
         if getattr(object, "type", "") == "CURVE":
-            self.objectName = object.name
+            self.object = object
 
     @classmethod
     def getCopyExpression(cls):
