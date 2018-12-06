@@ -56,6 +56,3 @@ def getNamesHash():
 def updateProperties():
     for socket in iterSocketsThatNeedUpdate():
         socket.updateProperty()
-
-    for tree in getAnimationNodeTrees():
-        tree.autoExecution.customTriggers.updateProperties()

@@ -1,7 +1,6 @@
 import bpy
 from bpy.props import *
 from .. utils.blender_ui import getDpiFactor
-from .. utils.id_reference import tryToFindObjectReference
 
 triggerTypeItems = [
     ("MONITOR_PROPERTY", "Monitor Property", "", "", 0)]
@@ -16,7 +15,8 @@ class AutoExecutionTrigger_MonitorProperty(bpy.types.PropertyGroup):
     idType: EnumProperty(name = "ID Type", default = "OBJECT",
         items = idTypeItems)
 
-    idObjectName: StringProperty(name = "ID Object Name", default = "")
+    object: PointerProperty(type = bpy.types.Object, name = "Object")
+    scene: PointerProperty(type = bpy.types.Scene, name = "Scene")
     dataPath: StringProperty(name = "Data Path", default = "")
 
     lastState: StringProperty(default = "")
@@ -52,14 +52,9 @@ class AutoExecutionTrigger_MonitorProperty(bpy.types.PropertyGroup):
 
     def getObject(self):
         if self.idType == "OBJECT":
-            return bpy.data.objects.get(self.idObjectName)
+            return self.object
         elif self.idType == "SCENE":
-            return bpy.data.scenes.get(self.idObjectName)
-
-    def updateNameProperty(self):
-        if self.idType == "OBJECT":
-            object = tryToFindObjectReference(self.idObjectName)
-            self.idObjectName = getattr(object, "name", "")
+            return self.scene
 
     def draw(self, layout, index):
         row = layout.row(align = True)
@@ -75,9 +70,9 @@ class AutoExecutionTrigger_MonitorProperty(bpy.types.PropertyGroup):
         props.index = index
 
         if self.idType == "OBJECT":
-            row.prop_search(self, "idObjectName", bpy.context.scene, "objects", text = "")
+            row.prop(self, "object", text = "")
         elif self.idType == "SCENE":
-            row.prop_search(self, "idObjectName", bpy.data, "scenes", text = "")
+            row.prop(self, "scene", text = "")
 
         row.prop(self, "dataPath", text = "")
 
@@ -101,10 +96,6 @@ class CustomAutoExecutionTriggers(bpy.types.PropertyGroup):
     def update(self):
         triggers = [trigger.update() for trigger in self.monitorPropertyTriggers]
         return any(triggers)
-
-    def updateProperties(self):
-        for trigger in self.monitorPropertyTriggers:
-            trigger.updateNameProperty()
 
 
 class AutoExecutionProperties(bpy.types.PropertyGroup):
@@ -205,7 +196,7 @@ class AssignActiveObjectToAutoExecutionTrigger(bpy.types.Operator):
         tree = context.space_data.node_tree
         trigger = tree.autoExecution.customTriggers.monitorPropertyTriggers[self.index]
         if trigger.idType == "OBJECT":
-            trigger.idObjectName = getattr(context.active_object, "name", "")
+            trigger.object = context.active_object
         if trigger.idType == "SCENE":
-            trigger.idObjectName = getattr(context.scene, "name", "")
+            trigger.scene = context.scene
         return {"FINISHED"}
