@@ -12,19 +12,19 @@ class CollectionSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = False
     comparable = True
 
-    collectionName: StringProperty(update = propertyChanged)
+    collection: PointerProperty(type = Collection, update = propertyChanged)
 
     def drawProperty(self, layout, text, node):
-        layout.prop_search(self, "collectionName", bpy.data, "collections", text = text)
+        layout.prop(self, "collection", text = text)
 
     def getValue(self):
-        return bpy.data.collections.get(self.collectionName)
+        return self.collection
 
     def setProperty(self, data):
-        self.collectionName = data
+        self.collection = data
 
     def getProperty(self):
-        return self.collectionName
+        return self.collection
 
     @classmethod
     def getDefaultValue(cls):
