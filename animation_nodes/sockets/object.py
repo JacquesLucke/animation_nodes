@@ -2,7 +2,6 @@ import bpy
 from bpy.props import *
 from bpy.types import Object
 from .. events import propertyChanged
-from .. utils.id_reference import tryToFindObjectReference
 from .. base_types import AnimationNodeSocket, PythonListSocket
 
 class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
@@ -13,7 +12,7 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = False
     comparable = True
 
-    objectName: StringProperty(update = propertyChanged)
+    object: PointerProperty(type = Object, update = propertyChanged)
     objectCreationType: StringProperty(default = "")
     showHideToggle: BoolProperty(default = False)
 
@@ -22,7 +21,7 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
         scene = self.nodeTree.scene
         if scene is None: scene = bpy.context.scene
-        row.prop_search(self, "objectName", scene, "objects", icon = "NONE", text = text)
+        row.prop(self, "object", text = text)
 
         if self.objectCreationType != "":
             self.invokeFunction(row, node, "createObject", icon = "PLUS")
@@ -38,18 +37,13 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             description = "Assign active object to this socket (hold CTRL to open a rename object dialog)")
 
     def getValue(self):
-        if self.objectName == "": return None
-
-        object = tryToFindObjectReference(self.objectName)
-        name = getattr(object, "name", "")
-        if name != self.objectName: self.objectName = name
-        return object
+        return self.object
 
     def setProperty(self, data):
-        self.objectName = data
+        self.object = data
 
     def getProperty(self):
-        return self.objectName
+        return self.object
 
     def updateProperty(self):
         self.getValue()
@@ -57,12 +51,12 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def handleEyedropperButton(self, event):
         if event.ctrl:
             bpy.ops.an.rename_datablock_popup("INVOKE_DEFAULT",
-                oldName = self.objectName,
+                oldName = self.object.name,
                 path = "bpy.data.objects",
                 icon = "OBJECT_DATA")
         else:
             object = bpy.context.active_object
-            if object: self.objectName = object.name
+            if object: self.object = object
 
     def createObject(self):
         type = self.objectCreationType
@@ -73,11 +67,10 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             data.fill_mode = "FULL"
         object = bpy.data.objects.new("Target", data)
         bpy.context.collection.objects.link(object)
-        self.objectName = object.name
+        self.object = object
 
     def toggleObjectVisibilty(self):
-        object = self.getValue()
-        if object is None: return
+        if self.object is None: return
         object.hide_viewport = not object.hide_viewport
         object.hide_render = object.hide_viewport
 
