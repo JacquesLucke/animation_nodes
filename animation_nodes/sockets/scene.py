@@ -12,7 +12,7 @@ class SceneSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = False
     comparable = True
 
-    sceneName: StringProperty(name = "Scene", update = propertyChanged)
+    scene: PointerProperty(type = Scene, update = propertyChanged)
     useGlobalScene: BoolProperty(name = "Use Global Scene", default = True,
         description = "Use the global scene for this node tree", update = propertyChanged)
 
@@ -22,19 +22,19 @@ class SceneSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             if text != "": text += ": "
             row.label(text = text + repr(self.nodeTree.scene.name))
         else:
-            row.prop_search(self, "sceneName",  bpy.data, "scenes", text = text)
+            row.prop(self, "scene", text = text)
         row.prop(self, "useGlobalScene", text = "", icon = "WORLD")
 
     def getValue(self):
         if self.useGlobalScene:
             return self.nodeTree.scene
-        return bpy.data.scenes.get(self.sceneName)
+        return self.scene
 
     def setProperty(self, data):
-        self.sceneName, self.useGlobalScene = data
+        self.scene, self.useGlobalScene = data
 
     def getProperty(self):
-        return self.sceneName, self.useGlobalScene
+        return self.scene, self.useGlobalScene
 
     @classmethod
     def getDefaultValue(cls):
